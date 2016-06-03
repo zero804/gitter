@@ -10,18 +10,61 @@
 @subdued-text-color: rgba(255, 255, 255, .5);
 
 @step-content-area-max-width: 800px;
-
+@step-fixed-progression-breakpoint: 500px;
 
 @primary-input-font-size: 3.789rem;
 @primary-input-height: 6rem;
 @primary-input-spacing-top: 3rem;
 @primary-input-spacing-bottom: 0;
+.primary-input-font-size() {
+  font-size: @primary-input-font-size;
+
+  @media (max-width: 670px) {
+    font-size: 3.2rem;
+  }
+  @media (max-width: 480px) {
+    font-size: 2.8rem;
+  }
+  @media (max-width: 400px) {
+    font-size: 2.5rem;
+  }
+}
+.primary-input-height() {
+  height: @primary-input-height;
+
+  @media (max-width: 670px) {
+    height: 5.5rem;
+  }
+  @media (max-width: 480px) {
+    height: 5rem;
+  }
+}
+.primary-input-spacing-top() {
+  margin-top: @primary-input-spacing-top;
+
+  @media (max-width: 670px) {
+    margin-top: 1.8rem;
+  }
+  @media (max-width: 480px) {
+    margin-top: 1rem;
+  }
+}
 
 @secondary-input-font-size: 1.6rem;
 @secondary-input-height: 3rem;
 @secondary-input-spacing-top: 2.5rem;
 @secondary-input-spacing-bottom: 2rem;
 
+.secondary-input-spacing-top() {
+  margin-top: @secondary-input-spacing-top;
+
+  @media (max-width: 670px) {
+    margin-top: 2rem;
+  }
+  @media (max-width: 480px) {
+    margin-top: 1.5rem;
+  }
+}
 
 @number-github-projects-per-row: 3;
 
@@ -56,6 +99,9 @@
 @invited-email-item-height: @invited-email-item-font-size;
 @invited-area-total-height: @people-list-item-height + @invite-user-item-spacing + @invited-email-item-height;
 @invited-area-spacing-top: 2.5rem;
+
+
+
 
 
 
@@ -180,15 +226,19 @@
   opacity: 0;
   pointer-events: none;
 
-  will-change: transform, opacity;
+  will-change: opacity;
   transition:
     visibility 0s ease .2s,
     opacity .2s ease;
 
 
   & > .community-create-step-content-area {
-    transform: translateX(200px);
-    transition: transform .2s ease;
+    // This suuuucks but webkit has a bug
+    // where you can't `position: fixed` inside a transformed element
+    & > * {
+      transform: translateX(200px);
+      transition: transform .2s ease;
+    }
   }
 
   &.active {
@@ -206,15 +256,18 @@
 
     transition:
       visibility 0s ease 0s,
-      opacity .2s ease,
-      transform .2s ease;
+      opacity .2s ease;
 
     & > .community-create-step-content-area {
-      transform: translateX(0);
+      // This suuuucks but webkit has a bug
+      // where you can't `position: fixed` inside a transformed element
+      & > * {
+        transform: translateX(0);
 
-      animation-name: community-create-step-move-in-animation;
-      animation-duration: .2s;
-      animation-timing-function: ease;
+        animation-name: community-create-step-move-in-animation;
+        animation-duration: .2s;
+        animation-timing-function: ease;
+      }
     }
   }
 
@@ -243,8 +296,16 @@
     width: 95%;
   }
 
+  padding-top: 9rem;
+  padding-bottom: 3rem;
+
   // Sometimes the wrapper can be a form, forms.less reset :(
   margin: 0;
+
+
+  @media (max-width: @step-fixed-progression-breakpoint) {
+    padding-bottom: 9rem;
+  }
 }
 
 @keyframes community-create-step-move-in-animation {
@@ -339,6 +400,8 @@
 
 
 .primary-community-heading {
+  .primary-input-font-size();
+
   max-width: 600px;
   min-height: 2em;
 
@@ -353,6 +416,8 @@
 
 
 .primary-tabbed-navigation-list(@font-size: 3rem) {
+  .primary-input-font-size();
+
   display: flex;
 
   margin-top: 0;
@@ -361,7 +426,6 @@
   padding-left: 0;
   list-style: none;
 
-  font-size: @primary-input-font-size;
   line-height: 1;
   font-weight: 300;
 }
@@ -379,12 +443,11 @@
   }
 }
 
-.primary-tabbed-navigation-button(@vertical-padding: .5em) {
+.primary-tabbed-navigation-button() {
+  .primary-input-height();
+
   display: block;
-  padding-top: @vertical-padding;
-  padding-left: 1em;
-  padding-bottom: @vertical-padding;
-  padding-right: 1em;
+  padding: 0 1em;
 
   background-color: transparent;
   border: 0;
@@ -413,7 +476,7 @@
   }
 }
 .primary-tabbed-navigation-button {
-  .primary-tabbed-navigation-button((@primary-input-height - @primary-input-font-size) / 2);
+  .primary-tabbed-navigation-button();
 }
 
 
@@ -426,15 +489,46 @@
   align-content: center;
 
   margin-top: 4rem;
+
+  @media (max-width: @step-fixed-progression-breakpoint) {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+
+    width: 100%;
+    padding: 1.5rem 2rem;
+
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(44, 23, 58, 0.8) 50%
+    );
+
+    // For the chrome bug where you can't mix `position: fixed` and transform :(
+    transform: unset;
+  }
 }
 
 .community-create-next-button {
 
 }
+.community-create-next-button--constrained {
+  .community-create-next-button();
+  @media (max-width: @step-fixed-progression-breakpoint) {
+    padding-left: 1.8em;
+    padding-right: 1.8em;
+  }
+}
 
 .community-create-back-button {
   .secondary-community-create-button();
   padding-left: 0;
+}
+.community-create-back-button--constrained {
+  .community-create-back-button();
+  @media (max-width: @step-fixed-progression-breakpoint) {
+    padding-right: 1em;
+  }
 }
 
 
@@ -444,17 +538,22 @@
 
 .primary-community-name-input {
   .primary-bare-input();
-  margin-top: @primary-input-spacing-top;
+  .primary-input-spacing-top();
+  .primary-input-font-size();
+  .primary-input-height();
+
   margin-bottom: @primary-input-spacing-bottom;
+
 }
 
 .community-creation-slug-input-wrapper {
+  .secondary-input-spacing-top();
+
   position: relative;
   display: flex;
   align-items: baseline;
   // aligning to baseline makes the whole thing a bit taller so just shrink this down to explicit height
   height: @secondary-input-height;
-  margin-top: @secondary-input-spacing-top;
   margin-bottom: @secondary-input-spacing-bottom;
 
   &:after {
@@ -533,8 +632,9 @@
 
 .community-creation-sub-room-input {
   .secondary-bare-input();
+  .secondary-input-spacing-top();
+
   flex: 1;
-  margin-top: @secondary-input-spacing-top;
   margin-bottom: @secondary-input-spacing-bottom;
 }
 
@@ -587,7 +687,7 @@
 
 .community-create-github-projects-tabbed-navigation-list {
   .primary-tabbed-navigation-list();
-  margin-top: @primary-input-spacing-top;
+  .primary-input-spacing-top();
   margin-bottom: @primary-input-spacing-bottom;
 }
 
@@ -706,8 +806,9 @@
 
 
 .community-create-org-list-root {
+  .secondary-input-spacing-top();
+
   height: @org-area-total-height + @org-area-padding;
-  margin-top: @secondary-input-spacing-top;
   //margin-top: @secondary-input-height + @secondary-input-spacing-top + @secondary-input-spacing-bottom;
   padding: (@org-area-padding - (@org-item-spacing / 2)) @org-area-padding;
 
@@ -743,7 +844,7 @@
 
 .primary-community-repo-name-filter-input {
   .secondary-bare-input();
-  margin-top: @secondary-input-spacing-top;
+  .secondary-input-spacing-top();
   margin-bottom: @secondary-input-spacing-bottom;
 }
 
@@ -822,9 +923,10 @@
 
 
 .community-create-invite-user-result-list-root {
+  .secondary-input-spacing-top();
+
   height: @invite-user-area-total-height + @org-area-padding;
 
-  margin-top: @secondary-input-spacing-top;
   //margin-top: @secondary-input-height + @secondary-input-spacing-top + @secondary-input-spacing-bottom;
   padding: (@org-area-padding - (@invite-user-item-spacing / 2)) @org-area-padding;
 
@@ -977,8 +1079,8 @@
 
 @overview-extra-space-section-offset: 2rem;
 .community-create-overview-info-area {
+  .primary-input-spacing-top();
   height: @overview-extra-space-section-offset + @primary-input-height + @primary-input-spacing-bottom + @secondary-input-height + @secondary-input-spacing-top + @secondary-input-spacing-bottom;
-  margin-top: @primary-input-spacing-top;
 }
 
 .community-create-overview-invite-area {
