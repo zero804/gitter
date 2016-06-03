@@ -1,11 +1,6 @@
 /* eslint no-console: ["error", { allow: ["log", "warn", "error"] }] */
 'use strict';
 
-if (require.main !== module) {
-  console.log('This should only be executed standalone');
-  process.exit(1);
-}
-
 var Benchmark = require('benchmark');
 var benchmarks = require('beautify-benchmark');
 var metrics = require('datadog-metrics');
