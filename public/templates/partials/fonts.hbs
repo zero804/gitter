@@ -1,6 +1,6 @@
 {{! pre-load all fonts }}
 {{#each fonts as |font|}}
-  <link rel="preload" href="{{font.fontPath}}">
+  <link rel="preload" href="{{font.fontPath}}" as="font" type="font/woff">
 {{/each}}
 
 {{! define all font face rules in the head}}
