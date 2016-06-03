@@ -270,8 +270,8 @@ function createExpectedFixtures(expected) {
       public: 'public' in securityDescriptor ? securityDescriptor.public : true,
       linkPath: securityDescriptor.linkPath,
       externalId: securityDescriptor.externalId,
-      extraMembers: undefined,
-      extraAdmins: undefined
+      extraMembers: securityDescriptor.extraMembers,
+      extraAdmins: securityDescriptor.extraAdmins
     };
 
     doc.sd = securityDoc;
@@ -321,8 +321,9 @@ function createExpectedFixtures(expected) {
     })
   }
 
+  var userCounter = 0;
+
   function createUsers(fixture) {
-    var userCounter = 0;
     return Promise.map(Object.keys(expected), function(key) {
 
       if(key.match(/^user/)) {
@@ -332,60 +333,63 @@ function createExpectedFixtures(expected) {
           });
       }
 
-      if(key.match(/^troupe/)) {
-        var t = expected[key];
-        var users = [];
-
-        if(t.users) {
-          if(!Array.isArray(t.users)) {
-            t.users = [t.users];
-          }
-
-          users = users.concat(t.users);
-        }
-
-        var extraMembers = t.securityDescriptor && t.securityDescriptor.extraMembers;
-        if (extraMembers) {
-          if(!Array.isArray(extraMembers)) {
-            extraMembers = [extraMembers];
-          }
-
-          users = users.concat(extraMembers);
-        }
-
-        var extraAdmins = t.securityDescriptor && t.securityDescriptor.extraAdmins;
-        if (extraAdmins) {
-          if(!Array.isArray(extraAdmins)) {
-            extraAdmins = [extraAdmins];
-          }
-
-          users = users.concat(extraAdmins);
-        }
-
-        return Promise.map(users, function(user, index) {
-            if(typeof user === 'string') {
-              if(expected[user]) return; // Already specified at the top level
-              expected[user] = {};
-              return createUser(user, {}).then(function(createdUser) {
-                fixture[user] = createdUser;
-              });
-            }
-
-            var fixtureName = 'user' + (++userCounter);
-            t.users[index] = fixtureName;
-            expected[fixtureName] = user;
-
-            return createUser(fixtureName, user)
-              .then(function(user) {
-                fixture[fixtureName] = user;
-              });
-
-          });
-
+      if(key.match(/^troupe/) || key.match(/^group/)) {
+        return createExtraUsers(fixture, key);
       }
 
       return null;
     });
+  }
+
+  function createExtraUsers(fixture, key) {
+    var obj = expected[key];
+    var users = [];
+
+    if(obj.users) {
+      if(!Array.isArray(obj.users)) {
+        obj.users = [obj.users];
+      }
+
+      users = users.concat(obj.users);
+    }
+
+    var extraMembers = obj.securityDescriptor && obj.securityDescriptor.extraMembers;
+    if (extraMembers) {
+      if(!Array.isArray(extraMembers)) {
+        extraMembers = [extraMembers];
+      }
+
+      users = users.concat(extraMembers);
+    }
+
+    var extraAdmins = obj.securityDescriptor && obj.securityDescriptor.extraAdmins;
+    if (extraAdmins) {
+      if(!Array.isArray(extraAdmins)) {
+        extraAdmins = [extraAdmins];
+      }
+
+      users = users.concat(extraAdmins);
+    }
+
+    return Promise.map(users, function(user, index) {
+        if(typeof user === 'string') {
+          if(expected[user]) return; // Already specified at the top level
+          expected[user] = {};
+          return createUser(user, {}).then(function(createdUser) {
+            fixture[user] = createdUser;
+          });
+        }
+
+        var fixtureName = 'user' + (++userCounter);
+        obj.users[index] = fixtureName;
+        expected[fixtureName] = user;
+
+        return createUser(fixtureName, user)
+          .then(function(user) {
+            fixture[fixtureName] = user;
+          });
+
+      });
   }
 
   function createIdentities(fixture) {
@@ -409,19 +413,22 @@ function createExpectedFixtures(expected) {
     // Create groups
     return Promise.map(Object.keys(expected), function(key) {
       if(key.match(/^group/)) {
-        return createGroup(key, expected[key])
+        var expectedGroup = expected[key];
+
+        var expectedSecurityDescriptor = expectedGroup && expectedGroup.securityDescriptor;
+        if (expectedSecurityDescriptor) {
+          expectedSecurityDescriptor.extraMembers = expectedSecurityDescriptor.extraMembers && expectedSecurityDescriptor.extraMembers.map(function(user) {
+            return fixture[user]._id;
+          });
+
+          expectedSecurityDescriptor.extraAdmins = expectedSecurityDescriptor.extraAdmins && expectedSecurityDescriptor.extraAdmins.map(function(user) {
+            return fixture[user]._id;
+          });
+        }
+
+        return createGroup(key, expectedGroup)
           .then(function(createdGroup) {
             fixture[key] = createdGroup;
-
-            // add specified extra admins
-            var f = expected[key];
-            var extraAdmins = f.securityDescriptor && f.securityDescriptor.extraAdmins;
-            if (extraAdmins) {
-              fixture[key].sd.extraAdmins = extraAdmins.map(function(user) {
-                return fixture[user]._id;
-              });
-              return fixture[key].save();
-            }
           });
       }
     })

@@ -21,7 +21,6 @@ describe('group-api', function() {
       User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }],
       Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
               { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() } ],
-      Troupe: [ {lcUri: fixtureLoader.GITTER_INTEGRATION_REPO.toLowerCase()}]
     },
     user1: {
       githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
