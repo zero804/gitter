@@ -37,6 +37,8 @@ var coveralls = require('gulp-coveralls');
 var lcovMerger = require('lcov-result-merger');
 var sonar = require('gulp-sonar');
 var codacy = require('gulp-codacy');
+var through = require('through2');
+var utimes  = require('fs').utimes;
 
 var fs = require('fs-extra');
 var path = require('path');
@@ -405,7 +407,8 @@ gulp.task('copy-asset-files', function() {
       'public/sprites/**',
       'public/repo/**'
     ], { "base" : "./public" })
-    .pipe(gulp.dest('output/assets'));
+    .pipe(gulp.dest('output/assets'))
+    .pipe(restoreOriginalFileTimestamps());
 });
 
 // Run this task occassionally and check the results into git...
@@ -601,15 +604,26 @@ gulp.task('embedded-uglify', ['embedded-webpack'], function() {
 
 gulp.task('build-assets', ['copy-asset-files', 'css', 'webpack', 'uglify']);
 
+
+/**
+ * Ensures that the file has the same mtime as the original source
+ */
+function restoreOriginalFileTimestamps() {
+  return through.obj(function(file, enc, done) {
+    utimes(file.path, file.stat.atime, file.stat.mtime, done);
+  });
+
+}
+
 gulp.task('compress-assets', ['build-assets'], function() {
-  return gulp.src(['output/assets/**/*.{css,js,ttf,svg}', '!**/*.map'], { base: 'output/assets/' })
-    .pipe(using())
+  return gulp.src(['output/assets/**/*.{css,js,ttf,svg,eot}', '!**/*.map'], { stat: true, base: 'output/assets/' })
     .pipe(gzip({ append: true, gzipOptions: { level: 9 } }))
-    .pipe(gulp.dest('output/assets/'));
+    .pipe(gulp.dest('output/assets/'))
+    .pipe(restoreOriginalFileTimestamps());
 });
 
 gulp.task('tar-assets', ['build-assets', 'compress-assets'], function () {
-    return gulp.src(['output/assets/**', '!**/*.map'])
+    return gulp.src(['output/assets/**', '!**/*.map'], { stat: true })
       .pipe(tar('assets.tar'))
       .pipe(gzip({ append: true, gzipOptions: { level: 9 } }))
       .pipe(gulp.dest('output'));
@@ -668,7 +682,7 @@ gulp.task('embedded-copy-asset-files', function() {
       'public/images/**',
       // 'public/sprites/**',
       'public/repo/katex/**',
-    ], { "base" : "./public" })
+    ], { "base" : "./public", stat: true })
     .pipe(gulp.dest('output/assets'));
 });
 
