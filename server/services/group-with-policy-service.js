@@ -85,11 +85,7 @@ GroupWithPolicyService.prototype.createRoom = secureMethod([allowAdmin], functio
   return ensureAccessAndFetchRoomInfo(user, group, options)
     .spread(function(roomInfo, securityDescriptor) {
       debug("Upserting %j", roomInfo);
-      // We have to send security along for now because we have to keep filling
-      // it in for backwards compatibility and there's no way to figure out if
-      // it should be INHERITED from a securityDescriptor.
       return roomService.upsertGroupRoom(user, group, roomInfo, securityDescriptor, {
-        security: options.security,
         tracking: options.tracking
       });
     });

@@ -66,12 +66,6 @@ describe('group-with-policy-service #slow', function() {
         assert.equal(room.topic, topic);
         assert.equal(room.groupId, fixture.group1.id);
 
-        // test backwards compatibility
-        assert.equal(room.lcOwner, fixture.group1.lcUri);
-        assert.equal(room.githubType, 'NONE');
-        assert.equal(room.githubId, undefined);
-        assert.equal(room.security, 'PUBLIC');
-
         return securityDescriptorService.getForRoomUser(room._id, null);
       })
       .then(function(securityDescriptor) {
@@ -93,7 +87,6 @@ describe('group-with-policy-service #slow', function() {
         security: 'PRIVATE'
       })
       .then(function(room) {
-        assert.equal(room.security, 'PRIVATE');
         return securityDescriptorService.getForRoomUser(room._id, null);
       })
       .then(function(securityDescriptor) {
@@ -128,10 +121,6 @@ describe('group-with-policy-service #slow', function() {
         linkPath: linkPath
       })
       .then(function(room) {
-        assert.equal(room.githubType, 'REPO');
-        assert.equal(room.githubId, fixtureLoader.GITTER_INTEGRATION_REPO_ID);
-        assert.equal(room.security, 'INHERITED');
-
         return securityDescriptorService.getForRoomUser(room._id, null);
       })
       .then(function(securityDescriptor) {
@@ -154,8 +143,6 @@ describe('group-with-policy-service #slow', function() {
         linkPath: linkPath
       })
       .then(function(room) {
-        assert.equal(room.security, 'PUBLIC');
-
         return securityDescriptorService.getForRoomUser(room._id, null);
       })
       .then(function(securityDescriptor) {
@@ -179,8 +166,6 @@ describe('group-with-policy-service #slow', function() {
         linkPath: linkPath
       })
       .then(function(room) {
-        assert.equal(room.security, 'PRIVATE');
-
         return securityDescriptorService.getForRoomUser(room._id, null);
       })
       .then(function(securityDescriptor) {
