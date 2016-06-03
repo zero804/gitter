@@ -56,9 +56,9 @@ module.exports = Marionette.LayoutView.extend({
     }
   },
 
-  onClick: function() {
+  onClick: function(e) {
     var hasTextSelected = window.getSelection().toString().length > 0;
-    if(!hasTextSelected) {
+    if(!hasTextSelected && e.target.tagName.toLowerCase() !== 'textarea') {
       appEvents.trigger('focus.request.chat');
     }
   }
