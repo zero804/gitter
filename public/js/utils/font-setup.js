@@ -1,3 +1,5 @@
+"use strict";
+
 var FontFaceObserver = require('fontfaceobserver');
 var RAF = require('utils/raf');
 var cookie = require('tiny-cookie');
