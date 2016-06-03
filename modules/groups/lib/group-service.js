@@ -11,7 +11,7 @@ var StatusError = require('statuserror');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var debug = require('debug')('gitter:groups:group-service');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
-var securityDescriptorGenerator = require('gitter-web-permissions/lib/security-descriptor-generator');
+var ensureAccessAndFetchDescriptor = require('gitter-web-permissions/lib/ensure-access-and-fetch-descriptor');
 
 /**
  * Find a group given an id
@@ -87,7 +87,7 @@ function ensureAccessAndFetchGroupInfo(user, options) {
         throw new StatusError(400, 'Group uri already taken: ' + uri);
       }
 
-      return securityDescriptorGenerator.ensureAccessAndFetchDescriptor(user, options)
+      return ensureAccessAndFetchDescriptor(user, options)
         .then(function(securityDescriptor) {
           return [{
             name: name,
