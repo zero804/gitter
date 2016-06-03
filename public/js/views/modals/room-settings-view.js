@@ -73,6 +73,7 @@ var View = Marionette.ItemView.extend({
 
   previewWelcomeMessage: function (e){
     e.preventDefault();
+    this.setPreviewLoadingState();
     toggleClass(this.el, 'preview', true);
     this.fetchRenderedHTML().then(function(html){
       this.injectContentIntoPreview(html);
@@ -81,9 +82,13 @@ var View = Marionette.ItemView.extend({
 
   editWelcomeMessage: function (e){
     e.preventDefault();
+    this.setPreviewLoadingState();
+    toggleClass(this.el, 'preview', false);
+  },
+
+  setPreviewLoadingState: function (){
     this.ui.welcomeMessagePreviewContainer.html('Loading ...');
     toggleClass(this.ui.welcomeMessagePreviewContainer[0], 'loading', true);
-    toggleClass(this.el, 'preview', false);
   },
 
   fetchRenderedHTML: function (){
