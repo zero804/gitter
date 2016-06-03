@@ -1286,7 +1286,6 @@ function upsertGroupRoom(user, group, roomInfo, securityDescriptor, options) {
 
   // convert back to the old github-tied vars here
   var type = securityDescriptor.type || null;
-  var githubId = securityDescriptor.externalId || null;
 
   var githubType;
   var roomType;
