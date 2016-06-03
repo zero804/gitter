@@ -8,8 +8,7 @@ var Promise = require('bluebird');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var onMongoConnect = require('../../server/utils/on-mongo-connect');
 var userService = require('../../server/services/user-service');
-var groupSecurityDescriptorGenerator = require('gitter-web-permissions/lib/group-security-descriptor-generator');
-var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
+var securityDescriptorGenerator = require('gitter-web-permissions/lib/security-descriptor-generator');
 
 
 function getGroupableRooms(matchMissingOnly) {
@@ -147,6 +146,21 @@ function migrate(batch, enc, callback) {
         return callback();
       }
 
+      // If we found a gitter user for the corresponding github user for
+      // this user batch, then we use that. For orgs or the jashkenas user
+      // case that will just be null.
+      // QUESTION: In the jashkenas case, should the security descriptor
+      // still be user or should it be org or something else?
+      var gitterUser = (info.type === 'user') ? batch.gitterUser : null;
+
+      // Insert group security descriptors for the owning org or user.
+      // (this will only insert if it is missing)
+      var securityDescriptor = securityDescriptorGenerator.generate(gitterUser, {
+        type: info.type.toUpperCase(), // ORG or USER
+        uri: info.owner.uri, // mixed case OK?
+        githubId: info.owner.githubId
+      });
+
       // upsert the lcOwner into group
       var query = { lcUri: lcOwner };
       return mongooseUtils.upsert(persistence.Group, query, {
@@ -157,7 +171,8 @@ function migrate(batch, enc, callback) {
             uri: info.owner.uri,
             lcUri: info.owner.lcUri,
             type: info.type,
-            githubId: info.owner.githubId // could be null
+            githubId: info.owner.githubId, // could be null
+            sd: securityDescriptor
           }
         })
         .spread(function(group/*, existing */) {
@@ -187,22 +202,6 @@ function migrate(batch, enc, callback) {
           // DISABLE for now
           //promises.push(uriLookupService.reserveUriForGroupId(groupId, 'org/'+group.lcUri+'/rooms'));
 
-          // If we found a gitter user for the corresponding github user for
-          // this user batch, then we use that. For orgs or the jashkenas user
-          // case that will just be null.
-          // QUESTION: In the jashkenas case, should the security descriptor
-          // still be user or should it be org or something else?
-          var gitterUser = (info.type === 'user') ? batch.gitterUser : null;
-
-          // Insert group security descriptors for the owning org or user.
-          // (this will only insert if it is missing)
-          var securityDescriptor = groupSecurityDescriptorGenerator.generate(gitterUser, {
-            uri: info.owner.uri, // mixed case OK?
-            type: info.type.toUpperCase(), // ORG or USER
-            githubId: info.owner.githubId,
-          });
-
-          promises.push(securityDescriptorService.insertForGroup(groupId, securityDescriptor));
 
           return Promise.all(promises);
         })

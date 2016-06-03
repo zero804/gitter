@@ -4,6 +4,7 @@ var mongoose = require('gitter-web-mongoose-bluebird');
 var Schema = mongoose.Schema;
 var ObjectId = Schema.ObjectId;
 var installVersionIncMiddleware = require('../install-version-inc-middleware');
+var securityDescriptor = require('./security-descriptor-subdocument');
 
 module.exports = {
   install: function(mongooseConnection) {
@@ -54,6 +55,7 @@ module.exports = {
       lang: { type: String }, // Human language of this room
       renamedLcUris: [String],
       providers: [String],
+      sd: { type: securityDescriptor.Schema, required: false },
       _tv: { type: 'MongooseNumber', 'default': 0 }
     }, { strict: 'throw' });
 
@@ -121,6 +123,8 @@ module.exports = {
     };
 
     var Troupe = mongooseConnection.model('Troupe', TroupeSchema);
+
+    securityDescriptor.installIndexes(TroupeSchema, Troupe);
 
     return {
       model: Troupe,
