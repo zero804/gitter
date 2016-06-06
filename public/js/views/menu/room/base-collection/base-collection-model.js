@@ -56,6 +56,6 @@ module.exports = Backbone.Model.extend({
   onFavourite: function() { this.onDefault(); },
   onPeople:    function() { this.onDefault(); },
   onOrg:       function() { this.onDefault(); },
-  onDefault:   function() { this.onDefault(); },
+  onDefault:   function() {},
 
 });
