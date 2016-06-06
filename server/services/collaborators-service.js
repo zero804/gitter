@@ -1,7 +1,7 @@
 'use strict';
 
 var Promise = require('bluebird');
-var collaboratorsCore = require('./core/collaborators-core');
+var collaboratorsCore = require('gitter-web-github-backend/lib/github-collaborators-service');
 
 
 function deduplicate(collaborators) {
