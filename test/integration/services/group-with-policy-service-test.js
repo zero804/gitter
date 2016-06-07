@@ -139,10 +139,25 @@ describe('group-with-policy-service #slow', function() {
       });
   });
 
-  it('Should throw an error if you try and add a GitHub repo backed room to a non-Github group', function() {
+  it('should throw an error if you try and add a GitHub repo backed room to a non-Github group', function() {
     return group2WithPolicyService.createRoom({
         type: 'GH_REPO',
         name: fixtureLoader.GITTER_INTEGRATION_REPO,
+        security: 'INHERITED',
+        linkPath: linkPath
+      })
+      .then(function() {
+        assert.ok(false, "error expected");
+      })
+      .catch(StatusError, function(err) {
+        assert.strictEqual(err.status, 400);
+      });
+  });
+
+  it('should throw an error if you try and add a GitHub repo where the linkPath and uri differs', function() {
+    return group1WithPolicyService.createRoom({
+        type: 'GH_REPO',
+        name: 'foo',
         security: 'INHERITED',
         linkPath: linkPath
       })

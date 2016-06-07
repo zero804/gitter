@@ -112,7 +112,7 @@ describe('group-api', function() {
     return request(app)
       .post('/v1/groups/' + fixture.group1.id + '/rooms')
       .send({
-        name: 'test',
+        name: fixtureLoader.GITTER_INTEGRATION_REPO,
         topic: 'all about testing',
         security: {
           security: 'INHERITED',
