@@ -12,8 +12,7 @@ var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var validateUri = require('gitter-web-github').GitHubUriValidator;
 var debug = require('debug')('gitter:groups:group-service');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
-var groupSecurityDescriptorGenerator = require('gitter-web-permissions/lib/group-security-descriptor-generator');
-var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
+var securityDescriptorGenerator = require('gitter-web-permissions/lib/security-descriptor-generator');
 
 /**
  * Find a group given an id
@@ -44,29 +43,22 @@ function upsertGroup(user, options) {
   var lcUri = uri.toLowerCase();
   var githubId = options.githubId || null;
 
+  var securityDescriptor = securityDescriptorGenerator.generate(user, {
+      uri: uri,
+      type: type,
+      githubId: githubId,
+    });
+
   return mongooseUtils.upsert(Group, { lcUri: lcUri }, {
       $setOnInsert: {
         name: name,
         uri: uri,
-        lcUri: lcUri
+        lcUri: lcUri,
+        sd: securityDescriptor
       }
     })
-    .spread(function(group, updateExisting) {
-      debug('Upsert found existing group? %s', updateExisting);
-
-      /** Add a security descriptor */
-      if (updateExisting) return group;
-
-      debug('Inserting a security descriptor for a new group');
-
-      var securityDescriptor = groupSecurityDescriptorGenerator.generate(user, {
-          uri: uri,
-          type: type,
-          githubId: githubId,
-        });
-
-      return securityDescriptorService.insertForGroup(group._id, securityDescriptor)
-        .return(group);
+    .spread(function(group /*, updateExisting */) {
+      return group;
     });
 }
 

@@ -66,10 +66,8 @@ function generateRepoPermissionsForRoom(room) {
 }
 
 
-function generateRepoChannelPermissionsForRoom(room, parentRoom) {
-  var uri = room.uri;
+function generateRepoChannelPermissionsForRoom(uri, security, parentRoom) {
   var ownerUri = uri.split('/').slice(0, 2).join('/');
-  var security = room.security;
   var githubId = parentRoom && parentRoom.githubId;
 
   if (parentRoom && ownerUri !== parentRoom.uri) {
@@ -142,11 +140,9 @@ function generateRepoChannelPermissionsForRoom(room, parentRoom) {
   }
 }
 
-function generateOrgChannelPermissionsForRoom(room, parentRoom) {
-  var uri = room.uri;
+function generateOrgChannelPermissionsForRoom(uri, security, parentRoom) {
   var ownerUri = uri.split('/')[0];
   var githubId = parentRoom && parentRoom.githubId;
-  var security = room.security;
 
   if (parentRoom && ownerUri !== parentRoom.uri) {
     debug('parent org room differs: %s vs %s', ownerUri, parentRoom.uri);
@@ -190,9 +186,7 @@ function generateOrgChannelPermissionsForRoom(room, parentRoom) {
 
 }
 
-function generateUserChannelPermissionsForRoom(room, ownerUser) {
-  var security = room.security;
-
+function generateUserChannelPermissionsForRoom(security, ownerUser) {
   switch(security) {
     case 'PUBLIC':
       return {
@@ -247,16 +241,16 @@ function generatePermissionsForRoom(room, parentRoom, ownerUser) {
       return generateOrgPermissionsForRoom(room);
 
     case 'REPO_CHANNEL':
-      return generateRepoChannelPermissionsForRoom(room, parentRoom);
+      return generateRepoChannelPermissionsForRoom(room.uri, room.security, parentRoom);
 
     case 'ORG_CHANNEL':
-      return generateOrgChannelPermissionsForRoom(room, parentRoom);
+      return generateOrgChannelPermissionsForRoom(room.uri, room.security, parentRoom);
 
     case 'USER_CHANNEL':
       if (!ownerUser) {
         throw new StatusError(500, 'Owner not found: ' + room.uri);
       }
-      return generateUserChannelPermissionsForRoom(room, ownerUser);
+      return generateUserChannelPermissionsForRoom(room.security, ownerUser);
 
     default:
       throw new Error(500, 'Unknown room type ' + githubType);
@@ -274,4 +268,36 @@ function generatePermissionsForRoomAndValidate(room, parentRoom, ownerUser) {
   return descriptor;
 }
 
-exports.generatePermissionsForRoom = generatePermissionsForRoomAndValidate;
+/**
+ * Generates permissions for a new channel
+ */
+function generateForNewChannel(user, parentRoom, options) {
+  debug('generateForNewChannel: %j', options);
+  var githubType = options.githubType;
+  var uri = options.uri;
+  var security = options.security;
+
+  switch(githubType) {
+    case 'REPO_CHANNEL':
+      return generateRepoChannelPermissionsForRoom(uri, security, parentRoom);
+
+    case 'ORG_CHANNEL':
+      return generateOrgChannelPermissionsForRoom(uri, security, parentRoom);
+
+    case 'USER_CHANNEL':
+      if (!user) {
+        throw new StatusError(500, 'Owner user required');
+      }
+
+      return generateUserChannelPermissionsForRoom(options.security, user);
+
+    default:
+      throw new Error(500, 'Unknown room type ' + githubType);
+  }
+
+}
+
+module.exports = {
+  generatePermissionsForRoom: generatePermissionsForRoomAndValidate,
+  generateForNewChannel: generateForNewChannel
+}
