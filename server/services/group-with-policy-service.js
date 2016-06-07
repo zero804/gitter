@@ -88,8 +88,14 @@ GroupWithPolicyService.prototype.createRoom = secureMethod([allowAdmin], functio
       throw new StatusError(400, 'GitHub repo backed rooms can only be added to GitHub org or user backed groups.');
     }
 
-    if (options.linkPath && options.linkPath.split('/')[0] !== group.sd.linkPath) {
-      throw new StatusError(400, 'GitHub repo backed rooms must be for the same owner (gh org or user) as the group.');
+    if (options.linkPath) {
+      if (options.linkPath !== group.uri + '/' + options.name) {
+        throw new StatusError(400, "GitHub repo backed rooms' linkPath must match the uri.");
+      }
+
+      if (options.linkPath.split('/')[0] !== group.sd.linkPath) {
+        throw new StatusError(400, 'GitHub repo backed rooms must be for the same owner (gh org or user) as the group.');
+      }
     }
   }
 
