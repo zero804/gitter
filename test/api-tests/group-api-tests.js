@@ -19,8 +19,11 @@ describe('group-api', function() {
   var fixture = fixtureLoader.setup({
     deleteDocuments: {
       User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }],
-      Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
+      Group: [
+              { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() },
+              { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
               { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() } ],
+      Troupe: [ { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() + '/' + fixtureLoader.GITTER_INTEGRATION_REPO.toLowerCase() } ]
     },
     user1: {
       githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
@@ -28,7 +31,12 @@ describe('group-api', function() {
       accessToken: 'web-internal'
     },
     group1: {
+      uri: fixtureLoader.GITTER_INTEGRATION_USERNAME,
+      lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase(),
       securityDescriptor: {
+        type: 'GH_USER',
+        admins: 'GH_USER_SAME',
+        linkPath: fixtureLoader.GITTER_INTEGRATION_USERNAME,
         extraAdmins: ['user1']
       }
     },
