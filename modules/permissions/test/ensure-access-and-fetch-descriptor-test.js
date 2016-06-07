@@ -80,9 +80,6 @@ describe('ensure-access-and-fetch-descriptor #slow', function() {
       });
   });
 
-  // NOTE: can anyone create a room for any repo? Do we have to check any
-  // access beyond "does it exist and is it public or private and you can get
-  // to it"?
   it('should return a descriptor for a github repo if the user has access', function() {
     var linkPath = fixtureLoader.GITTER_INTEGRATION_USERNAME + '/' + fixtureLoader.GITTER_INTEGRATION_REPO;
 

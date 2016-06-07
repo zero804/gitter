@@ -72,11 +72,11 @@ function ensureGitHubAccessAndFetchDescriptor(user, options) {
       var policyPromise;
       if (type === 'GH_REPO') {
         // a room based on a repo
-        // TODO: do you really need admin access, though?
         policyPromise = canAdminGitHubRepo(user, githubInfo, security); // or null?
       } else {
         // org or user based group
-        // TODO: or could you have a room like that too?
+        // TODO: or could you have a github user or org backed room going
+        // forward too?
         policyPromise = canAdminPotentialGitHubGroup(user, githubInfo, obtainAccessFromGitHubRepo);
       }
       return policyPromise
