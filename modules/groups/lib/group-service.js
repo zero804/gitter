@@ -1,5 +1,7 @@
 'use strict';
 
+var env = require('gitter-web-env');
+var config = env.config;
 var Promise = require('bluebird');
 var Group = require('gitter-web-persistence').Group;
 var Troupe = require('gitter-web-persistence').Troupe;
@@ -99,8 +101,10 @@ function ensureAccessAndFetchGroupInfo(user, options) {
 
 
 function createGroup(user, options) {
-  if (!options.type && options.uri && options.uri[0] !== '_') {
-    throw new StatusError(400, 'Non-GitHub community URIs MUST be prefixed by an underscore for now.');
+  if (!config.get("project-splitsville:enabled")) {
+    if (!options.type && options.uri && options.uri[0] !== '_') {
+      throw new StatusError(400, 'Non-GitHub community URIs MUST be prefixed by an underscore for now.');
+    }
   }
 
   return ensureAccessAndFetchGroupInfo(user, options)
