@@ -14,7 +14,7 @@ var Model = Backbone.Model.extend({
 
 var SuggestedCollection = Backbone.Collection.extend({
   model: Model,
-  
+
   initialize: function(models, attrs) { //jshint unused: true
 
     if (!attrs || !attrs.contextModel) {
