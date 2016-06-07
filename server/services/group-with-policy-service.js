@@ -1,5 +1,7 @@
 'use strict';
 
+var env = require('gitter-web-env');
+var config = env.config;
 var assert = require('assert');
 var StatusError = require('statuserror');
 var ensureAccessAndFetchDescriptor = require('gitter-web-permissions/lib/ensure-access-and-fetch-descriptor');
@@ -56,7 +58,6 @@ function ensureAccessAndFetchRoomInfo(user, group, options) {
 
   var uri = group.uri + '/' + name;
 
-
   return findByUri(uri)
     .then(function(room) {
       if (room) {
@@ -81,6 +82,16 @@ function ensureAccessAndFetchRoomInfo(user, group, options) {
 GroupWithPolicyService.prototype.createRoom = secureMethod([allowAdmin], function(options) {
   var user = this.user;
   var group = this.group;
+
+  if (!config.get("project-splitsville:enabled")) {
+    if (options.type && group.sd.type !== 'GH_ORG' && group.sd.type !== 'GH_USER') {
+      throw new StatusError(400, 'GitHub repo backed rooms can only be added to GitHub org or user backed groups.');
+    }
+
+    if (options.linkPath && options.linkPath.split('/')[0] !== group.sd.linkPath) {
+      throw new StatusError(400, 'GitHub repo backed rooms must be for the same owner (gh org or user) as the group.');
+    }
+  }
 
   return ensureAccessAndFetchRoomInfo(user, group, options)
     .spread(function(roomInfo, securityDescriptor) {
