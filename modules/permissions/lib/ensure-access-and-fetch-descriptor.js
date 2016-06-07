@@ -42,6 +42,10 @@ function ensureGitHubAccessAndFetchDescriptor(user, options) {
 
   return validateGitHubUri(user, linkPath)
     .then(function(githubInfo) {
+      if (!githubInfo) {
+        throw new StatusError(404, linkPath + ' does not exist.')
+      }
+
       debug("GitHub information for %s is %j", linkPath, githubInfo);
 
       if (security === 'INHERITED') {
@@ -68,6 +72,7 @@ function ensureGitHubAccessAndFetchDescriptor(user, options) {
       var policyPromise;
       if (type === 'GH_REPO') {
         // a room based on a repo
+        // TODO: do you really need admin access, though?
         policyPromise = canAdminGitHubRepo(user, githubInfo, security); // or null?
       } else {
         // org or user based group
@@ -76,7 +81,7 @@ function ensureGitHubAccessAndFetchDescriptor(user, options) {
       }
       return policyPromise
         .then(function(isAdmin) {
-          if (!isAdmin) throw new StatusError(403, 'Not an administrator of this org');
+          if (!isAdmin) throw new StatusError(403, 'Not an administrator of this '+githubInfo.type);
           return securityDescriptorGenerator.generate(user, {
               type: type,
               linkPath: linkPath,
@@ -95,7 +100,7 @@ var ensureAccessAndFetchDescriptor = function(user, options) {
     case 'GH_ORG':
     case 'GH_REPO':
     case 'GH_USER':
-    case 'GH_GUESS': // for migration calls to createGroup, see below
+    case 'GH_GUESS': // for migration calls to createGroup
       if (type === 'GH_REPO') {
         options.obtainAccessFromGitHubRepo = options.linkPath;
       }
