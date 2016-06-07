@@ -96,12 +96,16 @@ router.post('/invite-user',
   identifyRoute('api-private-invite-user'),
   require('./invite-user'));
 
+// TODO: this should go...
 router.get('/user-avatar/:username',
   identifyRoute('api-private-user-avatar'),
   require('./user-avatar'));
 
+router.use('/avatars', require('./avatars'));
+
 router.post('/markdown-preview',
   identifyRoute('api-private-markdown-preview'),
   require('./markdown-preview'));
+
 
 module.exports = router;

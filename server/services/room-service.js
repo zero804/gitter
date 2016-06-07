@@ -16,7 +16,6 @@ var persistence = require('gitter-web-persistence');
 var uriLookupService = require("./uri-lookup-service");
 var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
 var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
-var legacyMigration = require('gitter-web-permissions/lib/legacy-migration');
 var canUserBeInvitedToJoinRoom = require('gitter-web-permissions/lib/invited-permissions-service');
 var userService = require('./user-service');
 var troupeService = require('./troupe-service');
@@ -45,6 +44,8 @@ var uriResolver = require('./uri-resolver');
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 var userScopes = require('gitter-web-identity/lib/user-scopes');
 var groupService = require('gitter-web-groups/lib/group-service');
+var securityDescriptorGenerator = require('gitter-web-permissions/lib/security-descriptor-generator');
+var legacyMigration = require('gitter-web-permissions/lib/legacy-migration');
 
 var splitsvilleEnabled = nconf.get("project-splitsville:enabled");
 
@@ -201,12 +202,6 @@ function ensureGroupForGitHubRoom(user, githubType, uri) {
   return groupService.migration.ensureGroupForGitHubRoomCreation(user, options);
 }
 
-function doPostRoomCreationMigrationSteps(troupe) {
-  // create security permissions
-  var descriptor = legacyMigration.generatePermissionsForRoom(troupe, null, null);
-  return securityDescriptorService.insertForRoom(troupe._id, descriptor);
-}
-
 /**
  * Assuming that oneToOne uris have been handled already,
  * Figure out what this troupe is for
@@ -263,7 +258,8 @@ function createRoomForGitHubUri(user, uri, options) {
       return policyFactory.createPolicyForGithubObject(user, officialUri, githubType, null)
         .bind({
           troupe: null,
-          updateExisting: null
+          updateExisting: null,
+          groupId: null
         })
         .then(function(policy) {
           return policy.canAdmin();
@@ -277,18 +273,33 @@ function createRoomForGitHubUri(user, uri, options) {
         })
         .then(function(group) {
           // TODO: this will change when uris break away
-          var queryTerm = githubId ?
-                { githubId: githubId, githubType: githubType } :
-                { lcUri: lcUri, githubType: githubType };
+          var queryTerm;
+
+          if (githubId) {
+            queryTerm = { $or: [{ githubId: githubId }, { lcUri: lcUri }], githubType: githubType };
+          } else {
+            queryTerm = { lcUri: lcUri, githubType: githubType };
+          }
 
           // TODO: remove this when lcOwner goes away
           var lcOwner = lcUri.split('/')[0];
+
+          var groupId = this.groupId = group._id;
+
+          var sd = securityDescriptorGenerator.generate(user, {
+              uri: officialUri,
+              type: githubType,
+              githubId: githubId,
+              security: githubType === 'ORG' ? 'PRIVATE' : security
+            });
+
+          debug('Attempting to upsert room using query: %j', queryTerm);
 
           return mongooseUtils.upsert(persistence.Troupe, queryTerm, {
               $setOnInsert: {
                 lcUri: lcUri,
                 lcOwner: lcOwner, // This will go
-                groupId: group._id,
+                groupId: groupId,
                 uri: officialUri,
                 githubType: githubType,
                 githubId: githubId,
@@ -296,6 +307,7 @@ function createRoomForGitHubUri(user, uri, options) {
                 security: security,
                 dateLastSecurityCheck: new Date(),
                 userCount: 0,
+                sd: sd
               }
             });
         })
@@ -303,20 +315,45 @@ function createRoomForGitHubUri(user, uri, options) {
           /* Next stage - post creation migration */
           var troupe = this.troupe = upsertResult[0];
           var updateExisting = this.updateExisting = upsertResult[1];
+          var groupId = this.groupId;
 
           debug('Upsert found an existing room? %s', updateExisting);
 
-          if (updateExisting) return;
+          /* Next stage - possible rename */
+          // New room? Skip this step
+          if (!updateExisting) return;
 
-          return doPostRoomCreationMigrationSteps(troupe);
+          var updateRequired = false;
+          var set = {};
+
+          if (troupe.githubId !== githubId) {
+            updateRequired = true;
+            set.githubId = githubId;
+          }
+
+          if (!troupe.groupId) {
+            updateRequired = true;
+            set.groupId = groupId;
+          }
+
+          if (!updateRequired) return;
+
+          debug('Updating existing room with values %j', set);
+
+          return persistence.Troupe.findOneAndUpdate({ _id: troupe._id }, { $set: set })
+            .exec()
+            .bind(this)
+            .then(function(troupe) {
+              this.troupe = troupe;
+            })
         })
         .tap(function() {
-          /* Next stage - possible rename */
           var troupe = this.troupe;
           var updateExisting = this.updateExisting;
 
-          // New room? Skip this step
           if (!updateExisting) return;
+
+          // Rename URLS if required
 
           // Existing room and name hasn't changed? Skip
           if (troupe.uri === officialUri) return;
@@ -795,6 +832,12 @@ function createChannel(user, parentRoom, options) {
     .then(function(clash) {
       if(clash) throw new StatusError(409, 'There is already a channel at ' + uri);
 
+      var sd = legacyMigration.generateForNewChannel(user, parentRoom, {
+        githubType: githubType,
+        security: security,
+        uri: uri
+      });
+
       return mongooseUtils.upsert(persistence.Troupe,
         { lcUri: lcUri, githubType: githubType },
         {
@@ -807,7 +850,8 @@ function createChannel(user, parentRoom, options) {
             parentId: parentRoom ? parentRoom._id : undefined,
             ownerUserId: parentRoom ? undefined: user._id,
             githubType: githubType,
-            userCount: 0
+            userCount: 0,
+            sd: sd
           }
         })
         .spread(function(newRoom, updatedExisting) {
@@ -817,10 +861,6 @@ function createChannel(user, parentRoom, options) {
           }
 
           return newRoom;
-        })
-        .tap(function(newRoom) {
-          var descriptor = legacyMigration.generatePermissionsForRoom(newRoom, parentRoom, user);
-          return securityDescriptorService.insertForRoom(newRoom._id, descriptor);
         })
         .tap(function(newRoom) {
           if (!user) return;
