@@ -1,6 +1,6 @@
 "use strict";
 var Backbone = require('backbone');
-var qs = require('./qs');
+var qs = require('gitter-web-qs');
 var _ = require('underscore');
 var localStore = require('../components/local-store');
 var Promise = require('bluebird');
