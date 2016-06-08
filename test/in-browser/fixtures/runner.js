@@ -1,16 +1,19 @@
-'use strict';
+var Mocha = require('mocha');
+var path = require('path');
 
-var __karmaWebpackManifest__ = [];
-var testsContext = require.context('../specs', true, /\.js$/);
 
-function inManifest(path) {
-  return __karmaWebpackManifest__.indexOf(path) >= 0;
-}
+var mocha = new Mocha({ useColors: true });
+mocha.addFile(path.resolve(__dirname, './build/test.js'));
 
-var runnable = testsContext.keys().filter(inManifest);
+window.onerror = function(message){
+  console.log('-----------------------');
+  console.log(message);
+  console.log('-----------------------');
+};
 
-if (!runnable.length) {
-  runnable = testsContext.keys();
-}
-
-runnable.forEach(testsContext);
+// Run the tests.
+mocha.run(function(failures){
+  process.on('exit', function () {
+    process.exit(failures);  // exit with non-zero status if there were failures
+  });
+});

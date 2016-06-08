@@ -24,11 +24,4 @@ describe('SearchPeopleCollection', function() {
     assert.equal('/v1/user', collection.url());
   });
 
-  it('should throw an error if fetch is called with no query', function(){
-    try { collection.fetch(); }
-    catch(e) {
-      assert.equal(e.message, 'Search People fetch() called with no { data: { q: "huh?" }}');
-    }
-  });
-
 });
