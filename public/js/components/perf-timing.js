@@ -63,7 +63,16 @@ function perfImplementation() {
         markName = performance.domContentLoadedEventStart;
       }
 
-      performance.measure(PREFIX + name, markName);
+      // Because IE11 and MS Edge will throw a syntax error
+      // with an undefined 3 parameter
+      // https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/4933422/
+      // https://connect.microsoft.com/IE/feedback/details/1884529/bug-in-html5-performance-api
+      try {
+        performance.measure(PREFIX + name, markName);
+      }
+      catch(err) {
+        //...
+      }
     }
   };
 }

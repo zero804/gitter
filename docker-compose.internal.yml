@@ -62,7 +62,6 @@ mongosetup:
     ANNOUNCE_MONGO1_HOST: ""
     ANNOUNCE_MONGO2_HOST: ""
     ANNOUNCE_MONGO3_HOST: ""
-    DISABLE_TABLE_SCAN: 1
   working_dir: /src
   entrypoint: [ "/src/scripts/docker/mongo/mongo-setup.sh" ]
 
