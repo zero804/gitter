@@ -196,7 +196,7 @@ describe('group-service', function() {
         troupe4: { group: 'group1', security: 'PRIVATE' },
       });
 
-      it('should find the roomIds for group', function() {
+      it('should find the roomIds for group for an anonymous user', function() {
         return groupService.findRoomsIdForGroup(fixture.group1._id)
           .then(function(roomIds) {
             assert.deepEqual(roomIds.map(String), [
