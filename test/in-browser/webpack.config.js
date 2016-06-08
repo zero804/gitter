@@ -1,9 +1,11 @@
 'use strict';
 
-var path = require('path');
+var path              = require('path');
+var glob = require('glob');
 var ProgressBarPlugin = require('progress-bar-webpack-plugin');
 
 module.exports = {
+  entry: glob.sync(path.resolve(__dirname, './specs/**/*-test.js')),
   output: {
     path: path.join(__dirname, './fixtures/build'),
     filename: 'test.js',
@@ -22,12 +24,21 @@ module.exports = {
     loaders: [
       {
         test: /\.hbs$/,
-        loader: 'gitter-handlebars-loader?helperDirs[]=' + path.resolve(__dirname, './fixtures/hbs'),
+        loader: 'gitter-handlebars-loader', // disable minify for now + path.resolve(path.join(__dirname, "../../build-scripts/html-min-loader"))
+        query: {
+          helperDirs: [
+            path.resolve(__dirname, '../../shared/handlebars/helpers')
+          ],
+          knownHelpers: [
+            'cdn'
+          ],
+          partialsRootRelative: path.resolve(__dirname, '../../public/templates/partials') + path.sep
+        }
       },
       {
         test:    /.css$/,
         loader:  'style-loader!css-loader!postcss-loader',
-      },
+      }
     ],
   },
   plugins: [
