@@ -67,7 +67,7 @@ describe('room-service', function() {
     it('should fail to create a room for an org where the user is not an admin', function () {
 
       var roomService = testRequire.withProxies("./services/room-service", {
-        'gitter-web-permissions/lib/legacy-policy-factory': {
+        'gitter-web-permissions/lib/github-policy-factory': {
           createPolicyForGithubObject: function() {
             return Promise.resolve({
               canAdmin: function() {
@@ -149,7 +149,7 @@ describe('room-service', function() {
             }
           }
         },
-        'gitter-web-permissions/lib/legacy-policy-factory': {
+        'gitter-web-permissions/lib/github-policy-factory': {
           createPolicyForGithubObject: function(user, uri, ghType, security) {
             assert.equal(user.username, fixture.user1.username);
             assert.equal(uri, 'gitterTest');
@@ -161,7 +161,9 @@ describe('room-service', function() {
                 return Promise.resolve(true);
               }
             });
-          },
+          }
+        },
+        'gitter-web-permissions/lib/legacy-policy-factory': {
           createPolicyForRoom: function(user, room) {
             assert.equal(room.uri, 'gitterTest');
             return Promise.resolve({});
@@ -240,7 +242,7 @@ describe('room-service', function() {
             }
           }
         },
-        'gitter-web-permissions/lib/legacy-policy-factory': {
+        'gitter-web-permissions/lib/github-policy-factory': {
           createPolicyForGithubObject: function(user, uri, ghType, security) {
             assert.equal(user.username, fixture.user1.username);
             assert.equal(uri, 'gitterHQ/cloaked-avenger');
@@ -252,7 +254,9 @@ describe('room-service', function() {
                 return Promise.resolve(true);
               }
             });
-          },
+          }
+        },
+        'gitter-web-permissions/lib/legacy-policy-factory': {
           createPolicyForRoom: function(user, room) {
             assert.equal(room.uri, 'gitterHQ/cloaked-avenger');
             assert.equal(room.groupId, groupId);
@@ -304,7 +308,7 @@ describe('room-service', function() {
             }
           }
         },
-        'gitter-web-permissions/lib/legacy-policy-factory': {
+        'gitter-web-permissions/lib/github-policy-factory': {
           createPolicyForGithubObject: function(user, uri, ghType, security) {
             assert.equal(user.username, fixture.user1.username);
             assert.equal(uri, 'gitterHQ/cloaked-avenger');
@@ -317,6 +321,8 @@ describe('room-service', function() {
               }
             });
           },
+        },
+        'gitter-web-permissions/lib/legacy-policy-factory': {
           createPolicyForRoom: function(user, room) {
             assert.equal(room.uri, 'gitterHQ/cloaked-avenger');
             return Promise.resolve({
@@ -369,7 +375,7 @@ describe('room-service', function() {
             }
           }
         },
-        'gitter-web-permissions/lib/legacy-policy-factory': {
+        'gitter-web-permissions/lib/github-policy-factory': {
           createPolicyForGithubObject: function(user, uri, ghType, security) {
             assert.equal(user.username, fixture.user1.username);
             assert.equal(uri, 'gitterHQ/sandbox');
@@ -382,6 +388,8 @@ describe('room-service', function() {
               }
             });
           },
+        },
+        'gitter-web-permissions/lib/legacy-policy-factory': {
           createPolicyForRoom: function(user, room) {
             assert.equal(room.uri, 'gitterHQ/sandbox');
             return Promise.resolve({});
@@ -1620,7 +1628,7 @@ describe('room-service', function() {
             }
           }
         },
-        'gitter-web-permissions/lib/legacy-policy-factory': {
+        'gitter-web-permissions/lib/github-policy-factory': {
           createPolicyForGithubObject: function(user, uri, githubType, security) {
             assert.strictEqual(user.username, fixture.user1.username);
             assert.strictEqual(uri, 'gitterTest');
@@ -1660,7 +1668,7 @@ describe('room-service', function() {
             }
           }
         },
-        'gitter-web-permissions/lib/legacy-policy-factory': {
+        'gitter-web-permissions/lib/github-policy-factory': {
           createPolicyForGithubObject: function(user, uri, githubType, security) {
             assert.strictEqual(user.username, fixture.user1.username);
             assert.strictEqual(uri, 'gitterTest');
@@ -1698,7 +1706,7 @@ describe('room-service', function() {
         'gitter-web-github': {
           GitHubUriValidator: roomValidatorMock
         },
-        'gitter-web-permissions/lib/legacy-policy-factory': {
+        'gitter-web-permissions/lib/github-policy-factory': {
           createPolicyForGithubObject: createPolicyForGithubObjectMock
         },
         'gitter-web-groups/lib/group-service': {
@@ -1933,7 +1941,7 @@ describe('room-service', function() {
         'gitter-web-github': {
           GitHubUriValidator: roomValidatorMock
         },
-        'gitter-web-permissions/lib/legacy-policy-factory': {
+        'gitter-web-permissions/lib/github-policy-factory': {
           createPolicyForGithubObject: createPolicyForGithubObjectMock,
         }
       });

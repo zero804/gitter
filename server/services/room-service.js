@@ -15,6 +15,7 @@ var validateRoomName = require('gitter-web-validators/lib/validate-room-name');
 var persistence = require('gitter-web-persistence');
 var uriLookupService = require("./uri-lookup-service");
 var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
+var githubPolicyFactory = require('gitter-web-permissions/lib/github-policy-factory');
 var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
 var canUserBeInvitedToJoinRoom = require('gitter-web-permissions/lib/invited-permissions-service');
 var userService = require('./user-service');
@@ -256,7 +257,7 @@ function createRoomForGitHubUri(user, uri, options) {
       /* Room does not yet exist */
       // TODO: switch out for policy...
       // Parent rooms always have security == null
-      return policyFactory.createPolicyForGithubObject(user, officialUri, githubType, null)
+      return githubPolicyFactory.createPolicyForGithubObject(user, officialUri, githubType, null)
         .bind({
           troupe: null,
           updateExisting: null,
