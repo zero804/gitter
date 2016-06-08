@@ -1,6 +1,7 @@
 'use strict';
 
 var env = require('gitter-web-env');
+var stats = env.stats;
 var config = env.config;
 var Promise = require('bluebird');
 var _ = require('lodash');
@@ -58,12 +59,23 @@ function upsertGroup(user, groupInfo, securityDescriptor) {
         sd: securityDescriptor
       }
     })
-    .spread(function(group /*, updateExisting */) {
+    .spread(function(group, updateExisting) {
+      if (!updateExisting) {
+        /* Send a stat for a new group */
+        stats.event('new_group', {
+          uri: uri,
+          groupId: group._id,
+          userId: user._id
+        });
+      }
+
       return group;
     });
 }
 
-
+/**
+ * @private
+ */
 function ensureAccessAndFetchGroupInfo(user, options) {
   options = options || {};
 
@@ -103,7 +115,9 @@ function ensureAccessAndFetchGroupInfo(user, options) {
     })
 }
 
-
+/**
+ * Create a new group
+ */
 function createGroup(user, options) {
   if (!config.get("project-splitsville:enabled")) {
     if (!options.type && options.uri && options.uri[0] !== '_') {

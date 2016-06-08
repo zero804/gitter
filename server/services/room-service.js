@@ -62,7 +62,8 @@ function sendJoinStats(user, room, tracking) {
     source: tracking && tracking.source,
     room_uri: room.uri,
     owner: getOrgNameFromTroupeName(room.uri),
-    troupeId: room.id
+    troupeId: room.id,
+    groupId: room.groupId
   });
 }
 
@@ -553,6 +554,9 @@ function createRoomByUri(user, uri, options) {
               });
 
             stats.event("create_room", {
+              uri: uri,
+              roomId: troupe.id,
+              groupId: troupe.groupId,
               userId: user.id,
               roomType: "github-room"
             });
