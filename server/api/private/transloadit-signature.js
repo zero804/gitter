@@ -1,12 +1,12 @@
 "use strict";
 
-var env   = require('gitter-web-env');
+var env = require('gitter-web-env');
 var nconf = env.config;
 var redis = require('../../utils/redis');
-var uuid  = require('node-uuid');
+var uuid = require('node-uuid');
 
 var TransloaditClient = require('transloadit');
-var transloadit       = new TransloaditClient({
+var transloadit = new TransloaditClient({
   authKey    : nconf.get('transloadit:key'),
   authSecret : nconf.get('transloadit:secret')
 });
@@ -20,8 +20,8 @@ function randomString(length) {
     return result;
 }
 
-module.exports =  function(req, res) {
-  var token      = uuid.v4();
+module.exports = function(req, res) {
+  var token = uuid.v4();
   var shortToken = randomString(4);
   var apiBasePath = nconf.get('web:apiBasePath');
 

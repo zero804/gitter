@@ -1,17 +1,17 @@
 'use strict';
 
-var Backbone                    = require('backbone');
-var Marionette                  = require('backbone.marionette');
-var _                           = require('underscore');
-var ItemView                    = require('./primary-collection-item-view');
-var BaseCollectionView          = require('../base-collection/base-collection-view');
-var EmptyAllView                = require('./primary-collection-item-all-empty-view.js');
-var EmptySearchView             = require('./primary-collection-item-search-empty-view.js');
-var EmptyFavouriteView          = require('./primary-collection-item-favourite-empty-view.js');
-var perfTiming                  = require('components/perf-timing');
+var Backbone = require('backbone');
+var Marionette = require('backbone.marionette');
+var _ = require('underscore');
+var ItemView = require('./primary-collection-item-view');
+var BaseCollectionView = require('../base-collection/base-collection-view');
+var EmptyAllView = require('./primary-collection-item-all-empty-view.js');
+var EmptySearchView = require('./primary-collection-item-search-empty-view.js');
+var EmptyFavouriteView = require('./primary-collection-item-favourite-empty-view.js');
+var perfTiming = require('components/perf-timing');
 var compositeViewRenderTemplate = require('utils/composite-view-render-template');
-var domIndexById                = require('utils/dom-index-by-id');
-var toggleClass                 = require('utils/toggle-class');
+var domIndexById = require('utils/dom-index-by-id');
+var toggleClass = require('utils/toggle-class');
 
 var proto = BaseCollectionView.prototype;
 
@@ -42,10 +42,10 @@ var PrimaryCollectionView = BaseCollectionView.extend({
   },
 
   childViewOptions: function(model) {
-    var baseOptions   = BaseCollectionView.prototype.childViewOptions.apply(this, arguments);
+    var baseOptions = BaseCollectionView.prototype.childViewOptions.apply(this, arguments);
     baseOptions.model = model;
-    var id            = model.get('id');
-    var element       = this.domMap[id];
+    var id = model.get('id');
+    var element = this.domMap[id];
     return !!element ? _.extend(baseOptions, { el: element }) : baseOptions;
   },
 
@@ -54,8 +54,8 @@ var PrimaryCollectionView = BaseCollectionView.extend({
       throw new Error('A valid event bus must be passed to a new PrimaryCollectionView');
     }
 
-    this.bus     = options.bus;
-    this.model   = options.model;
+    this.bus = options.bus;
+    this.model = options.model;
     this.dndCtrl = options.dndCtrl;
     this.uiModel = new Backbone.Model({ isFocused: false, isDragging: false });
 

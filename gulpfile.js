@@ -1,42 +1,91 @@
 'use strict';
 
-var gulp = require('gulp');
+var Promise = require('bluebird');
 var argv = require('yargs').argv;
+var gulp = require('gulp');
+
+var through = require('through2');
+var gutil = require('gulp-util');
+var runSequence = require('run-sequence');
+var debug = require('gulp-debug');
+var _ = require('underscore');
+
 var livereload = require('gulp-livereload');
+var sourcemaps = require('gulp-sourcemaps');
+
+var postcss = require('gulp-postcss');
+var autoprefixer = require('autoprefixer-core');
+var mqpacker = require('css-mqpacker');
+var csswring = require('csswring');
+var styleBuilder = require('./build-scripts/style-builder');
+
 var webpack = require('gulp-webpack');
-var less = require('gulp-less');
+var eslint = require('gulp-eslint');
+
 var gzip = require('gulp-gzip');
 var mocha = require('gulp-spawn-mocha');
 var using = require('gulp-using');
 var tar = require('gulp-tar');
 var expect = require('gulp-expect-file');
 var git = require('gulp-git');
-var fs = require('fs');
-var eslint = require('gulp-eslint');
-var postcss = require('gulp-postcss');
-var autoprefixer = require('autoprefixer-core');
-var mqpacker = require('css-mqpacker');
-var csswring = require('csswring');
-var mkdirp = require('mkdirp');
-var sourcemaps = require('gulp-sourcemaps');
+
 var shell = require('gulp-shell');
-var del = require('del');
 var grepFail = require('gulp-grep-fail');
-var runSequence = require('run-sequence');
 var jsonlint = require('gulp-jsonlint');
 var uglify = require('gulp-uglify');
 var coveralls = require('gulp-coveralls');
-var lcovMerger = require ('lcov-result-merger');
-var gutil = require('gulp-util');
-var path = require('path');
+var lcovMerger = require('lcov-result-merger');
 var sonar = require('gulp-sonar');
-var glob = require('glob');
 var codacy = require('gulp-codacy');
 var through = require('through2');
 var utimes  = require('fs').utimes;
 
+var fs = require('fs-extra');
+var path = require('path');
+var mkdirp = require('mkdirp');
+var del = require('del');
+var glob = require('glob');
+var url = require('url');
+
+
+var getSourceMapUrl = function() {
+  if (!process.env.BUILD_URL) return;
+
+  return process.env.BUILD_URL + 'artifact/output';
+};
+
+
+var getGulpSourceMapOptions = function(mapsSubDir) {
+  var sourceMapUrl = getSourceMapUrl();
+  if (!sourceMapUrl) {
+    return {
+      dest: '.'
+    };
+  }
+  var suffix = mapsSubDir ? mapsSubDir + '/' : '';
+
+  mkdirp.sync('output/maps/' + suffix);
+
+  return {
+    dest: path.relative('./output/assets/js/' + suffix + '/', './output/maps/' + suffix + '/'),
+    options: {
+      sourceRoot: path.relative('./output/maps/' + suffix, './output/assets/js/' + suffix),
+      sourceMappingURLPrefix: sourceMapUrl,
+    }
+  };
+};
+
+
+var cssDestDir = 'output/assets/styles';
+var cssWatchGlob = 'public/**/*.less';
+
+
+
 /* Don't do clean in gulp, use make */
 var RUN_TESTS_IN_PARALLEL = false;
+if (process.env.PARALLEL_TESTS) {
+  RUN_TESTS_IN_PARALLEL = true;
+}
 
 var testModules = {
 };
@@ -50,6 +99,15 @@ modulesWithTest.forEach(function(testDir) {
     includeInFast: false
   }
 });
+
+testModules['api-tests'] = {
+  files: ['./test/api-tests/**/*.js'],
+  options: {
+    // These tests load the entire app, so mocha will sometimes timeout before it even runs the tests
+    timeout: 30000
+  },
+  includeInFast: false
+};
 
 testModules.integration = {
   files: ['./test/integration/**/*.js', './test/public-js/**/*.js'],
@@ -66,7 +124,7 @@ function makeTestTasks(taskName, generator, isFast) {
     }
 
     gulp.task(taskName + '-' + moduleName, function() {
-      return generator(moduleName, definition.files);
+      return generator(moduleName, definition.files, definition.options || {});
     });
   });
 
@@ -100,17 +158,21 @@ gulp.task('validate-config', function() {
 });
 
 gulp.task('validate-eslint', function() {
+  mkdirp.sync('output/eslint/');
   return gulp.src(['**/*.js','!node_modules/**','!public/repo/**'])
     .pipe(eslint({
       quiet: argv.quiet
     }))
-    .pipe(eslint.format())
+    .pipe(eslint.format('unix'))
+    .pipe(eslint.format('checkstyle', function(checkstyleData) {
+      fs.writeFileSync('output/eslint/checkstyle.xml', checkstyleData);
+    }))
     .pipe(eslint.failAfterError());
 });
 
 gulp.task('validate', ['validate-config', 'validate-eslint']);
 
-makeTestTasks('test-mocha', function(name, files) {
+makeTestTasks('test-mocha', function(name, files, options) {
   mkdirp.sync('output/test-reports/');
   mkdirp.sync('output/coverage-reports/' + name);
 
@@ -118,7 +180,7 @@ makeTestTasks('test-mocha', function(name, files) {
 
   var mochaOpts = {
     reporter: 'mocha-multi',
-    timeout: 10000,
+    timeout: options.timeout || 10000,
     istanbul: {
       dir: 'output/coverage-reports/' + name
     },
@@ -139,14 +201,14 @@ makeTestTasks('test-mocha', function(name, files) {
     .pipe(mocha(mochaOpts));
 });
 
-makeTestTasks('test-docker', function(name, files) {
+makeTestTasks('test-docker', function(name, files, options) {
   mkdirp.sync('output/test-reports/');
   mkdirp.sync('output/coverage-reports/' + name);
   gutil.log('Writing XUnit output', 'output/test-reports/' + name + '.xml');
   return gulp.src(files, { read: false })
     .pipe(mocha({
       reporter: 'mocha-multi',
-      timeout: 10000,
+      timeout: options.timeout || 10000,
       istanbul: {
         dir: 'output/coverage-reports/' + name
       },
@@ -206,12 +268,11 @@ gulp.task('submit-coveralls', ['test-mocha'/*, 'test-redis-lua'*/], function(cal
 
 gulp.task('test', ['test-mocha'/*, 'test-redis-lua'*/, 'submit-coveralls', 'submit-codacy']);
 
-makeTestTasks('localtest', function(name, files) {
-
+makeTestTasks('localtest', function(name, files, options) {
   return gulp.src(files, { read: false })
     .pipe(mocha({
       reporter: 'spec',
-      timeout: 10000,
+      timeout: options.timeout || 10000,
       bail: !!process.env.BAIL,
       env: {
         SKIP_BADGER_TESTS: 1,
@@ -238,14 +299,14 @@ gulp.task('clean:coverage', function (cb) {
   ], cb);
 });
 
-makeTestTasks('localtest-coverage', function(name, files) {
+makeTestTasks('localtest-coverage', function(name, files, options) {
   mkdirp.sync('output/test-reports/');
   mkdirp.sync('output/coverage-reports/' + name);
 
   return gulp.src(files, { read: false })
     .pipe(mocha({
       reporter: 'spec',
-      timeout: 10000,
+      timeout: options.timeout || 10000,
       istanbul: {
         dir: 'output/coverage-reports/' + name
       },
@@ -258,7 +319,7 @@ makeTestTasks('localtest-coverage', function(name, files) {
     }));
 });
 
-makeTestTasks('fasttest', function(name, files) {
+makeTestTasks('fasttest', function(name, files, options) {
   return gulp.src(files, { read: false })
     .pipe(mocha({
       reporter: 'spec',
@@ -350,7 +411,6 @@ gulp.task('copy-asset-files', function() {
     .pipe(restoreOriginalFileTimestamps());
 });
 
-
 // Run this task occassionally and check the results into git...
 // Disabled as it adds loads of extra time to npm install
 // and since we almost never use it
@@ -367,147 +427,146 @@ gulp.task('copy-asset-files', function() {
 //     .pipe(gulp.dest('./public'));
 // });
 //
-function getSourceMapUrl() {
-  if (!process.env.BUILD_URL) return;
 
-  return process.env.BUILD_URL + 'artifact/output';
-}
 
-function getSourceMapOptions(mapsSubDir) {
-  var sourceMapUrl = getSourceMapUrl();
-  if (!sourceMapUrl) {
-    return {
-      dest: '.'
-    };
-  }
-  var suffix = mapsSubDir ? mapsSubDir + '/' : '';
 
-  mkdirp.sync('output/maps/' + suffix);
-
-  return {
-    dest: path.relative('./output/assets/js/' + suffix + '/', './output/maps/' + suffix + '/'),
-    options: {
-      sourceRoot: path.relative('./output/maps/' + suffix, './output/assets/js/' + suffix ),
-      sourceMappingURLPrefix: sourceMapUrl,
+var cssIosStyleBuilder = styleBuilder([
+  'public/less/mobile-native-chat.less'
+], {
+  dest: cssDestDir,
+  watchGlob: cssWatchGlob,
+  sourceMapOptions: getGulpSourceMapOptions(),
+  lessOptions: {
+    paths: ['public/less'],
+    globalVars: {
+      'target-env': '"mobile"'
     }
+  },
+  streamTransform: function(stream) {
+    return stream
+      .pipe(postcss([
+        autoprefixer({
+          browsers: ['ios_saf >= 6'],
+          cascade: false
+        }),
+        mqpacker,
+        csswring
+      ]));
+  }
+});
+
+gulp.task('css-ios', function() {
+  return cssIosStyleBuilder.build();
+});
+
+
+var cssMobileStyleBuilder = styleBuilder([
+  'public/less/mobile-app.less',
+  'public/less/mobile-nli-app.less',
+  'public/less/mobile-userhome.less',
+  'public/less/mobile-native-userhome.less'
+], {
+  dest: cssDestDir,
+  watchGlob: cssWatchGlob,
+  sourceMapOptions: getGulpSourceMapOptions(),
+  lessOptions: {
+    paths: ['public/less'],
+    globalVars: {
+      'target-env': '"mobile"'
+    }
+  },
+  streamTransform: function(stream) {
+    return stream
+      .pipe(postcss([
+        autoprefixer({
+          browsers: [
+            'last 4 ios_saf versions',
+            'last 4 and_chr versions',
+            'last 4 and_ff versions',
+            'last 2 ie_mob versions'
+          ],
+          cascade: false
+        }),
+        mqpacker,
+        csswring
+      ]));
+  }
+});
+
+gulp.task('css-mobile', function() {
+  return cssMobileStyleBuilder.build();
+});
+
+var cssWebStyleBuilder = styleBuilder([
+  'public/less/trpAppsPage.less',
+  'public/less/error-page.less',
+  'public/less/error-layout.less',
+  'public/less/generic-layout.less',
+  'public/less/trpHooks.less',
+  'public/less/login.less',
+  'public/less/explore.less',
+  'public/less/router-chat.less',
+  'public/less/router-app.less',
+  'public/less/router-nli-app.less',
+  'public/less/router-nli-chat.less',
+  'public/less/router-embed-chat.less',
+  'public/less/router-nli-embed-chat.less',
+  'public/less/chat-card.less',
+  'public/less/router-archive-home.less',
+  'public/less/router-archive-links.less',
+  'public/less/router-archive-chat.less',
+  'public/less/homepage.less',
+  'public/less/userhome.less',
+  'public/less/402.less',
+  'public/less/org-page.less'
+], {
+  dest: cssDestDir,
+  watchGlob: cssWatchGlob,
+  sourceMapOptions: getGulpSourceMapOptions(),
+  lessOptions: {
+    paths: ['public/less'],
+    globalVars: {
+      'target-env': '"web"'
+    }
+  },
+  streamTransform: function(stream) {
+    return stream
+      .pipe(postcss([
+        autoprefixer({
+          browsers: [
+            'Safari >= 5',
+            'last 4 Firefox versions',
+            'last 4 Chrome versions',
+            'IE >= 10'
+          ],
+          cascade: false
+        }),
+        mqpacker,
+        csswring
+      ]));
+  }
+});
+
+gulp.task('css-web', function() {
+  return cssWebStyleBuilder.build();
+});
+
+
+gulp.task('css', function() {
+  var overrideOpts = {
+    watch: false
   };
 
-}
-
-gulp.task('css-ios', function () {
-  var sourceMapOpts = getSourceMapOptions();
-
-  return gulp.src([
-    'public/less/mobile-native-chat.less'
-    ])
-    .pipe(sourcemaps.init())
-    .pipe(less({
-      paths: ['public/less'],
-      globalVars: {
-        "target-env": '"mobile"'
-      }
-    }))
-    .pipe(postcss([
-      autoprefixer({
-        browsers: ['ios_saf >= 6'],
-        cascade: false
-      }),
-      mqpacker,
-      csswring
-    ]))
-    .pipe(sourcemaps.write(sourceMapOpts.dest, sourceMapOpts.options))
-    .pipe(gulp.dest('output/assets/styles'));
+  return Promise.all([
+    cssIosStyleBuilder.build(),
+    cssMobileStyleBuilder.build(),
+    cssWebStyleBuilder.build()
+  ]);
 });
 
-gulp.task('css-mobile', function () {
-  var sourceMapOpts = getSourceMapOptions();
-  return gulp.src([
-    'public/less/mobile-app.less',
-    'public/less/mobile-nli-app.less',
-    'public/less/mobile-userhome.less',
-    'public/less/mobile-native-userhome.less'
-    ])
-    .pipe(sourcemaps.init())
-    .pipe(less({
-      paths: ['public/less'],
-      globalVars: {
-        "target-env": '"mobile"'
-      }
-    }))
-    .pipe(postcss([
-      autoprefixer({
-        browsers: [
-          'last 4 ios_saf versions',
-          'last 4 and_chr versions',
-          'last 4 and_ff versions',
-          'last 2 ie_mob versions'],
-        cascade: false
-      }),
-      mqpacker,
-      csswring
-    ]))
-    .pipe(sourcemaps.write(sourceMapOpts.dest, sourceMapOpts.options))
-    .pipe(gulp.dest('output/assets/styles'));
-});
 
-gulp.task('css-web', function () {
-  var sourceMapOpts = getSourceMapOptions();
 
-  var lessFiles = [
-    'public/less/trpAppsPage.less',
-    'public/less/error-page.less',
-    'public/less/error-layout.less',
-    'public/less/generic-layout.less',
-    'public/less/trpHooks.less',
-    'public/less/login.less',
-    'public/less/explore.less',
-    'public/less/community-create.less',
-    'public/less/router-chat.less',
-    'public/less/router-app.less',
-    'public/less/router-nli-app.less',
-    'public/less/router-nli-chat.less',
-    'public/less/router-embed-chat.less',
-    'public/less/router-nli-embed-chat.less',
-    'public/less/chat-card.less',
-    'public/less/router-archive-home.less',
-    'public/less/router-archive-links.less',
-    'public/less/router-archive-chat.less',
-    'public/less/homepage.less',
-    'public/less/userhome.less',
-    'public/less/402.less',
-    'public/less/org-page.less'
-  ];
 
-  return gulp.src(lessFiles)
-    .pipe(expect({ errorOnFailure: true }, lessFiles))
-    .pipe(sourcemaps.init())
-    .pipe(less({
-      paths: ['public/less'],
-      globalVars: {
-        "target-env": '"web"'
-      }
-    }).on('error', function(err){
-      console.log(err);
-    }))
-    .pipe(postcss([
-      autoprefixer({
-        browsers: [
-          'Safari >= 5',
-          'last 4 Firefox versions',
-          'last 4 Chrome versions',
-          'IE >= 10'],
-        cascade: false
-      }),
-      mqpacker,
-      csswring
-    ]))
-    .pipe(sourcemaps.write(sourceMapOpts.dest, sourceMapOpts.options))
-    .pipe(gulp.dest('output/assets/styles'));
-
-    return stream;
-});
-
-gulp.task('css', ['css-web', 'css-mobile', 'css-ios']);
 
 gulp.task('webpack', function() {
   return gulp.src('./public/js/webpack.config')
@@ -526,7 +585,7 @@ function getUglifyOptions() {
 }
 
 gulp.task('uglify', ['webpack'], function() {
-  var sourceMapOpts = getSourceMapOptions();
+  var sourceMapOpts = getGulpSourceMapOptions();
   return gulp.src('output/assets/js/*.js')
     .pipe(sourcemaps.init({ /* loadMaps: true */ }))
     .pipe(uglify(getUglifyOptions()))
@@ -535,7 +594,7 @@ gulp.task('uglify', ['webpack'], function() {
 });
 
 gulp.task('embedded-uglify', ['embedded-webpack'], function() {
-  var sourceMapOpts = getSourceMapOptions();
+  var sourceMapOpts = getGulpSourceMapOptions();
   return gulp.src('output/assets/js/*.js')
     .pipe(sourcemaps.init({ /* loadMaps: true */ }))
     .pipe(uglify(getUglifyOptions()))
@@ -590,9 +649,10 @@ gulp.task('default', function(callback) {
 /**
  * watch
  */
-gulp.task('watch', ['css'], function() {
-  //livereload.listen();
-  gulp.watch('public/**/*.less', ['css'])/*.on('change', livereload.changed)*/;
+gulp.task('watch', function() {
+  cssIosStyleBuilder.startWatching();
+  cssMobileStyleBuilder.startWatching();
+  cssWebStyleBuilder.startWatching();
 });
 
 

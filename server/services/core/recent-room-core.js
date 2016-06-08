@@ -1,19 +1,19 @@
 "use strict";
 
-var Promise                 = require('bluebird');
-var lazy                    = require('lazy.js');
-var persistence             = require('gitter-web-persistence');
-var _                       = require('underscore');
-var debug                   = require('debug')('gitter:recent-room-core');
+var Promise = require('bluebird');
+var lazy = require('lazy.js');
+var persistence = require('gitter-web-persistence');
+var _ = require('underscore');
+var debug = require('debug')('gitter:app:recent-room-core');
 
-exports.updateFavourite                                = updateFavourite;
-exports.clearFavourite                                 = clearFavourite;
-exports.findFavouriteTroupesForUser                    = findFavouriteTroupesForUser;
-exports.saveUserTroupeLastAccess                       = saveUserTroupeLastAccess;
+exports.updateFavourite = updateFavourite;
+exports.clearFavourite = clearFavourite;
+exports.findFavouriteTroupesForUser = findFavouriteTroupesForUser;
+exports.saveUserTroupeLastAccess = saveUserTroupeLastAccess;
 exports.getTroupeLastAccessTimesForUserExcludingHidden = getTroupeLastAccessTimesForUserExcludingHidden;
-exports.getTroupeLastAccessTimesForUser                = getTroupeLastAccessTimesForUser;
-exports.findLastAccessTimesForUsersInRoom              = findLastAccessTimesForUsersInRoom;
-exports.clearLastVisitedTroupeforUserId                = clearLastVisitedTroupeforUserId;
+exports.getTroupeLastAccessTimesForUser = getTroupeLastAccessTimesForUser;
+exports.findLastAccessTimesForUsersInRoom = findLastAccessTimesForUsersInRoom;
+exports.clearLastVisitedTroupeforUserId = clearLastVisitedTroupeforUserId;
 
 /* const */
 var LEGACY_FAV_POSITION = 1000;
@@ -215,9 +215,9 @@ function getTroupeLastAccessTimesForUser(userId) {
 function findLastAccessTimesForUsersInRoom(roomId, userIds) {
   if (!userIds.length) return Promise.resolve({});
 
-  var troupesKey = 'troupes.' +  roomId;
-  var lastKey = 'last.' +  roomId;
-  var addedKey = 'added.' +  roomId;
+  var troupesKey = 'troupes.' + roomId;
+  var lastKey = 'last.' + roomId;
+  var addedKey = 'added.' + roomId;
 
   var orClause = [{}, {}, {}];
   orClause[0][troupesKey] = { $exists: true };

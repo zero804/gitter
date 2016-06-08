@@ -1,21 +1,21 @@
 "use strict";
 
-var env                   = require('gitter-web-env');
-var logger                = env.logger;
-var _                     = require("lodash");
-var Promise               = require('bluebird');
-var uniqueIds             = require('mongodb-unique-ids');
-var appEvents             = require('gitter-web-appevents');
-var createDistribution    = require('./create-distribution');
-var engine                = require('./engine');
-var readByService         = require("../readby-service");
+var env = require('gitter-web-env');
+var logger = env.logger;
+var _ = require("lodash");
+var Promise = require('bluebird');
+var uniqueIds = require('mongodb-unique-ids');
+var appEvents = require('gitter-web-appevents');
+var createDistribution = require('./create-distribution');
+var engine = require('./engine');
+var readByService = require("../readby-service");
 var roomMembershipService = require('../room-membership-service');
-var mongoUtils            = require('gitter-web-persistence-utils/lib/mongo-utils');
-var RedisBatcher          = require('../../utils/redis-batcher').RedisBatcher;
-var recentRoomCore        = require('../core/recent-room-core');
-var debug                 = require('debug')('gitter:unread-items:service');
-var badgeBatcher          = new RedisBatcher('badge', 1000, batchBadgeUpdates);
-var distributionDelta     = require('./distribution-delta');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var RedisBatcher = require('../../utils/redis-batcher').RedisBatcher;
+var recentRoomCore = require('../core/recent-room-core');
+var debug = require('debug')('gitter:app:unread-items:service');
+var badgeBatcher = new RedisBatcher('badge', 1000, batchBadgeUpdates);
+var distributionDelta = require('./distribution-delta');
 
 /* Handles batching badge updates to users */
 function batchBadgeUpdates(key, userIds, done) {

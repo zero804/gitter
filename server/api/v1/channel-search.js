@@ -1,9 +1,9 @@
 "use strict";
 
 var channelService = require('../../services/channel-service');
-var restSerializer   = require("../../serializers/rest-serializer");
+var restSerializer = require("../../serializers/rest-serializer");
 
-module.exports =  function(req, res, next) {
+module.exports = function(req, res, next) {
   var limit = req.query.limit ? parseInt(req.query.limit, 10) : undefined;
 
   channelService.findChannels(req.user, req.query.q, {limit: limit})

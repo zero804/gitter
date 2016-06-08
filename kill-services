@@ -8,11 +8,33 @@ set -euo pipefail
 
 DOCKER_MACHINE_NAME=${DOCKER_MACHINE_NAME-default}
 
+function has_local_docker_install {
+  if [[ "$OSTYPE" == "linux-gnu" ]]; then
+    return 0
+  fi
+
+  # Is Docker for Mac running?
+  if (pgrep -f /Applications/Docker.app/Contents/MacOS/Docker > /dev/null); then
+    return 0
+  fi
+
+  return 1
+}
+
+get_local_ip() {
+    local _ip _line
+    while IFS=$': \t' read -a _line ;do
+        [ -z "${_line%inet}" ] &&
+           _ip=${_line[${#_line[1]}>4?1:2]} &&
+           [ "${_ip#127.0.0.1}" ] && echo $_ip && return 0
+      done< <(LANG=C /sbin/ifconfig)
+}
+
 function get_ip {
-  if [[ "$OSTYPE" != "linux-gnu" ]]; then
-    echo "$(docker-machine ip $DOCKER_MACHINE_NAME)"
+  if has_local_docker_install; then
+    get_local_ip
   else
-    ip route get 8.8.8.8 | head -1 | cut -d' ' -f8
+    echo "$(docker-machine ip $DOCKER_MACHINE_NAME)"
   fi
 }
 
@@ -37,15 +59,13 @@ function stopDockerMachine {
 }
 
 function stopDockerServices {
-  eval "$(docker-machine env $DOCKER_MACHINE_NAME)"
-
   echo "-- Stop services using docker-compose"
   docker-compose stop
   docker-compose rm -f
 }
 
 
-if [[ "$OSTYPE" != "linux-gnu" ]]; then
+if ! has_local_docker_install; then
   eval "$(docker-machine env $DOCKER_MACHINE_NAME)"
 fi
 
@@ -56,4 +76,7 @@ WORKSPACE="$(pwd)"
 export WORKSPACE
 
 stopDockerServices
-stopDockerMachine
+
+if ! has_local_docker_install; then
+  stopDockerMachine
+fi

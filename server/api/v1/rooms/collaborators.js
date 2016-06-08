@@ -1,7 +1,7 @@
 "use strict";
 
 var getCollaboratorForRoom = require('../../../services/collaborators-service');
-var loadTroupeFromParam    = require('./load-troupe-param');
+var loadTroupeFromParam = require('./load-troupe-param');
 
 module.exports = {
   id: 'resourceTroupeUser',

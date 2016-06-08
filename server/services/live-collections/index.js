@@ -1,8 +1,8 @@
 'use strict';
 
-var env               = require('gitter-web-env');
-var logger            = env.logger;
-var EventEmitter      = require('events').EventEmitter;
+var env = require('gitter-web-env');
+var logger = env.logger;
+var EventEmitter = require('events').EventEmitter;
 
 // This is a bit crazy, but we need to get around node circular references
 var handlers = {

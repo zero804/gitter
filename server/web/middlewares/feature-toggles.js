@@ -1,9 +1,9 @@
 'use strict';
 
-var fflip       = require('fflip');
-var mongoUtils  = require('gitter-web-persistence-utils/lib/mongo-utils');
+var fflip = require('fflip');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var persistence = require('gitter-web-persistence');
-var useragent   = require('useragent');
+var useragent = require('useragent');
 
 /**
  * List of criteria functions to be used by feature toggles

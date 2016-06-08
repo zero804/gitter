@@ -1,40 +1,93 @@
 "use strict";
 
-var SecurityDescriptor = require('gitter-web-persistence').SecurityDescriptor;
-var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
+var Troupe = require('gitter-web-persistence').Troupe;
+var Group = require('gitter-web-persistence').Group;
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var assert = require('assert');
 var securityDescriptorValidator = require('./security-descriptor-validator');
 var StatusError = require('statuserror');
+var Promise = require('bluebird');
 
-function getForRoomUser(roomId, userId) {
+/**
+ * @private
+ */
+function findByIdForModel(Model, id, userId) {
   var projection = {
     _id: 0,
-    type: 1,
-    members: 1,
-    admins: 1,
-    public: 1,
-    linkPath: 1,
-    externalId: 1,
+    'sd.type': 1,
+    'sd.members': 1,
+    'sd.admins': 1,
+    'sd.public': 1,
+    'sd.linkPath': 1,
+    'sd.externalId': 1,
   };
 
   if (userId) {
-    var elemMatch = { $elemMatch: { $eq: userId } };
-    projection.oneToOneUsers = { $elemMatch: { userId: userId } };
+    // TODO: selectively elemMath var elemMatch = { $elemMatch: { $eq: userId } };
     // projection.bans = elemMatch; TODO ADD BANS
-    projection.extraMembers = elemMatch;
-    projection.extraAdmins = elemMatch;
+    projection['sd.extraMembers'] = 1;
+    projection['sd.extraAdmins'] = 1;
+  }
+
+  return Model.findById(id, projection, { lean: true })
+    .exec()
+    .then(function(doc) {
+      if (!doc) return null; // TODO: throw 404?
+      securityDescriptorValidator(doc.sd);
+      return doc.sd;
+    });
+}
+
+function getForRoomUser(roomId, userId) {
+  return findByIdForModel(Troupe, roomId, userId);
+}
+
+function getForGroupUser(groupId, userId) {
+  return findByIdForModel(Group, groupId, userId);
+}
+
+/**
+ * @private
+ */
+function insertForModel(Model, id, descriptor) {
+  var sd = {
+    type: descriptor.type,
+    members: descriptor.members,
+    admins: descriptor.admins,
+    public: descriptor.public,
+    linkPath: descriptor.linkPath,
+    externalId: descriptor.externalId,
+  };
+
+  var setOperation = {
+    $set: {
+      sd: sd
+    }
+  };
+
+  securityDescriptorValidator(descriptor);
+
+  // if (descriptor.bans && descriptor.bans.length) {
+  //   setOperation.$setOnInsert.bans = mongoUtils.asObjectIDS(descriptor.extraMembers);
+  // }
+
+  if (descriptor.extraMembers && descriptor.extraMembers.length) {
+    sd.extraMembers = mongoUtils.asObjectIDs(descriptor.extraMembers);
+  }
+
+  if (descriptor.extraAdmins && descriptor.extraAdmins.length) {
+    sd.extraAdmins = mongoUtils.asObjectIDs(descriptor.extraAdmins);
   }
 
   var query = {
-    troupeId: roomId
+    _id: mongoUtils.asObjectID(id),
+    sd: { $exists: false }
   };
 
-  return SecurityDescriptor.findOne(query, projection, { lean: true })
+  return Model.update(query, setOperation)
     .exec()
-    .then(function(descriptor) {
-      securityDescriptorValidator(descriptor);
-      return descriptor;
+    .then(function(result) {
+      return result.nModified > 0;
     });
 }
 
@@ -42,37 +95,11 @@ function getForRoomUser(roomId, userId) {
  * Returns true if an existing descriptor was updated
  */
 function insertForRoom(roomId, descriptor) {
-  roomId = mongoUtils.asObjectID(roomId);
-  securityDescriptorValidator(descriptor);
+  return insertForModel(Troupe, roomId, descriptor);
+}
 
-  var setOperation = {
-    $setOnInsert: {
-      troupeId: roomId,
-      type: descriptor.type,
-      members: descriptor.members,
-      admins: descriptor.admins,
-      public: descriptor.public,
-      linkPath: descriptor.linkPath,
-      externalId: descriptor.externalId,
-    }
-  };
-
-  // if (descriptor.bans && descriptor.bans.length) {
-  //   setOperation.$setOnInsert.bans = mongoUtils.asObjectIDS(descriptor.extraMembers);
-  // }
-
-  if (descriptor.extraMembers && descriptor.extraMembers.length) {
-    setOperation.$setOnInsert.extraMembers = mongoUtils.asObjectIDs(descriptor.extraMembers);
-  }
-
-  if (descriptor.extraAdmins && descriptor.extraAdmins.length) {
-    setOperation.$setOnInsert.extraAdmins = mongoUtils.asObjectIDs(descriptor.extraAdmins);
-  }
-
-  return mongooseUtils.leanUpsert(SecurityDescriptor, { troupeId: roomId }, setOperation)
-    .then(function(existing) {
-      return !existing;
-    });
+function insertForGroup(groupId, descriptor) {
+  return insertForModel(Group, groupId, descriptor);
 }
 
 function updateLinksForRepo(linkPath, newLinkPath, externalId) {
@@ -88,28 +115,30 @@ function updateLinksForRepo(linkPath, newLinkPath, externalId) {
     throw new StatusError(400, 'Invalid linkPath attribute: ' + linkPath);
   }
 
-
   var query = {
-    type: 'GH_REPO',
-    linkPath: linkPath
+    'sd.type': 'GH_REPO',
+    'sd.linkPath': linkPath
   };
 
   var update = {
     $set: {
-      linkPath: newLinkPath
+      'sd.linkPath': newLinkPath
     }
   };
 
   if (externalId) {
-    update.$set.externalId = externalId;
+    update.$set['sd.externalId'] = externalId;
   }
 
-  return SecurityDescriptor.update(query, update, { multi: true })
-    .exec();
+  return Promise.join(
+    Troupe.update(query, update, { multi: true }).exec(),
+    Group.update(query, update, { multi: true }).exec());
 }
 
 module.exports = {
   getForRoomUser: getForRoomUser,
+  getForGroupUser: getForGroupUser,
   insertForRoom: insertForRoom,
+  insertForGroup: insertForGroup,
   updateLinksForRepo: updateLinksForRepo,
 };

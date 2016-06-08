@@ -2,7 +2,7 @@
 
 var mongoose = require('mongoose');
 var Promise = require('bluebird');
-var debug = require('debug')('gitter:on-mongo-connect');
+var debug = require('debug')('gitter:infra:on-mongo-connect');
 
 module.exports = function onMongoConnect(callback) {
   var promise;

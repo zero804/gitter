@@ -1,9 +1,9 @@
 'use strict';
 
-var Marionette  = require('backbone.marionette');
-var fastdom     = require('fastdom');
-var template    = require('./base-collection-view.hbs');
-var context     = require('utils/context');
+var Marionette = require('backbone.marionette');
+var fastdom = require('fastdom');
+var template = require('./base-collection-view.hbs');
+var context = require('utils/context');
 var toggleClass = require('utils/toggle-class');
 var parseItemForTemplate = require('gitter-web-shared/parse/left-menu-primary-item');
 
@@ -51,9 +51,9 @@ module.exports = Marionette.CompositeView.extend({
 
 
   constructor: function(attrs) {
-    this.bus            = attrs.bus;
-    this.collection     = attrs.collection;
-    this.roomMenuModel  = attrs.roomMenuModel;
+    this.bus = attrs.bus;
+    this.collection = attrs.collection;
+    this.roomMenuModel = attrs.roomMenuModel;
     this.roomCollection = attrs.roomCollection;
     this.listenTo(this.roomMenuModel, 'change:hasDismissedSuggestions', this.onDismissSuggestionsUpdate, this);
     Marionette.CompositeView.prototype.constructor.apply(this, arguments);

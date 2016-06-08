@@ -1,8 +1,8 @@
 "use strict";
 
-var Marionette    = require('backbone.marionette');
-var ModalView     = require('./modal');
-var template      = require('./tmpl/login-view.hbs');
+var Marionette = require('backbone.marionette');
+var ModalView = require('./modal');
+var template = require('./tmpl/login-view.hbs');
 
 require('gitter-styleguide/css/components/buttons.css');
 

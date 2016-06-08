@@ -1,14 +1,14 @@
 "use strict";
 
-var env                    = require('gitter-web-env');
-var winston                = env.logger;
-var assert                 = require('assert');
-var _                      = require('underscore');
-var Promise                = require('bluebird');
-var githubUserService      = require('gitter-web-github').GitHubUserService;
-var persistence            = require('gitter-web-persistence');
-var uriLookupService       = require('./uri-lookup-service');
-var mongooseUtils          = require('gitter-web-persistence-utils/lib/mongoose-utils');
+var env = require('gitter-web-env');
+var winston = env.logger;
+var assert = require('assert');
+var _ = require('underscore');
+var Promise = require('bluebird');
+var githubUserService = require('gitter-web-github').GitHubUserService;
+var persistence = require('gitter-web-persistence');
+var uriLookupService = require('./uri-lookup-service');
+var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var extractGravatarVersion = require('../utils/extract-gravatar-version');
 
 /** FIXME: the insert fields should simply extend from options or a key in options.

@@ -1,9 +1,9 @@
 'use strict';
 
-var _                           = require('underscore');
-var moment                      = require('moment');
-var urlJoin                     = require('url-join');
-var searchTemplate              = require('./secondary-collection-item-search-view.hbs');
+var _ = require('underscore');
+var moment = require('moment');
+var urlJoin = require('url-join');
+var searchTemplate = require('./secondary-collection-item-search-view.hbs');
 var SecondaryCollectionItemView = require('./secondary-collection-item-view');
 
 var clientEnv = require('gitter-client-env');

@@ -1,8 +1,8 @@
 /*global describe:true, it:true */
 "use strict";
 
-var _               = require('underscore');
-var assert          = require("assert");
+var _ = require('underscore');
+var assert = require("assert");
 var GithubContibutorService = require('..').GitHubContributorService;
 
 describe('github-contributor-service #slow', function() {

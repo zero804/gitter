@@ -1,10 +1,10 @@
 'use strict';
 
-var random     = require('../../utils/random');
+var random = require('../../utils/random');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
-var crypto     = require('crypto');
+var crypto = require('crypto');
 
-var password   = 'soapP2igs1Od2gen';
+var password = 'soapP2igs1Od2gen';
 
 function encrypt(tokenPair) {
   var cipher = crypto.createCipher('aes128', password);
