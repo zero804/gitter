@@ -33,6 +33,7 @@ function getTroupeUserFromId(troupeId, userId) {
 function getTroupeUserFromUsername(troupeId, username) {
   return userService.findByUsername(username)
     .then(function(user) {
+      if (!user) return;
       return troupeService.findByIdLeanWithMembership(troupeId, user.id)
         .spread(function(troupe, isMember) {
           if (!isMember) return;

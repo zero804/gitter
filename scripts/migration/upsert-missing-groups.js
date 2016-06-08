@@ -156,9 +156,9 @@ function migrate(batch, enc, callback) {
       // Insert group security descriptors for the owning org or user.
       // (this will only insert if it is missing)
       var securityDescriptor = securityDescriptorGenerator.generate(gitterUser, {
-        type: 'GH_'+info.type.toUpperCase(), // ORG or USER
-        linkPath: info.owner.uri, // mixed case OK?
-        externalId: info.owner.githubId,
+        type: info.type.toUpperCase(), // ORG or USER
+        uri: info.owner.uri, // mixed case OK?
+        githubId: info.owner.githubId
       });
 
       // upsert the lcOwner into group
