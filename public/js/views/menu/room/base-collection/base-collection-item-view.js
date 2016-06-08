@@ -114,7 +114,7 @@ var BaseCollectionItemView = Marionette.ItemView.extend({
       unreadIndicatorContent = unreads;
     }
     Array.prototype.forEach.call(this.ui.unreadIndicator, function(indicatorElement) {
-      indicatorElement.innerHTML = unreadIndicatorContent;
+      indicatorElement.textContent = unreadIndicatorContent;
     });
 
     this.pulseIndicators();

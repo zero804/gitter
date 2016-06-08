@@ -11,5 +11,6 @@ module.exports = {
       return { then: function(){ return { catch: function(){} }; }, catch: function(){} };
     }
   },
-  delete: sinon.stub().returns(Promise.resolve())
+  delete: sinon.stub().returns(Promise.resolve()),
+  get: sinon.stub().returns(Promise.resolve())
 };
