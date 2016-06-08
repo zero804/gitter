@@ -19,7 +19,11 @@ describe('group-api', function() {
   var fixture = fixtureLoader.setup({
     deleteDocuments: {
       User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }],
-      Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() }],
+      Group: [
+              { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() },
+              { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
+              { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() } ],
+      Troupe: [ { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() + '/' + fixtureLoader.GITTER_INTEGRATION_REPO.toLowerCase() } ]
     },
     user1: {
       githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
@@ -27,6 +31,14 @@ describe('group-api', function() {
       accessToken: 'web-internal'
     },
     group1: {
+      uri: fixtureLoader.GITTER_INTEGRATION_USERNAME,
+      lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase(),
+      securityDescriptor: {
+        type: 'GH_USER',
+        admins: 'GH_USER_SAME',
+        linkPath: fixtureLoader.GITTER_INTEGRATION_USERNAME,
+        extraAdmins: ['user1']
+      }
     },
     troupe1: {
       security: 'PUBLIC',
@@ -49,10 +61,25 @@ describe('group-api', function() {
       .expect(200)
   });
 
-  it('POST /v1/groups', function() {
+  it('POST /v1/groups (new style community)', function() {
     return request(app)
       .post('/v1/groups')
-      .send({ uri: fixtureLoader.GITTER_INTEGRATION_ORG, name: 'Test' })
+      .send({ uri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY, name: 'Test' })
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+  });
+
+  it('POST /v1/groups (github org based)', function() {
+    return request(app)
+      .post('/v1/groups')
+      .send({
+        uri: fixtureLoader.GITTER_INTEGRATION_ORG,
+        name: 'Test',
+        security: {
+          type: 'GH_ORG',
+          linkPath: fixtureLoader.GITTER_INTEGRATION_ORG
+        }
+      })
       .set('x-access-token', fixture.user1.accessToken)
       .expect(200)
   });
@@ -81,5 +108,19 @@ describe('group-api', function() {
       })
   });
 
-
-})
+  it('POST /v1/groups/:groupId/rooms', function() {
+    return request(app)
+      .post('/v1/groups/' + fixture.group1.id + '/rooms')
+      .send({
+        name: fixtureLoader.GITTER_INTEGRATION_REPO,
+        topic: 'all about testing',
+        security: {
+          security: 'INHERITED',
+          type: 'GH_REPO',
+          linkPath: fixtureLoader.GITTER_INTEGRATION_USERNAME + '/' + fixtureLoader.GITTER_INTEGRATION_REPO
+        }
+      })
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200);
+  });
+});

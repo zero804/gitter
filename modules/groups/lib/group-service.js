@@ -1,5 +1,7 @@
 'use strict';
 
+var env = require('gitter-web-env');
+var config = env.config;
 var Promise = require('bluebird');
 var _ = require('lodash');
 var Group = require('gitter-web-persistence').Group;
@@ -9,12 +11,10 @@ var assert = require('assert');
 var validateGroupName = require('gitter-web-validators/lib/validate-group-name');
 var validateGroupUri = require('gitter-web-validators/lib/validate-group-uri');
 var StatusError = require('statuserror');
-var legacyPolicyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
-var validateUri = require('gitter-web-github').GitHubUriValidator;
 var debug = require('debug')('gitter:groups:group-service');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
-var securityDescriptorGenerator = require('gitter-web-permissions/lib/security-descriptor-generator');
+var ensureAccessAndFetchDescriptor = require('gitter-web-permissions/lib/ensure-access-and-fetch-descriptor');
 var lazy = require('lazy.js');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
@@ -45,18 +45,10 @@ function findByUri(uri) {
 /**
  *
  */
-function upsertGroup(user, options) {
-  var type = options.type;
-  var uri = options.uri;
-  var name = options.name || uri;
+function upsertGroup(user, groupInfo, securityDescriptor) {
+  var uri = groupInfo.uri;
+  var name = groupInfo.name || uri;
   var lcUri = uri.toLowerCase();
-  var githubId = options.githubId || null;
-
-  var securityDescriptor = securityDescriptorGenerator.generate(user, {
-      uri: uri,
-      type: type,
-      githubId: githubId,
-    });
 
   return mongooseUtils.upsert(Group, { lcUri: lcUri }, {
       $setOnInsert: {
@@ -71,66 +63,62 @@ function upsertGroup(user, options) {
     });
 }
 
-function createGroup(user, options) {
+
+function ensureAccessAndFetchGroupInfo(user, options) {
+  options = options || {};
+
   var name = options.name;
   var uri = options.uri;
+  var security = options.security || 'PUBLIC';
   assert(user, 'user required');
   assert(name, 'name required');
-  assert(uri, 'name required');
+  assert(uri, 'uri required');
 
-  if(!validateGroupName(name)) {
+  if (!validateGroupName(name)) {
     throw new StatusError(400, 'Invalid group name');
   }
 
-  if(!validateGroupUri(uri)) {
+  if (!validateGroupUri(uri)) {
     throw new StatusError(400, 'Invalid group uri: ' + uri);
   }
 
-  /* From here on we're going to be doing a create */
-  return validateUri(user, uri)
-    .bind({
-      githubInfo: null,
+  // we only support public groups for now
+  if (security !== 'PUBLIC') {
+    throw new StatusError(400, 'Invalid group security: ' + security);
+  }
+
+  return findByUri(uri)
+    .then(function(group) {
+      if (group) {
+        throw new StatusError(400, 'Group uri already taken: ' + uri);
+      }
+
+      return ensureAccessAndFetchDescriptor(user, options)
+        .then(function(securityDescriptor) {
+          return [{
+            name: name,
+            uri: uri
+          }, securityDescriptor];
+        });
     })
-    .then(function(githubInfo) {
-      debug("GitHub information for %s is %j", uri, githubInfo);
+}
 
-      if (!githubInfo) throw new StatusError(404);
-      this.githubInfo = githubInfo;
 
-      return canAdminPotentialGitHubGroup(user, githubInfo, options.obtainAccessFromGitHubRepo);
-    })
-    .then(function(isAdmin) {
-      if (!isAdmin) throw new StatusError(403, 'Not an administrator of this org');
+function createGroup(user, options) {
+  if (!config.get("project-splitsville:enabled")) {
+    if (!options.type && options.uri && options.uri[0] !== '_') {
+      throw new StatusError(400, 'Non-GitHub community URIs MUST be prefixed by an underscore for now.');
+    }
+  }
 
-      var githubInfo = this.githubInfo;
-      var type = githubInfo.type;
-      var uri = githubInfo.uri;
-      var githubId = githubInfo.githubId || null;
-      var security = githubInfo.security;
-
-      return upsertGroup(user, {
-        type: type,
-        name: name,
-        uri: uri,
-        githubId: githubId,
-        security: security
-      });
+  return ensureAccessAndFetchGroupInfo(user, options)
+    .spread(function(groupInfo, securityDescriptor) {
+      debug("Upserting %j", groupInfo);
+      return upsertGroup(user, groupInfo, securityDescriptor);
     });
 }
 
-/**
- * @private
- */
-function canAdminPotentialGitHubGroup(user, githubInfo, obtainAccessFromGitHubRepo) {
-  var type = githubInfo.type;
-  var uri = githubInfo.uri;
-  var githubId = githubInfo.id;
 
-  return legacyPolicyFactory.createGroupPolicyForGithubObject(user, type, uri, githubId, obtainAccessFromGitHubRepo)
-    .then(function(policy) {
-      return policy.canAdmin();
-    });
-}
 
 /**
  * @private
@@ -169,8 +157,10 @@ function ensureGroupForGitHubRoomCreation(user, options) {
 
       debug('No existing group. Will create');
       return createGroup(user, {
-        uri: uri,
+        type: 'GH_GUESS', // how do we know if it is a GH_ORG or GH_USER? or GH_REPO?
         name: name,
+        uri: uri,
+        linkPath: uri.split('/')[0], // does this make sense? or rather uri?
         obtainAccessFromGitHubRepo: options.obtainAccessFromGitHubRepo
       });
     });
@@ -327,8 +317,10 @@ function ensureGroupForRoom(room, user) {
       if (group) return group;
 
       return createGroup(user, {
-        uri: groupUri,
+        type: 'GH_GUESS', // could be a GH_ORG or GH_USER
         name: groupUri,
+        uri: groupUri,
+        linkPath: groupUri,
         obtainAccessFromGitHubRepo: obtainAccessFromGitHubRepo
       });
     })
@@ -356,8 +348,10 @@ function ensureGroupForUser(user) {
       if (group) return group;
 
       return createGroup(user, {
+        type: 'GH_USER',
         name: groupUri,
-        uri: groupUri
+        uri: groupUri,
+        linkPath: groupUri
       });
     });
   }
