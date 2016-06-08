@@ -7,7 +7,6 @@ var logger = env.logger;
 var GitHubStrategy = require('gitter-passport-github').Strategy;
 var TokenStateProvider = require('gitter-passport-oauth2').TokenStateProvider;
 
-
 function githubUpgradeCallback(req, accessToken, refreshToken, params, _profile, done) {
   var requestedScopes = params.scope.split(/,/);
   var scopeHash = requestedScopes.reduce(function(memo, v) {

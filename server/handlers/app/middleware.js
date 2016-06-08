@@ -1,10 +1,9 @@
 "use strict";
 
-// var roomService = require('../../services/room-service');
 var roomContextService = require('../../services/room-context-service');
-var isPhone     = require('../../web/is-phone');
-var url         = require('url');
-var debug       = require('debug')('gitter:app-middleware');
+var isPhone = require('../../web/is-phone');
+var url = require('url');
+var debug = require('debug')('gitter:app:app-middleware');
 var StatusError = require('statuserror');
 
 function normaliseUrl(params) {
@@ -24,27 +23,15 @@ function getRedirectUrl(roomUrl, req) {
   var m = req.path.match(/\/~\w+$/);
   var frame = m && m[0] || "";
   var finalUrl = url.format({ pathname: roomUrl + frame, query: req.query });
-  return finalUrl;
+  return encodeURI(finalUrl);
 }
 
 function uriContextResolverMiddleware(options) {
 
   return function(req, res, next) {
     var uri = normaliseUrl(req.params);
-    // var tracking = { source: req.query.source };
-
     debug("Looking up normalised uri %s", uri);
 
-    // var creationFilter = {
-    //   all: false
-    // };
-    //
-    // if(options && options.create) {
-    //   creationFilter.all = true;
-    //   if(options.create === 'not-repos') {
-    //     creationFilter.REPO = false;
-    //   }
-    // }
     return roomContextService.findContextForUri(req.user, uri, options)
       .then(function(uriContext) {
         req.troupe = uriContext.troupe;
@@ -79,45 +66,6 @@ function uriContextResolverMiddleware(options) {
         throw e;
       })
       .catch(next);
-
-    // This becomes
-    // roomService.findRoomContext(req.user, uri)
-    // return roomService.findOrCreateRoom(req.user, uri, { tracking: tracking, creationFilter: creationFilter })
-    //   .then(function(uriContext) {
-    //
-    //     var isValid = uriContext && (uriContext.troupe || uriContext.ownUrl);
-    //     var accessToOrgRoomDenied = uriContext && uriContext.accessDenied && uriContext.accessDenied.githubType === 'ORG';
-    //
-    //     if (!isValid && !accessToOrgRoomDenied) {
-    //       if(!req.user) {
-    //         throw 401;
-    //       }
-    //
-    //       throw 404;
-    //     }
-    //
-    //     var events = req.session.events;
-    //     if(!events) {
-    //       events = [];
-    //       req.session.events = events;
-    //     }
-    //
-    //     if(uriContext.hookCreationFailedDueToMissingScope) {
-    //       events.push('hooks_require_additional_public_scope');
-    //     }
-    //
-    //     req.troupe = uriContext.troupe;
-    //     req.uriContext = uriContext;
-    //     next();
-    //   })
-    //   .catch(function(err) {
-    //     if(err && err.redirect) {
-    //       return res.relativeRedirect(getRedirectUrl(err.redirect, req));
-    //     }
-    //
-    //     throw err;
-    //   })
-    //   .catch(next);
   };
 }
 
@@ -137,5 +85,8 @@ function unauthenticatedPhoneRedirectMiddleware(req, res, next) {
 module.exports = exports = {
   uriContextResolverMiddleware: uriContextResolverMiddleware,
   unauthenticatedPhoneRedirectMiddleware: unauthenticatedPhoneRedirectMiddleware,
-  isPhoneMiddleware: isPhoneMiddleware
+  isPhoneMiddleware: isPhoneMiddleware,
+  testOnly: {
+    getRedirectUrl: getRedirectUrl
+  }
 };

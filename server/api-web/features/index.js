@@ -1,10 +1,10 @@
 "use strict";
 
-var express        = require('express');
+var express = require('express');
 var featureToggles = require('../../web/middlewares/feature-toggles');
-var fflip          = require('fflip');
-var cors           = require('cors');
-var identifyRoute  = require('gitter-web-env').middlewares.identifyRoute;
+var fflip = require('fflip');
+var cors = require('cors');
+var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
 
 var corsOptions = {
   origin: function(origin, callback) {

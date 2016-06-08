@@ -1,16 +1,16 @@
 "use strict";
 
-var env                                = require('gitter-web-env');
-var errorReporter                      = env.errorReporter;
-var logger                             = env.logger;
+var env = require('gitter-web-env');
+var errorReporter = env.errorReporter;
+var logger = env.logger;
 
-var appEvents                          = require('gitter-web-appevents');
-var presenceService                    = require('gitter-web-presence');
+var appEvents = require('gitter-web-appevents');
+var presenceService = require('gitter-web-presence');
 var onlineNotificationGeneratorService = require('../services/notifications/online-notification-generator-service');
-var pushNotificationPostbox            = require('../services/notifications/push-notification-postbox');
-var debug                              = require('debug')('gitter:notification-event-listener');
-var pushNotificationGateway            = require("../gateways/push-notification-gateway");
-var pushNotificationFilter             = require("gitter-web-push-notification-filter");
+var pushNotificationPostbox = require('../services/notifications/push-notification-postbox');
+var debug = require('debug')('gitter:app:notification-event-listener');
+var pushNotificationGateway = require("../gateways/push-notification-gateway");
+var pushNotificationFilter = require("gitter-web-push-notification-filter");
 
 //
 // This installs the listeners that will listen to events

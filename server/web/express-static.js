@@ -1,9 +1,9 @@
 "use strict";
 
 exports.install = function(app) {
-  var express        = require('express');
-  var resolveStatic  = require('./resolve-static');
-  var favicon        = require('serve-favicon');
+  var express = require('express');
+  var resolveStatic = require('./resolve-static');
+  var favicon = require('serve-favicon');
 
   var webpackMiddleware = require("webpack-dev-middleware"); // eslint-disable-line node/no-unpublished-require
   var webpack = require('webpack');// eslint-disable-line node/no-unpublished-require

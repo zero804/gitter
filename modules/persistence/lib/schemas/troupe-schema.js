@@ -4,6 +4,7 @@ var mongoose = require('gitter-web-mongoose-bluebird');
 var Schema = mongoose.Schema;
 var ObjectId = Schema.ObjectId;
 var installVersionIncMiddleware = require('../install-version-inc-middleware');
+var securityDescriptor = require('./security-descriptor-subdocument');
 
 module.exports = {
   install: function(mongooseConnection) {
@@ -31,10 +32,11 @@ module.exports = {
     // A Troupe
     //
     var TroupeSchema = new Schema({
-      topic: { type: String, 'default':'' },
+      groupId: { type: ObjectId, required: false},
+      topic: { type: String, default: '' },
       uri: { type: String },
       tags: [String],
-      lcUri: { type: String, 'default': function() { return this.uri ? this.uri.toLowerCase() : null; }  },
+      lcUri: { type: String, 'default': function() { return this.uri ? this.uri.toLowerCase() : null; } },
       githubType: { type: String, 'enum': ['REPO', 'ORG', 'ONETOONE', 'REPO_CHANNEL', 'ORG_CHANNEL', 'USER_CHANNEL'], required: true },
       lcOwner: { type: String, 'default': function() { return this.uri ? this.uri.split('/')[0].toLowerCase() : null; } },
       status: { type: String, "enum": ['ACTIVE', 'DELETED'], "default": 'ACTIVE'},  // DEPRECATED. TODO: remove this
@@ -53,6 +55,7 @@ module.exports = {
       lang: { type: String }, // Human language of this room
       renamedLcUris: [String],
       providers: [String],
+      sd: { type: securityDescriptor.Schema, required: false },
       _tv: { type: 'MongooseNumber', 'default': 0 }
     }, { strict: 'throw' });
 
@@ -62,6 +65,7 @@ module.exports = {
       return !value || value === 'PRIVATE' || value === 'PUBLIC' || value === 'INHERITED';
     }, 'Invalid security');
 
+    TroupeSchema.index({ groupId: 1 });
     // Ideally we should never search against URI, only lcURI
     TroupeSchema.index({ uri: 1 }, { unique: true, sparse: true });
     TroupeSchema.index({ lcUri: 1 }, { unique: true, sparse: true });
@@ -77,7 +81,7 @@ module.exports = {
     installVersionIncMiddleware(TroupeSchema);
 
     TroupeSchema.pre('save', function (next) {
-      this.lcUri =  this.uri ? this.uri.toLowerCase() : undefined;
+      this.lcUri = this.uri ? this.uri.toLowerCase() : undefined;
       next();
       // Put this somewhere when it finds a better home
       // if (this.security !== 'PUBLIC') return next();
@@ -119,6 +123,8 @@ module.exports = {
     };
 
     var Troupe = mongooseConnection.model('Troupe', TroupeSchema);
+
+    securityDescriptor.installIndexes(TroupeSchema, Troupe);
 
     return {
       model: Troupe,

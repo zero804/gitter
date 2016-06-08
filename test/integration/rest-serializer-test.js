@@ -5,7 +5,7 @@ var testRequire = require('./test-require');
 var restSerializer = testRequire('./serializers/rest-serializer');
 
 var assert = require("assert");
-var fixtureLoader = require('./test-fixtures');
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
 
 describe('restSerializer', function() {

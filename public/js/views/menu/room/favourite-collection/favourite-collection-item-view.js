@@ -1,10 +1,10 @@
 'use strict';
 
-var _                         = require('underscore');
+var _ = require('underscore');
 var PrimaryCollectionItemView = require('../primary-collection/primary-collection-item-view');
-var BaseCollectionItemView    = require('../base-collection/base-collection-item-view');
-var fastdom                   = require('fastdom');
-var toggleClass               = require('utils/toggle-class');
+var BaseCollectionItemView = require('../base-collection/base-collection-item-view');
+var fastdom = require('fastdom');
+var toggleClass = require('utils/toggle-class');
 
 module.exports = PrimaryCollectionItemView.extend({
 

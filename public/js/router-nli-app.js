@@ -1,11 +1,11 @@
 "use strict";
 
-var appEvents       = require('utils/appevents');
-var context         = require('utils/context');
-var clientEnv       = require('gitter-client-env');
+var appEvents = require('utils/appevents');
+var context = require('utils/context');
+var clientEnv = require('gitter-client-env');
 var TitlebarUpdater = require('components/titlebar');
-var onready         = require('./utils/onready');
-var debug           = require('debug-proxy')('app:router-nli-app');
+var onready = require('./utils/onready');
+var debug = require('debug-proxy')('app:router-nli-app');
 
 require('views/widgets/preload');
 require('components/user-notifications');

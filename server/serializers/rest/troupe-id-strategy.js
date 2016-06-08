@@ -1,6 +1,6 @@
 "use strict";
 
-var troupeService  = require("../../services/troupe-service");
+var troupeService = require("../../services/troupe-service");
 var TroupeStrategy = require('./troupe-strategy');
 
 var idStrategyGenerator = require('../id-strategy-generator');

@@ -1,8 +1,8 @@
 'use strict';
 
-var speedy      = require("speedy");
+var speedy = require("speedy");
 var persistence = require('gitter-web-persistence');
-var onMongoConnect    = require('../../server/utils/on-mongo-connect');
+var onMongoConnect = require('../../server/utils/on-mongo-connect');
 
 onMongoConnect(function() {
   speedy.run({
@@ -30,7 +30,7 @@ onMongoConnect(function() {
               }
           }
         } } ])
-        .exec(function(err, results) {
+        .exec(function() {
           done();
         });
     },

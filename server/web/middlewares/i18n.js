@@ -1,9 +1,9 @@
 "use strict";
 
-var env             = require('gitter-web-env');
-var config          = env.config;
-var I18n            = require('i18n-2');
-var i18nFactory     = require('../../utils/i18n-factory');
+var env = require('gitter-web-env');
+var config = env.config;
+var I18n = require('i18n-2');
+var i18nFactory = require('../../utils/i18n-factory');
 
 var homepagePath = config.get('web:homeurl');
 

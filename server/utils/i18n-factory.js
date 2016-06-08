@@ -1,12 +1,12 @@
 "use strict";
 
-var env             = require('gitter-web-env');
-var config          = env.config;
-var I18n            = require('i18n-2');
-var path            = require('path');
-var fs              = require('fs');
+var env = require('gitter-web-env');
+var config = env.config;
+var I18n = require('i18n-2');
+var path = require('path');
+var fs = require('fs');
 
-var localesDir = path.join(__dirname,  '../../node_modules/@gitterhq/translations');
+var localesDir = path.join(__dirname, '../../node_modules/@gitterhq/translations');
 var homepageLocalesDir = path.join(localesDir, 'homepage');
 var devMode =config.runtimeEnvironment === 'dev';
 

@@ -1,8 +1,8 @@
 "use strict";
 
-var Promise           = require('bluebird');
+var Promise = require('bluebird');
 var TroupeUriStrategy = require('./troupe-uri-strategy');
-var billingService    = require('../../services/billing-service');
+var billingService = require('../../services/billing-service');
 
 function OrgPlanStrategy() {
   var orgsWithPlans;

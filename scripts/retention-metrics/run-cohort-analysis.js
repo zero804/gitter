@@ -133,7 +133,7 @@ function printCSV(results, asPercent) {
       var subcohort = cohort.subcohorts[subcohortKey];
       var subcohortSize = subcohort.total;
 
-      var subcohortRow = [subcohortKey,  showValue(subcohortSize, cohort.totals.total)].concat(cohortIntervalDates.map(function(cohortIntervalDate) {
+      var subcohortRow = [subcohortKey, showValue(subcohortSize, cohort.totals.total)].concat(cohortIntervalDates.map(function(cohortIntervalDate) {
         var value = subcohort[cohortIntervalDate];
         return showValue(value, subcohortSize);
       }));

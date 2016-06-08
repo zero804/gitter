@@ -1,6 +1,6 @@
 'use strict';
 
-var env     = require('gitter-web-env');
+var env = require('gitter-web-env');
 var express = require('express');
 var urlJoin = require('url-join');
 

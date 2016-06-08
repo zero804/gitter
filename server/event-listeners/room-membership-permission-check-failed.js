@@ -1,9 +1,9 @@
 "use strict";
 
-var env                   = require('gitter-web-env');
-var stats                 = env.stats;
-var errorReporter         = env.errorReporter;
-var appEvents             = require('gitter-web-appevents');
+var env = require('gitter-web-env');
+var stats = env.stats;
+var errorReporter = env.errorReporter;
+var appEvents = require('gitter-web-appevents');
 var roomMembershipService = require('../services/room-membership-service');
 
 var installed = false;

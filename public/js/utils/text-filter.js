@@ -36,7 +36,7 @@ module.exports = (function() {
 
     return function(item) {
       // Search the items or its fields
-      var searchable =  fields ? getFields(fields, item) : [item];
+      var searchable = fields ? getFields(fields, item) : [item];
       return searchable.some(function(item) {
         return regexps.every(function(regexp) {
           return item.match(regexp);

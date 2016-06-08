@@ -127,6 +127,52 @@ function validateGhOrgDescriptor(descriptor) {
   validateExtraUserIds(descriptor);
 }
 
+
+function validateGhUserLinkPath(linkPath) {
+  if (!linkPath) {
+    throw new StatusError(403, 'Invalid empty linkPath attribute for org');
+  }
+
+  var parts = linkPath.split('/');
+  if (parts.length !== 1) {
+    throw new StatusError(403, 'Invalid linkPath attribute for org: ' + linkPath);
+  }
+}
+
+function validateGhUserDescriptor(descriptor) {
+  var usesGH = false;
+  switch(descriptor.members) {
+    case 'PUBLIC':
+    case 'INVITE':
+      break;
+    default:
+      throw new StatusError(403, 'Invalid members attribute: ' + descriptor.members);
+  }
+
+  switch(descriptor.admins) {
+    case 'MANUAL':
+      break;
+    case 'GH_USER_SAME':
+      usesGH = true;
+      break;
+    default:
+      throw new StatusError(403, 'Invalid admins attribute: ' + descriptor.admins);
+  }
+
+  if (descriptor.public) {
+    if (descriptor.members !== 'PUBLIC') {
+      throw new StatusError(403, 'Invalid public attribute');
+    }
+  }
+
+  if (!usesGH) {
+    throw new StatusError(403, 'Unused reference type: GH_USER');
+  }
+
+  validateGhUserLinkPath(descriptor.linkPath);
+  validateExtraUserIds(descriptor);
+}
+
 function validateOneToOneDescriptor(descriptor) {
   if (descriptor.members) {
     throw new StatusError(403, 'Invalid members attribute');
@@ -148,11 +194,11 @@ function validateOneToOneDescriptor(descriptor) {
     throw new StatusError(403, 'Invalid externalId attribute');
   }
 
-  if (descriptor.extraMembers) {
+  if (descriptor.extraMembers && descriptor.extraMembers.length) {
     throw new StatusError(403, 'Invalid extraMembers attribute');
   }
 
-  if (descriptor.extraAdmins) {
+  if (descriptor.extraAdmins && descriptor.extraAdmins.length) {
     throw new StatusError(403, 'Invalid extraAdmins attribute');
   }
 
@@ -193,6 +239,9 @@ function validate(descriptor) {
 
     case 'GH_ORG':
       return validateGhOrgDescriptor(descriptor);
+
+    case 'GH_USER':
+      return validateGhUserDescriptor(descriptor);
 
     case 'ONE_TO_ONE':
       return validateOneToOneDescriptor(descriptor);

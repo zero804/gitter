@@ -1,7 +1,7 @@
 'use strict';
 
 var Promise = require('bluebird');
-var debug = require('debug')('gitter:permissions:one-to-one-policy-evaluator');
+var debug = require('debug')('gitter:app:permissions:one-to-one-policy-evaluator');
 
 function OneToOnePolicyEvaluator(user, securityDescriptor, contextDelegate) {
   this._user = user;

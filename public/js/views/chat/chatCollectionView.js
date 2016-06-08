@@ -1,16 +1,16 @@
 /* eslint complexity: ["error", 16] */
 "use strict";
 
-var $            = require('jquery');
-var Marionette   = require('backbone.marionette');
-var appEvents    = require('utils/appevents');
+var $ = require('jquery');
+var Marionette = require('backbone.marionette');
+var appEvents = require('utils/appevents');
 var chatItemView = require('./chatItemView');
-var Rollers      = require('utils/rollers');
+var Rollers = require('utils/rollers');
 var isolateBurst = require('gitter-web-shared/burst/isolate-burst-bb');
-var context      = require('utils/context');
-var perfTiming   = require('../../components/perf-timing');
-var debug        = require('debug-proxy')('app:chat-collection-view');
-var collapsedItemsClient   = require('../../utils/collapsed-item-client');
+var context = require('utils/context');
+var perfTiming = require('../../components/perf-timing');
+var debug = require('debug-proxy')('app:chat-collection-view');
+var collapsedItemsClient = require('../../utils/collapsed-item-client');
 
 require('views/behaviors/infinite-scroll');
 require('views/behaviors/smooth-scroll');
@@ -179,7 +179,7 @@ module.exports = (function() {
       var contentFrame = document.querySelector(SCROLL_ELEMENT);
       this.rollers = new Rollers(contentFrame, this.el);
 
-      this.decorators     = options.decorators || [];
+      this.decorators = options.decorators || [];
 
       /* Scroll to the bottom when the user sends a new chat */
       this.listenTo(appEvents, 'chat.send', function() {
