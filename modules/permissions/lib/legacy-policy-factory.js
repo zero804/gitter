@@ -4,11 +4,6 @@ var Promise = require('bluebird');
 var LegacyPolicyEvaluator = require('./policies/legacy-policy-evaluator');
 var LegacyGitHubPolicyEvaluator = require('./policies/legacy-github-policy-evaluator');
 
-function createPolicyForRoom(user, room) {
-  var userId = user && user._id;
-  return new LegacyPolicyEvaluator(userId, user, room._id, room);
-}
-
 function createPolicyForUserIdInRoomId(userId, roomId) {
   return new LegacyPolicyEvaluator(userId, null, roomId, null);
 }
@@ -22,7 +17,6 @@ function createPolicyForOneToOne(user, toUser) {
 }
 
 module.exports = {
-  createPolicyForRoom: Promise.method(createPolicyForRoom),
   createPolicyForUserIdInRoomId: Promise.method(createPolicyForUserIdInRoomId),
   createPolicyForUserIdInRoom: Promise.method(createPolicyForUserIdInRoom),
   createPolicyForOneToOne: Promise.method(createPolicyForOneToOne),

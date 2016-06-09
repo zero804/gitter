@@ -2,7 +2,7 @@
 
 var roomService = require('../../../services/room-service');
 var restSerializer = require("../../../serializers/rest-serializer");
-var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
+var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var RoomWithPolicyService = require('../../../services/room-with-policy-service');
 var StatusError = require('statuserror');
 

@@ -48,6 +48,20 @@ function createPolicyForRoomId(user, roomId) {
     });
 }
 
+function createPolicyForRoom(user, room) {
+  var roomId = room._id;
+  var userId = user && user._id;
+
+  // TODO: optimise this as we may already have the information we need on the room...
+  // in which case we shouldn't have to refetch it from mongo
+  return securityDescriptorService.getForRoomUser(roomId, userId)
+    .then(function(securityDescriptor) {
+      if (!securityDescriptor) throw new StatusError(404);
+
+      return createPolicyFromDescriptor(user, securityDescriptor, roomId);
+    });
+}
+
 function createPolicyForGroupId(user, groupId) {
   var userId = user && user._id;
 
@@ -65,6 +79,7 @@ function createPolicyForGroupId(user, groupId) {
 
 module.exports = {
   createPolicyForRoomId: Promise.method(createPolicyForRoomId),
+  createPolicyForRoom: Promise.method(createPolicyForRoom),
   createPolicyForGroupId: Promise.method(createPolicyForGroupId),
   createPolicyFromDescriptor: createPolicyFromDescriptor,
 };

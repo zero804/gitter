@@ -9,7 +9,6 @@ var roomService = require('../../../services/room-service');
 var Promise = require('bluebird');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var StatusError = require('statuserror');
-var legacyPolicyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var RoomWithPolicyService = require('../../../services/room-with-policy-service');
 
@@ -100,7 +99,7 @@ module.exports = {
 
     return troupeService.findById(troupeId)
       .then(function(room) {
-        return [room, legacyPolicyFactory.createPolicyForRoom(req.user, room)];
+        return [room, policyFactory.createPolicyForRoom(req.user, room)];
       })
       .spread(function(room, policy) {
         var options = {};
