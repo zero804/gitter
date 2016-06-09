@@ -37,6 +37,7 @@ var parseRoomsIntoLeftMenuRoomList = require('gitter-web-shared/rooms/left-menu-
 var generateLeftMenuSnapshot = require('../snapshots/left-menu-snapshot');
 var parseRoomsIntoLeftMenuFavouriteRoomList = require('gitter-web-shared/rooms/left-menu-room-favourite-list');
 var generateRoomCardContext = require('gitter-web-shared/templates/partials/room-card-context-generator');
+var fonts = require('../../utils/fonts');
 
 /* How many chats to send back */
 var INITIAL_CHAT_COUNT = 50;
@@ -98,23 +99,6 @@ function getSubResources(entryPoint, jsRoot) {
 
   return cdnSubResources(SUBRESOURCE_MAPPINGS[entryPoint], jsRoot);
 }
-
-// FONTS -------------------------------------
-var FONTS = [
-  { fontPath: cdn('fonts/sourcesans/SourceSansPro-Regular.otf.woff'), weight: 'normal', family: 'source-sans-pro', style: 'normal' },
-  { fontPath: cdn('fonts/sourcesans/SourceSansPro-It.otf.woff'), weight: 'italic', family: 'source-sans-pro', style: 'italic' },
-  { fontPath: cdn('fonts/sourcesans/SourceSansPro-Bold.otf.woff'), weight: 'bold', family: 'source-sans-pro', style: 'normal' },
-  { fontPath: cdn('fonts/sourcesans/SourceSansPro-Semibold.otf.woff'), weight: 600, family: 'source-sans-pro', style: 'normal' },
-  { fontPath: cdn('fonts/sourcesans/SourceSansPro-BoldIt.otf.woff'), weight: 'italic', family: 'source-sans-pro', style: 'italic' },
-  { fontPath: cdn('fonts/sourcesans/SourceSansPro-Light.otf.woff'), weight: 300, family: 'source-sans-pro', style: 'normal' },
-  { fontPath: cdn('fonts/sourcesans/SourceSansPro-ExtraLight.otf.woff'), weight: 200, family: 'source-sans-pro', style: 'normal' },
-];
-
-function getFonts(){
-  return FONTS;
-}
-// END FONTS ---------------------------------
-
 
 var stagingText, stagingLink;
 var dnsPrefetch = (nconf.get('cdn:hosts') || []).concat([
@@ -266,10 +250,6 @@ function renderMainFrame(req, res, next, frame) {
       //TODO Remove this when favourite tab is removed for realz JP 8/4/16
       if(snapshots.leftMenu.state === 'favourite') { leftMenuRoomList = []; }
 
-      //Work out font state
-      var fonts = getFonts();
-      var hasCachedFonts = (req.cookies.webfontsLoaded || '') === 'true';
-
       // pre-processing rooms
       // Bad mutation ... BAD MUTATION
       rooms = rooms
@@ -296,8 +276,8 @@ function renderMainFrame(req, res, next, frame) {
         stagingLink:            stagingLink,
         dnsPrefetch:            dnsPrefetch,
         subresources:           getSubResources(bootScriptName),
-        hasCachedFonts:         hasCachedFonts,
-        fonts:                  fonts,
+        hasCachedFonts:         fonts.hasCachedFonts(req),
+        fonts:                  fonts.getFonts(),
         showFooterButtons:      true,
         showUnreadTab:          true,
         menuHeaderExpanded:     false,
@@ -395,10 +375,6 @@ function renderChat(req, res, options, next) {
         var orgName = getOrgNameFromTroupeName(troupeContext.troupe.name);
         var orgPageHref = '/orgs/' + orgName + '/rooms/';
 
-        //Work out font state
-        var fonts = getFonts();
-        var hasCachedFonts = (req.cookies.webfontsLoaded || '') === 'true';
-
         var renderOptions = _.extend({
             isRepo: troupe.githubType === 'REPO',
             bootScriptName: script,
@@ -413,8 +389,8 @@ function renderChat(req, res, options, next) {
             classNames: classNames.join(' '),
             agent: req.headers['user-agent'],
             subresources: getSubResources(script),
-            hasCachedFonts: hasCachedFonts,
-            fonts: fonts,
+            hasCachedFonts: fonts.hasCachedFonts(req),
+            fonts: fonts.getFonts(),
             dnsPrefetch: dnsPrefetch,
             isPrivate: isPrivate,
             activityEvents: activityEvents,
