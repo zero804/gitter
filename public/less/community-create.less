@@ -236,16 +236,6 @@
     visibility 0s ease .2s,
     opacity .2s ease;
 
-
-  & > .community-create-step-content-area {
-    // This suuuucks but webkit has a bug
-    // where you can't `position: fixed` inside a transformed element
-    & > * {
-      transform: translateX(200px);
-      transition: transform .2s ease;
-    }
-  }
-
   &.active {
     visibility: visible;
     opacity: 1;
@@ -268,6 +258,7 @@
       // where you can't `position: fixed` inside a transformed element
       & > * {
         transform: translateX(0);
+        will-change: transform;
 
         animation-name: community-create-step-move-in-animation;
         animation-duration: .2s;
