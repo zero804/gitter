@@ -148,7 +148,9 @@ function renderHomePage(req, res, next) {
         showLinuxApp: showLinuxApp,
         troupeContext: troupeContext,
         isNativeDesktopApp: troupeContext.isNativeDesktopApp,
-        billingBaseUrl: nconf.get('web:billingBaseUrl')
+        billingBaseUrl: nconf.get('web:billingBaseUrl'),
+        fonts: fonts.getFonts(),
+        hasCachedFonts: fonts.hasCachedFonts(req),
       });
     })
     .catch(next);
