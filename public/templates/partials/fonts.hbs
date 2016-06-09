@@ -1,16 +1,18 @@
-{{! pre-load all fonts }}
-{{#each fonts as |font|}}
-  <link rel="preload" href="{{font.fontPath}}" as="font" type="font/woff">
-{{/each}}
+{{#if fonts}}
+  {{! pre-load all fonts }}
+  {{#each fonts as |font|}}
+    <link rel="preload" href="{{font.fontPath}}" as="font" type="font/woff">
+  {{/each}}
 
-{{! define all font face rules in the head}}
-<style>
-{{#each fonts as |font|}}
-  @font-face {
-    font-family: "{{font.family}}";
-    src: url("{{font.fontPath}}") format('woff');
-    font-weight: {{font.weight}};
-    font-style: {{font.style}}
-  }
-{{/each}}
-</style>
+  {{! define all font face rules in the head}}
+  <style>
+  {{#each fonts as |font|}}
+    @font-face {
+      font-family: "{{font.family}}";
+      src: url("{{font.fontPath}}") format('woff');
+      font-weight: {{font.weight}};
+      font-style: {{font.style}}
+    }
+  {{/each}}
+  </style>
+{{/if}}
