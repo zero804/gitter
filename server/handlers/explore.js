@@ -14,6 +14,7 @@ var exploreService = require('../services/explore-service');
 var suggestionsService = require('../services/suggestions-service');
 var exploreTagUtils = require('../utils/explore-tag-utils');
 var generateExploreSnapshot = require('./snapshots/explore-snapshot');
+var fonts = require('../utils/fonts');
 
 var processTagInput = function(input) {
   input = input || '';
@@ -178,7 +179,9 @@ router.get('/tags/:tags',
             exploreBaseUrl: req.baseUrl,
             troupeContext: troupeContext,
             isLoggedIn: isLoggedIn,
-            createRoomUrl: urlJoin(clientEnv.basePath, '#createroom')
+            createRoomUrl: urlJoin(clientEnv.basePath, '#createroom'),
+            fonts: fonts.getFonts(),
+            hasCachedFonts: fonts.hasCachedFonts(req),
           }));
         })
         .catch(next);
