@@ -9,9 +9,12 @@ var fs = require('fs');
 var es = require('event-stream');
 var through2 = require('through2');
 var shutdown = require('shutdown');
+var mongoose = require('mongoose');
 var persistence = require('gitter-web-persistence');
 var onMongoConnect = require('../../server/utils/on-mongo-connect');
+var installMigrationSchemas = require('./migration-schemas').install;
 
+var migrationSchemas;
 
 var opts = yargs
   .option('schema', {
@@ -31,21 +34,23 @@ var opts = yargs
   .alias('help', 'h')
   .argv;
 
-var schema;
-if (opts.schema == 'users') {
-  schema = persistence.GitHubUser;
-}
-if (opts.schema == 'orgs') {
-  schema = persistence.GitHubOrg;
-}
-
 function processBatch(lines, enc, cb) {
+  var schema;
+  if (opts.schema == 'users') {
+    console.log("importing users");
+    schema = migrationSchemas.GitHubUser;
+  }
+  if (opts.schema == 'orgs') {
+    console.log("importing orgs");
+    schema = migrationSchemas.GitHubOrg;
+  }
+
   var bulk = schema.collection.initializeUnorderedBulkOp();
   var numOperations = 0;
   lines.forEach(function(line) {
     var parts = line.split(',');
     var githubId = parseInt(parts[1], 10);
-    if (githubId > opts.since) {
+    if (!opts.since || githubId > opts.since) {
       numOperations++;
       bulk.insert({
         uri: parts[0],
@@ -83,8 +88,11 @@ function processOne(line, enc, cb) {
 
 
 
+console.log("connecting...");
 onMongoConnect()
   .then(function() {
+    console.log("installing migration schemas");
+    migrationSchemas = installMigrationSchemas(mongoose.connection);
     var s = fs.createReadStream(opts.filename)
       .pipe(es.split())
       .pipe(through2.obj(processOne))
@@ -96,4 +104,8 @@ onMongoConnect()
       .on('end', function() {
         shutdown.shutdownGracefully();
       })
+  })
+  .catch(function(err) {
+    console.error(err);
+    console.error(err.stack);
   });
