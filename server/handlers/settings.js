@@ -18,6 +18,7 @@ var identifyRoute = env.middlewares.identifyRoute;
 var debug = require('debug')('gitter:app:settings-route');
 var StatusError = require('statuserror');
 var userScopes = require('gitter-web-identity/lib/user-scopes');
+var fonts = require('../utils/fonts');
 
 var supportedServices = [
   { id: 'github', name: 'GitHub'},
@@ -60,7 +61,9 @@ function getIntegrations(req, res, next) {
       accessToken: req.accessToken,
       cdnRoot: cdn(''),
       supportedServices: supportedServices,
-      openServices: openServices
+      openServices: openServices,
+      fonts: fonts.getFonts(),
+      hasCachedFonts: fonts.hasCachedFonts(req),
     });
   });
 }
