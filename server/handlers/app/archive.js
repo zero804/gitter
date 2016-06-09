@@ -19,6 +19,7 @@ var debug = require('debug')('gitter:app:app-archive');
 var _ = require('underscore');
 var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 var StatusError = require('statuserror');
+var fonts = require('../../utils/fonts');
 
 var ONE_DAY_SECONDS = 60 * 60 * 24; // 1 day
 var ONE_DAY_MILLISECONDS = ONE_DAY_SECONDS * 1000;
@@ -107,7 +108,9 @@ exports.datesList = [
       public: troupe.security === 'PUBLIC',
       avatarUrl: avatarUrl,
       isPrivate: isPrivate,
-      avatarSrcSet: resolveRoomAvatarSrcSet({ uri: req.uriContext.uri }, 48)
+      avatarSrcSet: resolveRoomAvatarSrcSet({ uri: req.uriContext.uri }, 48),
+      fonts: fonts.getFonts(),
+      hasCachedFonts: fonts.hasCachedFonts(req),
     };
 
     return validateRoomForReadOnlyAccess(user, policy)
@@ -160,7 +163,9 @@ exports.linksList = [
       public: troupe.security === 'PUBLIC',
       avatarUrl: avatarUrl,
       avatarSrcSet: srcSetUrl,
-      isPrivate: isPrivate
+      isPrivate: isPrivate,
+      fonts: fonts.getFonts(),
+      hasCachedFonts: fonts.hasCachedFonts(req),
     };
 
     return validateRoomForReadOnlyAccess(user, policy)
@@ -329,7 +334,9 @@ exports.chatArchive = [
               nextDateLink: nextDateLink,
               monthYearFormatted: monthYearFormatted,
 
-              showDatesWithoutTimezone: true // Timeago widget will render whether or not we know the users timezone
+              showDatesWithoutTimezone: true, // Timeago widget will render whether or not we know the users timezone
+              fonts: fonts.getFonts(),
+              hasCachedFonts: fonts.hasCachedFonts(req),
             });
 
           });
