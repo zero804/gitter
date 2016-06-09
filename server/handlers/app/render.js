@@ -585,7 +585,9 @@ function renderOrgPage(req, res, next) {
         pagination: {
           page: currentPage,
           pageCount: pageCount
-        }
+        },
+        fonts: fonts.getFonts(),
+        hasCachedFonts: fonts.hasCachedFonts(req),
       });
     });
 
