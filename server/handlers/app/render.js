@@ -391,8 +391,8 @@ function renderChat(req, res, options, next) {
             classNames: classNames.join(' '),
             agent: req.headers['user-agent'],
             subresources: getSubResources(script),
-            hasCachedFonts: fonts.hasCachedFonts(req),
             fonts: fonts.getFonts(),
+            hasCachedFonts: fonts.hasCachedFonts(req),
             dnsPrefetch: dnsPrefetch,
             isPrivate: isPrivate,
             activityEvents: activityEvents,
@@ -440,7 +440,9 @@ function renderMobileUserHome(req, res, next) {
       troupeContext: troupeContext,
       agent: req.headers['user-agent'],
       user: req.user,
-      dnsPrefetch: dnsPrefetch
+      dnsPrefetch: dnsPrefetch,
+      fonts: fonts.getFonts(),
+      hasCachedFonts: fonts.hasCachedFonts(req),
     });
   })
   .catch(next);
