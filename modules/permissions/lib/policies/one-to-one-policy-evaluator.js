@@ -3,25 +3,24 @@
 var Promise = require('bluebird');
 var debug = require('debug')('gitter:app:permissions:one-to-one-policy-evaluator');
 
-function OneToOnePolicyEvaluator(user, securityDescriptor, contextDelegate) {
-  this._user = user;
+function OneToOnePolicyEvaluator(userId, securityDescriptor, contextDelegate) {
+  this._userId = userId;
   this._contextDelegate = contextDelegate;
 }
 
 OneToOnePolicyEvaluator.prototype = {
   canRead: Promise.method(function() {
-    if (!this._user) {
+    if (!this._userId) {
       debug('canRead: Denying anonymous user');
       return false;
     }
-    var userId = this._user._id;
 
     if (!this._contextDelegate) {
       debug('canRead: Denying user without context');
       return false;
     }
 
-    return this._contextDelegate.isMember(userId);
+    return this._contextDelegate.isMember(this._userId);
   }),
 
   canWrite: function() {
