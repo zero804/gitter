@@ -22,10 +22,9 @@ GitHubOrgService.prototype.getOrg = function(org) {
  * Returns the list of users with publisized membership to an organisation
  */
 GitHubOrgService.prototype.members = function(org, options) {
-  options = options || {};
   return tentacles.orgMember.listMembers(org, {
     accessToken: this.accessToken,
-    firstPageOnly: options.firstPageOnly
+    firstPageOnly: options && options.firstPageOnly
   });
 };
 
