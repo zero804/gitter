@@ -2,6 +2,8 @@
 
 var Backbone = require('backbone');
 var context = require('utils/context');
+var MinibarItemModel = require('./minibar-item-model');
+
 //just use shared/
 var getSuggestedOrgsFromRoomList = require('gitter-web-shared/orgs/suggested-orgs-from-room-list');
 
@@ -17,14 +19,6 @@ var tailDefaults = [{ name: 'close', type: 'close', id: 5 }];
 if(context.hasFeature('community-create')) {
   tailDefaults.unshift({ name: 'Create Community', type: 'community-create', id: 4 });
 }
-
-var MinibarItemModel = Backbone.Model.extend({
-  defaults: {
-    name: ' ',
-    type: 'org',
-    url: ' ',
-  }
-});
 
 module.exports = Backbone.Collection.extend({
   model: MinibarItemModel,
