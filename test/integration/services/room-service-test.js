@@ -708,10 +708,8 @@ describe('room-service', function() {
     describe('org channels', function() {
 
       it('should create private rooms and allow users to be added to them', function() {
-        var roomPermissionsModelMock = mockito.mockFunction();
         var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
         var roomService = testRequire.withProxies("./services/room-service", {
-          'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock,
           'gitter-web-groups/lib/group-service': {
             migration: {
               ensureGroupForRoom: function(parentTroupe, user) {
