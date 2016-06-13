@@ -16,25 +16,21 @@
             </button>
           </li>
 
-          {{!
-          <li data-state-change="favourite" id="minibar-favourite" class="room-menu-options__item--favourite">
-            <button class="room-menu-options__item-button" title="Your Favourite Conversations">
-              <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/favourites.svg"}}{{!' />
-            </button>
-          </li>
-          }}
-
           <li data-state-change="people" id="minibar-people" class="room-menu-options__item--people">
             <button class="room-menu-options__item-button" title="Your One to One Conversations">
               <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/people.svg"}}' />
             </button>
           </li>
 
-          {{#each leftMenuOrgs}} {{! JP 9/12/15 }} {{! TODO SHOULD THIS BE MOVED INTO A PARTIAL TO BE SHARED AROUND }}
-            <li data-state-change="org" id="minibar-{{name}}"  data-org-name="{{name}}" class="room-menu-options__item--org">
-              {{{ prerenderView "js/views/menu/room/minibar/minibar-item-view" }}}
-            </li>
-          {{/each}}
+          <li id="minibar-collection">
+            <ul class="minibar-collection-list">
+              {{#each leftMenuOrgs}} {{! JP 9/12/15 }} {{! TODO SHOULD THIS BE MOVED INTO A PARTIAL TO BE SHARED AROUND }}
+                <li data-state-change="org" id="minibar-{{name}}"  data-org-name="{{name}}" class="room-menu-options__item--org">
+                  {{{ prerenderView "js/views/menu/room/minibar/minibar-item-view" }}}
+                </li>
+              {{/each}}
+            </ul>
+          </li>
 
           <li data-state-change="close" id="minibar-close"  class="room-menu-options__item--close {{#if roomMenuIsPinned}}left{{/if}}">
             <button id="menu-toggle-button" class="room-menu-options__item-button menu-toggle-button" title="Toggle left menu">

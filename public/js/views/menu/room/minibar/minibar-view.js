@@ -5,6 +5,7 @@ var ItemView = require('./minibar-item-view');
 var ItemModel = require('./minibar-item-model');
 var CloseView = require('./minibar-close-item-view');
 var PeopleView = require('./minibar-people-item-view');
+var CollectionView = require('./minibar-collection-view');
 
 require('views/behaviors/isomorphic');
 
@@ -15,6 +16,7 @@ module.exports = Marionette.LayoutView.extend({
       home: { el: '#minibar-all', init: 'initHome' },
       search: { el: '#minibar-search', init: 'initSearch' },
       people: { el: '#minibar-people', init: 'initPeople' },
+      collectionView: { el: '#minibar-collection', init: 'initCollection' },
       close: { el: '#minibar-close', init: 'initClose' },
     },
   },
@@ -26,6 +28,7 @@ module.exports = Marionette.LayoutView.extend({
 
     //We have to manually bind child events because of the Isomorphic Behaviour
     this.listenTo(homeView, 'minibar-item:activated', this.onHomeActivate, this);
+    return homeView;
   },
 
   initSearch: function (optionsForRegion){
@@ -35,6 +38,7 @@ module.exports = Marionette.LayoutView.extend({
 
     //We have to manually bind child events because of the Isomorphic Behaviour
     this.listenTo(searchView, 'minibar-item:activated', this.onSearchActivate, this);
+    return searchView;
   },
 
   initPeople: function (optionsForRegion){
@@ -44,6 +48,20 @@ module.exports = Marionette.LayoutView.extend({
 
     //We have to manually bind child events because of the Isomorphic Behaviour
     this.listenTo(peopleView, 'minibar-item:activated', this.onPeopleActivate, this);
+    //FIXME, this throws an error, figure out why
+    //return peopleView;
+  },
+
+  initCollection: function (optionsForRegion){
+    var collectionView = new CollectionView(optionsForRegion({
+      collection: this.collection,
+      model: this.model,
+      roomCollection: this.roomCollection,
+      keyboardControllerView: this.keyboardControllerView,
+    }));
+
+    this.listenTo(collectionView, 'minibar-item:activated', this.onCollectionItemActivated, this);
+    return collectionView;
   },
 
   initClose: function (optionsForRegion){
@@ -54,7 +72,7 @@ module.exports = Marionette.LayoutView.extend({
 
     //We have to manually bind child events because of the Isomorphic Behaviour
     this.listenTo(closeView, 'minibar-item:close', this.onCloseClicked, this);
-    closeView.render();
+    return closeView;
   },
 
   childEvents: {
@@ -78,6 +96,11 @@ module.exports = Marionette.LayoutView.extend({
 
   onPeopleActivate: function (){
     this.changeMenuState('people');
+  },
+
+  onCollectionItemActivated: function (view, model){
+    this.changeMenuState('org');
+    this.model.set('selectedOrgName', model.get('name'));
   },
 
   changeMenuState: function(state){
