@@ -7,6 +7,19 @@ var ContributorService = require('gitter-web-github').GitHubContributorService;
 var MeService = require('gitter-web-github').GitHubMeService;
 
 
+
+function deduplicate(collaborators) {
+  var deduped = [];
+  var logins = {};
+  collaborators.forEach(function(collaborator) {
+    if (!collaborator) return;
+    if (logins[collaborator.login]) return;
+    logins[collaborator.login] = 1;
+    deduped.push(collaborator);
+  });
+  return deduped;
+}
+
 function withoutCurrentUser(users, user) {
   if (!users || !users.length) return [];
 
@@ -62,7 +75,8 @@ function getCollaboratorsForRepo(repoUri, security, user, options) {
           }
 
           return getCollaboratorsForUser(user, options);
-        });
+        })
+        .then(deduplicate);
   }
 
   /* INHERITED and PRIVATE rooms */
