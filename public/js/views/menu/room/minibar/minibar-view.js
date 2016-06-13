@@ -4,6 +4,7 @@ var Marionette = require('backbone.marionette');
 var ItemView = require('./minibar-item-view');
 var ItemModel = require('./minibar-item-model');
 var CloseView = require('./minibar-close-item-view');
+var PeopleView = require('./minibar-people-item-view');
 
 require('views/behaviors/isomorphic');
 
@@ -37,7 +38,7 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   initPeople: function (optionsForRegion){
-    var peopleView = new ItemView(optionsForRegion({
+    var peopleView = new PeopleView(optionsForRegion({
       model: new ItemModel({ name: 'people', type: 'people' }),
     }));
 
@@ -62,30 +63,30 @@ module.exports = Marionette.LayoutView.extend({
 
   initialize: function(attrs) {
     this.bus = attrs.bus;
+    this.model = attrs.model;
+    this.roomCollection = attrs.roomCollection;
+    this.keyboardControllerView = attrs.keyboardControllerView;
   },
 
   onHomeActivate: function (){
-    this.model.set({
-      panelOpenState: true,
-      state: 'all',
-      profileMenuOpenState: false,
-    });
+    this.changeMenuState('all');
   },
 
   onSearchActivate: function (){
-    this.model.set({
-      panelOpenState: true,
-      state: 'search',
-      profileMenuOpenState: false,
-    });
+    this.changeMenuState('search');
   },
 
   onPeopleActivate: function (){
+    this.changeMenuState('people');
+  },
+
+  changeMenuState: function(state){
     this.model.set({
-      panelOpenState: true,
-      state: 'people',
-      profileMenuOpenState: false,
+      panelopenstate: true,
+      state: state,
+      profilemenuopenstate: false,
     });
+
   },
 
   onCloseClicked: function (){
