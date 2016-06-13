@@ -9,6 +9,7 @@ var getSuggestedOrgsFromRoomList = require('gitter-web-shared/orgs/suggested-org
 
 module.exports = Backbone.Collection.extend({
   model: MinibarItemModel,
+  tagName: 'ul',
 
   constructor: function(models, attrs, options) {
     if (!attrs || !attrs.roomCollection) {

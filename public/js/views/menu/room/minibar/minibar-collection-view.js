@@ -50,7 +50,7 @@ var MinibarView = Marionette.CollectionView.extend({
   },
 
   onItemActivated: function(view, model, activationSourceType) {
-    this.trigger('minibar-item:activated');
+    this.trigger('minibar-item:activated', view, model, activationSourceType);
   },
 
   onItemKeyboardActivated: function(view, model) {
