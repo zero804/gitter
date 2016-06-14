@@ -7,6 +7,9 @@ var apiClient = require('components/apiClient');
 var getTimezoneInfo = require('utils/detect-timezone');
 var context = require('utils/context');
 
+var SPACEBAR_KEY = 32;
+var ENTER_KEY = 13;
+
 // via http://stackoverflow.com/a/8584217/796832
 var changeElementType = function($el, newType) {
   var attrs = {};
@@ -125,6 +128,21 @@ var createHeatMap = function(el, options) {
     $heatMap.find('.cal-heatmap-container').css({
       width: '',
       height: ''
+    });
+
+    // Make each date selectable
+    var dateItemElements = $heatMap.find('.graph-rect');
+    // Make them selectable
+    dateItemElements.attr('tabindex', 0);
+    // Make them accessible to keyboard shortcuts
+    dateItemElements.on('keydown', function(e) {
+      if(e.keyCode === SPACEBAR_KEY || e.keyCode === ENTER_KEY) {
+        var titleText = $(this).siblings('title').text();
+        var numItems = parseInt(titleText.replace(/\sitems.*/, ''), 10);
+        var dateString = titleText.replace(/.*on\s/, '');
+        // Simulate the click callback
+        opts.onClick(new Date(dateString), numItems);
+      }
     })
   });
 
@@ -166,7 +184,6 @@ var createResponsiveHeatMap = function(el, options) {
           if(breakpoint.success) {
             breakpoint.success();
           }
-          //console.log('new breakpoint', index, breakpoint.maxWidth);
           currentBreakpointIndex = index;
         }
 
