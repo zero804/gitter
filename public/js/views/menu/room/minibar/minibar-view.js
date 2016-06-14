@@ -3,8 +3,9 @@
 var Marionette = require('backbone.marionette');
 var ItemView = require('./minibar-item-view');
 var ItemModel = require('./minibar-item-model');
-var CloseView = require('./minibar-close-item-view');
+var HomeView = require('./home-view/home-view');
 var PeopleView = require('./minibar-people-item-view');
+var CloseView = require('./minibar-close-item-view');
 var CollectionView = require('./minibar-collection-view');
 
 require('views/behaviors/isomorphic');
@@ -22,7 +23,7 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   initHome: function (optionsForRegion){
-    var homeView = new ItemView(optionsForRegion({
+    var homeView = new HomeView(optionsForRegion({
       model: new ItemModel({ name: 'all', type: 'all' }),
     }));
 
