@@ -85,11 +85,12 @@ function unreadItemsGroupAdapter(groupCollection, troupesCollection) {
    * Queues a group for being updated, in future
    */
   function queueGroupUpdate(groupId) {
-    if (!groupId) return;
     if (!workQueue) {
+      // No workQueue? create one and process it in the next animation frame
       workQueue = { }
       raf(executeGroupUpdates);
     }
+
     workQueue[groupId] = true;
   }
 
