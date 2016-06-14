@@ -5,15 +5,16 @@
  * Also, this way is much faster, so it's not so bad
  */
 
-var compileTemplate = require('./compile-web-template');
 var _ = require('lodash');
+var compileTemplate = require('./compile-web-template');
+var clientEnv = require('gitter-client-env');
+var timeFormat = require('gitter-web-shared/time/time-format');
+// var fullTimeFormat = require('gitter-web-shared/time/full-time-format');
 
 var chatWrapper = compileTemplate.compileString('<div class="chat-item model-id-{{id}} {{burstClass}} {{unreadClass}} {{deletedClass}}">{{{inner}}}</div>');
 
 var chatItemTemplate = compileTemplate('/js/views/chat/tmpl/chatItemView.hbs');
 var statusItemTemplate = compileTemplate('/js/views/chat/tmpl/statusItemView.hbs');
-var timeFormat = require('gitter-web-shared/time/time-format');
-// var fullTimeFormat = require('gitter-web-shared/time/full-time-format');
 
 function getFormattedTime(model, lang, tz, tzOffset, showDatesWithoutTimezone) {
   /* In the chat environment, we don't want to prerender the time
@@ -36,11 +37,13 @@ module.exports = exports = function(model, params) {
 
   var root = params.data.root;
 
+  var troupeName = root.troupeName;
   var lang = root.lang;
   var locale = root.locale;
   var tz = root.tz;
   var tzOffset = root.tzOffset;
   var showDatesWithoutTimezone = root.showDatesWithoutTimezone;
+
 
   var text = model.text;
   var html = model.html || model.text;
@@ -64,7 +67,8 @@ module.exports = exports = function(model, params) {
     locale: locale,
     tz: tz,
     tzOffset: tzOffset,
-    showDatesWithoutTimezone: showDatesWithoutTimezone
+    showDatesWithoutTimezone: showDatesWithoutTimezone,
+    permalinkUrl: clientEnv['basePath'] + '/' + troupeName + '?at=' + model.id
   });
 
   var result;

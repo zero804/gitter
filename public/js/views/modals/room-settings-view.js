@@ -6,27 +6,35 @@ var ModalView = require('./modal');
 var apiClient = require('components/apiClient');
 var roomSettingsTemplate = require('./tmpl/room-settings-view.hbs');
 var Promise = require('bluebird');
+var toggleClass = require('utils/toggle-class');
 
 var View = Marionette.ItemView.extend({
   template: roomSettingsTemplate,
 
-  events:   {
-    'click #close-settings': 'destroySettings',
-  },
-
   ui: {
     githubOnly: '#github-only',
     welcomeMessage: '#room-welcome-message',
+    welcomeMessagePreviewButton: '#preview-welcome-message',
+    welcomeMessagePreviewContainer: '#welcome-message-preview-container',
+    editWelcomeMessageButton: '#close-welcome-message-preview',
     errorMessage: '#error-message',
+  },
+
+  events:   {
+    'click #close-settings': 'destroySettings',
+    'click @ui.welcomeMessagePreviewButton': 'previewWelcomeMessage',
+    'click @ui.editWelcomeMessageButton': 'editWelcomeMessage',
   },
 
   initialize: function() {
     this.listenTo(this, 'menuItemClicked', this.menuItemClicked, this);
-    apiClient.room.get('/meta/welcome-message').then(function(welcomeMessage){
+    apiClient.room.get('/meta/welcome-message')
+    .then(function(welcomeMessage){
       welcomeMessage = (welcomeMessage || { text: '', html: '' });
       if(!!welcomeMessage.text.length) { return this.initWithMessage(welcomeMessage); }
       return this.initEmptyTextArea();
-    }.bind(this));
+    }.bind(this))
+    .catch(this.showError.bind(this));
   },
 
   destroySettings: function () {
@@ -63,9 +71,43 @@ var View = Marionette.ItemView.extend({
     this.update();
   },
 
+  previewWelcomeMessage: function (e){
+    e.preventDefault();
+    this.setPreviewLoadingState();
+    toggleClass(this.el, 'preview', true);
+    //hide the text area
+    this.ui.welcomeMessage[0].classList.add('hidden');
+    this.fetchRenderedHTML().then(function(html){
+      this.ui.welcomeMessagePreviewContainer.html(html);
+      toggleClass(this.ui.welcomeMessagePreviewContainer[0], 'loading', false);
+    }.bind(this));
+  },
+
+  editWelcomeMessage: function (e){
+    e.preventDefault();
+    this.setPreviewLoadingState();
+    toggleClass(this.el, 'preview', false);
+    //show the text area
+    this.ui.welcomeMessage[0].classList.remove('hidden');
+  },
+
+  setPreviewLoadingState: function (){
+    this.ui.welcomeMessagePreviewContainer.html('Loading ...');
+    toggleClass(this.ui.welcomeMessagePreviewContainer[0], 'loading', true);
+  },
+
+  fetchRenderedHTML: function (){
+    return apiClient.post('/private/markdown-preview', { text: this.getWelcomeMessageContent() }, { dataType: 'text'})
+      .catch(this.showError.bind(this));
+  },
+
+  getWelcomeMessageContent: function (){
+    return this.ui.welcomeMessage.val();
+  },
+
   formSubmit: function() {
-    var providers = (this.ui.githubOnly.is(':checked')) ? ['github'] : [];
-    var welcomeMessageContent = this.ui.welcomeMessage.val();
+    var providers             = (this.ui.githubOnly.is(':checked')) ? ['github'] : [];
+    var welcomeMessageContent = this.getWelcomeMessageContent();
 
     Promise.all([
       apiClient.room.put('', { providers: providers }),
@@ -75,10 +117,14 @@ var View = Marionette.ItemView.extend({
       context.setTroupe(updatedTroupe);
       this.destroySettings();
     }.bind(this))
-    .catch(function(){
-      this.ui.errorMessage[0].classList.remove('hidden');
-    }.bind(this));
-  }
+    .catch(this.showError.bind(this));
+  },
+
+  showError: function (err){
+    this.ui.errorMessage[0].classList.remove('hidden');
+    this.ui.welcomeMessage.attr('disabled', true);
+  },
+
 });
 
 var Modal = ModalView.extend({
