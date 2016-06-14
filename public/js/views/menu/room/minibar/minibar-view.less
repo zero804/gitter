@@ -98,6 +98,11 @@
 }
 
 .room-menu-options__item() {
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   position:   relative;
   color:      white;
   text-align: center;
@@ -106,6 +111,8 @@
   min-width:  @desktop-menu-width;
   height:     @desktop-header-height;
   min-height: @desktop-header-height;
+
+  line-height: @desktop-header-height;
 
   &:hover {
     cursor: pointer;
@@ -117,11 +124,12 @@
     height:      @mobile-header-height;
   }
 
-  .desktop & {
-    line-height: @desktop-header-height;
-    height:      @desktop-header-height;
+  //Marionette forces to use wrapper divs if we server render, ugh.
+  //This also reduces the hit boxes unless we stretch the wrapper divs l;ike this, double ugh
+  & > .room-menu-options__container {
+    width: 100%;
+    height: 100%;
   }
-
 
 }
 

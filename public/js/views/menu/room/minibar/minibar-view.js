@@ -6,7 +6,7 @@ var ItemModel = require('./minibar-item-model');
 var HomeView = require('./home-view/home-view');
 var SearchView = require('./search-view/search-view');
 var PeopleView = require('./people-view/people-view');
-var CloseView = require('./minibar-close-item-view');
+var CloseView = require('./close-view/close-view');
 var CollectionView = require('./minibar-collection-view');
 
 require('views/behaviors/isomorphic');
@@ -46,12 +46,12 @@ module.exports = Marionette.LayoutView.extend({
   initPeople: function (optionsForRegion){
     var peopleView = new PeopleView(optionsForRegion({
       model: new ItemModel({ name: 'people', type: 'people' }),
+      roomCollection: this.roomCollection,
     }));
 
     //We have to manually bind child events because of the Isomorphic Behaviour
     this.listenTo(peopleView, 'minibar-item:activated', this.onPeopleActivate, this);
-    //FIXME, this throws an error, figure out why
-    //return peopleView;
+    return peopleView;
   },
 
   initCollection: function (optionsForRegion){
