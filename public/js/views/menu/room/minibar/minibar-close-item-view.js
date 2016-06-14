@@ -5,7 +5,6 @@ var toggleClass = require('utils/toggle-class');
 var closeTemplate = require('./minibar-close-item-view.hbs');
 var ItemView = require('./minibar-item-view.js');
 
-
 var defaults = {
   pinStateClass: 'is-menu-pinned',
   extraMouseOverElement: null,

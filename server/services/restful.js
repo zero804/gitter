@@ -7,6 +7,7 @@ var Promise = require('bluebird');
 var StatusError = require('statuserror');
 var _ = require('underscore');
 var gitHubProfileService = require('gitter-web-github-backend/lib/github-profile-service');
+var groupService = require('gitter-web-groups/lib/group-service');
 var groupMembershipService = require('gitter-web-groups/lib/group-membership-service');
 var restSerializer = require("../serializers/rest-serializer");
 var unreadItemService = require("./unread-items");
@@ -202,6 +203,17 @@ function serializeGroupsForUserId(userId) {
     });
 }
 
+function serializeRoomsForGroupId(groupId, userId) {
+  return groupService.findRoomsIdForGroup(groupId, userId)
+    .then(function(allTroupeIds) {
+      var strategy = new restSerializer.TroupeIdStrategy({
+        currentUserId: userId
+      });
+
+      return restSerializer.serialize(allTroupeIds, strategy);
+    });
+}
+
 module.exports = {
   serializeTroupesForUser: serializeTroupesForUser,
   serializeChatsForTroupe: serializeChatsForTroupe,
@@ -212,5 +224,6 @@ module.exports = {
   serializeOrgsForUser: serializeOrgsForUser,
   serializeOrgsForUserId: serializeOrgsForUserId,
   serializeProfileForUsername: serializeProfileForUsername,
-  serializeGroupsForUserId: Promise.method(serializeGroupsForUserId)
+  serializeGroupsForUserId: Promise.method(serializeGroupsForUserId),
+  serializeRoomsForGroupId: serializeRoomsForGroupId
 }
