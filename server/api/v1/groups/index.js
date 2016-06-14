@@ -31,7 +31,13 @@ module.exports = {
 
     var uri = String(req.body.uri);
     var name = String(req.body.name);
-    return groupService.createGroup(user, { uri: uri, name: name });
+    var createOptions = { uri: uri, name: name };
+    if (req.body.security) {
+      // for GitHub and future group types that are backed by other services
+      createOptions.type = req.body.security.type;
+      createOptions.linkPath = req.body.security.linkPath;
+    }
+    return groupService.createGroup(user, createOptions);
   },
 
   show: function(req) {
