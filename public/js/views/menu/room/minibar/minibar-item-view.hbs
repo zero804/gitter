@@ -10,18 +10,10 @@
   </div>
 {{/if}}
 
-{{#if isPeople}}
-  <button class="room-menu-options__item-button" title="Your One to One Conversations">
-    <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/people.svg"}}'>
-  </button>
-{{/if}}
-
-{{#if isOrg}}
-  <button class="room-menu-options__item-button" title="{{name}}">
-    <img class="room-menu-options__item__avatar"
-      src='{{avatarSrcset.src}}'
-      srcset="{{avatarSrcset.srcset}}"
-      width="{{avatarSrcset.size}}"
-      height="{{avatarSrcset.size}}">
-  </button>
-{{/if}}
+<button class="room-menu-options__item-button" title="{{name}}">
+  <img class="room-menu-options__item__avatar"
+    src='{{avatarSrcset.src}}'
+    srcset="{{avatarSrcset.srcset}}"
+    width="{{avatarSrcset.size}}"
+    height="{{avatarSrcset.size}}">
+</button>

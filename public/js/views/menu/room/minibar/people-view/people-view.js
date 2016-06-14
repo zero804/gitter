@@ -2,7 +2,8 @@
 
 var Backbone = require('backbone');
 var _ = require('underscore');
-var ItemView = require('./minibar-item-view');
+var ItemView = require('../minibar-item-view');
+var template = require('./people-view.hbs');
 
 var NotificationModel = Backbone.Model.extend({
 
@@ -37,6 +38,7 @@ var NotificationModel = Backbone.Model.extend({
 
 module.exports = ItemView.extend({
 
+  template: template,
   initialize: function(attrs) {
     this.roomCollection = attrs.roomCollection;
     this.notifications = new NotificationModel(null, { roomCollection: this.roomCollection });

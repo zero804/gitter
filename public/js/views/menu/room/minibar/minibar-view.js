@@ -5,7 +5,7 @@ var ItemView = require('./minibar-item-view');
 var ItemModel = require('./minibar-item-model');
 var HomeView = require('./home-view/home-view');
 var SearchView = require('./search-view/search-view');
-var PeopleView = require('./minibar-people-item-view');
+var PeopleView = require('./people-view/people-view');
 var CloseView = require('./minibar-close-item-view');
 var CollectionView = require('./minibar-collection-view');
 
