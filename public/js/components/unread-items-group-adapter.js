@@ -26,15 +26,22 @@ function unreadItemsGroupAdapter(groupCollection, troupesCollection) {
       var troupe = troupesCollection.get(troupeId);
       if (!troupe) continue;
 
-      if (troupe.attributes.mentions) {
-        // Immediate shortcut
+      // Use field accessors rather than `.get` for peformance
+      var troupeAttributes = troupe.attributes;
+
+      if (troupeAttributes.mentions) {
+        // At least one room in this group has mentions,
+        // so there's no point in checking the rest of the
+        // rooms, since we know there are mentions.
+        // Therefore, shortcut the loop and return that
+        // the group has mentions.
         return { mentions: true, unreadItems: false, activity: false };
       }
 
-      if (troupe.attributes.unreadItems) {
+      if (troupeAttributes.unreadItems) {
         hasUnread = true;
       } else {
-        if (troupe.attributes.activity) {
+        if (troupeAttributes.activity) {
           hasActivity = true;
         }
       }
