@@ -214,7 +214,7 @@ describe('unread-items-group-adapter', function() {
           unreadItems: false
         });
 
-      })
+      });
   });
 
   it('should handle resets', function() {
@@ -278,7 +278,60 @@ describe('unread-items-group-adapter', function() {
           unreadItems: true
         });
 
+      });
+  });
+
+  it('should handle rooms changing groups', function() {
+    var groups = new Backbone.Collection([
+      { id: 'g1' },
+      { id: 'g2' },
+      { id: 'g3' },
+      { id: 'g4' },
+    ]);
+
+    var troupes = new Backbone.Collection([
+      { id: 't1', groupId: 'g1', unreadItems: 1 },
+      { id: 't2', groupId: 'g2', mentions: 1 },
+      { id: 't3', groupId: 'g3', activity: 1 },
+    ]);
+
+    unreadItemsGroupAdapter(groups, troupes);
+
+    return Promise.delay(10)
+      .then(function() {
+        troupes.get('t1').set({ groupId: 'g4'});
       })
+      .delay(10)
+      .then(function() {
+        assert.deepEqual(groups.get('g1').attributes, {
+          id: "g1",
+          activity: false,
+          mentions: false,
+          unreadItems: false
+        });
+
+        assert.deepEqual(groups.get('g2').attributes, {
+          id: "g2",
+          activity: false,
+          mentions: true,
+          unreadItems: false
+        });
+
+        assert.deepEqual(groups.get('g3').attributes, {
+          id: "g3",
+          activity: true,
+          mentions: false,
+          unreadItems: false
+        });
+
+        assert.deepEqual(groups.get('g4').attributes, {
+          id: "g4",
+          activity: false,
+          mentions: false,
+          unreadItems: true
+        });
+
+      });
   });
 
 

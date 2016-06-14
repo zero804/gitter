@@ -18,6 +18,11 @@ function unreadItemsGroupAdapter(groupCollection, troupesCollection) {
    */
   function getModelUpdateForGroup(groupId) {
     var troupeIds = groupIndex[groupId];
+    if (!troupeIds) {
+      // Trivial case of the group no longer having any troupes
+      return { mentions: false, unreadItems: false, activity: false };
+    }
+    
     var hasActivity = false;
     var hasUnread = false;
 
