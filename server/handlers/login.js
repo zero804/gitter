@@ -112,6 +112,12 @@ router.post('/oauth/token',
   identifyRoute('login-oauth-token'),
   oauth2.token);
 
+router.all('/oauth/callback',
+  identifyRoute('login-oauth-callback'),
+  function(req, res) {
+    res.send('Wait time is the worst / I can hardly sit / No one has the time / Someone is always late');
+  });
+
 // Wait? Why is this here?
 // REMOVE IT: app.post('/oauth/authorize/decision', oauth2.decision);
 
