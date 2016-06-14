@@ -7,7 +7,7 @@ var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assert = require('assert');
 var _ = require('lodash');
 
-describe('group-api', function() {
+describe('room-api', function() {
   this.timeout(10000);
 
   var app, request;

@@ -8,14 +8,14 @@ var reservedNamespaceHash = reservedNamespaces.reduce(function(memo, name) {
   return memo;
 }, {});
 
-function validateGroupName(name) {
-  if (typeof name !== 'string') return false;
+function validateGroupUri(uri) {
+  if (typeof uri !== 'string') return false;
 
-  if (reservedNamespaceHash[name.toLowerCase()]) {
+  if (reservedNamespaceHash[uri.toLowerCase()]) {
     return false;
   }
 
-  return validateRoomName(name);
+  return validateRoomName(uri);
 }
 
-module.exports = validateGroupName;
+module.exports = validateGroupUri;

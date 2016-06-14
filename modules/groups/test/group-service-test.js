@@ -2,6 +2,7 @@
 
 var groupService = require('../lib/group-service');
 var assert = require('assert');
+var StatusError = require('statuserror');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
 
@@ -13,7 +14,9 @@ describe('group-service', function() {
       var fixture = fixtureLoader.setup({
         deleteDocuments: {
           User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }],
-          Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() }],
+          Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
+                  { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() },
+                  { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() }],
         },
         user1: {
           githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
@@ -21,10 +24,15 @@ describe('group-service', function() {
         }
       });
 
-      it('should create a group', function() {
+      it('should create a group for a GitHub org', function() {
         var groupUri = fixtureLoader.GITTER_INTEGRATION_ORG;
         var user = fixture.user1;
-        return groupService.createGroup(user, { name: 'Bob', uri: groupUri })
+        return groupService.createGroup(user, {
+            type: 'GH_ORG',
+            name: 'Bob',
+            uri: groupUri,
+            linkPath: groupUri
+          })
           .then(function(group) {
             assert.strictEqual(group.name, 'Bob');
             assert.strictEqual(group.uri, groupUri);
@@ -41,6 +49,69 @@ describe('group-service', function() {
               type: 'GH_ORG'
             })
           })
+      });
+
+      it('should create a group for an unknown GitHub owner', function() {
+        var groupUri = fixtureLoader.GITTER_INTEGRATION_USERNAME;
+        var user = fixture.user1;
+        return groupService.createGroup(user, {
+            type: 'GH_GUESS',
+            name: 'Bob',
+            uri: groupUri,
+            linkPath: groupUri
+          })
+          .then(function(group) {
+            assert.strictEqual(group.name, 'Bob');
+            assert.strictEqual(group.uri, groupUri);
+            assert.strictEqual(group.lcUri, groupUri.toLowerCase());
+            return securityDescriptorService.getForGroupUser(group._id, null);
+          })
+          .then(function(securityDescriptor) {
+            assert.deepEqual(securityDescriptor, {
+              admins: 'GH_USER_SAME',
+              externalId: fixtureLoader.GITTER_INTEGRATION_USER_ID,
+              linkPath: fixtureLoader.GITTER_INTEGRATION_USERNAME,
+              members: 'PUBLIC',
+              public: true,
+              type: 'GH_USER'
+            })
+          })
+      });
+
+      it('should create a group for a new style community', function() {
+        var user = fixture.user1;
+        return groupService.createGroup(user, {
+            name: 'Bob',
+            uri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY
+          })
+          .then(function(group) {
+            assert.strictEqual(group.name, 'Bob');
+            assert.strictEqual(group.uri, fixtureLoader.GITTER_INTEGRATION_COMMUNITY);
+            assert.strictEqual(group.lcUri, fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase());
+            return securityDescriptorService.getForGroupUser(group._id, null);
+          })
+          .then(function(securityDescriptor) {
+            assert.deepEqual(securityDescriptor, {
+              type: null,
+              admins: 'MANUAL',
+              public: true,
+              members: 'PUBLIC'
+            })
+          })
+      });
+
+      it('should throw an error if you try and create a new style community not prefixed with an underscore', function() {
+        var user = fixture.user1;
+        return groupService.createGroup(user, {
+            name: 'This Should Fail',
+            uri: 'i-love-cats'
+          })
+          .then(function() {
+            assert.ok(false, 'expected error')
+          })
+          .catch(StatusError, function(error) {
+            assert.strictEqual(error.status, 400);
+          });
       });
     });
 

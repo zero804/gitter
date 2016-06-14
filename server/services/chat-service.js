@@ -181,6 +181,7 @@ exports.newChatMessageToTroupe = function(troupe, user, data) {
         var statMetadata = _.extend({
           userId: user.id,
           troupeId: troupe.id,
+          groupId: troupe.groupId,
           username: user.username,
           room_uri: troupe.uri,
           owner: getOrgNameFromTroupeName(troupe.uri)
