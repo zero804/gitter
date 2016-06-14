@@ -13,11 +13,11 @@ var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 function getTroupeBatchedStream() {
   return persistence.Troupe
-    .find({})
+    .find({ sd: null })
     .lean()
     .read('secondaryPreferred')
     .stream()
-    .pipe(new BatchStream({ size : 8192 }));
+    .pipe(new BatchStream({ size: 8192 }));
 }
 
 function keyById(results) {
@@ -108,21 +108,22 @@ var updateBatch = Promise.method(function (items) {
 
   if (!items.length) return;
 
-  var bulk = persistence.SecurityDescriptor.collection.initializeUnorderedBulkOp();
+  var bulk = persistence.Troupe.collection.initializeUnorderedBulkOp();
 
   items.forEach(function(item) {
     var troupeId = item.troupe._id;
     var descriptor = item.perms;
 
     var setOperation = {
-      $setOnInsert: {
-        troupeId: troupeId,
-        type: descriptor.type,
-        members: descriptor.members,
-        admins: descriptor.admins,
-        public: descriptor.public,
-        linkPath: descriptor.linkPath,
-        externalId: descriptor.externalId,
+      $set: {
+        sd: {
+          type: descriptor.type,
+          members: descriptor.members,
+          admins: descriptor.admins,
+          public: descriptor.public,
+          linkPath: descriptor.linkPath,
+          externalId: descriptor.externalId,
+        }
       }
     };
 
@@ -138,7 +139,7 @@ var updateBatch = Promise.method(function (items) {
       setOperation.$setOnInsert.extraAdmins = mongoUtils.asObjectIDs(descriptor.extraAdmins);
     }
 
-    bulk.find({ troupeId: troupeId })
+    bulk.find({ _id: troupeId, sd: null })
       .upsert()
       .updateOne(setOperation);
   });
@@ -157,7 +158,7 @@ function execute() {
     var count = 0;
     var totalUpserted = 0;
     getPipeline()
-      .pipe(new BatchStream({ size : 1024 }))
+      .pipe(new BatchStream({ size: 1024 }))
       .pipe(through2Concurrent.obj({ maxConcurrency: 1 }, function(items, enc, callback) {
         console.log('updating ', items.length);
         return updateBatch(items)
