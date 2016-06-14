@@ -20,35 +20,33 @@ describe('BaseCollectionModel()', function() {
     model.onOrg = sinon.spy();
   });
 
-  it('should throw an error if no roomMenuModel is passed', function() {
-    try { new BaseCollectionModel(); }
-    catch (e) {
-      assert.equal(e.message, 'A valid instance of roomMenuModel must be passed to a new instance of BaseCollectionModel');
-    }
-  });
-
   it('should call onAll when the model moves into a search state', function() {
     roomMenuModel.set('state', 'all');
+    roomMenuModel.trigger('change:state:post');
     assert.equal(1, model.onAll.callCount);
   });
 
   it('should call onSearch when the model moves into a search state', function() {
     roomMenuModel.set('state', 'search');
+    roomMenuModel.trigger('change:state:post');
     assert.equal(1, model.onSearch.callCount);
   });
 
   it('should call onFavourite when the model moves into a search state', function() {
     roomMenuModel.set('state', 'favourite');
+    roomMenuModel.trigger('change:state:post');
     assert.equal(1, model.onFavourite.callCount);
   });
 
   it('should call onPeople when the model moves into a search state', function() {
     roomMenuModel.set('state', 'people');
+    roomMenuModel.trigger('change:state:post');
     assert.equal(1, model.onPeople.callCount);
   });
 
   it('should call onOrg when the model moves into a search state', function() {
     roomMenuModel.set('state', 'org');
+    roomMenuModel.trigger('change:state:post');
     assert.equal(1, model.onOrg.callCount);
   });
 
