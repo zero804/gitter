@@ -1,15 +1,4 @@
-{{#if hasUnreadIndicators}}
-  <div class="room-menu-options__item__unread-indicator-wrapper">
-    <span class="room-menu-options__item__unread-indicator pulse-animation {{#if mentions}}has-mentions{{else if unreadItems}}has-unreads{{else if activity}}has-activity{{/if}}" aria-label="{{#if mentions}}You were mentioned in a {{name}} room{{else}}Unread activity in a {{name}} room{{/if}}">
-      {{#if mentions}}
-        {{mentions}}
-      {{else if unreadItems}}
-        {{unreadItems}}
-      {{/if}}
-    </span>
-  </div>
-{{/if}}
-
+{{> minibar_activity_indicators}}
 <button class="room-menu-options__item-button" title="{{name}}">
   <img class="room-menu-options__item__avatar"
     src='{{avatarSrcset.src}}'

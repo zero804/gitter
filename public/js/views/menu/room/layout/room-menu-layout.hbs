@@ -5,21 +5,29 @@
         <ul id="minibar-list" class="room-menu-options nano-content">
 
           <li data-state-change="all" id="minibar-all"  class="room-menu-options__item--all">
-            <button class="room-menu-options__item-button" title="All Conversations">
-              <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/home.svg"}}' />
-            </button>
+            {{! the above li is passed to a Marionette view as its el so, sadly, we need to wrap these in divs}}
+            <div class="room-menu-options__container">
+              <button class="room-menu-options__item-button" title="All Conversations">
+                <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/home.svg"}}' />
+              </button>
+            </div>
           </li>
 
           <li data-state-change="search" id="minibar-search" class="room-menu-options__item--search">
-            <button class="room-menu-options__item-button" title="Search Gitter">
-              <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/search.svg"}}' />
-            </button>
+            <div class="room-menu-options__container">
+              <button class="room-menu-options__item-button" title="Search Gitter">
+                <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/search.svg"}}' />
+              </button>
+            </div>
           </li>
 
           <li data-state-change="people" id="minibar-people" class="room-menu-options__item--people">
-            <button class="room-menu-options__item-button" title="Your One to One Conversations">
-              <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/people.svg"}}' />
-            </button>
+            <div class="room-menu-options__container">
+              {{> minibar_activity_indicators}}
+              <button class="room-menu-options__item-button" title="Your One to One Conversations">
+                <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/people.svg"}}' />
+              </button>
+            </div>
           </li>
 
           <li id="minibar-collection">
@@ -33,9 +41,11 @@
           </li>
 
           <li data-state-change="close" id="minibar-close"  class="room-menu-options__item--close {{#if roomMenuIsPinned}}left{{/if}}">
-            <button id="menu-toggle-button" class="room-menu-options__item-button menu-toggle-button" title="Toggle left menu">
-              {{> pinned-hamburger-menu-icon }}
-            </button>
+            <div class="room-menu-options__container">
+              <button id="menu-toggle-button" class="room-menu-options__item-button menu-toggle-button" title="Toggle left menu">
+                {{> pinned-hamburger-menu-icon }}
+              </button>
+            </div>
           </li>
 
         </ul>

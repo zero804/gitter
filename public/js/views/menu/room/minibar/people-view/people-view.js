@@ -46,11 +46,20 @@ module.exports = ItemView.extend({
   },
 
   serializeData: function (){
-    return _.extend({}, ItemView.prototype.serializeData.apply(this, arguments), this.notifications.toJSON());
+    console.log('what the');
+    var result =  _.extend({}, ItemView.prototype.serializeData.apply(this, arguments), this.notifications.toJSON());
+    console.log(result);
+    return result;
   },
 
   onDestroy: function (){
     this.stopListening(this.notifications);
     this.notifications.destroy();
   },
+
+  render: function (){
+    console.log('render');
+    ItemView.prototype.render.apply(this, arguments);
+  },
+
 });
