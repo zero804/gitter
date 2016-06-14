@@ -56,7 +56,7 @@
             },
             "inherits": {
               "version": "2.0.1",
-              "from": "inherits@2.0.1",
+              "from": "inherits@>=2.0.1 <2.1.0",
               "resolved": "http://beta-internal:4873/inherits/-/inherits-2.0.1.tgz"
             }
           }
@@ -733,7 +733,7 @@
           "dependencies": {
             "mime-types": {
               "version": "2.1.11",
-              "from": "mime-types@>=2.1.11 <2.2.0",
+              "from": "mime-types@>=2.1.6 <2.2.0",
               "resolved": "http://beta-internal:4873/mime-types/-/mime-types-2.1.11.tgz",
               "dependencies": {
                 "mime-db": {
@@ -963,7 +963,7 @@
             },
             "mime-types": {
               "version": "2.1.11",
-              "from": "mime-types@>=2.1.11 <2.2.0",
+              "from": "mime-types@>=2.1.6 <2.2.0",
               "resolved": "http://beta-internal:4873/mime-types/-/mime-types-2.1.11.tgz",
               "dependencies": {
                 "mime-db": {
@@ -1022,7 +1022,7 @@
                 "minimist": {
                   "version": "0.0.8",
                   "from": "minimist@0.0.8",
-                  "resolved": "https://registry.npmjs.org/minimist/-/minimist-0.0.8.tgz"
+                  "resolved": "http://beta-internal:4873/minimist/-/minimist-0.0.8.tgz"
                 }
               }
             },
@@ -1798,9 +1798,9 @@
       }
     },
     "gitter-services": {
-      "version": "1.17.1",
-      "from": "git+https://github.com/gitterHQ/services.git#1.17.1",
-      "resolved": "git+https://github.com/gitterHQ/services.git#fa9d0d9c741b800e9908145105dd6eb36a2aac2b",
+      "version": "1.18.0",
+      "from": "git+https://github.com/gitterHQ/services.git#1.18.0",
+      "resolved": "git+https://github.com/gitterHQ/services.git#9cb44ba3dda8f7ca915451971ae95b6fb73442dc",
       "dependencies": {
         "require-all": {
           "version": "0.0.8",
@@ -2136,7 +2136,7 @@
             },
             "mime": {
               "version": "1.2.11",
-              "from": "mime@>=1.2.7 <1.3.0",
+              "from": "mime@>=1.2.11 <1.3.0",
               "resolved": "http://beta-internal:4873/mime/-/mime-1.2.11.tgz"
             },
             "request": {
@@ -2552,7 +2552,7 @@
             "minimist": {
               "version": "0.0.8",
               "from": "minimist@0.0.8",
-              "resolved": "https://registry.npmjs.org/minimist/-/minimist-0.0.8.tgz"
+              "resolved": "http://beta-internal:4873/minimist/-/minimist-0.0.8.tgz"
             }
           }
         },
@@ -2738,9 +2738,9 @@
       "resolved": "http://beta-internal:4873/mongodb-unique-ids/-/mongodb-unique-ids-0.1.2.tgz"
     },
     "mongoose": {
-      "version": "4.4.20",
+      "version": "4.5.0",
       "from": "mongoose@>=4.4.5 <5.0.0",
-      "resolved": "http://beta-internal:4873/mongoose/-/mongoose-4.4.20.tgz",
+      "resolved": "http://beta-internal:4873/mongoose/-/mongoose-4.5.0.tgz",
       "dependencies": {
         "async": {
           "version": "1.5.2",
@@ -2758,9 +2758,9 @@
           "resolved": "http://beta-internal:4873/hooks-fixed/-/hooks-fixed-1.1.0.tgz"
         },
         "kareem": {
-          "version": "1.0.1",
-          "from": "kareem@1.0.1",
-          "resolved": "http://beta-internal:4873/kareem/-/kareem-1.0.1.tgz"
+          "version": "1.1.0",
+          "from": "kareem@1.1.0",
+          "resolved": "http://beta-internal:4873/kareem/-/kareem-1.1.0.tgz"
         },
         "mongodb": {
           "version": "2.1.18",
@@ -4612,9 +4612,9 @@
       "resolved": "http://beta-internal:4873/tough-cookie/-/tough-cookie-0.12.1.tgz",
       "dependencies": {
         "punycode": {
-          "version": "1.4.1",
+          "version": "2.0.0",
           "from": "punycode@>=0.2.0",
-          "resolved": "http://beta-internal:4873/punycode/-/punycode-1.4.1.tgz"
+          "resolved": "http://beta-internal:4873/punycode/-/punycode-2.0.0.tgz"
         }
       }
     },
@@ -5140,7 +5140,7 @@
           "dependencies": {
             "strip-ansi": {
               "version": "3.0.1",
-              "from": "strip-ansi@>=3.0.0 <4.0.0",
+              "from": "strip-ansi@>=3.0.1 <4.0.0",
               "resolved": "http://beta-internal:4873/strip-ansi/-/strip-ansi-3.0.1.tgz",
               "dependencies": {
                 "ansi-regex": {
@@ -5432,7 +5432,7 @@
                           "dependencies": {
                             "spdx-license-ids": {
                               "version": "1.2.1",
-                              "from": "spdx-license-ids@>=1.0.2 <2.0.0",
+                              "from": "spdx-license-ids@>=1.0.0 <2.0.0",
                               "resolved": "http://beta-internal:4873/spdx-license-ids/-/spdx-license-ids-1.2.1.tgz"
                             }
                           }
@@ -5449,7 +5449,7 @@
                             },
                             "spdx-license-ids": {
                               "version": "1.2.1",
-                              "from": "spdx-license-ids@>=1.0.2 <2.0.0",
+                              "from": "spdx-license-ids@>=1.0.0 <2.0.0",
                               "resolved": "http://beta-internal:4873/spdx-license-ids/-/spdx-license-ids-1.2.1.tgz"
                             }
                           }
@@ -5532,7 +5532,7 @@
             },
             "strip-ansi": {
               "version": "3.0.1",
-              "from": "strip-ansi@>=3.0.0 <4.0.0",
+              "from": "strip-ansi@>=3.0.1 <4.0.0",
               "resolved": "http://beta-internal:4873/strip-ansi/-/strip-ansi-3.0.1.tgz",
               "dependencies": {
                 "ansi-regex": {
