@@ -16,7 +16,6 @@ var GroupSchema = new Schema({
 GroupSchema.schemaTypeName = 'GroupSchema';
 GroupSchema.index({ lcUri: 1 }, { unique: true });
 GroupSchema.index({ forumId: 1 }, { unique: true, sparse: true });
-GroupSchema.index({ type: 1, githubId: 1 }, { });
 
 module.exports = {
   install: function(mongooseConnection) {
