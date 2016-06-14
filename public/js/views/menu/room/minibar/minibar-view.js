@@ -4,6 +4,7 @@ var Marionette = require('backbone.marionette');
 var ItemView = require('./minibar-item-view');
 var ItemModel = require('./minibar-item-model');
 var HomeView = require('./home-view/home-view');
+var SearchView = require('./search-view/search-view');
 var PeopleView = require('./minibar-people-item-view');
 var CloseView = require('./minibar-close-item-view');
 var CollectionView = require('./minibar-collection-view');
@@ -33,7 +34,7 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   initSearch: function (optionsForRegion){
-    var searchView = new ItemView(optionsForRegion({
+    var searchView = new SearchView(optionsForRegion({
       model: new ItemModel({ name: 'search', type: 'search' }),
     }));
 
