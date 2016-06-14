@@ -16,7 +16,7 @@ var Model = Backbone.Model.extend({
 
 var SuggestedCollection = SuggestedRoomsByRoomCollection.extend({
   model: Model,
-  
+
   initialize: function(models, attrs, options) {
 
     if (!attrs || !attrs.roomMenuModel) {

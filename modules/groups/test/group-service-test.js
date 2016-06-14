@@ -2,6 +2,7 @@
 
 var groupService = require('../lib/group-service');
 var assert = require('assert');
+var StatusError = require('statuserror');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
 
@@ -13,7 +14,9 @@ describe('group-service', function() {
       var fixture = fixtureLoader.setup({
         deleteDocuments: {
           User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }],
-          Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() }],
+          Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
+                  { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() },
+                  { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() }],
         },
         user1: {
           githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
@@ -21,11 +24,15 @@ describe('group-service', function() {
         }
       });
 
-      it('should create a group', function() {
+      it('should create a group for a GitHub org', function() {
         var groupUri = fixtureLoader.GITTER_INTEGRATION_ORG;
         var user = fixture.user1;
-
-        return groupService.createGroup(user, { name: 'Bob', uri: groupUri })
+        return groupService.createGroup(user, {
+            type: 'GH_ORG',
+            name: 'Bob',
+            uri: groupUri,
+            linkPath: groupUri
+          })
           .then(function(group) {
             assert.strictEqual(group.name, 'Bob');
             assert.strictEqual(group.uri, groupUri);
@@ -42,6 +49,69 @@ describe('group-service', function() {
               type: 'GH_ORG'
             })
           })
+      });
+
+      it('should create a group for an unknown GitHub owner', function() {
+        var groupUri = fixtureLoader.GITTER_INTEGRATION_USERNAME;
+        var user = fixture.user1;
+        return groupService.createGroup(user, {
+            type: 'GH_GUESS',
+            name: 'Bob',
+            uri: groupUri,
+            linkPath: groupUri
+          })
+          .then(function(group) {
+            assert.strictEqual(group.name, 'Bob');
+            assert.strictEqual(group.uri, groupUri);
+            assert.strictEqual(group.lcUri, groupUri.toLowerCase());
+            return securityDescriptorService.getForGroupUser(group._id, null);
+          })
+          .then(function(securityDescriptor) {
+            assert.deepEqual(securityDescriptor, {
+              admins: 'GH_USER_SAME',
+              externalId: fixtureLoader.GITTER_INTEGRATION_USER_ID,
+              linkPath: fixtureLoader.GITTER_INTEGRATION_USERNAME,
+              members: 'PUBLIC',
+              public: true,
+              type: 'GH_USER'
+            })
+          })
+      });
+
+      it('should create a group for a new style community', function() {
+        var user = fixture.user1;
+        return groupService.createGroup(user, {
+            name: 'Bob',
+            uri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY
+          })
+          .then(function(group) {
+            assert.strictEqual(group.name, 'Bob');
+            assert.strictEqual(group.uri, fixtureLoader.GITTER_INTEGRATION_COMMUNITY);
+            assert.strictEqual(group.lcUri, fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase());
+            return securityDescriptorService.getForGroupUser(group._id, null);
+          })
+          .then(function(securityDescriptor) {
+            assert.deepEqual(securityDescriptor, {
+              type: null,
+              admins: 'MANUAL',
+              public: true,
+              members: 'PUBLIC'
+            })
+          })
+      });
+
+      it('should throw an error if you try and create a new style community not prefixed with an underscore', function() {
+        var user = fixture.user1;
+        return groupService.createGroup(user, {
+            name: 'This Should Fail',
+            uri: 'i-love-cats'
+          })
+          .then(function() {
+            assert.ok(false, 'expected error')
+          })
+          .catch(StatusError, function(error) {
+            assert.strictEqual(error.status, 400);
+          });
       });
     });
 
@@ -112,12 +182,53 @@ describe('group-service', function() {
           assert.equal(securityDescriptor.linkPath, fixtureLoader.GITTER_INTEGRATION_USERNAME);
           assert.equal(securityDescriptor.type, 'GH_USER');
         });
+      });
+    });
 
+    describe('findRoomsIdForGroup', function() {
+      var fixture = fixtureLoader.setup({
+        user1: {},
+        user2: {},
+        group1: {},
+        troupe1: { group: 'group1', security: 'PUBLIC' },
+        troupe2: { group: 'group1', security: 'PUBLIC' },
+        troupe3: { group: 'group1', security: 'PRIVATE', users: ['user1'] },
+        troupe4: { group: 'group1', security: 'PRIVATE' },
+      });
+
+      it('should find the roomIds for group for an anonymous user', function() {
+        return groupService.findRoomsIdForGroup(fixture.group1._id)
+          .then(function(roomIds) {
+            assert.deepEqual(roomIds.map(String), [
+              fixture.troupe1.id,
+              fixture.troupe2.id,
+            ]);
+          });
+      });
+
+      it('should find the roomIds for group and user with troupes', function() {
+        return groupService.findRoomsIdForGroup(fixture.group1._id, fixture.user1._id)
+          .then(function(roomIds) {
+            assert.deepEqual(roomIds.map(String), [
+              fixture.troupe1.id,
+              fixture.troupe2.id,
+              fixture.troupe3.id
+            ]);
+          });
+      });
+
+      it('should find the roomIds for group and user without troupes', function() {
+        return groupService.findRoomsIdForGroup(fixture.group1._id, fixture.user2._id)
+          .then(function(roomIds) {
+            assert.deepEqual(roomIds.map(String), [
+              fixture.troupe1.id,
+              fixture.troupe2.id,
+            ]);
+          });
       });
     });
 
     describe('ensureGroupForRoom', function() {
-
     });
 
   });

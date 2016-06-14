@@ -62,7 +62,8 @@ function sendJoinStats(user, room, tracking) {
     source: tracking && tracking.source,
     room_uri: room.uri,
     owner: getOrgNameFromTroupeName(room.uri),
-    troupeId: room.id
+    troupeId: room.id,
+    groupId: room.groupId
   });
 }
 
@@ -287,9 +288,9 @@ function createRoomForGitHubUri(user, uri, options) {
           var groupId = this.groupId = group._id;
 
           var sd = securityDescriptorGenerator.generate(user, {
-              uri: officialUri,
-              type: githubType,
-              githubId: githubId,
+              linkPath: officialUri,
+              type: 'GH_'+githubType, // GH_USER, GH_ORG or GH_REPO
+              externalId: githubId,
               security: githubType === 'ORG' ? 'PRIVATE' : security
             });
 
@@ -415,9 +416,9 @@ function createRoomForGitHubUri(user, uri, options) {
 function ensureAccessControl(user, troupe, access) {
   if(access) {
     var flags = userDefaultFlagsService.getDefaultFlagsForUser(user);
-    return roomMembershipService.addRoomMember(troupe._id, user._id, flags);
+    return roomMembershipService.addRoomMember(troupe._id, user._id, flags, troupe.groupId);
   } else {
-    return roomMembershipService.removeRoomMember(troupe._id, user._id);
+    return roomMembershipService.removeRoomMember(troupe._id, user._id, troupe.groupId);
   }
 }
 
@@ -553,6 +554,9 @@ function createRoomByUri(user, uri, options) {
               });
 
             stats.event("create_room", {
+              uri: uri,
+              roomId: troupe.id,
+              groupId: troupe.groupId,
               userId: user.id,
               roomType: "github-room"
             });
@@ -1007,7 +1011,7 @@ function addUserToRoom(room, instigatingUser, usernameToAdd) {
       return recentRoomService.saveLastVisitedTroupeforUserId(addedUser._id, room._id, { skipFayeUpdate: true })
         .then(function() {
           var flags = userDefaultFlagsService.getDefaultFlagsForUser(addedUser);
-          return roomMembershipService.addRoomMember(room._id, addedUser._id, flags);
+          return roomMembershipService.addRoomMember(room._id, addedUser._id, flags, room.groupId);
         })
         .then(function(wasAdded) {
           if (!wasAdded) return addedUser;
@@ -1057,7 +1061,7 @@ function addUserToRoom(room, instigatingUser, usernameToAdd) {
 //             })
 //             .then(function() {
 //               if (!removalUserIds.length) return;
-//               return roomMembershipService.removeRoomMembers(room._id, removalUserIds);
+//               return roomMembershipService.removeRoomMembers(room._id, removalUserIds, GROUPID);
 //             });
 //           });
 //     });
@@ -1115,13 +1119,21 @@ function removeUserFromRoom(room, user) {
   // if (!requestingUser) throw new StatusError(401, 'Not authenticated');
   if (room.oneToOne || room.githubType === 'ONETOONE') throw new StatusError(400, 'This room does not support removing.');
 
-  return roomMembershipService.removeRoomMember(room._id, user._id)
+  return roomMembershipService.removeRoomMember(room._id, user._id, room.groupId)
     .then(function() {
       // Remove favorites, unread items and last access times
       return recentRoomService.removeRecentRoomForUser(user._id, room._id);
     });
 }
 
+function removeRoomMemberById(roomId, userId) {
+  return persistence.TroupeUser.findById(roomId, { _id: 0, groupId: 1 })
+    .exec()
+    .then(function(room) {
+      var groupId = room && room.groupId;
+      return roomMembershipService.removeRoomMember(roomId, userId, groupId);
+    });
+}
 /**
  * Hides a room for a user.
  */
@@ -1138,11 +1150,16 @@ function hideRoomFromUser(roomId, userId) {
       }
 
       if (userLurkStatus) {
-        return roomMembershipService.removeRoomMember(roomId, userId);
+        return removeRoomMemberById(roomId, userId);
       }
 
       // TODO: in future get rid of this but this collection is used by the native clients
-      appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', { id: roomId, favourite: null, lastAccessTime: null, mentions: 0, unreadItems: 0 }, 'room');
+      appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', {
+        id: roomId,
+        favourite: null,
+        lastAccessTime: null,
+        mentions: 0,
+        unreadItems: 0 }, 'room');
     });
 }
 
@@ -1305,6 +1322,79 @@ function deleteRoom(troupe) {
     });
 }
 
+// This is the new way to add any type of room to a group and should replace
+// all the types of room creation except one-to-ones
+function upsertGroupRoom(user, group, roomInfo, securityDescriptor, options) {
+  options = options || {}; // options.tracking
+  var uri = roomInfo.uri;
+  var topic = roomInfo.topic || null;
+  var lcUri = uri.toLowerCase();
+
+  // convert back to the old github-tied vars here
+  var type = securityDescriptor.type || null;
+
+  var githubType;
+  var roomType;
+  switch (type) {
+    case 'GH_ORG':
+      githubType = 'ORG';
+      roomType = 'github-room';
+      break
+
+    case 'GH_REPO':
+      githubType = 'REPO';
+      roomType = 'github-room';
+      break
+
+    case null:
+      githubType = 'NONE';
+      roomType = 'group-room'; // or channel?
+      break;
+
+    default:
+      throw new StatusError(400, 'type is not known: ' + type);
+  }
+
+
+  return mongooseUtils.upsert(persistence.Troupe, { lcUri: lcUri }, {
+      $setOnInsert: {
+        groupId: group._id,
+        topic: topic,
+        uri: uri,
+        lcUri: lcUri,
+        userCount: 0,
+        sd: securityDescriptor,
+      }
+    })
+    .spread(function(room, updatedExisting) {
+      if (updatedExisting) {
+        /* Somehow someone beat us to it */
+        throw new StatusError(409);
+      }
+      return room;
+    })
+    .tap(function(room) {
+      var flags = userDefaultFlagsService.getDefaultFlagsForUser(user);
+      return roomMembershipService.addRoomMember(room._id, user._id, flags);
+    })
+    .tap(function(room) {
+      // Send the created room notification
+      emailNotificationService.createdRoomNotification(user, room) // send an email to the room's owner
+        .catch(function(err) {
+          logger.error('Unable to send create room notification: ' + err, { exception: err });
+        });
+
+      sendJoinStats(user, room, options.tracking);
+
+      stats.event("create_room", {
+        userId: user._id,
+        roomType: roomType
+      });
+
+      return uriLookupService.reserveUriForTroupeId(room._id, uri);
+    });
+}
+
 module.exports = {
   applyAutoHooksForRepoRoom: applyAutoHooksForRepoRoom,
   findAllRoomsIdsForUserIncludingMentions: findAllRoomsIdsForUserIncludingMentions,
@@ -1321,12 +1411,14 @@ module.exports = {
   /* DISABLED revalidatePermissionsForUsers: revalidatePermissionsForUsers, */
   ensureRepoRoomSecurity: ensureRepoRoomSecurity,
   removeUserFromRoom: Promise.method(removeUserFromRoom),
+  removeRoomMemberById: removeRoomMemberById,
   hideRoomFromUser: hideRoomFromUser,
 
   findBanByUsername: findBanByUsername,
   searchRooms: searchRooms,
   renameRepo: renameRepo,
   deleteRoom: deleteRoom,
+  upsertGroupRoom: upsertGroupRoom,
   testOnly: {
     updateUserDateAdded: updateUserDateAdded
 }

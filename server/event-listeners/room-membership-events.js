@@ -10,6 +10,7 @@ var errorReporter = env.errorReporter;
 var roomMembershipService = require('../services/room-membership-service');
 var liveCollections = require('../services/live-collections');
 var unreadItemService = require('../services/unread-items');
+var _ = require('lodash');
 
 function onMembersAdded(troupeId, userIds) {
   liveCollections.roomMembers.emit('added', troupeId, userIds);
@@ -20,7 +21,7 @@ function onMembersRemoved(troupeId, userIds) {
 }
 
 function onMembersLurkChange(troupeId, userIds, lurk) {
-  userIds.forEach(function(userId) {
+  _.forEach(userIds, function(userId) {
     stats.event("lurk_room", {
       userId: '' + userId,
       troupeId: '' + troupeId,
@@ -40,6 +41,32 @@ function onMembersLurkChange(troupeId, userIds, lurk) {
   return null;
 }
 
+function onGroupMembersAdded(groupId, userIds) {
+  var groupIdString = String(groupId);
+
+  _.forEach(userIds, function(userId) {
+    stats.event('join_group', {
+      userId: String(userId),
+      groupId: groupIdString,
+    });
+  });
+
+  liveCollections.groupMembers.emit('added', groupId, userIds);
+}
+
+function onGroupMembersRemoved(groupId, userIds) {
+  var groupIdString = String(groupId);
+
+  _.forEach(userIds, function(userId) {
+    stats.event('leave_group', {
+      userId: String(userId),
+      groupId: groupIdString,
+    });
+  });
+
+  liveCollections.groupMembers.emit('removed', groupId, userIds);
+}
+
 var installed = false;
 exports.install = function() {
   if (installed) return;
@@ -47,11 +74,15 @@ exports.install = function() {
 
   var events = roomMembershipService.events;
 
+  // Room Member changes
   events.on("members.added", onMembersAdded);
-
   events.on("members.removed", onMembersRemoved);
-
   events.on("members.lurk.change", onMembersLurkChange);
+
+  // Group Member Changes
+  events.on("group.members.added", onGroupMembersAdded);
+  events.on("group.members.removed", onGroupMembersRemoved);
+
 };
 
 exports.testOnly = {
