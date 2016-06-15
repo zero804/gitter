@@ -26,9 +26,7 @@ module.exports = Marionette.ItemView.extend({
 
   modelEvents: {
     'change:unreadItems change:mentions change:activity': 'onUnreadUpdate',
-    'change:active': 'onActiveStateUpdate',
-    'focus:item': 'focusItem',
-    'blur:item': 'blurItem'
+    'change:active': 'onActiveStateUpdate'
   },
   events: {
     'click': 'onItemClicked',
