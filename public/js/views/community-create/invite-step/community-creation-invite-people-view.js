@@ -11,7 +11,7 @@ var CommunityCreationPeopleListView = require('../shared/community-creation-peop
 var UserResultListView = require('../shared/community-create-invite-user-result-list-view');
 
 var userSearchModels = require('collections/user-search');
-var collaboratorsModels = require('collections/collaborators');
+var userSuggestionModels = require('collections/user-suggestions');
 
 require('gitter-styleguide/css/components/headings.css');
 require('gitter-styleguide/css/components/buttons.css');
@@ -66,12 +66,17 @@ module.exports = CommunityCreateBaseStepView.extend({
     'submit @ui.emailForm': 'onEmailSubmit'
   }),
 
-  initialize: function() {
+
+  initialize: function(options) {
     CommunityCreateBaseStepView.prototype.initialize.apply(this, arguments);
 
+    this.orgCollection = options.orgCollection;
+    this.repoCollection = options.repoCollection;
+
     this.userSearchCollection = new userSearchModels.Collection();
-    this.userSuggestionCollection = new collaboratorsModels.CollabCollection();
-    this.userSuggestionCollection.fetch();
+    this.userSuggestionCollection = new userSuggestionModels.UserSuggestionCollection();
+    this.fetchSuggestions();
+
 
     this.userResultCollection = new ProxyCollection({
       collection: this.userSuggestionCollection
@@ -85,6 +90,9 @@ module.exports = CommunityCreateBaseStepView.extend({
     });
 
     this.throttledFetchUsers = _.throttle(this.fetchUsers, 300);
+
+
+    this.listenTo(this.communityCreateModel, 'change:communityName change:communitySlug change:githubOrgId', this.onCommunityDataChange, this);
   },
 
   onDestroy: function() {
@@ -96,6 +104,34 @@ module.exports = CommunityCreateBaseStepView.extend({
   },
   onStepBack: function() {
     this.communityCreateModel.set('stepState', this.communityCreateModel.STEP_CONSTANT_MAP.main);
+  },
+
+  onActiveChange: function() {
+    CommunityCreateBaseStepView.prototype.onActiveChange.apply(this, arguments);
+    this.fetchSuggestions();
+  },
+
+  fetchSuggestions: function() {
+    var githubProjectInfo = this.communityCreateModel.getGithubProjectInfo(this.orgCollection, this.repoCollection);
+    var type = null;
+    if(this.communityCreateModel.get('githubOrgId')) {
+      type = 'GH_ORG';
+    }
+    else if(this.communityCreateModel.get('githubRepoId')) {
+      type = 'GH_REPO';
+    }
+    this.userSuggestionCollection.fetch({
+      data: {
+        type: type,
+        linkPath: githubProjectInfo.name
+      }
+    });
+  },
+
+  onCommunityDataChange: function() {
+    if(this.model.get('active')) {
+      this.fetchSuggestions();
+    }
   },
 
   onPeopleInputUpdate: function() {

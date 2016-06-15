@@ -64,7 +64,9 @@ var CommunityCreateView = Marionette.LayoutView.extend({
   initInvitePeopleView: function(optionsForRegion) {
     this.invitePeopleStepView = new CommunityCreationInvitePeopleView(optionsForRegion({
       model: this.invitePeopleStepViewModel,
-      communityCreateModel: this.model
+      communityCreateModel: this.model,
+      orgCollection: this.orgCollection,
+      repoCollection: this.repoCollection
     }));
     return this.invitePeopleStepView;
   },
