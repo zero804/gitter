@@ -1,6 +1,5 @@
 'use strict';
 
-var Promise = require('bluebird');
 var BackendMuxer = require('gitter-web-backend-muxer');
 
 

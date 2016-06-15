@@ -140,13 +140,13 @@ module.exports = (function() {
         data.showOrgMessage = true;
       }
 
-      if (data.githubType == 'ORG_CHANNEL') {
-        if (data.security == 'INHERITED') {
+      if (data.githubType === 'ORG_CHANNEL') {
+        if (data.security === 'INHERITED') {
           data.showOrgMessage = true;
         }
       }
 
-      if (data.security == 'PUBLIC') {
+      if (data.security === 'PUBLIC') {
         data.isPublic = true;
       }
 
