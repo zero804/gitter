@@ -76,7 +76,7 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
       el.classList.remove('hidden');
       el.classList.remove('will-hideaway');
     }
-
+    
     this.trigger('dnd:end-drag');
   },
 

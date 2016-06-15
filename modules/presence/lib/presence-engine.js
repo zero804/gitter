@@ -227,7 +227,6 @@ function socketReassociated(socketId, userId, troupeId, eyeballsOn) {
         // No change... process eyeballs and be done
       }
 
-
       return redisClient.presenceReassociate(
         /* keys */ keySocketUser(socketId),
                    keyUserLock(userId),

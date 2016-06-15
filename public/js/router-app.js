@@ -38,7 +38,6 @@ require('components/ping');
 require('views/widgets/avatar');
 
 onready(function() {
-
   var chatIFrame = document.getElementById('content-frame');
   var titlebarUpdater = new TitlebarUpdater();
 

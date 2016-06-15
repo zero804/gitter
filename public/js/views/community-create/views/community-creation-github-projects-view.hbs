@@ -6,18 +6,18 @@
   <section class="community-create-github-projects-tabbed-wrapper">
     <ul class="community-create-github-projects-tabbed-navigation-list">
       <li class="primary-tabbed-navigation-list-item">
-        <button class="primary-tabbed-navigation-button {{when isOrgAreaActive 'active' : ''}} community-create-github-projects-toggle-orgs">
+        <button class="primary-tabbed-navigation-button {{when isOrgAreaActive 'active' ''}} community-create-github-projects-toggle-orgs">
           my orgs
         </button>
       </li>
       <li class="primary-tabbed-navigation-list-item">
-        <button class="primary-tabbed-navigation-button  {{when isRepoAreaActive 'active' : ''}} community-create-github-projects-toggle-repos">
+        <button class="primary-tabbed-navigation-button  {{when isRepoAreaActive 'active' ''}} community-create-github-projects-toggle-repos">
           my repos
         </button>
       </li>
     </ul>
 
-    <div class="community-create-github-projects-tab-content-area js-community-create-github-projects-orgs-area {{when isOrgAreaActive 'active' : ''}}">
+    <div class="community-create-github-projects-tab-content-area js-community-create-github-projects-orgs-area {{when isOrgAreaActive 'active' ''}}">
       <div class="community-create-org-list-root"></div>
 
       <p class="community-create-org-missing-note">
@@ -35,7 +35,7 @@
       </p>
     </div>
 
-    <div class="community-create-github-projects-tab-content-area js-community-create-github-projects-repos-area {{when isRepoAreaActive 'active' : ''}}">
+    <div class="community-create-github-projects-tab-content-area js-community-create-github-projects-repos-area {{when isRepoAreaActive 'active' ''}}">
       <input
         class="primary-community-repo-name-filter-input"
         placeholder="repo name filter" />
