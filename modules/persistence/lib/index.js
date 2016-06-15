@@ -64,5 +64,6 @@ module.exports = createExports({
   PushNotificationDevice: require('./schemas/push-notification-device-schema'),
   UriLookup: require('./schemas/uri-lookup-schema'),
   Subscription: require('./schemas/subscription-schema'),
-  FeatureToggle: require('./schemas/feature-toggle-schema')
+  FeatureToggle: require('./schemas/feature-toggle-schema'),
+  TroupeRemovedUser: require('./schemas/troupe-removed-user-schema'),
 });
