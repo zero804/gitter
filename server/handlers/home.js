@@ -5,7 +5,8 @@ var urlJoin = require('url-join');
 var ensureLoggedIn = require('../web/middlewares/ensure-logged-in');
 var appMiddleware = require('./app/middleware');
 var timezoneMiddleware = require('../web/middlewares/timezone');
-var appRender = require('./app/render');
+var userHomeRenderer = require('./renderers/userhome');
+var mainFrameRenderer = require('./renderers/main-frame');
 var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
 var featureToggles = require('../web/middlewares/feature-toggles');
 
@@ -22,9 +23,9 @@ router.get('/',
     };
 
     if (req.isPhone) {
-      appRender.renderMobileUserHome(req, res, next, 'home');
+      userHomeRenderer.renderMobileUserHome(req, res, next, 'home');
     } else {
-      appRender.renderMainFrame(req, res, next, 'home');
+      mainFrameRenderer.renderMainFrame(req, res, next, 'home');
     }
   });
 
@@ -35,7 +36,7 @@ router.get('/~home',
   featureToggles,
   appMiddleware.isPhoneMiddleware,
   function(req, res, next) {
-    appRender.renderHomePage(req, res, next);
+    userHomeRenderer.renderHomePage(req, res, next);
   });
 
 
@@ -60,7 +61,7 @@ router.get(new RegExp('/explore(.*)?'),
 
     var frameUrl = urlJoin('explore', (req.params[0] || ''));
 
-    appRender.renderMainFrame(req, res, next, frameUrl);
+    mainFrameRenderer.renderMainFrame(req, res, next, frameUrl);
   });
 
 router.get('/learn',
@@ -72,7 +73,7 @@ router.get('/learn',
       uri: 'learn'
     };
 
-    appRender.renderMainFrame(req, res, next, 'learn');
+    mainFrameRenderer.renderMainFrame(req, res, next, 'learn');
   });
 
 module.exports = router;

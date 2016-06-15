@@ -104,6 +104,7 @@ router.get('/user-avatar/:username',
 router.use('/avatars', require('./avatars'));
 
 router.post('/markdown-preview',
+  authMiddleware,
   identifyRoute('api-private-markdown-preview'),
   require('./markdown-preview'));
 
