@@ -1,5 +1,8 @@
 "use strict";
 
+
+var env = require('gitter-web-env');
+var errorReporter = env.errorReporter;
 var persistence = require('gitter-web-persistence');
 var TroupeUser = persistence.TroupeUser;
 var Troupe = persistence.Troupe;
@@ -12,6 +15,7 @@ var recentRoomCore = require('./core/recent-room-core');
 var roomMembershipEvents = new EventEmitter();
 var _ = require('lodash');
 var roomMembershipFlags = require('./room-membership-flags');
+var removedUsers = require('./core/room-removed-user-core');
 
 /**
  * Returns the rooms the user is in
@@ -223,6 +227,13 @@ function removeRoomMember(troupeId, userId) {
       if (!removed) return false;
 
       roomMembershipEvents.emit("members.removed", troupeId, [userId]);
+
+      // Async record the remove user
+      removedUsers.addRemovedUser(troupeId, userId)
+        .catch(function(err) {
+          errorReporter(err, { troupeId: troupeId, userId: userId }, { module: 'room-membership-service' });
+        });
+
       return incrementTroupeUserCount(troupeId, -1)
         .thenReturn(true);
     });
@@ -252,6 +263,12 @@ function removeRoomMembers(troupeId, userIds) {
       // as we have no transactions.
       //
       roomMembershipEvents.emit("members.removed", troupeId, userIds);
+
+      // Async record the remove user
+      removedUsers.addRemovedUsers(troupeId, userIds)
+        .catch(function(err) {
+          errorReporter(err, { troupeId: troupeId, userIds: userIds }, { module: 'room-membership-service' });
+        });
 
       return resetTroupeUserCount(troupeId);
     });
