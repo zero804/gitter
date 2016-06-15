@@ -113,7 +113,8 @@ function getCollaboratorsForUser(user, options) {
         },[]);
 
       return withoutCurrentUser(users, user);
-    });
+    })
+    .then(deduplicate);
 
 }
 
