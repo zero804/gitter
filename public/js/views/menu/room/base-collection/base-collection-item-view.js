@@ -16,17 +16,11 @@ var BaseCollectionItemView = Marionette.ItemView.extend({
     'click': 'item:activated',
   },
 
-  keyboardEvents: {
-    'room-list-item:activate': 'onKeyboardItemActivated',
-  },
-
   modelEvents: {
     'activated':     'onItemActivated',
     'change:active': 'onActiveChange',
     'change:focus':    'onItemFocused',
     'change:unreadItems change:mentions change:activity': 'onUnreadUpdate',
-    'focus:item': 'focusItem',
-    'blur:item': 'blurItem',
     'change:isHidden': 'onHiddenChange',
   },
 
@@ -87,14 +81,6 @@ var BaseCollectionItemView = Marionette.ItemView.extend({
     toggleClass(this.ui.container[0], 'active', !!val);
   },
 
-  onKeyboardItemActivated: function(e) {
-    // Check to make sure the keyboard event was even spawned from this view
-    if(e.target === this.ui.container[0]) {
-      this.onItemActivated();
-      e.preventDefault();
-    }
-  },
-
   onItemActivated: function(e) {
     this.trigger('item:activated');
   },
@@ -120,24 +106,11 @@ var BaseCollectionItemView = Marionette.ItemView.extend({
     this.pulseIndicators();
   },
 
-  focusItem: function() {
-    this.ui.container.focus();
-    toggleClass(this.ui.container[0], 'focus', true);
-  },
-
-  blurItem: function() {
-    this.ui.container.blur();
-    toggleClass(this.ui.container[0], 'focus', false);
-  },
-
   onHiddenChange: function (model, val){
     toggleClass(this.el, 'hidden', val);
   },
 
 });
-
-
-cocktail.mixin(BaseCollectionItemView, KeyboardEventMixin);
 
 
 module.exports = BaseCollectionItemView;

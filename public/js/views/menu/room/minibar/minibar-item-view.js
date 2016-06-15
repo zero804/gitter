@@ -104,17 +104,4 @@ module.exports = Marionette.ItemView.extend({
 
     this.firstRender = false;
   },
-
-
-  focusItem: function() {
-    this.ui.minibarButton.focus();
-    toggleClass(this.ui.minibarButton[0], 'focus', true);
-    this.trigger('minibar-item:keyboard-activated', this.model);
-  },
-
-  blurItem: function() {
-    this.ui.minibarButton.blur();
-    toggleClass(this.ui.minibarButton[0], 'focus', false);
-  }
-
 });
