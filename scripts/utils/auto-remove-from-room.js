@@ -47,6 +47,8 @@ function run() {
   return Promise.reject(new Error('invalid usage'));
 }
 
+var total = 0;
+
 function handleRoom(troupe) {
   return (opts.dryRun ?
             autoRemovalService.findRemovalCandidates(troupe.id, { minTimeInDays: minTimeInDays }) :
@@ -57,6 +59,9 @@ function handleRoom(troupe) {
       return [candidates, userService.findByIds(userIds)];
     })
     .spread(function(candidates, users) {
+      total = total + candidates.length;
+      if (!candidates.length) return;
+
       var usersHash = collections.indexById(users);
       candidates.sort(function(a, b) {
         if (!a) {
@@ -95,7 +100,7 @@ function handleMultipleRooms() {
       .stream()
       .pipe(es.through(function(room) {
         this.pause();
-
+        console.log('Checking ' + room.uri + ' (' + room.userCount + ' members)')
         var self = this;
         return handleRoom(room)
           .catch(function(err) {
@@ -117,10 +122,10 @@ function handleMultipleRooms() {
 
 run()
   .then(function() {
+    console.log('Completed after removing ' + total + ' users.');
     if (opts.dryRun) process.exit(0);
-    console.log('Completed. Shutting down');
   })
-  .delay(10000)
+  .delay(5000)
   .then(function() {
     shutdown.shutdownGracefully();
   })
