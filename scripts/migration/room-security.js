@@ -114,30 +114,28 @@ var updateBatch = Promise.method(function (items) {
     var troupeId = item.troupe._id;
     var descriptor = item.perms;
 
-    var setOperation = {
-      $set: {
-        sd: {
-          type: descriptor.type,
-          members: descriptor.members,
-          admins: descriptor.admins,
-          public: descriptor.public,
-          linkPath: descriptor.linkPath,
-          externalId: descriptor.externalId,
-        }
-      }
+    var sd = {
+      type: descriptor.type,
+      members: descriptor.members,
+      admins: descriptor.admins,
+      public: descriptor.public,
+      linkPath: descriptor.linkPath,
+      externalId: descriptor.externalId,
     };
 
-    // if (descriptor.bans && descriptor.bans.length) {
-    //   setOperation.$setOnInsert.bans = mongoUtils.asObjectIDS(descriptor.extraMembers);
-    // }
-
     if (descriptor.extraMembers && descriptor.extraMembers.length) {
-      setOperation.$setOnInsert.extraMembers = mongoUtils.asObjectIDs(descriptor.extraMembers);
+      sd.extraMembers = mongoUtils.asObjectIDs(descriptor.extraMembers);
     }
 
     if (descriptor.extraAdmins && descriptor.extraAdmins.length) {
-      setOperation.$setOnInsert.extraAdmins = mongoUtils.asObjectIDs(descriptor.extraAdmins);
+      sd.extraAdmins = mongoUtils.asObjectIDs(descriptor.extraAdmins);
     }
+
+    var setOperation = {
+      $set: {
+        sd: sd
+      }
+    };
 
     bulk.find({ _id: troupeId, sd: null })
       .upsert()
