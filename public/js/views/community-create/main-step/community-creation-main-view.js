@@ -6,8 +6,8 @@ var context = require('utils/context');
 var toggleClass = require('utils/toggle-class');
 
 var template = require('./community-creation-main-view.hbs');
-var CommunityCreateBaseStepView = require('./community-creation-base-step-view');
-var CommunityCreationSubRoomListView = require('./community-creation-sub-room-list-view');
+var CommunityCreateBaseStepView = require('../shared/community-creation-base-step-view');
+var CommunityCreationSubRoomListView = require('../shared/community-creation-sub-room-list-view');
 
 require('gitter-styleguide/css/components/headings.css');
 require('gitter-styleguide/css/components/buttons.css');

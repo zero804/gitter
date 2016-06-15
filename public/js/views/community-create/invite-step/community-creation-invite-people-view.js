@@ -6,9 +6,9 @@ var ProxyCollection = require('backbone-proxy-collection');
 var VirtualMultipleCollection = require('../virtual-multiple-collection');
 
 var template = require('./community-creation-invite-people-view.hbs');
-var CommunityCreateBaseStepView = require('./community-creation-base-step-view');
-var CommunityCreationPeopleListView = require('./community-creation-people-list-view');
-var UserResultListView = require('./community-create-invite-user-result-list-view');
+var CommunityCreateBaseStepView = require('../shared/community-creation-base-step-view');
+var CommunityCreationPeopleListView = require('../shared/community-creation-people-list-view');
+var UserResultListView = require('../shared/community-create-invite-user-result-list-view');
 
 var userSearchModels = require('collections/user-search');
 var collaboratorsModels = require('collections/collaborators');
