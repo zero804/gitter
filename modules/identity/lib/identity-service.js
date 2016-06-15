@@ -52,7 +52,7 @@ var getIdentityForUser = Promise.method(function(user, provider) {
     return cachedIdentities[provider];
   }
 
-  var query = cachedIdentities[provider] = findIdentityForUser(user._id, provider);
+  var query = cachedIdentities[provider] = findIdentityForUser(user, provider);
   return query;
 });
 
