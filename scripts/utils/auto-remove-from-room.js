@@ -38,9 +38,9 @@ var minTimeInDays = parseInt(opts.min, 10);
 var members = parseInt(opts.members, 10);
 
 function run() {
-  if (!opts.dryRun) {
-    require('../../server/event-listeners').install();
-  }
+  // if (!opts.dryRun) {
+  //   require('../../server/event-listeners').install();
+  // }
 
   if (opts.room) return handleSingleRoom();
   if (members) return handleMultipleRooms();
@@ -67,7 +67,7 @@ function handleRoom(troupe) {
         if (!b) return 1;
         return a - b;
       });
-      
+
       candidates.forEach(function(c) {
         var user = usersHash[c.userId];
         if (!user) return;
