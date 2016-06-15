@@ -138,10 +138,6 @@ var PanelView = Marionette.LayoutView.extend({
       roomModel:  this.model,
       dndCtrl:    this.dndCtrl,
     });
-    this.listenTo(this.favCollection, 'filter-complete', function() {
-      this.model.trigger('update:collection-active-states');
-    }, this);
-
 
     this.favouriteCollectionModel = new FavouriteCollectionModel(null, {
       collection: this.favCollection,

@@ -29,8 +29,6 @@ var SEARCH_DEBOUNCE_INTERVAL = 1000;
 
 module.exports = Backbone.Model.extend({
 
-  //TODO: Review these defaults once the pin
-  //behaviour is finalised
   defaults: {
     state:                     '',
     searchTerm:                '',
@@ -38,8 +36,6 @@ module.exports = Backbone.Model.extend({
     roomMenuIsPinned:          true,
     selectedOrgName:           '',
     hasDismissedSuggestions:   false,
-    // 'keyboard', null (we can probably assume click from mouse)
-    activationSourceType:      null
   },
 
   //TODO Remove all these delete statements and pass the object with the options hash
@@ -121,18 +117,6 @@ module.exports = Backbone.Model.extend({
     this.listenTo(this, 'change', _.throttle(this.save.bind(this), 1500));
     this.listenTo(context.troupe(), 'change:id', this.onRoomChange, this);
 
-    // TODO: Should we be doing this stuff inside the collection-models?
-    //   We do something similar with the search in the model itself so maybe...
-    this.listenTo(this.activeRoomCollection, 'filter-complete', this.fireUpdateActiveState, this);
-    this.listenTo(this.searchTerms, 'filter-complete', this.fireUpdateActiveState, this);
-    this.listenTo(this.suggestedOrgs, 'sync', this.fireUpdateActiveState, this);
-    this.listenTo(this.suggestedOrgs, 'reset', this.fireUpdateActiveState, this);
-    this.listenTo(this.userSuggestions, 'sync', this.fireUpdateActiveState, this);
-    this.listenTo(this.userSuggestions, 'reset', this.fireUpdateActiveState, this);
-    this.listenTo(this.searchRoomAndPeople, 'reset', this.fireUpdateActiveState, this);
-    this.listenTo(this.searchChatMessages, 'reset', this.fireUpdateActiveState, this);
-
-
     //boot the model
     this.onSwitchState(this, this.get('state'));
   },
@@ -187,12 +171,7 @@ module.exports = Backbone.Model.extend({
         break;
     }
 
-    this.fireUpdateActiveState();
     this.trigger('change:state:post');
-  },
-
-  fireUpdateActiveState: function() {
-    this.trigger('update:collection-active-states');
   },
 
   onSearchTermChange: _.debounce(function() {
