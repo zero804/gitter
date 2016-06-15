@@ -42,7 +42,7 @@ function getGithubSuggestions(type, linkPath, user) {
     })
     .then(convertGitHubUserResultToGitterUsers);
   }
-  else if(!type) {
+  else if(type === 'GH_USER' || !type) {
     return collaboratorsService.getCollaboratorsForUser(user, {
       firstPageOnly: true
     })
