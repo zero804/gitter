@@ -143,43 +143,21 @@ var PanelView = Marionette.LayoutView.extend({
       collection: this.favCollection,
       roomMenuModel: this.model
     });
+
     this.primaryCollectionModel = new PrimaryCollectionModel(null, {
       collection: this.model.primaryCollection,
       roomMenuModel: this.model
     });
+
     this.secondaryCollectionModel = new SecondaryCollectionModel({}, {
       collection: this.model.secondaryCollection,
       roomMenuModel: this.model
     });
+
     this.tertiaryCollectionModel = new TertiaryCollectionModel({}, {
       collection: this.model.tertiaryCollection,
       roomMenuModel: this.model
     });
-
-    this.keyboardControllerView.inject(this.keyboardControllerView.constants.ROOM_LIST_KEY, [
-      {
-        collection: this.favCollection,
-        getActive: function() {
-          return this.favouriteCollectionModel.get('active');
-        }.bind(this)
-      }, {
-        collection: this.model.primaryCollection,
-        getActive: function() {
-          return this.primaryCollectionModel.get('active');
-        }.bind(this)
-      }, {
-        collection: this.model.secondaryCollection,
-        getActive: function() {
-          return this.secondaryCollectionModel.get('active');
-        }.bind(this)
-      }, {
-        collection: this.model.tertiaryCollection,
-        getActive: function() {
-          return this.tertiaryCollectionModel.get('active');
-        }.bind(this)
-      }
-    ]);
-
 
     this.listenTo(this.bus, 'ui:swipeleft', this.onSwipeLeft, this);
     this.listenTo(this.bus, 'focus.request.chat', this.onSearchItemSelected, this);
