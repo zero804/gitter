@@ -10,7 +10,7 @@ var getRoomNameFromTroupeName = require('gitter-web-shared/get-room-name-from-tr
 require('views/behaviors/isomorphic');
 
 var template = require('./community-creation-github-projects-view.hbs');
-var CommunityCreateBaseStepView = require('./community-creation-base-step-view');
+var CommunityCreateBaseStepView = require('../shared/community-creation-base-step-view');
 var CommunityCreationOrgListView = require('./community-creation-org-list-view');
 var CommunityCreationRepoListView = require('./community-creation-repo-list-view');
 

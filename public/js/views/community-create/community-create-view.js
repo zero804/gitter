@@ -14,10 +14,10 @@ var CommunityCreateGitHubProjectsStepViewModel = require('./community-create-git
 
 var ActiveCollection = require('./active-collection');
 
-var CommunityCreationMainView = require('./views/community-creation-main-view');
-var CommunityCreationGithubProjectsView = require('./views/community-creation-github-projects-view');
-var CommunityCreationInvitePeopleView = require('./views/community-creation-invite-people-view');
-var CommunityCreationOverviewView = require('./views/community-creation-overview-view');
+var CommunityCreationMainView = require('./main-step/community-creation-main-view');
+var CommunityCreationGithubProjectsView = require('./github-projects-step/community-creation-github-projects-view');
+var CommunityCreationInvitePeopleView = require('./invite-step/community-creation-invite-people-view');
+var CommunityCreationOverviewView = require('./overview-step/community-creation-overview-view');
 
 
 

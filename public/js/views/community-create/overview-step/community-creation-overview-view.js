@@ -5,9 +5,9 @@ var toggleClass = require('utils/toggle-class');
 var VirtualMultipleCollection = require('../virtual-multiple-collection');
 
 var template = require('./community-creation-overview-view.hbs');
-var CommunityCreateBaseStepView = require('./community-creation-base-step-view');
-var CommunityCreationSubRoomListView = require('./community-creation-sub-room-list-view');
-var CommunityCreationPeopleListView = require('./community-creation-people-list-view');
+var CommunityCreateBaseStepView = require('../shared/community-creation-base-step-view');
+var CommunityCreationSubRoomListView = require('../shared/community-creation-sub-room-list-view');
+var CommunityCreationPeopleListView = require('../shared/community-creation-people-list-view');
 
 require('gitter-styleguide/css/components/headings.css');
 require('gitter-styleguide/css/components/buttons.css');
