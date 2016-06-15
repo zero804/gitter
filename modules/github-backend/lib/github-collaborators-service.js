@@ -5,6 +5,7 @@ var RepoService = require('gitter-web-github').GitHubRepoService;
 var OrgService = require('gitter-web-github').GitHubOrgService;
 var ContributorService = require('gitter-web-github').GitHubContributorService;
 var MeService = require('gitter-web-github').GitHubMeService;
+var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 
 
 
@@ -84,6 +85,7 @@ function getCollaboratorsForRepo(repoUri, security, user, options) {
 }
 
 function getCollaboratorsForOrg(uri, user, options) {
+  uri = getOrgNameFromTroupeName(uri);
   var ghOrg = new OrgService(user);
   // Already using firstPageOnly
   return ghOrg.someMembers(uri, options)
