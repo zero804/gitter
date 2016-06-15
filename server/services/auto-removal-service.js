@@ -10,10 +10,10 @@ var roomMembershipService = require('./room-membership-service');
 
 /**
  * Returns a list of users who could be lurked
- * [{ userId: ..., lastAccessTime: ..., lurk: ..., notificationSettings: ... }]
+ * [{ userId: ..., lastAccessTime: ... }]
  */
 function findRemovalCandidates(roomId, options) {
-  var minTimeInDays = (options.minTimeInDays || 14);
+  var minTimeInDays = (options.minTimeInDays || 90);
 
   return roomMembershipService.findMembersForRoom(roomId)
     .then(function(userIds) {
