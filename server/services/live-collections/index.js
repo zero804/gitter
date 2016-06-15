@@ -10,7 +10,8 @@ var handlers = {
   chats: './live-collection-chats',
   rooms: './live-collection-rooms',
   roomMembers: './live-collection-room-members',
-  users: './live-collection-users'
+  users: './live-collection-users',
+  groupMembers: './live-collection-group-members'
 };
 
 var emitters;
