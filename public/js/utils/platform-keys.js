@@ -15,7 +15,7 @@ module.exports = (function() {
     };
     case 'Windows': return {
       cmd: 'ctrl',
-      room: context.hasFeature('left-menu') ? 'alt' : '⇧',
+      room: 'ctrl',
       gitter: '⇧'
     };
     default: return { // Linux and other
