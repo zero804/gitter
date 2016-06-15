@@ -44,8 +44,8 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   initPeople: function (optionsForRegion){
+    console.log(optionsForRegion());
     var peopleView = new PeopleView(optionsForRegion({
-      model: new ItemModel({ name: 'people', type: 'people' }),
       roomCollection: this.roomCollection,
     }));
 
