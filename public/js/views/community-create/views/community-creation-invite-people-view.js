@@ -53,11 +53,10 @@ module.exports = CommunityCreateBaseStepView.extend({
   },
 
   ui: _.extend({}, CommunityCreateBaseStepView.prototype.ui, {
-    peopleInput: '.community-invite-people-name-input',
-    inviteList: '.community-create-invite-list',
+    peopleInput: '.js-community-invite-people-name-input',
     emailForm: '.js-community-invite-people-email-form',
-    emailInput: '.community-invite-people-email-input',
-    emailSubmit: '.community-invite-people-email-submit-button'
+    emailInput: '.js-community-invite-people-email-input',
+    emailSubmit: '.js-community-invite-people-email-submit-button'
   }),
 
   events: _.extend({}, CommunityCreateBaseStepView.prototype.events, {
