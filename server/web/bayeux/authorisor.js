@@ -138,6 +138,10 @@ function populateSubUserCollection(options) {
   }
 
   switch(collection) {
+    case "groups":
+      return restful.serializeGroupsForUserId(userId)
+        .then(dataToSnapshot('user.groups'));
+
     case "rooms":
     case "troupes":
       return restful.serializeTroupesForUser(userId)
