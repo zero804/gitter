@@ -9,7 +9,9 @@ var NotificationModel = Backbone.Model.extend({
 
   defaults: {
     mentions: false,
-    unreadItems: false
+    unreadItems: false,
+    type: 'people',
+    name: 'people'
   },
 
   initialize: function(attrs, options) { //jshint unused: true
@@ -39,27 +41,9 @@ var NotificationModel = Backbone.Model.extend({
 module.exports = ItemView.extend({
 
   template: template,
-  initialize: function(attrs) {
-    this.roomCollection = attrs.roomCollection;
-    this.notifications = new NotificationModel(null, { roomCollection: this.roomCollection });
-    this.listenTo(this.notifications, 'change', this.render, this);
-  },
-
-  serializeData: function (){
-    console.log('what the');
-    var result =  _.extend({}, ItemView.prototype.serializeData.apply(this, arguments), this.notifications.toJSON());
-    console.log(result);
-    return result;
-  },
-
-  onDestroy: function (){
-    this.stopListening(this.notifications);
-    this.notifications.destroy();
-  },
-
-  render: function (){
-    console.log('render');
-    ItemView.prototype.render.apply(this, arguments);
+  constructor: function (attrs, options){
+    this.model = new NotificationModel(null, { roomCollection: attrs.roomCollection });
+    ItemView.prototype.constructor.apply(this, arguments);
   },
 
 });
