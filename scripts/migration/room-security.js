@@ -146,7 +146,7 @@ var updateBatch = Promise.method(function (items) {
       bulk.execute(callback);
     })
     .then(function(x) {
-      return x.nUpserted;
+      return x.nModified;
     });
 
 });
@@ -154,7 +154,7 @@ var updateBatch = Promise.method(function (items) {
 function execute() {
   return new Promise(function(resolve, reject) {
     var count = 0;
-    var totalUpserted = 0;
+    var totalModified = 0;
     getPipeline()
       .pipe(new BatchStream({ size: 1024 }))
       .pipe(through2Concurrent.obj({ maxConcurrency: 1 }, function(items, enc, callback) {
@@ -168,15 +168,15 @@ function execute() {
       }))
 
       .on('error', reject)
-      .on('data', function(upserted) {
+      .on('data', function(modified) {
         count++;
-        totalUpserted = totalUpserted + upserted;
+        totalModified = totalModified + modified;
         if ((count % 10) === 0) {
-          console.log('# ' + (count * 1024), 'upserted', totalUpserted);
+          console.log('# ' + (count * 1024), 'modified', totalModified);
         }
       })
       .on('end', function() {
-        console.log('# final' + (count * 1024), 'upserted', totalUpserted);
+        console.log('# final' + (count * 1024), 'modified', totalModified);
         resolve();
       });
 
