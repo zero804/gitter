@@ -36,23 +36,32 @@ GitHubRepoService.prototype.isCollaborator = function(repo, username) {
 /**
  *
  */
- GitHubRepoService.prototype.getCollaborators = function(repo) {
-  return tentacles.repoCollaborator.list(repo, { accessToken: this.accessToken });
+ GitHubRepoService.prototype.getCollaborators = function(repo, options) {
+  return tentacles.repoCollaborator.list(repo, {
+    accessToken: this.accessToken,
+    firstPageOnly: options && options.firstPageOnly
+  });
 };
 
 /**
  *
  */
 GitHubRepoService.prototype.getCommits = function(repo, options) {
-  return tentacles.repoCommit.list(repo, { firstPageOnly: options.firstPage, accessToken: this.accessToken });
+  return tentacles.repoCommit.list(repo, {
+    accessToken: this.accessToken,
+    firstPageOnly: options && options.firstPageOnly
+  });
 };
 
 
 /**
  *  Returns repo stargazers
  */
- GitHubRepoService.prototype.getStargazers = function(repo) {
-  return tentacles.starring.listForRepo(repo, { accessToken: this.accessToken });
+GitHubRepoService.prototype.getStargazers = function(repo, options) {
+  return tentacles.starring.listForRepo(repo, {
+    accessToken: this.accessToken,
+    firstPageOnly: options && options.firstPageOnly
+  });
 };
 
 /**
@@ -71,7 +80,11 @@ GitHubRepoService.prototype.getIssues = function(repo) {
 
 
 GitHubRepoService.prototype.getRecentlyStarredRepos = function() {
-  return tentacles.starring.listForAuthUser({ firstPageOnly: true, query: { per_page: 100 }, accessToken: this.accessToken });
+  return tentacles.starring.listForAuthUser({
+    accessToken: this.accessToken,
+    firstPageOnly: true,
+    query: { per_page: 100 }
+  });
 };
 
 GitHubRepoService.prototype.getWatchedRepos = function() {
@@ -87,8 +100,8 @@ GitHubRepoService.prototype.getAllReposForAuthUser = function() {
 /** TODO: deprecated */
 GitHubRepoService.prototype.getReposForUser = function(username, options) {
   return tentacles.repo.listForUser(username, {
-    firstPageOnly: options && options.firstPage,
-    accessToken: this.accessToken
+  accessToken: this.accessToken,
+    firstPageOnly: options && options.firstPageOnly
   });
 };
 

@@ -56,7 +56,7 @@
             },
             "inherits": {
               "version": "2.0.1",
-              "from": "inherits@2.0.1",
+              "from": "inherits@>=2.0.1 <2.1.0",
               "resolved": "http://beta-internal:4873/inherits/-/inherits-2.0.1.tgz"
             }
           }
@@ -375,7 +375,7 @@
       "dependencies": {
         "debug": {
           "version": "1.0.4",
-          "from": "debug@>=1.0.2 <2.0.0",
+          "from": "debug@>=1.0.4 <2.0.0",
           "resolved": "http://beta-internal:4873/debug/-/debug-1.0.4.tgz",
           "dependencies": {
             "ms": {
@@ -628,7 +628,7 @@
               "dependencies": {
                 "ansi-regex": {
                   "version": "0.2.1",
-                  "from": "ansi-regex@>=0.2.0 <0.3.0",
+                  "from": "ansi-regex@>=0.2.1 <0.3.0",
                   "resolved": "http://beta-internal:4873/ansi-regex/-/ansi-regex-0.2.1.tgz"
                 }
               }
@@ -640,7 +640,7 @@
               "dependencies": {
                 "ansi-regex": {
                   "version": "0.2.1",
-                  "from": "ansi-regex@>=0.2.0 <0.3.0",
+                  "from": "ansi-regex@>=0.2.1 <0.3.0",
                   "resolved": "http://beta-internal:4873/ansi-regex/-/ansi-regex-0.2.1.tgz"
                 }
               }
@@ -733,7 +733,7 @@
           "dependencies": {
             "mime-types": {
               "version": "2.1.11",
-              "from": "mime-types@>=2.1.11 <2.2.0",
+              "from": "mime-types@>=2.1.6 <2.2.0",
               "resolved": "http://beta-internal:4873/mime-types/-/mime-types-2.1.11.tgz",
               "dependencies": {
                 "mime-db": {
@@ -963,7 +963,7 @@
             },
             "mime-types": {
               "version": "2.1.11",
-              "from": "mime-types@>=2.1.11 <2.2.0",
+              "from": "mime-types@>=2.1.6 <2.2.0",
               "resolved": "http://beta-internal:4873/mime-types/-/mime-types-2.1.11.tgz",
               "dependencies": {
                 "mime-db": {
@@ -1022,7 +1022,7 @@
                 "minimist": {
                   "version": "0.0.8",
                   "from": "minimist@0.0.8",
-                  "resolved": "https://registry.npmjs.org/minimist/-/minimist-0.0.8.tgz"
+                  "resolved": "http://beta-internal:4873/minimist/-/minimist-0.0.8.tgz"
                 }
               }
             },
@@ -1798,9 +1798,9 @@
       }
     },
     "gitter-services": {
-      "version": "1.17.1",
-      "from": "git+https://github.com/gitterHQ/services.git#1.17.1",
-      "resolved": "git+https://github.com/gitterHQ/services.git#fa9d0d9c741b800e9908145105dd6eb36a2aac2b",
+      "version": "1.18.0",
+      "from": "git+https://github.com/gitterHQ/services.git#1.18.0",
+      "resolved": "git+https://github.com/gitterHQ/services.git#9cb44ba3dda8f7ca915451971ae95b6fb73442dc",
       "dependencies": {
         "require-all": {
           "version": "0.0.8",
@@ -2136,7 +2136,7 @@
             },
             "mime": {
               "version": "1.2.11",
-              "from": "mime@>=1.2.7 <1.3.0",
+              "from": "mime@>=1.2.11 <1.3.0",
               "resolved": "http://beta-internal:4873/mime/-/mime-1.2.11.tgz"
             },
             "request": {
@@ -2552,7 +2552,7 @@
             "minimist": {
               "version": "0.0.8",
               "from": "minimist@0.0.8",
-              "resolved": "https://registry.npmjs.org/minimist/-/minimist-0.0.8.tgz"
+              "resolved": "http://beta-internal:4873/minimist/-/minimist-0.0.8.tgz"
             }
           }
         },
@@ -2617,7 +2617,7 @@
         },
         "parseurl": {
           "version": "1.3.1",
-          "from": "parseurl@>=1.3.0 <1.4.0",
+          "from": "parseurl@>=1.3.1 <1.4.0",
           "resolved": "http://beta-internal:4873/parseurl/-/parseurl-1.3.1.tgz"
         },
         "vary": {
@@ -2739,7 +2739,7 @@
     },
     "mongoose": {
       "version": "4.4.20",
-      "from": "mongoose@>=4.4.5 <5.0.0",
+      "from": "mongoose@>=4.4.0 <4.5.0",
       "resolved": "http://beta-internal:4873/mongoose/-/mongoose-4.4.20.tgz",
       "dependencies": {
         "async": {
@@ -4086,7 +4086,7 @@
         },
         "parseurl": {
           "version": "1.3.1",
-          "from": "parseurl@>=1.3.0 <1.4.0",
+          "from": "parseurl@>=1.3.1 <1.4.0",
           "resolved": "http://beta-internal:4873/parseurl/-/parseurl-1.3.1.tgz"
         }
       }
@@ -4098,7 +4098,7 @@
       "dependencies": {
         "debug": {
           "version": "1.0.4",
-          "from": "debug@>=1.0.2 <2.0.0",
+          "from": "debug@>=1.0.4 <2.0.0",
           "resolved": "http://beta-internal:4873/debug/-/debug-1.0.4.tgz",
           "dependencies": {
             "ms": {
@@ -4612,9 +4612,9 @@
       "resolved": "http://beta-internal:4873/tough-cookie/-/tough-cookie-0.12.1.tgz",
       "dependencies": {
         "punycode": {
-          "version": "1.4.1",
+          "version": "2.0.0",
           "from": "punycode@>=0.2.0",
-          "resolved": "http://beta-internal:4873/punycode/-/punycode-1.4.1.tgz"
+          "resolved": "http://beta-internal:4873/punycode/-/punycode-2.0.0.tgz"
         }
       }
     },
@@ -5432,7 +5432,7 @@
                           "dependencies": {
                             "spdx-license-ids": {
                               "version": "1.2.1",
-                              "from": "spdx-license-ids@>=1.0.2 <2.0.0",
+                              "from": "spdx-license-ids@>=1.0.0 <2.0.0",
                               "resolved": "http://beta-internal:4873/spdx-license-ids/-/spdx-license-ids-1.2.1.tgz"
                             }
                           }
@@ -5449,7 +5449,7 @@
                             },
                             "spdx-license-ids": {
                               "version": "1.2.1",
-                              "from": "spdx-license-ids@>=1.0.2 <2.0.0",
+                              "from": "spdx-license-ids@>=1.0.0 <2.0.0",
                               "resolved": "http://beta-internal:4873/spdx-license-ids/-/spdx-license-ids-1.2.1.tgz"
                             }
                           }
