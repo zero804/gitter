@@ -183,6 +183,8 @@ function TroupeStrategy(options) {
       if (otherUser) {
         troupeName = otherUser.displayName;
         troupeUrl = "/" + otherUser.username;
+      } else {
+        return null;
       }
     } else {
       troupeName = item.uri;

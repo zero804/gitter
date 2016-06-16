@@ -9,7 +9,7 @@
   background-position: 0 0;
 }
 
-.service-sprite.gitbook-logo {
+.service-sprite.gitlab-logo {
   width: 16px;
   height: 16px;
   background-position: -16px 0;
@@ -135,13 +135,13 @@
   background-position: -80px -16px;
 }
 
-.service-sprite.appveyor-logo {
+.service-sprite.gitbook-logo {
   width: 16px;
   height: 16px;
   background-position: -80px -32px;
 }
 
-.service-sprite.gitlab-logo {
+.service-sprite.appveyor-logo {
   width: 16px;
   height: 16px;
   background-position: -80px -48px;
@@ -195,82 +195,94 @@
   background-position: -96px -16px;
 }
 
-.service-sprite.opencollective-logo {
+.service-sprite.newrelic-error {
   width: 16px;
   height: 16px;
   background-position: -96px -32px;
 }
 
-.service-sprite.pagerduty-logo {
+.service-sprite.newrelic-logo {
   width: 16px;
   height: 16px;
   background-position: -96px -48px;
 }
 
-.service-sprite.pivotaltracker-logo {
+.service-sprite.opencollective-logo {
   width: 16px;
   height: 16px;
   background-position: -96px -64px;
 }
 
-.service-sprite.sentry-error {
+.service-sprite.pagerduty-logo {
   width: 16px;
   height: 16px;
   background-position: 0 -82px;
 }
 
-.service-sprite.sentry-logo {
+.service-sprite.pivotaltracker-logo {
   width: 16px;
   height: 16px;
   background-position: -16px -82px;
 }
 
-.service-sprite.sprintly-columns {
+.service-sprite.sentry-error {
   width: 16px;
   height: 16px;
   background-position: -32px -82px;
 }
 
-.service-sprite.sprintly-logo {
+.service-sprite.sentry-logo {
   width: 16px;
   height: 16px;
   background-position: -48px -82px;
 }
 
-.service-sprite.trackjs-error {
+.service-sprite.sprintly-columns {
   width: 16px;
   height: 16px;
   background-position: -64px -82px;
 }
 
-.service-sprite.trackjs-logo {
+.service-sprite.sprintly-logo {
   width: 16px;
   height: 16px;
   background-position: -80px -82px;
 }
 
-.service-sprite.travis-frown {
+.service-sprite.trackjs-error {
   width: 16px;
   height: 16px;
   background-position: -96px -82px;
 }
 
-.service-sprite.travis-logo {
+.service-sprite.trackjs-logo {
   width: 16px;
   height: 16px;
   background-position: -112px 0;
 }
 
-.service-sprite.travis-meh {
+.service-sprite.travis-frown {
   width: 16px;
   height: 16px;
   background-position: -112px -16px;
 }
 
-.service-sprite.travis-smile {
+.service-sprite.travis-logo {
   width: 16px;
   height: 16px;
   background-position: -112px -32px;
+}
+
+.service-sprite.travis-meh {
+  width: 16px;
+  height: 16px;
+  background-position: -112px -48px;
+}
+
+.service-sprite.travis-smile {
+  width: 16px;
+  height: 16px;
+  background-position: -112px -64px;
 }
 
 

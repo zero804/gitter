@@ -585,6 +585,25 @@ describe('room-membership-service', function() {
               return roomMembershipService.findMembershipForUsersInRoom(troupeId, [userId1, userId2]);
             })
             .then(function(result) {
+              assert(Array.isArray(result));
+              assert.strictEqual(result.length, 1);
+              assert.equal(result[0], userId2);
+            });
+      });
+
+      it('should return some users when a single user is added', function() {
+        var troupeId = fixture.troupe1.id;
+        var userId1 = fixture.user1.id;
+        var userId2 = fixture.user2.id;
+
+        return Promise.join(
+            roomMembershipService.removeRoomMember(troupeId, userId1),
+            roomMembershipService.addRoomMember(troupeId, userId2, roomMembershipFlags.MODES.all),
+            function() {
+              return roomMembershipService.findMembershipForUsersInRoom(troupeId, [userId2]);
+            })
+            .then(function(result) {
+              assert(Array.isArray(result));
               assert.strictEqual(result.length, 1);
               assert.equal(result[0], userId2);
             });
