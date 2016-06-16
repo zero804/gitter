@@ -7,7 +7,6 @@ var toggleClass = require('utils/toggle-class');
 var PanelHeaderView = require('../header/header-view');
 var PanelFooterView = require('../footer/footer-view');
 var FavouriteCollectionView = require('../favourite-collection/favourite-collection-view');
-var FavouriteCollectionModel = require('../favourite-collection/favourite-collection-model');
 var PrimaryCollectionView = require('../primary-collection/primary-collection-view');
 var PrimaryCollectionModel = require('../primary-collection/primary-collection-model');
 var SecondaryCollectionView = require('../secondary-collection/secondary-collection-view');
@@ -55,7 +54,7 @@ var PanelView = Marionette.LayoutView.extend({
   initFavouriteCollection: function (optionsForRegion) {
     return new FavouriteCollectionView(optionsForRegion({
       collection:     this.model.favCollection,
-      model:          this.favouriteCollectionModel,
+      model:          this.model.favouriteCollectionModel,
       roomMenuModel:  this.model,
       bus:            this.bus,
       dndCtrl:        this.dndCtrl,
@@ -129,11 +128,6 @@ var PanelView = Marionette.LayoutView.extend({
     this.bus = attrs.bus;
     this.dndCtrl = attrs.dndCtrl;
     this.keyboardControllerView = attrs.keyboardControllerView;
-
-    this.favouriteCollectionModel = new FavouriteCollectionModel(null, {
-      collection: this.model.favCollection,
-      roomMenuModel: this.model
-    });
 
     this.primaryCollectionModel = new PrimaryCollectionModel(null, {
       collection: this.model.primaryCollection,

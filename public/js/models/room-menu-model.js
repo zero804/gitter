@@ -16,6 +16,7 @@ var SearchChatMessages = require('../collections/search-chat-messages');
 var perfTiming = require('components/perf-timing');
 var context = require('utils/context');
 var FilteredFavouriteRoomCollection = require('../collections/filtered-favourite-room-collection');
+var FavouriteCollectionModel = require('../views/menu/room/favourite-collection/favourite-collection-model');
 
 var states = [
   'all',
@@ -98,6 +99,11 @@ module.exports = Backbone.Model.extend({
       collection: this._roomCollection,
       roomModel:  this,
       dndCtrl:    this.dndCtrl,
+    });
+
+    this.favouriteCollectionModel = new FavouriteCollectionModel(null, {
+      collection: this.favCollection,
+      roomMenuModel: this
     });
 
     this.primaryCollection = new ProxyCollection({ collection: this.activeRoomCollection });
