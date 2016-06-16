@@ -17,7 +17,8 @@ var KeyboardController = Marionette.ItemView.extend({
     'room.3': 'onMinibarPeopleSelected',
     'room.4 room.5 room.6 room.7 room.8 room.9 room.10': 'onMinibarOrgSelected',
     'focus.search': 'onMinibarSearchSelected',
-    'room.down': 'onDownKeyPressed'
+    'room.down': 'onDownKeyPressed',
+    'room.up': 'onUpKeyPressed',
   },
 
   initialize: function(attrs) {
@@ -51,15 +52,36 @@ var KeyboardController = Marionette.ItemView.extend({
   },
 
   onDownKeyPressed: function (){
+    if(this.isMinibarFocused()) { this.moveMinibarFocus(1);}
+  },
+
+  onUpKeyPressed: function (){
+    if(this.isMinibarFocused()) { this.moveMinibarFocus(-1);}
+  },
+
+  moveMinibarFocus: function (direction){
     var focusedMinibarItem = this.minibarCollection.findWhere({ focus: true });
-    if(focusedMinibarItem) {
-      focusedMinibarItem.set('focus', false);
-      var index = this.minibarCollection.indexOf(focusedMinibarItem);
-      index = arrayBoundWrap(index + 1, this.minibarCollection.length);
-      var activeMinibarItem = this.minibarCollection.at(index);
-      activeMinibarItem.set('focus', true);
-      return this.setDebouncedState(activeMinibarItem);
-    }
+
+    //blur current minibar item
+    focusedMinibarItem.set('focus', false);
+
+    //get next index
+    var index = this.minibarCollection.indexOf(focusedMinibarItem);
+    index = arrayBoundWrap(index + direction, this.minibarCollection.length);
+
+    //focus next minibar element
+    var activeMinibarItem = this.minibarCollection.at(index);
+    activeMinibarItem.set('focus', true);
+
+    //bail if the close item is focused
+    if(activeMinibarItem.get('type') === 'close') { return; }
+
+    //change the menu state
+    return this.setDebouncedState(activeMinibarItem);
+  },
+
+  isMinibarFocused: function (){
+    return !!this.minibarCollection.findWhere({ focus: true });
   },
 
   setDebouncedState: _.debounce(function (model){
