@@ -106,6 +106,33 @@ describe('KeyboardControllerView', function(){
       }, 101);
     });
 
+    it('it should focus the previous minibar item when up is pressed', function(){
+      appEvents.trigger('keyboard.room.4', { key: 4 });
+      appEvents.trigger('keyboard.room.up');
+      assert(model.minibarCollection.at(2).get('focus'));
+      assert.equal(model.minibarCollection.at(3).get('focus'), false);
+    });
+
+    it('it should focus the last minibar item when up is pressed and the first item is focused', function(){
+      appEvents.trigger('keyboard.room.1');
+      appEvents.trigger('keyboard.room.up');
+      assert(model.minibarCollection.at(4).get('focus'));
+      assert.equal(model.minibarCollection.at(0).get('focus'), false);
+    });
+
+    it('should change menu state after a short delay when the up arrow key is pressed', function(done){
+      appEvents.trigger('keyboard.room.3');
+      appEvents.trigger('keyboard.room.up');
+      appEvents.trigger('keyboard.room.up');
+      appEvents.trigger('keyboard.room.up');
+      assert.equal(model.get('state'), 'people');
+      setTimeout(function(){
+        assert.equal(model.get('state'), 'org');
+        assert.equal(model.get('selectedOrgName'), 'gitterHQ');
+        done();
+      }, 101);
+    });
+
   });
 
 });
