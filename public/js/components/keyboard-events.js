@@ -126,6 +126,8 @@ module.exports = (function() {
       name: 'search.next',
       scope: 'input.search'
       }],
+    'right': [{ name: 'room.next', scope: 'other' }],
+    'left': [{ name: 'room.prev', scope: 'other' }],
     'tab': [{
       name: 'maininput.tab.next',
       scope: ['input.chat', 'input.chat.edit', 'input.search']

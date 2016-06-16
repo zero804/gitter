@@ -19,7 +19,6 @@ var BaseCollectionItemView = Marionette.ItemView.extend({
   modelEvents: {
     'activated':     'onItemActivated',
     'change:active': 'onActiveChange',
-    'change:focus':    'onItemFocused',
     'change:unreadItems change:mentions change:activity': 'onUnreadUpdate',
     'change:isHidden': 'onHiddenChange',
   },
@@ -83,10 +82,6 @@ var BaseCollectionItemView = Marionette.ItemView.extend({
 
   onItemActivated: function(e) {
     this.trigger('item:activated');
-  },
-
-  onItemFocused: function(model, val) {
-    toggleClass(this.ui.container[0], 'focus', !!val);
   },
 
   onUnreadUpdate: function() {
