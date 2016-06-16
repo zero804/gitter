@@ -89,7 +89,7 @@ var ChatToolbarInputLayout = ChatToolbarLayout.extend({
       return new ChatInputView(optionsForRegion({
         model: context.troupe(),
         collection: this.options.chatCollection
-      }, { rerender: true }));
+      }));
     } else {
       return new JoinRoomView(optionsForRegion({}, {rerender: true}));
     }

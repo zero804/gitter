@@ -1,7 +1,9 @@
 /* eslint-env mongo */
 'use strict';
 
-if (rs.status().set !== 'TroupeBetaProdData') {
+var status = rs.status();
+
+if (status.ok === 1 && status.set !== 'TroupeBetaProdData') {
   throw new Error('This script can only be executed against TroupeBetaProdData')
 }
 
@@ -32,4 +34,15 @@ printjson(db.users.update({
   githubToken: { $exists: true }
   },
   { $unset: { githubToken: true } },
+  { multi: true }));
+
+print('removing identity secrets');
+printjson(db.identities.update({ },
+  {
+    $unset: {
+      accessTokenSecret: true,
+      accessToken: true,
+      email: true,
+    }
+  },
   { multi: true }));

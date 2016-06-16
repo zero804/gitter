@@ -44,7 +44,7 @@ var ChatInputView = Marionette.LayoutView.extend({
     return new ChatInputBoxView(optionsForRegion({
       composeMode: this.composeMode,
       collection: this.collection
-    }, { rerender: true }));
+    }));
   },
 
   initChatInputButtonsRegion: function(optionsForRegion) {
