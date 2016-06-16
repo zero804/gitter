@@ -6,6 +6,7 @@ var FilteredRoomCollection = require('./filtered-room-collection');
 var sortAndFilters = require('gitter-realtime-client/lib/sorts-filters').model;
 var one2oneFavouriteFilter = require('gitter-web-shared/filters/left-menu-primary-favourite-one2one');
 var orgFavouriteFilter = require('gitter-web-shared/filters/left-menu-primary-favourite-org');
+var favouriteCollectionFilter = require('gitter-web-shared/filters/left-menu-primary-favourite');
 
 var FilteredFavouriteCollection = function() {
   FilteredRoomCollection.apply(this, arguments);
@@ -14,6 +15,11 @@ var FilteredFavouriteCollection = function() {
 _.extend(
   FilteredFavouriteCollection.prototype,
   FilteredRoomCollection.prototype, {
+
+    constructor: function(models, attrs){
+      models = (models || attrs._roomCollection.filter(favouriteCollectionFilter));
+      FilteredRoomCollection.prototype.constructor.apply(models, attrs);
+    },
 
     initialize: function(models, attrs) { //jshint unused: true
       FilteredRoomCollection.prototype.initialize.apply(this, arguments);

@@ -17,7 +17,6 @@ var perfTiming = require('components/perf-timing');
 var context = require('utils/context');
 var defaultCollectionFilter = require('gitter-web-shared/filters/left-menu-primary-default');
 var FilteredFavouriteRoomCollection = require('../collections/filtered-favourite-room-collection');
-var favouriteCollectionFilter = require('gitter-web-shared/filters/left-menu-primary-favourite');
 
 var states = [
   'all',
@@ -97,8 +96,7 @@ module.exports = Backbone.Model.extend({
       collection: this._roomCollection,
     });
 
-    var favModels = this._roomCollection.filter(favouriteCollectionFilter);
-    this.favCollection = new FilteredFavouriteRoomCollection(favModels, {
+    this.favCollection = new FilteredFavouriteRoomCollection(null, {
       collection: this._roomCollection,
       roomModel:  this,
       dndCtrl:    this.dndCtrl,
