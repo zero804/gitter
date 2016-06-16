@@ -30,6 +30,7 @@ var REMEMBER_ME_PREFIX = "rememberme:";
  * Generate an auth token for a user and save it in redis
  */
 function generateAuthToken(userId) {
+  debug('Generate auth token: userId=%s', userId);
   var key = uuid.v4();
   var token = uuid.v4();
 
@@ -51,6 +52,8 @@ function generateAuthToken(userId) {
  * Delete a token
  */
 var deleteAuthToken = Promise.method(function(authCookieValue) {
+  debug('Delete auth token: token=%s', authCookieValue);
+
   /* Auth cookie */
   if(!authCookieValue) return;
 
@@ -138,6 +141,7 @@ var validateAuthToken = Promise.method(function(authCookieValue) {
 function processRememberMeToken(presentedCookie) {
   return validateAuthToken(presentedCookie)
     .then(function(userId) {
+      debug('Resolved userId=%s for token=%s', userId, presentedCookie);
       if (!userId) return;
 
       return userService.findById(userId)
@@ -238,6 +242,7 @@ module.exports = {
         return passportLogin(req, user);
       })
       .catch(function(err) {
+        debug('Rememberme token failed with %s', err);
         stats.event("rememberme_rejected");
         res.clearCookie(cookieName, { domain: nconf.get("web:cookieDomain") });
         throw err;
