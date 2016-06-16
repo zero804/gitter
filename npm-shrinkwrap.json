@@ -375,7 +375,7 @@
       "dependencies": {
         "debug": {
           "version": "1.0.4",
-          "from": "debug@>=1.0.2 <2.0.0",
+          "from": "debug@>=1.0.4 <2.0.0",
           "resolved": "http://beta-internal:4873/debug/-/debug-1.0.4.tgz",
           "dependencies": {
             "ms": {
@@ -3009,7 +3009,7 @@
         },
         "parseurl": {
           "version": "1.3.1",
-          "from": "parseurl@>=1.3.0 <1.4.0",
+          "from": "parseurl@>=1.3.1 <1.4.0",
           "resolved": "http://beta-internal:4873/parseurl/-/parseurl-1.3.1.tgz"
         },
         "vary": {
@@ -3130,9 +3130,9 @@
       "resolved": "http://beta-internal:4873/mongodb-unique-ids/-/mongodb-unique-ids-0.1.2.tgz"
     },
     "mongoose": {
-      "version": "4.5.0",
-      "from": "mongoose@>=4.4.5 <5.0.0",
-      "resolved": "http://beta-internal:4873/mongoose/-/mongoose-4.5.0.tgz",
+      "version": "4.4.20",
+      "from": "mongoose@>=4.4.0 <4.5.0",
+      "resolved": "http://beta-internal:4873/mongoose/-/mongoose-4.4.20.tgz",
       "dependencies": {
         "async": {
           "version": "1.5.2",
@@ -3150,9 +3150,9 @@
           "resolved": "http://beta-internal:4873/hooks-fixed/-/hooks-fixed-1.1.0.tgz"
         },
         "kareem": {
-          "version": "1.1.0",
-          "from": "kareem@1.1.0",
-          "resolved": "http://beta-internal:4873/kareem/-/kareem-1.1.0.tgz"
+          "version": "1.0.1",
+          "from": "kareem@1.0.1",
+          "resolved": "http://beta-internal:4873/kareem/-/kareem-1.0.1.tgz"
         },
         "mongodb": {
           "version": "2.1.18",
@@ -3766,7 +3766,7 @@
       "dependencies": {
         "passport-oauth2": {
           "version": "1.3.0",
-          "from": "passport-oauth2@>=1.0.0 <2.0.0",
+          "from": "passport-oauth2@>=1.1.2 <2.0.0",
           "resolved": "http://beta-internal:4873/passport-oauth2/-/passport-oauth2-1.3.0.tgz",
           "dependencies": {
             "passport-strategy": {
@@ -3819,7 +3819,7 @@
       "dependencies": {
         "passport-oauth2": {
           "version": "1.3.0",
-          "from": "passport-oauth2@>=1.0.0 <2.0.0",
+          "from": "passport-oauth2@>=1.1.2 <2.0.0",
           "resolved": "http://beta-internal:4873/passport-oauth2/-/passport-oauth2-1.3.0.tgz",
           "dependencies": {
             "passport-strategy": {
@@ -4478,7 +4478,7 @@
         },
         "parseurl": {
           "version": "1.3.1",
-          "from": "parseurl@>=1.3.0 <1.4.0",
+          "from": "parseurl@>=1.3.1 <1.4.0",
           "resolved": "http://beta-internal:4873/parseurl/-/parseurl-1.3.1.tgz"
         }
       }
@@ -4490,7 +4490,7 @@
       "dependencies": {
         "debug": {
           "version": "1.0.4",
-          "from": "debug@>=1.0.2 <2.0.0",
+          "from": "debug@>=1.0.4 <2.0.0",
           "resolved": "http://beta-internal:4873/debug/-/debug-1.0.4.tgz",
           "dependencies": {
             "ms": {
@@ -5924,7 +5924,7 @@
             },
             "strip-ansi": {
               "version": "3.0.1",
-              "from": "strip-ansi@>=3.0.0 <4.0.0",
+              "from": "strip-ansi@>=3.0.1 <4.0.0",
               "resolved": "http://beta-internal:4873/strip-ansi/-/strip-ansi-3.0.1.tgz",
               "dependencies": {
                 "ansi-regex": {
