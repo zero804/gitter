@@ -6,16 +6,10 @@ var Backbone = require('backbone');
 var one2oneFilter = require('gitter-web-shared/filters/left-menu-primary-one2one');
 var orgFilter = require('gitter-web-shared/filters/left-menu-primary-org');
 var sortAndFilters = require('gitter-realtime-client/lib/sorts-filters').model;
-var defaultCollectionFilter = require('gitter-web-shared/filters/left-menu-primary-default');
 
 var FilteredRoomCollection = Backbone.Collection.extend({
 
   _filter: null,
-
-  constructor: function (models, attrs){
-    models = (models || attrs.collection.filter(defaultCollectionFilter));
-    Backbone.Collection.prototype.constructor.apply(this, arguments);
-  },
 
   initialize: function(models, options) { //jshint unused: true
     if (!options || !options.roomModel) {

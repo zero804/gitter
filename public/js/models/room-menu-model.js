@@ -20,6 +20,8 @@ var FavouriteCollectionModel = require('../views/menu/room/favourite-collection/
 var PrimaryCollectionModel = require('../views/menu/room/primary-collection/primary-collection-model');
 var SecondaryCollectionModel = require('../views/menu/room/secondary-collection/secondary-collection-model');
 var TertiaryCollectionModel = require('../views/menu/room/tertiary-collection/tertiary-collection-model');
+var defaultCollectionFilter = require('gitter-web-shared/filters/left-menu-primary-default');
+var favouriteCollectionFilter = require('gitter-web-shared/filters/left-menu-primary-favourite');
 
 var states = [
   'all',
@@ -93,12 +95,14 @@ module.exports = Backbone.Model.extend({
       suggestedOrgsCollection: this.suggestedOrgs,
     });
 
-    this.activeRoomCollection = new FilteredRoomCollection(null, {
+    var roomModels = this._roomCollection.filter(defaultCollectionFilter);
+    this.activeRoomCollection = new FilteredRoomCollection(roomModels, {
       roomModel:  this,
       collection: this._roomCollection,
     });
 
-    this.favCollection = new FilteredFavouriteRoomCollection(null, {
+    var favModels = this._roomCollection.filter(favouriteCollectionFilter);
+    this.favCollection = new FilteredFavouriteRoomCollection(favModels, {
       collection: this._roomCollection,
       roomModel:  this,
       dndCtrl:    this.dndCtrl,
