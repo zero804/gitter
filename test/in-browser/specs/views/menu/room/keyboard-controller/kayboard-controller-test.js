@@ -27,15 +27,19 @@ describe('KeyboardControllerView', function(){
       { uri: 'troupe/test1' },
     ]);
 
-    model.secondaryCollection = new Backbone.Collection([
-      { uri: 'gitterHQ/all-rooms-1' },
-      { uri: 'troupe/all-rooms-1' },
-    ]);
+    model.primaryCollectionModel = new Backbone.Model({ active: true });
 
     model.secondaryCollection = new Backbone.Collection([
       { uri: 'gitterHQ/all-rooms-1' },
       { uri: 'troupe/all-rooms-1' },
     ]);
+    model.secondaryCollectionModel = new Backbone.Model({ active: true });
+
+    model.tertiaryCollection = new Backbone.Collection([
+      { uri: 'gitterHQ/all-rooms-1' },
+      { uri: 'troupe/all-rooms-1' },
+    ]);
+    model.tertiaryCollectionModel = new Backbone.Model({ active: true });
 
     view = new KeyboardControllerView({
       model: model
@@ -96,15 +100,6 @@ describe('KeyboardControllerView', function(){
       assert.equal(model.get('state'), 'search');
     });
 
-    it('should blur the previously selected item', function(){
-      appEvents.trigger('keyboard.room.1');
-      appEvents.trigger('keyboard.room.2');
-      appEvents.trigger('keyboard.room.4', { key: 4 });
-      appEvents.trigger('keyboard.room.5', { key: 5 });
-      var items = model.minibarCollection.where({ focus: true });
-      assert.equal(items.length, 1);
-    });
-
   });
 
   describe('arrow key movement', function(){
@@ -131,7 +126,7 @@ describe('KeyboardControllerView', function(){
       setTimeout(function(){
         assert.equal(model.get('state'), 'all');
         done();
-      }, 101);
+      }, 150);
     });
 
     it('it should focus the previous minibar item when up is pressed', function(){
@@ -158,7 +153,70 @@ describe('KeyboardControllerView', function(){
         assert.equal(model.get('state'), 'org');
         assert.equal(model.get('selectedOrgName'), 'gitterHQ');
         done();
-      }, 101);
+      }, 150);
+    });
+
+    it('should focus on the room list when right is pressed after the minibar is in focus', function(){
+      //test with active in primary collection
+      appEvents.trigger('keyboard.room.3');
+      appEvents.trigger('keyboard.room.next');
+      assert(model.primaryCollection.at(0).get('focus'));
+
+      //reset and test with active in secondary
+      model.primaryCollection.findWhere({ active: true }).set('active', false);
+      model.secondaryCollection.at(0).set('active', true);
+      appEvents.trigger('keyboard.room.3');
+      appEvents.trigger('keyboard.room.next');
+      assert(model.secondaryCollection.at(0).get('focus'));
+
+      // reset and test with tertiary
+      model.secondaryCollection.findWhere({ active: true }).set('active', false);
+      model.tertiaryCollection.at(0).set('active', true);
+      appEvents.trigger('keyboard.room.3');
+      appEvents.trigger('keyboard.room.next');
+      assert(model.tertiaryCollection.at(0).get('focus'));
+    });
+
+    it('should resepct the collection models active property when moving focus with the right key', function(){
+      model.secondaryCollection.at(0).set('active', true);
+      model.primaryCollectionModel.set('active', false);
+      appEvents.trigger('keyboard.room.3');
+      appEvents.trigger('keyboard.room.next');
+      assert(model.secondaryCollection.at(0).get('focus'));
+
+      model.tertiaryCollection.at(0).set('active', true);
+      model.secondaryCollectionModel.set('active', false);
+      appEvents.trigger('keyboard.room.3');
+      appEvents.trigger('keyboard.room.next');
+      assert(model.tertiaryCollection.at(0).get('focus'));
+    });
+
+  });
+
+  describe('bluring items', function(){
+    it('should blur the previously selected minibar item', function(){
+      appEvents.trigger('keyboard.room.1');
+      appEvents.trigger('keyboard.room.2');
+      appEvents.trigger('keyboard.room.4', { key: 4 });
+      appEvents.trigger('keyboard.room.5', { key: 5 });
+      var items = model.minibarCollection.where({ focus: true });
+      assert.equal(items.length, 1);
+    });
+
+    it('should blur every item that is in focus when blurAllItems is called', function(){
+      model.minibarCollection.at(0).set('focus', true);
+      model.minibarCollection.at(3).set('focus', true);
+      model.primaryCollection.at(0).set('focus', true);
+      model.primaryCollection.at(1).set('focus', true);
+      model.secondaryCollection.at(0).set('focus', true);
+      model.secondaryCollection.at(1).set('focus', true);
+      model.tertiaryCollection.at(0).set('focus', true);
+      model.tertiaryCollection.at(1).set('focus', true);
+      view.blurAllItems();
+      assert.equal(model.minibarCollection.where({ focus: true }), 0);
+      assert.equal(model.primaryCollection.where({ focus: true }), 0);
+      assert.equal(model.secondaryCollection.where({ focus: true }), 0);
+      assert.equal(model.tertiaryCollection.where({ focus: true }), 0);
     });
 
   });
