@@ -1,8 +1,13 @@
 'use strict';
 
 var Marionette = require('backbone.marionette');
+var _ = require('underscore');
 var cocktail = require('cocktail');
 var KeyboardEventMixin = require('views/keyboard-events-mixin');
+
+var arrayBoundWrap = function(index, length) {
+  return ((index % length) + length) % length;
+};
 
 var KeyboardController = Marionette.ItemView.extend({
 
@@ -12,6 +17,7 @@ var KeyboardController = Marionette.ItemView.extend({
     'room.3': 'onMinibarPeopleSelected',
     'room.4 room.5 room.6 room.7 room.8 room.9 room.10': 'onMinibarOrgSelected',
     'focus.search': 'onMinibarSearchSelected',
+    'room.down': 'onDownKeyPressed'
   },
 
   initialize: function(attrs) {
@@ -43,6 +49,24 @@ var KeyboardController = Marionette.ItemView.extend({
     model.set('focus', true);
     this.model.set({ state: 'org', selectedOrgName: model.get('name') });
   },
+
+  onDownKeyPressed: function (){
+    var focusedMinibarItem = this.minibarCollection.findWhere({ focus: true });
+    if(focusedMinibarItem) {
+      focusedMinibarItem.set('focus', false);
+      var index = this.minibarCollection.indexOf(focusedMinibarItem);
+      index = arrayBoundWrap(index + 1, this.minibarCollection.length);
+      var activeMinibarItem = this.minibarCollection.at(index);
+      activeMinibarItem.set('focus', true);
+      return this.setDebouncedState(activeMinibarItem);
+    }
+  },
+
+  setDebouncedState: _.debounce(function (model){
+    var type = model.get('type');
+    if(type !== 'org') { return this.model.set('state', type); }
+    this.model.set({ state: type, selectedOrgName: model.get('name') });
+  }, 100),
 
 });
 
