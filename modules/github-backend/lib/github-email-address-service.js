@@ -30,7 +30,7 @@ function getValidPublicEmailAddress(username) {
 function getEmailFromCommit(user) {
   var ghRepo = new GitHubRepoService(user);
 
-  return ghRepo.getReposForUser(user.username, {firstPage: true})
+  return ghRepo.getReposForUser(user.username, {firstPageOnly: true})
   .then(function(repos) {
     if (!repos.length) return null;
 
@@ -39,7 +39,7 @@ function getEmailFromCommit(user) {
     var latestRepo = ownRepos.filter(function(repo) { return repo.pushed_at === dates[0]; });
     var latestRepoName = latestRepo[0].full_name;
 
-    return ghRepo.getCommits(latestRepoName, {firstPage: true, author: user.username});
+    return ghRepo.getCommits(latestRepoName, {firstPageOnly: true, author: user.username});
   })
   .then(function(commits) {
     if (!commits.length) return null;
