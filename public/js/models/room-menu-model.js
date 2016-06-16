@@ -19,6 +19,7 @@ var FilteredFavouriteRoomCollection = require('../collections/filtered-favourite
 var FavouriteCollectionModel = require('../views/menu/room/favourite-collection/favourite-collection-model');
 var PrimaryCollectionModel = require('../views/menu/room/primary-collection/primary-collection-model');
 var SecondaryCollectionModel = require('../views/menu/room/secondary-collection/secondary-collection-model');
+var TertiaryCollectionModel = require('../views/menu/room/tertiary-collection/tertiary-collection-model');
 
 var states = [
   'all',
@@ -121,6 +122,10 @@ module.exports = Backbone.Model.extend({
     });
 
     this.tertiaryCollection = new ProxyCollection({ collection: this._orgCollection });
+    this.tertiaryCollectionModel = new TertiaryCollectionModel({}, {
+      collection: this.tertiaryCollection,
+      roomMenuModel: this
+    });
 
     this.listenTo(this.primaryCollection, 'snapshot', this.onPrimaryCollectionSnapshot, this);
     this.snapshotTimeout = setTimeout(function(){
