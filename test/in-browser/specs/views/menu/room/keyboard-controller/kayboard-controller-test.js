@@ -73,7 +73,6 @@ describe('KeyboardControllerView', function(){
       appEvents.trigger('keyboard.focus.search');
       assert.equal(model.get('state'), 'search');
     });
-
   });
 
 });
