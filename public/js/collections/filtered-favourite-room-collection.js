@@ -17,7 +17,7 @@ _.extend(
   FilteredRoomCollection.prototype, {
 
     constructor: function(models, attrs){
-      models = (models || attrs._roomCollection.filter(favouriteCollectionFilter));
+      models = (models || attrs.collection.filter(favouriteCollectionFilter));
       FilteredRoomCollection.prototype.constructor.apply(models, attrs);
     },
 
