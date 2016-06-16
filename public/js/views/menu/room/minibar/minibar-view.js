@@ -113,9 +113,7 @@ var MinibarView = Marionette.CollectionView.extend({
     }
 
     // Set the minibar-item active
-    model.set({
-      active: true
-    });
+    model.set({ active: true });
 
     var state = model.get('type');
     // close-passthrough

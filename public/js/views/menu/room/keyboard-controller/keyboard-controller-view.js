@@ -93,6 +93,7 @@ var KeyboardController = Marionette.ItemView.extend({
   focusActiveRoomItem: function (){
     this.blurAllItems();
     var activeRoomItem = this.getActiveRoomItem();
+    if(!activeRoomItem) { return; }
     activeRoomItem.set('focus', true);
   },
 
