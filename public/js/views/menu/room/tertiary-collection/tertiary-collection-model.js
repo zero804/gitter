@@ -12,24 +12,6 @@ module.exports = BaseCollectionModel.extend({
     this.listenTo(this.roomMenuModel, 'change:searchTerm', this.updateModelActiveState, this);
   },
 
-  updateModelActiveState: function() {
-    // We use `collection.models.length` and `collection.length` just to
-    // play nice with proxycollections which don't seem to adjust `.length` appropriately
-    var active = !!this.collection.length && !!this.collection.models.length;
-
-    switch (this.roomMenuModel.get('state')) {
-      case 'search':
-        active = !this.roomMenuModel.get('searchTerm');
-        break;
-
-      case 'org':
-        active = !!this.collection.length && !this.roomMenuModel.get('hasDismissedSuggestions');
-        break;
-    }
-
-    this.set('active', active);
-  },
-
   onAll: function() {
     this.set({
       header:       'Your Organisations',
@@ -41,13 +23,15 @@ module.exports = BaseCollectionModel.extend({
     this.set({
       header:       'Recent Searches',
       isSuggestion: false,
+      active: !this.roomMenuModel.get('searchTerm'),
     });
   },
 
   onOrg: function (){
     this.set({
       header:       'Your Suggestions',
-      isSuggestion: true
+      isSuggestion: true,
+      active: !!this.collection.length && !this.roomMenuModel.get('hasDismissedSuggestions'),
     });
   },
 

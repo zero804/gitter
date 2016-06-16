@@ -119,6 +119,8 @@ module.exports = Backbone.Model.extend({
       roomMenuModel: this
     });
 
+    window.primaryCollectionModel = this.primaryCollectionModel;
+
     this.secondaryCollection = new ProxyCollection({ collection: this.searchTerms });
     this.secondaryCollectionModel = new SecondaryCollectionModel({}, {
       collection: this.secondaryCollection,

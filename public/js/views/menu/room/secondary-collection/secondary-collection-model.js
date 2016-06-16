@@ -49,13 +49,6 @@ module.exports = BaseCollectionModel.extend({
     });
   },
 
-  onFavourite: function(){
-    this.set({
-      header:       'Your Suggestions',
-      isSuggestion: true,
-    });
-  },
-
   onOrg: function() {
     this.set({
       header:       'All Rooms',
