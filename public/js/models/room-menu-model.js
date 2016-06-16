@@ -209,16 +209,6 @@ module.exports = Backbone.Model.extend({
         .catch(function(err) { if (options.error) options.error(err); });
     }
 
-    //if we are in a mobile environment then the menu will never be pinned
-    if (this.get('isMobile')) {
-      window.troupeContext = {
-        leftRoomMenuState: {
-          roomMenuIsPinned: false,
-          panelOpenState:   false,
-        },
-      };
-    }
-
     //The only time we need to fetch data is on page load
     //so we can just pull it our of the troupe context
     //JP 11/1/16

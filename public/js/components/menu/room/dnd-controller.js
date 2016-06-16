@@ -6,11 +6,6 @@ var _ = require('underscore');
 
 var DNDCtrl = function(attrs) {
 
-  if (!attrs || !attrs.model) {
-    throw new Error('A valid model must be passed to a new instance of the DNDController');
-  }
-
-  this.model = attrs.model;
   this.onMouseUp = this.onMouseUp.bind(this);
 
   this.drag = dragula([], {
@@ -49,11 +44,7 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
     //guard against no drop target
     if(!target || !target.dataset) { return }
 
-    if (this.model.get('state') !== 'favourite' &&
-        target.dataset.stateChange === 'favourite') {
-      this.trigger('room-menu:add-favourite', el.dataset.id);
-      this.onDragEnd();
-    } else if (target.classList.contains('collection-list--primary')) {
+    if (target.classList.contains('collection-list--primary')) {
       this.trigger('room-menu:remove-favourite', el.dataset.id);
       this.onDragEnd();
     } else {
@@ -76,7 +67,7 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
       el.classList.remove('hidden');
       el.classList.remove('will-hideaway');
     }
-    
+
     this.trigger('dnd:end-drag');
   },
 
