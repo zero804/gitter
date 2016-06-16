@@ -4,13 +4,6 @@ var BaseCollectionModel = require('../base-collection/base-collection-model');
 
 module.exports = BaseCollectionModel.extend({
 
-
-  constructor: function(attrs, options) {
-    BaseCollectionModel.prototype.constructor.apply(this, arguments);
-    this.collection = options.collection;
-    this.listenTo(this.roomMenuModel, 'change:searchTerm', this.onSearch, this);
-  },
-
   onSearch: function() {
     this.set({
       header: 'Rooms & People',
@@ -20,7 +13,8 @@ module.exports = BaseCollectionModel.extend({
 
   onPeople: function() {
     this.set({
-      header: false
+      header: false,
+      active: true,
     });
   },
 

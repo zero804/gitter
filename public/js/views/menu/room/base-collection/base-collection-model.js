@@ -15,15 +15,17 @@ module.exports = Backbone.Model.extend({
     }
 
     this.roomMenuModel = options.roomMenuModel;
-    this.listenTo(this.roomMenuModel, 'change:state', this.onModelChangeState, this);
+    this.listenTo(options.roomMenuModel, 'change:state change:searchTerm', this.determineActiveState, this);
+    this.listenTo(options.collection, 'sync reset', this.determineActiveState, this);
     Backbone.Model.prototype.constructor.apply(this, arguments);
 
-    this.onModelChangeState(this.roomMenuModel, this.roomMenuModel.get('state'));
+    this.determineActiveState(this.roomMenuModel, this.roomMenuModel.get('state'));
   },
 
-  onModelChangeState: function(model, val) {
-    this.set('state', val);
-    switch (this.roomMenuModel.get('state')) {
+  determineActiveState: function(model, val) {
+    var state = this.roomMenuModel.get('state');
+    this.set('state', state);
+    switch (state) {
       case 'all':
         this.onAll();
         break;

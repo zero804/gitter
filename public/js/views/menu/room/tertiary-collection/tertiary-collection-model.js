@@ -4,18 +4,11 @@ var BaseCollectionModel = require('../base-collection/base-collection-model');
 
 module.exports = BaseCollectionModel.extend({
 
-  constructor: function(attrs, options) {
-    BaseCollectionModel.prototype.constructor.apply(this, arguments);
-    this.collection = options.collection;
-
-    this.listenTo(this.collection, 'sync', this.updateModelActiveState, this);
-    this.listenTo(this.roomMenuModel, 'change:searchTerm', this.updateModelActiveState, this);
-  },
-
   onAll: function() {
     this.set({
-      header:       'Your Organisations',
+      header: 'Your Organisations',
       isSuggestion: false,
+      active: !!this.collection.length && !!this.collection.models.length,
     });
   },
 
@@ -39,6 +32,7 @@ module.exports = BaseCollectionModel.extend({
     this.set({
       header:       false,
       isSuggestion: false,
+      active: !!this.collection.length && !!this.collection.models.length
     });
   },
 });
