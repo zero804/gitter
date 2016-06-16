@@ -272,7 +272,6 @@
     "supertest": "^1.2.0",
     "supertest-as-promised": "^3.1.0",
     "tap-file": "0.0.2",
-    "through2": "^0.6.3",
     "vinyl-paths": "^2.0.0",
     "webpack": "^1.12.10",
     "webpack-dev-middleware": "^1.0.11",
