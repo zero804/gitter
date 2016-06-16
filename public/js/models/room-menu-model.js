@@ -97,7 +97,7 @@ module.exports = Backbone.Model.extend({
     });
 
     var orgsSnapshot = context.getSnapshot('orgs') || [];
-    this.minibarCollection = new MinibarCollection(orgsSnapshot, { roomCollection: this.roomCollection });
+    this.minibarCollection = new MinibarCollection(orgsSnapshot, { roomCollection: this._roomCollection });
 
     var roomModels = this._roomCollection.filter(defaultCollectionFilter);
     this.activeRoomCollection = new FilteredRoomCollection(roomModels, {
