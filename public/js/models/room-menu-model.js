@@ -22,6 +22,7 @@ var SecondaryCollectionModel = require('../views/menu/room/secondary-collection/
 var TertiaryCollectionModel = require('../views/menu/room/tertiary-collection/tertiary-collection-model');
 var defaultCollectionFilter = require('gitter-web-shared/filters/left-menu-primary-default');
 var favouriteCollectionFilter = require('gitter-web-shared/filters/left-menu-primary-favourite');
+var MinibarCollection = require('../views/menu/room/minibar/minibar-collection');
 
 var states = [
   'all',
@@ -94,6 +95,9 @@ module.exports = Backbone.Model.extend({
       roomCollection:          this._roomCollection,
       suggestedOrgsCollection: this.suggestedOrgs,
     });
+
+    var orgsSnapshot = context.getSnapshot('orgs') || [];
+    this.minibarCollection = new MinibarCollection(orgsSnapshot, { roomCollection: this.roomCollection });
 
     var roomModels = this._roomCollection.filter(defaultCollectionFilter);
     this.activeRoomCollection = new FilteredRoomCollection(roomModels, {

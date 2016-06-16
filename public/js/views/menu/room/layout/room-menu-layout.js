@@ -35,7 +35,7 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
   initMiniBar: function(optionsForRegion) {
     return new MiniBarView(optionsForRegion({
       model:          this.model,
-      collection:     this.minibarCollection,
+      collection:     this.model.minibarCollection,
       bus:            this.bus,
       dndCtrl:        this.dndCtrl,
       roomCollection: this.model._roomCollection,
@@ -74,26 +74,18 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
       throw new Error('A valid event bus needs to be passed to a new instance of RoomMenuLayout');
     }
 
-    this.bus = attrs.bus;
-
     //Room Collection
     if (!attrs || !attrs.roomCollection) {
       throw new Error('A valid room collection needs to be passed to a new instance of RoomMenyLayout');
     }
 
-
+    this.bus = attrs.bus;
     this.roomCollection = attrs.roomCollection;
-
-    //TODO TEST THIS & FIGURE OUT IF THEY ARE REQUIRED FOR MOBILE?
-    //JP 28/1/16
     this.orgCollection = attrs.orgCollection;
     this.suggestedRoomCollection = attrs.suggestedRoomCollection;
 
-    var orgsSnapshot = context.getSnapshot('orgs') || [];
-    this.minibarCollection = new MinibarCollection(orgsSnapshot, { roomCollection: this.roomCollection });
-
     //Make a new model
-    this.dndCtrl = new DNDCtrl({ model: this.model });
+    this.dndCtrl = new DNDCtrl();
     this.model = new RoomMenuModel(_.extend({}, context.getSnapshot('leftMenu'), {
       bus:                     this.bus,
       roomCollection:          this.roomCollection,
@@ -106,8 +98,6 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
     this.keyboardControls = new KeyboardControllerView({
       model: this.model,
     });
-
-    //Make a new drag & drop control
 
     window.addEventListener('resize', this._initNano.bind(this));
     this.listenTo(this.dndCtrl, 'dnd:start-drag', this.onDragStart.bind(this));
