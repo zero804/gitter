@@ -94,16 +94,16 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
     this.minibarCollection = new MinibarCollection(orgsSnapshot, { roomCollection: this.roomCollection });
 
     //Make a new model
+    this.dndCtrl = new DNDCtrl({ model: this.model });
     this.model = new RoomMenuModel(_.extend({}, context.getSnapshot('leftMenu'), {
       bus:                     this.bus,
       roomCollection:          this.roomCollection,
       orgCollection:           this.orgCollection,
       userModel:               context.user(),
       troupeModel:             context.troupe(),
-
-      //TODO id this the best way to do this? JP 12/1/16
-      isMobile:                $('body').hasClass('mobile'),
+      dndCtrl:                 this.dndCtrl,
     }));
+
 
     this.keyboardControllerView = new KeyboardControllerView({
       model: new KeyboardControllerModel(),
@@ -111,7 +111,6 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
     });
 
     //Make a new drag & drop control
-    this.dndCtrl = new DNDCtrl({ model: this.model });
 
     window.addEventListener('resize', this._initNano.bind(this));
     this.listenTo(this.dndCtrl, 'dnd:start-drag', this.onDragStart.bind(this));
