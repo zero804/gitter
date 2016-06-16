@@ -59,6 +59,12 @@ module.exports = Marionette.CompositeView.extend({
     Marionette.CompositeView.prototype.constructor.apply(this, arguments);
   },
 
+  initialize: function() {
+    var activeModel = this.collection.get(context.troupe().get('id'));
+    if(!activeModel) { return; }
+    activeModel.set('active', true);
+  },
+
   onItemActivated: function(view) {
     var model = view.model;
     var url = view.getRoomUrl();
