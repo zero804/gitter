@@ -27,9 +27,12 @@ exports.install = function(app) {
     maxAge: 0
   }));
 
-  app.use('/_s/l', express.static(resolveStatic(), {
+  var staticServer = express.static(resolveStatic(), {
     maxAge: 0
-  }));
+  });
+
+  app.use('/_s/lt/:cacheBuster', staticServer);
+  app.use('/_s/l', staticServer);
 
   app.use(favicon(resolveStatic('favicon.ico')));
 

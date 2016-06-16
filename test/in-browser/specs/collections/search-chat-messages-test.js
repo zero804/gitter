@@ -19,33 +19,12 @@ describe('SearchChatMessages', function() {
     collection.fetch = sinon.spy();
   });
 
-  it('should throw an error if no room menu is passed', function(done) {
-    try { new SearchChatMessages(); }
-    catch (e) {
-      assert.equal(e.message, 'A valid instance of RoomMenuModel must be passed to a new instance of SearchChatMessages');
-      done();
-    }
-  });
-
-  it('should throw an error is no roomModel is passed', function() {
-    try { new SearchChatMessages(null, { roomMenuModel: model });}
-    catch (e) {
-      assert.equal(e.message, 'A valid instance of a roomModel must be passed to a new Instance of SearchChatMessages');
-    }
-  });
-
   it('should set the roomMenuModel', function() {
     assert(collection.roomMenuModel);
   });
 
   it('should set the room model', function() {
     assert(collection.roomModel);
-  });
-
-  it('should fetch under the right conditions', function() {
-    room.set('id', 123456);
-    model.set({ state: 'search', searchTerm: 'sometestsearch' });
-    assert.equal(1, collection.fetch.callCount);
   });
 
   it('should not fetch when the model is not in a search state', function() {

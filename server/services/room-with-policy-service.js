@@ -170,7 +170,7 @@ RoomWithPolicyService.prototype.banUserFromRoom = secureMethod([allowStaff, allo
 
           return Promise.all([
               room.save(),
-              roomMembershipService.removeRoomMember(room._id, bannedUser._id)
+              roomMembershipService.removeRoomMember(room._id, bannedUser._id, room.groupId)
             ])
             .return(ban);
         })
@@ -249,7 +249,11 @@ RoomWithPolicyService.prototype.joinRoom = secureMethod([allowJoin], function(op
  *  GET room meta/welcome-message
  */
 RoomWithPolicyService.prototype.getRoomWelcomeMessage = secureMethod([allowJoin], function(){
-  return roomMetaService.findMetaByTroupeId(this.room.id, 'welcomeMessage');
+  return roomMetaService.findMetaByTroupeId(this.room.id, 'welcomeMessage')
+    .then(function(result){
+      result = (result || { text: '', html: ''});
+      return result;
+    });
 });
 
 /**

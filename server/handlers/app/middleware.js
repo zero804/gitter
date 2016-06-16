@@ -23,7 +23,7 @@ function getRedirectUrl(roomUrl, req) {
   var m = req.path.match(/\/~\w+$/);
   var frame = m && m[0] || "";
   var finalUrl = url.format({ pathname: roomUrl + frame, query: req.query });
-  return finalUrl;
+  return encodeURI(finalUrl);
 }
 
 function uriContextResolverMiddleware(options) {
@@ -85,5 +85,8 @@ function unauthenticatedPhoneRedirectMiddleware(req, res, next) {
 module.exports = exports = {
   uriContextResolverMiddleware: uriContextResolverMiddleware,
   unauthenticatedPhoneRedirectMiddleware: unauthenticatedPhoneRedirectMiddleware,
-  isPhoneMiddleware: isPhoneMiddleware
+  isPhoneMiddleware: isPhoneMiddleware,
+  testOnly: {
+    getRedirectUrl: getRedirectUrl
+  }
 };

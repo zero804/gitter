@@ -7,5 +7,10 @@
   "browser": "client-env-browser.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "gitter-web-env": "file:../env",
+    "gitter-web-qs": "file:../qs",
+    "gitter-app-version": "file:../app-version"
   }
 }

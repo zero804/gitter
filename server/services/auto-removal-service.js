@@ -10,10 +10,10 @@ var roomMembershipService = require('./room-membership-service');
 
 /**
  * Returns a list of users who could be lurked
- * [{ userId: ..., lastAccessTime: ..., lurk: ..., notificationSettings: ... }]
+ * [{ userId: ..., lastAccessTime: ... }]
  */
 function findRemovalCandidates(roomId, options) {
-  var minTimeInDays = (options.minTimeInDays || 14);
+  var minTimeInDays = (options.minTimeInDays || 90);
 
   return roomMembershipService.findMembersForRoom(roomId)
     .then(function(userIds) {
@@ -48,11 +48,11 @@ function findRemovalCandidates(roomId, options) {
 }
 exports.findRemovalCandidates = findRemovalCandidates;
 
-function bulkRemoveUsersFromRoom(roomId, userIds) {
+function bulkRemoveUsersFromRoom(roomId, groupId, userIds) {
 
   if (!userIds.length) return Promise.resolve();
   logger.info('Removing ' + userIds.length + ' users from ' + roomId);
-  return roomMembershipService.removeRoomMembers(roomId, userIds)
+  return roomMembershipService.removeRoomMembers(roomId, userIds, groupId)
     .then(function() {
       logger.info('Marking items as read');
       return Promise.map(userIds, function(userId) {
@@ -75,17 +75,17 @@ exports.bulkRemoveUsersFromRoom = bulkRemoveUsersFromRoom;
 /**
  * Auto remove users in a room
  */
-function autoRemoveInactiveUsers(roomId, options) {
+function autoRemoveInactiveUsers(roomId, groupId, options) {
   return findRemovalCandidates(roomId, options)
     .then(function(candidates) {
       if (!candidates.length) return [];
 
-      var usersToLurk = candidates
+      var userIdsForRemoval = candidates
         .map(function(candidate) {
           return candidate.userId;
         });
 
-      return bulkRemoveUsersFromRoom(roomId, usersToLurk)
+      return bulkRemoveUsersFromRoom(roomId, groupId, userIdsForRemoval)
         .thenReturn(candidates);
     });
 }
