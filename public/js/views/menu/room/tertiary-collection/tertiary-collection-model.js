@@ -22,7 +22,7 @@ module.exports = BaseCollectionModel.extend({
 
   onOrg: function (){
     this.set({
-      header:       'Your Suggestions',
+      header: 'Your Suggestions',
       isSuggestion: true,
       active: !!this.collection.length && !this.roomMenuModel.get('hasDismissedSuggestions'),
     });
