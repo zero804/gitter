@@ -11,6 +11,11 @@ function canUserBeInvitedToJoinRoom(usernameToBeInvited, troupe, instigatingUser
     return true;
   }
 
+  if (troupe.oneToOne) {
+    return false;
+  }
+
+  // TODO: change this for new security descriptor
   switch(troupe.githubType) {
     case 'REPO':
       return githubMembers.isMember(usernameToBeInvited, troupe.uri, 'REPO', instigatingUser);
