@@ -24,6 +24,10 @@ describe('KeyboardControllerView', function(){
     });
   });
 
+  afterEach(function(){
+    view.destroy();
+  });
+
   describe('minibar switch hot keys', function(){
     it('should add `focus` to the "all" minibar model on room.1 event', function(){
       appEvents.trigger('keyboard.room.1');
@@ -73,6 +77,35 @@ describe('KeyboardControllerView', function(){
       appEvents.trigger('keyboard.focus.search');
       assert.equal(model.get('state'), 'search');
     });
+  });
+
+  describe('arrow key movement', function(){
+    it('it should focus the next minibar item when down is pressed', function(){
+      appEvents.trigger('keyboard.room.4', { key: 4 });
+      appEvents.trigger('keyboard.room.down');
+      assert(model.minibarCollection.at(4).get('focus'));
+      assert.equal(model.minibarCollection.at(3).get('focus'), false);
+    });
+
+    it('it should focus the first minibar item when down is pressed and the last item is focused', function(){
+      appEvents.trigger('keyboard.room.5', { key: 5 });
+      appEvents.trigger('keyboard.room.down');
+      assert(model.minibarCollection.at(0).get('focus'));
+      assert.equal(model.minibarCollection.at(4).get('focus'), false);
+    });
+
+    it('should change menu state after a short delay when the down arrow key is pressed', function(done){
+      appEvents.trigger('keyboard.room.3');
+      appEvents.trigger('keyboard.room.down');
+      appEvents.trigger('keyboard.room.down');
+      appEvents.trigger('keyboard.room.down');
+      assert.equal(model.get('state'), 'people');
+      setTimeout(function(){
+        assert.equal(model.get('state'), 'all');
+        done();
+      }, 101);
+    });
+
   });
 
 });
