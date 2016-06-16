@@ -27,22 +27,26 @@ var KeyboardController = Marionette.ItemView.extend({
 
   onMinibarAllSelected: function (){
     var allModel = this.minibarCollection.findWhere({ type: 'all' });
+    this.blurAllItems();
     allModel.set('focus', true);
     this.model.set('state', 'all');
   },
 
   onMinibarSearchSelected: function (){
     //the search input will focus itself
+    this.blurAllItems();
     this.model.set('state', 'search');
   },
 
   onMinibarPeopleSelected: function (){
     var peopleModel = this.minibarCollection.findWhere({ type: 'people' });
+    this.blurAllItems();
     peopleModel.set('focus', true);
     this.model.set('state', 'people');
   },
 
   onMinibarOrgSelected: function (e){
+    this.blurAllItems();
     var index = e.key;
     if(index === 0) { index = 10; } // 0 key triggers room.10
     index = index - 1; // Array 0 indexing at work
@@ -61,10 +65,7 @@ var KeyboardController = Marionette.ItemView.extend({
 
   moveMinibarFocus: function (direction){
     var focusedMinibarItem = this.minibarCollection.findWhere({ focus: true });
-
-    //blur current minibar item
-    focusedMinibarItem.set('focus', false);
-
+    this.blurAllItems();
     //get next index
     var index = this.minibarCollection.indexOf(focusedMinibarItem);
     index = arrayBoundWrap(index + direction, this.minibarCollection.length);
@@ -72,9 +73,6 @@ var KeyboardController = Marionette.ItemView.extend({
     //focus next minibar element
     var activeMinibarItem = this.minibarCollection.at(index);
     activeMinibarItem.set('focus', true);
-
-    //bail if the close item is focused
-    if(activeMinibarItem.get('type') === 'close') { return; }
 
     //change the menu state
     return this.setDebouncedState(activeMinibarItem);
@@ -89,6 +87,12 @@ var KeyboardController = Marionette.ItemView.extend({
     if(type !== 'org') { return this.model.set('state', type); }
     this.model.set({ state: type, selectedOrgName: model.get('name') });
   }, 100),
+
+  blurAllItems: function (){
+    this.minibarCollection.where({ focus: true }).forEach(function(model){
+      model.set('focus', false);
+    });
+  },
 
 });
 

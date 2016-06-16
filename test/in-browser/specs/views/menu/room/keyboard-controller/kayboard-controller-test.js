@@ -19,6 +19,24 @@ describe('KeyboardControllerView', function(){
       { type: 'org', name: 'troupe' },
       { type: 'org', name: 'gitterHQ' },
     ]);
+
+    model.primaryCollection = new Backbone.Collection([
+      { uri: 'gitterHQ', active: true },
+      { uri: 'gitterHQ/test1' },
+      { uri: 'troupe' },
+      { uri: 'troupe/test1' },
+    ]);
+
+    model.secondaryCollection = new Backbone.Collection([
+      { uri: 'gitterHQ/all-rooms-1' },
+      { uri: 'troupe/all-rooms-1' },
+    ]);
+
+    model.secondaryCollection = new Backbone.Collection([
+      { uri: 'gitterHQ/all-rooms-1' },
+      { uri: 'troupe/all-rooms-1' },
+    ]);
+
     view = new KeyboardControllerView({
       model: model
     });
@@ -77,6 +95,16 @@ describe('KeyboardControllerView', function(){
       appEvents.trigger('keyboard.focus.search');
       assert.equal(model.get('state'), 'search');
     });
+
+    it('should blur the previously selected item', function(){
+      appEvents.trigger('keyboard.room.1');
+      appEvents.trigger('keyboard.room.2');
+      appEvents.trigger('keyboard.room.4', { key: 4 });
+      appEvents.trigger('keyboard.room.5', { key: 5 });
+      var items = model.minibarCollection.where({ focus: true });
+      assert.equal(items.length, 1);
+    });
+
   });
 
   describe('arrow key movement', function(){
