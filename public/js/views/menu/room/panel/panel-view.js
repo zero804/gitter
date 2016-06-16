@@ -8,9 +8,7 @@ var PanelHeaderView = require('../header/header-view');
 var PanelFooterView = require('../footer/footer-view');
 var FavouriteCollectionView = require('../favourite-collection/favourite-collection-view');
 var PrimaryCollectionView = require('../primary-collection/primary-collection-view');
-var PrimaryCollectionModel = require('../primary-collection/primary-collection-model');
 var SecondaryCollectionView = require('../secondary-collection/secondary-collection-view');
-var SecondaryCollectionModel = require('../secondary-collection/secondary-collection-model');
 var TertiaryCollectionView = require('../tertiary-collection/tertiary-collection-view');
 var TertiaryCollectionModel = require('../tertiary-collection/tertiary-collection-model');
 var ProfileMenuView = require('../profile/profile-menu-view');
@@ -66,7 +64,7 @@ var PanelView = Marionette.LayoutView.extend({
   initPrimaryCollection: function(optionsForRegion) {
     return new PrimaryCollectionView(optionsForRegion({
       collection:     this.model.primaryCollection,
-      model:          this.primaryCollectionModel,
+      model:          this.model.primaryCollectionModel,
       roomMenuModel:  this.model,
       bus:            this.bus,
       dndCtrl:        this.dndCtrl,
@@ -77,7 +75,7 @@ var PanelView = Marionette.LayoutView.extend({
   initSecondaryCollection: function(optionsForRegion) {
     return new SecondaryCollectionView(optionsForRegion({
       collection:        this.model.secondaryCollection,
-      model:             this.secondaryCollectionModel,
+      model:             this.model.secondaryCollectionModel,
       roomMenuModel:     this.model,
       bus:               this.bus,
       roomCollection:    this.model._roomCollection,
@@ -129,15 +127,9 @@ var PanelView = Marionette.LayoutView.extend({
     this.dndCtrl = attrs.dndCtrl;
     this.keyboardControllerView = attrs.keyboardControllerView;
 
-    this.primaryCollectionModel = new PrimaryCollectionModel(null, {
-      collection: this.model.primaryCollection,
-      roomMenuModel: this.model
-    });
 
-    this.secondaryCollectionModel = new SecondaryCollectionModel({}, {
-      collection: this.model.secondaryCollection,
-      roomMenuModel: this.model
-    });
+
+
 
     this.tertiaryCollectionModel = new TertiaryCollectionModel({}, {
       collection: this.model.tertiaryCollection,
