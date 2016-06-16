@@ -16,11 +16,12 @@ var SearchChatMessages = require('../collections/search-chat-messages');
 var perfTiming = require('components/perf-timing');
 var context = require('utils/context');
 var defaultCollectionFilter = require('gitter-web-shared/filters/left-menu-primary-default');
+var FilteredFavouriteRoomCollection = require('../collections/filtered-favourite-room-collection');
+var favouriteCollectionFilter = require('gitter-web-shared/filters/left-menu-primary-favourite');
 
 var states = [
   'all',
   'search',
-  'favourite',
   'people',
   'org',
 ];
@@ -66,8 +67,9 @@ module.exports = Backbone.Model.extend({
     this._troupeModel = attrs.troupeModel;
     delete attrs.troupeModel;
 
+    this.dndCtrl = attrs.dndCtrl;
+    delete attrs.dndCtrl;
 
-    //TODO TEST THIS & THROW ERROR JP 25/1/16
     this._orgCollection = attrs.orgCollection;
 
     this._detailCollection = (attrs.detailCollection || new Backbone.Collection());
@@ -95,7 +97,12 @@ module.exports = Backbone.Model.extend({
       collection: this._roomCollection,
     });
 
-
+    var favModels = this._roomCollection.filter(favouriteCollectionFilter);
+    this.favCollection = new FilteredFavouriteRoomCollection(favModels, {
+      collection: this._roomCollection,
+      roomModel:  this,
+      dndCtrl:    this.dndCtrl,
+    });
 
     this.primaryCollection = new ProxyCollection({ collection: this.activeRoomCollection });
     this.secondaryCollection = new ProxyCollection({ collection: this.searchTerms });
