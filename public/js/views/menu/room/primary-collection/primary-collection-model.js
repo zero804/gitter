@@ -18,12 +18,6 @@ module.exports = BaseCollectionModel.extend({
     });
   },
 
-  onFavourite: function(){
-    this.set({
-      header: false
-    });
-  },
-
   onPeople: function() {
     this.set({
       header: false

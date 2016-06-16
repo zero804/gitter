@@ -30,9 +30,6 @@ module.exports = Backbone.Model.extend({
       case 'search':
         this.onSearch();
         break;
-      case 'favourite':
-        this.onFavourite();
-        break;
       case 'people':
         this.onPeople();
         break;
@@ -47,7 +44,6 @@ module.exports = Backbone.Model.extend({
 
   onAll:       function() { this.onDefault(); },
   onSearch:    function() { this.onDefault(); },
-  onFavourite: function() { this.onDefault(); },
   onPeople:    function() { this.onDefault(); },
   onOrg:       function() { this.onDefault(); },
   onDefault:   function() {},
