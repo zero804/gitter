@@ -17,6 +17,7 @@ var perfTiming = require('components/perf-timing');
 var context = require('utils/context');
 var FilteredFavouriteRoomCollection = require('../collections/filtered-favourite-room-collection');
 var FavouriteCollectionModel = require('../views/menu/room/favourite-collection/favourite-collection-model');
+var PrimaryCollectionModel = require('../views/menu/room/primary-collection/primary-collection-model');
 
 var states = [
   'all',
@@ -107,6 +108,11 @@ module.exports = Backbone.Model.extend({
     });
 
     this.primaryCollection = new ProxyCollection({ collection: this.activeRoomCollection });
+    this.primaryCollectionModel = new PrimaryCollectionModel(null, {
+      collection: this.primaryCollection,
+      roomMenuModel: this
+    });
+
     this.secondaryCollection = new ProxyCollection({ collection: this.searchTerms });
     this.tertiaryCollection = new ProxyCollection({ collection: this._orgCollection });
 
