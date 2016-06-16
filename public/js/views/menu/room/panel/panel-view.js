@@ -10,7 +10,6 @@ var FavouriteCollectionView = require('../favourite-collection/favourite-collect
 var PrimaryCollectionView = require('../primary-collection/primary-collection-view');
 var SecondaryCollectionView = require('../secondary-collection/secondary-collection-view');
 var TertiaryCollectionView = require('../tertiary-collection/tertiary-collection-view');
-var TertiaryCollectionModel = require('../tertiary-collection/tertiary-collection-model');
 var ProfileMenuView = require('../profile/profile-menu-view');
 var FilteredFavouriteRoomCollection = require('../../../../collections/filtered-favourite-room-collection.js');
 var SearchInputView = require('views/menu/room/search-input/search-input-view');
@@ -87,7 +86,7 @@ var PanelView = Marionette.LayoutView.extend({
 
   initTertiaryCollection: function(optionsForRegion) {
     return new TertiaryCollectionView(optionsForRegion({
-      model:               this.tertiaryCollectionModel,
+      model:               this.model.tertiaryCollectionModel,
       collection:          this.model.tertiaryCollection,
       roomMenuModel:       this.model,
       bus:                 this.bus,
@@ -126,16 +125,6 @@ var PanelView = Marionette.LayoutView.extend({
     this.bus = attrs.bus;
     this.dndCtrl = attrs.dndCtrl;
     this.keyboardControllerView = attrs.keyboardControllerView;
-
-
-
-
-
-    this.tertiaryCollectionModel = new TertiaryCollectionModel({}, {
-      collection: this.model.tertiaryCollection,
-      roomMenuModel: this.model
-    });
-
     this.listenTo(this.bus, 'ui:swipeleft', this.onSwipeLeft, this);
     this.listenTo(this.bus, 'focus.request.chat', this.onSearchItemSelected, this);
     this.$el.find('#search-results').show();
