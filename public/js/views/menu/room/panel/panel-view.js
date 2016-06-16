@@ -54,7 +54,7 @@ var PanelView = Marionette.LayoutView.extend({
 
   initFavouriteCollection: function (optionsForRegion) {
     return new FavouriteCollectionView(optionsForRegion({
-      collection:     this.favCollection,
+      collection:     this.model.favCollection,
       model:          this.favouriteCollectionModel,
       roomMenuModel:  this.model,
       bus:            this.bus,
@@ -130,17 +130,8 @@ var PanelView = Marionette.LayoutView.extend({
     this.dndCtrl = attrs.dndCtrl;
     this.keyboardControllerView = attrs.keyboardControllerView;
 
-    //Sadly the favourite collection needs to be generated here rather than the room-menu-model
-    //because it has a dependency on the dnd-controller JP 1/4/16
-    var models = this.model._roomCollection.filter(favouriteCollectionFilter);
-    this.favCollection = new FilteredFavouriteRoomCollection(models, {
-      collection: this.model._roomCollection,
-      roomModel:  this.model,
-      dndCtrl:    this.dndCtrl,
-    });
-
     this.favouriteCollectionModel = new FavouriteCollectionModel(null, {
-      collection: this.favCollection,
+      collection: this.model.favCollection,
       roomMenuModel: this.model
     });
 
