@@ -19,10 +19,17 @@ var KeyboardController = Marionette.ItemView.extend({
     'focus.search': 'onMinibarSearchSelected',
     'room.down': 'onDownKeyPressed',
     'room.up': 'onUpKeyPressed',
+    'room.next': 'onRightKeyPressed',
   },
 
   initialize: function(attrs) {
     this.minibarCollection = attrs.model.minibarCollection;
+    this.primaryCollection = attrs.model.primaryCollection;
+    this.secondaryCollection = attrs.model.secondaryCollection;
+    this.tertiaryCollection = attrs.model.tertiaryCollection;
+    this.primaryCollectionModel = attrs.model.primaryCollectionModel;
+    this.secondaryCollectionModel = attrs.model.secondaryCollectionModel;
+    this.tertiaryCollectionModel = attrs.model.tertiaryCollectionModel;
   },
 
   onMinibarAllSelected: function (){
@@ -56,16 +63,21 @@ var KeyboardController = Marionette.ItemView.extend({
   },
 
   onDownKeyPressed: function (){
-    if(this.isMinibarFocused()) { this.moveMinibarFocus(1);}
+    if(this.isMinibarInFocus()) { return this.moveMinibarFocus(1);}
   },
 
   onUpKeyPressed: function (){
-    if(this.isMinibarFocused()) { this.moveMinibarFocus(-1);}
+    if(this.isMinibarInFocus()) { return this.moveMinibarFocus(-1);}
+  },
+
+  onRightKeyPressed: function (){
+    if(this.isMinibarInFocus()) { return this.focusActiveRoomItem(); }
   },
 
   moveMinibarFocus: function (direction){
     var focusedMinibarItem = this.minibarCollection.findWhere({ focus: true });
     this.blurAllItems();
+
     //get next index
     var index = this.minibarCollection.indexOf(focusedMinibarItem);
     index = arrayBoundWrap(index + direction, this.minibarCollection.length);
@@ -78,8 +90,20 @@ var KeyboardController = Marionette.ItemView.extend({
     return this.setDebouncedState(activeMinibarItem);
   },
 
-  isMinibarFocused: function (){
+  focusActiveRoomItem: function (){
+    this.blurAllItems();
+    var activeRoomItem = this.getActiveRoomItem();
+    activeRoomItem.set('focus', true);
+  },
+
+  isMinibarInFocus: function (){
     return !!this.minibarCollection.findWhere({ focus: true });
+  },
+
+  getActiveRoomItem: function (){
+    return this.primaryCollectionModel.get('active') && this.primaryCollection.findWhere({ active: true }) ||
+      this.secondaryCollectionModel.get('active') && this.secondaryCollection.findWhere({ active: true }) ||
+      this.tertiaryCollectionModel.get('active') && this.tertiaryCollection.findWhere({ active: true });
   },
 
   setDebouncedState: _.debounce(function (model){
@@ -89,9 +113,12 @@ var KeyboardController = Marionette.ItemView.extend({
   }, 100),
 
   blurAllItems: function (){
-    this.minibarCollection.where({ focus: true }).forEach(function(model){
-      model.set('focus', false);
-    });
+    function clearFocus(model){ model.set('focus', false); }
+    this.minibarCollection.where({ focus: true }).forEach(clearFocus);
+    this.primaryCollection.where({ focus: true }).forEach(clearFocus);
+    this.secondaryCollection.where({ focus: true }).forEach(clearFocus);
+    this.tertiaryCollection.where({ focus: true }).forEach(clearFocus);
+
   },
 
 });
