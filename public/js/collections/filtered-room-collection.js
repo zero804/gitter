@@ -13,7 +13,8 @@ var FilteredRoomCollection = Backbone.Collection.extend({
   _filter: null,
 
   constructor: function (models, attrs){
-    models = (models || attrs._roomCollection.filter(defaultCollectionFilter));
+    models = (models || attrs.collection.filter(defaultCollectionFilter));
+    Backbone.Collection.prototype.constructor.apply(this, arguments);
   },
 
   initialize: function(models, options) { //jshint unused: true
