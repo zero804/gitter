@@ -20,6 +20,7 @@ var KeyboardController = Marionette.ItemView.extend({
     'room.down': 'onDownKeyPressed',
     'room.up': 'onUpKeyPressed',
     'room.next': 'onRightKeyPressed',
+    'room.prev': 'onLeftKeyPressed',
   },
 
   initialize: function(attrs) {
@@ -88,6 +89,10 @@ var KeyboardController = Marionette.ItemView.extend({
     if(this.isMinibarInFocus()) { return this.focusActiveRoomItem(); }
   },
 
+  onLeftKeyPressed: function (){
+    if(!this.isMinibarInFocus()) { return this.focusActiveMinibarItem(); }
+  },
+
   moveMinibarFocus: function (direction){
     var focusedMinibarItem = this.minibarCollection.findWhere({ focus: true });
     this.blurAllItems();
@@ -126,8 +131,18 @@ var KeyboardController = Marionette.ItemView.extend({
     activeRoomItem.set('focus', true);
   },
 
+  focusActiveMinibarItem: function (){
+    this.blurAllItems();
+    var activeMinibarItem = this.getActiveMinibarItem();
+    activeMinibarItem.set('focus', true);
+  },
+
   isMinibarInFocus: function (){
-    return !!this.minibarCollection.findWhere({ focus: true });
+    return !!this.queryAttrOnMinibar('focus', true);
+  },
+
+  getActiveMinibarItem: function (){
+    return this.queryAttrOnMinibar('active', true);
   },
 
   getActiveRoomItem: function (){
@@ -144,6 +159,11 @@ var KeyboardController = Marionette.ItemView.extend({
       this.primaryCollectionModel.get('active') && this.primaryCollection.findWhere(q) ||
       this.secondaryCollectionModel.get('active') && this.secondaryCollection.findWhere(q) ||
       this.tertiaryCollectionModel.get('active') && this.tertiaryCollection.findWhere(q);
+  },
+
+  queryAttrOnMinibar: function (attr, val){
+    var q = {}; q[attr] = val;
+    return this.minibarCollection.findWhere(q);
   },
 
   getFlatRoomCollection: function (){
