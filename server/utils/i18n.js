@@ -6,7 +6,7 @@ var path = require('path');
 // TODO: put this somewhere else
 i18n.configure({
     // setup some locales - other locales default to en silently
-    locales:['en'],
+    locales: ['en'],
 
     // you may alter a site wide default locale
     defaultLocale: 'en',
