@@ -4,7 +4,7 @@ var env = require('gitter-web-env');
 var identifyRoute = env.middlewares.identifyRoute;
 
 var moment = require('moment');
-var appMiddleware = require('./middleware');
+var uriContextResolverMiddleware = require('../uri-context/uri-context-resolver-middleware');
 var chatService = require('../../services/chat-service');
 var heatmapService = require('../../services/chat-heatmap-service');
 var restSerializer = require('../../serializers/rest-serializer');
@@ -76,7 +76,7 @@ function generateChatTree(chatActivity) {
 
 exports.datesList = [
   identifyRoute('app-archive-main'),
-  appMiddleware.uriContextResolverMiddleware(),
+  uriContextResolverMiddleware,
   function(req, res, next) {
     var user = req.user;
     var troupe = req.uriContext.troupe;
@@ -128,7 +128,7 @@ exports.datesList = [
 
 exports.linksList = [
   identifyRoute('app-archive-links'),
-  appMiddleware.uriContextResolverMiddleware(),
+  uriContextResolverMiddleware,
   function(req, res, next) {
     var user = req.user;
     var troupe = req.uriContext.troupe;
@@ -189,7 +189,7 @@ exports.linksList = [
 
 exports.chatArchive = [
   identifyRoute('app-archive-date'),
-  appMiddleware.uriContextResolverMiddleware(),
+  uriContextResolverMiddleware,
   timezoneMiddleware,
   function(req, res, next) {
     var user = req.user;

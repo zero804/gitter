@@ -10,7 +10,7 @@ var crypto = require('crypto');
 var userSettingsService = require('../services/user-settings-service');
 var passphrase = config.get('email:unsubscribeNotificationsSecret');
 var request = require('request');
-var uriContextResolverMiddleware = require('./app/middleware').uriContextResolverMiddleware;
+var uriContextResolverMiddleware = require('./uri-context/uri-context-resolver-middleware');
 var jwt = require('jwt-simple');
 var cdn = require('../web/cdn');
 var services = require('gitter-services');
@@ -151,21 +151,21 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
   router.get(uri,
     ensureLoggedIn,
     identifyRoute('settings-room-get'),
-    uriContextResolverMiddleware(),
+    uriContextResolverMiddleware,
     adminAccessCheck,
     getIntegrations);
 
   router.delete(uri,
     ensureLoggedIn,
     identifyRoute('settings-room-delete'),
-    uriContextResolverMiddleware(),
+    uriContextResolverMiddleware,
     adminAccessCheck,
     deleteIntegration);
 
   router.post(uri,
     ensureLoggedIn,
     identifyRoute('settings-room-create'),
-    uriContextResolverMiddleware(),
+    uriContextResolverMiddleware,
     adminAccessCheck,
     createIntegration);
 });

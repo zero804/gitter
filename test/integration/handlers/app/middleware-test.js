@@ -2,8 +2,8 @@
 
 var assert = require('assert');
 var testRequire = require('../../test-require');
-var middleware = testRequire('./handlers/app/middleware');
-var getRedirectUrl = middleware.testOnly.getRedirectUrl;
+var uriContextResolverMiddleware = testRequire('./handlers/uri-context/uri-context-resolver-middleware');
+var getRedirectUrl = uriContextResolverMiddleware.testOnly.getRedirectUrl;
 
 // see https://github.com/nodejs/node/blob/master/lib/_http_common.js
 function checkInvalidHeaderChar(val) {
