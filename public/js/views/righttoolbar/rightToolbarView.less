@@ -1,11 +1,12 @@
+
+@import (reference) "trp3Vars.less";
+
 // Base
 @import "../../../less/base-avatar.less";
 
 // Required views
 @import "../people/peopleCollectionView";
-
 @import "../search/searchView";
-
 @import "activity.less";
 
 
@@ -40,6 +41,14 @@
 
     transition: width 200ms ease-in-out;
 
+    &.collapsed {
+      .collapsed-breakpoint();
+    }
+
+
+
+
+
     p {
       margin: 0px 0px 5px;
     }
@@ -65,23 +74,6 @@
       max-height: 300px;
     }
 
-    @media @mid {
-      #activity-header {
-      opacity: 0;
-      }
-
-      #people-header, #top-header, #repo-info, #activity-tip {
-        display: none;
-      }
-
-      #people-list .trpToolbarListContent
-      {
-        margin-left: 6px;
-        padding-top: 16px;
-        padding-right: 20px;
-        padding-left: 14px;
-      }
-    }
 
     .trpRepoInfoContainer {
       padding-left: 5px;
@@ -112,24 +104,7 @@
     }
   }
 
-  // if the toolbar is collapsable and viewport is mid size or smaller, then collapse.
-  // ...Unless the toolbar has been expanded (like if search has been activated).
-  .right-toolbar--collapsible:not(.right-toolbar--expanded) {
-    @media @mid {
-      width: 70px;
-      padding-right: 0px;
-    }
-  }
 
-  .right-toolbar {
-
-    @media @mid {
-      .trpToolbarList {
-        max-height: 40%;
-      }
-
-    }
-  }
 
   // this is bad, but until the margins/padding is done properly
   // for all <h1>, <p> etc tags in the toolbar, we have to style
@@ -144,7 +119,43 @@
     user-select: none;
   }
 
-  .right-toolbar__header {
+  .right-toolbar__pinned-toggle-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: @chat-frame-desktop-header-height;
+    padding: 0 2rem;
+
+    background-color: transparent;
+    border: 0;
+
+    transition: background-color .2s ease;
+
+    &:hover,
+    &:focus {
+      background-color: rgba(0, 0, 0, .05);
+      outline: none;
+    }
+
+    & > .menu-toggle-icon {
+      fill: none;
+      stroke: #969696;
+      stroke-width: 2px;
+
+      transition: transform .2s ease;
+
+      &:hover {
+        transform: translateZ(0) rotateZ(-90deg);
+      }
+    }
+    &:hover > .menu-toggle-icon {
+      transform: translateZ(0) rotateZ(-90deg);
+    }
+  }
+
+
+
+  .right-toolbar__search-header {
     height: 74px;
     border-bottom: 1px solid rgb(240, 240, 240);
     flex-shrink: 0;
@@ -159,18 +170,30 @@
     padding-top: 10px;
   }
 
-  .right-toolbar-activity-area {
-    @media @mid {
-      display: none;
-    }
-    &.visible {
-      @media @mid {
 
-        width:240px;
-        border-left: 4px solid rgba(211, 223, 211, 0.6);
-        background-clip: padding-box;
-      }
-    }
+  .remaining-region {
+    margin-top: 1rem;
+  }
+
+  .remaining-view {
+
+  }
+
+  .remaining-view-button,
+  .remaining-view-secondary-button {
+  }
+  .remaining-view-secondary-button {
+    color: darken(@caribbean, 10%);
+  }
+
+  .remaining-view-button-secondary-text {
+    color: rgba(51, 51, 51, 0.5);
+  }
+
+
+
+  .right-toolbar-activity-area {
+
   }
 
   .right-toolbar-activity-area-inner {
@@ -184,24 +207,63 @@
   }
 
   .right-toolbar__footer {
+    display: flex;
+    justify-content: flex-end;
     flex-shrink: 0;
     width: 100%;
   }
+}
 
-  .support {
-    height: 70px;
-    box-sizing: border-box;
-    text-align: center;
-    border-top: 1px solid rgba(0, 0, 0, .05);
-    padding: 20px 10px 26px;
-    @media @mid {
-      display: inline-block;
-      width: 100%;
-      opacity: 0.6;
+
+
+
+.collapsed-breakpoint() {
+  width: 70px;
+  padding-right: 0px;
+
+
+  #activity-header {
+    opacity: 0;
+  }
+
+  #people-header, #top-header, #repo-info, #activity-tip {
+    display: none;
+  }
+
+  #people-list .trpToolbarListContent {
+    margin-left: 6px;
+    padding-top: 16px;
+    padding-right: 20px;
+    padding-left: 14px;
+  }
+
+
+  .right-toolbar {
+    .trpToolbarList {
+      max-height: 40%;
     }
   }
 
-  .support:hover {
-    background-color: rgba(241,240,237,.4);
+  .remaining-view {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .remaining-view-button,
+  .remaining-view-secondary-button {
+    padding: 0;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .right-toolbar-activity-area {
+    display: none;
+
+    &.visible {
+      width: 240px;
+      border-left: 4px solid rgba(211, 223, 211, 0.6);
+      background-clip: padding-box;
+    }
   }
 }
