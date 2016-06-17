@@ -13,7 +13,7 @@ describe.only('KeyboardControllerView', function(){
   beforeEach(function(){
     model = new Backbone.Model();
     model.minibarCollection = new Backbone.Collection([
-      { type: 'all', name: 'all' },
+      { type: 'all', name: 'all', active: true },
       { type: 'search', name: 'search' },
       { type: 'people', name: 'people' },
       { type: 'org', name: 'troupe' },
@@ -241,6 +241,13 @@ describe.only('KeyboardControllerView', function(){
       model.favouriteCollection.at(0).set('focus', true);
       appEvents.trigger('keyboard.room.up');
       assert(model.tertiaryCollection.at(1).get('focus'));
+    });
+
+    it('should move focus back to the active minibar item if the room list is in focus and left is presssed', function(){
+      model.favouriteCollection.at(0).set('focus', true);
+      appEvents.trigger('keyboard.room.prev');
+      assert(!view.getFocussedRoomItem());
+      assert(model.minibarCollection.findWhere({ active: true}).get('focus'));
     });
 
   });
