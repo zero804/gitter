@@ -18,14 +18,13 @@ router.get('/',
   isPhoneMiddleware,
   timezoneMiddleware,
   function (req, res, next) {
-    req.uriContext = {
-      uri: 'home'
-    };
-
     if (req.isPhone) {
       userHomeRenderer.renderMobileUserHome(req, res, next, 'home');
     } else {
-      mainFrameRenderer.renderMainFrame(req, res, next, 'home');
+      mainFrameRenderer.renderMainFrame(req, res, next, {
+        subFrameLocation: '/home/~home',
+        title: 'Home'
+      });
     }
   });
 
@@ -55,13 +54,13 @@ router.get(new RegExp('/explore(.*)?'),
   featureToggles,
   isPhoneMiddleware,
   function (req, res, next) {
-    req.uriContext = {
-      uri: 'home'
-    };
+    var exploreParam = req.params[0] || '';
+    var subFrameLocation = urlJoin('/home/~explore', exploreParam);
 
-    var frameUrl = urlJoin('explore', (req.params[0] || ''));
-
-    mainFrameRenderer.renderMainFrame(req, res, next, frameUrl);
+    mainFrameRenderer.renderMainFrame(req, res, next, {
+      subFrameLocation: subFrameLocation,
+      title: 'Explore ' + exploreParam.split('/').join(', ')
+    });
   });
 
 router.get('/learn',
@@ -69,11 +68,10 @@ router.get('/learn',
   ensureLoggedIn,
   featureToggles,
   function (req, res, next) {
-    req.uriContext = {
-      uri: 'learn'
-    };
-
-    mainFrameRenderer.renderMainFrame(req, res, next, 'learn');
+    mainFrameRenderer.renderMainFrame(req, res, next, {
+      subFrameLocation: '/learn/~learn',
+      title: 'Learn'
+    });
   });
 
 module.exports = router;

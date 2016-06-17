@@ -2,28 +2,15 @@
 
 var roomContextService = require('../../services/room-context-service');
 var normalizeRedirect = require('./normalise-redirect');
-var debug = require('debug')('gitter:app:uri-context-resolver-middleware');
+var debug = require('debug')('gitter:app:group-context-resolver-middleware');
 var StatusError = require('statuserror');
 
-function normaliseUrl(params) {
-  if(params.roomPart3) {
-    return params.roomPart1 + '/' + params.roomPart2 + '/' + params.roomPart3;
-  }
-
-  if(params.roomPart2) {
-    return params.roomPart1 + '/' + params.roomPart2;
-  }
-
-  return params.roomPart1;
-}
-
-function uriContextResolverMiddleware(req, res, next) {
-  var uri = normaliseUrl(req.params);
+function groupContextResolverMiddleware(req, res, next) {
+  var uri = req.params.groupUri;
   debug("Looking up normalised uri %s", uri);
 
-  return roomContextService.findContextForUri(req.user, uri)
+  return roomContextService.findContextForGroup(req.user, uri)
     .then(function(uriContext) {
-      req.troupe = uriContext.troupe;
       req.group = uriContext.group;
       req.uriContext = uriContext;
     })
@@ -35,9 +22,11 @@ function uriContextResolverMiddleware(req, res, next) {
             res.redirect(normalizeRedirect(e.path, req));
             return null;
           }
+
           throw new StatusError(500, 'Invalid redirect');
 
         case 404:
+          // TODO: consider what we should be doing here
           if (e.githubType === 'ORG' && e.uri) {
             var url = '/orgs/' + e.uri + '/rooms';
             //test if we are trying to load the org page in the chat frame.
@@ -55,4 +44,4 @@ function uriContextResolverMiddleware(req, res, next) {
     .asCallback(next);
 }
 
-module.exports = uriContextResolverMiddleware;
+module.exports = groupContextResolverMiddleware;

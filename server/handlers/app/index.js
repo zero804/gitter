@@ -14,6 +14,11 @@ var featureToggles = require('../../web/middlewares/feature-toggles');
 var archive = require('./archive');
 var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
 var StatusError = require('statuserror');
+var fixMongoIdQueryParam = require('../../web/fix-mongo-id-query-param');
+var url = require('url');
+var social = require('../social-metadata');
+var chatService = require('../../services/chat-service');
+var restSerializer = require("../../serializers/rest-serializer");
 
 function saveRoom(req) {
   var userId = req.user && req.user.id;
@@ -22,6 +27,27 @@ function saveRoom(req) {
   if(userId && troupeId) {
     recentRoomService.saveLastVisitedTroupeforUserId(userId, troupeId);
   }
+}
+
+function getSocialMetaDataForRoom(room, aroundId) {
+    // TODO: change this to use policy
+    if (aroundId && room && room.security === 'PUBLIC') {
+      // If this is a permalinked chat, load special social meta-data....
+      return chatService.findByIdInRoom(room._id, aroundId)
+        .then(function(chat) {
+          var strategy = new restSerializer.ChatStrategy({
+            notLoggedIn: true,
+            troupeId: room._id
+          });
+
+          return restSerializer.serializeObject(chat, strategy);
+        })
+        .then(function(permalinkChatSerialized) {
+          return social.getMetadataForChatPermalink({ room: room, chat: permalinkChatSerialized });
+        });
+    }
+
+    return social.getMetadata({ room: room });
 }
 
 var mainFrameMiddlewarePipeline = [
@@ -49,11 +75,31 @@ var mainFrameMiddlewarePipeline = [
       chatRenderer.renderMobileChat(req, res, next);
 
     } else {
-      mainFrameRenderer.renderMainFrame(req, res, next, 'chat');
+      // Load the main-frame
+      var chatAppQuery = {};
+      var aroundId = fixMongoIdQueryParam(req.query.at);
+
+      if (aroundId) { chatAppQuery.at = aroundId; }
+
+      var subFrameLocation = url.format({
+        pathname: '/' + req.uriContext.uri + '/~chat',
+        query:    chatAppQuery,
+        hash:     '#initial'
+      });
+
+      var socialMetaDataPromise = getSocialMetaDataForRoom(req.troupe, aroundId);
+
+      mainFrameRenderer.renderMainFrame(req, res, next, {
+        subFrameLocation: subFrameLocation,
+        title: req.uriContext.uri,
+        socialMetaDataPromise: socialMetaDataPromise
+      });
     }
   },
   function (err, req, res, next) {
+    // TODO: this is probably not being used any more
     if (err && err.userNotSignedUp && !req.isPhone) {
+      // TODO This page is in need of some serious love
       userNotSignedUpRenderer.renderUserNotSignedUpMainFrame(req, res, next);
       return;
     }
