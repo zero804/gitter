@@ -151,21 +151,21 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
   router.get(uri,
     ensureLoggedIn,
     identifyRoute('settings-room-get'),
-    uriContextResolverMiddleware({ create: false }),
+    uriContextResolverMiddleware(),
     adminAccessCheck,
     getIntegrations);
 
   router.delete(uri,
     ensureLoggedIn,
     identifyRoute('settings-room-delete'),
-    uriContextResolverMiddleware({ create: false }),
+    uriContextResolverMiddleware(),
     adminAccessCheck,
     deleteIntegration);
 
   router.post(uri,
     ensureLoggedIn,
     identifyRoute('settings-room-create'),
-    uriContextResolverMiddleware({ create: false }),
+    uriContextResolverMiddleware(),
     adminAccessCheck,
     createIntegration);
 });
