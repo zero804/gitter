@@ -15,7 +15,9 @@ function handleOrgPage(req, res, next) {
 }
 
 function handleOrgPageInFrame(req, res, next) {
-  if (req.isPhone) return handleOrgPage(req, res, next);
+  if (req.isPhone) {
+    return handleOrgPage(req, res, next);
+  }
 
   mainFrameRenderer.renderMainFrame(req, res, next, 'iframe');
 }
