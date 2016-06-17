@@ -2,7 +2,7 @@
 
 var chatService = require('../../../services/chat-service');
 var restSerializer = require('../../../serializers/rest-serializer');
-var userAgentTags = require('../../../utils/user-agent-tagger');
+var userAgentTagger = require('../../../web/user-agent-tagger');
 var _ = require('underscore');
 var StatusError = require('statuserror');
 var loadTroupeFromParam = require('./load-troupe-param');
@@ -79,7 +79,7 @@ module.exports = {
     return loadTroupeFromParam(req)
       .then(function(troupe) {
         var data = _.clone(req.body);
-        data.stats = userAgentTags(req.headers['user-agent']);
+        data.stats = userAgentTagger(req);
 
         return chatService.newChatMessageToTroupe(troupe, req.user, data);
       })

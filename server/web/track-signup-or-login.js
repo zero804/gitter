@@ -6,7 +6,7 @@ var logger = env.logger;
 
 var trackNewUser = require('./track-new-user');
 var trackUserLogin = require('./track-user-login');
-var mixpanel = require('../web/mixpanelUtils');
+var mixpanel = require('./mixpanelUtils');
 
 
 module.exports = function trackSignupOrLogin(req, user, isNewUser, provider) {
