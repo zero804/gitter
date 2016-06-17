@@ -2,34 +2,41 @@
 
 var express = require('express');
 var isPhoneMiddleware = require('../web/middlewares/is-phone');
+var groupContextResolverMiddleware = require('./uri-context/group-context-resolver-middleware');
 var mainFrameRenderer = require('./renderers/main-frame');
 var renderOrg = require('./renderers/org');
 var featureToggles = require('../web/middlewares/feature-toggles');
-
+var StatusError = require('statuserror');
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
 function handleOrgPage(req, res, next) {
-  renderOrg.renderOrgPage(req, res, next, {
-    orgUri: req.params.orgName
-  });
+  if (!req.group) throw new StatusError(404);
+  renderOrg.renderOrgPage(req, res, next);
 }
 
 function handleOrgPageInFrame(req, res, next) {
+  if (!req.group) throw new StatusError(404);
+
   if (req.isPhone) {
     return handleOrgPage(req, res, next);
   }
 
-  mainFrameRenderer.renderMainFrame(req, res, next, 'iframe');
+  mainFrameRenderer.renderMainFrame(req, res, next, {
+    subFrameLocation: '/orgs/' + req.group.uri + '/~iframe',
+    title: req.group.uri
+    // TODO: add social meta data
+  });
 }
 
-router.get('/:orgName/rooms',
+router.get('/:groupUri/rooms',
   featureToggles,
-  isPhoneMiddleware,
+  groupContextResolverMiddleware,
   handleOrgPageInFrame);
 
-router.get('/:orgName/rooms/~iframe',
+router.get('/:groupUri/rooms/~iframe',
   featureToggles,
   isPhoneMiddleware,
+  groupContextResolverMiddleware,
   handleOrgPage);
 
 module.exports = router;

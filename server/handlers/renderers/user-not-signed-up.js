@@ -25,10 +25,12 @@ function renderUserNotSignedUp(req, res, next) {
 }
 
 function renderUserNotSignedUpMainFrame(req, res, next) {
-  req.uriContext = {
-    uri: req.params.roomPart1
-  }
-  return renderMainFrame.renderMainFrame(req, res, next, 'chat');
+  var username = req.params.roomPart1;
+
+  return renderMainFrame.renderMainFrame(req, res, next, {
+    subFrameLocation: '/' + username + '/~chat',
+    title: username
+  });
 }
 
 module.exports = exports = {
