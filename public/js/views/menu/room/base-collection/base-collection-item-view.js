@@ -21,9 +21,6 @@ var BaseCollectionItemView = Marionette.ItemView.extend({
     'change:active': 'onActiveChange',
     'change:unreadItems change:mentions change:activity': 'onUnreadUpdate',
     'change:isHidden': 'onHiddenChange',
-    'change:focus': function(){
-      console.log(this.model.toJSON());
-    }
   },
 
   ui: {

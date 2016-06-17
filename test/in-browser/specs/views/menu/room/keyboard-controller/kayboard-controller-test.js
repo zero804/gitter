@@ -199,6 +199,50 @@ describe.only('KeyboardControllerView', function(){
       assert(model.tertiaryCollection.at(0).get('focus'));
     });
 
+    it('should move the focus downwards when the focus is on a room items', function(){
+      view.blurAllItems();
+      model.favouriteCollection.at(0).set('focus', true);
+      appEvents.trigger('keyboard.room.down');
+      assert(model.favouriteCollection.at(1).get('focus'));
+    });
+
+    it('should move from favourite to primary etc when pressing down', function(){
+      view.blurAllItems();
+      model.favouriteCollection.at(0).set('focus', true);
+      appEvents.trigger('keyboard.room.down');
+      appEvents.trigger('keyboard.room.down');
+      assert(model.primaryCollection.at(0).get('focus'));
+    });
+
+    it('should wrap if at the end of the room collection', function(){
+      view.blurAllItems();
+      model.tertiaryCollection.at(1).set('focus', true);
+      appEvents.trigger('keyboard.room.down');
+      assert(model.favouriteCollection.at(0).get('focus'));
+    });
+
+    it('should move the focus upwards when the focus is on a room items', function(){
+      view.blurAllItems();
+      model.favouriteCollection.at(1).set('focus', true);
+      appEvents.trigger('keyboard.room.up');
+      assert(model.favouriteCollection.at(0).get('focus'));
+    });
+
+    it('should move from primary to favourite etc when pressing up', function(){
+      view.blurAllItems();
+      model.primaryCollection.at(0).set('focus', true);
+      appEvents.trigger('keyboard.room.up');
+      appEvents.trigger('keyboard.room.up');
+      assert(model.favouriteCollection.at(0).get('focus'));
+    });
+
+    it('should wrap if at the end of the room collection', function(){
+      view.blurAllItems();
+      model.favouriteCollection.at(0).set('focus', true);
+      appEvents.trigger('keyboard.room.up');
+      assert(model.tertiaryCollection.at(1).get('focus'));
+    });
+
   });
 
   describe('bluring items', function(){
@@ -215,6 +259,8 @@ describe.only('KeyboardControllerView', function(){
       //Focus all the things
       model.minibarCollection.at(0).set('focus', true);
       model.minibarCollection.at(3).set('focus', true);
+      model.favouriteCollection.at(0).set('focus', true);
+      model.favouriteCollection.at(1).set('focus', true);
       model.primaryCollection.at(0).set('focus', true);
       model.primaryCollection.at(1).set('focus', true);
       model.secondaryCollection.at(0).set('focus', true);
@@ -223,6 +269,7 @@ describe.only('KeyboardControllerView', function(){
       model.tertiaryCollection.at(1).set('focus', true);
       view.blurAllItems();
       assert.equal(model.minibarCollection.where({ focus: true }), 0);
+      assert.equal(model.favouriteCollection.where({ focus: true }), 0);
       assert.equal(model.primaryCollection.where({ focus: true }), 0);
       assert.equal(model.secondaryCollection.where({ focus: true }), 0);
       assert.equal(model.tertiaryCollection.where({ focus: true }), 0);

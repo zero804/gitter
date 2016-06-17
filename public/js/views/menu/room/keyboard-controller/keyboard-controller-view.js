@@ -76,10 +76,12 @@ var KeyboardController = Marionette.ItemView.extend({
 
   onDownKeyPressed: function (){
     if(this.isMinibarInFocus()) { return this.moveMinibarFocus(1);}
+    this.moveRoomCollectionFocus(1);
   },
 
   onUpKeyPressed: function (){
     if(this.isMinibarInFocus()) { return this.moveMinibarFocus(-1);}
+    this.moveRoomCollectionFocus(-1);
   },
 
   onRightKeyPressed: function (){
@@ -102,12 +104,24 @@ var KeyboardController = Marionette.ItemView.extend({
     return this.setDebouncedState(activeMinibarItem);
   },
 
+  moveRoomCollectionFocus: function (direction){
+    //get currently focussed OR active room element
+    var activeRoomItem = this.getFocussedRoomItem() || this.getActiveRoomItem();
+    //blur all currently focussed items
+    this.blurAllItems();
+    var roomCollection = this.getFlatRoomCollection();
+    var index = roomCollection.indexOf(activeRoomItem);
+    //if no room is currently focussed just focus the first one
+    //this can happen, for example, if you are on home with no active room item
+    //and you have just moved focus from the chat input
+    index = (index === -1) ? 0 : arrayBoundWrap(index + direction, roomCollection.length);
+    var nextActiveRoomItem = roomCollection[index];
+    nextActiveRoomItem.set('focus', true);
+  },
+
   focusActiveRoomItem: function (){
     this.blurAllItems();
     var activeRoomItem = this.getActiveRoomItem();
-    console.log('-----------------------');
-    console.log(activeRoomItem);
-    console.log('-----------------------');
     if(!activeRoomItem) { return; }
     activeRoomItem.set('focus', true);
   },
@@ -117,10 +131,46 @@ var KeyboardController = Marionette.ItemView.extend({
   },
 
   getActiveRoomItem: function (){
-    return this.favouriteCollectionModel.get('active') && this.favouriteCollection.findWhere({ active: true }) ||
-      this.primaryCollectionModel.get('active') && this.primaryCollection.findWhere({ active: true }) ||
-      this.secondaryCollectionModel.get('active') && this.secondaryCollection.findWhere({ active: true }) ||
-      this.tertiaryCollectionModel.get('active') && this.tertiaryCollection.findWhere({ active: true });
+    return this.queryAttrOnRoomCollections('active', true);
+  },
+
+  getFocussedRoomItem: function (){
+    return this.queryAttrOnRoomCollections('focus', true);
+  },
+
+  queryAttrOnRoomCollections: function (attr, val){
+    var q = {}; q[attr] = val;
+    return this.favouriteCollectionModel.get('active') && this.favouriteCollection.findWhere(q) ||
+      this.primaryCollectionModel.get('active') && this.primaryCollection.findWhere(q) ||
+      this.secondaryCollectionModel.get('active') && this.secondaryCollection.findWhere(q) ||
+      this.tertiaryCollectionModel.get('active') && this.tertiaryCollection.findWhere(q);
+  },
+
+  getFlatRoomCollection: function (){
+    var rooms = [];
+    function isHiddenFilter(model) { return !model.get('isHidden'); }
+
+    //get filtered favourite rooms
+    if(this.favouriteCollectionModel.get('active')) {
+      rooms = rooms.concat(this.favouriteCollection.filter(isHiddenFilter));
+    }
+
+    //get filtered primary rooms
+    if(this.primaryCollectionModel.get('active')) {
+      rooms = rooms.concat(this.primaryCollection.filter(isHiddenFilter));
+    }
+
+    //get filtered secondary rooms
+    if(this.secondaryCollectionModel.get('active')) {
+      rooms = rooms.concat(this.secondaryCollection.filter(isHiddenFilter));
+    }
+
+    //get filtered tertiary rooms
+    if(this.tertiaryCollectionModel.get('active')) {
+      rooms = rooms.concat(this.tertiaryCollection.filter(isHiddenFilter));
+    }
+
+    return rooms;
   },
 
   setDebouncedState: _.debounce(function (model){
@@ -132,6 +182,7 @@ var KeyboardController = Marionette.ItemView.extend({
   blurAllItems: function (){
     function clearFocus(model){ model.set('focus', false); }
     this.minibarCollection.where({ focus: true }).forEach(clearFocus);
+    this.favouriteCollection.where({ focus: true }).forEach(clearFocus);
     this.primaryCollection.where({ focus: true }).forEach(clearFocus);
     this.secondaryCollection.where({ focus: true }).forEach(clearFocus);
     this.tertiaryCollection.where({ focus: true }).forEach(clearFocus);
