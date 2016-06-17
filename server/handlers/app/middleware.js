@@ -73,17 +73,8 @@ function isPhoneMiddleware(req, res, next) {
   next();
 }
 
-function unauthenticatedPhoneRedirectMiddleware(req, res, next) {
-  if(req.isPhone && !req.user) {
-    res.redirect('/login');
-  } else {
-    next();
-  }
-}
-
 module.exports = exports = {
   uriContextResolverMiddleware: uriContextResolverMiddleware,
-  unauthenticatedPhoneRedirectMiddleware: unauthenticatedPhoneRedirectMiddleware,
   isPhoneMiddleware: isPhoneMiddleware,
   testOnly: {
     getRedirectUrl: getRedirectUrl
