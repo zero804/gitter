@@ -6,7 +6,7 @@ var chatRenderer = require('../renderers/chat');
 var userNotSignedUpRenderer = require('../renderers/user-not-signed-up');
 var appMiddleware = require('./middleware');
 var recentRoomService = require('../../services/recent-room-service');
-var isPhone = require('../../web/is-phone');
+var isPhoneMiddleware = require('../../web/middlewares/is-phone');
 var timezoneMiddleware = require('../../web/middlewares/timezone');
 var featureToggles = require('../../web/middlewares/feature-toggles');
 var archive = require('./archive');
@@ -26,7 +26,7 @@ var mainFrameMiddlewarePipeline = [
   identifyRoute('app-main-frame'),
   featureToggles,
   appMiddleware.uriContextResolverMiddleware(),
-  appMiddleware.isPhoneMiddleware,
+  isPhoneMiddleware,
   timezoneMiddleware,
   function (req, res, next) {
     if (req.uriContext.ownUrl) {
@@ -51,7 +51,7 @@ var mainFrameMiddlewarePipeline = [
     }
   },
   function (err, req, res, next) {
-    if (err && err.userNotSignedUp && !isPhone(req)) {
+    if (err && err.userNotSignedUp && !req.isPhone) {
       userNotSignedUpRenderer.renderUserNotSignedUpMainFrame(req, res, next);
       return;
     }
@@ -63,7 +63,7 @@ var chatMiddlewarePipeline = [
   identifyRoute('app-chat-frame'),
   featureToggles,
   appMiddleware.uriContextResolverMiddleware(),
-  appMiddleware.isPhoneMiddleware,
+  isPhoneMiddleware,
   timezoneMiddleware,
   function (req, res, next) {
     if (req.uriContext.accessDenied) {
@@ -97,7 +97,7 @@ var embedMiddlewarePipeline = [
   identifyRoute('app-embed-frame'),
   featureToggles,
   appMiddleware.uriContextResolverMiddleware(),
-  appMiddleware.isPhoneMiddleware,
+  isPhoneMiddleware,
   timezoneMiddleware,
   function (req, res, next) {
     if(!req.uriContext.troupe) return next(new StatusError(404));
