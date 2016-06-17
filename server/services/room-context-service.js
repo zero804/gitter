@@ -34,7 +34,12 @@ function findContextForUri(user, uri, options) {
 
   /* First off, try use local data to figure out what this url is for */
   return uriResolver(user && user.id, uri, options)
-    .spread(function (resolvedUser, resolvedTroupe, roomMember) {
+    .then(function (resolved) {
+      if (!resolved) throw new StatusError(404);
+
+      var resolvedUser = resolved.user;
+      var resolvedTroupe = resolved.room;
+      var roomMember = resolved.roomMember;
 
       // The uri resolved to a user, we need to do a one-to-one
       if(resolvedUser) {
