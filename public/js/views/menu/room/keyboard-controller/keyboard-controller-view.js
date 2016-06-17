@@ -23,12 +23,24 @@ var KeyboardController = Marionette.ItemView.extend({
   },
 
   initialize: function(attrs) {
+
+    //Minibar
     this.minibarCollection = attrs.model.minibarCollection;
+
+    //Favourite
+    this.favouriteCollection = attrs.model.favouriteCollection;
+    this.favouriteCollectionModel = attrs.model.favouriteCollectionModel;
+
+    //Primary
     this.primaryCollection = attrs.model.primaryCollection;
-    this.secondaryCollection = attrs.model.secondaryCollection;
-    this.tertiaryCollection = attrs.model.tertiaryCollection;
     this.primaryCollectionModel = attrs.model.primaryCollectionModel;
+
+    //Secondary
+    this.secondaryCollection = attrs.model.secondaryCollection;
     this.secondaryCollectionModel = attrs.model.secondaryCollectionModel;
+
+    //Tertiary
+    this.tertiaryCollection = attrs.model.tertiaryCollection;
     this.tertiaryCollectionModel = attrs.model.tertiaryCollectionModel;
   },
 
@@ -93,6 +105,9 @@ var KeyboardController = Marionette.ItemView.extend({
   focusActiveRoomItem: function (){
     this.blurAllItems();
     var activeRoomItem = this.getActiveRoomItem();
+    console.log('-----------------------');
+    console.log(activeRoomItem);
+    console.log('-----------------------');
     if(!activeRoomItem) { return; }
     activeRoomItem.set('focus', true);
   },
@@ -102,7 +117,8 @@ var KeyboardController = Marionette.ItemView.extend({
   },
 
   getActiveRoomItem: function (){
-    return this.primaryCollectionModel.get('active') && this.primaryCollection.findWhere({ active: true }) ||
+    return this.favouriteCollectionModel.get('active') && this.favouriteCollection.findWhere({ active: true }) ||
+      this.primaryCollectionModel.get('active') && this.primaryCollection.findWhere({ active: true }) ||
       this.secondaryCollectionModel.get('active') && this.secondaryCollection.findWhere({ active: true }) ||
       this.tertiaryCollectionModel.get('active') && this.tertiaryCollection.findWhere({ active: true });
   },

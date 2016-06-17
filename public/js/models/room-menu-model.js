@@ -98,7 +98,6 @@ module.exports = Backbone.Model.extend({
 
     var orgsSnapshot = context.getSnapshot('orgs') || [];
     this.minibarCollection = new MinibarCollection(orgsSnapshot, { roomCollection: this._roomCollection });
-    window.mini = this.minibarCollection;
 
     var roomModels = this._roomCollection.filter(defaultCollectionFilter);
     this.activeRoomCollection = new FilteredRoomCollection(roomModels, {
@@ -107,19 +106,18 @@ module.exports = Backbone.Model.extend({
     });
 
     var favModels = this._roomCollection.filter(favouriteCollectionFilter);
-    this.favCollection = new FilteredFavouriteRoomCollection(favModels, {
+    this.favouriteCollection = new FilteredFavouriteRoomCollection(favModels, {
       collection: this._roomCollection,
       roomModel:  this,
       dndCtrl:    this.dndCtrl,
     });
 
     this.favouriteCollectionModel = new FavouriteCollectionModel(null, {
-      collection: this.favCollection,
+      collection: this.favouriteCollection,
       roomMenuModel: this
     });
 
     this.primaryCollection = new ProxyCollection({ collection: this.activeRoomCollection });
-    window.primary = this.primaryCollection;
     this.primaryCollectionModel = new PrimaryCollectionModel(null, {
       collection: this.primaryCollection,
       roomMenuModel: this
