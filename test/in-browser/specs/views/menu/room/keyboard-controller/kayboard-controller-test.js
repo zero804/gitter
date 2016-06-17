@@ -20,6 +20,14 @@ describe.only('KeyboardControllerView', function(){
       { type: 'org', name: 'gitterHQ' },
     ]);
 
+
+    model.favouriteCollection = new Backbone.Collection([
+      { uri: 'gitterHQ/test2' },
+      { uri: 'troupe/test2' },
+    ]);
+
+    model.favouriteCollectionModel = new Backbone.Model({ active: true });
+
     model.primaryCollection = new Backbone.Collection([
       { uri: 'gitterHQ', active: true },
       { uri: 'gitterHQ/test1' },

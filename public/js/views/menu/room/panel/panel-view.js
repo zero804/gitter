@@ -50,7 +50,7 @@ var PanelView = Marionette.LayoutView.extend({
 
   initFavouriteCollection: function (optionsForRegion) {
     return new FavouriteCollectionView(optionsForRegion({
-      collection:     this.model.favCollection,
+      collection:     this.model.favouriteCollection,
       model:          this.model.favouriteCollectionModel,
       roomMenuModel:  this.model,
       bus:            this.bus,
