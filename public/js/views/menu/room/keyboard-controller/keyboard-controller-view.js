@@ -9,6 +9,8 @@ var arrayBoundWrap = function(index, length) {
   return ((index % length) + length) % length;
 };
 
+var isHiddenFilter = function (model) { return !model.get('isHidden'); }
+
 var KeyboardController = Marionette.ItemView.extend({
 
   keyboardEvents: {
@@ -127,7 +129,7 @@ var KeyboardController = Marionette.ItemView.extend({
   focusActiveRoomItem: function (){
     this.blurAllItems();
     var activeRoomItem = this.getActiveRoomItem();
-    if(!activeRoomItem) { return; }
+    if(!activeRoomItem) { activeRoomItem = this.getFlatRoomCollection()[0]; }
     activeRoomItem.set('focus', true);
   },
 
@@ -154,11 +156,11 @@ var KeyboardController = Marionette.ItemView.extend({
   },
 
   queryAttrOnRoomCollections: function (attr, val){
-    var q = {}; q[attr] = val;
-    return this.favouriteCollectionModel.get('active') && this.favouriteCollection.findWhere(q) ||
-      this.primaryCollectionModel.get('active') && this.primaryCollection.findWhere(q) ||
-      this.secondaryCollectionModel.get('active') && this.secondaryCollection.findWhere(q) ||
-      this.tertiaryCollectionModel.get('active') && this.tertiaryCollection.findWhere(q);
+    var filterFunc = function(model){ return model.get(attr) === val; };
+    return this.favouriteCollectionModel.get('active') && this.favouriteCollection.filter(isHiddenFilter).filter(filterFunc)[0] ||
+      this.primaryCollectionModel.get('active') && this.primaryCollection.filter(isHiddenFilter).filter(filterFunc)[0] ||
+      this.secondaryCollectionModel.get('active') && this.secondaryCollection.filter(isHiddenFilter).filter(filterFunc)[0] ||
+      this.tertiaryCollectionModel.get('active') && this.tertiaryCollection.filter(isHiddenFilter).filter(filterFunc)[0];
   },
 
   queryAttrOnMinibar: function (attr, val){
@@ -168,7 +170,6 @@ var KeyboardController = Marionette.ItemView.extend({
 
   getFlatRoomCollection: function (){
     var rooms = [];
-    function isHiddenFilter(model) { return !model.get('isHidden'); }
 
     //get filtered favourite rooms
     if(this.favouriteCollectionModel.get('active')) {
@@ -206,7 +207,6 @@ var KeyboardController = Marionette.ItemView.extend({
     this.primaryCollection.where({ focus: true }).forEach(clearFocus);
     this.secondaryCollection.where({ focus: true }).forEach(clearFocus);
     this.tertiaryCollection.where({ focus: true }).forEach(clearFocus);
-
   },
 
 });

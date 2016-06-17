@@ -284,4 +284,13 @@ describe('KeyboardControllerView', function(){
 
   });
 
+  describe('queryAttrOnRoomCollections', function(){
+    it('should respect isHidden values', function(){
+      model.primaryCollection.at(0).set({ active: true, isHidden: true });
+      model.primaryCollection.at(1).set({ active: true });
+      var result = view.queryAttrOnRoomCollections('active', true);
+      assert.equal(result.get('uri'), 'gitterHQ/test1');
+    });
+  });
+
 });
