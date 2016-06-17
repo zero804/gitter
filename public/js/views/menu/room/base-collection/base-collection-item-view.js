@@ -1,13 +1,13 @@
 'use strict';
 
-var Marionette = require('backbone.marionette');
+var BaseItemView = require('../base-item-view');
 var cocktail = require('cocktail');
 var toggleClass = require('utils/toggle-class');
 var KeyboardEventMixin = require('views/keyboard-events-mixin');
 var template = require('./base-collection-item-view.hbs');
 var updateUnreadIndicatorClassState = require('../../../../components/menu/update-unread-indicator-class-state');
 
-var BaseCollectionItemView = Marionette.ItemView.extend({
+var BaseCollectionItemView = BaseItemView.extend({
 
   className: 'room-item',
   template:  template,
@@ -33,7 +33,7 @@ var BaseCollectionItemView = Marionette.ItemView.extend({
     this.roomMenuModel = attrs.roomMenuModel;
     this.index = attrs.index;
 
-    Marionette.ItemView.prototype.constructor.apply(this, arguments);
+    BaseItemView.prototype.constructor.apply(this, arguments);
   },
 
   attributes: function() {

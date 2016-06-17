@@ -1,7 +1,7 @@
 'use strict';
 
 var _ = require('underscore');
-var Marionette = require('backbone.marionette');
+var BaseItemView = require('../base-item-view');
 var itemTemplate = require('./minibar-item-view.hbs');
 var resolveRoomAvatar = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 var updateUnreadIndicatorClassState = require('../../../../components/menu/update-unread-indicator-class-state');
@@ -9,7 +9,7 @@ var toggleClass = require('utils/toggle-class');
 
 
 
-module.exports = Marionette.ItemView.extend({
+module.exports = BaseItemView.extend({
   tagName: 'li',
   template: itemTemplate,
   ui: {
