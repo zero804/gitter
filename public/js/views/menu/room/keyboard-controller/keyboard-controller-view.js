@@ -45,6 +45,9 @@ var KeyboardController = Marionette.ItemView.extend({
     //Tertiary
     this.tertiaryCollection = attrs.model.tertiaryCollection;
     this.tertiaryCollectionModel = attrs.model.tertiaryCollectionModel;
+
+    //manage search focus
+    this.searchFocusModel = attrs.model.searchFocusModel;
   },
 
   onMinibarAllSelected: function (){
@@ -78,11 +81,13 @@ var KeyboardController = Marionette.ItemView.extend({
   },
 
   onDownKeyPressed: function (e){
+    this.searchFocusModel.set('focus', false);
     if(this.isMinibarInFocus()) { return this.moveMinibarFocus(1);}
     this.moveRoomCollectionFocus(1);
   },
 
   onUpKeyPressed: function (){
+    this.searchFocusModel.set('focus', false);
     if(this.isMinibarInFocus()) { return this.moveMinibarFocus(-1);}
     this.moveRoomCollectionFocus(-1);
   },

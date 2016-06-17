@@ -45,7 +45,11 @@ var PanelView = Marionette.LayoutView.extend({
   },
 
   initSearchInput: function(optionsForRegion) {
-    return new SearchInputView(optionsForRegion({ model: this.model, bus: this.bus }));
+    return new SearchInputView(optionsForRegion({
+      model: this.model,
+      bus: this.bus ,
+      searchFocusModel: this.model.searchFocusModel,
+    }));
   },
 
   initFavouriteCollection: function (optionsForRegion) {
