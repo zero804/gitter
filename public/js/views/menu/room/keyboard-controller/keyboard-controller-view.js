@@ -75,7 +75,7 @@ var KeyboardController = Marionette.ItemView.extend({
     this.model.set({ state: 'org', selectedOrgName: model.get('name') });
   },
 
-  onDownKeyPressed: function (){
+  onDownKeyPressed: function (e){
     if(this.isMinibarInFocus()) { return this.moveMinibarFocus(1);}
     this.moveRoomCollectionFocus(1);
   },
