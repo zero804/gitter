@@ -31,9 +31,9 @@ describe('normalise-redirect', function() {
     var output = normalizeRedirect(input, {
       path: '/gitterHQ/~chat',
       query: {
-        test: 1
+        test: 'hello there'
       }
     });
-    assert.strictEqual(output, '/a/b/~chat?test=1');
+    assert.strictEqual(output, '/a/b/~chat?test=hello%20there');
   });
 });
