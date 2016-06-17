@@ -3,8 +3,8 @@
 var express = require('express');
 var urlJoin = require('url-join');
 var ensureLoggedIn = require('../web/middlewares/ensure-logged-in');
-var appMiddleware = require('./app/middleware');
 var timezoneMiddleware = require('../web/middlewares/timezone');
+var isPhoneMiddleware = require('../web/middlewares/is-phone');
 var userHomeRenderer = require('./renderers/userhome');
 var mainFrameRenderer = require('./renderers/main-frame');
 var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
@@ -15,7 +15,7 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
 router.get('/',
   identifyRoute('home-main'),
   featureToggles,
-  appMiddleware.isPhoneMiddleware,
+  isPhoneMiddleware,
   timezoneMiddleware,
   function (req, res, next) {
     req.uriContext = {
@@ -34,7 +34,7 @@ router.get('/~home',
   identifyRoute('home-frame'),
   ensureLoggedIn,
   featureToggles,
-  appMiddleware.isPhoneMiddleware,
+  isPhoneMiddleware,
   function(req, res, next) {
     userHomeRenderer.renderHomePage(req, res, next);
   });
@@ -53,7 +53,7 @@ router.get(new RegExp('/explore(.*)?'),
   identifyRoute('home-explore'),
   ensureLoggedIn,
   featureToggles,
-  appMiddleware.isPhoneMiddleware,
+  isPhoneMiddleware,
   function (req, res, next) {
     req.uriContext = {
       uri: 'home'

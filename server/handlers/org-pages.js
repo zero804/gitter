@@ -1,7 +1,7 @@
 "use strict";
 
 var express = require('express');
-var appMiddleware = require('./app/middleware');
+var isPhoneMiddleware = require('../web/middlewares/is-phone');
 var mainFrameRenderer = require('./renderers/main-frame');
 var renderOrg = require('./renderers/org');
 var featureToggles = require('../web/middlewares/feature-toggles');
@@ -24,12 +24,12 @@ function handleOrgPageInFrame(req, res, next) {
 
 router.get('/:orgName/rooms',
   featureToggles,
-  appMiddleware.isPhoneMiddleware,
+  isPhoneMiddleware,
   handleOrgPageInFrame);
 
 router.get('/:orgName/rooms/~iframe',
   featureToggles,
-  appMiddleware.isPhoneMiddleware,
+  isPhoneMiddleware,
   handleOrgPage);
 
 module.exports = router;

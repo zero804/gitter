@@ -1,7 +1,6 @@
 "use strict";
 
 var roomContextService = require('../../services/room-context-service');
-var isPhone = require('../../web/is-phone');
 var url = require('url');
 var debug = require('debug')('gitter:app:app-middleware');
 var StatusError = require('statuserror');
@@ -37,7 +36,6 @@ function uriContextResolverMiddleware(options) {
         req.troupe = uriContext.troupe;
         req.group = uriContext.group;
         req.uriContext = uriContext;
-        return null; // Stop bluebird from moaning about promises
       })
       .catch(StatusError, function(e) {
         switch(e.status) {
@@ -68,14 +66,8 @@ function uriContextResolverMiddleware(options) {
   };
 }
 
-function isPhoneMiddleware(req, res, next) {
-  req.isPhone = isPhone(req);
-  next();
-}
-
 module.exports = exports = {
   uriContextResolverMiddleware: uriContextResolverMiddleware,
-  isPhoneMiddleware: isPhoneMiddleware,
   testOnly: {
     getRedirectUrl: getRedirectUrl
   }
