@@ -5,11 +5,20 @@ var _ = require('underscore');
 var localStore = require('../components/local-store');
 var Promise = require('bluebird');
 var clientEnv = require('gitter-client-env');
+var debug = require('debug-proxy')('app:context');
 
 module.exports = (function() {
 
   var ctx = window.troupeContext || {};
   var snapshots = ctx.snapshots || {};
+
+  function getGroupModel() {
+    var groupModel;
+    if (ctx.troupe && ctx.troupe.group) {
+      groupModel = ctx.troupe.group;
+    }
+    return new Backbone.Model(groupModel);
+  }
 
   function getTroupeModel() {
     var troupeModel;
@@ -88,6 +97,7 @@ module.exports = (function() {
 
     return result;
   }
+  var group = getGroupModel();
   var troupe = getTroupeModel();
   var user = getUserModel();
   var contextModel = getContextModel(troupe, user);
@@ -96,8 +106,16 @@ module.exports = (function() {
     return ctx;
   };
 
+  context.group = function() {
+    return group;
+  };
+
   context.troupe = function() {
     return troupe;
+  };
+
+  context.getGroupId = function() {
+    return group.id;
   };
 
   context.getTroupeId = function() {
@@ -131,6 +149,12 @@ module.exports = (function() {
   };
 
   context.setTroupe = function(value) {
+    if (value.group) {
+      group.set(clearOtherAttributes(value.group, group));
+    } else {
+      debug("Troupe data contains no group: %j", value);
+    }
+
     troupe.set(clearOtherAttributes(value, troupe));
   };
 
