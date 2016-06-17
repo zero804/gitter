@@ -155,6 +155,15 @@ module.exports = Backbone.Model.extend({
     this.onSwitchState(this, this.get('state'));
   },
 
+  set: function (key, val){
+    var isChangingState = (key === 'state') || (_.isObject(key) && !!key.state);
+    if(!isChangingState) { return Backbone.Model.prototype.set.apply(this, arguments); }
+    var newState = _.isObject(key) ? key.state : val;
+    //If we are changing the models state value
+    if(states.indexOf(newState) === -1) { return; }
+    return Backbone.Model.prototype.set.apply(this, arguments);
+  },
+
   onStateChangeCalled: function(newState) {
 
     if (states.indexOf(newState) === -1) {
