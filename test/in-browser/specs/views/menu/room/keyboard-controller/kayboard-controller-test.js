@@ -6,7 +6,7 @@ var _ = require('underscore');
 var KeyboardControllerView = require('public/js/views/menu/room/keyboard-controller/keyboard-controller-view');
 var appEvents = require('utils/appevents');
 
-describe('KeyboardControllerView', function(){
+describe.only('KeyboardControllerView', function(){
 
   var view;
   var model;
@@ -36,8 +36,8 @@ describe('KeyboardControllerView', function(){
     model.secondaryCollectionModel = new Backbone.Model({ active: true });
 
     model.tertiaryCollection = new Backbone.Collection([
-      { uri: 'gitterHQ/all-rooms-1' },
-      { uri: 'troupe/all-rooms-1' },
+      { uri: 'gitterHQ' },
+      { uri: 'troupe' },
     ]);
     model.tertiaryCollectionModel = new Backbone.Model({ active: true });
 
@@ -204,6 +204,7 @@ describe('KeyboardControllerView', function(){
     });
 
     it('should blur every item that is in focus when blurAllItems is called', function(){
+      //Focus all the things
       model.minibarCollection.at(0).set('focus', true);
       model.minibarCollection.at(3).set('focus', true);
       model.primaryCollection.at(0).set('focus', true);
