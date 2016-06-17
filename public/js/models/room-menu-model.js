@@ -135,6 +135,8 @@ module.exports = Backbone.Model.extend({
       roomMenuModel: this
     });
 
+    this.searchFocusModel = new Backbone.Model({ focus: false });
+
     this.listenTo(this.primaryCollection, 'snapshot', this.onPrimaryCollectionSnapshot, this);
     this.snapshotTimeout = setTimeout(function(){
       this.onPrimaryCollectionSnapshot();
@@ -183,6 +185,7 @@ module.exports = Backbone.Model.extend({
 
   onSwitchState: function(model, val) {
     //TODO Test this JP 27/1/15
+    var searchFocus = false;
     switch (val) {
       case 'all':
         this.primaryCollection.switchCollection(this.activeRoomCollection);
@@ -194,11 +197,7 @@ module.exports = Backbone.Model.extend({
         this.primaryCollection.switchCollection(this.searchRoomAndPeople);
         this.secondaryCollection.switchCollection(this.searchChatMessages);
         this.tertiaryCollection.switchCollection(this.searchTerms);
-        break;
-
-      case 'favourite':
-        this.primaryCollection.switchCollection(this.activeRoomCollection);
-        this.secondaryCollection.switchCollection(this._suggestedRoomCollection);
+        searchFocus = true;
         break;
 
       case 'org':
@@ -215,6 +214,7 @@ module.exports = Backbone.Model.extend({
     }
 
     this.trigger('change:state:post');
+    this.searchFocusModel.set('focus', searchFocus);
   },
 
   onSearchTermChange: _.debounce(function() {

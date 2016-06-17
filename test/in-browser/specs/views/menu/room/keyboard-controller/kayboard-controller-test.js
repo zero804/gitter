@@ -49,6 +49,8 @@ describe('KeyboardControllerView', function(){
     ]);
     model.tertiaryCollectionModel = new Backbone.Model({ active: true });
 
+    model.searchFocusModel = new Backbone.Model({ focus: false });
+
     view = new KeyboardControllerView({
       model: model
     });
@@ -248,6 +250,18 @@ describe('KeyboardControllerView', function(){
       appEvents.trigger('keyboard.room.prev');
       assert(!view.getFocussedRoomItem());
       assert(model.minibarCollection.findWhere({ active: true}).get('focus'));
+    });
+
+    it('should blur the search model when the down key is pressed', function(){
+      model.searchFocusModel.set('focus', true);
+      appEvents.trigger('keyboard.room.down');
+      assert(!model.searchFocusModel.get('focus'));
+    });
+
+    it('should blur the search model when the up key is pressed', function(){
+      model.searchFocusModel.set('focus', true);
+      appEvents.trigger('keyboard.room.up');
+      assert(!model.searchFocusModel.get('focus'));
     });
 
   });
