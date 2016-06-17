@@ -478,7 +478,7 @@ function createRoomByUri(user, uri, options) {
 
           return policyFactory.createPolicyForRoom(user, resolvedTroupe)
             .then(function(policy) {
-              return policy.canView();
+              return policy.canRead();
             })
             .then(function(viewAccess) {
               if (!viewAccess) throw new StatusError(404);
