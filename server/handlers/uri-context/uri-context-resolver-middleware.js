@@ -1,7 +1,7 @@
 "use strict";
 
 var roomContextService = require('../../services/room-context-service');
-var url = require('url');
+var normalizeRedirect = require('./normalise-redirect');
 var debug = require('debug')('gitter:app:uri-context-resolver-middleware');
 var StatusError = require('statuserror');
 
@@ -15,14 +15,6 @@ function normaliseUrl(params) {
   }
 
   return params.roomPart1;
-}
-
-function getRedirectUrl(roomUrl, req) {
-  // Figure out what the subframe is and add it to the URL, along with the original querystring
-  var m = req.path.match(/\/~\w+$/);
-  var frame = m && m[0] || "";
-  var finalUrl = url.format({ pathname: roomUrl + frame, query: req.query });
-  return encodeURI(finalUrl);
 }
 
 function uriContextResolverMiddleware(req, res, next) {
@@ -40,7 +32,7 @@ function uriContextResolverMiddleware(req, res, next) {
         case 301:
           // TODO: check this works for userhome....
           if (e.path) {
-            res.redirect(getRedirectUrl(e.path, req));
+            res.redirect(normalizeRedirect(e.path, req));
             return null;
           }
           throw new StatusError(500, 'Invalid redirect');
