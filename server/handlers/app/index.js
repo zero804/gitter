@@ -1,10 +1,12 @@
 "use strict";
 
+var env = require('gitter-web-env');
+var logger = env.logger;
 var express = require('express');
 var mainFrameRenderer = require('../renderers/main-frame');
 var chatRenderer = require('../renderers/chat');
 var userNotSignedUpRenderer = require('../renderers/user-not-signed-up');
-var appMiddleware = require('./middleware');
+var uriContextResolverMiddleware = require('../uri-context/uri-context-resolver-middleware');
 var recentRoomService = require('../../services/recent-room-service');
 var isPhoneMiddleware = require('../../web/middlewares/is-phone');
 var timezoneMiddleware = require('../../web/middlewares/timezone');
@@ -25,7 +27,7 @@ function saveRoom(req) {
 var mainFrameMiddlewarePipeline = [
   identifyRoute('app-main-frame'),
   featureToggles,
-  appMiddleware.uriContextResolverMiddleware(),
+  uriContextResolverMiddleware,
   isPhoneMiddleware,
   timezoneMiddleware,
   function (req, res, next) {
@@ -62,7 +64,7 @@ var mainFrameMiddlewarePipeline = [
 var chatMiddlewarePipeline = [
   identifyRoute('app-chat-frame'),
   featureToggles,
-  appMiddleware.uriContextResolverMiddleware(),
+  uriContextResolverMiddleware,
   isPhoneMiddleware,
   timezoneMiddleware,
   function (req, res, next) {
@@ -96,7 +98,7 @@ var chatMiddlewarePipeline = [
 var embedMiddlewarePipeline = [
   identifyRoute('app-embed-frame'),
   featureToggles,
-  appMiddleware.uriContextResolverMiddleware(),
+  uriContextResolverMiddleware,
   isPhoneMiddleware,
   timezoneMiddleware,
   function (req, res, next) {
@@ -112,7 +114,7 @@ var embedMiddlewarePipeline = [
 
 var cardMiddlewarePipeline = [
   identifyRoute('app-card-frame'),
-  appMiddleware.uriContextResolverMiddleware(),
+  uriContextResolverMiddleware,
   timezoneMiddleware,
   function (req, res, next) {
     if(!req.uriContext.troupe) return next(new StatusError(404));
@@ -154,10 +156,16 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
   router.get(path + '/archives', archive.linksList);
   router.get(path + '/archives/all', archive.datesList);
   router.get(path + '/archives/:yyyy(\\d{4})/:mm(\\d{2})/:dd(\\d{2})', archive.chatArchive);
+
   router.get(path, mainFrameMiddlewarePipeline);
+
+  // Why would somebody be posting to a room
+  // TODO: This should probably be removed
   router.post(path,
-    appMiddleware.uriContextResolverMiddleware(),
+    uriContextResolverMiddleware,
     function(req, res, next) {
+      logger.warn('POST to room', { path: req.originalUrl, userId: req.user && req.user.id });
+
       if(!req.uriContext.troupe || !req.uriContext.ownUrl) return next(new StatusError(404));
 
       // GET after POST
