@@ -2,11 +2,10 @@
 
 var restSerializer = require("../serializers/rest-serializer");
 var presenceService = require("gitter-web-presence");
-var useragent = require("useragent");
 var userService = require('../services/user-service');
 var userSettingsService = require('../services/user-settings-service');
 var roomMetaService = require('../services/room-meta-service');
-var isNative = require('../../public/js/utils/is-native');
+var isNative = require('./is-native');
 
 var assert = require("assert");
 var Promise = require('bluebird');
@@ -92,7 +91,7 @@ exports.generateTroupeContext = function(req, extras) {
 function determineDesktopNotifications(user, req) {
   if(!user) return true;
 
-  var agent = useragent.parse(req.headers['user-agent']);
+  var agent = req.getParsedUserAgent();
   var os = agent.os.family;
   var clientType;
 
@@ -113,10 +112,6 @@ function determineDesktopNotifications(user, req) {
 
   return true;
 
-}
-
-function isNativeDesktopApp(req) {
-  return isNative(req.headers['user-agent']);
 }
 
 function serializeUser(user) {
@@ -181,7 +176,7 @@ function createTroupeContext(req, options) {
     events: events,
     troupeUri: options.troupe ? options.troupe.uri : undefined,
     troupeHash: options.troupeHash,
-    isNativeDesktopApp: isNativeDesktopApp(req),
+    isNativeDesktopApp: isNative(req),
     permissions: options.permissions,
     locale: req.i18n.locales[req.i18n.locale],
     features: features,
