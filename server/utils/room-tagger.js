@@ -1,6 +1,5 @@
 'use strict';
 
-// dependencies
 var LanguageDetect = require('languagedetect');
 var lang = new LanguageDetect();
 var keywords = require('keyword-extractor');

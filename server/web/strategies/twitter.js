@@ -5,8 +5,8 @@ var config = env.config;
 
 var TwitterStrategy = require('passport-twitter');
 var userService = require('../../services/user-service');
-var trackSignupOrLogin = require('../../utils/track-signup-or-login');
-var updateUserLocale = require('../../utils/update-user-locale');
+var trackSignupOrLogin = require('../track-signup-or-login');
+var updateUserLocale = require('../update-user-locale');
 var passportLogin = require('../passport-login');
 
 //function twitterOauthCallback(req, accessToken, refreshToken, params, profile, done) {

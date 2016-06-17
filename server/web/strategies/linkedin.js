@@ -5,8 +5,8 @@ var config = env.config;
 
 var LinkedInStrategy = require('passport-linkedin-oauth2').Strategy;
 var userService = require('../../services/user-service');
-var trackSignupOrLogin = require('../../utils/track-signup-or-login');
-var updateUserLocale = require('../../utils/update-user-locale');
+var trackSignupOrLogin = require('../track-signup-or-login');
+var updateUserLocale = require('../update-user-locale');
 var passportLogin = require('../passport-login');
 
 function linkedinOauth2Callback(req, accessToken, refreshToken, profile, done) {
