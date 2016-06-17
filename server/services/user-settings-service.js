@@ -20,6 +20,27 @@ exports.getUserSettings = function(userId, settingsKey) {
     });
 };
 
+exports.getMultiUserSettingsForUserId = function(userId, settingsKeys) {
+  /* Not sure why mongoose isn't converting these */
+  assert(mongoUtils.isLikeObjectId(userId));
+  userId = mongoUtils.asObjectID(userId);
+
+  var select = settingsKeys.reduce(function(memo, settingsKey) {
+    memo['settings.' + settingsKey] = 1;
+    return memo;
+  }, {
+    _id: 0
+  });
+
+  return persistence.UserSettings.findOne({ userId: userId }, select, { lean: true })
+    .exec()
+    .then(function(us) {
+      if(!us) return {};
+      if(!us.settings) return {};
+
+      return us.settings;
+    });
+};
 
 exports.getMultiUserSettings = function(userIds, settingsKey) {
   userIds = userIds.map(function(id) {

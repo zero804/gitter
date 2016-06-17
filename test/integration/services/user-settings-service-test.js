@@ -1,11 +1,10 @@
-/*global describe:true, it:true, before:true, after:true */
 "use strict";
 
 var testRequire = require('./../test-require');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var userSettingsService = testRequire('./services/user-settings-service');
 var assert = testRequire("assert");
-
+var ObjectID = require('mongodb').ObjectID;
 var fixture = {};
 
 describe("User Settings Service", function() {
@@ -66,6 +65,34 @@ describe("User Settings Service", function() {
         assert(settings.test2.human);
       })
       .nodeify(done);
+  });
+
+  it('should be able to get multiple keys', function() {
+    var userId = fixture.user1.id;
+    var V1 = { value1: 1, value2: true, value3: 'string' };
+    var V2 = { human: 1, monkey: 0 };
+
+    return userSettingsService.setUserSettings(userId, 'test', V1)
+      .then(function() {
+        return userSettingsService.setUserSettings(userId, 'test2', V2);
+      })
+      .then(function() {
+        return userSettingsService.getMultiUserSettingsForUserId(userId, ['test', 'test2', 'notset']);
+      })
+      .then(function(settings) {
+        assert.deepEqual(settings, {
+          test: V1,
+          test2: V2
+        });
+      });
+  });
+
+  it('should be able to get multiple keys when the user has no settings', function() {
+    return userSettingsService.getMultiUserSettingsForUserId(new ObjectID(), ['test', 'test2', 'notset'])
+      .then(function(settings) {
+        assert.deepEqual(settings, {
+        });
+      });
   });
 
   it('should be able to fetch keys for multiple usertroupes', function(done) {
