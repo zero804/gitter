@@ -40,6 +40,7 @@ function findContextForUri(user, uri, options) {
       var resolvedUser = resolved.user;
       var resolvedTroupe = resolved.room;
       var roomMember = resolved.roomMember;
+      var resolvedGroup = resolved.group;
 
       // The uri resolved to a user, we need to do a one-to-one
       if(resolvedUser) {
@@ -90,6 +91,24 @@ function findContextForUri(user, uri, options) {
                   policy: policy,
                   uri: resolvedTroupe.uri,
                   roomMember: roomMember
+                };
+              })
+          });
+      }
+
+      if (resolvedGroup) {
+        return policyFactory.createPolicyForGroupId(user, resolvedGroup._id)
+          .then(function(policy) {
+            return policy.canRead()
+              .then(function(access) {
+                if (!access) {
+                  throw new StatusError(404);
+                }
+
+                return {
+                  group: resolvedGroup,
+                  policy: policy,
+                  uri: resolvedGroup.uri
                 };
               })
           });

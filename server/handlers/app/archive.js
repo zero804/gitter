@@ -76,7 +76,7 @@ function generateChatTree(chatActivity) {
 
 exports.datesList = [
   identifyRoute('app-archive-main'),
-  appMiddleware.uriContextResolverMiddleware({ create: false }),
+  appMiddleware.uriContextResolverMiddleware(),
   function(req, res, next) {
     var user = req.user;
     var troupe = req.uriContext.troupe;
@@ -128,7 +128,7 @@ exports.datesList = [
 
 exports.linksList = [
   identifyRoute('app-archive-links'),
-  appMiddleware.uriContextResolverMiddleware({ create: false }),
+  appMiddleware.uriContextResolverMiddleware(),
   function(req, res, next) {
     var user = req.user;
     var troupe = req.uriContext.troupe;
@@ -189,7 +189,7 @@ exports.linksList = [
 
 exports.chatArchive = [
   identifyRoute('app-archive-date'),
-  appMiddleware.uriContextResolverMiddleware({ create: false }),
+  appMiddleware.uriContextResolverMiddleware(),
   timezoneMiddleware,
   function(req, res, next) {
     var user = req.user;

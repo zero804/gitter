@@ -25,7 +25,7 @@ function saveRoom(req) {
 var mainFrameMiddlewarePipeline = [
   identifyRoute('app-main-frame'),
   featureToggles,
-  appMiddleware.uriContextResolverMiddleware({ create: 'not-repos' }),
+  appMiddleware.uriContextResolverMiddleware(),
   appMiddleware.isPhoneMiddleware,
   timezoneMiddleware,
   function (req, res, next) {
@@ -62,7 +62,7 @@ var mainFrameMiddlewarePipeline = [
 var chatMiddlewarePipeline = [
   identifyRoute('app-chat-frame'),
   featureToggles,
-  appMiddleware.uriContextResolverMiddleware({ create: 'not-repos'}),
+  appMiddleware.uriContextResolverMiddleware(),
   appMiddleware.isPhoneMiddleware,
   timezoneMiddleware,
   function (req, res, next) {
@@ -96,7 +96,7 @@ var chatMiddlewarePipeline = [
 var embedMiddlewarePipeline = [
   identifyRoute('app-embed-frame'),
   featureToggles,
-  appMiddleware.uriContextResolverMiddleware({ create: false }),
+  appMiddleware.uriContextResolverMiddleware(),
   appMiddleware.isPhoneMiddleware,
   timezoneMiddleware,
   function (req, res, next) {
@@ -112,7 +112,7 @@ var embedMiddlewarePipeline = [
 
 var cardMiddlewarePipeline = [
   identifyRoute('app-card-frame'),
-  appMiddleware.uriContextResolverMiddleware({ create: false }),
+  appMiddleware.uriContextResolverMiddleware(),
   timezoneMiddleware,
   function (req, res, next) {
     if(!req.uriContext.troupe) return next(new StatusError(404));
@@ -156,7 +156,7 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
   router.get(path + '/archives/:yyyy(\\d{4})/:mm(\\d{2})/:dd(\\d{2})', archive.chatArchive);
   router.get(path, mainFrameMiddlewarePipeline);
   router.post(path,
-    appMiddleware.uriContextResolverMiddleware({ create: true }),
+    appMiddleware.uriContextResolverMiddleware(),
     function(req, res, next) {
       if(!req.uriContext.troupe || !req.uriContext.ownUrl) return next(new StatusError(404));
 

@@ -35,13 +35,11 @@ function uriContextResolverMiddleware(options) {
     return roomContextService.findContextForUri(req.user, uri, options)
       .then(function(uriContext) {
         req.troupe = uriContext.troupe;
-
+        req.group = uriContext.group;
         req.uriContext = uriContext;
-        next();
         return null; // Stop bluebird from moaning about promises
       })
-      .catch(function(e) {
-        if (!(e instanceof StatusError)) throw e;
+      .catch(StatusError, function(e) {
         switch(e.status) {
           case 301:
             // TODO: check this works for userhome....
@@ -63,9 +61,10 @@ function uriContextResolverMiddleware(options) {
               return null;
             }
         }
+
         throw e;
       })
-      .catch(next);
+      .asCallback(next);
   };
 }
 
