@@ -63,6 +63,7 @@ module.exports = Marionette.CompositeView.extend({
     var activeModel = this.collection.get(context.troupe().get('id'));
     if(!activeModel) { return; }
     activeModel.set('active', true);
+    console.log(activeModel, this);
   },
 
   onItemActivated: function(view) {
