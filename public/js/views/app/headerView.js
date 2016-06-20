@@ -102,7 +102,8 @@ var HeaderView = Marionette.ItemView.extend({
       isPrivate:       getPrivateStatus(data),
       orgName:         orgName,
       orgPageHref:     orgPageHref,
-      shouldShowPlaceholderRoomTopic: data.userCount <= 1
+      shouldShowPlaceholderRoomTopic: data.userCount <= 1,
+      isRightToolbarPinned: this.rightToolbarModel.get('isPinned')
     });
 
     return data;

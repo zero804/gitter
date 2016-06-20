@@ -8,6 +8,7 @@ var restful = require('../../services/restful');
 var burstCalculator = require('../../utils/burst-calculator');
 var userSort = require('../../../public/js/utils/user-sort');
 var isolateBurst = require('gitter-web-shared/burst/isolate-burst-array');
+var userSettingsService = require('../../services/user-settings-service');
 var unreadItemService = require('../../services/unread-items');
 var roomMembershipService = require('../../services/room-membership-service');
 var _ = require('lodash');
@@ -51,12 +52,19 @@ function renderChat(req, res, options, next) {
         restful.serializeChatsForTroupe(troupe.id, userId, chatSerializerOptions),
         options.fetchEvents === false ? null : restful.serializeEventsForTroupe(troupe.id, userId),
         options.fetchUsers === false ? null : restful.serializeUsersForTroupe(troupe.id, userId, userSerializerOptions),
-      ]).spread(function (troupeContext, chats, activityEvents, users, ownerIsOrg) {
+        // TODO: Why does this always return undefined
+        userSettingsService.getUserSettings(req.user._id, 'rightToolbar')
+      ]).spread(function (troupeContext, chats, activityEvents, users, ownerIsOrg, rightToolbarUserSettings) {
 
         var initialChat = _.find(chats, function(chat) { return chat.initial; });
         var initialBottom = !initialChat;
         var githubLink;
         var classNames = options.classNames || [];
+
+        var isRightToolbarPinned = true;
+        if(rightToolbarUserSettings && rightToolbarUserSettings.isPinned !== undefined) {
+          isRightToolbarPinned = rightToolbarUserSettings.isPinned;
+        }
 
         if(troupe.githubType === 'REPO' || troupe.githubType === 'ORG') {
           githubLink = 'https://github.com/' + req.uriContext.uri;
@@ -112,6 +120,7 @@ function renderChat(req, res, options, next) {
             ownerIsOrg: ownerIsOrg,
             orgPageHref: orgPageHref,
             roomMember: req.uriContext.roomMember,
+            isRightToolbarPinned: isRightToolbarPinned,
 
             //Feature Switch Left Menu
             hasNewLeftMenu: req.fflip && req.fflip.has('left-menu'),
