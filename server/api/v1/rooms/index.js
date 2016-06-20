@@ -70,7 +70,11 @@ module.exports = {
         var strategy = new restSerializer.TroupeStrategy({
           currentUserId: req.user.id,
           currentUser: req.user,
-          includeRolesForTroupe: createResult.troupe
+          includeRolesForTroupe: createResult.troupe,
+          // include all these because it will replace the troupe in the context
+          includeTags: true,
+          includeProviders: true,
+          includeGroups: true
         });
 
         return [createResult, restSerializer.serializeObject(createResult.troupe, strategy)];
@@ -121,7 +125,8 @@ module.exports = {
           currentUser: req.user,
           includePermissions: true,
           includeOwner: true,
-          includeProviders: true
+          includeProviders: true,
+          includeGroups: true
         });
 
         return restSerializer.serializeObject(req.params.troupeId, strategy);

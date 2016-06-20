@@ -7,7 +7,7 @@ var isNative = require('./is-native');
 /**
  * Figures out whether to use desktop notifications for this user
  */
-function determineDesktopNotifications(user, req) {
+var determineDesktopNotifications = Promise.method(function(user, req) {
   if(!user) return true;
 
   var agent = req.getParsedUserAgent();
@@ -30,7 +30,7 @@ function determineDesktopNotifications(user, req) {
   }
 
   return true;
-}
+});
 
 function contextFromRequest(req) {
   var user = req.user;
