@@ -56,13 +56,16 @@ module.exports = Marionette.CompositeView.extend({
     this.roomMenuModel = attrs.roomMenuModel;
     this.roomCollection = attrs.roomCollection;
     this.listenTo(this.roomMenuModel, 'change:hasDismissedSuggestions', this.onDismissSuggestionsUpdate, this);
+    this.listenTo(this.roomMenuModel, 'change:state', this.clearFocus, this);
     Marionette.CompositeView.prototype.constructor.apply(this, arguments);
   },
 
   initialize: function() {
     var activeModel = this.collection.get(context.troupe().get('id'));
     if(!activeModel) { return; }
-    activeModel.set('active', true);
+    //On init we set focus on the active element because we can reliably assume that a minibar item is visible
+    //which we can't for room-itmes as you can load the menu in an org state
+    activeModel.set({ active: true, focus: true });
   },
 
   onItemActivated: function(view) {
@@ -133,12 +136,23 @@ module.exports = Marionette.CompositeView.extend({
     return this.ui.dismissButton[0].classList.add('hidden');
   },
 
-  onDestroy: function() {
-    this.stopListening(context.troupe());
+  clearFocus: function (){
+    var elementsInFocus = this.collection.where({ focus: true });
+    elementsInFocus.forEach(function(model){
+      model.set('focus', false);
+    });
+  },
+
+  focusActiveElement: function (){
+    var activeElement = this.collection.findWhere({ active: true });
+    if(!activeElement) { return; }
+    activeElement.set('focus', true);
   },
 
   _triggerNavigation: function (url, type, name) {
+    this.clearFocus();
     this.bus.trigger('navigation', url, type, name);
+    this.focusActiveElement();
   },
 
   _navigateToHome: function () {
