@@ -303,7 +303,7 @@
     "browser-run-test": "cd ./test/in-browser/fixtures && devtool -chq runner.js",
     "browser-test": "npm run browser-build-tests && npm run browser-run-test",
     "browser-watch-build-tests": "webpack -w --config ./test/in-browser/webpack.config.js",
-    "browser-watch-run-tests": "http-server ./test/in-browser -p 9191 & live-reload ./test/in-browser/fixtures --port 9091",
+    "browser-watch-run-tests": "http-server ./test/in-browser -p 9191 & live-reload ./test/in-browser/fixtures --port 9192",
     "browser-watch-test": "npm run browser-watch-build-tests & npm run browser-watch-run-tests"
   },
   "git": {
