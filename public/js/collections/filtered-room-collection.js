@@ -10,7 +10,6 @@ var sortAndFilters = require('gitter-realtime-client/lib/sorts-filters').model;
 var FilteredRoomCollection = Backbone.Collection.extend({
 
   _filter: null,
-
   initialize: function(models, options) { //jshint unused: true
     if (!options || !options.roomModel) {
       throw new Error('A valid RoomMenuModel must be passed to a new instance of FilteredRoomCollection');
