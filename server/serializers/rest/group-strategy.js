@@ -1,26 +1,27 @@
 "use strict";
 
-var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
+var resolveGroupIdAvatarUrl = require('gitter-web-shared/avatars/resolve-group-id-avatar-url');
 
-function GroupStrategy(/*options*/) {
+function GroupStrategy(options) {
+  var lean = options && options.lean;
+
+  this.preload = function(/*groups*/) {
+    return;
+  };
+
+  this.map = function(group) {
+    var id = group.id || group._id && group._id.toHexString();
+    return {
+      id: id,
+      name: group.name,
+      uri: group.uri,
+      avatarUrl: lean ? undefined : resolveGroupIdAvatarUrl(group._id)
+    };
+  };
 }
 
 GroupStrategy.prototype = {
   name: 'GroupStrategy',
-
-  preload: function(/*groups*/) {
-    return;
-  },
-
-  map: function(group) {
-    return {
-      id: group.id || group._id && group._id.toHexString(),
-      name: group.name,
-      uri: group.uri,
-      // for now just assume it is a GitHub org/user
-      avatarUrl: resolveRoomAvatarUrl({ uri: group.uri }, 48)
-    };
-  }
 };
 
 module.exports = GroupStrategy;
