@@ -18,6 +18,9 @@ var identifyRoute = env.middlewares.identifyRoute;
 var debug = require('debug')('gitter:app:settings-route');
 var StatusError = require('statuserror');
 var userScopes = require('gitter-web-identity/lib/user-scopes');
+var acceptInviteService = require('../services/accept-invite-service');
+var loginUtils = require('../web/login-utils');
+var resolveRoomUri = require('../utils/resolve-room-uri');
 
 var supportedServices = [
   { id: 'github', name: 'GitHub'},
@@ -169,6 +172,28 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
     adminAccessCheck,
     createIntegration);
 });
+
+router.get('/accept-invite/:secret',
+  identifyRoute('settings-accept-invite'),
+  ensureLoggedIn,
+  function(req, res, next) {
+    var secret = req.params.secret;
+    return acceptInviteService.accept(req.user, secret)
+      .then(function(room) {
+        return resolveRoomUri(room, req.user._id);
+      })
+      .then(function(roomUri) {
+        res.relativeRedirect(roomUri);
+      })
+      .catch(StatusError, function(err) {
+        if (err.status >= 500) throw err;
+
+        logger.error('Unable to use invite', { exception: err });
+        var next = loginUtils.whereToNext(req.user);
+        res.relativeRedirect(next);
+      })
+      .catch(next);
+  });
 
 router.get('/unsubscribe/:hash',
   identifyRoute('settings-unsubscribe'),

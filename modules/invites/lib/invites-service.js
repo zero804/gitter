@@ -30,49 +30,53 @@ function createInvite(roomId, options) {
     });
 }
 
-function associateSecretWithUser(secret, userId) {
+function accept(userId, secret) {
   assert(secret);
-  return TroupeInvite.findOne({ secret: secret })
+  return TroupeInvite.findOne({ secret: String(secret) })
     .lean()
     .exec()
-    .bind({
-      externalId: null,
-      type: null
-    })
     .then(function(invite) {
       if (!invite) throw new StatusError(404);
-      var type = this.type = invite.type;
-      var externalId = this.externalId = invite.externalId;
+      if (invite.userId) {
+        // Is this user re-using the invite?
+        if (!mongoUtils.objectIDsEqual(invite.userId, userId)) {
+          throw new StatusError(404);
+        }
+      }
 
-      return TroupeInvite.find({ type: type, externalId: externalId, state: 'PENDING', userId: null })
-        .lean()
-        .exec();
+      return invite;
+    });
+}
+
+function markInviteAccepted(inviteId, userId) {
+  return TroupeInvite.update({
+      _id: inviteId,
+      state: { $ne: 'ACCEPTED' }
+    }, {
+      $set: {
+        state: 'ACCEPTED',
+        userId: userId
+      }
     })
-    .then(function(invites) {
-      if (!invites || !invites.length) return;
+    .exec();
+}
 
-      var inviteIds = invites.map(function(i) {
-        return i._id;
-      });
-
-      return TroupeInvite.update({
-          _id: { $in: inviteIds },
-          type: this.type,
-          externalId: this.externalId,
-          state: 'PENDING',
-          userId: null
-        }, {
-          $set: {
-            userId: userId
-          }
-        }, {
-          multi: true
-        })
-        .return(invites);
+function markInviteRejected(inviteId, userId) {
+  return TroupeInvite.update({
+      _id: inviteId,
+      state: { $ne: 'REJECTED' }
+    }, {
+      $set: {
+        state: 'REJECTED',
+        userId: userId
+      }
     })
+    .exec();
 }
 
 module.exports = {
   createInvite: Promise.method(createInvite),
-  associateSecretWithUser: Promise.method(associateSecretWithUser)
+  accept: Promise.method(accept),
+  markInviteAccepted: Promise.method(markInviteAccepted),
+  markInviteRejected: Promise.method(markInviteRejected)
 }
