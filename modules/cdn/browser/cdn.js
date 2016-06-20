@@ -1,4 +1,5 @@
 "use strict";
+
 var clientEnv = require('gitter-client-env');
 
 module.exports = (function() {
@@ -51,7 +52,7 @@ module.exports = (function() {
     return cdnNativeApp;
   } else if(!hostLength) {
     return cdnPassthrough;
-  } else if(hostLength == 1) {
+  } else if(hostLength === 1) {
     return cdnSingle;
   } else {
     return cdnMulti;
@@ -59,4 +60,3 @@ module.exports = (function() {
 
 
 })();
-
