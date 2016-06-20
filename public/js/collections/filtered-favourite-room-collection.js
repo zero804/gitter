@@ -7,7 +7,7 @@ var sortAndFilters = require('gitter-realtime-client/lib/sorts-filters').model;
 var one2oneFavouriteFilter = require('gitter-web-shared/filters/left-menu-primary-favourite-one2one');
 var orgFavouriteFilter = require('gitter-web-shared/filters/left-menu-primary-favourite-org');
 
-var FilteredFavouriteCollection = function(models, attrs) {
+var FilteredFavouriteCollection = function() {
   FilteredRoomCollection.apply(this, arguments);
 };
 

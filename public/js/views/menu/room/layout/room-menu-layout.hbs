@@ -1,6 +1,6 @@
 <aside id="room-menu-container" class="room-menu-container">
   <section class="room-menu">
-    <div id="minibar" class="minibar">
+    <nav id="minibar" class="minibar">
       <div class="minibar-inner nano">
         <ul id="minibar-list" class="room-menu-options nano-content">
 
@@ -15,14 +15,6 @@
               <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/search.svg"}}' />
             </button>
           </li>
-
-          {{!
-          <li data-state-change="favourite" id="minibar-favourite" class="room-menu-options__item--favourite">
-            <button class="room-menu-options__item-button" title="Your Favourite Conversations">
-              <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/favourites.svg"}}{{!' />
-            </button>
-          </li>
-          }}
 
           <li data-state-change="people" id="minibar-people" class="room-menu-options__item--people">
             <button class="room-menu-options__item-button" title="Your One to One Conversations">
@@ -44,7 +36,7 @@
 
         </ul>
       </div>
-    </div>
+    </nav>
     <div id="room-menu__panel">
       <section class="room-menu__panel {{#if roomMenuIsPinned}}active loading{{/if}}">
         <header class="panel-header" id="panel-header"></header>
