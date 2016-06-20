@@ -20,6 +20,12 @@ var opts = require('yargs')
     required: true,
     description: 'Username of the user to remove'
   })
+  .option('limit', {
+    alias: 'l',
+    required: true,
+    default: 100,
+    description: 'Number of documents to find and delete'
+  })
   .help('help')
   .alias('help', 'h')
   .argv;
@@ -50,7 +56,7 @@ var getQuery = userService.findByUsername(opts.username)
           }
         },
         "from": 0,
-        "size": 100,
+        "size": opts.limit,
         "sort": [],
         "aggs": {}
       }
