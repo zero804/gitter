@@ -113,10 +113,19 @@ onready(function() {
 
     context.setTroupeId(troupe.id);
 
+    // turn backbone object to plain one so we don't modify the original
+    var newTroupe = troupe.toJSON();
+
+    // add the group to the troupe as if it was serialized by the server
+    var groupModel = troupeCollections.groups.get(newTroupe.groupId);
+    if (groupModel) {
+      newTroupe.group = groupModel.toJSON();
+    }
+
     //post a navigation change to the iframe
     postMessage({
       type: 'change:room',
-      newTroupe: troupe,
+      newTroupe: newTroupe,
       permalinkChatId: permalinkChatId
     });
   });
