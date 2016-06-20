@@ -1,5 +1,5 @@
 <div class="right-toolbar-region" id="right-toolbar-layout">
-  <div class="right-toolbar right-toolbar--collapsible">
+  <div class="right-toolbar right-toolbar--collapsible {{when isRightToolbarPinned '' 'collapsed'}}">
 
 
     {{#unless hasNewLeftMenu}} {{> switch_app_search_old}} {{/unless}}
@@ -28,19 +28,5 @@
         {{{ activityItemPrerender activityEvents wrap="div" className="right-toolbar-activity-area-inner" }}}
       </div>
     </div>
-
-    <footer id="zendesk-footer" class="right-toolbar__footer">
-      <a href="http://gitter.zendesk.com" target="_blank" style="text-decoration: none; display: block;" aria-labelledby="label-gitter-support">
-        <div class="support">
-          <i class='octicon octicon-question'></i>
-          <div
-            id="label-gitter-support"
-            class="trpActionsMenuLabel"
-          >
-            Gitter Support
-          </div>
-        </div>
-      </a>
-    </footer>
   </div>
 </div>
