@@ -3,7 +3,7 @@
 var testRequire = require('../test-require');
 var Promise = require('bluebird');
 var assert = require('assert');
-var i18nFactory = testRequire('./utils/i18n-factory');
+var i18nFactory = testRequire('gitter-web-i18n');
 
 var EMAIL_DATA = [
   {
