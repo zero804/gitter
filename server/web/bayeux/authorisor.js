@@ -174,6 +174,8 @@ function populateTroupe(options) {
   var strategy = new restSerializer.TroupeIdStrategy({
     currentUserId: userId,
     includePermissions: true,
+    includeProviders: true,
+    includeGroups: true,
     includeOwner: true
   });
   return restSerializer.serializeObject(troupeId, strategy)
