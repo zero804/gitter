@@ -31,6 +31,7 @@ module.exports = ItemView.extend({
     //I don't want to provide a onRender as this is easy to forget to override
     //adding this assignment here is a bit dodge but gets the job done in the safest way possible
     this.activeElement = this.el.querySelector('a') || this.el.querySelector('button');
+    if(this.model.get('focus')) { this.el.classList.add('focus'); }
   },
 
 });
