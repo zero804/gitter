@@ -117,7 +117,10 @@ onready(function() {
     var newTroupe = troupe.toJSON();
 
     // add the group to the troupe as if it was serialized by the server
-    newTroupe.group = troupeCollections.groups.findWhere({id: newTroupe.groupId});
+    var groupModel = troupeCollections.groups.get(newTroupe.groupId);
+    if (groupModel) {
+      newTroupe.group = groupModel.toJSON();
+    }
 
     //post a navigation change to the iframe
     postMessage({
