@@ -70,6 +70,7 @@ module.exports = Marionette.CompositeView.extend({
 
   onItemActivated: function(view) {
     var model = view.model;
+    model.set({ active: false, focus: false });
     var url = view.getRoomUrl();
     var name = view.getRoomName();
 
