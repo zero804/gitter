@@ -5,11 +5,20 @@ var _ = require('underscore');
 var localStore = require('../components/local-store');
 var Promise = require('bluebird');
 var clientEnv = require('gitter-client-env');
+var debug = require('debug-proxy')('app:context');
 
 module.exports = (function() {
 
   var ctx = window.troupeContext || {};
   var snapshots = ctx.snapshots || {};
+
+  function getGroupModel() {
+    var groupModel;
+    if (ctx.troupe && ctx.troupe.group) {
+      groupModel = ctx.troupe.group;
+    }
+    return new Backbone.Model(groupModel);
+  }
 
   function getTroupeModel() {
     var troupeModel;
@@ -17,22 +26,6 @@ module.exports = (function() {
       troupeModel = ctx.troupe;
     } else if(ctx.troupeId) {
       troupeModel = { id: ctx.troupeId };
-    } else if(window.cordova && window.location.pathname.indexOf('/mobile/chat') === 0) {
-      /*
-       * For native cordova apps, the room id is taken from the hash (or localstorage backup)
-       * instead of the url.
-       * This means that the we can use the same url for all rooms, and so cache one page in
-       * the user's web view.
-       */
-      var id = window.location.hash.split('#')[1] || localStore.get('lastTroupeId');
-
-      if(!id) {
-        window.location.pathname = '/mobile/home';
-        return;
-      }
-
-      localStore.set('lastTroupeId', id);
-      troupeModel = { id: id };
     } else if(qs.troupeId) {
       troupeModel = { id: qs.troupeId };
     }
@@ -88,6 +81,7 @@ module.exports = (function() {
 
     return result;
   }
+  var group = getGroupModel();
   var troupe = getTroupeModel();
   var user = getUserModel();
   var contextModel = getContextModel(troupe, user);
@@ -96,8 +90,16 @@ module.exports = (function() {
     return ctx;
   };
 
+  context.group = function() {
+    return group;
+  };
+
   context.troupe = function() {
     return troupe;
+  };
+
+  context.getGroupId = function() {
+    return group.id;
   };
 
   context.getTroupeId = function() {
@@ -131,6 +133,12 @@ module.exports = (function() {
   };
 
   context.setTroupe = function(value) {
+    if (value.group) {
+      group.set(clearOtherAttributes(value.group, group));
+    } else {
+      debug("Troupe data contains no group: %j", value);
+    }
+
     troupe.set(clearOtherAttributes(value, troupe));
   };
 
