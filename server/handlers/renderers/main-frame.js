@@ -88,6 +88,8 @@ function renderMainFrame(req, res, next, frame) {
       var leftMenuRoomList = parseRoomsIntoLeftMenuRoomList(snapshots.leftMenu.state, snapshots.rooms, snapshots.leftMenu.selectedOrgName);
       var leftMenuFavouriteRoomList = parseRoomsIntoLeftMenuFavouriteRoomList(snapshots.leftMenu.state, snapshots.rooms, snapshots.leftMenu.selectedOrgName);
 
+      var hasCommunityCreate = req.fflip && req.fflip.has('community-create');
+
       var previousLeftMenuState = troupeContext.leftRoomMenuState;
       var newLeftMenuState = snapshots['leftMenu'];
       if(req.user && !_.isEqual(previousLeftMenuState, newLeftMenuState)) {
@@ -133,6 +135,7 @@ function renderMainFrame(req, res, next, frame) {
         user:                   user,
         orgs:                   orgs,
         hasNewLeftMenu:         hasNewLeftMenu,
+        hasCommunityCreate:     hasCommunityCreate,
         leftMenuOrgs:           troupeContext.snapshots.orgs,
         leftMenuRooms:          leftMenuRoomList,
         leftMenuFavouriteRooms: leftMenuFavouriteRoomList,
