@@ -135,6 +135,7 @@ var KeyboardController = Marionette.ItemView.extend({
     this.blurAllItems();
     var activeRoomItem = this.getActiveRoomItem();
     if(!activeRoomItem) { activeRoomItem = this.getFlatRoomCollection()[0]; }
+    if(!activeRoomItem) { return; }
     activeRoomItem.set('focus', true);
   },
 
