@@ -9,6 +9,6 @@
   },
   "private": true,
   "devDependencies": {
-    "mocha": "^2.2.5"
+    "mocha": "^2.4.5"
   }
 }
