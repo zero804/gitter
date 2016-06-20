@@ -17,6 +17,7 @@ var troupeEnv = {
   domain: config.get('web:domain'),
   baseServer: config.get('web:baseserver'),
   basePath: config.get('web:basepath'),
+  avatarsUrl: config.get('avatars:baseUrl'),
   apiBasePath: config.get('web:apiBasePath'),
   homeUrl: config.get('web:homeurl'),
   badgeBaseUrl: config.get('web:badgeBaseUrl'),
