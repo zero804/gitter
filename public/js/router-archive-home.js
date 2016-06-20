@@ -16,6 +16,8 @@ require('components/bug-reporting');
 require('utils/tracking');
 require('components/ping');
 
+require('gitter-styleguide/css/components/buttons.css');
+
 onready(function() {
 
 
