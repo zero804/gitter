@@ -77,6 +77,8 @@ var MinibarView = Marionette.CollectionView.extend({
     this.listenTo(this.roomCollection, 'add remove', this.render, this);
     this.listenTo(this.collection, 'snapshot', this.onCollectionSnapshot, this);
     this.listenTo(this.model, 'change:state change:selectedOrgName', this.onMenuStateUpdate, this);
+    //Clicking a room item will trigger a navigation event so we want to clear any elements with focus in the minibar
+    this.listenTo(this.bus, 'navigation', this.clearFocus, this);
     this.onMenuStateUpdate();
 
     //Guard against not getting a snapshot
@@ -112,8 +114,12 @@ var MinibarView = Marionette.CollectionView.extend({
       modelName = this.model.get('name');
     }
 
+    //Clear any elements on the minibar with focus
+    //as we are about to re-assign that
+    this.clearFocus();
+
     // Set the minibar-item active
-    model.set({ active: true });
+    model.set({ active: true, focus: true });
 
     var state = model.get('type');
     // close-passthrough
@@ -168,12 +174,6 @@ var MinibarView = Marionette.CollectionView.extend({
 
   },
 
-  onDestroy: function () {
-    this.stopListening(this.collection);
-    this.stopListening(this.model);
-    this.stopListening(this.roomCollection);
-  },
-
 
   updateMinibarActiveState: function(currentState, selectedOrgName) {
     // Reset the currently active model
@@ -192,7 +192,14 @@ var MinibarView = Marionette.CollectionView.extend({
     if (nextActiveModel) {
       nextActiveModel.set('active', true);
     }
-  }
+  },
+
+  clearFocus: function (){
+    var elementsInFocus = this.collection.where({ focus: true });
+    elementsInFocus.forEach(function(model){
+      model.set('focus', false);
+    });
+  },
 
 
 });
