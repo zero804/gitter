@@ -3,6 +3,7 @@
 var Promise = require('bluebird');
 var GhOrgPolicyDelegate = require('./gh-org-policy-delegate');
 var LegacyGitHubPolicyEvaluator = require('./legacy-github-policy-evaluator');
+var debug = require('debug')('gitter:app:permissions:gh-policy-delegate-w-repo-fallback');
 
 function GhOrgPolicyDelegateWithRepoFallback(user, securityDescriptor, fallbackRepo) {
   this._orgPolicy = new GhOrgPolicyDelegate(user, securityDescriptor);
@@ -25,6 +26,8 @@ GhOrgPolicyDelegateWithRepoFallback.prototype = {
       .bind(this)
       .then(function(hasAccess) {
         if (hasAccess) return true;
+
+        debug('Access denied by ORG delegate, attempting to use repo access');
 
         // Fallback to the repo
         return this._repoPolicy.canAdmin();
@@ -49,7 +52,9 @@ GhOrgPolicyDelegateWithRepoFallback.prototype = {
 
     var repoOrgOrUser = parts[0];
 
-    return securityDescriptor.type === 'GH_ORG' && repoOrgOrUser === securityDescriptor.linkPath;
+    var result = securityDescriptor.type === 'GH_ORG' && repoOrgOrUser === securityDescriptor.linkPath;
+    debug('Is repo=%s a valid repo for %s', fallbackRepo, securityDescriptor.linkPath, result);
+    return result;
   }
 };
 

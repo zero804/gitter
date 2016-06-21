@@ -11,6 +11,7 @@ var GhOrgPolicyDelegateWithRepoFallback = require('./policies/gh-org-policy-dele
 var GhUserPolicyDelegate = require('./policies/gh-user-policy-delegate');
 var StatusError = require('statuserror');
 var securityDescriptorService = require('./security-descriptor-service');
+var debug = require('debug')('gitter:app:permissions:policy-factory');
 
 function getDelegateForSecurityDescriptor(user, securityDescriptor, obtainAccessFromGitHubRepo) {
   switch(securityDescriptor.type) {
@@ -68,6 +69,7 @@ function createPolicyForGroupId(user, groupId) {
 }
 
 function createPolicyForGroupIdWithRepoFallback(user, groupId, repoUri) {
+  debug('Create policy factory with repo fallback: repo=%s', repoUri);
   var userId = user && user._id;
 
   return securityDescriptorService.getForGroupUser(groupId, userId)
