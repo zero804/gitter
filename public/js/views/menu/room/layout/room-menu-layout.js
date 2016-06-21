@@ -13,7 +13,6 @@ var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-trou
 var RoomMenuModel = require('../../../../models/room-menu-model');
 var MiniBarView = require('../minibar/minibar-view');
 var PanelView = require('../panel/panel-view');
-var MinibarCollection = require('../minibar/minibar-collection');
 var KeyboardControllerView = require('../keyboard-controller/keyboard-controller-view');
 
 var MINIBAR_ITEM_HEIGHT = 65;
