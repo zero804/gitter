@@ -27,7 +27,7 @@ GhOrgPolicyDelegateWithRepoFallback.prototype = {
         if (hasAccess) return true;
 
         // Fallback to the repo
-        this._repoPolicy.canAdmin();
+        return this._repoPolicy.canAdmin();
       });
   }),
 
