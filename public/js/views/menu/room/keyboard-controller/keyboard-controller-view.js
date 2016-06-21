@@ -75,6 +75,7 @@ var KeyboardController = Marionette.ItemView.extend({
     var index = e.key;
     if(index === 0) { index = 10; } // 0 key triggers room.10
     index = index - 1; // Array 0 indexing at work
+    index = arrayBoundWrap(index, this.minibarCollection.length);
     var model = this.minibarCollection.at(index);
     model.set('focus', true);
     this.model.set({ state: 'org', selectedOrgName: model.get('name') });
@@ -94,10 +95,14 @@ var KeyboardController = Marionette.ItemView.extend({
 
   onRightKeyPressed: function (){
     if(this.isMinibarInFocus()) { return this.focusActiveRoomItem(); }
+    this.focusActiveMinibarItem();
   },
 
   onLeftKeyPressed: function (){
-    if(!this.isMinibarInFocus()) { return this.focusActiveMinibarItem(); }
+    if(!this.isMinibarInFocus()) {
+      if(this.isRoomListInFocus()) { return this.focusActiveMinibarItem(); }
+      return this.focusActiveRoomItem();
+    }
   },
 
   moveMinibarFocus: function (direction){
@@ -147,6 +152,10 @@ var KeyboardController = Marionette.ItemView.extend({
 
   isMinibarInFocus: function (){
     return !!this.queryAttrOnMinibar('focus', true);
+  },
+
+  isRoomListInFocus: function (){
+    return !!this.queryAttrOnRoomCollections('focus', true);
   },
 
   getActiveMinibarItem: function (){
