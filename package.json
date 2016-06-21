@@ -197,6 +197,7 @@
     "gitter-styleguide": "^1.6.6",
     "gitter-web-test-utils": "file:modules/test-utils",
     "gulp": "^3.8.11",
+    "gulp-brotli": "^1.1.0",
     "gulp-codacy": "^1.0.0",
     "gulp-coveralls": "^0.1.4",
     "gulp-debug": "^2.1.2",
