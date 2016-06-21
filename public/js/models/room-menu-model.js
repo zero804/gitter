@@ -157,6 +157,7 @@ module.exports = Backbone.Model.extend({
     this.onSwitchState(this, this.get('state'));
   },
 
+  //custom set to limit states that can be assigned
   set: function (key, val){
     var isChangingState = (key === 'state') || (_.isObject(key) && !!key.state);
     if(!isChangingState) { return Backbone.Model.prototype.set.apply(this, arguments); }
