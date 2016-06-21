@@ -261,7 +261,7 @@ describe('KeyboardControllerView', function(){
     it('should move focus back to the active minibar item if the room list is in focus and left is presssed', function(){
       model.favouriteCollection.at(0).set('focus', true);
       appEvents.trigger('keyboard.room.prev');
-      assert(!view.getFocussedRoomItem());
+      assert(!view.getFocusedRoomItem());
       assert(model.minibarCollection.findWhere({ active: true}).get('focus'));
     });
 
