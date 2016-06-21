@@ -16,8 +16,6 @@ module.exports = (function() {
   var platform = platformDetect();
   // Set modifier keys for the OS
   var cmdKey = platformKeys.cmd;
-  var roomKey = platformKeys.room;
-  var room2Key = platformKeys.room2;
   var gitterKey = platformKeys.gitter;
 
   // Define different scopes for the key listeners
@@ -152,27 +150,21 @@ module.exports = (function() {
   }];
 
   keyEvents[cmdKey + '+/, ' + cmdKey + '+' + gitterKey + '+/'] = 'chat.toggle';
-  keyEvents[cmdKey + '+' /*+ gitterKey*/ + '+s'] = 'focus.search';
+  keyEvents[cmdKey + '+' + '+s'] = 'focus.search';
   keyEvents[cmdKey + '+' + gitterKey + '+c'] = 'focus.chat';
   keyEvents[cmdKey + '+' + gitterKey + '+m'] = 'help.markdown';
   keyEvents[cmdKey + '+' + gitterKey + '+k'] = 'help.keyboard';
-
-  var roomModifiers = cmdKey + '+' + roomKey;
-  if(platform !== 'Mac' && platform !== 'Windows') {
-    roomModifiers = roomKey + '+' + room2Key;
-  }
-
-  keyEvents[gitterKey + '+' + roomKey + '+up'] = 'room.up';
-  keyEvents[gitterKey + '+' + roomKey + '+down'] = 'room.down';
-  keyEvents[gitterKey + '+' + roomKey + '+left'] = 'room.prev';
-  keyEvents[gitterKey + '+' + roomKey + '+right'] = 'room.next';
-  keyEvents[gitterKey + '+' + roomKey + '+enter'] = 'room.enter';
+  keyEvents[cmdKey + '+' + gitterKey + '+up'] = 'room.up';
+  keyEvents[cmdKey + '+' + gitterKey + '+down'] = 'room.down';
+  keyEvents[cmdKey + '+' + gitterKey + '+left'] = 'room.prev';
+  keyEvents[cmdKey + '+' + gitterKey + '+right'] = 'room.next';
+  keyEvents[cmdKey + '+' + gitterKey + '+enter'] = 'room.enter';
 
   // Go to a conversation by index in list
   _.each('123456789'.split(''), function (n) {
-    keyEvents[cmdKey + '+' + roomKey + '+' + n] = 'room.' + n;
+    keyEvents[cmdKey + '+' + gitterKey + '+' + n] = 'room.' + n;
   });
-  keyEvents[cmdKey + '+' + roomKey + '+0'] = 'room.10';
+  keyEvents[cmdKey + '+' + gitterKey + '+0'] = 'room.10';
 
   // Add listeners
 
