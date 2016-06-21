@@ -12,6 +12,7 @@ describe('MinibarView', function(){
   beforeEach(function(){
     el = document.createElement('div');
     model = new Backbone.Model();
+
     collection = new Backbone.Collection([
       { type: 'org', name: 'gitterHQ' },
       { type: 'org', name: 'troupe' }

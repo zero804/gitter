@@ -31,6 +31,10 @@ var KeyboardController = Marionette.ItemView.extend({
 
     //Minibar
     this.minibarCollection = attrs.model.minibarCollection;
+    this.minibarHomeModel = attrs.model.minibarHomeModel;
+    this.minibarSearchModel = attrs.model.minibarSearchModel;
+    this.minibarPeopleModel = attrs.model.minibarPeopleModel;
+    this.minibarCloseModel = attrs.model.minibarCloseModel;
 
     //Favourite
     this.favouriteCollection = attrs.model.favouriteCollection;
@@ -53,10 +57,9 @@ var KeyboardController = Marionette.ItemView.extend({
   },
 
   onMinibarAllSelected: function (){
-    var allModel = this.minibarCollection.findWhere({ type: 'all' });
     this.blurAllItems();
-    allModel.set('focus', true);
     this.model.set('state', 'all');
+    this.minibarHomeModel.set('focus', true);
   },
 
   onMinibarSearchSelected: function (){
@@ -66,17 +69,17 @@ var KeyboardController = Marionette.ItemView.extend({
   },
 
   onMinibarPeopleSelected: function (){
-    var peopleModel = this.minibarCollection.findWhere({ type: 'people' });
     this.blurAllItems();
-    peopleModel.set('focus', true);
     this.model.set('state', 'people');
+    this.minibarPeopleModel.set('focus', true);
   },
 
   onMinibarOrgSelected: function (e){
     this.blurAllItems();
     var index = e.key;
     if(index === 0) { index = 10; } // 0 key triggers room.10
-    index = index - 1; // Array 0 indexing at work
+    // we have room.1 ~ room.3 triggering home/search/people so we have to account for that with indexing here
+    index = index - 4;
     index = arrayBoundWrap(index, this.minibarCollection.length);
     var model = this.minibarCollection.at(index);
     model.set('focus', true);
@@ -119,9 +122,10 @@ var KeyboardController = Marionette.ItemView.extend({
     this.searchFocusModel.set('focus', false);
     if(this.isMinibarInFocus()) {
       var activeMinibarItem = this.queryAttrOnMinibar('focus', true);
-      index = this.minibarCollection.indexOf(activeMinibarItem);
+      var collection = this.getFlatMinibarCollection();
+      index = collection.indexOf(activeMinibarItem);
       //If the last item in the minibar collection has focus
-      if(index === (this.minibarCollection.length - 1)) { return this.focusFirstRoomItem(); }
+      if(index === (collection.length - 1)) { return this.focusFirstRoomItem(); }
       return this.moveMinibarFocus(1);
     }
     var activeRoomItem = this.queryAttrOnRoomCollections('focus', true);
@@ -137,7 +141,8 @@ var KeyboardController = Marionette.ItemView.extend({
     this.searchFocusModel.set('focus', false);
     if(this.isMinibarInFocus()) {
       var focusedMinibarItem = this.getFocusedMinibarItem();
-      index = this.minibarCollection.indexOf(focusedMinibarItem);
+      var collection = this.getFlatMinibarCollection();
+      index = collection.indexOf(focusedMinibarItem);
       if(index === 0) { return this.focusLastRoomItem(); }
       return this.moveMinibarFocus(-1);
     }
@@ -149,15 +154,16 @@ var KeyboardController = Marionette.ItemView.extend({
   },
 
   moveMinibarFocus: function (direction){
-    var focusedMinibarItem = this.minibarCollection.findWhere({ focus: true });
+    var focusedMinibarItem = this.queryAttrOnMinibar('focus', true);
     this.blurAllItems();
 
     //get next index
-    var index = this.minibarCollection.indexOf(focusedMinibarItem);
-    index = arrayBoundWrap(index + direction, this.minibarCollection.length);
+    var collection = this.getFlatMinibarCollection();
+    var index = collection.indexOf(focusedMinibarItem);
+    index = arrayBoundWrap(index + direction, collection.length);
 
     //focus next minibar element
-    var activeMinibarItem = this.minibarCollection.at(index);
+    var activeMinibarItem = collection[index];
     activeMinibarItem.set('focus', true);
 
     //change the menu state
@@ -252,7 +258,11 @@ var KeyboardController = Marionette.ItemView.extend({
 
   queryAttrOnMinibar: function (attr, val){
     var q = {}; q[attr] = val;
-    return this.minibarCollection.findWhere(q);
+    return  (this.minibarHomeModel.get(attr) === val) && this.minibarHomeModel ||
+      (this.minibarSearchModel.get(attr) === val) && this.minibarSearchModel ||
+      (this.minibarPeopleModel.get(attr) === val) && this.minibarPeopleModel ||
+      this.minibarCollection.findWhere(q) ||
+      (this.minibarCloseModel.get(attr) === val) && this.minibarCloseModel;
   },
 
   getFlatRoomCollection: function (){
@@ -281,6 +291,12 @@ var KeyboardController = Marionette.ItemView.extend({
     return rooms;
   },
 
+  getFlatMinibarCollection: function (){
+    return [ this.minibarHomeModel, this.minibarSearchModel, this.minibarPeopleModel ]
+    .concat(this.minibarCollection.models)
+    .concat([ this.minibarCloseModel]);
+  },
+
   setDebouncedState: _.debounce(function (model){
     var type = model.get('type');
     if(type !== 'org') { return this.model.set('state', type); }
@@ -289,11 +305,8 @@ var KeyboardController = Marionette.ItemView.extend({
 
   blurAllItems: function (){
     function clearFocus(model){ model.set('focus', false); }
-    this.minibarCollection.where({ focus: true }).forEach(clearFocus);
-    this.favouriteCollection.where({ focus: true }).forEach(clearFocus);
-    this.primaryCollection.where({ focus: true }).forEach(clearFocus);
-    this.secondaryCollection.where({ focus: true }).forEach(clearFocus);
-    this.tertiaryCollection.where({ focus: true }).forEach(clearFocus);
+    this.getFlatRoomCollection().forEach(clearFocus);
+    this.getFlatMinibarCollection().forEach(clearFocus);
   },
 
 });
