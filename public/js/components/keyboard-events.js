@@ -128,14 +128,8 @@ module.exports = (function() {
       }],
     'right': [{ name: 'room.next', scope: 'other' }],
     'left': [{ name: 'room.prev', scope: 'other' }],
-    'tab': [{
-      name: 'maininput.tab.next',
-      scope: ['input.chat', 'input.chat.edit', 'input.search']
-      }],
-    '⇧+tab': [{
-      name: 'maininput.tab.prev',
-      scope: ['input.chat', 'input.chat.edit', 'input.search']
-      }],
+    'tab': [{ name: 'room.tab' }],
+    '⇧+tab': [{ name: 'room.prev.tab'}],
     'pageup': 'pageUp',
     'pagedown': 'pageDown',
     'q, r': {
