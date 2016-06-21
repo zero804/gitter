@@ -46,7 +46,7 @@ module.exports = Marionette.LayoutView.extend({
 
   initPeople: function (optionsForRegion){
     var peopleView = new PeopleView(optionsForRegion({
-      roomCollection: this.roomCollection,
+      model: this.peopleModel,
     }));
 
     //We have to manually bind child events because of the Isomorphic Behaviour
@@ -58,7 +58,6 @@ module.exports = Marionette.LayoutView.extend({
     var collectionView = new CollectionView(optionsForRegion({
       collection: this.collection,
       model: this.model,
-      roomCollection: this.roomCollection,
       keyboardControllerView: this.keyboardControllerView,
     }));
 
@@ -86,6 +85,7 @@ module.exports = Marionette.LayoutView.extend({
     this.model = attrs.model;
     this.homeModel = this.model.minibarHomeModel;
     this.searchModel = this.model.minibarSearchModel;
+    this.peopleModel = this.model.minibarPeopleModel;
     this.roomCollection = attrs.roomCollection;
     this.keyboardControllerView = attrs.keyboardControllerView;
   },
