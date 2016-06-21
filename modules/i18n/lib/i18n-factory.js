@@ -5,9 +5,8 @@ var config = env.config;
 var I18n = require('i18n-2');
 var path = require('path');
 var fs = require('fs');
+var translations = require('@gitterhq/translations');
 
-var localesDir = path.join(__dirname, '../../../node_modules/@gitterhq/translations');
-var homepageLocalesDir = path.join(localesDir, 'homepage');
 var devMode = config.runtimeEnvironment === 'dev';
 
 function getLocales(localeDir) {
@@ -26,22 +25,25 @@ function getLocales(localeDir) {
     }));
 }
 
-var locales = getLocales(localesDir);
-var homepageLocales = getLocales(homepageLocalesDir);
+var messagesPath = translations.getMessagesPath();
+var messageLocales = getLocales(messagesPath);
+
+var homepagePath = translations.getHomePagePath();
+var homepageLocales = getLocales(homepagePath);
 
 module.exports = {
   get: function(req) {
     return new I18n({
-      locales: locales,
+      locales: messageLocales,
       defaultLocale: 'en',
       devMode: devMode,
-      directory: localesDir,
+      directory: messagesPath,
       request: req
     });
   },
 
   getLocales: function() {
-    return locales;
+    return messageLocales;
   },
 
   getHomePage: function(req) {
@@ -49,7 +51,7 @@ module.exports = {
       locales: homepageLocales,
       defaultLocale: 'en',
       devMode: devMode,
-      directory: homepageLocalesDir,
+      directory: homepagePath,
       request: req
     });
   }
