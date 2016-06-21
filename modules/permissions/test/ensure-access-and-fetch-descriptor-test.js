@@ -80,7 +80,7 @@ describe('ensure-access-and-fetch-descriptor #slow', function() {
   });
 
   it('should return a descriptor for a github repo if the user has access', function() {
-    var linkPath = fixtureLoader.GITTER_INTEGRATION_USERNAME + '/' + fixtureLoader.GITTER_INTEGRATION_REPO;
+    var linkPath = fixtureLoader.GITTER_INTEGRATION_REPO_FULL;
 
     return ensureAccessAndFetchDescriptor(fixture.user1, {
         type: 'GH_REPO',
@@ -124,7 +124,7 @@ describe('ensure-access-and-fetch-descriptor #slow', function() {
   it('should throw an error if the returned github type does not match as expected', function() {
     return ensureAccessAndFetchDescriptor(fixture.user1, {
         type: 'GH_ORG',
-        linkPath: fixtureLoader.GITTER_INTEGRATION_USERNAME + '/' + fixtureLoader.GITTER_INTEGRATION_REPO,
+        linkPath: fixtureLoader.GITTER_INTEGRATION_REPO_FULL,
         security: 'INHERITED'
       })
       .then(function() {

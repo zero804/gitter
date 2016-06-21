@@ -182,6 +182,7 @@ function getOwnerFromRepoFullName(repoName) {
  * given uri.
  */
 function ensureGroupForGitHubRoom(user, githubType, uri) {
+  debug('ensureGroupForGitHubRoom: type=%s uri=%s', githubType, uri);
   var options;
   switch (githubType) {
     case 'REPO':
