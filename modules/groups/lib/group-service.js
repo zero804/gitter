@@ -10,7 +10,7 @@ var StatusError = require('statuserror');
 var legacyPolicyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var validateUri = require('gitter-web-github').GitHubUriValidator;
-var debug = require('debug')('gitter:groups:group-service');
+var debug = require('debug')('gitter:app:groups:group-service');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var securityDescriptorGenerator = require('gitter-web-permissions/lib/security-descriptor-generator');
 
@@ -126,8 +126,8 @@ function canAdminPotentialGitHubGroup(user, githubInfo, obtainAccessFromGitHubRe
 /**
  * @private
  */
-function canUserAdminGroup(user, group) {
-  return policyFactory.createPolicyForGroupId(user, group._id)
+function canUserAdminGroup(user, group, obtainAccessFromGitHubRepo) {
+  return policyFactory.createPolicyForGroupIdWithRepoFallback(user, group._id, obtainAccessFromGitHubRepo)
     .then(function(policy) {
       return policy.canAdmin();
     });
@@ -141,15 +141,18 @@ function canUserAdminGroup(user, group) {
 function ensureGroupForGitHubRoomCreation(user, options) {
   var uri = options.uri;
   var name = options.name || uri;
+  var obtainAccessFromGitHubRepo = options.obtainAccessFromGitHubRepo;
+
+  debug('ensureGroupForGitHubRoomCreation: name=%s uri=%s', name, uri)
   assert(user, 'user required');
   assert(uri, 'name required');
 
   return findByUri(uri)
     .then(function(existingGroup) {
-      debug('Existing group found');
 
       if (existingGroup) {
-        return canUserAdminGroup(user, existingGroup)
+        debug('Existing group found');
+        return canUserAdminGroup(user, existingGroup, obtainAccessFromGitHubRepo)
           .then(function(adminAccess) {
             debug('Has admin access? %s', adminAccess);
 
@@ -158,11 +161,11 @@ function ensureGroupForGitHubRoomCreation(user, options) {
           });
       }
 
-      debug('No existing group. Will create');
+      debug('No existing group. Will create. obtainAccessFromGitHubRepo=%s', obtainAccessFromGitHubRepo);
       return createGroup(user, {
         uri: uri,
         name: name,
-        obtainAccessFromGitHubRepo: options.obtainAccessFromGitHubRepo
+        obtainAccessFromGitHubRepo: obtainAccessFromGitHubRepo
       });
     });
 }
