@@ -22,7 +22,7 @@ module.exports = Backbone.Model.extend({
     this.determineActiveState(this.roomMenuModel, this.roomMenuModel.get('state'));
   },
 
-  determineActiveState: function(model, val) {
+  determineActiveState: function(model) {
     var state = this.roomMenuModel.get('state');
     this.set('state', state);
     switch (state) {

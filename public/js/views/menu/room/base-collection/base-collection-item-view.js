@@ -29,11 +29,9 @@ var BaseCollectionItemView = BaseItemView.extend({
     title:           '#room-item-title',
   },
 
-  constructor: function(attrs) {
+  initialize: function(attrs) {
     this.roomMenuModel = attrs.roomMenuModel;
     this.index = attrs.index;
-
-    BaseItemView.prototype.constructor.apply(this, arguments);
   },
 
   attributes: function() {
