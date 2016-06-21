@@ -1,13 +1,14 @@
 "use strict";
 
 var Marionette = require('backbone.marionette');
-var ItemView = require('./minibar-item-view');
 var ItemModel = require('./minibar-item-model');
 var HomeView = require('./home-view/home-view');
 var SearchView = require('./search-view/search-view');
 var PeopleView = require('./people-view/people-view');
 var CloseView = require('./close-view/close-view');
 var CollectionView = require('./minibar-collection-view');
+var CommunityCreateItemView = require('./minibar-community-create-item-view');
+var domIndexById = require('../../../../utils/dom-index-by-id');
 
 require('views/behaviors/isomorphic');
 
@@ -76,8 +77,8 @@ module.exports = Marionette.LayoutView.extend({
     return closeView;
   },
 
-  childEvents: {
-    'minibar-item:activated': 'onItemActivated',
+  modelEvents: {
+    'change:state change:selectedOrgName': 'updateMinibarActiveState'
   },
 
   initialize: function(attrs) {
@@ -110,11 +111,10 @@ module.exports = Marionette.LayoutView.extend({
       state: state,
       profilemenuopenstate: false,
     });
-
   },
 
-  onCloseClicked: function (){
 
+  onCloseClicked: function() {
     var newVal = !this.model.get('roomMenuIsPinned');
     var ANIMATION_TIME = 150;
 
@@ -146,6 +146,32 @@ module.exports = Marionette.LayoutView.extend({
       }.bind(this), ANIMATION_TIME);
     }
 
+  },
+
+  updateMinibarActiveState: function(currentState, selectedOrgName) {
+    // Reset the currently active model
+    var activeModels = this.collection.where({ active: true });
+    if (activeModels) {
+      activeModels.forEach(function(model) {
+        model.set('active', false);
+      });
+    }
+
+    // Activate the new model
+    var nextActiveModel = (currentState !== 'org') ?
+      this.collection.findWhere({ type: currentState }) :
+      this.collection.findWhere({ name: selectedOrgName });
+
+    if (nextActiveModel) {
+      nextActiveModel.set('active', true);
+    }
+  },
+
+  clearFocus: function (){
+    var elementsInFocus = this.collection.where({ focus: true });
+    elementsInFocus.forEach(function(model){
+      model.set('focus', false);
+    });
   },
 
 });
