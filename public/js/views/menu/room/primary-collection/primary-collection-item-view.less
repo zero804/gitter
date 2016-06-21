@@ -26,6 +26,10 @@ JP 11/2/16
       background: rgba(255, 255, 255, .2);
     }
   }
+
+  &.focus .room-item__container {
+    .room-item-active();
+  }
 }
 
 .room-item__container {
@@ -43,7 +47,8 @@ JP 11/2/16
 
   &:hover,
   &.active,
-  &.focus,
+  .room-item.focus &,
+  .room-item:focus &
   &:focus {
     .room-item-active();
     outline: none;

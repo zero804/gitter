@@ -170,6 +170,8 @@ function migrate(batch, enc, callback) {
             name: info.owner.uri,
             uri: info.owner.uri,
             lcUri: info.owner.lcUri,
+            type: info.type,
+            githubId: info.owner.githubId, // could be null
             sd: securityDescriptor
           }
         })
