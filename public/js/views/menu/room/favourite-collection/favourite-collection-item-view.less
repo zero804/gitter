@@ -34,6 +34,10 @@
     opacity:    .2;
     max-height: @menu-item-height;
   }
+
+  &.focus .room-item__container {
+    .room-item-active();
+  }
 }
 
 .room-item--favourite-one2one {
