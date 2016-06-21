@@ -67,7 +67,10 @@ function performUpdateToUserRoom(req) {
 
       var strategy = new restSerializer.TroupeIdStrategy({
         currentUserId: userId,
-        includeProviders: true
+        // include all these because it will replace the troupe in the context
+        includeTags: true,
+        includeProviders: true,
+        includeGroups: true
       });
 
       return restSerializer.serializeObject(req.params.userTroupeId, strategy);
@@ -115,7 +118,8 @@ module.exports = {
           currentUserId: req.user._id,
           currentUser: req.user,
           includePermissions: true,
-          includeProviders: true
+          includeProviders: true,
+          includeGroups: true
         });
 
         return restSerializer.serializeObject(troupeId, strategy);
