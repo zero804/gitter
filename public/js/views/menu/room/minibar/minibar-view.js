@@ -77,7 +77,7 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   modelEvents: {
-    'change:state change:selectedOrgName': 'updateMinibarActiveState'
+    'change:state change:selectedOrgName': 'onMenuChangeState'
   },
 
   initialize: function(attrs) {
@@ -88,6 +88,7 @@ module.exports = Marionette.LayoutView.extend({
     this.peopleModel = this.model.minibarPeopleModel;
     this.roomCollection = attrs.roomCollection;
     this.keyboardControllerView = attrs.keyboardControllerView;
+    this.listenTo(this.bus, 'navigation', this.clearFocus, this);
   },
 
   onHomeActivate: function (){
@@ -150,22 +151,11 @@ module.exports = Marionette.LayoutView.extend({
 
   },
 
-  updateMinibarActiveState: function(currentState, selectedOrgName) {
-    // Reset the currently active model
-    var activeModels = this.collection.where({ active: true });
-    if (activeModels) {
-      activeModels.forEach(function(model) {
-        model.set('active', false);
-      });
-    }
-
-    // Activate the new model
-    var nextActiveModel = (currentState !== 'org') ?
-      this.collection.findWhere({ type: currentState }) :
-      this.collection.findWhere({ name: selectedOrgName });
-
-    if (nextActiveModel) {
-      nextActiveModel.set('active', true);
+  onMenuChangeState: function (){
+    var state = this.model.get('state');
+    switch(state) {
+      case 'all':
+        return this.homeModel.set({ active: true, focus: true });
     }
   },
 
