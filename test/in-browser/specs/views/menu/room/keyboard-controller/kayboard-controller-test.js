@@ -308,6 +308,13 @@ describe('KeyboardControllerView', function(){
       assert(model.minibarCollection.at(0).get('focus'));
     });
 
+    it('should focus the first room-item when search is in focus', function(){
+      view.blurAllItems();
+      model.searchFocusModel.set('focus', true);
+      appEvents.trigger('keyboard.room.tab');
+      assert(model.favouriteCollection.at(0).get('focus'));
+    });
+
     it('should move minibar focus backwards when shift-tab is pressed', function(){
       model.minibarCollection.at(1).set('focus', true);
       appEvents.trigger('keyboard.room.prev.tab');
