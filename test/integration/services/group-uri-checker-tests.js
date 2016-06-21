@@ -10,8 +10,7 @@ var groupUriChecker = testRequire('./services/group-uri-checker');
 describe('group-uri-checker #slow', function() {
   var fixture = fixtureLoader.setup({
     user1: {
-      githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
-      username: fixtureLoader.GITTER_INTEGRATION_USERNAME
+      githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN
     },
     group1: {},
     troupe1: {}
