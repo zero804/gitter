@@ -12,9 +12,6 @@ module.exports = (function() {
   // Attach keyboard events listeners as specified by the keymaster library
   // They will we emitted to appEvents with the `keyboard.` prefix
   // Use views/keyboard-events-mixin to attach handlers for these events to Backbone components
-
-  var platform = platformDetect();
-  // Set modifier keys for the OS
   var cmdKey = platformKeys.cmd;
   var gitterKey = platformKeys.gitter;
 
