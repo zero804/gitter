@@ -126,8 +126,8 @@ function canAdminPotentialGitHubGroup(user, githubInfo, obtainAccessFromGitHubRe
 /**
  * @private
  */
-function canUserAdminGroup(user, group) {
-  return policyFactory.createPolicyForGroupId(user, group._id)
+function canUserAdminGroup(user, group, obtainAccessFromGitHubRepo) {
+  return policyFactory.createPolicyForGroupIdWithRepoFallback(user, group._id, obtainAccessFromGitHubRepo)
     .then(function(policy) {
       return policy.canAdmin();
     });
@@ -141,6 +141,7 @@ function canUserAdminGroup(user, group) {
 function ensureGroupForGitHubRoomCreation(user, options) {
   var uri = options.uri;
   var name = options.name || uri;
+  var obtainAccessFromGitHubRepo = options.obtainAccessFromGitHubRepo;
   assert(user, 'user required');
   assert(uri, 'name required');
 
@@ -149,7 +150,7 @@ function ensureGroupForGitHubRoomCreation(user, options) {
       debug('Existing group found');
 
       if (existingGroup) {
-        return canUserAdminGroup(user, existingGroup)
+        return canUserAdminGroup(user, existingGroup, obtainAccessFromGitHubRepo)
           .then(function(adminAccess) {
             debug('Has admin access? %s', adminAccess);
 
@@ -162,7 +163,7 @@ function ensureGroupForGitHubRoomCreation(user, options) {
       return createGroup(user, {
         uri: uri,
         name: name,
-        obtainAccessFromGitHubRepo: options.obtainAccessFromGitHubRepo
+        obtainAccessFromGitHubRepo: obtainAccessFromGitHubRepo
       });
     });
 }
