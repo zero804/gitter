@@ -67,7 +67,7 @@ module.exports = Marionette.LayoutView.extend({
 
   initClose: function (optionsForRegion){
     var closeView = new CloseView(optionsForRegion({
-      model: new ItemModel({ name: 'close', type: 'close' }),
+      model: this.closeModel,
       roomModel: this.model
     }));
 
@@ -86,7 +86,7 @@ module.exports = Marionette.LayoutView.extend({
     this.homeModel = this.model.minibarHomeModel;
     this.searchModel = this.model.minibarSearchModel;
     this.peopleModel = this.model.minibarPeopleModel;
-    this.roomCollection = attrs.roomCollection;
+    this.closeModel = this.model.minibarCloseModel;
     this.keyboardControllerView = attrs.keyboardControllerView;
     this.listenTo(this.bus, 'navigation', this.clearFocus, this);
   },
@@ -112,7 +112,7 @@ module.exports = Marionette.LayoutView.extend({
     this.model.set({
       panelopenstate: true,
       state: state,
-      profilemenuopenstate: false,
+      profileMenuOpenState: false,
     });
   },
 
@@ -152,18 +152,42 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   onMenuChangeState: function (){
+    this.clearCurrentActiveElement();
     var state = this.model.get('state');
     switch(state) {
       case 'all':
         return this.homeModel.set({ active: true, focus: true });
+      case 'search':
+        return this.searchModel.set({ active: true, focus: true });
+      case 'people':
+        return this.peopleModel.set({ active: true, focus: true });
+      case 'org':
+        var orgName = this.model.get('selectedOrgName');
+        var model = this.collection.findWhere({ name: orgName });
+        return model.set({ active: true, focus: true });
     }
   },
 
+  clearCurrentActiveElement: function (){
+    this.clearFocus();
+    var activeModel = this.getActiveItem();
+    if(activeModel) { activeModel.set('active', false); }
+  },
+
+  getActiveItem: function (){
+    return this.homeModel.get('active') && this.homeModel ||
+      this.searchModel.get('active') && this.searchModel ||
+      this.peopleModel.get('active') && this.peopleModel ||
+      this.collection.findWhere({ active: true }) ||
+      this.closeModel.get('active') && this.closeModel;
+  },
+
   clearFocus: function (){
-    var elementsInFocus = this.collection.where({ focus: true });
-    elementsInFocus.forEach(function(model){
-      model.set('focus', false);
-    });
+    if(this.homeModel.get('focus')) { this.homeModel.set('focus', false); }
+    if(this.searchModel.get('focus')) { this.searchModel.set('focus', false); }
+    if(this.peopleModel.get('focus')) { this.peopleModel.set('focus', false); }
+    if(this.closeModel.get('focus')) { this.closeModel.set('focus', false); }
+    this.collection.where({ focus: true }).forEach(function(model){ model.set('focus', false); });
   },
 
 });

@@ -102,6 +102,7 @@ module.exports = Backbone.Model.extend({
     this.minibarHomeModel = new MinibarItemModel({ name: 'all', type: 'all' });
     this.minibarSearchModel = new MinibarItemModel({ name: 'search', type: 'search' });
     this.minibarPeopleModel = new MinibarPeopleModel(null, { roomCollection: this._roomCollection });
+    this.minibarCloseModel = new MinibarItemModel({ name: 'close', type: 'close' });
     this.minibarCollection = new MinibarCollection(orgsSnapshot, { roomCollection: this._roomCollection });
 
     var roomModels = this._roomCollection.filter(defaultCollectionFilter);
