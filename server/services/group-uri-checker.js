@@ -7,6 +7,7 @@ var userService = require('./user-service');
 var troupeService = require('./troupe-service');
 var groupService = require('gitter-web-groups/lib/group-service');
 var validateGitHubUri = require('gitter-web-github').GitHubUriValidator;
+var validateGroupUri = require('gitter-web-validators/lib/validate-group-uri');
 
 
 function checkLocalUri(uri) {
@@ -32,10 +33,8 @@ function checkGitHubUri(user, uri) {
 
 function checkIfGroupUriExists(user, uri) {
   return Promise.try(function() {
-      if (!uri) throw new StatusError(400);
-
-      // group uris only, not rooms too
-      if (uri.indexOf('/') !== -1) throw new StatusError(400);
+      // check length, chars, reserved namespaces, slashes..
+      if (!validateGroupUri(uri)) throw new StatusError(400);
 
       return Promise.join(
         checkLocalUri(uri),
