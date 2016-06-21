@@ -58,9 +58,9 @@ var SearchInputView = Marionette.ItemView.extend({
 
   onRender: function (){
     this.onModelChangeState(this.model, this.model.get('state'));
-    //We pass the third param to specify that we have just rendered (load the page)
-    //this will delay the focus action
-    this.onFocusUpdate(this.focusModel, this.focusModel.get('focus'), true);
+    setTimeout(function(){
+      this.onFocusUpdate(this.focusModel, this.focusModel.get('focus'));
+    }.bind(this), 1000);
   },
 
   onModelChangeSearchTerm: function(model, val) { //jshint unused: true
@@ -77,20 +77,7 @@ var SearchInputView = Marionette.ItemView.extend({
     this.ui.input.val(val);
   },
 
-  onFocusUpdate: function (model, val, shouldDelay){
-    //when we load the page the chat input want to steal focus
-    //so we have to have this wait here to focus after that has happened ... lame
-    if(shouldDelay === true) {
-      //The only time this should fire like this (with delay) is right after page load
-      setTimeout(function(){
-        if(!!val) { return this.ui.input.focus(); }
-        this.ui.input.blur();
-      }.bind(this), 1000);
-      return;
-    }
-
-    //we have to RAF here to get around the browser auto-magically managing the document focus
-    //and assigning it to the just clicked button, ugh.
+  onFocusUpdate: function (model, val){
     RAF(function(){
       if(val) { return this.ui.input.focus();}
       this.ui.input.blur();
