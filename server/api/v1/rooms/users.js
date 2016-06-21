@@ -10,6 +10,9 @@ var loadTroupeFromParam = require('./load-troupe-param');
 var RoomWithPolicyService = require('../../../services/room-with-policy-service');
 var Promise = require('bluebird');
 
+var SEARCH_EXPIRES_SECONDS = 10;
+var SEARCH_EXPIRES_MILLISECONDS = SEARCH_EXPIRES_SECONDS * 1000;
+
 function getTroupeUserFromId(troupeId, userId) {
   return troupeService.findByIdLeanWithMembership(troupeId, userId)
     .spread(function(troupe, isMember) {
@@ -35,7 +38,7 @@ function getTroupeUserFromUsername(troupeId, username) {
 module.exports = {
   id: 'resourceTroupeUser',
 
-  index: function(req) {
+  index: function(req, res) {
     var options = {
       lean: !!req.query.lean,
       skip: parseInt(req.query.skip, 10) || undefined,
@@ -43,7 +46,14 @@ module.exports = {
       searchTerm: req.query.q
     };
 
-    return restful.serializeUsersForTroupe(req.params.troupeId, req.user && req.user.id, options);
+    return restful.serializeUsersForTroupe(req.params.troupeId, req.user && req.user.id, options)
+      .then(function(result) {
+        if (typeof req.query.q === 'string') {
+          res.setHeader('Cache-Control', 'public, max-age=' + SEARCH_EXPIRES_SECONDS);
+          res.setHeader('Expires', new Date(Date.now() + SEARCH_EXPIRES_MILLISECONDS).toUTCString());
+        }
+        return result;
+      });
   },
 
   create: function(req) {
