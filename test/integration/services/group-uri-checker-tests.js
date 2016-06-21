@@ -1,5 +1,6 @@
 'use strict';
 
+var StatusError = require('statuserror');
 var testRequire = require('../test-require');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assert = require("assert");
@@ -14,6 +15,16 @@ describe('group-uri-checker #slow', function() {
     },
     group1: {},
     troupe1: {}
+  });
+
+  it('should throw an error if you pass in an invalid group uri', function() {
+    return groupUriChecker(fixture.user1, 'about')
+      .then(function() {
+        assert.ok(false, 'Error expected');
+      })
+      .catch(StatusError, function(err) {
+        assert.strictEqual(err.status, 400);
+      });
   });
 
   it('should resolve to true if a user with that username exists', function() {
