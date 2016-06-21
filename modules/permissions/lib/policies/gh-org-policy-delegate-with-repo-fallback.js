@@ -6,6 +6,7 @@ var LegacyGitHubPolicyEvaluator = require('./legacy-github-policy-evaluator');
 var debug = require('debug')('gitter:app:permissions:gh-policy-delegate-w-repo-fallback');
 
 function GhOrgPolicyDelegateWithRepoFallback(userId, userLoader, securityDescriptor, fallbackRepo) {
+  this._userId = userId;
   this._orgPolicy = new GhOrgPolicyDelegate(userId, userLoader, securityDescriptor);
   this._userLoader = userLoader;
   this._fallbackRepo = fallbackRepo;
@@ -27,7 +28,7 @@ GhOrgPolicyDelegateWithRepoFallback.prototype = {
         // Fallback to the repo and check that the user has
         // admin rights on it
         debug('Access denied by ORG delegate, attempting to use repo access');
-        return this.__getFallbackPolicy()
+        return this._getFallbackPolicy()
           .then(function(policy) {
             if (!policy) return false;
             return policy.canAdmin();
