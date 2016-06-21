@@ -9,6 +9,8 @@ module.exports = ItemView.extend({
   constructor: function (attrs, options){
     var model = (this.model || attrs.model);
     this.listenTo(model, 'change:focus', this.onModelChangeFocus, this);
+    //Manually listen to the render event to guard against onRender being overridden
+    this.listenTo(this, 'render', this.afterRender, this);
     _super.constructor.apply(this, arguments);
   },
 
@@ -26,12 +28,9 @@ module.exports = ItemView.extend({
     this.activeElement.blur();
   },
 
-  render: function (){
-    _super.render.apply(this, arguments);
-    //I don't want to provide a onRender as this is easy to forget to override
-    //adding this assignment here is a bit dodge but gets the job done in the safest way possible
+  afterRender: function (){
     this.activeElement = this.el.querySelector('a') || this.el.querySelector('button');
     if(this.model.get('focus')) { this.el.classList.add('focus'); }
-  },
+  }
 
 });
