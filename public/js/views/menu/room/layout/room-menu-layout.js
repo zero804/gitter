@@ -1,14 +1,11 @@
 'use strict';
 
 var _ = require('underscore');
-var $ = require('jquery');
 var Marionette = require('backbone.marionette');
 var fastdom = require('fastdom');
 var context = require('utils/context');
 var DNDCtrl = require('components/menu/room/dnd-controller');
-var localStore = require('components/local-store');
 var toggleClass = require('utils/toggle-class');
-var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 
 var RoomMenuModel = require('../../../../models/room-menu-model');
 var MiniBarView = require('../minibar/minibar-view');
