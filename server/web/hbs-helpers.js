@@ -4,7 +4,7 @@ var _ = require('underscore');
 var safeJson = require('../utils/safe-json');
 var util = require('util');
 var clientEnv = require('gitter-client-env');
-var cdn = require('./cdn');
+var cdn = require('gitter-web-cdn');
 
 exports.cdn = function(url, parameters) {
   return cdn(url, parameters ? parameters.hash:null);

@@ -45,6 +45,7 @@
     "gitter-web-appevents": "file:modules/appevents",
     "gitter-web-backend-muxer": "file:modules/backend-muxer",
     "gitter-web-cache-wrapper": "file:modules/cache-wrapper",
+    "gitter-web-cdn": "file:modules/cdn",
     "gitter-web-env": "file:modules/env",
     "gitter-web-github": "file:modules/github",
     "gitter-web-github-backend": "file:modules/github-backend",
