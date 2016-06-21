@@ -9,7 +9,6 @@ var DNDCtrl = require('components/menu/room/dnd-controller');
 var localStore = require('components/local-store');
 var toggleClass = require('utils/toggle-class');
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
-var KeyboardEventMixin = require('views/keyboard-events-mixin');
 
 var RoomMenuModel = require('../../../../models/room-menu-model');
 var MiniBarView = require('../minibar/minibar-view');
