@@ -23,6 +23,8 @@ var KeyboardController = Marionette.ItemView.extend({
     'room.up': 'onUpKeyPressed',
     'room.next': 'onRightKeyPressed',
     'room.prev': 'onLeftKeyPressed',
+    'room.tab': 'onTabKeyPressed',
+    'room.prev.tab': 'onTabShiftKeyPressed',
   },
 
   initialize: function(attrs) {
@@ -94,15 +96,52 @@ var KeyboardController = Marionette.ItemView.extend({
   },
 
   onRightKeyPressed: function (){
+    this.searchFocusModel.set('focus', false);
     if(this.isMinibarInFocus()) { return this.focusActiveRoomItem(); }
     this.focusActiveMinibarItem();
   },
 
   onLeftKeyPressed: function (){
+    this.searchFocusModel.set('focus', false);
     if(!this.isMinibarInFocus()) {
       if(this.isRoomListInFocus()) { return this.focusActiveMinibarItem(); }
       return this.focusActiveRoomItem();
     }
+  },
+
+  onTabKeyPressed: function (e){
+    var index;
+    if(e) { e.preventDefault(); }
+    this.searchFocusModel.set('focus', false);
+    if(this.isMinibarInFocus()) {
+      var activeMinibarItem = this.queryAttrOnMinibar('focus', true);
+      index = this.minibarCollection.indexOf(activeMinibarItem);
+      //If the last item in the minibar collection has focus
+      if(index === (this.minibarCollection.length - 1)) { return this.focusFirstRoomItem(); }
+      return this.moveMinibarFocus(1);
+    }
+    var activeRoomItem = this.queryAttrOnRoomCollections('focus', true);
+    var roomList = this.getFlatRoomCollection();
+    index = roomList.indexOf(activeRoomItem);
+    if(index === (roomList.length - 1)) { return this.focusFirstMinibarItem(); }
+    return this.moveRoomCollectionFocus(1);
+  },
+
+  onTabShiftKeyPressed: function (e){
+    var index;
+    if(e) { e.preventDefault(); }
+    this.searchFocusModel.set('focus', false);
+    if(this.isMinibarInFocus()) {
+      var focusedMinibarItem = this.getFocusedMinibarItem();
+      index = this.minibarCollection.indexOf(focusedMinibarItem);
+      if(index === 0) { return this.focusLastRoomItem(); }
+      return this.moveMinibarFocus(-1);
+    }
+    var focusedRoomItem = this.getFocusedRoomItem();
+    var roomList = this.getFlatRoomCollection();
+    index = roomList.indexOf(focusedRoomItem);
+    if(index === 0) { return this.focusLastMinibarItem(); }
+    return this.moveRoomCollectionFocus(-1);
   },
 
   moveMinibarFocus: function (direction){
@@ -150,16 +189,45 @@ var KeyboardController = Marionette.ItemView.extend({
     activeMinibarItem.set('focus', true);
   },
 
+  focusFirstRoomItem: function (){
+    this.blurAllItems();
+    var roomList = this.getFlatRoomCollection();
+    roomList[0].set('focus', true);
+  },
+
+  focusLastRoomItem: function (){
+    this.blurAllItems();
+    var roomList = this.getFlatRoomCollection();
+    var index = roomList.length - 1;
+    roomList[index].set('focus', true);
+  },
+
+  focusLastMinibarItem: function (){
+    this.blurAllItems();
+    var index = (this.minibarCollection.length - 1);
+    var lastMinibarItem = this.minibarCollection.at(index);
+    lastMinibarItem.set('focus', true);
+  },
+
+  focusFirstMinibarItem: function (){
+    this.blurAllItems();
+    this.minibarCollection.at(0).set('focus', true);
+  },
+
   isMinibarInFocus: function (){
-    return !!this.queryAttrOnMinibar('focus', true);
+    return !!this.getFocusedMinibarItem();
   },
 
   isRoomListInFocus: function (){
-    return !!this.queryAttrOnRoomCollections('focus', true);
+    return !!this.getFocusedRoomItem();
   },
 
   getActiveMinibarItem: function (){
     return this.queryAttrOnMinibar('active', true);
+  },
+
+  getFocusedMinibarItem: function (){
+    return this.queryAttrOnMinibar('focus', true);
   },
 
   getActiveRoomItem: function (){

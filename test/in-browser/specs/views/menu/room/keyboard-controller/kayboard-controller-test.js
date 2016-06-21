@@ -279,6 +279,65 @@ describe('KeyboardControllerView', function(){
 
   });
 
+  describe('tab key movement', function(){
+    it('should move minibar focus when tab is pressed', function(){
+      model.minibarCollection.at(0).set('focus', true);
+      appEvents.trigger('keyboard.room.tab');
+      assert(model.minibarCollection.at(1).get('focus'));
+    });
+
+    it('should move room list focus when tab is pressed', function(){
+      view.blurAllItems();
+      model.favouriteCollection.at(1).set('focus', true);
+      appEvents.trigger('keyboard.room.tab');
+      assert(model.primaryCollection.at(0).get('focus'));
+    });
+
+    it('should move focus to the room list if the last minibar item is in focus when tab is pressed', function(){
+      var lastMinibarItem = model.minibarCollection.at(model.minibarCollection.length - 1);
+      lastMinibarItem.set('focus', true);
+      appEvents.trigger('keyboard.room.tab');
+      assert(!lastMinibarItem.get('focus'));
+      assert(model.favouriteCollection.at(0).get('focus'));
+    });
+
+    it('should focus the first minibar item if the last item in the room list is in focus when tab is pressed', function(){
+      view.blurAllItems();
+      model.tertiaryCollection.at(1).set('focus', true);
+      appEvents.trigger('keyboard.room.tab');
+      assert(model.minibarCollection.at(0).get('focus'));
+    });
+
+    it('should move minibar focus backwards when shift-tab is pressed', function(){
+      model.minibarCollection.at(1).set('focus', true);
+      appEvents.trigger('keyboard.room.prev.tab');
+      assert(model.minibarCollection.at(0).get('focus'));
+    });
+
+    it('should move room list focus backwards when shift-tab is pressed', function(){
+      view.blurAllItems();
+      model.primaryCollection.at(0).set('focus', true);
+      appEvents.trigger('keyboard.room.prev.tab');
+      assert(model.favouriteCollection.at(1).get('focus'));
+    });
+
+    it('should focus the last item in the room list if the first item in the minibar is in focus and shift-tab is pressed', function(){
+      view.blurAllItems();
+      model.minibarCollection.findWhere({ type: 'all'}).set('focus', true);
+      appEvents.trigger('keyboard.room.prev.tab');
+      assert(model.tertiaryCollection.at(1).get('focus'));
+    });
+
+    it('should focus the last item in the minibar if the first room-item is in focus and shit-tab is pressed', function(){
+      view.blurAllItems();
+      model.favouriteCollection.at(0).set('focus', true);
+      appEvents.trigger('keyboard.room.prev.tab');
+      var index = (model.minibarCollection.length - 1);
+      assert(model.minibarCollection.at(index).get('focus'));
+    });
+
+  });
+
   describe('bluring items', function(){
     it('should blur the previously selected minibar item', function(){
       appEvents.trigger('keyboard.room.1');
