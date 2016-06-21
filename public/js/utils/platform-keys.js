@@ -10,12 +10,12 @@ module.exports = (function() {
   switch(platformDetect()) {
     case 'Mac': return {
       cmd: '⌘',
-      room: 'ctrl',
+      room: '⌘',
       gitter: 'ctrl'
     };
     case 'Windows': return {
       cmd: 'ctrl',
-      room: 'ctrl',
+      room: '⇧',
       gitter: '⇧'
     };
     default: return { // Linux and other
