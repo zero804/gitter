@@ -36,7 +36,7 @@ module.exports = Marionette.LayoutView.extend({
 
   initSearch: function (optionsForRegion){
     var searchView = new SearchView(optionsForRegion({
-      model: new ItemModel({ name: 'search', type: 'search' }),
+      model: this.searchModel,
     }));
 
     //We have to manually bind child events because of the Isomorphic Behaviour
@@ -85,6 +85,7 @@ module.exports = Marionette.LayoutView.extend({
     this.bus = attrs.bus;
     this.model = attrs.model;
     this.homeModel = this.model.minibarHomeModel;
+    this.searchModel = this.model.minibarSearchModel;
     this.roomCollection = attrs.roomCollection;
     this.keyboardControllerView = attrs.keyboardControllerView;
   },
