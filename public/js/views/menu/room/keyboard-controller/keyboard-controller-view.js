@@ -122,13 +122,13 @@ var KeyboardController = Marionette.ItemView.extend({
   },
 
   moveRoomCollectionFocus: function (direction){
-    //get currently focussed OR active room element
-    var activeRoomItem = this.getFocussedRoomItem() || this.getActiveRoomItem();
-    //blur all currently focussed items
+    //get currently Focused OR active room element
+    var activeRoomItem = this.getFocusedRoomItem() || this.getActiveRoomItem();
+    //blur all currently Focused items
     this.blurAllItems();
     var roomCollection = this.getFlatRoomCollection();
     var index = roomCollection.indexOf(activeRoomItem);
-    //if no room is currently focussed just focus the first one
+    //if no room is currently Focused just focus the first one
     //this can happen, for example, if you are on home with no active room item
     //and you have just moved focus from the chat input
     index = (index === -1) ? 0 : arrayBoundWrap(index + direction, roomCollection.length);
@@ -166,7 +166,7 @@ var KeyboardController = Marionette.ItemView.extend({
     return this.queryAttrOnRoomCollections('active', true);
   },
 
-  getFocussedRoomItem: function (){
+  getFocusedRoomItem: function (){
     return this.queryAttrOnRoomCollections('focus', true);
   },
 
