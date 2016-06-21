@@ -586,6 +586,11 @@ fixtureLoader.generateGithubId = generateGithubId;
 fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN = '***REMOVED***';
 fixtureLoader.GITTER_INTEGRATION_USERNAME = 'gitter-integration-tests';
 fixtureLoader.GITTER_INTEGRATION_USER_ID = '19433197';
+
+fixtureLoader.GITTER_INTEGRATION_COLLAB_USER_SCOPE_TOKEN = '***REMOVED***';
+fixtureLoader.GITTER_INTEGRATION_COLLAB_USERNAME = 'gitter-integration-tests-collaborator';
+fixtureLoader.GITTER_INTEGRATION_COLLAB_USER_ID = '20068982';
+
 fixtureLoader.GITTER_INTEGRATION_ORG = 'gitter-integration-tests-organisation';
 fixtureLoader.GITTER_INTEGRATION_ORG_ID = '19433202';
 fixtureLoader.GITTER_INTEGRATION_REPO = 'public-repo-1';
@@ -593,5 +598,7 @@ fixtureLoader.GITTER_INTEGRATION_REPO_FULL = fixtureLoader.GITTER_INTEGRATION_US
 fixtureLoader.GITTER_INTEGRATION_REPO_ID = '59505414';
 fixtureLoader.GITTER_INTEGRATION_COMMUNITY = '_I-heart-cats-Test-LOL';
 fixtureLoader.GITTER_INTEGRATION_ROOM = 'all-about-kitty-litter';
+
+fixtureLoader.GITTER_INTEGRATION_REPO_WITH_COLLAB = 'gitter-integration-tests-organisation/gitter-integration-tests-organisation-repo-1';
 
 module.exports = fixtureLoader;
