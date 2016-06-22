@@ -6,7 +6,7 @@ var template = require('./tmpl/parentSelectView.hbs');
 var itemTemplate = require('./tmpl/parentItemView.hbs');
 var Typeahead = require('views/controls/typeahead');
 var Backbone = require('backbone');
-var cdn = require('../../utils/cdn');
+var cdn = require('gitter-web-cdn');
 
 module.exports = (function() {
 

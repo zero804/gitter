@@ -10,7 +10,7 @@ var troupeService = require('../../services/troupe-service');
 var chatService = require('../../services/chat-service');
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
-var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
+var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 
 var redis = require('../../utils/redis');
 var redisClient = redis.getClient();

@@ -5,6 +5,7 @@ var troupeModels = require('../troupes');
 var groupModels = require('../groups');
 var orgModels = require('../orgs');
 var unreadItemsClient = require('components/unread-items-frame-client');
+var unreadItemsGroupAdapter = require('components/unread-items-group-adapter');
 var appEvents = require('utils/appevents');
 var Sorted = require('backbone-sorted-collection');
 var errorHandle = require('utils/live-collection-error-handle');
@@ -13,17 +14,20 @@ var moment = require('moment');
 var _ = require('underscore');
 var FilteredCollection = require('backbone-filtered-collection');
 
-var groupsCollection;
-if(context.hasFeature('groups')) {
-  groupsCollection = new groupModels.GroupCollection([], { listen: true });
-  groupsCollection.on('error', errorHandle.bind(null, 'group-collection'));
-}
 
 var roomsSnapshot = context.getSnapshot('rooms') || [];
 var existingRooms = roomsSnapshot.map(function(data){
   return data.lastAccessTime ? _.extend(data, { lastAccessTime: moment(data.lastAccessTime) }) : data;
 });
 var troupeCollection = new troupeModels.TroupeCollection(existingRooms, { listen: true });
+
+
+var groupCollection;
+groupCollection = new groupModels.GroupCollection([], { listen: true });
+groupCollection.on('error', errorHandle.bind(null, 'group-collection'));
+
+// Adapt unread items to the groups collection
+unreadItemsGroupAdapter(groupCollection, troupeCollection);
 
 var orgsCollection = new orgModels.OrgCollection(null, { listen: true });
 orgsCollection.on('error', errorHandle.bind(null, 'org-collection'));
@@ -76,7 +80,7 @@ var collections = {
   favourites: favourites,
   recentRoomsNonFavourites: recentRoomsNonFavourites,
   orgs: orgsCollection,
-  groupsCollection: groupsCollection
+  groups: groupCollection
 };
 
 window._troupeCollections = collections;

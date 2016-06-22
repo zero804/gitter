@@ -10,10 +10,10 @@ var roomMembershipService = require('./room-membership-service');
 
 /**
  * Returns a list of users who could be lurked
- * [{ userId: ..., lastAccessTime: ..., lurk: ..., notificationSettings: ... }]
+ * [{ userId: ..., lastAccessTime: ... }]
  */
 function findRemovalCandidates(roomId, options) {
-  var minTimeInDays = (options.minTimeInDays || 14);
+  var minTimeInDays = (options.minTimeInDays || 90);
 
   return roomMembershipService.findMembersForRoom(roomId)
     .then(function(userIds) {
@@ -80,12 +80,12 @@ function autoRemoveInactiveUsers(roomId, groupId, options) {
     .then(function(candidates) {
       if (!candidates.length) return [];
 
-      var usersToLurk = candidates
+      var userIdsForRemoval = candidates
         .map(function(candidate) {
           return candidate.userId;
         });
 
-      return bulkRemoveUsersFromRoom(roomId, groupId, usersToLurk)
+      return bulkRemoveUsersFromRoom(roomId, groupId, userIdsForRemoval)
         .thenReturn(candidates);
     });
 }

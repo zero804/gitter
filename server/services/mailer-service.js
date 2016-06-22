@@ -5,7 +5,7 @@ var mailer = env.mailer;
 
 var troupeTemplate = require('../utils/troupe-template');
 var Promise = require('bluebird');
-var cdn = require('../web/cdn');
+var cdn = require('gitter-web-cdn');
 
 
 var CACHED = { };
