@@ -162,7 +162,8 @@ onready(function() {
     roomCollection: troupeCollections.troupes,
     //TODO ADD THIS TO MOBILE JP 25/1/16
     orgCollection: troupeCollections.orgs,
-    repoCollection: repoCollection
+    repoCollection: repoCollection,
+    groupsCollection: troupeCollections.groupsCollection
   });
   appLayout.render();
 

@@ -85,6 +85,9 @@ module.exports = Backbone.Model.extend({
     this.userModel = attrs.userModel;
     delete attrs.userModel;
 
+    this.groupsCollection = attrs.groupsCollection;
+    delete attrs.groupsCollection;
+
     //expose the public collection
     this.searchTerms = new RecentSearchesCollection(null);
     this.searchRoomAndPeople = new SearchRoomPeopleCollection(null, { roomMenuModel: this, roomCollection: this._roomCollection });
@@ -103,7 +106,9 @@ module.exports = Backbone.Model.extend({
     this.minibarSearchModel = new MinibarItemModel({ name: 'search', type: 'search' });
     this.minibarPeopleModel = new MinibarPeopleModel(null, { roomCollection: this._roomCollection });
     this.minibarCloseModel = new MinibarItemModel({ name: 'close', type: 'close' });
-    this.minibarCollection = new MinibarCollection(orgsSnapshot, { roomCollection: this._roomCollection });
+    this.minibarCollection = context.hasFeature('groups') ?
+      this.groupsCollection :
+      new MinibarCollection(orgsSnapshot, { roomCollection: this._roomCollection });
 
     var roomModels = this._roomCollection.filter(defaultCollectionFilter);
     this.activeRoomCollection = new FilteredRoomCollection(roomModels, {

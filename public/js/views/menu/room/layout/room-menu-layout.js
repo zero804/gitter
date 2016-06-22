@@ -78,16 +78,18 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
     this.roomCollection = attrs.roomCollection;
     this.orgCollection = attrs.orgCollection;
     this.suggestedRoomCollection = attrs.suggestedRoomCollection;
+    this.groupsCollection = attrs.groupsCollection;
 
     //Make a new model
     this.dndCtrl = new DNDCtrl();
     this.model = new RoomMenuModel(_.extend({}, context.getSnapshot('leftMenu'), {
-      bus:                     this.bus,
-      roomCollection:          this.roomCollection,
-      orgCollection:           this.orgCollection,
-      userModel:               context.user(),
-      troupeModel:             context.troupe(),
-      dndCtrl:                 this.dndCtrl,
+      bus: this.bus,
+      roomCollection: this.roomCollection,
+      orgCollection: this.orgCollection,
+      userModel: context.user(),
+      troupeModel: context.troupe(),
+      dndCtrl: this.dndCtrl,
+      groupsCollection: this.groupsCollection
     }));
 
     this.keyboardControls = new KeyboardControllerView({
