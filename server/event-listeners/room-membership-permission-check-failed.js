@@ -4,7 +4,7 @@ var env = require('gitter-web-env');
 var stats = env.stats;
 var errorReporter = env.errorReporter;
 var appEvents = require('gitter-web-appevents');
-var roomMembershipService = require('../services/room-membership-service');
+var roomService = require('../services/room-service');
 
 var installed = false;
 exports.install = function() {
@@ -13,7 +13,7 @@ exports.install = function() {
 
   appEvents.onRoomMemberPermCheckFailed(function(roomId, userId) {
     // This person no longer actually has access. Remove them!
-    return roomMembershipService.removeRoomMember(roomId, userId)
+    return roomService.removeRoomMemberById(roomId, userId)
       .then(function() {
         stats.event('membership_perm_check_failed', { roomId: roomId, userId: userId });
       })

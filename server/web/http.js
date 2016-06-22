@@ -1,14 +1,17 @@
 "use strict";
 
-var http = require('http'),
-    res = http.ServerResponse.prototype;
+var http = require('http');
+var useragent = require('useragent');
+
+var ServerResponsePrototype = http.ServerResponse.prototype;
+var IncomingMessagePrototype = http.IncomingMessage.prototype;
 
 /* Monkey patch onto the response */
 /*
  * This is needed as connect/express attempt to be too smart for their own good behind proxies (like NGINX) and convert relative URLS into absolute URLS. Unfortunately behind a proxy the URL will proably we wrong.
  * TODO: raise this as a bug in express
  */
-res.relativeRedirect = function(status, url){
+ServerResponsePrototype.relativeRedirect = function(status, url) {
   var req = this.req;
   var body;
 
@@ -30,4 +33,14 @@ res.relativeRedirect = function(status, url){
   this.statusCode = status;
   this.header('Location', url);
   this.end(body);
+};
+
+IncomingMessagePrototype.getParsedUserAgent = function() {
+  if (this._parsedUserAgent) {
+    return this._parsedUserAgent;
+  }
+
+  var parsedUserAgent = useragent.parse(this.headers['user-agent']);
+  this._parsedUserAgent = parsedUserAgent;
+  return parsedUserAgent;
 };

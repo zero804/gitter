@@ -15,7 +15,7 @@ var StatusError = require('statuserror');
 var roomMembershipService = require('./room-membership-service');
 var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
 var legacyMigration = require('gitter-web-permissions/lib/legacy-migration');
-var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
+var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var debug = require('debug')('gitter:app:one-to-one-room-service');
 
 function getOneToOneRoomQuery(userId1, userId2) {
@@ -99,7 +99,7 @@ function ensureFromUserInRoom(troupeId, fromUserId) {
       // Deal with https://github.com/troupe/gitter-webapp/issues/1227
       return userDefaultFlagsService.getDefaultFlagsForUserId(fromUserId)
         .then(function(flags) {
-          return roomMembershipService.addRoomMember(troupeId, fromUserId, flags);
+          return roomMembershipService.addRoomMember(troupeId, fromUserId, flags, null);
         });
     });
 }
@@ -117,8 +117,8 @@ function addOneToOneUsersToNewRoom(troupeId, fromUserId, toUserId) {
       if (!toUserFlags) throw new StatusError(404);
 
       return Promise.join(
-        roomMembershipService.addRoomMember(troupeId, fromUserId, fromUserFlags),
-        roomMembershipService.addRoomMember(troupeId, toUserId, toUserFlags));
+        roomMembershipService.addRoomMember(troupeId, fromUserId, fromUserFlags, null),
+        roomMembershipService.addRoomMember(troupeId, toUserId, toUserFlags, null));
     });
 }
 

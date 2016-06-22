@@ -2,6 +2,7 @@
 
 var env = require('gitter-web-env');
 var config = env.config;
+var logger = env.logger;
 
 var passport = require('passport');
 var expressHbs = require('express-hbs');
@@ -12,9 +13,39 @@ var cookieParser = require('cookie-parser');
 var methodOverride = require('method-override');
 var session = require('express-session');
 var devMode = config.get('dev-mode');
+var appTag = require('./app-tag');
 
 // Naughty naughty naught, install some extra methods on the express prototype
 require('./http');
+
+function getSessionStore() {
+  var RedisStore = require('connect-redis')(session);
+
+  var redisClient = env.ioredis.createClient(config.get('redis_nopersist'));
+
+  return new RedisStore({
+    client: redisClient,
+    ttl: config.get('web:sessionTTL'),
+    logErrors: function(err) {
+      logger.error('connect-redis reported a redis error: ' + err, { exception: err });
+    }
+  });
+
+}
+
+function configureLocals(app) {
+  var locals = app.locals;
+
+  locals.googleTrackingId = config.get("stats:ga:key");
+  locals.googleTrackingDomain = config.get("stats:ga:domain");
+  locals.liveReload = config.get('web:liveReload');
+  locals.stagingText = appTag.text;
+  locals.stagingLink = appTag.link;
+
+  locals.dnsPrefetch = (config.get('cdn:hosts') || []).concat([
+    config.get('ws:hostname')
+  ]);
+}
 
 module.exports = {
   /**
@@ -23,9 +54,7 @@ module.exports = {
   installFull: function(app) {
     require('./register-helpers')(expressHbs);
 
-    app.locals.googleTrackingId = config.get("stats:ga:key");
-    app.locals.googleTrackingDomain = config.get("stats:ga:domain");
-    app.locals.liveReload = config.get('web:liveReload');
+    configureLocals(app);
 
     app.engine('hbs', expressHbs.express3({
       partialsDir: resolveStatic('/templates/partials'),
@@ -60,16 +89,10 @@ module.exports = {
     app.use(require('./middlewares/ie6-post-caching'));
     app.use(require('./middlewares/i18n'));
 
-    var RedisStore = require('connect-redis')(session);
-    var sessionStore = new RedisStore({
-      client: env.redis.createClient(process.env.REDIS_NOPERSIST_CONNECTION_STRING || config.get("redis_nopersist")),
-      ttl: config.get('web:sessionTTL')
-    });
-
     app.use(session({
       secret: config.get('web:sessionSecret'),
       key: config.get('web:cookiePrefix') + 'session',
-      store: sessionStore,
+      store: getSessionStore(),
       cookie: {
         path: '/',
         httpOnly: true,

@@ -1,4 +1,5 @@
-@font-base: "source-sans-pro",
+//Bundled Fonts -> Local System Fonts -> Web Fonts -> System Default Fonts -> Standard Web Fallbacks
+@font-base: "SourceSansLocal", "Source Sans Pro",  "source-sans-pro",
             /*
              * native ios and android cant read from "/_s/l", but they look better with
              * the same system fonts as the native elements anyway
@@ -11,8 +12,8 @@
 
 
 .m-default-fonts() {
-  //Try local sorce-sans-pro fallback to helvetica
-  font-family: "Source Sans Pro" Helvetica, Arial, sans-serif;
+  //Bundles Fonts -> Local System Fonts -> Standard Web Fallbacks
+  font-family: "SourceSansLocal", "Source Sans Pro", -apple-system, "Roboto",  Helvetica, Arial, sans-serif;
 
   .fonts-loaded & {
     font-family: @font-base;

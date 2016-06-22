@@ -11,13 +11,16 @@
   },
   "private": true,
   "dependencies": {
-    "bluebird": "^3.3.5",
+    "bluebird": "^3.2.1",
     "debug": "^2.2.0",
+    "gitter-web-env": "file:../env",
     "gitter-web-github": "file:../github",
     "gitter-web-permissions": "file:../permissions",
     "gitter-web-persistence": "file:../persistence",
     "gitter-web-persistence-utils": "file:../persistence-utils",
     "gitter-web-validators": "file:../validators",
+    "lazy.js": "^0.4.2",
+    "lodash": "^3.2.0",
     "statuserror": "^0.1.3"
   },
   "devDependencies": {

@@ -10,8 +10,11 @@ function GitHubContributorService(user) {
 }
 
 /** Returns an array of usernames of all contributors to a repo */
-GitHubContributorService.prototype.getContributors = function(repo) {
-  return tentacles.repo.listContributors(repo, { accessToken: this.accessToken });
+GitHubContributorService.prototype.getContributors = function(repo, options) {
+  return tentacles.repo.listContributors(repo, {
+    accessToken: this.accessToken,
+    firstPageOnly: options && options.firstPageOnly
+  });
 };
 
 module.exports = wrap(GitHubContributorService, function() {
@@ -22,4 +25,3 @@ module.exports = wrap(GitHubContributorService, function() {
   coldTTL: 14400, /* 4 hours cold cache */
   coolRefetchTimeout: 0.5 /* max time per call */
 });
-
