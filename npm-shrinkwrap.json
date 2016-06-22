@@ -3,9 +3,8 @@
   "version": "13.4.0",
   "dependencies": {
     "@gitterhq/translations": {
-      "version": "1.0.0",
-      "from": "@gitterhq/translations@>=1.0.0 <2.0.0",
-      "resolved": "https://registry.npmjs.org/@gitterhq/translations/-/translations-1.0.0.tgz"
+      "version": "1.1.1",
+      "from": "@gitterhq/translations@>=1.1.1 <2.0.0"
     },
     "apn": {
       "version": "1.7.6",
@@ -251,9 +250,9 @@
           "resolved": "http://beta-internal:4873/rimraf/-/rimraf-2.5.2.tgz",
           "dependencies": {
             "glob": {
-              "version": "7.0.4",
+              "version": "7.0.5",
               "from": "glob@>=7.0.0 <8.0.0",
-              "resolved": "http://beta-internal:4873/glob/-/glob-7.0.4.tgz",
+              "resolved": "http://beta-internal:4873/glob/-/glob-7.0.5.tgz",
               "dependencies": {
                 "fs.realpath": {
                   "version": "1.0.0",
@@ -279,7 +278,7 @@
                 },
                 "minimatch": {
                   "version": "3.0.2",
-                  "from": "minimatch@>=2.0.0 <3.0.0||>=3.0.0 <4.0.0",
+                  "from": "minimatch@>=3.0.2 <4.0.0",
                   "resolved": "http://beta-internal:4873/minimatch/-/minimatch-3.0.2.tgz",
                   "dependencies": {
                     "brace-expansion": {
@@ -1472,7 +1471,7 @@
                   "dependencies": {
                     "async": {
                       "version": "1.5.2",
-                      "from": "async@>=1.5.2 <2.0.0",
+                      "from": "async@1.5.2",
                       "resolved": "https://registry.npmjs.org/async/-/async-1.5.2.tgz"
                     }
                   }
@@ -2216,6 +2215,11 @@
       "from": "modules/cache-wrapper",
       "resolved": "file:modules/cache-wrapper"
     },
+    "gitter-web-cdn": {
+      "version": "1.0.0",
+      "from": "modules/cdn",
+      "resolved": "file:modules/cdn"
+    },
     "gitter-web-env": {
       "version": "1.0.0",
       "from": "modules/env",
@@ -2240,6 +2244,11 @@
       "version": "1.0.0",
       "from": "modules/groups",
       "resolved": "file:modules/groups"
+    },
+    "gitter-web-i18n": {
+      "version": "1.0.0",
+      "from": "modules/i18n",
+      "resolved": "file:modules/i18n"
     },
     "gitter-web-identity": {
       "version": "1.0.0",
@@ -2455,18 +2464,6 @@
       "version": "8.9.1",
       "from": "highlight.js@>=8.6.0 <9.0.0",
       "resolved": "http://beta-internal:4873/highlight.js/-/highlight.js-8.9.1.tgz"
-    },
-    "i18n": {
-      "version": "0.4.1",
-      "from": "i18n@>=0.4.1 <0.5.0",
-      "resolved": "http://beta-internal:4873/i18n/-/i18n-0.4.1.tgz",
-      "dependencies": {
-        "sprintf": {
-          "version": "0.1.5",
-          "from": "sprintf@>=0.1.1",
-          "resolved": "http://beta-internal:4873/sprintf/-/sprintf-0.1.5.tgz"
-        }
-      }
     },
     "i18n-2": {
       "version": "0.4.6",
@@ -3423,7 +3420,7 @@
     "node-uuid": {
       "version": "1.4.0",
       "from": "node-uuid@1.4.0",
-      "resolved": "http://beta-internal:4873/node-uuid/-/node-uuid-1.4.0.tgz"
+      "resolved": "https://registry.npmjs.org/node-uuid/-/node-uuid-1.4.0.tgz"
     },
     "nodemailer": {
       "version": "0.3.14",
@@ -3756,7 +3753,7 @@
       "dependencies": {
         "passport-oauth2": {
           "version": "1.3.0",
-          "from": "passport-oauth2@>=1.0.0 <2.0.0",
+          "from": "passport-oauth2@>=1.1.2 <2.0.0",
           "resolved": "http://beta-internal:4873/passport-oauth2/-/passport-oauth2-1.3.0.tgz",
           "dependencies": {
             "passport-strategy": {
@@ -3809,7 +3806,7 @@
       "dependencies": {
         "passport-oauth2": {
           "version": "1.3.0",
-          "from": "passport-oauth2@>=1.0.0 <2.0.0",
+          "from": "passport-oauth2@>=1.1.2 <2.0.0",
           "resolved": "http://beta-internal:4873/passport-oauth2/-/passport-oauth2-1.3.0.tgz",
           "dependencies": {
             "passport-strategy": {

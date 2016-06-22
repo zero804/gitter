@@ -182,6 +182,7 @@ function getOwnerFromRepoFullName(repoName) {
  * given uri.
  */
 function ensureGroupForGitHubRoom(user, githubType, uri) {
+  debug('ensureGroupForGitHubRoom: type=%s uri=%s', githubType, uri);
   var options;
   switch (githubType) {
     case 'REPO':
@@ -765,7 +766,7 @@ function createRoomChannel(parentTroupe, user, options) {
         });
     })
     .then(function(groupId) {
-      return createChannel(user, null, {
+      return createChannel(user, parentTroupe, {
         uri: uri,
         security: options.security,
         githubType: githubType,
