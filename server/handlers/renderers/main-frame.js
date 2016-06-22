@@ -22,6 +22,7 @@ var generateLeftMenuSnapshot = require('../snapshots/left-menu-snapshot');
 var parseRoomsIntoLeftMenuFavouriteRoomList = require('gitter-web-shared/rooms/left-menu-room-favourite-list');
 var getSubResources = require('./sub-resources');
 var fixMongoIdQueryParam = require('../../web/fix-mongo-id-query-param');
+var mapGroupsForRenderer = require('../../handlers/map-groups-for-renderer');
 
 /* How many chats to send back */
 
@@ -56,9 +57,10 @@ function renderMainFrame(req, res, next, frame) {
         winston.error('Failed to serialize orgs:' + err, { exception: err });
         return [];
       }),
+      restful.serializeGroupsForUserId(userId),
 
     ])
-    .spread(function (troupeContext, rooms, permalinkChat, orgs) {
+    .spread(function (troupeContext, rooms, permalinkChat, orgs, groups) {
 
       var chatAppQuery = {};
       if (aroundId) { chatAppQuery.at = aroundId; }
@@ -84,9 +86,11 @@ function renderMainFrame(req, res, next, frame) {
 
       //TODO Pass this to MINIBAR?? JP 17/2/16
       var hasNewLeftMenu = !req.isPhone && req.fflip && req.fflip.has('left-menu');
-      var snapshots = troupeContext.snapshots = generateLeftMenuSnapshot(req, troupeContext, rooms);
+      var hasGroups = req.fflip && req.fflip.has('groups');
+      var snapshots = troupeContext.snapshots = generateLeftMenuSnapshot(req, troupeContext, rooms, hasGroups);
       var leftMenuRoomList = parseRoomsIntoLeftMenuRoomList(snapshots.leftMenu.state, snapshots.rooms, snapshots.leftMenu.selectedOrgName);
       var leftMenuFavouriteRoomList = parseRoomsIntoLeftMenuFavouriteRoomList(snapshots.leftMenu.state, snapshots.rooms, snapshots.leftMenu.selectedOrgName);
+      if(!!hasGroups) { troupeContext.snapshots.orgs = mapGroupsForRenderer(groups);}
 
       var previousLeftMenuState = troupeContext.leftRoomMenuState;
       var newLeftMenuState = snapshots['leftMenu'];
@@ -99,10 +103,6 @@ function renderMainFrame(req, res, next, frame) {
             errorReporter(err, { userSettingsServiceSetFailed: true }, { module: 'app-render' });
           });
       }
-
-
-      //TODO Remove this when favourite tab is removed for realz JP 8/4/16
-      if(snapshots.leftMenu.state === 'favourite') { leftMenuRoomList = []; }
 
       // pre-processing rooms
       // Bad mutation ... BAD MUTATION
