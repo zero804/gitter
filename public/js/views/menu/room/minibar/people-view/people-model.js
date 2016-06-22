@@ -1,8 +1,8 @@
 "use strict";
 
-var Backbone = require('backbone');
+var ItemModel = require('../minibar-item-model');
 
-module.exports = Backbone.Model.extend({
+module.exports = ItemModel.extend({
 
   defaults: {
     mentions: false,
