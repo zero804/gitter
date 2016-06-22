@@ -136,18 +136,23 @@ var KeyboardController = Marionette.ItemView.extend({
   onTabShiftKeyPressed: function (e){
     var index;
     if(e) { e.preventDefault(); }
+    //unfocus search
     this.searchFocusModel.set('focus', false);
+    //when the minibar is in focus
     if(this.isMinibarInFocus()) {
       var focusedMinibarItem = this.getFocusedMinibarItem();
       index = this.minibarCollection.indexOf(focusedMinibarItem);
       if(index === 0) { return this.focusLastRoomItem(); }
       return this.moveMinibarFocus(-1);
     }
+
     var focusedRoomItem = this.getFocusedRoomItem();
     var roomList = this.getFlatRoomCollection();
     index = roomList.indexOf(focusedRoomItem);
-    if(index === 0) { return this.focusLastMinibarItem(); }
-    return this.moveRoomCollectionFocus(-1);
+    if(index !== 0) { return this.moveRoomCollectionFocus(-1);}
+    //If we are in the search state me may have to move focus back to search
+    if(this.model.get('state') === 'search') { return this.focusSearch(); }
+    return this.focusLastMinibarItem();
   },
 
   moveMinibarFocus: function (direction){
@@ -220,6 +225,11 @@ var KeyboardController = Marionette.ItemView.extend({
     this.minibarCollection.at(0).set('focus', true);
   },
 
+  focusSearch: function (){
+    this.blurAllItems();
+    this.searchFocusModel.set('focus', true);
+  },
+
   isMinibarInFocus: function (){
     return !!this.getFocusedMinibarItem();
   },
@@ -248,8 +258,8 @@ var KeyboardController = Marionette.ItemView.extend({
     var filterFunc = function(model){ return model.get(attr) === val; };
     return this.favouriteCollectionModel.get('active') && this.favouriteCollection.filter(isHiddenFilter).filter(filterFunc)[0] ||
       this.primaryCollectionModel.get('active') && this.primaryCollection.filter(isHiddenFilter).filter(filterFunc)[0] ||
-      this.secondaryCollectionModel.get('active') && this.secondaryCollection.filter(isHiddenFilter).filter(filterFunc)[0] ||
-      this.tertiaryCollectionModel.get('active') && this.tertiaryCollection.filter(isHiddenFilter).filter(filterFunc)[0];
+        this.secondaryCollectionModel.get('active') && this.secondaryCollection.filter(isHiddenFilter).filter(filterFunc)[0] ||
+          this.tertiaryCollectionModel.get('active') && this.tertiaryCollection.filter(isHiddenFilter).filter(filterFunc)[0];
   },
 
   queryAttrOnMinibar: function (attr, val){
