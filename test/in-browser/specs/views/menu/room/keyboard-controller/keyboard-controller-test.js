@@ -363,6 +363,16 @@ describe('KeyboardControllerView', function(){
       assert(model.minibarPeopleModel.get('focus'));
     });
 
+    it('should re-focus the search input when the first room item is selected in the search state and shift-tab os pressed', function(){
+      model.set('state', 'search');
+      view.blurAllItems();
+      model.favouriteCollection.at(0).set('focus', true);
+      appEvents.trigger('keyboard.room.prev.tab');
+      assert(!model.favouriteCollection.at(0).get('focus'));
+      assert(model.searchFocusModel.get('focus'));
+    });
+
+
   });
 
   describe('bluring items', function(){
