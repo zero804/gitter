@@ -21,7 +21,6 @@
   display:          flex;
   width:            100%;
   padding-left:     @desktop-menu-left-padding;
-  padding-right:    @desktop-menu-left-padding / 2;
   background-color: rgba(255, 255, 255, 0.97);
   border-bottom:    1px solid rgba(0,0,0,0.05);
   z-index:          @zIndexChatHeader;
@@ -256,20 +255,48 @@
   }
   &:focus {
     outline: none;
-    background: rgba(0, 0, 0, .05);
-  }
 
-
-  & > .chat-header__action-icon {
-    color: inherit;
+    & > .chat-header__action-icon,
+    & > .chat-header__right-toolbar-toggle-icon {
+      background-color: rgba(0, 0, 0, .05);
+    }
   }
+}
+
+.chat-header__action-icon {
+  &[class^=icon-],
+  &[class*=" icon-"] {
+    &:before {
+      margin-left: 0;
+      margin-right: 0;
+    }
+  }
+}
+
+.chat-header__action-icon,
+.chat-header__right-toolbar-toggle-icon {
+  color: inherit;
+
+  transition:
+    background-color .2s ease,
+    border-color .2s ease,
+    color .2s ease;
+
+  // Spacing that doesn't affect width
+  border-top: 4px solid transparent;
+  border-left: 6px solid transparent;
+  border-bottom: 4px solid transparent;
+  border-right: 6px solid transparent;
+  border-radius: 3px;
 }
 
 .chat-header__right-toolbar-toggle {
   position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: @right-toolbar-collapsed-width;
   margin-left: .7rem;
-  padding-left: @desktop-menu-left-padding / 2;
-  padding-right: @desktop-menu-left-padding / 2;
 
 
   &.pinned {
@@ -305,7 +332,6 @@
   position: relative;
   width: 29px;
   height: 26px;
-  border: 1px solid transparent;
 }
 
 .chat-header__right-toolbar-toggle-icon-base {
