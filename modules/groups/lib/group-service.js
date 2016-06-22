@@ -154,7 +154,7 @@ function ensureGroupForGitHubRoomCreation(user, options) {
   var name = options.name || uri;
   var obtainAccessFromGitHubRepo = options.obtainAccessFromGitHubRepo;
 
-  debug('ensureGroupForGitHubRoomCreation: name=%s uri=%s', name, uri)
+  debug('ensureGroupForGitHubRoomCreation: name=%s uri=%s obtainAccessFromGitHubRepo=%s', name, uri, obtainAccessFromGitHubRepo)
   assert(user, 'user required');
   assert(uri, 'name required');
 

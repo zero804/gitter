@@ -31,7 +31,7 @@ describe('group-resolver', function() {
       };
 
       groupResolver = testRequire.withProxies("./services/group-resolver", {
-        'gitter-web-permissions/lib/legacy-policy-factory': {
+        'gitter-web-permissions/lib/policy-factory': {
           createPolicyForRoom: createPolicyForRoom
         }
       });

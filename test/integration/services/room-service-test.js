@@ -67,7 +67,7 @@ describe('room-service', function() {
     it('should fail to create a room for an org where the user is not an admin', function () {
 
       var roomService = testRequire.withProxies("./services/room-service", {
-        'gitter-web-permissions/lib/legacy-policy-factory': {
+        'gitter-web-permissions/lib/github-policy-factory': {
           createPolicyForGithubObject: function() {
             return Promise.resolve({
               canAdmin: function() {
@@ -91,7 +91,7 @@ describe('room-service', function() {
       var uriResolver = mockito.mockFunction();
       var roomService = testRequire.withProxies('./services/room-service', {
         './uri-resolver': uriResolver,
-        'gitter-web-permissions/lib/legacy-policy-factory': {
+        'gitter-web-permissions/lib/policy-factory': {
           createPolicyForRoom: function() {
             return Promise.resolve({
               canJoin: function() {
@@ -149,7 +149,7 @@ describe('room-service', function() {
             }
           }
         },
-        'gitter-web-permissions/lib/legacy-policy-factory': {
+        'gitter-web-permissions/lib/github-policy-factory': {
           createPolicyForGithubObject: function(user, uri, ghType, security) {
             assert.equal(user.username, fixture.user1.username);
             assert.equal(uri, 'gitterTest');
@@ -161,7 +161,9 @@ describe('room-service', function() {
                 return Promise.resolve(true);
               }
             });
-          },
+          }
+        },
+        'gitter-web-permissions/lib/policy-factory': {
           createPolicyForRoom: function(user, room) {
             assert.equal(room.uri, 'gitterTest');
             return Promise.resolve({});
@@ -240,7 +242,7 @@ describe('room-service', function() {
             }
           }
         },
-        'gitter-web-permissions/lib/legacy-policy-factory': {
+        'gitter-web-permissions/lib/github-policy-factory': {
           createPolicyForGithubObject: function(user, uri, ghType, security) {
             assert.equal(user.username, fixture.user1.username);
             assert.equal(uri, 'gitterHQ/cloaked-avenger');
@@ -252,7 +254,9 @@ describe('room-service', function() {
                 return Promise.resolve(true);
               }
             });
-          },
+          }
+        },
+        'gitter-web-permissions/lib/policy-factory': {
           createPolicyForRoom: function(user, room) {
             assert.equal(room.uri, 'gitterHQ/cloaked-avenger');
             assert.equal(room.groupId, groupId);
@@ -304,7 +308,7 @@ describe('room-service', function() {
             }
           }
         },
-        'gitter-web-permissions/lib/legacy-policy-factory': {
+        'gitter-web-permissions/lib/github-policy-factory': {
           createPolicyForGithubObject: function(user, uri, ghType, security) {
             assert.equal(user.username, fixture.user1.username);
             assert.equal(uri, 'gitterHQ/cloaked-avenger');
@@ -317,6 +321,8 @@ describe('room-service', function() {
               }
             });
           },
+        },
+        'gitter-web-permissions/lib/policy-factory': {
           createPolicyForRoom: function(user, room) {
             assert.equal(room.uri, 'gitterHQ/cloaked-avenger');
             return Promise.resolve({
@@ -369,7 +375,7 @@ describe('room-service', function() {
             }
           }
         },
-        'gitter-web-permissions/lib/legacy-policy-factory': {
+        'gitter-web-permissions/lib/github-policy-factory': {
           createPolicyForGithubObject: function(user, uri, ghType, security) {
             assert.equal(user.username, fixture.user1.username);
             assert.equal(uri, 'gitterHQ/sandbox');
@@ -382,6 +388,8 @@ describe('room-service', function() {
               }
             });
           },
+        },
+        'gitter-web-permissions/lib/policy-factory': {
           createPolicyForRoom: function(user, room) {
             assert.equal(room.uri, 'gitterHQ/sandbox');
             return Promise.resolve({});
@@ -464,66 +472,27 @@ describe('room-service', function() {
     });
 
     it('should return an accessDenied if a user attempts to access an org which they dont have access to', function() {
-      var roomPermissionsModelMock = mockito.mockFunction();
-
       var roomService = testRequire.withProxies("./services/room-service", {
-        'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock
-      });
+        'gitter-web-permissions/lib/policy-factory': {
+          createPolicyForRoom: function(user, room) {
+            assert.strictEqual(room.id, fixture.troupeOrg1.id);
+            assert.strictEqual(user, fixture.user3);
 
-      mockito.when(roomPermissionsModelMock)().then(function(user, perm, incomingRoom) {
-        assert.equal(perm, 'join');
-        assert.equal(incomingRoom.id, fixture.troupeOrg1.id);
-        return Promise.resolve(false);
+            return Promise.resolve({
+              canJoin: function() {
+                return Promise.resolve(false);
+              }
+            });
+          }
+        }
       });
 
       return roomService.createRoomByUri(fixture.user3, fixture.troupeOrg1.uri)
-        .then(function () {
-          assert(false, 'Expected exception');
-        }, function(err) {
-          assert.strictEqual(err.status, 404);
-        });
-    });
-  });
-
-  describe.skip('user revalidation', function() {
-    it('should correctly revalidate the users in a room', function() {
-      var roomPermissionsModelMock = mockito.mockFunction();
-      var roomMembershipServiceMock = {
-        findMembersForRoom: mockito.mockFunction(),
-        removeRoomMembers:  mockito.mockFunction()
-      };
-
-      var roomService = testRequire.withProxies("./services/room-service", {
-        'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock,
-        './room-membership-service': roomMembershipServiceMock
-      });
-
-      mockito.when(roomPermissionsModelMock)().then(function(user, perm, incomingRoom) {
-        assert.equal(perm, 'join');
-        assert.equal(incomingRoom.id, fixture.troupeRepo.id);
-
-        if(user.id === fixture.user1.id) {
-          return Promise.resolve(true);
-        } else if(user.id === fixture.user2.id) {
-          return Promise.resolve(false);
-        } else {
-          assert(false, 'Unknown user');
-        }
-
-      });
-
-      mockito.when(roomMembershipServiceMock.findMembersForRoom)().then(function() {
-        return Promise.resolve([fixture.user1._id, fixture.user2._id]);
-      });
-
-      mockito.when(roomMembershipServiceMock.removeRoomMembers)().then(function(troupeId, userIds) {
-        assert.deepEqual(userIds, [fixture.user2._id]);
-      });
-
-      return roomService.revalidatePermissionsForUsers(fixture.troupeRepo)
         .then(function() {
-          mockito.verify(roomMembershipServiceMock.findMembersForRoom, once)();
-          mockito.verify(roomMembershipServiceMock.removeRoomMembers, once)();
+          assert(false, 'Expected exception');
+        })
+        .catch(StatusError, function(err) {
+          assert.strictEqual(err.status, 404);
         });
     });
   });
@@ -536,9 +505,6 @@ describe('room-service', function() {
 
     function createRoomServiceWithStubs(stubs) {
       return testRequire.withProxies("./services/room-service", {
-        'gitter-web-permissions/lib/room-permissions-model': function() {
-          return Promise.resolve(stubs.addUser);
-        },
         'gitter-web-permissions/lib/invited-permissions-service': function() {
           return Promise.resolve(stubs.canBeInvited);
         },
@@ -564,7 +530,6 @@ describe('room-service', function() {
 
     it('adds a user to the troupe', function() {
       var service = createRoomServiceWithStubs({
-        addUser: true,
         findByUsernameResult: { username: 'test-user', id: userId, _id: userId },
         createInvitedUserResult: null,
         canBeInvited: true,
@@ -592,7 +557,6 @@ describe('room-service', function() {
 
     it('saves troupe changes', function() {
       var service = createRoomServiceWithStubs({
-        addUser: true,
         findByUsernameResult: { username: 'test-user', id: userId, _id: userId },
         createInvitedUserResult: null,
         canBeInvited: true,
@@ -620,7 +584,6 @@ describe('room-service', function() {
 
     it('returns the added user and sets the date the user was added', function() {
       var service = createRoomServiceWithStubs({
-        addUser: true,
         findByUsernameResult: { username: 'test-user', id: userId, _id: userId },
         createInvitedUserResult: null,
         canBeInvited: true,
@@ -659,7 +622,6 @@ describe('room-service', function() {
 
     it('attempts an email invite for new users', function() {
       var service = createRoomServiceWithStubs({
-        addUser: true,
         findByUsernameResult: null,
         createInvitedUserResult: {
           username: 'test-user',
@@ -692,7 +654,6 @@ describe('room-service', function() {
 
     it('fails with 403 when adding someone to who cant be invited', function() {
       var service = createRoomServiceWithStubs({
-        addUser: true,
         findByUsernameResult: null,
         createInvitedUserResult: { username: 'test-user', id: 'test-user-id', state: 'INVITED' },
         canBeInvited: false,
@@ -717,7 +678,6 @@ describe('room-service', function() {
       var _inviteeUserId = new ObjectID();
 
       var service = createRoomServiceWithStubs({
-        addUser: true,
         findByUsernameResult: { username: 'test-user', id: _inviteeUserId, _id: _inviteeUserId },
         createInvitedUserResult: null,
         canBeInvited: true,
@@ -741,41 +701,6 @@ describe('room-service', function() {
 
       return service.addUserToRoom(troupe, user, 'test-user');
     });
-
-  //   it('fails with 403 when instigating user doesnt have permission to add people', function() {
-  //
-  //     var troupeId = new ObjectID();
-  //     var userId = new ObjectID();
-  //
-  //     var troupe = {
-  //       _id: troupeId,
-  //       id: troupeId.toHexString(),
-  //       uri: 'user/room'
-  //     };
-  //
-  //     var service = createRoomServiceWithStubs({
-  //       addUser: false,
-  //       findByUsernameResult: {
-  //         username: 'test-user',
-  //         _id: userId,
-  //         id: userId.toHexString()
-  //       },
-  //       createInvitedUserResult: null,
-  //       canBeInvited: true,
-  //       onInviteEmail: function() {
-  //         return Promise.resolve();
-  //       }
-  //     });
-  //
-  //     return service.addUserToRoom(troupe, {}, 'test-user')
-  //       .then(function() {
-  //         assert.ok(false, 'Expected exception');
-  //       }, function(err) {
-  //         if (!(err instanceof StatusError)) throw err;
-  //         assert.equal(err.status, 403);
-  //       });
-  //   });
-  //
   });
 
   describe('channel creation #slow', function() {
@@ -783,10 +708,8 @@ describe('room-service', function() {
     describe('org channels', function() {
 
       it('should create private rooms and allow users to be added to them', function() {
-        var roomPermissionsModelMock = mockito.mockFunction();
         var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
         var roomService = testRequire.withProxies("./services/room-service", {
-          'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModelMock,
           'gitter-web-groups/lib/group-service': {
             migration: {
               ensureGroupForRoom: function(parentTroupe, user) {
@@ -1346,7 +1269,7 @@ describe('room-service', function() {
   describe('removals', function() {
 
     var roomService = testRequire.withProxies('./services/room-service', {
-      'gitter-web-permissions/lib/legacy-policy-factory': {
+      'gitter-web-permissions/lib/policy-factory': {
         createPolicyForRoom: function(user/*, room*/) {
           return Promise.resolve({
             canAdmin: function() {
@@ -1630,7 +1553,7 @@ describe('room-service', function() {
             }
           }
         },
-        'gitter-web-permissions/lib/legacy-policy-factory': {
+        'gitter-web-permissions/lib/github-policy-factory': {
           createPolicyForGithubObject: function(user, uri, githubType, security) {
             assert.strictEqual(user.username, fixture.user1.username);
             assert.strictEqual(uri, 'gitterTest');
@@ -1670,7 +1593,7 @@ describe('room-service', function() {
             }
           }
         },
-        'gitter-web-permissions/lib/legacy-policy-factory': {
+        'gitter-web-permissions/lib/github-policy-factory': {
           createPolicyForGithubObject: function(user, uri, githubType, security) {
             assert.strictEqual(user.username, fixture.user1.username);
             assert.strictEqual(uri, 'gitterTest');
@@ -1708,7 +1631,7 @@ describe('room-service', function() {
         'gitter-web-github': {
           GitHubUriValidator: roomValidatorMock
         },
-        'gitter-web-permissions/lib/legacy-policy-factory': {
+        'gitter-web-permissions/lib/github-policy-factory': {
           createPolicyForGithubObject: createPolicyForGithubObjectMock
         },
         'gitter-web-groups/lib/group-service': {
@@ -1943,7 +1866,7 @@ describe('room-service', function() {
         'gitter-web-github': {
           GitHubUriValidator: roomValidatorMock
         },
-        'gitter-web-permissions/lib/legacy-policy-factory': {
+        'gitter-web-permissions/lib/github-policy-factory': {
           createPolicyForGithubObject: createPolicyForGithubObjectMock,
         }
       });
@@ -2214,7 +2137,7 @@ describe('room-service', function() {
         });
 
         roomService = testRequire.withProxies('./services/room-service', {
-          'gitter-web-permissions/lib/legacy-policy-factory': {
+          'gitter-web-permissions/lib/policy-factory': {
             createPolicyForRoom: createPolicyForRoom
           }
         });
