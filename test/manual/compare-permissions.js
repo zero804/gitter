@@ -1,11 +1,10 @@
 #!/usr/bin/env node
-/* jshint node:true, unused:true */
 'use strict';
 
 var persistence = require('gitter-web-persistence');
 var legacyMigration = require('gitter-web-permissions/lib/legacy-migration');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
-var legacyPolicyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
+var legacyPolicyFactory = require('gitter-web-permissions/lib/policy-factory');
 var Promise = require('bluebird');
 var assert = require('assert');
 

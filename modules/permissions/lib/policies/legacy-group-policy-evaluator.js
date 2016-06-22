@@ -4,11 +4,14 @@ var Promise = require('bluebird');
 var persistence = require('gitter-web-persistence');
 var LegacyGitHubPolicyEvaluator = require('./legacy-github-policy-evaluator');
 var StaticPolicyEvaluator = require('./static-policy-evaluator');
-var debug = require('debug')('gitter:permissions:legacy-group-policy-evaluator');
+var debug = require('debug')('gitter:app:permissions:legacy-group-policy-evaluator');
 var StatusError = require('statuserror');
 var assert = require('assert');
 
 function LegacyGroupPolicyEvaluator(userId, user, type, uri, githubId, obtainAccessFromGitHubRepo) {
+  debug('LegacyGroupPolicyEvaluator userId=%s type=%s uri=%s githubId=%s obtainAccessFromGitHubRepo=%s',
+    userId, type, uri, githubId, obtainAccessFromGitHubRepo);
+
   this._userId = userId;
 
   assert(type, 'type expected');
@@ -83,6 +86,8 @@ LegacyGroupPolicyEvaluator.prototype = {
       .then(function(user) {
         var obtainAccessFromGitHubRepo = this._obtainAccessFromGitHubRepo;
 
+        // TODO: we should probably check that the repo matches the URI, but since this
+        // code is about to go, we'll leave it for now
         switch (this._type) {
           case 'USER':
             if (this._callingUserMatchesGroup(user)) {
@@ -99,8 +104,13 @@ LegacyGroupPolicyEvaluator.prototype = {
             /* break; */
 
           case 'ORG':
-            debug('Delegating permissions to GitHub org: uri=%s', this._uri);
-            return new LegacyGitHubPolicyEvaluator(user, this._uri, 'ORG', null);
+            if (obtainAccessFromGitHubRepo) {
+              debug('Deferring permissions to GitHub repo: uri=%s', obtainAccessFromGitHubRepo);
+              return new LegacyGitHubPolicyEvaluator(user, obtainAccessFromGitHubRepo, 'REPO', null);
+            } else {
+              debug('Delegating permissions to GitHub org: uri=%s', this._uri);
+              return new LegacyGitHubPolicyEvaluator(user, this._uri, 'ORG', null);
+            }
 
           default:
             debug('Unknown group type: type=%s, denying access', this._type);

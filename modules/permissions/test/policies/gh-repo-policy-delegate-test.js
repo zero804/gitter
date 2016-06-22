@@ -6,9 +6,9 @@ var proxyquireNoCallThru = require("proxyquire").noCallThru();
 
 describe('gh-repo-policy-delegate', function() {
 
-  var REPO1_PUSH_USER = { username: 'x' };
-  var NOT_REPO1_PUSH_USER = { username: 'y' };
-  var NO_ACCESS_REPO1_USER = { username: 'y' };
+  var REPO1_PUSH_USER = { _id: '1', username: 'x' };
+  var NOT_REPO1_PUSH_USER = { _id: '2', username: 'y' };
+  var NO_ACCESS_REPO1_USER = { _id: '3', username: 'y' };
   var REPO1 = 'repo1';
 
   var FIXTURES = [
@@ -69,7 +69,15 @@ describe('gh-repo-policy-delegate', function() {
         linkPath: meta.repo
       }
 
-      var delegate = new GhRepoPolicyDelegate(meta.user, securityDescriptor);
+
+      var user = meta.user;
+      var userId = user && user._id;
+
+      function userLoader() {
+        return Promise.resolve(user);
+      }
+
+      var delegate = new GhRepoPolicyDelegate(userId, userLoader, securityDescriptor);
 
       return delegate.hasPolicy(meta.policy)
         .then(function(result) {
