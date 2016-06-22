@@ -39,50 +39,30 @@ module.exports = (function() {
       this.listenTo(this.stateModel, 'change', this.render);
     },
 
-    inviteUser: function() {
+    inviteGitHubUser: function(githubUsername, emailAddress) {
       var self = this;
+      var state = emailAddress ? 'inviting' : 'adding';
+
+      this.stateModel.set('state', state);
 
       var data = {
-        userId: this.stateModel.get('emailRequiredUserId'),
-        email: this.$el.find('.js-invite-email').val(),
-        roomId: context.getTroupeId(),
+        githubUsername: githubUsername,
       };
 
-      this.stateModel.set('state', 'inviting');
+      if (emailAddress) {
+        data.email = emailAddress;
+      }
 
-      apiClient.priv.post('/invite-user', data)
-        .then(function() {
-          self.stateModel.set('state', 'invited');
-        })
-        .catch(function() {
-          self.stateModel.set('state', 'fail');
-        });
+      return apiClient.room.post('/invites', data)
+        .then(function(invite) {
+          if (invite.email) {
+            self.userModel.set('email', invite.email);
+          }
 
-      // stop the page reloading
-      return false;
-    },
-
-    addUser: function() {
-      var self = this;
-
-      var githubUser = this.userModel;
-
-      appEvents.triggerParent('track-event', 'welcome-add-user-click');
-
-      this.stateModel.set('state', 'adding');
-      apiClient.room.post('/users', { username: githubUser.get('username') })
-        .then(function(res) {
-          var user = res.user;
-
-          if (!user.invited) {
+          if (invite.status === 'added') {
             self.stateModel.set('state', 'added');
-          } else if (user.invited && user.email) {
+          } else if (invite.status === 'invited') {
             self.stateModel.set('state', 'invited');
-          } else {
-            self.stateModel.set({
-              emailRequiredUserId: user.id,
-              state: 'email_address_required',
-            });
           }
         })
         .catch(function(e) {
@@ -94,23 +74,49 @@ module.exports = (function() {
             self.stateModel.set('state', 'initial');
           } else if (e.status === 409) {
             self.stateModel.set('state', 'fail_409');
+          } else if (e.status === 428) {
+            self.stateModel.set({
+              state: 'email_address_required',
+            });
           } else {
             self.stateModel.set('state', 'fail');
           }
         });
     },
 
+    inviteUser: function() {
+      var githubUsername = this.userModel.get('username');
+      var email = this.$el.find('.js-invite-email').val();
+
+      this.inviteGitHubUser(githubUsername, email);
+
+      // stop the page reloading
+      return false;
+    },
+
+    addUser: function() {
+      var githubUser = this.userModel;
+
+      appEvents.triggerParent('track-event', 'welcome-add-user-click');
+
+      var githubUsername = githubUser.get('username');
+      this.inviteGitHubUser(githubUsername, null);
+
+      return false;
+    },
+
     serializeData: function() {
       var state = this.stateModel.get('state');
       var username = this.userModel.get('username');
+      var email = this.userModel.get('email');
 
       var states = {
         initial:                { text: username, showAddButton: true },
         adding:                 { text: 'Adding…' },
         added:                  { text: username + ' added' },
-        invited:                { text: username + ' invited' },
+        invited:                { text: email ? 'Invited ' + email : 'Invited' },
         fail:                   { text: 'Unable to add ' + username },
-        fail_409:               { text: 'Unable to add person already in room' },
+        fail_409:               { text: 'Already invited' },
         email_address_required: { text: 'Enter ' + username + '\'s email', showEmailForm: true },
         inviting:               { text: 'Inviting…' },
       };
@@ -279,14 +285,14 @@ module.exports = (function() {
     },
 
     render: function() {
-      if (!this.shouldRender()) {
-        this.$el.hide();
-        appEvents.trigger('collaboratorsView:hide');
-        return this;
-      } else {
+      if (this.shouldRender()) {
         Marionette.CompositeView.prototype.render.apply(this, arguments);
         this.$el.show();
         appEvents.trigger('collaboratorsView:show');
+      } else {
+        this.$el.hide();
+        appEvents.trigger('collaboratorsView:hide');
+        return this;
       }
 
       return this;

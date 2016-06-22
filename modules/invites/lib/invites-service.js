@@ -13,7 +13,7 @@ function createInvite(roomId, options) {
   var invitedByUserId = options.invitedByUserId;
   var emailAddress = options.emailAddress;
 
-  if (type === 'EMAIL') {
+  if (type === 'email') {
     // Email address is mandatory
     if (!emailAddress) throw new StatusError(400);
     externalId = emailAddress;

@@ -284,7 +284,7 @@ RoomWithPolicyService.prototype.deleteRoom = secureMethod([allowAdmin], function
 });
 
 /**
- * Invite a user to a room
+ * Invite a non-gitter user to a room
  */
 RoomWithPolicyService.prototype.createRoomInvitation = secureMethod([allowAddUser], function(type, externalId, emailAddress) {
   return roomInviteService.createInvite(this.room, this.user, {
@@ -292,6 +292,28 @@ RoomWithPolicyService.prototype.createRoomInvitation = secureMethod([allowAddUse
     externalId: externalId,
     emailAddress: emailAddress
   });
+});
+
+/**
+ * Add an existing Gitter user to a room
+ */
+RoomWithPolicyService.prototype.addUserToRoom = secureMethod([allowAddUser], function(userToAdd) {
+  return roomService.addUserToRoom(this.room, this.user, userToAdd);
+});
+
+/**
+ * Always allows a user to remove themselves from a room
+ */
+function removeUserFromRoomAllowCurrentUser(userForRemove) {
+  if (!this.user || !userForRemove) return false;
+  return mongoUtils.objectIDsEqual(userForRemove._id, this.user._id)
+}
+
+/**
+ * Add an existing Gitter user to a room
+ */
+RoomWithPolicyService.prototype.removeUserFromRoom = secureMethod([removeUserFromRoomAllowCurrentUser, allowAdmin], function(userForRemove) {
+  return roomService.removeUserFromRoom(this.room, userForRemove);
 });
 
 module.exports = RoomWithPolicyService;

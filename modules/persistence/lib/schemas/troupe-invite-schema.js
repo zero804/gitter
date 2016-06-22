@@ -9,7 +9,7 @@ module.exports = {
 
     var TroupeInviteSchema = new Schema({
       troupeId: { type: ObjectId, required: true },
-      type: { type: String, 'enum': ['EMAIL', 'GITHUB', 'TWITTER'], required: true },
+      type: { type: String, 'enum': ['email', 'github', 'twitter'], required: true },
       emailAddress: { type: String, required: true },
       externalId: { type: String, required: true },
       userId: { type: ObjectId, required: false },
