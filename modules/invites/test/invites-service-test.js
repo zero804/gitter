@@ -5,6 +5,7 @@ var ObjectID = require('mongodb').ObjectID;
 var assert = require('assert');
 var StatusError = require('statuserror');
 var TroupeInvite = require('gitter-web-persistence').TroupeInvite;
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
 describe('invite-service', function() {
   describe('integration tests #slow', function() {
@@ -108,5 +109,43 @@ describe('invite-service', function() {
 
     });
 
+  });
+
+  describe('findInvitesForReminder #slow', function() {
+    var fixture = fixtureLoader.setup({
+      troupe1: {},
+      user1: {}
+    });
+
+    it('should return invites', function() {
+      return invitesService.createInvite(fixture.troupe1._id, {
+          type: 'email',
+          emailAddress: fixtureLoader.generateEmail(),
+          invitedByUserId: fixture.user1._id,
+        })
+        .bind({
+          inviteId: null
+        })
+        .then(function(invite) {
+          this.inviteId = invite._id;
+          return invitesService.findInvitesForReminder(-1);
+        })
+        .then(function(invites) {
+          assert(invites.length > 1);
+          var inviteId = this.inviteId;
+          var originalInvite = invites.filter(function(f) {
+            return String(inviteId) === String(f.invite._id);
+          })[0];
+
+          assert(originalInvite);
+          assert(originalInvite.invite);
+          assert(originalInvite.invitedByUser);
+          assert(originalInvite.troupe);
+
+          assert.strictEqual(String(originalInvite.invite._id), String(inviteId));
+          assert.strictEqual(String(originalInvite.invitedByUser._id), String(fixture.user1._id));
+          assert.strictEqual(String(originalInvite.troupe._id), String(fixture.troupe1._id));
+        })
+    });
   });
 });
