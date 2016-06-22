@@ -5,8 +5,7 @@
 var Promise = require('bluebird');
 var validateUri = require('gitter-web-github').GitHubUriValidator;
 var userService = require('../../server/services/user-service');
-var legacyPolicyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
-
+var githubPolicyFactory = require('gitter-web-permissions/lib/github-policy-factory');
 
 function execute(username, uri) {
   return userService.findByUsername(username)
@@ -31,7 +30,7 @@ function execute(username, uri) {
         security = githubInfo.security;
       }
 
-      return legacyPolicyFactory.createPolicyForGithubObject(this.user, officialUri, githubType, security);
+      return githubPolicyFactory.createPolicyForGithubObject(this.user, officialUri, githubType, security);
     })
     .then(function(policy) {
       return Promise.props({
