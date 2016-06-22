@@ -8,7 +8,6 @@ var sinon = require('sinon');
 var fixture = {};
 var roomMembershipFlags = testRequire('./services/room-membership-flags');
 
-
 function mongoIdEqualPredicate(value) {
   var strValue = String(value);
   return function(x) { return String(x) === strValue; };
@@ -16,7 +15,7 @@ function mongoIdEqualPredicate(value) {
 
 describe('room-membership-service', function() {
 
-  describe('#slow', function() {
+  describe('integration tests #slow', function() {
     var roomMembershipService, persistence;
 
     before(function() {
@@ -586,6 +585,25 @@ describe('room-membership-service', function() {
               return roomMembershipService.findMembershipForUsersInRoom(troupeId, [userId1, userId2]);
             })
             .then(function(result) {
+              assert(Array.isArray(result));
+              assert.strictEqual(result.length, 1);
+              assert.equal(result[0], userId2);
+            });
+      });
+
+      it('should return some users when a single user is added', function() {
+        var troupeId = fixture.troupe1.id;
+        var userId1 = fixture.user1.id;
+        var userId2 = fixture.user2.id;
+
+        return Promise.join(
+            roomMembershipService.removeRoomMember(troupeId, userId1),
+            roomMembershipService.addRoomMember(troupeId, userId2, roomMembershipFlags.MODES.all),
+            function() {
+              return roomMembershipService.findMembershipForUsersInRoom(troupeId, [userId2]);
+            })
+            .then(function(result) {
+              assert(Array.isArray(result));
               assert.strictEqual(result.length, 1);
               assert.equal(result[0], userId2);
             });
@@ -924,6 +942,130 @@ describe('room-membership-service', function() {
             expected[userId3] = roomMembershipFlags.MODES.mute;
 
             equivalentValues(result, expected);
+          });
+      });
+
+    });
+
+    describe('groupMembership change notification', function() {
+      var fixture = fixtureLoader.setup({
+        user1: {},
+        user2: {},
+        user3: {},
+        user4: {},
+        user5: {},
+        user6: {},
+        group1: {},
+        troupe1: { security: 'PUBLIC', group: 'group1', users: ['user3', 'user5', 'user6'] },
+        troupe2: { security: 'PUBLIC', group: 'group1', users: ['user2', 'user4', 'user5'] }
+      });
+      var _onAdded;
+      var onAdded;
+      var _onRemoved;
+      var onRemoved;
+
+      beforeEach(function() {
+        _onAdded = function() {
+          if (onAdded) {
+            return onAdded.apply(null, arguments);
+          }
+
+          assert.ok(false, 'Unexpected add');
+        }
+
+        _onRemoved = function() {
+          if (onRemoved) {
+            return onRemoved.apply(null, arguments);
+          }
+
+          assert.ok(false, 'Unexpected remove');
+        }
+
+        roomMembershipService.events.on('group.members.added', _onAdded);
+        roomMembershipService.events.on('group.members.removed', _onRemoved);
+      });
+
+      afterEach(function() {
+        roomMembershipService.events.removeListener('group.members.added', _onAdded);
+        roomMembershipService.events.removeListener('group.members.removed', _onRemoved);
+        onAdded = null;
+        onRemoved = null;
+      })
+
+      it('should notify when a user joins a new group', function() {
+        var troupeId = fixture.troupe1._id;
+        var userId = fixture.user1._id;
+        var groupId = fixture.group1._id;
+
+        var p = new Promise(function(resolve) {
+          onAdded = function(pGroupId, pUserIds) {
+            assert.strictEqual(pGroupId, groupId);
+            assert.deepEqual(pUserIds, [userId]);
+            resolve();
+          };
+        });
+
+        return roomMembershipService.addRoomMember(troupeId, userId, roomMembershipFlags.MODES.all, groupId)
+          .then(function() {
+            return p;
+          });
+
+      });
+
+      it('should not notify when a user joins a new room for a group they are already in', function() {
+        var troupeId = fixture.troupe1._id;
+        var userId = fixture.user2._id;
+        var groupId = fixture.group1._id;
+
+        return roomMembershipService.addRoomMember(troupeId, userId, roomMembershipFlags.MODES.all, groupId)
+          .delay(10); // Give the caller time to fire the event
+      });
+
+      it('should notify when a user leaves a room and its the last room in that group theyre a member of', function() {
+        var troupeId = fixture.troupe1._id;
+        var userId = fixture.user3._id;
+        var groupId = fixture.group1._id;
+
+        var p = new Promise(function(resolve) {
+          onRemoved = function(pGroupId, pUserIds) {
+            assert.strictEqual(pGroupId, groupId);
+            assert.deepEqual(pUserIds, [userId]);
+            resolve();
+          };
+        });
+
+        return roomMembershipService.removeRoomMember(troupeId, userId, groupId)
+          .then(function() {
+            return p;
+          });
+      });
+
+      it('should not notify when a user leaves a room and its not the last room in that group theyre a member of', function() {
+        var troupeId = fixture.troupe1._id;
+        var userId = fixture.user4._id;
+        var groupId = fixture.group1._id;
+
+        return roomMembershipService.removeRoomMember(troupeId, userId, groupId)
+          .delay(10); // Give the caller time to fire the event
+      });
+
+      it('should emit events when multiple room members are removed at once', function() {
+        var troupeId = fixture.troupe1._id;
+        var userId5 = fixture.user5._id;
+        var userId6 = fixture.user6._id;
+        var groupId = fixture.group1._id;
+
+        var p = new Promise(function(resolve) {
+          onRemoved = function(pGroupId, pUserIds) {
+            assert.strictEqual(pGroupId, groupId);
+            assert.deepEqual(pUserIds, [userId6]);
+            resolve();
+          };
+        });
+
+        return roomMembershipService.removeRoomMembers(troupeId, [userId5, userId6], groupId)
+          .then(function() {
+            return p;
           });
       });
 

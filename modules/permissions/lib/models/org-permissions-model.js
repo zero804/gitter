@@ -10,12 +10,7 @@ var StatusError = require('statuserror');
 /**
  * ORG permissions model
  */
-module.exports = function orgPermissionsModel(user, right, uri, security) {
-  // Security is only for child rooms
-  if(security) {
-    return Promise.reject(new Error('orgs do not have security'));
-  }
-
+module.exports = function orgPermissionsModel(user, right, uri/*, security*/) {
   // For now, only authenticated users can be members of orgs
   if(!user) return Promise.resolve(false);
 

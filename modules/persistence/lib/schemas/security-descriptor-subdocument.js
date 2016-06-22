@@ -14,6 +14,7 @@ var SecurityDescriptorSchema = new Schema({
     // 'GROUP' permissions from group
   ], required: false },
   members: { type: String, enum: [
+    null,              // For one-to-one
     'PUBLIC',          // Anyone
     'INVITE',          // Only invited users can join (private)
     'GH_REPO_ACCESS',  // for GH_REPO, must be able to see the repo
@@ -21,6 +22,7 @@ var SecurityDescriptorSchema = new Schema({
     'GH_ORG_MEMBER',   // for GH_ORG, must be org member
   ]},
   admins: { type: String, enum: [
+    null,             // For one-to-one rooms
     'MANUAL',         // Only users in extraUserIds are admins
     'GH_REPO_PUSH',   // for GH_REPO, must have repo push or admin
     'GH_ORG_MEMBER',  // for GH_ORG, must be org member

@@ -176,7 +176,7 @@ describe('room-with-policy-service', function() {
     it('should not allow admins to be banned', function() {
 
       var RoomWithPolicyService = testRequire.withProxies('./services/room-with-policy-service', {
-        'gitter-web-permissions/lib/legacy-policy-factory': {
+        'gitter-web-permissions/lib/policy-factory': {
           createPolicyForRoom: function(user, room) {
             assert.strictEqual(user.id, fixture.userBan.id);
             assert.strictEqual(room.id, fixture.troupeBan2.id);

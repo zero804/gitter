@@ -11,7 +11,7 @@ var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var StatusError = require('statuserror');
 var bayeuxExtension = require('./extension');
 var Promise = require('bluebird');
-var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
+var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var debug = require('debug')('gitter:app:bayeux-authorisor');
 var recentRoomService = require('../../services/recent-room-service');
 
@@ -138,6 +138,10 @@ function populateSubUserCollection(options) {
   }
 
   switch(collection) {
+    case "groups":
+      return restful.serializeGroupsForUserId(userId)
+        .then(dataToSnapshot('user.groups'));
+
     case "rooms":
     case "troupes":
       return restful.serializeTroupesForUser(userId)
@@ -170,6 +174,8 @@ function populateTroupe(options) {
   var strategy = new restSerializer.TroupeIdStrategy({
     currentUserId: userId,
     includePermissions: true,
+    includeProviders: true,
+    includeGroups: true,
     includeOwner: true
   });
   return restSerializer.serializeObject(troupeId, strategy)
