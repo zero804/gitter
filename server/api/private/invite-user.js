@@ -35,6 +35,7 @@ module.exports = function (req, res, next) {
 
       return user.save()
         .then(function() {
+          // TODO: remove this XXX
           return emailService.sendManualInvitation(req.user, user, room, email);
         })
         .thenReturn([user, room]);

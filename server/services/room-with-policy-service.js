@@ -18,6 +18,7 @@ var roomService = require('./room-service');
 var assert = require('assert');
 var roomMetaService = require('./room-meta-service');
 var processMarkdown = require('../utils/markdown-processor');
+var roomInviteService = require('./room-invite-service');
 
 var MAX_RAW_TAGS_LENGTH = 200;
 
@@ -42,6 +43,10 @@ function allowAdmin() {
 
 function allowJoin() {
   return this.policy.canJoin();
+}
+
+function allowAddUser() {
+  return this.policy.canAddUser();
 }
 
 /**
@@ -270,12 +275,23 @@ RoomWithPolicyService.prototype.updateRoomWelcomeMessage = secureMethod([allowAd
     });
 });
 
-/*
+/**
  * Delete a room
  */
- RoomWithPolicyService.prototype.deleteRoom = secureMethod([allowAdmin], function() {
-   logger.warn('User deleting room ', { roomId: this.room._id, username: this.user.username, userId: this.user._id });
-   return roomService.deleteRoom(this.room);
- });
+RoomWithPolicyService.prototype.deleteRoom = secureMethod([allowAdmin], function() {
+  logger.warn('User deleting room ', { roomId: this.room._id, username: this.user.username, userId: this.user._id });
+  return roomService.deleteRoom(this.room);
+});
+
+/**
+ * Invite a user to a room
+ */
+RoomWithPolicyService.prototype.createRoomInvitation = secureMethod([allowAddUser], function(type, externalId, emailAddress) {
+  return roomInviteService.createInvite(this.room, this.user, {
+    type: type,
+    externalId: externalId,
+    emailAddress: emailAddress
+  });
+});
 
 module.exports = RoomWithPolicyService;

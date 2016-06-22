@@ -78,55 +78,6 @@ function sanitiseUserSearchTerm(term) {
 
 var userService = {
 
-  /**
-   * createdInvitedUser() creates an invited user
-   *
-   * username   String - username used to fetch information from GitHub
-   * user       User - user sending the invite
-   * roomId     ObjectID - the room to whic the user has been invited to
-   * callback   Function - to be called once finished
-   */
-  createInvitedUser: function(username, user, roomId, callback) {
-    var githubUser = new githubUserService(user);
-
-    return githubUser.getUser(username)
-      .then(function (githubUser) {
-
-        // this will be used with newUser below, however you must also add the options to newUser?
-        var gitterUser = {
-          username:           githubUser.login,
-          displayName:        githubUser.name || githubUser.login,
-          gravatarImageUrl:   githubUser.avatar_url,
-          gravatarVersion:    extractGravatarVersion(githubUser.avatar_url),
-          githubId:           githubUser.id,
-          invitedByUser:      user && user._id,
-          invitedToRoom:      roomId,
-          state:              'INVITED'
-        };
-
-        // this does not actually create a user here, please follow through?!
-        return newUser(gitterUser);
-      })
-      .nodeify(callback);
-  },
-
-  inviteByUsernames: function(usernames, user, callback) {
-    return Promise.map(usernames, function(username) {
-        return userService.inviteByUsername(username, user).reflect();
-      })
-      .then(function(inspections) {
-        var invitedUsers = inspections.reduce(function(memo, inspection) {
-          if (inspection.isFulfilled()) {
-            memo.push(inspection.value());
-          }
-          return memo;
-        }, []);
-
-        return invitedUsers;
-      })
-      .nodeify(callback);
-  },
-
   findOrCreateUserForGithubId: function(options, callback) {
     winston.info("Locating or creating user", options);
 

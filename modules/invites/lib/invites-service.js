@@ -13,6 +13,15 @@ function createInvite(roomId, options) {
   var invitedByUserId = options.invitedByUserId;
   var emailAddress = options.emailAddress;
 
+  if (type === 'EMAIL') {
+    // Email address is mandatory
+    if (!emailAddress) throw new StatusError(400);
+    externalId = emailAddress;
+  } else {
+    if (!externalId) throw new StatusError(400);
+    // Email address is optional
+  }
+
   externalId = externalId.toLowerCase();
   var secret = uuid.v4();
   return TroupeInvite.create({
