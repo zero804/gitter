@@ -732,6 +732,7 @@ describe('room-service', function() {
           .bind({})
           .then(function(room) {
             this.room = room;
+            assert(mongoUtils.objectIDsEqual(room.parentId, fixture.troupeOrg1._id));
             assert(mongoUtils.objectIDsEqual(room.groupId, fixture.group1._id));
             return room;
           })
@@ -783,6 +784,7 @@ describe('room-service', function() {
           .bind({})
           .then(function(room) {
             this.room = room;
+            assert(mongoUtils.objectIDsEqual(room.parentId, fixture.troupeOrg1._id));
             assert(mongoUtils.objectIDsEqual(room.groupId, fixture.group1._id));
             return room;
           })
@@ -841,6 +843,7 @@ describe('room-service', function() {
           .bind({})
           .then(function(room) {
             this.room = room;
+            assert(mongoUtils.objectIDsEqual(room.parentId, fixture.troupeOrg1._id));
             assert(mongoUtils.objectIDsEqual(room.groupId, fixture.group1._id));
             return room;
           })
@@ -891,6 +894,7 @@ describe('room-service', function() {
           .bind({})
           .then(function(room) {
             this.room = room;
+            assert(mongoUtils.objectIDsEqual(room.parentId, fixture.troupeEmptyOrg._id));
             assert(mongoUtils.objectIDsEqual(room.groupId, fixture.group1._id));
             return room;
           })
@@ -943,6 +947,7 @@ describe('room-service', function() {
           .bind({})
           .then(function(room) {
             this.room = room;
+            assert(mongoUtils.objectIDsEqual(room.parentId, fixture.troupeRepo._id));
             assert(mongoUtils.objectIDsEqual(room.groupId, fixture.group1._id));
             return room;
           })
@@ -992,6 +997,7 @@ describe('room-service', function() {
           .bind({})
           .then(function(room) {
             this.room = room;
+            assert(mongoUtils.objectIDsEqual(room.parentId, fixture.troupeRepo._id));
             assert(mongoUtils.objectIDsEqual(room.groupId, fixture.group1._id));
             return room;
           })
@@ -1042,6 +1048,7 @@ describe('room-service', function() {
           .bind({})
           .then(function(room) {
             this.room = room;
+            assert(mongoUtils.objectIDsEqual(room.parentId, fixture.troupeRepo._id));
             assert(mongoUtils.objectIDsEqual(room.groupId, fixture.group1._id));
             return room;
           })
@@ -1091,6 +1098,7 @@ describe('room-service', function() {
           .bind({})
           .then(function(room) {
             this.room = room;
+            assert(mongoUtils.objectIDsEqual(room.ownerUserId, fixture.user1._id));
             assert(mongoUtils.objectIDsEqual(room.groupId, fixture.group1._id));
             return room;
           })
@@ -1138,6 +1146,7 @@ describe('room-service', function() {
           .bind({})
           .then(function(room) {
             this.room = room;
+            assert(mongoUtils.objectIDsEqual(room.ownerUserId, fixture.user1._id));
             assert(mongoUtils.objectIDsEqual(room.groupId, fixture.group1._id));
             return room;
           })
@@ -1185,6 +1194,7 @@ describe('room-service', function() {
           .bind({})
           .then(function(room) {
             this.room = room;
+            assert(mongoUtils.objectIDsEqual(room.ownerUserId, fixture.user1._id));
             return room;
           })
           .tap(function(room) {

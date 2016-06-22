@@ -12,7 +12,7 @@ var roomNameTrimmer = require('../../public/js/utils/room-name-trimmer');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var moment = require('moment');
 var Promise = require('bluebird');
-var i18nFactory = require('../utils/i18n-factory');
+var i18nFactory = require('gitter-web-i18n');
 
 /*
  * Return a nice sane

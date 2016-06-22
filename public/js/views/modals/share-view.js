@@ -7,7 +7,7 @@ var clientEnv = require('gitter-client-env');
 var apiClient = require('components/apiClient');
 var social = require('utils/social');
 var ModalView = require('./modal');
-var cdn = require('utils/cdn');
+var cdn = require('gitter-web-cdn');
 var template = require('./tmpl/share-view.hbs');
 var ZeroClipboard = require('zeroclipboard');
 

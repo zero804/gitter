@@ -182,6 +182,7 @@ function getOwnerFromRepoFullName(repoName) {
  * given uri.
  */
 function ensureGroupForGitHubRoom(user, githubType, uri) {
+  debug('ensureGroupForGitHubRoom: type=%s uri=%s', githubType, uri);
   var options;
   switch (githubType) {
     case 'REPO':
@@ -486,7 +487,7 @@ function createRoomByUri(user, uri, options) {
 
           return policyFactory.createPolicyForRoom(user, resolvedTroupe)
             .then(function(policy) {
-              return policy.canView();
+              return policy.canRead();
             })
             .then(function(viewAccess) {
               if (!viewAccess) throw new StatusError(404);
@@ -773,7 +774,7 @@ function createRoomChannel(parentTroupe, user, options) {
         });
     })
     .then(function(groupId) {
-      return createChannel(user, null, {
+      return createChannel(user, parentTroupe, {
         uri: uri,
         security: options.security,
         githubType: githubType,

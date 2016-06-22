@@ -147,7 +147,7 @@ describe('group-service', function() {
         return groupService.migration.ensureGroupForGitHubRoomCreation(fixture.user1, {
           uri: fixtureLoader.GITTER_INTEGRATION_ORG,
           name: 'BOB',
-          obtainAccessFromGitHubRepo: fixtureLoader.GITTER_INTEGRATION_REPO
+          obtainAccessFromGitHubRepo: fixtureLoader.GITTER_INTEGRATION_REPO_FULL
         })
         .then(function(group) {
           return securityDescriptorService.getForGroupUser(group._id, fixture.user1._id);
