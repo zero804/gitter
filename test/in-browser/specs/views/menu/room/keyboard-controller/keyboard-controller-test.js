@@ -301,13 +301,6 @@ describe('KeyboardControllerView', function(){
       assert(model.favouriteCollection.at(0).get('focus'));
     });
 
-    it('should focus the first minibar item if the last item in the room list is in focus when tab is pressed', function(){
-      view.blurAllItems();
-      model.tertiaryCollection.at(1).set('focus', true);
-      appEvents.trigger('keyboard.room.tab');
-      assert(model.minibarCollection.at(0).get('focus'));
-    });
-
     it('should focus the first room-item when search is in focus', function(){
       view.blurAllItems();
       model.searchFocusModel.set('focus', true);
@@ -326,13 +319,6 @@ describe('KeyboardControllerView', function(){
       model.primaryCollection.at(0).set('focus', true);
       appEvents.trigger('keyboard.room.prev.tab');
       assert(model.favouriteCollection.at(1).get('focus'));
-    });
-
-    it('should focus the last item in the room list if the first item in the minibar is in focus and shift-tab is pressed', function(){
-      view.blurAllItems();
-      model.minibarCollection.findWhere({ type: 'all'}).set('focus', true);
-      appEvents.trigger('keyboard.room.prev.tab');
-      assert(model.tertiaryCollection.at(1).get('focus'));
     });
 
     it('should focus the last item in the minibar if the first room-item is in focus and shit-tab is pressed', function(){
@@ -357,6 +343,18 @@ describe('KeyboardControllerView', function(){
       appEvents.trigger('keyboard.room.prev.tab');
       assert(!model.searchFocusModel.get('focus'));
       assert(model.minibarCollection.findWhere({ active: true}).get('focus'));
+    });
+
+    it('should not call preventDefault if the last item in the room list is in focus and tab is pressed', function(){
+      var spy = function(){ assert(false, 'e.preventDefault was called'); };
+      model.tertiaryCollection.at(1).set('focus', true);
+      appEvents.trigger('keyboard.room.tab', { preventDefault: spy });
+    });
+
+    it('should not call preventDefault if the first minibar-item is in focus and shift-tab is pressed', function(){
+      var spy = function(){ assert(false, 'e.preventDefault was called'); };
+      model.minibarCollection.at(0).set('focus', true);
+      appEvents.trigger('keyboard.room.prev.tab', { preventDefault: spy });
     });
 
   });
