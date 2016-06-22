@@ -7,6 +7,8 @@ var assert = require('assert');
 var StatusError = require('statuserror');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
+var MS_PER_DAY = 24 * 60 * 60 * 1000;
+
 function createInvite(roomId, options) {
   var type = options.type;
   var externalId = options.externalId;
@@ -83,9 +85,51 @@ function markInviteRejected(inviteId, userId) {
     .exec();
 }
 
+function findInvitesForReminder(timeHorizonDays) {
+  var cutoffId = mongoUtils.createIdForTimestamp(Date.now() - timeHorizonDays * MS_PER_DAY);
+  return TroupeInvite.aggregate([{
+      $match: {
+        state: 'PENDING',
+        _id: { $lt: cutoffId },
+        reminderSent: null,
+      }
+    }, {
+      $project: {
+        _id: 0,
+        invite: '$$ROOT'
+      }
+    },{
+      $lookup: {
+        from: 'troupes',
+        localField: 'invite.troupeId',
+        foreignField: '_id',
+        as: 'troupe'
+      }
+    },{
+      $unwind: {
+        path: '$troupe',
+        preserveNullAndEmptyArrays: true
+      }
+    },{
+      $lookup: {
+        from: 'users',
+        localField: 'invite.invitedByUserId',
+        foreignField: '_id',
+        as: 'invitedByUser'
+      }
+    },{
+      $unwind: {
+        path: '$invitedByUser',
+        preserveNullAndEmptyArrays: true
+      }
+    }])
+    .exec();
+}
+
 module.exports = {
   createInvite: Promise.method(createInvite),
   accept: Promise.method(accept),
   markInviteAccepted: Promise.method(markInviteAccepted),
-  markInviteRejected: Promise.method(markInviteRejected)
+  markInviteRejected: Promise.method(markInviteRejected),
+  findInvitesForReminder: findInvitesForReminder
 }
