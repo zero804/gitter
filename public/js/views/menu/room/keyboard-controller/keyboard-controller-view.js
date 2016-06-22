@@ -111,6 +111,12 @@ var KeyboardController = Marionette.ItemView.extend({
 
   onTabKeyPressed: function (e){
     var index;
+
+    var activeRoomItem = this.queryAttrOnRoomCollections('focus', true);
+    var roomList = this.getFlatRoomCollection();
+    //If the last room-item in the list is in focus bail out
+    if(roomList.indexOf(activeRoomItem) === (roomList.length - 1)) { return; }
+
     if(e) { e.preventDefault(); }
 
     //Wen search is in focus and you press tab move to the first item in the room list
@@ -126,8 +132,6 @@ var KeyboardController = Marionette.ItemView.extend({
       if(index === (this.minibarCollection.length - 1)) { return this.focusFirstRoomItem(); }
       return this.moveMinibarFocus(1);
     }
-    var activeRoomItem = this.queryAttrOnRoomCollections('focus', true);
-    var roomList = this.getFlatRoomCollection();
     index = roomList.indexOf(activeRoomItem);
     if(index === (roomList.length - 1)) { return this.focusFirstMinibarItem(); }
     return this.moveRoomCollectionFocus(1);
@@ -135,6 +139,9 @@ var KeyboardController = Marionette.ItemView.extend({
 
   onTabShiftKeyPressed: function (e){
     var index;
+
+    var isMinibarInFocus = this.isMinibarInFocus();
+    if(isMinibarInFocus && this.minibarCollection.at(0).get('focus')) { return; }
     if(e) { e.preventDefault(); }
 
     if(this.searchFocusModel.get('focus')){
@@ -145,7 +152,7 @@ var KeyboardController = Marionette.ItemView.extend({
     //unfocus search
     this.searchFocusModel.set('focus', false);
     //when the minibar is in focus
-    if(this.isMinibarInFocus()) {
+    if(isMinibarInFocus) {
       var focusedMinibarItem = this.getFocusedMinibarItem();
       index = this.minibarCollection.indexOf(focusedMinibarItem);
       if(index === 0) { return this.focusLastRoomItem(); }
