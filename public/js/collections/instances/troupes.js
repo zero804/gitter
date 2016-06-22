@@ -23,13 +23,11 @@ var troupeCollection = new troupeModels.TroupeCollection(existingRooms, { listen
 
 
 var groupCollection;
-if(context.hasFeature('groups')) {
-  groupCollection = new groupModels.GroupCollection([], { listen: true });
-  groupCollection.on('error', errorHandle.bind(null, 'group-collection'));
+groupCollection = new groupModels.GroupCollection([], { listen: true });
+groupCollection.on('error', errorHandle.bind(null, 'group-collection'));
 
-  // Adapt unread items to the groups collection
-  unreadItemsGroupAdapter(groupCollection, troupeCollection);
-}
+// Adapt unread items to the groups collection
+unreadItemsGroupAdapter(groupCollection, troupeCollection);
 
 var orgsCollection = new orgModels.OrgCollection(null, { listen: true });
 orgsCollection.on('error', errorHandle.bind(null, 'org-collection'));
