@@ -9,8 +9,17 @@ var groupUriChecker = testRequire('./services/group-uri-checker');
 
 describe('group-uri-checker #slow', function() {
   var fixture = fixtureLoader.setup({
+    deleteDocuments: {
+      User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }],
+      Troupe: [ { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() } ],
+      Group: [
+        { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
+        { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() }
+      ]
+    },
     user1: {
-      githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN
+      githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
+      username: fixtureLoader.GITTER_INTEGRATION_USERNAME
     },
     group1: {},
     troupe1: {}
@@ -26,45 +35,47 @@ describe('group-uri-checker #slow', function() {
       });
   });
 
-  it('should resolve to true if a user with that username exists', function() {
+  it('should not allow creation if a user with that username exists', function() {
     return groupUriChecker(fixture.user1, fixture.user1.username)
-      .then(function(exists) {
-        assert.strictEqual(exists, true);
+      .then(function(info) {
+        assert.strictEqual(info.allowCreate, false);
       });
   });
 
-  it('should resolve to true if a group with that uri exists', function() {
+  it('should not allow creation if a group with that uri exists', function() {
     return groupUriChecker(fixture.user1, fixture.group1.uri)
-      .then(function(exists) {
-        assert.strictEqual(exists, true);
+      .then(function(info) {
+        assert.strictEqual(info.allowCreate, false);
       });
   });
 
-  it('should resolve to true if a troupe with that uri exists', function() {
+  it('should not allow creation if a troupe with that uri exists', function() {
     return groupUriChecker(fixture.user1, fixture.troupe1.uri)
-      .then(function(exists) {
-        assert.strictEqual(exists, true);
+      .then(function(info) {
+        assert.strictEqual(info.allowCreate, false);
       });
   });
 
-  it('should resolve to true if a gh org with that login exists', function() {
+  it('should allow creation if a gh org with that login exists and the user has admin access', function() {
     return groupUriChecker(fixture.user1, fixtureLoader.GITTER_INTEGRATION_ORG)
-      .then(function(exists) {
-        assert.strictEqual(exists, true);
+      .then(function(info) {
+        assert.strictEqual(info.type, 'GH_ORG');
+        assert.strictEqual(info.allowCreate, true);
       });
   });
 
-  it('should resolve to true if a gh user with that login exists', function() {
+  it('should not allow creation if a gh user with that login exists', function() {
     return groupUriChecker(fixture.user1, fixtureLoader.GITTER_INTEGRATION_USERNAME)
-      .then(function(exists) {
-        assert.strictEqual(exists, true);
+      .then(function(info) {
+        assert.strictEqual(info.allowCreate, false);
       });
   });
 
-  it('should resolve to false if the uri is not taken in any way', function() {
+  it('should allow creation if the uri is not taken in any way', function() {
     return groupUriChecker(fixture.user1, '_this-should-not-exist')
-      .then(function(exists) {
-        assert.strictEqual(exists, false);
+      .then(function(info) {
+        assert.strictEqual(info.type, null);
+        assert.strictEqual(info.allowCreate, true);
       });
   });
 
