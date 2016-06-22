@@ -10,6 +10,7 @@ var userSort = require('../../../public/js/utils/user-sort');
 var isolateBurst = require('gitter-web-shared/burst/isolate-burst-array');
 var userSettingsService = require('../../services/user-settings-service');
 var unreadItemService = require('../../services/unread-items');
+var troupeService = require('../../services/troupe-service');
 var roomMembershipService = require('../../services/room-membership-service');
 var _ = require('lodash');
 var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
@@ -52,7 +53,7 @@ function renderChat(req, res, options, next) {
         restful.serializeChatsForTroupe(troupe.id, userId, chatSerializerOptions),
         options.fetchEvents === false ? null : restful.serializeEventsForTroupe(troupe.id, userId),
         options.fetchUsers === false ? null : restful.serializeUsersForTroupe(troupe.id, userId, userSerializerOptions),
-        // TODO: Why does this always return undefined
+        troupeService.checkGitHubTypeForUri(troupe.lcOwner || '', 'ORG'),
         userSettingsService.getUserSettings(req.user._id, 'rightToolbar')
       ]).spread(function (troupeContext, chats, activityEvents, users, ownerIsOrg, rightToolbarUserSettings) {
 

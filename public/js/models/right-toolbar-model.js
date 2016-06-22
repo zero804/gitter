@@ -5,13 +5,17 @@ var Backbone = require('backbone');
 var apiClient = require('components/apiClient');
 
 module.exports = Backbone.Model.extend({
-   defaults: {
-      isPinned: true
-   },
+  defaults: {
+    isPinned: true
+  },
 
-   initialize: function() {
-      this.listenTo(this, 'change', _.throttle(this.save.bind(this), 1500));
-   },
+  initialize: function() {
+    this.listenTo(this, 'change', _.throttle(this.save.bind(this), 1500));
+
+    // Should we add a snapshot instead?
+    // This still gives a slight wrong render
+    this.sync('read', this, {});
+  },
 
 
   toJSON: function() {
@@ -23,24 +27,23 @@ module.exports = Backbone.Model.extend({
     }, {});
   },
 
-   sync: function(method, model, options) {
-      var successCb = options.success.bind(this) || function() {};
+  sync: function(method, model, options) {
+    var successCb = (options.success && options.success.bind(this)) || function() {};
 
-      // Save
-      if (method === 'create' || method === 'update' || method === 'patch') {
-         return apiClient.user.put('/settings/rightToolbar', this.toJSON(), {
-             // No need to get the JSON back from the server...
-             dataType: 'text'
-           })
-           .then(function(data) { successCb(data); })
-           .catch(function(err) { if (options.error) options.error(err); });
-      }
+    // Save
+    if (method === 'create' || method === 'update' || method === 'patch') {
+       return apiClient.user.put('/settings/rightToolbar', this.toJSON(), {
+           // No need to get the JSON back from the server...
+           dataType: 'text'
+         })
+         .then(function(data) { successCb(data); })
+         .catch(function(err) { if (options.error) options.error(err); });
+    }
 
-      // TODO: Is this correct???
-      return apiClient.user.get('/settings/rightToolbar')
-         .then(function(result) {
-            this.set(result);
-            successCb();
-         });
-   }
+    return apiClient.user.get('/settings/rightToolbar')
+       .then(function(result) {
+          this.set(result);
+          successCb();
+       }.bind(this));
+  }
 });
