@@ -1,4 +1,4 @@
-/* eslint complexity: ["error", 15] */
+/* eslint complexity: ["error", 16] */
 "use strict";
 
 var debug = require('debug')('gitter:infra:serializer:troupe');
@@ -183,6 +183,8 @@ function TroupeStrategy(options) {
       if (otherUser) {
         troupeName = otherUser.displayName;
         troupeUrl = "/" + otherUser.username;
+      } else {
+        return null;
       }
     } else {
       troupeName = item.uri;
@@ -227,6 +229,7 @@ function TroupeStrategy(options) {
       ownerIsOrg: ownerIsOrgStrategy ? ownerIsOrgStrategy.map(item) : undefined, // TODO: remove this once groups are in place
       roomMember: roomMembershipStrategy ? roomMembershipStrategy.map(item.id) : undefined,
       group: groupIdStrategy && item.groupId ? groupIdStrategy.map(item.groupId) : undefined,
+      groupId: item.groupId || undefined,
       v: getVersion(item)
     };
   };

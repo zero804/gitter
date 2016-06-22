@@ -9,7 +9,7 @@ var _ = require('lodash');
 var uuid = require('node-uuid');
 var sechash = require('sechash');
 var userService = require('../../services/user-service');
-var useragentTagger = require('../../utils/user-agent-tagger');
+var useragentTagger = require('../user-agent-tagger');
 var debug = require('debug')('gitter:infra:rememberme-middleware');
 var userScopes = require('gitter-web-identity/lib/user-scopes');
 var passportLogin = require('../passport-login');
@@ -30,6 +30,7 @@ var REMEMBER_ME_PREFIX = "rememberme:";
  * Generate an auth token for a user and save it in redis
  */
 function generateAuthToken(userId) {
+  debug('Generate auth token: userId=%s', userId);
   var key = uuid.v4();
   var token = uuid.v4();
 
@@ -51,6 +52,8 @@ function generateAuthToken(userId) {
  * Delete a token
  */
 var deleteAuthToken = Promise.method(function(authCookieValue) {
+  debug('Delete auth token: token=%s', authCookieValue);
+
   /* Auth cookie */
   if(!authCookieValue) return;
 
@@ -138,6 +141,7 @@ var validateAuthToken = Promise.method(function(authCookieValue) {
 function processRememberMeToken(presentedCookie) {
   return validateAuthToken(presentedCookie)
     .then(function(userId) {
+      debug('Resolved userId=%s for token=%s', userId, presentedCookie);
       if (!userId) return;
 
       return userService.findById(userId)
@@ -223,7 +227,7 @@ module.exports = {
         req.accessToken = null;
 
         // Tracking
-        var properties = useragentTagger(req.headers['user-agent']);
+        var properties = useragentTagger(req);
         stats.userUpdate(user, properties);
 
         stats.event("rememberme_accepted");
@@ -238,6 +242,7 @@ module.exports = {
         return passportLogin(req, user);
       })
       .catch(function(err) {
+        debug('Rememberme token failed with %s', err);
         stats.event("rememberme_rejected");
         res.clearCookie(cookieName, { domain: nconf.get("web:cookieDomain") });
         throw err;

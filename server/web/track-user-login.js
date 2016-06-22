@@ -3,15 +3,15 @@
 var env = require('gitter-web-env');
 var stats = env.stats;
 
-var _ = require('underscore');
+var _ = require('lodash');
 var emailAddressService = require('../services/email-address-service');
-var useragentTagger = require('../utils/user-agent-tagger');
+var useragentTagger = require('./user-agent-tagger');
 
 // Use this whenever a user logs in again
 module.exports = function trackUserLogin(req, user, provider) {
-  emailAddressService(user)
+  return emailAddressService(user)
     .then(function(email) {
-      var properties = useragentTagger(req.headers['user-agent']);
+      var properties = useragentTagger(req);
 
       // this is only set because stats.userUpdate requires it
       user.email = email;

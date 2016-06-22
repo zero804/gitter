@@ -2,7 +2,7 @@
 
 var roomService = require('../../../services/room-service');
 var restSerializer = require("../../../serializers/rest-serializer");
-var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
+var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var RoomWithPolicyService = require('../../../services/room-with-policy-service');
 var StatusError = require('statuserror');
 
@@ -27,7 +27,13 @@ module.exports = function(req, res, next) {
       return roomWithPolicyService.createChannel({ name: channelName, security: channelSecurity });
     })
     .then(function(customRoom) {
-      var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id });
+      var strategy = new restSerializer.TroupeStrategy({
+        currentUserId: req.user.id,
+        // include all these because it will replace the troupe in the context
+        includeTags: true,
+        includeProviders: true,
+        includeGroups: true
+      });
       return restSerializer.serializeObject(customRoom, strategy);
     })
     .then(function(serialized) {

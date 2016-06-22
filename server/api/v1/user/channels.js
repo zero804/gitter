@@ -11,7 +11,13 @@ function serialize(items, req) {
 }
 
 function serializeObject(item, req) {
-  var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user && req.user.id });
+  var strategy = new restSerializer.TroupeStrategy({
+    currentUserId: req.user && req.user.id,
+    // include all these because it will replace the troupe in the context
+    includeTags: true,
+    includeProviders: true,
+    includeGroups: true
+  });
 
   return restSerializer.serializeObject(item, strategy);
 }

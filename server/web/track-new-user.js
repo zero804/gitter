@@ -4,7 +4,7 @@ var env = require('gitter-web-env');
 var stats = env.stats;
 
 var emailAddressService = require('../services/email-address-service');
-var gaCookieParser = require('../utils/ga-cookie-parser');
+var gaCookieParser = require('./ga-cookie-parser');
 
 // Use this whenever a user first signs up.
 module.exports = function trackNewUser(req, user, provider) {

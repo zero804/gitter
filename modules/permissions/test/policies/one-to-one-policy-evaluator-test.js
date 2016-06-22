@@ -2,14 +2,14 @@
 
 var assert = require('assert');
 var Promise = require('bluebird');
-var OneToOneRoomPolicyEvaluator = require('../../lib/policies/one-to-one-policy-evaluator');
+var OneToOnePolicyEvaluator = require('../../lib/policies/one-to-one-policy-evaluator');
 
 describe('one-to-one-policy-evaluator', function() {
 
   var FIXTURES = [
     { name: 'anon users can access anything', userId: null },
-    { name: 'anon users can access anything', userId: '1', inRoom: true },
-    { name: 'anon users can access anything', userId: '1', inRoom: false }
+    { name: 'User in the room can access', userId: '1', inRoom: true },
+    { name: 'User not in the room cannot access', userId: '1', inRoom: false }
   ];
 
   FIXTURES.forEach(function(meta) {
@@ -27,11 +27,7 @@ describe('one-to-one-policy-evaluator', function() {
         })
       };
 
-      var user = userId && {
-        _id: userId
-      };
-
-      var evaluator = new OneToOneRoomPolicyEvaluator(user, null, contextDelegate);
+      var evaluator = new OneToOnePolicyEvaluator(userId, null, contextDelegate);
 
       return Promise.join(
         evaluator.canRead(),
