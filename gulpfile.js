@@ -23,6 +23,7 @@ var webpack = require('gulp-webpack');
 var eslint = require('gulp-eslint');
 
 var gzip = require('gulp-gzip');
+var brotli = require('gulp-brotli');
 var mocha = require('gulp-spawn-mocha');
 var using = require('gulp-using');
 var tar = require('gulp-tar');
@@ -615,12 +616,40 @@ function restoreOriginalFileTimestamps() {
 
 }
 
-gulp.task('compress-assets', ['build-assets'], function() {
+gulp.task('compress-assets-gzip', ['build-assets'], function() {
   return gulp.src(['output/assets/**/*.{css,js,ttf,svg,eot}', '!**/*.map'], { stat: true, base: 'output/assets/' })
     .pipe(gzip({ append: true, gzipOptions: { level: 9 } }))
     .pipe(gulp.dest('output/assets/'))
     .pipe(restoreOriginalFileTimestamps());
 });
+
+// Brotli compression for text files
+gulp.task('compress-assets-brotli-text', ['build-assets'], function() {
+  return gulp.src(['output/assets/**/*.{css,svg,js}', '!**/*.map'], { stat: true, base: 'output/assets/' })
+    .pipe(brotli.compress({
+      mode: 1, // 1 = TEXT
+      extension: 'br',
+      quality: 11
+    }))
+    .pipe(gulp.dest('output/assets/'))
+    .pipe(restoreOriginalFileTimestamps());
+});
+
+// Brotli compression for non-text files
+gulp.task('compress-assets-brotli-generic', ['build-assets'], function() {
+  return gulp.src(['output/assets/**/*.{ttf,eot}', '!**/*.map'], { stat: true, base: 'output/assets/' })
+    .pipe(brotli.compress({
+      mode: 0, // 0 = GENERIC
+      extension: 'br',
+      quality: 11
+    }))
+    .pipe(gulp.dest('output/assets/'))
+    .pipe(restoreOriginalFileTimestamps());
+});
+
+gulp.task('compress-assets-brotli', ['compress-assets-brotli-generic', 'compress-assets-brotli-text']);
+
+gulp.task('compress-assets', ['compress-assets-brotli', 'compress-assets-gzip']);
 
 gulp.task('tar-assets', ['build-assets', 'compress-assets'], function () {
     return gulp.src(['output/assets/**', '!**/*.map'], { stat: true })
