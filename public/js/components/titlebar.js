@@ -1,7 +1,7 @@
 "use strict";
 var $ = require('jquery');
 var appEvents = require('utils/appevents');
-var cdn = require('../utils/cdn');
+var cdn = require('gitter-web-cdn');
 
 module.exports = (function() {
   var faviconUnread = cdn('images/favicon-unread.ico');
@@ -78,4 +78,3 @@ module.exports = (function() {
   return TitlebarUpdater;
 
 })();
-
