@@ -122,7 +122,7 @@ var KeyboardController = Marionette.ItemView.extend({
 
     if(e) { e.preventDefault(); }
 
-    //Wen search is in focus and you press tab move to the first item in the room list
+    //When search is in focus and you press tab move to the first item in the room list
     if(this.searchFocusModel.get('focus')) {
       this.searchFocusModel.set('focus', false);
       return this.focusFirstRoomItem();
