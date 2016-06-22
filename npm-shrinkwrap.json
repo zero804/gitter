@@ -3,9 +3,8 @@
   "version": "13.4.0",
   "dependencies": {
     "@gitterhq/translations": {
-      "version": "1.0.0",
-      "from": "@gitterhq/translations@>=1.0.0 <2.0.0",
-      "resolved": "https://registry.npmjs.org/@gitterhq/translations/-/translations-1.0.0.tgz"
+      "version": "1.1.1",
+      "from": "@gitterhq/translations@>=1.1.1 <2.0.0"
     },
     "apn": {
       "version": "1.7.6",
@@ -2216,6 +2215,11 @@
       "from": "modules/cache-wrapper",
       "resolved": "file:modules/cache-wrapper"
     },
+    "gitter-web-cdn": {
+      "version": "1.0.0",
+      "from": "modules/cdn",
+      "resolved": "file:modules/cdn"
+    },
     "gitter-web-env": {
       "version": "1.0.0",
       "from": "modules/env",
@@ -2240,6 +2244,11 @@
       "version": "1.0.0",
       "from": "modules/groups",
       "resolved": "file:modules/groups"
+    },
+    "gitter-web-i18n": {
+      "version": "1.0.0",
+      "from": "modules/i18n",
+      "resolved": "file:modules/i18n"
     },
     "gitter-web-identity": {
       "version": "1.0.0",
@@ -2450,18 +2459,6 @@
       "version": "8.9.1",
       "from": "highlight.js@>=8.6.0 <9.0.0",
       "resolved": "http://beta-internal:4873/highlight.js/-/highlight.js-8.9.1.tgz"
-    },
-    "i18n": {
-      "version": "0.4.1",
-      "from": "i18n@>=0.4.1 <0.5.0",
-      "resolved": "http://beta-internal:4873/i18n/-/i18n-0.4.1.tgz",
-      "dependencies": {
-        "sprintf": {
-          "version": "0.1.5",
-          "from": "sprintf@>=0.1.1",
-          "resolved": "http://beta-internal:4873/sprintf/-/sprintf-0.1.5.tgz"
-        }
-      }
     },
     "i18n-2": {
       "version": "0.4.6",

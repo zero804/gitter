@@ -766,7 +766,7 @@ function createRoomChannel(parentTroupe, user, options) {
         });
     })
     .then(function(groupId) {
-      return createChannel(user, null, {
+      return createChannel(user, parentTroupe, {
         uri: uri,
         security: options.security,
         githubType: githubType,
