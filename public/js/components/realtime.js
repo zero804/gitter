@@ -6,6 +6,7 @@ var appEvents = require('utils/appevents');
 var log = require('utils/log');
 var logout = require('utils/logout');
 var RealtimeClient = require('gitter-realtime-client').RealtimeClient;
+var wrapExtension = require('gitter-realtime-client').wrapExtension;
 var debug = require('debug-proxy')('app:realtime');
 var realtimePresenceTracker = require('./realtime-presence-tracking');
 var _ = require('underscore');
@@ -38,7 +39,7 @@ function authProvider(callback) {
 
 var updateTimers;
 var handshakeExtension = {
-  incoming: function (message, callback) {
+  incoming: wrapExtension(function(message, callback) {
     if (message.channel !== '/meta/handshake') return callback(message);
 
     if (message.successful) {
@@ -83,14 +84,14 @@ var handshakeExtension = {
     }
 
     callback(message);
-  }
+  })
 };
 
 
 var terminating = false;
 
 var accessTokenFailureExtension = {
-  incoming: function (message, callback) {
+  incoming: wrapExtension(function (message, callback) {
     if (message.error && message.advice && message.advice.reconnect === 'none') {
       // advice.reconnect == 'none': the server has effectively told us to go away for good
       if (!terminating) {
@@ -104,7 +105,7 @@ var accessTokenFailureExtension = {
     }
 
     callback(message);
-  }
+  })
 };
 
 var client;

@@ -15,7 +15,7 @@ var StatusError = require('statuserror');
 var roomMembershipService = require('./room-membership-service');
 var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
 var legacyMigration = require('gitter-web-permissions/lib/legacy-migration');
-var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
+var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var debug = require('debug')('gitter:app:one-to-one-room-service');
 
 function getOneToOneRoomQuery(userId1, userId2) {

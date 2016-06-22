@@ -55,7 +55,7 @@ describe('create-distribution', function() {
         '../room-membership-service': roomMembershipService,
         './distribution': MockDistribution,
         '../categorise-users-in-room': categoriseUserInRoom,
-        'gitter-web-permissions/lib/legacy-policy-factory': {
+        'gitter-web-permissions/lib/policy-factory': {
           createPolicyForUserIdInRoom: createPolicyForUserIdInRoom
         }
       });
@@ -271,7 +271,7 @@ describe('create-distribution', function() {
 
       createDistribution = testRequire.withProxies("./services/unread-items/create-distribution", {
         '../user-service': userService,
-        'gitter-web-permissions/lib/legacy-policy-factory': {
+        'gitter-web-permissions/lib/policy-factory': {
           createPolicyForUserIdInRoom: createPolicyForUserIdInRoom
         }
       });
@@ -306,7 +306,7 @@ describe('create-distribution', function() {
           }
         });
       });
-      
+
       return createDistribution.testOnly.findNonMembersWithAccess({ security: 'PUBLIC' }, ['1','2','3'])
         .then(function(userIds) {
           assert.deepEqual(userIds, ['1','2','3']);
