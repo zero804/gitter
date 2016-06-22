@@ -7,8 +7,7 @@ function checkGroupUri(req, res, next) {
     .then(function(info) {
       if (info.allowCreate) {
         res.send({
-          type: info.type,
-          allowCreate: info.allowCreate
+          type: info.type
         });
       } else {
         res.sendStatus(409);
