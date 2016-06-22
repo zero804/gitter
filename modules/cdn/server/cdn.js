@@ -66,9 +66,7 @@ function cdnMulti(url, options) {
 
 var useCdn = nconf.get("cdn:use");
 
-if(!useCdn) {
-  module.exports = passthrough;
-} else {
+if(useCdn) {
   hosts = nconf.get("cdn:hosts");
   hostLength = hosts.length;
 
@@ -85,4 +83,6 @@ if(!useCdn) {
   } else {
     module.exports = cdnSingle;
   }
+} else {
+  module.exports = passthrough;
 }

@@ -5,7 +5,6 @@ var makeBenchmark = require('../make-benchmark');
 var persistence = require('gitter-web-persistence');
 var legacyMigration = require('gitter-web-permissions/lib/legacy-migration');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
-var userCanAccessRoom = require('gitter-web-permissions/lib/user-can-access-room');
 var Promise = require('bluebird');
 
 var count = 0;
@@ -100,15 +99,6 @@ makeBenchmark({
         .asCallback(done);
     },
 
-    'old#permissionToRead': function(done) {
-      count++
-      var user = users[count % users.length];
-      var room = roomAndPerms[count % roomAndPerms.length].room;
-
-      return userCanAccessRoom.permissionToRead(user._id, room._id)
-        .asCallback(done);
-    },
-
     'new#canWrite': function(done) {
       count++
       var user = users[count % users.length];
@@ -119,16 +109,6 @@ makeBenchmark({
       return policy.canWrite()
         .asCallback(done);
     },
-
-    'old#permissionToWrite': function(done) {
-      count++
-      var user = users[count % users.length];
-      var room = roomAndPerms[count % roomAndPerms.length].room;
-
-      return userCanAccessRoom.permissionToWrite(user._id, room._id)
-        .asCallback(done);
-    },
-
 
   }
 

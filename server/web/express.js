@@ -2,6 +2,7 @@
 
 var env = require('gitter-web-env');
 var config = env.config;
+var logger = env.logger;
 
 var passport = require('passport');
 var expressHbs = require('express-hbs');
@@ -19,9 +20,15 @@ require('./http');
 
 function getSessionStore() {
   var RedisStore = require('connect-redis')(session);
+
+  var redisClient = env.ioredis.createClient(config.get('redis_nopersist'));
+
   return new RedisStore({
-    client: env.redis.createClient(process.env.REDIS_NOPERSIST_CONNECTION_STRING || config.get("redis_nopersist")),
-    ttl: config.get('web:sessionTTL')
+    client: redisClient,
+    ttl: config.get('web:sessionTTL'),
+    logErrors: function(err) {
+      logger.error('connect-redis reported a redis error: ' + err, { exception: err });
+    }
   });
 
 }

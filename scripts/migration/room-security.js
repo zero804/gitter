@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-/* jshint node:true, unused:true */
 'use strict';
 
 var persistence = require('gitter-web-persistence');
@@ -13,11 +12,11 @@ var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 function getTroupeBatchedStream() {
   return persistence.Troupe
-    .find({})
+    .find({ sd: null })
     .lean()
     .read('secondaryPreferred')
     .stream()
-    .pipe(new BatchStream({ size : 8192 }));
+    .pipe(new BatchStream({ size: 8192 }));
 }
 
 function keyById(results) {
@@ -108,21 +107,32 @@ var updateBatch = Promise.method(function (items) {
 
   if (!items.length) return;
 
-  var bulk = persistence.SecurityDescriptor.collection.initializeUnorderedBulkOp();
+  var bulk = persistence.Troupe.collection.initializeUnorderedBulkOp();
 
   items.forEach(function(item) {
     var troupeId = item.troupe._id;
     var descriptor = item.perms;
 
+    var sd = {
+      type: descriptor.type,
+      members: descriptor.members,
+      admins: descriptor.admins,
+      public: descriptor.public,
+      linkPath: descriptor.linkPath,
+      externalId: descriptor.externalId,
+    };
+
+    if (descriptor.extraMembers && descriptor.extraMembers.length) {
+      sd.extraMembers = mongoUtils.asObjectIDs(descriptor.extraMembers);
+    }
+
+    if (descriptor.extraAdmins && descriptor.extraAdmins.length) {
+      sd.extraAdmins = mongoUtils.asObjectIDs(descriptor.extraAdmins);
+    }
+
     var setOperation = {
-      $setOnInsert: {
-        troupeId: troupeId,
-        type: descriptor.type,
-        members: descriptor.members,
-        admins: descriptor.admins,
-        public: descriptor.public,
-        linkPath: descriptor.linkPath,
-        externalId: descriptor.externalId,
+      $set: {
+        sd: sd
       }
     };
 
@@ -130,15 +140,7 @@ var updateBatch = Promise.method(function (items) {
     //   setOperation.$setOnInsert.bans = mongoUtils.asObjectIDS(descriptor.extraMembers);
     // }
 
-    if (descriptor.extraMembers && descriptor.extraMembers.length) {
-      setOperation.$setOnInsert.extraMembers = mongoUtils.asObjectIDs(descriptor.extraMembers);
-    }
-
-    if (descriptor.extraAdmins && descriptor.extraAdmins.length) {
-      setOperation.$setOnInsert.extraAdmins = mongoUtils.asObjectIDs(descriptor.extraAdmins);
-    }
-
-    bulk.find({ troupeId: troupeId })
+    bulk.find({ _id: troupeId, sd: null })
       .upsert()
       .updateOne(setOperation);
   });
@@ -147,7 +149,7 @@ var updateBatch = Promise.method(function (items) {
       bulk.execute(callback);
     })
     .then(function(x) {
-      return x.nUpserted;
+      return x.nModified;
     });
 
 });
@@ -155,9 +157,9 @@ var updateBatch = Promise.method(function (items) {
 function execute() {
   return new Promise(function(resolve, reject) {
     var count = 0;
-    var totalUpserted = 0;
+    var totalModified = 0;
     getPipeline()
-      .pipe(new BatchStream({ size : 1024 }))
+      .pipe(new BatchStream({ size: 1024 }))
       .pipe(through2Concurrent.obj({ maxConcurrency: 1 }, function(items, enc, callback) {
         console.log('updating ', items.length);
         return updateBatch(items)
@@ -169,15 +171,15 @@ function execute() {
       }))
 
       .on('error', reject)
-      .on('data', function(upserted) {
+      .on('data', function(modified) {
         count++;
-        totalUpserted = totalUpserted + upserted;
+        totalModified = totalModified + modified;
         if ((count % 10) === 0) {
-          console.log('# ' + (count * 1024), 'upserted', totalUpserted);
+          console.log('# ' + (count * 1024), 'modified', totalModified);
         }
       })
       .on('end', function() {
-        console.log('# final' + (count * 1024), 'upserted', totalUpserted);
+        console.log('# final' + (count * 1024), 'modified', totalModified);
         resolve();
       });
 

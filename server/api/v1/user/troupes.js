@@ -9,7 +9,7 @@ var roomService = require('../../../services/room-service');
 var Promise = require('bluebird');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var StatusError = require('statuserror');
-var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
+var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var RoomWithPolicyService = require('../../../services/room-with-policy-service');
 
 function joinRoom(user, room, policy, options) {
@@ -67,7 +67,10 @@ function performUpdateToUserRoom(req) {
 
       var strategy = new restSerializer.TroupeIdStrategy({
         currentUserId: userId,
-        includeProviders: true
+        // include all these because it will replace the troupe in the context
+        includeTags: true,
+        includeProviders: true,
+        includeGroups: true
       });
 
       return restSerializer.serializeObject(req.params.userTroupeId, strategy);
@@ -115,7 +118,8 @@ module.exports = {
           currentUserId: req.user._id,
           currentUser: req.user,
           includePermissions: true,
-          includeProviders: true
+          includeProviders: true,
+          includeGroups: true
         });
 
         return restSerializer.serializeObject(troupeId, strategy);

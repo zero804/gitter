@@ -359,10 +359,6 @@ describe('policy-evaluator', function () {
         securityDescriptor.extraAdmins = [userId];
       }
 
-      var user = userId && {
-        _id: userId
-      };
-
       var policyDelegate;
       if (meta.hasPolicyDelegate) {
         policyDelegate = {
@@ -393,7 +389,7 @@ describe('policy-evaluator', function () {
         }
       }
 
-      var evaluator = new PolicyEvaluator(user, securityDescriptor, policyDelegate, contextDelegate);
+      var evaluator = new PolicyEvaluator(userId, securityDescriptor, policyDelegate, contextDelegate);
 
       return Promise.all([
           meta.read !== undefined && evaluator.canRead(),

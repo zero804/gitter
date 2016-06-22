@@ -26,6 +26,24 @@ describe('identityService', function() {
     fixture.cleanup();
   });
 
+
+
+  describe('getIdentityForUser', function() {
+    it('works for non github users', function() {
+      return identityService.getIdentityForUser(fixture.user1, 'google')
+        .then(function(identity) {
+          assert.equal(identity.provider, 'google');
+        });
+    });
+
+    it('works for github users', function() {
+      return identityService.getIdentityForUser(fixture.user2, 'github')
+        .then(function(identity) {
+          assert.equal(identity.provider, 'github');
+        });
+    });
+  });
+
   describe('listProvidersForUser', function() {
     it('works for non github users', function() {
       return identityService.listProvidersForUser(fixture.user1)

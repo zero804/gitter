@@ -9,8 +9,8 @@ var assert = require('assert');
 function assertNoDuplicates(collaborators) {
   var logins = {};
   collaborators.forEach(function(collaborator) {
-    assert(!logins[collaborator.login]);
-    logins[collaborator.login] = true;
+    assert(!logins[collaborator.username]);
+    logins[collaborator.username] = true;
   });
 }
 
@@ -21,7 +21,7 @@ describe('collaborators-service #slow', function() {
       .then(function(collaborators) {
         assert(Array.isArray(collaborators));
         assert(collaborators.length > 0);
-        assert(collaborators[0].login);
+        assert(collaborators[0].username);
         assertNoDuplicates(collaborators);
       });
   });
@@ -30,16 +30,16 @@ describe('collaborators-service #slow', function() {
     return getCollaboratorForRoom({ security: 'PRIVATE', githubType: 'REPO', uri: 'troupe/gitter-webapp' }, FAKE_USER)
       .then(function(collaborators) {
         assert(!collaborators.some(function(f) {
-          return f.login === 'waltfy';
+          return f.username === 'waltfy';
         }));
 
         assert(!collaborators.some(function(f) {
-          return f.login === 'timlind';
+          return f.username === 'timlind';
         }));
 
         assert(Array.isArray(collaborators));
         assert(collaborators.length > 0);
-        assert(collaborators[0].login);
+        assert(collaborators[0].username);
         assertNoDuplicates(collaborators);
       });
   });
@@ -49,7 +49,7 @@ describe('collaborators-service #slow', function() {
       .then(function(collaborators) {
         assert(Array.isArray(collaborators));
         assert(collaborators.length > 0);
-        assert(collaborators[0].login);
+        assert(collaborators[0].username);
         assertNoDuplicates(collaborators);
       });
   });
@@ -58,16 +58,16 @@ describe('collaborators-service #slow', function() {
     return getCollaboratorForRoom({ githubType: 'ORG', uri: 'troupe' }, FAKE_USER)
       .then(function(collaborators) {
         assert(!collaborators.some(function(f) {
-          return f.login === 'waltfy';
+          return f.username === 'waltfy';
         }));
 
         assert(!collaborators.some(function(f) {
-          return f.login === 'timlind';
+          return f.username === 'timlind';
         }));
 
         assert(Array.isArray(collaborators));
         assert(collaborators.length > 0);
-        assert(collaborators[0].login);
+        assert(collaborators[0].username);
         assertNoDuplicates(collaborators);
       });
   });
@@ -77,7 +77,7 @@ describe('collaborators-service #slow', function() {
       .then(function(collaborators) {
         assert(Array.isArray(collaborators));
         assert(collaborators.length > 0);
-        assert(collaborators[0].login);
+        assert(collaborators[0].username);
         assertNoDuplicates(collaborators);
       });
   });

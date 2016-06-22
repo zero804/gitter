@@ -51,7 +51,7 @@ var mainFrameMiddlewarePipeline = [
     }
   },
   function (err, req, res, next) {
-    if (err && err.userNotSignedUp && !isPhone(req.headers['user-agent'])) {
+    if (err && err.userNotSignedUp && !isPhone(req)) {
       userNotSignedUpRenderer.renderUserNotSignedUpMainFrame(req, res, next);
       return;
     }

@@ -66,16 +66,21 @@
     box-sizing: border-box;
   }
 
-  background-color: #eee;
   overflow: hidden;
-  padding: 0.625em;
-  margin: @collaborator-padding;
-  border-radius: 4px;
   display: flex;
+  align-items: center;
+
   width: 21rem;
   max-width: 350px;
-  cursor: default;
   max-height: 40px;
+  margin: @collaborator-padding;
+  padding: 0.825em;
+
+  background-color: #eee;
+  border-radius: 4px;
+
+  cursor: default;
+
   &:hover {
     background-color: #ccc;
   }
@@ -88,8 +93,6 @@
   }
 
   .content {
-    height: 40px;
-    line-height: 40px;
     margin: 0 0.625em;
     overflow: hidden;
     flex-grow: 1;
@@ -100,7 +103,6 @@
 
     p {
       margin: 0;
-      height: 40px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -136,7 +138,6 @@
     flex-shrink: 0;
     a {
       float: right;
-      margin-top: 5px;
     }
   }
 }
