@@ -49,7 +49,7 @@ describe('accept-invite-service', function() {
       var email = fixtureLoader.generateEmail();
       var troupeId1 = fixture.troupe1.id;
       return invitesService.createInvite(troupeId1, {
-          type: 'EMAIL',
+          type: 'email',
           externalId: email,
           invitedByUserId: fixture.user2._id,
           emailAddress: email
@@ -78,7 +78,7 @@ describe('accept-invite-service', function() {
       var troupeId1 = fixture.troupe1.id;
       shouldFail = true;
       return invitesService.createInvite(troupeId1, {
-          type: 'EMAIL',
+          type: 'email',
           externalId: email,
           invitedByUserId: fixture.user2._id,
           emailAddress: email

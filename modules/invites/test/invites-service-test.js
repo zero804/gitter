@@ -16,7 +16,7 @@ describe('invite-service', function() {
         var invitedBy = new ObjectID();
 
         return invitesService.createInvite(roomId, {
-            type: 'GITHUB',
+            type: 'github',
             externalId: 'gitterawesome',
             invitedByUserId: invitedBy,
             emailAddress: 'test@gitter.im'
@@ -28,7 +28,7 @@ describe('invite-service', function() {
             assert.strictEqual(invite.userId, null);
             assert.strictEqual(invite.emailAddress, 'test@gitter.im');
             assert.strictEqual(invite.externalId, 'gitterawesome');
-            assert.strictEqual(invite.type, 'GITHUB');
+            assert.strictEqual(invite.type, 'github');
           });
       });
 
@@ -37,14 +37,14 @@ describe('invite-service', function() {
         var invitedBy = new ObjectID();
 
         return invitesService.createInvite(roomId, {
-            type: 'GITHUB',
+            type: 'github',
             externalId: 'gitterawesome',
             invitedByUserId: invitedBy,
             emailAddress: 'test@gitter.im'
           })
           .then(function() {
             return invitesService.createInvite(roomId, {
-                type: 'GITHUB',
+                type: 'github',
                 externalId: 'gitterawesome',
                 invitedByUserId: invitedBy,
                 emailAddress: 'test@gitter.im'
@@ -67,7 +67,7 @@ describe('invite-service', function() {
         var userId2 = new ObjectID();
 
         return invitesService.createInvite(roomId, {
-            type: 'GITHUB',
+            type: 'github',
             externalId: 'gitterawesome',
             invitedByUserId: invitedBy,
             emailAddress: 'test@gitter.im'

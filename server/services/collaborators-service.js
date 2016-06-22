@@ -9,9 +9,9 @@ module.exports = function getCollaboratorForRoom(room, user) {
   var typeForSuggestions = null;
   if(roomType === 'REPO') {
     typeForSuggestions = 'GH_REPO';
-  }
-  else if(roomType === 'ORG') {
+  } else if(roomType === 'ORG') {
     typeForSuggestions = 'GH_ORG';
   }
+  
   return backendMuxer.getInviteUserSuggestions(typeForSuggestions, room.uri);
 };
