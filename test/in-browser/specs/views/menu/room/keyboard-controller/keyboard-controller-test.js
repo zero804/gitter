@@ -352,6 +352,13 @@ describe('KeyboardControllerView', function(){
       assert(model.searchFocusModel.get('focus'));
     });
 
+    it('should focus the active minibar item when search is in focus and shit-tab is pressed', function(){
+      model.searchFocusModel.set('focus', true);
+      appEvents.trigger('keyboard.room.prev.tab');
+      assert(!model.searchFocusModel.get('focus'));
+      assert(model.minibarCollection.findWhere({ active: true}).get('focus'));
+    });
+
   });
 
   describe('bluring items', function(){

@@ -136,6 +136,12 @@ var KeyboardController = Marionette.ItemView.extend({
   onTabShiftKeyPressed: function (e){
     var index;
     if(e) { e.preventDefault(); }
+
+    if(this.searchFocusModel.get('focus')){
+      this.searchFocusModel.set('focus', false);
+      return this.focusActiveMinibarItem();
+    }
+
     //unfocus search
     this.searchFocusModel.set('focus', false);
     //when the minibar is in focus
