@@ -1,6 +1,6 @@
 'use strict';
 
-var cdn = require("../../web/cdn");
+var cdn = require("gitter-web-cdn");
 
 function cdnSubResources(resources, jsRoot) {
   var resourceList = ['vendor'];

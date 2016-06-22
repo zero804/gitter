@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-/* jshint node:true, unused:true */
 'use strict';
 
 var persistence = require('gitter-web-persistence');
@@ -136,6 +135,10 @@ var updateBatch = Promise.method(function (items) {
         sd: sd
       }
     };
+
+    // if (descriptor.bans && descriptor.bans.length) {
+    //   setOperation.$setOnInsert.bans = mongoUtils.asObjectIDS(descriptor.extraMembers);
+    // }
 
     bulk.find({ _id: troupeId, sd: null })
       .upsert()
