@@ -16,6 +16,7 @@ module.exports = {
       invitedByUserId: { type: ObjectId },
       secret: { type: String },
       state: { type: String, 'enum': ['PENDING', 'ACCEPTED', 'REJECTED'], required: true },
+      reminderSent: { type: Date, required: false }
     }, { strict: 'throw' });
 
     TroupeInviteSchema.schemaTypeName = 'TroupeInviteSchema';
@@ -27,6 +28,7 @@ module.exports = {
     TroupeInviteSchema.index({ type: 1, externalId: 1 });
     TroupeInviteSchema.index({ userId: 1 });
     TroupeInviteSchema.index({ secret: 1 }, { unique: true, sparse: true });
+    TroupeInviteSchema.index({ reminderSent: 1 }); // Prevent table scans on finding emails that need reminders sent out
 
     var TroupeInvite = mongooseConnection.model('TroupeInvite', TroupeInviteSchema);
 
