@@ -168,25 +168,32 @@ var View = Marionette.CompositeView.extend({
       })
       .catch(function(e) {
         self.ui.loading.toggleClass('hide');
-        var m = e.friendlyMessage || 'Error';
+        var message = e.friendlyMessage || 'Error';
 
         // XXX: why not use the payment required status code for this?
-        if (m.match(/has reached its limit/)) self.dialog.showPremium();
-        self.typeahead.clear();
-
-        if (e.status === 428) {
-          model.set({
-            added: false,
-            invited: false,
-            unreachable: true,
-            timeAdded: Date.now(),
-            email: null,
-            user: null,
-          });
-          self.collection.add(model);
-        } else {
-          self.showValidationMessage(m);
+        if (message.match(/has reached its limit/)) {
+          self.dialog.showPremium();
         }
+
+        self.typeahead.clear();
+        switch(e.status) {
+          case 409:
+            message = model.get('username') + ' has already been invited';
+            break;
+          case 428:
+            model.set({
+              added: false,
+              invited: false,
+              unreachable: true,
+              timeAdded: Date.now(),
+              email: null,
+              user: null,
+            });
+            self.collection.add(model);
+            return;
+        }
+
+        self.showValidationMessage(message);
       });
   },
 
