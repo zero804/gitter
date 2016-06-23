@@ -11,10 +11,6 @@ module.exports = Backbone.Model.extend({
 
   initialize: function() {
     this.listenTo(this, 'change', _.throttle(this.save.bind(this), 1500));
-
-    // Should we add a snapshot instead?
-    // This still gives a slight wrong render
-    this.sync('read', this, {});
   },
 
 

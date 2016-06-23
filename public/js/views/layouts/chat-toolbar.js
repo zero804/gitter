@@ -41,7 +41,8 @@ module.exports = ChatLayout.extend({
   },
 
   initialize: function() {
-    this.rightToolbarModel = new RightToolBarModel();
+    var rightToolbarSnapshot = context.getSnapshot('rightToolbar');
+    this.rightToolbarModel = new RightToolBarModel(rightToolbarSnapshot);
   },
 
   initToolbarRegion: function(optionsForRegion) {

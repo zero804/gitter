@@ -1,22 +1,26 @@
 "use strict";
 
+var _ = require('lodash');
+var Promise = require('bluebird');
 var env = require('gitter-web-env');
 var nconf = env.config;
-var Promise = require('bluebird');
+
 var contextGenerator = require('../../web/context-generator');
 var restful = require('../../services/restful');
+
+var isolateBurst = require('gitter-web-shared/burst/isolate-burst-array');
 var burstCalculator = require('../../utils/burst-calculator');
 var userSort = require('../../../public/js/utils/user-sort');
-var isolateBurst = require('gitter-web-shared/burst/isolate-burst-array');
-var userSettingsService = require('../../services/user-settings-service');
-var unreadItemService = require('../../services/unread-items');
-var troupeService = require('../../services/troupe-service');
-var roomMembershipService = require('../../services/room-membership-service');
-var _ = require('lodash');
 var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 var getSubResources = require('./sub-resources');
 var fixMongoIdQueryParam = require('../../web/fix-mongo-id-query-param');
+var generateRightToolbarSnapshot = require('../snapshots/right-toolbar-snapshot');
+
+var unreadItemService = require('../../services/unread-items');
+var troupeService = require('../../services/troupe-service');
+var roomMembershipService = require('../../services/room-membership-service');
+
 
 /* How many chats to send back */
 var INITIAL_CHAT_COUNT = 50;
@@ -54,18 +58,16 @@ function renderChat(req, res, options, next) {
         options.fetchEvents === false ? null : restful.serializeEventsForTroupe(troupe.id, userId),
         options.fetchUsers === false ? null : restful.serializeUsersForTroupe(troupe.id, userId, userSerializerOptions),
         troupeService.checkGitHubTypeForUri(troupe.lcOwner || '', 'ORG'),
-        userSettingsService.getUserSettings(req.user._id, 'rightToolbar')
-      ]).spread(function (troupeContext, chats, activityEvents, users, ownerIsOrg, rightToolbarUserSettings) {
+        generateRightToolbarSnapshot(req)
+      ]).spread(function (troupeContext, chats, activityEvents, users, ownerIsOrg, rightToolbarSnapshot) {
 
         var initialChat = _.find(chats, function(chat) { return chat.initial; });
         var initialBottom = !initialChat;
         var githubLink;
         var classNames = options.classNames || [];
 
-        var isRightToolbarPinned = true;
-        if(rightToolbarUserSettings && rightToolbarUserSettings.isPinned !== undefined) {
-          isRightToolbarPinned = rightToolbarUserSettings.isPinned;
-        }
+        var snapshots = rightToolbarSnapshot;
+        troupeContext.snapshots = snapshots;
 
         if(troupe.githubType === 'REPO' || troupe.githubType === 'ORG') {
           githubLink = 'https://github.com/' + req.uriContext.uri;
@@ -121,7 +123,7 @@ function renderChat(req, res, options, next) {
             ownerIsOrg: ownerIsOrg,
             orgPageHref: orgPageHref,
             roomMember: req.uriContext.roomMember,
-            isRightToolbarPinned: isRightToolbarPinned,
+            isRightToolbarPinned: snapshots.rightToolbar.isPinned,
 
             //Feature Switch Left Menu
             hasNewLeftMenu: req.fflip && req.fflip.has('left-menu'),
