@@ -201,6 +201,9 @@ var KeyboardController = Marionette.ItemView.extend({
     //and you have just moved focus from the chat input
     index = (index === -1) ? 0 : arrayBoundWrap(index + direction, roomCollection.length);
     var nextActiveRoomItem = roomCollection[index];
+    //We can, in the case of the people state for example, have an empty room list
+    //so we guard here to avoid a runtime error
+    if(!nextActiveRoomItem) { return; }
     nextActiveRoomItem.set('focus', true);
   },
 
