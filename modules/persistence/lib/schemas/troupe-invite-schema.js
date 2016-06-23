@@ -21,9 +21,6 @@ module.exports = {
 
     TroupeInviteSchema.schemaTypeName = 'TroupeInviteSchema';
 
-    // Do not allow duplicate invites for the same external id
-    TroupeInviteSchema.index({ troupeId: 1, type: 1, externalId: 1 }, { unique: true });
-
     TroupeInviteSchema.index({ troupeId: 1 });
     TroupeInviteSchema.index({ type: 1, externalId: 1 });
     TroupeInviteSchema.index({ userId: 1 });
@@ -32,6 +29,22 @@ module.exports = {
 
     var TroupeInvite = mongooseConnection.model('TroupeInvite', TroupeInviteSchema);
 
+    // Only allow a single pending invite
+    // per external id
+    TroupeInvite.collection.createIndex({
+        troupeId: 1,
+        type: 1,
+        externalId: 1
+      } , {
+        background: true,
+        unique: true,
+        partialFilterExpression: {
+          state: 'PENDING'
+        }
+      },
+      function(err) {
+        if (err) throw err;
+      });
     return {
       model: TroupeInvite,
       schema: TroupeInviteSchema

@@ -10,6 +10,7 @@ var invitesService = require('gitter-web-invites/lib/invites-service');
 var StatusError = require('statuserror');
 var assert = require('assert');
 var Promise = require('bluebird');
+var addInvitePolicyFactory = require('gitter-web-permissions/lib/add-invite-policy-factory');
 
 /**
  * Accepts an invitation and return the room the user has just joined
@@ -31,7 +32,8 @@ function acceptInvite(user, secret) {
     .then(function(room) {
       if (!room) throw new StatusError(404);
       this.room = room;
-      return policyFactory.createPolicyForRoom(user, room);
+
+      return addInvitePolicyFactory.createPolicyForRoomInvite(user, room, secret);
     })
     .then(function(policy) {
       var roomWithPolicyService = new RoomWithPolicyService(this.room, user, policy);

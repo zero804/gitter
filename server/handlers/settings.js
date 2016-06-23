@@ -178,7 +178,7 @@ router.get('/accept-invite/:secret',
   ensureLoggedIn,
   function(req, res, next) {
     var secret = req.params.secret;
-    return acceptInviteService.accept(req.user, secret)
+    return acceptInviteService.acceptInvite(req.user, secret)
       .then(function(room) {
         return resolveRoomUri(room, req.user._id);
       })
@@ -188,9 +188,21 @@ router.get('/accept-invite/:secret',
       .catch(StatusError, function(err) {
         if (err.status >= 500) throw err;
 
-        logger.error('Unable to use invite', { exception: err });
-        var next = loginUtils.whereToNext(req.user);
-        res.relativeRedirect(next);
+        if (req.session) {
+          var events = req.session.events;
+          if (!events) {
+            events = [];
+            req.session.events = events;
+          }
+          events.push('invite_failed');
+        }
+        // TODO: tell the user why they could not get invited
+
+        logger.error('Unable to use invite', { username: req.user && req.user.username, exception: err });
+        return loginUtils.whereToNext(req.user)
+          .then(function(next) {
+            res.relativeRedirect(next);
+          });
       })
       .catch(next);
   });
