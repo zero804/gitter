@@ -228,8 +228,8 @@ function TroupeStrategy(options) {
       permissions: permissionsStrategy ? permissionsStrategy.map(item) : undefined,
       ownerIsOrg: ownerIsOrgStrategy ? ownerIsOrgStrategy.map(item) : undefined, // TODO: remove this once groups are in place
       roomMember: roomMembershipStrategy ? roomMembershipStrategy.map(item.id) : undefined,
+      groupId: item.groupId,
       group: groupIdStrategy && item.groupId ? groupIdStrategy.map(item.groupId) : undefined,
-      groupId: item.groupId || undefined,
       v: getVersion(item)
     };
   };
