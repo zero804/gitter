@@ -36,7 +36,11 @@ function getDelegateForSecurityDescriptor(userId, user, securityDescriptor) {
 }
 
 /**
- * Creates a policy for invites
+ * Creates a policy for invites:
+ * Note: this code does not deal with the case where:
+ * - Somebody is invited to join a room which they cannot ever join.
+ * - For example: I invite a non-member to join a room which only allows GitHub org members.
+ * In this case, the user will accept the invite and be rejected at that time.
  */
 function createPolicyForRoomInvite(user, room, inviteSecret) {
   var roomId = room._id;
@@ -66,7 +70,13 @@ function createPolicyForRoomInvite(user, room, inviteSecret) {
 }
 
 /**
- * Creates a policy for invites
+ * Creates a policy for adding users to a room.
+ * Note that if the user being added is unable to access the room because they
+ * have the wrong access tokens (for example, it's a private room and they only
+ * have public tokens) they will be rejected. This may be quiet confusing to
+ * the user who is trying to add the other user, since they won't really
+ * understand why the using they're trying to add is being rejected. We could
+ * probably add some extra help for this rare situation
  */
 function createPolicyForRoomAdd(user, room) {
   var roomId = room._id;
