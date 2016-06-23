@@ -5,15 +5,13 @@ var GhOrgPolicyDelegate = require('./gh-org-policy-delegate');
 var LegacyGitHubPolicyEvaluator = require('./legacy-github-policy-evaluator');
 var debug = require('debug')('gitter:app:permissions:gh-policy-delegate-w-repo-fallback');
 
-function GhOrgPolicyDelegateWithRepoFallback(user, securityDescriptor, fallbackRepo) {
-  this._orgPolicy = new GhOrgPolicyDelegate(user, securityDescriptor);
+function GhOrgPolicyDelegateWithRepoFallback(userId, userLoader, securityDescriptor, fallbackRepo) {
+  this._userId = userId;
+  this._orgPolicy = new GhOrgPolicyDelegate(userId, userLoader, securityDescriptor);
+  this._userLoader = userLoader;
   this._fallbackRepo = fallbackRepo;
   this._isValidFallback = this._isValidFallback(securityDescriptor, fallbackRepo);
-  if (this._isValidFallback) {
-    this._repoPolicy = new LegacyGitHubPolicyEvaluator(user, fallbackRepo, 'REPO', null);
-  } else {
-    this._repoPolicy = null;
-  }
+  this._getFallbackPolicyPromise = null;
 }
 
 GhOrgPolicyDelegateWithRepoFallback.prototype = {
@@ -27,10 +25,14 @@ GhOrgPolicyDelegateWithRepoFallback.prototype = {
       .then(function(hasAccess) {
         if (hasAccess) return true;
 
+        // Fallback to the repo and check that the user has
+        // admin rights on it
         debug('Access denied by ORG delegate, attempting to use repo access');
-
-        // Fallback to the repo
-        return this._repoPolicy.canAdmin();
+        return this._getFallbackPolicy()
+          .then(function(policy) {
+            if (!policy) return false;
+            return policy.canAdmin();
+          });
       });
   }),
 
@@ -55,7 +57,24 @@ GhOrgPolicyDelegateWithRepoFallback.prototype = {
     var result = securityDescriptor.type === 'GH_ORG' && repoOrgOrUser === securityDescriptor.linkPath;
     debug('Is repo=%s a valid repo for %s', fallbackRepo, securityDescriptor.linkPath, result);
     return result;
-  }
+  },
+
+  _getFallbackPolicy: Promise.method(function() {
+    if (!this._userId) return null;
+    if (!this._isValidFallback) return null;
+    if (this._getFallbackPolicyPromise) return this._getFallbackPolicyPromise;
+
+    var fallbackRepo = this._fallbackRepo;
+
+    var promise = this._getFallbackPolicyPromise = this._userLoader()
+      .then(function(user) {
+        if (!user) return null;
+
+        return new LegacyGitHubPolicyEvaluator(user, fallbackRepo, 'REPO', null);
+      });
+
+    return promise;
+  })
 };
 
 module.exports = GhOrgPolicyDelegateWithRepoFallback;
