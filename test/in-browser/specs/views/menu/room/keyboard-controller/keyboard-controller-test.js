@@ -110,13 +110,6 @@ describe('KeyboardControllerView', function(){
       assert.equal(model.get('state'), 'search');
     });
 
-    it('should select the active minibar item when nothing is in focus and the right key is pressed', function(){
-      view.blurAllItems();
-      model.set('state', 'all');
-      appEvents.trigger('keyboard.room.next');
-      assert(model.minibarCollection.at(0).get('focus'));
-    });
-
     it('should focus the active room item when nothing is in focus and left is pressed', function(){
       view.blurAllItems();
       appEvents.trigger('keyboard.room.prev');
