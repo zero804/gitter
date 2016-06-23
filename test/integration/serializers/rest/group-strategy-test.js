@@ -13,6 +13,7 @@ function getExpectedForGroup(group) {
     name: group.name,
     uri: group.uri,
     avatarUrl: '/api/private/user-avatar/'+group.uri+'?s=48',
+    type: group.sd.type
   }];
 }
 
