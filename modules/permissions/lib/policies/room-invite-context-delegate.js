@@ -18,8 +18,10 @@ RoomInviteContextDelegate.prototype = {
         secret: this.secret,
         $or: [{
           userId: null,
+          state: 'PENDING'
         }, {
-          userId: userId
+          userId: userId,
+          state: { $in: ['PENDING', 'REJECTED'] }
         }]
       })
       .exec()
