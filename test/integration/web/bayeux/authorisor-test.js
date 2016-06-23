@@ -76,7 +76,7 @@ describe('authorisor', function() {
       });
 
       var authorisor = testRequire.withProxies("./web/bayeux/authorisor", {
-        'gitter-web-permissions/lib/legacy-policy-factory': {
+        'gitter-web-permissions/lib/policy-factory': {
           createPolicyForUserIdInRoomId: createPolicyForUserIdInRoomId
         },
         'gitter-web-presence': presenceServiceMock,
