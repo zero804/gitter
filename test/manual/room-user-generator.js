@@ -30,7 +30,7 @@ Promise.all([
     troupeService.findByUri(opts.room),
     userService.findByUsername(opts.user)
   ])
-  .spread(function(room, user) {
+  .spread(function(room) {
     var a = [];
     for (var i = 0; i < parseInt(opts.count, 10); i++) {
       var displayName = cumberbatch();
@@ -41,8 +41,6 @@ Promise.all([
     return Promise.map(a, function(userInfo, i) {
         var newUser = new persistence.User({
           username:           userInfo.username,
-          invitedByUser:      user.id,
-          invitedToRoom:      room.id,
           displayName:        userInfo.displayName,
           state:              'INVITED'
         });
