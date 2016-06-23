@@ -498,15 +498,16 @@ describe('room-service', function() {
   });
 
   describe('addUserToRoom', function() {
-    var userId;
-    beforeEach(function() {
-      userId = mongoUtils.getNewObjectIdString();
-    });
-
     function createRoomServiceWithStubs(stubs) {
       return testRequire.withProxies("./services/room-service", {
-        'gitter-web-permissions/lib/invited-permissions-service': function() {
-          return Promise.resolve(stubs.canBeInvited);
+        'gitter-web-permissions/lib/add-invite-policy-factory': {
+          createPolicyForRoomAdd: function() {
+            return Promise.resolve({
+                canJoin: function() {
+                  return Promise.resolve(stubs.canBeInvited);
+                }
+            });
+          }
         },
         './email-notification-service': {
           sendInvitation: stubs.onInviteEmail,
@@ -721,6 +722,17 @@ describe('room-service', function() {
   });
 
   describe('channel creation #slow', function() {
+    function createMockAddInvitePolicyFactory(canBeInvited) {
+      return {
+        createPolicyForRoomAdd: function() {
+          return Promise.resolve({
+              canJoin: function() {
+                return Promise.resolve(canBeInvited);
+              }
+          });
+        }
+      }
+    }
 
     describe('org channels', function() {
 
@@ -775,9 +787,8 @@ describe('room-service', function() {
       });
 
       it('should create open rooms', function() {
-        var invitedPermissionsModelMock = mockito.mockFunction();
         var roomService = testRequire.withProxies("./services/room-service", {
-          'gitter-web-permissions/lib/invited-permissions-service': invitedPermissionsModelMock,
+          'gitter-web-permissions/lib/add-invite-policy-factory': createMockAddInvitePolicyFactory(true),
           'gitter-web-groups/lib/group-service': {
             migration: {
               ensureGroupForRoom: function(parentTroupe, user) {
@@ -797,21 +808,14 @@ describe('room-service', function() {
           })
           .bind({})
           .then(function(room) {
+            console.log('ROOM IS ', room);
             this.room = room;
             assert(mongoUtils.objectIDsEqual(room.parentId, fixture.troupeOrg1._id));
             assert(mongoUtils.objectIDsEqual(room.groupId, fixture.group1._id));
             return room;
           })
           .tap(function(room) {
-
-            mockito.when(invitedPermissionsModelMock)().then(function() {
-              return Promise.resolve(true);
-            });
-
-            return roomService.addUserToRoom(room, fixture.user1, fixture.user3)
-              .then(function() {
-                mockito.verify(invitedPermissionsModelMock, once)();
-              });
+            return roomService.addUserToRoom(room, fixture.user1, fixture.user3);
           })
           .then(function(room) {
             return roomMembershipService.checkRoomMembership(room.id, fixture.user3.id);
@@ -836,7 +840,7 @@ describe('room-service', function() {
 
       it('should create inherited rooms', function() {
         var roomService = testRequire.withProxies("./services/room-service", {
-          'gitter-web-permissions/lib/invited-permissions-service': function() { return Promise.resolve(true); },
+          'gitter-web-permissions/lib/add-invite-policy-factory': createMockAddInvitePolicyFactory(true),
           'gitter-web-groups/lib/group-service': {
             migration: {
               ensureGroupForRoom: function(parentTroupe, user) {
@@ -887,7 +891,7 @@ describe('room-service', function() {
 
       it('should create inherited rooms for empty orgs', function() {
         var roomService = testRequire.withProxies("./services/room-service", {
-          'gitter-web-permissions/lib/invited-permissions-service': function() { return Promise.resolve(true); },
+          'gitter-web-permissions/lib/add-invite-policy-factory': createMockAddInvitePolicyFactory(true),
           'gitter-web-groups/lib/group-service': {
             migration: {
               ensureGroupForRoom: function(parentTroupe, user) {
@@ -1041,7 +1045,7 @@ describe('room-service', function() {
 
       it(/* ::repo */ 'should create inherited rooms', function() {
         var roomService = testRequire.withProxies("./services/room-service", {
-          'gitter-web-permissions/lib/invited-permissions-service': function() { return Promise.resolve(true); },
+          'gitter-web-permissions/lib/add-invite-policy-factory': createMockAddInvitePolicyFactory(true),
           'gitter-web-groups/lib/group-service': {
             migration: {
               ensureGroupForRoom: function(parentTroupe, user) {

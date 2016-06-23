@@ -17,7 +17,7 @@ var uriLookupService = require("./uri-lookup-service");
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var githubPolicyFactory = require('gitter-web-permissions/lib/github-policy-factory');
 var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
-var canUserBeInvitedToJoinRoom = require('gitter-web-permissions/lib/invited-permissions-service');
+var addInvitePolicyFactory = require('gitter-web-permissions/lib/add-invite-policy-factory');
 var userService = require('./user-service');
 var troupeService = require('./troupe-service');
 var oneToOneRoomService = require('./one-to-one-room-service');
@@ -995,9 +995,10 @@ function addUserToRoom(room, instigatingUser, userToAdd) {
   assert(userToAdd && userToAdd.username, 'userToAdd required');
   var usernameToAdd = userToAdd.username;
 
-  // TODO: change this!!!!!! XXX
-  // This should use a PolicyObject with a specialised context
-  return canUserBeInvitedToJoinRoom(usernameToAdd, room, instigatingUser)
+  return addInvitePolicyFactory.createPolicyForRoomAdd(userToAdd, room)
+    .then(function(policy) {
+      return policy.canJoin();
+    })
     .then(function(canJoin) {
       if (!canJoin) throw new StatusError(403, usernameToAdd + ' does not have permission to join this room.');
     })
