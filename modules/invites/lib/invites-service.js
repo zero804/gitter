@@ -9,6 +9,9 @@ var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 var MS_PER_DAY = 24 * 60 * 60 * 1000;
 
+/**
+ *
+ */
 function createInvite(roomId, options) {
   var type = options.type;
   var externalId = options.externalId;
@@ -41,6 +44,9 @@ function createInvite(roomId, options) {
     });
 }
 
+/**
+ *
+ */
 function accept(userId, secret) {
   assert(secret);
   return TroupeInvite.findOne({ secret: String(secret) })
@@ -59,6 +65,9 @@ function accept(userId, secret) {
     });
 }
 
+/**
+ *
+ */
 function markInviteAccepted(inviteId, userId) {
   return TroupeInvite.update({
       _id: inviteId,
@@ -72,6 +81,9 @@ function markInviteAccepted(inviteId, userId) {
     .exec();
 }
 
+/**
+ *
+ */
 function markInviteRejected(inviteId, userId) {
   return TroupeInvite.update({
       _id: inviteId,
@@ -80,6 +92,20 @@ function markInviteRejected(inviteId, userId) {
       $set: {
         state: 'REJECTED',
         userId: userId
+      }
+    })
+    .exec();
+}
+
+/**
+ *
+ */
+function markInviteReminded(inviteId) {
+  return TroupeInvite.update({
+      _id: inviteId
+    }, {
+      $set: {
+        reminderSent: new Date()
       }
     })
     .exec();
@@ -131,5 +157,6 @@ module.exports = {
   accept: Promise.method(accept),
   markInviteAccepted: Promise.method(markInviteAccepted),
   markInviteRejected: Promise.method(markInviteRejected),
-  findInvitesForReminder: findInvitesForReminder
+  findInvitesForReminder: findInvitesForReminder,
+  markInviteReminded: markInviteReminded,
 }

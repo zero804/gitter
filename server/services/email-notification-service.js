@@ -157,12 +157,8 @@ module.exports = {
     return sendInvite(invitingUser, invite, room, 'invitation', 'invitation_sent');
   },
 
-  sendInvitationReminder: Promise.method(function(fromUser, toUser, room) {
-    // XXX NOCOMMIT FIX TODO: FIX THIS UP
-    // return emailAddressService(toUser, { preferInvitedEmail: true, attemptDiscovery: true })
-    // .then(function(email) {
-    //   return sendInvite(fromUser, toUser, room, email, 'invitation-reminder', 'invitation_reminder_sent');
-    // });
+  sendInvitationReminder: Promise.method(function(invitedByUser, invite, room) {
+    return sendInvite(invitedByUser, invite, room, 'invitation-reminder', 'invitation_reminder_sent');
   }),
 
   /**
