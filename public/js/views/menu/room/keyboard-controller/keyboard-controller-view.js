@@ -98,7 +98,6 @@ var KeyboardController = Marionette.ItemView.extend({
   onRightKeyPressed: function (){
     this.searchFocusModel.set('focus', false);
     if(this.isMinibarInFocus()) { return this.focusActiveRoomItem(); }
-    this.focusActiveMinibarItem();
   },
 
   onLeftKeyPressed: function (){
