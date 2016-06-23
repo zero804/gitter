@@ -10,7 +10,9 @@
 @chat-header-topic-font-size: 1em;
 @chat-header-topic-line-height: 25px;
 
+// Position of the arrow from the left side of the icon
 @chat-header-right-toolbar-toggle-icon-arrow-base-position: 16.6%;
+// The amount of travel when transitioning in and out
 @chat-header-right-toolbar-toggle-icon-arrow-delta: 18%;
 
 
@@ -264,12 +266,9 @@
 }
 
 .chat-header__action-icon {
-  &[class^=icon-],
-  &[class*=" icon-"] {
-    &:before {
-      margin-left: 0;
-      margin-right: 0;
-    }
+  &:before {
+    margin-left: 0;
+    margin-right: 0;
   }
 }
 
@@ -283,10 +282,9 @@
     color .2s ease;
 
   // Spacing that doesn't affect width
-  border-top: 4px solid transparent;
-  border-left: 6px solid transparent;
-  border-bottom: 4px solid transparent;
-  border-right: 6px solid transparent;
+  border-width: 4px 6px;
+  border-style: solid;
+  border-color: transparent;
   border-radius: 3px;
 }
 
