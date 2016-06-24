@@ -153,7 +153,8 @@ describe('restful #slow', function() {
             name: fixture.group1.name,
             uri: fixture.group1.uri,
             avatarUrl: '/api/private/user-avatar/'+fixture.group1.uri+'?s=48',
-            type: null
+            type: null,
+            linkPath: null
           }]);
         });
     });
