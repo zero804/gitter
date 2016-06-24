@@ -112,6 +112,7 @@ var View = Marionette.LayoutView.extend({
 
     var groupId = group.get('id');
     var groupType = group.get('type');
+    var groupLinkPath = group.get('linkPath');
     var permissions = self.$el.find('input[type=radio]:visible:checked').val();
     var roomName = self.ui.roomNameInput.val().trim();
 
@@ -139,10 +140,11 @@ var View = Marionette.LayoutView.extend({
 
     var apiUrl = '/v1/groups/' + groupId + '/rooms';
     var payload = {
-      type: null,
       name: roomName,
       security: {
-        security: permissions.toUpperCase()
+        type: groupType, // null or GH_ORG or GH_REPO
+        security: permissions.toUpperCase(),
+        linkPath: (groupType !== null) ? groupLinkPath : null
       }
     };
     return apiClient.post(apiUrl, payload)
