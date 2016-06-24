@@ -6,7 +6,7 @@ var oneToOneRoomService = require('./one-to-one-room-service');
 var debug = require('debug')('gitter:app:room-context-service');
 var Promise = require('bluebird');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
-var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
+var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 
 /**
  * Given a user and a URI returns (promise of) a context object.

@@ -14,7 +14,8 @@ var _ = require('lodash');
 var validateRoomName = require('gitter-web-validators/lib/validate-room-name');
 var persistence = require('gitter-web-persistence');
 var uriLookupService = require("./uri-lookup-service");
-var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
+var policyFactory = require('gitter-web-permissions/lib/policy-factory');
+var githubPolicyFactory = require('gitter-web-permissions/lib/github-policy-factory');
 var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
 var canUserBeInvitedToJoinRoom = require('gitter-web-permissions/lib/invited-permissions-service');
 var userService = require('./user-service');
@@ -181,6 +182,7 @@ function getOwnerFromRepoFullName(repoName) {
  * given uri.
  */
 function ensureGroupForGitHubRoom(user, githubType, uri) {
+  debug('ensureGroupForGitHubRoom: type=%s uri=%s', githubType, uri);
   var options;
   switch (githubType) {
     case 'REPO':
@@ -256,7 +258,7 @@ function createRoomForGitHubUri(user, uri, options) {
       /* Room does not yet exist */
       // TODO: switch out for policy...
       // Parent rooms always have security == null
-      return policyFactory.createPolicyForGithubObject(user, officialUri, githubType, null)
+      return githubPolicyFactory.createPolicyForGithubObject(user, officialUri, githubType, null)
         .bind({
           troupe: null,
           updateExisting: null,
@@ -477,7 +479,7 @@ function createRoomByUri(user, uri, options) {
 
           return policyFactory.createPolicyForRoom(user, resolvedTroupe)
             .then(function(policy) {
-              return policy.canView();
+              return policy.canRead();
             })
             .then(function(viewAccess) {
               if (!viewAccess) throw new StatusError(404);
@@ -764,7 +766,7 @@ function createRoomChannel(parentTroupe, user, options) {
         });
     })
     .then(function(groupId) {
-      return createChannel(user, null, {
+      return createChannel(user, parentTroupe, {
         uri: uri,
         security: options.security,
         githubType: githubType,
