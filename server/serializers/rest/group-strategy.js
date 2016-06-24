@@ -19,8 +19,10 @@ GroupStrategy.prototype = {
       uri: group.uri,
       // for now just assume it is a GitHub org/user
       avatarUrl: resolveRoomAvatarUrl({ uri: group.uri }, 48),
-      type: group.sd.type,
-      linkPath: group.sd.linkPath
+      backedBy: {
+        type: group.sd.type,
+        linkPath: group.sd.linkPath
+      }
     };
   }
 };
