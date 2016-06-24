@@ -53,6 +53,11 @@ describe('tempOrgAdapter', function(){
     assert.equal(groupCollection.length, 2);
   });
 
+  it('should add a temp property to models added by the adapter', function(){
+    context.troupe().set({ id: 3, uri: 'google/gxui' });
+    assert(groupCollection.at(2).get('temp'));
+  });
+
   it('should add a temporary org on init', function(){
 
     var roomCollection1 = new Backbone.Collection([
@@ -66,6 +71,20 @@ describe('tempOrgAdapter', function(){
     context.troupe().set({ id: 3, uri: 'google/gxui' });
     tempOrgAdapter(roomCollection1, groupCollection1);
     assert.equal(groupCollection1.at(2).get('name'), 'google');
+  });
+
+  it('should persist after a snapshot', function(){
+    context.troupe().set({ id: 3, uri: 'google/gxui' });
+    groupCollection.reset([]);
+    groupCollection.trigger('snapshot');
+    assert(groupCollection.at(0).get('name'), 'google');
+  });
+
+  it('should not add a group if one exists', function(){
+    groupCollection.reset([]);
+    context.troupe().set({ id: 3, uri: 'google/gxui' });
+    context.troupe().set({ id: 3, uri: 'google/gxui' });
+    assert.equal(groupCollection.length, 1);
   });
 
 });

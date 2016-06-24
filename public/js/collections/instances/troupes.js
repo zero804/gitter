@@ -6,6 +6,7 @@ var groupModels = require('../groups');
 var orgModels = require('../orgs');
 var unreadItemsClient = require('components/unread-items-frame-client');
 var unreadItemsGroupAdapter = require('components/unread-items-group-adapter');
+var tempOrgAdapter = require('../../components/temporary-org-adapter');
 var appEvents = require('utils/appevents');
 var Sorted = require('backbone-sorted-collection');
 var errorHandle = require('utils/live-collection-error-handle');
@@ -28,6 +29,7 @@ groupCollection.on('error', errorHandle.bind(null, 'group-collection'));
 
 // Adapt unread items to the groups collection
 unreadItemsGroupAdapter(groupCollection, troupeCollection);
+tempOrgAdapter(troupeCollection, groupCollection);
 
 var orgsCollection = new orgModels.OrgCollection(null, { listen: true });
 orgsCollection.on('error', errorHandle.bind(null, 'org-collection'));
