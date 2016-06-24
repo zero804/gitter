@@ -9,22 +9,6 @@ var Backbone = require('backbone');
 var cdn = require('gitter-web-cdn');
 
 module.exports = (function() {
-
-  var ItemModel = Backbone.Model.extend({
-    idAttribute: "uri",
-    constructor: function(underlyingModel, mappingFunction) {
-      // XXX: TODO: deal with minor memory leak here
-      this.mappingFunction = mappingFunction;
-      var attributes = mappingFunction(underlyingModel);
-      Backbone.Model.call(this, attributes);
-      this.listenTo(underlyingModel, 'change', this.underlyingChanged);
-    },
-    underlyingChanged: function(model) {
-      var attributes = this.mappingFunction(model);
-      this.set(attributes);
-    }
-  });
-
   return Marionette.ItemView.extend({
     events: {
       'focus @ui.input':    'show',
@@ -86,47 +70,6 @@ module.exports = (function() {
       this.typeahead.hide();
     },
 
-    // TODO: replace with selectGroupId or something
-    /*
-    selectUri: function(uri) {
-      var collection, predicate, mapper;
-
-      function repoPredicate(troupe) {
-        return troupe.get('githubType') === 'REPO' && troupe.get('uri') === uri;
-      }
-
-      function orgPredicate(o) {
-        return o.get('room') && o.get('room').uri === uri;
-      }
-
-      // TODO: only the group case (more like orgs), no troupes
-      if(uri.indexOf('/') >= 0) {
-        collection = this.troupesCollection;
-        predicate = repoPredicate;
-        mapper = modelFromRepoTroupe;
-      } else {
-        if(uri === context.user().get('username')) {
-          var userModel = modelFromUser(context.user());
-          this.selected(userModel);
-          return userModel;
-        }
-
-        collection = this.orgsCollection;
-        predicate = orgPredicate;
-        mapper = modelFromOrg;
-      }
-
-      var item = collection.find(predicate);
-
-      if(item) {
-        var model = mapper(item);
-        this.selected(model);
-        return model;
-      }
-
-    },
-    */
-
     selectGroupId: function(groupId) {
       var group = this.groupsCollection.find(function(g) {
         return g.get('id') === groupId;
@@ -138,12 +81,6 @@ module.exports = (function() {
     },
 
     refilter: function(query, collection, success) {
-      /*
-      var self = this;
-      var results = self.groupsCollection.map(modelFromOrg);
-      collection.set(results, { add: true, remove: true, merge: true });
-      */
-
       if (success) success();
     }
 
