@@ -2,6 +2,8 @@
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 var context = require('utils/context');
+var toggleClass = require('utils/toggle-class');
+
 var itemCollections = require('collections/instances/integrated-items');
 var PeopleCollectionView = require('views/people/peopleCollectionView');
 var RepoInfoView = require('./repoInfo');
@@ -51,6 +53,10 @@ module.exports = (function() {
       'add sync reset remove': 'onCollectionUpdate'
     },
 
+    modelEvents: {
+      'change:isPinned': 'onPanelPinStateChange'
+    },
+
     toggleSearch: function () {
       // hide all regions and show/hide search...
     },
@@ -95,6 +101,10 @@ module.exports = (function() {
 
     initSearchInputRegion: function(optionsForRegion) {
       if(!context.hasFeature('left-menu')) { return new SearchInputView(optionsForRegion({ model: this.searchState })); }
+    },
+
+    onPanelPinStateChange: function() {
+      toggleClass(this.el, 'collapsed', !this.model.get('isPinned'));
     },
 
     expandSearch: function() {
