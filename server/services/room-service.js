@@ -1348,6 +1348,11 @@ function upsertGroupRoom(user, group, roomInfo, securityDescriptor, options) {
       roomType = 'github-room';
       break
 
+    case 'GH_USER':
+      githubType = 'USER';
+      roomType = 'github-room';
+      break
+
     case null:
       githubType = 'NONE';
       roomType = 'group-room'; // or channel?
