@@ -4,22 +4,22 @@
   </div>
 </div>
 
-<div class="chat-header__main-grouping chat-header_header-grouping">
-  <h1 class='js-chat-name chat-header__heading' title="{{ lockTooltip }}">
-    <a {{#if githubLink}}href="{{ githubLink }}"{{/if}} class="chat-header__title" target="_blank">{{ troupeName }}</a>
+<div class="chat-header__main-grouping chat-header__info-grouping">
+  <div class="chat-header__heading-sub-group">
+    <h1 class="js-chat-name chat-header__heading" title="{{ lockTooltip }}">
+      <a {{#if githubLink}}href="{{ githubLink }}"{{/if}} class="chat-header__title" target="_blank">{{ troupeName }}</a>
 
-    {{#if isPrivate}}
-      <i class='octicon octicon-lock chat-header__permission-icon'></i>
-    {{/if}}
-  </h1>
-</div>
-
-
-<div class="chat-header__main-grouping chat-header__topic-grouping js-room-topic-edit-activator" tabindex="0">
-  <div class="chat-header__topic-wrapper js-room-topic-wrapper {{when isAdmin 'is-admin' : ''}} {{when shouldShowPlaceholderRoomTopic 'is-new-room' : ''}}">
-    {{~#unless oneToOne~}}
-    <p class="js-room-topic chat-header__topic {{when isAdmin 'is-admin' : ''}} {{when shouldShowPlaceholderRoomTopic 'is-new-room' : ''}}">{{troupeTopic}}</p>
-    {{~/unless~}}
+      {{#if isPrivate}}
+        <i class='octicon octicon-lock chat-header__permission-icon'></i>
+      {{/if}}
+    </h1>
+  </div>
+  <div class="chat-header__topic-sub-group js-room-topic-edit-activator" tabindex="0">
+    <div class="chat-header__topic-wrapper js-room-topic-wrapper {{when isAdmin 'is-admin' : ''}} {{when shouldShowPlaceholderRoomTopic 'is-new-room' : ''}}">
+      {{~#unless oneToOne~}}
+      <p class="js-room-topic chat-header__topic {{when isAdmin 'is-admin' : ''}} {{when shouldShowPlaceholderRoomTopic 'is-new-room' : ''}}">{{troupeTopic}}</p>
+      {{~/unless~}}
+    </div>
   </div>
 </div>
 
@@ -38,6 +38,13 @@
     </button>
     <button class="chat-header__settings js-chat-settings" title="Room settings" data-toggle="dropdown">
        <i class="chat-header__action-icon icon-slider-vertical" aria-hidden="true"></i>
+    </button>
+    <button class="chat-header__right-toolbar-toggle js-right-toolbar-toggle-button {{when isRightToolbarPinned 'pinned' ''}}" title="Toggle right-toolbar">
+      <div class="chat-header__right-toolbar-toggle-icon">
+        <img class="chat-header__right-toolbar-toggle-icon-base" src='{{cdn "images/svg/right-toolbar-toggle-base.svg"}}' />
+        <img class="chat-header__right-toolbar-toggle-icon-arrow-collapse" src='{{cdn "images/svg/right-toolbar-toggle-arrow-collapse.svg"}}' />
+        <img class="chat-header__right-toolbar-toggle-icon-arrow-expand" src='{{cdn "images/svg/right-toolbar-toggle-arrow-expand.svg"}}' />
+      </div>
     </button>
     {{/if}}
   {{/unless}}
