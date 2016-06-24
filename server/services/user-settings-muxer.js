@@ -27,6 +27,7 @@ function standardHandler(settingsKey) {
 var HANDLERS = {
   /* Left Room Menu */
   leftRoomMenu: standardHandler('leftRoomMenu'),
+  rightToolbar: standardHandler('rightToolbar'),
 
   /* Lang */
   lang: standardHandler('lang'),
