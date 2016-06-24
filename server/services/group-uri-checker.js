@@ -51,40 +51,37 @@ function checkGitHubUri(user, uri) {
 }
 
 function checkIfGroupUriExists(user, uri) {
-  return Promise.try(function() {
-      // check length, chars, reserved namespaces, slashes..
-      if (!validateGroupUri(uri)) throw new StatusError(400);
+  // check length, chars, reserved namespaces, slashes..
+  if (!validateGroupUri(uri)) throw new StatusError(400);
 
-      return Promise.join(
-        checkLocalUri(uri),
-        checkGitHubUri(user, uri),
-        function(localUriExists, info) {
-          var githubInfo = info.githubInfo;
-          var canAdminGitHubOrg = info.canAdmin;
-          var githubUriExists = !!githubInfo;
+  return Promise.join(
+    checkLocalUri(uri),
+    checkGitHubUri(user, uri),
+    function(localUriExists, info) {
+      var githubInfo = info.githubInfo;
+      var canAdminGitHubOrg = info.canAdmin;
+      var githubUriExists = !!githubInfo;
 
-          var allowCreate;
-          if (localUriExists) {
-            allowCreate = false;
-          } else if (githubUriExists) {
-            // If it is a github uri it must be an org and you have to have
-            // admin rights for you to be able to create a community for it.
-            allowCreate = (githubInfo.type === 'ORG') && canAdminGitHubOrg;
-          } else {
-            // if it doesn't exist locally AND it doesn't exist on github, then
-            // the user is definitely allowed to create it.
-            allowCreate = true;
-          }
+      var allowCreate;
+      if (localUriExists) {
+        allowCreate = false;
+      } else if (githubUriExists) {
+        // If it is a github uri it must be an org and you have to have
+        // admin rights for you to be able to create a community for it.
+        allowCreate = (githubInfo.type === 'ORG') && canAdminGitHubOrg;
+      } else {
+        // if it doesn't exist locally AND it doesn't exist on github, then
+        // the user is definitely allowed to create it.
+        allowCreate = true;
+      }
 
-          return {
-            // The future group will either be org-based or of type null which
-            // is just the new types that aren't backed by GitHub.
-            type: (githubInfo && githubInfo.type === 'ORG') ? 'GH_ORG' : null,
-            allowCreate: allowCreate
-          };
-        });
+      return {
+        // The future group will either be org-based or of type null which
+        // is just the new types that aren't backed by GitHub.
+        type: (githubInfo && githubInfo.type === 'ORG') ? 'GH_ORG' : null,
+        allowCreate: allowCreate
+      };
     });
-
 }
 
-module.exports = checkIfGroupUriExists;
+module.exports = Promise.method(checkIfGroupUriExists);
