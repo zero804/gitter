@@ -70,7 +70,7 @@ module.exports = (function() {
       appEvents.triggerParent('track-event', 'welcome-add-user-click');
 
       this.stateModel.set('state', 'adding');
-      apiClient.room.post('/users', { username: githubUser.get('login') })
+      apiClient.room.post('/users', { username: githubUser.get('username') })
         .then(function(res) {
           var user = res.user;
 
@@ -102,7 +102,7 @@ module.exports = (function() {
 
     serializeData: function() {
       var state = this.stateModel.get('state');
-      var username = this.userModel.get('login');
+      var username = this.userModel.get('username');
 
       var states = {
         initial:                { text: username, showAddButton: true },
@@ -140,13 +140,13 @@ module.exports = (function() {
         data.showOrgMessage = true;
       }
 
-      if (data.githubType == 'ORG_CHANNEL') {
-        if (data.security == 'INHERITED') {
+      if (data.githubType === 'ORG_CHANNEL') {
+        if (data.security === 'INHERITED') {
           data.showOrgMessage = true;
         }
       }
 
-      if (data.security == 'PUBLIC') {
+      if (data.security === 'PUBLIC') {
         data.isPublic = true;
       }
 
