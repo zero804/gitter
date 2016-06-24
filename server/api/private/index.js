@@ -108,8 +108,13 @@ router.post('/markdown-preview',
   identifyRoute('api-private-markdown-preview'),
   require('./markdown-preview'));
 
-  router.get('/inviteUserSuggestions',
-    identifyRoute('api-private-invite-user-suggestions'),
-    require('./invite-user-suggestions'));
+router.get('/inviteUserSuggestions',
+  identifyRoute('api-private-invite-user-suggestions'),
+  require('./invite-user-suggestions'));
+
+router.get('/check-group-uri',
+  authMiddleware,
+  identifyRoute('api-private-check-group-uri'),
+  require('./check-group-uri'));
 
 module.exports = router;
