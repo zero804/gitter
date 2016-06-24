@@ -46,7 +46,10 @@ These are scripts that can help you answer questions like "What's this user's ey
 
 If you want to run against production, ssh into app-00X and run with the `NODE_ENV` varible set.
 
-e.g `NODE_ENV=prod /opt/gitter/gitter-webapp/scripts/utils/unread.js trevorah`
+e.g
+
+ - On Servers: `NODE_ENV=prod npm run nodeselektor -- /opt/gitter/gitter-webapp/scripts/utils/unread.js trevorah`
+ - Locally: `NODE_ENV=prod npm run nodeselektor -- ./scripts/utils/unread.js trevorah`
 
 Also see https://github.com/gitterHQ/wiki/wiki/Support---Data-Maintenance
 
@@ -143,31 +146,31 @@ For example,
 
 ```shell
 # Include suprememoocow and trevorah in the test
-NODE_ENV=beta ./scripts/utils/feature-toggle.js fancy-new-feature --include-user suprememoocow --include-user trevorah
+NODE_ENV=beta npm run nodeselektor -- ./scripts/utils/feature-toggle.js fancy-new-feature --include-user suprememoocow --include-user trevorah
 
 # Exclude users from the test
-NODE_ENV=beta ./scripts/utils/feature-toggle.js fancy-new-feature --exclude-user suprememoocow --exclude-user trevorah
+NODE_ENV=beta npm run nodeselektor -- ./scripts/utils/feature-toggle.js fancy-new-feature --exclude-user suprememoocow --exclude-user trevorah
 
 # Include a percentage of all users
-NODE_ENV=beta ./scripts/utils/feature-toggle.js fancy-new-feature --percentage 70
+NODE_ENV=beta npm run nodeselektor -- ./scripts/utils/feature-toggle.js fancy-new-feature --percentage 70
 
 # Undo "include a percentage of all users"
-NODE_ENV=beta ./scripts/utils/feature-toggle.js fancy-new-feature --percentage-off
+NODE_ENV=beta npm run nodeselektor -- ./scripts/utils/feature-toggle.js fancy-new-feature --percentage-off
 
 # Include everyone
-NODE_ENV=beta ./scripts/utils/feature-toggle.js fancy-new-feature --enable
+NODE_ENV=beta npm run nodeselektor -- ./scripts/utils/feature-toggle.js fancy-new-feature --enable
 
 # Undo "include everyone"
-NODE_ENV=beta ./scripts/utils/feature-toggle.js fancy-new-feature --enable-off
+NODE_ENV=beta npm run nodeselektor -- ./scripts/utils/feature-toggle.js fancy-new-feature --enable-off
 
 # Disable Chrome, version 47 and below
-NODE_ENV=beta ./scripts/utils/feature-toggle.js fancy-new-feature --disable-browser Chrome:47
+NODE_ENV=beta npm run nodeselektor -- ./scripts/utils/feature-toggle.js fancy-new-feature --disable-browser Chrome:47
 
 # Disable all versions of IE
-NODE_ENV=beta ./scripts/utils/feature-toggle.js fancy-new-feature --disable-browser IE:all
+NODE_ENV=beta npm run nodeselektor -- ./scripts/utils/feature-toggle.js fancy-new-feature --disable-browser IE:all
 
 # Renable the feature for Chrome
-NODE_ENV=beta ./scripts/utils/feature-toggle.js fancy-new-feature --disable-browser-off Chrome
+NODE_ENV=beta npm run nodeselektor -- ./scripts/utils/feature-toggle.js fancy-new-feature --disable-browser-off Chrome
 ```
 
 To turn on and off features manually in your browser:
@@ -226,7 +229,7 @@ https://beta.gitter.im/api_web/features/chat-cache/1
 The social graph updater runs as a batch job in a cron every few hours. You can manually invoke it as follows.
 
 ```shell
-NODE_ENV=beta node scripts/graphs/upload-graph.js
+NODE_ENV=beta npm run nodeselektor -- ./scripts/graphs/upload-graph.js
 ```
 
 The uploader script starts a local webserver, and it will guess the URL for that webserver by looking at the host computers
@@ -240,7 +243,7 @@ NODE_ENV=prod LISTEN_IF=utun0 node scripts/graphs/upload-graph.js
 
 ## Auto Lurk Script
 ```shell
-NODE_ENV=prod scripts/utils/auto-lurk-room.js --members 30000 --min 31
+NODE_ENV=prod npm run nodeselektor -- scripts/utils/auto-lurk-room.js --members 30000 --min 31
 ```
 
 Testing
