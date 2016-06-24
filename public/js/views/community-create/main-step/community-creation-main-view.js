@@ -154,7 +154,7 @@ module.exports = CommunityCreateBaseStepView.extend({
 
     var githubProjectInfo = this.communityCreateModel.getGithubProjectInfo(this.orgCollection, this.repoCollection);
     this.ui.associatedProjectName[0].textContent = githubProjectInfo.name;
-    this.ui.associatedProjectLink[0].setAttribute('href', githubProjectInfo.link);
+    this.ui.associatedProjectLink[0].setAttribute('href', githubProjectInfo.url);
     toggleClass(this.ui.addAssociatedProjectCopy[0], 'active', !githubProjectInfo.name);
     toggleClass(this.ui.hasAssociatedProjectCopy[0], 'active', !!githubProjectInfo.name);
   },
