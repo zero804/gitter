@@ -119,20 +119,10 @@ var CommunityCreateView = Marionette.LayoutView.extend({
     var newStepState = this.model.get('stepState');
     var stepConstants = this.model.STEP_CONSTANT_MAP;
 
-    var stepActiveMap = Object.keys(stepConstants).reduce(function(map, stepKey) {
-      var stepConstant = stepConstants[stepKey];
-      var value = false;
-      if(newStepState === stepConstant) {
-        value = true;
-      }
-      map[stepConstant] = value;
-      return map;
-    }, {});
-
-    this.mainStepViewModel.set({ active: stepActiveMap[stepConstants.main] });
-    this.githubProjectsStepViewModel.set({ active: stepActiveMap[stepConstants.githubProjects] });
-    this.invitePeopleStepViewModel.set({ active: stepActiveMap[stepConstants.invite] });
-    this.overviewStepViewModel.set({ active: stepActiveMap[stepConstants.overview] });
+    this.mainStepViewModel.set({ active: newStepState === stepConstants.main });
+    this.githubProjectsStepViewModel.set({ active: newStepState === stepConstants.githubProjects });
+    this.invitePeopleStepViewModel.set({ active: newStepState === stepConstants.invite });
+    this.overviewStepViewModel.set({ active: newStepState === stepConstants.overview });
   },
 
   onActiveChange: function() {

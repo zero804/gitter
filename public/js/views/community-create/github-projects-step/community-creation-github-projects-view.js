@@ -149,19 +149,10 @@ module.exports = CommunityCreateBaseStepView.extend({
   },
 
   setAreaActive: function(newActiveAreaKey) {
-    var areas = [
-      'isOrgAreaActive',
-      'isRepoAreaActive'
-    ];
-    var areaHash = areas.reduce(function(prevAreaHash, areaKey) {
-      var value = false;
-      if(areaKey === newActiveAreaKey) {
-        value = true;
-      }
-      prevAreaHash[areaKey] = value;
-      return prevAreaHash;
-    }, {});
-    this.model.set(areaHash);
+    this.model.set({
+      isOrgAreaActive: newActiveAreaKey === 'isOrgAreaActive',
+      isRepoAreaActive: newActiveAreaKey === 'isRepoAreaActive'
+    });
   },
 
   onOrgSelectionChange: function(activeModel) {
