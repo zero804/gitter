@@ -39,6 +39,9 @@ module.exports = (function() {
       this.listenTo(this.stateModel, 'change', this.render);
     },
 
+    /**
+     * TODO: deal with non-GitHub users too
+     */
     inviteGitHubUser: function(githubUsername, emailAddress) {
       var self = this;
       var state = emailAddress ? 'inviting' : 'adding';
