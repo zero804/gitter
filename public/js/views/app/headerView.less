@@ -15,13 +15,19 @@
 
 
 
+// Position of the arrow from the left side of the icon
+@chat-header-right-toolbar-toggle-icon-arrow-base-position: 16.6%;
+// The amount of travel when transitioning in and out
+@chat-header-right-toolbar-toggle-icon-arrow-delta: 18%;
+
+
+
 .chat-header {
   box-sizing:       border-box;
   position:         absolute;
   display:          flex;
   width:            100%;
   padding-left:     @desktop-menu-left-padding;
-  padding-right:    @desktop-menu-left-padding;
   background-color: rgba(255, 255, 255, 0.97);
   border-bottom:    1px solid rgba(0,0,0,0.05);
   z-index:          @zIndexChatHeader;
@@ -250,7 +256,8 @@
 
 .chat-header__org-page,
 .chat-header__favourite,
-.chat-header__settings {
+.chat-header__settings,
+.chat-header__right-toolbar-toggle {
   body.embedded & { visibility: hidden; }
 
   display: inline-block;
@@ -278,14 +285,116 @@
   }
   &:focus {
     outline: none;
-    background: rgba(0, 0, 0, .05);
-  }
 
-
-  & > .chat-header__action-icon {
-    color: inherit;
+    & > .chat-header__action-icon,
+    & > .chat-header__right-toolbar-toggle-icon {
+      background-color: rgba(0, 0, 0, .05);
+    }
   }
 }
+
+.chat-header__action-icon {
+  &:before {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
+.chat-header__action-icon,
+.chat-header__right-toolbar-toggle-icon {
+  color: inherit;
+
+  transition:
+    background-color .2s ease,
+    border-color .2s ease,
+    color .2s ease;
+
+  // Spacing that doesn't affect width
+  border-width: 4px 6px;
+  border-style: solid;
+  border-color: transparent;
+  border-radius: 3px;
+}
+
+.chat-header__right-toolbar-toggle {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: @right-toolbar-collapsed-width;
+  margin-left: .7rem;
+
+
+  &.pinned {
+    & .chat-header__right-toolbar-toggle-icon-arrow-collapse {
+      left: @chat-header-right-toolbar-toggle-icon-arrow-base-position;
+      opacity: 1;
+    }
+
+    & .chat-header__right-toolbar-toggle-icon-arrow-expand {
+      left: @chat-header-right-toolbar-toggle-icon-arrow-base-position + @chat-header-right-toolbar-toggle-icon-arrow-delta;
+      opacity: 0;
+    }
+  }
+
+  &:before {
+    content: '';
+
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+
+    display: block;
+    height: 1.5em;
+
+    border-left: 1px solid rgba(0, 0, 0, .1);
+  }
+}
+
+.chat-header__right-toolbar-toggle-icon {
+  position: relative;
+  width: 29px;
+  height: 26px;
+}
+
+.chat-header__right-toolbar-toggle-icon-base {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+
+  width: auto;
+  height: 1em;
+}
+
+.chat-header__right-toolbar-toggle-icon-arrow() {
+  position: absolute;
+  top: 50%;
+  left: @chat-header-right-toolbar-toggle-icon-arrow-base-position;
+  transform: translateY(-50%);
+
+  width: auto;
+  height: 42.85%;
+
+  transition:
+    left .2s ease,
+    opacity .15s ease;
+}
+
+.chat-header__right-toolbar-toggle-icon-arrow-collapse {
+  .chat-header__right-toolbar-toggle-icon-arrow();
+
+  left: @chat-header-right-toolbar-toggle-icon-arrow-base-position - @chat-header-right-toolbar-toggle-icon-arrow-delta;
+  opacity: 0;
+}
+
+.chat-header__right-toolbar-toggle-icon-arrow-expand {
+  .chat-header__right-toolbar-toggle-icon-arrow();
+
+  transform: translateY(-50%);
+}
+
 
 .chat-header__org-page {
   .chat-header__action-icon {
