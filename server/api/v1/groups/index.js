@@ -29,8 +29,8 @@ module.exports = {
       throw new StatusError(404);
     }
 
-    var uri = String(req.body.uri);
-    var name = String(req.body.name);
+    var uri = req.body.uri;
+    var name = req.body.name;
     var createOptions = { uri: uri, name: name };
     if (req.body.security) {
       // for GitHub and future group types that are backed by other services
