@@ -129,6 +129,10 @@ var listProvidersForUser = Promise.method(function(user) {
 });
 
 
+/**
+ * Given a provider, eg "twitter" and a username on that provider
+ * attempts to find a user who has signed up those creds
+ */
 function findUserIdForProviderUsername(provider, username) {
   return Identity.findOne({ provider: provider, username: username }, { userId: 1, _id: 0 })
     .lean()

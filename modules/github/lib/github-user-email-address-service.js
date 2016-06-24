@@ -53,7 +53,12 @@ GitHubUserEmailAddressService.prototype._getValidPublicEmailAddress = function(u
 GitHubUserEmailAddressService.prototype._getEmailFromCommit = function(username) {
   var ghRepo = new GitHubRepoService(this.user);
 
-  return ghRepo.getReposForUser(username, { firstPageOnly: true, sort: 'pushed', perPage: 10 })
+  return ghRepo.getReposForUser(username, {
+      firstPageOnly: true,
+      sort: 'pushed',
+      perPage: 10,
+      type: 'owner'
+    })
     .then(function(repos) {
       if (!repos.length) {
         logger.info('User does not have any repos', { username: username });
@@ -67,7 +72,9 @@ GitHubUserEmailAddressService.prototype._getEmailFromCommit = function(username)
         })
         .slice(0, 3);
 
-      if (!validRepos.length) return;
+      if (!validRepos.length) {
+        return null;
+      }
 
       // Loop through the repos, trying to find
       // a valid commit
@@ -78,12 +85,16 @@ GitHubUserEmailAddressService.prototype._getEmailFromCommit = function(username)
         var repoFullname = repo.full_name;
 
         // Find the most recent commits by the author
-        return ghRepo.getCommits(repoFullname, { firstPageOnly: true, author: username, perPage: 5 })
+        return ghRepo.getCommits(repoFullname, {
+            firstPageOnly: true,
+            author: username,
+            perPage: 5,
+          })
           .then(function(commits) {
             if (!commits) return null;
 
             if (!commits.length) {
-              logger.info('User does not have any repos', { username: username });
+              logger.info('User does not have any commits', { username: username });
               return null;
             }
 

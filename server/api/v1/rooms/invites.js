@@ -1,10 +1,10 @@
 "use strict";
 
-var troupeService = require('../../../services/troupe-service');
 var RoomWithPolicyService = require('../../../services/room-with-policy-service');
 var StatusError = require('statuserror');
 var identityService = require('gitter-web-identity');
 var restSerializer = require("../../../serializers/rest-serializer");
+var loadTroupeFromParam = require('./load-troupe-param');
 
 /**
  * Hide the resolved email address from the caller
@@ -82,7 +82,7 @@ module.exports = {
   create: function(req) {
     var input = parseAndValidateBody(req.body);
 
-    return troupeService.findById(req.params.troupeId)
+    return loadTroupeFromParam(req)
       .then(function(troupe) {
         var roomWithPolicyService = new RoomWithPolicyService(troupe, req.user, req.userRoomPolicy);
         return roomWithPolicyService.createRoomInvitation(input.type, input.externalId, input.emailAddress);

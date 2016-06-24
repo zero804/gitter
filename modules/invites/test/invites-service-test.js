@@ -55,7 +55,7 @@ describe('invite-service', function() {
             assert.ok(false, 'Expected exception');
           })
           .catch(StatusError, function(err) {
-            assert(err.status, 419);
+            assert.strictEqual(err.status, 409);
           });
       });
     });

@@ -73,9 +73,9 @@ function createPolicyForRoomInvite(user, room, inviteSecret) {
  * Creates a policy for adding users to a room.
  * Note that if the user being added is unable to access the room because they
  * have the wrong access tokens (for example, it's a private room and they only
- * have public tokens) they will be rejected. This may be quiet confusing to
+ * have public tokens) they will be rejected. This may be confusing to
  * the user who is trying to add the other user, since they won't really
- * understand why the using they're trying to add is being rejected. We could
+ * understand why the user they're trying to add is being rejected. We could
  * probably add some extra help for this rare situation
  */
 function createPolicyForRoomAdd(user, room) {

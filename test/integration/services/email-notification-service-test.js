@@ -5,6 +5,9 @@ var Promise = require('bluebird');
 var assert = require('assert');
 var i18nFactory = testRequire('gitter-web-i18n');
 var ObjectID = require('mongodb').ObjectID;
+var config = require('gitter-web-env').config;
+
+var BASE_EMAIL_PATH = config.get('email:emailBasePath');
 
 var EMAIL_DATA = [
   {
@@ -203,7 +206,7 @@ describe('email-notification-service', function() {
           assert.strictEqual(emailPayload.subject, '[a/b] Join the chat on Gitter');
           assert.strictEqual(emailPayload.from, 'bob <support@gitter.im>');
           assert.strictEqual(emailPayload.to, 'x@troupetest.local');
-          assert.strictEqual(emailPayload.data.roomUrl, 'http://localhost:5000/settings/accept-invite/x123');
+          assert.strictEqual(emailPayload.data.roomUrl, BASE_EMAIL_PATH + '/settings/accept-invite/x123');
           assert.strictEqual(emailPayload.data.roomUri, 'a/b');
           assert.strictEqual(emailPayload.data.senderName, 'bob');
         });
