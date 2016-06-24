@@ -1329,7 +1329,7 @@ function deleteRoom(troupe) {
 function upsertGroupRoom(user, group, roomInfo, securityDescriptor, options) {
   options = options || {}; // options.tracking
   var uri = roomInfo.uri;
-  var topic = roomInfo.topic || null;
+  var topic = roomInfo.topic;
   var lcUri = uri.toLowerCase();
 
   // convert back to the old github-tied vars here
@@ -1362,16 +1362,17 @@ function upsertGroupRoom(user, group, roomInfo, securityDescriptor, options) {
       throw new StatusError(400, 'type is not known: ' + type);
   }
 
+  var insertData = {
+    groupId: group._id,
+    topic: topic || '',
+    uri: uri,
+    lcUri: lcUri,
+    userCount: 0,
+    sd: securityDescriptor
+  };
 
   return mongooseUtils.upsert(persistence.Troupe, { lcUri: lcUri }, {
-      $setOnInsert: {
-        groupId: group._id,
-        topic: topic,
-        uri: uri,
-        lcUri: lcUri,
-        userCount: 0,
-        sd: securityDescriptor,
-      }
+      $setOnInsert: insertData
     })
     .spread(function(room, updatedExisting) {
       if (updatedExisting) {

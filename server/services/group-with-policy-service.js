@@ -46,7 +46,7 @@ function ensureAccessAndFetchRoomInfo(user, group, options) {
     throw new StatusError(400, 'Invalid room security for ' + type +': '+ security);
   }
 
-  var topic = options.topic || null;
+  var topic = options.topic;
   // TODO: validate topic
 
   var name = options.name;
