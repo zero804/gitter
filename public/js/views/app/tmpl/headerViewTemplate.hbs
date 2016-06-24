@@ -4,22 +4,22 @@
   </div>
 </div>
 
-<div class="chat-header__main-grouping chat-header_header-grouping">
-  <h1 class='js-chat-name chat-header__heading' title="{{ lockTooltip }}">
-    <a {{#if githubLink}}href="{{ githubLink }}"{{/if}} class="chat-header__title" target="_blank">{{ troupeName }}</a>
+<div class="chat-header__main-grouping chat-header__info-grouping">
+  <div class="chat-header__heading-sub-group">
+    <h1 class="js-chat-name chat-header__heading" title="{{ lockTooltip }}">
+      <a {{#if githubLink}}href="{{ githubLink }}"{{/if}} class="chat-header__title" target="_blank">{{ troupeName }}</a>
 
-    {{#if isPrivate}}
-      <i class='octicon octicon-lock chat-header__permission-icon'></i>
-    {{/if}}
-  </h1>
-</div>
-
-
-<div class="chat-header__main-grouping chat-header__topic-grouping js-room-topic-edit-activator" tabindex="0">
-  <div class="chat-header__topic-wrapper js-room-topic-wrapper {{when isAdmin 'is-admin' : ''}} {{when shouldShowPlaceholderRoomTopic 'is-new-room' : ''}}">
-    {{~#unless oneToOne~}}
-    <p class="js-room-topic chat-header__topic {{when isAdmin 'is-admin' : ''}} {{when shouldShowPlaceholderRoomTopic 'is-new-room' : ''}}">{{troupeTopic}}</p>
-    {{~/unless~}}
+      {{#if isPrivate}}
+        <i class='octicon octicon-lock chat-header__permission-icon'></i>
+      {{/if}}
+    </h1>
+  </div>
+  <div class="chat-header__topic-sub-group js-room-topic-edit-activator" tabindex="0">
+    <div class="chat-header__topic-wrapper js-room-topic-wrapper {{when isAdmin 'is-admin' : ''}} {{when shouldShowPlaceholderRoomTopic 'is-new-room' : ''}}">
+      {{~#unless oneToOne~}}
+      <p class="js-room-topic chat-header__topic {{when isAdmin 'is-admin' : ''}} {{when shouldShowPlaceholderRoomTopic 'is-new-room' : ''}}">{{troupeTopic}}</p>
+      {{~/unless~}}
+    </div>
   </div>
 </div>
 

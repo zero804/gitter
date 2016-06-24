@@ -283,7 +283,6 @@ var HeaderView = Marionette.ItemView.extend({
 
     apiClient.room.put('', { topic: topic });
 
-    // TODO: once saved topic recalculate the header size
     this.editingTopic = false;
   },
 
@@ -358,6 +357,10 @@ var HeaderView = Marionette.ItemView.extend({
       // by the Isomorphic layout
       this.options.template = headerViewTemplate;
       this.render();
+
+
+      // If it is a new chat header, we can edit the topic again
+      this.editingTopic = false;
     }
   },
 });
