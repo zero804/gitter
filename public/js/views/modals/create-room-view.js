@@ -121,6 +121,7 @@ var View = Marionette.LayoutView.extend({
       return;
     }
 
+    // TODO: this will be GH_REPO too
     if (permissions === 'inherited' && groupType !== 'GH_ORG') {
       self.showValidationMessage('Please select the permissions for the room');
       return;
@@ -210,6 +211,7 @@ var View = Marionette.LayoutView.extend({
       var groupType = group.get('type');
       var orgName = group.get('linkPath') || '';
 
+      // TODO: make this work for repo-based groups too
       if (groupType == 'GH_ORG') {
         // rooms inside github org/repo-based groups can have inherited permissions
         ['permissions', 'permPublic', 'permPrivate', 'permInheritedOrg'].forEach(function (f) { showHide[f] = true; });
