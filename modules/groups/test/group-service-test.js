@@ -214,10 +214,16 @@ describe('group-service', function() {
       it('should find the roomIds for group for an anonymous user', function() {
         return groupService.findRoomsIdForGroup(fixture.group1._id)
           .then(function(roomIds) {
-            assert.deepEqual(roomIds.map(String), [
+            var roomStrings = roomIds.map(String);
+            roomStrings.sort();
+
+            var expectedStrings = [
               fixture.troupe1.id,
               fixture.troupe2.id,
-            ]);
+            ];
+            expectedStrings.sort();
+
+            assert.deepEqual(roomStrings, expectedStrings);
           });
       });
 
