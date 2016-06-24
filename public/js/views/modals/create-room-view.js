@@ -34,23 +34,23 @@ function checkForRepoExistence(repo, cb) {
 var View = Marionette.LayoutView.extend({
   template: template,
 
-  ui:                     {
-    permissions:          "#permissions",
-    permPublic:           "#perm-select-public",
-    permPrivate:          "#perm-select-private",
-    permInheritedOrg:     "#perm-select-inherited-org",
-    validation:           '#modal-failure',
-    existing:             '#existing',
-    groupNameLabel:       "#group-name",
-    roomNameInput:        '#room-name',
-    dropDownButton:       '#dd-button',
+  ui: {
+    permissions: '#permissions',
+    permPublic: '#perm-select-public',
+    permPrivate: '#perm-select-private',
+    permInheritedOrg: '#perm-select-inherited-org',
+    validation: '#modal-failure',
+    existing: '#existing',
+    orgNameLabel: '#org-name',
+    roomNameInput: '#room-name',
+    dropDownButton: '#dd-button',
   },
 
-  events:                       {
+  events: {
     'change @ui.roomNameInput': 'roomNameChange',
-    'cut @ui.roomNameInput':    'roomNameChange',
-    'paste @ui.roomNameInput':  'roomNameChange',
-    'input @ui.roomNameInput':  'roomNameChange',
+    'cut @ui.roomNameInput': 'roomNameChange',
+    'paste @ui.roomNameInput': 'roomNameChange',
+    'input @ui.roomNameInput': 'roomNameChange',
     'click @ui.dropDownButton': 'clickDropDown',
     'change input[type=radio]': 'permissionsChange'
   },
@@ -208,6 +208,7 @@ var View = Marionette.LayoutView.extend({
       var roomName = this.ui.roomNameInput.val();
       var groupUri = group.get('uri');
       var groupType = group.get('type');
+      var orgName = group.get('linkPath') || '';
 
       if (groupType == 'GH_ORG') {
         // rooms inside github org/repo-based groups can have inherited permissions
@@ -283,11 +284,11 @@ var View = Marionette.LayoutView.extend({
         arrayToJq(true).removeClass('hide');
         arrayToJq(false).addClass('hide');
         self.ui.roomNameInput.attr('placeholder', placeholder);
-        self.ui.groupNameLabel.text(groupName);
+        self.ui.orgNameLabel.text(orgName);
       } else {
         arrayToJq(true).filter(':hidden').removeClass('hide');
         arrayToJq(false).filter(':visible').addClass('hide');
-        self.ui.groupNameLabel.text(groupName);
+        self.ui.orgNameLabel.text(orgName);
         self.ui.roomNameInput.attr('placeholder', placeholder);
       }
     }
