@@ -111,8 +111,9 @@ var View = Marionette.LayoutView.extend({
     }
 
     var groupId = group.get('id');
-    var groupType = group.get('type');
-    var groupLinkPath = group.get('linkPath');
+    var groupBackedBy = group.get('backedBy');
+    var groupType = groupBackedBy.type;
+    var groupLinkPath = groupBackedBy.linkPath;
     var permissions = self.$el.find('input[type=radio]:visible:checked').val();
     var roomName = self.ui.roomNameInput.val().trim();
 
@@ -208,8 +209,9 @@ var View = Marionette.LayoutView.extend({
       groupName = group.get('name');
       var roomName = this.ui.roomNameInput.val();
       var groupUri = group.get('uri');
-      var groupType = group.get('type');
-      var orgName = group.get('linkPath') || '';
+      var groupBackedBy = group.get('backedBy');
+      var groupType = groupBackedBy.type;
+      var orgName = groupBackedBy.linkPath || '';
 
       // TODO: make this work for repo-based groups too
       if (groupType == 'GH_ORG') {
