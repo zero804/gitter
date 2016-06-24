@@ -326,16 +326,14 @@
 
 
   &.pinned {
-    & > .chat-header__right-toolbar-toggle-icon {
-      & > .chat-header__right-toolbar-toggle-icon-arrow-collapse {
-        left: @chat-header-right-toolbar-toggle-icon-arrow-base-position;
-        opacity: 1;
-      }
+    & .chat-header__right-toolbar-toggle-icon-arrow-collapse {
+      left: @chat-header-right-toolbar-toggle-icon-arrow-base-position;
+      opacity: 1;
+    }
 
-      & > .chat-header__right-toolbar-toggle-icon-arrow-expand {
-        left: @chat-header-right-toolbar-toggle-icon-arrow-base-position + @chat-header-right-toolbar-toggle-icon-arrow-delta;
-        opacity: 0;
-      }
+    & .chat-header__right-toolbar-toggle-icon-arrow-expand {
+      left: @chat-header-right-toolbar-toggle-icon-arrow-base-position + @chat-header-right-toolbar-toggle-icon-arrow-delta;
+      opacity: 0;
     }
   }
 
