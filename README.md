@@ -255,7 +255,7 @@ Running browser unit tests during development requires this command:
 npm run browser-watch-test
 ```
 
-Then open your favourite browser and view `http://localhost:9090/fixtures`. This page will live reload with you test changes when required.
+Then open your favourite browser and view `http://localhost:9191/fixtures`. This page will live reload with you test changes when required.
 
 To perform an automated test run use the following command:
 

@@ -92,6 +92,8 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
       groupsCollection: this.groupsCollection
     }));
 
+    this.minibarCollection = this.model.minibarCollection;
+
     this.keyboardControls = new KeyboardControllerView({
       model: this.model,
     });

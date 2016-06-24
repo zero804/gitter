@@ -7,8 +7,6 @@ var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assert = require('assert');
 
 describe('user-group-api', function() {
-  this.timeout(10000);
-
   var app, request;
 
   before(function() {

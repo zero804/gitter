@@ -11,7 +11,7 @@
   },
   "private": true,
   "dependencies": {
-    "bluebird": "^3.3.5",
+    "bluebird": "^3.2.1",
     "gitter-web-github-backend": "file:../github-backend",
     "gitter-web-google-backend": "file:../google-backend",
     "gitter-web-identity": "file:../identity",

@@ -95,7 +95,7 @@ module.exports = BaseItemView.extend({
   },
 
   onRender: function() {
-    if(!this.firstRender || this.firstRender && this.roomMenuModel && this.roomMenuModel.get('roomMenuIsPinned')) {
+    if(this.roomMenuModel.get('roomMenuIsPinned')) {
       this.onActiveStateUpdate();
     }
 
