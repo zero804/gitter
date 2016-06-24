@@ -102,13 +102,20 @@ module.exports = Backbone.Model.extend({
     });
 
     var orgsSnapshot = context.getSnapshot('orgs') || [];
-    this.minibarHomeModel = new MinibarItemModel({ name: 'all', type: 'all' });
-    this.minibarSearchModel = new MinibarItemModel({ name: 'search', type: 'search' });
-    this.minibarPeopleModel = new MinibarPeopleModel(null, { roomCollection: this._roomCollection });
+    var state = this.get('state');
+    var selectedOrg = this.get('selectedOrgName');
+    this.minibarHomeModel = new MinibarItemModel({ name: 'all', type: 'all', active: (state === 'all') });
+    this.minibarSearchModel = new MinibarItemModel({ name: 'search', type: 'search', active: (state === 'saerch') });
+    this.minibarPeopleModel = new MinibarPeopleModel({ active: (state === 'people')}, { roomCollection: this._roomCollection });
     this.minibarCloseModel = new MinibarItemModel({ name: 'close', type: 'close' });
+
+    var minibarModels = orgsSnapshot.map(function(model){
+      return _.extend({}, model, { active: (state === 'org' && model.name === selectedOrg) });
+    });
+
     this.minibarCollection = context.hasFeature('groups') ?
       this.groupsCollection :
-      new MinibarCollection(orgsSnapshot, { roomCollection: this._roomCollection });
+      new MinibarCollection(minibarModels, { roomCollection: this._roomCollection });
 
     var roomModels = this._roomCollection.filter(defaultCollectionFilter);
     this.activeRoomCollection = new FilteredRoomCollection(roomModels, {

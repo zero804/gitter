@@ -8,8 +8,6 @@ var assert = require('assert');
 var _ = require('lodash');
 
 describe('room-api', function() {
-  this.timeout(10000);
-
   var app, request;
 
   before(function() {
@@ -17,8 +15,29 @@ describe('room-api', function() {
     app = require('../../server/api');
   });
 
+/**
+ * fixtureLoader.GITTER_INTEGRATION_COLLAB_USER_SCOPE_TOKEN = '***REMOVED***';
+ fixtureLoader.GITTER_INTEGRATION_COLLAB_USERNAME = 'gitter-integration-tests-collaborator';
+ fixtureLoader.GITTER_INTEGRATION_COLLAB_USER_ID = '20068982';
+ */
   var fixture = fixtureLoader.setup({
+    deleteDocuments: {
+      User: [{
+        username: fixtureLoader.GITTER_INTEGRATION_USERNAME
+      }, {
+        username: fixtureLoader.GITTER_INTEGRATION_COLLAB_USERNAME
+      }],
+      Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() }],
+      Troupe: [ { lcUri: fixtureLoader.GITTER_INTEGRATION_REPO_WITH_COLLAB.toLowerCase() } ]
+    },
     user1: {
+      githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
+      username: fixtureLoader.GITTER_INTEGRATION_USERNAME,
+      accessToken: 'web-internal'
+    },
+    user2: {
+      githubToken: fixtureLoader.GITTER_INTEGRATION_COLLAB_USER_SCOPE_TOKEN,
+      username: fixtureLoader.GITTER_INTEGRATION_COLLAB_USERNAME,
       accessToken: 'web-internal'
     },
     group1: {
@@ -64,9 +83,30 @@ describe('room-api', function() {
           id: fixture.group1.id,
           uri: fixture.group1.uri
         });
-
-      })
+      });
   });
+
+  it('POST /v1/rooms/', function() {
+    return request(app)
+      .post('/v1/rooms')
+      .send({
+        uri: fixtureLoader.GITTER_INTEGRATION_REPO_WITH_COLLAB
+      })
+      .set('x-access-token', fixture.user2.accessToken)
+      .expect(200)
+      .then(function(result) {
+        var body = result.body;
+        assert.strictEqual(body.uri, fixtureLoader.GITTER_INTEGRATION_REPO_WITH_COLLAB);
+
+        return request(app)
+          .post('/v1/rooms')
+          .send({
+            uri: fixtureLoader.GITTER_INTEGRATION_REPO_WITH_COLLAB
+          })
+          .set('x-access-token', fixture.user1.accessToken)
+          .expect(200);
+      })
+  })
 
 
 })

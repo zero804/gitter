@@ -3,7 +3,6 @@
 var env = require('gitter-web-env');
 var nconf = env.config;
 var contextGenerator = require('../../web/context-generator');
-var useragent = require('useragent');
 
 var WELCOME_MESSAGES = [
   'Code for people',
@@ -33,7 +32,7 @@ function renderHomePage(req, res, next) {
     .then(function (troupeContext) {
       var page = req.isPhone ? 'mobile/mobile-userhome' : 'userhome-template';
 
-      var osName = useragent.parse(req.headers['user-agent']).os.family.toLowerCase();
+      var osName = req.getParsedUserAgent().os.family.toLowerCase();
 
       var isLinux = osName.indexOf('linux') >= 0;
       var isOsx = osName.indexOf('mac') >= 0;

@@ -1,43 +1,47 @@
 "use strict";
 
+var assert = require("assert");
+var Promise = require('bluebird');
+var _ = require('lodash');
 var restSerializer = require("../serializers/rest-serializer");
-var presenceService = require("gitter-web-presence");
-var useragent = require("useragent");
 var userService = require('../services/user-service');
 var userSettingsService = require('../services/user-settings-service');
 var roomMetaService = require('../services/room-meta-service');
-var isNative = require('../../public/js/utils/is-native');
-
-var assert = require("assert");
-var Promise = require('bluebird');
-var _ = require('underscore');
+var contextGeneratorRequest = require('./context-generator-request');
 
 /**
  * Returns the promise of a mini-context
  */
-exports.generateNonChatContext = function(req) {
+function generateNonChatContext(req) {
   var user = req.user;
-  var troupe = req.uriContext && req.uriContext.troupe;
+  var uriContext = req.uriContext;
+  var troupe = uriContext && uriContext.troupe;
+  var roomMember = uriContext && uriContext.roomMember;
 
   return Promise.all([
+      contextGeneratorRequest(req),
       user ? serializeUser(user) : null,
       troupe ? serializeTroupe(troupe, user) : undefined,
-      user ? determineDesktopNotifications(user, req) : false,
-      user ? userSettingsService.getUserSettings(user.id, 'suggestedRoomsHidden') : false,
-      user ? userSettingsService.getUserSettings(user.id, 'leftRoomMenu') : false,
+      user ? userSettingsService.getMultiUserSettingsForUserId(user._id, ['suggestedRoomsHidden', 'leftRoomMenu']) : null,
     ])
-    .spread(function (serializedUser, serializedTroupe, desktopNotifications, suggestedRoomsHidden, leftRoomMenuState) {
-      return createTroupeContext(req, {
-        user:                 serializedUser,
-        troupe:               serializedTroupe,
+    .spread(function (reqContextHash, serializedUser, serializedTroupe, settings) {
+      var suggestedRoomsHidden = settings && settings.suggestedRoomsHidden;
+      var leftRoomMenuState = settings && settings.leftRoomMenuState;
+
+      return _.extend({}, reqContextHash, {
+        roomMember: roomMember,
+        user: serializedUser,
+        troupe: serializedTroupe,
         suggestedRoomsHidden: suggestedRoomsHidden,
-        desktopNotifications: desktopNotifications,
-        leftRoomMenuState:    leftRoomMenuState,
+        leftRoomMenuState: leftRoomMenuState,
       });
     });
-};
+}
 
-exports.generateSocketContext = function(userId, troupeId) {
+/**
+ * Generates a context for sending over a bayeux connection
+ */
+function generateSocketContext(userId, troupeId) {
   function getUser() {
     if (!userId) return Promise.resolve(null);
     return userService.findById(userId);
@@ -56,67 +60,34 @@ exports.generateSocketContext = function(userId, troupeId) {
         troupe: serializedTroupe || undefined
       };
     });
-};
+}
 
-exports.generateTroupeContext = function(req, extras) {
+/**
+ * Generates the context to send for a main-frame
+ */
+function generateTroupeContext(req, extras) {
   var user = req.user;
   var uriContext = req.uriContext;
   assert(uriContext);
-
-  var troupe = req.uriContext.troupe;
+  var troupe = uriContext.troupe;
+  var roomMember = uriContext && uriContext.roomMember;
 
   return Promise.all([
+    contextGeneratorRequest(req),
     user ? serializeUser(user) : null,
     troupe ? serializeTroupe(troupe, user) : undefined,
-    determineDesktopNotifications(user, req),
     troupe && troupe._id ? roomMetaService.findMetaByTroupeId(troupe._id, 'welcomeMessage') : false,
   ])
-  .spread(function(serializedUser, serializedTroupe, desktopNotifications, welcomeMessage) {
+  .spread(function(reqContextHash, serializedUser, serializedTroupe, welcomeMessage) {
+    var roomHasWelcomeMessage = !!(welcomeMessage && welcomeMessage.text && welcomeMessage.text.length);
 
-    welcomeMessage = (welcomeMessage || { text: '' });
-
-    return createTroupeContext(req, {
+    return _.extend({}, reqContextHash, {
+      roomMember: roomMember,
       user: serializedUser,
       troupe: serializedTroupe,
-      desktopNotifications: desktopNotifications,
-      extras: extras,
-      roomHasWelcomeMessage: !!welcomeMessage.text && !!welcomeMessage.text.length,
-    });
+      roomHasWelcomeMessage: roomHasWelcomeMessage
+    }, extras);
   });
-};
-
-/**
- * Figures out whether to use desktop notifications for this user
- */
-
-function determineDesktopNotifications(user, req) {
-  if(!user) return true;
-
-  var agent = useragent.parse(req.headers['user-agent']);
-  var os = agent.os.family;
-  var clientType;
-
-  if(os === 'Mac OS X') {
-    clientType = 'osx';
-  } else if(os.indexOf('Windows') === 0) {
-    clientType = 'win';
-  } else if (os.indexOf('Linux') === 0) {
-    clientType= 'linux';
-  }
-
-  if(clientType) {
-    return presenceService.isUserConnectedWithClientType(user.id, clientType)
-      .then(function(result) {
-        return !result;
-      });
-  }
-
-  return true;
-
-}
-
-function isNativeDesktopApp(req) {
-  return isNative(req.headers['user-agent']);
 }
 
 function serializeUser(user) {
@@ -137,12 +108,12 @@ function serializeTroupeId(troupeId, user) {
     currentUser: user,
     includePermissions: true,
     includeOwner: true,
-    includeProviders: true
+    includeProviders: true,
+    includeGroups: true
   });
 
   return restSerializer.serializeObject(troupeId, strategy);
 }
-
 
 function serializeTroupe(troupe, user) {
   var strategy = new restSerializer.TroupeStrategy({
@@ -150,42 +121,15 @@ function serializeTroupe(troupe, user) {
     currentUser: user,
     includePermissions: true,
     includeOwner: true,
-    includeProviders: true
+    includeProviders: true,
+    includeGroups: true
   });
 
   return restSerializer.serializeObject(troupe, strategy);
 }
 
-function createTroupeContext(req, options) {
-  var events = req.session && req.session.events;
-  var extras = options.extras || {};
-
-  // Pass the feature toggles through to the client
-  var features;
-  if (req.fflip && req.fflip.features) {
-    features = Object.keys(req.fflip.features).filter(function(featureKey) {
-      return req.fflip.features[featureKey];
-    });
-  }
-
-  if (events) { req.session.events = []; }
-
-  return _.extend({
-    roomMember: req.uriContext && req.uriContext.roomMember,
-    user: options.user,
-    troupe: options.troupe,
-    homeUser: options.homeUser,
-    accessToken: req.accessToken,
-    suggestedRoomsHidden: options.suggestedRoomsHidden,
-    desktopNotifications: options.desktopNotifications,
-    events: events,
-    troupeUri: options.troupe ? options.troupe.uri : undefined,
-    troupeHash: options.troupeHash,
-    isNativeDesktopApp: isNativeDesktopApp(req),
-    permissions: options.permissions,
-    locale: req.i18n.locales[req.i18n.locale],
-    features: features,
-    leftRoomMenuState: options.leftRoomMenuState,
-    roomHasWelcomeMessage: options.roomHasWelcomeMessage
-  }, extras);
+module.exports = {
+  generateNonChatContext: generateNonChatContext,
+  generateSocketContext: generateSocketContext,
+  generateTroupeContext: generateTroupeContext
 }

@@ -8,7 +8,7 @@
   },
   "private": true,
   "dependencies": {
-    "bluebird": "^3.3.5",
+    "bluebird": "^3.2.1",
     "gitter-web-env": "file:../env",
     "lodash": "^3.2.0",
     "snappy-cache": "^0.3.0"
