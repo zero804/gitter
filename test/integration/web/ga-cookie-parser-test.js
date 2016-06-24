@@ -1,9 +1,8 @@
-/*jslint node: true */
 "use strict";
 
 var testRequire = require('../test-require');
 var assert = require('assert');
-var underTest = testRequire('./utils/ga-cookie-parser');
+var underTest = testRequire('./web/ga-cookie-parser');
 
 describe('ga-cookie-parser-test', function() {
 

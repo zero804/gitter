@@ -6,11 +6,16 @@ var Promise = require('bluebird');
 var _ = require('lodash');
 var cliff = require('cliff');
 var shutdown = require('shutdown');
+var uriLookupService = require("../../server/services/uri-lookup-service");
 
 function getOrgChannelsWithIncorrectParent() {
   return persistence.Troupe
     .aggregate([
-      { $match: { githubType: 'ORG_CHANNEL' } },
+      {
+        $match: {
+          githubType: 'ORG_CHANNEL',
+        }
+      },
       { $lookup: {
           from: "troupes",
           localField: "parentId",
@@ -112,6 +117,14 @@ function getUpdates() {
         var correctParent = orgsHashed[troupe.lcOwner];
         var count = userCounts[troupe._id] || 0;
 
+        var correctLcOwner;
+        var correctUri;
+        var lastPart = troupe.uri.split('/')[1];
+        if (correctParent) {
+          correctUri = correctParent.uri + '/' + lastPart;
+          correctLcOwner = correctParent.uri.split('/')[0].toLowerCase();
+        }
+
         return {
           _id: troupe._id,
           uri: troupe.uri,
@@ -119,8 +132,13 @@ function getUpdates() {
           originalOwnerUserId: troupe.ownerUserId,
           correctParentId: correctParent && correctParent._id,
           correctParentUri: correctParent && correctParent.uri,
+          correctLcOwner: correctLcOwner,
+          correctUri: correctUri,
           userCount: count
         };
+      })
+      .filter(function(update) {
+        return update.correctParentId && update.correctUri;
       });
     });
 }
@@ -128,9 +146,48 @@ function getUpdates() {
 function dryRun() {
   return getUpdates()
     .then(function(updates) {
-      console.log(cliff.stringifyObjectRows(updates, ['_id', 'uri', 'originalParentId', 'originalOwnerUserId', 'correctParentId', 'correctParentUri', 'userCount']));
+      console.log(cliff.stringifyObjectRows(updates, ['_id', 'uri', 'originalParentId', 'originalOwnerUserId', 'correctUri', 'correctParentId', 'correctParentUri', 'correctLcOwner', 'userCount']));
     });
 }
+
+var fixOrgChannel = Promise.method(function(update) {
+  var troupeId = update._id;
+  var newUri = update.correctUri;
+  if (!newUri) return;
+
+  return persistence.Troupe.findById(troupeId)
+    .then(function(channel) {
+      if (!channel) {
+        console.log('Did not find');
+        return;
+      }
+
+      var newLcUri = newUri.toLowerCase();
+      var oldUri = channel.uri;
+
+      var requiresRename = newLcUri !== channel.lcUri;
+      if (requiresRename) {
+        channel.renamedLcUris.addToSet(channel.lcUri);
+      }
+
+      channel.lcUri = newLcUri;
+      channel.uri = newUri;
+      channel.parentId = update.correctParentId;
+      channel.ownerUserId = null;
+      channel.lcOwner = update.correctLcOwner;
+
+      return channel.save()
+        .then(function() {
+          if (!requiresRename) return;
+          
+          return uriLookupService.removeBadUri(oldUri.toLowerCase())
+            .then(function() {
+              return uriLookupService.reserveUriForTroupeId(troupeId, newLcUri);
+            });
+
+        });
+    });
+});
 
 
 function execute() {
@@ -146,17 +203,7 @@ function execute() {
           console.log('# completed ', count);
         }
 
-        var troupeId = update._id;
-        var parentId = update.correctParentId || null;
-
-        return persistence.Troupe.update({
-            _id: troupeId,
-            githubType: 'ORG_CHANNEL'
-          }, {
-            $unset: { ownerUserId: true },
-            $set: { parentId: parentId }
-          })
-          .exec();
+        return fixOrgChannel(update);
       }, { concurrency: 10 });
     });
 }

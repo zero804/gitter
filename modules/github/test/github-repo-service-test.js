@@ -23,7 +23,7 @@ describe('github-repo-service #slow', function() {
   });
 
   it('should list the commits for a repo', function(done) {
-    ghRepo.getCommits('faye/faye', { firstPage: true })
+    ghRepo.getCommits('faye/faye', { firstPageOnly: true })
       .then(function(commits) {
         assert(commits.length >= 1);
       })

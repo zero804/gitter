@@ -1,7 +1,9 @@
 "use strict";
 
 var express = require('express');
-var appRender = require('./render');
+var mainFrameRenderer = require('../renderers/main-frame');
+var chatRenderer = require('../renderers/chat');
+var userNotSignedUpRenderer = require('../renderers/user-not-signed-up');
 var appMiddleware = require('./middleware');
 var recentRoomService = require('../../services/recent-room-service');
 var isPhone = require('../../web/is-phone');
@@ -9,6 +11,7 @@ var timezoneMiddleware = require('../../web/middlewares/timezone');
 var featureToggles = require('../../web/middlewares/feature-toggles');
 var archive = require('./archive');
 var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
+var StatusError = require('statuserror');
 
 function saveRoom(req) {
   var userId = req.user && req.user.id;
@@ -33,23 +36,23 @@ var mainFrameMiddlewarePipeline = [
     if(req.isPhone) {
       if(!req.user) {
         if (req.uriContext.accessDenied) {
-          //return appRender.renderOrgPage(req, res, next);
           return res.redirect('/orgs/' + req.uriContext.uri + '/rooms/~iframe');
         }
-        appRender.renderMobileNotLoggedInChat(req, res, next);
+
+        chatRenderer.renderMobileNotLoggedInChat(req, res, next);
         return;
       }
 
       saveRoom(req);
-      appRender.renderMobileChat(req, res, next);
+      chatRenderer.renderMobileChat(req, res, next);
 
     } else {
-      appRender.renderMainFrame(req, res, next, 'chat');
+      mainFrameRenderer.renderMainFrame(req, res, next, 'chat');
     }
   },
   function (err, req, res, next) {
-    if (err && err.userNotSignedUp && !isPhone(req.headers['user-agent'])) {
-      appRender.renderUserNotSignedUpMainFrame(req, res, next, 'chat');
+    if (err && err.userNotSignedUp && !isPhone(req)) {
+      userNotSignedUpRenderer.renderUserNotSignedUpMainFrame(req, res, next);
       return;
     }
     return next(err);
@@ -64,27 +67,26 @@ var chatMiddlewarePipeline = [
   timezoneMiddleware,
   function (req, res, next) {
     if (req.uriContext.accessDenied) {
-      //return appRender.renderOrgPage(req, res, next);
       return res.redirect('/orgs/' + req.uriContext.uri + '/rooms/~iframe');
     }
 
-    if(!req.uriContext.troupe) return next(404);
+    if(!req.uriContext.troupe) return next(new StatusError(404));
 
     if(req.user) {
       saveRoom(req);
-      appRender.renderChatPage(req, res, next);
+      chatRenderer.renderChatPage(req, res, next);
     } else {
       // We're doing this so we correctly redirect a logged out
       // user to the right chat post login
       var url = req.originalUrl;
       req.session.returnTo = url.replace(/\/~\w+(\?.*)?$/,"");
-      appRender.renderNotLoggedInChatPage(req, res, next);
+      chatRenderer.renderNotLoggedInChatPage(req, res, next);
     }
 
   },
   function (err, req, res, next) {
     if (err && err.userNotSignedUp) {
-      appRender.renderUserNotSignedUp(req, res, next);
+      userNotSignedUpRenderer.renderUserNotSignedUp(req, res, next);
       return;
     }
     return next(err);
@@ -98,12 +100,12 @@ var embedMiddlewarePipeline = [
   appMiddleware.isPhoneMiddleware,
   timezoneMiddleware,
   function (req, res, next) {
-    if(!req.uriContext.troupe) return next(404);
+    if(!req.uriContext.troupe) return next(new StatusError(404));
 
     if (req.user) {
-      appRender.renderEmbeddedChat(req, res, next);
+      chatRenderer.renderEmbeddedChat(req, res, next);
     } else {
-      appRender.renderNotLoggedInEmbeddedChat(req, res, next);
+      chatRenderer.renderNotLoggedInEmbeddedChat(req, res, next);
     }
   }
 ];
@@ -113,10 +115,10 @@ var cardMiddlewarePipeline = [
   appMiddleware.uriContextResolverMiddleware({ create: false }),
   timezoneMiddleware,
   function (req, res, next) {
-    if(!req.uriContext.troupe) return next(404);
-    if(req.uriContext.troupe.security !== 'PUBLIC') return next(403);
-    if(!req.query.at) return next(400);
-    appRender.renderChatCard(req, res, next);
+    if(!req.uriContext.troupe) return next(new StatusError(404));
+    if(req.uriContext.troupe.security !== 'PUBLIC') return next(new StatusError(403));
+    if(!req.query.at) return next(new StatusError(400));
+    chatRenderer.renderChatCard(req, res, next);
   }
 ];
 
@@ -156,7 +158,7 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
   router.post(path,
     appMiddleware.uriContextResolverMiddleware({ create: true }),
     function(req, res, next) {
-      if(!req.uriContext.troupe || !req.uriContext.ownUrl) return next(404);
+      if(!req.uriContext.troupe || !req.uriContext.ownUrl) return next(new StatusError(404));
 
       // GET after POST
       res.redirect(req.uri);

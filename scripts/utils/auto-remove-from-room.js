@@ -8,10 +8,10 @@ var troupeService = require('../../server/services/troupe-service');
 var persistence = require('gitter-web-persistence');
 var collections = require('../../server/utils/collections');
 var Promise = require('bluebird');
+var cliff = require('cliff');
+var moment = require('moment');
 var shutdown = require('shutdown');
 var es = require('event-stream');
-
-require('../../server/event-listeners').install();
 
 var opts = require('yargs')
   .option('room', {
@@ -38,34 +38,51 @@ var minTimeInDays = parseInt(opts.min, 10);
 var members = parseInt(opts.members, 10);
 
 function run() {
+  // if (!opts.dryRun) {
+  //   require('../../server/event-listeners').install();
+  // }
+
   if (opts.room) return handleSingleRoom();
   if (members) return handleMultipleRooms();
   return Promise.reject(new Error('invalid usage'));
 }
 
+var total = 0;
+
 function handleRoom(troupe) {
   return (opts.dryRun ?
             autoRemovalService.findRemovalCandidates(troupe.id, { minTimeInDays: minTimeInDays }) :
-            autoRemovalService.autoRemoveInactiveUsers(troupe.id, { minTimeInDays: minTimeInDays })
+            autoRemovalService.autoRemoveInactiveUsers(troupe.id, troupe.groupId, { minTimeInDays: minTimeInDays })
             )
     .then(function(candidates) {
       var userIds = candidates.map(function(c) { return c.userId; });
       return [candidates, userService.findByIds(userIds)];
     })
     .spread(function(candidates, users) {
-      console.log('>>>>>>>>>>> ROOM ', troupe.uri, '> ', candidates.length, 'candidates');
+      total = total + candidates.length;
+      if (!candidates.length) return;
+
       var usersHash = collections.indexById(users);
+      candidates.sort(function(a, b) {
+        if (!a) {
+          if (b) return -1;
+          return 0;
+        }
+
+        if (!b) return 1;
+        return a - b;
+      });
 
       candidates.forEach(function(c) {
         var user = usersHash[c.userId];
         if (!user) return;
-
-        console.log({
-          username: user.username,
-          lastAccessTime: c.lastAccessTime && c.lastAccessTime.toISOString()
-        });
+        c.username = user.username;
+        c.lastAccess = c.lastAccessTime && moment(c.lastAccessTime).format('YYYY/MM/DD HH:mm');
       });
-    });
+
+      console.log(cliff.stringifyObjectRows(candidates, ['userId', 'username', 'lastAccess'])); // eslint-disable-line
+
+        });
 }
 
 function handleSingleRoom() {
@@ -78,12 +95,12 @@ function handleMultipleRooms() {
     persistence.Troupe
       .find({ userCount: { $gt: members } })
       .sort({ userCount: -1 })
-      .select('uri userCount')
+      .select('uri userCount groupId')
       .limit(10)
       .stream()
       .pipe(es.through(function(room) {
         this.pause();
-
+        console.log('Checking ' + room.uri + ' (' + room.userCount + ' members)')
         var self = this;
         return handleRoom(room)
           .catch(function(err) {
@@ -104,6 +121,10 @@ function handleMultipleRooms() {
 }
 
 run()
+  .then(function() {
+    console.log('Completed after removing ' + total + ' users.');
+    if (opts.dryRun) process.exit(0);
+  })
   .delay(5000)
   .then(function() {
     shutdown.shutdownGracefully();
