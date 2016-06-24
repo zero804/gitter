@@ -5,7 +5,7 @@ var StatusError = require('statuserror');
 
 var userService = require('./user-service');
 var troupeService = require('./troupe-service');
-var legacyPolicyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
+var githubPolicyFactory = require('gitter-web-permissions/lib/github-policy-factory');
 var groupService = require('gitter-web-groups/lib/group-service');
 var validateGitHubUri = require('gitter-web-github').GitHubUriValidator;
 var validateGroupUri = require('gitter-web-validators/lib/validate-group-uri');
@@ -30,7 +30,7 @@ function checkGitHubUri(user, uri) {
     .then(function(githubInfo) {
       if (githubInfo && githubInfo.type === 'ORG') {
         // also check if you can actually admin the org.
-        return legacyPolicyFactory.createGroupPolicyForGithubObject(user, 'ORG', uri, githubInfo.githubId)
+        return githubPolicyFactory.createGroupPolicyForGithubObject(user, 'ORG', uri, githubInfo.githubId)
           .then(function(policy) {
             return policy.canAdmin();
           })
