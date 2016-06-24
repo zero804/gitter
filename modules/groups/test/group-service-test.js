@@ -99,20 +99,6 @@ describe('group-service', function() {
             })
           })
       });
-
-      it('should throw an error if you try and create a new style community not prefixed with an underscore', function() {
-        var user = fixture.user1;
-        return groupService.createGroup(user, {
-            name: 'This Should Fail',
-            uri: 'i-love-cats'
-          })
-          .then(function() {
-            assert.ok(false, 'expected error')
-          })
-          .catch(StatusError, function(error) {
-            assert.strictEqual(error.status, 400);
-          });
-      });
     });
 
     describe('findById #slow', function() {
@@ -147,7 +133,7 @@ describe('group-service', function() {
         return groupService.migration.ensureGroupForGitHubRoomCreation(fixture.user1, {
           uri: fixtureLoader.GITTER_INTEGRATION_ORG,
           name: 'BOB',
-          obtainAccessFromGitHubRepo: fixtureLoader.GITTER_INTEGRATION_REPO
+          obtainAccessFromGitHubRepo: fixtureLoader.GITTER_INTEGRATION_REPO_FULL
         })
         .then(function(group) {
           return securityDescriptorService.getForGroupUser(group._id, fixture.user1._id);
