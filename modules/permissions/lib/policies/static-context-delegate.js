@@ -3,7 +3,7 @@
 var Promise = require('bluebird');
 
 /**
- * OR-style context-delegate
+ * A context-delegate that always returns a static result
  */
 function StaticContextDelegate(result) {
   this.result = result;

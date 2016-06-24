@@ -808,7 +808,6 @@ describe('room-service', function() {
           })
           .bind({})
           .then(function(room) {
-            console.log('ROOM IS ', room);
             this.room = room;
             assert(mongoUtils.objectIDsEqual(room.parentId, fixture.troupeOrg1._id));
             assert(mongoUtils.objectIDsEqual(room.groupId, fixture.group1._id));

@@ -112,12 +112,18 @@ GitHubRepoService.prototype.getAllReposForAuthUser = function() {
 GitHubRepoService.prototype.getReposForUser = function(username, options) {
   var query = {};
 
-  if (options && options.sort) {
-    query.sort = options.sort;
-  }
+  if (options) {
+    if (options.type) {
+      query.type = options.type;
+    }
 
-  if (options && options.perPage) {
-    query.per_page = options.perPage;
+    if (options.sort) {
+      query.sort = options.sort;
+    }
+
+    if (options.perPage) {
+      query.per_page = options.perPage;
+    }
   }
 
   return tentacles.repo.listForUser(username, {

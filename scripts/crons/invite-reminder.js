@@ -15,7 +15,7 @@ function die(err) {
   process.exit(1);
 }
 
-invitesService.findInvitesForReminder(-1/*REMINDER_DAYS*/)
+invitesService.findInvitesForReminder(REMINDER_DAYS)
   .tap(function(inviteReminders) {
     return Promise.map(inviteReminders, function(inviteReminder) {
       var troupe = inviteReminder.troupe;
@@ -30,7 +30,7 @@ invitesService.findInvitesForReminder(-1/*REMINDER_DAYS*/)
             logger.error('Couldn\'t notify invite: ', { id: invite._id, exception: err });
           })
           .then(function() {
-            // return invitesService.markInviteReminded(invite._id);
+            return invitesService.markInviteReminded(invite._id);
           })
       }
     }, { concurrency: 10 });
