@@ -26,7 +26,7 @@ function generateNonChatContext(req) {
     ])
     .spread(function (reqContextHash, serializedUser, serializedTroupe, settings) {
       var suggestedRoomsHidden = settings && settings.suggestedRoomsHidden;
-      var leftRoomMenuState = settings && settings.leftRoomMenuState;
+      var leftRoomMenuState = settings && settings.leftRoomMenu;
 
       return _.extend({}, reqContextHash, {
         roomMember: roomMember,
