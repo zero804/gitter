@@ -3,12 +3,14 @@
 var _ = require('underscore');
 var Marionette = require('backbone.marionette');
 var fastdom = require('fastdom');
+var appEvents = require('utils/appevents');
+var domIndexById = require('utils/dom-index-by-id');
+
 var ItemView = require('./minibar-item-view');
 var CloseItemView = require('./minibar-close-item-view');
 var CommunityCreateItemView = require('./minibar-community-create-item-view');
 var FavouriteView = require('./minibar-favourite-item-view');
 var PeopleView = require('./minibar-people-item-view.js');
-var domIndexById = require('../../../../utils/dom-index-by-id');
 
 //TODO TEST ALL THE THINGS JP 2/2/16
 var MinibarView = Marionette.CollectionView.extend({
@@ -127,6 +129,9 @@ var MinibarView = Marionette.CollectionView.extend({
     model.set({
       active: true
     });
+
+    // Send off some stats
+    appEvents.trigger('stats.event', 'minibar.activated', model.get('type'));
 
     var state = model.get('type');
     // close-passthrough

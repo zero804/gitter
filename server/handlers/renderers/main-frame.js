@@ -3,6 +3,7 @@
 var env = require('gitter-web-env');
 var winston = env.logger;
 var errorReporter = env.errorReporter;
+var stats = env.stats;
 var Promise = require('bluebird');
 var contextGenerator = require('../../web/context-generator');
 var restful = require('../../services/restful');
@@ -98,6 +99,13 @@ function renderMainFrame(req, res, next, frame) {
           .catch(function(err) {
             errorReporter(err, { userSettingsServiceSetFailed: true }, { module: 'app-render' });
           });
+      }
+
+      if(snapshots && snapshots.leftMenu && snapshots.leftMenu.state) {
+        stats.event('left-menu-init-state', {
+          state: snapshots.leftMenu.state,
+          isPinned: snapshots.leftMenu.roomMenuIsPinned
+        });
       }
 
 
