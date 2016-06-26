@@ -1,0 +1,21 @@
+{
+  "name": "gitter-web-invites",
+  "version": "1.0.0",
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha test/"
+  },
+  "private": true,
+  "dependencies": {
+    "bluebird": "^3.4.1",
+    "gitter-web-persistence": "file:../persistence",
+    "gitter-web-persistence-utils": "file:../persistence-utils",
+    "mongodb": "^2.1.18",
+    "node-uuid": "^1.4.0",
+    "statuserror": "^0.1.3"
+  }
+}

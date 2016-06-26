@@ -1,5 +1,3 @@
-/*jslint node:true, unused:true*/
-/*global describe:true, it:true */
 "use strict";
 
 var assert = require('assert');
