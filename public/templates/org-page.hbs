@@ -1,8 +1,10 @@
-<html>
+<html class="{{#if hasCachedFonts}}fonts-loaded{{/if}}">
   <head>
+	  <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {{> fonts}}
     <link rel='stylesheet' type='text/css' href="{{ cdn 'styles/org-page.css' }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/octicons/2.0.2/octicons.min.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
 
   <body>
