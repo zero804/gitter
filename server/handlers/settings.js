@@ -19,6 +19,9 @@ var debug = require('debug')('gitter:app:settings-route');
 var StatusError = require('statuserror');
 var userScopes = require('gitter-web-identity/lib/user-scopes');
 var fonts = require('../utils/fonts');
+var acceptInviteService = require('../services/accept-invite-service');
+var loginUtils = require('../web/login-utils');
+var resolveRoomUri = require('../utils/resolve-room-uri');
 
 var supportedServices = [
   { id: 'github', name: 'GitHub'},
@@ -172,6 +175,40 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
     adminAccessCheck,
     createIntegration);
 });
+
+router.get('/accept-invite/:secret',
+  identifyRoute('settings-accept-invite'),
+  ensureLoggedIn,
+  function(req, res, next) {
+    var secret = req.params.secret;
+    return acceptInviteService.acceptInvite(req.user, secret)
+      .then(function(room) {
+        return resolveRoomUri(room, req.user._id);
+      })
+      .then(function(roomUri) {
+        res.relativeRedirect(roomUri);
+      })
+      .catch(StatusError, function(err) {
+        if (err.status >= 500) throw err;
+
+        if (req.session) {
+          var events = req.session.events;
+          if (!events) {
+            events = [];
+            req.session.events = events;
+          }
+          events.push('invite_failed');
+        }
+        // TODO: tell the user why they could not get invited
+
+        logger.error('Unable to use invite', { username: req.user && req.user.username, exception: err });
+        return loginUtils.whereToNext(req.user)
+          .then(function(next) {
+            res.relativeRedirect(next);
+          });
+      })
+      .catch(next);
+  });
 
 router.get('/unsubscribe/:hash',
   identifyRoute('settings-unsubscribe'),
