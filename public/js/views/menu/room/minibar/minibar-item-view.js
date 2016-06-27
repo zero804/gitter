@@ -98,7 +98,5 @@ module.exports = BaseItemView.extend({
     if(this.roomMenuModel.get('roomMenuIsPinned')) {
       this.onActiveStateUpdate();
     }
-
-    this.firstRender = false;
   },
 });
