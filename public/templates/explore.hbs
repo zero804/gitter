@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="{{#if hasCachedFonts}}fonts-loaded{{/if}}" lang="en">
   <head>
+	  <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Gitter &mdash; Explore</title>
     <link id="favicon" rel="shortcut icon" href="{{ cdn 'images/favicon-normal.ico' }}">
+    {{> fonts}}
     {{!-- <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,100"> --}}
     <link rel="stylesheet" type="text/css" href="{{ cdn 'styles/explore.css' }}">
   </head>
