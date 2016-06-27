@@ -22,14 +22,13 @@ var CommunityCreateModel = Backbone.Model.extend({
     }]),
     /* */
 
-    // user models
-    peopleToInvite: new Backbone.Collection(),
-    // { emailAddress }
-    emailsToInvite: new Backbone.Collection()
   },
 
   initialize: function() {
-
+    // user models
+    this.peopleToInvite = new Backbone.Collection();
+    // { emailAddress }
+    this.emailsToInvite = new Backbone.Collection();
   },
 
   getGithubProjectInfo: function(orgCollection, repoCollection) {

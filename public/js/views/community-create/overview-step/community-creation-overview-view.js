@@ -63,8 +63,8 @@ module.exports = CommunityCreateBaseStepView.extend({
 
     this.inviteCollection = new VirtualMultipleCollection([], {
       backingCollections: [
-        this.communityCreateModel.get('peopleToInvite'),
-        this.communityCreateModel.get('emailsToInvite')
+        this.communityCreateModel.peopleToInvite,
+        this.communityCreateModel.emailsToInvite
       ]
     });
 
