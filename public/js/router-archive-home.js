@@ -1,4 +1,7 @@
 "use strict";
+
+require('utils/font-setup');
+
 var $ = require('jquery');
 var context = require('utils/context');
 var clientEnv = require('gitter-client-env');

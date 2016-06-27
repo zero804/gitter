@@ -1,5 +1,6 @@
 'use strict';
 require('utils/initial-setup');
+require('utils/font-setup');
 
 var Backbone = require('backbone');
 var context = require('utils/context');
