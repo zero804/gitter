@@ -34,5 +34,6 @@ function onTroupeIdChange(roomCollection, groupCollection) {
 }
 
 function getNewOrgItem(data){
-  return new GroupModel({ name: getOrgNameFromURI(data.uri), temp: true, active: true });
+  if(!data.uri) { data.uri = document.location.pathname; }
+  return new GroupModel({ name: getOrgNameFromURI(data.uri), temp: true });
 }
