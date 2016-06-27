@@ -1,6 +1,7 @@
 /* eslint complexity: ["error", 19] */
 'use strict';
 require('utils/initial-setup');
+require('utils/font-setup');
 
 var $ = require('jquery');
 var appEvents = require('utils/appevents');
@@ -506,6 +507,15 @@ onready(function() {
 
   new Router();
   Backbone.history.start();
+
+  if (context.popEvent('invite_failed')) {
+    appEvents.trigger('user_notification', {
+      title: 'Unable to join room',
+      text: 'Unfortunately we were unable to add you to the requested room. Please ' +
+            'check that you have appropriate access and try again.',
+      timeout: 12000,
+    });
+  }
 
   if (context.popEvent('new_user_signup')) {
     require.ensure('scriptjs', function(require) {

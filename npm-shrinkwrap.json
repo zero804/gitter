@@ -2260,6 +2260,11 @@
       "from": "modules/intercom",
       "resolved": "file:modules/intercom"
     },
+    "gitter-web-invites": {
+      "version": "1.0.0",
+      "from": "modules/invites",
+      "resolved": "file:modules/invites"
+    },
     "gitter-web-linkedin-backend": {
       "version": "1.0.0",
       "from": "modules/linkedin-backend",
@@ -2991,7 +2996,7 @@
         },
         "parseurl": {
           "version": "1.3.1",
-          "from": "parseurl@>=1.3.0 <1.4.0",
+          "from": "parseurl@>=1.3.1 <1.4.0",
           "resolved": "http://beta-internal:4873/parseurl/-/parseurl-1.3.1.tgz"
         },
         "vary": {
@@ -3212,7 +3217,7 @@
         "mquery": {
           "version": "1.11.0",
           "from": "mquery@1.11.0",
-          "resolved": "http://beta-internal:4873/mquery/-/mquery-1.11.0.tgz",
+          "resolved": "https://registry.npmjs.org/mquery/-/mquery-1.11.0.tgz",
           "dependencies": {
             "bluebird": {
               "version": "2.10.2",
@@ -4345,7 +4350,7 @@
             },
             "mime-types": {
               "version": "2.1.11",
-              "from": "mime-types@>=2.1.7 <2.2.0",
+              "from": "mime-types@>=2.1.11 <2.2.0",
               "resolved": "http://beta-internal:4873/mime-types/-/mime-types-2.1.11.tgz",
               "dependencies": {
                 "mime-db": {
@@ -4455,7 +4460,7 @@
         },
         "parseurl": {
           "version": "1.3.1",
-          "from": "parseurl@>=1.3.0 <1.4.0",
+          "from": "parseurl@>=1.3.1 <1.4.0",
           "resolved": "http://beta-internal:4873/parseurl/-/parseurl-1.3.1.tgz"
         }
       }

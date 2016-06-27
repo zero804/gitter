@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="no-js" lang="en">
+<html class="no-js {{#if hasCachedFonts}}fonts-loaded{{/if}}" lang="en">
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=IE9" />
     {{{ newrelic }}}
@@ -22,6 +22,8 @@
     {{#each subresources}}
     <link rel="subresource" href="{{ this }}">
     {{/each}}
+
+    {{> fonts}}
 
     <link rel="stylesheet" href='{{cdn "sprites/services.css" }}'>
     <link rel="stylesheet" href='{{cdn cssFileName }}'>
