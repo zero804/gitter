@@ -3,7 +3,7 @@
 var env = require('gitter-web-env');
 var nconf = env.config;
 var contextGenerator = require('../../web/context-generator');
-var fonts = require('../../utils/fonts');
+var fonts = require('../../web/fonts');
 
 var WELCOME_MESSAGES = [
   'Code for people',
