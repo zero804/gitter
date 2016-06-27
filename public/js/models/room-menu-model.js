@@ -113,9 +113,13 @@ module.exports = Backbone.Model.extend({
       return _.extend({}, model, { active: (state === 'org' && model.name === selectedOrg) });
     });
 
-    this.minibarCollection = context.hasFeature('groups') ?
-      this.groupsCollection :
-      new MinibarCollection(minibarModels, { roomCollection: this._roomCollection });
+    if(context.hasFeature('groups')) {
+      this.groupsCollection.add(minibarModels);
+      this.minibarCollection = this.groupsCollection;
+    }
+    else {
+      this.minibarCollection = new MinibarCollection(minibarModels, { roomCollection: this._roomCollection });
+    }
 
     var roomModels = this._roomCollection.filter(defaultCollectionFilter);
     this.activeRoomCollection = new FilteredRoomCollection(roomModels, {
