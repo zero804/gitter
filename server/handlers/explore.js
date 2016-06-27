@@ -14,7 +14,7 @@ var exploreService = require('../services/explore-service');
 var suggestionsService = require('../services/suggestions-service');
 var exploreTagUtils = require('../utils/explore-tag-utils');
 var generateExploreSnapshot = require('./snapshots/explore-snapshot');
-var fonts = require('../utils/fonts');
+var fonts = require('../web/fonts');
 
 var processTagInput = function(input) {
   input = input || '';

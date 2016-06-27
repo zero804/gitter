@@ -19,7 +19,7 @@ var debug = require('debug')('gitter:app:app-archive');
 var _ = require('underscore');
 var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 var StatusError = require('statuserror');
-var fonts = require('../../utils/fonts');
+var fonts = require('../../web/fonts');
 
 var ONE_DAY_SECONDS = 60 * 60 * 24; // 1 day
 var ONE_DAY_MILLISECONDS = ONE_DAY_SECONDS * 1000;

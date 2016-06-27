@@ -4,7 +4,7 @@ var env = require('gitter-web-env');
 var nconf = env.config;
 var userService = require('../../services/user-service');
 var renderMainFrame = require('./main-frame');
-var fonts = require('../../utils/fonts');
+var fonts = require('../../web/fonts');
 
 /**
  * renderUserNotSignedUp() renders a set template for a 1:1 chat, with an invited user.

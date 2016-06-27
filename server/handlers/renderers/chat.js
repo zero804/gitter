@@ -15,7 +15,7 @@ var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-av
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 var getSubResources = require('./sub-resources');
 var fixMongoIdQueryParam = require('../../web/fix-mongo-id-query-param');
-var fonts = require('../../utils/fonts');
+var fonts = require('../../web/fonts');
 var generateRightToolbarSnapshot = require('../snapshots/right-toolbar-snapshot');
 
 var troupeService = require('../../services/troupe-service');

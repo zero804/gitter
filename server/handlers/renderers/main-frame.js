@@ -22,7 +22,7 @@ var generateLeftMenuSnapshot = require('../snapshots/left-menu-snapshot');
 var parseRoomsIntoLeftMenuFavouriteRoomList = require('gitter-web-shared/rooms/left-menu-room-favourite-list');
 var getSubResources = require('./sub-resources');
 var fixMongoIdQueryParam = require('../../web/fix-mongo-id-query-param');
-var fonts = require('../../utils/fonts.js');
+var fonts = require('../../web/fonts.js');
 
 /* How many chats to send back */
 

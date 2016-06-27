@@ -3,7 +3,7 @@
 var express = require('express');
 var ensureLoggedIn = require('../web/middlewares/ensure-logged-in');
 var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
-var fonts = require('../utils/fonts');
+var fonts = require('../web/fonts');
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 

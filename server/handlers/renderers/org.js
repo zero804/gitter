@@ -12,7 +12,7 @@ var GitHubOrgService = require('gitter-web-github').GitHubOrgService;
 var orgPermissionModel = require('gitter-web-permissions/lib/models/org-permissions-model');
 var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 var generateRoomCardContext = require('gitter-web-shared/templates/partials/room-card-context-generator');
-var fonts = require('../../utils/fonts');
+var fonts = require('../../web/fonts');
 
 function renderOrgPage(req, res, next, options) {
   var orgUri = options.orgUri;
