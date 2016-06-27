@@ -80,7 +80,6 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   events: _.extend({}, CommunityCreateBaseStepView.prototype.events, {
     'submit @ui.mainForm': 'onStepNext',
-    'click @ui.nextStep': 'validateStep',
     'input @ui.communityNameInput': 'onCommunityNameInputChange',
     'input @ui.communitySlugInput': 'onCommunitSlugInputChange',
     'click @ui.githubProjectLink': 'onGitHubProjectLinkActivated',
@@ -100,7 +99,6 @@ module.exports = CommunityCreateBaseStepView.extend({
     this.repoCollection = options.repoCollection;
 
     this.listenTo(this.communityCreateModel, 'change:communityName change:communitySlug', this.updateCommunityFields, this);
-    this.listenTo(this.communityCreateModel, 'change:communityName change:communitySlug', this.validateStep, this);
   },
 
 
@@ -115,24 +113,32 @@ module.exports = CommunityCreateBaseStepView.extend({
     return data;
   },
 
-  validateStep: function() {
-    var hasCommunityName = this.communityCreateModel.get('communityName').length;
-    var hasCommunitySlug = this.communityCreateModel.get('communitySlug').length;
-
-    this.model.set({
-      valid: hasCommunityName && hasCommunitySlug
-    });
-  },
-
   onStepNext: function(e) {
-    this.validateStep();
-    var isValid = this.model.get('valid');
-
-    if(isValid) {
+    if(this.model.isValid()) {
       this.communityCreateModel.set('stepState', stepConstants.INVITE);
     }
 
     e.preventDefault();
+  },
+
+  applyValidMessages: function(isValid, isAfterRender) {
+    CommunityCreateBaseStepView.prototype.applyValidMessages.apply(this, arguments);
+
+    var communityNameErrorMessage = '';
+    var communitySlugErrorMessage = '';
+    if(!isValid && isAfterRender !== true) {
+      (this.model.validationError || []).forEach(function(validationError) {
+        if(validationError.key === 'communityName') {
+          communityNameErrorMessage = validationError.message;
+        }
+        if(validationError.key === 'communitySlug') {
+          communitySlugErrorMessage = validationError.message;
+        }
+      });
+    }
+
+    this.ui.communityNameInput[0].setCustomValidity(communityNameErrorMessage);
+    this.ui.communitySlugInput[0].setCustomValidity(communitySlugErrorMessage);
   },
 
   onGitHubProjectLinkActivated: function(e) {
@@ -175,6 +181,8 @@ module.exports = CommunityCreateBaseStepView.extend({
         isUsingCustomSlug: isSlugEmpty ? false : isUsingCustomSlug
       });
     }
+
+    this.model.isValid();
   },
 
   onCommunitSlugInputChange: function() {
@@ -184,7 +192,7 @@ module.exports = CommunityCreateBaseStepView.extend({
       communitySlug: newSlug
     });
 
-    this.ui.communitySlugInput[0].setCustomValidity(isFormElementInvalid(this.ui.communitySlugInput[0]) ? 'Slug can only contain lowercase a-z and dashes -' : '');
+    this.model.isValid();
   },
 
   /* * /

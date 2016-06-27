@@ -11,7 +11,9 @@ var template = require('./community-create-view.hbs');
 
 var stepConstants = require('./step-constants');
 var CommunityCreateStepViewModel = require('./community-create-step-view-model');
-var CommunityCreateGitHubProjectsStepViewModel = require('./community-create-github-projects-step-view-model');
+var CommunityCreatMainStepViewModel = require('./main-step/community-create-main-step-view-model');
+var CommunityCreateGitHubProjectsStepViewModel = require('./github-projects-step/community-create-github-projects-step-view-model');
+
 
 var ActiveCollection = require('./active-collection');
 
@@ -105,13 +107,22 @@ var CommunityCreateView = Marionette.LayoutView.extend({
       collection: repoCollection
     });
 
-    this.mainStepViewModel = new CommunityCreateStepViewModel({
-      active: true,
-      valid: false
+    this.mainStepViewModel = new CommunityCreatMainStepViewModel({
+      communityCreateModel: this.model,
+      active: true
     });
-    this.githubProjectsStepViewModel = new CommunityCreateGitHubProjectsStepViewModel({ active: false });
-    this.invitePeopleStepViewModel = new CommunityCreateStepViewModel({ active: false });
-    this.overviewStepViewModel = new CommunityCreateStepViewModel({ active: false });
+    this.githubProjectsStepViewModel = new CommunityCreateGitHubProjectsStepViewModel({
+      communityCreateModel: this.model,
+      active: false
+    });
+    this.invitePeopleStepViewModel = new CommunityCreateStepViewModel({
+      communityCreateModel: this.model,
+      active: false
+    });
+    this.overviewStepViewModel = new CommunityCreateStepViewModel({
+      communityCreateModel: this.model,
+      active: false
+    });
   },
 
   onStepChangeState: function() {

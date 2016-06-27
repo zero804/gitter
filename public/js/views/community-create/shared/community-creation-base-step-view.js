@@ -15,26 +15,38 @@ module.exports = Marionette.LayoutView.extend({
 
   modelEvents: {
     'change:active': 'onActiveChange',
-    'change:valid': 'onValidChange'
+    'change': 'onChange',
+    'invalid': 'onInvalid'
   },
 
   initialize: function(options) {
     this.model = options.model;
     this.communityCreateModel = options.communityCreateModel;
+
+    this.listenTo(this.communityCreateModel, 'invalid', this.onInvalid, this);
+    this.listenTo(this.communityCreateModel, 'change', this.onChange, this);
   },
 
   onActiveChange: function() {
     toggleClass(this.$el[0], 'active', this.model.get('active'));
   },
 
-  onValidChange: function() {
-    var isValid = this.model.get('valid');
+  onChange: function() {
+    this.applyValidMessages(this.model.isValid());
+  },
+
+  onInvalid: function() {
+    this.applyValidMessages(false);
+  },
+
+  applyValidMessages: function(isValid/*, isAfterRender*/) {
     toggleClass(this.ui.nextStep[0], 'disabled', !isValid);
     //this.ui.nextStep[0][isValid ? 'removeAttribute' : 'setAttribute']('disabled', 'disabled');
   },
 
   onRender: function() {
     this.onActiveChange();
-    this.onValidChange();
+    this.model.isValid();
+    this.applyValidMessages(true);
   }
 });

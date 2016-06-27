@@ -4,12 +4,11 @@ var Backbone = require('backbone');
 
 var CommunityCreateStepViewModel = Backbone.Model.extend({
   defaults: {
-    active: true,
-    valid: true
+    active: true
   },
 
-  initialize: function() {
-
+  initialize: function(options) {
+    this.communityCreateModel = options.communityCreateModel;
   }
 });
 
