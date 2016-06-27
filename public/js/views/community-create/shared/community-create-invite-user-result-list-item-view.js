@@ -15,9 +15,7 @@ var AVATAR_SIZE = 44;
 var InviteUserResultListItemView = Marionette.ItemView.extend({
   template: InviteUserResultListItemTemplate,
   tagName: 'li',
-  attributes: {
-    class: 'community-create-invite-user-result-list-item'
-  },
+  className: 'community-create-invite-user-result-list-item',
 
   triggers: {
     'click': 'item:activated'

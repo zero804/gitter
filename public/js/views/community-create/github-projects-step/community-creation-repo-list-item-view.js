@@ -13,9 +13,7 @@ var REPO_LIST_AVATAR_SIZE = 22;
 var CommunityCreationRepoListItemView = Marionette.ItemView.extend({
   template: CommunityCreationRepoListItemTemplate,
   tagName: 'li',
-  attributes: {
-    class: 'community-create-repo-list-item'
-  },
+  className: 'community-create-repo-list-item',
 
   triggers: {
     'click': 'item:activated'

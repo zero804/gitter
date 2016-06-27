@@ -25,9 +25,7 @@ var CommunityCreationOverviewView = require('./overview-step/community-creation-
 var CommunityCreateView = Marionette.LayoutView.extend({
   template: template,
 
-  attributes: {
-    class: 'community-create-root-inner'
-  },
+  className: 'community-create-root-inner',
 
   ui: {
     close: '.js-community-create-close'

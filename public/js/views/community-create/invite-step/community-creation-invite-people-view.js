@@ -23,9 +23,7 @@ require('gitter-styleguide/css/components/buttons.css');
 module.exports = CommunityCreateBaseStepView.extend({
   template: template,
 
-  attributes: _.extend({}, CommunityCreateBaseStepView.prototype.attributes, {
-    class: 'community-create-step-wrapper community-create-invite-people-step-wrapper'
-  }),
+  className: 'community-create-step-wrapper community-create-invite-people-step-wrapper',
 
   behaviors: {
     Isomorphic: {
