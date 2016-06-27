@@ -6,7 +6,6 @@ var fastdom = require('fastdom');
 var ItemView = require('./minibar-item-view');
 var CloseItemView = require('./minibar-close-item-view');
 var CommunityCreateItemView = require('./minibar-community-create-item-view');
-var FavouriteView = require('./minibar-favourite-item-view');
 var PeopleView = require('./minibar-people-item-view.js');
 var domIndexById = require('../../../../utils/dom-index-by-id');
 
@@ -16,7 +15,6 @@ var MinibarView = Marionette.CollectionView.extend({
   id:        'minibar-list',
   childView: ItemView,
   childEvents: {
-    'minibar-item:keyboard-activated': 'onItemKeyboardActivated',
     'minibar-item:activated': 'onItemActivated',
     'minibar-item:close':   'onCloseClicked',
   },
@@ -54,9 +52,6 @@ var MinibarView = Marionette.CollectionView.extend({
         return new CloseItemView(viewOptions);
       case 'community-create':
         return new CommunityCreateItemView(viewOptions);
-      case 'favourite':
-        viewOptions = _.extend(viewOptions, { dndCtrl: this.dndCtrl });
-        return new FavouriteView(viewOptions);
       case 'people':
         viewOptions = _.extend(viewOptions, { roomCollection: this.roomCollection });
         return new PeopleView(viewOptions);
@@ -78,17 +73,9 @@ var MinibarView = Marionette.CollectionView.extend({
     this.listenTo(this.roomCollection, 'add remove', this.render, this);
     this.listenTo(this.collection, 'snapshot', this.onCollectionSnapshot, this);
     this.listenTo(this.model, 'change:state change:selectedOrgName', this.onMenuStateUpdate, this);
+    //Clicking a room item will trigger a navigation event so we want to clear any elements with focus in the minibar
+    this.listenTo(this.bus, 'navigation', this.clearFocus, this);
     this.onMenuStateUpdate();
-
-    this.keyboardControllerView.inject(this.keyboardControllerView.constants.MINIBAR_KEY, [
-      { collection: this.collection }
-    ]);
-
-    // For the normal arrowing through
-    // when we have too many rooms to render instantly
-    this.debouncedOnItemActivated = _.debounce(this.onItemActivated, 300);
-    // Just for the quick flicks
-    this.shortDebouncedOnItemActivated = _.debounce(this.onItemActivated, 100);
 
     //Guard against not getting a snapshot
     this.timeout = setTimeout(function() {
@@ -123,10 +110,12 @@ var MinibarView = Marionette.CollectionView.extend({
       modelName = this.model.get('name');
     }
 
+    //Clear any elements on the minibar with focus
+    //as we are about to re-assign that
+    this.clearFocus();
+
     // Set the minibar-item active
-    model.set({
-      active: true
-    });
+    model.set({ active: true, focus: true });
 
     var state = model.get('type');
     // close-passthrough
@@ -140,19 +129,6 @@ var MinibarView = Marionette.CollectionView.extend({
         selectedOrgName:      modelName,
         activationSourceType: activationSourceType
       });
-    }
-  },
-
-  onItemKeyboardActivated: function(view, model) {
-    // Arbitrary threshold based on when we can't render "instantly".
-    // We don't want to delay too much because majority of users won't run into render shortcomings
-    // and the delay could cause confusion for screen-reader users not recnogizing when
-    // the switch happens
-    if(this.roomCollection.length > 50) {
-      this.debouncedOnItemActivated(view, model, 'keyboard');
-    }
-    else {
-      this.shortDebouncedOnItemActivated(view, model, 'keyboard');
     }
   },
 
@@ -194,12 +170,6 @@ var MinibarView = Marionette.CollectionView.extend({
 
   },
 
-  onDestroy: function () {
-    this.stopListening(this.collection);
-    this.stopListening(this.model);
-    this.stopListening(this.roomCollection);
-  },
-
 
   updateMinibarActiveState: function(currentState, selectedOrgName) {
     // Reset the currently active model
@@ -218,7 +188,14 @@ var MinibarView = Marionette.CollectionView.extend({
     if (nextActiveModel) {
       nextActiveModel.set('active', true);
     }
-  }
+  },
+
+  clearFocus: function (){
+    var elementsInFocus = this.collection.where({ focus: true });
+    elementsInFocus.forEach(function(model){
+      model.set('focus', false);
+    });
+  },
 
 
 });
