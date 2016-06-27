@@ -48,7 +48,6 @@ module.exports = BaseItemView.extend({
 
   initialize: function(options) {
     this.roomMenuModel = options.roomMenuModel;
-    this.firstRender = true;
   },
 
 
