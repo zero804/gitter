@@ -58,12 +58,12 @@ function calculateSubjectForUnreadEmail(i18n, troupesWithUnreadCounts) {
 /*
  * Send invitation and reminder emails to the provided address.
  */
-function sendInvite(fromUser, toUser, room, email, template, eventName) {
-  if (!email) return;
+function sendInvite(invitingUser, invite, room, template, eventName) {
+  var email = invite.emailAddress;
 
-  var senderName = (fromUser.displayName || fromUser.username);
-  var recipientName = (toUser.displayName || toUser.username).split(' ')[0];
-  var date = moment(mongoUtils.getTimestampFromObjectId(toUser._id)).format('Do MMMM YYYY');
+  var senderName = (invitingUser.displayName || invitingUser.username);
+  var date = moment(mongoUtils.getTimestampFromObjectId(invite._id)).format('Do MMMM YYYY');
+  var inviteUrl = config.get("email:emailBasePath") + '/settings/accept-invite/' + invite.secret;
 
   return mailerService.sendEmail({
     templateFile:   template,
@@ -78,9 +78,8 @@ function sendInvite(fromUser, toUser, room, email, template, eventName) {
     data: {
       date: date,
       roomUri: room.uri,
-      roomUrl: config.get("email:emailBasePath") + '/' + room.uri,
-      senderName: senderName,
-      recipientName: recipientName
+      roomUrl: inviteUrl,
+      senderName: senderName
     }
   });
 }
@@ -97,22 +96,18 @@ module.exports = {
       return;
     }
 
-    // Re-enable all #lang!!
-    // Disabling localised emails until we have more content
-    // return Q.all([emailAddressService(user), userSettingsService.getUserSettings(user.id, 'lang')])
-    //  .spread(function(email, lang) {
-     return emailAddressService(user)
-      .then(function(email) {
+    return Promise.join(emailAddressService(user), userSettingsService.getUserSettings(user.id, 'lang'),
+      function(email, lang) {
         if(!email) {
           logger.info('Skipping email notification for ' + user.username + ' as they have no primary confirmed email');
           return;
         }
 
         var i18n = i18nFactory.get();
-        // #lang Disabling localised emails until we have more content
-        // if (lang) {
-        //   i18n.setLocale(lang);
-        // }
+
+        if (lang) {
+          i18n.setLocale(lang);
+        }
 
         var emailBasePath = config.get("email:emailBasePath");
         var unsubscribeUrl = emailBasePath + '/settings/unsubscribe/' + hash;
@@ -158,22 +153,12 @@ module.exports = {
       });
   }),
 
-  sendInvitation: Promise.method(function(fromUser, toUser, room) {
-    return emailAddressService(toUser, { preferInvitedEmail: true, attemptDiscovery: true })
-      .then(function(email) {
-        return sendInvite(fromUser, toUser, room, email, 'invitation', 'invitation_sent');
-      });
-  }),
+  sendInvitation: function(invitingUser, invite, room) {
+    return sendInvite(invitingUser, invite, room, 'invitation', 'invitation_sent');
+  },
 
-  sendInvitationReminder: Promise.method(function(fromUser, toUser, room) {
-    return emailAddressService(toUser, { preferInvitedEmail: true, attemptDiscovery: true })
-    .then(function(email) {
-      return sendInvite(fromUser, toUser, room, email, 'invitation-reminder', 'invitation_reminder_sent');
-    });
-  }),
-
-  sendManualInvitation: Promise.method(function(fromUser, toUser, room, email) {
-    return sendInvite(fromUser, toUser, room, email, 'invitation', 'invitation_sent');
+  sendInvitationReminder: Promise.method(function(invitedByUser, invite, room) {
+    return sendInvite(invitedByUser, invite, room, 'invitation-reminder', 'invitation_reminder_sent');
   }),
 
   /**
