@@ -102,7 +102,7 @@ module.exports = Backbone.Model.extend({
     var state = this.get('state');
     var selectedOrg = this.get('selectedOrgName');
     this.minibarHomeModel = new MinibarItemModel({ name: 'all', type: 'all', active: (state === 'all') });
-    this.minibarSearchModel = new MinibarItemModel({ name: 'search', type: 'search', active: (state === 'saerch') });
+    this.minibarSearchModel = new MinibarItemModel({ name: 'search', type: 'search', active: (state === 'search') });
     this.minibarPeopleModel = new MinibarPeopleModel({ active: (state === 'people')}, { roomCollection: this._roomCollection });
     this.minibarCloseModel = new MinibarItemModel({ name: 'close', type: 'close' });
     var minibarModels = orgsSnapshot.map(function(model){
