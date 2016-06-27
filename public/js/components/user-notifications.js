@@ -91,21 +91,6 @@ function initUserNotifications() {
   //subscribe to notifications
   appEvents.on('user_notification', onUserNotification);
 
-  appEvents.on('app.version.mismatch', function() {
-    appEvents.trigger('user_notification', {
-      notificationKey: 'app.version.mismatch',
-      title: 'A new version of Gitter is available',
-      text: 'Click here to reload',
-      click: function() {
-        try {
-          window.parent.location.reload(true);
-        } catch (e) {
-          window.location.reload(true);
-        }
-      }
-    });
-  });
-
   appEvents.on('ajaxError', function() {
     appEvents.trigger('user_notification', {
       notificationKey: 'ajax.error',

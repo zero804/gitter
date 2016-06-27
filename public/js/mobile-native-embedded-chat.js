@@ -12,7 +12,7 @@ var mobileDecorator = require('views/chat/decorators/mobileDecorator');
 var onready = require('./utils/onready');
 var FastClick = require('fastclick');
 
-require('components/eyeballs');
+require('./components/eyeballs-room-sync');
 require('components/ping');
 
 // Preload widgets
