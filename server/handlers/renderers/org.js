@@ -106,7 +106,7 @@ function renderOrgPage(req, res, next, options) {
         '&via=gitchat';
 
       res.render('org-page', {
-        hasCachedFonts: fonts.hasCachedFonts(req),
+        hasCachedFonts: fonts.hasCachedFonts(req.cookies),
         fonts: fonts.getFonts(),
         socialUrl: url,
         isLoggedIn: !!req.user,

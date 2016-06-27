@@ -66,7 +66,7 @@ function getIntegrations(req, res, next) {
       supportedServices: supportedServices,
       openServices: openServices,
       fonts: fonts.getFonts(),
-      hasCachedFonts: fonts.hasCachedFonts(req),
+      hasCachedFonts: fonts.hasCachedFonts(req.cookies),
     });
   });
 }

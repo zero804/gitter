@@ -14,7 +14,7 @@ router.get('/~learn',
     res.render('learn', {
       bootScriptName: "router-home-learn",
       fonts: fonts.getFonts(),
-      hasCachedFonts: fonts.hasCachedFonts(req),
+      hasCachedFonts: fonts.hasCachedFonts(req.cookies),
     });
   });
 

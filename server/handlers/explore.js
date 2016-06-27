@@ -181,7 +181,7 @@ router.get('/tags/:tags',
             isLoggedIn: isLoggedIn,
             createRoomUrl: urlJoin(clientEnv.basePath, '#createroom'),
             fonts: fonts.getFonts(),
-            hasCachedFonts: fonts.hasCachedFonts(req),
+            hasCachedFonts: fonts.hasCachedFonts(req.cookies),
           }));
         })
         .catch(next);

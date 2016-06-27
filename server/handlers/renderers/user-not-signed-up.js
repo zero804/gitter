@@ -13,7 +13,7 @@ function renderUserNotSignedUp(req, res, next) {
   userService.findByUsername(req.params.roomPart1)
     .then(function (user) {
       res.render('chat-invited-template', {
-        hasCachedFonts: fonts.hasCachedFonts(req),
+        hasCachedFonts: fonts.hasCachedFonts(req.cookies),
         fonts: fonts.getFonts(),
         cssFileName: "styles/router-nli-chat.css", // TODO: this shouldn't be hardcoded as this
         agent: req.headers['user-agent'],

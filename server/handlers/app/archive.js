@@ -110,7 +110,7 @@ exports.datesList = [
       isPrivate: isPrivate,
       avatarSrcSet: resolveRoomAvatarSrcSet({ uri: req.uriContext.uri }, 48),
       fonts: fonts.getFonts(),
-      hasCachedFonts: fonts.hasCachedFonts(req),
+      hasCachedFonts: fonts.hasCachedFonts(req.cookies),
     };
 
     return validateRoomForReadOnlyAccess(user, policy)
@@ -165,7 +165,7 @@ exports.linksList = [
       avatarSrcSet: srcSetUrl,
       isPrivate: isPrivate,
       fonts: fonts.getFonts(),
-      hasCachedFonts: fonts.hasCachedFonts(req),
+      hasCachedFonts: fonts.hasCachedFonts(req.cookies),
     };
 
     return validateRoomForReadOnlyAccess(user, policy)
@@ -336,7 +336,7 @@ exports.chatArchive = [
 
               showDatesWithoutTimezone: true, // Timeago widget will render whether or not we know the users timezone
               fonts: fonts.getFonts(),
-              hasCachedFonts: fonts.hasCachedFonts(req),
+              hasCachedFonts: fonts.hasCachedFonts(req.cookies),
             });
 
           });
