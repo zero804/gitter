@@ -92,6 +92,7 @@ module.exports = Marionette.LayoutView.extend({
     this.closeModel = this.model.minibarCloseModel;
     this.keyboardControllerView = attrs.keyboardControllerView;
     this.listenTo(this.bus, 'navigation', this.clearFocus, this);
+    this.onMenuChangeState();
   },
 
   onHomeActivate: function (){

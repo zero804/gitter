@@ -22,7 +22,12 @@ var GroupCollection = LiveCollection.extend({
   client: function() {
     return realtime.getClient();
   },
-  sync: SyncMixin.sync
+  sync: SyncMixin.sync,
+  comparator: function(a, b){
+    if(a.get('temp')) { return -1; }
+    if(b.get('temp')) { return 1; }
+    return 0;
+  }
 });
 
 module.exports = {
