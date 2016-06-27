@@ -241,6 +241,13 @@ function isMongoError(err) {
   // mongo driver loaded
   return err && err instanceof Error && err.name === 'MongoError';
 }
+
+function mongoErrorWithCode(code) {
+  return function(err) {
+    return isMongoError(err) && err.code === code;
+  }
+}
+
 exports.objectIDsEqual = objectIDsEqual;
 exports.isMongoError = isMongoError;
 exports.setIds = setIds;
@@ -256,3 +263,4 @@ exports.createIdForTimestamp = createIdForTimestamp;
 exports.createIdForTimestampString = createIdForTimestampString;
 exports.fieldInPredicate = fieldInPredicate;
 exports.isMongoError = isMongoError;
+exports.mongoErrorWithCode = mongoErrorWithCode;

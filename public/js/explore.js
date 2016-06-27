@@ -1,5 +1,6 @@
 'use strict';
 
+require('utils/font-setup');
 var appEvents = require('utils/appevents');
 var onready = require('utils/onready');
 var toggleClass = require('utils/toggle-class');

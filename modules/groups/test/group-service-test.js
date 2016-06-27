@@ -15,6 +15,7 @@ describe('group-service', function() {
         deleteDocuments: {
           User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }],
           Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
+                  { lcUri: fixtureLoader.GITTER_INTEGRATION_REPO.toLowerCase() },
                   { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() },
                   { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() }],
         },
@@ -47,6 +48,34 @@ describe('group-service', function() {
               members: 'PUBLIC',
               public: true,
               type: 'GH_ORG'
+            })
+          })
+      });
+
+      it('should create a group for a GitHub repo', function() {
+        var groupUri = fixtureLoader.GITTER_INTEGRATION_REPO;
+        var linkPath = fixtureLoader.GITTER_INTEGRATION_REPO_FULL;
+        var user = fixture.user1;
+        return groupService.createGroup(user, {
+            type: 'GH_REPO',
+            name: 'Bob',
+            uri: groupUri,
+            linkPath: linkPath
+          })
+          .then(function(group) {
+            assert.strictEqual(group.name, 'Bob');
+            assert.strictEqual(group.uri, groupUri);
+            assert.strictEqual(group.lcUri, groupUri.toLowerCase());
+            return securityDescriptorService.getForGroupUser(group._id, null);
+          })
+          .then(function(securityDescriptor) {
+            assert.deepEqual(securityDescriptor, {
+              admins: 'GH_REPO_PUSH',
+              externalId: fixtureLoader.GITTER_INTEGRATION_REPO_ID,
+              linkPath: linkPath,
+              members: 'PUBLIC',
+              public: true,
+              type: 'GH_REPO'
             })
           })
       });
@@ -185,10 +214,16 @@ describe('group-service', function() {
       it('should find the roomIds for group for an anonymous user', function() {
         return groupService.findRoomsIdForGroup(fixture.group1._id)
           .then(function(roomIds) {
-            assert.deepEqual(roomIds.map(String), [
+            var roomStrings = roomIds.map(String);
+            roomStrings.sort();
+
+            var expectedStrings = [
               fixture.troupe1.id,
               fixture.troupe2.id,
-            ]);
+            ];
+            expectedStrings.sort();
+
+            assert.deepEqual(roomStrings, expectedStrings);
           });
       });
 

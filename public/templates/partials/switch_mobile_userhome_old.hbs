@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="no-js loading" lang="en">
+<html class="no-js loading {{#if hasCachedFonts}}fonts-loaded{{/if}}" lang="en">
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no"/>
   <meta http-equiv="X-UA-Compatible" content="chrome=1">
@@ -10,6 +10,7 @@
 
   <title>{{troupeName}}</title>
 
+  {{> fonts}}
   <link rel="stylesheet" href='{{ cdn "styles/mobile-userhome.css"}}'>
 
   {{{ generateTroupeContext troupeContext }}}

@@ -3,15 +3,21 @@
 var userSettingsService = require('../../services/user-settings-service');
 
 module.exports = function getSnapshotsForPageContext(req) {
+  if (!req.user) return {};
+  return userSettingsService.getUserSettings(req.user._id, 'rightToolbar')
+    .then(function(rightToolbarUserSettings) {
+      var isPinned;
 
-  var getRightToolbarUserSettings = userSettingsService.getUserSettings(req.user._id, 'rightToolbar');
-
-  return getRightToolbarUserSettings.then(function(rightToolbarUserSettings) {
-    return {
-      rightToolbar: {
+      if (!rightToolbarUserSettings || rightToolbarUserSettings.isPinned === undefined) {
         // Default to pinned
-        isPinned: rightToolbarUserSettings.isPinned === undefined ? true : rightToolbarUserSettings.isPinned
+        isPinned = true;
+      } else {
+        isPinned = rightToolbarUserSettings.isPinned;
       }
-    };
-  })
+      return {
+        rightToolbar: {
+          isPinned: isPinned
+        }
+      };
+    });
 };

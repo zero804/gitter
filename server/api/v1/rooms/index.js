@@ -176,7 +176,8 @@ module.exports = {
     'collaborators': require('./collaborators'),
     'suggestedRooms': require('./suggested-rooms'),
     'events': require('./events'),
-    'meta': require('./meta')
+    'meta': require('./meta'),
+    'invites': require('./invites'),
   }
 
 };

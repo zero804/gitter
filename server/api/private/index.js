@@ -91,11 +91,6 @@ router.post('/create-badge',
   identifyRoute('api-private-create-badge'),
   require('./create-badge-pr'));
 
-router.post('/invite-user',
-  authMiddleware,
-  identifyRoute('api-private-invite-user'),
-  require('./invite-user'));
-
 // TODO: this should go...
 router.get('/user-avatar/:username',
   identifyRoute('api-private-user-avatar'),
@@ -108,8 +103,13 @@ router.post('/markdown-preview',
   identifyRoute('api-private-markdown-preview'),
   require('./markdown-preview'));
 
-  router.get('/inviteUserSuggestions',
-    identifyRoute('api-private-invite-user-suggestions'),
-    require('./invite-user-suggestions'));
+router.get('/inviteUserSuggestions',
+  identifyRoute('api-private-invite-user-suggestions'),
+  require('./invite-user-suggestions'));
+
+router.get('/check-group-uri',
+  authMiddleware,
+  identifyRoute('api-private-check-group-uri'),
+  require('./check-group-uri'));
 
 module.exports = router;
