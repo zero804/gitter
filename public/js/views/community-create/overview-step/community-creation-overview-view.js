@@ -4,6 +4,7 @@ var _ = require('underscore');
 var toggleClass = require('utils/toggle-class');
 var VirtualMultipleCollection = require('../virtual-multiple-collection');
 
+var stepConstants = require('../step-constants');
 var template = require('./community-creation-overview-view.hbs');
 var CommunityCreateBaseStepView = require('../shared/community-creation-base-step-view');
 var CommunityCreationSubRoomListView = require('../shared/community-creation-sub-room-list-view');
@@ -86,7 +87,7 @@ module.exports = CommunityCreateBaseStepView.extend({
     // TODO: Actually create the community, sub-rooms, and invite the people
   },
   onStepBack: function() {
-    this.communityCreateModel.set('stepState', this.communityCreateModel.STEP_CONSTANT_MAP.invite);
+    this.communityCreateModel.set('stepState', stepConstants.INVITE);
   },
 
   onCommunityDataChange: function() {

@@ -9,6 +9,7 @@ var getRoomNameFromTroupeName = require('gitter-web-shared/get-room-name-from-tr
 
 require('views/behaviors/isomorphic');
 
+var stepConstants = require('../step-constants');
 var template = require('./community-creation-github-projects-view.hbs');
 var CommunityCreateBaseStepView = require('../shared/community-creation-base-step-view');
 var CommunityCreationOrgListView = require('./community-creation-org-list-view');
@@ -120,10 +121,10 @@ module.exports = CommunityCreateBaseStepView.extend({
   },
 
   onStepNext: function() {
-    this.communityCreateModel.set('stepState', this.communityCreateModel.STEP_CONSTANT_MAP.main);
+    this.communityCreateModel.set('stepState', stepConstants.MAIN);
   },
   onStepBack: function() {
-    this.communityCreateModel.set('stepState', this.communityCreateModel.STEP_CONSTANT_MAP.main);
+    this.communityCreateModel.set('stepState', stepConstants.MAIN);
   },
 
   onOrgsAreaToggle: function() {
