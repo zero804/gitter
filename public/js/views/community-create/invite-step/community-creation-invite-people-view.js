@@ -44,7 +44,7 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   initInviteListView: function(optionsForRegion) {
     this.inviteListView = new CommunityCreationPeopleListView(optionsForRegion({
-      collection: this.inviteCollection,//this.communityCreateModel.get('peopleToInvite'),
+      collection: this.inviteCollection,
       model: new Backbone.Model({
         canRemove: true
       })
@@ -85,8 +85,8 @@ module.exports = CommunityCreateBaseStepView.extend({
 
     this.inviteCollection = new VirtualMultipleCollection([], {
       backingCollections: [
-        this.communityCreateModel.get('peopleToInvite'),
-        this.communityCreateModel.get('emailsToInvite')
+        this.communityCreateModel.peopleToInvite,
+        this.communityCreateModel.emailsToInvite
       ]
     });
 
@@ -162,19 +162,19 @@ module.exports = CommunityCreateBaseStepView.extend({
   },
 
   onPersonSelected: function(person) {
-    this.communityCreateModel.get('peopleToInvite').add(person);
+    this.communityCreateModel.peopleToInvite.add(person);
   },
 
   onPersonRemoved: function(person) {
-    this.communityCreateModel.get('peopleToInvite').remove(person);
-    this.communityCreateModel.get('emailsToInvite').remove(person);
+    this.communityCreateModel.peopleToInvite.remove(person);
+    this.communityCreateModel.emailsToInvite.remove(person);
   },
 
   onEmailSubmit: function(e) {
     var newEmailAddress = this.ui.emailInput[0].value;
 
     if(newEmailAddress.length) {
-      this.communityCreateModel.get('emailsToInvite').add({
+      this.communityCreateModel.emailsToInvite.add({
         emailAddress: newEmailAddress
       });
     }
