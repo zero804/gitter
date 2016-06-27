@@ -5,6 +5,7 @@ var StatusError = require('statuserror');
 var groupService = require('gitter-web-groups/lib/group-service');
 var restSerializer = require('../../../serializers/rest-serializer');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
+var GroupWithPolicyService = require('../../../services/group-with-policy-service');
 
 module.exports = {
   id: 'group',
@@ -31,13 +32,49 @@ module.exports = {
 
     var uri = req.body.uri;
     var name = req.body.name;
-    var createOptions = { uri: uri, name: name };
+    var groupOptions = { uri: uri, name: name };
     if (req.body.security) {
       // for GitHub and future group types that are backed by other services
-      createOptions.type = req.body.security.type;
-      createOptions.linkPath = req.body.security.linkPath;
+      groupOptions.type = req.body.security.type;
+      groupOptions.linkPath = req.body.security.linkPath;
     }
-    return groupService.createGroup(user, createOptions);
+
+    var group;
+    var userGroupPolicy;
+
+    return groupService.createGroup(user, groupOptions)
+      .then(function(_group) {
+        group = _group
+
+        return policyFactory.createPolicyForGroupId(req.user, group._id)
+          .then(function(policy) {
+            userGroupPolicy = policy;
+          });
+      })
+      .then(function() {
+        var groupWithPolicyService = new GroupWithPolicyService(group, req.user, userGroupPolicy);
+
+        var defaultRoomName = req.body.defaultRoomName || 'Lobby';
+        var roomOptions = { name: defaultRoomName, security: 'PUBLIC' };
+        if (req.body.security) {
+          // use the same security for the default room
+          roomOptions.type = req.body.security.type;
+          roomOptions.linkPath = req.body.security.linkPath;
+        }
+
+        return groupWithPolicyService.createRoom(roomOptions);
+      })
+      .then(function(room) {
+        // serialize the room and include the group
+        var strategy = new restSerializer.TroupeStrategy({
+          currentUserId: req.user.id,
+          includeTags: true,
+          includePermissions: true,
+          includeProviders: true,
+          includeGroups: true
+        });
+        return restSerializer.serializeObject(room, strategy);
+      });
   },
 
   show: function(req) {

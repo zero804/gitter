@@ -18,10 +18,15 @@ describe('group-api', function() {
     deleteDocuments: {
       User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }],
       Group: [
-              { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() },
-              { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
-              { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() } ],
-      Troupe: [ { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() + '/' + fixtureLoader.GITTER_INTEGRATION_REPO.toLowerCase() } ]
+        { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() },
+        { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
+        { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() }
+      ],
+      Troupe: [
+        { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() + '/' + fixtureLoader.GITTER_INTEGRATION_REPO.toLowerCase() },
+        { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() + '/lobby' },
+        { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() + '/lobby' }
+      ]
     },
     user1: {
       githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
@@ -65,6 +70,11 @@ describe('group-api', function() {
       .send({ uri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY, name: 'Test' })
       .set('x-access-token', fixture.user1.accessToken)
       .expect(200)
+      .then(function(result) {
+        var room = result.body;
+        assert.strictEqual(room.uri, fixtureLoader.GITTER_INTEGRATION_COMMUNITY + '/Lobby');
+        assert.strictEqual(room.group.uri, fixtureLoader.GITTER_INTEGRATION_COMMUNITY);
+      });
   });
 
   it('POST /v1/groups (github org based)', function() {
@@ -80,6 +90,11 @@ describe('group-api', function() {
       })
       .set('x-access-token', fixture.user1.accessToken)
       .expect(200)
+      .then(function(result) {
+        var room = result.body;
+        assert.strictEqual(room.uri, fixtureLoader.GITTER_INTEGRATION_ORG + '/Lobby');
+        assert.strictEqual(room.group.uri, fixtureLoader.GITTER_INTEGRATION_ORG);
+      });
   });
 
   it('GET /v1/groups/:groupId/rooms', function() {
