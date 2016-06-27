@@ -12,9 +12,7 @@ var CommunityCreationSubRoomListItemTemplate = require('./community-creation-sub
 var CommunityCreationSubRoomListItemView = Marionette.ItemView.extend({
   template: CommunityCreationSubRoomListItemTemplate,
   tagName: 'li',
-  attributes: {
-    class: 'community-create-sub-room-list-item'
-  },
+  className: 'community-create-sub-room-list-item',
 
   initialize: function(options) {
     this.communityCreateModel = options.communityCreateModel;

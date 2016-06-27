@@ -17,9 +17,7 @@ var AVATAR_SIZE = 44;
 var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
   template: CommunityCreationPeopleListItemTemplate,
   tagName: 'li',
-  attributes: {
-    class: 'community-create-people-list-item'
-  },
+  className: 'community-create-people-list-item',
 
   ui: {
     link: '.community-create-people-list-item-link',

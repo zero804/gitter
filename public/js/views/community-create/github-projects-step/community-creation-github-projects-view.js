@@ -48,9 +48,7 @@ module.exports = CommunityCreateBaseStepView.extend({
     return this.repoListView;
   },
 
-  attributes: _.extend({}, CommunityCreateBaseStepView.prototype.attributes, {
-    class: 'community-create-step-wrapper community-create-github-projects-step-wrapper'
-  }),
+  className: 'community-create-step-wrapper community-create-github-projects-step-wrapper',
 
   ui: _.extend({}, CommunityCreateBaseStepView.prototype.ui, {
     orgsToggle: '.community-create-github-projects-toggle-orgs',
