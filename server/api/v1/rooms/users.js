@@ -1,25 +1,14 @@
 "use strict";
 
 var restful = require('../../../services/restful');
-var roomService = require('../../../services/room-service');
-var emailAddressService = require('../../../services/email-address-service');
 var userService = require("../../../services/user-service");
 var restSerializer = require("../../../serializers/rest-serializer");
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var troupeService = require("../../../services/troupe-service");
 var StatusError = require('statuserror');
-var Promise = require('bluebird');
 var loadTroupeFromParam = require('./load-troupe-param');
-
-function maskEmail(email) {
-  return email
-    .split('@')
-    .map(function (item, index) {
-      if (index === 0) return item.slice(0, 4) + '****';
-      return item;
-    })
-    .join('@');
-}
+var RoomWithPolicyService = require('../../../services/room-with-policy-service');
+var Promise = require('bluebird');
 
 function getTroupeUserFromId(troupeId, userId) {
   return troupeService.findByIdLeanWithMembership(troupeId, userId)
@@ -58,32 +47,22 @@ module.exports = {
   },
 
   create: function(req) {
-    var policy = req.userRoomPolicy;
-
+    var username = req.body.username;
+    if (!username) throw new StatusError(400);
+    username = String(req.body.username);
     return Promise.join(
       loadTroupeFromParam(req),
-      policy.canAddUser(),
-      function(troupe, addUserAccess) {
+      userService.findByUsername(username),
+      function(troupe, userToAdd) {
         if (!troupe) throw new StatusError(404);
-        if (!addUserAccess) throw new StatusError(403, 'You do not have permission to add people to this room.');
-        var username = req.body.username;
 
-        return roomService.addUserToRoom(troupe, req.user, username);
+        var roomWithPolicyService = new RoomWithPolicyService(troupe, req.user, req.userRoomPolicy);
+        return roomWithPolicyService.addUserToRoom(userToAdd)
+          .return(userToAdd);
       })
-      .then(function(addedUser) {
+      .then(function(userToAdd) {
         var strategy = new restSerializer.UserStrategy();
-
-        return [
-          restSerializer.serializeObject(addedUser, strategy),
-          emailAddressService(addedUser, { attemptDiscovery: true })
-        ];
-      })
-      .spread(function(serializedUser, email) {
-        if (serializedUser.invited && email) {
-          serializedUser.email = maskEmail(email);
-        }
-
-        return { success: true, user: serializedUser };
+        return restSerializer.serializeObject(userToAdd, strategy);
       });
   },
 
@@ -94,24 +73,15 @@ module.exports = {
    * DELETE /rooms/:roomId/users/:userId
    */
   destroy: function(req) {
-    var user = req.resourceTroupeUser;
+    var userForRemoval = req.resourceTroupeUser;
     if (!req.user) throw new StatusError(401);
-    var policy = req.userRoomPolicy;
 
-    var policyCheck;
-    if (mongoUtils.objectIDsEqual(user._id, req.user._id)) {
-      policyCheck = Promise.resolve(true); // You can always remove yourself
-    } else {
-      policyCheck = policy.canAdmin();
-    }
+    return loadTroupeFromParam(req)
+      .then(function(troupe) {
+        if (!troupe) throw new StatusError(404);
 
-    return Promise.join(
-      loadTroupeFromParam(req),
-      policyCheck,
-      function(troupe, hasAccess) {
-        if (!hasAccess) throw new StatusError(403);
-
-        return roomService.removeUserFromRoom(troupe, user);
+        var roomWithPolicyService = new RoomWithPolicyService(troupe, req.user, req.userRoomPolicy);
+        return roomWithPolicyService.removeUserFromRoom(userForRemoval);
       })
       .then(function() {
         return { success: true };
