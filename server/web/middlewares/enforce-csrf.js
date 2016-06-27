@@ -4,6 +4,7 @@ var env = require('gitter-web-env');
 var stats = env.stats;
 var logger = env.logger;
 var debug = require('debug')('gitter:infra:enforce-csrf-middleware');
+var StatusError = require('statuserror');
 
 var escapeRegExp = require('../../utils/escape-regexp');
 
@@ -40,27 +41,27 @@ module.exports = function(req, res, next) {
   if(!clientToken) {
     stats.event('token.rejected.notpresented');
     logger.warn('csrf: Rejecting client ' + req.ip + ' request to ' + req.path + ' as they presented no token');
-    return next(403);
+    return next(new StatusError(403));
   }
 
   if(req.accessToken !== clientToken) {
     stats.event('token.rejected.mismatch');
 
-    if(!req.user) {
-      logger.warn('csrf: Rejecting client ' + req.ip + ' request to ' + req.path + ' as they are probably logged out', {
-        serverAccessToken: req.accessToken,
-        clientToken: clientToken,
-      });
-    } else {
+    if(req.user) {
       logger.warn('csrf: Rejecting client ' + req.ip + ' request to ' + req.path + ' as they presented an illegal token', {
         serverAccessToken: req.accessToken,
         clientToken: clientToken,
         username: req.user.username,
         userId: req.user.id
       });
+    } else {
+      logger.warn('csrf: Rejecting client ' + req.ip + ' request to ' + req.path + ' as they are probably logged out', {
+        serverAccessToken: req.accessToken,
+        clientToken: clientToken,
+      });
     }
 
-    return next(403);
+    return next(new StatusError(403));
   }
 
   return next();
