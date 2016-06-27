@@ -1,5 +1,6 @@
 @import (less) "../fonts/fontello/css/fontello.css";
 @import (less) "../fonts/octicons/octicons.css";
+@import "./mixins/text/default-fonts";
 
 /* THIS HAS INTENTIONALLY BEEN COMMENTED OUT AND WILL BE USED FOR WHEN THE HOME PAGE USES THIS LESS FILE*/
 /*@font-face {
@@ -16,70 +17,9 @@
 }
 */
 
-
-@font-face {
-    font-family: "source-sans-pro";
-    src: url("/_s/lt/1/fonts/sourcesans/SourceSansPro-Regular.otf.woff") format('woff');
-    font-weight: normal;
-}
-
-@font-face {
-    font-family: "source-sans-pro";
-    src: url("/_s/lt/1/fonts/sourcesans/SourceSansPro-It.otf.woff") format('woff');
-    font-weight: normal;
-    font-style: italic;
-}
-
-@font-face {
-    font-family: "source-sans-pro";
-    src: url("/_s/lt/1/fonts/sourcesans/SourceSansPro-Bold.otf.woff") format('woff');
-    font-weight: bold;
-}
-
-@font-face {
-    font-family: "source-sans-pro";
-    src: url("/_s/lt/1/fonts/sourcesans/SourceSansPro-Semibold.otf.woff") format('woff');
-    font-weight: 600;
-}
-
-@font-face {
-    font-family: "source-sans-pro";
-    src: url("/_s/lt/1/fonts/sourcesans/SourceSansPro-BoldIt.otf.woff") format('woff');
-    font-weight: bold;
-    font-style: italic;
-}
-
-@font-face {
-    font-family: "source-sans-pro";
-    src: url("/_s/lt/1/fonts/sourcesans/SourceSansPro-Light.otf.woff") format('woff');
-    font-weight: 300;
-}
-
-@font-face {
-    font-family: "source-sans-pro";
-    src: url("/_s/lt/1/fonts/sourcesans/SourceSansPro-ExtraLight.otf.woff") format('woff');
-    font-weight: 200;
-}
-
-
-
-@font-base: "source-sans-pro",
-            /*
-             * native ios and android cant read from "/_s/l", but they look better with
-             * the same system fonts as the native elements anyway
-             */
-            -apple-system, "Roboto",
-            /*
-             * fonts for when our cdn explodes
-             */
-            "pt sans", "calibri", sans-serif;
-
-/* Values derived from Major Second in http://type-scale.com/?size=16&scale=1.200&text=The%20quick%20brown%20fox%20jumped%20over%20the%20lazy%20dog&webfont=Source%20Sans%20Pro&font-family=Source%20Sans%20Pro&font-weight=400&font-family-headers=&font-weight-headers=inherit&background-color=white&font-color=%23333*/
-
-
 body {
+  .m-default-fonts();
   background-color: white;
-  font-family: @font-base;
   font-weight: 400;
   line-height: 1.4;
   color: #333;

@@ -1,6 +1,7 @@
 /* eslint complexity: ["error", 18] */
 'use strict';
 require('utils/initial-setup');
+require('utils/font-setup');
 
 var $ = require('jquery');
 var appEvents = require('utils/appevents');
