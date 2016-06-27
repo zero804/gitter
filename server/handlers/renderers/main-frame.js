@@ -119,7 +119,7 @@ function renderMainFrame(req, res, next, frame) {
         });
 
       res.render(template, {
-        hasCachedFonts:         fonts.hasCachedFonts(req),
+        hasCachedFonts:         fonts.hasCachedFonts(req.cookies),
         fonts:                  fonts.getFonts(),
         socialMetadata:         socialMetadata,
         bootScriptName:         bootScriptName,

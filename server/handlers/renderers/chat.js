@@ -100,7 +100,7 @@ function renderChat(req, res, options, next) {
         var orgPageHref = '/orgs/' + orgName + '/rooms/';
 
         var renderOptions = _.extend({
-            hasCachedFonts: fonts.hasCachedFonts(req),
+            hasCachedFonts: fonts.hasCachedFonts(req.cookies),
             fonts: fonts.getFonts(),
             isRepo: troupe.githubType === 'REPO',
             bootScriptName: script,

@@ -26,8 +26,8 @@ function getFonts(){
   return { local: LOCAL_FONTS, preload: FONTS };
 }
 
-function hasCachedFonts(req) {
-  return (req.cookies.webfontsLoaded || '') === 'true';
+function hasCachedFonts(cookies) {
+  return (cookies.webfontsLoaded || '') === 'true';
 }
 
 module.exports = {

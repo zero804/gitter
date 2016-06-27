@@ -45,7 +45,7 @@ function renderHomePage(req, res, next) {
       var showLinuxApp = !isOsx && !isWindows;
 
       res.render(page, {
-        hasCachedFonts: fonts.hasCachedFonts(req),
+        hasCachedFonts: fonts.hasCachedFonts(req.cookies),
         fonts: fonts.getFonts(),
         welcomeMessage: WELCOME_MESSAGES[Math.floor(Math.random() * WELCOME_MESSAGES.length)],
         showOsxApp: showOsxApp,
@@ -63,7 +63,7 @@ function renderMobileUserHome(req, res, next) {
   contextGenerator.generateNonChatContext(req)
   .then(function(troupeContext) {
     res.render('mobile/mobile-userhome', {
-      hasCachedFonts: fonts.hasCachedFonts(req),
+      hasCachedFonts: fonts.hasCachedFonts(req.cookies),
       fonts: fonts.getFonts(),
       troupeName: req.uriContext.uri,
       troupeContext: troupeContext,
@@ -78,7 +78,7 @@ function renderMobileNativeUserhome(req, res) {
   contextGenerator.generateNonChatContext(req)
     .then(function(troupeContext) {
       res.render('mobile/native-userhome-app', {
-        hasCachedFonts: fonts.hasCachedFonts(req),
+        hasCachedFonts: fonts.hasCachedFonts(req.cookies),
         fonts: fonts.getFonts(),
         bootScriptName: 'mobile-native-userhome',
         troupeContext: troupeContext
