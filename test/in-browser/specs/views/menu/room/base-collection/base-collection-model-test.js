@@ -32,12 +32,6 @@ describe('BaseCollectionModel()', function() {
     assert.equal(1, model.onSearch.callCount);
   });
 
-  it('should call onFavourite when the model moves into a search state', function() {
-    roomMenuModel.set('state', 'favourite');
-    roomMenuModel.trigger('change:state:post');
-    assert.equal(1, model.onFavourite.callCount);
-  });
-
   it('should call onPeople when the model moves into a search state', function() {
     roomMenuModel.set('state', 'people');
     roomMenuModel.trigger('change:state:post');
