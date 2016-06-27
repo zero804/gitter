@@ -16,9 +16,6 @@ var UserSchema = new Schema({
   displayName: { type: String },
   emails: [String],                            // Secondary email addresses
   invitedEmail: { type: String },
-  inviteReminderSent: { type: Date },
-  invitedByUser: ObjectId,
-  invitedToRoom: ObjectId,
   username: { type: String, required: true },
   gravatarImageUrl: { type: String },
   gravatarVersion: { type: String },
