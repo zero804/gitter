@@ -1329,7 +1329,7 @@ function deleteRoom(troupe) {
 function upsertGroupRoom(user, group, roomInfo, securityDescriptor, options) {
   options = options || {}; // options.tracking
   var uri = roomInfo.uri;
-  var topic = roomInfo.topic || null;
+  var topic = roomInfo.topic;
   var lcUri = uri.toLowerCase();
 
   // convert back to the old github-tied vars here
@@ -1345,6 +1345,11 @@ function upsertGroupRoom(user, group, roomInfo, securityDescriptor, options) {
 
     case 'GH_REPO':
       githubType = 'REPO';
+      roomType = 'github-room';
+      break
+
+    case 'GH_USER':
+      githubType = 'USER';
       roomType = 'github-room';
       break
 
