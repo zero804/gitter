@@ -1,19 +1,13 @@
 "use strict";
 
 var context = require('utils/context');
-var appEvents = require('utils/appevents');
-
-var eyeballState = true;
+var eyeballsDetector = require('./eyeballs-detector');
 var track = false;
 
 module.exports = {
   track: function() {
     if (track) return;
     track = true;
-
-    appEvents.on('eyeballStateChange', function (state) {
-      eyeballState = state;
-    });
   },
 
   getAuthDetails: function() {
@@ -21,11 +15,11 @@ module.exports = {
 
     return {
       troupeId: context.getTroupeId(),
-      eyeballs: eyeballState ? 1 : 0
+      eyeballs: eyeballsDetector.getEyeballs() ? 1 : 0
     };
   },
 
   getEyeballs: function() {
-    return (track && eyeballState) ? 1 : 0;
+    return (track && eyeballsDetector.getEyeballs()) ? 1 : 0;
   }
 };
