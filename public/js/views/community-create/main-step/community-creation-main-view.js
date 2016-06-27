@@ -5,6 +5,7 @@ var slugify = require('slug');
 var context = require('utils/context');
 var toggleClass = require('utils/toggle-class');
 
+var stepConstants = require('../step-constants');
 var template = require('./community-creation-main-view.hbs');
 var CommunityCreateBaseStepView = require('../shared/community-creation-base-step-view');
 var CommunityCreationSubRoomListView = require('../shared/community-creation-sub-room-list-view');
@@ -130,7 +131,7 @@ module.exports = CommunityCreateBaseStepView.extend({
     var isValid = this.model.get('valid');
 
     if(isValid) {
-      this.communityCreateModel.set('stepState', this.communityCreateModel.STEP_CONSTANT_MAP.invite);
+      this.communityCreateModel.set('stepState', stepConstants.INVITE);
     }
 
     e.preventDefault();
@@ -138,7 +139,7 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   onGitHubProjectLinkActivated: function(e) {
     // Move to the pick github project views
-    this.communityCreateModel.set('stepState', this.communityCreateModel.STEP_CONSTANT_MAP.githubProjects);
+    this.communityCreateModel.set('stepState', stepConstants.GITHUB_PROJECTS);
 
     e.preventDefault();
     e.stopPropagation();

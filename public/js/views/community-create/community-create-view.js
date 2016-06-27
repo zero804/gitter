@@ -9,6 +9,7 @@ require('views/behaviors/isomorphic');
 
 var template = require('./community-create-view.hbs');
 
+var stepConstants = require('./step-constants');
 var CommunityCreateStepViewModel = require('./community-create-step-view-model');
 var CommunityCreateGitHubProjectsStepViewModel = require('./community-create-github-projects-step-view-model');
 
@@ -117,12 +118,11 @@ var CommunityCreateView = Marionette.LayoutView.extend({
 
   onStepChangeState: function() {
     var newStepState = this.model.get('stepState');
-    var stepConstants = this.model.STEP_CONSTANT_MAP;
 
-    this.mainStepViewModel.set({ active: newStepState === stepConstants.main });
-    this.githubProjectsStepViewModel.set({ active: newStepState === stepConstants.githubProjects });
-    this.invitePeopleStepViewModel.set({ active: newStepState === stepConstants.invite });
-    this.overviewStepViewModel.set({ active: newStepState === stepConstants.overview });
+    this.mainStepViewModel.set({ active: newStepState === stepConstants.MAIN });
+    this.githubProjectsStepViewModel.set({ active: newStepState === stepConstants.GITHUB_PROJECTS });
+    this.invitePeopleStepViewModel.set({ active: newStepState === stepConstants.INVITE });
+    this.overviewStepViewModel.set({ active: newStepState === stepConstants.OVERVIEW });
   },
 
   onActiveChange: function() {

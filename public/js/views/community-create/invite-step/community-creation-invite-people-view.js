@@ -5,6 +5,7 @@ var Backbone = require('backbone');
 var ProxyCollection = require('backbone-proxy-collection');
 var VirtualMultipleCollection = require('../virtual-multiple-collection');
 
+var stepConstants = require('../step-constants');
 var template = require('./community-creation-invite-people-view.hbs');
 var CommunityCreateBaseStepView = require('../shared/community-creation-base-step-view');
 var CommunityCreationPeopleListView = require('../shared/community-creation-people-list-view');
@@ -100,10 +101,10 @@ module.exports = CommunityCreateBaseStepView.extend({
   },
 
   onStepNext: function() {
-    this.communityCreateModel.set('stepState', this.communityCreateModel.STEP_CONSTANT_MAP.overview);
+    this.communityCreateModel.set('stepState', stepConstants.OVERVIEW);
   },
   onStepBack: function() {
-    this.communityCreateModel.set('stepState', this.communityCreateModel.STEP_CONSTANT_MAP.main);
+    this.communityCreateModel.set('stepState', stepConstants.MAIN);
   },
 
   onActiveChange: function() {

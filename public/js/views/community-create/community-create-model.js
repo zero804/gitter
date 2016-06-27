@@ -2,20 +2,13 @@
 
 var Backbone = require('backbone');
 var urlJoin = require('url-join');
-
-var STEP_CONSTANT_MAP = {
-  main: 'main',
-  githubProjects: 'githubProjects',
-  invite: 'invite',
-  overview: 'overview'
-};
+var stepConstants = require('./step-constants');
 
 var CommunityCreateModel = Backbone.Model.extend({
-  STEP_CONSTANT_MAP: STEP_CONSTANT_MAP,
 
   defaults: {
     active: false,
-    stepState: STEP_CONSTANT_MAP.main,
+    stepState: stepConstants.MAIN,
 
     communityName: '',
     communitySlug: '',
@@ -61,7 +54,5 @@ var CommunityCreateModel = Backbone.Model.extend({
     return info;
   }
 });
-
-CommunityCreateModel.STEP_CONSTANT_MAP = STEP_CONSTANT_MAP;
 
 module.exports = CommunityCreateModel;
