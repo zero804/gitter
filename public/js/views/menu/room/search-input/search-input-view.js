@@ -7,6 +7,7 @@ var cocktail = require('cocktail');
 var KeyboardEventMixin = require('views/keyboard-events-mixin');
 var template = require('./search-input-view.hbs');
 var toggleClass = require('utils/toggle-class');
+var RAF = require('utils/raf');
 
 var SearchInputView = Marionette.ItemView.extend({
 
@@ -35,7 +36,9 @@ var SearchInputView = Marionette.ItemView.extend({
 
   initialize: function(attrs) {
     this.bus = attrs.bus;
+    this.focusModel = attrs.searchFocusModel;
     this.listenTo(this.bus, 'left-menu:recent-search', this.onRecentSearchUpdate, this);
+    this.listenTo(this.focusModel, 'change:focus', this.onFocusUpdate, this);
   },
 
   onInputChange: _.debounce(function(e) {
@@ -51,15 +54,13 @@ var SearchInputView = Marionette.ItemView.extend({
 
   onModelChangeState: function (model, val){ //jshint unused: true
     toggleClass(this.el, 'active', val === 'search');
-
-    // Don't ruin the minibar navigation when using a keyboard
-    if(model.get('activationSourceType') !== 'keyboard') {
-      this.focusSearchInput();
-    }
   },
 
   onRender: function (){
     this.onModelChangeState(this.model, this.model.get('state'));
+    setTimeout(function(){
+      this.onFocusUpdate(this.focusModel, this.focusModel.get('focus'));
+    }.bind(this), 1000);
   },
 
   onModelChangeSearchTerm: function(model, val) { //jshint unused: true
@@ -76,21 +77,12 @@ var SearchInputView = Marionette.ItemView.extend({
     this.ui.input.val(val);
   },
 
-  focusSearchInput: function() {
-    var state = this.model.get('state');
-    //We need to check if the ui elements have been bound
-    //as this is a string before it is bounce we can't check [0] || .length
-    //so we will check for the find function JP 15/3/16
-    if(state === 'search') {
-      //This REALLY sucks but we need to avoid any debouncing affect
-      //caused by the keyboard controller and its desire to blur the current element
-      //sshould get fixed with https://github.com/troupe/gitter-webapp/pull/1503
-      //JP 18/5/16
-      setTimeout(function(){
-        this.ui.input.focus();
-      }.bind(this), 300);
-    }
-  }
+  onFocusUpdate: function (model, val){
+    RAF(function(){
+      if(val) { return this.ui.input.focus();}
+      this.ui.input.blur();
+    }.bind(this));
+  },
 
 });
 

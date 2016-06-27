@@ -1,8 +1,8 @@
 <!doctype html>
-<html lang="en">
+<html class="{{#if hasCachedFonts}}fonts-loaded{{/if}}" lang="en">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
 	<meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
   <link id="favicon" rel="shortcut icon" href="{{cdn 'images/favicon-normal.ico' }}">
 
   <meta name="mobile-web-app-capable" content="yes">
@@ -10,6 +10,7 @@
 
 	<title>Home</title>
 
+  {{> fonts}}
   <link rel="stylesheet" href="{{cdn 'styles/userhome.css' }}">
   <base target="_parent">
 </head>
