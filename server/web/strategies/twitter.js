@@ -8,6 +8,7 @@ var userService = require('../../services/user-service');
 var trackSignupOrLogin = require('../track-signup-or-login');
 var updateUserLocale = require('../update-user-locale');
 var passportLogin = require('../passport-login');
+var identityService = require('gitter-web-identity');
 
 //function twitterOauthCallback(req, accessToken, refreshToken, params, profile, done) {
 function twitterOauthCallback(req, token, tokenSecret, profile, done) {
@@ -19,8 +20,9 @@ function twitterOauthCallback(req, token, tokenSecret, profile, done) {
     gravatarImageUrl: avatar
   };
   var twitterIdentity = {
-    provider: 'twitter',
+    provider: identityService.TWITTER_IDENTITY_PROVIDER,
     providerKey: profile.id,
+    username: profile.username,
     displayName: profile.displayName,
     // NOTE: doesn't look like passport is parsing out the email address if we
     // set userProfileURL for some reason. So profile.email is not set.
