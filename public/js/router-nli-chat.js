@@ -1,5 +1,7 @@
 "use strict";
 
+require('utils/font-setup');
+
 var appEvents = require('utils/appevents');
 var context = require('utils/context');
 var Backbone = require('backbone');
