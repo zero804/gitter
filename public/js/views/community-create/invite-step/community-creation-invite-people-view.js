@@ -12,7 +12,7 @@ var CommunityCreationPeopleListView = require('../shared/community-creation-peop
 var UserResultListView = require('../shared/community-create-invite-user-result-list-view');
 
 var userSearchModels = require('collections/user-search');
-var userSuggestionModels = require('collections/user-suggestions');
+var UserSuggestionCollection = require('collections/user-suggestions');
 
 require('gitter-styleguide/css/components/headings.css');
 require('gitter-styleguide/css/components/buttons.css');
@@ -73,7 +73,7 @@ module.exports = CommunityCreateBaseStepView.extend({
     this.repoCollection = options.repoCollection;
 
     this.userSearchCollection = new userSearchModels.Collection();
-    this.userSuggestionCollection = new userSuggestionModels.UserSuggestionCollection();
+    this.userSuggestionCollection = new UserSuggestionCollection();
     this.fetchSuggestions();
 
 
