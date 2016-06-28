@@ -39,10 +39,11 @@ function EyeballsFocus(callback) {
   passiveEventListener.addEventListener(window, 'focus', makeFocusHandler(0));
   passiveEventListener.addEventListener(window, 'blur', makeBlurHandler(0));
 
-  function monitorIFrame(frame, index) {
+  function monitorIFrame(frame) {
     var contentWindow = frame.contentWindow;
     var focused = contentWindow.document.hasFocus();
-    focusFrames.push(focused);
+    var newLength = focusFrames.push(focused);
+    var index = newLength - 1;
 
     var focusHandler = makeFocusHandler(index);
     var blurHandler = makeBlurHandler(index);
@@ -80,8 +81,7 @@ function EyeballsFocus(callback) {
     var frames = document.querySelectorAll('iframe');
     for (var i = 0; i < frames.length; i++) {
       var frame = frames[i];
-      var index = i + 1;
-      monitorIFrame(frame, index);
+      monitorIFrame(frame);
     }
 
     evaluateFocusBlur();
