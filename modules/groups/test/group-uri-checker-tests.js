@@ -1,10 +1,9 @@
 'use strict';
 
 var StatusError = require('statuserror');
-var testRequire = require('../test-require');
-var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assert = require("assert");
-var groupUriChecker = testRequire('./services/group-uri-checker');
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
+var groupUriChecker = require('../lib/group-uri-checker');
 
 
 describe('group-uri-checker #slow', function() {
