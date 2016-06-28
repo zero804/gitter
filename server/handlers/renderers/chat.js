@@ -99,6 +99,11 @@ function renderChat(req, res, options, next) {
         var orgName = getOrgNameFromTroupeName(troupeContext.troupe.name);
         var orgPageHref = '/orgs/' + orgName + '/rooms/';
 
+        var isRightToolbarPinned = snapshots && snapshots.rightToolbar && snapshots.rightToolbar.isPinned;
+        if(isRightToolbarPinned === undefined) {
+          isRightToolbarPinned = true;
+        }
+
         var renderOptions = _.extend({
             hasCachedFonts: fonts.hasCachedFonts(req.cookies),
             fonts: fonts.getFonts(),
@@ -125,7 +130,7 @@ function renderChat(req, res, options, next) {
             ownerIsOrg: ownerIsOrg,
             orgPageHref: orgPageHref,
             roomMember: req.uriContext.roomMember,
-            isRightToolbarPinned: snapshots && snapshots.rightToolbar && snapshots.rightToolbar.isPinned,
+            isRightToolbarPinned: isRightToolbarPinned,
 
             //Feature Switch Left Menu
             hasNewLeftMenu: req.fflip && req.fflip.has('left-menu'),
