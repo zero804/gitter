@@ -44,7 +44,7 @@ function send(value) {
 
 
 appEvents.on('change:room', function() {
-  eyeballsDetector.forceEyeballs(true);
+  eyeballsDetector.forceActivity();
 });
 
 eyeballsDetector.events.on('change', function(state) {
