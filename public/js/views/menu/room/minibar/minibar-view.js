@@ -180,6 +180,7 @@ module.exports = Marionette.LayoutView.extend({
       case 'org':
         var orgName = this.model.get('selectedOrgName');
         var model = this.collection.findWhere({ name: orgName });
+        if(this.tempModel.get('name') === orgName) { model = this.tempModel; }
         if(!model) { return; }
         return model.set({ active: true, focus: true });
     }
@@ -195,6 +196,7 @@ module.exports = Marionette.LayoutView.extend({
     return this.homeModel.get('active') && this.homeModel ||
       this.searchModel.get('active') && this.searchModel ||
       this.peopleModel.get('active') && this.peopleModel ||
+      this.tempModel.get('active') && this.tempModel ||
       this.collection.findWhere({ active: true }) ||
       this.closeModel.get('active') && this.closeModel;
   },
@@ -204,6 +206,7 @@ module.exports = Marionette.LayoutView.extend({
     if(this.searchModel.get('focus')) { this.searchModel.set('focus', false); }
     if(this.peopleModel.get('focus')) { this.peopleModel.set('focus', false); }
     if(this.closeModel.get('focus')) { this.closeModel.set('focus', false); }
+    if(this.tempModel.get('focus')) { this.tempModel.set('focus', false); }
     this.collection.where({ focus: true }).forEach(function(model){ model.set('focus', false); });
   },
 
