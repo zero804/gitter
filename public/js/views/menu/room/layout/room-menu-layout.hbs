@@ -32,7 +32,7 @@
 
           <li id="minibar-collection">
             <ul class="minibar-collection-list">
-              {{#each leftMenuOrgs}} {{! JP 9/12/15 }} {{! TODO SHOULD THIS BE MOVED INTO A PARTIAL TO BE SHARED AROUND }}
+              {{#each troupeContext.snapshots.groups}} {{! JP 9/12/15 }} {{! TODO SHOULD THIS BE MOVED INTO A PARTIAL TO BE SHARED AROUND }}
                 <li data-state-change="org" id="minibar-{{name}}"  data-org-name="{{name}}" class="room-menu-options__item--org">
                   {{{ prerenderView "js/views/menu/room/minibar/minibar-item-view" }}}
                 </li>
@@ -65,7 +65,7 @@
             <section id="favourite-collection" class="left-menu-collection">
               <div class="favourite-collection loaded active">
                 <div id="collection-list" class="collection-list--favourite">
-                  {{#each leftMenuFavouriteRooms}}
+                  {{#each troupeContext.snapshots.rooms}}
                     <div class="{{#if isNotOneToOne}}room-item--favourite{{else}}room-item--favourite-one2one{{/if}} {{#if isHidden}}hidden{{/if}}"
                          id="{{id}}"
                          data-id="{{id}}">

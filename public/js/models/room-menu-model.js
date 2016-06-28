@@ -101,7 +101,7 @@ module.exports = Backbone.Model.extend({
       suggestedOrgsCollection: this.suggestedOrgs,
     });
 
-    var orgsSnapshot = context.getSnapshot('orgs') || [];
+    var orgsSnapshot = context.getSnapshot('groups') || [];
     var state = this.get('state');
     var selectedOrg = this.get('selectedOrgName');
     this.minibarHomeModel = new MinibarItemModel({ name: 'all', type: 'all', active: (state === 'all') });
