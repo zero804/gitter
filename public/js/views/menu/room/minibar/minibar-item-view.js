@@ -48,7 +48,6 @@ module.exports = BaseItemView.extend({
 
   initialize: function(options) {
     this.roomMenuModel = options.roomMenuModel;
-    this.firstRender = true;
   },
 
 
@@ -98,7 +97,5 @@ module.exports = BaseItemView.extend({
     if(this.roomMenuModel.get('roomMenuIsPinned')) {
       this.onActiveStateUpdate();
     }
-
-    this.firstRender = false;
   },
 });
