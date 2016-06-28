@@ -23,6 +23,7 @@ var parseRoomsIntoLeftMenuFavouriteRoomList = require('gitter-web-shared/rooms/l
 var getSubResources = require('./sub-resources');
 var fixMongoIdQueryParam = require('../../web/fix-mongo-id-query-param');
 var mapGroupsForRenderer = require('../../handlers/map-groups-for-renderer');
+var fonts = require('../../web/fonts.js');
 
 /* How many chats to send back */
 
@@ -118,6 +119,8 @@ function renderMainFrame(req, res, next, frame) {
         });
 
       res.render(template, {
+        hasCachedFonts:         fonts.hasCachedFonts(req.cookies),
+        fonts:                  fonts.getFonts(),
         socialMetadata:         socialMetadata,
         bootScriptName:         bootScriptName,
         cssFileName:            "styles/" + bootScriptName + ".css",
