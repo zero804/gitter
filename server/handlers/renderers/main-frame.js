@@ -17,13 +17,12 @@ var roomSort = require('gitter-realtime-client/lib/sorts-filters').pojo; /* <-- 
                                                                                           libraries that we don't need */
 var roomNameTrimmer = require('../../../public/js/utils/room-name-trimmer');
 var userSettingsService = require('../../services/user-settings-service');
-var parseRoomsIntoLeftMenuRoomList = require('gitter-web-shared/rooms/left-menu-room-list.js');
-var generateLeftMenuSnapshot = require('../snapshots/left-menu-snapshot');
-var parseRoomsIntoLeftMenuFavouriteRoomList = require('gitter-web-shared/rooms/left-menu-room-favourite-list');
 var getSubResources = require('./sub-resources');
 var fixMongoIdQueryParam = require('../../web/fix-mongo-id-query-param');
 var mapGroupsForRenderer = require('../../handlers/map-groups-for-renderer');
 var fonts = require('../../web/fonts.js');
+
+var generateMainFrameSnapshots = require('../../handlers/snapshots/main-frame');
 
 /* How many chats to send back */
 
@@ -85,25 +84,10 @@ function renderMainFrame(req, res, next, frame) {
         social.getMetadataForChatPermalink({ room: req.troupe, chat: permalinkChat }) :
         social.getMetadata({ room: req.troupe });
 
-      //TODO Pass this to MINIBAR?? JP 17/2/16
+        //switches
       var hasNewLeftMenu = !req.isPhone && req.fflip && req.fflip.has('left-menu');
       var hasGroups = req.fflip && req.fflip.has('groups');
-      var snapshots = troupeContext.snapshots = generateLeftMenuSnapshot(req, troupeContext, rooms, hasGroups);
-      var leftMenuRoomList = parseRoomsIntoLeftMenuRoomList(snapshots.leftMenu.state, snapshots.rooms, snapshots.leftMenu.selectedOrgName);
-      var leftMenuFavouriteRoomList = parseRoomsIntoLeftMenuFavouriteRoomList(snapshots.leftMenu.state, snapshots.rooms, snapshots.leftMenu.selectedOrgName);
-      if(!!hasGroups) { troupeContext.snapshots.orgs = mapGroupsForRenderer(groups);}
-
-      var previousLeftMenuState = troupeContext.leftRoomMenuState;
-      var newLeftMenuState = snapshots['leftMenu'];
-      if(req.user && !_.isEqual(previousLeftMenuState, newLeftMenuState)) {
-        // Save our left-menu state so that if they don't send any updates on the client,
-        // we still have it when they refresh. We can't save it where it is changed(`./shared/parse/left-menu-troupe-context.js`)
-        // because that is in shared and the user-settings-service is in `./server`
-        userSettingsService.setUserSettings(req.user._id, 'leftRoomMenu', newLeftMenuState)
-          .catch(function(err) {
-            errorReporter(err, { userSettingsServiceSetFailed: true }, { module: 'app-render' });
-          });
-      }
+      var snapshots = troupeContext.snapshots = generateMainFrameSnapshots(req, troupeContext, rooms);
 
       // pre-processing rooms
       // Bad mutation ... BAD MUTATION
@@ -119,6 +103,14 @@ function renderMainFrame(req, res, next, frame) {
         });
 
       res.render(template, {
+        //left menu
+        hasNewLeftMenu:         hasNewLeftMenu,
+        //leftMenuRooms:          leftMenuRoomList,
+        //leftMenuFavouriteRooms: leftMenuFavouriteRoomList,
+        leftMenuOrgs:           troupeContext.snapshots.orgs,
+        roomMenuIsPinned:       snapshots.leftMenu.roomMenuIsPinned,
+
+        //fonts
         hasCachedFonts:         fonts.hasCachedFonts(req.cookies),
         fonts:                  fonts.getFonts(),
         socialMetadata:         socialMetadata,
@@ -126,7 +118,6 @@ function renderMainFrame(req, res, next, frame) {
         cssFileName:            "styles/" + bootScriptName + ".css",
         troupeName:             req.uriContext.uri,
         troupeContext:          troupeContext,
-        roomMenuIsPinned:       snapshots.leftMenu.roomMenuIsPinned,
         chatAppLocation:        chatAppLocation,
         agent:                  req.headers['user-agent'],
         subresources:           getSubResources(bootScriptName),
@@ -135,10 +126,6 @@ function renderMainFrame(req, res, next, frame) {
         menuHeaderExpanded:     false,
         user:                   user,
         orgs:                   orgs,
-        hasNewLeftMenu:         hasNewLeftMenu,
-        leftMenuOrgs:           troupeContext.snapshots.orgs,
-        leftMenuRooms:          leftMenuRoomList,
-        leftMenuFavouriteRooms: leftMenuFavouriteRoomList,
         isPhone:            req.isPhone,
         //TODO Remove this when left-menu switch goes away JP 23/2/16
         rooms: {
