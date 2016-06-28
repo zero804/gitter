@@ -4,7 +4,6 @@ var Promise = require('bluebird');
 var StatusError = require('statuserror');
 
 var User = require('gitter-web-persistence').User;
-var Troupe = require('gitter-web-persistence').Troupe;
 var Group = require('gitter-web-persistence').Group;
 var githubPolicyFactory = require('gitter-web-permissions/lib/github-policy-factory');
 var validateGitHubUri = require('gitter-web-github').GitHubUriValidator;
@@ -18,10 +17,9 @@ function checkLocalUri(uri) {
       // rather? See create-owner-report.js for an example.
       User.findOne({ username: uri }).exec(),
       Group.findOne({ lcUri: uri.toLowerCase() }).exec(),
-      Troupe.findOne({ lcUri: uri.toLowerCase() }).exec(),
-      function(user, group, troupe) {
-        debug("user: %s, group: %s, troupe: %s", !!user, !!group, !!troupe);
-        return !!(user || group || troupe);
+      function(user, group) {
+        debug("user: %s, group: %s", !!user, !!group);
+        return !!(user || group);
       }
     );
 }
