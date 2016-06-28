@@ -87,6 +87,7 @@ module.exports = Marionette.LayoutView.extend({
       roomMenuModel: this.model,
     }));
 
+    this.listenTo(tempView, 'minibar-item:activated', this.onTempOrgItemClicked, this);
     return tempView;
   },
 
@@ -121,6 +122,11 @@ module.exports = Marionette.LayoutView.extend({
 
   onCollectionItemActivated: function (view, model){
     this.model.set('selectedOrgName', model.get('name'));
+    this.changeMenuState('org');
+  },
+
+  onTempOrgItemClicked: function (){
+    this.model.set('selectedOrgName', this.tempModel.get('name'));
     this.changeMenuState('org');
   },
 
