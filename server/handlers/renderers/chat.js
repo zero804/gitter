@@ -1,23 +1,23 @@
 "use strict";
 
-var _ = require('lodash');
-var Promise = require('bluebird');
 var env = require('gitter-web-env');
 var nconf = env.config;
-
+var Promise = require('bluebird');
 var contextGenerator = require('../../web/context-generator');
 var restful = require('../../services/restful');
-
-var isolateBurst = require('gitter-web-shared/burst/isolate-burst-array');
 var burstCalculator = require('../../utils/burst-calculator');
 var userSort = require('../../../public/js/utils/user-sort');
+var isolateBurst = require('gitter-web-shared/burst/isolate-burst-array');
+var unreadItemService = require('../../services/unread-items');
+var _ = require('lodash');
+
 var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 var getSubResources = require('./sub-resources');
 var fixMongoIdQueryParam = require('../../web/fix-mongo-id-query-param');
+var fonts = require('../../web/fonts');
 var generateRightToolbarSnapshot = require('../snapshots/right-toolbar-snapshot');
 
-var unreadItemService = require('../../services/unread-items');
 var troupeService = require('../../services/troupe-service');
 var roomMembershipService = require('../../services/room-membership-service');
 
@@ -99,7 +99,14 @@ function renderChat(req, res, options, next) {
         var orgName = getOrgNameFromTroupeName(troupeContext.troupe.name);
         var orgPageHref = '/orgs/' + orgName + '/rooms/';
 
+        var isRightToolbarPinned = snapshots && snapshots.rightToolbar && snapshots.rightToolbar.isPinned;
+        if(isRightToolbarPinned === undefined) {
+          isRightToolbarPinned = true;
+        }
+
         var renderOptions = _.extend({
+            hasCachedFonts: fonts.hasCachedFonts(req.cookies),
+            fonts: fonts.getFonts(),
             isRepo: troupe.githubType === 'REPO',
             bootScriptName: script,
             cssFileName: cssFileName,
@@ -123,7 +130,7 @@ function renderChat(req, res, options, next) {
             ownerIsOrg: ownerIsOrg,
             orgPageHref: orgPageHref,
             roomMember: req.uriContext.roomMember,
-            isRightToolbarPinned: snapshots.rightToolbar.isPinned,
+            isRightToolbarPinned: isRightToolbarPinned,
 
             //Feature Switch Left Menu
             hasNewLeftMenu: req.fflip && req.fflip.has('left-menu'),
