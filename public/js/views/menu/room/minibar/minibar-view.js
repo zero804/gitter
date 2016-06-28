@@ -168,6 +168,7 @@ module.exports = Marionette.LayoutView.extend({
       case 'org':
         var orgName = this.model.get('selectedOrgName');
         var model = this.collection.findWhere({ name: orgName });
+        if(!model) { return; }
         return model.set({ active: true, focus: true });
     }
   },

@@ -105,8 +105,6 @@ function renderMainFrame(req, res, next, frame) {
       res.render(template, {
         //left menu
         hasNewLeftMenu:         hasNewLeftMenu,
-        //leftMenuRooms:          leftMenuRoomList,
-        //leftMenuFavouriteRooms: leftMenuFavouriteRoomList,
         leftMenuOrgs:           troupeContext.snapshots.orgs,
         roomMenuIsPinned:       snapshots.leftMenu.roomMenuIsPinned,
 

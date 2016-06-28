@@ -27,7 +27,8 @@ module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, group
   //Rooms
   //------------------------------------------------------
   //If the room is not in the room list we need to switch the state to show the parent group
-  if(rooms.indexOf(currentRoom) === -1) {
+
+  if(_.findWhere(rooms, { uri: currentRoom.uri})) {
     menuState = 'org';
     selectedOrgName = getOrgNameFromTroupeName(currentRoom.uri);
     tempOrg = {
@@ -45,9 +46,12 @@ module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, group
     groups = suggestedOrgsFromRoomList(rooms, uri, currentRoom.id, currentRoom);
   }
 
-
   return {
-    leftMenu: _.extend({}, lastLeftMenuSnapshot, { state: menuState, tempOrg: tempOrg }),
+    leftMenu: _.extend({}, lastLeftMenuSnapshot, {
+      state: menuState,
+      tempOrg: tempOrg,
+      selectedOrgName: selectedOrgName
+    }),
     rooms: parseRoomsIntoLeftMenuRoomList(menuState, rooms, selectedOrgName),
     favourites: parseRoomsIntoLeftMenuFavouriteRoomList(menuState, rooms, selectedOrgName),
     groups: groups,
