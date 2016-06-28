@@ -174,22 +174,7 @@ module.exports = Backbone.Model.extend({
     this.listenTo(this, 'change:state', this.onSwitchState, this);
     this.listenTo(this, 'change', _.throttle(this.save.bind(this), 1500));
     this.listenTo(context.troupe(), 'change:id', this.onRoomChange, this);
-
-    //If we have a temp org, visiting google/gxui for example
-    //(when not a member of google or the gxui room)
-    //we need to setup the initial state
-    if(context.hasFeature('groups')) {
-      this.listenTo(this.minibarCollection, 'add remove', this.maintainMinibarStateOnChange, this);
-      this.maintainMinibarStateOnChange();
-    }
-    //boot the model
     this.onSwitchState(this, this.get('state'));
-  },
-
-  maintainMinibarStateOnChange: function (){
-    var tempOrg = this.minibarCollection.findWhere({ temp: true });
-    if(!tempOrg) { return; }
-    this.set({ state: 'org', selectedOrgName: tempOrg.get('name') });
   },
 
   //custom set to limit states that can be assigned
