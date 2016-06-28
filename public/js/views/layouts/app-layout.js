@@ -27,7 +27,9 @@ module.exports = (function () {
 
     behaviors: function(){
       var behaviors = {
-        Isomorphic: {}
+        Isomorphic: {
+          communityCreate: { el: '.community-create-app-root', init: 'initCommunityCreateRegion' }
+        }
       };
 
       if(isMobile() || !context.hasFeature('left-menu')) {
@@ -78,13 +80,11 @@ module.exports = (function () {
     },
 
     initCommunityCreateRegion: function() {
-      this.communityCreateView = new CommunityCreateView({
-        el: '.community-create-app-root',
+      return new CommunityCreateView({
         model: this.communityCreateModel,
         orgCollection: this.orgCollection,
         repoCollection: this.repoCollection
       });
-      return this.communityCreateView;
     },
 
 
@@ -107,10 +107,6 @@ module.exports = (function () {
     },
 
     onCommunityCreateToggle: function(active) {
-      if(!this.hasRenderedCommunityCreateView) {
-        var communityCreateView = this.initCommunityCreateRegion();
-        communityCreateView.render();
-      }
       this.communityCreateModel.set('active', active);
 
       this.hasRenderedCommunityCreateView = true;
