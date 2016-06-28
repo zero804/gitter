@@ -6,6 +6,7 @@ var HomeView = require('./home-view/home-view');
 var SearchView = require('./search-view/search-view');
 var PeopleView = require('./people-view/people-view');
 var CloseView = require('./close-view/close-view');
+var TempOrgView = require('./temp-org-view/temp-org-view');
 var CollectionView = require('./minibar-collection-view');
 var CommunityCreateItemView = require('./minibar-community-create-item-view');
 var domIndexById = require('../../../../utils/dom-index-by-id');
@@ -21,6 +22,7 @@ module.exports = Marionette.LayoutView.extend({
       people: { el: '#minibar-people', init: 'initPeople' },
       collectionView: { el: '#minibar-collection', init: 'initCollection' },
       close: { el: '#minibar-close', init: 'initClose' },
+      tempOrg: { el: '#minibar-temp', init: 'initTemp' }
     },
   },
 
@@ -79,6 +81,15 @@ module.exports = Marionette.LayoutView.extend({
     return closeView;
   },
 
+  initTemp: function (optionsForRegion){
+    var tempView = new TempOrgView(optionsForRegion({
+      model: this.tempModel,
+      roomMenuModel: this.model,
+    }));
+
+    return tempView;
+  },
+
   modelEvents: {
     'change:state change:selectedOrgName': 'onMenuChangeState'
   },
@@ -90,6 +101,7 @@ module.exports = Marionette.LayoutView.extend({
     this.searchModel = this.model.minibarSearchModel;
     this.peopleModel = this.model.minibarPeopleModel;
     this.closeModel = this.model.minibarCloseModel;
+    this.tempModel = this.model.minibarTempOrgModel;
     this.keyboardControllerView = attrs.keyboardControllerView;
     this.listenTo(this.bus, 'navigation', this.clearFocus, this);
     this.onMenuChangeState();

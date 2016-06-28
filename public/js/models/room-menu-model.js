@@ -25,6 +25,7 @@ var favouriteCollectionFilter = require('gitter-web-shared/filters/left-menu-pri
 var MinibarCollection = require('../views/menu/room/minibar/minibar-collection');
 var MinibarItemModel = require('../views/menu/room/minibar/minibar-item-model.js');
 var MinibarPeopleModel = require('../views/menu/room/minibar/people-view/people-model');
+var MinibarTempOrgModel = require('../views/menu/room/minibar/temp-org-view/temp-org-model');
 
 var states = [
   'all',
@@ -51,63 +52,64 @@ module.exports = Backbone.Model.extend({
   //JP 27/1/16
   initialize: function(attrs) {
 
-    perfTiming.start('left-menu-init');
+      perfTiming.start('left-menu-init');
 
-    if (!attrs || !attrs.bus) {
-      throw new Error('A valid message bus must be passed when creating a new RoomMenuModel');
-    }
+      if (!attrs || !attrs.bus) {
+        throw new Error('A valid message bus must be passed when creating a new RoomMenuModel');
+      }
 
-    if (!attrs || !attrs.roomCollection) {
-      throw new Error('A valid room collection must be passed to a new RoomMenuModel');
-    }
+      if (!attrs || !attrs.roomCollection) {
+        throw new Error('A valid room collection must be passed to a new RoomMenuModel');
+      }
 
-    if (!attrs || !attrs.userModel) {
-      throw new Error('A valid user model must be passed to a new RoomMenuModel');
-    }
+      if (!attrs || !attrs.userModel) {
+        throw new Error('A valid user model must be passed to a new RoomMenuModel');
+      }
 
-    this.searchInterval = SEARCH_DEBOUNCE_INTERVAL;
+      this.searchInterval = SEARCH_DEBOUNCE_INTERVAL;
 
-    //assign internal collections
-    this._roomCollection = attrs.roomCollection;
-    delete attrs.roomCollection;
+      //assign internal collections
+      this._roomCollection = attrs.roomCollection;
+      delete attrs.roomCollection;
 
-    this._troupeModel = attrs.troupeModel;
-    delete attrs.troupeModel;
+      this._troupeModel = attrs.troupeModel;
+      delete attrs.troupeModel;
 
-    this.dndCtrl = attrs.dndCtrl;
-    delete attrs.dndCtrl;
+      this.dndCtrl = attrs.dndCtrl;
+      delete attrs.dndCtrl;
 
-    this._orgCollection = attrs.orgCollection;
+      this._orgCollection = attrs.orgCollection;
 
-    this._detailCollection = (attrs.detailCollection || new Backbone.Collection());
-    delete attrs.detailCollection;
+      this._detailCollection = (attrs.detailCollection || new Backbone.Collection());
+      delete attrs.detailCollection;
 
-    this.userModel = attrs.userModel;
-    delete attrs.userModel;
+      this.userModel = attrs.userModel;
+      delete attrs.userModel;
 
-    this.groupsCollection = attrs.groupsCollection;
-    delete attrs.groupsCollection;
+      this.groupsCollection = attrs.groupsCollection;
+      delete attrs.groupsCollection;
 
-    //expose the public collection
-    this.searchTerms = new RecentSearchesCollection(null);
-    this.searchRoomAndPeople = new SearchRoomPeopleCollection(null, { roomMenuModel: this, roomCollection: this._roomCollection });
-    this.searchChatMessages = new SearchChatMessages(null, { roomMenuModel: this, roomModel: this._troupeModel });
-    this.suggestedOrgs = new SuggestedOrgCollection({ contextModel: this, roomCollection: this._roomCollection });
-    this.userSuggestions = new UserSuggestions(null, { contextModel: context.user() });
-    this._suggestedRoomCollection = new SuggestedRoomsByRoomCollection({
-      roomMenuModel:           this,
-      troupeModel:             this._troupeModel,
-      roomCollection:          this._roomCollection,
-      suggestedOrgsCollection: this.suggestedOrgs,
-    });
+      //expose the public collection
+      this.searchTerms = new RecentSearchesCollection(null);
+      this.searchRoomAndPeople = new SearchRoomPeopleCollection(null, { roomMenuModel: this, roomCollection: this._roomCollection });
+      this.searchChatMessages = new SearchChatMessages(null, { roomMenuModel: this, roomModel: this._troupeModel });
+      this.suggestedOrgs = new SuggestedOrgCollection({ contextModel: this, roomCollection: this._roomCollection });
+      this.userSuggestions = new UserSuggestions(null, { contextModel: context.user() });
+      this._suggestedRoomCollection = new SuggestedRoomsByRoomCollection({
+        roomMenuModel:           this,
+        troupeModel:             this._troupeModel,
+        roomCollection:          this._roomCollection,
+        suggestedOrgsCollection: this.suggestedOrgs,
+      });
 
-    var orgsSnapshot = context.getSnapshot('groups') || [];
-    var state = this.get('state');
-    var selectedOrg = this.get('selectedOrgName');
-    this.minibarHomeModel = new MinibarItemModel({ name: 'all', type: 'all', active: (state === 'all') });
-    this.minibarSearchModel = new MinibarItemModel({ name: 'search', type: 'search', active: (state === 'search') });
-    this.minibarPeopleModel = new MinibarPeopleModel({ active: (state === 'people')}, { roomCollection: this._roomCollection });
-    this.minibarCloseModel = new MinibarItemModel({ name: 'close', type: 'close' });
+      var orgsSnapshot = context.getSnapshot('groups') || [];
+      var state = this.get('state');
+      var selectedOrg = this.get('selectedOrgName');
+      this.minibarHomeModel = new MinibarItemModel({ name: 'all', type: 'all', active: (state === 'all') });
+      this.minibarSearchModel = new MinibarItemModel({ name: 'search', type: 'search', active: (state === 'search') });
+      this.minibarPeopleModel = new MinibarPeopleModel({ active: (state === 'people')}, { roomCollection: this._roomCollection });
+      this.minibarCloseModel = new MinibarItemModel({ name: 'close', type: 'close' });
+      this.minibarTempOrgModel = new MinibarTempOrgModel(attrs.tempOrg[0]);
 
     var minibarModels = orgsSnapshot.map(function(model){
       return _.extend({}, model, { active: (state === 'org' && model.name === selectedOrg) });
