@@ -125,7 +125,7 @@ function renderChat(req, res, options, next) {
             ownerIsOrg: ownerIsOrg,
             orgPageHref: orgPageHref,
             roomMember: req.uriContext.roomMember,
-            isRightToolbarPinned: snapshots.rightToolbar.isPinned,
+            isRightToolbarPinned: snapshots && snapshots.rightToolbar && snapshots.rightToolbar.isPinned,
 
             //Feature Switch Left Menu
             hasNewLeftMenu: req.fflip && req.fflip.has('left-menu'),
