@@ -16,5 +16,10 @@ git commit --allow-empty -m ":tada: Start of feature ${FEATURE_NAME}" --no-verif
 git push -v --set-upstream origin "refs/heads/feature/${FEATURE_NAME}:refs/heads/feature/${FEATURE_NAME}"
 
 PR_URL=$(hub pull-request -m "${FEATURE_NAME}" -b develop)
+PR_NUMBER=${PR_URL#https://github.com/troupe/gitter-webapp/pull/}
 
+cat <<EOD | git notes append --stdin HEAD
+pull_request_number=${PR_NUMBER}
+pull_request_url=${PR_URL}
+EOD
 open "${PR_URL}"
