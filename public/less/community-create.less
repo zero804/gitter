@@ -127,9 +127,6 @@
   pointer-events: none;
 }
 
-// Backbone and our prerendre Isomorphic views work a bit differently
-// in how they put stuff in the wrapper so this just gets around either situation
-.community-create-app-root,
 .community-create-root-inner {
   width: 100%;
   height: 100%;
@@ -244,11 +241,9 @@
     visibility: visible;
     opacity: 1;
     pointer-events: auto;
-    .community-create-app-root &,
     .community-create-root-inner & {
       pointer-events: none;
     }
-    .community-create-app-root.active &,
     .community-create-root-inner.active & {
       pointer-events: auto;
     }

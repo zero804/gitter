@@ -30,6 +30,7 @@ module.exports = Marionette.LayoutView.extend({
   dialogRegion: modalRegion,
   behaviors: {
     Isomorphic: {
+      communityCreate: { el: '.community-create-app-root', init: 'initCommunityCreateRegion' },
       chat: { el: '#content-wrapper', init: 'initChatRegion' },
       input: { el: '#chat-input', init: 'initInputRegion' },
       menu: { el: '#menu-region', init: 'initMenuRegion' },
@@ -125,15 +126,11 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   initCommunityCreateRegion: function() {
-    this.repoCollection.fetch();
-
-    this.communityCreateView = new CommunityCreateView({
-      el: '.community-create-app-root',
+    return new CommunityCreateView({
       model: this.communityCreateModel,
       orgCollection: this.orgCollection,
       repoCollection: this.repoCollection
     });
-    return this.communityCreateView;
   },
 
   hideTroupes: function() {
@@ -153,12 +150,8 @@ module.exports = Marionette.LayoutView.extend({
     e.stopPropagation();
   },
 
-
+  
   onCommunityCreateToggle: function(active) {
-    if(!this.hasRenderedCommunityCreateView) {
-      var communityCreateView = this.initCommunityCreateRegion();
-      communityCreateView.render();
-    }
     this.communityCreateModel.set('active', active);
 
     this.hasRenderedCommunityCreateView = true;
