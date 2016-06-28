@@ -26,8 +26,8 @@ module.exports = {
       throw new StatusError(404);
     }
 
-    var name = String(req.body.name);
-    var topic = String(req.body.topic);
+    var name = req.body.name;
+    var topic = req.body.topic;
     var createOptions = { name: name, topic: topic };
     if (req.body.security) {
       // PUBLIC, PRIVATE or INHERITED
