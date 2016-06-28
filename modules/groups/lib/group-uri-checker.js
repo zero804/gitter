@@ -1,8 +1,9 @@
 'use strict';
 
+var env = require('gitter-web-env');
+var config = env.config;
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
-
 var User = require('gitter-web-persistence').User;
 var Group = require('gitter-web-persistence').Group;
 var githubPolicyFactory = require('gitter-web-permissions/lib/github-policy-factory');
@@ -25,29 +26,47 @@ function checkLocalUri(uri) {
 }
 
 function checkGitHubUri(user, uri, obtainAccessFromGitHubRepo) {
-  // gh orgs or users
-  return validateGitHubUri(user, uri)
-    .then(function(githubInfo) {
-      if (githubInfo && githubInfo.type === 'ORG') {
-        // also check if you can actually admin the org.
-        return githubPolicyFactory.createGroupPolicyForGithubObject(user, 'ORG', uri, githubInfo.githubId, obtainAccessFromGitHubRepo)
-          .then(function(policy) {
-            return policy.canAdmin();
-          })
-          .then(function(access) {
-            return {
-              githubInfo: githubInfo,
-              canAdmin: access
-            }
-          });
-      } else {
-        // either not found or not an org, so no reason to check permission
-        return {
-          githubInfo: githubInfo,
-          canAdmin: false // more like N/A
+  var splitsvilleEnabled = config.get('splitsville:enabled');
+  if (splitsvilleEnabled) {
+    // Don't check if it is a github URI once we split from GitHub because it
+    // is irrelevant. A user can take any URI that hasn't been taken by a group
+    // or a user yet.
+    return Promise.resolve();
+
+  } else {
+    // check gh orgs and users
+    return validateGitHubUri(user, uri)
+      .then(function(githubInfo) {
+        if (githubInfo && githubInfo.type === 'ORG') {
+          // also check if you can actually admin the org.
+
+          /*
+          NOTE: This checks the uri which might not be the same as the group's
+          eventual linkPath. Once we drop the extra checks after we split from
+          GitHub this canAdmin check will fall away and the only one left will
+          be the one inside groupService.createGroup that will test if you're
+          allowed to access linkPath.
+          */
+          return githubPolicyFactory.createGroupPolicyForGithubObject(user, 'ORG', uri, githubInfo.githubId, obtainAccessFromGitHubRepo)
+            .then(function(policy) {
+              return policy.canAdmin();
+            })
+            .then(function(access) {
+              return {
+                githubInfo: githubInfo,
+                canAdmin: access
+              }
+            });
+
+        } else {
+          // either not found or not an org, so no reason to check permission
+          return {
+            githubInfo: githubInfo,
+            canAdmin: false // more like N/A
+          }
         }
-      }
-    });
+      });
+  }
 }
 
 function checkIfGroupUriExists(user, uri, obtainAccessFromGitHubRepo) {
@@ -60,8 +79,8 @@ function checkIfGroupUriExists(user, uri, obtainAccessFromGitHubRepo) {
     checkLocalUri(uri),
     checkGitHubUri(user, uri, obtainAccessFromGitHubRepo),
     function(localUriExists, info) {
-      var githubInfo = info.githubInfo;
-      var canAdminGitHubOrg = info.canAdmin;
+      var githubInfo = info && info.githubInfo;
+      var canAdminGitHubOrg = info && info.canAdmin;
       var githubUriExists = !!githubInfo;
 
       debug('localUriExists: %s, githubUriExists: %s', localUriExists, githubUriExists);
@@ -70,9 +89,9 @@ function checkIfGroupUriExists(user, uri, obtainAccessFromGitHubRepo) {
       if (localUriExists) {
         allowCreate = false;
       } else if (githubUriExists) {
-        // If it is a github uri it must be an org and you have to have
-        // admin rights for you to be able to create a community for it.
-
+        // Until we split from GitHub: If it is a github uri it must be an org
+        // and you have to have admin rights for you to be able to create a
+        // community for it.
         debug('github type: %s, canAdmin: %s', githubInfo.type, canAdminGitHubOrg);
         allowCreate = (githubInfo.type === 'ORG') && canAdminGitHubOrg;
       } else {
