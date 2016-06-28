@@ -51,10 +51,13 @@ router.get('/createroom',
 
 router.get(new RegExp('/explore(.*)?'),
   identifyRoute('home-explore'),
-  ensureLoggedIn,
   featureToggles,
   appMiddleware.isPhoneMiddleware,
   function (req, res, next) {
+    if(!req.user) {
+      return res.redirect('/explore');
+    }
+
     req.uriContext = {
       uri: 'home'
     };
