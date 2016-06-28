@@ -3,34 +3,36 @@
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
 
-var userService = require('./user-service');
-var troupeService = require('./troupe-service');
+var User = require('gitter-web-persistence').User;
+var Troupe = require('gitter-web-persistence').Troupe;
+var Group = require('gitter-web-persistence').Group;
 var githubPolicyFactory = require('gitter-web-permissions/lib/github-policy-factory');
-var groupService = require('gitter-web-groups/lib/group-service');
 var validateGitHubUri = require('gitter-web-github').GitHubUriValidator;
 var validateGroupUri = require('gitter-web-validators/lib/validate-group-uri');
+var debug = require('debug')('gitter:app:groups:group-uri-checker');
 
 
 function checkLocalUri(uri) {
   return Promise.join(
       // TODO: what about usernames with different case? Should we use a regex
       // rather? See create-owner-report.js for an example.
-      userService.findByUsername(uri),
-      groupService.findByUri(uri),
-      troupeService.findByUri(uri),
+      User.findOne({ username: uri }).exec(),
+      Group.findOne({ lcUri: uri.toLowerCase() }).exec(),
+      Troupe.findOne({ lcUri: uri.toLowerCase() }).exec(),
       function(user, group, troupe) {
+        debug("user: %s, group: %s, troupe: %s", !!user, !!group, !!troupe);
         return !!(user || group || troupe);
       }
     );
 }
 
-function checkGitHubUri(user, uri) {
+function checkGitHubUri(user, uri, obtainAccessFromGitHubRepo) {
   // gh orgs or users
   return validateGitHubUri(user, uri)
     .then(function(githubInfo) {
       if (githubInfo && githubInfo.type === 'ORG') {
         // also check if you can actually admin the org.
-        return githubPolicyFactory.createGroupPolicyForGithubObject(user, 'ORG', uri, githubInfo.githubId)
+        return githubPolicyFactory.createGroupPolicyForGithubObject(user, 'ORG', uri, githubInfo.githubId, obtainAccessFromGitHubRepo)
           .then(function(policy) {
             return policy.canAdmin();
           })
@@ -50,17 +52,21 @@ function checkGitHubUri(user, uri) {
     });
 }
 
-function checkIfGroupUriExists(user, uri) {
+function checkIfGroupUriExists(user, uri, obtainAccessFromGitHubRepo) {
   // check length, chars, reserved namespaces, slashes..
   if (!validateGroupUri(uri)) throw new StatusError(400);
 
+  debug('checking %s', uri);
+
   return Promise.join(
     checkLocalUri(uri),
-    checkGitHubUri(user, uri),
+    checkGitHubUri(user, uri, obtainAccessFromGitHubRepo),
     function(localUriExists, info) {
       var githubInfo = info.githubInfo;
       var canAdminGitHubOrg = info.canAdmin;
       var githubUriExists = !!githubInfo;
+
+      debug('localUriExists: %s, githubUriExists: %s', localUriExists, githubUriExists);
 
       var allowCreate;
       if (localUriExists) {
@@ -68,6 +74,8 @@ function checkIfGroupUriExists(user, uri) {
       } else if (githubUriExists) {
         // If it is a github uri it must be an org and you have to have
         // admin rights for you to be able to create a community for it.
+
+        debug('github type: %s, canAdmin: %s', githubInfo.type, canAdminGitHubOrg);
         allowCreate = (githubInfo.type === 'ORG') && canAdminGitHubOrg;
       } else {
         // if it doesn't exist locally AND it doesn't exist on github, then
