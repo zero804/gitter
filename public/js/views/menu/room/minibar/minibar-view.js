@@ -85,6 +85,7 @@ module.exports = Marionette.LayoutView.extend({
     var tempView = new TempOrgView(optionsForRegion({
       model: this.tempModel,
       roomMenuModel: this.model,
+      roomCollection: this.roomCollection
     }));
 
     this.listenTo(tempView, 'minibar-item:activated', this.onTempOrgItemClicked, this);
@@ -98,6 +99,7 @@ module.exports = Marionette.LayoutView.extend({
   initialize: function(attrs) {
     this.bus = attrs.bus;
     this.model = attrs.model;
+    this.roomCollection = attrs.roomCollection;
     this.homeModel = this.model.minibarHomeModel;
     this.searchModel = this.model.minibarSearchModel;
     this.peopleModel = this.model.minibarPeopleModel;

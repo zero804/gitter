@@ -30,14 +30,16 @@
             </div>
           </li>
 
-          <li data-state-change="org"
-              id="minibar-temp"
-              class="room-menu-options__item--org {{#if troupeContext.snapshots.leftMenu.tempOrg.length}}active{{else}}hidden{{/if}}">
-              <div>
-                {{#each troupeContext.snapshots.leftMenu.tempOrg}}
-                    {{{ prerenderView "js/views/menu/room/minibar/minibar-item-view" }}}
-                {{/each}}
-              </div>
+          <li>
+            <ul id="minibar-temp" class="minibar-collection-list">
+              {{#each troupeContext.snapshots.leftMenu.tempOrg}}
+                <li data-state-change="org"
+                    id="minibar-{{name}}"
+                    class="room-menu-options__item--org {{#if troupeContext.snapshots.leftMenu.tempOrg.length}}active{{else}}hidden{{/if}}">
+                          {{{ prerenderView "js/views/menu/room/minibar/minibar-item-view" }}}
+                </li>
+              {{/each}}
+            </ul>
           </li>
 
           <li id="minibar-collection">

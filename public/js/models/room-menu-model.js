@@ -109,7 +109,7 @@ module.exports = Backbone.Model.extend({
       this.minibarSearchModel = new MinibarItemModel({ name: 'search', type: 'search', active: (state === 'search') });
       this.minibarPeopleModel = new MinibarPeopleModel({ active: (state === 'people')}, { roomCollection: this._roomCollection });
       this.minibarCloseModel = new MinibarItemModel({ name: 'close', type: 'close' });
-      this.minibarTempOrgModel = new MinibarTempOrgModel(attrs.tempOrg[0]);
+      this.minibarTempOrgModel = new MinibarTempOrgModel(attrs.tempOrg[0], { troupe: context.troupe(), });
 
     var minibarModels = orgsSnapshot.map(function(model){
       return _.extend({}, model, { active: (state === 'org' && model.name === selectedOrg) });
