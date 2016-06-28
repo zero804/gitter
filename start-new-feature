@@ -4,7 +4,7 @@ set -e
 set -u
 set -o pipefail
 
-if ! which hub; then
+if ! (which hub > /dev/null); then
   >&2 echo "Please install `hub` using `brew install hub`"
   exit 1
 fi
@@ -18,8 +18,14 @@ git push -v --set-upstream origin "refs/heads/feature/${FEATURE_NAME}:refs/heads
 PR_URL=$(hub pull-request -m "${FEATURE_NAME}" -b develop)
 PR_NUMBER=${PR_URL#https://github.com/troupe/gitter-webapp/pull/}
 
-cat <<EOD | git notes append --stdin HEAD
+NOTES_FILE=$(mktemp)
+cat <<EOD > ${NOTES_FILE}
 pull_request_number=${PR_NUMBER}
 pull_request_url=${PR_URL}
 EOD
+
+git notes append -f "${NOTES_FILE}" HEAD
+
+rm "${NOTES_FILE}"
+
 open "${PR_URL}"
