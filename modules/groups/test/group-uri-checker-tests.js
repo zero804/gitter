@@ -48,13 +48,6 @@ describe('group-uri-checker #slow', function() {
       });
   });
 
-  it('should not allow creation if a troupe with that uri exists', function() {
-    return groupUriChecker(fixture.user1, fixture.troupe1.uri)
-      .then(function(info) {
-        assert.strictEqual(info.allowCreate, false);
-      });
-  });
-
   it('should allow creation if a gh org with that login exists and the user has admin access', function() {
     return groupUriChecker(fixture.user1, fixtureLoader.GITTER_INTEGRATION_ORG)
       .then(function(info) {
