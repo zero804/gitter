@@ -5,6 +5,7 @@ var StatusError = require('statuserror');
 var identityService = require('gitter-web-identity');
 var restSerializer = require("../../../serializers/rest-serializer");
 var loadTroupeFromParam = require('./load-troupe-param');
+var avatars = require('gitter-web-avatars');
 
 /**
  * Hide the resolved email address from the caller
@@ -76,6 +77,18 @@ function parseAndValidateBody(body) {
   }
 }
 
+function getAvatar(input, resolvedEmailAddress) {
+  if (input.type === identityService.GITHUB_IDENTITY_PROVIDER) {
+    return avatars.getForGitHubUsername(input.externalId);
+  }
+
+  if (resolvedEmailAddress) {
+    return avatars.getForGravatarEmail(resolvedEmailAddress);
+  }
+
+  return avatars.getDefault();
+}
+
 module.exports = {
   id: 'roomInvite',
 
@@ -88,6 +101,8 @@ module.exports = {
         return roomWithPolicyService.createRoomInvitation(input.type, input.externalId, input.emailAddress);
       })
       .then(function(result) {
+        var avatarUrl = getAvatar(input, result.emailAddress);
+
         if (!input.emailAddress && result.emailAddress) {
           result.emailAddress = maskEmail(result.emailAddress);
         }
@@ -95,7 +110,8 @@ module.exports = {
         if (!result.user) {
           return {
             status: result.status,
-            email: result.emailAddress
+            email: result.emailAddress,
+            avatarUrl: avatarUrl
           }
         }
 
@@ -105,7 +121,8 @@ module.exports = {
             return {
               status: result.status,
               email: result.emailAddress,
-              user: serializedUser
+              user: serializedUser,
+              avatarUrl: avatarUrl
             }
           });
       })
