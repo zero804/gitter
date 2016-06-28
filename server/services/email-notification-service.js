@@ -63,7 +63,9 @@ function sendInvite(invitingUser, invite, room, template, eventName) {
 
   var senderName = (invitingUser.displayName || invitingUser.username);
   var date = moment(mongoUtils.getTimestampFromObjectId(invite._id)).format('Do MMMM YYYY');
-  var inviteUrl = config.get("email:emailBasePath") + '/settings/accept-invite/' + invite.secret;
+  var emailBasePath = config.get("email:emailBasePath");
+  var inviteUrl = emailBasePath + '/settings/accept-invite/' + invite.secret;
+  var roomUrl = emailBasePath + '/' + room.uri;
 
   return mailerService.sendEmail({
     templateFile:   template,
@@ -78,7 +80,8 @@ function sendInvite(invitingUser, invite, room, template, eventName) {
     data: {
       date: date,
       roomUri: room.uri,
-      roomUrl: inviteUrl,
+      roomUrl: roomUrl,
+      inviteUrl: inviteUrl,
       senderName: senderName
     }
   });
@@ -154,11 +157,11 @@ module.exports = {
   }),
 
   sendInvitation: function(invitingUser, invite, room) {
-    return sendInvite(invitingUser, invite, room, 'invitation', 'invitation_sent');
+    return sendInvite(invitingUser, invite, room, 'invitation-v2', 'invitation_sent');
   },
 
   sendInvitationReminder: Promise.method(function(invitedByUser, invite, room) {
-    return sendInvite(invitedByUser, invite, room, 'invitation-reminder', 'invitation_reminder_sent');
+    return sendInvite(invitedByUser, invite, room, 'invitation-reminder-v2', 'invitation_reminder_sent');
   }),
 
   /**
