@@ -15,15 +15,16 @@ realtimePresenceTracking.track();
 function send(value) {
   if (localStore.get('gitterNoEyeballSignals')) return;
 
-  if(!realtime.getClientId()) {
-    return;
-  }
-
   if(!context.getTroupeId()) {
     return;
   }
 
   var clientId = realtime.getClientId();
+
+  if(!clientId) {
+    return;
+  }
+
   apiClient.post('/v1/eyeballs', {
       socketId: clientId,
       on: value
