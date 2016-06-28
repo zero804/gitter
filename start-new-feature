@@ -19,7 +19,7 @@ git push -v --set-upstream origin "refs/heads/feature/${FEATURE_NAME}:refs/heads
 PR_URL=$(hub pull-request -m "${FEATURE_NAME}" -b develop)
 PR_NUMBER=${PR_URL#https://github.com/troupe/gitter-webapp/pull/}
 
-git notes --ref=pull_request_number add --file "${PR_NUMBER}" HEAD
+git notes --ref=pull_request_number add -m "${PR_NUMBER}" HEAD
 
 git push origin refs/notes/pull_request_number
 
