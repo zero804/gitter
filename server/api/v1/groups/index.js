@@ -40,27 +40,24 @@ module.exports = {
     }
 
     var group;
-    var userGroupPolicy;
 
     return groupService.createGroup(user, groupOptions)
       .then(function(_group) {
         group = _group
-
-        return policyFactory.createPolicyForGroupId(req.user, group._id)
-          .then(function(policy) {
-            userGroupPolicy = policy;
-          });
+        return policyFactory.createPolicyForGroupId(req.user, group._id);
       })
-      .then(function() {
+      .then(function(userGroupPolicy) {
         var groupWithPolicyService = new GroupWithPolicyService(group, req.user, userGroupPolicy);
 
         var defaultRoomName = req.body.defaultRoomName || 'Lobby';
-        var roomOptions = { name: defaultRoomName, security: 'PUBLIC' };
-        if (req.body.security) {
-          // use the same security for the default room
-          roomOptions.type = req.body.security.type;
-          roomOptions.linkPath = req.body.security.linkPath;
-        }
+        var roomOptions = {
+          name: defaultRoomName,
+          // default rooms are always public
+          security: 'PUBLIC',
+          // use the same backing object for the default room
+          type: group.sd.type,
+          linkPath: group.sd.linkPath
+        };
 
         return groupWithPolicyService.createRoom(roomOptions);
       })
