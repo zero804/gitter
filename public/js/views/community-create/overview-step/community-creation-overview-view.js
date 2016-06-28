@@ -7,7 +7,6 @@ var VirtualMultipleCollection = require('../virtual-multiple-collection');
 var stepConstants = require('../step-constants');
 var template = require('./community-creation-overview-view.hbs');
 var CommunityCreateBaseStepView = require('../shared/community-creation-base-step-view');
-var CommunityCreationSubRoomListView = require('../shared/community-creation-sub-room-list-view');
 var CommunityCreationPeopleListView = require('../shared/community-creation-people-list-view');
 
 require('gitter-styleguide/css/components/headings.css');
@@ -21,17 +20,8 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   behaviors: {
     Isomorphic: {
-      //subRoomListView: { el: '.community-create-sub-room-list-root', init: 'initSubRoomListView' },
       inviteListView: { el: '.community-create-overview-invite-list-root', init: 'initInviteListView' }
     },
-  },
-
-  initSubRoomListView: function(optionsForRegion) {
-    this.subRoomListView = new CommunityCreationSubRoomListView(optionsForRegion({
-      collection: this.communityCreateModel.get('subRooms'),
-      communityCreateModel: this.communityCreateModel
-    }));
-    return this.subRoomListView;
   },
 
   initInviteListView: function(optionsForRegion) {
