@@ -1,5 +1,6 @@
 "use strict";
 
+var Promise = require('bluebird');
 var restful = require("../../../services/restful");
 var StatusError = require('statuserror');
 var groupService = require('gitter-web-groups/lib/group-service');
@@ -62,15 +63,22 @@ module.exports = {
         return groupWithPolicyService.createRoom(roomOptions);
       })
       .then(function(room) {
-        // serialize the room and include the group
-        var strategy = new restSerializer.TroupeStrategy({
+        var groupStrategy = new restSerializer.GroupStrategy();
+        var troupeStrategy = new restSerializer.TroupeStrategy({
           currentUserId: req.user.id,
           includeTags: true,
           includePermissions: true,
-          includeProviders: true,
-          includeGroups: true
+          includeProviders: true
         });
-        return restSerializer.serializeObject(room, strategy);
+
+        return Promise.join(
+            restSerializer.serializeObject(group, groupStrategy),
+            restSerializer.serializeObject(room, troupeStrategy),
+            function(serializedGroup, serializedRoom) {
+              serializedGroup.defaultRoom = serializedRoom;
+              return serializedGroup;
+            }
+          );
       });
   },
 

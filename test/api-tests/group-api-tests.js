@@ -71,9 +71,9 @@ describe('group-api', function() {
       .set('x-access-token', fixture.user1.accessToken)
       .expect(200)
       .then(function(result) {
-        var room = result.body;
-        assert.strictEqual(room.uri, fixtureLoader.GITTER_INTEGRATION_COMMUNITY + '/Lobby');
-        assert.strictEqual(room.group.uri, fixtureLoader.GITTER_INTEGRATION_COMMUNITY);
+        var group = result.body;
+        assert.strictEqual(group.uri, fixtureLoader.GITTER_INTEGRATION_COMMUNITY);
+        assert.strictEqual(group.defaultRoom.uri, fixtureLoader.GITTER_INTEGRATION_COMMUNITY + '/Lobby');
       });
   });
 
@@ -91,9 +91,9 @@ describe('group-api', function() {
       .set('x-access-token', fixture.user1.accessToken)
       .expect(200)
       .then(function(result) {
-        var room = result.body;
-        assert.strictEqual(room.uri, fixtureLoader.GITTER_INTEGRATION_ORG + '/Lobby');
-        assert.strictEqual(room.group.uri, fixtureLoader.GITTER_INTEGRATION_ORG);
+        var group = result.body;
+        assert.strictEqual(group.uri, fixtureLoader.GITTER_INTEGRATION_ORG);
+        assert.strictEqual(group.defaultRoom.uri, fixtureLoader.GITTER_INTEGRATION_ORG + '/Lobby');
       });
   });
 
