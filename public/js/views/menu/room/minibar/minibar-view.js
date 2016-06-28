@@ -120,7 +120,7 @@ var MinibarView = Marionette.CollectionView.extend({
     model.set({ active: true, focus: true });
 
     // Send off some stats
-    appEvents.trigger('stats.event', 'minibar.activated', model.get('type'));
+    appEvents.trigger('stats.event', 'minibar.activated.' + model.get('type'));
 
     var state = model.get('type');
     // close-passthrough
