@@ -3,7 +3,8 @@
 var env = require('gitter-web-env');
 var winston = env.logger;
 var errorReporter = env.errorReporter;
-var stats = env.stats;
+var nconf = env.config;
+var statsd = env.createStatsClient({ prefix: nconf.get('stats:statsd:prefix')});
 var Promise = require('bluebird');
 var contextGenerator = require('../../web/context-generator');
 var restful = require('../../services/restful');
@@ -103,10 +104,11 @@ function renderMainFrame(req, res, next, frame) {
       }
 
       if(snapshots && snapshots.leftMenu && snapshots.leftMenu.state) {
-        stats.event('left-menu-init-state', {
-          state: snapshots.leftMenu.state,
-          isPinned: snapshots.leftMenu.roomMenuIsPinned
-        });
+        // `gitter.web.prerender-left-menu`
+        statsd.increment('prerender-left-menu', 1, 0.25, [
+          'state:' + snapshots.leftMenu.state,
+          'pinned:' + (snapshots.leftMenu.roomMenuIsPinned ? '1' : '0')
+        ]);
       }
 
 
