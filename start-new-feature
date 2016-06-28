@@ -11,6 +11,7 @@ fi
 
 FEATURE_NAME=$1
 git fetch origin
+git fetch origin refs/notes/*:refs/notes/*
 git flow feature start "${FEATURE_NAME}"
 git commit --allow-empty -m ":tada: Start of feature ${FEATURE_NAME}" --no-verify
 git push -v --set-upstream origin "refs/heads/feature/${FEATURE_NAME}:refs/heads/feature/${FEATURE_NAME}"
@@ -18,14 +19,8 @@ git push -v --set-upstream origin "refs/heads/feature/${FEATURE_NAME}:refs/heads
 PR_URL=$(hub pull-request -m "${FEATURE_NAME}" -b develop)
 PR_NUMBER=${PR_URL#https://github.com/troupe/gitter-webapp/pull/}
 
-NOTES_FILE=$(mktemp)
-cat <<EOD > ${NOTES_FILE}
-pull_request_number=${PR_NUMBER}
-pull_request_url=${PR_URL}
-EOD
+git notes --ref=pull_request_number add --file "${PR_NUMBER}" HEAD
 
-git notes append -f "${NOTES_FILE}" HEAD
-
-rm "${NOTES_FILE}"
+git push origin refs/notes/pull_request_number
 
 open "${PR_URL}"
