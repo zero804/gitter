@@ -5,8 +5,10 @@ var parseRoomsIntoLeftMenuRoomList = require('gitter-web-shared/rooms/left-menu-
 var parseRoomsIntoLeftMenuFavouriteRoomList = require('gitter-web-shared/rooms/left-menu-room-favourite-list');
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
+var suggestedOrgsFromRoomList = require('gitter-web-shared/orgs/suggested-orgs-from-room-list');
+var mapGroupsForRenderer = require('../map-groups-for-renderer');
 
-module.exports = function getMainFrameSnapshots(req, troupeContext, rooms) {
+module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, groups) {
   var hasNewLeftMenu = !req.isPhone && req.fflip && req.fflip.has('left-menu');
   var hasGroups = req.fflip && req.fflip.has('groups');
   var currentRoom = (req.troupe || {});
@@ -36,10 +38,18 @@ module.exports = function getMainFrameSnapshots(req, troupeContext, rooms) {
 
   //Orgs
   //------------------------------------------------------
+  if(hasGroups) {
+    groups = mapGroupsForRenderer(groups);
+  }
+  else {
+    groups = suggestedOrgsFromRoomList(rooms, uri, currentRoom.id, currentRoom);
+  }
+
 
   return {
     leftMenu: _.extend({}, lastLeftMenuSnapshot, { state: menuState, tempOrg: tempOrg }),
     rooms: parseRoomsIntoLeftMenuRoomList(menuState, rooms, selectedOrgName),
     favourites: parseRoomsIntoLeftMenuFavouriteRoomList(menuState, rooms, selectedOrgName),
+    groups: groups,
   };
 };
