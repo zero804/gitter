@@ -4,6 +4,26 @@ var path = require('path');
 var glob = require('glob');
 var ProgressBarPlugin = require('progress-bar-webpack-plugin');
 
+
+var opts = require('yargs')
+  .option('no-cover', {
+    default: false,
+    description: 'Age in minutes of the unread items'
+  })
+  .help('help')
+  .alias('help', 'h')
+  .argv;
+
+
+var preLoaders = [];
+if(!opts['no-cover']) {
+  preLoaders.push({
+    test: /\.js$/,
+    exclude: /(test|node_modules|repo)/,
+    loader: 'istanbul-instrumenter',
+  });
+}
+
 module.exports = {
   entry: glob.sync(path.resolve(__dirname, './specs/**/*-test.js')),
   output: {
@@ -14,13 +34,7 @@ module.exports = {
 
   devtool: 'inline-source-map',
   module: {
-    preLoaders: [
-      {
-        test: /\.js$/,
-        exclude: /(test|node_modules|repo)/,
-        loader: 'istanbul-instrumenter',
-      },
-    ],
+    preLoaders: preLoaders,
     loaders: [
       {
         test: /\.hbs$/,

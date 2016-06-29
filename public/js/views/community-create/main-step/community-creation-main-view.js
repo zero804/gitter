@@ -62,17 +62,19 @@ module.exports = CommunityCreateBaseStepView.extend({
     this.orgCollection = options.orgCollection;
     this.repoCollection = options.repoCollection;
 
+
+    var user = context.getUser();
+    this.hasGitHubProvider = user && user.providers && user.providers.some(function(provider) {
+      return provider === 'github';
+    });
+
     this.listenTo(this.communityCreateModel, 'change:communityName change:communitySlug', this.updateCommunityFields, this);
   },
 
 
   serializeData: function() {
     var data = this.model.toJSON();
-    var user = context.getUser();
-    var hasGitHubProvider = user.providers.some(function(provider) {
-      return provider === 'github';
-    });
-    data.hasGitHubProvider = hasGitHubProvider;
+    data.hasGitHubProvider = this.hasGitHubProvider;
 
     return data;
   },
@@ -120,11 +122,13 @@ module.exports = CommunityCreateBaseStepView.extend({
     updateElementValueAndMaintatinSelection(this.ui.communityNameInput[0], communityName);
     updateElementValueAndMaintatinSelection(this.ui.communitySlugInput[0], communitySlug);
 
-    var githubProjectInfo = this.communityCreateModel.getGithubProjectInfo(this.orgCollection, this.repoCollection);
-    this.ui.associatedProjectName[0].textContent = githubProjectInfo.name;
-    this.ui.associatedProjectLink[0].setAttribute('href', githubProjectInfo.url);
-    toggleClass(this.ui.addAssociatedProjectCopy[0], 'active', !githubProjectInfo.name);
-    toggleClass(this.ui.hasAssociatedProjectCopy[0], 'active', !!githubProjectInfo.name);
+    if(this.hasGitHubProvider) {
+      var githubProjectInfo = this.communityCreateModel.getGithubProjectInfo(this.orgCollection, this.repoCollection);
+      this.ui.associatedProjectName[0].textContent = githubProjectInfo.name;
+      this.ui.associatedProjectLink[0].setAttribute('href', githubProjectInfo.url);
+      toggleClass(this.ui.addAssociatedProjectCopy[0], 'active', !githubProjectInfo.name);
+      toggleClass(this.ui.hasAssociatedProjectCopy[0], 'active', !!githubProjectInfo.name);
+    }
   },
 
   onCommunityNameInputChange: function() {
