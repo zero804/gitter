@@ -158,11 +158,14 @@ var graphRooms = Promise.method(function(options) {
       // (The siblingRooms step might just add them back in anyway which is why
       //  this is not a standard step in filterRooms())
       var orgTotals = {};
+
       _.remove(suggestedRooms, function(room) {
-        if (orgTotals[room.lcOwner] === undefined) {
-          orgTotals[room.lcOwner] = 0;
+        if (orgTotals[room.lcOwner]) {
+          orgTotals[room.lcOwner] += 1;
+        } else {
+          orgTotals[room.lcOwner] = 1;
         }
-        orgTotals[room.lcOwner] += 1;
+
         return (orgTotals[room.lcOwner] > MAX_SUGGESTIONS_PER_ORG);
       });
 
@@ -191,7 +194,8 @@ var siblingRooms = Promise.method(function(options) {
 
   var orgNames = _.uniq(_.pluck(existingRooms, 'lcOwner'));
   return Promise.all(_.map(orgNames, function(orgName) {
-      return troupeService.findChildRoomsForOrg(orgName, {security: 'PUBLIC'});
+      // Hey, lets send 50 queries to mongo!
+      return troupeService.findChildRoomsForOrg(orgName, { security: 'PUBLIC' });
     }))
     .then(function(arrays) {
       var suggestedRooms = Array.prototype.concat.apply([], arrays);
@@ -215,14 +219,14 @@ function hilightedRooms(options) {
     return (roomLang === 'en' || roomLang === language);
   });
 
-  return Promise.all(_.map(filtered, function(roomInfo) {
-      return troupeService.findByUri(roomInfo.uri);
-    }))
+  var uris = _.map(filtered, function(highlighted) {
+    return highlighted.uri;
+  });
+
+  return troupeService.findByUris(uris)
     .then(function(suggestedRooms) {
-      if (suggestedRooms.length) {
-        if (debug.enabled) {
-          debug("hilightedRooms", _.pluck(suggestedRooms, "uri"));
-        }
+      if (debug.enabled) {
+        debug("hilightedRooms", _.pluck(suggestedRooms, "uri"));
       }
 
       return suggestedRooms;
