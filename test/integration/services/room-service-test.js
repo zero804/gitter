@@ -536,7 +536,10 @@ describe('room-service', function() {
       var troupe = {
         _id: _troupId,
         id: _troupId.toString(),
-        uri: 'user/room'
+        uri: 'user/room',
+        sd: {
+          public: true
+        }
       };
 
       var user = {
@@ -568,7 +571,10 @@ describe('room-service', function() {
       var troupe = {
         _id: _troupId,
         id: _troupId.toString(),
-        uri: 'user/room'
+        uri: 'user/room',
+        sd: {
+          public: true
+        }
       };
 
       var user = {
@@ -599,7 +605,10 @@ describe('room-service', function() {
 
       var troupe = {
         _id: _troupId,
-        uri: 'user/room'
+        uri: 'user/room',
+        sd: {
+          public: true
+        }
       };
 
       var user = {
@@ -642,7 +651,10 @@ describe('room-service', function() {
 
       var troupe = {
         _id: _troupId,
-        uri: 'user/room'
+        uri: 'user/room',
+        sd: {
+          public: true
+        }
       };
 
       var user = {
@@ -703,7 +715,10 @@ describe('room-service', function() {
 
       var troupe = {
         _id: _troupId,
-        uri: 'user/room'
+        uri: 'user/room',
+        sd: {
+          public: true
+        }
       };
 
       var user = {
