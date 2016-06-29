@@ -171,7 +171,6 @@ module.exports = {
     'issues': require('./issues'),
     'users': require('./users'),
     'bans': require('./bans'),
-    'channels': require('./channels'),
     'chatMessages': require('./chat-messages'),
     'collaborators': require('./collaborators'),
     'suggestedRooms': require('./suggested-rooms'),

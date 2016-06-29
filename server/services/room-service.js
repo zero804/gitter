@@ -11,7 +11,6 @@ var assert = require('assert');
 var Promise = require('bluebird');
 var request = require('request');
 var _ = require('lodash');
-var validateRoomName = require('gitter-web-validators/lib/validate-room-name');
 var persistence = require('gitter-web-persistence');
 var uriLookupService = require("./uri-lookup-service");
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
@@ -23,7 +22,6 @@ var troupeService = require('./troupe-service');
 var oneToOneRoomService = require('./one-to-one-room-service');
 var userDefaultFlagsService = require('./user-default-flags-service');
 var validateUri = require('gitter-web-github').GitHubUriValidator;
-var GitHubRepoService = require('gitter-web-github').GitHubRepoService;
 var validate = require('../utils/validate');
 var collections = require('../utils/collections');
 var StatusError = require('statuserror');
@@ -46,7 +44,6 @@ var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-trou
 var userScopes = require('gitter-web-identity/lib/user-scopes');
 var groupService = require('gitter-web-groups/lib/group-service');
 var securityDescriptorGenerator = require('gitter-web-permissions/lib/security-descriptor-generator');
-var legacyMigration = require('gitter-web-permissions/lib/legacy-migration');
 
 var splitsvilleEnabled = nconf.get("project-splitsville:enabled");
 
@@ -667,234 +664,6 @@ function findUsersChannelRoom(user, childTroupeId, callback) {
     .nodeify(callback);
 }
 
-function assertValidName(name) {
-  if (!validateRoomName(name)) {
-    var err = new StatusError(400);
-    err.clientDetail = {
-      illegalName: true
-    };
-    throw err;
-  }
-}
-
-var RANGE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefgihjklmnopqrstuvwxyz01234567890';
-function generateRandomName() {
-  var s = '';
-  for(var i = 0; i < 6; i++) {
-    s += RANGE.charAt(Math.floor(Math.random() * RANGE.length));
-  }
-  return s;
-}
-
-function notValidGithubRepoName(repoName) {
-  return (/^[\w\-]{1,}$/).test(repoName);
-}
-
-var ensureNoRepoNameClash = Promise.method(function (user, uri) {
-  var parts = uri.split('/');
-
-  if(parts.length < 2) {
-    /* The classic "this should never happen" gag */
-    throw new StatusError(400, "Bad channel uri");
-  }
-
-  if(parts.length === 2) {
-    /* If the name is non-valid in github land, it's safe to use it here */
-    if(!notValidGithubRepoName(parts[1])) {
-      return false;
-    }
-
-    var repoService = new GitHubRepoService(user);
-    return repoService.getRepo(uri)
-      .then(function(repo) {
-        /* Result? Then we have a clash */
-        return !!repo;
-      });
-  }
-
-  // Cant clash with /x/y/z
-  return false;
-});
-
-function ensureNoExistingChannelNameClash(uri) {
-  return troupeService.findByUri(uri)
-    .then(function(troupe) {
-      return !!troupe;
-    });
-}
-
-function createRoomChannel(parentTroupe, user, options) {
-  validate.expect(user, 'user is expected');
-  validate.expect(options, 'options is expected');
-
-  var name = options.name;
-  var security = options.security;
-  var uri, githubType;
-
-  assertValidName(name);
-  uri = parentTroupe.uri + '/' + name;
-
-  switch(parentTroupe.githubType) {
-    case 'ORG':
-      githubType = 'ORG_CHANNEL';
-      break;
-    case 'REPO':
-      githubType = 'REPO_CHANNEL';
-      break;
-    default:
-      validate.fail('Invalid parent room type');
-  }
-
-  switch(security) {
-    case 'PUBLIC':
-    case 'PRIVATE':
-    case 'INHERITED':
-      break;
-    default:
-      validate.fail('Invalid security option: ' + security);
-  }
-
-  return Promise.try(function() {
-      if (parentTroupe.groupId) return parentTroupe.groupId;
-
-      // The parent troupe does not have a groupId, but it should
-      // so, create the group add the parent to the group and
-      // the user the same groupId in the creation of this room
-      return groupService.migration.ensureGroupForRoom(parentTroupe, user)
-        .then(function(group) {
-          return group && group._id;
-        });
-    })
-    .then(function(groupId) {
-      return createChannel(user, parentTroupe, {
-        uri: uri,
-        security: options.security,
-        githubType: githubType,
-        groupId: groupId
-      });
-    })
-}
-
-/**
- * Create a channel under a user
- */
-function createUserChannel(user, options) {
-  validate.expect(user, 'user is expected');
-  validate.expect(options, 'options is expected');
-
-  var name = options.name;
-  var security = options.security;
-
-  // Create a child room for a user
-  switch(security) {
-    case 'PUBLIC':
-      assertValidName(name);
-      break;
-
-    case 'PRIVATE':
-      if(name) {
-        /* If you cannot afford a name, one will be assigned to you */
-        assertValidName(name);
-      } else {
-        name = generateRandomName();
-      }
-      break;
-
-    default:
-      validate.fail('Invalid security option: ' + security);
-  }
-
-  return groupService.migration.ensureGroupForUser(user)
-    .then(function(group) {
-      var groupId = group && group._id;
-      var uri = user.username + '/' + name;
-
-      return createChannel(user, null, {
-        uri: uri,
-        security: options.security,
-        githubType: 'USER_CHANNEL',
-        groupId: groupId
-      });
-    })
-}
-
-/**
- * @private
- */
-function createChannel(user, parentRoom, options) {
-  var uri = options.uri;
-  var githubType = options.githubType;
-  var lcUri = uri.toLowerCase();
-  var lcOwner = lcUri.split('/')[0];
-  var security = options.security;
-  var groupId = options.groupId;
-
-  // TODO: Add group support in here....
-  return ensureNoRepoNameClash(user, uri)
-    .then(function(clash) {
-      if(clash) throw new StatusError(409, 'There is a repo at ' + uri + ' therefore you cannot create a channel there');
-      return ensureNoExistingChannelNameClash(uri);
-    })
-    .then(function(clash) {
-      if(clash) throw new StatusError(409, 'There is already a channel at ' + uri);
-
-      var sd = legacyMigration.generateForNewChannel(user, parentRoom, {
-        githubType: githubType,
-        security: security,
-        uri: uri
-      });
-
-      return mongooseUtils.upsert(persistence.Troupe,
-        { lcUri: lcUri, githubType: githubType },
-        {
-          $setOnInsert: {
-            lcUri: lcUri,
-            lcOwner: lcOwner,
-            groupId: groupId,
-            uri: uri,
-            security: security,
-            parentId: parentRoom ? parentRoom._id : undefined,
-            ownerUserId: parentRoom ? undefined: user._id,
-            githubType: githubType,
-            userCount: 0,
-            sd: sd
-          }
-        })
-        .spread(function(newRoom, updatedExisting) {
-          if (updatedExisting) {
-            /* Somehow someone beat us to it */
-            throw new StatusError(409);
-          }
-
-          return newRoom;
-        })
-        .tap(function(newRoom) {
-          if (!user) return;
-
-          var flags = userDefaultFlagsService.getDefaultFlagsForUser(user);
-
-          return roomMembershipService.addRoomMember(newRoom._id, user._id, flags);
-        })
-        .tap(function(newRoom) {
-          // Send the created room notification
-          emailNotificationService.createdRoomNotification(user, newRoom) // send an email to the room's owner
-            .catch(function(err) {
-              logger.error('Unable to send create room notification: ' + err, { exception: err });
-            });
-
-          sendJoinStats(user, newRoom, options.tracking); // now the channel has now been created, send join stats for owner joining
-
-          stats.event("create_room", {
-            userId: user.id,
-            roomType: "channel"
-          });
-
-          return uriLookupService.reserveUriForTroupeId(newRoom._id, uri);
-        });
-    });
-
-}
-
 /**
  * notifyInvitedUser() informs an invited user
  *
@@ -1335,26 +1104,21 @@ function upsertGroupRoom(user, group, roomInfo, securityDescriptor, options) {
   // convert back to the old github-tied vars here
   var type = securityDescriptor.type || null;
 
-  var githubType;
   var roomType;
   switch (type) {
     case 'GH_ORG':
-      githubType = 'ORG';
       roomType = 'github-room';
       break
 
     case 'GH_REPO':
-      githubType = 'REPO';
       roomType = 'github-room';
       break
 
     case 'GH_USER':
-      githubType = 'USER';
       roomType = 'github-room';
       break
 
     case null:
-      githubType = 'NONE';
       roomType = 'group-room'; // or channel?
       break;
 
@@ -1408,8 +1172,6 @@ module.exports = {
   findAllRoomsIdsForUserIncludingMentions: findAllRoomsIdsForUserIncludingMentions,
   createRoomForGitHubUri: Promise.method(createRoomForGitHubUri),
   createRoomByUri: createRoomByUri,
-  createRoomChannel: Promise.method(createRoomChannel),
-  createUserChannel: Promise.method(createUserChannel),
   findAllChannelsForRoomId: findAllChannelsForRoomId,
   findChildChannelRoom: findChildChannelRoom,
   findAllChannelsForUser: findAllChannelsForUser,
@@ -1429,5 +1191,5 @@ module.exports = {
   upsertGroupRoom: upsertGroupRoom,
   testOnly: {
     updateUserDateAdded: updateUserDateAdded
-}
+  }
 };
