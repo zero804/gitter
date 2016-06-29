@@ -14,6 +14,7 @@ var ProfileMenuView = require('../profile/profile-menu-view');
 var FilteredFavouriteRoomCollection = require('../../../../collections/filtered-favourite-room-collection.js');
 var SearchInputView = require('views/menu/room/search-input/search-input-view');
 var favouriteCollectionFilter = require('gitter-web-shared/filters/left-menu-primary-favourite');
+var NeverEndingStory = require('utils/never-ending-story');
 
 require('views/behaviors/isomorphic');
 
@@ -131,6 +132,7 @@ var PanelView = Marionette.LayoutView.extend({
     this.keyboardControllerView = attrs.keyboardControllerView;
     this.listenTo(this.bus, 'ui:swipeleft', this.onSwipeLeft, this);
     this.listenTo(this.bus, 'focus.request.chat', this.onSearchItemSelected, this);
+    this.listenTo(this.model, 'change:state', this.onModelChangeState, this);
     this.$el.find('#search-results').show();
   },
 
@@ -178,8 +180,25 @@ var PanelView = Marionette.LayoutView.extend({
     this.ui.profileMenu[0].setAttribute('aria-hidden', !val);
   },
 
+  onModelChangeState: function (){
+    if(!this.scroll) { return; }
+    var state = this.model.get('state');
+    if(state !== 'search') { return this.scroll.disable(); }
+    return this.scroll.enable();
+  },
+
+  scrollBottom: _.debounce(function (){
+    this.model.set('isFetchingMoreSearchMessageResults', true);
+  }, 100),
+
   onRender: function() {
     this.ui.profileMenu[0].setAttribute('aria-hidden', !this.profileMenuOpenState);
+    if(!this.scroll) {
+      this.scroll = new NeverEndingStory(this.$el.find('.nano-content')[0]);
+      this.listenTo(this.scroll, 'approaching.bottom', this.scrollBottom, this);
+      this.scroll.disable();
+      this.onModelChangeState();
+    }
   },
 
   onDestroy: function() {
