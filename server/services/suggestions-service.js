@@ -268,23 +268,19 @@ var recommenders = [
   // doubtful about the potential network effect here.
   //ownedRepoRooms,
   //watchedRepoRooms,
-
   starredRepoRooms,
   graphRooms,
   siblingRooms,
   hilightedRooms
 ];
 
-/*
-
-options can have the following and they are all optional
-* user
-* rooms (array)
-* language (defaults to 'en')
-
-The plugins can just skip themselves if options doesn't contain what they need.
-
-*/
+/**
+ * options can have the following and they are all optional
+ * - user
+ * - rooms (array)
+ * - language (defaults to 'en')
+ * The plugins can just skip themselves if options doesn't contain what they need.
+ */
 function findSuggestionsForRooms(options) {
   var existingRooms = options.rooms || [];
   var language = options.language || 'en';
@@ -298,7 +294,7 @@ function findSuggestionsForRooms(options) {
     return room.oneToOne !== true;
   });
 
-  var filterSuggestions = function(results) {
+  function filterSuggestions(results) {
     var filtered = filterRooms(results, existingRooms);
     // Add all the rooms we've found so far to the rooms used by subsequent
     // lookups. This means that a new github user that hasn't joined any rooms
@@ -309,11 +305,15 @@ function findSuggestionsForRooms(options) {
     // better than just serving hilighted rooms.
     options.rooms = existingRooms.concat(filtered);
     return filtered;
-  };
+  }
+
   return promiseUtils.waterfall(recommenders, [options], filterSuggestions, NUM_SUGGESTIONS);
 }
-exports.findSuggestionsForRooms = findSuggestionsForRooms;
 
+/**
+ * Returns rooms for a user
+ * @private
+ */
 function findRoomsByUserId(userId) {
   return roomMembershipService.findRoomIdsForUser(userId)
     .then(function(roomIds) {
@@ -326,9 +326,10 @@ function findRoomsByUserId(userId) {
     });
 }
 
-// cache by userId
-exports.findSuggestionsForUserId = cacheWrapper('findSuggestionsForUserId',
-  function(userId) {
+/**
+ * Find some suggestions for the current user
+ */
+function findSuggestionsForUserId(userId) {
     return Promise.all([
       userService.findById(userId),
       findRoomsByUserId(userId),
@@ -341,4 +342,12 @@ exports.findSuggestionsForUserId = cacheWrapper('findSuggestionsForUserId',
         language: language
       });
     })
-  });
+  }
+
+module.exports = {
+  findSuggestionsForUserId: cacheWrapper('findSuggestionsForUserId', findSuggestionsForUserId),
+  findSuggestionsForRooms: findSuggestionsForRooms,
+  testOnly: {
+    HIGHLIGHTED_ROOMS: HIGHLIGHTED_ROOMS
+  }
+};
