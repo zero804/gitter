@@ -9,7 +9,6 @@ var suggestedOrgsFromRoomList = require('gitter-web-shared/orgs/suggested-orgs-f
 var mapGroupsForRenderer = require('../map-groups-for-renderer');
 
 module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, groups) {
-  var hasNewLeftMenu = !req.isPhone && req.fflip && req.fflip.has('left-menu');
   var hasGroups = req.fflip && req.fflip.has('groups');
   var currentRoom = (req.troupe || {});
   var lastLeftMenuSnapshot = troupeContext.leftRoomMenuState;
