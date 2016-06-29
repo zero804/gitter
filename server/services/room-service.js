@@ -17,7 +17,7 @@ var uriLookupService = require("./uri-lookup-service");
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var githubPolicyFactory = require('gitter-web-permissions/lib/github-policy-factory');
 var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
-var canUserBeInvitedToJoinRoom = require('gitter-web-permissions/lib/invited-permissions-service');
+var addInvitePolicyFactory = require('gitter-web-permissions/lib/add-invite-policy-factory');
 var userService = require('./user-service');
 var troupeService = require('./troupe-service');
 var oneToOneRoomService = require('./one-to-one-room-service');
@@ -913,7 +913,7 @@ function createChannel(user, parentRoom, options) {
  *
  * returns        User - the invited user
  */
-function notifyInvitedUser(fromUser, invitedUser, room/*, isNewUser*/) {
+function notifyInvitedUser(fromUser, invitedUser, room) {
 
   // get the email address
   return emailAddressService(invitedUser, { attemptDiscovery: true })
@@ -999,41 +999,41 @@ function joinRoom(room, user, options) {
  * Caller needs to ensure that the instigatingUser can add
  * the user to the room
  */
-function addUserToRoom(room, instigatingUser, usernameToAdd) {
-  return canUserBeInvitedToJoinRoom(usernameToAdd, room, instigatingUser)
+function addUserToRoom(room, instigatingUser, userToAdd) {
+  assert(userToAdd && userToAdd.username, 'userToAdd required');
+  var usernameToAdd = userToAdd.username;
+
+  return addInvitePolicyFactory.createPolicyForRoomAdd(userToAdd, room)
+    .then(function(policy) {
+      return policy.canJoin();
+    })
     .then(function(canJoin) {
       if (!canJoin) throw new StatusError(403, usernameToAdd + ' does not have permission to join this room.');
-
-      return userService.findByUsername(usernameToAdd);
     })
-    .then(function (existingUser) {
-      return assertJoinRoomChecks(room, existingUser)
-        .then(function() {
-          var isNewUser = !existingUser;
-
-          return [existingUser || userService.createInvitedUser(usernameToAdd, instigatingUser, room._id), isNewUser];
-        });
+    .then(function () {
+      return assertJoinRoomChecks(room, userToAdd);
     })
-    .spread(function (addedUser, isNewUser) {
+    .then(function() {
       // We need to add the last access time before adding the member to the room
       // so that the serialized create that the user receives will contain
       // the last access time and not be hidden in the troupe list
-      return recentRoomService.saveLastVisitedTroupeforUserId(addedUser._id, room._id, { skipFayeUpdate: true })
-        .then(function() {
-          var flags = userDefaultFlagsService.getDefaultFlagsForUser(addedUser);
-          return roomMembershipService.addRoomMember(room._id, addedUser._id, flags, room.groupId);
-        })
-        .then(function(wasAdded) {
-          if (!wasAdded) return addedUser;
+      return recentRoomService.saveLastVisitedTroupeforUserId(userToAdd._id, room._id, { skipFayeUpdate: true });
+    })
+    .then(function() {
+      var flags = userDefaultFlagsService.getDefaultFlagsForUser(userToAdd);
+      return roomMembershipService.addRoomMember(room._id, userToAdd._id, flags, room.groupId);
+    })
+    .then(function(wasAdded) {
+      if (!wasAdded) return userToAdd;
 
-          return Promise.all([
-            notifyInvitedUser(instigatingUser, addedUser, room, isNewUser),
-            updateUserDateAdded(addedUser.id, room.id)
-          ])
-          .thenReturn(addedUser);
-        });
+      return Promise.all([
+        notifyInvitedUser(instigatingUser, userToAdd, room),
+        updateUserDateAdded(userToAdd.id, room.id)
+      ]);
+    })
+    .then(function() {
+      return userToAdd;
     });
-
 }
 
 

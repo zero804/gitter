@@ -4,6 +4,7 @@ var env = require('gitter-web-env');
 var nconf = env.config;
 var userService = require('../../services/user-service');
 var renderMainFrame = require('./main-frame');
+var fonts = require('../../web/fonts');
 
 /**
  * renderUserNotSignedUp() renders a set template for a 1:1 chat, with an invited user.
@@ -12,6 +13,8 @@ function renderUserNotSignedUp(req, res, next) {
   userService.findByUsername(req.params.roomPart1)
     .then(function (user) {
       res.render('chat-invited-template', {
+        hasCachedFonts: fonts.hasCachedFonts(req.cookies),
+        fonts: fonts.getFonts(),
         cssFileName: "styles/router-nli-chat.css", // TODO: this shouldn't be hardcoded as this
         agent: req.headers['user-agent'],
         oneToOneInvited: true,

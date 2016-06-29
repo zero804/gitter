@@ -91,11 +91,6 @@ router.post('/create-badge',
   identifyRoute('api-private-create-badge'),
   require('./create-badge-pr'));
 
-router.post('/invite-user',
-  authMiddleware,
-  identifyRoute('api-private-invite-user'),
-  require('./invite-user'));
-
 // TODO: this should go...
 router.get('/user-avatar/:username',
   identifyRoute('api-private-user-avatar'),

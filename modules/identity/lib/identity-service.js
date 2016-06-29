@@ -75,8 +75,6 @@ var findIdentityForUser = Promise.method(function(user, provider) {
     .exec();
 });
 
-/*
-*/
 /**
  * List all the identities for a user
 
@@ -130,8 +128,27 @@ var listProvidersForUser = Promise.method(function(user) {
     .exec();
 });
 
+
+/**
+ * Given a provider, eg "twitter" and a username on that provider
+ * attempts to find a user who has signed up those creds
+ */
+function findUserIdForProviderUsername(provider, username) {
+  return Identity.findOne({ provider: provider, username: username }, { userId: 1, _id: 0 })
+    .lean()
+    .then(function(result) {
+      return result && result.userId;
+    })
+}
+
 module.exports = {
   getIdentityForUser: getIdentityForUser,
   listForUser: listForUser,
-  listProvidersForUser: listProvidersForUser
+  listProvidersForUser: listProvidersForUser,
+  findUserIdForProviderUsername: findUserIdForProviderUsername,
+
+  GITHUB_IDENTITY_PROVIDER: 'github',
+  GOOGLE_IDENTITY_PROVIDER: 'google',
+  TWITTER_IDENTITY_PROVIDER: 'twitter',
+  LINKEDIN_IDENTITY_PROVIDER: 'linkedin',
 };

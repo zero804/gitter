@@ -66,4 +66,5 @@ module.exports = createExports({
   Subscription: require('./schemas/subscription-schema'),
   FeatureToggle: require('./schemas/feature-toggle-schema'),
   TroupeRemovedUser: require('./schemas/troupe-removed-user-schema'),
+  TroupeInvite: require('./schemas/troupe-invite-schema'),
 });

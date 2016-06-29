@@ -501,22 +501,15 @@ describe('room-service', function() {
   });
 
   describe('addUserToRoom', function() {
-    var userId;
-    beforeEach(function() {
-      userId = mongoUtils.getNewObjectIdString();
-    });
-
     function createRoomServiceWithStubs(stubs) {
       return testRequire.withProxies("./services/room-service", {
-        'gitter-web-permissions/lib/invited-permissions-service': function() {
-          return Promise.resolve(stubs.canBeInvited);
-        },
-        './user-service': {
-          createInvitedUser: function() {
-            return Promise.resolve(stubs.createInvitedUserResult);
-          },
-          findByUsername: function() {
-            return Promise.resolve(stubs.findByUsernameResult);
+        'gitter-web-permissions/lib/add-invite-policy-factory': {
+          createPolicyForRoomAdd: function() {
+            return Promise.resolve({
+                canJoin: function() {
+                  return Promise.resolve(stubs.canBeInvited);
+                }
+            });
           }
         },
         './email-notification-service': {
@@ -533,8 +526,6 @@ describe('room-service', function() {
 
     it('adds a user to the troupe', function() {
       var service = createRoomServiceWithStubs({
-        findByUsernameResult: { username: 'test-user', id: userId, _id: userId },
-        createInvitedUserResult: null,
         canBeInvited: true,
         onInviteEmail: function() {
           return Promise.resolve();
@@ -543,6 +534,7 @@ describe('room-service', function() {
 
       var _troupId = new ObjectID();
       var _userId = new ObjectID();
+      var _userToAddId = new ObjectID();
 
       var troupe = {
         _id: _troupId,
@@ -555,13 +547,17 @@ describe('room-service', function() {
         id: _userId.toString()
       };
 
-      return service.addUserToRoom(troupe, user, 'test-user');
+      var userToAdd = {
+        _id: _userToAddId,
+        id: _userToAddId.toString(),
+        username: 'test-user'
+      }
+
+      return service.addUserToRoom(troupe, user, userToAdd);
     });
 
     it('saves troupe changes', function() {
       var service = createRoomServiceWithStubs({
-        findByUsernameResult: { username: 'test-user', id: userId, _id: userId },
-        createInvitedUserResult: null,
         canBeInvited: true,
         onInviteEmail: function() {
           return Promise.resolve();
@@ -570,6 +566,7 @@ describe('room-service', function() {
 
       var _troupId = new ObjectID();
       var _userId = new ObjectID();
+      var _userToAddId = new ObjectID();
 
       var troupe = {
         _id: _troupId,
@@ -582,13 +579,17 @@ describe('room-service', function() {
         id: _userId.toString()
       };
 
-      return service.addUserToRoom(troupe, user, 'test-user');
+      var userToAdd = {
+        _id: _userToAddId,
+        id: _userToAddId.toString(),
+        username: 'test-user'
+      }
+
+      return service.addUserToRoom(troupe, user, userToAdd);
     });
 
     it('returns the added user and sets the date the user was added', function() {
       var service = createRoomServiceWithStubs({
-        findByUsernameResult: { username: 'test-user', id: userId, _id: userId },
-        createInvitedUserResult: null,
         canBeInvited: true,
         onInviteEmail: function() {
           return Promise.resolve();
@@ -597,6 +598,7 @@ describe('room-service', function() {
 
       var _troupId = new ObjectID();
       var _userId = new ObjectID();
+      var _userToAddId = new ObjectID();
 
       var troupe = {
         _id: _troupId,
@@ -608,9 +610,15 @@ describe('room-service', function() {
         id: _userId.toString()
       };
 
-      return service.addUserToRoom(troupe, user, 'test-user')
+      var userToAdd = {
+        _id: _userToAddId,
+        id: _userToAddId.toString(),
+        username: 'test-user'
+      }
+
+      return service.addUserToRoom(troupe, user, userToAdd)
         .then(function(user) {
-          assert.equal(user.id, userId);
+          assert.equal(user.id, _userToAddId);
           assert.equal(user.username, 'test-user');
 
           return persistence.UserTroupeLastAccess.findOne({ userId: user.id }).exec();
@@ -625,14 +633,6 @@ describe('room-service', function() {
 
     it('attempts an email invite for new users', function() {
       var service = createRoomServiceWithStubs({
-        findByUsernameResult: null,
-        createInvitedUserResult: {
-          username: 'test-user',
-          _id: userId,
-          id: userId,
-          state: 'INVITED',
-          emails: ['a@b.com']
-        },
         canBeInvited: true,
         onInviteEmail: function() {
           return Promise.resolve();
@@ -641,6 +641,7 @@ describe('room-service', function() {
 
       var _troupId = new ObjectID();
       var _userId = new ObjectID();
+      var _userToAddId = new ObjectID();
 
       var troupe = {
         _id: _troupId,
@@ -652,7 +653,13 @@ describe('room-service', function() {
         id: _userId.toString()
       };
 
-      return service.addUserToRoom(troupe, user, 'test-user');
+      var userToAdd = {
+        _id: _userToAddId,
+        id: _userToAddId.toString(),
+        username: 'test-user'
+      }
+
+      return service.addUserToRoom(troupe, user, userToAdd);
     });
 
     it('fails with 403 when adding someone to who cant be invited', function() {
@@ -665,11 +672,19 @@ describe('room-service', function() {
         }
       });
 
+      var _userToAddId = new ObjectID();
+
       var troupe = {
         uri: 'user/room'
       };
 
-      return service.addUserToRoom(troupe, {}, 'test-user')
+      var userToAdd = {
+        _id: _userToAddId,
+        id: _userToAddId.toString(),
+        username: 'test-user'
+      };
+
+      return service.addUserToRoom(troupe, {}, userToAdd)
         .then(function() {
           assert.ok(false, 'Expected exception');
         }, function(err) {
@@ -678,11 +693,7 @@ describe('room-service', function() {
     });
 
     it('should not fail when adding someone who is already in the room', function() {
-      var _inviteeUserId = new ObjectID();
-
       var service = createRoomServiceWithStubs({
-        findByUsernameResult: { username: 'test-user', id: _inviteeUserId, _id: _inviteeUserId },
-        createInvitedUserResult: null,
         canBeInvited: true,
         onInviteEmail: function() {
           return Promise.resolve();
@@ -691,6 +702,7 @@ describe('room-service', function() {
 
       var _troupId = new ObjectID();
       var _userId = new ObjectID();
+      var _userToAddId = new ObjectID();
 
       var troupe = {
         _id: _troupId,
@@ -702,11 +714,28 @@ describe('room-service', function() {
         id: _userId.toString()
       };
 
-      return service.addUserToRoom(troupe, user, 'test-user');
+      var userToAdd = {
+        _id: _userToAddId,
+        id: _userToAddId.toString(),
+        username: 'test-user'
+      };
+
+      return service.addUserToRoom(troupe, user, userToAdd);
     });
   });
 
   describe('channel creation #slow', function() {
+    function createMockAddInvitePolicyFactory(canBeInvited) {
+      return {
+        createPolicyForRoomAdd: function() {
+          return Promise.resolve({
+              canJoin: function() {
+                return Promise.resolve(canBeInvited);
+              }
+          });
+        }
+      }
+    }
 
     describe('org channels', function() {
 
@@ -737,7 +766,7 @@ describe('room-service', function() {
             return room;
           })
           .tap(function(room) {
-            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username);
+            return roomService.addUserToRoom(room, fixture.user1, fixture.user3);
           })
           .then(function(room) {
             return roomMembershipService.checkRoomMembership(room.id, fixture.user3.id);
@@ -761,9 +790,8 @@ describe('room-service', function() {
       });
 
       it('should create open rooms', function() {
-        var invitedPermissionsModelMock = mockito.mockFunction();
         var roomService = testRequire.withProxies("./services/room-service", {
-          'gitter-web-permissions/lib/invited-permissions-service': invitedPermissionsModelMock,
+          'gitter-web-permissions/lib/add-invite-policy-factory': createMockAddInvitePolicyFactory(true),
           'gitter-web-groups/lib/group-service': {
             migration: {
               ensureGroupForRoom: function(parentTroupe, user) {
@@ -789,15 +817,7 @@ describe('room-service', function() {
             return room;
           })
           .tap(function(room) {
-
-            mockito.when(invitedPermissionsModelMock)().then(function() {
-              return Promise.resolve(true);
-            });
-
-            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
-              .then(function() {
-                mockito.verify(invitedPermissionsModelMock, once)();
-              });
+            return roomService.addUserToRoom(room, fixture.user1, fixture.user3);
           })
           .then(function(room) {
             return roomMembershipService.checkRoomMembership(room.id, fixture.user3.id);
@@ -822,7 +842,7 @@ describe('room-service', function() {
 
       it('should create inherited rooms', function() {
         var roomService = testRequire.withProxies("./services/room-service", {
-          'gitter-web-permissions/lib/invited-permissions-service': function() { return Promise.resolve(true); },
+          'gitter-web-permissions/lib/add-invite-policy-factory': createMockAddInvitePolicyFactory(true),
           'gitter-web-groups/lib/group-service': {
             migration: {
               ensureGroupForRoom: function(parentTroupe, user) {
@@ -848,7 +868,7 @@ describe('room-service', function() {
             return room;
           })
           .tap(function(room) {
-            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username);
+            return roomService.addUserToRoom(room, fixture.user1, fixture.user3);
           })
           .then(function(room) {
             return roomMembershipService.checkRoomMembership(room.id, fixture.user3.id);
@@ -873,7 +893,7 @@ describe('room-service', function() {
 
       it('should create inherited rooms for empty orgs', function() {
         var roomService = testRequire.withProxies("./services/room-service", {
-          'gitter-web-permissions/lib/invited-permissions-service': function() { return Promise.resolve(true); },
+          'gitter-web-permissions/lib/add-invite-policy-factory': createMockAddInvitePolicyFactory(true),
           'gitter-web-groups/lib/group-service': {
             migration: {
               ensureGroupForRoom: function(parentTroupe, user) {
@@ -899,7 +919,7 @@ describe('room-service', function() {
             return room;
           })
           .tap(function(room) {
-            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
+            return roomService.addUserToRoom(room, fixture.user1, fixture.user3)
           })
           .then(function(room) {
             return roomMembershipService.checkRoomMembership(room.id, fixture.user3.id);
@@ -952,7 +972,7 @@ describe('room-service', function() {
             return room;
           })
           .tap(function(room) {
-            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username);
+            return roomService.addUserToRoom(room, fixture.user1, fixture.user3);
           })
           .then(function(room) {
             return roomMembershipService.checkRoomMembership(room.id, fixture.user3.id);
@@ -1002,7 +1022,7 @@ describe('room-service', function() {
             return room;
           })
           .tap(function(room) {
-            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username);
+            return roomService.addUserToRoom(room, fixture.user1, fixture.user3);
           })
           .then(function(room) {
             return roomMembershipService.checkRoomMembership(room.id, fixture.user3.id);
@@ -1027,7 +1047,7 @@ describe('room-service', function() {
 
       it(/* ::repo */ 'should create inherited rooms', function() {
         var roomService = testRequire.withProxies("./services/room-service", {
-          'gitter-web-permissions/lib/invited-permissions-service': function() { return Promise.resolve(true); },
+          'gitter-web-permissions/lib/add-invite-policy-factory': createMockAddInvitePolicyFactory(true),
           'gitter-web-groups/lib/group-service': {
             migration: {
               ensureGroupForRoom: function(parentTroupe, user) {
@@ -1053,7 +1073,7 @@ describe('room-service', function() {
             return room;
           })
           .tap(function(room) {
-            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username);
+            return roomService.addUserToRoom(room, fixture.user1, fixture.user3);
           })
           .then(function(room) {
             return roomMembershipService.checkRoomMembership(room.id, fixture.user3.id);
@@ -1103,7 +1123,7 @@ describe('room-service', function() {
             return room;
           })
           .tap(function(room) {
-            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username);
+            return roomService.addUserToRoom(room, fixture.user1, fixture.user3);
           })
           .then(function(room) {
             return roomMembershipService.checkRoomMembership(room.id, fixture.user3.id);
@@ -1151,7 +1171,7 @@ describe('room-service', function() {
             return room;
           })
           .tap(function(room) {
-            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username);
+            return roomService.addUserToRoom(room, fixture.user1, fixture.user3);
           })
           .then(function(room) {
             return roomMembershipService.checkRoomMembership(room.id, fixture.user3.id);
@@ -1200,7 +1220,7 @@ describe('room-service', function() {
           .tap(function(room) {
             // Get another mock
             // ADD A PERSON TO THE ROOM
-            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username);
+            return roomService.addUserToRoom(room, fixture.user1, fixture.user3);
           })
           .then(function(room) {
             return roomMembershipService.checkRoomMembership(room.id, fixture.user3.id);

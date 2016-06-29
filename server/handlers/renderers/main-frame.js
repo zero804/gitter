@@ -3,6 +3,8 @@
 var env = require('gitter-web-env');
 var winston = env.logger;
 var errorReporter = env.errorReporter;
+var nconf = env.config;
+var statsd = env.createStatsClient({ prefix: nconf.get('stats:statsd:prefix')});
 var Promise = require('bluebird');
 var contextGenerator = require('../../web/context-generator');
 var restful = require('../../services/restful');
@@ -17,6 +19,7 @@ var parseRoomsIntoLeftMenuRoomList = require('gitter-web-shared/rooms/left-menu-
 var generateLeftMenuSnapshot = require('../snapshots/left-menu-snapshot');
 var parseRoomsIntoLeftMenuFavouriteRoomList = require('gitter-web-shared/rooms/left-menu-room-favourite-list');
 var getSubResources = require('./sub-resources');
+var fonts = require('../../web/fonts.js');
 
 function renderMainFrame(req, res, next, options) {
   var user = req.user;
@@ -66,6 +69,14 @@ function renderMainFrame(req, res, next, options) {
           });
       }
 
+      if(snapshots && snapshots.leftMenu && snapshots.leftMenu.state) {
+        // `gitter.web.prerender-left-menu`
+        statsd.increment('prerender-left-menu', 1, 0.25, [
+          'state:' + snapshots.leftMenu.state,
+          'pinned:' + (snapshots.leftMenu.roomMenuIsPinned ? '1' : '0')
+        ]);
+      }
+
 
       //TODO Remove this when favourite tab is removed for realz JP 8/4/16
       if(snapshots.leftMenu.state === 'favourite') { leftMenuRoomList = []; }
@@ -84,6 +95,8 @@ function renderMainFrame(req, res, next, options) {
         });
 
       res.render(template, {
+        hasCachedFonts:         fonts.hasCachedFonts(req.cookies),
+        fonts:                  fonts.getFonts(),
         socialMetadata:         socialMetadata,
         bootScriptName:         bootScriptName,
         cssFileName:            "styles/" + bootScriptName + ".css",
