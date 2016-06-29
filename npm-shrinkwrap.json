@@ -385,7 +385,7 @@
       "dependencies": {
         "redis": {
           "version": "2.6.2",
-          "from": "redis@latest",
+          "from": "redis@>=2.1.0 <3.0.0",
           "resolved": "http://beta-internal:4873/redis/-/redis-2.6.2.tgz",
           "dependencies": {
             "double-ended-queue": {
@@ -617,65 +617,72 @@
       }
     },
     "elasticsearch": {
-      "version": "2.4.3",
-      "from": "elasticsearch@>=2.4.3 <3.0.0",
-      "resolved": "http://beta-internal:4873/elasticsearch/-/elasticsearch-2.4.3.tgz",
+      "version": "11.0.1",
+      "from": "elasticsearch@>=11.0.0 <12.0.0",
+      "resolved": "http://beta-internal:4873/elasticsearch/-/elasticsearch-11.0.1.tgz",
       "dependencies": {
-        "bluebird": {
-          "version": "2.2.2",
-          "from": "bluebird@>=2.2.2 <2.3.0",
-          "resolved": "http://beta-internal:4873/bluebird/-/bluebird-2.2.2.tgz"
-        },
         "chalk": {
-          "version": "0.5.1",
-          "from": "chalk@>=0.5.1 <0.6.0",
-          "resolved": "http://beta-internal:4873/chalk/-/chalk-0.5.1.tgz",
+          "version": "1.1.3",
+          "from": "chalk@>=1.0.0 <2.0.0",
+          "resolved": "http://beta-internal:4873/chalk/-/chalk-1.1.3.tgz",
           "dependencies": {
             "ansi-styles": {
-              "version": "1.1.0",
-              "from": "ansi-styles@>=1.1.0 <2.0.0",
-              "resolved": "http://beta-internal:4873/ansi-styles/-/ansi-styles-1.1.0.tgz"
+              "version": "2.2.1",
+              "from": "ansi-styles@>=2.2.1 <3.0.0",
+              "resolved": "http://beta-internal:4873/ansi-styles/-/ansi-styles-2.2.1.tgz"
             },
             "has-ansi": {
-              "version": "0.1.0",
-              "from": "has-ansi@>=0.1.0 <0.2.0",
-              "resolved": "http://beta-internal:4873/has-ansi/-/has-ansi-0.1.0.tgz",
+              "version": "2.0.0",
+              "from": "has-ansi@>=2.0.0 <3.0.0",
+              "resolved": "http://beta-internal:4873/has-ansi/-/has-ansi-2.0.0.tgz",
               "dependencies": {
                 "ansi-regex": {
-                  "version": "0.2.1",
-                  "from": "ansi-regex@>=0.2.1 <0.3.0",
-                  "resolved": "http://beta-internal:4873/ansi-regex/-/ansi-regex-0.2.1.tgz"
+                  "version": "2.0.0",
+                  "from": "ansi-regex@>=2.0.0 <3.0.0",
+                  "resolved": "http://beta-internal:4873/ansi-regex/-/ansi-regex-2.0.0.tgz"
                 }
               }
             },
             "strip-ansi": {
-              "version": "0.3.0",
-              "from": "strip-ansi@>=0.3.0 <0.4.0",
-              "resolved": "http://beta-internal:4873/strip-ansi/-/strip-ansi-0.3.0.tgz",
+              "version": "3.0.1",
+              "from": "strip-ansi@>=3.0.0 <4.0.0",
+              "resolved": "http://beta-internal:4873/strip-ansi/-/strip-ansi-3.0.1.tgz",
               "dependencies": {
                 "ansi-regex": {
-                  "version": "0.2.1",
-                  "from": "ansi-regex@>=0.2.1 <0.3.0",
-                  "resolved": "http://beta-internal:4873/ansi-regex/-/ansi-regex-0.2.1.tgz"
+                  "version": "2.0.0",
+                  "from": "ansi-regex@>=2.0.0 <3.0.0",
+                  "resolved": "http://beta-internal:4873/ansi-regex/-/ansi-regex-2.0.0.tgz"
                 }
               }
             },
             "supports-color": {
-              "version": "0.2.0",
-              "from": "supports-color@>=0.2.0 <0.3.0",
-              "resolved": "http://beta-internal:4873/supports-color/-/supports-color-0.2.0.tgz"
+              "version": "2.0.0",
+              "from": "supports-color@>=2.0.0 <3.0.0",
+              "resolved": "http://beta-internal:4873/supports-color/-/supports-color-2.0.0.tgz"
             }
           }
         },
         "forever-agent": {
-          "version": "0.5.2",
-          "from": "forever-agent@>=0.5.2 <0.6.0",
-          "resolved": "http://beta-internal:4873/forever-agent/-/forever-agent-0.5.2.tgz"
+          "version": "0.6.1",
+          "from": "forever-agent@>=0.6.0 <0.7.0",
+          "resolved": "http://beta-internal:4873/forever-agent/-/forever-agent-0.6.1.tgz"
         },
-        "lodash-node": {
-          "version": "2.4.1",
-          "from": "lodash-node@>=2.4.0 <2.5.0",
-          "resolved": "http://beta-internal:4873/lodash-node/-/lodash-node-2.4.1.tgz"
+        "lodash-compat": {
+          "version": "3.10.2",
+          "from": "lodash-compat@>=3.0.0 <4.0.0",
+          "resolved": "http://beta-internal:4873/lodash-compat/-/lodash-compat-3.10.2.tgz"
+        },
+        "promise": {
+          "version": "7.1.1",
+          "from": "promise@>=7.1.1 <8.0.0",
+          "resolved": "http://beta-internal:4873/promise/-/promise-7.1.1.tgz",
+          "dependencies": {
+            "asap": {
+              "version": "2.0.4",
+              "from": "asap@>=2.0.3 <2.1.0",
+              "resolved": "http://beta-internal:4873/asap/-/asap-2.0.4.tgz"
+            }
+          }
         }
       }
     },
@@ -850,7 +857,7 @@
             "ee-first": {
               "version": "1.1.1",
               "from": "ee-first@1.1.1",
-              "resolved": "https://registry.npmjs.org/ee-first/-/ee-first-1.1.1.tgz"
+              "resolved": "http://beta-internal:4873/ee-first/-/ee-first-1.1.1.tgz"
             }
           }
         },
@@ -1927,7 +1934,7 @@
       "dependencies": {
         "redis": {
           "version": "2.6.2",
-          "from": "redis@latest",
+          "from": "redis@>=2.1.0 <3.0.0",
           "resolved": "http://beta-internal:4873/redis/-/redis-2.6.2.tgz",
           "dependencies": {
             "double-ended-queue": {
@@ -2997,7 +3004,7 @@
         },
         "parseurl": {
           "version": "1.3.1",
-          "from": "parseurl@>=1.3.1 <1.4.0",
+          "from": "parseurl@>=1.3.0 <1.4.0",
           "resolved": "http://beta-internal:4873/parseurl/-/parseurl-1.3.1.tgz"
         },
         "vary": {
@@ -4461,7 +4468,7 @@
         },
         "parseurl": {
           "version": "1.3.1",
-          "from": "parseurl@>=1.3.1 <1.4.0",
+          "from": "parseurl@>=1.3.0 <1.4.0",
           "resolved": "http://beta-internal:4873/parseurl/-/parseurl-1.3.1.tgz"
         }
       }
@@ -4939,7 +4946,7 @@
             },
             "inherits": {
               "version": "2.0.1",
-              "from": "inherits@2.0.1",
+              "from": "inherits@>=2.0.1 <2.1.0",
               "resolved": "http://beta-internal:4873/inherits/-/inherits-2.0.1.tgz"
             },
             "isarray": {
@@ -5510,7 +5517,7 @@
           "dependencies": {
             "strip-ansi": {
               "version": "3.0.1",
-              "from": "strip-ansi@>=3.0.1 <4.0.0",
+              "from": "strip-ansi@>=3.0.0 <4.0.0",
               "resolved": "http://beta-internal:4873/strip-ansi/-/strip-ansi-3.0.1.tgz",
               "dependencies": {
                 "ansi-regex": {
@@ -5902,7 +5909,7 @@
             },
             "strip-ansi": {
               "version": "3.0.1",
-              "from": "strip-ansi@>=3.0.1 <4.0.0",
+              "from": "strip-ansi@>=3.0.0 <4.0.0",
               "resolved": "http://beta-internal:4873/strip-ansi/-/strip-ansi-3.0.1.tgz",
               "dependencies": {
                 "ansi-regex": {

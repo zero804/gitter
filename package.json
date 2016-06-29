@@ -19,7 +19,7 @@
     "debug": "^2.2.0",
     "diskspace": "0.1.5",
     "dolph": "^0.2.0",
-    "elasticsearch": "^2.4.3",
+    "elasticsearch": "^11.0.0",
     "email-validator": "^1.0.0",
     "ent": "~0.1.0",
     "escape-string-regexp": "^1.0.5",
