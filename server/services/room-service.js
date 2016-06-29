@@ -581,90 +581,6 @@ function createRoomByUri(user, uri, options) {
 }
 
 /**
- * Find all non-private channels under a particular parent
- */
-function findAllChannelsForRoomId(user, parentTroupeId) {
-  return persistence.Troupe.find({ parentId: parentTroupeId, })
-    .exec()
-    .then(function(troupes) {
-      if (!troupes.length) return troupes;
-
-      var privateRooms = troupes
-        .filter(function(troupe) {
-          return troupe.security === 'PRIVATE';
-        })
-        .map(function(troupe) {
-          return troupe._id;
-        });
-
-      if (!privateRooms.length) return troupes;
-
-      // If there are private rooms, we need to filter out
-      // any rooms which the user is not a member of...
-      return roomMembershipService.findUserMembershipInRooms(user._id, privateRooms)
-        .then(function(privateRoomsWithAccess) {
-          var privateRoomsWithAccessHash = collections.hashArray(privateRoomsWithAccess);
-
-          // Filter out all the rooms which are private to which this
-          // use does not have access
-          return troupes.filter(function(troupe) {
-            if (troupe.security !== 'PRIVATE') return true; // Allow all non private rooms
-            return privateRoomsWithAccessHash[troupe._id];
-          });
-        });
-    });
-}
-
-/**
- * Given parent and child ids, find a child channel that is
- * not PRIVATE
- */
-function findChildChannelRoom(user, parentTroupeId, childTroupeId) {
-  return persistence.Troupe.findOne({
-      parentId: parentTroupeId,
-      id: childTroupeId
-    })
-    .exec()
-    .then(function(channelRoom) {
-      if (!channelRoom) return null;
-
-      if (channelRoom.security !== 'PRIVATE') return channelRoom;
-
-      // Before returning the private room to the user
-      // make sure they have access to the room
-      return roomMembershipService.checkRoomMembership(channelRoom._id, user._id)
-        .then(function(isInRoom) {
-          if (!isInRoom) return null;
-          return channelRoom;
-        });
-    });
-}
-
-/**
- * Find all non-private channels under a particular parent
- */
-function findAllChannelsForUser(user) {
-  return persistence.Troupe.find({
-      ownerUserId: user._id
-    })
-    .exec();
-}
-
-/**
- * Given parent and child ids, find a child channel that is
- * not PRIVATE
- */
-function findUsersChannelRoom(user, childTroupeId, callback) {
-  return persistence.Troupe.findOne({
-      ownerUserId: user._id,
-      id: childTroupeId
-      /* Dont filter private as owner can see all private rooms */
-    })
-    .exec()
-    .nodeify(callback);
-}
-
-/**
  * notifyInvitedUser() informs an invited user
  *
  * fromUser       User - the inviter
@@ -1172,10 +1088,6 @@ module.exports = {
   findAllRoomsIdsForUserIncludingMentions: findAllRoomsIdsForUserIncludingMentions,
   createRoomForGitHubUri: Promise.method(createRoomForGitHubUri),
   createRoomByUri: createRoomByUri,
-  findAllChannelsForRoomId: findAllChannelsForRoomId,
-  findChildChannelRoom: findChildChannelRoom,
-  findAllChannelsForUser: findAllChannelsForUser,
-  findUsersChannelRoom: findUsersChannelRoom,
   joinRoom: Promise.method(joinRoom),
   addUserToRoom: addUserToRoom,
   /* DISABLED revalidatePermissionsForUsers: revalidatePermissionsForUsers, */
