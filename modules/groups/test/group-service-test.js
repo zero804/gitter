@@ -142,6 +142,27 @@ describe('group-service', function() {
             })
           })
       });
+
+      it('should throw a 409 if a URL is not available', function() {
+        var user = fixture.user1;
+        var groupService = proxyquireNoCallThru('../lib/group-service', {
+          './group-uri-checker': function() {
+            return Promise.resolve({
+              allowCreate: false
+            });
+          }
+        });
+        groupService.createGroup(user, {
+            name: 'Bob',
+            uri: 'bob'
+          })
+          .then(function() {
+            assert.ok(false, 'Error Expected');
+          })
+          .catch(StatusError, function(err) {
+            assert.strictEqual(err.status, 409);
+          });
+      });
     });
 
     describe('findById #slow', function() {
