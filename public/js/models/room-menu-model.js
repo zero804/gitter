@@ -38,7 +38,6 @@ module.exports = Backbone.Model.extend({
   defaults: {
     state:                     '',
     searchTerm:                '',
-    panelOpenState:            true,
     roomMenuIsPinned:          true,
     selectedOrgName:           '',
     hasDismissedSuggestions:   false,
@@ -50,6 +49,7 @@ module.exports = Backbone.Model.extend({
   initialize: function(attrs) {
 
     perfTiming.start('left-menu-init');
+    this.set('panelOpenState', this.get('roomMenuIsPinned'));
 
     if (!attrs || !attrs.bus) {
       throw new Error('A valid message bus must be passed when creating a new RoomMenuModel');
@@ -266,6 +266,7 @@ module.exports = Backbone.Model.extend({
 
     if(activeModel) { activeModel.set('active', false); }
     if(newlyActiveModel) { newlyActiveModel.set('active', true); }
+    if(!this.get('roomMenuIsPinned')) { this.set('panelOpenState', false); }
   },
 
   _getModel: function (prop, val){
