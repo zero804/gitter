@@ -15,7 +15,6 @@ var persistence = require('gitter-web-persistence');
 var uriLookupService = require("./uri-lookup-service");
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var githubPolicyFactory = require('gitter-web-permissions/lib/github-policy-factory');
-var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
 var addInvitePolicyFactory = require('gitter-web-permissions/lib/add-invite-policy-factory');
 var userService = require('./user-service');
 var troupeService = require('./troupe-service');
@@ -33,7 +32,6 @@ var badger = require('./badger-service');
 var userSettingsService = require('./user-settings-service');
 var roomSearchService = require('./room-search-service');
 var assertJoinRoomChecks = require('./assert-join-room-checks');
-var redisLockPromise = require("../utils/redis-lock-promise");
 var unreadItemService = require('./unread-items');
 var debug = require('debug')('gitter:app:room-service');
 var roomMembershipService = require('./room-membership-service');
@@ -44,8 +42,6 @@ var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-trou
 var userScopes = require('gitter-web-identity/lib/user-scopes');
 var groupService = require('gitter-web-groups/lib/group-service');
 var securityDescriptorGenerator = require('gitter-web-permissions/lib/security-descriptor-generator');
-
-var splitsvilleEnabled = nconf.get("project-splitsville:enabled");
 
 /**
  * sendJoinStats() sends information to MixPanels about a join_room event
@@ -346,40 +342,6 @@ function createRoomForGitHubUri(user, uri, options) {
             .then(function(troupe) {
               this.troupe = troupe;
             })
-        })
-        .tap(function() {
-          var troupe = this.troupe;
-          var updateExisting = this.updateExisting;
-
-          if (!updateExisting) return;
-
-          // Rename URLS if required
-
-          // Existing room and name hasn't changed? Skip
-          if (troupe.uri === officialUri) return;
-
-          // Not a repo or we're no longer renaming, skip too
-          if (githubType !== 'REPO' || splitsvilleEnabled) return;
-
-          debug('Attempting to rename room %s to %s', uri, officialUri);
-
-          // Check if the new room already exists
-          return persistence.Troupe.findOne({ githubType: 'REPO', githubId: githubId, lcUri: officialUri.toLowerCase() })
-            .exec()
-            .bind(this)
-            .then(function(newRoom) {
-              if (newRoom) return newRoom;
-
-              // New room does not exist, use it instead
-              return renameRepo(troupe.uri, officialUri)
-                .then(function() {
-                  /* Refetch the troupe */
-                  return troupeService.findById(troupe.id);
-                });
-            })
-            .then(function(troupe) {
-              this.troupe = troupe;
-            });
         })
         .tap(function() {
           /* Next stage - post creation tasks */
@@ -903,77 +865,6 @@ function searchRooms(userId, queryText, options) {
 }
 
 /**
- * Rename a REPO room to a new URI.
- */
-function renameRepo(oldUri, newUri) {
-  if (oldUri === newUri) return Promise.resolve();
-
-  return redisLockPromise("lock:rename:" + oldUri, function() {
-    return troupeService.findByUri(oldUri)
-      .then(function(room) {
-        if (!room) return;
-        if (room.githubType !== 'REPO') throw new StatusError(400, 'Only repo rooms can be renamed');
-        if (room.uri === newUri) return; // Case change, and it's already happened
-
-        var originalLcUri = room.lcUri;
-        var lcUri = newUri.toLowerCase();
-        var lcOwner = lcUri.split('/')[0];
-
-        room.uri = newUri;
-        room.lcUri = lcUri;
-        room.lcOwner = lcOwner;
-
-        /* Only add if it's not a case change */
-        if (originalLcUri !== lcUri) {
-          room.renamedLcUris.addToSet(originalLcUri);
-        }
-
-        return room.save()
-          .then(function() {
-            // TODO: deal with externalId
-            return securityDescriptorService.updateLinksForRepo(oldUri, newUri, null);
-          })
-          .then(function() {
-            return uriLookupService.removeBadUri(oldUri);
-          })
-          .then(function() {
-            return uriLookupService.reserveUriForTroupeId(room.id, lcUri);
-          })
-          .then(function() {
-            return persistence.Troupe.find({ parentId: room._id }).exec();
-          })
-          .then(function(channels) {
-            return Promise.all(channels.map(function(channel) {
-              var originalLcUri = channel.lcUri;
-              var newChannelUri = newUri + '/' + channel.uri.split('/')[2];
-              var newChannelLcUri = newChannelUri.toLowerCase();
-
-              if (originalLcUri !== newChannelLcUri) {
-                channel.renamedLcUris.addToSet(originalLcUri);
-              }
-
-              channel.lcUri = newChannelLcUri;
-              channel.uri = newChannelUri;
-              channel.lcOwner = lcOwner;
-
-              return channel.save()
-                .then(function() {
-                  return uriLookupService.removeBadUri(originalLcUri);
-                })
-                .then(function() {
-                  return uriLookupService.reserveUriForTroupeId(channel.id, newChannelLcUri);
-                });
-            }));
-
-          });
-
-      });
-
-  });
-
-}
-
-/**
  * Delete room
  */
 function deleteRoom(troupe) {
@@ -1098,7 +989,6 @@ module.exports = {
 
   findBanByUsername: findBanByUsername,
   searchRooms: searchRooms,
-  renameRepo: renameRepo,
   deleteRoom: deleteRoom,
   upsertGroupRoom: upsertGroupRoom,
   testOnly: {
