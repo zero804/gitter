@@ -2,7 +2,6 @@
 
 var env = require('gitter-web-env');
 var stats = env.stats;
-var config = env.config;
 var Promise = require('bluebird');
 var _ = require('lodash');
 var Group = require('gitter-web-persistence').Group;
@@ -280,93 +279,6 @@ function findRoomsIdForGroup(groupId, userId) {
     });
 }
 
-/**
- * Given an existing room, ensures that the room has a room
- */
-function ensureGroupForRoom(room, user) {
-  if (room.groupId) {
-    return findById(room.groupId);
-  }
-  var githubType = room.githubType;
-
-  // One-to-one rooms will never have a group
-  if (room.oneToOne || githubType === 'ONETOONE') {
-    return null;
-  }
-
-  var splitUri = room.uri.split('/');
-
-  var groupUri = splitUri[0];
-  var obtainAccessFromGitHubRepo;
-
-  switch(githubType) {
-    case 'REPO':
-      assert.strictEqual(splitUri.length, 2);
-      obtainAccessFromGitHubRepo = room.uri;
-      break;
-
-    case 'REPO_CHANNEL':
-      assert.strictEqual(splitUri.length, 3);
-      obtainAccessFromGitHubRepo = splitUri.slice(0, 2);
-      break;
-
-    case 'ORG':
-      assert.strictEqual(splitUri.length, 1);
-      break;
-
-    case 'USER_CHANNEL':
-    case 'ORG_CHANNEL':
-      assert.strictEqual(splitUri.length, 3);
-      break;
-
-    default:
-      throw new StatusError(500, 'Unknown room type: ' + room.githubType);
-  }
-
-  return findByUri(groupUri)
-    .then(function(group) {
-      if (group) return group;
-
-      return createGroup(user, {
-        type: 'GH_GUESS', // could be a GH_ORG or GH_USER
-        name: groupUri,
-        uri: groupUri,
-        linkPath: groupUri,
-        obtainAccessFromGitHubRepo: obtainAccessFromGitHubRepo
-      });
-    })
-    .tap(function(group) {
-      if (!group) return;
-      var groupId = group._id;
-      room.groupId = groupId;
-
-      return Troupe.update({ _id: room._id }, { $set: { groupId: groupId } })
-        .exec();
-
-      // The room is now part of the group.
-      // TODO: Technically we should issue a live collection update to all the rooms users
-      // but we're going to skip this for now.
-    });
-}
-
-/**
- * A user is creating a channel. They need a group
- */
-function ensureGroupForUser(user) {
-  var groupUri = user.username;
-  return findByUri(groupUri)
-    .then(function(group) {
-      if (group) return group;
-
-      return createGroup(user, {
-        type: 'GH_USER',
-        name: groupUri,
-        uri: groupUri,
-        linkPath: groupUri
-      });
-    });
-  }
-
 module.exports = {
   findByUri: Promise.method(findByUri),
   findById: Promise.method(findById),
@@ -376,7 +288,5 @@ module.exports = {
   migration: {
     upsertGroup: upsertGroup,
     ensureGroupForGitHubRoomCreation: ensureGroupForGitHubRoomCreation,
-    ensureGroupForRoom: Promise.method(ensureGroupForRoom),
-    ensureGroupForUser: Promise.method(ensureGroupForUser)
   }
 };
