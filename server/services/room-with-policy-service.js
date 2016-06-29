@@ -19,6 +19,7 @@ var assert = require('assert');
 var roomMetaService = require('./room-meta-service');
 var processMarkdown = require('../utils/markdown-processor');
 var roomInviteService = require('./room-invite-service');
+var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
 
 var MAX_RAW_TAGS_LENGTH = 200;
 
@@ -133,9 +134,9 @@ RoomWithPolicyService.prototype.toggleSearchIndexing = secureMethod(allowAdmin, 
 });
 
 function canBanInRoom(room) {
-  if(room.githubType === 'ONETOONE') return false;
-  if(room.githubType === 'ORG') return false;
-  if(room.security === 'PRIVATE') return false; /* No bans in private rooms */
+  if (room.oneToOne) return false;
+  // Can only ban people from public rooms
+  if (!securityDescriptorUtils.isPublic(room)) return false;
 
   return true;
 }
