@@ -3,7 +3,7 @@ var Marionette = require('backbone.marionette');
 var behaviourLookup = require('./lookup');
 var _ = require('underscore');
 var rafUtils = require('utils/raf-utils');
-var addPassiveScrollListener = require('utils/passive-scroll-listener');
+var passiveEventListener = require('../../utils/passive-event-listener');
 
 var Behavior = Marionette.Behavior.extend({
   defaults: {
@@ -30,7 +30,7 @@ var Behavior = Marionette.Behavior.extend({
     this.lazyPointerEvents = _.debounce(this.enablePointerEvents.bind(this), 250);
 
     this.scrollHandler = this.smoothScroll.bind(this);
-    addPassiveScrollListener(this.scrollElement, this.scrollHandler);
+    passiveEventListener.addEventListener(this.scrollElement, 'scroll', this.scrollHandler);
   },
 
   // Trigger an event on the child of it's currently on screen
