@@ -8,6 +8,7 @@ var CommunityCreationRepoListItemView = require('./community-creation-repo-list-
 
 
 var CommunityCreationRepoListEmptyView = Marionette.ItemView.extend({
+  className: 'community-create-repo-list-root-inner',
   template: CommunityCreationRepoListEmptyTemplate,
   ui: {
     emptyNote: '.community-create-repo-list-empty-note__text-empty',
