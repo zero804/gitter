@@ -9,6 +9,9 @@ var CloseView = require('./close-view/close-view');
 var CollectionView = require('./minibar-collection-view');
 var CommunityCreateItemView = require('./minibar-community-create-item-view');
 var domIndexById = require('../../../../utils/dom-index-by-id');
+var fastdom = require('fastdom');
+var appEvents = require('utils/appevents');
+
 
 require('views/behaviors/isomorphic');
 
@@ -107,6 +110,7 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   onCollectionItemActivated: function (view, model){
+    appEvents.trigger('stats.event', 'minibar.activated.' + model.get('type'));
     this.model.set('selectedOrgName', model.get('name'));
     this.changeMenuState('org');
   },

@@ -4,17 +4,23 @@ set -e
 set -u
 set -o pipefail
 
-if ! which hub; then
+if ! (which hub > /dev/null); then
   >&2 echo "Please install `hub` using `brew install hub`"
   exit 1
 fi
 
 FEATURE_NAME=$1
 git fetch origin
+git fetch origin refs/notes/*:refs/notes/*
 git flow feature start "${FEATURE_NAME}"
 git commit --allow-empty -m ":tada: Start of feature ${FEATURE_NAME}" --no-verify
 git push -v --set-upstream origin "refs/heads/feature/${FEATURE_NAME}:refs/heads/feature/${FEATURE_NAME}"
 
 PR_URL=$(hub pull-request -m "${FEATURE_NAME}" -b develop)
+PR_NUMBER=${PR_URL#https://github.com/troupe/gitter-webapp/pull/}
+
+git notes --ref=pull_request_number add -m "${PR_NUMBER}" HEAD
+
+git push origin refs/notes/pull_request_number
 
 open "${PR_URL}"
