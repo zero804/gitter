@@ -24,6 +24,7 @@ var markdownMajorVersion = require('gitter-markdown-processor').version.split('.
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 var recentRoomService = require("./recent-room-service");
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
 
 var useHints = true;
 
@@ -140,13 +141,15 @@ exports.newChatMessageToTroupe = function(troupe, user, data) {
     return [parsedMessage, resolveMentions(troupe, user, parsedMessage)];
   })
   .spread(function(parsedMessage, mentions) {
+    var isPublic = securityDescriptorUtils.isPublic(troupe);
+
     var chatMessage = new ChatMessage({
       fromUserId: user.id,
       toTroupeId: troupe.id,
       sent:       sentAt,
       text:       data.text,                    // Keep the raw message.
       status:     data.status,                // Checks if it is a status update
-      pub:        troupe.security === 'PUBLIC' || undefined, // Public room - useful for sampling
+      pub:        isPublic || undefined, // Public room - useful for sampling
       html:       parsedMessage.html,
       lang:       parsedMessage.lang,
       urls:       parsedMessage.urls,
@@ -217,11 +220,11 @@ exports.updateChatMessage = function(troupe, chatMessage, user, newText, callbac
         throw new StatusError(400, "You can no longer edit this message");
       }
 
-      if(chatMessage.toTroupeId != troupe.id) {
+      if(!mongoUtils.objectIDsEqual(chatMessage.toTroupeId, troupe.id)) {
         throw new StatusError(403, "Permission to edit this chat message is denied.");
       }
 
-      if(chatMessage.fromUserId != user.id) {
+      if(!mongoUtils.objectIDsEqual(chatMessage.fromUserId, user.id)) {
         throw new StatusError(403, "Permission to edit this chat message is denied.");
       }
 
