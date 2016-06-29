@@ -54,11 +54,12 @@ module.exports = CommunityCreateBaseStepView.extend({
   className: 'community-create-step-wrapper community-create-github-projects-step-wrapper',
 
   ui: _.extend({}, _super.ui, {
-    orgsToggle: '.community-create-github-projects-toggle-orgs',
-    reposToggle: '.community-create-github-projects-toggle-repos',
+    orgsToggle: '.js-community-create-github-projects-toggle-orgs',
+    reposToggle: '.js-community-create-github-projects-toggle-repos',
     orgsArea: '.js-community-create-github-projects-orgs-area',
     reposArea: '.js-community-create-github-projects-repos-area',
-    repoFilterInput: '.primary-community-repo-name-filter-input'
+    repoFilterInput: '.primary-community-repo-name-filter-input',
+    repoScopeMissingNote: '.community-create-repo-missing-note'
   }),
 
   events: _.extend({}, _super.events, {
@@ -173,7 +174,9 @@ module.exports = CommunityCreateBaseStepView.extend({
 
     this.model.set({
       selectedOrgId: selectedOrgId,
-      selectedOrgName: selectedOrgName
+      selectedOrgName: selectedOrgName,
+      selectedRepoId: null,
+      selectedRepoName: null
     });
 
     this.setSelectedGitHubProjectCommunityState();
@@ -190,6 +193,8 @@ module.exports = CommunityCreateBaseStepView.extend({
        selectedRepoName = activeModel.get('name');
     }
     this.model.set({
+      selectedOrgId: null,
+      selectedOrgName: null,
       selectedRepoId: selectedRepoId,
       selectedRepoName: selectedRepoName
     });

@@ -6,8 +6,8 @@ var ProgressBarPlugin = require('progress-bar-webpack-plugin');
 
 
 var opts = require('yargs')
-  .option('no-cover', {
-    default: false,
+  .option('nocoverage', {
+    type: 'boolean',
     description: 'Age in minutes of the unread items'
   })
   .help('help')
@@ -16,7 +16,7 @@ var opts = require('yargs')
 
 
 var preLoaders = [];
-if(!opts['no-cover']) {
+if(!opts['nocoverage']) {
   preLoaders.push({
     test: /\.js$/,
     exclude: /(test|node_modules|repo)/,
