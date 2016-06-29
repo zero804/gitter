@@ -31,13 +31,13 @@ module.exports = {
       throw new StatusError(404);
     }
 
-    var uri = req.body.uri;
-    var name = req.body.name;
+    var uri = req.body.uri ? String(req.body.uri) : undefined;
+    var name = req.body.name ? String(req.body.name) : undefined;
     var groupOptions = { uri: uri, name: name };
     if (req.body.security) {
       // for GitHub and future group types that are backed by other services
-      groupOptions.type = req.body.security.type;
-      groupOptions.linkPath = req.body.security.linkPath;
+      groupOptions.type = req.body.security.type ? String(req.body.security.type) : undefined;
+      groupOptions.linkPath = req.body.security.linkPath ? String(req.body.security.linkPath) : undefined;
     }
 
     var group;
