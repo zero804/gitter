@@ -258,7 +258,6 @@ module.exports = (function() {
 
   context.testOnly = {
     resetTroupeContext: function(newContext) {
-
       ctx = newContext;
       troupe = getTroupeModel();
       user = getUserModel();
