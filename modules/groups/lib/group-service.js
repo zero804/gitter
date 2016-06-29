@@ -91,7 +91,13 @@ function checkGroupUri(user, uri, options) {
     .then(function(info) {
       if (!info.allowCreate) {
         // the frontend code should have prevented you from getting here
-        throw new StatusError(400, 'User is not allowed to create a group for this URI.');
+        /*
+        NOTE: 409 because an invalid group uri would already have raised 400,
+        so the reason why you can't create the group is either because a group
+        or user already took that uri or because another github org or user
+        took that uri. This means it also mirrors the check-group-uri endpount.
+        */
+        throw new StatusError(409, 'User is not allowed to create a group for this URI.');
       }
 
       var splitsvilleEnabled = config.get('splitsville:enabled');
