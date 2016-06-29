@@ -124,6 +124,13 @@ describe('KeyboardControllerView', function(){
       assert(model.primaryCollection.at(0).get('focus'));
     });
 
+    it('should focus the minibarTempOrgIcon when it is not hidden and room.4 is pressed', function(){
+      view.blurAllItems();
+      model.minibarTempOrgModel.set('hidden', false);
+      appEvents.trigger('keyboard.room.4', { key: 4 });
+      assert(model.minibarTempOrgModel.get('focus'));
+    });
+
   });
 
   describe('arrow key movement', function(){

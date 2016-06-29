@@ -17,7 +17,8 @@ var KeyboardController = Marionette.ItemView.extend({
     'room.1': 'onMinibarAllSelected',
     'room.2': 'onMinibarSearchSelected',
     'room.3': 'onMinibarPeopleSelected',
-    'room.4 room.5 room.6 room.7 room.8 room.9 room.10': 'onMinibarOrgSelected',
+    'room.4': 'onMinibarTempSelected',
+    'room.5 room.6 room.7 room.8 room.9 room.10': 'onMinibarOrgSelected',
     'focus.search': 'onMinibarSearchSelected',
     'room.down': 'onDownKeyPressed',
     'room.up': 'onUpKeyPressed',
@@ -73,6 +74,14 @@ var KeyboardController = Marionette.ItemView.extend({
     this.blurAllItems();
     this.model.set('state', 'people');
     this.minibarPeopleModel.set('focus', true);
+  },
+
+  onMinibarTempSelected: function (e){
+    this.blurAllItems();
+    if(!this.minibarTempOrgModel.get('hidden')) {
+      return this.minibarTempOrgModel.set('focus', true);
+    }
+    return this.onMinibarOrgSelected(e);
   },
 
   onMinibarOrgSelected: function (e){
