@@ -11,8 +11,7 @@ var CommunityCreateBaseStepView = require('../shared/community-creation-base-ste
 var CommunityCreationPeopleListView = require('../shared/community-creation-people-list-view');
 var UserResultListView = require('../shared/community-create-invite-user-result-list-view');
 
-var userSearchModels = require('collections/user-search');
-var UserSuggestionCollection = require('collections/user-suggestions');
+var UserResultCollection = require('collections/community-create-user-result-collection');
 
 require('gitter-styleguide/css/components/headings.css');
 require('gitter-styleguide/css/components/buttons.css');
@@ -72,14 +71,14 @@ module.exports = CommunityCreateBaseStepView.extend({
     this.orgCollection = options.orgCollection;
     this.repoCollection = options.repoCollection;
 
-    this.userSearchCollection = new userSearchModels.Collection();
-    this.userSuggestionCollection = new UserSuggestionCollection();
-    this.fetchSuggestions();
-
-
-    this.userResultCollection = new ProxyCollection({
-      collection: this.userSuggestionCollection
+    this.searchModel = new Backbone.Model({
+      searchInput: ''
     });
+    this.userResultCollection = new UserResultCollection(null, {
+      stepViewModel: this.model,
+      searchModel: this.searchModel,
+      communityCreateModel: this.communityCreateModel
+    })
 
     this.inviteCollection = new VirtualMultipleCollection([], {
       backingCollections: [
@@ -87,11 +86,6 @@ module.exports = CommunityCreateBaseStepView.extend({
         this.communityCreateModel.emailsToInvite
       ]
     });
-
-    this.throttledFetchUsers = _.throttle(this.fetchUsers, 300);
-
-
-    this.listenTo(this.communityCreateModel, 'change:communityName change:communitySlug change:githubOrgId', this.onCommunityDataChange, this);
   },
 
   onDestroy: function() {
@@ -105,58 +99,8 @@ module.exports = CommunityCreateBaseStepView.extend({
     this.communityCreateModel.set('stepState', stepConstants.MAIN);
   },
 
-  onActiveChange: function() {
-    CommunityCreateBaseStepView.prototype.onActiveChange.apply(this, arguments);
-    this.fetchSuggestions();
-  },
-
-  fetchSuggestions: function() {
-    var githubProjectInfo = this.communityCreateModel.getGithubProjectInfo(this.orgCollection, this.repoCollection);
-    var type = null;
-    if(this.communityCreateModel.get('githubOrgId')) {
-      type = 'GH_ORG';
-    }
-    else if(this.communityCreateModel.get('githubRepoId')) {
-      type = 'GH_REPO';
-    }
-    this.userSuggestionCollection.fetch({
-      data: {
-        type: type,
-        linkPath: githubProjectInfo.name
-      }
-    });
-  },
-
-  onCommunityDataChange: function() {
-    if(this.model.get('active')) {
-      this.fetchSuggestions();
-    }
-  },
-
   onPeopleInputUpdate: function() {
-    this.throttledFetchUsers();
-  },
-
-  fetchUsers: function() {
-    var input = this.ui.peopleInput[0].value;
-    if(input.length) {
-      this.userResultCollection.switchCollection(this.userSearchCollection);
-      this.userSearchCollection.fetch({
-        data: {
-            q: input,
-            limit: 12
-          }
-        },
-        {
-          add: true,
-          remove: true,
-          merge: true
-        }
-      );
-    }
-    else {
-      this.userResultCollection.switchCollection(this.userSuggestionCollection);
-    }
+    this.searchModel.set('searchInput', this.ui.peopleInput[0].value);
   },
 
   onPersonSelected: function(person) {
