@@ -20,6 +20,8 @@ require('gitter-styleguide/css/components/headings.css');
 require('gitter-styleguide/css/components/buttons.css');
 
 
+var _super = CommunityCreateBaseStepView.prototype;
+
 module.exports = CommunityCreateBaseStepView.extend({
   template: template,
 
@@ -50,7 +52,7 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   className: 'community-create-step-wrapper community-create-github-projects-step-wrapper',
 
-  ui: _.extend({}, CommunityCreateBaseStepView.prototype.ui, {
+  ui: _.extend({}, _super.ui, {
     orgsToggle: '.community-create-github-projects-toggle-orgs',
     reposToggle: '.community-create-github-projects-toggle-repos',
     orgsArea: '.js-community-create-github-projects-orgs-area',
@@ -58,7 +60,7 @@ module.exports = CommunityCreateBaseStepView.extend({
     repoFilterInput: '.primary-community-repo-name-filter-input'
   }),
 
-  events: _.extend({}, CommunityCreateBaseStepView.prototype.events, {
+  events: _.extend({}, _super.events, {
     'click @ui.nextStep': 'onStepNext',
     'click @ui.backStep': 'onStepBack',
     'click @ui.orgsToggle': 'onOrgsAreaToggle',
@@ -66,13 +68,13 @@ module.exports = CommunityCreateBaseStepView.extend({
     'input @ui.repoFilterInput': 'onRepoFilterInputChange'
   }),
 
-  modelEvents: _.extend({}, CommunityCreateBaseStepView.prototype.modelEvents, {
+  modelEvents: _.extend({}, _super.modelEvents, {
     'change:isOrgAreaActive change:isRepoAreaActive': 'onAreaActiveChange',
     'change:repoFilter': 'onRepoFilterChange'
   }),
 
   initialize: function(options) {
-    CommunityCreateBaseStepView.prototype.initialize.apply(this, arguments);
+    _super.initialize.apply(this, arguments);
 
     this.orgCollection = options.orgCollection;
     this.repoCollection = options.repoCollection;

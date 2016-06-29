@@ -13,6 +13,8 @@ require('gitter-styleguide/css/components/headings.css');
 require('gitter-styleguide/css/components/buttons.css');
 
 
+var _super = CommunityCreateBaseStepView.prototype;
+
 module.exports = CommunityCreateBaseStepView.extend({
   template: template,
 
@@ -31,20 +33,20 @@ module.exports = CommunityCreateBaseStepView.extend({
     return this.inviteListView;
   },
 
-  ui: _.extend({}, CommunityCreateBaseStepView.prototype.ui, {
+  ui: _.extend({}, _super.ui, {
     communityNameHeading: '.community-create-overview-community-name',
     communityUrlSlug: '.community-create-overview-url-heading-slug',
     githubLink: '.community-create-overview-github-link',
     githubName: '.community-create-overview-github-name'
   }),
 
-  events: _.extend({}, CommunityCreateBaseStepView.prototype.events, {
+  events: _.extend({}, _super.events, {
     'click @ui.nextStep': 'onStepNext',
     'click @ui.backStep': 'onStepBack',
   }),
 
   initialize: function(options) {
-    CommunityCreateBaseStepView.prototype.initialize.apply(this, arguments);
+    _super.initialize.apply(this, arguments);
 
     this.orgCollection = options.orgCollection;
     this.repoCollection = options.repoCollection;
