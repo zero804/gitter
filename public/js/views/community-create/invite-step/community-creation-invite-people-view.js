@@ -17,6 +17,7 @@ require('gitter-styleguide/css/components/headings.css');
 require('gitter-styleguide/css/components/buttons.css');
 
 
+var _super = CommunityCreateBaseStepView.prototype;
 
 
 module.exports = CommunityCreateBaseStepView.extend({
@@ -50,14 +51,14 @@ module.exports = CommunityCreateBaseStepView.extend({
     return this.inviteListView;
   },
 
-  ui: _.extend({}, CommunityCreateBaseStepView.prototype.ui, {
+  ui: _.extend({}, _super.ui, {
     peopleInput: '.js-community-invite-people-name-input',
     emailForm: '.js-community-invite-people-email-form',
     emailInput: '.js-community-invite-people-email-input',
     emailSubmit: '.js-community-invite-people-email-submit-button'
   }),
 
-  events: _.extend({}, CommunityCreateBaseStepView.prototype.events, {
+  events: _.extend({}, _super.events, {
     'click @ui.nextStep': 'onStepNext',
     'click @ui.backStep': 'onStepBack',
     'input @ui.peopleInput': 'onPeopleInputUpdate',
@@ -66,7 +67,7 @@ module.exports = CommunityCreateBaseStepView.extend({
 
 
   initialize: function(options) {
-    CommunityCreateBaseStepView.prototype.initialize.apply(this, arguments);
+    _super.initialize.apply(this, arguments);
 
     this.orgCollection = options.orgCollection;
     this.repoCollection = options.repoCollection;

@@ -12,6 +12,7 @@ var CommunityCreateBaseStepView = require('../shared/community-creation-base-ste
 require('gitter-styleguide/css/components/headings.css');
 require('gitter-styleguide/css/components/buttons.css');
 
+
 var updateElementValueAndMaintatinSelection = function(el, newValue) {
   var start = el.selectionStart;
   var end = el.selectionEnd;
@@ -24,28 +25,15 @@ var updateElementValueAndMaintatinSelection = function(el, newValue) {
   }
 };
 
-// Consider all constraints except a customError because we use
-// this to add a custom message on what to do to satisfy
-var isFormElementInvalid = function(el, useCustomError) {
-  return el.validity.badInput ||
-    (useCustomError ? el.validity.customError : false) ||
-    el.validity.patternMismatch ||
-    el.validity.rangeOverflow ||
-    el.validity.rangeUnderflow ||
-    el.validity.stepMismatch ||
-    el.validity.tooLong ||
-    el.validity.typeMismatch ||
-    //el.validity.valid ||
-    el.validity.valueMissing;
-};
 
+var _super = CommunityCreateBaseStepView.prototype;
 
 module.exports = CommunityCreateBaseStepView.extend({
   template: template,
 
   className: 'community-create-step-wrapper community-create-main-step-wrapper',
 
-  ui: _.extend({}, CommunityCreateBaseStepView.prototype.ui, {
+  ui: _.extend({}, _super.ui, {
     mainForm: '.js-community-create-main-view-form',
     communityNameInput: '.primary-community-name-input',
     communitySlugInput: '.community-creation-slug-input',
@@ -57,19 +45,19 @@ module.exports = CommunityCreateBaseStepView.extend({
     associatedProjectName: '.js-community-create-associated-project-name',
   }),
 
-  events: _.extend({}, CommunityCreateBaseStepView.prototype.events, {
+  events: _.extend({}, _super.events, {
     'submit @ui.mainForm': 'onStepNext',
     'input @ui.communityNameInput': 'onCommunityNameInputChange',
     'input @ui.communitySlugInput': 'onCommunitSlugInputChange',
     'click @ui.githubProjectLink': 'onGitHubProjectLinkActivated',
   }),
 
-  modelEvents: _.extend({}, CommunityCreateBaseStepView.prototype.modelEvents, {
+  modelEvents: _.extend({}, _super.modelEvents, {
 
   }),
 
   initialize: function(options) {
-    CommunityCreateBaseStepView.prototype.initialize.apply(this, arguments);
+    _super.initialize.apply(this, arguments);
 
     this.orgCollection = options.orgCollection;
     this.repoCollection = options.repoCollection;
@@ -98,7 +86,7 @@ module.exports = CommunityCreateBaseStepView.extend({
   },
 
   applyValidMessages: function(isValid, isAfterRender) {
-    CommunityCreateBaseStepView.prototype.applyValidMessages.apply(this, arguments);
+    _super.applyValidMessages.apply(this, arguments);
 
     var communityNameErrorMessage = '';
     var communitySlugErrorMessage = '';
