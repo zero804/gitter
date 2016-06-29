@@ -16,6 +16,26 @@
   &:hover,
   &:focus {
     .room-item-active();
+    //Reveal all text content | this nesting is gross but I don't know how to get around it
+    //JP 9/6/16
+    height:     auto;
+    max-height: initial;
+    overflow:   visible;
+
+    //remove all height restrictions on the container
+    & > .room-item__container--search {
+      height:     auto;
+      max-height: initial;
+      overflow:   visible;
+
+      //remove all height restrictions and overflow on content
+      & .room-item__title--search {
+        height:     auto;
+        max-height: initial;
+        overflow:   visible;
+        white-space: normal;
+      }
+    }
   }
 }
 
