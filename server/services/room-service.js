@@ -466,7 +466,15 @@ function createRoomByUri(user, uri, options) {
 
   /* First off, try use local data to figure out what this url is for */
   return uriResolver(user && user.id, uri, options)
-    .spread(function (resolvedUser, resolvedTroupe, roomMember) {
+    .then(function (resolved) {
+      var resolvedUser = resolved && resolved.user;
+      var resolvedTroupe = resolved && resolved.room;
+      var roomMember = resolved && resolved.roomMember;
+      var resolvedGroup = resolved && resolved.group;
+
+      // We resolved a group. There will never be a room at this URI
+      if (resolvedGroup) throw new StatusError(404);
+
       /* Deal with the case of the anonymous user first */
       if(!user) {
         if(resolvedUser) {
