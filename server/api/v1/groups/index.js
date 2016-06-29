@@ -29,13 +29,13 @@ module.exports = {
       throw new StatusError(404);
     }
 
-    var uri = req.body.uri;
-    var name = req.body.name;
+    var uri = req.body.uri ? String(req.body.uri) : undefined;
+    var name = req.body.name ? String(req.body.name) : undefined;
     var createOptions = { uri: uri, name: name };
     if (req.body.security) {
       // for GitHub and future group types that are backed by other services
-      createOptions.type = req.body.security.type;
-      createOptions.linkPath = req.body.security.linkPath;
+      createOptions.type = req.body.security.type ? String(req.body.security.type) : undefined;
+      createOptions.linkPath = req.body.security.linkPath ? String(req.body.security.linkPath) : undefined
     }
     return groupService.createGroup(user, createOptions);
   },
