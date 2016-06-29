@@ -88,7 +88,6 @@ function renderMainFrame(req, res, next, frame) {
 
         //switches
       var hasNewLeftMenu = !req.isPhone && req.fflip && req.fflip.has('left-menu');
-      var hasGroups = req.fflip && req.fflip.has('groups');
       var snapshots = troupeContext.snapshots = generateMainFrameSnapshots(req, troupeContext, rooms, groups);
 
       if(snapshots && snapshots.leftMenu && snapshots.leftMenu.state) {
