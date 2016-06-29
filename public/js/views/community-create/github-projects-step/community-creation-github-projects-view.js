@@ -81,14 +81,13 @@ module.exports = CommunityCreateBaseStepView.extend({
     this.orgCollection = options.orgCollection;
     this.repoCollection = options.repoCollection;
     this.filteredRepoCollection = new FilteredCollection({
-        collection: this.repoCollection
-      })
-      .on('filter-complete', function() {
-        this.trigger('reset');
-      });
+      collection: this.repoCollection
+    });
 
     this.throttledApplyFilterToRepos = _.throttle(this.applyFilterToRepos, 500);
     this.shortThrottledApplyFilterToRepos = _.throttle(this.applyFilterToRepos, 100);
+
+    this.listenTo(this.filteredRepoCollection, 'filter-complete', this.onRepoFilterComplete, this);
   },
 
   serializeData: function() {
@@ -232,5 +231,9 @@ module.exports = CommunityCreateBaseStepView.extend({
 
       return shouldShow;
     })
+  },
+
+  onRepoFilterComplete: function() {
+    this.filteredRepoCollection.trigger('reset');
   }
 });
