@@ -7,6 +7,12 @@ var _ = require('underscore');
 var BaseResolverCollection = require('./base-resolver-collection.js');
 var context = require('utils/context');
 
+var SEARCH_SKIP_INCREMENT = 30;
+
+var QueryModel = Backbone.Model.extend({
+  defaults: { skip: 0 }
+});
+
 var ContextModel = Backbone.Model.extend({
   defaults: {
     active: false,
@@ -59,10 +65,13 @@ module.exports = BaseResolverCollection.extend({
 
     this.roomModel = attrs.roomModel;
 
+    this.queryModel = new QueryModel(null);
     this.contextModel = new ContextModel(null, { roomMenuModel: this.roomMenuModel, roomModel: this.roomModel });
 
     this.listenTo(this.contextModel, 'change:active', this.onModelUpdateActive, this);
+    this.listenTo(this.queryModel, 'change:skip', this.onSkipUpdate, this);
     this.listenTo(this.roomMenuModel, 'change:searchTerm', this.onSearchTermUpdate, this);
+    this.listenTo(this.roomMenuModel, 'change:isFetchingMoreSearchMessageResults', this.onModelChangeFetchStatus, this);
 
     BaseResolverCollection.prototype.initialize.apply(this, arguments);
   },
@@ -72,19 +81,47 @@ module.exports = BaseResolverCollection.extend({
   },
 
   onSearchTermUpdate: function (model, val){ //jshint unused: true
-    if(!this.contextModel.get('active')) { return }
+    if(!this.contextModel.get('active')) { return; }
     if(!val) { return this.reset(); }
     this.fetchResults();
   },
 
+  onModelChangeFetchStatus: function (model, val){
+    if(!val) { return; }
+    var currentSkip = this.queryModel.get('skip');
+    var newSkip = currentSkip + SEARCH_SKIP_INCREMENT;
+    this.queryModel.set('skip', newSkip);
+  },
+
+  onSkipUpdate: function (model, val){
+    if(val !== 0) { return this.fetchResults(); }
+  },
+
+  onFetchSuccess: function (model, results){
+    if(results.length < SEARCH_SKIP_INCREMENT) {
+      return this.queryModel.set('hasReachedLimit', true);
+    }
+    return this.roomMenuModel.set('isFetchingMoreSearchMessageResults', false);
+  },
+
   fetchResults: _.debounce(function (){
-    this.fetch({
+    if(this.queryModel.get('hasReachedLimit')) { return; }
+
+    var query = {
+      remove: false,
+      success: this.onFetchSuccess.bind(this),
       data: {
         q:     this.roomMenuModel.get('searchTerm'),
         lang:  context.lang(),
-        limit: 45
+        limit: SEARCH_SKIP_INCREMENT,
       }
-    });
+    };
+
+    //Skip results in query
+    var skip = this.queryModel.get('skip');
+    if(skip !== 0) { query.data.skip = skip; }
+
+    this.fetch(query);
   }, 50),
 
 });
