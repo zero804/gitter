@@ -8,14 +8,17 @@ var userService = require('../../services/user-service');
 var roomMembershipService = require('../../services/room-membership-service');
 var troupeService = require('../../services/troupe-service');
 var _ = require('lodash');
-var GitHubOrgService = require('gitter-web-github').GitHubOrgService;
 var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 var generateRoomCardContext = require('gitter-web-shared/templates/partials/room-card-context-generator');
 var StatusError = require('statuserror');
 var fonts = require('../../web/fonts');
+var restSerializer = require('../../serializers/rest-serializer');
 
 function renderOrgPage(req, res, next) {
   if (!req.group) throw new StatusError(404);
+  var user = req.user;
+  var userId = user && user._id;
+  var group = req.group;
   var policy = req.uriContext.policy;
 
   var findChildRoomOptions = {};
@@ -25,19 +28,22 @@ function renderOrgPage(req, res, next) {
   // Show only public rooms to not logged in users
   if (!req.user) findChildRoomOptions.security = 'PUBLIC';
 
-  var ghOrgService = new GitHubOrgService(req.user);
-
   // TODO: fix this!!!
-  var orgUri = req.group.uri;
+  var orgUri = group.uri;
+
+  var strategy = new restSerializer.GroupStrategy({
+    currentUser: user,
+    currentUserId: userId
+  });
 
   return Promise.all([
-    ghOrgService.getOrg(orgUri).catch(function() { return null; }),
+    restSerializer.serializeObject(group, strategy),
     troupeService.findChildRoomsForOrg(orgUri, findChildRoomOptions),
     contextGenerator.generateNonChatContext(req),
     policy.canAdmin(),
     policy.canJoin()
   ])
-  .spread(function(ghOrg, rooms, troupeContext, isOrgAdmin, isOrgMember) {
+  .spread(function(serializedGroup, rooms, troupeContext, isOrgAdmin, isOrgMember) {
     var isStaff = !!(troupeContext.user || {}).staff;
 
     // Filter out PRIVATE rooms
@@ -118,9 +124,7 @@ function renderOrgPage(req, res, next) {
         exploreBaseUrl: '/home/~explore',
         roomCount: roomCount,
         orgUserCount: orgUserCount,
-        org: ghOrg || {
-          login: orgUri
-        },
+        group: serializedGroup,
         rooms: rooms,
         troupeContext: troupeContext,
         pagination: {
