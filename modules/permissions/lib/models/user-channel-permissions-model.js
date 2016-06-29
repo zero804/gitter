@@ -4,16 +4,14 @@
 var Promise = require('bluebird');
 var userIsInRoom = require('../user-in-room');
 var StatusError = require('statuserror');
+var util = require('util');
 
 var ALLOWED_USER_CHANNEL_SECURITY_VALUES = {
   PRIVATE: 1,
   PUBLIC: 1
 };
 
-/**
- * USER_CHANNEL permissions model
- */
-module.exports = Promise.method(function userChannelPermissionsModel(user, right, uri, security) {
+function userChannelPermissionsModel(user, right, uri, security) {
   if(!ALLOWED_USER_CHANNEL_SECURITY_VALUES.hasOwnProperty(security)) {
     throw new Error('Invalid security type:' + security);
   }
@@ -79,4 +77,9 @@ module.exports = Promise.method(function userChannelPermissionsModel(user, right
       throw new StatusError(400, 'Unknown right ' + right);
   }
 
-});
+}
+
+/**
+ * USER_CHANNEL permissions model
+ */
+module.exports = Promise.method(util.deprecate(userChannelPermissionsModel, 'userChannelPermissionsModel is deprecated'));
