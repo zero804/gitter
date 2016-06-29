@@ -1,6 +1,6 @@
 "use strict";
 
-var client = require('../utils/elasticsearch-client');
+var client = require('../utils/elasticsearch-client').v1;
 var Promise = require('bluebird');
 var assert = require('assert');
 

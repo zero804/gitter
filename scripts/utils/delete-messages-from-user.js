@@ -11,7 +11,7 @@ var mkdir = Promise.promisify(temp.mkdir);
 
 var userService = require('../../server/services/user-service');
 var chatService = require('../../server/services/chat-service');
-var client = require('../../server/utils/elasticsearch-client');
+var client = require('../../server/utils/elasticsearch-client').v1;
 
 
 var opts = require('yargs')
