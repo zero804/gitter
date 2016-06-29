@@ -53,21 +53,23 @@ function SuggestedRoomStrategy() {
     var uri = suggestedRoom && suggestedRoom.uri;
     if (!uri) return;
 
+    var id = suggestedRoom.id || suggestedRoom._id;
+
     var providers = (suggestedRoom.providers && suggestedRoom.providers.length) ?
         suggestedRoom.providers :
         undefined;
 
     return {
-      id: suggestedRoom.id,
+      id: id,
       uri: uri,
       avatarUrl: resolveRoomAvatarUrl(suggestedRoom, 48),
       userCount: suggestedRoom.userCount,
-      messageCount: messageCountStrategy.map(suggestedRoom.id),
+      messageCount: messageCountStrategy.map(id),
       tags: suggestedRoom.tags,
       providers: providers,
       // TODO: users/avatars (sample)
       description: suggestedRoom.topic,
-      exists: !!suggestedRoom.id
+      exists: !!id
     };
   };
 }

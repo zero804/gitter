@@ -33,14 +33,14 @@ function findRooms(groupId, user, currentPage) {
       limit: ROOMS_PER_PAGE
     })
     .then(function(roomBrowseResult) {
-      var strategy = new restSerializer.TroupeStrategy({
+      var strategy = new restSerializer.SuggestedRoomStrategy({
         currentUserId: userId,
         currentUser: user
       });
 
-      return restSerializer.serialize(roomBrowseResult.rooms, strategy)
+      return restSerializer.serialize(roomBrowseResult.results, strategy)
         .then(function(serializedRooms) {
-          roomBrowseResult.rooms = serializedRooms;
+          roomBrowseResult.results = serializedRooms;
           return roomBrowseResult;
         });
     });

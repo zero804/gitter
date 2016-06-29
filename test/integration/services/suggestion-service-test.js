@@ -36,10 +36,10 @@ describe('suggestion-service', function() {
       it('should return suggestions', function() {
         return suggestionService.findSuggestionsForUserId(fixture.user1._id)
           .then(function(suggestions) {
-            assert.deepEqual(serialize(suggestions), serialize([
-              fixture.troupe2
-            ]));
-          })
+            assert(suggestions.some(function(f) {
+              return String(f._id) === fixture.troupe2.id;
+            }));
+          });
       });
     });
 
@@ -51,12 +51,11 @@ describe('suggestion-service', function() {
           language: 'en'
         })
         .then(function(suggestions) {
-          assert.deepEqual(serialize(suggestions), serialize([
-            fixture.troupe2
-          ]));
-        })
-
-      })
+          assert(suggestions.some(function(f) {
+            return String(f._id) === fixture.troupe2.id;
+          }));
+        });
+      });
     });
 
   });
