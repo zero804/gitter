@@ -52,11 +52,6 @@ router.get('/repo-info',
   identifyRoute('repo-info'),
   require('./repo-info.js'));
 
-router.get('/channel-search',
-  authMiddleware,
-  identifyRoute('channel-search'),
-  require('./channel-search.js'));
-
 // Deprecated - remove by 15 November
 router.get('/public-repo-search',
   authMiddleware,
