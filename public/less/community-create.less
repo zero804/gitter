@@ -5,6 +5,11 @@
 @import 'typography';
 @import 'base-web';
 
+// Some slight adjustments for smaller screen realestate
+@small-breakpoint: 670px;
+@tiny-breakpoint: 480px;
+@micro-breakpoint: 400px;
+
 
 @base-text-color: rgba(255, 255, 255, .75);
 @subdued-text-color: rgba(255, 255, 255, .5);
@@ -19,33 +24,33 @@
 .primary-input-font-size() {
   font-size: @primary-input-font-size;
 
-  @media (max-width: 670px) {
+  @media (max-width: @small-breakpoint) {
     font-size: 3.2rem;
   }
-  @media (max-width: 480px) {
+  @media (max-width: @tiny-breakpoint) {
     font-size: 2.8rem;
   }
-  @media (max-width: 400px) {
+  @media (max-width: @micro-breakpoint) {
     font-size: 2.3rem;
   }
 }
 .primary-input-height() {
   height: @primary-input-height;
 
-  @media (max-width: 670px) {
+  @media (max-width: @small-breakpoint) {
     height: 5.5rem;
   }
-  @media (max-width: 480px) {
+  @media (max-width: @tiny-breakpoint) {
     height: 5rem;
   }
 }
 .primary-input-spacing-top() {
   margin-top: @primary-input-spacing-top;
 
-  @media (max-width: 670px) {
+  @media (max-width: @small-breakpoint) {
     margin-top: 1.8rem;
   }
-  @media (max-width: 480px) {
+  @media (max-width: @tiny-breakpoint) {
     margin-top: 1.5rem;
   }
 }
@@ -58,10 +63,10 @@
 .secondary-input-spacing-top() {
   margin-top: @secondary-input-spacing-top;
 
-  @media (max-width: 670px) {
+  @media (max-width: @small-breakpoint) {
     margin-top: 2rem;
   }
-  @media (max-width: 480px) {
+  @media (max-width: @tiny-breakpoint) {
     margin-top: 1.5rem;
   }
 }
@@ -809,11 +814,9 @@
   padding: (@org-area-padding - (@org-item-spacing / 2)) @org-area-padding;
 
   background-color: rgba(0, 0, 0, .2);
-
-  // Marrionette extra region div
-  & > div {
-    height: 100%;
-  }
+}
+.community-create-org-list-root-inner {
+  height: 100%;
 }
 
 .community-create-org-list {
@@ -849,11 +852,9 @@
   height: @org-area-total-height + @org-area-padding;
   padding: (@org-area-padding - (@repo-item-spacing / 2)) @org-area-padding;
   background-color: rgba(0, 0, 0, .2);
-
-  // Marrionette extra region div
-  & > div {
-    height: 100%;
-  }
+}
+.community-create-repo-list-root-inner {
+  height: 100%;
 }
 
 .community-create-repo-list {
