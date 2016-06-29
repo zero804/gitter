@@ -79,7 +79,6 @@ module.exports = Marionette.LayoutView.extend({
     this.repoCollection = options.repoCollection;
 
     this.communityCreateModel = new CommunityCreateModel();
-    this.hasRenderedCommunityCreateView = false;
 
     this.listenTo(appEvents, 'community-create-view:toggle', this.onCommunityCreateToggle, this);
   },
@@ -150,11 +149,9 @@ module.exports = Marionette.LayoutView.extend({
     e.stopPropagation();
   },
 
-  
+
   onCommunityCreateToggle: function(active) {
     this.communityCreateModel.set('active', active);
-
-    this.hasRenderedCommunityCreateView = true;
   }
 
 });
