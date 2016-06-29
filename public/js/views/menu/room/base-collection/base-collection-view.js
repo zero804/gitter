@@ -157,7 +157,7 @@ module.exports = Marionette.CompositeView.extend({
     activeElement.set('focus', true);
   },
 
-  onRoomupdate: function (troupe, id){
+  onRoomUpdate: function (troupe, id){
     this.clearFocus();
     this.clearActive();
     var model = this.collection.get(id);
