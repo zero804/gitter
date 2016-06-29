@@ -3,6 +3,7 @@
 var Promise = require('bluebird');
 var userHasSignedUp = require('../user-has-signed-up');
 var StatusError = require('statuserror');
+var util = require('util');
 
 function ensureUserHasSignedUp(uri) {
   return userHasSignedUp(uri)
@@ -19,7 +20,7 @@ function ensureUserHasSignedUp(uri) {
 /**
  * ONE-TO-ONE permissions model
  */
-module.exports = function oneToOnePermissionsModel(user, right, uri, security) {
+module.exports = util.deprecate(function oneToOnePermissionsModel(user, right, uri, security) {
   // Security is only for child rooms
   if (security) {
     return Promise.reject(new Error('oneToOnes do not have security'));
@@ -42,4 +43,4 @@ module.exports = function oneToOnePermissionsModel(user, right, uri, security) {
       throw new StatusError(400, 'Unknown right ' + right);
   }
 
-};
+}, 'one-to-one-permissions-model is deprecated');

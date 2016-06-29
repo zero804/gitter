@@ -2,6 +2,7 @@
 "use strict";
 
 var Promise = require('bluebird');
+var util = require('util');
 
 var ALLOWED_SECURITY_VALUES = {
   PRIVATE: 1,
@@ -19,7 +20,7 @@ var ALLOWED_SECURITY_VALUES = {
  */
 module.exports = function(delegatePermissionsModel, userIsInRoom) {
 
-  return Promise.method(function commonChannelPermissionsModel(user, right, uri, security) {
+  return Promise.method(util.deprecate(function commonChannelPermissionsModel(user, right, uri, security) {
     if(!ALLOWED_SECURITY_VALUES.hasOwnProperty(security)) {
       throw new Error('Unknown security: ' + security);
     }
@@ -105,5 +106,5 @@ module.exports = function(delegatePermissionsModel, userIsInRoom) {
       default:
         throw new Error('Unknown right: ' + right);
     }
-  });
+  }, 'common-org-repo-channel-permissions-model is deprecated'));
 };
