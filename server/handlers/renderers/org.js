@@ -12,6 +12,7 @@ var GitHubOrgService = require('gitter-web-github').GitHubOrgService;
 var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 var generateRoomCardContext = require('gitter-web-shared/templates/partials/room-card-context-generator');
 var StatusError = require('statuserror');
+var fonts = require('../../web/fonts');
 
 function renderOrgPage(req, res, next) {
   if (!req.group) throw new StatusError(404);
@@ -110,6 +111,8 @@ function renderOrgPage(req, res, next) {
         '&via=gitchat';
 
       res.render('org-page', {
+        hasCachedFonts: fonts.hasCachedFonts(req.cookies),
+        fonts: fonts.getFonts(),
         socialUrl: url,
         isLoggedIn: !!req.user,
         exploreBaseUrl: '/home/~explore',

@@ -1,13 +1,13 @@
 'use strict';
 
-var Marionette = require('backbone.marionette');
+var BaseItemView = require('../base-item-view');
 var cocktail = require('cocktail');
 var toggleClass = require('utils/toggle-class');
 var KeyboardEventMixin = require('views/keyboard-events-mixin');
 var template = require('./base-collection-item-view.hbs');
 var updateUnreadIndicatorClassState = require('../../../../components/menu/update-unread-indicator-class-state');
 
-var BaseCollectionItemView = Marionette.ItemView.extend({
+var BaseCollectionItemView = BaseItemView.extend({
 
   className: 'room-item',
   template:  template,
@@ -16,17 +16,10 @@ var BaseCollectionItemView = Marionette.ItemView.extend({
     'click': 'item:activated',
   },
 
-  keyboardEvents: {
-    'room-list-item:activate': 'onKeyboardItemActivated',
-  },
-
   modelEvents: {
     'activated':     'onItemActivated',
     'change:active': 'onActiveChange',
-    'change:focus':    'onItemFocused',
     'change:unreadItems change:mentions change:activity': 'onUnreadUpdate',
-    'focus:item': 'focusItem',
-    'blur:item': 'blurItem',
     'change:isHidden': 'onHiddenChange',
   },
 
@@ -36,11 +29,9 @@ var BaseCollectionItemView = Marionette.ItemView.extend({
     title:           '#room-item-title',
   },
 
-  constructor: function(attrs) {
+  initialize: function(attrs) {
     this.roomMenuModel = attrs.roomMenuModel;
     this.index = attrs.index;
-
-    Marionette.ItemView.prototype.constructor.apply(this, arguments);
   },
 
   attributes: function() {
@@ -87,20 +78,8 @@ var BaseCollectionItemView = Marionette.ItemView.extend({
     toggleClass(this.ui.container[0], 'active', !!val);
   },
 
-  onKeyboardItemActivated: function(e) {
-    // Check to make sure the keyboard event was even spawned from this view
-    if(e.target === this.ui.container[0]) {
-      this.onItemActivated();
-      e.preventDefault();
-    }
-  },
-
   onItemActivated: function(e) {
     this.trigger('item:activated');
-  },
-
-  onItemFocused: function(model, val) {
-    toggleClass(this.ui.container[0], 'focus', !!val);
   },
 
   onUnreadUpdate: function() {
@@ -120,24 +99,11 @@ var BaseCollectionItemView = Marionette.ItemView.extend({
     this.pulseIndicators();
   },
 
-  focusItem: function() {
-    this.ui.container.focus();
-    toggleClass(this.ui.container[0], 'focus', true);
-  },
-
-  blurItem: function() {
-    this.ui.container.blur();
-    toggleClass(this.ui.container[0], 'focus', false);
-  },
-
   onHiddenChange: function (model, val){
     toggleClass(this.el, 'hidden', val);
   },
 
 });
-
-
-cocktail.mixin(BaseCollectionItemView, KeyboardEventMixin);
 
 
 module.exports = BaseCollectionItemView;

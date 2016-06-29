@@ -5,41 +5,47 @@
         <ul id="minibar-list" class="room-menu-options nano-content">
 
           <li data-state-change="all" id="minibar-all"  class="room-menu-options__item--all">
-            <button class="room-menu-options__item-button" title="All Conversations">
-              <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/home.svg"}}' />
-            </button>
+            {{! the above li is passed to a Marionette view as its el so, sadly, we need to wrap these in divs}}
+            <div class="room-menu-options__container">
+              <button class="room-menu-options__item-button" title="All Conversations">
+                <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/home.svg"}}' />
+              </button>
+            </div>
           </li>
 
           <li data-state-change="search" id="minibar-search" class="room-menu-options__item--search">
-            <button class="room-menu-options__item-button" title="Search Gitter">
-              <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/search.svg"}}' />
-            </button>
+            <div class="room-menu-options__container">
+              <button class="room-menu-options__item-button" title="Search Gitter">
+                <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/search.svg"}}' />
+              </button>
+            </div>
           </li>
-
-          {{!
-          <li data-state-change="favourite" id="minibar-favourite" class="room-menu-options__item--favourite">
-            <button class="room-menu-options__item-button" title="Your Favourite Conversations">
-              <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/favourites.svg"}}{{!' />
-            </button>
-          </li>
-          }}
 
           <li data-state-change="people" id="minibar-people" class="room-menu-options__item--people">
-            <button class="room-menu-options__item-button" title="Your One to One Conversations">
-              <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/people.svg"}}' />
-            </button>
+            <div class="room-menu-options__container">
+              {{> minibar_activity_indicators}}
+              <button class="room-menu-options__item-button" title="Your One to One Conversations">
+                <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/people.svg"}}' />
+              </button>
+            </div>
           </li>
 
-          {{#each leftMenuOrgs}} {{! JP 9/12/15 }} {{! TODO SHOULD THIS BE MOVED INTO A PARTIAL TO BE SHARED AROUND }}
-            <li data-state-change="org" id="minibar-{{name}}"  data-org-name="{{name}}" class="room-menu-options__item--org">
-              {{{ prerenderView "js/views/menu/room/minibar/minibar-item-view" }}}
-            </li>
-          {{/each}}
+          <li id="minibar-collection">
+            <ul class="minibar-collection-list">
+              {{#each leftMenuOrgs}} {{! JP 9/12/15 }} {{! TODO SHOULD THIS BE MOVED INTO A PARTIAL TO BE SHARED AROUND }}
+                <li data-state-change="org" id="minibar-{{name}}"  data-org-name="{{name}}" class="room-menu-options__item--org">
+                  {{{ prerenderView "js/views/menu/room/minibar/minibar-item-view" }}}
+                </li>
+              {{/each}}
+            </ul>
+          </li>
 
           <li data-state-change="close" id="minibar-close"  class="room-menu-options__item--close {{#if roomMenuIsPinned}}left{{/if}}">
-            <button id="menu-toggle-button" class="room-menu-options__item-button menu-toggle-button" title="Toggle left menu">
-              {{> pinned-hamburger-menu-icon }}
-            </button>
+            <div class="room-menu-options__container">
+              <button id="menu-toggle-button" class="room-menu-options__item-button menu-toggle-button" title="Toggle left menu">
+                {{> pinned-hamburger-menu-icon }}
+              </button>
+            </div>
           </li>
 
         </ul>

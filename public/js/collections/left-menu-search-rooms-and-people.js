@@ -30,7 +30,7 @@ function uniqByUrl(list) {
   });
 }
 
-module.exports = Backbone.Collection.extend({
+var SearchMessageAndPeople = Backbone.Collection.extend({
   initialize: function(models, attrs) {//jshint unused: true
 
     if (!attrs || !attrs.roomMenuModel) {
@@ -87,3 +87,16 @@ module.exports = Backbone.Collection.extend({
   },
 
 });
+
+var FilteredSearchMessageAndPeople = function(models, attrs, options){
+  this.collection = attrs.collection = new SearchMessageAndPeople(models, attrs);
+  FilteredCollection.call(this, attrs, options);
+};
+
+_.extend(FilteredSearchMessageAndPeople.prototype, FilteredCollection.prototype, {
+  collectionFilter: function(model, index){
+    return index < 6;
+  }
+});
+
+module.exports = FilteredSearchMessageAndPeople;

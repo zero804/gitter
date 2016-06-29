@@ -23,11 +23,11 @@ require('utils/tracking');
 require('components/timezone-cookie');
 
 // Preload widgets
-require('views/widgets/avatar');
-require('components/ping');
-require('components/eyeballs');
-require('template/helpers/all');
-require('utils/gesture-controller');
+require('./views/widgets/avatar');
+require('./components/ping');
+require('./components/eyeballs-room-sync');
+require('./template/helpers/all');
+require('./utils/gesture-controller');
 
 onready(function() {
 

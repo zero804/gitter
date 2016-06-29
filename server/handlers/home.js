@@ -50,10 +50,13 @@ router.get('/createroom',
 
 router.get(new RegExp('/explore(.*)?'),
   identifyRoute('home-explore'),
-  ensureLoggedIn,
   featureToggles,
   isPhoneMiddleware,
   function (req, res, next) {
+    if(!req.user) {
+      return res.redirect('/explore');
+    }
+
     var exploreParam = req.params[0] || '';
     var subFrameLocation = urlJoin('/home/~explore', exploreParam);
 
