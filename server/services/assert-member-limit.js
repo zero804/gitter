@@ -8,13 +8,14 @@ var persistence = require('gitter-web-persistence');
 var debug = require('debug')('gitter:app:assert-room-limit');
 var Promise = require('bluebird');
 var roomMembershipService = require('./room-membership-service');
+var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
 
 var maxFreeOrgRoomMembers = nconf.get('maxFreeOrgRoomMembers');
 
 function assertMemberLimit(room, existingUser) {
   var uri = room && room.uri;
 
-  if (room.security === 'PUBLIC') {
+  if (securityDescriptorUtils.isPublic(room)) {
     debug('%s is a public room. you dont need to pay.', uri);
     return Promise.resolve();
   }
