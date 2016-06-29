@@ -46,7 +46,7 @@ function ensureAccessAndFetchRoomInfo(user, group, options) {
     throw new StatusError(400, 'Invalid room security for ' + type +': '+ security);
   }
 
-  var topic = options.topic || null;
+  var topic = options.topic;
   // TODO: validate topic
 
   var name = options.name;
@@ -84,16 +84,12 @@ GroupWithPolicyService.prototype.createRoom = secureMethod([allowAdmin], functio
   var group = this.group;
 
   if (!config.get("project-splitsville:enabled")) {
-    if (options.type && group.sd.type !== 'GH_ORG' && group.sd.type !== 'GH_USER') {
-      throw new StatusError(400, 'GitHub repo backed rooms can only be added to GitHub org or user backed groups.');
+    if (options.type && group.sd.type !== 'GH_ORG' && group.sd.type !== 'GH_REPO' && group.sd.type !== 'GH_USER') {
+      throw new StatusError(400, 'GitHub repo backed rooms can only be added to GitHub org, repo or user backed groups.');
     }
 
     if (options.linkPath) {
-      if (options.linkPath !== group.uri + '/' + options.name) {
-        throw new StatusError(400, "GitHub repo backed rooms' linkPath must match the uri.");
-      }
-
-      if (options.linkPath.split('/')[0] !== group.sd.linkPath) {
+      if (options.linkPath.split('/')[0] !== group.sd.linkPath.split('/')[0]) {
         throw new StatusError(400, 'GitHub repo backed rooms must be for the same owner (gh org or user) as the group.');
       }
     }
