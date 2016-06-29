@@ -13,16 +13,16 @@
 
       <div class="org-page__org">
         <div class="org-page__org-logo">
-          <img width='64' height='64' src='https://avatars.githubusercontent.com/{{ org.login }}?s=128'>
+          <img width='64' height='64' src='{{ group.avatarUrl }}'>
         </div>
 
         <div class="org-page__org-details">
           <div class="org-page__name">
-            <h1>{{ org.login }}</h1>
+            <h1>{{ group.uri }}</h1>
           </div>
 
           <div class="org-page__description">
-            {{org.description}}
+            {{ group.description }}
           </div>
         </div>
 
@@ -34,7 +34,7 @@
         </div>
         {{else}}
           <div class="org-page__login">
-            Are you a member of {{ org.login }}?  <a class="btn secondary orange sorg-page__login__btn" href="/login?action=login&source=orgpage" target="_parent">Sign in</a>
+            Are you a member of {{ group.uri }}?  <a class="btn secondary orange sorg-page__login__btn" href="/login?action=login&source=orgpage" target="_parent">Sign in</a>
           </div>
         {{/if}}
       </div>
@@ -50,6 +50,7 @@
           {{orgUserCount}} {{pluralize orgUserCount 'Person' 'People' }}
         </div>
 
+        {{!--
         {{#if org.location}}
           <div class="org-page__detail"><i class="octicon octicon-location"></i> {{org.location}}</div>
         {{/if}}
@@ -57,6 +58,8 @@
         {{#if org.blog}}
           <div class="org-page__detail"><i class="octicon octicon-link"></i><a href="{{org.blog}}" target="_blank"> {{org.blog}}</a></div>
         {{/if}}
+        --}}
+
       </div>
     </header>
 

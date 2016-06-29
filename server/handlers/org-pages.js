@@ -22,7 +22,7 @@ function handleOrgPageInFrame(req, res, next) {
   }
 
   mainFrameRenderer.renderMainFrame(req, res, next, {
-    subFrameLocation: '/orgs/' + req.group.uri + '/~iframe',
+    subFrameLocation: '/orgs/' + req.group.uri + '/rooms/~iframe',
     title: req.group.uri
     // TODO: add social meta data
   });
