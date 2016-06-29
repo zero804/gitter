@@ -5,6 +5,7 @@ var toggleClass = require('utils/toggle-class');
 var context = require('utils/context');
 var slugify = require('slug');
 var fuzzysearch = require('fuzzysearch');
+var FilteredCollection = require('backbone-filtered-collection');
 var getRoomNameFromTroupeName = require('gitter-web-shared/get-room-name-from-troupe-name');
 
 require('views/behaviors/isomorphic');
@@ -43,7 +44,7 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   initRepoListView: function(optionsForRegion) {
     this.repoListView = new CommunityCreationRepoListView(optionsForRegion({
-      collection: this.repoCollection
+      collection: this.filteredRepoCollection
     }));
     this.listenTo(this.repoListView, 'repo:activated', this.onRepoSelectionChange, this);
     this.listenTo(this.repoListView, 'repo:cleared', this.onRepoSelectionChange, this);
@@ -78,6 +79,12 @@ module.exports = CommunityCreateBaseStepView.extend({
 
     this.orgCollection = options.orgCollection;
     this.repoCollection = options.repoCollection;
+    this.filteredRepoCollection = new FilteredCollection({
+        collection: this.repoCollection
+      })
+      .on('filter-complete', function() {
+        this.trigger('reset');
+      });
 
     this.throttledApplyFilterToRepos = _.throttle(this.applyFilterToRepos, 500);
     this.shortThrottledApplyFilterToRepos = _.throttle(this.applyFilterToRepos, 100);
@@ -212,12 +219,13 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   applyFilterToRepos: function() {
     var filterString = (this.model.get('repoFilter') || '').toLowerCase();
-    this.repoCollection.models.forEach(function(repoModel) {
+    this.filteredRepoCollection.setFilter(function(model) {
       var shouldShow = true;
       if(filterString && filterString.length > 0) {
-        shouldShow = fuzzysearch(filterString, repoModel.get('name').toLowerCase());
+        shouldShow = fuzzysearch(filterString, model.get('name').toLowerCase());
       }
-      repoModel.set('hidden', !shouldShow);
-    });
+
+      return shouldShow;
+    })
   }
 });
