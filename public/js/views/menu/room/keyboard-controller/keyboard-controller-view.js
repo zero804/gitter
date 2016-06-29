@@ -35,6 +35,7 @@ var KeyboardController = Marionette.ItemView.extend({
     this.minibarSearchModel = attrs.model.minibarSearchModel;
     this.minibarPeopleModel = attrs.model.minibarPeopleModel;
     this.minibarCloseModel = attrs.model.minibarCloseModel;
+    this.minibarTempOrgModel = attrs.model.minibarTempOrgModel;
 
     //Favourite
     this.favouriteCollection = attrs.model.favouriteCollection;
@@ -319,9 +320,15 @@ var KeyboardController = Marionette.ItemView.extend({
   },
 
   getFlatMinibarCollection: function (){
-    return [ this.minibarHomeModel, this.minibarSearchModel, this.minibarPeopleModel ]
-    .concat(this.minibarCollection.models)
-    .concat([ this.minibarCloseModel]);
+    var collection = [ this.minibarHomeModel, this.minibarSearchModel, this.minibarPeopleModel ];
+
+    if(!this.minibarTempOrgModel.get('hidden')) {
+      collection = collection.concat([ this.minibarTempOrgModel ]);
+    }
+
+    collection = collection.concat(this.minibarCollection.models);
+    collection = collection.concat([ this.minibarCloseModel]);
+    return collection;
   },
 
   setDebouncedState: _.debounce(function (model){

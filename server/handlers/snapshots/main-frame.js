@@ -36,6 +36,7 @@ module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, group
       avatarSrcset: resolveRoomAvatarSrcSet({ uri: selectedOrgName}, 22),
       type: 'org',
       active: true,
+      hidden: false
     }];
   }
 

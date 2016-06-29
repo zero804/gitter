@@ -58,6 +58,7 @@ describe('KeyboardControllerView', function(){
     model.minibarSearchModel = new Backbone.Model({ type: 'search', name: 'search' });
     model.minibarPeopleModel = new Backbone.Model({ type: 'people', name: 'people' });
     model.minibarCloseModel = new Backbone.Model({ type: 'close', name: 'close' });
+    model.minibarTempOrgModel = new Backbone.Model({ type: 'org', name: 'google', hidden: true});
 
 
     view = new KeyboardControllerView({
