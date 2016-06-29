@@ -55,6 +55,10 @@ function permissionsModel(user, right, uri, roomType, security) {
     'USER_CHANNEL': userChannelPermissionsModel
   }[roomType];
 
+  if (roomType === 'ONETOONE' || roomType === 'REPO_CHANNEL' || roomType === 'USER_CHANNEL') {
+    winston.warn('Unexpected roomType permissions model call', { roomType: roomType });
+  }
+
   if(!submodel) {
     return Promise.reject(new Error('Invalid roomType ' + roomType));
   }
