@@ -11,10 +11,6 @@ var UserSuggestionCollection = require('collections/user-suggestions');
 var _super = ProxyCollection.prototype;
 
 var UserResutCollection = function(models, attrs, options) {
-  attrs.collection = new Backbone.Collection(models);
-  ProxyCollection.call(this, attrs, options);
-
-
   if (!attrs || !attrs.stepViewModel) {
     throw new Error('A valid instance of CommunityCreateStepViewModel should be passed to a new UserResultCollection');
   }
@@ -30,17 +26,16 @@ var UserResutCollection = function(models, attrs, options) {
   }
   this.communityCreateModel = attrs.communityCreateModel;
 
+
   this.userSearchCollection = new userSearchModels.Collection();
   this.userSuggestionCollection = new UserSuggestionCollection();
 
-
-  this.throttledFetchUsers = _.throttle(this.fetchUsers, 300);
+  attrs.collection = this.userSuggestionCollection;
+  ProxyCollection.call(this, attrs, options);
 
   this.listenTo(this.stepViewModel, 'change:active', this.onActiveChange, this);
   this.listenTo(this.searchModel, 'change:searchInput', this.getResults, this);
   this.listenTo(this.communityCreateModel, 'change:communityName change:communitySlug change:githubOrgId', this.getResults, this);
-
-  this.switchCollection(this.userSuggestionCollection);
 };
 
 
@@ -57,7 +52,7 @@ _.extend(UserResutCollection.prototype, _super, {
       var searchInput = this.searchModel.get('searchInput');
       if(searchInput.length) {
         this.switchCollection(this.userSearchCollection);
-        this.throttledFetchUsers();
+        this.fetchUsers();
       }
       else {
         this.switchCollection(this.userSuggestionCollection);
@@ -65,7 +60,7 @@ _.extend(UserResutCollection.prototype, _super, {
     }
   },
 
-  fetchUsers: function () {
+  fetchUsers: _.throttle(function() {
     var searchInput = this.searchModel.get('searchInput');
     this.userSearchCollection.fetch({
       data: {
@@ -79,7 +74,7 @@ _.extend(UserResutCollection.prototype, _super, {
         merge: true
       }
     );
-  },
+  }, 300),
 
 
   fetchSuggestions: function() {
