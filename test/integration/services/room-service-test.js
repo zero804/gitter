@@ -1114,50 +1114,6 @@ describe('room-service', function() {
       });
     });
 
-    describe('rename a room if a user attempts to create a new room with an existing githubId', function() {
-      var originalUrl = 'moo/cow-' + Date.now();
-      var renamedUrl = 'bob/renamed-cow-' + Date.now();
-
-      var fixture = fixtureLoader.setup({
-        user1: { },
-        troupeRepo: {
-          uri: originalUrl,
-          lcUri: originalUrl,
-          githubType: 'REPO',
-          githubId: true,
-          users: ['user1']
-        },
-      });
-
-      it('should succeed', function() {
-        mockito.when(roomValidatorMock)().then(function() {
-          return Promise.resolve({
-            type: 'REPO',
-            uri: renamedUrl,
-            description: 'renamed',
-            githubId: fixture.troupeRepo.githubId,
-            security: 'PUBLIC'
-          });
-        });
-
-        mockito.when(createPolicyForGithubObjectMock)().then(function() {
-          return Promise.resolve({
-            canAdmin: function() {
-              return true;
-            }
-          });
-        })
-
-        return roomService.createRoomByUri(fixture.user1, renamedUrl, {})
-          .then(function(result) {
-            assert.strictEqual(result.didCreate, false);
-            assert.strictEqual(result.troupe.uri, renamedUrl);
-            assert.strictEqual(result.troupe.lcUri, renamedUrl);
-            assert.strictEqual(result.troupe.renamedLcUris[0], originalUrl);
-          });
-      });
-    });
-
     /**
      * • A room "x/y" does not exist but used to be called "a/b" on GitHub
      * • User attempts to create a new room "a/b"
@@ -1243,59 +1199,6 @@ describe('room-service', function() {
           });
       });
     });
-
-    /**
-     * • A room "x/y" exists.
-     * • User renames repo on github to "a/b"
-     * • User attempts to create a new room "a/b"
-     * • Should return room 'x/y' but renamed to "a/b"
-     */
-    describe('should rename a room if a user attempts to create a new room with an old uri that does not exist', function() {
-      var originalUrl3 = 'moo3/cow-' + Date.now();
-      var renamedUrl3 = 'bob3/renamed-cow-' + Date.now();
-
-      var fixture = fixtureLoader.setup({
-        user1: {},
-        troupe: {
-          uri: originalUrl3,
-          lcUri: originalUrl3,
-          githubType: 'REPO',
-          githubId: true,
-          users: ['user1']
-        }
-      });
-
-      it('should succeed', function() {
-        mockito.when(roomValidatorMock)().then(function() {
-          return Promise.resolve({
-            type: 'REPO',
-            uri: renamedUrl3,
-            description: 'renamed',
-            githubId: fixture.troupe.githubId,
-            security: 'PUBLIC'
-          });
-        });
-
-        mockito.when(createPolicyForGithubObjectMock)().then(function() {
-          return Promise.resolve({
-            canAdmin: function() {
-              return true;
-            }
-          });
-        })
-
-        return roomService.createRoomByUri(fixture.user1, renamedUrl3, {})
-          .then(function(result) {
-            assert.strictEqual(result.didCreate, false);
-            assert.strictEqual(result.troupe.id, fixture.troupe.id);
-            assert.strictEqual(result.troupe.uri, renamedUrl3);
-            assert.strictEqual(result.troupe.lcUri, renamedUrl3);
-          });
-      });
-
-    });
-
-
 
   });
 
