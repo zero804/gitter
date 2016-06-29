@@ -51,6 +51,9 @@ module.exports = Backbone.Model.extend({
   //JP 27/1/16
   initialize: function(attrs) {
 
+    //manually set that we are not fetching any extra search results
+    //(infinite scroll)
+    this.set({ isFetchingMoreSearchMessageResults: false });
     perfTiming.start('left-menu-init');
 
     if (!attrs || !attrs.bus) {
