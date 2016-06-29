@@ -90,6 +90,8 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
       dndCtrl:                 this.dndCtrl,
     }));
 
+    this.minibarCollection = this.model.minibarCollection;
+
     this.keyboardControls = new KeyboardControllerView({
       model: this.model,
     });
