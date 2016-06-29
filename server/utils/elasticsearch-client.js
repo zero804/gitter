@@ -30,7 +30,7 @@ ElasticSearchLoggingAdapter.prototype.trace = function (method, requestUrl, body
 };
 ElasticSearchLoggingAdapter.prototype.close = function () { };
 
-var client = new elasticsearch.Client({
+var v1 = new elasticsearch.Client({
   hosts: config.get('elasticsearch:hosts'),
   // Warning: possible memory leak: https://github.com/elasticsearch/elasticsearch-js/issues/71
   sniffOnStart: config.get('elasticsearch:sniffOnStart'),
@@ -39,4 +39,16 @@ var client = new elasticsearch.Client({
   log: ElasticSearchLoggingAdapter
 });
 
-module.exports = exports = client;
+var typeahead = new elasticsearch.Client({
+  hosts: config.get('elasticsearchTypeahead:hosts'),
+  // Warning: possible memory leak: https://github.com/elasticsearch/elasticsearch-js/issues/71
+  sniffOnStart: config.get('elasticsearch:sniffOnStart'),
+  sniffInterval: 300000,
+  apiVersion: '2.3',
+  log: ElasticSearchLoggingAdapter
+});
+
+module.exports = exports = {
+  v1: v1,
+  typeahead: typeahead
+};

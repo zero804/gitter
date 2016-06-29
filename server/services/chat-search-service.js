@@ -7,7 +7,7 @@ var Promise = require('bluebird');
 var _ = require('underscore');
 var languageDetector = require('../utils/language-detector');
 var languageAnalyzerMapper = require('../utils/language-analyzer-mapper');
-var client = require('../utils/elasticsearch-client');
+var client = require('../utils/elasticsearch-client').v1;
 
 
 /* Magic way of figuring out the matching terms so that we can highlight */
