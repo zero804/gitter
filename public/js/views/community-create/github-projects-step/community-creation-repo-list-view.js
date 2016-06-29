@@ -43,9 +43,6 @@ var CommunityCreationRepoListView = Marionette.CompositeView.extend({
     'item:activated': 'onItemActivated'
   },
 
-  initialize: function() {
-  },
-
   onItemActivated: function(view) {
     var newActiveValue = !view.model.get('active');
 

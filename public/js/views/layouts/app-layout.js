@@ -66,7 +66,6 @@ module.exports = (function () {
       this.dialogRegion = modalRegion;
 
       this.communityCreateModel = new CommunityCreateModel();
-      this.hasRenderedCommunityCreateView = false;
 
       //Mobile events don't seem to bind 100% of the time so lets use a native method
       var menuHotspot = document.querySelector('.menu__hotspot');
@@ -108,8 +107,6 @@ module.exports = (function () {
 
     onCommunityCreateToggle: function(active) {
       this.communityCreateModel.set('active', active);
-
-      this.hasRenderedCommunityCreateView = true;
     }
 
   });

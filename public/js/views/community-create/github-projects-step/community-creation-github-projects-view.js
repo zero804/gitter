@@ -93,7 +93,7 @@ module.exports = CommunityCreateBaseStepView.extend({
   serializeData: function() {
     var data = this.model.toJSON();
     var user = context.getUser();
-    data.isUserMissingPrivateRepoScope = user && !user.scopes.private_repo;
+    data.isUserMissingPrivateRepoScope = user && user.scopes && !user.scopes.private_repo;
 
     return data;
   },
