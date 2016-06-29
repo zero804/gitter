@@ -10,7 +10,7 @@ var loadTroupeFromParam = require('./load-troupe-param');
 var RoomWithPolicyService = require('../../../services/room-with-policy-service');
 var Promise = require('bluebird');
 
-var SEARCH_EXPIRES_SECONDS = 10;
+var SEARCH_EXPIRES_SECONDS = 60;
 var SEARCH_EXPIRES_MILLISECONDS = SEARCH_EXPIRES_SECONDS * 1000;
 
 function getTroupeUserFromId(troupeId, userId) {
