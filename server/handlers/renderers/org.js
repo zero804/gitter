@@ -38,7 +38,7 @@ function renderOrgPage(req, res, next) {
     policy.canJoin()
   ])
   .spread(function(ghOrg, rooms, troupeContext, isOrgAdmin, isOrgMember) {
-    var isStaff = !!(troupeContext.user || {}).staff;
+    var isStaff = req.user && req.user.staff;
 
     // Filter out PRIVATE rooms
     _.remove(rooms, function(room) { return room.security === 'PRIVATE'; });
