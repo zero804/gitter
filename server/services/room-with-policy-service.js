@@ -239,10 +239,6 @@ RoomWithPolicyService.prototype.unbanUserFromRoom = secureMethod([allowStaff, al
       })
 });
 
-RoomWithPolicyService.prototype.createChannel = secureMethod([allowAdmin], function(options) {
-  return roomService.createRoomChannel(this.room, this.user, options);
-});
-
 /**
  * User join room
  */
