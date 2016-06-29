@@ -20,7 +20,7 @@ try {
  * Attempts to add a passive scroll listener if possible,
  * otherwise adds a non-capture listeners
  */
-function addPassiveScrollListener(target, handler) {
+function addEventListener(target, type, handler) {
   var optionsOrCapture;
   if (supportsPassiveOption) {
     optionsOrCapture = { passive: true };
@@ -28,7 +28,21 @@ function addPassiveScrollListener(target, handler) {
     optionsOrCapture = false;
   }
 
-  target.addEventListener('scroll', handler, optionsOrCapture);
+  target.addEventListener(type, handler, optionsOrCapture);
 }
 
-module.exports = addPassiveScrollListener;
+function removeEventListener(target, type, handler) {
+  var optionsOrCapture;
+  if (supportsPassiveOption) {
+    optionsOrCapture = { passive: true };
+  } else {
+    optionsOrCapture = false;
+  }
+
+  target.removeEventListener(type, handler, optionsOrCapture);
+}
+
+module.exports = {
+  addEventListener: addEventListener,
+  removeEventListener: removeEventListener
+};

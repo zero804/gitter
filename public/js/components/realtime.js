@@ -10,6 +10,7 @@ var wrapExtension = require('gitter-realtime-client').wrapExtension;
 var debug = require('debug-proxy')('app:realtime');
 var realtimePresenceTracker = require('./realtime-presence-tracking');
 var _ = require('underscore');
+var reloadOnUpdate = require('./reload-on-update');
 
 var PING_INTERVAL = 30000;
 var ENABLE_APP_LAYER_PINGS = true;
@@ -37,7 +38,6 @@ function authProvider(callback) {
     });
 }
 
-var updateTimers;
 var handshakeExtension = {
   incoming: wrapExtension(function(message, callback) {
     if (message.channel !== '/meta/handshake') return callback(message);
@@ -45,34 +45,8 @@ var handshakeExtension = {
     if (message.successful) {
       var ext = message.ext;
       if (ext) {
-        if (ext.appVersion && ext.appVersion !== clientEnv['version']) {
-
-          debug('Application version mismatch');
-          if (!updateTimers) {
-            // Give the servers time to complete the upgrade
-            updateTimers = [setTimeout(function () {
-              /* 10 minutes */
-              appEvents.trigger('app.version.mismatch');
-              appEvents.trigger('stats.event', 'reload.warning.10m');
-            }, 10 * 60000), setTimeout(function () {
-              /* 1 hour */
-              appEvents.trigger('app.version.mismatch');
-              appEvents.trigger('stats.event', 'reload.warning.1hr');
-            }, 60 * 60000), setTimeout(function () {
-              /* 6 hours */
-              appEvents.trigger('stats.event', 'reload.forced');
-              setTimeout(function () {
-                window.location.reload(true);
-              }, 30000); // Give the stat time to send
-
-            }, 360 * 60000)];
-          }
-
-        } else if (updateTimers) {
-          updateTimers.forEach(function (t) {
-            clearTimeout(t);
-          });
-          updateTimers = null;
+        if (ext.appVersion) {
+          reloadOnUpdate.reportServerVersion(ext.appVersion);
         }
 
         if (ext.context) {

@@ -466,7 +466,15 @@ function createRoomByUri(user, uri, options) {
 
   /* First off, try use local data to figure out what this url is for */
   return uriResolver(user && user.id, uri, options)
-    .spread(function (resolvedUser, resolvedTroupe, roomMember) {
+    .then(function (resolved) {
+      var resolvedUser = resolved && resolved.user;
+      var resolvedTroupe = resolved && resolved.room;
+      var roomMember = resolved && resolved.roomMember;
+      var resolvedGroup = resolved && resolved.group;
+
+      // We resolved a group. There will never be a room at this URI
+      if (resolvedGroup) throw new StatusError(404);
+
       /* Deal with the case of the anonymous user first */
       if(!user) {
         if(resolvedUser) {
@@ -1329,7 +1337,7 @@ function deleteRoom(troupe) {
 function upsertGroupRoom(user, group, roomInfo, securityDescriptor, options) {
   options = options || {}; // options.tracking
   var uri = roomInfo.uri;
-  var topic = roomInfo.topic || null;
+  var topic = roomInfo.topic;
   var lcUri = uri.toLowerCase();
 
   // convert back to the old github-tied vars here
@@ -1345,6 +1353,11 @@ function upsertGroupRoom(user, group, roomInfo, securityDescriptor, options) {
 
     case 'GH_REPO':
       githubType = 'REPO';
+      roomType = 'github-room';
+      break
+
+    case 'GH_USER':
+      githubType = 'USER';
       roomType = 'github-room';
       break
 
