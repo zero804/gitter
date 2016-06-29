@@ -2,7 +2,6 @@
 
 var groupService = require('../lib/group-service');
 var assert = require('assert');
-var StatusError = require('statuserror');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
 

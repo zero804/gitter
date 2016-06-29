@@ -218,8 +218,8 @@ describe('room-service', function() {
           securityDescriptorValidator(securityDescriptor);
 
           assert.deepEqual(securityDescriptor, {
-            extraAdmins: [],
-            extraMembers: [],
+            // extraAdmins: [],
+            // extraMembers: [],
             public: false,
             type: "ONE_TO_ONE"
           });
