@@ -70,6 +70,7 @@ module.exports = BaseResolverCollection.extend({
 
     this.listenTo(this.contextModel, 'change:active', this.onModelUpdateActive, this);
     this.listenTo(this.queryModel, 'change:skip', this.onSkipUpdate, this);
+    this.listenTo(this.roomMenuModel, 'change:state', this.resetSearch, this);
     this.listenTo(this.roomMenuModel, 'change:searchTerm', this.onSearchTermUpdate, this);
     this.listenTo(this.roomMenuModel, 'change:isFetchingMoreSearchMessageResults', this.onModelChangeFetchStatus, this);
 
@@ -81,6 +82,7 @@ module.exports = BaseResolverCollection.extend({
   },
 
   onSearchTermUpdate: function (model, val){ //jshint unused: true
+    this.resetSearch();
     if(!this.contextModel.get('active')) { return; }
     if(!val) { return this.reset(); }
     this.fetchResults();
@@ -102,6 +104,12 @@ module.exports = BaseResolverCollection.extend({
       return this.queryModel.set('hasReachedLimit', true);
     }
     return this.roomMenuModel.set('isFetchingMoreSearchMessageResults', false);
+  },
+
+  resetSearch: function (){
+    this.roomMenuModel.set('isFetchingMoreSearchMessageResults', false);
+    this.queryModel.set({ skip: 0, hasReachedLimit: false });
+    this.reset();
   },
 
   fetchResults: _.debounce(function (){
