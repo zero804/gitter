@@ -2,8 +2,6 @@
 
 var crypto = require('crypto');
 
-var DEFAULT_SIZE = 64;
-
 function hashEmail(email) {
   return crypto.createHash('md5').update(email).digest('hex');
 }
@@ -14,8 +12,11 @@ function forEmail(email, size) {
 }
 
 function forChecksum(checksum, size) {
-  if (!size) size = DEFAULT_SIZE;
-  return 'https://secure.gravatar.com/avatar/' + checksum + '?s=' + size;
+  if (size) {
+    return 'https://secure.gravatar.com/avatar/' + checksum + '?s=' + size;
+  } else {
+    return 'https://secure.gravatar.com/avatar/' + checksum;
+  }
 }
 
 module.exports = {
