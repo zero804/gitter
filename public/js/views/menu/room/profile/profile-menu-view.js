@@ -6,14 +6,24 @@ var itemTemplate = require('./profile-menu-item-view.hbs');
 var fastdom = require('fastdom');
 var toggleClass = require('utils/toggle-class');
 var logout = require('utils/logout');
+var isMobile = require('utils/is-mobile');
+var isNative = require('utils/is-native');
 
 var profileCollection = new Backbone.Collection([
   { name: 'Home', stub: '/home' },
   { name: 'Billing', stub: 'http://billing.gitter.im/accounts'},
-  { name: 'Get Gitter Apps', stub: '/apps'},
-  //TODO Logout does not work JP 27/1/16
-  { name: 'Sign Out', stub: '/logout' }
 ]);
+
+var isWebApp = !isNative();
+var isMobileApp = isMobile();
+
+if(isWebApp && !isMobileApp) {
+  profileCollection.add({ name: 'Get Gitter Apps', stub: '/apps'});
+}
+
+if(isWebApp) {
+  profileCollection.add({ name: 'Sign Out', stub: '/logout' });
+}
 
 var ItemView = Marionette.ItemView.extend({
   tagName: 'li',

@@ -1,10 +1,22 @@
 'use strict';
 
-var groupService = require('../lib/group-service');
+var Promise = require('bluebird');
 var assert = require('assert');
 var StatusError = require('statuserror');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
+var proxyquireNoCallThru = require("proxyquire").noCallThru();
+
+// stub out this check because otherwise we end up with a the tests all
+// clashing with the user that's required to have access to create those
+// groups..
+var groupService = proxyquireNoCallThru('../lib/group-service', {
+  './group-uri-checker': function() {
+    return Promise.resolve({
+      allowCreate: true
+    });
+  }
+});
 
 describe('group-service', function() {
 
@@ -14,10 +26,12 @@ describe('group-service', function() {
       var fixture = fixtureLoader.setup({
         deleteDocuments: {
           User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }],
-          Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
-                  { lcUri: fixtureLoader.GITTER_INTEGRATION_REPO.toLowerCase() },
-                  { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() },
-                  { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() }],
+          Group: [
+            { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
+            { lcUri: fixtureLoader.GITTER_INTEGRATION_REPO.toLowerCase() },
+            { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() },
+            { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() }
+          ],
         },
         user1: {
           githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
@@ -127,6 +141,27 @@ describe('group-service', function() {
               members: 'PUBLIC'
             })
           })
+      });
+
+      it('should throw a 409 if a URL is not available', function() {
+        var user = fixture.user1;
+        var groupService = proxyquireNoCallThru('../lib/group-service', {
+          './group-uri-checker': function() {
+            return Promise.resolve({
+              allowCreate: false
+            });
+          }
+        });
+        groupService.createGroup(user, {
+            name: 'Bob',
+            uri: 'bob'
+          })
+          .then(function() {
+            assert.ok(false, 'Error Expected');
+          })
+          .catch(StatusError, function(err) {
+            assert.strictEqual(err.status, 409);
+          });
       });
     });
 
