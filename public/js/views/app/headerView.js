@@ -90,7 +90,7 @@ var HeaderView = Marionette.ItemView.extend({
     var orgPageHref = '/orgs/' + orgName + '/rooms/';
     _.extend(data, {
       headerView: {
-        avatarUrl: avatars.getForRoomUri(data.url)
+        avatarUrl: avatars.getForRoomUri(data.uri)
       },
       troupeName:      data.name,
       troupeFavourite: !!data.favourite,
