@@ -13,7 +13,6 @@ var SuggestedRoomsByRoomCollection = require('../collections/left-menu-suggested
 var UserSuggestions = require('../collections/user-suggested-rooms');
 var SearchRoomPeopleCollection = require('../collections/left-menu-search-rooms-and-people');
 var SearchChatMessages = require('../collections/search-chat-messages');
-var perfTiming = require('components/perf-timing');
 var context = require('utils/context');
 var FilteredFavouriteRoomCollection = require('../collections/filtered-favourite-room-collection');
 var FavouriteCollectionModel = require('../views/menu/room/favourite-collection/favourite-collection-model');
@@ -49,7 +48,6 @@ module.exports = Backbone.Model.extend({
   //JP 27/1/16
   initialize: function(attrs) {
 
-    perfTiming.start('left-menu-init');
     this.set('panelOpenState', this.get('roomMenuIsPinned'));
 
     if (!attrs || !attrs.bus) {
