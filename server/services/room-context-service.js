@@ -1,5 +1,7 @@
 'use strict';
 
+var env = require('gitter-web-env');
+var logger = env.logger;
 var uriResolver = require('./uri-resolver');
 var StatusError = require('statuserror');
 var oneToOneRoomService = require('./one-to-one-room-service');
@@ -7,6 +9,7 @@ var debug = require('debug')('gitter:app:room-context-service');
 var Promise = require('bluebird');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
+var groupService = require('gitter-web-groups/lib/group-service');
 
 /**
  * Given a user and a URI returns (promise of) a context object.
@@ -30,11 +33,17 @@ function findContextForUri(user, uri, options) {
 
   var userId = user && user.id;
 
-  if (!uri) return Promise.reject(new StatusError(400, 'uri required'));
+  if (!uri) throw new StatusError(400, 'uri required');
 
   /* First off, try use local data to figure out what this url is for */
   return uriResolver(user && user.id, uri, options)
-    .spread(function (resolvedUser, resolvedTroupe, roomMember) {
+    .then(function (resolved) {
+      if (!resolved) throw new StatusError(404);
+
+      var resolvedUser = resolved.user;
+      var resolvedTroupe = resolved.room;
+      var roomMember = resolved.roomMember;
+      var resolvedGroup = resolved.group;
 
       // The uri resolved to a user, we need to do a one-to-one
       if(resolvedUser) {
@@ -90,12 +99,71 @@ function findContextForUri(user, uri, options) {
           });
       }
 
+      if (resolvedGroup) {
+        return policyFactory.createPolicyForGroupId(user, resolvedGroup._id)
+          .then(function(policy) {
+            return policy.canRead()
+              .then(function(access) {
+                if (!access) {
+                  throw new StatusError(404);
+                }
+
+                return {
+                  group: resolvedGroup,
+                  policy: policy,
+                  uri: resolvedGroup.uri
+                };
+              })
+          });
+      }
+
       // No user, no room. 404
       throw new StatusError(404);
     });
-
 }
 
+function findContextForGroup(user, uri, options) {
+  debug("findContextForGroup %s %s %j", user && user.username, uri, options);
+  var ignoreCase = options && options.ignoreCase;
+
+  if (!uri) throw new StatusError(400, 'uri required');
+
+  return groupService.findByUri(uri)
+    .then(function (group) {
+      if (!group) throw new StatusError(404);
+
+      return policyFactory.createPolicyForGroupId(user, group._id)
+        .then(function(policy) {
+          return policy.canRead()
+            .then(function(access) {
+              if (!access) {
+                throw new StatusError(404);
+              }
+
+              return {
+                group: group,
+                policy: policy,
+                uri: group.uri
+              };
+            });
+        })
+        .tap(function(uriContext) {
+          // URI mismatch? Perhaps we should redirect...
+          if (uriContext.uri !== uri) {
+            if (ignoreCase && uriContext.uri.toLowerCase() === uri.toLowerCase()) {
+              logger.info('Ignoring incorrect case for room', { providedUri: uri, correctUri: uriContext.uri });
+            } else {
+              var redirect = new StatusError(301);
+              redirect.path = '/' + uriContext.uri;
+              throw redirect;
+            }
+          }
+        });
+    });
+}
+
+
 module.exports = {
-  findContextForUri: findContextForUri
+  findContextForUri: Promise.method(findContextForUri),
+  findContextForGroup: Promise.method(findContextForGroup)
 };
