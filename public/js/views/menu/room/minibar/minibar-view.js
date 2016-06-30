@@ -202,7 +202,6 @@ var MinibarView = Marionette.CollectionView.extend({
     });
   },
 
-
 });
 
 
