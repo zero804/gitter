@@ -12,11 +12,11 @@ function getExpectedForGroup(group) {
     id: group.id,
     name: group.name,
     uri: group.uri,
-    avatarUrl: '/api/private/user-avatar/'+group.uri+'?s=48',
     backedBy: {
       type: group.sd.type,
       linkPath: group.sd.linkPath
-    }
+    },
+    avatarUrl: 'http://localhost:5000/api/private/avatars/group/i/' + group.id,
   }];
 }
 

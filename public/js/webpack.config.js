@@ -71,7 +71,8 @@ var webpackConfig = {
             path.resolve(__dirname, '../../shared/handlebars/helpers')
           ],
           knownHelpers: [
-            'cdn'
+            'cdn',
+            'avatarSrcSet'
           ],
           partialsRootRelative: path.resolve(__dirname, '../templates/partials/') + path.sep
         }

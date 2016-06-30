@@ -310,15 +310,6 @@ function getDateOfFirstMessageInRoom(troupeId) {
 }
 exports.getDateOfFirstMessageInRoom = getDateOfFirstMessageInRoom;
 
-/*
- * this does a massive query, so it has to be cached for a long time
- */
-exports.getRoughMessageCount = cacheWrapper('getRoughMessageCount', function(troupeId) {
-  return ChatMessage.count({ toTroupeId: troupeId }).exec();
-}, {
-  ttl: config.get('chat-service:get-rough-message-count-cache-timeout')
-});
-
 function findFirstUnreadMessageId(troupeId, userId) {
   return unreadItemService.getFirstUnreadItem(userId, troupeId);
 }
