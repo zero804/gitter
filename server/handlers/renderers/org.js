@@ -27,7 +27,8 @@ function findRooms(groupId, user, currentPage) {
   var userId = user && user._id;
 
   var skip = (currentPage - 1) * ROOMS_PER_PAGE;
-  if (skip > 2000) { skip = 2000; }
+  if (skip > 2000) throw new StatusError(400);
+  
   return groupBrowserService.findRoomsWithPagination(groupId, userId, {
       skip: skip,
       limit: ROOMS_PER_PAGE
@@ -47,67 +48,69 @@ function findRooms(groupId, user, currentPage) {
 }
 
 function renderOrgPage(req, res, next) {
-  var group = req.group;
-  if (!group) throw new StatusError(404);
-  var groupId = group._id;
-  var user = req.user;
-  var policy = req.uriContext.policy;
+  return Promise.try(function() {
+    var group = req.group;
+    if (!group) throw new StatusError(404);
+    var groupId = group._id;
+    var user = req.user;
+    var policy = req.uriContext.policy;
 
-  var currentPage = Math.max(parseInt(req.query.page, 10) || 1, 1);
+    var currentPage = Math.max(parseInt(req.query.page, 10) || 1, 1);
 
-  return Promise.join(
-    serializeGroup(group, user),
-    findRooms(groupId, user, currentPage),
-    contextGenerator.generateNonChatContext(req),
-    policy.canAdmin(),
-    function(serializedGroup, roomBrowseResult, troupeContext, isOrgAdmin) {
-      var isStaff = req.user && req.user.staff;
-      var editAccess = isOrgAdmin || isStaff;
-      var orgUserCount = roomBrowseResult.totalUsers;
-      var roomCount = roomBrowseResult.total;
+    return Promise.join(
+      serializeGroup(group, user),
+      findRooms(groupId, user, currentPage),
+      contextGenerator.generateNonChatContext(req),
+      policy.canAdmin(),
+      function(serializedGroup, roomBrowseResult, troupeContext, isOrgAdmin) {
+        var isStaff = req.user && req.user.staff;
+        var editAccess = isOrgAdmin || isStaff;
+        var orgUserCount = roomBrowseResult.totalUsers;
+        var roomCount = roomBrowseResult.total;
 
-      // Calculate total pages
-      var pageCount = Math.ceil(roomCount / ROOMS_PER_PAGE);
-      var rooms = roomBrowseResult.results.map(function(room) {
-        var result = generateRoomCardContext(room, {
-          isStaff: editAccess
+        // Calculate total pages
+        var pageCount = Math.ceil(roomCount / ROOMS_PER_PAGE);
+        var rooms = roomBrowseResult.results.map(function(room) {
+          var result = generateRoomCardContext(room, {
+            isStaff: editAccess
+          });
+
+          // No idea why this is called `isStaff`
+          result.isStaff = editAccess;
+
+          return result;
         });
 
-        // No idea why this is called `isStaff`
-        result.isStaff = editAccess;
+        // This is used to track pageViews in mixpanel
+        troupeContext.isCommunityPage = true;
 
-        return result;
+        var fullUri = nconf.get('web:basepath') + "/orgs/" + serializedGroup.uri + "/rooms";
+        var text = encodeURIComponent('Explore our chat community on Gitter:');
+        var url = 'https://twitter.com/share?' +
+          'text=' + text +
+          '&url=' + fullUri +
+          '&related=gitchat' +
+          '&via=gitchat';
+
+        res.render('org-page', {
+          hasCachedFonts: fonts.hasCachedFonts(req.cookies),
+          fonts: fonts.getFonts(),
+          socialUrl: url,
+          isLoggedIn: !!req.user,
+          exploreBaseUrl: '/home/~explore',
+          roomCount: roomCount,
+          orgUserCount: orgUserCount,
+          group: serializedGroup,
+          rooms: rooms,
+          troupeContext: troupeContext,
+          pagination: {
+            page: currentPage,
+            pageCount: pageCount
+          }
+        });
       });
-
-      // This is used to track pageViews in mixpanel
-      troupeContext.isCommunityPage = true;
-
-      var fullUri = nconf.get('web:basepath') + "/orgs/" + serializedGroup.uri + "/rooms";
-      var text = encodeURIComponent('Explore our chat community on Gitter:');
-      var url = 'https://twitter.com/share?' +
-        'text=' + text +
-        '&url=' + fullUri +
-        '&related=gitchat' +
-        '&via=gitchat';
-
-      res.render('org-page', {
-        hasCachedFonts: fonts.hasCachedFonts(req.cookies),
-        fonts: fonts.getFonts(),
-        socialUrl: url,
-        isLoggedIn: !!req.user,
-        exploreBaseUrl: '/home/~explore',
-        roomCount: roomCount,
-        orgUserCount: orgUserCount,
-        group: serializedGroup,
-        rooms: rooms,
-        troupeContext: troupeContext,
-        pagination: {
-          page: currentPage,
-          pageCount: pageCount
-        }
-      });
-    })
-    .catch(next);
+  })
+  .catch(next);
 }
 
 module.exports = exports = {
