@@ -4,6 +4,7 @@ var MinibarItemView  = require('../minibar-item-view');
 var _ = require('underscore');
 var toggleClass = require('utils/toggle-class');
 var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
+var context = require('utils/context');
 var _super = MinibarItemView.prototype;
 
 module.exports = MinibarItemView.extend({
@@ -15,6 +16,10 @@ initialize: function(attrs, options) {
   },
 
   onRoomChange: function (model, val){
+    //If the new room is not in the room list then show the temp icon
+    //as we are sure we should be showing a temp org
+    //return context.hasFeature('groups') && this.model.set('hidden', !!this.roomCollection.get(val));
+
     this.model.set('hidden', !!this.roomCollection.get(val));
   },
 
