@@ -21,8 +21,9 @@ require('components/ping');
 
 require('gitter-styleguide/css/components/buttons.css');
 
-onready(function() {
 
+
+onready(function() {
 
   require('components/link-handler').installLinkHandler();
   appEvents.on('navigation', function(url) {
