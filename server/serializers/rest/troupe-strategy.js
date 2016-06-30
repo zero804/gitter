@@ -229,7 +229,7 @@ function TroupeStrategy(options) {
       ownerIsOrg: ownerIsOrgStrategy ? ownerIsOrgStrategy.map(item) : undefined, // TODO: remove this once groups are in place
       roomMember: roomMembershipStrategy ? roomMembershipStrategy.map(item.id) : undefined,
       group: groupIdStrategy && item.groupId ? groupIdStrategy.map(item.groupId) : undefined,
-      groupId: item.groupId || undefined,
+      groupId: item.groupId,
       v: getVersion(item)
     };
   };
