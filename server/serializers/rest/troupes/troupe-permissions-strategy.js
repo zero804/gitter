@@ -3,7 +3,7 @@
 var logger = require('gitter-web-env').logger;
 var userService = require("../../../services/user-service");
 var Promise = require('bluebird');
-var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
+var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 
 /**
  * Returns the permissions the user has in the orgs.
@@ -20,18 +20,23 @@ TroupePermissionsStrategy.prototype = {
   preload: function(troupes) {
     if (troupes.isEmpty()) return;
 
-    var userPromise;
-    if (this.currentUser) {
-      userPromise = Promise.resolve(this.currentUser);
-    } else {
-      userPromise = userService.findById(this.currentUserId);
-    }
+    var currentUser = this.currentUser;
+    var currentUserId = this.currentUserId;
 
-    var isAdmin = {};
+    return Promise.try(function() {
+        if (currentUser) {
+          return currentUser;
+        }
 
-    return userPromise
+        if (currentUserId) {
+          return userService.findById(currentUserId)
+        }
+      })
+      .bind(this)
       .then(function(user) {
         if (!user) return;
+
+        var isAdmin = this.isAdmin = {};
 
         return Promise.map(troupes.toArray(), function(troupe) {
           return policyFactory.createPolicyForRoom(user, troupe)
@@ -47,10 +52,6 @@ TroupePermissionsStrategy.prototype = {
               isAdmin[troupe.id] = false;
             });
         });
-      })
-      .bind(this)
-      .then(function() {
-        this.isAdmin = isAdmin;
       });
   },
 

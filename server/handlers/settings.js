@@ -10,14 +10,18 @@ var crypto = require('crypto');
 var userSettingsService = require('../services/user-settings-service');
 var passphrase = config.get('email:unsubscribeNotificationsSecret');
 var request = require('request');
-var uriContextResolverMiddleware = require('./app/middleware').uriContextResolverMiddleware;
+var uriContextResolverMiddleware = require('./uri-context/uri-context-resolver-middleware');
 var jwt = require('jwt-simple');
-var cdn = require('../web/cdn');
+var cdn = require('gitter-web-cdn');
 var services = require('gitter-services');
 var identifyRoute = env.middlewares.identifyRoute;
 var debug = require('debug')('gitter:app:settings-route');
 var StatusError = require('statuserror');
 var userScopes = require('gitter-web-identity/lib/user-scopes');
+var fonts = require('../web/fonts');
+var acceptInviteService = require('../services/accept-invite-service');
+var loginUtils = require('../web/login-utils');
+var resolveRoomUri = require('../utils/resolve-room-uri');
 
 var supportedServices = [
   { id: 'github', name: 'GitHub'},
@@ -60,7 +64,9 @@ function getIntegrations(req, res, next) {
       accessToken: req.accessToken,
       cdnRoot: cdn(''),
       supportedServices: supportedServices,
-      openServices: openServices
+      openServices: openServices,
+      fonts: fonts.getFonts(),
+      hasCachedFonts: fonts.hasCachedFonts(req.cookies),
     });
   });
 }
@@ -151,24 +157,58 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
   router.get(uri,
     ensureLoggedIn,
     identifyRoute('settings-room-get'),
-    uriContextResolverMiddleware({ create: false }),
+    uriContextResolverMiddleware,
     adminAccessCheck,
     getIntegrations);
 
   router.delete(uri,
     ensureLoggedIn,
     identifyRoute('settings-room-delete'),
-    uriContextResolverMiddleware({ create: false }),
+    uriContextResolverMiddleware,
     adminAccessCheck,
     deleteIntegration);
 
   router.post(uri,
     ensureLoggedIn,
     identifyRoute('settings-room-create'),
-    uriContextResolverMiddleware({ create: false }),
+    uriContextResolverMiddleware,
     adminAccessCheck,
     createIntegration);
 });
+
+router.get('/accept-invite/:secret',
+  identifyRoute('settings-accept-invite'),
+  ensureLoggedIn,
+  function(req, res, next) {
+    var secret = req.params.secret;
+    return acceptInviteService.acceptInvite(req.user, secret)
+      .then(function(room) {
+        return resolveRoomUri(room, req.user._id);
+      })
+      .then(function(roomUri) {
+        res.relativeRedirect(roomUri);
+      })
+      .catch(StatusError, function(err) {
+        if (err.status >= 500) throw err;
+
+        if (req.session) {
+          var events = req.session.events;
+          if (!events) {
+            events = [];
+            req.session.events = events;
+          }
+          events.push('invite_failed');
+        }
+        // TODO: tell the user why they could not get invited
+
+        logger.error('Unable to use invite', { username: req.user && req.user.username, exception: err });
+        return loginUtils.whereToNext(req.user)
+          .then(function(next) {
+            res.relativeRedirect(next);
+          });
+      })
+      .catch(next);
+  });
 
 router.get('/unsubscribe/:hash',
   identifyRoute('settings-unsubscribe'),

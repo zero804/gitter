@@ -3,7 +3,11 @@
 var testRequire = require('../test-require');
 var Promise = require('bluebird');
 var assert = require('assert');
-var i18nFactory = testRequire('./utils/i18n-factory');
+var i18nFactory = testRequire('gitter-web-i18n');
+var ObjectID = require('mongodb').ObjectID;
+var config = require('gitter-web-env').config;
+
+var BASE_EMAIL_PATH = config.get('email:emailBasePath');
 
 var EMAIL_DATA = [
   {
@@ -107,44 +111,112 @@ var EMAIL_DATA = [
 
 
 describe('email-notification-service', function() {
-  var emailNotificationService;
-  var lang;
 
-  beforeEach(function() {
-    emailNotificationService = testRequire.withProxies("./services/email-notification-service", {
-      './email-address-service': function() {
-        return Promise.resolve('mike.bartlett@gmail.com');
-      },
-      './user-settings-service': {
-        getUserSettings: function(userId, key) {
-          assert(userId);
-          assert.strictEqual(key, 'lang');
-          return Promise.resolve(lang);
+  describe('unread notifications', function() {
+    var emailNotificationService;
+    var lang;
+    var emailPayload;
+
+    beforeEach(function() {
+      emailPayload = null;
+      lang = null;
+      emailNotificationService = testRequire.withProxies("./services/email-notification-service", {
+        './email-address-service': function() {
+          return Promise.resolve('mike.bartlett@gmail.com');
+        },
+        './user-settings-service': {
+          getUserSettings: function(userId, key) {
+            assert(userId);
+            assert.strictEqual(key, 'lang');
+            return Promise.resolve(lang);
+          }
+        },
+        './mailer-service': {
+          sendEmail: function(pPayload) {
+            emailPayload = pPayload;
+            return Promise.resolve();
+          }
         }
-      }
+      });
     });
+
+    it('should send emails about unread items', function() {
+      var user = { id: "5405bfdd66579b000004df1a" };
+
+      return emailNotificationService.sendUnreadItemsNotification(user, EMAIL_DATA)
+        .then(function() {
+          assert.strictEqual(emailPayload.subject, 'Unread messages in gitterHQ/gitter and gitterHQ/nibbles')
+        });
+    });
+
+    it('should send emails about unread items in de', function() {
+      lang = 'de';
+      var user = { id: "5405bfdd66579b000004df1a" };
+
+      return emailNotificationService.sendUnreadItemsNotification(user, EMAIL_DATA)
+        .then(function() {
+          assert.strictEqual(emailPayload.subject, 'Ungelesene Nachrichten in gitterHQ/gitter und gitterHQ/nibbles')
+        })
+    });
+
+    it('should send emails about unread items in an unknown langage', function() {
+      lang = 'gobbledegook';
+      var user = { id: "5405bfdd66579b000004df1a" };
+
+      return emailNotificationService.sendUnreadItemsNotification(user, EMAIL_DATA)
+        .then(function() {
+          assert.strictEqual(emailPayload.subject, 'Unread messages in gitterHQ/gitter and gitterHQ/nibbles')
+        })
+    });
+
   });
 
-  it.skip('should send emails about unread items #slow', function(done) {
-    this.timeout(30000);
-    var user = { id: "5405bfdd66579b000004df1a" };
+  describe('sendInvitation', function() {
+    var emailNotificationService;
+    var emailPayload;
+    beforeEach(function() {
+      emailPayload = null;
+      emailNotificationService = testRequire.withProxies("./services/email-notification-service", {
+        './mailer-service': {
+          sendEmail: function(pPayload) {
+            emailPayload = pPayload;
+            return Promise.resolve();
+          }
+        }
+      });
+    });
 
-    return emailNotificationService.sendUnreadItemsNotification(user, EMAIL_DATA)
-      .nodeify(done);
-  });
+    it('should send an invitation email', function() {
+      var invitingUser = {
+        username: 'bob',
+      };
 
-  it.skip('should send emails about unread items in spanish  #slow', function(done) {
-    this.timeout(30000);
+      var invite = {
+        _id: new ObjectID(),
+        secret: 'x123',
+        emailAddress: 'x@troupetest.local'
+      };
 
-    lang = 'es';
-    var user = { id: "5405bfdd66579b000004df1a" };
+      var room = {
+        uri: 'a/b'
+      }
 
-    return emailNotificationService.sendUnreadItemsNotification(user, EMAIL_DATA)
-      .nodeify(done);
-  });
+      return emailNotificationService.sendInvitation(invitingUser, invite, room)
+        .then(function() {
+          assert.strictEqual(emailPayload.subject, '[a/b] Join the chat on Gitter');
+          assert.strictEqual(emailPayload.from, 'bob <support@gitter.im>');
+          assert.strictEqual(emailPayload.to, 'x@troupetest.local');
+          assert.strictEqual(emailPayload.data.roomUrl, BASE_EMAIL_PATH + '/settings/accept-invite/x123');
+          assert.strictEqual(emailPayload.data.roomUri, 'a/b');
+          assert.strictEqual(emailPayload.data.senderName, 'bob');
+        });
+    })
+  })
 
 
   describe('subjects', function() {
+    var emailNotificationService = testRequire("./services/email-notification-service");
+
     var FIXTURE_ODD = [{
         troupe: {
           uri: 'gitterHQ'

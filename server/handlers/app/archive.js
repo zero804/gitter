@@ -4,7 +4,7 @@ var env = require('gitter-web-env');
 var identifyRoute = env.middlewares.identifyRoute;
 
 var moment = require('moment');
-var appMiddleware = require('./middleware');
+var uriContextResolverMiddleware = require('../uri-context/uri-context-resolver-middleware');
 var chatService = require('../../services/chat-service');
 var heatmapService = require('../../services/chat-heatmap-service');
 var restSerializer = require('../../serializers/rest-serializer');
@@ -19,6 +19,7 @@ var debug = require('debug')('gitter:app:app-archive');
 var _ = require('underscore');
 var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 var StatusError = require('statuserror');
+var fonts = require('../../web/fonts');
 
 var ONE_DAY_SECONDS = 60 * 60 * 24; // 1 day
 var ONE_DAY_MILLISECONDS = ONE_DAY_SECONDS * 1000;
@@ -76,7 +77,7 @@ function generateChatTree(chatActivity) {
 
 exports.datesList = [
   identifyRoute('app-archive-main'),
-  appMiddleware.uriContextResolverMiddleware({ create: false }),
+  uriContextResolverMiddleware,
   function(req, res, next) {
     var user = req.user;
     var troupe = req.uriContext.troupe;
@@ -107,7 +108,9 @@ exports.datesList = [
       public: troupe.security === 'PUBLIC',
       avatarUrl: avatarUrl,
       isPrivate: isPrivate,
-      avatarSrcSet: resolveRoomAvatarSrcSet({ uri: req.uriContext.uri }, 48)
+      avatarSrcSet: resolveRoomAvatarSrcSet({ uri: req.uriContext.uri }, 48),
+      fonts: fonts.getFonts(),
+      hasCachedFonts: fonts.hasCachedFonts(req.cookies),
     };
 
     return validateRoomForReadOnlyAccess(user, policy)
@@ -128,7 +131,7 @@ exports.datesList = [
 
 exports.linksList = [
   identifyRoute('app-archive-links'),
-  appMiddleware.uriContextResolverMiddleware({ create: false }),
+  uriContextResolverMiddleware,
   function(req, res, next) {
     var user = req.user;
     var troupe = req.uriContext.troupe;
@@ -160,7 +163,9 @@ exports.linksList = [
       public: troupe.security === 'PUBLIC',
       avatarUrl: avatarUrl,
       avatarSrcSet: srcSetUrl,
-      isPrivate: isPrivate
+      isPrivate: isPrivate,
+      fonts: fonts.getFonts(),
+      hasCachedFonts: fonts.hasCachedFonts(req.cookies),
     };
 
     return validateRoomForReadOnlyAccess(user, policy)
@@ -189,7 +194,7 @@ exports.linksList = [
 
 exports.chatArchive = [
   identifyRoute('app-archive-date'),
-  appMiddleware.uriContextResolverMiddleware({ create: false }),
+  uriContextResolverMiddleware,
   timezoneMiddleware,
   function(req, res, next) {
     var user = req.user;
@@ -329,7 +334,9 @@ exports.chatArchive = [
               nextDateLink: nextDateLink,
               monthYearFormatted: monthYearFormatted,
 
-              showDatesWithoutTimezone: true // Timeago widget will render whether or not we know the users timezone
+              showDatesWithoutTimezone: true, // Timeago widget will render whether or not we know the users timezone
+              fonts: fonts.getFonts(),
+              hasCachedFonts: fonts.hasCachedFonts(req.cookies),
             });
 
           });

@@ -33,6 +33,7 @@ var webpackConfig = {
     "router-userhome": path.resolve(path.join(__dirname, './router-userhome.js')),
 
     "mobile-native-userhome": path.resolve(path.join(__dirname, "./mobile-native-userhome")),
+    "router-home-learn": path.resolve(path.join(__dirname, './router-home-learn')),
 
     vendor: [
       'utils/webpack',
@@ -114,7 +115,7 @@ var webpackConfig = {
   },
   plugins: [
     new CommonsChunkPlugin("vendor", "[name].js"),
-    new ContextReplacementPlugin(/moment\/locale$/, /ar|cs|da|de|en-gb|es|fr|it|ja|ko|nl|pl|pt|ru|sv|zh-cn/)
+    new ContextReplacementPlugin(/moment\/locale$/, /ar|cs|da|de|en-gb|es|fa|fr|hu|it|ja|ko|lt|nl|pl|pt|ru|sk|sv|ua|zh-cn/)
   ],
   bail: true,
   recordsPath: '/tmp/records.json',

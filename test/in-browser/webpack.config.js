@@ -1,6 +1,6 @@
 'use strict';
 
-var path              = require('path');
+var path = require('path');
 var glob = require('glob');
 var ProgressBarPlugin = require('progress-bar-webpack-plugin');
 

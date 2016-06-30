@@ -8,7 +8,7 @@ var getMaxTagLength = require('gitter-web-shared/validation/validate-tag').getMa
 var secureMethod = require('../utils/secure-method');
 var StatusError = require('statuserror');
 var Promise = require('bluebird');
-var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
+var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var userService = require('./user-service');
 var eventService = require('./event-service');
 var chatService = require('./chat-service');
@@ -18,6 +18,7 @@ var roomService = require('./room-service');
 var assert = require('assert');
 var roomMetaService = require('./room-meta-service');
 var processMarkdown = require('../utils/markdown-processor');
+var roomInviteService = require('./room-invite-service');
 
 var MAX_RAW_TAGS_LENGTH = 200;
 
@@ -42,6 +43,10 @@ function allowAdmin() {
 
 function allowJoin() {
   return this.policy.canJoin();
+}
+
+function allowAddUser() {
+  return this.policy.canAddUser();
 }
 
 /**
@@ -270,12 +275,45 @@ RoomWithPolicyService.prototype.updateRoomWelcomeMessage = secureMethod([allowAd
     });
 });
 
-/*
+/**
  * Delete a room
  */
- RoomWithPolicyService.prototype.deleteRoom = secureMethod([allowAdmin], function() {
-   logger.warn('User deleting room ', { roomId: this.room._id, username: this.user.username, userId: this.user._id });
-   return roomService.deleteRoom(this.room);
- });
+RoomWithPolicyService.prototype.deleteRoom = secureMethod([allowAdmin], function() {
+  logger.warn('User deleting room ', { roomId: this.room._id, username: this.user.username, userId: this.user._id });
+  return roomService.deleteRoom(this.room);
+});
+
+/**
+ * Invite a non-gitter user to a room
+ */
+RoomWithPolicyService.prototype.createRoomInvitation = secureMethod([allowAddUser], function(type, externalId, emailAddress) {
+  return roomInviteService.createInvite(this.room, this.user, {
+    type: type,
+    externalId: externalId,
+    emailAddress: emailAddress
+  });
+});
+
+/**
+ * Add an existing Gitter user to a room
+ */
+RoomWithPolicyService.prototype.addUserToRoom = secureMethod([allowAddUser], function(userToAdd) {
+  return roomService.addUserToRoom(this.room, this.user, userToAdd);
+});
+
+/**
+ * Always allows a user to remove themselves from a room
+ */
+function removeUserFromRoomAllowCurrentUser(userForRemove) {
+  if (!this.user || !userForRemove) return false;
+  return mongoUtils.objectIDsEqual(userForRemove._id, this.user._id)
+}
+
+/**
+ * Add an existing Gitter user to a room
+ */
+RoomWithPolicyService.prototype.removeUserFromRoom = secureMethod([removeUserFromRoomAllowCurrentUser, allowAdmin], function(userForRemove) {
+  return roomService.removeUserFromRoom(this.room, userForRemove);
+});
 
 module.exports = RoomWithPolicyService;

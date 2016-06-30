@@ -6,7 +6,7 @@ var restSerializer = require("../../../serializers/rest-serializer");
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
 var loadTroupeFromParam = require('./load-troupe-param');
-var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
+var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var RoomWithPolicyService = require('../../../services/room-with-policy-service');
 
 function searchRooms(req) {
@@ -176,7 +176,8 @@ module.exports = {
     'collaborators': require('./collaborators'),
     'suggestedRooms': require('./suggested-rooms'),
     'events': require('./events'),
-    'meta': require('./meta')
+    'meta': require('./meta'),
+    'invites': require('./invites'),
   }
 
 };

@@ -4,7 +4,7 @@ var Promise = require('bluebird');
 var StatusError = require('statuserror');
 var assert = require('assert');
 var validateGitHubUri = require('gitter-web-github').GitHubUriValidator;
-var legacyPolicyFactory = require('./legacy-policy-factory');
+var githubPolicyFactory = require('./github-policy-factory');
 var debug = require('debug')('gitter:app:security-descriptor-generator');
 var securityDescriptorGenerator = require('./security-descriptor-generator');
 
@@ -14,8 +14,7 @@ function canAdminPotentialGitHubGroup(user, githubInfo, obtainAccessFromGitHubRe
   var uri = githubInfo.uri;
   var githubId = githubInfo.githubId;
 
-  // TODO: just use securityDescriptorGenerator.generate()?
-  return legacyPolicyFactory.createGroupPolicyForGithubObject(user, type, uri, githubId, obtainAccessFromGitHubRepo)
+  return githubPolicyFactory.createGroupPolicyForGithubObject(user, type, uri, githubId, obtainAccessFromGitHubRepo)
     .then(function(policy) {
       return policy.canAdmin();
     });
@@ -25,7 +24,7 @@ function canAdminGitHubRepo(user, githubInfo, security) {
   var type = githubInfo.type;
   var uri = githubInfo.uri;
 
-  return legacyPolicyFactory.createPolicyForGithubObject(user, uri, type, security)
+  return githubPolicyFactory.createPolicyForGithubObject(user, uri, type, security)
     .then(function(policy) {
       return policy.canAdmin();
     });

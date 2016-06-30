@@ -28,5 +28,5 @@ switch(nconf.get('NODE_ENV')) {
 
 module.exports = {
   text: stagingText,
-  stagingLink: stagingLink
+  link: stagingLink
 }

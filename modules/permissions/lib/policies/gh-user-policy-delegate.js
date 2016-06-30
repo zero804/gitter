@@ -2,28 +2,18 @@
 
 var Promise = require('bluebird');
 
-function GhRepoPolicyDelegate(user, securityDescriptor) {
-  this._user = user;
+function GhUserPolicyDelegate(userId, userLoader, securityDescriptor) {
+  this._userId = userId;
+  this._userLoader = userLoader;
   this._securityDescriptor = securityDescriptor;
-  this._fetchPromise = null;
 }
 
-function usernameMatchesUri(user, linkPath) {
-  if (!user) return false;
-  var currentUserName = user.username;
-  if (!currentUserName) return false;
-
-  if (!linkPath) return false;
-
-  return currentUserName.toLowerCase() === linkPath.toLowerCase();
-}
-
-GhRepoPolicyDelegate.prototype = {
+GhUserPolicyDelegate.prototype = {
   hasPolicy: Promise.method(function(policyName) {
 
     switch(policyName) {
       case 'GH_USER_SAME':
-        return usernameMatchesUri(this._user, this._securityDescriptor.linkPath);
+        return this._usernameMatchesUri();
 
       default:
         return false;
@@ -35,7 +25,26 @@ GhRepoPolicyDelegate.prototype = {
    */
   getPolicyRateLimitKey: function() {
     return null;
+  },
+
+  /* Does the username match */
+  _usernameMatchesUri: function() {
+    if (!this._userId) return false;
+
+    var linkPath = this._securityDescriptor.linkPath;
+    if (!linkPath) return false;
+
+    return this._userLoader()
+      .then(function(user) {
+        if (!user) return false;
+
+        var currentUserName = user.username;
+        if (!currentUserName) return false;
+
+        return currentUserName.toLowerCase() === linkPath.toLowerCase();
+      });
   }
+
 };
 
-module.exports = GhRepoPolicyDelegate;
+module.exports = GhUserPolicyDelegate;

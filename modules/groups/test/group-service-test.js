@@ -1,10 +1,22 @@
 'use strict';
 
-var groupService = require('../lib/group-service');
+var Promise = require('bluebird');
 var assert = require('assert');
 var StatusError = require('statuserror');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
+var proxyquireNoCallThru = require("proxyquire").noCallThru();
+
+// stub out this check because otherwise we end up with a the tests all
+// clashing with the user that's required to have access to create those
+// groups..
+var groupService = proxyquireNoCallThru('../lib/group-service', {
+  './group-uri-checker': function() {
+    return Promise.resolve({
+      allowCreate: true
+    });
+  }
+});
 
 describe('group-service', function() {
 
@@ -14,9 +26,12 @@ describe('group-service', function() {
       var fixture = fixtureLoader.setup({
         deleteDocuments: {
           User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }],
-          Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
-                  { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() },
-                  { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() }],
+          Group: [
+            { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
+            { lcUri: fixtureLoader.GITTER_INTEGRATION_REPO.toLowerCase() },
+            { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() },
+            { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() }
+          ],
         },
         user1: {
           githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
@@ -47,6 +62,34 @@ describe('group-service', function() {
               members: 'PUBLIC',
               public: true,
               type: 'GH_ORG'
+            })
+          })
+      });
+
+      it('should create a group for a GitHub repo', function() {
+        var groupUri = fixtureLoader.GITTER_INTEGRATION_REPO;
+        var linkPath = fixtureLoader.GITTER_INTEGRATION_REPO_FULL;
+        var user = fixture.user1;
+        return groupService.createGroup(user, {
+            type: 'GH_REPO',
+            name: 'Bob',
+            uri: groupUri,
+            linkPath: linkPath
+          })
+          .then(function(group) {
+            assert.strictEqual(group.name, 'Bob');
+            assert.strictEqual(group.uri, groupUri);
+            assert.strictEqual(group.lcUri, groupUri.toLowerCase());
+            return securityDescriptorService.getForGroupUser(group._id, null);
+          })
+          .then(function(securityDescriptor) {
+            assert.deepEqual(securityDescriptor, {
+              admins: 'GH_REPO_PUSH',
+              externalId: fixtureLoader.GITTER_INTEGRATION_REPO_ID,
+              linkPath: linkPath,
+              members: 'PUBLIC',
+              public: true,
+              type: 'GH_REPO'
             })
           })
       });
@@ -100,17 +143,24 @@ describe('group-service', function() {
           })
       });
 
-      it('should throw an error if you try and create a new style community not prefixed with an underscore', function() {
+      it('should throw a 409 if a URL is not available', function() {
         var user = fixture.user1;
-        return groupService.createGroup(user, {
-            name: 'This Should Fail',
-            uri: 'i-love-cats'
+        var groupService = proxyquireNoCallThru('../lib/group-service', {
+          './group-uri-checker': function() {
+            return Promise.resolve({
+              allowCreate: false
+            });
+          }
+        });
+        groupService.createGroup(user, {
+            name: 'Bob',
+            uri: 'bob'
           })
           .then(function() {
-            assert.ok(false, 'expected error')
+            assert.ok(false, 'Error Expected');
           })
-          .catch(StatusError, function(error) {
-            assert.strictEqual(error.status, 400);
+          .catch(StatusError, function(err) {
+            assert.strictEqual(err.status, 409);
           });
       });
     });
@@ -147,7 +197,7 @@ describe('group-service', function() {
         return groupService.migration.ensureGroupForGitHubRoomCreation(fixture.user1, {
           uri: fixtureLoader.GITTER_INTEGRATION_ORG,
           name: 'BOB',
-          obtainAccessFromGitHubRepo: fixtureLoader.GITTER_INTEGRATION_REPO
+          obtainAccessFromGitHubRepo: fixtureLoader.GITTER_INTEGRATION_REPO_FULL
         })
         .then(function(group) {
           return securityDescriptorService.getForGroupUser(group._id, fixture.user1._id);
@@ -199,10 +249,16 @@ describe('group-service', function() {
       it('should find the roomIds for group for an anonymous user', function() {
         return groupService.findRoomsIdForGroup(fixture.group1._id)
           .then(function(roomIds) {
-            assert.deepEqual(roomIds.map(String), [
+            var roomStrings = roomIds.map(String);
+            roomStrings.sort();
+
+            var expectedStrings = [
               fixture.troupe1.id,
               fixture.troupe2.id,
-            ]);
+            ];
+            expectedStrings.sort();
+
+            assert.deepEqual(roomStrings, expectedStrings);
           });
       });
 
