@@ -11,7 +11,6 @@ var suggestionsService = require('../../server/services/suggestions-service');
 var userSettingsService = require('../../server/services/user-settings-service');
 var restSerializer = require('../../server/serializers/rest-serializer');
 var intercom = require('gitter-web-intercom');
-var suggestions = require('gitter-web-suggestions');
 var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
 
 var opts = require('yargs')
