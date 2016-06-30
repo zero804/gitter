@@ -45,8 +45,8 @@ module.exports = exports = function(model, params) {
   var showDatesWithoutTimezone = root.showDatesWithoutTimezone;
 
 
-  var text = model.text;
-  var html = model.html || model.text;
+  var text = model.text || '';
+  var html = model.html || model.text || '';
 
   // Handle empty messages as deleted
   if (html.length === 0) {
