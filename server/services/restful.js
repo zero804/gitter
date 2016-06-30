@@ -191,14 +191,18 @@ function serializeProfileForUsername(username) {
 }
 
 
-function serializeGroupsForUserId(userId) {
+function serializeGroupsForUserId(userId, options) {
   if (!userId) return [];
 
   return groupMembershipService.findGroupsForUser(userId)
     .then(function(groups) {
       if (!groups || !groups.length) return [];
 
-      var strategy = new restSerializer.GroupStrategy({ currentUserId: userId });
+      var strategy = new restSerializer.GroupStrategy({
+        currentUserId: userId,
+        lean: options && options.lean
+      });
+
       return restSerializer.serialize(groups, strategy);
     });
 }

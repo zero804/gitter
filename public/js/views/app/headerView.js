@@ -14,8 +14,8 @@ var appEvents = require('utils/appevents');
 var KeyboardEventMixin = require('views/keyboard-events-mixin');
 var headerViewTemplate = require('./tmpl/headerViewTemplate.hbs');
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
-var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 var toggleClass = require('utils/toggle-class');
+var avatars = require('gitter-web-avatars');
 
 require('views/behaviors/tooltip');
 
@@ -32,6 +32,23 @@ function getPrivateStatus(data) {
 function getGithubUrl(data) {
   if (data.githubType !== 'REPO') return;
   return 'https://github.com' + data.url;
+}
+
+/**
+ * TODO: this should be using the user object to
+ * get room information in a one-to-one room
+ */
+function getAvatarUrlForRoom(model) {
+  if (model.get('oneToOne')) {
+    if (model.get('user')) {
+      return avatars.getForUser(model.get('user'));
+    }
+
+    // TODO: investigate if and why this is happening...
+    return avatars.getForRoomUri(model.get('name'));
+  }
+
+  return avatars.getForRoomUri(model.get('uri'))
 }
 
 var HeaderView = Marionette.ItemView.extend({
@@ -88,12 +105,13 @@ var HeaderView = Marionette.ItemView.extend({
     var data = this.model.toJSON();
     var orgName = getOrgNameFromTroupeName(data.name);
     var orgPageHref = '/orgs/' + orgName + '/rooms/';
-
     _.extend(data, {
+      headerView: {
+        avatarUrl: getAvatarUrlForRoom(this.model)
+      },
       troupeName:      data.name,
       troupeFavourite: !!data.favourite,
       troupeTopic:     data.topic,
-      avatarSrcSet:    resolveRoomAvatarSrcSet({ uri: data.url }, 48),
       user:            !!context.isLoggedIn(),
       isAdmin:         context.isTroupeAdmin(),
       archives:        this.options.archives,
