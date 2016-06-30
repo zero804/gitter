@@ -1,10 +1,10 @@
 "use strict";
-require('./widget');
-require('./cdn');
 
+var Handlebars = require('handlebars/runtime').default;
+var cdn = require('gitter-web-cdn');
+var Widget = require('./widget');
+var avatarImgSrcSetHbsHelper = require('gitter-web-avatars/shared/avatar-img-srcset-hbs-helper');
 
-module.exports = (function() {
-
-  return null;
-
-})();
+Handlebars.registerHelper('cdn', cdn);
+Handlebars.registerHelper('widget', Widget);
+Handlebars.registerHelper('avatarSrcSet', avatarImgSrcSetHbsHelper);

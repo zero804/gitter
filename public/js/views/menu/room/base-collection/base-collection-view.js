@@ -57,6 +57,7 @@ module.exports = Marionette.CompositeView.extend({
     this.roomCollection = attrs.roomCollection;
     this.listenTo(this.roomMenuModel, 'change:hasDismissedSuggestions', this.onDismissSuggestionsUpdate, this);
     this.listenTo(this.roomMenuModel, 'change:state', this.clearFocus, this);
+    this.listenTo(context.troupe(), 'change:id', this.onRoomUpdate, this);
     Marionette.CompositeView.prototype.constructor.apply(this, arguments);
   },
 
@@ -70,7 +71,6 @@ module.exports = Marionette.CompositeView.extend({
 
   onItemActivated: function(view) {
     var model = view.model;
-    model.set({ active: false, focus: false });
     var url = view.getRoomUrl();
     var name = view.getRoomName();
 
@@ -144,10 +144,25 @@ module.exports = Marionette.CompositeView.extend({
     });
   },
 
+  clearActive: function (){
+    var activeElements = this.collection.where({ active: true });
+    activeElements.forEach(function(model){
+      model.set('active', false);
+    });
+  },
+
   focusActiveElement: function (){
     var activeElement = this.collection.findWhere({ active: true });
     if(!activeElement) { return; }
     activeElement.set('focus', true);
+  },
+
+  onRoomUpdate: function (troupe, id){
+    this.clearFocus();
+    this.clearActive();
+    var model = this.collection.get(id);
+    if(!model) { return; }
+    model.set({ active: true, focus: true });
   },
 
   _triggerNavigation: function (url, type, name) {
