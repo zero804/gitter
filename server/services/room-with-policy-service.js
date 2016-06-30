@@ -265,7 +265,7 @@ RoomWithPolicyService.prototype.getRoomWelcomeMessage = secureMethod([allowJoin]
  * Update the welcome message for a room
  */
 RoomWithPolicyService.prototype.updateRoomWelcomeMessage = secureMethod([allowAdmin], function(data){
-  if (!data || !data.welcomeMessage) throw new StatusError(400);
+  if (!data || !data.welcomeMessage && data.welcomeMessage !== '') throw new StatusError(400);
 
   return processMarkdown(data.welcomeMessage)
     .bind(this)
