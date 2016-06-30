@@ -22,7 +22,6 @@ initialize: function(attrs, options) {
     //If the new room is not in the room list then show the temp icon
     //as we are sure we should be showing a temp org
     //return context.hasFeature('groups') && this.model.set('hidden', !!this.roomCollection.get(val));
-
     if(!context.hasFeature('groups')) { return; }
     var orgName = getOrgnameFromUri(this.getRoomUri());
     var roomId = val;
