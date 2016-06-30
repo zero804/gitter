@@ -28,7 +28,10 @@ describe('room-api', function() {
         username: fixtureLoader.GITTER_INTEGRATION_COLLAB_USERNAME
       }],
       Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() }],
-      Troupe: [ { lcUri: fixtureLoader.GITTER_INTEGRATION_REPO_WITH_COLLAB.toLowerCase() } ]
+      Troupe: [
+        { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
+        { lcUri: fixtureLoader.GITTER_INTEGRATION_REPO_WITH_COLLAB.toLowerCase() }
+      ]
     },
     user1: {
       githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
