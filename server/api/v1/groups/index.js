@@ -16,7 +16,9 @@ module.exports = {
       throw new StatusError(401);
     }
 
-    return restful.serializeGroupsForUserId(req.user._id);
+    var lean = req.query.lean && parseInt(req.query.lean, 10) || false;
+
+    return restful.serializeGroupsForUserId(req.user._id, { lean: lean });
   },
 
   create: function(req) {

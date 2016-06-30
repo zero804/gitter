@@ -1,15 +1,13 @@
 'use strict';
 
 var avatarCdnResolver = require('../shared/avatar-cdn-resolver');
-var gravatar = require('./gravatar');
 
 function getForGitHubUsername(githubUsername) {
   return avatarCdnResolver('/gh/u/' + githubUsername);
 }
 
 function getForGravatarEmail(emailAddress) {
-  var hash = gravatar.hashEmail(emailAddress);
-  return avatarCdnResolver('/gravatar/m/' + hash);
+  return avatarCdnResolver('/gravatar/e/' + emailAddress);
 }
 
 function getForGroupId(groupId) {

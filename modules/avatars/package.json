@@ -2,6 +2,7 @@
   "name": "gitter-web-avatars",
   "version": "1.0.0",
   "main": "server/index.js",
+  "browser": "browser/index.js",
   "directories": {
     "lib": "lib",
     "test": "test"
