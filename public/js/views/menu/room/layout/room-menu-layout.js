@@ -94,6 +94,8 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
       model: this.model,
     });
 
+    this.minibarCollection = this.model.minibarCollection;
+
     window.addEventListener('resize', this._initNano.bind(this));
     this.listenTo(this.dndCtrl, 'dnd:start-drag', this.onDragStart.bind(this));
     this.listenTo(this.dndCtrl, 'dnd:end-drag', this.onDragEnd.bind(this));
@@ -133,7 +135,7 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
     if(!this.model.get('roomMenuIsPinned')) {
       var activeModel = this.minibarCollection.findWhere({ active: true });
       if (activeModel) {
-        activeModel.set('active', false);
+        activeModel.set({ active: false, focus: false });
       }
     }
   },

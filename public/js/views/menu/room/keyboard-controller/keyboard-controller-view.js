@@ -56,13 +56,13 @@ var KeyboardController = Marionette.ItemView.extend({
     var allModel = this.minibarCollection.findWhere({ type: 'all' });
     this.blurAllItems();
     allModel.set('focus', true);
-    this.model.set('state', 'all');
+    this.setModelState('all');
   },
 
   onMinibarSearchSelected: function (){
     //the search input will focus itself
     this.blurAllItems();
-    this.model.set('state', 'search');
+    this.setModelState('search');
   },
 
   onMinibarPeopleSelected: function (){
@@ -70,6 +70,7 @@ var KeyboardController = Marionette.ItemView.extend({
     this.blurAllItems();
     peopleModel.set('focus', true);
     this.model.set('state', 'people');
+    this.setModelState('people');
   },
 
   onMinibarOrgSelected: function (e){
@@ -80,7 +81,7 @@ var KeyboardController = Marionette.ItemView.extend({
     index = arrayBoundWrap(index, this.minibarCollection.length);
     var model = this.minibarCollection.at(index);
     model.set('focus', true);
-    this.model.set({ state: 'org', selectedOrgName: model.get('name') });
+    this.setModelState({ state: 'org', selectedOrgName: model.get('name') });
   },
 
   onDownKeyPressed: function (e){
@@ -165,6 +166,13 @@ var KeyboardController = Marionette.ItemView.extend({
     //If we are in the search state me may have to move focus back to search
     if(this.model.get('state') === 'search') { return this.focusSearch(); }
     return this.focusLastMinibarItem();
+  },
+
+  setModelState: function (attrs){
+    if(_.isString(attrs)) { attrs = { state: attrs }; }
+    this.model.set(_.extend({}, attrs, {
+      panelOpenState: true
+    }));
   },
 
   moveMinibarFocus: function (direction){
@@ -307,8 +315,10 @@ var KeyboardController = Marionette.ItemView.extend({
 
   setDebouncedState: _.debounce(function (model){
     var type = model.get('type');
-    if(type !== 'org') { return this.model.set('state', type); }
-    this.model.set({ state: type, selectedOrgName: model.get('name') });
+    this.setModelState({
+      state: type,
+      selectedOrgName: (type === 'org') ? model.get('name') : null,
+    });
   }, 100),
 
   blurAllItems: function (){
