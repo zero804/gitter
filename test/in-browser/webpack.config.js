@@ -62,7 +62,6 @@ module.exports = {
       'components/apiClient':                               path.resolve(__dirname, './fixtures/helpers/apiclient.js'),
       'utils/appevents':                                    path.resolve(__dirname, './fixtures/helpers/appevents.js'),
       'filtered-collection':                                path.resolve(__dirname, '../../public/repo/filtered-collection/filtered-collection.js'),
-      'gitter-web-shared/get-org-name-from-uri':            path.resolve(__dirname, '../../shared/get-org-name-from-uri.js'),
     },
   },
   node: {
