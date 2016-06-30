@@ -9,11 +9,7 @@ var Promise = require('bluebird');
 var contextGenerator = require('../../web/context-generator');
 var restful = require('../../services/restful');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
-var url = require('url');
 var _ = require('lodash');
-var chatService = require('../../services/chat-service');
-var social = require('../social-metadata');
-var restSerializer = require("../../serializers/rest-serializer");
 var roomSort = require('gitter-realtime-client/lib/sorts-filters').pojo; /* <-- Don't use the default export
                                                                                           will bring in tons of client-side
                                                                                           libraries that we don't need */
@@ -22,38 +18,19 @@ var userSettingsService = require('../../services/user-settings-service');
 var getSubResources = require('./sub-resources');
 var fixMongoIdQueryParam = require('../../web/fix-mongo-id-query-param');
 var mapGroupsForRenderer = require('../../handlers/map-groups-for-renderer');
+var generateMainFrameSnapshots = require('../../handlers/snapshots/main-frame');
 var fonts = require('../../web/fonts.js');
 
-var generateMainFrameSnapshots = require('../../handlers/snapshots/main-frame');
-
-/* How many chats to send back */
-
-function getPermalinkChatForRoom(troupe, chatId) {
-  if (!troupe || troupe.security !== 'PUBLIC') return Promise.resolve();
-
-  return chatService.findByIdInRoom(troupe.id, chatId)
-    .then(function(chat) {
-      var strategy = new restSerializer.ChatStrategy({
-        notLoggedIn: true,
-        troupeId: troupe.id
-      });
-
-      return restSerializer.serializeObject(chat, strategy);
-    });
-}
-
-
-function renderMainFrame(req, res, next, frame) {
+function renderMainFrame(req, res, next, options) {
   var user = req.user;
   var userId = user && user.id;
-  var aroundId = fixMongoIdQueryParam(req.query.at);
 
   var selectedRoomId = req.troupe && req.troupe.id;
 
   Promise.all([
       contextGenerator.generateNonChatContext(req),
       restful.serializeTroupesForUser(userId),
-      aroundId && getPermalinkChatForRoom(req.troupe, aroundId),
+      options.socialMetaDataPromise,
       restful.serializeOrgsForUserId(userId).catch(function(err) {
         // Workaround for GitHub outage
         winston.error('Failed to serialize orgs:' + err, { exception: err });
@@ -62,15 +39,8 @@ function renderMainFrame(req, res, next, frame) {
       restful.serializeGroupsForUserId(userId),
 
     ])
-    .spread(function (troupeContext, rooms, permalinkChat, orgs, groups) {
-
-      var chatAppQuery = {};
-      if (aroundId) { chatAppQuery.at = aroundId; }
-      var chatAppLocation = url.format({
-        pathname: '/' + req.uriContext.uri + '/~' + frame,
-        query:    chatAppQuery,
-        hash:     '#initial'
-      });
+    .spread(function (troupeContext, rooms, socialMetadata, orgs, groups) {
+      var chatAppLocation = options.subFrameLocation;
 
       var template, bootScriptName;
 
@@ -82,11 +52,6 @@ function renderMainFrame(req, res, next, frame) {
         bootScriptName = 'router-nli-app';
       }
 
-      var socialMetadata = permalinkChat ?
-        social.getMetadataForChatPermalink({ room: req.troupe, chat: permalinkChat }) :
-        social.getMetadata({ room: req.troupe });
-
-        //switches
       var hasNewLeftMenu = !req.isPhone && req.fflip && req.fflip.has('left-menu');
       var snapshots = troupeContext.snapshots = generateMainFrameSnapshots(req, troupeContext, rooms, groups);
 
@@ -123,7 +88,7 @@ function renderMainFrame(req, res, next, frame) {
         socialMetadata:         socialMetadata,
         bootScriptName:         bootScriptName,
         cssFileName:            "styles/" + bootScriptName + ".css",
-        troupeName:             req.uriContext.uri,
+        troupeName:             options.title,
         troupeContext:          troupeContext,
         chatAppLocation:        chatAppLocation,
         agent:                  req.headers['user-agent'],
