@@ -165,7 +165,6 @@ module.exports = Backbone.Model.extend({
     this.bus = attrs.bus;
     delete attrs.bus;
 
-    this.listenTo(this.bus, 'room-menu:change:state', this.onStateChangeCalled, this);
     this.listenTo(this, 'change:searchTerm', this.onSearchTermChange, this);
     this.listenTo(this, 'change:state', this.onSwitchState, this);
     this.listenTo(this, 'change', _.throttle(this.save.bind(this), 1500));
@@ -181,23 +180,6 @@ module.exports = Backbone.Model.extend({
     //If we are changing the models state value
     if(states.indexOf(newState) === -1) { return; }
     return Backbone.Model.prototype.set.apply(this, arguments);
-  },
-
-  onStateChangeCalled: function(newState) {
-
-    if (states.indexOf(newState) === -1) {
-      throw new Error('Please only pass a valid state to roomMenuModel change state, you passed:' + newState);
-    }
-
-
-    perfTiming.start('left-menu-change');
-    this.set('state', newState);
-    perfTiming.end('left-menu-change');
-  },
-
-  //This may be redundant
-  setState: function(type) {
-    this.onStateChangeCalled(type);
   },
 
   onSwitchState: function(model, val) {
