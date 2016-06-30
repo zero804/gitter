@@ -12,7 +12,7 @@ function getExpectedForGroup(group) {
     id: group.id,
     name: group.name,
     uri: group.uri,
-    avatarUrl: '/api/private/avatars/group/i/' + group.id,
+    avatarUrl: 'http://localhost:5000/api/private/avatars/group/i/' + group.id,
   }];
 }
 
