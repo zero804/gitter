@@ -34,6 +34,23 @@ function getGithubUrl(data) {
   return 'https://github.com' + data.url;
 }
 
+/**
+ * TODO: this should be using the user object to
+ * get room information in a one-to-one room
+ */
+function getAvatarUrlForRoom(model) {
+  if (model.get('oneToOne')) {
+    if (model.get('user')) {
+      return avatars.getForUser(model.get('user'));
+    }
+
+    // TODO: investigate if and why this is happening...
+    return avatars.getForRoomUri(model.get('name'));
+  }
+
+  return avatars.getForRoomUri(model.get('uri'))
+}
+
 var HeaderView = Marionette.ItemView.extend({
   template: headerViewTemplate,
 
@@ -90,7 +107,7 @@ var HeaderView = Marionette.ItemView.extend({
     var orgPageHref = '/orgs/' + orgName + '/rooms/';
     _.extend(data, {
       headerView: {
-        avatarUrl: avatars.getForRoomUri(data.uri)
+        avatarUrl: getAvatarUrlForRoom(this.model)
       },
       troupeName:      data.name,
       troupeFavourite: !!data.favourite,
