@@ -9,18 +9,24 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
 var DEFAULT_AVATAR_URL = 'https://avatars.githubusercontent.com/u/0';
 
 function sendAvatar(req, res, imageUrl, hasCacheBuster) {
-  if (hasCacheBuster) {
-    res.set('Cache-Control', 'public, max-age=600, s-maxage=600'); // TODO: add more here
-  } else {
-    res.set('Cache-Control', 'public, max-age=60, s-maxage=60'); // TODO: add more here
-  }
 
   // If the nginx image proxy is sitting in front of the app
   // use that
   if (req.headers['x-avatar-server']) {
-    res.set('X-Accel-Redirect', '/fetch/' + imageUrl);
+    if (hasCacheBuster) {
+      res.set('X-Accel-Redirect', '/fetch_lt/' + imageUrl);
+    } else {
+      res.set('X-Accel-Redirect', '/fetch/' + imageUrl);
+    }
     res.sendStatus(200).send('OK');
     return;
+  }
+
+  // No image proxy, in the development environment
+  if (hasCacheBuster) {
+    res.set('Cache-Control', 'max-age=2592000'); // TODO: add more here
+  } else {
+    res.set('Cache-Control', 'max-age=3600'); // TODO: add more here
   }
 
   res.redirect(imageUrl);
@@ -31,6 +37,19 @@ function githubUrl(username, size) {
   var base = 'https://avatars.githubusercontent.com/' + username;
   if (size) {
     base = base + '?s=' + size;
+  }
+
+  return base;
+}
+
+function githubVerionedUrl(username, version, size) {
+  if (!version) {
+    return githubUrl(username, size);
+  }
+
+  var base = 'https://avatars.githubusercontent.com/' + username + '?v=' + version;
+  if (size) {
+    base = base + '&s=' + size;
   }
 
   return base;
@@ -95,7 +114,19 @@ router.get('/gh/u/:username',
   identifyRoute('api-private-github-username'),
   function(req, res) {
     var username = req.params.username;
-    sendAvatar(req, res, 'https://avatars.githubusercontent.com/' + username, true);
+    var size = req.query.size && parseInt(req.query.size, 10) || '';
+    var avatarUrl = githubUrl(username, size);
+    sendAvatar(req, res, avatarUrl, false);
+  });
+
+router.get('/gh/uv/:version/:username',
+  identifyRoute('api-private-github-versioned-username'),
+  function(req, res) {
+    var username = req.params.username;
+    var version = req.params.version;
+    var size = req.query.size && parseInt(req.query.size, 10) || '';
+    var avatarUrl = githubVerionedUrl(username, version, size);
+    sendAvatar(req, res, avatarUrl, false);
   });
 
 
