@@ -27,6 +27,24 @@ function getForRoomUri(uri) {
   return avatarCdnResolver('/gh/u/' + orgOrUser);
 }
 
+/**
+ * This will change in future
+ */
+function getForUser(user) {
+  if (!user) return DEFAULT;
+  var username = user.username;
+  if (!username) return DEFAULT;
+  var gv = user.gravatarVersion || user.gv;
+
+  if (gv) {
+    // Use the versioned interface
+    return avatarCdnResolver('/gh/uv/' + gv + '/' + username);
+  } else {
+    // Use the unversioned interface, with a shorter cache time
+    return avatarCdnResolver('/gh/u/' + username);
+  }
+}
+
 function getDefault() {
   return DEFAULT;
 }
@@ -36,5 +54,6 @@ module.exports = {
   getForGravatarEmail: getForGravatarEmail,
   getForGroupId: getForGroupId,
   getForRoomUri: getForRoomUri,
+  getForUser: getForUser,
   getDefault: getDefault,
 }
