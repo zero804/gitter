@@ -26,18 +26,19 @@ module.exports = {
       throw new StatusError(404);
     }
 
-    var name = req.body.name;
-    var topic = req.body.topic;
+    var name = req.body.name ? String(req.body.name) : undefined;
+    var topic = req.body.topic ? String(req.body.topic) : undefined;
     var createOptions = { name: name, topic: topic };
     if (req.body.security) {
       // PUBLIC, PRIVATE or INHERITED
-      createOptions.security = req.body.security.security;
+      createOptions.security = req.body.security.security ? String(req.body.security.security) : undefined;
       assert(createOptions.security, 'security required');
 
-      createOptions.type = req.body.security.type;
+      // type defaults to null, not undefined
+      createOptions.type = req.body.security.type ? String(req.body.security.type) : null;
       if (createOptions.type) {
         // for GitHub and future room types that are backed by other services
-        createOptions.linkPath = req.body.security.linkPath;
+        createOptions.linkPath = req.body.security.linkPath ? String(req.body.security.linkPath) : undefined;
         assert(createOptions.linkPath, 'linkPath required');
       }
     } else {

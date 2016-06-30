@@ -5,11 +5,13 @@ var handlebars = require('handlebars');
 var i18nFactory = require('gitter-web-i18n');
 var _ = require('underscore');
 var hbsHelpers = require('../web/hbs-helpers');
+var avatarImgSrcSetHbsHelper = require('gitter-web-avatars/shared/avatar-img-srcset-hbs-helper');
 var Promise = require('bluebird');
 
 // TODO: add caching!
 handlebars.registerHelper('cdn', hbsHelpers.cdn);
 handlebars.registerHelper('pad', hbsHelpers.pad);
+handlebars.registerHelper('avatarSrcSet', avatarImgSrcSetHbsHelper);
 
 var defaultI18n = i18nFactory.get();
 

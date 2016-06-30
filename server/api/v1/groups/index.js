@@ -1,10 +1,12 @@
 "use strict";
 
+var Promise = require('bluebird');
 var restful = require("../../../services/restful");
 var StatusError = require('statuserror');
 var groupService = require('gitter-web-groups/lib/group-service');
 var restSerializer = require('../../../serializers/rest-serializer');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
+var GroupWithPolicyService = require('../../../services/group-with-policy-service');
 
 module.exports = {
   id: 'group',
@@ -14,7 +16,9 @@ module.exports = {
       throw new StatusError(401);
     }
 
-    return restful.serializeGroupsForUserId(req.user._id);
+    var lean = req.query.lean && parseInt(req.query.lean, 10) || false;
+
+    return restful.serializeGroupsForUserId(req.user._id, { lean: lean });
   },
 
   create: function(req) {
@@ -29,15 +33,55 @@ module.exports = {
       throw new StatusError(404);
     }
 
-    var uri = req.body.uri;
-    var name = req.body.name;
-    var createOptions = { uri: uri, name: name };
+    var uri = req.body.uri ? String(req.body.uri) : undefined;
+    var name = req.body.name ? String(req.body.name) : undefined;
+    var groupOptions = { uri: uri, name: name };
     if (req.body.security) {
       // for GitHub and future group types that are backed by other services
-      createOptions.type = req.body.security.type;
-      createOptions.linkPath = req.body.security.linkPath;
+      groupOptions.type = req.body.security.type ? String(req.body.security.type) : undefined;
+      groupOptions.linkPath = req.body.security.linkPath ? String(req.body.security.linkPath) : undefined;
     }
-    return groupService.createGroup(user, createOptions);
+
+    var group;
+
+    return groupService.createGroup(user, groupOptions)
+      .then(function(_group) {
+        group = _group
+        return policyFactory.createPolicyForGroupId(req.user, group._id);
+      })
+      .then(function(userGroupPolicy) {
+        var groupWithPolicyService = new GroupWithPolicyService(group, req.user, userGroupPolicy);
+
+        var defaultRoomName = req.body.defaultRoomName || 'Lobby';
+        var roomOptions = {
+          name: defaultRoomName,
+          // default rooms are always public
+          security: 'PUBLIC',
+          // use the same backing object for the default room
+          type: group.sd.type,
+          linkPath: group.sd.linkPath
+        };
+
+        return groupWithPolicyService.createRoom(roomOptions);
+      })
+      .then(function(room) {
+        var groupStrategy = new restSerializer.GroupStrategy();
+        var troupeStrategy = new restSerializer.TroupeStrategy({
+          currentUserId: req.user.id,
+          includeTags: true,
+          includePermissions: true,
+          includeProviders: true
+        });
+
+        return Promise.join(
+            restSerializer.serializeObject(group, groupStrategy),
+            restSerializer.serializeObject(room, troupeStrategy),
+            function(serializedGroup, serializedRoom) {
+              serializedGroup.defaultRoom = serializedRoom;
+              return serializedGroup;
+            }
+          );
+      });
   },
 
   show: function(req) {
