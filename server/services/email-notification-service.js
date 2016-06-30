@@ -58,19 +58,25 @@ function calculateSubjectForUnreadEmail(i18n, troupesWithUnreadCounts) {
 /*
  * Send invitation and reminder emails to the provided address.
  */
-function sendInvite(invitingUser, invite, room, template, eventName) {
+function sendInvite(invitingUser, invite, room, isReminder, template, eventName) {
   var email = invite.emailAddress;
 
   var senderName = (invitingUser.displayName || invitingUser.username);
   var date = moment(mongoUtils.getTimestampFromObjectId(invite._id)).format('Do MMMM YYYY');
-  var inviteUrl = config.get("email:emailBasePath") + '/settings/accept-invite/' + invite.secret;
+  var emailBasePath = config.get("email:emailBasePath");
+  var inviteUrl = emailBasePath + '/settings/accept-invite/' + invite.secret;
+  var roomUrl = emailBasePath + '/' + room.uri;
+  var subject = senderName + ' invited you to join the ' + room.uri + ' chat on Gitter';
+  if (isReminder) {
+    subject = 'Reminder: ' + subject;
+  }
 
   return mailerService.sendEmail({
     templateFile:   template,
     from:           senderName + ' <support@gitter.im>',
     fromName:       senderName,
     to:             email,
-    subject:        '[' + room.uri + '] Join the chat on Gitter',
+    subject:        subject,
     tracking: {
       event: eventName,
       data: { email: email }
@@ -78,7 +84,8 @@ function sendInvite(invitingUser, invite, room, template, eventName) {
     data: {
       date: date,
       roomUri: room.uri,
-      roomUrl: inviteUrl,
+      roomUrl: roomUrl,
+      inviteUrl: inviteUrl,
       senderName: senderName
     }
   });
@@ -154,11 +161,11 @@ module.exports = {
   }),
 
   sendInvitation: function(invitingUser, invite, room) {
-    return sendInvite(invitingUser, invite, room, 'invitation', 'invitation_sent');
+    return sendInvite(invitingUser, invite, room, false, 'invitation-v2', 'invitation_sent');
   },
 
   sendInvitationReminder: Promise.method(function(invitedByUser, invite, room) {
-    return sendInvite(invitedByUser, invite, room, 'invitation-reminder', 'invitation_reminder_sent');
+    return sendInvite(invitedByUser, invite, room, true, 'invitation-reminder-v2', 'invitation_reminder_sent');
   }),
 
   /**
