@@ -11,7 +11,7 @@ var isolateBurst = require('gitter-web-shared/burst/isolate-burst-array');
 var unreadItemService = require('../../services/unread-items');
 var _ = require('lodash');
 
-var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
+var avatars = require('gitter-web-avatars');
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 var getSubResources = require('./sub-resources');
 var fixMongoIdQueryParam = require('../../web/fix-mongo-id-query-param');
@@ -139,7 +139,10 @@ function renderChat(req, res, options, next) {
             troupeTopic: troupeContext.troupe.topic,
             premium: troupeContext.troupe.premium,
             troupeFavourite: troupeContext.troupe.favourite,
-            avatarSrcSet:  resolveRoomAvatarSrcSet({ uri: troupeContext.troupe.url }, 48),
+            headerView: {
+              // TODO: move all the headerView things in here
+              avatarUrl: avatars.getForRoomUri(req.uriContext.uri)
+            },
             isAdmin: isAdmin,
             isNativeDesktopApp: troupeContext.isNativeDesktopApp
           }, options.extras);

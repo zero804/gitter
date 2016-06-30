@@ -14,8 +14,8 @@ var appEvents = require('utils/appevents');
 var KeyboardEventMixin = require('views/keyboard-events-mixin');
 var headerViewTemplate = require('./tmpl/headerViewTemplate.hbs');
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
-var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 var toggleClass = require('utils/toggle-class');
+var avatars = require('gitter-web-avatars');
 
 require('views/behaviors/tooltip');
 
@@ -88,12 +88,13 @@ var HeaderView = Marionette.ItemView.extend({
     var data = this.model.toJSON();
     var orgName = getOrgNameFromTroupeName(data.name);
     var orgPageHref = '/orgs/' + orgName + '/rooms/';
-
     _.extend(data, {
+      headerView: {
+        avatarUrl: avatars.getForRoomUri(data.url)
+      },
       troupeName:      data.name,
       troupeFavourite: !!data.favourite,
       troupeTopic:     data.topic,
-      avatarSrcSet:    resolveRoomAvatarSrcSet({ uri: data.url }, 48),
       user:            !!context.isLoggedIn(),
       isAdmin:         context.isTroupeAdmin(),
       archives:        this.options.archives,
