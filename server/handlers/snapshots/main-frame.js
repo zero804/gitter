@@ -54,6 +54,7 @@ module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, group
       tempOrg: tempOrg,
       selectedOrgName: selectedOrgName,
     }),
+    allRooms: rooms,
     rooms: parseRoomsIntoLeftMenuRoomList(menuState, rooms, selectedOrgName),
     favourites: parseRoomsIntoLeftMenuFavouriteRoomList(menuState, rooms, selectedOrgName),
     groups: groups,
