@@ -3,8 +3,8 @@
 var express = require('express');
 var urlJoin = require('url-join');
 var ensureLoggedIn = require('../web/middlewares/ensure-logged-in');
-var appMiddleware = require('./app/middleware');
 var timezoneMiddleware = require('../web/middlewares/timezone');
+var isPhoneMiddleware = require('../web/middlewares/is-phone');
 var userHomeRenderer = require('./renderers/userhome');
 var mainFrameRenderer = require('./renderers/main-frame');
 var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
@@ -15,17 +15,16 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
 router.get('/',
   identifyRoute('home-main'),
   featureToggles,
-  appMiddleware.isPhoneMiddleware,
+  isPhoneMiddleware,
   timezoneMiddleware,
   function (req, res, next) {
-    req.uriContext = {
-      uri: 'home'
-    };
-
     if (req.isPhone) {
       userHomeRenderer.renderMobileUserHome(req, res, next, 'home');
     } else {
-      mainFrameRenderer.renderMainFrame(req, res, next, 'home');
+      mainFrameRenderer.renderMainFrame(req, res, next, {
+        subFrameLocation: '/home/~home',
+        title: 'Home'
+      });
     }
   });
 
@@ -34,7 +33,7 @@ router.get('/~home',
   identifyRoute('home-frame'),
   ensureLoggedIn,
   featureToggles,
-  appMiddleware.isPhoneMiddleware,
+  isPhoneMiddleware,
   function(req, res, next) {
     userHomeRenderer.renderHomePage(req, res, next);
   });
@@ -51,17 +50,20 @@ router.get('/createroom',
 
 router.get(new RegExp('/explore(.*)?'),
   identifyRoute('home-explore'),
-  ensureLoggedIn,
   featureToggles,
-  appMiddleware.isPhoneMiddleware,
+  isPhoneMiddleware,
   function (req, res, next) {
-    req.uriContext = {
-      uri: 'home'
-    };
+    if(!req.user) {
+      return res.redirect('/explore');
+    }
 
-    var frameUrl = urlJoin('explore', (req.params[0] || ''));
+    var exploreParam = req.params[0] || '';
+    var subFrameLocation = urlJoin('/home/~explore', exploreParam);
 
-    mainFrameRenderer.renderMainFrame(req, res, next, frameUrl);
+    mainFrameRenderer.renderMainFrame(req, res, next, {
+      subFrameLocation: subFrameLocation,
+      title: 'Explore ' + exploreParam.split('/').join(', ')
+    });
   });
 
 router.get('/learn',
@@ -69,11 +71,10 @@ router.get('/learn',
   ensureLoggedIn,
   featureToggles,
   function (req, res, next) {
-    req.uriContext = {
-      uri: 'learn'
-    };
-
-    mainFrameRenderer.renderMainFrame(req, res, next, 'learn');
+    mainFrameRenderer.renderMainFrame(req, res, next, {
+      subFrameLocation: '/learn/~learn',
+      title: 'Learn'
+    });
   });
 
 module.exports = router;

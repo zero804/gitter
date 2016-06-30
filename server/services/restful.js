@@ -91,8 +91,8 @@ function serializeUsersForTroupe(troupeId, userId, options) {
     limit = MAX_USERS_LIMIT;
   }
 
-  if(searchTerm) {
-    if (survivalMode) {
+  if(typeof searchTerm === 'string') {
+    if (survivalMode || searchTerm.length < 1) {
       return Promise.resolve([]);
     }
 

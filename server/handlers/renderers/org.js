@@ -9,12 +9,15 @@ var roomMembershipService = require('../../services/room-membership-service');
 var troupeService = require('../../services/troupe-service');
 var _ = require('lodash');
 var GitHubOrgService = require('gitter-web-github').GitHubOrgService;
-var orgPermissionModel = require('gitter-web-permissions/lib/models/org-permissions-model');
 var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 var generateRoomCardContext = require('gitter-web-shared/templates/partials/room-card-context-generator');
+var StatusError = require('statuserror');
+var fonts = require('../../web/fonts');
 
-function renderOrgPage(req, res, next, options) {
-  var orgUri = options.orgUri;
+function renderOrgPage(req, res, next) {
+  if (!req.group) throw new StatusError(404);
+  var policy = req.uriContext.policy;
+
   var findChildRoomOptions = {};
 
   var ROOMS_PER_PAGE = 15;
@@ -24,12 +27,15 @@ function renderOrgPage(req, res, next, options) {
 
   var ghOrgService = new GitHubOrgService(req.user);
 
+  // TODO: fix this!!!
+  var orgUri = req.group.uri;
+
   return Promise.all([
     ghOrgService.getOrg(orgUri).catch(function() { return null; }),
     troupeService.findChildRoomsForOrg(orgUri, findChildRoomOptions),
     contextGenerator.generateNonChatContext(req),
-    orgPermissionModel(req.user, 'admin', orgUri),
-    orgPermissionModel(req.user, 'join', orgUri)
+    policy.canAdmin(),
+    policy.canJoin()
   ])
   .spread(function(ghOrg, rooms, troupeContext, isOrgAdmin, isOrgMember) {
     var isStaff = !!(troupeContext.user || {}).staff;
@@ -105,6 +111,8 @@ function renderOrgPage(req, res, next, options) {
         '&via=gitchat';
 
       res.render('org-page', {
+        hasCachedFonts: fonts.hasCachedFonts(req.cookies),
+        fonts: fonts.getFonts(),
         socialUrl: url,
         isLoggedIn: !!req.user,
         exploreBaseUrl: '/home/~explore',

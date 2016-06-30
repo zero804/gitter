@@ -1,5 +1,6 @@
 'use strict';
 require('utils/initial-setup');
+require('utils/font-setup');
 
 var Backbone = require('backbone');
 var context = require('utils/context');
@@ -24,7 +25,7 @@ require('components/statsc');
 require('views/widgets/preload');
 require('components/dozy');
 require('template/helpers/all');
-require('components/eyeballs');
+require('./components/eyeballs-room-sync');
 require('components/bug-reporting');
 require('components/focus-events');
 

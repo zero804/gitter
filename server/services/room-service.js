@@ -14,9 +14,10 @@ var _ = require('lodash');
 var validateRoomName = require('gitter-web-validators/lib/validate-room-name');
 var persistence = require('gitter-web-persistence');
 var uriLookupService = require("./uri-lookup-service");
-var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
+var policyFactory = require('gitter-web-permissions/lib/policy-factory');
+var githubPolicyFactory = require('gitter-web-permissions/lib/github-policy-factory');
 var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
-var canUserBeInvitedToJoinRoom = require('gitter-web-permissions/lib/invited-permissions-service');
+var addInvitePolicyFactory = require('gitter-web-permissions/lib/add-invite-policy-factory');
 var userService = require('./user-service');
 var troupeService = require('./troupe-service');
 var oneToOneRoomService = require('./one-to-one-room-service');
@@ -181,6 +182,7 @@ function getOwnerFromRepoFullName(repoName) {
  * given uri.
  */
 function ensureGroupForGitHubRoom(user, githubType, uri) {
+  debug('ensureGroupForGitHubRoom: type=%s uri=%s', githubType, uri);
   var options;
   switch (githubType) {
     case 'REPO':
@@ -256,7 +258,7 @@ function createRoomForGitHubUri(user, uri, options) {
       /* Room does not yet exist */
       // TODO: switch out for policy...
       // Parent rooms always have security == null
-      return policyFactory.createPolicyForGithubObject(user, officialUri, githubType, null)
+      return githubPolicyFactory.createPolicyForGithubObject(user, officialUri, githubType, null)
         .bind({
           troupe: null,
           updateExisting: null,
@@ -464,7 +466,15 @@ function createRoomByUri(user, uri, options) {
 
   /* First off, try use local data to figure out what this url is for */
   return uriResolver(user && user.id, uri, options)
-    .spread(function (resolvedUser, resolvedTroupe, roomMember) {
+    .then(function (resolved) {
+      var resolvedUser = resolved && resolved.user;
+      var resolvedTroupe = resolved && resolved.room;
+      var roomMember = resolved && resolved.roomMember;
+      var resolvedGroup = resolved && resolved.group;
+
+      // We resolved a group. There will never be a room at this URI
+      if (resolvedGroup) throw new StatusError(404);
+
       /* Deal with the case of the anonymous user first */
       if(!user) {
         if(resolvedUser) {
@@ -477,7 +487,7 @@ function createRoomByUri(user, uri, options) {
 
           return policyFactory.createPolicyForRoom(user, resolvedTroupe)
             .then(function(policy) {
-              return policy.canView();
+              return policy.canRead();
             })
             .then(function(viewAccess) {
               if (!viewAccess) throw new StatusError(404);
@@ -764,7 +774,7 @@ function createRoomChannel(parentTroupe, user, options) {
         });
     })
     .then(function(groupId) {
-      return createChannel(user, null, {
+      return createChannel(user, parentTroupe, {
         uri: uri,
         security: options.security,
         githubType: githubType,
@@ -903,7 +913,7 @@ function createChannel(user, parentRoom, options) {
  *
  * returns        User - the invited user
  */
-function notifyInvitedUser(fromUser, invitedUser, room/*, isNewUser*/) {
+function notifyInvitedUser(fromUser, invitedUser, room) {
 
   // get the email address
   return emailAddressService(invitedUser, { attemptDiscovery: true })
@@ -989,41 +999,41 @@ function joinRoom(room, user, options) {
  * Caller needs to ensure that the instigatingUser can add
  * the user to the room
  */
-function addUserToRoom(room, instigatingUser, usernameToAdd) {
-  return canUserBeInvitedToJoinRoom(usernameToAdd, room, instigatingUser)
+function addUserToRoom(room, instigatingUser, userToAdd) {
+  assert(userToAdd && userToAdd.username, 'userToAdd required');
+  var usernameToAdd = userToAdd.username;
+
+  return addInvitePolicyFactory.createPolicyForRoomAdd(userToAdd, room)
+    .then(function(policy) {
+      return policy.canJoin();
+    })
     .then(function(canJoin) {
       if (!canJoin) throw new StatusError(403, usernameToAdd + ' does not have permission to join this room.');
-
-      return userService.findByUsername(usernameToAdd);
     })
-    .then(function (existingUser) {
-      return assertJoinRoomChecks(room, existingUser)
-        .then(function() {
-          var isNewUser = !existingUser;
-
-          return [existingUser || userService.createInvitedUser(usernameToAdd, instigatingUser, room._id), isNewUser];
-        });
+    .then(function () {
+      return assertJoinRoomChecks(room, userToAdd);
     })
-    .spread(function (addedUser, isNewUser) {
+    .then(function() {
       // We need to add the last access time before adding the member to the room
       // so that the serialized create that the user receives will contain
       // the last access time and not be hidden in the troupe list
-      return recentRoomService.saveLastVisitedTroupeforUserId(addedUser._id, room._id, { skipFayeUpdate: true })
-        .then(function() {
-          var flags = userDefaultFlagsService.getDefaultFlagsForUser(addedUser);
-          return roomMembershipService.addRoomMember(room._id, addedUser._id, flags, room.groupId);
-        })
-        .then(function(wasAdded) {
-          if (!wasAdded) return addedUser;
+      return recentRoomService.saveLastVisitedTroupeforUserId(userToAdd._id, room._id, { skipFayeUpdate: true });
+    })
+    .then(function() {
+      var flags = userDefaultFlagsService.getDefaultFlagsForUser(userToAdd);
+      return roomMembershipService.addRoomMember(room._id, userToAdd._id, flags, room.groupId);
+    })
+    .then(function(wasAdded) {
+      if (!wasAdded) return userToAdd;
 
-          return Promise.all([
-            notifyInvitedUser(instigatingUser, addedUser, room, isNewUser),
-            updateUserDateAdded(addedUser.id, room.id)
-          ])
-          .thenReturn(addedUser);
-        });
+      return Promise.all([
+        notifyInvitedUser(instigatingUser, userToAdd, room),
+        updateUserDateAdded(userToAdd.id, room.id)
+      ]);
+    })
+    .then(function() {
+      return userToAdd;
     });
-
 }
 
 
@@ -1327,7 +1337,7 @@ function deleteRoom(troupe) {
 function upsertGroupRoom(user, group, roomInfo, securityDescriptor, options) {
   options = options || {}; // options.tracking
   var uri = roomInfo.uri;
-  var topic = roomInfo.topic || null;
+  var topic = roomInfo.topic;
   var lcUri = uri.toLowerCase();
 
   // convert back to the old github-tied vars here
@@ -1343,6 +1353,11 @@ function upsertGroupRoom(user, group, roomInfo, securityDescriptor, options) {
 
     case 'GH_REPO':
       githubType = 'REPO';
+      roomType = 'github-room';
+      break
+
+    case 'GH_USER':
+      githubType = 'USER';
       roomType = 'github-room';
       break
 

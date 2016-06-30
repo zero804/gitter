@@ -6,9 +6,14 @@
   max-height:    @menu-item-height;
   overflow:      hidden;
   color:         @menu-item-color;
-  font-size:     1.5rem;
-  font-weight:   600;
+  font-size:     1.4rem;
+  font-weight:   500;
   line-height:   @menu-item-height;
-  white-space: nowrap;
+  white-space:   nowrap;
   text-overflow: ellipsis;
+
+  .fonts-loaded & {
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
 }

@@ -15,7 +15,6 @@ var userIds;
 var roomMembershipService;
 var appEvents;
 var userService;
-var roomPermissionsModel;
 var chatWithNoMentions;
 var unreadItemService;
 var troupe;
@@ -44,10 +43,8 @@ makeBenchmark({
       _id: troupeId,
     };
 
-    roomMembershipService = mockito.mock(testRequire('./services/room-membership-service'));
     userService = mockito.mock(testRequire('./services/user-service'));
     appEvents = mockito.mock(testRequire('gitter-web-appevents'));
-    roomPermissionsModel = mockito.mockFunction();
 
     mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId).thenReturn(Promise.resolve(troupeLurkersUserHash));
 
@@ -55,7 +52,6 @@ makeBenchmark({
       '../room-membership-service': roomMembershipService,
       '../user-service': userService,
       '../app-events': appEvents,
-      'gitter-web-permissions/lib/room-permissions-model': roomPermissionsModel,
     });
     unreadItemService.testOnly.setSendBadgeUpdates(false);
   },

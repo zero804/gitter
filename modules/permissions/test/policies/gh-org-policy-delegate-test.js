@@ -6,9 +6,9 @@ var proxyquireNoCallThru = require("proxyquire").noCallThru();
 
 describe('gh-org-policy-delegate', function() {
 
-  var ORG1_USER = { username: 'x' };
-  var NOT_ORG1_USER = { username: 'y' };
-  var INVALID_USER = { };
+  var ORG1_USER = { _id: 1, username: 'x' };
+  var NOT_ORG1_USER = { _id: 2, username: 'y' };
+  var INVALID_USER = { _id: 3 };
   var ORG1 = 'org1';
 
   var FIXTURES = [
@@ -46,7 +46,14 @@ describe('gh-org-policy-delegate', function() {
         linkPath: meta.org
       }
 
-      var delegate = new GhOrgPolicyDelegate(meta.user, securityDescriptor);
+      var user = meta.user;
+      var userId = user && user._id;
+
+      function userLoader() {
+        return Promise.resolve(user);
+      }
+
+      var delegate = new GhOrgPolicyDelegate(userId, userLoader, securityDescriptor);
 
       return delegate.hasPolicy(meta.policy)
         .then(function(result) {

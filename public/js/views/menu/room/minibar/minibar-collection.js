@@ -2,32 +2,14 @@
 
 var Backbone = require('backbone');
 var context = require('utils/context');
+var MinibarItemModel = require('./minibar-item-model');
+
 //just use shared/
 var getSuggestedOrgsFromRoomList = require('gitter-web-shared/orgs/suggested-orgs-from-room-list');
 
-var defaultModels = [
-  { name: 'all', type: 'all', id: 0 },
-  { name: 'search', type: 'search', id: 1 },
-  //{ name: 'favourite', type: 'favourite', id: 2 },
-  { name: 'people', type: 'people', id: 3 },
-];
-
-var tailDefaults = [{ name: 'close', type: 'close', id: 5 }];
-
-if(context.hasFeature('community-create')) {
-  tailDefaults.unshift({ name: 'Create Community', type: 'community-create', id: 4 });
-}
-
-var MinibarItemModel = Backbone.Model.extend({
-  defaults: {
-    name: ' ',
-    type: 'org',
-    url: ' ',
-  }
-});
-
 module.exports = Backbone.Collection.extend({
   model: MinibarItemModel,
+  tagName: 'ul',
 
   constructor: function(models, attrs, options) {
     if (!attrs || !attrs.roomCollection) {
@@ -40,7 +22,6 @@ module.exports = Backbone.Collection.extend({
     this.listenTo(this.roomCollection, 'sync change:activity change:unreadItems change:mentions', this.onCollectionUpdate, this);
     this.listenTo(this.roomCollection, 'remove reset', this.onItemRemoved, this);
 
-    models = defaultModels.concat(models || []).concat(tailDefaults);
     Backbone.Collection.prototype.constructor.call(this, models, attrs, options);
   },
 
@@ -59,14 +40,12 @@ module.exports = Backbone.Collection.extend({
 
   getNewCollection: function (){
     var currentRoom = this.roomCollection.get(context.troupe().get('id')) || context.troupe();
-    return defaultModels
-      .concat(getSuggestedOrgsFromRoomList(
-        this.roomCollection.toJSON(),
-        document.location.pathname,
-        context.troupe().get('id'),
-        currentRoom
-      ))
-      .concat(tailDefaults);
+    return getSuggestedOrgsFromRoomList(
+      this.roomCollection.toJSON(),
+      document.location.pathname,
+      context.troupe().get('id'),
+      currentRoom
+    );
   },
 
 });

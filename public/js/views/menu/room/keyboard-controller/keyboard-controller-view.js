@@ -1,354 +1,342 @@
 'use strict';
 
-var _ = require('underscore');
 var Marionette = require('backbone.marionette');
+var _ = require('underscore');
 var cocktail = require('cocktail');
 var KeyboardEventMixin = require('views/keyboard-events-mixin');
-var sanitizeDir = require('./sanitize-direction');
-var findNextActiveItem = require('./find-next-active-item');
-var findNextNavigableModel = require('./find-next-navigable-model');
 
-var navigableCollectionItemActiveCb = findNextNavigableModel.navigableCollectionItemActiveCb;
-
-var isNullOrUndefined = function(obj) {
-  return obj === null || obj === undefined;
+var arrayBoundWrap = function(index, length) {
+  return ((index % length) + length) % length;
 };
 
-var isValidCurrentReference = function(currentItemReference) {
-  var isValidCurrentReference = !isNullOrUndefined(currentItemReference.get('mapKey')) &&
-    !isNullOrUndefined(currentItemReference.get('listIndex')) &&
-    (!isNullOrUndefined(currentItemReference.get('modelId')) || !isNullOrUndefined(currentItemReference.get('modelIndex')));
+var isHiddenFilter = function (model) { return !model.get('isHidden'); }
 
-  return isValidCurrentReference;
-};
-
-
-
-var FOCUS_EVENT = 'focus:item';
-var BLUR_EVENT = 'blur:item';
-
-var MINIBAR_KEY = 'minibar';
-var ROOM_LIST_KEY = 'room-list';
-
-
-
-
-var KeyboardControllerView = Marionette.LayoutView.extend({
-  constants: {
-    FOCUS_EVENT: FOCUS_EVENT,
-    BLUR_EVENT: BLUR_EVENT,
-
-    MINIBAR_KEY: MINIBAR_KEY,
-    ROOM_LIST_KEY: ROOM_LIST_KEY
-  },
+var KeyboardController = Marionette.ItemView.extend({
 
   keyboardEvents: {
-    'focus.minibar': function(e) { this.startNavigation(e, MINIBAR_KEY, true); },
-    'focus.room-list': function(e) { this.startNavigation(e, ROOM_LIST_KEY, true); },
-    'left-menu.prev': function(e) { this.selectPrev(e, null); },
-    'left-menu.next': function(e) { this.selectNext(e, null); },
-
-    'minibar.start-nav': function(e) { this.startNavigation(e, MINIBAR_KEY, true); },
-    'minibar-item.prev': function(e) { this.selectPrev(e, MINIBAR_KEY); },
-    'minibar-item.next': function(e) { this.selectNext(e, MINIBAR_KEY); },
-
-    'room-list.start-nav': function(e) { this.startNavigation(e, ROOM_LIST_KEY, false); },
-    'room-list-item.prev': function(e) { this.selectPrev(e, ROOM_LIST_KEY); },
-    'room-list-item.next': function(e) { this.selectNext(e, ROOM_LIST_KEY); },
-
-    'room.1 room.2 room.3 room.4 room.5 room.6 room.7 room.8 room.9 room.10': function(e, handler) { this.selectByIndex(e, ROOM_LIST_KEY, handler); },
-    'minibar.1 minibar.2 minibar.3 minibar.4 minibar.5 minibar.6 minibar.7 minibar.8 minibar.9 minibar.10': function(e, handler) { this.selectByIndex(e, MINIBAR_KEY, handler); },
-    'focus.search': 'focusSearch',
-  },
-
-  // Public method meant to be used on the outside
-  // Add new collections to navigate
-  // ```js
-  //   keyboardControllerView.inject(keyboardControllerView.constants.ROOM_LIST_KEY, [{
-  //     collection: someCollection,
-  //     // Optional function to determine(returns boolean) whether to use this collection when navigating along.
-  //     getActive: function(){ /*...*/} },
-  //   }]);
-  // ```
-  inject: function(mapKey, newNavigableCollectionItems) {
-    var navigableCollectionList = (this.navigableCollectionListMap[mapKey] || []);
-    this.navigableCollectionListMap[mapKey] = navigableCollectionList.concat(newNavigableCollectionItems);
-
-    newNavigableCollectionItems.forEach(function(collectionItem, index) {
-      this.listenTo(collectionItem.collection, 'change:active', function(model) {
-        // Set a new current reference when we find a new active model
-        if(model.get('active')) {
-          this.startNavigation(null, mapKey, true);
-        }
-      });
-    }.bind(this));
+    'room.1': 'onMinibarAllSelected',
+    'room.2': 'onMinibarSearchSelected',
+    'room.3': 'onMinibarPeopleSelected',
+    'room.4 room.5 room.6 room.7 room.8 room.9 room.10': 'onMinibarOrgSelected',
+    'focus.search': 'onMinibarSearchSelected',
+    'room.down': 'onDownKeyPressed',
+    'room.up': 'onUpKeyPressed',
+    'room.next': 'onRightKeyPressed',
+    'room.prev': 'onLeftKeyPressed',
+    'room.tab': 'onTabKeyPressed',
+    'room.prev.tab': 'onTabShiftKeyPressed',
   },
 
   initialize: function(attrs) {
-    // This object has a structure like the following,
-    // { foo: [{ collection, getActive }, { collection, getActive }], bar: [/*...*/]}
-    this.navigableCollectionListMap = {};
-    this.roomMenuModel = attrs.roomMenuModel;
+
+    //Minibar
+    this.minibarCollection = attrs.model.minibarCollection;
+    this.minibarHomeModel = attrs.model.minibarHomeModel;
+    this.minibarSearchModel = attrs.model.minibarSearchModel;
+    this.minibarPeopleModel = attrs.model.minibarPeopleModel;
+    this.minibarCloseModel = attrs.model.minibarCloseModel;
+
+    //Favourite
+    this.favouriteCollection = attrs.model.favouriteCollection;
+    this.favouriteCollectionModel = attrs.model.favouriteCollectionModel;
+
+    //Primary
+    this.primaryCollection = attrs.model.primaryCollection;
+    this.primaryCollectionModel = attrs.model.primaryCollectionModel;
+
+    //Secondary
+    this.secondaryCollection = attrs.model.secondaryCollection;
+    this.secondaryCollectionModel = attrs.model.secondaryCollectionModel;
+
+    //Tertiary
+    this.tertiaryCollection = attrs.model.tertiaryCollection;
+    this.tertiaryCollectionModel = attrs.model.tertiaryCollectionModel;
+
+    //manage search focus
+    this.searchFocusModel = attrs.model.searchFocusModel;
   },
 
-
-  getCurrentReferenceCollectionList: function() {
-    var currentItemReference = this.model;
-    if(isValidCurrentReference(currentItemReference)) {
-      var currentNavigationCollectionList = this.navigableCollectionListMap[currentItemReference.get('mapKey')];
-
-      return currentNavigationCollectionList;
-    }
-
-    return null;
+  onMinibarAllSelected: function (){
+    this.blurAllItems();
+    this.model.set('state', 'all');
+    this.minibarHomeModel.set('focus', true);
   },
 
-  getCurrentReferenceCollectionItem: function() {
-    var currentItemReference = this.model;
-    if(isValidCurrentReference(currentItemReference)) {
-      var currentNavigationCollectionList = this.getCurrentReferenceCollectionList();
-      var currentNavigationCollectionItem = currentNavigationCollectionList[currentItemReference.get('listIndex')];
-
-      return currentNavigationCollectionItem;
-    }
-
-    return null;
+  onMinibarSearchSelected: function (){
+    //the search input will focus itself
+    this.blurAllItems();
+    this.model.set('state', 'search');
   },
 
-  getCurrentReferenceModel: function() {
-    var currentItemReference = this.model;
-
-    if(isValidCurrentReference(currentItemReference)) {
-      var currentNavigationCollectionItem = this.getCurrentReferenceCollectionItem();
-      var currentModel = currentItemReference.get('modelId') ?
-        currentNavigationCollectionItem.collection.get(currentItemReference.get('modelId')) :
-        // We use `collection.models[x]` vs `collection.at(x)` because the ProxyCollection doesn't update the index
-        currentNavigationCollectionItem.collection.models[currentItemReference.get('modelIndex')];
-
-      return currentModel;
-    }
-
-    return null;
+  onMinibarPeopleSelected: function (){
+    this.blurAllItems();
+    this.model.set('state', 'people');
+    this.minibarPeopleModel.set('focus', true);
   },
 
-  // Helper function to blur the current active item we have stored
-  blurCurrentItem: function() {
-    var currentModel = this.getCurrentReferenceModel();
-    if(currentModel) {
-      currentModel.trigger(BLUR_EVENT);
-    }
+  onMinibarOrgSelected: function (e){
+    this.blurAllItems();
+    var index = e.key;
+    if(index === 0) { index = 10; } // 0 key triggers room.10
+    // we have room.1 ~ room.3 triggering home/search/people so we have to account for that with indexing here
+    index = index - 4;
+    index = arrayBoundWrap(index, this.minibarCollection.length);
+    var model = this.minibarCollection.at(index);
+    model.set('focus', true);
+    this.model.set({ state: 'org', selectedOrgName: model.get('name') });
   },
 
-  // When you start/switch navigating a navigableCollection, we need to find where
-  // you should start off and set the current reference
-  startNavigation: function(e, mapKey, shouldGoToActive) {
-    // Clear out any previous focus as we have moved to a new area
-    this.blurCurrentItem();
+  onDownKeyPressed: function (e){
+    this.searchFocusModel.set('focus', false);
+    if(this.isMinibarInFocus()) { return this.moveMinibarFocus(1);}
+    this.moveRoomCollectionFocus(1);
+  },
 
-    // Find the first active item
-    // This will ensure we start from where the user is currently is
-    var activeCollectionItemResult;
-    var activeModelResult;
-    if(shouldGoToActive) {
-      activeCollectionItemResult = findNextActiveItem(
-        this.navigableCollectionListMap[mapKey],
-        0,
-        sanitizeDir.FORWARDS,
-        function(navigableCollectionItem, navigableCollectionItemIndex) {
-          if(navigableCollectionItemActiveCb(navigableCollectionItem)) {
-            var modelResult = findNextActiveItem(
-              navigableCollectionItem.collection.models,
-              0,
-              sanitizeDir.FORWARDS,
-              function(model, modelIndex) {
-                return !model.get('isHidden') && model.get('active');
-              }
-            );
+  onUpKeyPressed: function (){
+    this.searchFocusModel.set('focus', false);
+    if(this.isMinibarInFocus()) { return this.moveMinibarFocus(-1);}
+    this.moveRoomCollectionFocus(-1);
+  },
 
-            if(modelResult) {
-              activeModelResult = modelResult;
-              return true;
-            }
-          }
-        }
-      );
+  onRightKeyPressed: function (){
+    this.searchFocusModel.set('focus', false);
+    if(this.isMinibarInFocus()) { return this.focusActiveRoomItem(); }
+  },
 
-      if(activeCollectionItemResult && activeModelResult) {
-        // Save it as the current
-        this.model.set({
-          mapKey: mapKey,
-          listIndex: activeCollectionItemResult.index,
-          modelId: activeModelResult.item.id,
-          modelIndex: activeModelResult.index
-        });
-        activeModelResult.item.trigger(FOCUS_EVENT);
-      }
-    }
-
-    // Fallback to find the first item in the first active collection
-    if(!shouldGoToActive || !activeCollectionItemResult) {
-      var nextModelResult = findNextNavigableModel(this.navigableCollectionListMap[mapKey], {
-        mapKey: mapKey,
-        listIndex: null,
-        modelIndex: null
-      }, sanitizeDir.FORWARDS);
-
-      if(nextModelResult) {
-        // Save it as the current
-        this.model.set(nextModelResult.reference);
-        nextModelResult.model.trigger(FOCUS_EVENT);
-      }
+  onLeftKeyPressed: function (){
+    this.searchFocusModel.set('focus', false);
+    if(!this.isMinibarInFocus()) {
+      if(this.isRoomListInFocus()) { return this.focusActiveMinibarItem(); }
+      return this.focusActiveRoomItem();
     }
   },
 
+  onTabKeyPressed: function (e){
+    var index;
 
-  // Move to the next progressable item forwards/backwards depending on `dir`
-  progressInDirection: function(dir) {
-    dir = sanitizeDir(dir);
-    var nextModelResult = findNextNavigableModel(this.getCurrentReferenceCollectionList(), this.model.toJSON(), dir);
+    var activeRoomItem = this.queryAttrOnRoomCollections('focus', true);
+    var roomList = this.getFlatRoomCollection();
+    //If the last room-item in the list is in focus bail out
+    if(roomList.indexOf(activeRoomItem) === (roomList.length - 1)) { return; }
 
-    if(nextModelResult) {
-      // Deactivate the current item
-      this.blurCurrentItem();
+    if(e) { e.preventDefault(); }
 
-      // Activate the next item
-      this.model.set(nextModelResult.reference);
-      nextModelResult.model.trigger(FOCUS_EVENT);
-    }
-  },
-
-  // Move to the next exact item according to their index across the collection list
-  progressToIndex: function(mapKey, targetIndex) {
-    var previousItemCount = 0;
-
-    var nextModelResult;
-    var collectionItemWithNextModelResult = findNextActiveItem(
-      this.navigableCollectionListMap[mapKey],
-      0,
-      sanitizeDir.FORWARDS,
-      function(navigableCollectionItem) {
-        var nonHiddenModels = navigableCollectionItem.collection.models.filter(function(model) {
-          return !model.get('isHidden');
-        });
-
-        var currentItemCount = previousItemCount + nonHiddenModels.length;
-        if((currentItemCount - 1) >= targetIndex) {
-          var nextModelIndex = targetIndex - previousItemCount;
-
-          nextModelResult = {
-            item: navigableCollectionItem.collection.models[nextModelIndex],
-            index: nextModelIndex
-          };
-          return true;
-        }
-
-        previousItemCount = currentItemCount;
-      }
-    );
-
-    if(collectionItemWithNextModelResult && nextModelResult) {
-      // Deactivate the current item
-      this.blurCurrentItem();
-
-      // Save it as the current
-      this.model.set({
-        mapKey: mapKey,
-        listIndex: collectionItemWithNextModelResult.index,
-        modelId: nextModelResult.item.id,
-        modelIndex: nextModelResult.index
-      });
-      nextModelResult.item.trigger(FOCUS_EVENT);
-    }
-  },
-
-  // Helper function to determine whether it is ok to use the `Tab` event to navigate the items.
-  // We want to be able to escape out of this list of items once we `Tab` at the end of the list or
-  // we were at the start of the list using `Shift + Tab`
-  shouldCaptureTabEvent: function(e) {
-    // If the tab key was pushed
-    if(e && e.code && e.code.toLowerCase() === 'tab') {
-      var navigableCollectionList = this.navigableCollectionListMap[this.model.get('mapKey')];
-      var collectionItemForCurrentModel = navigableCollectionList[this.model.get('listIndex')];
-
-      // If we are on the first or last item already, let's just let them pass on
-      if(this.model.get('listIndex') === (navigableCollectionList.length - 1)) {
-        var currentModels = collectionItemForCurrentModel.collection.models;
-        // We use `collection.models.length` vs `collection.length` because the ProxyCollection doesn't update the length
-        var firstModel = currentModels[0];
-        var lastModel = currentModels[currentModels.length - 1];
-
-        if(e.shiftKey && this.model.get('modelId') === firstModel.id) {
-          return false;
-        }
-        else if(!e.shiftKey && this.model.get('modelId') === lastModel.id) {
-          return false;
-        }
-      }
+    //When search is in focus and you press tab move to the first item in the room list
+    if(this.searchFocusModel.get('focus')) {
+      this.searchFocusModel.set('focus', false);
+      return this.focusFirstRoomItem();
     }
 
-    return true;
+    if(this.isMinibarInFocus()) {
+      var activeMinibarItem = this.queryAttrOnMinibar('focus', true);
+      var collection = this.getFlatMinibarCollection();
+      index = collection.indexOf(activeMinibarItem);
+      //If the last item in the minibar collection has focus
+      if(index === (collection.length - 1)) { return this.focusFirstRoomItem(); }
+      return this.moveMinibarFocus(1);
+    }
+    index = roomList.indexOf(activeRoomItem);
+    if(index === (roomList.length - 1)) { return this.focusFirstMinibarItem(); }
+    return this.moveRoomCollectionFocus(1);
   },
 
-  // Helper to smooth out problems
-  // Kick the current reference into shape
-  // And make sure we should handle the event itself(currently only have to worry about `tab`)
-  shouldHandleEvent: function(e, mapKey) {
-    if(
-      // If the current location reference is different than what we were just told to navigate to.
-      mapKey !== this.model.get('mapKey') ||
-      // Or our current reference is not filled in.
-      !this.getCurrentReferenceModel()
-    ) {
-      // Restart the navigation from the currently active item
-      this.startNavigation(null, mapKey, true);
+  onTabShiftKeyPressed: function (e){
+    var index;
+
+    var isMinibarInFocus = this.isMinibarInFocus();
+    if(this.minibarHomeModel.get('focus')) { return; }
+    if(e) { e.preventDefault(); }
+
+    if(this.searchFocusModel.get('focus')){
+      this.searchFocusModel.set('focus', false);
+      return this.focusActiveMinibarItem();
     }
 
-    return this.shouldCaptureTabEvent(e);
-  },
-
-  // Move to the previous item in the current navigableCollection
-  // Pass null, to move in whatever current collection-list
-  selectPrev: function(e, mapKey) {
-    mapKey = mapKey || (this.model.get('mapKey') || ROOM_LIST_KEY);
-    if(this.shouldHandleEvent(e, mapKey)) {
-      this.progressInDirection(sanitizeDir.BACKWARDS);
-      e.preventDefault();
-      e.stopPropagation();
-    }
-  },
-
-  // Move to the next item in the current navigableCollection
-  // Pass null, to move in whatever current collection-list
-  selectNext: function(e, mapKey) {
-    mapKey = mapKey || (this.model.get('mapKey') || ROOM_LIST_KEY);
-    if(this.shouldHandleEvent(e, mapKey)) {
-      this.progressInDirection(sanitizeDir.FORWARDS);
-      e.preventDefault();
-      e.stopPropagation();
-    }
-  },
-
-  selectByIndex: function (e, mapKey, handler) {
-    var keys = handler.key.split('+');
-    var key = keys[keys.length - 1];
-
-    var keyInt = parseInt(key, 10);
-    var index = keyInt > 0 ? keyInt - 1 : 0;
-    if(keyInt === 0) {
-      index = 9;
+    //unfocus search
+    this.searchFocusModel.set('focus', false);
+    //when the minibar is in focus
+    if(isMinibarInFocus) {
+      var focusedMinibarItem = this.getFocusedMinibarItem();
+      var collection = this.getFlatMinibarCollection();
+      index = collection.indexOf(focusedMinibarItem);
+      if(index === 0) { return this.focusLastRoomItem(); }
+      return this.moveMinibarFocus(-1);
     }
 
-    this.progressToIndex(mapKey, index);
+    var focusedRoomItem = this.getFocusedRoomItem();
+    var roomList = this.getFlatRoomCollection();
+    index = roomList.indexOf(focusedRoomItem);
+    if(index !== 0) { return this.moveRoomCollectionFocus(-1);}
+    //If we are in the search state me may have to move focus back to search
+    if(this.model.get('state') === 'search') { return this.focusSearch(); }
+    return this.focusLastMinibarItem();
   },
 
-  focusSearch: function (e){
-    this.roomMenuModel.set({ activationSourceType: null, state: 'search' });
+  moveMinibarFocus: function (direction){
+    var focusedMinibarItem = this.queryAttrOnMinibar('focus', true);
+    this.blurAllItems();
+
+    //get next index
+    var collection = this.getFlatMinibarCollection();
+    var index = collection.indexOf(focusedMinibarItem);
+    index = arrayBoundWrap(index + direction, collection.length);
+
+    //focus next minibar element
+    var activeMinibarItem = collection[index];
+    activeMinibarItem.set('focus', true);
+
+    //change the menu state
+    return this.setDebouncedState(activeMinibarItem);
   },
 
+  moveRoomCollectionFocus: function (direction){
+    //get currently Focused OR active room element
+    var activeRoomItem = this.getFocusedRoomItem() || this.getActiveRoomItem();
+    //blur all currently Focused items
+    this.blurAllItems();
+    var roomCollection = this.getFlatRoomCollection();
+    var index = roomCollection.indexOf(activeRoomItem);
+    //if no room is currently Focused just focus the first one
+    //this can happen, for example, if you are on home with no active room item
+    //and you have just moved focus from the chat input
+    index = (index === -1) ? 0 : arrayBoundWrap(index + direction, roomCollection.length);
+    var nextActiveRoomItem = roomCollection[index];
+    //We can, in the case of the people state for example, have an empty room list
+    //so we guard here to avoid a runtime error
+    if(!nextActiveRoomItem) { return; }
+    nextActiveRoomItem.set('focus', true);
+  },
+
+  focusActiveRoomItem: function (){
+    this.blurAllItems();
+    var activeRoomItem = this.getActiveRoomItem();
+    if(!activeRoomItem) { activeRoomItem = this.getFlatRoomCollection()[0]; }
+    if(!activeRoomItem) { return; }
+    activeRoomItem.set('focus', true);
+  },
+
+  focusActiveMinibarItem: function (){
+    this.blurAllItems();
+    var activeMinibarItem = this.getActiveMinibarItem();
+    activeMinibarItem.set('focus', true);
+  },
+
+  focusFirstRoomItem: function (){
+    this.blurAllItems();
+    var roomList = this.getFlatRoomCollection();
+    roomList[0].set('focus', true);
+  },
+
+  focusLastRoomItem: function (){
+    this.blurAllItems();
+    var roomList = this.getFlatRoomCollection();
+    var index = roomList.length - 1;
+    roomList[index].set('focus', true);
+  },
+
+  focusLastMinibarItem: function (){
+    this.blurAllItems();
+    var index = (this.minibarCollection.length - 1);
+    var lastMinibarItem = this.minibarCollection.at(index);
+    lastMinibarItem.set('focus', true);
+  },
+
+  focusFirstMinibarItem: function (){
+    this.blurAllItems();
+    this.minibarCollection.at(0).set('focus', true);
+  },
+
+  focusSearch: function (){
+    this.blurAllItems();
+    this.searchFocusModel.set('focus', true);
+  },
+
+  isMinibarInFocus: function (){
+    return !!this.getFocusedMinibarItem();
+  },
+
+  isRoomListInFocus: function (){
+    return !!this.getFocusedRoomItem();
+  },
+
+  getActiveMinibarItem: function (){
+    return this.queryAttrOnMinibar('active', true);
+  },
+
+  getFocusedMinibarItem: function (){
+    return this.queryAttrOnMinibar('focus', true);
+  },
+
+  getActiveRoomItem: function (){
+    return this.queryAttrOnRoomCollections('active', true);
+  },
+
+  getFocusedRoomItem: function (){
+    return this.queryAttrOnRoomCollections('focus', true);
+  },
+
+  queryAttrOnRoomCollections: function (attr, val){
+    var filterFunc = function(model){ return model.get(attr) === val; };
+    return this.favouriteCollectionModel.get('active') && this.favouriteCollection.filter(isHiddenFilter).filter(filterFunc)[0] ||
+      this.primaryCollectionModel.get('active') && this.primaryCollection.filter(isHiddenFilter).filter(filterFunc)[0] ||
+        this.secondaryCollectionModel.get('active') && this.secondaryCollection.filter(isHiddenFilter).filter(filterFunc)[0] ||
+          this.tertiaryCollectionModel.get('active') && this.tertiaryCollection.filter(isHiddenFilter).filter(filterFunc)[0];
+  },
+
+  queryAttrOnMinibar: function (attr, val){
+    var q = {}; q[attr] = val;
+    return  (this.minibarHomeModel.get(attr) === val) && this.minibarHomeModel ||
+      (this.minibarSearchModel.get(attr) === val) && this.minibarSearchModel ||
+      (this.minibarPeopleModel.get(attr) === val) && this.minibarPeopleModel ||
+      this.minibarCollection.findWhere(q) ||
+      (this.minibarCloseModel.get(attr) === val) && this.minibarCloseModel;
+  },
+
+  getFlatRoomCollection: function (){
+    var rooms = [];
+
+    //get filtered favourite rooms
+    if(this.favouriteCollectionModel.get('active')) {
+      rooms = rooms.concat(this.favouriteCollection.filter(isHiddenFilter));
+    }
+
+    //get filtered primary rooms
+    if(this.primaryCollectionModel.get('active')) {
+      rooms = rooms.concat(this.primaryCollection.filter(isHiddenFilter));
+    }
+
+    //get filtered secondary rooms
+    if(this.secondaryCollectionModel.get('active')) {
+      rooms = rooms.concat(this.secondaryCollection.filter(isHiddenFilter));
+    }
+
+    //get filtered tertiary rooms
+    if(this.tertiaryCollectionModel.get('active')) {
+      rooms = rooms.concat(this.tertiaryCollection.filter(isHiddenFilter));
+    }
+
+    return rooms;
+  },
+
+  getFlatMinibarCollection: function (){
+    return [ this.minibarHomeModel, this.minibarSearchModel, this.minibarPeopleModel ]
+    .concat(this.minibarCollection.models)
+    .concat([ this.minibarCloseModel]);
+  },
+
+  setDebouncedState: _.debounce(function (model){
+    var type = model.get('type');
+    if(type !== 'org') { return this.model.set('state', type); }
+    this.model.set({ state: type, selectedOrgName: model.get('name') });
+  }, 100),
+
+  blurAllItems: function (){
+    function clearFocus(model){ model.set('focus', false); }
+    this.getFlatRoomCollection().forEach(clearFocus);
+    this.getFlatMinibarCollection().forEach(clearFocus);
+  },
 
 });
 
-cocktail.mixin(KeyboardControllerView, KeyboardEventMixin);
-
-
-module.exports = KeyboardControllerView;
+cocktail.mixin(KeyboardController, KeyboardEventMixin);
+module.exports = KeyboardController;

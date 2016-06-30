@@ -9,7 +9,7 @@ var roomService = require('../../../services/room-service');
 var Promise = require('bluebird');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var StatusError = require('statuserror');
-var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
+var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var RoomWithPolicyService = require('../../../services/room-with-policy-service');
 
 function joinRoom(user, room, policy, options) {

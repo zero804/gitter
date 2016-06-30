@@ -10,14 +10,14 @@ var Troupe = require('gitter-web-persistence').Troupe;
 var TroupeUser = require('gitter-web-persistence').TroupeUser;
 var assert = require('assert');
 var validateGroupName = require('gitter-web-validators/lib/validate-group-name');
-var validateGroupUri = require('gitter-web-validators/lib/validate-group-uri');
 var StatusError = require('statuserror');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
-var debug = require('debug')('gitter:groups:group-service');
+var debug = require('debug')('gitter:app:groups:group-service');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var ensureAccessAndFetchDescriptor = require('gitter-web-permissions/lib/ensure-access-and-fetch-descriptor');
 var lazy = require('lazy.js');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var checkIfGroupUriExists = require('./group-uri-checker');
 
 
 /**
@@ -73,6 +73,49 @@ function upsertGroup(user, groupInfo, securityDescriptor) {
     });
 }
 
+function checkGroupUri(user, uri, options) {
+  assert(user, 'user required');
+  assert(uri, 'uri required');
+
+  // type can be null
+  var type = options.type;
+
+  // linkPath is undefined if type is null
+  var linkPath = options.linkPath;
+
+  // obtainAccessFromGitHubRepo can be undefined
+  var obtainAccessFromGitHubRepo = options.obtainAccessFromGitHubRepo;
+
+  // run the same validation that gets used by the group uri checker service
+  return checkIfGroupUriExists(user, uri, obtainAccessFromGitHubRepo)
+    .then(function(info) {
+      if (!info.allowCreate) {
+        // the frontend code should have prevented you from getting here
+        /*
+        NOTE: 409 because an invalid group uri would already have raised 400,
+        so the reason why you can't create the group is either because a group
+        or user already took that uri or because another github org or user
+        took that uri. This means it also mirrors the check-group-uri endpount.
+        */
+        throw new StatusError(409, 'User is not allowed to create a group for this URI.');
+      }
+
+      var splitsvilleEnabled = config.get('splitsville:enabled');
+      if (!splitsvilleEnabled) {
+        if (info.type === 'GH_ORG') {
+          if (type !== 'GH_ORG' && type !== 'GH_GUESS') {
+            // the frontend code should have prevented you from getting here
+            throw new StatusError(400, 'Group must be type GH_ORG: ' + type);
+          }
+          if (linkPath !== uri) {
+            // the frontend code should have prevented you from getting here
+            throw new StatusError(400, 'Group linkPath must match uri: ' + linkPath);
+          }
+        }
+      }
+    });
+}
+
 /**
  * @private
  */
@@ -80,31 +123,22 @@ function ensureAccessAndFetchGroupInfo(user, options) {
   options = options || {};
 
   var name = options.name;
-  var uri = options.uri;
-  var security = options.security || 'PUBLIC';
-  assert(user, 'user required');
   assert(name, 'name required');
-  assert(uri, 'uri required');
-
   if (!validateGroupName(name)) {
     throw new StatusError(400, 'Invalid group name');
   }
 
-  if (!validateGroupUri(uri)) {
-    throw new StatusError(400, 'Invalid group uri: ' + uri);
-  }
+  // uri gets validated by checkGroupUri below
+  var uri = options.uri;
 
   // we only support public groups for now
+  var security = options.security || 'PUBLIC';
   if (security !== 'PUBLIC') {
     throw new StatusError(400, 'Invalid group security: ' + security);
   }
 
-  return findByUri(uri)
-    .then(function(group) {
-      if (group) {
-        throw new StatusError(400, 'Group uri already taken: ' + uri);
-      }
-
+  return checkGroupUri(user, uri, options)
+    .then(function() {
       return ensureAccessAndFetchDescriptor(user, options)
         .then(function(securityDescriptor) {
           return [{
@@ -112,19 +146,13 @@ function ensureAccessAndFetchGroupInfo(user, options) {
             uri: uri
           }, securityDescriptor];
         });
-    })
+    });
 }
 
 /**
  * Create a new group
  */
 function createGroup(user, options) {
-  if (!config.get("project-splitsville:enabled")) {
-    if (!options.type && options.uri && options.uri[0] !== '_') {
-      throw new StatusError(400, 'Non-GitHub community URIs MUST be prefixed by an underscore for now.');
-    }
-  }
-
   return ensureAccessAndFetchGroupInfo(user, options)
     .spread(function(groupInfo, securityDescriptor) {
       debug("Upserting %j", groupInfo);
@@ -137,8 +165,8 @@ function createGroup(user, options) {
 /**
  * @private
  */
-function canUserAdminGroup(user, group) {
-  return policyFactory.createPolicyForGroupId(user, group._id)
+function canUserAdminGroup(user, group, obtainAccessFromGitHubRepo) {
+  return policyFactory.createPolicyForGroupIdWithRepoFallback(user, group._id, obtainAccessFromGitHubRepo)
     .then(function(policy) {
       return policy.canAdmin();
     });
@@ -152,15 +180,18 @@ function canUserAdminGroup(user, group) {
 function ensureGroupForGitHubRoomCreation(user, options) {
   var uri = options.uri;
   var name = options.name || uri;
+  var obtainAccessFromGitHubRepo = options.obtainAccessFromGitHubRepo;
+
+  debug('ensureGroupForGitHubRoomCreation: name=%s uri=%s obtainAccessFromGitHubRepo=%s', name, uri, obtainAccessFromGitHubRepo)
   assert(user, 'user required');
   assert(uri, 'name required');
 
   return findByUri(uri)
     .then(function(existingGroup) {
-      debug('Existing group found');
 
       if (existingGroup) {
-        return canUserAdminGroup(user, existingGroup)
+        debug('Existing group found');
+        return canUserAdminGroup(user, existingGroup, obtainAccessFromGitHubRepo)
           .then(function(adminAccess) {
             debug('Has admin access? %s', adminAccess);
 
@@ -169,13 +200,13 @@ function ensureGroupForGitHubRoomCreation(user, options) {
           });
       }
 
-      debug('No existing group. Will create');
+      debug('No existing group. Will create. obtainAccessFromGitHubRepo=%s', obtainAccessFromGitHubRepo);
       return createGroup(user, {
         type: 'GH_GUESS', // how do we know if it is a GH_ORG or GH_USER? or GH_REPO?
         name: name,
         uri: uri,
         linkPath: uri.split('/')[0], // does this make sense? or rather uri?
-        obtainAccessFromGitHubRepo: options.obtainAccessFromGitHubRepo
+        obtainAccessFromGitHubRepo: obtainAccessFromGitHubRepo
       });
     });
 }
