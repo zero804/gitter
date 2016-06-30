@@ -315,8 +315,10 @@ var KeyboardController = Marionette.ItemView.extend({
 
   setDebouncedState: _.debounce(function (model){
     var type = model.get('type');
-    if(type !== 'org') { return this.setModelState(type); }
-    this.setModelState({ state: type, selectedOrgName: model.get('name') });
+    this.setModelState({
+      state: type,
+      selectedOrgName: (type === 'org') ? model.get('name') : null,
+    });
   }, 100),
 
   blurAllItems: function (){
