@@ -32,7 +32,7 @@ initialize: function(attrs, options) {
   serializeData: function (){
     var data = this.model.toJSON();
     var uri = this.getRoomUri();
-    return  _.extend({}, _super.serializeData.apply(this, arguments), {
+    return  _.extend({}, data,  _super.serializeData.apply(this, arguments), {
       avatarSrcset: resolveRoomAvatarSrcSet({ uri: uri }, 22),
     });
   },
