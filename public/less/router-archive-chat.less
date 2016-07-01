@@ -1,17 +1,16 @@
 @import "base-web.less";
 @import "typography.less";
 
-@import "layouts/archive";
+// This will go (soon I hope)
+@import "trp3Chat.less";
+@import "trpButtons.less";
+
+// Dependencies of the template
 @import "chat-app.less";
 @import "chat-content.less";
 
-// Initial cut
-.trpChatContainer > div:first-child {
-  padding-top: @chat-frame-desktop-header-height;
-}
+@import "layouts/archive";
 
-// This will go (soon I hope)
-@import "trp3Chat.less";
 
 // Even though there is no chatCollectionView, we use it's css
 @import "../js/views/chat/chatCollectionView";
