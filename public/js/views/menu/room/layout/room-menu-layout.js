@@ -104,18 +104,6 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
     this.listenTo(this.dndCtrl, 'dnd:start-drag', this.onDragStart.bind(this));
     this.listenTo(this.dndCtrl, 'dnd:end-drag', this.onDragEnd.bind(this));
     this.listenTo(this.bus, 'panel:render', this.onPanelRender, this);
-
-    //this.$el.find('#searc-results').show();
-
-    // Keeps track of the unload time so we can kinda detect if a refresh happened.
-    // We use this information with the left-menu state rehrydration
-
-    window.addEventListener('beforeunload', this.onPageUnload);
-  },
-
-  onPageUnload: function() {
-    var timeAtUnload = new Date().getTime();
-    document.cookie = 'previousUnloadTime=' + timeAtUnload + '; path=/';
   },
 
   onDragStart: function() {
