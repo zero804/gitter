@@ -49,7 +49,7 @@ onReady(function(){
 
     routes: {
       '': 'index',
-      ':roomId/tags': 'onNavigateTags'
+      'tags/:roomId': 'onNavigateTags'
     },
 
     index: function(){
