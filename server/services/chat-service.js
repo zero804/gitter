@@ -212,6 +212,8 @@ exports.getRecentPublicChats = function() {
  */
 exports.updateChatMessage = function(troupe, chatMessage, user, newText, callback) {
   return Promise.try(function() {
+      newText = newText || '';
+      
       var age = (Date.now() - chatMessage.sent.valueOf()) / 1000;
       if(age > MAX_CHAT_EDIT_AGE_SECONDS) {
         throw new StatusError(400, "You can no longer edit this message");
