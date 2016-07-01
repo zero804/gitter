@@ -171,6 +171,12 @@ module.exports = CommunityCreateBaseStepView.extend({
        selectedOrgName = activeModel.get('name');
     }
 
+    // Set any repo item that may be selected inactive
+    var previousActiveRepoModel = this.repoCollection.findWhere({ active: true });
+    if(previousActiveRepoModel) {
+      previousActiveRepoModel.set('active', false);
+    }
+
     this.model.set({
       selectedOrgId: selectedOrgId,
       selectedOrgName: selectedOrgName,
@@ -191,6 +197,13 @@ module.exports = CommunityCreateBaseStepView.extend({
        selectedRepoId = activeModel.get('id');
        selectedRepoName = activeModel.get('name');
     }
+
+    // Set any org item that may be selected inactive
+    var previousActiveOrgModel = this.orgCollection.findWhere({ active: true });
+    if(previousActiveOrgModel) {
+      previousActiveOrgModel.set('active', false);
+    }
+
     this.model.set({
       selectedOrgId: null,
       selectedOrgName: null,

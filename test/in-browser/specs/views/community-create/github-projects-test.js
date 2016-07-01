@@ -39,6 +39,11 @@ describe('community-creation-github-projects-view', function() {
         model: viewModel,
         communityCreateModel: communityCreateModel,
         orgCollection: new (Backbone.Collection.extend({
+          defaults: {
+            id: undefined,
+            name: '',
+            active: false
+          },
           fetch: function() {}
         }))([
           {
@@ -98,7 +103,7 @@ describe('community-creation-github-projects-view', function() {
   it('should move to main view after selecting repo', function() {
     assert.strictEqual(communityCreateModel.get('stepState'), stepConstants.GITHUB_PROJECTS);
     var repoItem = view.repoListView.children.findByIndex(0);
-    // Make the tab active
+    // Make the repo tab active
     view.ui.reposToggle.trigger('click');
     // Click the repo item
     $(repoItem.el).trigger('click');
@@ -110,7 +115,7 @@ describe('community-creation-github-projects-view', function() {
   });
 
 
-  it('should move to main view after selecting repo', function() {
+  it('should move to main view after changing mind and choosing org', function() {
     assert.strictEqual(communityCreateModel.get('stepState'), stepConstants.GITHUB_PROJECTS);
     var repoItem = view.repoListView.children.findByIndex(0);
     var orgItem = view.orgListView.children.findByIndex(0);
@@ -123,8 +128,6 @@ describe('community-creation-github-projects-view', function() {
     // Click the org item
     $(orgItem.el).trigger('click');
     // Make sure the item on the other tab is inactive
-    // TODO: Figure out why the `community-creation-org-list-view` -> `previousActiveModel = this.collection.findWhere({ active: true });`
-    // never works :/
     assert.strictEqual(repoItem.model.get('active'), false);
 
     // Assert the final state is in a good place
