@@ -248,13 +248,22 @@ Testing
 
 All unit tests etc can be run with `npm test`
 
-Tests run in the browser context will not be included within the above command.
-To tun these tests you will need these variables within your `env`:
+__Browser testing__
+Running browser unit tests during development requires this command:
 
-BROWSERSTACK_USERNAME
-BROWSERSTACK_KEY
+```
+npm run browser-watch-test
+```
 
-Once you have these you can run `npm run test:unit:browser` which should kick off the tests via browserstack
+Then open your favourite browser and view `http://localhost:9191/fixtures`. This page will live reload with you test changes when required.
+
+To perform an automated test run use the following command:
+
+```
+npm run browser-test
+```
+
+this will run all tests in [devtool](https://www.npmjs.com/package/devtool).
 
 ## Shrinkwrap Cheatsheat
 

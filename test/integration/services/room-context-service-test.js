@@ -33,7 +33,7 @@ describe('room-context-service', function() {
     });
 
     roomContextService = testRequire.withProxies("./services/room-context-service", {
-      'gitter-web-permissions/lib/legacy-policy-factory': {
+      'gitter-web-permissions/lib/policy-factory': {
         createPolicyForRoom: createPolicyForRoom
       }
     });

@@ -1,8 +1,7 @@
 {
   "env": {
     "commonjs": true,
-    "browser": true,
-    "mocha": true
+    "browser": true
   },
   "rules": {
     "node/no-unpublished-require": "off",

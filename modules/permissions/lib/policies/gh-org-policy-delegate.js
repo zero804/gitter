@@ -4,8 +4,9 @@ var Promise = require('bluebird');
 var GitHubOrgService = require('gitter-web-github').GitHubOrgService;
 var PolicyDelegateTransportError = require('./policy-delegate-transport-error');
 
-function GhOrgPolicyDelegate(user, securityDescriptor) {
-  this._user = user;
+function GhOrgPolicyDelegate(userId, userLoader, securityDescriptor) {
+  this._userId = userId;
+  this._userLoader = userLoader;
   this._securityDescriptor = securityDescriptor;
   this._fetchPromise = null;
 }
@@ -27,15 +28,11 @@ GhOrgPolicyDelegate.prototype = {
     if (!this._isValidUser()) return;
     var uri = this._securityDescriptor.linkPath;
 
-    return "GH_ORG:" + this._user._id + ":" + uri + ":" + policyName;
+    return "GH_ORG:" + this._userId + ":" + uri + ":" + policyName;
   },
 
   _isValidUser: function() {
-    var user = this._user;
-    if (!user) return false;
-    if (!user.username) return false;
-    // TODO: check that this user is a github user...
-    return true;
+    return !!this._userId;
   },
 
   _fetch: function() {
@@ -43,11 +40,13 @@ GhOrgPolicyDelegate.prototype = {
       return this._fetchPromise;
     }
 
-    var user = this._user;
     var uri = this._securityDescriptor.linkPath;
 
-    var ghOrg = new GitHubOrgService(user);
-    this._fetchPromise = ghOrg.member(uri, user.username)
+    this._fetchPromise = this._userLoader()
+      .then(function(user) {
+        var ghOrg = new GitHubOrgService(user);
+        return ghOrg.member(uri, user.username);
+      })
       .catch(function(err) {
         if(err.errno && err.syscall || err.statusCode >= 500) {
           // GitHub call failed and may be down.
@@ -56,7 +55,8 @@ GhOrgPolicyDelegate.prototype = {
         }
 
         throw err;
-      })
+      });
+
     return this._fetchPromise;
   }
 };

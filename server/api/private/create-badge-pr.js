@@ -2,7 +2,7 @@
 
 var badgerService = require('../../services/badger-service');
 var troupeService = require('../../services/troupe-service');
-var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
+var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var StatusError = require('statuserror');
 
 module.exports = function (req, res, next) {

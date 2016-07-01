@@ -8,6 +8,7 @@ var userService = require('../../services/user-service');
 var trackSignupOrLogin = require('../track-signup-or-login');
 var updateUserLocale = require('../update-user-locale');
 var passportLogin = require('../passport-login');
+var identityService = require('gitter-web-identity');
 
 function linkedinOauth2Callback(req, accessToken, refreshToken, profile, done) {
   var avatar = profile.photos[0].value; // is this always set?
@@ -18,7 +19,7 @@ function linkedinOauth2Callback(req, accessToken, refreshToken, profile, done) {
     gravatarImageUrl: avatar
   };
   var linkedinIdentity = {
-    provider: 'linkedin',
+    provider: identityService.LINKEDIN_IDENTITY_PROVIDER,
     providerKey: profile.id,
     displayName: profile.displayName,
     email: profile.email,

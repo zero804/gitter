@@ -14,20 +14,18 @@ describe('github-repo-service #slow', function() {
     ghRepo = new GitHubRepoService(FAKE_USER);
   });
 
-  it('should list the repos for a user', function(done) {
-    ghRepo.getReposForUser('suprememoocow')
+  it('should list the repos for a user', function() {
+    return ghRepo.getReposForUser('suprememoocow')
       .then(function(repos) {
         assert(repos.length >= 1);
-      })
-      .nodeify(done);
+      });
   });
 
-  it('should list the commits for a repo', function(done) {
-    ghRepo.getCommits('faye/faye', { firstPageOnly: true })
+  it('should list the commits for a repo', function() {
+    return ghRepo.getCommits('faye/faye', { firstPageOnly: true })
       .then(function(commits) {
         assert(commits.length >= 1);
-      })
-      .nodeify(done);
+      });
   });
 
 });

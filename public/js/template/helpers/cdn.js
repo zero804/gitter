@@ -1,6 +1,6 @@
 "use strict";
 
-var cdn = require('utils/cdn');
+var cdn = require('gitter-web-cdn');
 
 var Handlebars = require('handlebars/runtime').default;
 Handlebars.registerHelper('cdn', cdn);

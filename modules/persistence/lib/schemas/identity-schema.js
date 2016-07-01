@@ -36,7 +36,7 @@ module.exports = {
       } , {
         background: true,
         unique: true,
-        partialFilterExpression : {
+        partialFilterExpression: {
           username: { $exists: true },
         }
       },

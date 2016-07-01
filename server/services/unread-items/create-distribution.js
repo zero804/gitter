@@ -7,7 +7,7 @@ var Promise = require('bluebird');
 var Distribution = require('./distribution');
 var roomMembershipService = require('../room-membership-service');
 var categoriseUserInRoom = require("../categorise-users-in-room");
-var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
+var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 
 /**
  * Given an array of non-member userIds in a room,

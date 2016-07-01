@@ -2,7 +2,7 @@
 
 var fs = require('fs');
 var handlebars = require('handlebars');
-var i18nFactory = require('./i18n-factory');
+var i18nFactory = require('gitter-web-i18n');
 var _ = require('underscore');
 var hbsHelpers = require('../web/hbs-helpers');
 var Promise = require('bluebird');

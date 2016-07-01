@@ -3,7 +3,7 @@
 var restful = require("../../../services/restful");
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var StatusError = require('statuserror');
-var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
+var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var groupService = require('gitter-web-groups/lib/group-service');
 
 module.exports = {

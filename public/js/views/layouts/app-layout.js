@@ -14,11 +14,6 @@ var RoomMenuLayout = require('../menu/room/layout/room-menu-layout');
 var CommunityCreateModel = require('../community-create/community-create-model');
 var CommunityCreateView = require('../community-create/community-create-view');
 
-var oldIsoProps = {
-  menu: { el: "#menu-region", init: 'initMenuRegion' }
-  //RoomMenuLayout: { el: '#room-menu-container', init: 'initNewMenuRegion' }
-};
-
 require('views/behaviors/isomorphic');
 
 module.exports = (function () {

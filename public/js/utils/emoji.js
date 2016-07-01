@@ -1,6 +1,6 @@
 "use strict";
 var emojify = require('emojify');
-var cdn = require('utils/cdn');
+var cdn = require('gitter-web-cdn');
 
 module.exports = (function() {
 
@@ -16,4 +16,3 @@ module.exports = (function() {
 
 
 })();
-

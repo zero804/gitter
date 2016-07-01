@@ -119,12 +119,6 @@ function ensureAccessAndFetchGroupInfo(user, options) {
  * Create a new group
  */
 function createGroup(user, options) {
-  if (!config.get("project-splitsville:enabled")) {
-    if (!options.type && options.uri && options.uri[0] !== '_') {
-      throw new StatusError(400, 'Non-GitHub community URIs MUST be prefixed by an underscore for now.');
-    }
-  }
-
   return ensureAccessAndFetchGroupInfo(user, options)
     .spread(function(groupInfo, securityDescriptor) {
       debug("Upserting %j", groupInfo);
@@ -154,7 +148,7 @@ function ensureGroupForGitHubRoomCreation(user, options) {
   var name = options.name || uri;
   var obtainAccessFromGitHubRepo = options.obtainAccessFromGitHubRepo;
 
-  debug('ensureGroupForGitHubRoomCreation: name=%s uri=%s', name, uri)
+  debug('ensureGroupForGitHubRoomCreation: name=%s uri=%s obtainAccessFromGitHubRepo=%s', name, uri, obtainAccessFromGitHubRepo)
   assert(user, 'user required');
   assert(uri, 'name required');
 

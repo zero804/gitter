@@ -7,6 +7,11 @@ var SyncMixin = require('./sync-mixin');
 var context = require('utils/context');
 
 var GroupModel = Backbone.Model.extend({
+  defaults: {
+    unreadItems: false,
+    mentions: false,
+    activity: false
+  }
 });
 
 var GroupCollection = LiveCollection.extend({

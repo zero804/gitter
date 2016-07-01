@@ -26,6 +26,11 @@ test: clean npm
 	./exec-in-docker ./node_modules/.bin/gulp test-docker
 	echo "Docker tests completed"
 
+test-no-coverage: clean npm
+	mkdir -p output/
+	./exec-in-docker ./node_modules/.bin/gulp test-docker --no-coverage
+	echo "Docker tests completed"
+
 print-nodejs-version:
 	node --version
 	npm --version

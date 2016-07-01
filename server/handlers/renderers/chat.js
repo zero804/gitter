@@ -9,12 +9,18 @@ var burstCalculator = require('../../utils/burst-calculator');
 var userSort = require('../../../public/js/utils/user-sort');
 var isolateBurst = require('gitter-web-shared/burst/isolate-burst-array');
 var unreadItemService = require('../../services/unread-items');
-var roomMembershipService = require('../../services/room-membership-service');
 var _ = require('lodash');
+
 var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 var getSubResources = require('./sub-resources');
 var fixMongoIdQueryParam = require('../../web/fix-mongo-id-query-param');
+var fonts = require('../../web/fonts');
+var generateRightToolbarSnapshot = require('../snapshots/right-toolbar-snapshot');
+
+var troupeService = require('../../services/troupe-service');
+var roomMembershipService = require('../../services/room-membership-service');
+
 
 /* How many chats to send back */
 var INITIAL_CHAT_COUNT = 50;
@@ -51,12 +57,17 @@ function renderChat(req, res, options, next) {
         restful.serializeChatsForTroupe(troupe.id, userId, chatSerializerOptions),
         options.fetchEvents === false ? null : restful.serializeEventsForTroupe(troupe.id, userId),
         options.fetchUsers === false ? null : restful.serializeUsersForTroupe(troupe.id, userId, userSerializerOptions),
-      ]).spread(function (troupeContext, chats, activityEvents, users, ownerIsOrg) {
+        troupeService.checkGitHubTypeForUri(troupe.lcOwner || '', 'ORG'),
+        generateRightToolbarSnapshot(req)
+      ]).spread(function (troupeContext, chats, activityEvents, users, ownerIsOrg, rightToolbarSnapshot) {
 
         var initialChat = _.find(chats, function(chat) { return chat.initial; });
         var initialBottom = !initialChat;
         var githubLink;
         var classNames = options.classNames || [];
+
+        var snapshots = rightToolbarSnapshot;
+        troupeContext.snapshots = snapshots;
 
         if(troupe.githubType === 'REPO' || troupe.githubType === 'ORG') {
           githubLink = 'https://github.com/' + req.uriContext.uri;
@@ -88,7 +99,14 @@ function renderChat(req, res, options, next) {
         var orgName = getOrgNameFromTroupeName(troupeContext.troupe.name);
         var orgPageHref = '/orgs/' + orgName + '/rooms/';
 
+        var isRightToolbarPinned = snapshots && snapshots.rightToolbar && snapshots.rightToolbar.isPinned;
+        if(isRightToolbarPinned === undefined) {
+          isRightToolbarPinned = true;
+        }
+
         var renderOptions = _.extend({
+            hasCachedFonts: fonts.hasCachedFonts(req.cookies),
+            fonts: fonts.getFonts(),
             isRepo: troupe.githubType === 'REPO',
             bootScriptName: script,
             cssFileName: cssFileName,
@@ -112,6 +130,7 @@ function renderChat(req, res, options, next) {
             ownerIsOrg: ownerIsOrg,
             orgPageHref: orgPageHref,
             roomMember: req.uriContext.roomMember,
+            isRightToolbarPinned: isRightToolbarPinned,
 
             //Feature Switch Left Menu
             hasNewLeftMenu: req.fflip && req.fflip.has('left-menu'),

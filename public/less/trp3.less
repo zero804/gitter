@@ -340,34 +340,6 @@ ul.roster {
   }
 }
 
-.remaining-region {
-  margin-top: 1rem;
-}
-
-.remaining-view {
-
-  @media @mid {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-  }
-}
-
-.remaining-view-button,
-.remaining-view-secondary-button {
-  @media @mid {
-    padding: 0;
-    letter-spacing: 0;
-    text-transform: none;
-  }
-}
-.remaining-view-secondary-button {
-  color: darken(@caribbean, 10%);
-}
-
-.remaining-view-button-secondary-text {
-  color: rgba(51, 51, 51, 0.5);
-}
 
 
 
@@ -507,16 +479,6 @@ ul.roster {
   /* MB: The below is bad, but not sure how to convert output of RGBA -> Hex without opacity*/
   /* E.g. fade(@light,20%) without opacity */
   background-color: #FBFBFB;
-}
-
-.trpActionsMenuLabel {
-  display: inline-block;
-  vertical-align: middle;
-  margin-top: -4px;
-
-  @media @mid {
-    display: none;
-  }
 }
 
 // TODO: as we progress with the css refactoring this will have to be changed. Walter.

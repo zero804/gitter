@@ -1,4 +1,7 @@
 "use strict";
+
+require('utils/font-setup');
+
 var $ = require('jquery');
 var context = require('utils/context');
 var clientEnv = require('gitter-client-env');
@@ -15,6 +18,8 @@ require('template/helpers/all');
 require('components/bug-reporting');
 require('utils/tracking');
 require('components/ping');
+
+require('gitter-styleguide/css/components/buttons.css');
 
 onready(function() {
 

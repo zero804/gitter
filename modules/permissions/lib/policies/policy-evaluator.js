@@ -11,8 +11,8 @@ var debug = require('debug')('gitter:app:permissions:policy-evaluator');
 
 var SUCCESS_RESULT_CACHE_TIME = 5 * 60; // 5 minutes in seconds
 
-function PolicyEvaluator(user, securityDescriptor, policyDelegate, contextDelegate) {
-  this._user = user;
+function PolicyEvaluator(userId, securityDescriptor, policyDelegate, contextDelegate) {
+  this._userId = userId;
   this._securityDescriptor = securityDescriptor;
   this._policyDelegate = policyDelegate;
   this._contextDelegate = contextDelegate;
@@ -25,9 +25,8 @@ PolicyEvaluator.prototype = {
   }),
 
   canWrite: Promise.method(function() {
-    var user = this._user;
     // Anonymous users can never write to a room
-    if (!user || !user._id) return false;
+    if (!this._userId) return false;
 
     return this._checkAccess(true); // With Good Faith
   }),
@@ -36,25 +35,23 @@ PolicyEvaluator.prototype = {
    * Similar to canRead, but with a full access check
    */
   canJoin: Promise.method(function() {
-    var user = this._user;
-    if (!user || !user._id) return false;
+    // Anonymous users can never join
+    if (!this._userId) return false;
 
-    /* Anonymous users can't join */
     return this._checkAccess(false); // Without Good Faith
   }),
 
   canAdmin: Promise.method(function() {
     debug('canAdmin');
 
-    var user = this._user;
+    var userId = this._userId;
 
     // Anonymous users are never admins
-    if (!user) {
+    if (!userId) {
       debug('canAdmin: deny access for anonymous');
       return false;
     }
 
-    var userId = user._id;
     var adminPolicy = this._securityDescriptor.admins;
 
     if (userIdIsIn(userId, this._securityDescriptor.extraAdmins)) {
@@ -81,17 +78,15 @@ PolicyEvaluator.prototype = {
   }),
 
   canAddUser: function() {
-    var user = this._user;
     // Anonymous users can never write to a room
-    if (!user || !user._id) return false;
+    if (!this._userId) return false;
 
     return this._checkAccess(true); // With Good Faith
   },
 
   _checkAccess: function(useGoodFailChecks) {
     // TODO: ADD BANS
-    var user = this._user;
-    var userId = user && user._id;
+    var userId = this._userId;
     var membersPolicy = this._securityDescriptor.members;
     var contextDelegate = this._contextDelegate;
     var policyDelegate = this._policyDelegate;
@@ -122,6 +117,7 @@ PolicyEvaluator.prototype = {
     }
 
     if (userId) {
+      // Logged-in user
       if (useGoodFailChecks) {
         return this._checkAuthedMembershipWithGoodFaith();
       } else {
@@ -129,6 +125,7 @@ PolicyEvaluator.prototype = {
 
       }
     } else {
+      // Anonymous case
       return this._checkAnonymousAccessWithGoodFaith();
     }
 
@@ -139,7 +136,7 @@ PolicyEvaluator.prototype = {
    */
   _checkMembershipInContextForInviteRooms: function() {
     var contextDelegate = this._contextDelegate;
-    var userId = this._user._id; // User must be defined in this function....
+    var userId = this._userId; // User must be defined in this function....
 
     return contextDelegate.isMember(userId)
       .bind(this)
@@ -232,7 +229,7 @@ PolicyEvaluator.prototype = {
     var securityDescriptor = this._securityDescriptor;
     var contextDelegate = this._contextDelegate;
     var membersPolicy = this._securityDescriptor.members;
-    var userId = this._user._id; // User must be defined in this function....
+    var userId = this._userId; // User must be defined in this function....
 
     return this._checkPolicyCacheResult(membersPolicy)
       .catch(PolicyDelegateTransportError, function(err) {

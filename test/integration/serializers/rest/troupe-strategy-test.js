@@ -97,6 +97,8 @@ describe('TroupeStrategy', function() {
       });
   });
 
+  // TODO: includeGroups
+
   it('should serialize tags with includeTags', function() {
     var strategy = new TroupeStrategy({ includeTags: true });
     var t = fixture.troupe3;

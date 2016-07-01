@@ -27,15 +27,21 @@ cat <<EOD > "modules/${module_name}/package.json"
 EOD
 fi
 
-if [[ ! -f modules/${module_name}/test/.eslintrc.js ]]; then
-cat <<EOD > "modules/${module_name}/test/.eslintrc.js"
-module.exports = {
-    "env": {
-        "commonjs": true,
-        "node": true,
-        "mocha": true
-    }
-};
+if [[ ! -f modules/${module_name}/test/.eslintrc.json ]]; then
+cat <<EOD > "modules/${module_name}/test/.eslintrc.json"
+{
+  "env": {
+    "commonjs": true,
+    "node": true,
+    "mocha": true
+  },
+  "plugins": [
+    "mocha"
+  ],
+  "rules": {
+    "mocha/no-exclusive-tests": "error"
+  }
+}
 EOD
 fi
 

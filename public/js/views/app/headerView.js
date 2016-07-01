@@ -50,6 +50,7 @@ var HeaderView = Marionette.ItemView.extend({
     name:           '.js-chat-name',
     favourite:      '.js-favourite-button',
     orgrooms:       '.js-chat-header-org-page-action',
+    toggleRightToolbarButton: '.js-right-toolbar-toggle-button',
   },
 
   events: {
@@ -59,6 +60,7 @@ var HeaderView = Marionette.ItemView.extend({
     'dblclick @ui.topicActivator': 'showInput',
     'keydown textarea':            'detectKeys',
     'click @ui.orgrooms':          'goToOrgRooms',
+    'click @ui.toggleRightToolbarButton': 'toggleRightToolbar'
   },
 
   keyboardEvents: {
@@ -74,9 +76,12 @@ var HeaderView = Marionette.ItemView.extend({
     },
   },
 
-  initialize: function() {
+  initialize: function(options) {
+    this.rightToolbarModel = options.rightToolbarModel;
     this.menuItemsCollection = new Backbone.Collection([]);
     this.buildDropdown();
+
+    this.listenTo(this.rightToolbarModel, 'change:isPinned', this.onPanelPinStateChange, this);
   },
 
   serializeData: function() {
@@ -97,7 +102,8 @@ var HeaderView = Marionette.ItemView.extend({
       isPrivate:       getPrivateStatus(data),
       orgName:         orgName,
       orgPageHref:     orgPageHref,
-      shouldShowPlaceholderRoomTopic: data.userCount <= 1
+      shouldShowPlaceholderRoomTopic: data.userCount <= 1,
+      isRightToolbarPinned: this.rightToolbarModel.get('isPinned')
     });
 
     return data;
@@ -123,6 +129,10 @@ var HeaderView = Marionette.ItemView.extend({
         }
       });
     }
+  },
+
+  onPanelPinStateChange: function() {
+    toggleClass(this.ui.toggleRightToolbarButton[0], 'pinned', this.rightToolbarModel.get('isPinned'));
   },
 
   getChatNameTitle: function() {
@@ -167,7 +177,7 @@ var HeaderView = Marionette.ItemView.extend({
       autolink(topicEl);
     }
 
-
+    this.onPanelPinStateChange();
   },
 
   showDropdown: function() {
@@ -261,13 +271,18 @@ var HeaderView = Marionette.ItemView.extend({
 
   },
 
+  toggleRightToolbar: function() {
+    this.rightToolbarModel.set({
+      isPinned: !this.rightToolbarModel.get('isPinned')
+    });
+  },
+
   saveTopic: function() {
     var topic = this.$el.find('textarea').val();
     context.troupe().set('topic', topic);
 
     apiClient.room.put('', { topic: topic });
 
-    // TODO: once saved topic recalculate the header size
     this.editingTopic = false;
   },
 
@@ -342,6 +357,10 @@ var HeaderView = Marionette.ItemView.extend({
       // by the Isomorphic layout
       this.options.template = headerViewTemplate;
       this.render();
+
+
+      // If it is a new chat header, we can edit the topic again
+      this.editingTopic = false;
     }
   },
 });

@@ -3,7 +3,7 @@
 var Promise = require('bluebird');
 var assert = require('assert');
 var _ = require('lodash');
-var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
+var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 
 /**
  * Return a value or a promise of the team members

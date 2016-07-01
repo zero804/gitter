@@ -1,7 +1,7 @@
 'use strict';
 
 var appEvents = require('utils/appevents');
-var cdn = require('../utils/cdn');
+var cdn = require('gitter-web-cdn');
 var WindowNotification = window.Notification;
 var webkitNotifications = window.webkitNotifications;
 var urlParser = require('../utils/url-parser');

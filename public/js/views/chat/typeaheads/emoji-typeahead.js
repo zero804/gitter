@@ -2,7 +2,7 @@
 
 var isMobile = require('utils/is-mobile');
 var emoji = require('utils/emoji');
-var cdn = require('utils/cdn');
+var cdn = require('gitter-web-cdn');
 var template = require('./tmpl/emoji-typeahead.hbs');
 
 var SUGGESTED_EMOJI = ['smile', 'worried', '+1', '-1', 'fire', 'sparkles', 'clap', 'shipit'];

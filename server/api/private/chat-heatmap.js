@@ -1,6 +1,6 @@
 "use strict";
 
-var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
+var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var heatmapService = require('../../services/chat-heatmap-service');
 var moment = require('moment');
 var StatusError = require('statuserror');
