@@ -12,6 +12,7 @@ module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, group
   var hasGroups = req.fflip && req.fflip.has('groups');
   var currentRoom = (req.troupe || {});
   var lastLeftMenuSnapshot = (troupeContext.leftRoomMenuState || {});
+  req.uriContext = (req.uriContext || {});
   var uri = req.uriContext.uri;
   var selectedOrgName = lastLeftMenuSnapshot.selectedOrgName;
   var tempOrg = [];
