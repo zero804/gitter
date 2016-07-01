@@ -11,6 +11,7 @@ var mapGroupsForRenderer = require('../map-groups-for-renderer');
 module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, groups) {
   var hasGroups = req.fflip && req.fflip.has('groups');
   var currentRoom = (req.troupe || {});
+  var groupName = getOrgNameFromUri(currentRoom.uri);
   var lastLeftMenuSnapshot = (troupeContext.leftRoomMenuState || {});
   req.uriContext = (req.uriContext || {});
   var uri = req.uriContext.uri;
@@ -24,22 +25,6 @@ module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, group
   //If you are loading a home view then activate the search state
   if(uri === 'home') { menuState = 'search'; }
 
-  //Rooms
-  //------------------------------------------------------
-  //If the room is not in the room list we need to switch the state to show the parent group
-
-  else if(!_.findWhere(rooms, { uri: currentRoom.uri})) {
-    menuState = 'org';
-    selectedOrgName = getOrgNameFromUri(currentRoom.uri);
-    tempOrg = [{
-      name: selectedOrgName,
-      avatarSrcset: resolveRoomAvatarSrcSet({ uri: selectedOrgName}, 22),
-      type: 'org',
-      active: true,
-      hidden: false
-    }];
-  }
-
   //Groups
   //------------------------------------------------------
   if(hasGroups) {
@@ -47,6 +32,21 @@ module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, group
   }
   else {
     groups = suggestedOrgsFromRoomList(rooms, uri, currentRoom.id, currentRoom);
+  }
+
+  var hasJoinedRoom = _.findWhere(rooms, { uri: currentRoom.uri});
+  var hasJoinedGroup = _.findWhere(groups, { name: groupName });
+
+  if(uri !== 'home' && !hasJoinedRoom && !hasJoinedGroup) {
+    menuState = 'org';
+    selectedOrgName = groupName;
+    tempOrg = [{
+      name: selectedOrgName,
+      avatarSrcset: resolveRoomAvatarSrcSet({ uri: selectedOrgName}, 22),
+      type: 'org',
+      active: true,
+      hidden: false
+    }];
   }
 
   return {
