@@ -19,6 +19,7 @@ var url = require('url');
 var social = require('../social-metadata');
 var chatService = require('../../services/chat-service');
 var restSerializer = require("../../serializers/rest-serializer");
+var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
 
 function saveRoom(req) {
   var userId = req.user && req.user.id;
@@ -31,7 +32,7 @@ function saveRoom(req) {
 
 function getSocialMetaDataForRoom(room, aroundId) {
     // TODO: change this to use policy
-    if (aroundId && room && room.security === 'PUBLIC') {
+    if (aroundId && room && securityDescriptorUtils.isPublic(room)) {
       // If this is a permalinked chat, load special social meta-data....
       return chatService.findByIdInRoom(room._id, aroundId)
         .then(function(chat) {

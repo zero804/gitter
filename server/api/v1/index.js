@@ -52,12 +52,6 @@ router.get('/repo-info',
   identifyRoute('repo-info'),
   require('./repo-info.js'));
 
-// Deprecated - remove by 15 November
-router.get('/public-repo-search',
-  authMiddleware,
-  identifyRoute('public-repo-search'),
-  require('./public-repo-search.js'));
-
 router.post('/private/gcm',
   authMiddleware,
   identifyRoute('gcm-registration'),
