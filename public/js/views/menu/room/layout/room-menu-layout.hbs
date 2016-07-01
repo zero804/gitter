@@ -32,13 +32,15 @@
 
           <li>
             <ul id="minibar-temp" class="minibar-collection-list">
-              {{#each troupeContext.snapshots.leftMenu.tempOrg}}
+              {{#if troupeContext.snapshots.leftMenu.tempOrg}}
+              {{#with troupeContext.snapshots.leftMenu.tempOrg}}
                 <li data-state-change="org"
                     id="minibar-{{name}}"
-                    class="room-menu-options__item--org {{#if troupeContext.snapshots.leftMenu.tempOrg.length}}active{{else}}hidden{{/if}}">
+                    class="room-menu-options__item--org active">
                           {{{ prerenderView "js/views/menu/room/minibar/minibar-item-view" }}}
                 </li>
-              {{/each}}
+              {{/with}}
+              {{/if}}
             </ul>
           </li>
 

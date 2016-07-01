@@ -35,18 +35,21 @@ module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, group
   }
 
   var hasJoinedRoom = _.findWhere(rooms, { uri: currentRoom.uri});
-  var hasJoinedGroup = _.findWhere(groups, { name: groupName });
+  //The old group generation adds the tep-org with a prop of temp so we account for that here
+  var hasJoinedGroup = _.findWhere(groups, { name: groupName }) && !_.findWhere(groups, { temp: true });
 
   if(uri !== 'home' && !hasJoinedRoom && !hasJoinedGroup) {
     menuState = 'org';
     selectedOrgName = groupName;
-    tempOrg = [{
-      name: selectedOrgName,
-      avatarSrcset: resolveRoomAvatarSrcSet({ uri: selectedOrgName}, 22),
-      type: 'org',
-      active: true,
-      hidden: false
-    }];
+    if(hasGroups) {
+      tempOrg = {
+        name: selectedOrgName,
+        avatarSrcset: resolveRoomAvatarSrcSet({ uri: selectedOrgName}, 22),
+        type: 'org',
+        active: true,
+        hidden: false
+      };
+    }
   }
 
   return {
