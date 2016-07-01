@@ -67,13 +67,13 @@ describe('room-service', function() {
     it('should fail to create a room for an org where the user is not an admin', function () {
 
       var roomService = testRequire.withProxies("./services/room-service", {
-        'gitter-web-permissions/lib/github-policy-factory': {
-          createPolicyForGithubObject: function() {
-            return Promise.resolve({
+        'gitter-web-permissions/lib/policy-factory': {
+          getPreCreationPolicyEvaluator: function() {
+            return {
               canAdmin: function() {
                 return Promise.resolve(false);
               }
-            });
+            };
           }
         }
       });
@@ -152,21 +152,18 @@ describe('room-service', function() {
             }
           }
         },
-        'gitter-web-permissions/lib/github-policy-factory': {
-          createPolicyForGithubObject: function(user, uri, ghType, security) {
+        'gitter-web-permissions/lib/policy-factory': {
+          getPreCreationPolicyEvaluator: function(user, type, uri) {
             assert.equal(user.username, fixture.user1.username);
             assert.equal(uri, 'gitterTest');
-            assert.equal(ghType, 'ORG');
-            assert.equal(security, null);
+            assert.equal(type, 'GH_ORG');
 
-            return Promise.resolve({
+            return {
               canAdmin: function() {
                 return Promise.resolve(true);
               }
-            });
-          }
-        },
-        'gitter-web-permissions/lib/policy-factory': {
+            };
+          },
           createPolicyForRoom: function(user, room) {
             assert.equal(room.uri, 'gitterTest');
             return Promise.resolve({});
@@ -245,21 +242,18 @@ describe('room-service', function() {
             }
           }
         },
-        'gitter-web-permissions/lib/github-policy-factory': {
-          createPolicyForGithubObject: function(user, uri, ghType, security) {
+        'gitter-web-permissions/lib/policy-factory': {
+          getPreCreationPolicyEvaluator: function(user, type, uri) {
             assert.equal(user.username, fixture.user1.username);
             assert.equal(uri, 'gitterHQ/cloaked-avenger');
-            assert.equal(ghType, 'REPO');
-            assert.equal(security, null);
+            assert.equal(type, 'GH_REPO');
 
-            return Promise.resolve({
+            return {
               canAdmin: function() {
                 return Promise.resolve(true);
               }
-            });
-          }
-        },
-        'gitter-web-permissions/lib/policy-factory': {
+            };
+          },
           createPolicyForRoom: function(user, room) {
             assert.equal(room.uri, 'gitterHQ/cloaked-avenger');
             assert.equal(room.groupId, groupId);
@@ -311,21 +305,18 @@ describe('room-service', function() {
             }
           }
         },
-        'gitter-web-permissions/lib/github-policy-factory': {
-          createPolicyForGithubObject: function(user, uri, ghType, security) {
+        'gitter-web-permissions/lib/policy-factory': {
+          getPreCreationPolicyEvaluator: function(user, type, uri) {
             assert.equal(user.username, fixture.user1.username);
             assert.equal(uri, 'gitterHQ/cloaked-avenger');
-            assert.equal(ghType, 'REPO');
-            assert.equal(security, null);
+            assert.equal(type, 'GH_REPO');
 
-            return Promise.resolve({
+            return {
               canAdmin: function() {
                 return Promise.resolve(true);
               }
-            });
+            };
           },
-        },
-        'gitter-web-permissions/lib/policy-factory': {
           createPolicyForRoom: function(user, room) {
             assert.equal(room.uri, 'gitterHQ/cloaked-avenger');
             return Promise.resolve({
@@ -378,21 +369,18 @@ describe('room-service', function() {
             }
           }
         },
-        'gitter-web-permissions/lib/github-policy-factory': {
-          createPolicyForGithubObject: function(user, uri, ghType, security) {
+        'gitter-web-permissions/lib/policy-factory': {
+          getPreCreationPolicyEvaluator: function(user, type, uri) {
             assert.equal(user.username, fixture.user1.username);
             assert.equal(uri, 'gitterHQ/sandbox');
-            assert.equal(ghType, 'REPO');
-            assert.equal(security, null);
+            assert.equal(type, 'GH_REPO');
 
-            return Promise.resolve({
+            return {
               canAdmin: function() {
                 return Promise.resolve(true);
               }
-            });
+            };
           },
-        },
-        'gitter-web-permissions/lib/policy-factory': {
           createPolicyForRoom: function(user, room) {
             assert.equal(room.uri, 'gitterHQ/sandbox');
             return Promise.resolve({});
@@ -1026,17 +1014,16 @@ describe('room-service', function() {
             }
           }
         },
-        'gitter-web-permissions/lib/github-policy-factory': {
-          createPolicyForGithubObject: function(user, uri, githubType, security) {
+        'gitter-web-permissions/lib/policy-factory': {
+          getPreCreationPolicyEvaluator: function(user, type, uri) {
             assert.strictEqual(user.username, fixture.user1.username);
             assert.strictEqual(uri, 'gitterTest');
-            assert.strictEqual(githubType, 'ORG');
-            assert.strictEqual(security, null);
-            return Promise.resolve({
+            assert.strictEqual(type, 'GH_ORG');
+            return {
               canAdmin: function() {
                 return Promise.resolve(true);
               }
-            });
+            };
           }
         }
       });
@@ -1066,17 +1053,16 @@ describe('room-service', function() {
             }
           }
         },
-        'gitter-web-permissions/lib/github-policy-factory': {
-          createPolicyForGithubObject: function(user, uri, githubType, security) {
+        'gitter-web-permissions/lib/policy-factory': {
+          getPreCreationPolicyEvaluator: function(user, type, uri) {
             assert.strictEqual(user.username, fixture.user1.username);
             assert.strictEqual(uri, 'gitterTest');
-            assert.strictEqual(githubType, 'ORG');
-            assert.strictEqual(security, null);
-            return Promise.resolve({
+            assert.strictEqual(type, 'GH_ORG');
+            return {
               canAdmin: function() {
                 return Promise.resolve(true);
               }
-            });
+            };
           }
         }
       });
@@ -1092,11 +1078,11 @@ describe('room-service', function() {
 
   describe('renames #slow', function() {
     var roomValidatorMock, roomService;
-    var createPolicyForGithubObjectMock;
+    var getPreCreationPolicyEvaluatorMock;
     var groupId;
 
     beforeEach(function() {
-      createPolicyForGithubObjectMock = mockito.mockFunction();
+      getPreCreationPolicyEvaluatorMock = mockito.mockFunction();
       groupId = new ObjectID();
 
       roomValidatorMock = mockito.mockFunction();
@@ -1104,8 +1090,8 @@ describe('room-service', function() {
         'gitter-web-github': {
           GitHubUriValidator: roomValidatorMock
         },
-        'gitter-web-permissions/lib/github-policy-factory': {
-          createPolicyForGithubObject: createPolicyForGithubObjectMock
+        'gitter-web-permissions/lib/policy-factory': {
+          getPreCreationPolicyEvaluator: getPreCreationPolicyEvaluatorMock
         },
         'gitter-web-groups/lib/group-service': {
           migration: {
@@ -1137,12 +1123,12 @@ describe('room-service', function() {
            });
          });
 
-         mockito.when(createPolicyForGithubObjectMock)().then(function() {
-           return Promise.resolve({
+         mockito.when(getPreCreationPolicyEvaluatorMock)().then(function() {
+           return {
              canAdmin: function() {
-               return true;
+               return Promise.resolve(true);
              }
-           });
+           };
          })
 
          return roomService.createRoomByUri(fixture.user1, originalUrl4, {})
@@ -1185,12 +1171,12 @@ describe('room-service', function() {
           });
         });
 
-        mockito.when(createPolicyForGithubObjectMock)().then(function() {
-          return Promise.resolve({
+        mockito.when(getPreCreationPolicyEvaluatorMock)().then(function() {
+          return {
             canAdmin: function() {
               return true;
             }
-          });
+          };
         })
 
         return roomService.createRoomByUri(fixture.user1, originalUrl2, {})
@@ -1207,7 +1193,7 @@ describe('room-service', function() {
 
   describe('createRoomForGitHubUri #slow', function() {
     var roomValidatorMock, roomService;
-    var createPolicyForGithubObjectMock;
+    var getPreCreationPolicyEvaluatorMock;
     var duplicateGithubId = fixtureLoader.generateGithubId();
     var groupId;
 
@@ -1228,7 +1214,7 @@ describe('room-service', function() {
     });
 
     beforeEach(function() {
-      createPolicyForGithubObjectMock = mockito.mockFunction();
+      getPreCreationPolicyEvaluatorMock = mockito.mockFunction();
       groupId = new ObjectID();
       roomValidatorMock = mockito.mockFunction();
       roomService = testRequire.withProxies('./services/room-service', {
@@ -1242,20 +1228,20 @@ describe('room-service', function() {
         'gitter-web-github': {
           GitHubUriValidator: roomValidatorMock
         },
-        'gitter-web-permissions/lib/github-policy-factory': {
-          createPolicyForGithubObject: createPolicyForGithubObjectMock,
+        'gitter-web-permissions/lib/policy-factory': {
+          getPreCreationPolicyEvaluator: getPreCreationPolicyEvaluatorMock,
         }
       });
     });
 
     it('should return an new room if one does not exist', function() {
 
-      mockito.when(createPolicyForGithubObjectMock)().then(function() {
-        return Promise.resolve({
+      mockito.when(getPreCreationPolicyEvaluatorMock)().then(function() {
+        return {
           canAdmin: function() {
-            return true;
+            return Promise.resolve(true);
           }
-        });
+        };
       })
 
       var orgUri = fixture.generateUri('ORG');
@@ -1278,12 +1264,12 @@ describe('room-service', function() {
     });
 
     it('should return an existing room if it exists', function() {
-      mockito.when(createPolicyForGithubObjectMock)().then(function() {
-        return Promise.resolve({
+      mockito.when(getPreCreationPolicyEvaluatorMock)().then(function() {
+        return {
           canAdmin: function() {
-            return true;
+            return Promise.resolve(true);
           }
-        });
+        };
       })
 
       mockito.when(roomValidatorMock)().then(function() {
@@ -1303,12 +1289,12 @@ describe('room-service', function() {
     });
 
     it('should deal with room renames where a room with the new URI has been created', function() {
-      mockito.when(createPolicyForGithubObjectMock)().then(function() {
-        return Promise.resolve({
+      mockito.when(getPreCreationPolicyEvaluatorMock)().then(function() {
+        return {
           canAdmin: function() {
-            return true;
+            return Promise.resolve(true);
           }
-        });
+        };
       })
 
       mockito.when(roomValidatorMock)().then(function() {
