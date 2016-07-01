@@ -121,7 +121,7 @@ var HeaderView = Marionette.ItemView.extend({
       orgName:         orgName,
       orgPageHref:     orgPageHref,
       shouldShowPlaceholderRoomTopic: data.userCount <= 1,
-      isRightToolbarPinned: this.rightToolbarModel.get('isPinned')
+      isRightToolbarPinned: this.getIsRightToolbarPinned()
     });
 
     return data;
@@ -149,8 +149,20 @@ var HeaderView = Marionette.ItemView.extend({
     }
   },
 
+  getIsRightToolbarPinned: function() {
+    var isRightToolbarPinned = true;
+    if(this.rightToolbarModel) {
+      isRightToolbarPinned = this.rightToolbarModel.get('isPinned');
+    }
+
+    return isRightToolbarPinned;
+  },
+
   onPanelPinStateChange: function() {
-    toggleClass(this.ui.toggleRightToolbarButton[0], 'pinned', this.rightToolbarModel.get('isPinned'));
+    // Archives don't have certain actions
+    if(this.ui.toggleRightToolbarButton.length > 0) {
+      toggleClass(this.ui.toggleRightToolbarButton[0], 'pinned', this.getIsRightToolbarPinned());
+    }
   },
 
   getChatNameTitle: function() {
