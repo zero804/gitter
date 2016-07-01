@@ -1,4 +1,5 @@
 @charset "UTF-8";
+@import (reference) "trp3Vars.less";
 @import "base-web";
 
 @import "../../js/views/righttoolbar/rightToolbarView";
@@ -11,11 +12,15 @@
   padding-top: 0;
 }
 
+.trpContentPanel.archive {
+  padding-top: @chat-frame-desktop-header-height;
+}
+
 .right-toolbar-region {
+  max-height: 100%;
   @media @archive-mid {
     order: 0;
     height: auto;
-    margin-bottom: 20px;
   }
 
   & > .right-toolbar {
@@ -26,23 +31,39 @@
   }
 }
 
+.gtrArchiveToolbarWrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  padding-left: 20px;
+  padding-right: 20px;
+}
 
 .gtrArchiveInfoContainer {
-  width: 100%;
-  padding-bottom: 20px;
   overflow: hidden;
+  flex-shrink: 0;
+  width: 100%;
+  margin-bottom: 20px;
 }
 
 .gtrArchiveInfo {
   clear: both;
-  padding: 20px 20px 0 20px;
+  margin-top: 20px;
+
+  & > p {
+    @media @archive-mid {
+      margin-top: 5px;
+      margin-bottom: 5px;
+    }
+  }
 }
 
 .gtrArchiveLogo {
-  padding: 20px;
+  padding-top: 20px;
   margin-bottom: 20px;
+
   .logo-container {
-    float: left;
     background-image: url('../images/logo-text-blue-pink.png');
     width: 160px;
     height: 32px;
@@ -54,18 +75,35 @@
   }
 }
 
+.archive-right-toolbar-option-container {
+  flex: 1 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+
+  width: 100%;
+  padding-top: 4px;
+  padding-bottom: 12px;
+}
+
+.archive-right-toolbar-button-wrapper {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.archive-right-toolbar-button {
+  width: 100%;
+  padding-left: 0;
+  padding-right: 0;
+}
+
 .gtrArchiveDate {
   margin: 16px 0;
 }
 
 .gtrArchiveHomeWrapper {
   box-sizing: border-box;
-  overflow: auto;
-  position: relative;
-  width: 100%;
-  height: 100%;
-
-  padding-top: 80px;
+  padding-top: 20px;
   padding-left: 50px;
   padding-bottom: 40px;
   padding-right: 50px;
@@ -124,7 +162,8 @@
 
 .gtrArchiveNavigationWrapper {
   margin-bottom: 20px;
-  padding: 20px;
+  padding-left: 20px;
+  padding-right: 20px;
 
   &:empty {
     display: none;

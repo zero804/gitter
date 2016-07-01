@@ -14,7 +14,6 @@ function canAdminPotentialGitHubGroup(user, githubInfo, obtainAccessFromGitHubRe
   var uri = githubInfo.uri;
   var githubId = githubInfo.githubId;
 
-  // TODO: just use securityDescriptorGenerator.generate()?
   return githubPolicyFactory.createGroupPolicyForGithubObject(user, type, uri, githubId, obtainAccessFromGitHubRepo)
     .then(function(policy) {
       return policy.canAdmin();

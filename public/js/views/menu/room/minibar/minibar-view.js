@@ -8,9 +8,10 @@ var PeopleView = require('./people-view/people-view');
 var CloseView = require('./close-view/close-view');
 var CollectionView = require('./minibar-collection-view');
 var CommunityCreateItemView = require('./minibar-community-create-item-view');
-var domIndexById = require('../../../../utils/dom-index-by-id');
 var fastdom = require('fastdom');
 var appEvents = require('utils/appevents');
+var domIndexById = require('utils/dom-index-by-id');
+
 
 
 require('views/behaviors/isomorphic');
