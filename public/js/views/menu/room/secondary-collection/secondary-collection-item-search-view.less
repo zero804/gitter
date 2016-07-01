@@ -3,6 +3,9 @@
 @import "../../../../../less/components/menu/room/avatar.less";
 @import "../../../../../less/components/menu/room/menu-text.less";
 
+@search-expand-transition-time: 1s;
+@search-collapse-transition-time: .3s;
+
 .room-item--search-message {
   .room-item();
   height: auto;
@@ -11,11 +14,25 @@
   margin-right: @desktop-menu-left-padding / 2;
   padding-left: @desktop-menu-left-padding / 2;
 
-  transition: background-color .2s ease-out;
+  transition:
+    max-height @search-collapse-transition-time ease,
+    background-color .2s ease-out;
 
   &:hover,
   &:focus {
     .room-item-active();
+    //Reveal all text content | this nesting is gross but I don't know how to get around it
+    //JP 9/6/16
+    max-height: 200vh;
+    transition-duration: @search-expand-transition-time, .2s;
+
+    & > .room-item__container--search {
+      //remove all height restrictions and overflow on content
+      & > .room-item__title--search {
+        max-height: 200vh;
+        transition-duration: @search-expand-transition-time;
+      }
+    }
   }
 }
 
@@ -74,15 +91,21 @@
 
 .room-item__title--search {
   .room-item__title();
-  height:        1.25em;
+  position:      relative;
   overflow:      hidden;
+  height:        auto;
   max-width:     100%;
+  max-height:    1.25em;
   margin-top:    0.5em;
   margin-left:   0;
 
   font-size:     1.4rem;
   line-height:   1.25em;
+  white-space:   normal;
+  word-break:    break-all;
   text-overflow: ellipsis;
+
+  transition: max-height @search-collapse-transition-time ease;
 }
 
 .highlight {
