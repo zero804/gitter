@@ -14,7 +14,6 @@ var _ = require('lodash');
 var persistence = require('gitter-web-persistence');
 var uriLookupService = require("./uri-lookup-service");
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
-var githubPolicyFactory = require('gitter-web-permissions/lib/github-policy-factory');
 var addInvitePolicyFactory = require('gitter-web-permissions/lib/add-invite-policy-factory');
 var userService = require('./user-service');
 var troupeService = require('./troupe-service');
@@ -218,10 +217,15 @@ function createRoomForGitHubUri(user, uri, options) {
       if (!githubInfo) throw new StatusError(404);
 
       var githubType = githubInfo.type;
+      var backendType;
 
       switch (githubType) {
         case 'ORG':
+          backendType = 'GH_ORG';
+          break;
+
         case 'REPO':
+          backendType = 'GH_REPO';
           break;
 
         case 'USER':
@@ -249,22 +253,19 @@ function createRoomForGitHubUri(user, uri, options) {
       }
 
       /* Room does not yet exist */
-      // TODO: switch out for policy...
-      // Parent rooms always have security == null
-      return githubPolicyFactory.createPolicyForGithubObject(user, officialUri, githubType, null)
+      var policy = policyFactory.getPreCreationPolicyEvaluator(user, backendType, officialUri)
+      return policy.canAdmin()
         .bind({
           troupe: null,
           updateExisting: null,
           groupId: null
-        })
-        .then(function(policy) {
-          return policy.canAdmin();
         })
         .then(function(access) {
           debug('Does the user have access to create room %s? %s', uri, access);
 
           // If the user is not allowed to create this room, go no further
           if(!access) throw new StatusError(403);
+
           return ensureGroupForGitHubRoom(user, githubType, officialUri);
         })
         .then(function(group) {

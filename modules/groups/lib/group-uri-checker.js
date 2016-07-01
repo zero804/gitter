@@ -6,11 +6,10 @@ var Promise = require('bluebird');
 var StatusError = require('statuserror');
 var User = require('gitter-web-persistence').User;
 var Group = require('gitter-web-persistence').Group;
-var githubPolicyFactory = require('gitter-web-permissions/lib/github-policy-factory');
 var validateGitHubUri = require('gitter-web-github').GitHubUriValidator;
 var validateGroupUri = require('gitter-web-validators/lib/validate-group-uri');
 var debug = require('debug')('gitter:app:groups:group-uri-checker');
-
+var policyFactory = require('gitter-web-permissions/lib/policy-factory')
 
 function checkLocalUri(uri) {
   return Promise.join(
@@ -47,10 +46,8 @@ function checkGitHubUri(user, uri, obtainAccessFromGitHubRepo) {
           be the one inside groupService.createGroup that will test if you're
           allowed to access linkPath.
           */
-          return githubPolicyFactory.createGroupPolicyForGithubObject(user, 'ORG', uri, githubInfo.githubId, obtainAccessFromGitHubRepo)
-            .then(function(policy) {
-              return policy.canAdmin();
-            })
+          var policy = policyFactory.getPreCreationPolicyEvaluatorWithRepoFallback(user, 'GH_ORG', uri, obtainAccessFromGitHubRepo);
+          return policy.canAdmin()
             .then(function(access) {
               return {
                 githubInfo: githubInfo,
