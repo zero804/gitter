@@ -88,7 +88,8 @@ module.exports = Backbone.Model.extend({
     //expose the public collection
     this.searchTerms = new RecentSearchesCollection(null);
     this.searchRoomAndPeople = new SearchRoomPeopleCollection(null, { roomMenuModel: this, roomCollection: this._roomCollection });
-    this.searchChatMessages = new SearchChatMessages(null, { roomMenuModel: this, roomModel: this._troupeModel });
+    this.searchMessageQueryModel = new Backbone.Model({ skip: 0 });
+    this.searchChatMessages = new SearchChatMessages(null, { roomMenuModel: this, roomModel: this._troupeModel, queryModel: this.searchMessageQueryModel });
     this.suggestedOrgs = new SuggestedOrgCollection({ contextModel: this, roomCollection: this._roomCollection });
     this.userSuggestions = new UserSuggestions(null, { contextModel: context.user() });
     this._suggestedRoomCollection = new SuggestedRoomsByRoomCollection({
@@ -257,11 +258,11 @@ module.exports = Backbone.Model.extend({
     //save
     if (method === 'create' || method === 'update' || method === 'patch') {
       return apiClient.user.put('/settings/leftRoomMenu', this.toJSON(), {
-          // No need to get the JSON back from the server...
-          dataType: 'text'
-        })
-        .then(function() { if (options.success) options.success.apply(self, arguments); })
-        .catch(function(err) { if (options.error) options.error(err); });
+        // No need to get the JSON back from the server...
+        dataType: 'text'
+      })
+      .then(function() { if (options.success) options.success.apply(self, arguments); })
+      .catch(function(err) { if (options.error) options.error(err); });
     }
 
     //The only time we need to fetch data is on page load
@@ -283,9 +284,9 @@ module.exports = Backbone.Model.extend({
   _getModel: function (prop, val){
     var query = {}; query[prop] = val;
     return this.primaryCollection.findWhere(query) ||
-           this.secondaryCollection.findWhere(query) ||
-           this.tertiaryCollection.findWhere(query) ||
-           this._roomCollection.findWhere(query);
+      this.secondaryCollection.findWhere(query) ||
+        this.tertiaryCollection.findWhere(query) ||
+          this._roomCollection.findWhere(query);
   },
 
 });
