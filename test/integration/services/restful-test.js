@@ -5,6 +5,9 @@ var restful = testRequire('./services/restful');
 var userService = testRequire('./services/user-service');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assert = require('assert');
+var env = require('gitter-web-env');
+var nconf = env.config;
+
 
 var counter = 0;
 
@@ -152,7 +155,7 @@ describe('restful #slow', function() {
             id: fixture.group1.id,
             name: fixture.group1.name,
             uri: fixture.group1.uri,
-            avatarUrl: 'http://localhost:5000/api/private/avatars/group/i/' + fixture.group1.id,
+            avatarUrl: nconf.get('avatar:officialHost') + '/group/i/' + fixture.group1.id,
           }]);
         });
     });
