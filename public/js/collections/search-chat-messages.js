@@ -9,10 +9,6 @@ var context = require('utils/context');
 
 var SEARCH_SKIP_INCREMENT = 30;
 
-var QueryModel = Backbone.Model.extend({
-  defaults: { skip: 0 }
-});
-
 var ContextModel = Backbone.Model.extend({
   defaults: {
     active: false,
@@ -65,14 +61,14 @@ module.exports = BaseResolverCollection.extend({
 
     this.roomModel = attrs.roomModel;
 
-    this.queryModel = new QueryModel(null);
+    this.queryModel = attrs.queryModel;
     this.contextModel = new ContextModel(null, { roomMenuModel: this.roomMenuModel, roomModel: this.roomModel });
 
     this.listenTo(this.contextModel, 'change:active', this.onModelUpdateActive, this);
     this.listenTo(this.queryModel, 'change:skip', this.onSkipUpdate, this);
     this.listenTo(this.roomMenuModel, 'change:state', this.resetSearch, this);
     this.listenTo(this.roomMenuModel, 'change:searchTerm', this.onSearchTermUpdate, this);
-    this.listenTo(this.roomMenuModel, 'change:isFetchingMoreSearchMessageResults', this.onModelChangeFetchStatus, this);
+    this.listenTo(this.queryModel, 'change:isFetchingMoreSearchMessageResults', this.onModelChangeFetchStatus, this);
 
     BaseResolverCollection.prototype.initialize.apply(this, arguments);
   },
@@ -103,11 +99,11 @@ module.exports = BaseResolverCollection.extend({
     if(results.length < SEARCH_SKIP_INCREMENT) {
       return this.queryModel.set('hasReachedLimit', true);
     }
-    return this.roomMenuModel.set('isFetchingMoreSearchMessageResults', false);
+    return this.queryModel.set('isFetchingMoreSearchMessageResults', false);
   },
 
   resetSearch: function (){
-    this.roomMenuModel.set('isFetchingMoreSearchMessageResults', false);
+    this.queryModel.set('isFetchingMoreSearchMessageResults', false);
     this.queryModel.set({ skip: 0, hasReachedLimit: false });
     this.reset();
   },

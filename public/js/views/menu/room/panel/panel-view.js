@@ -130,6 +130,7 @@ var PanelView = Marionette.LayoutView.extend({
     this.bus = attrs.bus;
     this.dndCtrl = attrs.dndCtrl;
     this.keyboardControllerView = attrs.keyboardControllerView;
+    this.queryModel = this.model.searchMessageQueryModel;
     this.listenTo(this.bus, 'ui:swipeleft', this.onSwipeLeft, this);
     this.listenTo(this.bus, 'focus.request.chat', this.onSearchItemSelected, this);
     this.listenTo(this.model, 'change:state', this.onModelChangeState, this);
@@ -188,7 +189,7 @@ var PanelView = Marionette.LayoutView.extend({
   },
 
   scrollBottom: _.debounce(function (){
-    this.model.set('isFetchingMoreSearchMessageResults', true);
+    this.queryModel.set('isFetchingMoreSearchMessageResults', true);
   }, 100),
 
   onRender: function() {
