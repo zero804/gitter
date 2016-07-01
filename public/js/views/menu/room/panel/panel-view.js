@@ -181,10 +181,10 @@ var PanelView = Marionette.LayoutView.extend({
   },
 
   onModelChangeState: function (){
-    if(!this.scroll) { return; }
+    if(!this.neverendingstory) { return; }
     var state = this.model.get('state');
-    if(state !== 'search') { return this.scroll.disable(); }
-    return this.scroll.enable();
+    if(state !== 'search') { return this.neverendingstory.disable(); }
+    return this.neverendingstory.enable();
   },
 
   scrollBottom: _.debounce(function (){
@@ -193,10 +193,10 @@ var PanelView = Marionette.LayoutView.extend({
 
   onRender: function() {
     this.ui.profileMenu[0].setAttribute('aria-hidden', !this.profileMenuOpenState);
-    if(!this.scroll) {
-      this.scroll = new NeverEndingStory(this.$el.find('.nano-content')[0]);
-      this.listenTo(this.scroll, 'approaching.bottom', this.scrollBottom, this);
-      this.scroll.disable();
+    if(!this.neverendingstory) {
+      this.neverendingstory = new NeverEndingStory(this.$el.find('.nano-content')[0]);
+      this.listenTo(this.neverendingstory, 'approaching.bottom', this.scrollBottom, this);
+      this.neverendingstory.disable();
       this.onModelChangeState();
     }
   },
