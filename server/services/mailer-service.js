@@ -5,7 +5,7 @@ var mailer = env.mailer;
 
 var troupeTemplate = require('../utils/troupe-template');
 var Promise = require('bluebird');
-var cdn = require('../web/cdn');
+var cdn = require('gitter-web-cdn');
 
 
 var CACHED = { };
@@ -24,8 +24,8 @@ function applyTemplate(templateName, data) {
 
 var VALID_TEMPLATES = {
   'added-to-room': addedToRoomMapping,
-  'invitation': invitationMapping,
-  'invitation-reminder': invitationMapping,
+  'invitation-v2': invitationMapping,
+  'invitation-reminder-v2': invitationMapping,
   'unread-notification': unreadNoticationMapping,
   'created-room': createdRoomMapping
 };
@@ -56,11 +56,12 @@ function addedToRoomMapping(data) {
 
 function invitationMapping(data) {
   return {
-    NAME:    data.recipientName,
-    DATE:    data.date,
-    SENDER:  data.senderName,
+    NAME: data.recipientName,
+    DATE: data.date,
+    SENDER: data.senderName,
     ROOMURI: data.roomUri,
     ROOMURL: data.roomUrl,
+    INVITEURL: data.inviteUrl,
     LOGOURL: cdn('images/logo-text-blue-pink.png', { email: true })
   };
 }

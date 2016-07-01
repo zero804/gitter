@@ -11,8 +11,9 @@
   },
   "private": true,
   "dependencies": {
-    "bluebird": "^3.3.5",
+    "bluebird": "^3.2.1",
     "debug": "^2.2.0",
+    "email-validator": "^1.0.0",
     "gitter-web-appevents": "file:../appevents",
     "gitter-web-cache-wrapper": "file:../cache-wrapper",
     "gitter-web-env": "file:../env",

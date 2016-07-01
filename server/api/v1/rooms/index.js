@@ -6,7 +6,7 @@ var restSerializer = require("../../../serializers/rest-serializer");
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
 var loadTroupeFromParam = require('./load-troupe-param');
-var policyFactory = require('gitter-web-permissions/lib/legacy-policy-factory');
+var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var RoomWithPolicyService = require('../../../services/room-with-policy-service');
 
 function searchRooms(req) {
@@ -70,7 +70,11 @@ module.exports = {
         var strategy = new restSerializer.TroupeStrategy({
           currentUserId: req.user.id,
           currentUser: req.user,
-          includeRolesForTroupe: createResult.troupe
+          includeRolesForTroupe: createResult.troupe,
+          // include all these because it will replace the troupe in the context
+          includeTags: true,
+          includeProviders: true,
+          includeGroups: true
         });
 
         return [createResult, restSerializer.serializeObject(createResult.troupe, strategy)];
@@ -121,7 +125,8 @@ module.exports = {
           currentUser: req.user,
           includePermissions: true,
           includeOwner: true,
-          includeProviders: true
+          includeProviders: true,
+          includeGroups: true
         });
 
         return restSerializer.serializeObject(req.params.troupeId, strategy);
@@ -171,7 +176,8 @@ module.exports = {
     'collaborators': require('./collaborators'),
     'suggestedRooms': require('./suggested-rooms'),
     'events': require('./events'),
-    'meta': require('./meta')
+    'meta': require('./meta'),
+    'invites': require('./invites'),
   }
 
 };

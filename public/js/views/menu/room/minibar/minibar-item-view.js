@@ -1,7 +1,7 @@
 'use strict';
 
 var _ = require('underscore');
-var Marionette = require('backbone.marionette');
+var BaseItemView = require('../base-item-view');
 var itemTemplate = require('./minibar-item-view.hbs');
 var resolveRoomAvatar = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 var updateUnreadIndicatorClassState = require('../../../../components/menu/update-unread-indicator-class-state');
@@ -9,7 +9,7 @@ var toggleClass = require('utils/toggle-class');
 
 
 
-module.exports = Marionette.ItemView.extend({
+module.exports = BaseItemView.extend({
   tagName: 'li',
   template: itemTemplate,
   ui: {
@@ -26,9 +26,7 @@ module.exports = Marionette.ItemView.extend({
 
   modelEvents: {
     'change:unreadItems change:mentions change:activity': 'onUnreadUpdate',
-    'change:active': 'onActiveStateUpdate',
-    'focus:item': 'focusItem',
-    'blur:item': 'blurItem'
+    'change:active': 'onActiveStateUpdate'
   },
   events: {
     'click': 'onItemClicked',
@@ -87,7 +85,6 @@ module.exports = Marionette.ItemView.extend({
   onActiveStateUpdate: function() {
     var isActive = !!this.model.get('active');
     toggleClass(this.el, 'active', isActive);
-    toggleClass(this.ui.minibarButton[0], 'focus', isActive);
   },
 
   onUnreadUpdate: function() {
@@ -104,17 +101,4 @@ module.exports = Marionette.ItemView.extend({
 
     this.firstRender = false;
   },
-
-
-  focusItem: function() {
-    this.ui.minibarButton.focus();
-    toggleClass(this.ui.minibarButton[0], 'focus', true);
-    this.trigger('minibar-item:keyboard-activated', this.model);
-  },
-
-  blurItem: function() {
-    this.ui.minibarButton.blur();
-    toggleClass(this.ui.minibarButton[0], 'focus', false);
-  }
-
 });

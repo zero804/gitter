@@ -89,15 +89,6 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     this.setActive();
   },
 
-  filter: function(model, index) { //jshint unused: true
-    switch (this.roomMenuModel.get('state')) {
-      case 'search':
-        return (index <= 5);
-      default:
-        return true;
-    }
-  },
-
   onDragStart: function () {
     this.uiModel.set('isDragging', true);
     this.el.classList.add('dragging');

@@ -15,12 +15,18 @@ var SearchRoomPeopleCollection = require('../collections/left-menu-search-rooms-
 var SearchChatMessages = require('../collections/search-chat-messages');
 var perfTiming = require('components/perf-timing');
 var context = require('utils/context');
+var FilteredFavouriteRoomCollection = require('../collections/filtered-favourite-room-collection');
+var FavouriteCollectionModel = require('../views/menu/room/favourite-collection/favourite-collection-model');
+var PrimaryCollectionModel = require('../views/menu/room/primary-collection/primary-collection-model');
+var SecondaryCollectionModel = require('../views/menu/room/secondary-collection/secondary-collection-model');
+var TertiaryCollectionModel = require('../views/menu/room/tertiary-collection/tertiary-collection-model');
 var defaultCollectionFilter = require('gitter-web-shared/filters/left-menu-primary-default');
+var favouriteCollectionFilter = require('gitter-web-shared/filters/left-menu-primary-favourite');
+var MinibarCollection = require('../views/menu/room/minibar/minibar-collection');
 
 var states = [
   'all',
   'search',
-  'favourite',
   'people',
   'org',
 ];
@@ -29,17 +35,12 @@ var SEARCH_DEBOUNCE_INTERVAL = 1000;
 
 module.exports = Backbone.Model.extend({
 
-  //TODO: Review these defaults once the pin
-  //behaviour is finalised
   defaults: {
     state:                     '',
     searchTerm:                '',
-    panelOpenState:            true,
     roomMenuIsPinned:          true,
     selectedOrgName:           '',
     hasDismissedSuggestions:   false,
-    // 'keyboard', null (we can probably assume click from mouse)
-    activationSourceType:      null
   },
 
   //TODO Remove all these delete statements and pass the object with the options hash
@@ -48,6 +49,7 @@ module.exports = Backbone.Model.extend({
   initialize: function(attrs) {
 
     perfTiming.start('left-menu-init');
+    this.set('panelOpenState', this.get('roomMenuIsPinned'));
 
     if (!attrs || !attrs.bus) {
       throw new Error('A valid message bus must be passed when creating a new RoomMenuModel');
@@ -70,8 +72,9 @@ module.exports = Backbone.Model.extend({
     this._troupeModel = attrs.troupeModel;
     delete attrs.troupeModel;
 
+    this.dndCtrl = attrs.dndCtrl;
+    delete attrs.dndCtrl;
 
-    //TODO TEST THIS & THROW ERROR JP 25/1/16
     this._orgCollection = attrs.orgCollection;
 
     this._detailCollection = (attrs.detailCollection || new Backbone.Collection());
@@ -93,17 +96,46 @@ module.exports = Backbone.Model.extend({
       suggestedOrgsCollection: this.suggestedOrgs,
     });
 
-    var models = this._roomCollection.filter(defaultCollectionFilter);
-    this.activeRoomCollection = new FilteredRoomCollection(models, {
+    var orgsSnapshot = context.getSnapshot('orgs') || [];
+    this.minibarCollection = new MinibarCollection(orgsSnapshot, { roomCollection: this._roomCollection });
+
+    var roomModels = this._roomCollection.filter(defaultCollectionFilter);
+    this.activeRoomCollection = new FilteredRoomCollection(roomModels, {
       roomModel:  this,
       collection: this._roomCollection,
     });
 
+    var favModels = this._roomCollection.filter(favouriteCollectionFilter);
+    this.favouriteCollection = new FilteredFavouriteRoomCollection(favModels, {
+      collection: this._roomCollection,
+      roomModel:  this,
+      dndCtrl:    this.dndCtrl,
+    });
 
+    this.favouriteCollectionModel = new FavouriteCollectionModel(null, {
+      collection: this.favouriteCollection,
+      roomMenuModel: this
+    });
 
     this.primaryCollection = new ProxyCollection({ collection: this.activeRoomCollection });
+    this.primaryCollectionModel = new PrimaryCollectionModel(null, {
+      collection: this.primaryCollection,
+      roomMenuModel: this
+    });
+
     this.secondaryCollection = new ProxyCollection({ collection: this.searchTerms });
+    this.secondaryCollectionModel = new SecondaryCollectionModel({}, {
+      collection: this.secondaryCollection,
+      roomMenuModel: this
+    });
+
     this.tertiaryCollection = new ProxyCollection({ collection: this._orgCollection });
+    this.tertiaryCollectionModel = new TertiaryCollectionModel({}, {
+      collection: this.tertiaryCollection,
+      roomMenuModel: this
+    });
+
+    this.searchFocusModel = new Backbone.Model({ focus: false });
 
     this.listenTo(this.primaryCollection, 'snapshot', this.onPrimaryCollectionSnapshot, this);
     this.snapshotTimeout = setTimeout(function(){
@@ -121,20 +153,18 @@ module.exports = Backbone.Model.extend({
     this.listenTo(this, 'change', _.throttle(this.save.bind(this), 1500));
     this.listenTo(context.troupe(), 'change:id', this.onRoomChange, this);
 
-    // TODO: Should we be doing this stuff inside the collection-models?
-    //   We do something similar with the search in the model itself so maybe...
-    this.listenTo(this.activeRoomCollection, 'filter-complete', this.fireUpdateActiveState, this);
-    this.listenTo(this.searchTerms, 'filter-complete', this.fireUpdateActiveState, this);
-    this.listenTo(this.suggestedOrgs, 'sync', this.fireUpdateActiveState, this);
-    this.listenTo(this.suggestedOrgs, 'reset', this.fireUpdateActiveState, this);
-    this.listenTo(this.userSuggestions, 'sync', this.fireUpdateActiveState, this);
-    this.listenTo(this.userSuggestions, 'reset', this.fireUpdateActiveState, this);
-    this.listenTo(this.searchRoomAndPeople, 'reset', this.fireUpdateActiveState, this);
-    this.listenTo(this.searchChatMessages, 'reset', this.fireUpdateActiveState, this);
-
-
     //boot the model
     this.onSwitchState(this, this.get('state'));
+  },
+
+  //custom set to limit states that can be assigned
+  set: function (key, val){
+    var isChangingState = (key === 'state') || (_.isObject(key) && !!key.state);
+    if(!isChangingState) { return Backbone.Model.prototype.set.apply(this, arguments); }
+    var newState = _.isObject(key) ? key.state : val;
+    //If we are changing the models state value
+    if(states.indexOf(newState) === -1) { return; }
+    return Backbone.Model.prototype.set.apply(this, arguments);
   },
 
   onStateChangeCalled: function(newState) {
@@ -156,6 +186,7 @@ module.exports = Backbone.Model.extend({
 
   onSwitchState: function(model, val) {
     //TODO Test this JP 27/1/15
+    var searchFocus = false;
     switch (val) {
       case 'all':
         this.primaryCollection.switchCollection(this.activeRoomCollection);
@@ -167,11 +198,7 @@ module.exports = Backbone.Model.extend({
         this.primaryCollection.switchCollection(this.searchRoomAndPeople);
         this.secondaryCollection.switchCollection(this.searchChatMessages);
         this.tertiaryCollection.switchCollection(this.searchTerms);
-        break;
-
-      case 'favourite':
-        this.primaryCollection.switchCollection(this.activeRoomCollection);
-        this.secondaryCollection.switchCollection(this._suggestedRoomCollection);
+        searchFocus = true;
         break;
 
       case 'org':
@@ -187,12 +214,8 @@ module.exports = Backbone.Model.extend({
         break;
     }
 
-    this.fireUpdateActiveState();
     this.trigger('change:state:post');
-  },
-
-  fireUpdateActiveState: function() {
-    this.trigger('update:collection-active-states');
+    this.searchFocusModel.set('focus', searchFocus);
   },
 
   onSearchTermChange: _.debounce(function() {
@@ -230,16 +253,6 @@ module.exports = Backbone.Model.extend({
         .catch(function(err) { if (options.error) options.error(err); });
     }
 
-    //if we are in a mobile environment then the menu will never be pinned
-    if (this.get('isMobile')) {
-      window.troupeContext = {
-        leftRoomMenuState: {
-          roomMenuIsPinned: false,
-          panelOpenState:   false,
-        },
-      };
-    }
-
     //The only time we need to fetch data is on page load
     //so we can just pull it our of the troupe context
     //JP 11/1/16
@@ -253,6 +266,7 @@ module.exports = Backbone.Model.extend({
 
     if(activeModel) { activeModel.set('active', false); }
     if(newlyActiveModel) { newlyActiveModel.set('active', true); }
+    if(!this.get('roomMenuIsPinned')) { this.set('panelOpenState', false); }
   },
 
   _getModel: function (prop, val){
