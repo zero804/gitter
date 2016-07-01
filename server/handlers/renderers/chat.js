@@ -10,7 +10,6 @@ var userSort = require('../../../public/js/utils/user-sort');
 var isolateBurst = require('gitter-web-shared/burst/isolate-burst-array');
 var unreadItemService = require('../../services/unread-items');
 var _ = require('lodash');
-var avatars = require('gitter-web-avatars');
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 var getSubResources = require('./sub-resources');
 var fixMongoIdQueryParam = require('../../web/fix-mongo-id-query-param');
@@ -18,20 +17,12 @@ var fonts = require('../../web/fonts');
 var generateRightToolbarSnapshot = require('../snapshots/right-toolbar-snapshot');
 var troupeService = require('../../services/troupe-service');
 var roomMembershipService = require('../../services/room-membership-service');
+var getAvatarUrlForUriContext = require('../../web/get-avatar-url-for-uri-context');
 
 /* How many chats to send back */
 var INITIAL_CHAT_COUNT = 50;
 var ROSTER_SIZE = 25;
 
-function getAvatarUrlForContext(uriContext) {
-  var troupe = uriContext.troupe;
-
-  if (troupe.oneToOne) {
-    return avatars.getForUser(uriContext.oneToOneUser);
-  } else {
-    return avatars.getForRoomUri(uriContext.uri);
-  }
-}
 
 function renderChat(req, res, options, next) {
   var troupe = req.uriContext.troupe;
@@ -110,7 +101,7 @@ function renderChat(req, res, options, next) {
           isRightToolbarPinned = true;
         }
 
-        var roomAvatarUrl = getAvatarUrlForContext(req.uriContext);
+        var roomAvatarUrl = getAvatarUrlForUriContext(req.uriContext);
 
         var renderOptions = _.extend({
             hasCachedFonts: fonts.hasCachedFonts(req.cookies),
