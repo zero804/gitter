@@ -4,127 +4,111 @@ var env = require('gitter-web-env');
 var nconf = env.config;
 var Promise = require('bluebird');
 var contextGenerator = require('../../web/context-generator');
-var userService = require('../../services/user-service');
-var roomMembershipService = require('../../services/room-membership-service');
-var troupeService = require('../../services/troupe-service');
-var _ = require('lodash');
-var GitHubOrgService = require('gitter-web-github').GitHubOrgService;
-var orgPermissionModel = require('gitter-web-permissions/lib/models/org-permissions-model');
-var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 var generateRoomCardContext = require('gitter-web-shared/templates/partials/room-card-context-generator');
+var StatusError = require('statuserror');
 var fonts = require('../../web/fonts');
+var restSerializer = require('../../serializers/rest-serializer');
+var groupBrowserService = require('gitter-web-groups/lib/group-browser-service');
 
-function renderOrgPage(req, res, next, options) {
-  var orgUri = options.orgUri;
-  var findChildRoomOptions = {};
+var ROOMS_PER_PAGE = 15;
 
-  var ROOMS_PER_PAGE = 15;
+function serializeGroup(group, user) {
+  var userId = user && user._id;
 
-  // Show only public rooms to not logged in users
-  if (!req.user) findChildRoomOptions.security = 'PUBLIC';
+  var strategy = new restSerializer.GroupStrategy({
+    currentUser: user,
+    currentUserId: userId
+  });
 
-  var ghOrgService = new GitHubOrgService(req.user);
+  return restSerializer.serializeObject(group, strategy);
+}
 
-  return Promise.all([
-    ghOrgService.getOrg(orgUri).catch(function() { return null; }),
-    troupeService.findChildRoomsForOrg(orgUri, findChildRoomOptions),
-    contextGenerator.generateNonChatContext(req),
-    orgPermissionModel(req.user, 'admin', orgUri),
-    orgPermissionModel(req.user, 'join', orgUri)
-  ])
-  .spread(function(ghOrg, rooms, troupeContext, isOrgAdmin, isOrgMember) {
-    var isStaff = !!(troupeContext.user || {}).staff;
+function findRooms(groupId, user, currentPage) {
+  var userId = user && user._id;
 
-    // Filter out PRIVATE rooms
-    _.remove(rooms, function(room) { return room.security === 'PRIVATE'; });
-
-    // Filter out ORG room and INHERITED permission rooms for non-org members
-    if (!isOrgMember) {
-      _.remove(rooms, function(room) {
-        return (room.githubType === 'ORG' || room.security === 'INHERITED');
-      });
-    }
-
-    // Calculate org user count across all rooms (except private)
-    var orgUserCount = rooms.reduce(function(accum, room) {
-      return accum + room.userCount;
-    }, 0);
-
-    // Calculate total number of rooms
-    var roomCount = rooms.length;
-
-    // Calculate total pages
-    var pageCount = Math.ceil(rooms.length / ROOMS_PER_PAGE);
-    var currentPage = req.query.page || 1;
-
-    // Select only the rooms for this page
-    rooms = rooms.slice(currentPage * ROOMS_PER_PAGE - ROOMS_PER_PAGE, currentPage * ROOMS_PER_PAGE);
-
-    var getMembers = rooms.map(function(room) {
-      return roomMembershipService.findMembersForRoom(room.id, {limit: 10});
-    });
-
-    // Get memberships and then users for the rooms in this page
-    return Promise.all(getMembers)
-    .then(function(values) {
-      rooms.forEach(function(room, index) {
-        room.userIds = values[index];
-      });
-
-      var populateUsers = rooms.map(function(room) {
-        return userService.findByIds(room.userIds);
-      });
-
-      return Promise.all(populateUsers);
+  var skip = (currentPage - 1) * ROOMS_PER_PAGE;
+  if (skip > 2000) throw new StatusError(400);
+  
+  return groupBrowserService.findRoomsWithPagination(groupId, userId, {
+      skip: skip,
+      limit: ROOMS_PER_PAGE
     })
-    .then(function(values) {
-       rooms.forEach(function(room, index) {
-        room.users = values[index];
-        _.each(room.users, function(user) {
-          user.avatarUrlSmall = resolveUserAvatarUrl(user, 60);
+    .then(function(roomBrowseResult) {
+      var strategy = new restSerializer.SuggestedRoomStrategy({
+        currentUserId: userId,
+        currentUser: user
+      });
+
+      return restSerializer.serialize(roomBrowseResult.results, strategy)
+        .then(function(serializedRooms) {
+          roomBrowseResult.results = serializedRooms;
+          return roomBrowseResult;
         });
-      });
-
-      // Custom data for the org page
-      rooms = rooms.map(function(room) {
-        var result = generateRoomCardContext(room, {
-          isStaff: isStaff
-        });
-        result.isStaff = isOrgAdmin || result.isStaff;
-        return result;
-      });
-
-      // This is used to track pageViews in mixpanel
-      troupeContext.isCommunityPage = true;
-
-      var fullUri = nconf.get('web:basepath') + "/orgs/" + orgUri + "/rooms";
-      var text = encodeURIComponent('Explore our chat community on Gitter:');
-      var url = 'https://twitter.com/share?' +
-        'text=' + text +
-        '&url=' + fullUri +
-        '&related=gitchat' +
-        '&via=gitchat';
-
-      res.render('org-page', {
-        hasCachedFonts: fonts.hasCachedFonts(req.cookies),
-        fonts: fonts.getFonts(),
-        socialUrl: url,
-        isLoggedIn: !!req.user,
-        exploreBaseUrl: '/home/~explore',
-        roomCount: roomCount,
-        orgUserCount: orgUserCount,
-        org: ghOrg || {
-          login: orgUri
-        },
-        rooms: rooms,
-        troupeContext: troupeContext,
-        pagination: {
-          page: currentPage,
-          pageCount: pageCount
-        }
-      });
     });
+}
 
+function renderOrgPage(req, res, next) {
+  return Promise.try(function() {
+    var group = req.group;
+    if (!group) throw new StatusError(404);
+    var groupId = group._id;
+    var user = req.user;
+    var policy = req.uriContext.policy;
+
+    var currentPage = Math.max(parseInt(req.query.page, 10) || 1, 1);
+
+    return Promise.join(
+      serializeGroup(group, user),
+      findRooms(groupId, user, currentPage),
+      contextGenerator.generateNonChatContext(req),
+      policy.canAdmin(),
+      function(serializedGroup, roomBrowseResult, troupeContext, isOrgAdmin) {
+        var isStaff = req.user && req.user.staff;
+        var editAccess = isOrgAdmin || isStaff;
+        var orgUserCount = roomBrowseResult.totalUsers;
+        var roomCount = roomBrowseResult.total;
+
+        // Calculate total pages
+        var pageCount = Math.ceil(roomCount / ROOMS_PER_PAGE);
+        var rooms = roomBrowseResult.results.map(function(room) {
+          var result = generateRoomCardContext(room, {
+            isStaff: editAccess
+          });
+
+          // No idea why this is called `isStaff`
+          result.isStaff = editAccess;
+
+          return result;
+        });
+
+        // This is used to track pageViews in mixpanel
+        troupeContext.isCommunityPage = true;
+
+        var fullUri = nconf.get('web:basepath') + "/orgs/" + serializedGroup.uri + "/rooms";
+        var text = encodeURIComponent('Explore our chat community on Gitter:');
+        var url = 'https://twitter.com/share?' +
+          'text=' + text +
+          '&url=' + fullUri +
+          '&related=gitchat' +
+          '&via=gitchat';
+
+        res.render('org-page', {
+          hasCachedFonts: fonts.hasCachedFonts(req.cookies),
+          fonts: fonts.getFonts(),
+          socialUrl: url,
+          isLoggedIn: !!req.user,
+          exploreBaseUrl: '/home/~explore',
+          roomCount: roomCount,
+          orgUserCount: orgUserCount,
+          group: serializedGroup,
+          rooms: rooms,
+          troupeContext: troupeContext,
+          pagination: {
+            page: currentPage,
+            pageCount: pageCount
+          }
+        });
+      });
   })
   .catch(next);
 }

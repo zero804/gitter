@@ -158,11 +158,14 @@ var graphRooms = Promise.method(function(options) {
       // (The siblingRooms step might just add them back in anyway which is why
       //  this is not a standard step in filterRooms())
       var orgTotals = {};
+
       _.remove(suggestedRooms, function(room) {
-        if (orgTotals[room.lcOwner] === undefined) {
-          orgTotals[room.lcOwner] = 0;
+        if (orgTotals[room.lcOwner]) {
+          orgTotals[room.lcOwner] += 1;
+        } else {
+          orgTotals[room.lcOwner] = 1;
         }
-        orgTotals[room.lcOwner] += 1;
+
         return (orgTotals[room.lcOwner] > MAX_SUGGESTIONS_PER_ORG);
       });
 
@@ -191,7 +194,8 @@ var siblingRooms = Promise.method(function(options) {
 
   var orgNames = _.uniq(_.pluck(existingRooms, 'lcOwner'));
   return Promise.all(_.map(orgNames, function(orgName) {
-      return troupeService.findChildRoomsForOrg(orgName, {security: 'PUBLIC'});
+      // Hey, lets send 50 queries to mongo!
+      return troupeService.findChildRoomsForOrg(orgName, { security: 'PUBLIC' });
     }))
     .then(function(arrays) {
       var suggestedRooms = Array.prototype.concat.apply([], arrays);
@@ -215,14 +219,14 @@ function hilightedRooms(options) {
     return (roomLang === 'en' || roomLang === language);
   });
 
-  return Promise.all(_.map(filtered, function(roomInfo) {
-      return troupeService.findByUri(roomInfo.uri);
-    }))
+  var uris = _.map(filtered, function(highlighted) {
+    return highlighted.uri;
+  });
+
+  return troupeService.findByUris(uris)
     .then(function(suggestedRooms) {
-      if (suggestedRooms.length) {
-        if (debug.enabled) {
-          debug("hilightedRooms", _.pluck(suggestedRooms, "uri"));
-        }
+      if (debug.enabled) {
+        debug("hilightedRooms", _.pluck(suggestedRooms, "uri"));
       }
 
       return suggestedRooms;
@@ -268,23 +272,19 @@ var recommenders = [
   // doubtful about the potential network effect here.
   //ownedRepoRooms,
   //watchedRepoRooms,
-
   starredRepoRooms,
   graphRooms,
   siblingRooms,
   hilightedRooms
 ];
 
-/*
-
-options can have the following and they are all optional
-* user
-* rooms (array)
-* language (defaults to 'en')
-
-The plugins can just skip themselves if options doesn't contain what they need.
-
-*/
+/**
+ * options can have the following and they are all optional
+ * - user
+ * - rooms (array)
+ * - language (defaults to 'en')
+ * The plugins can just skip themselves if options doesn't contain what they need.
+ */
 function findSuggestionsForRooms(options) {
   var existingRooms = options.rooms || [];
   var language = options.language || 'en';
@@ -298,7 +298,7 @@ function findSuggestionsForRooms(options) {
     return room.oneToOne !== true;
   });
 
-  var filterSuggestions = function(results) {
+  function filterSuggestions(results) {
     var filtered = filterRooms(results, existingRooms);
     // Add all the rooms we've found so far to the rooms used by subsequent
     // lookups. This means that a new github user that hasn't joined any rooms
@@ -309,11 +309,15 @@ function findSuggestionsForRooms(options) {
     // better than just serving hilighted rooms.
     options.rooms = existingRooms.concat(filtered);
     return filtered;
-  };
+  }
+
   return promiseUtils.waterfall(recommenders, [options], filterSuggestions, NUM_SUGGESTIONS);
 }
-exports.findSuggestionsForRooms = findSuggestionsForRooms;
 
+/**
+ * Returns rooms for a user
+ * @private
+ */
 function findRoomsByUserId(userId) {
   return roomMembershipService.findRoomIdsForUser(userId)
     .then(function(roomIds) {
@@ -326,9 +330,10 @@ function findRoomsByUserId(userId) {
     });
 }
 
-// cache by userId
-exports.findSuggestionsForUserId = cacheWrapper('findSuggestionsForUserId',
-  function(userId) {
+/**
+ * Find some suggestions for the current user
+ */
+function findSuggestionsForUserId(userId) {
     return Promise.all([
       userService.findById(userId),
       findRoomsByUserId(userId),
@@ -341,4 +346,12 @@ exports.findSuggestionsForUserId = cacheWrapper('findSuggestionsForUserId',
         language: language
       });
     })
-  });
+  }
+
+module.exports = {
+  findSuggestionsForUserId: cacheWrapper('findSuggestionsForUserId', findSuggestionsForUserId),
+  findSuggestionsForRooms: findSuggestionsForRooms,
+  testOnly: {
+    HIGHLIGHTED_ROOMS: HIGHLIGHTED_ROOMS
+  }
+};
