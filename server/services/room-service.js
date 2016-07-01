@@ -41,6 +41,7 @@ var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-trou
 var userScopes = require('gitter-web-identity/lib/user-scopes');
 var groupService = require('gitter-web-groups/lib/group-service');
 var securityDescriptorGenerator = require('gitter-web-permissions/lib/security-descriptor-generator');
+var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
 
 /**
  * sendJoinStats() sends information to MixPanels about a join_room event
@@ -122,7 +123,7 @@ function doPostGitHubRoomCreationTasks(troupe, user, githubType, security, optio
 
   if (options.skipPostCreationSteps) return;
 
-  if (githubType !== 'REPO') return;
+  if (!securityDescriptorUtils.isType('GH_REPO', troupe)) return;
 
   /* Created here */
   /* TODO: Later we'll need to handle private repos too */
@@ -141,7 +142,7 @@ function doPostGitHubRoomCreationTasks(troupe, user, githubType, security, optio
     hookCreationFailedDueToMissingScope = true;
   }
 
-  if(security === 'PUBLIC' && badgerEnabled && options.addBadge) {
+  if(securityDescriptorUtils.isPublic(troupe) && badgerEnabled && options.addBadge) {
     /* Do this asynchronously (don't chain the promise) */
     userSettingsService.getUserSettings(user.id, 'badger_optout')
       .then(function(badgerOptOut) {
@@ -684,89 +685,6 @@ function addUserToRoom(room, instigatingUser, userToAdd) {
     });
 }
 
-
-/* Re-insure that each user in the room has access to the room */
-
-// DISABLED
-// function revalidatePermissionsForUsers(room) {
-//   return roomMembershipService.findMembersForRoom(room._id)
-//     .then(function(userIds) {
-//         if(!userIds.length) return;
-//
-//         return userService.findByIds(userIds)
-//           .then(function(users) {
-//             var usersHash = collections.indexById(users);
-//
-//             var removalUserIds = [];
-//
-//             /** TODO: warning: this may run 10000 promises in parallel */
-//             return Promise.map(userIds, function(userId) {
-//               var user = usersHash[userId];
-//               if(!user) {
-//                 // Can't find the user?, remove them
-//                 logger.warn('Unable to find user, removing from troupe', { userId: userId, troupeId: room.id });
-//                 removalUserIds.push(userId);
-//                 return;
-//               }
-//
-//               return roomPermissionsModel(user, 'join', room)
-//                 .then(function(access) {
-//                   if(!access) {
-//                     logger.warn('User no longer has access to room', { userId: userId, troupeId: room.id });
-//                     removalUserIds.push(userId);
-//                   }
-//                 });
-//             })
-//             .then(function() {
-//               if (!removalUserIds.length) return;
-//               return roomMembershipService.removeRoomMembers(room._id, removalUserIds, GROUPID);
-//             });
-//           });
-//     });
-//
-// }
-
-/**
- * The security of a room may be off. Do a check and update if required
- */
-function ensureRepoRoomSecurity(uri, security) {
-  if(security !== 'PRIVATE' && security !== 'PUBLIC') {
-    return Promise.reject(new Error("Unknown security type: " + security));
-  }
-
-  return troupeService.findByUri(uri)
-    .then(function(troupe) {
-      if(!troupe) return;
-
-      if(troupe.githubType !== 'REPO') throw new Error("Only repo room security can be changed");
-
-      /* No need to change it? */
-      if(troupe.security === security) return;
-
-      logger.info('Security of troupe does not match. Updating.', {
-        roomId: troupe.id,
-        uri: uri,
-        current: troupe.security,
-        security: security
-      });
-
-      troupe.security = security;
-      troupe.dateLastSecurityCheck = new Date();
-
-      return troupe.save()
-        // .then(function() {
-        //   if(security === 'PUBLIC') return;
-        //
-        //   /* Only do this after the save, otherwise
-        //    * multiple events will be generated */
-        //
-        //   return revalidatePermissionsForUsers(troupe);
-        // })
-        .return(troupe);
-
-    });
-}
-
 /**
  * Remove user from room
  * If the user to be removed is not the one requesting, check permissions
@@ -990,12 +908,9 @@ module.exports = {
   createRoomByUri: createRoomByUri,
   joinRoom: Promise.method(joinRoom),
   addUserToRoom: addUserToRoom,
-  /* DISABLED revalidatePermissionsForUsers: revalidatePermissionsForUsers, */
-  ensureRepoRoomSecurity: ensureRepoRoomSecurity,
   removeUserFromRoom: Promise.method(removeUserFromRoom),
   removeRoomMemberById: removeRoomMemberById,
   hideRoomFromUser: hideRoomFromUser,
-
   findBanByUsername: findBanByUsername,
   searchRooms: searchRooms,
   deleteRoom: deleteRoom,

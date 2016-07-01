@@ -19,6 +19,7 @@ var _ = require('underscore');
 var StatusError = require('statuserror');
 var fonts = require('../../web/fonts');
 var getAvatarUrlForUriContext = require('../../web/get-avatar-url-for-uri-context');
+var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
 
 var ONE_DAY_SECONDS = 60 * 60 * 24; // 1 day
 var ONE_DAY_MILLISECONDS = ONE_DAY_SECONDS * 1000;
@@ -53,6 +54,7 @@ function generateChatTree(chatActivity) {
   //console.log(JSON.stringify(yearMap, null, 2));
 
   // change the nested maps into sorted nested arrays of objects
+  // O(𝑛³) code uphead. Good times.
   var yearArray = [];
   _.each(yearMap, function(monthMap, year) {
     var monthArray = [];
@@ -104,7 +106,7 @@ exports.datesList = [
       noindex: troupe.noindex,
       roomUrl: roomUrl,
       accessToken: req.accessToken,
-      public: troupe.security === 'PUBLIC',
+      public: securityDescriptorUtils.isPublic(troupe),
       headerView: {
         // TODO: move all the headerView things in here
         avatarUrl: roomAvatarUrl
@@ -160,7 +162,7 @@ exports.linksList = [
       noindex: troupe.noindex,
       roomUrl: roomUrl,
       accessToken: req.accessToken,
-      public: troupe.security === 'PUBLIC',
+      public: securityDescriptorUtils.isPublic(troupe.security),
       headerView: {
         // TODO: move all the headerView things in here
         avatarUrl: roomAvatarUrl

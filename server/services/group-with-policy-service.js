@@ -10,7 +10,18 @@ var debug = require('debug')('gitter:app:group-with-policy-service');
 var roomService = require('./room-service');
 var secureMethod = require('../utils/secure-method');
 var validateRoomName = require('gitter-web-validators/lib/validate-room-name');
-var validateRoomSecurity = require('gitter-web-validators/lib/validate-room-security');
+
+/**
+ * @private
+ */
+function validateRoomSecurity(type, security) {
+  if (security === 'PUBLIC' || security === 'PRIVATE') {
+    return true;
+  } else if (type && security === 'INHERITED') {
+    return true;
+  }
+  return false;
+}
 
 /**
  * This could do with a better name
