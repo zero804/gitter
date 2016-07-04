@@ -13,7 +13,7 @@ var restSerializer = require("../serializers/rest-serializer");
 var unreadItemService = require("./unread-items");
 var chatService = require("./chat-service");
 var userService = require("./user-service");
-var userSearchService = require('./user-search-service');
+var userTypeahead = require('./typeaheads/user-typeahead');
 var eventService = require("./event-service");
 var roomService = require('./room-service');
 var roomMembershipService = require('./room-membership-service');
@@ -96,10 +96,10 @@ function serializeUsersForTroupe(troupeId, userId, options) {
       return Promise.resolve([]);
     }
 
-    return userSearchService.searchForUsersInRoom(searchTerm, troupeId, { limit: limit })
-      .then(function(resp) {
-        var strategy = new restSerializer.UserStrategy();
-        return restSerializer.serialize(resp.results, strategy);
+    return userTypeahead.query(searchTerm, troupeId)
+      .then(function(userIds) {
+        var strategy = new restSerializer.UserIdStrategy();
+        return restSerializer.serialize(userIds, strategy);
       });
 
   }
