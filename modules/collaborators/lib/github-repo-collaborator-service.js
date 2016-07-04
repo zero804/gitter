@@ -60,7 +60,7 @@ GitHubRepoCollaboratorService.prototype.findCollaborators = function() {
         return {
           displayName: member.login,
           githubUsername: member.login,
-          avatar: avatars.getForGitHubUsername(member.login)
+          avatarUrl: avatars.getForGitHubUsername(member.login)
         }
       });
     });

@@ -56,6 +56,8 @@ function findCollaborators(user, type, linkPath) {
 
       return userCollaboratorFactory(user)
         .then(function(collaboratorsService) {
+          if (!collaboratorsService) return [];
+
           return collaboratorsService.findCollaborators();
         });
     });
