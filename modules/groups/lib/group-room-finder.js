@@ -37,6 +37,10 @@ function queryForPublicRooms(groupId) {
   return { groupId: groupId, 'sd.public': true };
 }
 
+function queryForPublicRoomsInGroupIds(groupIds) {
+  return { groupId: { $in: groupIds }, 'sd.public': true };
+}
+
 function queryForAccessibleRooms(groupId, userId) {
   if (!userId) return queryForPublicRooms(groupId);
 
@@ -56,5 +60,6 @@ function queryForAccessibleRooms(groupId, userId) {
 
 module.exports = {
   queryForPublicRooms: queryForPublicRooms,
+  queryForPublicRoomsInGroupIds: queryForPublicRoomsInGroupIds,
   queryForAccessibleRooms: Promise.method(queryForAccessibleRooms)
 }

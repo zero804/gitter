@@ -1,31 +1,24 @@
 'use strict';
 
-var Promise = require('bluebird');
-var _ = require('lodash');
 var restSerializer = require('../../../serializers/rest-serializer');
-var troupeService = require('../../../services/troupe-service');
-var roomMembershipService = require('../../../services/room-membership-service');
-var collections = require('../../../utils/collections');
+var util = require('util');
+var groupRoomSuggestions = require('gitter-web-groups/lib/group-room-suggestions');
+var groupService = require('gitter-web-groups/lib/group-service');
 
 /* TODO: replace this */
 module.exports = {
-  index: function(req) {
+  index: util.deprecate(function(req) {
+    if (!req.user) return [];
     var userId = req.user._id;
-    var orgName = req.params.orgName.toLowerCase();
-    return Promise.join(
-        troupeService.findChildRoomsForOrg(orgName, {security: 'PUBLIC'}),
-        roomMembershipService.findRoomIdsForUser(userId),
-        function(rooms, existingRoomIds) {
-          /* TODO: this basically suggests 12 random rooms :( */
-          var idMap = collections.hashArray(existingRoomIds);
 
-          return _.reject(rooms, function(room) {
-            return idMap[room.id];
-          }).slice(0, 12);
-        }
-      )
+    return groupService.findByUri(req.params.orgName)
+      .then(function(group) {
+        if (!group) return [];
+
+        return groupRoomSuggestions.findUnjoinedRoomsInGroup(group._id, userId);
+      })
       .then(function(suggestions) {
         return restSerializer.serialize(suggestions, new restSerializer.SuggestedRoomStrategy({ }));
       });
-  },
+  }, '/v1/orgs/:orgName/suggestedRooms is deprecated')
 };

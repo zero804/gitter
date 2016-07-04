@@ -90,18 +90,17 @@ function checkGitHubTypeForUri(uri, githubType) {
     });
 }
 
-function findChildRoomsForOrg(org, opts) {
-  if (!org) return Promise.resolve([]);
-  opts = opts || {};
-
-  var query = { lcOwner: org.toLowerCase() };
-  if (opts.security) query.security = opts.security;
+function findPublicRoomsByTypeAndLinkPaths(type, linkPaths) {
+  var query = {
+    'sd.type': type,
+    'sd.linkPath': { $in: linkPaths },
+    'sd.public': true
+  };
 
   return persistence.Troupe.find(query)
-    .sort({ userCount: 'desc' })
-    .exec();
+    .lean()
+    .exec()
 }
-
 
 module.exports = {
   findByUri: findByUri,
@@ -112,5 +111,5 @@ module.exports = {
   findByIdsLean: findByIdsLean,
   findByIdLeanWithMembership: findByIdLeanWithMembership,
   checkGitHubTypeForUri: checkGitHubTypeForUri,
-  findChildRoomsForOrg: findChildRoomsForOrg,
+  findPublicRoomsByTypeAndLinkPaths: findPublicRoomsByTypeAndLinkPaths
 };
