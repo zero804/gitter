@@ -103,8 +103,6 @@ var HeaderView = Marionette.ItemView.extend({
 
   serializeData: function() {
     var data = this.model.toJSON();
-    var orgName = getOrgNameFromTroupeName(data.name);
-    var orgPageHref = '/orgs/' + orgName + '/rooms/';
     _.extend(data, {
       headerView: {
         avatarUrl: getAvatarUrlForRoom(this.model),
@@ -119,8 +117,6 @@ var HeaderView = Marionette.ItemView.extend({
       oneToOne:        (data.githubType === 'ONETOONE'),
       githubLink:      getGithubUrl(data),
       isPrivate:       getPrivateStatus(data),
-      orgName:         orgName,
-      orgPageHref:     orgPageHref,
       shouldShowPlaceholderRoomTopic: data.userCount <= 1,
       isRightToolbarPinned: this.getIsRightToolbarPinned()
     });
