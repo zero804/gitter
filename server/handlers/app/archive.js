@@ -91,7 +91,7 @@ exports.datesList = [
 
     var roomUrl = '/api/v1/rooms/' + troupe.id;
     var roomAvatarUrl = getAvatarUrlForUriContext(req.uriContext);
-    var isPrivate = troupe.security !== "PUBLIC";
+    var isPrivate = !securityDescriptorUtils.isPublic(troupe);
 
     var templateContext = {
       layout: 'archive',
@@ -147,7 +147,7 @@ exports.linksList = [
 
     var roomUrl = '/api/v1/rooms/' + troupe.id;
     var roomAvatarUrl = getAvatarUrlForUriContext(req.uriContext);
-    var isPrivate = troupe.security !== "PUBLIC";
+    var isPrivate = !securityDescriptorUtils.isPublic(troupe);
 
     var templateContext = {
       layout: 'archive',
@@ -162,7 +162,7 @@ exports.linksList = [
       noindex: troupe.noindex,
       roomUrl: roomUrl,
       accessToken: req.accessToken,
-      public: securityDescriptorUtils.isPublic(troupe.security),
+      public: securityDescriptorUtils.isPublic(troupe),
       headerView: {
         // TODO: move all the headerView things in here
         avatarUrl: roomAvatarUrl
@@ -291,7 +291,7 @@ exports.chatArchive = [
             var roomUrl = '/api/v1/rooms/' + troupe.id;
 
             var roomAvatarUrl = getAvatarUrlForUriContext(req.uriContext);
-            var isPrivate = troupe.security !== "PUBLIC";
+            var isPrivate = !securityDescriptorUtils.isPublic(troupe);
 
             /*
             What I'm trying to do here is: The current day is still in-progress, so

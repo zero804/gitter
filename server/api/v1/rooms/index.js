@@ -136,8 +136,6 @@ module.exports = {
   destroy: function(req) {
     return loadTroupeFromParam(req)
       .then(function(troupe) {
-        if (troupe.oneToOne || !troupe.uri) throw new StatusError(400, 'cannot delete one to one rooms');
-
         var roomWithPolicyService = new RoomWithPolicyService(troupe, req.user, req.userRoomPolicy);
         return roomWithPolicyService.deleteRoom();
       })
