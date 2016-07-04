@@ -6,7 +6,7 @@ var _ = require('lodash');
 var GithubMe = require('gitter-web-github').GitHubMeService;
 var gitHubEmailAddressService = require('./github-email-address-service');
 var gitHubProfileService = require('./github-profile-service');
-var gitHubInviteUserSuggestionsService = require('./github-invite-user-suggestions.js');
+var gitHubInviteUserSuggestionsService = require('./github-invite-user-suggestions');
 
 
 function GitHubBackend(user, identity) {
