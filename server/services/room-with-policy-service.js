@@ -133,9 +133,7 @@ RoomWithPolicyService.prototype.toggleSearchIndexing = secureMethod(allowAdmin, 
 });
 
 function canBanInRoom(room) {
-  if(room.githubType === 'ONETOONE') return false;
-  if(room.githubType === 'ORG') return false;
-  if(room.security === 'PRIVATE') return false; /* No bans in private rooms */
+  if (room.oneToOne) return false;
 
   return true;
 }
@@ -149,9 +147,11 @@ RoomWithPolicyService.prototype.banUserFromRoom = secureMethod([allowStaff, allo
 
   if (!username) throw new StatusError(400, 'Username required');
   if (currentUser.username === username) throw new StatusError(400, 'You cannot ban yourself');
+
   if (!canBanInRoom(room)) throw new StatusError(400, 'This room does not support banning.');
 
   return userService.findByUsername(username)
+    .bind(this)
     .then(function(bannedUser) {
       if(!bannedUser) throw new StatusError(404, 'User ' + username + ' not found.');
 
@@ -160,6 +160,21 @@ RoomWithPolicyService.prototype.banUserFromRoom = secureMethod([allowStaff, allo
       });
 
       if(existingBan) return existingBan;
+
+      // If there is already a ban or the room
+      // type doesn't make sense for a ban, just remove the user
+      // TODO: re-address this in https://github.com/troupe/gitter-webapp/pull/1679
+      // Just ensure that the user is removed from the room
+      if (existingBan) {
+        return this.removeUserFromRoom(bannedUser)
+          .return(existingBan)
+      }
+
+      if (room.githubType === 'ORG' || room.security === 'PRIVATE') {
+        return this.removeUserFromRoom(bannedUser)
+          .return(null); // Signals that the user was removed from room, but not banned
+      }
+
 
       // Don't allow admins to be banned!
       return policyFactory.createPolicyForRoom(bannedUser, room)
