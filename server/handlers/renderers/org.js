@@ -28,7 +28,7 @@ function findRooms(groupId, user, currentPage) {
 
   var skip = (currentPage - 1) * ROOMS_PER_PAGE;
   if (skip > 2000) throw new StatusError(400);
-  
+
   return groupBrowserService.findRoomsWithPagination(groupId, userId, {
       skip: skip,
       limit: ROOMS_PER_PAGE

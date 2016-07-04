@@ -14,6 +14,7 @@ var billingService = require('../../services/billing-service');
 var leanUserDao = require('../../services/daos/user-dao').full;
 var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 var userScopes = require('gitter-web-identity/lib/user-scopes');
+var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
 
 function UserPremiumStatusStrategy() {
   var usersWithPlans;
@@ -54,7 +55,8 @@ function UserRoleInTroupeStrategy(options) {
         if (!troupe) return;
 
         /* Only works for repos */
-        if (troupe.githubType !== 'REPO') return;
+        var linkPath = securityDescriptorUtils.getLinkPathIfType('GH_REPO', troupe);
+        if (!linkPath) return;
         var userPromise;
 
         if (options.currentUser) {
@@ -67,12 +69,23 @@ function UserRoleInTroupeStrategy(options) {
           return userPromise.then(function(user) {
             /* Need a user to perform the magic */
             if (!user) return;
-            var uri = troupe.uri;
-            ownerLogin = uri.split('/')[0];
+            ownerLogin = linkPath.split('/')[0];
 
             var contributorService = new GithubContributorService(user);
-            return contributorService.getContributors(uri)
+            return contributorService.getContributors(linkPath)
               .timeout(1000)
+              .then(function(githubContributors) {
+                contributors = {};
+                if (githubContributors) {
+                  githubContributors.forEach(function(contributor) {
+                    contributors[contributor.login] = 'contributor';
+                  });
+                }
+
+                // Temporary stop-gap solution until we can figure out
+                // who the admins are
+                contributors[ownerLogin] = 'admin';
+              })
               .catch(function(err) {
                 /* Github Repo failure. Die quietely */
                 winston.info('Contributor fetch failed: ' + err);
@@ -80,19 +93,6 @@ function UserRoleInTroupeStrategy(options) {
               });
           });
         }
-      })
-      .then(function(githubContributors) {
-        contributors = {};
-
-        if (githubContributors) {
-          githubContributors.forEach(function(contributor) {
-            contributors[contributor.login] = 'contributor';
-          });
-        }
-
-        // Temporary stop-gap solution until we can figure out
-        // who the admins are
-        contributors[ownerLogin] = 'admin';
       });
   };
 
