@@ -118,7 +118,7 @@ module.exports = Marionette.LayoutView.extend({
 
   changeMenuState: function(state){
     this.model.set({
-      panelopenstate: true,
+      panelOpenState: true,
       state: state,
       profileMenuOpenState: false,
     });
