@@ -276,6 +276,8 @@ RoomWithPolicyService.prototype.updateRoomWelcomeMessage = secureMethod([allowAd
  * Delete a room
  */
 RoomWithPolicyService.prototype.deleteRoom = secureMethod([allowAdmin], function() {
+  if (this.room.oneToOne) throw new StatusError(400, 'cannot delete one to one rooms');
+
   logger.warn('User deleting room ', { roomId: this.room._id, username: this.user.username, userId: this.user._id });
   return roomService.deleteRoom(this.room);
 });

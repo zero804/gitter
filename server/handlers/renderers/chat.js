@@ -18,6 +18,7 @@ var generateRightToolbarSnapshot = require('../snapshots/right-toolbar-snapshot'
 var troupeService = require('../../services/troupe-service');
 var roomMembershipService = require('../../services/room-membership-service');
 var getAvatarUrlForUriContext = require('../../web/get-avatar-url-for-uri-context');
+var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
 
 /* How many chats to send back */
 var INITIAL_CHAT_COUNT = 50;
@@ -72,7 +73,7 @@ function renderChat(req, res, options, next) {
 
         if (!user) classNames.push("logged-out");
 
-        var isPrivate = troupe.security !== "PUBLIC";
+        var isPrivate = !securityDescriptorUtils.isPublic(troupe);
         var integrationsUrl;
 
         if (troupeContext && troupeContext.isNativeDesktopApp) {
