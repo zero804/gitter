@@ -133,14 +133,6 @@ RoomWithPolicyService.prototype.toggleSearchIndexing = secureMethod(allowAdmin, 
   return room.save();
 });
 
-function canBanInRoom(room) {
-  if (room.oneToOne) return false;
-  // Can only ban people from public rooms
-  if (!securityDescriptorUtils.isPublic(room)) return false;
-
-  return true;
-}
-
 /**
  * Ban a user from the room. Caller should ensure admin permissions
  */
@@ -150,9 +142,13 @@ RoomWithPolicyService.prototype.banUserFromRoom = secureMethod([allowStaff, allo
 
   if (!username) throw new StatusError(400, 'Username required');
   if (currentUser.username === username) throw new StatusError(400, 'You cannot ban yourself');
-  if (!canBanInRoom(room)) throw new StatusError(400, 'This room does not support banning.');
+
+  if (room.oneToOne) {
+    throw new StatusError(400, 'Cannot ban in a oneToOne room');
+  }
 
   return userService.findByUsername(username)
+    .bind(this)
     .then(function(bannedUser) {
       if(!bannedUser) throw new StatusError(404, 'User ' + username + ' not found.');
 
@@ -160,7 +156,20 @@ RoomWithPolicyService.prototype.banUserFromRoom = secureMethod([allowStaff, allo
         return mongoUtils.objectIDsEqual(ban.userId, bannedUser._id);
       });
 
-      if(existingBan) return existingBan;
+      // If there is already a ban or the room
+      // type doesn't make sense for a ban, just remove the user
+      // TODO: re-address this in https://github.com/troupe/gitter-webapp/pull/1679
+      // Just ensure that the user is removed from the room
+      if (existingBan) {
+        return this.removeUserFromRoom(bannedUser)
+          .return(existingBan)
+      }
+
+      // Can only ban people from public rooms
+      if (!securityDescriptorUtils.isPublic(room)) {
+        return this.removeUserFromRoom(bannedUser)
+          .return(null); // Signals that the user was removed from room, but not banned
+      }
 
       // Don't allow admins to be banned!
       return policyFactory.createPolicyForRoom(bannedUser, room)
