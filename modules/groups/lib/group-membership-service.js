@@ -41,7 +41,11 @@ function findGroupsForUser(userId) {
           _id: '$group._id',
           name: '$group.name',
           uri: '$group.uri',
-          lcUri: '$group.lcUri'
+          lcUri: '$group.lcUri',
+          sd: {
+            type: '$group.sd.type',
+            linkPath: '$group.sd.linkPath'
+          }
         }
       }])
       .read('primaryPreferred')
