@@ -61,6 +61,8 @@ module.exports = {
    */
   create: function(req) {
     var roomUri = req.query.uri || req.body.uri;
+    roomUri = roomUri ? String(roomUri) : undefined;
+
     var addBadge = req.body.addBadge || false;
 
     if (!roomUri) throw new StatusError(400);

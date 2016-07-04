@@ -112,4 +112,9 @@ router.get('/check-group-uri',
   identifyRoute('api-private-check-group-uri'),
   require('./check-group-uri'));
 
+router.post('/create-github-room',
+  authMiddleware,
+  identifyRoute('api-private-create-github-room'),
+  require('./create-github-room'));
+
 module.exports = router;
