@@ -1,83 +1,64 @@
 'use strict';
 
-var testRequire = require('./../test-require');
-var getCollaboratorForRoom = testRequire('./services/collaborators-service');
+var collaboratorsService = require('../lib/collaborators-service');
 var FAKE_USER = { username: 'gittertestbot', githubToken: '***REMOVED***'};
 var assert = require('assert');
-
 
 function assertNoDuplicates(collaborators) {
   var logins = {};
   collaborators.forEach(function(collaborator) {
-    assert(!logins[collaborator.username]);
-    logins[collaborator.username] = true;
+    // TODO: add other services into this test
+    assert(!logins[collaborator.githubUsername]);
+    logins[collaborator.githubUsername] = true;
   });
 }
 
 describe('collaborators-service #slow', function() {
-
   it('should return collaborators for a PUBLIC REPO', function() {
-    return getCollaboratorForRoom({ security: 'PUBLIC', githubType: 'REPO', uri: 'gitterHQ/gitter' }, FAKE_USER)
+    return collaboratorsService.findCollaborators(FAKE_USER, 'GH_REPO', 'gitterHQ/gitter')
       .then(function(collaborators) {
         assert(Array.isArray(collaborators));
         assert(collaborators.length > 0);
-        assert(collaborators[0].username);
+        assert(collaborators[0].githubUsername);
         assertNoDuplicates(collaborators);
       });
   });
 
   it('should return collaborators for a PRIVATE REPO', function() {
-    return getCollaboratorForRoom({ security: 'PRIVATE', githubType: 'REPO', uri: 'troupe/gitter-webapp' }, FAKE_USER)
+    return collaboratorsService.findCollaborators(FAKE_USER, 'GH_REPO', 'troupe/gitter-webapp')
       .then(function(collaborators) {
-        assert(!collaborators.some(function(f) {
-          return f.username === 'waltfy';
-        }));
-
-        assert(!collaborators.some(function(f) {
-          return f.username === 'timlind';
-        }));
-
         assert(Array.isArray(collaborators));
         assert(collaborators.length > 0);
-        assert(collaborators[0].username);
+        assert(collaborators[0].githubUsername);
         assertNoDuplicates(collaborators);
       });
   });
 
   it('should return collaborators for a unknown REPO', function() {
-    return getCollaboratorForRoom({ security: 'PUBLIC', githubType: 'REPO', uri: 'troupe/xyz' }, FAKE_USER)
+    return collaboratorsService.findCollaborators(FAKE_USER, 'GH_REPO', 'troupe/xyz')
       .then(function(collaborators) {
         assert(Array.isArray(collaborators));
-        assert(collaborators.length > 0);
-        assert(collaborators[0].username);
+        assert.strictEqual(collaborators.length, 0);
         assertNoDuplicates(collaborators);
       });
   });
 
   it('should return collaborators for an ORG', function() {
-    return getCollaboratorForRoom({ githubType: 'ORG', uri: 'troupe' }, FAKE_USER)
+    return collaboratorsService.findCollaborators(FAKE_USER, 'GH_ORG', 'troupe')
       .then(function(collaborators) {
-        assert(!collaborators.some(function(f) {
-          return f.username === 'waltfy';
-        }));
-
-        assert(!collaborators.some(function(f) {
-          return f.username === 'timlind';
-        }));
-
         assert(Array.isArray(collaborators));
         assert(collaborators.length > 0);
-        assert(collaborators[0].username);
+        assert(collaborators[0].githubUsername);
         assertNoDuplicates(collaborators);
       });
   });
 
   it('should return collaborators for an USER', function() {
-    return getCollaboratorForRoom({ githubType: 'USER', uri: 'gittertestbot' }, FAKE_USER)
+    return collaboratorsService.findCollaborators(FAKE_USER, null, null)
       .then(function(collaborators) {
         assert(Array.isArray(collaborators));
-        assert(collaborators.length > 0);
-        assert(collaborators[0].username);
+        // assert(collaborators.length > 0);
+        // assert(collaborators[0].githubUsername);
         assertNoDuplicates(collaborators);
       });
   });
