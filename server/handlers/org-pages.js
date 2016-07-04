@@ -8,6 +8,7 @@ var renderOrg = require('./renderers/org');
 var featureToggles = require('../web/middlewares/feature-toggles');
 var StatusError = require('statuserror');
 var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
+var redirectErrorMiddleware = require('./uri-context/redirect-error-middleware');
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
 function handleOrgPage(req, res, next) {
@@ -33,13 +34,15 @@ router.get('/:groupUri/rooms',
   identifyRoute('group-rooms-mainframe'),
   featureToggles,
   groupContextResolverMiddleware,
-  handleOrgPageInFrame);
+  handleOrgPageInFrame,
+  redirectErrorMiddleware);
 
 router.get('/:groupUri/rooms/~iframe',
   identifyRoute('group-rooms-frame'),
   featureToggles,
   isPhoneMiddleware,
   groupContextResolverMiddleware,
-  handleOrgPage);
+  handleOrgPage,
+  redirectErrorMiddleware);
 
 module.exports = router;
