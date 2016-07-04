@@ -65,6 +65,8 @@ module.exports = {
 
     if (!roomUri) throw new StatusError(400);
 
+    // TODO: change this to a simple resolve,
+    // except in the case of a user
     return roomService.createRoomByUri(req.user, roomUri, { ignoreCase: true, addBadge: addBadge })
       .then(function (createResult) {
         var strategy = new restSerializer.TroupeStrategy({
