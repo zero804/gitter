@@ -151,8 +151,12 @@ var cardMiddlewarePipeline = [
   uriContextResolverMiddleware,
   timezoneMiddleware,
   function (req, res, next) {
-    if(!req.uriContext.troupe) return next(new StatusError(404));
-    if(req.uriContext.troupe.security !== 'PUBLIC') return next(new StatusError(403));
+    var troupe = req.uriContext.troupe;
+    
+    if(!troupe) return next(new StatusError(404));
+    if (!securityDescriptorUtils.isPublic(troupe)) {
+      return next(new StatusError(403));
+    }
     if(!req.query.at) return next(new StatusError(400));
     chatRenderer.renderChatCard(req, res, next);
   },
