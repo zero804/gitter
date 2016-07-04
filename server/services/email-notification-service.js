@@ -185,6 +185,7 @@ module.exports = {
     var isPublic = !!(room && securityDescriptorUtils.isPublic(room));
 
     var recipientName = (user.displayName || user.username).split(' ')[0];
+    var roomSecurityDescription = isPublic ? 'public': 'private';
 
     return emailAddressService(user)
       .then(function (email) {
@@ -217,7 +218,7 @@ module.exports = {
             isPublic: isPublic,
             unsubscribeUrl: unsubscribeUrl,
             recipientName: recipientName,
-            roomType: room.security.toLowerCase(),
+            roomType: roomSecurityDescription,
             roomUri: room.uri,
             roomUrl: roomUrl,
             twitterURL: twitterURL
