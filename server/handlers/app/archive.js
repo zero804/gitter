@@ -312,7 +312,6 @@ exports.chatArchive = [
               layout: 'archive',
               archives: true,
               archiveChats: true,
-              isRepo: troupe.githubType === 'REPO',
               bootScriptName: 'router-archive-chat',
               cssFileName: 'styles/router-archive-chat.css',
               githubLink: '/' + req.uriContext.uri,
