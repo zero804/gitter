@@ -94,29 +94,6 @@ function applyAutoHooksForRepoRoom(user, troupe) {
 
 }
 
-
-/**
- * Returns Promise{boolean} if the user can join the room
- */
-function joinRoomForGitHubUri(user, troupe) {
-  /* The troupe exists. Ensure it's not past the max limit and the user can join */
-  return policyFactory.createPolicyForRoom(user, troupe)
-    .then(function(policy) {
-      return policy.canJoin();
-    })
-    .then(function(joinAccess) {
-      debug('Does user %s have access to existing room? %s', (user && user.username || '~anon~'), joinAccess);
-
-      if (!joinAccess) return false;
-
-      // If the user has access to the room, assert member count
-      return assertJoinRoomChecks(troupe, user)
-        .then(function() {
-          return true;
-        });
-    });
-}
-
 function doPostGitHubRoomCreationTasks(troupe, user, githubType, security, options) {
   var uri = troupe.uri;
   if (!user) return; // Can this ever happen?
@@ -430,7 +407,6 @@ function createRoomByUri(user, uri, options) {
     .then(function (resolved) {
       var resolvedUser = resolved && resolved.user;
       var resolvedTroupe = resolved && resolved.room;
-      var roomMember = resolved && resolved.roomMember;
       var resolvedGroup = resolved && resolved.group;
 
       // We resolved a group. There will never be a room at this URI
@@ -480,34 +456,18 @@ function createRoomByUri(user, uri, options) {
       }
 
       if (resolvedTroupe) {
-        if (roomMember) {
-          debug("User is already a member of the room %s. Allowing access", resolvedTroupe.uri);
-
-          return {
-            troupe: resolvedTroupe
-          };
-        }
-
-        debug("Room %s exists, but user is not a member", resolvedTroupe.uri);
-
-        return joinRoomForGitHubUri(user, resolvedTroupe)
-          .then(function(access) {
-            return ensureAccessControl(user, resolvedTroupe, access)
-              .then(function (userRoomMembershipChanged) {
-                if (!access) throw new StatusError(404);
-
-                // if the user has been granted access to the room, send join stats for the cases of being the owner or just joining the room
-                if(userRoomMembershipChanged) {
-                  /* Note that options.tracking is never sent as a param */
-                  sendJoinStats(user, resolvedTroupe, options.tracking);
-                }
-
-                return {
-                  troupe: resolvedTroupe,
-                  didCreate: false
-                };
-              });
+        return policyFactory.createPolicyForRoom(user, resolvedTroupe)
+          .then(function(policy) {
+            return policy.canRead();
           })
+          .then(function(access) {
+            if (!access) throw new StatusError(403);
+
+            return {
+              troupe: resolvedTroupe,
+            };
+          });
+
       }
 
       // The room does not exist, lets attempt to create it

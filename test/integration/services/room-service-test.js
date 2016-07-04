@@ -87,14 +87,14 @@ describe('room-service', function() {
         });
     });
 
-    it('should disallow users from accessing rooms they cannot join #slow', function () {
+    it('should disallow users from accessing rooms they cannot read #slow', function () {
       var uriResolver = mockito.mockFunction();
       var roomService = testRequire.withProxies('./services/room-service', {
         './uri-resolver': uriResolver,
         'gitter-web-permissions/lib/policy-factory': {
           createPolicyForRoom: function() {
             return Promise.resolve({
-              canJoin: function() {
+              canRead: function() {
                 return Promise.resolve(false);
               }
             });
@@ -129,7 +129,7 @@ describe('room-service', function() {
           assert(false, 'Expected an exception');
         })
         .catch(StatusError, function(err) {
-          assert.strictEqual(err.status, 404);
+          assert.strictEqual(err.status, 403);
         });
     });
 
@@ -320,7 +320,7 @@ describe('room-service', function() {
           createPolicyForRoom: function(user, room) {
             assert.equal(room.uri, 'gitterHQ/cloaked-avenger');
             return Promise.resolve({
-              canJoin: function() {
+              canRead: function() {
                 return Promise.resolve(true);
               }
             });
@@ -348,7 +348,7 @@ describe('room-service', function() {
           return roomMembershipService.checkRoomMembership(this.uriContext.troupe._id, fixture.user1._id);
         })
         .then(function(isRoomMember) {
-          assert.strictEqual(isRoomMember, true);
+          assert.strictEqual(isRoomMember, false);
         });
     });
 
@@ -470,7 +470,7 @@ describe('room-service', function() {
             assert.strictEqual(user, fixture.user3);
 
             return Promise.resolve({
-              canJoin: function() {
+              canRead: function() {
                 return Promise.resolve(false);
               }
             });
@@ -483,7 +483,7 @@ describe('room-service', function() {
           assert(false, 'Expected exception');
         })
         .catch(StatusError, function(err) {
-          assert.strictEqual(err.status, 404);
+          assert.strictEqual(err.status, 403);
         });
     });
   });
