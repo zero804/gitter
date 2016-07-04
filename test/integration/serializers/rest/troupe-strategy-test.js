@@ -223,7 +223,6 @@ describe('TroupeStrategy', function() {
           githubType: 'USER_CHANNEL',
           security: 'PUBLIC',
           noindex: false,
-          ownerIsOrg: false,
           v: 1
         }]);
       });
