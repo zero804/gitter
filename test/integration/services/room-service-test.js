@@ -1028,7 +1028,7 @@ describe('room-service', function() {
         }
       });
 
-      return roomService
+      return roomService.testOnly
         .createRoomForGitHubUri(fixture.user1, 'gitterTest')
         .then(function (result) {
           assert.equal(result.troupe.uri, 'gitterTest');
@@ -1068,8 +1068,8 @@ describe('room-service', function() {
       });
 
       return Promise.join(
-        roomService.createRoomForGitHubUri(fixture.user1, 'gitterTest'),
-        roomService.createRoomForGitHubUri(fixture.user1, 'gitterTest'),
+        roomService.testOnly.createRoomForGitHubUri(fixture.user1, 'gitterTest'),
+        roomService.testOnly.createRoomForGitHubUri(fixture.user1, 'gitterTest'),
         function(r1, r2) {
           assert(mongoUtils.objectIDsEqual(r1.troupe._id, r2.troupe._id));
         });
@@ -1256,7 +1256,7 @@ describe('room-service', function() {
         });
       });
 
-      return roomService.createRoomForGitHubUri(fixture.user1, orgUri)
+      return roomService.testOnly.createRoomForGitHubUri(fixture.user1, orgUri)
         .then(function(result) {
           assert.strictEqual(result.troupe.uri, orgUri);
           assert.strictEqual(result.troupe.githubId, githubId);
@@ -1282,7 +1282,7 @@ describe('room-service', function() {
         });
       });
 
-      return roomService.createRoomForGitHubUri(fixture.user1, fixture.troupeOrg1.uri)
+      return roomService.testOnly.createRoomForGitHubUri(fixture.user1, fixture.troupeOrg1.uri)
         .then(function(result) {
           assert.strictEqual(result.troupe.id, fixture.troupeOrg1.id);
         });
@@ -1308,7 +1308,7 @@ describe('room-service', function() {
         });
       });
 
-      return roomService.createRoomForGitHubUri(fixture.user1, fixture.troupeDup1.uri)
+      return roomService.testOnly.createRoomForGitHubUri(fixture.user1, fixture.troupeDup1.uri)
         .then(function(result) {
           assert.strictEqual(result.troupe.id, fixture.troupeDup2.id);
         });

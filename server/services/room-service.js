@@ -904,7 +904,6 @@ function upsertGroupRoom(user, group, roomInfo, securityDescriptor, options) {
 module.exports = {
   applyAutoHooksForRepoRoom: applyAutoHooksForRepoRoom,
   findAllRoomsIdsForUserIncludingMentions: findAllRoomsIdsForUserIncludingMentions,
-  createRoomForGitHubUri: Promise.method(createRoomForGitHubUri),
   createRoomByUri: createRoomByUri,
   joinRoom: Promise.method(joinRoom),
   addUserToRoom: addUserToRoom,
@@ -916,6 +915,7 @@ module.exports = {
   deleteRoom: deleteRoom,
   upsertGroupRoom: upsertGroupRoom,
   testOnly: {
-    updateUserDateAdded: updateUserDateAdded
+    updateUserDateAdded: updateUserDateAdded,
+    createRoomForGitHubUri: createRoomForGitHubUri,
   }
 };
