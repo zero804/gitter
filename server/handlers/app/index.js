@@ -5,7 +5,6 @@ var logger = env.logger;
 var express = require('express');
 var mainFrameRenderer = require('../renderers/main-frame');
 var chatRenderer = require('../renderers/chat');
-var userNotSignedUpRenderer = require('../renderers/user-not-signed-up');
 var uriContextResolverMiddleware = require('../uri-context/uri-context-resolver-middleware');
 var recentRoomService = require('../../services/recent-room-service');
 var isPhoneMiddleware = require('../../web/middlewares/is-phone');
@@ -20,6 +19,7 @@ var social = require('../social-metadata');
 var chatService = require('../../services/chat-service');
 var restSerializer = require("../../serializers/rest-serializer");
 var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
+var redirectErrorMiddleware = require('../uri-context/redirect-error-middleware');
 
 function saveRoom(req) {
   var userId = req.user && req.user.id;
@@ -97,15 +97,7 @@ var mainFrameMiddlewarePipeline = [
       });
     }
   },
-  function (err, req, res, next) {
-    // TODO: this is probably not being used any more
-    if (err && err.userNotSignedUp && !req.isPhone) {
-      // TODO This page is in need of some serious love
-      userNotSignedUpRenderer.renderUserNotSignedUpMainFrame(req, res, next);
-      return;
-    }
-    return next(err);
-  }
+  redirectErrorMiddleware
 ];
 
 var chatMiddlewarePipeline = [
@@ -133,13 +125,7 @@ var chatMiddlewarePipeline = [
     }
 
   },
-  function (err, req, res, next) {
-    if (err && err.userNotSignedUp) {
-      userNotSignedUpRenderer.renderUserNotSignedUp(req, res, next);
-      return;
-    }
-    return next(err);
-  }
+  redirectErrorMiddleware
 ];
 
 var embedMiddlewarePipeline = [
@@ -156,7 +142,8 @@ var embedMiddlewarePipeline = [
     } else {
       chatRenderer.renderNotLoggedInEmbeddedChat(req, res, next);
     }
-  }
+  },
+  redirectErrorMiddleware
 ];
 
 var cardMiddlewarePipeline = [
@@ -168,7 +155,8 @@ var cardMiddlewarePipeline = [
     if(req.uriContext.troupe.security !== 'PUBLIC') return next(new StatusError(403));
     if(!req.query.at) return next(new StatusError(400));
     chatRenderer.renderChatCard(req, res, next);
-  }
+  },
+  redirectErrorMiddleware
 ];
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
