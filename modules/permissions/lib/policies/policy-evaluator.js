@@ -91,6 +91,11 @@ PolicyEvaluator.prototype = {
     var contextDelegate = this._contextDelegate;
     var policyDelegate = this._policyDelegate;
 
+    // Check if the user has been banned
+    if (userId && bansIncludesUserId(this._securityDescriptor.bans, userId)) {
+      return false;
+    }
+
     if (membersPolicy === 'PUBLIC') {
       debug('canRead: allowing access to PUBLIC');
       // Shortcut for PUBLIC rooms - always allow everyone to read them
@@ -294,6 +299,19 @@ PolicyEvaluator.prototype = {
       })
   }
 };
+
+function bansIncludesUserId(bans, userId) {
+  if (!bans || !bans.length) return false;
+
+  if (bans.length === 1) {
+    return mongoUtils.objectIDsEqual(userId, bans[0].userId);
+  }
+
+  return _.some(bans, function(ban) {
+    return mongoUtils.objectIDsEqual(userId, ban.userId);
+  });
+}
+
 
 function userIdIsIn(userId, collection) {
   if (!collection || !collection.length) return false;
