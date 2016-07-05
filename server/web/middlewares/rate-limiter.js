@@ -7,7 +7,7 @@ var redisClient = redis.getClient();
 var env = require('gitter-web-env');
 var config = env.config;
 
-module.exports = dolph({
+var rateLimiter = dolph({
   prefix: 'rate:',
   limit: config.get('web:apiRateLimit') || 100,
   expiry: 60,
@@ -35,3 +35,20 @@ module.exports = dolph({
   },
   redisClient: redisClient
 });
+
+// Hacky workaround for avatar rate limit issues in our dev environments
+// until we come up with a better solution
+var rateLimiterMiddleware;
+if (process.env.NODE_ENV === 'dev') {
+  rateLimiterMiddleware = function(req, res, next) {
+    if (req.originalUrl.indexOf('/api/private/avatars') === 0) {
+      return next();
+    }
+
+    return rateLimiter(req, res, next);
+  };
+} else {
+  rateLimiterMiddleware = rateLimiter;
+}
+
+module.exports = rateLimiterMiddleware;
