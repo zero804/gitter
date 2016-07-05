@@ -1,6 +1,7 @@
 'use strict';
 
 var CommunityCreateStepViewModel = require('../community-create-step-view-model');
+var slugAvailabilityStatusConstants = require('../slug-availability-status-constants');
 
 var CommunityCreateMainStepViewModel = CommunityCreateStepViewModel.extend({
   validate: function() {
@@ -26,6 +27,12 @@ var CommunityCreateMainStepViewModel = CommunityCreateStepViewModel.extend({
       errors.push({
         key: 'communitySlug',
         message: 'Slug can only contain lowercase a-z and dashes -'
+      });
+    }
+    if(this.communityCreateModel.get('communitySlugAvailabilityStatus') !== slugAvailabilityStatusConstants.AVAILABLE) {
+      errors.push({
+        key: 'communitySlug',
+        message: 'Slug is already taken'
       });
     }
 
