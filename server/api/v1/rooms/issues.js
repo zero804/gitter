@@ -2,13 +2,14 @@
 
 var Promise = require('bluebird');
 var RepoService = require('gitter-web-github').GitHubRepoService;
+var OrgService = require('gitter-web-github').GitHubOrgService;
 var GitHubIssueService = require('gitter-web-github').GitHubIssueService;
 var processChat = require('../../../utils/markdown-processor');
 var StatusError = require('statuserror');
 var loadTroupeFromParam = require('./load-troupe-param');
 var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
 
-function getEightSuggestedIssues(issues) {
+function getEightSuggestedIssues(issues, includeRepo) {
   var suggestedIssues = [];
   for(var i = issues.length - 1; i >= 0 && suggestedIssues.length < 8; i--) {
     var issue = issues[i];
@@ -17,22 +18,31 @@ function getEightSuggestedIssues(issues) {
     }
   }
 
-  return suggestedIssues.map(trimDownIssue);
+  return suggestedIssues.map(function(issue) {
+    return {
+      title: issue.title,
+      number: includeRepo ? issue.repository.full_name + '#' + issue.number : issue.number
+    };
+  });
 }
 
-function getTopEightMatchingIssues(issues, term) {
-  var matches = issues.filter(function(issue) {
-    return issue && (''+issue.number).indexOf(term) === 0;
-  }).slice(0, 8).map(trimDownIssue);
+function getTopEightMatchingIssues(issues, term, includeRepo) {
+  var matches = issues
+    .filter(function(issue) {
+      return issue && (''+issue.number).indexOf(term) === 0;
+    })
+    .slice(0, 8)
+    .map(function(issue) {
+      return {
+        title: issue.title,
+        number: includeRepo ? issue.repository.full_name + '#' + issue.number : issue.number
+      };
+    });
+
   return matches;
 }
 
-function trimDownIssue(issue) {
-  return {
-    title: issue.title,
-    number: issue.number
-  };
-}
+
 
 module.exports = {
   id: 'issue',
@@ -42,26 +52,43 @@ module.exports = {
     var issueNumber = req.query.issueNumber || '';
 
     return Promise.try(function() {
-        if (repoName) return repoName;
+        if (repoName) return [repoName];
 
         // Resolve the repo name from the room
         return loadTroupeFromParam(req)
           .then(function(troupe) {
-            return securityDescriptorUtils.getLinkPathIfType('GH_REPO', troupe);
+            return [
+              securityDescriptorUtils.getLinkPathIfType('GH_REPO', troupe),
+              securityDescriptorUtils.getLinkPathIfType('GH_ORG', troupe),
+            ];
           });
       })
-      .then(function(repoName) {
-        if (!repoName) return [];
-        var repoService = new RepoService(req.user);
+      .bind({
+        includeRepo: false
+      })
+      .spread(function(repoName, orgName) {
+        if (repoName) {
+          var repoService = new RepoService(req.user);
 
-        return repoService.getIssues(repoName, {
+          return repoService.getIssues(repoName, {
             firstPageOnly: !issueNumber
-          })
-          .then(function(issues) {
-            var matches = issueNumber ? getTopEightMatchingIssues(issues, issueNumber) : getEightSuggestedIssues(issues);
-            return matches;
           });
-        });
+        }
+
+        if (orgName) {
+          var orgService = new OrgService(req.user);
+          this.includeRepo = true;
+          return orgService.getIssues(orgName, {
+            firstPageOnly: true // Only fetch the first page for org issues
+          });
+        }
+
+        return [];
+      })
+      .then(function(issues) {
+        var matches = issueNumber ? getTopEightMatchingIssues(issues, issueNumber, this.includeRepo) : getEightSuggestedIssues(issues, this.includeRepo);
+        return matches;
+      });
   },
 
   show: function(req) {
