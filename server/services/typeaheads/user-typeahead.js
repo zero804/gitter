@@ -211,9 +211,15 @@ function reindexMemberships() {
   return new Promise(function(resolve, reject) {
     var troupeUserStream = persistence.TroupeUser.aggregate([
       {
+        $group: {
+          _id: '$troupeId',
+          userIds: { $push: '$userId' }
+        }
+      },
+      {
         $lookup: {
           from: 'troupes',
-          localField: 'troupeId',
+          localField: '_id',
           foreignField: '_id',
           as: 'troupe'
         }
@@ -227,16 +233,16 @@ function reindexMemberships() {
       },
       {
         $project: {
-          // id is included by default but we dont need it
-          _id: false,
-          userId: true,
-          troupeId: true
+          userIds: true
         }
       },
       {
+        $unwind: '$userIds'
+      },
+      {
         $group: {
-          _id: '$userId',
-          troupeIds: { $push: '$troupeId' }
+          _id: '$userIds',
+          troupeIds: { $push: '$_id' }
         }
       }
     ])
