@@ -281,6 +281,12 @@ module.exports = Backbone.Model.extend({
     if(!this.get('roomMenuIsPinned')) { this.set('panelOpenState', false); }
   },
 
+  getCurrentGroup: function (){
+    if(this.get('state') !== 'org') { return false; }
+    var selectedOrg = this.get('selectedOrgname');
+    return this.minibarCollection.findWhere({ name: selectedOrg });
+  },
+
   _getModel: function (prop, val){
     var query = {}; query[prop] = val;
     return this.primaryCollection.findWhere(query) ||
