@@ -1,7 +1,7 @@
 "use strict";
 
-var getCollaboratorForRoom = require('../../../services/collaborators-service');
 var loadTroupeFromParam = require('./load-troupe-param');
+var collaboratorsService = require('gitter-web-collaborators');
 
 module.exports = {
   id: 'resourceTroupeUser',
@@ -9,8 +9,7 @@ module.exports = {
   index: function(req) {
     return loadTroupeFromParam(req)
       .then(function(troupe) {
-        // Why does this not use a serializer?
-        return getCollaboratorForRoom(troupe, req.user);
+        return collaboratorsService.findCollaborators(req.user, troupe.sd.type, troupe.sd.linkPath);
       });
   }
 

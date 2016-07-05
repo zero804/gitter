@@ -103,11 +103,10 @@ var HeaderView = Marionette.ItemView.extend({
 
   serializeData: function() {
     var data = this.model.toJSON();
-    var orgName = getOrgNameFromTroupeName(data.name);
-    var orgPageHref = '/orgs/' + orgName + '/rooms/';
     _.extend(data, {
       headerView: {
-        avatarUrl: getAvatarUrlForRoom(this.model)
+        avatarUrl: getAvatarUrlForRoom(this.model),
+        group: data.group,
       },
       troupeName:      data.name,
       troupeFavourite: !!data.favourite,
@@ -118,8 +117,6 @@ var HeaderView = Marionette.ItemView.extend({
       oneToOne:        (data.githubType === 'ONETOONE'),
       githubLink:      getGithubUrl(data),
       isPrivate:       getPrivateStatus(data),
-      orgName:         orgName,
-      orgPageHref:     orgPageHref,
       shouldShowPlaceholderRoomTopic: data.userCount <= 1,
       isRightToolbarPinned: this.getIsRightToolbarPinned()
     });
@@ -217,62 +214,62 @@ var HeaderView = Marionette.ItemView.extend({
   },
 
   createMenu: function() {
-      var menuItems = [];
-      var c = context();
-      var isStaff = context.isStaff();
-      var isAdmin = context.isTroupeAdmin();
-      var isRoomMember = context.isRoomMember();
-      var githubType = this.model.get('githubType');
-      var isOneToOne = githubType === 'ONETOONE';
-      var security = this.model.get('security');
-      var url = this.model.get('url');
+    var menuItems = [];
+    var c = context();
+    var isStaff = context.isStaff();
+    var isAdmin = context.isTroupeAdmin();
+    var isRoomMember = context.isRoomMember();
+    var githubType = this.model.get('githubType');
+    var isOneToOne = githubType === 'ONETOONE';
+    var security = this.model.get('security');
+    var url = this.model.get('url');
 
-      if (!isOneToOne) {
-        menuItems.push({ title: 'Add people to this room', href: '#add' });
-        menuItems.push({ title: 'Share this chat room', href: '#share' });
+    if (!isOneToOne) {
+      menuItems.push({ title: 'Add people to this room', href: '#add' });
+      menuItems.push({ title: 'Share this chat room', href: '#share' });
+      menuItems.push({ divider: true });
+    }
+
+    if (isRoomMember) menuItems.push({ title: 'Notifications', href: '#notifications' });
+
+    if (!isOneToOne) {
+      if (isAdmin) {
+        if (c.isNativeDesktopApp) {
+          menuItems.push({ title: 'Integrations', href: clientEnv['basePath'] + url + '#integrations', target: '_blank', dataset: { disableRouting: 1 } });
+        } else {
+          menuItems.push({ title: 'Integrations', href: '#integrations' });
+        }
+      }
+
+      if (isStaff || isAdmin) {
+        menuItems.push({ title: 'Tags', href: '#tags' });
+        if (security === 'PUBLIC') {
+          menuItems.push({ title: 'Settings', href: '#settings' });
+        }
         menuItems.push({ divider: true });
       }
 
-      if (isRoomMember) menuItems.push({ title: 'Notifications', href: '#notifications' });
+      menuItems.push({ title: 'Archives', href: url + '/archives/all', target: '_blank'});
 
-      if (!isOneToOne) {
-        if (isAdmin) {
-          if (c.isNativeDesktopApp) {
-            menuItems.push({ title: 'Integrations', href: clientEnv['basePath'] + url + '#integrations', target: '_blank', dataset: { disableRouting: 1 } });
-          } else {
-            menuItems.push({ title: 'Integrations', href: '#integrations' });
-          }
-        }
-
-        if (isStaff || isAdmin) {
-          menuItems.push({ title: 'Tags', href: '#tags' });
-          if (security == 'PUBLIC') {
-            menuItems.push({ title: 'Settings', href: '#settings' });
-          }
-          menuItems.push({ divider: true });
-        }
-
-        menuItems.push({ title: 'Archives', href: url + '/archives/all', target: '_blank'});
-
-        if (githubType === 'REPO' || githubType === 'ORG') {
-          menuItems.push({ title: 'Open in GitHub', href: 'https://www.github.com' + url, target: '_blank' });
-        }
-
-        if (isAdmin || isRoomMember) {
-          menuItems.push({ divider: true });
-        }
-
-        if (isAdmin) {
-          menuItems.push({ title: 'Delete this room', href: '#delete' });
-        }
-
-        if (isRoomMember) {
-          menuItems.push({ title: 'Leave this room', href: '#leave' });
-        }
+      if (githubType === 'REPO' || githubType === 'ORG') {
+        menuItems.push({ title: 'Open in GitHub', href: 'https://www.github.com' + url, target: '_blank' });
       }
 
-      return menuItems;
-    },
+      if (isAdmin || isRoomMember) {
+        menuItems.push({ divider: true });
+      }
+
+      if (isAdmin) {
+        menuItems.push({ title: 'Delete this room', href: '#delete' });
+      }
+
+      if (isRoomMember) {
+        menuItems.push({ title: 'Leave this room', href: '#leave' });
+      }
+    }
+
+    return menuItems;
+  },
 
   leaveRoom: function() {
     if (!context.isLoggedIn()) return;
@@ -382,7 +379,7 @@ var HeaderView = Marionette.ItemView.extend({
       }
     }
 
-    if (changedContains(['name', 'id', 'githubType', 'favourite', 'topic', 'ownerIsOrg', 'roomMember'])) {
+    if (changedContains(['name', 'id', 'githubType', 'favourite', 'topic', 'group', 'roomMember'])) {
       // The template may have been set to false
       // by the Isomorphic layout
       this.options.template = headerViewTemplate;

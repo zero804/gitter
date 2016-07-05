@@ -14,7 +14,6 @@ var LurkAndActivityForUserStrategy = require('./troupes/lurk-and-activity-for-us
 var ProOrgStrategy = require('./troupes/pro-org-strategy');
 var RoomMembershipStrategy = require('./troupes/room-membership-strategy');
 var TagsStrategy = require('./troupes/tags-strategy');
-var TroupeOwnerIsOrgStrategy = require('./troupes/troupe-owner-is-org-strategy');
 var TroupePermissionsStrategy = require('./troupes/troupe-permissions-strategy');
 var GroupIdStrategy = require('./group-id-strategy');
 
@@ -51,7 +50,6 @@ function TroupeStrategy(options) {
   var userIdStrategy;
   var proOrgStrategy;
   var permissionsStrategy;
-  var ownerIsOrgStrategy;
   var roomMembershipStrategy;
   var groupIdStrategy;
 
@@ -105,12 +103,6 @@ function TroupeStrategy(options) {
     if ((currentUserId || options.currentUser) && options.includePermissions) {
       permissionsStrategy = new TroupePermissionsStrategy(options);
       strategies.push(permissionsStrategy.preload(items));
-    }
-
-    // Include the owner
-    if (options.includeOwner) {
-      ownerIsOrgStrategy = new TroupeOwnerIsOrgStrategy(options);
-      strategies.push(ownerIsOrgStrategy.preload(items));
     }
 
     // Include the tags
@@ -226,10 +218,9 @@ function TroupeStrategy(options) {
       tags: tagsStrategy ? tagsStrategy.map(item) : undefined,
       providers: providers,
       permissions: permissionsStrategy ? permissionsStrategy.map(item) : undefined,
-      ownerIsOrg: ownerIsOrgStrategy ? ownerIsOrgStrategy.map(item) : undefined, // TODO: remove this once groups are in place
       roomMember: roomMembershipStrategy ? roomMembershipStrategy.map(item.id) : undefined,
-      group: groupIdStrategy && item.groupId ? groupIdStrategy.map(item.groupId) : undefined,
       groupId: item.groupId,
+      group: groupIdStrategy && item.groupId ? groupIdStrategy.map(item.groupId) : undefined,
       v: getVersion(item)
     };
   };

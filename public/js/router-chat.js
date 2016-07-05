@@ -260,12 +260,16 @@ onready(function() {
     },
 
     autojoin: function() {
-      apiClient.post('/v1/rooms', {
-          uri: context.troupe().get('uri') || context.troupe().get('url')
-        })
-        .then(function() {
-          //location.reload();
-          context.troupe().set('roomMember', true);
+      if (context.roomHasWelcomeMessage()) {
+        this.showWelcomeMessage();
+        return;
+      }
+
+      apiClient.user
+        .post('/rooms', { id: context.troupe().id })
+        .bind(this)
+        .then(function(body) {
+          context.setTroupe(body);
         });
     },
 

@@ -15,6 +15,7 @@ function hash(string) {
     hash = hash & hash; // Convert to 32bit integer
   }
 
+  if (hash < 0) return -hash;
   return hash;
 }
 

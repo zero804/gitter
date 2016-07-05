@@ -13,6 +13,7 @@ var graphSuggestions = require('gitter-web-suggestions');
 var cacheWrapper = require('gitter-web-cache-wrapper');
 var debug = require('debug')('gitter:app:suggestions');
 var logger = require('gitter-web-env').logger;
+var groupRoomSuggestions = require('gitter-web-groups/lib/group-room-suggestions');
 
 // the old github recommenders that find repos, to be filtered to rooms
 // var ownedRepos = require('./recommendations/owned-repos');
@@ -58,6 +59,15 @@ var HIGHLIGHTED_ROOMS = [
   }, {
     uri: 'angular-ui/ng-grid',
     localeLanguage: 'en',
+  }, {
+    uri: 'dev-ua/frontend-ua',
+    localeLanguage: 'ua',
+  }, {
+    uri: 'rus-speaking/android',
+    localeLanguage: 'ru',
+  }, {
+    uri: 'FreeCodeCamp/Espanol',
+    localeLanguage: 'es',
   }
 ];
 
@@ -67,16 +77,11 @@ function reposToRooms(repos) {
   // in later.
   repos = repos.slice(0, 100);
 
-  debug("start reposToRooms");
-  return Promise.all(_.map(repos, function(repo) {
-      return troupeService.findByUri(repo.uri);
-    }))
-    .then(function(rooms) {
-      debug("end reposToRooms");
+  var uris = _.map(repos, function(repo) {
+    return repo.uri;
+  });
 
-      // strip nulls
-      return _.filter(rooms);
-    });
+  return troupeService.findPublicRoomsByTypeAndLinkPaths('GH_REPO', uris);
 }
 
 // var ownedRepoRooms = Promise.method(function(options) {
@@ -160,13 +165,13 @@ var graphRooms = Promise.method(function(options) {
       var orgTotals = {};
 
       _.remove(suggestedRooms, function(room) {
-        if (orgTotals[room.lcOwner]) {
-          orgTotals[room.lcOwner] += 1;
+        if (orgTotals[room.groupId]) {
+          orgTotals[room.groupId] += 1;
         } else {
-          orgTotals[room.lcOwner] = 1;
+          orgTotals[room.groupId] = 1;
         }
 
-        return (orgTotals[room.lcOwner] > MAX_SUGGESTIONS_PER_ORG);
+        return (orgTotals[room.groupId] > MAX_SUGGESTIONS_PER_ORG);
       });
 
       if (debug.enabled) {
@@ -185,26 +190,27 @@ var graphRooms = Promise.method(function(options) {
 
 var siblingRooms = Promise.method(function(options) {
   var existingRooms = options.rooms;
+  var user = options.user;
 
-  if (!existingRooms || !existingRooms.length) {
+  if (!user || !existingRooms || !existingRooms.length) {
     return [];
   }
 
+  var userId = user._id;
+
   debug('checking siblingRooms');
 
-  var orgNames = _.uniq(_.pluck(existingRooms, 'lcOwner'));
-  return Promise.all(_.map(orgNames, function(orgName) {
-      // Hey, lets send 50 queries to mongo!
-      return troupeService.findChildRoomsForOrg(orgName, { security: 'PUBLIC' });
-    }))
-    .then(function(arrays) {
-      var suggestedRooms = Array.prototype.concat.apply([], arrays);
+  var groupIds = _.pluck(existingRooms, 'groupId').filter(function(groupId) {
+    return !!groupId;
+  });
 
+  return groupRoomSuggestions.findUnjoinedRoomsInGroups(userId, _.uniq(groupIds))
+    .then(function(results) {
       if (debug.enabled) {
-        debug("siblingRooms", _.pluck(suggestedRooms, "uri"));
+        debug("siblingRooms", _.pluck(results, "uri"));
       }
 
-      return suggestedRooms;
+      return results;
     });
 });
 
@@ -323,7 +329,7 @@ function findRoomsByUserId(userId) {
     .then(function(roomIds) {
       return troupeService.findByIdsLean(roomIds, {
         uri: 1,
-        lcOwner: 1,
+        groupId: 1,
         lang: 1,
         oneToOne: 1
       });
