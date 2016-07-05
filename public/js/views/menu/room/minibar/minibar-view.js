@@ -112,6 +112,8 @@ module.exports = Marionette.LayoutView.extend({
     this.tempModel = this.model.minibarTempOrgModel;
     this.keyboardControllerView = attrs.keyboardControllerView;
     this.listenTo(this.bus, 'navigation', this.clearFocus, this);
+    //When a snapshot comes back we need to re-set active/focus on the currently active element
+    this.listenTo(this.collection, 'snapshot', this.onMenuChangeState, this);
     this.onMenuChangeState();
   },
 

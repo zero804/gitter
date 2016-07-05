@@ -26,6 +26,8 @@ var groupCollection;
 groupCollection = new groupModels.GroupCollection([], { listen: true });
 groupCollection.on('error', errorHandle.bind(null, 'group-collection'));
 
+window.groupCollection = groupCollection;
+
 // Adapt unread items to the groups collection
 unreadItemsGroupAdapter(groupCollection, troupeCollection);
 
