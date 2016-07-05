@@ -5,6 +5,7 @@ var persistence = require('gitter-web-persistence');
 var BatchStream = require('batch-stream');
 var through2 = require('through2');
 var ElasticBulkUpdateStream = require('./elastic-bulk-update-stream');
+var bulkTools = require('./elastic-bulk-tools');
 var Suggester = require('./suggester');
 var userService = require('../user-service');
 var troupeService = require('../troupe-service');
@@ -53,23 +54,39 @@ function reindex() {
     });
 }
 
-function addUserToRoom(userId, roomId) {
-  return elasticClient.update(generateRemoveMembershipReq(userId, roomId))
+function addUsersToRoom(userIds, roomId) {
+  var updates = userIds.map(function(userId) {
+    return createAddMembershipUpdate(userId, roomId);
+  });
+  var req = bulkTools.createBulkUpdate(updates);
+  return elasticClient.bulk(req)
+    .then(function(res) {
+      var err = bulkTools.findPartialError(req, res);
+      if (err) throw err;
+    });
 }
 
-function removeUserFromRoom(userId, roomId) {
-  return elasticClient.update(generateAddMembershipReq(userId, roomId))
+function removeUsersFromRoom(userIds, roomId) {
+  var updates = userIds.map(function(userId) {
+    return createRemoveMembershipUpdate(userId, roomId);
+  });
+  var req = bulkTools.createBulkUpdate(updates);
+  return elasticClient.bulk(req)
+    .then(function(res) {
+      var err = bulkTools.findPartialError(req, res);
+      if (err) throw err;
+    });
 }
 
 function updateUser(user) {
-  return elasticClient.update(generateUpdateUserReq(user))
+  return elasticClient.update(createUserUpdate(user))
 }
 
 module.exports = {
   query: query,
   reindex: reindex,
-  addUserToRoom: addUserToRoom,
-  removeUserFromRoom: removeUserFromRoom,
+  addUsersToRoom: addUsersToRoom,
+  removeUsersFromRoom: removeUsersFromRoom,
   updateUser: updateUser
 };
 
@@ -187,7 +204,7 @@ function reindexUsers() {
       .stream();
 
     var user2elastic = through2.obj(function(user, encoding, callback) {
-      this.push(generateUpdateUserReq(user));
+      this.push(createUserUpdate(user));
       callback();
     });
 
@@ -253,7 +270,7 @@ function reindexMemberships() {
     .stream();
 
     var memberships2elastic = through2.obj(function(memberships, encoding, callback) {
-      this.push(generateAddMembershipReq(memberships._id, memberships.troupeIds));
+      this.push(createAddMembershipUpdate(memberships._id, memberships.troupeIds));
       callback();
     });
 
@@ -273,7 +290,7 @@ function reindexMemberships() {
   });
 }
 
-function generateUpdateUserReq(user) {
+function createUserUpdate(user) {
   var id = user._id.toString();
   var input = inputForUser(user);
 
@@ -311,7 +328,7 @@ function inputForUser(user) {
   return input;
 }
 
-function generateAddMembershipReq(userId, roomIds) {
+function createAddMembershipUpdate(userId, roomIds) {
   var id = userId.toString();
   var newRooms = roomIds.map(function(roomId) {
     return roomId.toString();
@@ -346,7 +363,7 @@ function generateAddMembershipReq(userId, roomIds) {
   }
 }
 
-function generateRemoveMembershipReq(userId, roomId) {
+function createRemoveMembershipUpdate(userId, roomId) {
   return {
     index: WRITE_INDEX_ALIAS,
     type: 'user',
