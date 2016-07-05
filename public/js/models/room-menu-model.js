@@ -19,7 +19,6 @@ var FavouriteCollectionModel = require('../views/menu/room/favourite-collection/
 var PrimaryCollectionModel = require('../views/menu/room/primary-collection/primary-collection-model');
 var SecondaryCollectionModel = require('../views/menu/room/secondary-collection/secondary-collection-model');
 var TertiaryCollectionModel = require('../views/menu/room/tertiary-collection/tertiary-collection-model');
-var MinibarCollection = require('../views/menu/room/minibar/minibar-collection');
 var MinibarItemModel = require('../views/menu/room/minibar/minibar-item-model.js');
 var MinibarPeopleModel = require('../views/menu/room/minibar/people-view/people-model');
 var MinibarTempOrgModel = require('../views/menu/room/minibar/temp-org-view/temp-org-model');
@@ -111,13 +110,8 @@ module.exports = Backbone.Model.extend({
       return _.extend({}, model, { active: (state === 'org' && model.name === selectedOrg) });
     });
 
-    if(context.hasFeature('groups')) {
-      this.groupsCollection.add(minibarModels);
-      this.minibarCollection = this.groupsCollection;
-    }
-    else {
-      this.minibarCollection = new MinibarCollection(minibarModels, { roomCollection: this._roomCollection });
-    }
+    this.groupsCollection.add(minibarModels);
+    this.minibarCollection = this.groupsCollection;
 
     this.activeRoomCollection = new FilteredRoomCollection(context.getSnapshot('rooms'), {
       roomModel:  this,
