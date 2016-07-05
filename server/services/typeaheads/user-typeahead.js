@@ -3,7 +3,7 @@
 var Promise = require('bluebird');
 var persistence = require('gitter-web-persistence');
 var BatchStream = require('batch-stream');
-var Transform = require('stream').Transform;
+var through2 = require('through2');
 var ElasticBulkUpdateStream = require('./elastic-bulk-update-stream');
 var Suggester = require('./suggester');
 var userService = require('../user-service');
@@ -186,13 +186,9 @@ function reindexUsers() {
       .batchSize(BATCH_SIZE)
       .stream();
 
-    var elasticTransformStream = new Transform({
-      readableObjectMode: true,
-      writableObjectMode: true,
-      transform: function(user, encoding, callback) {
-        this.push(generateUpdateUserReq(user));
-        callback();
-      }
+    var user2elastic = through2.obj(function(user, encoding, callback) {
+      this.push(generateUpdateUserReq(user));
+      callback();
     });
 
     var batchStream = new BatchStream({ size: BATCH_SIZE });
@@ -201,7 +197,7 @@ function reindexUsers() {
 
     userStream
       .on('error', reject)
-      .pipe(elasticTransformStream)
+      .pipe(user2elastic)
       .on('error', reject)
       .pipe(batchStream)
       .on('error', reject)
@@ -250,13 +246,9 @@ function reindexMemberships() {
     .exec()
     .stream();
 
-    var elasticTransformStream = new Transform({
-      readableObjectMode: true,
-      writableObjectMode: true,
-      transform: function(obj, encoding, callback) {
-        this.push(generateAddMembershipReq(obj._id, obj.troupeIds));
-        callback();
-      }
+    var memberships2elastic = through2.obj(function(memberships, encoding, callback) {
+      this.push(generateAddMembershipReq(memberships._id, memberships.troupeIds));
+      callback();
     });
 
     var batchStream = new BatchStream({ size: BATCH_SIZE });
@@ -265,7 +257,7 @@ function reindexMemberships() {
 
     troupeUserStream
       .on('error', reject)
-      .pipe(elasticTransformStream)
+      .pipe(memberships2elastic)
       .on('error', reject)
       .pipe(batchStream)
       .on('error', reject)
