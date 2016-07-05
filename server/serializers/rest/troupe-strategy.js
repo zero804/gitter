@@ -16,6 +16,7 @@ var RoomMembershipStrategy = require('./troupes/room-membership-strategy');
 var TagsStrategy = require('./troupes/tags-strategy');
 var TroupePermissionsStrategy = require('./troupes/troupe-permissions-strategy');
 var GroupIdStrategy = require('./group-id-strategy');
+var TroupeBackendStrategy = require('./troupes/troupe-backend-strategy');
 
 /**
  * Given the currentUser and a sequence of troupes
@@ -52,6 +53,7 @@ function TroupeStrategy(options) {
   var permissionsStrategy;
   var roomMembershipStrategy;
   var groupIdStrategy;
+  var backendStrategy;
 
   this.preload = function(items) { // eslint-disable-line max-statements
     if (items.isEmpty()) return;
@@ -121,6 +123,11 @@ function TroupeStrategy(options) {
         });
 
       strategies.push(groupIdStrategy.preload(groupIds));
+    }
+
+    if (options.includeBackend) {
+      backendStrategy = new TroupeBackendStrategy();
+      // Backend strategy needs no mapping stage
     }
 
     return Promise.all(strategies)
@@ -221,6 +228,7 @@ function TroupeStrategy(options) {
       roomMember: roomMembershipStrategy ? roomMembershipStrategy.map(item.id) : undefined,
       groupId: item.groupId,
       group: groupIdStrategy && item.groupId ? groupIdStrategy.map(item.groupId) : undefined,
+      backend: backendStrategy ? backendStrategy.map(item) : undefined,
       v: getVersion(item)
     };
   };
