@@ -11,6 +11,11 @@ module.exports = {
       return { then: function(){ return { catch: function(){} }; }, catch: function(){} };
     }
   },
+  priv: {
+    channelGenerator: function(relativeUrl) {
+      return relativeUrl;
+    }
+  },
   delete: sinon.stub().returns(Promise.resolve()),
   get: sinon.stub().returns(Promise.resolve())
 };

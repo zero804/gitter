@@ -2,7 +2,6 @@
 
 var Backbone = require('backbone');
 var apiClient = require('components/apiClient');
-var BaseResolverCollection = require('./base-resolver-collection.js');
 var SyncMixin = require('./sync-mixin.js');
 
 
