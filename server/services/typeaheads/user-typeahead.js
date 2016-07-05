@@ -64,19 +64,19 @@ function reindex() {
 
 function addUserToRoom(userId, roomId) {
   return Promise.resolve(
-    elasticClient.update(createReqRemoveMembership(userId, roomId))
+    elasticClient.update(generateRemoveMembershipReq(userId, roomId))
   );
 }
 
 function removeUserFromRoom(userId, roomId) {
   return Promise.resolve(
-    elasticClient.update(createReqAddMembership(userId, roomId))
+    elasticClient.update(generateAddMembershipReq(userId, roomId))
   );
 }
 
 function updateUser(user) {
   return Promise.resolve(
-    elasticClient.update(generateUserUpdate(user))
+    elasticClient.update(generateUpdateUserReq(user))
   );
 }
 
@@ -175,7 +175,7 @@ function reindexUsers() {
       readableObjectMode: true,
       writableObjectMode: true,
       transform: function(user, encoding, callback) {
-        this.push(createReqUpdateUser(user));
+        this.push(generateUpdateUserReq(user));
         callback();
       }
     });
@@ -239,7 +239,7 @@ function reindexMemberships() {
       readableObjectMode: true,
       writableObjectMode: true,
       transform: function(obj, encoding, callback) {
-        this.push(createReqAddMembership(obj._id, obj.troupeIds));
+        this.push(generateAddMembershipReq(obj._id, obj.troupeIds));
         callback();
       }
     });
@@ -260,7 +260,7 @@ function reindexMemberships() {
   });
 }
 
-function createReqUpdateUser(user) {
+function generateUpdateUserReq(user) {
   var id = user._id.toString();
   var input = [user.username];
   if (user.displayName) {
@@ -292,7 +292,7 @@ function createReqUpdateUser(user) {
   }
 }
 
-function createReqAddMembership(userId, roomIds) {
+function generateAddMembershipReq(userId, roomIds) {
   var id = userId.toString();
   var newRooms = roomIds.map(function(roomId) {
     return roomId.toString();
@@ -327,7 +327,7 @@ function createReqAddMembership(userId, roomIds) {
   }
 }
 
-function createReqRemoveMembership(userId, roomId) {
+function generateRemoveMembershipReq(userId, roomId) {
   return {
     index: WRITE_INDEX_ALIAS,
     type: 'user',
