@@ -43,20 +43,8 @@ describe('room-service', function() {
       githubType: 'REPO',
       users: ['user1', 'user2']
     },
-    troupeCanRemove: {
-      security: 'PUBLIC',
-      githubType: 'REPO',
-      users: ['userToRemove', 'userRemoveNonAdmin', 'userRemoveAdmin']
-    },
-    troupeCannotRemove: {
-      security: 'PRIVATE',
-      githubType: 'ONETOONE',
-      users: ['userToRemove', 'userRemoveAdmin']
-    },
     group1: {},
     userToRemove: {},
-    userRemoveNonAdmin: {},
-    userRemoveAdmin: {}
   }));
 
   after(function() {
@@ -729,6 +717,20 @@ describe('room-service', function() {
 
   describe('removals', function() {
 
+    var fixture = fixtureLoader.setup({
+      troupeCanRemove: {
+        security: 'PUBLIC',
+        githubType: 'REPO',
+        users: ['userToRemove', 'userRemoveNonAdmin', 'userRemoveAdmin']
+      },
+      troupeCannotRemove: {
+        oneToOne: true,
+        users: ['userToRemove', 'userRemoveAdmin']
+      },
+      userToRemove: {},
+      userRemoveAdmin: {}
+    });
+
     var roomService = testRequire.withProxies('./services/room-service', {
       'gitter-web-permissions/lib/policy-factory': {
         createPolicyForRoom: function(user/*, room*/) {
@@ -748,10 +750,10 @@ describe('room-service', function() {
       }
     });
 
-    var userIsInRoom = testRequire('gitter-web-permissions/lib/user-in-room');
+    var roomMembershipService = testRequire('./services/room-membership-service');
 
     it('should prevent from removing users from one-to-one rooms', function() {
-      return userIsInRoom(fixture.troupeCannotRemove.uri, fixture.userToRemove)
+      return roomMembershipService.checkRoomMembership(fixture.troupeCannotRemove._id, fixture.userToRemove._id)
         .then(function(here) {
           assert(here);
           return roomService.removeUserFromRoom(fixture.troupeCannotRemove, fixture.userToRemove, fixture.userRemoveAdmin);
@@ -761,7 +763,7 @@ describe('room-service', function() {
           assert.equal(err.message, 'This room does not support removing.');
         })
         .then(function() {
-          return userIsInRoom(fixture.troupeCannotRemove.uri, fixture.userToRemove);
+          return roomMembershipService.checkRoomMembership(fixture.troupeCannotRemove._id, fixture.userToRemove._id)
         })
         .then(function(here) {
           assert(here);
@@ -769,13 +771,13 @@ describe('room-service', function() {
     });
 
     it('should remove users from rooms', function() {
-      return userIsInRoom(fixture.troupeCanRemove.uri, fixture.userToRemove)
+      return roomMembershipService.checkRoomMembership(fixture.troupeCanRemove._id, fixture.userToRemove._id)
         .then(function(here) {
           assert(here);
           return roomService.removeUserFromRoom(fixture.troupeCanRemove, fixture.userToRemove, fixture.userRemoveAdmin);
         })
         .then(function() {
-          return userIsInRoom(fixture.troupeCanRemove.uri, fixture.userToRemove);
+          return roomMembershipService.checkRoomMembership(fixture.troupeCanRemove._id, fixture.userToRemove._id)
         })
         .then(function(here) {
           assert(!here);
@@ -787,8 +789,7 @@ describe('room-service', function() {
   describe('remove and hide #slow', function() {
     var troupeService = testRequire('./services/troupe-service');
     var recentRoomService = testRequire('./services/recent-room-service');
-    // TODO: this should not be used
-    var userIsInRoom = testRequire('gitter-web-permissions/lib/user-in-room');
+    var roomMembershipService = testRequire('./services/room-membership-service');
     var recentRoomCore = testRequire('./services/core/recent-room-core');
     var appEvents = testRequire('gitter-web-appevents');
 
@@ -838,7 +839,7 @@ describe('room-service', function() {
         };
 
         var checkHere = function() {
-          return userIsInRoom(fixture.troupeCanRemove.uri, fixture.userFavourite);
+          return roomMembershipService.checkRoomMembership(fixture.troupeCanRemove._id, fixture.userFavourite._id)
         };
 
         // Create an event listener with expected parameters
@@ -939,7 +940,7 @@ describe('room-service', function() {
             model: {id: fixture.troupeEmpty.id}
           });
 
-          return userIsInRoom(fixture.troupeEmpty.uri, fixture.userFavourite)
+          return roomMembershipService.checkRoomMembership(fixture.troupeEmpty._id, fixture.userFavourite._id)
             .then(function(here) {
               assert(!here); // Check that user is not in the room
             })
@@ -960,13 +961,13 @@ describe('room-service', function() {
         var roomService = testRequire('./services/room-service');
 
         it('should remove user from room', function() {
-          return userIsInRoom(fixture.troupeCanRemove.uri, fixture.userLeave)
+          return roomMembershipService.checkRoomMembership(fixture.troupeCanRemove._id, fixture.userLeave._id)
             .then(function(here) {
               assert(here);
               return roomService.removeUserFromRoom(fixture.troupeCanRemove, fixture.userLeave, fixture.userLeave);
             })
             .then(function() {
-              return userIsInRoom(fixture.troupeCanRemove.uri, fixture.userLeave);
+              return roomMembershipService.checkRoomMembership(fixture.troupeCanRemove._id, fixture.userLeave._id);
             })
             .then(function(here) {
               assert(!here);
@@ -980,13 +981,13 @@ describe('room-service', function() {
         var roomService = testRequire('./services/room-service');
 
         it('should remove users from rooms', function() {
-          return userIsInRoom(fixture.troupeCanRemove.uri, fixture.userToRemove)
+          return roomMembershipService.checkRoomMembership(fixture.troupeCanRemove._id, fixture.userToRemove._id)
             .then(function(here) {
               assert(here);
               return roomService.removeUserFromRoom(fixture.troupeCanRemove, fixture.userToRemove, fixture.userRemoveAdmin);
             })
             .then(function() {
-              return userIsInRoom(fixture.troupeCanRemove.uri, fixture.userToRemove);
+              return roomMembershipService.checkRoomMembership(fixture.troupeCanRemove._id, fixture.userToRemove._id);
             })
             .then(function(here) {
               assert(!here);
