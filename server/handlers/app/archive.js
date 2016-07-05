@@ -4,7 +4,7 @@ var env = require('gitter-web-env');
 var identifyRoute = env.middlewares.identifyRoute;
 
 var moment = require('moment');
-var appMiddleware = require('./middleware');
+var uriContextResolverMiddleware = require('../uri-context/uri-context-resolver-middleware');
 var chatService = require('../../services/chat-service');
 var heatmapService = require('../../services/chat-heatmap-service');
 var restSerializer = require('../../serializers/rest-serializer');
@@ -12,14 +12,14 @@ var contextGenerator = require('../../web/context-generator');
 var Promise = require('bluebird');
 var burstCalculator = require('../../utils/burst-calculator');
 var timezoneMiddleware = require('../../web/middlewares/timezone');
-var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
 var dateTZtoUTC = require('gitter-web-shared/time/date-timezone-to-utc');
 var beforeTodayAnyTimezone = require('gitter-web-shared/time/before-today-any-timezone');
 var debug = require('debug')('gitter:app:app-archive');
 var _ = require('underscore');
-var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 var StatusError = require('statuserror');
 var fonts = require('../../web/fonts');
+var getAvatarUrlForUriContext = require('../../web/get-avatar-url-for-uri-context');
+var redirectErrorMiddleware = require('../uri-context/redirect-error-middleware');
 
 var ONE_DAY_SECONDS = 60 * 60 * 24; // 1 day
 var ONE_DAY_MILLISECONDS = ONE_DAY_SECONDS * 1000;
@@ -77,7 +77,7 @@ function generateChatTree(chatActivity) {
 
 exports.datesList = [
   identifyRoute('app-archive-main'),
-  appMiddleware.uriContextResolverMiddleware({ create: false }),
+  uriContextResolverMiddleware,
   function(req, res, next) {
     var user = req.user;
     var troupe = req.uriContext.troupe;
@@ -89,7 +89,7 @@ exports.datesList = [
     }
 
     var roomUrl = '/api/v1/rooms/' + troupe.id;
-    var avatarUrl = resolveRoomAvatarUrl(troupe, 48);
+    var roomAvatarUrl = getAvatarUrlForUriContext(req.uriContext);
     var isPrivate = troupe.security !== "PUBLIC";
 
     var templateContext = {
@@ -106,9 +106,11 @@ exports.datesList = [
       roomUrl: roomUrl,
       accessToken: req.accessToken,
       public: troupe.security === 'PUBLIC',
-      avatarUrl: avatarUrl,
+      headerView: {
+        // TODO: move all the headerView things in here
+        avatarUrl: roomAvatarUrl
+      },
       isPrivate: isPrivate,
-      avatarSrcSet: resolveRoomAvatarSrcSet({ uri: req.uriContext.uri }, 48),
       fonts: fonts.getFonts(),
       hasCachedFonts: fonts.hasCachedFonts(req.cookies),
     };
@@ -126,12 +128,13 @@ exports.datesList = [
         res.render('archive-home-template', templateContext);
       })
       .catch(next);
-  }
+  },
+  redirectErrorMiddleware
 ];
 
 exports.linksList = [
   identifyRoute('app-archive-links'),
-  appMiddleware.uriContextResolverMiddleware({ create: false }),
+  uriContextResolverMiddleware,
   function(req, res, next) {
     var user = req.user;
     var troupe = req.uriContext.troupe;
@@ -143,8 +146,7 @@ exports.linksList = [
     }
 
     var roomUrl = '/api/v1/rooms/' + troupe.id;
-    var avatarUrl = resolveRoomAvatarUrl(troupe, 48);
-    var srcSetUrl = resolveRoomAvatarSrcSet(troupe, 48);
+    var roomAvatarUrl = getAvatarUrlForUriContext(req.uriContext);
     var isPrivate = troupe.security !== "PUBLIC";
 
     var templateContext = {
@@ -161,8 +163,10 @@ exports.linksList = [
       roomUrl: roomUrl,
       accessToken: req.accessToken,
       public: troupe.security === 'PUBLIC',
-      avatarUrl: avatarUrl,
-      avatarSrcSet: srcSetUrl,
+      headerView: {
+        // TODO: move all the headerView things in here
+        avatarUrl: roomAvatarUrl
+      },
       isPrivate: isPrivate,
       fonts: fonts.getFonts(),
       hasCachedFonts: fonts.hasCachedFonts(req.cookies),
@@ -189,12 +193,13 @@ exports.linksList = [
         res.render('archive-links-template', templateContext);
       })
       .catch(next);
-  }
+  },
+  redirectErrorMiddleware
 ];
 
 exports.chatArchive = [
   identifyRoute('app-archive-date'),
-  appMiddleware.uriContextResolverMiddleware({ create: false }),
+  uriContextResolverMiddleware,
   timezoneMiddleware,
   function(req, res, next) {
     var user = req.user;
@@ -286,7 +291,7 @@ exports.chatArchive = [
             var billingUrl = env.config.get('web:billingBaseUrl') + '/bill/' + req.uriContext.uri.split('/')[0];
             var roomUrl = '/api/v1/rooms/' + troupe.id;
 
-            var avatarUrl = resolveRoomAvatarUrl(troupe, 48);
+            var roomAvatarUrl = getAvatarUrlForUriContext(req.uriContext);
             var isPrivate = troupe.security !== "PUBLIC";
 
             /*
@@ -321,9 +326,11 @@ exports.chatArchive = [
               noindex: troupe.noindex,
               roomUrl: roomUrl,
               accessToken: req.accessToken,
-              avatarUrl: avatarUrl,
+              headerView: {
+                // TODO: move all the headerView things in here
+                avatarUrl: roomAvatarUrl
+              },
               isPrivate: isPrivate,
-              avatarSrcSet: resolveRoomAvatarSrcSet({ uri: req.uriContext.uri }, 48),
 
               /* For prerendered archive-navigation-view */
               previousDate: previousDateFormatted,

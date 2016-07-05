@@ -1,10 +1,9 @@
 'use strict';
 
 var StatusError = require('statuserror');
-var testRequire = require('../test-require');
-var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assert = require("assert");
-var groupUriChecker = testRequire('./services/group-uri-checker');
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
+var groupUriChecker = require('../lib/group-uri-checker');
 
 
 describe('group-uri-checker #slow', function() {
@@ -44,13 +43,6 @@ describe('group-uri-checker #slow', function() {
 
   it('should not allow creation if a group with that uri exists', function() {
     return groupUriChecker(fixture.user1, fixture.group1.uri)
-      .then(function(info) {
-        assert.strictEqual(info.allowCreate, false);
-      });
-  });
-
-  it('should not allow creation if a troupe with that uri exists', function() {
-    return groupUriChecker(fixture.user1, fixture.troupe1.uri)
       .then(function(info) {
         assert.strictEqual(info.allowCreate, false);
       });
