@@ -88,7 +88,7 @@ exports.searchRooms = function(queryText, userId, privateRoomIds, options) {
     }
   };
 
-  return Promise.resolve(client.search(queryRequest))
+  return client.search(queryRequest)
     .then(function(response) {
       return response.hits.hits.map(function(hit) {
         return hit._id;

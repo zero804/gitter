@@ -16,23 +16,21 @@ var BATCH_SIZE = 1000;
 var MEMBERSHIP_LIMIT = 600;
 
 function query(text, roomId) {
-  return Promise.resolve(
-    elasticClient.suggest({
-      size: 10,
-      index: READ_INDEX_ALIAS,
-      type: 'user',
-      body: {
-        suggest: {
-          text: text,
-          completion: {
-            field: "suggest",
-            context: { rooms: roomId },
-            payload: ["_uid"]
-          }
+  return elasticClient.suggest({
+    size: 10,
+    index: READ_INDEX_ALIAS,
+    type: 'user',
+    body: {
+      suggest: {
+        text: text,
+        completion: {
+          field: "suggest",
+          context: { rooms: roomId },
+          payload: ["_uid"]
         }
       }
-    })
-  ).then(function(res) {
+    }
+  }).then(function(res) {
     var options = res.suggest[0].options
     var userIds = options.map(function(option) {
       return option.payload._uid[0].split('#')[1];
@@ -63,21 +61,15 @@ function reindex() {
 }
 
 function addUserToRoom(userId, roomId) {
-  return Promise.resolve(
-    elasticClient.update(generateRemoveMembershipReq(userId, roomId))
-  );
+  return elasticClient.update(generateRemoveMembershipReq(userId, roomId))
 }
 
 function removeUserFromRoom(userId, roomId) {
-  return Promise.resolve(
-    elasticClient.update(generateAddMembershipReq(userId, roomId))
-  );
+  return elasticClient.update(generateAddMembershipReq(userId, roomId))
 }
 
 function updateUser(user) {
-  return Promise.resolve(
-    elasticClient.update(generateUpdateUserReq(user))
-  );
+  return elasticClient.update(generateUpdateUserReq(user))
 }
 
 module.exports = {
@@ -90,66 +82,60 @@ module.exports = {
 
 function createIndex(name) {
   debug('creating index %s', name);
-  return Promise.resolve(
-    elasticClient.indices.create({
-      index: name,
-      body: {
-        settings: {
-          number_of_shards: 4,
-          number_of_replicas: 1,
-          mapper: {
-            dynamic: false
-          }
-        },
-        mappings: {
-          user: {
-            dynamic: "strict",
-            properties: {
-              suggest: {
-                type: "completion",
-                analyzer: "simple",
-                search_analyzer: "simple",
-                preserve_separators: false,
-                contexts: [{ name: "rooms", type: "category" }]
-              }
+  return elasticClient.indices.create({
+    index: name,
+    body: {
+      settings: {
+        number_of_shards: 4,
+        number_of_replicas: 1,
+        mapper: {
+          dynamic: false
+        }
+      },
+      mappings: {
+        user: {
+          dynamic: "strict",
+          properties: {
+            suggest: {
+              type: "completion",
+              analyzer: "simple",
+              search_analyzer: "simple",
+              preserve_separators: false,
+              contexts: [{ name: "rooms", type: "category" }]
             }
           }
         }
       }
-    })
-  );
+    }
+  });
 }
 
 function setWriteAlias(index) {
   debug("setting %s as sole write alias (%s)", index, WRITE_INDEX_ALIAS);
-  return Promise.resolve(
-    elasticClient.indices.updateAliases({
-      body: {
-        actions: [
-          { remove: { index: INDEX_PREFIX + '*', alias: WRITE_INDEX_ALIAS } },
-          { add: { index: index, alias: WRITE_INDEX_ALIAS } }
-        ]
-      }
-    })
-  );
+  return elasticClient.indices.updateAliases({
+    body: {
+      actions: [
+        { remove: { index: INDEX_PREFIX + '*', alias: WRITE_INDEX_ALIAS } },
+        { add: { index: index, alias: WRITE_INDEX_ALIAS } }
+      ]
+    }
+  });
 }
 
 function setReadAlias(index) {
   debug("setting %s as sole read alias (%s)", index, READ_INDEX_ALIAS);
-  return Promise.resolve(
-    elasticClient.indices.updateAliases({
-      body: {
-        actions: [
-          { remove: { index: INDEX_PREFIX + '*', alias: READ_INDEX_ALIAS } },
-          { add: { index: index, alias: READ_INDEX_ALIAS } }
-        ]
-      }
-    })
-  );
+  return elasticClient.indices.updateAliases({
+    body: {
+      actions: [
+        { remove: { index: INDEX_PREFIX + '*', alias: READ_INDEX_ALIAS } },
+        { add: { index: index, alias: READ_INDEX_ALIAS } }
+      ]
+    }
+  });
 }
 
 function removeUnusedIndicies() {
-  return Promise.resolve(elasticClient.indices.getAliases())
+  return elasticClient.indices.getAliases()
     .then(function(resp) {
       var unused = Object.keys(resp).filter(function(index) {
         var aliases = Object.keys(resp[index].aliases)
