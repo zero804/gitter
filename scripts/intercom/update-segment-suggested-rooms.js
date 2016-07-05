@@ -14,7 +14,6 @@ var roomMembershipService = require('../../server/services/room-membership-servi
 var suggestionsService = require('../../server/services/suggestions-service');
 var userSettingsService = require('../../server/services/user-settings-service');
 var restSerializer = require('../../server/serializers/rest-serializer');
-var suggestions = require('gitter-web-suggestions');
 var intercom = require('gitter-web-intercom');
 var getIntercomStream = require('intercom-stream');
 var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');

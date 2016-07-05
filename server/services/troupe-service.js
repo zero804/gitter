@@ -15,6 +15,15 @@ function findByUri(uri, callback) {
     .nodeify(callback);
 }
 
+function findByUris(uris) {
+  if (!uris.length) return [];
+  var lcUris = uris.map(function(f) { return f.toLowerCase(); });
+
+  return persistence.Troupe.find({ lcUri: { $in: lcUris } })
+    .lean()
+    .exec();
+}
+
 function findByIds(ids, callback) {
   return mongooseUtils.findByIds(persistence.Troupe, ids, callback);
 }
@@ -96,6 +105,7 @@ function findChildRoomsForOrg(org, opts) {
 
 module.exports = {
   findByUri: findByUri,
+  findByUris: Promise.method(findByUris),
   findById: findById,
   checkIdExists: checkIdExists,
   findByIds: findByIds,

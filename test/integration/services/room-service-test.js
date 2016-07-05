@@ -105,7 +105,8 @@ describe('room-service', function() {
       mockito
         .when(uriResolver)()
         .then(function () {
-          return Promise.resolve([null, {
+          return Promise.resolve({
+            room: {
               _id: '5436981c00062eebf0fbc0d5',
               githubType: 'ORG',
               uri: 'gitterTest',
@@ -116,7 +117,9 @@ describe('room-service', function() {
               lcUri: 'gitterhq',
               tags: [],
               topic: 'Gitter',
-          }, false]);
+            },
+            roomMember: false
+          });
         });
 
       // test
@@ -173,7 +176,7 @@ describe('room-service', function() {
 
       mockito.when(uriResolver)()
         .then(function () {
-          return Promise.resolve([null, null, false]);
+          return Promise.resolve(null);
         });
 
       return roomService

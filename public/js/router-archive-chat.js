@@ -60,19 +60,5 @@ onready(function() {
     previousDate: archiveContext.previousDate
   }).render();
 
-  // Adjust header manually: #nasty
-  var size = $('#header-wrapper').outerHeight() + 'px';
-  var ss = document.styleSheets[2];
-  try {
-    if (ss.insertRule) {
-      ss.insertRule('.trpChatContainer > div:first-child { padding-top: ' + size + ' }', ss.cssRules.length);
-    } else if (ss.addRule) {
-      ss.addRule('.trpChatContainer > div:first-child', 'padding-top:' + size);
-    }
-  } catch (err) {
-    // TODO: Handle the error? WC.
-  }
-
-
 
 });

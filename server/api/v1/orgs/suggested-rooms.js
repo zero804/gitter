@@ -7,6 +7,7 @@ var troupeService = require('../../../services/troupe-service');
 var roomMembershipService = require('../../../services/room-membership-service');
 var collections = require('../../../utils/collections');
 
+/* TODO: replace this */
 module.exports = {
   index: function(req) {
     var userId = req.user._id;
@@ -15,6 +16,7 @@ module.exports = {
         troupeService.findChildRoomsForOrg(orgName, {security: 'PUBLIC'}),
         roomMembershipService.findRoomIdsForUser(userId),
         function(rooms, existingRoomIds) {
+          /* TODO: this basically suggests 12 random rooms :( */
           var idMap = collections.hashArray(existingRoomIds);
 
           return _.reject(rooms, function(room) {

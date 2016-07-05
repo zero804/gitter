@@ -1,43 +1,48 @@
 "use strict";
 
 var express = require('express');
-var appMiddleware = require('./app/middleware');
+var isPhoneMiddleware = require('../web/middlewares/is-phone');
+var groupContextResolverMiddleware = require('./uri-context/group-context-resolver-middleware');
 var mainFrameRenderer = require('./renderers/main-frame');
 var renderOrg = require('./renderers/org');
 var featureToggles = require('../web/middlewares/feature-toggles');
-
+var StatusError = require('statuserror');
+var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
+var redirectErrorMiddleware = require('./uri-context/redirect-error-middleware');
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
 function handleOrgPage(req, res, next) {
-  // TODO: remove this when https://github.com/troupe/gitter-webapp/pull/1624 is merged
-  req.uriContext = {
-    uri: req.params.orgName
-  };
-
-  renderOrg.renderOrgPage(req, res, next, {
-    orgUri: req.params.orgName
-  });
+  if (!req.group) throw new StatusError(404);
+  renderOrg.renderOrgPage(req, res, next);
 }
 
 function handleOrgPageInFrame(req, res, next) {
-  if (req.isPhone) return handleOrgPage(req, res, next);
+  if (!req.group) throw new StatusError(404);
 
-  // TODO: remove this when https://github.com/troupe/gitter-webapp/pull/1624 is merged
-  req.uriContext = {
-    uri: 'orgs/' + req.params.orgName + '/rooms'
-  };
+  if (req.isPhone) {
+    return handleOrgPage(req, res, next);
+  }
 
-  mainFrameRenderer.renderMainFrame(req, res, next, 'iframe');
+  mainFrameRenderer.renderMainFrame(req, res, next, {
+    subFrameLocation: '/orgs/' + req.group.uri + '/rooms/~iframe',
+    title: req.group.uri
+    // TODO: add social meta data
+  });
 }
 
-router.get('/:orgName/rooms',
+router.get('/:groupUri/rooms',
+  identifyRoute('group-rooms-mainframe'),
   featureToggles,
-  appMiddleware.isPhoneMiddleware,
-  handleOrgPageInFrame);
+  groupContextResolverMiddleware,
+  handleOrgPageInFrame,
+  redirectErrorMiddleware);
 
-router.get('/:orgName/rooms/~iframe',
+router.get('/:groupUri/rooms/~iframe',
+  identifyRoute('group-rooms-frame'),
   featureToggles,
-  appMiddleware.isPhoneMiddleware,
-  handleOrgPage);
+  isPhoneMiddleware,
+  groupContextResolverMiddleware,
+  handleOrgPage,
+  redirectErrorMiddleware);
 
 module.exports = router;

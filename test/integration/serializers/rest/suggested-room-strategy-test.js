@@ -56,12 +56,4 @@ describe('SuggestedRoomStrategy', function() {
       });
   });
 
-  it('should serialize a suggestion with a roomId', function() {
-    var strategy = new SuggestedRoomStrategy({ currentUserId: fixture.user1._id});
-    var suggestion = fixture.troupe1;
-    return serialize([{roomId: suggestion.id}], strategy)
-      .then(function(s) {
-        assertUtils.assertSerializedEqual(s, getExpectedForSuggestion(suggestion));
-      });
-  });
 });

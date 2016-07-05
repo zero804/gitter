@@ -35,6 +35,7 @@ var client = new elasticsearch.Client({
   // Warning: possible memory leak: https://github.com/elasticsearch/elasticsearch-js/issues/71
   sniffOnStart: config.get('elasticsearch:sniffOnStart'),
   sniffInterval: 300000,
+  apiVersion: '1.4',
   log: ElasticSearchLoggingAdapter
 });
 
