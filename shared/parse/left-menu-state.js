@@ -17,6 +17,11 @@ module.exports = function generateLeftMenuState(leftRoomMenuState, uri, orgs, op
   var roomMenuIsPinned = currentLeftRoomMenuData.roomMenuIsPinned;
   var currentState = currentLeftRoomMenuData.state || 'all';
   var currentlySelectedOrgName = currentLeftRoomMenuData.selectedOrgName || '';
+  //Add a fallback case, if we have the org state selected but not actual org name
+  //fall back to "All Conversations"
+  if(currentState === 'org' && currentlySelectedOrgName === '') {
+    currentState = 'all';
+  }
 
   var timeNow = new Date().getTime();
   var previousUnloadTime = opts.previousUnloadTime;
