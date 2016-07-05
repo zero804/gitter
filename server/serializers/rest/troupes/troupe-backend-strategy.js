@@ -11,11 +11,11 @@ TroupeBackendStrategy.prototype = {
 
   map: function(troupe) {
     var sd = troupe.sd;
+    if (troupe.oneToOne) return undefined;
     if (!sd) return undefined;
     return {
       type: sd.type || undefined,
       linkPath: sd.linkPath || undefined,
-      public: sd.public
     };
   },
 
