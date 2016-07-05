@@ -5,6 +5,7 @@ var GitHubIssueService = require('gitter-web-github').GitHubIssueService;
 var processChat = require('../../../utils/markdown-processor');
 var StatusError = require('statuserror');
 var loadTroupeFromParam = require('./load-troupe-param');
+var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
 
 function getEightSuggestedIssues(issues) {
   var suggestedIssues = [];
@@ -39,7 +40,7 @@ module.exports = {
     return loadTroupeFromParam(req)
       .then(function(troupe) {
         var query = req.query || {};
-        var repoName = query.repoName || (troupe.githubType === 'REPO' && troupe.uri);
+        var repoName = query.repoName || securityDescriptorUtils.getLinkPathIfType('GH_REPO', troupe)
 
         if(!repoName) return [];
 
@@ -58,13 +59,13 @@ module.exports = {
   show: function(req) {
     return loadTroupeFromParam(req)
       .then(function(troupe) {
-        if(troupe.githubType != 'REPO') throw new StatusError(404);
+        var repoUri = securityDescriptorUtils.getLinkPathIfType('GH_REPO', troupe);
+        if(!repoUri) throw new StatusError(404);
 
         var issueNumber = req.params.issue;
-        var repoName = troupe.uri;
 
         var issueService = new GitHubIssueService(req.user);
-        return issueService.getIssue(repoName, issueNumber);
+        return issueService.getIssue(repoUri, issueNumber);
       })
       .then(function(issue) {
         if(!issue) throw new StatusError(404);
