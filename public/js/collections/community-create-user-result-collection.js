@@ -10,7 +10,7 @@ var UserSuggestionCollection = require('collections/user-suggestions');
 
 var _super = ProxyCollection.prototype;
 
-var UserResutCollection = function(models, attrs, options) {
+var UserResultCollection = function(models, attrs, options) {
   if (!attrs || !attrs.stepViewModel) {
     throw new Error('A valid instance of CommunityCreateStepViewModel should be passed to a new UserResultCollection');
   }
@@ -39,7 +39,7 @@ var UserResutCollection = function(models, attrs, options) {
 };
 
 
-_.extend(UserResutCollection.prototype, _super, {
+_.extend(UserResultCollection.prototype, _super, {
 
   onActiveChange: function() {
     if(this.stepViewModel.get('active')) {
@@ -96,4 +96,4 @@ _.extend(UserResutCollection.prototype, _super, {
 
 });
 
-module.exports = UserResutCollection;
+module.exports = UserResultCollection;

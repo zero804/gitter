@@ -2,7 +2,6 @@
 
 var _ = require('underscore');
 var Backbone = require('backbone');
-var ProxyCollection = require('backbone-proxy-collection');
 var VirtualMultipleCollection = require('../virtual-multiple-collection');
 
 var stepConstants = require('../step-constants');
