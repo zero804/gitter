@@ -43,7 +43,7 @@ function getHeaderViewOptions(serializedTroupe) {
     oneToOne: serializedTroupe.oneToOne,
     troupeName: serializedTroupe.name,
     premium: serializedTroupe.premium,
-    private: !!serializedTroupe.public,
+    isPrivate: !serializedTroupe.public,
     troupeTopic: serializedTroupe.topic,
     isAdmin: isTroupeAdmin(serializedTroupe),
     // TODO: move all the headerView things in here
