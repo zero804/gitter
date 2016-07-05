@@ -8,6 +8,7 @@ var StatusError = require('statuserror');
 var loadTroupeFromParam = require('./load-troupe-param');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var RoomWithPolicyService = require('../../../services/room-with-policy-service');
+var roomContextService = require('../../../services/room-context-service');
 
 function searchRooms(req) {
   var user = req.user;
@@ -57,37 +58,32 @@ module.exports = {
   },
 
   /**
-   * This endpoint will go under the new communities API
+   * This endpoint will go under the new communities API.
+   *
+   * It no longer creates the room, only resolves existing rooms,
+   * except in the case of users, for whom it will still
+   * create a one-to-one room
    */
   create: function(req) {
     var roomUri = req.query.uri || req.body.uri;
-    var addBadge = req.body.addBadge || false;
+    roomUri = roomUri ? String(roomUri) : undefined;
 
     if (!roomUri) throw new StatusError(400);
-
-    return roomService.createRoomByUri(req.user, roomUri, { ignoreCase: true, addBadge: addBadge })
-      .then(function (createResult) {
+    
+    return roomContextService.findContextForRoom(req.user, roomUri)
+      .then(function(room) {
         var strategy = new restSerializer.TroupeStrategy({
           currentUserId: req.user.id,
           currentUser: req.user,
-          includeRolesForTroupe: createResult.troupe,
+          includeRolesForTroupe: room,
           // include all these because it will replace the troupe in the context
           includeTags: true,
           includeProviders: true,
           includeGroups: true
         });
 
-        return [createResult, restSerializer.serializeObject(createResult.troupe, strategy)];
-      })
-      .spread(function(createResult, serialized) {
-        serialized.extra = {
-          didCreate: createResult.didCreate,
-          hookCreationFailedDueToMissingScope: createResult.hookCreationFailedDueToMissingScope
-        };
-
-        return serialized;
+        return restSerializer.serializeObject(room, strategy);
       });
-
   },
 
   update: function(req) {
@@ -136,8 +132,6 @@ module.exports = {
   destroy: function(req) {
     return loadTroupeFromParam(req)
       .then(function(troupe) {
-        if (troupe.oneToOne || !troupe.uri) throw new StatusError(400, 'cannot delete one to one rooms');
-
         var roomWithPolicyService = new RoomWithPolicyService(troupe, req.user, req.userRoomPolicy);
         return roomWithPolicyService.deleteRoom();
       })
@@ -171,7 +165,6 @@ module.exports = {
     'issues': require('./issues'),
     'users': require('./users'),
     'bans': require('./bans'),
-    'channels': require('./channels'),
     'chatMessages': require('./chat-messages'),
     'collaborators': require('./collaborators'),
     'suggestedRooms': require('./suggested-rooms'),

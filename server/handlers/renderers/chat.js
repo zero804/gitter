@@ -10,14 +10,13 @@ var userSort = require('../../../public/js/utils/user-sort');
 var isolateBurst = require('gitter-web-shared/burst/isolate-burst-array');
 var unreadItemService = require('../../services/unread-items');
 var _ = require('lodash');
-var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 var getSubResources = require('./sub-resources');
 var fixMongoIdQueryParam = require('../../web/fix-mongo-id-query-param');
 var fonts = require('../../web/fonts');
 var generateRightToolbarSnapshot = require('../snapshots/right-toolbar-snapshot');
-var troupeService = require('../../services/troupe-service');
 var roomMembershipService = require('../../services/room-membership-service');
 var getAvatarUrlForUriContext = require('../../web/get-avatar-url-for-uri-context');
+var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
 
 /* How many chats to send back */
 var INITIAL_CHAT_COUNT = 50;
@@ -51,13 +50,12 @@ function renderChat(req, res, options, next) {
     }, snapshotOptions);
 
     return Promise.all([
-        options.generateContext === false ? null : contextGenerator.generateTroupeContext(req, { snapshots: { chat: snapshotOptions }, permalinkChatId: aroundId }),
+        options.generateContext === false ? { } : contextGenerator.generateTroupeContext(req, { snapshots: { chat: snapshotOptions }, permalinkChatId: aroundId }),
         restful.serializeChatsForTroupe(troupe.id, userId, chatSerializerOptions),
         options.fetchEvents === false ? null : restful.serializeEventsForTroupe(troupe.id, userId),
         options.fetchUsers === false ? null : restful.serializeUsersForTroupe(troupe.id, userId, userSerializerOptions),
-        troupeService.checkGitHubTypeForUri(troupe.lcOwner || '', 'ORG'),
         generateRightToolbarSnapshot(req)
-      ]).spread(function (troupeContext, chats, activityEvents, users, ownerIsOrg, rightToolbarSnapshot) {
+      ]).spread(function (troupeContext, chats, activityEvents, users, rightToolbarSnapshot) {
         var initialChat = _.find(chats, function(chat) { return chat.initial; });
         var initialBottom = !initialChat;
         var githubLink;
@@ -72,7 +70,7 @@ function renderChat(req, res, options, next) {
 
         if (!user) classNames.push("logged-out");
 
-        var isPrivate = troupe.security !== "PUBLIC";
+        var isPrivate = !securityDescriptorUtils.isPublic(troupe);
         var integrationsUrl;
 
         if (troupeContext && troupeContext.isNativeDesktopApp) {
@@ -90,11 +88,6 @@ function renderChat(req, res, options, next) {
 
         /* This is less than ideal way of checking if the user is the admin */
         var isAdmin = troupeContext.troupe && troupeContext.troupe.permissions && troupeContext.troupe.permissions.admin;
-
-        //add ownerIsOrg to the troupe model
-        troupeContext.troupe.ownerIsOrg = ownerIsOrg;
-        var orgName = getOrgNameFromTroupeName(troupeContext.troupe.name);
-        var orgPageHref = '/orgs/' + orgName + '/rooms/';
 
         var isRightToolbarPinned = snapshots && snapshots.rightToolbar && snapshots.rightToolbar.isPinned;
         if(isRightToolbarPinned === undefined) {
@@ -126,8 +119,6 @@ function renderChat(req, res, options, next) {
             hasHiddenMembers: troupe.userCount > 25,
             integrationsUrl: integrationsUrl,
             isMobile: options.isMobile,
-            ownerIsOrg: ownerIsOrg,
-            orgPageHref: orgPageHref,
             roomMember: req.uriContext.roomMember,
             isRightToolbarPinned: isRightToolbarPinned,
 
@@ -140,7 +131,8 @@ function renderChat(req, res, options, next) {
             troupeFavourite: troupeContext.troupe.favourite,
             headerView: {
               // TODO: move all the headerView things in here
-              avatarUrl: roomAvatarUrl
+              avatarUrl: roomAvatarUrl,
+              group: troupeContext.troupe.group
             },
             isAdmin: isAdmin,
             isNativeDesktopApp: troupeContext.isNativeDesktopApp

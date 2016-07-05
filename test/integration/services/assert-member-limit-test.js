@@ -46,7 +46,9 @@ describe('assert-member-limit:', function() {
     it('allows user to join public room', function(done) {
       var room = {
         uri: 'user/room',
-        security: 'PUBLIC',
+        sd: {
+          public: true
+        }
       };
 
       assertMemberLimit(room, FAKE_USER).nodeify(done);
@@ -55,7 +57,9 @@ describe('assert-member-limit:', function() {
     it('allows user to join private room', function(done) {
       var room = {
         uri: 'user/room',
-        security: 'PRIVATE',
+        sd: {
+          public: false
+        }
       };
 
 
@@ -69,7 +73,9 @@ describe('assert-member-limit:', function() {
     it('allows user to join public room', function(done) {
       var room = {
         uri: 'org/room',
-        security: 'PUBLIC',
+        sd: {
+          public: true
+        }
       };
       countUsersInRoomResult = 26;
       assertMemberLimit(room, FAKE_USER).nodeify(done);
@@ -78,7 +84,9 @@ describe('assert-member-limit:', function() {
     it('allows user to join private room with 0 people in the org', function(done) {
       var room = {
         uri: 'org/room',
-        security: 'PRIVATE',
+        sd: {
+          public: false
+        }
       };
       countUsersInRoomResult = 0;
 
@@ -88,7 +96,9 @@ describe('assert-member-limit:', function() {
     it('allows undefined user to join private room with 10 people inside', function(done) {
       var room = {
         uri: 'org/room',
-        security: 'PRIVATE'
+        sd: {
+          public: false
+        }
       };
       countUsersInRoomResult = 10;
       assertMemberLimit(room, undefined).nodeify(done);
@@ -97,7 +107,9 @@ describe('assert-member-limit:', function() {
     it('allows user to join private room with 24 people inside', function(done) {
       var room = {
         uri: 'org/room',
-        security: 'PRIVATE'
+        sd: {
+          public: false
+        }
       };
       countUsersInRoomResult = 24;
       assertMemberLimit(room, FAKE_USER).nodeify(done);
@@ -106,7 +118,9 @@ describe('assert-member-limit:', function() {
     it('throws when user tries to join private room with 25 other people inside', function(done) {
       var room = {
         uri: 'org/room',
-        security: 'PRIVATE'
+        sd: {
+          public: false
+        }
       };
       countUsersInRoomResult = 25;
 
@@ -123,7 +137,9 @@ describe('assert-member-limit:', function() {
     it('throws when user tries to join inherited room with 25 other people inside', function(done) {
       var room = {
         uri: 'org/room',
-        security: 'INHERITED',
+        sd: {
+          public: false
+        }
       };
       countUsersInRoomResult = 25;
 
@@ -140,6 +156,9 @@ describe('assert-member-limit:', function() {
     it('throws when user tries to join room with undefined security with 25 other people inside', function(done) {
       var room = {
         uri: 'org/room',
+        sd: {
+          public: false
+        }
       };
       countUsersInRoomResult = 25;
 
@@ -159,7 +178,9 @@ describe('assert-member-limit:', function() {
 
       var room = {
         uri: 'org/room',
-        security: 'PRIVATE'
+        sd: {
+          public: false
+        }
       };
 
       assertMemberLimit(room, FAKE_USER).nodeify(done);
@@ -171,7 +192,9 @@ describe('assert-member-limit:', function() {
 
       var room = {
         uri: 'org/room',
-        security: 'PRIVATE',
+        sd: {
+          public: false
+        }
       };
 
       assertMemberLimit(room, FAKE_USER).nodeify(done);
@@ -185,7 +208,9 @@ describe('assert-member-limit:', function() {
       countUsersInRoomResult = 100;
       var room = {
         uri: 'xxx/room',
-        security: 'PUBLIC'
+        sd: {
+          public: true
+        }
       };
 
       assertMemberLimit(room, FAKE_USER).nodeify(done);
@@ -195,7 +220,9 @@ describe('assert-member-limit:', function() {
       countUsersInRoomResult = 100;
       var room = {
         uri: 'xxx/room',
-        security: 'PRIVATE',
+        sd: {
+          public: false
+        }
       };
 
       assertMemberLimit(room, FAKE_USER).nodeify(done);

@@ -8,9 +8,9 @@
       "resolved": "https://registry.npmjs.org/@gitterhq/translations/-/translations-1.2.0.tgz"
     },
     "apn": {
-      "version": "1.7.6",
-      "from": "apn@>=1.7.3 <1.8.0",
-      "resolved": "http://beta-internal:4873/apn/-/apn-1.7.6.tgz",
+      "version": "1.7.5",
+      "from": "apn@1.7.5",
+      "resolved": "http://beta-internal:4873/apn/-/apn-1.7.5.tgz",
       "dependencies": {
         "node-forge": {
           "version": "0.6.40",
@@ -95,7 +95,7 @@
           "dependencies": {
             "inherits": {
               "version": "2.0.1",
-              "from": "inherits@2.0.1",
+              "from": "inherits@>=2.0.1 <2.1.0",
               "resolved": "http://beta-internal:4873/inherits/-/inherits-2.0.1.tgz"
             },
             "setprototypeof": {
@@ -246,13 +246,13 @@
           "resolved": "http://beta-internal:4873/nan/-/nan-2.3.5.tgz"
         },
         "rimraf": {
-          "version": "2.5.2",
+          "version": "2.5.3",
           "from": "rimraf@>=2.4.0 <3.0.0",
-          "resolved": "http://beta-internal:4873/rimraf/-/rimraf-2.5.2.tgz",
+          "resolved": "http://beta-internal:4873/rimraf/-/rimraf-2.5.3.tgz",
           "dependencies": {
             "glob": {
               "version": "7.0.5",
-              "from": "glob@>=7.0.0 <8.0.0",
+              "from": "glob@>=7.0.5 <8.0.0",
               "resolved": "http://beta-internal:4873/glob/-/glob-7.0.5.tgz",
               "dependencies": {
                 "fs.realpath": {
@@ -1090,14 +1090,14 @@
       }
     },
     "express-session": {
-      "version": "1.13.0",
+      "version": "1.14.0",
       "from": "express-session@>=1.11.3 <2.0.0",
-      "resolved": "http://beta-internal:4873/express-session/-/express-session-1.13.0.tgz",
+      "resolved": "http://beta-internal:4873/express-session/-/express-session-1.14.0.tgz",
       "dependencies": {
         "cookie": {
-          "version": "0.2.3",
-          "from": "cookie@0.2.3",
-          "resolved": "http://beta-internal:4873/cookie/-/cookie-0.2.3.tgz"
+          "version": "0.3.1",
+          "from": "cookie@0.3.1",
+          "resolved": "http://beta-internal:4873/cookie/-/cookie-0.3.1.tgz"
         },
         "cookie-signature": {
           "version": "1.0.6",
@@ -1116,18 +1116,23 @@
         },
         "parseurl": {
           "version": "1.3.1",
-          "from": "parseurl@>=1.3.0 <1.4.0",
+          "from": "parseurl@>=1.3.1 <1.4.0",
           "resolved": "http://beta-internal:4873/parseurl/-/parseurl-1.3.1.tgz"
         },
         "uid-safe": {
-          "version": "2.0.0",
-          "from": "uid-safe@>=2.0.0 <2.1.0",
-          "resolved": "http://beta-internal:4873/uid-safe/-/uid-safe-2.0.0.tgz",
+          "version": "2.1.1",
+          "from": "uid-safe@>=2.1.1 <2.2.0",
+          "resolved": "http://beta-internal:4873/uid-safe/-/uid-safe-2.1.1.tgz",
           "dependencies": {
             "base64-url": {
-              "version": "1.2.1",
-              "from": "base64-url@1.2.1",
-              "resolved": "http://beta-internal:4873/base64-url/-/base64-url-1.2.1.tgz"
+              "version": "1.2.2",
+              "from": "base64-url@1.2.2",
+              "resolved": "http://beta-internal:4873/base64-url/-/base64-url-1.2.2.tgz"
+            },
+            "random-bytes": {
+              "version": "1.0.0",
+              "from": "random-bytes@>=1.0.0 <1.1.0",
+              "resolved": "http://beta-internal:4873/random-bytes/-/random-bytes-1.0.0.tgz"
             }
           }
         },
@@ -2233,6 +2238,11 @@
       "from": "modules/cdn",
       "resolved": "file:modules/cdn"
     },
+    "gitter-web-collaborators": {
+      "version": "1.0.0",
+      "from": "modules/collaborators",
+      "resolved": "file:modules/collaborators"
+    },
     "gitter-web-env": {
       "version": "1.0.0",
       "from": "modules/env",
@@ -2332,6 +2342,11 @@
       "version": "1.0.0",
       "from": "modules/suggestions",
       "resolved": "file:modules/suggestions"
+    },
+    "gitter-web-twitter": {
+      "version": "1.0.0",
+      "from": "modules/twitter",
+      "resolved": "file:modules/twitter"
     },
     "gitter-web-twitter-backend": {
       "version": "1.0.0",
@@ -3009,7 +3024,7 @@
         },
         "parseurl": {
           "version": "1.3.1",
-          "from": "parseurl@>=1.3.0 <1.4.0",
+          "from": "parseurl@>=1.3.1 <1.4.0",
           "resolved": "http://beta-internal:4873/parseurl/-/parseurl-1.3.1.tgz"
         },
         "vary": {
@@ -3025,9 +3040,9 @@
       "resolved": "http://beta-internal:4873/mixpanel/-/mixpanel-0.0.20.tgz"
     },
     "moment": {
-      "version": "2.13.0",
+      "version": "2.14.1",
       "from": "moment@>=2.10.3 <3.0.0",
-      "resolved": "http://beta-internal:4873/moment/-/moment-2.13.0.tgz"
+      "resolved": "http://beta-internal:4873/moment/-/moment-2.14.1.tgz"
     },
     "mongodb": {
       "version": "2.1.21",
@@ -3136,7 +3151,7 @@
       "dependencies": {
         "async": {
           "version": "1.5.2",
-          "from": "async@>=1.5.2 <2.0.0",
+          "from": "async@1.5.2",
           "resolved": "https://registry.npmjs.org/async/-/async-1.5.2.tgz"
         },
         "bson": {
@@ -3766,7 +3781,7 @@
       "dependencies": {
         "passport-oauth2": {
           "version": "1.3.0",
-          "from": "passport-oauth2@>=1.0.0 <2.0.0",
+          "from": "passport-oauth2@>=1.1.2 <2.0.0",
           "resolved": "http://beta-internal:4873/passport-oauth2/-/passport-oauth2-1.3.0.tgz",
           "dependencies": {
             "passport-strategy": {
@@ -3819,7 +3834,7 @@
       "dependencies": {
         "passport-oauth2": {
           "version": "1.3.0",
-          "from": "passport-oauth2@>=1.0.0 <2.0.0",
+          "from": "passport-oauth2@>=1.1.2 <2.0.0",
           "resolved": "http://beta-internal:4873/passport-oauth2/-/passport-oauth2-1.3.0.tgz",
           "dependencies": {
             "passport-strategy": {
@@ -4363,7 +4378,7 @@
             },
             "mime-types": {
               "version": "2.1.11",
-              "from": "mime-types@>=2.1.7 <2.2.0",
+              "from": "mime-types@>=2.1.11 <2.2.0",
               "resolved": "http://beta-internal:4873/mime-types/-/mime-types-2.1.11.tgz",
               "dependencies": {
                 "mime-db": {
@@ -4473,7 +4488,7 @@
         },
         "parseurl": {
           "version": "1.3.1",
-          "from": "parseurl@>=1.3.0 <1.4.0",
+          "from": "parseurl@>=1.3.1 <1.4.0",
           "resolved": "http://beta-internal:4873/parseurl/-/parseurl-1.3.1.tgz"
         }
       }
@@ -4951,7 +4966,7 @@
             },
             "inherits": {
               "version": "2.0.1",
-              "from": "inherits@2.0.1",
+              "from": "inherits@>=2.0.1 <2.1.0",
               "resolved": "http://beta-internal:4873/inherits/-/inherits-2.0.1.tgz"
             },
             "isarray": {
@@ -5300,7 +5315,7 @@
     "underscore": {
       "version": "1.8.3",
       "from": "underscore@>=1.8.3 <2.0.0",
-      "resolved": "http://beta-internal:4873/underscore/-/underscore-1.8.3.tgz"
+      "resolved": "https://registry.npmjs.org/underscore/-/underscore-1.8.3.tgz"
     },
     "url-join": {
       "version": "0.0.1",
@@ -5814,7 +5829,7 @@
                           "dependencies": {
                             "spdx-license-ids": {
                               "version": "1.2.1",
-                              "from": "spdx-license-ids@>=1.0.0 <2.0.0",
+                              "from": "spdx-license-ids@>=1.0.2 <2.0.0",
                               "resolved": "http://beta-internal:4873/spdx-license-ids/-/spdx-license-ids-1.2.1.tgz"
                             }
                           }
@@ -5831,7 +5846,7 @@
                             },
                             "spdx-license-ids": {
                               "version": "1.2.1",
-                              "from": "spdx-license-ids@>=1.0.0 <2.0.0",
+                              "from": "spdx-license-ids@>=1.0.2 <2.0.0",
                               "resolved": "http://beta-internal:4873/spdx-license-ids/-/spdx-license-ids-1.2.1.tgz"
                             }
                           }
