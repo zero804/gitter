@@ -602,8 +602,7 @@ function addUserToRoom(room, instigatingUser, userToAdd) {
 function removeUserFromRoom(room, user) {
   if (!room) throw new StatusError(400, 'Room required');
   if (!user) throw new StatusError(400, 'User required');
-  // if (!requestingUser) throw new StatusError(401, 'Not authenticated');
-  if (room.oneToOne || room.githubType === 'ONETOONE') throw new StatusError(400, 'This room does not support removing.');
+  if (room.oneToOne) throw new StatusError(400, 'This room does not support removing.');
 
   return roomMembershipService.removeRoomMember(room._id, user._id, room.groupId)
     .then(function() {
