@@ -5,6 +5,9 @@ var persistence = require('gitter-web-persistence');
 var BatchStream = require('batch-stream');
 var Transform = require('stream').Transform;
 var ElasticBulkUpdateStream = require('./elastic-bulk-update-stream');
+var Suggester = require('./suggester');
+var userService = require('../user-service');
+var troupeService = require('../troupe-service');
 var elasticClient = require('../../utils/elasticsearch-client').typeahead;
 var uuid = require('node-uuid');
 var debug = require('debug')('gitter:app:user-typeahead');
@@ -16,27 +19,17 @@ var BATCH_SIZE = 1000;
 var MEMBERSHIP_LIMIT = 600;
 
 function query(text, roomId) {
-  return elasticClient.suggest({
-    size: 10,
-    index: READ_INDEX_ALIAS,
-    type: 'user',
-    body: {
-      suggest: {
-        text: text,
-        completion: {
-          field: "suggest",
-          context: { rooms: roomId },
-          payload: ["_uid"]
-        }
+  return troupeService.findById(roomId)
+    .then(function(room) {
+      if (room.oneToOne) {
+        var usersIds = room.oneToOneUsers.map(function(obj) {
+          return obj.userId.toString();
+        });
+        return queryOneToOne(text, usersIds);
+      } else {
+        return queryRoom(text, roomId);
       }
-    }
-  }).then(function(res) {
-    var options = res.suggest[0].options
-    var userIds = options.map(function(option) {
-      return option.payload._uid[0].split('#')[1];
     });
-    return userIds;
-  });
 }
 
 function reindex() {
@@ -79,6 +72,42 @@ module.exports = {
   removeUserFromRoom: removeUserFromRoom,
   updateUser: updateUser
 };
+
+function queryRoom(text, roomId) {
+  return elasticClient.suggest({
+    size: 10,
+    index: READ_INDEX_ALIAS,
+    type: 'user',
+    body: {
+      suggest: {
+        text: text,
+        completion: {
+          field: "suggest",
+          context: { rooms: roomId },
+          payload: ["_uid"]
+        }
+      }
+    }
+  }).then(function(res) {
+    var options = res.suggest[0].options
+    var userIds = options.map(function(option) {
+      return option.payload._uid[0].split('#')[1];
+    });
+    return userIds;
+  });
+}
+
+function queryOneToOne(text, userIds) {
+  return userService.findByIdsLean(userIds)
+    .then(function(users) {
+      var suggester = new Suggester()
+      users.forEach(function(user) {
+        suggester.add(user._id.toString(), inputForUser(user));
+      });
+
+      return suggester.suggest(text);
+    });
+}
 
 function createIndex(name) {
   debug('creating index %s', name);
@@ -248,12 +277,7 @@ function reindexMemberships() {
 
 function generateUpdateUserReq(user) {
   var id = user._id.toString();
-  var input = [user.username];
-  if (user.displayName) {
-    // for matching "Andy Trevorah" with "andy", "trev", or "andy t"
-    var names = user.displayName.split(' ').filter(Boolean);
-    input = input.concat(user.displayName, names);
-  }
+  var input = inputForUser(user);
 
   return {
     index: WRITE_INDEX_ALIAS,
@@ -276,6 +300,17 @@ function generateUpdateUserReq(user) {
     },
     _retry_on_conflict: 3
   }
+}
+
+function inputForUser(user) {
+  var input = [user.username];
+  if (user.displayName) {
+    // for matching "Andy Trevorah" with "andy", "trev", or "andy t"
+    var names = user.displayName.split(/\s/).filter(Boolean);
+    input = input.concat(user.displayName, names);
+  }
+
+  return input;
 }
 
 function generateAddMembershipReq(userId, roomIds) {
