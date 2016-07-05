@@ -1,5 +1,6 @@
 "use strict";
 
+var Promise = require('bluebird');
 var RepoService = require('gitter-web-github').GitHubRepoService;
 var GitHubIssueService = require('gitter-web-github').GitHubIssueService;
 var processChat = require('../../../utils/markdown-processor');
@@ -37,23 +38,30 @@ module.exports = {
   id: 'issue',
 
   index: function(req) {
-    return loadTroupeFromParam(req)
-      .then(function(troupe) {
-        var query = req.query || {};
-        var repoName = query.repoName || securityDescriptorUtils.getLinkPathIfType('GH_REPO', troupe)
+    var repoName = req.query.repoName;
+    var issueNumber = req.query.issueNumber || '';
 
-        if(!repoName) return [];
+    return Promise.try(function() {
+        if (repoName) return repoName;
 
-        var issueNumber = query.issueNumber || '';
-        var service = new RepoService(req.user);
+        // Resolve the repo name from the room
+        return loadTroupeFromParam(req)
+          .then(function(troupe) {
+            return securityDescriptorUtils.getLinkPathIfType('GH_REPO', troupe);
+          });
+      })
+      .then(function(repoName) {
+        if (!repoName) return [];
+        var repoService = new RepoService(req.user);
 
-        return service.getIssues(repoName)
+        return repoService.getIssues(repoName, {
+            firstPageOnly: !issueNumber
+          })
           .then(function(issues) {
-            var matches = issueNumber.length ? getTopEightMatchingIssues(issues, issueNumber) : getEightSuggestedIssues(issues);
+            var matches = issueNumber ? getTopEightMatchingIssues(issues, issueNumber) : getEightSuggestedIssues(issues);
             return matches;
           });
-
-      });
+        });
   },
 
   show: function(req) {
