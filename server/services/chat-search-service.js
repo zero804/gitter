@@ -137,7 +137,7 @@ function performQuery(troupeId, parsedQuery, options) {
 
   var startTime = Date.now();
 
-  return Promise.resolve(client.search(queryRequest))
+  return client.search(queryRequest)
     .then(function(response) {
       stats.responseTime('chat.search.exec', Date.now() - startTime);
 
