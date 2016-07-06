@@ -69,9 +69,9 @@ function reindex() {
     });
 }
 
-function addUsersToRoom(userIds, roomId) {
+function addUsersToGroupRoom(userIds, roomId) {
   var updates = userIds.map(function(userId) {
-    return createAddMembershipUpdate(userId, roomId);
+    return createAddMembershipUpdate(userId, [roomId]);
   });
   var req = bulkTools.createBulkUpdate(updates);
   return elasticClient.bulk(req)
@@ -93,16 +93,16 @@ function removeUsersFromRoom(userIds, roomId) {
     });
 }
 
-function updateUser(user) {
+function upsertUser(user) {
   return elasticClient.update(createUserUpdate(user))
 }
 
 module.exports = {
   query: query,
   reindex: reindex,
-  addUsersToRoom: addUsersToRoom,
+  addUsersToGroupRoom: addUsersToGroupRoom,
   removeUsersFromRoom: removeUsersFromRoom,
-  updateUser: updateUser
+  upsertUser: upsertUser
 };
 
 function createIndex(name) {
