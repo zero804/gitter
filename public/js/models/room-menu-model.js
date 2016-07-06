@@ -23,6 +23,10 @@ var MinibarItemModel = require('../views/menu/room/minibar/minibar-item-model.js
 var MinibarPeopleModel = require('../views/menu/room/minibar/people-view/people-model');
 var MinibarTempOrgModel = require('../views/menu/room/minibar/temp-org-view/temp-org-model');
 
+//filters
+var defaultCollectionFilter = require('gitter-web-shared/filters/left-menu-primary-default');
+var favouriteCollectionFilter = require('gitter-web-shared/filters/left-menu-primary-favourite');
+
 var states = [
   'all',
   'search',
@@ -114,12 +118,14 @@ module.exports = Backbone.Model.extend({
     this.groupsCollection.add(minibarModels);
     this.minibarCollection = this.groupsCollection;
 
-    this.activeRoomCollection = new FilteredRoomCollection(context.getSnapshot('rooms'), {
+    var roomModels = this._roomCollection.filter(defaultCollectionFilter);
+    this.activeRoomCollection = new FilteredRoomCollection(roomModels, {
       roomModel:  this,
       collection: this._roomCollection,
     });
 
-    this.favouriteCollection = new FilteredFavouriteRoomCollection(context.getSnapshot('favourites'), {
+    var favModels = this._roomCollection.filter(favouriteCollectionFilter);
+    this.favouriteCollection = new FilteredFavouriteRoomCollection(favModels, {
       collection: this._roomCollection,
       roomModel:  this,
       dndCtrl:    this.dndCtrl,
