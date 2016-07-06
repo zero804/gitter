@@ -16,6 +16,7 @@ var RoomMembershipStrategy = require('./troupes/room-membership-strategy');
 var TagsStrategy = require('./troupes/tags-strategy');
 var TroupePermissionsStrategy = require('./troupes/troupe-permissions-strategy');
 var GroupIdStrategy = require('./group-id-strategy');
+var TroupeBackendStrategy = require('./troupes/troupe-backend-strategy');
 
 /**
  * Given the currentUser and a sequence of troupes
@@ -37,6 +38,69 @@ function oneToOneOtherUserSequence(currentUserId, troupes) {
     });
 }
 
+/** Best guess efforts */
+function guessLegacyGitHubType(item) {
+  if (item.githubType) {
+    return item.githubType;
+  }
+
+  if (item.oneToOne) {
+    return 'ONETOONE';
+  }
+
+  if (!item.sd) return 'REPO_CHANNEL'; // Could we do better?
+
+  var linkPath = item.sd.linkPath;
+
+  switch(item.sd.type) {
+    case 'GH_REPO':
+      if (item.uri === linkPath) {
+        return 'REPO';
+      } else {
+        return 'REPO_CHANNEL';
+      }
+      /* break */
+
+    case 'GH_ORG':
+      if (item.uri === linkPath) {
+        return 'REPO';
+      } else {
+        return 'REPO_CHANNEL';
+      }
+      /* break */
+
+    case 'GH_USER':
+      return 'USER_CHANNEL';
+  }
+
+  return 'REPO_CHANNEL';
+}
+
+/** Best guess efforts */
+function guessLegacySecurity(item) {
+  if (item.security) {
+    return item.security;
+  }
+
+  // One-to-one rooms in legacy had security=null
+  if (item.oneToOne) {
+    return undefined;
+  }
+
+  if (item.sd.public) {
+    return 'PUBLIC';
+  }
+
+  var type = item.sd.type;
+  if (type === 'GH_REPO' || type === 'GH_ORG') {
+    if (item.sd.linkPath && item.sd.linkPath !== item.uri) {
+      return 'INHERITED';
+    }
+  }
+
+  return 'PRIVATE';
+}
+
 function TroupeStrategy(options) {
   if (!options) options = {};
 
@@ -52,6 +116,7 @@ function TroupeStrategy(options) {
   var permissionsStrategy;
   var roomMembershipStrategy;
   var groupIdStrategy;
+  var backendStrategy;
 
   this.preload = function(items) { // eslint-disable-line max-statements
     if (items.isEmpty()) return;
@@ -121,6 +186,11 @@ function TroupeStrategy(options) {
         });
 
       strategies.push(groupIdStrategy.preload(groupIds));
+    }
+
+    if (options.includeBackend) {
+      backendStrategy = new TroupeBackendStrategy();
+      // Backend strategy needs no mapping stage
     }
 
     return Promise.all(strategies)
@@ -196,6 +266,14 @@ function TroupeStrategy(options) {
       }
     }
 
+    var isPublic;
+    if (item.oneToOne) {
+      // Double-check here
+      isPublic = false;
+    } else {
+      isPublic = item.sd.public;
+    }
+
     return {
       id: item.id || item._id,
       name: troupeName,
@@ -211,8 +289,8 @@ function TroupeStrategy(options) {
       lurk: isLurking,
       activity: hasActivity,
       url: troupeUrl,
-      githubType: item.githubType,
-      security: item.security,
+      githubType: guessLegacyGitHubType(item),
+      security: guessLegacySecurity(item),
       premium: isPro,
       noindex: item.noindex,
       tags: tagsStrategy ? tagsStrategy.map(item) : undefined,
@@ -221,6 +299,8 @@ function TroupeStrategy(options) {
       roomMember: roomMembershipStrategy ? roomMembershipStrategy.map(item.id) : undefined,
       groupId: item.groupId,
       group: groupIdStrategy && item.groupId ? groupIdStrategy.map(item.groupId) : undefined,
+      backend: backendStrategy ? backendStrategy.map(item) : undefined,
+      public: isPublic,
       v: getVersion(item)
     };
   };
