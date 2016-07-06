@@ -18,7 +18,7 @@ function sendAvatar(req, res, imageUrl, hasCacheBuster) {
     } else {
       res.set('X-Accel-Redirect', '/fetch/' + imageUrl);
     }
-    res.sendStatus(200).send('OK');
+    res.send('OK');
     return;
   }
 
