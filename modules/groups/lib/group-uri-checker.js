@@ -74,7 +74,7 @@ function checkGitHubUri(user, uri, obtainAccessFromGitHubRepo) {
           case you could be adding a repo under your own name, so we have to
           check for that and allow that too. At least for now.
           */
-          policy = policyFactory.getPreCreationPolicyEvaluatorWithRepoFallback(user, 'GH_USER', uri, obtainAccessFromGitHubRepo);
+          policy = policyFactory.getPreCreationPolicyEvaluatorWithRepoFallback(user, 'GH_USER', uri, obtainAccessFromGitHubRepo)
           return policy.canAdmin()
             .then(function(access) {
               return {
