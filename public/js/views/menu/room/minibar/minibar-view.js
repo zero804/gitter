@@ -1,33 +1,39 @@
 "use strict";
 
 var Marionette = require('backbone.marionette');
-var ItemModel = require('./minibar-item-model');
+var context = require('utils/context');
+var appEvents = require('utils/appevents');
 var HomeView = require('./home-view/home-view');
 var SearchView = require('./search-view/search-view');
 var PeopleView = require('./people-view/people-view');
 var CloseView = require('./close-view/close-view');
 var TempOrgView = require('./temp-org-view/temp-org-view');
 var CollectionView = require('./minibar-collection-view');
-var CommunityCreateItemView = require('./minibar-community-create-item-view');
-var fastdom = require('fastdom');
-var appEvents = require('utils/appevents');
-var domIndexById = require('utils/dom-index-by-id');
-
-
+var CommunityCreateView = require('./minibar-community-create-item-view');
 
 require('views/behaviors/isomorphic');
 
+
 module.exports = Marionette.LayoutView.extend({
 
-  behaviors: {
-    Isomorphic: {
-      home: { el: '#minibar-all', init: 'initHome' },
-      search: { el: '#minibar-search', init: 'initSearch' },
-      people: { el: '#minibar-people', init: 'initPeople' },
-      collectionView: { el: '#minibar-collection', init: 'initCollection' },
-      close: { el: '#minibar-close', init: 'initClose' },
-      tempOrg: { el: '#minibar-temp', init: 'initTemp' }
-    },
+  behaviors: function() {
+
+    var behaviours = {
+      Isomorphic: {
+        home: { el: '#minibar-all', init: 'initHome' },
+        search: { el: '#minibar-search', init: 'initSearch' },
+        people: { el: '#minibar-people', init: 'initPeople' },
+        collectionView: { el: '#minibar-collection', init: 'initCollection' },
+        close: { el: '#minibar-close', init: 'initClose' },
+        tempOrg: { el: '#minibar-temp', init: 'initTemp' }
+      },
+    };
+
+    if(context.hasFeature('community-create')) {
+      behaviours.Isomorphic.communityCreate = { el: '#minibar-community-create', init: 'initCommunityCreate' };
+    }
+
+    return behaviours;
   },
 
   initHome: function (optionsForRegion){
@@ -66,7 +72,7 @@ module.exports = Marionette.LayoutView.extend({
   initCollection: function (optionsForRegion){
     var collectionView = new CollectionView(optionsForRegion({
       collection: this.collection,
-      model: this.model,
+      roomMenuModel: this.model,
       keyboardControllerView: this.keyboardControllerView,
     }));
 
@@ -74,10 +80,19 @@ module.exports = Marionette.LayoutView.extend({
     return collectionView;
   },
 
+  initCommunityCreate: function (optionsForRegion){
+    var communityCreateView = new CommunityCreateView(optionsForRegion({
+      model: this.communityCreateModel,
+      roomMenuModel: this.model
+    }));
+
+    return communityCreateView;
+  },
+
   initClose: function (optionsForRegion){
     var closeView = new CloseView(optionsForRegion({
       model: this.closeModel,
-      roomModel: this.model
+      roomMenuModel: this.model
     }));
 
     //We have to manually bind child events because of the Isomorphic Behaviour
@@ -108,6 +123,7 @@ module.exports = Marionette.LayoutView.extend({
     this.homeModel = this.model.minibarHomeModel;
     this.searchModel = this.model.minibarSearchModel;
     this.peopleModel = this.model.minibarPeopleModel;
+    this.communityCreateModel = this.model.minibarCommunityCreateModel;
     this.closeModel = this.model.minibarCloseModel;
     this.tempModel = this.model.minibarTempOrgModel;
     this.keyboardControllerView = attrs.keyboardControllerView;
@@ -214,6 +230,7 @@ module.exports = Marionette.LayoutView.extend({
       this.peopleModel.get('active') && this.peopleModel ||
       this.tempModel.get('active') && this.tempModel ||
       this.collection.findWhere({ active: true }) ||
+      this.communityCreateModel.get('active') && this.communityCreateModel ||
       this.closeModel.get('active') && this.closeModel;
   },
 
@@ -221,6 +238,7 @@ module.exports = Marionette.LayoutView.extend({
     if(this.homeModel.get('focus')) { this.homeModel.set('focus', false); }
     if(this.searchModel.get('focus')) { this.searchModel.set('focus', false); }
     if(this.peopleModel.get('focus')) { this.peopleModel.set('focus', false); }
+    if(this.communityCreateModel.get('focus')) { this.communityCreateModel.set('focus', false); }
     if(this.closeModel.get('focus')) { this.closeModel.set('focus', false); }
     if(this.tempModel.get('focus')) { this.tempModel.set('focus', false); }
     this.collection.where({ focus: true }).forEach(function(model){ model.set('focus', false); });

@@ -20,7 +20,7 @@ var MinibarView = Marionette.CollectionView.extend({
     var opts = {
       index: index,
       model: model,
-      roomMenuModel: this.model
+      roomMenuModel: this.roomMenuModel
     };
 
     if(!!element) { opts.el = element; }
@@ -28,7 +28,7 @@ var MinibarView = Marionette.CollectionView.extend({
   },
 
   initialize: function(attrs) {
-    this.model = attrs.model;
+    this.roomMenuModel = attrs.roomMenuModel;
     this.roomCollection = attrs.roomCollection;
   },
 
