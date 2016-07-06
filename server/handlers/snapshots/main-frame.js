@@ -9,7 +9,6 @@ var suggestedOrgsFromRoomList = require('gitter-web-shared/orgs/suggested-orgs-f
 var mapGroupsForRenderer = require('../map-groups-for-renderer');
 
 module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, groups) {
-  var hasGroups = req.fflip && req.fflip.has('groups');
   var currentRoom = (req.troupe || {});
   var groupName = getOrgNameFromUri(currentRoom.uri);
   var lastLeftMenuSnapshot = (troupeContext.leftRoomMenuState || {});
@@ -27,12 +26,7 @@ module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, group
 
   //Groups
   //------------------------------------------------------
-  if(hasGroups) {
-    groups = mapGroupsForRenderer(groups);
-  }
-  else {
-    groups = suggestedOrgsFromRoomList(rooms, uri, currentRoom.id, currentRoom);
-  }
+  groups = mapGroupsForRenderer(groups);
 
   var hasJoinedRoom = _.findWhere(rooms, { uri: currentRoom.uri});
   //The old group generation adds the tep-org with a prop of temp so we account for that here
@@ -41,15 +35,13 @@ module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, group
   if(uri !== 'home' && !hasJoinedRoom && !hasJoinedGroup) {
     menuState = 'org';
     selectedOrgName = groupName;
-    if(hasGroups) {
-      tempOrg = {
-        name: selectedOrgName,
-        avatarSrcset: resolveRoomAvatarSrcSet({ uri: selectedOrgName}, 22),
-        type: 'org',
-        active: true,
-        hidden: false
-      };
-    }
+    tempOrg = {
+      name: selectedOrgName,
+      avatarSrcset: resolveRoomAvatarSrcSet({ uri: selectedOrgName}, 22),
+      type: 'org',
+      active: true,
+      hidden: false
+    };
   }
 
   return {
