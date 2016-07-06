@@ -9,6 +9,7 @@ var stepConstants = require('public/js/views/community-create/step-constants');
 var CommunityCreateModel = require('public/js/views/community-create/community-create-model');
 var CommunityCreatMainStepViewModel = require('public/js/views/community-create/main-step/community-create-main-step-view-model');
 var MainView = require('public/js/views/community-create/main-step/community-creation-main-view');
+var slugAvailabilityStatusConstants = require('public/js/views/community-create/slug-availability-status-constants');
 
 describe('community-creation-main-view', function() {
 
@@ -81,6 +82,14 @@ describe('community-creation-main-view', function() {
   });
 
   it('should move to the invite step when things are valid', function() {
+    // Stub it as valid
+    var viewValidateCb = viewModel.validate;
+    viewModel.validate = function() {
+      // Override any async responses
+      communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.AVAILABLE);
+      return viewValidateCb.apply(this, arguments);
+    };
+
     assert.strictEqual(communityCreateModel.get('stepState'), stepConstants.MAIN);
     view.ui.communityNameInput.val('foo');
     view.ui.communityNameInput.trigger('input');

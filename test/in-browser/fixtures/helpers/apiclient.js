@@ -12,6 +12,9 @@ module.exports = {
     }
   },
   priv: {
+    get: function() {
+      return Promise.resolve({});
+    },
     channelGenerator: function(relativeUrl) {
       return relativeUrl;
     }
