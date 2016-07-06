@@ -6,6 +6,7 @@ var BatchStream = require('batch-stream');
 var through2 = require('through2');
 var ElasticBulkUpdateStream = require('./elastic-bulk-update-stream');
 var bulkTools = require('./elastic-bulk-tools');
+var inputsForUser = require('./elastic-inputs-for-user');
 var elasticClient = require('../../utils/elasticsearch-client').typeahead;
 var userService = require('../user-service');
 var collections = require('../../utils/collections');
@@ -270,7 +271,7 @@ function reindexMemberships() {
 
 function createUserUpdate(user) {
   var id = user._id.toString();
-  var input = inputForUser(user);
+  var input = inputsForUser(user);
 
   return {
     index: WRITE_INDEX_ALIAS,
@@ -293,17 +294,6 @@ function createUserUpdate(user) {
     },
     _retry_on_conflict: 3
   }
-}
-
-function inputForUser(user) {
-  var input = [user.username];
-  if (user.displayName) {
-    // for matching "Andy Trevorah" with "andy", "trev", or "andy t"
-    var names = user.displayName.split(/\s/).filter(Boolean);
-    input = input.concat(user.displayName, names);
-  }
-
-  return input;
 }
 
 function createAddMembershipUpdate(userId, roomIds) {
