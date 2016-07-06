@@ -6,7 +6,7 @@ var Promise = require('bluebird');
 var StatusError = require('statuserror');
 var User = require('gitter-web-persistence').User;
 var Group = require('gitter-web-persistence').Group;
-var policyFactory = require('gitter-web-permissions/lib/policy-factory');
+var githubPolicyFactory = require('gitter-web-permissions/lib/github-policy-factory');
 var validateGitHubUri = require('gitter-web-github').GitHubUriValidator;
 var validateGroupUri = require('gitter-web-validators/lib/validate-group-uri');
 var debug = require('debug')('gitter:app:groups:group-uri-checker');
@@ -60,8 +60,10 @@ function checkGitHubUri(user, uri, obtainAccessFromGitHubRepo) {
           be the one inside groupService.createGroup that will test if you're
           allowed to access linkPath.
           */
-          policy = policyFactory.getPreCreationPolicyEvaluatorWithRepoFallback(user, 'GH_ORG', uri, obtainAccessFromGitHubRepo);
-          return policy.canAdmin()
+          return githubPolicyFactory.createGroupPolicyForGithubObject(user, 'ORG', uri, githubInfo.githubId, obtainAccessFromGitHubRepo)
+            .then(function(policy) {
+              return policy.canAdmin();
+            })
             .then(function(access) {
               return {
                 githubInfo: githubInfo,
@@ -75,8 +77,10 @@ function checkGitHubUri(user, uri, obtainAccessFromGitHubRepo) {
           case you could be adding a repo under your own name, so we have to
           check for that and allow that too. At least for now.
           */
-          policy = policyFactory.getPreCreationPolicyEvaluatorWithRepoFallback(user, 'GH_USER', uri, obtainAccessFromGitHubRepo);
-          return policy.canAdmin()
+          return githubPolicyFactory.createGroupPolicyForGithubObject(user, 'USER', uri, githubInfo.githubId, obtainAccessFromGitHubRepo)
+            .then(function(policy) {
+              return policy.canAdmin();
+            })
             .then(function(access) {
               return {
                 githubInfo: githubInfo,
