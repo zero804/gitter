@@ -1,5 +1,5 @@
-/* eslint complexity: ["error", 16] */
 'use strict';
+
 var _ = require('underscore');
 var context = require('utils/context');
 var clientEnv = require('gitter-client-env');
@@ -13,43 +13,11 @@ var Dropdown = require('views/controls/dropdown');
 var appEvents = require('utils/appevents');
 var KeyboardEventMixin = require('views/keyboard-events-mixin');
 var headerViewTemplate = require('./tmpl/headerViewTemplate.hbs');
-var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 var toggleClass = require('utils/toggle-class');
-var avatars = require('gitter-web-avatars');
+var getHeaderViewOptions = require('gitter-web-shared/templates/get-header-view-options');
+var MenuBuilder = require('../../utils/menu-builder');
 
 require('views/behaviors/tooltip');
-
-
-function getPrivateStatus(data) {
-  if (data.security === 'PUBLIC') {
-    return false;
-  }
-  // actually everything not-public in getChatNameTitle says it is private in
-  // some way, but be safe for now.
-  return (data.security === 'PRIVATE' || ['REPO', 'ORG', 'REPO_CHANNEL', 'ORG_CHANNEL', 'USER_CHANNEL', 'ONETOONE'].indexOf(data.githubType) !== -1);
-}
-
-function getGithubUrl(data) {
-  if (data.githubType !== 'REPO') return;
-  return 'https://github.com' + data.url;
-}
-
-/**
- * TODO: this should be using the user object to
- * get room information in a one-to-one room
- */
-function getAvatarUrlForRoom(model) {
-  if (model.get('oneToOne')) {
-    if (model.get('user')) {
-      return avatars.getForUser(model.get('user'));
-    }
-
-    // TODO: investigate if and why this is happening...
-    return avatars.getForRoomUri(model.get('name'));
-  }
-
-  return avatars.getForRoomUri(model.get('uri'))
-}
 
 var HeaderView = Marionette.ItemView.extend({
   template: headerViewTemplate,
@@ -103,20 +71,11 @@ var HeaderView = Marionette.ItemView.extend({
 
   serializeData: function() {
     var data = this.model.toJSON();
+
     _.extend(data, {
-      headerView: {
-        avatarUrl: getAvatarUrlForRoom(this.model),
-        group: data.group,
-      },
-      troupeName:      data.name,
-      troupeFavourite: !!data.favourite,
-      troupeTopic:     data.topic,
+      headerView:      getHeaderViewOptions(data),
       user:            !!context.isLoggedIn(),
-      isAdmin:         context.isTroupeAdmin(),
       archives:        this.options.archives,
-      oneToOne:        (data.githubType === 'ONETOONE'),
-      githubLink:      getGithubUrl(data),
-      isPrivate:       getPrivateStatus(data),
       shouldShowPlaceholderRoomTopic: data.userCount <= 1,
       isRightToolbarPinned: this.getIsRightToolbarPinned()
     });
@@ -164,31 +123,28 @@ var HeaderView = Marionette.ItemView.extend({
 
   getChatNameTitle: function() {
     var model = this.model;
-    if (model.get('security') === 'PUBLIC') return 'Anyone can join';
+    if (model.get('public')) {
+      return 'Anyone can join';
+    }
 
-    switch (model.get('githubType')) {
-      case 'REPO':
+    if (model.get('oneToOne')) {
+      return 'This chat is just between you two';
+    }
+
+    var backend = model.get('backend');
+
+    switch (backend && backend.type) {
+      case 'GH_REPO':
         return 'All repo collaborators can join';
 
-      case 'ORG':
+      case 'GH_ORG':
         return 'All org members can join';
 
-      case 'REPO_CHANNEL':
-        var repoName = model.get('uri').split('/')[1];
-        var repoRealm = model.get('security') === 'PRIVATE' ? 'Only invited users' : 'Anyone in ' + repoName;
-        return repoRealm + ' can join';
-
-      case 'ORG_CHANNEL':
-        var orgName = model.get('uri').split('/')[0];
-        var orgRealm = model.get('security') === 'PRIVATE' ? 'Only invited users' : 'Anyone in ' + orgName;
-        return orgRealm + ' can join';
-
-      case 'USER_CHANNEL':
-        return 'Only invited users can join';
-
       default:
-        return model.get('oneToOne') ? 'This chat is just between you two' : 'Only invited users can join';
+        return 'Only invited users can join';
     }
+
+
   },
 
   onRender: function() {
@@ -214,61 +170,46 @@ var HeaderView = Marionette.ItemView.extend({
   },
 
   createMenu: function() {
-    var menuItems = [];
     var c = context();
     var isStaff = context.isStaff();
     var isAdmin = context.isTroupeAdmin();
     var isRoomMember = context.isRoomMember();
-    var githubType = this.model.get('githubType');
-    var isOneToOne = githubType === 'ONETOONE';
-    var security = this.model.get('security');
+    var backend = this.model.get('backend');
+    var type = backend && backend.type;
+    var isOneToOne = this.model.get('oneToOne');
+    var isPublic = this.model.get('public');
     var url = this.model.get('url');
+    var staffOrAdmin = isStaff || isAdmin;
+    var isGitHubObject = type === 'GH_REPO' || type === 'GH_ORG';
+
+    var menuBuilder = new MenuBuilder();
+
+    menuBuilder.addConditional(!isOneToOne, { title: 'Add people to this room', href: '#add' });
+    menuBuilder.addConditional(!isOneToOne, { title: 'Share this chat room', href: '#share' });
+    menuBuilder.addDivider();
+    menuBuilder.addConditional(isRoomMember, { title: 'Notifications', href: '#notifications' });
 
     if (!isOneToOne) {
-      menuItems.push({ title: 'Add people to this room', href: '#add' });
-      menuItems.push({ title: 'Share this chat room', href: '#share' });
-      menuItems.push({ divider: true });
+      var settingMenuItem = c.isNativeDesktopApp ?
+          { title: 'Integrations', href: clientEnv['basePath'] + url + '#integrations', target: '_blank', dataset: { disableRouting: 1 } } :
+          { title: 'Integrations', href: '#integrations' };
+
+      menuBuilder.addConditional(isAdmin, settingMenuItem);
+
+      menuBuilder.addConditional(staffOrAdmin, { title: 'Tags', href: '#tags' });
+      menuBuilder.addConditional(isPublic && staffOrAdmin ,{ title: 'Settings', href: '#settings' });
+      menuBuilder.addDivider();
+
+      menuBuilder.add({ title: 'Archives', href: url + '/archives/all', target: '_blank'});
+      menuBuilder.addConditional(isGitHubObject, { title: 'Open in GitHub', href: 'https://www.github.com' + url, target: '_blank' });
+
+      menuBuilder.addDivider();
+
+      menuBuilder.addConditional(isAdmin, { title: 'Delete this room', href: '#delete' });
+      menuBuilder.addConditional(isRoomMember, { title: 'Leave this room', href: '#leave' });
     }
 
-    if (isRoomMember) menuItems.push({ title: 'Notifications', href: '#notifications' });
-
-    if (!isOneToOne) {
-      if (isAdmin) {
-        if (c.isNativeDesktopApp) {
-          menuItems.push({ title: 'Integrations', href: clientEnv['basePath'] + url + '#integrations', target: '_blank', dataset: { disableRouting: 1 } });
-        } else {
-          menuItems.push({ title: 'Integrations', href: '#integrations' });
-        }
-      }
-
-      if (isStaff || isAdmin) {
-        menuItems.push({ title: 'Tags', href: '#tags' });
-        if (security === 'PUBLIC') {
-          menuItems.push({ title: 'Settings', href: '#settings' });
-        }
-        menuItems.push({ divider: true });
-      }
-
-      menuItems.push({ title: 'Archives', href: url + '/archives/all', target: '_blank'});
-
-      if (githubType === 'REPO' || githubType === 'ORG') {
-        menuItems.push({ title: 'Open in GitHub', href: 'https://www.github.com' + url, target: '_blank' });
-      }
-
-      if (isAdmin || isRoomMember) {
-        menuItems.push({ divider: true });
-      }
-
-      if (isAdmin) {
-        menuItems.push({ title: 'Delete this room', href: '#delete' });
-      }
-
-      if (isRoomMember) {
-        menuItems.push({ title: 'Leave this room', href: '#leave' });
-      }
-    }
-
-    return menuItems;
+    return menuBuilder.getItems();
   },
 
   leaveRoom: function() {
@@ -283,8 +224,10 @@ var HeaderView = Marionette.ItemView.extend({
 
   goToOrgRooms: function(e) {
     e.preventDefault();
-    var orgName = getOrgNameFromTroupeName(context.troupe().get('name'));
-    appEvents.trigger('navigation', '/orgs/' + orgName + '/rooms', 'iframe', orgName + ' rooms');
+    var group = this.model.get('group');
+    if (!group) return;
+    var groupUri = group.uri;
+    appEvents.trigger('navigation', '/orgs/' + groupUri + '/rooms', 'iframe', groupUri + ' rooms');
   },
 
   toggleFavourite: function() {
@@ -379,7 +322,7 @@ var HeaderView = Marionette.ItemView.extend({
       }
     }
 
-    if (changedContains(['name', 'id', 'githubType', 'favourite', 'topic', 'group', 'roomMember'])) {
+    if (changedContains(['uri', 'name', 'id', 'favourite', 'topic', 'group', 'roomMember', 'backend', 'public'])) {
       // The template may have been set to false
       // by the Isomorphic layout
       this.options.template = headerViewTemplate;

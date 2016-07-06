@@ -15,8 +15,7 @@ var fixMongoIdQueryParam = require('../../web/fix-mongo-id-query-param');
 var fonts = require('../../web/fonts');
 var generateRightToolbarSnapshot = require('../snapshots/right-toolbar-snapshot');
 var roomMembershipService = require('../../services/room-membership-service');
-var getAvatarUrlForUriContext = require('../../web/get-avatar-url-for-uri-context');
-var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
+var getHeaderViewOptions = require('gitter-web-shared/templates/get-header-view-options');
 
 /* How many chats to send back */
 var INITIAL_CHAT_COUNT = 50;
@@ -70,7 +69,6 @@ function renderChat(req, res, options, next) {
 
         if (!user) classNames.push("logged-out");
 
-        var isPrivate = !securityDescriptorUtils.isPublic(troupe);
         var integrationsUrl;
 
         if (troupeContext && troupeContext.isNativeDesktopApp) {
@@ -94,25 +92,21 @@ function renderChat(req, res, options, next) {
           isRightToolbarPinned = true;
         }
 
-        var roomAvatarUrl = getAvatarUrlForUriContext(req.uriContext);
-
         var renderOptions = _.extend({
             hasCachedFonts: fonts.hasCachedFonts(req.cookies),
             fonts: fonts.getFonts(),
-            isRepo: troupe.githubType === 'REPO',
+            isRepo: troupe.sd.type === 'GH_REPO', // Used by chat_toolbar patial
             bootScriptName: script,
             cssFileName: cssFileName,
             githubLink: githubLink,
             troupeName: req.uriContext.uri,
-            oneToOne: troupe.oneToOne,
+            oneToOne: troupe.oneToOne, // Used by the old left menu
             user: user,
             troupeContext: troupeContext,
             initialBottom: initialBottom,
             chats: chatsWithBurst,
             classNames: classNames.join(' '),
-            agent: req.headers['user-agent'],
             subresources: getSubResources(script),
-            isPrivate: isPrivate,
             activityEvents: activityEvents,
             users: users && users.sort(userSort),
             userCount: troupe.userCount,
@@ -124,16 +118,10 @@ function renderChat(req, res, options, next) {
 
             //Feature Switch Left Menu
             hasNewLeftMenu: req.fflip && req.fflip.has('left-menu'),
-
-          }, troupeContext && {
             troupeTopic: troupeContext.troupe.topic,
             premium: troupeContext.troupe.premium,
             troupeFavourite: troupeContext.troupe.favourite,
-            headerView: {
-              // TODO: move all the headerView things in here
-              avatarUrl: roomAvatarUrl,
-              group: troupeContext.troupe.group
-            },
+            headerView: getHeaderViewOptions(troupeContext.troupe),
             isAdmin: isAdmin,
             isNativeDesktopApp: troupeContext.isNativeDesktopApp
           }, options.extras);

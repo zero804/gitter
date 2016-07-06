@@ -51,7 +51,8 @@ module.exports = {
       includeTags: true,
       includePermissions: true,
       includeProviders: true,
-      includeGroups: true
+      includeGroups: true,
+      includeBackend: true
     });
 
     return restSerializer.serializeObject(req.params.troupeId, strategy);
@@ -69,7 +70,7 @@ module.exports = {
     roomUri = roomUri ? String(roomUri) : undefined;
 
     if (!roomUri) throw new StatusError(400);
-    
+
     return roomContextService.findContextForRoom(req.user, roomUri)
       .then(function(room) {
         var strategy = new restSerializer.TroupeStrategy({
@@ -122,7 +123,8 @@ module.exports = {
           includePermissions: true,
           includeOwner: true,
           includeProviders: true,
-          includeGroups: true
+          includeGroups: true,
+          includeBackend: true
         });
 
         return restSerializer.serializeObject(req.params.troupeId, strategy);
