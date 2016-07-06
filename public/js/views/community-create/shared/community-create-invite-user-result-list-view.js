@@ -7,6 +7,7 @@ var InviteUserResultListItemView = require('./community-create-invite-user-resul
 var Marionette = require('backbone.marionette');
 
 var InviteUserResultListView = Marionette.CompositeView.extend({
+  className: 'community-create-invite-user-result-list-root-inner',
   template: CommunityCreationOrgListTemplate,
   childView: InviteUserResultListItemView,
   childViewContainer: '.community-create-invite-user-result-list',
