@@ -87,28 +87,6 @@ describe('group-with-policy-service #slow', function() {
 
   // repo rooms
 
-  it('should create a repo room (inherited)', function() {
-    return group1WithPolicyService.createRoom({
-        type: 'GH_REPO',
-        name: fixtureLoader.GITTER_INTEGRATION_REPO,
-        security: 'INHERITED',
-        linkPath: linkPath
-      })
-      .then(function(room) {
-        return securityDescriptorService.getForRoomUser(room._id, null);
-      })
-      .then(function(securityDescriptor) {
-        assert.deepEqual(securityDescriptor, {
-          type: 'GH_REPO',
-          members: 'PUBLIC',
-          admins: 'GH_REPO_PUSH',
-          public: true,
-          linkPath: linkPath,
-          externalId: fixtureLoader.GITTER_INTEGRATION_REPO_ID
-        });
-      });
-  });
-
   it('should create a repo room (public)', function() {
     return group1WithPolicyService.createRoom({
         type: 'GH_REPO',
@@ -154,13 +132,11 @@ describe('group-with-policy-service #slow', function() {
       });
   });
 
-  // TODO: inherited repo room tests? What does that even mean again?
-
   it('should throw an error if you try and add a GitHub repo backed room to a non-Github group', function() {
     return group2WithPolicyService.createRoom({
         type: 'GH_REPO',
         name: fixtureLoader.GITTER_INTEGRATION_REPO,
-        security: 'INHERITED',
+        security: 'PUBLIC',
         linkPath: linkPath
       })
       .then(function() {
@@ -220,25 +196,11 @@ describe('group-with-policy-service #slow', function() {
       });
   });
 
-  it('should throw an error when trying to create a normal room with security: INHERITED', function() {
-    return group2WithPolicyService.createRoom({
-        type: null,
-        name: fixtureLoader.GITTER_INTEGRATION_ROOM,
-        security: 'INHERITED'
-      })
-      .then(function() {
-        assert.ok(false, 'expected error')
-      })
-      .catch(StatusError, function(error) {
-        assert.strictEqual(error.status, 400);
-      });
-  });
-
   it('should throw an error when validateRoomName fails', function() {
     return group2WithPolicyService.createRoom({
         type: null,
         name: '',
-        security: 'INHERITED'
+        security: 'PUBLIC'
       })
       .then(function() {
         assert.ok(false, 'expected error')
@@ -275,31 +237,6 @@ describe('group-with-policy-service #slow', function() {
         type: 'GH_ORG',
         name: fixtureLoader.GITTER_INTEGRATION_ROOM,
         security: 'PUBLIC',
-        linkPath: fixtureLoader.GITTER_INTEGRATION_ORG
-      })
-      .then(function(room) {
-        return securityDescriptorService.getForRoomUser(room._id, null);
-      })
-      .then(function(securityDescriptor) {
-        assert.deepEqual(securityDescriptor, {
-          type: 'GH_ORG',
-          members: 'PUBLIC',
-          admins: 'GH_ORG_MEMBER',
-          public: true,
-          linkPath: fixtureLoader.GITTER_INTEGRATION_ORG,
-          externalId: fixtureLoader.GITTER_INTEGRATION_ORG_ID
-        });
-      });
-  });
-
-  it('should create an org room (inherited)', function() {
-    // TODO: does this make any sense? The modal says "Anyone in {orgname} can
-    // join" regardless of whether INHERITED ends up as PUBLIC or PRIVATE and
-    // PRIVATE actually matches with what the inherited option says.
-    return group3WithPolicyService.createRoom({
-        type: 'GH_ORG',
-        name: fixtureLoader.GITTER_INTEGRATION_ROOM,
-        security: 'INHERITED',
         linkPath: fixtureLoader.GITTER_INTEGRATION_ORG
       })
       .then(function(room) {
@@ -382,21 +319,6 @@ describe('group-with-policy-service #slow', function() {
           linkPath: fixtureLoader.GITTER_INTEGRATION_USERNAME,
           externalId: fixtureLoader.GITTER_INTEGRATION_USER_ID
         });
-      });
-  });
-
-  it('should throw an error when trying to create a user room with security: INHERITED', function() {
-    return group1WithPolicyService.createRoom({
-        type: 'GH_USER',
-        name: fixtureLoader.GITTER_INTEGRATION_ROOM,
-        security: 'INHERITED',
-        linkPath: linkPath
-      })
-      .then(function() {
-        assert.ok(false, 'expected error')
-      })
-      .catch(StatusError, function(error) {
-        assert.strictEqual(error.status, 400);
       });
   });
 

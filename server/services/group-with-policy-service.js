@@ -15,12 +15,7 @@ var validateRoomName = require('gitter-web-validators/lib/validate-room-name');
  * @private
  */
 function validateRoomSecurity(type, security) {
-  if (security === 'PUBLIC' || security === 'PRIVATE') {
-    return true;
-  } else if (type && security === 'INHERITED') {
-    return true;
-  }
-  return false;
+  return (security === 'PUBLIC' || security === 'PRIVATE');
 }
 
 /**
@@ -61,7 +56,6 @@ function ensureAccessAndFetchRoomInfo(user, group, options) {
   // TODO: validate topic
 
   var name = options.name;
-  assert(name, 'name required');
 
   if (!validateRoomName(name)) {
     throw new StatusError(400, 'Invalid room name: ' + name);
