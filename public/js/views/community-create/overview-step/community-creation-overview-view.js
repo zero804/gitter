@@ -1,7 +1,11 @@
 'use strict';
 
 var _ = require('underscore');
+var urlJoin = require('url-join');
+var clientEnv = require('gitter-client-env');
 var toggleClass = require('utils/toggle-class');
+var apiClient = require('components/apiClient');
+var appEvents = require('utils/appevents');
 var VirtualMultipleCollection = require('../virtual-multiple-collection');
 
 var stepConstants = require('../step-constants');
@@ -74,7 +78,49 @@ module.exports = CommunityCreateBaseStepView.extend({
   },
 
   onStepNext: function() {
-    // TODO: Actually create the community, sub-rooms, and invite the people
+    var communityCreateModel = this.communityCreateModel;
+
+    var type = null;
+    var linkPath = null;
+    var githubProjectModel;
+    var githubOrgId = communityCreateModel.get('githubOrgId');
+    var githubRepoId = communityCreateModel.get('githubRepoId');
+    if(githubOrgId) {
+      githubProjectModel = this.orgCollection.get(githubOrgId);
+      type = 'GH_ORG';
+    }
+    else if(githubRepoId) {
+      githubProjectModel = this.repoCollection.get(githubRepoId);
+      type = 'GH_REPO';
+    }
+
+    if(githubProjectModel) {
+      linkPath = githubProjectModel.get('uri');
+    }
+
+    var defaultRoomName = 'Lobby';
+
+
+    // TODO: Invite people
+    var creatingGroupPromise = apiClient.post('/v1/groups', {
+      name: communityCreateModel.get('communityName'),
+      uri: communityCreateModel.get('communitySlug'),
+      type: type,
+      linkPath: linkPath,
+      defaultRoomName: defaultRoomName
+    });
+
+    var basePath = clientEnv['basePath'];
+    creatingGroupPromise.then(function(results) {
+      var defaultRoomName = results && results.defaultRoom && results.defaultRoom.name;
+      var defaultRoomUri = results && results.defaultRoom && results.defaultRoom.uri;
+
+      appEvents.trigger('navigation', urlJoin(basePath, defaultRoomUri), 'chat', defaultRoomName);
+      // Hide create community
+      //communityCreateModel.set('active', false);
+      communityCreateModel.clear().set(communityCreateModel.defaults);
+    });
+
   },
   onStepBack: function() {
     this.communityCreateModel.set('stepState', stepConstants.INVITE);

@@ -7,14 +7,16 @@ var CommunityCreateMainStepViewModel = CommunityCreateStepViewModel.extend({
   validate: function() {
     var errors = [];
 
-    var hasCommunityName = this.communityCreateModel.get('communityName').length > 0;
+    var communityName = this.communityCreateModel.get('communityName') || '';
+
+    var hasCommunityName = communityName.length > 0;
     if(!hasCommunityName) {
       errors.push({
         key: 'communityName',
         message: 'Please fill in the community name'
       });
     }
-    var communitySlug = this.communityCreateModel.get('communitySlug');
+    var communitySlug = this.communityCreateModel.get('communitySlug') || '';
     var hasCommunitySlug = communitySlug.length > 0;
     if(!hasCommunitySlug) {
       errors.push({
