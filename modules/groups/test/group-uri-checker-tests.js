@@ -34,12 +34,15 @@ describe('group-uri-checker #slow', function() {
       });
   });
 
-  it('should not allow creation if a user with that username exists', function() {
+  // see group-uri-checker.js. This check was disabled for now.
+  /*
+  it('should not allow creation if a gitter user with that username exists', function() {
     return groupUriChecker(fixture.user1, fixture.user1.username)
       .then(function(info) {
         assert.strictEqual(info.allowCreate, false);
       });
   });
+  */
 
   it('should not allow creation if a group with that uri exists', function() {
     return groupUriChecker(fixture.user1, fixture.group1.uri)
@@ -56,12 +59,6 @@ describe('group-uri-checker #slow', function() {
       });
   });
 
-  it('should not allow creation if a gh user with that login exists', function() {
-    return groupUriChecker(fixture.user1, fixtureLoader.GITTER_INTEGRATION_USERNAME)
-      .then(function(info) {
-        assert.strictEqual(info.allowCreate, false);
-      });
-  });
 
   it('should allow creation if the uri is not taken in any way', function() {
     return groupUriChecker(fixture.user1, '_this-should-not-exist')
@@ -71,4 +68,18 @@ describe('group-uri-checker #slow', function() {
       });
   });
 
+
+  it("should allow creation if a gh user with that login exists and you are that user ", function() {
+    return groupUriChecker(fixture.user1, fixtureLoader.GITTER_INTEGRATION_USERNAME)
+      .then(function(info) {
+        assert.strictEqual(info.allowCreate, true);
+      });
+  });
+
+  it("should not allow creation if a gh user with that login exists and you are not that user", function() {
+    return groupUriChecker(fixture.user2, fixtureLoader.GITTER_INTEGRATION_USERNAME)
+      .then(function(info) {
+        assert.strictEqual(info.allowCreate, false);
+      });
+  });
 });
