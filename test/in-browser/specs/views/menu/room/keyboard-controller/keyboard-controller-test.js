@@ -476,6 +476,18 @@ describe('KeyboardControllerView', function(){
       assert(view.isMinibarInFocus());
     });
 
+    it('should return true if the tempOrgItem is in focus', function(){
+      view.blurAllItems();
+      model.minibarTempOrgModel.set({ hidden: false, focus: true });
+      assert(view.isMinibarInFocus());
+    });
+
+    it('should return false if the tempOrgItem is in focus but is hidden', function(){
+      view.blurAllItems();
+      model.minibarTempOrgModel.set({ hidden: true, focus: true });
+      assert(!view.isMinibarInFocus());
+    });
+
   });
 
   describe('getFlatMinibarCollection', function(){

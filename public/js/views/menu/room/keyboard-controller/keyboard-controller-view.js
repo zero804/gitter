@@ -305,6 +305,7 @@ var KeyboardController = Marionette.ItemView.extend({
     return  (this.minibarHomeModel.get(attr) === val) && this.minibarHomeModel ||
       (this.minibarSearchModel.get(attr) === val) && this.minibarSearchModel ||
       (this.minibarPeopleModel.get(attr) === val) && this.minibarPeopleModel ||
+      (!this.minibarTempOrgModel.get('hidden') && this.minibarTempOrgModel.get(attr) === val && this.minibarTempOrgModel) ||
       this.minibarCollection.findWhere(q) ||
       (this.minibarCloseModel.get(attr) === val) && this.minibarCloseModel;
   },
