@@ -5,7 +5,7 @@ var resolveRoomAvatar = require('gitter-web-shared/avatars/resolve-room-avatar-s
 module.exports = function mapGroupsForRenderer(groups) {
   return groups.map(function(group){
     return _.extend({}, group, {
-      avatarSrcset: resolveRoomAvatar({ uri: group.name }),
+      avatarSrcset: resolveRoomAvatar({ uri: group.uri }),
     });
   });
 };
