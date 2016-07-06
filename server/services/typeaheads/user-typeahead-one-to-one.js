@@ -17,8 +17,6 @@ module.exports = {
           return getNames(user).some(function(name) {
             return name.indexOf(lcText) === 0;
           });
-        }).map(function(user) {
-          return user._id.toString();
         });
       });
   }

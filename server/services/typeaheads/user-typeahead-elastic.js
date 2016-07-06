@@ -7,6 +7,8 @@ var through2 = require('through2');
 var ElasticBulkUpdateStream = require('./elastic-bulk-update-stream');
 var bulkTools = require('./elastic-bulk-tools');
 var elasticClient = require('../../utils/elasticsearch-client').typeahead;
+var userService = require('../user-service');
+var collections = require('../../utils/collections');
 var uuid = require('node-uuid');
 var debug = require('debug')('gitter:app:user-typeahead');
 
@@ -38,7 +40,10 @@ function query(text, options) {
     var userIds = options.map(function(option) {
       return option.payload._uid[0].split('#')[1];
     });
-    return userIds;
+    return userService.findByIds(userIds)
+      .then(function(users) {
+        return collections.maintainIdOrder(userIds, users);
+      });
   });
 }
 
