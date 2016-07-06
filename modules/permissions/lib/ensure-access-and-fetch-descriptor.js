@@ -100,7 +100,7 @@ function ensureAccessAndFetchDescriptor(user, options) {
         if (!githubInfo) {
           throw new StatusError('Cannot have INHERITED permissions on a non-GitHub backed object')
         }
-        
+
         security = githubInfo.security;
       }
 

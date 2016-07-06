@@ -21,6 +21,7 @@ describe('group-with-policy-service #slow', function() {
   var fixture = {};
   var group1WithPolicyService;
   var group2WithPolicyService;
+  var group3WithPolicyService;
 
   var linkPath = fixtureLoader.GITTER_INTEGRATION_USERNAME + '/' + fixtureLoader.GITTER_INTEGRATION_REPO;
 
@@ -35,7 +36,10 @@ describe('group-with-policy-service #slow', function() {
           ],
           Troupe: [
             { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() + '/' + fixtureLoader.GITTER_INTEGRATION_REPO.toLowerCase() },
-            { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() + '/' + fixtureLoader.GITTER_INTEGRATION_ROOM.toLowerCase() }
+            { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() + '/' + fixtureLoader.GITTER_INTEGRATION_ROOM.toLowerCase() },
+            { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() + '/' + fixtureLoader.GITTER_INTEGRATION_ROOM.toLowerCase() },
+            { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() + '/' + fixtureLoader.GITTER_INTEGRATION_ROOM.toLowerCase() },
+
           ]
         },
         user1: {
@@ -58,11 +62,22 @@ describe('group-with-policy-service #slow', function() {
           securityDescriptor: {
             extraAdmins: ['user1']
           }
+        },
+        // group3 is a github org backed group
+        group3: {
+          uri: fixtureLoader.GITTER_INTEGRATION_ORG,
+          lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase(),
+          securityDescriptor: {
+            type: 'GH_ORG',
+            linkPath: fixtureLoader.GITTER_INTEGRATION_ORG,
+            extraAdmins: ['user1']
+          }
         }
       })()
     .then(function() {
       group1WithPolicyService = new GroupWithPolicyService(fixture.group1, fixture.user1, isAdminPolicy);
       group2WithPolicyService = new GroupWithPolicyService(fixture.group2, fixture.user1, isAdminPolicy);
+      group3WithPolicyService = new GroupWithPolicyService(fixture.group3, fixture.user1, isAdminPolicy);
     });
   });
 
@@ -139,6 +154,8 @@ describe('group-with-policy-service #slow', function() {
       });
   });
 
+  // TODO: inherited repo room tests? What does that even mean again?
+
   it('should throw an error if you try and add a GitHub repo backed room to a non-Github group', function() {
     return group2WithPolicyService.createRoom({
         type: 'GH_REPO',
@@ -203,7 +220,7 @@ describe('group-with-policy-service #slow', function() {
       });
   });
 
-  it('should throw an error when trying to create a normal room with security: INHERIT', function() {
+  it('should throw an error when trying to create a normal room with security: INHERITED', function() {
     return group2WithPolicyService.createRoom({
         type: null,
         name: fixtureLoader.GITTER_INTEGRATION_ROOM,
@@ -251,6 +268,138 @@ describe('group-with-policy-service #slow', function() {
       });
   });
 
-  // TODO: what about an org channel?
-  // TODO: what about if someone tries to pass in a gh user as linkPath? Is that allowed?
+  // org rooms
+
+  it('should create an org room (public)', function() {
+    return group3WithPolicyService.createRoom({
+        type: 'GH_ORG',
+        name: fixtureLoader.GITTER_INTEGRATION_ROOM,
+        security: 'PUBLIC',
+        linkPath: fixtureLoader.GITTER_INTEGRATION_ORG
+      })
+      .then(function(room) {
+        return securityDescriptorService.getForRoomUser(room._id, null);
+      })
+      .then(function(securityDescriptor) {
+        assert.deepEqual(securityDescriptor, {
+          type: 'GH_ORG',
+          members: 'PUBLIC',
+          admins: 'GH_ORG_MEMBER',
+          public: true,
+          linkPath: fixtureLoader.GITTER_INTEGRATION_ORG,
+          externalId: fixtureLoader.GITTER_INTEGRATION_ORG_ID
+        });
+      });
+  });
+
+  it('should create an org room (inherited)', function() {
+    // TODO: does this make any sense? The modal says "Anyone in {orgname} can
+    // join" regardless of whether INHERITED ends up as PUBLIC or PRIVATE and
+    // PRIVATE actually matches with what the inherited option says.
+    return group3WithPolicyService.createRoom({
+        type: 'GH_ORG',
+        name: fixtureLoader.GITTER_INTEGRATION_ROOM,
+        security: 'INHERITED',
+        linkPath: fixtureLoader.GITTER_INTEGRATION_ORG
+      })
+      .then(function(room) {
+        return securityDescriptorService.getForRoomUser(room._id, null);
+      })
+      .then(function(securityDescriptor) {
+        assert.deepEqual(securityDescriptor, {
+          type: 'GH_ORG',
+          members: 'PUBLIC',
+          admins: 'GH_ORG_MEMBER',
+          public: true,
+          linkPath: fixtureLoader.GITTER_INTEGRATION_ORG,
+          externalId: fixtureLoader.GITTER_INTEGRATION_ORG_ID
+        });
+      });
+  });
+
+  it('should create an org room (private)', function() {
+    return group3WithPolicyService.createRoom({
+        type: 'GH_ORG',
+        name: fixtureLoader.GITTER_INTEGRATION_ROOM,
+        security: 'PRIVATE',
+        linkPath: fixtureLoader.GITTER_INTEGRATION_ORG
+      })
+      .then(function(room) {
+        return securityDescriptorService.getForRoomUser(room._id, null);
+      })
+      .then(function(securityDescriptor) {
+        assert.deepEqual(securityDescriptor, {
+          type: 'GH_ORG',
+          members: 'GH_ORG_MEMBER',
+          admins: 'GH_ORG_MEMBER',
+          public: false,
+          linkPath: fixtureLoader.GITTER_INTEGRATION_ORG,
+          externalId: fixtureLoader.GITTER_INTEGRATION_ORG_ID
+        });
+      });
+  });
+
+  // user rooms
+
+  it('should create a user room (public)', function() {
+    return group1WithPolicyService.createRoom({
+        type: 'GH_USER',
+        name: fixtureLoader.GITTER_INTEGRATION_ROOM,
+        security: 'PUBLIC',
+        linkPath: fixtureLoader.GITTER_INTEGRATION_USERNAME
+      })
+      .then(function(room) {
+        return securityDescriptorService.getForRoomUser(room._id, null);
+      })
+      .then(function(securityDescriptor) {
+        assert.deepEqual(securityDescriptor, {
+          type: 'GH_USER',
+          members: 'PUBLIC',
+          admins: 'GH_USER_SAME',
+          public: true,
+          linkPath: fixtureLoader.GITTER_INTEGRATION_USERNAME,
+          externalId: fixtureLoader.GITTER_INTEGRATION_USER_ID
+        });
+      });
+  });
+
+  it('should create a user room (private)', function() {
+    return group1WithPolicyService.createRoom({
+        type: 'GH_USER',
+        name: fixtureLoader.GITTER_INTEGRATION_ROOM,
+        security: 'PRIVATE',
+        linkPath: fixtureLoader.GITTER_INTEGRATION_USERNAME
+      })
+      .then(function(room) {
+        return securityDescriptorService.getForRoomUser(room._id, null);
+      })
+      .then(function(securityDescriptor) {
+        assert.deepEqual(securityDescriptor, {
+          type: 'GH_USER',
+          members: 'INVITE',
+          admins: 'GH_USER_SAME',
+          public: false,
+          linkPath: fixtureLoader.GITTER_INTEGRATION_USERNAME,
+          externalId: fixtureLoader.GITTER_INTEGRATION_USER_ID
+        });
+      });
+  });
+
+  it('should throw an error when trying to create a user room with security: INHERITED', function() {
+    return group1WithPolicyService.createRoom({
+        type: 'GH_USER',
+        name: fixtureLoader.GITTER_INTEGRATION_ROOM,
+        security: 'INHERITED',
+        linkPath: linkPath
+      })
+      .then(function() {
+        assert.ok(false, 'expected error')
+      })
+      .catch(StatusError, function(error) {
+        assert.strictEqual(error.status, 400);
+      });
+  });
+
+  // TODO: test all the obtainAccessFromGitHubRepo cases
+
 });
