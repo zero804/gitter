@@ -48,6 +48,7 @@ function checkGitHubUri(user, uri, obtainAccessFromGitHubRepo) {
     // check gh orgs and users
     return validateGitHubUri(user, uri)
       .then(function(githubInfo) {
+        var policy;
         if (githubInfo && githubInfo.type === 'ORG') {
           // also check if you can actually admin the org.
 
@@ -58,7 +59,7 @@ function checkGitHubUri(user, uri, obtainAccessFromGitHubRepo) {
           be the one inside groupService.createGroup that will test if you're
           allowed to access linkPath.
           */
-          var policy = policyFactory.getPreCreationPolicyEvaluatorWithRepoFallback(user, 'GH_ORG', uri, obtainAccessFromGitHubRepo);
+          policy = policyFactory.getPreCreationPolicyEvaluatorWithRepoFallback(user, 'GH_ORG', uri, obtainAccessFromGitHubRepo);
           return policy.canAdmin()
             .then(function(access) {
               return {
@@ -73,7 +74,7 @@ function checkGitHubUri(user, uri, obtainAccessFromGitHubRepo) {
           case you could be adding a repo under your own name, so we have to
           check for that and allow that too. At least for now.
           */
-          var policy = policyFactory.getPreCreationPolicyEvaluatorWithRepoFallback(user, 'GH_USER', uri, obtainAccessFromGitHubRepo)
+          policy = policyFactory.getPreCreationPolicyEvaluatorWithRepoFallback(user, 'GH_USER', uri, obtainAccessFromGitHubRepo);
           return policy.canAdmin()
             .then(function(access) {
               return {
