@@ -96,7 +96,7 @@ function serializeUsersForTroupe(troupeId, userId, options) {
       return Promise.resolve([]);
     }
 
-    return userTypeahead.query(searchTerm, troupeId)
+    return userTypeahead.query(searchTerm, { roomId: troupeId })
       .then(function(userIds) {
         var strategy = new restSerializer.UserIdStrategy();
         return restSerializer.serialize(userIds, strategy);
