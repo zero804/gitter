@@ -35,6 +35,7 @@ var KeyboardController = Marionette.ItemView.extend({
     this.minibarHomeModel = attrs.model.minibarHomeModel;
     this.minibarSearchModel = attrs.model.minibarSearchModel;
     this.minibarPeopleModel = attrs.model.minibarPeopleModel;
+    this.minibarCommunityCreateModel = attrs.model.minibarCommunityCreateModel;
     this.minibarCloseModel = attrs.model.minibarCloseModel;
     this.minibarTempOrgModel = attrs.model.minibarTempOrgModel;
 
