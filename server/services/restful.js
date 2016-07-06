@@ -97,9 +97,9 @@ function serializeUsersForTroupe(troupeId, userId, options) {
     }
 
     return userTypeahead.query(searchTerm, { roomId: troupeId })
-      .then(function(userIds) {
-        var strategy = new restSerializer.UserIdStrategy();
-        return restSerializer.serialize(userIds, strategy);
+      .then(function(users) {
+        var strategy = new restSerializer.UserStrategy();
+        return restSerializer.serialize(users, strategy);
       });
 
   }
