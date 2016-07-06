@@ -21,7 +21,7 @@ function getExpectedForSuggestion(suggestion) {
     uri: suggestion.uri,
     avatarUrl: guessAvatarUrl(suggestion.uri),
     userCount: 1,
-    messageCount: 0,
+    // messageCount: 0,
     tags: [],
     description: '',
     exists: true
