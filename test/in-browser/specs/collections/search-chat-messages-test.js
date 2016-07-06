@@ -11,11 +11,13 @@ describe('SearchChatMessages', function() {
   var model;
   var room;
   var collection;
+  var query;
 
   beforeEach(function() {
     model = new Backbone.Model({ state: 'all' });
     room = new Backbone.Model({ id: 1 });
-    collection = new SearchChatMessages(null, { roomMenuModel: model, roomModel: room });
+    query = new Backbone.Model();
+    collection = new SearchChatMessages(null, { roomMenuModel: model, roomModel: room, queryModel: query });
     collection.fetch = sinon.spy();
   });
 
