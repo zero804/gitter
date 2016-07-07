@@ -6,8 +6,59 @@ var uuid = require('node-uuid');
 var assert = require('assert');
 var StatusError = require('statuserror');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var GitHubUserEmailAddressService = require('gitter-web-github').GitHubUserEmailAddressService;
+var persistence = require('gitter-web-persistence');
+var identityService = require('gitter-web-identity');
+
 
 var MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+var GITTER_IDENTITY_TYPE = 'gitter';
+var GITHUB_IDENTITY_PROVIDER = identityService.GITHUB_IDENTITY_PROVIDER;
+
+function findExistingGitterUser(username) {
+  return persistence.User.findOne({ username: username })
+          .exec();
+}
+
+function findExistingIdentityUsername(provider, username) {
+  return identityService.findUserIdForProviderUsername(provider, username)
+    .then(function(userId) {
+      if (!userId) return;
+      return persistence.User.findById(userId)
+        .exec();
+    })
+}
+
+function findExistingUser(type, externalId) {
+  switch(type) {
+    case GITTER_IDENTITY_TYPE:
+      return findExistingGitterUser(externalId);
+
+    case GITHUB_IDENTITY_PROVIDER:
+      // TODO: Note that we will need to do a lookup once
+      // splitville is complete and gitter usernames <> github usernames
+      return findExistingGitterUser(externalId);
+
+    // TODO: twitter?
+  }
+
+  return findExistingIdentityUsername(type, externalId);
+}
+
+function resolveGitHubUserEmail(invitingUser, githubUsername) {
+  var githubUserEmailAddressService = new GitHubUserEmailAddressService(invitingUser);
+  return githubUserEmailAddressService.findEmailAddressForGitHubUser(githubUsername);
+}
+
+function resolveEmailAddress(invitingUser, type, externalId) {
+  // For now, we only try resolve email addresses for GitHub users
+  if (type === GITHUB_IDENTITY_PROVIDER) {
+    return resolveGitHubUserEmail(invitingUser, externalId);
+  }
+
+  return null;
+}
 
 /**
  *
@@ -153,6 +204,8 @@ function findInvitesForReminder(timeHorizonDays) {
 }
 
 module.exports = {
+  findExistingUser: findExistingUser,
+  resolveEmailAddress: resolveEmailAddress,
   createInvite: Promise.method(createInvite),
   accept: Promise.method(accept),
   markInviteAccepted: Promise.method(markInviteAccepted),
