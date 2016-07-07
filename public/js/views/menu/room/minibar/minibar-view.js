@@ -6,6 +6,7 @@ var HomeView = require('./home-view/home-view');
 var SearchView = require('./search-view/search-view');
 var PeopleView = require('./people-view/people-view');
 var CloseView = require('./close-view/close-view');
+var TempOrgView = require('./temp-org-view/temp-org-view');
 var CollectionView = require('./minibar-collection-view');
 var CommunityCreateItemView = require('./minibar-community-create-item-view');
 var fastdom = require('fastdom');
@@ -25,6 +26,7 @@ module.exports = Marionette.LayoutView.extend({
       people: { el: '#minibar-people', init: 'initPeople' },
       collectionView: { el: '#minibar-collection', init: 'initCollection' },
       close: { el: '#minibar-close', init: 'initClose' },
+      tempOrg: { el: '#minibar-temp', init: 'initTemp' }
     },
   },
 
@@ -83,6 +85,18 @@ module.exports = Marionette.LayoutView.extend({
     return closeView;
   },
 
+  initTemp: function (optionsForRegion){
+    var tempView = new TempOrgView(optionsForRegion({
+      model: this.tempModel,
+      roomMenuModel: this.model,
+      roomCollection: this.roomCollection,
+      groupCollection: this.collection,
+    }));
+
+    this.listenTo(tempView, 'minibar-item:activated', this.onTempOrgItemClicked, this);
+    return tempView;
+  },
+
   modelEvents: {
     'change:state change:selectedOrgName': 'onMenuChangeState'
   },
@@ -90,12 +104,17 @@ module.exports = Marionette.LayoutView.extend({
   initialize: function(attrs) {
     this.bus = attrs.bus;
     this.model = attrs.model;
+    this.roomCollection = attrs.roomCollection;
     this.homeModel = this.model.minibarHomeModel;
     this.searchModel = this.model.minibarSearchModel;
     this.peopleModel = this.model.minibarPeopleModel;
     this.closeModel = this.model.minibarCloseModel;
+    this.tempModel = this.model.minibarTempOrgModel;
     this.keyboardControllerView = attrs.keyboardControllerView;
     this.listenTo(this.bus, 'navigation', this.clearFocus, this);
+    //When a snapshot comes back we need to re-set active/focus on the currently active element
+    this.listenTo(this.collection, 'snapshot', this.onMenuChangeState, this);
+    this.onMenuChangeState();
   },
 
   onHomeActivate: function (){
@@ -116,9 +135,14 @@ module.exports = Marionette.LayoutView.extend({
     this.changeMenuState('org');
   },
 
+  onTempOrgItemClicked: function (){
+    this.model.set('selectedOrgName', this.tempModel.get('name'));
+    this.changeMenuState('org');
+  },
+
   changeMenuState: function(state){
     this.model.set({
-      panelopenstate: true,
+      panelOpenState: true,
       state: state,
       profileMenuOpenState: false,
     });
@@ -172,6 +196,8 @@ module.exports = Marionette.LayoutView.extend({
       case 'org':
         var orgName = this.model.get('selectedOrgName');
         var model = this.collection.findWhere({ name: orgName });
+        if(this.tempModel.get('name') === orgName) { model = this.tempModel; }
+        if(!model) { return; }
         return model.set({ active: true, focus: true });
     }
   },
@@ -186,6 +212,7 @@ module.exports = Marionette.LayoutView.extend({
     return this.homeModel.get('active') && this.homeModel ||
       this.searchModel.get('active') && this.searchModel ||
       this.peopleModel.get('active') && this.peopleModel ||
+      this.tempModel.get('active') && this.tempModel ||
       this.collection.findWhere({ active: true }) ||
       this.closeModel.get('active') && this.closeModel;
   },
@@ -195,6 +222,7 @@ module.exports = Marionette.LayoutView.extend({
     if(this.searchModel.get('focus')) { this.searchModel.set('focus', false); }
     if(this.peopleModel.get('focus')) { this.peopleModel.set('focus', false); }
     if(this.closeModel.get('focus')) { this.closeModel.set('focus', false); }
+    if(this.tempModel.get('focus')) { this.tempModel.set('focus', false); }
     this.collection.where({ focus: true }).forEach(function(model){ model.set('focus', false); });
   },
 

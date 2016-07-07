@@ -15,10 +15,10 @@ var roomSort = require('gitter-realtime-client/lib/sorts-filters').pojo; /* <-- 
                                                                                           libraries that we don't need */
 var roomNameTrimmer = require('../../../public/js/utils/room-name-trimmer');
 var userSettingsService = require('../../services/user-settings-service');
-var parseRoomsIntoLeftMenuRoomList = require('gitter-web-shared/rooms/left-menu-room-list.js');
-var generateLeftMenuSnapshot = require('../snapshots/left-menu-snapshot');
-var parseRoomsIntoLeftMenuFavouriteRoomList = require('gitter-web-shared/rooms/left-menu-room-favourite-list');
 var getSubResources = require('./sub-resources');
+var fixMongoIdQueryParam = require('../../web/fix-mongo-id-query-param');
+var mapGroupsForRenderer = require('../../handlers/map-groups-for-renderer');
+var generateMainFrameSnapshots = require('../../handlers/snapshots/main-frame');
 var fonts = require('../../web/fonts.js');
 
 function renderMainFrame(req, res, next, options) {
@@ -36,9 +36,10 @@ function renderMainFrame(req, res, next, options) {
         winston.error('Failed to serialize orgs:' + err, { exception: err });
         return [];
       }),
+      restful.serializeGroupsForUserId(userId),
 
     ])
-    .spread(function (troupeContext, rooms, socialMetadata, orgs) {
+    .spread(function (troupeContext, rooms, socialMetadata, orgs, groups) {
       var chatAppLocation = options.subFrameLocation;
 
       var template, bootScriptName;
@@ -51,25 +52,9 @@ function renderMainFrame(req, res, next, options) {
         bootScriptName = 'router-nli-app';
       }
 
-      //TODO Pass this to MINIBAR?? JP 17/2/16
-      var hasNewLeftMenu = !req.isPhone && req.fflip && req.fflip.has('left-menu');
-      var snapshots = troupeContext.snapshots = generateLeftMenuSnapshot(req, troupeContext, rooms);
-      var leftMenuRoomList = parseRoomsIntoLeftMenuRoomList(snapshots.leftMenu.state, snapshots.rooms, snapshots.leftMenu.selectedOrgName);
-      var leftMenuFavouriteRoomList = parseRoomsIntoLeftMenuFavouriteRoomList(snapshots.leftMenu.state, snapshots.rooms, snapshots.leftMenu.selectedOrgName);
-
       var hasCommunityCreate = req.fflip && req.fflip.has('community-create');
-
-      var previousLeftMenuState = troupeContext.leftRoomMenuState;
-      var newLeftMenuState = snapshots['leftMenu'];
-      if(req.user && !_.isEqual(previousLeftMenuState, newLeftMenuState)) {
-        // Save our left-menu state so that if they don't send any updates on the client,
-        // we still have it when they refresh. We can't save it where it is changed(`./shared/parse/left-menu-troupe-context.js`)
-        // because that is in shared and the user-settings-service is in `./server`
-        userSettingsService.setUserSettings(req.user._id, 'leftRoomMenu', newLeftMenuState)
-          .catch(function(err) {
-            errorReporter(err, { userSettingsServiceSetFailed: true }, { module: 'app-render' });
-          });
-      }
+      var hasNewLeftMenu = !req.isPhone && req.fflip && req.fflip.has('left-menu');
+      var snapshots = troupeContext.snapshots = generateMainFrameSnapshots(req, troupeContext, rooms, groups);
 
       if(snapshots && snapshots.leftMenu && snapshots.leftMenu.state) {
         // `gitter.web.prerender-left-menu`
@@ -78,10 +63,6 @@ function renderMainFrame(req, res, next, options) {
           'pinned:' + (snapshots.leftMenu.roomMenuIsPinned ? '1' : '0')
         ]);
       }
-
-
-      //TODO Remove this when favourite tab is removed for realz JP 8/4/16
-      if(snapshots.leftMenu.state === 'favourite') { leftMenuRoomList = []; }
 
       // pre-processing rooms
       // Bad mutation ... BAD MUTATION
@@ -97,6 +78,13 @@ function renderMainFrame(req, res, next, options) {
         });
 
       res.render(template, {
+        hasCommunityCreate:     hasCommunityCreate,
+        //left menu
+        hasNewLeftMenu:         hasNewLeftMenu,
+        leftMenuOrgs:           troupeContext.snapshots.orgs,
+        roomMenuIsPinned:       snapshots.leftMenu.roomMenuIsPinned,
+
+        //fonts
         hasCachedFonts:         fonts.hasCachedFonts(req.cookies),
         fonts:                  fonts.getFonts(),
         socialMetadata:         socialMetadata,
@@ -104,7 +92,6 @@ function renderMainFrame(req, res, next, options) {
         cssFileName:            "styles/" + bootScriptName + ".css",
         troupeName:             options.title,
         troupeContext:          troupeContext,
-        roomMenuIsPinned:       snapshots.leftMenu.roomMenuIsPinned,
         chatAppLocation:        chatAppLocation,
         agent:                  req.headers['user-agent'],
         subresources:           getSubResources(bootScriptName),
@@ -113,11 +100,6 @@ function renderMainFrame(req, res, next, options) {
         menuHeaderExpanded:     false,
         user:                   user,
         orgs:                   orgs,
-        hasNewLeftMenu:         hasNewLeftMenu,
-        hasCommunityCreate:     hasCommunityCreate,
-        leftMenuOrgs:           troupeContext.snapshots.orgs,
-        leftMenuRooms:          leftMenuRoomList,
-        leftMenuFavouriteRooms: leftMenuFavouriteRoomList,
         isPhone:            req.isPhone,
         //TODO Remove this when left-menu switch goes away JP 23/2/16
         rooms: {

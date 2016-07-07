@@ -11,16 +11,14 @@ describe('SearchChatMessages', function() {
   var model;
   var room;
   var collection;
+  var query;
 
   beforeEach(function() {
-      model = new Backbone.Model({ state: 'all' });
-      room = new Backbone.Model({ id: 1 });
-      collection = new SearchChatMessages(null, {
-        roomMenuModel: model,
-        roomModel: room,
-        queryModel: new Backbone.Model({})
-      });
-      collection.fetch = sinon.spy();
+    model = new Backbone.Model({ state: 'all' });
+    room = new Backbone.Model({ id: 1 });
+    query = new Backbone.Model();
+    collection = new SearchChatMessages(null, { roomMenuModel: model, roomModel: room, queryModel: query });
+    collection.fetch = sinon.spy();
   });
 
   it('should set the roomMenuModel', function() {
