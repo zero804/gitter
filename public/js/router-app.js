@@ -172,7 +172,8 @@ onready(function() {
     roomCollection: troupeCollections.troupes,
     //TODO ADD THIS TO MOBILE JP 25/1/16
     orgCollection: troupeCollections.orgs,
-    repoCollection: repoCollection
+    repoCollection: repoCollection,
+    groupsCollection: troupeCollections.groups
   });
   appLayout.render();
 
@@ -431,25 +432,8 @@ onready(function() {
 
     createcustomroom: function(name) {
       function getSuitableGroupId() {
-        // TODO: isn't there a group in the context somewhere that we can just
-        // read out? Otherwise this will just break for org pages or community
-        // home pages in future.
-
-        var currentRoom = allRoomsCollection.findWhere({
-          id: context.getTroupeId()
-        });
-
-        if (!currentRoom) {
-          // not a member or collection hasnt synced yet
-          return;
-        }
-
-        if (currentRoom.get('oneToOne')) {
-          // one to ones don't belong to groups
-          return;
-        }
-
-        return currentRoom.get('groupId');
+        var group = appLayout.getRoomMenuModel().getCurrentGroup();
+        return group && group.get('id');
       }
 
       require.ensure(['views/modals/create-room-view'], function(require) {
