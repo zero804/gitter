@@ -48,9 +48,10 @@ module.exports = (function () {
 
     initNewMenuRegion: function (optionsForRegion){
       this.menuRegion = new RoomMenuLayout(optionsForRegion({
-        bus:                     appEvents,
-        roomCollection:          this.roomCollection,
-        orgCollection:           this.orgCollection
+        bus: appEvents,
+        roomCollection: this.roomCollection,
+        orgCollection: this.orgCollection,
+        groupsCollection: this.groupsCollection
       }));
       return this.menuRegion;
     },
@@ -62,6 +63,7 @@ module.exports = (function () {
     initialize: function (options) {
       this.roomCollection = options.roomCollection;
       this.orgCollection = options.orgCollection;
+      this.groupsCollection = options.groupsCollection;
       this.repoCollection = options.repoCollection;
       this.dialogRegion = modalRegion;
 

@@ -18,7 +18,7 @@ function sendAvatar(req, res, imageUrl, hasCacheBuster) {
     } else {
       res.set('X-Accel-Redirect', '/fetch/' + imageUrl);
     }
-    res.sendStatus(200).send('OK');
+    res.send('OK');
     return;
   }
 
@@ -69,7 +69,7 @@ router.get('/group/i/:groupId',
     return Group.findById(req.params.groupId, { 'sd.type': 1, 'sd.linkPath': 1 })
       .then(function(group) {
         if (!group) {
-          sendAvatar(req, res, DEFAULT_AVATAR_URL, false);
+          return sendAvatar(req, res, DEFAULT_AVATAR_URL, false);
         }
 
         var type = group.sd && group.sd.type;
@@ -78,16 +78,14 @@ router.get('/group/i/:groupId',
         switch(type) {
           case 'GH_ORG':
           case 'GH_USER':
-            sendAvatar(req, res, githubUrl(linkPath, size), false);
-            return;
+            return sendAvatar(req, res, githubUrl(linkPath, size), false);
 
           case 'GH_REPO':
-            sendAvatar(req, res, githubUrl(linkPath.split('/')[0], size), false);
-            return;
+            return sendAvatar(req, res, githubUrl(linkPath.split('/')[0], size), false);
 
           // Add non-github avatars in here
           default:
-            sendAvatar(req, res, DEFAULT_AVATAR_URL, false);
+            return sendAvatar(req, res, DEFAULT_AVATAR_URL, false);
         }
       })
       .catch(next);
@@ -99,7 +97,7 @@ router.get('/gravatar/e/:email',
   function(req, res) {
     var email = req.params.email;
     var gravatarUrl = gravatar.forEmail(email, req.query.s);
-    sendAvatar(req, res, gravatarUrl, true);
+    return sendAvatar(req, res, gravatarUrl, true);
   });
 
 router.get('/gravatar/m/:md5',
@@ -107,7 +105,7 @@ router.get('/gravatar/m/:md5',
   function(req, res) {
     var md5 = req.params.md5;
     var gravatarUrl = gravatar.forChecksum(md5, req.query.s);
-    sendAvatar(req, res, gravatarUrl, true);
+    return sendAvatar(req, res, gravatarUrl, true);
   });
 
 router.get('/gh/u/:username',
@@ -116,7 +114,7 @@ router.get('/gh/u/:username',
     var username = req.params.username;
     var size = req.query.size && parseInt(req.query.size, 10) || '';
     var avatarUrl = githubUrl(username, size);
-    sendAvatar(req, res, avatarUrl, false);
+    return sendAvatar(req, res, avatarUrl, false);
   });
 
 router.get('/gh/uv/:version/:username',
@@ -126,7 +124,7 @@ router.get('/gh/uv/:version/:username',
     var version = req.params.version;
     var size = req.query.size && parseInt(req.query.size, 10) || '';
     var avatarUrl = githubVerionedUrl(username, version, size);
-    sendAvatar(req, res, avatarUrl, false);
+    return sendAvatar(req, res, avatarUrl, false);
   });
 
 

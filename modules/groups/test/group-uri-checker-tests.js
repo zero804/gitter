@@ -9,7 +9,10 @@ var groupUriChecker = require('../lib/group-uri-checker');
 describe('group-uri-checker #slow', function() {
   var fixture = fixtureLoader.setup({
     deleteDocuments: {
-      User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }],
+      User: [
+        { username: fixtureLoader.GITTER_INTEGRATION_USERNAME },
+        { username: fixtureLoader.GITTER_INTEGRATION_COLLAB_USERNAME },
+      ],
       Troupe: [ { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() } ],
       Group: [
         { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
@@ -19,6 +22,10 @@ describe('group-uri-checker #slow', function() {
     user1: {
       githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
       username: fixtureLoader.GITTER_INTEGRATION_USERNAME
+    },
+    user2: {
+      githubToken: fixtureLoader.GITTER_INTEGRATION_COLLAB_USER_SCOPE_TOKEN,
+      username: fixtureLoader.GITTER_INTEGRATION_COLLAB_USERNAME
     },
     group1: {},
     troupe1: {}
@@ -34,12 +41,15 @@ describe('group-uri-checker #slow', function() {
       });
   });
 
-  it('should not allow creation if a user with that username exists', function() {
+  // see group-uri-checker.js. This check was disabled for now.
+  /*
+  it('should not allow creation if a gitter user with that username exists', function() {
     return groupUriChecker(fixture.user1, fixture.user1.username)
       .then(function(info) {
         assert.strictEqual(info.allowCreate, false);
       });
   });
+  */
 
   it('should not allow creation if a group with that uri exists', function() {
     return groupUriChecker(fixture.user1, fixture.group1.uri)
@@ -56,12 +66,6 @@ describe('group-uri-checker #slow', function() {
       });
   });
 
-  it('should not allow creation if a gh user with that login exists', function() {
-    return groupUriChecker(fixture.user1, fixtureLoader.GITTER_INTEGRATION_USERNAME)
-      .then(function(info) {
-        assert.strictEqual(info.allowCreate, false);
-      });
-  });
 
   it('should allow creation if the uri is not taken in any way', function() {
     return groupUriChecker(fixture.user1, '_this-should-not-exist')
@@ -71,4 +75,36 @@ describe('group-uri-checker #slow', function() {
       });
   });
 
+
+  it("should allow creation if a gh user with that login exists and you are that user ", function() {
+    return groupUriChecker(fixture.user1, fixtureLoader.GITTER_INTEGRATION_USERNAME)
+      .then(function(info) {
+        assert.strictEqual(info.allowCreate, true);
+      });
+  });
+
+  it("should not allow creation if a gh user with that login exists and you are not that user", function() {
+    return groupUriChecker(fixture.user2, fixtureLoader.GITTER_INTEGRATION_USERNAME)
+      .then(function(info) {
+        assert.strictEqual(info.allowCreate, false);
+      });
+  });
+
+  it("should allow creation if a user with repo access to a repo for a gh user tries to create a group for that gh user", function() {
+    // This is for the jashkenas/backbone case when it has to upsert jashkenas
+    // when any contributor for that repo comes along.
+    // NOTE that we're passing in obtainAccessFromGitHubRepo
+    return groupUriChecker(fixture.user2, fixtureLoader.GITTER_INTEGRATION_USERNAME, fixtureLoader.GITTER_INTEGRATION_REPO_FULL)
+      .then(function(info) {
+        assert.strictEqual(info.allowCreate, true);
+      });
+  });
+
+  it("should not allow creation if a user without repo access to a repo for a gh user tries to create a group for that gh user", function() {
+    // simular to above, this is the case where you DON'T have push access.
+    return groupUriChecker(fixture.user2, fixtureLoader.GITTER_INTEGRATION_USERNAME, fixtureLoader.GITTER_INTEGRATION_REPO2_FULL)
+      .then(function(info) {
+        assert.strictEqual(info.allowCreate, false);
+      });
+  });
 });

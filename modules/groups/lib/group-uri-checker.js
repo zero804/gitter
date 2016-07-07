@@ -13,9 +13,15 @@ var debug = require('debug')('gitter:app:groups:group-uri-checker');
 
 
 function checkLocalUri(uri) {
+  /*
+  NOTE: When adding a repo room and we're upserting group, then that
+  user probably already exists locally, but we should be able to add a
+  group for that user anyway. This is how upserting user groups for repo
+  rooms has been working for some time and the new create community flow
+  isn't live yet, so safe to just disable this for now.
+  */
+  /*
   return Promise.join(
-      // TODO: what about usernames with different case? Should we use a regex
-      // rather? See create-owner-report.js for an example.
       User.findOne({ username: uri }).exec(),
       Group.findOne({ lcUri: uri.toLowerCase() }).exec(),
       function(user, group) {
@@ -23,6 +29,12 @@ function checkLocalUri(uri) {
         return !!(user || group);
       }
     );
+  */
+  return Group.findOne({ lcUri: uri.toLowerCase() }).exec()
+    .then(function(group) {
+      debug("group: %s", !!group);
+      return !!group;
+    });
 }
 
 function checkGitHubUri(user, uri, obtainAccessFromGitHubRepo) {
@@ -37,6 +49,7 @@ function checkGitHubUri(user, uri, obtainAccessFromGitHubRepo) {
     // check gh orgs and users
     return validateGitHubUri(user, uri)
       .then(function(githubInfo) {
+        var policy;
         if (githubInfo && githubInfo.type === 'ORG') {
           // also check if you can actually admin the org.
 
@@ -55,6 +68,32 @@ function checkGitHubUri(user, uri, obtainAccessFromGitHubRepo) {
               return {
                 githubInfo: githubInfo,
                 canAdmin: access
+              }
+            });
+
+        } else if (githubInfo && githubInfo.type === 'USER') {
+          /*
+          When adding a repo room we have to upsert the group for now. In that
+          case you could be adding a repo under your own name, so we have to
+          check for that and allow that too. At least for now.
+          */
+          return githubPolicyFactory.createGroupPolicyForGithubObject(user, 'USER', uri, githubInfo.githubId, obtainAccessFromGitHubRepo)
+            .then(function(policy) {
+              return policy.canAdmin();
+            })
+            .then(function(access) {
+              return {
+                githubInfo: githubInfo,
+                canAdmin: access
+              }
+            })
+            .catch(StatusError, function(err) {
+              debug('StatusError', err.message);
+              // User and group do not match, and obtainAccessFromGitHubRepo
+              // not provided, denying access
+              return {
+                githubInfo: githubInfo,
+                canAdmin: false
               }
             });
 
@@ -80,7 +119,6 @@ function checkIfGroupUriExists(user, uri, obtainAccessFromGitHubRepo) {
     checkGitHubUri(user, uri, obtainAccessFromGitHubRepo),
     function(localUriExists, info) {
       var githubInfo = info && info.githubInfo;
-      var canAdminGitHubOrg = info && info.canAdmin;
       var githubUriExists = !!githubInfo;
 
       debug('localUriExists: %s, githubUriExists: %s', localUriExists, githubUriExists);
@@ -89,16 +127,17 @@ function checkIfGroupUriExists(user, uri, obtainAccessFromGitHubRepo) {
       if (localUriExists) {
         allowCreate = false;
       } else if (githubUriExists) {
-        // Until we split from GitHub: If it is a github uri it must be an org
-        // and you have to have admin rights for you to be able to create a
-        // community for it.
-        debug('github type: %s, canAdmin: %s', githubInfo.type, canAdminGitHubOrg);
-        allowCreate = (githubInfo.type === 'ORG') && canAdminGitHubOrg;
+        // Until we split from GitHub: If it is a github uri it can only be an
+        // org or user and you have to have admin rights for you to be able to
+        // create a community for it.
+        debug('github type: %s, canAdmin: %s', githubInfo.type, info.canAdmin);
+        allowCreate = info.canAdmin;
       } else {
         // if it doesn't exist locally AND it doesn't exist on github, then
         // the user is definitely allowed to create it.
         allowCreate = true;
       }
+
 
       return {
         // The future group will either be org-based or of type null which

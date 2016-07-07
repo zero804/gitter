@@ -19,6 +19,7 @@ var _ = require('underscore');
 var StatusError = require('statuserror');
 var fonts = require('../../web/fonts');
 var getAvatarUrlForUriContext = require('../../web/get-avatar-url-for-uri-context');
+var redirectErrorMiddleware = require('../uri-context/redirect-error-middleware');
 
 var ONE_DAY_SECONDS = 60 * 60 * 24; // 1 day
 var ONE_DAY_MILLISECONDS = ONE_DAY_SECONDS * 1000;
@@ -127,7 +128,8 @@ exports.datesList = [
         res.render('archive-home-template', templateContext);
       })
       .catch(next);
-  }
+  },
+  redirectErrorMiddleware
 ];
 
 exports.linksList = [
@@ -191,7 +193,8 @@ exports.linksList = [
         res.render('archive-links-template', templateContext);
       })
       .catch(next);
-  }
+  },
+  redirectErrorMiddleware
 ];
 
 exports.chatArchive = [

@@ -1,6 +1,7 @@
 "use strict";
 
 var path = require("path");
+var ProvidePlugin = require('webpack/lib/ProvidePlugin');
 var CommonsChunkPlugin = require("webpack/lib/optimize/CommonsChunkPlugin");
 var ContextReplacementPlugin = require("webpack/lib/ContextReplacementPlugin");
 
@@ -115,6 +116,7 @@ var webpackConfig = {
     },
   },
   plugins: [
+    new ProvidePlugin({ Promise: "bluebird" }),
     new CommonsChunkPlugin("vendor", "[name].js"),
     new ContextReplacementPlugin(/moment\/locale$/, /ar|cs|da|de|en-gb|es|fa|fr|hu|it|ja|ko|lt|nl|pl|pt|ru|sk|sv|ua|zh-cn/)
   ],
