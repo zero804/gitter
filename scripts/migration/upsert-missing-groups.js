@@ -155,10 +155,12 @@ function migrate(batch, enc, callback) {
 
       // Insert group security descriptors for the owning org or user.
       // (this will only insert if it is missing)
+      var githubType = info.type.toUpperCase();
       var securityDescriptor = securityDescriptorGenerator.generate(gitterUser, {
-        type: info.type.toUpperCase(), // ORG or USER
-        uri: info.owner.uri, // mixed case OK?
-        githubId: info.owner.githubId
+        type: 'GH_' + githubType, // ORG or USER
+        linkPath: info.owner.uri, // mixed case OK?
+        externalId: info.owner.githubId,
+        security: githubType === 'ORG' ? 'PRIVATE' : null
       });
 
       // upsert the lcOwner into group
@@ -170,8 +172,6 @@ function migrate(batch, enc, callback) {
             name: info.owner.uri,
             uri: info.owner.uri,
             lcUri: info.owner.lcUri,
-            type: info.type,
-            githubId: info.owner.githubId, // could be null
             sd: securityDescriptor
           }
         })
