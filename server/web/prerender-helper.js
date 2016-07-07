@@ -26,7 +26,8 @@ var PRERENDERED_VIEWS = [
   "js/views/chat/tmpl/chat-input-buttons",
   "js/views/chat/tmpl/join-room-view",
   'js/views/people/tmpl/peopleCollectionView',
-  'js/views/explore/tmpl/explore-view'
+  'js/views/explore/tmpl/explore-view',
+  'js/views/community-create/community-create-view'
   /* new */
 ].reduce(function(memo, v) {
   memo[v] = compileTemplate(v + ".hbs");
