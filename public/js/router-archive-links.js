@@ -53,6 +53,7 @@ onready(function() {
   new HeaderView({
     el: '#header',
     model: context.troupe(),
+    rightToolbarModel: rightToolbarModel,
     archives: true
   });
 });
