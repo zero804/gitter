@@ -1,17 +1,20 @@
 'use strict';
 
+var Promise = require('bluebird');
 var userService = require('../user-service');
 var inputsForUser = require('./elastic-inputs-for-user');
 
 module.exports = {
   query: function(text, room) {
-    var lcText = text.toLowerCase();
+    // not matching anything with an empty query, just like elastic
+    if (!text) return Promise.resolve([]);
 
+    var lcText = text.toLowerCase();
     var userIds = room.oneToOneUsers.map(function(obj) {
       return obj.userId.toString();
     });
 
-    return userService.findByIdsLean(userIds)
+    return userService.findByIds(userIds)
       .then(function(users) {
         return users.filter(function(user) {
           return getNames(user).some(function(name) {
@@ -23,8 +26,14 @@ module.exports = {
 };
 
 function getNames(user) {
+  // elastic normally does this analysis, but we're faking it
+  var nonWhitespaceAlternatives = [];
   return inputsForUser(user).map(function(input) {
-    // elastic normally does this analysis, but we're faking it
-    return input.split(/\s/).filter(Boolean).join('').toLowerCase();
-  })
+    var lcInput = input.toLowerCase();
+    var nonWhitespace = lcInput.split(/\s/).filter(Boolean).join('');
+    if (lcInput !== nonWhitespace) {
+      nonWhitespaceAlternatives.push(nonWhitespace)
+    }
+    return lcInput;
+  }).concat(nonWhitespaceAlternatives);
 }
