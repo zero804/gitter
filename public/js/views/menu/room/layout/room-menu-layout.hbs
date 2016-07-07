@@ -47,7 +47,7 @@
           <li id="minibar-collection">
             <ul class="minibar-collection-list">
               {{#each troupeContext.snapshots.groups}} {{! JP 9/12/15 }} {{! TODO SHOULD THIS BE MOVED INTO A PARTIAL TO BE SHARED AROUND }}
-                <li data-state-change="org" id="minibar-{{name}}"  data-org-name="{{name}}" class="room-menu-options__item--org">
+                <li data-state-change="org" id="{{id}}"  data-org-name="{{name}}" class="room-menu-options__item--org">
                   {{{ prerenderView "js/views/menu/room/minibar/minibar-item-view" }}}
                 </li>
               {{/each}}
