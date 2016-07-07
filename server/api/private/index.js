@@ -107,6 +107,11 @@ router.get('/inviteUserSuggestions',
   identifyRoute('api-private-invite-user-suggestions'),
   require('./invite-user-suggestions'));
 
+router.get('/check-invite',
+  authMiddleware,
+  identifyRoute('api-private-check-invite'),
+  require('./check-invite'));
+
 router.get('/check-group-uri',
   authMiddleware,
   identifyRoute('api-private-check-group-uri'),
