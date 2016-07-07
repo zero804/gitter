@@ -11,8 +11,15 @@
 @chat-header-topic-line-height: 25px;
 @chat-header-topic-color: #777777;
 
-@chat-header-topic-stack-breakpoint: 650px;
 
+
+@topic-space-to-chat-header: (@chat-frame-desktop-header-height - @chat-header-heading-line-height) / 2;
+@chat-header-font-vertical-padding: (@chat-header-heading-line-height - @chat-header-heading-font-size) / 2;
+@vert-diff-baseline-offset-between-header-and-topic: @chat-header-font-vertical-padding ~"+" @chat-header-heading-font-size ~"-" @chat-header-topic-line-height;
+// The extra `.125` is for account for desenders to match baseline
+@topic-margin-calc-value: @topic-space-to-chat-header ~"+" @vert-diff-baseline-offset-between-header-and-topic ~"+" .125em;
+@topic-margin-top: calc(@topic-margin-calc-value);
+@topic-margin-bottom: calc(~"(" @topic-margin-calc-value ~")" ~"/" 2);
 
 
 // Position of the arrow from the left side of the icon
@@ -52,34 +59,31 @@
   .chat-header__main-grouping();
   overflow: hidden;
   flex: 1;
+  flex-wrap: wrap;
   align-items: flex-start;
+  max-height: @chat-frame-desktop-header-height;
 
-  @media (max-width: @chat-header-topic-stack-breakpoint) {
-    flex-direction: column;
-    max-height: 0;
+  transition: max-height .5s ease;
 
-    transition: max-height .5s ease;
-
-    &:hover,
-    &:focus {
-      // plenty of room to auto expand into
-      max-height: 800px;
-    }
+  &:hover,
+  &:focus {
+    // plenty of room to auto expand into
+    max-height: 100vh;
   }
 }
 
 .chat-header__heading-sub-group {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
-  min-height: inherit;
 }
 
 .chat-header__heading {
   box-sizing: border-box;
   max-width: 100%;
-  margin-top: 0;
+  margin-top: (@chat-frame-desktop-header-height - @chat-header-heading-line-height) / 2;
   margin-bottom: 0;
-  padding-right: 20px;
+  padding-right: 2rem;
 
   white-space: nowrap;
 }
@@ -103,29 +107,18 @@
 .chat-header__topic-sub-group {
   overflow: hidden;
   position: relative;
-  min-height: inherit;
+  flex-basis: 30rem;
+  flex-grow: 1;
 
   &:focus {
     outline: none;
-  }
-
-  @media (max-width: @chat-header-topic-stack-breakpoint) {
-    align-self: stretch;
-    min-height: 0;
   }
 }
 
 .chat-header__topic-wrapper {
   box-sizing: border-box;
-  align-self: flex-start;
   display: flex;
   max-width: 100%;
-
-  @space-to-chat-header: (@chat-frame-desktop-header-height - @chat-header-heading-line-height) / 2;
-  @chat-header-font-vertical-padding: (@chat-header-heading-line-height - @chat-header-heading-font-size) / 2;
-  @vert-diff-baseline-offset-between-header-and-topic: @chat-header-font-vertical-padding ~"+" @chat-header-heading-font-size ~"-" @chat-header-topic-line-height;
-  // The extra `.125` is for account for desenders to match baseline
-  margin-top: calc(@space-to-chat-header ~"+" @vert-diff-baseline-offset-between-header-and-topic ~"+" .125em);
 
   padding-right: 2em;
   color: fade(@chat-header-topic-color, 0);
@@ -144,6 +137,7 @@
     &:after {
       /* Pencil icon */
       content: '\e81a';
+      margin-top: @topic-margin-top;
       margin-left: 1em;
       color: inherit;
       font-family: 'fontello';
@@ -155,11 +149,6 @@
       color: @chat-header-topic-color;
     }
   }
-
-  @media (max-width: @chat-header-topic-stack-breakpoint) {
-    margin-top: 0;
-    margin-bottom: 1em;
-  }
 }
 
 .chat-header__topic {
@@ -167,9 +156,6 @@
   overflow: hidden;
   display: inline-block;
   vertical-align: baseline;
-  width: 100%;
-  // min height so that an empty topic can be double clicked to edit
-  min-height: @chat-header-topic-line-height;
   // max height to allow height animations
   max-height: @chat-header-topic-line-height;
   margin: 0;
@@ -185,11 +171,19 @@
 
   transition: max-height .5s ease-in-out;
 
+
+  &:not(:empty) {
+    margin-top: @topic-margin-top;
+    margin-bottom: @topic-margin-bottom;
+  }
+
   /* Handle the placeholder description */
   &.is-admin {
     cursor: pointer;
 
     &:empty {
+      margin-top: @topic-margin-top;
+      margin-bottom: @topic-margin-bottom;
       color: inherit;
 
       &:before {
@@ -199,11 +193,15 @@
     }
   }
 
+  &.is-editing {
+    width: 100%;
+  }
+
 
   .chat-header__info-grouping:hover &,
   .chat-header__info-grouping:focus & {
     // plenty of room to auto expand into
-    max-height: 800px;
+    max-height: 100vh;
 
     white-space: normal;
     word-wrap: break-word;
