@@ -22,7 +22,7 @@ module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, group
   //Default new state is "All Conversations"
   var menuState = (lastLeftMenuSnapshot.state || 'all');
   //If you are loading a home view then activate the search state
-  if(uri === 'home') { menuState = 'search'; }
+  if(uri === 'home' || uri === 'explore') { menuState = 'search'; }
 
   //Groups
   //------------------------------------------------------
@@ -32,7 +32,7 @@ module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, group
   //The old group generation adds the tep-org with a prop of temp so we account for that here
   var hasJoinedGroup = _.findWhere(groups, { name: groupName }) && !_.findWhere(groups, { temp: true });
 
-  if(uri !== 'home' && !hasJoinedRoom && !hasJoinedGroup) {
+  if(uri !== 'home' && uri !== 'explore' && groupName && !hasJoinedRoom && !hasJoinedGroup) {
     menuState = 'org';
     selectedOrgName = groupName;
     tempOrg = {
