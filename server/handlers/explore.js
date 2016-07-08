@@ -9,6 +9,7 @@ var clientEnv = require('gitter-client-env');
 var contextGenerator = require('../web/context-generator');
 var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
 var featureToggles = require('../web/middlewares/feature-toggles');
+var generateStaticUriContextMiddleware = require('./uri-context/generate-static-uri-context-middleware');
 
 var exploreService = require('../services/explore-service');
 var suggestionsService = require('../services/suggestions-service');
@@ -29,6 +30,9 @@ var processTagInput = function(input) {
 
   return selectedTagsInput;
 };
+
+
+var exploreUriContextMiddleware = generateStaticUriContextMiddleware('explore');
 
 
 
@@ -76,6 +80,7 @@ var firstTag = exploreRedirectStaticTagMap[Object.keys(exploreRedirectStaticTagM
 router.get('/:tags?',
   identifyRoute('explore-tags-redirect'),
   featureToggles,
+  exploreUriContextMiddleware,
   function (req, res) {
     var inputTags = processTagInput(req.query.search);
 
@@ -93,6 +98,7 @@ router.get('/:tags?',
 router.get('/tags/:tags',
   identifyRoute('explore-tags'),
   featureToggles,
+  exploreUriContextMiddleware,
   function(req, res, next) {
     contextGenerator.generateNonChatContext(req).then(function(troupeContext) {
       var user = troupeContext.user;
@@ -159,7 +165,7 @@ router.get('/tags/:tags',
           // Anyone know why we're putting this on the
           // context? Probably not.
           troupeContext.snapshots = snapshots;
-          
+
           res.render('explore', _.extend({}, snapshots, {
             exploreBaseUrl: req.baseUrl,
             troupeContext: troupeContext,
