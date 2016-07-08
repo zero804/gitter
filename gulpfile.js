@@ -175,9 +175,7 @@ function guessBaseBranch() {
   var branch = process.env.GIT_BRANCH;
   if (!branch) return 'develop';
 
-  if (branch.match(/\bdevelop$/)) return branch.replace(/\bdevelop$/, 'master');
-  if (branch.match(/\brelease\//)) return branch.replace(/\brelease\/.*$/, 'master');
-  if (branch.match(/\bfeature\//)) return branch.replace(/\bfeature\/.*$/, 'develop');
+  if (branch.match(/\bfeature\//)) return 'develop';
 
   return 'master';
 }
