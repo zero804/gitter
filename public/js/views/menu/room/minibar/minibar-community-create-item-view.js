@@ -7,8 +7,8 @@ var ItemView = require('./minibar-item-view.js');
 module.exports = ItemView.extend({
   template: template,
 
-  initialize: function() {
-
+  initialize: function(attrs) {
+    this.roomMenuModel = attrs.roomMenuModel;
   },
 
   onItemClicked: function() {

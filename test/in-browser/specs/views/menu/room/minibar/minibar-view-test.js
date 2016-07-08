@@ -21,6 +21,7 @@ describe('MinibarView', function(){
     model.minibarHomeModel = new Backbone.Model({ type: 'all', name: 'all' });
     model.minibarSearchModel = new Backbone.Model({ type: 'search', name: 'search' });
     model.minibarPeopleModel = new Backbone.Model({ type: 'people', name: 'people' });
+    model.minibarCommunityCreateModel = new Backbone.Model({ name: 'Create Community', type: 'community-create' });
     model.minibarCloseModel = new Backbone.Model({ type: 'close', name: 'close' });
     model.minibarTempOrgModel = new Backbone.Model({ type: 'org', name: 'google', hidden: true });
 
