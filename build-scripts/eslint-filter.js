@@ -17,11 +17,15 @@ function filterFiles(baseBranch) {
       var changedLines = {}
       result.forEach(function(file) {
         var absPath = path.resolve(file.to);
+        var diffLine = 0;
         changedLines[absPath] = {};
         file.chunks.forEach(function(chunk) {
-          for (var i = chunk.newStart; i < chunk.newStart + chunk.newLines; i++) {
-            changedLines[absPath][i] = true;
-          }
+          chunk.changes.forEach(function(change) {
+            diffLine++;
+            if (change.add) {
+              changedLines[absPath][change.ln] = diffLine;
+            }
+          });
         })
       });
 
