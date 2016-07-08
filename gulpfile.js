@@ -47,7 +47,7 @@ var mkdirp = require('mkdirp');
 var del = require('del');
 var glob = require('glob');
 var url = require('url');
-
+var github = require('gulp-github');
 
 var getSourceMapUrl = function() {
   if (!process.env.BUILD_URL) return;
@@ -160,15 +160,25 @@ gulp.task('validate-config', function() {
 
 gulp.task('validate-eslint', function() {
   mkdirp.sync('output/eslint/');
-  return gulp.src(['**/*.js','!node_modules/**','!public/repo/**'])
+  var eslintPipe = gulp.src(['**/*.js','!node_modules/**','!public/repo/**'])
     .pipe(eslint({
       quiet: argv.quiet
     }))
     .pipe(eslint.format('unix'))
     .pipe(eslint.format('checkstyle', function(checkstyleData) {
       fs.writeFileSync('output/eslint/checkstyle.xml', checkstyleData);
-    }))
-    .pipe(eslint.failAfterError());
+    }));
+
+  if (process.env.SONARQUBE_GITHUB_ACCESS_TOKEN && process.env.ghprbPullId && process.env.GIT_COMMIT) {
+    eslintPipe = eslintPipe.pipe(github({
+       git_token: process.env.SONARQUBE_GITHUB_ACCESS_TOKEN,
+       git_repo: 'troupe/gitter-webapp',
+       git_prid: process.env.ghprbPullId,
+       git_sha: process.env.GIT_COMMIT,
+    }));
+  }
+
+  return eslintPipe.pipe(eslint.failAfterError());
 });
 
 gulp.task('validate', ['validate-config', 'validate-eslint']);
@@ -207,7 +217,7 @@ makeTestTasks('test-docker', function(name, files, options) {
   mkdirp.sync('output/coverage-reports/' + name);
   gutil.log('Writing XUnit output', 'output/test-reports/' + name + '.xml');
   var istanbulOptions;
-  
+
   if (argv['coverage'] === false) {
     istanbulOptions = undefined;
   } else {
