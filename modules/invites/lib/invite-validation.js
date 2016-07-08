@@ -44,6 +44,7 @@ function parseAndValidateInput(input) {
 
   addUserIdentifer('gitter', 'username');
   addUserIdentifer(identityService.GITHUB_IDENTITY_PROVIDER, 'githubUsername');
+  // TODO: this doesn't actually work in the rest if the invites code
   addUserIdentifer(identityService.TWITTER_IDENTITY_PROVIDER, 'twitterUsername');
 
   var emailAddress = validateIsString(input.email);
