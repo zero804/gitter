@@ -16,8 +16,8 @@ var FilteredRoomCollection = Backbone.Collection.extend({
     }
 
     this.roomModel = options.roomModel;
-    this.listenTo(this.roomModel, 'change:state', this.onModelChangeState, this);
-    this.listenTo(this.roomModel, 'change:selectedOrgName', this.onOrgNameChange, this);
+    this.listenTo(this.roomModel, 'change:state', this.onModelChangeState);
+    this.listenTo(this.roomModel, 'change:selectedOrgName', this.onOrgNameChange);
 
 
     if (!options || !options.collection) {
@@ -25,17 +25,19 @@ var FilteredRoomCollection = Backbone.Collection.extend({
     }
 
     this.roomCollection = options.collection;
-    this.listenTo(this.roomCollection, 'snapshot', this.onRoomCollectionSnapshot, this);
-    this.listenTo(this.roomCollection, 'change:favourite', this.onFavouriteChange, this);
-    this.listenTo(this.roomCollection, 'remove', this.onRoomRemoved, this);
-    this.listenTo(this.roomCollection, 'add', this.onRoomAdded, this);
+    this.listenTo(this.roomCollection, 'snapshot', this.onRoomCollectionSnapshot);
+    this.listenTo(this.roomCollection, 'change:favourite', this.onFavouriteChange);
+    this.listenTo(this.roomCollection, 'remove', this.onRoomRemoved);
+    this.listenTo(this.roomCollection, 'add', this.onRoomAdded);
+    this.listenTo(this.roomCollection, 'reset', this.onRoomCollectionReset);
 
-    this.listenTo(this, 'filter-complete', this.sort, this);
+    this.listenTo(this, 'filter-complete', this.sort);
 
-    this.listenTo(this.roomCollection, 'change:escalationTime', this.sort);
+    this.listenTo(this, 'change:escalationTime', this.sort);
 
-    this.listenTo(this.roomCollection, 'change:activity change:unreadItems change:mentions change:lastAccessTime', this.modelCriteriaChange);
+    this.listenTo(this, 'change:activity change:unreadItems change:mentions change:lastAccessTime', this.onRoomCriteriaChange);
 
+    this.onRoomCollectionReset();
     this.onModelChangeState();
     this.onOrgNameChange();
   },
@@ -101,6 +103,13 @@ var FilteredRoomCollection = Backbone.Collection.extend({
     this.trigger('filter-complete');
   },
 
+  onRoomCollectionReset: function() {
+    this.reset();
+    this.roomCollection.forEach(function(model) {
+      this.onRoomAdded(model);
+    }, this);
+  },
+
   getFilter: function (){
     return (this._filter || this.filterDefault);
   },
@@ -117,11 +126,11 @@ var FilteredRoomCollection = Backbone.Collection.extend({
     this.sort();
   },
 
-  onRoomRemoved: function(model){
+  onRoomRemoved: function(model) {
     this.remove(model);
   },
 
-  onFavouriteChange: function (model) {
+  onFavouriteChange: function(model) {
     if(this.modelApplies(model)) {
       this.add(model);
     } else {
@@ -131,9 +140,10 @@ var FilteredRoomCollection = Backbone.Collection.extend({
     this.setFilter();
   },
 
-  onRoomAdded: function (model){
+  onRoomAdded: function(model) {
     if(this.modelApplies(model)) {
-      model.set('isHidden', !this._filter(model));
+      var filter = this.getFilter();
+      model.set('isHidden', !filter(model));
       this.add(model);
     }
   },

@@ -20,7 +20,6 @@ var FavouriteCollectionModel = require('../views/menu/room/favourite-collection/
 var PrimaryCollectionModel = require('../views/menu/room/primary-collection/primary-collection-model');
 var SecondaryCollectionModel = require('../views/menu/room/secondary-collection/secondary-collection-model');
 var TertiaryCollectionModel = require('../views/menu/room/tertiary-collection/tertiary-collection-model');
-var defaultCollectionFilter = require('gitter-web-shared/filters/left-menu-primary-default');
 var favouriteCollectionFilter = require('gitter-web-shared/filters/left-menu-primary-favourite');
 var MinibarCollection = require('../views/menu/room/minibar/minibar-collection');
 var MinibarItemModel = require('../views/menu/room/minibar/minibar-item-model.js');
@@ -110,8 +109,7 @@ module.exports = Backbone.Model.extend({
     });
     this.minibarCollection = new MinibarCollection(minibarModels, { roomCollection: this._roomCollection });
 
-    var roomModels = this._roomCollection.filter(defaultCollectionFilter);
-    this.activeRoomCollection = new FilteredRoomCollection(roomModels, {
+    this.activeRoomCollection = new FilteredRoomCollection(null, {
       roomModel:  this,
       collection: this._roomCollection,
     });
