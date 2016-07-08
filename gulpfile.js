@@ -186,7 +186,7 @@ gulp.task('validate-eslint-diff', function() {
   gutil.log('Performing eslint comparison to', baseBranch);
 
   var eslintPipe = gulp.src(['**/*.js','!node_modules/**','!public/repo/**'], { read: false })
-    .pipe(eslintFilter.filterFiles('develop'))
+    .pipe(eslintFilter.filterFiles(baseBranch))
     .pipe(eslint({
       quiet: argv.quiet
     }))
