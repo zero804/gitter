@@ -38,6 +38,7 @@ var View = Marionette.LayoutView.extend({
     permissions: '#permissions',
     permPublic: '#perm-select-public',
     permPrivate: '#perm-select-private',
+    permInheritedOrg: '#perm-select-inherited-org',
     validation: '#modal-failure',
     existing: '#existing',
     orgNameLabel: '#org-name',
@@ -194,6 +195,7 @@ var View = Marionette.LayoutView.extend({
       'permissions': false,
       'permPublic': false,
       'permPrivate': false,
+      'permInheritedOrg': false,
       'existing': false,
     };
 
@@ -214,7 +216,7 @@ var View = Marionette.LayoutView.extend({
       // TODO: make this work for repo-based groups too
       if (groupType == 'GH_ORG') {
         // rooms inside github org/repo-based groups can have inherited permissions
-        ['permissions', 'permPublic', 'permPrivate'].forEach(function (f) { showHide[f] = true; });
+        ['permissions', 'permPublic', 'permPrivate', 'permInheritedOrg'].forEach(function (f) { showHide[f] = true; });
         checkForRepo = roomName && groupUri + '/' + roomName;
 
       } else {
@@ -233,6 +235,7 @@ var View = Marionette.LayoutView.extend({
           'permissions': false,
           'permPublic': false,
           'permPrivate': false,
+          'permInheritedOrg': false,
           'existing': true
         };
         checkForRepo = null;
@@ -252,6 +255,7 @@ var View = Marionette.LayoutView.extend({
             'permissions': false,
             'permPublic': false,
             'permPrivate': false,
+            'permInheritedOrg': false,
             'existing': false
           };
           self.showValidationMessage('You cannot create a channel with this name as a repo with the same name already exists.');
