@@ -8,7 +8,6 @@ var through = require('through2');
 var gutil = require('gulp-util');
 var runSequence = require('run-sequence');
 var debug = require('gulp-debug');
-var _ = require('underscore');
 
 var livereload = require('gulp-livereload');
 var sourcemaps = require('gulp-sourcemaps');
@@ -48,6 +47,7 @@ var del = require('del');
 var glob = require('glob');
 var url = require('url');
 var github = require('gulp-github');
+var eslintFilter = require('./build-scripts/eslint-filter');
 
 var getSourceMapUrl = function() {
   if (!process.env.BUILD_URL) return;
@@ -158,16 +158,42 @@ gulp.task('validate-config', function() {
     .pipe(jsonlint.failOnError());
 });
 
+// Full eslint
 gulp.task('validate-eslint', function() {
   mkdirp.sync('output/eslint/');
-  var eslintPipe = gulp.src(['**/*.js','!node_modules/**','!public/repo/**'])
+  return gulp.src(['**/*.js','!node_modules/**','!public/repo/**'])
     .pipe(eslint({
       quiet: argv.quiet
     }))
-    .pipe(eslint.format('unix'))
     .pipe(eslint.format('checkstyle', function(checkstyleData) {
       fs.writeFileSync('output/eslint/checkstyle.xml', checkstyleData);
-    }));
+    }))
+    .pipe(eslint.failAfterError());
+});
+
+function guessBaseBranch() {
+  var branch = process.env.GIT_BRANCH;
+  if (!branch) return 'develop';
+
+  if (branch.match(/\bdevelop$/)) return branch.replace(/\bdevelop$/, 'master');
+  if (branch.match(/\brelease\//)) return branch.replace(/\brelease\/.*$/, 'master');
+  if (branch.match(/\bfeature\//)) return branch.replace(/\bfeature\/.*$/, 'develop');
+
+  return 'master';
+}
+
+// eslint of the diff
+gulp.task('validate-eslint-diff', function() {
+  var baseBranch = process.env.BASE_BRANCH || guessBaseBranch();
+  gutil.log('Performing eslint comparison to', baseBranch);
+
+  var eslintPipe = gulp.src(['**/*.js','!node_modules/**','!public/repo/**'], { read: false })
+    .pipe(eslintFilter.filterFiles('develop'))
+    .pipe(eslint({
+      quiet: argv.quiet
+    }))
+    .pipe(eslintFilter.filterMessages())
+    .pipe(eslint.format('unix'))
 
   if (process.env.SONARQUBE_GITHUB_ACCESS_TOKEN && process.env.ghprbPullId && process.env.GIT_COMMIT) {
     eslintPipe = eslintPipe.pipe(github({
@@ -178,8 +204,9 @@ gulp.task('validate-eslint', function() {
     }));
   }
 
-  return eslintPipe.pipe(eslint.failAfterError());
+  return eslintPipe;
 });
+
 
 gulp.task('validate', ['validate-config', 'validate-eslint']);
 
