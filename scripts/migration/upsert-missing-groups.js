@@ -160,7 +160,7 @@ function migrate(batch, enc, callback) {
         type: 'GH_' + githubType, // ORG or USER
         linkPath: info.owner.uri, // mixed case OK?
         externalId: info.owner.githubId,
-        security: githubType === 'ORG' ? 'PRIVATE' : null
+        security: 'PUBLIC'
       });
 
       // upsert the lcOwner into group
