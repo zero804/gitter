@@ -95,15 +95,6 @@ function ensureAccessAndFetchDescriptor(user, options) {
 
   return validateAndFetchBackingInfo(user, options)
     .spread(function(type, githubInfo) {
-      // Deal with INHERITED security rooms
-      if (security === 'INHERITED') {
-        if (!githubInfo) {
-          throw new StatusError('Cannot have INHERITED permissions on a non-GitHub backed object')
-        }
-
-        security = githubInfo.security;
-      }
-
       return securityDescriptorGenerator.generate(user, {
           type: type,
           linkPath: linkPath,
