@@ -208,7 +208,7 @@ gulp.task('validate-eslint-diff', function() {
 });
 
 
-gulp.task('validate', ['validate-config', 'validate-eslint']);
+gulp.task('validate', ['validate-config', 'validate-eslint', 'validate-eslint-diff']);
 
 makeTestTasks('test-mocha', function(name, files, options) {
   mkdirp.sync('output/test-reports/');
