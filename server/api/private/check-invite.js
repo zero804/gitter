@@ -5,10 +5,19 @@ var StatusError = require('statuserror');
 var isValidEmail = require('email-validator').validate;
 var inviteValidation = require('gitter-web-invites/lib/invite-validation');
 var invitesService = require('gitter-web-invites/lib/invites-service');
+var BackendMuxer = require('gitter-web-backend-muxer');
+var avatars = require('gitter-web-avatars');
 var restSerializer = require("../../serializers/rest-serializer");
 
+function getAvatar(userToInvite, type, externalId, emailAddress) {
+  if (userToInvite) {
+    return avatars.getForUser(userToInvite);
+  } else {
+    return inviteValidation.getAvatar(type, externalId, emailAddress)
+  }
+}
 
-function _findEmailAddress(invitingUser, type, externalId, emailAddress) {
+function _findEmailAddress(invitingUser, userToInvite, type, externalId, emailAddress) {
   if (emailAddress) {
     if (!isValidEmail(emailAddress)) {
       throw new StatusError(400);
@@ -17,7 +26,13 @@ function _findEmailAddress(invitingUser, type, externalId, emailAddress) {
     return emailAddress;
   }
 
-  return invitesService.resolveEmailAddress(invitingUser, type, externalId);
+  if (userToInvite) {
+    var backendMuxer = new BackendMuxer(userToInvite);
+    return backendMuxer.getEmailAddress();
+
+  } else {
+    return invitesService.resolveEmailAddress(invitingUser, type, externalId);
+  }
 }
 
 var findEmailAddress = Promise.method(_findEmailAddress);
@@ -27,7 +42,7 @@ function findInvitationInfo(invitingUser, type, externalId, emailAddress) {
   return invitesService.findExistingUser(type, externalId)
     .then(function(_userToInvite) {
       userToInvite = _userToInvite;
-      return findEmailAddress(invitingUser, type, externalId, emailAddress)
+      return findEmailAddress(invitingUser, userToInvite, type, externalId, emailAddress);
     })
     .then(function(resolvedEmailAddress) {
       if (!resolvedEmailAddress) throw new StatusError(428);
@@ -36,7 +51,7 @@ function findInvitationInfo(invitingUser, type, externalId, emailAddress) {
         user: userToInvite, // can be null/undefined
         displayName: userToInvite && userToInvite.displayName || externalId,
         emailAddress: resolvedEmailAddress,
-        avatarUrl: inviteValidation.getAvatar(type, externalId, resolvedEmailAddress)
+        avatarUrl: getAvatar(invitingUser, type, externalId, resolvedEmailAddress)
       };
     });
 }
@@ -67,7 +82,11 @@ function checkInvite(req, res, next) {
             avatarUrl: result.avatarUrl
           }
         });
-    });
+    })
+    .then(function(response) {
+      res.send(response);
+    })
+    .catch(next);
 }
 
 
