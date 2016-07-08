@@ -44,8 +44,14 @@ module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, group
     };
   }
 
+  var roomMenuIsPinned = true;
+  if(lastLeftMenuSnapshot.roomMenuIsPinned !== undefined) {
+    roomMenuIsPinned = lastLeftMenuSnapshot.roomMenuIsPinned;
+  }
+
   return {
     leftMenu: _.extend({}, lastLeftMenuSnapshot, {
+      roomMenuIsPinned: roomMenuIsPinned,
       state: menuState,
       tempOrg: tempOrg,
       selectedOrgName: selectedOrgName,
