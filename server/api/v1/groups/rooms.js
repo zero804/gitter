@@ -30,7 +30,7 @@ module.exports = {
     var topic = req.body.topic ? String(req.body.topic) : undefined;
     var createOptions = { name: name, topic: topic };
     if (req.body.security) {
-      // PUBLIC, PRIVATE or INHERITED
+      // PUBLIC or PRIVATE
       createOptions.security = req.body.security.security ? String(req.body.security.security) : undefined;
       assert(createOptions.security, 'security required');
 

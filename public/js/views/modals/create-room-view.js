@@ -142,14 +142,29 @@ var View = Marionette.LayoutView.extend({
     }
 
     var apiUrl = '/v1/groups/' + groupId + '/rooms';
-    var payload = {
-      name: roomName,
-      security: {
-        type: groupType, // null or GH_ORG or GH_REPO
-        security: permissions.toUpperCase(),
-        linkPath: (groupType !== null) ? groupLinkPath : null
-      }
-    };
+    var security = permissions.toUpperCase();
+    var payload;
+    if (security === 'PUBLIC' || security === 'INHERITED') {
+      payload = {
+        name: roomName,
+        security: {
+          type: groupType, // null or GH_ORG or GH_REPO
+          // the backend only understands PUBLIC or PRIVATE. INHERITED is what
+          // it understands as a PRIVATE GH_GROUP or GH_REPO room.
+          security: (security === 'PUBLIC') ? 'PUBLIC' : 'PRIVATE',
+          linkPath: (groupType !== null) ? groupLinkPath : null
+        }
+      };
+    } else {
+      // PRIVATE rooms don't have a backing object regardless of the group
+      payload = {
+        name: roomName,
+        security: {
+          type: null,
+          security: 'PRIVATE',
+        }
+      };
+    }
     return apiClient.post(apiUrl, payload)
       .then(function(data) {
         self.dialog.hide();
