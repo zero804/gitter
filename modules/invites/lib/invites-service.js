@@ -6,7 +6,6 @@ var uuid = require('node-uuid');
 var assert = require('assert');
 var StatusError = require('statuserror');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
-var _ = require('lodash');
 
 var MS_PER_DAY = 24 * 60 * 60 * 1000;
 
