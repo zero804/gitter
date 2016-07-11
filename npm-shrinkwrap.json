@@ -241,9 +241,9 @@
           }
         },
         "nan": {
-          "version": "2.3.5",
+          "version": "2.4.0",
           "from": "nan@>=2.0.5 <3.0.0",
-          "resolved": "http://beta-internal:4873/nan/-/nan-2.3.5.tgz"
+          "resolved": "http://beta-internal:4873/nan/-/nan-2.4.0.tgz"
         },
         "rimraf": {
           "version": "2.5.3",
@@ -385,7 +385,7 @@
       "dependencies": {
         "redis": {
           "version": "2.6.2",
-          "from": "redis@>=2.1.0 <3.0.0",
+          "from": "redis@latest",
           "resolved": "http://beta-internal:4873/redis/-/redis-2.6.2.tgz",
           "dependencies": {
             "double-ended-queue": {
@@ -2102,6 +2102,7 @@
     "gitter-realtime-client": {
       "version": "1.3.1",
       "from": "gitter-realtime-client@>=1.3.1 <2.0.0",
+      "resolved": "http://beta-internal:4873/gitter-realtime-client/-/gitter-realtime-client-1.3.1.tgz",
       "dependencies": {
         "backbone": {
           "version": "1.3.3",
@@ -2995,9 +2996,9 @@
           "resolved": "http://beta-internal:4873/bindings/-/bindings-1.2.1.tgz"
         },
         "nan": {
-          "version": "2.3.5",
+          "version": "2.4.0",
           "from": "nan@>=2.0.0 <3.0.0",
-          "resolved": "http://beta-internal:4873/nan/-/nan-2.3.5.tgz"
+          "resolved": "http://beta-internal:4873/nan/-/nan-2.4.0.tgz"
         }
       }
     },
@@ -3034,24 +3035,24 @@
       "resolved": "http://beta-internal:4873/moment/-/moment-2.14.1.tgz"
     },
     "mongodb": {
-      "version": "2.2.0",
-      "from": "mongodb@>=2.0.34 <3.0.0",
-      "resolved": "http://beta-internal:4873/mongodb/-/mongodb-2.2.0.tgz",
+      "version": "2.1.18",
+      "from": "mongodb@2.1.18",
+      "resolved": "http://beta-internal:4873/mongodb/-/mongodb-2.1.18.tgz",
       "dependencies": {
         "es6-promise": {
           "version": "3.0.2",
           "from": "es6-promise@3.0.2",
-          "resolved": "http://beta-internal:4873/es6-promise/-/es6-promise-3.0.2.tgz"
+          "resolved": "https://registry.npmjs.org/es6-promise/-/es6-promise-3.0.2.tgz"
         },
         "mongodb-core": {
-          "version": "2.0.3",
-          "from": "mongodb-core@2.0.3",
-          "resolved": "http://beta-internal:4873/mongodb-core/-/mongodb-core-2.0.3.tgz",
+          "version": "1.3.18",
+          "from": "mongodb-core@1.3.18",
+          "resolved": "http://beta-internal:4873/mongodb-core/-/mongodb-core-1.3.18.tgz",
           "dependencies": {
             "bson": {
-              "version": "0.5.0",
-              "from": "bson@>=0.5.0 <0.6.0",
-              "resolved": "http://beta-internal:4873/bson/-/bson-0.5.0.tgz"
+              "version": "0.4.23",
+              "from": "bson@>=0.4.23 <0.5.0",
+              "resolved": "http://beta-internal:4873/bson/-/bson-0.4.23.tgz"
             },
             "require_optional": {
               "version": "1.0.0",
@@ -3134,9 +3135,9 @@
       "resolved": "http://beta-internal:4873/mongodb-unique-ids/-/mongodb-unique-ids-0.1.2.tgz"
     },
     "mongoose": {
-      "version": "4.4.20",
-      "from": "mongoose@>=4.4.0 <4.5.0",
-      "resolved": "http://beta-internal:4873/mongoose/-/mongoose-4.4.20.tgz",
+      "version": "4.5.3",
+      "from": "mongoose@>=4.5.3 <5.0.0",
+      "resolved": "https://registry.npmjs.org/mongoose/-/mongoose-4.5.3.tgz",
       "dependencies": {
         "async": {
           "version": "1.5.2",
@@ -3154,72 +3155,9 @@
           "resolved": "http://beta-internal:4873/hooks-fixed/-/hooks-fixed-1.1.0.tgz"
         },
         "kareem": {
-          "version": "1.0.1",
-          "from": "kareem@1.0.1",
-          "resolved": "http://beta-internal:4873/kareem/-/kareem-1.0.1.tgz"
-        },
-        "mongodb": {
-          "version": "2.1.18",
-          "from": "mongodb@2.1.18",
-          "resolved": "https://registry.npmjs.org/mongodb/-/mongodb-2.1.18.tgz",
-          "dependencies": {
-            "es6-promise": {
-              "version": "3.0.2",
-              "from": "es6-promise@3.0.2",
-              "resolved": "http://beta-internal:4873/es6-promise/-/es6-promise-3.0.2.tgz"
-            },
-            "mongodb-core": {
-              "version": "1.3.18",
-              "from": "mongodb-core@1.3.18",
-              "resolved": "https://registry.npmjs.org/mongodb-core/-/mongodb-core-1.3.18.tgz",
-              "dependencies": {
-                "require_optional": {
-                  "version": "1.0.0",
-                  "from": "require_optional@>=1.0.0 <1.1.0",
-                  "resolved": "http://beta-internal:4873/require_optional/-/require_optional-1.0.0.tgz",
-                  "dependencies": {
-                    "semver": {
-                      "version": "5.2.0",
-                      "from": "semver@>=5.1.0 <6.0.0",
-                      "resolved": "https://registry.npmjs.org/semver/-/semver-5.2.0.tgz"
-                    },
-                    "resolve-from": {
-                      "version": "2.0.0",
-                      "from": "resolve-from@>=2.0.0 <3.0.0",
-                      "resolved": "https://registry.npmjs.org/resolve-from/-/resolve-from-2.0.0.tgz"
-                    }
-                  }
-                }
-              }
-            },
-            "readable-stream": {
-              "version": "1.0.31",
-              "from": "readable-stream@1.0.31",
-              "resolved": "http://beta-internal:4873/readable-stream/-/readable-stream-1.0.31.tgz",
-              "dependencies": {
-                "core-util-is": {
-                  "version": "1.0.2",
-                  "from": "core-util-is@>=1.0.0 <1.1.0",
-                  "resolved": "http://beta-internal:4873/core-util-is/-/core-util-is-1.0.2.tgz"
-                },
-                "isarray": {
-                  "version": "0.0.1",
-                  "from": "isarray@0.0.1",
-                  "resolved": "http://beta-internal:4873/isarray/-/isarray-0.0.1.tgz"
-                },
-                "string_decoder": {
-                  "version": "0.10.31",
-                  "from": "string_decoder@>=0.10.0 <0.11.0",
-                  "resolved": "http://beta-internal:4873/string_decoder/-/string_decoder-0.10.31.tgz"
-                },
-                "inherits": {
-                  "version": "2.0.1",
-                  "from": "inherits@>=2.0.1 <2.1.0",
-                  "resolved": "http://beta-internal:4873/inherits/-/inherits-2.0.1.tgz"
-                }
-              }
-            }
-          }
+          "version": "1.1.3",
+          "from": "kareem@1.1.3",
+          "resolved": "https://registry.npmjs.org/kareem/-/kareem-1.1.3.tgz"
         },
         "mpath": {
           "version": "0.2.1",
@@ -3772,7 +3710,7 @@
       "dependencies": {
         "passport-oauth2": {
           "version": "1.3.0",
-          "from": "passport-oauth2@>=1.1.2 <2.0.0",
+          "from": "passport-oauth2@>=1.0.0 <2.0.0",
           "resolved": "http://beta-internal:4873/passport-oauth2/-/passport-oauth2-1.3.0.tgz",
           "dependencies": {
             "passport-strategy": {
@@ -3825,7 +3763,7 @@
       "dependencies": {
         "passport-oauth2": {
           "version": "1.3.0",
-          "from": "passport-oauth2@>=1.1.2 <2.0.0",
+          "from": "passport-oauth2@>=1.0.0 <2.0.0",
           "resolved": "http://beta-internal:4873/passport-oauth2/-/passport-oauth2-1.3.0.tgz",
           "dependencies": {
             "passport-strategy": {
@@ -4041,9 +3979,9 @@
       "resolved": "http://beta-internal:4873/request-extensible/-/request-extensible-0.1.1.tgz",
       "dependencies": {
         "request": {
-          "version": "2.72.0",
+          "version": "2.73.0",
           "from": "request@>=2.53.0 <3.0.0",
-          "resolved": "http://beta-internal:4873/request/-/request-2.72.0.tgz",
+          "resolved": "https://registry.npmjs.org/request/-/request-2.73.0.tgz",
           "dependencies": {
             "aws-sign2": {
               "version": "0.6.0",
@@ -4128,7 +4066,7 @@
             },
             "form-data": {
               "version": "1.0.0-rc4",
-              "from": "form-data@>=1.0.0-rc3 <1.1.0",
+              "from": "form-data@>=1.0.0-rc4 <1.1.0",
               "resolved": "http://beta-internal:4873/form-data/-/form-data-1.0.0-rc4.tgz",
               "dependencies": {
                 "async": {
@@ -4390,9 +4328,9 @@
               "resolved": "http://beta-internal:4873/oauth-sign/-/oauth-sign-0.8.2.tgz"
             },
             "qs": {
-              "version": "6.1.0",
-              "from": "qs@>=6.1.0 <6.2.0",
-              "resolved": "http://beta-internal:4873/qs/-/qs-6.1.0.tgz"
+              "version": "6.2.0",
+              "from": "qs@>=6.2.0 <6.3.0",
+              "resolved": "http://beta-internal:4873/qs/-/qs-6.2.0.tgz"
             },
             "stringstream": {
               "version": "0.0.5",
@@ -4546,9 +4484,9 @@
           "resolved": "http://beta-internal:4873/create-error/-/create-error-0.3.1.tgz"
         },
         "request": {
-          "version": "2.72.0",
+          "version": "2.73.0",
           "from": "request@>=2.53.0 <3.0.0",
-          "resolved": "http://beta-internal:4873/request/-/request-2.72.0.tgz",
+          "resolved": "https://registry.npmjs.org/request/-/request-2.73.0.tgz",
           "dependencies": {
             "aws-sign2": {
               "version": "0.6.0",
@@ -4633,7 +4571,7 @@
             },
             "form-data": {
               "version": "1.0.0-rc4",
-              "from": "form-data@>=1.0.0-rc3 <1.1.0",
+              "from": "form-data@>=1.0.0-rc4 <1.1.0",
               "resolved": "http://beta-internal:4873/form-data/-/form-data-1.0.0-rc4.tgz",
               "dependencies": {
                 "async": {
@@ -4895,9 +4833,9 @@
               "resolved": "http://beta-internal:4873/oauth-sign/-/oauth-sign-0.8.2.tgz"
             },
             "qs": {
-              "version": "6.1.0",
-              "from": "qs@>=6.1.0 <6.2.0",
-              "resolved": "http://beta-internal:4873/qs/-/qs-6.1.0.tgz"
+              "version": "6.2.0",
+              "from": "qs@>=6.2.0 <6.3.0",
+              "resolved": "http://beta-internal:4873/qs/-/qs-6.2.0.tgz"
             },
             "stringstream": {
               "version": "0.0.5",
@@ -5512,15 +5450,10 @@
       "resolved": "http://beta-internal:4873/xregexp/-/xregexp-2.0.0.tgz"
     },
     "yargs": {
-      "version": "4.7.1",
+      "version": "4.8.0",
       "from": "yargs@>=4.2.0 <5.0.0",
-      "resolved": "http://beta-internal:4873/yargs/-/yargs-4.7.1.tgz",
+      "resolved": "http://beta-internal:4873/yargs/-/yargs-4.8.0.tgz",
       "dependencies": {
-        "camelcase": {
-          "version": "3.0.0",
-          "from": "camelcase@>=3.0.0 <4.0.0",
-          "resolved": "http://beta-internal:4873/camelcase/-/camelcase-3.0.0.tgz"
-        },
         "cliui": {
           "version": "3.2.0",
           "from": "cliui@>=3.2.0 <4.0.0",
@@ -5583,107 +5516,6 @@
                   "resolved": "http://beta-internal:4873/invert-kv/-/invert-kv-1.0.0.tgz"
                 }
               }
-            }
-          }
-        },
-        "pkg-conf": {
-          "version": "1.1.3",
-          "from": "pkg-conf@>=1.1.2 <2.0.0",
-          "resolved": "http://beta-internal:4873/pkg-conf/-/pkg-conf-1.1.3.tgz",
-          "dependencies": {
-            "find-up": {
-              "version": "1.1.2",
-              "from": "find-up@>=1.0.0 <2.0.0",
-              "resolved": "http://beta-internal:4873/find-up/-/find-up-1.1.2.tgz",
-              "dependencies": {
-                "path-exists": {
-                  "version": "2.1.0",
-                  "from": "path-exists@>=2.0.0 <3.0.0",
-                  "resolved": "http://beta-internal:4873/path-exists/-/path-exists-2.1.0.tgz"
-                },
-                "pinkie-promise": {
-                  "version": "2.0.1",
-                  "from": "pinkie-promise@>=2.0.0 <3.0.0",
-                  "resolved": "http://beta-internal:4873/pinkie-promise/-/pinkie-promise-2.0.1.tgz",
-                  "dependencies": {
-                    "pinkie": {
-                      "version": "2.0.4",
-                      "from": "pinkie@>=2.0.0 <3.0.0",
-                      "resolved": "http://beta-internal:4873/pinkie/-/pinkie-2.0.4.tgz"
-                    }
-                  }
-                }
-              }
-            },
-            "load-json-file": {
-              "version": "1.1.0",
-              "from": "load-json-file@>=1.1.0 <2.0.0",
-              "resolved": "http://beta-internal:4873/load-json-file/-/load-json-file-1.1.0.tgz",
-              "dependencies": {
-                "graceful-fs": {
-                  "version": "4.1.4",
-                  "from": "graceful-fs@>=4.1.2 <5.0.0",
-                  "resolved": "http://beta-internal:4873/graceful-fs/-/graceful-fs-4.1.4.tgz"
-                },
-                "parse-json": {
-                  "version": "2.2.0",
-                  "from": "parse-json@>=2.2.0 <3.0.0",
-                  "resolved": "http://beta-internal:4873/parse-json/-/parse-json-2.2.0.tgz",
-                  "dependencies": {
-                    "error-ex": {
-                      "version": "1.3.0",
-                      "from": "error-ex@>=1.2.0 <2.0.0",
-                      "resolved": "http://beta-internal:4873/error-ex/-/error-ex-1.3.0.tgz",
-                      "dependencies": {
-                        "is-arrayish": {
-                          "version": "0.2.1",
-                          "from": "is-arrayish@>=0.2.1 <0.3.0",
-                          "resolved": "http://beta-internal:4873/is-arrayish/-/is-arrayish-0.2.1.tgz"
-                        }
-                      }
-                    }
-                  }
-                },
-                "pify": {
-                  "version": "2.3.0",
-                  "from": "pify@>=2.0.0 <3.0.0",
-                  "resolved": "http://beta-internal:4873/pify/-/pify-2.3.0.tgz"
-                },
-                "pinkie-promise": {
-                  "version": "2.0.1",
-                  "from": "pinkie-promise@>=2.0.0 <3.0.0",
-                  "resolved": "http://beta-internal:4873/pinkie-promise/-/pinkie-promise-2.0.1.tgz",
-                  "dependencies": {
-                    "pinkie": {
-                      "version": "2.0.4",
-                      "from": "pinkie@>=2.0.0 <3.0.0",
-                      "resolved": "http://beta-internal:4873/pinkie/-/pinkie-2.0.4.tgz"
-                    }
-                  }
-                },
-                "strip-bom": {
-                  "version": "2.0.0",
-                  "from": "strip-bom@>=2.0.0 <3.0.0",
-                  "resolved": "http://beta-internal:4873/strip-bom/-/strip-bom-2.0.0.tgz",
-                  "dependencies": {
-                    "is-utf8": {
-                      "version": "0.2.1",
-                      "from": "is-utf8@>=0.2.0 <0.3.0",
-                      "resolved": "http://beta-internal:4873/is-utf8/-/is-utf8-0.2.1.tgz"
-                    }
-                  }
-                }
-              }
-            },
-            "object-assign": {
-              "version": "4.1.0",
-              "from": "object-assign@>=4.0.1 <5.0.0",
-              "resolved": "http://beta-internal:4873/object-assign/-/object-assign-4.1.0.tgz"
-            },
-            "symbol": {
-              "version": "0.2.3",
-              "from": "symbol@>=0.2.1 <0.3.0",
-              "resolved": "http://beta-internal:4873/symbol/-/symbol-0.2.3.tgz"
             }
           }
         },
@@ -5820,7 +5652,7 @@
                           "dependencies": {
                             "spdx-license-ids": {
                               "version": "1.2.1",
-                              "from": "spdx-license-ids@>=1.0.2 <2.0.0",
+                              "from": "spdx-license-ids@>=1.0.0 <2.0.0",
                               "resolved": "http://beta-internal:4873/spdx-license-ids/-/spdx-license-ids-1.2.1.tgz"
                             }
                           }
@@ -5837,7 +5669,7 @@
                             },
                             "spdx-license-ids": {
                               "version": "1.2.1",
-                              "from": "spdx-license-ids@>=1.0.2 <2.0.0",
+                              "from": "spdx-license-ids@>=1.0.0 <2.0.0",
                               "resolved": "http://beta-internal:4873/spdx-license-ids/-/spdx-license-ids-1.2.1.tgz"
                             }
                           }
@@ -5879,15 +5711,20 @@
             }
           }
         },
+        "require-directory": {
+          "version": "2.1.1",
+          "from": "require-directory@>=2.1.1 <3.0.0",
+          "resolved": "http://beta-internal:4873/require-directory/-/require-directory-2.1.1.tgz"
+        },
         "require-main-filename": {
           "version": "1.0.1",
           "from": "require-main-filename@>=1.0.1 <2.0.0",
           "resolved": "http://beta-internal:4873/require-main-filename/-/require-main-filename-1.0.1.tgz"
         },
         "set-blocking": {
-          "version": "1.0.0",
-          "from": "set-blocking@>=1.0.0 <2.0.0",
-          "resolved": "http://beta-internal:4873/set-blocking/-/set-blocking-1.0.0.tgz"
+          "version": "2.0.0",
+          "from": "set-blocking@>=2.0.0 <3.0.0",
+          "resolved": "http://beta-internal:4873/set-blocking/-/set-blocking-2.0.0.tgz"
         },
         "string-width": {
           "version": "1.0.1",
@@ -5931,6 +5768,11 @@
               }
             }
           }
+        },
+        "which-module": {
+          "version": "1.0.0",
+          "from": "which-module@>=1.0.0 <2.0.0",
+          "resolved": "http://beta-internal:4873/which-module/-/which-module-1.0.0.tgz"
         },
         "window-size": {
           "version": "0.2.0",
