@@ -94,6 +94,8 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
     else {
       this.model.set('inviteStatus', peopleToInviteStatusConstants.NEEDS_EMAIL);
     }
+
+    this.model.set('emailAddress', emailInputText);
   }
 });
 
