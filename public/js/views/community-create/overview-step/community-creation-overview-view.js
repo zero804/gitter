@@ -107,7 +107,8 @@ module.exports = CommunityCreateBaseStepView.extend({
       uri: communityCreateModel.get('communitySlug'),
       type: type,
       linkPath: linkPath,
-      defaultRoomName: defaultRoomName
+      defaultRoomName: defaultRoomName,
+      invites: [].concat(communityCreateModel.peopleToInvite.toJSON(), communityCreateModel.emailsToInvite.toJSON())
     });
 
     var basePath = clientEnv['basePath'];
