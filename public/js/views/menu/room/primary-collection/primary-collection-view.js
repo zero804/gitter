@@ -13,8 +13,6 @@ var compositeViewRenderTemplate = require('utils/composite-view-render-template'
 var domIndexById = require('utils/dom-index-by-id');
 var toggleClass = require('utils/toggle-class');
 
-var proto = BaseCollectionView.prototype;
-
 var PrimaryCollectionView = BaseCollectionView.extend({
 
   //Ugh, Marionette, get your game together JP 17/2/16
@@ -140,6 +138,11 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     this.stopListening(this.dndCtrl);
     this.stopListening(this.collection);
   },
+
+  filter: function (child) {
+    var hidden = child.get('isHidden');
+    return !hidden;
+  }
 
 });
 
