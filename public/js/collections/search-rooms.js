@@ -1,7 +1,7 @@
 'use strict';
 
-var BaseResolverCollection = require('./base-resolver-collection.js');
-var SyncMixin = require('./sync-mixin.js');
+var BaseResolverCollection = require('./base-resolver-collection');
+var SyncMixin = require('./sync-mixin');
 
 module.exports = BaseResolverCollection.extend({
   template: '/v1/rooms',

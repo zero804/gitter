@@ -7,6 +7,7 @@ var GithubMe = require('gitter-web-github').GitHubMeService;
 var gitHubEmailAddressService = require('./github-email-address-service');
 var gitHubProfileService = require('./github-profile-service');
 
+
 function GitHubBackend(user, identity) {
   this.user = user;
   this.identity = identity;

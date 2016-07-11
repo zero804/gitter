@@ -879,11 +879,12 @@ describe('room-service', function() {
               favourite: null,
               lastAccessTime: null,
               mentions: 0,
-              unreadItems: 0
+              unreadItems: 0,
+              activity: 0
             }
           });
 
-          return roomService.hideRoomFromUser(fixture.troupeCanRemove.id, fixture.userFavourite.id)
+          return roomService.hideRoomFromUser(fixture.troupeCanRemove, fixture.userFavourite.id)
             .then(checkEvent) // Ensure event was emitted
             .then(getFavs)
             .then(function(favs) {
@@ -902,7 +903,7 @@ describe('room-service', function() {
               return troupeService.findById(fixture.troupeCanRemove.id);
             })
             .then(function(troupe) {
-              return roomService.hideRoomFromUser(troupe.id, fixture.userFavourite.id);
+              return roomService.hideRoomFromUser(troupe, fixture.userFavourite.id);
             })
             .then(getFavs)
             .then(function(favs) {
@@ -921,7 +922,7 @@ describe('room-service', function() {
               return troupeService.findById(fixture.troupeCanRemove.id);
             })
             .then(function(troupe) {
-              return roomService.hideRoomFromUser(troupe.id, fixture.userFavourite.id);
+              return roomService.hideRoomFromUser(troupe, fixture.userFavourite.id);
             })
             .then(getFavs)
             .then(function(favs) {
@@ -945,7 +946,7 @@ describe('room-service', function() {
               assert(!here); // Check that user is not in the room
             })
             .then(function() {
-              return roomService.hideRoomFromUser(fixture.troupeEmpty.id, fixture.userFavourite.id);
+              return roomService.hideRoomFromUser(fixture.troupeEmpty, fixture.userFavourite.id);
             })
             .then(checkEvent) // Ensure event was emitted
             .then(getFavs)
