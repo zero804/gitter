@@ -178,11 +178,11 @@ module.exports = CommunityCreateBaseStepView.extend({
     apiClient.priv.get('/check-group-uri', {
         uri: slug
       })
-      .then(function(results) {
+      .then(function() {
         communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.AVAILABLE);
         model.isValid();
       })
-      .catch(function(err) {
+      .catch(function() {
         communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.UNAVAILABLE);
         model.isValid();
       });
