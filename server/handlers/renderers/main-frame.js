@@ -2,24 +2,19 @@
 
 var env = require('gitter-web-env');
 var winston = env.logger;
-var errorReporter = env.errorReporter;
 var nconf = env.config;
 var statsd = env.createStatsClient({ prefix: nconf.get('stats:statsd:prefix')});
 var Promise = require('bluebird');
 var contextGenerator = require('../../web/context-generator');
 var restful = require('../../services/restful');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
-var _ = require('lodash');
 var roomSort = require('gitter-realtime-client/lib/sorts-filters').pojo; /* <-- Don't use the default export
                                                                                           will bring in tons of client-side
                                                                                           libraries that we don't need */
 var roomNameTrimmer = require('../../../public/js/utils/room-name-trimmer');
-var userSettingsService = require('../../services/user-settings-service');
 var getSubResources = require('./sub-resources');
-var fixMongoIdQueryParam = require('../../web/fix-mongo-id-query-param');
-var mapGroupsForRenderer = require('../../handlers/map-groups-for-renderer');
 var generateMainFrameSnapshots = require('../../handlers/snapshots/main-frame');
-var fonts = require('../../web/fonts.js');
+var fonts = require('../../web/fonts');
 
 function renderMainFrame(req, res, next, options) {
   var user = req.user;
@@ -52,9 +47,10 @@ function renderMainFrame(req, res, next, options) {
         bootScriptName = 'router-nli-app';
       }
 
+      var hasCommunityCreate = req.fflip && req.fflip.has('community-create');
       var hasNewLeftMenu = !req.isPhone && req.fflip && req.fflip.has('left-menu');
       var snapshots = troupeContext.snapshots = generateMainFrameSnapshots(req, troupeContext, rooms, groups);
-
+      
       if(snapshots && snapshots.leftMenu && snapshots.leftMenu.state) {
         // `gitter.web.prerender-left-menu`
         statsd.increment('prerender-left-menu', 1, 0.25, [
@@ -77,6 +73,7 @@ function renderMainFrame(req, res, next, options) {
         });
 
       res.render(template, {
+        hasCommunityCreate:     hasCommunityCreate,
         //left menu
         hasNewLeftMenu:         hasNewLeftMenu,
         leftMenuOrgs:           troupeContext.snapshots.orgs,
