@@ -23,9 +23,9 @@ initialize: function(attrs, options) {
     //as we are sure we should be showing a temp org
     var orgName = getOrgnameFromUri(this.getRoomUri());
     var roomId = val;
-    var org = this.roomCollection.get(roomId) && this.groupCollection.findWhere({ name: orgName });
-    var hasJoinedOrg = !!org;
-    var shouldHideTempOrg = hasJoinedOrg || orgName === 'home' || orgName === 'search' || orgName === 'people';
+    var group = this.roomCollection.get(roomId) && this.groupCollection.findWhere({ name: orgName });
+    var hasJoinedOrg = !!group;
+    var shouldHideTempOrg = hasJoinedOrg || !group;
     this.model.set('hidden', shouldHideTempOrg);
   },
 
