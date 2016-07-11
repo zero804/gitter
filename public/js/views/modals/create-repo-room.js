@@ -3,7 +3,7 @@ var Marionette = require('backbone.marionette');
 var ModalView = require('./modal');
 var context = require('utils/context');
 var apiClient = require('components/apiClient');
-var RepoSelectView = require('../createRoom/repoSelectView.js');
+var RepoSelectView = require('../createRoom/repoSelectView');
 var template = require('./tmpl/create-repo-room.hbs');
 var appEvents = require('utils/appevents');
 
