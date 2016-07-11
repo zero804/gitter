@@ -135,6 +135,17 @@
                     if (elementType !== 'img') {
                         emojiElement.setAttribute('class', 'emoji emoji-' + args.emojiName);
                     } else {
+                        /**
+                        * mutantjs doesn't have the ability to resolve CSS properties (we could add it in, but it would slow it down a lot)
+                        * so it detects that an image will cause a reflow when:
+                        * - The image is in a loading state
+                        * - The image does not have height and width attributes
+                        * Then, when the image state changes to loaded, it emits a reflow notification.
+                        *
+                        * For this reason, make sure we set the height and width on the emoji image.
+                        */
+                        emojiElement.setAttribute('width', '20');
+                        emojiElement.setAttribute('height', '20');
                         emojiElement.setAttribute('align', 'absmiddle');
                         emojiElement.setAttribute('alt', ':' + args.emojiName + ':');
                         emojiElement.setAttribute('class', 'emoji');
