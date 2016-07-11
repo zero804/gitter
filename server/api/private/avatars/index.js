@@ -8,6 +8,10 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
 
 var DEFAULT_AVATAR_URL = 'https://avatars.githubusercontent.com/u/0';
 
+function getSizeParam(req) {
+  return req.query.s && parseInt(req.query.s, 10) || '';
+}
+
 function sendAvatar(req, res, imageUrl, hasCacheBuster) {
 
   // If the nginx image proxy is sitting in front of the app
@@ -61,8 +65,7 @@ function githubVerionedUrl(username, version, size) {
 router.get('/group/i/:groupId',
   identifyRoute('api-private-avatar-group-id'),
   function(req, res, next) {
-    var size = req.query.size && parseInt(req.query.size, 10) || '';
-
+    var size = getSizeParam(req);
     // TODO: deal with cache-busters
     // and non-github objects
 
@@ -95,16 +98,19 @@ router.get('/group/i/:groupId',
 router.get('/gravatar/e/:email',
   identifyRoute('api-private-avatar-gravatar'),
   function(req, res) {
+    var size = getSizeParam(req);
+
     var email = req.params.email;
-    var gravatarUrl = gravatar.forEmail(email, req.query.s);
+    var gravatarUrl = gravatar.forEmail(email, size);
     return sendAvatar(req, res, gravatarUrl, true);
   });
 
 router.get('/gravatar/m/:md5',
   identifyRoute('api-private-avatar-checksum'),
   function(req, res) {
+    var size = getSizeParam(req);
     var md5 = req.params.md5;
-    var gravatarUrl = gravatar.forChecksum(md5, req.query.s);
+    var gravatarUrl = gravatar.forChecksum(md5, size);
     return sendAvatar(req, res, gravatarUrl, true);
   });
 
@@ -112,7 +118,7 @@ router.get('/gh/u/:username',
   identifyRoute('api-private-github-username'),
   function(req, res) {
     var username = req.params.username;
-    var size = req.query.size && parseInt(req.query.size, 10) || '';
+    var size = getSizeParam(req);
     var avatarUrl = githubUrl(username, size);
     return sendAvatar(req, res, avatarUrl, false);
   });
@@ -122,7 +128,7 @@ router.get('/gh/uv/:version/:username',
   function(req, res) {
     var username = req.params.username;
     var version = req.params.version;
-    var size = req.query.size && parseInt(req.query.size, 10) || '';
+    var size = req.query.s && parseInt(req.query.s, 10) || '';
     var avatarUrl = githubVerionedUrl(username, version, size);
     return sendAvatar(req, res, avatarUrl, false);
   });
