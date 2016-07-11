@@ -80,7 +80,9 @@ module.exports = CommunityCreateBaseStepView.extend({
     this.userResultCollection = new UserResultCollection(null, {
       stepViewModel: this.model,
       searchModel: this.searchModel,
-      communityCreateModel: this.communityCreateModel
+      communityCreateModel: this.communityCreateModel,
+      orgCollection: this.orgCollection,
+      repoCollection: this.repoCollection
     })
 
     this.inviteCollection = new VirtualMultipleCollection([], {
