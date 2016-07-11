@@ -10,7 +10,6 @@ var itemTemplate = require('./tmpl/collaboratorsItemView.hbs');
 var emptyViewTemplate = require('./tmpl/collaboratorsEmptyView.hbs');
 var appEvents = require('utils/appevents');
 var collaboratorsModels = require('collections/collaborators');
-var resolveUserAvatarSrcSet = require('gitter-web-shared/avatars/resolve-user-avatar-srcset');
 
 require('gitter-styleguide/css/components/buttons.css');
 require('gitter-styleguide/css/components/links.css');
@@ -42,19 +41,11 @@ module.exports = (function() {
     /**
      * TODO: deal with non-GitHub users too
      */
-    inviteGitHubUser: function(githubUsername, emailAddress) {
+    inviteGitHubUser: function(data) {
       var self = this;
-      var state = emailAddress ? 'inviting' : 'adding';
+      var state = 'inviting';
 
       this.stateModel.set('state', state);
-
-      var data = {
-        githubUsername: githubUsername,
-      };
-
-      if (emailAddress) {
-        data.email = emailAddress;
-      }
 
       return apiClient.room.post('/invites', data)
         .then(function(invite) {
@@ -88,44 +79,40 @@ module.exports = (function() {
     },
 
     inviteUser: function() {
-      var githubUsername = this.userModel.get('username');
       var email = this.$el.find('.js-invite-email').val();
-
-      this.inviteGitHubUser(githubUsername, email);
+      this.userModel.set({ email: email });
+      this.inviteGitHubUser(this.userModel.toJSON());
 
       // stop the page reloading
       return false;
     },
 
     addUser: function() {
-      var githubUser = this.userModel;
-
       appEvents.triggerParent('track-event', 'welcome-add-user-click');
 
-      var githubUsername = githubUser.get('username');
-      this.inviteGitHubUser(githubUsername, null);
+      this.inviteGitHubUser(this.userModel.toJSON(), null);
 
       return false;
     },
 
     serializeData: function() {
       var state = this.stateModel.get('state');
-      var username = this.userModel.get('username');
+      var displayName = this.userModel.get('displayName');
       var email = this.userModel.get('email');
 
       var states = {
-        initial:                { text: username, showAddButton: true },
+        initial:                { text: displayName, showAddButton: true },
         adding:                 { text: 'Adding…' },
-        added:                  { text: username + ' added' },
+        added:                  { text: displayName + ' added' },
         invited:                { text: email ? 'Invited ' + email : 'Invited' },
-        fail:                   { text: 'Unable to add ' + username },
+        fail:                   { text: 'Unable to add ' + displayName },
         fail_409:               { text: 'Already invited' },
-        email_address_required: { text: 'Enter ' + username + '\'s email', showEmailForm: true },
+        email_address_required: { text: 'Enter ' + displayName + '\'s email', showEmailForm: true },
         inviting:               { text: 'Inviting…' },
       };
 
       var data = states[state] || states.initial;
-      data.avatarSrcSet = resolveUserAvatarSrcSet({ username: username }, 30);
+      data.avatarUrl = this.userModel.get('avatarUrl');
 
       return data;
     },

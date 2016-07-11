@@ -85,7 +85,7 @@ describe('ensure-access-and-fetch-descriptor #slow', function() {
     return ensureAccessAndFetchDescriptor(fixture.user1, {
         type: 'GH_REPO',
         linkPath: linkPath,
-        security: 'INHERITED'
+        security: 'PUBLIC'
       })
       .then(function(sd) {
         assert.deepEqual(sd, {
@@ -125,7 +125,7 @@ describe('ensure-access-and-fetch-descriptor #slow', function() {
     return ensureAccessAndFetchDescriptor(fixture.user1, {
         type: 'GH_ORG',
         linkPath: fixtureLoader.GITTER_INTEGRATION_REPO_FULL,
-        security: 'INHERITED'
+        security: 'PUBLIC'
       })
       .then(function() {
         assert.ok(false, 'Expected error');
@@ -139,7 +139,7 @@ describe('ensure-access-and-fetch-descriptor #slow', function() {
     return ensureAccessAndFetchDescriptor(fixture.user1, {
         type: 'GH_ORG',
         linkPath: 'gitterHQ',
-        security: 'INHERITED'
+        security: 'PUBLIC'
       })
       .then(function() {
         assert.ok(false, 'Expected error');
@@ -153,7 +153,7 @@ describe('ensure-access-and-fetch-descriptor #slow', function() {
     return ensureAccessAndFetchDescriptor(fixture.user1, {
         type: 'GH_ORG',
         linkPath: 'foo-foo-does-not-exist',
-        security: 'INHERITED'
+        security: 'PUBLIC'
       })
       .then(function() {
         assert.ok(false, 'Expected error');

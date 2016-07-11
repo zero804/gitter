@@ -3,7 +3,7 @@
 
     <dl class="owner">
       <dt>
-        <label for="owner"><h5>Owner</h5></label>
+        <label for="owner"><h5>Community</h5></label>
       </dt>
       <dd id="owner-region">
         <div class="gtrInput gtrOwnerDD">
@@ -41,21 +41,6 @@
       </label>
     </div>
 
-    <div id="perm-select-inherited-org" class="permission">
-      <div class='permission__input'>
-        <input name="permissions" id="perm-select-inherited-org-input"  type="radio" value="inherited">
-      </div>
-      <label for='perm-select-inherited-org-input'>
-        <div class='permission__icon permission__icon--large'>
-          <i class="octicon octicon-organization"></i>
-        </div>
-        <div class='permission__details'>
-          <strong>Organisation</strong><br>
-          Anyone in <strong id="parent-name">orgName</strong> can join.
-        </div>
-      </label>
-    </div>
-
     <div id="perm-select-private" class="permission">
       <div class='permission__input'>
         <input name="permissions" id="perm-select-private-input" type="radio" value="private">
@@ -69,15 +54,6 @@
           Only people added to the room can join.
         </div>
       </label>
-    </div>
-
-    <div id="perm-select-required" class="permission-row">
-      <span class="description">Select a parent room to continue</span>
-    </div>
-
-    <div id="auto-join" class="gtrAutoJoin">
-      <input type="checkbox"/>
-      <div class="permission-label">Automatically add people in <strong id="parent-name">orgName</strong> to this room.</div>
     </div>
 
     <div id="existing">

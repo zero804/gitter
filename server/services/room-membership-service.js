@@ -309,7 +309,7 @@ function removeRoomMembers(troupeId, userIds, groupId) {
           roomMembershipEvents.emit("group.members.removed", groupId, usersNoLongerInGroup);
         }
       }
-      
+
       // Async record the remove user
       removedUsers.addRemovedUsers(troupeId, userIds)
         .catch(function(err) {
@@ -681,6 +681,7 @@ function updateRoomMembershipFlagsForUser(userId, newFlags, overrideAll) {
     });
 }
 
+
 /* Exports */
 exports.findRoomIdsForUser = findRoomIdsForUser;
 exports.findRoomIdsForUserWithLurk = findRoomIdsForUserWithLurk;
@@ -709,6 +710,7 @@ exports.findMembershipModeForUsersInRoom = findMembershipModeForUsersInRoom;
 exports.findMembersForRoomForNotify = findMembersForRoomForNotify;
 exports.findMembersForRoomWithFlags = findMembersForRoomWithFlags;
 exports.updateRoomMembershipFlagsForUser = updateRoomMembershipFlagsForUser;
+
 
 /* Event emitter */
 exports.events = roomMembershipEvents;

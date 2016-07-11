@@ -7,6 +7,14 @@ var userService = require('../../services/user-service');
 var StatusError = require('statuserror');
 var Promise = require('bluebird');
 
+/**
+ * TODO: refactor this https://github.com/troupe/gitter-webapp/issues/1708
+ *
+ * Proposed new method:
+ * - Find all non-public rooms for the group
+ * - Count the number of distinct users in the private rooms
+ * - Done
+ */
 function listOrgMembers(user, uri) {
   var ghMe = new GitHubMeService(user);
   return ghMe.isOrgAdmin(uri)

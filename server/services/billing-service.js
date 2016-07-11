@@ -8,18 +8,6 @@ function toLowerCase(value) {
   return value && value.toLowerCase();
 }
 
-exports.findActivePersonalPlansForUsers = function(userIds) {
-  if(!userIds || !userIds.length) return Promise.resolve([]);
-
-  var query = mongoUtils.fieldInPredicate('userId', userIds.map(mongoUtils.asObjectID), {
-    subscriptionType: 'USER',
-    status: 'CURRENT'
-  });
-
-  return persistence.Subscription.find(query)
-    .exec();
-};
-
 exports.findActiveOrgPlans = function(orgUris) {
   if(!orgUris || !orgUris.length) return Promise.resolve([]);
 

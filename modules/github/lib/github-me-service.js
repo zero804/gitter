@@ -75,6 +75,13 @@ GitHubMeService.prototype.getRepos = function() {
   });
 };
 
+GitHubMeService.prototype.getFollowers = function(options) {
+  return tentacles.userFollower.listForUser(this.user.username, {
+    accessToken: this.accessToken,
+    firstPageOnly: options && options.firstPageOnly
+  });
+};
+
 // module.exports = GitHubMeService;
 module.exports = wrap(GitHubMeService, function() {
   return [this.accessToken || ''];

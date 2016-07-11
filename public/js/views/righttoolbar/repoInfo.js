@@ -2,9 +2,7 @@
 
 var repoInfoTemplate = require('./tmpl/repoInfo.hbs');
 var Marionette = require('backbone.marionette');
-var context = require('utils/context');
-var RepoInfoModel = require('collections/repo-info');
-
+var backendUtils = require('../../utils/backend-utils');
 
 module.exports = Marionette.ItemView.extend({
 
@@ -14,33 +12,27 @@ module.exports = Marionette.ItemView.extend({
     "change": "render"
   },
 
-  constructor: function (){
-    this.model = new RepoInfoModel();
-    this.roomModel = context.troupe();
-    Marionette.ItemView.prototype.constructor.apply(this, arguments);
+  initialize: function(options) {
+    this.roomModel = options.roomModel;
+    this.onRoomChange();
+
+    this.listenTo(this.roomModel, 'change:backend', this.onRoomChange, this);
   },
 
-  initialize: function repoInfoViewInit(attrs, options){
-    if(this.roomModel.get('githubType') === 'REPO') {
-      this.model.fetch({
-        data: {
-          repo: this.roomModel.get('uri')
-        }
-      });
-    }
-    this.listenTo(this.roomModel, 'change:id', this.onRoomChange, this);
-  },
+  onRoomChange: function() {
+    var linkPath = backendUtils.getLinkPathCond('GH_REPO', this.roomModel);
+    this.triggerMethod('repoInfo:changeVisible', !!linkPath);
 
-  //update when  room changes
-  onRoomChange: function repoInfoRoomChange(roomModel){
-    if(roomModel.get('githubType') === 'REPO') {
-      var uri = roomModel.get('uri');
-      this.model.fetch({
-        data: {
-          repo: uri
-        }
-      });
+    if (!linkPath) {
+      this.model.clear();
+      return;
     }
+
+    this.model.fetch({
+      data: {
+        repo: linkPath
+      }
+    });
   }
 
 });

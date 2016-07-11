@@ -176,7 +176,8 @@ function populateTroupe(options) {
     includePermissions: true,
     includeProviders: true,
     includeGroups: true,
-    includeOwner: true
+    includeOwner: true,
+    includeBackend: true
   });
   return restSerializer.serializeObject(troupeId, strategy)
     .then(dataToSnapshot('room'));

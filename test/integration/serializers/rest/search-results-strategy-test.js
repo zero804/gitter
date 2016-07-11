@@ -56,6 +56,7 @@ describe('SearchResultsStrategy', function() {
             githubType: 'USER_CHANNEL',
             security: 'PUBLIC',
             noindex: false,
+            public: true,
             v: 1
           }]
         }]);
@@ -91,6 +92,7 @@ describe('SearchResultsStrategy', function() {
             githubType: 'USER_CHANNEL',
             security: 'PUBLIC',
             noindex: false,
+            public: true,
             v: 1
           }]
         }]);

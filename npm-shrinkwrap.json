@@ -205,7 +205,7 @@
                 "brace-expansion": {
                   "version": "1.1.5",
                   "from": "brace-expansion@>=1.0.0 <2.0.0",
-                  "resolved": "http://beta-internal:4873/brace-expansion/-/brace-expansion-1.1.5.tgz",
+                  "resolved": "https://registry.npmjs.org/brace-expansion/-/brace-expansion-1.1.5.tgz",
                   "dependencies": {
                     "balanced-match": {
                       "version": "0.4.1",
@@ -285,7 +285,7 @@
                     "brace-expansion": {
                       "version": "1.1.5",
                       "from": "brace-expansion@>=1.0.0 <2.0.0",
-                      "resolved": "http://beta-internal:4873/brace-expansion/-/brace-expansion-1.1.5.tgz",
+                      "resolved": "https://registry.npmjs.org/brace-expansion/-/brace-expansion-1.1.5.tgz",
                       "dependencies": {
                         "balanced-match": {
                           "version": "0.4.1",
@@ -1013,7 +1013,7 @@
             "mkdirp": {
               "version": "0.5.1",
               "from": "mkdirp@>=0.5.0 <0.6.0",
-              "resolved": "http://beta-internal:4873/mkdirp/-/mkdirp-0.5.1.tgz",
+              "resolved": "https://registry.npmjs.org/mkdirp/-/mkdirp-0.5.1.tgz",
               "dependencies": {
                 "minimist": {
                   "version": "0.0.8",
@@ -2238,6 +2238,11 @@
       "from": "modules/cdn",
       "resolved": "file:modules/cdn"
     },
+    "gitter-web-collaborators": {
+      "version": "1.0.0",
+      "from": "modules/collaborators",
+      "resolved": "file:modules/collaborators"
+    },
     "gitter-web-env": {
       "version": "1.0.0",
       "from": "modules/env",
@@ -2338,6 +2343,11 @@
       "from": "modules/suggestions",
       "resolved": "file:modules/suggestions"
     },
+    "gitter-web-twitter": {
+      "version": "1.0.0",
+      "from": "modules/twitter",
+      "resolved": "file:modules/twitter"
+    },
     "gitter-web-twitter-backend": {
       "version": "1.0.0",
       "from": "modules/twitter-backend",
@@ -2378,7 +2388,7 @@
             "brace-expansion": {
               "version": "1.1.5",
               "from": "brace-expansion@>=1.0.0 <2.0.0",
-              "resolved": "http://beta-internal:4873/brace-expansion/-/brace-expansion-1.1.5.tgz",
+              "resolved": "https://registry.npmjs.org/brace-expansion/-/brace-expansion-1.1.5.tgz",
               "dependencies": {
                 "balanced-match": {
                   "version": "0.4.1",
@@ -2438,12 +2448,12 @@
         "source-map": {
           "version": "0.1.43",
           "from": "source-map@>=0.1.40 <0.2.0",
-          "resolved": "http://beta-internal:4873/source-map/-/source-map-0.1.43.tgz",
+          "resolved": "https://registry.npmjs.org/source-map/-/source-map-0.1.43.tgz",
           "dependencies": {
             "amdefine": {
               "version": "1.0.0",
               "from": "amdefine@>=0.0.4",
-              "resolved": "http://beta-internal:4873/amdefine/-/amdefine-1.0.0.tgz"
+              "resolved": "https://registry.npmjs.org/amdefine/-/amdefine-1.0.0.tgz"
             }
           }
         },
@@ -2913,7 +2923,7 @@
         "commander": {
           "version": "2.8.1",
           "from": "commander@>=2.8.1 <2.9.0",
-          "resolved": "https://registry.npmjs.org/commander/-/commander-2.8.1.tgz",
+          "resolved": "http://beta-internal:4873/commander/-/commander-2.8.1.tgz",
           "dependencies": {
             "graceful-readlink": {
               "version": "1.0.1",
@@ -2944,7 +2954,7 @@
         "mkdirp": {
           "version": "0.5.1",
           "from": "mkdirp@>=0.5.1 <0.6.0",
-          "resolved": "http://beta-internal:4873/mkdirp/-/mkdirp-0.5.1.tgz",
+          "resolved": "https://registry.npmjs.org/mkdirp/-/mkdirp-0.5.1.tgz",
           "dependencies": {
             "minimist": {
               "version": "0.0.8",
@@ -3042,7 +3052,7 @@
         "es6-promise": {
           "version": "3.0.2",
           "from": "es6-promise@3.0.2",
-          "resolved": "https://registry.npmjs.org/es6-promise/-/es6-promise-3.0.2.tgz"
+          "resolved": "http://beta-internal:4873/es6-promise/-/es6-promise-3.0.2.tgz"
         },
         "mongodb-core": {
           "version": "1.3.18",
@@ -3157,7 +3167,7 @@
         "kareem": {
           "version": "1.1.3",
           "from": "kareem@1.1.3",
-          "resolved": "https://registry.npmjs.org/kareem/-/kareem-1.1.3.tgz"
+          "resolved": "http://beta-internal:4873/kareem/-/kareem-1.1.3.tgz"
         },
         "mpath": {
           "version": "0.2.1",
@@ -3172,7 +3182,7 @@
         "mquery": {
           "version": "1.11.0",
           "from": "mquery@1.11.0",
-          "resolved": "https://registry.npmjs.org/mquery/-/mquery-1.11.0.tgz",
+          "resolved": "http://beta-internal:4873/mquery/-/mquery-1.11.0.tgz",
           "dependencies": {
             "bluebird": {
               "version": "2.10.2",
@@ -3710,7 +3720,7 @@
       "dependencies": {
         "passport-oauth2": {
           "version": "1.3.0",
-          "from": "passport-oauth2@>=1.0.0 <2.0.0",
+          "from": "passport-oauth2@>=1.1.2 <2.0.0",
           "resolved": "http://beta-internal:4873/passport-oauth2/-/passport-oauth2-1.3.0.tgz",
           "dependencies": {
             "passport-strategy": {
@@ -3763,7 +3773,7 @@
       "dependencies": {
         "passport-oauth2": {
           "version": "1.3.0",
-          "from": "passport-oauth2@>=1.0.0 <2.0.0",
+          "from": "passport-oauth2@>=1.1.2 <2.0.0",
           "resolved": "http://beta-internal:4873/passport-oauth2/-/passport-oauth2-1.3.0.tgz",
           "dependencies": {
             "passport-strategy": {
@@ -3981,7 +3991,7 @@
         "request": {
           "version": "2.73.0",
           "from": "request@>=2.53.0 <3.0.0",
-          "resolved": "https://registry.npmjs.org/request/-/request-2.73.0.tgz",
+          "resolved": "http://beta-internal:4873/request/-/request-2.73.0.tgz",
           "dependencies": {
             "aws-sign2": {
               "version": "0.6.0",
@@ -4376,7 +4386,7 @@
         "depd": {
           "version": "1.0.1",
           "from": "depd@>=1.0.1 <1.1.0",
-          "resolved": "http://beta-internal:4873/depd/-/depd-1.0.1.tgz"
+          "resolved": "https://registry.npmjs.org/depd/-/depd-1.0.1.tgz"
         }
       }
     },
@@ -4486,7 +4496,7 @@
         "request": {
           "version": "2.73.0",
           "from": "request@>=2.53.0 <3.0.0",
-          "resolved": "https://registry.npmjs.org/request/-/request-2.73.0.tgz",
+          "resolved": "http://beta-internal:4873/request/-/request-2.73.0.tgz",
           "dependencies": {
             "aws-sign2": {
               "version": "0.6.0",
@@ -5461,7 +5471,7 @@
           "dependencies": {
             "strip-ansi": {
               "version": "3.0.1",
-              "from": "strip-ansi@>=3.0.1 <4.0.0",
+              "from": "strip-ansi@>=3.0.0 <4.0.0",
               "resolved": "http://beta-internal:4873/strip-ansi/-/strip-ansi-3.0.1.tgz",
               "dependencies": {
                 "ansi-regex": {
@@ -5637,7 +5647,7 @@
                     },
                     "semver": {
                       "version": "5.2.0",
-                      "from": "semver@>=2.0.0 <3.0.0||>=3.0.0 <4.0.0||>=4.0.0 <5.0.0||>=5.0.0 <6.0.0",
+                      "from": "semver@>=5.1.0 <6.0.0",
                       "resolved": "https://registry.npmjs.org/semver/-/semver-5.2.0.tgz"
                     },
                     "validate-npm-package-license": {
@@ -5652,7 +5662,7 @@
                           "dependencies": {
                             "spdx-license-ids": {
                               "version": "1.2.1",
-                              "from": "spdx-license-ids@>=1.0.0 <2.0.0",
+                              "from": "spdx-license-ids@>=1.0.2 <2.0.0",
                               "resolved": "http://beta-internal:4873/spdx-license-ids/-/spdx-license-ids-1.2.1.tgz"
                             }
                           }
@@ -5669,7 +5679,7 @@
                             },
                             "spdx-license-ids": {
                               "version": "1.2.1",
-                              "from": "spdx-license-ids@>=1.0.0 <2.0.0",
+                              "from": "spdx-license-ids@>=1.0.2 <2.0.0",
                               "resolved": "http://beta-internal:4873/spdx-license-ids/-/spdx-license-ids-1.2.1.tgz"
                             }
                           }
@@ -5757,7 +5767,7 @@
             },
             "strip-ansi": {
               "version": "3.0.1",
-              "from": "strip-ansi@>=3.0.1 <4.0.0",
+              "from": "strip-ansi@>=3.0.0 <4.0.0",
               "resolved": "http://beta-internal:4873/strip-ansi/-/strip-ansi-3.0.1.tgz",
               "dependencies": {
                 "ansi-regex": {
