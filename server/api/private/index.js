@@ -108,9 +108,19 @@ router.get('/inviteUserSuggestions',
   identifyRoute('api-private-invite-user-suggestions'),
   require('./invite-user-suggestions'));
 
+router.get('/check-invite',
+  authMiddleware,
+  identifyRoute('api-private-check-invite'),
+  require('./check-invite'));
+
 router.get('/check-group-uri',
   authMiddleware,
   identifyRoute('api-private-check-group-uri'),
   require('./check-group-uri'));
+
+router.post('/create-github-room',
+  authMiddleware,
+  identifyRoute('api-private-create-github-room'),
+  require('./create-github-room'));
 
 module.exports = router;

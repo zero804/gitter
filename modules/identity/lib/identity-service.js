@@ -141,11 +141,34 @@ function findUserIdForProviderUsername(provider, username) {
     })
 }
 
+/**
+ * Returns the primary identity of a user
+ */
+function findPrimaryIdentityForUser(user) {
+  // TODO: handle caching
+  if (isGitHubUser(user)) {
+    return castUserAsGitHubIdentity(user);
+  }
+
+  // TODO: handle multiple identities better, in future
+  return Identity.findOne({ userId: user._id }, { _id: 0, userId: 0, __v: 0 })
+    .lean()
+    .exec()
+    .then(function(identity) {
+      if (!identity) {
+        return castUserAsGitHubIdentity(user);
+      }
+
+      return identity;
+    });
+}
+
 module.exports = {
   getIdentityForUser: getIdentityForUser,
   listForUser: listForUser,
   listProvidersForUser: listProvidersForUser,
   findUserIdForProviderUsername: findUserIdForProviderUsername,
+  findPrimaryIdentityForUser: Promise.method(findPrimaryIdentityForUser),
 
   GITHUB_IDENTITY_PROVIDER: 'github',
   GOOGLE_IDENTITY_PROVIDER: 'google',

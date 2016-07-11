@@ -111,10 +111,6 @@ BackendMuxer.prototype.findProfiles = function() {
   return this.findResults('getProfile');
 };
 
-BackendMuxer.prototype.getInviteUserSuggestions = function(type, linkPath) {
-  return this.getFirstResult('getInviteUserSuggestions', [type, linkPath]);
-};
-
 BackendMuxer.testOnly = {
   getFirstResultForBackends: getFirstResultForBackends
 };

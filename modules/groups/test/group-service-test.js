@@ -2,10 +2,10 @@
 
 var Promise = require('bluebird');
 var assert = require('assert');
-var StatusError = require('statuserror');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
 var proxyquireNoCallThru = require("proxyquire").noCallThru();
+var StatusError = require('statuserror');
 
 // stub out this check because otherwise we end up with a the tests all
 // clashing with the user that's required to have access to create those
