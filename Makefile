@@ -16,7 +16,7 @@ package: npm
 	gulp package
 
 submit-to-coveralls: npm test
-	gulp submit-coveralls-post-tests submit-codacy-post-tests
+	gulp submit-coveralls-post-tests
 
 clean:
 	rm -rf output
@@ -65,10 +65,7 @@ maintain-data:
 post-test-maintain-data:
 	MODIFY=true ./scripts/datamaintenance/execute.sh || true
 
-send-to-sonar:
-	( gulp sonar | grep -v DEBUG | grep -v '^\s*$$' ) || true
-
-continuous-integration: build send-to-sonar
+continuous-integration: build
 
 performance-tests: clean npm
 	gulp test-perf

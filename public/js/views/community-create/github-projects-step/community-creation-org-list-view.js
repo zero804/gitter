@@ -6,7 +6,9 @@ var CommunityCreationOrgListTemplate = require('./community-creation-org-list-vi
 var CommunityCreationOrgListItemView = require('./community-creation-org-list-item-view');
 
 var CommunityCreationOrgListView = Marionette.CompositeView.extend({
+  className: 'community-create-org-list-root-inner',
   template: CommunityCreationOrgListTemplate,
+
   childView: CommunityCreationOrgListItemView,
   childViewContainer: '.community-create-org-list',
   childEvents: {
