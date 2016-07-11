@@ -71,7 +71,7 @@ module.exports = CommunityCreateBaseStepView.extend({
       return provider === 'github';
     });
 
-    this.listenTo(this.communityCreateModel, 'change:communityName change:communitySlug', this.updateCommunityFields, this);
+    this.listenTo(this.communityCreateModel, 'change:communityName change:communitySlug', this.onCommunityInfoChange, this);
     this.listenTo(this.communityCreateModel, 'change:communitySlugAvailabilityStatus', this.updateSlugAvailabilityStatusIndicator, this);
 
   },
@@ -118,6 +118,23 @@ module.exports = CommunityCreateBaseStepView.extend({
 
     e.preventDefault();
     e.stopPropagation();
+  },
+
+  onCommunityInfoChange: function() {
+    var communitySlug = this.communityCreateModel.get('communitySlug');
+    // TODO: Why does this match the first item always?
+    var matchingOrgItem = this.orgCollection.findWhere('name', communitySlug);
+    var matchingRepoItem = this.repoCollection.findWhere('uri', communitySlug);
+    if(matchingOrgItem) {
+      this.communityCreateModel.set('githubOrgId', matchingOrgItem.get('id'));
+      this.communityCreateModel.set('githubRepoId', null);
+    }
+    else if(matchingRepoItem) {
+      this.communityCreateModel.set('githubOrgId', null);
+      this.communityCreateModel.set('githubRepoId', matchingRepoItem.get('id'));
+    }
+
+    this.updateCommunityFields();
   },
 
   updateCommunityFields: function() {
