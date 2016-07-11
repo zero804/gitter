@@ -104,6 +104,7 @@ router.post('/markdown-preview',
   require('./markdown-preview'));
 
 router.get('/inviteUserSuggestions',
+  authMiddleware,
   identifyRoute('api-private-invite-user-suggestions'),
   require('./invite-user-suggestions'));
 
