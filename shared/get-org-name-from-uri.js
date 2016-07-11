@@ -1,6 +1,6 @@
 'use strict';
 
-var getOrgNameFromTroupeName = require('./get-org-name-from-troupe-name.js');
+var getOrgNameFromTroupeName = require('./get-org-name-from-troupe-name');
 
 //TODO We should account for more cases than just the org urls
 module.exports = function getOrgNameFromUri(uri) {

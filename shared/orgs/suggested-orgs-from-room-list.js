@@ -2,7 +2,7 @@
 'use strict';
 
 var _ = require('underscore');
-var resolveRoomAvatarSrcSet = require('../avatars/resolve-room-avatar-srcset.js');
+var resolveRoomAvatarSrcSet = require('../avatars/resolve-room-avatar-srcset');
 var getOrgNameFromUri = require('../get-org-name-from-uri');
 var defaultFilter = require('../filters/left-menu-primary-default');
 var defaultFavouriteFilter = require('../filters/left-menu-primary-favourite');

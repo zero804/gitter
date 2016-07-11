@@ -1,7 +1,7 @@
 'use strict';
 
 var Marionette = require('backbone.marionette');
-var TagModel = require('../../../collections/tag-collection.js').TagModel;
+var TagModel = require('../../../collections/tag-collection').TagModel;
 
 var tagInputTemplate = require('./tmpl/tagInputTemplate.hbs');
 

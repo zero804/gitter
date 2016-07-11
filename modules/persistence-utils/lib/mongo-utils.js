@@ -16,7 +16,18 @@ function objectIDsEqual(a, b) {
     return b.equals(a);
   }
 
-  return a.equals(b);
+  // So, different versions of mongodb.ObjectID don't match as equal
+  if (a.constructor === b.constructor) {
+    return a.equals(b);
+  } else {
+    if (typeof b === 'string') {
+      return a.equals(b);
+    } else if (b.toHexString) {
+      return a.equals(b.toHexString());
+    } else {
+      return a.equals(b);
+    }
+  }
 }
 
 function stringToObjectID(string) {

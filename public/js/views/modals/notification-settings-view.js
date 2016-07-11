@@ -17,8 +17,8 @@ var OPTIONS = {
 var View = Marionette.LayoutView.extend({
   template: template,
   events:   {
-    'click #close-settings' : 'destroySettings',
-    'change #notification-options' : 'formChange'
+    'click #close-settings': 'destroySettings',
+    'change #notification-options': 'formChange'
   },
   modelEvents: {
     change: 'update'
@@ -220,7 +220,7 @@ var View = Marionette.LayoutView.extend({
     this.dialog.toggleButtonClass('apply', 'modal--default__footer__btn', !noChange);
   },
 
-  destroySettings : function () {
+  destroySettings: function() {
     this.dialog.hide();
     this.dialog = null;
   },

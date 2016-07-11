@@ -6,7 +6,7 @@ var url = require('url');
 var EventEmitter = require('events').EventEmitter;
 var chokidar = require('chokidar');
 
-var lessDependencyMapUtils = require('./lib/less-dependency-map-utils.js');
+var lessDependencyMapUtils = require('./lib/less-dependency-map-utils');
 
 
 var transformPathsToAbsolute = function(paths, /*option*/basePath) {

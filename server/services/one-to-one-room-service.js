@@ -97,7 +97,7 @@ function ensureFromUserInRoom(troupeId, fromUserId) {
       if (isRoomMember) return;
 
       // Deal with https://github.com/troupe/gitter-webapp/issues/1227
-      return userDefaultFlagsService.getDefaultFlagsForUserId(fromUserId)
+      return userDefaultFlagsService.getDefaultFlagsOneToOneForUserId(fromUserId)
         .then(function(flags) {
           return roomMembershipService.addRoomMember(troupeId, fromUserId, flags, null);
         });
@@ -108,7 +108,7 @@ function ensureFromUserInRoom(troupeId, fromUserId) {
  * Ensure that both users are in the one-to-one room
  */
 function addOneToOneUsersToNewRoom(troupeId, fromUserId, toUserId) {
-  return userDefaultFlagsService.getDefaultFlagsForUserIds([fromUserId, toUserId])
+  return userDefaultFlagsService.getDefaultOneToOneFlagsForUserIds([fromUserId, toUserId])
     .then(function(userFlags) {
       var fromUserFlags = userFlags[fromUserId];
       var toUserFlags = userFlags[toUserId];
