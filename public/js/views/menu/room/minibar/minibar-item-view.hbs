@@ -1,8 +1,4 @@
 {{> minibar_activity_indicators}}
 <button class="room-menu-options__item-button" title="{{name}}">
-  <img class="room-menu-options__item__avatar"
-    src="{{avatarSrcset.src}}"
-    srcset="{{avatarSrcset.srcset}}"
-    width="{{avatarSrcset.size}}"
-    height="{{avatarSrcset.size}}">
+  <img class="room-menu-options__item__avatar" {{{ avatarSrcSet avatarUrl 22 }}} >
 </button>
