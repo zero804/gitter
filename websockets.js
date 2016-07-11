@@ -4,4 +4,4 @@
 var env = require('gitter-web-env');
 env.installUncaughtExceptionHandler();
 
-require('./server/websockets.js');
+require('./server/websockets');
