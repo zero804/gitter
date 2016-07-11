@@ -8,11 +8,28 @@ var toggleClass = require('utils/toggle-class');
 
 var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 
+var peopleToInviteStatusConstants = require('../people-to-invite-status-constants');
 var CommunityCreationPeopleListTemplate = require('./community-creation-people-list-view.hbs');
 var CommunityCreationPeopleListItemTemplate = require('./community-creation-people-list-item-view.hbs');
 var CommunityCreationPeopleListEmptyTemplate = require('./community-creation-people-list-empty-view.hbs');
 
 var AVATAR_SIZE = 44;
+
+// Consider all constraints except a customError because we use
+// this to add a custom message on what to do to satisfy
+var isFormElementInvalid = function(el, useCustomError) {
+  return el.validity.badInput ||
+    (useCustomError ? el.validity.customError : false) ||
+    el.validity.patternMismatch ||
+    el.validity.rangeOverflow ||
+    el.validity.rangeUnderflow ||
+    el.validity.stepMismatch ||
+    el.validity.tooLong ||
+    el.validity.typeMismatch ||
+    //el.validity.valid ||
+    el.validity.valueMissing;
+};
+
 
 var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
   template: CommunityCreationPeopleListItemTemplate,
@@ -21,11 +38,17 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
 
   ui: {
     link: '.community-create-people-list-item-link',
-    removeButton: '.community-create-people-list-item-remove-button'
+    removeButton: '.community-create-people-list-item-remove-button',
+    emailInput: '.js-community-create-people-list-item-email-input'
   },
 
   events: {
-    'click @ui.link': 'onLinkClick'
+    'click @ui.link': 'onLinkClick',
+    'input @ui.emailInput': 'onEmailInputChange'
+  },
+
+  modelEvents: {
+    'change:inviteStatus': 'onInviteStatusChange'
   },
 
   triggers: {
@@ -34,6 +57,7 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
 
   initialize: function(options) {
     this.model.set('canRemove', options.canRemove);
+    this.model.set('canEditEmail', options.canEditEmail);
   },
 
   serializeData: function() {
@@ -54,13 +78,37 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
     return data;
   },
 
+  onRender: function() {
+    this.onInviteStatusChange();
+  },
+
   onActiveChange: function() {
     toggleClass(this.$el[0], 'active', this.model.get('active'));
+  },
+
+  onInviteStatusChange: function() {
+    var inviteStatus = this.model.get('inviteStatus');
+
+    toggleClass(this.$el[0], 'pending', inviteStatus === peopleToInviteStatusConstants.PENDING);
+    // We don't use this state to differentiate
+    //toggleClass(this.$el[0], 'ready', inviteStatus === peopleToInviteStatusConstants.READY);
+    toggleClass(this.$el[0], 'needs-email', inviteStatus === peopleToInviteStatusConstants.NEEDS_EMAIL);
+    toggleClass(this.$el[0], 'ready-valid-email', inviteStatus === peopleToInviteStatusConstants.READY_VALID_EMAIL);
   },
 
   onLinkClick: function(e) {
     e.preventDefault();
     e.stopPropagation();
+  },
+
+  onEmailInputChange: function() {
+    var emailInputText = this.ui.emailInput[0].value;
+    if(emailInputText.length > 3) {
+      this.model.set('inviteStatus', peopleToInviteStatusConstants.READY_VALID_EMAIL);
+    }
+    else {
+      this.model.set('inviteStatus', peopleToInviteStatusConstants.NEEDS_EMAIL);
+    }
   }
 });
 
@@ -77,7 +125,8 @@ var CommunityCreationPeopleListView = Marionette.CompositeView.extend({
   childViewContainer: '.community-create-people-list',
   childViewOptions: function() {
     return {
-      canRemove: this.model.get('canRemove')
+      canRemove: this.model.get('canRemove'),
+      canEditEmail: this.model.get('canEditEmail')
     };
   },
   childEvents: {

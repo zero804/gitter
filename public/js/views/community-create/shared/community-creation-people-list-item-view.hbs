@@ -5,11 +5,20 @@
     srcset="{{ avatarSrcset.srcset }}"
     height="{{ avatarSrcset.size }}"
     width="{{ avatarSrcset.size }}" />
-  <div class="community-create-people-list-item-overlay">
-    {{#if canRemove}}
-      <button class="community-create-people-list-item-remove-button">
-        <i class="icon-g-cancel"></i>
-      </button>
-    {{/if}}
-  </div>
+  {{#if canEditEmail}}
+    <div class="community-create-people-list-item-overlay">
+      <input
+        type="email"
+        id="community-create-people-list-item-email-input"
+        class="community-create-people-list-item-email-input js-community-create-people-list-item-email-input"
+        placeholder="enter email address">
+    </div>
+  {{/if}}
+  {{#if canRemove}}
+    <div class="community-create-people-list-item-remove-button-overlay">
+        <button class="community-create-people-list-item-remove-button">
+          <i class="icon-g-cancel"></i>
+        </button>
+    </div>
+  {{/if}}
 </a>
