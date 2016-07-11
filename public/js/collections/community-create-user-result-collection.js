@@ -26,6 +26,9 @@ var UserResultCollection = function(models, attrs, options) {
   }
   this.communityCreateModel = attrs.communityCreateModel;
 
+  this.orgCollection = attrs.orgCollection;
+  this.repoCollection = attrs.repoCollection;
+
 
   this.userSearchCollection = new userSearchModels.Collection();
   this.userSuggestionCollection = new UserSuggestionCollection();
