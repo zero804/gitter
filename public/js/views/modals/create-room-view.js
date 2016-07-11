@@ -199,20 +199,25 @@ var View = Marionette.LayoutView.extend({
 
     var placeholder = "Required";
     var group = this.selectedGroup;
+
     var checkForRepo;
-    var groupName = "";
-    var createButtonEnabled = true;
+    var createButtonEnabled;
+    var roomName;
+    var groupUri;
+    var groupBackedBy;
+    var groupType;
+    var orgName;
 
     if (group) {
-      groupName = group.get('name');
-      var roomName = this.ui.roomNameInput.val();
-      var groupUri = group.get('uri');
-      var groupBackedBy = group.get('backedBy');
-      var groupType = groupBackedBy.type;
-      var orgName = groupBackedBy.linkPath || '';
+      createButtonEnabled = true;
+      roomName = this.ui.roomNameInput.val();
+      groupUri = group.get('uri');
+      groupBackedBy = group.get('backedBy');
+      groupType = groupBackedBy.type;
+      orgName = groupBackedBy.linkPath || '';
 
       // TODO: make this work for repo-based groups too
-      if (groupType == 'GH_ORG') {
+      if (groupType === 'GH_ORG') {
         // rooms inside github org/repo-based groups can have inherited permissions
         ['permissions', 'permPublic', 'permPrivate'].forEach(function (f) { showHide[f] = true; });
         checkForRepo = roomName && groupUri + '/' + roomName;

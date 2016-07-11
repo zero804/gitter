@@ -161,7 +161,7 @@ module.exports = {
             function(serializedGroup, serializedRoom) {
               serializedGroup.defaultRoom = serializedRoom;
               // invitesResults is an array of simple js objects
-              serializedGroup.inviteResults = invitesReport;
+              serializedGroup.inviteResults = inviteResults;
               return serializedGroup;
             }
           );
