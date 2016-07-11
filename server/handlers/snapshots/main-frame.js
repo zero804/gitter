@@ -1,11 +1,10 @@
 "use strict";
 
 var _ = require('lodash');
-var parseRoomsIntoLeftMenuRoomList = require('gitter-web-shared/rooms/left-menu-room-list.js');
+var parseRoomsIntoLeftMenuRoomList = require('gitter-web-shared/rooms/left-menu-room-list');
 var parseRoomsIntoLeftMenuFavouriteRoomList = require('gitter-web-shared/rooms/left-menu-room-favourite-list');
 var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
 var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
-var suggestedOrgsFromRoomList = require('gitter-web-shared/orgs/suggested-orgs-from-room-list');
 var mapGroupsForRenderer = require('../map-groups-for-renderer');
 
 module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, groups) {
