@@ -7,8 +7,8 @@ var CommunityCreateStepViewModel = Backbone.Model.extend({
     active: true
   },
 
-  initialize: function() {
-    
+  initialize: function(options) {
+    this.communityCreateModel = options.communityCreateModel;
   }
 });
 

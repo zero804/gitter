@@ -2,10 +2,11 @@
 var $ = require('jquery');
 var context = require('utils/context');
 var clientEnv = require('gitter-client-env');
-var HeaderView = require('views/app/headerView');
-var onready = require('./utils/onready');
+var onready = require('utils/onready');
 var appEvents = require('utils/appevents');
 var apiClient = require('components/apiClient');
+var HeaderView = require('views/app/headerView');
+var RightToolBarModel = require('./models/right-toolbar-model');
 
 require('components/timezone-cookie');
 require('views/widgets/preload');
@@ -48,5 +49,11 @@ onready(function() {
     window.parent.location.href = href;
   });
 
-  new HeaderView({ model: context.troupe(), el: '#header' });
+  var rightToolbarModel = new RightToolBarModel({});
+  new HeaderView({
+    el: '#header',
+    model: context.troupe(),
+    rightToolbarModel: rightToolbarModel,
+    archives: true
+  });
 });

@@ -1,7 +1,7 @@
 <aside id="room-menu-container" class="room-menu-container">
   <section class="room-menu">
     <nav id="minibar" class="minibar">
-      <div class="minibar-inner nano">
+      <div class="minibar-inner nano {{when hasCommunityCreate 'has-community-create' ''}}">
         <ul id="minibar-list" class="room-menu-options nano-content">
 
           <li data-state-change="all" id="minibar-all"  class="room-menu-options__item--all">
@@ -53,6 +53,14 @@
               {{/each}}
             </ul>
           </li>
+
+          {{#if hasCommunityCreate }}
+            <li class="room-menu-options__item--community-create" data-state-change="community-create" id="minibar-community-create">
+              <button class="room-menu-options__item-button" title="Create a new community">
+                <div class="room-menu-options__item__community-create-icon">+</div>
+              </button>
+            </li>
+          {{/if}}
 
           <li data-state-change="close" id="minibar-close"  class="room-menu-options__item--close {{#if roomMenuIsPinned}}left{{/if}}">
             <div class="room-menu-options__container">
@@ -115,4 +123,6 @@
   </section>
 </aside>
 
-<div class="community-create-app-root"></div>
+<div class="community-create-app-root">
+  {{{ prerenderView "js/views/community-create/community-create-view" }}}
+</div>

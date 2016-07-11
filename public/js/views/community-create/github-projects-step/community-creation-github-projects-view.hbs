@@ -1,0 +1,69 @@
+<div class="community-create-step-content-area">
+  <h1 class="primary-community-heading h1">
+    Use any of your organisations or repositories to create a community
+  </h1>
+
+  <section class="community-create-github-projects-tabbed-wrapper">
+    <ul class="community-create-github-projects-tabbed-navigation-list">
+      <li class="primary-tabbed-navigation-list-item">
+        <button class="primary-tabbed-navigation-button {{when isOrgAreaActive 'active' ''}} js-community-create-github-projects-toggle-orgs">
+          my orgs
+        </button>
+      </li>
+      <li class="primary-tabbed-navigation-list-item">
+        <button class="primary-tabbed-navigation-button  {{when isRepoAreaActive 'active' ''}} js-community-create-github-projects-toggle-repos">
+          my repos
+        </button>
+      </li>
+    </ul>
+
+    <div class="community-create-github-projects-tab-content-area js-community-create-github-projects-orgs-area {{when isOrgAreaActive 'active' ''}}">
+      <div class="community-create-org-list-root"></div>
+
+      <p class="community-create-org-missing-note">
+        If you are missing some orgs,
+        you will need to manually grant access on a per-org basis.
+        See
+        <a
+          href="https://gitter.zendesk.com/hc/en-us/articles/202460552-Why-isn-t-my-GitHub-organisation-appearing-"
+          target="_blank"
+          class="community-create-general-link">
+          this article
+        </a>
+        for more info.
+
+      </p>
+    </div>
+
+    <div class="community-create-github-projects-tab-content-area js-community-create-github-projects-repos-area {{when isRepoAreaActive 'active' ''}}">
+      <input
+        class="primary-community-repo-name-filter-input"
+        placeholder="repo name filter" />
+
+      <div class="community-create-repo-list-root"></div>
+
+      <p class="community-create-repo-missing-note">
+        {{#if isUserMissingPrivateRepoScope}}
+            If you're looking to access a private repository,
+            you will need to upgrade your GitHub authentication.
+            <a href="/login/upgrade?scopes=repo" target="_blank" class="community-create-general-link">
+              Click here to do this now.
+            </a>
+        {{/if}}
+      </p>
+    </div>
+
+  </section>
+
+
+  <section class="community-create-progression-button-wrapper">
+    <button class="community-create-back-button secondary-button-clouds js-community-create-step-back">
+      Back
+    </button>
+
+    <button class="community-create-next-button button-caribbean js-community-create-step-next">
+      Skip
+    </button>
+  </section>
+
+</div>

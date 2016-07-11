@@ -2,7 +2,7 @@
 
 var _ = require('underscore');
 
-var CommunityCreateStepViewModel = require('./community-create-step-view-model');
+var CommunityCreateStepViewModel = require('../community-create-step-view-model');
 
 var CommunityCreateGitHubProjectsStepViewModel = CommunityCreateStepViewModel.extend({
   defaults: _.extend({}, CommunityCreateStepViewModel.prototype.defaults, {
