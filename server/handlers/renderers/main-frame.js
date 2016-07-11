@@ -48,8 +48,11 @@ function renderMainFrame(req, res, next, options) {
       }
 
       var hasNewLeftMenu = !req.isPhone && req.fflip && req.fflip.has('left-menu');
-      var snapshots = troupeContext.snapshots = generateMainFrameSnapshots(req, troupeContext, rooms, groups);
-      
+      var extras = {
+        suggestedMenuState: options.suggestedMenuState
+      };
+      var snapshots = troupeContext.snapshots = generateMainFrameSnapshots(req, troupeContext, rooms, groups, extras);
+
       if(snapshots && snapshots.leftMenu && snapshots.leftMenu.state) {
         // `gitter.web.prerender-left-menu`
         statsd.increment('prerender-left-menu', 1, 0.25, [
