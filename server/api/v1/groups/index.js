@@ -10,6 +10,8 @@ var GroupWithPolicyService = require('../../../services/group-with-policy-servic
 var RoomWithPolicyService = require('../../../services/room-with-policy-service');
 var inviteValidation = require('gitter-web-invites/lib/invite-validation');
 
+var MAX_BATCHED_INVITES = 100;
+
 
 function processInvitesReport(invitesInput, report) {
   /*
@@ -93,6 +95,10 @@ module.exports = {
 
     var invitesInput;
     if (req.body.invites && req.body.invites.length) {
+      if (req.body.invites.length > MAX_BATCHED_INVITES) {
+        throw new StatusError(400, 'Too many batched invites.');
+      }
+
       // This could throw, but it is the basic user-input validation that would
       // have failed if the frontend didn't call the invite checker API like it
       // should have anyway.
