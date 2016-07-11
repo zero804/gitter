@@ -1,7 +1,7 @@
 "use strict";
 
 var assert = require('assert');
-var gitHubInviteUserSuggestionsService = require('../lib/github-invite-user-suggestions.js');
+var gitHubInviteUserSuggestionsService = require('../lib/github-invite-user-suggestions');
 
 var FAKE_USER = { username: 'gittertestbot', githubToken: '***REMOVED***'};
 

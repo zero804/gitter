@@ -15,7 +15,7 @@ _.extend(
   FilteredFavouriteCollection.prototype,
   FilteredRoomCollection.prototype, {
 
-    initialize: function(models, attrs) { //jshint unused: true
+    initialize: function(models, attrs) {
       FilteredRoomCollection.prototype.initialize.apply(this, arguments);
       this.dndCtrl = attrs.dndCtrl;
       this.listenTo(this.dndCtrl, 'dnd:start-drag', this.onDragStart, this);
@@ -29,12 +29,12 @@ _.extend(
 
     filterDefault: sortAndFilters.favourites.filter,
     filterOneToOnes: function(model) {
-      return one2oneFavouriteFilter(model.toJSON());
+      return one2oneFavouriteFilter(model.attributes);
     },
 
     filterOrgRooms: function(model) {
       var orgName = this.roomModel.get('selectedOrgName');
-      return orgFavouriteFilter(model.toJSON(), orgName);
+      return orgFavouriteFilter(model.attributes, orgName);
     },
 
     //When we start dragging an element we want to display all the
@@ -72,19 +72,10 @@ _.extend(
       }
     },
 
-    onFavouriteChange: function (model, val) {
-      //Because we no longer filter we must manually add/remove items when a favourite changes
-      if(!!val) { this.add(model); }
-      else { this.remove(model); }
-      this.setFilter();
-    },
-
-    onRoomAdded: function (model){
-      if(model.get('favourite')) {
-        model.set('isHidden', !this._filter(model));
-        this.add(model);
-      }
-    },
+    /* This overrides modelApplies from the base class */
+    modelApplies: function(model) {
+      return model.get('favourite');
+    }
   }
 );
 
