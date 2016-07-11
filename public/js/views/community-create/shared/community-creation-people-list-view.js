@@ -15,21 +15,6 @@ var CommunityCreationPeopleListEmptyTemplate = require('./community-creation-peo
 
 var AVATAR_SIZE = 44;
 
-// Consider all constraints except a customError because we use
-// this to add a custom message on what to do to satisfy
-var isFormElementInvalid = function(el, useCustomError) {
-  return el.validity.badInput ||
-    (useCustomError ? el.validity.customError : false) ||
-    el.validity.patternMismatch ||
-    el.validity.rangeOverflow ||
-    el.validity.rangeUnderflow ||
-    el.validity.stepMismatch ||
-    el.validity.tooLong ||
-    el.validity.typeMismatch ||
-    //el.validity.valid ||
-    el.validity.valueMissing;
-};
-
 
 var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
   template: CommunityCreationPeopleListItemTemplate,
