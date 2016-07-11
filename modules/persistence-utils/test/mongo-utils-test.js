@@ -92,6 +92,47 @@ describe('mongo-utils', function() {
         assert.strictEqual(result, fixture.result);
       });
     });
+
+    describe('multiple versions of mongodb', function() {
+      var PackageDetails = {
+        ObjectID: require('mongodb').ObjectID,
+        version: 'local'
+      }
+
+      var BaseDetails = {
+        ObjectID: require('../../../node_modules/mongodb').ObjectID,
+        version: require('../../../node_modules/mongodb/package.json').version
+      }
+
+      var MongooseDetails = {
+        ObjectID: require('mongoose').mongo.ObjectID,
+        version: 'mongoose'
+      }
+
+      var FIXTURES = [
+        { A: PackageDetails, B: PackageDetails },
+        { A: BaseDetails, B: BaseDetails },
+        { A: MongooseDetails, B: MongooseDetails },
+        { A: PackageDetails, B: BaseDetails },
+        { A: BaseDetails, B: PackageDetails },
+        { A: PackageDetails, B: MongooseDetails },
+        { A: MongooseDetails, B: PackageDetails },
+        { A: MongooseDetails, B: PackageDetails },
+        { A: BaseDetails, B: MongooseDetails },
+        { A: MongooseDetails, B: BaseDetails },
+      ];
+
+      FIXTURES.forEach(function(fixture, index) {
+        it('should handle case #' + index, function() {
+          var a = new fixture.A.ObjectID('571f97883f33e1a227b8ab85');
+          var b = new fixture.B.ObjectID('571f97883f33e1a227b8ab85');
+          var nativeResult = a.equals(b);
+          assert.strictEqual(nativeResult, true, 'Fail from ' + fixture.A.version + ' vs. ' + fixture.B.version);
+          var result = underTest.objectIDsEqual(a, b);
+          assert.strictEqual(result, true);
+        });
+      });
+    })
   });
 
   describe('isLikeObjectId', function() {
