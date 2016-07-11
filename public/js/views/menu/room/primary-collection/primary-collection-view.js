@@ -139,6 +139,11 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     this.stopListening(this.collection);
   },
 
+  filter: function (child) {
+    var hidden = child.get('isHidden');
+    return !hidden;
+  }
+
 });
 
 module.exports = PrimaryCollectionView;
