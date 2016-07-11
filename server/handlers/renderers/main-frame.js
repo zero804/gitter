@@ -50,7 +50,7 @@ function renderMainFrame(req, res, next, options) {
       var hasCommunityCreate = req.fflip && req.fflip.has('community-create');
       var hasNewLeftMenu = !req.isPhone && req.fflip && req.fflip.has('left-menu');
       var snapshots = troupeContext.snapshots = generateMainFrameSnapshots(req, troupeContext, rooms, groups);
-
+      
       if(snapshots && snapshots.leftMenu && snapshots.leftMenu.state) {
         // `gitter.web.prerender-left-menu`
         statsd.increment('prerender-left-menu', 1, 0.25, [
