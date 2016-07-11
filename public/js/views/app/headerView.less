@@ -12,12 +12,16 @@
 @chat-header-topic-color: #777777;
 
 
-
-@topic-space-to-chat-header: (@chat-frame-desktop-header-height - @chat-header-heading-line-height) / 2;
+// The space above the chat header
+@chat-header-space-to-heading: (@chat-frame-desktop-header-height - @chat-header-heading-line-height) / 2;
+// The difference between line-height and font-size bounds
 @chat-header-font-vertical-padding: (@chat-header-heading-line-height - @chat-header-heading-font-size) / 2;
+// The extra amount needed to align the topic to the baseline of the heading
 @vert-diff-baseline-offset-between-header-and-topic: @chat-header-font-vertical-padding ~"+" @chat-header-heading-font-size ~"-" @chat-header-topic-line-height;
-// The extra `.125` is for account for desenders to match baseline
-@topic-margin-calc-value: @topic-space-to-chat-header ~"+" @vert-diff-baseline-offset-between-header-and-topic ~"+" .125em;
+// Actual margin value to align the topic to the baseline of the heading
+// Extra `.125` is for account for desenders to match baseline
+// This needs to be split out of the calc so we can re-use it in a calc
+@topic-margin-calc-value: @chat-header-space-to-heading ~"+" @vert-diff-baseline-offset-between-header-and-topic ~"+" .125em;
 @topic-margin-top: calc(@topic-margin-calc-value);
 @topic-margin-bottom: calc(~"(" @topic-margin-calc-value ~")" ~"/" 2);
 
