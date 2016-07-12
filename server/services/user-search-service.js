@@ -2,7 +2,7 @@
 
 var persistence = require('gitter-web-persistence');
 var Promise = require('bluebird');
-var client = require('../utils/elasticsearch-client').v1;
+var client = require('../utils/elasticsearch-client');
 var collections = require('../utils/collections');
 var _ = require('underscore');
 var userService = require('./user-service');
