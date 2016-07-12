@@ -7,8 +7,6 @@ var clientEnv = require('gitter-client-env');
 var avatars = require('gitter-web-avatars');
 var toggleClass = require('utils/toggle-class');
 
-var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
-
 var peopleToInviteStatusConstants = require('../people-to-invite-status-constants');
 var CommunityCreationPeopleListTemplate = require('./community-creation-people-list-view.hbs');
 var CommunityCreationPeopleListItemTemplate = require('./community-creation-people-list-item-view.hbs');
@@ -52,7 +50,7 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
     var emailAddress = data.emailAddress;
 
     data.absoluteUri = urlJoin(clientEnv.basePath, username);
-    
+
     // TODO: Handle Twitter avatars
     if(githubUsername) {
       data.avatarUrl = avatars.getForGitHubUsername(githubUsername);
