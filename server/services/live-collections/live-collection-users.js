@@ -28,25 +28,25 @@ function serializeUserToRooms(troupeIds, operation, user) {
 
 module.exports = {
   create: function(user) {
-    return Promise.all([
+    return Promise.join(
       userTypeaheadElastic.upsertUser(user),
       getRoomDistribution(user._id)
         .then(function(troupeIds) {
           return serializeUserToRooms(troupeIds, "create", user);
-        })
-    ]);
+        }),
+      function() {}
+    );
   },
 
   update: function(user) {
-    return Promise.all([
+    return Promise.join(
       userTypeaheadElastic.upsertUser(user),
       getRoomDistribution(user._id)
         .then(function(troupeIds) {
-          if (!troupeIds.length) return;
-
           return serializeUserToRooms(troupeIds, "update", user);
-        })
-    ]);
+        }),
+      function() {}
+    );
   },
 
   patch: function(userId, patch) {
