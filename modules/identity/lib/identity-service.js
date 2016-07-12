@@ -3,13 +3,8 @@
 var Promise = require('bluebird');
 var Identity = require('gitter-web-persistence').Identity;
 var assert = require('assert');
-
+var isGitHubUser = require('./is-github-user');
 var GITHUB_PROVIDER_KEY = 'github';
-
-// TODO: improve this
-function isGitHubUser(user) {
-  return user.githubUserToken || user.githubToken || user.githubId;
-}
 
 /**
  * If a user is a github user, returns a fake identity

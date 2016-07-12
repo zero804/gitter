@@ -14,6 +14,7 @@ function query(text, params) {
   return neo4jClient.query(text, params)
     .then(function(response) {
       stats.responseTime('suggestions.graph.query', Date.now() - start);
+      debug("Neo4j response: %j", response);
       return response;
     })
     .catch(function(err) {
@@ -22,6 +23,9 @@ function query(text, params) {
     });
   }
 
+/**
+ * @private
+ */
 function queryRoomSuggestions(roomId, userId) {
   if (userId) {
     /* Given a user .... */
@@ -49,17 +53,23 @@ function queryRoomSuggestions(roomId, userId) {
 /** Returns the ids of rooms suggested for the current user */
 function getSuggestionsForRoom(room, user/*, locale */) {
   return queryRoomSuggestions(room.id, user && user.id)
-    .then(function(results) {
-      return results.data.map(function(f) {
+    .then(function(response) {
+      var results = response.data.map(function(f) {
         /* Return the roomId only */
-        return { roomId: f[0] };
+        return f[0];
       });
+
+      debug('getSuggestionsForRoom: %j', results);
+
+      return results;
     });
 
 }
-exports.getSuggestionsForRoom = getSuggestionsForRoom;
 
-/* Returns the ids of rooms suggested for the current user */
+/**
+ * Returns the ids of rooms suggested for the current user
+ * This is not currently used
+ */
 function getSuggestionsForUser(user /*, locale */) {
   return query("MATCH (u:User)-[:MEMBER]->(:Room)-[:MEMBER]-(:User)-[:MEMBER]-(r:Room) " +
                "WHERE u.userId = {userId} AND NOT(u-[:MEMBER]-r) AND r.security = 'PUBLIC'" +
@@ -71,11 +81,10 @@ function getSuggestionsForUser(user /*, locale */) {
           })
     .then(function(results) {
       return results.data.map(function(f) {
-        return { roomId: f[0] };
+        return f[0];
       });
     });
 }
-exports.getSuggestionsForUser = getSuggestionsForUser;
 
 function getSuggestionsForRooms(rooms, localeLanguage) {
   var roomIds = _.map(rooms, function(room) {
@@ -93,12 +102,17 @@ function getSuggestionsForRooms(rooms, localeLanguage) {
     'ORDER BY c DESC ' +
     'LIMIT 20';
 
-  var attrs = {roomIds: roomIds, lang: localeLanguage};
+  var attrs = { roomIds: roomIds, lang: localeLanguage };
   return query(qry, attrs)
     .then(function(results) {
       return results.data.map(function(f) {
-        return { roomId: f[0] };
+        return f[0];
       });
     });
 }
-exports.getSuggestionsForRooms = getSuggestionsForRooms;
+
+module.exports = {
+  getSuggestionsForUser: getSuggestionsForUser,
+  getSuggestionsForRoom: getSuggestionsForRoom,
+  getSuggestionsForRooms: getSuggestionsForRooms
+};
