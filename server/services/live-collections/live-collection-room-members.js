@@ -58,11 +58,12 @@ module.exports = {
           return notifyUsersOfAddedOneToOneRooms(room, userIds);
         }
 
-        return Promise.all([
+        return Promise.join(
           notifyGroupRoomOfAddedUsers(room, userIds),
           notifyUsersOfAddedGroupRooms(room, userIds),
-          userTypeaheadElastic.addUsersToGroupRoom(userIds, troupeId)
-        ]);
+          userTypeaheadElastic.addUsersToGroupRoom(userIds, troupeId),
+          function() {}
+        );
       });
   },
 
