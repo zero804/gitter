@@ -194,13 +194,26 @@ module.exports = CommunityCreateBaseStepView.extend({
   },
 
   checkSlugAvailability: _.throttle(function() {
-    var slug = this.communityCreateModel.get('communitySlug');
     var communityCreateModel = this.communityCreateModel;
     var model = this.model;
 
+    var slug = communityCreateModel.get('communitySlug');
+    var githubOrgId = communityCreateModel.get('githubOrgId');
+    var githubRepoId = communityCreateModel.get('githubRepoId');
+    var type = null;
+    if(githubOrgId) {
+      type = 'GH_ORG';
+    }
+    else if(githubRepoId) {
+      type = 'GH_REPO';
+    }
+
     communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.PENDING);
     apiClient.priv.get('/check-group-uri', {
-        uri: slug
+        uri: slug,
+        // TODO: Figure out how to check for slugs associated with repo/org
+        // This currently doesn't work (see API)
+        //type: type
       })
       .then(function() {
         communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.AVAILABLE);
