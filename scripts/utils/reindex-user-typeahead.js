@@ -7,14 +7,14 @@ var shutdown = require('shutdown');
 
 onMongoConnect()
   .then(function() {
+    console.log('Reindexing. Run with DEBUG=* to get more info. See you in roughly 10mins!')
     return typeahead.reindex();
   })
   .then(function() {
     console.log('DONE');
+    shutdown.shutdownGracefully();
   })
   .catch(function(err) {
     console.error("error:", err);
-  })
-  .finally(function() {
-    shutdown.shutdownGracefully();
+    shutdown.shutdownGracefully(1);
   });
