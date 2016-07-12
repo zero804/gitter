@@ -76,11 +76,13 @@ function parseAndValidateInput(input) {
 }
 
 function getAvatar(type, externalId, resolvedEmailAddress) {
+  // TODO: what about an arbitrary gitter user?
+
   if (type === identityService.GITHUB_IDENTITY_PROVIDER) {
     return avatars.getForGitHubUsername(externalId);
   }
 
-  // TODO: what about twitter?
+  // TODO: what about a twitter user? At least one that has signed up.
 
   if (resolvedEmailAddress) {
     return avatars.getForGravatarEmail(resolvedEmailAddress);
