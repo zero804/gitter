@@ -26,8 +26,7 @@ TwitterUserCollaboratorService.prototype.findCollaborators = function() {
           displayName: follower.name,
           twitterUsername: follower.screen_name,
           avatarUrl: follower.profile_image_url_https, // TODO: use avatar service?
-          type: identityService.TWITTER_IDENTITY_PROVIDER,
-          externalId: follower.id
+          type: identityService.TWITTER_IDENTITY_PROVIDER
         };
       });
     });

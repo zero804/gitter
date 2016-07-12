@@ -91,7 +91,3 @@ function checkInvite(req, res, next) {
 
 
 module.exports = checkInvite;
-
-
-
-
