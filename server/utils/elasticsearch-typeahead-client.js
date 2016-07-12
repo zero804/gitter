@@ -45,11 +45,11 @@ function defer() {
 }
 
 module.exports = new elasticsearch.Client({
-  hosts: config.get('elasticsearch:hosts'),
+  hosts: config.get('elasticsearchTypeahead:hosts'),
   // Warning: possible memory leak: https://github.com/elasticsearch/elasticsearch-js/issues/71
   sniffOnStart: config.get('elasticsearch:sniffOnStart'),
   sniffInterval: 300000,
-  apiVersion: '1.4',
+  apiVersion: '2.3',
   defer: defer,
   log: ElasticSearchLoggingAdapter
 });

@@ -5,6 +5,7 @@ var Promise = require('bluebird');
 var appEvents = require('gitter-web-appevents');
 var restSerializer = require("../../serializers/rest-serializer");
 var roomMembershipService = require('../room-membership-service');
+var userTypeaheadElastic = require('../typeaheads/user-typeahead-elastic');
 
 function getRoomDistribution(userId) {
   return roomMembershipService.findRoomIdsForUser(userId);
@@ -27,19 +28,25 @@ function serializeUserToRooms(troupeIds, operation, user) {
 
 module.exports = {
   create: function(user) {
-    return getRoomDistribution(user._id)
-      .then(function(troupeIds) {
-        return serializeUserToRooms(troupeIds, "create", user);
-      });
+    return Promise.join(
+      userTypeaheadElastic.upsertUser(user),
+      getRoomDistribution(user._id)
+        .then(function(troupeIds) {
+          return serializeUserToRooms(troupeIds, "create", user);
+        }),
+      function() {}
+    );
   },
 
   update: function(user) {
-    return getRoomDistribution(user._id)
-      .then(function(troupeIds) {
-        if (!troupeIds.length) return;
-
-        return serializeUserToRooms(troupeIds, "update", user);
-      });
+    return Promise.join(
+      userTypeaheadElastic.upsertUser(user),
+      getRoomDistribution(user._id)
+        .then(function(troupeIds) {
+          return serializeUserToRooms(troupeIds, "update", user);
+        }),
+      function() {}
+    );
   },
 
   patch: function(userId, patch) {
