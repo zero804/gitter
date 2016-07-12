@@ -4,6 +4,7 @@ var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 var urlJoin = require('url-join');
 var clientEnv = require('gitter-client-env');
+var avatars = require('gitter-web-avatars');
 var toggleClass = require('utils/toggle-class');
 
 var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
@@ -12,9 +13,6 @@ var peopleToInviteStatusConstants = require('../people-to-invite-status-constant
 var CommunityCreationPeopleListTemplate = require('./community-creation-people-list-view.hbs');
 var CommunityCreationPeopleListItemTemplate = require('./community-creation-people-list-item-view.hbs');
 var CommunityCreationPeopleListEmptyTemplate = require('./community-creation-people-list-empty-view.hbs');
-
-var AVATAR_SIZE = 44;
-
 
 var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
   template: CommunityCreationPeopleListItemTemplate,
@@ -47,17 +45,23 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
 
   serializeData: function() {
     var data = this.model.toJSON();
-    data.absoluteUri = urlJoin(clientEnv.basePath, this.model.get('username'));
-    if(data.username) {
-      data.avatarSrcset = resolveRoomAvatarSrcSet({ uri: data.username }, AVATAR_SIZE);
+
+    var githubUsername = this.model.get('githubUsername');
+    var twitterUsername = this.model.get('twitterUsername');
+    var username = githubUsername || twitterUsername;
+    var emailAddress = data.emailAddress;
+
+    data.absoluteUri = urlJoin(clientEnv.basePath, username);
+    
+    // TODO: Handle Twitter avatars
+    if(githubUsername) {
+      data.avatarUrl = avatars.getForGitHubUsername(githubUsername);
     }
-    else if(data.emailAddress) {
-      var avatarUrl = 'https://avatars-beta.gitter.im/gravatar/e/' + data.emailAddress;
-      data.avatarSrcset = {
-        src: avatarUrl + '?size=' + AVATAR_SIZE,
-        size: AVATAR_SIZE,
-        srcset: avatarUrl + '?size=' + (2 * AVATAR_SIZE) + ' 2x',
-      };
+    else if(username) {
+      data.avatarUrl = avatars.getForUser(username);
+    }
+    else if(emailAddress) {
+      data.avatarUrl = avatars.getForGravatarEmail(emailAddress);
     }
 
     return data;
