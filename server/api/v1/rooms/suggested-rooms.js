@@ -13,17 +13,27 @@ module.exports = {
 
   index: function(req) {
     var userId = req.user._id;
+
     return loadTroupeFromParam(req)
       .then(function(troupe) {
         return Promise.join(
-          suggestions.getSuggestionsForRoom(troupe),
-          roomMembershipService.findRoomIdsForUser(userId),
+          suggestions.getSuggestionsForRoom(troupe, req.user),
+          userId && roomMembershipService.findRoomIdsForUser(userId),
           function(suggestions, existingRoomIds) {
-            var idMap = collections.hashArray(existingRoomIds);
+            if (!suggestions || !suggestions.length) {
+              return [];
+            }
 
-            return _.reject(suggestions, function(suggestion) {
-              return idMap[suggestion.roomId];
-            }).slice(0, 12);
+            if (existingRoomIds) {
+              // Remove any existing
+              var idMap = collections.hashArray(existingRoomIds);
+
+              suggestions = _.reject(suggestions, function(suggestion) {
+                return idMap[suggestion.roomId];
+              });
+            }
+
+            return suggestions.slice(0, 12);
           }
         );
       })
