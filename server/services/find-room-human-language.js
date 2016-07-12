@@ -1,6 +1,6 @@
 'use strict';
 
-var esClient = require('../utils/elasticsearch-client').v1;
+var esClient = require('../utils/elasticsearch-client');
 
 function findRoomHumanLanguage(roomId) {
   var query = {
