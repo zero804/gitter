@@ -73,7 +73,6 @@ module.exports = CommunityCreateBaseStepView.extend({
 
     this.listenTo(this.communityCreateModel, 'change:communityName change:communitySlug', this.onCommunityInfoChange, this);
     this.listenTo(this.communityCreateModel, 'change:communitySlugAvailabilityStatus', this.updateSlugAvailabilityStatusIndicator, this);
-
   },
 
 
@@ -123,8 +122,12 @@ module.exports = CommunityCreateBaseStepView.extend({
   onCommunityInfoChange: function() {
     var communitySlug = this.communityCreateModel.get('communitySlug');
     // TODO: Why does this match the first item always?
-    var matchingOrgItem = this.orgCollection.findWhere('name', communitySlug);
-    var matchingRepoItem = this.repoCollection.findWhere('uri', communitySlug);
+    var matchingOrgItem = this.orgCollection.filter(function(org) {
+      return (org.get('name') || '').toLowerCase() === communitySlug;
+    })[0];
+    var matchingRepoItem = this.repoCollection.filter(function(repo) {
+      return (repo.get('uri') || '').toLowerCase() === communitySlug;
+    })[0];
     if(matchingOrgItem) {
       this.communityCreateModel.set('githubOrgId', matchingOrgItem.get('id'));
       this.communityCreateModel.set('githubRepoId', null);
@@ -132,6 +135,10 @@ module.exports = CommunityCreateBaseStepView.extend({
     else if(matchingRepoItem) {
       this.communityCreateModel.set('githubOrgId', null);
       this.communityCreateModel.set('githubRepoId', matchingRepoItem.get('id'));
+    }
+    else {
+      this.communityCreateModel.set('githubOrgId', null);
+      this.communityCreateModel.set('githubRepoId', null);
     }
 
     this.updateCommunityFields();
