@@ -111,12 +111,20 @@ module.exports = CommunityCreateBaseStepView.extend({
   onPersonSelected: function(person) {
     // We want the defaults added to the model as well
     var newPerson = this.communityCreateModel.peopleToInvite.add(person.toJSON());
-    apiClient.priv.get('/check-invite', {
-        username: newPerson.get('username'),
-        githubUsername: newPerson.get('githubUsername'),
-        twitterUsername: newPerson.get('twitterUsername'),
-        emailAddress: newPerson.get('emailAddress')
-      })
+    var checkInviteParams = {
+      githubUsername: newPerson.get('githubUsername'),
+      twitterUsername: newPerson.get('twitterUsername'),
+      emailAddress: newPerson.get('emailAddress')
+    };
+    // FIXME: Workaround for search endpoint, https://github.com/troupe/gitter-webapp/issues/1759#issuecomment-231992894
+    if(newPerson.get('id')) {
+      checkInviteParams.username = newPerson.get('username');
+    }
+    else if(!checkInviteParams.githubUsername) {
+      checkInviteParams.githubUsername = newPerson.get('username');
+    }
+
+    apiClient.priv.get('/check-invite', checkInviteParams)
       .then(function() {
         newPerson.set('inviteStatus', peopleToInviteStatusConstants.READY);
       })
