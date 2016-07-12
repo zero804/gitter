@@ -2,6 +2,7 @@
 
 var _ = require('lodash');
 var TwitterService = require('gitter-web-twitter');
+var identityService = require('gitter-web-identity');
 
 function TwitterUserCollaboratorService(user, identity) {
   this.user = user;
@@ -24,7 +25,9 @@ TwitterUserCollaboratorService.prototype.findCollaborators = function() {
         return {
           displayName: follower.name,
           twitterUsername: follower.screen_name,
-          avatarUrl: follower.profile_image_url_https // TODO: use avatar service?
+          avatarUrl: follower.profile_image_url_https, // TODO: use avatar service?
+          type: identityService.TWITTER_IDENTITY_PROVIDER,
+          externalId: follower.id
         };
       });
     });

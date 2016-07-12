@@ -5,6 +5,7 @@ var OrgService = require('gitter-web-github').GitHubOrgService;
 var MeService = require('gitter-web-github').GitHubMeService;
 var _ = require('lodash');
 var avatars = require('gitter-web-avatars');
+var identityService = require('gitter-web-identity');
 
 function deduplicate(collaborators) {
   var deduped = [];
@@ -45,7 +46,9 @@ GitHubUserCollaboratorService.prototype.findCollaborators = function() {
         return {
           displayName: member.login,
           githubUsername: member.login,
-          avatarUrl: avatars.getForGitHubUsername(member.login)
+          avatarUrl: avatars.getForGitHubUsername(member.login),
+          type: identityService.GITHUB_IDENTITY_PROVIDER,
+          externalId: member.id
         }
       });
     });

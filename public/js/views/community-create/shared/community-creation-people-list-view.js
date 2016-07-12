@@ -46,17 +46,17 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
 
     var githubUsername = this.model.get('githubUsername');
     var twitterUsername = this.model.get('twitterUsername');
-    var username = githubUsername || twitterUsername;
+    var username = githubUsername || twitterUsername || this.model.get('username');
     var emailAddress = data.emailAddress;
 
     data.absoluteUri = urlJoin(clientEnv.basePath, username);
 
     // TODO: Handle Twitter avatars
-    if(githubUsername) {
-      data.avatarUrl = avatars.getForGitHubUsername(githubUsername);
-    }
-    else if(username) {
-      data.avatarUrl = avatars.getForUser(username);
+    if(username) {
+      data.avatarUrl = avatars.getForUser({
+        username: username,
+        gv: this.model.get('gv')
+      });
     }
     else if(emailAddress) {
       data.avatarUrl = avatars.getForGravatarEmail(emailAddress);

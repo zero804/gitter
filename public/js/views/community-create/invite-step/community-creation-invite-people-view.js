@@ -111,7 +111,11 @@ module.exports = CommunityCreateBaseStepView.extend({
   onPersonSelected: function(person) {
     // We want the defaults added to the model as well
     var newPerson = this.communityCreateModel.peopleToInvite.add(person.toJSON());
-    apiClient.priv.get('/check-invite', person.toJSON())
+    apiClient.priv.get('/check-invite', {
+        type: newPerson.get('type'),
+        externalId: newPerson.get('externalId'),
+        emailAddress: newPerson.get('emailAddress')
+      })
       .then(function() {
         newPerson.set('inviteStatus', peopleToInviteStatusConstants.READY);
       })
