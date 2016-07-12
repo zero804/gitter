@@ -11,7 +11,7 @@ module.exports = {
 
     var lcText = text.toLowerCase();
     var userIds = room.oneToOneUsers.map(function(obj) {
-      return obj.userId.toString();
+      return obj.userId;
     });
 
     return userService.findByIds(userIds)
