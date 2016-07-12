@@ -16,8 +16,8 @@ var FilteredRoomCollection = Backbone.Collection.extend({
     }
 
     this.roomModel = options.roomModel;
-    this.listenTo(this.roomModel, 'change:state', this.onModelChangeState, this);
-    this.listenTo(this.roomModel, 'change:selectedOrgName', this.onOrgNameChange, this);
+    this.listenTo(this.roomModel, 'change:state', this.onModelChangeState);
+    this.listenTo(this.roomModel, 'change:selectedOrgName', this.onOrgNameChange);
 
 
     if (!options || !options.collection) {
@@ -25,12 +25,19 @@ var FilteredRoomCollection = Backbone.Collection.extend({
     }
 
     this.roomCollection = options.collection;
-    this.listenTo(this.roomCollection, 'snapshot', this.onRoomCollectionSnapshot, this);
-    this.listenTo(this.roomCollection, 'change:favourite', this.onFavouriteChange, this);
-    this.listenTo(this.roomCollection, 'remove', this.onRoomRemoved, this);
-    this.listenTo(this.roomCollection, 'add', this.onRoomAdded, this);
-    this.listenTo(this, 'filter-complete change:escalationTime change:activity change:unreadItems change:mentions', this.sort, this);
+    this.listenTo(this.roomCollection, 'snapshot', this.onRoomCollectionSnapshot);
+    this.listenTo(this.roomCollection, 'change:favourite', this.onFavouriteChange);
+    this.listenTo(this.roomCollection, 'remove', this.onRoomRemoved);
+    this.listenTo(this.roomCollection, 'add', this.onRoomAdded);
+    this.listenTo(this.roomCollection, 'reset', this.onRoomCollectionReset);
 
+    this.listenTo(this, 'filter-complete', this.sort);
+
+    this.listenTo(this, 'change:escalationTime', this.sort);
+
+    this.listenTo(this, 'change:activity change:unreadItems change:mentions change:lastAccessTime', this.onRoomCriteriaChange);
+
+    this.onRoomCollectionReset();
     this.onModelChangeState();
     this.onOrgNameChange();
   },
@@ -56,17 +63,12 @@ var FilteredRoomCollection = Backbone.Collection.extend({
     this.setFilter();
   },
 
-  onFavouriteChange: function (model, val) {
-    if(!val) { this.add(model); }
-    else { this.remove(model); }
-    this.setFilter();
-  },
 
   filterDefault:   sortAndFilters.recents.filter,
   filterFavourite: sortAndFilters.favourites.filter,
 
   filterOneToOnes: function(model) {
-    return one2oneFilter(model.toJSON());
+    return one2oneFilter(model.attributes);
   },
 
   filterSearches: function() {
@@ -75,7 +77,7 @@ var FilteredRoomCollection = Backbone.Collection.extend({
 
   filterOrgRooms: function(model) {
     var orgName = this.roomModel.get('selectedOrgName');
-    return orgFilter(model.toJSON(), orgName);
+    return orgFilter(model.attributes, orgName);
   },
 
   onRoomCollectionSnapshot: function() {
@@ -101,20 +103,55 @@ var FilteredRoomCollection = Backbone.Collection.extend({
     this.trigger('filter-complete');
   },
 
+  onRoomCollectionReset: function() {
+    this.reset();
+    this.roomCollection.forEach(function(model) {
+      this.onRoomAdded(model);
+    }, this);
+  },
+
   getFilter: function (){
     return (this._filter || this.filterDefault);
   },
 
-  onRoomRemoved: function (model){
+  // The criteria on the room model has changed.
+  // Do we need to hide this item or not
+  onRoomCriteriaChange: function(model) {
+    // Only apply the filter if the model applies
+    // to this collection.
+    if (!this.modelApplies(model)) return;
+
+    var filter = this._filter || this.filterDefault;
+    model.set('isHidden', !filter(model));
+    this.sort();
+  },
+
+  onRoomRemoved: function(model) {
     this.remove(model);
   },
 
-  onRoomAdded: function (model){
-    if(!model.get('favourite')) {
-      model.set('isHidden', !this._filter(model));
+  onFavouriteChange: function(model) {
+    if(this.modelApplies(model)) {
+      this.add(model);
+    } else {
+      this.remove(model);
+    }
+
+    this.setFilter();
+  },
+
+  onRoomAdded: function(model) {
+    if(this.modelApplies(model)) {
+      var filter = this.getFilter();
+      model.set('isHidden', !filter(model));
       this.add(model);
     }
   },
+
+  /* This is override in filtered-favourite-room-collection */
+  modelApplies: function(model) {
+    return !model.get('favourite');
+  }
 
 });
 

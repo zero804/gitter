@@ -23,8 +23,10 @@ initialize: function(attrs, options) {
     //as we are sure we should be showing a temp org
     var orgName = getOrgnameFromUri(this.getRoomUri());
     var roomId = val;
-    var hasJoinedOrg = !this.roomCollection.get(roomId) && !this.groupCollection.findWhere({ name: orgName });
-    this.model.set('hidden', !hasJoinedOrg);
+    var group = this.roomCollection.get(roomId) && this.groupCollection.findWhere({ name: orgName });
+    var hasJoinedOrg = !!group;
+    var shouldHideTempOrg = hasJoinedOrg || !group;
+    this.model.set('hidden', shouldHideTempOrg);
   },
 
   serializeData: function (){
