@@ -145,7 +145,7 @@ var View = Marionette.LayoutView.extend({
       security: {
         type: groupType, // null or GH_ORG or GH_REPO
         security: permissions.toUpperCase(),
-        linkPath: (groupType !== null) ? groupLinkPath : null
+        linkPath: (groupType) ? groupLinkPath : null
       }
     };
     return apiClient.post(apiUrl, payload)
