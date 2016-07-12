@@ -137,11 +137,6 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     this.stopListening(this.model);
     this.stopListening(this.dndCtrl);
     this.stopListening(this.collection);
-  },
-
-  filter: function (child) {
-    var hidden = child.get('isHidden');
-    return !hidden;
   }
 
 });
