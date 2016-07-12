@@ -159,7 +159,7 @@ router.get('/tags/:tags',
           // Anyone know why we're putting this on the
           // context? Probably not.
           troupeContext.snapshots = snapshots;
-          
+
           res.render('explore', _.extend({}, snapshots, {
             exploreBaseUrl: req.baseUrl,
             troupeContext: troupeContext,
