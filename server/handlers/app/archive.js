@@ -325,5 +325,6 @@ exports.chatArchive = [
           });
       })
       .catch(next);
-  }
+  },
+  redirectErrorMiddleware
 ];

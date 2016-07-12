@@ -4,7 +4,7 @@
 
 var Backbone = require('backbone');
 var _ = require('underscore');
-var BaseResolverCollection = require('./base-resolver-collection.js');
+var BaseResolverCollection = require('./base-resolver-collection');
 var context = require('utils/context');
 
 var SEARCH_SKIP_INCREMENT = 30;

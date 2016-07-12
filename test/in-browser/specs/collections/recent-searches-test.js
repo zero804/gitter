@@ -2,7 +2,7 @@
 'use strict';
 
 var assert = require('assert');
-var RecentSearchesCollection = require('../../../../public/js/collections/recent-searches.js');
+var RecentSearchesCollection = require('../../../../public/js/collections/recent-searches');
 
 describe('RecentSearchesCollection', function() {
 

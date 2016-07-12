@@ -56,6 +56,7 @@ function accept(userId, secret) {
       if (!invite) throw new StatusError(404);
       if (invite.userId) {
         // Is this user re-using the invite?
+
         if (!mongoUtils.objectIDsEqual(invite.userId, userId)) {
           throw new StatusError(404);
         }
@@ -113,6 +114,7 @@ function markInviteReminded(inviteId) {
 
 function findInvitesForReminder(timeHorizonDays) {
   var cutoffId = mongoUtils.createIdForTimestamp(Date.now() - timeHorizonDays * MS_PER_DAY);
+
   return TroupeInvite.aggregate([{
       $match: {
         state: 'PENDING',

@@ -622,7 +622,11 @@ function removeRoomMemberById(roomId, userId) {
 /**
  * Hides a room for a user.
  */
-function hideRoomFromUser(roomId, userId) {
+function hideRoomFromUser(room, userId) {
+  assert(room && room.id, 'room parameter required');
+  assert(userId, 'userId parameter required');
+  var roomId = room.id;
+
   return recentRoomService.removeRecentRoomForUser(userId, roomId)
     .then(function() {
       return roomMembershipService.getMemberLurkStatus(roomId, userId);
@@ -634,17 +638,24 @@ function hideRoomFromUser(roomId, userId) {
         return;
       }
 
-      if (userLurkStatus) {
-        return removeRoomMemberById(roomId, userId);
-      }
-
       // TODO: in future get rid of this but this collection is used by the native clients
       appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', {
         id: roomId,
         favourite: null,
         lastAccessTime: null,
+        activity: 0,
         mentions: 0,
         unreadItems: 0 }, 'room');
+
+      // If somebody is lurking in a room
+      // and the room is not one-to-one
+      // remove them from the room
+      // See https://github.com/troupe/gitter-webapp/issues/1743
+
+      if (userLurkStatus && !room.oneToOne) {
+        return removeRoomMemberById(roomId, userId);
+      }
+
     });
 }
 
