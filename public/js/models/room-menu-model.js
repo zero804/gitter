@@ -267,8 +267,8 @@ module.exports = Backbone.Model.extend({
 
   getCurrentGroup: function (){
     if(this.get('state') !== 'org') { return false; }
-    var selectedOrg = this.get('selectedOrgname');
-    if(!selectedOrg.length) { throw new Error('Left menu is in the org state with no selected org'); }
+    var selectedOrg = this.get('selectedOrgName');
+    if(!selectedOrg) { throw new Error('Left menu is in the org state with no selected org'); }
     return this.minibarCollection.findWhere({ name: selectedOrg });
   },
 

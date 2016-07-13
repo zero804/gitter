@@ -13,8 +13,6 @@ var ObjectID = require('mongodb').ObjectID;
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var StatusError = require('statuserror');
 var roomMembershipService = require('./room-membership-service');
-var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
-var legacyMigration = require('gitter-web-permissions/lib/legacy-migration');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var debug = require('debug')('gitter:app:one-to-one-room-service');
 
@@ -68,7 +66,11 @@ function upsertNewOneToOneRoom(userId1, userId2) {
       _id: new ObjectID(),
       userId: userId2
     }],
-    userCount: 0
+    userCount: 0,
+    sd: {
+      type: 'ONE_TO_ONE',
+      public: false, // One-to-ones are always private
+    }
   };
 
   debug('Attempting upsert for new one-to-one room');
@@ -76,15 +78,6 @@ function upsertNewOneToOneRoom(userId1, userId2) {
   // Upsert returns [model, existing] already
   return mongooseUtils.upsert(Troupe, query, {
     $setOnInsert: insertFields
-  })
-  .tap(function(upsertResult) {
-    var troupe = upsertResult[0];
-    var updateExisting = upsertResult[1];
-
-    if (updateExisting) return;
-
-    var descriptor = legacyMigration.generatePermissionsForRoom(troupe, null, null);
-    return securityDescriptorService.insertForRoom(troupe._id, descriptor);
   });
 }
 

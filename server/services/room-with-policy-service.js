@@ -19,6 +19,7 @@ var assert = require('assert');
 var roomMetaService = require('./room-meta-service');
 var processMarkdown = require('../utils/markdown-processor');
 var roomInviteService = require('./room-invite-service');
+var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
 
 var MAX_RAW_TAGS_LENGTH = 200;
 
@@ -132,12 +133,6 @@ RoomWithPolicyService.prototype.toggleSearchIndexing = secureMethod(allowAdmin, 
   return room.save();
 });
 
-function canBanInRoom(room) {
-  if (room.oneToOne) return false;
-
-  return true;
-}
-
 /**
  * Ban a user from the room. Caller should ensure admin permissions
  */
@@ -148,7 +143,9 @@ RoomWithPolicyService.prototype.banUserFromRoom = secureMethod([allowStaff, allo
   if (!username) throw new StatusError(400, 'Username required');
   if (currentUser.username === username) throw new StatusError(400, 'You cannot ban yourself');
 
-  if (!canBanInRoom(room)) throw new StatusError(400, 'This room does not support banning.');
+  if (room.oneToOne) {
+    throw new StatusError(400, 'Cannot ban in a oneToOne room');
+  }
 
   return userService.findByUsername(username)
     .bind(this)
@@ -159,8 +156,6 @@ RoomWithPolicyService.prototype.banUserFromRoom = secureMethod([allowStaff, allo
         return mongoUtils.objectIDsEqual(ban.userId, bannedUser._id);
       });
 
-      if(existingBan) return existingBan;
-
       // If there is already a ban or the room
       // type doesn't make sense for a ban, just remove the user
       // TODO: re-address this in https://github.com/troupe/gitter-webapp/pull/1679
@@ -170,11 +165,11 @@ RoomWithPolicyService.prototype.banUserFromRoom = secureMethod([allowStaff, allo
           .return(existingBan)
       }
 
-      if (room.githubType === 'ORG' || room.security === 'PRIVATE') {
+      // Can only ban people from public rooms
+      if (!securityDescriptorUtils.isPublic(room)) {
         return this.removeUserFromRoom(bannedUser)
           .return(null); // Signals that the user was removed from room, but not banned
       }
-
 
       // Don't allow admins to be banned!
       return policyFactory.createPolicyForRoom(bannedUser, room)
@@ -254,10 +249,6 @@ RoomWithPolicyService.prototype.unbanUserFromRoom = secureMethod([allowStaff, al
       })
 });
 
-RoomWithPolicyService.prototype.createChannel = secureMethod([allowAdmin], function(options) {
-  return roomService.createRoomChannel(this.room, this.user, options);
-});
-
 /**
  * User join room
  */
@@ -294,6 +285,8 @@ RoomWithPolicyService.prototype.updateRoomWelcomeMessage = secureMethod([allowAd
  * Delete a room
  */
 RoomWithPolicyService.prototype.deleteRoom = secureMethod([allowAdmin], function() {
+  if (this.room.oneToOne) throw new StatusError(400, 'cannot delete one to one rooms');
+
   logger.warn('User deleting room ', { roomId: this.room._id, username: this.user.username, userId: this.user._id });
   return roomService.deleteRoom(this.room);
 });
