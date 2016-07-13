@@ -121,8 +121,10 @@ onready(function() {
     // Set the last access time immediately to prevent
     // delay in hidden rooms becoming visible only
     // once we get the server-side update
-    var liveCollectionTroupe = troupeCollections.get(troupe.id)
-    liveCollectionTroupe.set('lastAccessTime', moment())
+    var liveCollectionTroupe = troupeCollections.troupes.get(troupe.id)
+    if (liveCollectionTroupe) {
+      liveCollectionTroupe.set('lastAccessTime', moment());
+    }
 
     // add the group to the troupe as if it was serialized by the server
     var groupModel = troupeCollections.groups.get(newTroupe.groupId);
