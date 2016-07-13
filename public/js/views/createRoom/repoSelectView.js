@@ -20,6 +20,7 @@ var ItemView = Marionette.ItemView.extend({
   template: itemTemplate,
   tagName: 'li',
   onRender: function() {
+    this.el.setAttribute('title', this.model.get('name'));
     dataset.set(this.el, 'cid', this.model.cid);
   }
 });

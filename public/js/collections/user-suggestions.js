@@ -2,7 +2,7 @@
 
 var Backbone = require('backbone');
 var apiClient = require('components/apiClient');
-var SyncMixin = require('./sync-mixin.js');
+var SyncMixin = require('./sync-mixin');
 
 
 var UserSuggestionCollection = Backbone.Collection.extend({
