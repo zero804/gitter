@@ -5,12 +5,13 @@ var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
 var gravatar = require('gitter-web-avatars/server/gravatar');
 var Group = require('gitter-web-persistence').Group;
 var User = require('gitter-web-persistence').User;
+var avatars = require('gitter-web-avatars');
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 var isGitHubUsername = require('gitter-web-identity/lib/is-github-username');
 var fixMongoIdQueryParam = require('../../../web/fix-mongo-id-query-param');
 var url = require('url');
 
-var DEFAULT_AVATAR_URL = 'https://avatars.githubusercontent.com/u/0';
+var DEFAULT_AVATAR_URL = avatars.getDefault();
 var DEFAULT_SIZE = 128;
 
 function getSizeParam(req) {
@@ -188,5 +189,23 @@ router.get('/gh/uv/:version/:username',
     return sendAvatar(req, res, avatarUrl, false);
   });
 
+/* Default route for anything else on the avatar server */
+router.use(
+  identifyRoute('api-private-missing-avatar'),
+  function(req, res) {
+
+    // If the nginx image proxy is sitting in front of the app
+    // use that
+    if (req.headers['x-avatar-server']) {
+      res.set('X-Accel-Redirect', '/missing');
+      res.send('OK');
+      return;
+    }
+
+    // Deliberately don't fall back in development
+    // since we want to know that the image is broken...
+    res.set('Cache-Control', 'max-age=60');
+    res.status(404).send('Not Found');
+})
 
 module.exports = router;

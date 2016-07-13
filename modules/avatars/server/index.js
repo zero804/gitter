@@ -4,7 +4,10 @@ var isGitHubUser = require('../shared/is-github-user');
 var avatarCdnResolver = require('../shared/avatar-cdn-resolver');
 var gravatar = require('./gravatar');
 
-var DEFAULT = 'https://avatars.githubusercontent.com/u/0';
+var clientEnv = require('gitter-client-env');
+var avatarUrl = clientEnv.avatarsUrl;
+
+var DEFAULT = avatarUrl + '/0';
 
 function getForGitHubUsername(githubUsername) {
   return avatarCdnResolver('/gh/u/' + githubUsername);
