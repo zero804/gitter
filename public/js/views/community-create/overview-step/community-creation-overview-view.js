@@ -1,10 +1,8 @@
 'use strict';
 
 var _ = require('underscore');
-var urlJoin = require('url-join');
-var clientEnv = require('gitter-client-env');
+var Promise = require('bluebird');
 var toggleClass = require('utils/toggle-class');
-var apiClient = require('components/apiClient');
 var appEvents = require('utils/appevents');
 var VirtualMultipleCollection = require('../virtual-multiple-collection');
 
@@ -12,6 +10,7 @@ var stepConstants = require('../step-constants');
 var template = require('./community-creation-overview-view.hbs');
 var CommunityCreateBaseStepView = require('../shared/community-creation-base-step-view');
 var CommunityCreationPeopleListView = require('../shared/community-creation-people-list-view');
+var grouphModels = require('collections/groups');
 
 require('gitter-styleguide/css/components/headings.css');
 require('gitter-styleguide/css/components/buttons.css');
@@ -98,24 +97,29 @@ module.exports = CommunityCreateBaseStepView.extend({
       linkPath = githubProjectModel.get('uri');
     }
 
-    var defaultRoomName = 'Lobby';
-
-
     // TODO: Invite people
-    var creatingGroupPromise = apiClient.post('/v1/groups', {
+    var newGroupModel = new grouphModels.Model({
       name: communityCreateModel.get('communityName'),
       uri: communityCreateModel.get('communitySlug'),
       type: type,
-      linkPath: linkPath,
-      defaultRoomName: defaultRoomName
+      linkPath: linkPath
+    });
+    var creatingGroupPromise = new Promise(function(resolve, reject) {
+      newGroupModel.save(null, {
+        success: function(model, response) {
+          resolve(response);
+        },
+        error: function(model, response) {
+          reject(response);
+        }
+      });
     });
 
-    var basePath = clientEnv['basePath'];
     creatingGroupPromise.then(function(results) {
       var defaultRoomName = results && results.defaultRoom && results.defaultRoom.name;
       var defaultRoomUri = results && results.defaultRoom && results.defaultRoom.uri;
 
-      appEvents.trigger('navigation', urlJoin(basePath, defaultRoomUri), 'chat', defaultRoomName);
+      appEvents.trigger('navigation', '/' + defaultRoomUri, 'chat', defaultRoomName);
       // Hide create community
       //communityCreateModel.set('active', false);
       communityCreateModel.clear().set(communityCreateModel.defaults);
