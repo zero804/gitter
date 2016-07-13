@@ -1,0 +1,22 @@
+#!/bin/bash
+
+set -e
+
+git fetch origin refs/notes/*:refs/notes/*
+
+PRS=$(git log master..HEAD --show-notes=pull_request_number |
+  grep -A1 pull_request_number |
+  grep -vE '(pull_request_number|--)'|
+  awk '{ print $1 }')
+
+echo "| PR | Title | Author | Changes | Changed Files |"
+echo "|----|-------|--------|---------|---------------|"
+for i in ${PRS}; do
+  PR_BODY=$(curl --silent -n https://api.github.com/repos/troupe/gitter-webapp/pulls/$i)
+  title=$(echo ${PR_BODY} | jq '.title' | cut -d\" -f2)
+  user=$(echo ${PR_BODY} | jq '.user.login' | cut -d\" -f2)
+  additions=$(echo ${PR_BODY} | jq '.additions')
+  deletions=$(echo ${PR_BODY} | jq '.deletions')
+  changed_files=$(echo ${PR_BODY} | jq '.changed_files')
+  echo "| #${i} | $title | @${user} | +${additions} -${deletions} | ${changed_files} |"
+done
