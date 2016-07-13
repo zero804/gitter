@@ -4,9 +4,18 @@ var express = require('express');
 var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
 var gravatar = require('gitter-web-avatars/server/gravatar');
 var Group = require('gitter-web-persistence').Group;
+var User = require('gitter-web-persistence').User;
 var router = express.Router({ caseSensitive: true, mergeParams: true });
+var isGitHubUsername = require('gitter-web-identity/lib/is-github-username');
+var fixMongoIdQueryParam = require('../../../web/fix-mongo-id-query-param');
+var url = require('url');
 
 var DEFAULT_AVATAR_URL = 'https://avatars.githubusercontent.com/u/0';
+var DEFAULT_SIZE = 128;
+
+function getSizeParam(req) {
+  return req.query.s && parseInt(req.query.s, 10) || DEFAULT_SIZE;
+}
 
 function sendAvatar(req, res, imageUrl, hasCacheBuster) {
 
@@ -55,18 +64,30 @@ function githubVerionedUrl(username, version, size) {
   return base;
 }
 
+function addSizeParam(avatarUrl, sizeParamName, sizeValue) {
+  if (!sizeValue) return avatarUrl;
+  var parsed = url.parse(avatarUrl, true);
+  parsed.search = null;
+  parsed.query[sizeParamName] = sizeValue;
+  return url.format(parsed);
+}
+
 /**
  * Group Avatars, by ID
  */
 router.get('/group/i/:groupId',
   identifyRoute('api-private-avatar-group-id'),
   function(req, res, next) {
-    var size = req.query.size && parseInt(req.query.size, 10) || '';
-
+    var size = getSizeParam(req);
     // TODO: deal with cache-busters
     // and non-github objects
+    var groupId = fixMongoIdQueryParam(req.params.groupId);
 
-    return Group.findById(req.params.groupId, { 'sd.type': 1, 'sd.linkPath': 1 })
+    if (!groupId) {
+      return sendAvatar(req, res, DEFAULT_AVATAR_URL, false);
+    }
+
+    return Group.findById(groupId, { 'sd.type': 1, 'sd.linkPath': 1 }, { lean: true })
       .then(function(group) {
         if (!group) {
           return sendAvatar(req, res, DEFAULT_AVATAR_URL, false);
@@ -91,38 +112,78 @@ router.get('/group/i/:groupId',
       .catch(next);
   });
 
+/* Case sensitive */
+router.get('/g/u/:username',
+  identifyRoute('api-private-avatar-gitter-username'),
+  function(req, res, next) {
+    var size = getSizeParam(req);
+    var username = req.params.username;
+
+    if (!username) {
+      return sendAvatar(req, res, DEFAULT_AVATAR_URL, false);
+    }
+
+    return User.findOne({ username: username }, { _id: 0, gravatarImageUrl: 1 }, { lean: true })
+      .then(function(doc) {
+        if (!doc || !doc.gravatarImageUrl) {
+          // We don't know who this user is. Just fallback to GitHub for now
+          var fallback = githubUrl(username, size);
+          return sendAvatar(req, res, fallback, false);
+        }
+
+        if (isGitHubUsername(username)) {
+          var url = addSizeParam(doc.gravatarImageUrl, 's', size);
+          return sendAvatar(req, res, url, false);
+        }
+
+        // TODO: Deal with twitter users better (for example sizes etc)
+        return sendAvatar(req, res, doc.gravatarImageUrl, false);
+      })
+      .catch(next);
+
+  });
+
 
 router.get('/gravatar/e/:email',
   identifyRoute('api-private-avatar-gravatar'),
   function(req, res) {
+    var size = getSizeParam(req);
+
     var email = req.params.email;
-    var gravatarUrl = gravatar.forEmail(email, req.query.s);
+    var gravatarUrl = gravatar.forEmail(email, size);
     return sendAvatar(req, res, gravatarUrl, true);
   });
 
 router.get('/gravatar/m/:md5',
   identifyRoute('api-private-avatar-checksum'),
   function(req, res) {
+    var size = getSizeParam(req);
     var md5 = req.params.md5;
-    var gravatarUrl = gravatar.forChecksum(md5, req.query.s);
+    var gravatarUrl = gravatar.forChecksum(md5, size);
     return sendAvatar(req, res, gravatarUrl, true);
   });
 
+/**
+ * Only used in DEV. Otherwise nginx handles this route
+ */
 router.get('/gh/u/:username',
   identifyRoute('api-private-github-username'),
   function(req, res) {
     var username = req.params.username;
-    var size = req.query.size && parseInt(req.query.size, 10) || '';
+    var size = getSizeParam(req);
     var avatarUrl = githubUrl(username, size);
     return sendAvatar(req, res, avatarUrl, false);
   });
 
+/**
+ * Only used in DEV. Otherwise nginx handles this route
+ */
 router.get('/gh/uv/:version/:username',
   identifyRoute('api-private-github-versioned-username'),
   function(req, res) {
     var username = req.params.username;
     var version = req.params.version;
-    var size = req.query.size && parseInt(req.query.size, 10) || '';
+    var size = req.query.s && parseInt(req.query.s, 10) || '';
     var avatarUrl = githubVerionedUrl(username, version, size);
     return sendAvatar(req, res, avatarUrl, false);
   });

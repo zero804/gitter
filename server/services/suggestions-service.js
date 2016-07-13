@@ -148,8 +148,7 @@ var graphRooms = Promise.method(function(options) {
   var firstTen = existingRooms.slice(0, 10);
   return graphSuggestions.getSuggestionsForRooms(firstTen, language)
     .timeout(2000)
-    .then(function(suggestions) {
-      var roomIds = _.pluck(suggestions, 'roomId');
+    .then(function(roomIds) {
       return troupeService.findByIdsLean(roomIds);
     })
     .then(function(suggestedRooms) {
