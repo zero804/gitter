@@ -109,6 +109,9 @@ module.exports = BaseCollectionItemView.extend({
   onHideClicked: function(e) {
     e.stopPropagation();
 
+    // Hide the room in the UI immediately
+    this.model.set('lastAccessTime', null);
+
     //TODO figure out why this throws an error.
     //implementation is exactly the same as on develop?
     //JP 13/1/16
