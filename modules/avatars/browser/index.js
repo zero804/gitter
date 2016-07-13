@@ -2,7 +2,8 @@
 
 var isGitHubUser = require('../shared/is-github-user');
 var avatarCdnResolver = require('../shared/avatar-cdn-resolver');
-var DEFAULT = 'https://avatars.githubusercontent.com/u/0';
+
+var DEFAULT = require('url?limit=1024!../../../public/images/default-avatar.png'); // eslint-disable-line
 
 function getForGitHubUsername(githubUsername) {
   return avatarCdnResolver('/gh/u/' + githubUsername);
@@ -20,7 +21,7 @@ function getForGroupId(groupId) {
  * This will change in future
  */
 function getForRoomUri(uri) {
-  if (!uri) return DEFAULT;
+  if (!uri) return null;
   var orgOrUser = uri.split('/')[0];
   return avatarCdnResolver('/gh/u/' + orgOrUser);
 }
@@ -29,9 +30,9 @@ function getForRoomUri(uri) {
  * This will change in future.
  */
 function getForUser(user) {
-  if (!user) return DEFAULT;
+  if (!user) return null;
   var username = user.username;
-  if (!username) return DEFAULT;
+  if (!username) return null;
   var gv = user.gv;
 
   if (!isGitHubUser(user)) {
@@ -60,4 +61,5 @@ module.exports = {
   getForRoomUri: getForRoomUri,
   getForUser: getForUser,
   getDefault: getDefault,
+
 }
