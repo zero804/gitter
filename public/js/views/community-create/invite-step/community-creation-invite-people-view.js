@@ -116,7 +116,8 @@ module.exports = CommunityCreateBaseStepView.extend({
       twitterUsername: newPerson.get('twitterUsername'),
       emailAddress: newPerson.get('emailAddress')
     };
-    // FIXME: Workaround for search endpoint, https://github.com/troupe/gitter-webapp/issues/1759#issuecomment-231992894
+    // TODO: Make this more robust
+    // Currently using workaround for search endpoint, https://github.com/troupe/gitter-webapp/issues/1759#issuecomment-231992894
     if(newPerson.get('id')) {
       checkInviteParams.username = newPerson.get('username');
     }
