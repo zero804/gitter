@@ -155,6 +155,10 @@ describe('restful #slow', function() {
             id: fixture.group1.id,
             name: fixture.group1.name,
             uri: fixture.group1.uri,
+            backedBy: {
+              type: null,
+              linkPath: null
+            },
             avatarUrl: nconf.get('avatar:officialHost') + '/group/i/' + fixture.group1.id,
           }]);
         });

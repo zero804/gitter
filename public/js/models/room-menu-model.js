@@ -105,6 +105,7 @@ module.exports = Backbone.Model.extend({
     this.minibarHomeModel = new MinibarItemModel({ name: 'all', type: 'all', active: (state === 'all') });
     this.minibarSearchModel = new MinibarItemModel({ name: 'search', type: 'search', active: (state === 'search') });
     this.minibarPeopleModel = new MinibarPeopleModel({ active: (state === 'people')}, { roomCollection: this._roomCollection });
+    this.minibarCommunityCreateModel = new MinibarItemModel({ name: 'Create Community', type: 'community-create' });
     this.minibarCloseModel = new MinibarItemModel({ name: 'close', type: 'close' });
     this.minibarTempOrgModel = new MinibarTempOrgModel(attrs.tempOrg, { troupe: context.troupe(), });
 
@@ -266,8 +267,8 @@ module.exports = Backbone.Model.extend({
 
   getCurrentGroup: function (){
     if(this.get('state') !== 'org') { return false; }
-    var selectedOrg = this.get('selectedOrgname');
-    if(!selectedOrg.length) { throw new Error('Left menu is in the org state with no selected org'); }
+    var selectedOrg = this.get('selectedOrgName');
+    if(!selectedOrg) { throw new Error('Left menu is in the org state with no selected org'); }
     return this.minibarCollection.findWhere({ name: selectedOrg });
   },
 

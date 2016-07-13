@@ -65,6 +65,10 @@ if(!process.env.NODEMON) {
   });
 }
 
+if (process.env.NODE_ENV === 'dev') {
+  process.traceDeprecation = true;
+}
+
 if(nconf.get('diagnostics:heapdump')) {
   var memwatch = require('memwatch-next');
   memwatch.on('leak', function(info) {

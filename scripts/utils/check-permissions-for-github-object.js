@@ -5,7 +5,7 @@
 var Promise = require('bluebird');
 var validateUri = require('gitter-web-github').GitHubUriValidator;
 var userService = require('../../server/services/user-service');
-var githubPolicyFactory = require('gitter-web-permissions/lib/github-policy-factory');
+var policyFactory = require('gitter-web-permissions/lib/policy-factory')
 
 function execute(username, uri) {
   return userService.findByUsername(username)
@@ -23,16 +23,10 @@ function execute(username, uri) {
 
       var githubType = githubInfo.type;
       var officialUri = githubInfo.uri;
-      var security;
-      if (githubType === 'ORG') {
-        security = null;
-      } else {
-        security = githubInfo.security;
-      }
+      var type = 'GH_' + githubType;
 
-      return githubPolicyFactory.createPolicyForGithubObject(this.user, officialUri, githubType, security);
-    })
-    .then(function(policy) {
+      var policy = policyFactory.getPreCreationPolicyEvaluator(this.user, type, officialUri);
+
       return Promise.props({
         canRead: policy.canRead(),
         canWrite: policy.canWrite(),

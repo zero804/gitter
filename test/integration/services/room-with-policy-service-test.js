@@ -126,11 +126,10 @@ describe('room-with-policy-service', function() {
     it('should ban users from rooms #slow', function() {
       var roomService = testRequire("./services/room-service");
       var roomMembershipService = testRequire('./services/room-membership-service');
-      var userBannedFromRoom = require('gitter-web-permissions/lib/user-banned-from-room');
 
       var r = new RoomWithPolicyService(fixture.troupeBan, fixture.userBanAdmin, isAdminPolicy);
 
-      return userBannedFromRoom(fixture.troupeBan.uri, fixture.userBan)
+      return roomService.findBanByUsername(fixture.troupeBan._id, fixture.userBan.username)
         .then(function(banned) {
           assert(!banned);
 
@@ -151,13 +150,13 @@ describe('room-with-policy-service', function() {
               assert(ban);
               assert(ban.userId);
 
-              return userBannedFromRoom(fixture.troupeBan.uri, fixture.userBan)
+              return roomService.findBanByUsername(fixture.troupeBan._id, fixture.userBan.username)
                 .then(function(banned) {
                   assert(banned);
 
                   return r.unbanUserFromRoom(ban.userId)
                     .then(function() {
-                      return userBannedFromRoom(fixture.troupeBan.uri, fixture.userBan)
+                      return roomService.findBanByUsername(fixture.troupeBan._id, fixture.userBan.username)
                         .then(function(banned) {
                           assert(!banned);
 

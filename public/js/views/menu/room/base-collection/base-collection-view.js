@@ -71,7 +71,7 @@ module.exports = Marionette.CompositeView.extend({
   onItemActivated: function(view) {
     var model = view.model;
     var url = view.getRoomUrl();
-    var name = view.getRoomName();
+    var name = view.getRoomTitle();
 
     //We have to explicitly check for false because search
     //results come through with `exists: false` for rooms yet to be created

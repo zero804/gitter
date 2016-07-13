@@ -13,6 +13,10 @@ function GroupStrategy(/* options */) {
       id: id,
       name: group.name,
       uri: group.uri,
+      backedBy: {
+        type: group.sd.type,
+        linkPath: group.sd.linkPath
+      },
       avatarUrl: avatars.getForGroupId(group._id)
     };
   };

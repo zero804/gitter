@@ -89,6 +89,7 @@ describe('GithubRepoStrategy', function() {
             githubType: 'REPO',
             security: 'PUBLIC',
             noindex: false,
+            public: true,
             v: 1
           },
           exists: true,
@@ -97,4 +98,3 @@ describe('GithubRepoStrategy', function() {
       });
   });
 });
-
