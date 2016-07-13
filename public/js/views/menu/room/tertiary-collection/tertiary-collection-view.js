@@ -76,6 +76,16 @@ module.exports = BaseCollectionView.extend({
     }
   },
 
+  /** Called from the base class */
+  roomExistsForModel: function(model) {
+    if(this.roomMenuModel.get('state') === 'all') {
+      // Org room case
+      return !!model.get('room');
+    } else {
+      return model.get('exists') !== false;
+    }
+  },
+
   onSearchItemClicked: function(view) {
     this.roomMenuModel.set('searchTerm', view.model.get('name'));
     this.bus.trigger('left-menu:recent-search', view.model.get('name'));
