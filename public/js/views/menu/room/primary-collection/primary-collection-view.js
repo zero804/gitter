@@ -5,15 +5,13 @@ var Marionette = require('backbone.marionette');
 var _ = require('underscore');
 var ItemView = require('./primary-collection-item-view');
 var BaseCollectionView = require('../base-collection/base-collection-view');
-var EmptyAllView = require('./primary-collection-item-all-empty-view.js');
-var EmptySearchView = require('./primary-collection-item-search-empty-view.js');
-var EmptyFavouriteView = require('./primary-collection-item-favourite-empty-view.js');
+var EmptyAllView = require('./primary-collection-item-all-empty-view');
+var EmptySearchView = require('./primary-collection-item-search-empty-view');
+var EmptyFavouriteView = require('./primary-collection-item-favourite-empty-view');
 var perfTiming = require('components/perf-timing');
 var compositeViewRenderTemplate = require('utils/composite-view-render-template');
 var domIndexById = require('utils/dom-index-by-id');
 var toggleClass = require('utils/toggle-class');
-
-var proto = BaseCollectionView.prototype;
 
 var PrimaryCollectionView = BaseCollectionView.extend({
 
@@ -139,7 +137,7 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     this.stopListening(this.model);
     this.stopListening(this.dndCtrl);
     this.stopListening(this.collection);
-  },
+  }
 
 });
 

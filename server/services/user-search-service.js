@@ -100,7 +100,7 @@ function performQuery(queryText, options) {
     }
   };
 
-  return Promise.resolve(client.search(queryRequest)).then(elasticResponseToUserIds);
+  return client.search(queryRequest).then(elasticResponseToUserIds);
 }
 
 function elasticsearchUserTypeahead(queryText, options) {
@@ -150,7 +150,7 @@ function elasticsearchUserTypeahead(queryText, options) {
     }
   };
 
-  return Promise.resolve(client.search(queryRequest)).then(elasticResponseToUserIds);
+  return client.search(queryRequest).then(elasticResponseToUserIds);
 }
 
 function elasticResponseToUserIds(response) {

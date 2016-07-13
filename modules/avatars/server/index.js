@@ -1,5 +1,6 @@
 'use strict';
 
+var isGitHubUser = require('../shared/is-github-user');
 var avatarCdnResolver = require('../shared/avatar-cdn-resolver');
 var gravatar = require('./gravatar');
 
@@ -34,6 +35,13 @@ function getForUser(user) {
   if (!user) return DEFAULT;
   var username = user.username;
   if (!username) return DEFAULT;
+
+  if (!isGitHubUser(user)) {
+    // In future, all users will be routed here
+    // Get our services to resolve the user
+    return avatarCdnResolver('/g/u/' + username);
+  }
+
   var gv = user.gravatarVersion || user.gv;
 
   if (gv) {

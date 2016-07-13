@@ -1,5 +1,6 @@
 'use strict';
 
+var isGitHubUser = require('../shared/is-github-user');
 var avatarCdnResolver = require('../shared/avatar-cdn-resolver');
 var DEFAULT = 'https://avatars.githubusercontent.com/u/0';
 
@@ -32,6 +33,12 @@ function getForUser(user) {
   var username = user.username;
   if (!username) return DEFAULT;
   var gv = user.gv;
+
+  if (!isGitHubUser(user)) {
+    // In future, all users will be routed here
+    // Get our services to resolve the user
+    return avatarCdnResolver('/g/u/' + username);
+  }
 
   if (gv) {
     // Use the versioned interface
