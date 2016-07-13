@@ -6,6 +6,7 @@ var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var Promise = require('bluebird');
 var EventEmitter = require('events').EventEmitter;
 var _ = require('lodash');
+var securityDescriptorAdminFilter = require('gitter-web-permissions/lib/security-descriptor-admin-filter');
 
 var groupMembershipEvents = new EventEmitter();
 
@@ -43,10 +44,7 @@ function findGroupsForUser(userId) {
           name: '$group.name',
           uri: '$group.uri',
           lcUri: '$group.lcUri',
-          sd: {
-            type: '$group.sd.type',
-            linkPath: '$group.sd.linkPath'
-          }
+          sd: '$group.sd',
         }
       }])
       .read('primaryPreferred')
@@ -54,6 +52,13 @@ function findGroupsForUser(userId) {
       .then(function(results) {
         return results;
       });
+}
+
+function findAdminGroupsForUser(user) {
+  return findGroupsForUser(user._id)
+    .then(function(groups) {
+      return securityDescriptorAdminFilter(user, groups);
+    });
 }
 
 function findRoomIdsForUserInGroup(groupId, userId) {
@@ -126,9 +131,11 @@ function findRoomIdsForUserInGroups(userId, groupIds) {
       });
 }
 
+
 /* Exports */
 module.exports = {
   findGroupsForUser: Promise.method(findGroupsForUser),
+  findAdminGroupsForUser: Promise.method(findAdminGroupsForUser),
   findRoomIdsForUserInGroup: findRoomIdsForUserInGroup,
   findRoomIdsForUserInGroups: findRoomIdsForUserInGroups,
   events: groupMembershipEvents
