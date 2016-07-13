@@ -53,6 +53,7 @@ module.exports = CommunityCreateBaseStepView.extend({
 
     this.orgCollection = options.orgCollection;
     this.repoCollection = options.repoCollection;
+    this.groupsCollection = options.groupsCollection;
 
     this.inviteCollection = new VirtualMultipleCollection([], {
       backingCollections: [
@@ -98,14 +99,14 @@ module.exports = CommunityCreateBaseStepView.extend({
     }
 
     // TODO: Invite people
-    var newGroupModel = new grouphModels.Model({
-      name: communityCreateModel.get('communityName'),
-      uri: communityCreateModel.get('communitySlug'),
-      type: type,
-      linkPath: linkPath
-    });
     var creatingGroupPromise = new Promise(function(resolve, reject) {
-      newGroupModel.save(null, {
+      this.groupsCollection.create({
+        name: communityCreateModel.get('communityName'),
+        uri: communityCreateModel.get('communitySlug'),
+        type: type,
+        linkPath: linkPath
+      }, {
+        wait: true,
         success: function(model, response) {
           resolve(response);
         },
@@ -113,7 +114,7 @@ module.exports = CommunityCreateBaseStepView.extend({
           reject(response);
         }
       });
-    });
+    }.bind(this));
 
     creatingGroupPromise.then(function(results) {
       var defaultRoomName = results && results.defaultRoom && results.defaultRoom.name;
