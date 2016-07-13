@@ -23,6 +23,7 @@ var SPARoomSwitcher = require('components/spa-room-switcher');
 var debug = require('debug-proxy')('app:router-app');
 var linkHandler = require('./components/link-handler');
 var roomListGenerator = require('./components/chat-cache/room-list-generator');
+var moment = require('moment');
 
 require('components/statsc');
 require('views/widgets/preload');
@@ -117,6 +118,14 @@ onready(function() {
     // turn backbone object to plain one so we don't modify the original
     var newTroupe = troupe.toJSON();
 
+    // Set the last access time immediately to prevent
+    // delay in hidden rooms becoming visible only
+    // once we get the server-side update
+    var liveCollectionTroupe = troupeCollections.troupes.get(troupe.id)
+    if (liveCollectionTroupe) {
+      liveCollectionTroupe.set('lastAccessTime', moment());
+    }
+
     // add the group to the troupe as if it was serialized by the server
     var groupModel = troupeCollections.groups.get(newTroupe.groupId);
     if (groupModel) {
@@ -172,7 +181,8 @@ onready(function() {
     roomCollection: troupeCollections.troupes,
     //TODO ADD THIS TO MOBILE JP 25/1/16
     orgCollection: troupeCollections.orgs,
-    repoCollection: repoCollection
+    repoCollection: repoCollection,
+    groupsCollection: troupeCollections.groups
   });
   appLayout.render();
 

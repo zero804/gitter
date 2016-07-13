@@ -15,7 +15,7 @@ var _ = require('underscore');
 var FilteredCollection = require('backbone-filtered-collection');
 
 
-var roomsSnapshot = context.getSnapshot('rooms') || [];
+var roomsSnapshot = context.getSnapshot('allRooms') || [];
 var existingRooms = roomsSnapshot.map(function(data){
   return data.lastAccessTime ? _.extend(data, { lastAccessTime: moment(data.lastAccessTime) }) : data;
 });

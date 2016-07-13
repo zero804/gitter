@@ -8,6 +8,7 @@ var context = require('utils/context');
 
 var GroupModel = Backbone.Model.extend({
   defaults: {
+    type: 'org',
     unreadItems: false,
     mentions: false,
     activity: false
@@ -21,7 +22,7 @@ var GroupCollection = LiveCollection.extend({
   client: function() {
     return realtime.getClient();
   },
-  sync: SyncMixin.sync
+  sync: SyncMixin.sync,
 });
 
 module.exports = {

@@ -110,6 +110,7 @@ function performQuery(troupeId, parsedQuery, options) {
 
   var queryRequest = {
     size: options.limit || 10,
+    from: options.skip,
     timeout: 500,
     index: 'gitter-primary',
     type: 'chat',
