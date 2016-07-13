@@ -84,7 +84,7 @@ var Behavior = Marionette.Behavior.extend({
   },
 
   onDestroy: function() {
-    this.scrollElement.removeEventListener('scroll', this.scrollHandler, false);
+    passiveEventListener.removeEventListener(this.scrollElement, 'scroll', this.scrollHandler);
   }
 });
 
