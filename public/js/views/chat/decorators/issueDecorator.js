@@ -86,11 +86,10 @@ var FooterView = Marionette.ItemView.extend({
 
 function getRoomRepo() {
   var room = context.troupe();
-  if(room.get('githubType') === 'REPO') {
-    return room.get('uri');
-  } else {
-    return '';
-  }
+  var backend = room.get('backend');
+  if (!backend || backend.type !== 'GH_REPO') return;
+
+  return backend.linkPath;
 }
 
 function createPopover(model, targetElement) {
@@ -116,9 +115,6 @@ var IssueModel = Backbone.Model.extend({
 function getGitHubIssueUrl(repo, issueNumber) {
   return 'https://github.com/' + repo + '/issues/' + issueNumber;
 }
-
-
-
 
 var decorator = {
   decorate: function(view) {

@@ -5,6 +5,7 @@ var TroupeUser = persistence.TroupeUser;
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var Promise = require('bluebird');
 var EventEmitter = require('events').EventEmitter;
+var _ = require('lodash');
 
 var groupMembershipEvents = new EventEmitter();
 
@@ -41,7 +42,11 @@ function findGroupsForUser(userId) {
           _id: '$group._id',
           name: '$group.name',
           uri: '$group.uri',
-          lcUri: '$group.lcUri'
+          lcUri: '$group.lcUri',
+          sd: {
+            type: '$group.sd.type',
+            linkPath: '$group.sd.linkPath'
+          }
         }
       }])
       .read('primaryPreferred')
@@ -51,8 +56,80 @@ function findGroupsForUser(userId) {
       });
 }
 
+function findRoomIdsForUserInGroup(groupId, userId) {
+  return TroupeUser.aggregate([
+      { $match: { userId: userId } },
+      { $project: { _id: 0, troupeId: 1 } },
+      { $lookup: {
+          from: 'troupes',
+          localField: 'troupeId',
+          foreignField: '_id',
+          as: 'troupe'
+        }
+      }, {
+        $unwind: '$troupe'
+      }, {
+        $match: {
+          'troupe.groupId': groupId
+        }
+      }, {
+        $project: {
+          _id: 0,
+          troupeId: '$troupeId'
+        }
+      }])
+      .read('secondaryPreferred')
+      .exec()
+      .then(function(results) {
+        if (!results || !results.length) {
+          return [];
+        }
+
+        return _.map(results, function(result) {
+          return result.troupeId;
+        });
+      });
+}
+
+function findRoomIdsForUserInGroups(userId, groupIds) {
+  return TroupeUser.aggregate([
+      { $match: { userId: userId } },
+      { $project: { _id: 0, troupeId: 1 } },
+      { $lookup: {
+          from: 'troupes',
+          localField: 'troupeId',
+          foreignField: '_id',
+          as: 'troupe'
+        }
+      }, {
+        $unwind: '$troupe'
+      }, {
+        $match: {
+          'troupe.groupId': { $in: groupIds }
+        }
+      }, {
+        $project: {
+          _id: 0,
+          troupeId: '$troupeId'
+        }
+      }])
+      .read('secondaryPreferred')
+      .exec()
+      .then(function(results) {
+        if (!results || !results.length) {
+          return [];
+        }
+
+        return _.map(results, function(result) {
+          return result.troupeId;
+        });
+      });
+}
+
 /* Exports */
 module.exports = {
   findGroupsForUser: Promise.method(findGroupsForUser),
+  findRoomIdsForUserInGroup: findRoomIdsForUserInGroup,
+  findRoomIdsForUserInGroups: findRoomIdsForUserInGroups,
   events: groupMembershipEvents
 };

@@ -21,30 +21,13 @@ describe('room-api', function() {
  fixtureLoader.GITTER_INTEGRATION_COLLAB_USER_ID = '20068982';
  */
   var fixture = fixtureLoader.setup({
-    deleteDocuments: {
-      User: [{
-        username: fixtureLoader.GITTER_INTEGRATION_USERNAME
-      }, {
-        username: fixtureLoader.GITTER_INTEGRATION_COLLAB_USERNAME
-      }],
-      Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() }],
-      Troupe: [
-        { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
-        { lcUri: fixtureLoader.GITTER_INTEGRATION_REPO_WITH_COLLAB.toLowerCase() }
-      ]
-    },
     user1: {
-      githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
-      username: fixtureLoader.GITTER_INTEGRATION_USERNAME,
       accessToken: 'web-internal'
     },
     user2: {
-      githubToken: fixtureLoader.GITTER_INTEGRATION_COLLAB_USER_SCOPE_TOKEN,
-      username: fixtureLoader.GITTER_INTEGRATION_COLLAB_USERNAME,
       accessToken: 'web-internal'
     },
-    group1: {
-    },
+    group1: { },
     troupe1: {
       security: 'PUBLIC',
       users: ['user1'],
@@ -89,25 +72,31 @@ describe('room-api', function() {
       });
   });
 
-  it('POST /v1/rooms/', function() {
+  it('POST /v1/rooms/ with a room', function() {
     return request(app)
       .post('/v1/rooms')
       .send({
-        uri: fixtureLoader.GITTER_INTEGRATION_REPO_WITH_COLLAB
+        uri: fixture.troupe1.uri
       })
       .set('x-access-token', fixture.user2.accessToken)
       .expect(200)
       .then(function(result) {
         var body = result.body;
-        assert.strictEqual(body.uri, fixtureLoader.GITTER_INTEGRATION_REPO_WITH_COLLAB);
+        assert.strictEqual(body.uri, fixture.troupe1.uri);
+      })
+  })
 
-        return request(app)
-          .post('/v1/rooms')
-          .send({
-            uri: fixtureLoader.GITTER_INTEGRATION_REPO_WITH_COLLAB
-          })
-          .set('x-access-token', fixture.user1.accessToken)
-          .expect(200);
+  it('POST /v1/rooms/ with a user', function() {
+    return request(app)
+      .post('/v1/rooms')
+      .send({
+        uri: fixture.user1.username
+      })
+      .set('x-access-token', fixture.user2.accessToken)
+      .expect(200)
+      .then(function(result) {
+        var body = result.body;
+        assert.strictEqual(body.user.username, fixture.user1.username);
       })
   })
 

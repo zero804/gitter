@@ -119,7 +119,8 @@ module.exports = {
           currentUser: req.user,
           includePermissions: true,
           includeProviders: true,
-          includeGroups: true
+          includeGroups: true,
+          includeBackend: true
         });
 
         return restSerializer.serializeObject(troupeId, strategy);

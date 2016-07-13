@@ -52,25 +52,9 @@ router.get('/repo-info',
   identifyRoute('repo-info'),
   require('./repo-info'));
 
-router.get('/channel-search',
-  authMiddleware,
-  identifyRoute('channel-search'),
-  require('./channel-search'));
-
-// Deprecated - remove by 15 November
-router.get('/public-repo-search',
-  authMiddleware,
-  identifyRoute('public-repo-search'),
-  require('./public-repo-search'));
-
 router.post('/private/gcm',
   authMiddleware,
   identifyRoute('gcm-registration'),
   require('./private/gcm'));
-
-router.post('/private/channels',
-  authMiddleware,
-  identifyRoute('create-channel'),
-  require('./private/create-channel'));
 
 module.exports = router;

@@ -14,6 +14,10 @@ function getExpectedForGroup(group) {
     id: group.id,
     name: group.name,
     uri: group.uri,
+    backedBy: {
+      type: group.sd.type,
+      linkPath: group.sd.linkPath
+    },
     avatarUrl: nconf.get('avatar:officialHost') + '/group/i/' + group.id,
   }];
 }
