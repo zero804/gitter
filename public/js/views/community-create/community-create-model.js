@@ -3,15 +3,18 @@
 var Backbone = require('backbone');
 var urlJoin = require('url-join');
 var stepConstants = require('./step-constants');
+//var slugAvailabilityStatusConstants = require('./slug-availability-status-constants');
+
 
 var CommunityCreateModel = Backbone.Model.extend({
-
   defaults: {
     active: false,
     stepState: stepConstants.MAIN,
 
     communityName: '',
     communitySlug: '',
+    // slugAvailabilityStatusConstants
+    communitySlugAvailabilityStatus: null,
     isUsingCustomSlug: false,
     githubOrgId: null,
     githubRepoId: null,

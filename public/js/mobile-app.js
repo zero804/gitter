@@ -62,7 +62,8 @@ onready(function() {
     //Left Menu Additions
     //roomCollection: troupeCollections.troupes
     orgCollection: troupeCollections.orgs,
-    repoCollection: repoCollection
+    repoCollection: repoCollection,
+    groupsCollection: troupeCollections.groups
   });
   appView.render();
 
