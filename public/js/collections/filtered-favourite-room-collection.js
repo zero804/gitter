@@ -18,11 +18,9 @@ var FilteredFavouriteCollection = FilteredRoomCollection.extend({
   comparator: sortAndFilters.favourites.sort,
 
   /**
-   * The base filter for this collection
+   * The base filter for this collection - all favourites
    */
-  filterFn: function(model) {
-    return model.get('favourite') && model.get('lastAccessTime');
-  },
+  filterFn: sortAndFilters.favourites.filter,
 
   visiblePredicates: {
     people: function(model) {

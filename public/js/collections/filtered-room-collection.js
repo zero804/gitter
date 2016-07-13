@@ -29,9 +29,7 @@ var FilteredRoomCollection = SimpleFilteredCollection.extend({
    * This is used to filter out what items will be
    * in this collection, hidden and visible
    */
-  filterFn: function(model) {
-    return !model.get('favourite') && model.get('lastAccessTime');
-  },
+  filterFn: sortAndFilters.recents.filter,
 
   /**
    * Predicates used for hiding items in this view
