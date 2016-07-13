@@ -1,6 +1,6 @@
 'use strict';
 
-var stepContants = {
+var stepConstants = {
   MAIN: 'main',
   GITHUB_PROJECTS: 'github-projects',
   INVITE: 'invite',
@@ -8,4 +8,4 @@ var stepContants = {
 };
 
 
-module.exports = stepContants;
+module.exports = stepConstants;

@@ -1,13 +1,19 @@
 #!/bin/bash
 
-set -e
+set -euo pipefail
 
 git fetch origin refs/notes/*:refs/notes/*
 
-PRS=$(git log master..HEAD --show-notes=pull_request_number |
+NOTE_PRS=$(git log master..HEAD --show-notes=pull_request_number |
   grep -A1 pull_request_number |
   grep -vE '(pull_request_number|--)'|
   awk '{ print $1 }')
+
+MERGED_PRS=$(git log master..HEAD |grep 'Merge pull request'|cut -d'#' -f2|cut -d\  -f1)
+
+PRS=$((for word in ${NOTE_PRS} ${MERGED_PRS}; do
+  echo "$word"
+done) | sort -u)
 
 echo "| PR | Title | Author | Changes | Changed Files |"
 echo "|----|-------|--------|---------|---------------|"
@@ -20,3 +26,16 @@ for i in ${PRS}; do
   changed_files=$(echo ${PR_BODY} | jq '.changed_files')
   echo "| #${i} | $title | @${user} | +${additions} -${deletions} | ${changed_files} |"
 done
+
+echo '
+
+## Summary of Commits'
+
+echo '```'
+git summary master..HEAD
+echo '```
+
+## Summary of all-time commits, by number of lines committed
+```'
+#git summary --line
+echo '```'

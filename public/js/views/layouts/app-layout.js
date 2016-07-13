@@ -63,8 +63,8 @@ module.exports = (function () {
     initialize: function (options) {
       this.roomCollection = options.roomCollection;
       this.orgCollection = options.orgCollection;
-      this.groupsCollection = options.groupsCollection;
       this.repoCollection = options.repoCollection;
+      this.groupsCollection = options.groupsCollection;
       this.dialogRegion = modalRegion;
 
       this.communityCreateModel = new CommunityCreateModel();
@@ -84,7 +84,8 @@ module.exports = (function () {
       return new CommunityCreateView({
         model: this.communityCreateModel,
         orgCollection: this.orgCollection,
-        repoCollection: this.repoCollection
+        repoCollection: this.repoCollection,
+        groupsCollection: this.groupsCollection
       });
     },
 
