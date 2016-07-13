@@ -1,7 +1,9 @@
 'use strict';
 
 var _ = require('underscore');
+var Promise = require('bluebird');
 var toggleClass = require('utils/toggle-class');
+var appEvents = require('utils/appevents');
 var VirtualMultipleCollection = require('../virtual-multiple-collection');
 
 var stepConstants = require('../step-constants');
@@ -50,6 +52,7 @@ module.exports = CommunityCreateBaseStepView.extend({
 
     this.orgCollection = options.orgCollection;
     this.repoCollection = options.repoCollection;
+    this.groupsCollection = options.groupsCollection;
 
     this.inviteCollection = new VirtualMultipleCollection([], {
       backingCollections: [
@@ -74,7 +77,54 @@ module.exports = CommunityCreateBaseStepView.extend({
   },
 
   onStepNext: function() {
-    // TODO: Actually create the community, sub-rooms, and invite the people
+    var communityCreateModel = this.communityCreateModel;
+
+    var type = null;
+    var linkPath = null;
+    var githubProjectModel;
+    var githubOrgId = communityCreateModel.get('githubOrgId');
+    var githubRepoId = communityCreateModel.get('githubRepoId');
+    if(githubOrgId) {
+      githubProjectModel = this.orgCollection.get(githubOrgId);
+      type = 'GH_ORG';
+    }
+    else if(githubRepoId) {
+      githubProjectModel = this.repoCollection.get(githubRepoId);
+      type = 'GH_REPO';
+    }
+
+    if(githubProjectModel) {
+      linkPath = githubProjectModel.get('uri');
+    }
+
+    // TODO: Invite people
+    var creatingGroupPromise = new Promise(function(resolve, reject) {
+      this.groupsCollection.create({
+        name: communityCreateModel.get('communityName'),
+        uri: communityCreateModel.get('communitySlug'),
+        type: type,
+        linkPath: linkPath
+      }, {
+        wait: true,
+        success: function(model, response) {
+          resolve(response);
+        },
+        error: function(model, response) {
+          reject(response);
+        }
+      });
+    }.bind(this));
+
+    creatingGroupPromise.then(function(results) {
+      var defaultRoomName = results && results.defaultRoom && results.defaultRoom.name;
+      var defaultRoomUri = results && results.defaultRoom && results.defaultRoom.uri;
+
+      appEvents.trigger('navigation', '/' + defaultRoomUri, 'chat', defaultRoomName);
+      // Hide create community
+      //communityCreateModel.set('active', false);
+      communityCreateModel.clear().set(communityCreateModel.defaults);
+    });
+
   },
   onStepBack: function() {
     this.communityCreateModel.set('stepState', stepConstants.INVITE);
