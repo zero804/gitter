@@ -10,7 +10,6 @@ var stepConstants = require('../step-constants');
 var template = require('./community-creation-overview-view.hbs');
 var CommunityCreateBaseStepView = require('../shared/community-creation-base-step-view');
 var CommunityCreationPeopleListView = require('../shared/community-creation-people-list-view');
-var grouphModels = require('collections/groups');
 
 require('gitter-styleguide/css/components/headings.css');
 require('gitter-styleguide/css/components/buttons.css');
