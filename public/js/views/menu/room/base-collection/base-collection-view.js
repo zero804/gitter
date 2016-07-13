@@ -5,7 +5,6 @@ var fastdom = require('fastdom');
 var template = require('./base-collection-view.hbs');
 var context = require('utils/context');
 var toggleClass = require('utils/toggle-class');
-var parseItemForTemplate = require('gitter-web-shared/parse/left-menu-primary-item');
 
 module.exports = Marionette.CompositeView.extend({
 
@@ -77,12 +76,14 @@ module.exports = Marionette.CompositeView.extend({
     //We have to explicitly check for false because search
     //results come through with `exists: false` for rooms yet to be created
     //whereas on room models `exists: undefined` :( JP 10/3/16
-    if (model.get('exists') === false) {
-      return this._openCreateRoomDialog(name);
+    // org-items have `room`, not exists
+    if (model.get('room') || model.get('exists') !== false) {
+      //default trigger navigation to an existing room
+      this._triggerNavigation(url, 'chat', name);
+      return;
     }
 
-    //default trigger navigation to an existing room
-    this._triggerNavigation(url, 'chat', name);
+    return this._openCreateRoomDialog(name);
   },
 
   onFilterComplete: function() {

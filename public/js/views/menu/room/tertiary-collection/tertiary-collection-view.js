@@ -4,8 +4,6 @@ var _ = require('underscore');
 var urlJoin = require('url-join');
 var Marionette = require('backbone.marionette');
 var toggleClass = require('utils/toggle-class');
-var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
-var roomNameShortener = require('gitter-web-shared/room-name-shortener');
 var BaseCollectionView = require('../base-collection/base-collection-view');
 var BaseCollectionItemView = require('../base-collection/base-collection-item-view');
 var EmptySearchView = require('./tertiary-collection-item-search-empty-view');
@@ -71,22 +69,11 @@ module.exports = BaseCollectionView.extend({
 
   onItemActivated: function() {
     switch (this.roomMenuModel.get('state')) {
-      case 'all':
-        return this.onOrgItemClicked.apply(this, arguments);
       case 'search':
         return this.onSearchItemClicked.apply(this, arguments);
       default:
         return proto.onItemActivated.apply(this, arguments);
     }
-  },
-
-  onOrgItemClicked: function(view) {
-    var existingRoom = this.roomCollection.findWhere({ name: view.model.get('name') });
-    if (!existingRoom) {
-      return this._openCreateRoomDialog(view.model.get('name'));
-    }
-
-    proto.onItemActivated.apply(this, arguments);
   },
 
   onSearchItemClicked: function(view) {
