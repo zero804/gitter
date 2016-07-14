@@ -104,8 +104,14 @@ router.post('/markdown-preview',
   require('./markdown-preview'));
 
 router.get('/inviteUserSuggestions',
+  authMiddleware,
   identifyRoute('api-private-invite-user-suggestions'),
   require('./invite-user-suggestions'));
+
+router.get('/check-invite',
+  authMiddleware,
+  identifyRoute('api-private-check-invite'),
+  require('./check-invite'));
 
 router.get('/check-group-uri',
   authMiddleware,
