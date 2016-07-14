@@ -7,9 +7,6 @@ var gulp = require('gulp');
 var through = require('through2');
 var gutil = require('gulp-util');
 var runSequence = require('run-sequence');
-var debug = require('gulp-debug');
-
-var livereload = require('gulp-livereload');
 var sourcemaps = require('gulp-sourcemaps');
 
 var postcss = require('gulp-postcss');
@@ -26,24 +23,20 @@ var brotli = require('gulp-brotli');
 var mocha = require('gulp-spawn-mocha');
 var using = require('gulp-using');
 var tar = require('gulp-tar');
-var expect = require('gulp-expect-file');
 var git = require('gulp-git');
 
 var shell = require('gulp-shell');
-var grepFail = require('gulp-grep-fail');
 var jsonlint = require('gulp-jsonlint');
 var uglify = require('gulp-uglify');
-var coveralls = require('gulp-coveralls');
+var codecov = require('gulp-codecov');
 var lcovMerger = require('lcov-result-merger');
-var through = require('through2');
-var utimes  = require('fs').utimes;
+var utimes = require('fs').utimes;
 
 var fs = require('fs-extra');
 var path = require('path');
 var mkdirp = require('mkdirp');
 var del = require('del');
 var glob = require('glob');
-var url = require('url');
 var github = require('gulp-github');
 var eslintFilter = require('./build-scripts/eslint-filter');
 
@@ -274,30 +267,22 @@ gulp.task('merge-lcov', function() {
     .pipe(gulp.dest('output/coverage-reports/merged/'));
 });
 
-gulp.task('submit-coveralls-post-tests', ['merge-lcov'], function() {
-  var GIT_BRANCH = process.env.GIT_BRANCH;
-  if (GIT_BRANCH) {
-    // Make coveralls play nice with Jenkins (lame)
-    process.env.GIT_BRANCH = GIT_BRANCH.replace(/^origin\//,'');
-  }
+gulp.task('submit-codecov-post-tests', ['merge-lcov'], function() {
+  process.env.CODECOV_TOKEN = "4d30a5c7-3839-4396-a2fd-d8f9a68a5c3a";
 
   return gulp.src('output/coverage-reports/merged/lcov.info')
-    .pipe(coveralls())
+    .pipe(codecov())
     .on('error', function(err) {
       gutil.log(err);
-      process.env.GIT_BRANCH = GIT_BRANCH;
       this.emit('end');
-    })
-    .on('end', function() {
-      process.env.GIT_BRANCH = GIT_BRANCH;
     });
 });
 
-gulp.task('submit-coveralls', ['test-mocha'/*, 'test-redis-lua'*/], function(callback) {
-  runSequence('submit-coveralls-post-tests', callback);
+gulp.task('submit-codecov', ['test-mocha'/*, 'test-redis-lua'*/], function(callback) {
+  runSequence('submit-codecov-post-tests', callback);
 });
 
-gulp.task('test', ['test-mocha'/*, 'test-redis-lua'*/, 'submit-coveralls']);
+gulp.task('test', ['test-mocha'/*, 'test-redis-lua'*/, 'submit-codecov']);
 
 makeTestTasks('localtest', function(name, files, options) {
   return gulp.src(files, { read: false })
@@ -350,7 +335,7 @@ makeTestTasks('localtest-coverage', function(name, files, options) {
     }));
 });
 
-makeTestTasks('fasttest', function(name, files, options) {
+makeTestTasks('fasttest', function(name, files /*, options*/) {
   return gulp.src(files, { read: false })
     .pipe(mocha({
       reporter: 'spec',
@@ -383,7 +368,7 @@ gulp.task('copy-app-files', function() {
       'shared/**',
       'redis-lua/**',
       'modules/**'
-    ], { "base" : "." })
+    ], { base: "." })
     .pipe(gulp.dest('output/app'));
 });
 
@@ -437,7 +422,7 @@ gulp.task('copy-asset-files', function() {
       'public/images/**',
       'public/sprites/**',
       'public/repo/**'
-    ], { "base" : "./public" })
+    ], { base: "./public" })
     .pipe(gulp.dest('output/assets'))
     .pipe(restoreOriginalFileTimestamps());
 });
@@ -584,20 +569,12 @@ gulp.task('css-web', function() {
 
 
 gulp.task('css', function() {
-  var overrideOpts = {
-    watch: false
-  };
-
   return Promise.all([
     cssIosStyleBuilder.build(),
     cssMobileStyleBuilder.build(),
     cssWebStyleBuilder.build()
   ]);
 });
-
-
-
-
 
 gulp.task('webpack', function() {
   return gulp.src('./public/js/webpack.config')
@@ -741,7 +718,10 @@ gulp.task('embedded-copy-asset-files', function() {
       'public/images/**',
       // 'public/sprites/**',
       'public/repo/katex/**',
-    ], { "base" : "./public", stat: true })
+    ], {
+      base: "./public",
+      stat: true
+    })
     .pipe(gulp.dest('output/assets'));
 });
 
