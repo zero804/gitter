@@ -77,7 +77,8 @@ var CommunityCreateView = Marionette.LayoutView.extend({
       model: this.overviewStepViewModel,
       communityCreateModel: this.model,
       orgCollection: this.orgCollection,
-      repoCollection: this.repoCollection
+      repoCollection: this.repoCollection,
+      groupsCollection: this.groupsCollection
     }));
     return this.overviewStepView;
   },
@@ -106,6 +107,8 @@ var CommunityCreateView = Marionette.LayoutView.extend({
     this.repoCollection = new ActiveCollection(repoCollection.models, {
       collection: repoCollection
     });
+
+    this.groupsCollection = options.groupsCollection;
 
     this.mainStepViewModel = new CommunityCreatMainStepViewModel({
       communityCreateModel: this.model,

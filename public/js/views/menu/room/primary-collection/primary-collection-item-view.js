@@ -96,7 +96,7 @@ module.exports = BaseCollectionItemView.extend({
         this.el.classList.remove('room-item--favourite-one2one');
       }
     } else {
-      if (!!model.get('favourite')) {
+      if (model.get('favourite')) {
         this.el.classList.remove('room-item');
         this.el.classList.add('room-item--favourite');
       } else {
@@ -108,6 +108,9 @@ module.exports = BaseCollectionItemView.extend({
 
   onHideClicked: function(e) {
     e.stopPropagation();
+
+    // Hide the room in the UI immediately
+    this.model.set('lastAccessTime', null);
 
     //TODO figure out why this throws an error.
     //implementation is exactly the same as on develop?
@@ -139,7 +142,8 @@ module.exports = BaseCollectionItemView.extend({
     //TODO Figure out why there is soooo much rendering JP 5/2/16
     if (!Object.keys(this.model.changed)) { return; }
 
-    BaseCollectionItemView.prototype.render.apply(this, arguments);
+    // Using call since render never has any arguments and `.call` is much faster
+    BaseCollectionItemView.prototype.render.call(this);
   },
 
   onRender: function (){

@@ -561,17 +561,25 @@
     position: absolute;
     right: 0;
 
-    content: '\e81a';
+    content: '';
     font-family: 'fontello';
-
-    color: transparent;
 
     transition: color .2s ease;
   }
 
-  &:hover {
+  &.pending {
     &:after {
-      color: rgba(255, 255, 255, 0.5);
+      content: '\e80b';
+    }
+  }
+  &.available {
+    &:after {
+      content: '\e804';
+    }
+  }
+  &.unavailable {
+    &:after {
+      content: '\e817';
     }
   }
 }
