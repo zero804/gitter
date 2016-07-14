@@ -15,7 +15,10 @@ var validateRoomName = require('gitter-web-validators/lib/validate-room-name');
  * @private
  */
 function validateRoomSecurity(type, security) {
-  return (security === 'PUBLIC' || security === 'PRIVATE');
+  if (security === 'PUBLIC' || security === 'PRIVATE') {
+    return true;
+  }
+  return false;
 }
 
 /**

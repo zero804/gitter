@@ -38,9 +38,12 @@ var View = Marionette.LayoutView.extend({
     permissions: '#permissions',
     permPublic: '#perm-select-public',
     permPrivate: '#perm-select-private',
+    permInheritedOrg: '#perm-select-inherited-org',
+    permInheritedRepo: '#perm-select-inherited-repo',
     validation: '#modal-failure',
     existing: '#existing',
     orgNameLabel: '#org-name',
+    repoNameLabel: '#repo-name',
     roomNameInput: '#room-name',
     dropDownButton: '#dd-button',
   },
@@ -121,8 +124,7 @@ var View = Marionette.LayoutView.extend({
       return;
     }
 
-    // TODO: this will be GH_REPO too
-    if (permissions === 'inherited' && groupType !== 'GH_ORG') {
+    if (permissions === 'inherited' && groupType !== 'GH_ORG' && groupType !== 'GH_REPO') {
       self.showValidationMessage('Please select the permissions for the room');
       return;
     }
@@ -140,14 +142,29 @@ var View = Marionette.LayoutView.extend({
     }
 
     var apiUrl = '/v1/groups/' + groupId + '/rooms';
-    var payload = {
-      name: roomName,
-      security: {
-        type: groupType, // null or GH_ORG or GH_REPO
-        security: permissions.toUpperCase(),
-        linkPath: (groupType) ? groupLinkPath : null
-      }
-    };
+    var security = permissions.toUpperCase();
+    var payload;
+    if (security === 'PUBLIC' || security === 'INHERITED') {
+      payload = {
+        name: roomName,
+        security: {
+          type: groupType, // null or GH_ORG or GH_REPO
+          // the backend only understands PUBLIC or PRIVATE. INHERITED is what
+          // it understands as a PRIVATE GH_GROUP or GH_REPO room.
+          security: (security === 'PUBLIC') ? 'PUBLIC' : 'PRIVATE',
+          linkPath: (groupType !== null) ? groupLinkPath : null
+        }
+      };
+    } else {
+      // PRIVATE rooms don't have a backing object regardless of the group
+      payload = {
+        name: roomName,
+        security: {
+          type: null,
+          security: 'PRIVATE',
+        }
+      };
+    }
     return apiClient.post(apiUrl, payload)
       .then(function(data) {
         self.dialog.hide();
@@ -194,6 +211,8 @@ var View = Marionette.LayoutView.extend({
       'permissions': false,
       'permPublic': false,
       'permPrivate': false,
+      'permInheritedOrg': false,
+      'permInheritedRepo': false,
       'existing': false,
     };
 
@@ -202,24 +221,24 @@ var View = Marionette.LayoutView.extend({
 
     var checkForRepo;
     var createButtonEnabled;
-    var roomName;
-    var groupUri;
-    var groupBackedBy;
-    var groupType;
-    var orgName;
 
     if (group) {
       createButtonEnabled = true;
-      roomName = this.ui.roomNameInput.val();
-      groupUri = group.get('uri');
-      groupBackedBy = group.get('backedBy');
-      groupType = groupBackedBy.type;
-      orgName = groupBackedBy.linkPath || '';
+      var roomName = this.ui.roomNameInput.val();
+      var groupUri = group.get('uri');
+      var groupBackedBy = group.get('backedBy');
+      var groupType = groupBackedBy.type;
+      var orgName = groupBackedBy.linkPath || '';
+      var repoName = groupBackedBy.linkPath || '';
 
-      // TODO: make this work for repo-based groups too
       if (groupType === 'GH_ORG') {
-        // rooms inside github org/repo-based groups can have inherited permissions
-        ['permissions', 'permPublic', 'permPrivate'].forEach(function (f) { showHide[f] = true; });
+        // rooms inside github org based groups can have inherited permissions
+        ['permissions', 'permPublic', 'permPrivate', 'permInheritedOrg'].forEach(function (f) { showHide[f] = true; });
+        checkForRepo = roomName && groupUri + '/' + roomName;
+
+      } else if (groupType === 'GH_REPO') {
+        // rooms inside github repo based groups can have inherited permissions
+        ['permissions', 'permPublic', 'permPrivate', 'permInheritedRepo'].forEach(function (f) { showHide[f] = true; });
         checkForRepo = roomName && groupUri + '/' + roomName;
 
       } else {
@@ -238,6 +257,8 @@ var View = Marionette.LayoutView.extend({
           'permissions': false,
           'permPublic': false,
           'permPrivate': false,
+          'permInheritedOrg': false,
+          'permInheritedRepo': false,
           'existing': true
         };
         checkForRepo = null;
@@ -257,6 +278,8 @@ var View = Marionette.LayoutView.extend({
             'permissions': false,
             'permPublic': false,
             'permPrivate': false,
+            'permInheritedOrg': false,
+            'permInheritedRepo': false,
             'existing': false
           };
           self.showValidationMessage('You cannot create a channel with this name as a repo with the same name already exists.');
@@ -288,15 +311,14 @@ var View = Marionette.LayoutView.extend({
       if(animated === false) {
         arrayToJq(true).removeClass('hide');
         arrayToJq(false).addClass('hide');
-        self.ui.roomNameInput.attr('placeholder', placeholder);
-        self.ui.orgNameLabel.text(orgName);
       } else {
         arrayToJq(true).filter(':hidden').removeClass('hide');
         arrayToJq(false).filter(':visible').addClass('hide');
-        self.ui.orgNameLabel.text(orgName);
-        self.ui.roomNameInput.attr('placeholder', placeholder);
       }
     }
+    self.ui.orgNameLabel.text(orgName);
+    self.ui.repoNameLabel.text(repoName);
+    self.ui.roomNameInput.attr('placeholder', placeholder);
   },
 
   onRender: function() {
