@@ -286,7 +286,7 @@ var HeaderView = Marionette.ItemView.extend({
     toggleClass(this.ui.topicWrapper[0], 'is-editing', true);
     toggleClass(this.ui.topic[0], 'is-editing', true);
     // create inputview
-    this.ui.topic.html('<textarea class=\'topic-input\'></textarea>');
+    this.ui.topic.html('<textarea class="topic-input"></textarea>');
 
     var textarea = this.ui.topic.find('textarea').val(unsafeText);
 
