@@ -11,10 +11,10 @@ compress_dir() {
   cd ${dir_name}
   pwd
 
-  # zopflipng -m --iterations=15 --filters=0meb --prefix=zop_ *.png
-  zopflipng --prefix=zop_ *.png
+  zopflipng -m --iterations=15 --filters=0meb --prefix=zop_ *.png
+  # zopflipng --prefix=zop_ *.png
   for i in zop_*.png; do
-    mv ${i} ${i#zop_}
+    mv -- "${i}" "${i#zop_}"
   done
   popd
 }
