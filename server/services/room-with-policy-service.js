@@ -302,6 +302,37 @@ RoomWithPolicyService.prototype.createRoomInvitation = secureMethod([allowAddUse
   });
 });
 
+RoomWithPolicyService.prototype.createRoomInvitations = secureMethod([allowAddUser], function(invites) {
+  var room = this.room;
+  var user = this.user;
+  return Promise.map(invites, function(invite) {
+    var type = invite.type;
+    var externalId = invite.externalId;
+    var emailAddress = invite.emailAddress;
+
+    return roomInviteService.createInvite(room, user, {
+        type: type,
+        externalId: externalId,
+        emailAddress: emailAddress
+      })
+      .catch(StatusError, function(err) {
+        /*
+        NOTE: We intercept some errors so that one failed invite doesn't fail
+        everything and then pass information on about that error so it can
+        ultimately  be returned to the client. Are there are kinds of errors we
+        should be intercepting? Probably not safe to intercept ALL errors.
+
+        Many (most?) of these would have been caught if the frontend used the
+        check avatar API like it should, so it shouldn't be too likely anyway.
+        */
+        return {
+          status: 'error', // as opposed to 'invited' or 'added'
+          statusCode: err.status
+        }
+      });
+  });
+});
+
 /**
  * Add an existing Gitter user to a room
  */
