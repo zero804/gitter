@@ -44,7 +44,8 @@ module.exports = {
             path.resolve(__dirname, '../../shared/handlebars/helpers')
           ],
           knownHelpers: [
-            'cdn'
+            'cdn',
+            'avatarSrcSet'
           ],
           partialsRootRelative: path.resolve(__dirname, '../../public/templates/partials') + path.sep
         }

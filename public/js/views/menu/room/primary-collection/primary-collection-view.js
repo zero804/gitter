@@ -137,7 +137,7 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     this.stopListening(this.model);
     this.stopListening(this.dndCtrl);
     this.stopListening(this.collection);
-  },
+  }
 
 });
 

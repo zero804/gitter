@@ -8,13 +8,16 @@ var ProxyCollection = require('backbone-proxy-collection');
 var RecentSearchesCollection = require('../collections/recent-searches');
 var SuggestedOrgCollection = require('../collections/org-suggested-rooms');
 var apiClient = require('components/apiClient');
+var context = require('utils/context');
+
+var FilteredMinibarGroupCollection = require('../collections/filtered-minibar-group-collection');
 var FilteredRoomCollection = require('../collections/filtered-room-collection');
+var FilteredFavouriteRoomCollection = require('../collections/filtered-favourite-room-collection');
 var SuggestedRoomsByRoomCollection = require('../collections/left-menu-suggested-by-room');
 var UserSuggestions = require('../collections/user-suggested-rooms');
 var SearchRoomPeopleCollection = require('../collections/left-menu-search-rooms-and-people');
 var SearchChatMessages = require('../collections/search-chat-messages');
-var context = require('utils/context');
-var FilteredFavouriteRoomCollection = require('../collections/filtered-favourite-room-collection');
+
 var FavouriteCollectionModel = require('../views/menu/room/favourite-collection/favourite-collection-model');
 var PrimaryCollectionModel = require('../views/menu/room/primary-collection/primary-collection-model');
 var SecondaryCollectionModel = require('../views/menu/room/secondary-collection/secondary-collection-model');
@@ -105,6 +108,7 @@ module.exports = Backbone.Model.extend({
     this.minibarHomeModel = new MinibarItemModel({ name: 'all', type: 'all', active: (state === 'all') });
     this.minibarSearchModel = new MinibarItemModel({ name: 'search', type: 'search', active: (state === 'search') });
     this.minibarPeopleModel = new MinibarPeopleModel({ active: (state === 'people')}, { roomCollection: this._roomCollection });
+    this.minibarCommunityCreateModel = new MinibarItemModel({ name: 'Create Community', type: 'community-create' });
     this.minibarCloseModel = new MinibarItemModel({ name: 'close', type: 'close' });
     this.minibarTempOrgModel = new MinibarTempOrgModel(attrs.tempOrg, { troupe: context.troupe(), });
 
@@ -113,7 +117,10 @@ module.exports = Backbone.Model.extend({
     });
 
     this.groupsCollection.add(minibarModels);
-    this.minibarCollection = this.groupsCollection;
+    this.minibarCollection = new FilteredMinibarGroupCollection(null, {
+      collection: this.groupsCollection
+    });
+
 
     this.activeRoomCollection = new FilteredRoomCollection(null, {
       roomModel:  this,
