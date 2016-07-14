@@ -7,7 +7,7 @@ PATH := ./node_modules/.bin:$(PATH)
 validate: npm
 	gulp validate
 
-build: clean npm validate test test-lua submit-to-coveralls package
+build: clean npm validate test test-lua submit-to-codecov package
 
 test-lua:
 	echo lua tests disabled #gulp test-redis-lua
@@ -15,8 +15,8 @@ test-lua:
 package: npm
 	gulp package
 
-submit-to-coveralls: npm test
-	gulp submit-coveralls-post-tests
+submit-to-codecov: npm test
+	gulp submit-codecov-post-tests
 
 clean:
 	rm -rf output
