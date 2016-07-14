@@ -165,6 +165,15 @@ describe('restful #slow', function() {
     });
   });
 
+  describe('serializeAdminGroupsForUser', function() {
+    it('should do what it says on the tin', function() {
+      return restful.serializeAdminGroupsForUser(fixture.user1)
+        .then(function(result) {
+          assert.deepEqual(result, []);
+        });
+    });
+  });
+
   describe('serializeRoomsForGroupId', function() {
     var fixture = fixtureLoader.setup({
       group1: {},
