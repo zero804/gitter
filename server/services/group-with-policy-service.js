@@ -6,6 +6,7 @@ var assert = require('assert');
 var StatusError = require('statuserror');
 var ensureAccessAndFetchDescriptor = require('gitter-web-permissions/lib/ensure-access-and-fetch-descriptor');
 var Troupe = require('gitter-web-persistence').Troupe;
+var Group = require('gitter-web-persistence').Group;
 var debug = require('debug')('gitter:app:group-with-policy-service');
 var roomService = require('./room-service');
 var secureMethod = require('../utils/secure-method');
@@ -104,5 +105,22 @@ GroupWithPolicyService.prototype.createRoom = secureMethod([allowAdmin], functio
     });
 });
 
+GroupWithPolicyService.prototype.setAvatar = secureMethod([allowAdmin], function(url) {
+  var user = this.user;
+  var group = this.group;
+
+  var query  = { _id: group._id };
+
+  var update = {
+    $set: {
+      avatarUrl: url
+    },
+    $inc: {
+      avatarVersion: 1
+    }
+  };
+
+  return Group.findOneAndUpdate(query, update).exec();
+});
 
 module.exports = GroupWithPolicyService;
