@@ -3,8 +3,10 @@
 var _ = require('underscore');
 var Backbone = require('backbone');
 var VirtualMultipleCollection = require('../virtual-multiple-collection');
+var apiClient = require('components/apiClient');
 
 var stepConstants = require('../step-constants');
+var peopleToInviteStatusConstants = require('../people-to-invite-status-constants');
 var template = require('./community-creation-invite-people-view.hbs');
 var CommunityCreateBaseStepView = require('../shared/community-creation-base-step-view');
 var CommunityCreationPeopleListView = require('../shared/community-creation-people-list-view');
@@ -43,7 +45,8 @@ module.exports = CommunityCreateBaseStepView.extend({
     this.inviteListView = new CommunityCreationPeopleListView(optionsForRegion({
       collection: this.inviteCollection,
       model: new Backbone.Model({
-        canRemove: true
+        canRemove: true,
+        canEditEmail: true
       })
     }));
     this.listenTo(this.inviteListView, 'person:remove', this.onPersonRemoved, this);
@@ -77,7 +80,9 @@ module.exports = CommunityCreateBaseStepView.extend({
     this.userResultCollection = new UserResultCollection(null, {
       stepViewModel: this.model,
       searchModel: this.searchModel,
-      communityCreateModel: this.communityCreateModel
+      communityCreateModel: this.communityCreateModel,
+      orgCollection: this.orgCollection,
+      repoCollection: this.repoCollection
     })
 
     this.inviteCollection = new VirtualMultipleCollection([], {
@@ -104,7 +109,29 @@ module.exports = CommunityCreateBaseStepView.extend({
   },
 
   onPersonSelected: function(person) {
-    this.communityCreateModel.peopleToInvite.add(person);
+    // We want the defaults added to the model as well
+    var newPerson = this.communityCreateModel.peopleToInvite.add(person.toJSON());
+    var checkInviteParams = {
+      githubUsername: newPerson.get('githubUsername'),
+      twitterUsername: newPerson.get('twitterUsername'),
+      emailAddress: newPerson.get('emailAddress')
+    };
+    // TODO: Make this more robust
+    // Currently using workaround for search endpoint, https://github.com/troupe/gitter-webapp/issues/1759#issuecomment-231992894
+    if(newPerson.get('id')) {
+      checkInviteParams.username = newPerson.get('username');
+    }
+    else if(!checkInviteParams.githubUsername) {
+      checkInviteParams.githubUsername = newPerson.get('username');
+    }
+
+    apiClient.priv.get('/check-invite', checkInviteParams)
+      .then(function() {
+        newPerson.set('inviteStatus', peopleToInviteStatusConstants.READY);
+      })
+      .catch(function() {
+        newPerson.set('inviteStatus', peopleToInviteStatusConstants.NEEDS_EMAIL);
+      });
   },
 
   onPersonRemoved: function(person) {

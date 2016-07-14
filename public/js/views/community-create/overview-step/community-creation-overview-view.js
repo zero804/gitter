@@ -97,13 +97,13 @@ module.exports = CommunityCreateBaseStepView.extend({
       linkPath = githubProjectModel.get('uri');
     }
 
-    // TODO: Invite people
     var creatingGroupPromise = new Promise(function(resolve, reject) {
       this.groupsCollection.create({
         name: communityCreateModel.get('communityName'),
         uri: communityCreateModel.get('communitySlug'),
         type: type,
-        linkPath: linkPath
+        linkPath: linkPath,
+        invites: [].concat(communityCreateModel.peopleToInvite.toJSON(), communityCreateModel.emailsToInvite.toJSON())
       }, {
         wait: true,
         success: function(model, response) {

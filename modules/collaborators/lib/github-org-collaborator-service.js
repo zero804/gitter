@@ -3,6 +3,7 @@
 var OrgService = require('gitter-web-github').GitHubOrgService;
 var _ = require('lodash');
 var avatars = require('gitter-web-avatars');
+var identityService = require('gitter-web-identity');
 
 function withoutCurrentUser(users, user) {
   if (!users || !users.length) return [];
@@ -27,7 +28,8 @@ GitHubOrgCollaboratorService.prototype.findCollaborators = function() {
         return {
           displayName: member.login,
           githubUsername: member.login,
-          avatarUrl: avatars.getForGitHubUsername(member.login)
+          avatarUrl: avatars.getForGitHubUsername(member.login),
+          type: identityService.GITHUB_IDENTITY_PROVIDER
         }
       });
     });
