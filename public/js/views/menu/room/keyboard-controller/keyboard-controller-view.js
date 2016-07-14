@@ -88,12 +88,14 @@ var KeyboardController = Marionette.ItemView.extend({
 
   onMinibarOrgSelected: function (e){
     this.blurAllItems();
-    var index = e.key;
-    if(index === 0) { index = 10; } // 0 key triggers room.10
+    // On Windows, `e.key` will be the symbols because `shift` is used
+    var keyIndex = parseInt(e.code.replace('Digit', ''), 10);
+    if(keyIndex === 0) { keyIndex = 10; } // 0 key triggers room.10
     // we have room.1 ~ room.3 triggering home/search/people so we have to account for that with indexing here
-    index = index - 4;
-    index = arrayBoundWrap(index, this.minibarCollection.length);
-    var model = this.minibarCollection.at(index);
+    var index = keyIndex - 4;
+    var collection = this.minibarCollection;
+    index = arrayBoundWrap(index, collection.length);
+    var model = collection.at(index);
     model.set('focus', true);
     this.setModelState({ state: 'org', selectedOrgName: model.get('name') });
   },
