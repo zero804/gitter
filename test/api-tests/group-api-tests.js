@@ -128,7 +128,7 @@ describe('group-api', function() {
         name: fixtureLoader.GITTER_INTEGRATION_REPO,
         topic: 'all about testing',
         security: {
-          security: 'PUBLIC',
+          security: 'PRIVATE',
           type: 'GH_REPO',
           linkPath: fixtureLoader.GITTER_INTEGRATION_USERNAME + '/' + fixtureLoader.GITTER_INTEGRATION_REPO
         }
