@@ -218,12 +218,12 @@ var View = Marionette.LayoutView.extend({
 
     var placeholder = "Required";
     var group = this.selectedGroup;
+
     var checkForRepo;
-    var groupName = "";
-    var createButtonEnabled = true;
+    var createButtonEnabled;
 
     if (group) {
-      groupName = group.get('name');
+      createButtonEnabled = true;
       var roomName = this.ui.roomNameInput.val();
       var groupUri = group.get('uri');
       var groupBackedBy = group.get('backedBy');

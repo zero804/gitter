@@ -1,12 +1,9 @@
 "use strict";
 
 var Marionette = require('backbone.marionette');
-var context = require('utils/context');
 var template = require('./tmpl/groupSelectView.hbs');
 var itemTemplate = require('./tmpl/parentItemView.hbs');
 var Typeahead = require('views/controls/typeahead');
-var Backbone = require('backbone');
-var cdn = require('gitter-web-cdn');
 
 module.exports = (function() {
   return Marionette.ItemView.extend({
