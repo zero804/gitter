@@ -207,6 +207,23 @@ function serializeGroupsForUserId(userId, options) {
     });
 }
 
+function serializeAdminGroupsForUser(user, options) {
+  if (!user) return [];
+
+  return groupMembershipService.findAdminGroupsForUser(user)
+    .then(function(groups) {
+      if (!groups || !groups.length) return [];
+
+      var strategy = new restSerializer.GroupStrategy({
+        currentUserId: user._id,
+        currentUser: user,
+        lean: options && options.lean
+      });
+
+      return restSerializer.serialize(groups, strategy);
+    });
+}
+
 function serializeRoomsForGroupId(groupId, userId) {
   return groupService.findRoomsIdForGroup(groupId, userId)
     .then(function(allTroupeIds) {
@@ -229,5 +246,6 @@ module.exports = {
   serializeOrgsForUserId: serializeOrgsForUserId,
   serializeProfileForUsername: serializeProfileForUsername,
   serializeGroupsForUserId: Promise.method(serializeGroupsForUserId),
+  serializeAdminGroupsForUser: Promise.method(serializeAdminGroupsForUser),
   serializeRoomsForGroupId: serializeRoomsForGroupId
 }

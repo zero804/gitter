@@ -64,6 +64,13 @@ describe('group-api', function() {
       .expect(200)
   });
 
+  it('GET /v1/groups?type=admin', function() {
+    return request(app)
+      .get('/v1/groups?type=admin')
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+  });
+
   it('POST /v1/groups (new style community)', function() {
     return request(app)
       .post('/v1/groups')
