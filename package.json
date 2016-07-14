@@ -205,7 +205,6 @@
     "gulp": "^3.8.11",
     "gulp-brotli": "^1.1.0",
     "gulp-codecov": "^2.0.2",
-    "gulp-coveralls": "^0.1.4",
     "gulp-eslint": "^2.0.0",
     "gulp-git": "^0.5.4",
     "gulp-github": "^0.3.4",
