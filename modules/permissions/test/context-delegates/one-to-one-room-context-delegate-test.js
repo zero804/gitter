@@ -8,9 +8,7 @@ describe('one-to-one-room-context-delegate', function() {
 
   describe('integration tests #slow', function() {
 
-    var fixture = {};
-
-    before(fixtureLoader(fixture, {
+    var fixture = fixtureLoader.setup({
       user1: {},
       user2: {},
       user3: {},
@@ -21,9 +19,7 @@ describe('one-to-one-room-context-delegate', function() {
       troupe1: {
         users: ['user1']
       }
-    }));
-
-    after(function() { fixture.cleanup(); });
+    });
 
     it('should work with users in the room', function() {
       var delegate = new OneToOneRoomContextDelegate(fixture.user1._id, fixture.troupeOneToOne._id);
