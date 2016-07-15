@@ -23,7 +23,7 @@ var troupeCollection = new troupeModels.TroupeCollection(existingRooms, { listen
 
 
 var groupCollection;
-groupCollection = new groupModels.GroupCollection([], { listen: true });
+groupCollection = new groupModels.Collection([], { listen: true });
 groupCollection.on('error', errorHandle.bind(null, 'group-collection'));
 
 // Adapt unread items to the groups collection

@@ -10,32 +10,10 @@ var Promise = require('bluebird');
 var collections = require("../../utils/collections");
 var GithubContributorService = require('gitter-web-github').GitHubContributorService;
 var getVersion = require('../get-model-version');
-var billingService = require('../../services/billing-service');
 var leanUserDao = require('../../services/daos/user-dao').full;
 var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 var userScopes = require('gitter-web-identity/lib/user-scopes');
-
-function UserPremiumStatusStrategy() {
-  var usersWithPlans;
-
-  this.preload = function(userIds) {
-    return billingService.findActivePersonalPlansForUsers(userIds.toArray())
-      .then(function(subscriptions) {
-        usersWithPlans = subscriptions.reduce(function(memo, s) {
-          memo[s.userId] = true;
-          return memo;
-        }, {});
-      });
-  };
-
-  this.map = function(userId) {
-    return usersWithPlans[userId];
-  };
-}
-
-UserPremiumStatusStrategy.prototype = {
-  name: 'UserPremiumStatusStrategy'
-};
+var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
 
 function UserRoleInTroupeStrategy(options) {
   var contributors;
@@ -54,7 +32,8 @@ function UserRoleInTroupeStrategy(options) {
         if (!troupe) return;
 
         /* Only works for repos */
-        if (troupe.githubType !== 'REPO') return;
+        var linkPath = securityDescriptorUtils.getLinkPathIfType('GH_REPO', troupe);
+        if (!linkPath) return;
         var userPromise;
 
         if (options.currentUser) {
@@ -67,12 +46,23 @@ function UserRoleInTroupeStrategy(options) {
           return userPromise.then(function(user) {
             /* Need a user to perform the magic */
             if (!user) return;
-            var uri = troupe.uri;
-            ownerLogin = uri.split('/')[0];
+            ownerLogin = linkPath.split('/')[0];
 
             var contributorService = new GithubContributorService(user);
-            return contributorService.getContributors(uri)
+            return contributorService.getContributors(linkPath)
               .timeout(1000)
+              .then(function(githubContributors) {
+                contributors = {};
+                if (githubContributors) {
+                  githubContributors.forEach(function(contributor) {
+                    contributors[contributor.login] = 'contributor';
+                  });
+                }
+
+                // Temporary stop-gap solution until we can figure out
+                // who the admins are
+                contributors[ownerLogin] = 'admin';
+              })
               .catch(function(err) {
                 /* Github Repo failure. Die quietely */
                 winston.info('Contributor fetch failed: ' + err);
@@ -80,19 +70,6 @@ function UserRoleInTroupeStrategy(options) {
               });
           });
         }
-      })
-      .then(function(githubContributors) {
-        contributors = {};
-
-        if (githubContributors) {
-          githubContributors.forEach(function(contributor) {
-            contributors[contributor.login] = 'contributor';
-          });
-        }
-
-        // Temporary stop-gap solution until we can figure out
-        // who the admins are
-        contributors[ownerLogin] = 'admin';
       });
   };
 
@@ -167,7 +144,6 @@ function UserStrategy(options) {
 
   var userRoleInTroupeStrategy;
   var userPresenceInTroupeStrategy;
-  var userPremiumStatusStrategy;
   var userProvidersStrategy;
 
   this.preload = function(users) {
@@ -183,12 +159,6 @@ function UserStrategy(options) {
     if (options.showPresenceForTroupeId) {
       userPresenceInTroupeStrategy = new UserPresenceInTroupeStrategy(options.showPresenceForTroupeId)
       strategies.push(userPresenceInTroupeStrategy.preload());
-    }
-
-    if (options.showPremiumStatus) {
-      var userIds = users.map(function(user) { return user.id; });
-      userPremiumStatusStrategy = new UserPremiumStatusStrategy();
-      strategies.push(userPremiumStatusStrategy.preload(userIds));
     }
 
     if (options.includeProviders) {
@@ -250,7 +220,6 @@ function UserStrategy(options) {
       online: userPresenceInTroupeStrategy && userPresenceInTroupeStrategy.map(user.id) || undefined,
       staff: user.staff,
       role: userRoleInTroupeStrategy && userRoleInTroupeStrategy.map(user.username) || undefined,
-      premium: userPremiumStatusStrategy && userPremiumStatusStrategy.map(user.id) || undefined,
       providers: userProvidersStrategy && userProvidersStrategy.map(user.id) || undefined,
       /* TODO: when adding states use user.state and the respective string value desired */
       invited: user.state === 'INVITED' || undefined, // true or undefined

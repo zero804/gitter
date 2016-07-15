@@ -8,9 +8,9 @@ var itemCollections = require('collections/instances/integrated-items');
 var PeopleCollectionView = require('views/people/peopleCollectionView');
 var RepoInfoView = require('./repoInfo');
 var ActivityCompositeView = require('./activityCompositeView');
-
 var SearchView = require('views/search/searchView');
 var SearchInputView = require('views/search/search-input-view');
+var RepoInfoModel = require('../../collections/repo-info');
 
 require('views/behaviors/isomorphic');
 
@@ -43,10 +43,11 @@ module.exports = (function() {
     },
 
     childEvents: {
-      'search:expand':   'expandSearch',
+      'search:expand': 'expandSearch',
       'search:collapse': 'collapseSearch',
-      'search:show':     'showSearch',
-      'search:hide':     'hideSearch'
+      'search:show': 'showSearch',
+      'search:hide': 'hideSearch',
+      'repoInfo:changeVisible': 'repoInfoChangeVisible'
     },
 
     collectionEvents: {
@@ -80,7 +81,10 @@ module.exports = (function() {
 
     initRepo_infoRegion: function(optionsForRegion) {
       // Repo info
-      return new RepoInfoView(optionsForRegion());
+      return new RepoInfoView(optionsForRegion({
+        model: new RepoInfoModel(),
+        roomModel: context.troupe()
+      }));
     },
 
     initActivityRegion: function(optionsForRegion) {
@@ -141,16 +145,12 @@ module.exports = (function() {
       this.ui.repoInfoHeader.addClass('selected');
     },
 
-    onRoomChange: function (model){
-      var roomType = model.get('githubType');
-      var repoInfoHeader = this.$el.find('#info-header');
-      var isNotRepo = (roomType !== 'REPO');
-
+    repoInfoChangeVisible: function(child, visible) {
       //hide the 'REPO INFO' tab if we are not in a repo room
-      repoInfoHeader.toggleClass('hidden', isNotRepo);
+      this.ui.repoInfoHeader.toggleClass('hidden', !visible);
 
       //move back to the people list if we are showing repo info for a non repo room
-      if(repoInfoHeader.hasClass('selected') && isNotRepo){
+      if(this.ui.repoInfoHeader.hasClass('selected') && !visible) {
         this.showPeopleList();
       }
     },

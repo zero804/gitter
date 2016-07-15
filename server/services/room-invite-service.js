@@ -1,63 +1,12 @@
 'use strict';
 
-var invitesService = require('gitter-web-invites/lib/invites-service');
 var Promise = require('bluebird');
 var isValidEmail = require('email-validator').validate;
 var StatusError = require('statuserror');
-var GitHubUserEmailAddressService = require('gitter-web-github').GitHubUserEmailAddressService;
 var emailNotificationService = require('./email-notification-service');
 var roomService = require('./room-service');
-var identityService = require('gitter-web-identity');
-var userService = require('./user-service');
+var invitesService = require('gitter-web-invites/lib/invites-service');
 
-var GITTER_IDENTITY_TYPE = 'gitter';
-var GITHUB_IDENTITY_PROVIDER = identityService.GITHUB_IDENTITY_PROVIDER;
-
-function findExistingGitterUser(username) {
-  return userService.findByUsername(username);
-}
-
-function findExistingIdentityUsername(provider, username) {
-  return identityService.findUserIdForProviderUsername(provider, username)
-    .then(function(userId) {
-      if (!userId) return;
-      return userService.findById(userId);
-    })
-}
-
-function findExistingUser(type, externalId) {
-  switch(type) {
-    case GITTER_IDENTITY_TYPE:
-      return findExistingGitterUser(externalId);
-
-    case GITHUB_IDENTITY_PROVIDER:
-      // TODO: Note that we will need to do a lookup once
-      // splitville is complete and gitter usernames <> github usernames
-      return findExistingGitterUser(externalId);
-  }
-
-  return findExistingIdentityUsername(type, externalId);
-}
-
-/**
- * @private
- */
-function resolveGitHubUserEmail(invitingUser, githubUsername) {
-  var githubUserEmailAddressService = new GitHubUserEmailAddressService(invitingUser);
-  return githubUserEmailAddressService.findEmailAddressForGitHubUser(githubUsername);
-}
-
-/**
- * @private
- */
-function resolveEmailAddress(invitingUser, type, externalId) {
-  // For now, we only try resolve email addresses for GitHub users
-  if (type === GITHUB_IDENTITY_PROVIDER) {
-    return resolveGitHubUserEmail(invitingUser, externalId);
-  }
-
-  return null;
-}
 
 /**
  * @private
@@ -83,7 +32,7 @@ function createInviteForNewUser(room, invitingUser, type, externalId, emailAddre
 
       // No email address was provided, attempt to
       // sniff out the email address given the external username and type
-      return resolveEmailAddress(invitingUser, type, externalId);
+      return invitesService.resolveEmailAddress(invitingUser, type, externalId);
     })
     .bind({
       email: null
@@ -122,7 +71,7 @@ function createInvite(room, invitingUser, options) {
   var emailAddress = options.emailAddress;
 
   // Firstly, try figure out whether this user is already on gitter.
-  return findExistingUser(type, externalId)
+  return invitesService.findExistingUser(type, externalId)
     .then(function(userToInvite) {
       if (userToInvite) {
         // The user already exists!
