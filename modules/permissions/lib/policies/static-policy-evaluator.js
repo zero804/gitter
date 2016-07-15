@@ -15,9 +15,6 @@ StaticPolicyEvaluator.prototype = {
     return this._response;
   }),
 
-  /**
-   * Similar to canRead, but with a full access check
-   */
   canJoin: Promise.method(function() {
     return this._response;
   }),
