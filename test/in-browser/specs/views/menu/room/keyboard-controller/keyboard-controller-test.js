@@ -10,12 +10,10 @@ describe('KeyboardControllerView', function(){
 
   var view;
   var model;
+  var collection;
   beforeEach(function(){
     model = new Backbone.Model();
     model.minibarCollection = new Backbone.Collection([
-      { type: 'all', name: 'all', active: true },
-      { type: 'search', name: 'search' },
-      { type: 'people', name: 'people' },
       { type: 'org', name: 'troupe' },
       { type: 'org', name: 'gitterHQ' },
     ]);
@@ -51,6 +49,19 @@ describe('KeyboardControllerView', function(){
 
     model.searchFocusModel = new Backbone.Model({ focus: false });
 
+    collection = new Backbone.Collection([
+      { type: 'org', name: 'gitterHQ' },
+      { type: 'org', name: 'troupe' }
+    ]);
+
+    model.minibarHomeModel = new Backbone.Model({ type: 'all', name: 'all', active: true });
+    model.minibarSearchModel = new Backbone.Model({ type: 'search', name: 'search' });
+    model.minibarPeopleModel = new Backbone.Model({ type: 'people', name: 'people' });
+    model.minibarCommunityCreateModel = new Backbone.Model({ name: 'Create Community', type: 'community-create' });
+    model.minibarCloseModel = new Backbone.Model({ type: 'close', name: 'close' });
+    model.minibarTempOrgModel = new Backbone.Model({ type: 'org', name: 'google', hidden: true});
+
+
     view = new KeyboardControllerView({
       model: model
     });
@@ -63,8 +74,7 @@ describe('KeyboardControllerView', function(){
   describe('minibar switch hot keys', function(){
     it('should add `focus` to the "all" minibar model on room.1 event', function(){
       appEvents.trigger('keyboard.room.1');
-      var allModel = model.minibarCollection.findWhere({ focus: true });
-      assert.equal(allModel.get('name'), 'all');
+      assert(model.minibarHomeModel.get('focus'));
     });
 
     it('should change the models state on room.1 event', function(){
@@ -81,8 +91,7 @@ describe('KeyboardControllerView', function(){
 
     it('should add `focus` to the "people" minibar model on room.3 event', function(){
       appEvents.trigger('keyboard.room.3');
-      var peopleModel = model.minibarCollection.findWhere({ focus: true });
-      assert.equal(peopleModel.get('name'), 'people');
+      assert(model.minibarPeopleModel.get('focus'));
     });
 
     it('should change the models state on room.3 event', function(){
@@ -92,9 +101,9 @@ describe('KeyboardControllerView', function(){
 
     it('should select the right org item on a room event > 3', function(){
       appEvents.trigger('keyboard.room.4', { key: 4 });
-      assert(model.minibarCollection.at(3).get('focus'));
+      assert(model.minibarCollection.at(0).get('focus'));
       appEvents.trigger('keyboard.room.5', { key: 5 });
-      assert(model.minibarCollection.at(4).get('focus'));
+      assert(model.minibarCollection.at(1).get('focus'));
     });
 
     it('should set the correct org state and selectedOrg name on room event > 3', function(){
@@ -116,25 +125,33 @@ describe('KeyboardControllerView', function(){
       assert(model.primaryCollection.at(0).get('focus'));
     });
 
+    it('should focus the minibarTempOrgIcon when it is not hidden and room.4 is pressed', function(){
+      view.blurAllItems();
+      model.minibarTempOrgModel.set('hidden', false);
+      appEvents.trigger('keyboard.room.4', { key: 4 });
+      assert(model.minibarTempOrgModel.get('focus'));
+    });
+
   });
 
   describe('arrow key movement', function(){
     it('it should focus the next minibar item when down is pressed', function(){
       appEvents.trigger('keyboard.room.4', { key: 4 });
       appEvents.trigger('keyboard.room.down');
-      assert(model.minibarCollection.at(4).get('focus'));
-      assert.equal(model.minibarCollection.at(3).get('focus'), false);
+      assert(model.minibarCollection.at(1).get('focus'));
+      assert.equal(model.minibarCollection.at(0).get('focus'), false);
     });
 
     it('it should focus the first minibar item when down is pressed and the last item is focused', function(){
       appEvents.trigger('keyboard.room.5', { key: 5 });
       appEvents.trigger('keyboard.room.down');
-      assert(model.minibarCollection.at(0).get('focus'));
-      assert.equal(model.minibarCollection.at(4).get('focus'), false);
+      assert(model.minibarCloseModel.get('focus'));
+      assert.equal(model.minibarCollection.at(1).get('focus'), false);
     });
 
     it('should change menu state after a short delay when the down arrow key is pressed', function(done){
       appEvents.trigger('keyboard.room.3');
+      appEvents.trigger('keyboard.room.down');
       appEvents.trigger('keyboard.room.down');
       appEvents.trigger('keyboard.room.down');
       appEvents.trigger('keyboard.room.down');
@@ -148,14 +165,14 @@ describe('KeyboardControllerView', function(){
     it('it should focus the previous minibar item when up is pressed', function(){
       appEvents.trigger('keyboard.room.4', { key: 4 });
       appEvents.trigger('keyboard.room.up');
-      assert(model.minibarCollection.at(2).get('focus'));
-      assert.equal(model.minibarCollection.at(3).get('focus'), false);
+      assert(model.minibarPeopleModel.get('focus'));
+      assert.equal(model.minibarCollection.at(0).get('focus'), false);
     });
 
     it('it should focus the last minibar item when up is pressed and the first item is focused', function(){
       appEvents.trigger('keyboard.room.1');
       appEvents.trigger('keyboard.room.up');
-      assert(model.minibarCollection.at(4).get('focus'));
+      assert(model.minibarCloseModel.get('focus'));
       assert.equal(model.minibarCollection.at(0).get('focus'), false);
     });
 
@@ -166,8 +183,7 @@ describe('KeyboardControllerView', function(){
       appEvents.trigger('keyboard.room.up');
       assert.equal(model.get('state'), 'people');
       setTimeout(function(){
-        assert.equal(model.get('state'), 'org');
-        assert.equal(model.get('selectedOrgName'), 'gitterHQ');
+        assert.equal(model.get('state'), 'close');
         done();
       }, 150);
     });
@@ -253,9 +269,10 @@ describe('KeyboardControllerView', function(){
 
     it('should move focus back to the active minibar item if the room list is in focus and left is presssed', function(){
       model.favouriteCollection.at(0).set('focus', true);
+      model.minibarHomeModel.set('active', true);
       appEvents.trigger('keyboard.room.prev');
       assert(!view.getFocusedRoomItem());
-      assert(model.minibarCollection.findWhere({ active: true}).get('focus'));
+      assert(model.minibarHomeModel.get('focus'));
     });
 
     it('should blur the search model when the down key is pressed', function(){
@@ -287,10 +304,9 @@ describe('KeyboardControllerView', function(){
     });
 
     it('should move focus to the room list if the last minibar item is in focus when tab is pressed', function(){
-      var lastMinibarItem = model.minibarCollection.at(model.minibarCollection.length - 1);
-      lastMinibarItem.set('focus', true);
+      model.minibarCloseModel.set('focus', true);
       appEvents.trigger('keyboard.room.tab');
-      assert(!lastMinibarItem.get('focus'));
+      assert(!model.minibarCloseModel.get('focus'));
       assert(model.favouriteCollection.at(0).get('focus'));
     });
 
@@ -322,6 +338,19 @@ describe('KeyboardControllerView', function(){
       assert(model.minibarCollection.at(index).get('focus'));
     });
 
+    it('should focus the close button after the last org item', function(){
+      appEvents.trigger('keyboard.room.5', { key: 5 });
+      appEvents.trigger('keyboard.room.tab');
+      assert(model.minibarCloseModel.get('focus'));
+    });
+
+    it('should focus on people if the first minibar org item is in focus and shit-tab is pressed', function(){
+      appEvents.trigger('keyboard.room.4', { key: 4 });
+      assert(model.minibarCollection.at(0).get('focus'));
+      appEvents.trigger('keyboard.room.prev.tab');
+      assert(model.minibarPeopleModel.get('focus'));
+    });
+
     it('should re-focus the search input when the first room item is selected in the search state and shift-tab os pressed', function(){
       model.set('state', 'search');
       view.blurAllItems();
@@ -335,7 +364,7 @@ describe('KeyboardControllerView', function(){
       model.searchFocusModel.set('focus', true);
       appEvents.trigger('keyboard.room.prev.tab');
       assert(!model.searchFocusModel.get('focus'));
-      assert(model.minibarCollection.findWhere({ active: true}).get('focus'));
+      assert(model.minibarHomeModel.get('focus'));
     });
 
     it('should not call preventDefault if the last item in the room list is in focus and tab is pressed', function(){
@@ -346,7 +375,7 @@ describe('KeyboardControllerView', function(){
 
     it('should not call preventDefault if the first minibar-item is in focus and shift-tab is pressed', function(){
       var spy = function(){ assert(false, 'e.preventDefault was called'); };
-      model.minibarCollection.at(0).set('focus', true);
+      model.minibarHomeModel.set('focus', true);
       appEvents.trigger('keyboard.room.prev.tab', { preventDefault: spy });
     });
 
@@ -365,7 +394,7 @@ describe('KeyboardControllerView', function(){
     it('should blur every item that is in focus when blurAllItems is called', function(){
       //Focus all the things
       model.minibarCollection.at(0).set('focus', true);
-      model.minibarCollection.at(3).set('focus', true);
+      model.minibarCollection.at(1).set('focus', true);
       model.favouriteCollection.at(0).set('focus', true);
       model.favouriteCollection.at(1).set('focus', true);
       model.primaryCollection.at(0).set('focus', true);
@@ -382,6 +411,30 @@ describe('KeyboardControllerView', function(){
       assert.equal(model.tertiaryCollection.where({ focus: true }), 0);
     });
 
+    it('should blur the minibarHomeModel', function(){
+      model.minibarHomeModel.set('focus', true);
+      view.blurAllItems();
+      assert(!model.minibarHomeModel.get('focus'));
+    });
+
+    it('should blur the minibarPeopleModel', function(){
+      model.minibarPeopleModel.set('focus', true);
+      view.blurAllItems();
+      assert(!model.minibarPeopleModel.get('focus'));
+    });
+
+    it('should blur the minibarSearchModel', function(){
+      model.minibarSearchModel.set('focus', true);
+      view.blurAllItems();
+      assert(!model.minibarSearchModel.get('focus'));
+    });
+
+    it('should blur the minibarCloseModel', function(){
+      model.minibarCloseModel.set('focus', true);
+      view.blurAllItems();
+      assert(!model.minibarCloseModel.get('focus'));
+    });
+
   });
 
   describe('queryAttrOnRoomCollections', function(){
@@ -391,6 +444,67 @@ describe('KeyboardControllerView', function(){
       var result = view.queryAttrOnRoomCollections('active', true);
       assert.equal(result.get('uri'), 'gitterHQ/test1');
     });
+  });
+
+  describe('isMinibarInFocus', function(){
+    it('should return true if the homeModel is in focus', function(){
+      view.blurAllItems();
+      model.minibarHomeModel.set('focus', true);
+      assert(view.isMinibarInFocus());
+    });
+
+    it('should return true if the searchModel is in focus', function(){
+      view.blurAllItems();
+      model.minibarSearchModel.set('focus', true);
+      assert(view.isMinibarInFocus());
+    });
+
+    it('should return true if the peopleModel is in focus', function(){
+      view.blurAllItems();
+      model.minibarPeopleModel.set('focus', true);
+      assert(view.isMinibarInFocus());
+    });
+
+    it('should return true if the closeModel is in focus', function(){
+      view.blurAllItems();
+      model.minibarCloseModel.set('focus', true);
+      assert(view.isMinibarInFocus());
+    });
+
+    it('should return true if a minibar collection item is in focus', function(){
+      view.blurAllItems();
+      model.minibarCollection.at(0).set('focus', true);
+      assert(view.isMinibarInFocus());
+    });
+
+    it('should return true if the tempOrgItem is in focus', function(){
+      view.blurAllItems();
+      model.minibarTempOrgModel.set({ hidden: false, focus: true });
+      assert(view.isMinibarInFocus());
+    });
+
+    it('should return false if the tempOrgItem is in focus but is hidden', function(){
+      view.blurAllItems();
+      model.minibarTempOrgModel.set({ hidden: true, focus: true });
+      assert(!view.isMinibarInFocus());
+    });
+
+  });
+
+  describe('getFlatMinibarCollection', function(){
+
+    it('should place the homeMinibarItem at the 0 index', function(){
+      assert.equal(view.getFlatMinibarCollection().indexOf(model.minibarHomeModel), 0);
+    });
+
+    it('should place the searchMinibarItem at the 1 index', function(){
+      assert.equal(view.getFlatMinibarCollection().indexOf(model.minibarSearchModel), 1);
+    });
+
+    it('should place the peopleMinibarItem at the 2 index', function(){
+      assert.equal(view.getFlatMinibarCollection().indexOf(model.minibarPeopleModel), 2);
+    });
+
   });
 
 });

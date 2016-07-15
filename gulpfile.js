@@ -7,10 +7,6 @@ var gulp = require('gulp');
 var through = require('through2');
 var gutil = require('gulp-util');
 var runSequence = require('run-sequence');
-var debug = require('gulp-debug');
-var _ = require('underscore');
-
-var livereload = require('gulp-livereload');
 var sourcemaps = require('gulp-sourcemaps');
 
 var postcss = require('gulp-postcss');
@@ -23,31 +19,25 @@ var webpack = require('gulp-webpack');
 var eslint = require('gulp-eslint');
 
 var gzip = require('gulp-gzip');
-var brotli = require('gulp-brotli');
 var mocha = require('gulp-spawn-mocha');
 var using = require('gulp-using');
 var tar = require('gulp-tar');
-var expect = require('gulp-expect-file');
 var git = require('gulp-git');
 
 var shell = require('gulp-shell');
-var grepFail = require('gulp-grep-fail');
 var jsonlint = require('gulp-jsonlint');
 var uglify = require('gulp-uglify');
-var coveralls = require('gulp-coveralls');
+var codecov = require('gulp-codecov');
 var lcovMerger = require('lcov-result-merger');
-var sonar = require('gulp-sonar');
-var codacy = require('gulp-codacy');
-var through = require('through2');
-var utimes  = require('fs').utimes;
+var utimes = require('fs').utimes;
 
 var fs = require('fs-extra');
 var path = require('path');
 var mkdirp = require('mkdirp');
 var del = require('del');
 var glob = require('glob');
-var url = require('url');
-
+var github = require('gulp-github');
+var eslintFilter = require('./build-scripts/eslint-filter');
 
 var getSourceMapUrl = function() {
   if (!process.env.BUILD_URL) return;
@@ -158,20 +148,55 @@ gulp.task('validate-config', function() {
     .pipe(jsonlint.failOnError());
 });
 
+// Full eslint
 gulp.task('validate-eslint', function() {
   mkdirp.sync('output/eslint/');
   return gulp.src(['**/*.js','!node_modules/**','!public/repo/**'])
     .pipe(eslint({
       quiet: argv.quiet
     }))
-    .pipe(eslint.format('unix'))
     .pipe(eslint.format('checkstyle', function(checkstyleData) {
       fs.writeFileSync('output/eslint/checkstyle.xml', checkstyleData);
     }))
     .pipe(eslint.failAfterError());
 });
 
-gulp.task('validate', ['validate-config', 'validate-eslint']);
+function guessBaseBranch() {
+  var branch = process.env.GIT_BRANCH;
+  if (!branch) return 'develop';
+
+  if (branch.match(/\bfeature\//)) return 'origin/develop';
+
+  return 'origin/master';
+}
+
+// eslint of the diff
+gulp.task('validate-eslint-diff', function() {
+  var baseBranch = process.env.BASE_BRANCH || guessBaseBranch();
+  gutil.log('Performing eslint comparison to', baseBranch);
+
+  var eslintPipe = gulp.src(['**/*.js','!node_modules/**','!public/repo/**'], { read: false })
+    .pipe(eslintFilter.filterFiles(baseBranch))
+    .pipe(eslint({
+      quiet: argv.quiet
+    }))
+    .pipe(eslintFilter.filterMessages())
+    .pipe(eslint.format('unix'))
+
+  if (process.env.SONARQUBE_GITHUB_ACCESS_TOKEN && process.env.ghprbPullId && process.env.GIT_COMMIT) {
+    eslintPipe = eslintPipe.pipe(github({
+       git_token: process.env.SONARQUBE_GITHUB_ACCESS_TOKEN,
+       git_repo: 'troupe/gitter-webapp',
+       git_prid: process.env.ghprbPullId,
+       git_sha: process.env.GIT_COMMIT,
+    }));
+  }
+
+  return eslintPipe;
+});
+
+
+gulp.task('validate', ['validate-config', 'validate-eslint', 'validate-eslint-diff']);
 
 makeTestTasks('test-mocha', function(name, files, options) {
   mkdirp.sync('output/test-reports/');
@@ -207,7 +232,7 @@ makeTestTasks('test-docker', function(name, files, options) {
   mkdirp.sync('output/coverage-reports/' + name);
   gutil.log('Writing XUnit output', 'output/test-reports/' + name + '.xml');
   var istanbulOptions;
-  
+
   if (argv['coverage'] === false) {
     istanbulOptions = undefined;
   } else {
@@ -241,41 +266,22 @@ gulp.task('merge-lcov', function() {
     .pipe(gulp.dest('output/coverage-reports/merged/'));
 });
 
-gulp.task('submit-codacy-post-tests', ['merge-lcov'], function() {
-  return gulp.src(['output/coverage-reports/merged/lcov.info'], { read: false })
-    .pipe(codacy({
-      token: '30c3b1cf278c41c795b06235102f141b'
-    }));
-});
-
-gulp.task('submit-codacy', ['test-mocha'/*, 'test-redis-lua'*/], function(callback) {
-  runSequence('submit-codacy-post-tests', callback);
-});
-
-gulp.task('submit-coveralls-post-tests', ['merge-lcov'], function() {
-  var GIT_BRANCH = process.env.GIT_BRANCH;
-  if (GIT_BRANCH) {
-    // Make coveralls play nice with Jenkins (lame)
-    process.env.GIT_BRANCH = GIT_BRANCH.replace(/^origin\//,'');
-  }
+gulp.task('submit-codecov-post-tests', ['merge-lcov'], function() {
+  process.env.CODECOV_TOKEN = "4d30a5c7-3839-4396-a2fd-d8f9a68a5c3a";
 
   return gulp.src('output/coverage-reports/merged/lcov.info')
-    .pipe(coveralls())
+    .pipe(codecov())
     .on('error', function(err) {
       gutil.log(err);
-      process.env.GIT_BRANCH = GIT_BRANCH;
       this.emit('end');
-    })
-    .on('end', function() {
-      process.env.GIT_BRANCH = GIT_BRANCH;
     });
 });
 
-gulp.task('submit-coveralls', ['test-mocha'/*, 'test-redis-lua'*/], function(callback) {
-  runSequence('submit-coveralls-post-tests', callback);
+gulp.task('submit-codecov', ['test-mocha'/*, 'test-redis-lua'*/], function(callback) {
+  runSequence('submit-codecov-post-tests', callback);
 });
 
-gulp.task('test', ['test-mocha'/*, 'test-redis-lua'*/, 'submit-coveralls', 'submit-codacy']);
+gulp.task('test', ['test-mocha'/*, 'test-redis-lua'*/, 'submit-codecov']);
 
 makeTestTasks('localtest', function(name, files, options) {
   return gulp.src(files, { read: false })
@@ -328,7 +334,7 @@ makeTestTasks('localtest-coverage', function(name, files, options) {
     }));
 });
 
-makeTestTasks('fasttest', function(name, files, options) {
+makeTestTasks('fasttest', function(name, files /*, options*/) {
   return gulp.src(files, { read: false })
     .pipe(mocha({
       reporter: 'spec',
@@ -361,7 +367,7 @@ gulp.task('copy-app-files', function() {
       'shared/**',
       'redis-lua/**',
       'modules/**'
-    ], { "base" : "." })
+    ], { base: "." })
     .pipe(gulp.dest('output/app'));
 });
 
@@ -415,7 +421,7 @@ gulp.task('copy-asset-files', function() {
       'public/images/**',
       'public/sprites/**',
       'public/repo/**'
-    ], { "base" : "./public" })
+    ], { base: "./public" })
     .pipe(gulp.dest('output/assets'))
     .pipe(restoreOriginalFileTimestamps());
 });
@@ -562,20 +568,12 @@ gulp.task('css-web', function() {
 
 
 gulp.task('css', function() {
-  var overrideOpts = {
-    watch: false
-  };
-
   return Promise.all([
     cssIosStyleBuilder.build(),
     cssMobileStyleBuilder.build(),
     cssWebStyleBuilder.build()
   ]);
 });
-
-
-
-
 
 gulp.task('webpack', function() {
   return gulp.src('./public/js/webpack.config')
@@ -633,6 +631,9 @@ gulp.task('compress-assets-gzip', ['build-assets'], function() {
 
 // Brotli compression for text files
 gulp.task('compress-assets-brotli-text', ['build-assets'], function() {
+  if (!process.env.ENABLE_BROTLI_COMPRESSION) return;
+
+  var brotli = require('gulp-brotli');
   return gulp.src(['output/assets/**/*.{css,svg,js}', '!**/*.map'], { stat: true, base: 'output/assets/' })
     .pipe(brotli.compress({
       mode: 1, // 1 = TEXT
@@ -645,6 +646,9 @@ gulp.task('compress-assets-brotli-text', ['build-assets'], function() {
 
 // Brotli compression for non-text files
 gulp.task('compress-assets-brotli-generic', ['build-assets'], function() {
+  if (!process.env.ENABLE_BROTLI_COMPRESSION) return;
+
+  var brotli = require('gulp-brotli');
   return gulp.src(['output/assets/**/*.{ttf,eot}', '!**/*.map'], { stat: true, base: 'output/assets/' })
     .pipe(brotli.compress({
       mode: 0, // 0 = GENERIC
@@ -719,56 +723,11 @@ gulp.task('embedded-copy-asset-files', function() {
       'public/images/**',
       // 'public/sprites/**',
       'public/repo/katex/**',
-    ], { "base" : "./public", stat: true })
+    ], {
+      base: "./public",
+      stat: true
+    })
     .pipe(gulp.dest('output/assets'));
 });
 
 gulp.task('embedded-package', ['embedded-uglify', 'css-ios', 'embedded-copy-asset-files']);
-
-
-gulp.task('sonar', function () {
-  var sourceDirectories = [
-    'server/',
-    'public/js/',
-    'shared/'
-  ].concat(glob.sync('modules/*/lib'))
-
-  var options = {
-    sonar: {
-      host: {
-        url: 'http://beta-internal:9000'
-      },
-      projectKey: 'sonar:gitter-webapp:1.0.0',
-      projectName: 'Gitter Webapp',
-      projectVersion: '1.0.0',
-      sources: sourceDirectories.join(','),
-      language: 'js',
-      sourceEncoding: 'UTF-8',
-      javascript: {
-        lcov: {
-          reportPath: 'output/coverage-reports/merged/lcov.info'
-        }
-      },
-      analysis: {
-        mode: 'preview'
-      },
-      github: {
-        pullRequest: process.env.ghprbPullId,
-        repository: 'troupe/gitter-webapp',
-        oauth: process.env.SONARQUBE_GITHUB_ACCESS_TOKEN
-      },
-      exec: {
-          // All these properties will be send to the child_process.exec method (see: https://nodejs.org/api/child_process.html#child_process_child_process_exec_command_options_callback )
-          // Increase the amount of data allowed on stdout or stderr (if this value is exceeded then the child process is killed, and the gulp-sonar will fail).
-          maxBuffer : 1024*1024
-      }
-    }
-  };
-
-  // gulp source doesn't matter, all files are referenced in options object above
-  return gulp.src('gulpfile.js', { read: false })
-      .pipe(sonar(options))
-      .on('error', function(err) {
-        gutil.log(err);
-      });
-});

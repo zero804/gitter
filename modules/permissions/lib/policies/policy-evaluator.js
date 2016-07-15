@@ -21,7 +21,17 @@ function PolicyEvaluator(userId, securityDescriptor, policyDelegate, contextDele
 PolicyEvaluator.prototype = {
   canRead: Promise.method(function() {
     debug('canRead');
-    return this._checkAccess(true); // With Good Faith
+    return this._checkAccess(true) // With Good Faith
+      .bind(this)
+      .tap(function(access) {
+        // If access is denied to the room, let the contextDelegate know
+        // so that it can appropriate action
+        if (!access && this._contextDelegate) {
+          return this._contextDelegate.handleReadAccessFailure();
+        }
+
+        return null;
+      })
   }),
 
   canWrite: Promise.method(function() {
@@ -84,12 +94,17 @@ PolicyEvaluator.prototype = {
     return this._checkAccess(true); // With Good Faith
   },
 
-  _checkAccess: function(useGoodFailChecks) {
+  _checkAccess: Promise.method(function(useGoodFailChecks) {
     // TODO: ADD BANS
     var userId = this._userId;
     var membersPolicy = this._securityDescriptor.members;
     var contextDelegate = this._contextDelegate;
     var policyDelegate = this._policyDelegate;
+
+    // Check if the user has been banned
+    if (userId && bansIncludesUserId(this._securityDescriptor.bans, userId)) {
+      return false;
+    }
 
     if (membersPolicy === 'PUBLIC') {
       debug('canRead: allowing access to PUBLIC');
@@ -129,16 +144,15 @@ PolicyEvaluator.prototype = {
       return this._checkAnonymousAccessWithGoodFaith();
     }
 
-  },
+  }),
 
   /**
    * User is in the room or has admin access
    */
   _checkMembershipInContextForInviteRooms: function() {
     var contextDelegate = this._contextDelegate;
-    var userId = this._userId; // User must be defined in this function....
 
-    return contextDelegate.isMember(userId)
+    return contextDelegate.isMember()
       .bind(this)
       .then(function(result) {
         if (result) {
@@ -229,7 +243,6 @@ PolicyEvaluator.prototype = {
     var securityDescriptor = this._securityDescriptor;
     var contextDelegate = this._contextDelegate;
     var membersPolicy = this._securityDescriptor.members;
-    var userId = this._userId; // User must be defined in this function....
 
     return this._checkPolicyCacheResult(membersPolicy)
       .catch(PolicyDelegateTransportError, function(err) {
@@ -241,9 +254,12 @@ PolicyEvaluator.prototype = {
           return false;
         }
 
-        return contextDelegate.isMember(userId)
+        return contextDelegate.isMember()
           .then(function(isMember) {
-            if (isMember) return true;
+            if (isMember) {
+              logger.error('Backend down but allowing user to access room on account of already being a member');
+              return true;
+            }
 
             return false;
           });
@@ -294,6 +310,19 @@ PolicyEvaluator.prototype = {
       })
   }
 };
+
+function bansIncludesUserId(bans, userId) {
+  if (!bans || !bans.length) return false;
+
+  if (bans.length === 1) {
+    return mongoUtils.objectIDsEqual(userId, bans[0].userId);
+  }
+
+  return _.some(bans, function(ban) {
+    return mongoUtils.objectIDsEqual(userId, ban.userId);
+  });
+}
+
 
 function userIdIsIn(userId, collection) {
   if (!collection || !collection.length) return false;

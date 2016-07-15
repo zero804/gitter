@@ -10,6 +10,7 @@ var ModalView = require('./modal');
 var cdn = require('gitter-web-cdn');
 var template = require('./tmpl/share-view.hbs');
 var ZeroClipboard = require('zeroclipboard');
+var backendUtils = require('../../utils/backend-utils');
 
 require('gitter-styleguide/css/components/buttons.css');
 
@@ -74,10 +75,12 @@ var View = Marionette.ItemView.extend({
     var room = context.getTroupe();
     var isAdmin = context.isTroupeAdmin();
 
+    var isRepo = !!backendUtils.getLinkPathCond('GH_REPO', room);
+
     return {
-      isRepo: room.githubType === 'REPO',
-      isPublic: room.security === 'PUBLIC',
-      allowBadgePR: room.security === 'PUBLIC' && isAdmin,
+      isRepo: isRepo,
+      isPublic: room.public,
+      allowBadgePR: room.public && isAdmin,
       hasFlash: this.detectFlash(),
       // FIXME: This used to be named `url` but we ran into https://github.com/altano/handlebars-loader/issues/75
       stub: this.getShareUrl(),

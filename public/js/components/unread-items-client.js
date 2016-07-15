@@ -9,7 +9,8 @@ var appEvents = require('utils/appevents');
 var UnreadItemStore = require('./unread-items-client-store');
 var log = require('utils/log');
 var raf = require('utils/raf')
-var addPassiveScrollListener = require('utils/passive-scroll-listener');
+var passiveEventListener = require('../utils/passive-event-listener');
+var eyeballsDetector = require('./eyeballs-detector');
 
 module.exports = (function() {
 
@@ -76,7 +77,6 @@ module.exports = (function() {
     unreadItemStore.on('reset', this._onStoreReset, this);
     unreadItemStore.on('itemMarkedRead', this._onItemMarkedRead, this);
     chatCollection.on('reset', this._onCollectionReset, this);
-    appEvents.on('eyeballStateChange', this._eyeballStateChange, this);
 
     this._clearActivityBadgeLimited = limit(this._clearActivityBadge, this, 100);
   }
@@ -137,13 +137,9 @@ module.exports = (function() {
       }
     },
 
-    _eyeballStateChange: function(newState) {
-      this._eyeballState = newState;
-    },
-
     _onStoreReset: function() {
       var lurk = this._store.getLurkMode();
-      if (lurk && this._eyeballState) {
+      if (lurk && eyeballsDetector.getEyeballs()) {
         this._activity();
       }
     },
@@ -324,14 +320,14 @@ module.exports = (function() {
     this._windowScrollLimited = limit(this._windowScroll, this, 50);
 
     var foldCountLimited = this._foldCountLimited = limit(this._foldCount, this, 50);
-    this._inFocus = true;
 
-    appEvents.on('eyeballStateChange', this._eyeballStateChange, this);
+    eyeballsDetector.events.on('change', this._eyeballStateChange, this);
 
     function rafGetBounds() {
       raf(boundGetBounds);
     }
-    addPassiveScrollListener(this._scrollElement, rafGetBounds);
+
+    passiveEventListener.addEventListener(this._scrollElement, 'scroll', rafGetBounds);
 
     // this is not a live collection so this will not work inside an SPA
     //$('.mobile-scroll-class').on('scroll', boundGetBounds);
@@ -357,6 +353,11 @@ module.exports = (function() {
 
       var lastAccess = room.get('lastAccessTime');
       this.collection.forEach(function(chat) {
+        if (!chat.get('sent')) {
+          // see #1728
+          debug('Chat is missing sent %j', chat);
+          return;
+        }
         if (chat.get('sent').isBefore(lastAccess) && chat.get('unread')) {
           self._store.markItemRead(chat.id);
         }
@@ -379,7 +380,7 @@ module.exports = (function() {
     },
 
     _getBounds: function() {
-      if (!this._inFocus) {
+      if (!eyeballsDetector.getEyeballs()) {
         this._foldCountLimited();
         return;
       }
@@ -404,7 +405,7 @@ module.exports = (function() {
     },
 
     _windowScroll: function() {
-      if(!this._inFocus) {
+      if(!eyeballsDetector.getEyeballs()) {
         return;
       }
 
@@ -580,7 +581,6 @@ module.exports = (function() {
 
     },
     _eyeballStateChange: function(newState) {
-      this._inFocus = newState;
       if(newState) {
         this._getBounds();
       }

@@ -53,6 +53,30 @@ GitHubOrgService.prototype.getMembership = function(org, username) {
   });
 };
 
+/**
+ * Returns a promise of the issues for a repo
+ */
+GitHubOrgService.prototype.getIssues = function(org, options) {
+  var query = {
+    state: options && options.state || 'all',
+  }
+
+  return tentacles.issue.listForOrgForAuthUser(org, {
+      query: query,
+      accessToken: this.accessToken,
+      firstPageOnly: !options || options.firstPageOnly !== false
+    })
+    .then(function(returnedIssues) {
+      var issues = [];
+
+      returnedIssues.forEach(function(issue) {
+        issues[issue.number] = issue;
+      });
+
+      return issues;
+    });
+};
+
 module.exports = wrap(GitHubOrgService, function() {
   return [this.accessToken || ''];
 });

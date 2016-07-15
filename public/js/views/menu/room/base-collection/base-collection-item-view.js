@@ -1,9 +1,7 @@
 'use strict';
 
 var BaseItemView = require('../base-item-view');
-var cocktail = require('cocktail');
 var toggleClass = require('utils/toggle-class');
-var KeyboardEventMixin = require('views/keyboard-events-mixin');
 var template = require('./base-collection-item-view.hbs');
 var updateUnreadIndicatorClassState = require('../../../../components/menu/update-unread-indicator-class-state');
 
@@ -52,9 +50,20 @@ var BaseCollectionItemView = BaseItemView.extend({
     return name;
   },
 
+  getRoomTitle: function() {
+    var model = this.model;
+
+    return model.get('name') || // For room models
+           model.get('displayName') || // For users in search
+           model.get('username') || // For users in search
+           model.get('uri') || // Fallback
+           '';
+  },
+
   getRoomUrl: function() {
+    // Does every room not have a `url`?
     var name = this.getRoomName();
-    var url = (name[0] !== '/') ? '/' + name : name;
+    var url = (name[0] === '/') ? name: '/' + name;
 
     return url;
   },
@@ -78,7 +87,7 @@ var BaseCollectionItemView = BaseItemView.extend({
     toggleClass(this.ui.container[0], 'active', !!val);
   },
 
-  onItemActivated: function(e) {
+  onItemActivated: function() {
     this.trigger('item:activated');
   },
 

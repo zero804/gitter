@@ -5,8 +5,108 @@
 @import 'typography';
 @import 'base-web';
 
+// Some slight adjustments for smaller screen realestate
+@small-breakpoint: 670px;
+@tiny-breakpoint: 480px;
+@micro-breakpoint: 400px;
 
-@base-text-color: rgba(255, 255, 255, .8);
+
+@base-text-color: rgba(255, 255, 255, .75);
+@subdued-text-color: rgba(255, 255, 255, .5);
+
+@step-content-area-max-width: 800px;
+@step-fixed-progression-breakpoint: 500px;
+
+@primary-input-font-size: 3.789rem;
+@primary-input-height: 6rem;
+@primary-input-spacing-top: 3rem;
+@primary-input-spacing-bottom: 0;
+.primary-input-font-size() {
+  font-size: @primary-input-font-size;
+
+  @media (max-width: @small-breakpoint) {
+    font-size: 3.2rem;
+  }
+  @media (max-width: @tiny-breakpoint) {
+    font-size: 2.8rem;
+  }
+  @media (max-width: @micro-breakpoint) {
+    font-size: 2.3rem;
+  }
+}
+.primary-input-height() {
+  height: @primary-input-height;
+
+  @media (max-width: @small-breakpoint) {
+    height: 5.5rem;
+  }
+  @media (max-width: @tiny-breakpoint) {
+    height: 5rem;
+  }
+}
+.primary-input-spacing-top() {
+  margin-top: @primary-input-spacing-top;
+
+  @media (max-width: @small-breakpoint) {
+    margin-top: 1.8rem;
+  }
+  @media (max-width: @tiny-breakpoint) {
+    margin-top: 1.5rem;
+  }
+}
+
+@secondary-input-font-size: 1.6rem;
+@secondary-input-height: 3rem;
+@secondary-input-spacing-top: 2.5rem;
+@secondary-input-spacing-bottom: 2rem;
+
+.secondary-input-spacing-top() {
+  margin-top: @secondary-input-spacing-top;
+
+  @media (max-width: @small-breakpoint) {
+    margin-top: 2rem;
+  }
+  @media (max-width: @tiny-breakpoint) {
+    margin-top: 1.5rem;
+  }
+}
+
+@number-github-projects-per-row: 3;
+
+@number-org-items-per-column: 3;
+@org-item-avatar-size: 3.6rem;
+@org-item-height: @org-item-avatar-size;
+@org-item-spacing: 2rem;
+
+@number-repo-items-per-column: 5;
+@repo-item-avatar-size: 2rem;
+@repo-item-height: @repo-item-avatar-size;
+
+@org-area-padding: 2rem;
+// 2rem but need px so we can avoid calc
+@org-area-inner-width: (@step-content-area-max-width - (2 * 20px)); /*@org-area-padding*/
+@org-area-total-height: (@number-org-items-per-column * @org-item-height) + (@number-org-items-per-column * @org-item-spacing);
+
+@repo-item-spacing: (@org-area-total-height - (@number-repo-items-per-column * @repo-item-height)) / @number-repo-items-per-column;
+
+
+@number-invite-user-items-per-column: 2;
+@invite-user-item-avatar-size: 3.6rem;
+@invite-user-item-height: @invite-user-item-avatar-size;
+@invite-user-item-spacing: 2rem;
+@invite-user-area-total-height: @org-area-total-height;
+
+
+@people-list-item-spacing: .4rem;
+@people-list-item-height: @invite-user-item-avatar-size + (2 * @people-list-item-spacing);
+
+@invited-email-item-font-size: 1.6rem;
+@invited-email-item-height: @invited-email-item-font-size;
+@invited-area-total-height: @people-list-item-height + @invite-user-item-spacing + @invited-email-item-height;
+@invited-area-spacing-top: 2.5rem;
+
+
+
 
 
 
@@ -32,9 +132,6 @@
   pointer-events: none;
 }
 
-// Backbone and our prerendre Isomorphic views work a bit differently
-// in how they put stuff in the wrapper so this just gets around either situation
-.community-create-app-root,
 .community-create-root-inner {
   width: 100%;
   height: 100%;
@@ -62,6 +159,19 @@
   background-size: cover;
 
   color: @base-text-color;
+
+  &:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+
+    background-color: rgba(0, 0, 0, 0.6);
+
+    pointer-events: none;
+  }
 }
 
 .community-create-close-button {
@@ -76,18 +186,27 @@
   background-color: transparent;
   border: 0;
 
-  color: rgba(255, 255, 255, .5);
-  font-size: 4rem;
+  opacity: .5;
+  font-size: 3rem;
 
-  transition: color .2s ease;
+  transition: opacity .2s ease;
 
   &:hover {
-    color: rgba(255, 255, 255, .9);
+    opacity: .9;
   }
   &:focus {
     outline: none;
     color: @jaffa;
   }
+
+  @media (max-width: @step-fixed-progression-breakpoint) {
+    padding: 2rem;
+    font-size: 2rem;
+  }
+}
+
+.community-create-close-button-image {
+  width: 1.2em;
 }
 
 
@@ -104,7 +223,10 @@
 
 
 .community-create-step-wrapper {
-  overflow: auto;
+  // Because of what seems to be a bug when using transform
+  // that cause scrollbars but go away after causing a layout from a trivial CSS change
+  overflow-x: hidden;
+  overflow-y: auto;
   width: 100%;
   height: 100%;
 
@@ -115,42 +237,37 @@
   opacity: 0;
   pointer-events: none;
 
-  will-change: transform, opacity;
+  will-change: opacity;
   transition:
     visibility 0s ease .2s,
-    opacity .2s ease,
-    transform .2s ease;
-
-
-  & > .community-create-step-content-area {
-    transform: translateX(200px);
-    transition: transform .2s ease;
-  }
+    opacity .2s ease;
 
   &.active {
     visibility: visible;
     opacity: 1;
     pointer-events: auto;
-    .community-create-app-root &,
     .community-create-root-inner & {
       pointer-events: none;
     }
-    .community-create-app-root.active &,
     .community-create-root-inner.active & {
       pointer-events: auto;
     }
 
     transition:
       visibility 0s ease 0s,
-      opacity .2s ease,
-      transform .2s ease;
+      opacity .2s ease;
 
     & > .community-create-step-content-area {
-      transform: translateX(0);
+      // This suuuucks but webkit has a bug
+      // where you can't `position: fixed` inside a transformed element
+      & > * {
+        transform: translateX(0);
+        will-change: transform;
 
-      animation-name: community-create-step-move-in-animation;
-      animation-duration: .2s;
-      animation-timing-function: ease;
+        animation-name: community-create-step-move-in-animation;
+        animation-duration: .2s;
+        animation-timing-function: ease;
+      }
     }
   }
 
@@ -166,19 +283,29 @@
 
 .community-create-step-content-area {
   display: inline-block;
-  display: inline-flex;
-  align-items: flex-end;
   vertical-align: middle;
   // reset centering from above
   text-align: left;
 
   width: 75%;
-  max-width: 800px;
+  max-width: @step-content-area-max-width;
   @media (max-width: 800px) {
     width: 85%;
   }
   @media (max-width: 600px) {
-    width: 95%;
+    width: 90%;
+  }
+
+  padding-top: 9rem;
+  padding-bottom: 3rem;
+
+  // Sometimes the wrapper can be a form, forms.less reset :(
+  margin: 0;
+
+
+  @media (max-width: @step-fixed-progression-breakpoint) {
+    padding-top: 5rem;
+    padding-bottom: 9rem;
   }
 }
 
@@ -189,12 +316,8 @@
 }
 
 
-.community-create-step-main-body {
-  flex: 1;
-}
-
 .community-create-general-link {
-  color: @ruby;
+  color: @caribbean;
 }
 
 
@@ -208,19 +331,31 @@
   border-bottom: 2px solid rgba(255, 255, 255, .2);
 }
 
-.primary-bare-input(@font-size: 3.789rem; @border-width: 3px) {
+.primary-bare-input(@explicit-height: @primary-input-height; @font-size: @primary-input-font-size; @border-width: 3px) {
+  display: block;
   width: 100%;
+  height: @explicit-height;
 
-  padding: .9em 0;
+  // Inputs are weird with height, idk
+  @leftover-height: @primary-input-height - @primary-input-font-size;
+  @vertical-padding: ~"calc(("@leftover-height ~"-" @border-width~") / 2)";
+  padding-top: 0;
+  padding-left: 0;
+  padding-bottom: @vertical-padding;
+  padding-right: 0;
 
   background-color: transparent;
   border: 0;
-  border-bottom: @border-width solid @ruby;
+  border-bottom: @border-width solid @jaffa;
   box-shadow: none;
   border-radius: 0;
 
   color: @base-text-color;
   font-size: @font-size;
+  line-height: 1;
+  font-weight: 300;
+
+  transition: border-color .2s ease;
 
   &:hover,
   &:focus {
@@ -231,25 +366,59 @@
     outline: none;
     box-shadow: none;
   }
+
+
+  // Reset forms.less :(
+  &:focus:required:invalid {
+    color: @base-text-color;
+    border-bottom-color: @ruby;
+    box-shadow: none;
+  }
+
+  &:required {
+    border-bottom-color: @jaffa;
+  }
+  &:valid {
+    border-bottom-color: @caribbean;
+  }
+  &:invalid {
+    border-bottom-color: @ruby;
+  }
+  &:not(:required) {
+    border-bottom-color: @jaffa;
+  }
+
+  &:placeholder {
+    color: @subdued-text-color;
+  }
+
 }
 
 .secondary-bare-input() {
-  .primary-bare-input(1.6rem, 2px);
+  .primary-bare-input(@secondary-input-height, @secondary-input-font-size, 1px);
 }
 
 
 
 .primary-community-heading {
+  .primary-input-font-size();
+
+  max-width: 600px;
+  min-height: 2em;
+
   color: #ffffff;
-  margin-bottom: 1.5rem;
+  font-weight: 300;
+  line-height: 1.2;
 }
 
 .secondary-community-create-button {
-  color: @base-text-color;
+  color: @subdued-text-color;
 }
 
 
-.primary-tabbed-navigation-list {
+.primary-tabbed-navigation-list(@font-size: 3rem) {
+  .primary-input-font-size();
+
   display: flex;
 
   margin-top: 0;
@@ -258,7 +427,8 @@
   padding-left: 0;
   list-style: none;
 
-  font-size: 3rem;
+  line-height: 1;
+  font-weight: 300;
 }
 
 .primary-tabbed-navigation-list-item {
@@ -270,24 +440,24 @@
   }
 
   & + & {
-    border-left: 2px solid rgba(255, 255, 255, .4);
+    border-left: 3px solid rgba(255, 255, 255, .4);
   }
 }
 
-.primary-tabbed-navigation-button {
+.primary-tabbed-navigation-button() {
+  .primary-input-height();
+
   display: block;
-  padding-top: .5em;
-  padding-left: 1em;
-  padding-bottom: .5em;
-  padding-right: 1em;
+  padding: 0 1em;
 
   background-color: transparent;
   border: 0;
 
   color: fade(@base-text-color, 40%);
   font-size: inherit;
-  font-family: inherit;
   line-height: 1;
+  font-family: inherit;
+  font-weight: 300;
 
   transition:
     background-color .2s ease,
@@ -306,58 +476,117 @@
     color: @ruby;
   }
 }
-
-
-
-.primary-community-name-input,
-.primary-community-repo-name-filter-input,
-.primary-community-invite-people-name-input {
-  .primary-bare-input();
-  margin-top: 1.5rem;
-  margin-bottom: 3rem;
+.primary-tabbed-navigation-button {
+  .primary-tabbed-navigation-button();
 }
 
 
 
 
+
+.community-create-progression-button-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-content: center;
+
+  margin-top: 4rem;
+
+  @media (max-width: @step-fixed-progression-breakpoint) {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+
+    width: 100%;
+    padding: 1.5rem 2rem;
+
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(44, 23, 58, 0.8) 50%
+    );
+
+    // For the chrome bug where you can't mix `position: fixed` and transform :(
+    transform: unset;
+  }
+}
+
 .community-create-next-button {
-  padding-right: 0;
-  text-align: left;
+
+}
+.community-create-next-button--constrained {
+  .community-create-next-button();
+  @media (max-width: @step-fixed-progression-breakpoint) {
+    padding-left: 1.8em;
+    padding-right: 1.8em;
+  }
 }
 
 .community-create-back-button {
   .secondary-community-create-button();
   padding-left: 0;
 }
+.community-create-back-button--constrained {
+  .community-create-back-button();
+  @media (max-width: @step-fixed-progression-breakpoint) {
+    padding-right: 1em;
+  }
+}
 
+
+
+
+
+
+.primary-community-name-input {
+  .primary-bare-input();
+  .primary-input-spacing-top();
+  .primary-input-font-size();
+  .primary-input-height();
+
+  margin-bottom: @primary-input-spacing-bottom;
+
+}
 
 .community-creation-slug-input-wrapper {
+  .secondary-input-spacing-top();
+
   position: relative;
   display: flex;
   align-items: baseline;
-  margin-bottom: 4rem;
+  // aligning to baseline makes the whole thing a bit taller so just shrink this down to explicit height
+  height: @secondary-input-height;
+  margin-bottom: @secondary-input-spacing-bottom;
 
   &:after {
     position: absolute;
     right: 0;
 
-    content: '\e81a';
+    content: '';
     font-family: 'fontello';
-
-    color: transparent;
 
     transition: color .2s ease;
   }
 
-  &:hover {
+  &.pending {
     &:after {
-      color: rgba(255, 255, 255, 0.5);
+      content: '\e80b';
+    }
+  }
+  &.available {
+    &:after {
+      content: '\e804';
+    }
+  }
+  &.unavailable {
+    &:after {
+      content: '\e817';
     }
   }
 }
 
 .community-creation-slug-input-prefix {
   margin-right: 0.5rem;
+  font-weight: 300;
 }
 
 .community-creation-slug-input {
@@ -368,6 +597,37 @@
 .community-creation-slug-input-icon {
 
 }
+
+
+.community-create-associated-project-section {
+  height: (@org-area-total-height + @org-area-padding) + @invited-area-total-height + @invited-area-spacing-top;
+  padding-top: @org-item-height;
+}
+
+.community-create-associated-project-copy {
+  display: none;
+  margin: 0;
+
+  color: @subdued-text-color;
+
+  &.active {
+    display: block;
+  }
+}
+
+.community-create-has-associated-project-copy {
+  .community-create-associated-project-copy();
+
+  &.active {
+    display: flex;
+    justify-content: space-between;
+  }
+}
+
+.community-create-change-github-project-button {
+  padding: 0;
+}
+
 
 
 .community-creation-sub-room-input-wrapper {
@@ -381,7 +641,10 @@
 
 .community-creation-sub-room-input {
   .secondary-bare-input();
+  .secondary-input-spacing-top();
+
   flex: 1;
+  margin-bottom: @secondary-input-spacing-bottom;
 }
 
 .community-creation-sub-room-submit-button {
@@ -427,7 +690,14 @@
 
 
 .community-create-github-projects-tabbed-wrapper {
+  overflow: hidden;
   position: relative;
+}
+
+.community-create-github-projects-tabbed-navigation-list {
+  .primary-tabbed-navigation-list();
+  .primary-input-spacing-top();
+  margin-bottom: @primary-input-spacing-bottom;
 }
 
 .community-create-github-projects-tab-content-area {
@@ -459,7 +729,10 @@
 
 .community-create-github-project-list-wrapper {
   overflow: auto;
-  max-height: unit(60 * 4, px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
 
   &::-webkit-scrollbar-thumb {
     background-color: rgba(255, 255, 255, .2);
@@ -469,13 +742,50 @@
   }
 }
 
-.community-create-org-list,
-.community-create-repo-list {
+.community-create-github-project-list() {
+  display: flex;
+  flex-wrap: wrap;
+
   margin-top: 0;
   margin-left: 0;
   margin-bottom: 0;
   padding-left: 0;
   list-style: none;
+}
+
+.loop-github-projects-list-item-max-width(@num-columns) when (@num-columns > 1) {
+  // next iteration
+  .loop-github-projects-list-item-max-width(@num-columns - 1);
+
+  // Only when we can fit the appropriate number of items in (see flex-basis)
+  @breakpoint-width: ((@org-area-inner-width / @num-columns) * (@num-columns - 1));
+  @media (min-width: @breakpoint-width) {
+    max-width: 100% / @num-columns;
+  }
+}
+
+.community-create-github-project-list-item(@item-spacing) {
+  @border-width: 2px;
+  @vertical-padding-calc-value: (@item-spacing / 2) ~"-" @border-width;
+
+  overflow: hidden;
+  flex-grow: 1;
+  // This will ensure we can have at max 2 items
+  flex-basis: (@org-area-inner-width / (@number-github-projects-per-row + 1)) + 1;
+  display: block;
+  .loop-github-projects-list-item-max-width(@number-github-projects-per-row);
+
+  margin-top: calc(@vertical-padding-calc-value);
+  margin-bottom: calc(@vertical-padding-calc-value);
+
+  border: @border-width solid transparent;
+
+  transition: border-color .2s ease;
+
+  &.active {
+    background-color: rgba(255, 255, 255, .08);
+    border: 2px solid fade(@ruby, 60%);
+  }
 }
 
 .community-create-list-item-link {
@@ -485,10 +795,15 @@
   color: @base-text-color;
   white-space: nowrap;
   text-overflow: ellipsis;
+  line-height: 1;
 
   transition:
     background-color .2s ease;
 
+  &:hover {
+    background-color: rgba(255, 255, 255, .075);
+    text-decoration: none;
+  }
   &:focus {
     background-color: rgba(255, 255, 255, .1);
     outline: none;
@@ -496,78 +811,171 @@
 }
 
 .community-create-list-item-name {
+}
 
+
+.community-create-org-list-root {
+  .secondary-input-spacing-top();
+
+  height: @org-area-total-height + @org-area-padding;
+  //margin-top: @secondary-input-height + @secondary-input-spacing-top + @secondary-input-spacing-bottom;
+  padding: (@org-area-padding - (@org-item-spacing / 2)) @org-area-padding;
+
+  background-color: rgba(0, 0, 0, .2);
+}
+.community-create-org-list-root-inner {
+  height: 100%;
+}
+
+.community-create-org-list {
+  .community-create-github-project-list();
 }
 
 .community-create-org-list-item {
-  margin-top: 1rem;
-  border: 2px solid transparent;
+  .community-create-github-project-list-item(@org-item-spacing);
+}
 
-  transition: border-color .2s ease;
+.community-create-org-list-item-link {
+  .community-create-list-item-link();
+}
 
-  &.active {
-    background-color: rgba(255, 255, 255, .08);
-    border: 2px solid fade(@ruby, 60%);
-  }
+.community-create-org-list-item-avatar {
+  width: @org-item-avatar-size;
+  height: @org-item-avatar-size;
+  vertical-align: middle;
+  margin-right: 1.6rem;
+
+  background-color: #ffffff;
+  border-radius: 4px;
 }
 
 
-.community-create-org-list-item-avatar {
-  max-width: 44px;
-  vertical-align: middle;
-  margin-right: 16px;
+.primary-community-repo-name-filter-input {
+  .secondary-bare-input();
+  .secondary-input-spacing-top();
+  margin-bottom: @secondary-input-spacing-bottom;
+}
+
+.community-create-repo-list-root {
+  height: @org-area-total-height + @org-area-padding;
+  padding: (@org-area-padding - (@repo-item-spacing / 2)) @org-area-padding;
+  background-color: rgba(0, 0, 0, .2);
+}
+.community-create-repo-list-root-inner {
+  height: 100%;
 }
 
 .community-create-repo-list {
-  column-width: 250px;
+  .community-create-github-project-list();
 }
 
 .community-create-repo-list-item {
-  margin-top: 8px;
-  border: 2px solid transparent;
+  .community-create-github-project-list-item(@repo-item-spacing);
+}
 
-  transition: border-color .2s ease;
-
-  &.hidden {
-    display: none;
-  }
-
-  &.active {
-    background-color: rgba(255, 255, 255, .08);
-    border: 2px solid fade(@ruby, 60%);
-  }
+.community-create-repo-list-item-link {
+  .community-create-list-item-link();
 }
 
 .community-create-repo-list-item-avatar {
-  max-width: 22px;
+  width: @repo-item-avatar-size;
+  height: @repo-item-avatar-size;
   vertical-align: middle;
   margin-right: .3rem;
+
+  background-color: #ffffff;
+  border-radius: 3px;
 }
 
 
+.community-create-org-missing-note {
+  // @secondary-input-spacing-top is already used on top of org list
+  @secondary-input-leftover-height: @secondary-input-height + @secondary-input-spacing-bottom;
+  height: @invited-area-total-height + @secondary-input-leftover-height;
+  margin-top: @invited-area-spacing-top;
+  margin-bottom: 0;
+}
 
 
-.community-create-people-list {
+.community-create-repo-missing-note {
+  min-height: @invited-area-total-height;
+  margin-top: @invited-area-spacing-top;
+  margin-bottom: 0;
+}
+
+.community-invite-people-name-input {
+  .primary-community-name-input();
+}
+
+.community-invite-people-email-input-wrapper {
+  display: flex;
+  // reset forms.less :(
+  margin: 0;
+  margin-top: @invite-user-item-spacing;
+}
+
+.community-invite-people-email-input {
+  .secondary-bare-input();
+  flex: 6;
+  margin-bottom: 0;
+}
+
+.community-invite-people-email-submit-button {
+  flex: 1;
+  flex-shrink: 0;
+  padding: 0;
+
+  text-align: right;
+}
+
+
+.community-create-invite-user-result-list-root {
+  .secondary-input-spacing-top();
+
+  height: @invite-user-area-total-height + @org-area-padding;
+
+  //margin-top: @secondary-input-height + @secondary-input-spacing-top + @secondary-input-spacing-bottom;
+  padding: (@org-area-padding - (@invite-user-item-spacing / 2)) @org-area-padding;
+
+  background-color: rgba(0, 0, 0, .2);
+}
+
+.community-create-invite-user-result-list-root-inner {
+  height: 100%;
+}
+
+.community-create-invite-user-result-list-wrapper {
   overflow: auto;
-  max-height: unit(60 * 4, px);
+  height: 100%;
+}
+
+.community-create-invite-user-result-list {
+  display: flex;
+  flex-wrap: wrap;
 
   margin-left: 0;
-  padding-left: 2.5rem;
+  padding-left: 0;
 
   list-style: none;
 }
 
-.community-create-people-list-empty-note {
-  color: fade(@base-text-color, 40%);
+.community-create-invite-user-result-list-empty-note {
+  color: @subdued-text-color;
   font-size: 1.6rem;
   font-style: italic;
 }
 
-.community-create-people-list-item {
-  margin-top: 1.5rem;
+.community-create-invite-user-result-list-item {
+  @vertical-padding-calc-value: (@invite-user-item-spacing / 2);
+
+  flex-grow: 1;
+  // This will ensure we can have at max 2 items
+  flex-basis: (@step-content-area-max-width / 3) + 1;
+  margin-top: calc(@vertical-padding-calc-value);
+  margin-bottom: calc(@vertical-padding-calc-value);
 }
 
-.community-create-people-list-item-link {
+.community-create-invite-user-result-list-item-link {
   .community-create-list-item-link();
   display: flex;
   align-items: center;
@@ -578,39 +986,250 @@
   }
 }
 
-.community-create-people-list-item-avatar {
-  max-width: 44px;
+.community-create-invite-user-result-list-item-avatar {
+  width: @invite-user-item-avatar-size;
+  height: @invite-user-item-avatar-size;
   margin-right: 1rem;
+
+  background-color: #ffffff;
+  border-radius: 4px;
 }
 
 
-.community-create-list-item-name {
-  flex: 1;
+
+
+.community-create-invite-list-root {
+  // @secondary-input-spacing-top is already used on the invite user result list
+  min-height: @people-list-item-height;
+  margin-top: @invite-user-item-spacing;
+}
+
+.community-create-people-list {
+  margin-left: 0;
+  margin-bottom: 0;
+
+  list-style: none;
+  line-height: 1;
+}
+
+.community-create-people-list-empty-note {
+  color: @subdued-text-color;
+  font-size: 1.6rem;
+  font-style: italic;
+}
+
+.community-create-people-list-item {
+  position: relative;
+  display: inline-block;
+  margin: @people-list-item-spacing;
+
+  &.pending {
+    opacity: .8;
+
+    &:after {
+      content: '\e834';
+      position: absolute;
+      top: 0;
+      right: 0;
+
+      font-family: 'fontello';
+
+      animation-name: community-create-people-list-item-pending-spinner-rotate;
+      animation-duration: .75s;
+      animation-iteration-count: infinite;
+      animation-timing-function: linear;
+    }
+  }
+
+  &.needs-email {
+    animation-name: community-create-people-list-item-needs-email-flash;
+    animation-duration: .75s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+    animation-direction: alternate;
+  }
+
+  &.pending {
+    .community-create-people-list-item-remove-button {
+      display: none;
+    }
+  }
+
+
+  .community-create-people-list-item-overlay {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s ease;
+  }
+
+  &.needs-email,
+  &.ready-valid-email {
+    &:hover {
+      .community-create-people-list-item-overlay {
+        opacity: 1;
+        pointer-events: auto;
+      }
+    }
+  }
+
+}
+@keyframes community-create-people-list-item-pending-spinner-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes community-create-people-list-item-needs-email-flash {
+  from {
+    opacity: .8;
+  }
+  to {
+    opacity: .5;
+  }
+}
+
+@keyframes community-create-people-list-item-pending-spinner-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+.community-create-people-list-item-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  &:hover,
+  &:focus {
+    text-decoration: none;
+  }
+}
+
+.community-create-people-list-item-avatar {
+  width: @invite-user-item-avatar-size;
+  height: @invite-user-item-avatar-size;
+
+  background-color: #ffffff;
+  border-radius: 4px;
+}
+
+.community-create-people-list-item-remove-button-overlay {
+  z-index: 1;
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 
 .community-create-people-list-item-remove-button {
-  background-color: transparent;
+  @people-list-item-remove-button-size:  3rem;
+  @people-list-item-remove-button-background-color: @caribbean;
+  @people-list-item-remove-button-color: #ffffff;
+
+  width: @people-list-item-remove-button-size;
+  height: @people-list-item-remove-button-size;
+  padding: 0;
+
+  background-color: fade(@people-list-item-remove-button-background-color, 60%);
   border: 0;
 
-  color: inherit;
+  color: fade(@people-list-item-remove-button-color, 60%);
   font-size: 1em;
+  line-height: @people-list-item-remove-button-size;
+  text-align: center;
+
+  transform: scale(.5);
+  transform-origin: top right;
+
+  will-change: transform;
+  transition:
+    background-color .2s ease,
+    color .2s ease,
+    transform .2s ease;
+
+  .community-create-people-list-item-link:hover &,
+  .community-create-people-list-item-link:focus & {
+    background-color: @people-list-item-remove-button-background-color;
+    color: @people-list-item-remove-button-color;
+    transform: scale(1);
+  }
+
+}
+
+.community-create-people-list-item-overlay {
+  z-index: 1;
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  min-width: 300px;
+  padding-top: 1rem;
+  padding-left: calc(@invite-user-item-avatar-size + 1rem);
+  padding-bottom: .6rem;
+  padding-right: 1rem;
+
+  background-color: rgba(0, 0, 0, .3);
+
+  color: #ffffff;
+}
+
+.community-create-people-list-item-email-input {
+  .secondary-bare-input();
+
+  &:focus,
+  &:invalid:focus {
+    outline: none;
+    box-shadow: none;
+  }
 }
 
 
 
+@overview-extra-space-section-offset: 2rem;
+.community-create-overview-info-area {
+  .primary-input-spacing-top();
+  height: @overview-extra-space-section-offset + @primary-input-height + @primary-input-spacing-bottom + @secondary-input-height + @secondary-input-spacing-top + @secondary-input-spacing-bottom;
+}
+
+.community-create-overview-invite-area {
+  height: -@overview-extra-space-section-offset + (@org-area-total-height + @org-area-padding) + @invited-area-total-height + @invited-area-spacing-top;
+  padding-top: 3rem;
+  border-top: 2px solid rgba(255,255,255,.2);
+}
+
 .community-create-overview-community-name {
-  font-size: 2.3rem;
-  font-weight: bold;
+  margin-bottom: 1.8rem;
+
+  font-weight: 300;
+  line-height: 1;
 }
 
 .community-create-overview-url-heading {
+  margin-bottom: 1.2rem;
+
   color: fade(@base-text-color, 60%);
   font-size: 1.8rem;
-  font-weight: normal;
+  font-weight: 300;
 }
 
 .community-create-overview-github-link {
   .community-create-general-link();
+  font-weight: 300;
+}
+
+.community-create-overview-invite-list-heading {
+  font-weight: 300;
+}
+
+.community-create-overview-invite-list-root {
+  min-height: @people-list-item-height;
+  margin-top: @invite-user-item-spacing;
 }
 
 .community-create-overview-sub-room-heading {

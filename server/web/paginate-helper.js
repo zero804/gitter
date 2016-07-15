@@ -1,83 +1,108 @@
-/* eslint complexity: ["error", 19] */
 'use strict';
+
+function requiredBlock(context, page, pageCount, fn) {
+  if (page > 1 || pageCount > 1) {
+    return fn(context)
+  } else {
+    return "";
+  }
+}
+
+function middleBlock(page, pageCount, limit, fn) {
+  function contextForItem(pageNumber) {
+    return {
+      n: pageNumber,
+      active: pageNumber === page
+    };
+  }
+
+  var i;
+  var ret = '';
+  if (typeof limit === 'number') {
+    i = 0;
+    var leftCount = Math.ceil(limit / 2) - 1;
+    var rightCount = limit - leftCount - 1;
+    if (page + rightCount > pageCount)
+      leftCount = limit - (pageCount - page) - 1;
+    if (page - leftCount < 1)
+      leftCount = page - 1;
+    var start = page - leftCount;
+
+    while (i < limit && i < pageCount) {
+      ret = ret + fn(contextForItem(start));
+      start++;
+      i++;
+    }
+  } else {
+    for (i = 1; i <= pageCount; i++) {
+      ret = ret + fn(contextForItem(i));
+    }
+  }
+
+  return ret;
+}
+
+function previousBlock(page, pageCount, fn) {
+  if (page === 1) {
+    return fn({ disabled: true, n: 1 });
+  } else {
+    return fn({ n: page - 1 });
+  }
+}
+
+function nextBlock(page, pageCount, fn) {
+  if (page === pageCount) {
+    return fn({ disabled: true, n: pageCount });
+  } else {
+    return fn({ n: page + 1 });
+  }
+}
+
+function firstBlock(page, pageCount, fn) {
+  if (page === 1) {
+    return fn({ disabled: true, n: 1 });
+  } else {
+    return fn({ n: 1 });
+  }
+}
+
+function lastBlock(page, pageCount, fn) {
+  if (page === pageCount) {
+    return fn({ disabled: true, n: pageCount });
+  } else {
+    return fn({ n: pageCount });
+  }
+
+}
 
 module.exports = function(pagination, options) {
   var type = options.hash.type || 'middle';
-  var ret = '';
+
   var pageCount = Number(pagination.pageCount);
   var page = Number(pagination.page);
   var limit;
   if (options.hash.limit) limit = +options.hash.limit;
+  var fn = options.fn;
 
-  //page pageCount
-  var newContext = {};
   switch (type) {
-    case 'middle':
-      var i;
-      if (typeof limit === 'number') {
-        i = 0;
-        var leftCount = Math.ceil(limit / 2) - 1;
-        var rightCount = limit - leftCount - 1;
-        if (page + rightCount > pageCount)
-          leftCount = limit - (pageCount - page) - 1;
-        if (page - leftCount < 1)
-          leftCount = page - 1;
-        var start = page - leftCount;
+    case 'required':
+      return requiredBlock(this, page, pageCount, fn);
 
-        while (i < limit && i < pageCount) {
-          newContext = { n: start };
-          if (start === page) newContext.active = true;
-          ret = ret + options.fn(newContext);
-          start++;
-          i++;
-        }
-      }
-      else {
-        for (i = 1; i <= pageCount; i++) {
-          newContext = { n: i };
-          if (i === page) newContext.active = true;
-          ret = ret + options.fn(newContext);
-        }
-      }
-      break;
+    case 'middle':
+      return middleBlock(page, pageCount, limit, fn);
+
     case 'previous':
-      if (page === 1) {
-        newContext = { disabled: true, n: 1 };
-      }
-      else {
-        newContext = { n: page - 1 };
-      }
-      ret = ret + options.fn(newContext);
-      break;
+      return previousBlock(page, pageCount, fn);
+
     case 'next':
-      newContext = {};
-      if (page === pageCount) {
-        newContext = { disabled: true, n: pageCount };
-      }
-      else {
-        newContext = { n: page + 1 };
-      }
-      ret = ret + options.fn(newContext);
-      break;
+      return nextBlock(page, pageCount, fn);
+
     case 'first':
-      if (page === 1) {
-        newContext = { disabled: true, n: 1 };
-      }
-      else {
-        newContext = { n: 1 };
-      }
-      ret = ret + options.fn(newContext);
-      break;
+      return firstBlock(page, pageCount, fn)
+
     case 'last':
-      if (page === pageCount) {
-        newContext = { disabled: true, n: pageCount };
-      }
-      else {
-        newContext = { n: pageCount };
-      }
-      ret = ret + options.fn(newContext);
-      break;
+      return lastBlock(page, pageCount, fn)
   }
 
-  return ret;
+  return '';
 };

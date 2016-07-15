@@ -6,33 +6,53 @@ var Marionette = require('backbone.marionette');
 var troupeCollections = require('collections/instances/troupes');
 var ModalView = require('./modal');
 var apiClient = require('components/apiClient');
-var ParentSelectView = require('views/createRoom/parentSelectView');
+var GroupSelectView = require('views/createRoom/groupSelectView');
 var template = require('./tmpl/create-room-view.hbs');
 var appEvents = require('utils/appevents');
+
+
+/* We do a better job on the server with checking names, as we have XRegExp there */
+function safeRoomName(val) {
+  if (val.length < 1) return false;
+  if (/[<>\\\/\{\}|\#@\&\.\(\)\'\"]/.test(val)) return false;
+  return true;
+}
+
+function checkForRepoExistence(repo, cb) {
+  apiClient.priv.get('/gh/repos/' + repo)
+    .then(function () {
+      return true;
+    })
+    .catch(function () {
+      return false;
+    })
+    .then(function(result) {
+      cb(result);
+    });
+}
 
 var View = Marionette.LayoutView.extend({
   template: template,
 
-  ui:                     {
-    autoJoin:             "#auto-join",
-    permPublic:           "#perm-select-public",
-    permPrivate:          "#perm-select-private",
-    permInheritedOrg:     "#perm-select-inherited-org",
-    validation:           '#modal-failure',
-    selectParentRequired: "#perm-select-required",
-    existing:             '#existing',
-    parentNameLabel:      "#parent-name",
-    permInheritedLabel:   '#perm-inherited-label',
-    roomNameInput:        '#room-name',
-    dropDownButton:       '#dd-button',
-    permissionsLabel:     '#permissions-label',
+  ui: {
+    permissions: '#permissions',
+    permPublic: '#perm-select-public',
+    permPrivate: '#perm-select-private',
+    permInheritedOrg: '#perm-select-inherited-org',
+    permInheritedRepo: '#perm-select-inherited-repo',
+    validation: '#modal-failure',
+    existing: '#existing',
+    orgNameLabel: '#org-name',
+    repoNameLabel: '#repo-name',
+    roomNameInput: '#room-name',
+    dropDownButton: '#dd-button',
   },
 
-  events:                       {
+  events: {
     'change @ui.roomNameInput': 'roomNameChange',
-    'cut @ui.roomNameInput':    'roomNameChange',
-    'paste @ui.roomNameInput':  'roomNameChange',
-    'input @ui.roomNameInput':  'roomNameChange',
+    'cut @ui.roomNameInput': 'roomNameChange',
+    'paste @ui.roomNameInput': 'roomNameChange',
+    'input @ui.roomNameInput': 'roomNameChange',
     'click @ui.dropDownButton': 'clickDropDown',
     'change input[type=radio]': 'permissionsChange'
   },
@@ -67,8 +87,8 @@ var View = Marionette.LayoutView.extend({
   },
 
   clickDropDown: function() {
-    this.parentSelect.focus();
-    this.parentSelect.show();
+    this.groupSelect.focus();
+    this.groupSelect.show();
   },
 
   showValidationMessage: function (message) {
@@ -85,75 +105,70 @@ var View = Marionette.LayoutView.extend({
 
   validateAndCreate: function() {
     var self = this;
-    /* We do a better job on the server with checking names, as we have XRegExp there */
-    function safeRoomName(val) {
-      if(val.length < 1) return false;
-      if(/[<>\\\/\{\}|\#@\&\.\(\)\'\"]/.test(val)) return false;
-      return true;
-    }
 
-    var ownerModel = self.selectedModel;
-    if(!ownerModel) {
-      self.parentSelect.show();
+    var group = self.selectedGroup;
+    if (!group) {
+      self.groupSelect.show();
       return;
     }
 
+    var groupId = group.get('id');
+    var groupBackedBy = group.get('backedBy');
+    var groupType = groupBackedBy.type;
+    var groupLinkPath = groupBackedBy.linkPath;
     var permissions = self.$el.find('input[type=radio]:visible:checked').val();
-    var channelName = self.ui.roomNameInput.val().trim();
+    var roomName = self.ui.roomNameInput.val().trim();
 
-    var payload = { security: permissions && permissions.toUpperCase(), name: channelName };
-
-    var promise;
-
-    switch(ownerModel.get('type')) {
-      case 'user':
-        if(permissions !== 'public' && permissions !== 'private') {
-          self.showValidationMessage('Please select the permissions for the room');
-          // TODO: better error reporting!
-          return;
-        }
-
-        if(permissions === 'public' && !channelName) {
-          self.showValidationMessage('You need to specify a room name');
-          self.ui.roomNameInput.focus();
-          return;
-        }
-
-        if(channelName && !safeRoomName(channelName)) {
-          self.showValidationMessage('Please choose a channel name consisting of letter and number characters');
-          self.ui.roomNameInput.focus();
-          return;
-        }
-
-        promise = apiClient.user.post('/channels', payload);
-        break;
-
-      case 'repo':
-      case 'org':
-        if(permissions !== 'public' && permissions !== 'private' && permissions !== 'inherited') {
-          self.showValidationMessage('Please select the permissions for the room');
-          // TODO: better error reporting!
-          return;
-        }
-
-        if(!channelName || !safeRoomName(channelName)) {
-          self.showValidationMessage('Please choose a channel name consisting of letter and number characters');
-          self.ui.roomNameInput.focus();
-          return;
-        }
-
-        payload.ownerUri = ownerModel.get('uri');
-        // we use a special endpoint that can create an empty owner room if it hasnt been created yet
-        // the current /v1/:room/channels api requires owner room membership, so we need to use our
-        // special endpoint if the owner room is empty as well.
-        promise = apiClient.post('/v1/private/channels', payload);
-        break;
+    if (permissions !== 'public' && permissions !== 'inherited' && permissions !== 'private') {
+      self.showValidationMessage('Please select the permissions for the room');
+      return;
     }
 
-    promise
+    if (permissions === 'inherited' && groupType !== 'GH_ORG' && groupType !== 'GH_REPO') {
+      self.showValidationMessage('Please select the permissions for the room');
+      return;
+    }
+
+    if (!roomName) {
+      self.showValidationMessage('You need to specify a room name');
+      self.ui.roomNameInput.focus();
+      return;
+    }
+
+    if (roomName && !safeRoomName(roomName)) {
+      self.showValidationMessage('Please choose a channel name consisting of letter and number characters');
+      self.ui.roomNameInput.focus();
+      return;
+    }
+
+    var apiUrl = '/v1/groups/' + groupId + '/rooms';
+    var security = permissions.toUpperCase();
+    var payload;
+    if (security === 'PUBLIC' || security === 'INHERITED') {
+      payload = {
+        name: roomName,
+        security: {
+          type: groupType, // null or GH_ORG or GH_REPO
+          // the backend only understands PUBLIC or PRIVATE. INHERITED is what
+          // it understands as a PRIVATE GH_GROUP or GH_REPO room.
+          security: (security === 'PUBLIC') ? 'PUBLIC' : 'PRIVATE',
+          linkPath: (groupType !== null) ? groupLinkPath : null
+        }
+      };
+    } else {
+      // PRIVATE rooms don't have a backing object regardless of the group
+      payload = {
+        name: roomName,
+        security: {
+          type: null,
+          security: 'PRIVATE',
+        }
+      };
+    }
+    return apiClient.post(apiUrl, payload)
       .then(function(data) {
         self.dialog.hide();
-        appEvents.trigger('navigation', data.url , 'chat#add', data.uri);
+        appEvents.trigger('navigation', '/'+data.uri , 'chat#add', '/'+data.uri);
       })
       .catch(function(err) {
         var status = err.status;
@@ -161,6 +176,7 @@ var View = Marionette.LayoutView.extend({
 
         switch (status) {
           case 400:
+            // TODO: send this from the server
             if (err.response && err.response.illegalName) {
               message = 'Please choose a channel name consisting of letter and number characters.';
               self.ui.roomNameInput.focus();
@@ -182,99 +198,88 @@ var View = Marionette.LayoutView.extend({
       });
   },
 
-  parentSelected: function(model, animated) {
-    this.selectedModel = model;
+  groupSelected: function(group, animated) {
+    this.selectedGroup = group;
     this.recalcView(animated);
   },
 
   recalcView: function (animated) {
-
     if (!this._uiBindings) return; // ui may not be bound yet.
     var self = this;
 
     var showHide = {
-      'selectParentRequired': false,
-      'autoJoin': false,
+      'permissions': false,
       'permPublic': false,
       'permPrivate': false,
       'permInheritedOrg': false,
+      'permInheritedRepo': false,
       'existing': false,
-      'permissionsLabel': true
     };
 
-    var placeholder = "";
-    var model = this.selectedModel;
+    var placeholder = "Required";
+    var group = this.selectedGroup;
+
     var checkForRepo;
-    var parentName = "";
-    var createButtonEnabled = true;
+    var createButtonEnabled;
 
-    if (model) {
-      parentName = model.get('name');
+    if (group) {
+      createButtonEnabled = true;
       var roomName = this.ui.roomNameInput.val();
-      var parentUri = model.get('uri');
+      var groupUri = group.get('uri');
+      var groupBackedBy = group.get('backedBy');
+      var groupType = groupBackedBy.type;
+      var orgName = groupBackedBy.linkPath || '';
+      var repoName = groupBackedBy.linkPath || '';
 
-      switch(model.get('type')) {
-        case 'org':
-          [/*'autoJoin', */'permPublic', 'permPrivate', 'permInheritedOrg'].forEach(function (f) { showHide[f] = true; });
-          checkForRepo = roomName && parentUri + '/' + roomName;
-          placeholder = "Required";
-          break;
+      if (groupType === 'GH_ORG') {
+        // rooms inside github org based groups can have inherited permissions
+        ['permissions', 'permPublic', 'permPrivate', 'permInheritedOrg'].forEach(function (f) { showHide[f] = true; });
+        checkForRepo = roomName && groupUri + '/' + roomName;
 
-        case 'repo':
-          [/*'autoJoin', */'permPublic', 'permPrivate'].forEach(function (f) { showHide[f] = true; });
-          placeholder = "Required";
-          break;
+      } else if (groupType === 'GH_REPO') {
+        // rooms inside github repo based groups can have inherited permissions
+        ['permissions', 'permPublic', 'permPrivate', 'permInheritedRepo'].forEach(function (f) { showHide[f] = true; });
+        checkForRepo = roomName && groupUri + '/' + roomName;
 
-        case 'user':
-          [/*'autoJoin', */'permPublic', 'permPrivate'].forEach(function(f) { showHide[f] = true; });
-          var permissions = this.$el.find('input[type=radio]:visible:checked').val();
-          switch(permissions) {
-            case 'public':
-              placeholder = "Required";
-              break;
-
-            case 'private':
-              placeholder = "Optional";
-              break;
-
-            default:
-              placeholder = "Required for public channels";
-          }
-          checkForRepo = roomName && parentUri + '/' + roomName;
-          break;
+      } else {
+        // other rooms can only have public or private permissions
+        ['permissions', 'permPublic', 'permPrivate'].forEach(function(f) { showHide[f] = true; });
+        checkForRepo = roomName && groupUri + '/' + roomName;
       }
 
       createButtonEnabled = false;
-      var existing = roomName && troupeCollections.troupes.findWhere({ uri: parentUri + '/' + roomName});
+      var existing = roomName && troupeCollections.troupes.findWhere({ uri: groupUri + '/' + roomName});
       createButtonEnabled = !existing;
 
       if (existing) {
+        // TODO: make a reset() and use that
         showHide = {
-          'selectParentRequired': false,
-          'autoJoin': false,
+          'permissions': false,
           'permPublic': false,
           'permPrivate': false,
           'permInheritedOrg': false,
-          'permissionsLabel': false,
+          'permInheritedRepo': false,
           'existing': true
         };
         checkForRepo = null;
       }
     }
 
+    // TODO: do we still have to check for this? Until we break the uri link, I
+    // guess.
     if (checkForRepo) {
       createButtonEnabled = false;
       checkForRepoExistence(checkForRepo, function (exists) {
         createButtonEnabled = !exists;
 
         if (exists) {
+          // TODO: make a reset() and use that
           showHide = {
-            'selectParentRequired': false,
-            'autoJoin': false,
+            'permissions': false,
             'permPublic': false,
             'permPrivate': false,
             'permInheritedOrg': false,
-            'permissionsLabel': false,
+            'permInheritedRepo': false,
             'existing': false
           };
           self.showValidationMessage('You cannot create a channel with this name as a repo with the same name already exists.');
@@ -285,21 +290,8 @@ var View = Marionette.LayoutView.extend({
       applyShowHides();
     }
 
-    function checkForRepoExistence(repo, cb) {
-      apiClient.priv.get('/gh/repos/' + repo)
-        .then(function () {
-          return true;
-        })
-        .catch(function () {
-          return false;
-        })
-        .then(function(result) {
-          cb(result);
-        });
-    }
 
     function applyShowHides() {
-
       if (!self.dialog) return; // callback but room has already been created, therefore self.dialog is null
 
       self.dialog.setButtonState('create', createButtonEnabled); // set button state
@@ -314,45 +306,43 @@ var View = Marionette.LayoutView.extend({
         return $(elements);
       }
 
-
       self.dialog.showActions();
-
 
       if(animated === false) {
         arrayToJq(true).removeClass('hide');
         arrayToJq(false).addClass('hide');
-        self.ui.roomNameInput.attr('placeholder', placeholder);
-        self.ui.parentNameLabel.text(parentName);
       } else {
-        arrayToJq(true).filter(':hidden').removeClass('hide'); //.slideDown('fast').css('display','flex');
-        arrayToJq(false).filter(':visible').addClass('hide');//.slideUp('fast').css('display','flex');
-
-        self.ui.parentNameLabel.text(parentName);
-        self.ui.roomNameInput.attr('placeholder', placeholder);
+        arrayToJq(true).filter(':hidden').removeClass('hide');
+        arrayToJq(false).filter(':visible').addClass('hide');
       }
     }
+    self.ui.orgNameLabel.text(orgName);
+    self.ui.repoNameLabel.text(repoName);
+    self.ui.roomNameInput.attr('placeholder', placeholder);
   },
 
   onRender: function() {
-    var parentSelect = new ParentSelectView({
-      orgsCollection: troupeCollections.orgs,
-      troupesCollection: troupeCollections.troupes
+    // TODO: troupeCollections.groups is probably not loaded yet
+    var groupSelect = new GroupSelectView({
+      groupsCollection: troupeCollections.groups
     });
 
-    this.parentSelect = parentSelect;
-    this.ownerSelect.show(parentSelect);
+    this.groupSelect = groupSelect;
+    this.ownerSelect.show(groupSelect);
 
-    this.listenTo(parentSelect, 'selected', this.parentSelected);
+    this.listenTo(groupSelect, 'selected', this.groupSelected);
 
-    if(this.options.roomName) {
+    if (this.options.roomName) {
       this.ui.roomNameInput.val(this.options.roomName);
     }
 
-    if(this.options.initialParent) {
-      var model = this.parentSelect.selectUri(this.options.initialParent);
-      this.parentSelected(model, false);
+    // TODO: troupeCollections.groups is probably not loaded yet, so you can't
+    // select the initial group.
+    if (this.options.initialGroupId) {
+      var group = this.groupSelect.selectGroupId(this.options.initialGroupId);
+      this.groupSelected(group, false);
     } else {
-      this.parentSelected(null, false);
+      this.groupSelected(null, false);
     }
 
     this.recalcView(false);

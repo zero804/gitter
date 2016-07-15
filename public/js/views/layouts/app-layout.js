@@ -27,7 +27,9 @@ module.exports = (function () {
 
     behaviors: function(){
       var behaviors = {
-        Isomorphic: {}
+        Isomorphic: {
+          communityCreate: { el: '.community-create-app-root', init: 'initCommunityCreateRegion' }
+        }
       };
 
       if(isMobile() || !context.hasFeature('left-menu')) {
@@ -46,9 +48,10 @@ module.exports = (function () {
 
     initNewMenuRegion: function (optionsForRegion){
       this.menuRegion = new RoomMenuLayout(optionsForRegion({
-        bus:                     appEvents,
-        roomCollection:          this.roomCollection,
-        orgCollection:           this.orgCollection
+        bus: appEvents,
+        roomCollection: this.roomCollection,
+        orgCollection: this.orgCollection,
+        groupsCollection: this.groupsCollection
       }));
       return this.menuRegion;
     },
@@ -60,11 +63,11 @@ module.exports = (function () {
     initialize: function (options) {
       this.roomCollection = options.roomCollection;
       this.orgCollection = options.orgCollection;
-      this.repoCollection = options.repoCollection
+      this.repoCollection = options.repoCollection;
+      this.groupsCollection = options.groupsCollection;
       this.dialogRegion = modalRegion;
 
       this.communityCreateModel = new CommunityCreateModel();
-      this.hasRenderedCommunityCreateView = false;
 
       //Mobile events don't seem to bind 100% of the time so lets use a native method
       var menuHotspot = document.querySelector('.menu__hotspot');
@@ -78,15 +81,12 @@ module.exports = (function () {
     },
 
     initCommunityCreateRegion: function() {
-      this.repoCollection.fetch();
-
-      this.communityCreateView = new CommunityCreateView({
-        el: '.community-create-app-root',
+      return new CommunityCreateView({
         model: this.communityCreateModel,
         orgCollection: this.orgCollection,
-        repoCollection: this.repoCollection
+        repoCollection: this.repoCollection,
+        groupsCollection: this.groupsCollection
       });
-      return this.communityCreateView;
     },
 
 
@@ -109,13 +109,7 @@ module.exports = (function () {
     },
 
     onCommunityCreateToggle: function(active) {
-      if(!this.hasRenderedCommunityCreateView) {
-        var communityCreateView = this.initCommunityCreateRegion();
-        communityCreateView.render();
-      }
       this.communityCreateModel.set('active', active);
-
-      this.hasRenderedCommunityCreateView = true;
     }
 
   });

@@ -26,7 +26,8 @@ ProOrgStrategy.prototype = {
       .then(function(subscriptions) {
         var proOrgs = {};
         subscriptions.forEach(function(subscription) {
-          proOrgs[subscription.uri.toLowerCase()] = !!subscription;
+          var uri = subscription.uri || "";
+          proOrgs[uri.toLowerCase()] = !!subscription;
         });
 
         this.proOrgs = proOrgs;

@@ -62,7 +62,7 @@ exports.getHeatmapForRoom = function(roomId, startMonth, endMonth, tz) {
     }
   };
 
-  return Promise.resolve(client.search(queryRequest))
+  return client.search(queryRequest)
     .then(function(result) {
       return result.aggregations.messages_per_day.buckets.reduce(function(memo, bucket) {
         var unixTime = (bucket.key / 1000).toFixed(0);

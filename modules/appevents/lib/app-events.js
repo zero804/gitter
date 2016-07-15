@@ -6,6 +6,11 @@ function makeEmitter() {
   var localEventEmitter = new events.EventEmitter();
 
   return {
+    /* This is only good for testing */
+    removeAllListeners: function() {
+      localEventEmitter.removeAllListeners()
+    },
+
     newUnreadItem: function(userId, troupeId, items, online) {
       localEventEmitter.emit('newUnreadItem', {
         userId: userId,
@@ -186,7 +191,12 @@ function makeEmitter() {
   };
 }
 
-module.exports = makeEmitter();
+var defaultListener = makeEmitter();
+
+module.exports = defaultListener;
 module.exports.testOnly = {
-  makeEmitter: makeEmitter
+  makeEmitter: makeEmitter,
+  removeAllListeners: function() {
+    defaultListener.removeAllListeners();
+  }
 };

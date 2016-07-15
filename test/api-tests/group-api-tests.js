@@ -18,10 +18,15 @@ describe('group-api', function() {
     deleteDocuments: {
       User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }],
       Group: [
-              { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() },
-              { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
-              { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() } ],
-      Troupe: [ { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() + '/' + fixtureLoader.GITTER_INTEGRATION_REPO.toLowerCase() } ]
+        { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() },
+        { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
+        { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() }
+      ],
+      Troupe: [
+        { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() + '/' + fixtureLoader.GITTER_INTEGRATION_REPO.toLowerCase() },
+        { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() + '/lobby' },
+        { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() + '/lobby' }
+      ]
     },
     user1: {
       githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
@@ -59,12 +64,24 @@ describe('group-api', function() {
       .expect(200)
   });
 
+  it('GET /v1/groups?type=admin', function() {
+    return request(app)
+      .get('/v1/groups?type=admin')
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+  });
+
   it('POST /v1/groups (new style community)', function() {
     return request(app)
       .post('/v1/groups')
       .send({ uri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY, name: 'Test' })
       .set('x-access-token', fixture.user1.accessToken)
       .expect(200)
+      .then(function(result) {
+        var group = result.body;
+        assert.strictEqual(group.uri, fixtureLoader.GITTER_INTEGRATION_COMMUNITY);
+        assert.strictEqual(group.defaultRoom.uri, fixtureLoader.GITTER_INTEGRATION_COMMUNITY + '/Lobby');
+      });
   });
 
   it('POST /v1/groups (github org based)', function() {
@@ -80,6 +97,11 @@ describe('group-api', function() {
       })
       .set('x-access-token', fixture.user1.accessToken)
       .expect(200)
+      .then(function(result) {
+        var group = result.body;
+        assert.strictEqual(group.uri, fixtureLoader.GITTER_INTEGRATION_ORG);
+        assert.strictEqual(group.defaultRoom.uri, fixtureLoader.GITTER_INTEGRATION_ORG + '/Lobby');
+      });
   });
 
   it('GET /v1/groups/:groupId/rooms', function() {
@@ -113,7 +135,7 @@ describe('group-api', function() {
         name: fixtureLoader.GITTER_INTEGRATION_REPO,
         topic: 'all about testing',
         security: {
-          security: 'INHERITED',
+          security: 'PRIVATE',
           type: 'GH_REPO',
           linkPath: fixtureLoader.GITTER_INTEGRATION_USERNAME + '/' + fixtureLoader.GITTER_INTEGRATION_REPO
         }
