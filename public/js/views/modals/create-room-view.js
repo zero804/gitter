@@ -4,6 +4,7 @@ var $ = require('jquery');
 var _ = require('underscore');
 var Marionette = require('backbone.marionette');
 var troupeCollections = require('collections/instances/troupes');
+var groupModels = require('collections/groups');
 var ModalView = require('./modal');
 var apiClient = require('components/apiClient');
 var GroupSelectView = require('views/createRoom/groupSelectView');
@@ -63,6 +64,20 @@ var View = Marionette.LayoutView.extend({
 
   initialize: function() {
     var self = this;
+
+    this.groupCollection = new groupModels.Collection([]);
+    this.groupCollection.fetch({
+      data: {
+          type: 'admin'
+        }
+      },
+      {
+        add: true,
+        remove: true,
+        merge: true
+      }
+    );
+
     self.listenTo(self, 'menuItemClicked', self.menuItemClicked);
     self.recalcViewDebounced = _.debounce(function() {
       self.recalcView(true);
@@ -322,9 +337,9 @@ var View = Marionette.LayoutView.extend({
   },
 
   onRender: function() {
-    // TODO: troupeCollections.groups is probably not loaded yet
+    // TODO: this.groupCollection is probably not loaded yet
     var groupSelect = new GroupSelectView({
-      groupsCollection: troupeCollections.groups
+      groupsCollection: this.groupCollection
     });
 
     this.groupSelect = groupSelect;
@@ -336,7 +351,7 @@ var View = Marionette.LayoutView.extend({
       this.ui.roomNameInput.val(this.options.roomName);
     }
 
-    // TODO: troupeCollections.groups is probably not loaded yet, so you can't
+    // TODO: this.groupCollection is probably not loaded yet, so you can't
     // select the initial group.
     if (this.options.initialGroupId) {
       var group = this.groupSelect.selectGroupId(this.options.initialGroupId);
