@@ -2,18 +2,9 @@
 
 set -euo pipefail
 
-git fetch origin refs/notes/*:refs/notes/*
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-NOTE_PRS=$(git log master..HEAD --show-notes=pull_request_number |
-  grep -A1 pull_request_number |
-  grep -vE '(pull_request_number|--)'|
-  awk '{ print $1 }')
-
-MERGED_PRS=$(git log master..HEAD |grep 'Merge pull request'|cut -d'#' -f2|cut -d\  -f1)
-
-PRS=$((for word in ${NOTE_PRS} ${MERGED_PRS}; do
-  echo "$word"
-done) | sort -u)
+PRS=$(${SCRIPT_DIR}/build-scripts/list-pr-differences master..HEAD)
 
 echo "| PR | Title | Author | Changes | Changed Files |"
 echo "|----|-------|--------|---------|---------------|"
