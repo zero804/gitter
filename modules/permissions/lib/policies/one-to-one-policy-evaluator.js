@@ -20,7 +20,7 @@ OneToOnePolicyEvaluator.prototype = {
       return false;
     }
 
-    return this._contextDelegate.isMember(this._userId);
+    return this._contextDelegate.isMember();
   }),
 
   canWrite: function() {

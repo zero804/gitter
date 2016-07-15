@@ -10,9 +10,13 @@ function StaticContextDelegate(result) {
 }
 
 StaticContextDelegate.prototype = {
-  isMember: Promise.method(function(/*userId*/) {
+  isMember: Promise.method(function() {
     return this.result;
   }),
+
+  handleReadAccessFailure: Promise.method(function() {
+    // Nothing to do here
+  })
 };
 
 module.exports = StaticContextDelegate;
