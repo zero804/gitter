@@ -146,7 +146,6 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   onCollectionItemActivated: function (view, model){
-    appEvents.trigger('stats.event', 'minibar.activated.' + model.get('type'));
     this.model.set('selectedOrgName', model.get('name'));
     this.changeMenuState('org');
   },
@@ -157,6 +156,7 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   changeMenuState: function(state){
+    appEvents.trigger('stats.event', 'minibar.activated.' + state);
     this.model.set({
       panelOpenState: true,
       state: state,
