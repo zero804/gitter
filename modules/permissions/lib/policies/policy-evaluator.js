@@ -141,9 +141,8 @@ PolicyEvaluator.prototype = {
    */
   _checkMembershipInContextForInviteRooms: function() {
     var contextDelegate = this._contextDelegate;
-    var userId = this._userId; // User must be defined in this function....
 
-    return contextDelegate.isMember(userId)
+    return contextDelegate.isMember()
       .bind(this)
       .then(function(result) {
         if (result) {
@@ -234,7 +233,6 @@ PolicyEvaluator.prototype = {
     var securityDescriptor = this._securityDescriptor;
     var contextDelegate = this._contextDelegate;
     var membersPolicy = this._securityDescriptor.members;
-    var userId = this._userId; // User must be defined in this function....
 
     return this._checkPolicyCacheResult(membersPolicy)
       .catch(PolicyDelegateTransportError, function(err) {
@@ -246,7 +244,7 @@ PolicyEvaluator.prototype = {
           return false;
         }
 
-        return contextDelegate.isMember(userId)
+        return contextDelegate.isMember()
           .then(function(isMember) {
             if (isMember) return true;
 
