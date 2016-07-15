@@ -116,11 +116,11 @@ function handleUploadToGroup(transloadit, metadata) {
       var url = fixUrl(upload.ssl_url);
       /*
       example url:
-      https://xxx.s3.amazonaws.com/5f/bbe64049a511e69dcdbda1cf4ccf5b/original.jpeg
+      https://blah.s3.amazonaws.com/5f/bbe64049a511e69dcdbda1cf4ccf5b/original.jpeg
 
       example thumbnails:
-      https://xxx.s3.amazonaws.com/5f/bbe64049a511e69dcdbda1cf4ccf5b/22.png
-      https://xxx.s3.amazonaws.com/5f/bbe64049a511e69dcdbda1cf4ccf5b/44.png
+      https://blah.s3.amazonaws.com/5f/bbe64049a511e69dcdbda1cf4ccf5b/22.png
+      https://blah.s3.amazonaws.com/5f/bbe64049a511e69dcdbda1cf4ccf5b/44.png
       etc, etc.
 
       NOTE: The original's file extension could be any supported image file
