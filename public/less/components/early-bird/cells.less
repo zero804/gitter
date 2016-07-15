@@ -1,9 +1,11 @@
+@mobile ~"(min-width: 440px)";
+
 .cell-advantage {
   box-sizing: border-box;
   width: 50%;
   padding: 2rem 4rem;
 
-  @media (min-width: 440px) {
+  @media @mobile {
     &:nth-child(odd) {
       padding-left: 0;
     }
@@ -13,7 +15,7 @@
     }
   }
 
-  @media (max-width: 440px) {
+  @media @mobile {
     width: 100%;
     padding: 0;
     padding-bottom:  4rem;
@@ -24,7 +26,7 @@
   width: 25rem;
   margin-bottom: 4rem;
 
-  @media (max-width: 440px) {
+  @media @mobile {
     width: 100%;
     margin-bottom: 6rem;
   }
