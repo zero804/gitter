@@ -1,29 +1,34 @@
 /* eslint complexity: ["error", 19] */
 'use strict';
-require('utils/initial-setup');
-require('utils/font-setup');
 
+var debug = require('debug-proxy')('app:router-app');
 var $ = require('jquery');
+var Backbone = require('backbone');
+var moment = require('moment');
+var clientEnv = require('gitter-client-env');
+var RAF = require('utils/raf');
 var appEvents = require('utils/appevents');
 var context = require('utils/context');
-var clientEnv = require('gitter-client-env');
-var Backbone = require('backbone');
-var AppLayout = require('views/layouts/app-layout');
-var LoadingView = require('views/app/loading-view');
+var onready = require('utils/onready');
+var urlParser = require('utils/url-parser');
+
+var TitlebarUpdater = require('components/titlebar');
+var realtime = require('components/realtime');
+
 var troupeCollections = require('collections/instances/troupes');
 var repoModels = require('collections/repos');
 var ReposCollection = repoModels.ReposCollection;
-var TitlebarUpdater = require('components/titlebar');
-var realtime = require('components/realtime');
-var onready = require('./utils/onready');
-var urlParser = require('utils/url-parser');
-var RAF = require('utils/raf');
+var groupModels = require('collections/groups');
+
+var AppLayout = require('views/layouts/app-layout');
+var LoadingView = require('views/app/loading-view');
 var RoomCollectionTracker = require('components/room-collection-tracker');
 var SPARoomSwitcher = require('components/spa-room-switcher');
-var debug = require('debug-proxy')('app:router-app');
-var linkHandler = require('./components/link-handler');
-var roomListGenerator = require('./components/chat-cache/room-list-generator');
-var moment = require('moment');
+var linkHandler = require('components/link-handler');
+var roomListGenerator = require('components/chat-cache/room-list-generator');
+
+require('utils/initial-setup');
+require('utils/font-setup');
 
 require('components/statsc');
 require('views/widgets/preload');
@@ -32,12 +37,13 @@ require('template/helpers/all');
 require('components/bug-reporting');
 require('components/focus-events');
 
-
 require('utils/tracking');
 require('components/ping');
 
 // Preload widgets
 require('views/widgets/avatar');
+
+
 
 onready(function() {
   var chatIFrame = document.getElementById('content-frame');
@@ -441,15 +447,40 @@ onready(function() {
 
     createcustomroom: function(name) {
       function getSuitableGroupId() {
-        var group = appLayout.getRoomMenuModel().getCurrentGroup();
-        return group && group.get('id');
+        var groupId = false;
+
+        var currentTroupe = context.troupe();
+        var menuBarGroup = appLayout.getRoomMenuModel().getCurrentGroup();
+        if(menuBarGroup) {
+          groupId = menuBarGroup.get('id');
+        }
+        else if(currentTroupe) {
+          groupId = currentTroupe.get('groupId');
+        }
+
+        return groupId;
       }
+
+
+      var adminGroupsCollection = new groupModels.Collection([]);
+      adminGroupsCollection.fetch({
+        data: {
+            type: 'admin'
+          }
+        },
+        {
+          add: true,
+          remove: true,
+          merge: true
+        }
+      );
 
       require.ensure(['views/modals/create-room-view'], function(require) {
         var createRoomView = require('views/modals/create-room-view');
         var modal = new createRoomView.Modal({
           initialGroupId: getSuitableGroupId(),
           roomName: name,
+          groupsCollection: adminGroupsCollection
         });
 
         appLayout.dialogRegion.show(modal);
