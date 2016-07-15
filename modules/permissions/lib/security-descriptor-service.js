@@ -143,6 +143,30 @@ function updateLinksForRepo(linkPath, newLinkPath, externalId) {
   return Promise.join(
     Troupe.update(query, update, { multi: true }).exec(),
     Group.update(query, update, { multi: true }).exec());
+
+  // TODO: consider sending live-collection updates
+}
+
+function updatePublicFlagForRepo(linkPath, isPublic) {
+  assert(linkPath, 'linkPath expected');
+  assert(isPublic === true || isPublic === false, 'isPublic must be a boolean');
+
+  var query = {
+    'sd.type': 'GH_REPO',
+    'sd.linkPath': linkPath
+  };
+
+  var update = {
+    $set: {
+      'sd.public': isPublic
+    }
+  };
+
+  return Promise.join(
+    Troupe.update(query, update, { multi: true }).exec(),
+    Group.update(query, update, { multi: true }).exec());
+
+  // TODO: consider sending live-collection updates
 }
 
 module.exports = {
@@ -151,4 +175,5 @@ module.exports = {
   insertForRoom: insertForRoom,
   insertForGroup: insertForGroup,
   updateLinksForRepo: updateLinksForRepo,
+  updatePublicFlagForRepo: updatePublicFlagForRepo
 };

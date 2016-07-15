@@ -2,7 +2,6 @@
 var $ = require('jquery');
 var context = require('utils/context');
 var liveContext = require('components/live-context');
-var cordovaNav = require('components/cordova-navigate');
 var chatModels = require('collections/chat');
 var ChatCollectionView = require('views/chat/chatCollectionView');
 var unreadItemsClient = require('components/unread-items-client');
@@ -21,8 +20,6 @@ require('template/helpers/all');
 
 onready(function() {
   FastClick.attach(document.body);
-
-  cordovaNav.syncNativeWithWebContext(context.troupe());
 
   var chatCollection = new chatModels.ChatCollection(null, { listen: true });
 

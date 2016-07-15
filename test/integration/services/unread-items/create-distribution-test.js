@@ -35,6 +35,9 @@ describe('create-distribution', function() {
       troupe = {
         id: troupeId,
         _id: troupeId,
+        sd: {
+
+        }
       };
       troupeNotifyArray = [{ userId: userId1, flags: 1 }, { userId: userId2, flags: 2 }];
 
@@ -278,7 +281,7 @@ describe('create-distribution', function() {
     });
 
     it('should handle an empty array', function() {
-      return createDistribution.testOnly.findNonMembersWithAccess({ }, [])
+      return createDistribution.testOnly.findNonMembersWithAccess({ sd: { public: true } }, [])
         .then(function(userIds) {
           assert.deepEqual(userIds, []);
         });
@@ -291,30 +294,25 @@ describe('create-distribution', function() {
         });
     });
 
-    it('should handle private rooms', function() {
-      return createDistribution.testOnly.findNonMembersWithAccess({ security: 'PRIVATE' }, ['1','2','3'])
-        .then(function(userIds) {
-          assert.deepEqual(userIds, []);
-        });
-    });
-
     it('should handle public rooms', function() {
       mockito.when(createPolicyForUserIdInRoom)().then(function() {
         return Promise.resolve({
           canJoin: function() {
-            return true;
+            return Promise.resolve(true);
           }
         });
       });
 
-      return createDistribution.testOnly.findNonMembersWithAccess({ security: 'PUBLIC' }, ['1','2','3'])
+      return createDistribution.testOnly.findNonMembersWithAccess({ sd: { public: true } }, ['1','2','3'])
         .then(function(userIds) {
           assert.deepEqual(userIds, ['1','2','3']);
         });
     });
 
     it('should handle org and inherited rooms', function() {
-      var troupe = {};
+      var troupe = {
+        sd: { public: false }
+      };
       mockito.when(userService).findByIds().then(function(userIds) {
         assert.deepEqual(userIds, ['1','2','3']);
         return Promise.resolve(userIds.map(function(userId) {
