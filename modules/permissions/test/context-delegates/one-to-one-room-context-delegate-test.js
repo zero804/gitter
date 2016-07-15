@@ -49,6 +49,11 @@ describe('one-to-one-room-context-delegate', function() {
         });
     });
 
+    it('should handle handleReadAccessFailure', function() {
+      var delegate = new OneToOneRoomContextDelegate(fixture.user3._id, fixture.troupe1._id);
+      return delegate.handleReadAccessFailure();
+    });
+
   });
 
 });

@@ -21,6 +21,12 @@ DisjunctionContextDelegate.prototype = {
       });
     });
   },
+
+  handleReadAccessFailure: Promise.method(function() {
+    return Promise.map(this.contextDelegates, function(delegate) {
+      return delegate.handleReadAccessFailure();
+    });
+  })
 };
 
 module.exports = DisjunctionContextDelegate;

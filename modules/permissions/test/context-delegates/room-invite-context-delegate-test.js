@@ -86,4 +86,9 @@ describe('room-invite-context-delegate', function() {
         assert.strictEqual(result, false);
       });
   });
+
+  it('should handle handleReadAccessFailure when the user is not in the room', function() {
+    var delegate = new RoomInviteContextDelegate(userId1, troupeId, secret3);
+    return delegate.handleReadAccessFailure();
+  });
 });

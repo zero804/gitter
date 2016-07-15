@@ -2,6 +2,7 @@
 
 var Promise = require('bluebird');
 var PolicyEvaluator = require('./policies/policy-evaluator');
+var StaticPolicyEvaluator = require('./policies/static-policy-evaluator');
 var OneToOnePolicyEvaluator = require('./policies/one-to-one-policy-evaluator');
 var OneToOneUnconnectionPolicyEvalator = require('./policies/one-to-one-unconnected-policy-evaluator');
 var RoomContextDelegate = require('./context-delegates/room-context-delegate');
@@ -40,13 +41,21 @@ function getDelegateForSecurityDescriptor(userId, user, securityDescriptor, obta
 
 function createPolicyFromDescriptor(userId, user, securityDescriptor, roomId) {
   if (securityDescriptor.type === 'ONE_TO_ONE') {
-    var oneToOneContextDelegate = new OneToOneContextDelegate(userId, roomId);
+    if (!userId) {
+      // Anonymous users can never join a one-to-one
+      return new StaticPolicyEvaluator(false);
+    }
 
+    var oneToOneContextDelegate = new OneToOneContextDelegate(userId, roomId);
     return new OneToOnePolicyEvaluator(userId, securityDescriptor, oneToOneContextDelegate);
   }
 
   var policyDelegate = getDelegateForSecurityDescriptor(userId, user, securityDescriptor);
-  var contextDelegate = new RoomContextDelegate(userId, roomId);
+  var contextDelegate;
+  if (userId) {
+    // No point in providing a context delegate for an anonymous user
+    contextDelegate = new RoomContextDelegate(userId, roomId);
+  }
 
   return new PolicyEvaluator(userId, securityDescriptor, policyDelegate, contextDelegate);
 }

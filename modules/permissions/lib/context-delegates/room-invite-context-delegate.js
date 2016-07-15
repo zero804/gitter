@@ -1,7 +1,12 @@
 'use strict';
 
+
+var env = require('gitter-web-env');
+var logger = env.logger;
 var assert = require('assert');
 var TroupeInvite = require('gitter-web-persistence').TroupeInvite;
+var memoizePromise = require('./memoize-promise');
+var Promise = require('bluebird');
 
 /**
  * This context uses an invite to determine whether a user
@@ -18,7 +23,7 @@ function RoomInviteContextDelegate(userId, roomId, secret) {
 }
 
 RoomInviteContextDelegate.prototype = {
-  isMember: function() {
+  isMember: memoizePromise('isMember', function() {
     return TroupeInvite.count({
         troupeId: this.roomId,
         secret: this.secret,
@@ -34,7 +39,12 @@ RoomInviteContextDelegate.prototype = {
       .then(function(count) {
         return count > 0;
       });
-  },
+  }),
+
+  handleReadAccessFailure: Promise.method(function() {
+    // Access to the room was denied.
+    logger.info('room-invite-context: user denied access to room', { userId: this.userId, roomId: this.roomId });
+  })
 };
 
 module.exports = RoomInviteContextDelegate;
