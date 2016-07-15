@@ -9,6 +9,8 @@ var onready = require('./utils/onready');
 var MobileLayout = require('views/layouts/mobile');
 var RoomCollectionTracker = require('components/room-collection-tracker');
 var troupeCollections = require('collections/instances/troupes');
+var repoModels = require('collections/repos');
+var ReposCollection = repoModels.ReposCollection;
 var unreadItemsClient = require('components/unread-items-client');
 
 //Remove when left menu is in place
@@ -23,14 +25,13 @@ require('utils/tracking');
 require('components/timezone-cookie');
 
 // Preload widgets
-require('views/widgets/avatar');
-require('components/ping');
-require('components/eyeballs');
-require('template/helpers/all');
-require('utils/gesture-controller');
+require('./views/widgets/avatar');
+require('./components/ping');
+require('./components/eyeballs-room-sync');
+require('./template/helpers/all');
+require('./utils/gesture-controller');
 
 onready(function() {
-
   //Ledt Menu Additions
   //gestures.init();
 
@@ -51,6 +52,8 @@ onready(function() {
     'chat': chatCollection
   });
 
+  var repoCollection = new ReposCollection();
+
   var appView = new MobileLayout({
     model: context.troupe(),
     template: false,
@@ -58,6 +61,9 @@ onready(function() {
     chatCollection: chatCollection,
     //Left Menu Additions
     //roomCollection: troupeCollections.troupes
+    orgCollection: troupeCollections.orgs,
+    repoCollection: repoCollection,
+    groupsCollection: troupeCollections.groups
   });
   appView.render();
 
@@ -65,7 +71,8 @@ onready(function() {
     routes: {
       "": "hideModal",
       "notifications": "notifications",
-      'notification-defaults': 'notificationDefaults'
+      'notification-defaults': 'notificationDefaults',
+      'createcommunity': 'createCommunity'
     },
 
     hideModal: function() {
@@ -88,6 +95,10 @@ onready(function() {
         }));
 
       });
+    },
+
+    createCommunity: function(/* uri */) {
+      appEvents.trigger('community-create-view:toggle', true);
     }
   });
 

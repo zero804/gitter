@@ -111,7 +111,6 @@ var TypeaheadView = Marionette.ItemView.extend({
     function fetchSuccess() {
       self.autoSelect();
     }
-
     if(this.options.fetch) {
       this.options.fetch(input, this.collection, fetchSuccess);
     } else {

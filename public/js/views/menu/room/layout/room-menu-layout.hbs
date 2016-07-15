@@ -1,37 +1,75 @@
 <aside id="room-menu-container" class="room-menu-container">
   <section class="room-menu">
     <nav id="minibar" class="minibar">
-      <div class="minibar-inner nano">
+      <div class="minibar-inner nano {{when hasCommunityCreate 'has-community-create' ''}}">
         <ul id="minibar-list" class="room-menu-options nano-content">
 
           <li data-state-change="all" id="minibar-all"  class="room-menu-options__item--all">
-            <button class="room-menu-options__item-button" title="All Conversations">
-              <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/home.svg"}}' />
-            </button>
+            {{! the above li is passed to a Marionette view as its el so, sadly, we need to wrap these in divs}}
+            <div class="room-menu-options__container">
+              <button class="room-menu-options__item-button" title="All Conversations">
+                <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/home.svg"}}' />
+              </button>
+            </div>
           </li>
 
           <li data-state-change="search" id="minibar-search" class="room-menu-options__item--search">
-            <button class="room-menu-options__item-button" title="Search Gitter">
-              <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/search.svg"}}' />
-            </button>
+            <div class="room-menu-options__container">
+              <button class="room-menu-options__item-button" title="Search Gitter">
+                <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/search.svg"}}' />
+              </button>
+            </div>
           </li>
 
           <li data-state-change="people" id="minibar-people" class="room-menu-options__item--people">
-            <button class="room-menu-options__item-button" title="Your One to One Conversations">
-              <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/people.svg"}}' />
-            </button>
+            <div class="room-menu-options__container">
+              {{> minibar_activity_indicators}}
+              <button class="room-menu-options__item-button" title="Your One to One Conversations">
+                <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/people.svg"}}' />
+              </button>
+            </div>
           </li>
 
-          {{#each leftMenuOrgs}} {{! JP 9/12/15 }} {{! TODO SHOULD THIS BE MOVED INTO A PARTIAL TO BE SHARED AROUND }}
-            <li data-state-change="org" id="minibar-{{name}}"  data-org-name="{{name}}" class="room-menu-options__item--org">
-              {{{ prerenderView "js/views/menu/room/minibar/minibar-item-view" }}}
+          <li>
+            <ul id="minibar-temp" class="minibar-collection-list">
+              {{#if troupeContext.snapshots.leftMenu.tempOrg}}
+              {{#with troupeContext.snapshots.leftMenu.tempOrg}}
+                <li data-state-change="org"
+                    id="minibar-{{name}}"
+                    class="room-menu-options__item--org active">
+                          {{{ prerenderView "js/views/menu/room/minibar/minibar-item-view" }}}
+                </li>
+              {{/with}}
+              {{/if}}
+            </ul>
+          </li>
+
+          <li id="minibar-collection">
+            <ul class="minibar-collection-list">
+              {{#each troupeContext.snapshots.groups}} {{! JP 9/12/15 }} {{! TODO SHOULD THIS BE MOVED INTO A PARTIAL TO BE SHARED AROUND }}
+                <li data-state-change="org" id="{{id}}"  data-org-name="{{name}}" class="room-menu-options__item--org">
+                  {{{ prerenderView "js/views/menu/room/minibar/minibar-item-view" }}}
+                </li>
+              {{/each}}
+            </ul>
+          </li>
+
+          {{#if hasCommunityCreate }}
+            <li class="room-menu-options__item--community-create" data-state-change="community-create" id="minibar-community-create">
+              <div class="room-menu-options__container">
+                <button class="room-menu-options__item-button" title="Create a new community">
+                  <div class="room-menu-options__item__community-create-icon">+</div>
+                </button>
+              </div>
             </li>
-          {{/each}}
+          {{/if}}
 
           <li data-state-change="close" id="minibar-close"  class="room-menu-options__item--close {{#if roomMenuIsPinned}}left{{/if}}">
-            <button id="menu-toggle-button" class="room-menu-options__item-button menu-toggle-button" title="Toggle left menu">
-              {{> pinned-hamburger-menu-icon }}
-            </button>
+            <div class="room-menu-options__container">
+              <button id="menu-toggle-button" class="room-menu-options__item-button menu-toggle-button" title="Toggle left menu">
+                {{> pinned-hamburger-menu-icon }}
+              </button>
+            </div>
           </li>
 
         </ul>
@@ -51,7 +89,7 @@
             <section id="favourite-collection" class="left-menu-collection">
               <div class="favourite-collection loaded active">
                 <div id="collection-list" class="collection-list--favourite">
-                  {{#each leftMenuFavouriteRooms}}
+                  {{#each troupeContext.snapshots.favourites}}
                     <div class="{{#if isNotOneToOne}}room-item--favourite{{else}}room-item--favourite-one2one{{/if}} {{#if isHidden}}hidden{{/if}}"
                          id="{{id}}"
                          data-id="{{id}}">
@@ -69,7 +107,7 @@
                   <i id="dismiss-suggestion" class="icon-cancel-circle collection-header__dismiss-suggestion hidden"></i>
                 </header>
                 <div id="collection-list" class="collection-list--primary">
-                  {{#each leftMenuRooms}}
+                  {{#each troupeContext.snapshots.rooms}}
                     <div class="{{#if isNotOneToOne}}room-item{{else}}room-item--one2one{{/if}} {{#if isHidden}}hidden{{/if}}" id="{{id}}"  data-id="{{id}}">
                       {{{ prerenderView "js/views/menu/room/primary-collection/primary-collection-item-view" }}}
                     </div>
@@ -87,4 +125,8 @@
   </section>
 </aside>
 
-<div class="community-create-app-root"></div>
+<div class="community-create-app-root">
+  <div class="community-create-root-inner">
+    {{{ prerenderView "js/views/community-create/community-create-view-prerendered" }}}
+  </div>
+</div>

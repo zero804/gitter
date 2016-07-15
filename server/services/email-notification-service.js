@@ -13,6 +13,7 @@ var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var moment = require('moment');
 var Promise = require('bluebird');
 var i18nFactory = require('gitter-web-i18n');
+var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
 
 /*
  * Return a nice sane
@@ -58,19 +59,25 @@ function calculateSubjectForUnreadEmail(i18n, troupesWithUnreadCounts) {
 /*
  * Send invitation and reminder emails to the provided address.
  */
-function sendInvite(invitingUser, invite, room, template, eventName) {
+function sendInvite(invitingUser, invite, room, isReminder, template, eventName) {
   var email = invite.emailAddress;
 
   var senderName = (invitingUser.displayName || invitingUser.username);
   var date = moment(mongoUtils.getTimestampFromObjectId(invite._id)).format('Do MMMM YYYY');
-  var inviteUrl = config.get("email:emailBasePath") + '/settings/accept-invite/' + invite.secret;
+  var emailBasePath = config.get("email:emailBasePath");
+  var inviteUrl = emailBasePath + '/settings/accept-invite/' + invite.secret;
+  var roomUrl = emailBasePath + '/' + room.uri;
+  var subject = senderName + ' invited you to join the ' + room.uri + ' chat on Gitter';
+  if (isReminder) {
+    subject = 'Reminder: ' + subject;
+  }
 
   return mailerService.sendEmail({
     templateFile:   template,
     from:           senderName + ' <support@gitter.im>',
     fromName:       senderName,
     to:             email,
-    subject:        '[' + room.uri + '] Join the chat on Gitter',
+    subject:        subject,
     tracking: {
       event: eventName,
       data: { email: email }
@@ -78,7 +85,8 @@ function sendInvite(invitingUser, invite, room, template, eventName) {
     data: {
       date: date,
       roomUri: room.uri,
-      roomUrl: inviteUrl,
+      roomUrl: roomUrl,
+      inviteUrl: inviteUrl,
       senderName: senderName
     }
   });
@@ -154,11 +162,11 @@ module.exports = {
   }),
 
   sendInvitation: function(invitingUser, invite, room) {
-    return sendInvite(invitingUser, invite, room, 'invitation', 'invitation_sent');
+    return sendInvite(invitingUser, invite, room, false, 'invitation-v2', 'invitation_sent');
   },
 
   sendInvitationReminder: Promise.method(function(invitedByUser, invite, room) {
-    return sendInvite(invitedByUser, invite, room, 'invitation-reminder', 'invitation_reminder_sent');
+    return sendInvite(invitedByUser, invite, room, true, 'invitation-reminder-v2', 'invitation_reminder_sent');
   }),
 
   /**
@@ -174,20 +182,22 @@ module.exports = {
     var emailBasePath = config.get("email:emailBasePath");
     var unsubscribeUrl = emailBasePath + '/settings/unsubscribe/' + hash;
 
-    var isPublic = !!(room && room.security === 'PUBLIC');
-    var isOrg = !!(room && room.security === 'ORG_ROOM');
+    var isPublic = !!(room && securityDescriptorUtils.isPublic(room));
 
     var recipientName = (user.displayName || user.username).split(' ')[0];
-
-    // TODO maybe logic can be better?
-    if (!isPublic && !isOrg) return; // we only want to send emails if the room is a public or an org room
+    var roomSecurityDescription = isPublic ? 'public': 'private';
 
     return emailAddressService(user)
       .then(function (email) {
         var roomUrl = config.get("email:emailBasePath") + '/' + room.uri;
 
         // TODO move the generation of tweet links into it's own function?
-        var twitterURL = (isPublic) ? 'http://twitter.com/intent/tweet?url=' + roomUrl + '&text=' + encodeURIComponent('Join me in the ' + room.uri + ' chat room on Gitter') + '&via=gitchat' : undefined; // if the room is public we shall have a tweet link
+        var twitterURL = (isPublic)
+                          ? 'http://twitter.com/intent/tweet?url=' + roomUrl +
+                            '&text=' +
+                            encodeURIComponent('Join me in the ' + room.uri + ' chat room on Gitter') +
+                            '&via=gitchat'
+                          : undefined; // if the room is public we shall have a tweet link
 
         return mailerService.sendEmail({
           templateFile: "created_room",
@@ -197,16 +207,18 @@ module.exports = {
           subject: "Your new chat room on Gitter",
           tracking: {
             event: 'created_room_email_sent',
-            data: { userId: user.id, email: email }
+            data: {
+              userId: user.id,
+              email: email
+            }
           },
           data: {
             user: user,
             room: room,
             isPublic: isPublic,
-            isOrg: isOrg,
             unsubscribeUrl: unsubscribeUrl,
             recipientName: recipientName,
-            roomType: room.security.toLowerCase(),
+            roomType: roomSecurityDescription,
             roomUri: room.uri,
             roomUrl: roomUrl,
             twitterURL: twitterURL

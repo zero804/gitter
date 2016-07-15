@@ -19,6 +19,7 @@ var assert = require('assert');
 var roomMetaService = require('./room-meta-service');
 var processMarkdown = require('../utils/markdown-processor');
 var roomInviteService = require('./room-invite-service');
+var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
 
 var MAX_RAW_TAGS_LENGTH = 200;
 
@@ -132,14 +133,6 @@ RoomWithPolicyService.prototype.toggleSearchIndexing = secureMethod(allowAdmin, 
   return room.save();
 });
 
-function canBanInRoom(room) {
-  if(room.githubType === 'ONETOONE') return false;
-  if(room.githubType === 'ORG') return false;
-  if(room.security === 'PRIVATE') return false; /* No bans in private rooms */
-
-  return true;
-}
-
 /**
  * Ban a user from the room. Caller should ensure admin permissions
  */
@@ -149,9 +142,13 @@ RoomWithPolicyService.prototype.banUserFromRoom = secureMethod([allowStaff, allo
 
   if (!username) throw new StatusError(400, 'Username required');
   if (currentUser.username === username) throw new StatusError(400, 'You cannot ban yourself');
-  if (!canBanInRoom(room)) throw new StatusError(400, 'This room does not support banning.');
+
+  if (room.oneToOne) {
+    throw new StatusError(400, 'Cannot ban in a oneToOne room');
+  }
 
   return userService.findByUsername(username)
+    .bind(this)
     .then(function(bannedUser) {
       if(!bannedUser) throw new StatusError(404, 'User ' + username + ' not found.');
 
@@ -159,7 +156,20 @@ RoomWithPolicyService.prototype.banUserFromRoom = secureMethod([allowStaff, allo
         return mongoUtils.objectIDsEqual(ban.userId, bannedUser._id);
       });
 
-      if(existingBan) return existingBan;
+      // If there is already a ban or the room
+      // type doesn't make sense for a ban, just remove the user
+      // TODO: re-address this in https://github.com/troupe/gitter-webapp/pull/1679
+      // Just ensure that the user is removed from the room
+      if (existingBan) {
+        return this.removeUserFromRoom(bannedUser)
+          .return(existingBan)
+      }
+
+      // Can only ban people from public rooms
+      if (!securityDescriptorUtils.isPublic(room)) {
+        return this.removeUserFromRoom(bannedUser)
+          .return(null); // Signals that the user was removed from room, but not banned
+      }
 
       // Don't allow admins to be banned!
       return policyFactory.createPolicyForRoom(bannedUser, room)
@@ -239,10 +249,6 @@ RoomWithPolicyService.prototype.unbanUserFromRoom = secureMethod([allowStaff, al
       })
 });
 
-RoomWithPolicyService.prototype.createChannel = secureMethod([allowAdmin], function(options) {
-  return roomService.createRoomChannel(this.room, this.user, options);
-});
-
 /**
  * User join room
  */
@@ -265,7 +271,7 @@ RoomWithPolicyService.prototype.getRoomWelcomeMessage = secureMethod([allowJoin]
  * Update the welcome message for a room
  */
 RoomWithPolicyService.prototype.updateRoomWelcomeMessage = secureMethod([allowAdmin], function(data){
-  if (!data || !data.welcomeMessage) throw new StatusError(400);
+  if (!data || !data.welcomeMessage && data.welcomeMessage !== '') throw new StatusError(400);
 
   return processMarkdown(data.welcomeMessage)
     .bind(this)
@@ -279,6 +285,8 @@ RoomWithPolicyService.prototype.updateRoomWelcomeMessage = secureMethod([allowAd
  * Delete a room
  */
 RoomWithPolicyService.prototype.deleteRoom = secureMethod([allowAdmin], function() {
+  if (this.room.oneToOne) throw new StatusError(400, 'cannot delete one to one rooms');
+
   logger.warn('User deleting room ', { roomId: this.room._id, username: this.user.username, userId: this.user._id });
   return roomService.deleteRoom(this.room);
 });
@@ -291,6 +299,37 @@ RoomWithPolicyService.prototype.createRoomInvitation = secureMethod([allowAddUse
     type: type,
     externalId: externalId,
     emailAddress: emailAddress
+  });
+});
+
+RoomWithPolicyService.prototype.createRoomInvitations = secureMethod([allowAddUser], function(invites) {
+  var room = this.room;
+  var user = this.user;
+  return Promise.map(invites, function(invite) {
+    var type = invite.type;
+    var externalId = invite.externalId;
+    var emailAddress = invite.emailAddress;
+
+    return roomInviteService.createInvite(room, user, {
+        type: type,
+        externalId: externalId,
+        emailAddress: emailAddress
+      })
+      .catch(StatusError, function(err) {
+        /*
+        NOTE: We intercept some errors so that one failed invite doesn't fail
+        everything and then pass information on about that error so it can
+        ultimately  be returned to the client. Are there are kinds of errors we
+        should be intercepting? Probably not safe to intercept ALL errors.
+
+        Many (most?) of these would have been caught if the frontend used the
+        check avatar API like it should, so it shouldn't be too likely anyway.
+        */
+        return {
+          status: 'error', // as opposed to 'invited' or 'added'
+          statusCode: err.status
+        }
+      });
   });
 });
 

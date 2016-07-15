@@ -1,145 +1,169 @@
-'use strict';
+"use strict";
 
-var _ = require('underscore');
 var Marionette = require('backbone.marionette');
-var fastdom = require('fastdom');
+var context = require('utils/context');
 var appEvents = require('utils/appevents');
-var domIndexById = require('utils/dom-index-by-id');
+var HomeView = require('./home-view/home-view');
+var SearchView = require('./search-view/search-view');
+var PeopleView = require('./people-view/people-view');
+var CloseView = require('./close-view/close-view');
+var TempOrgView = require('./temp-org-view/temp-org-view');
+var CollectionView = require('./minibar-collection-view');
+var CommunityCreateView = require('./minibar-community-create-item-view');
 
-var ItemView = require('./minibar-item-view');
-var CloseItemView = require('./minibar-close-item-view');
-var CommunityCreateItemView = require('./minibar-community-create-item-view');
-var PeopleView = require('./minibar-people-item-view.js');
+require('views/behaviors/isomorphic');
 
-//TODO TEST ALL THE THINGS JP 2/2/16
-var MinibarView = Marionette.CollectionView.extend({
-  tagName:   'ul',
-  id:        'minibar-list',
-  childView: ItemView,
-  childEvents: {
-    'minibar-item:activated': 'onItemActivated',
-    'minibar-item:close':   'onCloseClicked',
-  },
 
-  //if an element exists in the dom pass that as the el prop
-  childViewOptions: function(model, index) {
-    //
-    //use different selectors for orgs
-    var selector = (model.get('type') === 'org') ?
-      'minibar-' + model.get('name') :
-      'minibar-' + model.get('type');
+module.exports = Marionette.LayoutView.extend({
 
-    var element = this.domMap[selector];
-    var opts = {
-      index: index,
-      model: model,
-      roomMenuModel: this.model
+  behaviors: function() {
+
+    var behaviours = {
+      Isomorphic: {
+        home: { el: '#minibar-all', init: 'initHome' },
+        search: { el: '#minibar-search', init: 'initSearch' },
+        people: { el: '#minibar-people', init: 'initPeople' },
+        collectionView: { el: '#minibar-collection', init: 'initCollection' },
+        close: { el: '#minibar-close', init: 'initClose' },
+        tempOrg: { el: '#minibar-temp', init: 'initTemp' }
+      },
     };
-    if(!!element) {
-      opts.el = element;
+
+    if(context.hasFeature('community-create')) {
+      behaviours.Isomorphic.communityCreate = { el: '#minibar-community-create', init: 'initCommunityCreate' };
     }
 
-    return opts;
+    return behaviours;
   },
 
-  buildChildView: function(model, ViewClass, options) {
+  initHome: function (optionsForRegion){
+    var homeView = new HomeView(optionsForRegion({
+      model: this.homeModel,
+      roomMenuModel: this.model,
+    }));
 
-    //construct the default options
-    var viewOptions = _.extend({}, options, { model: model });
+    //We have to manually bind child events because of the Isomorphic Behaviour
+    this.listenTo(homeView, 'minibar-item:activated', this.onHomeActivate, this);
+    return homeView;
+  },
 
-    //construct specialist view for close button
-    switch (model.get('type')) {
-      case 'close':
-        viewOptions = _.extend(viewOptions, { roomModel: this.model });
-        return new CloseItemView(viewOptions);
-      case 'community-create':
-        return new CommunityCreateItemView(viewOptions);
-      case 'people':
-        viewOptions = _.extend(viewOptions, { roomCollection: this.roomCollection });
-        return new PeopleView(viewOptions);
-      default:
-        return new ViewClass(viewOptions);
-    }
+  initSearch: function (optionsForRegion){
+    var searchView = new SearchView(optionsForRegion({
+      model: this.searchModel,
+      roomMenuModel: this.model,
+    }));
 
+    //We have to manually bind child events because of the Isomorphic Behaviour
+    this.listenTo(searchView, 'minibar-item:activated', this.onSearchActivate, this);
+    return searchView;
+  },
+
+  initPeople: function (optionsForRegion){
+    var peopleView = new PeopleView(optionsForRegion({
+      model: this.peopleModel,
+      roomMenuModel: this.model,
+    }));
+
+    //We have to manually bind child events because of the Isomorphic Behaviour
+    this.listenTo(peopleView, 'minibar-item:activated', this.onPeopleActivate, this);
+    return peopleView;
+  },
+
+  initCollection: function (optionsForRegion){
+    var collectionView = new CollectionView(optionsForRegion({
+      collection: this.collection,
+      roomMenuModel: this.model,
+      keyboardControllerView: this.keyboardControllerView,
+    }));
+
+    this.listenTo(collectionView, 'minibar-item:activated', this.onCollectionItemActivated, this);
+    return collectionView;
+  },
+
+  initCommunityCreate: function (optionsForRegion){
+    var communityCreateView = new CommunityCreateView(optionsForRegion({
+      model: this.communityCreateModel,
+      roomMenuModel: this.model
+    }));
+
+    return communityCreateView;
+  },
+
+  initClose: function (optionsForRegion){
+    var closeView = new CloseView(optionsForRegion({
+      model: this.closeModel,
+      roomMenuModel: this.model
+    }));
+
+    //We have to manually bind child events because of the Isomorphic Behaviour
+    this.listenTo(closeView, 'minibar-item:close', this.onCloseClicked, this);
+    return closeView;
+  },
+
+  initTemp: function (optionsForRegion){
+    var tempView = new TempOrgView(optionsForRegion({
+      model: this.tempModel,
+      roomMenuModel: this.model,
+      roomCollection: this.roomCollection,
+      groupCollection: this.collection,
+    }));
+
+    this.listenTo(tempView, 'minibar-item:activated', this.onTempOrgItemClicked, this);
+    return tempView;
+  },
+
+  modelEvents: {
+    'change:state change:selectedOrgName': 'onMenuChangeState'
   },
 
   initialize: function(attrs) {
     this.bus = attrs.bus;
-    this.dndCtrl = attrs.dndCtrl;
     this.model = attrs.model;
     this.roomCollection = attrs.roomCollection;
+    this.homeModel = this.model.minibarHomeModel;
+    this.searchModel = this.model.minibarSearchModel;
+    this.peopleModel = this.model.minibarPeopleModel;
+    this.communityCreateModel = this.model.minibarCommunityCreateModel;
+    this.closeModel = this.model.minibarCloseModel;
+    this.tempModel = this.model.minibarTempOrgModel;
     this.keyboardControllerView = attrs.keyboardControllerView;
-
-    this.shouldRender = false;
-
-    this.listenTo(this.roomCollection, 'add remove', this.render, this);
-    this.listenTo(this.collection, 'snapshot', this.onCollectionSnapshot, this);
-    this.listenTo(this.model, 'change:state change:selectedOrgName', this.onMenuStateUpdate, this);
-    //Clicking a room item will trigger a navigation event so we want to clear any elements with focus in the minibar
     this.listenTo(this.bus, 'navigation', this.clearFocus, this);
-    this.onMenuStateUpdate();
-
-    //Guard against not getting a snapshot
-    this.timeout = setTimeout(function() {
-      this.onCollectionSnapshot();
-    }.bind(this), 2000);
+    //When a snapshot comes back we need to re-set active/focus on the currently active element
+    this.listenTo(this.collection, 'snapshot', this.onMenuChangeState, this);
+    this.onMenuChangeState();
   },
 
-  onBeforeRender: function () {
-    this.domMap = domIndexById(this.el);
+  onHomeActivate: function (){
+    this.changeMenuState('all');
   },
 
-  render: function() {
-    return this.shouldRender ? Marionette.CollectionView.prototype.render.apply(this, arguments) : null;
+  onSearchActivate: function (){
+    this.changeMenuState('search');
   },
 
-  onCollectionSnapshot: function() {
-    clearTimeout(this.timeout);
-
-    //Only render after a snapshot
-    this.shouldRender = true;
-    fastdom.mutate(function() {
-      this.render();
-    }.bind(this));
+  onPeopleActivate: function (){
+    this.changeMenuState('people');
   },
 
-
-  onItemActivated: function(view, model, activationSourceType) {
-    var modelName = model.get('name');
-
-    //stop selectedOrg name from changing if it does not need to
-    if (modelName === 'all' || modelName === 'search' || modelName === 'favourite' || modelName === 'people') {
-      modelName = this.model.get('name');
-    }
-
-    //Clear any elements on the minibar with focus
-    //as we are about to re-assign that
-    this.clearFocus();
-
-    // Set the minibar-item active
-    model.set({ active: true, focus: true });
-
-    // Send off some stats
-    appEvents.trigger('stats.event', 'minibar.activated.' + model.get('type'));
-
-    var state = model.get('type');
-    // close-passthrough
-    // Don't change the state when we focus/activate the `close`/toggle icon
-    if(state !== 'close') {
-      // Update the minibar state
-      this.model.set({
-        panelOpenState:       true,
-        state:                state,
-        profileMenuOpenState: false,
-        selectedOrgName:      modelName,
-        activationSourceType: activationSourceType
-      });
-    }
+  onCollectionItemActivated: function (view, model){
+    this.model.set('selectedOrgName', model.get('name'));
+    this.changeMenuState('org');
   },
 
-  onMenuStateUpdate: function() {
-    this.updateMinibarActiveState(this.model.get('state'), this.model.get('selectedOrgName'));
+  onTempOrgItemClicked: function (){
+    this.model.set('selectedOrgName', this.tempModel.get('name'));
+    this.changeMenuState('org');
   },
+
+  changeMenuState: function(state){
+    appEvents.trigger('stats.event', 'minibar.activated.' + state);
+    this.model.set({
+      panelOpenState: true,
+      state: state,
+      profileMenuOpenState: false,
+    });
+  },
+
 
   onCloseClicked: function() {
     var newVal = !this.model.get('roomMenuIsPinned');
@@ -175,35 +199,49 @@ var MinibarView = Marionette.CollectionView.extend({
 
   },
 
-
-  updateMinibarActiveState: function(currentState, selectedOrgName) {
-    // Reset the currently active model
-    var activeModels = this.collection.where({ active: true });
-    if (activeModels) {
-      activeModels.forEach(function(model) {
-        model.set('active', false);
-      });
+  onMenuChangeState: function (){
+    this.clearCurrentActiveElement();
+    var state = this.model.get('state');
+    switch(state) {
+      case 'all':
+        return this.homeModel.set({ active: true, focus: true });
+      case 'search':
+        return this.searchModel.set({ active: true, focus: true });
+      case 'people':
+        return this.peopleModel.set({ active: true, focus: true });
+      case 'org':
+        var orgName = this.model.get('selectedOrgName');
+        var model = this.collection.findWhere({ name: orgName });
+        if(this.tempModel.get('name') === orgName) { model = this.tempModel; }
+        if(!model) { return; }
+        return model.set({ active: true, focus: true });
     }
+  },
 
-    // Activate the new model
-    var nextActiveModel = (currentState !== 'org') ?
-      this.collection.findWhere({ type: currentState }) :
-      this.collection.findWhere({ name: selectedOrgName });
+  clearCurrentActiveElement: function (){
+    this.clearFocus();
+    var activeModel = this.getActiveItem();
+    if(activeModel) { activeModel.set('active', false); }
+  },
 
-    if (nextActiveModel) {
-      nextActiveModel.set('active', true);
-    }
+  getActiveItem: function (){
+    return this.homeModel.get('active') && this.homeModel ||
+      this.searchModel.get('active') && this.searchModel ||
+      this.peopleModel.get('active') && this.peopleModel ||
+      this.tempModel.get('active') && this.tempModel ||
+      this.collection.findWhere({ active: true }) ||
+      this.communityCreateModel.get('active') && this.communityCreateModel ||
+      this.closeModel.get('active') && this.closeModel;
   },
 
   clearFocus: function (){
-    var elementsInFocus = this.collection.where({ focus: true });
-    elementsInFocus.forEach(function(model){
-      model.set('focus', false);
-    });
+    if(this.homeModel.get('focus')) { this.homeModel.set('focus', false); }
+    if(this.searchModel.get('focus')) { this.searchModel.set('focus', false); }
+    if(this.peopleModel.get('focus')) { this.peopleModel.set('focus', false); }
+    if(this.communityCreateModel.get('focus')) { this.communityCreateModel.set('focus', false); }
+    if(this.closeModel.get('focus')) { this.closeModel.set('focus', false); }
+    if(this.tempModel.get('focus')) { this.tempModel.set('focus', false); }
+    this.collection.where({ focus: true }).forEach(function(model){ model.set('focus', false); });
   },
 
-
 });
-
-
-module.exports = MinibarView;

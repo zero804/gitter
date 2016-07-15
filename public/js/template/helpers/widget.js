@@ -1,25 +1,23 @@
 'use strict';
+
 var Handlebars = require('handlebars/runtime').default;
 
-module.exports = (function () {
-  var widgetId = 1;
+var widgetId = 1;
 
-  function Widget(widgetName, model) {
-    var id = widgetId++;
-    var prerenderedText = this.getPrerendered(widgetName, model.hash, id);
-    
-    if (!this.prerenderedViews) {
-      this.prerenderedViews = {};
-    }
+function Widget(widgetName, model) {
+  var id = widgetId++;
+  var prerenderedText = this.getPrerendered(widgetName, model.hash, id);
 
-    this.prerenderedViews[id] = {
-      widgetName: widgetName,
-      model: model.hash
-    };
-
-    return new Handlebars.SafeString(prerenderedText);
+  if (!this.prerenderedViews) {
+    this.prerenderedViews = {};
   }
 
-  Handlebars.registerHelper('widget', Widget);
-  return Widget;
-})();
+  this.prerenderedViews[id] = {
+    widgetName: widgetName,
+    model: model.hash
+  };
+
+  return new Handlebars.SafeString(prerenderedText);
+}
+
+module.exports = Widget;

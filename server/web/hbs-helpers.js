@@ -35,11 +35,6 @@ exports.bootScript = function(url, parameters) {
          bootScriptUrl);
 };
 
-exports.isMobile = function(agent, options) {
-  if (!agent) return false;
-  return ((agent.match(/ipad/i)) ? options.fn(this) : null);
-};
-
 function createEnv(context, options) {
   if(options) {
     return _.extend({

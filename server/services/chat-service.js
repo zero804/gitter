@@ -24,6 +24,7 @@ var markdownMajorVersion = require('gitter-markdown-processor').version.split('.
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 var recentRoomService = require("./recent-room-service");
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
 
 var useHints = true;
 
@@ -140,13 +141,15 @@ exports.newChatMessageToTroupe = function(troupe, user, data) {
     return [parsedMessage, resolveMentions(troupe, user, parsedMessage)];
   })
   .spread(function(parsedMessage, mentions) {
+    var isPublic = securityDescriptorUtils.isPublic(troupe);
+
     var chatMessage = new ChatMessage({
       fromUserId: user.id,
       toTroupeId: troupe.id,
       sent:       sentAt,
       text:       data.text,                    // Keep the raw message.
       status:     data.status,                // Checks if it is a status update
-      pub:        troupe.security === 'PUBLIC' || undefined, // Public room - useful for sampling
+      pub:        isPublic || undefined, // Public room - useful for sampling
       html:       parsedMessage.html,
       lang:       parsedMessage.lang,
       urls:       parsedMessage.urls,
@@ -212,16 +215,18 @@ exports.getRecentPublicChats = function() {
  */
 exports.updateChatMessage = function(troupe, chatMessage, user, newText, callback) {
   return Promise.try(function() {
+      newText = newText || '';
+      
       var age = (Date.now() - chatMessage.sent.valueOf()) / 1000;
       if(age > MAX_CHAT_EDIT_AGE_SECONDS) {
         throw new StatusError(400, "You can no longer edit this message");
       }
 
-      if(chatMessage.toTroupeId != troupe.id) {
+      if(!mongoUtils.objectIDsEqual(chatMessage.toTroupeId, troupe.id)) {
         throw new StatusError(403, "Permission to edit this chat message is denied.");
       }
 
-      if(chatMessage.fromUserId != user.id) {
+      if(!mongoUtils.objectIDsEqual(chatMessage.fromUserId, user.id)) {
         throw new StatusError(403, "Permission to edit this chat message is denied.");
       }
 
@@ -306,15 +311,6 @@ function getDateOfFirstMessageInRoom(troupeId) {
     });
 }
 exports.getDateOfFirstMessageInRoom = getDateOfFirstMessageInRoom;
-
-/*
- * this does a massive query, so it has to be cached for a long time
- */
-exports.getRoughMessageCount = cacheWrapper('getRoughMessageCount', function(troupeId) {
-  return ChatMessage.count({ toTroupeId: troupeId }).exec();
-}, {
-  ttl: config.get('chat-service:get-rough-message-count-cache-timeout')
-});
 
 function findFirstUnreadMessageId(troupeId, userId) {
   return unreadItemService.getFirstUnreadItem(userId, troupeId);

@@ -23,6 +23,7 @@ var SPARoomSwitcher = require('components/spa-room-switcher');
 var debug = require('debug-proxy')('app:router-app');
 var linkHandler = require('./components/link-handler');
 var roomListGenerator = require('./components/chat-cache/room-list-generator');
+var moment = require('moment');
 
 require('components/statsc');
 require('views/widgets/preload');
@@ -117,6 +118,14 @@ onready(function() {
     // turn backbone object to plain one so we don't modify the original
     var newTroupe = troupe.toJSON();
 
+    // Set the last access time immediately to prevent
+    // delay in hidden rooms becoming visible only
+    // once we get the server-side update
+    var liveCollectionTroupe = troupeCollections.troupes.get(troupe.id)
+    if (liveCollectionTroupe) {
+      liveCollectionTroupe.set('lastAccessTime', moment());
+    }
+
     // add the group to the troupe as if it was serialized by the server
     var groupModel = troupeCollections.groups.get(newTroupe.groupId);
     if (groupModel) {
@@ -172,7 +181,8 @@ onready(function() {
     roomCollection: troupeCollections.troupes,
     //TODO ADD THIS TO MOBILE JP 25/1/16
     orgCollection: troupeCollections.orgs,
-    repoCollection: repoCollection
+    repoCollection: repoCollection,
+    groupsCollection: troupeCollections.groups
   });
   appLayout.render();
 
@@ -430,60 +440,15 @@ onready(function() {
     },
 
     createcustomroom: function(name) {
-
-      function getSuitableParentRoomUri() {
-
-        if(context.hasFeature('left-menu')) {
-          //JP 12/4/16
-          // If the left menu is in an org state we can take the currently selected
-          // org as the correct parent for the newly created room
-          // we have to check if the org exists in the users room list otherwise
-          // they probably don't have permission to create a child room of that type
-          var roomMenuModel = appLayout.getRoomMenuModel();
-          var currentLeftMenuState = roomMenuModel.get('state');
-          var currentlySelectedOrg = roomMenuModel.get('selectedOrgName');
-          var hasPermissionToCreateOrgChildRoom = !!troupeCollections.troupes.findWhere({ uri: currentlySelectedOrg }) || context.getUser().username === currentlySelectedOrg;
-
-          if(currentLeftMenuState === 'org' && hasPermissionToCreateOrgChildRoom) {
-            return currentlySelectedOrg;
-          }
-        }
-
-        var currentRoomUri = window.location.pathname.split('/').slice(1).join('/');
-
-        if (currentRoomUri === 'home') {
-          // no suitable parent
-          return;
-        }
-
-        var currentRoom = allRoomsCollection.findWhere({
-          id: context.getTroupeId()
-        });
-
-        if (!currentRoom) {
-          // not a member or collection hasnt synced yet
-          return;
-        }
-
-        if (currentRoom.get('oneToOne')) {
-          // no suitable parent
-          return;
-        }
-
-        if (currentRoom.get('githubType') === 'REPO' || currentRoom.get('githubType') === 'ORG') {
-          // assume user wants to create an org/repo channel
-          return currentRoom.get('uri');
-        }
-
-        // assume user want to create a room based off the same parent
-        var parentUri = currentRoom.get('uri').split('/').slice(0, -1).join('/');
-        return parentUri;
+      function getSuitableGroupId() {
+        var group = appLayout.getRoomMenuModel().getCurrentGroup();
+        return group && group.get('id');
       }
 
       require.ensure(['views/modals/create-room-view'], function(require) {
         var createRoomView = require('views/modals/create-room-view');
         var modal = new createRoomView.Modal({
-          initialParent: getSuitableParentRoomUri(),
+          initialGroupId: getSuitableGroupId(),
           roomName: name,
         });
 

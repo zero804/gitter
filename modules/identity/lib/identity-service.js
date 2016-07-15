@@ -3,13 +3,8 @@
 var Promise = require('bluebird');
 var Identity = require('gitter-web-persistence').Identity;
 var assert = require('assert');
-
+var isGitHubUser = require('./is-github-user');
 var GITHUB_PROVIDER_KEY = 'github';
-
-// TODO: improve this
-function isGitHubUser(user) {
-  return user.githubUserToken || user.githubToken || user.githubId;
-}
 
 /**
  * If a user is a github user, returns a fake identity
@@ -141,11 +136,34 @@ function findUserIdForProviderUsername(provider, username) {
     })
 }
 
+/**
+ * Returns the primary identity of a user
+ */
+function findPrimaryIdentityForUser(user) {
+  // TODO: handle caching
+  if (isGitHubUser(user)) {
+    return castUserAsGitHubIdentity(user);
+  }
+
+  // TODO: handle multiple identities better, in future
+  return Identity.findOne({ userId: user._id }, { _id: 0, userId: 0, __v: 0 })
+    .lean()
+    .exec()
+    .then(function(identity) {
+      if (!identity) {
+        return castUserAsGitHubIdentity(user);
+      }
+
+      return identity;
+    });
+}
+
 module.exports = {
   getIdentityForUser: getIdentityForUser,
   listForUser: listForUser,
   listProvidersForUser: listProvidersForUser,
   findUserIdForProviderUsername: findUserIdForProviderUsername,
+  findPrimaryIdentityForUser: Promise.method(findPrimaryIdentityForUser),
 
   GITHUB_IDENTITY_PROVIDER: 'github',
   GOOGLE_IDENTITY_PROVIDER: 'google',

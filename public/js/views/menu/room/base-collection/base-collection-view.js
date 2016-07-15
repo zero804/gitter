@@ -5,7 +5,6 @@ var fastdom = require('fastdom');
 var template = require('./base-collection-view.hbs');
 var context = require('utils/context');
 var toggleClass = require('utils/toggle-class');
-var parseItemForTemplate = require('gitter-web-shared/parse/left-menu-primary-item');
 
 module.exports = Marionette.CompositeView.extend({
 
@@ -57,6 +56,7 @@ module.exports = Marionette.CompositeView.extend({
     this.roomCollection = attrs.roomCollection;
     this.listenTo(this.roomMenuModel, 'change:hasDismissedSuggestions', this.onDismissSuggestionsUpdate, this);
     this.listenTo(this.roomMenuModel, 'change:state', this.clearFocus, this);
+    this.listenTo(context.troupe(), 'change:id', this.onRoomUpdate, this);
     Marionette.CompositeView.prototype.constructor.apply(this, arguments);
   },
 
@@ -70,19 +70,27 @@ module.exports = Marionette.CompositeView.extend({
 
   onItemActivated: function(view) {
     var model = view.model;
-    model.set({ active: false, focus: false });
     var url = view.getRoomUrl();
-    var name = view.getRoomName();
+    var name = view.getRoomTitle();
 
     //We have to explicitly check for false because search
     //results come through with `exists: false` for rooms yet to be created
     //whereas on room models `exists: undefined` :( JP 10/3/16
-    if (model.get('exists') === false) {
-      return this._openCreateRoomDialog(name);
+    // org-items have `room`, not exists
+    if (this.roomExistsForModel(model)) {
+      //default trigger navigation to an existing room
+      this._triggerNavigation(url, 'chat', name);
+      return;
     }
 
-    //default trigger navigation to an existing room
-    this._triggerNavigation(url, 'chat', name);
+    return this._openCreateRoomDialog(name);
+  },
+
+  /**
+   * Default implementation. Can be overridden.
+   */
+  roomExistsForModel: function(model) {
+    return model.get('exists') !== false;
   },
 
   onFilterComplete: function() {
@@ -144,10 +152,25 @@ module.exports = Marionette.CompositeView.extend({
     });
   },
 
+  clearActive: function (){
+    var activeElements = this.collection.where({ active: true });
+    activeElements.forEach(function(model){
+      model.set('active', false);
+    });
+  },
+
   focusActiveElement: function (){
     var activeElement = this.collection.findWhere({ active: true });
     if(!activeElement) { return; }
     activeElement.set('focus', true);
+  },
+
+  onRoomUpdate: function (troupe, id){
+    this.clearFocus();
+    this.clearActive();
+    var model = this.collection.get(id);
+    if(!model) { return; }
+    model.set({ active: true, focus: true });
   },
 
   _triggerNavigation: function (url, type, name) {

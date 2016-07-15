@@ -8,21 +8,24 @@ var ProxyCollection = require('backbone-proxy-collection');
 var RecentSearchesCollection = require('../collections/recent-searches');
 var SuggestedOrgCollection = require('../collections/org-suggested-rooms');
 var apiClient = require('components/apiClient');
-var FilteredRoomCollection = require('../collections/filtered-room-collection.js');
+var context = require('utils/context');
+
+var FilteredMinibarGroupCollection = require('../collections/filtered-minibar-group-collection');
+var FilteredRoomCollection = require('../collections/filtered-room-collection');
+var FilteredFavouriteRoomCollection = require('../collections/filtered-favourite-room-collection');
 var SuggestedRoomsByRoomCollection = require('../collections/left-menu-suggested-by-room');
 var UserSuggestions = require('../collections/user-suggested-rooms');
 var SearchRoomPeopleCollection = require('../collections/left-menu-search-rooms-and-people');
 var SearchChatMessages = require('../collections/search-chat-messages');
-var perfTiming = require('components/perf-timing');
-var context = require('utils/context');
-var FilteredFavouriteRoomCollection = require('../collections/filtered-favourite-room-collection');
+
 var FavouriteCollectionModel = require('../views/menu/room/favourite-collection/favourite-collection-model');
 var PrimaryCollectionModel = require('../views/menu/room/primary-collection/primary-collection-model');
 var SecondaryCollectionModel = require('../views/menu/room/secondary-collection/secondary-collection-model');
 var TertiaryCollectionModel = require('../views/menu/room/tertiary-collection/tertiary-collection-model');
-var defaultCollectionFilter = require('gitter-web-shared/filters/left-menu-primary-default');
 var favouriteCollectionFilter = require('gitter-web-shared/filters/left-menu-primary-favourite');
-var MinibarCollection = require('../views/menu/room/minibar/minibar-collection');
+var MinibarItemModel = require('../views/menu/room/minibar/minibar-item-model');
+var MinibarPeopleModel = require('../views/menu/room/minibar/people-view/people-model');
+var MinibarTempOrgModel = require('../views/menu/room/minibar/temp-org-view/temp-org-model');
 
 var states = [
   'all',
@@ -38,7 +41,6 @@ module.exports = Backbone.Model.extend({
   defaults: {
     state:                     '',
     searchTerm:                '',
-    panelOpenState:            true,
     roomMenuIsPinned:          true,
     selectedOrgName:           '',
     hasDismissedSuggestions:   false,
@@ -49,7 +51,7 @@ module.exports = Backbone.Model.extend({
   //JP 27/1/16
   initialize: function(attrs) {
 
-    perfTiming.start('left-menu-init');
+    this.set('panelOpenState', this.get('roomMenuIsPinned'));
 
     if (!attrs || !attrs.bus) {
       throw new Error('A valid message bus must be passed when creating a new RoomMenuModel');
@@ -83,10 +85,14 @@ module.exports = Backbone.Model.extend({
     this.userModel = attrs.userModel;
     delete attrs.userModel;
 
+    this.groupsCollection = attrs.groupsCollection;
+    delete attrs.groupsCollection;
+
     //expose the public collection
     this.searchTerms = new RecentSearchesCollection(null);
     this.searchRoomAndPeople = new SearchRoomPeopleCollection(null, { roomMenuModel: this, roomCollection: this._roomCollection });
-    this.searchChatMessages = new SearchChatMessages(null, { roomMenuModel: this, roomModel: this._troupeModel });
+    this.searchMessageQueryModel = new Backbone.Model({ skip: 0 });
+    this.searchChatMessages = new SearchChatMessages(null, { roomMenuModel: this, roomModel: this._troupeModel, queryModel: this.searchMessageQueryModel });
     this.suggestedOrgs = new SuggestedOrgCollection({ contextModel: this, roomCollection: this._roomCollection });
     this.userSuggestions = new UserSuggestions(null, { contextModel: context.user() });
     this._suggestedRoomCollection = new SuggestedRoomsByRoomCollection({
@@ -96,11 +102,27 @@ module.exports = Backbone.Model.extend({
       suggestedOrgsCollection: this.suggestedOrgs,
     });
 
-    var orgsSnapshot = context.getSnapshot('orgs') || [];
-    this.minibarCollection = new MinibarCollection(orgsSnapshot, { roomCollection: this._roomCollection });
+    var orgsSnapshot = context.getSnapshot('groups') || [];
+    var state = this.get('state');
+    var selectedOrg = this.get('selectedOrgName');
+    this.minibarHomeModel = new MinibarItemModel({ name: 'all', type: 'all', active: (state === 'all') });
+    this.minibarSearchModel = new MinibarItemModel({ name: 'search', type: 'search', active: (state === 'search') });
+    this.minibarPeopleModel = new MinibarPeopleModel({ active: (state === 'people')}, { roomCollection: this._roomCollection });
+    this.minibarCommunityCreateModel = new MinibarItemModel({ name: 'Create Community', type: 'community-create' });
+    this.minibarCloseModel = new MinibarItemModel({ name: 'close', type: 'close' });
+    this.minibarTempOrgModel = new MinibarTempOrgModel(attrs.tempOrg, { troupe: context.troupe(), });
 
-    var roomModels = this._roomCollection.filter(defaultCollectionFilter);
-    this.activeRoomCollection = new FilteredRoomCollection(roomModels, {
+    var minibarModels = orgsSnapshot.map(function(model){
+      return _.extend({}, model, { active: (state === 'org' && model.name === selectedOrg) });
+    });
+
+    this.groupsCollection.add(minibarModels);
+    this.minibarCollection = new FilteredMinibarGroupCollection(null, {
+      collection: this.groupsCollection
+    });
+
+
+    this.activeRoomCollection = new FilteredRoomCollection(null, {
       roomModel:  this,
       collection: this._roomCollection,
     });
@@ -147,13 +169,10 @@ module.exports = Backbone.Model.extend({
     this.bus = attrs.bus;
     delete attrs.bus;
 
-    this.listenTo(this.bus, 'room-menu:change:state', this.onStateChangeCalled, this);
     this.listenTo(this, 'change:searchTerm', this.onSearchTermChange, this);
     this.listenTo(this, 'change:state', this.onSwitchState, this);
     this.listenTo(this, 'change', _.throttle(this.save.bind(this), 1500));
     this.listenTo(context.troupe(), 'change:id', this.onRoomChange, this);
-
-    //boot the model
     this.onSwitchState(this, this.get('state'));
   },
 
@@ -165,23 +184,6 @@ module.exports = Backbone.Model.extend({
     //If we are changing the models state value
     if(states.indexOf(newState) === -1) { return; }
     return Backbone.Model.prototype.set.apply(this, arguments);
-  },
-
-  onStateChangeCalled: function(newState) {
-
-    if (states.indexOf(newState) === -1) {
-      throw new Error('Please only pass a valid state to roomMenuModel change state, you passed:' + newState);
-    }
-
-
-    perfTiming.start('left-menu-change');
-    this.set('state', newState);
-    perfTiming.end('left-menu-change');
-  },
-
-  //This may be redundant
-  setState: function(type) {
-    this.onStateChangeCalled(type);
   },
 
   onSwitchState: function(model, val) {
@@ -246,11 +248,11 @@ module.exports = Backbone.Model.extend({
     //save
     if (method === 'create' || method === 'update' || method === 'patch') {
       return apiClient.user.put('/settings/leftRoomMenu', this.toJSON(), {
-          // No need to get the JSON back from the server...
-          dataType: 'text'
-        })
-        .then(function() { if (options.success) options.success.apply(self, arguments); })
-        .catch(function(err) { if (options.error) options.error(err); });
+        // No need to get the JSON back from the server...
+        dataType: 'text'
+      })
+      .then(function() { if (options.success) options.success.apply(self, arguments); })
+      .catch(function(err) { if (options.error) options.error(err); });
     }
 
     //The only time we need to fetch data is on page load
@@ -266,14 +268,22 @@ module.exports = Backbone.Model.extend({
 
     if(activeModel) { activeModel.set('active', false); }
     if(newlyActiveModel) { newlyActiveModel.set('active', true); }
+    if(!this.get('roomMenuIsPinned')) { this.set('panelOpenState', false); }
+  },
+
+  getCurrentGroup: function (){
+    if(this.get('state') !== 'org') { return false; }
+    var selectedOrg = this.get('selectedOrgName');
+    if(!selectedOrg) { throw new Error('Left menu is in the org state with no selected org'); }
+    return this.minibarCollection.findWhere({ name: selectedOrg });
   },
 
   _getModel: function (prop, val){
     var query = {}; query[prop] = val;
     return this.primaryCollection.findWhere(query) ||
-           this.secondaryCollection.findWhere(query) ||
-           this.tertiaryCollection.findWhere(query) ||
-           this._roomCollection.findWhere(query);
+      this.secondaryCollection.findWhere(query) ||
+        this.tertiaryCollection.findWhere(query) ||
+          this._roomCollection.findWhere(query);
   },
 
 });

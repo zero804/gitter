@@ -4,6 +4,7 @@ var Promise = require('bluebird');
 var appEvents = require('gitter-web-appevents');
 var restSerializer = require("../../serializers/rest-serializer");
 var troupeService = require('../troupe-service');
+var userTypeaheadElastic = require('../typeaheads/user-typeahead-elastic');
 var debug = require('debug')('gitter:app:live-collection-room-members');
 
 function notifyGroupRoomOfAddedUsers(room, userIds) {
@@ -57,10 +58,12 @@ module.exports = {
           return notifyUsersOfAddedOneToOneRooms(room, userIds);
         }
 
-        return Promise.all([
+        return Promise.join(
           notifyGroupRoomOfAddedUsers(room, userIds),
-          notifyUsersOfAddedGroupRooms(room, userIds)
-        ]);
+          notifyUsersOfAddedGroupRooms(room, userIds),
+          userTypeaheadElastic.addUsersToGroupRoom(userIds, troupeId),
+          function() {}
+        );
       });
   },
 
@@ -74,7 +77,7 @@ module.exports = {
       appEvents.userRemovedFromTroupe({ troupeId: troupeId, userId: userId });
     });
 
-    return Promise.resolve();
+    return userTypeaheadElastic.removeUsersFromRoom(userIds, troupeId);
   },
 
   lurkChange: function(troupeId, userIds, lurk) {
