@@ -62,6 +62,9 @@ function parseAndValidateTransloadit(user, input) {
     user_id: user.id
   };
 
+  // NOTE: This doesn't actually check that room or group uri makes sense for
+  // room or group id.
+
   if (input.room_uri && input.room_id) {
     // upload a document or image to a room
     metadata.room_id = input.room_id;
