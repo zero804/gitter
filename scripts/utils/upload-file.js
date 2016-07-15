@@ -4,11 +4,9 @@
 var env = require('gitter-web-env');
 var nconf = env.config;
 var Promise = require('bluebird');
-var _ = require('lodash');
 var yargs = require('yargs');
 var shutdown = require('shutdown');
 var StatusError = require('statuserror');
-var persistence = require('gitter-web-persistence');
 var troupeService = require('../../server/services/troupe-service');
 var groupService = require('gitter-web-groups/lib/group-service');
 
