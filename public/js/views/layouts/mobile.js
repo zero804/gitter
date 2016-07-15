@@ -77,6 +77,7 @@ module.exports = Marionette.LayoutView.extend({
     this.roomCollection = options.roomCollection;
     this.orgCollection = options.orgCollection;
     this.repoCollection = options.repoCollection;
+    this.groupsCollection = options.groupsCollection;
 
     this.communityCreateModel = new CommunityCreateModel();
 
@@ -128,7 +129,8 @@ module.exports = Marionette.LayoutView.extend({
     return new CommunityCreateView({
       model: this.communityCreateModel,
       orgCollection: this.orgCollection,
-      repoCollection: this.repoCollection
+      repoCollection: this.repoCollection,
+      groupsCollection: this.groupsCollection
     });
   },
 

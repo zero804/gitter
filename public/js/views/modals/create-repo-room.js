@@ -47,7 +47,7 @@ var View = Marionette.LayoutView.extend({
     var uri = r.get('uri');
     var addBadge = this.ui.addBadge.prop('checked');
 
-    apiClient.post('/v1/rooms', { uri: uri, addBadge: addBadge })
+    apiClient.post('/private/create-github-room', { uri: uri, addBadge: addBadge })
       .then(function (res) {
         if (res.extra.hookCreationFailedDueToMissingScope) {
           setTimeout(promptForHook, 1500);

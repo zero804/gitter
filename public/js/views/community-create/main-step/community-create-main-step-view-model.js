@@ -1,19 +1,22 @@
 'use strict';
 
 var CommunityCreateStepViewModel = require('../community-create-step-view-model');
+var slugAvailabilityStatusConstants = require('../slug-availability-status-constants');
 
 var CommunityCreateMainStepViewModel = CommunityCreateStepViewModel.extend({
   validate: function() {
     var errors = [];
 
-    var hasCommunityName = this.communityCreateModel.get('communityName').length > 0;
+    var communityName = this.communityCreateModel.get('communityName') || '';
+
+    var hasCommunityName = communityName.length > 0;
     if(!hasCommunityName) {
       errors.push({
         key: 'communityName',
         message: 'Please fill in the community name'
       });
     }
-    var communitySlug = this.communityCreateModel.get('communitySlug');
+    var communitySlug = this.communityCreateModel.get('communitySlug') || '';
     var hasCommunitySlug = communitySlug.length > 0;
     if(!hasCommunitySlug) {
       errors.push({
@@ -26,6 +29,12 @@ var CommunityCreateMainStepViewModel = CommunityCreateStepViewModel.extend({
       errors.push({
         key: 'communitySlug',
         message: 'Slug can only contain lowercase a-z and dashes -'
+      });
+    }
+    if(this.communityCreateModel.get('communitySlugAvailabilityStatus') !== slugAvailabilityStatusConstants.AVAILABLE) {
+      errors.push({
+        key: 'communitySlug',
+        message: 'Slug is already taken'
       });
     }
 
