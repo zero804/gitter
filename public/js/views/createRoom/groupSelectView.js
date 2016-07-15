@@ -37,6 +37,7 @@ module.exports = (function() {
     onRender: function() {
       if(!this.typeahead) {
         this.typeahead = new Typeahead({
+          disableShowOnAdd: true,
           fetch: this.refilter.bind(this),
           collection: this.groupsCollection,
           itemTemplate: itemTemplate,
