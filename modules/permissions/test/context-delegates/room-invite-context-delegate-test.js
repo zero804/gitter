@@ -4,7 +4,7 @@ var TroupeInvite = require('gitter-web-persistence').TroupeInvite;
 var ObjectID = require('mongodb').ObjectID;
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var Promise = require('bluebird');
-var RoomInviteContextDelegate = require('../../lib/policies/room-invite-context-delegate');
+var RoomInviteContextDelegate = require('../../lib/context-delegates/room-invite-context-delegate');
 var assert = require('assert');
 
 describe('room-invite-context-delegate', function() {
@@ -48,42 +48,47 @@ describe('room-invite-context-delegate', function() {
   });
 
   it('should allow an invite to be used', function() {
-    var r = new RoomInviteContextDelegate(troupeId, secret1);
-    return r.isMember(userId1)
+    var r = new RoomInviteContextDelegate(userId1, troupeId, secret1);
+    return r.isMember()
       .then(function(result) {
         assert.strictEqual(result, true);
       });
   });
 
   it('should allow a rejected invite to be re-used by the same user', function() {
-    var r = new RoomInviteContextDelegate(troupeId, secret3);
-    return r.isMember(userId2)
+    var r = new RoomInviteContextDelegate(userId2, troupeId, secret3);
+    return r.isMember()
       .then(function(result) {
         assert.strictEqual(result, true);
       });
   });
 
   it('should not allow an accepted invite to be re-used by the same user', function() {
-    var r = new RoomInviteContextDelegate(troupeId, secret2);
-    return r.isMember(userId1)
+    var r = new RoomInviteContextDelegate(userId1, troupeId, secret2);
+    return r.isMember()
       .then(function(result) {
         assert.strictEqual(result, false);
       });
   });
 
   it('should not allow an rejected invite to be re-used by the another user', function() {
-    var r = new RoomInviteContextDelegate(troupeId, secret3);
-    return r.isMember(userId1)
+    var r = new RoomInviteContextDelegate(userId1, troupeId, secret3);
+    return r.isMember()
       .then(function(result) {
         assert.strictEqual(result, false);
       });
   });
 
   it('should not allow an invalid secret to be used', function() {
-    var r = new RoomInviteContextDelegate(troupeId, 'fobar' + Math.random());
-    return r.isMember(userId1)
+    var r = new RoomInviteContextDelegate(userId1, troupeId, 'fobar' + Math.random());
+    return r.isMember()
       .then(function(result) {
         assert.strictEqual(result, false);
       });
+  });
+
+  it('should handle handleReadAccessFailure when the user is not in the room', function() {
+    var delegate = new RoomInviteContextDelegate(userId1, troupeId, secret3);
+    return delegate.handleReadAccessFailure();
   });
 });
