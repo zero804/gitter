@@ -353,6 +353,11 @@ module.exports = (function() {
 
       var lastAccess = room.get('lastAccessTime');
       this.collection.forEach(function(chat) {
+        if (!chat.get('sent')) {
+          // see #1728
+          debug('Chat is missing sent %j', chat);
+          return;
+        }
         if (chat.get('sent').isBefore(lastAccess) && chat.get('unread')) {
           self._store.markItemRead(chat.id);
         }
