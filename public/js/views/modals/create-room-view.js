@@ -4,7 +4,6 @@ var $ = require('jquery');
 var _ = require('underscore');
 var Marionette = require('backbone.marionette');
 var troupeCollections = require('collections/instances/troupes');
-var groupModels = require('collections/groups');
 var ModalView = require('./modal');
 var apiClient = require('components/apiClient');
 var GroupSelectView = require('views/createRoom/groupSelectView');
@@ -62,26 +61,14 @@ var View = Marionette.LayoutView.extend({
     ownerSelect: '#owner-region',
   },
 
-  initialize: function() {
-    var self = this;
+  initialize: function(attrs) {
+    this.groupsCollection = attrs.groupsCollection;
+    this.listenTo(this.groupsCollection, 'sync', this.selectSuggestedGroup);
 
-    this.groupCollection = new groupModels.Collection([]);
-    this.groupCollection.fetch({
-      data: {
-          type: 'admin'
-        }
-      },
-      {
-        add: true,
-        remove: true,
-        merge: true
-      }
-    );
-
-    self.listenTo(self, 'menuItemClicked', self.menuItemClicked);
-    self.recalcViewDebounced = _.debounce(function() {
-      self.recalcView(true);
-    }, 300);
+    this.listenTo(self, 'menuItemClicked', this.menuItemClicked);
+    this.recalcViewDebounced = _.debounce(function() {
+      this.recalcView(true);
+    }.bind(this), 300);
     this.bindUIElements();
   },
 
@@ -337,9 +324,9 @@ var View = Marionette.LayoutView.extend({
   },
 
   onRender: function() {
-    // TODO: this.groupCollection is probably not loaded yet
+    // TODO: this.groupsCollection is probably not loaded yet
     var groupSelect = new GroupSelectView({
-      groupsCollection: this.groupCollection
+      groupsCollection: this.groupsCollection
     });
 
     this.groupSelect = groupSelect;
@@ -351,16 +338,18 @@ var View = Marionette.LayoutView.extend({
       this.ui.roomNameInput.val(this.options.roomName);
     }
 
-    // TODO: this.groupCollection is probably not loaded yet, so you can't
-    // select the initial group.
+    this.selectSuggestedGroup();
+
+    this.recalcView(false);
+  },
+
+  selectSuggestedGroup: function() {
     if (this.options.initialGroupId) {
       var group = this.groupSelect.selectGroupId(this.options.initialGroupId);
       this.groupSelected(group, false);
     } else {
       this.groupSelected(null, false);
     }
-
-    this.recalcView(false);
   },
 
   roomNameChange: function() {
