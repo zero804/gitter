@@ -114,10 +114,9 @@ GroupWithPolicyService.prototype.createRoom = secureMethod([allowAdmin], functio
 });
 
 GroupWithPolicyService.prototype.setAvatar = secureMethod([allowAdmin], function(url) {
-  var user = this.user;
   var group = this.group;
 
-  var query  = { _id: group._id };
+  var query = { _id: group._id };
 
   var update = {
     $set: {
