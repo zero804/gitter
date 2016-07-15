@@ -333,12 +333,11 @@ describe('policy-evaluator', function () {
       var userId = meta.anonymous ? null : 'user1';
 
       var contextDelegate = {
-        isMember: Promise.method(function (_userId) {
+        isMember: Promise.method(function() {
           if (!userId) {
             assert.ok(false, 'Unexpected contextDelegate call');
           }
 
-          assert.strictEqual(_userId, userId);
           return meta.inRoom;
         })
       };

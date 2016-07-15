@@ -1,18 +1,24 @@
 'use strict';
 
+var assert = require('assert');
 var TroupeInvite = require('gitter-web-persistence').TroupeInvite;
 
 /**
  * This context uses an invite to determine whether a user
  * can access a room
  */
-function RoomInviteContextDelegate(roomId, secret) {
+function RoomInviteContextDelegate(userId, roomId, secret) {
+  assert(userId, 'userId required');
+  assert(roomId, 'roomId required');
+  assert(secret, 'secret required');
+
+  this.userId = userId;
   this.roomId = roomId;
   this.secret = secret;
 }
 
 RoomInviteContextDelegate.prototype = {
-  isMember: function(userId) {
+  isMember: function() {
     return TroupeInvite.count({
         troupeId: this.roomId,
         secret: this.secret,
@@ -20,7 +26,7 @@ RoomInviteContextDelegate.prototype = {
           userId: null,
           state: 'PENDING'
         }, {
-          userId: userId,
+          userId: this.userId,
           state: { $in: ['PENDING', 'REJECTED'] }
         }]
       })
