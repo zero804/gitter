@@ -23,9 +23,9 @@ function getTroupeModel() {
   if(ctx.troupe) {
     troupeModel = ctx.troupe;
   } else if(ctx.troupeId) {
-    troupeModel = window._troupeCollections.get(ctx.troupeId) || { id: ctx.troupeId };
+    troupeModel = window._troupeCollections.troupes.get(ctx.troupeId) || { id: ctx.troupeId };
   } else if(qs.troupeId) {
-    troupeModel = window._troupeCollections.get(qs.troupeId) || { id: qs.troupeId };
+    troupeModel = window._troupeCollections.troupes.get(qs.troupeId) || { id: qs.troupeId };
   }
 
   return new Backbone.Model(troupeModel);
@@ -126,7 +126,8 @@ function clearOtherAttributes(s, v) {
 
 /** TEMP - lets think of a better way to do this... */
 context.setTroupeId = function(value) {
-  troupe.set(clearOtherAttributes({ id: value }, troupe));
+  var actualModel = window._troupeCollections.troupes.get(value);
+  troupe.set(actualModel ? actualModel.attributes : clearOtherAttributes({ id: value }, troupe));
   return;
 };
 
