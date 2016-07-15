@@ -21,7 +21,17 @@ function PolicyEvaluator(userId, securityDescriptor, policyDelegate, contextDele
 PolicyEvaluator.prototype = {
   canRead: Promise.method(function() {
     debug('canRead');
-    return this._checkAccess(true); // With Good Faith
+    return this._checkAccess(true) // With Good Faith
+      .bind(this)
+      .tap(function(access) {
+        // If access is denied to the room, let the contextDelegate know
+        // so that it can appropriate action
+        if (!access && this._contextDelegate) {
+          return this._contextDelegate.handleReadAccessFailure();
+        }
+
+        return null;
+      })
   }),
 
   canWrite: Promise.method(function() {
@@ -84,7 +94,7 @@ PolicyEvaluator.prototype = {
     return this._checkAccess(true); // With Good Faith
   },
 
-  _checkAccess: function(useGoodFailChecks) {
+  _checkAccess: Promise.method(function(useGoodFailChecks) {
     // TODO: ADD BANS
     var userId = this._userId;
     var membersPolicy = this._securityDescriptor.members;
@@ -134,7 +144,7 @@ PolicyEvaluator.prototype = {
       return this._checkAnonymousAccessWithGoodFaith();
     }
 
-  },
+  }),
 
   /**
    * User is in the room or has admin access
@@ -246,7 +256,10 @@ PolicyEvaluator.prototype = {
 
         return contextDelegate.isMember()
           .then(function(isMember) {
-            if (isMember) return true;
+            if (isMember) {
+              logger.error('Backend down but allowing user to access room on account of already being a member');
+              return true;
+            }
 
             return false;
           });
