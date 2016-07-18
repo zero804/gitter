@@ -292,7 +292,7 @@ function createExpectedFixtures(expected) {
       if (f.avatarUrl) {
         avatarVersion = 1;
       } else {
-        avatarVersion = null;
+        avatarVersion = 0;
       }
     }
 
