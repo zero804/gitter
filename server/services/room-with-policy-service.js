@@ -310,11 +310,12 @@ RoomWithPolicyService.prototype.createRoomInvitations = secureMethod([allowAddUs
     var externalId = invite.externalId;
     var emailAddress = invite.emailAddress;
 
-    return roomInviteService.createInvite(room, user, {
-        type: type,
-        externalId: externalId,
-        emailAddress: emailAddress
-      })
+    var inviteInfo = {
+      type: type,
+      externalId: externalId,
+      emailAddress: emailAddress
+    };
+    return roomInviteService.createInvite(room, user, inviteInfo)
       .catch(StatusError, function(err) {
         /*
         NOTE: We intercept some errors so that one failed invite doesn't fail
@@ -325,6 +326,13 @@ RoomWithPolicyService.prototype.createRoomInvitations = secureMethod([allowAddUs
         Many (most?) of these would have been caught if the frontend used the
         check avatar API like it should, so it shouldn't be too likely anyway.
         */
+        logger.error("Unable to create an invite: " + err, {
+          exception: err,
+          invitingUserId: user._id.toString(),
+          roomId: room._id.toString(),
+          inviteInfo: inviteInfo
+        });
+
         return {
           status: 'error', // as opposed to 'invited' or 'added'
           statusCode: err.status

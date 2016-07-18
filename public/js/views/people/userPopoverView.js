@@ -1,13 +1,14 @@
 "use strict";
+
 var Marionette = require('backbone.marionette');
 var Backbone = require('backbone');
-var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 var Popover = require('views/popover');
 var template = require('./tmpl/userPopoverView.hbs');
 var footerTemplate = require('./tmpl/userPopoverFooterView.hbs');
 var appEvents = require('utils/appevents');
 var context = require('utils/context');
 var SyncMixin = require('collections/sync-mixin');
+var avatars = require('gitter-web-avatars');
 
 module.exports = (function() {
 
@@ -19,7 +20,7 @@ module.exports = (function() {
     serializeData: function() {
       var data = this.model.toJSON();
       data.inactive = data.invited || data.removed;
-      data.avatarUrl = resolveUserAvatarUrl(data, 128);
+      data.avatarUrl = avatars.getForUser(data);
       return data;
     }
   });
@@ -61,6 +62,7 @@ module.exports = (function() {
         }
       }
 
+      data.avatarUrl = avatars.getForUser(data);
       data.inactive = data.invited || data.removed;
       data.chatPrivately = chatPrivately;
       data.mentionable = mentionable;

@@ -12,53 +12,6 @@ var inviteValidation = require('gitter-web-invites/lib/invite-validation');
 
 var MAX_BATCHED_INVITES = 100;
 
-
-function processInvitesReport(invitesInput, report) {
-  /*
-  We might have to mask some emails and serialize some users so that the
-  response looks similar to when you just add a user to a room one by one. Some
-  errors got intercepted and now form part of the report and they just get
-  passed through.
-  */
-
-  return Promise.map(report, Promise.method(function(result, index) {
-    // deal with the intercepted errors up front
-    if (result.status === 'error') {
-      return result; // status, statusCode
-    }
-
-    var input = invitesInput[index];
-
-    // TODO: This is actually the same as some code in v1/rooms/invite, but it
-    // uses restful, so unclear where best to put it.
-
-    var avatarUrl = inviteValidation.getAvatar(input.type, input.externalId, result.emailAddress);
-
-    if (!input.emailAddress && result.emailAddress) {
-      result.emailAddress = inviteValidation.maskEmail(result.emailAddress);
-    }
-
-    if (!result.user) {
-      return {
-        status: result.status,
-        email: result.emailAddress,
-        avatarUrl: avatarUrl
-      }
-    }
-
-    var strategy = new restSerializer.UserStrategy();
-    return restSerializer.serializeObject(result.user, strategy)
-      .then(function(serializedUser) {
-        return {
-          status: result.status,
-          email: result.emailAddress,
-          user: serializedUser,
-          avatarUrl: avatarUrl
-        }
-      });
-  }));
-}
-
 module.exports = {
   id: 'group',
 
@@ -148,8 +101,6 @@ module.exports = {
         return roomWithPolicyService.createRoomInvitations(invitesInput);
       })
       .then(function(invitesReport) {
-        var inviteResults = processInvitesReport(invitesInput, invitesReport);
-
         var groupStrategy = new restSerializer.GroupStrategy();
         var troupeStrategy = new restSerializer.TroupeStrategy({
           currentUserId: req.user.id,
@@ -164,8 +115,6 @@ module.exports = {
             restSerializer.serializeObject(room, troupeStrategy),
             function(serializedGroup, serializedRoom) {
               serializedGroup.defaultRoom = serializedRoom;
-              // invitesResults is an array of simple js objects
-              serializedGroup.inviteResults = inviteResults;
               return serializedGroup;
             }
           );
