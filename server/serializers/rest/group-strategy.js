@@ -17,7 +17,7 @@ function GroupStrategy(/* options */) {
         type: group.sd.type,
         linkPath: group.sd.linkPath
       },
-      avatarUrl: avatars.getForGroupId(group._id)
+      avatarUrl: avatars.getForGroup(group)
     };
   };
 }

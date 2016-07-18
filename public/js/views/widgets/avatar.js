@@ -7,12 +7,14 @@ var template = require('./tmpl/avatar.hbs');
 var UserPopoverView = require('views/people/userPopoverView');
 var widgets = require('views/behaviors/widgets');
 var resolveUserAvatarSrcSet = require('gitter-web-shared/avatars/resolve-user-avatar-srcset');
-require('views/behaviors/tooltip');
 var FastAttachMixin = require('views/fast-attach-mixin');
+var avatars = require('gitter-web-avatars');
+
+require('views/behaviors/tooltip');
 
 var AVATAR_SIZE_MEDIUM = 64;
 var AVATAR_SIZE_SMALL = 30;
-var FALLBACK_IMAGE_URL = "https://avatars.githubusercontent.com/u/0";
+var FALLBACK_IMAGE_URL = avatars.getDefault();
 
 module.exports = (function() {
 
@@ -130,18 +132,11 @@ module.exports = (function() {
 
     onImageError: function(e) {
       var img = e.currentTarget;
-      var options = this.options || {};
-      var avatarSize = options.avatarSize || 's';
-      var imgSize = avatarSize == 'm' ? AVATAR_SIZE_MEDIUM : AVATAR_SIZE_SMALL;
-
-      var user = this.model && this.model.toJSON();
-      var avatarSrcSet = resolveUserAvatarSrcSet(user, imgSize);
-
-      // Still pointing at the same location?
-      if(img.src === avatarSrcSet.src) {
-        img.src = FALLBACK_IMAGE_URL;
-        img.srcset = "";
+      if (img.src === FALLBACK_IMAGE_URL) {
+        return;
       }
+
+      img.src = FALLBACK_IMAGE_URL;
     },
 
     attachElContent: FastAttachMixin.attachElContent

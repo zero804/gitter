@@ -81,19 +81,15 @@ module.exports = CommunityCreateBaseStepView.extend({
 
     var type = null;
     var linkPath = null;
-    var githubProjectModel;
     var githubOrgId = communityCreateModel.get('githubOrgId');
     var githubRepoId = communityCreateModel.get('githubRepoId');
-    if(githubOrgId) {
-      githubProjectModel = this.orgCollection.get(githubOrgId);
+    var githubProjectModel = this.orgCollection.get(githubOrgId) || this.repoCollection.get(githubRepoId);
+    if(githubOrgId && githubProjectModel) {
       type = 'GH_ORG';
+      linkPath = githubProjectModel.get('name').toLowerCase();
     }
-    else if(githubRepoId) {
-      githubProjectModel = this.repoCollection.get(githubRepoId);
+    else if(githubRepoId && githubProjectModel) {
       type = 'GH_REPO';
-    }
-
-    if(githubProjectModel) {
       linkPath = githubProjectModel.get('uri');
     }
 
@@ -101,8 +97,14 @@ module.exports = CommunityCreateBaseStepView.extend({
       this.groupsCollection.create({
         name: communityCreateModel.get('communityName'),
         uri: communityCreateModel.get('communitySlug'),
-        type: type,
+        type: 'org',
+        // This one is for the left-menu
         linkPath: linkPath,
+        // This is for POSTing to the API
+        security: {
+          type: type,
+          linkPath: linkPath
+        },
         invites: [].concat(communityCreateModel.peopleToInvite.toJSON(), communityCreateModel.emailsToInvite.toJSON())
       }, {
         wait: true,
