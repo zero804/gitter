@@ -42,6 +42,11 @@ describe('avatar-api', function() {
     expected: null,
     proxyRedirect: '/fetch/https://avatars.githubusercontent.com/gitter-integration-tests?s=128'
   }, {
+    name: '/group/iv/:version/:groupId',
+    url: null,
+    expected: null,
+    proxyRedirect: '/fetch/https://avatars.githubusercontent.com/gitter-integration-tests?s=128'
+  }, {
     name: '/g/u/:username',
     url: '/g/u/' + fixtureLoader.GITTER_INTEGRATION_USERNAME,
     expected: null,
@@ -75,6 +80,7 @@ describe('avatar-api', function() {
 
   before(function() {
     FIXTURES_TEMPLATES[0].url = '/group/i/' + fixture.group1.id;
+    FIXTURES_TEMPLATES[1].url = '/group/iv/1/' + fixture.group1.id;
   });
 
   describe('direct', function() {

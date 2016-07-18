@@ -75,12 +75,25 @@ function sendAvatar(callback) {
       .catch(next);
   }
 }
+
 /**
  * Group Avatars, by ID
  */
 router.get('/group/i/:groupId',
   identifyRoute('api-private-avatar-group-id'),
   sendAvatar(function(req, size) {
+    var groupId = fixMongoIdQueryParam(req.params.groupId);
+    if (!groupId) return null;
+    return groupById(groupId, size);
+  }));
+
+/**
+ * Group Avatars, by ID (versioned)
+ */
+router.get('/group/iv/:version/:groupId',
+  identifyRoute('api-private-avatar-group-id-versioned'),
+  sendAvatar(function(req, size) {
+    // Ignore the version it's only used as a cache-buster
     var groupId = fixMongoIdQueryParam(req.params.groupId);
     if (!groupId) return null;
     return groupById(groupId, size);
