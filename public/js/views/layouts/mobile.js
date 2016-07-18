@@ -30,7 +30,6 @@ module.exports = Marionette.LayoutView.extend({
   dialogRegion: modalRegion,
   behaviors: {
     Isomorphic: {
-      communityCreate: { el: '.community-create-app-root', init: 'initCommunityCreateRegion' },
       chat: { el: '#content-wrapper', init: 'initChatRegion' },
       input: { el: '#chat-input', init: 'initInputRegion' },
       menu: { el: '#menu-region', init: 'initMenuRegion' },
@@ -150,10 +149,5 @@ module.exports = Marionette.LayoutView.extend({
     this.ui.mainPage.toggleClass('partiallyOffScreen');
     e.stopPropagation();
   },
-
-
-  onCommunityCreateToggle: function(active) {
-    this.communityCreateModel.set('active', active);
-  }
 
 });
