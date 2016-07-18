@@ -11,8 +11,8 @@ var GroupSchema = new Schema({
   lcUri: { type: String, required: true },
   forumId: { type: ObjectId, required: false },
   sd: { type: securityDescriptor.Schema, required: false },
-  avatarUrl: { type: String, required: false},
-  avatarVersion: { type: Number, required: false }
+  avatarUrl: { type: String, required: false },
+  avatarVersion: { type: Number, required: false, default: 0 }
 
 }, { strict: 'throw' });
 
