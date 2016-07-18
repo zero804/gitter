@@ -86,10 +86,10 @@ function parseAndValidateTransloadit(user, input) {
     params.fields.group_uri = input.group_uri;
 
     params.steps.export_original = {
-      path: '${fields.group_uri}/${fields.token}/original.${file.ext}'
+      path: 'groups/' + input.group_id + '/original'
     };
     params.steps.export_thumbs = {
-      path: '${fields.group_uri}/${fields.token}/${file.meta.width}.png'
+      path: 'groups/' + input.group_id + '/${file.meta.width}'
     };
 
   } else {
