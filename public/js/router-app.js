@@ -1,6 +1,9 @@
 /* eslint complexity: ["error", 19] */
 'use strict';
 
+require('utils/initial-setup');
+require('utils/font-setup');
+
 var debug = require('debug-proxy')('app:router-app');
 var $ = require('jquery');
 var Backbone = require('backbone');
@@ -26,9 +29,6 @@ var CommunityCreateModel = require('views/community-create/community-create-mode
 
 var AppLayout = require('views/layouts/app-layout');
 var LoadingView = require('views/app/loading-view');
-
-require('utils/initial-setup');
-require('utils/font-setup');
 
 require('components/statsc');
 require('views/widgets/preload');
