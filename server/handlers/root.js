@@ -8,6 +8,8 @@ var express = require('express');
 var loginUtils = require('../web/login-utils');
 var social = require('./social-metadata');
 var langs = require('langs');
+var earlyBirdRenderer = require('./renderers/early-bird');
+
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
 router.get(nconf.get('web:homeurl'),
@@ -106,6 +108,11 @@ router.get('/-/unawesome-browser',
   function(req, res) {
     res.status(406/* Not Acceptable */).render('unawesome-browser', { });
   });
+
+router.get('/about/early-bird',
+  identifyRoute('earlybird'),
+  earlyBirdRenderer.renderEarlyBirdPage
+);
 
 // old campaign that still gets some hits
 router.get('/about/*',
