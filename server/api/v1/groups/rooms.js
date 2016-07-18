@@ -21,7 +21,7 @@ module.exports = {
       throw new StatusError(401);
     }
 
-    if (!req.authInfo || !req.authInfo.clientKey === 'web-internal') {
+    if (!req.authInfo || req.authInfo.client.clientKey !== 'web-internal') {
       // This is a private API
       throw new StatusError(404);
     }
