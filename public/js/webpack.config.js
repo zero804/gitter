@@ -35,6 +35,7 @@ var webpackConfig = {
 
     "mobile-native-userhome": path.resolve(path.join(__dirname, "./mobile-native-userhome")),
     "router-home-learn": path.resolve(path.join(__dirname, './router-home-learn')),
+    "early-bird": path.resolve(path.join(__dirname, './early-bird')),
 
     vendor: [
       'utils/webpack',
