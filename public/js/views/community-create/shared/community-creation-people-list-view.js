@@ -12,6 +12,23 @@ var CommunityCreationPeopleListTemplate = require('./community-creation-people-l
 var CommunityCreationPeopleListItemTemplate = require('./community-creation-people-list-item-view.hbs');
 var CommunityCreationPeopleListEmptyTemplate = require('./community-creation-people-list-empty-view.hbs');
 
+// Consider all constraints except a customError because we use
+// this to add a custom message on what to do to satisfy
+var isFormElementInvalid = function(el, useCustomError) {
+  return el.validity.badInput ||
+    (useCustomError ? el.validity.customError : false) ||
+    el.validity.patternMismatch ||
+    el.validity.rangeOverflow ||
+    el.validity.rangeUnderflow ||
+    el.validity.stepMismatch ||
+    el.validity.tooLong ||
+    el.validity.typeMismatch ||
+    //el.validity.valid ||
+    el.validity.valueMissing;
+};
+
+
+
 var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
   template: CommunityCreationPeopleListItemTemplate,
   tagName: 'li',
@@ -90,7 +107,8 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
 
   onEmailInputChange: function() {
     var emailInputText = this.ui.emailInput[0].value;
-    if(emailInputText.length > 3) {
+    var isEmailValid = !isFormElementInvalid(this.ui.emailInput[0]);
+    if(isEmailValid) {
       this.model.set('inviteStatus', peopleToInviteStatusConstants.READY_VALID_EMAIL);
     }
     else {

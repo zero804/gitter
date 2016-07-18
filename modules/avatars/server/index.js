@@ -4,7 +4,10 @@ var isGitHubUser = require('../shared/is-github-user');
 var avatarCdnResolver = require('../shared/avatar-cdn-resolver');
 var gravatar = require('./gravatar');
 
-var DEFAULT = 'https://avatars.githubusercontent.com/u/0';
+var clientEnv = require('gitter-client-env');
+var avatarUrl = clientEnv.avatarsUrl;
+
+var DEFAULT = avatarUrl + '/default';
 
 function getForGitHubUsername(githubUsername) {
   return avatarCdnResolver('/gh/u/' + githubUsername);
@@ -16,7 +19,20 @@ function getForGravatarEmail(emailAddress) {
 }
 
 function getForGroupId(groupId) {
+  if (!groupId) return DEFAULT;
   return avatarCdnResolver('/group/i/' + groupId);
+}
+
+function getForGroup(group) {
+  if (!group) return DEFAULT;
+  var groupId = group.id || group._id;
+  if (!groupId) return DEFAULT;
+
+  if (group.avatarVersion) {
+    return avatarCdnResolver('/group/iv/' + group.avatarVersion + '/' + groupId);
+  } else {
+    return getForGroupId(groupId);
+  }
 }
 
 /**
@@ -61,6 +77,7 @@ module.exports = {
   getForGitHubUsername: getForGitHubUsername,
   getForGravatarEmail: getForGravatarEmail,
   getForGroupId: getForGroupId,
+  getForGroup: getForGroup,
   getForRoomUri: getForRoomUri,
   getForUser: getForUser,
   getDefault: getDefault,
