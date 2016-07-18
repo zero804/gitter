@@ -120,25 +120,27 @@ module.exports = CommunityCreateBaseStepView.extend({
   },
 
   onCommunityInfoChange: function() {
-    var communitySlug = this.communityCreateModel.get('communitySlug');
-    // TODO: Why does this match the first item always?
-    var matchingOrgItem = this.orgCollection.filter(function(org) {
-      return (org.get('name') || '').toLowerCase() === communitySlug;
-    })[0];
-    var matchingRepoItem = this.repoCollection.filter(function(repo) {
-      return (repo.get('uri') || '').toLowerCase() === communitySlug;
-    })[0];
-    if(matchingOrgItem) {
-      this.communityCreateModel.set('githubOrgId', matchingOrgItem.get('id'));
-      this.communityCreateModel.set('githubRepoId', null);
-    }
-    else if(matchingRepoItem) {
-      this.communityCreateModel.set('githubOrgId', null);
-      this.communityCreateModel.set('githubRepoId', matchingRepoItem.get('id'));
-    }
-    else {
-      this.communityCreateModel.set('githubOrgId', null);
-      this.communityCreateModel.set('githubRepoId', null);
+    if(!this.communityCreateModel.get('isUsingExplicitGitHubProject')) {
+      var communitySlug = this.communityCreateModel.get('communitySlug');
+      // TODO: Why does this match the first item always?
+      var matchingOrgItem = this.orgCollection.filter(function(org) {
+        return (org.get('name') || '').toLowerCase() === communitySlug;
+      })[0];
+      var matchingRepoItem = this.repoCollection.filter(function(repo) {
+        return (repo.get('uri') || '').toLowerCase() === communitySlug;
+      })[0];
+      if(matchingOrgItem) {
+        this.communityCreateModel.set('githubOrgId', matchingOrgItem.get('id'));
+        this.communityCreateModel.set('githubRepoId', null);
+      }
+      else if(matchingRepoItem) {
+        this.communityCreateModel.set('githubOrgId', null);
+        this.communityCreateModel.set('githubRepoId', matchingRepoItem.get('id'));
+      }
+      else {
+        this.communityCreateModel.set('githubOrgId', null);
+        this.communityCreateModel.set('githubRepoId', null);
+      }
     }
 
     this.updateCommunityFields();

@@ -27,6 +27,7 @@ var CommunityCreateModel = Backbone.Model.extend({
     // slugAvailabilityStatusConstants
     communitySlugAvailabilityStatus: null,
     isUsingCustomSlug: false,
+    isUsingExplicitGitHubProject: false,
     githubOrgId: null,
     githubRepoId: null,
 
