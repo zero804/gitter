@@ -114,21 +114,7 @@ function handleUploadToGroup(transloadit, metadata) {
       var upload = transloadit.results[':original'][0];
 
       var url = fixUrl(upload.ssl_url);
-      /*
-      example url:
-      https://blah.s3.amazonaws.com/5f/bbe64049a511e69dcdbda1cf4ccf5b/original.jpeg
 
-      example thumbnails:
-      https://blah.s3.amazonaws.com/5f/bbe64049a511e69dcdbda1cf4ccf5b/22.png
-      https://blah.s3.amazonaws.com/5f/bbe64049a511e69dcdbda1cf4ccf5b/44.png
-      etc, etc.
-
-      NOTE: The original's file extension could be any supported image file
-      type, but the thumbnails will all have the same one. (png at time of
-      writing)
-      */
-
-      // TODO: should we validate the uploaded image in any way?
       // TODO: should we delete the existing image if there is one?
 
       return groupWithPolicyService.setAvatar(url);
