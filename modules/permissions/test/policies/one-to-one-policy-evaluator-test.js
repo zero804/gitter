@@ -17,12 +17,11 @@ describe('one-to-one-policy-evaluator', function() {
       var userId = meta.userId;
 
       var contextDelegate = {
-        isMember: Promise.method(function(pUserId) {
+        isMember: Promise.method(function() {
           if (userId === null) {
             assert.ok(false, 'Unexpected call');
           }
 
-          assert.strictEqual(pUserId, userId)
           return meta.inRoom;
         })
       };

@@ -2,10 +2,10 @@
 
 var Promise = require('bluebird');
 var PolicyEvaluator = require('./policies/policy-evaluator');
-var RoomContextDelegate = require('./policies/room-context-delegate');
-var RoomInviteContextDelegate = require('./policies/room-invite-context-delegate');
-var DisjunctionContextDelegate = require('./policies/disjunction-context-delegate');
-var StaticContextDelegate = require('./policies/static-context-delegate');
+var RoomContextDelegate = require('./context-delegates/room-context-delegate');
+var RoomInviteContextDelegate = require('./context-delegates/room-invite-context-delegate');
+var DisjunctionContextDelegate = require('./context-delegates/disjunction-context-delegate');
+var StaticContextDelegate = require('./context-delegates/static-context-delegate');
 var GhRepoPolicyDelegate = require('./policies/gh-repo-policy-delegate');
 var GhOrgPolicyDelegate = require('./policies/gh-org-policy-delegate');
 var GhUserPolicyDelegate = require('./policies/gh-user-policy-delegate');
@@ -61,8 +61,8 @@ function createPolicyForRoomInvite(user, room, inviteSecret) {
 
       // Either the user is in the room already, or the secret matches
       var contextDelegate = new DisjunctionContextDelegate([
-        new RoomContextDelegate(roomId),
-        new RoomInviteContextDelegate(roomId, inviteSecret)
+        new RoomContextDelegate(userId, roomId),
+        new RoomInviteContextDelegate(userId, roomId, inviteSecret)
       ]);
 
       return new PolicyEvaluator(userId, securityDescriptor, policyDelegate, contextDelegate);

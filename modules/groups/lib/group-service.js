@@ -61,7 +61,8 @@ function upsertGroup(user, groupInfo, securityDescriptor) {
         stats.event('new_group', {
           uri: uri,
           groupId: group._id,
-          userId: user._id
+          userId: user._id,
+          type: securityDescriptor.type
         });
       }
 
