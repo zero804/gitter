@@ -14,9 +14,21 @@ function getForGravatarEmail(emailAddress) {
 }
 
 function getForGroupId(groupId) {
+  if (!groupId) return null;
   return avatarCdnResolver('/group/i/' + groupId);
 }
 
+function getForGroup(group) {
+  if (!group) return null;
+  var groupId = group.id || group._id;
+  if (!groupId) return null;
+
+  if (group.avatarVersion) {
+    return avatarCdnResolver('/group/iv/' + group.avatarVersion + '/' + groupId);
+  } else {
+    return getForGroupId(groupId);
+  }
+}
 /**
  * This will change in future
  */
@@ -58,6 +70,7 @@ module.exports = {
   getForGitHubUsername: getForGitHubUsername,
   getForGravatarEmail: getForGravatarEmail,
   getForGroupId: getForGroupId,
+  getForGroup: getForGroup,
   getForRoomUri: getForRoomUri,
   getForUser: getForUser,
   getDefault: getDefault,
