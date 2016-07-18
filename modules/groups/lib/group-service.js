@@ -104,10 +104,6 @@ function checkGroupUri(user, uri, options) {
             // the frontend code should have prevented you from getting here
             throw new StatusError(400, 'Group must be type GH_ORG: ' + type);
           }
-          if (linkPath !== uri) {
-            // the frontend code should have prevented you from getting here
-            throw new StatusError(400, 'Group linkPath must match uri: ' + linkPath);
-          }
         }
       }
     });

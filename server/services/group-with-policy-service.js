@@ -91,7 +91,7 @@ GroupWithPolicyService.prototype.createRoom = secureMethod([allowAdmin], functio
   var user = this.user;
   var group = this.group;
 
-  if (!config.get("project-splitsville:enabled")) {
+  if (!config.get("splitsville:enabled")) {
     if (options.type && group.sd.type !== 'GH_ORG' && group.sd.type !== 'GH_REPO' && group.sd.type !== 'GH_USER') {
       throw new StatusError(400, 'GitHub repo backed rooms can only be added to GitHub org, repo or user backed groups.');
     }
