@@ -1,7 +1,7 @@
 'use strict';
 
 var Backbone = require('backbone');
-var BaseResolverCollection = require('./base-resolver-collection.js');
+var BaseResolverCollection = require('./base-resolver-collection');
 
 var Model = Backbone.Model.extend({
   defaults: {

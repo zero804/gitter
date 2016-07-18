@@ -3,7 +3,7 @@
 var Backbone = require('backbone');
 var _ = require('underscore');
 var FilteredCollection = require('backbone-filtered-collection');
-var SuggestedRoomsByRoomCollection = require('./room-suggested-rooms.js');
+var SuggestedRoomsByRoomCollection = require('./room-suggested-rooms');
 var SyncMixin = require('./sync-mixin');
 
 var SuggestionsContextModel = Backbone.Model.extend({});

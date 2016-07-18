@@ -147,7 +147,7 @@ module.exports = (function() {
     scope: 'input.chat.edit'
   }];
 
-  keyEvents[cmdKey + '+/, ' + cmdKey + '+' + gitterKey + '+/'] = { name:'chat.toggle', scope: 'other' };
+  keyEvents[cmdKey + '+/, ' + cmdKey + '+' + gitterKey + '+/'] = { name: 'chat.toggle' };
   keyEvents[cmdKey + '+' + '+s'] = 'focus.search';
   keyEvents[cmdKey + '+' + gitterKey + '+c'] = { name:'focus.chat', scope: 'other' };
   keyEvents[cmdKey + '+' + gitterKey + '+m'] = 'help.markdown';
