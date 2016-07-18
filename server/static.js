@@ -23,6 +23,7 @@ var corsOptions = {
   allowedHeaders: [
     'content-type',
     'x-access-token',
+    'authorization',
     'accept'
   ],
   exposedHeaders: [

@@ -49,6 +49,7 @@ function checkGitHubUri(user, uri, obtainAccessFromGitHubRepo) {
     // check gh orgs and users
     return validateGitHubUri(user, uri)
       .then(function(githubInfo) {
+        var policy;
         if (githubInfo && githubInfo.type === 'ORG') {
           // also check if you can actually admin the org.
 

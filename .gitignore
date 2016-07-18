@@ -96,3 +96,5 @@ node_modules_linux
 .eslintcache
 scripts/graphs/*.dot
 scripts/graphs/*.gephi
+.devhttps.ca.crt
+.devhttps.ca.key

@@ -41,7 +41,7 @@ var FIXTURES = [{
     meta: {
       right: 'create'
     },
-    tests:[
+    tests: [
       { name: 'You cant create PUBLIC room under someone elses account',
         security: 'PUBLIC', ownChannel: false, expectedResult: false },
       { name: 'You cant create PRIVATE room under someone elses account',
@@ -58,7 +58,7 @@ var FIXTURES = [{
     ]
   }, {
     name: 'join and view',
-    tests:[{
+    tests: [{
       name: 'public channels',
       meta: {
         security: 'PUBLIC',
@@ -89,7 +89,7 @@ var FIXTURES = [{
       right: 'admin',
       security: 'PUBLIC',
     },
-    tests:[
+    tests: [
       { name: 'The owner is the admin',
         ownChannel: true, expectedResult: true },
       { name: 'A non owner is not the admin',
@@ -100,7 +100,7 @@ var FIXTURES = [{
     meta: {
       right: 'adduser'
     },
-    tests:[
+    tests: [
       { name: 'Anyone can add people to a public room',
         security: 'PUBLIC', expectedResult: true }, // Anyone can add someone to a public room
       { name: 'Non room members can adduser',
@@ -140,10 +140,10 @@ describe('user-channel-permissions', function() {
 
       permissionsModel(USER, RIGHT, URI, SECURITY)
         .then(function(result) {
-          if(EXPECTED !== 'throw') {
-            assert.strictEqual(result, EXPECTED);
-          } else {
+          if(EXPECTED === 'throw') {
             assert(false, 'Expected the permission model to throw an exception');
+          } else {
+            assert.strictEqual(result, EXPECTED);
           }
         }, function(err) {
           if(EXPECTED !== 'throw') throw err;

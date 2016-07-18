@@ -271,10 +271,10 @@ describe('repo-permissions', function() {
 
       permissionsModel(USER, RIGHT, URI, SECURITY)
         .then(function(result) {
-          if(EXPECTED !== 'throw') {
-            assert.strictEqual(result, EXPECTED);
-          } else {
+          if(EXPECTED === 'throw') {
             assert(false, 'Expected the permission model to throw an exception, instead got ' + result);
+          } else {
+            assert.strictEqual(result, EXPECTED);
           }
         }, function(err) {
           if(EXPECTED !== 'throw') throw err;

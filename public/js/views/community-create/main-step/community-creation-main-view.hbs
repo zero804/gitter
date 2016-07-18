@@ -1,0 +1,54 @@
+<form class="community-create-step-content-area js-community-create-main-view-form">
+  <h1 class="primary-community-heading h1">
+    Think big,<br>
+    start small, grow fast
+  </h1>
+
+  <input
+    class="primary-community-name-input"
+    placeholder="your community name"
+    pattern=".+"
+    required />
+
+  <div class="community-creation-slug-input-wrapper">
+    <span class="community-creation-slug-input-prefix">gitter.im/</span>
+    <input
+      class="community-creation-slug-input"
+      placeholder="your-community-domain"
+      pattern="[a-z0-9\-]+"
+      required />
+  </div>
+
+  {{#if hasGitHubProvider}}
+    <section class="community-create-associated-project-section">
+      <p class="community-create-associated-project-copy active js-community-create-add-associated-project-copy">
+        do you want to start a community for one of your
+        <a href="#0" class="community-create-general-link js-community-create-from-github-project-link">
+          github projects?
+        </a>
+      </p>
+      <p class="community-create-has-associated-project-copy js-community-create-has-associated-project-copy">
+        <span>
+          Associated with
+          <a href="#0" class="community-create-general-link js-community-create-associated-project-link">
+            <i class="icon-github-circled"></i>
+            <span class="js-community-create-associated-project-name"></span>
+          </a>
+        </span>
+        <a href="#0" class="community-create-change-github-project-button secondary-button-caribbean js-community-create-from-github-project-link">
+          change
+        </a>
+      </p>
+    </section>
+  {{/if}}
+
+
+  <section class="community-create-progression-button-wrapper">
+    <div></div>
+
+    <button type="submit" class="community-create-next-button button-caribbean js-community-create-step-next">
+      Next
+    </button>
+  </section>
+
+</form>
