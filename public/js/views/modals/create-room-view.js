@@ -65,7 +65,7 @@ var View = Marionette.LayoutView.extend({
     this.groupsCollection = attrs.groupsCollection;
     this.listenTo(this.groupsCollection, 'sync', this.selectSuggestedGroup);
 
-    this.listenTo(self, 'menuItemClicked', this.menuItemClicked);
+    this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
     this.recalcViewDebounced = _.debounce(function() {
       this.recalcView(true);
     }.bind(this), 300);
