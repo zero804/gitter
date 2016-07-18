@@ -9,8 +9,8 @@ var Promise = require('bluebird');
 
 var TransloaditClient = require('transloadit');
 var transloadit = new TransloaditClient({
-  authKey    : nconf.get('transloadit:key'),
-  authSecret : nconf.get('transloadit:secret')
+  authKey: nconf.get('transloadit:key'),
+  authSecret: nconf.get('transloadit:secret')
 });
 
 var redisClient = redis.getClient();
@@ -86,10 +86,12 @@ function parseAndValidateTransloadit(user, input) {
     params.fields.group_uri = input.group_uri;
 
     params.steps.export_original = {
-      path: 'groups/' + input.group_id + '/original'
+      path: 'groups/' + input.group_id + '/original',
+      bucket: nconf.get('transloadit:avatars:bucket')
     };
     params.steps.export_thumbs = {
-      path: 'groups/' + input.group_id + '/${file.meta.width}'
+      path: 'groups/' + input.group_id + '/${file.meta.width}',
+      bucket: nconf.get('transloadit:avatars:bucket')
     };
 
   } else {
