@@ -223,15 +223,18 @@ var View = Marionette.LayoutView.extend({
 
     var checkForRepo;
     var createButtonEnabled;
+    var roomName;
+    var groupUri;
+    var groupBackedBy;
+    var groupType;
+    var backingName;
 
     if (group) {
-      createButtonEnabled = true;
-      var roomName = this.ui.roomNameInput.val();
-      var groupUri = group.get('uri');
-      var groupBackedBy = group.get('backedBy');
-      var groupType = groupBackedBy.type;
-      var orgName = groupBackedBy.linkPath || '';
-      var repoName = groupBackedBy.linkPath || '';
+      roomName = this.ui.roomNameInput.val();
+      groupUri = group.get('uri');
+      groupBackedBy = group.get('backedBy');
+      groupType = groupBackedBy.type;
+      backingName = groupBackedBy.linkPath || '';
 
       if (groupType === 'GH_ORG') {
         // rooms inside github org based groups can have inherited permissions
@@ -249,7 +252,6 @@ var View = Marionette.LayoutView.extend({
         checkForRepo = roomName && groupUri + '/' + roomName;
       }
 
-      createButtonEnabled = false;
       var existing = roomName && troupeCollections.troupes.findWhere({ uri: groupUri + '/' + roomName});
       createButtonEnabled = !existing;
 
@@ -292,7 +294,6 @@ var View = Marionette.LayoutView.extend({
       applyShowHides();
     }
 
-
     function applyShowHides() {
       if (!self.dialog) return; // callback but room has already been created, therefore self.dialog is null
 
@@ -310,7 +311,7 @@ var View = Marionette.LayoutView.extend({
 
       self.dialog.showActions();
 
-      if(animated === false) {
+      if (animated === false) {
         arrayToJq(true).removeClass('hide');
         arrayToJq(false).addClass('hide');
       } else {
@@ -318,8 +319,8 @@ var View = Marionette.LayoutView.extend({
         arrayToJq(false).filter(':visible').addClass('hide');
       }
     }
-    self.ui.orgNameLabel.text(orgName);
-    self.ui.repoNameLabel.text(repoName);
+    self.ui.orgNameLabel.text(backingName);
+    self.ui.repoNameLabel.text(backingName);
     self.ui.roomNameInput.attr('placeholder', placeholder);
   },
 
