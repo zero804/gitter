@@ -61,12 +61,14 @@ var View = Marionette.LayoutView.extend({
     ownerSelect: '#owner-region',
   },
 
-  initialize: function() {
-    var self = this;
-    self.listenTo(self, 'menuItemClicked', self.menuItemClicked);
-    self.recalcViewDebounced = _.debounce(function() {
-      self.recalcView(true);
-    }, 300);
+  initialize: function(attrs) {
+    this.groupsCollection = attrs.groupsCollection;
+    this.listenTo(this.groupsCollection, 'sync', this.selectSuggestedGroup);
+
+    this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
+    this.recalcViewDebounced = _.debounce(function() {
+      this.recalcView(true);
+    }.bind(this), 300);
     this.bindUIElements();
   },
 
@@ -323,9 +325,9 @@ var View = Marionette.LayoutView.extend({
   },
 
   onRender: function() {
-    // TODO: troupeCollections.groups is probably not loaded yet
+    // TODO: this.groupsCollection is probably not loaded yet
     var groupSelect = new GroupSelectView({
-      groupsCollection: troupeCollections.groups
+      groupsCollection: this.groupsCollection
     });
 
     this.groupSelect = groupSelect;
@@ -337,16 +339,18 @@ var View = Marionette.LayoutView.extend({
       this.ui.roomNameInput.val(this.options.roomName);
     }
 
-    // TODO: troupeCollections.groups is probably not loaded yet, so you can't
-    // select the initial group.
+    this.selectSuggestedGroup();
+
+    this.recalcView(false);
+  },
+
+  selectSuggestedGroup: function() {
     if (this.options.initialGroupId) {
       var group = this.groupSelect.selectGroupId(this.options.initialGroupId);
       this.groupSelected(group, false);
     } else {
       this.groupSelected(null, false);
     }
-
-    this.recalcView(false);
   },
 
   roomNameChange: function() {
