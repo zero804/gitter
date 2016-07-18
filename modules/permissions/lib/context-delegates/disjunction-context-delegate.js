@@ -10,9 +10,9 @@ function DisjunctionContextDelegate(contextDelegates) {
 }
 
 DisjunctionContextDelegate.prototype = {
-  isMember: function(userId) {
+  isMember: function() {
     return Promise.map(this.contextDelegates, function(delegate) {
-      return delegate.isMember(userId)
+      return delegate.isMember();
     })
     .then(function(results) {
       // If any of the results are true, the result is true (OR)
@@ -21,6 +21,12 @@ DisjunctionContextDelegate.prototype = {
       });
     });
   },
+
+  handleReadAccessFailure: Promise.method(function() {
+    return Promise.map(this.contextDelegates, function(delegate) {
+      return delegate.handleReadAccessFailure();
+    });
+  })
 };
 
 module.exports = DisjunctionContextDelegate;
