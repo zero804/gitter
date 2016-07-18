@@ -6,7 +6,6 @@ var fastdom = require('fastdom');
 var context = require('utils/context');
 var DNDCtrl = require('components/menu/room/dnd-controller');
 var toggleClass = require('utils/toggle-class');
-var appEvents = require('utils/appevents');
 
 var RoomMenuModel = require('../../../../models/room-menu-model');
 var MiniBarView = require('../minibar/minibar-view');
@@ -105,15 +104,6 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
     this.listenTo(this.dndCtrl, 'dnd:start-drag', this.onDragStart.bind(this));
     this.listenTo(this.dndCtrl, 'dnd:end-drag', this.onDragEnd.bind(this));
     this.listenTo(this.bus, 'panel:render', this.onPanelRender, this);
-    this.listenTo(appEvents, 'left-menu-menu-bar:activate', function(menuBarItemActivate) {
-      menuBarItemActivate = menuBarItemActivate || {};
-      this.model.set({
-        panelOpenState: true,
-        profileMenuOpenState: false,
-        state: menuBarItemActivate.state,
-        selectedOrgName: menuBarItemActivate.selectedOrgName
-      });
-    }, this);
   },
 
   onDragStart: function() {
