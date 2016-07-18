@@ -129,4 +129,6 @@ function transloaditSignature(req, res, next) {
 }
 
 module.exports = transloaditSignature;
-module.exports.testOnly = parseAndValidateTransloadit;
+module.exports.testOnly = {
+  parseAndValidateTransloadit: parseAndValidateTransloadit
+}
