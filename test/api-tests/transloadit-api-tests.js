@@ -7,6 +7,8 @@ var nconf = env.config;
 var Promise = require('bluebird');
 var assert = require('assert');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
+var groupService = require('gitter-web-groups/lib/group-service');
+
 
 describe('transloadit-api-tests #slow', function() {
   var app, request;
@@ -40,6 +42,9 @@ describe('transloadit-api-tests #slow', function() {
   });
 
   it('GET /private/generate-signature (group avatar)', function() {
+    var transloaditUrl = 'https://' + nconf.get('transloadit:bucket') + '.s3.amazonaws.com/groups/' + fixture.group1.id + '/original';
+    var fixedUrl = 'https://' + nconf.get('transloadit:cname') + '/groups/' + fixture.group1.id + '/original';
+
     return request(app)
       .get('/private/generate-signature')
       .query({
@@ -55,10 +60,36 @@ describe('transloadit-api-tests #slow', function() {
         // test that type avatar became the correct template_id
         assert.strictEqual(params.template_id, nconf.get('transloadit:template_avatar_id'));
 
+        // check that we went down the groups code path
         var originalPath = 'groups/' + fixture.group1.id + '/original';
         var thumbsPath = 'groups/' + fixture.group1.id + '/${file.meta.width}';
         assert.strictEqual(params.steps.export_original.path, originalPath);
         assert.strictEqual(params.steps.export_thumbs.path, thumbsPath);
+
+        // manually hit the notify url, impersonating tranloadit
+        var apiBasePath = nconf.get('web:apiBasePath');
+        var notifyUrl = params.notify_url.replace(apiBasePath, '');
+        return request(app)
+          .post(notifyUrl)
+          .send({
+            transloadit: JSON.stringify({
+              ok: 'ASSEMBLY_COMPLETED',
+              results: {
+                ':original': [{
+                  ssl_url: transloaditUrl
+                }]
+              }
+            })
+          })
+          .expect(200);
+      })
+      .then(function() {
+        // load the group again so we can see if the url changed
+        return groupService.findById(fixture.group1.id);
+      })
+      .then(function(group) {
+        assert.strictEqual(group.avatarUrl, fixedUrl);
+        assert.strictEqual(group.avatarVersion, 1);
       });
   });
 
