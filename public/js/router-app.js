@@ -487,7 +487,8 @@ onready(function() {
       function getSuitableGroupId() {
         var groupId = false;
 
-        var currentTroupe = context.troupe();
+        var slimCurrentTroupe = context.troupe();
+        var currentTroupe = troupeCollections.troupes.get(slimCurrentTroupe.get('id'));
         var menuBarGroup = appLayout.getRoomMenuModel().getCurrentGroup();
         if(menuBarGroup) {
           groupId = menuBarGroup.get('id');

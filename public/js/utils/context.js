@@ -2,10 +2,10 @@
 var Backbone = require('backbone');
 var qs = require('gitter-web-qs');
 var _ = require('underscore');
+var localStore = require('../components/local-store');
 var Promise = require('bluebird');
 var clientEnv = require('gitter-client-env');
 var debug = require('debug-proxy')('app:context');
-
 
 var ctx = window.troupeContext || {};
 var snapshots = ctx.snapshots || {};
@@ -23,9 +23,9 @@ function getTroupeModel() {
   if(ctx.troupe) {
     troupeModel = ctx.troupe;
   } else if(ctx.troupeId) {
-    troupeModel = window._troupeCollections.troupes.get(ctx.troupeId) || { id: ctx.troupeId };
+    troupeModel = { id: ctx.troupeId };
   } else if(qs.troupeId) {
-    troupeModel = window._troupeCollections.troupes.get(qs.troupeId) || { id: qs.troupeId };
+    troupeModel = { id: qs.troupeId };
   }
 
   return new Backbone.Model(troupeModel);
@@ -126,8 +126,7 @@ function clearOtherAttributes(s, v) {
 
 /** TEMP - lets think of a better way to do this... */
 context.setTroupeId = function(value) {
-  var actualModel = window._troupeCollections.troupes.get(value);
-  troupe.set(actualModel ? actualModel.attributes : clearOtherAttributes({ id: value }, troupe));
+  troupe.set(clearOtherAttributes({ id: value }, troupe));
   return;
 };
 
@@ -285,6 +284,7 @@ context.getSnapshot = function(key) {
 context.roomHasWelcomeMessage = function(){
   return ctx.roomHasWelcomeMessage;
 };
+
 
 
 module.exports = context;
