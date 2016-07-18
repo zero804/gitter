@@ -218,12 +218,28 @@ function findRoomsIdForGroup(groupId, userId) {
     });
 }
 
+function setAvatarForGroup(groupId, url) {
+  var query = { _id: groupId };
+
+  var update = {
+    $set: {
+      avatarUrl: url
+    },
+    $inc: {
+      avatarVersion: 1
+    }
+  };
+
+  return Group.findOneAndUpdate(query, update).exec();
+}
+
 module.exports = {
   findByUri: Promise.method(findByUri),
   findById: Promise.method(findById),
   findByIds: findByIds,
   createGroup: Promise.method(createGroup),
   findRoomsIdForGroup: Promise.method(findRoomsIdForGroup),
+  setAvatarForGroup: setAvatarForGroup,
   migration: {
     upsertGroup: upsertGroup,
     ensureGroupForGitHubRoomCreation: ensureGroupForGitHubRoomCreation,
