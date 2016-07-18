@@ -86,7 +86,7 @@ module.exports = CommunityCreateBaseStepView.extend({
     var githubProjectModel = this.orgCollection.get(githubOrgId) || this.repoCollection.get(githubRepoId);
     if(githubOrgId && githubProjectModel) {
       type = 'GH_ORG';
-      linkPath = githubProjectModel.get('name');
+      linkPath = githubProjectModel.get('name').toLowerCase();
     }
     else if(githubRepoId && githubProjectModel) {
       type = 'GH_REPO';
@@ -98,12 +98,12 @@ module.exports = CommunityCreateBaseStepView.extend({
         name: communityCreateModel.get('communityName'),
         uri: communityCreateModel.get('communitySlug'),
         type: 'org',
-        linkPath: communityCreateModel.get('communitySlug'), //linkPath,
+        // This one is for the left-menu
+        linkPath: linkPath,
+        // This is for POSTing to the API
         security: {
           type: type,
-          // TODO: project-splitsville "Group linkPath must match uri"
-          // But these could be different in the future
-          linkPath: communityCreateModel.get('communitySlug') //linkPath
+          linkPath: linkPath
         },
         invites: [].concat(communityCreateModel.peopleToInvite.toJSON(), communityCreateModel.emailsToInvite.toJSON())
       }, {
