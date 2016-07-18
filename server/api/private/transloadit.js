@@ -17,12 +17,8 @@ var GroupWithPolicyService = require('../../services/group-with-policy-service')
 var redis = require('../../utils/redis');
 var redisClient = redis.getClient();
 
-function fixFileUrl(url) {
+function fixUrl(url) {
   return url.replace(nconf.get('transloadit:bucket') + '.s3.amazonaws.com', nconf.get('transloadit:cname'));
-}
-
-function fixAvatarUrl(url) {
-  return url.replace(nconf.get('transloadit:avatars:bucket') + '.s3.amazonaws.com', nconf.get('transloadit:avatars:cname'));
 }
 
 function handleUploadToRoom(transloadit, metadata) {
@@ -58,20 +54,20 @@ function handleUploadToRoom(transloadit, metadata) {
 
       if (transloadit.results['doc_thumbs']) {
         transloadit.results['doc_thumbs'].forEach(function (thumb) {
-          thumbs[thumb.original_id] = fixFileUrl(thumb.ssl_url);
+          thumbs[thumb.original_id] = fixUrl(thumb.ssl_url);
         });
       }
 
       if (transloadit.results['img_thumbs']) {
         transloadit.results['img_thumbs'].forEach(function (thumb) {
-          thumbs[thumb.original_id] = fixFileUrl(thumb.ssl_url);
+          thumbs[thumb.original_id] = fixUrl(thumb.ssl_url);
         });
       }
 
       // Generate a message for each uploaded file.
       return Promise.map(transloadit.results[':original'], function (upload) {
         var name = upload.name;
-        var url = fixFileUrl(upload.ssl_url);
+        var url = fixUrl(upload.ssl_url);
         var thumb = thumbs[upload.id];
 
         var text;
@@ -117,11 +113,9 @@ function handleUploadToGroup(transloadit, metadata) {
 
       var upload = transloadit.results[':original'][0];
 
-      var url = fixAvatarUrl(upload.ssl_url);
-
       // TODO: should we delete the existing image if there is one?
 
-      return groupWithPolicyService.setAvatar(url);
+      return groupWithPolicyService.setAvatar(upload.ssl_url);
     })
     .then(function() {
       stats.event('file.upload');

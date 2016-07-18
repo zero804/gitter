@@ -43,7 +43,6 @@ describe('transloadit-api-tests #slow', function() {
 
   it('GET /private/generate-signature (group avatar)', function() {
     var transloaditUrl = 'https://' + nconf.get('transloadit:avatars:bucket') + '.s3.amazonaws.com/groups/' + fixture.group1.id + '/original';
-    var fixedUrl = 'https://' + nconf.get('transloadit:avatars:cname') + '/groups/' + fixture.group1.id + '/original';
 
     return request(app)
       .get('/private/generate-signature')
@@ -88,7 +87,7 @@ describe('transloadit-api-tests #slow', function() {
         return groupService.findById(fixture.group1.id);
       })
       .then(function(group) {
-        assert.strictEqual(group.avatarUrl, fixedUrl);
+        assert.strictEqual(group.avatarUrl, transloaditUrl);
         assert.strictEqual(group.avatarVersion, 1);
       });
   });
