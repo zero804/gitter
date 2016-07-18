@@ -1,5 +1,8 @@
 "use strict";
 
 module.exports = function(username, size) {
-  return 'https://avatars.githubusercontent.com/' + username + '?s=' + size;
+  return {
+    url: 'https://avatars.githubusercontent.com/' + username + '?s=' + size,
+    longTermCachable: false
+  };
 }

@@ -45,7 +45,7 @@ describe('avatar-api', function() {
     name: '/group/iv/:version/:groupId',
     url: null,
     expected: null,
-    proxyRedirect: '/fetch/https://avatars.githubusercontent.com/gitter-integration-tests?s=128'
+    proxyRedirect: '/fetch_lt/https://avatars.githubusercontent.com/gitter-integration-tests?s=128'
   }, {
     name: '/g/u/:username',
     url: '/g/u/' + fixtureLoader.GITTER_INTEGRATION_USERNAME,

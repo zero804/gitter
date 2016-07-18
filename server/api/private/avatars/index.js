@@ -32,19 +32,12 @@ function sendAvatar(callback) {
         return callback(req, size);
       })
       .then(function(response) {
-        var url, longTermCachable;
-
         if (!response) {
           return sendMissing(req, res);
         }
 
-        if (typeof response === 'string') {
-          url = response;
-          longTermCachable = false;
-        } else {
-          url = response.url;
-          longTermCachable = response.longTermCachable;
-        }
+        var url = response.url;
+        var longTermCachable = response.longTermCachable;
 
         if (!url) {
           return sendMissing(req, res);
@@ -84,7 +77,7 @@ router.get('/group/i/:groupId',
   sendAvatar(function(req, size) {
     var groupId = fixMongoIdQueryParam(req.params.groupId);
     if (!groupId) return null;
-    return groupById(groupId, size);
+    return groupById(groupId, size, false);
   }));
 
 /**
@@ -96,7 +89,7 @@ router.get('/group/iv/:version/:groupId',
     // Ignore the version it's only used as a cache-buster
     var groupId = fixMongoIdQueryParam(req.params.groupId);
     if (!groupId) return null;
-    return groupById(groupId, size);
+    return groupById(groupId, size, true);
   }));
 
 /* Case sensitive */

@@ -44,15 +44,17 @@ function getAvatarUrlForSize(avatarUrl, size) {
   return url.format(parsed);
 }
 
-
-module.exports = function(groupId, size) {
+module.exports = function(groupId, size, isVersioned) {
   return Group.findById(groupId, { 'avatarUrl': 1, 'sd.type': 1, 'sd.linkPath': 1 }, { lean: true })
     .then(function(group) {
       if (!group) return null;
 
       // Use the custom URL if we have one
       if (group.avatarUrl) {
-        return getAvatarUrlForSize(group.avatarUrl, size);
+        return {
+          url:  getAvatarUrlForSize(group.avatarUrl, size),
+          longTermCachable: !!isVersioned
+        };
       }
 
       var type = group.sd && group.sd.type;
@@ -74,6 +76,9 @@ module.exports = function(groupId, size) {
 
       if (!githubUsername) return null;
 
-      return 'https://avatars.githubusercontent.com/' + githubUsername + '?s=' + size;
+      return {
+        url: 'https://avatars.githubusercontent.com/' + githubUsername + '?s=' + size,
+        longTermCachable: !!isVersioned
+      };
     });
 }
