@@ -1,0 +1,32 @@
+@early-bird-dark-bg: #221f1f;
+
+.container {
+  box-sizing:     border-box;
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  width:          100%;
+  padding:        8rem 2rem;
+}
+
+.container--clouds {
+  .container();
+  background-image: url("../images/home/banner.jpg");
+  background-position: top left;
+  background-size: cover;
+}
+
+.container--secondary {
+  .container();
+  background-color: @pampas;
+}
+.container--tertiary {
+  .container();
+  background-color: @early-bird-dark-bg;
+  color: @pampas;
+}
+
+.container--grid {
+  .container();
+  padding-top: 0;
+}
