@@ -20,7 +20,7 @@ function getForGroupId(groupId) {
 
 function getForGroup(group) {
   if (!group) return null;
-  var groupId = group.id || group._id;
+  var groupId = group.id;
   if (!groupId) return null;
 
   if (group.avatarVersion) {
