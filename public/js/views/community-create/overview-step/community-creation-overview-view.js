@@ -81,19 +81,15 @@ module.exports = CommunityCreateBaseStepView.extend({
 
     var type = null;
     var linkPath = null;
-    var githubProjectModel;
     var githubOrgId = communityCreateModel.get('githubOrgId');
     var githubRepoId = communityCreateModel.get('githubRepoId');
-    if(githubOrgId) {
-      githubProjectModel = this.orgCollection.get(githubOrgId);
+    var githubProjectModel = this.orgCollection.get(githubOrgId) || this.repoCollection.get(githubRepoId);
+    if(githubOrgId && githubProjectModel) {
       type = 'GH_ORG';
+      linkPath = githubProjectModel.get('name');
     }
-    else if(githubRepoId) {
-      githubProjectModel = this.repoCollection.get(githubRepoId);
+    else if(githubRepoId && githubProjectModel) {
       type = 'GH_REPO';
-    }
-
-    if(githubProjectModel) {
       linkPath = githubProjectModel.get('uri');
     }
 
@@ -101,8 +97,14 @@ module.exports = CommunityCreateBaseStepView.extend({
       this.groupsCollection.create({
         name: communityCreateModel.get('communityName'),
         uri: communityCreateModel.get('communitySlug'),
-        type: type,
-        linkPath: linkPath,
+        type: 'org',
+        linkPath: communityCreateModel.get('communitySlug'), //linkPath,
+        security: {
+          type: type,
+          // TODO: project-splitsville "Group linkPath must match uri"
+          // But these could be different in the future
+          linkPath: communityCreateModel.get('communitySlug') //linkPath
+        },
         invites: [].concat(communityCreateModel.peopleToInvite.toJSON(), communityCreateModel.emailsToInvite.toJSON())
       }, {
         wait: true,
