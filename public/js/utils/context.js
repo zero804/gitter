@@ -2,291 +2,289 @@
 var Backbone = require('backbone');
 var qs = require('gitter-web-qs');
 var _ = require('underscore');
-var localStore = require('../components/local-store');
 var Promise = require('bluebird');
 var clientEnv = require('gitter-client-env');
 var debug = require('debug-proxy')('app:context');
 
-module.exports = (function() {
 
-  var ctx = window.troupeContext || {};
-  var snapshots = ctx.snapshots || {};
+var ctx = window.troupeContext || {};
+var snapshots = ctx.snapshots || {};
 
-  function getGroupModel() {
-    var groupModel;
-    if (ctx.troupe && ctx.troupe.group) {
-      groupModel = ctx.troupe.group;
+function getGroupModel() {
+  var groupModel;
+  if (ctx.troupe && ctx.troupe.group) {
+    groupModel = ctx.troupe.group;
+  }
+  return new Backbone.Model(groupModel);
+}
+
+function getTroupeModel() {
+  var troupeModel;
+  if(ctx.troupe) {
+    troupeModel = ctx.troupe;
+  } else if(ctx.troupeId) {
+    troupeModel = window._troupeCollections.troupes.get(ctx.troupeId) || { id: ctx.troupeId };
+  } else if(qs.troupeId) {
+    troupeModel = window._troupeCollections.troupes.get(qs.troupeId) || { id: qs.troupeId };
+  }
+
+  return new Backbone.Model(troupeModel);
+}
+
+function getUserModel() {
+  var userModel;
+
+  if(ctx.user) {
+    userModel = ctx.user;
+  } else if(ctx.userId) {
+    userModel = { id: ctx.userId };
+  }
+
+  return new Backbone.Model(userModel);
+}
+
+function getContextModel(troupe, user) {
+  var result = new Backbone.Model();
+  result.set({ userId: user.id, troupeId: troupe.id });
+  result.listenTo(user, 'change:id', function(user, newId) { // jshint unused:true
+    result.set({ userId: newId });
+  });
+
+  result.listenTo(troupe, 'change:id', function(troupe, newId) { // jshint unused:true
+    result.set({ troupeId: newId });
+  });
+
+  return result;
+}
+
+function getDelayedContextModel(contextModel, delay) {
+  var result = new Backbone.Model();
+  result.set({ userId: contextModel.get('userId'), troupeId: contextModel.get('troupeId') });
+
+  var delayedUpdate = _.debounce(function() {
+    result.set({ troupeId: contextModel.get('troupeId') });
+  }, delay);
+
+  result.listenTo(contextModel, 'change:userId', function(user, newId) { // jshint unused:true
+    result.set({ userId: newId });
+  });
+
+  result.listenTo(contextModel, 'change:troupeId', function() {
+    // Clear the troupeId...
+    result.set({ troupeId: null });
+
+    // ...and reset it after a period of time
+    delayedUpdate();
+  });
+
+  return result;
+}
+var group = getGroupModel();
+var troupe = getTroupeModel();
+var user = getUserModel();
+var contextModel = getContextModel(troupe, user);
+
+var context = function() {
+  return ctx;
+};
+
+context.group = function() {
+  return group;
+};
+
+context.troupe = function() {
+  return troupe;
+};
+
+context.getGroupId = function() {
+  return group.id;
+};
+
+context.getTroupeId = function() {
+  return troupe.id;
+};
+
+context.contextModel = function() {
+  return contextModel;
+};
+
+context.delayedContextModel = function(delay) {
+  return getDelayedContextModel(contextModel, delay);
+};
+
+function clearOtherAttributes(s, v) {
+  Object.keys(v.attributes).forEach(function(key) {
+    if(!s.hasOwnProperty(key)) {
+      s[key] = null;
     }
-    return new Backbone.Model(groupModel);
+  });
+
+  return s;
+}
+
+
+
+/** TEMP - lets think of a better way to do this... */
+context.setTroupeId = function(value) {
+  var actualModel = window._troupeCollections.troupes.get(value);
+  troupe.set(actualModel ? actualModel.attributes : clearOtherAttributes({ id: value }, troupe));
+  return;
+};
+
+context.setTroupe = function(value) {
+  if (value.group) {
+    group.set(clearOtherAttributes(value.group, group));
+  } else {
+    debug("Troupe data contains no group: %j", value);
   }
 
-  function getTroupeModel() {
-    var troupeModel;
-    if(ctx.troupe) {
-      troupeModel = ctx.troupe;
-    } else if(ctx.troupeId) {
-      troupeModel = { id: ctx.troupeId };
-    } else if(qs.troupeId) {
-      troupeModel = { id: qs.troupeId };
+  troupe.set(clearOtherAttributes(value, troupe));
+};
+
+
+context.getUserId = function() {
+  return user.id;
+};
+
+context.setUser = function(value) {
+  user.set(clearOtherAttributes(value, user));
+};
+
+context.isAuthed = function() {
+  return !!user.id;
+};
+
+context.inTroupeContext = function() {
+  return !!troupe.id;
+};
+
+context.inOneToOneTroupeContext = function() {
+  if(!context.inTroupeContext()) return false;
+  return !!troupe.get('oneToOne');
+};
+
+/**
+ * DEPRECATED
+ */
+context.getUser = function() {
+  return user.toJSON();
+};
+
+// Unlike getUser, this returns a backbone model
+context.user = function() {
+  return user;
+};
+
+/**
+ * DEPRECATED
+ */
+context.getTroupe = function() {
+  return troupe.toJSON();
+};
+
+context.popEvent = function(name) {
+  var events = ctx.events;
+  if(events) {
+    var i = events.indexOf(name);
+    if(i >= 0) {
+      events.splice(i, 1);
+      return true;
     }
-
-    return new Backbone.Model(troupeModel);
   }
+};
 
-  function getUserModel() {
-    var userModel;
-
-    if(ctx.user) {
-      userModel = ctx.user;
-    } else if(ctx.userId) {
-      userModel = { id: ctx.userId };
-    }
-
-    return new Backbone.Model(userModel);
-  }
-
-  function getContextModel(troupe, user) {
-    var result = new Backbone.Model();
-    result.set({ userId: user.id, troupeId: troupe.id });
-    result.listenTo(user, 'change:id', function(user, newId) { // jshint unused:true
-      result.set({ userId: newId });
-    });
-
-    result.listenTo(troupe, 'change:id', function(troupe, newId) { // jshint unused:true
-      result.set({ troupeId: newId });
-    });
-
-    return result;
-  }
-
-  function getDelayedContextModel(contextModel, delay) {
-    var result = new Backbone.Model();
-    result.set({ userId: contextModel.get('userId'), troupeId: contextModel.get('troupeId') });
-
-    var delayedUpdate = _.debounce(function() {
-      result.set({ troupeId: contextModel.get('troupeId') });
-    }, delay);
-
-    result.listenTo(contextModel, 'change:userId', function(user, newId) { // jshint unused:true
-      result.set({ userId: newId });
-    });
-
-    result.listenTo(contextModel, 'change:troupeId', function() {
-      // Clear the troupeId...
-      result.set({ troupeId: null });
-
-      // ...and reset it after a period of time
-      delayedUpdate();
-    });
-
-    return result;
-  }
-  var group = getGroupModel();
-  var troupe = getTroupeModel();
-  var user = getUserModel();
-  var contextModel = getContextModel(troupe, user);
-
-  var context = function() {
-    return ctx;
-  };
-
-  context.group = function() {
-    return group;
-  };
-
-  context.troupe = function() {
-    return troupe;
-  };
-
-  context.getGroupId = function() {
-    return group.id;
-  };
-
-  context.getTroupeId = function() {
-    return troupe.id;
-  };
-
-  context.contextModel = function() {
-    return contextModel;
-  };
-
-  context.delayedContextModel = function(delay) {
-    return getDelayedContextModel(contextModel, delay);
-  };
-
-  function clearOtherAttributes(s, v) {
-    Object.keys(v.attributes).forEach(function(key) {
-      if(!s.hasOwnProperty(key)) {
-        s[key] = null;
-      }
-    });
-
-    return s;
-  }
-
-
-
-  /** TEMP - lets think of a better way to do this... */
-  context.setTroupeId = function(value) {
-    troupe.set(clearOtherAttributes({ id: value }, troupe));
+context.getAccessToken = Promise.method(function() {
+  var iterations = 0;
+  if(clientEnv['anonymous']) {
     return;
-  };
+  }
 
-  context.setTroupe = function(value) {
-    if (value.group) {
-      group.set(clearOtherAttributes(value.group, group));
-    } else {
-      debug("Troupe data contains no group: %j", value);
-    }
+  function checkToken() {
+    // This is a very rough first attempt
+    var token = window.bearerToken || qs.bearerToken || ctx.accessToken;
+    if(token) return token;
 
-    troupe.set(clearOtherAttributes(value, troupe));
-  };
+    iterations++;
+    if(iterations > 50) {
+      // Force a reload, but don't do it more than once a minute
+      if(window.sessionStorage) {
+        var forcedReload = parseInt(window.sessionStorage.getItem('forced_reload'), 10);
+        if(forcedReload && Date.now() < forcedReload) {
+          return;
+        }
 
-
-  context.getUserId = function() {
-    return user.id;
-  };
-
-  context.setUser = function(value) {
-    user.set(clearOtherAttributes(value, user));
-  };
-
-  context.isAuthed = function() {
-    return !!user.id;
-  };
-
-  context.inTroupeContext = function() {
-    return !!troupe.id;
-  };
-
-  context.inOneToOneTroupeContext = function() {
-    if(!context.inTroupeContext()) return false;
-    return !!troupe.get('oneToOne');
-  };
-
-  /**
-   * DEPRECATED
-   */
-  context.getUser = function() {
-    return user.toJSON();
-  };
-
-  // Unlike getUser, this returns a backbone model
-  context.user = function() {
-    return user;
-  };
-
-  /**
-   * DEPRECATED
-   */
-  context.getTroupe = function() {
-    return troupe.toJSON();
-  };
-
-  context.popEvent = function(name) {
-    var events = ctx.events;
-    if(events) {
-      var i = events.indexOf(name);
-      if(i >= 0) {
-        events.splice(i, 1);
-        return true;
+        window.sessionStorage.setItem('forced_reload', Date.now() + 60000);
       }
-    }
-  };
 
-  context.getAccessToken = Promise.method(function() {
-    var iterations = 0;
-    if(clientEnv['anonymous']) {
+      window.location.reload(true);
       return;
     }
 
-    function checkToken() {
-      // This is a very rough first attempt
-      var token = window.bearerToken || qs.bearerToken || ctx.accessToken;
-      if(token) return token;
+    return Promise.delay(100).then(checkToken);
+  }
 
-      iterations++;
-      if(iterations > 50) {
-        // Force a reload, but don't do it more than once a minute
-        if(window.sessionStorage) {
-          var forcedReload = parseInt(window.sessionStorage.getItem('forced_reload'), 10);
-          if(forcedReload && Date.now() < forcedReload) {
-            return;
-          }
+  return checkToken();
+});
 
-          window.sessionStorage.setItem('forced_reload', Date.now() + 60000);
-        }
+context.isLoggedIn = function() {
+  // If we're in a context where one cannot be logged out...
+  if(clientEnv['loggedIn']) return true;
 
-        window.location.reload(true);
-        return;
-      }
+  // TODO: this is not ideal. perhaps make this better
+  return !!user.id;
+};
 
-      return Promise.delay(100).then(checkToken);
-    }
+context.isStaff = function() {
+  return user.get('staff');
+};
 
-    return checkToken();
-  });
+context.isTroupeAdmin = function() {
+  var permissions = troupe.get('permissions');
+  if (!permissions) return false;
+  return !!permissions.admin;
+};
 
-  context.isLoggedIn = function() {
-    // If we're in a context where one cannot be logged out...
-    if(clientEnv['loggedIn']) return true;
+context.lang = function() {
+  if(ctx.lang) return ctx.lang;
+  var e = clientEnv['lang'];
+  if(e) return e;
+  return [window.navigator.language];
+};
 
-    // TODO: this is not ideal. perhaps make this better
-    return !!user.id;
-  };
+context.isRoomMember = function() {
+  return troupe.get('roomMember');
+};
 
-  context.isStaff = function() {
-    return user.get('staff');
-  };
+context.testOnly = {
+  resetTroupeContext: function(newContext) {
+    ctx = newContext;
+    troupe = getTroupeModel();
+    user = getUserModel();
 
-  context.isTroupeAdmin = function() {
-    var permissions = troupe.get('permissions');
-    if (!permissions) return false;
-    return !!permissions.admin;
-  };
+  }
+};
 
-  context.lang = function() {
-    if(ctx.lang) return ctx.lang;
-    var e = clientEnv['lang'];
-    if(e) return e;
-    return [window.navigator.language];
-  };
+// Has a feature been enabled?
+context.hasFeature = function(featureName) {
+  return ctx.features && ctx.features.indexOf(featureName) >= 0;
+};
 
-  context.isRoomMember = function() {
-    return troupe.get('roomMember');
-  };
+context.getFeatures = function() {
+  return ctx.features || [];
+};
 
-  context.testOnly = {
-    resetTroupeContext: function(newContext) {
-      ctx = newContext;
-      troupe = getTroupeModel();
-      user = getUserModel();
+context.getSnapshot = function(key) {
+  var snapshot = snapshots[key];
 
-    }
-  };
+  //cleanup
+  delete snapshots[key];
 
-  // Has a feature been enabled?
-  context.hasFeature = function(featureName) {
-    return ctx.features && ctx.features.indexOf(featureName) >= 0;
-  };
+  return snapshot;
+};
 
-  context.getFeatures = function() {
-    return ctx.features || [];
-  };
+context.roomHasWelcomeMessage = function(){
+  return ctx.roomHasWelcomeMessage;
+};
 
-  context.getSnapshot = function(key) {
-    var snapshot = snapshots[key];
 
-    //cleanup
-    delete snapshots[key];
-
-    return snapshot;
-  };
-
-  context.roomHasWelcomeMessage = function(){
-    return ctx.roomHasWelcomeMessage;
-  };
-
-  return context;
-
-})();
+module.exports = context;

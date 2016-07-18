@@ -1,10 +1,12 @@
 /* eslint complexity: ["error", 19] */
 'use strict';
+
 require('utils/initial-setup');
 require('utils/font-setup');
 
 var debug = require('debug-proxy')('app:router-app');
 var $ = require('jquery');
+var _ = require('underscore');
 var Backbone = require('backbone');
 var moment = require('moment');
 var clientEnv = require('gitter-client-env');
@@ -23,6 +25,7 @@ var roomListGenerator = require('components/chat-cache/room-list-generator');
 var troupeCollections = require('collections/instances/troupes');
 var repoModels = require('collections/repos');
 var ReposCollection = repoModels.ReposCollection;
+var groupModels = require('collections/groups');
 var CommunityCreateModel = require('views/community-create/community-create-model');
 
 var AppLayout = require('views/layouts/app-layout');
@@ -41,6 +44,8 @@ require('components/ping');
 
 // Preload widgets
 require('views/widgets/avatar');
+
+
 
 onready(function() {
   var chatIFrame = document.getElementById('content-frame');
@@ -318,6 +323,21 @@ onready(function() {
 
   var repoCollection = new ReposCollection();
 
+  var adminGroupsCollection = new groupModels.Collection([]);
+  var initializeAdminGroupsCollection = _.once(function() {
+    adminGroupsCollection.fetch({
+      data: {
+          type: 'admin'
+        }
+      },
+      {
+        add: true,
+        remove: true,
+        merge: true
+      }
+    );
+  });
+
   var communityCreateModel = new CommunityCreateModel({
     active: false
   });
@@ -449,6 +469,7 @@ onready(function() {
     },
 
     createroom: function() {
+      initializeAdminGroupsCollection();
       require.ensure(['views/modals/choose-room-view'], function(require) {
         var chooseRoomView = require('views/modals/choose-room-view');
         appLayout.dialogRegion.show(new chooseRoomView.Modal());
@@ -464,15 +485,28 @@ onready(function() {
 
     createcustomroom: function(name) {
       function getSuitableGroupId() {
-        var group = appLayout.getRoomMenuModel().getCurrentGroup();
-        return group && group.get('id');
+        var groupId = false;
+
+        var currentTroupe = context.troupe();
+        var menuBarGroup = appLayout.getRoomMenuModel().getCurrentGroup();
+        if(menuBarGroup) {
+          groupId = menuBarGroup.get('id');
+        }
+        else if(currentTroupe) {
+          groupId = currentTroupe.get('groupId');
+        }
+
+        return groupId;
       }
+
+      initializeAdminGroupsCollection();
 
       require.ensure(['views/modals/create-room-view'], function(require) {
         var createRoomView = require('views/modals/create-room-view');
         var modal = new createRoomView.Modal({
           initialGroupId: getSuitableGroupId(),
           roomName: name,
+          groupsCollection: adminGroupsCollection
         });
 
         appLayout.dialogRegion.show(modal);
