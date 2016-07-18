@@ -1,8 +1,10 @@
 'use strict';
 
+var avatars = require('..');
+
 function avatarImgSrcSetHbsHelper(avatarServerUrl, size) {
   if (!avatarServerUrl) {
-    return " height='" + size + "' width='" + size + "' ";
+    return " height='" + size + "' width='" + size + "' src='" + avatars.getDefault() + "'";
   }
 
   var src = avatarServerUrl + '?s=' + size;
