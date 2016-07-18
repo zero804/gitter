@@ -6,26 +6,26 @@ var $ = require('jquery');
 var Backbone = require('backbone');
 var moment = require('moment');
 var clientEnv = require('gitter-client-env');
+var onready = require('utils/onready');
+var urlParser = require('utils/url-parser');
 var RAF = require('utils/raf');
 var appEvents = require('utils/appevents');
 var context = require('utils/context');
-var onready = require('utils/onready');
-var urlParser = require('utils/url-parser');
 
 var TitlebarUpdater = require('components/titlebar');
 var realtime = require('components/realtime');
-
-var troupeCollections = require('collections/instances/troupes');
-var repoModels = require('collections/repos');
-var ReposCollection = repoModels.ReposCollection;
-var groupModels = require('collections/groups');
-
-var AppLayout = require('views/layouts/app-layout');
-var LoadingView = require('views/app/loading-view');
 var RoomCollectionTracker = require('components/room-collection-tracker');
 var SPARoomSwitcher = require('components/spa-room-switcher');
 var linkHandler = require('components/link-handler');
 var roomListGenerator = require('components/chat-cache/room-list-generator');
+var troupeCollections = require('collections/instances/troupes');
+var repoModels = require('collections/repos');
+var ReposCollection = repoModels.ReposCollection;
+var groupModels = require('collections/groups');
+var CommunityCreateModel = require('views/community-create/community-create-model');
+
+var AppLayout = require('views/layouts/app-layout');
+var LoadingView = require('views/app/loading-view');
 
 require('utils/initial-setup');
 require('utils/font-setup');
@@ -36,6 +36,7 @@ require('components/user-notifications');
 require('template/helpers/all');
 require('components/bug-reporting');
 require('components/focus-events');
+
 
 require('utils/tracking');
 require('components/ping');
@@ -176,34 +177,6 @@ onready(function() {
     roomSwitcher.change(iframeUrl);
   };
 
-  var allRoomsCollection = troupeCollections.troupes;
-  new RoomCollectionTracker(allRoomsCollection);
-
-  var repoCollection = new ReposCollection();
-
-  var appLayout = new AppLayout({
-    template: false,
-    el: 'body',
-    roomCollection: troupeCollections.troupes,
-    //TODO ADD THIS TO MOBILE JP 25/1/16
-    orgCollection: troupeCollections.orgs,
-    repoCollection: repoCollection,
-    groupsCollection: troupeCollections.groups
-  });
-  appLayout.render();
-
-  allRoomsCollection.on('remove', function(model) {
-    if (model.id === context.getTroupeId()) {
-      //context.troupe().set('roomMember', false);
-      var newLocation = '/home';
-      var newFrame = '/home/~home';
-      var title = 'home';
-
-      pushState(newFrame, title, newLocation);
-      roomSwitcher.change(newFrame);
-    }
-  });
-
   // Called from the OSX native client for faster page loads
   // when clicking on a chat notification
   window.gitterLoader = function(url) {
@@ -214,24 +187,6 @@ onready(function() {
     var parsed = urlParser.parse(url);
     linkHandler.routeLink(parsed, { appFrame: true });
   };
-
-  appEvents.on('navigation', function(url, type, title) {
-    debug('navigation: %s', url);
-    var parsed = urlParser.parse(url);
-    var frameUrl = parsed.pathname + '/~' + type + parsed.search;
-
-    if (parsed.pathname === window.location.pathname) {
-      pushState(frameUrl, title, url);
-      postMessage({
-        type: 'permalink.navigate',
-        query: urlParser.parseSearch(parsed.search),
-      });
-      return;
-    }
-
-    pushState(frameUrl, title, url);
-    roomSwitcher.change(frameUrl);
-  });
 
   function onUnreadItemsCountMessage(message) {
     var count = message.count;
@@ -361,9 +316,73 @@ onready(function() {
     }
   }, false);
 
+
+  var allRoomsCollection = troupeCollections.troupes;
+  new RoomCollectionTracker(allRoomsCollection);
+
+  var repoCollection = new ReposCollection();
+
+  var communityCreateModel = new CommunityCreateModel({
+    active: false
+  });
+
+
+  allRoomsCollection.on('remove', function(model) {
+    if (model.id === context.getTroupeId()) {
+      //context.troupe().set('roomMember', false);
+      var newLocation = '/home';
+      var newFrame = '/home/~home';
+      var title = 'home';
+
+      pushState(newFrame, title, newLocation);
+      roomSwitcher.change(newFrame);
+    }
+  });
+
+
+  var appLayout = new AppLayout({
+    template: false,
+    el: 'body',
+    roomCollection: troupeCollections.troupes,
+    //TODO ADD THIS TO MOBILE JP 25/1/16
+    orgCollection: troupeCollections.orgs,
+    repoCollection: repoCollection,
+    groupsCollection: troupeCollections.groups
+  });
+  appLayout.render();
+
+
+
   function postMessage(message) {
     chatIFrame.contentWindow.postMessage(JSON.stringify(message), clientEnv.basePath);
   }
+
+  appEvents.on('community-create-view:toggle', function(active) {
+    communityCreateModel.set('active', active);
+    if(active) {
+      window.location.hash = '#createcommunity';
+    }
+  });
+
+  appEvents.on('navigation', function(url, type, title) {
+    debug('navigation: %s', url);
+    var parsed = urlParser.parse(url);
+    var frameUrl = parsed.pathname + '/~' + type + parsed.search;
+
+    if (parsed.pathname === window.location.pathname) {
+      pushState(frameUrl, title, url);
+      postMessage({
+        type: 'permalink.navigate',
+        query: urlParser.parseSearch(parsed.search),
+      });
+      return;
+    }
+
+    pushState(frameUrl, title, url);
+    roomSwitcher.change(frameUrl);
+  });
+
+
 
   // Call preventDefault() on tab events so that we can manage focus as we want
   appEvents.on('keyboard.tab.next keyboard.tab.prev', function(e) {
@@ -414,6 +433,8 @@ onready(function() {
     };
     postMessage(message);
   });
+
+
 
   var Router = Backbone.Router.extend({
     routes: {
@@ -497,8 +518,19 @@ onready(function() {
     },
 
     createCommunity: function(/* uri */) {
-      appEvents.trigger('community-create-view:toggle', true);
-    },
+      require.ensure(['views/community-create/community-create-view'], function(require) {
+        var CommunityCreateView = require('views/community-create/community-create-view');
+        communityCreateModel.set('active', true);
+        var communityCreateView = new CommunityCreateView({
+          model: communityCreateModel,
+          orgCollection: troupeCollections.orgs,
+          repoCollection: repoCollection,
+          groupsCollection: troupeCollections.groups
+        });
+
+        appLayout.dialogRegion.show(communityCreateView);
+      });
+    }
   });
 
   new Router();

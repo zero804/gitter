@@ -11,9 +11,6 @@ var isMobile = require('utils/is-mobile');
 //NEW LEFT MENU
 var RoomMenuLayout = require('../menu/room/layout/room-menu-layout');
 
-var CommunityCreateModel = require('../community-create/community-create-model');
-var CommunityCreateView = require('../community-create/community-create-view');
-
 require('views/behaviors/isomorphic');
 
 module.exports = (function () {
@@ -28,7 +25,7 @@ module.exports = (function () {
     behaviors: function(){
       var behaviors = {
         Isomorphic: {
-          communityCreate: { el: '.community-create-app-root', init: 'initCommunityCreateRegion' }
+          // ...
         }
       };
 
@@ -67,8 +64,6 @@ module.exports = (function () {
       this.groupsCollection = options.groupsCollection;
       this.dialogRegion = modalRegion;
 
-      this.communityCreateModel = new CommunityCreateModel();
-
       //Mobile events don't seem to bind 100% of the time so lets use a native method
       var menuHotspot = document.querySelector('.menu__hotspot');
       if(menuHotspot) {
@@ -76,17 +71,6 @@ module.exports = (function () {
           this.fireEventToggleMobileMenu();
         }.bind(this));
       }
-
-      this.listenTo(appEvents, 'community-create-view:toggle', this.onCommunityCreateToggle, this);
-    },
-
-    initCommunityCreateRegion: function() {
-      return new CommunityCreateView({
-        model: this.communityCreateModel,
-        orgCollection: this.orgCollection,
-        repoCollection: this.repoCollection,
-        groupsCollection: this.groupsCollection
-      });
     },
 
 
@@ -107,10 +91,6 @@ module.exports = (function () {
     fireEventToggleMobileMenu: function() {
       appEvents.trigger('menu:show');
     },
-
-    onCommunityCreateToggle: function(active) {
-      this.communityCreateModel.set('active', active);
-    }
 
   });
 
