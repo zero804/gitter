@@ -6,6 +6,7 @@ require('utils/font-setup');
 
 var debug = require('debug-proxy')('app:router-app');
 var $ = require('jquery');
+var _ = require('underscore');
 var Backbone = require('backbone');
 var moment = require('moment');
 var clientEnv = require('gitter-client-env');
@@ -322,6 +323,21 @@ onready(function() {
 
   var repoCollection = new ReposCollection();
 
+  var adminGroupsCollection = new groupModels.Collection([]);
+  var initializeAdminGroupsCollection = _.once(function() {
+    adminGroupsCollection.fetch({
+      data: {
+          type: 'admin'
+        }
+      },
+      {
+        add: true,
+        remove: true,
+        merge: true
+      }
+    );
+  });
+
   var communityCreateModel = new CommunityCreateModel({
     active: false
   });
@@ -453,6 +469,7 @@ onready(function() {
     },
 
     createroom: function() {
+      initializeAdminGroupsCollection();
       require.ensure(['views/modals/choose-room-view'], function(require) {
         var chooseRoomView = require('views/modals/choose-room-view');
         appLayout.dialogRegion.show(new chooseRoomView.Modal());
@@ -482,19 +499,7 @@ onready(function() {
         return groupId;
       }
 
-
-      var adminGroupsCollection = new groupModels.Collection([]);
-      adminGroupsCollection.fetch({
-        data: {
-            type: 'admin'
-          }
-        },
-        {
-          add: true,
-          remove: true,
-          merge: true
-        }
-      );
+      initializeAdminGroupsCollection();
 
       require.ensure(['views/modals/create-room-view'], function(require) {
         var createRoomView = require('views/modals/create-room-view');
