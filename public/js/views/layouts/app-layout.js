@@ -11,9 +11,6 @@ var isMobile = require('utils/is-mobile');
 //NEW LEFT MENU
 var RoomMenuLayout = require('../menu/room/layout/room-menu-layout');
 
-var CommunityCreateModel = require('../community-create/community-create-model');
-var CommunityCreateView = require('../community-create/community-create-view');
-
 require('views/behaviors/isomorphic');
 
 module.exports = (function () {
@@ -27,7 +24,9 @@ module.exports = (function () {
 
     behaviors: function(){
       var behaviors = {
-        Isomorphic: {}
+        Isomorphic: {
+          // ...
+        }
       };
 
       if(isMobile() || !context.hasFeature('left-menu')) {
@@ -46,9 +45,10 @@ module.exports = (function () {
 
     initNewMenuRegion: function (optionsForRegion){
       this.menuRegion = new RoomMenuLayout(optionsForRegion({
-        bus:                     appEvents,
-        roomCollection:          this.roomCollection,
-        orgCollection:           this.orgCollection
+        bus: appEvents,
+        roomCollection: this.roomCollection,
+        orgCollection: this.orgCollection,
+        groupsCollection: this.groupsCollection
       }));
       return this.menuRegion;
     },
@@ -60,11 +60,9 @@ module.exports = (function () {
     initialize: function (options) {
       this.roomCollection = options.roomCollection;
       this.orgCollection = options.orgCollection;
-      this.repoCollection = options.repoCollection
+      this.repoCollection = options.repoCollection;
+      this.groupsCollection = options.groupsCollection;
       this.dialogRegion = modalRegion;
-
-      this.communityCreateModel = new CommunityCreateModel();
-      this.hasRenderedCommunityCreateView = false;
 
       //Mobile events don't seem to bind 100% of the time so lets use a native method
       var menuHotspot = document.querySelector('.menu__hotspot');
@@ -73,20 +71,6 @@ module.exports = (function () {
           this.fireEventToggleMobileMenu();
         }.bind(this));
       }
-
-      this.listenTo(appEvents, 'community-create-view:toggle', this.onCommunityCreateToggle, this);
-    },
-
-    initCommunityCreateRegion: function() {
-      this.repoCollection.fetch();
-
-      this.communityCreateView = new CommunityCreateView({
-        el: '.community-create-app-root',
-        model: this.communityCreateModel,
-        orgCollection: this.orgCollection,
-        repoCollection: this.repoCollection
-      });
-      return this.communityCreateView;
     },
 
 
@@ -107,16 +91,6 @@ module.exports = (function () {
     fireEventToggleMobileMenu: function() {
       appEvents.trigger('menu:show');
     },
-
-    onCommunityCreateToggle: function(active) {
-      if(!this.hasRenderedCommunityCreateView) {
-        var communityCreateView = this.initCommunityCreateRegion();
-        communityCreateView.render();
-      }
-      this.communityCreateModel.set('active', active);
-
-      this.hasRenderedCommunityCreateView = true;
-    }
 
   });
 

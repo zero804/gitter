@@ -3,6 +3,8 @@
 var testRequire = require('../../test-require');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assertUtils = require('../../assert-utils')
+var env = require('gitter-web-env');
+var nconf = env.config;
 var serialize = testRequire('./serializers/serialize');
 var GroupStrategy = testRequire('./serializers/rest/group-strategy');
 
@@ -12,7 +14,11 @@ function getExpectedForGroup(group) {
     id: group.id,
     name: group.name,
     uri: group.uri,
-    avatarUrl: '/api/private/user-avatar/'+group.uri+'?s=48',
+    backedBy: {
+      type: group.sd.type,
+      linkPath: group.sd.linkPath
+    },
+    avatarUrl: nconf.get('avatar:officialHost') + '/group/i/' + group.id,
   }];
 }
 

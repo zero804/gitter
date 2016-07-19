@@ -1,6 +1,7 @@
 "use strict";
 
 var path = require("path");
+var ProvidePlugin = require('webpack/lib/ProvidePlugin');
 var CommonsChunkPlugin = require("webpack/lib/optimize/CommonsChunkPlugin");
 var ContextReplacementPlugin = require("webpack/lib/ContextReplacementPlugin");
 
@@ -34,6 +35,7 @@ var webpackConfig = {
 
     "mobile-native-userhome": path.resolve(path.join(__dirname, "./mobile-native-userhome")),
     "router-home-learn": path.resolve(path.join(__dirname, './router-home-learn')),
+    "early-bird": path.resolve(path.join(__dirname, './early-bird')),
 
     vendor: [
       'utils/webpack',
@@ -71,7 +73,8 @@ var webpackConfig = {
             path.resolve(__dirname, '../../shared/handlebars/helpers')
           ],
           knownHelpers: [
-            'cdn'
+            'cdn',
+            'avatarSrcSet'
           ],
           partialsRootRelative: path.resolve(__dirname, '../templates/partials/') + path.sep
         }
@@ -114,6 +117,7 @@ var webpackConfig = {
     },
   },
   plugins: [
+    new ProvidePlugin({ Promise: "bluebird" }),
     new CommonsChunkPlugin("vendor", "[name].js"),
     new ContextReplacementPlugin(/moment\/locale$/, /ar|cs|da|de|en-gb|es|fa|fr|hu|it|ja|ko|lt|nl|pl|pt|ru|sk|sv|ua|zh-cn/)
   ],

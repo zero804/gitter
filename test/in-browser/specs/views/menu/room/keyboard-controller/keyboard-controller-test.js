@@ -57,7 +57,9 @@ describe('KeyboardControllerView', function(){
     model.minibarHomeModel = new Backbone.Model({ type: 'all', name: 'all', active: true });
     model.minibarSearchModel = new Backbone.Model({ type: 'search', name: 'search' });
     model.minibarPeopleModel = new Backbone.Model({ type: 'people', name: 'people' });
+    model.minibarCommunityCreateModel = new Backbone.Model({ name: 'Create Community', type: 'community-create' });
     model.minibarCloseModel = new Backbone.Model({ type: 'close', name: 'close' });
+    model.minibarTempOrgModel = new Backbone.Model({ type: 'org', name: 'google', hidden: true});
 
 
     view = new KeyboardControllerView({
@@ -121,6 +123,13 @@ describe('KeyboardControllerView', function(){
       view.blurAllItems();
       appEvents.trigger('keyboard.room.prev');
       assert(model.primaryCollection.at(0).get('focus'));
+    });
+
+    it('should focus the minibarTempOrgIcon when it is not hidden and room.4 is pressed', function(){
+      view.blurAllItems();
+      model.minibarTempOrgModel.set('hidden', false);
+      appEvents.trigger('keyboard.room.4', { key: 4 });
+      assert(model.minibarTempOrgModel.get('focus'));
     });
 
   });
@@ -466,6 +475,18 @@ describe('KeyboardControllerView', function(){
       view.blurAllItems();
       model.minibarCollection.at(0).set('focus', true);
       assert(view.isMinibarInFocus());
+    });
+
+    it('should return true if the tempOrgItem is in focus', function(){
+      view.blurAllItems();
+      model.minibarTempOrgModel.set({ hidden: false, focus: true });
+      assert(view.isMinibarInFocus());
+    });
+
+    it('should return false if the tempOrgItem is in focus but is hidden', function(){
+      view.blurAllItems();
+      model.minibarTempOrgModel.set({ hidden: true, focus: true });
+      assert(!view.isMinibarInFocus());
     });
 
   });

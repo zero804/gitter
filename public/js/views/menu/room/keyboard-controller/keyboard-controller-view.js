@@ -3,13 +3,14 @@
 var Marionette = require('backbone.marionette');
 var _ = require('underscore');
 var cocktail = require('cocktail');
+var context = require('utils/context');
 var KeyboardEventMixin = require('views/keyboard-events-mixin');
 
 var arrayBoundWrap = function(index, length) {
   return ((index % length) + length) % length;
 };
 
-var isHiddenFilter = function (model) { return !model.get('isHidden'); }
+var isHiddenFilter = function (model) { return !model.get('isHidden'); };
 
 var KeyboardController = Marionette.ItemView.extend({
 
@@ -17,7 +18,8 @@ var KeyboardController = Marionette.ItemView.extend({
     'room.1': 'onMinibarAllSelected',
     'room.2': 'onMinibarSearchSelected',
     'room.3': 'onMinibarPeopleSelected',
-    'room.4 room.5 room.6 room.7 room.8 room.9 room.10': 'onMinibarOrgSelected',
+    'room.4': 'onMinibarTempSelected',
+    'room.5 room.6 room.7 room.8 room.9 room.10': 'onMinibarOrgSelected',
     'focus.search': 'onMinibarSearchSelected',
     'room.down': 'onDownKeyPressed',
     'room.up': 'onUpKeyPressed',
@@ -34,7 +36,9 @@ var KeyboardController = Marionette.ItemView.extend({
     this.minibarHomeModel = attrs.model.minibarHomeModel;
     this.minibarSearchModel = attrs.model.minibarSearchModel;
     this.minibarPeopleModel = attrs.model.minibarPeopleModel;
+    this.minibarCommunityCreateModel = attrs.model.minibarCommunityCreateModel;
     this.minibarCloseModel = attrs.model.minibarCloseModel;
+    this.minibarTempOrgModel = attrs.model.minibarTempOrgModel;
 
     //Favourite
     this.favouriteCollection = attrs.model.favouriteCollection;
@@ -58,32 +62,42 @@ var KeyboardController = Marionette.ItemView.extend({
 
   onMinibarAllSelected: function (){
     this.blurAllItems();
-    this.model.set('state', 'all');
     this.minibarHomeModel.set('focus', true);
+    this.setModelState('all');
   },
 
   onMinibarSearchSelected: function (){
     //the search input will focus itself
     this.blurAllItems();
-    this.model.set('state', 'search');
+    this.setModelState('search');
   },
 
   onMinibarPeopleSelected: function (){
     this.blurAllItems();
-    this.model.set('state', 'people');
     this.minibarPeopleModel.set('focus', true);
+    this.setModelState('people');
+  },
+
+  onMinibarTempSelected: function (e){
+    this.blurAllItems();
+    if(!this.minibarTempOrgModel.get('hidden')) {
+      return this.minibarTempOrgModel.set('focus', true);
+    }
+    return this.onMinibarOrgSelected(e);
   },
 
   onMinibarOrgSelected: function (e){
     this.blurAllItems();
-    var index = e.key;
-    if(index === 0) { index = 10; } // 0 key triggers room.10
+    // On Windows, `e.key` will be the symbols because `shift` is used
+    var keyIndex = parseInt(e.code.replace('Digit', ''), 10);
+    if(keyIndex === 0) { keyIndex = 10; } // 0 key triggers room.10
     // we have room.1 ~ room.3 triggering home/search/people so we have to account for that with indexing here
-    index = index - 4;
-    index = arrayBoundWrap(index, this.minibarCollection.length);
-    var model = this.minibarCollection.at(index);
+    var index = keyIndex - 4;
+    var collection = this.minibarCollection;
+    index = arrayBoundWrap(index, collection.length);
+    var model = collection.at(index);
     model.set('focus', true);
-    this.model.set({ state: 'org', selectedOrgName: model.get('name') });
+    this.setModelState({ state: 'org', selectedOrgName: model.get('name') });
   },
 
   onDownKeyPressed: function (e){
@@ -170,6 +184,13 @@ var KeyboardController = Marionette.ItemView.extend({
     //If we are in the search state me may have to move focus back to search
     if(this.model.get('state') === 'search') { return this.focusSearch(); }
     return this.focusLastMinibarItem();
+  },
+
+  setModelState: function (attrs){
+    if(_.isString(attrs)) { attrs = { state: attrs }; }
+    this.model.set(_.extend({}, attrs, {
+      panelOpenState: true
+    }));
   },
 
   moveMinibarFocus: function (direction){
@@ -288,7 +309,9 @@ var KeyboardController = Marionette.ItemView.extend({
     return  (this.minibarHomeModel.get(attr) === val) && this.minibarHomeModel ||
       (this.minibarSearchModel.get(attr) === val) && this.minibarSearchModel ||
       (this.minibarPeopleModel.get(attr) === val) && this.minibarPeopleModel ||
+      (!this.minibarTempOrgModel.get('hidden') && this.minibarTempOrgModel.get(attr) === val && this.minibarTempOrgModel) ||
       this.minibarCollection.findWhere(q) ||
+      (context.hasFeature('community-create') && this.minibarCommunityCreateModel.get(attr) === val) && this.minibarCommunityCreateModel ||
       (this.minibarCloseModel.get(attr) === val) && this.minibarCloseModel;
   },
 
@@ -319,15 +342,27 @@ var KeyboardController = Marionette.ItemView.extend({
   },
 
   getFlatMinibarCollection: function (){
-    return [ this.minibarHomeModel, this.minibarSearchModel, this.minibarPeopleModel ]
-    .concat(this.minibarCollection.models)
-    .concat([ this.minibarCloseModel]);
+    var collection = [ this.minibarHomeModel, this.minibarSearchModel, this.minibarPeopleModel ];
+
+    if(!this.minibarTempOrgModel.get('hidden')) {
+      collection = collection.concat([ this.minibarTempOrgModel ]);
+    }
+
+    collection = collection.concat(this.minibarCollection.models);
+
+    if(context.hasFeature('community-create')) {
+      collection = collection.concat([ this.minibarCommunityCreateModel ]);
+    }
+    collection = collection.concat([ this.minibarCloseModel ]);
+    return collection;
   },
 
   setDebouncedState: _.debounce(function (model){
     var type = model.get('type');
-    if(type !== 'org') { return this.model.set('state', type); }
-    this.model.set({ state: type, selectedOrgName: model.get('name') });
+    this.setModelState({
+      state: type,
+      selectedOrgName: (type === 'org') ? model.get('name') : null,
+    });
   }, 100),
 
   blurAllItems: function (){

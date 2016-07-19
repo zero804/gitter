@@ -3,7 +3,7 @@ var Marionette = require('backbone.marionette');
 var ModalView = require('./modal');
 var context = require('utils/context');
 var apiClient = require('components/apiClient');
-var RepoSelectView = require('../createRoom/repoSelectView.js');
+var RepoSelectView = require('../createRoom/repoSelectView');
 var template = require('./tmpl/create-repo-room.hbs');
 var appEvents = require('utils/appevents');
 
@@ -47,7 +47,7 @@ var View = Marionette.LayoutView.extend({
     var uri = r.get('uri');
     var addBadge = this.ui.addBadge.prop('checked');
 
-    apiClient.post('/v1/rooms', { uri: uri, addBadge: addBadge })
+    apiClient.post('/private/create-github-room', { uri: uri, addBadge: addBadge })
       .then(function (res) {
         if (res.extra.hookCreationFailedDueToMissingScope) {
           setTimeout(promptForHook, 1500);

@@ -88,9 +88,6 @@ module.exports = BaseCollectionView.extend({
     var isHidden = false;
 
     switch (this.roomMenuModel.get('state')) {
-      case 'search':
-        isHidden = (index > 25);
-        break;
       case 'org':
         isHidden = (index > 9);
         break;

@@ -12,6 +12,14 @@ var Typeahead = require('views/controls/typeahead');
 var userSearchModels = require('collections/user-search');
 require('views/behaviors/widgets');
 
+var DEFAULT_AVATAR_UNTIL_AVATARS_SERVICE_ARRIVES = 'https://avatars.githubusercontent.com/u/0'
+/**
+ *  Ridiculously sloppy regexp based email validator, let the server
+ *  do the real validation
+ */
+function isEmailAddress(string) {
+  return /^[^@]+@[^@]+\.[^@]+$/.test(string);
+}
 
 var RowView = Marionette.ItemView.extend({
   events: {
@@ -149,8 +157,16 @@ var View = Marionette.CompositeView.extend({
     var self = this;
 
     self.ui.loading.toggleClass('hide');
+    var username = model.get('username');
+    var email = model.get('email');
+    var body;
+    if (username) {
+      body = { githubUsername: username };
+    } else if (email) {
+      body = { email: email };
+    }
 
-    return apiClient.room.post('/invites', { githubUsername: model.get('username') })
+    return apiClient.room.post('/invites', body)
       .then(function(invite) {
         self.ui.loading.toggleClass('hide');
         model.set({
@@ -216,6 +232,24 @@ var View = Marionette.CompositeView.extend({
           return displayName && displayName.indexOf(input) >= 0 ||
                  username && username.indexOf(input) >= 0;
         };
+      },
+      fetch: function(input, collection, fetchSuccess) {
+        if (input.indexOf('@') >= 0) {
+          if (isEmailAddress(input)) {
+            this.collection.reset([{
+              displayName: input,
+              email: input,
+              avatarUrlSmall: DEFAULT_AVATAR_UNTIL_AVATARS_SERVICE_ARRIVES,
+              avatarUrlMedium: DEFAULT_AVATAR_UNTIL_AVATARS_SERVICE_ARRIVES
+            }]);
+          } else {
+            this.collection.reset([]);
+          }
+
+          return fetchSuccess();
+        }
+
+        this.collection.fetch({ data: { q: input }}, { add: true, remove: true, merge: true, success: fetchSuccess });
       }
     });
 

@@ -1,90 +1,75 @@
 "use strict";
 
-var Promise = require('bluebird');
-var chatService = require('../../services/chat-service');
-var persistence = require('gitter-web-persistence');
-var collections = require('../../utils/collections');
-var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var env = require('gitter-web-env');
+var logger = env.logger;
+var estimatedChatsService = require('../../services/estimated-chats-service');
 var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
 
-var loadRooms = Promise.method(function(roomIds) {
-  if (!roomIds.length) {
-    return [];
-  }
-
-  return persistence.Troupe.find({ _id: { $in: roomIds }, security: 'PUBLIC' }, { uri: 1, githubType: 1, userCount: 1, topic: 1, tags: 1 })
-    .exec();
-});
-
-var loadMessageCounts = Promise.method(function(roomIds) {
-  if (!roomIds.length) {
-    return [];
-  }
-  return Promise.map(roomIds, function(roomId) {
-    return chatService.getRoughMessageCount(roomId)
-      .then(function(messageCount) {
-        return {
-          id: roomId,
-          count: messageCount
-        };
-      });
-  });
-});
+// function RoomMessageCountStrategy() {
+//   this.messageCounts = null;
+// }
+//
+// RoomMessageCountStrategy.prototype = {
+//   preload: function(troupeIds) {
+//     if (troupeIds.isEmpty()) return;
+//
+//     return estimatedChatsService.getEstimatedMessageCountForRoomIds(troupeIds.toArray())
+//       .bind(this)
+//       .timeout(1000)
+//       .then(function(messageCounts) {
+//         this.messageCounts = messageCounts;
+//       })
+//       .catch(function(e) {
+//         logger.warn('Message count failure', { exception: e });
+//       });
+//   },
+//
+//   map: function(troupeId) {
+//     return this.messageCounts && this.messageCounts[troupeId];
+//   },
+//
+//   name: 'RoomMessageCountStrategy'
+// };
 
 function SuggestedRoomStrategy() {
-  var roomHash;
-  var messageCountHash;
+  // var messageCountStrategy;
 
   this.preload = function(suggestedRooms) {
-    var allRoomIds = suggestedRooms.map(function(suggestedRoom) {
-        return suggestedRoom.roomId || suggestedRoom.id;
-      })
-      .toArray();
-
-    // NOTE: only suggestions with roomId will be preloaded. Otherwise it
-    // assumes that the suggestion IS the room.
-    var suggestedRoomIds = suggestedRooms
-      .filter(function(f) { return !!f.roomId; })
-      .map(function(f) { return mongoUtils.asObjectID(f.roomId); })
-      .toArray();
-
-    return Promise.join(
-      loadRooms(suggestedRoomIds),
-      loadMessageCounts(allRoomIds),
-      function(rooms, messageCounts) {
-        roomHash = collections.indexById(rooms);
-        messageCountHash = {};
-        messageCounts.forEach(function(mc) {
-          messageCountHash[mc.id] = mc.count;
-        });
-      });
+    // if (suggestedRooms.isEmpty()) return;
+    //
+    // var troupeIds = suggestedRooms
+    //   .map(function(troupe) {
+    //     return troupe._id || troupe.id;
+    //   })
+    //   .filter(function(f) {
+    //     return !!f;
+    //   });
+    //
+    // messageCountStrategy = new RoomMessageCountStrategy();
+    // return messageCountStrategy.preload(troupeIds);
   };
 
   this.map = function(suggestedRoom) {
-    // NOTE: It uses the preloaded room for suggestions with roomId
-    // (getSuggestionsForRoom), otherwise it assumes that the entire object is
-    // the room (getSuggestionsForUserId.)
-    var room = roomHash[suggestedRoom.roomId] || suggestedRoom;
-
-    // in case id wasn't loaded for whatever reason
-    room.id = room.id || room._id;
-
-    var uri = room && room.uri;
+    var uri = suggestedRoom && suggestedRoom.uri;
     if (!uri) return;
 
-    var providers = (room.providers && room.providers.length) ? room.providers : undefined;
+    var id = suggestedRoom.id || suggestedRoom._id;
+
+    var providers = (suggestedRoom.providers && suggestedRoom.providers.length) ?
+        suggestedRoom.providers :
+        undefined;
 
     return {
-      id: room.id,
+      id: id,
       uri: uri,
-      avatarUrl: resolveRoomAvatarUrl(room, 48),
-      userCount: room.userCount,
-      messageCount: messageCountHash[room.id],
-      tags: room.tags,
+      avatarUrl: resolveRoomAvatarUrl(suggestedRoom, 48),
+      userCount: suggestedRoom.userCount,
+      messageCount: undefined, // messageCountStrategy.map(id),
+      tags: suggestedRoom.tags,
       providers: providers,
       // TODO: users/avatars (sample)
-      description: room.topic,
-      exists: !!room.id
+      description: suggestedRoom.topic,
+      exists: !!id
     };
   };
 }

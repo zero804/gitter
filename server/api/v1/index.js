@@ -29,48 +29,32 @@ router.use('/groups', groupsResources);
 // and this is used for devices without users
 router.post('/apn',
   identifyRoute('apn-registration'),
-  require('./apn.js'));
+  require('./apn'));
 
 // userapn ties together devices from /v1/apn and actual users.
 // this definitely requires auth
 router.post('/userapn',
   authMiddleware,
   identifyRoute('user-apn-registration'),
-  require('./userapn.js'));
+  require('./userapn'));
 
 router.post('/eyeballs',
   authMiddleware,
   identifyRoute('eyeballs'),
-  require('./eyeballs.js'));
+  require('./eyeballs'));
 
 router.delete('/sockets/:socketId',
   identifyRoute('remove-socket'),
-  require('./sockets.js'));
+  require('./sockets'));
 
 router.get('/repo-info',
   authMiddleware,
   identifyRoute('repo-info'),
-  require('./repo-info.js'));
-
-router.get('/channel-search',
-  authMiddleware,
-  identifyRoute('channel-search'),
-  require('./channel-search.js'));
-
-// Deprecated - remove by 15 November
-router.get('/public-repo-search',
-  authMiddleware,
-  identifyRoute('public-repo-search'),
-  require('./public-repo-search.js'));
+  require('./repo-info'));
 
 router.post('/private/gcm',
   authMiddleware,
   identifyRoute('gcm-registration'),
   require('./private/gcm'));
-
-router.post('/private/channels',
-  authMiddleware,
-  identifyRoute('create-channel'),
-  require('./private/create-channel'));
 
 module.exports = router;

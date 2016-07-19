@@ -3,26 +3,30 @@
 require('utils/initial-setup');
 require('utils/font-setup');
 
+var debug = require('debug-proxy')('app:router-app');
 var $ = require('jquery');
+var Backbone = require('backbone');
+var moment = require('moment');
+var clientEnv = require('gitter-client-env');
+var onready = require('utils/onready');
+var urlParser = require('utils/url-parser');
+var RAF = require('utils/raf');
 var appEvents = require('utils/appevents');
 var context = require('utils/context');
-var clientEnv = require('gitter-client-env');
-var Backbone = require('backbone');
-var AppLayout = require('views/layouts/app-layout');
-var LoadingView = require('views/app/loading-view');
+
+var TitlebarUpdater = require('components/titlebar');
+var realtime = require('components/realtime');
+var RoomCollectionTracker = require('components/room-collection-tracker');
+var SPARoomSwitcher = require('components/spa-room-switcher');
+var linkHandler = require('components/link-handler');
+var roomListGenerator = require('components/chat-cache/room-list-generator');
 var troupeCollections = require('collections/instances/troupes');
 var repoModels = require('collections/repos');
 var ReposCollection = repoModels.ReposCollection;
-var TitlebarUpdater = require('components/titlebar');
-var realtime = require('components/realtime');
-var onready = require('./utils/onready');
-var urlParser = require('utils/url-parser');
-var RAF = require('utils/raf');
-var RoomCollectionTracker = require('components/room-collection-tracker');
-var SPARoomSwitcher = require('components/spa-room-switcher');
-var debug = require('debug-proxy')('app:router-app');
-var linkHandler = require('./components/link-handler');
-var roomListGenerator = require('./components/chat-cache/room-list-generator');
+var CommunityCreateModel = require('views/community-create/community-create-model');
+
+var AppLayout = require('views/layouts/app-layout');
+var LoadingView = require('views/app/loading-view');
 
 require('components/statsc');
 require('views/widgets/preload');
@@ -117,6 +121,14 @@ onready(function() {
     // turn backbone object to plain one so we don't modify the original
     var newTroupe = troupe.toJSON();
 
+    // Set the last access time immediately to prevent
+    // delay in hidden rooms becoming visible only
+    // once we get the server-side update
+    var liveCollectionTroupe = troupeCollections.troupes.get(troupe.id)
+    if (liveCollectionTroupe) {
+      liveCollectionTroupe.set('lastAccessTime', moment());
+    }
+
     // add the group to the troupe as if it was serialized by the server
     var groupModel = troupeCollections.groups.get(newTroupe.groupId);
     if (groupModel) {
@@ -161,33 +173,6 @@ onready(function() {
     roomSwitcher.change(iframeUrl);
   };
 
-  var allRoomsCollection = troupeCollections.troupes;
-  new RoomCollectionTracker(allRoomsCollection);
-
-  var repoCollection = new ReposCollection();
-
-  var appLayout = new AppLayout({
-    template: false,
-    el: 'body',
-    roomCollection: troupeCollections.troupes,
-    //TODO ADD THIS TO MOBILE JP 25/1/16
-    orgCollection: troupeCollections.orgs,
-    repoCollection: repoCollection
-  });
-  appLayout.render();
-
-  allRoomsCollection.on('remove', function(model) {
-    if (model.id === context.getTroupeId()) {
-      //context.troupe().set('roomMember', false);
-      var newLocation = '/home';
-      var newFrame = '/home/~home';
-      var title = 'home';
-
-      pushState(newFrame, title, newLocation);
-      roomSwitcher.change(newFrame);
-    }
-  });
-
   // Called from the OSX native client for faster page loads
   // when clicking on a chat notification
   window.gitterLoader = function(url) {
@@ -198,24 +183,6 @@ onready(function() {
     var parsed = urlParser.parse(url);
     linkHandler.routeLink(parsed, { appFrame: true });
   };
-
-  appEvents.on('navigation', function(url, type, title) {
-    debug('navigation: %s', url);
-    var parsed = urlParser.parse(url);
-    var frameUrl = parsed.pathname + '/~' + type + parsed.search;
-
-    if (parsed.pathname === window.location.pathname) {
-      pushState(frameUrl, title, url);
-      postMessage({
-        type: 'permalink.navigate',
-        query: urlParser.parseSearch(parsed.search),
-      });
-      return;
-    }
-
-    pushState(frameUrl, title, url);
-    roomSwitcher.change(frameUrl);
-  });
 
   function onUnreadItemsCountMessage(message) {
     var count = message.count;
@@ -345,9 +312,73 @@ onready(function() {
     }
   }, false);
 
+
+  var allRoomsCollection = troupeCollections.troupes;
+  new RoomCollectionTracker(allRoomsCollection);
+
+  var repoCollection = new ReposCollection();
+
+  var communityCreateModel = new CommunityCreateModel({
+    active: false
+  });
+
+
+  allRoomsCollection.on('remove', function(model) {
+    if (model.id === context.getTroupeId()) {
+      //context.troupe().set('roomMember', false);
+      var newLocation = '/home';
+      var newFrame = '/home/~home';
+      var title = 'home';
+
+      pushState(newFrame, title, newLocation);
+      roomSwitcher.change(newFrame);
+    }
+  });
+
+
+  var appLayout = new AppLayout({
+    template: false,
+    el: 'body',
+    roomCollection: troupeCollections.troupes,
+    //TODO ADD THIS TO MOBILE JP 25/1/16
+    orgCollection: troupeCollections.orgs,
+    repoCollection: repoCollection,
+    groupsCollection: troupeCollections.groups
+  });
+  appLayout.render();
+
+
+
   function postMessage(message) {
     chatIFrame.contentWindow.postMessage(JSON.stringify(message), clientEnv.basePath);
   }
+
+  appEvents.on('community-create-view:toggle', function(active) {
+    communityCreateModel.set('active', active);
+    if(active) {
+      window.location.hash = '#createcommunity';
+    }
+  });
+
+  appEvents.on('navigation', function(url, type, title) {
+    debug('navigation: %s', url);
+    var parsed = urlParser.parse(url);
+    var frameUrl = parsed.pathname + '/~' + type + parsed.search;
+
+    if (parsed.pathname === window.location.pathname) {
+      pushState(frameUrl, title, url);
+      postMessage({
+        type: 'permalink.navigate',
+        query: urlParser.parseSearch(parsed.search),
+      });
+      return;
+    }
+
+    pushState(frameUrl, title, url);
+    roomSwitcher.change(frameUrl);
+  });
+
+
 
   // Call preventDefault() on tab events so that we can manage focus as we want
   appEvents.on('keyboard.tab.next keyboard.tab.prev', function(e) {
@@ -399,6 +430,8 @@ onready(function() {
     postMessage(message);
   });
 
+
+
   var Router = Backbone.Router.extend({
     routes: {
       // TODO: get rid of the pipes
@@ -430,60 +463,15 @@ onready(function() {
     },
 
     createcustomroom: function(name) {
-
-      function getSuitableParentRoomUri() {
-
-        if(context.hasFeature('left-menu')) {
-          //JP 12/4/16
-          // If the left menu is in an org state we can take the currently selected
-          // org as the correct parent for the newly created room
-          // we have to check if the org exists in the users room list otherwise
-          // they probably don't have permission to create a child room of that type
-          var roomMenuModel = appLayout.getRoomMenuModel();
-          var currentLeftMenuState = roomMenuModel.get('state');
-          var currentlySelectedOrg = roomMenuModel.get('selectedOrgName');
-          var hasPermissionToCreateOrgChildRoom = !!troupeCollections.troupes.findWhere({ uri: currentlySelectedOrg }) || context.getUser().username === currentlySelectedOrg;
-
-          if(currentLeftMenuState === 'org' && hasPermissionToCreateOrgChildRoom) {
-            return currentlySelectedOrg;
-          }
-        }
-
-        var currentRoomUri = window.location.pathname.split('/').slice(1).join('/');
-
-        if (currentRoomUri === 'home') {
-          // no suitable parent
-          return;
-        }
-
-        var currentRoom = allRoomsCollection.findWhere({
-          id: context.getTroupeId()
-        });
-
-        if (!currentRoom) {
-          // not a member or collection hasnt synced yet
-          return;
-        }
-
-        if (currentRoom.get('oneToOne')) {
-          // no suitable parent
-          return;
-        }
-
-        if (currentRoom.get('githubType') === 'REPO' || currentRoom.get('githubType') === 'ORG') {
-          // assume user wants to create an org/repo channel
-          return currentRoom.get('uri');
-        }
-
-        // assume user want to create a room based off the same parent
-        var parentUri = currentRoom.get('uri').split('/').slice(0, -1).join('/');
-        return parentUri;
+      function getSuitableGroupId() {
+        var group = appLayout.getRoomMenuModel().getCurrentGroup();
+        return group && group.get('id');
       }
 
       require.ensure(['views/modals/create-room-view'], function(require) {
         var createRoomView = require('views/modals/create-room-view');
         var modal = new createRoomView.Modal({
-          initialParent: getSuitableParentRoomUri(),
+          initialGroupId: getSuitableGroupId(),
           roomName: name,
         });
 
@@ -501,8 +489,19 @@ onready(function() {
     },
 
     createCommunity: function(/* uri */) {
-      appEvents.trigger('community-create-view:toggle', true);
-    },
+      require.ensure(['views/community-create/community-create-view'], function(require) {
+        var CommunityCreateView = require('views/community-create/community-create-view');
+        communityCreateModel.set('active', true);
+        var communityCreateView = new CommunityCreateView({
+          model: communityCreateModel,
+          orgCollection: troupeCollections.orgs,
+          repoCollection: repoCollection,
+          groupsCollection: troupeCollections.groups
+        });
+
+        appLayout.dialogRegion.show(communityCreateView);
+      });
+    }
   });
 
   new Router();

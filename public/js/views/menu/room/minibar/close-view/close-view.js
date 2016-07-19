@@ -3,7 +3,7 @@
 var _ = require('underscore');
 var toggleClass = require('utils/toggle-class');
 var template = require('./close-view.hbs');
-var ItemView = require('../minibar-item-view.js');
+var ItemView = require('../minibar-item-view');
 
 var defaults = {
   pinStateClass: 'is-menu-pinned',
@@ -77,10 +77,10 @@ module.exports = ItemView.extend({
   initialize: function(attrs) {
     this.iconOpts = _.extend({}, defaults, (attrs.icon || {}));
     this.iconHover = false;
-    this.roomModel = attrs.roomModel;
+    this.roomMenuModel = attrs.roomMenuModel;
 
     // 'change:panelOpenState change:roomMenuIsPinned'
-    this.listenTo(this.roomModel, 'change:roomMenuIsPinned', this.onPanelPinChange, this);
+    this.listenTo(this.roomMenuModel, 'change:roomMenuIsPinned', this.onPanelPinChange, this);
   },
 
   onItemMouseEnter: function() {
@@ -98,8 +98,8 @@ module.exports = ItemView.extend({
   },
 
   updatePinnedState: function() {
-    var isPinned = !!this.roomModel.get('roomMenuIsPinned');
-    //var openState = this.roomModel.get('panelOpenState');
+    var isPinned = !!this.roomMenuModel.get('roomMenuIsPinned');
+    //var openState = this.roomMenuModel.get('panelOpenState');
 
     toggleClass(this.ui.toggleIcon[0], this.iconOpts.pinStateClass, isPinned);
     this.deflectArms();
@@ -110,7 +110,7 @@ module.exports = ItemView.extend({
   },
 
   onDestroy: function() {
-    this.stopListening(this.roomModel);
+    this.stopListening(this.roomMenuModel);
   },
 
   // Animation/Interaction
@@ -136,7 +136,7 @@ module.exports = ItemView.extend({
   },
 
   deflectArms: function() {
-    var isPinned = !!this.roomModel.get('roomMenuIsPinned');
+    var isPinned = !!this.roomMenuModel.get('roomMenuIsPinned');
     var isHovered = this.iconHover;
 
     var legDeflectAnimationOptions = this.getLegDeflectAnimationOptions();

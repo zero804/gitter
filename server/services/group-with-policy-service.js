@@ -1,7 +1,5 @@
 'use strict';
 
-var env = require('gitter-web-env');
-var config = env.config;
 var assert = require('assert');
 var StatusError = require('statuserror');
 var ensureAccessAndFetchDescriptor = require('gitter-web-permissions/lib/ensure-access-and-fetch-descriptor');
@@ -10,7 +8,16 @@ var debug = require('debug')('gitter:app:group-with-policy-service');
 var roomService = require('./room-service');
 var secureMethod = require('../utils/secure-method');
 var validateRoomName = require('gitter-web-validators/lib/validate-room-name');
-var validateRoomSecurity = require('gitter-web-validators/lib/validate-room-security');
+
+/**
+ * @private
+ */
+function validateRoomSecurity(type, security) {
+  if (security === 'PUBLIC' || security === 'PRIVATE') {
+    return true;
+  }
+  return false;
+}
 
 /**
  * This could do with a better name
@@ -50,7 +57,6 @@ function ensureAccessAndFetchRoomInfo(user, group, options) {
   // TODO: validate topic
 
   var name = options.name;
-  assert(name, 'name required');
 
   if (!validateRoomName(name)) {
     throw new StatusError(400, 'Invalid room name: ' + name);
@@ -83,15 +89,13 @@ GroupWithPolicyService.prototype.createRoom = secureMethod([allowAdmin], functio
   var user = this.user;
   var group = this.group;
 
-  if (!config.get("project-splitsville:enabled")) {
-    if (options.type && group.sd.type !== 'GH_ORG' && group.sd.type !== 'GH_REPO' && group.sd.type !== 'GH_USER') {
-      throw new StatusError(400, 'GitHub repo backed rooms can only be added to GitHub org, repo or user backed groups.');
-    }
+  if (options.type && group.sd.type !== 'GH_ORG' && group.sd.type !== 'GH_REPO' && group.sd.type !== 'GH_USER') {
+    throw new StatusError(400, 'GitHub repo backed rooms can only be added to GitHub org, repo or user backed groups.');
+  }
 
-    if (options.linkPath) {
-      if (options.linkPath.split('/')[0] !== group.sd.linkPath.split('/')[0]) {
-        throw new StatusError(400, 'GitHub repo backed rooms must be for the same owner (gh org or user) as the group.');
-      }
+  if (options.linkPath) {
+    if (options.linkPath.split('/')[0] !== group.sd.linkPath.split('/')[0]) {
+      throw new StatusError(400, 'GitHub repo backed rooms must be for the same owner (gh org or user) as the group.');
     }
   }
 

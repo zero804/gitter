@@ -15,12 +15,12 @@ var MinibarView = Marionette.CollectionView.extend({
 
   //if an element exists in the dom pass that as the el prop
   childViewOptions: function(model, index) {
-    var selector = 'minibar-' + model.get('name');
+    var selector = model.get('id');
     var element = this.domMap[selector];
     var opts = {
       index: index,
       model: model,
-      roomMenuModel: this.model
+      roomMenuModel: this.roomMenuModel
     };
 
     if(!!element) { opts.el = element; }
@@ -28,7 +28,7 @@ var MinibarView = Marionette.CollectionView.extend({
   },
 
   initialize: function(attrs) {
-    this.model = attrs.model;
+    this.roomMenuModel = attrs.roomMenuModel;
     this.roomCollection = attrs.roomCollection;
   },
 

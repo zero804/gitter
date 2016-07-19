@@ -98,6 +98,7 @@ function createExpectedFixtures(expected) {
       githubId:         possibleGenerate('githubId', generateGithubId),
       githubToken:      possibleGenerate('githubToken', generateGithubToken),
       username:         possibleGenerate('username', generateUsername),
+      gravatarImageUrl:  f.gravatarImageUrl,
       state:            f.state || undefined,
       staff:            f.staff || false
     });
@@ -596,6 +597,9 @@ fixtureLoader.GITTER_INTEGRATION_ORG_ID = '19433202';
 fixtureLoader.GITTER_INTEGRATION_REPO = 'public-repo-1';
 fixtureLoader.GITTER_INTEGRATION_REPO_FULL = fixtureLoader.GITTER_INTEGRATION_USERNAME + '/' + fixtureLoader.GITTER_INTEGRATION_REPO;
 fixtureLoader.GITTER_INTEGRATION_REPO_ID = '59505414';
+fixtureLoader.GITTER_INTEGRATION_REPO2 = 'public-repo-2';
+fixtureLoader.GITTER_INTEGRATION_REPO2_FULL = fixtureLoader.GITTER_INTEGRATION_USERNAME + '/' + fixtureLoader.GITTER_INTEGRATION_REPO2;
+fixtureLoader.GITTER_INTEGRATION_REPO2_ID = '62724563';
 fixtureLoader.GITTER_INTEGRATION_COMMUNITY = '_I-heart-cats-Test-LOL';
 fixtureLoader.GITTER_INTEGRATION_ROOM = 'all-about-kitty-litter';
 

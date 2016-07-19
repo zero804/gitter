@@ -24,8 +24,8 @@ function applyTemplate(templateName, data) {
 
 var VALID_TEMPLATES = {
   'added-to-room': addedToRoomMapping,
-  'invitation': invitationMapping,
-  'invitation-reminder': invitationMapping,
+  'invitation-v2': invitationMapping,
+  'invitation-reminder-v2': invitationMapping,
   'unread-notification': unreadNoticationMapping,
   'created-room': createdRoomMapping
 };
@@ -56,11 +56,12 @@ function addedToRoomMapping(data) {
 
 function invitationMapping(data) {
   return {
-    NAME:    data.recipientName,
-    DATE:    data.date,
-    SENDER:  data.senderName,
+    NAME: data.recipientName,
+    DATE: data.date,
+    SENDER: data.senderName,
     ROOMURI: data.roomUri,
     ROOMURL: data.roomUrl,
+    INVITEURL: data.inviteUrl,
     LOGOURL: cdn('images/logo-text-blue-pink.png', { email: true })
   };
 }
@@ -83,7 +84,6 @@ function unreadNoticationMapping(data) {
 
 function createdRoomMapping(data) {
   var twitterSnippet = data.isPublic ? '<tr><td><br><a href="' + data.twitterURL + '" style="text-decoration: none" target="_blank" class="button-twitter">Share on Twitter</a></td></tr>' : '';
-  var orgNote = data.isOrg ? '<p>Note that only people within your organisation can join this room.</p>' : '';
 
   return {
     NAME:        data.recipientName,
@@ -92,7 +92,7 @@ function createdRoomMapping(data) {
     ROOMURL:     data.roomUrl,
     UNSUB:       data.unsubscribeUrl,
     TWITTERURL:  twitterSnippet,
-    ORGNOTE:     orgNote,
+    ORGNOTE:     '', // No used since splitsville
     ROOMTYPE:    data.roomType,
     LOGOURL:     cdn('images/logo-text-blue-pink.png', {email: true})
   };
