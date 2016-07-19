@@ -30,7 +30,8 @@ describe('group-service', function() {
             { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
             { lcUri: fixtureLoader.GITTER_INTEGRATION_REPO.toLowerCase() },
             { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() },
-            { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() }
+            { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() },
+            { lcUri: 'bob' }
           ],
         },
         user1: {
@@ -95,18 +96,20 @@ describe('group-service', function() {
       });
 
       it('should create a group for an unknown GitHub owner', function() {
-        var groupUri = fixtureLoader.GITTER_INTEGRATION_USERNAME;
         var user = fixture.user1;
         return groupService.createGroup(user, {
             type: 'GH_GUESS',
             name: 'Bob',
-            uri: groupUri,
-            linkPath: groupUri
+            // This also tests that you can have a group with an arbitrary uri
+            // that is backed by a github user/org with a linkPath that is
+            // different to the group's uri.
+            uri: 'Bob',
+            linkPath: fixtureLoader.GITTER_INTEGRATION_USERNAME
           })
           .then(function(group) {
             assert.strictEqual(group.name, 'Bob');
-            assert.strictEqual(group.uri, groupUri);
-            assert.strictEqual(group.lcUri, groupUri.toLowerCase());
+            assert.strictEqual(group.uri, 'Bob');
+            assert.strictEqual(group.lcUri, 'bob');
             return securityDescriptorService.getForGroupUser(group._id, null);
           })
           .then(function(securityDescriptor) {
