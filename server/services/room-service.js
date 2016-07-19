@@ -749,7 +749,7 @@ function deleteRoom(troupe) {
 
 // This is the new way to add any type of room to a group and should replace
 // all the types of room creation except one-to-ones
-function upsertGroupRoom(user, group, roomInfo, securityDescriptor, options) {
+function createGroupRoom(user, group, roomInfo, securityDescriptor, options) {
   options = options || {}; // options.tracking
   var uri = roomInfo.uri;
   var topic = roomInfo.topic;
@@ -789,21 +789,23 @@ function upsertGroupRoom(user, group, roomInfo, securityDescriptor, options) {
     sd: securityDescriptor
   };
 
+  var room;
+
   return mongooseUtils.upsert(persistence.Troupe, { lcUri: lcUri }, {
       $setOnInsert: insertData
     })
-    .spread(function(room, updatedExisting) {
+    .spread(function(_room, updatedExisting) {
+      // bind & tap both get too limiting, so just storing room here
+      room = _room;
       if (updatedExisting) {
-        /* Somehow someone beat us to it */
         throw new StatusError(409);
       }
-      return room;
     })
-    .tap(function(room) {
+    .then(function() {
       var flags = userDefaultFlagsService.getDefaultFlagsForUser(user);
       return roomMembershipService.addRoomMember(room._id, user._id, flags);
     })
-    .tap(function(room) {
+    .then(function() {
       // Send the created room notification
       emailNotificationService.createdRoomNotification(user, room) // send an email to the room's owner
         .catch(function(err) {
@@ -818,6 +820,30 @@ function upsertGroupRoom(user, group, roomInfo, securityDescriptor, options) {
       });
 
       return uriLookupService.reserveUriForTroupeId(room._id, uri);
+    })
+    .then(function() {
+      if (room.sd.type === 'GH_REPO' && options.runPostGitHubRoomCreationTasks) {
+        /*
+        This should only ever be true when creating the default room of a
+        GH_REPO backed group. Once we move repo room creation over to this API
+        endpoint it will be true in those cases as well.
+        */
+        // TODO: what do we make githubType and security?
+        // doPostGitHubRoomCreationTasks doesn't use either anymore
+        var githubType = null;
+        var security = null;
+        // options can be addBadge and skipPostCreationSteps
+        return doPostGitHubRoomCreationTasks(room, user, githubType, security, options);
+      }
+    })
+    .then(function(postCreationResults) {
+      // mimicking createRoomByUri's response here
+      var hookCreationFailedDueToMissingScope = postCreationResults && postCreationResults.hookCreationFailedDueToMissingScope;
+      return {
+        troupe: room,
+        didCreate: true, // would have 409'd otherwise
+        hookCreationFailedDueToMissingScope: hookCreationFailedDueToMissingScope
+      };
     });
 }
 
@@ -833,7 +859,7 @@ module.exports = {
   findBanByUsername: findBanByUsername,
   searchRooms: searchRooms,
   deleteRoom: deleteRoom,
-  upsertGroupRoom: upsertGroupRoom,
+  createGroupRoom: createGroupRoom,
   testOnly: {
     updateUserDateAdded: updateUserDateAdded,
     createRoomForGitHubUri: createRoomForGitHubUri,
