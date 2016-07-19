@@ -70,7 +70,7 @@ function extendStatusError(statusCode, options) {
 function applyAutoHooksForRepoRoom(user, troupe) {
   validate.expect(user, 'user is required');
   validate.expect(troupe, 'troupe is required');
-  validate.expect(troupe.githubType === 'REPO', 'Auto hooks can only be used on repo rooms. This room is a '+ troupe.githubType);
+  validate.expect(securityDescriptorUtils.isType('GH_REPO', troupe), 'Auto hooks can only be used on repo rooms. This room is a '+ troupe.githubType);
 
   logger.info("Requesting autoconfigured integrations");
 
@@ -94,10 +94,12 @@ function applyAutoHooksForRepoRoom(user, troupe) {
 
 }
 
-function doPostGitHubRoomCreationTasks(troupe, user, githubType, security, options) {
+function doPostGitHubRoomCreationTasks(troupe, user, options) {
   var uri = troupe.uri;
   if (!user) return; // Can this ever happen?
 
+  // TODO: remove this as it is never set anymore and the new create room API
+  // opts itsef into this function rather than out.
   if (options.skipPostCreationSteps) return;
 
   if (!securityDescriptorUtils.isType('GH_REPO', troupe)) return;
@@ -279,7 +281,7 @@ function createRoomForGitHubUri(user, uri, options) {
 
           if (updateExisting) return;
 
-          return doPostGitHubRoomCreationTasks(troupe, user, githubType, security, options);
+          return doPostGitHubRoomCreationTasks(troupe, user, options);
         })
         .then(function(postCreationResults) {
           /* Finally, return the results to the user */
@@ -749,7 +751,7 @@ function deleteRoom(troupe) {
 
 // This is the new way to add any type of room to a group and should replace
 // all the types of room creation except one-to-ones
-function upsertGroupRoom(user, group, roomInfo, securityDescriptor, options) {
+function createGroupRoom(user, group, roomInfo, securityDescriptor, options) {
   options = options || {}; // options.tracking
   var uri = roomInfo.uri;
   var topic = roomInfo.topic;
@@ -789,21 +791,23 @@ function upsertGroupRoom(user, group, roomInfo, securityDescriptor, options) {
     sd: securityDescriptor
   };
 
+  var room;
+
   return mongooseUtils.upsert(persistence.Troupe, { lcUri: lcUri }, {
       $setOnInsert: insertData
     })
-    .spread(function(room, updatedExisting) {
+    .spread(function(_room, updatedExisting) {
+      // bind & tap both get too limiting, so just storing room here
+      room = _room;
       if (updatedExisting) {
-        /* Somehow someone beat us to it */
         throw new StatusError(409);
       }
-      return room;
     })
-    .tap(function(room) {
+    .then(function() {
       var flags = userDefaultFlagsService.getDefaultFlagsForUser(user);
       return roomMembershipService.addRoomMember(room._id, user._id, flags);
     })
-    .tap(function(room) {
+    .then(function() {
       // Send the created room notification
       emailNotificationService.createdRoomNotification(user, room) // send an email to the room's owner
         .catch(function(err) {
@@ -818,6 +822,26 @@ function upsertGroupRoom(user, group, roomInfo, securityDescriptor, options) {
       });
 
       return uriLookupService.reserveUriForTroupeId(room._id, uri);
+    })
+    .then(function() {
+      if (room.sd.type === 'GH_REPO' && options.runPostGitHubRoomCreationTasks) {
+        /*
+        This should only ever be true when creating the default room of a
+        GH_REPO backed group. Once we move repo room creation over to this API
+        endpoint it will be true in those cases as well.
+        */
+        // options can be addBadge
+        return doPostGitHubRoomCreationTasks(room, user, options);
+      }
+    })
+    .then(function(postCreationResults) {
+      // mimicking createRoomByUri's response here
+      var hookCreationFailedDueToMissingScope = postCreationResults && postCreationResults.hookCreationFailedDueToMissingScope;
+      return {
+        troupe: room,
+        didCreate: true, // would have 409'd otherwise
+        hookCreationFailedDueToMissingScope: hookCreationFailedDueToMissingScope
+      };
     });
 }
 
@@ -833,7 +857,7 @@ module.exports = {
   findBanByUsername: findBanByUsername,
   searchRooms: searchRooms,
   deleteRoom: deleteRoom,
-  upsertGroupRoom: upsertGroupRoom,
+  createGroupRoom: createGroupRoom,
   testOnly: {
     updateUserDateAdded: updateUserDateAdded,
     createRoomForGitHubUri: createRoomForGitHubUri,
