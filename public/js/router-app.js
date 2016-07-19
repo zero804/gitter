@@ -27,6 +27,7 @@ var repoModels = require('collections/repos');
 var ReposCollection = repoModels.ReposCollection;
 var groupModels = require('collections/groups');
 var CommunityCreateModel = require('views/community-create/community-create-model');
+var CreateRoomModel = require('views/modals/create-room-view-v2-model');
 
 var AppLayout = require('views/layouts/app-layout');
 var LoadingView = require('views/app/loading-view');
@@ -456,6 +457,7 @@ onready(function() {
     routes: {
       // TODO: get rid of the pipes
       '': 'hideModal',
+      'createroomv2': 'createroomv2',
       'createcustomroom': 'createcustomroom',
       'createcustomroom/:name': 'createcustomroom',
       'createreporoom': 'createreporoom',
@@ -520,6 +522,42 @@ onready(function() {
         appLayout.dialogRegion.show(new confirmRepoRoomView.Modal({
           uri: uri,
         }));
+      });
+    },
+
+    createroomv2: function() {
+      var getSuitableGroupId = function() {
+        var groupId = false;
+
+        var slimCurrentTroupe = context.troupe();
+        var currentTroupe = troupeCollections.troupes.get(slimCurrentTroupe.get('id'));
+        var menuBarGroup = appLayout.getRoomMenuModel().getCurrentGroup();
+        if(menuBarGroup) {
+          groupId = menuBarGroup.get('id');
+        }
+        else if(currentTroupe) {
+          groupId = currentTroupe.get('groupId');
+        }
+
+        return groupId;
+      };
+
+      initializeAdminGroupsCollection();
+
+      if(repoCollection.length === 0) {
+        repoCollection.fetch();
+      }
+
+      require.ensure(['views/modals/create-room-view-v2'], function(require) {
+        var createRoomView = require('views/modals/create-room-view-v2');
+        var modal = new createRoomView.Modal({
+          model: new CreateRoomModel(),
+          initialGroupId: getSuitableGroupId(),
+          groupsCollection: adminGroupsCollection,
+          repoCollection: repoCollection
+        });
+
+        appLayout.dialogRegion.show(modal);
       });
     },
 
