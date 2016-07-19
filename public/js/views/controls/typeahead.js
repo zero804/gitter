@@ -100,10 +100,6 @@ var TypeaheadView = Marionette.ItemView.extend({
 
     var matches = this.collection.filter(predicate);
     if(matches.length === 0) return;
-    if(matches.length === 1) {
-      this.dropdown.setActive(matches[0]);
-      return;
-    }
 
     this.dropdown.setActive(matches[0]);
   },

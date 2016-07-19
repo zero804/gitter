@@ -1,0 +1,169 @@
+
+.create-room-section() {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid @trpGrey;
+}
+
+
+.create-room-room-wrapper {
+  display: flex;
+}
+
+.create-room-group-select-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.create-room-name-select-wrapper  {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.create-room-room-divider {
+  margin-top: 1.5rem;
+  margin-left: 1rem;
+  margin-right: 1rem;
+  font-size: 3rem;
+}
+
+.create-room-group-select-label,
+.create-room-name-select-label {
+  text-transform: uppercase;
+}
+
+.create-room-group-input {
+  margin-bottom: 1rem;
+
+  & .gtrDDButton {
+    display: flex;
+    align-items: center;
+    width: 100%;
+
+    &:before {
+      top: 50%;
+      right: 20px;
+      transform: translateY(-25%);
+    }
+  }
+  & .gtrInput {
+    width: 100%;
+    margin-bottom: 0;
+  }
+}
+
+.create-room-create-community-link {
+  display: flex;
+  align-items: center;
+  min-height: 5rem;
+}
+
+.create-room-create-community-icon {
+  font-size: 3rem;
+}
+
+.create-room-name-input-wrapper {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.create-room-name-input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 3.2rem;
+
+  margin-bottom: 0;
+  padding: 0px .9rem;
+
+  background-color: fade(@trpGrey, 50%);
+  border: 1px solid @trpGrey;
+  box-shadow: none;
+  border-radius: 4px;
+  color: black;
+}
+
+.create-room-name-input-clear-button {
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  transform: translateY(-50%);
+
+  cursor: pointer;
+}
+
+.create-room-associated-github-project-link {
+  display: flex;
+  align-items: center;
+  min-height: 5rem;
+}
+
+.create-room-associated-github-project-icon {
+  .create-room-create-community-icon();
+  margin-right: 1rem;
+}
+
+
+
+.create-room-security-section {
+  .create-room-section();
+}
+
+.create-room-security-list {
+  margin-left: 0;
+  list-style: none;
+}
+
+.create-room-security-list-item {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 2rem;
+}
+
+.create-room-security-list-item-radio {
+  margin-right: 1rem;
+}
+
+.create-room-security-list-item-label {
+  display: flex;
+}
+
+.create-room-security-list-item-icon {
+  width: 3rem;
+  font-size: 2.5rem;
+}
+
+.create-room-security-list-item-name {
+  font-weight: bold;
+}
+
+
+
+.create-room-detail-section {
+  .create-room-section();
+}
+
+.create-room-detail-option-list {
+  margin-left: 0;
+  list-style: none;
+}
+
+.create-room-detail-option-item {
+  margin-bottom: 1rem;
+}
+
+.create-room-detail-option-item-input {
+  width: 2.5rem;
+}
+
+.create-room-detail-option-item-label {
+
+}
+
+
+
+.create-room-availability-status-message {
+  margin-top: 2rem;
+  color: #ff0000;
+}
