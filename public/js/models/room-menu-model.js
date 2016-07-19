@@ -9,7 +9,6 @@ var RecentSearchesCollection = require('../collections/recent-searches');
 var SuggestedOrgCollection = require('../collections/org-suggested-rooms');
 var apiClient = require('components/apiClient');
 var context = require('utils/context');
-var appEvents = require('utils/appevents');
 
 var FilteredMinibarGroupCollection = require('../collections/filtered-minibar-group-collection');
 var FilteredRoomCollection = require('../collections/filtered-room-collection');
@@ -174,7 +173,7 @@ module.exports = Backbone.Model.extend({
     this.listenTo(this, 'change:state', this.onSwitchState, this);
     this.listenTo(this, 'change', _.throttle(this.save.bind(this), 1500));
     this.listenTo(context.troupe(), 'change:id', this.onRoomChange, this);
-    this.listenTo(appEvents, 'left-menu-menu-bar:activate', this.onMenuBarActivateRequest, this);
+    this.listenTo(this.bus, 'left-menu-menu-bar:activate', this.onMenuBarActivateRequest, this);
 
     this.onSwitchState(this, this.get('state'));
   },
@@ -273,7 +272,7 @@ module.exports = Backbone.Model.extend({
     if(newlyActiveModel) { newlyActiveModel.set('active', true); }
     if(!this.get('roomMenuIsPinned')) { this.set('panelOpenState', false); }
   },
-  
+
   onMenuBarActivateRequest: function(menuBarItemActivate) {
     menuBarItemActivate = menuBarItemActivate || {};
     this.set({
