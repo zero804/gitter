@@ -98,9 +98,8 @@ function doPostGitHubRoomCreationTasks(troupe, user, options) {
   var uri = troupe.uri;
   if (!user) return; // Can this ever happen?
 
-  // TODO: remove this once we only have one create room in group modal as
-  // options.runPostGitHubRoomCreationTasks will replace
-  // options.skipPostCreationSteps. opt in versus negated opt out
+  // TODO: remove this as it is never set anymore and the new create room API
+  // opts itsef into this function rather than out.
   if (options.skipPostCreationSteps) return;
 
   if (!securityDescriptorUtils.isType('GH_REPO', troupe)) return;
@@ -831,7 +830,7 @@ function createGroupRoom(user, group, roomInfo, securityDescriptor, options) {
         GH_REPO backed group. Once we move repo room creation over to this API
         endpoint it will be true in those cases as well.
         */
-        // options can be addBadge and skipPostCreationSteps
+        // options can be addBadge
         return doPostGitHubRoomCreationTasks(room, user, options);
       }
     })
