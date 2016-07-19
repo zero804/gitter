@@ -121,7 +121,13 @@ module.exports = CommunityCreateBaseStepView.extend({
       var defaultRoomName = results && results.defaultRoom && results.defaultRoom.name;
       var defaultRoomUri = results && results.defaultRoom && results.defaultRoom.uri;
 
+      // Move to the default room
       appEvents.trigger('navigation', '/' + defaultRoomUri, 'chat', defaultRoomName);
+      // Select the new community in the new left menu
+      appEvents.trigger('left-menu-menu-bar:activate', {
+        state: 'org',
+        selectedOrgName: results.name
+      });
       // Hide create community
       //communityCreateModel.set('active', false);
       communityCreateModel.clear().set(communityCreateModel.defaults);
