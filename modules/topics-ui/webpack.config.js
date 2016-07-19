@@ -1,11 +1,12 @@
 "use strict";
 
 /*
- This config is likely to chage and be broken into
+ This config is likely to change and be broken into
  - server
  - client
-managed by a gulp build
-its good enough for now however to have everything in one file
+
+  managed by a gulp build
+  its good enough for now however to have everything in one file
 */
 
 var path = require('path');
