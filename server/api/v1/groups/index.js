@@ -89,8 +89,7 @@ module.exports = {
           // only github repo based rooms have the default room automatically
           // integrated with github
           runPostGitHubRoomCreationTasks: groupOptions.type === 'GH_REPO',
-          addBadge: !!req.body.addBadge,
-          skipPostCreationSteps: !!req.body.skipPostCreationSteps
+          addBadge: !!req.body.addBadge
         };
 
         return groupWithPolicyService.createRoom(roomOptions);
