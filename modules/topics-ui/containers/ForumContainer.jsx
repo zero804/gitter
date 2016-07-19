@@ -1,6 +1,4 @@
 var react = require('react');
-var backbone = require('backbone');
-var underscore = require('underscore');
 
 module.exports = react.createClass({
   render(){
