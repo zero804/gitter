@@ -168,6 +168,7 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
 
 router.get('/:roomPart1/topics',
   identifyRoute('org-base-topic'),
+  featureToggles,
   function(req, res, next){
     return topicsRenderers.renderForum(req, res, next);
   }
