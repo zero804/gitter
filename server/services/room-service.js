@@ -94,7 +94,7 @@ function applyAutoHooksForRepoRoom(user, troupe) {
 
 }
 
-function doPostGitHubRoomCreationTasks(troupe, user, githubType, security, options) {
+function doPostGitHubRoomCreationTasks(troupe, user, options) {
   var uri = troupe.uri;
   if (!user) return; // Can this ever happen?
 
@@ -282,7 +282,7 @@ function createRoomForGitHubUri(user, uri, options) {
 
           if (updateExisting) return;
 
-          return doPostGitHubRoomCreationTasks(troupe, user, githubType, security, options);
+          return doPostGitHubRoomCreationTasks(troupe, user, options);
         })
         .then(function(postCreationResults) {
           /* Finally, return the results to the user */
@@ -831,12 +831,8 @@ function createGroupRoom(user, group, roomInfo, securityDescriptor, options) {
         GH_REPO backed group. Once we move repo room creation over to this API
         endpoint it will be true in those cases as well.
         */
-        // TODO: what do we make githubType and security?
-        // doPostGitHubRoomCreationTasks doesn't use either anymore
-        var githubType = null;
-        var security = null;
         // options can be addBadge and skipPostCreationSteps
-        return doPostGitHubRoomCreationTasks(room, user, githubType, security, options);
+        return doPostGitHubRoomCreationTasks(room, user, options);
       }
     })
     .then(function(postCreationResults) {
