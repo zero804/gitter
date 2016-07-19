@@ -48,7 +48,7 @@ function acceptInvite(user, secret) {
       var room = this.room;
       var invite = this.invite;
       stats.event("invite_accepted", {
-        user: user && (user.id || user._id),
+        userId: user && (user.id || user._id),
         troupeId: room && (room.id || room._id),
         type: invite.type,
         uri: room && room.uri
@@ -72,7 +72,7 @@ function acceptInvite(user, secret) {
       var invite = this.invite;
 
       stats.event("invite_rejected", {
-        user: user && (user.id || user._id),
+        userId: user && (user.id || user._id),
         troupeId: room && (room.id || room._id),
         type: invite && invite.type,
         uri: room && room.uri
