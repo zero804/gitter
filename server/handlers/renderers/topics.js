@@ -1,5 +1,7 @@
 "use strict";
+
 var StatusError = require('statuserror');
+var fonts       = require('../../web/fonts');
 
 function renderForum(req, res){
 
@@ -9,6 +11,8 @@ function renderForum(req, res){
   res.render('topics/forum', {
     layout: 'topics-layout',
     groupName: req.params.roomPart1,
+    hasCachedFonts: fonts.hasCachedFonts(req.cookies),
+    fonts: fonts.getFonts(),
   });
 }
 
