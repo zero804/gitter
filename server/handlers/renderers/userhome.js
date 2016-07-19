@@ -65,7 +65,7 @@ function renderMobileUserHome(req, res, next) {
     res.render('mobile/mobile-userhome', {
       hasCachedFonts: fonts.hasCachedFonts(req.cookies),
       fonts: fonts.getFonts(),
-      troupeName: req.uriContext.uri,
+      troupeName: troupeContext.troupe && troupeContext.troupe.uri || "Home",
       troupeContext: troupeContext,
       agent: req.headers['user-agent'],
       user: req.user
