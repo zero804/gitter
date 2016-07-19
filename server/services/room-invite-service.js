@@ -55,7 +55,7 @@ function createInviteForNewUser(room, invitingUser, type, externalId, emailAddre
         userId: invitingUser && (invitingUser.id || invitingUser._id),
         troupeId: room && (room.id || room._id),
         type: type,
-        uri: room.uri
+        uri: room && room.uri
       });
 
       return emailNotificationService.sendInvitation(invitingUser, invite, room);
