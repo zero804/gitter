@@ -1,8 +1,16 @@
-var react = require('react');
+'use strict';
 
-module.exports = react.createClass({
-  render(){
+var React = require('react');
+
+module.exports = React.createClass({
+  displayName: 'ForumContainer',
+  propTypes: {
+    groupName: React.PropTypes.string
+  },
+  render() {
     const { groupName } = this.props;
-    return(<h1>Welcome to { groupName }'s topics</h1>);
+    return (
+      <h1>Welcome to { groupName }s topics</h1>
+    );
   }
 });
