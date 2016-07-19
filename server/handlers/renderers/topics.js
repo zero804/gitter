@@ -1,7 +1,10 @@
 "use strict";
 
 function renderForum(req, res){
-  res.sendStatus(200);
+  res.render('topics/forum', {
+    layout: 'topics-layout',
+    groupName: req.params.roomPart1,
+  });
 }
 
 module.exports = {
