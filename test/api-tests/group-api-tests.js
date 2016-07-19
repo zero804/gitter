@@ -113,6 +113,7 @@ describe('group-api', function() {
       .send({
         name: 'Repo Group',
         uri: 'Repo-Group',
+        addBadge: true,
         security: {
           type: 'GH_REPO',
           linkPath: fixtureLoader.GITTER_INTEGRATION_REPO_FULL

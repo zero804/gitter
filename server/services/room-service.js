@@ -70,7 +70,7 @@ function extendStatusError(statusCode, options) {
 function applyAutoHooksForRepoRoom(user, troupe) {
   validate.expect(user, 'user is required');
   validate.expect(troupe, 'troupe is required');
-  validate.expect(troupe.githubType === 'REPO', 'Auto hooks can only be used on repo rooms. This room is a '+ troupe.githubType);
+  validate.expect(securityDescriptorUtils.isType('GH_REPO', troupe), 'Auto hooks can only be used on repo rooms. This room is a '+ troupe.githubType);
 
   logger.info("Requesting autoconfigured integrations");
 
@@ -98,6 +98,9 @@ function doPostGitHubRoomCreationTasks(troupe, user, githubType, security, optio
   var uri = troupe.uri;
   if (!user) return; // Can this ever happen?
 
+  // TODO: remove this once we only have one create room in group modal as
+  // options.runPostGitHubRoomCreationTasks will replace
+  // options.skipPostCreationSteps. opt in versus negated opt out
   if (options.skipPostCreationSteps) return;
 
   if (!securityDescriptorUtils.isType('GH_REPO', troupe)) return;
