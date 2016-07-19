@@ -102,8 +102,9 @@ GroupWithPolicyService.prototype.createRoom = secureMethod([allowAdmin], functio
   return ensureAccessAndFetchRoomInfo(user, group, options)
     .spread(function(roomInfo, securityDescriptor) {
       debug("Upserting %j", roomInfo);
-      return roomService.upsertGroupRoom(user, group, roomInfo, securityDescriptor, {
-        tracking: options.tracking
+      return roomService.createGroupRoom(user, group, roomInfo, securityDescriptor, {
+        tracking: options.tracking,
+        runPostGitHubRoomCreationTasks: options.runPostGitHubRoomCreationTasks
       });
     });
 });
