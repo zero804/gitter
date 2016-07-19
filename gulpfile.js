@@ -534,7 +534,8 @@ var cssWebStyleBuilder = styleBuilder([
   'public/less/userhome.less',
   'public/less/402.less',
   'public/less/org-page.less',
-  'public/less/early-bird.less'
+  'public/less/early-bird.less',
+  'public/less/topics.less',
 ], {
   dest: cssDestDir,
   watchGlob: cssWatchGlob,
