@@ -8,6 +8,7 @@ var debug = require('debug')('gitter:app:group-with-policy-service');
 var roomService = require('./room-service');
 var secureMethod = require('../utils/secure-method');
 var validateRoomName = require('gitter-web-validators/lib/validate-room-name');
+var groupService = require('gitter-web-groups/lib/group-service');
 
 /**
  * @private
@@ -108,5 +109,8 @@ GroupWithPolicyService.prototype.createRoom = secureMethod([allowAdmin], functio
     });
 });
 
+GroupWithPolicyService.prototype.setAvatar = secureMethod([allowAdmin], function(url) {
+  groupService.setAvatarForGroup(this.group._id, url);
+});
 
 module.exports = GroupWithPolicyService;
