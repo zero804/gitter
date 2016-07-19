@@ -1,7 +1,7 @@
 "use strict";
 
 var StatusError = require('statuserror');
-var fonts       = require('../../web/fonts');
+var fonts = require('../../web/fonts');
 
 function renderForum(req, res){
 
