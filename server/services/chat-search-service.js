@@ -110,6 +110,7 @@ function performQuery(troupeId, parsedQuery, options) {
 
   var queryRequest = {
     size: options.limit || 10,
+    from: options.skip,
     timeout: 500,
     index: 'gitter-primary',
     type: 'chat',
@@ -136,7 +137,7 @@ function performQuery(troupeId, parsedQuery, options) {
 
   var startTime = Date.now();
 
-  return Promise.resolve(client.search(queryRequest))
+  return client.search(queryRequest)
     .then(function(response) {
       stats.responseTime('chat.search.exec', Date.now() - startTime);
 

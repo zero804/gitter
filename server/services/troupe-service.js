@@ -15,6 +15,15 @@ function findByUri(uri, callback) {
     .nodeify(callback);
 }
 
+function findByUris(uris) {
+  if (!uris.length) return [];
+  var lcUris = uris.map(function(f) { return f.toLowerCase(); });
+
+  return persistence.Troupe.find({ lcUri: { $in: lcUris } })
+    .lean()
+    .exec();
+}
+
 function findByIds(ids, callback) {
   return mongooseUtils.findByIds(persistence.Troupe, ids, callback);
 }
@@ -81,26 +90,26 @@ function checkGitHubTypeForUri(uri, githubType) {
     });
 }
 
-function findChildRoomsForOrg(org, opts) {
-  if (!org) return Promise.resolve([]);
-  opts = opts || {};
-
-  var query = { lcOwner: org.toLowerCase() };
-  if (opts.security) query.security = opts.security;
+function findPublicRoomsByTypeAndLinkPaths(type, linkPaths) {
+  var query = {
+    'sd.type': type,
+    'sd.linkPath': { $in: linkPaths },
+    'sd.public': true
+  };
 
   return persistence.Troupe.find(query)
-    .sort({ userCount: 'desc' })
-    .exec();
+    .lean()
+    .exec()
 }
-
 
 module.exports = {
   findByUri: findByUri,
+  findByUris: Promise.method(findByUris),
   findById: findById,
   checkIdExists: checkIdExists,
   findByIds: findByIds,
   findByIdsLean: findByIdsLean,
   findByIdLeanWithMembership: findByIdLeanWithMembership,
   checkGitHubTypeForUri: checkGitHubTypeForUri,
-  findChildRoomsForOrg: findChildRoomsForOrg,
+  findPublicRoomsByTypeAndLinkPaths: findPublicRoomsByTypeAndLinkPaths
 };

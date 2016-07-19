@@ -18,7 +18,11 @@ module.exports = function(underTest) {
 
     afterEach(function(done) {
       async.each(tokens, function(token, callback) {
-        underTest.deleteToken(token, callback);
+        if (token) {
+          underTest.deleteToken(token, callback);
+        } else {
+          callback();
+        }
       }, done);
     });
 

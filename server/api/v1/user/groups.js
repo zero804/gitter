@@ -12,7 +12,13 @@ module.exports = {
   index: function(req) {
     if(!req.user) throw new StatusError(401);
 
-    return restful.serializeGroupsForUserId(req.user._id);
+    var lean = req.query.lean && parseInt(req.query.lean, 10) || false;
+
+    if (req.query.type === 'admin') {
+      return restful.serializeAdminGroupsForUser(req.user, { lean: lean })
+    }
+    
+    return restful.serializeGroupsForUserId(req.user._id, { lean: lean });
   },
 
   load: function(req, id) {

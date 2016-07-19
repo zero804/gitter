@@ -7,6 +7,10 @@ var groupService = require('gitter-web-groups/lib/group-service');
 var restSerializer = require('../../../serializers/rest-serializer');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var GroupWithPolicyService = require('../../../services/group-with-policy-service');
+var RoomWithPolicyService = require('../../../services/room-with-policy-service');
+var inviteValidation = require('gitter-web-invites/lib/invite-validation');
+
+var MAX_BATCHED_INVITES = 100;
 
 module.exports = {
   id: 'group',
@@ -16,7 +20,13 @@ module.exports = {
       throw new StatusError(401);
     }
 
-    return restful.serializeGroupsForUserId(req.user._id);
+    var lean = req.query.lean && parseInt(req.query.lean, 10) || false;
+
+    if (req.query.type === 'admin') {
+      return restful.serializeAdminGroupsForUser(req.user, { lean: lean })
+    }
+
+    return restful.serializeGroupsForUserId(req.user._id, { lean: lean });
   },
 
   create: function(req) {
@@ -26,7 +36,7 @@ module.exports = {
       throw new StatusError(401);
     }
 
-    if (!req.authInfo || !req.authInfo.clientKey === 'web-internal') {
+    if (!req.authInfo || req.authInfo.client.clientKey !== 'web-internal') {
       // This is a private API
       throw new StatusError(404);
     }
@@ -40,7 +50,25 @@ module.exports = {
       groupOptions.linkPath = req.body.security.linkPath ? String(req.body.security.linkPath) : undefined;
     }
 
+    var invitesInput;
+    if (req.body.invites && req.body.invites.length) {
+      if (req.body.invites.length > MAX_BATCHED_INVITES) {
+        throw new StatusError(400, 'Too many batched invites.');
+      }
+
+      // This could throw, but it is the basic user-input validation that would
+      // have failed if the frontend didn't call the invite checker API like it
+      // should have anyway.
+      invitesInput = req.body.invites.map(function(input) {
+        return inviteValidation.parseAndValidateInput(input);
+      });
+    } else {
+      // invites are optional
+      invitesInput = [];
+    }
+
     var group;
+    var room;
 
     return groupService.createGroup(user, groupOptions)
       .then(function(_group) {
@@ -62,13 +90,24 @@ module.exports = {
 
         return groupWithPolicyService.createRoom(roomOptions);
       })
-      .then(function(room) {
+      .then(function(_room) {
+        room = _room;
+        return policyFactory.createPolicyForRoomId(req.user, room._id);
+      })
+      .then(function(userRoomPolicy) {
+        var roomWithPolicyService = new RoomWithPolicyService(room, req.user, userRoomPolicy);
+        // Some of these can fail, but the errors will be caught and added to
+        // the report that the promise resolves to.
+        return roomWithPolicyService.createRoomInvitations(invitesInput);
+      })
+      .then(function(invitesReport) {
         var groupStrategy = new restSerializer.GroupStrategy();
         var troupeStrategy = new restSerializer.TroupeStrategy({
           currentUserId: req.user.id,
           includeTags: true,
           includePermissions: true,
-          includeProviders: true
+          includeProviders: true,
+          includeBackend: true
         });
 
         return Promise.join(

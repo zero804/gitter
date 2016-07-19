@@ -20,11 +20,12 @@ function unreadItemsGroupAdapter(groupCollection, troupesCollection) {
     var troupeIds = groupIndex[groupId];
     if (!troupeIds) {
       // Trivial case of the group no longer having any troupes
-      return { mentions: false, unreadItems: false, activity: false };
+      return { mentions: false, unreadItems: false, activity: false, allHidden: true };
     }
-    
+
     var hasActivity = false;
     var hasUnread = false;
+    var allHidden = true;
 
     for (var i = 0; i < troupeIds.length; i++) {
       var troupeId = troupeIds[i];
@@ -34,13 +35,17 @@ function unreadItemsGroupAdapter(groupCollection, troupesCollection) {
       // Use field accessors rather than `.get` for peformance
       var troupeAttributes = troupe.attributes;
 
+      if (troupeAttributes.lastAccessTime) {
+        allHidden = false;
+      }
+
       if (troupeAttributes.mentions) {
         // At least one room in this group has mentions,
         // so there's no point in checking the rest of the
         // rooms, since we know there are mentions.
         // Therefore, shortcut the loop and return that
         // the group has mentions.
-        return { mentions: true, unreadItems: false, activity: false };
+        return { mentions: true, unreadItems: false, activity: false, allHidden: false };
       }
 
       if (troupeAttributes.unreadItems) {
@@ -53,14 +58,14 @@ function unreadItemsGroupAdapter(groupCollection, troupesCollection) {
     }
 
     if (hasUnread) {
-      return { mentions: false, unreadItems: true, activity: false };
+      return { mentions: false, unreadItems: true, activity: false, allHidden: false };
     }
 
     if (hasActivity) {
-      return { mentions: false, unreadItems: false, activity: true };
+      return { mentions: false, unreadItems: false, activity: true, allHidden: false };
     }
-
-    return { mentions: false, unreadItems: false, activity: false };
+    
+    return { mentions: false, unreadItems: false, activity: false, allHidden: allHidden };
   }
 
   /**
@@ -205,6 +210,7 @@ function unreadItemsGroupAdapter(groupCollection, troupesCollection) {
   troupesCollection.on('change:activity', onModelChange);
   troupesCollection.on('change:unreadItems', onModelChange);
   troupesCollection.on('change:mentions', onModelChange);
+  troupesCollection.on('change:lastAccessTime', onModelChange);
 }
 
 module.exports = unreadItemsGroupAdapter;

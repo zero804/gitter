@@ -13,6 +13,7 @@ var graphSuggestions = require('gitter-web-suggestions');
 var cacheWrapper = require('gitter-web-cache-wrapper');
 var debug = require('debug')('gitter:app:suggestions');
 var logger = require('gitter-web-env').logger;
+var groupRoomSuggestions = require('gitter-web-groups/lib/group-room-suggestions');
 
 // the old github recommenders that find repos, to be filtered to rooms
 // var ownedRepos = require('./recommendations/owned-repos');
@@ -58,6 +59,15 @@ var HIGHLIGHTED_ROOMS = [
   }, {
     uri: 'angular-ui/ng-grid',
     localeLanguage: 'en',
+  }, {
+    uri: 'dev-ua/frontend-ua',
+    localeLanguage: 'ua',
+  }, {
+    uri: 'rus-speaking/android',
+    localeLanguage: 'ru',
+  }, {
+    uri: 'FreeCodeCamp/Espanol',
+    localeLanguage: 'es',
   }
 ];
 
@@ -67,16 +77,11 @@ function reposToRooms(repos) {
   // in later.
   repos = repos.slice(0, 100);
 
-  debug("start reposToRooms");
-  return Promise.all(_.map(repos, function(repo) {
-      return troupeService.findByUri(repo.uri);
-    }))
-    .then(function(rooms) {
-      debug("end reposToRooms");
+  var uris = _.map(repos, function(repo) {
+    return repo.uri;
+  });
 
-      // strip nulls
-      return _.filter(rooms);
-    });
+  return troupeService.findPublicRoomsByTypeAndLinkPaths('GH_REPO', uris);
 }
 
 // var ownedRepoRooms = Promise.method(function(options) {
@@ -148,8 +153,7 @@ var graphRooms = Promise.method(function(options) {
   var firstTen = existingRooms.slice(0, 10);
   return graphSuggestions.getSuggestionsForRooms(firstTen, language)
     .timeout(2000)
-    .then(function(suggestions) {
-      var roomIds = _.pluck(suggestions, 'roomId');
+    .then(function(roomIds) {
       return troupeService.findByIdsLean(roomIds);
     })
     .then(function(suggestedRooms) {
@@ -158,12 +162,15 @@ var graphRooms = Promise.method(function(options) {
       // (The siblingRooms step might just add them back in anyway which is why
       //  this is not a standard step in filterRooms())
       var orgTotals = {};
+
       _.remove(suggestedRooms, function(room) {
-        if (orgTotals[room.lcOwner] === undefined) {
-          orgTotals[room.lcOwner] = 0;
+        if (orgTotals[room.groupId]) {
+          orgTotals[room.groupId] += 1;
+        } else {
+          orgTotals[room.groupId] = 1;
         }
-        orgTotals[room.lcOwner] += 1;
-        return (orgTotals[room.lcOwner] > MAX_SUGGESTIONS_PER_ORG);
+
+        return (orgTotals[room.groupId] > MAX_SUGGESTIONS_PER_ORG);
       });
 
       if (debug.enabled) {
@@ -182,25 +189,27 @@ var graphRooms = Promise.method(function(options) {
 
 var siblingRooms = Promise.method(function(options) {
   var existingRooms = options.rooms;
+  var user = options.user;
 
-  if (!existingRooms || !existingRooms.length) {
+  if (!user || !existingRooms || !existingRooms.length) {
     return [];
   }
 
+  var userId = user._id;
+
   debug('checking siblingRooms');
 
-  var orgNames = _.uniq(_.pluck(existingRooms, 'lcOwner'));
-  return Promise.all(_.map(orgNames, function(orgName) {
-      return troupeService.findChildRoomsForOrg(orgName, {security: 'PUBLIC'});
-    }))
-    .then(function(arrays) {
-      var suggestedRooms = Array.prototype.concat.apply([], arrays);
+  var groupIds = _.pluck(existingRooms, 'groupId').filter(function(groupId) {
+    return !!groupId;
+  });
 
+  return groupRoomSuggestions.findUnjoinedRoomsInGroups(userId, _.uniq(groupIds))
+    .then(function(results) {
       if (debug.enabled) {
-        debug("siblingRooms", _.pluck(suggestedRooms, "uri"));
+        debug("siblingRooms", _.pluck(results, "uri"));
       }
 
-      return suggestedRooms;
+      return results;
     });
 });
 
@@ -215,14 +224,14 @@ function hilightedRooms(options) {
     return (roomLang === 'en' || roomLang === language);
   });
 
-  return Promise.all(_.map(filtered, function(roomInfo) {
-      return troupeService.findByUri(roomInfo.uri);
-    }))
+  var uris = _.map(filtered, function(highlighted) {
+    return highlighted.uri;
+  });
+
+  return troupeService.findByUris(uris)
     .then(function(suggestedRooms) {
-      if (suggestedRooms.length) {
-        if (debug.enabled) {
-          debug("hilightedRooms", _.pluck(suggestedRooms, "uri"));
-        }
+      if (debug.enabled) {
+        debug("hilightedRooms", _.pluck(suggestedRooms, "uri"));
       }
 
       return suggestedRooms;
@@ -268,23 +277,19 @@ var recommenders = [
   // doubtful about the potential network effect here.
   //ownedRepoRooms,
   //watchedRepoRooms,
-
   starredRepoRooms,
   graphRooms,
   siblingRooms,
   hilightedRooms
 ];
 
-/*
-
-options can have the following and they are all optional
-* user
-* rooms (array)
-* language (defaults to 'en')
-
-The plugins can just skip themselves if options doesn't contain what they need.
-
-*/
+/**
+ * options can have the following and they are all optional
+ * - user
+ * - rooms (array)
+ * - language (defaults to 'en')
+ * The plugins can just skip themselves if options doesn't contain what they need.
+ */
 function findSuggestionsForRooms(options) {
   var existingRooms = options.rooms || [];
   var language = options.language || 'en';
@@ -298,7 +303,7 @@ function findSuggestionsForRooms(options) {
     return room.oneToOne !== true;
   });
 
-  var filterSuggestions = function(results) {
+  function filterSuggestions(results) {
     var filtered = filterRooms(results, existingRooms);
     // Add all the rooms we've found so far to the rooms used by subsequent
     // lookups. This means that a new github user that hasn't joined any rooms
@@ -309,26 +314,31 @@ function findSuggestionsForRooms(options) {
     // better than just serving hilighted rooms.
     options.rooms = existingRooms.concat(filtered);
     return filtered;
-  };
+  }
+
   return promiseUtils.waterfall(recommenders, [options], filterSuggestions, NUM_SUGGESTIONS);
 }
-exports.findSuggestionsForRooms = findSuggestionsForRooms;
 
+/**
+ * Returns rooms for a user
+ * @private
+ */
 function findRoomsByUserId(userId) {
   return roomMembershipService.findRoomIdsForUser(userId)
     .then(function(roomIds) {
       return troupeService.findByIdsLean(roomIds, {
         uri: 1,
-        lcOwner: 1,
+        groupId: 1,
         lang: 1,
         oneToOne: 1
       });
     });
 }
 
-// cache by userId
-exports.findSuggestionsForUserId = cacheWrapper('findSuggestionsForUserId',
-  function(userId) {
+/**
+ * Find some suggestions for the current user
+ */
+function findSuggestionsForUserId(userId) {
     return Promise.all([
       userService.findById(userId),
       findRoomsByUserId(userId),
@@ -341,4 +351,12 @@ exports.findSuggestionsForUserId = cacheWrapper('findSuggestionsForUserId',
         language: language
       });
     })
-  });
+  }
+
+module.exports = {
+  findSuggestionsForUserId: cacheWrapper('findSuggestionsForUserId', findSuggestionsForUserId),
+  findSuggestionsForRooms: findSuggestionsForRooms,
+  testOnly: {
+    HIGHLIGHTED_ROOMS: HIGHLIGHTED_ROOMS
+  }
+};

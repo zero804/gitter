@@ -21,7 +21,7 @@ module.exports = {
       throw new StatusError(401);
     }
 
-    if (!req.authInfo || !req.authInfo.clientKey === 'web-internal') {
+    if (!req.authInfo || req.authInfo.client.clientKey !== 'web-internal') {
       // This is a private API
       throw new StatusError(404);
     }
@@ -30,7 +30,7 @@ module.exports = {
     var topic = req.body.topic ? String(req.body.topic) : undefined;
     var createOptions = { name: name, topic: topic };
     if (req.body.security) {
-      // PUBLIC, PRIVATE or INHERITED
+      // PUBLIC or PRIVATE
       createOptions.security = req.body.security.security ? String(req.body.security.security) : undefined;
       assert(createOptions.security, 'security required');
 

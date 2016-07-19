@@ -10,21 +10,17 @@ var userSort = require('../../../public/js/utils/user-sort');
 var isolateBurst = require('gitter-web-shared/burst/isolate-burst-array');
 var unreadItemService = require('../../services/unread-items');
 var _ = require('lodash');
-
-var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
-var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 var getSubResources = require('./sub-resources');
 var fixMongoIdQueryParam = require('../../web/fix-mongo-id-query-param');
 var fonts = require('../../web/fonts');
 var generateRightToolbarSnapshot = require('../snapshots/right-toolbar-snapshot');
-
-var troupeService = require('../../services/troupe-service');
 var roomMembershipService = require('../../services/room-membership-service');
-
+var getHeaderViewOptions = require('gitter-web-shared/templates/get-header-view-options');
 
 /* How many chats to send back */
 var INITIAL_CHAT_COUNT = 50;
 var ROSTER_SIZE = 25;
+
 
 function renderChat(req, res, options, next) {
   var troupe = req.uriContext.troupe;
@@ -53,14 +49,12 @@ function renderChat(req, res, options, next) {
     }, snapshotOptions);
 
     return Promise.all([
-        options.generateContext === false ? null : contextGenerator.generateTroupeContext(req, { snapshots: { chat: snapshotOptions }, permalinkChatId: aroundId }),
+        options.generateContext === false ? { } : contextGenerator.generateTroupeContext(req, { snapshots: { chat: snapshotOptions }, permalinkChatId: aroundId }),
         restful.serializeChatsForTroupe(troupe.id, userId, chatSerializerOptions),
         options.fetchEvents === false ? null : restful.serializeEventsForTroupe(troupe.id, userId),
         options.fetchUsers === false ? null : restful.serializeUsersForTroupe(troupe.id, userId, userSerializerOptions),
-        troupeService.checkGitHubTypeForUri(troupe.lcOwner || '', 'ORG'),
         generateRightToolbarSnapshot(req)
-      ]).spread(function (troupeContext, chats, activityEvents, users, ownerIsOrg, rightToolbarSnapshot) {
-
+      ]).spread(function (troupeContext, chats, activityEvents, users, rightToolbarSnapshot) {
         var initialChat = _.find(chats, function(chat) { return chat.initial; });
         var initialBottom = !initialChat;
         var githubLink;
@@ -75,7 +69,6 @@ function renderChat(req, res, options, next) {
 
         if (!user) classNames.push("logged-out");
 
-        var isPrivate = troupe.security !== "PUBLIC";
         var integrationsUrl;
 
         if (troupeContext && troupeContext.isNativeDesktopApp) {
@@ -94,11 +87,6 @@ function renderChat(req, res, options, next) {
         /* This is less than ideal way of checking if the user is the admin */
         var isAdmin = troupeContext.troupe && troupeContext.troupe.permissions && troupeContext.troupe.permissions.admin;
 
-        //add ownerIsOrg to the troupe model
-        troupeContext.troupe.ownerIsOrg = ownerIsOrg;
-        var orgName = getOrgNameFromTroupeName(troupeContext.troupe.name);
-        var orgPageHref = '/orgs/' + orgName + '/rooms/';
-
         var isRightToolbarPinned = snapshots && snapshots.rightToolbar && snapshots.rightToolbar.isPinned;
         if(isRightToolbarPinned === undefined) {
           isRightToolbarPinned = true;
@@ -107,39 +95,33 @@ function renderChat(req, res, options, next) {
         var renderOptions = _.extend({
             hasCachedFonts: fonts.hasCachedFonts(req.cookies),
             fonts: fonts.getFonts(),
-            isRepo: troupe.githubType === 'REPO',
+            isRepo: troupe.sd.type === 'GH_REPO', // Used by chat_toolbar patial
             bootScriptName: script,
             cssFileName: cssFileName,
             githubLink: githubLink,
             troupeName: req.uriContext.uri,
-            oneToOne: troupe.oneToOne,
+            oneToOne: troupe.oneToOne, // Used by the old left menu
             user: user,
             troupeContext: troupeContext,
             initialBottom: initialBottom,
             chats: chatsWithBurst,
             classNames: classNames.join(' '),
-            agent: req.headers['user-agent'],
             subresources: getSubResources(script),
-            isPrivate: isPrivate,
             activityEvents: activityEvents,
             users: users && users.sort(userSort),
             userCount: troupe.userCount,
             hasHiddenMembers: troupe.userCount > 25,
             integrationsUrl: integrationsUrl,
             isMobile: options.isMobile,
-            ownerIsOrg: ownerIsOrg,
-            orgPageHref: orgPageHref,
             roomMember: req.uriContext.roomMember,
             isRightToolbarPinned: isRightToolbarPinned,
 
             //Feature Switch Left Menu
             hasNewLeftMenu: req.fflip && req.fflip.has('left-menu'),
-
-          }, troupeContext && {
             troupeTopic: troupeContext.troupe.topic,
             premium: troupeContext.troupe.premium,
             troupeFavourite: troupeContext.troupe.favourite,
-            avatarSrcSet:  resolveRoomAvatarSrcSet({ uri: troupeContext.troupe.url }, 48),
+            headerView: getHeaderViewOptions(troupeContext.troupe),
             isAdmin: isAdmin,
             isNativeDesktopApp: troupeContext.isNativeDesktopApp
           }, options.extras);

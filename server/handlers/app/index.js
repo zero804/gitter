@@ -5,7 +5,6 @@ var logger = env.logger;
 var express = require('express');
 var mainFrameRenderer = require('../renderers/main-frame');
 var chatRenderer = require('../renderers/chat');
-var userNotSignedUpRenderer = require('../renderers/user-not-signed-up');
 var uriContextResolverMiddleware = require('../uri-context/uri-context-resolver-middleware');
 var recentRoomService = require('../../services/recent-room-service');
 var isPhoneMiddleware = require('../../web/middlewares/is-phone');
@@ -19,6 +18,8 @@ var url = require('url');
 var social = require('../social-metadata');
 var chatService = require('../../services/chat-service');
 var restSerializer = require("../../serializers/rest-serializer");
+var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
+var redirectErrorMiddleware = require('../uri-context/redirect-error-middleware');
 
 function saveRoom(req) {
   var userId = req.user && req.user.id;
@@ -31,7 +32,7 @@ function saveRoom(req) {
 
 function getSocialMetaDataForRoom(room, aroundId) {
     // TODO: change this to use policy
-    if (aroundId && room && room.security === 'PUBLIC') {
+    if (aroundId && room && securityDescriptorUtils.isPublic(room)) {
       // If this is a permalinked chat, load special social meta-data....
       return chatService.findByIdInRoom(room._id, aroundId)
         .then(function(chat) {
@@ -96,15 +97,7 @@ var mainFrameMiddlewarePipeline = [
       });
     }
   },
-  function (err, req, res, next) {
-    // TODO: this is probably not being used any more
-    if (err && err.userNotSignedUp && !req.isPhone) {
-      // TODO This page is in need of some serious love
-      userNotSignedUpRenderer.renderUserNotSignedUpMainFrame(req, res, next);
-      return;
-    }
-    return next(err);
-  }
+  redirectErrorMiddleware
 ];
 
 var chatMiddlewarePipeline = [
@@ -132,13 +125,7 @@ var chatMiddlewarePipeline = [
     }
 
   },
-  function (err, req, res, next) {
-    if (err && err.userNotSignedUp) {
-      userNotSignedUpRenderer.renderUserNotSignedUp(req, res, next);
-      return;
-    }
-    return next(err);
-  }
+  redirectErrorMiddleware
 ];
 
 var embedMiddlewarePipeline = [
@@ -155,7 +142,8 @@ var embedMiddlewarePipeline = [
     } else {
       chatRenderer.renderNotLoggedInEmbeddedChat(req, res, next);
     }
-  }
+  },
+  redirectErrorMiddleware
 ];
 
 var cardMiddlewarePipeline = [
@@ -163,11 +151,16 @@ var cardMiddlewarePipeline = [
   uriContextResolverMiddleware,
   timezoneMiddleware,
   function (req, res, next) {
-    if(!req.uriContext.troupe) return next(new StatusError(404));
-    if(req.uriContext.troupe.security !== 'PUBLIC') return next(new StatusError(403));
+    var troupe = req.uriContext.troupe;
+    
+    if(!troupe) return next(new StatusError(404));
+    if (!securityDescriptorUtils.isPublic(troupe)) {
+      return next(new StatusError(403));
+    }
     if(!req.query.at) return next(new StatusError(400));
     chatRenderer.renderChatCard(req, res, next);
-  }
+  },
+  redirectErrorMiddleware
 ];
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });

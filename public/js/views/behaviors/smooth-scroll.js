@@ -36,7 +36,7 @@ var Behavior = Marionette.Behavior.extend({
   // Trigger an event on the child of it's currently on screen
   decorateIfVisible: function() {
     this.view.children.each(function(child) {
-      if (this.viewportStatus(child.el) === 'visible') child.trigger('messageInViewport');
+      if (this.isElementVisible(child.el)) child.trigger('messageInViewport');
     }.bind(this));
   },
 
@@ -50,16 +50,14 @@ var Behavior = Marionette.Behavior.extend({
     this.queue = [];
 
     queue.forEach(function(child) {
-      if (this.viewportStatus(child.el) === 'visible') child.trigger('messageInViewport');
+      if (this.isElementVisible(child.el)) child.trigger('messageInViewport');
     }, this);
   },
 
   // Give an element tells you if it's on screen or above/below the fold
-  viewportStatus: function(el) {
+  isElementVisible: function(el) {
     var rect = el.getBoundingClientRect();
-    if (rect.top >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)) return 'visible';
-    if (rect.top >= 0 && rect.bottom >= (window.innerHeight || document.documentElement.clientHeight)) return 'below';
-    if (rect.top <= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)) return 'above';
+    return rect.bottom >= 0 && rect.top <= (window.innerHeight || document.documentElement.clientHeight);
   },
 
   // Trigger an event on the view after scrolling to keep track of the most centered element on screen
@@ -86,7 +84,7 @@ var Behavior = Marionette.Behavior.extend({
   },
 
   onDestroy: function() {
-    this.scrollElement.removeEventListener('scroll', this.scrollHandler, false);
+    passiveEventListener.removeEventListener(this.scrollElement, 'scroll', this.scrollHandler);
   }
 });
 

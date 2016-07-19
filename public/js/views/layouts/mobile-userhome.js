@@ -6,7 +6,7 @@ var modalRegion = require('components/modal-region');
 var UserhomeView = require('views/userhome/userHomeView');
 
 //TODO Move this into the upper js container
-//var appEvents    = require('../../utils/appevents.js');
+//var appEvents    = require('../../utils/appevents');
 //var troupes      = require('../../collections/instances/troupes').troupes;
 //var RoomMenuLayout = require('../menu/room/layout/room-menu-layout');
 

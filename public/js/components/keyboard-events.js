@@ -48,6 +48,7 @@ module.exports = (function() {
     else {
       scope = 'other';
     }
+
     key.setScope(scope);
     return true;
   };
@@ -146,16 +147,16 @@ module.exports = (function() {
     scope: 'input.chat.edit'
   }];
 
-  keyEvents[cmdKey + '+/, ' + cmdKey + '+' + gitterKey + '+/'] = 'chat.toggle';
+  keyEvents[cmdKey + '+/, ' + cmdKey + '+' + gitterKey + '+/'] = { name: 'chat.toggle' };
   keyEvents[cmdKey + '+' + '+s'] = 'focus.search';
-  keyEvents[cmdKey + '+' + gitterKey + '+c'] = 'focus.chat';
+  keyEvents[cmdKey + '+' + gitterKey + '+c'] = { name:'focus.chat', scope: 'other' };
   keyEvents[cmdKey + '+' + gitterKey + '+m'] = 'help.markdown';
   keyEvents[cmdKey + '+' + gitterKey + '+k'] = 'help.keyboard';
-  keyEvents[cmdKey + '+' + gitterKey + '+up'] = 'room.up';
-  keyEvents[cmdKey + '+' + gitterKey + '+down'] = 'room.down';
-  keyEvents[cmdKey + '+' + gitterKey + '+left'] = 'room.prev';
-  keyEvents[cmdKey + '+' + gitterKey + '+right'] = 'room.next';
-  keyEvents[cmdKey + '+' + gitterKey + '+enter'] = 'room.enter';
+  keyEvents[cmdKey + '+' + gitterKey + '+up'] = { name:'room.up', scope: 'other' };
+  keyEvents[cmdKey + '+' + gitterKey + '+down'] = { name:'room.down', scope: 'other' };
+  keyEvents[cmdKey + '+' + gitterKey + '+left'] = { name:'room.prev', scope: 'other' };
+  keyEvents[cmdKey + '+' + gitterKey + '+right'] = { name:'room.next', scope: 'other' };
+  keyEvents[cmdKey + '+' + gitterKey + '+enter'] = { name:'room.enter', scope: 'other' };
 
   // Go to a conversation by index in list
   _.each('123456789'.split(''), function (n) {

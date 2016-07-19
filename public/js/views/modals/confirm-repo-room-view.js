@@ -44,7 +44,7 @@ var View = Marionette.ItemView.extend({
     self.ui.modalFailure.hide();
     var uri = self.model.get('uri');
 
-    apiClient.post('/v1/rooms', { uri: uri, addBadge: addBadge })
+    apiClient.post('/private/create-github-room', { uri: uri, addBadge: addBadge })
       .then(function () {
         if (self.dialog) { self.dialog.hide(); }
         appEvents.trigger('navigation', '/' + uri, 'chat', uri, null);
