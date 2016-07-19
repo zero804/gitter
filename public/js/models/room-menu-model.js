@@ -273,13 +273,13 @@ module.exports = Backbone.Model.extend({
     if(!this.get('roomMenuIsPinned')) { this.set('panelOpenState', false); }
   },
 
-  onMenuBarActivateRequest: function(menuBarItemActivate) {
-    menuBarItemActivate = menuBarItemActivate || {};
+  onMenuBarActivateRequest: function(data) {
+    data = data || {};
     this.set({
       panelOpenState: true,
       profileMenuOpenState: false,
-      state: menuBarItemActivate.state,
-      selectedOrgName: menuBarItemActivate.selectedOrgName
+      state: data.state,
+      selectedOrgName: data.selectedOrgName
     });
   },
 
