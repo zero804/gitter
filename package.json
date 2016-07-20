@@ -27,7 +27,6 @@
     "express": "^4.13.1",
     "express-hbs": "~0.8.4",
     "express-session": "^1.11.3",
-    "faker": "^3.1.0",
     "fast-csv": "^0.6.0",
     "fflip": "git+https://github.com/suprememoocow/fflip.git#fa77d5d981c2b93279c42305e8fe5632716c06a5",
     "fs-extra": "^0.8.1",
