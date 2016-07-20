@@ -18,7 +18,11 @@ module.exports = function getFakeForumObject(){
       return faker.hacker.adjective();
     });
 
-    var topics = getTopics();
+    var topics = getTopics().map(function(topic){
+      var data = _.extend({}, topic);
+      delete data.replies;
+      return data;
+    });
 
     forum =  {
       name:        faker.commerce.productName(),
