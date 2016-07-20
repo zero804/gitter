@@ -2,6 +2,7 @@
 
 var _ = require('lodash'); // eslint-disable-line node/no-unpublished-require
 var faker = require('faker');
+var getRandomCommentsSample = require('../comments/get-random-sample');
 
 var replies;
 
@@ -13,12 +14,16 @@ module.exports = function getFakeReplies(){
       var body = faker.hacker.phrase();
       var bodyHTML = '<p>' + body + '</p>';
 
+      var comments = getRandomCommentsSample();
+
       return {
         id: val,
         user: {},
         test: body,
         html: bodyHTML,
         sent: faker.date.past(),
+        comments: comments,
+        commentTotal: comments.length,
       };
     });
   }
