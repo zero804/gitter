@@ -1,7 +1,6 @@
 /*eslint-env browser */
 
 'use strict';
-var _ = require('underscore');
 var qs = require('gitter-web-qs');
 
 var env = window.gitterClientEnv || {};

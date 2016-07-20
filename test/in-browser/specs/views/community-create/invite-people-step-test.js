@@ -4,7 +4,6 @@
 var assert = require('assert');
 var Backbone = require('backbone');
 var context = require('utils/context');
-var clientEnv = require('gitter-client-env');
 
 var stepConstants = require('public/js/views/community-create/step-constants');
 var CommunityCreateModel = require('public/js/views/community-create/community-create-model');
