@@ -113,7 +113,10 @@ GroupWithPolicyService.prototype.createRoom = secureMethod([allowAdmin], functio
       return roomService.createGroupRoom(user, group, roomInfo, securityDescriptor, {
         tracking: options.tracking,
         runPostGitHubRoomCreationTasks: options.runPostGitHubRoomCreationTasks
-      });
+      })
+    })
+    .then(function(results) {
+      return results.troupe;
     });
 });
 
