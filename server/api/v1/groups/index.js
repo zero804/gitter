@@ -12,6 +12,61 @@ var inviteValidation = require('gitter-web-invites/lib/invite-validation');
 
 var MAX_BATCHED_INVITES = 100;
 
+function getGroupOptions(input) {
+  var uri = input.uri ? String(input.uri) : undefined;
+  var name = input.name ? String(input.name) : undefined;
+
+  var groupOptions = { uri: uri, name: name };
+  if (input.security) {
+    // for GitHub and future group types that are backed by other services
+    groupOptions.type = input.security.type ? String(input.security.type) : undefined;
+    groupOptions.linkPath = input.security.linkPath ? String(input.security.linkPath) : undefined;
+  }
+
+  return groupOptions;
+}
+
+function getInvites(invitesInput) {
+  if (invitesInput && invitesInput.length) {
+    if (invitesInput.length > MAX_BATCHED_INVITES) {
+      throw new StatusError(400, 'Too many batched invites.');
+    }
+
+    // This could throw, but it is the basic user-input validation that would
+    // have failed if the frontend didn't call the invite checker API like it
+    // should have anyway.
+    return invitesInput.map(function(input) {
+      return inviteValidation.parseAndValidateInput(input);
+    });
+  }
+
+  // invites are optional
+  return [];
+}
+
+function getRoomOptions(group, input) {
+  var defaultRoomName = input.defaultRoomName || 'Lobby';
+
+  var roomOptions = {
+    name: defaultRoomName,
+    // default rooms are always public
+    security: 'PUBLIC',
+    // use the same backing object for the default room
+    type: group.sd.type,
+    linkPath: group.sd.linkPath,
+    // only github repo based rooms have the default room automatically
+    // integrated with github
+    runPostGitHubRoomCreationTasks: group.sd.type === 'GH_REPO',
+    addBadge: !!input.addBadge
+  };
+
+  if (input.providers && Array.isArray(input.providers)) {
+    roomOptions.providers = input.providers;
+  }
+
+  return roomOptions;
+}
+
 module.exports = {
   id: 'group',
 
@@ -41,32 +96,9 @@ module.exports = {
       throw new StatusError(404);
     }
 
-    var uri = req.body.uri ? String(req.body.uri) : undefined;
-    var name = req.body.name ? String(req.body.name) : undefined;
+    var groupOptions = getGroupOptions(req.body);
 
-    var groupOptions = { uri: uri, name: name };
-    if (req.body.security) {
-      // for GitHub and future group types that are backed by other services
-      groupOptions.type = req.body.security.type ? String(req.body.security.type) : undefined;
-      groupOptions.linkPath = req.body.security.linkPath ? String(req.body.security.linkPath) : undefined;
-    }
-
-    var invitesInput;
-    if (req.body.invites && req.body.invites.length) {
-      if (req.body.invites.length > MAX_BATCHED_INVITES) {
-        throw new StatusError(400, 'Too many batched invites.');
-      }
-
-      // This could throw, but it is the basic user-input validation that would
-      // have failed if the frontend didn't call the invite checker API like it
-      // should have anyway.
-      invitesInput = req.body.invites.map(function(input) {
-        return inviteValidation.parseAndValidateInput(input);
-      });
-    } else {
-      // invites are optional
-      invitesInput = [];
-    }
+    var invites = getInvites(req.body.invites);
 
     var group;
     var room;
@@ -79,35 +111,19 @@ module.exports = {
       .then(function(userGroupPolicy) {
         var groupWithPolicyService = new GroupWithPolicyService(group, req.user, userGroupPolicy);
 
-        var defaultRoomName = req.body.defaultRoomName || 'Lobby';
-        var roomOptions = {
-          name: defaultRoomName,
-          // default rooms are always public
-          security: 'PUBLIC',
-          // use the same backing object for the default room
-          type: group.sd.type,
-          linkPath: group.sd.linkPath,
-          // only github repo based rooms have the default room automatically
-          // integrated with github
-          runPostGitHubRoomCreationTasks: groupOptions.type === 'GH_REPO',
-          addBadge: !!req.body.addBadge
-        };
-
-        if (req.body.providers && Array.isArray(req.body.providers)) {
-          roomOptions.providers = req.body.providers;
-        }
+        var roomOptions = getRoomOptions(group, req.body);
 
         return groupWithPolicyService.createRoom(roomOptions);
       })
-      .then(function(results) {
-        room = results.troupe;
+      .then(function(_room) {
+        room = _room;
         return policyFactory.createPolicyForRoomId(req.user, room._id);
       })
       .then(function(userRoomPolicy) {
         var roomWithPolicyService = new RoomWithPolicyService(room, req.user, userRoomPolicy);
         // Some of these can fail, but the errors will be caught and added to
         // the report that the promise resolves to.
-        return roomWithPolicyService.createRoomInvitations(invitesInput);
+        return roomWithPolicyService.createRoomInvitations(invites);
       })
       .then(function(invitesReport) {
         var groupStrategy = new restSerializer.GroupStrategy();
