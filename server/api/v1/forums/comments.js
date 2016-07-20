@@ -9,6 +9,10 @@ module.exports = {
 
   index: function(){
     return Promise.resolve(fakeData.getComments());
+  },
+
+  show: function(){
+    return Promise.resolve(fakeData.getComment());
   }
 
 };
