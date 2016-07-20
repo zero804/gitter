@@ -1,0 +1,14 @@
+{
+  "name": "gitter-web-fake-data",
+  "version": "1.0.0",
+  "description": "Some Fake Data For Stubbing API Endpoints",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Gitter Team",
+  "license": "ISC",
+  "dependencies": {
+    "faker": "^3.1.0"
+  }
+}
