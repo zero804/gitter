@@ -9,6 +9,7 @@
   "author": "Gitter Team",
   "license": "ISC",
   "dependencies": {
-    "faker": "^3.1.0"
+    "faker": "^3.1.0",
+    "lodash": "^4.13.1"
   }
 }

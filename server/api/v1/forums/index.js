@@ -9,7 +9,7 @@ module.exports = {
 
   id: 'forumId',
 
-  show: function(req, res){
+  show: function(){
     if(!req.user) { throw new StatusError(404); }
     return Promise.resolve(getForum());
   },

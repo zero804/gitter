@@ -6,7 +6,7 @@ var getRandomInt = require('../utils/get-random-int');
 
 module.exports = function getRandomReplySample(parentId){
 
-  var replies   = getReplies();
+  var replies = getReplies();
   var lastIndex = replies.length - 1;
 
   var start = lastIndex;

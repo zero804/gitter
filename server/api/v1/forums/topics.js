@@ -7,7 +7,7 @@ module.exports = {
 
   id: 'topicId',
 
-  index: function(req, res){
+  index: function(){
     return Promise.resolve(fakeData.getTopics());
   },
 
