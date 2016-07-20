@@ -21,3 +21,7 @@ var runner = mocha.run(function(failures){
 runner.on('end', function(){
   process.exit();
 });
+
+runner.on('fail', function(test, err){
+  process.exit(1);
+});
