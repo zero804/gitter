@@ -7,4 +7,5 @@ module.exports = {
   getReplies:  require('./lib/replies'),
   getReply:    require('./lib/replies/get-reply'),
   getComments: require('./lib/comments'),
+  getComment:  require('./lib/comments/get-comment'),
 };
