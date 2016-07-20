@@ -699,6 +699,30 @@ gulp.task('watch', function() {
 });
 
 
+gulp.task('start-nodemon-server', function() {
+  var nodemon = require('gulp-nodemon');
+
+  nodemon({
+    debug: true,
+    script: 'web.js',
+    args: ['--cdn:use', 'true']
+  });
+});
+
+gulp.task('start-static-server', function() {
+  var child_process = require('child_process');
+  child_process.fork('./server/static', [], {
+    env: {
+      SERVE_STATIC_ASSETS: 1,
+      PORT: 5001
+    }
+  });
+});
+
+gulp.task('dev-watch', ['watch', 'start-nodemon-server', 'start-static-server'], function() {
+
+})
+
 // Run gulp safe-install --package xyz@0.1.0
 gulp.task('safe-install', shell.task([
   'npm run unlink',
