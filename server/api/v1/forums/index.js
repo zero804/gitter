@@ -39,11 +39,11 @@ function buildForum(){
   });
 
   return {
-    name: faker.commerce.productName(),
+    name:        faker.commerce.productName(),
     topicsTotal: topics.length,
-    topics: topics,
-    categories: categories,
-    tags: tags,
+    topics:      topics,
+    categories:  categories,
+    tags:        tags,
   };
 }
 
