@@ -19,7 +19,11 @@ module.exports = function getFakeTopicsList(){
       var body = faker.hacker.phrase();
       var bodyHTML = '<p>' + body + '</p>';
 
-      var replies = getRandomReplySample(val);
+      var replies = getRandomReplySample(val).map(function(reply){
+        var data = _.extend({}, reply);
+        delete data.comments;
+        return data;
+      });
 
       var topic = {
         id: val,
