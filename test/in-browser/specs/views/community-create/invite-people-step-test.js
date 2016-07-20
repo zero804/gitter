@@ -4,11 +4,16 @@
 var assert = require('assert');
 var Backbone = require('backbone');
 var context = require('utils/context');
+var clientEnv = require('gitter-client-env');
 
 var stepConstants = require('public/js/views/community-create/step-constants');
 var CommunityCreateModel = require('public/js/views/community-create/community-create-model');
 var CommunityCreateStepViewModel = require('public/js/views/community-create/community-create-step-view-model');
 var InvitePeopleView = require('public/js/views/community-create/invite-step/community-creation-invite-people-view');
+
+require('template/helpers/all');
+
+
 
 describe('community-creation-invite-people-view', function() {
 

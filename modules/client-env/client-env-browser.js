@@ -1,6 +1,7 @@
 /*eslint-env browser */
 
 'use strict';
+var _ = require('underscore');
 var qs = require('gitter-web-qs');
 
 var env = window.gitterClientEnv || {};
@@ -17,6 +18,12 @@ if(qs.env) {
     Object.keys(m).forEach(function(k) {
       env[k] = m[k];
     });
+  }
+}
+
+env.testOnly = {
+  resetClientEnv: function(newClientEnv) {
+    _.extend(env, newClientEnv);
   }
 }
 
