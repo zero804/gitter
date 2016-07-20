@@ -1,3 +1,5 @@
+"use strict";
+
 var getRandomInt = require('./get-random-int');
 
 module.exports = function getRandomBool(){

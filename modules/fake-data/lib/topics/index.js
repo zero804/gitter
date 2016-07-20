@@ -1,6 +1,6 @@
 "use strict";
 
-var _ = require('lodash');
+var _ = require('lodash'); // eslint-disable-line node/no-unpublished-require
 var faker = require('faker');
 var getRandomInt = require('../utils/get-random-int');
 var getRandomBool = require('../utils/get-random-bool');
