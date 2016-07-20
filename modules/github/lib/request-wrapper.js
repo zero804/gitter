@@ -10,6 +10,7 @@ var requestWithRetry = require('./request-with-retry');
 var publicTokenPool = require('./public-token-pool');
 var requestExt = require('request-extensible');
 var RequestHttpCache = require('request-http-cache');
+var useForeverExtension = require('./use-forever-extension');
 
 function createRedisClient() {
   var redisCachingConfig = process.env.REDIS_CACHING_CONNECTION_STRING || config.get("redis_caching");
@@ -33,13 +34,19 @@ var httpRequestCache = new RequestHttpCache({
   stats: env.createStatsClient({ prefix: 'github.cache.' })
 });
 
+var extensions = [
+  publicTokenPool,
+  fetchAllPages,
+  logFailingRequest,
+  httpRequestCache.extension,
+  requestWithRetry({ maxRetries: 3 }),
+  logRateLimit,
+];
+
+if (config.get('github:foreverAgent')) {
+  extensions.push(useForeverExtension);
+}
+
 module.exports = requestExt({
-  extensions: [
-    publicTokenPool,
-    fetchAllPages,
-    logFailingRequest,
-    httpRequestCache.extension,
-    requestWithRetry({ maxRetries: 3 }),
-    logRateLimit
-  ]
+  extensions: extensions
 });

@@ -27,8 +27,10 @@ module.exports = {
       })
       .then(function(ban) {
         if (!ban) {
-          res.status(202).send({ removed: true });
-          return;
+          res.status(202);
+          return {
+            removed: true
+          };
         }
 
         var strategy = new restSerializer.TroupeBanStrategy({ });

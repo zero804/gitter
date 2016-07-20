@@ -57,6 +57,8 @@ if (!process.env.DISABLE_API_404_HANDLER) {
 
 // Error Handlers
 router.use('/', require('../web/middlewares/token-error-handler'));
-router.use('/', env.middlewares.errorHandler);
+if (!process.env.DISABLE_API_ERROR_HANDLER) {
+  router.use('/', env.middlewares.errorHandler);
+}
 
 module.exports = router;
