@@ -5,4 +5,5 @@ module.exports = {
   getTopics:  require('./lib/topics'),
   getTopic:   require('./lib/topics/get-topic'),
   getReplies: require('./lib/replies'),
+  getReply:   require('./lib/replies/get-reply'),
 };
