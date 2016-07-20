@@ -217,6 +217,7 @@
     "gulp-jsonlint": "^1.1.0",
     "gulp-less": "^3.0.5",
     "gulp-matcha": "^1.0.3",
+    "gulp-nodemon": "^2.1.0",
     "gulp-postcss": "^5.0.0",
     "gulp-replace": "^0.5.4",
     "gulp-shell": "^0.4.1",
