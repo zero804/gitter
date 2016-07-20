@@ -6,6 +6,6 @@ var fakeData = require('gitter-web-fake-data');
 module.exports = {
   id: 'replyId',
   index: function(){
-    return Promise.resolve(200);
+    return Promise.resolve(fakeData.getReplies());
   }
 };
