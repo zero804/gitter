@@ -6,7 +6,7 @@
 var env = require('gitter-web-env');
 var winston = env.logger;
 
-winston.info('Starting server/web.js');
+winston.info('Starting server/static.js');
 
 var express = require('express');
 var http = require('http');
@@ -39,7 +39,7 @@ app.options('*', cors(corsOptions));
 
 require('./web/express-static').install(app);
 
-var port = 5005;
+var port = process.env.PORT || 5001;
 
 server.listen(port, function() {
   winston.info("Listening on " + port);
