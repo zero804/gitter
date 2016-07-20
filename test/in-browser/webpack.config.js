@@ -25,7 +25,7 @@ if(!opts['nocoverage']) {
 }
 
 module.exports = {
-  entry: glob.sync(path.resolve(__dirname, './specs/**/*-test.js')),
+  entry: path.resolve(__dirname, './fixtures/entry.js'),
   output: {
     path: path.join(__dirname, './fixtures/build'),
     filename: 'test.js',
