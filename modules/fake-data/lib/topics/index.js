@@ -7,7 +7,7 @@ var getRandomBool = require('../utils/get-random-bool');
 
 var topics;
 
-module.exports = function getFakeTopicsList(isNested){
+module.exports = function getFakeTopicsList(){
 
   if(!topics) {
     topics = _.range(getRandomInt(3, 10)).map(function(){
@@ -27,10 +27,6 @@ module.exports = function getFakeTopicsList(isNested){
         isParticipating:    getRandomBool(),
         isWatching:         getRandomBool(),
       };
-
-      if(!isNested) {
-        //Add full details
-      }
 
       return topic;
     });
