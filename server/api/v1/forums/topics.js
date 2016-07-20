@@ -1,14 +1,14 @@
 "use strict";
 
 var Promise = require('bluebird');
-var getTopics = require('gitter-web-fake-data').getTopics;
+var fakeData = require('gitter-web-fake-data');
 
 module.exports = {
   id: 'topicId',
   index: function(req, res){
-    return Promise.resolve(getTopics());
+    return Promise.resolve(fakeData.getTopics());
   },
   show: function (){
-    return Promise.resolve(200);
+    return Promise.resolve(fakeData.getTopic());
   },
 };
