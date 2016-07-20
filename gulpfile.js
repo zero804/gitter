@@ -39,6 +39,11 @@ var glob = require('glob');
 var github = require('gulp-github');
 var eslintFilter = require('./build-scripts/eslint-filter');
 
+/*
+ * Include the forums gulp file
+ */
+require('./modules/topics-ui/gulpfile-topics');
+
 var getSourceMapUrl = function() {
   if (!process.env.BUILD_URL) return;
 
@@ -153,7 +158,8 @@ gulp.task('validate-eslint', function() {
   mkdirp.sync('output/eslint/');
   return gulp.src(['**/*.js','!node_modules/**','!public/repo/**'])
     .pipe(eslint({
-      quiet: argv.quiet
+      quiet: argv.quiet,
+      extensions: ['.js', '.jsx']
     }))
     .pipe(eslint.format('checkstyle', function(checkstyleData) {
       fs.writeFileSync('output/eslint/checkstyle.xml', checkstyleData);
@@ -624,7 +630,7 @@ function restoreOriginalFileTimestamps() {
 
 }
 
-gulp.task('compress-assets-gzip', ['build-assets'], function() {
+gulp.task('compress-assets-gzip', ['build-assets', 'build-topics'], function() {
   return gulp.src(['output/assets/**/*.{css,js,ttf,svg,eot}', '!**/*.map'], { stat: true, base: 'output/assets/' })
     .pipe(gzip({ append: true, gzipOptions: { level: 9 } }))
     .pipe(gulp.dest('output/assets/'))
@@ -632,7 +638,7 @@ gulp.task('compress-assets-gzip', ['build-assets'], function() {
 });
 
 // Brotli compression for text files
-gulp.task('compress-assets-brotli-text', ['build-assets'], function() {
+gulp.task('compress-assets-brotli-text', ['build-assets', 'build-topics'], function() {
   if (!process.env.ENABLE_BROTLI_COMPRESSION) return;
 
   var brotli = require('gulp-brotli');
@@ -674,10 +680,33 @@ gulp.task('tar-assets', ['build-assets', 'compress-assets'], function () {
 
 gulp.task('prepare-assets', ['build-assets', 'compress-assets', 'tar-assets']);
 
+var FORUM_RELOCATIONS = {
+  babel: 'output/app/modules/topics-ui/output/babel/',
+  assets: 'output/assets/topics/'
+}
+
+var FORUM_RELOCATION_TASKS = Object.keys(FORUM_RELOCATIONS).map(function(key) {
+  return 'rearrange-topics-' + key;
+});
+
+Object.keys(FORUM_RELOCATIONS).forEach(function(key) {
+  var dest = FORUM_RELOCATIONS[key];
+
+  gulp.task('rearrange-topics-' + key, ['topics:default'], function() {
+    return gulp.src(['modules/topics-ui/output/' + key + '/**', '!**/*.map'], { stat: true, base: 'modules/topics-ui/output/' + key })
+      .pipe(gulp.dest(dest))
+      .pipe(restoreOriginalFileTimestamps());
+  });
+});
+
+gulp.task('rearrange-topics', FORUM_RELOCATION_TASKS);
+
+gulp.task('build-topics', ['topics:default', 'rearrange-topics']);
+
 /**
  * package
  */
-gulp.task('package', ['prepare-app', 'prepare-assets']);
+gulp.task('package', ['build-topics', 'prepare-app', 'prepare-assets']);
 
 /**
  * default
@@ -757,3 +786,12 @@ gulp.task('embedded-copy-asset-files', function() {
 });
 
 gulp.task('embedded-package', ['embedded-uglify', 'css-ios', 'embedded-copy-asset-files']);
+
+
+gulp.task('clean-main', function (cb) {
+  del([
+    'output/'
+  ], cb);
+});
+
+gulp.task('clean', ['clean-main', 'topics:clean']);
