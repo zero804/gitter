@@ -2,9 +2,9 @@
 
 var Promise = require('bluebird');
 
-module.exprts = {
+module.exports = {
   id: 'groupId',
-  index: function(req, res){
-    return Promise.resolve(200);
+  show: function(req, res){
+    return Promise.resolve({ key: 'THIS IS THE NEWS' });
   }
 };
