@@ -3,7 +3,7 @@
 var Promise = require('bluebird');
 
 module.exports = {
-  id: 'groupId',
+  id: 'forumId',
   show: function(req, res){
     return Promise.resolve({ key: 'THIS IS THE NEWS' });
   }
