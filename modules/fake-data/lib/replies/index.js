@@ -14,7 +14,7 @@ module.exports = function getFakeReplies(){
       var body = faker.hacker.phrase();
       var bodyHTML = '<p>' + body + '</p>';
 
-      var comments = getRandomCommentsSample();
+      var comments = getRandomCommentsSample(val);
 
       return {
         id: val,
