@@ -3,10 +3,11 @@
 var StatusError = require('statuserror');
 var fonts = require('../../web/fonts');
 
-function renderForum(req, res){
+function renderForum(req, res, next) {
 
-  var hasTopics = req.fflip && req.fflip.has('topics');
-  if(!hasTopics) { throw new StatusError(404); }
+  if (!req.fflip || !req.fflip.has('topics')) {
+    return next(new StatusError(404));
+  }
 
   res.render('topics/forum', {
     layout: 'topics-layout',
