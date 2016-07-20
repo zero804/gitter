@@ -85,13 +85,17 @@ module.exports = {
           security: 'PUBLIC',
           // use the same backing object for the default room
           type: group.sd.type,
-          linkPath: group.sd.linkPath
+          linkPath: group.sd.linkPath,
+          // only github repo based rooms have the default room automatically
+          // integrated with github
+          runPostGitHubRoomCreationTasks: groupOptions.type === 'GH_REPO',
+          addBadge: !!req.body.addBadge
         };
 
         return groupWithPolicyService.createRoom(roomOptions);
       })
-      .then(function(_room) {
-        room = _room;
+      .then(function(results) {
+        room = results.troupe;
         return policyFactory.createPolicyForRoomId(req.user, room._id);
       })
       .then(function(userRoomPolicy) {
