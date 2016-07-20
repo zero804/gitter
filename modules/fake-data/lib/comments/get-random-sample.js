@@ -5,7 +5,7 @@ var getComments = require('./index');
 var getRandomInt = require('../utils/get-random-int');
 
 module.exports = function getRandomCommentsSample(parentId){
-  var comments   = getComments();
+  var comments = getComments();
   var lastIndex = comments.length - 1;
 
   var start = lastIndex;
