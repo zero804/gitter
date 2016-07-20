@@ -18,7 +18,7 @@ describe('avatar-api', function() {
     deleteDocuments: {
       User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }],
       Group: [
-        { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() }
+        { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() }
       ],
     },
     user1: {
@@ -34,6 +34,13 @@ describe('avatar-api', function() {
         linkPath: fixtureLoader.GITTER_INTEGRATION_USERNAME
       }
     },
+    group2: {
+      avatarUrl: 'http://s3.amazonaws.com/gitter-avatars/moo/cow/original.png',
+      avatarVersion: 1,
+      securityDescriptor: {
+        type: null
+      }
+    },
   });
 
   var FIXTURES_TEMPLATES = [{
@@ -42,10 +49,20 @@ describe('avatar-api', function() {
     expected: null,
     proxyRedirect: '/fetch/https://avatars.githubusercontent.com/gitter-integration-tests?s=128'
   }, {
+    name: '/group/i/:groupId - custom avatar',
+    url: null,
+    expected: null,
+    proxyRedirect: '/fetch/http://s3.amazonaws.com/gitter-avatars/moo/cow/128.png'
+  }, {
     name: '/group/iv/:version/:groupId',
     url: null,
     expected: null,
     proxyRedirect: '/fetch_lt/https://avatars.githubusercontent.com/gitter-integration-tests?s=128'
+  }, {
+    name: '/group/iv/:version/:groupId - custom avatar',
+    url: null,
+    expected: null,
+    proxyRedirect: '/fetch_lt/http://s3.amazonaws.com/gitter-avatars/moo/cow/128.png'
   }, {
     name: '/g/u/:username',
     url: '/g/u/' + fixtureLoader.GITTER_INTEGRATION_USERNAME,
@@ -80,7 +97,9 @@ describe('avatar-api', function() {
 
   before(function() {
     FIXTURES_TEMPLATES[0].url = '/group/i/' + fixture.group1.id;
-    FIXTURES_TEMPLATES[1].url = '/group/iv/1/' + fixture.group1.id;
+    FIXTURES_TEMPLATES[1].url = '/group/i/' + fixture.group2.id;
+    FIXTURES_TEMPLATES[2].url = '/group/iv/1/' + fixture.group1.id;
+    FIXTURES_TEMPLATES[3].url = '/group/iv/1/' + fixture.group2.id;
   });
 
   describe('direct', function() {

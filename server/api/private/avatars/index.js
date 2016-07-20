@@ -13,13 +13,15 @@ var groupById = require('./group-by-id');
 var userByUsername = require('./user-by-username');
 
 var DEFAULT_SIZE = 128;
+var MISSING_IMAGE_CONTENT_TYPE = 'image/png';
 
 function sendMissing(req, res) {
   // If the nginx image proxy is sitting in front of the app
   // use that
   if (req.headers['x-avatar-server']) {
     res.set('X-Accel-Redirect', '/missing');
-    res.send('OK');
+    res.set('Content-Type', MISSING_IMAGE_CONTENT_TYPE);
+    res.status(200).end();
   } else {
     res.status(404).end();
   }

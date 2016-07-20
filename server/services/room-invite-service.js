@@ -1,5 +1,7 @@
 'use strict';
 
+var env = require('gitter-web-env');
+var stats = env.stats;
 var Promise = require('bluebird');
 var isValidEmail = require('email-validator').validate;
 var StatusError = require('statuserror');
@@ -49,6 +51,13 @@ function createInviteForNewUser(room, invitingUser, type, externalId, emailAddre
         });
     })
     .tap(function(invite) {
+      stats.event("new_invite", {
+        userId: invitingUser && (invitingUser.id || invitingUser._id),
+        troupeId: room && (room.id || room._id),
+        type: type,
+        uri: room && room.uri
+      });
+
       return emailNotificationService.sendInvitation(invitingUser, invite, room);
     })
     .then(function(invite) {
