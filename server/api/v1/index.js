@@ -26,6 +26,7 @@ router.use('/rooms', roomsResources);
 router.use('/users', usersResources);
 router.use('/orgs', orgResources);
 router.use('/groups', groupsResources);
+router.use('/forums', forumsResources);
 
 // APN has no auth requirement as user may not have authenticated
 // and this is used for devices without users
