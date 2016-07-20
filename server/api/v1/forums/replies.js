@@ -13,5 +13,9 @@ module.exports = {
 
   show: function(){
     return Promise.resolve(fakeData.getReply());
-  }
+  },
+
+  subresources: {
+    'comments': require('./comments'),
+  },
 };
