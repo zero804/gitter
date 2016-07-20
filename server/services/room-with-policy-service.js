@@ -20,6 +20,7 @@ var roomMetaService = require('./room-meta-service');
 var processMarkdown = require('../utils/markdown-processor');
 var roomInviteService = require('./room-invite-service');
 var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
+var validateProviders = require('gitter-web-validators/lib/validate-providers');
 
 var MAX_RAW_TAGS_LENGTH = 200;
 
@@ -108,17 +109,11 @@ RoomWithPolicyService.prototype.updateTopic = secureMethod(allowAdmin, function(
 RoomWithPolicyService.prototype.updateProviders = secureMethod([allowStaff, allowAdmin], function(providers) {
   var room = this.room;
 
-  // strictly validate the list of providers
-  var filtered = _.uniq(providers.filter(function(provider) {
-    // only github is allowed for now
-    return (provider === 'github');
-  }));
-
-  if (filtered.length) {
-    room.providers = filtered;
-  } else {
-    room.providers = undefined;
+  if (providers && !validateProviders(providers)) {
+    throw new StatusError(400, 'Invalid providers '+providers.toString());
   }
+
+  room.providers = providers;
 
   return room.save();
 });

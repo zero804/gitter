@@ -43,6 +43,7 @@ module.exports = {
 
     var uri = req.body.uri ? String(req.body.uri) : undefined;
     var name = req.body.name ? String(req.body.name) : undefined;
+
     var groupOptions = { uri: uri, name: name };
     if (req.body.security) {
       // for GitHub and future group types that are backed by other services
@@ -91,6 +92,10 @@ module.exports = {
           runPostGitHubRoomCreationTasks: groupOptions.type === 'GH_REPO',
           addBadge: !!req.body.addBadge
         };
+
+        if (req.body.providers && Array.isArray(req.body.providers)) {
+          roomOptions.providers = req.body.providers;
+        }
 
         return groupWithPolicyService.createRoom(roomOptions);
       })

@@ -113,6 +113,7 @@ describe('group-api', function() {
       .send({
         name: 'Repo Group',
         uri: 'Repo-Group',
+        providers: ['github'],
         addBadge: true,
         security: {
           type: 'GH_REPO',
@@ -124,7 +125,10 @@ describe('group-api', function() {
       .then(function(result) {
         var group = result.body;
         assert.strictEqual(group.uri, 'Repo-Group');
-        assert.strictEqual(group.defaultRoom.uri, 'Repo-Group/Lobby');
+        var room = group.defaultRoom;
+        assert.strictEqual(room.uri, 'Repo-Group/Lobby');
+        assert.strictEqual(room.providers.length, 1);
+        assert.strictEqual(room.providers[0], 'github');
       });
   });
 
@@ -158,6 +162,7 @@ describe('group-api', function() {
       .send({
         name: fixtureLoader.GITTER_INTEGRATION_REPO,
         topic: 'all about testing',
+        providers: ['github'],
         security: {
           security: 'PRIVATE',
           type: 'GH_REPO',
@@ -165,6 +170,11 @@ describe('group-api', function() {
         }
       })
       .set('x-access-token', fixture.user1.accessToken)
-      .expect(200);
+      .expect(200)
+      .then(function(result) {
+        var room = result.body;
+        assert.strictEqual(room.providers.length, 1);
+        assert.strictEqual(room.providers[0], 'github');
+      });
   });
 });
