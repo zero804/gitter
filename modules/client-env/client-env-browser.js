@@ -21,10 +21,4 @@ if(qs.env) {
   }
 }
 
-env.testOnly = {
-  resetClientEnv: function(newClientEnv) {
-    _.extend(env, newClientEnv);
-  }
-}
-
 module.exports = env;
