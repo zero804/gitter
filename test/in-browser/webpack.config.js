@@ -77,6 +77,7 @@ module.exports = {
       'components/apiClient':                               path.resolve(__dirname, './fixtures/helpers/apiclient.js'),
       'utils/appevents':                                    path.resolve(__dirname, './fixtures/helpers/appevents.js'),
       'filtered-collection':                                path.resolve(__dirname, '../../public/repo/filtered-collection/filtered-collection.js'),
+      'gitter-client-env':                                  path.resolve(__dirname, './fixtures/helpers/gitter-client-env.js'),
     },
   },
   node: {
