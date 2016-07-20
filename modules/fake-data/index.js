@@ -1,7 +1,7 @@
 "use strict";
 
 module.exports = {
-  getForum:    require('./lib/forum'),
+  getForum:    require('./lib/forums'),
   getTopics:   require('./lib/topics'),
   getTopic:    require('./lib/topics/get-topic'),
   getReplies:  require('./lib/replies'),
