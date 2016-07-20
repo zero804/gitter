@@ -18,8 +18,8 @@ package: npm
 submit-to-codecov: npm test
 	gulp submit-codecov-post-tests
 
-clean:
-	rm -rf output
+clean: npm
+	gulp clean
 
 test: clean npm
 	mkdir -p output/

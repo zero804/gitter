@@ -7,16 +7,18 @@ var config = {
     forums: path.resolve(__dirname, './browser/forums'),
   },
   output: {
-    path: path.resolve(__dirname, './output'),
-    libraryTarget: 'commonjs2',
-    filename: '[name].js'
+    path: path.resolve(__dirname, "./output/assets/js/"),
+    filename: "[name].js",
+    chunkFilename: "[id].chunk.js",
+    publicPath: "/_s/l/js/forums/",
+    devtoolModuleFilenameTemplate: "[resource-path]",
+    devtoolFallbackModuleFilenameTemplate: "[resource-path]?[hash]"
   },
   module: {
     loaders: [
       {
         test: /\.jsx$/,
         loader: 'babel',
-        exclude: /\/node_modules\//,
         query: {
           presets: [
             "es2015",
