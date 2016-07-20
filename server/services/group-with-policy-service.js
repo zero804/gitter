@@ -8,6 +8,7 @@ var debug = require('debug')('gitter:app:group-with-policy-service');
 var roomService = require('./room-service');
 var secureMethod = require('../utils/secure-method');
 var validateRoomName = require('gitter-web-validators/lib/validate-room-name');
+var validateProviders = require('gitter-web-validators/lib/validate-providers');
 var groupService = require('gitter-web-groups/lib/group-service');
 
 /**
@@ -45,6 +46,11 @@ function findByUri(uri) {
 function ensureAccessAndFetchRoomInfo(user, group, options) {
   options = options || {};
 
+  var providers = options.providers;
+  if (providers && !validateProviders(providers)) {
+    throw new StatusError(400, 'Invalid providers ' + providers.toString());
+  }
+
   var type = options.type || null;
 
   var security = options.security;
@@ -75,7 +81,8 @@ function ensureAccessAndFetchRoomInfo(user, group, options) {
         .then(function(securityDescriptor) {
           return [{
             topic: topic,
-            uri: uri
+            uri: uri,
+            providers: providers
           }, securityDescriptor];
         });
     })
@@ -103,9 +110,6 @@ GroupWithPolicyService.prototype.createRoom = secureMethod([allowAdmin], functio
   return ensureAccessAndFetchRoomInfo(user, group, options)
     .spread(function(roomInfo, securityDescriptor) {
       debug("Upserting %j", roomInfo);
-      if(options.providers) {
-        roomInfo.providers = options.providers;
-      }
       return roomService.createGroupRoom(user, group, roomInfo, securityDescriptor, {
         tracking: options.tracking,
         runPostGitHubRoomCreationTasks: options.runPostGitHubRoomCreationTasks
