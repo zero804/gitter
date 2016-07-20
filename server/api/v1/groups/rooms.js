@@ -1,3 +1,4 @@
+/* eslint complexity: ["error", 13] */
 'use strict';
 
 var assert = require('assert');
@@ -43,6 +44,10 @@ module.exports = {
       }
     } else {
       createOptions.security = 'PUBLIC';
+    }
+
+    if(req.body.providers) {
+      createOptions.providers = req.body.providers.split(',');
     }
 
     // keep tracking info around for sendStats
