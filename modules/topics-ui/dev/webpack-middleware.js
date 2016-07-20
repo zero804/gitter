@@ -1,7 +1,7 @@
 'use strict';
 
-var webpack = require('webpack');// eslint-disable-line node/no-unpublished-require
-var webpackMiddleware = require("webpack-dev-middleware"); // eslint-disable-line node/no-unpublished-require
+var webpack = require('webpack');
+var webpackMiddleware = require("webpack-dev-middleware");
 
 var middleware = webpackMiddleware(webpack(require('../webpack.config')), {
   noInfo: false,
@@ -10,7 +10,7 @@ var middleware = webpackMiddleware(webpack(require('../webpack.config')), {
   watchOptions: {
     aggregateTimeout: 400
   },
-  publicPath: "/_s/l/js/forums/",
+  publicPath: "/_s/l/topics/js/",
   stats: {
     colors: true
   }
