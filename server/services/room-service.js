@@ -756,6 +756,7 @@ function createGroupRoom(user, group, roomInfo, securityDescriptor, options) {
   var uri = roomInfo.uri;
   var topic = roomInfo.topic;
   var lcUri = uri.toLowerCase();
+  var providers = roomInfo.providers;
 
   // convert back to the old github-tied vars here
   var type = securityDescriptor.type || null;
@@ -788,7 +789,8 @@ function createGroupRoom(user, group, roomInfo, securityDescriptor, options) {
     uri: uri,
     lcUri: lcUri,
     userCount: 0,
-    sd: securityDescriptor
+    sd: securityDescriptor,
+    providers: providers || []
   };
 
   var room;
