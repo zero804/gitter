@@ -2,7 +2,6 @@
 
 var env = require('gitter-web-env');
 var stats = env.stats;
-var config = env.config;
 var Promise = require('bluebird');
 var Group = require('gitter-web-persistence').Group;
 var Troupe = require('gitter-web-persistence').Troupe;
@@ -97,17 +96,10 @@ function checkGroupUri(user, uri, options) {
         throw new StatusError(409, 'User is not allowed to create a group for this URI.');
       }
 
-      var splitsvilleEnabled = config.get('splitsville:enabled');
-      if (!splitsvilleEnabled) {
-        if (info.type === 'GH_ORG') {
-          if (type !== 'GH_ORG' && type !== 'GH_GUESS') {
-            // the frontend code should have prevented you from getting here
-            throw new StatusError(400, 'Group must be type GH_ORG: ' + type);
-          }
-          if (linkPath !== uri) {
-            // the frontend code should have prevented you from getting here
-            throw new StatusError(400, 'Group linkPath must match uri: ' + linkPath);
-          }
+      if (info.type === 'GH_ORG') {
+        if (type !== 'GH_ORG' && type !== 'GH_GUESS') {
+          // the frontend code should have prevented you from getting here
+          throw new StatusError(400, 'Group must be type GH_ORG: ' + type);
         }
       }
     });
@@ -218,12 +210,28 @@ function findRoomsIdForGroup(groupId, userId) {
     });
 }
 
+function setAvatarForGroup(groupId, url) {
+  var query = { _id: groupId };
+
+  var update = {
+    $set: {
+      avatarUrl: url
+    },
+    $inc: {
+      avatarVersion: 1
+    }
+  };
+
+  return Group.findOneAndUpdate(query, update).exec();
+}
+
 module.exports = {
   findByUri: Promise.method(findByUri),
   findById: Promise.method(findById),
   findByIds: findByIds,
   createGroup: Promise.method(createGroup),
   findRoomsIdForGroup: Promise.method(findRoomsIdForGroup),
+  setAvatarForGroup: setAvatarForGroup,
   migration: {
     upsertGroup: upsertGroup,
     ensureGroupForGitHubRoomCreation: ensureGroupForGitHubRoomCreation,
