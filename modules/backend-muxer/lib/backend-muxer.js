@@ -112,7 +112,8 @@ BackendMuxer.prototype.findProfiles = function() {
 };
 
 BackendMuxer.testOnly = {
-  getFirstResultForBackends: getFirstResultForBackends
+  getFirstResultForBackends: getFirstResultForBackends,
+  resolveUserBackends: resolveUserBackends
 };
 
 module.exports = BackendMuxer;

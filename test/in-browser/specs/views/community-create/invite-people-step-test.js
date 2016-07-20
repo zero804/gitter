@@ -10,6 +10,7 @@ var CommunityCreateModel = require('public/js/views/community-create/community-c
 var CommunityCreateStepViewModel = require('public/js/views/community-create/community-create-step-view-model');
 var InvitePeopleView = require('public/js/views/community-create/invite-step/community-creation-invite-people-view');
 
+
 describe('community-creation-invite-people-view', function() {
 
   var communityCreateModel;
