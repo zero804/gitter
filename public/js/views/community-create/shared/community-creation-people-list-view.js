@@ -61,9 +61,9 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
   serializeData: function() {
     var data = this.model.toJSON();
 
-    var githubUsername = this.model.get('githubUsername');
-    var twitterUsername = this.model.get('twitterUsername');
-    var username = githubUsername || twitterUsername || this.model.get('username');
+    var githubUsername = data.githubUsername;
+    var twitterUsername = data.twitterUsername;
+    var username = githubUsername || twitterUsername || data.username;
     var emailAddress = data.emailAddress;
 
     data.absoluteUri = urlJoin(clientEnv.basePath, username);
