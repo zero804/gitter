@@ -2,6 +2,7 @@
 
 var Promise = require('bluebird');
 var _ = require('lodash');
+var StatusError = require('statuserror');
 
 //TODO remove
 var faker = require('faker');
@@ -54,6 +55,10 @@ function getForum(){
 module.exports = {
   id: 'forumId',
   show: function(req, res){
+
+    var hasTopics = req.fflip && req.fflip.has('topics');
+    if(!hasTopics || !req.user) { throw new StatusError(404); }
+
     return Promise.resolve(getForum());
   }
 };
