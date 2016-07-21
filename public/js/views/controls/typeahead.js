@@ -15,17 +15,19 @@ var TypeaheadView = Marionette.ItemView.extend({
       this.collection = new Backbone.Collection();
     }
 
-    // fix for first typeahead suggestion not triggering
-    // the dropdown to show
-    //
-    // if dropdown.show() is called on every add, then you
-    // get weird duplicates in the collectionView (!)
-    //
-    // tbh, dropdown's support for live typeaheads and static menus
-    // does not mix well.
-    this.listenToOnce(this.collection, 'add', function() {
-      if (this.dropdown) this.dropdown.show();
-    });
+    if(!options.disableShowOnAdd) {
+      // fix for first typeahead suggestion not triggering
+      // the dropdown to show
+      //
+      // if dropdown.show() is called on every add, then you
+      // get weird duplicates in the collectionView (!)
+      //
+      // tbh, dropdown's support for live typeaheads and static menus
+      // does not mix well.
+      this.listenToOnce(this.collection, 'add', function() {
+        if (this.dropdown) this.dropdown.show();
+      });
+    }
 
     // May not exist
     this.autoSelector = options.autoSelector;

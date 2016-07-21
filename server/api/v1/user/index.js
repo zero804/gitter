@@ -61,6 +61,7 @@ module.exports = {
     'rooms': require('./troupes'),
     'orgs': require('./orgs'),
     'repos': require('./repos'),
+    'groups': require('./groups'),
     'settings': require('./user-settings'),
     'suggestedRooms': require('./suggested-rooms'),
     'unreadItems': require('./aggregated-unread-items')
