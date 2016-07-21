@@ -9,6 +9,7 @@ var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var GroupWithPolicyService = require('../../../services/group-with-policy-service');
 var RoomWithPolicyService = require('../../../services/room-with-policy-service');
 var inviteValidation = require('gitter-web-invites/lib/invite-validation');
+var internalClientAccessOnly = require('../../../web/middlewares/internal-client-access-only');
 
 var MAX_BATCHED_INVITES = 100;
 
@@ -87,13 +88,11 @@ module.exports = {
   create: function(req) {
     var user = req.user;
 
+    // This is for internal clients only
+    internalClientAccessOnly.validateClientInternal(req);
+
     if (!req.user) {
       throw new StatusError(401);
-    }
-
-    if (!req.authInfo || req.authInfo.client.clientKey !== 'web-internal') {
-      // This is a private API
-      throw new StatusError(404);
     }
 
     var groupOptions = getGroupOptions(req.body);
@@ -125,7 +124,7 @@ module.exports = {
         // the report that the promise resolves to.
         return roomWithPolicyService.createRoomInvitations(invites);
       })
-      .then(function(invitesReport) {
+      .then(function(/* invitesReport */) {
         var groupStrategy = new restSerializer.GroupStrategy();
         var troupeStrategy = new restSerializer.TroupeStrategy({
           currentUserId: req.user.id,

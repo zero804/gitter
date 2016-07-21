@@ -1,5 +1,3 @@
-/*jslint node:true, unused:true*/
-/*global describe:true, it:true, before:true, after: true */
 "use strict";
 
 var testRequire = require('../test-require');
@@ -199,5 +197,20 @@ describe('oauth-service', function() {
       .nodeify(done);
   });
 
+  describe('isInternalClient', function() {
+    var FIXTURES = [
+      { client: null, result: false },
+      { client: { }, result: false },
+      { client: { clientKey: 'bob', canSkipAuthorization: false }, result: false },
+      { client: { clientKey: 'bob', canSkipAuthorization: true }, result: true },
+      { client: { clientKey: 'web-internal' }, result: true },
+    ];
 
+    FIXTURES.forEach(function(meta, index) {
+      it('check #' + (index + 1), function() {
+        var result = oauthService.isInternalClient(meta.client);
+        assert.strictEqual(result, meta.result);
+      });
+    });
+  });
 });
