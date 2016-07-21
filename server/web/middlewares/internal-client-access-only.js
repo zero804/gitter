@@ -11,7 +11,7 @@ function isInternalClient(req) {
   return oauthService.isInternalClient(req.authInfo.client);
 }
 
-function logAccessDenied(user, client) {
+function logAccessDenied(user, client, originalUrl) {
   var clientKey = client && client.clientKey;
   var clientId = client && (client.id || client._id);
   var userId = user && (userId.id || userId._id);
@@ -19,22 +19,25 @@ function logAccessDenied(user, client) {
   logger.error('Non internal client attempted to access private API', {
     clientKey: clientKey,
     clientId: clientId,
-    userId: userId
+    userId: userId,
+    path: originalUrl
   });
 
   stats.event('internalapi.access.denied');
 }
 
-function validateClientInternal(req) {
+function isRequestFromInternalClient(req) {
   if (!isInternalClient(req)) {
-    logAccessDenied(req.user, req.client);
-    throw new StatusError(404);
+    logAccessDenied(req.user, req.client, req.originalUrl);
+    return false;
   }
+
+  return true;
 }
 
 function middleware(req, res, next) {
   if (!isInternalClient(req)) {
-    logAccessDenied(req.user, req.client);
+    logAccessDenied(req.user, req.client, req.originalUrl);
     return next(new StatusError(404));
   }
 
@@ -42,6 +45,6 @@ function middleware(req, res, next) {
 }
 
 module.exports = {
-  validateClientInternal: validateClientInternal,
+  isRequestFromInternalClient: isRequestFromInternalClient,
   middleware: middleware
 };

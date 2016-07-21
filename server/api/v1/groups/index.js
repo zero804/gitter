@@ -89,7 +89,9 @@ module.exports = {
     var user = req.user;
 
     // This is for internal clients only
-    internalClientAccessOnly.validateClientInternal(req);
+    if (!internalClientAccessOnly.isRequestFromInternalClient(req)) {
+      throw new StatusError(404);
+    }
 
     if (!req.user) {
       throw new StatusError(401);
