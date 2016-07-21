@@ -9,6 +9,7 @@ var itemTemplate = require('./tmpl/parentItemView.hbs');
 var GroupSelectView = Marionette.ItemView.extend({
   events: {
     'focus @ui.input': 'show',
+    'blur @ui.input': 'hide',
     'click @ui.input': 'show'
   },
   ui: {

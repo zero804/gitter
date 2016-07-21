@@ -311,6 +311,8 @@ var CreateRoomView = Marionette.LayoutView.extend({
 
 
 var Modal = ModalView.extend({
+  disableAutoFocus: true,
+
   initialize: function(options) {
     options = options || {};
     options.title = options.title || 'Create a room';
