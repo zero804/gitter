@@ -1,0 +1,11 @@
+{
+  "env": {
+    "node": true
+  },
+  "extends": [
+    "eslint:recommended"
+  ],
+  "rules": {
+    "node/no-unpublished-require": "off"
+  }
+}
