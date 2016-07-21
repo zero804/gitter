@@ -21,7 +21,7 @@ npm.load({
 }, function (err) {
   if (err) throw err;
 
-  npm.commands.install([dep + "@" + version], function (err, data) {
+  npm.commands.install([dep + "@" + version], function (err) {
     if (err) throw err;
   });
 
