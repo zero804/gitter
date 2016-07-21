@@ -46,6 +46,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
     associatedProjectName: '.js-associated-github-project-name',
     associatedProjectLink: '.js-associated-github-project-link',
     securityOptions: '[name="create-room-security"]',
+    roomDetailSection: '.js-create-room-detail-section',
     onlyGithubUsersOption: '.js-create-room-only-github-users-option',
     onlyGithubUsersOptionInput: '.js-create-room-only-github-users-option-input',
     onlyOrgUsersOption: '.js-create-room-only-org-users-option',
@@ -279,12 +280,18 @@ var CreateRoomView = Marionette.LayoutView.extend({
     toggleClass(this.ui.associatedProjectLink[0], 'hidden', !associatedGithubProject);
     this.ui.associatedProjectLink[0].setAttribute('href', associatedGithubProject ? urlJoin('https://github.com', associatedGithubProject.get('uri')) : '');
 
-    toggleClass(this.ui.onlyGithubUsersOption[0], 'hidden', security !== 'PUBLIC');
-
     var groupBackedBy = group.get('backedBy');
     var isBackedByGitHub = groupBackedBy.type === 'GH_ORG' || groupBackedBy.type === 'GH_REPO';
-    toggleClass(this.ui.onlyOrgUsersOption[0], 'hidden', !isBackedByGitHub || security !== 'PRIVATE');
-    this.ui.onlyOrgUsersOptionOrgName[0].textContent = associatedGithubProject ? associatedGithubProject.get('name') : '';
+
+    var shouldHideOnlyGitHubUsersOption = !isBackedByGitHub || security !== 'PUBLIC';
+    toggleClass(this.ui.onlyGithubUsersOption[0], 'hidden', shouldHideOnlyGitHubUsersOption);
+
+    var shouldHideOnlyOrgUsersOption = !isBackedByGitHub || security !== 'PRIVATE';
+    toggleClass(this.ui.onlyOrgUsersOption[0], 'hidden', shouldHideOnlyOrgUsersOption);
+    this.ui.onlyOrgUsersOptionOrgName[0].textContent = groupBackedBy.linkPath;
+
+    toggleClass(this.ui.roomDetailSection[0], 'hidden', shouldHideOnlyGitHubUsersOption && shouldHideOnlyOrgUsersOption);
+
   },
 
   filterReposForSelectedGroup: function() {
