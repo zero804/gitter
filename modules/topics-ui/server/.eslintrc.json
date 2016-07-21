@@ -1,0 +1,20 @@
+{
+  "env": {
+    "commonjs": true,
+    "node": true
+  },
+  "plugins": [
+    "node"
+  ],
+  "extends": [
+    "eslint:recommended"
+  ],
+  "rules": {
+    "node/no-unsupported-features": [
+      "error",
+      {
+        "version": 4
+      }
+    ]
+  }
+}
