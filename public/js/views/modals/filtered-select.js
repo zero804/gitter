@@ -7,8 +7,8 @@ var FilteredCollection = require('backbone-filtered-collection');
 
 var GroupSelectView = Marionette.ItemView.extend({
   events: {
-    'focus': 'show',
-    'click': 'show'
+    'focus': 'onActivate',
+    'click': 'onActivate'
   },
 
 
@@ -16,6 +16,7 @@ var GroupSelectView = Marionette.ItemView.extend({
     this.filter = options.filter;
     this.collection = options.collection;
     this.itemTemplate = options.itemTemplate;
+    this.showOnActivate = options.showOnActivate;
 
     this.filteredCollection = new FilteredCollection({
       collection: this.collection
@@ -53,6 +54,12 @@ var GroupSelectView = Marionette.ItemView.extend({
 
   onDestroy: function() {
     this.typeahead.destroy();
+  },
+
+  onActivate: function() {
+    if(this.showOnActivate) {
+      this.show();
+    }
   },
 
   show: function() {
