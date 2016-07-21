@@ -162,6 +162,39 @@ exports.deleteToken = function(token, callback) {
     .nodeify(callback);
 };
 
+function clientKeyIsInternal(clientKey) { // eslint-disable-line complexity
+  switch(clientKey) {
+    case 'web-internal': // The webapp
+    case '1': // old OSX app
+    case '2': // old Beta OSX app
+    case '4': // old Troupe Notifier OSX app
+    case '5': // old Troupe Notifier Beta OSX app
+    case 'osx-desktop-prod':
+    case 'windows-desktop-prod':
+    case 'linux-desktop-prod':
+    case 'android-prod':
+    case 'ios-beta':
+    case 'ios-beta-dev':
+    case 'ios-prod':
+    case 'ios-prod-dev':
+      return true;
+  }
+
+  return false;
+}
+
+/**
+ * In future we should add scopes to our client schema, rather than
+ * doing this, which is horrible
+ */
+exports.isInternalClient = function(client) {
+  if (!client) return false;
+  if (!client.clientKey) return false;
+  if (client.canSkipAuthorization) return true;
+
+  return clientKeyIsInternal(client.clientKey);
+}
+
 exports.testOnly = {
   invalidateCache: function() {
     return tokenProvider.testOnly.invalidateCache();
