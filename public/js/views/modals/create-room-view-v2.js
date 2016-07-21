@@ -139,8 +139,15 @@ var CreateRoomView = Marionette.LayoutView.extend({
     var onlyGithubUsers = this.model.get('onlyGithubUsers');
     var onlyOrgUsers = this.model.get('onlyOrgUsers');
 
+    var type = null;
+    var linkPath = null;
     if(onlyOrgUsers && security === 'PRIVATE') {
-      security = 'INHERITED'
+      type = 'GH_ORG';
+      linkPath = selectedGroup.get('uri');
+    }
+    else if(associatedGithubProject) {
+      type = 'GH_REPO';
+      linkPath = associatedGithubProject.get('uri');
     }
 
     var apiUrl = urlJoin('/v1/groups/', selectedGroup.get('id'), '/rooms');
@@ -148,9 +155,9 @@ var CreateRoomView = Marionette.LayoutView.extend({
       name: roomName,
       security: {
         // null or GH_ORG or GH_REPO
-        type: associatedGithubProject ? 'GH_REPO' : null,
+        type: type,
         security: security,
-        linkPath: associatedGithubProject ? associatedGithubProject.get('uri') : null
+        linkPath: linkPath
       }
     };
 
