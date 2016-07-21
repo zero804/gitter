@@ -30,7 +30,7 @@ var CommunityCreateModel = Backbone.Model.extend({
     isUsingExplicitGitHubProject: false,
     githubOrgId: null,
     githubRepoId: null,
-
+    allowBadger: true,
   },
 
   initialize: function() {
