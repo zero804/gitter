@@ -143,7 +143,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
       security = 'INHERITED'
     }
 
-    var apiUrl = '/v1/groups/' + selectedGroup.get('id') + '/rooms';
+    var apiUrl = urlJoin('/v1/groups/', selectedGroup.get('id'), '/rooms');
     var payload = {
       name: roomName,
       security: {
@@ -163,7 +163,8 @@ var CreateRoomView = Marionette.LayoutView.extend({
     apiClient.post(apiUrl, payload)
       .then(function(data) {
         this.dialog.hide();
-        appEvents.trigger('navigation', '/' + data.uri, 'chat#add', '/' + data.uri);
+        // url, type, title
+        appEvents.trigger('navigation', urlJoin('/', data.uri), 'chat#add', data.uri);
       }.bind(this))
       .catch(function(err) {
         var status = err.status;
