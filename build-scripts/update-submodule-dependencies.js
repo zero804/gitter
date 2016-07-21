@@ -126,7 +126,7 @@ function installUpdates(packageFile, isDev, changes) {
     return c.name + '@' + correctVersion;
   }).join(' ');
 
-  console.log('(cd ' + wd + '; npm i ' + versions + (isDev ? ' --save-dev' : ' --save')  + '; rm -rf node_modules)')
+  console.log('(cd ' + wd + '; npm i ' + versions + (isDev ? ' --save-dev' : ' --save') + '; rm -rf node_modules)')
 }
 
 function updateDependenciesForPackage(packageFile) {
