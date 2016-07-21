@@ -2,6 +2,10 @@
 {
   "watch": ["server", "shared", "modules"],
   "ext": "js json hbs",
+  "ignore": [
+    ".git",
+    "modules/topics-ui/containers/**"
+  ],
   "verbose": true,
   "env": {
     "NODEMON": "1",
