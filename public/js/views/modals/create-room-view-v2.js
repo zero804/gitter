@@ -141,13 +141,13 @@ var CreateRoomView = Marionette.LayoutView.extend({
 
     var type = null;
     var linkPath = null;
-    if(onlyOrgUsers && security === 'PRIVATE') {
-      type = 'GH_ORG';
-      linkPath = selectedGroup.get('uri');
-    }
-    else if(associatedGithubProject) {
+    if(associatedGithubProject) {
       type = 'GH_REPO';
       linkPath = associatedGithubProject.get('uri');
+    }
+    else if((onlyOrgUsers && security === 'PRIVATE') || security === 'PUBLIC') {
+      type = 'GH_ORG';
+      linkPath = selectedGroup.get('uri');
     }
 
     var apiUrl = urlJoin('/v1/groups/', selectedGroup.get('id'), '/rooms');
