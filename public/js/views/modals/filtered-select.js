@@ -8,6 +8,7 @@ var FilteredCollection = require('backbone-filtered-collection');
 var FilteredSelect = Marionette.ItemView.extend({
   events: {
     'focus': 'onActivate',
+    'blur': 'hide',
     'click': 'onActivate'
   },
 

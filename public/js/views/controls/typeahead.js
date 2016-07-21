@@ -29,7 +29,7 @@ var TypeaheadView = Marionette.ItemView.extend({
       // tbh, dropdown's support for live typeaheads and static menus
       // does not mix well.
       this.listenToOnce(this.collection, 'add', function() {
-        if (this.dropdown) this.dropdown.show();
+        this.show();
       });
     }
 
@@ -54,15 +54,15 @@ var TypeaheadView = Marionette.ItemView.extend({
   },
 
   show: function() {
-    if(this.lastFetchInput === undefined) {
-      this.searchTextChanged(this.el.value);
+    if (this.dropdown) {
+      this.dropdown.show();
     }
-
-    this.dropdown.show();
   },
 
   hide: function() {
-    this.dropdown.hide();
+    if (this.dropdown) {
+      this.dropdown.hide();
+    }
   },
 
   attach: function() {
@@ -128,7 +128,7 @@ var TypeaheadView = Marionette.ItemView.extend({
       this.collection.fetch({ data: { q: input }}, { add: true, remove: true, merge: true, success: fetchSuccess });
     }
 
-    this.dropdown.show();
+    this.show();
   },
 
   keydown: function(e) {
@@ -145,7 +145,7 @@ var TypeaheadView = Marionette.ItemView.extend({
         if(this.dropdown.active()) {
           this.dropdown.selectNext();
         } else {
-          this.dropdown.show();
+          this.show();
         }
         break;
 
@@ -155,7 +155,7 @@ var TypeaheadView = Marionette.ItemView.extend({
           return;
         }
 
-        this.dropdown.hide();
+        this.hide();
         break;
 
       default:
