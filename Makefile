@@ -2,18 +2,20 @@ EMBEDDED_NODE_ENV ?= prod
 EMBEDDED_WWW_DIRECTORY ?= ~/code/gitter/ios/Troupe/www/build
 PATH := ./node_modules/.bin:$(PATH)
 
-.PHONY: build clean test npm sprites npm-quick npm-full performance-tests test-no-coverage
+.PHONY: build clean test npm sprites npm-quick npm-full performance-tests test-no-coverage continuous-integration validate
+
+continuous-integration: build
+
+build: clean npm validate test package
 
 validate: npm
 	gulp validate
-
-build: clean npm package
 
 test-lua:
 	echo lua tests disabled #gulp test-redis-lua
 
 package: npm
-	gulp package
+	gulp package --skip-stage validate --skip-stage test
 
 clean: npm
 	gulp clean
@@ -57,8 +59,6 @@ upgrade-data:
 
 maintain-data:
 	MODIFY=true ./scripts/datamaintenance/execute.sh || true
-
-continuous-integration: build
 
 clean-embedded-chat:
 	rm -rf output/embedded output/embedded.tgz
