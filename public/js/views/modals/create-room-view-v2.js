@@ -217,7 +217,6 @@ var CreateRoomView = Marionette.LayoutView.extend({
 
     this.debouncedCheckForRoomConflict();
 
-    this.ui.nameInput[0].value = roomName;
     this.repoNameTypeahead.hide();
   },
 
