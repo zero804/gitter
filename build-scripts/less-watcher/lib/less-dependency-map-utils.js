@@ -1,3 +1,5 @@
+'use strict';
+
 var Promise = require('bluebird');
 var fs = require('fs');
 var readFile = Promise.promisify(fs.readFile);
@@ -6,8 +8,6 @@ var path = require('path');
 var pathUtils = require('./path-parse-format-utils');
 var _ = require('underscore');
 var memoize = require('memoize-promise');
-
-
 
 var extendDepMaps = function(/*n-number of depMaps*/) {
   var resultantDepMap = {};
@@ -106,7 +106,7 @@ var generateLessDependencyMap = memoize(function(rootFilePath, options, /*intern
                 depMap = extendDepMaps(depMap, pDepMap);
               });
             })
-            .catch(function(err) {
+            .catch(function(/*err*/) {
               // Swallow any errors
               // We don't care about not finding it because
               // there are multiple directories(`opts.paths`) to check
