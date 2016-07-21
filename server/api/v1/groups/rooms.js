@@ -56,11 +56,6 @@ module.exports = {
       throw new StatusError(401);
     }
 
-    if (!req.authInfo || req.authInfo.client.clientKey !== 'web-internal') {
-      // This is a private API
-      throw new StatusError(404);
-    }
-
     var createOptions = getCreateOptions(req.body);
 
     var groupWithPolicyService = new GroupWithPolicyService(req.group, req.user, req.userGroupPolicy);
