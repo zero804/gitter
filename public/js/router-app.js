@@ -489,14 +489,17 @@ onready(function() {
       function getSuitableGroupId() {
         var groupId = false;
 
-        var slimCurrentTroupe = context.troupe();
-        var currentTroupe = troupeCollections.troupes.get(slimCurrentTroupe.get('id'));
         var menuBarGroup = appLayout.getRoomMenuModel().getCurrentGroup();
         if(menuBarGroup) {
           groupId = menuBarGroup.get('id');
         }
-        else if(currentTroupe) {
-          groupId = currentTroupe.get('groupId');
+        else {
+          var slimCurrentTroupe = context.troupe();
+          var currentTroupe = troupeCollections.troupes.get(slimCurrentTroupe.get('id'));
+
+          if(currentTroupe) {
+            groupId = currentTroupe.get('groupId');
+          }
         }
 
         return groupId;
