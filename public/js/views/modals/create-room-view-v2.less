@@ -140,6 +140,10 @@
 
 .create-room-security-list-item-label {
   display: flex;
+
+  .create-room-security-list-item-radio:disabled + & {
+    color: fade(@trpDarkGrey, 30%);
+  }
 }
 
 .create-room-security-list-item-icon {
