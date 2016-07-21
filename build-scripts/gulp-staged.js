@@ -3,6 +3,18 @@
 var gulp = require('gulp');
 var runSequence = require('run-sequence');
 
+var argv = require('yargs')
+  .option('skip-stage', {
+    array: true,
+    describe: 'skip a stage'
+  })
+  .help('help')
+  .argv;
+
+function shouldSkip(stageName) {
+  return argv['skip-stage'] && argv['skip-stage'].indexOf(stageName) >= 0;
+}
+
 function findStageTasks(config, stageName) {
   var items = Object.keys(config)
     .map(function(name) {
@@ -19,6 +31,12 @@ function findStageTasks(config, stageName) {
 function configureTasks(config) {
 
   function createStageTask(stageName, previousStages) {
+    if (shouldSkip(stageName)) return;
+    if (previousStages) {
+      previousStages = previousStages.filter(function(name) {
+        return !shouldSkip(name);
+      });
+    }
     var preTaskName = 'pre-' + stageName;
     var postTaskName = 'post-' + stageName;
 
