@@ -22,7 +22,7 @@ module.exports = function getFakeForumObject(){
       return data;
     });
 
-    forum =  {
+    forum = {
       name:        faker.commerce.productName(),
       topicsTotal: topics.length,
       topics:      topics,

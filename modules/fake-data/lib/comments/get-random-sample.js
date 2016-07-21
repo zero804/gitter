@@ -7,7 +7,7 @@ var getRandomInt = require('../utils/get-random-int');
 module.exports = function getRandomCommentsSample(parentId){
 
   var comments = getComments();
-  return comments.slice(0, comments.length - 1).map(function(reply){
+  return comments.slice(getRandomInt(0, comments.length - 1)).map(function(reply){
     return _.extend({}, reply, { parentId: parentId });
   });
 
