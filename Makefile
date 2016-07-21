@@ -19,9 +19,15 @@ submit-to-codecov: npm test
 	gulp submit-codecov-post-tests
 
 clean:
+	echo "Removing modules/topics-ui/output please do not backmerge"
+	## ----TEMP TEMP TEMP-----------------------------------
+	## Remove this after release 17.5.0 has been released
+	rm -rf modules/topics-ui/output
+	## ----END TEMP TEMP TEMP-------------------------------
 	rm -rf output
 
 test: clean npm
+
 	mkdir -p output/
 	./exec-in-docker ./node_modules/.bin/gulp test-docker
 	echo "Docker tests completed"
