@@ -52,7 +52,9 @@ var webpackConfig = {
       'raven-js',
       'keymaster',
       'moment',
-      'bluebird'
+      'bluebird',
+      'fuzzysearch',
+      'url-join'
     ]
   },
   output: {
