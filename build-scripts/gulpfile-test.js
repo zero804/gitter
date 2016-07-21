@@ -94,7 +94,7 @@ testModules.integration = {
   isCritical: true
 };
 
-function spawnMochaProcess(moduleName, options, files) {
+function spawnMochaProcess(moduleName, options, files) { // eslint-disable-line max-statements
   var executable;
   var args;
 
