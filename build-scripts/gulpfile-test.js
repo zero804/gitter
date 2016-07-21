@@ -128,6 +128,7 @@ function spawnMochaProcess(moduleName, options, files) {
   }
 
   if (testSuite === 'docker') {
+    env.HOME = '/tmp'; // Needs to be writeable inside docker for `nyc`
     env.NODE_ENV = 'test-docker';
   }
 
