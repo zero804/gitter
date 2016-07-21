@@ -1,6 +1,7 @@
 'use strict';
 
 var Promise = require('bluebird');
+var _ = require('underscore');
 var Marionette = require('backbone.marionette');
 var fuzzysearch = require('fuzzysearch');
 var urlJoin = require('url-join');
@@ -22,8 +23,9 @@ var repoTypeaheadItemTemplate = require('./tmpl/create-room-repo-typeahead-item-
 
 
 
-var checkForRepoExistence = function(repoUri) {
-  if(repoUri) {
+var checkForRepoExistence = function(orgName, repoName) {
+  if(orgName && repoName) {
+    var repoUri = (orgName + '/' + repoName).toLowerCase();
     return apiClient.priv.get('/gh/repos/' + repoUri)
       .then(function() {
         return true;
@@ -36,7 +38,6 @@ var checkForRepoExistence = function(repoUri) {
   return Promise.resolve(false);
 };
 
-
 var CreateRoomView = Marionette.LayoutView.extend({
   template: template,
 
@@ -46,6 +47,8 @@ var CreateRoomView = Marionette.LayoutView.extend({
     associatedProjectName: '.js-associated-github-project-name',
     associatedProjectLink: '.js-associated-github-project-link',
     securityOptions: '[name="create-room-security"]',
+    publicSecurityOption: '.js-create-room-security-public-radio',
+    privateSecurityOption: '.js-create-room-security-private-radio',
     roomDetailSection: '.js-create-room-detail-section',
     onlyGithubUsersOption: '.js-create-room-only-github-users-option',
     onlyGithubUsersOptionInput: '.js-create-room-only-github-users-option-input',
@@ -73,7 +76,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
     'change:roomName': 'onRoomNameChange',
     'change:associatedGithubProject': 'updateFields',
     'change:security': 'updateFields',
-    'change:roomAvailabilityStatus': 'onRoomAvailabilityStatusChange'
+    'change:roomAvailabilityStatus': 'onRoomAvailabilityStatusChange',
   },
 
   initialize: function(attrs) {
@@ -115,7 +118,11 @@ var CreateRoomView = Marionette.LayoutView.extend({
   menuItemClicked: function(button) {
     switch(button) {
       case 'create':
-        this.sendCreateRoomRequest();
+        if(this.model.isValid()) {
+          this.sendCreateRoomRequest();
+        }
+        // Update the fields with any errors after validation
+        this.updateFields();
         break;
 
       case 'cancel':
@@ -187,23 +194,36 @@ var CreateRoomView = Marionette.LayoutView.extend({
   },
 
   onGroupSelected: function(group) {
-    this.model.set('group', group);
+    var previousGroup = this.model.get('group');
+    this.model.set({
+      group: group
+    });
+
     this.filterReposForSelectedGroup();
+    // Don't run this on the initial group filling because it adds unnecessary error texts to the user
+    if(previousGroup) {
+      this.debouncedCheckForRoomConflict();
+    }
   },
 
   onRepoSelected: function(repo) {
     var roomName = getRoomNameFromTroupeName(repo.get('name'));
     this.model.set({
       roomName: roomName,
-      associatedGithubProject: repo
+      associatedGithubProject: repo,
+      security: repo.get('private') ? 'PRIVATE' : 'PUBLIC'
     });
+
+    this.debouncedCheckForRoomConflict();
 
     this.ui.nameInput[0].value = roomName;
     this.repoNameTypeahead.hide();
   },
 
   onNameInput: function() {
-    this.model.set('roomName', this.ui.nameInput[0].value);
+    this.model.set({
+      roomName: this.ui.nameInput[0].value
+    });
   },
 
   onNameClearActivated: function() {
@@ -235,20 +255,35 @@ var CreateRoomView = Marionette.LayoutView.extend({
   },
 
   onRoomNameChange: function() {
-    var roomName = this.model.get('roomName');
-    var group = this.model.get('group');
-    var associatedGithubProject = this.model.get('associatedGithubProject');
+    this.debouncedCheckForRoomConflict();
+    this.updateFields();
+  },
 
-    var repoCheckString = group.get('name') + '/' + roomName;
+  debouncedCheckForRoomConflict: _.debounce(function() {
+    var group = this.model.get('group');
+    var roomName = this.model.get('roomName');
+
+    var repoCheckString = group.get('uri') + '/' + roomName;
     var roomAlreadyExists = roomName && troupeCollections.troupes.findWhere({ uri: repoCheckString });
     if(roomAlreadyExists) {
       this.model.set('roomAvailabilityStatus', roomAvailabilityStatusConstants.UNAVAILABLE);
     }
     else {
+      var associatedGithubProject = this.model.get('associatedGithubProject');
       this.model.set('roomAvailabilityStatus', roomAvailabilityStatusConstants.PENDING);
-      checkForRepoExistence(repoCheckString)
+      checkForRepoExistence(group.get('uri'), roomName)
         .then(function(doesExist) {
-          if(doesExist && associatedGithubProject) {
+          var doesCurrentGitHubProjectMatchRequest = false;
+          if(associatedGithubProject) {
+            var requestRepoUri = (group.get('uri') + '/' + roomName).toLowerCase();
+            doesCurrentGitHubProjectMatchRequest = requestRepoUri === (associatedGithubProject.get('uri') || '').toLowerCase();
+          }
+
+          if(!doesExist) {
+            this.model.set('roomAvailabilityStatus', roomAvailabilityStatusConstants.AVAILABLE);
+          }
+          // You can still create a room with the same name as the repo if you associate it with project
+          else if(doesExist && doesCurrentGitHubProjectMatchRequest) {
             this.model.set('roomAvailabilityStatus', roomAvailabilityStatusConstants.AVAILABLE);
           }
           else {
@@ -256,16 +291,11 @@ var CreateRoomView = Marionette.LayoutView.extend({
           }
         }.bind(this));
     }
-
-    this.updateFields();
-  },
+  }, 300),
 
   onRoomAvailabilityStatusChange: function() {
-    (this.model.validationError || []).forEach(function(validationError) {
-      if(validationError.key === 'roomName') {
-        this.ui.roomAvailabilityStatusMessage[0].textContent = validationError.message;
-      }
-    });
+    this.model.isValid();
+    this.updateFields();
   },
 
   updateFields: function() {
@@ -274,12 +304,24 @@ var CreateRoomView = Marionette.LayoutView.extend({
     var associatedGithubProject = this.model.get('associatedGithubProject');
     var security = this.model.get('security');
 
+    // Room name
     this.ui.nameInput[0].value = roomName;
 
+    // Associated github project
     this.ui.associatedProjectName[0].textContent = associatedGithubProject ? associatedGithubProject.get('name') : '';
     toggleClass(this.ui.associatedProjectLink[0], 'hidden', !associatedGithubProject);
     this.ui.associatedProjectLink[0].setAttribute('href', associatedGithubProject ? urlJoin('https://github.com', associatedGithubProject.get('uri')) : '');
 
+    // Security Options
+    this.ui.publicSecurityOption[0].disabled = associatedGithubProject && associatedGithubProject.get('private');
+    this.ui.privateSecurityOption[0].disabled = associatedGithubProject && !associatedGithubProject.get('private');
+    // Only change if there is a project
+    if(associatedGithubProject) {
+      this.ui.publicSecurityOption[0].checked = !associatedGithubProject.get('private');
+      this.ui.privateSecurityOption[0].checked = associatedGithubProject.get('private');
+    }
+
+    // Details
     var groupBackedBy = group.get('backedBy');
     var isBackedByGitHub = groupBackedBy.type === 'GH_ORG' || groupBackedBy.type === 'GH_REPO';
 
@@ -290,8 +332,18 @@ var CreateRoomView = Marionette.LayoutView.extend({
     toggleClass(this.ui.onlyOrgUsersOption[0], 'hidden', shouldHideOnlyOrgUsersOption);
     this.ui.onlyOrgUsersOptionOrgName[0].textContent = groupBackedBy.linkPath;
 
+
     toggleClass(this.ui.roomDetailSection[0], 'hidden', shouldHideOnlyGitHubUsersOption && shouldHideOnlyOrgUsersOption);
 
+    // Validation and Errors
+    var roomAvailabilityStatusMessage = '';
+    (this.model.validationError || []).forEach(function(validationError) {
+      if(validationError.key === 'roomName') {
+        roomAvailabilityStatusMessage = validationError.message;
+      }
+    }.bind(this));
+
+    this.ui.roomAvailabilityStatusMessage[0].textContent = roomAvailabilityStatusMessage;
   },
 
   filterReposForSelectedGroup: function() {

@@ -3,7 +3,7 @@
 var roomAvailabilityStatusConstants = {
   PENDING: 'pending',
   AVAILABLE: 'available',
-  REPO_CONFLICT: 'available',
+  REPO_CONFLICT: 'repo_conflict',
   UNAVAILABLE: 'unavailable'
 };
 

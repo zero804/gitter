@@ -19,7 +19,7 @@ var CreateRoomViewModel = Backbone.Model.extend({
   validate: function() {
     var errors = [];
 
-    var roomName = this.communityCreateModel.get('roomName') || '';
+    var roomName = this.get('roomName') || '';
 
     var hasRoomName = roomName.length > 0;
     if(!hasRoomName) {
@@ -29,19 +29,19 @@ var CreateRoomViewModel = Backbone.Model.extend({
       });
     }
 
-    if(this.communityCreateModel.get('roomAvailabilityStatus') === roomAvailabilityStatusConstants.UNAVAILABLE) {
+    if(this.get('roomAvailabilityStatus') === roomAvailabilityStatusConstants.UNAVAILABLE) {
       errors.push({
         key: 'roomName',
         message: 'That room already exists'
       });
     }
-    else if(this.communityCreateModel.get('roomAvailabilityStatus') === roomAvailabilityStatusConstants.REPO_CONFLICT) {
+    else if(this.get('roomAvailabilityStatus') === roomAvailabilityStatusConstants.REPO_CONFLICT) {
       errors.push({
         key: 'roomName',
         message: 'You cannot create a channel with a same name that as an already existing repo'
       });
     }
-    else if(this.communityCreateModel.get('roomAvailabilityStatus') === roomAvailabilityStatusConstants.REPO_CONFLICT) {
+    else if(this.get('roomAvailabilityStatus') === roomAvailabilityStatusConstants.REPO_CONFLICT) {
       errors.push({
         key: 'roomName',
         message: 'Waiting for room name check to respond'
