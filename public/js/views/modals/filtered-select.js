@@ -5,7 +5,7 @@ var Typeahead = require('views/controls/typeahead');
 var FilteredCollection = require('backbone-filtered-collection');
 
 
-var GroupSelectView = Marionette.ItemView.extend({
+var FilteredSelect = Marionette.ItemView.extend({
   events: {
     'focus': 'onActivate',
     'click': 'onActivate'
@@ -26,6 +26,9 @@ var GroupSelectView = Marionette.ItemView.extend({
     this.typeahead = new Typeahead({
       el: this.el,
       disableShowOnAdd: true,
+      disableListenToChange: true,
+      longDebounce: 200,
+      shortDebounce: 50,
       collection: this.filteredCollection,
       itemTemplate: this.itemTemplate,
       fetch: this.refilter.bind(this),
@@ -44,12 +47,9 @@ var GroupSelectView = Marionette.ItemView.extend({
     return this.selectedGroup;
   },
 
-  selected: function(group) {
-    if (this.typeahead) {
-      this.typeahead.hide();
-    }
-
-    this.trigger('selected', group);
+  selected: function(item) {
+    this.hide();
+    this.trigger('selected', item);
   },
 
   onDestroy: function() {
@@ -63,11 +63,15 @@ var GroupSelectView = Marionette.ItemView.extend({
   },
 
   show: function() {
-    this.typeahead.show();
+    if (this.typeahead) {
+      this.typeahead.show();
+    }
   },
 
   hide: function() {
-    this.typeahead.hide();
+    if (this.typeahead) {
+      this.typeahead.hide();
+    }
   },
 
   refilter: function(input, collection, success) {
@@ -80,4 +84,4 @@ var GroupSelectView = Marionette.ItemView.extend({
 
 });
 
-module.exports = GroupSelectView;
+module.exports = FilteredSelect;

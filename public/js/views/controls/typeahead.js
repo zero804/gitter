@@ -11,6 +11,10 @@ var TypeaheadView = Marionette.ItemView.extend({
     'keyup': 'keyup'
   },
   initialize: function(options) {
+    this.disableListenToChange = options.disableListenToChange;
+    this.longDebounce = options.longDebounce;
+    this.shortDebounce = options.shortDebounce;
+
     if(!this.collection) {
       this.collection = new Backbone.Collection();
     }
@@ -63,7 +67,12 @@ var TypeaheadView = Marionette.ItemView.extend({
 
   attach: function() {
     if(this.dropdown) return;
-    liveSearch(this, this.$el, 'searchTextChanged', { immediate: 'autoSelect' });
+    liveSearch(this, this.$el, 'searchTextChanged', {
+      immediate: 'autoSelect',
+      disableListenToChange: this.disableListenToChange,
+      longDebounce: this.longDebounce,
+      shortDebounce: this.shortDebounce
+    });
 
     this.dropdown = new Dropdown({
       collection: this.collection,
@@ -85,6 +94,10 @@ var TypeaheadView = Marionette.ItemView.extend({
   selected: function(m) {
     this.selected = m;
     this.trigger('selected', m);
+  },
+
+  active: function() {
+    return this.dropdown.active();
   },
 
   autoSelect: function() {

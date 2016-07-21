@@ -94,7 +94,9 @@ var CreateRoomView = Marionette.LayoutView.extend({
     this.groupSelect = new GroupSelectView({
       groupsCollection: this.groupsCollection
     });
-    var repoNameTypeahead = new FilteredSelect({
+    this.groupSelectRegion.show(this.groupSelect);
+
+    this.repoNameTypeahead = new FilteredSelect({
       el: this.ui.nameInput[0],
       collection: this.filteredRepoCollection,
       itemTemplate: repoTypeaheadItemTemplate,
@@ -104,9 +106,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
       }
     });
 
-    this.groupSelectRegion.show(this.groupSelect);
-
-    this.listenTo(repoNameTypeahead, 'selected', this.onRepoSelected, this);
+    this.listenTo(this.repoNameTypeahead, 'selected', this.onRepoSelected, this);
     this.listenTo(this.groupSelect, 'selected', this.onGroupSelected, this);
 
     this.selectSuggestedGroup();
@@ -197,9 +197,9 @@ var CreateRoomView = Marionette.LayoutView.extend({
       roomName: roomName,
       associatedGithubProject: repo
     });
-    this.ui.nameInput[0].value = roomName;
 
-    this.groupSelect.hide();
+    this.ui.nameInput[0].value = roomName;
+    this.repoNameTypeahead.hide();
   },
 
   onNameInput: function() {
