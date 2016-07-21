@@ -18,12 +18,14 @@ function getOutputPath(relative) {
   }
 }
 
-gulp.task('topics:babel', function() {
+gulp.task('topics:compile', ['topics:compile:babel', 'topics:compile:webpack']);
+
+gulp.task('topics:compile:babel', function() {
   return babelPipeline(ROOT)
     .pipe(gulp.dest(getOutputPath('babel')));
 });
 
-gulp.task('topics:webpack', function() {
+gulp.task('topics:compile:webpack', function() {
   return webpackPipeline(ROOT)
     .pipe(gulp.dest(getOutputPath('assets/js')));
 });
@@ -33,7 +35,3 @@ gulp.task('topics:clean', function(cb) {
     getOutputPath()
   ], cb);
 });
-
-gulp.task('topics:prepare-app', ['topics:babel']);
-gulp.task('topics:prepare-assets', ['topics:webpack']);
-gulp.task('topics:default', ['topics:prepare-app', 'topics:prepare-assets']);
