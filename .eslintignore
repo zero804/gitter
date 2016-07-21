@@ -1,7 +1,6 @@
 **/node_modules/*
 public/repo/**
 output/**
-build-scripts/**
 test/in-browser/old-n-busted/**
 test/in-browser/fixtures/coverage/**
 test/end-to-end/yslow/**
