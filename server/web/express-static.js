@@ -7,8 +7,11 @@ exports.install = function(app) {
 
   var webpackMiddleware = require("webpack-dev-middleware"); // eslint-disable-line node/no-unpublished-require
   var webpack = require('webpack');// eslint-disable-line node/no-unpublished-require
+  var topicsWebpackMiddleware = require('gitter-web-topics-ui/dev/webpack-middleware');
 
   process.env.WEBPACK_DEV_MODE = '1';
+
+  app.use(topicsWebpackMiddleware);
 
   app.use(webpackMiddleware(webpack(require('../../public/js/webpack.config')), {
       noInfo: false,

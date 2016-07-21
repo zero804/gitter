@@ -17,7 +17,7 @@ function readFileSync(fileName) {
   return '';
 }
 
-var assetTag = readFileSync('ASSET_TAG') || '';
+var assetTag = readFileSync('ASSET_TAG') || 'l';
 var commit = readFileSync('GIT_COMMIT') || '';
 var branch = readFileSync('VERSION') || 'HEAD';
 var version = commit ? commit.substring(0, 6) : 'HEAD-' + Math.floor(Date.now() / 10000);
