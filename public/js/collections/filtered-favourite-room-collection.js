@@ -32,8 +32,8 @@ var FilteredFavouriteCollection = FilteredRoomCollection.extend({
     },
 
     org: function(model) {
-      var orgName = this.roomModel.get('selectedOrgName');
-      return orgFavouriteFilter(model.attributes, orgName);
+      var groupId = this.roomModel.get('roomId');
+      return orgFavouriteFilter(model.attributes, groupId);
     },
 
     default: sortAndFilters.favourites.filter
