@@ -7,7 +7,7 @@ var assert = require('assert');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var groupService = require('gitter-web-groups/lib/group-service');
 
-describe('user-orgs #slow', function() {
+describe('user-repos #slow', function() {
   var app, request;
 
   before(function() {
@@ -21,11 +21,11 @@ describe('user-orgs #slow', function() {
         { username: fixtureLoader.GITTER_INTEGRATION_USERNAME }
       ],
       Group: [
-        { 'sd.linkPath': fixtureLoader.GITTER_INTEGRATION_ORG },
+        { 'sd.linkPath': fixtureLoader.GITTER_INTEGRATION_REPO_FULL },
         { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() }
       ],
       Troupe: [
-        { 'sd.linkPath': fixtureLoader.GITTER_INTEGRATION_ORG },
+        { 'sd.linkPath': fixtureLoader.GITTER_INTEGRATION_REPO_FULL },
         { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() + '/lobby' }
       ]
     },
@@ -36,30 +36,31 @@ describe('user-orgs #slow', function() {
     }
   });
 
-  it('GET /v1/user/:userId/orgs', function() {
+  it('GET /v1/user/:userId/repos', function() {
     return request(app)
-      .get('/v1/user/' + fixture.user1.id + '/orgs')
+      .get('/v1/user/' + fixture.user1.id + '/repos')
       .set('x-access-token', fixture.user1.accessToken)
       .expect(200)
       .then(function(result) {
-        var orgs = result.body;
+        var repos = result.body;
 
-        assert(orgs.some(function(org) {
-          return org.name === fixtureLoader.GITTER_INTEGRATION_ORG;
+        assert(repos.some(function(repo) {
+          console.log(repo.name, fixtureLoader.GITTER_INTEGRATION_REPO_FULL);
+          return repo.name === fixtureLoader.GITTER_INTEGRATION_REPO_FULL
         }));
       });
   });
 
-  it('GET /v1/user/:userId/orgs?type=unused', function() {
+  it('GET /v1/user/:userId/repos?type=unused', function() {
     return request(app)
-      .get('/v1/user/' + fixture.user1.id + '/orgs?type=unused')
+      .get('/v1/user/' + fixture.user1.id + '/repos?type=unused')
       .set('x-access-token', fixture.user1.accessToken)
       .expect(200)
       .then(function(result) {
-        var orgs = result.body;
+        var repos = result.body;
 
-        assert(orgs.some(function(org) {
-          return org.name === fixtureLoader.GITTER_INTEGRATION_ORG
+        assert(repos.some(function(repo) {
+          return repo.name === fixtureLoader.GITTER_INTEGRATION_REPO_FULL
         }));
 
         // now try and add one and see if it is still in there
@@ -67,23 +68,23 @@ describe('user-orgs #slow', function() {
         //  as it is faster to execute and which user took the linkPath is
         //  irrelevant)
         return groupService.createGroup(fixture.user1, {
-            type: 'GH_ORG',
+            type: 'GH_REPO',
             name: fixtureLoader.GITTER_INTEGRATION_COMMUNITY,
             uri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY,
-            linkPath: fixtureLoader.GITTER_INTEGRATION_ORG
+            linkPath: fixtureLoader.GITTER_INTEGRATION_REPO_FULL
           })
       })
       .then(function() {
         return request(app)
-          .get('/v1/user/' + fixture.user1.id + '/orgs?type=unused')
+          .get('/v1/user/' + fixture.user1.id + '/repos?type=unused')
           .set('x-access-token', fixture.user1.accessToken)
           .expect(200);
       })
       .then(function(result) {
-        var orgs = result.body;
+        var repos = result.body;
 
-        assert(orgs.every(function(org) {
-          return org.name !== fixtureLoader.GITTER_INTEGRATION_ORG
+        assert(repos.every(function(repo) {
+          return repo.name !== fixtureLoader.GITTER_INTEGRATION_REPO_FULL
         }));
       })
   });
