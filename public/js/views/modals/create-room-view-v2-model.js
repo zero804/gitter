@@ -5,7 +5,7 @@ var roomAvailabilityStatusConstants = require('./room-availability-status-consta
 
 var CreateRoomViewModel = Backbone.Model.extend({
   defaults: {
-    group: null,
+    groupId: null,
     roomName: '',
     associatedGithubProject: null,
     security: 'PUBLIC',
