@@ -70,10 +70,6 @@ var FilteredFavouriteCollection = FilteredRoomCollection.extend({
     this.onModelChangeState();
   },
 
-  onModelChangeState: function (){
-    FilteredRoomCollection.prototype.onModelChangeState.apply(this, arguments);
-  },
-
   onRemoveFavourite: function (id){
     var model = this.findWhere({ id: id });
     if(model) {
