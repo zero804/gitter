@@ -52,7 +52,7 @@ var HeaderView = Marionette.ItemView.extend({
     var groupId = this.model.get('groupId');
     var selectedGroup = this.groupsCollection.get(groupId);
     return {
-      orgName: selectedGroup.get('name'),
+      orgName: !!selectedGroup ? selectedGroup.get('name') : '',
     };
   },
 
