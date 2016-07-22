@@ -45,7 +45,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
     clearNameButton: '.js-create-room-clear-name-button',
     associatedProjectName: '.js-associated-github-project-name',
     associatedProjectLink: '.js-associated-github-project-link',
-    securityOptions: '[name="create-room-security"]',
+    securityOptions: '.js-create-room-security-radio',
     publicSecurityOption: '.js-create-room-security-public-radio',
     privateSecurityOption: '.js-create-room-security-private-radio',
     roomDetailSection: '.js-create-room-detail-section',
@@ -248,7 +248,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
       }
 
       return previousSecurity;
-    }, 'PUBLIC')
+    }, 'PUBLIC');
 
     this.model.set('security', security);
   },
