@@ -3,5 +3,5 @@
 var componentRenderer = require('gitter-web-topics-ui');
 
 module.exports = function topicComponentHelper(componentName, context){
-  return componentRenderer(componentName, context);
+  return '<div id="app-root">' + componentRenderer(componentName, context) + '</div>';
 };

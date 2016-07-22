@@ -19,6 +19,7 @@ module.exports = function(hbs) {
   hbs.registerHelper('newrelic', require('./newrelic-helper'));
   hbs.registerHelper('paginate', require('./paginate-helper'));
   hbs.registerHelper('topic-component', require('./topic-component-helper'));
+  hbs.registerHelper('topic-context', require('./topic-context-helper'));
 
   hbs.registerHelper('avatarSrcSet', avatarImgSrcSetHbsHelper);
 };
