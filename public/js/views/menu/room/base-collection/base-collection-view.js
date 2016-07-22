@@ -55,6 +55,7 @@ module.exports = Marionette.CompositeView.extend({
     this.roomMenuModel = attrs.roomMenuModel;
     this.roomCollection = attrs.roomCollection;
     this.groupsCollection = attrs.groupsCollection;
+    console.log(this.groupsCollection);
     this.listenTo(this.roomMenuModel, 'change:hasDismissedSuggestions', this.onDismissSuggestionsUpdate, this);
     this.listenTo(this.roomMenuModel, 'change:state', this.clearFocus, this);
     this.listenTo(context.troupe(), 'change:id', this.onRoomUpdate, this);
