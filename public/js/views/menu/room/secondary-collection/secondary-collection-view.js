@@ -57,7 +57,6 @@ module.exports = BaseCollectionView.extend({
   getOrgRoomUrl: function () {
     var groupId = this.roomMenuModel.get('groupId');
     var selectedGroup = this.groupsCollection.get(groupId);
-    //FIXME --- Remove this check
     return urlJoin('/orgs', !!selectedGroup ? selectedGroup.get('uri') : '', 'rooms');
   },
 

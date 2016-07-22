@@ -188,25 +188,12 @@ module.exports = Backbone.Model.extend({
 
   //custom set to limit states that can be assigned
   set: function (key, val){
-
-    //FIXME -- REMOVE
-    var isChangeingOrgName = (key === 'selectedOrgName') || (_.isObject(key) && !!key.selectedOrgName);
-    if(isChangeingOrgName) {
-      console.trace('CHANGING SELECTED ORG NAME', key.selectedOrgName || val);
-    }
-
     var isChangingState = (key === 'state') || (_.isObject(key) && !!key.state);
     if(!isChangingState) { return Backbone.Model.prototype.set.apply(this, arguments); }
     var newState = _.isObject(key) ? key.state : val;
     //If we are changing the models state value
     if(states.indexOf(newState) === -1) { return; }
     return Backbone.Model.prototype.set.apply(this, arguments);
-  },
-
-  get: function (key){
-    //FIXME --- REMOVE
-    if(key === 'selectedOrgName') { console.trace('getting selected org name', this.attributes[key]); }
-    return Backbone.Model.prototype.get.apply(this, arguments);
   },
 
   onSwitchState: function(model, val) {
@@ -301,7 +288,6 @@ module.exports = Backbone.Model.extend({
       panelOpenState: true,
       profileMenuOpenState: false,
       state: data.state,
-      //FIXME -- test if this works && remove check
       groupId: !!group ? group.get('id') : '',
     });
   },
