@@ -220,8 +220,14 @@ module.exports = CommunityCreateBaseStepView.extend({
         communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.AVAILABLE);
         model.isValid();
       })
-      .catch(function() {
-        communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.UNAVAILABLE);
+      .catch(function(err) {
+        var status = err.status;
+        if(status === 409) {
+          communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.UNAVAILABLE);
+        }
+        else {
+          communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.INVALID);
+        }
         model.isValid();
       });
   }, 300),
