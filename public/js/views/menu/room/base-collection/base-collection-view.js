@@ -102,7 +102,8 @@ module.exports = Marionette.CompositeView.extend({
     var data = this.model.toJSON();
     var groupId = this.roomMenuModel.get('groupId');
     var selectedGroup = this.groupsCollection.get(groupId);
-    return { selectedGroupName: selectedGroup.get('name'), };
+    //FIXME --- remove this check
+    return { selectedGroupName: !!selectedGroup ? selectedGroup.get('name') : '', };
   },
 
   onBeforeRender: function() {
