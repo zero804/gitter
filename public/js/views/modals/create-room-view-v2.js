@@ -12,7 +12,6 @@ var getRoomNameFromTroupeName = require('gitter-web-shared/get-room-name-from-tr
 var apiClient = require('components/apiClient');
 var appEvents = require('utils/appevents');
 
-var troupeCollections = require('collections/instances/troupes');
 var GroupSelectView = require('views/createRoom/groupSelectView');
 var ModalView = require('./modal');
 var FilteredSelect = require('./filtered-select');
@@ -82,6 +81,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
   initialize: function(attrs) {
     this.model = attrs.model;
     this.groupsCollection = attrs.groupsCollection;
+    this.troupeCollection = attrs.troupeCollection;
     this.repoCollection = attrs.repoCollection;
     this.initialGroupId = attrs.initialGroupId;
 
@@ -271,7 +271,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
     var roomName = this.model.get('roomName');
 
     var repoCheckString = group.get('uri') + '/' + roomName;
-    var roomAlreadyExists = roomName && troupeCollections.troupes.findWhere({ uri: repoCheckString });
+    var roomAlreadyExists = roomName && this.troupeCollection.findWhere({ uri: repoCheckString });
     if(roomAlreadyExists) {
       this.model.set('roomAvailabilityStatus', roomAvailabilityStatusConstants.UNAVAILABLE);
     }
