@@ -352,15 +352,15 @@ var CreateRoomView = Marionette.LayoutView.extend({
       }
 
       // Details
-      var groupBackedBy = group.get('backedBy');
-      var isBackedByGitHub = groupBackedBy.type === 'GH_ORG' || groupBackedBy.type === 'GH_REPO';
+      var groupBackedBy = group && group.get('backedBy');
+      var isBackedByGitHub = groupBackedBy && (groupBackedBy.type === 'GH_ORG' || groupBackedBy.type === 'GH_REPO');
 
       var shouldHideOnlyGitHubUsersOption = !isBackedByGitHub || security !== 'PUBLIC';
       toggleClass(this.ui.onlyGithubUsersOption[0], 'hidden', shouldHideOnlyGitHubUsersOption);
 
       var shouldHideOnlyOrgUsersOption = !isBackedByGitHub || security !== 'PRIVATE';
       toggleClass(this.ui.onlyOrgUsersOption[0], 'hidden', shouldHideOnlyOrgUsersOption);
-      this.ui.onlyOrgUsersOptionOrgName[0].textContent = groupBackedBy.linkPath;
+      this.ui.onlyOrgUsersOptionOrgName[0].textContent = groupBackedBy && groupBackedBy.linkPath;
 
 
       toggleClass(this.ui.roomDetailSection[0], 'hidden', shouldHideOnlyGitHubUsersOption && shouldHideOnlyOrgUsersOption);
