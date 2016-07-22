@@ -6,6 +6,7 @@ var Marionette = require('backbone.marionette');
 var fuzzysearch = require('fuzzysearch');
 var urlJoin = require('url-join');
 var FilteredCollection = require('backbone-filtered-collection');
+var fastdom = require('fastdom');
 var toggleClass = require('utils/toggle-class');
 var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
 var getRoomNameFromTroupeName = require('gitter-web-shared/get-room-name-from-troupe-name');
@@ -74,7 +75,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
     'change:roomName': 'onRoomNameChange',
     'change:associatedGithubProject': 'updateFields',
     'change:security': 'updateFields',
-    'change:roomAvailabilityStatus': 'onRoomAvailabilityStatusChange',
+    'change:roomAvailabilityStatus': 'onRoomAvailabilityStatusChange'
   },
 
   initialize: function(attrs) {
@@ -318,59 +319,61 @@ var CreateRoomView = Marionette.LayoutView.extend({
     var associatedGithubProject = this.model.get('associatedGithubProject');
     var security = this.model.get('security');
 
-    // Room name
-    this.ui.nameInput[0].value = roomName;
+    fastdom.mutate(function() {
+      // Room name
+      this.ui.nameInput[0].value = roomName;
 
-    // Associated github project
-    this.ui.associatedProjectName[0].textContent = associatedGithubProject ? associatedGithubProject.get('name') : '';
-    toggleClass(this.ui.associatedProjectLink[0], 'hidden', !associatedGithubProject);
-    this.ui.associatedProjectLink[0].setAttribute('href', associatedGithubProject ? urlJoin('https://github.com', associatedGithubProject.get('uri')) : '');
+      // Associated github project
+      this.ui.associatedProjectName[0].textContent = associatedGithubProject ? associatedGithubProject.get('name') : '';
+      toggleClass(this.ui.associatedProjectLink[0], 'hidden', !associatedGithubProject);
+      this.ui.associatedProjectLink[0].setAttribute('href', associatedGithubProject ? urlJoin('https://github.com', associatedGithubProject.get('uri')) : '');
 
-    // Security Options
-    this.ui.publicSecurityOption[0].disabled = associatedGithubProject && associatedGithubProject.get('private');
-    this.ui.privateSecurityOption[0].disabled = associatedGithubProject && !associatedGithubProject.get('private');
-    // Only change if there is a project
-    if(associatedGithubProject) {
-      this.ui.publicSecurityOption[0].checked = !associatedGithubProject.get('private');
-      this.ui.privateSecurityOption[0].checked = associatedGithubProject.get('private');
-    }
+      // Security Options
+      this.ui.publicSecurityOption[0].disabled = associatedGithubProject && associatedGithubProject.get('private');
+      this.ui.privateSecurityOption[0].disabled = associatedGithubProject && !associatedGithubProject.get('private');
+      // Only change if there is a project
+      if(associatedGithubProject) {
+        this.ui.publicSecurityOption[0].checked = !associatedGithubProject.get('private');
+        this.ui.privateSecurityOption[0].checked = associatedGithubProject.get('private');
+      }
 
-    // Details
-    var groupBackedBy = group.get('backedBy');
-    var isBackedByGitHub = groupBackedBy.type === 'GH_ORG' || groupBackedBy.type === 'GH_REPO';
+      // Details
+      var groupBackedBy = group.get('backedBy');
+      var isBackedByGitHub = groupBackedBy.type === 'GH_ORG' || groupBackedBy.type === 'GH_REPO';
 
-    var shouldHideOnlyGitHubUsersOption = !isBackedByGitHub || security !== 'PUBLIC';
-    toggleClass(this.ui.onlyGithubUsersOption[0], 'hidden', shouldHideOnlyGitHubUsersOption);
+      var shouldHideOnlyGitHubUsersOption = !isBackedByGitHub || security !== 'PUBLIC';
+      toggleClass(this.ui.onlyGithubUsersOption[0], 'hidden', shouldHideOnlyGitHubUsersOption);
 
-    var shouldHideOnlyOrgUsersOption = !isBackedByGitHub || security !== 'PRIVATE';
-    toggleClass(this.ui.onlyOrgUsersOption[0], 'hidden', shouldHideOnlyOrgUsersOption);
-    this.ui.onlyOrgUsersOptionOrgName[0].textContent = groupBackedBy.linkPath;
+      var shouldHideOnlyOrgUsersOption = !isBackedByGitHub || security !== 'PRIVATE';
+      toggleClass(this.ui.onlyOrgUsersOption[0], 'hidden', shouldHideOnlyOrgUsersOption);
+      this.ui.onlyOrgUsersOptionOrgName[0].textContent = groupBackedBy.linkPath;
 
 
-    toggleClass(this.ui.roomDetailSection[0], 'hidden', shouldHideOnlyGitHubUsersOption && shouldHideOnlyOrgUsersOption);
+      toggleClass(this.ui.roomDetailSection[0], 'hidden', shouldHideOnlyGitHubUsersOption && shouldHideOnlyOrgUsersOption);
 
-    // Validation and Errors
-    var roomAvailabilityStatusMessage = '';
-    (this.model.validationError || []).forEach(function(validationError) {
-      if(validationError.key === 'roomName') {
-        roomAvailabilityStatusMessage = validationError.message;
+      // Validation and Errors
+      var roomAvailabilityStatusMessage = '';
+      (this.model.validationError || []).forEach(function(validationError) {
+        if(validationError.key === 'roomName') {
+          roomAvailabilityStatusMessage = validationError.message;
+        }
+      }.bind(this));
+
+      // Only show pending message after a 1 second
+      var roomAvailabilityStatus = this.model.get('roomAvailabilityStatus');
+      if(roomAvailabilityStatus === roomAvailabilityStatusConstants.PENDING) {
+        setTimeout(function() {
+          // Only show if still pending after the timeout
+          var newRoomAvailabilityStatus = this.model.get('roomAvailabilityStatus');
+          if(newRoomAvailabilityStatus === roomAvailabilityStatusConstants.PENDING) {
+            this.ui.roomAvailabilityStatusMessage[0].textContent = roomAvailabilityStatusMessage;
+          }
+        }.bind(this), 1000);
+      }
+      else {
+        this.ui.roomAvailabilityStatusMessage[0].textContent = roomAvailabilityStatusMessage;
       }
     }.bind(this));
-
-    // Only show pending message after a 1 second
-    var roomAvailabilityStatus = this.model.get('roomAvailabilityStatus');
-    if(roomAvailabilityStatus === roomAvailabilityStatusConstants.PENDING) {
-      setTimeout(function() {
-        // Only show if still pending after the timeout
-        var newRoomAvailabilityStatus = this.model.get('roomAvailabilityStatus');
-        if(newRoomAvailabilityStatus === roomAvailabilityStatusConstants.PENDING) {
-          this.ui.roomAvailabilityStatusMessage[0].textContent = roomAvailabilityStatusMessage;
-        }
-      }.bind(this), 1000);
-    }
-    else {
-      this.ui.roomAvailabilityStatusMessage[0].textContent = roomAvailabilityStatusMessage;
-    }
   },
 
   filterReposForSelectedGroup: function() {
