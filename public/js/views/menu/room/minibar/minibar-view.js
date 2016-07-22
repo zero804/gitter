@@ -152,9 +152,9 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   onTempOrgItemClicked: function (){
-    var group = this.groupsCollection.findWhere({ name: this.tempModel.get('name'), });
-    this.model.set('groupId', group.get('id'));
-    this.changeMenuState('org');
+    var name = this.tempModel.get('name');
+    this.model.set('tempGroupUri', name);
+    this.changeMenuState('temp-org');
   },
 
   changeMenuState: function(state){

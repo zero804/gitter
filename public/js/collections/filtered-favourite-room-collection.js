@@ -37,6 +37,8 @@ var FilteredFavouriteCollection = FilteredRoomCollection.extend({
       return orgFavouriteFilter(model.attributes, groupId);
     },
 
+    tempOrg: function(){ return false; },
+
     default: sortAndFilters.favourites.filter
   },
 

@@ -48,6 +48,8 @@ var FilteredRoomCollection = SimpleFilteredCollection.extend({
       return orgFilter(model.attributes, groupId);
     },
 
+    tempOrg: function(){ return false; },
+
     default: sortAndFilters.recents.filter
   },
 
@@ -61,6 +63,10 @@ var FilteredRoomCollection = SimpleFilteredCollection.extend({
       case 'search':
       case 'org':
         this.setVisibilePredicate(this.visiblePredicates[state].bind(this));
+        break;
+      case 'temp-org':
+        console.log('set temp org');
+        this.setVisibilePredicate(this.visiblePredicates.tempOrg);
         break;
       default:
         this.setVisibilePredicate(this.visiblePredicates.default);
