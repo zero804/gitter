@@ -28,11 +28,22 @@ var CreateRoomViewModel = Backbone.Model.extend({
         message: 'Please fill in the room name'
       });
     }
-
-    if(this.get('roomAvailabilityStatus') === roomAvailabilityStatusConstants.UNAVAILABLE) {
+    else if(this.get('roomAvailabilityStatus') === roomAvailabilityStatusConstants.UNAVAILABLE) {
       errors.push({
         key: 'roomName',
-        message: 'That room already exists'
+        message: 'There is already a room with that name.'
+      });
+    }
+    else if(this.get('roomAvailabilityStatus') === roomAvailabilityStatusConstants.VALIDATION_FAILED) {
+      errors.push({
+        key: 'roomName',
+        message: 'Validation failed'
+      });
+    }
+    else if(this.get('roomAvailabilityStatus') === roomAvailabilityStatusConstants.ILLEGAL_NAME) {
+      errors.push({
+        key: 'roomName',
+        message: 'Room names can only contain letters, numbers, and dashes'
       });
     }
     else if(this.get('roomAvailabilityStatus') === roomAvailabilityStatusConstants.REPO_CONFLICT) {
@@ -41,7 +52,7 @@ var CreateRoomViewModel = Backbone.Model.extend({
         message: 'You cannot create a channel with a same name that as an already existing repo'
       });
     }
-    else if(this.get('roomAvailabilityStatus') === roomAvailabilityStatusConstants.REPO_CONFLICT) {
+    else if(this.get('roomAvailabilityStatus') === roomAvailabilityStatusConstants.PENDING) {
       errors.push({
         key: 'roomName',
         message: 'Waiting for room name check to respond'
