@@ -457,66 +457,14 @@ onready(function() {
     routes: {
       // TODO: get rid of the pipes
       '': 'hideModal',
-      'createroomv2': 'createroomv2',
-      'createcustomroom': 'createcustomroom',
-      'createcustomroom/:name': 'createcustomroom',
-      'createreporoom': 'createreporoom',
       'createroom': 'createroom',
+      'createroom/:name': 'createroom',
       'confirm/*uri': 'confirmRoom',
       'createcommunity': 'createCommunity'
     },
 
     hideModal: function() {
       appLayout.dialogRegion.destroy();
-    },
-
-    createroom: function() {
-      initializeAdminGroupsCollection();
-      require.ensure(['views/modals/choose-room-view'], function(require) {
-        var chooseRoomView = require('views/modals/choose-room-view');
-        appLayout.dialogRegion.show(new chooseRoomView.Modal());
-      });
-    },
-
-    createreporoom: function() {
-      require.ensure(['views/modals/create-repo-room'], function(require) {
-         var createRepoRoomView = require('views/modals/create-repo-room');
-         appLayout.dialogRegion.show(new createRepoRoomView.Modal());
-       });
-    },
-
-    createcustomroom: function(name) {
-      function getSuitableGroupId() {
-        var groupId = false;
-
-        var menuBarGroup = appLayout.getRoomMenuModel().getCurrentGroup();
-        if(menuBarGroup) {
-          groupId = menuBarGroup.get('id');
-        }
-        else {
-          var slimCurrentTroupe = context.troupe();
-          var currentTroupe = troupeCollections.troupes.get(slimCurrentTroupe.get('id'));
-
-          if(currentTroupe) {
-            groupId = currentTroupe.get('groupId');
-          }
-        }
-
-        return groupId;
-      }
-
-      initializeAdminGroupsCollection();
-
-      require.ensure(['views/modals/create-room-view'], function(require) {
-        var createRoomView = require('views/modals/create-room-view');
-        var modal = new createRoomView.Modal({
-          initialGroupId: getSuitableGroupId(),
-          roomName: name,
-          groupsCollection: adminGroupsCollection
-        });
-
-        appLayout.dialogRegion.show(modal);
-      });
     },
 
     confirmRoom: function(uri) {
@@ -528,7 +476,7 @@ onready(function() {
       });
     },
 
-    createroomv2: function() {
+    createroom: function(initialRoomName) {
       var getSuitableGroupId = function() {
         var groupId = null;
 
@@ -557,6 +505,7 @@ onready(function() {
         var modal = new createRoomView.Modal({
           model: new CreateRoomModel(),
           initialGroupId: getSuitableGroupId(),
+          initialRoomName: initialRoomName,
           groupsCollection: adminGroupsCollection,
           troupeCollection: troupeCollections.troupes,
           repoCollection: repoCollection
@@ -566,7 +515,7 @@ onready(function() {
       });
     },
 
-    createCommunity: function(/* uri */) {
+    createCommunity: function() {
       require.ensure(['views/community-create/community-create-view'], function(require) {
         var CommunityCreateView = require('views/community-create/community-create-view');
         communityCreateModel.set('active', true);

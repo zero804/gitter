@@ -13,7 +13,7 @@ var getRoomNameFromTroupeName = require('gitter-web-shared/get-room-name-from-tr
 var apiClient = require('components/apiClient');
 var appEvents = require('utils/appevents');
 
-var GroupSelectView = require('views/createRoom/groupSelectView');
+var GroupSelectView = require('views/create-room/groupSelectView');
 var ModalView = require('./modal');
 var FilteredSelect = require('./filtered-select');
 var roomAvailabilityStatusConstants = require('./room-availability-status-constants');
@@ -73,8 +73,8 @@ var CreateRoomView = Marionette.LayoutView.extend({
   modelEvents: {
     'change:groupId': 'onGroupIdChange',
     'change:roomName': 'onRoomNameChange',
-    'change:associatedGithubProject': 'updateFields',
-    'change:security': 'updateFields',
+    'change:associatedGithubProject': 'safeUpdateFields',
+    'change:security': 'safeUpdateFields',
     'change:roomAvailabilityStatus': 'onRoomAvailabilityStatusChange'
   },
 
@@ -83,14 +83,19 @@ var CreateRoomView = Marionette.LayoutView.extend({
     this.groupsCollection = attrs.groupsCollection;
     this.troupeCollection = attrs.troupeCollection;
     this.repoCollection = attrs.repoCollection;
-    this.initialGroupId = attrs.initialGroupId;
+    this.hasRendered = false;
 
     this.filteredRepoCollection = new FilteredCollection({
       collection: this.repoCollection
     });
 
+    this.model.set({
+      groupId: attrs.initialGroupId || null,
+      roomName: attrs.initialRoomName || ''
+    });
+
     this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
-    this.listenTo(this.groupsCollection, 'sync', this.selectSuggestedGroup);
+    this.listenToOnce(this.groupsCollection, 'sync', this.selectSuggestedGroup);
   },
 
   onRender: function() {
@@ -113,6 +118,9 @@ var CreateRoomView = Marionette.LayoutView.extend({
     this.listenTo(this.groupSelect, 'selected', this.onGroupSelected, this);
 
     this.selectSuggestedGroup();
+
+    this.updateFields();
+    this.hasRendered = true;
   },
 
   menuItemClicked: function(button) {
@@ -122,7 +130,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
           this.sendCreateRoomRequest();
         }
         // Update the fields with any errors after validation
-        this.updateFields();
+        this.safeUpdateFields();
         break;
 
       case 'cancel':
@@ -266,12 +274,12 @@ var CreateRoomView = Marionette.LayoutView.extend({
       this.debouncedCheckForRoomConflict();
     }
 
-    this.updateFields();
+    this.safeUpdateFields();
   },
 
   onRoomNameChange: function() {
     this.debouncedCheckForRoomConflict();
-    this.updateFields();
+    this.safeUpdateFields();
   },
 
   debouncedCheckForRoomConflict: _.debounce(function() {
@@ -310,7 +318,13 @@ var CreateRoomView = Marionette.LayoutView.extend({
 
   onRoomAvailabilityStatusChange: function() {
     this.model.isValid();
-    this.updateFields();
+    this.safeUpdateFields();
+  },
+
+  safeUpdateFields: function() {
+    if(this.hasRendered) {
+      this.updateFields();
+    }
   },
 
   updateFields: function() {
@@ -384,8 +398,9 @@ var CreateRoomView = Marionette.LayoutView.extend({
   },
 
   selectSuggestedGroup: function() {
-    if (this.initialGroupId) {
-      this.groupSelect.selectGroupId(this.initialGroupId);
+    if(this.groupSelect) {
+      var groupId = this.model.get('groupId');
+      this.groupSelect.selectGroupId(groupId);
     }
   },
 
