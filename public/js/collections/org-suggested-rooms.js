@@ -27,7 +27,8 @@ var SuggestedCollection = Backbone.Collection.extend({
     this.listenTo(this.contextModel, 'change:groupId', this.onOrgNameUpdate, this);
 
     if(this.contextModel.get('state') === 'org') {
-      this.fetch({ reset: true });
+      //FIXME --- remove
+      //this.fetch({ reset: true });
     }
 
   },
@@ -40,7 +41,8 @@ var SuggestedCollection = Backbone.Collection.extend({
     if (!val || val === '') return;
     //clear any old models
     this.reset([]);
-    this.fetch({ reset: true });
+    //FIXME --- remove
+    //this.fetch({ reset: true });
   },
 
   sync: SyncMixin.sync,

@@ -59,6 +59,7 @@ var PanelView = Marionette.LayoutView.extend({
       bus:            this.bus,
       dndCtrl:        this.dndCtrl,
       roomCollection: this.model._roomCollection,
+      groupsCollection: this.model.groupsCollection,
     }));
 
   },
@@ -71,6 +72,7 @@ var PanelView = Marionette.LayoutView.extend({
       bus:            this.bus,
       dndCtrl:        this.dndCtrl,
       roomCollection: this.model._roomCollection,
+      groupsCollection: this.model.groupsCollection,
     }));
   },
 
@@ -84,6 +86,7 @@ var PanelView = Marionette.LayoutView.extend({
       primaryCollection: this.model.primaryCollection,
       userModel:         this.model.userModel,
       troupeModel:       this.model._troupeModel,
+      groupsCollection: this.model.groupsCollection,
     }));
   },
 
@@ -96,6 +99,7 @@ var PanelView = Marionette.LayoutView.extend({
       primaryCollection:   this.model.primaryCollection,
       secondaryCollection: this.model.secondaryCollection,
       roomCollection:      this.model._roomCollection,
+      groupsCollection: this.model.groupsCollection,
     }));
   },
 
