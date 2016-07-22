@@ -34,7 +34,8 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
       bus:            this.bus,
       dndCtrl:        this.dndCtrl,
       roomCollection: this.model._roomCollection,
-      keyboardControllerView: this.keyboardControllerView
+      keyboardControllerView: this.keyboardControllerView,
+      groupsCollection: this.model.groupsCollection,
     }));
   },
 
