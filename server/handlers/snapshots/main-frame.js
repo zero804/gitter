@@ -8,10 +8,11 @@ var avatars = require('gitter-web-avatars');
 
 module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, groups, extras) {
   var currentRoom = (req.troupe || {});
-  var groupName = getOrgNameFromUri(currentRoom.uri);
+  var groupId = (lastLeftMenuSnapshot.groupId || '');
+  var group = _.findWhere(groups, { id: groupId });
+  var groupName = group.name;
   var lastLeftMenuSnapshot = (troupeContext.leftRoomMenuState || {});
   req.uriContext = (req.uriContext || {});
-  var selectedOrgName = lastLeftMenuSnapshot.selectedOrgName;
   var tempOrg = [];
 
   //Left menu state
@@ -31,9 +32,8 @@ module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, group
   // But if we find something later, let's use it instead
   if(groupName && !hasJoinedRoom && !hasJoinedGroup) {
     menuState = 'org';
-    selectedOrgName = groupName;
     tempOrg = {
-      name: selectedOrgName,
+      name: getOrgNameFromUri(currentRoom.uri),
       avatarUrl: avatars.getForGroupId(currentRoom.groupId),
       type: 'org',
       active: true,
@@ -51,11 +51,11 @@ module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, group
       roomMenuIsPinned: roomMenuIsPinned,
       state: menuState,
       tempOrg: tempOrg,
-      selectedOrgName: selectedOrgName,
+      groupId: groupId,
     }),
     allRooms: rooms,
-    rooms: parseRoomsIntoLeftMenuRoomList(menuState, rooms, selectedOrgName),
-    favourites: parseRoomsIntoLeftMenuFavouriteRoomList(menuState, rooms, selectedOrgName),
+    rooms: parseRoomsIntoLeftMenuRoomList(menuState, rooms, groupId),
+    favourites: parseRoomsIntoLeftMenuFavouriteRoomList(menuState, rooms, groupId),
     groups: groups,
   };
 };

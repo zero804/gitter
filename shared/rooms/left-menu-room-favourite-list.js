@@ -8,7 +8,7 @@ var favouriteSort = require('../sorting/left-menu-primary-favourite');
 
 var parseToTemplateItem = require('../parse/left-menu-primary-item');
 
-module.exports = function generateLemMenuFavouriteRoomsList(state, rooms, selectedOrgName) {
+module.exports = function generateLemMenuFavouriteRoomsList(state, rooms, groupId) {
 
   var filter;
   switch(state) {
@@ -19,7 +19,7 @@ module.exports = function generateLemMenuFavouriteRoomsList(state, rooms, select
       filter = favouriteOneToOneFilter;
       break;
     case 'org':
-      filter = function(model) { return orgFavouriteFilter(model, selectedOrgName) };
+      filter = function(model) { return orgFavouriteFilter(model, groupId) };
       break;
     default:
       filter = favouriteFilter;
