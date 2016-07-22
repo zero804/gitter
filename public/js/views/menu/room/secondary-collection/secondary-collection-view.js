@@ -48,6 +48,7 @@ module.exports = BaseCollectionView.extend({
 
   serializeData: function() {
     var data = this.model.toJSON();
+    console.log('secondary');
     return _.extend({}, proto.serializeData.apply(this, arguments), data, {
       isSearch:        (data.state === 'search'),
       orgRoomUrl:      this.getOrgRoomUrl(),
