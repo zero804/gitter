@@ -1,5 +1,7 @@
 "use strict";
 
+require('../less/index.less');
+
 var React = require('react');
 var reactDOM = require('react-dom');
 var app = require('./app.jsx');
