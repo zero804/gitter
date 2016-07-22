@@ -488,7 +488,14 @@ onready(function() {
           var slimCurrentTroupe = context.troupe();
           var currentTroupe = troupeCollections.troupes.get(slimCurrentTroupe.get('id'));
 
-          groupId = currentTroupe && currentTroupe.get('groupId');
+          if(currentTroupe) {
+            groupId = currentTroupe.get('groupId');
+          }
+          // Last ditch effort, perhaps they are visiting a room they haven't joined
+          // on page load and we can see the full troupe
+          else {
+            groupId = slimCurrentTroupe.get('groupId');
+          }
         }
 
         return groupId;
