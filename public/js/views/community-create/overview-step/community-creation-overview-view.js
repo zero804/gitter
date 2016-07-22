@@ -126,7 +126,7 @@ module.exports = CommunityCreateBaseStepView.extend({
       // Select the new community in the new left menu
       appEvents.trigger('left-menu-menu-bar:activate', {
         state: 'org',
-        selectedOrgName: results.name
+        groupName: results.name
       });
       // Hide create community
       //communityCreateModel.set('active', false);

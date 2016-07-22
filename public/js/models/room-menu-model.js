@@ -39,11 +39,11 @@ var SEARCH_DEBOUNCE_INTERVAL = 1000;
 module.exports = Backbone.Model.extend({
 
   defaults: {
-    state:                     '',
-    searchTerm:                '',
-    roomMenuIsPinned:          true,
-    selectedOrgName:           '',
-    hasDismissedSuggestions:   false,
+    state: '',
+    searchTerm: '',
+    roomMenuIsPinned: true,
+    groupId: '',
+    hasDismissedSuggestions: false,
   },
 
   //TODO Remove all these delete statements and pass the object with the options hash
@@ -104,7 +104,6 @@ module.exports = Backbone.Model.extend({
 
     var orgsSnapshot = context.getSnapshot('groups') || [];
     var state = this.get('state');
-    var selectedOrg = this.get('selectedOrgName');
     this.minibarHomeModel = new MinibarItemModel({ name: 'all', type: 'all', active: (state === 'all') });
     this.minibarSearchModel = new MinibarItemModel({ name: 'search', type: 'search', active: (state === 'search') });
     this.minibarPeopleModel = new MinibarPeopleModel({ active: (state === 'people')}, { roomCollection: this._roomCollection });
@@ -113,7 +112,7 @@ module.exports = Backbone.Model.extend({
     this.minibarTempOrgModel = new MinibarTempOrgModel(attrs.tempOrg, { troupe: context.troupe(), });
 
     var minibarModels = orgsSnapshot.map(function(model){
-      return _.extend({}, model, { active: (state === 'org' && model.name === selectedOrg) });
+      return _.extend({}, model, { active: (state === 'org' && model.id === this.get('groupId')) });
     });
 
     this.groupsCollection.add(minibarModels);
@@ -288,19 +287,19 @@ module.exports = Backbone.Model.extend({
 
   onMenuBarActivateRequest: function(data) {
     data = data || {};
+    var group = this.groupsCollection.findWhere({ name: data.groupName });
     this.set({
       panelOpenState: true,
       profileMenuOpenState: false,
       state: data.state,
-      selectedOrgName: data.selectedOrgName
+      //FIXME -- test if this works && remove check
+      groupId: !!group ? group.get('id') : '',
     });
   },
 
   getCurrentGroup: function (){
     if(this.get('state') !== 'org') { return false; }
-    var selectedOrg = this.get('selectedOrgName');
-    if(!selectedOrg) { throw new Error('Left menu is in the org state with no selected org'); }
-    return this.minibarCollection.findWhere({ name: selectedOrg });
+    return this.groupsCollection.get(this.get('groupId'));
   },
 
   _getModel: function (prop, val){
