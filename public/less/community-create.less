@@ -129,9 +129,7 @@
 @people-list-item-spacing: .4rem;
 @people-list-item-height: @invite-user-item-avatar-size + (2 * @people-list-item-spacing);
 
-@invited-email-item-font-size: 1.6rem;
-@invited-email-item-height: @invited-email-item-font-size;
-@invited-area-total-height: @people-list-item-height + @invite-user-item-spacing + @invited-email-item-height;
+@invited-area-total-height: @people-list-item-height;
 @invited-area-spacing-top: 2.5rem;
 
 
@@ -940,7 +938,7 @@
   display: flex;
   // reset forms.less :(
   margin: 0;
-  margin-top: @invite-user-item-spacing;
+  margin-top: @invited-area-spacing-top;
 }
 
 .community-invite-people-email-input {
