@@ -147,7 +147,9 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   onCollectionItemActivated: function (view, model){
+    console.log('groupId');
     this.model.set('groupId', model.get('id'));
+    console.log('state');
     this.changeMenuState('org');
   },
 

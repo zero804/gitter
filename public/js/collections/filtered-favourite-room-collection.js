@@ -31,8 +31,9 @@ var FilteredFavouriteCollection = FilteredRoomCollection.extend({
       return false;
     },
 
-    org: function(model) {
-      var groupId = this.roomModel.get('roomId');
+    org: function(model, val) {
+      if(model.get('isOneToOne')) { return false; }
+      var groupId = this.roomModel.get('groupId');
       return orgFavouriteFilter(model.attributes, groupId);
     },
 
@@ -67,6 +68,11 @@ var FilteredFavouriteCollection = FilteredRoomCollection.extend({
     // Reapply the original visiblePredicates to remove
     // the temp items
     this.onModelChangeState();
+  },
+
+  onModelChangeState: function (){
+    console.log('--- CHANGE ---');
+    FilteredRoomCollection.prototype.onModelChangeState.apply(this, arguments);
   },
 
   onRemoveFavourite: function (id){
