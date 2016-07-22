@@ -46,6 +46,8 @@ module.exports = CommunityCreateBaseStepView.extend({
     hasAssociatedProjectCopy: '.js-community-create-has-associated-project-copy',
     associatedProjectLink: '.js-community-create-associated-project-link',
     associatedProjectName: '.js-community-create-associated-project-name',
+    associatedProjectBadgerOption: '.js-community-create-associated-project-badger-option',
+    associatedProjectBadgerOptionInput: '.js-community-create-associated-project-badger-option-input'
   }),
 
   events: _.extend({}, _super.events, {
@@ -53,6 +55,7 @@ module.exports = CommunityCreateBaseStepView.extend({
     'input @ui.communityNameInput': 'onCommunityNameInputChange',
     'input @ui.communitySlugInput': 'onCommunitSlugInputChange',
     'click @ui.githubProjectLink': 'onGitHubProjectLinkActivated',
+    'change @ui.associatedProjectBadgerOptionInput': 'onBadgerInputChange'
   }),
 
   modelEvents: _.extend({}, _super.modelEvents, {
@@ -159,6 +162,9 @@ module.exports = CommunityCreateBaseStepView.extend({
       this.ui.associatedProjectLink[0].setAttribute('href', githubProjectInfo.url);
       toggleClass(this.ui.addAssociatedProjectCopy[0], 'active', !githubProjectInfo.name);
       toggleClass(this.ui.hasAssociatedProjectCopy[0], 'active', !!githubProjectInfo.name);
+
+      var isBackedByRepo = !!this.communityCreateModel.get('githubRepoId');
+      toggleClass(this.ui.associatedProjectBadgerOption[0], 'active', isBackedByRepo);
     }
 
     this.checkSlugAvailability();
@@ -193,6 +199,12 @@ module.exports = CommunityCreateBaseStepView.extend({
     });
 
     this.model.isValid();
+  },
+
+  onBadgerInputChange: function() {
+    this.communityCreateModel.set({
+      allowBadger: this.ui.associatedProjectBadgerOptionInput[0].checked
+    });
   },
 
   checkSlugAvailability: _.throttle(function() {
