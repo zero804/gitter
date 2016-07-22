@@ -70,8 +70,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
   },
 
   modelEvents: {
-    // TODO: Why does `change:group` not trigger?
-    'change:group': 'updateFields',
+    'change:groupId': 'onGroupIdChange',
     'change:roomName': 'onRoomNameChange',
     'change:associatedGithubProject': 'updateFields',
     'change:security': 'updateFields',
@@ -131,9 +130,15 @@ var CreateRoomView = Marionette.LayoutView.extend({
     }
   },
 
+  getGroupFromId: function(groupId) {
+    if(groupId) {
+      return this.groupsCollection.get(groupId);
+    }
+  },
+
   sendCreateRoomRequest: function() {
     var roomName = this.model.get('roomName');
-    var selectedGroup = this.model.get('group');
+    var selectedGroup = this.getGroupFromId(this.model.get('groupId'));
     var associatedGithubProject = this.model.get('associatedGithubProject');
     var security = this.model.get('security');
     var onlyGithubUsers = this.model.get('onlyGithubUsers');
@@ -161,8 +166,6 @@ var CreateRoomView = Marionette.LayoutView.extend({
       }
     };
 
-    // TODO: Does this work?
-    // not sure if you can add providers to the POST creation
     if(onlyGithubUsers) {
       payload.providers = ['github'];
     }
@@ -201,16 +204,9 @@ var CreateRoomView = Marionette.LayoutView.extend({
   },
 
   onGroupSelected: function(group) {
-    var previousGroup = this.model.get('group');
     this.model.set({
-      group: group
+      groupId: group.get('id')
     });
-
-    this.filterReposForSelectedGroup();
-    // Don't run this on the initial group filling because it adds unnecessary error texts to the user
-    if(previousGroup) {
-      this.debouncedCheckForRoomConflict();
-    }
   },
 
   onRepoSelected: function(repo) {
@@ -260,13 +256,25 @@ var CreateRoomView = Marionette.LayoutView.extend({
     this.model.set('onlyOrgUsers', this.ui.onlyOrgUsersOptionInput[0].checked);
   },
 
+  onGroupIdChange: function() {
+    var previousGroup = this.getGroupFromId(this.model.previous('groupId'));
+
+    this.filterReposForSelectedGroup();
+    // Don't run this on the initial group filling because it adds unnecessary error texts to the user
+    if(previousGroup) {
+      this.debouncedCheckForRoomConflict();
+    }
+
+    this.updateFields();
+  },
+
   onRoomNameChange: function() {
     this.debouncedCheckForRoomConflict();
     this.updateFields();
   },
 
   debouncedCheckForRoomConflict: _.debounce(function() {
-    var group = this.model.get('group');
+    var group = this.getGroupFromId(this.model.get('groupId'));
     var roomName = this.model.get('roomName');
 
     var repoCheckString = group.get('uri') + '/' + roomName;
@@ -306,7 +314,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
 
   updateFields: function() {
     var roomName = this.model.get('roomName');
-    var group = this.model.get('group');
+    var group = this.getGroupFromId(this.model.get('groupId'));
     var associatedGithubProject = this.model.get('associatedGithubProject');
     var security = this.model.get('security');
 
@@ -366,7 +374,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
   },
 
   filterReposForSelectedGroup: function() {
-    var selectedGroup = this.model.get('group');
+    var selectedGroup = this.getGroupFromId(this.model.get('groupId'));
     this.filteredRepoCollection.setFilter(function(model) {
       return getOrgNameFromUri(model.get('uri')).toLowerCase() === selectedGroup.get('name').toLowerCase();
     });
