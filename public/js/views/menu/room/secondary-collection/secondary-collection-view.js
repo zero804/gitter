@@ -48,9 +48,8 @@ module.exports = BaseCollectionView.extend({
 
   serializeData: function() {
     var data = this.model.toJSON();
-    return _.extend({}, data, {
+    return _.extend({}, proto.serializeData.apply(this, arguments), data, {
       isSearch:        (data.state === 'search'),
-      selectedOrgName: this.roomMenuModel.get('selectedOrgName'),
       orgRoomUrl:      this.getOrgRoomUrl(),
     });
   },
