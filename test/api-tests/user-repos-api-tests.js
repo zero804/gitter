@@ -45,7 +45,6 @@ describe('user-repos #slow', function() {
         var repos = result.body;
 
         assert(repos.some(function(repo) {
-          console.log(repo.name, fixtureLoader.GITTER_INTEGRATION_REPO_FULL);
           return repo.name === fixtureLoader.GITTER_INTEGRATION_REPO_FULL
         }));
       });
