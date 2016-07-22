@@ -21,8 +21,8 @@ var HeaderView = Marionette.ItemView.extend({
   },
 
   modelEvents: {
-    'change:state':                'updateActiveElement',
-    'change:selectedOrgName':      'render',
+    'change:state': 'updateActiveElement',
+    'change:groupId': 'render',
     'change:profileMenuOpenState': 'onProfileToggle',
   },
 
@@ -44,9 +44,16 @@ var HeaderView = Marionette.ItemView.extend({
     profileToggle:   '#panel-header-profile-toggle',
   },
 
+  initialize: function(attrs) {
+    this.groupsCollection = attrs.groupsCollection;
+  },
+
   serializeData: function() {
+    var groupId = this.model.get('groupId');
+    var selectedGroup = this.groupsCollection.get('groupId');
+    //FIXME -- remove this check
     return {
-      orgName:    this.model.get('selectedOrgName'),
+      orgName: !!selectedGroup ? selectedGroup.get('name') : '',
     };
   },
 
