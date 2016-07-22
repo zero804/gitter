@@ -48,7 +48,6 @@ module.exports = BaseCollectionView.extend({
 
   serializeData: function() {
     var data = this.model.toJSON();
-    console.log('secondary');
     return _.extend({}, proto.serializeData.apply(this, arguments), data, {
       isSearch:        (data.state === 'search'),
       orgRoomUrl:      this.getOrgRoomUrl(),
@@ -56,7 +55,10 @@ module.exports = BaseCollectionView.extend({
   },
 
   getOrgRoomUrl: function () {
-    return urlJoin('/orgs', this.roomMenuModel.get('selectedOrgName'), 'rooms');
+    var groupId = this.roomMenuModel.get('groupId');
+    var selectedGroup = this.groupsCollection.get(groupId);
+    //FIXME --- Remove this check
+    return urlJoin('/orgs', !!selectedGroup ? selectedGroup.get('uri') : '', 'rooms');
   },
 
   initialize: function(attrs) {
@@ -77,7 +79,9 @@ module.exports = BaseCollectionView.extend({
     //Sort out show more button
     if (this.roomMenuModel.get('state') === 'org' && this.collection.length >= 9) {
       this.ui.showMore.attr('href', this.getOrgRoomUrl());
-      this.ui.showMore.attr('title', 'more ' + this.roomMenuModel.get('selectedOrgName') + ' rooms');
+      var groupId = this.roomMenuModel.get('groupId');
+      var selectedOrg = this.groupsCollection.get(groupId);
+      this.ui.showMore.attr('title', 'more ' + !!selectedOrg ? selectedOrg.get('name') : '' + ' rooms');
       this.ui.showMore[0].classList.remove('hidden');
     } else {
       this.ui.showMore[0].classList.add('hidden');
