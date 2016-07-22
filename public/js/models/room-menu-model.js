@@ -49,7 +49,9 @@ module.exports = Backbone.Model.extend({
   },
 
   constructor: function (attrs, options){
-
+    //For some users we will still have stat = org and groupId = null as they will have a selectedOrgName
+    //this constructor just adds a small patch to add groupId
+    //If one can't be found then just change state to all
     var groupsCollection = attrs.groupsCollection;
     var activeGroup = groupsCollection.filter(function(group){
       return getOrgNameFromUri(group.uri) === attrs.selecedOrgName;
