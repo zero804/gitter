@@ -266,6 +266,7 @@
     "nanoscroller": "^0.8.7",
     "node-spritesheet": "trevorah/node-spritesheet",
     "nodemon": "^1.8.1",
+    "normalize.css": "^4.2.0",
     "nyc": "^7.0.0",
     "object-inspect": "^1.0.2",
     "parse-diff": "^0.3.2",
