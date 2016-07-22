@@ -11,5 +11,4 @@ if [ "$branch" = "refs/heads/master" ]; then
 fi
 
 gulp="$repo_dir/node_modules/.bin/gulp"
-eslint --cache --quiet --format unix --ext .js --ext .jsx $repo_dir
 (cd $repo_dir && npm run precommit-checks)

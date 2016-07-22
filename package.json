@@ -316,7 +316,7 @@
     "flush-dev-db": "mongo gitter-mongo-dev/gitter --eval 'printjson(db.dropDatabase())'; ./scripts/dataupgrades/001-oauth-client/002-add-redirect-uri.sh gitter-mongo-dev/gitter; redis-cli -h gitter-redis-dev flushall",
     "task-css": "gulp css:compile",
     "task-fasttest": "gulp test:test --test-fast",
-    "precommit-checks": "gulp linter:validate:config test:test --test-fast --test-critical-only",
+    "precommit-checks": "eslint --cache --quiet --format unix --ext .js --ext .jsx . && gulp linter:validate:config test:test --test-fast --test-critical-only",
     "task-validate": "gulp validate",
     "task-watch": "gulp watch",
     "browser-build-tests": "webpack --config ./test/in-browser/webpack.config.js",
