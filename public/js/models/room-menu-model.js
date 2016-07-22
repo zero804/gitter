@@ -34,6 +34,7 @@ var states = [
   'search',
   'people',
   'org',
+  'temp-org'
 ];
 
 var SEARCH_DEBOUNCE_INTERVAL = 1000;
@@ -220,6 +221,13 @@ module.exports = Backbone.Model.extend({
         this.secondaryCollection.switchCollection(this.suggestedOrgs);
         this.tertiaryCollection.switchCollection(this._suggestedRoomCollection);
         break;
+
+      case 'temp-org':
+        this.primaryCollection.switchCollection(this.activeRoomCollection);
+        this.secondaryCollection.switchCollection(this.suggestedOrgs);
+        this.tertiaryCollection.switchCollection(this._suggestedRoomCollection);
+        break;
+
 
       default:
         this.primaryCollection.switchCollection(this.activeRoomCollection);
