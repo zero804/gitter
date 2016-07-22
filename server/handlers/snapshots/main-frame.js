@@ -7,13 +7,17 @@ var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
 var avatars = require('gitter-web-avatars');
 
 module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, groups, extras) {
-  var currentRoom = (req.troupe || {});
-  var groupId = (lastLeftMenuSnapshot.groupId || '');
-  var group = _.findWhere(groups, { id: groupId });
-  var groupName = group.name;
+  //Defaults
   var lastLeftMenuSnapshot = (troupeContext.leftRoomMenuState || {});
+  var currentRoom = (req.troupe || {});
   req.uriContext = (req.uriContext || {});
-  var tempOrg = [];
+
+  //Groups
+  var groupId = (lastLeftMenuSnapshot || '');
+  var group = (_.findWhere(groups, { id: groupId }) || {});
+  var groupName = group.name;
+
+  var tempOrg;
 
   //Left menu state
   //------------------------------------------------------
