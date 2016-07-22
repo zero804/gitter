@@ -83,7 +83,8 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
 
     //Make a new model
     this.dndCtrl = new DNDCtrl();
-    this.model = new RoomMenuModel(_.extend({}, context.getSnapshot('leftMenu'), {
+    var snapshot = context.getSnapshot('leftMenu');
+    this.model = new RoomMenuModel(_.extend({}, snapshot, {
       bus: this.bus,
       roomCollection: this.roomCollection,
       orgCollection: this.orgCollection,

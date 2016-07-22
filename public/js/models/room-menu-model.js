@@ -27,6 +27,8 @@ var MinibarItemModel = require('../views/menu/room/minibar/minibar-item-model');
 var MinibarPeopleModel = require('../views/menu/room/minibar/people-view/people-model');
 var MinibarTempOrgModel = require('../views/menu/room/minibar/temp-org-view/temp-org-model');
 
+var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
+
 var states = [
   'all',
   'search',
@@ -174,7 +176,23 @@ module.exports = Backbone.Model.extend({
     this.listenTo(context.troupe(), 'change:id', this.onRoomChange, this);
     this.listenTo(this.bus, 'left-menu-menu-bar:activate', this.onMenuBarActivateRequest, this);
 
-    this.onSwitchState(this, this.get('state'));
+    //TODO Remove
+    //When moving away from selected org name we moved to groupID,
+    //this accounts for that change and insures no breakages
+    if(this.get('state') === 'org' && !!this.get('selectedOrgName')) {
+      //We have to filter here because the org name used to be derived from the uri
+      var activeGroup = this.groupsCollection.filter(function(group){
+        return getOrgNameFromUri(group.uri) === this.get('selectedOrgName');
+      }.bind(this))[0];
+      //If we can't match a group just set the state to all
+      if(!activeGroup) { return this.set('state', 'all'); }
+      //Setup the active groupIs
+      this.set('groupId', activeGroup.get('id'));
+    }
+    else {
+      this.onSwitchState(this, this.get('state'));
+    }
+
   },
 
   //custom set to limit states that can be assigned

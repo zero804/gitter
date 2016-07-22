@@ -13,7 +13,7 @@ module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, group
   req.uriContext = (req.uriContext || {});
 
   //Groups
-  var groupId = (lastLeftMenuSnapshot || '');
+  var groupId = (lastLeftMenuSnapshot.groupId || '');
   var group = (_.findWhere(groups, { id: groupId }) || {});
   var groupName = group.name;
 
