@@ -50,10 +50,9 @@ var HeaderView = Marionette.ItemView.extend({
 
   serializeData: function() {
     var groupId = this.model.get('groupId');
-    var selectedGroup = this.groupsCollection.get('groupId');
-    //FIXME -- remove this check
+    var selectedGroup = this.groupsCollection.get(groupId);
     return {
-      orgName: !!selectedGroup ? selectedGroup.get('name') : '',
+      orgName: selectedGroup.get('name'),
     };
   },
 
