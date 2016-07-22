@@ -29,12 +29,15 @@ module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, group
     menuState = extras.suggestedMenuState;
   }
 
-  var hasJoinedRoom = _.findWhere(rooms, { uri: currentRoom.uri});
-  //The old group generation adds the temp-org with a prop of temp so we account for that here
-  var hasJoinedGroup = _.findWhere(groups, { name: groupName }) && !_.findWhere(groups, { temp: true });
+  var hasJoinedRoom = _.findWhere(rooms, { uri: currentRoom.uri });
+  var hasJoinedGroup = true;
+  if(!hasJoinedRoom) {
+    var groupUri = getOrgNameFromUri(currentRoom.uri);
+    hasJoinedGroup = _.findWhere(groups, { uri: groupUri });
+  }
 
   // But if we find something later, let's use it instead
-  if(groupName && !hasJoinedRoom && !hasJoinedGroup) {
+  if(!hasJoinedRoom && !hasJoinedGroup) {
     menuState = 'org';
     tempOrg = {
       name: getOrgNameFromUri(currentRoom.uri),
