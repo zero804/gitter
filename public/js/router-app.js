@@ -558,6 +558,7 @@ onready(function() {
           model: new CreateRoomModel(),
           initialGroupId: getSuitableGroupId(),
           groupsCollection: adminGroupsCollection,
+          troupeCollection: troupeCollections.troupes,
           repoCollection: repoCollection
         });
 
