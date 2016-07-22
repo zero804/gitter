@@ -113,7 +113,7 @@ module.exports = Backbone.Model.extend({
 
     var minibarModels = orgsSnapshot.map(function(model){
       return _.extend({}, model, { active: (state === 'org' && model.id === this.get('groupId')) });
-    });
+    }.bind(this));
 
     this.groupsCollection.add(minibarModels);
     this.minibarCollection = new FilteredMinibarGroupCollection(null, {
