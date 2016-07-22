@@ -18,7 +18,7 @@ var ModalView = require('./modal');
 var FilteredSelect = require('./filtered-select');
 var roomAvailabilityStatusConstants = require('./room-availability-status-constants');
 
-var template = require('./tmpl/create-room-view-v2.hbs');
+var template = require('./tmpl/create-room-view.hbs');
 var repoTypeaheadItemTemplate = require('./tmpl/create-room-repo-typeahead-item-view.hbs');
 
 
