@@ -12,7 +12,7 @@ var FilteredRoomCollection = SimpleFilteredCollection.extend({
     }
 
     this.roomModel = options.roomModel;
-    this.listenTo(this.roomModel, 'change:state change:selectedOrgName', this.onModelChangeState);
+    this.listenTo(this.roomModel, 'change:state change:groupId', this.onModelChangeState);
 
     this.listenTo(this, 'change add', this.applyHideCriteria);
     this.listenTo(this, 'reset', this.reapplyHideCriteria);
@@ -44,8 +44,8 @@ var FilteredRoomCollection = SimpleFilteredCollection.extend({
     },
 
     org: function(model) {
-      var orgName = this.roomModel.get('selectedOrgName');
-      return orgFilter(model.attributes, orgName);
+      var groupId = this.roomModel.get('groupId');
+      return orgFilter(model.attributes, groupId);
     },
 
     default: sortAndFilters.recents.filter
