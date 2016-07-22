@@ -34,7 +34,7 @@ var CommunityCreateMainStepViewModel = CommunityCreateStepViewModel.extend({
     if(this.communityCreateModel.get('communitySlugAvailabilityStatus') !== slugAvailabilityStatusConstants.AVAILABLE) {
       errors.push({
         key: 'communitySlug',
-        message: 'Slug is already taken'
+        message: 'This address is not available'
       });
     }
 
