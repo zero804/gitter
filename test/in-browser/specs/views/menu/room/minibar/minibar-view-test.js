@@ -52,7 +52,7 @@ describe('MinibarView', function(){
       assert(model.minibarPeopleModel.get('focus'));
     });
 
-    it('it should set active on the correct org model when the model changes state to org', function(){
+    it.skip('it should set active on the correct org model when the model changes state to org', function(){
       model.set({ state: 'org', selectedOrgName: 'gitterHQ' });
       assert(collection.findWhere({ name: 'gitterHQ'}).get('active'));
       assert(collection.findWhere({ name: 'gitterHQ'}).get('focus'));
