@@ -113,7 +113,7 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   modelEvents: {
-    'change:state change:selectedOrgName': 'onMenuChangeState'
+    'change:state change:groupId': 'onMenuChangeState'
   },
 
   initialize: function(attrs) {
@@ -127,6 +127,7 @@ module.exports = Marionette.LayoutView.extend({
     this.closeModel = this.model.minibarCloseModel;
     this.tempModel = this.model.minibarTempOrgModel;
     this.keyboardControllerView = attrs.keyboardControllerView;
+    this.groupsCollection = attrs.groupsCollection;
     this.listenTo(this.bus, 'navigation', this.clearFocus, this);
     //When a snapshot comes back we need to re-set active/focus on the currently active element
     this.listenTo(this.collection, 'snapshot', this.onMenuChangeState, this);
@@ -146,12 +147,13 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   onCollectionItemActivated: function (view, model){
-    this.model.set('selectedOrgName', model.get('name'));
+    this.model.set('groupId', model.get('id'));
     this.changeMenuState('org');
   },
 
   onTempOrgItemClicked: function (){
-    this.model.set('selectedOrgName', this.tempModel.get('name'));
+    var group = this.groupsCollection.findWhere({ name: this.tempModel.get('name'), });
+    this.model.set('groupId', group.get('id'));
     this.changeMenuState('org');
   },
 
@@ -210,8 +212,11 @@ module.exports = Marionette.LayoutView.extend({
       case 'people':
         return this.peopleModel.set({ active: true, focus: true });
       case 'org':
-        var orgName = this.model.get('selectedOrgName');
-        var model = this.collection.findWhere({ name: orgName });
+        //FIXME -- test this works
+        var groupId = this.model.get('groupId');
+        var group = this.groupsCollection.get(groupId);
+        var orgName = group.get('name');
+        var model = this.collection.findWhere({ groupId: groupId });
         if(this.tempModel.get('name') === orgName) { model = this.tempModel; }
         if(!model) { return; }
         return model.set({ active: true, focus: true });
