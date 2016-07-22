@@ -21,9 +21,9 @@ initialize: function(attrs, options) {
   onRoomChange: function (model, val){
     //If the new room is not in the room list then show the temp icon
     //as we are sure we should be showing a temp org
-    var orgName = getOrgnameFromUri(this.getRoomUri());
-    var roomId = val;
-    var group = this.roomCollection.get(roomId) && this.groupCollection.findWhere({ name: orgName });
+    var selectedRoom = this.roomCollection.get('id');
+    var groupId = selectedRoom.get('groupId');
+    var group = this.groupCollection.get(groupId);
     var hasJoinedOrg = !!group;
     var shouldHideTempOrg = hasJoinedOrg || !group;
     this.model.set('hidden', shouldHideTempOrg);
