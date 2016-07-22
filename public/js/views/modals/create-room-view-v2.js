@@ -392,9 +392,11 @@ var CreateRoomView = Marionette.LayoutView.extend({
 
   filterReposForSelectedGroup: function() {
     var selectedGroup = this.getGroupFromId(this.model.get('groupId'));
-    this.filteredRepoCollection.setFilter(function(model) {
-      return getOrgNameFromUri(model.get('uri')).toLowerCase() === selectedGroup.get('name').toLowerCase();
-    });
+    if(selectedGroup) {
+      this.filteredRepoCollection.setFilter(function(model) {
+        return getOrgNameFromUri(model.get('uri')).toLowerCase() === selectedGroup.get('name').toLowerCase();
+      });
+    }
   },
 
   selectSuggestedGroup: function() {

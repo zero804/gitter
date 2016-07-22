@@ -45,6 +45,7 @@ var GroupSelectView = Marionette.ItemView.extend({
     if(!this.typeahead) {
       this.typeahead = new Typeahead({
         disableShowOnAdd: true,
+        backdropClass: 'group-select-view-dropdown-backdrop',
         fetch: this.refilter.bind(this),
         collection: this.groupsCollection,
         itemTemplate: itemTemplate,
