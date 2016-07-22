@@ -71,7 +71,6 @@ var FilteredFavouriteCollection = FilteredRoomCollection.extend({
   },
 
   onModelChangeState: function (){
-    console.log('--- CHANGE ---');
     FilteredRoomCollection.prototype.onModelChangeState.apply(this, arguments);
   },
 

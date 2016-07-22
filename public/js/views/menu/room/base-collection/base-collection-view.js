@@ -1,6 +1,7 @@
 'use strict';
 
 var Marionette = require('backbone.marionette');
+var _ = require('underscore');
 var fastdom = require('fastdom');
 var template = require('./base-collection-view.hbs');
 var context = require('utils/context');
@@ -102,8 +103,9 @@ module.exports = Marionette.CompositeView.extend({
     var data = this.model.toJSON();
     var groupId = this.roomMenuModel.get('groupId');
     var selectedGroup = this.groupsCollection.get(groupId);
-    //FIXME --- remove this check
-    return { selectedGroupName: !!selectedGroup ? selectedGroup.get('name') : '', };
+    return _.extend({}, data, {
+      selectedGroupName: !!selectedGroup ? selectedGroup.get('name') : '',
+    });
   },
 
   onBeforeRender: function() {
