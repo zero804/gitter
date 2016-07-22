@@ -1,3 +1,5 @@
+"use strict";
+
 var React = require('react');
 var reactDOM = require('react-dom');
 var app = require('./app.jsx');
