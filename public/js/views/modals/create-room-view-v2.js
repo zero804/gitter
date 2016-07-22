@@ -181,19 +181,18 @@ var CreateRoomView = Marionette.LayoutView.extend({
           case 400:
             // TODO: send this from the server
             if (err.response && err.response.illegalName) {
-              message = 'Please choose a channel name consisting of letter and number characters.';
-              self.ui.roomNameInput.focus();
+              this.model.set('roomAvailabilityStatus', roomAvailabilityStatusConstants.ILLEGAL_NAME);
             } else {
-              message = 'Validation failed';
+              this.model.set('roomAvailabilityStatus', roomAvailabilityStatusConstants.VALIDATION_FAILED);
             }
             break;
 
           case 403:
-            message = 'You don\'t have permission to create that room.';
+            this.model.set('roomAvailabilityStatus', roomAvailabilityStatusConstants.INSUFFICIENT_PERMISSIONS);
             break;
 
           case 409:
-            message = 'There is already a Github repository or a room with that name.';
+            this.model.set('roomAvailabilityStatus', roomAvailabilityStatusConstants.UNAVAILABLE);
             break;
         }
 
@@ -350,7 +349,20 @@ var CreateRoomView = Marionette.LayoutView.extend({
       }
     }.bind(this));
 
-    this.ui.roomAvailabilityStatusMessage[0].textContent = roomAvailabilityStatusMessage;
+    // Only show pending message after a 1 second
+    var roomAvailabilityStatus = this.model.get('roomAvailabilityStatus');
+    if(roomAvailabilityStatus === roomAvailabilityStatusConstants.PENDING) {
+      setTimeout(function() {
+        // Only show if still pending after the timeout
+        var newRoomAvailabilityStatus = this.model.get('roomAvailabilityStatus');
+        if(newRoomAvailabilityStatus === roomAvailabilityStatusConstants.PENDING) {
+          this.ui.roomAvailabilityStatusMessage[0].textContent = roomAvailabilityStatusMessage;
+        }
+      }.bind(this), 1000);
+    }
+    else {
+      this.ui.roomAvailabilityStatusMessage[0].textContent = roomAvailabilityStatusMessage;
+    }
   },
 
   filterReposForSelectedGroup: function() {
