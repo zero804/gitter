@@ -54,9 +54,7 @@ module.exports = Backbone.Model.extend({
     var activeGroup = groupsCollection.filter(function(group){
       return getOrgNameFromUri(group.uri) === attrs.selecedOrgName;
     }.bind(this))[0];
-    if(activeGroup) {
-      console.log('setting up a group id');
-      attrs.groupId = activeGroup.get('id'); }
+    if(activeGroup) { attrs.groupId = activeGroup.get('id'); }
 
     Backbone.Model.prototype.constructor.call(this, attrs, options);
   },
