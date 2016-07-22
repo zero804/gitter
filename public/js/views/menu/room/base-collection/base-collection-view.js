@@ -102,7 +102,7 @@ module.exports = Marionette.CompositeView.extend({
     var data = this.model.toJSON();
     var groupId = this.roomMenuModel.get('groupId');
     var selectedGroup = this.groupsCollection.get(groupId);
-    return { selectedOrgName: selectedGroup.get('name'), };
+    return { selectedGroupName: selectedGroup.get('name'), };
   },
 
   onBeforeRender: function() {
