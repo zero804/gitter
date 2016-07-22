@@ -9,5 +9,5 @@ module.exports = function topicsContextHelper(context){
     return;
   }
   if(!data) { return; }
-  return '<script>' + 'window.context = ' + data + ';'  + '</script>';
+  return '<script>' + 'window.context = ' + data + ';' + '</script>';
 };
