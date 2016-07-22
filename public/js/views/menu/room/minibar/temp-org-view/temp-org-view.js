@@ -5,7 +5,7 @@ var _ = require('underscore');
 var toggleClass = require('utils/toggle-class');
 var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 var context = require('utils/context');
-var getOrgnameFromUri = require('gitter-web-shared/get-org-name-from-uri');
+var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
 
 var _super = MinibarItemView.prototype;
 
@@ -14,19 +14,15 @@ initialize: function(attrs, options) {
     _super.initialize.apply(this, arguments);
     this.roomCollection = attrs.roomCollection;
     this.groupCollection = attrs.groupCollection;
+    this.roomMenuModel = attrs.roomMenuModel;
     this.listenTo(this.model.troupe, 'change:id', this.onRoomChange, this);
     this.listenTo(this.model, 'change:hidden', this.render, this);
   },
 
   onRoomChange: function (model, val){
-    //If the new room is not in the room list then show the temp icon
-    //as we are sure we should be showing a temp org
-    var selectedRoom = this.roomCollection.get('id');
-    var groupId = selectedRoom.get('groupId');
-    var group = this.groupCollection.get(groupId);
-    var hasJoinedOrg = !!group;
-    var shouldHideTempOrg = hasJoinedOrg || !group;
-    this.model.set('hidden', shouldHideTempOrg);
+    var groupUri = getOrgNameFromUri(this.getRoomUri());
+    var hasGroup = !!this.groupCollection.findWhere({ uri: groupUri });
+    this.model.set('hidden', hasGroup);
   },
 
   serializeData: function (){
