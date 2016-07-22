@@ -27,7 +27,7 @@ var repoModels = require('collections/repos');
 var ReposCollection = repoModels.ReposCollection;
 var groupModels = require('collections/groups');
 var CommunityCreateModel = require('views/community-create/community-create-model');
-var CreateRoomModel = require('views/modals/create-room-view-model');
+var CreateRoomModel = require('models/create-room-view-model');
 
 var AppLayout = require('views/layouts/app-layout');
 var LoadingView = require('views/app/loading-view');

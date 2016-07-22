@@ -16,7 +16,7 @@ var appEvents = require('utils/appevents');
 var GroupSelectView = require('views/create-room/groupSelectView');
 var ModalView = require('./modal');
 var FilteredSelect = require('./filtered-select');
-var roomAvailabilityStatusConstants = require('./room-availability-status-constants');
+var roomAvailabilityStatusConstants = require('../create-room/room-availability-status-constants');
 
 var template = require('./tmpl/create-room-view.hbs');
 var repoTypeaheadItemTemplate = require('./tmpl/create-room-repo-typeahead-item-view.hbs');

@@ -1,7 +1,7 @@
 'use strict';
 
 var Backbone = require('backbone');
-var roomAvailabilityStatusConstants = require('./room-availability-status-constants');
+var roomAvailabilityStatusConstants = require('../views/create-room/room-availability-status-constants');
 
 var CreateRoomViewModel = Backbone.Model.extend({
   defaults: {
