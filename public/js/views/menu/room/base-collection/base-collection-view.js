@@ -55,9 +55,6 @@ module.exports = Marionette.CompositeView.extend({
     this.roomMenuModel = attrs.roomMenuModel;
     this.roomCollection = attrs.roomCollection;
     this.groupsCollection = attrs.groupsCollection;
-    console.log('-----------------------');
-    console.log(this.groupsCollection);
-    console.log('-----------------------');
     this.listenTo(this.roomMenuModel, 'change:hasDismissedSuggestions', this.onDismissSuggestionsUpdate, this);
     this.listenTo(this.roomMenuModel, 'change:state', this.clearFocus, this);
     this.listenTo(context.troupe(), 'change:id', this.onRoomUpdate, this);
@@ -99,6 +96,13 @@ module.exports = Marionette.CompositeView.extend({
 
   onFilterComplete: function() {
     this.setActive();
+  },
+
+  serializeData: function (){
+    var data = this.model.toJSON();
+    var groupId = this.roomMenuModel.get('groupId');
+    var selectedGroup = this.groupsCollection.get(groupId);
+    return { selectedOrgName: selectedGroup.get('name'), };
   },
 
   onBeforeRender: function() {

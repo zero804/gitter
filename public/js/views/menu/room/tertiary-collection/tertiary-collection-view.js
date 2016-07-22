@@ -25,6 +25,7 @@ var ItemView = BaseCollectionItemView.extend({
 
   serializeData: function() {
     var data = parseForTemplate(this.model.toJSON(), this.roomMenuModel.get('state'));
+    data = _.extend({}, data,  proto.serializeData.apply(this, arguments));
     return data;
   }
 });
