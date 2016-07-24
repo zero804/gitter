@@ -18,6 +18,17 @@ var getHeaderViewOptions = require('gitter-web-shared/templates/get-header-view-
 var MenuBuilder = require('../../utils/menu-builder');
 
 require('views/behaviors/tooltip');
+require('transloadit');
+
+
+var TRANSLOADIT_DEFAULT_OPTIONS = {
+  wait: true,
+  modal: false,
+  autoSubmit: false,
+  debug: false
+};
+
+
 
 var HeaderView = Marionette.ItemView.extend({
   template: headerViewTemplate,
@@ -27,6 +38,11 @@ var HeaderView = Marionette.ItemView.extend({
   },
 
   ui: {
+    groupAvatarUploadForm: '.js-chat-header-group-avatar-upload-form',
+    groupAvatarFileInput: '.js-chat-header-group-avatar-upload-input',
+    groupAvatarSignatureInput: '.js-chat-header-group-avatar-upload-signature',
+    groupAvatarParamsInput: '.js-chat-header-group-avatar-upload-params',
+    groupAvatarProgress: '.js-chat-header-group-avatar-upload-progress',
     cog:            '.js-chat-settings',
     dropdownMenu:   '#cog-dropdown',
     topic:          '.js-room-topic',
@@ -39,6 +55,7 @@ var HeaderView = Marionette.ItemView.extend({
   },
 
   events: {
+    'change @ui.groupAvatarFileInput': 'onGroupAvatarUploadChange',
     'click @ui.cog':               'showDropdown',
     'click #leave-room':           'leaveRoom',
     'click @ui.favourite':         'toggleFavourite',
@@ -62,6 +79,7 @@ var HeaderView = Marionette.ItemView.extend({
   },
 
   initialize: function(options) {
+    this.groupsCollection = options.groupsCollection;
     this.rightToolbarModel = options.rightToolbarModel;
     this.menuItemsCollection = new Backbone.Collection([]);
     this.buildDropdown();
@@ -324,6 +342,87 @@ var HeaderView = Marionette.ItemView.extend({
       this.editingTopic = false;
     }
   },
+
+
+  onGroupAvatarUploadChange: function() {
+    this.uploadGroupAvatar();
+  },
+
+  updateProgressBar: function(spec) {
+    var bar = this.ui.groupAvatarProgress;
+    var value = spec.value && (spec.value * 100) + '%';
+    bar.css('width', value);
+  },
+
+  resetProgressBar: function() {
+    this.ui.groupAvatarProgress.addClass('hidden');
+    this.updateProgressBar({
+      value: 0
+    });
+  },
+
+  handleUploadStart: function() {
+    this.ui.groupAvatarProgress.removeClass('hidden');
+    this.updateProgressBar({
+      // Just show some progress
+      value: .2
+    });
+  },
+
+  handleUploadProgress: function(done, expected) {
+    this.updateProgressBar({
+      value: done / expected
+    });
+  },
+
+  handleUploadSuccess: function(/*res*/) {
+    this.resetProgressBar();
+    appEvents.triggerParent('user_notification', {
+      title: 'Avatar upload complete'
+    });
+  },
+
+  handleUploadError: function(err) {
+    appEvents.triggerParent('user_notification', {
+      title: 'Error Uploading File',
+      text:  err.message
+    });
+    this.resetProgressBar();
+  },
+
+  uploadGroupAvatar: function() {
+    var currentRoom = context.troupe();
+    if(!this.groupsCollection || !currentRoom) {
+      return;
+    }
+
+    var currentGroup = new Backbone.Model(currentRoom.get('group')) || this.groupsCollection.get(currentRoom.get('groupId'));
+
+    this.handleUploadStart();
+
+    apiClient.priv.get('/generate-signature', {
+      type: 'avatar',
+        group_id: currentGroup.get('id'),
+        group_uri: currentGroup.get('uri')
+      })
+      .then(function(res) {
+        this.ui.groupAvatarParamsInput[0].setAttribute('value', res.params);
+        this.ui.groupAvatarSignatureInput[0].setAttribute('value', res.sig);
+
+        var formData = new FormData(this.ui.groupAvatarUploadForm[0]);
+
+        this.ui.groupAvatarUploadForm.unbind('submit.transloadit');
+        this.ui.groupAvatarUploadForm.transloadit(_.extend(TRANSLOADIT_DEFAULT_OPTIONS, {
+          formData: formData,
+          onStart: this.handleUploadStart.bind(this),
+          onProgress: this.handleUploadProgress.bind(this),
+          onSuccess: this.handleUploadSuccess.bind(this),
+          onError: this.handleUploadError.bind(this)
+        }));
+
+        this.ui.groupAvatarUploadForm.trigger('submit.transloadit');
+      }.bind(this));
+  }
 });
 
 cocktail.mixin(HeaderView, KeyboardEventMixin);
