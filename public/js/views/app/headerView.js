@@ -71,6 +71,7 @@ var HeaderView = Marionette.ItemView.extend({
 
   behaviors: {
     Tooltip: {
+      '.js-chat-header-group-avatar-upload-label': { placement: 'right' },
       '.js-chat-name': { titleFn: 'getChatNameTitle', placement: 'right' },
       '.js-chat-header-org-page-action': { placement: 'left' },
       '.js-favourite-button': { placement: 'left' },
@@ -90,12 +91,16 @@ var HeaderView = Marionette.ItemView.extend({
   serializeData: function() {
     var data = this.model.toJSON();
 
+    var isStaff = context.isStaff();
+    var isAdmin = context.isTroupeAdmin();
+    var canChangeGroupAvatar = isStaff || isAdmin;
     _.extend(data, {
-      headerView:      getHeaderViewOptions(data),
-      user:            !!context.isLoggedIn(),
-      archives:        this.options.archives,
+      headerView: getHeaderViewOptions(data),
+      user: !!context.isLoggedIn(),
+      archives: this.options.archives,
       shouldShowPlaceholderRoomTopic: data.userCount <= 1,
-      isRightToolbarPinned: this.rightToolbarModel.get('isPinned')
+      isRightToolbarPinned: this.rightToolbarModel.get('isPinned'),
+      canChangeGroupAvatar: canChangeGroupAvatar
     });
 
     return data;
