@@ -9,7 +9,12 @@ function resolveInviteUserSuggestions(req, res, next) {
 
   return collaboratorsService.findCollaborators(req.user, type, linkPath)
     .then(function(suggestions) {
+      console.log('suggestions', suggestions);
       res.send(suggestions);
+    })
+    .catch(function(err) {
+      console.log('err', err, err.stack);
+      throw err;
     })
     .catch(next);
 }

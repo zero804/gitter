@@ -29,6 +29,7 @@ TwitterService.prototype.findFollowers = function(username) {
     }
   })
   .then(function(results) {
+    console.log('Twitter API results', results);
     if (!results.body || !results.body.users) {
       return [];
     }
