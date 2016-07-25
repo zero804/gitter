@@ -71,9 +71,8 @@ module.exports = CommunityCreateBaseStepView.extend({
       return provider === 'github';
     });
 
-    this.listenTo(this.communityCreateModel, 'change:communityName change:communitySlug', this.updateCommunityFields, this);
+    this.listenTo(this.communityCreateModel, 'change:communityName change:communitySlug', this.onCommunityInfoChange, this);
     this.listenTo(this.communityCreateModel, 'change:communitySlugAvailabilityStatus', this.updateSlugAvailabilityStatusIndicator, this);
-
   },
 
 
@@ -118,6 +117,33 @@ module.exports = CommunityCreateBaseStepView.extend({
 
     e.preventDefault();
     e.stopPropagation();
+  },
+
+  onCommunityInfoChange: function() {
+    if(!this.communityCreateModel.get('isUsingExplicitGitHubProject')) {
+      var communitySlug = this.communityCreateModel.get('communitySlug');
+      // TODO: Why does this match the first item always?
+      var matchingOrgItem = this.orgCollection.filter(function(org) {
+        return (org.get('name') || '').toLowerCase() === communitySlug;
+      })[0];
+      var matchingRepoItem = this.repoCollection.filter(function(repo) {
+        return (repo.get('uri') || '').toLowerCase() === communitySlug;
+      })[0];
+      if(matchingOrgItem) {
+        this.communityCreateModel.set('githubOrgId', matchingOrgItem.get('id'));
+        this.communityCreateModel.set('githubRepoId', null);
+      }
+      else if(matchingRepoItem) {
+        this.communityCreateModel.set('githubOrgId', null);
+        this.communityCreateModel.set('githubRepoId', matchingRepoItem.get('id'));
+      }
+      else {
+        this.communityCreateModel.set('githubOrgId', null);
+        this.communityCreateModel.set('githubRepoId', null);
+      }
+    }
+
+    this.updateCommunityFields();
   },
 
   updateCommunityFields: function() {
@@ -170,19 +196,19 @@ module.exports = CommunityCreateBaseStepView.extend({
   },
 
   checkSlugAvailability: _.throttle(function() {
-    var slug = this.communityCreateModel.get('communitySlug');
     var communityCreateModel = this.communityCreateModel;
     var model = this.model;
+    var slug = communityCreateModel.get('communitySlug');
 
     communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.PENDING);
     apiClient.priv.get('/check-group-uri', {
         uri: slug
       })
-      .then(function(results) {
+      .then(function() {
         communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.AVAILABLE);
         model.isValid();
       })
-      .catch(function(err) {
+      .catch(function() {
         communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.UNAVAILABLE);
         model.isValid();
       });

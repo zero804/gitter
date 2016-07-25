@@ -1,7 +1,5 @@
 'use strict';
 
-var env = require('gitter-web-env');
-var config = env.config;
 var assert = require('assert');
 var StatusError = require('statuserror');
 var ensureAccessAndFetchDescriptor = require('gitter-web-permissions/lib/ensure-access-and-fetch-descriptor');
@@ -10,7 +8,18 @@ var debug = require('debug')('gitter:app:group-with-policy-service');
 var roomService = require('./room-service');
 var secureMethod = require('../utils/secure-method');
 var validateRoomName = require('gitter-web-validators/lib/validate-room-name');
-var validateRoomSecurity = require('gitter-web-validators/lib/validate-room-security');
+var validateProviders = require('gitter-web-validators/lib/validate-providers');
+var groupService = require('gitter-web-groups/lib/group-service');
+
+/**
+ * @private
+ */
+function validateRoomSecurity(type, security) {
+  if (security === 'PUBLIC' || security === 'PRIVATE') {
+    return true;
+  }
+  return false;
+}
 
 /**
  * This could do with a better name
@@ -37,6 +46,11 @@ function findByUri(uri) {
 function ensureAccessAndFetchRoomInfo(user, group, options) {
   options = options || {};
 
+  var providers = options.providers;
+  if (providers && !validateProviders(providers)) {
+    throw new StatusError(400, 'Invalid providers ' + providers.toString());
+  }
+
   var type = options.type || null;
 
   var security = options.security;
@@ -50,7 +64,6 @@ function ensureAccessAndFetchRoomInfo(user, group, options) {
   // TODO: validate topic
 
   var name = options.name;
-  assert(name, 'name required');
 
   if (!validateRoomName(name)) {
     throw new StatusError(400, 'Invalid room name: ' + name);
@@ -68,7 +81,8 @@ function ensureAccessAndFetchRoomInfo(user, group, options) {
         .then(function(securityDescriptor) {
           return [{
             topic: topic,
-            uri: uri
+            uri: uri,
+            providers: providers
           }, securityDescriptor];
         });
     })
@@ -83,26 +97,31 @@ GroupWithPolicyService.prototype.createRoom = secureMethod([allowAdmin], functio
   var user = this.user;
   var group = this.group;
 
-  if (!config.get("project-splitsville:enabled")) {
-    if (options.type && group.sd.type !== 'GH_ORG' && group.sd.type !== 'GH_REPO' && group.sd.type !== 'GH_USER') {
-      throw new StatusError(400, 'GitHub repo backed rooms can only be added to GitHub org, repo or user backed groups.');
-    }
+  if (options.type && group.sd.type !== 'GH_ORG' && group.sd.type !== 'GH_REPO' && group.sd.type !== 'GH_USER') {
+    throw new StatusError(400, 'GitHub repo backed rooms can only be added to GitHub org, repo or user backed groups.');
+  }
 
-    if (options.linkPath) {
-      if (options.linkPath.split('/')[0] !== group.sd.linkPath.split('/')[0]) {
-        throw new StatusError(400, 'GitHub repo backed rooms must be for the same owner (gh org or user) as the group.');
-      }
+  if (options.linkPath) {
+    if (options.linkPath.split('/')[0] !== group.sd.linkPath.split('/')[0]) {
+      throw new StatusError(400, 'GitHub repo backed rooms must be for the same owner (gh org or user) as the group.');
     }
   }
 
   return ensureAccessAndFetchRoomInfo(user, group, options)
     .spread(function(roomInfo, securityDescriptor) {
       debug("Upserting %j", roomInfo);
-      return roomService.upsertGroupRoom(user, group, roomInfo, securityDescriptor, {
-        tracking: options.tracking
-      });
+      return roomService.createGroupRoom(user, group, roomInfo, securityDescriptor, {
+        tracking: options.tracking,
+        runPostGitHubRoomCreationTasks: options.runPostGitHubRoomCreationTasks
+      })
+    })
+    .then(function(results) {
+      return results.troupe;
     });
 });
 
+GroupWithPolicyService.prototype.setAvatar = secureMethod([allowAdmin], function(url) {
+  groupService.setAvatarForGroup(this.group._id, url);
+});
 
 module.exports = GroupWithPolicyService;

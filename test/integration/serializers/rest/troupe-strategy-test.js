@@ -58,6 +58,7 @@ describe('TroupeStrategy', function() {
           githubType: 'USER_CHANNEL',
           security: 'PUBLIC',
           noindex: false,
+          public: true,
           v: 1
         }]);
       });
@@ -83,6 +84,7 @@ describe('TroupeStrategy', function() {
           security: 'PUBLIC',
           noindex: false,
           roomMember: true,
+          public: true,
           v: 1
         }]);
       });
@@ -138,6 +140,7 @@ describe('TroupeStrategy', function() {
           githubType: 'ONETOONE',
           noindex: false,
           roomMember: true,
+          public: false,
           v: 1
         }]);
       });
@@ -164,6 +167,7 @@ describe('TroupeStrategy', function() {
           security: 'PUBLIC',
           noindex: false,
           roomMember: true,
+          public: true,
           v: 1
         }]);
       });
@@ -202,6 +206,7 @@ describe('TroupeStrategy', function() {
             */
             admin: false
           },
+          public: true,
           v: 1
         }]);
       });
@@ -223,7 +228,7 @@ describe('TroupeStrategy', function() {
           githubType: 'USER_CHANNEL',
           security: 'PUBLIC',
           noindex: false,
-          ownerIsOrg: false,
+          public: true,
           v: 1
         }]);
       });
@@ -246,6 +251,7 @@ describe('TroupeStrategy', function() {
           security: 'PUBLIC',
           noindex: false,
           roomMember: true,
+          public: true,
           v: 1
         }]);
       });

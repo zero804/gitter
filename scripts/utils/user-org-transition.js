@@ -2,8 +2,6 @@
 /*jslint node: true */
 "use strict";
 
-var env = require('gitter-web-env');
-var winston = env.logger;
 var shutdown = require('shutdown');
 var Promise = require('bluebird');
 var userRemovalService = require('../../server/services/user-removal-service');
@@ -12,7 +10,9 @@ var userService = require('../../server/services/user-service');
 var persistence = require('gitter-web-persistence');
 var uriLookupService = require('../../server/services/uri-lookup-service');
 var validateUri = require('gitter-web-github').GitHubUriValidator;
-var permissionsModel = require('gitter-web-permissions/lib/permissions-model');
+// var permissionsModel = require('gitter-web-permissions/lib/permissions-model');
+var permissionsModel = null;
+// THIS SCRIPT NEEDS REWRITING
 
 var opts = require('yargs')
   .option('username', {

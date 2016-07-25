@@ -2,10 +2,10 @@
 
 var env = require('gitter-web-env');
 var logger = env.logger;
+var stats = env.stats;
 
 var RoomWithPolicyService = require('./room-with-policy-service');
 var troupeService = require('./troupe-service');
-var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var invitesService = require('gitter-web-invites/lib/invites-service');
 var StatusError = require('statuserror');
 var assert = require('assert');
@@ -43,6 +43,17 @@ function acceptInvite(user, secret) {
       return invitesService.markInviteAccepted(this.invite._id, user._id)
         .return(this.room);
     })
+    .tap(function() {
+      // Success statistics
+      var room = this.room;
+      var invite = this.invite;
+      stats.event("invite_accepted", {
+        userId: user && (user.id || user._id),
+        troupeId: room && (room.id || room._id),
+        type: invite.type,
+        uri: room && room.uri
+      });
+    })
     .catch(StatusError, function(err) {
       if (err.status >= 500) throw err;
 
@@ -54,7 +65,21 @@ function acceptInvite(user, secret) {
       }
 
       throw err;
-    });
+    })
+    .catch(function(e) {
+      // Failure statistics
+      var room = this.room;
+      var invite = this.invite;
+
+      stats.event("invite_rejected", {
+        userId: user && (user.id || user._id),
+        troupeId: room && (room.id || room._id),
+        type: invite && invite.type,
+        uri: room && room.uri
+      });
+
+      throw e;
+    })
 }
 
 module.exports = {

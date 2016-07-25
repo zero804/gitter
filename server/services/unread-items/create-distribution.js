@@ -8,6 +8,7 @@ var Distribution = require('./distribution');
 var roomMembershipService = require('../room-membership-service');
 var categoriseUserInRoom = require("../categorise-users-in-room");
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
+var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
 
 /**
  * Given an array of non-member userIds in a room,
@@ -16,9 +17,14 @@ var policyFactory = require('gitter-web-permissions/lib/policy-factory');
  * have access will not.
  */
 function findNonMembersWithAccess(troupe, userIds) {
-  if (!userIds.length || troupe.oneToOne || troupe.security === 'PRIVATE') {
+  if (!userIds.length || troupe.oneToOne) {
     // Trivial case, and the case where only members have access to the room type
     return Promise.resolve([]);
+  }
+
+  // Public? Anyone can join
+  if (securityDescriptorUtils.isPublic(troupe)) {
+    return Promise.resolve(userIds);
   }
 
   var result = [];

@@ -81,29 +81,31 @@ module.exports = CommunityCreateBaseStepView.extend({
 
     var type = null;
     var linkPath = null;
-    var githubProjectModel;
     var githubOrgId = communityCreateModel.get('githubOrgId');
     var githubRepoId = communityCreateModel.get('githubRepoId');
-    if(githubOrgId) {
-      githubProjectModel = this.orgCollection.get(githubOrgId);
+    var githubProjectModel = this.orgCollection.get(githubOrgId) || this.repoCollection.get(githubRepoId);
+    if(githubOrgId && githubProjectModel) {
       type = 'GH_ORG';
+      linkPath = githubProjectModel.get('name').toLowerCase();
     }
-    else if(githubRepoId) {
-      githubProjectModel = this.repoCollection.get(githubRepoId);
+    else if(githubRepoId && githubProjectModel) {
       type = 'GH_REPO';
-    }
-
-    if(githubProjectModel) {
       linkPath = githubProjectModel.get('uri');
     }
 
-    // TODO: Invite people
     var creatingGroupPromise = new Promise(function(resolve, reject) {
       this.groupsCollection.create({
         name: communityCreateModel.get('communityName'),
         uri: communityCreateModel.get('communitySlug'),
-        type: type,
-        linkPath: linkPath
+        type: 'org',
+        // This one is for the left-menu
+        linkPath: linkPath,
+        // This is for POSTing to the API
+        security: {
+          type: type,
+          linkPath: linkPath
+        },
+        invites: [].concat(communityCreateModel.peopleToInvite.toJSON(), communityCreateModel.emailsToInvite.toJSON())
       }, {
         wait: true,
         success: function(model, response) {
@@ -119,7 +121,13 @@ module.exports = CommunityCreateBaseStepView.extend({
       var defaultRoomName = results && results.defaultRoom && results.defaultRoom.name;
       var defaultRoomUri = results && results.defaultRoom && results.defaultRoom.uri;
 
+      // Move to the default room
       appEvents.trigger('navigation', '/' + defaultRoomUri, 'chat', defaultRoomName);
+      // Select the new community in the new left menu
+      appEvents.trigger('left-menu-menu-bar:activate', {
+        state: 'org',
+        selectedOrgName: results.name
+      });
       // Hide create community
       //communityCreateModel.set('active', false);
       communityCreateModel.clear().set(communityCreateModel.defaults);

@@ -122,6 +122,64 @@ function findContextForUri(user, uri, options) {
     });
 }
 
+/**
+ * Resolves a uri in the context of a user.
+ *
+ * Will only create a room in the case of a one-to-one
+ */
+function findContextForRoom(user, uri) {
+  debug("findContextForRoom %s %s %j", user && user.username, uri);
+
+  var userId = user && user.id;
+
+  if (!uri) throw new StatusError(400, 'uri required');
+
+  /* First off, try use local data to figure out what this url is for */
+  return uriResolver(user && user.id, uri, { ignoreCase: true })
+    .then(function (resolved) {
+      if (!resolved) throw new StatusError(404);
+
+      var resolvedUser = resolved.user;
+      var resolvedTroupe = resolved.room;
+
+      // The uri resolved to a user, we need to do a one-to-one
+      if(resolvedUser) {
+        if(!user) {
+          debug("uriResolver returned user for uri=%s", uri);
+          throw new StatusError(401); // Login required
+        }
+
+        if(mongoUtils.objectIDsEqual(resolvedUser.id, userId)) {
+          throw new StatusError(404);
+        }
+
+        debug("localUriLookup returned user for uri=%s. Finding or creating one-to-one", uri);
+
+        return oneToOneRoomService.findOrCreateOneToOneRoom(user, resolvedUser.id)
+          .spread(function(troupe/*, resolvedUser*/) {
+            return troupe;
+          });
+      }
+
+      if (resolvedTroupe) {
+        return policyFactory.createPolicyForRoom(user, resolvedTroupe)
+          .then(function(policy) {
+            return policy.canRead()
+              .then(function(access) {
+                if (!access) {
+                  throw new StatusError(404);
+                }
+
+                return resolvedTroupe;
+              });
+          });
+      }
+
+      // No user, no room. 404
+      throw new StatusError(404);
+    });
+}
+
 function findContextForGroup(user, uri, options) {
   debug("findContextForGroup %s %s %j", user && user.username, uri, options);
   var ignoreCase = options && options.ignoreCase;
@@ -165,5 +223,6 @@ function findContextForGroup(user, uri, options) {
 
 module.exports = {
   findContextForUri: Promise.method(findContextForUri),
+  findContextForRoom: Promise.method(findContextForRoom),
   findContextForGroup: Promise.method(findContextForGroup)
 };

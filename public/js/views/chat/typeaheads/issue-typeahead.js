@@ -32,7 +32,12 @@ module.exports = function() {
       });
     },
     replace: function(issue) {
-      return '$1$3#' + issue.number + ' ';
+      if ((typeof issue.number === 'string') && issue.number.indexOf('#') >= 0) {
+        return '$1$3' + issue.number + ' ';
+      } else {
+        return '$1$3#' + issue.number + ' ';
+      }
+
     }
   };
 };

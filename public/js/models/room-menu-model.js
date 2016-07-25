@@ -173,6 +173,8 @@ module.exports = Backbone.Model.extend({
     this.listenTo(this, 'change:state', this.onSwitchState, this);
     this.listenTo(this, 'change', _.throttle(this.save.bind(this), 1500));
     this.listenTo(context.troupe(), 'change:id', this.onRoomChange, this);
+    this.listenTo(this.bus, 'left-menu-menu-bar:activate', this.onMenuBarActivateRequest, this);
+
     this.onSwitchState(this, this.get('state'));
   },
 
@@ -271,10 +273,20 @@ module.exports = Backbone.Model.extend({
     if(!this.get('roomMenuIsPinned')) { this.set('panelOpenState', false); }
   },
 
+  onMenuBarActivateRequest: function(data) {
+    data = data || {};
+    this.set({
+      panelOpenState: true,
+      profileMenuOpenState: false,
+      state: data.state,
+      selectedOrgName: data.selectedOrgName
+    });
+  },
+
   getCurrentGroup: function (){
     if(this.get('state') !== 'org') { return false; }
-    var selectedOrg = this.get('selectedOrgname');
-    if(!selectedOrg.length) { throw new Error('Left menu is in the org state with no selected org'); }
+    var selectedOrg = this.get('selectedOrgName');
+    if(!selectedOrg) { throw new Error('Left menu is in the org state with no selected org'); }
     return this.minibarCollection.findWhere({ name: selectedOrg });
   },
 

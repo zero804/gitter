@@ -98,6 +98,7 @@ function createExpectedFixtures(expected) {
       githubId:         possibleGenerate('githubId', generateGithubId),
       githubToken:      possibleGenerate('githubToken', generateGithubToken),
       username:         possibleGenerate('username', generateUsername),
+      gravatarImageUrl:  f.gravatarImageUrl,
       state:            f.state || undefined,
       staff:            f.staff || false
     });
@@ -284,10 +285,23 @@ function createExpectedFixtures(expected) {
 
     var uri = f.uri || generateGroupUri();
 
+    var avatarVersion;
+    if(f.hasOwnProperty('avatarVersion')) {
+      avatarVersion = f.avatarVersion;
+    } else {
+      if (f.avatarUrl) {
+        avatarVersion = 1;
+      } else {
+        avatarVersion = 0;
+      }
+    }
+
     var doc = {
       name: f.name || uri,
       uri: uri,
-      lcUri: uri.toLowerCase()
+      lcUri: uri.toLowerCase(),
+      avatarUrl: f.avatarUrl || null,
+      avatarVersion: avatarVersion
     };
 
 
@@ -315,8 +329,6 @@ function createExpectedFixtures(expected) {
     doc.sd = securityDoc;
 
     debug('Creating group %s with %j', fixtureName, doc);
-
-    debug(doc);
 
     return persistence.Group.create(doc);
   }

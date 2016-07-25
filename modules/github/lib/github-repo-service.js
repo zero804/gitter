@@ -78,8 +78,16 @@ GitHubRepoService.prototype.getStargazers = function(repo, options) {
 /**
  * Returns a promise of the issues for a repo
  */
-GitHubRepoService.prototype.getIssues = function(repo) {
-  return tentacles.issue.listForRepo(repo, { query: { state: 'all' }, accessToken: this.accessToken })
+GitHubRepoService.prototype.getIssues = function(repo, options) {
+  var query = {
+    state: options && options.state || 'all',
+  }
+
+  return tentacles.issue.listForRepo(repo, {
+      query: query,
+      accessToken: this.accessToken,
+      firstPageOnly: options && options.firstPageOnly
+    })
     .then(function(returnedIssues) {
       var issues = [];
       returnedIssues.forEach(function(issue) {
