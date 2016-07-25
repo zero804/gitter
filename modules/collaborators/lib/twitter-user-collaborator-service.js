@@ -15,6 +15,7 @@ TwitterUserCollaboratorService.prototype.findCollaborators = function() {
 
   return twitterService.findFollowers(username)
     .then(function(followers) {
+      console.log('followers', followers.length, followers);
       followers.sort(function(a, b) {
         return b.followers_count - a.followers_count;
       });
