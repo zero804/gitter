@@ -606,7 +606,8 @@
   }
   &.unavailable {
     &:after {
-      content: '\e817';
+      content: '\e825';
+      color: @ruby;
     }
   }
 }
@@ -647,8 +648,24 @@
 
   &.active {
     display: flex;
-    justify-content: space-between;
+    align-items: baseline;
   }
+}
+
+.community-create-associated-project-main-area {
+  flex: 1;
+}
+
+.community-create-associated-project-badger-option {
+  display: none;
+
+  &.active {
+    display: block;
+  }
+}
+
+.community-create-associated-project-badger-option-input {
+  margin-right: .5rem;
 }
 
 .community-create-change-github-project-button {

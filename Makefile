@@ -21,6 +21,7 @@ clean: npm
 	gulp clean
 
 test: clean npm
+
 	mkdir -p output/
 	./exec-in-docker ./node_modules/.bin/gulp test --test-coverage --test-suite docker --test-xunit-reports
 	echo "Docker tests completed"

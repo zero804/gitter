@@ -5,7 +5,6 @@ var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var resolveRoomUri = testRequire('./utils/resolve-room-uri');
 var assert = require('assert');
 var StatusError = require('statuserror');
-var Promise = require('bluebird');
 
 describe('resolve-room-uri', function() {
   describe('integration tests #slow', function() {
@@ -40,7 +39,7 @@ describe('resolve-room-uri', function() {
           var o = fixture[META.uri];
           expectedUri = '/' + (o.uri || o.username);
         }
-        
+
         return resolveRoomUri(room, user && user.id)
           .then(function(uri) {
             if (META.error) {
