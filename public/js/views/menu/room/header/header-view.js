@@ -6,6 +6,7 @@ var fastdom = require('fastdom');
 var toggleClass = require('utils/toggle-class');
 var cocktail = require('cocktail');
 var KeyboardEventMixin = require('views/keyboard-events-mixin');
+var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
 
 
 var HeaderView = Marionette.ItemView.extend({
@@ -53,12 +54,17 @@ var HeaderView = Marionette.ItemView.extend({
     var selectedGroup = this.groupsCollection.get(groupId);
     var name = '';
     if(selectedGroup) { name = selectedGroup.get('name'); }
+    else { name = getOrgNameFromUri(document.location.pathname); }
+    console.log('-----------------------');
+    console.log(name);
+    console.log('-----------------------');
     return {
       orgName: name,
     };
   },
 
   updateActiveElement: function(model, state) { //jshint unused: true
+    console.log(state);
     //This can be called after render so we need to add a small delay to get the transitions working
     //jp 6/12/16
     setTimeout(function() {
@@ -67,7 +73,7 @@ var HeaderView = Marionette.ItemView.extend({
         toggleClass(this.ui.headerSearch[0], 'active', state === 'search');
         toggleClass(this.ui.headerFavourite[0], 'active', state === 'favourite');
         toggleClass(this.ui.headerPeople[0], 'active', state === 'people');
-        toggleClass(this.ui.headerOrg[0], 'active', state === 'org');
+        toggleClass(this.ui.headerOrg[0], 'active', (state === 'org' || state === 'temp-org'));
       }.bind(this));
     }.bind(this));
   },
