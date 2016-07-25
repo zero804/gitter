@@ -223,6 +223,7 @@ module.exports = Backbone.Model.extend({
         break;
 
       case 'temp-org':
+        this.set('groupId', null);
         this.primaryCollection.switchCollection(this.activeRoomCollection);
         this.secondaryCollection.switchCollection(this.suggestedOrgs);
         this.tertiaryCollection.switchCollection(this._suggestedRoomCollection);
