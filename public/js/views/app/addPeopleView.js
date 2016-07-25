@@ -239,7 +239,7 @@ var View = Marionette.CompositeView.extend({
             this.collection.reset([{
               displayName: input,
               email: input,
-              avatarUrlSmallder: DEFAULT_AVATAR_UNTIL_AVATARS_SERVICE_ARRIVES,
+              avatarUrlSmall: DEFAULT_AVATAR_UNTIL_AVATARS_SERVICE_ARRIVES,
               avatarUrlMedium: DEFAULT_AVATAR_UNTIL_AVATARS_SERVICE_ARRIVES
             }]);
           } else {
