@@ -42,6 +42,7 @@ var userScopes = require('gitter-web-identity/lib/user-scopes');
 var groupService = require('gitter-web-groups/lib/group-service');
 var securityDescriptorGenerator = require('gitter-web-permissions/lib/security-descriptor-generator');
 var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
+var liveCollections = require('./live-collections');
 
 /**
  * sendJoinStats() sends information to MixPanels about a join_room event
@@ -847,6 +848,19 @@ function createGroupRoom(user, group, roomInfo, securityDescriptor, options) {
     });
 }
 
+function updateTopic(roomId, topic) {
+  if (!topic) topic = '';
+  if (topic.length > 4096) throw new StatusError(400);
+  return persistence.Troupe.findOneAndUpdate(
+    { _id: roomId },
+    { $set: { topic: topic } })
+    .exec()
+    .then(function() {
+      liveCollections.rooms.emit('patch', roomId, { topic: topic });
+      return null;
+    });
+}
+
 module.exports = {
   applyAutoHooksForRepoRoom: applyAutoHooksForRepoRoom,
   findAllRoomsIdsForUserIncludingMentions: findAllRoomsIdsForUserIncludingMentions,
@@ -860,6 +874,7 @@ module.exports = {
   searchRooms: searchRooms,
   deleteRoom: deleteRoom,
   createGroupRoom: createGroupRoom,
+  updateTopic: updateTopic,
   testOnly: {
     updateUserDateAdded: updateUserDateAdded,
     createRoomForGitHubUri: createRoomForGitHubUri,
