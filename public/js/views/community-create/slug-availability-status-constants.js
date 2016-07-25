@@ -3,7 +3,8 @@
 var slugAvailabilityStatusConstants = {
   PENDING: 'pending',
   AVAILABLE: 'available',
-  UNAVAILABLE: 'unavailable'
+  UNAVAILABLE: 'unavailable',
+  INVALID: 'invalid'
 };
 
 
