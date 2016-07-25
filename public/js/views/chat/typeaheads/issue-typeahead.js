@@ -32,7 +32,7 @@ module.exports = function() {
       });
     },
     replace: function(issue) {
-      if (issue.number.indexOf('#') >= 0) {
+      if ((typeof issue.number === 'string') && issue.number.indexOf('#') >= 0) {
         return '$1$3' + issue.number + ' ';
       } else {
         return '$1$3#' + issue.number + ' ';
