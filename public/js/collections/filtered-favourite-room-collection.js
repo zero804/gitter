@@ -5,6 +5,7 @@ var FilteredRoomCollection = require('./filtered-room-collection');
 var sortAndFilters = require('gitter-realtime-client/lib/sorts-filters').model;
 var one2oneFavouriteFilter = require('gitter-web-shared/filters/left-menu-primary-favourite-one2one');
 var orgFavouriteFilter = require('gitter-web-shared/filters/left-menu-primary-favourite-org');
+var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
 
 var FilteredFavouriteCollection = FilteredRoomCollection.extend({
   initialize: function(models, options) {
@@ -37,7 +38,10 @@ var FilteredFavouriteCollection = FilteredRoomCollection.extend({
       return orgFavouriteFilter(model.attributes, groupId);
     },
 
-    tempOrg: function(){ return false; },
+    tempOrg: function(model){
+      var groupName = getOrgNameFromUri(document.location.pathname);
+      return getOrgNameFromUri(model.get('uri')) === groupName;
+    },
 
     default: sortAndFilters.favourites.filter
   },
