@@ -125,7 +125,7 @@ module.exports = {
         // the report that the promise resolves to.
         return roomWithPolicyService.createRoomInvitations(invites);
       })
-      .then(function(invitesReport) {
+      .then(function(/*invitesReport*/) {
         var groupStrategy = new restSerializer.GroupStrategy();
         var troupeStrategy = new restSerializer.TroupeStrategy({
           currentUserId: req.user.id,
