@@ -155,8 +155,21 @@ describe('restful #slow', function() {
             id: fixture.group1.id,
             name: fixture.group1.name,
             uri: fixture.group1.uri,
+            backedBy: {
+              type: null,
+              linkPath: null
+            },
             avatarUrl: nconf.get('avatar:officialHost') + '/group/i/' + fixture.group1.id,
           }]);
+        });
+    });
+  });
+
+  describe('serializeAdminGroupsForUser', function() {
+    it('should do what it says on the tin', function() {
+      return restful.serializeAdminGroupsForUser(fixture.user1)
+        .then(function(result) {
+          assert.deepEqual(result, []);
         });
     });
   });

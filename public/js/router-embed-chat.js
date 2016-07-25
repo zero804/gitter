@@ -25,21 +25,38 @@ require('views/widgets/avatar');
 onready(function() {
   var Router = Backbone.Router.extend({
     routes: {
-      'autojoin': 'autojoin'
+      '': 'hideModal',
+      'autojoin': 'autojoin',
+      'welcome-message': 'showWelcomeMessage'
+    },
+    
+    hideModal: function() {
+      appView.dialogRegion.destroy();
     },
 
     autojoin: function() {
-      apiClient.post('/v1/rooms', {
-          uri: context.troupe().get('uri') || context.troupe().get('url')
-        })
-        .then(function() {
-          //location.reload();
-          context.troupe().set('roomMember', true);
+      if (context.roomHasWelcomeMessage()) {
+        this.showWelcomeMessage();
+        return;
+      }
+
+      apiClient.user
+        .post('/rooms', { id: context.troupe().id })
+        .bind(this)
+        .then(function(body) {
+          context.setTroupe(body);
         });
-    }
+    },
+
+    showWelcomeMessage: function (){
+      require.ensure(['./views/modals/welcome-message'], function(require){
+        var WelcomeMessageView = require('./views/modals/welcome-message');
+        appView.dialogRegion.show(new WelcomeMessageView.Modal());
+      });
+    },
   });
 
-  var router = new Router();
+  new Router();
 
   var appView = new EmbedLayout({
     el: 'body',

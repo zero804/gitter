@@ -27,7 +27,11 @@ var PRERENDERED_VIEWS = [
   "js/views/chat/tmpl/join-room-view",
   'js/views/people/tmpl/peopleCollectionView',
   'js/views/explore/tmpl/explore-view',
-  'js/views/community-create/community-create-view'
+  'js/views/community-create/main-step/community-creation-main-view',
+  'js/views/community-create/invite-step/community-creation-invite-people-view',
+  'js/views/community-create/github-projects-step/community-creation-github-projects-view',
+  'js/views/community-create/overview-step/community-creation-overview-view'
+
   /* new */
 ].reduce(function(memo, v) {
   memo[v] = compileTemplate(v + ".hbs");
