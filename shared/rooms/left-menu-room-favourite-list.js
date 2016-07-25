@@ -13,6 +13,7 @@ module.exports = function generateLemMenuFavouriteRoomsList(state, rooms, groupI
   var filter;
   switch(state) {
     case 'search':
+    case 'temp-org':
       filter = function(){ return false; };
       break;
     case 'people':

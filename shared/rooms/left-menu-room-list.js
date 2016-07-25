@@ -12,6 +12,7 @@ module.exports = function generateLeftMenuRoomsList(state, rooms, selectedOrgNam
 
   var filter;
   switch(state) {
+    case 'temp-org':
     case 'search':
       filter = function(){ return false; };
       break;
