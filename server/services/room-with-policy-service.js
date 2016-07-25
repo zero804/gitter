@@ -99,8 +99,7 @@ RoomWithPolicyService.prototype.updateTags = secureMethod([allowStaff, allowAdmi
  */
 RoomWithPolicyService.prototype.updateTopic = secureMethod(allowAdmin, function(topic) {
   var room = this.room;
-  room.topic = topic;
-  return room.save();
+  return roomService.updateTopic(room._id, topic);
 });
 
 /**
