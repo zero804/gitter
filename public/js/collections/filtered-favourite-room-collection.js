@@ -31,7 +31,7 @@ var FilteredFavouriteCollection = FilteredRoomCollection.extend({
       return false;
     },
 
-    org: function(model, val) {
+    org: function(model) {
       if(model.get('isOneToOne')) { return false; }
       var groupId = this.roomModel.get('groupId');
       return orgFavouriteFilter(model.attributes, groupId);
