@@ -20,6 +20,7 @@
     "del": "^2.2.1",
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
+    "mocha-loader": "^0.7.1",
     "webpack": "^1.13.1",
     "webpack-dev-middleware": "^1.6.1"
   },

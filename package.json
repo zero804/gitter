@@ -262,6 +262,7 @@
     "mkdirp": "^0.5.1",
     "mocha": "^2.5.3",
     "mocha-istanbul": "0.2.0",
+    "mocha-loader": "^0.7.1",
     "mocha-multi": "^0.9.0",
     "ms": "^0.7.1",
     "mutantjs": "^0.2.0",
