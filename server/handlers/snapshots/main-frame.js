@@ -22,6 +22,11 @@ module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, group
   //------------------------------------------------------
   //Default new state is "All Conversations"
   var menuState = lastLeftMenuSnapshot.state || 'all';
+
+  //It can be the case that a user has saved a state of temp-org
+  //if this is the case reset, it will be recalculated below
+  if(menuState === 'temp-org') { menuState = 'all'; }
+
   // Try the suggested
   // ex. If you are loading a home view then activate the search state
   if(extras.suggestedMenuState) {
