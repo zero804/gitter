@@ -65,7 +65,6 @@ var FilteredRoomCollection = SimpleFilteredCollection.extend({
         this.setVisibilePredicate(this.visiblePredicates[state].bind(this));
         break;
       case 'temp-org':
-        console.log('set temp org');
         this.setVisibilePredicate(this.visiblePredicates.tempOrg);
         break;
       default:

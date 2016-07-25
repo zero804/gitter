@@ -200,7 +200,6 @@ module.exports = Backbone.Model.extend({
   },
 
   onSwitchState: function(model, val) {
-    //TODO Test this JP 27/1/15
     var searchFocus = false;
     switch (val) {
       case 'all':

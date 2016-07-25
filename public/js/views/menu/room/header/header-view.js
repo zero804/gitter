@@ -55,16 +55,10 @@ var HeaderView = Marionette.ItemView.extend({
     var name = '';
     if(selectedGroup) { name = selectedGroup.get('name'); }
     else { name = getOrgNameFromUri(document.location.pathname); }
-    console.log('-----------------------');
-    console.log(name);
-    console.log('-----------------------');
-    return {
-      orgName: name,
-    };
+    return { orgName: name, };
   },
 
   updateActiveElement: function(model, state) { //jshint unused: true
-    console.log(state);
     //This can be called after render so we need to add a small delay to get the transitions working
     //jp 6/12/16
     setTimeout(function() {

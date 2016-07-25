@@ -6,7 +6,7 @@ var _ = require('underscore');
 var KeyboardControllerView = require('public/js/views/menu/room/keyboard-controller/keyboard-controller-view');
 var appEvents = require('utils/appevents');
 
-describe.only('KeyboardControllerView', function(){
+describe('KeyboardControllerView', function(){
 
   var view;
   var model;
