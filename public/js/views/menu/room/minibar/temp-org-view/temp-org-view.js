@@ -3,9 +3,9 @@
 var MinibarItemView  = require('../minibar-item-view');
 var _ = require('underscore');
 var toggleClass = require('utils/toggle-class');
-var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 var context = require('utils/context');
 var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
+var avatars = require('gitter-web-avatars');
 
 var _super = MinibarItemView.prototype;
 
@@ -22,14 +22,17 @@ initialize: function(attrs, options) {
   onRoomChange: function (model, val){
     var groupUri = getOrgNameFromUri(this.getRoomUri());
     var hasGroup = !!this.groupCollection.findWhere({ uri: groupUri });
+    //Render so we can get the right src on the buttons img
+    if(hasGroup) { this.render(); }
     this.model.set('hidden', hasGroup);
   },
 
   serializeData: function (){
     var data = this.model.toJSON();
-    var uri = this.getRoomUri();
+    var uri = getOrgNameFromUri(this.getRoomUri());
+    var imgDetails = avatars.getForRoomUri(uri);
     return  _.extend({}, data,  _super.serializeData.apply(this, arguments), {
-      avatarSrcset: resolveRoomAvatarSrcSet({ uri: uri }, 22),
+      avatarUrl: imgDetails,
     });
   },
 
