@@ -214,12 +214,11 @@ module.exports = Marionette.LayoutView.extend({
       case 'org':
         //FIXME -- test this works
         var groupId = this.model.get('groupId');
-        var group = this.groupsCollection.get(groupId);
-        var orgName = group.get('name');
-        var model = this.collection.findWhere({ groupId: groupId });
-        if(this.tempModel.get('name') === orgName) { model = this.tempModel; }
+        var model = this.collection.get(groupId);
         if(!model) { return; }
         return model.set({ active: true, focus: true });
+      case 'temp-org':
+        return this.tempModel.set({ active: true, focus: true });
     }
   },
 
