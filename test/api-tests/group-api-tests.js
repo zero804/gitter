@@ -112,7 +112,10 @@ describe('group-api', function() {
       .post('/v1/groups')
       .send({
         name: 'Repo Group',
-        uri: 'Repo-Group',
+        // Adding an _ in here otherwise the test might fail with a 409 if a
+        // user ever signs up to GitHub with that name before we split away
+        // from GitHub. See fixtureLoader.GITTER_INTEGRATION_COMMUNITY too.
+        uri: '_Repo-Group',
         providers: ['github'],
         addBadge: true,
         security: {
@@ -124,9 +127,9 @@ describe('group-api', function() {
       .expect(200)
       .then(function(result) {
         var group = result.body;
-        assert.strictEqual(group.uri, 'Repo-Group');
+        assert.strictEqual(group.uri, '_Repo-Group');
         var room = group.defaultRoom;
-        assert.strictEqual(room.uri, 'Repo-Group/Lobby');
+        assert.strictEqual(room.uri, '_Repo-Group/Lobby');
         assert.strictEqual(room.providers.length, 1);
         assert.strictEqual(room.providers[0], 'github');
       });
