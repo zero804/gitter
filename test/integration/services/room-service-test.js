@@ -1543,4 +1543,38 @@ describe('room-service', function() {
 
   });
 
+  describe('updateTopic #slow', function() {
+    var roomService = testRequire('./services/room-service');
+
+
+    var fixture = fixtureLoader.setup({
+      troupe1: { },
+    });
+
+    it('should update the topic', function() {
+      return roomService.updateTopic(fixture.troupe1.id, 'THE TOPIC')
+        .then(function() {
+          return persistence.Troupe.findById(fixture.troupe1.id)
+            .exec();
+        })
+        .then(function(troupe) {
+          assert.strictEqual(troupe.topic, 'THE TOPIC');
+        });
+    });
+
+
+    it('null should update the topic', function() {
+      return roomService.updateTopic(fixture.troupe1.id, null)
+        .then(function() {
+          return persistence.Troupe.findById(fixture.troupe1.id)
+            .exec();
+        })
+        .then(function(troupe) {
+          assert.strictEqual(troupe.topic, '');
+        });
+    });
+
+
+  })
+
 });
