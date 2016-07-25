@@ -21,9 +21,11 @@ initialize: function(attrs, options) {
 
   onRoomChange: function (model, val){
     var groupUri = getOrgNameFromUri(this.getRoomUri());
+    //For any /home/* url's just hide
+    if(/^home/.test(groupUri)) { return this.model.get('hidden', true); }
     var hasGroup = !!this.groupCollection.findWhere({ uri: groupUri });
     //Render so we can get the right src on the buttons img
-    if(hasGroup) { this.render(); }
+    if(!hasGroup) { this.render(); }
     this.model.set('hidden', hasGroup);
   },
 
