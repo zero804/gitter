@@ -14,6 +14,7 @@ var FilteredMinibarGroupCollection = require('../collections/filtered-minibar-gr
 var FilteredRoomCollection = require('../collections/filtered-room-collection');
 var FilteredFavouriteRoomCollection = require('../collections/filtered-favourite-room-collection');
 var SuggestedRoomsByRoomCollection = require('../collections/left-menu-suggested-by-room');
+var SuggestedRoomsByGroupName = require('../collections/org-suggested-rooms-by-name');
 var UserSuggestions = require('../collections/user-suggested-rooms');
 var SearchRoomPeopleCollection = require('../collections/left-menu-search-rooms-and-people');
 var SearchChatMessages = require('../collections/search-chat-messages');
@@ -114,6 +115,8 @@ module.exports = Backbone.Model.extend({
       roomCollection:          this._roomCollection,
       suggestedOrgsCollection: this.suggestedOrgs,
     });
+
+    this.suggestedRoomsByOrgName = new SuggestedRoomsByGroupName(null, { roomMenuModel: this });
 
     var orgsSnapshot = context.getSnapshot('groups') || [];
     var state = this.get('state');
@@ -223,9 +226,9 @@ module.exports = Backbone.Model.extend({
 
       case 'temp-org':
         this.set('groupId', null);
-        this.primaryCollection.switchCollection(this.activeRoomCollection);
-        this.secondaryCollection.switchCollection(this.suggestedOrgs);
-        this.tertiaryCollection.switchCollection(this._suggestedRoomCollection);
+        this.primaryCollection.switchCollection(this.suggestedRoomsByOrgName);
+        this.secondaryCollection.switchCollection(this._suggestedRoomCollection);
+        this.tertiaryCollection.switchCollection(new Backbone.Collection(null));
         break;
 
 

@@ -37,7 +37,7 @@ module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, group
 
   // But if we find something later, let's use it instead
   if(!hasJoinedRoom && !hasJoinedGroup) {
-    menuState = 'org';
+    menuState = 'temp-org';
     tempOrg = {
       name: getOrgNameFromUri(currentRoom.uri),
       avatarUrl: avatars.getForGroupId(currentRoom.groupId),
