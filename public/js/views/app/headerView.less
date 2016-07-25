@@ -55,7 +55,7 @@
   display: flex;
   align-items: center;
   // header can expand to fit long topics when hovered over
-  min-height: @chat-frame-desktop-header-height;
+  height: @chat-frame-desktop-header-height;
 }
 
 
@@ -65,6 +65,7 @@
   flex: 1;
   flex-wrap: wrap;
   align-items: flex-start;
+  height: auto;
   max-height: @chat-frame-desktop-header-height;
 
   transition: max-height .3s ease;
@@ -419,11 +420,11 @@
 
 .chat-header__avatar {
   @side: 38px;
-  height: @side;
-  float: left;
-  box-sizing: border-box;
-  background-color: white;
+
   position: relative;
+  box-sizing: border-box;
+  height: @side;
+  background-color: white;
   user-select: none;
 
   img {
