@@ -9,10 +9,6 @@ babelRegister(babelConfig);
 var mocha = new Mocha({ useColors: true });
 
 
-window.onerror = function(message){
-  console.error(message);
-};
-
 glob.sync(path.resolve(__dirname, '../specs') + '/**/*.js').forEach(function(filePath){
   mocha.addFile(filePath);
 });
