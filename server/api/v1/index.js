@@ -12,18 +12,21 @@ router.use('/rooms', authMiddleware);
 router.use('/users', authMiddleware);
 router.use('/orgs', authMiddleware);
 router.use('/groups', authMiddleware);
+router.use('/forums', authMiddleware);
 
 var userResources = resourceRoute('api-user', require('./user'));
 var roomsResources = resourceRoute('api-rooms', require('./rooms'));
 var usersResources = resourceRoute('api-rooms', require('./users'));
 var orgResources = resourceRoute('api-orgs', require('./orgs'));
 var groupsResources = resourceRoute('groups-orgs', require('./groups'));
+var forumsResources = resourceRoute('api-forums', require('./forums'));
 
 router.use('/user', userResources);
 router.use('/rooms', roomsResources);
 router.use('/users', usersResources);
 router.use('/orgs', orgResources);
 router.use('/groups', groupsResources);
+router.use('/forums', forumsResources);
 
 // APN has no auth requirement as user may not have authenticated
 // and this is used for devices without users
