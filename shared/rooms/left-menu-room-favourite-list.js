@@ -12,9 +12,9 @@ module.exports = function generateLemMenuFavouriteRoomsList(state, rooms, groupI
 
   var filter;
   switch(state) {
+    //There is no filter here because you can only be in the temp org state
+    //if you have not joined any rooms for a given group
     case 'search':
-      //There is no filter here because you can only be in the temp org state
-      //if you have not joined any rooms for a given group
     case 'temp-org':
       filter = function(){ return false; };
       break;
