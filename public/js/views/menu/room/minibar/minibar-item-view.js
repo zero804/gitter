@@ -62,7 +62,7 @@ module.exports = BaseItemView.extend({
       isOrg:             (data.type === 'org'),
       isCommunityCreate: (data.type === 'community-create'),
       hasUnreadIndicators: (data.type === 'people' || data.type === 'org'),
-      avatarSrcset:  resolveRoomAvatar({ uri: data.name }, 23)
+      avatarSrcset:  resolveRoomAvatar({ uri: data.uri }, 23)
     });
   },
 

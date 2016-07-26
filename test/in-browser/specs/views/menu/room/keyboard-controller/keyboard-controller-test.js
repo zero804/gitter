@@ -14,8 +14,8 @@ describe('KeyboardControllerView', function(){
   beforeEach(function(){
     model = new Backbone.Model();
     model.minibarCollection = new Backbone.Collection([
-      { type: 'org', name: 'troupe' },
-      { type: 'org', name: 'gitterHQ' },
+      { type: 'org', name: 'troupe', id: 1 },
+      { type: 'org', name: 'gitterHQ', id: 2 },
     ]);
 
 
@@ -106,12 +106,12 @@ describe('KeyboardControllerView', function(){
       assert(model.minibarCollection.at(1).get('focus'));
     });
 
-    it('should set the correct org state and selectedOrg name on room event > 3', function(){
+    it('should set the correct org state and groupId on room event > 3', function(){
       appEvents.trigger('keyboard.room.4', { key: 4, code: 'Digit4' });
       assert.equal(model.get('state'), 'org');
-      assert.equal(model.get('selectedOrgName'), 'troupe');
+      assert.equal(model.get('groupId'), 1);
       appEvents.trigger('keyboard.room.5', { key: 5, code: 'Digit5' });
-      assert.equal(model.get('selectedOrgName'), 'gitterHQ');
+      assert.equal(model.get('groupId'), 2);
     });
 
     it('should focus change menu state to search on cmd+s', function(){
