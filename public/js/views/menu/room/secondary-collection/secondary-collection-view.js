@@ -81,8 +81,8 @@ module.exports = BaseCollectionView.extend({
     if (this.roomMenuModel.get('state') === 'org' && this.collection.length >= 9) {
       this.ui.showMore.attr('href', this.getOrgRoomUrl());
       var groupId = this.roomMenuModel.get('groupId');
-      var selectedOrg = this.groupsCollection.get(groupId);
-      this.ui.showMore.attr('title', 'more ' + !!selectedOrg ? selectedOrg.get('name') : '' + ' rooms');
+      var selectedGroup = this.groupsCollection.get(groupId);
+      this.ui.showMore.attr('title', 'more ' + !!selectedGroup ? selectedGroup.get('name') : '' + ' rooms');
       this.ui.showMore[0].classList.remove('hidden');
     } else {
       this.ui.showMore[0].classList.add('hidden');
