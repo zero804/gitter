@@ -1,3 +1,5 @@
+"use strict";
+
 var Mocha = require('mocha');
 var glob = require('glob');
 var path = require('path');
@@ -24,6 +26,6 @@ runner.on('end', function(){
   process.exit();
 });
 
-runner.on('fail', function(test, err){
+runner.on('fail', function(){
   process.exit(1);
 });
