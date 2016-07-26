@@ -24,7 +24,9 @@ var linkHandler = require('components/link-handler');
 var roomListGenerator = require('components/chat-cache/room-list-generator');
 var troupeCollections = require('collections/instances/troupes');
 var repoModels = require('collections/repos');
-var ReposCollection = repoModels.ReposCollection;
+var RepoCollection = repoModels.ReposCollection;
+var orgModels = require('collections/orgs');
+var OrgCollection = orgModels.OrgCollection;
 var groupModels = require('collections/groups');
 var CommunityCreateModel = require('views/community-create/community-create-model');
 var CreateRoomModel = require('models/create-room-view-model');
@@ -322,7 +324,37 @@ onready(function() {
   var allRoomsCollection = troupeCollections.troupes;
   new RoomCollectionTracker(allRoomsCollection);
 
-  var repoCollection = new ReposCollection();
+  var repoCollection = new RepoCollection();
+  var unusedRepoCollection = new RepoCollection();
+  var unusedOrgCollection = new OrgCollection();
+
+  var initializeUnusedRepoCollection = _.once(function() {
+    unusedRepoCollection.fetch({
+      data: {
+          type: 'unused'
+        }
+      },
+      {
+        add: true,
+        remove: true,
+        merge: true
+      }
+    );
+  });
+
+  var initializeUnusedOrgCollection = _.once(function() {
+    unusedOrgCollection.fetch({
+      data: {
+          type: 'unused'
+        }
+      },
+      {
+        add: true,
+        remove: true,
+        merge: true
+      }
+    );
+  });
 
   var adminGroupsCollection = new groupModels.Collection([]);
   var initializeAdminGroupsCollection = _.once(function() {
@@ -523,13 +555,18 @@ onready(function() {
     },
 
     createCommunity: function() {
+      initializeUnusedRepoCollection();
+      initializeUnusedOrgCollection();
+
       require.ensure(['views/community-create/community-create-view'], function(require) {
         var CommunityCreateView = require('views/community-create/community-create-view');
         communityCreateModel.set('active', true);
         var communityCreateView = new CommunityCreateView({
           model: communityCreateModel,
           orgCollection: troupeCollections.orgs,
+          unusedOrgCollection: unusedOrgCollection,
           repoCollection: repoCollection,
+          unusedRepoCollection: unusedRepoCollection,
           groupsCollection: troupeCollections.groups
         });
 

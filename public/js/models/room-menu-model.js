@@ -14,6 +14,7 @@ var FilteredMinibarGroupCollection = require('../collections/filtered-minibar-gr
 var FilteredRoomCollection = require('../collections/filtered-room-collection');
 var FilteredFavouriteRoomCollection = require('../collections/filtered-favourite-room-collection');
 var SuggestedRoomsByRoomCollection = require('../collections/left-menu-suggested-by-room');
+var SuggestedRoomsByGroupName = require('../collections/org-suggested-rooms-by-name');
 var UserSuggestions = require('../collections/user-suggested-rooms');
 var SearchRoomPeopleCollection = require('../collections/left-menu-search-rooms-and-people');
 var SearchChatMessages = require('../collections/search-chat-messages');
@@ -27,11 +28,14 @@ var MinibarItemModel = require('../views/menu/room/minibar/minibar-item-model');
 var MinibarPeopleModel = require('../views/menu/room/minibar/people-view/people-model');
 var MinibarTempOrgModel = require('../views/menu/room/minibar/temp-org-view/temp-org-model');
 
+var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
+
 var states = [
   'all',
   'search',
   'people',
   'org',
+  'temp-org'
 ];
 
 var SEARCH_DEBOUNCE_INTERVAL = 1000;
@@ -39,16 +43,26 @@ var SEARCH_DEBOUNCE_INTERVAL = 1000;
 module.exports = Backbone.Model.extend({
 
   defaults: {
-    state:                     '',
-    searchTerm:                '',
-    roomMenuIsPinned:          true,
-    selectedOrgName:           '',
-    hasDismissedSuggestions:   false,
+    state: '',
+    searchTerm: '',
+    roomMenuIsPinned: true,
+    groupId: '',
+    hasDismissedSuggestions: false,
   },
 
-  //TODO Remove all these delete statements and pass the object with the options hash
-  //not the attrs
-  //JP 27/1/16
+  constructor: function (attrs, options){
+    //For some users we will still have state = org and groupId = null as they will have a selectedOrgName
+    //this constructor just adds a small patch to add groupId
+    //If one can't be found then just change state to all
+    var groupsCollection = attrs.groupsCollection;
+    var activeGroup = groupsCollection.find(function(group){
+      return getOrgNameFromUri(group.uri) === attrs.selecedOrgName;
+    }.bind(this));
+    if(activeGroup) { attrs.groupId = activeGroup.get('id'); }
+
+    Backbone.Model.prototype.constructor.call(this, attrs, options);
+  },
+
   initialize: function(attrs) {
 
     this.set('panelOpenState', this.get('roomMenuIsPinned'));
@@ -102,9 +116,9 @@ module.exports = Backbone.Model.extend({
       suggestedOrgsCollection: this.suggestedOrgs,
     });
 
-    var orgsSnapshot = context.getSnapshot('groups') || [];
+    this.suggestedRoomsByOrgName = new SuggestedRoomsByGroupName(null, { roomMenuModel: this });
+
     var state = this.get('state');
-    var selectedOrg = this.get('selectedOrgName');
     this.minibarHomeModel = new MinibarItemModel({ name: 'all', type: 'all', active: (state === 'all') });
     this.minibarSearchModel = new MinibarItemModel({ name: 'search', type: 'search', active: (state === 'search') });
     this.minibarPeopleModel = new MinibarPeopleModel({ active: (state === 'people')}, { roomCollection: this._roomCollection });
@@ -112,11 +126,13 @@ module.exports = Backbone.Model.extend({
     this.minibarCloseModel = new MinibarItemModel({ name: 'close', type: 'close' });
     this.minibarTempOrgModel = new MinibarTempOrgModel(attrs.tempOrg, { troupe: context.troupe(), });
 
-    var minibarModels = orgsSnapshot.map(function(model){
-      return _.extend({}, model, { active: (state === 'org' && model.name === selectedOrg) });
-    });
+    //Setup an inital active group model
+    this.groupsCollection.forEach(function(model){
+      if(state === 'org' && model.id === this.get('groupId')) {
+        model.set('active', true);
+      }
+    }.bind(this));
 
-    this.groupsCollection.add(minibarModels);
     this.minibarCollection = new FilteredMinibarGroupCollection(null, {
       collection: this.groupsCollection
     });
@@ -174,7 +190,6 @@ module.exports = Backbone.Model.extend({
     this.listenTo(this, 'change', _.throttle(this.save.bind(this), 1500));
     this.listenTo(context.troupe(), 'change:id', this.onRoomChange, this);
     this.listenTo(this.bus, 'left-menu-menu-bar:activate', this.onMenuBarActivateRequest, this);
-
     this.onSwitchState(this, this.get('state'));
   },
 
@@ -189,7 +204,6 @@ module.exports = Backbone.Model.extend({
   },
 
   onSwitchState: function(model, val) {
-    //TODO Test this JP 27/1/15
     var searchFocus = false;
     switch (val) {
       case 'all':
@@ -210,6 +224,14 @@ module.exports = Backbone.Model.extend({
         this.secondaryCollection.switchCollection(this.suggestedOrgs);
         this.tertiaryCollection.switchCollection(this._suggestedRoomCollection);
         break;
+
+      case 'temp-org':
+        this.set('groupId', null);
+        this.primaryCollection.switchCollection(this.activeRoomCollection);
+        this.secondaryCollection.switchCollection(this.suggestedRoomsByOrgName);
+        this.tertiaryCollection.switchCollection(this._suggestedRoomCollection);
+        break;
+
 
       default:
         this.primaryCollection.switchCollection(this.activeRoomCollection);
@@ -279,15 +301,13 @@ module.exports = Backbone.Model.extend({
       panelOpenState: true,
       profileMenuOpenState: false,
       state: data.state,
-      selectedOrgName: data.selectedOrgName
+      groupId: data.groupId,
     });
   },
 
   getCurrentGroup: function (){
     if(this.get('state') !== 'org') { return false; }
-    var selectedOrg = this.get('selectedOrgName');
-    if(!selectedOrg) { throw new Error('Left menu is in the org state with no selected org'); }
-    return this.minibarCollection.findWhere({ name: selectedOrg });
+    return this.groupsCollection.get(this.get('groupId'));
   },
 
   _getModel: function (prop, val){
