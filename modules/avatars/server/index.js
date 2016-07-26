@@ -2,6 +2,7 @@
 
 var isGitHubUser = require('../shared/is-github-user');
 var avatarCdnResolver = require('../shared/avatar-cdn-resolver');
+var extractTwitterAvatarInfo = require('../shared/extract-twitter-avatar-info');
 var gravatar = require('./gravatar');
 
 var clientEnv = require('gitter-client-env');
@@ -16,6 +17,12 @@ function getForGitHubUsername(githubUsername) {
 function getForGravatarEmail(emailAddress) {
   var hash = gravatar.hashEmail(emailAddress);
   return avatarCdnResolver('/gravatar/m/' + hash);
+}
+
+function getForTwitterUrl(twitterUrl) {
+  var info = extractTwitterAvatarInfo(twitterUrl);
+  if (!info) return DEFAULT;
+  return avatarCdnResolver('/tw/i/' + info.id1 + '/' + info.id2 + '/' + info.extension);
 }
 
 function getForGroupId(groupId) {
@@ -76,6 +83,7 @@ function getDefault() {
 module.exports = {
   getForGitHubUsername: getForGitHubUsername,
   getForGravatarEmail: getForGravatarEmail,
+  getForTwitterUrl: getForTwitterUrl,
   getForGroupId: getForGroupId,
   getForGroup: getForGroup,
   getForRoomUri: getForRoomUri,
