@@ -32,9 +32,9 @@ initialize: function(attrs, options) {
   serializeData: function (){
     var data = this.model.toJSON();
     var uri = getOrgNameFromUri(this.getRoomUri());
-    var imgDetails = avatars.getForRoomUri(uri);
+    var avatarUrl = avatars.getForRoomUri(uri);
     return  _.extend({}, data,  _super.serializeData.apply(this, arguments), {
-      avatarUrl: imgDetails,
+      avatarUrl: avatarUrl,
     });
   },
 
