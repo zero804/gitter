@@ -15,6 +15,17 @@ describe('extract-twitter-avatar-info', function() {
     });
   });
 
+  it('should deal with underscores in the ids', function() {
+    var info = extractTwitterAvatarInfo('https://pbs.twimg.com/profile_images/567819058104377344/91aRlK_t_bigger.png');
+
+    assert.deepEqual(info, {
+      id1: '567819058104377344',
+      id2: '91aRlK_t',
+      extension: 'png'
+    });
+
+  });
+
   it('should return null for other urls', function() {
     assert.strictEqual(extractTwitterAvatarInfo('moo'), null);
   });
