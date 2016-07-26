@@ -733,7 +733,7 @@ function deleteRoom(troupe) {
         }))
         .then(function() {
           // Remove all the folk from the room
-          return roomMembershipService.removeRoomMembers(troupe._id, userIds);
+          return roomMembershipService.removeRoomMembers(troupe._id, userIds/*, groupId */);
         });
     })
     .then(function() {
