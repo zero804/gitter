@@ -24,6 +24,11 @@ var opts = require('yargs')
 
 userService.findByUsername(opts.username)
   .then(function(user) {
+    if (!user) {
+      console.log('User not found with given username', opts.username);
+      throw new Error('User not found with given username' + opts.username)
+    }
+
     return collaboratorsService.findCollaborators(user, opts.type || null, opts.linkPath || null)
       .then(function(suggestions) {
         console.log('Suggestions', suggestions);
