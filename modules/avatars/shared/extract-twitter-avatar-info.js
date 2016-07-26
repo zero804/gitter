@@ -19,11 +19,11 @@ function extractTwitterAvatarInfo(twitterUrl) {
     return null;
   }
   var rest = twitterUrl.slice(TWITTER_AVATAR_PREFIX.length);
-  var ids = rest.slice(0, rest.indexOf('_'));
+  var ids = rest.slice(0, rest.lastIndexOf('_'));
   return {
     id1: ids.slice(0, ids.indexOf('/')),
     id2: ids.slice(ids.indexOf('/')+1),
-    extension: rest.slice(rest.indexOf('.')+1)
+    extension: rest.slice(rest.lastIndexOf('.')+1)
   }
 }
 
