@@ -58,7 +58,10 @@ module.exports = BaseCollectionView.extend({
   getOrgRoomUrl: function () {
     var groupId = this.roomMenuModel.get('groupId');
     var selectedGroup = this.groupsCollection.get(groupId);
-    var uri = !!selectedGroup ? selectedGroup.get('uri') : getOrgNameFromUri(document.location.pathname);
+    var uri = getOrgNameFromUri(document.location.pathname);
+    if(selectedGroup) {
+      uri = selectedGroup.get('uri');
+    }
     return urlJoin('/orgs', uri, 'rooms');
   },
 
