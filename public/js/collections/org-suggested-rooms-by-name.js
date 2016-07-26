@@ -11,6 +11,9 @@ var ContextModel = Backbone.Model.extend({
 
 module.exports = BaseResolverCollection.extend({
 
+  //As it stands today when we visit a temp org the only info we know about that org is the current uri
+  //With this in mind we have to use the old suggested rooms by name endpoint as this means we dont have
+  //to do an id lookup before we can get the suggestions
   template: '/v1/orgs/:groupName/suggestedRooms',
 
   constructor: function(models, attrs) {
