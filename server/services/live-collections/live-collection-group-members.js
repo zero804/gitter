@@ -25,7 +25,7 @@ module.exports = {
 
   removed: function(groupId, userIds) {
     _.forEach(userIds, function(userId) {
-      appEvents.dataChange2('/user/' + userId + '/groups', "remove", { id: groupId }, 'room');
+      appEvents.dataChange2('/user/' + userId + '/groups', "remove", { id: groupId }, 'group');
     });
 
     return Promise.resolve();
