@@ -18,95 +18,78 @@ require('utils/tracking');
 var active = [];
 
 var featuredRooms = [
-  { uri: 'marionettejs/backbone.marionette',
-    name: 'Marionette',
-    language: 'JavaScript',
-    locale: 'en'
-  },
-  { uri: 'LaravelRUS/chat',
-    name: 'LaravelRUS',
-    channel: true,
-    language: 'PHP',
-    locale: 'ru'
-  },
-  { uri: 'gitterHQ/nodejs',
-    name: '#nodejs',
-    channel: true,
-    language: 'JavaScript',
-    locale: 'en'
-  },
-  { uri: 'lotus/chat',
-    name: 'Lotus',
-    channel: true,
-    language: 'Ruby',
-    locale: 'en'
-  },
-  { uri: 'FreeCodeCamp/FreeCodeCamp',
-    name: 'FreeCodeCamp',
-    channel: true,
-    language: 'JavaScript',
-    locale: 'en'
-  },
-  { uri: 'webpack/webpack',
-    name: 'WebPack',
-    language: 'JavaScript',
-    locale: 'en'
-  },
-  { uri: 'require-lx/group',
-    name: "require('lx')",
-    language: 'JavaScript',
-    locale: 'en'
-  },
-  { uri: 'angular-ui/ng-grid',
-    name: 'Angular UI',
-    language: 'JavaScript',
-    locale: 'en'
-  },
-  { uri: 'FreeCodeCamp/FreeCodeCamp',
-    name: 'FreeCodeCamp',
-    language: 'JavaScript',
-    locale: 'en'
-  },
-  { uri: 'Aurelia/Discuss',
-    name: 'Aurelia',
-    language: 'JavaScript',
-    locale: 'en'
-  },
-  { uri: 'Dogfalo/materialize',
-    name: 'Materialize',
-    language: 'CSS',
-    locale: 'en'
-  },
-  { uri: 'scala/scala',
-    name: 'Scala',
-    language: 'Scala',
-    locale: 'en'
-  },
-  { uri: 'jspm/jspm',
-    name: 'JSPM',
-    language: 'JavaScript',
-    locale: 'en'
-  },
-  { uri: 'postcss/postcss',
-    name: 'Postcss',
-    language: 'CSS',
-    locale: 'en'
-  },
-  { uri: 'lotus/chat',
-    name: 'Lotus',
-    language: 'Ruby',
-    locale: 'en'
-  },
-  { uri: 'neovim/neovim',
-    name: 'Neovim',
-    language: 'C',
-    locale: 'en'
-  },
-  { uri: 'BinaryMuse/fluxxor',
-    name: 'Fluxxor',
-    language: 'JavaScript',
-    locale: 'en'
-  }
+ { uri: 'angular-ui/ng-grid',
+   name: 'Angular UI',
+   language: 'JavaScript',
+   locale: 'en'
+ },
+ { uri: 'postcss/postcss',
+   name: 'Postcss',
+   language: 'CSS',
+   locale: 'en'
+ },
+ { uri: 'gitterHQ/nodejs',
+   name: '#nodejs',
+   channel: true,
+   language: 'JavaScript',
+   locale: 'en'
+ },
+ { uri: 'scala/scala',
+   name: 'Scala',
+   language: 'Scala',
+   locale: 'en'
+ },
+ { uri: 'FreeCodeCamp/FreeCodeCamp',
+   name: 'FreeCodeCamp',
+   channel: true,
+   language: 'JavaScript',
+   locale: 'en'
+ },
+ { uri: 'mozillascience/community',
+  name: 'Mozilla Science',
+  language: 'Mozilla Science Lab community',
+  locale: 'en'
+ },
+ { uri: 'openai/gym',
+   name: 'Open AI Gym',
+   language: 'Reinforcement Learning',
+   locale: 'en'
+ },
+ { uri: 'deeplearning4j/deeplearning4j',
+   name: 'Deeplearning4J',
+   language: 'Deep Learning for Java',
+   locale: 'en'
+ },
+ { uri: 'numenta/public',
+   name: 'Numenta',
+   language: 'Machine Intelligence Research',
+   locale: 'en'
+ },
+ { uri: 'Aurelia/Discuss',
+   name: 'Aurelia',
+   language: 'JavaScript',
+   locale: 'en'
+ },
+ { uri: 'Dogfalo/materialize',
+   name: 'Materialize',
+   language: 'CSS',
+   locale: 'en'
+ },
+ { uri: 'google/material-design-lite',
+  name: 'Material Design Lite',
+  language: 'Google Material Design Lite',
+  locale: 'en'
+ },
+ { uri: 'aws/aws-sdk-ruby',
+  name: 'AWS Ruby SDK',
+  language: 'The official AWS SDK for Ruby',
+  locale: 'en'
+ },
+ { uri: 'postcss/postcss',
+   name: 'PostCSS',
+   language: 'CSS',
+   locale: 'en'
+ }
 ];
 
 function random(array) {
