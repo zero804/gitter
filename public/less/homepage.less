@@ -855,7 +855,6 @@ h1:after, h2:after {
 .pricing-panel__heading {
   color: #fff;
   font-size: 46px;
-  margin-bottom: 75px;
 }
 
 .pricing-panel__price-plans {
@@ -913,6 +912,28 @@ h1:after, h2:after {
   letter-spacing: -1px;
 }
 
+.price-plan__price-inner {
+  position: relative;
+  display: inline-block;
+}
+
+.price-plan__price-sub-note {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: .4em;
+  transform: translateX(-105%);
+
+  display: flex;
+  align-items: flex-end;
+
+  opacity: 0.4;
+  font-size: 12px;
+  line-height: 1;
+  font-style: italic;
+  letter-spacing: 2px;
+}
+
 .price-plan__units {
   opacity: 0.8;
   font-size: 12px;
@@ -942,9 +963,14 @@ h1:after, h2:after {
   color: #c2b9bd
 }
 
+.pricing-panel__paragraph {
+  margin-top: 50px;
+  margin-bottom: 50px;
+  color: rgba(255, 255, 255, .75);
+}
+
 .pricing-panel__fine-print {
-  color: white;
-  opacity: 0.4;
+  color: rgba(255, 255, 255, .4);
 }
 
 .pricing-panel__fine-print a {

@@ -280,7 +280,11 @@
 
       <section class="pricing-panel" id="pricing-panel">
         <div class="pricing-panel__content">
-            <h1 class="pricing-panel__heading">{{ __ "Organisation pricing"}}</h1>
+            <h1 class="pricing-panel__heading">{{ __ "Pricing"}}</h1>
+
+            <p class="pricing-panel__paragraph">
+              Pricing plans are coming early 2017. Join the Earlybird programme now and get a 75% discount.
+            </p>
 
             <div class="pricing-panel__price-plans">
 
@@ -295,9 +299,7 @@
                   {{{ __ "<b>Unlimited</b> integrations" }}}<br/>
                   <br/>
                   {{{ __ "<b>Unlimited</b> public rooms" }}}<br/>
-                  {{{ __ "<b>Unlimited</b> private rooms" }}}<br/>
-                  <br/>
-                  {{{ __ "Limited to 25 users per private room" }}}<br/>
+                  {{{ __ "<b>Unlimited</b> private rooms up to 25 users" }}}<br/>
                 </div>
 
                 <a class="btn price-plan__button price-plan__button--free" href="/login?action=signup&source=pricing.free">{{{ __ "<b>Get started</b> for free" }}}</a>
@@ -306,21 +308,23 @@
 
               <article class="price-plan">
                 <header class="price-plan__header price-plan__header--pro">
-                  <p class="price-plan__name">{{ __ "Pro" }}</p>
-                  <p class="price-plan__price">$5</p>
-                  <p class="price-plan__units">{{ __ "per user/month" }}</p>
+                  <p class="price-plan__name">{{ __ "Premium Plans" }}</p>
+                  <p class="price-plan__price">
+                    <span class="price-plan__price-inner">
+                      <span class="price-plan__price-sub-note">starting from</span> $12.50
+                    <span>
+                  </p>
+                  <p class="price-plan__units">{{ __ "per month" }}</p>
                 </header>
                 <div class="price-plan__body">
-                  {{{ __ "<b>Unlimited</b> chat history" }}}<br/>
-                  {{{ __ "<b>Unlimited</b> integrations" }}}<br/>
-                  <br/>
-                  {{{ __ "<b>Unlimited</b> public rooms" }}}<br/>
-                  {{{ __ "<b>Unlimited</b> private rooms" }}}<br/>
-                  <br/>
-                  {{{ __ "<b>Unlimited</b> users per private room" }}}
+                  {{{ __ "Communiy insights & analytics" }}}<br/>
+                  {{{ __ "Community engagement & marketing tools" }}}<br/>
+                  {{{ __ "Customisable look of the community rooms" }}}<br/>
+                  {{{ __ "PR & promotional tools" }}}<br/>
+                  {{{ __ "Access to community managers" }}}<br/>
                 </div>
 
-                <a class="btn price-plan__button" href="{{billingBaseUrl}}/plan/pro">{{{ __ "<b>Purchase</b> now" }}}</a>
+                <a class="btn price-plan__button" href="{{billingBaseUrl}}/plan/pro">{{{ __ "<b>Join</b> earlybird programme" }}}</a>
 
               </article>
 
