@@ -297,12 +297,11 @@ module.exports = Backbone.Model.extend({
 
   onMenuBarActivateRequest: function(data) {
     data = data || {};
-    var group = this.groupsCollection.findWhere({ name: data.groupName });
     this.set({
       panelOpenState: true,
       profileMenuOpenState: false,
       state: data.state,
-      groupId: !!group ? group.get('id') : '',
+      groupId: data.groupId,
     });
   },
 
