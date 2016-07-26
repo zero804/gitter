@@ -10,9 +10,11 @@
   "author": "Gitter Team",
   "license": "ISC",
   "dependencies": {
+    "glob": "^7.0.5",
+    "lodash": "^4.14.0",
+    "mocha": "^2.5.3",
     "react": "^15.2.1",
-    "react-dom": "^15.2.1",
-    "lodash": "^4.14.0"
+    "react-dom": "^15.2.1"
   },
   "devDependencies": {
     "babel-loader": "^6.2.4",
