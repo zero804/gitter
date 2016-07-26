@@ -51,15 +51,10 @@ module.exports = Backbone.Model.extend({
   },
 
   constructor: function (attrs, options){
-    //For some users we will still have state = org and groupId = null as they will have a selectedOrgName
-    //this constructor just adds a small patch to add groupId
-    //If one can't be found then just change state to all
-    var groupsCollection = attrs.groupsCollection;
-    var activeGroup = groupsCollection.find(function(group){
-      return getOrgNameFromUri(group.uri) === attrs.selecedOrgName;
-    }.bind(this));
-    if(activeGroup) { attrs.groupId = activeGroup.get('id'); }
-
+    //It is the case that some users will have `selectedOrgName` saved in the DB
+    //Now we use groupId this will result in a totally broken app
+    //In this case we want to redirect the user to the all state to prevent broken stuff
+    if(attrs.state === 'org' && !attrs.groupId) { attrs.state = 'all'; }
     Backbone.Model.prototype.constructor.call(this, attrs, options);
   },
 
