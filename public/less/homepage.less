@@ -745,7 +745,8 @@ h1:after, h2:after {
   opacity: 1;
 }
 
-#testimonials-panel img {
+.testimonial-image-wrapper {
+  overflow: hidden;
   position: absolute;
   left: -150px;
   top: 0;
@@ -754,6 +755,11 @@ h1:after, h2:after {
   height: 100px;
 
   border-radius: 6px;
+
+  & > img {
+    width: 100%;
+    height: auto;
+  }
 }
 
 #testimonials-panel cite {
