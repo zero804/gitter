@@ -8,6 +8,7 @@ var ItemView = require('./secondary-collection-item-view');
 var SearchItemView = require('./secondary-collection-item-search-view');
 var BaseCollectionView = require('../base-collection/base-collection-view');
 var EmptySearchView = require('./secondary-collection-item-search-empty-view');
+var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
 
 var clientEnv = require('gitter-client-env');
 
@@ -57,7 +58,8 @@ module.exports = BaseCollectionView.extend({
   getOrgRoomUrl: function () {
     var groupId = this.roomMenuModel.get('groupId');
     var selectedGroup = this.groupsCollection.get(groupId);
-    return urlJoin('/orgs', !!selectedGroup ? selectedGroup.get('uri') : '', 'rooms');
+    var uri = !!selectedGroup ? selectedGroup.get('uri') : getOrgNameFromUri(document.location.pathname);
+    return urlJoin('/orgs', uri, 'rooms');
   },
 
   initialize: function(attrs) {
