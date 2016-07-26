@@ -14,8 +14,6 @@ module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, group
 
   //Groups
   var groupId = (lastLeftMenuSnapshot.groupId || '');
-  var group = (_.findWhere(groups, { id: groupId }) || {});
-
   var tempOrg;
 
   //Left menu state
