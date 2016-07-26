@@ -79,6 +79,11 @@ describe('avatar-api', function() {
     expected: null,
     proxyRedirect: '/fetch_lt/https://secure.gravatar.com/avatar/2644d6233d2c210258362f7f0f5138c2?s=128'
   }, {
+    name: '/tw/i/:id1/:id2/:extension',
+    url: '/tw/i/378800000308609669/c5cc5261cc55da2dbca442eaf60920cc/jpeg',
+    expected: null,
+    proxyRedirect: '/fetch/https://pbs.twimg.com/profile_images/378800000308609669/c5cc5261cc55da2dbca442eaf60920cc_normal.jpeg'
+  }, {
     name: '/gh/u/:username',
     url: '/gh/u/suprememoocow',
     expected: null,
