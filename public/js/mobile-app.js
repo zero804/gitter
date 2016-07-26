@@ -1,6 +1,7 @@
 "use strict";
 
 var $ = require('jquery');
+var _ = require('underscore');
 var Backbone = require('backbone');
 var context = require('utils/context');
 var appEvents = require('utils/appevents');
@@ -9,7 +10,9 @@ var onready = require('utils/onready');
 var chatModels = require('collections/chat');
 var troupeCollections = require('collections/instances/troupes');
 var repoModels = require('collections/repos');
-var ReposCollection = repoModels.ReposCollection;
+var RepoCollection = repoModels.ReposCollection;
+var orgModels = require('collections/orgs');
+var OrgCollection = orgModels.OrgCollection;
 var CommunityCreateModel = require('views/community-create/community-create-model');
 
 var unreadItemsClient = require('components/unread-items-client');
@@ -55,7 +58,37 @@ onready(function() {
     'chat': chatCollection
   });
 
-  var repoCollection = new ReposCollection();
+  var repoCollection = new RepoCollection();
+  var unusedRepoCollection = new RepoCollection();
+  var unusedOrgCollection = new OrgCollection();
+
+  var initializeUnusedRepoCollection = _.once(function() {
+    unusedRepoCollection.fetch({
+      data: {
+          type: 'unused'
+        }
+      },
+      {
+        add: true,
+        remove: true,
+        merge: true
+      }
+    );
+  });
+
+  var initializeUnusedOrgCollection = _.once(function() {
+    unusedOrgCollection.fetch({
+      data: {
+          type: 'unused'
+        }
+      },
+      {
+        add: true,
+        remove: true,
+        merge: true
+      }
+    );
+  });
 
   var communityCreateModel = new CommunityCreateModel({
     active: false
@@ -115,13 +148,18 @@ onready(function() {
     },
 
     createCommunity: function(/* uri */) {
+      initializeUnusedRepoCollection();
+      initializeUnusedOrgCollection();
+
       require.ensure(['views/community-create/community-create-view'], function(require) {
         var CommunityCreateView = require('views/community-create/community-create-view');
         communityCreateModel.set('active', true);
         var communityCreateView = new CommunityCreateView({
           model: communityCreateModel,
           orgCollection: troupeCollections.orgs,
+          unusedOrgCollection: unusedOrgCollection,
           repoCollection: repoCollection,
+          unusedRepoCollection: unusedRepoCollection,
           groupsCollection: troupeCollections.groups
         });
 

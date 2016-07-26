@@ -35,7 +35,7 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   initOrgListView: function(optionsForRegion) {
     this.orgListView = new CommunityCreationOrgListView(optionsForRegion({
-      collection: this.orgCollection
+      collection: this.unusedOrgCollection
     }));
     this.listenTo(this.orgListView, 'org:activated', this.onOrgSelectionChange, this);
     this.listenTo(this.orgListView, 'org:cleared', this.onOrgSelectionChange, this);
@@ -44,7 +44,7 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   initRepoListView: function(optionsForRegion) {
     this.repoListView = new CommunityCreationRepoListView(optionsForRegion({
-      collection: this.filteredRepoCollection
+      collection: this.filteredUnusedRepoCollection
     }));
     this.listenTo(this.repoListView, 'repo:activated', this.onRepoSelectionChange, this);
     this.listenTo(this.repoListView, 'repo:cleared', this.onRepoSelectionChange, this);
@@ -79,15 +79,17 @@ module.exports = CommunityCreateBaseStepView.extend({
     _super.initialize.apply(this, arguments);
 
     this.orgCollection = options.orgCollection;
+    this.unusedOrgCollection = options.unusedOrgCollection;
     this.repoCollection = options.repoCollection;
-    this.filteredRepoCollection = new FilteredCollection({
-      collection: this.repoCollection
+    this.unusedRepoCollection = options.unusedRepoCollection;
+    this.filteredUnusedRepoCollection = new FilteredCollection({
+      collection: this.unusedRepoCollection
     });
 
     this.throttledApplyFilterToRepos = _.throttle(this.applyFilterToRepos, 500);
     this.shortThrottledApplyFilterToRepos = _.throttle(this.applyFilterToRepos, 100);
 
-    this.listenTo(this.filteredRepoCollection, 'filter-complete', this.onRepoFilterComplete, this);
+    this.listenTo(this.filteredUnusedRepoCollection, 'filter-complete', this.onRepoFilterComplete, this);
   },
 
   serializeData: function() {
@@ -238,7 +240,7 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   applyFilterToRepos: function() {
     var filterString = (this.model.get('repoFilter') || '').toLowerCase();
-    this.filteredRepoCollection.setFilter(function(model) {
+    this.filteredUnusedRepoCollection.setFilter(function(model) {
       var shouldShow = true;
       if(filterString && filterString.length > 0) {
         shouldShow = fuzzysearch(filterString, model.get('name').toLowerCase());
@@ -249,6 +251,6 @@ module.exports = CommunityCreateBaseStepView.extend({
   },
 
   onRepoFilterComplete: function() {
-    this.filteredRepoCollection.trigger('reset');
+    this.filteredUnusedRepoCollection.trigger('reset');
   }
 });
