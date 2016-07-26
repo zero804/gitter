@@ -212,7 +212,6 @@ module.exports = Marionette.LayoutView.extend({
       case 'people':
         return this.peopleModel.set({ active: true, focus: true });
       case 'org':
-        //FIXME -- test this works
         var groupId = this.model.get('groupId');
         var model = this.collection.get(groupId);
         if(!model) { return; }
