@@ -13,7 +13,6 @@ var repoModels = require('collections/repos');
 var RepoCollection = repoModels.ReposCollection;
 var orgModels = require('collections/orgs');
 var OrgCollection = orgModels.OrgCollection;
-var groupModels = require('collections/groups');
 var CommunityCreateModel = require('views/community-create/community-create-model');
 
 var unreadItemsClient = require('components/unread-items-client');
@@ -81,21 +80,6 @@ onready(function() {
     unusedOrgCollection.fetch({
       data: {
           type: 'unused'
-        }
-      },
-      {
-        add: true,
-        remove: true,
-        merge: true
-      }
-    );
-  });
-
-  var adminGroupsCollection = new groupModels.Collection([]);
-  var initializeAdminGroupsCollection = _.once(function() {
-    adminGroupsCollection.fetch({
-      data: {
-          type: 'admin'
         }
       },
       {
