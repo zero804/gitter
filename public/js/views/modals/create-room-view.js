@@ -232,8 +232,12 @@ var CreateRoomView = Marionette.LayoutView.extend({
   },
 
   onNameInput: function() {
+    var newName = this.ui.nameInput[0].value;
+    // For the CSS selectors
+    this.ui.nameInput[0].setAttribute('value', newName);
+
     this.model.set({
-      roomName: this.ui.nameInput[0].value
+      roomName: newName
     });
   },
 

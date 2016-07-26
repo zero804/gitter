@@ -1,3 +1,4 @@
+@import (reference) 'bootstrap/forms.less';
 @import '../create-room/groupSelectView';
 
 .create-room-section() {
@@ -76,6 +77,9 @@
 }
 
 .create-room-name-input {
+  @border-color: @trpGrey;
+  @text-color: #000000;
+
   box-sizing: border-box;
   width: 100%;
   min-height: 3.2rem;
@@ -84,10 +88,23 @@
   padding: 0px .9rem;
 
   background-color: fade(@trpGrey, 50%);
-  border: 1px solid @trpGrey;
+  border: 1px solid @border-color;
   box-shadow: none;
   border-radius: 4px;
-  color: black;
+  color: @text-color;
+
+  // Reset forms.less :(
+  &:focus:invalid {
+    border-color: @border-color;
+    box-shadow: none;
+    color: @text-color;
+  }
+
+  &:not([value=""]) {
+    &:focus:invalid {
+      .forms-invalid-input-style();
+    }
+  }
 }
 
 .create-room-name-input-clear-button {
