@@ -55,9 +55,9 @@ module.exports = Backbone.Model.extend({
     //this constructor just adds a small patch to add groupId
     //If one can't be found then just change state to all
     var groupsCollection = attrs.groupsCollection;
-    var activeGroup = groupsCollection.filter(function(group){
+    var activeGroup = groupsCollection.find(function(group){
       return getOrgNameFromUri(group.uri) === attrs.selecedOrgName;
-    }.bind(this))[0];
+    }.bind(this));
     if(activeGroup) { attrs.groupId = activeGroup.get('id'); }
 
     Backbone.Model.prototype.constructor.call(this, attrs, options);
@@ -118,7 +118,6 @@ module.exports = Backbone.Model.extend({
 
     this.suggestedRoomsByOrgName = new SuggestedRoomsByGroupName(null, { roomMenuModel: this });
 
-    var orgsSnapshot = context.getSnapshot('groups') || [];
     var state = this.get('state');
     this.minibarHomeModel = new MinibarItemModel({ name: 'all', type: 'all', active: (state === 'all') });
     this.minibarSearchModel = new MinibarItemModel({ name: 'search', type: 'search', active: (state === 'search') });
@@ -127,11 +126,13 @@ module.exports = Backbone.Model.extend({
     this.minibarCloseModel = new MinibarItemModel({ name: 'close', type: 'close' });
     this.minibarTempOrgModel = new MinibarTempOrgModel(attrs.tempOrg, { troupe: context.troupe(), });
 
-    var minibarModels = orgsSnapshot.map(function(model){
-      return _.extend({}, model, { active: (state === 'org' && model.id === this.get('groupId')) });
+    //Setup an inital active group model
+    this.groupsCollection.forEach(function(model){
+      if(state === 'org' && model.id === this.get('groupId')) {
+        model.set('active', true);
+      }
     }.bind(this));
 
-    this.groupsCollection.add(minibarModels);
     this.minibarCollection = new FilteredMinibarGroupCollection(null, {
       collection: this.groupsCollection
     });
