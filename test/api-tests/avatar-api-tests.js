@@ -35,7 +35,7 @@ describe('avatar-api', function() {
       }
     },
     group2: {
-      avatarUrl: 'http://s3.amazonaws.com/gitter-avatars/moo/cow/original.png',
+      avatarUrl: 'http://s3.amazonaws.com/gitter-avatars/moo/cow/original',
       avatarVersion: 1,
       securityDescriptor: {
         type: null
@@ -52,7 +52,7 @@ describe('avatar-api', function() {
     name: '/group/i/:groupId - custom avatar',
     url: null,
     expected: null,
-    proxyRedirect: '/fetch/http://s3.amazonaws.com/gitter-avatars/moo/cow/128.png'
+    proxyRedirect: '/fetch/http://s3.amazonaws.com/gitter-avatars/moo/cow/128'
   }, {
     name: '/group/iv/:version/:groupId',
     url: null,
@@ -62,7 +62,7 @@ describe('avatar-api', function() {
     name: '/group/iv/:version/:groupId - custom avatar',
     url: null,
     expected: null,
-    proxyRedirect: '/fetch_lt/http://s3.amazonaws.com/gitter-avatars/moo/cow/128.png'
+    proxyRedirect: '/fetch_lt/http://s3.amazonaws.com/gitter-avatars/moo/cow/128'
   }, {
     name: '/g/u/:username',
     url: '/g/u/' + fixtureLoader.GITTER_INTEGRATION_USERNAME,
