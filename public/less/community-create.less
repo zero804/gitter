@@ -27,18 +27,23 @@
 @primary-input-spacing-top: 3rem;
 @primary-input-spacing-bottom: 0;
 
-.primary-heading-font-size() {
-  font-size: 4.2rem;
+.primary-font-size(@extra-base: 0) {
+  font-size: @primary-input-font-size + @extra-base;
 
   @media (max-width: @small-breakpoint) {
-    font-size: 3.789rem;
+    font-size: 3.2rem + @extra-base;
   }
   @media (max-width: @tiny-breakpoint) {
-    font-size: 3.2rem;
+    font-size: 2.8rem + @extra-base;
   }
   @media (max-width: @micro-breakpoint) {
-    font-size: 2.8rem;
+    font-size: 2.3rem + @extra-base;
   }
+}
+
+
+.primary-heading-font-size() {
+  .primary-font-size(.45rem);
 }
 
 .community-create-associated-project-section-height(@extra-base: 0; @extra-small: 0) {
@@ -51,17 +56,7 @@
 }
 
 .primary-input-font-size() {
-  font-size: @primary-input-font-size;
-
-  @media (max-width: @small-breakpoint) {
-    font-size: 3.2rem;
-  }
-  @media (max-width: @tiny-breakpoint) {
-    font-size: 2.8rem;
-  }
-  @media (max-width: @micro-breakpoint) {
-    font-size: 2.3rem;
-  }
+  .primary-font-size();
 }
 .primary-input-height() {
   height: @primary-input-height;
