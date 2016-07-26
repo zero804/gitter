@@ -261,7 +261,14 @@ function removeItemFromMap($message) {
 
 function cycleElements($els, time) {
   $els.first().addClass('visible');
-  $els.parent().css('height', $els.outerHeight());
+  var tallestHeight = 0;
+  $els.each(function() {
+    var height = $(this).outerHeight();
+    if(height > tallestHeight) {
+      tallestHeight = height;
+    }
+  });
+  $els.parent().css('height', tallestHeight);
 
   setInterval(function () {
     var active = $els.filter('.visible').removeClass('visible').addClass('going');
