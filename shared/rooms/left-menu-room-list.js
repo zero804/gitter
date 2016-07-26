@@ -8,7 +8,7 @@ var defaultSort = require('../sorting/left-menu-primary-default');
 
 var parseToTemplateItem = require('../parse/left-menu-primary-item');
 
-module.exports = function generateLeftMenuRoomsList(state, rooms, selectedOrgName){
+module.exports = function generateLeftMenuRoomsList(state, rooms, groupId){
 
   var filter;
   switch(state) {
@@ -20,7 +20,7 @@ module.exports = function generateLeftMenuRoomsList(state, rooms, selectedOrgNam
       filter = one2oneFilter;
       break;
     case 'org':
-      filter = function(model) { return orgFilter(model, selectedOrgName) };
+      filter = function(model) { return orgFilter(model, groupId) };
       break;
     default:
       filter = function(){ return true; };
