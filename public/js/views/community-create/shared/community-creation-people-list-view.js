@@ -69,22 +69,7 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
 
     data.absoluteUri = urlJoin(clientEnv.basePath, username);
 
-    if(username) {
-      // TODO: Update this as we add more providers :(
-      // I wish this just took a type
-      // This doesn't even work for Twitter users who haven't signed up
-      var usernameForAvatar = username;
-      if(data.type === 'twitter') {
-        usernameForAvatar += '_twitter';
-      }
-
-      data.avatarUrl = avatars.getForUser({
-        username: usernameForAvatar,
-        gv: this.model.get('gv'),
-        type: data.type
-      });
-    }
-    else if(emailAddress) {
+    if(emailAddress) {
       data.avatarUrl = avatars.getForGravatarEmail(emailAddress);
     }
 
