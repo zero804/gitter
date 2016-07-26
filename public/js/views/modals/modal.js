@@ -72,6 +72,10 @@ var ModalView = Marionette.LayoutView.extend({
       }, 100);
 
     }
+    else if(!isCompact()) {
+      // Focus the modal overall so you can start navigating to the controls
+      this.el.focus();
+    }
   },
 
   setButtonState: function(name,state) {
