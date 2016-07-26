@@ -1,6 +1,7 @@
 'use strict';
 
 var Marionette = require('backbone.marionette');
+var fuzzysearch = require('fuzzysearch');
 var Typeahead = require('views/controls/typeahead');
 var template = require('./tmpl/groupSelectView.hbs');
 var itemTemplate = require('./tmpl/parentItemView.hbs');
@@ -52,7 +53,8 @@ var GroupSelectView = Marionette.ItemView.extend({
         el: this.ui.input[0],
         autoSelector: function(input) {
           return function(m) {
-            return m.get('name') && m.get('name').indexOf(input) >= 0;
+            var mName = m.get('name') || '';
+            return fuzzysearch(input.toLowerCase(), mName.toLowerCase());
           };
         }
       });
