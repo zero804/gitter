@@ -12,6 +12,8 @@ module.exports = function generateLeftMenuRoomsList(state, rooms, groupId){
 
   var filter;
   switch(state) {
+    //Here we dont return rooms for temp-org because if you are in the temp-org state
+    //that you cannot have joined any of the parent group's rooms
     case 'temp-org':
     case 'search':
       filter = function(){ return false; };
