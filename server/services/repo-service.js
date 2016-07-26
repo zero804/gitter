@@ -1,6 +1,7 @@
 "use strict";
 
 var GithubRepo = require('gitter-web-github').GitHubRepoService;
+var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
 
 function applyFilters(array, filters) {
   // Filter out what needs filtering out
@@ -35,6 +36,34 @@ function getReposForUser(user, options) {
     });
 }
 
+/**
+ * Gets a list of repos for a user that aren't being used by a group or a room
+ * yet.
+ * @returns The promise of a list of repos for the user
+ */
+function getUnusedReposForUser(user, options) {
+  options = options || {};
+
+  return getReposForUser(user, options)
+    .bind({
+      repos: null
+    })
+    .then(function(repos) {
+      this.repos = repos;
+
+      var linkPaths = repos.map(function(repo) {
+        return repo.full_name;
+      });
+      return securityDescriptorService.getUsedLinkPaths('GH_REPO', linkPaths);
+    })
+    .then(function(usedLinkPaths) {
+      return this.repos.filter(function(repo) {
+        return !usedLinkPaths[repo.full_name];
+      });
+    });
+}
+
 module.exports = {
-  getReposForUser: getReposForUser
+  getReposForUser: getReposForUser,
+  getUnusedReposForUser: getUnusedReposForUser
 }

@@ -169,11 +169,35 @@ function updatePublicFlagForRepo(linkPath, isPublic) {
   // TODO: consider sending live-collection updates
 }
 
+function getUsedLinkPathsForModel(Model, type, linkPaths) {
+  var query = {
+    'sd.type': type,
+    'sd.linkPath': {
+      $in: linkPaths
+    }
+  };
+  return Model.distinct('sd.linkPath', query).exec();
+}
+
+function getUsedLinkPaths(type, linkPaths) {
+  return Promise.join(
+    getUsedLinkPathsForModel(Group, type, linkPaths),
+    getUsedLinkPathsForModel(Troupe, type, linkPaths),
+    function(groups, repos) {
+      return groups.concat(repos)
+        .reduce(function(map, linkPath) {
+          map[linkPath] = true;
+          return map;
+        }, {});
+    });
+}
+
 module.exports = {
   getForRoomUser: getForRoomUser,
   getForGroupUser: getForGroupUser,
   insertForRoom: insertForRoom,
   insertForGroup: insertForGroup,
   updateLinksForRepo: updateLinksForRepo,
-  updatePublicFlagForRepo: updatePublicFlagForRepo
+  updatePublicFlagForRepo: updatePublicFlagForRepo,
+  getUsedLinkPaths: getUsedLinkPaths
 };
