@@ -124,15 +124,6 @@ module.exports = Marionette.LayoutView.extend({
 
   },
 
-  initCommunityCreateRegion: function() {
-    return new CommunityCreateView({
-      model: this.communityCreateModel,
-      orgCollection: this.orgCollection,
-      repoCollection: this.repoCollection,
-      groupsCollection: this.groupsCollection
-    });
-  },
-
   hideTroupes: function() {
     this.makeAppFullScreen();
     //TODO Remove jp 24-11-15
