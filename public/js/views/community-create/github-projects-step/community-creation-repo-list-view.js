@@ -18,14 +18,26 @@ var CommunityCreationRepoListEmptyView = Marionette.ItemView.extend({
     this.listenTo(this.collection, 'reset sync snapshot', this.onCollectionDoneLoading.bind(this), this);
   },
 
+  onRender: function() {
+    this.onCollectionFetch();
+  },
+
   onCollectionFetch: function() {
-    this.ui.emptyNote[0].classList.add('hidden');
-    this.ui.loadingNote[0].classList.remove('hidden');
+    if(this.ui.emptyNote.length && this.ui.emptyNote[0].classList) {
+      this.ui.emptyNote[0].classList.add('hidden');
+    }
+    if(this.ui.loadingNote.length && this.ui.loadingNote[0].classList) {
+      this.ui.loadingNote[0].classList.remove('hidden');
+    }
   },
 
   onCollectionDoneLoading: function() {
-    this.ui.emptyNote[0].classList.remove('hidden');
-    this.ui.loadingNote[0].classList.add('hidden');
+    if(this.ui.emptyNote.length && this.ui.emptyNote[0].classList) {
+      this.ui.emptyNote[0].classList.remove('hidden');
+    }
+    if(this.ui.loadingNote.length && this.ui.loadingNote[0].classList) {
+      this.ui.loadingNote[0].classList.add('hidden');
+    }
   }
 });
 
