@@ -1,5 +1,6 @@
 'use strict';
 
+var debug = require('debug')('gitter:modules:collaborators');
 var _ = require('lodash');
 var TwitterService = require('gitter-web-twitter');
 var identityService = require('gitter-web-identity');
@@ -10,11 +11,12 @@ function TwitterUserCollaboratorService(user, identity) {
 }
 
 TwitterUserCollaboratorService.prototype.findCollaborators = function() {
-  var username = this.user.username.replace(/_twitter$/, ''); // This is awful
+  var username = this.identity.username;
   var twitterService = new TwitterService(this.identity);
 
   return twitterService.findFollowers(username)
     .then(function(followers) {
+      debug('Twitter followers', followers.length, followers);
       followers.sort(function(a, b) {
         return b.followers_count - a.followers_count;
       });
