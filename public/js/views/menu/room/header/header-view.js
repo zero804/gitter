@@ -55,7 +55,7 @@ var HeaderView = Marionette.ItemView.extend({
     var name = '';
     if(selectedGroup) { name = selectedGroup.get('name'); }
     else { name = getOrgNameFromUri(document.location.pathname); }
-    return { orgName: name, };
+    return { groupName: name, };
   },
 
   updateActiveElement: function(model, state) { //jshint unused: true
