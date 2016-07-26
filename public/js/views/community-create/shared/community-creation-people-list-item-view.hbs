@@ -1,4 +1,9 @@
-<a href="{{ absoluteUri }}" class="community-create-people-list-item-link" target="_blank">
+<a
+  href="{{ absoluteUri }}"
+  class="community-create-people-list-item-link"
+  target="_blank"
+  data-vendor-username="{{ vendorUsername }}"
+  data-vendor-type="{{ type }}">
   <img class="community-create-people-list-item-avatar" {{{ avatarSrcSet avatarUrl 44 }}}>
   {{#if canEditEmail}}
     <div class="community-create-people-list-item-overlay">
