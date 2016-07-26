@@ -45,6 +45,7 @@ function findGroupsForUser(userId) {
           uri: '$group.uri',
           lcUri: '$group.lcUri',
           sd: '$group.sd',
+          avatarVersion: '$group.avatarVersion'
         }
       }])
       .read('primaryPreferred')

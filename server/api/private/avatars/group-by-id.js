@@ -39,7 +39,7 @@ function getAvatarUrlForSize(avatarUrl, size) {
   var parsed = url.parse(avatarUrl);
   var pathParts = parsed.pathname.split('/');
   pathParts.pop();
-  pathParts.push(bestSize + '.png');
+  pathParts.push(bestSize);
   parsed.pathname = pathParts.join('/');
   return url.format(parsed);
 }
