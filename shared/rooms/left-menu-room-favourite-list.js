@@ -8,18 +8,21 @@ var favouriteSort = require('../sorting/left-menu-primary-favourite');
 
 var parseToTemplateItem = require('../parse/left-menu-primary-item');
 
-module.exports = function generateLemMenuFavouriteRoomsList(state, rooms, selectedOrgName) {
+module.exports = function generateLemMenuFavouriteRoomsList(state, rooms, groupId) {
 
   var filter;
   switch(state) {
+    //There is no filter here because you can only be in the temp org state
+    //if you have not joined any rooms for a given group
     case 'search':
+    case 'temp-org':
       filter = function(){ return false; };
       break;
     case 'people':
       filter = favouriteOneToOneFilter;
       break;
     case 'org':
-      filter = function(model) { return orgFavouriteFilter(model, selectedOrgName) };
+      filter = function(model) { return orgFavouriteFilter(model, groupId) };
       break;
     default:
       filter = favouriteFilter;
