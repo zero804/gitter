@@ -4,7 +4,7 @@ var path = require('path');
 
 var config = {
   entry: {
-    forums: path.resolve(__dirname, './browser/forums'),
+    index: path.resolve(__dirname, './browser/js/index'),
   },
   output: {
     path: path.resolve(__dirname, "./output/assets/js/"),
