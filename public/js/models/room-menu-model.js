@@ -51,6 +51,9 @@ module.exports = Backbone.Model.extend({
   },
 
   constructor: function (attrs, options){
+    //It is the case that some users will have `selectedOrgName` saved in the DB
+    //Now we use groupId this will result in a totally broken app
+    //In this case we want to redirect the user to the all state to prevent broken stuff
     if(attrs.state === 'org' && !attrs.groupId) { attrs.state = 'all'; }
     Backbone.Model.prototype.constructor.call(this, attrs, options);
   },
