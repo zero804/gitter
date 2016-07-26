@@ -7,33 +7,42 @@ var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
 var avatars = require('gitter-web-avatars');
 
 module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, groups, extras) {
-  var currentRoom = (req.troupe || {});
-  var groupName = getOrgNameFromUri(currentRoom.uri);
+  //Defaults
   var lastLeftMenuSnapshot = (troupeContext.leftRoomMenuState || {});
+  var currentRoom = (req.troupe || {});
   req.uriContext = (req.uriContext || {});
-  var selectedOrgName = lastLeftMenuSnapshot.selectedOrgName;
-  var tempOrg = [];
+
+  //Groups
+  var groupId = (lastLeftMenuSnapshot.groupId || '');
+  var tempOrg;
 
   //Left menu state
   //------------------------------------------------------
   //Default new state is "All Conversations"
   var menuState = lastLeftMenuSnapshot.state || 'all';
+
+  //It can be the case that a user has saved a state of temp-org
+  //if this is the case reset, it will be recalculated below
+  if(menuState === 'temp-org') { menuState = 'all'; }
+
   // Try the suggested
   // ex. If you are loading a home view then activate the search state
   if(extras.suggestedMenuState) {
     menuState = extras.suggestedMenuState;
   }
 
-  var hasJoinedRoom = _.findWhere(rooms, { uri: currentRoom.uri});
-  //The old group generation adds the temp-org with a prop of temp so we account for that here
-  var hasJoinedGroup = _.findWhere(groups, { name: groupName }) && !_.findWhere(groups, { temp: true });
+  var hasJoinedRoom = _.findWhere(rooms, { uri: currentRoom.uri });
+  var hasJoinedGroup = true;
+  if(!hasJoinedRoom) {
+    var groupUri = getOrgNameFromUri(currentRoom.uri);
+    hasJoinedGroup = _.findWhere(groups, { uri: groupUri });
+  }
 
   // But if we find something later, let's use it instead
-  if(groupName && !hasJoinedRoom && !hasJoinedGroup) {
-    menuState = 'org';
-    selectedOrgName = groupName;
+  if(!hasJoinedRoom && !hasJoinedGroup) {
+    menuState = 'temp-org';
     tempOrg = {
-      name: selectedOrgName,
+      name: getOrgNameFromUri(currentRoom.uri),
       avatarUrl: avatars.getForGroupId(currentRoom.groupId),
       type: 'org',
       active: true,
@@ -51,11 +60,11 @@ module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, group
       roomMenuIsPinned: roomMenuIsPinned,
       state: menuState,
       tempOrg: tempOrg,
-      selectedOrgName: selectedOrgName,
+      groupId: groupId,
     }),
     allRooms: rooms,
-    rooms: parseRoomsIntoLeftMenuRoomList(menuState, rooms, selectedOrgName),
-    favourites: parseRoomsIntoLeftMenuFavouriteRoomList(menuState, rooms, selectedOrgName),
+    rooms: parseRoomsIntoLeftMenuRoomList(menuState, rooms, groupId),
+    favourites: parseRoomsIntoLeftMenuFavouriteRoomList(menuState, rooms, groupId),
     groups: groups,
   };
 };

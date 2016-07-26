@@ -14,8 +14,8 @@ describe('MinibarView', function(){
     model = new Backbone.Model();
 
     collection = new Backbone.Collection([
-      { type: 'org', name: 'gitterHQ' },
-      { type: 'org', name: 'troupe' }
+      { type: 'org', name: 'gitterHQ', id: 1 },
+      { type: 'org', name: 'troupe', id: 2 }
     ]);
 
     model.minibarHomeModel = new Backbone.Model({ type: 'all', name: 'all' });
@@ -53,10 +53,10 @@ describe('MinibarView', function(){
     });
 
     it('it should set active on the correct org model when the model changes state to org', function(){
-      model.set({ state: 'org', selectedOrgName: 'gitterHQ' });
+      model.set({ state: 'org', groupId: 1 });
       assert(collection.findWhere({ name: 'gitterHQ'}).get('active'));
       assert(collection.findWhere({ name: 'gitterHQ'}).get('focus'));
-      model.set('selectedOrgName', 'troupe');
+      model.set('groupId', 2);
       assert(collection.findWhere({ name: 'troupe'}).get('active'));
       assert(collection.findWhere({ name: 'troupe'}).get('focus'));
     });

@@ -22,8 +22,9 @@ var existingRooms = roomsSnapshot.map(function(data){
 var troupeCollection = new troupeModels.TroupeCollection(existingRooms, { listen: true });
 
 
+var groupsSnapshot = context.getSnapshot('groups') || [];
 var groupCollection;
-groupCollection = new groupModels.Collection([], { listen: true });
+groupCollection = new groupModels.Collection(groupsSnapshot, { listen: true });
 groupCollection.on('error', errorHandle.bind(null, 'group-collection'));
 
 // Adapt unread items to the groups collection
