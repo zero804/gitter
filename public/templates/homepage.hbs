@@ -1,25 +1,27 @@
 <!doctype html>
 <html class="no-js" lang="{{ lang }}">
     <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-        <title>{{{ __ "Gitter &mdash; Where developers come to talk." }}}</title>
+      <title>{{{ __ "Gitter &mdash; Where developers come to talk." }}}</title>
 
-        <meta name="description" content="Where developers come to talk.">
+      <meta name="description" content="Where developers come to talk.">
 
-        {{#each socialMetadata}}
-        <meta property="{{@key}}" content="{{this}}"/>
-        {{/each}}
+      {{#each socialMetadata}}
+      <meta property="{{@key}}" content="{{this}}"/>
+      {{/each}}
 
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <link rel="stylesheet" href='{{cdn cssFileName }}'>
+      <link rel="stylesheet" href='{{cdn cssFileName }}'>
 
-        <link id="favicon" rel="shortcut icon" href="{{ cdn 'images/favicon-normal.ico' }}">
-        {{#if useOptimizely}}<script src="//cdn.optimizely.com/js/590160700.js"></script>{{/if }}
-    </head>
-    <body  {{#if wordy}}class="wordy"{{/if}}><div class="homepage">
+      <link id="favicon" rel="shortcut icon" href="{{ cdn 'images/favicon-normal.ico' }}">
+      {{#if useOptimizely}}<script src="//cdn.optimizely.com/js/590160700.js"></script>{{/if }}
+  </head>
+  <body  {{#if wordy}}class="wordy"{{/if}}>
+    <div class="homepage">
+
       <header id="intro-panel">
         <nav class="site-nav">
           <div class="wrap">
@@ -284,7 +286,7 @@
                   {{{ __ "<b>Unlimited</b> public rooms" }}}<br/>
                   {{{ __ "<b>Unlimited</b> private rooms" }}}<br/>
                   <br/>
-                  {{{ __ "<b>Unlimited</b> users per private room" }}}</li>
+                  {{{ __ "<b>Unlimited</b> users per private room" }}}
                 </div>
 
                 <a class="btn price-plan__button" href="{{billingBaseUrl}}/plan/pro">{{{ __ "<b>Purchase</b> now" }}}</a>
@@ -315,184 +317,49 @@
           <p>{{{ __ "We currently have apps for OSX, iOS, Android, Windows and Linux. We also have a sweet little <a %s>IRC bridge</a>" "href='https://irc.gitter.im' target='_blank'" }}}.</p>
 
           <p>
-            <a class="btn outline" href="http://update.gitter.im/osx/latest" id="osx-download"><i class="icon-apple"></i>{{ __ "Mac"}}</span></a>
+            <a class="btn outline" href="http://update.gitter.im/osx/latest" id="osx-download"><i class="icon-apple"></i>{{ __ "Mac"}}</a>
             <a class="btn outline" href="http://update.gitter.im/win/latest" id="windows-download"><i class="icon-windows"></i>{{ __ "Windows" }}</a>
             <a class="btn outline" href="http://update.gitter.im/linux32/latest"><i class="icon-linux"></i>{{ __ "Linux 32" }}</a>
             <a class="btn outline" href="http://update.gitter.im/linux64/latest"><i class="icon-linux"></i>{{ __ "Linux 64" }}</a>
           </p>
           <p>
-            <a class="btn outline" href="http://appstore.com/gitter" target="_blank"><i class="icon-apple"></i>{{ __ "iPhone" }}</span></a>
-            <a class="btn outline" href="https://play.google.com/store/apps/details?id=im.gitter.gitter" target="_blank"><i class="icon-android"></i>{{ __ "Android" }}</span></a>
+            <a class="btn outline" href="http://appstore.com/gitter" target="_blank"><i class="icon-apple"></i>{{ __ "iPhone" }}</a>
+            <a class="btn outline" href="https://play.google.com/store/apps/details?id=im.gitter.gitter" target="_blank"><i class="icon-android"></i>{{ __ "Android" }}</a>
           </p>
           </div>
       </section>
 
-      <footer id="bottom-panel">
-        <div class="wrap">
-          <h1>{{ __ "By developers, for developers"}}</h1>
-          <p>{{ __ "Gitter is built in London by a team of developers just like you. Hell even the product guy writes code, although we generally end up rewriting those bits." }}</p>
-          <p>{{ __ "If you're ever around Silicon Roundabout, give us a shout, we love meeting up with other developers." }}</p>
+    </div>
 
-          <ul class="team-list">
-            <li class="team-list__item">
-              <ul class="team-list__item__link-list">
-                <li class="team-list__item__link-list__item">
-                  <b>Mike</b>
-                </li>
-                <li class="team-list__item__link-list__item">
-                  <a target="_blank" href="https://twitter.com/mydigitalself">
-                    <img src="{{cdn 'images/home/twitter.png'}}" alt="Twitter" />
-                  </a>
-                </li>
-                <li class="team-list__item__link-list__item">
-                  <a target="_blank" href="https://github.com/mydigitalself"><img src="{{cdn 'images/home/github.png'}}" alt="Github" /></a>
-                </li>
-              </ul>
-              <img class="team-list__item__profile-image"  src="{{cdn 'images/home/mike.jpeg'}}" />
-            </li>
-
-            <li class="team-list__item">
-              <ul class="team-list__item__link-list">
-                <li class="team-list__item__link-list__item">
-                  <b>Andrew</b>
-                </li>
-                <li class="team-list__item__link-list__item">
-                  <a target="_blank" href="https://twitter.com/suprememoocow">
-                    <img src="{{cdn 'images/home/twitter.png'}}" alt="Twitter" />
-                  </a>
-                </li>
-                <li class="team-list__item__link-list__item">
-                  <a target="_blank" href="https://github.com/suprememoocow">
-                    <img src="{{cdn 'images/home/github.png'}}" alt="Github" />
-                  </a>
-                </li>
-              </ul>
-              <img class="team-list__item__profile-image"  src="{{cdn 'images/home/andrew.jpeg'}}" />
-            </li>
-
-            <li class="team-list__item">
-              <ul class="team-list__item__link-list">
-                <li class="team-list__item__link-list__item">
-                  <b>Andy</b>
-                </li>
-                <li class="team-list__item__link-list__item">
-                  <a target="_blank" href="https://twitter.com/trevorah_">
-                    <img src="{{cdn 'images/home/twitter.png'}}" alt="Twitter">
-                  </a>
-                </li>
-                <li class="team-list__item__link-list__item">
-                  <a target="_blank" href="https://github.com/trevorah_">
-                    <img src="{{cdn 'images/home/github.png'}}" alt="Github">
-                  </a>
-                </li>
-              </ul>
-              <img class="team-list__item__profile-image"  src="{{cdn 'images/home/andy.jpeg'}}">
-            </li>
-
-            <li class="team-list__item">
-              <ul class="team-list__item__link-list">
-                <li class="team-list__item__link-list__item">
-                <b>Ricardo</b>
-                </li>
-                <li class="team-list__item__link-list__item">
-                  <a target="_blank" href="https://twitter.com/ricardobaeta">
-                      <img src="{{cdn 'images/home/twitter.png'}}" alt="Twitter">
-                  </a>
-                </li>
-                <li class="team-list__item__link-list__item">
-                  <a target="_blank" href="https://github.com/ricardobaeta">
-                    <img src="{{cdn 'images/home/github.png'}}" alt="Github">
-                  </a>
-                </li>
-              </ul>
-              <img class="team-list__item__profile-image"  src="{{cdn 'images/home/ricardo.jpeg'}}">
-            </li>
-
-            <li class="team-list__item">
-              <ul class="team-list__item__link-list">
-                <li class="team-list__item__link-list__item">
-                <b>Jon</b>
-                </li>
-                <li class="team-list__item__link-list__item">
-                  <a target="_blank" href="https://twitter.com/cutandpastey">
-                    <img src="{{cdn 'images/home/twitter.png'}}" alt="Twitter">
-                  </a>
-                </li>
-                <li class="team-list__item__link-list__item">
-                  <a target="_blank" href="https://github.com/cutandpastey">
-                    <img src="{{cdn 'images/home/github.png'}}" alt="Github">
-                  </a>
-                </li>
-              </ul>
-              <img class="team-list__item__profile-image"  src="{{cdn 'images/home/jon.jpeg'}}">
-            </li>
-
-            <li class="team-list__item">
-              <ul class="team-list__item__link-list">
-                <li class="team-list__item__link-list__item">
-                <b>Eric</b>
-                </li>
-                <li class="team-list__item__link-list__item">
-                  <a target="_blank" href="https://twitter.com/MadLittleMods">
-                      <img src="{{cdn 'images/home/twitter.png'}}" alt="Twitter">
-                  </a>
-                </li>
-                <li class="team-list__item__link-list__item">
-                  <a target="_blank" href="https://github.com/MadLittleMods">
-                    <img src="{{cdn 'images/home/github.png'}}" alt="Github">
-                  </a>
-                </li>
-              </ul>
-              <img class="team-list__item__profile-image"  src="{{cdn 'images/home/eric.jpeg'}}">
-            </li>
-
-            <li class="team-list__item">
-              <ul class="team-list__item__link-list">
-                <li class="team-list__item__link-list__item">
-                <b>Le Roux</b>
-                </li>
-                <li class="team-list__item__link-list__item">
-                  <a target="_blank" href="https://twitter.com/__leroux">
-                      <img src="{{cdn 'images/home/twitter.png'}}" alt="Twitter">
-                  </a>
-                </li>
-                <li class="team-list__item__link-list__item">
-                  <a target="_blank" href="https://github.com/lerouxb">
-                    <img src="{{cdn 'images/home/github.png'}}" alt="Github">
-                  </a>
-                </li>
-              </ul>
-              <img class="team-list__item__profile-image"  src="{{cdn 'images/home/leroux.jpeg'}}">
-            </li>
-
-          </ul>
-          <small>
-            <span>&copy; 2016 Troupe Technology Ltd. All rights reserved.</span>
-            <a href="http://support.gitter.im" target="_blank">{{ __ "Support" }}</a>
-            <a href="https://developer.gitter.im" target="_blank">{{ __ "API" }}</a>
-            <a href="http://blog.gitter.im" target="_blank">{{ __ "Blog" }}</a>
-            <a href="https://twitter.com/gitchat" target="_blank">{{ __ "Twitter" }}</a>
-          </small>
-          {{#if translationRequired}}
+    <footer id="bottom-panel">
+      <div class="wrap">
+        <small>
+          <span>&copy; 2016 Troupe Technology Ltd. All rights reserved.</span>
+          <a href="http://support.gitter.im" target="_blank">{{ __ "Support" }}</a>
+          <a href="https://developer.gitter.im" target="_blank">{{ __ "API" }}</a>
+          <a href="http://blog.gitter.im" target="_blank">{{ __ "Blog" }}</a>
+          <a href="https://twitter.com/gitchat" target="_blank">{{ __ "Twitter" }}</a>
+        </small>
+        {{#if translationRequired}}
+        <p class="translation">
+          <a href="https://github.com/gitterHQ/gitter-translations">Want this in {{ requestLangLocalName}}?</a>
+        </p>
+        {{else}}
+          {{#if translated}}
           <p class="translation">
-            <a href="https://github.com/gitterHQ/gitter-translations">Want this in {{ requestLangLocalName}}?</a>
+            <a href="https://github.com/gitterHQ/gitter-translations">Translation</a>  kindly done by {{{ translated }}}.
           </p>
-          {{else}}
-            {{#if translated}}
-            <p class="translation">
-              <a href="https://github.com/gitterHQ/gitter-translations">Translation</a>  kindly done by {{{ translated }}}.
-            </p>
-            {{/if}}
           {{/if}}
+        {{/if}}
 
-        </div>
-      </footer></div>
+      </div>
+    </footer>
 
-      {{{ generateEnv anonymous=true }}}
-      {{{ bootScript bootScriptName jsRoot=jsRoot }}}
+    {{{ generateEnv anonymous=true }}}
+    {{{ bootScript bootScriptName jsRoot=jsRoot }}}
 
-      <script type="text/javascript" src="//use.typekit.net/ohh4mcl.js"></script>
-      <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+    <script type="text/javascript" src="//use.typekit.net/ohh4mcl.js"></script>
+    <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
 
-    </body>
+  </body>
 </html>
