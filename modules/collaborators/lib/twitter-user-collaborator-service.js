@@ -11,7 +11,7 @@ function TwitterUserCollaboratorService(user, identity) {
 }
 
 TwitterUserCollaboratorService.prototype.findCollaborators = function() {
-  var username = this.user.username.replace(/_twitter$/, ''); // This is awful
+  var username = this.identity.username;
   var twitterService = new TwitterService(this.identity);
 
   return twitterService.findFollowers(username)
