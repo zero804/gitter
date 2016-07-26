@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "bluebird": "^3.2.1",
+    "debug": "^2.2.0",
     "gitter-web-avatars": "file:../avatars",
     "gitter-web-env": "file:../env",
     "gitter-web-identity": "file:../identity",

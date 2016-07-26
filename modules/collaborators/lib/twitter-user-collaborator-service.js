@@ -1,5 +1,6 @@
 'use strict';
 
+var debug = require('debug')('gitter:modules:collaborators');
 var _ = require('lodash');
 var TwitterService = require('gitter-web-twitter');
 var identityService = require('gitter-web-identity');
@@ -15,7 +16,7 @@ TwitterUserCollaboratorService.prototype.findCollaborators = function() {
 
   return twitterService.findFollowers(username)
     .then(function(followers) {
-      console.log('followers', followers.length, followers);
+      debug('Twitter followers', followers.length, followers);
       followers.sort(function(a, b) {
         return b.followers_count - a.followers_count;
       });
