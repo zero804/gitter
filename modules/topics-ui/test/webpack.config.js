@@ -6,19 +6,25 @@ var glob = require('glob');
 var path = require('path');
 
 var config = _.extend({}, webpackConfig, {
-  entry: glob.sync(path.resolve(__dirname) + '/**/*-test.js'),
+  entry: {
+    runner: path.resolve(__dirname, './fixtures/runner-browser.js')
+  },
   output: {
     filename: "[name].js",
     path: path.resolve(__dirname, './build'),
+  },
+  resolve: {
+    alias: {
+      mocha: path.resolve(__dirname, '../node_modules/mocha/mocha.js'),
+      mochaCss: path.resolve(__dirname, '../node_modules/mocha/mocha.css'),
+    }
   }
 });
 
+//Load in the mocha CSS so everything looks pretty
 config.module.loaders.push({
-  test: /-test.js$/,
-  loader: 'mocha-loader',
-  query: {
-    useColors: true
-  },
+  test:    /.css$/,
+  loader:  'style-loader!css-loader',
 });
 
 module.exports = config;
