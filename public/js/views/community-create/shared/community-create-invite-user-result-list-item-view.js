@@ -28,6 +28,7 @@ var InviteUserResultListItemView = Marionette.ItemView.extend({
     var githubUsername = this.model.get('githubUsername');
     var twitterUsername = this.model.get('twitterUsername');
     var username = githubUsername || twitterUsername || this.model.get('username');
+    data.vendorUsername = username;
     var emailAddress = data.emailAddress;
 
     data.absoluteUri = urlJoin(clientEnv.basePath, username);
@@ -36,7 +37,8 @@ var InviteUserResultListItemView = Marionette.ItemView.extend({
     if(username) {
       data.avatarUrl = avatars.getForUser({
         username: username,
-        gv: this.model.get('gv')
+        gv: this.model.get('gv'),
+        type: data.type
       });
     }
     else if(emailAddress) {

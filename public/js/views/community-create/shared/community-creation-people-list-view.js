@@ -64,6 +64,7 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
     var githubUsername = data.githubUsername;
     var twitterUsername = data.twitterUsername;
     var username = githubUsername || twitterUsername || data.username;
+    data.vendorUsername = username;
     var emailAddress = data.emailAddress;
 
     data.absoluteUri = urlJoin(clientEnv.basePath, username);
@@ -72,7 +73,8 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
     if(username) {
       data.avatarUrl = avatars.getForUser({
         username: username,
-        gv: this.model.get('gv')
+        gv: this.model.get('gv'),
+        type: data.type
       });
     }
     else if(emailAddress) {
