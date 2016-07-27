@@ -2,8 +2,7 @@
 @import "homepage-mobile.less";
 @import "colors.less";
 @import "logo.less";
-@import (less) "../fonts/fontello/css/fontello.css";
-@import (less) "../fonts/octicons/octicons.css";
+@import "typography.less";
 
 @import "./mixins/text/button-text.less";
 @import "./components/home-team-list.less";
@@ -101,7 +100,8 @@ a {
 /**
  *   Type
  */
-* {
+body,
+.fonts-loaded.fonts-loaded body {
 // body, input, textarea, button, select, .btn, #pricing-panel b {
   font-family: proxima-nova-alt, "Proxima Nova Alt", sans-serif;
 }
@@ -566,6 +566,19 @@ h1:after, h2:after {
     color: inherit;
     border-bottom: 1px solid rgba(255,255,255,0.2);
   }
+}
+
+.intro-panel-cta-button-block {
+  white-space: nowrap;
+
+  @media (max-width: 1200px) {
+    white-space: normal;
+  }
+}
+
+.intro-panel-button {
+  margin-bottom: 2rem;
+  text-decoration: none;
 }
 
 .site-nav {

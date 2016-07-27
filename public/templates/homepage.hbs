@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="no-js" lang="{{ lang }}">
+<html class="no-js {{#if hasCachedFonts}}fonts-loaded{{/if}}" lang="{{ lang }}">
     <head>
       <meta charset="utf-8">
       <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -17,6 +17,8 @@
       <link rel="stylesheet" href='{{cdn cssFileName }}'>
 
       <link id="favicon" rel="shortcut icon" href="{{ cdn 'images/favicon-normal.ico' }}">
+      {{> fonts}}
+
       {{#if useOptimizely}}<script src="//cdn.optimizely.com/js/590160700.js"></script>{{/if }}
   </head>
   <body  {{#if wordy}}class="wordy"{{/if}}>
@@ -44,75 +46,46 @@
         </nav>
         <div class="wrap">
           <div class="map"><img class="bg" src="{{cdn 'images/home/map.png'}}" alt="There should be a map here"></div>
-          {{#if hasCommunityCreate }}
-              <h1>{{ __ "Where communities thrive"}}</h1>
-              <p>{{ __ "Gitter is a chat and networking platform that helps to manage, grow and connect communities through messaging, content and discovery." }}</p>
+            <h1>{{ __ "Where communities thrive"}}</h1>
+            <p>{{ __ "Gitter is a chat and networking platform that helps to manage, grow and connect communities through messaging, content and discovery." }}</p>
 
-              <a class="btn signup" href="/login?action=signup&source=intro-createcommunity&returnTo=%23createcommunity">
-                <b>
+            <div class="intro-panel-cta-button-block">
+              <a class="button-caribbean signup intro-panel-button" href="/login?action=signup&source=intro-createcommunity&returnTo=%23createcommunity">
                   {{  __ "Create your own community" }}
-                </b>
               </a>
-          {{else}}
-              <h1>{{ __ "Chat, for GitHub."}}</h1>
-              <p>{{ __ "Get unlimited public rooms and one-to-one chats, free forever. Private team plans start from $5 per user per month. No credit card required." }}</p>
 
-              <a class="btn signup" href="/login?action=signup&source=intro-signup">
-                <b>
-                  <span class='desktopOnly'>{{  __ "Sign up to start talking" }}</span>
-                  <span class='exceptDesktop'>{{ __ "Sign up to start talking"}}</span>
-                </b>
+              <a class="subdued-button-clouds intro-panel-button" href="/explore/tags/?action=explore&source=homepage">
+              {{ __ "Explore other communities"}}
               </a>
-          {{/if}}
+            </div>
+
           <div class="legal">
             <span>
               {{{ __ "By signing up you agree to our <a %s>Terms and Conditions</a>" "href='https://gitter.zendesk.com/hc/en-us/sections/200274872-Legal-documentation' target='_blank'" }}}.
             </span>
           </div>
 
-          {{#if hasCommunityCreate }}
-              <ul class="mini-features-list">
-                <li>
-                  <h2>{{ __ "Free without limits" }}</h2>
-                  <span>{{ __ "Enjoy free public communities with unlimited people, message history and integrations."}}</span>
-                </li>
+          <ul class="mini-features-list">
+            <li>
+              <h2>{{ __ "Free without limits" }}</h2>
+              <span>{{ __ "Enjoy free public communities with unlimited people, message history and integrations."}}</span>
+            </li>
 
-                <li>
-                  <h2>{{ __ "Simple to create"}}</h2>
-                  <span>{{{ __ "Simply create your community and start talking - no need to set up any invitation services."}}}</span>
-                </li>
+            <li>
+              <h2>{{ __ "Simple to create"}}</h2>
+              <span>{{{ __ "Simply create your community and start talking - no need to set up any invitation services."}}}</span>
+            </li>
 
-                <li>
-                  <h2>{{ __ "Quick to grow" }}</h2>
-                  <span>{{{ __ "Grow your community in no time with our easy sharing tools." }}}</span>
-                </li>
+            <li>
+              <h2>{{ __ "Quick to grow" }}</h2>
+              <span>{{{ __ "Grow your community in no time with our easy sharing tools." }}}</span>
+            </li>
 
-                <li>
-                  <h2>{{ __ "Out in the open" }}</h2>
-                  <span>{{{ __ "Let your community be discovered! With Gitter, everyone can find your community in our directory and via search engines." }}}</span>
-                </li>
-              </ul>
-          {{else}}
-              <ul class="mini-features-list">
-                <li>
-                  <img src="{{cdn 'images/home/quill.png'}}" alt="Quill icon">
-                  <h2>{{ __ "Markdown power" }}</h2>
-                  <span>{{ __ "Ever wanted full markdown support in chat? How about syntax highlighting?"}}<br>{{ __ "Yip, we got your back."}}</span>
-                </li>
-
-                <li>
-                  <img src="{{cdn 'images/home/shield.png'}}" alt="Shield icon">
-                  <h2>{{ __ "Private conversations"}}</h2>
-                  <span>{{{ __ "Public rooms are awesome (and free), but we get that some stuff is private. So we've got <a %s>plans for that</a>." "href='#pricing-panel'"}}}</span>
-                </li>
-
-                <li>
-                  <img src="{{cdn 'images/home/cloud.png'}}" alt="Shield icon">
-                  <h2>{{ __ "Developer friendly" }}</h2>
-                  <span>{{{ __ "This is a picture of a cloud against a background of clouds. OMG! We <a %s>integrate</a> with a bunch of stuff in the cloud." "href='#integrations-panel'" }}}</span>
-                </li>
-              </ul>
-          {{/if}}
+            <li>
+              <h2>{{ __ "Out in the open" }}</h2>
+              <span>{{{ __ "Let your community be discovered! With Gitter, everyone can find your community in our directory and via search engines." }}}</span>
+            </li>
+          </ul>
         </div>
         <div class='bg-animation'>{{!-- the div below is responsible for the fadein of the background --}}</div>
       </header>
@@ -153,10 +126,10 @@
           <h1>
             {{ __ "Some of our communities"}}
 
-            <a class="btn secondary" href="/login?action=signup&source=communities{{when hasCommunityCreate '&returnTo=%23createcommunity' ''}}">
+            <a class="button-jaffa--small communites-panel-heading-button" href="/login?action=signup&source=communities&returnTo=%23createcommunity">
               {{ __ "Create your own"}}
             </a>
-            <a class="btn primary" href="/explore/tags/?action=explore&source=homepage">
+            <a class="button-caribbean--small communites-panel-heading-button" href="/explore/tags/?action=explore&source=homepage">
               <span class='desktopOnly'>{{ __ "Explore rooms"}}</span>
               <span class='exceptDesktop'>{{ __ "Explore"}}</span>
             </a>
@@ -284,7 +257,9 @@
             </blockquote>
 
             <blockquote>
-              <img src="{{cdn 'images/home/doge.jpeg'}}">
+              <div class="testimonial-image-wrapper">
+                <img src="{{cdn 'images/home/doge.jpeg'}}">
+              </div>
 
               <cite><b>Doge</b><span class="no-small">, Chief Woofing Officer</span>:</cite>
               <p>Wow chat. Much awesome.</p>
