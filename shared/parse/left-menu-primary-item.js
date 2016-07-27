@@ -26,6 +26,10 @@ module.exports = function parseContentToTemplateData(data, state) {
     data.avatarUrl = avatars.getForUser(data.user);
   }
 
+  if(data.avatar_url) {
+    data.avatarUrl = data.avatar_url;
+  }
+
   data.absoluteRoomUri = urlJoin(clientEnv.basePath, (data.uri || data.url));
 
   //For user results
