@@ -1,7 +1,9 @@
 "use strict";
 
 var testRequire = require('../../test-require');
-var assertUtils = require('../../assert-utils')
+var assertUtils = require('../../assert-utils');
+var env = require('gitter-web-env');
+var nconf = env.config;
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var serialize = testRequire('./serializers/serialize');
 var SearchResultsStrategy = testRequire('./serializers/rest/search-results-strategy');
@@ -49,6 +51,7 @@ describe('SearchResultsStrategy', function() {
             id: t.id,
             name: t.uri,
             topic: '',
+            avatarUrl:  nconf.get('avatar:officialHost') + '/gh/u/' + t.uri,
             uri: t.uri,
             oneToOne: false,
             userCount: 1,
@@ -85,6 +88,7 @@ describe('SearchResultsStrategy', function() {
             id: t.id,
             name: t.uri,
             topic: '',
+            avatarUrl:  nconf.get('avatar:officialHost') + '/gh/u/' + t.uri,
             uri: t.uri,
             oneToOne: false,
             userCount: 1,

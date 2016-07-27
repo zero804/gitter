@@ -1,22 +1,5 @@
 'use strict';
 
-var avatars = require('gitter-web-avatars');
-
-function getAvatarUrlForUriContext(serializedTroupe) {
-  if (serializedTroupe.oneToOne) {
-    if (serializedTroupe.user) {
-      return avatars.getForUser(serializedTroupe.user);
-    } else {
-      // TODO: investigate if and why this is happening...
-      // It's borrowed from other code so just keeping it the same
-      // for now
-      return avatars.getForRoomUri(serializedTroupe.name);
-    }
-  } else {
-    return avatars.getForRoomUri(serializedTroupe.uri);
-  }
-}
-
 function getGithubLinkUrl(serializedTroupe) {
   var backend = serializedTroupe.backend;
   if (!backend) return;
@@ -47,7 +30,7 @@ function getHeaderViewOptions(serializedTroupe) {
     troupeTopic: serializedTroupe.topic,
     isAdmin: isTroupeAdmin(serializedTroupe),
     // TODO: move all the headerView things in here
-    avatarUrl: getAvatarUrlForUriContext(serializedTroupe),
+    avatarUrl: serializedTroupe.avatarUrl,
     group: group,
     groupPageUrl: groupPageUrl,
     githubLink: getGithubLinkUrl(serializedTroupe)
