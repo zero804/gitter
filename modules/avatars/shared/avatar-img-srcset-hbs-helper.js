@@ -9,10 +9,10 @@ function avatarImgSrcSetHbsHelper(avatarServerUrl, size) {
   }
 
   var parsedAvatarServerUrl = urlParse(avatarServerUrl , true);
-  parsedAvatarServerUrl.s = size;
+  parsedAvatarServerUrl.query.s = size;
 
   var parsedAvatarServerUrlSrcSet = urlParse(avatarServerUrl , true);
-  parsedAvatarServerUrl.s = 2 * size;
+  parsedAvatarServerUrlSrcSet.query.s = 2 * size;
 
   var src = parsedAvatarServerUrl.toString();
   var srcset = parsedAvatarServerUrlSrcSet.toString() + ' 2x';
