@@ -3,7 +3,7 @@
 "use strict";
 
 //Import mocha css
-require('mochaCss'); /* eslint-disable no-unpublished-require no-missing-require */
+require('mochaCss'); // eslint-disable-line node/no-missing-require
 
 //Import global mocha object
 require('mocha');
