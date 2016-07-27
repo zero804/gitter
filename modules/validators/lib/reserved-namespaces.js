@@ -1,6 +1,9 @@
 "use strict";
 
-module.exports = [
+// These are top-level namespaces, so used to validate things like group uris,
+// usernames and org rooms.
+
+var namespaces = [
   '_s',
   'about',
   'api',
@@ -10,5 +13,33 @@ module.exports = [
   'mobile',
   'settings',
   'logout',
-  'apps'
+  'apps',
+  'topic',
+  'topics',
+  'archive',
+  'archives',
+  'integration',
+  'integrations',
+  '-',
+  'x',
+  'learn',
+  'org',
+  'orgs',
+  'team',
+  'teams',
+  'developer',
+  'developers',
+  'job',
+  'jobs',
+  'support',
+  'contact',
+  'app',
+  'private',
 ];
+
+module.exports = namespaces;
+
+module.exports.hashMap = namespaces.reduce(function(memo, name) {
+  memo[name.toLowerCase()] = true;
+  return memo;
+}, {});
