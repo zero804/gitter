@@ -3,13 +3,12 @@
 
 var _ = require('underscore');
 var urlJoin = require('url-join');
-var resolveRoomAvatarSrcSet = require('../avatars/resolve-room-avatar-srcset');
+var avatars = require('gitter-web-avatars');
 var roomNameShortener = require('../room-name-shortener');
 var parseRoomItemName = require('../get-org-menu-state-name-from-troupe-name');
 
 var clientEnv = require('gitter-client-env');
 
-var AVATAR_SIZE = 22;
 
 module.exports = function parseContentToTemplateData(data, state) {
   data.name = (data.name || data.uri || '');
@@ -27,21 +26,21 @@ module.exports = function parseContentToTemplateData(data, state) {
   if (data.displayName) {
     return _.extend({}, {
       name:         roomNameShortener(data.displayName),
-      avatarSrcset: resolveRoomAvatarSrcSet({ uri: data.username }, AVATAR_SIZE),
+      avatarUrl: avatars.getForUser(data),
       absoluteRoomUri: data.absoluteRoomUri
     });
   }
 
   if(data.isRecentSearch || data.isSearchRepoResult) {
-    var avatarSrcset = resolveRoomAvatarSrcSet({ uri: data.name }, AVATAR_SIZE);
+    var avatarUrl = avatars.getForGitHubUsername(data.name);
     // No avatars on recent searches
     if(data.isRecentSearch) {
-      avatarSrcset = null;
+      avatarUrl = null;
     }
 
     return _.extend({}, {
-      name:         roomNameShortener(data.name),
-      avatarSrcset: avatarSrcset,
+      name: roomNameShortener(data.name),
+      avatarUrl: avatarUrl
     });
   }
 
@@ -59,7 +58,6 @@ module.exports = function parseContentToTemplateData(data, state) {
 
   var uri = data.uri || (data.url || '').substring(1) || data.name;
   return _.extend({}, data, {
-    avatarSrcset:  resolveRoomAvatarSrcSet({ uri: uri }, AVATAR_SIZE),
     isNotOneToOne: (data.githubType !== 'ONETOONE'),
     name:          roomNameShortener(roomName),
     mentions:      hasMentions,
