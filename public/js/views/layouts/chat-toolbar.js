@@ -42,6 +42,7 @@ module.exports = ChatLayout.extend({
 
   initialize: function(attrs) {
     this.groupsCollection = attrs.groupsCollection;
+    this.roomCollection = attrs.roomCollection;
 
     var rightToolbarSnapshot = context.getSnapshot('rightToolbar');
     this.rightToolbarModel = new RightToolBarModel(rightToolbarSnapshot);
