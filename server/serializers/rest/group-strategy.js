@@ -17,7 +17,8 @@ function GroupStrategy(/* options */) {
         type: group.sd.type,
         linkPath: group.sd.linkPath
       },
-      avatarUrl: avatars.getForGroup(group)
+      avatarUrl: avatars.getForGroup(group),
+      hasAvatarSet: group.avatarVersion !== 0 && group.avatarUrl
     };
   };
 }

@@ -1,10 +1,6 @@
 <a href="{{when absoluteRoomUri absoluteRoomUri uri}}" id="room-item__container" class="room-item__container {{#if active}}active{{/if}}">
-  {{#if avatarSrcset}}
-    <img class="room-item__avatar"
-         src="{{ avatarSrcset.src }}"
-         srcset="{{avatarSrcset.srcset}}"
-         height="{{avatarSrcset.size}}"
-         width="{{avatarSrcset.size}}"/>
+  {{#if avatarUrl}}
+     <img class="room-item__avatar" {{{ avatarSrcSet avatarUrl 22 }}} >
   {{/if}}
   <h2 id="room-item-title"  class="room-item__title">{{name}}</h2>
   {{#unless isSearch}}

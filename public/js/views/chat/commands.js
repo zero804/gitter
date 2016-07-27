@@ -71,9 +71,9 @@ var commandsList = [
       var channel = channelMatch[1];
 
       if(channel) {
-        appEvents.trigger('route', 'createcustomroom/' + channel);
+        appEvents.trigger('route', 'createroom/' + channel);
       } else {
-        appEvents.trigger('route', 'createcustomroom');
+        appEvents.trigger('route', 'createroom');
       }
     }
   },

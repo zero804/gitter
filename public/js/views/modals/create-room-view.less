@@ -1,17 +1,204 @@
-.create-room-container {
-  display: flex;
+@import (reference) 'bootstrap/forms.less';
+@import '../create-room/groupSelectView';
 
-  .gtrSlash {
-    margin-top: 20px;
-    margin-right: 10px;
-    font-size: 2.5rem;
+.create-room-section() {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid @trpGrey;
+}
+
+
+.create-room-room-wrapper {
+  display: flex;
+}
+
+.create-room-group-select-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.create-room-name-select-wrapper  {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.create-room-group-select-label,
+.create-room-name-select-label {
+  text-transform: uppercase;
+}
+
+.create-room-group-input {
+  margin-bottom: 1rem;
+
+  & .gtrDDButton {
+    display: flex;
+    align-items: center;
+    width: 100%;
+
+    &:before {
+      top: 50%;
+      right: 20px;
+      transform: translateY(-25%);
+    }
+  }
+  & .gtrInput {
+    width: 100%;
+    margin-bottom: 0;
   }
 }
 
-//Horrible hacky selector to ONLY target a
-//selectable dropdown within a modal
-.modal-backdrop + .dropdown.selectable {
-  max-height: 350px;
-  overflow: auto;
+.create-room-create-community-link {
+  display: flex;
+  align-items: center;
+  min-height: 5rem;
+
+  transition: color .2s ease;
+
+  &:hover,
+  &:focus {
+    color: darken(@caribbean, 10%);
+    text-decoration: none;
+  }
 }
 
+.create-room-create-community-icon {
+  font-size: 2.5rem;
+
+  &:before {
+    margin-left: 0;
+  }
+}
+
+.create-room-name-input-wrapper {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.create-room-name-input {
+  @border-color: @trpGrey;
+  @text-color: #000000;
+
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 3.2rem;
+
+  margin-bottom: 0;
+  padding: 0px .9rem;
+
+  background-color: fade(@trpGrey, 50%);
+  border: 1px solid @border-color;
+  box-shadow: none;
+  border-radius: 4px;
+  color: @text-color;
+
+  // Reset forms.less :(
+  &:focus:invalid {
+    border-color: @border-color;
+    box-shadow: none;
+    color: @text-color;
+  }
+
+  &:not([value=""]) {
+    &:focus:invalid {
+      .forms-invalid-input-style();
+    }
+  }
+}
+
+.create-room-name-input-clear-button {
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  transform: translateY(-50%);
+
+  cursor: pointer;
+}
+
+.create-room-associated-github-project-link {
+  display: flex;
+  align-items: center;
+  min-height: 5rem;
+
+  transition: color .2s ease;
+
+  &:hover,
+  &:focus {
+    color: darken(@caribbean, 10%);
+    text-decoration: none;
+  }
+}
+
+.create-room-associated-github-project-icon {
+  .create-room-create-community-icon();
+  margin-right: 1rem;
+}
+
+
+
+.create-room-security-section {
+  .create-room-section();
+}
+
+.create-room-security-list {
+  margin-left: 0;
+  list-style: none;
+}
+
+.create-room-security-list-item {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 2rem;
+}
+
+.create-room-security-list-item-radio {
+  margin-right: 1rem;
+}
+
+.create-room-security-list-item-label {
+  display: flex;
+
+  .create-room-security-list-item-radio:disabled + & {
+    color: fade(@trpDarkGrey, 30%);
+  }
+}
+
+.create-room-security-list-item-icon {
+  width: 3rem;
+  font-size: 2.5rem;
+}
+
+.create-room-security-list-item-name {
+  font-weight: bold;
+}
+
+
+
+.create-room-detail-section {
+  .create-room-section();
+}
+
+.create-room-detail-option-list {
+  margin-left: 0;
+  list-style: none;
+}
+
+.create-room-detail-option-item {
+  margin-bottom: 1rem;
+}
+
+.create-room-detail-option-item-input {
+  width: 2.5rem;
+}
+
+.create-room-detail-option-item-label {
+
+}
+
+
+
+.create-room-availability-status-message {
+  margin-top: 2rem;
+  color: #ff0000;
+}
