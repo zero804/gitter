@@ -5,9 +5,6 @@ var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 var cocktail = require('cocktail');
 var autolink = require('autolink');
-var urlParse = require('url-parse');
-var urlJoin = require('url-join');
-var avatars = require('gitter-web-avatars');
 var clientEnv = require('gitter-client-env');
 var context = require('utils/context');
 var toggleClass = require('utils/toggle-class');
@@ -392,8 +389,6 @@ var HeaderView = Marionette.ItemView.extend({
       text: 'Wait a few moments for your new avatar to appear...'
     });
 
-    var currentRoom = context.troupe();
-
     // TODO: Make this work not on refresh
     // See snippet below
     setTimeout(function() {
@@ -402,6 +397,9 @@ var HeaderView = Marionette.ItemView.extend({
       });
     }, 1000);
     /* * /
+    var urlParse = require('url-parse');
+    var urlJoin = require('url-join');
+    var avatars = require('gitter-web-avatars');
     setTimeout(function() {
       var currentRoom = context.troupe();
       var currentGroup = this.groupsCollection.get(currentRoom.get('groupId'));
