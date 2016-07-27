@@ -20,6 +20,12 @@ module.exports = function parseContentToTemplateData(data, state) {
     data.uri = urlJoin(data.uri, '?source=suggested-menu');
   }
 
+  //This is a dirty hack to provide avatar for one-to-one avatars
+  //as the troupe serializer has no way of deriving them
+  if(data.oneToOne) {
+     data.avatarUrl = avatars.getForUser(data.user);
+  }
+
   data.absoluteRoomUri = urlJoin(clientEnv.basePath, (data.uri || data.url));
 
   //For user results
