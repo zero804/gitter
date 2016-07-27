@@ -236,7 +236,8 @@ onready(function() {
     template: false,
     el: 'body',
     chatCollection: chatCollection,
-    groupsCollection: troupeCollections.groups
+    groupsCollection: troupeCollections.groups,
+    roomCollection: troupeCollections.troupes
   });
 
   appView.render();

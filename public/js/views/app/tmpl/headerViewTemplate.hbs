@@ -17,7 +17,7 @@
       class="chat-header__group-avatar-upload-label js-chat-header-group-avatar-upload-label"
       for="chat-header-group-avatar-upload-input"
       {{#if canChangeGroupAvatar}}title="Upload new avatar"{{/if}}>
-      <img {{{ avatarSrcSet headerView.avatarUrl 48 }}}>
+      <img class="js-chat-header-avatar-image" {{{ avatarSrcSet headerView.avatarUrl 48 }}}>
       <div class="chat-header__group-avatar-upload-progress hidden js-chat-header-group-avatar-upload-progress"></div>
     </label>
   </form>

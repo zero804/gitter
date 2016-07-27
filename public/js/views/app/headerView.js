@@ -1,21 +1,25 @@
 'use strict';
 
 var _ = require('underscore');
-var context = require('utils/context');
-var clientEnv = require('gitter-client-env');
-var apiClient = require('components/apiClient');
-var Marionette = require('backbone.marionette');
 var Backbone = require('backbone');
+var Marionette = require('backbone.marionette');
 var cocktail = require('cocktail');
 var autolink = require('autolink');
+var urlParse = require('url-parse');
+var urlJoin = require('url-join');
+var avatars = require('gitter-web-avatars');
+var clientEnv = require('gitter-client-env');
+var context = require('utils/context');
+var toggleClass = require('utils/toggle-class');
+var MenuBuilder = require('utils/menu-builder');
+var appEvents = require('utils/appevents');
+
+var apiClient = require('components/apiClient');
 var userNotifications = require('components/user-notifications');
 var Dropdown = require('views/controls/dropdown');
-var appEvents = require('utils/appevents');
 var KeyboardEventMixin = require('views/keyboard-events-mixin');
 var headerViewTemplate = require('./tmpl/headerViewTemplate.hbs');
-var toggleClass = require('utils/toggle-class');
 var getHeaderViewOptions = require('gitter-web-shared/templates/get-header-view-options');
-var MenuBuilder = require('../../utils/menu-builder');
 
 require('views/behaviors/tooltip');
 require('transloadit');
@@ -34,10 +38,11 @@ var HeaderView = Marionette.ItemView.extend({
   template: headerViewTemplate,
 
   modelEvents: {
-    change:       'renderIfRequired',
+    change: 'renderIfRequired',
   },
 
   ui: {
+    avatarImage: '.js-chat-header-avatar-image',
     groupAvatarUploadForm: '.js-chat-header-group-avatar-upload-form',
     groupAvatarFileInput: '.js-chat-header-group-avatar-upload-input',
     groupAvatarSignatureInput: '.js-chat-header-group-avatar-upload-signature',
@@ -81,6 +86,7 @@ var HeaderView = Marionette.ItemView.extend({
 
   initialize: function(options) {
     this.groupsCollection = options.groupsCollection;
+    this.roomCollection = options.roomCollection;
     this.rightToolbarModel = options.rightToolbarModel;
     this.menuItemsCollection = new Backbone.Collection([]);
     this.buildDropdown();
@@ -336,7 +342,7 @@ var HeaderView = Marionette.ItemView.extend({
       }
     }
 
-    if (changedContains(['uri', 'name', 'id', 'favourite', 'topic', 'group', 'roomMember', 'backend', 'public'])) {
+    if (changedContains(['uri', 'name', 'id', 'favourite', 'topic', 'avatarUrl', 'group', 'roomMember', 'backend', 'public'])) {
       // The template may have been set to false
       // by the Isomorphic layout
       this.options.template = headerViewTemplate;
@@ -347,7 +353,6 @@ var HeaderView = Marionette.ItemView.extend({
       this.editingTopic = false;
     }
   },
-
 
   onGroupAvatarUploadChange: function() {
     this.uploadGroupAvatar();
@@ -383,8 +388,40 @@ var HeaderView = Marionette.ItemView.extend({
   handleUploadSuccess: function(/*res*/) {
     this.resetProgressBar();
     appEvents.triggerParent('user_notification', {
-      title: 'Avatar upload complete'
+      title: 'Avatar upload complete',
+      text: 'Wait a few moments for your new avatar to appear...'
     });
+
+    var currentRoom = context.troupe();
+
+    // TODO: Make this work not on refresh
+    // See snippet below
+    setTimeout(function() {
+      appEvents.trigger('navigation', null, null, null, {
+        refresh: true
+      });
+    }, 1000);
+    /* * /
+    setTimeout(function() {
+      var currentRoom = context.troupe();
+      var currentGroup = this.groupsCollection.get(currentRoom.get('groupId'));
+
+      // Assemble the new URL
+      // We cache bust the long-running one so we can show the updated avatar
+      // When the user refreshes, they will go back to using the version avatar URL
+      var unversionedAvatarUrl = avatars.getForGroupId(currentGroup.get('id'));
+      var parsedAvatarUrl = urlParse(unversionedAvatarUrl, true);
+      parsedAvatarUrl.query.cacheBuster = Math.ceil(Math.random() * 9999);
+      var newAvatarUrl = parsedAvatarUrl.toString();
+
+      currentGroup.set('avatarUrl', newAvatarUrl);
+      currentRoom.set('avatarUrl', newAvatarUrl);
+      // TODO: This does not work because it is empty and is not shared with parent frame
+      if(this.roomCollection) {
+        console.log(this.roomCollection.where({ groupId: currentGroup.get('id') }));
+      }
+    }.bind(this), 5000);
+    /* */
   },
 
   handleUploadError: function(err) {
@@ -401,7 +438,7 @@ var HeaderView = Marionette.ItemView.extend({
       return;
     }
 
-    var currentGroup = new Backbone.Model(currentRoom.get('group')) || this.groupsCollection.get(currentRoom.get('groupId'));
+    var currentGroup = this.groupsCollection.get(currentRoom.get('groupId'));
 
     this.handleUploadStart();
 
