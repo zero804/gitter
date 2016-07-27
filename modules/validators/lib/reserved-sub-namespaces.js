@@ -8,7 +8,8 @@ var namespaces = [
   'archive',
   'archives',
   'integration',
-  'integrations'
+  'integrations',
+  'home'
 ];
 
 module.exports = {
