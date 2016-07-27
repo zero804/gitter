@@ -36,7 +36,14 @@ require('components/ping');
 
 onready(function() {
 
-  appEvents.on('navigation', function(url, type, title) {
+  appEvents.on('navigation', function(url, type, title, options) {
+    options = options || {};
+
+    if(!url && options.refresh) {
+      window.location.reload();
+      return;
+    }
+
     if (frameUtils.hasParentFrameSameOrigin()) {
       frameUtils.postMessage({ type: 'navigation', url: url, urlType: type, title: title});
     } else {

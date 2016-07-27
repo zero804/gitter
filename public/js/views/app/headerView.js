@@ -10,6 +10,7 @@ var context = require('utils/context');
 var toggleClass = require('utils/toggle-class');
 var MenuBuilder = require('utils/menu-builder');
 var appEvents = require('utils/appevents');
+var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
 
 var apiClient = require('components/apiClient');
 var userNotifications = require('components/user-notifications');
@@ -392,10 +393,10 @@ var HeaderView = Marionette.ItemView.extend({
     // TODO: Make this work not on refresh
     // See snippet below
     setTimeout(function() {
-      appEvents.trigger('navigation', null, null, null, {
+      appEvents.triggerParent('navigation', null, null, null, {
         refresh: true
       });
-    }, 1000);
+    }.bind(this), 1000);
     /* * /
     var urlParse = require('url-parse');
     var urlJoin = require('url-join');
@@ -437,13 +438,16 @@ var HeaderView = Marionette.ItemView.extend({
     }
 
     var currentGroup = this.groupsCollection.get(currentRoom.get('groupId'));
+    // For groups that were created within page lifetime
+    var groupId = currentGroup ? currentGroup.get('id') : currentRoom.get('groupId');
+    var groupUri = currentGroup ? currentGroup.get('uri') : getOrgNameFromUri(document.location.pathname);
 
     this.handleUploadStart();
 
     apiClient.priv.get('/generate-signature', {
       type: 'avatar',
-        group_id: currentGroup.get('id'),
-        group_uri: currentGroup.get('uri')
+        group_id: groupId,
+        group_uri: groupUri
       })
       .then(function(res) {
         this.ui.groupAvatarParamsInput[0].setAttribute('value', res.params);
