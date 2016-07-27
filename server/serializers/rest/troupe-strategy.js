@@ -25,9 +25,9 @@ function getAvatarUrlForTroupe(serializedTroupe, group) {
     return avatars.getForUser(serializedTroupe.user);
   }
   else if(serializedTroupe.oneToOne && !serializedTroupe.user) {
-    // TODO: investigate if and why this is happening...
-    // It's borrowed from other code so just keeping it the same
-    // for now
+    //TODO this is totally and utterly broken. 1-2-1's don't have a name here
+    //nor do they have nay serialized users so avatar resolution here is never going to work
+    //I imagine its for reasons like this we moved avatar generation to the client apps ....
     return avatars.getForRoomUri(serializedTroupe.name);
   }
   else if (group && group.hasAvatarSet) {
