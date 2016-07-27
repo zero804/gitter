@@ -23,9 +23,9 @@ function getHeaderViewOptions(serializedTroupe) {
   var groupUri = group && group.uri;
   var groupPageUrl = groupUri && '/orgs/' + groupUri + '/rooms';
 
-  var avatarUrl = '';
+  var avatarUrl = avatars.getForGroupId(serializedTroupe.groupId);
   if(group) {
-    avatarUrl = group.avatarUrl;
+    avatarUrl = avatars.getForGroup(group);
   }
   else if(serializedTroupe.oneToOne) {
     avatarUrl = avatars.getForUser(serializedTroupe.user);
