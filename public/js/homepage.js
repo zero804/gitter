@@ -1,4 +1,7 @@
 "use strict";
+
+require('utils/font-setup');
+
 var $ = require('jquery');
 
 var urlParse = require('url-parse');
@@ -14,6 +17,7 @@ var modalRegion = require('components/modal-region');
 var LoginView = require('views/modals/login-view');
 
 require('utils/tracking');
+require('gitter-styleguide/css/components/buttons.css');
 
 var active = [];
 
