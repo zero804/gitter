@@ -524,16 +524,20 @@ h1:after, h2:after {
   margin-bottom: 20px;
 }
 
+
 #intro-panel ul {
-  padding: 50px 0 30px;
   display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
   width: 100%;
+  padding: 50px 0 30px;
 }
 
 #intro-panel li {
   position: relative;
+  flex: 1;
 
-  padding: 0 55px 0 115px;
+  padding-right: 55px;
 }
 
 #intro-panel li:last-child {
@@ -548,7 +552,6 @@ h1:after, h2:after {
 
 #intro-panel ul span {
   display: inline-block;
-  width: 210px;
 
   font-size: 16px;
   line-height: 25px;
