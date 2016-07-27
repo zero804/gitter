@@ -1,7 +1,7 @@
 'use strict';
 
 var xregexp = require('xregexp').XRegExp;
-var reservedSubNamespaceHash = require('./reserved-sub-namespaces').hashMap;
+var reservedSubNamespaceHash = require('./reserved-sub-namespaces').hash;
 
 function validateRoomName(name) {
   // prevent rooms called "topics" and stuff like that.
