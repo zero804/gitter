@@ -12,6 +12,7 @@
   },
   "private": true,
   "dependencies": {
-    "gitter-client-env": "file:../client-env"
+    "gitter-client-env": "file:../client-env",
+    "url-parse": "^1.0.5"
   }
 }
