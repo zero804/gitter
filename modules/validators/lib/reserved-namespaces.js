@@ -35,6 +35,8 @@ var namespaces = [
   'contact',
   'app',
   'private',
+  'c',
+  'u',
 ];
 
 module.exports = {
