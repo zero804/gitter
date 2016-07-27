@@ -59,6 +59,7 @@ function renderChat(req, res, options, next) {
         var initialBottom = !initialChat;
         var githubLink;
         var classNames = options.classNames || [];
+        var isStaff = req.user && req.user.staff;
 
         var snapshots = rightToolbarSnapshot;
         troupeContext.snapshots = snapshots;
@@ -122,6 +123,7 @@ function renderChat(req, res, options, next) {
             premium: troupeContext.troupe.premium,
             troupeFavourite: troupeContext.troupe.favourite,
             headerView: getHeaderViewOptions(troupeContext.troupe),
+            canChangeGroupAvatar: isStaff || isAdmin,
             isAdmin: isAdmin,
             isNativeDesktopApp: troupeContext.isNativeDesktopApp
           }, options.extras);

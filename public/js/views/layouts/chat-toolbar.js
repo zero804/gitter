@@ -40,7 +40,10 @@ module.exports = ChatLayout.extend({
     }
   },
 
-  initialize: function() {
+  initialize: function(attrs) {
+    this.groupsCollection = attrs.groupsCollection;
+    this.roomCollection = attrs.roomCollection;
+
     var rightToolbarSnapshot = context.getSnapshot('rightToolbar');
     this.rightToolbarModel = new RightToolBarModel(rightToolbarSnapshot);
   },
@@ -54,7 +57,9 @@ module.exports = ChatLayout.extend({
   initHeaderRegion: function(optionsForRegion) {
     return new HeaderView(optionsForRegion({
       model: context.troupe(),
-      rightToolbarModel: this.rightToolbarModel
+      rightToolbarModel: this.rightToolbarModel,
+      groupsCollection: this.groupsCollection,
+      roomCollection: this.roomCollection
     }));
   }
 });

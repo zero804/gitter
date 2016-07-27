@@ -1,5 +1,6 @@
 'use strict';
 
+var debug = require('debug')('gitter:api:invite-user-suggestions');
 var collaboratorsService = require('gitter-web-collaborators');
 
 function resolveInviteUserSuggestions(req, res, next) {
@@ -9,7 +10,12 @@ function resolveInviteUserSuggestions(req, res, next) {
 
   return collaboratorsService.findCollaborators(req.user, type, linkPath)
     .then(function(suggestions) {
+      debug('suggestions', suggestions);
       res.send(suggestions);
+    })
+    .catch(function(err) {
+      debug('err', err, err.stack);
+      throw err;
     })
     .catch(next);
 }

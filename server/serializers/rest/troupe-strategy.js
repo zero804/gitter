@@ -1,11 +1,12 @@
 /* eslint complexity: ["error", 16] */
 "use strict";
 
+var Promise = require('bluebird');
 var debug = require('debug')('gitter:infra:serializer:troupe');
 var getVersion = require('../get-model-version');
 var UserIdStrategy = require('./user-id-strategy');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
-var Promise = require('bluebird');
+var avatars = require('gitter-web-avatars');
 
 var AllUnreadItemCountStrategy = require('./troupes/all-unread-item-count-strategy');
 var FavouriteTroupesForUserStrategy = require('./troupes/favourite-troupes-for-user-strategy');
@@ -17,6 +18,28 @@ var TagsStrategy = require('./troupes/tags-strategy');
 var TroupePermissionsStrategy = require('./troupes/troupe-permissions-strategy');
 var GroupIdStrategy = require('./group-id-strategy');
 var TroupeBackendStrategy = require('./troupes/troupe-backend-strategy');
+
+
+function getAvatarUrlForTroupe(serializedTroupe, group) {
+  if (serializedTroupe.oneToOne && serializedTroupe.user) {
+    return avatars.getForUser(serializedTroupe.user);
+  }
+  else if(serializedTroupe.oneToOne && !serializedTroupe.user) {
+    //TODO this is totally and utterly broken. 1-2-1's don't have a name here
+    //nor do they have nay serialized users so avatar resolution here is never going to work
+    //I imagine its for reasons like this we moved avatar generation to the client apps ....
+    return avatars.getForRoomUri(serializedTroupe.name);
+  }
+  else if (group && group.hasAvatarSet) {
+    return avatars.getForGroup(group);
+  }
+  else if(serializedTroupe.groupId) {
+    return avatars.getForGroupId(serializedTroupe.groupId);
+  }
+  else {
+    return avatars.getForRoomUri(serializedTroupe.uri);
+  }
+}
 
 /**
  * Given the currentUser and a sequence of troupes
@@ -188,6 +211,7 @@ function TroupeStrategy(options) {
       strategies.push(groupIdStrategy.preload(groupIds));
     }
 
+
     if (options.includeBackend) {
       backendStrategy = new TroupeBackendStrategy();
       // Backend strategy needs no mapping stage
@@ -274,10 +298,13 @@ function TroupeStrategy(options) {
       isPublic = item.sd.public;
     }
 
+    var group = groupIdStrategy && item.groupId ? groupIdStrategy.map(item.groupId) : undefined;
+
     return {
       id: item.id || item._id,
       name: troupeName,
       topic: item.topic,
+      avatarUrl: getAvatarUrlForTroupe(item, group),
       uri: item.uri,
       oneToOne: item.oneToOne,
       userCount: item.userCount,
@@ -298,7 +325,7 @@ function TroupeStrategy(options) {
       permissions: permissionsStrategy ? permissionsStrategy.map(item) : undefined,
       roomMember: roomMembershipStrategy ? roomMembershipStrategy.map(item.id) : undefined,
       groupId: item.groupId,
-      group: groupIdStrategy && item.groupId ? groupIdStrategy.map(item.groupId) : undefined,
+      group: group,
       backend: backendStrategy ? backendStrategy.map(item) : undefined,
       public: isPublic,
       v: getVersion(item)
