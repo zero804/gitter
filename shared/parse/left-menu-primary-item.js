@@ -1,4 +1,4 @@
-/* eslint complexity: ["error", 14] */
+/* eslint complexity: ["error", 16] */
 'use strict';
 
 var _ = require('underscore');
@@ -23,7 +23,7 @@ module.exports = function parseContentToTemplateData(data, state) {
   //This is a dirty hack to provide avatar for one-to-one avatars
   //as the troupe serializer has no way of deriving them
   if(data.oneToOne) {
-     data.avatarUrl = avatars.getForUser(data.user);
+    data.avatarUrl = avatars.getForUser(data.user);
   }
 
   data.absoluteRoomUri = urlJoin(clientEnv.basePath, (data.uri || data.url));
@@ -62,7 +62,6 @@ module.exports = function parseContentToTemplateData(data, state) {
     roomName = parseRoomItemName(data.name);
   }
 
-  var uri = data.uri || (data.url || '').substring(1) || data.name;
   return _.extend({}, data, {
     isNotOneToOne: (data.githubType !== 'ONETOONE'),
     name:          roomNameShortener(roomName),
