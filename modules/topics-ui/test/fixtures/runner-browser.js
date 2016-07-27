@@ -1,9 +1,8 @@
 /*global mocha*/
-/*eslint-env node, browser */
 "use strict";
 
 //Import mocha css
-require('mochaCss'); // eslint-disable-line node/no-missing-require
+require('mochaCss');
 
 //Import global mocha object
 require('mocha');
