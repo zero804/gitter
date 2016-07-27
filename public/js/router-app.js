@@ -413,10 +413,16 @@ onready(function() {
     }
   });
 
-  appEvents.on('navigation', function(url, type, title) {
+  appEvents.on('navigation', function(url, type, title, options) {
     debug('navigation: %s', url);
+    options = options || {};
     var parsed = urlParser.parse(url);
     var frameUrl = parsed.pathname + '/~' + type + parsed.search;
+
+    if(!url && options.refresh) {
+      window.location.reload();
+      return;
+    }
 
     if (parsed.pathname === window.location.pathname) {
       pushState(frameUrl, title, url);
