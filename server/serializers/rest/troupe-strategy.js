@@ -33,6 +33,9 @@ function getAvatarUrlForTroupe(serializedTroupe, group) {
   else if (group && group.hasAvatarSet) {
     return avatars.getForGroup(group);
   }
+  else if(serializedTroupe.groupId) {
+    return avatars.getForGroupId(serializedTroupe.groupId);
+  }
   else {
     return avatars.getForRoomUri(serializedTroupe.uri);
   }
@@ -196,16 +199,17 @@ function TroupeStrategy(options) {
       strategies.push(tagsStrategy.preload(items));
     }
 
+    if (options.includeGroups) {
+      groupIdStrategy = new GroupIdStrategy(options);
+      var groupIds = items.map(function(troupe) {
+          return troupe.groupId;
+        })
+        .filter(function(f) {
+          return !!f;
+        });
 
-    groupIdStrategy = new GroupIdStrategy(options);
-    var groupIds = items.map(function(troupe) {
-        return troupe.groupId;
-      })
-      .filter(function(f) {
-        return !!f;
-      });
-
-    strategies.push(groupIdStrategy.preload(groupIds));
+      strategies.push(groupIdStrategy.preload(groupIds));
+    }
 
 
     if (options.includeBackend) {
