@@ -25,7 +25,7 @@ function getHeaderViewOptions(serializedTroupe) {
 
   var avatarUrl = avatars.getForGroupId(serializedTroupe.groupId);
   if(group) {
-    avatarUrl = avatars.getForGroup(group);
+    avatarUrl = group.avatarUrl;
   }
   else if(serializedTroupe.oneToOne) {
     avatarUrl = avatars.getForUser(serializedTroupe.user);
