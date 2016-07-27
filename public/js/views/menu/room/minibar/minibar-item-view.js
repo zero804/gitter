@@ -3,7 +3,6 @@
 var _ = require('underscore');
 var BaseItemView = require('../base-item-view');
 var itemTemplate = require('./minibar-item-view.hbs');
-var resolveRoomAvatar = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 var updateUnreadIndicatorClassState = require('../../../../components/menu/update-unread-indicator-class-state');
 var toggleClass = require('utils/toggle-class');
 
@@ -62,7 +61,6 @@ module.exports = BaseItemView.extend({
       isOrg:             (data.type === 'org'),
       isCommunityCreate: (data.type === 'community-create'),
       hasUnreadIndicators: (data.type === 'people' || data.type === 'org'),
-      avatarSrcset:  resolveRoomAvatar({ uri: data.uri }, 23)
     });
   },
 
