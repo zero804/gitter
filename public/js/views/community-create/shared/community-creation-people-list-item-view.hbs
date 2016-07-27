@@ -4,7 +4,19 @@
   target="_blank"
   data-vendor-username="{{ vendorUsername }}"
   data-vendor-type="{{ type }}">
-  <img class="community-create-people-list-item-avatar" {{{ avatarSrcSet avatarUrl 44 }}}>
+  
+  {{!-- TODO: Only use avatarUrl when user?q has avatarUrl --}}
+  {{#if avatarUrl}}
+    <img class="community-create-invite-user-result-list-item-avatar" {{{ avatarSrcSet avatarUrl 44 }}}>
+  {{else if avatarSrcset}}
+    <img
+      class="community-create-invite-user-result-list-item-avatar"
+      src="{{ avatarSrcset.src }}"
+      srcset="{{ avatarSrcset.srcset }}"
+      height="{{ avatarSrcset.size }}"
+      width="{{ avatarSrcset.size }}" />
+  {{/if}}
+
   {{#if canEditEmail}}
     <div class="community-create-people-list-item-overlay">
       <input
