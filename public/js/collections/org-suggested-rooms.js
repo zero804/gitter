@@ -23,12 +23,10 @@ var SuggestedCollection = Backbone.Collection.extend({
 
     this.contextModel = attrs.contextModel;
     this.roomCollection = attrs.roomCollection;
-    this.urlModel = backboneUrlResolver('/v1/orgs/:selectedOrgName/suggestedRooms', this.contextModel);
-    this.listenTo(this.contextModel, 'change:selectedOrgName', this.onOrgNameUpdate, this);
+    this.urlModel = backboneUrlResolver('/v1/groups/:groupId/suggestedRooms', this.contextModel);
+    this.listenTo(this.contextModel, 'change:groupId', this.onOrgNameUpdate, this);
 
-    var selectedOrg = this.contextModel.get('selectedOrgName');
-    var orgIsSelected = selectedOrg && selectedOrg.length > 0;
-    if(this.contextModel.get('state') === 'org' && orgIsSelected) {
+    if(this.contextModel.get('state') === 'org') {
       this.fetch({ reset: true });
     }
 

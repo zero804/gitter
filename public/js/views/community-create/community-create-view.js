@@ -58,7 +58,9 @@ var CommunityCreateView = Marionette.LayoutView.extend({
       model: this.githubProjectsStepViewModel,
       communityCreateModel: this.model,
       orgCollection: this.orgCollection,
-      repoCollection: this.repoCollection
+      unusedOrgCollection: this.unusedOrgCollection,
+      repoCollection: this.repoCollection,
+      unusedRepoCollection: this.unusedRepoCollection
     }));
     return this.githubProjectsStepView;
   },
@@ -99,14 +101,22 @@ var CommunityCreateView = Marionette.LayoutView.extend({
 
   initialize: function(options) {
     var orgCollection = options.orgCollection;
+    var unusedOrgCollection = options.unusedOrgCollection;
     var repoCollection = options.repoCollection;
+    var unusedRepoCollection = options.unusedRepoCollection
 
     this.orgCollection = new ActiveCollection(orgCollection.models, {
       collection: orgCollection
     });
+    this.unusedOrgCollection = new ActiveCollection(unusedOrgCollection.models, {
+      collection: unusedOrgCollection
+    });
 
     this.repoCollection = new ActiveCollection(repoCollection.models, {
       collection: repoCollection
+    });
+    this.unusedRepoCollection = new ActiveCollection(unusedRepoCollection.models, {
+      collection: unusedRepoCollection
     });
 
     this.groupsCollection = options.groupsCollection;
