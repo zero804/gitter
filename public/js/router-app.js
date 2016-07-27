@@ -419,7 +419,7 @@ onready(function() {
     var parsed = urlParser.parse(url);
     var frameUrl = parsed.pathname + '/~' + type + parsed.search;
 
-    if(options.refresh) {
+    if(!url && options.refresh) {
       window.location.reload();
       return;
     }
