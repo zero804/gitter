@@ -1,7 +1,7 @@
 'use strict';
 
-var reservedNamespaceHash = require('gitter-web-validators/lib/reserved-namespaces').hashMap;
-var reservedSubNamespaceHash = require('gitter-web-validators/lib/reserved-sub-namespaces').hashMap;
+var reservedNamespaceHash = require('gitter-web-validators/lib/reserved-namespaces').hash;
+var reservedSubNamespaceHash = require('gitter-web-validators/lib/reserved-sub-namespaces').hash;
 
 
 module.exports = function(uri) {

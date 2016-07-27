@@ -37,9 +37,11 @@ var namespaces = [
   'private',
 ];
 
-module.exports = namespaces;
+module.exports = {
+  list: namespaces,
+  hash: namespaces.reduce(function(memo, name) {
+    memo[name.toLowerCase()] = true;
+    return memo;
+  }, {})
+}
 
-module.exports.hashMap = namespaces.reduce(function(memo, name) {
-  memo[name.toLowerCase()] = true;
-  return memo;
-}, {});

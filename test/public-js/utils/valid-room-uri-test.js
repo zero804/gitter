@@ -1,8 +1,8 @@
 'use strict';
 
 var isValidRoomUri = require('../../../public/js/utils/valid-room-uri');
-var RESERVED = require('gitter-web-validators/lib/reserved-namespaces');
-var RESERVED_SUB = require('gitter-web-validators/lib/reserved-sub-namespaces');
+var RESERVED = require('gitter-web-validators/lib/reserved-namespaces').list;
+var RESERVED_SUB = require('gitter-web-validators/lib/reserved-sub-namespaces').list;
 var assert = require('assert');
 
 function test(name, expected) {

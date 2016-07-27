@@ -1,7 +1,7 @@
 'use strict';
 
 var validateRoomName = require('./validate-room-name');
-var reservedNamespaceHash = require('./reserved-namespaces').hashMap;
+var reservedNamespaceHash = require('./reserved-namespaces').hash;
 var xregexp = require('xregexp').XRegExp;
 
 function validateGroupUri(uri) {
