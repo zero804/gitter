@@ -2,7 +2,10 @@
 
 var assert = require('assert');
 var testRequire = require('../../test-require');
-var assertUtils = require('../../assert-utils')
+var assertUtils = require('../../assert-utils');
+var env = require('gitter-web-env');
+var nconf = env.config;
+var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var serialize = testRequire('./serializers/serialize');
 var TroupeStrategy = testRequire('./serializers/rest/troupe-strategy');
@@ -51,6 +54,7 @@ describe('TroupeStrategy', function() {
           id: t.id,
           name: t.uri,
           topic: '',
+          avatarUrl: nconf.get('avatar:officialHost') + '/gh/u/' + t.uri,
           uri: t.uri,
           oneToOne: false,
           userCount: 1,
@@ -73,6 +77,7 @@ describe('TroupeStrategy', function() {
           id: t.id,
           name: t.uri,
           topic: '',
+          avatarUrl: nconf.get('avatar:officialHost') + '/gh/u/' + t.uri,
           uri: t.uri,
           oneToOne: false,
           userCount: 1,
@@ -120,6 +125,7 @@ describe('TroupeStrategy', function() {
           id: t.id,
           name: u2.displayName,
           topic: '',
+          avatarUrl: nconf.get('avatar:officialHost') + '/default',
           uri: t.uri,
           oneToOne: true,
           userCount: 2,
@@ -158,6 +164,7 @@ describe('TroupeStrategy', function() {
           id: t.id,
           name: t.uri,
           topic: '',
+          avatarUrl: nconf.get('avatar:officialHost') + '/gh/u/' + t.uri,
           uri: t.uri,
           oneToOne: false,
           userCount: 1,
@@ -186,6 +193,7 @@ describe('TroupeStrategy', function() {
           id: t.id,
           name: t.uri,
           topic: '',
+          avatarUrl: nconf.get('avatar:officialHost') + '/gh/u/' + t.uri,
           uri: t.uri,
           oneToOne: false,
           userCount: 1,
@@ -221,6 +229,7 @@ describe('TroupeStrategy', function() {
           id: t.id,
           name: t.uri,
           topic: '',
+          avatarUrl: nconf.get('avatar:officialHost') + '/gh/u/' + t.uri,
           uri: t.uri,
           oneToOne: false,
           userCount: 1,
@@ -243,6 +252,7 @@ describe('TroupeStrategy', function() {
           id: t.id,
           name: t.uri,
           topic: '',
+          avatarUrl: nconf.get('avatar:officialHost') + '/gh/u/' + t.uri,
           uri: t.uri,
           oneToOne: false,
           userCount: 1,
