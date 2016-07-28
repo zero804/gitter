@@ -255,6 +255,7 @@
     "keymaster": "^1.6.2",
     "lcov-result-merger": "^1.0.2",
     "less": "^2.6.1",
+    "less-loader": "^2.2.3",
     "live-reload": "^1.1.0",
     "lorem-ipsum": "^1.0.1",
     "matcha": "^0.6.0",
