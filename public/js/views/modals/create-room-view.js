@@ -273,6 +273,17 @@ var CreateRoomView = Marionette.LayoutView.extend({
   onGroupIdChange: function() {
     var previousGroup = this.getGroupFromId(this.model.previous('groupId'));
 
+    var roomName = this.model.get('roomName');
+    var associatedGithubProject = this.model.get('associatedGithubProject');
+    // Reset the room name if unchanged from the same as the associated GitHub project
+    if(associatedGithubProject && getRoomNameFromTroupeName(associatedGithubProject.get('name')) === roomName) {
+      this.model.set('roomName', '');
+    }
+    // Reset the associated project on group change
+    this.model.set('associatedGithubProject', null);
+
+
+
     this.filterReposForSelectedGroup();
     // Don't run this on the initial group filling because it adds unnecessary error texts to the user
     if(previousGroup) {
