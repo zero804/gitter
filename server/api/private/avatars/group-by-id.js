@@ -2,6 +2,7 @@
 
 var Group = require('gitter-web-persistence').Group;
 var url = require('url');
+var avatars = require('gitter-web-avatars');
 
 var KNOWN_AVATAR_SIZES = [
   22,
@@ -84,7 +85,12 @@ module.exports = function(groupId, size, isVersioned) {
       var type = group.sd && group.sd.type;
       var linkPath = group.sd && group.sd.linkPath;
 
-      if (!linkPath) return null;
+      if (!linkPath) {
+        return {
+          url: avatars.getDefault(),
+          longTermCachable: !!isVersioned
+        };
+      }
 
       var githubUsername;
 
@@ -98,7 +104,12 @@ module.exports = function(groupId, size, isVersioned) {
           githubUsername = linkPath.split('/')[0];
       }
 
-      if (!githubUsername) return null;
+      if (!githubUsername) {
+        return {
+          url: avatars.getDefault(),
+          longTermCachable: !!isVersioned
+        };
+      }
 
       return {
         url: 'https://avatars.githubusercontent.com/' + githubUsername + '?s=' + size,

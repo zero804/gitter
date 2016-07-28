@@ -5,6 +5,7 @@ var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 var fixMongoIdQueryParam = require('../../../web/fix-mongo-id-query-param');
 var Promise = require('bluebird');
+var cdn = require('gitter-web-cdn');
 var githubUserByUsernameVersioned = require('./github-user-by-username-versioned');
 var githubUserByUsername = require('./github-user-by-username');
 var gravatarByEmail = require('./gravatar-by-email');
@@ -71,6 +72,18 @@ function sendAvatar(callback) {
       .catch(next);
   }
 }
+
+/**
+ * Default for development environment
+ */
+router.get('/default',
+  identifyRoute('api-private-avatar-default'),
+  sendAvatar(function(/*req, size*/) {
+    return {
+      url: cdn('images/avatar-fallback.png'),
+      longTermCachable: true
+    };
+  }));
 
 /**
  * Group Avatars, by ID
