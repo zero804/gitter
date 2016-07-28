@@ -2,8 +2,7 @@
 @import "homepage-mobile.less";
 @import "colors.less";
 @import "logo.less";
-@import (less) "../fonts/fontello/css/fontello.css";
-@import (less) "../fonts/octicons/octicons.css";
+@import "typography.less";
 
 @import "./mixins/text/button-text.less";
 @import "./components/home-team-list.less";
@@ -101,7 +100,8 @@ a {
 /**
  *   Type
  */
-* {
+body,
+.fonts-loaded.fonts-loaded body {
 // body, input, textarea, button, select, .btn, #pricing-panel b {
   font-family: proxima-nova-alt, "Proxima Nova Alt", sans-serif;
 }
@@ -394,9 +394,10 @@ h1:after, h2:after {
 }
 
 #intro-panel .map {
-  position: relative;
-  float: right;
-  margin: 150px -50px 0 0;
+  z-index: -1;
+  position: absolute;
+  right: -50px;
+  top: 90px;
 }
 
 #intro-panel .msg {
@@ -477,7 +478,6 @@ h1:after, h2:after {
 #intro-panel h1 {
   margin-top: 100px;
   margin-bottom: 60px;
-  width: 500px;
 
   font-size: 60px;
   line-height: 72px;
@@ -524,16 +524,20 @@ h1:after, h2:after {
   margin-bottom: 20px;
 }
 
+
 #intro-panel ul {
-  padding: 50px 0 30px;
   display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
   width: 100%;
+  padding: 50px 0 30px;
 }
 
 #intro-panel li {
   position: relative;
+  flex: 1;
 
-  padding: 0 55px 0 115px;
+  padding-right: 55px;
 }
 
 #intro-panel li:last-child {
@@ -548,7 +552,6 @@ h1:after, h2:after {
 
 #intro-panel ul span {
   display: inline-block;
-  width: 210px;
 
   font-size: 16px;
   line-height: 25px;
@@ -563,6 +566,20 @@ h1:after, h2:after {
     color: inherit;
     border-bottom: 1px solid rgba(255,255,255,0.2);
   }
+}
+
+.intro-panel-cta-button-block {
+  white-space: nowrap;
+
+  @media (max-width: 1200px) {
+    white-space: normal;
+  }
+}
+
+.intro-panel-button {
+  margin-bottom: 2rem;
+  margin-right: 2.4rem;
+  text-decoration: none;
 }
 
 .site-nav {
@@ -614,6 +631,49 @@ h1:after, h2:after {
 
   background: rgba(0,0,0,.2);
 }
+
+
+
+
+/**
+ *   Trusted by panel
+ */
+
+#trusted-by-panel {
+  padding-top: 50px;
+  padding-bottom: 50px;
+}
+
+.trusted-by-heading {
+  color: #726c61;
+}
+
+.trusted-by-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-left: 0;
+  list-style: none;
+}
+
+.trusted-by-list-item {
+  flex-basis: 16rem;
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+
+.trusted-by-list-item--smaller {
+  .trusted-by-list-item();
+  flex-basis: 14rem;
+}
+
+.trusted-by-list-item-logo {
+  width: 100%;
+  height: auto;
+}
+
 
 
 
@@ -745,7 +805,8 @@ h1:after, h2:after {
   opacity: 1;
 }
 
-#testimonials-panel img {
+.testimonial-image-wrapper {
+  overflow: hidden;
   position: absolute;
   left: -150px;
   top: 0;
@@ -754,6 +815,11 @@ h1:after, h2:after {
   height: 100px;
 
   border-radius: 6px;
+
+  & > img {
+    width: 100%;
+    height: auto;
+  }
 }
 
 #testimonials-panel cite {
@@ -812,7 +878,6 @@ h1:after, h2:after {
 .pricing-panel__heading {
   color: #fff;
   font-size: 46px;
-  margin-bottom: 75px;
 }
 
 .pricing-panel__price-plans {
@@ -853,10 +918,14 @@ h1:after, h2:after {
 .price-plan__name {
   margin-bottom: 15px;
 
-  opacity: 0.8;
+  color: rgba(255, 255, 255, .7);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 2px;
+}
+
+.price-plan__name-highlight {
+  color: rgba(255, 255, 255, 1);
 }
 
 .price-plan__price {
@@ -868,6 +937,28 @@ h1:after, h2:after {
   font-family: DP,sans-serif;
   font-weight: 400;
   letter-spacing: -1px;
+}
+
+.price-plan__price-inner {
+  position: relative;
+  display: inline-block;
+}
+
+.price-plan__price-sub-note {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: .4em;
+  transform: translateX(-105%);
+
+  display: flex;
+  align-items: flex-end;
+
+  opacity: 0.4;
+  font-size: 12px;
+  line-height: 1;
+  font-style: italic;
+  letter-spacing: 2px;
 }
 
 .price-plan__units {
@@ -899,9 +990,14 @@ h1:after, h2:after {
   color: #c2b9bd
 }
 
+.pricing-panel__paragraph {
+  margin-top: 50px;
+  margin-bottom: 50px;
+  color: rgba(255, 255, 255, .75);
+}
+
 .pricing-panel__fine-print {
-  color: white;
-  opacity: 0.4;
+  color: rgba(255, 255, 255, .4);
 }
 
 .pricing-panel__fine-print a {
@@ -984,14 +1080,12 @@ footer h1 {
 }
 
 footer {
-  padding-bottom: 0;
+  padding-bottom: 40px;
 }
 
 /* actual footer */
 footer small {
   display: block;
-  margin-top: 60px;
-  padding: 40px 0;
 
   clear: both;
   overflow: hidden;

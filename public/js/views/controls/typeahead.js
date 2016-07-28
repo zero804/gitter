@@ -11,21 +11,27 @@ var TypeaheadView = Marionette.ItemView.extend({
     'keyup': 'keyup'
   },
   initialize: function(options) {
+    this.disableListenToChange = options.disableListenToChange;
+    this.longDebounce = options.longDebounce;
+    this.shortDebounce = options.shortDebounce;
+
     if(!this.collection) {
       this.collection = new Backbone.Collection();
     }
 
-    // fix for first typeahead suggestion not triggering
-    // the dropdown to show
-    //
-    // if dropdown.show() is called on every add, then you
-    // get weird duplicates in the collectionView (!)
-    //
-    // tbh, dropdown's support for live typeaheads and static menus
-    // does not mix well.
-    this.listenToOnce(this.collection, 'add', function() {
-      if (this.dropdown) this.dropdown.show();
-    });
+    if(!options.disableShowOnAdd) {
+      // fix for first typeahead suggestion not triggering
+      // the dropdown to show
+      //
+      // if dropdown.show() is called on every add, then you
+      // get weird duplicates in the collectionView (!)
+      //
+      // tbh, dropdown's support for live typeaheads and static menus
+      // does not mix well.
+      this.listenToOnce(this.collection, 'add', function() {
+        this.show();
+      });
+    }
 
     // May not exist
     this.autoSelector = options.autoSelector;
@@ -48,26 +54,33 @@ var TypeaheadView = Marionette.ItemView.extend({
   },
 
   show: function() {
-    if(this.lastFetchInput === undefined) {
-      this.searchTextChanged(this.el.value);
+    if (this.dropdown) {
+      this.dropdown.show();
     }
-
-    this.dropdown.show();
   },
 
   hide: function() {
-    this.dropdown.hide();
+    if (this.dropdown) {
+      this.dropdown.hide();
+    }
   },
 
   attach: function() {
     if(this.dropdown) return;
-    liveSearch(this, this.$el, 'searchTextChanged', { immediate: 'autoSelect' });
+    liveSearch(this, this.$el, 'searchTextChanged', {
+      immediate: 'autoSelect',
+      disableListenToChange: this.disableListenToChange,
+      longDebounce: this.longDebounce,
+      shortDebounce: this.shortDebounce
+    });
 
     this.dropdown = new Dropdown({
       collection: this.collection,
       itemTemplate: this.options.itemTemplate,
       itemSerializeData: this.options.itemSerializeData,
-      targetElement: this.el
+      targetElement: this.el,
+      dropdownClass: this.options.dropdownClass,
+      backdropClass: this.options.backdropClass
     });
 
     this.listenTo(this.dropdown, 'selected', this.selected);
@@ -85,6 +98,10 @@ var TypeaheadView = Marionette.ItemView.extend({
     this.trigger('selected', m);
   },
 
+  active: function() {
+    return this.dropdown.active();
+  },
+
   autoSelect: function() {
     var input = this.el.value;
 
@@ -98,10 +115,6 @@ var TypeaheadView = Marionette.ItemView.extend({
 
     var matches = this.collection.filter(predicate);
     if(matches.length === 0) return;
-    if(matches.length === 1) {
-      this.dropdown.setActive(matches[0]);
-      return;
-    }
 
     this.dropdown.setActive(matches[0]);
   },
@@ -117,7 +130,7 @@ var TypeaheadView = Marionette.ItemView.extend({
       this.collection.fetch({ data: { q: input }}, { add: true, remove: true, merge: true, success: fetchSuccess });
     }
 
-    this.dropdown.show();
+    this.show();
   },
 
   keydown: function(e) {
@@ -134,7 +147,7 @@ var TypeaheadView = Marionette.ItemView.extend({
         if(this.dropdown.active()) {
           this.dropdown.selectNext();
         } else {
-          this.dropdown.show();
+          this.show();
         }
         break;
 
@@ -144,7 +157,7 @@ var TypeaheadView = Marionette.ItemView.extend({
           return;
         }
 
-        this.dropdown.hide();
+        this.hide();
         break;
 
       default:

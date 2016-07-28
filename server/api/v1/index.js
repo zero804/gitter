@@ -1,9 +1,12 @@
 "use strict";
 
+var env = require('gitter-web-env');
 var express = require('express');
 var resourceRoute = require('../../web/resource-route-generator');
 var authMiddleware = require('../../web/middlewares/auth-api');
 var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
+
+var nconf = env.config;
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
@@ -12,18 +15,26 @@ router.use('/rooms', authMiddleware);
 router.use('/users', authMiddleware);
 router.use('/orgs', authMiddleware);
 router.use('/groups', authMiddleware);
+if(nconf.get('topics:useApi')) {
+  router.use('/forums', authMiddleware);
+}
 
 var userResources = resourceRoute('api-user', require('./user'));
 var roomsResources = resourceRoute('api-rooms', require('./rooms'));
 var usersResources = resourceRoute('api-rooms', require('./users'));
 var orgResources = resourceRoute('api-orgs', require('./orgs'));
 var groupsResources = resourceRoute('groups-orgs', require('./groups'));
+var forumsResources = resourceRoute('api-forums', require('./forums'));
 
 router.use('/user', userResources);
 router.use('/rooms', roomsResources);
 router.use('/users', usersResources);
 router.use('/orgs', orgResources);
 router.use('/groups', groupsResources);
+
+if(nconf.get('topics:useApi')) {
+  router.use('/forums', forumsResources);
+}
 
 // APN has no auth requirement as user may not have authenticated
 // and this is used for devices without users

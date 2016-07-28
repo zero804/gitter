@@ -1,4 +1,3 @@
-/* eslint-enable */
 'use strict';
 
 var path = require('path');
@@ -6,6 +5,7 @@ var simpleGit = require('simple-git')();
 var parse = require('parse-diff');
 var es = require('event-stream');
 var vinylFile = require('vinyl-file');
+var Promise = require('bluebird');
 
 function filterFiles(baseBranch) {
   var changedPromise = new Promise(function(resolve, reject) {

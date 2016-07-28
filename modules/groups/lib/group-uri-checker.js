@@ -29,7 +29,7 @@ function checkLocalUri(uri) {
   */
   return Group.findOne({ lcUri: uri.toLowerCase() }).exec()
     .then(function(group) {
-      debug("group: %s", !!group);
+      debug("group for %s: %s", uri.toLowerCase(), !!group);
       return !!group;
     });
 }

@@ -1,7 +1,8 @@
+'use strict';
+
 var Promise = require('bluebird');
 var _ = require('underscore');
 var path = require('path');
-var url = require('url');
 
 var EventEmitter = require('events').EventEmitter;
 var chokidar = require('chokidar');
@@ -74,6 +75,7 @@ LessWatcher.prototype.startWatching = function(/*optional*/newWatchGlob) {
   var affectedEmitter = this.affectedEmitter;
 
   this.getDepMap()
+    .bind(this)
     .then(function(depMap) {
       //console.log('depMap', depMap);
       console.log('depMap has ' + Object.keys(depMap).length + ' keys.');

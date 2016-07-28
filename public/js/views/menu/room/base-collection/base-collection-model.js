@@ -35,6 +35,7 @@ module.exports = Backbone.Model.extend({
       case 'people':
         this.onPeople();
         break;
+      case 'temp-org':
       case 'org':
         this.onOrg();
         break;

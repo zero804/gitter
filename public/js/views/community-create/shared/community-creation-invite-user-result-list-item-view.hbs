@@ -1,5 +1,20 @@
-<a href="{{ absoluteUri }}" class="community-create-invite-user-result-list-item-link" target="_blank">
-  <img class="community-create-invite-user-result-list-item-avatar" {{{ avatarSrcSet avatarUrl 44 }}}>
+<a
+  href="{{ absoluteUri }}"
+  class="community-create-invite-user-result-list-item-link"
+  target="_blank"
+  data-vendor-username="{{ vendorUsername }}"
+  data-vendor-type="{{ type }}">
+  {{!-- TODO: Only use avatarUrl when user?q has avatarUrl --}}
+  {{#if avatarUrl}}
+    <img class="community-create-invite-user-result-list-item-avatar" {{{ avatarSrcSet avatarUrl 44 }}}>
+  {{else if avatarSrcset}}
+    <img
+      class="community-create-invite-user-result-list-item-avatar"
+      src="{{ avatarSrcset.src }}"
+      srcset="{{ avatarSrcset.srcset }}"
+      height="{{ avatarSrcset.size }}"
+      width="{{ avatarSrcset.size }}" />
+  {{/if}}
   <span class="community-create-invite-user-result-list-item-name">
     {{ displayName }}
   </span>

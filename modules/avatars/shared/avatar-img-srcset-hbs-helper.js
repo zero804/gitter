@@ -1,5 +1,6 @@
 'use strict';
 
+var urlParse = require('url-parse');
 var avatars = require('..');
 
 function avatarImgSrcSetHbsHelper(avatarServerUrl, size) {
@@ -7,8 +8,14 @@ function avatarImgSrcSetHbsHelper(avatarServerUrl, size) {
     return " height='" + size + "' width='" + size + "' src='" + avatars.getDefault() + "'";
   }
 
-  var src = avatarServerUrl + '?s=' + size;
-  var srcset = avatarServerUrl + '?s=' + (size * 2) + ' 2x';
+  var parsedAvatarServerUrl = urlParse(avatarServerUrl , true);
+  parsedAvatarServerUrl.query.s = size;
+
+  var parsedAvatarServerUrlSrcSet = urlParse(avatarServerUrl , true);
+  parsedAvatarServerUrlSrcSet.query.s = 2 * size;
+
+  var src = parsedAvatarServerUrl.toString();
+  var srcset = parsedAvatarServerUrlSrcSet.toString() + ' 2x';
 
   return " height='" + size + "' width='" + size + "' src='" + src + "' srcset='" + srcset + "' ";
 }
