@@ -6,6 +6,7 @@ var fastdom = require('fastdom');
 var toggleClass = require('utils/toggle-class');
 var cocktail = require('cocktail');
 var KeyboardEventMixin = require('views/keyboard-events-mixin');
+var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
 
 
 var HeaderView = Marionette.ItemView.extend({
@@ -21,8 +22,8 @@ var HeaderView = Marionette.ItemView.extend({
   },
 
   modelEvents: {
-    'change:state':                'updateActiveElement',
-    'change:selectedOrgName':      'render',
+    'change:state': 'updateActiveElement',
+    'change:groupId': 'render',
     'change:profileMenuOpenState': 'onProfileToggle',
   },
 
@@ -44,10 +45,17 @@ var HeaderView = Marionette.ItemView.extend({
     profileToggle:   '#panel-header-profile-toggle',
   },
 
+  initialize: function(attrs) {
+    this.groupsCollection = attrs.groupsCollection;
+  },
+
   serializeData: function() {
-    return {
-      orgName:    this.model.get('selectedOrgName'),
-    };
+    var groupId = this.model.get('groupId');
+    var selectedGroup = this.groupsCollection.get(groupId);
+    var name = '';
+    if(selectedGroup) { name = selectedGroup.get('name'); }
+    else { name = getOrgNameFromUri(document.location.pathname); }
+    return { groupName: name, };
   },
 
   updateActiveElement: function(model, state) { //jshint unused: true
@@ -59,7 +67,7 @@ var HeaderView = Marionette.ItemView.extend({
         toggleClass(this.ui.headerSearch[0], 'active', state === 'search');
         toggleClass(this.ui.headerFavourite[0], 'active', state === 'favourite');
         toggleClass(this.ui.headerPeople[0], 'active', state === 'people');
-        toggleClass(this.ui.headerOrg[0], 'active', state === 'org');
+        toggleClass(this.ui.headerOrg[0], 'active', (state === 'org' || state === 'temp-org'));
       }.bind(this));
     }.bind(this));
   },

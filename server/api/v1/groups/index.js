@@ -175,6 +175,7 @@ module.exports = {
 
   subresources: {
     'rooms': require('./rooms'),
+    'suggestedRooms': require('./suggested-rooms')
   }
 
 };

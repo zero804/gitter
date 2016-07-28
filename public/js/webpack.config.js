@@ -36,6 +36,7 @@ var webpackConfig = {
     "mobile-native-userhome": path.resolve(path.join(__dirname, "./mobile-native-userhome")),
     "router-home-learn": path.resolve(path.join(__dirname, './router-home-learn')),
     "early-bird": path.resolve(path.join(__dirname, './early-bird')),
+    "topics-bootstrap": path.resolve(path.join(__dirname, './topics-bootstrap')),
 
     vendor: [
       'utils/webpack',
@@ -51,7 +52,9 @@ var webpackConfig = {
       'raven-js',
       'keymaster',
       'moment',
-      'bluebird'
+      'bluebird',
+      'fuzzysearch',
+      'url-join'
     ]
   },
   output: {
@@ -90,6 +93,7 @@ var webpackConfig = {
       "utils": path.resolve(path.join(__dirname, "/utils/")),
       // "shared": path.resolve(path.join(__dirname, "../../shared/")),
       "views": path.resolve(path.join(__dirname, "./views/")),
+      "models": path.resolve(path.join(__dirname, "./models")),
       "collections": path.resolve(path.join(__dirname, "./collections")),
       "components": path.resolve(path.join(__dirname, "./components")),
       "template": path.resolve(path.join(__dirname, "./template")),

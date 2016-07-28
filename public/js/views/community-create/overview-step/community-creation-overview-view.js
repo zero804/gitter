@@ -105,7 +105,8 @@ module.exports = CommunityCreateBaseStepView.extend({
           type: type,
           linkPath: linkPath
         },
-        invites: [].concat(communityCreateModel.peopleToInvite.toJSON(), communityCreateModel.emailsToInvite.toJSON())
+        invites: [].concat(communityCreateModel.peopleToInvite.toJSON(), communityCreateModel.emailsToInvite.toJSON()),
+        addBadge: communityCreateModel.get('allowBadger')
       }, {
         wait: true,
         success: function(model, response) {
@@ -121,16 +122,16 @@ module.exports = CommunityCreateBaseStepView.extend({
       var defaultRoomName = results && results.defaultRoom && results.defaultRoom.name;
       var defaultRoomUri = results && results.defaultRoom && results.defaultRoom.uri;
 
+      // Hide create community
+      communityCreateModel.set('active', false);
+
       // Move to the default room
       appEvents.trigger('navigation', '/' + defaultRoomUri, 'chat', defaultRoomName);
       // Select the new community in the new left menu
       appEvents.trigger('left-menu-menu-bar:activate', {
         state: 'org',
-        selectedOrgName: results.name
+        groupId: results.id
       });
-      // Hide create community
-      //communityCreateModel.set('active', false);
-      communityCreateModel.clear().set(communityCreateModel.defaults);
     });
 
   },

@@ -14,8 +14,8 @@ describe('KeyboardControllerView', function(){
   beforeEach(function(){
     model = new Backbone.Model();
     model.minibarCollection = new Backbone.Collection([
-      { type: 'org', name: 'troupe' },
-      { type: 'org', name: 'gitterHQ' },
+      { type: 'org', name: 'troupe', id: 1 },
+      { type: 'org', name: 'gitterHQ', id: 2 },
     ]);
 
 
@@ -100,18 +100,18 @@ describe('KeyboardControllerView', function(){
     });
 
     it('should select the right org item on a room event > 3', function(){
-      appEvents.trigger('keyboard.room.4', { key: 4 });
+      appEvents.trigger('keyboard.room.4', { key: 4, code: 'Digit4' });
       assert(model.minibarCollection.at(0).get('focus'));
-      appEvents.trigger('keyboard.room.5', { key: 5 });
+      appEvents.trigger('keyboard.room.5', { key: 5, code: 'Digit5' });
       assert(model.minibarCollection.at(1).get('focus'));
     });
 
-    it('should set the correct org state and selectedOrg name on room event > 3', function(){
-      appEvents.trigger('keyboard.room.4', { key: 4 });
+    it('should set the correct org state and groupId on room event > 3', function(){
+      appEvents.trigger('keyboard.room.4', { key: 4, code: 'Digit4' });
       assert.equal(model.get('state'), 'org');
-      assert.equal(model.get('selectedOrgName'), 'troupe');
-      appEvents.trigger('keyboard.room.5', { key: 5 });
-      assert.equal(model.get('selectedOrgName'), 'gitterHQ');
+      assert.equal(model.get('groupId'), 1);
+      appEvents.trigger('keyboard.room.5', { key: 5, code: 'Digit5' });
+      assert.equal(model.get('groupId'), 2);
     });
 
     it('should focus change menu state to search on cmd+s', function(){
@@ -128,7 +128,7 @@ describe('KeyboardControllerView', function(){
     it('should focus the minibarTempOrgIcon when it is not hidden and room.4 is pressed', function(){
       view.blurAllItems();
       model.minibarTempOrgModel.set('hidden', false);
-      appEvents.trigger('keyboard.room.4', { key: 4 });
+      appEvents.trigger('keyboard.room.4', { key: 4, code: 'Digit4' });
       assert(model.minibarTempOrgModel.get('focus'));
     });
 
@@ -136,14 +136,14 @@ describe('KeyboardControllerView', function(){
 
   describe('arrow key movement', function(){
     it('it should focus the next minibar item when down is pressed', function(){
-      appEvents.trigger('keyboard.room.4', { key: 4 });
+      appEvents.trigger('keyboard.room.4', { key: 4, code: 'Digit4' });
       appEvents.trigger('keyboard.room.down');
       assert(model.minibarCollection.at(1).get('focus'));
       assert.equal(model.minibarCollection.at(0).get('focus'), false);
     });
 
     it('it should focus the first minibar item when down is pressed and the last item is focused', function(){
-      appEvents.trigger('keyboard.room.5', { key: 5 });
+      appEvents.trigger('keyboard.room.5', { key: 5, code: 'Digit5' });
       appEvents.trigger('keyboard.room.down');
       assert(model.minibarCloseModel.get('focus'));
       assert.equal(model.minibarCollection.at(1).get('focus'), false);
@@ -163,7 +163,7 @@ describe('KeyboardControllerView', function(){
     });
 
     it('it should focus the previous minibar item when up is pressed', function(){
-      appEvents.trigger('keyboard.room.4', { key: 4 });
+      appEvents.trigger('keyboard.room.4', { key: 4, code: 'Digit4' });
       appEvents.trigger('keyboard.room.up');
       assert(model.minibarPeopleModel.get('focus'));
       assert.equal(model.minibarCollection.at(0).get('focus'), false);
@@ -339,13 +339,13 @@ describe('KeyboardControllerView', function(){
     });
 
     it('should focus the close button after the last org item', function(){
-      appEvents.trigger('keyboard.room.5', { key: 5 });
+      appEvents.trigger('keyboard.room.5', { key: 5, code: 'Digit5' });
       appEvents.trigger('keyboard.room.tab');
       assert(model.minibarCloseModel.get('focus'));
     });
 
     it('should focus on people if the first minibar org item is in focus and shit-tab is pressed', function(){
-      appEvents.trigger('keyboard.room.4', { key: 4 });
+      appEvents.trigger('keyboard.room.4', { key: 4, code: 'Digit4' });
       assert(model.minibarCollection.at(0).get('focus'));
       appEvents.trigger('keyboard.room.prev.tab');
       assert(model.minibarPeopleModel.get('focus'));
@@ -385,8 +385,8 @@ describe('KeyboardControllerView', function(){
     it('should blur the previously selected minibar item', function(){
       appEvents.trigger('keyboard.room.1');
       appEvents.trigger('keyboard.room.2');
-      appEvents.trigger('keyboard.room.4', { key: 4 });
-      appEvents.trigger('keyboard.room.5', { key: 5 });
+      appEvents.trigger('keyboard.room.4', { key: 4, code: 'Digit4' });
+      appEvents.trigger('keyboard.room.5', { key: 5, code: 'Digit5' });
       var items = model.minibarCollection.where({ focus: true });
       assert.equal(items.length, 1);
     });

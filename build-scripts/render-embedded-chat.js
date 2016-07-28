@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 "use strict";
 
-var express       = require('express');
-var fs            = require('fs');
-var expressHbs    = require('express-hbs');
+var express = require('express');
+var fs = require('fs');
+var expressHbs = require('express-hbs');
 var resolveStatic = require('../server/web/resolve-static');
 
 var opts = require('yargs')
