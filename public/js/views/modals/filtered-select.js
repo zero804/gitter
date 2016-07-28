@@ -17,6 +17,7 @@ var FilteredSelect = Marionette.ItemView.extend({
     this.filter = options.filter;
     this.collection = options.collection;
     this.itemTemplate = options.itemTemplate;
+    this.dropdownClass = options.dropdownClass;
     this.showOnActivate = options.showOnActivate;
 
     this.filteredCollection = new FilteredCollection({
@@ -32,6 +33,7 @@ var FilteredSelect = Marionette.ItemView.extend({
       shortDebounce: 50,
       collection: this.filteredCollection,
       itemTemplate: this.itemTemplate,
+      dropdownClass: this.dropdownClass,
       fetch: this.refilter.bind(this),
       autoSelector: function(input) {
         return function(model) {
