@@ -122,6 +122,9 @@ module.exports = CommunityCreateBaseStepView.extend({
       var defaultRoomName = results && results.defaultRoom && results.defaultRoom.name;
       var defaultRoomUri = results && results.defaultRoom && results.defaultRoom.uri;
 
+      // Hide create community
+      communityCreateModel.set('active', false);
+
       // Move to the default room
       appEvents.trigger('navigation', '/' + defaultRoomUri, 'chat', defaultRoomName);
       // Select the new community in the new left menu
@@ -129,9 +132,6 @@ module.exports = CommunityCreateBaseStepView.extend({
         state: 'org',
         groupId: results.id
       });
-      // Hide create community
-      //communityCreateModel.set('active', false);
-      communityCreateModel.clear().set(communityCreateModel.defaults);
     });
 
   },
