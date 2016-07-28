@@ -109,6 +109,8 @@ module.exports = (function() {
 
       this.options = _.extend({}, DEFAULTS, options);
 
+      this.dropdownClass = options.dropdownClass;
+
       /* From the selectable-mixin */
       this.listenTo(this, 'selectClicked', function() {
         this.hide();
@@ -131,6 +133,9 @@ module.exports = (function() {
         zIndex = 100;
       }
       this.el.style.zIndex = zIndex;
+      if(this.dropdownClass) {
+        this.el.classList.add(this.dropdownClass);
+      }
     },
 
     onDestroy: function() {

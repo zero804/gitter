@@ -79,6 +79,7 @@ var TypeaheadView = Marionette.ItemView.extend({
       itemTemplate: this.options.itemTemplate,
       itemSerializeData: this.options.itemSerializeData,
       targetElement: this.el,
+      dropdownClass: this.options.dropdownClass,
       backdropClass: this.options.backdropClass
     });
 
