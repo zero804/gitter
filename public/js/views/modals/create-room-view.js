@@ -95,7 +95,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
     });
 
     this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
-    this.listenToOnce(this.groupsCollection, 'sync', this.selectSuggestedGroup);
+    this.listenToOnce(this.groupsCollection, 'sync', this.selectInitialGroup);
   },
 
   onRender: function() {
@@ -117,7 +117,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
     this.listenTo(this.repoNameTypeahead, 'selected', this.onRepoSelected, this);
     this.listenTo(this.groupSelect, 'selected', this.onGroupSelected, this);
 
-    this.selectSuggestedGroup();
+    this.selectInitialGroup();
 
     this.updateFields();
     this.hasRendered = true;
@@ -273,6 +273,17 @@ var CreateRoomView = Marionette.LayoutView.extend({
   onGroupIdChange: function() {
     var previousGroup = this.getGroupFromId(this.model.previous('groupId'));
 
+    var roomName = this.model.get('roomName');
+    var associatedGithubProject = this.model.get('associatedGithubProject');
+    // Reset the room name if unchanged from the same as the associated GitHub project
+    if(associatedGithubProject && getRoomNameFromTroupeName(associatedGithubProject.get('name')) === roomName) {
+      this.model.set('roomName', '');
+    }
+    // Reset the associated project on group change
+    this.model.set('associatedGithubProject', null);
+
+
+
     this.filterReposForSelectedGroup();
     // Don't run this on the initial group filling because it adds unnecessary error texts to the user
     if(previousGroup) {
@@ -404,7 +415,9 @@ var CreateRoomView = Marionette.LayoutView.extend({
     }
   },
 
-  selectSuggestedGroup: function() {
+  selectInitialGroup: function() {
+    this.filterReposForSelectedGroup();
+
     if(this.groupSelect) {
       var groupId = this.model.get('groupId');
       this.groupSelect.selectGroupId(groupId);
