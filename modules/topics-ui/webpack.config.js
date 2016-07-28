@@ -1,6 +1,8 @@
 "use strict";
 
 var path = require('path');
+var webpack = require('webpack');
+var ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 var config = {
   entry: {
@@ -17,6 +19,11 @@ var config = {
   module: {
     loaders: [
       {
+        test: /.less$/,
+        loader: ExtractTextPlugin.extract('style-loader', 'css-loader!less-loader'),
+        include: path.resolve(__dirname, './browser/less')
+      },
+      {
         test: /\.jsx$/,
         loader: 'babel',
         query: {
@@ -27,7 +34,10 @@ var config = {
         }
       }
     ]
-  }
+  },
+  plugins: [
+    new ExtractTextPlugin("style.css", { allChunks: false })
+  ]
 };
 
 module.exports = config;

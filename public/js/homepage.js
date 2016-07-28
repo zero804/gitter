@@ -177,10 +177,11 @@ function initAppsPanelScrollListener() {
 
 function initMapMessages() {
   //  Make sure we don't randomly generate people in the ocean
+  // Commented out coords are on south america that interfere with the cta buttons
   var coords = shuffle([
-    [64, 113], [150, 142], [194, 222], [345, 221], [275, 70],
+    [64, 113], [150, 142], /*[194, 222],*/ [345, 221], [275, 70],
     [340, 95], [490, 141], [531, 206], [579, 268], [345, 104],
-    [532, 21], [218, 48], [384, 226], [153, 226], [420, 157]
+    [532, 21], [218, 48], [384, 226], /*[153, 226],*/ [420, 157]
   ]);
 
   var $map = $('.map');
