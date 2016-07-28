@@ -108,6 +108,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
       el: this.ui.nameInput[0],
       collection: this.filteredRepoCollection,
       itemTemplate: repoTypeaheadItemTemplate,
+      dropdownClass: 'create-room-repo-name-typeahead-dropdown',
       filter: function(input, model) {
         var mName = model.get('name') || '';
         return fuzzysearch(input.toLowerCase(), mName.toLowerCase());
