@@ -3,10 +3,10 @@
 var Promise = require('bluebird');
 var getForum = require('gitter-web-fake-data').getForum;
 
-function findById() {
+function findByName() {
   return Promise.resolve(getForum());
 }
 
 module.exports = {
-  findById: findById
+  findByName: findByName
 };
