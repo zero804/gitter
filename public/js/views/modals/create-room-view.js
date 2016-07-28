@@ -95,7 +95,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
     });
 
     this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
-    this.listenToOnce(this.groupsCollection, 'sync', this.selectSuggestedGroup);
+    this.listenToOnce(this.groupsCollection, 'sync', this.selectInitialGroup);
   },
 
   onRender: function() {
@@ -117,7 +117,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
     this.listenTo(this.repoNameTypeahead, 'selected', this.onRepoSelected, this);
     this.listenTo(this.groupSelect, 'selected', this.onGroupSelected, this);
 
-    this.selectSuggestedGroup();
+    this.selectInitialGroup();
 
     this.updateFields();
     this.hasRendered = true;
@@ -404,7 +404,9 @@ var CreateRoomView = Marionette.LayoutView.extend({
     }
   },
 
-  selectSuggestedGroup: function() {
+  selectInitialGroup: function() {
+    this.filterReposForSelectedGroup();
+
     if(this.groupSelect) {
       var groupId = this.model.get('groupId');
       this.groupSelect.selectGroupId(groupId);
