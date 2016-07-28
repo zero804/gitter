@@ -32,6 +32,7 @@
     "fflip": "git+https://github.com/suprememoocow/fflip.git#fa77d5d981c2b93279c42305e8fe5632716c06a5",
     "fs-extra": "^0.8.1",
     "gitter-app-version": "file:modules/app-version",
+    "gitter-web-forums": "file:modules/forums",
     "gitter-client-env": "file:modules/client-env",
     "gitter-env": "^0.24.0",
     "gitter-faye": "^1.1.0-e",
