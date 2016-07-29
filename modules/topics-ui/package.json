@@ -5,7 +5,7 @@
   "main": "server/index.js",
   "scripts": {
     "test": "node ./test/fixtures/runner-node.js",
-    "test-watch": "cd ./test && webpack -w & http-server"
+    "test-watch": "webpack -w --config ./test/webpack.config.js & http-server ./test/fixtures"
   },
   "author": "Gitter Team",
   "license": "ISC",

@@ -2,25 +2,28 @@
 
 var assert = require('assert');
 var Backbone = require('backbone');
-var Router = require('../../../../browser/js/routers/index');
+var router = require('../../../../browser/js/routers/index');
 
 describe('Router', function(){
 
-  var router;
   beforeEach(function(){
-    router = new Router();
-    Backbone.History.start({
-      root: '/test/fixtures/',
+    window.location.hash = 'gitterHQ/topics';
+    Backbone.history.start({
       pushState: false,
     });
   });
 
   afterEach(function(){
-    Backbone.History.stop();
+    window.location.hash = '';
+    Backbone.history.stop();
   });
 
   it('should start with the right default route', function(){
+    assert.equal(router.get('route'), 'forum');
+  });
 
+  it('should have the right inital groupName', function(){
+    assert.equal(router.get('groupName'), 'gitterHQ');
   });
 
 });
