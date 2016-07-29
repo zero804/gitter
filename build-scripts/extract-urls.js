@@ -63,7 +63,6 @@ css.eachDecl(function(decl) {
   if (!decl.value) return;
 
   var urls = [];
-  var ttf;
 
   reduceFunctionCall(decl.value, "url", function(value) {
     var m = /^['"]([^'"]*)['"]$/.exec(value);

@@ -13,6 +13,7 @@ var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var moment = require('moment');
 var Promise = require('bluebird');
 var i18nFactory = require('gitter-web-i18n');
+var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
 
 /*
  * Return a nice sane
@@ -181,20 +182,22 @@ module.exports = {
     var emailBasePath = config.get("email:emailBasePath");
     var unsubscribeUrl = emailBasePath + '/settings/unsubscribe/' + hash;
 
-    var isPublic = !!(room && room.security === 'PUBLIC');
-    var isOrg = !!(room && room.security === 'ORG_ROOM');
+    var isPublic = !!(room && securityDescriptorUtils.isPublic(room));
 
     var recipientName = (user.displayName || user.username).split(' ')[0];
-
-    // TODO maybe logic can be better?
-    if (!isPublic && !isOrg) return; // we only want to send emails if the room is a public or an org room
+    var roomSecurityDescription = isPublic ? 'public': 'private';
 
     return emailAddressService(user)
       .then(function (email) {
         var roomUrl = config.get("email:emailBasePath") + '/' + room.uri;
 
         // TODO move the generation of tweet links into it's own function?
-        var twitterURL = (isPublic) ? 'http://twitter.com/intent/tweet?url=' + roomUrl + '&text=' + encodeURIComponent('Join me in the ' + room.uri + ' chat room on Gitter') + '&via=gitchat' : undefined; // if the room is public we shall have a tweet link
+        var twitterURL = (isPublic)
+                          ? 'http://twitter.com/intent/tweet?url=' + roomUrl +
+                            '&text=' +
+                            encodeURIComponent('Join me in the ' + room.uri + ' chat room on Gitter') +
+                            '&via=gitchat'
+                          : undefined; // if the room is public we shall have a tweet link
 
         return mailerService.sendEmail({
           templateFile: "created_room",
@@ -204,16 +207,18 @@ module.exports = {
           subject: "Your new chat room on Gitter",
           tracking: {
             event: 'created_room_email_sent',
-            data: { userId: user.id, email: email }
+            data: {
+              userId: user.id,
+              email: email
+            }
           },
           data: {
             user: user,
             room: room,
             isPublic: isPublic,
-            isOrg: isOrg,
             unsubscribeUrl: unsubscribeUrl,
             recipientName: recipientName,
-            roomType: room.security.toLowerCase(),
+            roomType: roomSecurityDescription,
             roomUri: room.uri,
             roomUrl: roomUrl,
             twitterURL: twitterURL

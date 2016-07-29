@@ -26,7 +26,8 @@ module.exports = BaseItemView.extend({
 
   modelEvents: {
     'change:unreadItems change:mentions change:activity': 'onUnreadUpdate',
-    'change:active': 'onActiveStateUpdate'
+    'change:active': 'onActiveStateUpdate',
+    'change:allHidden': 'onAllRoomsHiddenUpdate'
   },
   events: {
     'click': 'onItemClicked',
@@ -94,8 +95,14 @@ module.exports = BaseItemView.extend({
   },
 
   onRender: function() {
+    this.onAllRoomsHiddenUpdate();
     if(this.roomMenuModel.get('roomMenuIsPinned')) {
       this.onActiveStateUpdate();
     }
   },
+
+  onAllRoomsHiddenUpdate: function() {
+    var allHidden = !!this.model.get('allHidden');
+    toggleClass(this.el, 'hidden', allHidden);
+  }
 });

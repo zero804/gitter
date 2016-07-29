@@ -3,6 +3,7 @@
 var Marionette = require('backbone.marionette');
 var cocktail = require('cocktail');
 var toggleClass = require('utils/toggle-class');
+var appEvents = require('utils/appevents');
 var KeyboardEventMixin = require('views/keyboard-events-mixin');
 
 require('views/behaviors/isomorphic');
@@ -77,7 +78,8 @@ var CommunityCreateView = Marionette.LayoutView.extend({
       model: this.overviewStepViewModel,
       communityCreateModel: this.model,
       orgCollection: this.orgCollection,
-      repoCollection: this.repoCollection
+      repoCollection: this.repoCollection,
+      groupsCollection: this.groupsCollection
     }));
     return this.overviewStepView;
   },
@@ -107,6 +109,8 @@ var CommunityCreateView = Marionette.LayoutView.extend({
       collection: repoCollection
     });
 
+    this.groupsCollection = options.groupsCollection;
+
     this.mainStepViewModel = new CommunityCreatMainStepViewModel({
       communityCreateModel: this.model,
       active: true
@@ -128,6 +132,7 @@ var CommunityCreateView = Marionette.LayoutView.extend({
   onStepChangeState: function() {
     var newStepState = this.model.get('stepState');
 
+    appEvents.trigger('stats.event', 'community.create.active.' + this.model.get('stepState'));
     this.mainStepViewModel.set({ active: newStepState === stepConstants.MAIN });
     this.githubProjectsStepViewModel.set({ active: newStepState === stepConstants.GITHUB_PROJECTS });
     this.invitePeopleStepViewModel.set({ active: newStepState === stepConstants.INVITE });
@@ -135,11 +140,31 @@ var CommunityCreateView = Marionette.LayoutView.extend({
   },
 
   onActiveChange: function() {
+    appEvents.trigger('stats.event', 'community.create.enter');
     toggleClass(this.$el[0], 'active', this.model.get('active'));
   },
 
   closeView: function() {
+    appEvents.trigger('stats.event', 'community.create.exit.' + this.model.get('stepState'));
     this.model.set('active', false);
+    window.location.hash = '#';
+  },
+
+  onRender: function() {
+    this.onActiveChange();
+  },
+
+  show: function() {
+    this.render();
+
+    var rootWrapperElement = document.createElement('div');
+    rootWrapperElement.classList.add('community-create-app-root');
+    rootWrapperElement.appendChild(this.el);
+    document.body.appendChild(rootWrapperElement);
+  },
+
+  navigationalHide: function() {
+    this.closeView();
   }
 });
 

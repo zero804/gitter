@@ -2,7 +2,6 @@
 
 var env = require('gitter-web-env');
 var stats = env.stats;
-var config = env.config;
 var Promise = require('bluebird');
 var Group = require('gitter-web-persistence').Group;
 var Troupe = require('gitter-web-persistence').Troupe;
@@ -61,7 +60,8 @@ function upsertGroup(user, groupInfo, securityDescriptor) {
         stats.event('new_group', {
           uri: uri,
           groupId: group._id,
-          userId: user._id
+          userId: user._id,
+          type: securityDescriptor.type
         });
       }
 
@@ -96,17 +96,10 @@ function checkGroupUri(user, uri, options) {
         throw new StatusError(409, 'User is not allowed to create a group for this URI.');
       }
 
-      var splitsvilleEnabled = config.get('splitsville:enabled');
-      if (!splitsvilleEnabled) {
-        if (info.type === 'GH_ORG') {
-          if (type !== 'GH_ORG' && type !== 'GH_GUESS') {
-            // the frontend code should have prevented you from getting here
-            throw new StatusError(400, 'Group must be type GH_ORG: ' + type);
-          }
-          if (linkPath !== uri) {
-            // the frontend code should have prevented you from getting here
-            throw new StatusError(400, 'Group linkPath must match uri: ' + linkPath);
-          }
+      if (info.type === 'GH_ORG') {
+        if (type !== 'GH_ORG' && type !== 'GH_GUESS') {
+          // the frontend code should have prevented you from getting here
+          throw new StatusError(400, 'Group must be type GH_ORG: ' + type);
         }
       }
     });
@@ -217,92 +210,20 @@ function findRoomsIdForGroup(groupId, userId) {
     });
 }
 
-/**
- * Given an existing room, ensures that the room has a room
- */
-function ensureGroupForRoom(room, user) {
-  if (room.groupId) {
-    return findById(room.groupId);
-  }
-  var githubType = room.githubType;
+function setAvatarForGroup(groupId, url) {
+  var query = { _id: groupId };
 
-  // One-to-one rooms will never have a group
-  if (room.oneToOne || githubType === 'ONETOONE') {
-    return null;
-  }
+  var update = {
+    $set: {
+      avatarUrl: url
+    },
+    $inc: {
+      avatarVersion: 1
+    }
+  };
 
-  var splitUri = room.uri.split('/');
-
-  var groupUri = splitUri[0];
-  var obtainAccessFromGitHubRepo;
-
-  switch(githubType) {
-    case 'REPO':
-      assert.strictEqual(splitUri.length, 2);
-      obtainAccessFromGitHubRepo = room.uri;
-      break;
-
-    case 'REPO_CHANNEL':
-      assert.strictEqual(splitUri.length, 3);
-      obtainAccessFromGitHubRepo = splitUri.slice(0, 2);
-      break;
-
-    case 'ORG':
-      assert.strictEqual(splitUri.length, 1);
-      break;
-
-    case 'USER_CHANNEL':
-    case 'ORG_CHANNEL':
-      assert.strictEqual(splitUri.length, 3);
-      break;
-
-    default:
-      throw new StatusError(500, 'Unknown room type: ' + room.githubType);
-  }
-
-  return findByUri(groupUri)
-    .then(function(group) {
-      if (group) return group;
-
-      return createGroup(user, {
-        type: 'GH_GUESS', // could be a GH_ORG or GH_USER
-        name: groupUri,
-        uri: groupUri,
-        linkPath: groupUri,
-        obtainAccessFromGitHubRepo: obtainAccessFromGitHubRepo
-      });
-    })
-    .tap(function(group) {
-      if (!group) return;
-      var groupId = group._id;
-      room.groupId = groupId;
-
-      return Troupe.update({ _id: room._id }, { $set: { groupId: groupId } })
-        .exec();
-
-      // The room is now part of the group.
-      // TODO: Technically we should issue a live collection update to all the rooms users
-      // but we're going to skip this for now.
-    });
+  return Group.findOneAndUpdate(query, update).exec();
 }
-
-/**
- * A user is creating a channel. They need a group
- */
-function ensureGroupForUser(user) {
-  var groupUri = user.username;
-  return findByUri(groupUri)
-    .then(function(group) {
-      if (group) return group;
-
-      return createGroup(user, {
-        type: 'GH_USER',
-        name: groupUri,
-        uri: groupUri,
-        linkPath: groupUri
-      });
-    });
-  }
 
 module.exports = {
   findByUri: Promise.method(findByUri),
@@ -310,10 +231,9 @@ module.exports = {
   findByIds: findByIds,
   createGroup: Promise.method(createGroup),
   findRoomsIdForGroup: Promise.method(findRoomsIdForGroup),
+  setAvatarForGroup: setAvatarForGroup,
   migration: {
     upsertGroup: upsertGroup,
     ensureGroupForGitHubRoomCreation: ensureGroupForGitHubRoomCreation,
-    ensureGroupForRoom: Promise.method(ensureGroupForRoom),
-    ensureGroupForUser: Promise.method(ensureGroupForUser)
   }
 };

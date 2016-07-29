@@ -25,7 +25,7 @@ if(!opts['nocoverage']) {
 }
 
 module.exports = {
-  entry: glob.sync(path.resolve(__dirname, './specs/**/*-test.js')),
+  entry: path.resolve(__dirname, './fixtures/entry.js'),
   output: {
     path: path.join(__dirname, './fixtures/build'),
     filename: 'test.js',
@@ -44,7 +44,8 @@ module.exports = {
             path.resolve(__dirname, '../../shared/handlebars/helpers')
           ],
           knownHelpers: [
-            'cdn'
+            'cdn',
+            'avatarSrcSet'
           ],
           partialsRootRelative: path.resolve(__dirname, '../../public/templates/partials') + path.sep
         }
@@ -76,6 +77,7 @@ module.exports = {
       'components/apiClient':                               path.resolve(__dirname, './fixtures/helpers/apiclient.js'),
       'utils/appevents':                                    path.resolve(__dirname, './fixtures/helpers/appevents.js'),
       'filtered-collection':                                path.resolve(__dirname, '../../public/repo/filtered-collection/filtered-collection.js'),
+      'gitter-client-env':                                  path.resolve(__dirname, './fixtures/helpers/gitter-client-env.js'),
     },
   },
   node: {

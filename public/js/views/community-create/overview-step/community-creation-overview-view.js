@@ -1,7 +1,9 @@
 'use strict';
 
 var _ = require('underscore');
+var Promise = require('bluebird');
 var toggleClass = require('utils/toggle-class');
+var appEvents = require('utils/appevents');
 var VirtualMultipleCollection = require('../virtual-multiple-collection');
 
 var stepConstants = require('../step-constants');
@@ -50,6 +52,7 @@ module.exports = CommunityCreateBaseStepView.extend({
 
     this.orgCollection = options.orgCollection;
     this.repoCollection = options.repoCollection;
+    this.groupsCollection = options.groupsCollection;
 
     this.inviteCollection = new VirtualMultipleCollection([], {
       backingCollections: [
@@ -74,7 +77,63 @@ module.exports = CommunityCreateBaseStepView.extend({
   },
 
   onStepNext: function() {
-    // TODO: Actually create the community, sub-rooms, and invite the people
+    var communityCreateModel = this.communityCreateModel;
+
+    var type = null;
+    var linkPath = null;
+    var githubOrgId = communityCreateModel.get('githubOrgId');
+    var githubRepoId = communityCreateModel.get('githubRepoId');
+    var githubProjectModel = this.orgCollection.get(githubOrgId) || this.repoCollection.get(githubRepoId);
+    if(githubOrgId && githubProjectModel) {
+      type = 'GH_ORG';
+      linkPath = githubProjectModel.get('name').toLowerCase();
+    }
+    else if(githubRepoId && githubProjectModel) {
+      type = 'GH_REPO';
+      linkPath = githubProjectModel.get('uri');
+    }
+
+    var creatingGroupPromise = new Promise(function(resolve, reject) {
+      this.groupsCollection.create({
+        name: communityCreateModel.get('communityName'),
+        uri: communityCreateModel.get('communitySlug'),
+        type: 'org',
+        // This one is for the left-menu
+        linkPath: linkPath,
+        // This is for POSTing to the API
+        security: {
+          type: type,
+          linkPath: linkPath
+        },
+        invites: [].concat(communityCreateModel.peopleToInvite.toJSON(), communityCreateModel.emailsToInvite.toJSON()),
+        addBadge: communityCreateModel.get('allowBadger')
+      }, {
+        wait: true,
+        success: function(model, response) {
+          resolve(response);
+        },
+        error: function(model, response) {
+          reject(response);
+        }
+      });
+    }.bind(this));
+
+    creatingGroupPromise.then(function(results) {
+      var defaultRoomName = results && results.defaultRoom && results.defaultRoom.name;
+      var defaultRoomUri = results && results.defaultRoom && results.defaultRoom.uri;
+
+      // Move to the default room
+      appEvents.trigger('navigation', '/' + defaultRoomUri, 'chat', defaultRoomName);
+      // Select the new community in the new left menu
+      appEvents.trigger('left-menu-menu-bar:activate', {
+        state: 'org',
+        selectedOrgName: results.name
+      });
+      // Hide create community
+      //communityCreateModel.set('active', false);
+      communityCreateModel.clear().set(communityCreateModel.defaults);
+    });
+
   },
   onStepBack: function() {
     this.communityCreateModel.set('stepState', stepConstants.INVITE);

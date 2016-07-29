@@ -4,8 +4,10 @@ var _ = require('underscore');
 var slugify = require('slug');
 var context = require('utils/context');
 var toggleClass = require('utils/toggle-class');
+var apiClient = require('components/apiClient');
 
 var stepConstants = require('../step-constants');
+var slugAvailabilityStatusConstants = require('../slug-availability-status-constants');
 var template = require('./community-creation-main-view.hbs');
 var CommunityCreateBaseStepView = require('../shared/community-creation-base-step-view');
 
@@ -37,12 +39,15 @@ module.exports = CommunityCreateBaseStepView.extend({
     mainForm: '.js-community-create-main-view-form',
     communityNameInput: '.primary-community-name-input',
     communitySlugInput: '.community-creation-slug-input',
+    communitySlugInputWrapper: '.community-creation-slug-input-wrapper',
     githubProjectLink: '.js-community-create-from-github-project-link',
 
     addAssociatedProjectCopy: '.js-community-create-add-associated-project-copy',
     hasAssociatedProjectCopy: '.js-community-create-has-associated-project-copy',
     associatedProjectLink: '.js-community-create-associated-project-link',
     associatedProjectName: '.js-community-create-associated-project-name',
+    associatedProjectBadgerOption: '.js-community-create-associated-project-badger-option',
+    associatedProjectBadgerOptionInput: '.js-community-create-associated-project-badger-option-input'
   }),
 
   events: _.extend({}, _super.events, {
@@ -50,6 +55,7 @@ module.exports = CommunityCreateBaseStepView.extend({
     'input @ui.communityNameInput': 'onCommunityNameInputChange',
     'input @ui.communitySlugInput': 'onCommunitSlugInputChange',
     'click @ui.githubProjectLink': 'onGitHubProjectLinkActivated',
+    'change @ui.associatedProjectBadgerOptionInput': 'onBadgerInputChange'
   }),
 
   modelEvents: _.extend({}, _super.modelEvents, {
@@ -68,7 +74,8 @@ module.exports = CommunityCreateBaseStepView.extend({
       return provider === 'github';
     });
 
-    this.listenTo(this.communityCreateModel, 'change:communityName change:communitySlug', this.updateCommunityFields, this);
+    this.listenTo(this.communityCreateModel, 'change:communityName change:communitySlug', this.onCommunityInfoChange, this);
+    this.listenTo(this.communityCreateModel, 'change:communitySlugAvailabilityStatus', this.updateSlugAvailabilityStatusIndicator, this);
   },
 
 
@@ -115,6 +122,33 @@ module.exports = CommunityCreateBaseStepView.extend({
     e.stopPropagation();
   },
 
+  onCommunityInfoChange: function() {
+    if(!this.communityCreateModel.get('isUsingExplicitGitHubProject')) {
+      var communitySlug = this.communityCreateModel.get('communitySlug');
+      // TODO: Why does this match the first item always?
+      var matchingOrgItem = this.orgCollection.filter(function(org) {
+        return (org.get('name') || '').toLowerCase() === communitySlug;
+      })[0];
+      var matchingRepoItem = this.repoCollection.filter(function(repo) {
+        return (repo.get('uri') || '').toLowerCase() === communitySlug;
+      })[0];
+      if(matchingOrgItem) {
+        this.communityCreateModel.set('githubOrgId', matchingOrgItem.get('id'));
+        this.communityCreateModel.set('githubRepoId', null);
+      }
+      else if(matchingRepoItem) {
+        this.communityCreateModel.set('githubOrgId', null);
+        this.communityCreateModel.set('githubRepoId', matchingRepoItem.get('id'));
+      }
+      else {
+        this.communityCreateModel.set('githubOrgId', null);
+        this.communityCreateModel.set('githubRepoId', null);
+      }
+    }
+
+    this.updateCommunityFields();
+  },
+
   updateCommunityFields: function() {
     var communityName = this.communityCreateModel.get('communityName');
     var communitySlug = this.communityCreateModel.get('communitySlug');
@@ -128,7 +162,12 @@ module.exports = CommunityCreateBaseStepView.extend({
       this.ui.associatedProjectLink[0].setAttribute('href', githubProjectInfo.url);
       toggleClass(this.ui.addAssociatedProjectCopy[0], 'active', !githubProjectInfo.name);
       toggleClass(this.ui.hasAssociatedProjectCopy[0], 'active', !!githubProjectInfo.name);
+
+      var isBackedByRepo = !!this.communityCreateModel.get('githubRepoId');
+      toggleClass(this.ui.associatedProjectBadgerOption[0], 'active', isBackedByRepo);
     }
+
+    this.checkSlugAvailability();
   },
 
   onCommunityNameInputChange: function() {
@@ -160,5 +199,39 @@ module.exports = CommunityCreateBaseStepView.extend({
     });
 
     this.model.isValid();
+  },
+
+  onBadgerInputChange: function() {
+    this.communityCreateModel.set({
+      allowBadger: this.ui.associatedProjectBadgerOptionInput[0].checked
+    });
+  },
+
+  checkSlugAvailability: _.throttle(function() {
+    var communityCreateModel = this.communityCreateModel;
+    var model = this.model;
+    var slug = communityCreateModel.get('communitySlug');
+
+    communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.PENDING);
+    apiClient.priv.get('/check-group-uri', {
+        uri: slug
+      })
+      .then(function() {
+        communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.AVAILABLE);
+        model.isValid();
+      })
+      .catch(function() {
+        communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.UNAVAILABLE);
+        model.isValid();
+      });
+  }, 300),
+
+
+  updateSlugAvailabilityStatusIndicator: function() {
+    var status = this.communityCreateModel.get('communitySlugAvailabilityStatus');
+
+    this.ui.communitySlugInputWrapper.toggleClass('pending', status === slugAvailabilityStatusConstants.PENDING);
+    this.ui.communitySlugInputWrapper.toggleClass('available', status === slugAvailabilityStatusConstants.AVAILABLE);
+    this.ui.communitySlugInputWrapper.toggleClass('unavailable', status === slugAvailabilityStatusConstants.UNAVAILABLE);
   }
 });

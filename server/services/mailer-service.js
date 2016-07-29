@@ -84,7 +84,6 @@ function unreadNoticationMapping(data) {
 
 function createdRoomMapping(data) {
   var twitterSnippet = data.isPublic ? '<tr><td><br><a href="' + data.twitterURL + '" style="text-decoration: none" target="_blank" class="button-twitter">Share on Twitter</a></td></tr>' : '';
-  var orgNote = data.isOrg ? '<p>Note that only people within your organisation can join this room.</p>' : '';
 
   return {
     NAME:        data.recipientName,
@@ -93,7 +92,7 @@ function createdRoomMapping(data) {
     ROOMURL:     data.roomUrl,
     UNSUB:       data.unsubscribeUrl,
     TWITTERURL:  twitterSnippet,
-    ORGNOTE:     orgNote,
+    ORGNOTE:     '', // No used since splitsville
     ROOMTYPE:    data.roomType,
     LOGOURL:     cdn('images/logo-text-blue-pink.png', {email: true})
   };

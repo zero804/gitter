@@ -29,7 +29,11 @@ describe('group-membership-service', function() {
 
     var fixture = fixtureLoader.setup({
       group1: {},
-      group2: {},
+      group2: {
+        securityDescriptor: {
+          extraAdmins: ['user2']
+        }
+      },
       group3: {},
       user1: {},
       user2: {},
@@ -69,6 +73,32 @@ describe('group-membership-service', function() {
         return groupMembershipService.findGroupsForUser(fixture.user3._id)
           .then(function(groups) {
             assert.strictEqual(groups.length, 0);
+          });
+      });
+    });
+
+    describe('findAdminGroupsForUser', function() {
+      it('should return all the groups for a user, 1', function() {
+        return groupMembershipService.findAdminGroupsForUser(fixture.user1)
+          .then(function(groups) {
+            assert.deepEqual(groups, []);
+          });
+      });
+
+      it('should return all the groups for a user, 2', function() {
+        return groupMembershipService.findAdminGroupsForUser(fixture.user2)
+          .then(function(groups) {
+            assert.strictEqual(groups.length, 1);
+            var g2 = findGroup(groups, fixture.group2._id);
+            assertGroupEqual(g2, fixture.group2);
+          });
+      });
+
+      it('should return all the groups for a user without groups', function() {
+
+        return groupMembershipService.findAdminGroupsForUser(fixture.user3)
+          .then(function(groups) {
+            assert.deepEqual(groups, []);
           });
       });
     });

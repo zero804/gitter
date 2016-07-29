@@ -18,8 +18,9 @@ var debug = require('debug')('gitter:app:app-archive');
 var _ = require('underscore');
 var StatusError = require('statuserror');
 var fonts = require('../../web/fonts');
-var getAvatarUrlForUriContext = require('../../web/get-avatar-url-for-uri-context');
+var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
 var redirectErrorMiddleware = require('../uri-context/redirect-error-middleware');
+var getHeaderViewOptions = require('gitter-web-shared/templates/get-header-view-options');
 
 var ONE_DAY_SECONDS = 60 * 60 * 24; // 1 day
 var ONE_DAY_MILLISECONDS = ONE_DAY_SECONDS * 1000;
@@ -54,6 +55,7 @@ function generateChatTree(chatActivity) {
   //console.log(JSON.stringify(yearMap, null, 2));
 
   // change the nested maps into sorted nested arrays of objects
+  // O(𝑛³) code uphead. Good times.
   var yearArray = [];
   _.each(yearMap, function(monthMap, year) {
     var monthArray = [];
@@ -89,42 +91,31 @@ exports.datesList = [
     }
 
     var roomUrl = '/api/v1/rooms/' + troupe.id;
-    var roomAvatarUrl = getAvatarUrlForUriContext(req.uriContext);
-    var isPrivate = troupe.security !== "PUBLIC";
-
-    var templateContext = {
-      layout: 'archive',
-      user: user,
-      archives: true,
-      bootScriptName: 'router-archive-home',
-      cssFileName: 'styles/router-archive-home.css',
-      troupeTopic: troupe.topic,
-      githubLink: '/' + req.uriContext.uri,
-      troupeName: req.uriContext.uri,
-      isHomePage: true,
-      noindex: troupe.noindex,
-      roomUrl: roomUrl,
-      accessToken: req.accessToken,
-      public: troupe.security === 'PUBLIC',
-      headerView: {
-        // TODO: move all the headerView things in here
-        avatarUrl: roomAvatarUrl
-      },
-      isPrivate: isPrivate,
-      fonts: fonts.getFonts(),
-      hasCachedFonts: fonts.hasCachedFonts(req.cookies),
-    };
 
     return validateRoomForReadOnlyAccess(user, policy)
       .then(function() {
-        return policy.canAdmin();
+        return [policy.canAdmin(), contextGenerator.generateTroupeContext(req)];
       })
-      .then(function(adminAccess) {
-        templateContext.isAdmin = adminAccess
-        return contextGenerator.generateTroupeContext(req)
-      })
-      .then(function(troupeContext) {
-        templateContext.troupeContext = troupeContext;
+      .spread(function(adminAccess, troupeContext) {
+        var templateContext = {
+          layout: 'archive',
+          user: user,
+          archives: true,
+          bootScriptName: 'router-archive-home',
+          cssFileName: 'styles/router-archive-home.css',
+          troupeName: req.uriContext.uri,
+          isHomePage: true,
+          noindex: troupe.noindex,
+          roomUrl: roomUrl,
+          accessToken: req.accessToken,
+          public: securityDescriptorUtils.isPublic(troupe),
+          headerView: getHeaderViewOptions(troupeContext.troupe),
+          fonts: fonts.getFonts(),
+          hasCachedFonts: fonts.hasCachedFonts(req.cookies),
+          isAdmin: adminAccess, // Used by archive.hbs
+          troupeContext: troupeContext
+        };
+
         res.render('archive-home-template', templateContext);
       })
       .catch(next);
@@ -146,47 +137,38 @@ exports.linksList = [
     }
 
     var roomUrl = '/api/v1/rooms/' + troupe.id;
-    var roomAvatarUrl = getAvatarUrlForUriContext(req.uriContext);
-    var isPrivate = troupe.security !== "PUBLIC";
-
-    var templateContext = {
-      layout: 'archive',
-      user: user,
-      archives: true,
-      bootScriptName: 'router-archive-links',
-      cssFileName: 'styles/router-archive-links.css',
-      troupeTopic: troupe.topic,
-      githubLink: '/' + req.uriContext.uri,
-      troupeName: req.uriContext.uri,
-      isHomePage: true,
-      noindex: troupe.noindex,
-      roomUrl: roomUrl,
-      accessToken: req.accessToken,
-      public: troupe.security === 'PUBLIC',
-      headerView: {
-        // TODO: move all the headerView things in here
-        avatarUrl: roomAvatarUrl
-      },
-      isPrivate: isPrivate,
-      fonts: fonts.getFonts(),
-      hasCachedFonts: fonts.hasCachedFonts(req.cookies),
-    };
+    var isPrivate = !securityDescriptorUtils.isPublic(troupe);
 
     return validateRoomForReadOnlyAccess(user, policy)
       .then(function() {
-        return policy.canAdmin();
+        return [
+          policy.canAdmin(),
+          heatmapService.getHeatmapForRoom(troupe.id),
+          contextGenerator.generateTroupeContext(req)
+        ];
       })
-      .then(function(adminAccess) {
-        templateContext.isAdmin = adminAccess
+      .spread(function(adminAccess, chatActivity, troupeContext) {
         // no start, no end, no timezone for now
-        return heatmapService.getHeatmapForRoom(troupe.id)
-      })
-      .then(function(chatActivity) {
-        templateContext.chatTree = generateChatTree(chatActivity);
-        return contextGenerator.generateTroupeContext(req)
-      })
-      .then(function(troupeContext) {
-        templateContext.troupeContext = troupeContext;
+        var templateContext = {
+          layout: 'archive',
+          user: user,
+          archives: true,
+          bootScriptName: 'router-archive-links',
+          cssFileName: 'styles/router-archive-links.css',
+          troupeName: req.uriContext.uri,
+          isHomePage: true,
+          noindex: troupe.noindex,
+          roomUrl: roomUrl,
+          accessToken: req.accessToken,
+          public: securityDescriptorUtils.isPublic(troupe),
+          headerView: getHeaderViewOptions(troupeContext.troupe),
+          isPrivate: isPrivate,
+          fonts: fonts.getFonts(),
+          hasCachedFonts: fonts.hasCachedFonts(req.cookies),
+          troupeContext: troupeContext,
+          isAdmin: adminAccess,
+          chatTree: generateChatTree(chatActivity)
+        };
 
         res.setHeader('Cache-Control', 'public, max-age=' + ONE_DAY_SECONDS);
         res.setHeader('Expires', new Date(Date.now() + ONE_DAY_MILLISECONDS).toUTCString());
@@ -291,8 +273,7 @@ exports.chatArchive = [
             var billingUrl = env.config.get('web:billingBaseUrl') + '/bill/' + req.uriContext.uri.split('/')[0];
             var roomUrl = '/api/v1/rooms/' + troupe.id;
 
-            var roomAvatarUrl = getAvatarUrlForUriContext(req.uriContext);
-            var isPrivate = troupe.security !== "PUBLIC";
+            var isPrivate = !securityDescriptorUtils.isPublic(troupe);
 
             /*
             What I'm trying to do here is: The current day is still in-progress, so
@@ -313,23 +294,18 @@ exports.chatArchive = [
               layout: 'archive',
               archives: true,
               archiveChats: true,
-              isRepo: troupe.githubType === 'REPO',
               bootScriptName: 'router-archive-chat',
               cssFileName: 'styles/router-archive-chat.css',
               githubLink: '/' + req.uriContext.uri,
               user: user,
               troupeContext: troupeContext,
               troupeName: req.uriContext.uri,
-              troupeTopic: troupe.topic,
               chats: burstCalculator(serialized),
               billingUrl: billingUrl,
               noindex: troupe.noindex,
               roomUrl: roomUrl,
               accessToken: req.accessToken,
-              headerView: {
-                // TODO: move all the headerView things in here
-                avatarUrl: roomAvatarUrl
-              },
+              headerView: getHeaderViewOptions(troupeContext.troupe),
               isPrivate: isPrivate,
 
               /* For prerendered archive-navigation-view */

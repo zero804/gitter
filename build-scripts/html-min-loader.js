@@ -1,5 +1,6 @@
+'use strict';
+
 // Loader adding a header
-var path = require("path");
 var htmlclean = require('htmlclean');
 
 module.exports = function(source) {

@@ -2,10 +2,10 @@
 
 var Promise = require('bluebird');
 var assert = require('assert');
-var StatusError = require('statuserror');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
 var proxyquireNoCallThru = require("proxyquire").noCallThru();
+var StatusError = require('statuserror');
 
 // stub out this check because otherwise we end up with a the tests all
 // clashing with the user that's required to have access to create those
@@ -30,7 +30,8 @@ describe('group-service', function() {
             { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
             { lcUri: fixtureLoader.GITTER_INTEGRATION_REPO.toLowerCase() },
             { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() },
-            { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() }
+            { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() },
+            { lcUri: 'bob' }
           ],
         },
         user1: {
@@ -95,18 +96,20 @@ describe('group-service', function() {
       });
 
       it('should create a group for an unknown GitHub owner', function() {
-        var groupUri = fixtureLoader.GITTER_INTEGRATION_USERNAME;
         var user = fixture.user1;
         return groupService.createGroup(user, {
             type: 'GH_GUESS',
             name: 'Bob',
-            uri: groupUri,
-            linkPath: groupUri
+            // This also tests that you can have a group with an arbitrary uri
+            // that is backed by a github user/org with a linkPath that is
+            // different to the group's uri.
+            uri: 'Bob',
+            linkPath: fixtureLoader.GITTER_INTEGRATION_USERNAME
           })
           .then(function(group) {
             assert.strictEqual(group.name, 'Bob');
-            assert.strictEqual(group.uri, groupUri);
-            assert.strictEqual(group.lcUri, groupUri.toLowerCase());
+            assert.strictEqual(group.uri, 'Bob');
+            assert.strictEqual(group.lcUri, 'bob');
             return securityDescriptorService.getForGroupUser(group._id, null);
           })
           .then(function(securityDescriptor) {
