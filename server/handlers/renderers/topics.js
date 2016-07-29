@@ -3,6 +3,7 @@
 var StatusError = require('statuserror');
 var fonts = require('../../web/fonts');
 var forumService = require('gitter-web-forums').forumService;
+var forumCategoryStore = require('gitter-web-topics-ui/server/stores/forum-category-store')
 
 function renderForum(req, res, next) {
 
@@ -19,6 +20,7 @@ function renderForum(req, res, next) {
         componentData: {
           groupName: req.params.roomPart1,
           forum: forum,
+          categoryStore: forumCategoryStore(forum.categories),
         }
       });
     });

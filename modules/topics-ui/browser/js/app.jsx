@@ -6,7 +6,7 @@ var ForumContainer = require('../../containers/ForumContainer.jsx');
 module.exports = React.createClass({
 
   render(){
-    return <ForumContainer {...this.props} />
+    return <ForumContainer {...this.props} {...this.state} />
   },
 
 });
