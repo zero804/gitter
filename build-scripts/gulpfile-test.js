@@ -70,7 +70,7 @@ var criticalOnly = argv['test-critical-only'];
 var testModules = {
 };
 
-var modulesWithTest = glob.sync('./modules/*/test');
+var modulesWithTest = glob.sync('./modules/*-test.js');
 modulesWithTest.forEach(function(testDir) {
   var moduleDir = path.dirname(testDir);
   var moduleName = path.basename(moduleDir);
