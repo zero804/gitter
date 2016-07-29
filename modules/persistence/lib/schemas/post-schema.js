@@ -35,10 +35,11 @@ var PostSchema = new Schema({
   replyId: { type: ObjectId, required: false },
 
   // TODO: tags as an array of objectIds or strings?
-  // TODO: favouriters, participators, watchers.. how are we storing that?
+  // TODO: likers, participators, watchers.. how are we storing that?
   // (participators are likely going to be in here, favouriters and watchers
   //  outside if I had to guess)
-  // TODO: are we maintaining repliesTotal and commentsTotal?
+  // TODO: are we maintaining repliesTotal, commentsTotal, likesTotal,
+  // participatorTotal and wathcerTotal?
 
   // _tv? _md? lang? lastUpdated? (for the entire topic)
 }, { strict: 'throw' });
