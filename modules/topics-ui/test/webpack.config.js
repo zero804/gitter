@@ -10,12 +10,13 @@ var config = _.extend({}, webpackConfig, {
   },
   output: {
     filename: "[name].js",
-    path: path.resolve(__dirname, './build'),
+    path: path.resolve(__dirname, './fixtures/build'),
   },
   resolve: {
     alias: {
       mocha: path.resolve(__dirname, '../node_modules/mocha/mocha.js'),
       mochaCss: path.resolve(__dirname, '../node_modules/mocha/mocha.css'),
+      jquery: path.resolve(__dirname, '../node_modules/jquery/dist/jquery.js'),
     }
   }
 });
