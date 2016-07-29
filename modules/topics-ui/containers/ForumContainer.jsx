@@ -3,12 +3,15 @@
 var React = require('react');
 
 module.exports = React.createClass({
+
   displayName: 'ForumContainer',
+
   propTypes: {
     categoryStore: React.PropTypes.shape({
-      getCategories: React.PropTypes.func.isRequired
+      models: React.PropTypes.array.isRequired
     })
   },
+
   render() {
     const { groupName } = this.props;
     return (

@@ -9,4 +9,4 @@ var App = React.createFactory(app);
 var appRoot = document.getElementById('app-root');
 var context = window.context;
 
-reactDOM.render(App(context), appRoot);
+reactDOM.render(App(), appRoot);
