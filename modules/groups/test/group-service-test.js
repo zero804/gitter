@@ -18,6 +18,14 @@ var groupService = proxyquireNoCallThru('../lib/group-service', {
   }
 });
 
+function compareSets(a, b) {
+  // Sort before comparing, but don't mutate them when sorting. Not that that
+  // matters at the time of writing, but just in case people start using this
+  // elsewhere.
+  // (Yes there are a million ways to do this.)
+  assert.deepEqual(a.slice().sort(), b.slice().sort());
+}
+
 describe('group-service', function() {
 
   describe('integration tests #slow', function() {
@@ -268,7 +276,7 @@ describe('group-service', function() {
       it('should find the roomIds for group and user with troupes', function() {
         return groupService.findRoomsIdForGroup(fixture.group1._id, fixture.user1._id)
           .then(function(roomIds) {
-            assert.deepEqual(roomIds.map(String), [
+            compareSets(roomIds.map(String), [
               fixture.troupe1.id,
               fixture.troupe2.id,
               fixture.troupe3.id
@@ -279,7 +287,7 @@ describe('group-service', function() {
       it('should find the roomIds for group and user without troupes', function() {
         return groupService.findRoomsIdForGroup(fixture.group1._id, fixture.user2._id)
           .then(function(roomIds) {
-            assert.deepEqual(roomIds.map(String), [
+            compareSets(roomIds.map(String), [
               fixture.troupe1.id,
               fixture.troupe2.id,
             ]);
