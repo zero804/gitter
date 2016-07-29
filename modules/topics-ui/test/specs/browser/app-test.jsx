@@ -1,0 +1,25 @@
+"use strict";
+
+var assert = require('assert');
+var { shallow } = require('enzyme');
+var Backbone = require('backbone');
+var React = require('react');
+var App = require('../../../browser/js/app.jsx');
+var ForumContainer = require('../../../containers/ForumContainer.jsx');
+
+describe.only('App', function(){
+
+  it('should set the right state when rendered with the forum route', function(){
+    var route = new Backbone.Model({ route: 'forum', groupName: 'gitterHQ' });
+    const wrapper = shallow(<App router={route} />);
+    assert.equal(wrapper.state('route'), 'forum');
+    assert.equal(wrapper.state('groupName'), 'gitterHQ');
+  });
+
+  it('should render a ForumContainer when rendered with the forum route', function(){
+    var route = new Backbone.Model({ route: 'forum', groupName: 'gitterHQ' });
+    const wrapper = shallow(<App router={route} />);
+    assert.equal(wrapper.find(ForumContainer).length, 1);
+  });
+
+});

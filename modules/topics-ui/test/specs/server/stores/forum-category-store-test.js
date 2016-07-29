@@ -3,7 +3,7 @@
 var assert = require('assert');
 var categoryStore = require('../../../../server/stores/forum-category-store');
 
-describe('CategoryStore', function(){
+describe.skip('CategoryStore', function(){
 
   it('should return an object with getCategories', function(){
     assert(categoryStore().getCategories);
