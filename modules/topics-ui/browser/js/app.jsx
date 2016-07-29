@@ -1,19 +1,33 @@
 'use strict';
 
-var React = require('react');
-var Backbone = require('backbone');
-var ForumContainer = require('../../containers/ForumContainer.jsx');
-var router = require('./routers/index');
+const React = require('react');
+const Backbone = require('backbone');
+const ForumContainer = require('../../containers/ForumContainer.jsx');
+const CategoryStore = require('./stores/forum-category-store');
+const router = require('./routers/index');
 
 Backbone.history.start({ pushState: true });
 
 module.exports = React.createClass({
 
-  render(){
+  getInitialState(){
     switch(router.get('route')) {
-      case 'forum':
-      return <ForumContainer {...this.props} {...this.state} />
+      case 'forum': return this.getForumState();
     }
   },
+
+  render(){
+    switch(router.get('route')) {
+      case 'forum': return <ForumContainer {...this.state} />
+    }
+  },
+
+  getForumState(){
+    const categoryStore = (window.context.categoryStore || {});
+    return {
+      groupName: router.get('groupName'),
+      categoryStore: new CategoryStore(categoryStore.models),
+    };
+  }
 
 });
