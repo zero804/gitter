@@ -7,6 +7,9 @@ var assert = require('assert');
 describe('identityService', function() {
   var fixture = {};
   before(fixtureLoader(fixture, {
+    deleteDocuments: {
+      Identity: [{ provider: 'google', providerKey: 'google-identity' }]
+    },
     user1: {
       githubId: null,
       githubToken: null,
