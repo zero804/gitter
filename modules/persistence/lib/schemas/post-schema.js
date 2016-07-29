@@ -6,6 +6,8 @@ var ObjectId = Schema.ObjectId;
 
 var PostSchema = new Schema({
   // all of these are only required for topics, not replies and comments
+  // TODO: OR do we calculate and store uris for replies & comments so they all
+  // have permalinks at the db level and can just be looked up in one go?
   title: { type: String, required: false },
   uri: { type: String, required: false },
   lcUri: { type: String, required: false },
