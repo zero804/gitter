@@ -8,7 +8,7 @@ var ForumSchema = new Schema({
   name: { type: String, required: true },
   uri: { type: String, required: true },
   lcUri: { type: String, required: true },
-  groupId: { type: ObjectId, required: true },
+  // NOTE: assuming no groupId as forums could be for anything
   defaultCategoryId: { type: ObjectId },
   defaultTopicId: { type: ObjectId },
   // TODO: tags as a separate collection or just an array? Assuming categories
@@ -17,7 +17,6 @@ var ForumSchema = new Schema({
 }, { strict: 'throw' });
 
 ForumSchema.schemaTypeName = 'ForumSchema';
-ForumSchema.index({ groupId: 1 });
 ForumSchema.index({ lcUri: 1 }, { unique: true });
 
 module.exports = {
