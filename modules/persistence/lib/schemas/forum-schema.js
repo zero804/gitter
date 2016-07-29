@@ -17,7 +17,7 @@ var ForumSchema = new Schema({
 }, { strict: 'throw' });
 
 ForumSchema.schemaTypeName = 'ForumSchema';
-ForumSchema.index({ lcUri: 1 }, { unique: true });
+ForumSchema.index({ lcUri: 1 });
 
 module.exports = {
   install: function(mongooseConnection) {
