@@ -17,6 +17,7 @@ function usernameMatchesUri(user, linkPath) {
 function generateUserSecurityDescriptor(user, options) {
   var externalId = options.externalId;
   var linkPath = options.linkPath;
+  var security = options.security;
 
   var extraAdmins;
   if (!user || usernameMatchesUri(user, linkPath)) {
@@ -25,15 +26,34 @@ function generateUserSecurityDescriptor(user, options) {
     extraAdmins = [user._id];
   }
 
-  return {
-    type: 'GH_USER',
-    members: 'PUBLIC',
-    admins: 'GH_USER_SAME',
-    public: true,
-    linkPath: linkPath,
-    externalId: externalId,
-    extraAdmins: extraAdmins
-  };
+  switch(security || null) {
+    case 'PUBLIC':
+    case null:
+      return {
+        type: 'GH_USER',
+        members: 'PUBLIC',
+        admins: 'GH_USER_SAME',
+        public: true,
+        linkPath: linkPath,
+        externalId: externalId,
+        extraAdmins: extraAdmins
+      };
+
+    case 'PRIVATE':
+      return {
+        type: 'GH_USER',
+        members: 'INVITE',
+        admins: 'GH_USER_SAME',
+        public: false,
+        linkPath: linkPath,
+        externalId: externalId,
+        extraAdmins: extraAdmins
+      };
+
+    default:
+      throw new StatusError(500, 'Unknown security type: ' + security);
+  }
+
 }
 
 function generateOrgSecurityDescriptor(user, options) {

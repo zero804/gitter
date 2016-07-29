@@ -1,17 +1,20 @@
 "use strict";
 
-var context = require('utils/context');
 var $ = require('jquery');
-var appEvents = require('utils/appevents');
-var chatModels = require('collections/chat');
 var Backbone = require('backbone');
-var onready = require('./utils/onready');
-var MobileLayout = require('views/layouts/mobile');
-var RoomCollectionTracker = require('components/room-collection-tracker');
+var context = require('utils/context');
+var appEvents = require('utils/appevents');
+var onready = require('utils/onready');
+
+var chatModels = require('collections/chat');
 var troupeCollections = require('collections/instances/troupes');
 var repoModels = require('collections/repos');
 var ReposCollection = repoModels.ReposCollection;
+var CommunityCreateModel = require('views/community-create/community-create-model');
+
 var unreadItemsClient = require('components/unread-items-client');
+var RoomCollectionTracker = require('components/room-collection-tracker');
+var MobileLayout = require('views/layouts/mobile');
 
 //Remove when left menu is in place
 var FastClick = require('fastclick');
@@ -54,6 +57,10 @@ onready(function() {
 
   var repoCollection = new ReposCollection();
 
+  var communityCreateModel = new CommunityCreateModel({
+    active: false
+  });
+
   var appView = new MobileLayout({
     model: context.troupe(),
     template: false,
@@ -62,9 +69,20 @@ onready(function() {
     //Left Menu Additions
     //roomCollection: troupeCollections.troupes
     orgCollection: troupeCollections.orgs,
-    repoCollection: repoCollection
+    repoCollection: repoCollection,
+    groupsCollection: troupeCollections.groups
   });
   appView.render();
+
+
+  appEvents.on('community-create-view:toggle', function(active) {
+    communityCreateModel.set('active', active);
+    if(active) {
+      window.location.hash = '#createcommunity';
+    }
+  });
+
+
 
   var Router = Backbone.Router.extend({
     routes: {
@@ -97,7 +115,18 @@ onready(function() {
     },
 
     createCommunity: function(/* uri */) {
-      appEvents.trigger('community-create-view:toggle', true);
+      require.ensure(['views/community-create/community-create-view'], function(require) {
+        var CommunityCreateView = require('views/community-create/community-create-view');
+        communityCreateModel.set('active', true);
+        var communityCreateView = new CommunityCreateView({
+          model: communityCreateModel,
+          orgCollection: troupeCollections.orgs,
+          repoCollection: repoCollection,
+          groupsCollection: troupeCollections.groups
+        });
+
+        appView.dialogRegion.show(communityCreateView);
+      });
     }
   });
 

@@ -3,6 +3,7 @@
 var Marionette = require('backbone.marionette');
 var _ = require('underscore');
 var cocktail = require('cocktail');
+var context = require('utils/context');
 var KeyboardEventMixin = require('views/keyboard-events-mixin');
 
 var arrayBoundWrap = function(index, length) {
@@ -35,6 +36,7 @@ var KeyboardController = Marionette.ItemView.extend({
     this.minibarHomeModel = attrs.model.minibarHomeModel;
     this.minibarSearchModel = attrs.model.minibarSearchModel;
     this.minibarPeopleModel = attrs.model.minibarPeopleModel;
+    this.minibarCommunityCreateModel = attrs.model.minibarCommunityCreateModel;
     this.minibarCloseModel = attrs.model.minibarCloseModel;
     this.minibarTempOrgModel = attrs.model.minibarTempOrgModel;
 
@@ -86,12 +88,14 @@ var KeyboardController = Marionette.ItemView.extend({
 
   onMinibarOrgSelected: function (e){
     this.blurAllItems();
-    var index = e.key;
-    if(index === 0) { index = 10; } // 0 key triggers room.10
+    // On Windows, `e.key` will be the symbols because `shift` is used
+    var keyIndex = parseInt(e.code.replace('Digit', ''), 10);
+    if(keyIndex === 0) { keyIndex = 10; } // 0 key triggers room.10
     // we have room.1 ~ room.3 triggering home/search/people so we have to account for that with indexing here
-    index = index - 4;
-    index = arrayBoundWrap(index, this.minibarCollection.length);
-    var model = this.minibarCollection.at(index);
+    var index = keyIndex - 4;
+    var collection = this.minibarCollection;
+    index = arrayBoundWrap(index, collection.length);
+    var model = collection.at(index);
     model.set('focus', true);
     this.setModelState({ state: 'org', selectedOrgName: model.get('name') });
   },
@@ -307,6 +311,7 @@ var KeyboardController = Marionette.ItemView.extend({
       (this.minibarPeopleModel.get(attr) === val) && this.minibarPeopleModel ||
       (!this.minibarTempOrgModel.get('hidden') && this.minibarTempOrgModel.get(attr) === val && this.minibarTempOrgModel) ||
       this.minibarCollection.findWhere(q) ||
+      (context.hasFeature('community-create') && this.minibarCommunityCreateModel.get(attr) === val) && this.minibarCommunityCreateModel ||
       (this.minibarCloseModel.get(attr) === val) && this.minibarCloseModel;
   },
 
@@ -344,7 +349,11 @@ var KeyboardController = Marionette.ItemView.extend({
     }
 
     collection = collection.concat(this.minibarCollection.models);
-    collection = collection.concat([ this.minibarCloseModel]);
+
+    if(context.hasFeature('community-create')) {
+      collection = collection.concat([ this.minibarCommunityCreateModel ]);
+    }
+    collection = collection.concat([ this.minibarCloseModel ]);
     return collection;
   },
 

@@ -40,28 +40,32 @@ describe('unread-items-group-adapter', function() {
           id: "g1",
           activity: false,
           mentions: true,
-          unreadItems: false
+          unreadItems: false,
+          allHidden: false
         });
 
         assert.deepEqual(groups.get('g2').attributes, {
           id: "g2",
           activity: false,
           mentions: false,
-          unreadItems: true
+          unreadItems: true,
+          allHidden: false
         });
 
         assert.deepEqual(groups.get('g3').attributes, {
           id: "g3",
           activity: true,
           mentions: false,
-          unreadItems: false
+          unreadItems: false,
+          allHidden: false
         });
 
         assert.deepEqual(groups.get('g4').attributes, {
           id: "g4",
           activity: false,
           mentions: false,
-          unreadItems: false
+          unreadItems: false,
+          allHidden: true
         });
       });
   });
@@ -93,21 +97,24 @@ describe('unread-items-group-adapter', function() {
           id: "g1",
           activity: false,
           mentions: true,
-          unreadItems: false
+          unreadItems: false,
+          allHidden: false
         });
 
         assert.deepEqual(groups.get('g2').attributes, {
           id: "g2",
           activity: false,
           mentions: false,
-          unreadItems: true
+          unreadItems: true,
+          allHidden: false
         });
 
         assert.deepEqual(groups.get('g3').attributes, {
           id: "g3",
           activity: true,
           mentions: false,
-          unreadItems: false
+          unreadItems: false,
+          allHidden: false
         });
 
         troupes.get('t1').set({ mentions: 0 });
@@ -121,22 +128,86 @@ describe('unread-items-group-adapter', function() {
           id: "g1",
           activity: false,
           mentions: false,
-          unreadItems: false
+          unreadItems: false,
+          allHidden: true
         });
 
         assert.deepEqual(groups.get('g2').attributes, {
           id: "g2",
           activity: false,
           mentions: false,
-          unreadItems: false
+          unreadItems: false,
+          allHidden: true
         });
 
         assert.deepEqual(groups.get('g3').attributes, {
           id: "g3",
           activity: false,
           mentions: false,
-          unreadItems: false
+          unreadItems: false,
+          allHidden: true
         });
+      })
+  });
+
+  it('should handle changes lastAccessTime changes', function() {
+    var groups = new Backbone.Collection([
+      { id: 'g1' },
+      { id: 'g2' },
+    ]);
+
+    var troupes = new Backbone.Collection([
+      { id: 't1', groupId: 'g1' },
+      { id: 't2', groupId: 'g2' }
+    ]);
+
+
+    unreadItemsGroupAdapter(groups, troupes);
+
+    troupes.get('t1').set({ lastAccessTime: new Date() });
+
+    return Promise.delay(10)
+      .then(function() {
+
+        assert.deepEqual(groups.get('g1').attributes, {
+          id: "g1",
+          activity: false,
+          mentions: false,
+          unreadItems: false,
+          allHidden: false
+        });
+
+        assert.deepEqual(groups.get('g2').attributes, {
+          id: "g2",
+          activity: false,
+          mentions: false,
+          unreadItems: false,
+          allHidden: true
+        });
+
+
+        troupes.get('t1').set({ lastAccessTime: null });
+        troupes.get('t2').set({ lastAccessTime: new Date() });
+      })
+      .delay(10)
+      .then(function() {
+
+        assert.deepEqual(groups.get('g1').attributes, {
+          id: "g1",
+          activity: false,
+          mentions: false,
+          unreadItems: false,
+          allHidden: true
+        });
+
+        assert.deepEqual(groups.get('g2').attributes, {
+          id: "g2",
+          activity: false,
+          mentions: false,
+          unreadItems: false,
+          allHidden: false
+        });
+
       })
   });
 
@@ -170,21 +241,24 @@ describe('unread-items-group-adapter', function() {
           id: "g1",
           activity: false,
           mentions: false,
-          unreadItems: false
+          unreadItems: false,
+          allHidden: true
         });
 
         assert.deepEqual(groups.get('g2').attributes, {
           id: "g2",
           activity: false,
           mentions: false,
-          unreadItems: false
+          unreadItems: false,
+          allHidden: true
         });
 
         assert.deepEqual(groups.get('g3').attributes, {
           id: "g3",
           activity: false,
           mentions: false,
-          unreadItems: false
+          unreadItems: false,
+          allHidden: true
         });
 
         troupes.get('t4').set({ mentions: 0 });
@@ -197,21 +271,24 @@ describe('unread-items-group-adapter', function() {
           id: "g1",
           activity: false,
           mentions: false,
-          unreadItems: false
+          unreadItems: false,
+          allHidden: true
         });
 
         assert.deepEqual(groups.get('g2').attributes, {
           id: "g2",
           activity: false,
           mentions: false,
-          unreadItems: false
+          unreadItems: false,
+          allHidden: true
         });
 
         assert.deepEqual(groups.get('g3').attributes, {
           id: "g3",
           activity: false,
           mentions: false,
-          unreadItems: false
+          unreadItems: false,
+          allHidden: true
         });
 
       });
@@ -254,28 +331,32 @@ describe('unread-items-group-adapter', function() {
           id: "g1",
           activity: false,
           mentions: false,
-          unreadItems: false
+          unreadItems: false,
+          allHidden: true
         });
 
         assert.deepEqual(groups.get('g2').attributes, {
           id: "g2",
           activity: false,
           mentions: true,
-          unreadItems: false
+          unreadItems: false,
+          allHidden: false
         });
 
         assert.deepEqual(groups.get('g3').attributes, {
           id: "g3",
           activity: true,
           mentions: false,
-          unreadItems: false
+          unreadItems: false,
+          allHidden: false
         });
 
         assert.deepEqual(groups.get('g4').attributes, {
           id: "g4",
           activity: false,
           mentions: false,
-          unreadItems: true
+          unreadItems: true,
+          allHidden: false
         });
 
       });
@@ -307,28 +388,32 @@ describe('unread-items-group-adapter', function() {
           id: "g1",
           activity: false,
           mentions: false,
-          unreadItems: false
+          unreadItems: false,
+          allHidden: true
         });
 
         assert.deepEqual(groups.get('g2').attributes, {
           id: "g2",
           activity: false,
           mentions: true,
-          unreadItems: false
+          unreadItems: false,
+          allHidden: false
         });
 
         assert.deepEqual(groups.get('g3').attributes, {
           id: "g3",
           activity: true,
           mentions: false,
-          unreadItems: false
+          unreadItems: false,
+          allHidden: false
         });
 
         assert.deepEqual(groups.get('g4').attributes, {
           id: "g4",
           activity: false,
           mentions: false,
-          unreadItems: true
+          unreadItems: true,
+          allHidden: false
         });
 
       });

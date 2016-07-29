@@ -6,7 +6,6 @@ var _ = require('lodash');
 var GithubMe = require('gitter-web-github').GitHubMeService;
 var gitHubEmailAddressService = require('./github-email-address-service');
 var gitHubProfileService = require('./github-profile-service');
-var gitHubInviteUserSuggestionsService = require('./github-invite-user-suggestions');
 
 
 function GitHubBackend(user, identity) {
@@ -39,10 +38,6 @@ GitHubBackend.prototype.getProfile = function() {
       _.extend(profile, gitHubProfile);
       return profile;
     });
-};
-
-GitHubBackend.prototype.getInviteUserSuggestions = function(type, linkPath) {
-  return gitHubInviteUserSuggestionsService(type, linkPath, this.user);
 };
 
 module.exports = GitHubBackend;

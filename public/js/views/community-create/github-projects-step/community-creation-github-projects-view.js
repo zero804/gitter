@@ -111,7 +111,8 @@ module.exports = CommunityCreateBaseStepView.extend({
         communitySlug: slugify(selectedOrgName.toLowerCase()),
         isUsingCustomSlug: false,
         githubOrgId: selectedOrgId,
-        githubRepoId: null
+        githubRepoId: null,
+        isUsingExplicitGitHubProject: !!selectedOrgName
       });
     }
     else if(this.model.get('isRepoAreaActive')) {
@@ -122,7 +123,8 @@ module.exports = CommunityCreateBaseStepView.extend({
         communitySlug: slugify(selectedRepoName.toLowerCase()),
         isUsingCustomSlug: false,
         githubOrgId: null,
-        githubRepoId: selectedRepoId
+        githubRepoId: selectedRepoId,
+        isUsingExplicitGitHubProject: !!selectedRepoId
       });
     }
   },

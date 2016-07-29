@@ -56,9 +56,11 @@
 
           {{#if hasCommunityCreate }}
             <li class="room-menu-options__item--community-create" data-state-change="community-create" id="minibar-community-create">
-              <button class="room-menu-options__item-button" title="Create a new community">
-                <div class="room-menu-options__item__community-create-icon">+</div>
-              </button>
+              <div class="room-menu-options__container">
+                <button class="room-menu-options__item-button" title="Create a new community">
+                  <div class="room-menu-options__item__community-create-icon">+</div>
+                </button>
+              </div>
             </li>
           {{/if}}
 
@@ -122,7 +124,3 @@
     </div>
   </section>
 </aside>
-
-<div class="community-create-app-root">
-  {{{ prerenderView "js/views/community-create/community-create-view" }}}
-</div>

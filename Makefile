@@ -2,33 +2,32 @@ EMBEDDED_NODE_ENV ?= prod
 EMBEDDED_WWW_DIRECTORY ?= ~/code/gitter/ios/Troupe/www/build
 PATH := ./node_modules/.bin:$(PATH)
 
-.PHONY: build clean test npm sprites npm-quick npm-full performance-tests
+.PHONY: build clean test npm sprites npm-quick npm-full performance-tests test-no-coverage continuous-integration validate
+
+continuous-integration: build
+
+build: clean npm validate test package
 
 validate: npm
 	gulp validate
-
-build: clean npm validate test test-lua submit-to-coveralls package
 
 test-lua:
 	echo lua tests disabled #gulp test-redis-lua
 
 package: npm
-	gulp package
+	gulp package --skip-stage validate --skip-stage test
 
-submit-to-coveralls: npm test
-	gulp submit-coveralls-post-tests
-
-clean:
-	rm -rf output
+clean: npm
+	gulp clean
 
 test: clean npm
 	mkdir -p output/
-	./exec-in-docker ./node_modules/.bin/gulp test-docker
+	./exec-in-docker ./node_modules/.bin/gulp test --test-coverage --test-suite docker --test-xunit-reports
 	echo "Docker tests completed"
 
 test-no-coverage: clean npm
 	mkdir -p output/
-	./exec-in-docker ./node_modules/.bin/gulp test-docker --no-coverage
+	./exec-in-docker ./node_modules/.bin/gulp test --test-suite docker --test-xunit-reports
 	echo "Docker tests completed"
 
 print-nodejs-version:
@@ -61,22 +60,13 @@ upgrade-data:
 maintain-data:
 	MODIFY=true ./scripts/datamaintenance/execute.sh || true
 
-# Make a second target
-post-test-maintain-data:
-	MODIFY=true ./scripts/datamaintenance/execute.sh || true
-
-continuous-integration: build
-
-performance-tests: clean npm
-	gulp test-perf
-
 clean-embedded-chat:
 	rm -rf output/embedded output/embedded.tgz
 
 embedded-chat: clean
 	mkdir -p output/embedded/www/mobile
 	NODE_ENV=$(EMBEDDED_NODE_ENV) ./build-scripts/render-embedded-chat.js  -o output/embedded/www/mobile/embedded-chat.html
-	gulp embedded-package
+	gulp --gulpfile gulpfile-embedded.js
 	ls output/assets/js/*.js  >> output/embedded-resources.txt
 	ls output/assets/styles/*.css  >> output/embedded-resources.txt
 

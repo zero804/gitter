@@ -18,6 +18,7 @@ module.exports = function(hbs) {
   hbs.registerHelper('prerenderOrgListItem', require('./prerender-org-item-helper'));
   hbs.registerHelper('newrelic', require('./newrelic-helper'));
   hbs.registerHelper('paginate', require('./paginate-helper'));
+  hbs.registerHelper('topic-component', require('./topic-component-helper'));
 
   hbs.registerHelper('avatarSrcSet', avatarImgSrcSetHbsHelper);
 };

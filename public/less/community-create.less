@@ -561,17 +561,25 @@
     position: absolute;
     right: 0;
 
-    content: '\e81a';
+    content: '';
     font-family: 'fontello';
-
-    color: transparent;
 
     transition: color .2s ease;
   }
 
-  &:hover {
+  &.pending {
     &:after {
-      color: rgba(255, 255, 255, 0.5);
+      content: '\e80b';
+    }
+  }
+  &.available {
+    &:after {
+      content: '\e804';
+    }
+  }
+  &.unavailable {
+    &:after {
+      content: '\e817';
     }
   }
 }
@@ -612,8 +620,24 @@
 
   &.active {
     display: flex;
-    justify-content: space-between;
+    align-items: baseline;
   }
+}
+
+.community-create-associated-project-main-area {
+  flex: 1;
+}
+
+.community-create-associated-project-badger-option {
+  display: none;
+
+  &.active {
+    display: block;
+  }
+}
+
+.community-create-associated-project-badger-option-input {
+  margin-right: .5rem;
 }
 
 .community-create-change-github-project-button {
@@ -1011,9 +1035,87 @@
 }
 
 .community-create-people-list-item {
+  position: relative;
   display: inline-block;
   margin: @people-list-item-spacing;
+
+  &.pending {
+    opacity: .8;
+
+    &:after {
+      content: '\e834';
+      position: absolute;
+      top: 0;
+      right: 0;
+
+      font-family: 'fontello';
+
+      animation-name: community-create-people-list-item-pending-spinner-rotate;
+      animation-duration: .75s;
+      animation-iteration-count: infinite;
+      animation-timing-function: linear;
+    }
+  }
+
+  &.needs-email {
+    animation-name: community-create-people-list-item-needs-email-flash;
+    animation-duration: .75s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+    animation-direction: alternate;
+  }
+
+  &.pending {
+    .community-create-people-list-item-remove-button {
+      display: none;
+    }
+  }
+
+
+  .community-create-people-list-item-overlay {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s ease;
+  }
+
+  &.needs-email,
+  &.ready-valid-email {
+    &:hover {
+      .community-create-people-list-item-overlay {
+        opacity: 1;
+        pointer-events: auto;
+      }
+    }
+  }
+
 }
+@keyframes community-create-people-list-item-pending-spinner-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes community-create-people-list-item-needs-email-flash {
+  from {
+    opacity: .8;
+  }
+  to {
+    opacity: .5;
+  }
+}
+
+@keyframes community-create-people-list-item-pending-spinner-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 
 .community-create-people-list-item-link {
   position: relative;
@@ -1034,7 +1136,7 @@
   border-radius: 4px;
 }
 
-.community-create-people-list-item-overlay {
+.community-create-people-list-item-remove-button-overlay {
   z-index: 1;
   position: absolute;
   top: 0;
@@ -1075,6 +1177,34 @@
   }
 
 }
+
+.community-create-people-list-item-overlay {
+  z-index: 1;
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  min-width: 300px;
+  padding-top: 1rem;
+  padding-left: calc(@invite-user-item-avatar-size + 1rem);
+  padding-bottom: .6rem;
+  padding-right: 1rem;
+
+  background-color: rgba(0, 0, 0, .3);
+
+  color: #ffffff;
+}
+
+.community-create-people-list-item-email-input {
+  .secondary-bare-input();
+
+  &:focus,
+  &:invalid:focus {
+    outline: none;
+    box-shadow: none;
+  }
+}
+
 
 
 @overview-extra-space-section-offset: 2rem;
