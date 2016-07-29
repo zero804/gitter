@@ -42,7 +42,13 @@ var config = {
   },
   plugins: [
     new ExtractTextPlugin("style.css", { allChunks: false })
-  ]
+  ],
+  externals: {
+    'cheerio': 'window',
+    'react/addons': true,
+    'react/lib/ExecutionEnvironment': true,
+    'react/lib/ReactContext': true
+  }
 };
 
 module.exports = config;
