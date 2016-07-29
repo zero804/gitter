@@ -11,6 +11,8 @@ var ForumSchema = new Schema({
   lcUri: { type: String, required: true },
   groupId: { type: ObjectId, required: true },
   sd: { type: securityDescriptor.Schema, required: false },
+  defaultCategoryId: { type: ObjectId },
+  defaultTopicId: { type: ObjectId },
   // TODO: tags as a separate collection or just an array? Assuming categories
   // is a separate collection.
   // TODO: are we maintaining topicsTotal?
