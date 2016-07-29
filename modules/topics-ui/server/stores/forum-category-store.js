@@ -2,6 +2,6 @@
 
 module.exports = function forumCategoryStore(categories) {
   return {
-    models: categories
+    models: (categories || [])
   };
 };

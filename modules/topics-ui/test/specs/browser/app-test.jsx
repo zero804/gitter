@@ -7,7 +7,7 @@ var React = require('react');
 var App = require('../../../browser/js/app.jsx');
 var ForumContainer = require('../../../containers/ForumContainer.jsx');
 
-describe.only('App', function(){
+describe('App', function(){
 
   it('should set the right state when rendered with the forum route', function(){
     var route = new Backbone.Model({ route: 'forum', groupName: 'gitterHQ' });
