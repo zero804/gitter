@@ -2,6 +2,7 @@
 
 var env = require('gitter-web-env');
 var winston = env.logger;
+var config = env.config;
 var errorReporter = env.errorReporter;
 var mongoose = require('gitter-web-mongoose-bluebird');
 var debug = require('debug')('gitter:infra:persistence-service');
@@ -46,7 +47,7 @@ function createExports(schemas) {
   return ex;
 }
 
-module.exports = createExports({
+var schemas = {
   User: require('./schemas/user-schema'),
   Identity: require('./schemas/identity-schema'),
   UserTroupeLastAccess: require('./schemas/user-troupe-last-access-schema'),
@@ -67,4 +68,12 @@ module.exports = createExports({
   FeatureToggle: require('./schemas/feature-toggle-schema'),
   TroupeRemovedUser: require('./schemas/troupe-removed-user-schema'),
   TroupeInvite: require('./schemas/troupe-invite-schema'),
-});
+};
+
+if (config.get('topics:useApi')) {
+  schemas.Forum = require('./schemas/forum-schema');
+  schemas.ForumCategory = require('./schemas/forum-category-schema');
+  schemas.Post = require('./schemas/post-schema');
+}
+
+module.exports = createExports(schemas);
