@@ -2,11 +2,15 @@
 
 require('../less/index.less');
 
-var React = require('react');
-var reactDOM = require('react-dom');
-var app = require('./app.jsx');
-var App = React.createFactory(app);
-var appRoot = document.getElementById('app-root');
-var context = window.context;
+const Backbone = require('backbone');
+const React = require('react');
+const reactDOM = require('react-dom');
+const app = require('./app.jsx');
+const router = require('./routers/index');
 
-reactDOM.render(App(), appRoot);
+const App = React.createFactory(app);
+const appRoot = document.getElementById('app-root');
+const context = window.context;
+
+Backbone.history.start({ pushState: true });
+reactDOM.render(App({ router: router }), appRoot);
