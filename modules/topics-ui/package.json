@@ -28,8 +28,10 @@
     "extract-text-webpack-plugin": "^1.0.1",
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
+    "jquery": "^3.1.0",
     "less-loader": "^2.2.3",
     "style-loader": "^0.13.1",
+    "underscore": "^1.8.3",
     "webpack": "^1.13.1",
     "webpack-dev-middleware": "^1.6.1"
   },
