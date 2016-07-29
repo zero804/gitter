@@ -1,5 +1,6 @@
 'use strict';
 
+var _ = require('underscore');
 var Marionette = require('backbone.marionette');
 var cocktail = require('cocktail');
 var toggleClass = require('utils/toggle-class');
@@ -150,8 +151,18 @@ var CommunityCreateView = Marionette.LayoutView.extend({
   },
 
   onActiveChange: function() {
-    appEvents.trigger('stats.event', 'community.create.enter');
-    toggleClass(this.$el[0], 'active', this.model.get('active'));
+    var isActive = this.model.get('active');
+    toggleClass(this.$el[0], 'active', isActive);
+
+    if(isActive) {
+      appEvents.trigger('stats.event', 'community.create.enter');
+    }
+
+    // Reset for next time if we are hiding create community
+    if(!isActive) {
+      // Get around the infinite recursion
+     this.model.clear({ silent: true }).set(_.omit(this.model.defaults, 'active'));
+    }
   },
 
   closeView: function() {
