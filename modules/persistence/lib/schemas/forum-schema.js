@@ -3,14 +3,12 @@
 var mongoose = require('gitter-web-mongoose-bluebird');
 var Schema = mongoose.Schema;
 var ObjectId = Schema.ObjectId;
-var securityDescriptor = require('./security-descriptor-subdocument');
 
 var ForumSchema = new Schema({
   name: { type: String, required: true },
   uri: { type: String, required: true },
   lcUri: { type: String, required: true },
   groupId: { type: ObjectId, required: true },
-  sd: { type: securityDescriptor.Schema, required: false },
   defaultCategoryId: { type: ObjectId },
   defaultTopicId: { type: ObjectId },
   // TODO: tags as a separate collection or just an array? Assuming categories
