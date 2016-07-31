@@ -66,12 +66,15 @@ module.exports = function parseContentToTemplateData(data, state) {
     roomName = parseRoomItemName(data.name);
   }
 
+  var namePieces = roomName.split('/');
+
   return _.extend({}, data, {
     isNotOneToOne: (data.githubType !== 'ONETOONE'),
-    name:          roomNameShortener(roomName),
-    mentions:      hasMentions,
-    unreadItems:   unreadItems,
-    lurkActivity:  lurkActivity,
-    isSearch:      (state === 'search'),
+    name: roomName,
+    namePieces: namePieces,
+    mentions: hasMentions,
+    unreadItems: unreadItems,
+    lurkActivity: lurkActivity,
+    isSearch: (state === 'search'),
   });
 };
