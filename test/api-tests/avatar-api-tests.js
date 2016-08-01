@@ -52,7 +52,7 @@ describe('avatar-api', function() {
     name: '/group/i/:groupId - custom avatar',
     url: null,
     expected: null,
-    proxyRedirect: '/fetch/http://s3.amazonaws.com/gitter-avatars/moo/cow/128'
+    proxyRedirect: '/fetch/http://s3.amazonaws.com/gitter-avatars/moo/cow/128?v=1'
   }, {
     name: '/group/iv/:version/:groupId',
     url: null,
