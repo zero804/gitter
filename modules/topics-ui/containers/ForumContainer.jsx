@@ -1,6 +1,8 @@
 'use strict';
 
 var React = require('react');
+var Container = require('../shared/components/container.jsx');
+var Panel = require('../shared/components/panel.jsx');
 
 module.exports = React.createClass({
 
@@ -8,14 +10,20 @@ module.exports = React.createClass({
 
   propTypes: {
     categoryStore: React.PropTypes.shape({
-      models: React.PropTypes.array.isRequired
+      models: React.PropTypes.array.isRequired,
+      getCategories: React.PropTypes.func.isRequired
     })
   },
 
   render() {
-    const { groupName } = this.props;
+    const categories = this.props.categoryStore.getCategories();
     return (
-      <h1>Welcome to { groupName }s topics</h1>
+      //Search header ...
+      <Container>
+        <Panel>
+          { categories.map((cat, i) => <span key={i}>{cat}</span>) }
+        </Panel>
+      </Container>
     );
   }
 });

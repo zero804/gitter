@@ -11,7 +11,7 @@ babelRegister(babelConfig);
 var mocha = new Mocha({ useColors: true });
 
 
-glob.sync(path.resolve(__dirname, '../specs') + '/**/*.js').forEach(function(filePath){
+glob.sync(path.resolve(__dirname, '../specs') + '/**/*.{js,jsx}').forEach(function(filePath){
   if(/browser/.test(filePath)) { return; }
   mocha.addFile(filePath);
 });

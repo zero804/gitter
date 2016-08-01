@@ -14,4 +14,9 @@ describe('CategoryStore', function(){
     assert.equal(categoryStore(categories).models, categories);
   });
 
+  it('should return models when getCategories is called', function(){
+    var categories = [ 1, 2, 3];
+    assert.equal(categoryStore(categories).getCategories(), categories);
+  });
+
 });
