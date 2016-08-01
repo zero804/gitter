@@ -45,12 +45,7 @@ function getAvatarUrlForSize(avatarUrl, size) {
 }
 
 module.exports = function(groupId, size, isVersioned) {
-  var fields = { 'avatarUrl': 1, 'sd.type': 1, 'sd.linkPath': 1 };
-
-  // only load the version if we're returning a versioned avatar
-  if (isVersioned) {
-    fields.avatarVersion = 1;
-  }
+  var fields = { 'avatarUrl': 1, 'avatarVersion': 1, 'sd.type': 1, 'sd.linkPath': 1 };
 
   return Group.findById(groupId, fields, { lean: true })
     .then(function(group) {
@@ -61,19 +56,9 @@ module.exports = function(groupId, size, isVersioned) {
       if (group.avatarUrl) {
         avatarUrl = getAvatarUrlForSize(group.avatarUrl, size);
 
-        /*
-        When returning a versioned avatar, tack on a param to the end to break
-        through nginx's cache. Otherwise all versions cause nginx to download
-        the same file which means the same downloaded avatar will be cached
-        inside nginx for all versions and that cache is then shared among them
-        all, defeating the purpose of the version param.
-
-        This should break through that cache in nginx and S3 doesn't appear to
-        mind the extra url param.
-        */
-        if (isVersioned) {
-          avatarUrl = avatarUrl + '?v=' + group.avatarVersion;
-        }
+        // Tack on a version param otherwise the S3 url is always the same and
+        // you always get the cached avatar from nginx's cache.
+        avatarUrl = avatarUrl + '?v=' + group.avatarVersion;
 
         return {
           url: avatarUrl,
