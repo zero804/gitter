@@ -3,6 +3,13 @@
 var React = require('react');
 
 module.exports = React.createClass({
+
+  displayName: 'Panel',
+
+  propTypes: {
+    className: React.PropTypes.string,
+  },
+
   render(){
 
     const { className } = this.props;
