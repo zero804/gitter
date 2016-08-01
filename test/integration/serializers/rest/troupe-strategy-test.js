@@ -2,7 +2,7 @@
 
 var assert = require('assert');
 var testRequire = require('../../test-require');
-var assertUtils = require('../../assert-utils');
+var assertUtils = require('../../assert-utils')
 var env = require('gitter-web-env');
 var nconf = env.config;
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
@@ -133,6 +133,7 @@ describe('TroupeStrategy', function() {
             username: u2.username,
             displayName: u2.displayName,
             url: '/' + u2.username,
+            avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + u2.username,
             avatarUrlSmall: '/api/private/user-avatar/'+u2.username+'?s=60',
             avatarUrlMedium: '/api/private/user-avatar/'+u2.username+'?s=128',
             staff: false,
