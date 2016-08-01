@@ -27,7 +27,7 @@ function sendMissing(req, res) {
     res.status(200).end();
   } else {
     res.redirect(avatars.getDefault());
-    res.status(404).end();
+    res.status(200).end();
   }
 }
 

@@ -39,14 +39,50 @@ describe('GroupStrategy', function() {
             type: group.sd.type,
             linkPath: group.sd.linkPath
           },
-          avatarUrl: nconf.get('avatar:officialHost') + '/group/i/' + group.id,
-          hasAvatarSet: false
+          avatarUrl: nconf.get('avatar:officialHost') + '/group/i/' + group.id
         }]);
       });
   });
 
   it('should serialize a group with avatarUrl set', function() {
     var strategy = new GroupStrategy();
+    var group = fixture.group2;
+    return serialize([group], strategy)
+      .then(function(s) {
+        assertUtils.assertSerializedEqual(s, [{
+          id: group.id,
+          name: group.name,
+          uri: group.uri,
+          backedBy: {
+            type: group.sd.type,
+            linkPath: group.sd.linkPath
+          },
+          avatarUrl: nconf.get('avatar:officialHost') + '/group/iv/' + group.avatarVersion + '/' + group.id
+        }]);
+      });
+  });
+
+  it('should serialize a group with hasAvatarSet and no avatar set', function() {
+    var strategy = new GroupStrategy({ includeHasAvatarSet: true });
+    var group = fixture.group1;
+    return serialize([group], strategy)
+      .then(function(s) {
+        assertUtils.assertSerializedEqual(s, [{
+          id: group.id,
+          name: group.name,
+          uri: group.uri,
+          backedBy: {
+            type: group.sd.type,
+            linkPath: group.sd.linkPath
+          },
+          avatarUrl: nconf.get('avatar:officialHost') + '/group/i/' + group.id,
+          hasAvatarSet: false
+        }]);
+      });
+  });
+
+  it('should serialize a group with hasAvatarSet and avatar set', function() {
+    var strategy = new GroupStrategy({ includeHasAvatarSet: true });
     var group = fixture.group2;
     return serialize([group], strategy)
       .then(function(s) {
