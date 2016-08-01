@@ -3,6 +3,7 @@
 var path = require('path');
 var webpack = require('webpack');
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
+var getPostcssStack = require('gitter-styleguide/postcss-stack');
 
 var config = {
   entry: {
@@ -18,6 +19,10 @@ var config = {
   },
   module: {
     loaders: [
+      {
+        test:    /.css$/,
+        loader:  'style-loader?insertAt=top!css-loader!postcss-loader',
+      },
       {
         test: /.less$/,
         loader: ExtractTextPlugin.extract('style-loader', 'css-loader!less-loader'),
@@ -37,7 +42,8 @@ var config = {
   },
   resolve: {
     alias: {
-      jquery: path.resolve(__dirname, './node_modules/jquery/dist/jquery.js')
+      jquery: path.resolve(__dirname, './node_modules/jquery/dist/jquery.js'),
+      'gitter-styleguide': path.resolve(__dirname, './node_modules/gitter-styleguide'),
     }
   },
   plugins: [
@@ -49,7 +55,10 @@ var config = {
     'react/lib/ExecutionEnvironment': true,
     'react/lib/ReactContext': true,
     fs: '{}',
-  }
+  },
+  postcss: function(webpack) {
+    return getPostcssStack(webpack);
+  },
 };
 
 module.exports = config;
