@@ -15,6 +15,7 @@ module.exports = React.createClass({
   },
 
   render() {
+    //TODO migrate this into state
     const categories = this.props.categoryStore.getCategories();
     return (
       //Search header ...

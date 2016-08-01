@@ -3,16 +3,20 @@
 var assert = require('assert');
 var React = require('react');
 var { shallow } = require('enzyme');
+var sinon = require('sinon');
 var CategoryList = require('../../../../../shared/components/forum/category-list.jsx');
 var Container = require('../../../../../shared/components/container.jsx');
 var Panel = require('../../../../../shared/components/panel.jsx');
+var CategoryListItem = require('../../../../../shared/components/forum/category-list-item.jsx');
 
 describe('<CategoryList />', function(){
 
-  const categories = [ 1, 2, 3, 4];
+  const categories = [ '1', '2', '3', '4' ];
   let wrapper;
+  let clickHandle;
   beforeEach(function(){
-    wrapper = shallow(<CategoryList categories={categories} />);
+    clickHandle = sinon.spy();
+    wrapper = shallow(<CategoryList onCategoryClicked={clickHandle}  categories={categories} />);
   });
 
   it('should render a single container', function(){
@@ -29,6 +33,20 @@ describe('<CategoryList />', function(){
 
   it('should render a li for each child', function(){
     assert.equal(wrapper.find('li').length, categories.length);
+  });
+
+  it('should render a CategoryListItem for each category', function(){
+    assert.equal(wrapper.find(CategoryListItem).length, categories.length);
+  });
+
+  it('should call the onCategoryClicked when a child button is clicked', function(){
+    wrapper.find(CategoryListItem).at(0).simulate('click');
+    assert.equal(clickHandle.callCount, 1);
+  });
+
+  it('should call clickHandle with the correct arguments', function(){
+    wrapper.find(CategoryListItem).at(0).simulate('click');
+    assert(clickHandle.calledWith('1'));
   });
 
 });
