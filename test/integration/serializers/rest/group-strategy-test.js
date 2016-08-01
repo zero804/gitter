@@ -19,6 +19,7 @@ function getExpectedForGroup(group) {
       linkPath: group.sd.linkPath
     },
     avatarUrl: nconf.get('avatar:officialHost') + '/group/i/' + group.id,
+    hasAvatarSet: false
   }];
 }
 
