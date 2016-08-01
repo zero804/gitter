@@ -118,12 +118,20 @@ module.exports = ItemView.extend({
   getLegDeflectAnimationOptions: function() {
     var opts = this.iconOpts;
     var legElements = this.ui.toggleIcon[0].children;
+    // We are probably in IE which makes it hard to work with SVG's
+    if(!legElements) {
+      // Filter out the text nodes
+      legElements = Array.prototype.filter.call(this.ui.toggleIcon[0].childNodes || [], function(node) {
+        // Magic number 3 for the text node type
+        return node.nodeType !== 3;
+      });
+    }
 
     return {
       duration: 200,
       queue: false,
       step: function(t, fx) {
-        if(legElements) {
+        if(legElements && legElements.length >= 3) {
           if(fx.prop === 'firstT') {
             legElements[0].setAttribute('d', getFirstLegDescription(opts, fx.now));
           }

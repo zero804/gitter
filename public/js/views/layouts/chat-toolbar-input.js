@@ -25,23 +25,6 @@ var ChatToolbarInputLayout = ChatToolbarLayout.extend({
     'change:roomMember': '_roomMemberChanged'
   },
 
-  _roomMemberChanged: function() {
-    var inputRegion = this.regionManager.get('input');
-
-    if (this.model.get('roomMember')) {
-      inputRegion.show(new ChatInputView({
-        model: context.troupe(),
-        collection: this.options.chatCollection
-      }));
-    } else {
-      if (!this.model.get('aboutToLeave')) {
-        inputRegion.show(new JoinRoomView({ }));
-      }
-    }
-
-  },
-
-
   behaviors: {
     Isomorphic: {
       chat: {
@@ -110,6 +93,24 @@ var ChatToolbarInputLayout = ChatToolbarLayout.extend({
   initCollaboratorsView: function (optionsForRegion){
     return new CollaboratorsView(optionsForRegion());
   },
+
+  _roomMemberChanged: function() {
+    var inputRegion = this.regionManager.get('input');
+
+    if (this.model.get('roomMember')) {
+      inputRegion.show(new ChatInputView({
+        model: context.troupe(),
+        collection: this.options.chatCollection
+      }));
+    } else {
+      if (!this.model.get('aboutToLeave')) {
+        inputRegion.show(new JoinRoomView({ }));
+      }
+    }
+
+  },
+
+
 
   onKeyBackspace: function(e) {
     e.stopPropagation();

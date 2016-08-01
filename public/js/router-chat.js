@@ -5,18 +5,20 @@ require('utils/font-setup');
 var Backbone = require('backbone');
 var context = require('utils/context');
 var clientEnv = require('gitter-client-env');
-var liveContext = require('components/live-context');
-var appEvents = require('utils/appevents');
 var debug = require('debug-proxy')('app:router-chat');
-var ChatToolbarInputLayout = require('views/layouts/chat-toolbar-input');
-var DropTargetView = require('views/app/dropTargetView');
-var onready = require('./utils/onready');
+var fullTimeFormat = require('gitter-web-shared/time/full-time-format');
+
+var onready = require('utils/onready');
+var appEvents = require('utils/appevents');
+var frameUtils = require('utils/frame-utils');
+var liveContext = require('components/live-context');
 var apiClient = require('components/apiClient');
-var perfTiming = require('./components/perf-timing');
-var frameUtils = require('./utils/frame-utils');
+var perfTiming = require('components/perf-timing');
 var itemCollections = require('collections/instances/integrated-items');
 var chatCollection = require('collections/instances/chats-cached');
-var fullTimeFormat = require('gitter-web-shared/time/full-time-format');
+var troupeCollections = require('collections/instances/troupes');
+var ChatToolbarInputLayout = require('views/layouts/chat-toolbar-input');
+var DropTargetView = require('views/app/dropTargetView');
 
 /* Set the timezone cookie */
 require('components/timezone-cookie');
@@ -25,7 +27,7 @@ require('components/statsc');
 require('views/widgets/preload');
 require('components/dozy');
 require('template/helpers/all');
-require('./components/eyeballs-room-sync');
+require('components/eyeballs-room-sync');
 require('components/bug-reporting');
 require('components/focus-events');
 
@@ -34,7 +36,14 @@ require('components/ping');
 
 onready(function() {
 
-  appEvents.on('navigation', function(url, type, title) {
+  appEvents.on('navigation', function(url, type, title, options) {
+    options = options || {};
+
+    if(!url && options.refresh) {
+      window.location.reload();
+      return;
+    }
+
     if (frameUtils.hasParentFrameSameOrigin()) {
       frameUtils.postMessage({ type: 'navigation', url: url, urlType: type, title: title});
     } else {
@@ -233,7 +242,9 @@ onready(function() {
     model: context.troupe(),
     template: false,
     el: 'body',
-    chatCollection: chatCollection
+    chatCollection: chatCollection,
+    groupsCollection: troupeCollections.groups,
+    roomCollection: troupeCollections.troupes
   });
 
   appView.render();

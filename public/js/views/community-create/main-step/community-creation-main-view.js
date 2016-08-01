@@ -220,8 +220,14 @@ module.exports = CommunityCreateBaseStepView.extend({
         communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.AVAILABLE);
         model.isValid();
       })
-      .catch(function() {
-        communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.UNAVAILABLE);
+      .catch(function(err) {
+        var status = err.status;
+        if(status === 409) {
+          communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.UNAVAILABLE);
+        }
+        else {
+          communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.INVALID);
+        }
         model.isValid();
       });
   }, 300),
@@ -232,6 +238,6 @@ module.exports = CommunityCreateBaseStepView.extend({
 
     this.ui.communitySlugInputWrapper.toggleClass('pending', status === slugAvailabilityStatusConstants.PENDING);
     this.ui.communitySlugInputWrapper.toggleClass('available', status === slugAvailabilityStatusConstants.AVAILABLE);
-    this.ui.communitySlugInputWrapper.toggleClass('unavailable', status === slugAvailabilityStatusConstants.UNAVAILABLE);
+    this.ui.communitySlugInputWrapper.toggleClass('unavailable', status === slugAvailabilityStatusConstants.UNAVAILABLE || status === slugAvailabilityStatusConstants.INVALID);
   }
 });

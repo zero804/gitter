@@ -52,7 +52,9 @@ var webpackConfig = {
       'raven-js',
       'keymaster',
       'moment',
-      'bluebird'
+      'bluebird',
+      'fuzzysearch',
+      'url-join'
     ]
   },
   output: {
@@ -91,6 +93,7 @@ var webpackConfig = {
       "utils": path.resolve(path.join(__dirname, "/utils/")),
       // "shared": path.resolve(path.join(__dirname, "../../shared/")),
       "views": path.resolve(path.join(__dirname, "./views/")),
+      "models": path.resolve(path.join(__dirname, "./models")),
       "collections": path.resolve(path.join(__dirname, "./collections")),
       "components": path.resolve(path.join(__dirname, "./components")),
       "template": path.resolve(path.join(__dirname, "./template")),
