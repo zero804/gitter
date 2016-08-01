@@ -1,6 +1,7 @@
 "use strict";
 
 require('../less/index.less');
+require('../../node_modules/gitter-styleguide/css/components/buttons.css');
 
 const Backbone = require('backbone');
 const React = require('react');
