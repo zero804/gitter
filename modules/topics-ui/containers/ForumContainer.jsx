@@ -12,7 +12,7 @@ module.exports = React.createClass({
     categoryStore: React.PropTypes.shape({
       models: React.PropTypes.array.isRequired,
       getCategories: React.PropTypes.func.isRequired
-    })
+    }).isRequired
   },
 
   render() {
