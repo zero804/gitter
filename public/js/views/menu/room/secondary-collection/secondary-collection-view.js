@@ -8,6 +8,7 @@ var ItemView = require('./secondary-collection-item-view');
 var SearchItemView = require('./secondary-collection-item-search-view');
 var BaseCollectionView = require('../base-collection/base-collection-view');
 var EmptySearchView = require('./secondary-collection-item-search-empty-view');
+var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
 
 var clientEnv = require('gitter-client-env');
 
@@ -48,15 +49,20 @@ module.exports = BaseCollectionView.extend({
 
   serializeData: function() {
     var data = this.model.toJSON();
-    return _.extend({}, data, {
+    return _.extend({}, proto.serializeData.apply(this, arguments), data, {
       isSearch:        (data.state === 'search'),
-      selectedOrgName: this.roomMenuModel.get('selectedOrgName'),
       orgRoomUrl:      this.getOrgRoomUrl(),
     });
   },
 
   getOrgRoomUrl: function () {
-    return urlJoin('/orgs', this.roomMenuModel.get('selectedOrgName'), 'rooms');
+    var groupId = this.roomMenuModel.get('groupId');
+    var selectedGroup = this.groupsCollection.get(groupId);
+    var uri = getOrgNameFromUri(document.location.pathname);
+    if(selectedGroup) {
+      uri = selectedGroup.get('uri');
+    }
+    return urlJoin('/orgs', uri, 'rooms');
   },
 
   initialize: function(attrs) {
@@ -77,7 +83,9 @@ module.exports = BaseCollectionView.extend({
     //Sort out show more button
     if (this.roomMenuModel.get('state') === 'org' && this.collection.length >= 9) {
       this.ui.showMore.attr('href', this.getOrgRoomUrl());
-      this.ui.showMore.attr('title', 'more ' + this.roomMenuModel.get('selectedOrgName') + ' rooms');
+      var groupId = this.roomMenuModel.get('groupId');
+      var selectedGroup = this.groupsCollection.get(groupId);
+      this.ui.showMore.attr('title', 'more ' + !!selectedGroup ? selectedGroup.get('name') : '' + ' rooms');
       this.ui.showMore[0].classList.remove('hidden');
     } else {
       this.ui.showMore[0].classList.add('hidden');

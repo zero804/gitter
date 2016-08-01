@@ -9,6 +9,7 @@ var githubUserByUsernameVersioned = require('./github-user-by-username-versioned
 var githubUserByUsername = require('./github-user-by-username');
 var gravatarByEmail = require('./gravatar-by-email');
 var gravatarByHash = require('./gravatar-by-hash');
+var twitterByIds = require('./twitter-by-ids');
 var groupById = require('./group-by-id');
 var userByUsername = require('./user-by-username');
 
@@ -121,6 +122,18 @@ router.get('/gravatar/m/:md5',
 
     return gravatarByHash(md5, size);
   }));
+
+router.get('/tw/i/:id1/:id2/:extension',
+  identifyRoute('api-private-avatar-twitter'),
+  sendAvatar(function(req, size) {
+    var id1 = req.params.id1;
+    var id2 = req.params.id2;
+    var extension = req.params.extension;
+
+    if (!id1 || !id2 || !extension) return null;
+
+    return twitterByIds(id1, id2, extension, size);
+  }))
 
 /**
  * Only used in DEV. Otherwise nginx handles this route

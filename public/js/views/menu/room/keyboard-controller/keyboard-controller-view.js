@@ -97,7 +97,7 @@ var KeyboardController = Marionette.ItemView.extend({
     index = arrayBoundWrap(index, collection.length);
     var model = collection.at(index);
     model.set('focus', true);
-    this.setModelState({ state: 'org', selectedOrgName: model.get('name') });
+    this.setModelState({ state: 'org', groupId: model.get('id') });
   },
 
   onDownKeyPressed: function (e){
@@ -361,7 +361,7 @@ var KeyboardController = Marionette.ItemView.extend({
     var type = model.get('type');
     this.setModelState({
       state: type,
-      selectedOrgName: (type === 'org') ? model.get('name') : null,
+      groupId: (type === 'org') ? model.get('id') : null,
     });
   }, 100),
 

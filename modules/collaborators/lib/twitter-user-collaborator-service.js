@@ -4,6 +4,7 @@ var debug = require('debug')('gitter:modules:collaborators');
 var _ = require('lodash');
 var TwitterService = require('gitter-web-twitter');
 var identityService = require('gitter-web-identity');
+var avatars = require('gitter-web-avatars');
 
 function TwitterUserCollaboratorService(user, identity) {
   this.user = user;
@@ -27,7 +28,7 @@ TwitterUserCollaboratorService.prototype.findCollaborators = function() {
         return {
           displayName: follower.name,
           twitterUsername: follower.screen_name,
-          avatarUrl: follower.profile_image_url_https, // TODO: use avatar service?
+          avatarUrl: avatars.getForTwitterUrl(follower.profile_image_url_https),
           type: identityService.TWITTER_IDENTITY_PROVIDER
         };
       });

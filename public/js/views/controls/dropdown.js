@@ -35,7 +35,8 @@ module.exports = (function() {
     return max;
   }
 
-  var backdrop = '.dropdown-backdrop';
+  var backdropClass = 'dropdown-backdrop';
+  var backdropSelector = '.' + backdropClass;
 
   var DropdownItemView = Marionette.ItemView.extend({
     tagName: "li",
@@ -108,6 +109,8 @@ module.exports = (function() {
 
       this.options = _.extend({}, DEFAULTS, options);
 
+      this.dropdownClass = options.dropdownClass;
+
       /* From the selectable-mixin */
       this.listenTo(this, 'selectClicked', function() {
         this.hide();
@@ -130,10 +133,14 @@ module.exports = (function() {
         zIndex = 100;
       }
       this.el.style.zIndex = zIndex;
+      if(this.dropdownClass) {
+        this.el.classList.add(this.dropdownClass);
+      }
     },
 
     onDestroy: function() {
       if(this.mutant) this.mutant.disconnect();
+      $(backdropSelector).off(this.backdropClickedCallback);
     },
 
     clicked: function() {
@@ -142,6 +149,15 @@ module.exports = (function() {
         this.hide();
       }
     },
+    backdropClickedCallback: function() {
+      $(backdropSelector).remove();
+      if(activeDropdown) {
+        var t = activeDropdown;
+        activeDropdown = null;
+        t.hide();
+      }
+    },
+
     getPosition: function () {
       var el = this.targetElement;
 
@@ -185,8 +201,10 @@ module.exports = (function() {
       var $e = this.render().$el;
       var e = this.el;
 
+      // Stop any impending actions from hide
+      window.clearTimeout(this.hideTimeoutId);
 
-      $(backdrop).remove();
+      $(backdropSelector).remove();
       if(activeDropdown) {
         activeDropdown.hide();
       }
@@ -194,14 +212,7 @@ module.exports = (function() {
       activeDropdown = this;
 
       var zIndex = parseInt(this.el.style.zIndex, 10);
-      $('<div class="dropdown-backdrop"/>').css({ zIndex: zIndex - 1 }).insertAfter($('body')).on('click', function() {
-        $(backdrop).remove();
-        if(activeDropdown) {
-          var t = activeDropdown;
-          activeDropdown = null;
-          t.hide();
-        }
-      });
+      $('<div class="' + backdropClass + ' ' + this.options.backdropClass + '"/>').css({ zIndex: zIndex - 1 }).insertAfter($('body')).on('click', this.backdropClickedCallback);
 
       this.setActive(this.selectedModel);
 
@@ -231,9 +242,9 @@ module.exports = (function() {
       if(!this.active()) return;
       // $el.find('li.active:not(.divider):visible').removeClass('active');
       $el.addClass('dropdown-hidden');
-      $(backdrop).remove();
+      $(backdropSelector).remove();
 
-      window.setTimeout(function() {
+      this.hideTimeoutId = window.setTimeout(function() {
         $el.css({ display: 'none' });
       }, TRANSITION);
       activeDropdown = null;

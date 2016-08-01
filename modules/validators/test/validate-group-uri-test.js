@@ -15,6 +15,8 @@ describe('validate-group-uri', function() {
     '张德江访因展示标语被捕': true,
     'spaces ': false,
     'colons:': false,
+    'topics': false,
+    'archive': false
   };
 
   Object.keys(FIXTURES).forEach(function(key) {
