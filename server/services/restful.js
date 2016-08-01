@@ -17,7 +17,8 @@ var userTypeahead = require('./typeaheads/user-typeahead');
 var eventService = require("./event-service");
 var roomService = require('./room-service');
 var roomMembershipService = require('./room-membership-service');
-var BackendMuxer = require('gitter-web-backend-muxer');
+var orgService = require("./org-service");
+var repoService = require("./repo-service");
 var userScopes = require('gitter-web-identity/lib/user-scopes');
 
 var survivalMode = !!process.env.SURVIVAL_MODE || false;
@@ -152,8 +153,7 @@ function serializeEventsForTroupe(troupeId, userId, callback) {
 }
 
 function serializeOrgsForUser(user) {
-  var backendMuxer = new BackendMuxer(user);
-  return backendMuxer.findOrgs()
+  return orgService.getOrgsForUser(user)
     .then(function(orgs) {
       var strategyOptions = { currentUserId: user.id };
       // TODO: not all organisations are going to be github ones in future!
@@ -168,6 +168,34 @@ function serializeOrgsForUserId(userId, options) {
       if(!user) return [];
 
       return serializeOrgsForUser(user, options);
+    });
+}
+
+function serializeUnusedOrgsForUser(user) {
+  return orgService.getUnusedOrgsForUser(user)
+    .then(function(orgs) {
+      var strategyOptions = { currentUserId: user.id };
+      var strategy = new restSerializer.GithubOrgStrategy(strategyOptions);
+      return restSerializer.serialize(orgs, strategy);
+    });
+
+}
+
+function serializeReposForUser(user) {
+  return repoService.getReposForUser(user)
+    .then(function(repos) {
+      var strategyOptions = { currentUserId: user.id };
+      var strategy = new restSerializer.GithubRepoStrategy(strategyOptions);
+      return restSerializer.serialize(repos, strategy);
+    });
+}
+
+function serializeUnusedReposForUser(user) {
+  return repoService.getUnusedReposForUser(user)
+    .then(function(repos) {
+      var strategyOptions = { currentUserId: user.id };
+      var strategy = new restSerializer.GithubRepoStrategy(strategyOptions);
+      return restSerializer.serialize(repos, strategy);
     });
 }
 
@@ -244,6 +272,9 @@ module.exports = {
   serializeEventsForTroupe: serializeEventsForTroupe,
   serializeOrgsForUser: serializeOrgsForUser,
   serializeOrgsForUserId: serializeOrgsForUserId,
+  serializeUnusedOrgsForUser: serializeUnusedOrgsForUser,
+  serializeReposForUser: serializeReposForUser,
+  serializeUnusedReposForUser: serializeUnusedReposForUser,
   serializeProfileForUsername: serializeProfileForUsername,
   serializeGroupsForUserId: Promise.method(serializeGroupsForUserId),
   serializeAdminGroupsForUser: Promise.method(serializeAdminGroupsForUser),

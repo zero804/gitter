@@ -1,99 +1,103 @@
-<div class="trpModalBody">
-  <div id="room-owner-and-name" class="create-room-container gtrRoomName">
-
-    <dl class="owner">
-      <dt>
-        <label for="owner"><h5>Community</h5></label>
-      </dt>
-      <dd id="owner-region">
-        <div class="gtrInput gtrOwnerDD">
-        </div>
-      </dd>
-    </dl>
-
-    <div class="gtrSlash">/</div>
-
-    <dl class="owner">
-      <dt>
-        <label for="room"><h5>Room name</h5></label>
-      </dt>
-      <dd>
-        <input class="gtrInput room" id="room-name" autofocus/>
-        <div class="modal--default__content__info" style="margin-top: -8px; opacity: 0.5; margin-left: 1px; padding: 0">Letters and numbers. Can't contain spaces.</div>
-      </dd>
-    </dl>
-
-  </div>
-  <div class="permissions" id="permissions">
-    <h5>Permissions</h5>
-    <div id="perm-select-public" class="permission">
-      <div class='permission__input'>
-        <input name="permissions" id="perm-select-public-input"  type="radio" value="public" checked="true">
-      </div>
-      <label for='perm-select-public-input'>
-        <div class='permission__icon permission__icon--large'>
-          <i class="octicon octicon-globe"></i>
-        </div>
-        <div class='permission__details'>
-          <strong>Public</strong><br>
-          <div>Anyone in the world can join.</div>
-        </div>
+<div>
+  <section class="create-room-room-wrapper">
+    <div class="create-room-group-select-wrapper">
+      <label class="create-room-group-select-label">
+        Community
       </label>
+      <div class="create-room-group-input js-create-room-group-input"></div>
+      <a href="#createcommunity" class="create-room-create-community-link">
+        <i class="create-room-create-community-icon icon-globe"></i> Create New Community
+      </a>
     </div>
-
-    <div id="perm-select-inherited-org" class="permission">
-      <div class='permission__input'>
-        <input name="permissions" id="perm-select-inherited-org-input"  type="radio" value="inherited">
-      </div>
-      <label for='perm-select-inherited-org-input'>
-        <div class='permission__icon permission__icon--large'>
-          <i class="octicon octicon-organization"></i>
-        </div>
-        <div class='permission__details'>
-          <strong>Organisation</strong><br>
-          Anyone in <strong id="org-name">orgName</strong> can join.
-        </div>
+    <div class="create-room-name-select-wrapper">
+      <label class="create-room-name-select-label" for="create-room-name-input">
+        Room Name
       </label>
-    </div>
-
-    <div id="perm-select-inherited-repo" class="permission">
-      <div class='permission__input'>
-        <input name="permissions" id="perm-select-inherited-repo-input"  type="radio" value="inherited">
+      <div class="create-room-name-input-wrapper">
+        <input
+          class="create-room-name-input js-create-room-name-input"
+          id="create-room-name-input"
+          pattern="[a-z0-9\-]+"
+          required
+          value="">
+        <i class="create-room-name-input-clear-button icon-cancel-circle js-create-room-clear-name-button"></i>
       </div>
-      <label for='perm-select-inherited-repo-input'>
-        <div class='permission__icon permission__icon--large'>
-          <i class="octicon octicon-repo"></i>
-        </div>
-        <div class='permission__details'>
-          <strong>Repository</strong><br>
-          Anyone with access to <strong id="repo-name">repoName</strong> can join.
-        </div>
-      </label>
+      <a href="" class="hidden create-room-associated-github-project-link js-associated-github-project-link">
+        <i class="create-room-associated-github-project-icon octicon octicon-repo"></i>
+        <span class="js-associated-github-project-name"></span>
+      </a>
     </div>
+  </section>
 
-    <div id="perm-select-private" class="permission">
-      <div class='permission__input'>
-        <input name="permissions" id="perm-select-private-input" type="radio" value="private">
-      </div>
-      <label for='perm-select-private-input'>
-        <div class='permission__icon permission__icon--large'>
-          <i class="octicon octicon-lock"></i>
-        </div>
-        <div class='permission__details'>
-          <strong>Private</strong><br>
-          Only people added to the room can join.
-        </div>
-      </label>
-    </div>
+  <section class="create-room-security-section">
+    <ul class="create-room-security-list">
+      <li class="create-room-security-list-item">
+        <input
+          type="radio"
+          class="create-room-security-list-item-radio js-create-room-security-radio js-create-room-security-public-radio"
+          id="create-room-public-security"
+          name="create-room-security"
+          value="PUBLIC"
+          checked>
+        <label class="create-room-security-list-item-label" for="create-room-public-security">
+          <i class="create-room-security-list-item-icon octicon octicon-globe"></i>
+          <span>
+            <span class="create-room-security-list-item-name">Public</span>
+            <br>
+            <span>
+              Anyone in the world can join.
+            </span>
+          </span>
+        </label>
+      </li>
+      <li class="create-room-security-list-item">
+        <input
+          type="radio"
+          class="create-room-security-list-item-radio js-create-room-security-radio js-create-room-security-private-radio"
+          id="create-room-private-security"
+          name="create-room-security"
+          value="PRIVATE">
+        <label class="create-room-security-list-item-label" for="create-room-private-security">
+          <i class="create-room-security-list-item-icon octicon octicon-lock"></i>
+          <span>
+            <span class="create-room-security-list-item-name">Private</span>
+            <br>
+            <span>
+              Only people added to the room can join.
+            </span>
+          </span>
+        </label>
+      </li>
+    </ul>
+  </section>
 
-    <div id="existing">
-      <div class="permission-label">That room already exists.</div>
-    </div>
+  <section class="create-room-detail-section js-create-room-detail-section">
+    <ul class="create-room-detail-option-list">
+      <li class="create-room-detail-option-item js-create-room-only-github-users-option">
+        <input
+          type="checkbox"
+          class="create-room-detail-option-item-input js-create-room-only-github-users-option-input"
+          id="create-room-only-github-users"
+          value="public">
+        <label class="create-room-detail-option-item-label" for="create-room-only-github-users">
+          Only GitHub users can join this room
+        </labe>
+      </li>
+      <li class="create-room-detail-option-item hidden js-create-room-only-org-users-option">
+        <input
+          type="checkbox"
+          class="create-room-detail-option-item-input js-create-room-only-org-users-option-input"
+          id="create-room-only-org-users"
+          value="public">
+        <label class="create-room-detail-option-item-label" for="create-room-only-org-users">
+          Members of <span class="js-create-room-only-org-users-option-org-name">asdf</span> can join this room
+        </labe>
+      </li>
+    </ul>
+  </section>
 
-  </div>
-</div>
-<div class="modal--default__content__error" id="modal-failure" style="display:none">
-</div>
-<div class="modal--default__content__error" id="premium-required" style="display:none;">
-  To create this type of room, you will need a premium account.
+  <section>
+    <div class="create-room-availability-status-message js-room-availability-status-message"></div>
+  </sectio>
+
 </div>
