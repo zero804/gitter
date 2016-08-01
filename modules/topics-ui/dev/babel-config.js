@@ -1,4 +1,4 @@
 module.exports = {
   cache: false,
-  extensions: [".jsx"]
+  extensions: [".js", ".jsx"]
 };
