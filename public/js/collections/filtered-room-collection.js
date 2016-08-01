@@ -4,6 +4,7 @@ var one2oneFilter = require('gitter-web-shared/filters/left-menu-primary-one2one
 var orgFilter = require('gitter-web-shared/filters/left-menu-primary-org');
 var sortAndFilters = require('gitter-realtime-client/lib/sorts-filters').model;
 var SimpleFilteredCollection = require('./simple-filtered-collection');
+var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
 
 var FilteredRoomCollection = SimpleFilteredCollection.extend({
   initialize: function(models, options) {
@@ -12,7 +13,7 @@ var FilteredRoomCollection = SimpleFilteredCollection.extend({
     }
 
     this.roomModel = options.roomModel;
-    this.listenTo(this.roomModel, 'change:state change:selectedOrgName', this.onModelChangeState);
+    this.listenTo(this.roomModel, 'change:state change:groupId', this.onModelChangeState);
 
     this.listenTo(this, 'change add', this.applyHideCriteria);
     this.listenTo(this, 'reset', this.reapplyHideCriteria);
@@ -44,8 +45,13 @@ var FilteredRoomCollection = SimpleFilteredCollection.extend({
     },
 
     org: function(model) {
-      var orgName = this.roomModel.get('selectedOrgName');
-      return orgFilter(model.attributes, orgName);
+      var groupId = this.roomModel.get('groupId');
+      return orgFilter(model.attributes, groupId);
+    },
+
+    tempOrg: function(model){
+      var groupName = getOrgNameFromUri(document.location.pathname);
+      return getOrgNameFromUri(model.get('uri')) === groupName;
     },
 
     default: sortAndFilters.recents.filter
@@ -61,6 +67,9 @@ var FilteredRoomCollection = SimpleFilteredCollection.extend({
       case 'search':
       case 'org':
         this.setVisibilePredicate(this.visiblePredicates[state].bind(this));
+        break;
+      case 'temp-org':
+        this.setVisibilePredicate(this.visiblePredicates.tempOrg);
         break;
       default:
         this.setVisibilePredicate(this.visiblePredicates.default);

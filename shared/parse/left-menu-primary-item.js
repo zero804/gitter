@@ -1,15 +1,14 @@
-/* eslint complexity: ["error", 14] */
+/* eslint complexity: ["error", 16] */
 'use strict';
 
 var _ = require('underscore');
 var urlJoin = require('url-join');
-var resolveRoomAvatarSrcSet = require('../avatars/resolve-room-avatar-srcset');
+var avatars = require('gitter-web-avatars');
 var roomNameShortener = require('../room-name-shortener');
 var parseRoomItemName = require('../get-org-menu-state-name-from-troupe-name');
 
 var clientEnv = require('gitter-client-env');
 
-var AVATAR_SIZE = 22;
 
 module.exports = function parseContentToTemplateData(data, state) {
   data.name = (data.name || data.uri || '');
@@ -21,27 +20,37 @@ module.exports = function parseContentToTemplateData(data, state) {
     data.uri = urlJoin(data.uri, '?source=suggested-menu');
   }
 
+  //This is a dirty hack to provide avatar for one-to-one avatars
+  //as the troupe serializer has no way of deriving them
+  if(data.oneToOne) {
+    data.avatarUrl = avatars.getForUser(data.user);
+  }
+
+  if(data.avatar_url) {
+    data.avatarUrl = data.avatar_url;
+  }
+
   data.absoluteRoomUri = urlJoin(clientEnv.basePath, (data.uri || data.url));
 
   //For user results
   if (data.displayName) {
     return _.extend({}, {
       name:         roomNameShortener(data.displayName),
-      avatarSrcset: resolveRoomAvatarSrcSet({ uri: data.username }, AVATAR_SIZE),
+      avatarUrl: avatars.getForUser(data),
       absoluteRoomUri: data.absoluteRoomUri
     });
   }
 
   if(data.isRecentSearch || data.isSearchRepoResult) {
-    var avatarSrcset = resolveRoomAvatarSrcSet({ uri: data.name }, AVATAR_SIZE);
+    var avatarUrl = avatars.getForGitHubUsername(data.name);
     // No avatars on recent searches
     if(data.isRecentSearch) {
-      avatarSrcset = null;
+      avatarUrl = null;
     }
 
     return _.extend({}, {
-      name:         roomNameShortener(data.name),
-      avatarSrcset: avatarSrcset,
+      name: roomNameShortener(data.name),
+      avatarUrl: avatarUrl
     });
   }
 
@@ -57,9 +66,7 @@ module.exports = function parseContentToTemplateData(data, state) {
     roomName = parseRoomItemName(data.name);
   }
 
-  var uri = data.uri || (data.url || '').substring(1) || data.name;
   return _.extend({}, data, {
-    avatarSrcset:  resolveRoomAvatarSrcSet({ uri: uri }, AVATAR_SIZE),
     isNotOneToOne: (data.githubType !== 'ONETOONE'),
     name:          roomNameShortener(roomName),
     mentions:      hasMentions,
