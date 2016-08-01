@@ -1,8 +1,7 @@
 'use strict';
 
 var React = require('react');
-var Container = require('../shared/components/container.jsx');
-var Panel = require('../shared/components/panel.jsx');
+var CategoryList = require('../shared/components/forum/category-list.jsx');
 
 module.exports = React.createClass({
 
@@ -19,11 +18,7 @@ module.exports = React.createClass({
     const categories = this.props.categoryStore.getCategories();
     return (
       //Search header ...
-      <Container>
-        <Panel>
-          { categories.map((cat, i) => <span key={i}>{cat}</span>) }
-        </Panel>
-      </Container>
+      <CategoryList categories={categories} />
     );
   }
 });
