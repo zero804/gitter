@@ -21,13 +21,13 @@ var config = {
     loaders: [
       {
         test:    /.css$/,
-        loader:  'style-loader?insertAt=top!css-loader!postcss-loader',
+        loader:  'style-loader!css-loader!postcss-loader',
       },
-      {
-        test: /.less$/,
-        loader: ExtractTextPlugin.extract('style-loader', 'css-loader!less-loader'),
-        include: path.resolve(__dirname, './browser/less')
-      },
+      //{
+      //  test: /.less$/,
+      //  loader: ExtractTextPlugin.extract('style-loader', 'css-loader!less-loader'),
+      //  include: path.resolve(__dirname, './browser/less')
+      //},
       {
         test: /\.jsx$/,
         loader: 'babel',
@@ -43,11 +43,10 @@ var config = {
   resolve: {
     alias: {
       jquery: path.resolve(__dirname, './node_modules/jquery/dist/jquery.js'),
-      'gitter-styleguide': path.resolve(__dirname, './node_modules/gitter-styleguide'),
     }
   },
   plugins: [
-    new ExtractTextPlugin("style.css", { allChunks: false })
+    //new ExtractTextPlugin("style.css", { allChunks: false })
   ],
   externals: {
     'cheerio': 'window',
