@@ -184,6 +184,10 @@ var CommunityCreateView = Marionette.LayoutView.extend({
     document.body.appendChild(rootWrapperElement);
   },
 
+  hideInternal: function() {
+    this.destroy();
+  },
+
   navigationalHide: function() {
     this.closeView();
   }
