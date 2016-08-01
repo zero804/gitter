@@ -18,16 +18,18 @@ var config = {
     devtoolFallbackModuleFilenameTemplate: "[resource-path]?[hash]"
   },
   module: {
+    preLoaders: [
+      {
+        test: /.css$/,
+        loader: 'postcss-loader',
+      },
+    ],
     loaders: [
       {
-        test:    /.css$/,
-        loader:  'style-loader!css-loader!postcss-loader',
+        test: /.less$/,
+        loader: ExtractTextPlugin.extract('style-loader', 'css-loader!less-loader'),
+        include: path.resolve(__dirname, './browser/less'),
       },
-      //{
-      //  test: /.less$/,
-      //  loader: ExtractTextPlugin.extract('style-loader', 'css-loader!less-loader'),
-      //  include: path.resolve(__dirname, './browser/less')
-      //},
       {
         test: /\.jsx$/,
         loader: 'babel',
@@ -46,7 +48,7 @@ var config = {
     }
   },
   plugins: [
-    //new ExtractTextPlugin("style.css", { allChunks: false })
+    new ExtractTextPlugin("style.css", { allChunks: false })
   ],
   externals: {
     'cheerio': 'window',

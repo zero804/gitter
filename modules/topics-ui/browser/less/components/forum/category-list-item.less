@@ -1,7 +1,8 @@
-.category-list__item {
-  //.subdued-button-clouds--xsmall();
-}
+@import (less, reference) "../../../../node_modules/gitter-styleguide/css/components/buttons.css";
 
-.category-list__item--active {
-  //.button-clouds--xsmall();
+.category-list__item {
+  &:extend(.subdued-button-clouds--xsmall all);
+}
+.category-list__item--active{
+  &:extend(.button-clouds--xsmall all);
 }
