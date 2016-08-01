@@ -80,7 +80,7 @@ router.get('/default',
   identifyRoute('api-private-avatar-default'),
   sendAvatar(function(/*req, size*/) {
     return {
-      url: cdn('images/avatar-fallback.png'),
+      url: cdn('images/default-avatar.png'),
       longTermCachable: true
     };
   }));
