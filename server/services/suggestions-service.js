@@ -2,6 +2,8 @@
 
 var Promise = require('bluebird');
 var _ = require('lodash');
+var env = require('gitter-web-env');
+var config = env.config;
 var promiseUtils = require('../utils/promise-utils');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var troupeService = require('./troupe-service');
@@ -19,6 +21,8 @@ var groupRoomSuggestions = require('gitter-web-groups/lib/group-room-suggestions
 // var ownedRepos = require('./recommendations/owned-repos');
 var starredRepos = require('./recommendations/starred-repos');
 // var watchedRepos = require('./recommendations/watched-repos');
+
+var EXPIRES_SECONDS = config.get('suggestions:cache-timeout');
 
 var NUM_SUGGESTIONS = 12;
 var MAX_SUGGESTIONS_PER_ORG = 2;
@@ -354,7 +358,9 @@ function findSuggestionsForUserId(userId) {
   }
 
 module.exports = {
-  findSuggestionsForUserId: cacheWrapper('findSuggestionsForUserId', findSuggestionsForUserId),
+  findSuggestionsForUserId: cacheWrapper('findSuggestionsForUserId', findSuggestionsForUserId, {
+    ttl: EXPIRES_SECONDS
+  }),
   findSuggestionsForRooms: findSuggestionsForRooms,
   testOnly: {
     HIGHLIGHTED_ROOMS: HIGHLIGHTED_ROOMS
