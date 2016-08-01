@@ -12,9 +12,12 @@ module.exports = React.createClass({
   },
 
   render(){
+
     const { category, active, onClick } = this.props;
+
     var className = 'subdued-button-clouds--xsmall';
     if(active) { className = 'button-clouds--xsmall'; }
+
     return (
       <button className={ className } onClick={() => onClick(category)}>{ category }</button>
     );
