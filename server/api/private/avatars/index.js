@@ -6,6 +6,7 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
 var fixMongoIdQueryParam = require('../../../web/fix-mongo-id-query-param');
 var Promise = require('bluebird');
 var cdn = require('gitter-web-cdn');
+var avatars = require('gitter-web-avatars');
 var githubUserByUsernameVersioned = require('./github-user-by-username-versioned');
 var githubUserByUsername = require('./github-user-by-username');
 var gravatarByEmail = require('./gravatar-by-email');
@@ -25,6 +26,7 @@ function sendMissing(req, res) {
     res.set('Content-Type', MISSING_IMAGE_CONTENT_TYPE);
     res.status(200).end();
   } else {
+    res.redirect(avatars.getDefault());
     res.status(404).end();
   }
 }
