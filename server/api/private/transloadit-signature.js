@@ -114,7 +114,7 @@ function transloaditSignature(req, res, next) {
     var apiBasePath = nconf.get('web:apiBasePath');
     var token = uuid.v4();
 
-    params.fields.shortToken = randomString(4);
+    params.fields.token = randomString(4);
     params.notify_url = apiBasePath + '/private/transloadit/' + token;
 
     // Store the token temporarily to verify Transloadit callback
