@@ -2,7 +2,7 @@
 
 var avatars = require('gitter-web-avatars');
 
-function GroupStrategy(/* options */) {
+function GroupStrategy(options) {
   this.preload = function(/*groups*/) {
     return;
   };
@@ -10,7 +10,10 @@ function GroupStrategy(/* options */) {
   this.map = function(group) {
     var id = group.id || group._id && group._id.toHexString();
 
-    var hasAvatarSet = group.avatarVersion > 0 || group.sd.type === 'GH_ORG' || group.sd.type === 'GH_REPO' || group.sd.type === 'GH_USER';
+    var hasAvatarSet = undefined;
+    if(options && options.includeHasAvatarSet) {
+      hasAvatarSet = group.avatarVersion > 0 || group.sd.type === 'GH_ORG' || group.sd.type === 'GH_REPO' || group.sd.type === 'GH_USER';
+    }
 
     return {
       id: id,
