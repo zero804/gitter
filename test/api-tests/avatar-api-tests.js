@@ -5,7 +5,6 @@ process.env.DISABLE_API_LISTEN = '1';
 var assert = require('assert');
 var Promise = require('bluebird');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
-var avatars = require('gitter-web-avatars');
 
 describe('avatar-api', function() {
   var app, request;
