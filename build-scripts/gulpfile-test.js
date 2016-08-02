@@ -234,8 +234,7 @@ if (RUN_TESTS_IN_PARALLEL) {
 /**
  * Hook into post test
  */
-if (process.env.JENKINS_URL) {
-  // Public code-coverage, only if we're using Jenkins
+if (generateCoverage) {
   gulp.task('test:post-test', ['test:post-test:merge-lcov', 'test:post-test:submit-codecov']);
 }
 
