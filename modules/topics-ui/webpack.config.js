@@ -6,6 +6,7 @@ var ExtractTextPlugin = require("extract-text-webpack-plugin");
 var getPostcssStack = require('gitter-styleguide/postcss-stack');
 
 var config = {
+  devtool: 'source-map',
   entry: {
     index: path.resolve(__dirname, './browser/js/index'),
   },
