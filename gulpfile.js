@@ -14,4 +14,21 @@ gulpStaged({
 
   topics: require('./modules/topics-ui/gulpfile-topics'),
   embedtopics: require('./build-scripts/gulpfile-embed-topics')
+});
+
+/* eslint-disable */
+process.on('exit', function(code, signal) {
+  console.log('PROCESS EXIT EVENT', process.argv);
+  console.log('PROCESS EXIT CODE', code);
+  console.log('PROCESS EXIT SIGNAL', signal);
+  console.trace();
 })
+
+var originalExit = process.exit;
+process.exit = function(code, signal) {
+  console.log('PROCESS EXIT', process.argv);
+  console.log('PROCESS EXIT CODE', code);
+  console.log('PROCESS EXIT SIGNAL', signal);
+  console.trace();
+  originalExit.call(process, code);
+}
