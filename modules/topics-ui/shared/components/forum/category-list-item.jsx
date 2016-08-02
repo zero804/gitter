@@ -9,17 +9,27 @@ module.exports = React.createClass({
     category: React.PropTypes.string.isRequired,
     active: React.PropTypes.bool.isRequired,
     onClick: React.PropTypes.func.isRequired,
+    groupName: React.PropTypes.string.isRequired,
   },
 
   render(){
 
-    const { category, active, onClick } = this.props;
+    const { groupName, category, active, onClick } = this.props;
+    const href = `/${groupName}/topics/categories/${category}`;
+    const title = `${category} topics`;
 
-    var className = 'category-list__item';
+    let className = 'category-list__item';
     if(active) { className = 'category-list__item--active'; }
 
     return (
-      <button className={ className } onClick={() => onClick(category)}>{ category }</button>
+      <a href={href} title={title} className={ className } onClick={this.onClick}>{ category }</a>
     );
+  },
+
+  onClick(e = { preventDefault: () => {}}){
+    e.preventDefault();
+    const { onClick, category } = this.props;
+    onClick(category);
   }
+
 });

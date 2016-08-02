@@ -8,6 +8,7 @@ module.exports = React.createClass({
   displayName: 'ForumContainer',
 
   propTypes: {
+    groupName: React.PropTypes.string.isRequired,
     categoryStore: React.PropTypes.shape({
       models: React.PropTypes.array.isRequired,
       getCategories: React.PropTypes.func.isRequired
@@ -17,12 +18,15 @@ module.exports = React.createClass({
   render() {
     //TODO migrate this into state
     const categories = this.props.categoryStore.getCategories();
+    const { groupName } = this.props;
     return (
       //Search header ...
-      <CategoryList categories={categories} onCategoryClicked={ this.onCategoryClicked } />
+      <CategoryList categories={ categories } groupName={ groupName }  onCategoryClicked={ this.onCategoryClicked } />
     );
   },
 
-  onCategoryClicked(){}
+  onCategoryClicked(){
+    console.log('this is working');
+  }
 
 });
