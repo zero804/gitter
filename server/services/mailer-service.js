@@ -97,3 +97,7 @@ function createdRoomMapping(data) {
     LOGOURL:     cdn('images/logo/gitter-logo-email-64.png', {email: true})
   };
 }
+
+exports.testOnly = {
+  VALID_TEMPLATES: VALID_TEMPLATES
+};
