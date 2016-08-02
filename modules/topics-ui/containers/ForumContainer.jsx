@@ -2,6 +2,7 @@
 
 var React = require('react');
 var CategoryList = require('../shared/components/forum/category-list.jsx');
+var Dispatcher = require('../browser/js/dispatcher');
 
 module.exports = React.createClass({
 
@@ -28,8 +29,11 @@ module.exports = React.createClass({
     );
   },
 
-  onCategoryClicked(){
-    console.log('this is working');
+  onCategoryClicked(category){
+    Dispatcher.trigger('navigate-to', {
+      route: 'forum',
+      category: category,
+    });
   }
 
 });
