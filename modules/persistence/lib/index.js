@@ -73,7 +73,10 @@ var schemas = {
 if (config.get('topics:useApi')) {
   schemas.Forum = require('./schemas/forum-schema');
   schemas.ForumCategory = require('./schemas/forum-category-schema');
+  schemas.Topic = require('./schemas/topic-schema');
   schemas.Post = require('./schemas/post-schema');
+  schemas.LikedTopic = require('./schemas/liked-topic-schema');
+  schemas.WatchedTopic = require('./schemas/watched-topic-schema');
 }
 
 module.exports = createExports(schemas);

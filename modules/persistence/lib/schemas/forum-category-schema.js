@@ -7,7 +7,6 @@ var ObjectId = Schema.ObjectId;
 var ForumCategorySchema = new Schema({
   name: { type: String, required: true },
   slug: { type: String, required: true },
-  lcSlug: { type: String, required: true },
   forumId: { type: ObjectId, required: true },
 
   // TODO: sort order, security descriptor, etc.
@@ -16,8 +15,7 @@ var ForumCategorySchema = new Schema({
 
 ForumCategorySchema.schemaTypeName = 'ForumCategorySchema';
 ForumCategorySchema.index({ forumId: 1 });
-ForumCategorySchema.index({ lcSlug: 1 });
-ForumCategorySchema.index({ forumId: 1, lcSlug: 1 }, { unique: true });
+ForumCategorySchema.index({ forumId: 1, slug: 1 }, { unique: true });
 
 module.exports = {
   install: function(mongooseConnection) {
