@@ -14,7 +14,8 @@ if [[ -n "$SU_TO_USER" ]]; then
   PATH="$(pwd)/node_modules/.bin/:${PATH}"
   export PATH
 
-  echo $PATH
+  echo Path: $PATH
+  echo Jenkins URL: $JENKINS_URL
   su $SU_TO_USER --preserve-environment -s '/bin/bash' -c "PATH=$PATH $cmd"
 else
   PATH="$(pwd)/node_modules/.bin:${PATH}"
