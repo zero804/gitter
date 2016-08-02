@@ -15,6 +15,12 @@ var PreCreationGhOrgPolicyEvaluator = require('./pre-creation/gh-org-policy-eval
 var PreCreationGhUserPolicyEvaluator = require('./pre-creation/gh-user-policy-evaluator');
 var FallbackPolicyEvaluator = require('./pre-creation/fallback-policy-evaluator');
 var policyDelegateFactory = require('./policy-delegate-factory');
+var userLoaderFactory = require('./user-loader-factory');
+
+function getPolicyDelegate(userId, user, securityDescriptor) {
+  var userLoader = userLoaderFactory(userId, user);
+  return policyDelegateFactory(userId, userLoader, securityDescriptor);
+}
 
 function createPolicyFromDescriptor(userId, user, securityDescriptor, roomId) {
   if (securityDescriptor.type === 'ONE_TO_ONE') {
@@ -27,7 +33,7 @@ function createPolicyFromDescriptor(userId, user, securityDescriptor, roomId) {
     return new OneToOnePolicyEvaluator(userId, securityDescriptor, oneToOneContextDelegate);
   }
 
-  var policyDelegate = policyDelegateFactory(userId, user, securityDescriptor);
+  var policyDelegate = getPolicyDelegate(userId, user, securityDescriptor);
   var contextDelegate;
   if (userId) {
     // No point in providing a context delegate for an anonymous user
@@ -69,10 +75,10 @@ function createPolicyForGroupId(user, groupId) {
     .then(function(securityDescriptor) {
       if (!securityDescriptor) throw new StatusError(404);
 
-      var policyDelegate = policyDelegateFactory(userId, user, securityDescriptor);
+      var policyDelegate = getPolicyDelegate(userId, user, securityDescriptor);
       var contextDelegate = null; // No group context yet
 
-      return new PolicyEvaluator(user, securityDescriptor, policyDelegate, contextDelegate);
+      return new PolicyEvaluator(userId, securityDescriptor, policyDelegate, contextDelegate);
     });
 }
 
@@ -84,10 +90,10 @@ function createPolicyForGroupIdWithRepoFallback(user, groupId, repoUri) {
     .then(function(securityDescriptor) {
       if (!securityDescriptor) throw new StatusError(404);
 
-      var policyDelegate = policyDelegateFactory(userId, user, securityDescriptor);
+      var policyDelegate = getPolicyDelegate(userId, user, securityDescriptor);
       var contextDelegate = null; // No group context yet
 
-      var primary = new PolicyEvaluator(user, securityDescriptor, policyDelegate, contextDelegate);
+      var primary = new PolicyEvaluator(userId, securityDescriptor, policyDelegate, contextDelegate);
       var secondary = new PreCreationGhRepoPolicyEvaluator(user, repoUri);
 
       return new FallbackPolicyEvaluator(primary, secondary);
