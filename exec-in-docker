@@ -42,6 +42,15 @@ trap finish EXIT
 
 docker-compose -p "${PROJECT_NAME}" -f docker-compose.internal.yml run --rm mongosetup
 docker-compose -p "${PROJECT_NAME}" -f docker-compose.internal.yml run \
+    -e JENKINS_URL \
+    -e GIT_COMMIT \
+    -e GIT_BRANCH \
+    -e BUILD_NUMBER \
+    -e BUILD_URL \
+    -e WORKSPACE \
+    -e ghprbPullId \
+    -e ghprbActualCommit \
+    -e ghprbSourceBranch \
     "${TARGET_DOCKER_CONTAINER}" \
     "${WORKSPACE}/scripts/docker/exec/exec.sh" "$@"
 
