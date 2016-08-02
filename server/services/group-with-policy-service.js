@@ -1,6 +1,7 @@
 'use strict';
 
 var assert = require('assert');
+var slugify = require('slug');
 var StatusError = require('statuserror');
 var ensureAccessAndFetchDescriptor = require('gitter-web-permissions/lib/ensure-access-and-fetch-descriptor');
 var Troupe = require('gitter-web-persistence').Troupe;
@@ -10,6 +11,10 @@ var secureMethod = require('../utils/secure-method');
 var validateRoomName = require('gitter-web-validators/lib/validate-room-name');
 var validateProviders = require('gitter-web-validators/lib/validate-providers');
 var groupService = require('gitter-web-groups/lib/group-service');
+var forumService = require('gitter-web-forums/lib/forum-service');
+var forumCategoryService = require('gitter-web-forum-categories/lib/forum-category-service');
+var postService = require('gitter-web-posts/lib/post-service');
+
 
 /**
  * @private
@@ -117,6 +122,82 @@ GroupWithPolicyService.prototype.createRoom = secureMethod([allowAdmin], functio
     })
     .then(function(results) {
       return results.troupe;
+    });
+});
+
+function getDefaultCategoryOptions(forumUri, options) {
+  options = options || {};
+
+  options.name = options.name || 'General';
+  options.slug = options.slug || slugify(options.name);
+
+  // TODO: validate name, slug
+
+  return options;
+}
+
+/**
+ * Allow admins to create a new forum
+ * @return {Promise} Promise of forum
+ */
+GroupWithPolicyService.prototype.createForum = secureMethod([allowAdmin], function(options) {
+  var user = this.user;
+  var group = this.group;
+
+  if (!options.name) {
+    throw new StatusError(400, 'name required');
+  }
+
+  options.slug = options.slug || slugify(options.name);
+
+  // TODO: validate forum name & uri
+
+  options.defaultCategory = getDefaultCategoryOptions(options.defaultTopic);
+
+  // For now we only allow one forum per group.
+  // We don't upsert into the existing one either.
+  if (group.forumId) {
+    throw new StatusError(400, 'Group already has a forum.');
+  }
+
+  // TODO: check that no forum with the specified uri exists. Not that it
+  // should  if we filled in group.forumId, but you never know..
+
+  var forumInfo = {
+    name: options.name,
+    slug: options.slug,
+  };
+
+  return forumService.createForum(user, forumInfo)
+    .bind({
+      forum: null,
+      category: null,
+      topic: null
+    })
+    .then(function(forum) {
+      this.forum = forum;
+
+      // store the forum as the group's forum
+      return groupService.setForumForGroup(group._id, forum._id);
+    })
+    .then(function() {
+      var forum = this.forum;
+
+      // create the default category
+      var categoryInfo = {
+        name: options.defaultCategory.name,
+        slug: options.defaultCategory.slug
+      };
+
+      // TODO: forumWithPolicyService?
+      return forumCategoryService.createCategory(user, forum, categoryInfo);
+    })
+    .then(function(category) {
+      // send all these so we can return them all serialized together
+      return {
+        forum: this.forum,
+        defaultCategory: category
+      }
     });
 });
 
