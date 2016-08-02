@@ -19,7 +19,10 @@ module.exports = React.createClass({
     const categories = this.props.categoryStore.getCategories();
     return (
       //Search header ...
-      <CategoryList categories={categories} />
+      <CategoryList categories={categories} onCategoryClicked={ this.onCategoryClicked()} />
     );
-  }
+  },
+
+  onCategoryClicked(){}
+
 });

@@ -19,12 +19,12 @@ describe('<CategoryListItem />', function(){
   });
 
   it('should render the correct class', function(){
-    assert.equal(wrapper.find('.subdued-button-clouds--xsmall').length, 1);
+    assert.equal(wrapper.find('.category-list__item').length, 1);
   });
 
   it('should render the correct class in the active state', function(){
     wrapper = shallow(<CategoryListItem category="test" active={true} onClick={() => true} />);
-    assert.equal(wrapper.find('.button-clouds--xsmall').length, 1);
+    assert.equal(wrapper.find('.category-list__item--active').length, 1);
   });
 
   it('should call the click handler when clicked', function(){
