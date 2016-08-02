@@ -93,10 +93,6 @@ module.exports = CommunityCreateBaseStepView.extend({
     });
   },
 
-  onDestroy: function() {
-    this.typeahead.destroy();
-  },
-
   onStepNext: function() {
     this.communityCreateModel.set('stepState', stepConstants.OVERVIEW);
   },
