@@ -9,13 +9,6 @@ var onMongoConnect = testRequire('./utils/on-mongo-connect');
 
 process.traceDeprecation = true;
 
-var originalExit = process.exit;
-process.exit = function(code) {
-  console.log('PROCESS EXIT', process.argv, code);
-  console.trace();
-  originalExit.call(process, code);
-}
-
 describe('start', function() {
   this.timeout(30000);
 
