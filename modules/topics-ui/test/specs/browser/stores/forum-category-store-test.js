@@ -1,18 +1,10 @@
 "use strict";
 
 var assert = require('assert');
+var Backbone = require('backbone');
 var CategoryStore = require('../../../../browser/js/stores/forum-category-store');
+var serverSideStore = require('../../../../server/stores/forum-category-store.js');
 
 describe('ForumCategoryStore', function(){
-  var categories;
-  var categoryStore;
-  beforeEach(function(){
-    categories = [ 1, 2, 3, 4];
-    categoryStore = new CategoryStore(categories);
-  });
-
-  it('should have return objects from getCategories', function(){
-    assert.deepEqual(categories, categoryStore.getCategories());
-  });
 
 });

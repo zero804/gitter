@@ -11,7 +11,11 @@ var CategoryListItem = require('../../../../../shared/components/forum/category-
 
 describe('<CategoryList />', function(){
 
-  const categories = [ '1', '2', '3', '4' ];
+  const categories = [
+    { category: 'all', active: true },
+    { category: 'test-1', active: false },
+    { category: 'test-2', active: false },
+  ];
   let wrapper;
   let clickHandle;
   beforeEach(function(){
@@ -46,7 +50,7 @@ describe('<CategoryList />', function(){
 
   it('should call clickHandle with the correct arguments', function(){
     wrapper.find(CategoryListItem).at(0).simulate('click');
-    assert(clickHandle.calledWith('1'));
+    assert(clickHandle.calledWith('all'));
   });
 
 });
