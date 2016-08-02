@@ -74,7 +74,7 @@ function ensureAccessAndFetchRoomInfo(user, group, options) {
   return findByUri(uri)
     .then(function(room) {
       if (room) {
-        throw new StatusError(400, 'Room uri already taken: ' + uri);
+        throw new StatusError(409, 'Room uri already taken: ' + uri);
       }
 
       return ensureAccessAndFetchDescriptor(user, options)

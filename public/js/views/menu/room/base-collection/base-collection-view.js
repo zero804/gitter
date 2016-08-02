@@ -1,6 +1,7 @@
 'use strict';
 
 var Marionette = require('backbone.marionette');
+var _ = require('underscore');
 var fastdom = require('fastdom');
 var template = require('./base-collection-view.hbs');
 var context = require('utils/context');
@@ -54,6 +55,7 @@ module.exports = Marionette.CompositeView.extend({
     this.collection = attrs.collection;
     this.roomMenuModel = attrs.roomMenuModel;
     this.roomCollection = attrs.roomCollection;
+    this.groupsCollection = attrs.groupsCollection;
     this.listenTo(this.roomMenuModel, 'change:hasDismissedSuggestions', this.onDismissSuggestionsUpdate, this);
     this.listenTo(this.roomMenuModel, 'change:state', this.clearFocus, this);
     this.listenTo(context.troupe(), 'change:id', this.onRoomUpdate, this);
@@ -95,6 +97,17 @@ module.exports = Marionette.CompositeView.extend({
 
   onFilterComplete: function() {
     this.setActive();
+  },
+
+  serializeData: function (){
+    var data = this.model.toJSON();
+    var groupId = this.roomMenuModel.get('groupId');
+    var selectedGroup = this.groupsCollection.get(groupId);
+    var selectedGroupName = '';
+    if(selectedGroup) { selectedGroupName = selectedGroup.get('name'); }
+    return _.extend({}, data, {
+      selectedGroupName: selectedGroupName,
+    });
   },
 
   onBeforeRender: function() {
