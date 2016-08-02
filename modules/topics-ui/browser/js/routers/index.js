@@ -1,8 +1,9 @@
 "use strict"
 
 var Backbone = require('backbone');
-var qs = require('gitter-web-qs');
 var _ = require('lodash');
+var Dispatcher = require('../dispatcher');
+var navConstants = require('../constants/navigation');
 
 var _super = Backbone.Router.prototype;
 
@@ -15,6 +16,7 @@ var Router = Backbone.Router.extend({
   constructor: function(){
     this.model = new RouteModel();
     _super.constructor.call(this, ...arguments);
+    Dispatcher.on(navConstants.NAVIGATE_TO, this.navigateTo, this);
   },
 
   routes: {
@@ -29,6 +31,23 @@ var Router = Backbone.Router.extend({
       groupName: groupName,
       categoryName: categoryName,
     });
+  },
+
+  navigateTo(data){
+    switch(data.route) {
+      case 'forum': return this.navigateToForum(data);
+    }
+  },
+
+  navigateToForum(data = { category: 'all' }){
+
+    const { category } = data;
+
+    var url = (data.category === 'all') ?
+      `/${this.model.get('groupName')}/topics` :
+      `/${this.model.get('groupName')}/topics/categories/${category}`;
+
+    this.navigate(url, { trigger: true, replace: true });
   }
 
 });
