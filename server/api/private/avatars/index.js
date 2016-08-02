@@ -123,16 +123,16 @@ router.get('/gravatar/m/:md5',
     return gravatarByHash(md5, size);
   }));
 
-router.get('/tw/i/:id1/:id2/:extension',
+router.get('/tw/i/:id/:filename',
   identifyRoute('api-private-avatar-twitter'),
-  sendAvatar(function(req, size) {
-    var id1 = req.params.id1;
-    var id2 = req.params.id2;
-    var extension = req.params.extension;
+  // NOTE: it doesn't support a size param yet
+  sendAvatar(function(req) {
+    var id = req.params.id;
+    var filename = req.params.filename;
 
-    if (!id1 || !id2 || !extension) return null;
+    if (!id || !filename) return null;
 
-    return twitterByIds(id1, id2, extension, size);
+    return twitterByIds(id, filename);
   }))
 
 /**
