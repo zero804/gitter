@@ -235,11 +235,7 @@ if (RUN_TESTS_IN_PARALLEL) {
  * Hook into post test
  */
 if (generateCoverage) {
-  gutil.log('Will submit coverage post tests');
   gulp.task('test:post-test', ['test:post-test:merge-lcov', 'test:post-test:submit-codecov']);
-} else {
-  gutil.log('No test:post-test task as there is no coverage reporting');
-
 }
 
 gulp.task('test:post-test:merge-lcov', function() {
