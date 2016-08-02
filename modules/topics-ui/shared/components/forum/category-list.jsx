@@ -20,7 +20,7 @@ module.exports = React.createClass({
 
     return (
       <Container>
-        <Panel>
+        <Panel className="panel--category">
           <ul className="category-list">{ categories.map(this.getChildCategory) }</ul>
         </Panel>
       </Container>
@@ -31,9 +31,9 @@ module.exports = React.createClass({
     const { onCategoryClicked } = this.props;
     return (
       <li key={`forum-category-list-item-${index}`}>
-      <CategoryListItem
-        category={category}
-        onClick={ () => onCategoryClicked(category) } />
+        <CategoryListItem
+          category={category}
+          onClick={ () => onCategoryClicked(category) } />
       </li>
     );
   }
