@@ -15,10 +15,10 @@ if [[ -n "$SU_TO_USER" ]]; then
   export PATH
 
   echo $PATH
-  exec su $SU_TO_USER --preserve-environment -s '/bin/sh' -c "PATH=$PATH $cmd"
+  su $SU_TO_USER --preserve-environment -s '/bin/bash' -c "PATH=$PATH $cmd"
 else
   PATH="$(pwd)/node_modules/.bin:${PATH}"
   export PATH
 
-  exec /bin/sh -c "PATH=$PATH $cmd"
+  /bin/bash -c "PATH=$PATH $cmd"
 fi
