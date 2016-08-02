@@ -1,5 +1,6 @@
 'use strict';
 
+var debug = require('debug')('gitter:modules:twitter-service');
 var env = require('gitter-web-env');
 var config = env.config;
 var Promise = require('bluebird');
@@ -29,6 +30,7 @@ TwitterService.prototype.findFollowers = function(username) {
     }
   })
   .then(function(results) {
+    debug('Twitter API results', results && results.body);
     if (!results.body || !results.body.users) {
       return [];
     }
