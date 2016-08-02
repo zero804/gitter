@@ -28,14 +28,14 @@ describe('Router', function(){
     assert.equal(router.get('groupName'), 'gitterHQ');
   });
 
-  it('should have the right inital filter', function(){
-    assert.equal(router.get('filter'), 'all');
+  it('should have the right inital categoryName', function(){
+    assert.equal(router.get('categoryName'), 'all');
   });
 
-  it.only('should have the right filter on url change', function(){
-    assert.equal(router.get('filter'), 'all');
-    Backbone.history.navigate('gitterHQ/topics?filter=activity', trigger);
-    assert.equal(router.get('filter'), 'activity');
+  it('should have the right filter on url change', function(){
+    assert.equal(router.get('categoryName'), 'all');
+    Backbone.history.navigate('gitterHQ/topics/categories/activity', trigger);
+    assert.equal(router.get('categoryName'), 'activity');
   });
 
 });
