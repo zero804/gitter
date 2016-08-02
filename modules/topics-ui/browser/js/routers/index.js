@@ -19,24 +19,16 @@ var Router = Backbone.Router.extend({
 
   routes: {
     ':groupName/topics': 'forums',
-    ':groupName/topics?*query': 'forums'
+    ':groupName/topics/categories/:categoryName': 'forums'
   },
 
-  forums(groupName, query){
-    console.log(query);
-
-    var payload = {
+  forums(groupName, categoryName){
+    categoryName = (categoryName || 'all');
+    this.model.set({
       route: 'forum' ,
       groupName: groupName,
-      filter: 'all'
-    };
-
-    if(query) { payload = _.extend(payload, qs); }
-
-    console.log('-----------------------');
-    console.log(payload, query);
-    console.log('-----------------------');
-    this.model.set(payload);
+      categoryName: categoryName,
+    });
   }
 
 });
