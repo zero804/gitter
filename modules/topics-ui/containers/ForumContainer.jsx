@@ -3,6 +3,7 @@
 var React = require('react');
 var CategoryList = require('../shared/components/forum/category-list.jsx');
 var Dispatcher = require('../browser/js/dispatcher');
+var navConstants = require('../browser/js/constants/navigation');
 
 module.exports = React.createClass({
 
@@ -30,7 +31,8 @@ module.exports = React.createClass({
   },
 
   onCategoryClicked(category){
-    Dispatcher.trigger('navigate-to', {
+    //TODO Replace payload generation with an action-creator
+    Dispatcher.trigger(navConstants.NAVIGATE_TO, {
       route: 'forum',
       category: category,
     });
