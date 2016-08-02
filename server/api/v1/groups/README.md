@@ -65,12 +65,12 @@ Try it from the CLI:
 
 ### Parameters
 
- - `name`: Group name.
- - `uri`: Group URI on Gitter.
+ - **`name`**: Group name.
+ - **`uri`**: Group URI on Gitter.
  - `security`: Security descriptor. Describes the backing object we get permissions from.
     - `type`: `[null|'ONE_TO_ONE'|'GH_REPO'|'GH_ORG'|'GH_USER']`
     - `linkPath`: Represents how we find the backing object given the type
- - `invites`: Array of users
+ - `invites`: Array of user objects. Below is a list of properties you can include on each object to invite on various platforms
     - `username`: Gitter username
     - `githubUsername`: GitHub username
     - `twitterUsername`: Twitter username
@@ -120,7 +120,7 @@ Create room nested under the specified group.
 
 ### Parameters
 
- - `name`: Room name.
+ - **`name`**: Room name.
  - `topic`: Room topic/description
  - `security`: Security descriptor. Describes the backing object we get permissions from. (defaults to `'PUBLIC'`)
     - `security`: `'PUBLIC'|'PRIVATE'`
