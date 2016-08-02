@@ -15,13 +15,13 @@ var Router = Backbone.Router.extend({
 
   constructor: function(){
     this.model = new RouteModel();
-    _super.constructor.call(this, ...arguments);
     Dispatcher.on(navConstants.NAVIGATE_TO, this.navigateTo, this);
+    _super.constructor.call(this, ...arguments);
   },
 
   routes: {
-    ':groupName/topics': 'forums',
-    ':groupName/topics/categories/:categoryName': 'forums'
+    ':groupName/topics(/)': 'forums',
+    ':groupName/topics/categories/:categoryName(/)': 'forums'
   },
 
   forums(groupName, categoryName){
