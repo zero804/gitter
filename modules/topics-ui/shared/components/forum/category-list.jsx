@@ -27,13 +27,14 @@ module.exports = React.createClass({
     );
   },
 
-  getChildCategory(category, index){
+  getChildCategory(model, index){
     const { onCategoryClicked } = this.props;
     return (
       <li key={`forum-category-list-item-${index}`}>
         <CategoryListItem
-          category={category}
-          onClick={ () => onCategoryClicked(category) } />
+          category={model.category}
+          active={model.active}
+          onClick={ () => onCategoryClicked(model.category) } />
       </li>
     );
   }

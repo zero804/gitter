@@ -5,6 +5,7 @@ var _ = require('lodash');
 var path = require('path');
 
 var config = _.extend({}, webpackConfig, {
+  devtool: 'source-map',
   entry: {
     runner: path.resolve(__dirname, './fixtures/runner-browser.js')
   },
