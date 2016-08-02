@@ -9,7 +9,6 @@ var policyFactory = require('../lib/policy-factory');
 describe('policy-factory', function() {
   describe('integration tests #slow', function() {
 
-
     var fixture = {};
     before(fixtureLoader(fixture, {
       user1: {},
