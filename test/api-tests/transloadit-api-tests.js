@@ -108,6 +108,9 @@ describe('transloadit-api-tests #slow', function() {
         // test that type image became the correct template_id
         assert.strictEqual(params.template_id, nconf.get('transloadit:template_image_id'));
 
+        // test that we set a random token..
+        assert.ok(params.fields.token);
+
         // these don't change for rooms, but at least checking them means we
         // went down the right path
         var originalPath = '${fields.room_uri}/${fields.token}/${file.url_name}';
