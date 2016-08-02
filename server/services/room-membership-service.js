@@ -180,6 +180,7 @@ function addRoomMember(troupeId, userId, flags, groupId) {
     })
     .then(function(alreadyInGroup) {
       this.alreadyInGroup = alreadyInGroup;
+      debug("Is member %s already in group %s? %s", userId, groupId, alreadyInGroup);
 
       return TroupeUser.findOneAndUpdate({
           troupeId: troupeId,

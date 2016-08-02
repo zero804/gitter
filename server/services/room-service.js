@@ -549,7 +549,7 @@ function joinRoom(room, user, options) {
     .then(function() {
       var flags = userDefaultFlagsService.getDefaultFlagsForUser(user);
 
-      return roomMembershipService.addRoomMember(room._id, user._id, flags);
+      return roomMembershipService.addRoomMember(room._id, user._id, flags, room.groupId);
     })
     .then(function() {
       sendJoinStats(user, room, options.tracking);
@@ -733,7 +733,7 @@ function deleteRoom(troupe) {
         }))
         .then(function() {
           // Remove all the folk from the room
-          return roomMembershipService.removeRoomMembers(troupe._id, userIds);
+          return roomMembershipService.removeRoomMembers(troupe._id, userIds, troupe.groupId);
         });
     })
     .then(function() {
@@ -808,7 +808,7 @@ function createGroupRoom(user, group, roomInfo, securityDescriptor, options) {
     })
     .then(function() {
       var flags = userDefaultFlagsService.getDefaultFlagsForUser(user);
-      return roomMembershipService.addRoomMember(room._id, user._id, flags);
+      return roomMembershipService.addRoomMember(room._id, user._id, flags, group._id);
     })
     .then(function() {
       // Send the created room notification

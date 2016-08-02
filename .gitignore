@@ -98,3 +98,4 @@ scripts/graphs/*.dot
 scripts/graphs/*.gephi
 .devhttps.ca.crt
 .devhttps.ca.key
+unread-notification.out.html
