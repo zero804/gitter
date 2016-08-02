@@ -96,7 +96,7 @@ describe('avatar-api', function() {
   }, {
     name: '/invalid_does_not_exist',
     url: '/invalid_does_not_exist',
-    expected: 404,
+    expected: 302,
     proxyRedirect: '/missing'
   }];
 
