@@ -18,7 +18,9 @@ package: npm
 	gulp package --skip-stage validate --skip-stage test
 
 clean: npm
-	gulp clean
+	gulp clean || (make npm-full && gulp clean)
+  # If gulp clean failed, it's almost certainly a problem
+  # with the npm folder, so nuke it and try again
 
 test: clean npm
 

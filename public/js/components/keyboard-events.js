@@ -45,6 +45,12 @@ module.exports = (function() {
     else if (tag.classList.contains('js-profile-menu-toggle')) {
       scope = 'button.profile-menu';
     }
+    else if(tag.classList.contains('room-menu-options__item-button')) {
+      scope = 'minibar.item';
+    }
+    else if(tag.classList.contains('room-item__container')) {
+      scope = 'room-list.item';
+    }
     else {
       scope = 'other';
     }
@@ -107,7 +113,10 @@ module.exports = (function() {
     }],
     'up': [{
       name: 'room.up',
-      scope: 'other'
+      scope: 'minibar.item'
+      },{
+      name: 'room.up',
+      scope: 'room-list.item'
       },{
       name: 'chat.edit.openLast',
       scope: 'input.chat'
@@ -117,15 +126,44 @@ module.exports = (function() {
       }],
     'down': [{
       name: 'room.down',
-      scope: 'other'
+      scope: 'minibar.item'
+      },{
+      name: 'room.down',
+      scope: 'room-list.item'
       },{
       name: 'search.next',
       scope: 'input.search'
       }],
-    'right': [{ name: 'room.next', scope: 'other' }],
-    'left': [{ name: 'room.prev', scope: 'other' }],
-    'tab': [{ name: 'room.tab' }],
-    '⇧+tab': [{ name: 'room.prev.tab'}],
+    'right': [{
+      name: 'room.next',
+      scope: 'minibar.item'
+      },{
+      name: 'room.next',
+      scope: 'room-list.item'
+    }],
+    'left': [{
+      name: 'room.prev',
+      scope: 'minibar.item'
+      },{
+      name: 'room.prev',
+      scope: 'room-list.item'
+    }],
+    /* */
+    'tab': [{
+      name: 'room.tab',
+      scope: 'minibar.item'
+      },{
+      name: 'room.tab',
+      scope: 'room-list.item'
+    }],
+    '⇧+tab': [{
+      name: 'room.prev.tab',
+      scope: 'minibar.item'
+      },{
+      name: 'room.prev.tab',
+      scope: 'room-list.item'
+    }],
+    /* */
     'pageup': 'pageUp',
     'pagedown': 'pageDown',
     'q, r': {
