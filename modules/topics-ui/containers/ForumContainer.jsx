@@ -21,7 +21,10 @@ module.exports = React.createClass({
     const { groupName } = this.props;
     return (
       //Search header ...
-      <CategoryList categories={ categories } groupName={ groupName }  onCategoryClicked={ this.onCategoryClicked } />
+      <CategoryList
+        categories={ categories }
+        groupName={ groupName }
+        onCategoryClicked={ this.onCategoryClicked } />
     );
   },
 
