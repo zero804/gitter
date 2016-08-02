@@ -5,6 +5,4 @@ var Backbone = require('backbone');
 var CategoryStore = require('../../../../browser/js/stores/forum-category-store');
 var serverSideStore = require('../../../../server/stores/forum-category-store.js');
 
-describe('ForumCategoryStore', function(){
-
-});
+describe('ForumCategoryStore', function(){});
