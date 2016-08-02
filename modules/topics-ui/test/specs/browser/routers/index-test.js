@@ -3,6 +3,9 @@
 var assert = require('assert');
 var Backbone = require('backbone');
 var router = require('../../../../browser/js/routers/index');
+var sinon = require('sinon');
+var dispatcher = require('../../../../browser/js/dispatcher');
+var navConstants = require('../../../../browser/js/constants/navigation.js');
 
 describe('Router', function(){
 
@@ -36,6 +39,12 @@ describe('Router', function(){
     assert.equal(router.get('categoryName'), 'all');
     Backbone.history.navigate('gitterHQ/topics/categories/activity', trigger);
     assert.equal(router.get('categoryName'), 'activity');
+  });
+
+  it('should set the right state after dispatching a forum navigate action', function(){
+    dispatcher.trigger(navConstants.NAVIGATE_TO, { route: 'forum', category: 'test'});
+    assert.equal(router.get('categoryName'), 'test');
+    assert.equal(router.get('route'), 'forum');
   });
 
 });
