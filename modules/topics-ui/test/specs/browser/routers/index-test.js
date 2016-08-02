@@ -6,6 +6,8 @@ var router = require('../../../../browser/js/routers/index');
 
 describe('Router', function(){
 
+  var trigger = {trigger: true};
+
   beforeEach(function(){
     window.location.hash = 'gitterHQ/topics';
     Backbone.history.start({
@@ -24,6 +26,16 @@ describe('Router', function(){
 
   it('should have the right inital groupName', function(){
     assert.equal(router.get('groupName'), 'gitterHQ');
+  });
+
+  it('should have the right inital filter', function(){
+    assert.equal(router.get('filter'), 'all');
+  });
+
+  it.only('should have the right filter on url change', function(){
+    assert.equal(router.get('filter'), 'all');
+    Backbone.history.navigate('gitterHQ/topics?filter=activity', trigger);
+    assert.equal(router.get('filter'), 'activity');
   });
 
 });

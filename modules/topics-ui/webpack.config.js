@@ -45,6 +45,7 @@ var config = {
   resolve: {
     alias: {
       jquery: path.resolve(__dirname, './node_modules/jquery/dist/jquery.js'),
+      underscore: path.resolve(__dirname, './node_modules/lodash/index.js'),
     }
   },
   plugins: [
