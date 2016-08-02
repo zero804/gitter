@@ -1,6 +1,8 @@
 "use strict"
 
 var Backbone = require('backbone');
+var Dispatcher = require('../dispatcher');
+var constants = require('../constants/forum-categories');
 
 var Model = Backbone.Model.extend({
   defaults: { category: null },
@@ -21,6 +23,7 @@ module.exports = Backbone.Collection.extend({
   onCategoryUpdate(model, val){
     this.where({ active: true }).forEach((m) => m.set('active', false));
     this.findWhere({ category: val }).set('active', true);
+    Dispatcher.trigger(constants.UPDATE_ACTIVE_CATEGORY);
   }
 
 });
