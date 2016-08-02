@@ -253,6 +253,12 @@
       "src": "fontelico"
     },
     {
+      "uid": "b035c28eba2b35c6ffe92aee8b0df507",
+      "css": "attention-circled",
+      "code": 59429,
+      "src": "fontawesome"
+    },
+    {
       "uid": "12af2bcbfe60f39e7a1e835639d38ad8",
       "css": "settings",
       "code": 59396,

@@ -1,6 +1,7 @@
 'use strict';
 
 var Marionette = require('backbone.marionette');
+var toggleClass = require('utils/toggle-class');
 
 var CommunityCreationRepoListTemplate = require('./community-creation-repo-list-view.hbs');
 var CommunityCreationRepoListEmptyTemplate = require('./community-creation-repo-list-empty-view.hbs');
@@ -18,14 +19,25 @@ var CommunityCreationRepoListEmptyView = Marionette.ItemView.extend({
     this.listenTo(this.collection, 'reset sync snapshot', this.onCollectionDoneLoading.bind(this), this);
   },
 
+  onRender: function() {
+    this.onCollectionFetch();
+  },
+
   onCollectionFetch: function() {
-    this.ui.emptyNote[0].classList.add('hidden');
-    this.ui.loadingNote[0].classList.remove('hidden');
+    this.updateNoteHiddenStates(true, false);
   },
 
   onCollectionDoneLoading: function() {
-    this.ui.emptyNote[0].classList.remove('hidden');
-    this.ui.loadingNote[0].classList.add('hidden');
+    this.updateNoteHiddenStates(false, true);
+  },
+
+  updateNoteHiddenStates: function(shouldHideEmptyNode, shouldHideLoadingNote) {
+    if(this.ui.emptyNote.length && this.ui.emptyNote[0].classList) {
+      toggleClass(this.ui.emptyNote[0], 'hidden', shouldHideEmptyNode);
+    }
+    if(this.ui.loadingNote.length && this.ui.loadingNote[0].classList) {
+      toggleClass(this.ui.loadingNote[0], 'hidden', shouldHideLoadingNote);
+    }
   }
 });
 

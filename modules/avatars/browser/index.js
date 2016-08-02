@@ -2,6 +2,7 @@
 
 var isGitHubUser = require('../shared/is-github-user');
 var avatarCdnResolver = require('../shared/avatar-cdn-resolver');
+var extractTwitterAvatarInfo = require('../shared/extract-twitter-avatar-info');
 
 var DEFAULT = require('url?limit=1024!../../../public/images/default-avatar.png'); // eslint-disable-line
 
@@ -11,6 +12,12 @@ function getForGitHubUsername(githubUsername) {
 
 function getForGravatarEmail(emailAddress) {
   return avatarCdnResolver('/gravatar/e/' + emailAddress);
+}
+
+function getForTwitterUrl(twitterUrl) {
+  var info = extractTwitterAvatarInfo(twitterUrl);
+  if (!info) return DEFAULT;
+  return avatarCdnResolver('/tw/i/' + info.id1 + '/' + info.id2 + '/' + info.extension);
 }
 
 function getForGroupId(groupId) {
@@ -69,6 +76,7 @@ function getDefault() {
 module.exports = {
   getForGitHubUsername: getForGitHubUsername,
   getForGravatarEmail: getForGravatarEmail,
+  getForTwitterUrl: getForTwitterUrl,
   getForGroupId: getForGroupId,
   getForGroup: getForGroup,
   getForRoomUri: getForRoomUri,

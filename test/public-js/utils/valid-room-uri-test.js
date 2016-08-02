@@ -1,12 +1,18 @@
 'use strict';
 
 var isValidRoomUri = require('../../../public/js/utils/valid-room-uri');
-var RESERVED = require('gitter-web-validators/lib/reserved-namespaces');
+var RESERVED = require('gitter-web-validators/lib/reserved-namespaces').list;
+var RESERVED_SUB = require('gitter-web-validators/lib/reserved-sub-namespaces').list;
 var assert = require('assert');
 
-function test(name, result) {
-  result = typeof result === 'undefined' ? true : result;
-  assert.equal(isValidRoomUri(name), result);
+function test(name, expected) {
+  expected = typeof expected === 'undefined' ? true : expected;
+  var result = isValidRoomUri(name);
+  // keeping this as it is useful for seeing which one actually broke
+  //if (result !== expected) {
+  //  console.log(name);
+  //}
+  assert.equal(result, expected);
 }
 
 describe('valid-room-uri', function () {
@@ -16,6 +22,10 @@ describe('valid-room-uri', function () {
       .forEach(function (keyword) {
         test('/' + keyword, false);
       });
+    RESERVED_SUB
+      .forEach(function (keyword) {
+        test('/foo/' + keyword, false);
+      });
   });
 
   it('accepts rooms with vanity keywords, but aren\'t vanity keyworkds', function () {
@@ -23,6 +33,8 @@ describe('valid-room-uri', function () {
     test('/apiguy');
     test('/aboutandrew?test=true');
     test('/apiguy?test=true');
+    test('/aboutandrew/roomname');
+    test('/aboutandrew/topicsname');
   });
 
   it('rejects undefined and empty string', function () {
@@ -41,6 +53,8 @@ describe('valid-room-uri', function () {
   });
 
   it('accepts room URIs', function () {
+    test('/i-love-cats');
+    test('/i-love-cats/Lobby');
     test('/gitterHQ');
     test('/gitterHQ/gitter');
     test('/gitterHQ/gitter/channel');

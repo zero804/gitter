@@ -2,5 +2,8 @@
   "env": {
     "commonjs": true,
     "browser": true
+  },
+  "rules": {
+    "node/no-unsupported-features": 0
   }
 }

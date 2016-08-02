@@ -1,85 +1,137 @@
-"use strict";
+'use strict';
 
-var $ = require('jquery');
+var Promise = require('bluebird');
 var _ = require('underscore');
 var Marionette = require('backbone.marionette');
-var troupeCollections = require('collections/instances/troupes');
-var ModalView = require('./modal');
+var fuzzysearch = require('fuzzysearch');
+var urlJoin = require('url-join');
+var FilteredCollection = require('backbone-filtered-collection');
+var fastdom = require('fastdom');
+var toggleClass = require('utils/toggle-class');
+var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
+var getRoomNameFromTroupeName = require('gitter-web-shared/get-room-name-from-troupe-name');
 var apiClient = require('components/apiClient');
-var GroupSelectView = require('views/createRoom/groupSelectView');
-var template = require('./tmpl/create-room-view.hbs');
 var appEvents = require('utils/appevents');
 
+var GroupSelectView = require('views/create-room/groupSelectView');
+var ModalView = require('./modal');
+var FilteredSelect = require('./filtered-select');
+var roomAvailabilityStatusConstants = require('../create-room/room-availability-status-constants');
 
-/* We do a better job on the server with checking names, as we have XRegExp there */
-function safeRoomName(val) {
-  if (val.length < 1) return false;
-  if (/[<>\\\/\{\}|\#@\&\.\(\)\'\"]/.test(val)) return false;
-  return true;
-}
+var template = require('./tmpl/create-room-view.hbs');
+var repoTypeaheadItemTemplate = require('./tmpl/create-room-repo-typeahead-item-view.hbs');
 
-function checkForRepoExistence(repo, cb) {
-  apiClient.priv.get('/gh/repos/' + repo)
-    .then(function () {
-      return true;
-    })
-    .catch(function () {
-      return false;
-    })
-    .then(function(result) {
-      cb(result);
-    });
-}
 
-var View = Marionette.LayoutView.extend({
+
+var checkForRepoExistence = function(orgName, repoName) {
+  if(orgName && repoName) {
+    var repoUri = (orgName + '/' + repoName).toLowerCase();
+    return apiClient.priv.get('/gh/repos/' + repoUri)
+      .then(function() {
+        return true;
+      })
+      .catch(function() {
+        return false;
+      });
+  }
+
+  return Promise.resolve(false);
+};
+
+var CreateRoomView = Marionette.LayoutView.extend({
   template: template,
 
   ui: {
-    permissions: '#permissions',
-    permPublic: '#perm-select-public',
-    permPrivate: '#perm-select-private',
-    permInheritedOrg: '#perm-select-inherited-org',
-    permInheritedRepo: '#perm-select-inherited-repo',
-    validation: '#modal-failure',
-    existing: '#existing',
-    orgNameLabel: '#org-name',
-    repoNameLabel: '#repo-name',
-    roomNameInput: '#room-name',
-    dropDownButton: '#dd-button',
-  },
-
-  events: {
-    'change @ui.roomNameInput': 'roomNameChange',
-    'cut @ui.roomNameInput': 'roomNameChange',
-    'paste @ui.roomNameInput': 'roomNameChange',
-    'input @ui.roomNameInput': 'roomNameChange',
-    'click @ui.dropDownButton': 'clickDropDown',
-    'change input[type=radio]': 'permissionsChange'
+    nameInput: '.js-create-room-name-input',
+    clearNameButton: '.js-create-room-clear-name-button',
+    associatedProjectName: '.js-associated-github-project-name',
+    associatedProjectLink: '.js-associated-github-project-link',
+    securityOptions: '.js-create-room-security-radio',
+    publicSecurityOption: '.js-create-room-security-public-radio',
+    privateSecurityOption: '.js-create-room-security-private-radio',
+    roomDetailSection: '.js-create-room-detail-section',
+    onlyGithubUsersOption: '.js-create-room-only-github-users-option',
+    onlyGithubUsersOptionInput: '.js-create-room-only-github-users-option-input',
+    onlyOrgUsersOption: '.js-create-room-only-org-users-option',
+    onlyOrgUsersOptionInput: '.js-create-room-only-org-users-option-input',
+    onlyOrgUsersOptionOrgName: '.js-create-room-only-org-users-option-org-name',
+    roomAvailabilityStatusMessage: '.js-room-availability-status-message'
   },
 
   regions: {
-    ownerSelect: '#owner-region',
+    groupSelectRegion: '.js-create-room-group-input',
+  },
+
+  events: {
+    'input @ui.nameInput': 'onNameInput',
+    'click @ui.clearNameButton': 'onNameClearActivated',
+    'change @ui.securityOptions': 'onSecurityChange',
+    'change @ui.onlyGithubUsersOptionInput': 'onOnlyGitHubUsersOptionChange',
+    'change @ui.onlyOrgUsersOptionInput': 'onOnlyOrgUsersOptionChange'
+  },
+
+  modelEvents: {
+    'change:groupId': 'onGroupIdChange',
+    'change:roomName': 'onRoomNameChange',
+    'change:associatedGithubProject': 'safeUpdateFields',
+    'change:security': 'safeUpdateFields',
+    'change:roomAvailabilityStatus': 'onRoomAvailabilityStatusChange'
   },
 
   initialize: function(attrs) {
+    this.model = attrs.model;
     this.groupsCollection = attrs.groupsCollection;
-    this.listenTo(this.groupsCollection, 'sync', this.selectSuggestedGroup);
+    this.troupeCollection = attrs.troupeCollection;
+    this.repoCollection = attrs.repoCollection;
+    this.hasRendered = false;
+
+    this.filteredRepoCollection = new FilteredCollection({
+      collection: this.repoCollection
+    });
+
+    this.model.set({
+      groupId: attrs.initialGroupId || null,
+      roomName: attrs.initialRoomName || ''
+    });
 
     this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
-    this.recalcViewDebounced = _.debounce(function() {
-      this.recalcView(true);
-    }.bind(this), 300);
-    this.bindUIElements();
+    this.listenToOnce(this.groupsCollection, 'sync', this.selectInitialGroup);
+  },
+
+  onRender: function() {
+    this.groupSelect = new GroupSelectView({
+      groupsCollection: this.groupsCollection
+    });
+    this.groupSelectRegion.show(this.groupSelect);
+
+    this.repoNameTypeahead = new FilteredSelect({
+      el: this.ui.nameInput[0],
+      collection: this.filteredRepoCollection,
+      itemTemplate: repoTypeaheadItemTemplate,
+      dropdownClass: 'create-room-repo-name-typeahead-dropdown',
+      filter: function(input, model) {
+        var mName = model.get('name') || '';
+        return fuzzysearch(input.toLowerCase(), mName.toLowerCase());
+      }
+    });
+
+    this.listenTo(this.repoNameTypeahead, 'selected', this.onRepoSelected, this);
+    this.listenTo(this.groupSelect, 'selected', this.onGroupSelected, this);
+
+    this.selectInitialGroup();
+
+    this.updateFields();
+    this.hasRendered = true;
   },
 
   menuItemClicked: function(button) {
     switch(button) {
       case 'create':
-        this.validateAndCreate();
-        break;
-
-      case 'back':
-        window.location.hash = "#createroom";
+        if(this.model.isValid()) {
+          this.sendCreateRoomRequest();
+        }
+        // Update the fields with any errors after validation
+        this.safeUpdateFields();
         break;
 
       case 'cancel':
@@ -88,90 +140,53 @@ var View = Marionette.LayoutView.extend({
     }
   },
 
-  clickDropDown: function() {
-    this.groupSelect.focus();
-    this.groupSelect.show();
+  getGroupFromId: function(groupId) {
+    if(groupId) {
+      return this.groupsCollection.get(groupId);
+    }
   },
 
-  showValidationMessage: function (message) {
-    var validation = $(this.ui.validation);
-    if (!message) return validation.slideUp('fast');
+  sendCreateRoomRequest: function() {
+    var roomName = this.model.get('roomName');
+    var selectedGroup = this.getGroupFromId(this.model.get('groupId'));
+    var associatedGithubProject = this.model.get('associatedGithubProject');
+    var security = this.model.get('security');
+    var onlyGithubUsers = this.model.get('onlyGithubUsers');
+    var onlyOrgUsers = this.model.get('onlyOrgUsers');
 
-    validation.text(message);
-    validation.slideDown('fast');
-
-    setTimeout(function () {
-      validation.slideUp('fast');
-    }, 2000);
-  },
-
-  validateAndCreate: function() {
-    var self = this;
-
-    var group = self.selectedGroup;
-    if (!group) {
-      self.groupSelect.show();
-      return;
+    var type = null;
+    var linkPath = null;
+    if(associatedGithubProject) {
+      type = 'GH_REPO';
+      linkPath = associatedGithubProject.get('uri');
+    }
+    else if((onlyOrgUsers && security === 'PRIVATE') || security === 'PUBLIC') {
+      var backedBy = selectedGroup.get('backedBy');
+      type = backedBy.type;
+      linkPath = backedBy.linkPath;
     }
 
-    var groupId = group.get('id');
-    var groupBackedBy = group.get('backedBy');
-    var groupType = groupBackedBy.type;
-    var groupLinkPath = groupBackedBy.linkPath;
-    var permissions = self.$el.find('input[type=radio]:visible:checked').val();
-    var roomName = self.ui.roomNameInput.val().trim();
+    var apiUrl = urlJoin('/v1/groups/', selectedGroup.get('id'), '/rooms');
+    var payload = {
+      name: roomName,
+      security: {
+        // null or GH_ORG or GH_REPO
+        type: type,
+        security: security,
+        linkPath: linkPath
+      }
+    };
 
-    if (permissions !== 'public' && permissions !== 'inherited' && permissions !== 'private') {
-      self.showValidationMessage('Please select the permissions for the room');
-      return;
+    if(onlyGithubUsers) {
+      payload.providers = ['github'];
     }
 
-    if (permissions === 'inherited' && groupType !== 'GH_ORG' && groupType !== 'GH_REPO') {
-      self.showValidationMessage('Please select the permissions for the room');
-      return;
-    }
-
-    if (!roomName) {
-      self.showValidationMessage('You need to specify a room name');
-      self.ui.roomNameInput.focus();
-      return;
-    }
-
-    if (roomName && !safeRoomName(roomName)) {
-      self.showValidationMessage('Please choose a channel name consisting of letter and number characters');
-      self.ui.roomNameInput.focus();
-      return;
-    }
-
-    var apiUrl = '/v1/groups/' + groupId + '/rooms';
-    var security = permissions.toUpperCase();
-    var payload;
-    if (security === 'PUBLIC' || security === 'INHERITED') {
-      payload = {
-        name: roomName,
-        security: {
-          type: groupType, // null or GH_ORG or GH_REPO
-          // the backend only understands PUBLIC or PRIVATE. INHERITED is what
-          // it understands as a PRIVATE GH_GROUP or GH_REPO room.
-          security: (security === 'PUBLIC') ? 'PUBLIC' : 'PRIVATE',
-          linkPath: (groupType !== null) ? groupLinkPath : null
-        }
-      };
-    } else {
-      // PRIVATE rooms don't have a backing object regardless of the group
-      payload = {
-        name: roomName,
-        security: {
-          type: null,
-          security: 'PRIVATE',
-        }
-      };
-    }
-    return apiClient.post(apiUrl, payload)
+    apiClient.post(apiUrl, payload)
       .then(function(data) {
-        self.dialog.hide();
-        appEvents.trigger('navigation', '/'+data.uri , 'chat#add', '/'+data.uri);
-      })
+        this.dialog.hide();
+        // url, type, title
+        appEvents.trigger('navigation', urlJoin('/', data.uri), 'chat#add', data.uri);
+      }.bind(this))
       .catch(function(err) {
         var status = err.status;
         var message = 'Unable to create channel.';
@@ -180,204 +195,261 @@ var View = Marionette.LayoutView.extend({
           case 400:
             // TODO: send this from the server
             if (err.response && err.response.illegalName) {
-              message = 'Please choose a channel name consisting of letter and number characters.';
-              self.ui.roomNameInput.focus();
+              this.model.set('roomAvailabilityStatus', roomAvailabilityStatusConstants.ILLEGAL_NAME);
             } else {
-              message = 'Validation failed';
+              this.model.set('roomAvailabilityStatus', roomAvailabilityStatusConstants.VALIDATION_FAILED);
             }
             break;
 
           case 403:
-            message = 'You don\'t have permission to create that room.';
+            this.model.set('roomAvailabilityStatus', roomAvailabilityStatusConstants.INSUFFICIENT_PERMISSIONS);
             break;
 
           case 409:
-            message = 'There is already a Github repository or a room with that name.';
+            this.model.set('roomAvailabilityStatus', roomAvailabilityStatusConstants.UNAVAILABLE);
             break;
         }
 
-        self.showValidationMessage(message);
-      });
+        this.ui.roomAvailabilityStatusMessage[0].textContent = message;
+      }.bind(this));
   },
 
-  groupSelected: function(group, animated) {
-    this.selectedGroup = group;
-    this.recalcView(animated);
+  onGroupSelected: function(group) {
+    this.model.set({
+      groupId: group.get('id')
+    });
   },
 
-  recalcView: function (animated) {
-    if (!this._uiBindings) return; // ui may not be bound yet.
-    var self = this;
-
-    var showHide = {
-      'permissions': false,
-      'permPublic': false,
-      'permPrivate': false,
-      'permInheritedOrg': false,
-      'permInheritedRepo': false,
-      'existing': false,
-    };
-
-    var placeholder = "Required";
-    var group = this.selectedGroup;
-
-    var checkForRepo;
-    var createButtonEnabled;
-    var roomName;
-    var groupUri;
-    var groupBackedBy;
-    var groupType;
-    var backingName;
-
-    if (group) {
-      roomName = this.ui.roomNameInput.val();
-      groupUri = group.get('uri');
-      groupBackedBy = group.get('backedBy');
-      groupType = groupBackedBy.type;
-      backingName = groupBackedBy.linkPath || '';
-
-      if (groupType === 'GH_ORG') {
-        // rooms inside github org based groups can have inherited permissions
-        ['permissions', 'permPublic', 'permPrivate', 'permInheritedOrg'].forEach(function (f) { showHide[f] = true; });
-        checkForRepo = roomName && groupUri + '/' + roomName;
-
-      } else if (groupType === 'GH_REPO') {
-        // rooms inside github repo based groups can have inherited permissions
-        ['permissions', 'permPublic', 'permPrivate', 'permInheritedRepo'].forEach(function (f) { showHide[f] = true; });
-        checkForRepo = roomName && groupUri + '/' + roomName;
-
-      } else {
-        // other rooms can only have public or private permissions
-        ['permissions', 'permPublic', 'permPrivate'].forEach(function(f) { showHide[f] = true; });
-        checkForRepo = roomName && groupUri + '/' + roomName;
-      }
-
-      var existing = roomName && troupeCollections.troupes.findWhere({ uri: groupUri + '/' + roomName});
-      createButtonEnabled = !existing;
-
-      if (existing) {
-        // TODO: make a reset() and use that
-        showHide = {
-          'permissions': false,
-          'permPublic': false,
-          'permPrivate': false,
-          'permInheritedOrg': false,
-          'permInheritedRepo': false,
-          'existing': true
-        };
-        checkForRepo = null;
-      }
-    }
-
-    // TODO: do we still have to check for this? Until we break the uri link, I
-    // guess.
-    if (checkForRepo) {
-      createButtonEnabled = false;
-      checkForRepoExistence(checkForRepo, function (exists) {
-        createButtonEnabled = !exists;
-
-        if (exists) {
-          // TODO: make a reset() and use that
-          showHide = {
-            'permissions': false,
-            'permPublic': false,
-            'permPrivate': false,
-            'permInheritedOrg': false,
-            'permInheritedRepo': false,
-            'existing': false
-          };
-          self.showValidationMessage('You cannot create a channel with this name as a repo with the same name already exists.');
-        }
-        applyShowHides();
-      });
-    } else {
-      applyShowHides();
-    }
-
-    function applyShowHides() {
-      if (!self.dialog) return; // callback but room has already been created, therefore self.dialog is null
-
-      self.dialog.setButtonState('create', createButtonEnabled); // set button state
-
-      function arrayToJq(value) {
-        var elements = [];
-        Object.keys(showHide).forEach(function(f) {
-          if(showHide[f] === value) {
-            elements = elements.concat(self.ui[f].get());
-          }
-        });
-        return $(elements);
-      }
-
-      self.dialog.showActions();
-
-      if (animated === false) {
-        arrayToJq(true).removeClass('hide');
-        arrayToJq(false).addClass('hide');
-      } else {
-        arrayToJq(true).filter(':hidden').removeClass('hide');
-        arrayToJq(false).filter(':visible').addClass('hide');
-      }
-    }
-    self.ui.orgNameLabel.text(backingName);
-    self.ui.repoNameLabel.text(backingName);
-    self.ui.roomNameInput.attr('placeholder', placeholder);
-  },
-
-  onRender: function() {
-    // TODO: this.groupsCollection is probably not loaded yet
-    var groupSelect = new GroupSelectView({
-      groupsCollection: this.groupsCollection
+  onRepoSelected: function(repo) {
+    var roomName = getRoomNameFromTroupeName(repo.get('name'));
+    this.model.set({
+      roomName: roomName,
+      associatedGithubProject: repo,
+      security: repo.get('private') ? 'PRIVATE' : 'PUBLIC'
     });
 
-    this.groupSelect = groupSelect;
-    this.ownerSelect.show(groupSelect);
+    this.debouncedCheckForRoomConflict();
 
-    this.listenTo(groupSelect, 'selected', this.groupSelected);
+    this.repoNameTypeahead.hide();
+  },
 
-    if (this.options.roomName) {
-      this.ui.roomNameInput.val(this.options.roomName);
+  onNameInput: function() {
+    var newName = this.ui.nameInput[0].value;
+    // For the CSS selectors
+    this.ui.nameInput[0].setAttribute('value', newName);
+
+    this.model.set({
+      roomName: newName
+    });
+  },
+
+  onNameClearActivated: function() {
+    this.model.set({
+      roomName: '',
+      associatedGithubProject: null
+    });
+    this.groupSelect.hide();
+  },
+
+  onSecurityChange: function() {
+    var security = Array.prototype.reduce.call(this.ui.securityOptions, function(previousSecurity, securityOptionElement) {
+      if(securityOptionElement.checked) {
+        return securityOptionElement.value;
+      }
+
+      return previousSecurity;
+    }, 'PUBLIC');
+
+    this.model.set('security', security);
+  },
+
+  onOnlyGitHubUsersOptionChange: function() {
+    this.model.set('onlyGithubUsers', this.ui.onlyGithubUsersOptionInput[0].checked);
+  },
+
+  onOnlyOrgUsersOptionChange: function() {
+    this.model.set('onlyOrgUsers', this.ui.onlyOrgUsersOptionInput[0].checked);
+  },
+
+  onGroupIdChange: function() {
+    var previousGroup = this.getGroupFromId(this.model.previous('groupId'));
+
+    var roomName = this.model.get('roomName');
+    var associatedGithubProject = this.model.get('associatedGithubProject');
+    // Reset the room name if unchanged from the same as the associated GitHub project
+    if(associatedGithubProject && getRoomNameFromTroupeName(associatedGithubProject.get('name')) === roomName) {
+      this.model.set('roomName', '');
+    }
+    // Reset the associated project on group change
+    this.model.set('associatedGithubProject', null);
+
+
+
+    this.filterReposForSelectedGroup();
+    // Don't run this on the initial group filling because it adds unnecessary error texts to the user
+    if(previousGroup) {
+      this.debouncedCheckForRoomConflict();
     }
 
-    this.selectSuggestedGroup();
-
-    this.recalcView(false);
+    this.safeUpdateFields();
   },
 
-  selectSuggestedGroup: function() {
-    if (this.options.initialGroupId) {
-      var group = this.groupSelect.selectGroupId(this.options.initialGroupId);
-      this.groupSelected(group, false);
-    } else {
-      this.groupSelected(null, false);
+  onRoomNameChange: function() {
+    this.debouncedCheckForRoomConflict();
+    this.safeUpdateFields();
+  },
+
+  debouncedCheckForRoomConflict: _.debounce(function() {
+    var group = this.getGroupFromId(this.model.get('groupId'));
+    var roomName = this.model.get('roomName');
+
+    var repoCheckString = group.get('uri') + '/' + roomName;
+    var roomAlreadyExists = roomName && this.troupeCollection.findWhere({ uri: repoCheckString });
+    if(roomAlreadyExists) {
+      this.model.set('roomAvailabilityStatus', roomAvailabilityStatusConstants.UNAVAILABLE);
+    }
+    else {
+      var associatedGithubProject = this.model.get('associatedGithubProject');
+      this.model.set('roomAvailabilityStatus', roomAvailabilityStatusConstants.PENDING);
+      checkForRepoExistence(group.get('uri'), roomName)
+        .then(function(doesExist) {
+          var doesCurrentGitHubProjectMatchRequest = false;
+          if(associatedGithubProject) {
+            var requestRepoUri = (group.get('uri') + '/' + roomName).toLowerCase();
+            doesCurrentGitHubProjectMatchRequest = requestRepoUri === (associatedGithubProject.get('uri') || '').toLowerCase();
+          }
+
+          if(!doesExist) {
+            this.model.set('roomAvailabilityStatus', roomAvailabilityStatusConstants.AVAILABLE);
+          }
+          // You can still create a room with the same name as the repo if you associate it with project
+          else if(doesExist && doesCurrentGitHubProjectMatchRequest) {
+            this.model.set('roomAvailabilityStatus', roomAvailabilityStatusConstants.AVAILABLE);
+          }
+          else {
+            this.model.set('roomAvailabilityStatus', roomAvailabilityStatusConstants.REPO_CONFLICT);
+          }
+        }.bind(this));
+    }
+  }, 300),
+
+  onRoomAvailabilityStatusChange: function() {
+    this.model.isValid();
+    this.safeUpdateFields();
+  },
+
+  safeUpdateFields: function() {
+    if(this.hasRendered) {
+      this.updateFields();
     }
   },
 
-  roomNameChange: function() {
-    this.recalcViewDebounced();
+  updateFields: function() {
+    var roomName = this.model.get('roomName');
+    var group = this.getGroupFromId(this.model.get('groupId'));
+    var associatedGithubProject = this.model.get('associatedGithubProject');
+    var security = this.model.get('security');
+
+    fastdom.mutate(function() {
+      // Room name
+      this.ui.nameInput[0].value = roomName;
+
+      // Associated github project
+      this.ui.associatedProjectName[0].textContent = associatedGithubProject ? associatedGithubProject.get('name') : '';
+      toggleClass(this.ui.associatedProjectLink[0], 'hidden', !associatedGithubProject);
+      this.ui.associatedProjectLink[0].setAttribute('href', associatedGithubProject ? urlJoin('https://github.com', associatedGithubProject.get('uri')) : '');
+
+      // Security Options
+      this.ui.publicSecurityOption[0].disabled = associatedGithubProject && associatedGithubProject.get('private');
+      this.ui.privateSecurityOption[0].disabled = associatedGithubProject && !associatedGithubProject.get('private');
+      // Only change if there is a project
+      if(associatedGithubProject) {
+        this.ui.publicSecurityOption[0].checked = !associatedGithubProject.get('private');
+        this.ui.privateSecurityOption[0].checked = associatedGithubProject.get('private');
+      }
+
+      // Details
+      var groupBackedBy = group && group.get('backedBy');
+      var isBackedByGitHub = groupBackedBy && (groupBackedBy.type === 'GH_ORG' || groupBackedBy.type === 'GH_REPO');
+
+      var shouldHideOnlyGitHubUsersOption = !isBackedByGitHub || security !== 'PUBLIC';
+      toggleClass(this.ui.onlyGithubUsersOption[0], 'hidden', shouldHideOnlyGitHubUsersOption);
+
+      var shouldHideOnlyOrgUsersOption = !isBackedByGitHub || security !== 'PRIVATE';
+      toggleClass(this.ui.onlyOrgUsersOption[0], 'hidden', shouldHideOnlyOrgUsersOption);
+      this.ui.onlyOrgUsersOptionOrgName[0].textContent = groupBackedBy && groupBackedBy.linkPath;
+
+
+      toggleClass(this.ui.roomDetailSection[0], 'hidden', shouldHideOnlyGitHubUsersOption && shouldHideOnlyOrgUsersOption);
+
+      // Validation and Errors
+      var roomAvailabilityStatusMessage = '';
+      (this.model.validationError || []).forEach(function(validationError) {
+        if(validationError.key === 'roomName') {
+          roomAvailabilityStatusMessage = validationError.message;
+        }
+      }.bind(this));
+
+      // Only show pending message after a 1 second
+      var roomAvailabilityStatus = this.model.get('roomAvailabilityStatus');
+      if(roomAvailabilityStatus === roomAvailabilityStatusConstants.PENDING) {
+        setTimeout(function() {
+          // Only show if still pending after the timeout
+          var newRoomAvailabilityStatus = this.model.get('roomAvailabilityStatus');
+          if(newRoomAvailabilityStatus === roomAvailabilityStatusConstants.PENDING) {
+            this.ui.roomAvailabilityStatusMessage[0].textContent = roomAvailabilityStatusMessage;
+          }
+        }.bind(this), 1000);
+      }
+      else {
+        this.ui.roomAvailabilityStatusMessage[0].textContent = roomAvailabilityStatusMessage;
+      }
+    }.bind(this));
   },
 
-  permissionsChange: function() {
-    this.recalcViewDebounced();
-  }
+  filterReposForSelectedGroup: function() {
+    var selectedGroup = this.getGroupFromId(this.model.get('groupId'));
+    if(selectedGroup) {
+      this.filteredRepoCollection.setFilter(function(model) {
+        return getOrgNameFromUri(model.get('uri')).toLowerCase() === selectedGroup.get('name').toLowerCase();
+      });
+    }
+  },
+
+  selectInitialGroup: function() {
+    this.filterReposForSelectedGroup();
+
+    if(this.groupSelect) {
+      var groupId = this.model.get('groupId');
+      this.groupSelect.selectGroupId(groupId);
+    }
+  },
+
 });
+
 
 var Modal = ModalView.extend({
   disableAutoFocus: true,
+
   initialize: function(options) {
     options = options || {};
-    options.title = options.title || "Create a channel";
+    options.title = options.title || 'Create a room';
 
     ModalView.prototype.initialize.call(this, options);
-    this.view = new View(options);
+    this.view = new CreateRoomView(options);
   },
   menuItems: [
-    { action: "back", pull: 'left', text: "Back", className: "modal--default__footer__link" },
-    { action: "create", pull: 'right', text: "Create", className: "modal--default__footer__btn" },
+    {
+      action: 'create',
+      pull: 'right',
+      text: 'Create',
+      className: 'modal--default__footer__btn'
+    },
   ]
 });
 
+
 module.exports = {
-  View: View,
+  View: CreateRoomView,
   Modal: Modal
 };

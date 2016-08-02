@@ -248,7 +248,7 @@ describe('group-with-policy-service #slow', function() {
         assert.ok(false, "error expected");
       })
       .catch(StatusError, function(err) {
-        assert.deepEqual(err.status, 400);
+        assert.deepEqual(err.status, 409);
       });
   });
 
