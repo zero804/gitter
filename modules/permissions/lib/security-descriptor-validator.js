@@ -45,7 +45,7 @@ function validateGroupDescriptor(descriptor) {
       break;
 
     case 'INVITE':
-      if (!descriptor.public) {
+      if (descriptor.public) {
         throw new StatusError(403, 'Invalid public attribute: ' + descriptor.public);
       }
       break;
