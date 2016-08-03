@@ -3,12 +3,11 @@
 var mongoose = require('gitter-web-mongoose-bluebird');
 var Schema = mongoose.Schema;
 var ObjectId = Schema.ObjectId;
+var securityDescriptor = require('./security-descriptor-subdocument');
 
 var ForumSchema = new Schema({
-  name: { type: String, required: true },
-  slug: { type: String, required: true },
   tags: [String],
-  topicsTotal: { type: Number, "default": 0 }
+  sd: { type: securityDescriptor.Schema, required: true },
 }, { strict: 'throw' });
 
 ForumSchema.schemaTypeName = 'ForumSchema';
@@ -16,6 +15,8 @@ ForumSchema.schemaTypeName = 'ForumSchema';
 module.exports = {
   install: function(mongooseConnection) {
     var Model = mongooseConnection.model('Forum', ForumSchema);
+
+    securityDescriptor.installIndexes(ForumSchema, Model);
 
     return {
       model: Model,
