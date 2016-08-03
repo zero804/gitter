@@ -15,4 +15,13 @@ describe.only('<TableControl/>', () => {
   it('should render a container', () => {
     assert.equal(wrapper.find('Container').length, 1);
   });
+
+  it('should render a panel', () => {
+    assert.equal(wrapper.find('Panel').length, 1);
+  });
+
+  it('should render the panel with a variation class', () => {
+    assert.equal(wrapper.find('.panel--table-control').length, 1);
+  });
+
 });
