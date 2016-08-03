@@ -12,9 +12,6 @@ module.exports = React.createClass({
 
   render(){
     const { options } = this.props;
-    console.log('-----------------------');
-    console.log(options);
-    console.log('-----------------------');
     const { onChange } = this;
     return (
       <select className="table-control__select" onChange={ onChange }>
@@ -24,7 +21,6 @@ module.exports = React.createClass({
   },
 
   getChildOption(index, opts){
-    console.log(index, opts);
     const { name, value, selected } = opts;
     return (
       <option key={`table-control-select-index-${index}`}
@@ -36,7 +32,6 @@ module.exports = React.createClass({
   },
 
   onChange(e){
-    console.log(e);
     const { onChange } = this.props;
     onChange(e.target.value);
   }
