@@ -22,7 +22,9 @@ module.exports = React.createClass({
     return (
       <Container className="container--category">
         <Panel className="panel--category">
-          <ul className="category-list">{ categories.map(this.getChildCategory) }</ul>
+          <nav>
+            <ul className="category-list">{ categories.map(this.getChildCategory) }</ul>
+          </nav>
         </Panel>
       </Container>
     );
