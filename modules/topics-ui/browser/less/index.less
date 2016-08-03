@@ -2,20 +2,20 @@
 @import "./colors";
 
 .m-cover-screen() { height: 100%; width: 100%; }
-
-html { .m-cover-screen();  font-size: 62.5%; }
-body { .m-cover-screen(); font-size: 1.6rem; }
-
-#app-root { .m-cover-screen(); }
-
-main {
-  .m-cover-screen();
+.m-grad-background() {
   background-image: radial-gradient(
     150rem at 0 -15rem,
     @topic-bg-left,
     @topic-bg-right
   );
 }
+
+html {
+  .m-cover-screen();
+  .m-grad-background();
+  font-size: 62.5%;
+}
+body { .m-cover-screen(); font-size: 1.6rem; }
 
 //Generic
 @import "./components/container";
