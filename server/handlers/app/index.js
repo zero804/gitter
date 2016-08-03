@@ -174,6 +174,14 @@ router.get('/:roomPart1/topics',
   }
 );
 
+router.get('/:roomPart1/topics/categories/:categoryName',
+  identifyRoute('org-base-topic'),
+  featureToggles,
+  function(req, res, next){
+    return topicsRenderers.renderForum(req, res, next);
+  }
+);
+
 [
   '/:roomPart1/~chat',                         // ORG or ONE_TO_ONE
   '/:roomPart1/:roomPart2/~chat',              // REPO or ORG_CHANNEL or ADHOC
