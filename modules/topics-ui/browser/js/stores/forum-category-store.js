@@ -23,7 +23,9 @@ module.exports = Backbone.Collection.extend({
   onCategoryUpdate(model, val){
     this.where({ active: true }).forEach((m) => m.set('active', false));
     this.findWhere({ category: val }).set('active', true);
-    Dispatcher.trigger(constants.UPDATE_ACTIVE_CATEGORY);
+    //FIXME test the payload here
+    //also migrate to action creators so we can throw errors for non-present values
+    Dispatcher.trigger(constants.UPDATE_ACTIVE_CATEGORY, { category: val });
   }
 
 });

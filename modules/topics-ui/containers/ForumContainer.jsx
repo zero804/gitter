@@ -15,6 +15,7 @@ module.exports = React.createClass({
 
   propTypes: {
     groupName: React.PropTypes.string.isRequired,
+    categoryName: React.PropTypes.string.isRequired,
     categoryStore: React.PropTypes.shape({
       models: React.PropTypes.array.isRequired,
       getCategories: React.PropTypes.func.isRequired
@@ -24,7 +25,8 @@ module.exports = React.createClass({
   getInitialState(){
     const { categoryStore } = this.props;
     return {
-      categories: categoryStore.getCategories()
+      categories: categoryStore.getCategories(),
+      categoryName: this.props.categoryName,
     };
   },
 
@@ -38,7 +40,7 @@ module.exports = React.createClass({
   },
 
   render() {
-    const { categories } = this.state;
+    const { categories, categoryName } = this.state;
     const { groupName } = this.props;
     return (
       <main>
@@ -47,7 +49,9 @@ module.exports = React.createClass({
           groupName={ groupName }
           onCategoryClicked={ this.onCategoryClicked } />
 
-        <TableControl />
+        <TableControl
+          groupName={groupName}
+          category={categoryName}/>
       </main>
     );
   },
@@ -60,10 +64,14 @@ module.exports = React.createClass({
     });
   },
 
-  onCategoryUpdate(){
+  onCategoryUpdate(data){
     const { categoryStore } = this.props;
     this.setState({
       categories: categoryStore.getCategories(),
+      ////FIXME
+      //Consider moving this out of the event payload and provide
+      //categoryStore.getActiveCategoryName() to get this
+      categoryName: data.category,
     })
   }
 
