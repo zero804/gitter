@@ -49,7 +49,7 @@ function addedToRoomMapping(data) {
     ROOMURI: data.roomUri,
     ROOMURL: data.roomUrl,
     UNSUB:   data.unsubscribeUrl,
-    LOGOURL: cdn('images/logo-text-blue-pink.png', {email: true})
+    LOGOURL: cdn('images/logo/gitter-logo-email-64.png', {email: true})
   };
 
 }
@@ -62,7 +62,7 @@ function invitationMapping(data) {
     ROOMURI: data.roomUri,
     ROOMURL: data.roomUrl,
     INVITEURL: data.inviteUrl,
-    LOGOURL: cdn('images/logo-text-blue-pink.png', { email: true })
+    LOGOURL: cdn('images/logo/gitter-logo-email-64.png', { email: true })
   };
 }
 
@@ -77,7 +77,7 @@ function unreadNoticationMapping(data) {
     HTML:       applyTemplate("emails/unread_notification_html", data),
     MICRODATA:  applyTemplate("emails/unread_notification_microdata", data),
     PLAINTEXT:  applyTemplate("emails/unread_notification", data),
-    LOGOURL:    cdn('images/logo-text-blue-pink.png', {email: true})
+    LOGOURL:    cdn('images/logo/gitter-logo-email-64.png', {email: true})
   };
 
 }
@@ -94,6 +94,10 @@ function createdRoomMapping(data) {
     TWITTERURL:  twitterSnippet,
     ORGNOTE:     '', // No used since splitsville
     ROOMTYPE:    data.roomType,
-    LOGOURL:     cdn('images/logo-text-blue-pink.png', {email: true})
+    LOGOURL:     cdn('images/logo/gitter-logo-email-64.png', {email: true})
   };
 }
+
+exports.testOnly = {
+  VALID_TEMPLATES: VALID_TEMPLATES
+};

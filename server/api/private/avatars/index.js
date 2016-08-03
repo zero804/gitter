@@ -5,6 +5,8 @@ var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 var fixMongoIdQueryParam = require('../../../web/fix-mongo-id-query-param');
 var Promise = require('bluebird');
+var cdn = require('gitter-web-cdn');
+var avatars = require('gitter-web-avatars');
 var githubUserByUsernameVersioned = require('./github-user-by-username-versioned');
 var githubUserByUsername = require('./github-user-by-username');
 var gravatarByEmail = require('./gravatar-by-email');
@@ -24,7 +26,8 @@ function sendMissing(req, res) {
     res.set('Content-Type', MISSING_IMAGE_CONTENT_TYPE);
     res.status(200).end();
   } else {
-    res.status(404).end();
+    res.redirect(avatars.getDefault());
+    res.status(200).end();
   }
 }
 
@@ -71,6 +74,18 @@ function sendAvatar(callback) {
       .catch(next);
   }
 }
+
+/**
+ * Default for development environment
+ */
+router.get('/default',
+  identifyRoute('api-private-avatar-default'),
+  sendAvatar(function(/*req, size*/) {
+    return {
+      url: cdn('images/default-avatar.png'),
+      longTermCachable: true
+    };
+  }));
 
 /**
  * Group Avatars, by ID
@@ -123,16 +138,16 @@ router.get('/gravatar/m/:md5',
     return gravatarByHash(md5, size);
   }));
 
-router.get('/tw/i/:id1/:id2/:extension',
+router.get('/tw/i/:id/:filename',
   identifyRoute('api-private-avatar-twitter'),
-  sendAvatar(function(req, size) {
-    var id1 = req.params.id1;
-    var id2 = req.params.id2;
-    var extension = req.params.extension;
+  // NOTE: it doesn't support a size param yet
+  sendAvatar(function(req) {
+    var id = req.params.id;
+    var filename = req.params.filename;
 
-    if (!id1 || !id2 || !extension) return null;
+    if (!id || !filename) return null;
 
-    return twitterByIds(id1, id2, extension, size);
+    return twitterByIds(id, filename);
   }))
 
 /**
