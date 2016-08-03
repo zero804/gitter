@@ -777,6 +777,8 @@ function createGroupRoom(user, group, roomInfo, securityDescriptor, options) {
       break
 
     case null:
+    case 'GROUP':
+      // TODO: this is not very descriptive
       roomType = 'group-room'; // or channel?
       break;
 
