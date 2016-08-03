@@ -11,6 +11,8 @@ function renderForum(req, res, next) {
     return next(new StatusError(404));
   }
 
+  var categoryFilter = (req.params.categoryName || 'all');
+
   forumService.findByName(req.params.roomPart1)
     .then(function(forum){
       res.render('topics/forum', {
@@ -20,7 +22,7 @@ function renderForum(req, res, next) {
         componentData: {
           groupName: req.params.roomPart1,
           forum: forum,
-          categoryStore: forumCategoryStore(forum.categories),
+          categoryStore: forumCategoryStore(forum.categories, categoryFilter),
         }
       });
     });
