@@ -36,6 +36,50 @@ function validateExtraUserIds(descriptor) {
   }
 }
 
+function validateGroupDescriptor(descriptor) {
+  switch(descriptor.members) {
+    case 'PUBLIC':
+      if (!descriptor.public) {
+        throw new StatusError(403, 'Invalid public attribute: ' + descriptor.public);
+      }
+      break;
+
+    case 'INVITE':
+      if (!descriptor.public) {
+        throw new StatusError(403, 'Invalid public attribute: ' + descriptor.public);
+      }
+      break;
+
+    default:
+      throw new StatusError(403, 'Invalid members attribute: ' + descriptor.members);
+  }
+
+  switch(descriptor.admins) {
+    case 'GROUP_ADMIN':
+      break;
+    default:
+      throw new StatusError(403, 'Invalid admins attribute: ' + descriptor.admins);
+  }
+
+  if (descriptor.linkPath) {
+    throw new StatusError(403, 'Invalid linkPath attribute: ' + descriptor.linkPath);
+  }
+
+  if (descriptor.externalId) {
+    throw new StatusError(403, 'Invalid linkPath attribute: ' + descriptor.externalId);
+  }
+
+  if (!descriptor.internalId) {
+    throw new StatusError(403, 'Invalid internalId attribute: ' + descriptor.internalId);
+  }
+
+  if(!mongoUtils.isLikeObjectId(descriptor.internalId)) {
+    throw new StatusError(403, 'Invalid internalId attribute: ' + descriptor.internalId);
+  }
+
+  validateExtraUserIds(descriptor);
+}
+
 function validateGhRepoDescriptor(descriptor) {
   var usesGH = false;
 
@@ -73,6 +117,10 @@ function validateGhRepoDescriptor(descriptor) {
       default:
         throw new StatusError(403, 'Invalid public attribute: ' + descriptor.public);
     }
+  }
+
+  if (descriptor.internalId) {
+    throw new StatusError(403, 'Invalid internalId attribute: ' + descriptor.internalId);
   }
 
   validateGhRepoLinkPath(descriptor.linkPath);
@@ -123,6 +171,10 @@ function validateGhOrgDescriptor(descriptor) {
     throw new StatusError(403, 'Unused reference type: GH_ORG');
   }
 
+  if (descriptor.internalId) {
+    throw new StatusError(403, 'Invalid internalId attribute: ' + descriptor.internalId);
+  }
+
   validateGhOrgLinkPath(descriptor.linkPath);
   validateExtraUserIds(descriptor);
 }
@@ -169,6 +221,10 @@ function validateGhUserDescriptor(descriptor) {
     throw new StatusError(403, 'Unused reference type: GH_USER');
   }
 
+  if (descriptor.internalId) {
+    throw new StatusError(403, 'Invalid internalId attribute: ' + descriptor.internalId);
+  }
+
   validateGhUserLinkPath(descriptor.linkPath);
   validateExtraUserIds(descriptor);
 }
@@ -192,6 +248,10 @@ function validateOneToOneDescriptor(descriptor) {
 
   if (descriptor.externalId) {
     throw new StatusError(403, 'Invalid externalId attribute');
+  }
+
+  if (descriptor.internalId) {
+    throw new StatusError(403, 'Invalid internalId attribute: ' + descriptor.internalId);
   }
 
   if (descriptor.extraMembers && descriptor.extraMembers.length) {
@@ -227,6 +287,14 @@ function validateBasicDescriptor(descriptor) {
     throw new StatusError(403, 'Invalid linkPath attribute');
   }
 
+  if (descriptor.externalId) {
+    throw new StatusError(403, 'Invalid externalId attribute: ' + descriptor.externalId);
+  }
+
+  if (descriptor.internalId) {
+    throw new StatusError(403, 'Invalid internalId attribute: ' + descriptor.internalId);
+  }
+
   validateExtraUserIds(descriptor);
 }
 
@@ -234,6 +302,9 @@ function validate(descriptor) {
   if (!descriptor) throw new StatusError(403, 'Invalid descriptor');
 
   switch(descriptor.type) {
+    case 'GROUP':
+      return validateGroupDescriptor(descriptor);
+
     case 'GH_REPO':
       return validateGhRepoDescriptor(descriptor);
 
