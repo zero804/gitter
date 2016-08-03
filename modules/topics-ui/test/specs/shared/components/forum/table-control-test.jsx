@@ -2,14 +2,16 @@
 
 import assert from 'assert';
 import React from  'react';
-import { shallow } from 'enzyme';
+import { shallow, mount } from 'enzyme';
 import TableControl from '../../../../../shared/components/forum/table-control.jsx';
 
-describe('<TableControl/>', () => {
+describe.only('<TableControl/>', () => {
 
   let wrapper;
+  let mounted;
   beforeEach(() => {
     wrapper = shallow(<TableControl groupName="gitterHQ" category="all"/>);
+    mounted = mount(<TableControl groupName="gitterHQ" category="all"/>);
   });
 
   it('should render a container', () => {
@@ -30,6 +32,14 @@ describe('<TableControl/>', () => {
 
   it('should render three table-control-buttons', () => {
     assert.equal(wrapper.find('TableControlButton').length, 3);
+  });
+
+  it.skip('should render two select elements', () => {
+    assert.equal(wrapper.find('TableControlSelect').length, 2);
+  });
+
+  it('should render with the right default props', () => {
+    assert.equal(mounted.props().sortBy.length, 4);
   });
 
 });
