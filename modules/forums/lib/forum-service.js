@@ -2,16 +2,17 @@
 
 var env = require('gitter-web-env');
 var stats = env.stats;
-var Promise = require('bluebird');
-var assert = require('assert');
-var StatusError = require('statuserror');
 var Forum = require('gitter-web-persistence').Forum;
-var debug = require('debug')('gitter:app:forums:forum-service');
-
+var debug = require('debug')('gitter:app:topics:forum-service');
 
 function createForum(user, forumInfo) {
   // we can't upsert because there's nothing unique on a Forum to check against
-  return Forum.create(forumInfo)
+  var insertData = {
+    name: forumInfo.name,
+    slug: forumInfo.slug,
+    tags: forumInfo.tags || []
+  };
+  return Forum.create(insertData)
     .then(function(forum) {
       stats.event('new_forum', {
         // TODO: groupId would probably have been handy here? But leaky.

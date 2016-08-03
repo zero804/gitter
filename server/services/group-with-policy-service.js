@@ -13,7 +13,6 @@ var validateProviders = require('gitter-web-validators/lib/validate-providers');
 var groupService = require('gitter-web-groups/lib/group-service');
 var forumService = require('gitter-web-forums/lib/forum-service');
 var forumCategoryService = require('gitter-web-forum-categories/lib/forum-category-service');
-var postService = require('gitter-web-posts/lib/post-service');
 
 
 /**
