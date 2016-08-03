@@ -46,11 +46,6 @@ module.exports = React.createClass({
   getForumState(){
     const categoryStore = (window.context.categoryStore || {});
     const tagStore = (window.context.tagStore || {});
-
-    console.log('----------------------');
-    console.log(tagStore);
-    console.log('----------------------');
-
     const { router } = this.props;
     return Object.assign(this.getDefaultState(), {
       groupName: router.get('groupName'),
