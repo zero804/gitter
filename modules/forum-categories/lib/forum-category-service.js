@@ -2,12 +2,10 @@
 
 var env = require('gitter-web-env');
 var stats = env.stats;
-var Promise = require('bluebird');
-var assert = require('assert');
 var StatusError = require('statuserror');
 var ForumCategory = require('gitter-web-persistence').ForumCategory;
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
-var debug = require('debug')('gitter:app:forums:forum-category-service');
+var debug = require('debug')('gitter:app:topics:forum-category-service');
 
 function createCategory(user, forum, categoryInfo) {
   var query = {

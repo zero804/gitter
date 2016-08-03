@@ -1,7 +1,7 @@
 {
-  "name": "gitter-web-posts",
+  "name": "gitter-web-replies",
   "version": "1.0.0",
-  "main": "lib/post-service.js",
+  "main": "lib/reply-service.js",
   "directories": {
     "lib": "lib",
     "test": "test"
