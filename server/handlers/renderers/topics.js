@@ -20,9 +20,10 @@ function renderForum(req, res, next) {
         hasCachedFonts: fonts.hasCachedFonts(req.cookies),
         fonts: fonts.getFonts(),
         componentData: {
-          groupName: req.params.roomPart1,
           forum: forum,
+          groupName: req.params.roomPart1,
           categoryStore: forumCategoryStore(forum.categories, categoryFilter),
+          categoryName: categoryFilter,
         }
       });
     });
