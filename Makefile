@@ -18,10 +18,11 @@ package: npm
 	gulp package --skip-stage validate --skip-stage test
 
 clean: npm
-	gulp clean
+	gulp clean || (make npm-full && gulp clean)
+  # If gulp clean failed, it's almost certainly a problem
+  # with the npm folder, so nuke it and try again
 
 test: clean npm
-
 	mkdir -p output/
 	./exec-in-docker ./node_modules/.bin/gulp test --test-coverage --test-suite docker --test-xunit-reports
 	echo "Docker tests completed"
@@ -38,10 +39,14 @@ print-nodejs-version:
 npm-quick: print-nodejs-version
 	npm prune
 	npm install
+	./build-scripts/validate-modules-for-build.sh
 
 npm-full: print-nodejs-version
 	npm cache clean
 	rm -rf node_modules/
+	rm -rf modules/*/node_modules
+	rm -rf shared/node_modules
+
 	npm install
 
 npm:

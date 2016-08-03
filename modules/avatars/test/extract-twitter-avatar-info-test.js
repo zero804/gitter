@@ -9,9 +9,8 @@ describe('extract-twitter-avatar-info', function() {
     var info = extractTwitterAvatarInfo('https://pbs.twimg.com/profile_images/378800000308609669/c5cc5261cc55da2dbca442eaf60920cc_normal.jpeg');
 
     assert.deepEqual(info, {
-      id1: '378800000308609669',
-      id2: 'c5cc5261cc55da2dbca442eaf60920cc',
-      extension: 'jpeg'
+      id: '378800000308609669',
+      filename: 'c5cc5261cc55da2dbca442eaf60920cc_normal.jpeg',
     });
   });
 
@@ -19,9 +18,8 @@ describe('extract-twitter-avatar-info', function() {
     var info = extractTwitterAvatarInfo('https://pbs.twimg.com/profile_images/567819058104377344/91aRlK_t_bigger.png');
 
     assert.deepEqual(info, {
-      id1: '567819058104377344',
-      id2: '91aRlK_t',
-      extension: 'png'
+      id: '567819058104377344',
+      filename: '91aRlK_t_bigger.png',
     });
 
   });
