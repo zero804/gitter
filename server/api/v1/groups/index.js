@@ -10,6 +10,7 @@ var GroupWithPolicyService = require('../../../services/group-with-policy-servic
 var RoomWithPolicyService = require('../../../services/room-with-policy-service');
 var inviteValidation = require('gitter-web-invites/lib/invite-validation');
 var internalClientAccessOnly = require('../../../web/middlewares/internal-client-access-only');
+var TwitterBadger = require('gitter-web-twitter/lib/twitter-badger');
 
 var MAX_BATCHED_INVITES = 100;
 
@@ -100,6 +101,7 @@ module.exports = {
     var groupOptions = getGroupOptions(req.body);
 
     var invites = getInvites(req.body.invites);
+    var allowTweeting = req.body.allowTweeting;
 
     var group;
     var room;
@@ -121,10 +123,25 @@ module.exports = {
         return policyFactory.createPolicyForRoomId(req.user, room._id);
       })
       .then(function(userRoomPolicy) {
+
         var roomWithPolicyService = new RoomWithPolicyService(room, req.user, userRoomPolicy);
         // Some of these can fail, but the errors will be caught and added to
         // the report that the promise resolves to.
         return roomWithPolicyService.createRoomInvitations(invites);
+      })
+      .then(function(invitesReport) {
+        // Tweet the users
+        if(allowTweeting) {
+          var usersToTweet = [];
+          invitesReport.forEach(function(report) {
+            if(report.status === 'error' && report.user.type === 'twitter') {
+              usersToTweet.push(report.user);
+            }
+          })
+          TwitterBadger.sendUserInviteTweets(req.user, usersToTweet, room.url);
+        }
+
+        return invitesReport;
       })
       .then(function(/* invitesReport */) {
         var groupStrategy = new restSerializer.GroupStrategy();
