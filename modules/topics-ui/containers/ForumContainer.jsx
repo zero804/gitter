@@ -15,18 +15,25 @@ module.exports = React.createClass({
 
   propTypes: {
     groupName: React.PropTypes.string.isRequired,
+    //Categories ---
     categoryName: React.PropTypes.string.isRequired,
     categoryStore: React.PropTypes.shape({
       models: React.PropTypes.array.isRequired,
       getCategories: React.PropTypes.func.isRequired
-    }).isRequired
+    }).isRequired,
+    //Tags -----
+    tagStore: React.PropTypes.shape({
+      models: React.PropTypes.array.isRequired,
+      getTags: React.PropTypes.func.isRequired
+    }).isRequired,
   },
 
   getInitialState(){
-    const { categoryStore } = this.props;
+    const { categoryStore, tagStore } = this.props;
     return {
       categories: categoryStore.getCategories(),
       categoryName: this.props.categoryName,
+      tags: tagStore.getTags()
     };
   },
 
@@ -40,7 +47,7 @@ module.exports = React.createClass({
   },
 
   render() {
-    const { categories, categoryName } = this.state;
+    const { categories, categoryName, tags } = this.state;
     const { groupName } = this.props;
     return (
       <main>
@@ -51,7 +58,8 @@ module.exports = React.createClass({
 
         <TableControl
           groupName={groupName}
-          category={categoryName}/>
+          category={categoryName}
+          tags={tags}/>
       </main>
     );
   },

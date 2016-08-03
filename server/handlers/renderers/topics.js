@@ -4,6 +4,7 @@ var StatusError = require('statuserror');
 var fonts = require('../../web/fonts');
 var forumService = require('gitter-web-forums').forumService;
 var forumCategoryStore = require('gitter-web-topics-ui/server/stores/forum-category-store')
+var forumTagStore = require('gitter-web-topics-ui/server/stores/forum-tag-store')
 
 function renderForum(req, res, next) {
 
@@ -12,6 +13,7 @@ function renderForum(req, res, next) {
   }
 
   var categoryFilter = (req.params.categoryName || 'all');
+  var tagFilter = (req.query.tag || 'all-tags');
 
   forumService.findByName(req.params.roomPart1)
     .then(function(forum){
@@ -24,6 +26,8 @@ function renderForum(req, res, next) {
           groupName: req.params.roomPart1,
           categoryStore: forumCategoryStore(forum.categories, categoryFilter),
           categoryName: categoryFilter,
+          tagStore: forumTagStore(forum.tags, tagFilter),
+          tagName: tagFilter,
         }
       });
     });

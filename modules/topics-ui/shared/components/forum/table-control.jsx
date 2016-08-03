@@ -12,7 +12,8 @@ module.exports = React.createClass({
   propTypes: {
     groupName: PropTypes.string.isRequired,
     category: PropTypes.string.isRequired,
-    sortBy: PropTypes.array
+    sortBy: PropTypes.array,
+    tags: PropTypes.array.isRequired
   },
 
   getDefaultProps(){
@@ -28,7 +29,7 @@ module.exports = React.createClass({
 
   render(){
 
-    const { groupName, category, sortBy } = this.props;
+    const { groupName, category, sortBy, tags } = this.props;
 
     return (
       <Container className="container--table-control">
@@ -38,7 +39,10 @@ module.exports = React.createClass({
               <li>{this.getChildTopicTableButton('Activity', 'activity')}</li>
               <li>{this.getChildTopicTableButton('My Topics', 'my-topics')}</li>
               <li>{this.getChildTopicTableButton('Watched', 'watched')}</li>
-              <li className="tabel-control__divider"><TopicTableSelect options={sortBy} onChange={this.onSortChange} /></li>
+              <li className="tabel-control__divider">
+                <TopicTableSelect options={tags} onChange={this.onTagChange} />
+              </li>
+              <li><TopicTableSelect options={sortBy} onChange={this.onSortChange} /></li>
             </ul>
           </nav>
         </Panel>
@@ -65,6 +69,10 @@ module.exports = React.createClass({
 
   onSortChange(sortType){
     console.log('Sort Update', arguments);
+  },
+
+  onTagChange(tag) {
+    console.log('Tag Change', tag);
   }
 
 });
