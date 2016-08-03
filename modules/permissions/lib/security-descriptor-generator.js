@@ -119,32 +119,6 @@ function generateRepoSecurityDescriptor(user, options) {
   }
 }
 
-
-function generate(user, options) {
-  options.type = options.type || null;
-
-  if (options.type) {
-    assert(options.linkPath, 'linkPath required');
-  }
-
-  switch (options.type) {
-    case null:
-      return generateDefaultSecurityDescriptor(user, options);
-
-    case 'GH_USER':
-      return generateUserSecurityDescriptor(user, options);
-
-    case 'GH_REPO':
-      return generateRepoSecurityDescriptor(user, options);
-
-    case 'GH_ORG':
-      return generateOrgSecurityDescriptor(user, options);
-
-    default:
-      throw new StatusError(500, 'Unknown type: ' + options.type)
-  }
-}
-
 function generateDefaultSecurityDescriptor(user, options) {
   var members;
   var isPublic;
@@ -172,6 +146,31 @@ function generateDefaultSecurityDescriptor(user, options) {
     members: members,
     extraMembers: [],
     extraAdmins: [user._id]
+  }
+}
+
+function generate(user, options) {
+  options.type = options.type || null;
+
+  if (options.type) {
+    assert(options.linkPath, 'linkPath required');
+  }
+
+  switch (options.type) {
+    case null:
+      return generateDefaultSecurityDescriptor(user, options);
+
+    case 'GH_USER':
+      return generateUserSecurityDescriptor(user, options);
+
+    case 'GH_REPO':
+      return generateRepoSecurityDescriptor(user, options);
+
+    case 'GH_ORG':
+      return generateOrgSecurityDescriptor(user, options);
+
+    default:
+      throw new StatusError(500, 'Unknown type: ' + options.type)
   }
 }
 
