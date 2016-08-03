@@ -38,7 +38,7 @@ module.exports = React.createClass({
               <li>{this.getChildTopicTableButton('Activity', 'activity')}</li>
               <li>{this.getChildTopicTableButton('My Topics', 'my-topics')}</li>
               <li>{this.getChildTopicTableButton('Watched', 'watched')}</li>
-              <li><TopicTableSelect options={sortBy} onChange={this.onSortChange} /></li>
+              <li className="tabel-control__divider"><TopicTableSelect options={sortBy} onChange={this.onSortChange} /></li>
             </ul>
           </nav>
         </Panel>
