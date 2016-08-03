@@ -82,6 +82,18 @@ function createPolicyForGroupId(user, groupId) {
     });
 }
 
+function createPolicyForGroupIdWithUserLoader(userId, userLoader, groupId) {
+  return securityDescriptorService.getForGroupUser(groupId, userId)
+    .then(function(securityDescriptor) {
+      if (!securityDescriptor) throw new StatusError(404);
+
+      var policyDelegate = policyDelegateFactory(userId, userLoader, securityDescriptor);
+      var contextDelegate = null; // No group context yet
+
+      return new PolicyEvaluator(userId, securityDescriptor, policyDelegate, contextDelegate);
+    });
+}
+
 function createPolicyForGroupIdWithRepoFallback(user, groupId, repoUri) {
   debug('Create policy factory with repo fallback: repo=%s', repoUri);
   var userId = user && user._id;
@@ -163,6 +175,7 @@ module.exports = {
   createPolicyForRoomId: Promise.method(createPolicyForRoomId),
   createPolicyForRoom: Promise.method(createPolicyForRoom),
   createPolicyForGroupId: Promise.method(createPolicyForGroupId),
+  createPolicyForGroupIdWithUserLoader: Promise.method(createPolicyForGroupIdWithUserLoader),
   createPolicyForGroupIdWithRepoFallback: Promise.method(createPolicyForGroupIdWithRepoFallback),
   createPolicyForUserIdInRoomId: Promise.method(createPolicyForUserIdInRoomId),
   createPolicyForUserIdInRoom: Promise.method(createPolicyForUserIdInRoom),
