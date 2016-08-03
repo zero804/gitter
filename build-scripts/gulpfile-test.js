@@ -2,6 +2,7 @@
 
 var gulp = require('gulp');
 var gutil = require('gulp-util');
+var Promise = require('bluebird');
 var runSequence = require('run-sequence');
 var using = require('gulp-using');
 var codecov = require('gulp-codecov');
@@ -173,10 +174,29 @@ function spawnMochaProcess(moduleName, options, files) { // eslint-disable-line 
 
   args = args.concat(files);
   gutil.log('Running tests with', executable, args.join(' '));
-  return spawn(executable, args, {
-    stdio: 'inherit',
-    env: _.extend({}, process.env, env)
-  });
+
+  return Promise.try(function() {
+    return spawn(executable, args, {
+      stdio: 'inherit',
+      env: _.extend({}, process.env, env)
+    });
+  })
+  .then(function(command) {
+    return new Promise(function(resolve, reject) {
+      command.on('close', function (code) {
+        if (code) {
+          reject(new Error(executable + ' exited with ' + code));
+        } else {
+          resolve();
+        }
+      });
+
+      command.on('error', function(err) {
+        reject(err);
+      });
+    });
+  })
+
 
 }
 
@@ -191,11 +211,9 @@ Object.keys(testModules).forEach(function(moduleName) {
   var testTaskName = 'test:test:' + moduleName;
   subTasks.push(testTaskName);
 
-  gulp.task(testTaskName, function(callback) {
-    var cmd = spawnMochaProcess(moduleName, definition.options, definition.files)
-    cmd.on('close', function (code) {
-      callback(code);
-    });
+  gulp.task(testTaskName, function() {
+    return spawnMochaProcess(moduleName, definition.options, definition.files)
+
   });
 
 });
@@ -216,8 +234,7 @@ if (RUN_TESTS_IN_PARALLEL) {
 /**
  * Hook into post test
  */
-if (process.env.JENKINS_URL) {
-  // Public code-coverage, only if we're using Jenkins
+if (generateCoverage) {
   gulp.task('test:post-test', ['test:post-test:merge-lcov', 'test:post-test:submit-codecov']);
 }
 

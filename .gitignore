@@ -99,3 +99,4 @@ scripts/graphs/*.gephi
 .devhttps.ca.crt
 .devhttps.ca.key
 unread-notification.out.html
+.nyc_output
