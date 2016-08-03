@@ -1,0 +1,16 @@
+{
+  "env": {
+    "commonjs": true,
+    "node": true,
+    "browser": true
+  },
+  "plugins": [
+    "node"
+  ],
+  "extends": "eslint:recommended",
+  "rules": {
+    "node/no-missing-require": 0,
+    "node/no-unpublished-require": 0,
+    "no-console": 0
+  }
+}
