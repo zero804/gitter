@@ -1,13 +1,13 @@
 "use strict";
 
-module.exports = function forumCategoryStore(categories = [], filter = 'all') {
+module.exports = function forumCategoryStore(categories = [], categoryFilter = 'all') {
 
   categories = categories.map((cat) => ({
     category: cat,
-    active: (cat === filter)
+    active: (cat === categoryFilter)
   }));
 
-  categories.unshift({ category: 'all', active: (filter === 'all') });
+  categories.unshift({ category: 'all', active: (categoryFilter === 'all') });
 
   const getCategories = () => categories;
 
