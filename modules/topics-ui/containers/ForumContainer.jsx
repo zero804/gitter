@@ -1,10 +1,13 @@
 'use strict';
 
-var React = require('react');
-var CategoryList = require('../shared/components/forum/category-list.jsx');
-var Dispatcher = require('../browser/js/dispatcher');
-var navConstants = require('../browser/js/constants/navigation');
-var forumCatConstants = require('../browser/js/constants/forum-categories');
+import React from 'react';
+import Dispatcher from '../browser/js/dispatcher';
+
+import CategoryList from '../shared/components/forum/category-list.jsx';
+import TableControl from '../shared/components/forum/table-control.jsx';
+
+import navConstants from '../browser/js/constants/navigation';
+import forumCatConstants from '../browser/js/constants/forum-categories';
 
 module.exports = React.createClass({
 
@@ -38,11 +41,14 @@ module.exports = React.createClass({
     const { categories } = this.state;
     const { groupName } = this.props;
     return (
-      //Search header ...
-      <CategoryList
-        categories={ categories }
-        groupName={ groupName }
-        onCategoryClicked={ this.onCategoryClicked } />
+      <main>
+        <CategoryList
+          categories={ categories }
+          groupName={ groupName }
+          onCategoryClicked={ this.onCategoryClicked } />
+
+        <TableControl />
+      </main>
     );
   },
 
