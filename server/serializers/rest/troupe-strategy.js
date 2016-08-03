@@ -21,21 +21,15 @@ var GroupIdStrategy = require('./group-id-strategy');
 var TroupeBackendStrategy = require('./troupes/troupe-backend-strategy');
 
 
-function getAvatarUrlForTroupe(serializedTroupe, group) {
-  if (serializedTroupe.oneToOne && serializedTroupe.user) {
-    return avatars.getForUser(serializedTroupe.user);
+function getAvatarUrlForTroupe(serializedTroupe, options) {
+  if (serializedTroupe.oneToOne && options && options.user) {
+    return avatars.getForUser(options.user);
   }
-  else if(serializedTroupe.oneToOne && !serializedTroupe.user) {
-    //TODO this is totally and utterly broken. 1-2-1's don't have a name here
-    //nor do they have nay serialized users so avatar resolution here is never going to work
-    //I imagine its for reasons like this we moved avatar generation to the client apps ....
-    return avatars.getForRoomUri(serializedTroupe.name);
+  else if(serializedTroupe.oneToOne && (!options || !options.user)) {
+    return avatars.getForRoomUri(options.name);
   }
-  else if (group && group.hasAvatarSet) {
-    return avatars.getForGroup(group);
-  }
-  else if(serializedTroupe.groupId) {
-    return avatars.getForGroupId(serializedTroupe.groupId);
+  else if (options && options.group) {
+    return options.group.avatarUrl || avatars.getForGroup(options.group);
   }
   else {
     return avatars.getForRoomUri(serializedTroupe.uri);
@@ -306,11 +300,17 @@ function TroupeStrategy(options) {
       isPublic = item.sd.public;
     }
 
+    var avatarUrl = getAvatarUrlForTroupe(item, {
+      name: troupeName,
+      group: group,
+      user: otherUser
+    });
+
     return {
       id: item.id || item._id,
       name: troupeName,
       topic: item.topic,
-      avatarUrl: getAvatarUrlForTroupe(item, group),
+      avatarUrl: avatarUrl,
       uri: item.uri,
       oneToOne: item.oneToOne,
       userCount: item.userCount,

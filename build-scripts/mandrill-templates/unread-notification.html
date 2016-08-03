@@ -603,11 +603,6 @@ body.outlook p {
 
 @media only screen and (max-width: 600px) {
 
-  table[class="body"] img {
-    width: auto !important;
-    height: auto !important;
-  }
-
   table[class="body"] center {
     min-width: 0 !important;
   }
@@ -639,11 +634,6 @@ body.outlook p {
   table[class="body"] .wrapper.first .columns,
   table[class="body"] .wrapper.first .column {
     display: table !important;
-  }
-
-  table[class="body"] table.columns td,
-  table[class="body"] table.column td {
-    width: 100% !important;
   }
 
   table[class="body"] .columns td.one,
@@ -804,6 +794,11 @@ body.outlook p {
 
     .avatar {
       border-radius: 4px;
+    }
+    
+    img.avatar {
+      width: 24px;
+      height: 24px;
     }
 
     .callout .panel {

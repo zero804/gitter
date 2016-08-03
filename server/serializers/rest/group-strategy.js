@@ -2,13 +2,19 @@
 
 var avatars = require('gitter-web-avatars');
 
-function GroupStrategy(/* options */) {
+function GroupStrategy(options) {
   this.preload = function(/*groups*/) {
     return;
   };
 
   this.map = function(group) {
     var id = group.id || group._id && group._id.toHexString();
+
+    var hasAvatarSet = undefined;
+    if(options && options.includeHasAvatarSet) {
+      hasAvatarSet = group.avatarVersion > 0 || group.sd.type === 'GH_ORG' || group.sd.type === 'GH_REPO' || group.sd.type === 'GH_USER';
+    }
+
     return {
       id: id,
       name: group.name,
@@ -18,7 +24,7 @@ function GroupStrategy(/* options */) {
         linkPath: group.sd.linkPath
       },
       avatarUrl: avatars.getForGroup(group),
-      hasAvatarSet: group.avatarVersion !== 0 && group.avatarUrl
+      hasAvatarSet: hasAvatarSet
     };
   };
 }
