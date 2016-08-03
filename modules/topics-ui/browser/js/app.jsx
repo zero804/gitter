@@ -47,6 +47,7 @@ module.exports = React.createClass({
     const { router } = this.props;
     return Object.assign(this.getDefaultState(), {
       groupName: router.get('groupName'),
+      categoryName: router.get('categoryName'),
       categoryStore: new CategoryStore(categoryStore.models, { router: router }),
     });
   }

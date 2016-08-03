@@ -5,9 +5,6 @@ var React = require('react');
 var { shallow } = require('enzyme');
 var sinon = require('sinon');
 var CategoryList = require('../../../../../shared/components/forum/category-list.jsx');
-var Container = require('../../../../../shared/components/container.jsx');
-var Panel = require('../../../../../shared/components/panel.jsx');
-var CategoryListItem = require('../../../../../shared/components/forum/category-list-item.jsx');
 
 describe('<CategoryList />', function(){
 
@@ -24,11 +21,15 @@ describe('<CategoryList />', function(){
   });
 
   it('should render a single container', function(){
-    assert.equal(wrapper.find(Container).length, 1);
+    assert.equal(wrapper.find('Container').length, 1);
+  });
+
+  it('should render a container with custom class', () => {
+    assert.equal(wrapper.find('.container--category').length, 1);
   });
 
   it('should render a single panel', function(){
-    assert.equal(wrapper.find(Panel).length, 1);
+    assert.equal(wrapper.find('Panel').length, 1);
   });
 
   it('should render a single ui', function(){
@@ -40,16 +41,16 @@ describe('<CategoryList />', function(){
   });
 
   it('should render a CategoryListItem for each category', function(){
-    assert.equal(wrapper.find(CategoryListItem).length, categories.length);
+    assert.equal(wrapper.find('CategoryListItem').length, categories.length);
   });
 
   it('should call the onCategoryClicked when a child button is clicked', function(){
-    wrapper.find(CategoryListItem).at(0).simulate('click');
+    wrapper.find('CategoryListItem').at(0).simulate('click');
     assert.equal(clickHandle.callCount, 1);
   });
 
   it('should call clickHandle with the correct arguments', function(){
-    wrapper.find(CategoryListItem).at(0).simulate('click');
+    wrapper.find('CategoryListItem').at(0).simulate('click');
     assert(clickHandle.calledWith('all'));
   });
 
