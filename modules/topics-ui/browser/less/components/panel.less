@@ -5,7 +5,7 @@
   padding:    2rem 4rem;
 }
 
-@decal-height: 1rem;
+@decal-height:       1rem;
 @panel-border-width: 1rem;
 
 .m-panel--category-decal(){
@@ -21,8 +21,7 @@
 
 .panel--category {
   position:         relative;
-  margin-top:       @decal-height;
-  padding:          .5rem 4rem 2rem;
+  padding:          (@decal-height + .5rem) 4rem 2rem;
   border-left:      @panel-border-width solid desaturate(@jaffa, 10%);
   background-color: lighten(@jaffa, 10%);
 
