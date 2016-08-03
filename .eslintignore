@@ -10,3 +10,4 @@ config/mongo-docker/*
 test/in-browser/fixtures/build/*
 test/in-browser/fixtures/runner.js
 modules/*/output/**
+modules/topics-ui/test/fixtures/build/*
