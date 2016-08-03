@@ -5,16 +5,12 @@ var Schema = mongoose.Schema;
 var ObjectId = Schema.ObjectId;
 var installVersionIncMiddleware = require('../install-version-inc-middleware');
 
-var TopicSchema = new Schema({
+var ReplySchema = new Schema({
   forumId: { type: ObjectId, required: true },
-  title: { type: String, required: true },
-  slug: { type: String, required: true },
-  categoryId: { type: ObjectId, required: true },
-  tags: [String],
-  sticky: { type: Number, "default": 0},
+  topicId: { type: ObjectId, required: true },
   text: { type: String },
   html: { type: String },
-  userId: { type: ObjectId, required: true },
+  userId: {type: ObjectId, required: true},
   sent: { type: Date, "default": Date.now },
   editedAt: { type: Date, "default": null },
   lastModified: { type: Date, "default": null },
@@ -23,19 +19,19 @@ var TopicSchema = new Schema({
   _md: {type: Number }
 }, { strict: 'throw' });
 
-TopicSchema.schemaTypeName = 'TopicSchema';
-// Should any/all of these be sparse?
-TopicSchema.index({ forumId: 1 });
+ReplySchema.schemaTypeName = 'ReplySchema';
+ReplySchema.index({ forumId: 1 });
+ReplySchema.index({ topicId: 1 });
 
-installVersionIncMiddleware(TopicSchema);
+installVersionIncMiddleware(ReplySchema);
 
 module.exports = {
   install: function(mongooseConnection) {
-    var Model = mongooseConnection.model('Topic', TopicSchema);
+    var Model = mongooseConnection.model('Reply', ReplySchema);
 
     return {
       model: Model,
-      schema: TopicSchema
+      schema: ReplySchema
     };
   }
 };
