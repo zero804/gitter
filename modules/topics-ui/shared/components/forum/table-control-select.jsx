@@ -14,9 +14,11 @@ module.exports = React.createClass({
     const { options } = this.props;
     const { onChange } = this;
     return (
-      <select className="table-control__select" onChange={ onChange }>
-        {options.map((opt, index) => this.getChildOption(index, opt))}
-      </select>
+      <div className="table-control__select-decal">
+        <select className="table-control__select" onChange={ onChange }>
+          {options.map((opt, index) => this.getChildOption(index, opt))}
+        </select>
+      </div>
     );
   },
 
