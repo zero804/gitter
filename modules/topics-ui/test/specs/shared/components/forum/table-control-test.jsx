@@ -2,16 +2,24 @@
 
 import assert from 'assert';
 import React from  'react';
+import Backbone from 'backbone';
 import { shallow, mount } from 'enzyme';
 import TableControl from '../../../../../shared/components/forum/table-control.jsx';
+
+
+var TagCollection = Backbone.Collection.extend({
+  getTags(){ return this.models.map((m) => m.toJSON() ); }
+});
 
 describe('<TableControl/>', () => {
 
   let wrapper;
   let mounted;
+  let tagCollection;
   beforeEach(() => {
-    wrapper = shallow(<TableControl groupName="gitterHQ" category="all"/>);
-    mounted = mount(<TableControl groupName="gitterHQ" category="all"/>);
+    tagCollection = new TagCollection([{value: 'all-tags', name: 'All Tags', active: true }])
+    wrapper = shallow(<TableControl tagStore={tagCollection} groupName="gitterHQ" category="all"/>);
+    mounted = mount(<TableControl tagStore={tagCollection} groupName="gitterHQ" category="all"/>);
   });
 
   it('should render a container', () => {

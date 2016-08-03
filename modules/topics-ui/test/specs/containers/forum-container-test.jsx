@@ -8,18 +8,24 @@ var ForumContainer = require('../../../containers/ForumContainer.jsx');
 var dispatcher = require('../../../browser/js/dispatcher');
 var navConstants = require('../../../browser/js/constants/navigation');
 
-var Collection = Backbone.Collection.extend({
+//TODO move these into mock objects
+var CategoryCollection = Backbone.Collection.extend({
   getCategories(){ return this.models.map((m) => m.toJSON() ); }
+});
+var TagCollection = Backbone.Collection.extend({
+  getTags(){ return this.models.map((m) => m.toJSON() ); }
 });
 
 describe('<ForumContainer />', function(){
 
   let wrapper;
-  let collection;
+  let catCollection;
+  let tagCollection;
 
   beforeEach(function(){
-    collection = new Collection([ { category: 'all', active: true } ]);
-    wrapper = shallow(<ForumContainer categoryStore={collection} groupName='gitterHQ' />);
+    catCollection = new CategoryCollection([ { category: 'all', active: true } ]);
+    tagCollection = new TagCollection([{value: 'all-tags', name: 'All Tags', active: true }])
+    wrapper = shallow(<ForumContainer categoryStore={catCollection} tagStore={tagCollection} groupName='gitterHQ' />);
   });
 
   it('should dispatch the right action when a category is clicked', function(done){
