@@ -5,7 +5,7 @@ import React from  'react';
 import { shallow, mount } from 'enzyme';
 import TableControl from '../../../../../shared/components/forum/table-control.jsx';
 
-describe.only('<TableControl/>', () => {
+describe('<TableControl/>', () => {
 
   let wrapper;
   let mounted;
