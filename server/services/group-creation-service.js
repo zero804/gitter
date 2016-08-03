@@ -18,11 +18,10 @@ function getRoomOptions(group, options) {
     // default rooms are always public
     security: 'PUBLIC',
     // use the same backing object for the default room
-    type: group.sd.type,
-    linkPath: group.sd.linkPath,
+    type: 'GROUP',
     // only github repo based rooms have the default room automatically
     // integrated with github
-    runPostGitHubRoomCreationTasks: group.sd.type === 'GH_REPO',
+    runPostGitHubRoomCreationTasks: group.sd.type === 'GH_REPO', // TODO: THIS IS GOING TO FAIL.....
     addBadge: defaultRoomOptions.addBadge,
     providers: defaultRoomOptions.providers
   };

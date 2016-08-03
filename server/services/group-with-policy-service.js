@@ -61,16 +61,6 @@ GroupWithPolicyService.prototype.createRoom = secureMethod([allowAdmin], functio
     throw new StatusError(400, 'Invalid room name: ' + name);
   }
 
-  if (options.type && group.sd.type !== 'GH_ORG' && group.sd.type !== 'GH_REPO' && group.sd.type !== 'GH_USER') {
-    throw new StatusError(400, 'GitHub repo backed rooms can only be added to GitHub org, repo or user backed groups.');
-  }
-
-  if (options.linkPath) {
-    if (options.linkPath.split('/')[0] !== group.sd.linkPath.split('/')[0]) {
-      throw new StatusError(400, 'GitHub repo backed rooms must be for the same owner (gh org or user) as the group.');
-    }
-  }
-
   return this._ensureAccessAndFetchRoomInfo(options)
     .spread(function(roomInfo, securityDescriptor) {
       debug("Upserting %j", roomInfo);
@@ -101,6 +91,7 @@ GroupWithPolicyService.prototype._ensureAccessAndFetchRoomInfo = function(option
   var topic = options.topic;
   var name = options.name;
   var linkPath = options.linkPath;
+  var internalId;
 
   // This is probably not needed...
   var obtainAccessFromGitHubRepo = options.obtainAccessFromGitHubRepo;
@@ -121,6 +112,10 @@ GroupWithPolicyService.prototype._ensureAccessAndFetchRoomInfo = function(option
     throw new StatusError(400, 'Invalid room name: ' + name);
   }
 
+  if (type === 'GROUP') {
+    internalId = group._id;
+  }
+
   return troupeService.findByUri(uri)
     .then(function(room) {
       if (room) {
@@ -131,6 +126,7 @@ GroupWithPolicyService.prototype._ensureAccessAndFetchRoomInfo = function(option
           type: type,
           linkPath: linkPath,
           obtainAccessFromGitHubRepo: obtainAccessFromGitHubRepo,
+          internalId: internalId,
           security: security,
         })
         .then(function(securityDescriptor) {

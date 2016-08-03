@@ -3,7 +3,6 @@
 var StatusError = require('statuserror');
 var assert = require('assert');
 
-
 function usernameMatchesUri(user, linkPath) {
   if (!user) return false;
   var currentUserName = user.username;
@@ -18,6 +17,8 @@ function generateUserSecurityDescriptor(user, options) {
   var externalId = options.externalId;
   var linkPath = options.linkPath;
   var security = options.security;
+
+  assert(linkPath, 'linkPath required');
 
   var extraAdmins;
   if (!user || usernameMatchesUri(user, linkPath)) {
@@ -61,6 +62,8 @@ function generateOrgSecurityDescriptor(user, options) {
   var linkPath = options.linkPath;
   var security = options.security;
 
+  assert(linkPath, 'linkPath required');
+
   switch(security || null) {
     case 'PUBLIC':
     case null:
@@ -92,6 +95,8 @@ function generateRepoSecurityDescriptor(user, options) {
   var externalId = options.externalId;
   var linkPath = options.linkPath;
   var security = options.security;
+  
+  assert(linkPath, 'linkPath required');
 
   switch (security) {
     case 'PUBLIC':
@@ -149,16 +154,51 @@ function generateDefaultSecurityDescriptor(user, options) {
   }
 }
 
+function generateGroupSecurityDescriptor(user, options) {
+  var members;
+  var isPublic;
+
+  switch (options.security || null) {
+    case null:
+    case 'PUBLIC':
+      members = 'PUBLIC';
+      isPublic = true;
+      break;
+
+    case 'PRIVATE':
+      members = 'INVITE';
+      isPublic = false;
+      break;
+
+    default:
+      throw new StatusError(500, 'Unknown security type: ' + options.security);
+  }
+
+  var internalId = options.internalId;
+  if (!internalId) {
+    throw new StatusError(500, 'Group security descriptor types must have an internalId');
+  }
+
+  return {
+    type: 'GROUP',
+    admins: 'GROUP_ADMIN',
+    public: isPublic,
+    members: members,
+    extraMembers: [],
+    extraAdmins: [],
+    internalId: internalId
+  }
+}
+
 function generate(user, options) {
   options.type = options.type || null;
-
-  if (options.type) {
-    assert(options.linkPath, 'linkPath required');
-  }
 
   switch (options.type) {
     case null:
       return generateDefaultSecurityDescriptor(user, options);
+
+    case 'GROUP':
+      return generateGroupSecurityDescriptor(user, options);
 
     case 'GH_USER':
       return generateUserSecurityDescriptor(user, options);
