@@ -61,12 +61,12 @@ module.exports = React.createClass({
     );
   },
 
-  onFilterUpdate(){
-    console.log('Filter Update');
+  onFilterUpdate(filter){
+    console.log('Filter Update', filter);
   },
 
   onSortChange(sortType){
-    console.log('Sort Update', arguments);
+    console.log('Sort Update', sortType);
   },
 
   onTagChange(tag) {
