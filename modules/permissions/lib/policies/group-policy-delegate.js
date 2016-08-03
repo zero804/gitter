@@ -31,13 +31,14 @@ GroupPolicyDelegate.prototype = {
   _isAdmin: function() {
     if (!this._userId) return false;
 
-    var externalId = this._securityDescriptor.externalId;
-    if (!externalId) return false;
+    var internalId = this._securityDescriptor.internalId;
+    if (!internalId) return false;
 
     if (this._isAdminPromise) return this._isAdminPromise;
 
+    // Late load this to prevent circular dependencies
     var policyFactory = require('../policy-factory');
-    var promise = this._isAdminPromise = policyFactory.createPolicyForGroupIdWithUserLoader(this._userId, this._userLoader, externalId)
+    var promise = this._isAdminPromise = policyFactory.createPolicyForGroupIdWithUserLoader(this._userId, this._userLoader, internalId)
       .then(function(policy) {
         return policy.canAdmin();
       });
