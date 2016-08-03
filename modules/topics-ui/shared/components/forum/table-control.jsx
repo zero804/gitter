@@ -4,6 +4,7 @@ import React, { PropTypes } from 'react';
 import Container from '../container.jsx';
 import Panel from '../panel.jsx';
 import TopicTableButton from './table-control-button.jsx';
+import TopicTableSelect from './table-control-select.jsx';
 
 module.exports = React.createClass({
 
@@ -11,11 +12,23 @@ module.exports = React.createClass({
   propTypes: {
     groupName: PropTypes.string.isRequired,
     category: PropTypes.string.isRequired,
+    sortBy: PropTypes.array
+  },
+
+  getDefaultProps(){
+    return {
+      sortBy: [
+        { name: 'Most Recent', value: 'most-recent', selected: true },
+        { name: 'Most Replies', value: 'most-replies' },
+        { name: 'Most Watchers', value: 'most-watchers' },
+        { name: 'Most Likes', value: 'most-likes' },
+      ]
+    }
   },
 
   render(){
 
-    const { groupName, category } = this.props;
+    const { groupName, category, sortBy } = this.props;
 
     return (
       <Container className="container--table-control">
@@ -25,6 +38,7 @@ module.exports = React.createClass({
               <li>{this.getChildTopicTableButton('Activity', 'activity')}</li>
               <li>{this.getChildTopicTableButton('My Topics', 'my-topics')}</li>
               <li>{this.getChildTopicTableButton('Watched', 'watched')}</li>
+              <li><TopicTableSelect options={sortBy} onChange={this.onSortChange} /></li>
             </ul>
           </nav>
         </Panel>
@@ -47,6 +61,10 @@ module.exports = React.createClass({
 
   onFilterUpdate(){
     console.log('Filter Update');
+  },
+
+  onSortChange(sortType){
+    console.log('Sort Update', arguments);
   }
 
 });
