@@ -1,3 +1,16 @@
+.table-control__select-decal {
+  position: relative;
+  &:after{
+    content:   '\2023';
+    position:  absolute;
+    top:       1.6rem;
+    right:     1rem;
+    color:     white;
+    font-size: 2.5rem;
+    transform: rotate(90deg);
+  }
+}
+
 .table-control__select {
   //FIXME -> add autoprefixer
   -webkit-appearance: none;
