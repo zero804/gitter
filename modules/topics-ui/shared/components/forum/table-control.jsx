@@ -22,37 +22,26 @@ module.exports = React.createClass({
         <Panel className="panel--table-control">
           <nav>
             <ul className="table-control">
-              <li>
-                <TopicTableButton
-                  title="Activity"
-                  value="activity"
-                  groupName={groupName}
-                  category={category}
-                  active={false}
-                  onClick={this.onFilterUpdate}/>
-              </li>
-              <li>
-                <TopicTableButton
-                  title="My Topics"
-                  value="my-topics"
-                  groupName={groupName}
-                  category={category}
-                  active={false}
-                  onClick={this.onFilterUpdate}/>
-              </li>
-              <li>
-                <TopicTableButton
-                  title="Watched"
-                  value="watched"
-                  groupName={groupName}
-                  category={category}
-                  active={false}
-                  onClick={this.onFilterUpdate}/>
-              </li>
+              <li>{this.getChildTopicTableButton('Activity', 'activity')}</li>
+              <li>{this.getChildTopicTableButton('My Topics', 'my-topics')}</li>
+              <li>{this.getChildTopicTableButton('Watched', 'watched')}</li>
             </ul>
           </nav>
         </Panel>
       </Container>
+    );
+  },
+
+  getChildTopicTableButton(title, value){
+    const { groupName, category } = this.props;
+    return (
+      <TopicTableButton
+        title={title}
+        value={value}
+        groupName={groupName}
+        category={category}
+        active={false}
+        onClick={this.onFilterUpdate}/>
     );
   },
 
