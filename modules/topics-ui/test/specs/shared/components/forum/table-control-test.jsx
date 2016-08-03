@@ -42,4 +42,8 @@ describe.only('<TableControl/>', () => {
     assert.equal(mounted.props().sortBy.length, 4);
   });
 
+  it('should render only one divider', () => {
+    assert.equal(wrapper.find('.tabel-control__divider').length, 1);
+  });
+
 });
