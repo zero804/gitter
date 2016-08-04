@@ -144,6 +144,7 @@ var CommunityCreateView = Marionette.LayoutView.extend({
     var newStepState = this.model.get('stepState');
 
     appEvents.trigger('stats.event', 'community.create.active.' + this.model.get('stepState'));
+    appEvents.trigger('track-event', 'community.create.active.' + this.model.get('stepState'));
     this.mainStepViewModel.set({ active: newStepState === stepConstants.MAIN });
     this.githubProjectsStepViewModel.set({ active: newStepState === stepConstants.GITHUB_PROJECTS });
     this.invitePeopleStepViewModel.set({ active: newStepState === stepConstants.INVITE });
@@ -156,6 +157,7 @@ var CommunityCreateView = Marionette.LayoutView.extend({
 
     if(isActive) {
       appEvents.trigger('stats.event', 'community.create.enter');
+      appEvents.trigger('track-event', 'community.create.enter');
     }
 
     // Reset for next time if we are hiding create community
@@ -167,6 +169,7 @@ var CommunityCreateView = Marionette.LayoutView.extend({
 
   closeView: function() {
     appEvents.trigger('stats.event', 'community.create.exit.' + this.model.get('stepState'));
+    appEvents.trigger('track-event', 'community.create.exit.' + this.model.get('stepState'));
     this.model.set('active', false);
     window.location.hash = '#';
   },
