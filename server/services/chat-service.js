@@ -11,7 +11,7 @@ var logger = env.logger;
 var ChatMessage = require('gitter-web-persistence').ChatMessage;
 var collections = require("../utils/collections");
 var userService = require("./user-service");
-var processChat = require('../utils/markdown-processor');
+var processText = require('gitter-web-text-processor');
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
 var _ = require('underscore');
@@ -135,7 +135,7 @@ exports.newChatMessageToTroupe = function(troupe, user, data) {
     if(data.text.length > MAX_CHAT_MESSAGE_LENGTH) throw new StatusError(400, 'Message exceeds maximum size');
 
     // TODO: validate message
-    return processChat(data.text);
+    return processText(data.text);
   })
   .then(function(parsedMessage) {
     return [parsedMessage, resolveMentions(troupe, user, parsedMessage)];
@@ -231,7 +231,7 @@ exports.updateChatMessage = function(troupe, chatMessage, user, newText, callbac
       }
 
       chatMessage.text = newText;
-      return processChat(newText);
+      return processText(newText);
     })
     .then(function(parsedMessage) {
       return Promise.all([parsedMessage, resolveMentions(troupe, user, parsedMessage)]);
