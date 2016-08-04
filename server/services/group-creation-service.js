@@ -7,29 +7,6 @@ var GroupWithPolicyService = require('./group-with-policy-service');
 var RoomWithPolicyService = require('./room-with-policy-service');
 
 /**
- * @private
- */
-function getRoomOptions(group, options) {
-  var defaultRoomOptions = options.defaultRoom;
-  var defaultRoomName = defaultRoomOptions.defaultRoomName || 'Lobby';
-
-  var roomOptions = {
-    name: defaultRoomName,
-    // default rooms are always public
-    security: 'PUBLIC',
-    // use the same backing object for the default room
-    type: 'GROUP',
-    // only github repo based rooms have the default room automatically
-    // integrated with github
-    runPostGitHubRoomCreationTasks: group.sd.type === 'GH_REPO', // TODO: THIS IS GOING TO FAIL.....
-    addBadge: defaultRoomOptions.addBadge,
-    providers: defaultRoomOptions.providers
-  };
-
-  return roomOptions;
-}
-
-/**
  * Create a group with a default room and invite some people
  *
  * Returns
@@ -54,8 +31,31 @@ function groupCreationService(user, options) {
       var group = this.group;
       var groupWithPolicyService = new GroupWithPolicyService(this.group, user, userGroupPolicy);
 
-      var roomOptions = getRoomOptions(group, options);
-      return groupWithPolicyService.createRoom(roomOptions);
+      var defaultRoomOptions = options.defaultRoom;
+      var defaultRoomName = defaultRoomOptions.defaultRoomName || 'Lobby';
+
+      return groupWithPolicyService.createRoom({
+        name: defaultRoomName,
+
+        // default rooms are always public
+        security: 'PUBLIC',
+
+        // New way:
+        // type: 'GROUP',
+
+        // Old way
+        // use the same backing object for the default room
+        type: group.sd.type,
+        linkPath: group.sd.linkPath,
+
+        // only github repo based rooms have the default room automatically
+        // integrated with github
+        // This is going to have to change in the new GROUP world
+        runPostGitHubRoomCreationTasks: group.sd.type === 'GH_REPO',
+        
+        addBadge: defaultRoomOptions.addBadge,
+        providers: defaultRoomOptions.providers
+      });
     })
     .then(function(defaultRoom) {
       this.defaultRoom = defaultRoom;

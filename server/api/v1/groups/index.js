@@ -15,7 +15,7 @@ var MAX_BATCHED_INVITES = 100;
 function getGroupOptions(body) {
   var uri = body.uri ? String(body.uri) : undefined;
   var name = body.name ? String(body.name) : undefined;
-  var defaultRoomName = body.defaultRoomName ? String(defaultRoomName) : undefined;
+  var defaultRoomName = body.defaultRoomName ? String(body.defaultRoomName) : undefined;
 
   var providers;
   if (body.providers && Array.isArray(body.providers)) {
