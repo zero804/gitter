@@ -2,6 +2,7 @@
 
 var Troupe = require('gitter-web-persistence').Troupe;
 var Group = require('gitter-web-persistence').Group;
+var Forum = require('gitter-web-persistence').Forum;
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var assert = require('assert');
 var securityDescriptorValidator = require('./security-descriptor-validator');
@@ -55,6 +56,10 @@ function getForRoomUser(roomId, userId) {
 
 function getForGroupUser(groupId, userId) {
   return findByIdForModel(Group, groupId, userId);
+}
+
+function getForForumUser(forumId, userId) {
+  return findByIdForModel(Forum, forumId, userId);
 }
 
 /**
@@ -197,6 +202,7 @@ function getUsedLinkPaths(type, linkPaths) {
 module.exports = {
   getForRoomUser: getForRoomUser,
   getForGroupUser: getForGroupUser,
+  getForForumUser: getForForumUser,
   insertForRoom: insertForRoom,
   insertForGroup: insertForGroup,
   updateLinksForRepo: updateLinksForRepo,
