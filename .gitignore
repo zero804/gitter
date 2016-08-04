@@ -98,4 +98,6 @@ scripts/graphs/*.dot
 scripts/graphs/*.gephi
 .devhttps.ca.crt
 .devhttps.ca.key
+modules/topics-ui/test/build/*
 unread-notification.out.html
+.nyc_output
