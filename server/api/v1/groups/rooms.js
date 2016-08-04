@@ -65,7 +65,9 @@ module.exports = {
 
     var groupWithPolicyService = new GroupWithPolicyService(req.group, req.user, req.userGroupPolicy);
     return groupWithPolicyService.createRoom(createOptions)
-      .then(function(room) {
+      .then(function(createResult) {
+        var room = createResult.troupe;
+        var hookCreationFailedDueToMissingScope = createResult.hookCreationFailedDueToMissingScope;
         var strategy = new restSerializer.TroupeStrategy({
           currentUserId: req.user.id,
           currentUser: req.user,
@@ -76,7 +78,14 @@ module.exports = {
           includeGroups: true
         });
 
-        return restSerializer.serializeObject(room, strategy);
+        return restSerializer.serializeObject(room, strategy)
+          .then(function(serialized) {
+            serialized.extra = {
+              hookCreationFailedDueToMissingScope: hookCreationFailedDueToMissingScope
+            };
+            return serialized;
+
+          })
       });
   }
 };
