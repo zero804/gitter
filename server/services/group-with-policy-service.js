@@ -112,7 +112,8 @@ GroupWithPolicyService.prototype.createRoom = secureMethod([allowAdmin], functio
       debug("Upserting %j", roomInfo);
       return roomService.createGroupRoom(user, group, roomInfo, securityDescriptor, {
         tracking: options.tracking,
-        runPostGitHubRoomCreationTasks: options.runPostGitHubRoomCreationTasks
+        runPostGitHubRoomCreationTasks: options.runPostGitHubRoomCreationTasks,
+        addBadge: options.addBadge
       })
     })
     .then(function(results) {
