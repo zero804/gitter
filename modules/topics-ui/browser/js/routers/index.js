@@ -2,7 +2,7 @@
 
 var Backbone = require('backbone');
 var _ = require('lodash');
-var Dispatcher = require('../dispatcher');
+var { subscribe }  = require('../dispatcher');
 var navConstants = require('../constants/navigation');
 
 var _super = Backbone.Router.prototype;
@@ -15,7 +15,7 @@ var Router = Backbone.Router.extend({
 
   constructor: function(){
     this.model = new RouteModel();
-    Dispatcher.on(navConstants.NAVIGATE_TO, this.navigateTo, this);
+    subscribe(navConstants.NAVIGATE_TO, this.navigateTo, this);
     _super.constructor.call(this, ...arguments);
   },
 

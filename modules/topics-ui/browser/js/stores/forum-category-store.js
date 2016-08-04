@@ -1,8 +1,8 @@
 "use strict"
 
 var Backbone = require('backbone');
-var Dispatcher = require('../dispatcher');
-var constants = require('../constants/forum-categories');
+var { dispatch } = require('../dispatcher');
+var updateActiveCategory = require('../action-creators/forum/update-active-category');
 
 var Model = Backbone.Model.extend({
   defaults: { category: null },
@@ -16,6 +16,7 @@ module.exports = Backbone.Collection.extend({
     this.listenTo(this.router, 'change:categoryName', this.onCategoryUpdate, this);
   },
 
+  //This is basically a reducer
   getCategories: function() {
     return this.models.map(model => model.toJSON());
   },
@@ -23,7 +24,7 @@ module.exports = Backbone.Collection.extend({
   onCategoryUpdate(model, val){
     this.where({ active: true }).forEach((m) => m.set('active', false));
     this.findWhere({ category: val }).set('active', true);
-    Dispatcher.trigger(constants.UPDATE_ACTIVE_CATEGORY);
+    dispatch(updateActiveCategory(val));
   }
 
 });
