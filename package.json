@@ -288,5 +288,11 @@
       "pre-commit": "gulp fasttest",
       "post-merge": "npm prune && npm install"
     }
+  },
+  "nyc": {
+    "exclude": [
+      "public/repo/**",
+      "**/test/**"
+    ]
   }
 }
