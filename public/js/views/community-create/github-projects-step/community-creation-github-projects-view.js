@@ -247,7 +247,7 @@ module.exports = CommunityCreateBaseStepView.extend({
       }
 
       return shouldShow;
-    })
+    });
   },
 
   onRepoFilterComplete: function() {

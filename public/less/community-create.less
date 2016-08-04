@@ -13,6 +13,7 @@
 
 @base-text-color: rgba(255, 255, 255, .75);
 @subdued-text-color: rgba(255, 255, 255, .5);
+@list-area-background-color: rgba(0, 0, 0, .2);
 
 @step-content-area-max-width: 800px;
 @step-fixed-progression-breakpoint: 500px;
@@ -860,7 +861,7 @@
   //margin-top: @secondary-input-height + @secondary-input-spacing-top + @secondary-input-spacing-bottom;
   padding: (@org-area-padding - (@org-item-spacing / 2)) @org-area-padding;
 
-  background-color: rgba(0, 0, 0, .2);
+  background-color: @list-area-background-color;
 }
 .community-create-org-list-root-inner {
   height: 100%;
@@ -898,7 +899,7 @@
 .community-create-repo-list-root {
   height: @org-area-total-height + @org-area-padding;
   padding: (@org-area-padding - (@repo-item-spacing / 2)) @org-area-padding;
-  background-color: rgba(0, 0, 0, .2);
+  background-color: @list-area-background-color;
 }
 .community-create-repo-list-root-inner {
   height: 100%;
@@ -968,6 +969,7 @@
 }
 
 
+
 .community-create-invite-user-result-list-root {
   .secondary-input-spacing-top();
 
@@ -976,7 +978,7 @@
   //margin-top: @secondary-input-height + @secondary-input-spacing-top + @secondary-input-spacing-bottom;
   padding: (@org-area-padding - (@invite-user-item-spacing / 2)) @org-area-padding;
 
-  background-color: rgba(0, 0, 0, .2);
+  background-color: @list-area-background-color;
 }
 
 .community-create-invite-user-result-list-root-inner {
@@ -1034,6 +1036,83 @@
   border-radius: 4px;
 }
 
+
+
+
+.community-create-trouble-invite-section {
+  background-color: @list-area-background-color;
+}
+
+.community-create-trouble-invite-list-root {
+  .community-create-invite-user-result-list-root();
+  background-color: transparent;
+}
+
+.community-create-expanded-people-list-root-inner {
+  .community-create-invite-user-result-list-root-inner();
+}
+
+.community-create-expanded-people-list-wrapper {
+  .community-create-invite-user-result-list-wrapper();
+}
+
+.community-create-expanded-people-list {
+  .community-create-invite-user-result-list();
+}
+
+.community-create-expanded-people-list-item {
+  .community-create-invite-user-result-list-item();
+  flex-basis: auto;
+  width: 100%;
+}
+
+.community-create-expanded-people-list-item-link {
+  .community-create-invite-user-result-list-item-link();
+}
+
+.community-create-expanded-people-list-item-username {
+  flex: 1;
+}
+
+.community-create-expanded-people-list-item-email-input {
+  .secondary-bare-input();
+  flex: 1;
+  width: auto;
+  margin-bottom: 0;
+
+  transition: opacity .2s ease;
+
+  &.should-show-on-hover {
+    opacity: 0;
+  }
+
+  &:hover,
+  &:focus,
+  .community-create-expanded-people-list-item-link:hover > &,
+  .community-create-expanded-people-list-item-link:focus > & {
+    opacity: 1;
+  }
+}
+
+.community-create-expanded-people-list-item-status {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.community-create-trouble-invite-section-footer {
+  .primary-input-height();
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding-left: @org-area-padding;
+  padding-right: @org-area-padding;
+
+  color: @base-text-color;
+}
+
+.community-create-trouble-invite-section-footer-allow-badger-option-input {
+  margin-left: 1rem;
+}
 
 
 

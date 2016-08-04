@@ -9,9 +9,9 @@ var toggleClass = require('utils/toggle-class');
 var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 
 var peopleToInviteStatusConstants = require('../people-to-invite-status-constants');
-var CommunityCreationPeopleListTemplate = require('./community-creation-people-list-view.hbs');
-var CommunityCreationPeopleListItemTemplate = require('./community-creation-people-list-item-view.hbs');
-var CommunityCreationPeopleListEmptyTemplate = require('./community-creation-people-list-empty-view.hbs');
+var CommunityCreationPeopleListTemplate = require('./community-creation-expanded-people-list-view.hbs');
+var CommunityCreationPeopleListItemTemplate = require('./community-creation-expanded-people-list-item-view.hbs');
+var CommunityCreationPeopleListEmptyTemplate = require('./community-creation-expanded-people-list-empty-view.hbs');
 
 // Consider all constraints except a customError because we use
 // this to add a custom message on what to do to satisfy
@@ -34,12 +34,13 @@ var AVATAR_SIZE = 44;
 var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
   template: CommunityCreationPeopleListItemTemplate,
   tagName: 'li',
-  className: 'community-create-people-list-item',
+  className: 'community-create-expanded-people-list-item',
 
   ui: {
-    link: '.community-create-people-list-item-link',
-    removeButton: '.community-create-people-list-item-remove-button',
-    emailInput: '.js-community-create-people-list-item-email-input'
+    link: '.community-create-expanded-people-list-item-link',
+    emailInput: '.js-community-create-expanded-people-list-item-email-input',
+    twitterStatusIcon: '.js-community-create-expanded-people-list-item-status-twitter',
+    needsAttentionStatusIcon: '.js-community-create-expanded-people-list-item-status-needs-attention'
   },
 
   events: {
@@ -52,13 +53,11 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
   },
 
   triggers: {
-    'click @ui.removeButton': 'item:remove'
+
   },
 
   initialize: function(options) {
     this.communityCreateModel = options.communityCreateModel;
-    this.model.set('canRemove', options.canRemove);
-    this.model.set('canEditEmail', options.canEditEmail);
 
     if(this.communityCreateModel) {
       this.listenTo(this.communityCreateModel, 'change:allowTweetBadger', this.onAllowTweetBadgerChange, this);
@@ -81,6 +80,9 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
       data.avatarUrl = avatars.getForGravatarEmail(emailAddress);
     }
 
+    data.isTwitter = data.type === 'twitter';
+    data.shouldShowOnHover = data.isTwitter;
+
     return data;
   },
 
@@ -94,16 +96,11 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
 
   onInviteStatusChange: function() {
     var inviteStatus = this.model.get('inviteStatus');
-    var allowTweetBadger = this.communityCreateModel.get('allowTweetBadger');
-    var isTwitter = this.model.get('type') === 'twitter';
 
-    // Only use Twitter badger, if email wasn't provided
-    var willUseTwitterInvite = !this.model.get('emailAddress') && isTwitter && allowTweetBadger;
-
-    toggleClass(this.$el[0], 'pending', !willUseTwitterInvite && inviteStatus === peopleToInviteStatusConstants.PENDING);
+    toggleClass(this.$el[0], 'pending', inviteStatus === peopleToInviteStatusConstants.PENDING);
     // We don't use this state to differentiate
     //toggleClass(this.$el[0], 'ready', inviteStatus === peopleToInviteStatusConstants.READY);
-    toggleClass(this.$el[0], 'needs-email', !willUseTwitterInvite && inviteStatus === peopleToInviteStatusConstants.NEEDS_EMAIL);
+    toggleClass(this.$el[0], 'needs-email', inviteStatus === peopleToInviteStatusConstants.NEEDS_EMAIL);
     toggleClass(this.$el[0], 'ready-valid-email', inviteStatus === peopleToInviteStatusConstants.READY_VALID_EMAIL);
   },
 
@@ -126,7 +123,13 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
   },
 
   onAllowTweetBadgerChange: function() {
-    this.onInviteStatusChange();
+    var allowTweetBadger = this.communityCreateModel.get('allowTweetBadger');
+    var isTwitter = this.model.get('type') === 'twitter';
+
+    var canShowTwitterStatus = isTwitter && allowTweetBadger;
+    toggleClass(this.ui.emailInput[0], 'should-show-on-hover', canShowTwitterStatus);
+    toggleClass(this.ui.twitterStatusIcon[0], 'hidden', !canShowTwitterStatus);
+    toggleClass(this.ui.needsAttentionStatusIcon[0], 'hidden', canShowTwitterStatus);
   }
 });
 
@@ -137,27 +140,19 @@ var CommunityCreationPeopleListEmptyView = Marionette.ItemView.extend({
 var CommunityCreationPeopleListView = Marionette.CompositeView.extend({
   model: new Backbone.Model(),
 
+  className: 'community-create-expanded-people-list-root-inner',
   template: CommunityCreationPeopleListTemplate,
   childView: CommunityCreationPeopleListItemView,
   emptyView: CommunityCreationPeopleListEmptyView,
-  childViewContainer: '.community-create-people-list',
+  childViewContainer: '.community-create-expanded-people-list',
   childViewOptions: function() {
     return {
-      communityCreateModel: this.communityCreateModel,
-      canRemove: this.model.get('canRemove'),
-      canEditEmail: this.model.get('canEditEmail')
+      communityCreateModel: this.communityCreateModel
     };
-  },
-  childEvents: {
-    'item:remove': 'onItemRemoved'
   },
 
   initialize: function(options) {
     this.communityCreateModel = options.communityCreateModel;
-  },
-
-  onItemRemoved: function(view) {
-    this.trigger('person:remove', view.model);
   }
 });
 
