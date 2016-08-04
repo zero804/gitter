@@ -12,7 +12,7 @@ var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
 var getRoomNameFromTroupeName = require('gitter-web-shared/get-room-name-from-troupe-name');
 var apiClient = require('components/apiClient');
 var appEvents = require('utils/appevents');
-
+var context = require('../../utils/context');
 var GroupSelectView = require('views/create-room/groupSelectView');
 var ModalView = require('./modal');
 var FilteredSelect = require('./filtered-select');
@@ -135,6 +135,10 @@ var CreateRoomView = Marionette.LayoutView.extend({
         }
         // Update the fields with any errors after validation
         this.safeUpdateFields();
+        break;
+
+      case 'upgrade':
+        window.location.href = '#upgraderepoaccess/createroom'
         break;
 
       case 'cancel':
@@ -455,14 +459,31 @@ var Modal = ModalView.extend({
     ModalView.prototype.initialize.call(this, options);
     this.view = new CreateRoomView(options);
   },
-  menuItems: [
-    {
+  
+  menuItems: function() {
+    var result = [];
+    var user = context.user();
+    var scopes = user.get('scopes');
+
+    if (user.id && scopes && !scopes.private_repo) {
+      // GitHub user, without private repo access?
+      result.push({
+        action: "upgrade",
+        text: "GitHub Private Access",
+        pull: 'left',
+        className: "modal--default__footer__btn--neutral"
+      });
+    }
+
+    result.push({
       action: 'create',
       pull: 'right',
       text: 'Create',
       className: 'modal--default__footer__btn'
-    },
-  ]
+    });
+
+    return result;
+  }
 });
 
 

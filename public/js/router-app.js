@@ -495,6 +495,7 @@ onready(function() {
       // TODO: get rid of the pipes
       '': 'hideModal',
       'upgraderepoaccess': 'upgradeRepoAccess',
+      'upgraderepoaccess/:name': 'upgradeRepoAccess',
       'createroom': 'createroom',
       'createroom/:name': 'createroom',
       'confirm/*uri': 'confirmRoom',
@@ -580,10 +581,10 @@ onready(function() {
       });
     },
 
-    upgradeRepoAccess: function() {
+    upgradeRepoAccess: function(returnLocation) {
       scopeUpgrader('repo')
         .then(function() {
-          window.location.href = '#';
+          window.location.href = '#' + (returnLocation || '');
         });
     }
   });
