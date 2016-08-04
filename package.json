@@ -72,6 +72,7 @@
     "gitter-web-shared": "file:shared",
     "gitter-web-split-tests": "file:modules/split-tests",
     "gitter-web-suggestions": "file:modules/suggestions",
+    "gitter-web-text-processor": "file:modules/text-processor",
     "gitter-web-topics": "file:modules/topics",
     "gitter-web-topics-ui": "file:modules/topics-ui",
     "gitter-web-twitter": "file:modules/twitter",
