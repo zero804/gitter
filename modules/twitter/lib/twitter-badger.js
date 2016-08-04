@@ -1,5 +1,6 @@
 'use strict';
 
+var debug = require('debug')('gitter:modules:twitter:badger');
 var Promise = require('bluebird');
 var env = require('gitter-web-env');
 var config = env.config;
@@ -63,10 +64,12 @@ function sendUserInviteTweets(invitingUser, users, url) {
       }
     });
 
+  debug((invitingUser && invitingUser.username) + ' is inviting ' + mentionList.length + ' people via the Twitter Badger');
+
   if(invitingUser && mentionList.length > 0) {
     var invitingUserName = invitingUser.twitterUsername ? ('@' + invitingUser.twitterUsername) : invitingUser.username;
 
-    var baseMessage = invitingUserName + ' invited you to join ' + url + '. ';
+    var baseMessage = invitingUserName + ' invited you to join ' + url + ' ';
 
     // Split up the mentions into multiple tweets if necessary
     var mentionStringBuckets = [''];
@@ -79,6 +82,8 @@ function sendUserInviteTweets(invitingUser, users, url) {
 
       mentionStringBuckets[mentionStringBuckets.length - 1] = (currentMentionString ? (currentMentionString + ' ') : '') + mention;
     });
+
+    debug('Sending ' + mentionStringBuckets.length + ' invite tweets');
 
     return Promise.all(mentionStringBuckets.map(function(mentionString) {
       var message = baseMessage + mentionString;

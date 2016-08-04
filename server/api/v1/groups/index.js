@@ -1,16 +1,18 @@
 "use strict";
 
 var Promise = require('bluebird');
-var restful = require("../../../services/restful");
 var StatusError = require('statuserror');
+var clientEnv = require('gitter-client-env');
 var groupService = require('gitter-web-groups/lib/group-service');
-var restSerializer = require('../../../serializers/rest-serializer');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
+var inviteValidation = require('gitter-web-invites/lib/invite-validation');
+var TwitterBadger = require('gitter-web-twitter/lib/twitter-badger');
+var identityService = require('gitter-web-identity');
+var restful = require("../../../services/restful");
+var restSerializer = require('../../../serializers/rest-serializer');
 var GroupWithPolicyService = require('../../../services/group-with-policy-service');
 var RoomWithPolicyService = require('../../../services/room-with-policy-service');
-var inviteValidation = require('gitter-web-invites/lib/invite-validation');
 var internalClientAccessOnly = require('../../../web/middlewares/internal-client-access-only');
-var TwitterBadger = require('gitter-web-twitter/lib/twitter-badger');
 
 var MAX_BATCHED_INVITES = 100;
 
@@ -68,6 +70,29 @@ function getRoomOptions(group, input) {
 
   return roomOptions;
 }
+
+
+function inviteTroubleTwitterUsers(user, room, invitesReport) {
+  return identityService.getIdentityForUser(user, 'twitter')
+    .then(function(identity) {
+      user.twitterUsername = identity.username;
+
+      var usersToTweet = [];
+      invitesReport.forEach(function(report) {
+        if(report.status === 'error' && report.inviteInfo.type === 'twitter') {
+          usersToTweet.push({
+            twitterUsername: report.inviteInfo.externalId
+          });
+        }
+      });
+
+      var roomUrl = room.lcUri ? (clientEnv['basePath'] + '/' + room.lcUri) : undefined;
+
+      return TwitterBadger.sendUserInviteTweets(user, usersToTweet, roomUrl);
+    });
+}
+
+
 
 module.exports = {
   id: 'group',
@@ -132,13 +157,7 @@ module.exports = {
       .then(function(invitesReport) {
         // Tweet the users
         if(allowTweeting) {
-          var usersToTweet = [];
-          invitesReport.forEach(function(report) {
-            if(report.status === 'error' && report.user.type === 'twitter') {
-              usersToTweet.push(report.user);
-            }
-          })
-          TwitterBadger.sendUserInviteTweets(req.user, usersToTweet, room.url);
+          inviteTroubleTwitterUsers(req.user, room, invitesReport);
         }
 
         return invitesReport;
