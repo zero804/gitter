@@ -34,7 +34,7 @@ function getCreateOptions(input) {
 
   // only github repo based rooms have the default room automatically
   // integrated with github
-  createOptions.runPostGitHubRoomCreationTasks = !!input.addBadge;
+  createOptions.runPostGitHubRoomCreationTasks = createOptions.type === 'GH_REPO';
   createOptions.addBadge = !!input.addBadge
 
   // keep tracking info around for sendStats
