@@ -1,6 +1,6 @@
 'use strict';
 
-var debug = require('debug')('gitter:modules:twitter-service');
+var debug = require('debug')('gitter:modules:twitter');
 var Promise = require('bluebird');
 var request = Promise.promisify(require('request'));
 
@@ -55,6 +55,9 @@ TwitterService.prototype.sendTweet = function(status) {
     form: {
       status: status
     }
+  })
+  .tap(function() {
+    debug('Sent tweet', status);
   });
 };
 

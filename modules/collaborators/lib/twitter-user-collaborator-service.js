@@ -38,7 +38,8 @@ TwitterUserCollaboratorService.prototype.findCollaborators = function() {
         };
       });
     })
-    .catch(function() {
+    .catch(function(err) {
+      debug('Ran into error requesting followers', err, err.stack);
       return [];
     });
 };

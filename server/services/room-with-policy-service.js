@@ -330,7 +330,7 @@ RoomWithPolicyService.prototype.createRoomInvitations = secureMethod([allowAddUs
         return {
           status: 'error', // as opposed to 'invited' or 'added'
           statusCode: err.status,
-          user: user
+          inviteInfo: inviteInfo
         }
       });
   });
