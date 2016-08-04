@@ -9,7 +9,7 @@ function webpackPipeline(rootDir) {
   return gulp.src(rootDir + '/webpack.config.js')
     .pipe(webpack(require('../webpack.config')))
     .pipe(sourcemaps.init({ /* loadMaps: true */ debug:true }))
-    .pipe(uglify())
+    //.pipe(uglify())
     .pipe(sourcemaps.write('../maps'));
 }
 
