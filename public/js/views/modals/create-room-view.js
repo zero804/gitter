@@ -55,6 +55,8 @@ var CreateRoomView = Marionette.LayoutView.extend({
     onlyOrgUsersOption: '.js-create-room-only-org-users-option',
     onlyOrgUsersOptionInput: '.js-create-room-only-org-users-option-input',
     onlyOrgUsersOptionOrgName: '.js-create-room-only-org-users-option-org-name',
+    allowBadgerOption: '.js-create-room-allow-badger',
+    allowBadgerOptionInput: '.js-create-room-allow-badger-option-input',
     roomAvailabilityStatusMessage: '.js-room-availability-status-message'
   },
 
@@ -67,7 +69,8 @@ var CreateRoomView = Marionette.LayoutView.extend({
     'click @ui.clearNameButton': 'onNameClearActivated',
     'change @ui.securityOptions': 'onSecurityChange',
     'change @ui.onlyGithubUsersOptionInput': 'onOnlyGitHubUsersOptionChange',
-    'change @ui.onlyOrgUsersOptionInput': 'onOnlyOrgUsersOptionChange'
+    'change @ui.onlyOrgUsersOptionInput': 'onOnlyOrgUsersOptionChange',
+    'change @ui.allowBadgerOptionInput': 'onAllowBadgerOptionChange'
   },
 
   modelEvents: {
@@ -153,6 +156,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
     var security = this.model.get('security');
     var onlyGithubUsers = this.model.get('onlyGithubUsers');
     var onlyOrgUsers = this.model.get('onlyOrgUsers');
+    var allowBadger = this.model.get('allowBadger');
 
     var type = null;
     var linkPath = null;
@@ -174,7 +178,8 @@ var CreateRoomView = Marionette.LayoutView.extend({
         type: type,
         security: security,
         linkPath: linkPath
-      }
+      },
+      addBadge: allowBadger
     };
 
     if(onlyGithubUsers) {
@@ -269,6 +274,10 @@ var CreateRoomView = Marionette.LayoutView.extend({
 
   onOnlyOrgUsersOptionChange: function() {
     this.model.set('onlyOrgUsers', this.ui.onlyOrgUsersOptionInput[0].checked);
+  },
+
+  onAllowBadgerOptionChange: function() {
+    this.model.set('allowBadger', this.ui.allowBadgerOptionInput[0].checked);
   },
 
   onGroupIdChange: function() {
@@ -379,8 +388,16 @@ var CreateRoomView = Marionette.LayoutView.extend({
       toggleClass(this.ui.onlyOrgUsersOption[0], 'hidden', shouldHideOnlyOrgUsersOption);
       this.ui.onlyOrgUsersOptionOrgName[0].textContent = groupBackedBy && groupBackedBy.linkPath;
 
+      var groupBackedByRepo = null;
+      if(groupBackedBy && groupBackedBy.type === 'GH_REPO') {
+        groupBackedByRepo = this.repoCollection.findWhere({ uri: groupBackedBy.linkPath });
+      }
+      var isGroupBackedByRepo = groupBackedByRepo && !groupBackedByRepo.get('private');
+      var isAssociatedWithPublicRepo = associatedGithubProject && !associatedGithubProject.get('private');
+      var shouldHideAllowBadgerOption = !(isGroupBackedByRepo || isAssociatedWithPublicRepo) || security !== 'PUBLIC';
+      toggleClass(this.ui.allowBadgerOption[0], 'hidden', shouldHideAllowBadgerOption);
 
-      toggleClass(this.ui.roomDetailSection[0], 'hidden', shouldHideOnlyGitHubUsersOption && shouldHideOnlyOrgUsersOption);
+      toggleClass(this.ui.roomDetailSection[0], 'hidden', shouldHideOnlyGitHubUsersOption && shouldHideOnlyOrgUsersOption && shouldHideAllowBadgerOption);
 
       // Validation and Errors
       var roomAvailabilityStatusMessage = '';
