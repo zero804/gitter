@@ -6,7 +6,7 @@ var restful = require('../../../services/restful')
 var GroupWithPolicyService = require('../../../services/group-with-policy-service');
 var restSerializer = require('../../../serializers/rest-serializer');
 
-function getCreateOptions(input) {
+function getCreateOptions(group, input) {
   var name = input.name ? String(input.name) : undefined;
   var topic = input.topic ? String(input.topic) : undefined;
   var createOptions = { name: name, topic: topic };
@@ -32,6 +32,11 @@ function getCreateOptions(input) {
     createOptions.providers = input.providers;
   }
 
+  // only github repo based rooms have the default room automatically
+  // integrated with github
+  createOptions.runPostGitHubRoomCreationTasks = group.sd.type === 'GH_REPO';
+  createOptions.addBadge = !!input.addBadge
+
   // keep tracking info around for sendStats
   if (typeof input.source === 'string') {
     createOptions.tracking = { source: input.source };
@@ -56,7 +61,7 @@ module.exports = {
       throw new StatusError(401);
     }
 
-    var createOptions = getCreateOptions(req.body);
+    var createOptions = getCreateOptions(req.group, req.body);
 
     var groupWithPolicyService = new GroupWithPolicyService(req.group, req.user, req.userGroupPolicy);
     return groupWithPolicyService.createRoom(createOptions)
