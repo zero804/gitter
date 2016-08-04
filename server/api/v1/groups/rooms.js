@@ -6,7 +6,7 @@ var restful = require('../../../services/restful')
 var GroupWithPolicyService = require('../../../services/group-with-policy-service');
 var restSerializer = require('../../../serializers/rest-serializer');
 
-function getCreateOptions(group, input) {
+function getCreateOptions(input) {
   var name = input.name ? String(input.name) : undefined;
   var topic = input.topic ? String(input.topic) : undefined;
   var createOptions = { name: name, topic: topic };
@@ -61,7 +61,7 @@ module.exports = {
       throw new StatusError(401);
     }
 
-    var createOptions = getCreateOptions(req.group, req.body);
+    var createOptions = getCreateOptions(req.body);
 
     var groupWithPolicyService = new GroupWithPolicyService(req.group, req.user, req.userGroupPolicy);
     return groupWithPolicyService.createRoom(createOptions)
