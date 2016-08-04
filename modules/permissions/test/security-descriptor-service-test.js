@@ -5,6 +5,7 @@ var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var securityDescriptorService = require('../lib/security-descriptor-service');
 var permissionCombinations = require('./permission-combinations');
 var persistence = require('gitter-web-persistence');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 describe('security-descriptor-service', function() {
   describe('integration tests #slow', function() {
@@ -26,6 +27,7 @@ describe('security-descriptor-service', function() {
                 assert.strictEqual(result.admins, descriptor.admins);
                 assert.strictEqual(result.linkPath, descriptor.linkPath);
                 assert.strictEqual(result.externalId, descriptor.externalId);
+                assert.strictEqual(mongoUtils.objectIDsEqual(result.internalId, descriptor.internalId), true);
               })
               .finally(function() {
                 return troupe.remove();
@@ -48,6 +50,7 @@ describe('security-descriptor-service', function() {
           public: true,
           linkPath: 'gitterHQ/gitter',
           externalId: null,
+          internalId: null,
         }
       }
     }));

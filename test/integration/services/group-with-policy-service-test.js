@@ -154,21 +154,6 @@ describe('group-with-policy-service #slow', function() {
       });
   });
 
-  it('should throw an error if you try and add a GitHub repo backed room to a non-Github group', function() {
-    return group2WithPolicyService.createRoom({
-        type: 'GH_REPO',
-        name: fixtureLoader.GITTER_INTEGRATION_REPO,
-        security: 'PUBLIC',
-        linkPath: linkPath
-      })
-      .then(function() {
-        assert.ok(false, "error expected");
-      })
-      .catch(StatusError, function(err) {
-        assert.strictEqual(err.status, 400);
-      });
-  });
-
   // normal rooms
 
   it('should create a normal room (public)', function() {

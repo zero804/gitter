@@ -76,9 +76,6 @@ function checkGroupUri(user, uri, options) {
   // type can be null
   var type = options.type;
 
-  // linkPath is undefined if type is null
-  var linkPath = options.linkPath;
-
   // obtainAccessFromGitHubRepo can be undefined
   var obtainAccessFromGitHubRepo = options.obtainAccessFromGitHubRepo;
 
