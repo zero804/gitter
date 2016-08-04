@@ -5,9 +5,9 @@ var babel = require('gulp-babel');
 
 function babelPipeline(rootDir) {
   return gulp.src(rootDir + '/containers/**.{js,jsx}')
-      .pipe(babel({
-        // Babel options
-      }));
+    .pipe(babel({
+      //babel options
+    }));
 }
 
 module.exports = babelPipeline;
