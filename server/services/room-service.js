@@ -253,11 +253,11 @@ function createRoomForGitHubUri(user, uri, options) {
           var groupId = this.groupId = group._id;
 
           var sd = securityDescriptorGenerator.generate(user, {
-              linkPath: officialUri,
-              type: 'GH_'+githubType, // GH_USER, GH_ORG or GH_REPO
-              externalId: githubId,
-              security: githubType === 'ORG' ? 'PRIVATE' : security
-            });
+            linkPath: officialUri,
+            type: 'GH_' + githubType, // GH_USER, GH_ORG or GH_REPO
+            externalId: githubId,
+            security: githubType === 'ORG' ? 'PRIVATE' : security
+          });
 
           return mongooseUtils.upsert(persistence.Troupe, { lcUri: lcUri }, {
               $setOnInsert: {
@@ -777,6 +777,8 @@ function createGroupRoom(user, group, roomInfo, securityDescriptor, options) {
       break
 
     case null:
+    case 'GROUP':
+      // TODO: this is not very descriptive
       roomType = 'group-room'; // or channel?
       break;
 

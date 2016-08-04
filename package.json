@@ -245,6 +245,7 @@
     "raven-js": "^1.1.11",
     "reduce-function-call": "^1.0.1",
     "run-sequence": "^1.2.0",
+    "signal-exit": "^3.0.0",
     "simple-git": "^1.40.0",
     "sinon": "1.5.2",
     "speedy": "^0.1.1",
@@ -292,5 +293,11 @@
       "pre-commit": "gulp fasttest",
       "post-merge": "npm prune && npm install"
     }
+  },
+  "nyc": {
+    "exclude": [
+      "public/repo/**",
+      "**/test/**"
+    ]
   }
 }

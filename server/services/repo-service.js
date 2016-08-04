@@ -1,7 +1,9 @@
 "use strict";
 
+var Promise = require('bluebird');
 var GithubRepo = require('gitter-web-github').GitHubRepoService;
 var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
+var isGitHubUser = require('gitter-web-identity/lib/is-github-user');
 
 function applyFilters(array, filters) {
   // Filter out what needs filtering out
@@ -17,6 +19,11 @@ function applyFilters(array, filters) {
 function getReposForUser(user, options) {
   if(!options) options = {};
   var adminAccessOnly = 'adminAccessOnly' in options ? options.adminAccessOnly : false;
+
+  // TODO: Move this (saving Twitter users from 401 signout (see badCredentialsCheck))
+  if(!isGitHubUser(user)) {
+    return Promise.resolve([]);
+  }
 
   var ghRepo = new GithubRepo(user);
 
@@ -64,6 +71,6 @@ function getUnusedReposForUser(user, options) {
 }
 
 module.exports = {
-  getReposForUser: getReposForUser,
-  getUnusedReposForUser: getUnusedReposForUser
-}
+  getReposForUser: Promise.method(getReposForUser),
+  getUnusedReposForUser: Promise.method(getUnusedReposForUser)
+};
