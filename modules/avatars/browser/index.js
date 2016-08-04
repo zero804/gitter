@@ -17,7 +17,7 @@ function getForGravatarEmail(emailAddress) {
 function getForTwitterUrl(twitterUrl) {
   var info = extractTwitterAvatarInfo(twitterUrl);
   if (!info) return DEFAULT;
-  return avatarCdnResolver('/tw/i/' + info.id1 + '/' + info.id2 + '/' + info.extension);
+  return avatarCdnResolver('/tw/i/' + info.id + '/' + info.filename);
 }
 
 function getForGroupId(groupId) {

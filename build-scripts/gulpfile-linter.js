@@ -30,7 +30,7 @@ gulp.task('linter:validate:config', function() {
 // Full eslint
 gulp.task('linter:validate:eslint', function() {
   mkdirp.sync('output/eslint/');
-  return gulp.src(['**/*.js','!node_modules/**','!public/repo/**'])
+  return gulp.src(['**/*.js','!node_modules/**', '!node_modules_linux/**', '!public/repo/**'])
     .pipe(eslint({
       quiet: argv.quiet,
       extensions: ['.js', '.jsx']
@@ -46,7 +46,7 @@ gulp.task('linter:validate:eslint-diff', function() {
   var baseBranch = process.env.BASE_BRANCH || guessBaseBranch();
   gutil.log('Performing eslint comparison to', baseBranch);
 
-  var eslintPipe = gulp.src(['**/*.js','!node_modules/**','!public/repo/**'], { read: false })
+  var eslintPipe = gulp.src(['**/*.js','!node_modules/**', '!node_modules_linux/**', '!public/repo/**'], { read: false })
     .pipe(eslintFilter.filterFiles(baseBranch))
     .pipe(eslint({
       quiet: argv.quiet
