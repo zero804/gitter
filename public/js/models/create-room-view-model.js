@@ -8,6 +8,7 @@ var CreateRoomViewModel = Backbone.Model.extend({
     groupId: null,
     roomName: '',
     associatedGithubProject: null,
+    allowBadger: false,
     security: 'PUBLIC',
     onlyGithubUsers: false,
     onlyOrgUsers: false,
