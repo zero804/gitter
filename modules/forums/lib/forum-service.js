@@ -5,12 +5,11 @@ var stats = env.stats;
 var Forum = require('gitter-web-persistence').Forum;
 var debug = require('debug')('gitter:app:topics:forum-service');
 
-function createForum(user, forumInfo) {
+function createForum(user, forumInfo, securityDescriptor) {
   // we can't upsert because there's nothing unique on a Forum to check against
   var insertData = {
-    name: forumInfo.name,
-    slug: forumInfo.slug,
-    tags: forumInfo.tags || []
+    tags: forumInfo.tags || [],
+    sd: securityDescriptor
   };
   return Forum.create(insertData)
     .then(function(forum) {

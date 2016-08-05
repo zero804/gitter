@@ -222,6 +222,18 @@ function setAvatarForGroup(groupId, url) {
   return Group.findOneAndUpdate(query, update).exec();
 }
 
+function setForumForGroup(groupId, forumId) {
+  var query = { _id: groupId };
+
+  var update = {
+    $set: {
+      forumId: forumId
+    }
+  };
+
+  return Group.findOneAndUpdate(query, update).exec();
+}
+
 module.exports = {
   findByUri: Promise.method(findByUri),
   findById: Promise.method(findById),
@@ -229,6 +241,7 @@ module.exports = {
   createGroup: Promise.method(createGroup),
   findRoomsIdForGroup: Promise.method(findRoomsIdForGroup),
   setAvatarForGroup: setAvatarForGroup,
+  setForumForGroup: setForumForGroup,
   migration: {
     upsertGroup: upsertGroup,
     ensureGroupForGitHubRoomCreation: ensureGroupForGitHubRoomCreation,
