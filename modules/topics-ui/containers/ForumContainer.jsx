@@ -1,7 +1,7 @@
 'use strict';
 
 import React from 'react';
-import Dispatcher from '../browser/js/dispatcher';
+import {subscribe, unsubscribe, dispatch} from '../browser/js/dispatcher';
 
 import CategoryList from '../shared/components/forum/category-list.jsx';
 import TableControl from '../shared/components/forum/table-control.jsx';
@@ -39,11 +39,11 @@ module.exports = React.createClass({
 
   componentDidMount(){
     const { categoryStore } = this.props;
-    Dispatcher.on(forumCatConstants.UPDATE_ACTIVE_CATEGORY, this.onCategoryUpdate, this);
+    subscribe(forumCatConstants.UPDATE_ACTIVE_CATEGORY, this.onCategoryUpdate, this);
   },
 
   componentWillUnmount(){
-    Dispatcher.off(forumCatConstants.UPDATE_ACTIVE_CATEGORY, this.onCategoryUpdate, this);
+    unsubscribe(forumCatConstants.UPDATE_ACTIVE_CATEGORY, this.onCategoryUpdate, this);
   },
 
   render() {
@@ -66,10 +66,7 @@ module.exports = React.createClass({
 
   onCategoryClicked(category){
     //TODO Replace payload generation with an action-creator
-    Dispatcher.trigger(navConstants.NAVIGATE_TO, {
-      route: 'forum',
-      category: category,
-    });
+    dispatch(navigateToCategory(category));
   },
 
   onCategoryUpdate(data){
