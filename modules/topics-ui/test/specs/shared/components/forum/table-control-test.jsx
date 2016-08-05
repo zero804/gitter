@@ -18,23 +18,27 @@ describe.only('<TableControl/>', () => {
   let mounted;
   let tags;
   let filterHandle;
+  let tagHandle;
 
   beforeEach(() => {
     filterHandle = sinon.spy();
+    tagHandle = sinon.spy();
     tags = [{value: 'all-tags', name: 'All Tags', active: true }];
     wrapper = shallow(
       <TableControl
       tags={tags}
       groupName="gitterHQ"
       category="all"
-      filterChange={filterHandle} />
+      filterChange={filterHandle}
+      tagChange={tagHandle}/>
     );
     mounted = mount(
       <TableControl
       tags={tags}
       groupName="gitterHQ"
       category="all"
-      filterChange={filterHandle}/>
+      filterChange={filterHandle}
+      tagChange={tagHandle}/>
     );
   });
 
@@ -78,6 +82,16 @@ describe.only('<TableControl/>', () => {
   it('should call filterChange with the right arguments', () => {
     wrapper.find('TableControlButton').at(0).prop('onClick')('activity');
     assert(filterHandle.calledWith('activity'));
+  });
+
+  it('should call tagChange when the first TopicTableSelect changes', () => {
+    wrapper.find('TableControlSelect').at(0).prop('onChange')();
+    assert.equal(tagHandle.callCount, 1);
+  });
+
+  it('should call tagChange with the right arguments', () => {
+    wrapper.find('TableControlSelect').at(0).prop('onChange')('tag');
+    assert(tagHandle.calledWith('tag'));
   });
 
 });
