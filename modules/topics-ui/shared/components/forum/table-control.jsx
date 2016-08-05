@@ -28,6 +28,9 @@ module.exports = React.createClass({
 
   getDefaultProps(){
     return {
+      filterName: 'none',
+      tagName: 'all-tags',
+      sortName: 'none',
       sortBy: [
         { name: 'Most Recent', value: 'most-recent', selected: true },
         { name: 'Most Replies', value: 'most-replies' },
