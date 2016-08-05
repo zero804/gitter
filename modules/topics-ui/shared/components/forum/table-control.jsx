@@ -5,6 +5,7 @@ import Container from '../container.jsx';
 import Panel from '../panel.jsx';
 import TableControlButton from './table-control-button.jsx';
 import TableControlSelect from './table-control-select.jsx';
+import navConstants from '../../../browser/js/constants/navigation';
 
 module.exports = React.createClass({
 
@@ -27,9 +28,9 @@ module.exports = React.createClass({
   getDefaultProps(){
     console.log(this.props && this.props.sortName);
     return {
-      filterName: 'activity',
-      tagName: 'all-tags',
-      sortName: 'most-recent'
+      filterName: navConstants.DEFAULT_FILTER_NAME,
+      tagName: navConstants.DEFAULT_TAG_NAME,
+      sortName: navConstants.DEFULT_SORT_NAME,
     }
   },
 

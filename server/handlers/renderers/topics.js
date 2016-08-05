@@ -12,13 +12,6 @@ function renderForum(req, res, next) {
     return next(new StatusError(404));
   }
 
-  //FIXME move these defaults into the app and use ForumContainer.getDeafultProps to provide them
-  var categoryName = (req.params.categoryName || 'all');
-  var tagName = (req.query.tag || 'all-tags');
-  var filterName = (req.query.filter || 'none');
-  var sortName = (req.query.sort || 'none');
-
-
   forumService.findByName(req.params.roomPart1)
     .then(function(forum){
       res.render('topics/forum', {
@@ -29,10 +22,10 @@ function renderForum(req, res, next) {
           forum: forum,
 
           groupName: req.params.roomPart1,
-          categoryName: categoryName,
-          filterName: filterName,
-          tagName: tagName,
-          sortName: sortName,
+          categoryName: req.params.categoryName,
+          filterName: req.query.filter,
+          tagName: req.query.tag,
+          sortName: req.query.sort,
 
           categoryStore: forumCategoryStore(forum.categories, categoryName),
           tagStore: forumTagStore(forum.tags, tagName),

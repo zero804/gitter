@@ -42,10 +42,6 @@ module.exports = React.createClass({
     const tagStore = (window.context.tagStore || {});
     const { router } = this.props;
 
-    console.log('-----------------------');
-    console.log(router.get('filterName'));
-    console.log('-----------------------');
-
     return Object.assign(this.getDefaultState(), {
       groupName: router.get('groupName'),
       categoryName: router.get('categoryName'),
