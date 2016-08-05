@@ -3,7 +3,7 @@
 var assert = require('assert');
 var tagStore = require('../../../../server/stores/forum-tag-store');
 
-describe.only('ForumStore', () => {
+describe('ForumStore', () => {
 
   const tags = [ 1, 2, 3];
   const parsedTags = [

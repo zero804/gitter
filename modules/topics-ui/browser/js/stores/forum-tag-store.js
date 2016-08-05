@@ -17,6 +17,10 @@ module.exports = Backbone.Collection.extend({
     dispatch(updateActiveTag(val));
   },
 
+  getActiveTagName(){
+    return this.findWhere({ active: true }).get('value');
+  },
+
   getTags: function() {
     return this.models.map(model => model.toJSON());
   },
