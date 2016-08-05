@@ -9,6 +9,7 @@ import ForumTableControl from '../shared/components/forum/table-control.jsx';
 import navigateToCategory from '../browser/js/action-creators/forum/navigate-to-category';
 import navigateToFilter from '../browser/js/action-creators/forum/navigate-to-filter';
 import navigateToSort from '../browser/js/action-creators/forum/navigate-to-sort';
+import navigateToTag from '../browser/js/action-creators/forum/navigate-to-tag';
 
 import forumCatConstants from '../browser/js/constants/forum-categories';
 
@@ -65,6 +66,7 @@ module.exports = React.createClass({
           category={categoryName}
           filterChange={this.onFilterChange}
           sortChange={this.onSortChange}
+          tagChange={this.onTagChange}
           tags={tags}/>
       </main>
     );
@@ -80,6 +82,10 @@ module.exports = React.createClass({
 
   onSortChange(sort) {
     dispatch(navigateToSort(sort));
+  },
+
+  onTagChange(tag){
+    dispatch(navigateToTag(tag));
   },
 
   onCategoryUpdate(){
