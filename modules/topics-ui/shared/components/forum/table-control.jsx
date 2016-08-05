@@ -32,7 +32,7 @@ module.exports = React.createClass({
 
   render(){
 
-    const { groupName, category, sortBy, tags } = this.props;
+    const { groupName, category, sortBy, tags, sortChange, tagChange } = this.props;
 
     return (
       <Container className="container--table-control">
@@ -42,8 +42,8 @@ module.exports = React.createClass({
               <li>{this.getChildTableControlButton('Activity', 'activity')}</li>
               <li>{this.getChildTableControlButton('My Topics', 'my-topics')}</li>
               <li className="tabel-control__divider">{this.getChildTableControlButton('Watched', 'watched')}</li>
-              <li><TableControlSelect options={tags} onChange={this.onTagChange} /></li>
-              <li><TableControlSelect options={sortBy} onChange={this.onSortChange} /></li>
+              <li><TableControlSelect options={tags} onChange={(tag) => tagChange(tag)} /></li>
+              <li><TableControlSelect options={sortBy} onChange={(sort) => sortChange(sort)} /></li>
             </ul>
           </nav>
         </Panel>
@@ -52,7 +52,7 @@ module.exports = React.createClass({
   },
 
   getChildTableControlButton(title, value){
-    const { groupName, category } = this.props;
+    const { groupName, category, filterChange } = this.props;
     return (
       <TableControlButton
         title={title}
@@ -60,13 +60,8 @@ module.exports = React.createClass({
         groupName={groupName}
         category={category}
         active={false}
-        onClick={this.onFilterChange}/>
+        onClick={(filter) => filterChange(filter)}/>
     );
-  },
-
-  onFilterChange(filter){
-    const { filterChange } = this.props;
-    filterChange(filter);
   },
 
   onSortChange(sort){
