@@ -10,10 +10,17 @@ module.exports = React.createClass({
 
   displayName: 'ForumTableControl',
   propTypes: {
+    //Route params
     groupName: PropTypes.string.isRequired,
-    category: PropTypes.string.isRequired,
+    categoryName: PropTypes.string.isRequired,
+    filterName: PropTypes.string,
+    tagName: PropTypes.string,
+    sortName: PropTypes.string,
+
+    //Collections
     sortBy: PropTypes.array,
     tags: PropTypes.array.isRequired,
+    //Event handles
     filterChange: PropTypes.func.isRequired,
     tagChange: PropTypes.func.isRequired,
     sortChange: PropTypes.func.isRequired,
@@ -32,7 +39,7 @@ module.exports = React.createClass({
 
   render(){
 
-    const { groupName, category, sortBy, tags, sortChange, tagChange } = this.props;
+    const { groupName, sortBy, tags, sortChange, tagChange } = this.props;
 
     return (
       <Container className="container--table-control">
@@ -52,13 +59,13 @@ module.exports = React.createClass({
   },
 
   getChildTableControlButton(title, value, active=false){
-    const { groupName, category, filterChange } = this.props;
+    const { groupName, categoryName, filterChange } = this.props;
     return (
       <TableControlButton
         title={title}
         value={value}
         groupName={groupName}
-        category={category}
+        category={categoryName}
         active={active}
         onClick={(filter) => filterChange(filter)}/>
     );

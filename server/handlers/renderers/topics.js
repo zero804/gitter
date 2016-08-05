@@ -12,6 +12,7 @@ function renderForum(req, res, next) {
     return next(new StatusError(404));
   }
 
+  //FIXME move these defaults into the app and use ForumContainer.getDeafultProps to provide them
   var categoryName = (req.params.categoryName || 'all');
   var tagName = (req.query.tag || 'all-tags');
   var filterName = (req.query.filter || 'none');
@@ -31,6 +32,7 @@ function renderForum(req, res, next) {
           categoryName: categoryName,
           filterName: filterName,
           tagName: tagName,
+          sortName: sortName,
 
           categoryStore: forumCategoryStore(forum.categories, categoryName),
           tagStore: forumTagStore(forum.tags, tagName),

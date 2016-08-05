@@ -30,7 +30,7 @@ describe('<TableControl/>', () => {
       <TableControl
       tags={tags}
       groupName="gitterHQ"
-      category="all"
+      categoryName="all"
       filterChange={filterHandle}
       tagChange={tagHandle}
       sortChange={sortHandle}/>
@@ -39,7 +39,7 @@ describe('<TableControl/>', () => {
       <TableControl
       tags={tags}
       groupName="gitterHQ"
-      category="all"
+      categoryName="all"
       filterChange={filterHandle}
       tagChange={tagHandle}
       sortChange={sortHandle}/>
