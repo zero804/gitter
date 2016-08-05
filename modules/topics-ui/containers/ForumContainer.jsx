@@ -15,6 +15,7 @@ import navigateToTag from '../browser/js/action-creators/forum/navigate-to-tag';
 import forumCatConstants from '../browser/js/constants/forum-categories';
 import forumTagConstants from '../browser/js/constants/forum-tags';
 import forumFilterConstants from '../browser/js/constants/forum-filters';
+import forumSortConstants from '../browser/js/constants/forum-sorts';
 import navConstants from '../browser/js/constants/navigation';
 
 module.exports = React.createClass({
@@ -67,11 +68,14 @@ module.exports = React.createClass({
     subscribe(forumCatConstants.UPDATE_ACTIVE_CATEGORY, this.onCategoryUpdate, this);
     subscribe(forumTagConstants.UPDATE_ACTIVE_TAG, this.onTagUpdate, this);
     subscribe(forumFilterConstants.UPDATE_ACTIVE_FILTER, this.onFilterUpdate, this);
+    subscribe(forumSortConstants.UPDATE_ACTIVE_SORT, this.onSortUpdate, this);
   },
 
   componentWillUnmount(){
     unsubscribe(forumCatConstants.UPDATE_ACTIVE_CATEGORY, this.onCategoryUpdate, this);
     unsubscribe(forumTagConstants.UPDATE_ACTIVE_TAG, this.onTagUpdate, this);
+    unsubscribe(forumFilterConstants.UPDATE_ACTIVE_FILTER, this.onFilterUpdate, this);
+    unsubscribe(forumSortConstants.UPDATE_ACTIVE_SORT, this.onSortUpdate, this);
   },
 
   render() {
@@ -135,6 +139,12 @@ module.exports = React.createClass({
     this.setState((state) => _.extend(state, {
       filterName: data.filter,
     }));
-  }
+  },
+
+  onSortUpdate(data) {
+    this.setState((state) => _.extend(state, {
+      sortName: data.sort,
+    }));
+  },
 
 });

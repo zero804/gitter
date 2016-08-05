@@ -16,10 +16,12 @@ describe('Router', function(){
 
   const trigger = {trigger: true};
   let filterHandle;
+  let sortHandle;
 
   beforeEach(function(){
     window.location.hash = 'gitterHQ/topics';
     filterHandle = sinon.spy();
+    sortHandle = sinon.spy();
     Backbone.history.start({
       pushState: false,
     });
@@ -76,6 +78,12 @@ describe('Router', function(){
     subscribe(forumFilterConstants.UPDATE_ACTIVE_FILTER, filterHandle);
     router.set('filterName', 'test');
     assert.equal(filterHandle.callCount, 1);
+  });
+
+  it('should dispacth the right event when the sort property updates', () => {
+    subscribe(forumSortConstants.UPDATE_ACTIVE_SORT, sortHandle);
+    router.set('sortName', 'test');
+    assert.equal(sortHandle.callCount, 1);
   });
 
 
