@@ -30,7 +30,7 @@ module.exports = React.createClass({
     return {
       filterName: navConstants.DEFAULT_FILTER_NAME,
       tagName: navConstants.DEFAULT_TAG_NAME,
-      sortName: navConstants.DEFULT_SORT_NAME,
+      sortName: navConstants.DEFAULT_SORT_NAME,
     }
   },
 

@@ -13,6 +13,7 @@ import navigateToSort from '../browser/js/action-creators/forum/navigate-to-sort
 import navigateToTag from '../browser/js/action-creators/forum/navigate-to-tag';
 
 import forumCatConstants from '../browser/js/constants/forum-categories';
+import navConstants from '../browser/js/constants/navigation';
 
 module.exports = React.createClass({
 
@@ -41,9 +42,9 @@ module.exports = React.createClass({
 
   getDefaultProps(){
     return {
-      filterName: 'none',
-      tagName: 'all-tags',
-      sortName: 'none',
+      filterName: navConstants.DEFAULT_FILTER_NAME,
+      tagName: navConstants.DEFAULT_TAG_NAME,
+      sortName: navConstants.DEFAULT_SORT_NAME
     };
   },
 
