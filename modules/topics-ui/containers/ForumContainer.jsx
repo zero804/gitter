@@ -51,6 +51,9 @@ module.exports = React.createClass({
     const { categoryStore, tagStore } = this.props;
     return {
       categoryName: this.props.categoryName,
+      filterName: this.props.filterName,
+      tagName: this.props.tagName,
+      sortName: this.props.sortName,
       categories: categoryStore.getCategories(),
       tags: tagStore.getTags()
     };

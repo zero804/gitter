@@ -37,6 +37,8 @@ var Router = Backbone.Router.extend({
     queryString = (queryString || '');
     const query = qs.parse(queryString);
 
+    console.log(query);
+
     this.model.set({
       route: 'forum' ,
       groupName: groupName,
