@@ -15,6 +15,7 @@ module.exports = React.createClass({
     sortBy: PropTypes.array,
     tags: PropTypes.array.isRequired,
     filterChange: PropTypes.func.isRequired,
+    tagChange: PropTypes.func.isRequired,
   },
 
   getDefaultProps(){
@@ -72,7 +73,8 @@ module.exports = React.createClass({
   },
 
   onTagChange(tag) {
-    console.log('Tag Change', tag);
+    const { tagChange } = this.props;
+    tagChange(tag);
   }
 
 });
