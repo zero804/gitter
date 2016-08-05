@@ -45,12 +45,8 @@ module.exports = React.createClass({
   },
 
   render(){
-
     const { groupName, tags, sortChange, tagChange, filterName, tagName, sortName } = this.props;
     const { sortBy } = this.state;
-
-    console.log(filterName, '<---');
-
     return (
       <Container className="container--table-control">
         <Panel className="panel--table-control">

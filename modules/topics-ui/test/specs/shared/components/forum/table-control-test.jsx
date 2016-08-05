@@ -28,21 +28,21 @@ describe('<TableControl/>', () => {
     tags = [{value: 'all-tags', name: 'All Tags', active: true }];
     wrapper = shallow(
       <TableControl
-      tags={tags}
-      groupName="gitterHQ"
-      categoryName="all"
-      filterChange={filterHandle}
-      tagChange={tagHandle}
-      sortChange={sortHandle}/>
+        tags={tags}
+        groupName="gitterHQ"
+        categoryName="all"
+        filterChange={filterHandle}
+        tagChange={tagHandle}
+        sortChange={sortHandle}/>
     );
     mounted = mount(
       <TableControl
-      tags={tags}
-      groupName="gitterHQ"
-      categoryName="all"
-      filterChange={filterHandle}
-      tagChange={tagHandle}
-      sortChange={sortHandle}/>
+        tags={tags}
+        groupName="gitterHQ"
+        categoryName="all"
+        filterChange={filterHandle}
+        tagChange={tagHandle}
+        sortChange={sortHandle}/>
     );
   });
 
