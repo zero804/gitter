@@ -26,7 +26,6 @@ module.exports = React.createClass({
   },
 
   getDefaultProps(){
-    console.log(this.props && this.props.sortName);
     return {
       filterName: navConstants.DEFAULT_FILTER_NAME,
       tagName: navConstants.DEFAULT_TAG_NAME,
@@ -35,7 +34,6 @@ module.exports = React.createClass({
   },
 
   getInitialState(){
-    console.log(this.props);
     return {
       sortBy: [
         { name: 'Most Recent', value: 'most-recent', selected: true },
