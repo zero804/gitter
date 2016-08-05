@@ -13,9 +13,14 @@ module.exports = React.createClass({
   render(){
     const { options } = this.props;
     const { onChange } = this;
+    const defaultVal = options.reduce(function(memo, option){
+      if(!!option.active) { return option.value; }
+      return memo;
+    });
+
     return (
       <div className="table-control__select-decal">
-        <select className="table-control__select" onChange={ onChange }>
+        <select className="table-control__select" onChange={ onChange } defaultValue={defaultVal}>
           {options.map((opt, index) => this.getChildOption(index, opt))}
         </select>
       </div>
@@ -23,7 +28,7 @@ module.exports = React.createClass({
   },
 
   getChildOption(index, opts){
-    const { name, value, selected } = opts;
+    const { name, value } = opts;
     return (
       <option key={`table-control-select-index-${index}`}
         label={name}

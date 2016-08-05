@@ -34,12 +34,13 @@ module.exports = React.createClass({
   },
 
   getInitialState(){
+    const { sortName } = this.props;
     return {
       sortBy: [
-        { name: 'Most Recent', value: 'most-recent', selected: true },
-        { name: 'Most Replies', value: 'most-replies' },
-        { name: 'Most Watchers', value: 'most-watchers' },
-        { name: 'Most Likes', value: 'most-likes' },
+        { name: 'Most Recent', value: 'most-recent', active: (sortName === 'most-recent') },
+        { name: 'Most Replies', value: 'most-replies', active: (sortName === 'most-replies') },
+        { name: 'Most Watchers', value: 'most-watchers', active: (sortName === 'most-watchers') },
+        { name: 'Most Likes', value: 'most-likes', active: (sortName === 'most-likes') },
       ]
     }
   },
