@@ -1,6 +1,7 @@
 'use strict';
 
 import React from 'react';
+import _ from 'lodash';
 import {subscribe, unsubscribe, dispatch} from '../browser/js/dispatcher';
 
 import CategoryList from '../shared/components/forum/category-list.jsx';
@@ -38,6 +39,14 @@ module.exports = React.createClass({
     }).isRequired,
   },
 
+  getDefaultProps(){
+    return {
+      filterName: 'none',
+      tagName: 'all-tags',
+      sortName: 'none',
+    };
+  },
+
   getInitialState(){
     const { categoryStore, tagStore } = this.props;
     return {
@@ -57,7 +66,7 @@ module.exports = React.createClass({
   },
 
   render() {
-    const { categories, categoryName, tags } = this.state;
+    const { categories, categoryName, tags, filterName, tagName, sortName } = this.state;
     const { groupName } = this.props;
     return (
       <main>
@@ -99,12 +108,10 @@ module.exports = React.createClass({
 
   onCategoryUpdate(){
     const { categoryStore } = this.props;
-    //TODO --> you can get the current state with setState((state) =>)
-    //use that and extend the payload with these new values
-    this.setState({
+    this.setState((state) => _.extend(state, {
       categories: categoryStore.getCategories(),
       categoryName: categoryStore.getActiveCategoryName(),
-    })
+    }));
   }
 
 });
