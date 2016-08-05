@@ -3,6 +3,7 @@
 var Promise = require('bluebird');
 var persistence = require('gitter-web-persistence');
 var uuid = require('node-uuid');
+var slugify = require('slug');
 var debug = require('debug')('gitter:tests:test-fixtures');
 var counter = 0;
 
@@ -20,7 +21,7 @@ function generateName() {
 }
 
 function generateUri(roomType) {
-  if(roomType === 'REPO') {
+  if (roomType === 'REPO') {
     return '_test_' + (++counter) + seed + '/_repo_' + (++counter) + Date.now();
   }
 
@@ -60,7 +61,7 @@ function createBaseFixture() {
 
       return Promise.all(Object.keys(this).map(function(key) {
           var o = self[key];
-          if(typeof o.remove === 'function') {
+          if (typeof o.remove === 'function') {
             count++;
             return o.remove();
           }
@@ -292,7 +293,7 @@ function createExpectedFixtures(expected) {
     var uri = f.uri || generateGroupUri();
 
     var avatarVersion;
-    if(f.hasOwnProperty('avatarVersion')) {
+    if (f.hasOwnProperty('avatarVersion')) {
       avatarVersion = f.avatarVersion;
     } else {
       if (f.avatarUrl) {
@@ -302,12 +303,15 @@ function createExpectedFixtures(expected) {
       }
     }
 
+    var forumId = f.forum && f.forum._id;
+
     var doc = {
       name: f.name || uri,
       uri: uri,
       lcUri: uri.toLowerCase(),
       avatarUrl: f.avatarUrl || null,
-      avatarVersion: avatarVersion
+      avatarVersion: avatarVersion,
+      forumId: forumId
     };
 
 
@@ -337,6 +341,54 @@ function createExpectedFixtures(expected) {
     debug('Creating group %s with %j', fixtureName, doc);
 
     return persistence.Group.create(doc);
+  }
+
+  function createForum(fixtureName, f) {
+    debug('Creating %s', fixtureName);
+
+    var securityDescriptor = f.securityDescriptor || {};
+
+    var securityDescriptorType;
+    if (securityDescriptor.type) {
+      securityDescriptorType = securityDescriptor.type;
+    } else {
+      securityDescriptorType = null;
+    }
+
+    var securityDoc = {
+      // Permissions stuff
+      type: securityDescriptorType,
+      members: securityDescriptor.members || 'PUBLIC',
+      admins: securityDescriptor.admins || 'MANUAL',
+      public: 'public' in securityDescriptor ? securityDescriptor.public : true,
+      linkPath: securityDescriptor.linkPath,
+      externalId: securityDescriptor.externalId,
+      extraMembers: securityDescriptor.extraMembers,
+      extraAdmins: securityDescriptor.extraAdmins
+    };
+
+    var doc = {
+      sd: securityDoc
+    };
+
+    debug('Creating forum %s with %j', fixtureName, doc);
+
+    return persistence.Forum.create(doc);
+  }
+
+  function createCategory(fixtureName, f) {
+    debug('Creating %s', fixtureName);
+
+    var name = f.name || generateName();
+    var doc = {
+      name: name,
+      slug: f.slug || slugify(name),
+      forumId: f.forum && f.forum._id
+    };
+
+    debug('Creating forum category %s with %j', fixtureName, doc);
+
+    return persistence.ForumCategory.create(doc);
   }
 
   function createMessage(fixtureName, f) {
@@ -382,18 +434,26 @@ function createExpectedFixtures(expected) {
   function createUsers(fixture) {
     return Promise.map(Object.keys(expected), function(key) {
 
-      if(key.match(/^user/)) {
+      if (key.match(/^user/)) {
         return createUser(key, expected[key])
           .then(function(user) {
             fixture[key] = user;
           });
       }
 
-      if(key.match(/^troupe/) || key.match(/^group/)) {
-        return createExtraUsers(fixture, key);
-      }
-
       return null;
+    })
+    .then(function() {
+      // only create the extra ones afterwards, otherwise we'll create
+      // duplicate users before the ones above got saved and then they won't
+      // link back to the same objects.
+      return Promise.map(Object.keys(expected), function(key) {
+        if (key.match(/^(troupe|group|forum|topic|reply|comment)/)) {
+          return createExtraUsers(fixture, key);
+        }
+
+        return null;
+      });
     });
   }
 
@@ -401,8 +461,8 @@ function createExpectedFixtures(expected) {
     var obj = expected[key];
     var users = [];
 
-    if(obj.users) {
-      if(!Array.isArray(obj.users)) {
+    if (obj.users) {
+      if (!Array.isArray(obj.users)) {
         obj.users = [obj.users];
       }
 
@@ -411,7 +471,7 @@ function createExpectedFixtures(expected) {
 
     var extraMembers = obj.securityDescriptor && obj.securityDescriptor.extraMembers;
     if (extraMembers) {
-      if(!Array.isArray(extraMembers)) {
+      if (!Array.isArray(extraMembers)) {
         extraMembers = [extraMembers];
       }
 
@@ -420,7 +480,7 @@ function createExpectedFixtures(expected) {
 
     var extraAdmins = obj.securityDescriptor && obj.securityDescriptor.extraAdmins;
     if (extraAdmins) {
-      if(!Array.isArray(extraAdmins)) {
+      if (!Array.isArray(extraAdmins)) {
         extraAdmins = [extraAdmins];
       }
 
@@ -428,8 +488,8 @@ function createExpectedFixtures(expected) {
     }
 
     return Promise.map(users, function(user, index) {
-        if(typeof user === 'string') {
-          if(expected[user]) return; // Already specified at the top level
+        if (typeof user === 'string') {
+          if (expected[user]) return; // Already specified at the top level
           expected[user] = {};
           return createUser(user, {}).then(function(createdUser) {
             fixture[user] = createdUser;
@@ -439,6 +499,8 @@ function createExpectedFixtures(expected) {
         var fixtureName = 'user' + (++userCounter);
         obj.users[index] = fixtureName;
         expected[fixtureName] = user;
+
+        debug('creating extra user %s', fixtureName);
 
         return createUser(fixtureName, user)
           .then(function(user) {
@@ -468,7 +530,7 @@ function createExpectedFixtures(expected) {
   function createGroups(fixture) {
     // Create groups
     return Promise.map(Object.keys(expected), function(key) {
-      if(key.match(/^group/)) {
+      if (key.match(/^group/)) {
         var expectedGroup = expected[key];
 
         var expectedSecurityDescriptor = expectedGroup && expectedGroup.securityDescriptor;
@@ -487,36 +549,152 @@ function createExpectedFixtures(expected) {
             fixture[key] = createdGroup;
           });
       }
+
+      return null;
     })
     .then(function() {
-      // Attach the groups to the troupes
       return Promise.map(Object.keys(expected), function(key) {
-        if(key.match(/^troupe/)) {
-          var troupe = expected[key];
-          var group = troupe.group;
-          if (!group) return;
-
-          if (typeof group !== 'string') throw new Error('Please specify the group as a string id')
-          if (fixture[group]) {
-            // Already specified at the top level
-            troupe.group = fixture[group];
-            return
-          }
-
-          return createGroup(group, { })
-            .then(function(createdGroup) {
-              troupe.group = createdGroup;
-              fixture[group] = createdGroup;
-            });
+        if (key.match(/^troupe/)) {
+          return createExtraGroups(fixture, key);
         }
+
+        return null;
       });
     });
+  }
+
+  function createExtraGroups(fixture, key) {
+    // Attach the groups to the troupes
+    var obj = expected[key];
+    var group = obj.group;
+    if (!group) return;
+
+    if (typeof group !== 'string') throw new Error('Please specify the group as a string id')
+    if (fixture[group]) {
+      // Already specified at the top level
+      obj.group = fixture[group];
+      return
+    }
+
+    debug('creating extra group %s', group);
+
+    return createGroup(group, { })
+      .then(function(createdGroup) {
+        obj.group = createdGroup;
+        fixture[group] = createdGroup;
+      });
+  }
+
+  function createForums(fixture) {
+    // Create forums
+    return Promise.map(Object.keys(expected), function(key) {
+      if (key.match(/^forum/)) {
+        var expectedForum = expected[key];
+
+        var expectedSecurityDescriptor = expectedForum && expectedForum.securityDescriptor;
+        if (expectedSecurityDescriptor) {
+          expectedSecurityDescriptor.extraMembers = expectedSecurityDescriptor.extraMembers && expectedSecurityDescriptor.extraMembers.map(function(user) {
+            return fixture[user]._id;
+          });
+
+          expectedSecurityDescriptor.extraAdmins = expectedSecurityDescriptor.extraAdmins && expectedSecurityDescriptor.extraAdmins.map(function(user) {
+            return fixture[user]._id;
+          });
+        }
+
+        return createForum(key, expectedForum)
+          .then(function(createdForum) {
+            debug('setting %s', key);
+            fixture[key] = createdForum;
+          });
+      }
+
+      return null;
+    })
+    .then(function() {
+      return Promise.map(Object.keys(expected), function(key) {
+        if (key.match(/^(group|category|topic|reply|comment)/)) {
+          return createExtraForums(fixture, key);
+        }
+
+        return null;
+      });
+    });
+  }
+
+  function createExtraForums(fixture, key) {
+    var obj = expected[key];
+    var forum = obj.forum;
+    if (!forum) return;
+
+    if (typeof forum !== 'string') throw new Error('Please specify the forum as a string id');
+
+    if (fixture[forum]) {
+      // Already specified at the top level
+      obj.forum = fixture[forum];
+      return;
+    }
+
+    debug('creating extra forum %s', forum);
+
+    return createForum(forum, {})
+      .then(function(createdForum) {
+        obj.forum = createdForum;
+        fixture[forum] = createdForum;
+      });
+  }
+
+  function createCategories(fixture) {
+    return Promise.map(Object.keys(expected), function(key) {
+      if (key.match(/^category/)) {
+        var expectedCategory = expected[key];
+
+        return createCategory(key, expectedCategory, fixture)
+          .then(function(category) {
+            fixture[key] = category;
+          });
+      }
+
+
+      return null;
+    })
+    .then(function() {
+      return Promise.map(Object.keys(expected), function(key) {
+        if (key.match(/^topic/)) {
+          return createExtraCategories(fixture, key);
+        }
+
+        return null;
+      });
+    });
+  }
+
+  function createExtraCategories(fixture, key) {
+    var obj = expected[key];
+    var category = obj.category;
+    if (!category) return;
+
+    if (typeof category !== 'string') throw new Error('Please specify the category as a string id');
+
+    if (fixture[category]) {
+      // Already specified at the top level
+      obj.category = fixture[category];
+      return;
+    }
+
+    debug('creating extra forum category %s', category);
+
+    return createCategory(category, {})
+      .then(function(createdCategory) {
+        obj.category = createdCategory;
+        fixture[category] = createdCategory;
+      });
   }
 
   function createTroupes(fixture) {
     return Promise.map(Object.keys(expected), function(key) {
 
-      if(key.match(/^troupe/)) {
+      if (key.match(/^troupe/)) {
         var expectedTroupe = expected[key];
 
         expectedTroupe.userIds = expectedTroupe.users && expectedTroupe.users.map(function(user) {
@@ -547,7 +725,7 @@ function createExpectedFixtures(expected) {
 
   function createMessages(fixture) {
     return Promise.map(Object.keys(expected), function(key) {
-      if(key.match(/^message/)) {
+      if (key.match(/^message/)) {
         var expectedMessage = expected[key];
 
         expectedMessage.fromUserId = fixture[expectedMessage.user]._id;
@@ -567,6 +745,8 @@ function createExpectedFixtures(expected) {
     .tap(deleteDocuments)
     .tap(createUsers)
     .tap(createIdentities)
+    .tap(createForums)
+    .tap(createCategories)
     .tap(createGroups)
     .tap(createTroupes)
     .tap(createMessages);
