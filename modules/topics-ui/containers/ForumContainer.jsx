@@ -65,18 +65,14 @@ module.exports = React.createClass({
   },
 
   onCategoryClicked(category){
-    //TODO Replace payload generation with an action-creator
     dispatch(navigateToCategory(category));
   },
 
-  onCategoryUpdate(data){
+  onCategoryUpdate(){
     const { categoryStore } = this.props;
     this.setState({
       categories: categoryStore.getCategories(),
-      ////FIXME
-      //Consider moving this out of the event payload and provide
-      //categoryStore.getActiveCategoryName() to get this
-      categoryName: data.category,
+      categoryName: categoryStore.getActiveCategoryName(),
     })
   }
 
