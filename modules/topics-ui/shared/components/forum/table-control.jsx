@@ -16,6 +16,7 @@ module.exports = React.createClass({
     tags: PropTypes.array.isRequired,
     filterChange: PropTypes.func.isRequired,
     tagChange: PropTypes.func.isRequired,
+    sortChange: PropTypes.func.isRequired,
   },
 
   getDefaultProps(){
@@ -68,8 +69,9 @@ module.exports = React.createClass({
     filterChange(filter);
   },
 
-  onSortChange(sortType){
-    console.log('Sort Update', sortType);
+  onSortChange(sort){
+    const { sortChange } = this.props;
+    sortChange(sort);
   },
 
   onTagChange(tag) {
