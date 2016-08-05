@@ -18,13 +18,19 @@ module.exports = React.createClass({
   displayName: 'ForumContainer',
 
   propTypes: {
+    //Route parameters ---
     groupName: React.PropTypes.string.isRequired,
-    //Categories ---
     categoryName: React.PropTypes.string.isRequired,
+    filterName: React.PropTypes.string,
+    tagName: React.PropTypes.string,
+    sortName: React.PropTypes.string,
+
+    //Categories ---
     categoryStore: React.PropTypes.shape({
       models: React.PropTypes.array.isRequired,
       getCategories: React.PropTypes.func.isRequired
     }).isRequired,
+
     //Tags -----
     tagStore: React.PropTypes.shape({
       models: React.PropTypes.array.isRequired,

@@ -44,6 +44,9 @@ module.exports = React.createClass({
     return Object.assign(this.getDefaultState(), {
       groupName: router.get('groupName'),
       categoryName: router.get('categoryName'),
+      filterName: router.get('filterName'),
+      tagName: router.get('tagName'),
+      sortName: router.get('sortName'),
       categoryStore: new CategoryStore(categoryStore.models, { router: router }),
       tagStore: new TagStore(tagStore.models, { router: router }),
     });
