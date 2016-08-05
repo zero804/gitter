@@ -13,6 +13,7 @@ import navigateToSort from '../browser/js/action-creators/forum/navigate-to-sort
 import navigateToTag from '../browser/js/action-creators/forum/navigate-to-tag';
 
 import forumCatConstants from '../browser/js/constants/forum-categories';
+import forumTagConstants from '../browser/js/constants/forum-tags';
 import navConstants from '../browser/js/constants/navigation';
 
 module.exports = React.createClass({
@@ -63,10 +64,12 @@ module.exports = React.createClass({
   componentDidMount(){
     const { categoryStore } = this.props;
     subscribe(forumCatConstants.UPDATE_ACTIVE_CATEGORY, this.onCategoryUpdate, this);
+    subscribe(forumTagConstants.UPDATE_ACTIVE_TAG, this.onTagUpdate, this);
   },
 
   componentWillUnmount(){
     unsubscribe(forumCatConstants.UPDATE_ACTIVE_CATEGORY, this.onCategoryUpdate, this);
+    unsubscribe(forumTagConstants.UPDATE_ACTIVE_TAG, this.onTagUpdate, this);
   },
 
   render() {
@@ -115,6 +118,14 @@ module.exports = React.createClass({
     this.setState((state) => _.extend(state, {
       categories: categoryStore.getCategories(),
       categoryName: categoryStore.getActiveCategoryName(),
+    }));
+  },
+
+  onTagUpdate(){
+    const { tagStore } = this.props;
+    this.setState((state) => _.extend(state, {
+      tags: tagStore.getTags(),
+      tagName: tagStore.getActiveTagName(),
     }));
   }
 
