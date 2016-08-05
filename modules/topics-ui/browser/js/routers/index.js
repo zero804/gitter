@@ -1,11 +1,5 @@
 "use strict"
-/*
-FIXME
-Consider changing this to be a store that can be passed around
-This way derived states can be calculated in components rather than passing
-Im thinking mainly of active states in the category buttons and active states in the table control
-props way down from the parent
-*/
+
 var Backbone = require('backbone');
 var _ = require('lodash');
 var qs = require('qs');
@@ -32,18 +26,13 @@ var Router = Backbone.Router.extend({
   },
 
   forums(groupName, categoryName, queryString){
-
-    queryString = (queryString || '');
-    const query = qs.parse(queryString);
-
-    console.log(query);
-
+    const query = qs.parse(queryString || '');
     this.model.set({
       route: 'forum' ,
       groupName: groupName,
       categoryName: (categoryName || navConstants.DEFAULT_CATEGORY_NAME),
       filterName: (query.filter || navConstants.DEFAULT_FILTER_NAME),
-      tagName: (query.tag || navConstants.DEFULT_TAG_NAME),
+      tagName: (query.tag || navConstants.DEFAULT_TAG_NAME),
       sortName: (query.sort || navConstants.DEFAULT_SORT_NAME),
     });
   },
