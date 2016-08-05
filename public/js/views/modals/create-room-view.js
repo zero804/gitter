@@ -12,16 +12,15 @@ var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
 var getRoomNameFromTroupeName = require('gitter-web-shared/get-room-name-from-troupe-name');
 var apiClient = require('components/apiClient');
 var appEvents = require('utils/appevents');
-
+var context = require('../../utils/context');
 var GroupSelectView = require('views/create-room/groupSelectView');
 var ModalView = require('./modal');
 var FilteredSelect = require('./filtered-select');
 var roomAvailabilityStatusConstants = require('../create-room/room-availability-status-constants');
+var scopeUpgrader = require('../../components/scope-upgrader');
 
 var template = require('./tmpl/create-room-view.hbs');
 var repoTypeaheadItemTemplate = require('./tmpl/create-room-repo-typeahead-item-view.hbs');
-
-
 
 var checkForRepoExistence = function(orgName, repoName) {
   if(orgName && repoName) {
@@ -37,6 +36,29 @@ var checkForRepoExistence = function(orgName, repoName) {
 
   return Promise.resolve(false);
 };
+
+function promptForHook() {
+  appEvents.trigger('user_notification', {
+    title: 'Authorisation',
+    text: 'Your room has been created, but we weren\'t able ' +
+      'to integrate with the repository as we need write ' +
+      'access to your GitHub repositories. Click here to ' +
+      'give Gitter access to do this.',
+    timeout: 12000,
+    click: function() {
+      return scopeUpgrader('public_repo')
+        .then(function() {
+          return apiClient.room.put('', { autoConfigureHooks: 1 });
+        })
+        .then(function() {
+          appEvents.trigger('user_notification', {
+            title: 'Thank You',
+            text: 'Your integrations have been setup.',
+          });
+        });
+    },
+  });
+}
 
 var CreateRoomView = Marionette.LayoutView.extend({
   template: template,
@@ -55,6 +77,8 @@ var CreateRoomView = Marionette.LayoutView.extend({
     onlyOrgUsersOption: '.js-create-room-only-org-users-option',
     onlyOrgUsersOptionInput: '.js-create-room-only-org-users-option-input',
     onlyOrgUsersOptionOrgName: '.js-create-room-only-org-users-option-org-name',
+    allowBadgerOption: '.js-create-room-allow-badger',
+    allowBadgerOptionInput: '.js-create-room-allow-badger-option-input',
     roomAvailabilityStatusMessage: '.js-room-availability-status-message'
   },
 
@@ -67,7 +91,8 @@ var CreateRoomView = Marionette.LayoutView.extend({
     'click @ui.clearNameButton': 'onNameClearActivated',
     'change @ui.securityOptions': 'onSecurityChange',
     'change @ui.onlyGithubUsersOptionInput': 'onOnlyGitHubUsersOptionChange',
-    'change @ui.onlyOrgUsersOptionInput': 'onOnlyOrgUsersOptionChange'
+    'change @ui.onlyOrgUsersOptionInput': 'onOnlyOrgUsersOptionChange',
+    'change @ui.allowBadgerOptionInput': 'onAllowBadgerOptionChange'
   },
 
   modelEvents: {
@@ -134,6 +159,10 @@ var CreateRoomView = Marionette.LayoutView.extend({
         this.safeUpdateFields();
         break;
 
+      case 'upgrade':
+        window.location.href = '#upgraderepoaccess/createroom'
+        break;
+
       case 'cancel':
         this.dialog.hide();
         break;
@@ -153,6 +182,12 @@ var CreateRoomView = Marionette.LayoutView.extend({
     var security = this.model.get('security');
     var onlyGithubUsers = this.model.get('onlyGithubUsers');
     var onlyOrgUsers = this.model.get('onlyOrgUsers');
+    var allowBadger = this.model.get('allowBadger');
+
+    // You should be stopped before this in the UI validation but a good sanity check
+    if(!selectedGroup) {
+      throw new Error('A group needs to be selected in order to create a room');
+    }
 
     var type = null;
     var linkPath = null;
@@ -174,7 +209,8 @@ var CreateRoomView = Marionette.LayoutView.extend({
         type: type,
         security: security,
         linkPath: linkPath
-      }
+      },
+      addBadge: allowBadger
     };
 
     if(onlyGithubUsers) {
@@ -183,6 +219,9 @@ var CreateRoomView = Marionette.LayoutView.extend({
 
     apiClient.post(apiUrl, payload)
       .then(function(data) {
+        if (data.extra && data.extra.hookCreationFailedDueToMissingScope) {
+           setTimeout(promptForHook, 1500);
+        }
         this.dialog.hide();
         // url, type, title
         appEvents.trigger('navigation', urlJoin('/', data.uri), 'chat#add', data.uri);
@@ -269,6 +308,10 @@ var CreateRoomView = Marionette.LayoutView.extend({
 
   onOnlyOrgUsersOptionChange: function() {
     this.model.set('onlyOrgUsers', this.ui.onlyOrgUsersOptionInput[0].checked);
+  },
+
+  onAllowBadgerOptionChange: function() {
+    this.model.set('allowBadger', this.ui.allowBadgerOptionInput[0].checked);
   },
 
   onGroupIdChange: function() {
@@ -379,8 +422,16 @@ var CreateRoomView = Marionette.LayoutView.extend({
       toggleClass(this.ui.onlyOrgUsersOption[0], 'hidden', shouldHideOnlyOrgUsersOption);
       this.ui.onlyOrgUsersOptionOrgName[0].textContent = groupBackedBy && groupBackedBy.linkPath;
 
+      var groupBackedByRepo = null;
+      if(groupBackedBy && groupBackedBy.type === 'GH_REPO') {
+        groupBackedByRepo = this.repoCollection.findWhere({ uri: groupBackedBy.linkPath });
+      }
+      var isGroupBackedByRepo = groupBackedByRepo && !groupBackedByRepo.get('private');
+      var isAssociatedWithPublicRepo = associatedGithubProject && !associatedGithubProject.get('private');
+      var shouldHideAllowBadgerOption = !(isGroupBackedByRepo || isAssociatedWithPublicRepo) || security !== 'PUBLIC';
+      toggleClass(this.ui.allowBadgerOption[0], 'hidden', shouldHideAllowBadgerOption);
 
-      toggleClass(this.ui.roomDetailSection[0], 'hidden', shouldHideOnlyGitHubUsersOption && shouldHideOnlyOrgUsersOption);
+      toggleClass(this.ui.roomDetailSection[0], 'hidden', shouldHideOnlyGitHubUsersOption && shouldHideOnlyOrgUsersOption && shouldHideAllowBadgerOption);
 
       // Validation and Errors
       var roomAvailabilityStatusMessage = '';
@@ -438,14 +489,31 @@ var Modal = ModalView.extend({
     ModalView.prototype.initialize.call(this, options);
     this.view = new CreateRoomView(options);
   },
-  menuItems: [
-    {
+
+  menuItems: function() {
+    var result = [];
+    var user = context.user();
+    var scopes = user.get('scopes');
+
+    if (user.id && scopes && !scopes.private_repo) {
+      // GitHub user, without private repo access?
+      result.push({
+        action: "upgrade",
+        text: "GitHub Private Access",
+        pull: 'left',
+        className: "modal--default__footer__btn--neutral"
+      });
+    }
+
+    result.push({
       action: 'create',
       pull: 'right',
       text: 'Create',
       className: 'modal--default__footer__btn'
-    },
-  ]
+    });
+
+    return result;
+  }
 });
 
 
