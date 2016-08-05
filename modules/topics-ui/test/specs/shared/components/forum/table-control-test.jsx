@@ -3,6 +3,7 @@
 import assert from 'assert';
 import React from  'react';
 import Backbone from 'backbone';
+import sinon from 'sinon';
 import { shallow, mount } from 'enzyme';
 import TableControl from '../../../../../shared/components/forum/table-control.jsx';
 
@@ -11,15 +12,30 @@ var TagCollection = Backbone.Collection.extend({
   getTags(){ return this.models.map((m) => m.toJSON() ); }
 });
 
-describe('<TableControl/>', () => {
+describe.only('<TableControl/>', () => {
 
   let wrapper;
   let mounted;
-  let tagCollection;
+  let tags;
+  let filterHandle;
+
   beforeEach(() => {
-    tagCollection = new TagCollection([{value: 'all-tags', name: 'All Tags', active: true }])
-    wrapper = shallow(<TableControl tagStore={tagCollection} groupName="gitterHQ" category="all"/>);
-    mounted = mount(<TableControl tagStore={tagCollection} groupName="gitterHQ" category="all"/>);
+    filterHandle = sinon.spy();
+    tags = [{value: 'all-tags', name: 'All Tags', active: true }];
+    wrapper = shallow(
+      <TableControl
+      tags={tags}
+      groupName="gitterHQ"
+      category="all"
+      filterChange={filterHandle} />
+    );
+    mounted = mount(
+      <TableControl
+      tags={tags}
+      groupName="gitterHQ"
+      category="all"
+      filterChange={filterHandle}/>
+    );
   });
 
   it('should render a container', () => {
@@ -42,7 +58,7 @@ describe('<TableControl/>', () => {
     assert.equal(wrapper.find('TableControlButton').length, 3);
   });
 
-  it.skip('should render two select elements', () => {
+  it('should render two select elements', () => {
     assert.equal(wrapper.find('TableControlSelect').length, 2);
   });
 
@@ -52,6 +68,16 @@ describe('<TableControl/>', () => {
 
   it('should render only one divider', () => {
     assert.equal(wrapper.find('.tabel-control__divider').length, 1);
+  });
+
+  it('should call filterChange when a TopicTableButton is pressed', () => {
+    wrapper.find('TableControlButton').at(0).prop('onClick')();
+    assert.equal(filterHandle.callCount, 1);
+  });
+
+  it('should call filterChange with the right arguments', () => {
+    wrapper.find('TableControlButton').at(0).prop('onClick')('activity');
+    assert(filterHandle.calledWith('activity'));
   });
 
 });

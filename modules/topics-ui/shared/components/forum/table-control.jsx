@@ -3,8 +3,8 @@
 import React, { PropTypes } from 'react';
 import Container from '../container.jsx';
 import Panel from '../panel.jsx';
-import TopicTableButton from './table-control-button.jsx';
-import TopicTableSelect from './table-control-select.jsx';
+import TableControlButton from './table-control-button.jsx';
+import TableControlSelect from './table-control-select.jsx';
 
 module.exports = React.createClass({
 
@@ -13,7 +13,8 @@ module.exports = React.createClass({
     groupName: PropTypes.string.isRequired,
     category: PropTypes.string.isRequired,
     sortBy: PropTypes.array,
-    tags: PropTypes.array.isRequired
+    tags: PropTypes.array.isRequired,
+    filterChange: PropTypes.func.isRequired,
   },
 
   getDefaultProps(){
@@ -36,11 +37,11 @@ module.exports = React.createClass({
         <Panel className="panel--table-control">
           <nav>
             <ul className="table-control">
-              <li>{this.getChildTopicTableButton('Activity', 'activity')}</li>
-              <li>{this.getChildTopicTableButton('My Topics', 'my-topics')}</li>
-              <li className="tabel-control__divider">{this.getChildTopicTableButton('Watched', 'watched')}</li>
-              <li><TopicTableSelect options={tags} onChange={this.onTagChange} /></li>
-              <li><TopicTableSelect options={sortBy} onChange={this.onSortChange} /></li>
+              <li>{this.getChildTableControlButton('Activity', 'activity')}</li>
+              <li>{this.getChildTableControlButton('My Topics', 'my-topics')}</li>
+              <li className="tabel-control__divider">{this.getChildTableControlButton('Watched', 'watched')}</li>
+              <li><TableControlSelect options={tags} onChange={this.onTagChange} /></li>
+              <li><TableControlSelect options={sortBy} onChange={this.onSortChange} /></li>
             </ul>
           </nav>
         </Panel>
@@ -48,21 +49,22 @@ module.exports = React.createClass({
     );
   },
 
-  getChildTopicTableButton(title, value){
+  getChildTableControlButton(title, value){
     const { groupName, category } = this.props;
     return (
-      <TopicTableButton
+      <TableControlButton
         title={title}
         value={value}
         groupName={groupName}
         category={category}
         active={false}
-        onClick={this.onFilterUpdate}/>
+        onClick={this.onFilterChange}/>
     );
   },
 
-  onFilterUpdate(filter){
-    console.log('Filter Update', filter);
+  onFilterChange(filter){
+    const { filterChange } = this.props;
+    filterChange(filter);
   },
 
   onSortChange(sortType){
