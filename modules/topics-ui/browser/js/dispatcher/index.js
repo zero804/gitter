@@ -25,7 +25,6 @@ module.exports = {
 
   dispatch: function(data){
     var evt = data.type; delete data.type;
-    console.log(evt, data);
     Backbone.Events.trigger(evt, data);
   }
 
