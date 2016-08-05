@@ -17,11 +17,10 @@ var GroupSelectView = require('views/create-room/groupSelectView');
 var ModalView = require('./modal');
 var FilteredSelect = require('./filtered-select');
 var roomAvailabilityStatusConstants = require('../create-room/room-availability-status-constants');
+var scopeUpgrader = require('../../components/scope-upgrader');
 
 var template = require('./tmpl/create-room-view.hbs');
 var repoTypeaheadItemTemplate = require('./tmpl/create-room-repo-typeahead-item-view.hbs');
-
-
 
 var checkForRepoExistence = function(orgName, repoName) {
   if(orgName && repoName) {
@@ -37,6 +36,29 @@ var checkForRepoExistence = function(orgName, repoName) {
 
   return Promise.resolve(false);
 };
+
+function promptForHook() {
+  appEvents.trigger('user_notification', {
+    title: 'Authorisation',
+    text: 'Your room has been created, but we weren\'t able ' +
+      'to integrate with the repository as we need write ' +
+      'access to your GitHub repositories. Click here to ' +
+      'give Gitter access to do this.',
+    timeout: 12000,
+    click: function() {
+      return scopeUpgrader('public_repo')
+        .then(function() {
+          return apiClient.room.put('', { autoConfigureHooks: 1 });
+        })
+        .then(function() {
+          appEvents.trigger('user_notification', {
+            title: 'Thank You',
+            text: 'Your integrations have been setup.',
+          });
+        });
+    },
+  });
+}
 
 var CreateRoomView = Marionette.LayoutView.extend({
   template: template,
@@ -197,6 +219,9 @@ var CreateRoomView = Marionette.LayoutView.extend({
 
     apiClient.post(apiUrl, payload)
       .then(function(data) {
+        if (data.extra && data.extra.hookCreationFailedDueToMissingScope) {
+           setTimeout(promptForHook, 1500);
+        }
         this.dialog.hide();
         // url, type, title
         appEvents.trigger('navigation', urlJoin('/', data.uri), 'chat#add', data.uri);

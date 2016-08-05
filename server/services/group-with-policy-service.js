@@ -117,7 +117,10 @@ GroupWithPolicyService.prototype.createRoom = secureMethod([allowAdmin], functio
       })
     })
     .then(function(results) {
-      return results.troupe;
+      return {
+        troupe: results.troupe,
+        hookCreationFailedDueToMissingScope: results.hookCreationFailedDueToMissingScope
+      };
     });
 });
 
