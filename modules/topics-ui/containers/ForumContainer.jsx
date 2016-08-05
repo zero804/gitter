@@ -56,18 +56,18 @@ module.exports = React.createClass({
     return (
       <main>
         <CategoryList
-          categories={ categories }
           groupName={ groupName }
+          categories={ categories }
           //Change this attribute name to categoryChange
           onCategoryClicked={ this.onCategoryClicked } />
 
         <ForumTableControl
           groupName={groupName}
           category={categoryName}
+          tags={tags}
           filterChange={this.onFilterChange}
           sortChange={this.onSortChange}
-          tagChange={this.onTagChange}
-          tags={tags}/>
+          tagChange={this.onTagChange}/>
       </main>
     );
   },

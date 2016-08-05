@@ -12,8 +12,11 @@ function renderForum(req, res, next) {
     return next(new StatusError(404));
   }
 
-  var categoryFilter = (req.params.categoryName || 'all');
-  var tagFilter = (req.query.tag || 'all-tags');
+  var categoryName = (req.params.categoryName || 'all');
+  var tagName = (req.query.tag || 'all-tags');
+  var filterName = (req.query.filter || 'none');
+  var sortName = (req.query.sort || 'none');
+
 
   forumService.findByName(req.params.roomPart1)
     .then(function(forum){
@@ -23,11 +26,14 @@ function renderForum(req, res, next) {
         fonts: fonts.getFonts(),
         componentData: {
           forum: forum,
+
           groupName: req.params.roomPart1,
-          categoryStore: forumCategoryStore(forum.categories, categoryFilter),
-          categoryName: categoryFilter,
-          tagStore: forumTagStore(forum.tags, tagFilter),
-          tagName: tagFilter,
+          categoryName: categoryName,
+          filterName: filterName,
+          tagName: tagName,
+
+          categoryStore: forumCategoryStore(forum.categories, categoryName),
+          tagStore: forumTagStore(forum.tags, tagName),
         }
       });
     });

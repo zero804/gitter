@@ -3,8 +3,8 @@
 module.exports = function forumTagStore(tags = [], activeTagName = 'all-tags'){
 
   tags = tags.map((tag) => ({
-    value:    tag,
-    name:   tag,
+    value: tag,
+    name: tag,
     active: (tag === activeTagName),
   }));
 

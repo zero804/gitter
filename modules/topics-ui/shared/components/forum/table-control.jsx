@@ -51,7 +51,7 @@ module.exports = React.createClass({
     );
   },
 
-  getChildTableControlButton(title, value){
+  getChildTableControlButton(title, value, active=false){
     const { groupName, category, filterChange } = this.props;
     return (
       <TableControlButton
@@ -59,7 +59,7 @@ module.exports = React.createClass({
         value={value}
         groupName={groupName}
         category={category}
-        active={false}
+        active={active}
         onClick={(filter) => filterChange(filter)}/>
     );
   },
