@@ -15,7 +15,7 @@ function allowAdmin() {
 }
 
 function allowWrite() {
-  this.policy.canWrite();
+  return this.policy.canWrite();
 }
 
 function ForumWithPolicyService(forum, user, policy) {
@@ -81,12 +81,12 @@ ForumWithPolicyService.prototype.createCategory = secureMethod([allowAdmin], fun
   return forumCategoryService.createCategory(user, forum, categoryOptions);
 });
 
-ForumWithPolicyService.prototype.createTopic = secureMethod([allowWrite], function(options) {
+ForumWithPolicyService.prototype.createTopic = secureMethod([allowWrite], function(category, options) {
   var user = this.user;
   var forum = this.forum;
 
   var createOptions = getTopicOptions(options);
-  return topicService.createCategory(user, forum, createOptions);
+  return topicService.createTopic(user, category, createOptions);
 });
 
 ForumWithPolicyService.prototype.createReply = secureMethod([allowWrite], function(topic, options) {
