@@ -14,6 +14,7 @@ import navigateToTag from '../browser/js/action-creators/forum/navigate-to-tag';
 
 import forumCatConstants from '../browser/js/constants/forum-categories';
 import forumTagConstants from '../browser/js/constants/forum-tags';
+import forumFilterConstants from '../browser/js/constants/forum-filters';
 import navConstants from '../browser/js/constants/navigation';
 
 module.exports = React.createClass({
@@ -65,6 +66,7 @@ module.exports = React.createClass({
     const { categoryStore } = this.props;
     subscribe(forumCatConstants.UPDATE_ACTIVE_CATEGORY, this.onCategoryUpdate, this);
     subscribe(forumTagConstants.UPDATE_ACTIVE_TAG, this.onTagUpdate, this);
+    subscribe(forumFilterConstants.UPDATE_ACTIVE_FILTER, this.onFilterUpdate, this);
   },
 
   componentWillUnmount(){
@@ -126,6 +128,12 @@ module.exports = React.createClass({
     this.setState((state) => _.extend(state, {
       tags: tagStore.getTags(),
       tagName: tagStore.getActiveTagName(),
+    }));
+  },
+
+  onFilterUpdate(data){
+    this.setState((state) => _.extend(state, {
+      filterName: data.filter,
     }));
   }
 

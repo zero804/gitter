@@ -2,9 +2,10 @@
 
 var assert = require('assert');
 var Backbone = require('backbone');
+var sinon = require('sinon');
 var router = require('../../../../browser/js/routers/index');
 var sinon = require('sinon');
-var {dispatch} = require('../../../../browser/js/dispatcher');
+var {dispatch, subscribe} = require('../../../../browser/js/dispatcher');
 var navConstants = require('../../../../browser/js/constants/navigation.js');
 var forumCatConstants = require('../../../../browser/js/constants/forum-categories');
 var forumFilterConstants = require('../../../../browser/js/constants/forum-filters');
@@ -13,10 +14,12 @@ var forumSortConstants = require('../../../../browser/js/constants/forum-sorts')
 
 describe('Router', function(){
 
-  var trigger = {trigger: true};
+  const trigger = {trigger: true};
+  let filterHandle;
 
   beforeEach(function(){
     window.location.hash = 'gitterHQ/topics';
+    filterHandle = sinon.spy();
     Backbone.history.start({
       pushState: false,
     });
@@ -67,6 +70,12 @@ describe('Router', function(){
     dispatch({type: forumSortConstants.NAVIGATE_TO_SORT, route: 'forum', sort: 'test'});
     assert.equal(router.get('sortName'), 'test');
     assert.equal(router.get('route'), 'forum');
+  });
+
+  it('should dispacth the right event when the filter property updates', () => {
+    subscribe(forumFilterConstants.UPDATE_ACTIVE_FILTER, filterHandle);
+    router.set('filterName', 'test');
+    assert.equal(filterHandle.callCount, 1);
   });
 
 
