@@ -6,7 +6,7 @@ import {subscribe, unsubscribe, dispatch} from '../browser/js/dispatcher';
 import CategoryList from '../shared/components/forum/category-list.jsx';
 import TableControl from '../shared/components/forum/table-control.jsx';
 
-import navConstants from '../browser/js/constants/navigation';
+import navigateToCategory from '../browser/js/action-creators/forum/navigate-to-category';
 import forumCatConstants from '../browser/js/constants/forum-categories';
 
 module.exports = React.createClass({
