@@ -7,6 +7,9 @@ var Promise = require('bluebird');
 var StatusError = require('statuserror');
 var GroupWithPolicyService = testRequire('./services/group-with-policy-service');
 var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
+var groupService = require('gitter-web-groups/lib/group-service');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+
 
 var isAdminPolicy = {
   canAdmin: function() {
@@ -331,4 +334,40 @@ describe('group-with-policy-service #slow', function() {
 
   // TODO: test all the obtainAccessFromGitHubRepo cases
 
+  it('should create a forum for a group if it does not have one yet', function() {
+    return group1WithPolicyService.createForum()
+      .bind({
+        forum: null
+      })
+      .then(function(forum) {
+        this.forum = forum;
+
+        // load the group again so we can see if it actually set the group's forum
+        return groupService.findById(fixture.group1._id);
+      })
+      .then(function(group) {
+        // did it set the group's forumId?
+        assert(mongoUtils.objectIDsEqual(group.forumId, this.forum._id));
+      });
+  });
+
+  it('should throw an error when trying to create a forum for a group that has one already', function() {
+    return group2WithPolicyService.createForum()
+      .then(function() {
+        // reload the group so we get the updated group.forumId
+        return groupService.findById(fixture.group2._id);
+      })
+      .then(function(group) {
+        var updatedGroupWithPolicyService = new GroupWithPolicyService(group, fixture.user1, isAdminPolicy);
+
+        // try again (should fail)
+        return updatedGroupWithPolicyService.createForum()
+      })
+      .then(function() {
+        assert.ok(false, "Expected error.");
+      })
+      .catch(StatusError, function(err) {
+        assert.strictEqual(err.status, 409);
+      });
+  });
 });

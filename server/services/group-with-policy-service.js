@@ -147,14 +147,14 @@ GroupWithPolicyService.prototype._ensureAccessAndFetchRoomInfo = function(option
  * Allow admins to create a new forum
  * @return {Promise} Promise of forum
  */
-GroupWithPolicyService.prototype.createForum = secureMethod([allowAdmin], function(options) {
+GroupWithPolicyService.prototype.createForum = secureMethod([allowAdmin], function() {
   var user = this.user;
   var group = this.group;
 
   // For now we only allow one forum per group.
   // We don't upsert into the existing one either.
   if (group.forumId) {
-    throw new StatusError(400, 'Group already has a forum.');
+    throw new StatusError(409, 'Group already has a forum.');
   }
 
   // There is nothing configurable at this stage on forum level.
