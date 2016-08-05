@@ -18,6 +18,8 @@ module.exports = React.createClass({
     const { title, active, groupName, category, value } = this.props;
     const titleContent = `Filter current topics by ${title}`;
 
+    console.log(active);
+
     const className = !!active ?
       'topic-control__button--active' :
       'topic-control__button';

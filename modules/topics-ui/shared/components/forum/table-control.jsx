@@ -17,8 +17,6 @@ module.exports = React.createClass({
     tagName: PropTypes.string,
     sortName: PropTypes.string,
 
-    //Collections
-    sortBy: PropTypes.array,
     tags: PropTypes.array.isRequired,
     //Event handles
     filterChange: PropTypes.func.isRequired,
@@ -27,10 +25,17 @@ module.exports = React.createClass({
   },
 
   getDefaultProps(){
+    console.log(this.props && this.props.sortName);
     return {
-      filterName: 'none',
+      filterName: 'activity',
       tagName: 'all-tags',
-      sortName: 'none',
+      sortName: 'most-recent'
+    }
+  },
+
+  getInitialState(){
+    console.log(this.props);
+    return {
       sortBy: [
         { name: 'Most Recent', value: 'most-recent', selected: true },
         { name: 'Most Replies', value: 'most-replies' },
@@ -42,16 +47,19 @@ module.exports = React.createClass({
 
   render(){
 
-    const { groupName, sortBy, tags, sortChange, tagChange } = this.props;
+    const { groupName, tags, sortChange, tagChange, filterName, tagName, sortName } = this.props;
+    const { sortBy } = this.state;
+
+    console.log(filterName, '<---');
 
     return (
       <Container className="container--table-control">
         <Panel className="panel--table-control">
           <nav>
             <ul className="table-control">
-              <li>{this.getChildTableControlButton('Activity', 'activity')}</li>
-              <li>{this.getChildTableControlButton('My Topics', 'my-topics')}</li>
-              <li className="tabel-control__divider">{this.getChildTableControlButton('Watched', 'watched')}</li>
+              <li>{this.getChildTableControlButton('Activity', 'activity', filterName === 'activity')}</li>
+              <li>{this.getChildTableControlButton('My Topics', 'my-topics', filterName === 'my-topics')}</li>
+              <li className="tabel-control__divider">{this.getChildTableControlButton('Watched', 'watched', filterName === 'watched')}</li>
               <li><TableControlSelect options={tags} onChange={(tag) => tagChange(tag)} /></li>
               <li><TableControlSelect options={sortBy} onChange={(sort) => sortChange(sort)} /></li>
             </ul>
