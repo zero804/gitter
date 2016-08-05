@@ -130,6 +130,7 @@ module.exports = {
 
     var group;
     var room;
+    var hookCreationFailedDueToMissingScope;
 
     return groupService.createGroup(user, groupOptions)
       .then(function(_group) {
@@ -143,8 +144,10 @@ module.exports = {
 
         return groupWithPolicyService.createRoom(roomOptions);
       })
-      .then(function(_room) {
-        room = _room;
+      .then(function(createRoomResult) {
+        room = createRoomResult.troupe;
+        hookCreationFailedDueToMissingScope = createRoomResult.hookCreationFailedDueToMissingScope;
+        
         return policyFactory.createPolicyForRoomId(req.user, room._id);
       })
       .then(function(userRoomPolicy) {
@@ -177,6 +180,7 @@ module.exports = {
             restSerializer.serializeObject(room, troupeStrategy),
             function(serializedGroup, serializedRoom) {
               serializedGroup.defaultRoom = serializedRoom;
+              serializedGroup.hookCreationFailedDueToMissingScope = hookCreationFailedDueToMissingScope;
               return serializedGroup;
             }
           );
