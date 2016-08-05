@@ -19,10 +19,12 @@ describe.only('<TableControl/>', () => {
   let tags;
   let filterHandle;
   let tagHandle;
+  let sortHandle;
 
   beforeEach(() => {
     filterHandle = sinon.spy();
     tagHandle = sinon.spy();
+    sortHandle = sinon.spy();
     tags = [{value: 'all-tags', name: 'All Tags', active: true }];
     wrapper = shallow(
       <TableControl
@@ -30,7 +32,8 @@ describe.only('<TableControl/>', () => {
       groupName="gitterHQ"
       category="all"
       filterChange={filterHandle}
-      tagChange={tagHandle}/>
+      tagChange={tagHandle}
+      sortChange={sortHandle}/>
     );
     mounted = mount(
       <TableControl
@@ -38,7 +41,8 @@ describe.only('<TableControl/>', () => {
       groupName="gitterHQ"
       category="all"
       filterChange={filterHandle}
-      tagChange={tagHandle}/>
+      tagChange={tagHandle}
+      sortChange={sortHandle}/>
     );
   });
 
@@ -92,6 +96,16 @@ describe.only('<TableControl/>', () => {
   it('should call tagChange with the right arguments', () => {
     wrapper.find('TableControlSelect').at(0).prop('onChange')('tag');
     assert(tagHandle.calledWith('tag'));
+  });
+
+  it('should call sortChange when the second TopicTableSelect changes', () => {
+    wrapper.find('TableControlSelect').at(1).prop('onChange')();
+    assert.equal(sortHandle.callCount, 1);
+  });
+
+  it('should call sortChange with the right arguments', () => {
+    wrapper.find('TableControlSelect').at(1).prop('onChange')('sort');
+    assert(sortHandle.calledWith('sort'));
   });
 
 });
