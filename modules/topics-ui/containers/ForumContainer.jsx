@@ -4,9 +4,12 @@ import React from 'react';
 import {subscribe, unsubscribe, dispatch} from '../browser/js/dispatcher';
 
 import CategoryList from '../shared/components/forum/category-list.jsx';
-import TableControl from '../shared/components/forum/table-control.jsx';
+import ForumTableControl from '../shared/components/forum/table-control.jsx';
 
 import navigateToCategory from '../browser/js/action-creators/forum/navigate-to-category';
+import navigateToFilter from '../browser/js/action-creators/forum/navigate-to-filter';
+import navigateToSort from '../browser/js/action-creators/forum/navigate-to-sort';
+
 import forumCatConstants from '../browser/js/constants/forum-categories';
 
 module.exports = React.createClass({
@@ -54,11 +57,14 @@ module.exports = React.createClass({
         <CategoryList
           categories={ categories }
           groupName={ groupName }
+          //Change this attribute name to categoryChange
           onCategoryClicked={ this.onCategoryClicked } />
 
-        <TableControl
+        <ForumTableControl
           groupName={groupName}
           category={categoryName}
+          filterChange={this.onFilterChange}
+          sortChange={this.onSortChange}
           tags={tags}/>
       </main>
     );
@@ -68,8 +74,18 @@ module.exports = React.createClass({
     dispatch(navigateToCategory(category));
   },
 
+  onFilterChange(filter){
+    dispatch(navigateToFilter(filter));
+  },
+
+  onSortChange(sort) {
+    dispatch(navigateToSort(sort));
+  },
+
   onCategoryUpdate(){
     const { categoryStore } = this.props;
+    //TODO --> you can get the current state with setState((state) =>)
+    //use that and extend the payload with these new values
     this.setState({
       categories: categoryStore.getCategories(),
       categoryName: categoryStore.getActiveCategoryName(),
