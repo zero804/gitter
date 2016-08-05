@@ -2,12 +2,12 @@
 
 var assert = require('assert');
 var navigateToCategory = require('../../../../../browser/js/action-creators/forum/navigate-to-category');
-var navConstants = require('../../../../../browser/js/constants/navigation');
+var forumCatConstants = require('../../../../../browser/js/constants/forum-categories');
 
 describe('navigateToCategory', () => {
 
   it('should provide the right event type', () => {
-    assert.equal(navigateToCategory('all').type, navConstants.NAVIGATE_TO);
+    assert.equal(navigateToCategory('all').type, forumCatConstants.NAVIGATE_TO_CATEGORY);
   });
 
   it('should provde the right route value', () => {

@@ -5,6 +5,10 @@ var _ = require('lodash');
 var qs = require('qs');
 var { subscribe }  = require('../dispatcher');
 var navConstants = require('../constants/navigation');
+var forumCatConstants = require('../constants/forum-categories');
+var forumFilterConstants = require('../constants/forum-filters');
+var forumTagConstants = require('../constants/forum-tags');
+var forumSortConstants = require('../constants/forum-sorts');
 
 var _super = Backbone.Router.prototype;
 
@@ -17,7 +21,10 @@ var Router = Backbone.Router.extend({
 
   constructor: function(){
     this.model = new RouteModel();
-    subscribe(navConstants.NAVIGATE_TO, this.navigateTo, this);
+    subscribe(forumCatConstants.NAVIGATE_TO_CATEGORY, this.updateForumCategory, this);
+    subscribe(forumFilterConstants.NAVIGATE_TO_FILTER, this.updateForumFilter, this);
+    subscribe(forumTagConstants.NAVIGATE_TO_TAG, this.updateForumTag, this);
+    subscribe(forumSortConstants.NAVIGATE_TO_SORT, this.updateForumSort, this);
     _super.constructor.call(this, ...arguments);
   },
 
@@ -37,22 +44,58 @@ var Router = Backbone.Router.extend({
     });
   },
 
-  navigateTo(data){
-    switch(data.route) {
-      case 'forum': return this.navigateToForum(data);
-    }
+  updateForumCategory(data){
+    var url = this.buildForumUrl(data.category);
+    this.navigate(url, { trigger: true, replace: true });
   },
 
-  navigateToForum(data = { category: 'all' }){
-
-    const { category } = data;
-
-    var url = (data.category === 'all') ?
-      `/${this.model.get('groupName')}/topics` :
-      `/${this.model.get('groupName')}/topics/categories/${category}`;
-
+  updateForumFilter(data) {
+    var url = this.buildForumUrl(undefined, data.filter);
     this.navigate(url, { trigger: true, replace: true });
-  }
+  },
+
+  updateForumTag(data){
+    var url = this.buildForumUrl(undefined, undefined, data.tag);
+    this.navigate(url, { trigger: true, replace: true });
+  },
+
+  updateForumSort(data){
+    var url = this.buildForumUrl(undefined, undefined, undefined, data.sort);
+    this.navigate(url, { trigger: true, replace: true });
+  },
+
+  buildForumUrl(categoryName, filterName, tagName, sortName){
+
+    var groupName = this.model.get('groupName');
+    categoryName = categoryName || this.model.get('categoryName');
+
+    //Get current values and cancel anything that is a default
+    filterName = (filterName || this.model.get('filterName'));
+    if(filterName === navConstants.DEFAULT_FILTER_NAME) { filterName = undefined; }
+
+    tagName = (tagName || this.model.get('tagName'));
+    if(tagName === navConstants.DEFAULT_TAG_NAME) { tagName = undefined; }
+
+    sortName = (sortName || this.model.get('sortName'));
+    if(sortName === navConstants.DEFAULT_SORT_NAME) { sortName = undefined; }
+
+    //Base URL
+    let url = (categoryName === navConstants.DEFULT_CATEGORY_NAME) ?
+      `/${groupName}/topics/` :
+      `${groupName}/topics/categories/${categoryName}/`;
+
+    //QUERY STRING
+    const query = qs.stringify({
+      filter: filterName,
+      tag: tagName,
+      sort: sortName,
+    });
+
+    if(!!query.length) { url = `${url}?${query}`; }
+
+    return url;
+
+  },
 
 });
 

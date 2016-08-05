@@ -33,8 +33,8 @@ module.exports = React.createClass({
 
   onClick(e = { preventDefault: () => {}}) {
     e.preventDefault();
-    const { title, onClick } = this.props;
-    onClick(title);
+    const { value, onClick } = this.props;
+    onClick(value);
   }
 
 })

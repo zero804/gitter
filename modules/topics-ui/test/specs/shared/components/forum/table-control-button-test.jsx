@@ -47,7 +47,7 @@ describe('<TopicTableButton/>', () => {
   it('should call the onClick handle with the right data on click', () => {
     wrapper.find('a').simulate('click');
     assert.equal(clickHandle.callCount, 1);
-    assert(clickHandle.calledWith(title));
+    assert(clickHandle.calledWith(value));
   });
 
   it('should render an element with the right class', () => {
