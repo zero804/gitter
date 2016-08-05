@@ -7,7 +7,7 @@ var sinon = require('sinon');
 var { shallow } = require('enzyme');
 var ForumContainer = require('../../../containers/ForumContainer.jsx');
 var { subscribe } = require('../../../browser/js/dispatcher');
-var navConstants = require('../../../browser/js/constants/navigation');
+var forumCatConstants = require('../../../browser/js/constants/forum-categories');
 var forumFilterConstants = require('../../../browser/js/constants/forum-filters');
 var forumSortConstants = require('../../../browser/js/constants/forum-sorts');
 var forumTagConstants = require('../../../browser/js/constants/forum-tags');
@@ -42,7 +42,7 @@ describe('<ForumContainer />', function(){
   });
 
   it('should dispatch the right action when a category is clicked', function(){
-    subscribe(navConstants.NAVIGATE_TO, catChangeHandle);
+    subscribe(forumCatConstants.NAVIGATE_TO_CATEGORY, catChangeHandle);
     wrapper.find('CategoryList').prop('onCategoryClicked')('all');
     assert.equal(catChangeHandle.callCount, 1);
   });

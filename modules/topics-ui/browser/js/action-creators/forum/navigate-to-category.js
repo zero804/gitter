@@ -1,6 +1,6 @@
 "use strict";
 
-var navConstants = require('../../constants/navigation');
+var forumCatConstants = require('../../constants/forum-categories');
 
 module.exports = function navigateToCategory(category){
 
@@ -14,7 +14,7 @@ module.exports = function navigateToCategory(category){
      Move this into a specific event,
      the NAVIGATE_TO event is too generic
     */
-    type: navConstants.NAVIGATE_TO,
+    type: forumCatConstants.NAVIGATE_TO_CATEGORY,
     route: 'forum',
     category: category
   };
