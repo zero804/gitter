@@ -40,6 +40,7 @@ var Router = Backbone.Router.extend({
     this.model.set({
       route: 'forum' ,
       groupName: groupName,
+      //These should have defaults and be pulled from havigation constants
       categoryName: categoryName,
       filterName: query.filter,
       tagName: query.tag,

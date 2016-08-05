@@ -41,8 +41,8 @@ module.exports = React.createClass({
   getInitialState(){
     const { categoryStore, tagStore } = this.props;
     return {
-      categories: categoryStore.getCategories(),
       categoryName: this.props.categoryName,
+      categories: categoryStore.getCategories(),
       tags: tagStore.getTags()
     };
   },
@@ -69,7 +69,10 @@ module.exports = React.createClass({
 
         <ForumTableControl
           groupName={groupName}
-          category={categoryName}
+          categoryName={categoryName}
+          filterName={filterName}
+          tagName={tagName}
+          sortName={sortName}
           tags={tags}
           filterChange={this.onFilterChange}
           sortChange={this.onSortChange}
