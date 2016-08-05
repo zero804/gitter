@@ -70,10 +70,6 @@ describe('<TableControl/>', () => {
     assert.equal(wrapper.find('TableControlSelect').length, 2);
   });
 
-  it('should render with the right default props', () => {
-    assert.equal(mounted.props().sortBy.length, 4);
-  });
-
   it('should render only one divider', () => {
     assert.equal(wrapper.find('.tabel-control__divider').length, 1);
   });
