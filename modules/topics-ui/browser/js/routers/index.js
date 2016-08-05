@@ -3,7 +3,10 @@
 var Backbone = require('backbone');
 var _ = require('lodash');
 var qs = require('qs');
-var { subscribe }  = require('../dispatcher');
+var { subscribe, dispatch }  = require('../dispatcher');
+
+var updateActiveFilter = require('../action-creators/forum/update-active-filter');
+
 var navConstants = require('../constants/navigation');
 var forumCatConstants = require('../constants/forum-categories');
 var forumFilterConstants = require('../constants/forum-filters');
@@ -25,6 +28,9 @@ var Router = Backbone.Router.extend({
     subscribe(forumFilterConstants.NAVIGATE_TO_FILTER, this.updateForumFilter, this);
     subscribe(forumTagConstants.NAVIGATE_TO_TAG, this.updateForumTag, this);
     subscribe(forumSortConstants.NAVIGATE_TO_SORT, this.updateForumSort, this);
+
+    this.listenTo(this.model, 'change:filterName', this.onFilterUpdate, this);
+
     _super.constructor.call(this, ...arguments);
   },
 
@@ -62,6 +68,10 @@ var Router = Backbone.Router.extend({
   updateForumSort(data){
     var url = this.buildForumUrl(undefined, undefined, undefined, data.sort);
     this.navigate(url, { trigger: true, replace: true });
+  },
+
+  onFilterUpdate(model, val){
+    dispatch(updateActiveFilter(val));
   },
 
   buildForumUrl(categoryName, filterName, tagName, sortName){
