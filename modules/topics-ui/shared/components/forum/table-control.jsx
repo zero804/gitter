@@ -63,15 +63,4 @@ module.exports = React.createClass({
         onClick={(filter) => filterChange(filter)}/>
     );
   },
-
-  onSortChange(sort){
-    const { sortChange } = this.props;
-    sortChange(sort);
-  },
-
-  onTagChange(tag) {
-    const { tagChange } = this.props;
-    tagChange(tag);
-  }
-
 });
