@@ -1,14 +1,17 @@
 "use strict";
 
 var Promise = require('bluebird');
-var restful = require("../../../services/restful");
 var StatusError = require('statuserror');
+var clientEnv = require('gitter-client-env');
 var groupService = require('gitter-web-groups/lib/group-service');
-var restSerializer = require('../../../serializers/rest-serializer');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
+var inviteValidation = require('gitter-web-invites/lib/invite-validation');
+var TwitterBadger = require('gitter-web-twitter/lib/twitter-badger');
+var identityService = require('gitter-web-identity');
+var restful = require("../../../services/restful");
+var restSerializer = require('../../../serializers/rest-serializer');
 var GroupWithPolicyService = require('../../../services/group-with-policy-service');
 var RoomWithPolicyService = require('../../../services/room-with-policy-service');
-var inviteValidation = require('gitter-web-invites/lib/invite-validation');
 var internalClientAccessOnly = require('../../../web/middlewares/internal-client-access-only');
 
 var MAX_BATCHED_INVITES = 100;
@@ -68,6 +71,29 @@ function getRoomOptions(group, input) {
   return roomOptions;
 }
 
+
+function inviteTroubleTwitterUsers(user, room, invitesReport) {
+  return identityService.getIdentityForUser(user, 'twitter')
+    .then(function(identity) {
+      user.twitterUsername = identity.username;
+
+      var usersToTweet = [];
+      invitesReport.forEach(function(report) {
+        if(report.status === 'error' && report.inviteInfo.type === 'twitter') {
+          usersToTweet.push({
+            twitterUsername: report.inviteInfo.externalId
+          });
+        }
+      });
+
+      var roomUrl = room.lcUri ? (clientEnv['basePath'] + '/' + room.lcUri) : undefined;
+
+      return TwitterBadger.sendUserInviteTweets(user, usersToTweet, roomUrl);
+    });
+}
+
+
+
 module.exports = {
   id: 'group',
 
@@ -100,6 +126,7 @@ module.exports = {
     var groupOptions = getGroupOptions(req.body);
 
     var invites = getInvites(req.body.invites);
+    var allowTweeting = req.body.allowTweeting;
 
     var group;
     var room;
@@ -121,10 +148,19 @@ module.exports = {
         return policyFactory.createPolicyForRoomId(req.user, room._id);
       })
       .then(function(userRoomPolicy) {
+
         var roomWithPolicyService = new RoomWithPolicyService(room, req.user, userRoomPolicy);
         // Some of these can fail, but the errors will be caught and added to
         // the report that the promise resolves to.
         return roomWithPolicyService.createRoomInvitations(invites);
+      })
+      .then(function(invitesReport) {
+        // Tweet the users
+        if(allowTweeting) {
+          inviteTroubleTwitterUsers(req.user, room, invitesReport);
+        }
+
+        return invitesReport;
       })
       .then(function(/* invitesReport */) {
         var groupStrategy = new restSerializer.GroupStrategy();
