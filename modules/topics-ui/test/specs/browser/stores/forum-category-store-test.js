@@ -34,4 +34,8 @@ describe('ForumCategoryStore', function(){
     assert.equal(handle.callCount, 1);
   });
 
+  it('should return the active category name from getActiveCategoryName()', () => {
+    assert.equal(categoryStore.getActiveCategoryName(), 'all');
+  });
+
 });

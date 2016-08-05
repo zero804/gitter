@@ -25,6 +25,10 @@ module.exports = Backbone.Collection.extend({
     return this.models.map(model => model.toJSON());
   },
 
+  getActiveCategoryName(){
+    return this.findWhere({ active: true }).get('category');
+  },
+
   onCategoryUpdate(model, val){
     this.where({ active: true }).forEach((m) => m.set('active', false));
     this.findWhere({ category: val }).set('active', true);

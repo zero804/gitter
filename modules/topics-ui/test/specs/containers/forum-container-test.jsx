@@ -17,7 +17,7 @@ var TagCollection = Backbone.Collection.extend({
   getTags(){ return this.models.map((m) => m.toJSON() ); }
 });
 
-describe.only('<ForumContainer />', function(){
+describe('<ForumContainer />', function(){
 
   let wrapper;
   let catCollection;
