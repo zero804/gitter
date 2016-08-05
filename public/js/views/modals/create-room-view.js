@@ -162,6 +162,11 @@ var CreateRoomView = Marionette.LayoutView.extend({
     var onlyOrgUsers = this.model.get('onlyOrgUsers');
     var allowBadger = this.model.get('allowBadger');
 
+    // You should be stopped before this in the UI validation but a good sanity check
+    if(!selectedGroup) {
+      throw new Error('A group needs to be selected in order to create a room');
+    }
+
     var type = null;
     var linkPath = null;
     if(associatedGithubProject) {
@@ -459,7 +464,7 @@ var Modal = ModalView.extend({
     ModalView.prototype.initialize.call(this, options);
     this.view = new CreateRoomView(options);
   },
-  
+
   menuItems: function() {
     var result = [];
     var user = context.user();
