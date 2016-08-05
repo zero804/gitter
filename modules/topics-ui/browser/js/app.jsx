@@ -14,12 +14,6 @@ module.exports = React.createClass({
     router: React.PropTypes.shape({
       get: React.PropTypes.func.isRequired,
       set: React.PropTypes.func.isRequired,
-    }),
-
-    //CategoryStore (not required as not ALWAYS needed)
-    categoryStore: React.PropTypes.shape({
-      models: React.PropTypes.array.isRequired,
-      getCategories: React.PropTypes.func.isRequired
     })
   },
 

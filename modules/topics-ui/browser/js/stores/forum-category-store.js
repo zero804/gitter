@@ -16,7 +16,11 @@ module.exports = Backbone.Collection.extend({
     this.listenTo(this.router, 'change:categoryName', this.onCategoryUpdate, this);
   },
 
-  //This is basically a reducer
+  /*
+   TODO -->
+   This functionality is pretty generic on the client,
+   we should abstract into a base client here
+   */
   getCategories: function() {
     return this.models.map(model => model.toJSON());
   },
