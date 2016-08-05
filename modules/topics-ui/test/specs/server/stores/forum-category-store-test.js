@@ -14,6 +14,10 @@ describe('CategoryStore', function(){
   ];
 
   it('should return an object with models', function(){
+    /*
+     TODO -->
+     The models attribute is not used: REMOVE
+     */
     assert(categoryStore().models, 'should return a models property');
   });
 

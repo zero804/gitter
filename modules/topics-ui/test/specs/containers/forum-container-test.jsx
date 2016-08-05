@@ -5,7 +5,7 @@ var Backbone = require('backbone');
 var React = require('react');
 var { shallow } = require('enzyme');
 var ForumContainer = require('../../../containers/ForumContainer.jsx');
-var dispatcher = require('../../../browser/js/dispatcher');
+var { subscribe } = require('../../../browser/js/dispatcher');
 var navConstants = require('../../../browser/js/constants/navigation');
 
 //TODO move these into mock objects
@@ -30,7 +30,7 @@ describe('<ForumContainer />', function(){
 
   it('should dispatch the right action when a category is clicked', function(done){
 
-    dispatcher.on(navConstants.NAVIGATE_TO, function(data){
+    subscribe(navConstants.NAVIGATE_TO, function(data){
       assert.equal(data.route, 'forum');
       assert.equal(data.category, 'all');
       done();
