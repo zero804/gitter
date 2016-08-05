@@ -33,7 +33,6 @@ var Router = Backbone.Router.extend({
 
   forums(groupName, categoryName, queryString){
 
-    categoryName = (categoryName || 'all');
     queryString = (queryString || '');
     const query = qs.parse(queryString);
 
@@ -42,11 +41,10 @@ var Router = Backbone.Router.extend({
     this.model.set({
       route: 'forum' ,
       groupName: groupName,
-      //These should have defaults and be pulled from havigation constants
-      categoryName: categoryName,
-      filterName: query.filter,
-      tagName: query.tag,
-      sortName: query.sort
+      categoryName: (categoryName || navConstants.DEFAULT_CATEGORY_NAME),
+      filterName: (query.filter || navConstants.DEFAULT_FILTER_NAME),
+      tagName: (query.tag || navConstants.DEFULT_TAG_NAME),
+      sortName: (query.sort || navConstants.DEFAULT_SORT_NAME),
     });
   },
 
