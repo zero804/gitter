@@ -7,8 +7,8 @@ module.exports = function(plop) {
 
   var baseComponentDir = path.resolve(__dirname, '../../shared/components');
   var baseComponentDirs = glob.sync(baseComponentDir + '/*/');
-  var componentDirs = ['./'].concat(baseComponentDirs.map(function(folderPath){
-    return '.' + folderPath.replace(baseComponentDir, '');
+  var componentDirs = ['.'].concat(baseComponentDirs.map(function(folderPath){
+    return folderPath.replace(baseComponentDir, '');
   }));
 
   plop.setGenerator('component', {
@@ -36,7 +36,7 @@ module.exports = function(plop) {
 
       return [{
         type: 'add',
-        path: path.resolve(__dirname, '../../shared/components', data.subFolder) + '/{{dashCase name}}.jsx',
+        path: path.resolve(__dirname, '../../shared/components/', data.subFolder) + '/{{dashCase name}}.jsx',
         templateFile: path.resolve(__dirname, '../templates/component.txt'),
       }, {
         type: 'add',
