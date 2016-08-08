@@ -4,7 +4,7 @@ var env = require('gitter-web-env');
 var logger = env.logger;
 
 module.exports = exports = function badCredentialsCheck(err) {
-  if (err.statusCode == 401 || err.statusCode == 403) {
+  if (err.statusCode === 401 || err.statusCode === 403) {
     var logout = true;
 
     logger.info('Tentacles '+err.statusCode+' error.', {
