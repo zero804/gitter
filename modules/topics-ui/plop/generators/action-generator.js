@@ -46,6 +46,11 @@ module.exports = function(plop){
         path: path.resolve(__dirname, '../../browser/js/constants/', data.constantFile),
         pattern: /};/gi,
         template: "  {{constantCase name}}: '{{dashCase name}}',\n};"
+      },
+      {
+        type: 'add',
+        path: path.resolve(__dirname, '../../browser/js/action-creators', data.actionBaseDir) + '/{{dashCase name}}.js',
+        templateFile: path.resolve(__dirname, '../templates/action-creator.txt')
       }];
 
     }
