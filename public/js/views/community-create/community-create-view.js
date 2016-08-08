@@ -2,7 +2,7 @@
 
 var _ = require('underscore');
 var Marionette = require('backbone.marionette');
-var FilteredCollection = require('backbone-filtered-collection');
+var SimpleFilteredCollection = require('../../collections/simple-filtered-collection');
 var cocktail = require('cocktail');
 var toggleClass = require('utils/toggle-class');
 var appEvents = require('utils/appevents');
@@ -149,10 +149,9 @@ var CommunityCreateView = Marionette.LayoutView.extend({
       ]
     });
 
-    this.troubleInviteCollection = new FilteredCollection({
+    this.troubleInviteCollection = new SimpleFilteredCollection([], {
       collection: this.inviteCollection
     });
-    this.listenTo(this.troubleInviteCollection, 'filter-complete', this.onTroubleInviteFilterComplete, this);
     this.troubleInviteCollection.setFilter(function(model) {
       return model.get('inviteStatus') !== peopleToInviteStatusConstants.READY;
     });
@@ -234,10 +233,6 @@ var CommunityCreateView = Marionette.LayoutView.extend({
 
   navigationalHide: function() {
     this.closeView();
-  },
-
-  onTroubleInviteFilterComplete: function() {
-    this.troubleInviteCollection.trigger('reset');
   }
 });
 
