@@ -10,8 +10,6 @@ var debug = require('debug')('gitter:tests:test-fixtures');
 function createTopic(fixtureName, f) {
   debug('Creating %s', fixtureName);
 
-  console.log(f);
-
   var title = f.title || fixtureUtils.generateName();
   var doc = {
     title: title,
@@ -47,7 +45,7 @@ function createExtraTopics(expected, fixture, key) {
 
   debug('creating extra topic %s', topic);
 
-  return createTopic(category, {})
+  return createTopic(topic, {})
     .then(function(createdTopic) {
       obj.topic = createdTopic;
       fixture[topic] = createdTopic;

@@ -73,7 +73,7 @@ function createExtraGroups(expected, fixture, key) {
   if (fixture[group]) {
     // Already specified at the top level
     obj.group = fixture[group];
-    return
+    return;
   }
 
   debug('creating extra group %s', group);

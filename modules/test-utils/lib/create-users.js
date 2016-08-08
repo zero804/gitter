@@ -69,6 +69,11 @@ function createExtraUsers(expected, fixture, key) {
   var obj = expected[key];
   var users = [];
 
+  if (obj.user) {
+    // topics, replies and comments
+    users.push(obj.user);
+  }
+
   if (obj.users) {
     if (!Array.isArray(obj.users)) {
       obj.users = [obj.users];
@@ -98,6 +103,7 @@ function createExtraUsers(expected, fixture, key) {
   return Promise.map(users, function(user, index) {
       if (typeof user === 'string') {
         if (expected[user]) return; // Already specified at the top level
+
         expected[user] = {};
         return createUser(user, {}).then(function(createdUser) {
           fixture[user] = createdUser;
@@ -115,6 +121,20 @@ function createExtraUsers(expected, fixture, key) {
           fixture[fixtureName] = user;
         });
 
+    })
+    .then(function() {
+      // now try and fill in the ones specified at the top level
+      // (This applies to topics, replies and comments)
+
+      var obj = expected[key];
+      var user = obj.user;
+
+      if (!user) return;
+
+      if (typeof user === 'string' && fixture[user]) {
+        // Already specified at the top level, so copy it
+        obj.user = fixture[user];
+      }
     });
 }
 
