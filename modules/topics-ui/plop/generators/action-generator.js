@@ -10,6 +10,11 @@ module.exports = function(plop){
     return fullPath.replace(baseConstFilePath + '/', '');
   });
 
+  var baseActionCreatorsFolder = path.resolve(__dirname, '../../browser/js/action-creators');
+  var actionCreatorFolders = glob.sync(baseActionCreatorsFolder + '/*').map(function(folderPath){
+    return folderPath.replace(baseActionCreatorsFolder, '');
+  });
+
   plop.setGenerator('action', {
     description: 'Generate a system action',
     prompts: [{
@@ -20,7 +25,14 @@ module.exports = function(plop){
         if ((/.+/).test(value)) { return true; }
         return 'name is required';
       }
-    }, {
+    },
+    {
+      type: 'list',
+      name: 'actionBaseDir',
+      message: 'Pick a sub folder to add the action creator to',
+      choices: actionCreatorFolders,
+    },
+    {
       type: 'list',
       name: 'constantFile',
       message: 'Pick a file to add you event constant to',
@@ -28,11 +40,8 @@ module.exports = function(plop){
     }],
     actions: function(data){
 
-      console.log('-----------------------');
-      console.log(data);
-      console.log('-----------------------');
-
       return [{
+        //Add the action type to a constant file
         type: 'modify',
         path: path.resolve(__dirname, '../../browser/js/constants/', data.constantFile),
         pattern: /};/gi,
