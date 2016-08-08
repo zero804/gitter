@@ -18,6 +18,7 @@ var config = _.extend({}, webpackConfig, {
       mocha: path.resolve(__dirname, '../node_modules/mocha/mocha.js'),
       mochaCss: path.resolve(__dirname, '../node_modules/mocha/mocha.css'),
       jquery: path.resolve(__dirname, '../node_modules/jquery/dist/jquery.js'),
+      sinon: path.resolve(__dirname, '../node_modules/sinon/pkg/sinon.js'),
     }
   }
 });

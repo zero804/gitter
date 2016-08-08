@@ -18,6 +18,9 @@ var config = {
     devtoolFallbackModuleFilenameTemplate: "[resource-path]?[hash]"
   },
   module: {
+    noParse: [
+      /\/sinon\.js/,
+    ],
     preLoaders: [
       {
         test: /.css$/,
