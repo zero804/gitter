@@ -97,19 +97,21 @@ function applyAutoHooksForRepoRoom(user, troupe) {
 
 function doPostGitHubRoomCreationTasks(troupe, user, options) {
   var uri = troupe.uri;
+
+  debug('Executing doPostGitHubRoomCreationTasks for ' + uri);
+
   if (!user) return; // Can this ever happen?
 
-  // TODO: remove this as it is never set anymore and the new create room API
-  // opts itsef into this function rather than out.
-  if (options.skipPostCreationSteps) return;
-
-  if (!securityDescriptorUtils.isType('GH_REPO', troupe)) return;
+  if (!securityDescriptorUtils.isType('GH_REPO', troupe)) {
+    debug('Room is not type GH_REPO: ' + uri);
+    return;
+  }
 
   /* Created here */
   /* TODO: Later we'll need to handle private repos too */
   var hasScope = userScopes.hasGitHubScope(user, "public_repo");
   var hookCreationFailedDueToMissingScope;
-  if(hasScope) {
+  if (hasScope) {
     debug('User has public_repo scope. Will attempt to setup webhooks for this room');
 
     /* Do this asynchronously */
@@ -119,15 +121,21 @@ function doPostGitHubRoomCreationTasks(troupe, user, options) {
         errorReporter(err, { uri: uri, user: user.username }, { module: 'room-service' });
       });
   } else {
+    debug('User lacks public_repo scope.');
     hookCreationFailedDueToMissingScope = true;
   }
 
-  if(securityDescriptorUtils.isPublic(troupe) && badgerEnabled && options.addBadge) {
+  if (securityDescriptorUtils.isPublic(troupe) && badgerEnabled && options.addBadge) {
     /* Do this asynchronously (don't chain the promise) */
     userSettingsService.getUserSettings(user.id, 'badger_optout')
       .then(function(badgerOptOut) {
         // If the user has opted out never send the pull request
-        if(badgerOptOut) return;
+        if (badgerOptOut) {
+          debug('User opted out of badger PRs: ' + user.id);
+          return;
+        }
+
+        debug('Sending a badger PR for ' + uri);
 
         // Badgers Go!
         return badger.sendBadgePullRequest(uri, user);
@@ -136,6 +144,8 @@ function doPostGitHubRoomCreationTasks(troupe, user, options) {
         errorReporter(err, { uri: uri, user: user.username }, { module: 'room-service' });
         logger.error('Unable to send pull request for new room', { exception: err });
       });
+  } else {
+    debug('Not adding a badger PR. Public %s, badgerEnabled: %s, addBadge: %s', securityDescriptorUtils.isPublic(troupe), badgerEnabled, options.addBadge);
   }
 
   return {
@@ -549,7 +559,7 @@ function joinRoom(room, user, options) {
     .then(function() {
       var flags = userDefaultFlagsService.getDefaultFlagsForUser(user);
 
-      return roomMembershipService.addRoomMember(room._id, user._id, flags);
+      return roomMembershipService.addRoomMember(room._id, user._id, flags, room.groupId);
     })
     .then(function() {
       sendJoinStats(user, room, options.tracking);
@@ -733,7 +743,7 @@ function deleteRoom(troupe) {
         }))
         .then(function() {
           // Remove all the folk from the room
-          return roomMembershipService.removeRoomMembers(troupe._id, userIds);
+          return roomMembershipService.removeRoomMembers(troupe._id, userIds, troupe.groupId);
         });
     })
     .then(function() {
@@ -808,7 +818,7 @@ function createGroupRoom(user, group, roomInfo, securityDescriptor, options) {
     })
     .then(function() {
       var flags = userDefaultFlagsService.getDefaultFlagsForUser(user);
-      return roomMembershipService.addRoomMember(room._id, user._id, flags);
+      return roomMembershipService.addRoomMember(room._id, user._id, flags, group._id);
     })
     .then(function() {
       // Send the created room notification

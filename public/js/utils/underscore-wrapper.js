@@ -7,6 +7,11 @@ var _ = require('../../../node_modules/underscore');
 
 var ObjProto = Object.prototype;
 var toString = ObjProto.toString;
+var objValueOf = ObjProto.valueOf;
+
+function customValueOfFunction(f) {
+  return _.isFunction(f) && f !== objValueOf;
+}
 
 // Internal recursive comparison function for `isEqual`.
 function eq(a, b, aStack, bStack) {
@@ -78,7 +83,7 @@ function eq(a, b, aStack, bStack) {
       }
     }
   } else {
-    if(_.isFunction(a.valueOf) && _.isFunction(b.valueOf)) {
+    if(customValueOfFunction(a.valueOf) && customValueOfFunction(b.valueOf)) {
       var vA = a.valueOf();
       var vB = b.valueOf();
 
