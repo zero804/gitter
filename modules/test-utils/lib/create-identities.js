@@ -1,7 +1,7 @@
 "use strict";
 
 var Promise = require('bluebird');
-var Identity = require('gitter-web-persistence').Topic;
+var Identity = require('gitter-web-persistence').Identity;
 var debug = require('debug')('gitter:tests:test-fixtures');
 
 function createIdentity(fixtureName, f) {
