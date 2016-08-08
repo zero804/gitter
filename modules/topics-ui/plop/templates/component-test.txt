@@ -7,6 +7,12 @@ import {{properCase name}} from '../../../../shared/components/{{subFolder}}/{{d
 
 describe('<{{properCase name}}/>', () => {
 
+  let wrapper;
+
+  beforeEach(() => {
+    wrapper = shallow(<{{properCase name}}/>);
+  });
+
   it('should fail a test because you should write some', () => {
     assert(false);
   });
