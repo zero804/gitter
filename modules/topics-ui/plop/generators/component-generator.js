@@ -31,12 +31,13 @@ module.exports = function(plop) {
     actions: function(data){
 
       console.log('-----------------------');
-      console.log(path.resolve(__dirname, '../../shared/components', data.subFolder));
+      console.log(data.subFolder);
       console.log('-----------------------');
+      var subFolder = (data.subFolder === '.') ? '' : data.subFolder;
 
       return [{
         type: 'add',
-        path: path.resolve(__dirname, '../../shared/components/', data.subFolder) + '/{{dashCase name}}.jsx',
+        path: path.resolve(__dirname, '../../shared/components/', subFolder) + '/{{dashCase name}}.jsx',
         templateFile: path.resolve(__dirname, '../templates/component.txt'),
       }, {
         type: 'add',
