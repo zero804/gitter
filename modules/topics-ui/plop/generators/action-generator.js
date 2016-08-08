@@ -49,7 +49,7 @@ module.exports = function(plop){
       },
       {
         type: 'add',
-        path: path.resolve(__dirname, '../../browser/js/action-creators', data.actionBaseDir) + '/{{dashCase name}}.js',
+        path: path.resolve(__dirname, '../../browser/js/action-creators', '.' + data.actionBaseDir) + '/{{dashCase name}}.js',
         templateFile: path.resolve(__dirname, '../templates/action-creator.txt')
       }];
 
