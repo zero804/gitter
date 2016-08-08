@@ -1,11 +1,14 @@
 "use strict";
 
-module.exports = function forumTagStore(tags = [], activeTagName = 'all-tags'){
+module.exports = function forumTagStore(tags, activeTagName){
+
+  tags = (tags || []);
+  activeTagName = (activeTagName || 'all-tags');
 
   tags = tags.map((tag) => ({
     value: tag,
     name: tag,
-    active: (tag === activeTagName),
+    active: (tag === activeTagName)
   }));
 
   tags.unshift({ value: 'all-tags', name: 'All Tags', active: (activeTagName === 'all-tags') });
@@ -14,6 +17,6 @@ module.exports = function forumTagStore(tags = [], activeTagName = 'all-tags'){
 
   return {
     models: tags,
-    getTags: getTags,
+    getTags: getTags
   };
 };

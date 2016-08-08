@@ -1,7 +1,6 @@
 "use strict";
 
 var path = require('path');
-var webpack = require('webpack');
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 var getPostcssStack = require('gitter-styleguide/postcss-stack');
 

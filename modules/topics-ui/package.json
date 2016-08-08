@@ -10,12 +10,16 @@
   "author": "Gitter Team",
   "license": "ISC",
   "dependencies": {
+    "backbone": "^1.3.3",
+    "extract-text-webpack-plugin": "^1.0.1",
+    "gitter-styleguide": "^1.6.6",
     "glob": "^7.0.5",
     "lodash": "^4.14.0",
     "mocha": "^2.5.3",
     "qs": "^6.2.1",
     "react": "^15.2.1",
-    "react-dom": "^15.2.1"
+    "react-dom": "^15.2.1",
+    "sinon": "^1.17.5"
   },
   "devDependencies": {
     "babel-loader": "^6.2.4",
@@ -27,8 +31,6 @@
     "enzyme": "^2.4.1",
     "eslint": "^3.1.1",
     "eslint-plugin-mocha": "^4.2.0",
-    "extract-text-webpack-plugin": "^1.0.1",
-    "gitter-styleguide": "^1.6.6",
     "gitter-web-qs": "file:../qs",
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
@@ -36,6 +38,7 @@
     "less-loader": "^2.2.3",
     "postcss-less": "^0.14.0",
     "postcss-loader": "^0.9.1",
+    "raf": "^3.2.0",
     "react-addons-shallow-compare": "^15.3.0",
     "react-addons-test-utils": "^15.2.1",
     "style-loader": "^0.13.1",

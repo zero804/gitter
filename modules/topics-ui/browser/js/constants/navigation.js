@@ -1,3 +1,5 @@
+"use strict";
+
 module.exports = {
   NAVIGATE_TO: 'navigate-to',
   DEFAULT_CATEGORY_NAME: 'all',
