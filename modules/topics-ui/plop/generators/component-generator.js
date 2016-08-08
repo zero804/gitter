@@ -36,8 +36,12 @@ module.exports = function(plop) {
 
       return [{
         type: 'add',
-        path: path.resolve(__dirname, '../../shared/components', data.subFolder) + '/{{dashCase name}}.js',
+        path: path.resolve(__dirname, '../../shared/components', data.subFolder) + '/{{dashCase name}}.jsx',
         templateFile: path.resolve(__dirname, '../templates/component.txt'),
+      }, {
+        type: 'add',
+        path: path.resolve(__dirname, '../../test/specs/shared/components', data.subFolder) + '/{{dashCase name}}.jsx',
+        templateFile: path.resolve(__dirname, '../templates/component-test.txt'),
       }];
     }
   });
