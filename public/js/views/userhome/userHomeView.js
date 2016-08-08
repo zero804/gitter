@@ -60,7 +60,9 @@ module.exports = (function() {
       var target = e.target.href;
 
       window.addEventListener("message", function(event) {
-        if(event.data === 'oauth_upgrade_complete') {
+        var data = event.data;
+
+        if(data && data.type === 'oauth_upgrade_complete') {
           window.location.reload(true);
         }
       }, false);
