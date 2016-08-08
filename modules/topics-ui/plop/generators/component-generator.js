@@ -40,7 +40,7 @@ module.exports = function(plop) {
         templateFile: path.resolve(__dirname, '../templates/component.txt'),
       }, {
         type: 'add',
-        path: path.resolve(__dirname, '../../test/specs/shared/components', data.subFolder) + '/{{dashCase name}}.jsx',
+        path: path.resolve(__dirname, '../../test/specs/shared/components', data.subFolder) + '/{{dashCase name}}-test.jsx',
         templateFile: path.resolve(__dirname, '../templates/component-test.txt'),
       }];
     }
