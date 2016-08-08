@@ -1,12 +1,14 @@
 'use strict';
 
 var _ = require('underscore');
+var Promise = require('bluebird');
 var toggleClass = require('utils/toggle-class');
 var context = require('utils/context');
 var slugify = require('slug');
 var fuzzysearch = require('fuzzysearch');
-var FilteredCollection = require('backbone-filtered-collection');
+var SimpleFilteredCollection = require('../../../collections/simple-filtered-collection');
 var getRoomNameFromTroupeName = require('gitter-web-shared/get-room-name-from-troupe-name');
+var scopeUpgrader = require('../../../components/scope-upgrader');
 
 require('views/behaviors/isomorphic');
 
@@ -59,7 +61,8 @@ module.exports = CommunityCreateBaseStepView.extend({
     orgsArea: '.js-community-create-github-projects-orgs-area',
     reposArea: '.js-community-create-github-projects-repos-area',
     repoFilterInput: '.primary-community-repo-name-filter-input',
-    repoScopeMissingNote: '.community-create-repo-missing-note'
+    repoScopeMissingNote: '.community-create-repo-missing-note',
+    upgradeGitHub: '.js-upgrade-github',
   }),
 
   events: _.extend({}, _super.events, {
@@ -67,7 +70,8 @@ module.exports = CommunityCreateBaseStepView.extend({
     'click @ui.backStep': 'onStepBack',
     'click @ui.orgsToggle': 'onOrgsAreaToggle',
     'click @ui.reposToggle': 'onReposAreaToggle',
-    'input @ui.repoFilterInput': 'onRepoFilterInputChange'
+    'input @ui.repoFilterInput': 'onRepoFilterInputChange',
+    'click @ui.upgradeGitHub': 'onUpgradeGitHub'
   }),
 
   modelEvents: _.extend({}, _super.modelEvents, {
@@ -82,14 +86,12 @@ module.exports = CommunityCreateBaseStepView.extend({
     this.unusedOrgCollection = options.unusedOrgCollection;
     this.repoCollection = options.repoCollection;
     this.unusedRepoCollection = options.unusedRepoCollection;
-    this.filteredUnusedRepoCollection = new FilteredCollection({
+    this.filteredUnusedRepoCollection = new SimpleFilteredCollection([], {
       collection: this.unusedRepoCollection
     });
 
     this.throttledApplyFilterToRepos = _.throttle(this.applyFilterToRepos, 500);
     this.shortThrottledApplyFilterToRepos = _.throttle(this.applyFilterToRepos, 100);
-
-    this.listenTo(this.filteredUnusedRepoCollection, 'filter-complete', this.onRepoFilterComplete, this);
   },
 
   serializeData: function() {
@@ -250,7 +252,56 @@ module.exports = CommunityCreateBaseStepView.extend({
     });
   },
 
-  onRepoFilterComplete: function() {
-    this.filteredUnusedRepoCollection.trigger('reset');
+  fetchRepos: function() {
+    var self = this;
+    return new Promise(function(resolve, reject) {
+      self.repoCollection.fetch({
+        reset: true,
+        data: {
+          cb: Date.now()
+        },
+        success: function() {
+          resolve();
+        },
+        error: reject
+      });
+
+    });
+  },
+
+  fetchUnusedRepos: function() {
+    var self = this;
+    return new Promise(function(resolve, reject) {
+      self.unusedRepoCollection.fetch({
+        reset: true,
+        data: {
+          type: 'unused',
+          cb: Date.now()
+        },
+        success: function() {
+          resolve();
+        },
+        error: reject
+      });
+
+    });
+  },
+
+  onUpgradeGitHub: function(e) {
+    e.preventDefault();
+
+    var self = this;
+    scopeUpgrader('repo')
+      .then(function() {
+        self.ui.repoScopeMissingNote.hide();
+        return Promise.join(
+          self.fetchUnusedRepos(),
+          self.fetchRepos(),
+          function() {
+            self.applyFilterToRepos();
+          });
+      });
+
+    return false;
   }
 });
