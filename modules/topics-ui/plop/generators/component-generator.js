@@ -29,9 +29,16 @@ module.exports = function(plop) {
       choices: componentDirs,
     }],
     actions: function(data){
-      return [{
 
-      }]
+      console.log('-----------------------');
+      console.log(path.resolve(__dirname, '../../shared/components', data.subFolder));
+      console.log('-----------------------');
+
+      return [{
+        type: 'add',
+        path: path.resolve(__dirname, '../../shared/components', data.subFolder) + '{{dashCase name}}',
+        templateFile: path.resolve(__dirname, '../templates/component.txt'),
+      }];
     }
   });
 
