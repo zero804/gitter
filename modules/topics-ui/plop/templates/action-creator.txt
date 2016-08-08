@@ -1,6 +1,6 @@
 "use strict";
 
-var constants = require('../constants/{{constantFile}}');
+var constants = require('../../constants/{{constantFile}}');
 
 module.exports = function {{camelCase name}}(){
   return {
