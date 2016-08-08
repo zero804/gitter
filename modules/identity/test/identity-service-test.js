@@ -8,6 +8,7 @@ describe('identityService', function() {
   var fixture = {};
   before(fixtureLoader(fixture, {
     deleteDocuments: {
+      User: [{ githubId: null }],
       Identity: [{ provider: 'google', providerKey: 'google-identity' }]
     },
     user1: {
