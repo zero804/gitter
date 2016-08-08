@@ -10,7 +10,6 @@ const router = require('./routers/index');
 
 const App = React.createFactory(app);
 const appRoot = document.getElementById('app-root');
-const context = window.context;
 
 Backbone.history.start({ pushState: true });
 reactDOM.render(App({ router: router }), appRoot);

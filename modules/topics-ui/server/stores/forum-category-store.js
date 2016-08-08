@@ -1,6 +1,9 @@
 "use strict";
 
-module.exports = function forumCategoryStore(categories = [], categoryFilter = 'all') {
+module.exports = function forumCategoryStore(categories, categoryFilter) {
+
+  categories = (categories || []);
+  categoryFilter = (categoryFilter || 'all');
 
   categories = categories.map((cat) => ({
     category: cat,

@@ -1,9 +1,8 @@
 "use strict"
 
 var Backbone = require('backbone');
-var _ = require('lodash');
 var qs = require('qs');
-var { subscribe, dispatch }  = require('../dispatcher');
+var { subscribe, dispatch } = require('../dispatcher');
 
 var updateActiveFilter = require('../action-creators/forum/update-active-filter');
 var updateActiveSort = require('../action-creators/forum/update-active-sort');
