@@ -5,7 +5,7 @@
 <script type="text/javascript">
 window.onload = function() {
   if (window.opener) {
-    window.opener.postMessage("oauth_upgrade_complete", "*");
+    window.opener.postMessage({{{ oAuthCompletePostMessage }}}, "*");
     window.close();
   } else {
     location.href = '/';
