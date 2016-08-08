@@ -33,7 +33,7 @@ var ActiveCollection = Backbone.Collection.extend({
   },
 
   onItemAdded: function(model) {
-    this.add(new ActiveItemModel(model.toJSON()));
+    this.add(new ActiveItemModel(model.attributes));
   },
   onItemRemoved: function(model) {
     this.remove(model);
@@ -60,8 +60,8 @@ var ActiveCollection = Backbone.Collection.extend({
 
   addModels: function(models) {
     models = models || [];
-    this.set(models.map(function(model) {
-      return new ActiveItemModel(model.toJSON());
+    this.reset(models.map(function(model) {
+      return new ActiveItemModel(model.attributes);
     }));
   }
 });
