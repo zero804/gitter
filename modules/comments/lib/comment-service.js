@@ -8,7 +8,7 @@ var processText = require('gitter-web-text-processor');
 var markdownMajorVersion = require('gitter-markdown-processor').version.split('.')[0];
 
 
-function createComment(user, forum, reply, options) {
+function createComment(user, reply, options) {
   return processText(options.text)
     .then(function(parsedMessage) {
       var insertData = {

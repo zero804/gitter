@@ -30,13 +30,13 @@ describe('forum-with-policy-service #slow', function() {
       forum: 'forum1',
       category: 'category1'
     },
-    /*
     reply1: {
       user: 'user1',
       forum: 'forum1',
       category: 'category1',
       topic: 'topic1'
     },
+    /*
     comment1: {
       user: 'user1',
       forum: 'forum1',
@@ -69,7 +69,7 @@ describe('forum-with-policy-service #slow', function() {
       })
       .then(function(topic) {
         assert.strictEqual(topic.title, 'foo');
-        assert(mongoUtils.objectIDsEqual(topic.categoryId, fixture.category1.id));
+        assert(mongoUtils.objectIDsEqual(topic.categoryId, fixture.category1._id));
         assert.deepEqual(topic.tags.slice(), ['cats', 'dogs']);
         assert.ok(topic.sticky);
         assert.strictEqual(topic.text, 'This is **my** story.');
@@ -90,6 +90,19 @@ describe('forum-with-policy-service #slow', function() {
       });
   });
 
-  it('should allow members to comments on topics');
+  it('should allow members to comments on topics', function() {
+    return forumWithPolicyService.createComment(fixture.reply1, {
+        text: '**hi!**'
+      })
+      .then(function(comment) {
+        assert(mongoUtils.objectIDsEqual(comment.userId, fixture.user1._id));
+        assert(mongoUtils.objectIDsEqual(comment.forumId, fixture.forum1._id));
+        assert(mongoUtils.objectIDsEqual(comment.topicId, fixture.topic1._id));
+        assert(mongoUtils.objectIDsEqual(comment.replyId, fixture.reply1._id));
+        assert.strictEqual(comment.text, '**hi!**');
+        assert.strictEqual(comment.html, '<strong>hi!</strong>');
+      });
+
+  });
 
 });

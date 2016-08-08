@@ -14,7 +14,7 @@ var fixtureSteps = [
   require('./create-forums'),
   require('./create-categories'),
   require('./create-topics'),
-  //require('./create-replies'),
+  require('./create-replies'),
   //require('./create-comments'),
   require('./create-groups'),
   require('./create-troupes'),
