@@ -106,7 +106,9 @@ module.exports = CommunityCreateBaseStepView.extend({
           linkPath: linkPath
         },
         invites: [].concat(communityCreateModel.peopleToInvite.toJSON(), communityCreateModel.emailsToInvite.toJSON()),
-        addBadge: communityCreateModel.get('allowBadger')
+        addBadge: communityCreateModel.get('allowBadger'),
+        // TODO: ADD UI option
+        allowTweeting: true
       }, {
         wait: true,
         success: function(model, response) {

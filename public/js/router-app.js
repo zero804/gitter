@@ -30,6 +30,7 @@ var OrgCollection = orgModels.OrgCollection;
 var groupModels = require('collections/groups');
 var CommunityCreateModel = require('views/community-create/community-create-model');
 var CreateRoomModel = require('models/create-room-view-model');
+var scopeUpgrader = require('components/scope-upgrader');
 
 var AppLayout = require('views/layouts/app-layout');
 var LoadingView = require('views/app/loading-view');
@@ -47,8 +48,6 @@ require('components/ping');
 
 // Preload widgets
 require('views/widgets/avatar');
-
-
 
 onready(function() {
   var chatIFrame = document.getElementById('content-frame');
@@ -495,6 +494,8 @@ onready(function() {
     routes: {
       // TODO: get rid of the pipes
       '': 'hideModal',
+      'upgraderepoaccess': 'upgradeRepoAccess',
+      'upgraderepoaccess/:name': 'upgradeRepoAccess',
       'createroom': 'createroom',
       'createroom/:name': 'createroom',
       'confirm/*uri': 'confirmRoom',
@@ -578,6 +579,13 @@ onready(function() {
 
         appLayout.dialogRegion.show(communityCreateView);
       });
+    },
+
+    upgradeRepoAccess: function(returnLocation) {
+      scopeUpgrader('repo')
+        .then(function() {
+          window.location.href = '#' + (returnLocation || '');
+        });
     }
   });
 
