@@ -14,7 +14,7 @@ describe('<{{properCase name}}/>', () => {
   });
 
   it('should fail a test because you should write some', () => {
-    assert(false);
+    assert(false, 'Srsly, write some tests');
   });
 
 });
