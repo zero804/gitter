@@ -271,15 +271,15 @@ module.exports = Backbone.Model.extend({
   //This can be changed to userPreferences once the data is maintained
   //JP 8/1/16
   sync: function(method, model, options) {
-    var self = this;
-
     //save
     if (method === 'create' || method === 'update' || method === 'patch') {
       return apiClient.user.put('/settings/leftRoomMenu', this.toJSON(), {
         // No need to get the JSON back from the server...
         dataType: 'text'
       })
-      .then(function() { if (options.success) options.success.apply(self, arguments); })
+      .then(function() {
+        if (options.success) options.success({});
+      })
       .catch(function(err) { if (options.error) options.error(err); });
     }
   },
