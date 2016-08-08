@@ -24,7 +24,27 @@ describe('forum-with-policy-service #slow', function() {
     forum1: {},
     category1: {
       forum: 'forum1'
+    },
+    topic1: {
+      user: 'user1',
+      forum: 'forum1',
+      category: 'category1'
+    },
+    /*
+    reply1: {
+      user: 'user1',
+      forum: 'forum1',
+      category: 'category1',
+      topic: 'topic1'
+    },
+    comment1: {
+      user: 'user1',
+      forum: 'forum1',
+      category: 'category1',
+      topic: 'topic1',
+      reply: 'reply1'
     }
+    */
   });
 
   var forumWithPolicyService;
@@ -57,7 +77,19 @@ describe('forum-with-policy-service #slow', function() {
       });
   });
 
-  it('should allow members to reply to topics');
+  it('should allow members to reply to topics', function() {
+    return forumWithPolicyService.createReply(fixture.topic1, {
+        text: '_Helloooo_'
+      })
+      .then(function(reply) {
+        assert(mongoUtils.objectIDsEqual(reply.userId, fixture.user1._id));
+        assert(mongoUtils.objectIDsEqual(reply.forumId, fixture.forum1._id));
+        assert(mongoUtils.objectIDsEqual(reply.topicId, fixture.topic1._id));
+        assert.strictEqual(reply.text, '_Helloooo_');
+        assert.strictEqual(reply.html, '<em>Helloooo</em>');
+      });
+  });
+
   it('should allow members to comments on topics');
 
 });
