@@ -52,7 +52,7 @@ describe('avatar-api', function() {
     name: '/group/i/:groupId - custom avatar',
     url: null,
     expected: null,
-    proxyRedirect: '/fetch/http://s3.amazonaws.com/gitter-avatars/moo/cow/128'
+    proxyRedirect: '/fetch/http://s3.amazonaws.com/gitter-avatars/moo/cow/128?v=1'
   }, {
     name: '/group/iv/:version/:groupId',
     url: null,
@@ -79,8 +79,8 @@ describe('avatar-api', function() {
     expected: null,
     proxyRedirect: '/fetch_lt/https://secure.gravatar.com/avatar/2644d6233d2c210258362f7f0f5138c2?s=128'
   }, {
-    name: '/tw/i/:id1/:id2/:extension',
-    url: '/tw/i/378800000308609669/c5cc5261cc55da2dbca442eaf60920cc/jpeg',
+    name: '/tw/i/:id/:filename',
+    url: '/tw/i/378800000308609669/c5cc5261cc55da2dbca442eaf60920cc_normal.jpeg',
     expected: null,
     proxyRedirect: '/fetch/https://pbs.twimg.com/profile_images/378800000308609669/c5cc5261cc55da2dbca442eaf60920cc_normal.jpeg'
   }, {
@@ -96,7 +96,7 @@ describe('avatar-api', function() {
   }, {
     name: '/invalid_does_not_exist',
     url: '/invalid_does_not_exist',
-    expected: 404,
+    expected: 302,
     proxyRedirect: '/missing'
   }];
 

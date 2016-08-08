@@ -1,4 +1,4 @@
-/* eslint complexity: ["error", 16] */
+/* eslint complexity: ["error", 15] */
 'use strict';
 
 var _ = require('underscore');
@@ -18,16 +18,6 @@ module.exports = function parseContentToTemplateData(data, state) {
 
   if(data.isSuggestion) {
     data.uri = urlJoin(data.uri, '?source=suggested-menu');
-  }
-
-  //This is a dirty hack to provide avatar for one-to-one avatars
-  //as the troupe serializer has no way of deriving them
-  if(data.oneToOne) {
-    data.avatarUrl = avatars.getForUser(data.user);
-  }
-
-  if(data.avatar_url) {
-    data.avatarUrl = data.avatar_url;
   }
 
   data.absoluteRoomUri = urlJoin(clientEnv.basePath, (data.uri || data.url));

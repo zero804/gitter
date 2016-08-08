@@ -10,6 +10,7 @@ var rememberMe = require('../../web/middlewares/rememberme-middleware');
 var ensureLoggedIn = require('../../web/middlewares/ensure-logged-in');
 var redirectAfterLogin = require('../../web/middlewares/redirect-after-login');
 var passportCallbackForStrategy = require('../../web/middlewares/passport-callback-for-strategy');
+var userScopes = require('gitter-web-identity/lib/user-scopes');
 
 var routes = {};
 
@@ -65,7 +66,12 @@ routes.upgrade = [
     });
 
     if(!addedScopes) {
-      res.render('github-upgrade-complete');
+      res.render('github-upgrade-complete', {
+        oAuthCompletePostMessage: JSON.stringify({
+          type: "oauth_upgrade_complete",
+          scopes: userScopes.getScopesHash(req.user)
+        })
+      });
       return;
     }
 

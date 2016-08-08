@@ -2,6 +2,8 @@
 
 var testRequire = require('../../test-require');
 var assertUtils = require('../../assert-utils');
+var env = require('gitter-web-env');
+var nconf = env.config;
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var serialize = testRequire('./serializers/serialize');
 var ChatStrategy = testRequire('./serializers/rest/chat-strategy');
@@ -46,6 +48,7 @@ describe('chat-strategy-test', function() {
         username: fixture.user1.username,
         displayName: fixture.user1.displayName,
         url: '/' + fixture.user1.username,
+        avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + fixture.user1.username,
         avatarUrlSmall: '/api/private/user-avatar/' + fixture.user1.username + '?s=60',
         avatarUrlMedium: '/api/private/user-avatar/' + fixture.user1.username + '?s=128',
         staff: false,
@@ -69,6 +72,7 @@ describe('chat-strategy-test', function() {
          username: fixture.user1.username,
          displayName: fixture.user1.displayName,
          url: '/' + fixture.user1.username,
+         avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + fixture.user1.username,
          avatarUrlSmall: '/api/private/user-avatar/' + fixture.user1.username + '?s=60',
          avatarUrlMedium: '/api/private/user-avatar/' + fixture.user1.username + '?s=128',
          staff: false,
@@ -105,6 +109,7 @@ describe('chat-strategy-test', function() {
          username: fixture.user1.username,
          displayName: fixture.user1.displayName,
          url: '/' + fixture.user1.username,
+         avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + fixture.user1.username,
          avatarUrlSmall: '/api/private/user-avatar/' + fixture.user1.username + '?s=60',
          avatarUrlMedium: '/api/private/user-avatar/' + fixture.user1.username + '?s=128',
          staff: false,
@@ -140,6 +145,7 @@ describe('chat-strategy-test', function() {
           username: fixture.user1.username,
           displayName: fixture.user1.displayName,
           url: '/' + fixture.user1.username,
+          avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + fixture.user1.username,
           avatarUrlSmall: '/api/private/user-avatar/' + fixture.user1.username + '?s=60',
           avatarUrlMedium: '/api/private/user-avatar/' + fixture.user1.username + '?s=128',
           staff: false,
