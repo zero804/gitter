@@ -5,7 +5,8 @@
   "main": "server/index.js",
   "scripts": {
     "test": "node ./test/fixtures/runner-node.js",
-    "test-watch": "webpack -w --config ./test/webpack.config.js & http-server ./test/fixtures"
+    "test-watch": "webpack -w --config ./test/webpack.config.js & http-server ./test/fixtures",
+    "generate": "plop"
   },
   "author": "Gitter Team",
   "license": "ISC",
@@ -36,11 +37,13 @@
     "gulp-babel": "^6.1.2",
     "jquery": "^3.1.0",
     "less-loader": "^2.2.3",
+    "plop": "^1.5.0",
     "postcss-less": "^0.14.0",
     "postcss-loader": "^0.9.1",
     "raf": "^3.2.0",
     "react-addons-shallow-compare": "^15.3.0",
     "react-addons-test-utils": "^15.2.1",
+    "require-all": "^2.0.0",
     "style-loader": "^0.13.1",
     "underscore": "^1.8.3",
     "webpack": "^1.13.1",
