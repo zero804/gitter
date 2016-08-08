@@ -11,7 +11,7 @@ module.exports = function(plop){
   });
 
   var baseActionCreatorsFolder = path.resolve(__dirname, '../../browser/js/action-creators');
-  var actionCreatorFolders = glob.sync(baseActionCreatorsFolder + '/*').map(function(folderPath){
+  var actionCreatorFolders = glob.sync(baseActionCreatorsFolder + '/*/').map(function(folderPath){
     return folderPath.replace(baseActionCreatorsFolder, '');
   });
 
