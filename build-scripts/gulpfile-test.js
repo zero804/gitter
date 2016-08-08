@@ -2,7 +2,6 @@
 
 var gulp = require('gulp');
 var gutil = require('gulp-util');
-var Promise = require('bluebird');
 var runSequence = require('run-sequence');
 var using = require('gulp-using');
 var codecov = require('gulp-codecov');
@@ -10,8 +9,7 @@ var lcovMerger = require('lcov-result-merger');
 var path = require('path');
 var mkdirp = require('mkdirp');
 var glob = require('glob');
-var spawn = require('child_process').spawn;
-var _ = require('lodash');
+var childProcessPromise = require('./child-process-promise');
 var del = require('del');
 
 var argv = require('yargs')
@@ -177,29 +175,7 @@ function spawnMochaProcess(moduleName, options, files) { // eslint-disable-line 
   args = args.concat(files);
   gutil.log('Running tests with', executable, args.join(' '));
 
-  return Promise.try(function() {
-    return spawn(executable, args, {
-      stdio: 'inherit',
-      env: _.extend({}, process.env, env)
-    });
-  })
-  .then(function(command) {
-    return new Promise(function(resolve, reject) {
-      command.on('close', function (code) {
-        if (code) {
-          reject(new Error(executable + ' exited with ' + code));
-        } else {
-          resolve();
-        }
-      });
-
-      command.on('error', function(err) {
-        reject(err);
-      });
-    });
-  })
-
-
+  return childProcessPromise.spawn(executable, args, env);
 }
 
 var subTasks = [];
