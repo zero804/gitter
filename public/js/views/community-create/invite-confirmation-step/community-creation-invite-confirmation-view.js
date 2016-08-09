@@ -49,12 +49,6 @@ module.exports = CommunityCreateBaseStepView.extend({
     this.troubleInviteCollection = options.troubleInviteCollection;
   },
 
-  serializeData: function() {
-    var data = _.extend({}, this.model.toJSON());
-
-    return data;
-  },
-
   onStepNext: function() {
     this.communityCreateModel.set('stepState', stepConstants.OVERVIEW);
   },
