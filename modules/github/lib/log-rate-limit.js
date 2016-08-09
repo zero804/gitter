@@ -1,7 +1,7 @@
 'use strict';
 
 var env = require('gitter-web-env');
-var logger = env.logger;
+var logger = env.logger.get('github');
 var stats = env.stats;
 
 module.exports = function(options, callback, request) {
