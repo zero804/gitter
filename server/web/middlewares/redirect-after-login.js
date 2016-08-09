@@ -1,9 +1,18 @@
 'use strict'
 
-module.exports = function redirectAfterLogin(req, res) {
+var userScopes = require('gitter-web-identity/lib/user-scopes');
+
+function redirectAfterLogin(req, res) {
   if (req.session && req.session.githubScopeUpgrade) {
     delete req.session.githubScopeUpgrade;
-    res.render('github-upgrade-complete');
+
+    res.render('github-upgrade-complete', {
+      oAuthCompletePostMessage: JSON.stringify({
+        type: "oauth_upgrade_complete",
+        scopes: userScopes.getScopesHash(req.user)
+      })
+    });
+
     return;
   }
 
@@ -19,3 +28,5 @@ module.exports = function redirectAfterLogin(req, res) {
     res.redirect('/');
   }
 }
+
+module.exports = redirectAfterLogin;

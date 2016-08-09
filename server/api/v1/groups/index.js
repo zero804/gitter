@@ -1,13 +1,13 @@
 "use strict";
 
 var Promise = require('bluebird');
-var restful = require("../../../services/restful");
 var StatusError = require('statuserror');
 var groupService = require('gitter-web-groups/lib/group-service');
-var restSerializer = require('../../../serializers/rest-serializer');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var groupCreationService = require('../../../services/group-creation-service');
 var inviteValidation = require('gitter-web-invites/lib/invite-validation');
+var restful = require("../../../services/restful");
+var restSerializer = require('../../../serializers/rest-serializer');
 var internalClientAccessOnly = require('../../../web/middlewares/internal-client-access-only');
 
 var MAX_BATCHED_INVITES = 100;
@@ -34,7 +34,8 @@ function getGroupOptions(body) {
     defaultRoom: {
       defaultRoomName: defaultRoomName,
       providers: providers
-    }
+    },
+    allowTweeting: body.allowTweeting
   };
 
   if (body.security) {
@@ -115,6 +116,7 @@ module.exports = {
             restSerializer.serializeObject(defaultRoom, troupeStrategy),
             function(serializedGroup, serializedRoom) {
               serializedGroup.defaultRoom = serializedRoom;
+              serializedGroup.hookCreationFailedDueToMissingScope = groupCreationResult.hookCreationFailedDueToMissingScope;
               return serializedGroup;
             }
           );
