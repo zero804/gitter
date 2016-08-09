@@ -82,9 +82,31 @@ JP 11/2/16
 .room-item__title {
   .room-menu-text();
   flex: 1;
+  display: flex;
 
   &:first-child {
     margin-left: @desktop-menu-left-padding / 2;
+  }
+}
+
+.room-item__title-piece {
+	overflow: hidden;
+	min-width: 4ch;
+  max-width: 90%;
+  max-width: calc(100% ~"-" 1ch);
+	flex-basis: auto;
+	flex-grow: 0;
+	flex-shrink: 1;
+	text-overflow: ellipsis;
+
+	transition: flex-shrink .2s ease;
+
+  &:hover {
+	  flex-shrink: 0;
+  }
+
+  &:not(:first-child):before {
+  	content: '/';
   }
 }
 
