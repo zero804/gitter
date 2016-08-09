@@ -1,15 +1,15 @@
 "use strict";
 
-import React, { PropTypes } from 'react';
+import React from 'react';
 
 export default React.createClass({
 
-  displayName: '{{properCase name}}',
+  displayName: 'CreateTopicModal',
   propTypes: {},
 
   render(){
     return (
-      //Render some stuff
+      <div />
     );
   }
 
