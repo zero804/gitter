@@ -17,7 +17,10 @@ var _super = Backbone.Router.prototype;
 
 var RouteModel = Backbone.Model.extend({
   //Do we need to use the constructor to get the default values out of the window.context
-  defaults: { route: null }
+  defaults: {
+    route: null,
+    createTopic: false
+  }
 });
 
 var Router = Backbone.Router.extend({
@@ -41,8 +44,7 @@ var Router = Backbone.Router.extend({
   },
 
   createTopic(groupName){
-    this.forums(groupName);
-    this.model.set('createTopic', true);
+    this.model.set('route', 'create-topic');
   },
 
   forums(groupName, categoryName, queryString){

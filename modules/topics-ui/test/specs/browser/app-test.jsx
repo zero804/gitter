@@ -5,7 +5,6 @@ var { shallow } = require('enzyme');
 var Backbone = require('backbone');
 var React = require('react');
 var App = require('../../../browser/js/app.jsx');
-var ForumContainer = require('../../../containers/ForumContainer.jsx');
 
 describe('App', function(){
 
@@ -19,7 +18,14 @@ describe('App', function(){
   it('should render a ForumContainer when rendered with the forum route', function(){
     var route = new Backbone.Model({ route: 'forum', groupName: 'gitterHQ' });
     const wrapper = shallow(<App router={route} />);
-    assert.equal(wrapper.find(ForumContainer).length, 1);
+    assert.equal(wrapper.find('ForumContainer').length, 1);
+  });
+
+  it('should render a ForumContainer when rendered with the create-topic route', () => {
+    var route = new Backbone.Model({ route: 'create-topic', groupName: 'gitterHQ', createTopic: true });
+    const wrapper = shallow(<App router={route} />);
+    assert.equal(wrapper.find('ForumContainer').length, 1);
+    assert.equal(wrapper.state('createTopic'), true);
   });
 
 });

@@ -22,13 +22,15 @@ module.exports = React.createClass({
     const { router } = this.props;
     switch(router.get('route')) {
       case 'forum': return this.getForumState();
+      case 'create-topic': return this.getCreateTopicState();
     }
   },
 
   render(){
     const { route } = this.state;
     switch(route) {
-      case 'forum': return <ForumContainer {...this.state} />
+      case 'forum': return <ForumContainer {...this.state} />;
+      case 'create-topic': return <ForumContainer {...this.state} />;
     }
   },
 
@@ -50,6 +52,13 @@ module.exports = React.createClass({
       sortName: router.get('sortName'),
       categoryStore: new CategoryStore(categoryStore.models, { router: router }),
       tagStore: new TagStore(tagStore.models, { router: router }),
+    });
+  },
+
+  getCreateTopicState(){
+    const { router } = this.props;
+    return Object.assign(this.getForumState(), {
+      createTopic: router.get('createTopic'),
     });
   }
 
