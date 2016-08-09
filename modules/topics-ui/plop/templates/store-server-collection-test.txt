@@ -11,7 +11,7 @@ describe('{{camelCase name}}Store', () => {
     assert({{camelCase name}}Store(models).models);
   });
 
-  it('should an object with get{{properCase name}}', () => {
+  it('should return an object with get{{properCase name}}', () => {
     assert({{camelCase name}}Store(models).get{{properCase name}});
   });
 
