@@ -5,6 +5,12 @@ var stats = env.stats;
 var Forum = require('gitter-web-persistence').Forum;
 var debug = require('debug')('gitter:app:topics:forum-service');
 
+function findById(forumId) {
+  return Forum.findById(forumId)
+    .lean()
+    .exec();
+}
+
 function createForum(user, forumInfo, securityDescriptor) {
   // we can't upsert because there's nothing unique on a Forum to check against
   var insertData = {
@@ -24,5 +30,6 @@ function createForum(user, forumInfo, securityDescriptor) {
 }
 
 module.exports = {
+  findById: findById,
   createForum: createForum
 };
