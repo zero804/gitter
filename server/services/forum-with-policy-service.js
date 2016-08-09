@@ -29,7 +29,7 @@ function ForumWithPolicyService(forum, user, policy) {
 function getCategoryOptions(options) {
   options = options || {};
 
-  var name = options.name || 'General';
+  var name = options.name;
 
   var opts = {
     name: name,
