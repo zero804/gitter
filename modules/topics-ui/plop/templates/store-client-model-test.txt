@@ -10,8 +10,4 @@ describe('{{properCase name}}Store', () => {
     store = new {{properCaseName}}Store();
   });
 
-  it('should provide a get{{properCase name}}()', () => {
-    assert(store.get{{properCase name}});
-  });
-
 });

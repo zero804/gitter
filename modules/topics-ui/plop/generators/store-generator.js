@@ -33,11 +33,11 @@ module.exports = function(plop) {
 
       var clientSideTemplate= data.resourceType === 'Collection' ?
         path.resolve(__dirname, '../templates/store-client-collection.txt') :
-        '';
+        path.resolve(__dirname, '../templates/store-client-model.txt');
 
       var clientSideTestTemplate = data.resourceType === 'Collection' ?
         path.resolve(__dirname, '../templates/store-client-collection-test.txt') :
-        '';
+        path.resolve(__dirname, '../templates/store-client-model-test.txt');
 
       return [{
         type: 'add',
