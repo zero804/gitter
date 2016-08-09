@@ -90,7 +90,7 @@ describe('Router', function(){
   it('should identify create topic', () => {
     assert.equal(router.get('categoryName'), 'all');
     Backbone.history.navigate('gitterHQ/topics/create-topic', trigger);
-    assert.equal(router.get('createTopic'), true);
+    assert.equal(router.get('route'), 'create-topic');
   });
 
 });

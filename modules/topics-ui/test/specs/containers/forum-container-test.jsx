@@ -5,8 +5,10 @@ var Backbone = require('backbone');
 var React = require('react');
 var sinon = require('sinon');
 var { shallow } = require('enzyme');
-var ForumContainer = require('../../../containers/ForumContainer.jsx');
 var { subscribe } = require('../../../browser/js/dispatcher');
+
+var ForumContainer = require('../../../containers/ForumContainer.jsx');
+
 var forumCatConstants = require('../../../browser/js/constants/forum-categories');
 var forumFilterConstants = require('../../../browser/js/constants/forum-filters');
 var forumSortConstants = require('../../../browser/js/constants/forum-sorts');
@@ -64,5 +66,10 @@ describe('<ForumContainer />', function(){
     wrapper.find('ForumTableControl').prop('tagChange')('all');
     assert.equal(tagChangeHandle.callCount, 1);
   });
+
+  it('should render an inactive modal by default', () => {
+    assert.equal(wrapper.find('CreateTopicModal').prop('active'), false);
+  });
+
 
 });
