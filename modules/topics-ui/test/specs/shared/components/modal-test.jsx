@@ -31,4 +31,8 @@ describe('<Modal/>', () => {
     assert.equal(wrapper.find('article').length, 1);
   });
 
+  it('should render the right body class', () => {
+    assert.equal(wrapper.find('modal__body').length, 1);
+  });
+
 });

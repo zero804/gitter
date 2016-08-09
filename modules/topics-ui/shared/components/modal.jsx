@@ -14,7 +14,7 @@ export default React.createClass({
     var className = !!active ? 'modal--active' : 'modal';
     return (
       <section className={ className }>
-        <article>
+        <article className="modal__body">
           { this.props.children }
         </article>
       </section>
