@@ -5,7 +5,8 @@ var _ = require('underscore');
 var urlJoin = require('url-join');
 var avatars = require('gitter-web-avatars');
 var roomNameShortener = require('../room-name-shortener');
-var parseRoomItemName = require('../get-org-menu-state-name-from-troupe-name');
+var getOrgNameFromTroupeName = require('../get-org-name-from-troupe-name');
+var getRoomNameFromTroupeName = require('../get-room-name-from-troupe-name');
 
 var clientEnv = require('gitter-client-env');
 
@@ -50,17 +51,25 @@ module.exports = function parseContentToTemplateData(data, state) {
   // Make sure we are lurking and we only have activity so we don't override mentions or unread indicators
   var lurkActivity = !!data.activity && (!hasMentions && !unreadItems);
 
-  var roomName = data.name;
+  var displayName = data.name;
   // Get rid of the org prefix, if viewing in a org bucket
   if(state === 'org') {
-    roomName = parseRoomItemName(data.name);
+    displayName = getRoomNameFromTroupeName(data.name);
   }
 
-  var namePieces = roomName.split('/');
+  displayName = roomNameShortener(displayName);
+
+
+  var namePieces = undefined;
+  var orgName = getOrgNameFromTroupeName(data.name);
+  var roomName = getRoomNameFromTroupeName(data.name);
+  if(orgName === roomName) {
+    namePieces = data.name.split('/');
+  }
 
   return _.extend({}, data, {
     isNotOneToOne: (data.githubType !== 'ONETOONE'),
-    name: roomName,
+    displayName: displayName,
     namePieces: namePieces,
     mentions: hasMentions,
     unreadItems: unreadItems,
