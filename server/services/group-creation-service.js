@@ -1,7 +1,5 @@
 "use strict";
 
-var env = require('gitter-web-env');
-var errorReporter = env.errorReporter;
 var Promise = require('bluebird');
 var groupService = require('gitter-web-groups/lib/group-service');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
@@ -27,7 +25,7 @@ function inviteTroubleTwitterUsers(user, room, invitesReport) {
 
       var roomUrl = room.lcUri ? (clientEnv['basePath'] + '/' + room.lcUri) : undefined;
 
-      return TwitterBadger.sendUserInviteTweets(user, usersToTweet, roomUrl);
+      return TwitterBadger.sendUserInviteTweets(user, usersToTweet, room.name, roomUrl);
     });
 }
 
@@ -78,7 +76,7 @@ function groupCreationService(user, options) {
         // integrated with github
         // This is going to have to change in the new GROUP world
         runPostGitHubRoomCreationTasks: group.sd.type === 'GH_REPO',
-        
+
         addBadge: defaultRoomOptions.addBadge,
         providers: defaultRoomOptions.providers
       });
@@ -105,14 +103,13 @@ function groupCreationService(user, options) {
     .then(function(invitesReport) {
       this.invitesReport = invitesReport;
 
-      if(options.allowTweeting) {
-        inviteTroubleTwitterUsers(user, this.defaultRoom, invitesReport)
-          .catch(function(err) {
-            errorReporter(err, { user: user.username }, { module: 'group-creation-service' });
-          });
+      if (!options.allowTweeting) {
+        return this;
       }
 
-      return this;
+      // Tweet all the users
+      return inviteTroubleTwitterUsers(user, this.defaultRoom, invitesReport)
+        .return(this);
     });
 }
 
