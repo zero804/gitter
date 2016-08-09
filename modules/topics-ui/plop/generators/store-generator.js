@@ -29,7 +29,7 @@ module.exports = function(plop) {
 
       return [{
         type: 'add',
-        path: path.resolve(__dirname, '../../server/stores/{{dashCase name}}'),
+        path: path.resolve(__dirname, '../../server/stores/{{dashCase name}}.js'),
         templateFile: serverSideTemplate
       }];
 
