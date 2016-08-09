@@ -29,9 +29,11 @@ function ForumWithPolicyService(forum, user, policy) {
 function getCategoryOptions(options) {
   options = options || {};
 
+  var name = options.name || 'General';
+
   var opts = {
-    name: options.name || 'General',
-    slug: options.slug || slugify(options.name)
+    name: name,
+    slug: options.slug || slugify(name)
   };
 
   // TODO: validate name, slug
@@ -40,9 +42,10 @@ function getCategoryOptions(options) {
 }
 
 function getTopicOptions(options) {
+  var title = options.title;
   var opts = {
-    title: options.title,
-    slug: options.slug || slugify(options.title),
+    title: title,
+    slug: options.slug || slugify(title),
     tags: options.tags,
     sticky: options.sticky,
     text: options.text
