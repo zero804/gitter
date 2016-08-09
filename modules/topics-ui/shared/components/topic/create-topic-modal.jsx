@@ -1,15 +1,19 @@
 "use strict";
 
-import React from 'react';
+import React, {PropTypes} from 'react';
+import Modal from '../modal.jsx';
 
 export default React.createClass({
 
   displayName: 'CreateTopicModal',
-  propTypes: {},
+  propTypes: {
+    active: PropTypes.bool.isRequired
+  },
 
   render(){
+    const { active } = this.props;
     return (
-      <div />
+      <Modal active={active} />
     );
   }
 

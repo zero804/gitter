@@ -71,5 +71,15 @@ describe('<ForumContainer />', function(){
     assert.equal(wrapper.find('CreateTopicModal').prop('active'), false);
   });
 
+  it('should render an active modal from create-topic', () => {
+    wrapper = shallow(
+      <ForumContainer
+        categoryStore={catCollection}
+        tagStore={tagCollection}
+        createTopic={true}
+        groupName='gitterHQ' />
+    );
+    assert.equal(wrapper.find('CreateTopicModal').prop('active'), true);
+  });
 
 });
