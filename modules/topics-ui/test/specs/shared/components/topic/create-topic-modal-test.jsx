@@ -8,9 +8,15 @@ import CreateTopicModal from '../../../../../shared/components/topic/create-topi
 describe('<CreateTopicModal/>', () => {
 
   let wrapper;
+  let activeWrapper;
 
   beforeEach(() => {
-    wrapper = shallow(<CreateTopicModal/>);
+    wrapper = shallow(<CreateTopicModal active={false}/>);
+    activeWrapper = shallow(<CreateTopicModal active={true}/>);
+  });
+
+  it('should render a modal', () => {
+    assert.equal(wrapper.find('Modal').length, 1);
   });
 
 });
