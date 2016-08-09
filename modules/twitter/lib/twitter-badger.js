@@ -26,7 +26,8 @@ var alwaysAllowedUsernames = [
   '__leroux',
   'CutAndPastey',
   'escociao',
-  'koholaa'
+  'koholaa',
+  'NeverGitter'
 ];
 
 var userFilter = function(user) {
@@ -39,9 +40,11 @@ var userFilter = function(user) {
     return true;
   }
 
+  var lcUsername = (user.twitterUsername || '').toLowerCase();
+
   // We don't want to bother other users when testing (non-prod)
   return alwaysAllowedUsernames.some(function(alwaysAllowedUsername) {
-    return user.twitterUsername === alwaysAllowedUsername;
+    return lcUsername === alwaysAllowedUsername.toLowerCase();
   });
 };
 
