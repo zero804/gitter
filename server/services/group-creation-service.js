@@ -12,6 +12,8 @@ var identityService = require('gitter-web-identity');
 function inviteTroubleTwitterUsers(user, room, invitesReport) {
   return identityService.getIdentityForUser(user, 'twitter')
     .then(function(identity) {
+      if (!identity) return;
+      
       user.twitterUsername = identity.username;
 
       var usersToTweet = [];
