@@ -29,6 +29,7 @@ var PRERENDERED_VIEWS = [
   'js/views/explore/tmpl/explore-view',
   'js/views/community-create/main-step/community-creation-main-view',
   'js/views/community-create/invite-step/community-creation-invite-people-view',
+  'js/views/community-create/invite-confirmation-step/community-creation-invite-confirmation-view',
   'js/views/community-create/github-projects-step/community-creation-github-projects-view',
   'js/views/community-create/overview-step/community-creation-overview-view'
 
