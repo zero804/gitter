@@ -41,22 +41,22 @@ module.exports = function(plop) {
 
       return [{
         type: 'add',
-        path: path.resolve(__dirname, '../../server/stores/{{dashCase name}}.js'),
+        path: path.resolve(__dirname, '../../server/stores/{{dashCase name}}-store.js'),
         templateFile: serverSideTemplate
       },
       {
         type: 'add',
-        path: path.resolve(__dirname, '../../test/specs/server/stores/{{dashCase name}}-test.js'),
+        path: path.resolve(__dirname, '../../test/specs/server/stores/{{dashCase name}}-store--test.js'),
         templateFile: serverSideTestTemplate,
       },
       {
         type: 'add',
-        path: path.resolve(__dirname, '../../browser/js/stores/{{dashCase name}}.js'),
+        path: path.resolve(__dirname, '../../browser/js/stores/{{dashCase name}}-store.js'),
         templateFile: clientSideTemplate
       },
       {
         type: 'add',
-        path: path.resolve(__dirname, '../../test/specs/browser/stores/{{dashCase name}}-test.js'),
+        path: path.resolve(__dirname, '../../test/specs/browser/stores/{{dashCase name}}-store-test.js'),
         templateFile: clientSideTestTemplate
       }];
 
