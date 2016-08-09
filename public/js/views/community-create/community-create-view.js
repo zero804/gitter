@@ -149,11 +149,11 @@ var CommunityCreateView = Marionette.LayoutView.extend({
     });
 
     this.troubleInviteCollection = new SimpleFilteredCollection([], {
-      collection: this.inviteCollection
-    });
-    this.troubleInviteCollection.setFilter(function(model) {
-      // Anyone who isn't ready or can't be covered by the Twitter Badger
-      return model.get('inviteStatus') !== peopleToInviteStatusConstants.READY && model.get('type') !== 'twitter';
+      collection: this.inviteCollection,
+      filter: function(model) {
+        // Anyone who isn't ready or can't be covered by the Twitter Badger
+        return model.get('inviteStatus') !== peopleToInviteStatusConstants.READY && model.get('type') !== 'twitter';
+      }
     });
 
 
