@@ -218,11 +218,8 @@
     "jsmockito": "^1.0.5",
     "keymaster": "^1.6.2",
     "lcov-result-merger": "^1.0.2",
-<<<<<<< HEAD
     "less": "^2.6.1",
     "less-loader": "^2.2.3",
-=======
->>>>>>> develop
     "live-reload": "^1.1.0",
     "lorem-ipsum": "^1.0.1",
     "memoize-promise": "^0.2.2",
