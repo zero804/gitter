@@ -36,7 +36,13 @@ var Router = Backbone.Router.extend({
   },
 
   routes: {
+    ':groupName/topics/create-topic(/)': 'createTopic',
     ':groupName/topics(/categories/:categoryName)(/)(?*queryString)': 'forums'
+  },
+
+  createTopic(groupName){
+    this.forums(groupName);
+    this.model.set('createTopic', true);
   },
 
   forums(groupName, categoryName, queryString){
