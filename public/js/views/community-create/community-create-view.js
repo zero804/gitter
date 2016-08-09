@@ -87,7 +87,6 @@ var CommunityCreateView = Marionette.LayoutView.extend({
     this.invitePeopleStepView = new CommunityCreationInviteConfirmationView(optionsForRegion({
       model: this.inviteConfirmationStepViewModel,
       communityCreateModel: this.model,
-      inviteCollection: this.inviteCollection,
       troubleInviteCollection: this.troubleInviteCollection
     }));
     return this.invitePeopleStepView;
@@ -153,7 +152,8 @@ var CommunityCreateView = Marionette.LayoutView.extend({
       collection: this.inviteCollection
     });
     this.troubleInviteCollection.setFilter(function(model) {
-      return model.get('inviteStatus') !== peopleToInviteStatusConstants.READY;
+      // Anyone who isn't ready or can't be covered by the Twitter Badger
+      return model.get('inviteStatus') !== peopleToInviteStatusConstants.READY && model.get('type') !== 'twitter';
     });
 
 
