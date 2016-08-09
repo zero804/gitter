@@ -52,10 +52,6 @@ module.exports = BaseCollectionItemView.extend({
   serializeData: function() {
     var data = parseForTemplate(this.model.toJSON(), this.roomMenuModel.get('state'));
 
-
-    var namePieces = data.name.split('/');
-    data.namePieces = namePieces;
-
     //When the user is viewing a room he is lurking in and activity occurs
     //we explicitly, in this case, cancel the lurk activity
     //this would be a lot easier (as with a lot of things) if we persisted activity on the server JP 17/3/16
@@ -172,10 +168,14 @@ module.exports = BaseCollectionItemView.extend({
   },
 
   onMenuChangeState: function () {
-    var name = (this.model.get('name') || this.model.get('uri') || this.model.get('username'));
-    var content = (this.roomMenuModel.get('state') === 'org') ?
-      parseRoomItemName(name) :
-      roomNameShortener(name);
-    this.ui.title.text(content);
+    var data = parseForTemplate(this.model.toJSON(), this.roomMenuModel.get('state'));
+
+    if(data.namePieces) {
+      // If we don't want to re-render, then we need to duplicate this template logic
+      this.ui.title.html(data.namePieces.reduce(function(html, piece) { return html + '<span class="room-item__title-piece">' + piece + '</span>'; }, ''));
+    }
+    else {
+      this.ui.title.text(data.displayName || data.name);
+    }
   },
 });

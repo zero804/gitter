@@ -7,6 +7,8 @@
       {{~#each namePieces~}}
         <span class="room-item__title-piece">{{this}}</span>
       {{~/each~}}
+    {{else if displayName}}
+      {{displayName}}
     {{else}}
       {{name}}
     {{/if}}
