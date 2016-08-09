@@ -31,6 +31,14 @@ module.exports = function(plop) {
         path.resolve(__dirname, '../templates/store-server-collection-test.txt') :
         path.resolve(__dirname, '../templates/store-server-model-test.txt');
 
+      var clientSideTemplate= data.resourceType === 'Collection' ?
+        path.resolve(__dirname, '../templates/store-client-collection.txt') :
+        '';
+
+      var clientSideTestTemplate = data.resourceType === 'Collection' ?
+        path.resolve(__dirname, '../templates/store-client-collection-test.txt') :
+        '';
+
       return [{
         type: 'add',
         path: path.resolve(__dirname, '../../server/stores/{{dashCase name}}.js'),
@@ -40,6 +48,16 @@ module.exports = function(plop) {
         type: 'add',
         path: path.resolve(__dirname, '../../test/specs/server/stores/{{dashCase name}}-test.js'),
         templateFile: serverSideTestTemplate,
+      },
+      {
+        type: 'add',
+        path: path.resolve(__dirname, '../../browser/js/stores/{{dashCase name}}.js'),
+        templateFile: clientSideTemplate
+      },
+      {
+        type: 'add',
+        path: path.resolve(__dirname, '../../browser/js/stores/{{dashCase name}}.js'),
+        templateFile: clientSideTestTemplate
       }];
 
     }
