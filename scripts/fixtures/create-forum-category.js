@@ -2,6 +2,7 @@
 'use strict';
 
 var yargs = require('yargs');
+var faker = require('faker');
 var utils = require('./fixture-script-utils');
 
 var argv = yargs.argv;
@@ -25,8 +26,9 @@ var opts = yargs
 utils.runScript(function() {
   return utils.getForumWithPolicyService(opts.username, opts.group)
     .then(function(forumWithPolicyService) {
-      // TODO: fill in gibberish opts.name if not specified
-      return forumWithPolicyService.createCategory({ name: opts.name})
+      return forumWithPolicyService.createCategory({
+        name: opts.name || faker.commerce.productName()
+      })
     })
     .then(function(category) {
       console.log("CREATED " + category.id);
