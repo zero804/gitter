@@ -5,7 +5,27 @@ var stats = env.stats;
 var Topic = require('gitter-web-persistence').Topic;
 var debug = require('debug')('gitter:app:topics:topic-service');
 var processText = require('gitter-web-text-processor');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var markdownMajorVersion = require('gitter-markdown-processor').version.split('.')[0];
+
+
+function findById(topicId) {
+  return Topic.findById(topicId)
+    .lean()
+    .exec();
+}
+
+function findByIdForForum(forumId, topicId) {
+  return findById(topicId)
+    .then(function(topic) {
+      if (!topic) return null;
+
+      // make sure the topic is in the specified forum
+      if (!mongoUtils.objectIDsEqual(topic.forumId, forumId)) return null;
+
+      return topic;
+    });
+}
 
 
 function createTopic(user, category, options) {
@@ -40,5 +60,7 @@ function createTopic(user, category, options) {
 }
 
 module.exports = {
+  findById: findById,
+  findByIdForForum: findByIdForForum,
   createTopic: createTopic
 };
