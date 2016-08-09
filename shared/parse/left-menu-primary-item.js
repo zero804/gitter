@@ -51,21 +51,28 @@ module.exports = function parseContentToTemplateData(data, state) {
   // Make sure we are lurking and we only have activity so we don't override mentions or unread indicators
   var lurkActivity = !!data.activity && (!hasMentions && !unreadItems);
 
+
+  var orgName = getOrgNameFromTroupeName(data.name);
+  var roomName = getRoomNameFromTroupeName(data.name);
+
   var displayName = data.name;
+  var namePieces = undefined;
+
+  // TODO: Do we want this to be `defaultRoomName` from the group?
+  if(roomName === 'Lobby') {
+    displayName = orgName;
+  }
+  else if(orgName === roomName) {
+    namePieces = data.name.split('/');
+  }
   // Get rid of the org prefix, if viewing in a org bucket
-  if(state === 'org') {
+  else if(state === 'org') {
     displayName = getRoomNameFromTroupeName(data.name);
   }
 
+  // Truncate
   displayName = roomNameShortener(displayName);
 
-
-  var namePieces = undefined;
-  var orgName = getOrgNameFromTroupeName(data.name);
-  var roomName = getRoomNameFromTroupeName(data.name);
-  if(orgName === roomName) {
-    namePieces = data.name.split('/');
-  }
 
   return _.extend({}, data, {
     isNotOneToOne: (data.githubType !== 'ONETOONE'),
