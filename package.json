@@ -70,6 +70,7 @@
     "gitter-web-qs": "file:modules/qs",
     "gitter-web-replies": "file:modules/replies",
     "gitter-web-shared": "file:shared",
+    "gitter-web-slugify": "file:modules/slugify",
     "gitter-web-split-tests": "file:modules/split-tests",
     "gitter-web-suggestions": "file:modules/suggestions",
     "gitter-web-text-processor": "file:modules/text-processor",
