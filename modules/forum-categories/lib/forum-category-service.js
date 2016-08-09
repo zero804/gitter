@@ -7,6 +7,13 @@ var ForumCategory = require('gitter-web-persistence').ForumCategory;
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var debug = require('debug')('gitter:app:topics:forum-category-service');
 
+
+function findBySlugForForum(forumId, slug) {
+  return ForumCategory.findOne({ forumId: forumId, slug: slug })
+    .lean()
+    .exec();
+}
+
 function createCategory(user, forum, categoryInfo) {
   var query = {
     forumId: forum._id,
@@ -37,5 +44,6 @@ function createCategory(user, forum, categoryInfo) {
 }
 
 module.exports = {
+  findBySlugForForum: findBySlugForForum,
   createCategory: createCategory
 };
