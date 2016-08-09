@@ -1,5 +1,6 @@
 'use strict';
 
+var _ = require('underscore');
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 var urlJoin = require('url-join');
@@ -29,6 +30,20 @@ var isFormElementInvalid = function(el, useCustomError) {
 };
 
 
+
+var getStatusClassStates = function(type, inviteStatus, allowTweetBadger) {
+  var hasValidEmail = inviteStatus === peopleToInviteStatusConstants.READY_VALID_EMAIL;
+  var isTwitter = type === 'twitter';
+  var canShowTwitterStatus = isTwitter && allowTweetBadger;
+
+  return {
+    needsAttention: !hasValidEmail && !canShowTwitterStatus,
+    usingTweetBadger: canShowTwitterStatus && !hasValidEmail,
+    isValid: hasValidEmail
+  };
+};
+
+
 var AVATAR_SIZE = 44;
 
 var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
@@ -40,7 +55,8 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
     link: '.community-create-expanded-people-list-item-link',
     emailInput: '.js-community-create-expanded-people-list-item-email-input',
     twitterStatusIcon: '.js-community-create-expanded-people-list-item-status-twitter',
-    needsAttentionStatusIcon: '.js-community-create-expanded-people-list-item-status-needs-attention'
+    needsAttentionStatusIcon: '.js-community-create-expanded-people-list-item-status-needs-attention',
+    isValidStatusIcon: '.js-community-create-expanded-people-list-item-status-is-valid'
   },
 
   events: {
@@ -80,6 +96,9 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
       data.avatarUrl = avatars.getForGravatarEmail(emailAddress);
     }
 
+    var statusStates = getStatusClassStates(data.type, data.inviteStatus, this.communityCreateModel.get('allowTweetBadger'));
+    data = _.extend({}, data, statusStates);
+
     data.isTwitter = data.type === 'twitter';
     data.shouldShowOnHover = data.isTwitter;
 
@@ -102,6 +121,8 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
     //toggleClass(this.$el[0], 'ready', inviteStatus === peopleToInviteStatusConstants.READY);
     toggleClass(this.$el[0], 'needs-email', inviteStatus === peopleToInviteStatusConstants.NEEDS_EMAIL);
     toggleClass(this.$el[0], 'ready-valid-email', inviteStatus === peopleToInviteStatusConstants.READY_VALID_EMAIL);
+
+    this.updateStatusIcons();
   },
 
   onLinkClick: function(e) {
@@ -123,13 +144,16 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
   },
 
   onAllowTweetBadgerChange: function() {
-    var allowTweetBadger = this.communityCreateModel.get('allowTweetBadger');
-    var isTwitter = this.model.get('type') === 'twitter';
+    this.updateStatusIcons();
+  },
 
-    var canShowTwitterStatus = isTwitter && allowTweetBadger;
-    toggleClass(this.ui.emailInput[0], 'should-show-on-hover', canShowTwitterStatus);
-    toggleClass(this.ui.twitterStatusIcon[0], 'hidden', !canShowTwitterStatus);
-    toggleClass(this.ui.needsAttentionStatusIcon[0], 'hidden', canShowTwitterStatus);
+  updateStatusIcons: function() {
+    var statusStates = getStatusClassStates(this.model.get('type'), this.model.get('inviteStatus'), this.communityCreateModel.get('allowTweetBadger'));
+
+    toggleClass(this.ui.emailInput[0], 'should-show-on-hover', statusStates.usingTweetBadger);
+    toggleClass(this.ui.twitterStatusIcon[0], 'hidden', !statusStates.usingTweetBadger);
+    toggleClass(this.ui.needsAttentionStatusIcon[0], 'hidden', !statusStates.needsAttention);
+    toggleClass(this.ui.isValidStatusIcon[0], 'hidden', !statusStates.isValid);
   }
 });
 

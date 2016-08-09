@@ -28,12 +28,14 @@
   <input
     type="email"
     id="community-create-expanded-people-list-item-email-input"
-    class="community-create-expanded-people-list-item-email-input {{when shouldShowOnHover 'should-show-on-hover' '' }} js-community-create-expanded-people-list-item-email-input"
+    class="community-create-expanded-people-list-item-email-input {{when usingTweetBadger 'should-show-on-hover' '' }} js-community-create-expanded-people-list-item-email-input"
     placeholder="enter email address"
-    value="{{ emailAddress }}">
+    value="{{ emailAddress }}"
+    required>
 
   <div class="community-create-expanded-people-list-item-status">
-    <i class="js-community-create-expanded-people-list-item-status-twitter {{when isTwitter '' 'hidden' }} icon-twitter"></i>
-    <i class="js-community-create-expanded-people-list-item-status-needs-attention {{when isTwitter 'hidden' '' }} icon-attention-circled"></i>
+    <i class="js-community-create-expanded-people-list-item-status-twitter {{when usingTweetBadger '' 'hidden' }} icon-twitter"></i>
+    <i class="js-community-create-expanded-people-list-item-status-needs-attention {{when needsAttention '' 'hidden' }} icon-attention-circled"></i>
+    <i class="js-community-create-expanded-people-list-item-status-is-valid {{when isValid '' 'hidden' }} icon-check"></i>
   </div>
 </a>
