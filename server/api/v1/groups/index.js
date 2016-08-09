@@ -88,7 +88,7 @@ function inviteTroubleTwitterUsers(user, room, invitesReport) {
 
       var roomUrl = room.lcUri ? (clientEnv['basePath'] + '/' + room.lcUri) : undefined;
 
-      return TwitterBadger.sendUserInviteTweets(user, usersToTweet, roomUrl);
+      return TwitterBadger.sendUserInviteTweets(user, usersToTweet, room.name, roomUrl);
     });
 }
 
@@ -147,7 +147,7 @@ module.exports = {
       .then(function(createRoomResult) {
         room = createRoomResult.troupe;
         hookCreationFailedDueToMissingScope = createRoomResult.hookCreationFailedDueToMissingScope;
-        
+
         return policyFactory.createPolicyForRoomId(req.user, room._id);
       })
       .then(function(userRoomPolicy) {
@@ -158,12 +158,15 @@ module.exports = {
         return roomWithPolicyService.createRoomInvitations(invites);
       })
       .then(function(invitesReport) {
+        var inviteTroubleUsersPromise = Promise.resolve(invitesReport);
         // Tweet the users
         if(allowTweeting) {
-          inviteTroubleTwitterUsers(req.user, room, invitesReport);
+          inviteTroubleUsersPromise = inviteTroubleTwitterUsers(req.user, room, invitesReport);
         }
 
-        return invitesReport;
+        return inviteTroubleUsersPromise.then(function() {
+          return invitesReport;
+        });
       })
       .then(function(/* invitesReport */) {
         var groupStrategy = new restSerializer.GroupStrategy();
