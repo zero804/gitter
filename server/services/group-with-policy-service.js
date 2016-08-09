@@ -102,7 +102,7 @@ GroupWithPolicyService.prototype.createRoom = secureMethod([allowAdmin], functio
   }
 
   if (options.linkPath) {
-    if (options.linkPath.split('/')[0] !== group.sd.linkPath.split('/')[0]) {
+    if (options.linkPath.split('/')[0].toLowerCase() !== group.sd.linkPath.split('/')[0].toLowerCase()) {
       throw new StatusError(400, 'GitHub repo backed rooms must be for the same owner (gh org or user) as the group.');
     }
   }
