@@ -130,20 +130,20 @@ module.exports = React.createClass({
 
   onTagUpdate(){
     const { tagStore } = this.props;
-    raf(() => this.setState((state) => _.extend(state, {
+    raf(() => this.setState((state) => Object.assign(state, {
       tags: tagStore.getTags(),
       tagName: tagStore.getActiveTagName(),
     })));
   },
 
   onFilterUpdate(data){
-    raf(() => this.setState((state) => _.extend(state, {
+    raf(() => this.setState((state) => Object.assign(state, {
       filterName: data.filter,
     })));
   },
 
   onSortUpdate(data) {
-    raf(() => this.setState((state) => _.extend(state, {
+    raf(() => this.setState((state) => Object.assign(state, {
       sortName: data.sort,
     })));
   },
