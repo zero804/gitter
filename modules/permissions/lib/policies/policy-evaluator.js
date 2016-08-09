@@ -1,7 +1,7 @@
 'use strict';
 
 var env = require('gitter-web-env');
-var logger = env.logger;
+var logger = env.logger.get('permissions');
 var Promise = require('bluebird');
 var _ = require('lodash');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
