@@ -56,7 +56,7 @@ module.exports = function(plop) {
       },
       {
         type: 'add',
-        path: path.resolve(__dirname, '../../browser/js/stores/{{dashCase name}}.js'),
+        path: path.resolve(__dirname, '../../test/specs/browser/stores/{{dashCase name}}-test.js'),
         templateFile: clientSideTestTemplate
       }];
 
