@@ -27,10 +27,19 @@ module.exports = function(plop) {
         path.resolve(__dirname, '../templates/store-server-collection.txt') :
         '';
 
+      var serverSideTestTemplate = data.resourceType === 'Collection' ?
+        path.resolve(__dirname, '../templates/store-server-collection-test.txt') :
+        '';
+
       return [{
         type: 'add',
         path: path.resolve(__dirname, '../../server/stores/{{dashCase name}}.js'),
         templateFile: serverSideTemplate
+      },
+      {
+        type: 'add',
+        path: path.resolve(__dirname, '../../test/specs/server/stores/{{dashCase name}}-test.js'),
+        templateFile: serverSideTestTemplate,
       }];
 
     }
