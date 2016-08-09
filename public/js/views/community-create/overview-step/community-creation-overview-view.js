@@ -53,9 +53,10 @@ module.exports = CommunityCreateBaseStepView.extend({
 
     this.orgCollection = options.orgCollection;
     this.repoCollection = options.repoCollection;
+    this.groupsCollection = options.groupsCollection;
     this.inviteCollection = options.inviteCollection;
     this.troubleInviteCollection = options.troubleInviteCollection;
-    
+
     this.listenTo(this.communityCreateModel, 'change:communityName change:communitySlug change:githubOrgId', this.onCommunityDataChange, this);
   },
 

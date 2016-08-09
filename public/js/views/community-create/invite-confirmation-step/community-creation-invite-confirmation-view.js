@@ -5,7 +5,6 @@ var _ = require('underscore');
 var stepConstants = require('../step-constants');
 var template = require('./community-creation-invite-confirmation-view.hbs');
 var CommunityCreateBaseStepView = require('../shared/community-creation-base-step-view');
-var CommunityCreationPeopleListView = require('../shared/community-creation-people-list-view');
 var CommunityCreationTroublePeopleListView = require('../shared/community-creation-expanded-people-list-view');
 
 
@@ -22,17 +21,8 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   behaviors: {
     Isomorphic: {
-      inviteListView: { el: '.community-create-invite-list-root', init: 'initInviteListView' },
       troubleInviteListView: { el: '.community-create-trouble-invite-list-root', init: 'initTroubleInviteListView' }
     },
-  },
-
-  initInviteListView: function(optionsForRegion) {
-    this.inviteListView = new CommunityCreationPeopleListView(optionsForRegion({
-      collection: this.inviteCollection,
-      communityCreateModel: this.communityCreateModel
-    }));
-    return this.inviteListView;
   },
 
   initTroubleInviteListView: function(optionsForRegion) {
@@ -56,7 +46,6 @@ module.exports = CommunityCreateBaseStepView.extend({
   initialize: function(options) {
     _super.initialize.apply(this, arguments);
 
-    this.inviteCollection = options.inviteCollection;
     this.troubleInviteCollection = options.troubleInviteCollection;
   },
 
