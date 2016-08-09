@@ -2,8 +2,7 @@
 
 var env = require('gitter-web-env');
 var config = env.config;
-var winston = env.logger;
-
+var logger = env.logger.get('presence');
 var events = require('events');
 var StatusError = require('statuserror');
 var debug = require('debug')('gitter:app:presence-engine');
@@ -110,7 +109,7 @@ function disassociateSocketAndDeactivateUserAndTroupe(socketId, userId, callback
           var userInTroupeCount = parseInt(userInTroupeCountString, 10);  // If the user was already eboff, this will be -1
 
           if(sremResult !== 1 && sremResult !== "1") {
-            winston.warn("presence: Socket has already been removed from active sockets. Something fishy is happening.");
+            logger.warn("presence: Socket has already been removed from active sockets. Something fishy is happening.");
           }
 
           if(userSocketCount === 0) {
@@ -125,7 +124,7 @@ function disassociateSocketAndDeactivateUserAndTroupe(socketId, userId, callback
 
 function sendAppEventsForUserEyeballsOffTroupe(userInTroupeCount, totalUsersInTroupe, userId, troupeId, socketId) {
   if(totalUsersInTroupe === 0 && userInTroupeCount > 0) {
-    winston.warn("presence: Troupe is empty, yet user has not left troupe. Something is fishy.", {
+    logger.warn("presence: Troupe is empty, yet user has not left troupe. Something is fishy.", {
       troupeId: troupeId,
       socketId: socketId,
       userId: userId,
@@ -170,7 +169,7 @@ function userSocketConnected(userId, socketId, connectionType, clientType, realt
         }
 
         if(saddResult !== 1 && saddResult !== "1") {
-          winston.warn("presence: Socket has already been added to active sockets. Something fishy is happening.");
+          logger.warn("presence: Socket has already been added to active sockets. Something fishy is happening.");
         }
         return 0;
       })
@@ -189,7 +188,7 @@ function userSocketConnected(userId, socketId, connectionType, clientType, realt
       var userSocketCount = parseInt(userSocketCountString, 10);
 
       if(saddResult !== 1 && saddResult !== "1") {
-        winston.warn("presence: Socket has already been added to active sockets. Something fishy is happening.");
+        logger.warn("presence: Socket has already been added to active sockets. Something fishy is happening.");
       }
 
       if(userSocketCount === 1) {
@@ -199,7 +198,7 @@ function userSocketConnected(userId, socketId, connectionType, clientType, realt
       if(troupeId && eyeballState && userId) {
         return eyeBallsOnTroupe(userId, socketId, troupeId)
           .catch(function(err) {
-            winston.error('Unable to signal eyeballs on: ' + err, {
+            logger.error('Unable to signal eyeballs on: ' + err, {
               userId: userId,
               socketId: socketId,
               exception: err
@@ -217,7 +216,7 @@ function socketReassociated(socketId, userId, troupeId, eyeballsOn) {
   return lookupSocketOwnerAndTroupe(socketId)
     .spread(function(userId2, previousTroupeId) {
       if(userId !== userId2) {
-        winston.warn("User " + userId + " attempted to eyeball socket " + socketId + " but that socket belongs to " + userId2);
+        logger.warn("User " + userId + " attempted to eyeball socket " + socketId + " but that socket belongs to " + userId2);
         var err2 = new StatusError(400, 'Invalid socket for user');
         err2.invalidSocketId = true;
         throw err2;
@@ -679,7 +678,7 @@ function clientEyeballSignal(userId, socketId, eyeballsOn, callback) {
   return lookupSocketOwnerAndTroupe(socketId)
     .spread(function(userId2, troupeId) {
       if(userId !== userId2) {
-        winston.warn("User " + userId + " attempted to eyeball socket " + socketId + " but that socket belongs to " + userId2);
+        logger.warn("User " + userId + " attempted to eyeball socket " + socketId + " but that socket belongs to " + userId2);
         var err2 = new StatusError(400, 'Invalid socket for user');
         err2.invalidSocketId = true;
         throw err2;
@@ -708,7 +707,7 @@ function collectGarbage(bayeux, callback) {
       var total = Date.now() - start;
 
       if(invalidSocketCount) {
-        winston.warn('Presence GC took ' + total + 'ms and cleared out ' + invalidSocketCount + ' sockets');
+        logger.warn('Presence GC took ' + total + 'ms and cleared out ' + invalidSocketCount + ' sockets');
       } else {
         debug('Presence GC took %sms and cleared out no invalid sockets', total);
       }
@@ -747,7 +746,7 @@ function validateActiveSockets(bayeux, callback) {
 
             return socketGarbageCollected(socketId)
               .catch(function(err) {
-                winston.info('Failure while gc-ing invalid socket', { exception: err, socketId: socketId });
+                logger.info('Failure while gc-ing invalid socket', { exception: err, socketId: socketId });
               });
           });
         }, { concurrency: 5})
@@ -847,7 +846,7 @@ function validateUsersSubset(userIds, callback) {
             var calculatedMobileScore = mobileCounts[userId] || 0;
 
             if(calculatedActiveScore !== currentActiveScore) {
-              winston.info('Inconsistency in active score in presence service for user ' + userId + '. ' + calculatedActiveScore + ' vs ' + currentActiveScore);
+              logger.info('Inconsistency in active score in presence service for user ' + userId + '. ' + calculatedActiveScore + ' vs ' + currentActiveScore);
 
               needsUpdate = true;
               multi.zrem(ACTIVE_USERS_KEY, userId);
@@ -857,7 +856,7 @@ function validateUsersSubset(userIds, callback) {
             }
 
             if(calculatedMobileScore !== currentMobileScore) {
-              winston.info('Inconsistency in mobile score in presence service for user ' + userId + '. ' + currentMobileScore + ' vs ' + calculatedMobileScore);
+              logger.info('Inconsistency in mobile score in presence service for user ' + userId + '. ' + currentMobileScore + ' vs ' + calculatedMobileScore);
 
               needsUpdate = true;
               multi.zrem(MOBILE_USERS_KEY, userId);
@@ -877,7 +876,7 @@ function validateUsersSubset(userIds, callback) {
               var calculatedTroupeScore = troupeCounts[userId] && troupeCounts[userId][troupeId] || 0;
 
               if(calculatedTroupeScore !== currentTroupeScore) {
-                winston.info('Inconsistency in troupe score in presence service for user ' + userId + ' in troupe ' + troupeId + '. ' + calculatedTroupeScore + ' vs ' + currentTroupeScore);
+                logger.info('Inconsistency in troupe score in presence service for user ' + userId + ' in troupe ' + troupeId + '. ' + calculatedTroupeScore + ' vs ' + currentTroupeScore);
 
                 needsUpdate = true;
                 var key = keyTroupeUsers(troupeId);
@@ -915,15 +914,15 @@ function validateUsers(callback) {
 
   return listOnlineUsers()
     .then(function(userIds) {
-      winston.info('presence:validate:online user count is ' + userIds.length);
+      logger.info('presence:validate:online user count is ' + userIds.length);
 
       if(userIds.length === 0) return;
 
       function recurseUserIds() {
-        winston.info('presence:validate:validating next batch: ' + userIds.length + ' users remaining.');
+        logger.info('presence:validate:validating next batch: ' + userIds.length + ' users remaining.');
         if(!userIds.length) {
           var total = Date.now() - start;
-          winston.info('Presence.validateUsers GC took ' + total + 'ms');
+          logger.info('Presence.validateUsers GC took ' + total + 'ms');
           return;
         }
 
