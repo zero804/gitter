@@ -90,7 +90,7 @@ describe('forum-with-policy-service #slow', function() {
       });
   });
 
-  it('should allow members to comments on topics', function() {
+  it('should allow members to comment on replies', function() {
     return forumWithPolicyService.createComment(fixture.reply1, {
         text: '**hi!**'
       })
