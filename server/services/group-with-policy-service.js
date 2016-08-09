@@ -1,7 +1,7 @@
 'use strict';
 
 var assert = require('assert');
-var slugify = require('slug');
+var slugify = require('gitter-web-slugify');
 var StatusError = require('statuserror');
 var ensureAccessAndFetchDescriptor = require('gitter-web-permissions/lib/ensure-access-and-fetch-descriptor');
 var debug = require('debug')('gitter:app:group-with-policy-service');

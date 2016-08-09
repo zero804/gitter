@@ -1,6 +1,6 @@
 "use strict";
 
-var slugify = require('slug');
+var slugify = require('gitter-web-slugify');
 var Promise = require('bluebird');
 var Topic = require('gitter-web-persistence').Topic;
 var fixtureUtils = require('./fixture-utils');

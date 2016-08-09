@@ -1,7 +1,7 @@
 'use strict';
 
 var assert = require('assert');
-var slugify = require('slug');
+var slugify = require('gitter-web-slugify');
 var forumCategoryService = require('gitter-web-forum-categories/lib/forum-category-service');
 var topicService = require('gitter-web-topics/lib/topic-service');
 var replyService = require('gitter-web-replies/lib/reply-service');

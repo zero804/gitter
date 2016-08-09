@@ -1,8 +1,8 @@
 "use strict";
 
-var slugify = require('slug');
 var Promise = require('bluebird');
 var ForumCategory = require('gitter-web-persistence').ForumCategory;
+var slugify = require('gitter-web-slugify');
 var fixtureUtils = require('./fixture-utils');
 var debug = require('debug')('gitter:tests:test-fixtures');
 

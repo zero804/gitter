@@ -2,7 +2,7 @@
 
 var Promise = require('bluebird');
 var persistence = require('gitter-web-persistence');
-var slugify = require('slug');
+var slugify = require('gitter-web-slugify');
 var debug = require('debug')('gitter:tests:test-fixtures');
 var fixtureUtils = require('./fixture-utils');
 
