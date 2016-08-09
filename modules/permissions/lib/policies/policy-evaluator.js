@@ -64,7 +64,7 @@ PolicyEvaluator.prototype = {
 
     var adminPolicy = this._securityDescriptor.admins;
 
-    if (userIdIsIn(userId, this._securityDescriptor.extraAdmins)) {
+    if (this._isExtraAdmin()) {
       // The user is in extraAdmins...
       debug('canAdmin: allow access for extraAdmin');
       return true;
@@ -147,6 +147,15 @@ PolicyEvaluator.prototype = {
   }),
 
   /**
+   * Returns true iff the user is in extraAdmins
+   */
+  _isExtraAdmin: function() {
+    var userId = this._userId;
+
+    return userIdIsIn(userId, this._securityDescriptor.extraAdmins);
+  },
+
+  /**
    * User is in the room or has admin access
    */
   _checkMembershipInContextForInviteRooms: function() {
@@ -159,9 +168,13 @@ PolicyEvaluator.prototype = {
           return true;
         }
 
-        // Not a member, could they be an admin?
-        return this.canAdmin();
-      })
+
+        // Not a member, but explicitly allowed via extraAdmins?
+        // Note: we do not do a full admin check as this would allow anyone
+        // from the owning room to be allowed into the PRIVATE room.
+        // See https://github.com/troupe/gitter-webapp/issues/1742
+        return this._isExtraAdmin();
+      });
 
   },
 
