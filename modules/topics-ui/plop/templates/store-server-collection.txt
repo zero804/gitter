@@ -11,12 +11,12 @@ module.exports = function {{camelCase name}}Store(models) {
   });
 
   //Get resource
-  const get{{properCase}} = () => models;
+  const get{{properCase name}} = () => models;
 
   //Methods
   return {
     models: models,
-    get{{properCase}}: get{{properCase}}
+    get{{properCase name}}: get{{properCase name}}
   };
 
 };
