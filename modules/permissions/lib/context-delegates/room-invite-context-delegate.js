@@ -2,7 +2,7 @@
 
 
 var env = require('gitter-web-env');
-var logger = env.logger;
+var logger = env.logger.get('permissions');
 var assert = require('assert');
 var TroupeInvite = require('gitter-web-persistence').TroupeInvite;
 var memoizePromise = require('./memoize-promise');
