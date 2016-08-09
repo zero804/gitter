@@ -9,7 +9,7 @@ function validateRoomName(name) {
     return false;
   }
 
-  var matcher = xregexp('^[\\p{L}\\d\\_][\\p{L}\\d\\-\\_]{1,80}$');
+  var matcher = xregexp('^[\\p{L}\\d\\_\\.][\\p{L}\\d\\-\\_\\.]{1,80}$');
   return !!matcher.test(name);
 }
 
