@@ -11,9 +11,7 @@ var chatModels = require('collections/chat');
 var troupeCollections = require('collections/instances/troupes');
 var repoModels = require('collections/repos');
 var RepoCollection = repoModels.ReposCollection;
-var orgModels = require('collections/orgs');
-var OrgCollection = orgModels.OrgCollection;
-var CommunityCreateModel = require('views/community-create/community-create-model');
+var generateCreateGroupAndRoomRoutes = require('./generate-create-group-and-room-routes');
 
 var unreadItemsClient = require('components/unread-items-client');
 var RoomCollectionTracker = require('components/room-collection-tracker');
@@ -59,40 +57,7 @@ onready(function() {
   });
 
   var repoCollection = new RepoCollection();
-  var unusedRepoCollection = new RepoCollection();
-  var unusedOrgCollection = new OrgCollection();
 
-  var initializeUnusedRepoCollection = _.once(function() {
-    unusedRepoCollection.fetch({
-      data: {
-          type: 'unused'
-        }
-      },
-      {
-        add: true,
-        remove: true,
-        merge: true
-      }
-    );
-  });
-
-  var initializeUnusedOrgCollection = _.once(function() {
-    unusedOrgCollection.fetch({
-      data: {
-          type: 'unused'
-        }
-      },
-      {
-        add: true,
-        remove: true,
-        merge: true
-      }
-    );
-  });
-
-  var communityCreateModel = new CommunityCreateModel({
-    active: false
-  });
 
   var appView = new MobileLayout({
     model: context.troupe(),
@@ -108,20 +73,20 @@ onready(function() {
   appView.render();
 
 
-  appEvents.on('community-create-view:toggle', function(active) {
-    communityCreateModel.set('active', active);
-    if(active) {
-      window.location.hash = '#createcommunity';
-    }
+  var createGroupAndRoomRoutes = generateCreateGroupAndRoomRoutes(appView, {
+    groupCollection: troupeCollections.groups,
+    roomCollection: troupeCollections.troupes,
+    orgCollection: troupeCollections.orgs,
+    repoCollection: repoCollection
   });
-
-
 
   var Router = Backbone.Router.extend({
     routes: {
       "": "hideModal",
       "notifications": "notifications",
       'notification-defaults': 'notificationDefaults',
+      'createroom': 'createRoom',
+      'createroom/:name': 'createRoom',
       'createcommunity': 'createCommunity'
     },
 
@@ -147,25 +112,8 @@ onready(function() {
       });
     },
 
-    createCommunity: function(/* uri */) {
-      initializeUnusedRepoCollection();
-      initializeUnusedOrgCollection();
-
-      require.ensure(['views/community-create/community-create-view'], function(require) {
-        var CommunityCreateView = require('views/community-create/community-create-view');
-        communityCreateModel.set('active', true);
-        var communityCreateView = new CommunityCreateView({
-          model: communityCreateModel,
-          orgCollection: troupeCollections.orgs,
-          unusedOrgCollection: unusedOrgCollection,
-          repoCollection: repoCollection,
-          unusedRepoCollection: unusedRepoCollection,
-          groupsCollection: troupeCollections.groups
-        });
-
-        appView.dialogRegion.show(communityCreateView);
-      });
-    }
+    createRoom: createGroupAndRoomRoutes.createRoom,
+    createCommunity: createGroupAndRoomRoutes.createCommunity
   });
 
   new Router();
