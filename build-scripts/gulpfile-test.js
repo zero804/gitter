@@ -227,7 +227,9 @@ gulp.task('test:post-test:submit-codecov', ['test:post-test:merge-lcov'], functi
   process.env.CODECOV_TOKEN = "4d30a5c7-3839-4396-a2fd-d8f9a68a5c3a";
 
   return gulp.src('output/coverage-reports/merged/lcov.info')
-    .pipe(codecov())
+    .pipe(codecov({
+      disable: 'gcov'
+    }))
     .on('error', function(err) {
       gutil.log(err);
       this.emit('end');
