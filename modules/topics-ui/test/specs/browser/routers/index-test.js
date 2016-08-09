@@ -6,6 +6,7 @@ var sinon = require('sinon');
 var router = require('../../../../browser/js/routers/index');
 var sinon = require('sinon');
 var {dispatch, subscribe} = require('../../../../browser/js/dispatcher');
+
 var navConstants = require('../../../../browser/js/constants/navigation.js');
 var forumCatConstants = require('../../../../browser/js/constants/forum-categories');
 var forumFilterConstants = require('../../../../browser/js/constants/forum-filters');
@@ -86,5 +87,10 @@ describe('Router', function(){
     assert.equal(sortHandle.callCount, 1);
   });
 
+  it('should identify create topic', () => {
+    assert.equal(router.get('categoryName'), 'all');
+    Backbone.history.navigate('gitterHQ/topics/create-topic', trigger);
+    assert.equal(router.get('createTopic'), true);
+  });
 
 });
