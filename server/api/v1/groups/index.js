@@ -1,16 +1,31 @@
 "use strict";
 
 var Promise = require('bluebird');
-var restful = require("../../../services/restful");
 var StatusError = require('statuserror');
 var groupService = require('gitter-web-groups/lib/group-service');
-var restSerializer = require('../../../serializers/rest-serializer');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var groupCreationService = require('../../../services/group-creation-service');
 var inviteValidation = require('gitter-web-invites/lib/invite-validation');
+var restful = require("../../../services/restful");
+var restSerializer = require('../../../serializers/rest-serializer');
 var internalClientAccessOnly = require('../../../web/middlewares/internal-client-access-only');
 
 var MAX_BATCHED_INVITES = 100;
+
+function getInvites(invitesInput) {
+  if (!invitesInput || !invitesInput.length) return [];
+
+  if (invitesInput.length > MAX_BATCHED_INVITES) {
+    throw new StatusError(400, 'Too many batched invites.');
+  }
+
+  // This could throw, but it is the basic user-input validation that would
+  // have failed if the frontend didn't call the invite checker API like it
+  // should have anyway.
+  return invitesInput.map(function(input) {
+    return inviteValidation.parseAndValidateInput(input);
+  });
+}
 
 function getGroupOptions(body) {
   var uri = body.uri ? String(body.uri) : undefined;
@@ -34,7 +49,9 @@ function getGroupOptions(body) {
     defaultRoom: {
       defaultRoomName: defaultRoomName,
       providers: providers
-    }
+    },
+    invites: getInvites(body.invites),
+    allowTweeting: body.allowTweeting
   };
 
   if (body.security) {
@@ -46,23 +63,6 @@ function getGroupOptions(body) {
   return groupOptions;
 }
 
-function getInvites(invitesInput) {
-  if (invitesInput && invitesInput.length) {
-    if (invitesInput.length > MAX_BATCHED_INVITES) {
-      throw new StatusError(400, 'Too many batched invites.');
-    }
-
-    // This could throw, but it is the basic user-input validation that would
-    // have failed if the frontend didn't call the invite checker API like it
-    // should have anyway.
-    return invitesInput.map(function(input) {
-      return inviteValidation.parseAndValidateInput(input);
-    });
-  }
-
-  // invites are optional
-  return [];
-}
 
 module.exports = {
   id: 'group',
@@ -94,7 +94,6 @@ module.exports = {
     }
 
     var groupCreationOptions = getGroupOptions(req.body);
-    groupCreationOptions.invites = getInvites(req.body.invites);
 
     return groupCreationService(user, groupCreationOptions)
       .then(function(groupCreationResult) {
@@ -115,6 +114,7 @@ module.exports = {
             restSerializer.serializeObject(defaultRoom, troupeStrategy),
             function(serializedGroup, serializedRoom) {
               serializedGroup.defaultRoom = serializedRoom;
+              serializedGroup.hookCreationFailedDueToMissingScope = groupCreationResult.hookCreationFailedDueToMissingScope;
               return serializedGroup;
             }
           );

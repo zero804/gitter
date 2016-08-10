@@ -1,7 +1,7 @@
 'use strict';
 
 var env = require('gitter-web-env');
-var logger = env.logger;
+var logger = env.logger.get('github');
 
 module.exports = exports = function badCredentialsCheck(err) {
   if (err.statusCode === 401 || err.statusCode === 403) {
