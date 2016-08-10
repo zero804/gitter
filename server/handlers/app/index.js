@@ -32,24 +32,34 @@ function saveRoom(req) {
 }
 
 function getSocialMetaDataForRoom(room, aroundId) {
-    // TODO: change this to use policy
-    if (aroundId && room && securityDescriptorUtils.isPublic(room)) {
-      // If this is a permalinked chat, load special social meta-data....
-      return chatService.findByIdInRoom(room._id, aroundId)
-        .then(function(chat) {
-          var strategy = new restSerializer.ChatStrategy({
-            notLoggedIn: true,
-            troupeId: room._id
+  var roomStrategy = new restSerializer.TroupeStrategy();
+
+  return restSerializer.serializeObject(room, roomStrategy)
+    .then(function(serializedRoom) {
+
+      // TODO: change this to use policy
+      if (aroundId && room && securityDescriptorUtils.isPublic(room)) {
+        // If this is a permalinked chat, load special social meta-data....
+        return chatService.findByIdInRoom(room._id, aroundId)
+          .then(function(chat) {
+            var chatStrategy = new restSerializer.ChatStrategy({
+              notLoggedIn: true,
+              troupeId: room._id
+            });
+
+
+            return restSerializer.serializeObject(chat, chatStrategy);
+          })
+          .then(function(permalinkChatSerialized) {
+            return social.getMetadataForChatPermalink({
+              room: serializedRoom,
+              chat: permalinkChatSerialized
+            });
           });
+      }
 
-          return restSerializer.serializeObject(chat, strategy);
-        })
-        .then(function(permalinkChatSerialized) {
-          return social.getMetadataForChatPermalink({ room: room, chat: permalinkChatSerialized });
-        });
-    }
-
-    return social.getMetadata({ room: room });
+      return social.getMetadata({ room: serializedRoom });
+    });
 }
 
 var mainFrameMiddlewarePipeline = [
