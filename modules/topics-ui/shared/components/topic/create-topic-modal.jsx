@@ -2,6 +2,7 @@
 
 import React, {PropTypes} from 'react';
 import Modal from '../modal.jsx';
+import Input from '../forms/input.jsx';
 
 export default React.createClass({
 
@@ -13,7 +14,11 @@ export default React.createClass({
   render(){
     const { active } = this.props;
     return (
-      <Modal active={active} />
+      <Modal active={active}>
+        <form name="create-topic">
+          <Input name="title" />
+        </form>
+      </Modal>
     );
   }
 
