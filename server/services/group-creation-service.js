@@ -5,6 +5,31 @@ var groupService = require('gitter-web-groups/lib/group-service');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var GroupWithPolicyService = require('./group-with-policy-service');
 var RoomWithPolicyService = require('./room-with-policy-service');
+var clientEnv = require('gitter-client-env');
+var TwitterBadger = require('gitter-web-twitter/lib/twitter-badger');
+var identityService = require('gitter-web-identity');
+
+function inviteTroubleTwitterUsers(user, room, invitesReport) {
+  return identityService.getIdentityForUser(user, 'twitter')
+    .then(function(identity) {
+      if (!identity) return;
+      
+      user.twitterUsername = identity.username;
+
+      var usersToTweet = [];
+      invitesReport.forEach(function(report) {
+        if(report.status === 'error' && report.inviteInfo.type === 'twitter') {
+          usersToTweet.push({
+            twitterUsername: report.inviteInfo.externalId
+          });
+        }
+      });
+
+      var roomUrl = room.lcUri ? (clientEnv['basePath'] + '/' + room.lcUri) : undefined;
+
+      return TwitterBadger.sendUserInviteTweets(user, usersToTweet, room.name, roomUrl);
+    });
+}
 
 /**
  * Create a group with a default room and invite some people
@@ -21,7 +46,8 @@ function groupCreationService(user, options) {
     .bind({
       group: null,
       defaultRoom: null,
-      invitesReport: null
+      invitesReport: null,
+      hookCreationFailedDueToMissingScope: null
     })
     .then(function(group) {
       this.group = group;
@@ -52,13 +78,14 @@ function groupCreationService(user, options) {
         // integrated with github
         // This is going to have to change in the new GROUP world
         runPostGitHubRoomCreationTasks: group.sd.type === 'GH_REPO',
-        
+
         addBadge: defaultRoomOptions.addBadge,
         providers: defaultRoomOptions.providers
       });
     })
-    .then(function(defaultRoom) {
-      this.defaultRoom = defaultRoom;
+    .then(function(createRoomResult) {
+      this.hookCreationFailedDueToMissingScope = createRoomResult.hookCreationFailedDueToMissingScope;
+      var defaultRoom = this.defaultRoom = createRoomResult.troupe;
 
       if (!options.invites || !options.invites.length) {
         // No invites to send out....
@@ -77,7 +104,14 @@ function groupCreationService(user, options) {
     })
     .then(function(invitesReport) {
       this.invitesReport = invitesReport;
-      return this;
+
+      if (!options.allowTweeting) {
+        return this;
+      }
+
+      // Tweet all the users
+      return inviteTroubleTwitterUsers(user, this.defaultRoom, invitesReport)
+        .return(this);
     });
 }
 

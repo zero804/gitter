@@ -14,6 +14,7 @@ describe('policy-factory', function() {
       user2: {},
       user3: {},
       user4: {},
+      user5: {},
       group1: {
         securityDescriptor: {
           type: null,
@@ -22,7 +23,7 @@ describe('policy-factory', function() {
           public: true,
           linkPath: null,
           externalId: null,
-          extraAdmins: ['user1']
+          extraAdmins: ['user1', 'user5']
         }
       },
       troupe1: {
@@ -52,6 +53,7 @@ describe('policy-factory', function() {
         }
       },
       troupe3: {
+        users: ['user5'],
         securityDescriptor: {
           type: 'GROUP',
           members: 'PUBLIC',
@@ -180,8 +182,17 @@ describe('policy-factory', function() {
       });
 
       describe('invite-only', function() {
-        it('group admin is admin of a group-backed room', function() {
+        it('group admin is not admin of a group-backed room if they are not in the room', function() {
           return checkPolicyForRoom(fixture.user1, fixture.troupe4, {
+            canRead: false,
+            canJoin: false,
+            canAdmin: false,
+            canAddUser: false
+          });
+        });
+
+        it('group admin is admin of a group-backed room if they are in the room', function() {
+          return checkPolicyForRoom(fixture.user5, fixture.troupe3, {
             canRead: true,
             canJoin: true,
             canAdmin: true,

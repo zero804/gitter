@@ -2,7 +2,7 @@
 
 var env = require('gitter-web-env');
 var stats = env.stats;
-var logger = env.logger;
+var logger = env.logger.get('github');
 var Promise = require('bluebird');
 var GitHubUserService = require('./github-user-service');
 var GitHubRepoService = require('./github-repo-service');

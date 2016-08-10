@@ -97,7 +97,8 @@ describe('group-with-policy-service #slow', function() {
         security: 'PUBLIC',
         linkPath: linkPath
       })
-      .then(function(room) {
+      .then(function(createRoomResult) {
+        var room = createRoomResult.troupe;
         return securityDescriptorService.getForRoomUser(room._id, null);
       })
       .then(function(securityDescriptor) {
@@ -119,7 +120,8 @@ describe('group-with-policy-service #slow', function() {
         security: 'PUBLIC',
         linkPath: linkPath
       })
-      .then(function(room) {
+      .then(function(createRoomResult) {
+        var room = createRoomResult.troupe;
         return securityDescriptorService.getForRoomUser(room._id, null);
       })
       .then(function(securityDescriptor) {
@@ -142,7 +144,8 @@ describe('group-with-policy-service #slow', function() {
         security: 'PRIVATE',
         linkPath: linkPath
       })
-      .then(function(room) {
+      .then(function(createRoomResult) {
+        var room = createRoomResult.troupe;
         return securityDescriptorService.getForRoomUser(room._id, null);
       })
       .then(function(securityDescriptor) {
@@ -167,7 +170,8 @@ describe('group-with-policy-service #slow', function() {
         topic: topic,
         security: 'PUBLIC'
       })
-      .then(function(room) {
+      .then(function(createRoomResult) {
+        var room = createRoomResult.troupe;
         assert.strictEqual(room.uri, fixture.group2.uri+'/'+fixtureLoader.GITTER_INTEGRATION_ROOM);
         assert.strictEqual(room.lcUri, fixture.group2.lcUri+'/'+fixtureLoader.GITTER_INTEGRATION_ROOM.toLowerCase());
         assert.equal(room.topic, topic);
@@ -193,7 +197,8 @@ describe('group-with-policy-service #slow', function() {
         topic: topic,
         security: 'PRIVATE'
       })
-      .then(function(room) {
+      .then(function(createRoomResult) {
+        var room = createRoomResult.troupe;
         return securityDescriptorService.getForRoomUser(room._id, null);
       })
       .then(function(securityDescriptor) {
@@ -249,7 +254,8 @@ describe('group-with-policy-service #slow', function() {
         security: 'PUBLIC',
         linkPath: fixtureLoader.GITTER_INTEGRATION_ORG
       })
-      .then(function(room) {
+      .then(function(createRoomResult) {
+        var room = createRoomResult.troupe;
         return securityDescriptorService.getForRoomUser(room._id, null);
       })
       .then(function(securityDescriptor) {
@@ -271,7 +277,8 @@ describe('group-with-policy-service #slow', function() {
         security: 'PRIVATE',
         linkPath: fixtureLoader.GITTER_INTEGRATION_ORG
       })
-      .then(function(room) {
+      .then(function(createRoomResult) {
+        var room = createRoomResult.troupe;
         return securityDescriptorService.getForRoomUser(room._id, null);
       })
       .then(function(securityDescriptor) {
@@ -288,14 +295,15 @@ describe('group-with-policy-service #slow', function() {
 
   // user rooms
 
-  it('should create a user room (public)', function() {
+  it('should create a user room - public', function() {
     return group1WithPolicyService.createRoom({
         type: 'GH_USER',
         name: fixtureLoader.GITTER_INTEGRATION_ROOM,
         security: 'PUBLIC',
         linkPath: fixtureLoader.GITTER_INTEGRATION_USERNAME
       })
-      .then(function(room) {
+      .then(function(createRoomResult) {
+        var room = createRoomResult.troupe;
         return securityDescriptorService.getForRoomUser(room._id, null);
       })
       .then(function(securityDescriptor) {
@@ -317,7 +325,8 @@ describe('group-with-policy-service #slow', function() {
         security: 'PRIVATE',
         linkPath: fixtureLoader.GITTER_INTEGRATION_USERNAME
       })
-      .then(function(room) {
+      .then(function(createRoomResult) {
+        var room = createRoomResult.troupe;
         return securityDescriptorService.getForRoomUser(room._id, null);
       })
       .then(function(securityDescriptor) {
