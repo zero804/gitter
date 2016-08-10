@@ -8,10 +8,15 @@ var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var policyCheckRateLimiter = require('./policy-check-rate-limiter');
 var PolicyDelegateTransportError = require('./policy-delegate-transport-error');
 var debug = require('debug')('gitter:app:permissions:policy-evaluator');
+var assert = require('assert');
 
 var SUCCESS_RESULT_CACHE_TIME = 5 * 60; // 5 minutes in seconds
 
 function PolicyEvaluator(userId, securityDescriptor, policyDelegate, contextDelegate) {
+  if (userId) {
+    assert(mongoUtils.isLikeObjectId(userId), 'userId must be an ObjectID');
+  }
+
   this._userId = userId;
   this._securityDescriptor = securityDescriptor;
   this._policyDelegate = policyDelegate;

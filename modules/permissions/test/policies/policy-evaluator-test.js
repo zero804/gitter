@@ -4,6 +4,7 @@ var assert = require('assert');
 var Promise = require('bluebird');
 var proxyquireNoCallThru = require("proxyquire").noCallThru();
 var PolicyDelegateTransportError = require('../../lib/policies/policy-delegate-transport-error');
+var ObjectID = require('mongodb').ObjectID;
 
 function getName(meta, index) {
   if (meta.name) {
@@ -369,7 +370,7 @@ describe('policy-evaluator', function () {
         './policy-check-rate-limiter': stubRateLimiter
       });
 
-      var userId = meta.anonymous ? null : 'user1';
+      var userId = meta.anonymous ? null : new ObjectID(1);
 
       var contextDelegate;
 
@@ -478,7 +479,7 @@ describe('policy-evaluator', function () {
           if (meta.handleReadAccessFailure) {
             assert(didCallHandleReadAccessFailure > 0);
           }
-          
+
           assert.strictEqual(didRemoveUserFromRoom, !!meta.removeUserFromRoom);
         });
     });
