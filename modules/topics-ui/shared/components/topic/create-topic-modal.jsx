@@ -3,6 +3,7 @@
 import React, {PropTypes} from 'react';
 import Modal from '../modal.jsx';
 import Input from '../forms/input.jsx';
+import H1 from '../text/h-1.jsx';
 
 export default React.createClass({
 
@@ -16,7 +17,8 @@ export default React.createClass({
     return (
       <Modal active={active}>
         <form name="create-topic">
-          <Input name="title" />
+          <H1 className="create-topic__heading">Create Topic</H1>
+          <Input className="create-topic__input--name" name="title" placeholder="Add title ..."/>
         </form>
       </Modal>
     );
