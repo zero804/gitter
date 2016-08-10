@@ -10,7 +10,7 @@ describe('<Editor/>', () => {
   let wrapper;
 
   beforeEach(() => {
-    wrapper = shallow(<Editor className="test"/>);
+    wrapper = shallow(<Editor className="test" name="test"/>);
   });
 
   it('should render a text area', () => {
@@ -23,6 +23,10 @@ describe('<Editor/>', () => {
 
   it('should render a custom class if provided', () => {
     equal(wrapper.find('.test').length, 1);
+  });
+
+  it('should pass down a name if provided', () => {
+      equal(wrapper.find('textarea').at(0).prop('name'), 'test');
   });
 
 });

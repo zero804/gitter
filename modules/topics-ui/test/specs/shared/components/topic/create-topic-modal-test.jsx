@@ -55,4 +55,12 @@ describe('<CreateTopicModal/>', () => {
     equal(wrapper.find('.create-topic__control-row').length, 1);
   });
 
+  it('should render a submit button', () => {
+    equal(wrapper.find('.create-topic__submit').length, 1);
+  });
+
+  it('should render the editor with a name of body', () => {
+      equal(wrapper.find('Editor').at(0).prop('name'), 'body');
+  });
+
 });
