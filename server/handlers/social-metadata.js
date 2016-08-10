@@ -2,16 +2,11 @@
 
 var env = require('gitter-web-env');
 var nconf = env.config;
-var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-url');
-var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
 
 var METADATA_IMAGE_SIZE = 256;
 
 function getMetadata(options) {
   var room = options && options.room;
-
-  var resolveRoom = (room && room.uri) ? room : {uri: 'gitterHQ'};
-  var image = resolveRoomAvatarUrl(resolveRoom, METADATA_IMAGE_SIZE);
 
   var title = room && room.uri || 'Gitter';
   var description = room && room.topic || 'Where developers come to talk.';
@@ -20,13 +15,13 @@ function getMetadata(options) {
     'og:title': title,
     'og:description': description,
     'og:type': 'website',
-    'og:image': image,
+    'og:image': room.avatarUrl,
     'fb:app_id': nconf.get('facebook:app-id'),
     'twitter:card': 'summary',
     'twitter:site': '@gitchat',
     'twitter:title': title,
     'twitter:description': description,
-    'twitter:image': image
+    'twitter:image': room.avatarUrl
   };
 }
 
@@ -40,8 +35,6 @@ function getMetadataForChatPermalink(options) {
 
   var fromUser = chat.fromUser;
 
-  var image = resolveUserAvatarUrl(fromUser, METADATA_IMAGE_SIZE);
-
   var title = room && room.uri || 'Gitter';
   var description = '@' + fromUser.username + ': ' + chat.text;
 
@@ -49,13 +42,13 @@ function getMetadataForChatPermalink(options) {
     'og:title': title,
     'og:description': description,
     'og:type': 'website',
-    'og:image': image,
+    'og:image': room.avatarUrl,
     'fb:app_id': nconf.get('facebook:app-id'),
     'twitter:card': 'summary',
     'twitter:site': '@gitchat',
     'twitter:title': title,
     'twitter:description': description,
-    'twitter:image': image
+    'twitter:image': room.avatarUrl
   };
 }
 
