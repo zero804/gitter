@@ -13,6 +13,8 @@ function renderForum(req, res, next, options) {
     return next(new StatusError(404));
   }
 
+  options = (options || {});
+
   forumService.findByName(req.params.groupName)
     .then(function(forum){
 
