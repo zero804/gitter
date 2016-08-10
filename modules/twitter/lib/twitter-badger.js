@@ -28,7 +28,8 @@ var alwaysAllowedUsernames = [
   'CutAndPastey',
   'escociao',
   'koholaa',
-  'NeverGitter'
+  'NeverGitter',
+  'TestyTestymike'
 ];
 
 var userFilter = function(user) {
