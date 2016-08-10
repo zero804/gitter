@@ -1,0 +1,31 @@
+@import (less, reference) "~gitter-styleguide/css/components/headings.css";
+
+.topics-table-body {
+  background:    @light;
+}
+
+.topics-table-body__row {
+  border-bottom: 1px solid @topic-table-cell-border;
+  &:nth-child(even) {
+    background-color: @topic-table-cell-odd-background;
+  }
+}
+
+.topics-table-body__cell {
+  &:extend(.h4);
+  padding:    1rem;
+  text-align: right;
+  color:      @topic-table-header-color;
+}
+
+.topics-table-body__cell--first {
+  &:extend(.topics-table-body__cell);
+  padding-left: @panel-horiz-padding + @panel-border-width;
+  text-align:   left;
+  color:        @topic-table-cell-color;
+}
+
+.topics-table-body__cell--last {
+  &:extend(.topics-table-body__cell);
+  padding-right: @panel-horiz-padding + @panel-border-width;
+}
