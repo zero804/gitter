@@ -28,7 +28,7 @@ describe('twitter-badger #slow', function() {
   if(!process.env.RUN_TWITTER_BADGER_TESTS) return;
 
   it('should send a tweet with one person', function() {
-    return TwitterBadger.sendUserInviteTweets(INVITING_USER, USERS_TO_INVITE.slice(0, 1), 'foo/bar')
+    return TwitterBadger.sendUserInviteTweets(INVITING_USER, USERS_TO_INVITE.slice(0, 1), 'foo/bar', '#0')
       .then(function(results) {
         // Assert number of tweets
         assert.equal(results.length, 1);
@@ -36,7 +36,7 @@ describe('twitter-badger #slow', function() {
   });
 
   it('should send a tweet with multiple people', function() {
-    return TwitterBadger.sendUserInviteTweets(INVITING_USER, USERS_TO_INVITE.slice(0, 2), 'foo/bar')
+    return TwitterBadger.sendUserInviteTweets(INVITING_USER, USERS_TO_INVITE.slice(0, 2), 'foo/bar', '#0')
       .then(function(results) {
         // Assert number of tweets
         assert.equal(results.length, 1);
@@ -44,7 +44,7 @@ describe('twitter-badger #slow', function() {
   });
 
   it('should send multiple tweets if we can not fit everything in one tweet', function() {
-    return TwitterBadger.sendUserInviteTweets(INVITING_USER, USERS_TO_INVITE, 'foo/bar')
+    return TwitterBadger.sendUserInviteTweets(INVITING_USER, USERS_TO_INVITE, 'foo/bar', '#0')
       .then(function(results) {
         // Assert number of tweets
         assert.equal(results.length, 2);
