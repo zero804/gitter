@@ -4,9 +4,8 @@
 
 var env = require('gitter-web-env');
 var stats = env.stats;
-var config = env.config;
 var errorReporter = env.errorReporter;
-var logger = env.logger;
+var logger = env.logger.get('chat');
 
 var ChatMessage = require('gitter-web-persistence').ChatMessage;
 var collections = require("../utils/collections");
@@ -16,7 +15,6 @@ var Promise = require('bluebird');
 var StatusError = require('statuserror');
 var _ = require('underscore');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
-var cacheWrapper = require('gitter-web-cache-wrapper');
 var groupResolver = require('./group-resolver');
 var chatSearchService = require('./chat-search-service');
 var unreadItemService = require('./unread-items');
@@ -123,7 +121,6 @@ function resolveMentions(troupe, user, parsedMessage) {
  * to chat in the room
  */
 exports.newChatMessageToTroupe = function(troupe, user, data) {
-
   // Keep this up here, set sent time asap to ensure order
   var sentAt = new Date();
 
@@ -216,7 +213,7 @@ exports.getRecentPublicChats = function() {
 exports.updateChatMessage = function(troupe, chatMessage, user, newText, callback) {
   return Promise.try(function() {
       newText = newText || '';
-      
+
       var age = (Date.now() - chatMessage.sent.valueOf()) / 1000;
       if(age > MAX_CHAT_EDIT_AGE_SECONDS) {
         throw new StatusError(400, "You can no longer edit this message");

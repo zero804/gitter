@@ -70,11 +70,15 @@ GroupWithPolicyService.prototype.createRoom = secureMethod([allowAdmin], functio
 
       return roomService.createGroupRoom(user, group, roomInfo, securityDescriptor, {
         tracking: options.tracking,
-        runPostGitHubRoomCreationTasks: options.runPostGitHubRoomCreationTasks
+        runPostGitHubRoomCreationTasks: options.runPostGitHubRoomCreationTasks,
+        addBadge: options.addBadge
       })
     })
     .then(function(results) {
-      return results.troupe;
+      return {
+        troupe: results.troupe,
+        hookCreationFailedDueToMissingScope: results.hookCreationFailedDueToMissingScope
+      };
     });
 });
 
