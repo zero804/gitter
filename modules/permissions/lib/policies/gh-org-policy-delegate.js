@@ -1,10 +1,14 @@
 'use strict';
 
+var assert = require('assert');
 var Promise = require('bluebird');
 var GitHubOrgService = require('gitter-web-github').GitHubOrgService;
 var PolicyDelegateTransportError = require('./policy-delegate-transport-error');
 
 function GhOrgPolicyDelegate(userId, userLoader, securityDescriptor) {
+  assert(userLoader, 'userLoader required');
+  assert(securityDescriptor, 'securityDescriptor required');
+
   this._userId = userId;
   this._userLoader = userLoader;
   this._securityDescriptor = securityDescriptor;
