@@ -5,6 +5,7 @@ const Backbone = require('backbone');
 const ForumContainer = require('../../containers/ForumContainer.jsx');
 const CategoryStore = require('./stores/forum-category-store');
 const TagStore = require('./stores/forum-tag-store');
+const TopicsStore = require('./stores/topics-store');
 
 module.exports = React.createClass({
 
@@ -42,6 +43,7 @@ module.exports = React.createClass({
   getForumState(){
     const categoryStore = (window.context.categoryStore || {});
     const tagStore = (window.context.tagStore || {});
+    const topicsStore = (window.context.topicsStore || {});
     const { router } = this.props;
 
     return Object.assign(this.getDefaultState(), {
@@ -52,6 +54,7 @@ module.exports = React.createClass({
       sortName: router.get('sortName'),
       categoryStore: new CategoryStore(categoryStore.models, { router: router }),
       tagStore: new TagStore(tagStore.models, { router: router }),
+      topicsStore: new TopicsStore(topicsStore.models, { router: router })
     });
   },
 
