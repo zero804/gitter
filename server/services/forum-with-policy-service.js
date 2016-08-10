@@ -38,8 +38,6 @@ function getCategoryOptions(options) {
     slug: options.slug || slugify(name)
   };
 
-  // TODO: validate name, slug
-
   return opts;
 }
 
@@ -52,8 +50,6 @@ function getTopicOptions(options) {
     sticky: options.sticky,
     text: options.text
   };
-
-  // TODO: validate title, slug, tags, text
 
   return opts;
 }

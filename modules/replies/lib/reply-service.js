@@ -2,11 +2,14 @@
 
 var env = require('gitter-web-env');
 var stats = env.stats;
+var Promise = require('bluebird');
+var StatusError = require('statuserror');
 var Reply = require('gitter-web-persistence').Reply;
 var debug = require('debug')('gitter:app:topics:reply-service');
 var processText = require('gitter-web-text-processor');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var markdownMajorVersion = require('gitter-markdown-processor').version.split('.')[0];
+var validators = require('gitter-web-validators');
 
 
 function findById(replyId) {
@@ -27,20 +30,38 @@ function findByIdForForum(forumId, replyId) {
     });
 }
 
-function createReply(user, topic, options) {
-  return processText(options.text)
-    .then(function(parsedMessage) {
-      var insertData = {
-        forumId: topic.forumId,
-        topicId: topic._id,
-        userId: user._id,
-        text: options.text || '',
-        html: parsedMessage.html,
-        lang: parsedMessage.lang,
-        _md: parsedMessage.markdownProcessingFailed ? -markdownMajorVersion : markdownMajorVersion
-      };
+function validateReply(data) {
+  if (!validators.validateMarkdown(data.text)) {
+    throw new StatusError(400, 'Text is invalid.')
+  }
 
-      return Reply.create(insertData);
+  return data;
+}
+
+function createReply(user, topic, options) {
+  var data = {
+    forumId: topic.forumId,
+    topicId: topic._id,
+    userId: user._id,
+    text: options.text || '',
+  };
+
+  return Promise.try(function() {
+      return validateReply(data);
+    })
+    .bind({})
+    .then(function(insertData) {
+      this.insertData = insertData;
+      return processText(options.text);
+    })
+    .then(function(parsedMessage) {
+      var data = this.insertData;
+
+      data.html = parsedMessage.html;
+      data.lang = parsedMessage.lang;
+      data._md = parsedMessage.markdownProcessingFailed ? -markdownMajorVersion : markdownMajorVersion;
+
+      return Reply.create(data);
     })
     .then(function(reply) {
       stats.event('new_reply', {
