@@ -21,6 +21,9 @@ export default React.createClass({
           <H1 className="create-topic__heading">Create Topic</H1>
           <Input className="create-topic__input--name" name="title" placeholder="Add title ..."/>
           <Editor className="create-topic__editor--body"/>
+          <div className="create-topic__control-row">
+
+          </div>
         </form>
       </Modal>
     );
