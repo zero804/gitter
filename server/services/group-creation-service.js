@@ -6,14 +6,14 @@ var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var GroupWithPolicyService = require('./group-with-policy-service');
 var RoomWithPolicyService = require('./room-with-policy-service');
 var clientEnv = require('gitter-client-env');
-var TwitterBadger = require('gitter-web-twitter/lib/twitter-badger');
+var twitterBadger = require('gitter-web-twitter/lib/twitter-badger');
 var identityService = require('gitter-web-identity');
 
 function inviteTroubleTwitterUsers(user, room, invitesReport) {
   return identityService.getIdentityForUser(user, 'twitter')
     .then(function(identity) {
       if (!identity) return;
-      
+
       user.twitterUsername = identity.username;
 
       var usersToTweet = [];
@@ -27,7 +27,7 @@ function inviteTroubleTwitterUsers(user, room, invitesReport) {
 
       var roomUrl = room.lcUri ? (clientEnv['basePath'] + '/' + room.lcUri) : undefined;
 
-      return TwitterBadger.sendUserInviteTweets(user, usersToTweet, room.name, roomUrl);
+      return twitterBadger.sendUserInviteTweets(user, usersToTweet, room.name, roomUrl);
     });
 }
 

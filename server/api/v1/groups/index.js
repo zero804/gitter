@@ -12,6 +12,26 @@ var internalClientAccessOnly = require('../../../web/middlewares/internal-client
 
 var MAX_BATCHED_INVITES = 100;
 
+
+function getInvites(invitesInput) {
+  if (invitesInput && invitesInput.length) {
+    if (invitesInput.length > MAX_BATCHED_INVITES) {
+      throw new StatusError(400, 'Too many batched invites.');
+    }
+
+    // This could throw, but it is the basic user-input validation that would
+    // have failed if the frontend didn't call the invite checker API like it
+    // should have anyway.
+    return invitesInput.map(function(input) {
+      return inviteValidation.parseAndValidateInput(input);
+    });
+  }
+
+  // invites are optional
+  return [];
+}
+
+
 function getGroupOptions(body) {
   var uri = body.uri ? String(body.uri) : undefined;
   var name = body.name ? String(body.name) : undefined;
@@ -35,7 +55,8 @@ function getGroupOptions(body) {
       defaultRoomName: defaultRoomName,
       providers: providers
     },
-    allowTweeting: body.allowTweeting
+    allowTweeting: body.allowTweeting,
+    invites: getInvites(body.invites)
   };
 
   if (body.security) {
@@ -47,23 +68,6 @@ function getGroupOptions(body) {
   return groupOptions;
 }
 
-function getInvites(invitesInput) {
-  if (invitesInput && invitesInput.length) {
-    if (invitesInput.length > MAX_BATCHED_INVITES) {
-      throw new StatusError(400, 'Too many batched invites.');
-    }
-
-    // This could throw, but it is the basic user-input validation that would
-    // have failed if the frontend didn't call the invite checker API like it
-    // should have anyway.
-    return invitesInput.map(function(input) {
-      return inviteValidation.parseAndValidateInput(input);
-    });
-  }
-
-  // invites are optional
-  return [];
-}
 
 module.exports = {
   id: 'group',
@@ -95,7 +99,6 @@ module.exports = {
     }
 
     var groupCreationOptions = getGroupOptions(req.body);
-    groupCreationOptions.invites = getInvites(req.body.invites);
 
     return groupCreationService(user, groupCreationOptions)
       .then(function(groupCreationResult) {
