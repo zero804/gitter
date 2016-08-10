@@ -3,8 +3,11 @@
 var StatusError = require('statuserror');
 var fonts = require('../../web/fonts');
 var forumService = require('gitter-web-forums').forumService;
+
 var forumCategoryStore = require('gitter-web-topics-ui/server/stores/forum-category-store');
 var forumTagStore = require('gitter-web-topics-ui/server/stores/forum-tag-store');
+var forumTopicsStore = require('gitter-web-topics-ui/server/stores/topics-store');
+
 var navConstants = require('gitter-web-topics-ui/browser/js/constants/navigation');
 
 function renderForum(req, res, next, options) {
@@ -40,6 +43,7 @@ function renderForum(req, res, next, options) {
 
           categoryStore: forumCategoryStore(forum.categories, categoryName),
           tagStore: forumTagStore(forum.tags, tagName),
+          topicStore: forumTopicsStore(forum.topics),
         }
       });
     });
