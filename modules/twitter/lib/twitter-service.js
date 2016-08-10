@@ -1,6 +1,6 @@
 'use strict';
 
-var debug = require('debug')('gitter:modules:twitter');
+var debug = require('debug')('gitter:app:twitter');
 var Promise = require('bluebird');
 var request = Promise.promisify(require('request'));
 
@@ -31,7 +31,7 @@ TwitterService.prototype.findFollowers = function(username) {
     }
   })
   .then(function(results) {
-    debug('Twitter API results', results && results.body);
+    debug('Twitter API results: %j', results && results.body);
     if (!results.body || !results.body.users) {
       return [];
     }
@@ -57,7 +57,7 @@ TwitterService.prototype.sendTweet = function(status) {
     }
   })
   .tap(function() {
-    debug('Sent tweet', status);
+    debug('Sent tweet: %j', status);
   });
 };
 
