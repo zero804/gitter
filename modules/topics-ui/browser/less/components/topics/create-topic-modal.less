@@ -1,0 +1,14 @@
+@import "../../colors";
+@import (less, reference) "~gitter-styleguide/css/components/headings.css";
+
+.create-topic__heading {
+  margin-bottom: 6rem;
+  color:         @create-modal-heading-color;
+  font-weight:   100;
+}
+
+.create-topic__input--name {
+  &:extend(.h2);
+  width: 100%;
+  color: @create-topic-name-color;
+}

@@ -1,3 +1,6 @@
+@light: white;
+@dark: black;
+
 @ruby:      #ed1965;
 @jaffa:     #F68D42;
 @caribbean: #46BC99;
@@ -9,8 +12,16 @@
 @topic-bg-right: #42b9dd;
 
 //Forum specific
-@topic-table-bg: white;
-@topic-container-category-bg: rgba(255, 255, 255, .1);
-@topic-container-table-control-bg: rgba(255, 255, 255, .1);
+@topic-table-bg: @light;
+@topic-container-category-bg: fadeout(@light, 90%);
+@topic-container-table-control-bg: fadeout(@light, 90%);
 
-@modal-wrapper-bg: rgba(255, 255, 255, .8);
+//Forms
+@input-border-color: lighten(@dark, 80%);
+
+//Modal
+@modal-wrapper-bg: fadeout(@light, 10%);
+
+//Create Topic
+@create-modal-heading-color: lighten(@dark, 80%);
+@create-topic-name-color: lighten(@dark, 10%);
