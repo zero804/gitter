@@ -5,7 +5,7 @@ import React from 'react';
 import { shallow } from 'enzyme';
 import CreateTopicModal from '../../../../../shared/components/topic/create-topic-modal.jsx';
 
-describe.only('<CreateTopicModal/>', () => {
+describe('<CreateTopicModal/>', () => {
 
   let wrapper;
   let activeWrapper;
@@ -41,6 +41,14 @@ describe.only('<CreateTopicModal/>', () => {
 
   it('should render the name input with the right placeholder', () => {
     equal(wrapper.find('Input').at(0).prop('placeholder'), 'Add title ...');
+  });
+
+  it('should render an Editor element', () => {
+    equal(wrapper.find('Editor').length, 1);
+  });
+
+  it('should render the editor with a custom class', () => {
+    equal(wrapper.find('.create-topic__editor--body').length, 1);
   });
 
 });
