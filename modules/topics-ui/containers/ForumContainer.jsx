@@ -43,6 +43,12 @@ module.exports = React.createClass({
       models: React.PropTypes.array.isRequired,
       getTags: React.PropTypes.func.isRequired
     }).isRequired,
+
+    //Topics
+    topicsStore: React.PropTypes.shape({
+      models: React.PropTypes.array.isRequired,
+      getTopics: React.PropTypes.func.isRequired
+    }).isRequired,
   },
 
   getDefaultProps(){

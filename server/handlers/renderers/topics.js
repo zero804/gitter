@@ -43,7 +43,7 @@ function renderForum(req, res, next, options) {
 
           categoryStore: forumCategoryStore(forum.categories, categoryName),
           tagStore: forumTagStore(forum.tags, tagName),
-          topicStore: forumTopicsStore(forum.topics),
+          topicsStore: forumTopicsStore(forum.topics),
         }
       });
     });
