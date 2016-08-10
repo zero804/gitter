@@ -6,9 +6,28 @@ var Promise = require('bluebird');
 var StatusError = require('statuserror');
 var validators = require('gitter-web-validators');
 var ForumCategory = require('gitter-web-persistence').ForumCategory;
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var debug = require('debug')('gitter:app:topics:forum-category-service');
 
+
+function findById(categoryId) {
+  return ForumCategory.findById(categoryId)
+    .lean()
+    .exec();
+}
+
+function findByIdForForum(forumId, categoryId) {
+  return findById(categoryId)
+    .then(function(category) {
+      if (!category) return null;
+
+      // make sure the category is in the specified forum
+      if (!mongoUtils.objectIDsEqual(category.forumId, forumId)) return null;
+
+      return category;
+    });
+}
 
 function findBySlugForForum(forumId, slug) {
   return ForumCategory.findOne({ forumId: forumId, slug: slug })
@@ -65,6 +84,8 @@ function createCategory(user, forum, categoryInfo) {
 }
 
 module.exports = {
+  findById: findById,
+  findByIdForForum: findByIdForForum,
   findBySlugForForum: findBySlugForForum,
   createCategory: createCategory
 };
