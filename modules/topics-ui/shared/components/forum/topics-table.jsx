@@ -2,16 +2,21 @@
 
 import React, { PropTypes } from 'react';
 import Container from '../container.jsx';
+import TopicsTableHeader from './topics-table-header.jsx';
 
 export default React.createClass({
 
   displayName: 'TopicsTable',
-  propTypes: {},
+  propTypes: {
+    topics: PropTypes.array.isRequired
+  },
 
   render(){
     return (
       <Container>
-      This is a table
+        <table className="topics-table">
+          <TopicsTableHeader />
+        </table>
       </Container>
     );
   }
