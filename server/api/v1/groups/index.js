@@ -12,25 +12,20 @@ var internalClientAccessOnly = require('../../../web/middlewares/internal-client
 
 var MAX_BATCHED_INVITES = 100;
 
-
 function getInvites(invitesInput) {
-  if (invitesInput && invitesInput.length) {
-    if (invitesInput.length > MAX_BATCHED_INVITES) {
-      throw new StatusError(400, 'Too many batched invites.');
-    }
+  if (!invitesInput || !invitesInput.length) return [];
 
-    // This could throw, but it is the basic user-input validation that would
-    // have failed if the frontend didn't call the invite checker API like it
-    // should have anyway.
-    return invitesInput.map(function(input) {
-      return inviteValidation.parseAndValidateInput(input);
-    });
+  if (invitesInput.length > MAX_BATCHED_INVITES) {
+    throw new StatusError(400, 'Too many batched invites.');
   }
 
-  // invites are optional
-  return [];
+  // This could throw, but it is the basic user-input validation that would
+  // have failed if the frontend didn't call the invite checker API like it
+  // should have anyway.
+  return invitesInput.map(function(input) {
+    return inviteValidation.parseAndValidateInput(input);
+  });
 }
-
 
 function getGroupOptions(body) {
   var uri = body.uri ? String(body.uri) : undefined;
@@ -55,8 +50,8 @@ function getGroupOptions(body) {
       defaultRoomName: defaultRoomName,
       providers: providers
     },
-    allowTweeting: body.allowTweeting,
-    invites: getInvites(body.invites)
+    invites: getInvites(body.invites),
+    allowTweeting: body.allowTweeting
   };
 
   if (body.security) {
