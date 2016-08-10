@@ -19,7 +19,7 @@ var debug = require('debug')('gitter:app:group-creation-service');
  * @private
  * @return inviteReport
  */
-function sendInvitesForRoom(user, room, invites) {
+var sendInvitesForRoom = Promise.method(function(user, room, invites) {
   if (!invites || !invites.length) return;
 
   // Invite all the users
@@ -33,7 +33,7 @@ function sendInvitesForRoom(user, room, invites) {
       // the report that the promise resolves to.
       return roomWithPolicyService.createRoomInvitations(invites);
     })
-}
+});
 
 /**
  * @private
