@@ -30,4 +30,8 @@ describe('<TopicsTable/>', () => {
     equal(wrapper.find('.topics-table').length, 1);
   });
 
+  it('should render a TopicsTableBody', () => {
+    equal(wrapper.find('TopicsTableBody').length, 1);
+  });
+
 });

@@ -62,7 +62,7 @@ module.exports = React.createClass({
   },
 
   getInitialState(){
-    const { categoryStore, tagStore } = this.props;
+    const { categoryStore, tagStore, topicsStore } = this.props;
     return {
       categoryName: this.props.categoryName,
       filterName: this.props.filterName,
@@ -71,6 +71,7 @@ module.exports = React.createClass({
       createTopic: this.props.createTopic,
       categories: categoryStore.getCategories(),
       tags: tagStore.getTags(),
+      topics: topicsStore.getTopics(),
     };
   },
 
@@ -90,7 +91,7 @@ module.exports = React.createClass({
   },
 
   render() {
-    const { categories, categoryName, tags, filterName, tagName, sortName, createTopic } = this.state;
+    const { categories, categoryName, tags, filterName, tagName, sortName, createTopic, topics } = this.state;
     const { groupName } = this.props;
     return (
       <main>
@@ -111,7 +112,7 @@ module.exports = React.createClass({
           sortChange={this.onSortChange}
           tagChange={this.onTagChange}/>
 
-        <TopicsTable />
+        <TopicsTable topics={topics}/>
 
         <CreateTopicModal active={createTopic} />
       </main>
