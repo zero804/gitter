@@ -7,6 +7,7 @@ import {subscribe, unsubscribe, dispatch} from '../browser/js/dispatcher';
 import CategoryList from '../shared/components/forum/category-list.jsx';
 import ForumTableControl from '../shared/components/forum/table-control.jsx';
 import CreateTopicModal from '../shared/components/topic/create-topic-modal.jsx';
+import TopicsTable from '../shared/components/forum/topics-table.jsx';
 
 import navigateToCategory from '../browser/js/action-creators/forum/navigate-to-category';
 import navigateToFilter from '../browser/js/action-creators/forum/navigate-to-filter';
@@ -109,6 +110,8 @@ module.exports = React.createClass({
           filterChange={this.onFilterChange}
           sortChange={this.onSortChange}
           tagChange={this.onTagChange}/>
+
+        <TopicsTable />
 
         <CreateTopicModal active={createTopic} />
       </main>

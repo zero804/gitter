@@ -94,4 +94,8 @@ describe('<ForumContainer />', function(){
     assert.equal(wrapper.find('CreateTopicModal').prop('active'), true);
   });
 
+  it('should render a TopicsTable', () => {
+    assert.equal(wrapper.find('TopicsTable').length, 1);
+  });
+
 });
