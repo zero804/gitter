@@ -51,4 +51,8 @@ describe('<CreateTopicModal/>', () => {
     equal(wrapper.find('.create-topic__editor--body').length, 1);
   });
 
+  it('should render a control row', () => {
+    equal(wrapper.find('.create-topic__control-row').length, 1);
+  });
+
 });
