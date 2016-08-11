@@ -37,6 +37,10 @@ describe('topic-api', function() {
         text: 'This is some **markdown** copy.'
       })
       .set('x-access-token', fixture.user1.accessToken)
-      .expect(200);
+      .expect(200)
+      .then(function(result) {
+        var topic = result.body;
+        assert.strictEqual(topic.title, 'I am a topic');
+      });
   });
 });

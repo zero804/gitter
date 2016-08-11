@@ -8,6 +8,7 @@ var forumService = require('gitter-web-forums/lib/forum-service');
 var forumCategoryService = require('gitter-web-forum-categories/lib/forum-category-service');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var ForumWithPolicyService = require('../../../services/forum-with-policy-service');
+var restSerializer = require('../../../serializers/rest-serializer');
 
 
 function getTopicOptions(body) {
@@ -92,10 +93,8 @@ module.exports = {
         return forumWithPolicyService.createTopic(this.category, topicOptions);
       })
       .then(function(topic) {
-        // TODO: use a proper serializer strategy
-        return {
-          id: topic.id
-        };
+        var topicStrategy = new restSerializer.TopicStrategy();
+        return restSerializer.serializeObject(topic, topicStrategy);
       });
   },
 
