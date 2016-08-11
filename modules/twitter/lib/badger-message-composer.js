@@ -1,5 +1,6 @@
 'use strict';
 
+var _ = require('lodash');
 var TWEET_MAX_CHARACTER_LIMIT = 140;
 
 function countMaxUsernamesForTweet(mentionList, size) {
@@ -40,6 +41,7 @@ function composeTweetAndDequeue(invitingUserName, mentionList, name, url) {
 
 function badgerMessageComposer(invitingUserName, mentionList, name, url) {
   if (!mentionList.length) return [];
+  mentionList = _.uniq(mentionList);
 
   var tweets = [];
   while(mentionList.length) {

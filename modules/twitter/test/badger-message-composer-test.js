@@ -24,6 +24,11 @@ describe('badger-message-composer', function() {
     assert.deepEqual(tweets, ['Hey @billy you\'ve been invited to the bob community by @suprememoocow.\nbob/bob']);
   });
 
+  it('should handle a duplicate users', function() {
+    var tweets = badgerMessageComposer('@suprememoocow', ['@billy', '@billy'], 'bob', 'bob/bob');
+    assert.deepEqual(tweets, ['Hey @billy you\'ve been invited to the bob community by @suprememoocow.\nbob/bob']);
+  });
+
   it('should handle a two users', function() {
     var tweets = badgerMessageComposer('@suprememoocow', ['@billy', '@bob'], 'bob', 'bob/bob');
     assert.deepEqual(tweets, ['Hey @billy @bob you\'ve been invited to the bob community by @suprememoocow.\nbob/bob']);
