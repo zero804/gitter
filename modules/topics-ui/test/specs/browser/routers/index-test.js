@@ -94,4 +94,9 @@ describe('Router', function(){
     assert.equal(router.get('createTopic'), true);
   });
 
+  it('should have the right route param when on the topic page', () => {
+    Backbone.history.navigate('gitterHQ/topics/topic/123/this-is-a-slug', trigger);
+    assert.equal(router.get('route'), 'topic');
+  });
+
 });

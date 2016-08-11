@@ -2,7 +2,10 @@
 
 const React = require('react');
 const Backbone = require('backbone');
+
 const ForumContainer = require('../../containers/ForumContainer.jsx');
+const TopicContainer = require('../../containers/TopicContainer.jsx');
+
 const CategoryStore = require('./stores/forum-category-store');
 const TagStore = require('./stores/forum-tag-store');
 const TopicsStore = require('./stores/topics-store');
@@ -24,6 +27,7 @@ module.exports = React.createClass({
     switch(router.get('route')) {
       case 'forum': return this.getForumState();
       case 'create-topic': return this.getCreateTopicState();
+      case 'topic': return this.getTopicState();
     }
   },
 
@@ -32,6 +36,7 @@ module.exports = React.createClass({
     switch(route) {
       case 'forum': return <ForumContainer {...this.state} />;
       case 'create-topic': return <ForumContainer {...this.state} />;
+      case 'topic': return <TopicContainer {...this.state} />;
     }
   },
 
@@ -63,6 +68,13 @@ module.exports = React.createClass({
     return Object.assign(this.getForumState(), {
       createTopic: router.get('createTopic'),
     });
-  }
+  },
+
+  getTopicState(){
+    const { router } = this.props;
+    return Object.assign(this.getDefaultState(), {
+      groupName: router.get('groupName'),
+    });
+  },
 
 });

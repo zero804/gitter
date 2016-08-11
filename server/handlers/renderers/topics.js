@@ -3,6 +3,7 @@
 var StatusError = require('statuserror');
 var fonts = require('../../web/fonts');
 var forumService = require('gitter-web-forums').forumService;
+var topicService = require('gitter-web-forums').topicService;
 
 var forumCategoryStore = require('gitter-web-topics-ui/server/stores/forum-category-store');
 var forumTagStore = require('gitter-web-topics-ui/server/stores/forum-tag-store');
@@ -49,6 +50,28 @@ function renderForum(req, res, next, options) {
     });
 }
 
+
+function renderTopic(req, res, next) {
+  if (!req.fflip || !req.fflip.has('topics')) {
+    return next(new StatusError(404));
+  }
+
+  topicService.findById(req.params.topicId)
+    .then(function(topic){
+
+      res.render('topics/topic', {
+        layout: 'topics-layout',
+        hasCachedFonts: fonts.hasCachedFonts(req.cookies),
+        fonts: fonts.getFonts(),
+        componentData: {
+          topic: topic,
+          groupName: req.params.groupName,
+        }
+      });
+    });
+}
+
 module.exports = {
   renderForum: renderForum,
+  renderTopic: renderTopic,
 };
