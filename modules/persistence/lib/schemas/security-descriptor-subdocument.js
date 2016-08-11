@@ -10,8 +10,8 @@ var SecurityDescriptorSchema = new Schema({
     'ONE_TO_ONE',
     'GH_REPO',
     'GH_ORG',
-    'GH_USER'
-    // 'GROUP' permissions from group
+    'GH_USER',
+    'GROUP'
   ], required: false },
   members: { type: String, enum: [
     null,              // For one-to-one
@@ -26,12 +26,13 @@ var SecurityDescriptorSchema = new Schema({
     'MANUAL',         // Only users in extraUserIds are admins
     'GH_REPO_PUSH',   // for GH_REPO, must have repo push or admin
     'GH_ORG_MEMBER',  // for GH_ORG, must be org member
-    'GH_USER_SAME'    // For GH_USER, user is same
-    // 'GROUP_ADMIN'  // for GROUP, but be a group admin
+    'GH_USER_SAME',   // For GH_USER, user is same
+    'GROUP_ADMIN'     // for GROUP, must be a group admin
   ]},
   public: { type: Boolean },
   linkPath: { type: String },
   externalId: { type: String },
+  internalId: { type: ObjectId },
   extraMembers: { type: [ObjectId] }, // TODO: record who added etc?
   extraAdmins: { type: [ObjectId] },  // TODO: record who added etc?
 }, { strict: 'throw' });
@@ -60,6 +61,19 @@ function installIndexes(Schema, Model) {
       background: true,
       partialFilterExpression: {
         externalId: { $exists: true }
+      }
+    },
+    function(err) {
+      if (err) throw err;
+    });
+
+  Model.collection.createIndex({
+      'sd.type': 1,
+      'sd.internalId': 1
+    } , {
+      background: true,
+      partialFilterExpression: {
+        internalId: { $exists: true }
       }
     },
     function(err) {

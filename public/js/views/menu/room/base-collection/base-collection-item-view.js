@@ -68,7 +68,7 @@ var BaseCollectionItemView = BaseItemView.extend({
     return url;
   },
 
-  onRender: function (){
+  onRender: function() {
     toggleClass(this.el, 'hidden', this.model.get('isHidden'));
   },
 
