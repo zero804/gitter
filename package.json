@@ -32,7 +32,7 @@
     "gitter-app-version": "file:modules/app-version",
     "gitter-web-forums": "file:modules/forums",
     "gitter-client-env": "file:modules/client-env",
-    "gitter-env": "^0.24.0",
+    "gitter-env": "^0.25.0",
     "gitter-faye": "^1.1.0-e",
     "gitter-faye-redis": "^0.4.4",
     "gitter-markdown-processor": "^11.2.0",
@@ -176,6 +176,7 @@
     "eslint-plugin-mocha": "^2.2.0",
     "eslint-plugin-node": "^1.2.1",
     "eslint-plugin-react": "^5.2.2",
+    "extract-text-webpack-plugin": "^1.0.1",
     "fastclick": "^1.0.6",
     "fastdom": "^1.0.1",
     "faye": "^1.1.2",
@@ -190,6 +191,7 @@
     "gulp-brotli": "^1.1.0",
     "gulp-codecov": "^2.0.2",
     "gulp-eslint": "^2.0.0",
+    "gulp-filter": "^4.0.0",
     "gulp-git": "^0.5.4",
     "gulp-github": "^0.3.4",
     "gulp-grep-stream": "0.0.2",
@@ -207,7 +209,7 @@
     "gulp-spawn-mocha": "^2.0.1",
     "gulp-tar": "^1.5.0",
     "gulp-uglify": "^1.4.2",
-    "gulp-using": "0.0.1",
+    "gulp-using": "^0.1.1",
     "gulp-util": "^3.0.7",
     "gulp-webpack": "^1.5.0",
     "hammerjs": "^2.0.4",
@@ -218,11 +220,8 @@
     "jsmockito": "^1.0.5",
     "keymaster": "^1.6.2",
     "lcov-result-merger": "^1.0.2",
-<<<<<<< HEAD
     "less": "^2.6.1",
     "less-loader": "^2.2.3",
-=======
->>>>>>> develop
     "live-reload": "^1.1.0",
     "lorem-ipsum": "^1.0.1",
     "memoize-promise": "^0.2.2",
@@ -294,5 +293,11 @@
       "pre-commit": "gulp fasttest",
       "post-merge": "npm prune && npm install"
     }
+  },
+  "nyc": {
+    "exclude": [
+      "public/repo/**",
+      "**/test/**"
+    ]
   }
 }

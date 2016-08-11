@@ -1,7 +1,7 @@
 'use strict';
 
 var env = require('gitter-web-env');
-var logger = env.logger;
+var logger = env.logger.get('collaborators');
 var Promise = require('bluebird');
 var RepoService = require('gitter-web-github').GitHubRepoService;
 var ContributorService = require('gitter-web-github').GitHubContributorService;
