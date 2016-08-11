@@ -600,6 +600,7 @@ fixtureLoader.setup = function(expected) {
 fixtureLoader.createExpectedFixtures = createExpectedFixtures;
 fixtureLoader.generateEmail = generateEmail;
 fixtureLoader.generateGithubId = generateGithubId;
+fixtureLoader.generateUri = generateUri;
 
 fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN = '***REMOVED***';
 fixtureLoader.GITTER_INTEGRATION_USERNAME = 'gitter-integration-tests';
