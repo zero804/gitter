@@ -59,6 +59,12 @@ var CreateRoomViewModel = Backbone.Model.extend({
         message: 'Waiting for room name check to respond'
       });
     }
+    else if(this.get('roomAvailabilityStatus') === roomAvailabilityStatusConstants.GROUP_REQUIRED) {
+      errors.push({
+        key: 'group',
+        message: 'Please select a community'
+      });
+    }
 
     return errors.length > 0 ? errors : undefined;
   }
