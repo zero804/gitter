@@ -112,12 +112,7 @@ var ExploreView = Marionette.LayoutView.extend({
   },
 
   popCreate: function() {
-    if(context.hasFeature('community-create')) {
-      //appEvents.trigger('community-create-view:toggle', true);
-      frameUtils.postMessage({ type: 'community-create-view:toggle', active: true });
-    } else {
-      frameUtils.postMessage({ type: 'route', hash: 'createroom' });
-    }
+    frameUtils.postMessage({ type: 'community-create-view:toggle', active: true });
   }
 });
 

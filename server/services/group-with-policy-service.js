@@ -3,13 +3,13 @@
 var assert = require('assert');
 var StatusError = require('statuserror');
 var ensureAccessAndFetchDescriptor = require('gitter-web-permissions/lib/ensure-access-and-fetch-descriptor');
-var Troupe = require('gitter-web-persistence').Troupe;
 var debug = require('debug')('gitter:app:group-with-policy-service');
 var roomService = require('./room-service');
 var secureMethod = require('../utils/secure-method');
 var validateRoomName = require('gitter-web-validators/lib/validate-room-name');
 var validateProviders = require('gitter-web-validators/lib/validate-providers');
 var groupService = require('gitter-web-groups/lib/group-service');
+var troupeService = require('./troupe-service');
 
 /**
  * @private
@@ -21,9 +21,10 @@ function validateRoomSecurity(type, security) {
   return false;
 }
 
-/**
- * This could do with a better name
- */
+function allowAdmin() {
+  return this.policy.canAdmin();
+}
+
 function GroupWithPolicyService(group, user, policy) {
   assert(group, 'Group required');
   assert(policy, 'Policy required');
@@ -32,52 +33,106 @@ function GroupWithPolicyService(group, user, policy) {
   this.policy = policy;
 }
 
-function allowAdmin() {
-  return this.policy.canAdmin();
-}
-
-function findByUri(uri) {
-  assert(uri, 'uri required');
-  return Troupe.findOne({ lcUri: uri.toLowerCase() })
-    .lean()
-    .exec();
-}
-
-function ensureAccessAndFetchRoomInfo(user, group, options) {
-  options = options || {};
-
+/**
+ * Allow admins to create a new room
+ * @return {Promise} Promise of room
+ */
+GroupWithPolicyService.prototype.createRoom = secureMethod([allowAdmin], function(options) {
+  assert(options, 'options required');
+  var type = options.type || null;
   var providers = options.providers;
+  var security = options.security;
+  var name = options.name;
+
+  var user = this.user;
+  var group = this.group;
+
   if (providers && !validateProviders(providers)) {
-    throw new StatusError(400, 'Invalid providers ' + providers.toString());
+    throw new StatusError(400, 'Invalid providers ' + providers);
   }
 
-  var type = options.type || null;
-
-  var security = options.security;
   assert(security, 'security required');
 
   if (!validateRoomSecurity(type, security)) {
     throw new StatusError(400, 'Invalid room security for ' + type +': '+ security);
   }
 
-  var topic = options.topic;
-  // TODO: validate topic
+  if (!validateRoomName(name)) {
+    throw new StatusError(400, 'Invalid room name: ' + name);
+  }
 
+  return this._ensureAccessAndFetchRoomInfo(options)
+    .spread(function(roomInfo, securityDescriptor) {
+      debug("Upserting %j", roomInfo);
+
+      return roomService.createGroupRoom(user, group, roomInfo, securityDescriptor, {
+        tracking: options.tracking,
+        runPostGitHubRoomCreationTasks: options.runPostGitHubRoomCreationTasks,
+        addBadge: options.addBadge
+      })
+    })
+    .then(function(results) {
+      return {
+        troupe: results.troupe,
+        hookCreationFailedDueToMissingScope: results.hookCreationFailedDueToMissingScope
+      };
+    });
+});
+
+GroupWithPolicyService.prototype.setAvatar = secureMethod([allowAdmin], function(url) {
+  groupService.setAvatarForGroup(this.group._id, url);
+});
+
+/**
+ * @private
+ */
+GroupWithPolicyService.prototype._ensureAccessAndFetchRoomInfo = function(options) {
+  var user = this.user;
+  var group = this.group;
+  var type = options.type || null;
+  var providers = options.providers;
+  var security = options.security;
+  var topic = options.topic;
   var name = options.name;
+  var linkPath = options.linkPath;
+  var internalId;
+
+  // This is probably not needed...
+  var obtainAccessFromGitHubRepo = options.obtainAccessFromGitHubRepo;
+
+  var uri = group.uri + '/' + name;
+
+  if (providers && !validateProviders(providers)) {
+    throw new StatusError(400, 'Invalid providers ' + providers.toString());
+  }
+
+  assert(security, 'security required');
+
+  if (!validateRoomSecurity(type, security)) {
+    throw new StatusError(400, 'Invalid room security for ' + type +': '+ security);
+  }
 
   if (!validateRoomName(name)) {
     throw new StatusError(400, 'Invalid room name: ' + name);
   }
 
-  var uri = group.uri + '/' + name;
+  if (type === 'GROUP') {
+    internalId = group._id;
+  }
 
-  return findByUri(uri)
+  return troupeService.findByUri(uri)
     .then(function(room) {
       if (room) {
         throw new StatusError(409, 'Room uri already taken: ' + uri);
       }
 
-      return ensureAccessAndFetchDescriptor(user, options)
+      return ensureAccessAndFetchDescriptor(user, {
+          type: type,
+          linkPath: linkPath,
+          obtainAccessFromGitHubRepo: obtainAccessFromGitHubRepo,
+          internalId: internalId,
+          security: security,
+        })
         .then(function(securityDescriptor) {
           return [{
             topic: topic,
@@ -87,41 +142,5 @@ function ensureAccessAndFetchRoomInfo(user, group, options) {
         });
     })
 }
-
-
-/**
- * Allow admins to create a new room
- * @return {Promise} Promise of room
- */
-GroupWithPolicyService.prototype.createRoom = secureMethod([allowAdmin], function(options) {
-  var user = this.user;
-  var group = this.group;
-
-  if (options.type && group.sd.type !== 'GH_ORG' && group.sd.type !== 'GH_REPO' && group.sd.type !== 'GH_USER') {
-    throw new StatusError(400, 'GitHub repo backed rooms can only be added to GitHub org, repo or user backed groups.');
-  }
-
-  if (options.linkPath) {
-    if (options.linkPath.split('/')[0] !== group.sd.linkPath.split('/')[0]) {
-      throw new StatusError(400, 'GitHub repo backed rooms must be for the same owner (gh org or user) as the group.');
-    }
-  }
-
-  return ensureAccessAndFetchRoomInfo(user, group, options)
-    .spread(function(roomInfo, securityDescriptor) {
-      debug("Upserting %j", roomInfo);
-      return roomService.createGroupRoom(user, group, roomInfo, securityDescriptor, {
-        tracking: options.tracking,
-        runPostGitHubRoomCreationTasks: options.runPostGitHubRoomCreationTasks
-      })
-    })
-    .then(function(results) {
-      return results.troupe;
-    });
-});
-
-GroupWithPolicyService.prototype.setAvatar = secureMethod([allowAdmin], function(url) {
-  groupService.setAvatarForGroup(this.group._id, url);
-});
 
 module.exports = GroupWithPolicyService;
