@@ -21,6 +21,9 @@ function createTopic(fixtureName, f) {
     sticky: f.sticky,
     text: f.text,
     html: f.html,
+    sent: f.sent,
+    editedAt: f.editedAt,
+    lastModified: f.lastModified,
     lang: f.lang,
     _md: f._md
   };

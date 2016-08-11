@@ -29,6 +29,11 @@ function findByIdForForum(forumId, categoryId) {
     });
 }
 
+function findByIds(ids) {
+  return mongooseUtils.findByIds(ForumCategory, ids);
+
+}
+
 function findBySlugForForum(forumId, slug) {
   return ForumCategory.findOne({ forumId: forumId, slug: slug })
     .lean()
@@ -86,6 +91,7 @@ function createCategory(user, forum, categoryInfo) {
 module.exports = {
   findById: findById,
   findByIdForForum: findByIdForForum,
+  findByIds: findByIds,
   findBySlugForForum: findBySlugForForum,
   createCategory: createCategory
 };
