@@ -3,7 +3,7 @@
 var gulp = require('gulp');
 var webpack = require('gulp-webpack');
 var sourcemaps = require('gulp-sourcemaps');
-var uglify = require('gulp-uglify');
+// var uglify = require('gulp-uglify');
 
 function webpackPipeline(rootDir) {
   return gulp.src(rootDir + '/webpack.config.js')
