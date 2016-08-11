@@ -5,6 +5,7 @@ var Promise = require('bluebird');
 var env = require('gitter-web-env');
 var config = env.config;
 var TwitterService = require('./twitter-service');
+var StatusError = require('statuserror');
 
 var TWEET_MAX_CHARACTER_LIMIT = 140;
 
@@ -26,7 +27,9 @@ var alwaysAllowedUsernames = [
   '__leroux',
   'CutAndPastey',
   'escociao',
-  'koholaa'
+  'koholaa',
+  'NeverGitter',
+  'TestyTestymike'
 ];
 
 var userFilter = function(user) {
@@ -39,14 +42,16 @@ var userFilter = function(user) {
     return true;
   }
 
+  var lcUsername = (user.twitterUsername || '').toLowerCase();
+
   // We don't want to bother other users when testing (non-prod)
   return alwaysAllowedUsernames.some(function(alwaysAllowedUsername) {
-    return user.twitterUsername === alwaysAllowedUsername;
+    return lcUsername === alwaysAllowedUsername.toLowerCase();
   });
 };
 
 
-function sendUserInviteTweets(invitingUser, users, url) {
+function sendUserInviteTweets(invitingUser, users, name, url) {
   if(!invitingUser) {
     return Promise.reject(new Error('No user provided to show as the person inviting other users'));
   }
@@ -69,27 +74,44 @@ function sendUserInviteTweets(invitingUser, users, url) {
   if(invitingUser && mentionList.length > 0) {
     var invitingUserName = invitingUser.twitterUsername ? ('@' + invitingUser.twitterUsername) : invitingUser.username;
 
-    var baseMessage = invitingUserName + ' invited you to join ' + url + ' ';
+    var baseMessagePre = 'Hey ';
+    var baseMessagePost = ' you\'ve been invited to the ' + name + ' community by ' + invitingUserName + '.\n' + url;
+    var baseMessageLength = baseMessagePre.length + baseMessagePost.length;
 
     // Split up the mentions into multiple tweets if necessary
     var mentionStringBuckets = [''];
     mentionList.forEach(function(mention) {
       var currentMentionString = mentionStringBuckets[mentionStringBuckets.length - 1];
-      if(baseMessage.length + currentMentionString.length > TWEET_MAX_CHARACTER_LIMIT) {
+      var newMentionString = currentMentionString + (currentMentionString ? ' ' : '') + mention;
+
+      if(baseMessageLength + newMentionString.length > TWEET_MAX_CHARACTER_LIMIT) {
         mentionStringBuckets.push('');
         currentMentionString = '';
       }
 
-      mentionStringBuckets[mentionStringBuckets.length - 1] = (currentMentionString ? (currentMentionString + ' ') : '') + mention;
+      // Logic is kinda duplicated here but because we need to compare to the potential new bucket
+      mentionStringBuckets[mentionStringBuckets.length - 1] = currentMentionString + (currentMentionString ? ' ' : '') + mention;
     });
 
     debug('Sending ' + mentionStringBuckets.length + ' invite tweets');
 
     return Promise.all(mentionStringBuckets.map(function(mentionString) {
-      var message = baseMessage + mentionString;
+      var message = baseMessagePre + mentionString + baseMessagePost;
       return twitterService.sendTweet(message)
-        .then(function() {
-          return message;
+        .then(function(res) {
+          if(res.statusCode === 200) {
+            return message;
+          }
+
+          var errorMessage = res.body;
+          if(res.body.errors) {
+            errorMessage = (res.body.errors || []).reduce(function(errorString, error) {
+              return errorString + (errorString.length > 0 ? ' -- ' : '') + error.code + ' ' + error.message;
+            }, '');
+          }
+          var errorString = 'Status: ' + res.statusCode + ' -- ' + errorMessage;
+
+          throw new StatusError(400, errorString);
         });
     }));
   }
