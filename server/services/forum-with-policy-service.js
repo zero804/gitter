@@ -35,6 +35,8 @@ function getCategoryOptions(options) {
 
   var opts = {
     name: name,
+    // TODO: should the default slugify be performed in here, or in the
+    // integration service or in the module service?
     slug: options.slug || slugify(name)
   };
 
@@ -59,8 +61,6 @@ function getReplyOptions(options) {
     text: options.text
   };
 
-  // TODO: validate text
-
   return opts;
 }
 
@@ -68,8 +68,6 @@ function getCommentOptions(options) {
   var opts = {
     text: options.text
   };
-
-  // TODO: validate text
 
   return opts;
 }
