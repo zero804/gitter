@@ -18,7 +18,6 @@ var FilteredSelect = Marionette.ItemView.extend({
     this.collection = options.collection;
     this.itemTemplate = options.itemTemplate;
     this.dropdownClass = options.dropdownClass;
-    this.showOnActivate = options.showOnActivate;
 
     this.filteredCollection = new FilteredCollection({
       collection: this.collection
@@ -60,7 +59,7 @@ var FilteredSelect = Marionette.ItemView.extend({
   },
 
   onActivate: function() {
-    if(this.showOnActivate) {
+    if(this.el.value) {
       this.show();
     }
   },

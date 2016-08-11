@@ -30,7 +30,8 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   initInviteListView: function(optionsForRegion) {
     this.inviteListView = new CommunityCreationPeopleListView(optionsForRegion({
-      collection: this.inviteCollection
+      collection: this.inviteCollection,
+      communityCreateModel: this.communityCreateModel,
     }));
     return this.inviteListView;
   },
@@ -53,13 +54,8 @@ module.exports = CommunityCreateBaseStepView.extend({
     this.orgCollection = options.orgCollection;
     this.repoCollection = options.repoCollection;
     this.groupsCollection = options.groupsCollection;
-
-    this.inviteCollection = new VirtualMultipleCollection([], {
-      backingCollections: [
-        this.communityCreateModel.peopleToInvite,
-        this.communityCreateModel.emailsToInvite
-      ]
-    });
+    this.inviteCollection = options.inviteCollection;
+    this.troubleInviteCollection = options.troubleInviteCollection;
 
     this.listenTo(this.communityCreateModel, 'change:communityName change:communitySlug change:githubOrgId', this.onCommunityDataChange, this);
   },
@@ -106,7 +102,9 @@ module.exports = CommunityCreateBaseStepView.extend({
           linkPath: linkPath
         },
         invites: [].concat(communityCreateModel.peopleToInvite.toJSON(), communityCreateModel.emailsToInvite.toJSON()),
-        addBadge: communityCreateModel.get('allowBadger')
+        addBadge: communityCreateModel.get('allowBadger'),
+        // TODO: ADD UI option
+        allowTweeting: true
       }, {
         wait: true,
         success: function(model, response) {
@@ -136,7 +134,13 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   },
   onStepBack: function() {
-    this.communityCreateModel.set('stepState', stepConstants.INVITE);
+    // Only go back to confirmation if there was trouble initially
+    if(this.troubleInviteCollection.length > 0) {
+      this.communityCreateModel.set('stepState', stepConstants.INVITE_CONFIRMATION);
+    }
+    else {
+      this.communityCreateModel.set('stepState', stepConstants.INVITE);
+    }
   },
 
   onCommunityDataChange: function() {
