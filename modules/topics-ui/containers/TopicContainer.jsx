@@ -1,6 +1,7 @@
 "use strict";
 
 import React, {PropTypes, createClass} from 'react';
+import TopicHeader from '../shared/components/topic/topic-header.jsx';
 
 module.exports = createClass({
 
@@ -8,6 +9,8 @@ module.exports = createClass({
   propTypes: {},
 
   render(){
-    return <div>THIS IS THE NEWS</div>
+    return (
+      <TopicHeader />
+    );
   }
 });
