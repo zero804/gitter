@@ -73,6 +73,14 @@ function getCommentOptions(options) {
 }
 
 ForumWithPolicyService.prototype.assertForumId = function(forumId) {
+  /*
+  Suppose a user posts to /v1/forums/:forumId/topics/:topicId/replies. This
+  makes sure that that topic is actually in the same forum. Otherwise you can
+  craft a URL that will do the security validation against one forum, but allow
+  you to then perform actions against any category/topic/reply/comment/whatever
+  in any other forum. (Depending obviously on what the code did before we got
+  here.) That wouldn't be good.
+  */
   if (!mongoUtils.objectIDsEqual(forumId, this.forum._id)) {
     // not sure what would be the best HTTP status code here
     throw new StatusError(403, 'forumId does not match');
