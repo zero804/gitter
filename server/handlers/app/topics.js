@@ -33,4 +33,12 @@ router.get('/create-topic',
   }
 );
 
+router.get('/topic/:topicId/:topicSlug',
+  identifyRoute('topic'),
+  featureToggles,
+  function(req, res, next){
+    return topicsRenderers.renderTopic(req, res, next);
+  }
+);
+
 module.exports = router;

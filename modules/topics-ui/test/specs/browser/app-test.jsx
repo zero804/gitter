@@ -6,7 +6,7 @@ var Backbone = require('backbone');
 var React = require('react');
 var App = require('../../../browser/js/app.jsx');
 
-describe('App', function(){
+describe.only('App', function(){
 
   it('should set the right state when rendered with the forum route', function(){
     var route = new Backbone.Model({ route: 'forum', groupName: 'gitterHQ' });
@@ -26,6 +26,12 @@ describe('App', function(){
     const wrapper = shallow(<App router={route} />);
     assert.equal(wrapper.find('ForumContainer').length, 1);
     assert.equal(wrapper.state('createTopic'), true);
+  });
+
+  it('should render a TopicContainer when in the topic state', () => {
+    var route = new Backbone.Model({ route: 'topic', groupName: 'gitterHQ' });
+    const wrapper = shallow(<App router={route} />);
+    assert.equal(wrapper.find('TopicContainer').length, 1);
   });
 
 });

@@ -40,7 +40,8 @@ var Router = Backbone.Router.extend({
 
   routes: {
     ':groupName/topics/create-topic(/)': 'createTopic',
-    ':groupName/topics(/categories/:categoryName)(/)(?*queryString)': 'forums'
+    ':groupName/topics(/categories/:categoryName)(/)(?*queryString)': 'forums',
+    ':groupName/topics/topic/:id/:slug(/)(?*queryString)': 'topic'
   },
 
   createTopic(groupName){
@@ -61,6 +62,12 @@ var Router = Backbone.Router.extend({
       filterName: (query.filter || navConstants.DEFAULT_FILTER_NAME),
       tagName: (query.tag || navConstants.DEFAULT_TAG_NAME),
       sortName: (query.sort || navConstants.DEFAULT_SORT_NAME),
+    });
+  },
+
+  topic(id, slug, queryString){
+    this.model.set({
+      route: 'topic',
     });
   },
 
