@@ -196,8 +196,6 @@ module.exports = (function() {
     },
 
     initialize: function() {
-      var ctx = context();
-
       //listen to room permission changes so we can refresh the collection
       this.listenTo(context.troupe(), 'change:permissions', this.onRoomChange, this);
     },
