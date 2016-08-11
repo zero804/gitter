@@ -1,7 +1,7 @@
 "use strict";
 
 var path = require('path');
-var ExtractTextPlugin = require("extract-text-webpack-plugin");
+var ExtractTextPlugin = require("extract-text-webpack-plugin"); //eslint-disable-line node/no-unpublished-require
 
 var config = {
   entry: {
