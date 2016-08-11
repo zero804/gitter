@@ -157,14 +157,18 @@ GroupWithPolicyService.prototype.createForum = secureMethod([allowAdmin], functi
 
   // For now we only allow one forum per group.
   // We don't upsert into the existing one either.
+  // NOTE: should this check be part of an integration service too?
   if (group.forumId) {
     throw new StatusError(409, 'Group already has a forum.');
   }
 
+  // TODO: this stuff should be moved to an integration service
+
   // There is nothing configurable at this stage on forum level.
   var forumInfo = {};
 
-  // hardcode the security descriptor to public for now
+  // TODO: this is hardcoded for now, but down the line the user should be able
+  // to make it PRIVATE too.
   var securityDescriptor = securityDescriptorGenerator.generate(user, {
     type: 'GROUP',
     internalId: group._id,

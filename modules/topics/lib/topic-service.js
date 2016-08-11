@@ -85,6 +85,7 @@ function createTopic(user, category, options) {
       return Topic.create(data);
     })
     .then(function(topic) {
+      // TODO: this should be moved to the integration service rather
       stats.event('new_topic', {
         userId: user._id,
         forumId: category.forumId,
