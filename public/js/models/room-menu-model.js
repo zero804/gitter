@@ -28,8 +28,6 @@ var MinibarItemModel = require('../views/menu/room/minibar/minibar-item-model');
 var MinibarPeopleModel = require('../views/menu/room/minibar/people-view/people-model');
 var MinibarTempOrgModel = require('../views/menu/room/minibar/temp-org-view/temp-org-model');
 
-var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
-
 var states = [
   'all',
   'search',
@@ -59,7 +57,6 @@ module.exports = Backbone.Model.extend({
   },
 
   initialize: function(attrs) {
-
     this.set('panelOpenState', this.get('roomMenuIsPinned'));
 
     if (!attrs || !attrs.bus) {
@@ -182,7 +179,8 @@ module.exports = Backbone.Model.extend({
 
     this.listenTo(this, 'change:searchTerm', this.onSearchTermChange, this);
     this.listenTo(this, 'change:state', this.onSwitchState, this);
-    this.listenTo(this, 'change', _.throttle(this.save.bind(this), 1500));
+    this.listenTo(this, 'change', this.persistChanges);
+    this._throttledSave = _.throttle(this.save.bind(this), 1500, { leading: false });
     this.listenTo(context.troupe(), 'change:id', this.onRoomChange, this);
     this.listenTo(this.bus, 'left-menu-menu-bar:activate', this.onMenuBarActivateRequest, this);
     this.onSwitchState(this, this.get('state'));
@@ -259,26 +257,31 @@ module.exports = Backbone.Model.extend({
     }, {});
   },
 
+  persistChanges: function() {
+    var includesPersistentChanges = Object.keys(this.changed).some(function(changedKey) {
+      if (changedKey === 'searchTerm') return false;
+      return this.defaults.hasOwnProperty(changedKey);
+    }, this);
+
+    if (includesPersistentChanges) {
+      this._throttledSave();
+    }
+  },
+
   //This can be changed to userPreferences once the data is maintained
   //JP 8/1/16
   sync: function(method, model, options) {
-    var self = this;
-
     //save
     if (method === 'create' || method === 'update' || method === 'patch') {
       return apiClient.user.put('/settings/leftRoomMenu', this.toJSON(), {
         // No need to get the JSON back from the server...
         dataType: 'text'
       })
-      .then(function() { if (options.success) options.success.apply(self, arguments); })
+      .then(function() {
+        if (options.success) options.success({});
+      })
       .catch(function(err) { if (options.error) options.error(err); });
     }
-
-    //The only time we need to fetch data is on page load
-    //so we can just pull it our of the troupe context
-    //JP 11/1/16
-    this.set(context.getLeftRoomMenuContext());
-    if (options.success) options.success();
   },
 
   onRoomChange: function (){

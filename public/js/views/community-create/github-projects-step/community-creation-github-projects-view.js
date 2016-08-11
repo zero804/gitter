@@ -249,7 +249,7 @@ module.exports = CommunityCreateBaseStepView.extend({
       }
 
       return shouldShow;
-    })
+    });
   },
 
   fetchRepos: function() {
