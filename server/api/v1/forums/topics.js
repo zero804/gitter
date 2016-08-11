@@ -29,11 +29,14 @@ function getTopicOptions(body) {
   var text = body.text ? String(body.text) : undefined;
 
   return {
+    // required:
     title: title,
+    text: text,
+
+    // optional:
     slug: slug,
     tags: tags,
-    sticky: sticky,
-    text: text
+    sticky: sticky
   };
 }
 
@@ -76,6 +79,7 @@ module.exports = {
       .bind({})
       .spread(function(forum, category) {
         if (!forum) throw new StatusError(404, 'Forum not found.');
+        if (!category) throw new StatusError(404, 'Category not found.');
 
         this.forum = forum;
         this.category = category;
