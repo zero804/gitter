@@ -17,7 +17,7 @@
         <input
           class="create-room-name-input js-create-room-name-input"
           id="create-room-name-input"
-          pattern="[a-z0-9\-]+"
+          pattern="[a-z0-9\-\_\.]+"
           required
           value="">
         <i class="create-room-name-input-clear-button icon-cancel-circle js-create-room-clear-name-button"></i>
@@ -98,7 +98,8 @@
           type="checkbox"
           class="create-room-detail-option-item-input js-create-room-allow-badger-option-input"
           id="create-room-allow-badger"
-          value="public">
+          value="public"
+          checked>
         <label class="create-room-detail-option-item-label" for="create-room-allow-badger">
           Send PR to add Gitter badge to README
         </labe>

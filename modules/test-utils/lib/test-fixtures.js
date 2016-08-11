@@ -170,7 +170,7 @@ function createExpectedFixtures(expected) {
       });
   }
 
-  function generateSecurityDescriptorForTroupeFixture(f) {
+  function generateSecurityDescriptorForTroupeFixture(f, fixture) {
     var securityDescriptor = f.securityDescriptor || {};
 
     var securityDescriptorType;
@@ -183,6 +183,7 @@ function createExpectedFixtures(expected) {
     var isPublic;
     var members;
     var admins;
+    var internalId;
 
     if ('public' in securityDescriptor) {
       isPublic = securityDescriptor.public;
@@ -218,6 +219,10 @@ function createExpectedFixtures(expected) {
       admins = 'MANUAL';
     }
 
+    if (securityDescriptor.internalId) {
+      internalId = fixture[securityDescriptor.internalId]._id;
+    }
+
     return {
       // Permissions stuff
       type: securityDescriptorType,
@@ -226,12 +231,13 @@ function createExpectedFixtures(expected) {
       public: isPublic,
       linkPath: securityDescriptor.linkPath,
       externalId: securityDescriptor.externalId,
+      internalId: internalId,
       extraMembers: securityDescriptor.extraMembers,
       extraAdmins: securityDescriptor.extraAdmins
     };
   }
 
-  function createTroupe(fixtureName, f) {
+  function createTroupe(fixtureName, f, fixture) {
     var oneToOneUsers;
 
     if (f.oneToOne && f.userIds) {
@@ -270,7 +276,7 @@ function createExpectedFixtures(expected) {
       providers: f.providers,
     };
 
-    doc.sd = generateSecurityDescriptorForTroupeFixture(f);
+    doc.sd = generateSecurityDescriptorForTroupeFixture(f, fixture);
 
     debug('Creating troupe %s with %j', fixtureName, doc);
     return persistence.Troupe.create(doc)
@@ -529,7 +535,7 @@ function createExpectedFixtures(expected) {
         }
 
 
-        return createTroupe(key, expectedTroupe)
+        return createTroupe(key, expectedTroupe, fixture)
           .then(function(troupe) {
             fixture[key] = troupe;
           });
