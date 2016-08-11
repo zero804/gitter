@@ -1,6 +1,6 @@
 'use strict';
 
-var debug = require('debug')('gitter:app:twitter');
+var debug = require('debug')('gitter:app:twitter:service');
 var Promise = require('bluebird');
 var request = Promise.promisify(require('request'));
 var querystring = require('querystring');

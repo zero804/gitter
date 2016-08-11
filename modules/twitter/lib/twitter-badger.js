@@ -5,6 +5,7 @@ var env = require('gitter-web-env');
 var config = env.config;
 var TwitterService = require('./twitter-service');
 var badgerMessageComposer = require('./badger-message-composer');
+var debug = require('debug')('gitter:app:twitter:badger');
 
 var CONSUMER_KEY = config.get('twitterbadger:consumer_key');
 var CONSUMER_SECRET = config.get('twitterbadger:consumer_secret');
@@ -74,6 +75,7 @@ function sendUserInviteTweets(invitingUser, users, name, url) {
   var invitingUserName = invitingUser.twitterUsername ? ('@' + invitingUser.twitterUsername) : invitingUser.username;
   var tweets = badgerMessageComposer(invitingUserName, mentionList, name, url);
 
+  debug('Sending tweets: %j', tweets);
   return Promise.map(tweets, function(tweet) {
     return twitterService.sendTweet(tweet)
       .return(tweet);

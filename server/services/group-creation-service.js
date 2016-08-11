@@ -46,8 +46,6 @@ var sendTweetsForRoom = Promise.method(function(user, group, room, twitterHandle
       if (!identity) return;
 
       user.twitterUsername = identity.username;
-
-
       debug('Sending tweets to: %j', twitterHandles);
 
       var usersToTweet = twitterHandles.map(function(twitterUsername) {
@@ -66,7 +64,8 @@ var sendTweetsForRoom = Promise.method(function(user, group, room, twitterHandle
         count: usersToTweet.length
       });
 
-      return twitterBadger.sendUserInviteTweets(user, usersToTweet, group.uri, roomUrl);
+      var name = group.name || group.uri;
+      return twitterBadger.sendUserInviteTweets(user, usersToTweet, name, roomUrl);
     });
 });
 
