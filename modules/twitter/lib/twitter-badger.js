@@ -82,12 +82,15 @@ function sendUserInviteTweets(invitingUser, users, name, url) {
     var mentionStringBuckets = [''];
     mentionList.forEach(function(mention) {
       var currentMentionString = mentionStringBuckets[mentionStringBuckets.length - 1];
-      if(baseMessageLength + currentMentionString.length > TWEET_MAX_CHARACTER_LIMIT) {
+      var newMentionString = currentMentionString + (currentMentionString ? ' ' : '') + mention;
+
+      if(baseMessageLength + newMentionString.length > TWEET_MAX_CHARACTER_LIMIT) {
         mentionStringBuckets.push('');
         currentMentionString = '';
       }
 
-      mentionStringBuckets[mentionStringBuckets.length - 1] = (currentMentionString ? (currentMentionString + ' ') : '') + mention;
+      // Logic is kinda duplicated here but because we need to compare to the potential new bucket
+      mentionStringBuckets[mentionStringBuckets.length - 1] = currentMentionString + (currentMentionString ? ' ' : '') + mention;
     });
 
     debug('Sending ' + mentionStringBuckets.length + ' invite tweets');
@@ -100,9 +103,13 @@ function sendUserInviteTweets(invitingUser, users, name, url) {
             return message;
           }
 
-          var errorString = 'Status: ' + res.statusCode + ' -- ' + (res.body.errors || []).reduce(function(errorString, error) {
-            return errorString + (errorString.length > 0 ? ' -- ' : '') + error.code + ' ' + error.message;
-          }, '');
+          var errorMessage = res.body;
+          if(res.body.errors) {
+            errorMessage = (res.body.errors || []).reduce(function(errorString, error) {
+              return errorString + (errorString.length > 0 ? ' -- ' : '') + error.code + ' ' + error.message;
+            }, '');
+          }
+          var errorString = 'Status: ' + res.statusCode + ' -- ' + errorMessage;
 
           throw new StatusError(400, errorString);
         });
