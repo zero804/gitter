@@ -66,7 +66,7 @@ var sendTweetsForRoom = Promise.method(function(user, group, room, twitterHandle
         count: usersToTweet.length
       });
 
-      return twitterBadger.sendUserInviteTweets(user, usersToTweet, room.name, roomUrl);
+      return twitterBadger.sendUserInviteTweets(user, usersToTweet, group.uri, roomUrl);
     });
 });
 

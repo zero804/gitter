@@ -4,6 +4,7 @@ var debug = require('debug')('gitter:app:twitter');
 var Promise = require('bluebird');
 var request = Promise.promisify(require('request'));
 var querystring = require('querystring');
+var StatusError = require('statuserror');
 
 function escapeTweet(str) {
   return encodeURIComponent(str).replace(/[!'()*]/g, escape);
@@ -79,9 +80,22 @@ TwitterService.prototype.sendTweet = function(status) {
         encodeURIComponent: escapeTweet
       })
   })
-  .tap(function() {
-    debug('Sent tweet: %j', status);
+  .then(function(res) {
+    if(res.statusCode === 200) {
+      return;
+    }
+
+    var errorMessage = res.body;
+    if(res.body.errors) {
+      errorMessage = (res.body.errors || []).reduce(function(errorString, error) {
+        return errorString + (errorString.length > 0 ? ' -- ' : '') + error.code + ' ' + error.message;
+      }, '');
+    }
+    var errorString = 'Status: ' + res.statusCode + ' -- ' + errorMessage;
+
+    throw new StatusError(400, errorString);
   });
+
 };
 
 module.exports = TwitterService;
