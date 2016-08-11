@@ -20,6 +20,7 @@ function findByIdForModel(Model, id, userId) {
     'sd.public': 1,
     'sd.linkPath': 1,
     'sd.externalId': 1,
+    'sd.internalId': 1,
   };
 
   if (userId) {
@@ -67,6 +68,7 @@ function insertForModel(Model, id, descriptor) {
     public: descriptor.public,
     linkPath: descriptor.linkPath,
     externalId: descriptor.externalId,
+    internalId: mongoUtils.asObjectID(descriptor.internalId),
   };
 
   var setOperation = {

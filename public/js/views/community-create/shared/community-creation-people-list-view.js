@@ -56,8 +56,13 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
   },
 
   initialize: function(options) {
+    this.communityCreateModel = options.communityCreateModel;
     this.model.set('canRemove', options.canRemove);
     this.model.set('canEditEmail', options.canEditEmail);
+
+    if(this.communityCreateModel) {
+      this.listenTo(this.communityCreateModel, 'change:allowTweetBadger', this.onAllowTweetBadgerChange, this);
+    }
   },
 
   serializeData: function() {
@@ -89,11 +94,16 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
 
   onInviteStatusChange: function() {
     var inviteStatus = this.model.get('inviteStatus');
+    var allowTweetBadger = this.communityCreateModel.get('allowTweetBadger');
+    var isTwitter = this.model.get('type') === 'twitter';
 
-    toggleClass(this.$el[0], 'pending', inviteStatus === peopleToInviteStatusConstants.PENDING);
+    // Only use Twitter badger, if email wasn't provided
+    var willUseTwitterInvite = !this.model.get('emailAddress') && isTwitter && allowTweetBadger;
+
+    toggleClass(this.$el[0], 'pending', !willUseTwitterInvite && inviteStatus === peopleToInviteStatusConstants.PENDING);
     // We don't use this state to differentiate
     //toggleClass(this.$el[0], 'ready', inviteStatus === peopleToInviteStatusConstants.READY);
-    toggleClass(this.$el[0], 'needs-email', inviteStatus === peopleToInviteStatusConstants.NEEDS_EMAIL);
+    toggleClass(this.$el[0], 'needs-email', !willUseTwitterInvite && inviteStatus === peopleToInviteStatusConstants.NEEDS_EMAIL);
     toggleClass(this.$el[0], 'ready-valid-email', inviteStatus === peopleToInviteStatusConstants.READY_VALID_EMAIL);
   },
 
@@ -113,6 +123,10 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
     }
 
     this.model.set('emailAddress', emailInputText);
+  },
+
+  onAllowTweetBadgerChange: function() {
+    this.onInviteStatusChange();
   }
 });
 
@@ -129,12 +143,17 @@ var CommunityCreationPeopleListView = Marionette.CompositeView.extend({
   childViewContainer: '.community-create-people-list',
   childViewOptions: function() {
     return {
+      communityCreateModel: this.communityCreateModel,
       canRemove: this.model.get('canRemove'),
       canEditEmail: this.model.get('canEditEmail')
     };
   },
   childEvents: {
     'item:remove': 'onItemRemoved'
+  },
+
+  initialize: function(options) {
+    this.communityCreateModel = options.communityCreateModel;
   },
 
   onItemRemoved: function(view) {

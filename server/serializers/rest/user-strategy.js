@@ -181,11 +181,8 @@ function UserStrategy(options) {
     if (!user) return null;
     var scopes;
 
-    if (options.includeScopes) {
-      scopes = {
-        'public_repo': userScopes.hasGitHubScope(user, 'public_repo'),
-        'private_repo': userScopes.hasGitHubScope(user, 'repo')
-      };
+    if (options.includeScopes && userScopes.isGitHubUser(user)) {
+      scopes = userScopes.getScopesHash(user);
     }
 
     var obj;

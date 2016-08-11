@@ -72,9 +72,20 @@ function isMissingTokens(user) {
   return !user.githubToken && !user.githubUserToken;
 }
 
+/**
+ * Deprecated
+ */
+function getScopesHash(user) {
+  return {
+    'public_repo': hasGitHubScope(user, 'public_repo'),
+    'private_repo': hasGitHubScope(user, 'repo')
+  };
+}
+
 module.exports = {
   hasGitHubScope: hasGitHubScope,
   getGitHubToken: getGitHubToken,
   isGitHubUser: isGitHubUser,
-  isMissingTokens: isMissingTokens
+  isMissingTokens: isMissingTokens,
+  getScopesHash: getScopesHash
 };
