@@ -168,10 +168,14 @@ module.exports = BaseCollectionItemView.extend({
   },
 
   onMenuChangeState: function () {
-    var name = (this.model.get('name') || this.model.get('uri') || this.model.get('username'));
-    var content = (this.roomMenuModel.get('state') === 'org') ?
-      parseRoomItemName(name) :
-      roomNameShortener(name);
-    this.ui.title.text(content);
+    var data = parseForTemplate(this.model.toJSON(), this.roomMenuModel.get('state'));
+
+    if(data.namePieces) {
+      // If we don't want to re-render, then we need to duplicate this template logic
+      this.ui.title.html(data.namePieces.reduce(function(html, piece) { return html + '<span class="room-item__title-piece">' + piece + '</span>'; }, ''));
+    }
+    else {
+      this.ui.title.text(data.displayName || data.name);
+    }
   },
 });

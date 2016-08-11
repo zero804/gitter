@@ -31,6 +31,7 @@ var CommunityCreateModel = Backbone.Model.extend({
     githubOrgId: null,
     githubRepoId: null,
     allowBadger: true,
+    allowTweetBadger: true
   },
 
   initialize: function() {
