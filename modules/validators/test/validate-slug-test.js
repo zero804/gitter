@@ -26,7 +26,7 @@ describe('validate-slug', function() {
     assert.strictEqual(validateSlug({foo: 'bar'}), false);
     assert.strictEqual(validateSlug([]), false);
     assert.strictEqual(validateSlug(100), false);
-    //assert.strictEqual(validateSlug(undefined), false);
+    assert.strictEqual(validateSlug(undefined), false);
     assert.strictEqual(validateSlug(null), false);
   });
 
