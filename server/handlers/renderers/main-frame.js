@@ -47,7 +47,6 @@ function renderMainFrame(req, res, next, options) {
         bootScriptName = 'router-nli-app';
       }
 
-      var hasCommunityCreate = req.fflip && req.fflip.has('community-create');
       var hasNewLeftMenu = !req.isPhone && req.fflip && req.fflip.has('left-menu');
       var extras = {
         suggestedMenuState: options.suggestedMenuState
@@ -75,7 +74,6 @@ function renderMainFrame(req, res, next, options) {
         });
 
       res.render(template, {
-        hasCommunityCreate:     hasCommunityCreate,
         //left menu
         hasNewLeftMenu:         hasNewLeftMenu,
         leftMenuOrgs:           troupeContext.snapshots.orgs,
