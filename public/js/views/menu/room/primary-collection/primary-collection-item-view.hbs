@@ -2,7 +2,17 @@
   {{#if avatarUrl}}
      <img class="room-item__avatar" {{{ avatarSrcSet avatarUrl 22 }}} >
   {{/if}}
-  <h2 id="room-item-title"  class="room-item__title">{{name}}</h2>
+  <h2 id="room-item-title"  class="room-item__title">
+    {{#if namePieces}}
+      {{~#each namePieces~}}
+        <span class="room-item__title-piece">{{this}}</span>
+      {{~/each~}}
+    {{else if displayName}}
+      {{displayName}}
+    {{else}}
+      {{name}}
+    {{/if}}
+  </h2>
   {{#unless isSearch}}
     <button id="room-item-options-toggle" class="room-item__options" title="Toggle room actions dropdown">
       <i class="room-item__options-icon" aria-hidden="true"></i>

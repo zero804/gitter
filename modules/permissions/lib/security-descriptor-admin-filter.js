@@ -3,6 +3,7 @@
 var Promise = require('bluebird');
 var policyDelegateFactory = require('./policy-delegate-factory');
 var PolicyEvaluator = require('./policies/policy-evaluator');
+var userLoaderFactory = require('./user-loader-factory');
 
 /**
  * When testing n > MAX_FILTER_CONCURRENCY items, this is the
@@ -12,11 +13,12 @@ var MAX_FILTER_CONCURRENCY = 32;
 
 function securityDescriptorAdminFilter(user, objectsWithSecurityDescriptors) {
   if (!user || !objectsWithSecurityDescriptors.length) return [];
+  var userLoader = userLoaderFactory(user._id, user);
 
   return Promise.map(objectsWithSecurityDescriptors, function(objectsWithSecurityDescriptor) {
       var securityDescriptor = objectsWithSecurityDescriptor.sd;
 
-      var policyDelegate = policyDelegateFactory(user._id, user, securityDescriptor);
+      var policyDelegate = policyDelegateFactory(user._id, userLoader, securityDescriptor);
       var contextDelegate = null; // No context delegate needed for admin
 
       var policyEvaluator = new PolicyEvaluator(user._id, securityDescriptor, policyDelegate, contextDelegate);

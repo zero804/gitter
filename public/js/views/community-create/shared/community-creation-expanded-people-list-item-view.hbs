@@ -1,0 +1,41 @@
+<a
+  href="{{ absoluteUri }}"
+  class="community-create-expanded-people-list-item-link"
+  target="_blank"
+  data-vendor-username="{{ vendorUsername }}"
+  data-vendor-type="{{ type }}">
+
+  {{!-- TODO: Only use avatarUrl when user?q has avatarUrl --}}
+  {{#if avatarUrl}}
+    <img class="community-create-invite-user-result-list-item-avatar" {{{ avatarSrcSet avatarUrl 44 }}}>
+  {{else if avatarSrcset}}
+    <img
+      class="community-create-invite-user-result-list-item-avatar"
+      src="{{ avatarSrcset.src }}"
+      srcset="{{ avatarSrcset.srcset }}"
+      height="{{ avatarSrcset.size }}"
+      width="{{ avatarSrcset.size }}" />
+  {{/if}}
+
+  <div class="community-create-expanded-people-list-item-username">
+    {{#if username}}
+      {{ username }}
+    {{else}}
+      {{ vendorUsername }}
+    {{/if}}
+  </div>
+
+  <input
+    type="email"
+    id="community-create-expanded-people-list-item-email-input"
+    class="community-create-expanded-people-list-item-email-input {{when usingTweetBadger 'should-show-on-hover' '' }} js-community-create-expanded-people-list-item-email-input"
+    placeholder="enter email address"
+    value="{{ emailAddress }}"
+    required>
+
+  <div class="community-create-expanded-people-list-item-status">
+    <i class="js-community-create-expanded-people-list-item-status-twitter {{when usingTweetBadger '' 'hidden' }} icon-twitter"></i>
+    <i class="js-community-create-expanded-people-list-item-status-needs-attention {{when needsAttention '' 'hidden' }} icon-attention-circled"></i>
+    <i class="js-community-create-expanded-people-list-item-status-is-valid {{when isValid '' 'hidden' }} icon-check"></i>
+  </div>
+</a>

@@ -1,11 +1,16 @@
 'use strict';
 
-var debug = require('debug')('gitter:modules:twitter');
+var debug = require('debug')('gitter:app:twitter');
 var Promise = require('bluebird');
 var request = Promise.promisify(require('request'));
+var querystring = require('querystring');
 
+function escapeTweet(str) {
+  return encodeURIComponent(str).replace(/[!'()*]/g, escape);
+}
 
 var FOLLOWER_API_ENDPOINT = 'https://api.twitter.com/1.1/followers/list.json';
+var FAVORITES_API_ENDPOINT = 'https://api.twitter.com/1.1/favorites/list.json';
 var TWEET_API_ENDPOINT = 'https://api.twitter.com/1.1/statuses/update.json';
 
 function TwitterService(consumerKey, consumerSecret, accessToken, accessTokenSecret) {
@@ -16,7 +21,6 @@ function TwitterService(consumerKey, consumerSecret, accessToken, accessTokenSec
 }
 
 TwitterService.prototype.findFollowers = function(username) {
-
   return request({
     url: FOLLOWER_API_ENDPOINT,
     json: true,
@@ -31,7 +35,7 @@ TwitterService.prototype.findFollowers = function(username) {
     }
   })
   .then(function(results) {
-    debug('Twitter API results', results && results.body);
+    debug('Twitter API results: %j', results && results.body);
     if (!results.body || !results.body.users) {
       return [];
     }
@@ -40,6 +44,19 @@ TwitterService.prototype.findFollowers = function(username) {
   });
 };
 
+
+TwitterService.prototype.findFavorites = function() {
+  return request({
+    url: FAVORITES_API_ENDPOINT,
+    json: true,
+    oauth: {
+      consumer_key: this.consumerKey,
+      consumer_secret: this.consumerSecret,
+      token: this.accessToken,
+      token_secret: this.accessTokenSecret
+    }
+  });
+};
 
 TwitterService.prototype.sendTweet = function(status) {
   return request({
@@ -52,12 +69,18 @@ TwitterService.prototype.sendTweet = function(status) {
       token: this.accessToken,
       token_secret: this.accessTokenSecret
     },
-    form: {
-      status: status
-    }
+    encoding: null,
+    headers: {
+      'content-type': 'application/x-www-form-urlencoded'
+    },
+    body: querystring.stringify({
+        status: status
+      }, '&', '=', {
+        encodeURIComponent: escapeTweet
+      })
   })
   .tap(function() {
-    debug('Sent tweet', status);
+    debug('Sent tweet: %j', status);
   });
 };
 
