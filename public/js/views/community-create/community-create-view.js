@@ -1,6 +1,5 @@
 'use strict';
 
-var _ = require('underscore');
 var Marionette = require('backbone.marionette');
 var SimpleFilteredCollection = require('../../collections/simple-filtered-collection');
 var cocktail = require('cocktail');
@@ -202,8 +201,7 @@ var CommunityCreateView = Marionette.LayoutView.extend({
 
     // Reset for next time if we are hiding create community
     if(!isActive) {
-      // Get around the infinite recursion
-     this.model.clear({ silent: true }).set(_.omit(this.model.defaults, 'active'));
+     this.model.reset({ silent: true });
     }
   },
 
