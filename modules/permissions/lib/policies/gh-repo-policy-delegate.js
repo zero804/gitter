@@ -1,11 +1,15 @@
 'use strict';
 
+var assert = require('assert');
 var Promise = require('bluebird');
 var GitHubRepoService = require('gitter-web-github').GitHubRepoService;
 var PolicyDelegateTransportError = require('./policy-delegate-transport-error');
 var debug = require('debug')('gitter:app:permissions:gh-repo-policy-delegate');
 
 function GhRepoPolicyDelegate(userId, userLoader, securityDescriptor) {
+  assert(userLoader, 'userLoader required');
+  assert(securityDescriptor, 'securityDescriptor required');
+
   this._userId = userId;
   this._userLoader = userLoader;
   this._securityDescriptor = securityDescriptor;
