@@ -10,15 +10,16 @@
 
 .topics-table-header__cell {
   &:extend(.h5);
-  padding:       4rem 0 1rem 0;
-  text-align:    right;
+  padding:        4rem 1rem 1rem;
+  text-align:     center;
   text-transform: uppercase;
 }
 
 .topics-table-header__cell--first {
   &:extend(.topics-table-header__cell);
-  text-align:   left;
+  width:        80%;
   padding-left: @panel-horiz-padding + @panel-border-width;
+  text-align:   left;
 }
 
 .topics-table-header__cell--last {
