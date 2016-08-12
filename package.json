@@ -227,7 +227,7 @@
     "nanoscroller": "^0.8.7",
     "node-spritesheet": "trevorah/node-spritesheet",
     "nodemon": "^1.8.1",
-    "nodeselektor": "^0.11.0",
+    "nodeselektor": "^0.14.0",
     "normalize.css": "^4.2.0",
     "nyc": "^7.0.0",
     "parse-diff": "^0.3.2",
