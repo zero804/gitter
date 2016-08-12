@@ -11,6 +11,7 @@ module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, group
   var lastLeftMenuSnapshot = (troupeContext.leftRoomMenuState || {});
   var currentRoom = (req.troupe || {});
   req.uriContext = (req.uriContext || {});
+  var groupNameFromUri = getOrgNameFromUri(currentRoom.uri);
 
   //Groups
   var groupId = (lastLeftMenuSnapshot.groupId || '');
@@ -34,12 +35,11 @@ module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, group
   var hasJoinedRoom = _.findWhere(rooms, { uri: currentRoom.uri });
   var hasJoinedGroup = true;
   if(!hasJoinedRoom) {
-    var groupUri = getOrgNameFromUri(currentRoom.uri);
-    hasJoinedGroup = _.findWhere(groups, { uri: groupUri });
+    hasJoinedGroup = _.findWhere(groups, { uri: groupNameFromUri });
   }
 
   // But if we find something later, let's use it instead
-  if(!hasJoinedRoom && !hasJoinedGroup) {
+  if(groupNameFromUri && !hasJoinedRoom && !hasJoinedGroup) {
     menuState = 'temp-org';
     tempOrg = {
       name: getOrgNameFromUri(currentRoom.uri),
