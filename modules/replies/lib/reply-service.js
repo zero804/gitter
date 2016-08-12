@@ -30,6 +30,21 @@ function findByIdForForum(forumId, replyId) {
     });
 }
 
+function findByIdForForumAndTopic(forumId, topicId, replyId) {
+  return findById(replyId)
+    .then(function(reply) {
+      if (!reply) return null;
+
+      // make sure the reply is in the specified forum
+      if (!mongoUtils.objectIDsEqual(reply.forumId, forumId)) return null;
+
+      // make sure the reply is in the specified topic
+      if (!mongoUtils.objectIDsEqual(reply.topicId, topicId)) return null;
+
+      return reply;
+    });
+}
+
 function validateReply(data) {
   if (!validators.validateMarkdown(data.text)) {
     throw new StatusError(400, 'Text is invalid.')
@@ -78,5 +93,6 @@ function createReply(user, topic, options) {
 module.exports = {
   findById: findById,
   findByIdForForum: findByIdForForum,
+  findByIdForForumAndTopic: findByIdForForumAndTopic,
   createReply: createReply
 };

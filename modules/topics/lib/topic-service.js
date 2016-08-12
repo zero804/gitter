@@ -82,6 +82,8 @@ function createTopic(user, category, options) {
       data._md = parsedMessage.markdownProcessingFailed ? -markdownMajorVersion : markdownMajorVersion;
       // urls, issues, mentions?
 
+      debug("Creating topic with %j", data);
+
       return Topic.create(data);
     })
     .then(function(topic) {
