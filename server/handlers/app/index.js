@@ -31,35 +31,29 @@ function saveRoom(req) {
   }
 }
 
-function getSocialMetaDataForRoom(room, aroundId) {
-  var roomStrategy = new restSerializer.TroupeStrategy();
-
-  return restSerializer.serializeObject(room, roomStrategy)
-    .then(function(serializedRoom) {
-
-      // TODO: change this to use policy
-      if (aroundId && room && securityDescriptorUtils.isPublic(room)) {
-        // If this is a permalinked chat, load special social meta-data....
-        return chatService.findByIdInRoom(room._id, aroundId)
-          .then(function(chat) {
-            var chatStrategy = new restSerializer.ChatStrategy({
-              notLoggedIn: true,
-              troupeId: room._id
-            });
+function getSocialMetaDataForRoom(room, serializedRoom, aroundId) {
+  // TODO: change this to use policy
+  if (aroundId && room && securityDescriptorUtils.isPublic(room)) {
+    // If this is a permalinked chat, load special social meta-data....
+    return chatService.findByIdInRoom(room._id, aroundId)
+      .then(function(chat) {
+        var chatStrategy = new restSerializer.ChatStrategy({
+          notLoggedIn: true,
+          troupeId: room._id
+        });
 
 
-            return restSerializer.serializeObject(chat, chatStrategy);
-          })
-          .then(function(permalinkChatSerialized) {
-            return social.getMetadataForChatPermalink({
-              room: serializedRoom,
-              chat: permalinkChatSerialized
-            });
-          });
-      }
+        return restSerializer.serializeObject(chat, chatStrategy);
+      })
+      .then(function(permalinkChatSerialized) {
+        return social.getMetadataForChatPermalink({
+          room: serializedRoom,
+          chat: permalinkChatSerialized
+        });
+      });
+  }
 
-      return social.getMetadata({ room: serializedRoom });
-    });
+  return social.getMetadata({ room: serializedRoom });
 }
 
 var mainFrameMiddlewarePipeline = [
@@ -99,12 +93,13 @@ var mainFrameMiddlewarePipeline = [
         hash:     '#initial'
       });
 
-      var socialMetaDataPromise = getSocialMetaDataForRoom(req.troupe, aroundId);
-
       mainFrameRenderer.renderMainFrame(req, res, next, {
         subFrameLocation: subFrameLocation,
         title: req.uriContext.uri,
-        socialMetaDataPromise: socialMetaDataPromise
+        socialMetadataGenerator: function(troupeContext) {
+          var serializedRoom = troupeContext.troupe;
+          return getSocialMetaDataForRoom(req.troupe, serializedRoom, aroundId);
+        }
       });
     }
   },
