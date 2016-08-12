@@ -10,7 +10,10 @@ describe('<TopicHeader/>', () => {
   let wrapper;
 
   beforeEach(() => {
-    wrapper = shallow(<TopicHeader topic={{ title: 'test' }}/>);
+    wrapper = shallow(
+      <TopicHeader
+      topic={{ title: 'test', user: { displayName: 'test-user', avatarUrl: 'test-src'} }}/>
+    );
   });
 
   it('should render a continer element', () => {
@@ -30,7 +33,15 @@ describe('<TopicHeader/>', () => {
   });
 
   it('should render a custom container', () => {
-      equal(wrapper.find('.container--topic-header').length, 1);
+    equal(wrapper.find('.container--topic-header').length, 1);
+  });
+
+  it('should render a user avatar', () => {
+    equal(wrapper.find('UserAvatar').length, 1);
+  });
+
+  it('should render a .topic-header', () => {
+    equal(wrapper.find('.topic-header').length, 1);
   });
 
 });
