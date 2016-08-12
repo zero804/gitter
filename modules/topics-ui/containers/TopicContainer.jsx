@@ -2,6 +2,7 @@
 
 import React, {PropTypes, createClass} from 'react';
 import TopicHeader from '../shared/components/topic/topic-header.jsx';
+import TopicBody from '../shared/components/topic/topic-body.jsx';
 
 module.exports = createClass({
 
@@ -28,7 +29,10 @@ module.exports = createClass({
     const { topic } = this.state;
 
     return (
-      <TopicHeader topic={topic}/>
+      <main>
+        <TopicHeader topic={topic}/>
+        <TopicBody topic={topic} />
+      </main>
     );
   }
 });

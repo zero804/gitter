@@ -24,4 +24,8 @@ describe('<TopicContainer />', () => {
     equal(wrapper.find('TopicHeader').length, 1);
   });
 
+  it('should render a TopicBody', () => {
+    equal(wrapper.find('TopicBody').length, 1);
+  });
+
 });
