@@ -11,8 +11,7 @@ describe('<TopicHeader/>', () => {
 
   beforeEach(() => {
     wrapper = shallow(
-      <TopicHeader
-      topic={{ title: 'test', user: { displayName: 'test-user', avatarUrl: 'test-src'} }}/>
+      <TopicHeader topic={{ title: 'test', user: { displayName: 'test-user', avatarUrl: 'test-src'} }}/>
     );
   });
 
