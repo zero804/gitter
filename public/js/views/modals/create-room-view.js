@@ -186,6 +186,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
 
     // You should be stopped before this in the UI validation but a good sanity check
     if(!selectedGroup) {
+      this.model.set('roomAvailabilityStatus', roomAvailabilityStatusConstants.GROUP_REQUIRED);
       throw new Error('A group needs to be selected in order to create a room');
     }
 
@@ -436,7 +437,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
       // Validation and Errors
       var roomAvailabilityStatusMessage = '';
       (this.model.validationError || []).forEach(function(validationError) {
-        if(validationError.key === 'roomName') {
+        if(validationError.key === 'group' || validationError.key === 'roomName') {
           roomAvailabilityStatusMessage = validationError.message;
         }
       }.bind(this));

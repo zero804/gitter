@@ -52,19 +52,9 @@ function validateGitHubType(requestedType, actualGitHubType) {
   return requestedType;
 }
 
-function validateAndFetchBackingInfo(user, options) {
-  var type = options.type;
-  if (!type) {
-    // No backing object. Nothing to do
-    return Promise.resolve([null, null]);
-  }
-
-  if (type !== 'GH_ORG' && type !== 'GH_REPO' && type !== 'GH_USER' && type !== 'GH_GUESS') {
-    throw new StatusError(400);
-  }
-
+function validateAndFetchBackingInfoForGitHub(user, options) {
   if (!options.linkPath) {
-    throw new StatusError(400);
+    throw new StatusError(400, 'GitHub objects must have a linkPath');
   }
 
   return validateGitHubUri(user, options.linkPath)
@@ -86,12 +76,32 @@ function validateAndFetchBackingInfo(user, options) {
           return [type, githubInfo];
         });
     });
+}
 
+function validateAndFetchBackingInfo(user, options) {
+  switch(options.type || null) {
+    case null:
+      // No backing object. Nothing to do
+      return Promise.resolve([null, null]);
+
+    case 'GH_ORG':
+    case 'GH_REPO':
+    case 'GH_USER':
+    case 'GH_GUESS':
+      return validateAndFetchBackingInfoForGitHub(user, options);
+
+    case 'GROUP':
+      return Promise.resolve(['GROUP', null]);
+
+    default:
+      throw new StatusError(400, 'Unknown type: ' + options.type);
+  }
 }
 
 function ensureAccessAndFetchDescriptor(user, options) {
   var security = options.security || 'PUBLIC';
   var linkPath = options.linkPath;
+  var internalId = options.internalId;
 
   return validateAndFetchBackingInfo(user, options)
     .spread(function(type, githubInfo) {
@@ -99,6 +109,7 @@ function ensureAccessAndFetchDescriptor(user, options) {
           type: type,
           linkPath: linkPath,
           externalId: githubInfo && githubInfo.githubId,
+          internalId: internalId,
           security: security
         });
     });
