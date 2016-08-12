@@ -6,7 +6,7 @@ var toggleClass = require('utils/toggle-class');
 var context = require('utils/context');
 var slugify = require('slug');
 var fuzzysearch = require('fuzzysearch');
-var SimpleFilteredCollection = require('../../../collections/simple-filtered-collection');
+var SimpleFilteredCollection = require('gitter-realtime-client/lib/simple-filtered-collection');
 var getRoomNameFromTroupeName = require('gitter-web-shared/get-room-name-from-troupe-name');
 var scopeUpgrader = require('../../../components/scope-upgrader');
 

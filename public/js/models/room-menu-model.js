@@ -19,6 +19,7 @@ var SuggestedRoomsByGroupName = require('../collections/org-suggested-rooms-by-n
 var UserSuggestions = require('../collections/user-suggested-rooms');
 var SearchRoomPeopleCollection = require('../collections/left-menu-search-rooms-and-people');
 var SearchChatMessages = require('../collections/search-chat-messages');
+var LimitedCollection = require('gitter-realtime-client/lib/limited-collection');
 
 var FavouriteCollectionModel = require('../views/menu/room/favourite-collection/favourite-collection-model');
 var PrimaryCollectionModel = require('../views/menu/room/primary-collection/primary-collection-model');
@@ -97,10 +98,18 @@ module.exports = Backbone.Model.extend({
 
     //expose the public collection
     this.searchTerms = new RecentSearchesCollection(null);
-    this.searchRoomAndPeople = new SearchRoomPeopleCollection(null, { roomMenuModel: this, roomCollection: this._roomCollection });
+
+    this.searchRoomAndPeople = new SearchRoomPeopleCollection(null, {
+      roomMenuModel: this,
+      roomCollection: this._roomCollection
+    });
+
     this.searchMessageQueryModel = new Backbone.Model({ skip: 0 });
     this.searchChatMessages = new SearchChatMessages(null, { roomMenuModel: this, roomModel: this._troupeModel, queryModel: this.searchMessageQueryModel });
-    this.suggestedOrgs = new SuggestedOrgCollection({ contextModel: this, roomCollection: this._roomCollection });
+    this.suggestedOrgs = new SuggestedOrgCollection({
+      contextModel: this,
+      roomCollection: this._roomCollection
+    });
     this.userSuggestions = new UserSuggestions(null, { contextModel: context.user() });
     this._suggestedRoomCollection = new SuggestedRoomsByRoomCollection({
       roomMenuModel:           this,
