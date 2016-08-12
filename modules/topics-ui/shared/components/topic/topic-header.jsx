@@ -19,7 +19,7 @@ export default React.createClass({
     const { title } = this.props.topic;
 
     return (
-      <Container>
+      <Container className="container--topic-header">
         <Panel>
           <header>
             <H1>{title}</H1>

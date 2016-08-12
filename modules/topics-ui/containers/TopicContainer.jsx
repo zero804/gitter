@@ -12,7 +12,7 @@ module.exports = createClass({
 
     topicsStore: PropTypes.shape({
       models: PropTypes.array.isRequired,
-      getTopic: PropTypes.func.isRequired,
+      getById: PropTypes.func.isRequired,
     }).isRequired,
   },
 

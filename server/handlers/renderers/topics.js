@@ -61,11 +61,10 @@ function renderTopic(req, res, next) {
     .then(function(topics){
 
       //TODO Remove this, its only for fake data
-      var topicId = topics[0].id;
+      var topicId = topics[0].id += '';
       //var topicId = req.params.topicId;
 
       var topicStore = forumTopicsStore(topics);
-      var topic = topicStore.getById(topicId);
 
       res.render('topics/topic', {
         layout: 'topics-layout',
@@ -74,7 +73,7 @@ function renderTopic(req, res, next) {
         componentData: {
           groupName: req.params.groupName,
           topicsStore: topicStore,
-          topic: topic,
+          topicId: topicId,
         }
       });
     });
