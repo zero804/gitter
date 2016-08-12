@@ -13,7 +13,12 @@ function createReply(fixtureName, f) {
     userId: f.user && f.user._id,
     topicId: f.topic && f.topic._id,
     text: f.text,
-    html: f.html
+    html: f.html,
+    sent: f.sent,
+    editedAt: f.editedAt,
+    lastModified: f.lastModified,
+    lang: f.lang,
+    _md: f._md
   };
 
   debug('Creating reply %s with %j', fixtureName, doc);
