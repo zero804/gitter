@@ -38,22 +38,29 @@ describe('ReplyStrategy', function() {
       category: 'category1',
       user: 'user1',
       topic: 'topic1',
+    },
+    comment1: {
+      forum: 'forum1',
+      category: 'category1',
+      user: 'user1',
+      topic: 'topic1',
+      reply: 'reply1',
       sent: new Date('2014-01-01T00:00:00.000Z')
     }
   });
 
-  it('should serialize a reply', function() {
+  it('should serialize a comment', function() {
     var strategy = new ReplyStrategy();
 
-    var reply = fixture.reply1;
+    var comment = fixture.comment1;
     var user = fixture.user1;
 
-    return serialize([reply], strategy)
+    return serialize([comment], strategy)
       .then(function(s) {
         assertUtils.assertSerializedEqual(s, [{
-          id: reply.id,
-          text: reply.text,
-          html: reply.html,
+          id: comment.id,
+          text: comment.text,
+          html: comment.html,
           user: {
             id: user.id,
             username: user.username,
@@ -76,16 +83,16 @@ describe('ReplyStrategy', function() {
   it("should serialize a reply with lookups=['user']", function() {
     var strategy = new ReplyStrategy({ lookups: ['user'] });
 
-    var reply = fixture.reply1;
+    var comment = fixture.comment1;
     var user = fixture.user1;
 
-    return serialize([reply], strategy)
+    return serialize([comment], strategy)
       .then(function(s) {
         assertUtils.assertSerializedEqual(s, {
           items: [{
-            id: reply.id,
-            text: reply.text,
-            html: reply.html,
+            id: comment.id,
+            text: comment.text,
+            html: comment.html,
             user: fixture.user1.id,
             sent: '2014-01-01T00:00:00.000Z',
             editedAt: null,
