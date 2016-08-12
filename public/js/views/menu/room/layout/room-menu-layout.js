@@ -147,10 +147,6 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
     this.model.set('panelOpenState', false);
   },
 
-  onRender: function() {
-    toggleClass(this.ui.minibarInner[0], 'has-community-create', context.hasFeature('community-create'));
-  },
-
   onChildRender: function () {
     this._initNano();
   },
