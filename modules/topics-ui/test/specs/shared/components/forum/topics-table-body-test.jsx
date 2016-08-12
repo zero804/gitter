@@ -9,11 +9,11 @@ describe('<TopicsTableBody/>', () => {
 
   let wrapper;
   let topics = [
-    { title: { text: '1', html: '1' } },
-    { title: { text: '2', html: '2' } },
-    { title: { text: '3', html: '3' } },
-    { title: { text: '4', html: '4' } },
-    { title: { text: '5', html: '5' } },
+    { title: '1' },
+    { title: '2' },
+    { title: '3' },
+    { title: '4' },
+    { title: '5' },
   ];
 
   beforeEach(() => {

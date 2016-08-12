@@ -7,10 +7,7 @@ export default React.createClass({
   displayName: 'TopicsTableBody',
   propTypes: {
     topics: PropTypes.arrayOf(PropTypes.shape({
-      title: PropTypes.shape({
-        text: PropTypes.string,
-        html: PropTypes.string,
-      })
+      title: PropTypes.string.isRequired
     }))
   },
 
@@ -26,7 +23,7 @@ export default React.createClass({
   renderChildRow(topic, i) {
     return (
       <tr className="topics-table-body__row"  key={`topics-table-row-${i}`}>
-        <td className="topics-table-body__cell--first">{topic.title.text}</td>
+        <td className="topics-table-body__cell--first">{topic.title}</td>
         <td className="topics-table-body__cell">0</td>
         <td className="topics-table-body__cell">0</td>
         <td className="topics-table-body__cell--last">0</td>
