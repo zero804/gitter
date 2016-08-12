@@ -2,7 +2,6 @@
 
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
-var User = require('gitter-web-persistence').User;
 var Group = require('gitter-web-persistence').Group;
 var validateGitHubUri = require('gitter-web-github').GitHubUriValidator;
 var validateGroupUri = require('gitter-web-validators/lib/validate-group-uri');

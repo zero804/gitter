@@ -2,7 +2,6 @@
 
 var _ = require('underscore');
 var Backbone = require('backbone');
-var VirtualMultipleCollection = require('../virtual-multiple-collection');
 var apiClient = require('components/apiClient');
 
 var stepConstants = require('../step-constants');
