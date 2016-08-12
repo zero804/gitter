@@ -75,6 +75,9 @@ var sendTweetsForRoom = Promise.method(function(user, group, room, twitterHandle
 function sendInvitesAndTweetsPostRoomCreation(user, group, room, invites, allowTweeting) {
   return sendInvitesForRoom(user, room, invites)
     .tap(function(invitesReport) {
+      // Poor fix for https://github.com/troupe/gitter-webapp/issues/2041
+      if (!invitesReport) invitesReport = [];
+
       var successes = invitesReport.reduce(function(memo, report) {
         if (report.status === 'added') {
           memo++;
