@@ -62,12 +62,13 @@ describe('security-descriptor-admin-filter', function() {
   FIXTURES.forEach(function(META) {
 
     it(META.name, function() {
+      var mockPolicyDelegate = {};
 
       var securityDescriptorAdminFilter = proxyquireNoCallThru('../lib/security-descriptor-admin-filter', {
         './policies/policy-evaluator': function(userId, securityDescriptor, policyDelegate, contextDelegate) {
           assert.strictEqual(userId, META.user._id);
           assert.ok(securityDescriptor);
-          assert.strictEqual(policyDelegate, null);
+          assert.strictEqual(policyDelegate, mockPolicyDelegate);
           assert.strictEqual(contextDelegate, null);
 
           this.canAdmin = function() {
@@ -87,7 +88,13 @@ describe('security-descriptor-admin-filter', function() {
 
             return Promise.resolve(META.responses[index]);
           }
-        }
+        },
+        './policy-delegate-factory': function(pUserId, pUserLoader, pSecurityDescriptor) {
+          assert.strictEqual(pUserId, META.user._id);
+          assert.strictEqual(typeof pUserLoader, 'function');
+          assert(pSecurityDescriptor === DESCRIPTOR_2.sd || pSecurityDescriptor === DESCRIPTOR_1.sd);
+          return mockPolicyDelegate;
+        },
       });
 
       return securityDescriptorAdminFilter(META.user, META.input)

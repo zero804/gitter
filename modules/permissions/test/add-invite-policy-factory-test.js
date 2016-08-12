@@ -3,6 +3,7 @@
 var proxyquireNoCallThru = require("proxyquire").noCallThru();
 var Promise = require('bluebird');
 var assert = require('assert');
+var ObjectID = require('mongodb').ObjectID;
 
 describe('add-invite-policy-factory', function() {
   describe('createPolicyForRoomAdd', function() {
@@ -43,8 +44,11 @@ describe('add-invite-policy-factory', function() {
 
     FIXTURES.forEach(function(META) {
       it(META.name, function() {
-        var user = { _id: '1', id: '1' };
-        var room = { _id: '2', id: '2' };
+        var id1 = ObjectID(1);
+        var id2 = ObjectID(1);
+
+        var user = { _id: id1, id: id1.toHexString() };
+        var room = { _id: id2, id: id2.toHexString() };
 
         var addInvitePolicyFactory = proxyquireNoCallThru('../lib/add-invite-policy-factory', {
           './policies/gh-repo-policy-delegate': function() {

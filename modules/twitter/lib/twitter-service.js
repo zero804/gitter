@@ -1,42 +1,101 @@
 'use strict';
 
-var debug = require('debug')('gitter:modules:twitter-service');
-var env = require('gitter-web-env');
-var config = env.config;
+var debug = require('debug')('gitter:app:twitter:service');
 var Promise = require('bluebird');
 var request = Promise.promisify(require('request'));
+var querystring = require('querystring');
+var StatusError = require('statuserror');
 
-var CONSUMER_KEY = config.get('twitteroauth:consumer_key');
-var CONSUMER_SECRET = config.get('twitteroauth:consumer_secret');
+function escapeTweet(str) {
+  return encodeURIComponent(str).replace(/[!'()*]/g, escape);
+}
 
-function TwitterService(identity) {
-  this.identity = identity;
+var FOLLOWER_API_ENDPOINT = 'https://api.twitter.com/1.1/followers/list.json';
+var FAVORITES_API_ENDPOINT = 'https://api.twitter.com/1.1/favorites/list.json';
+var TWEET_API_ENDPOINT = 'https://api.twitter.com/1.1/statuses/update.json';
+
+function TwitterService(consumerKey, consumerSecret, accessToken, accessTokenSecret) {
+  this.consumerKey = consumerKey;
+  this.consumerSecret = consumerSecret;
+  this.accessToken = accessToken;
+  this.accessTokenSecret = accessTokenSecret;
 }
 
 TwitterService.prototype.findFollowers = function(username) {
-  var followerApiUrl = 'https://api.twitter.com/1.1/followers/list.json';
-
   return request({
-    url: followerApiUrl,
+    url: FOLLOWER_API_ENDPOINT,
     json: true,
     oauth: {
-      consumer_key: CONSUMER_KEY,
-      consumer_secret: CONSUMER_SECRET,
-      token: this.identity.accessToken,
-      token_secret: this.identity.accessTokenSecret
+      consumer_key: this.consumerKey,
+      consumer_secret: this.consumerSecret,
+      token: this.accessToken,
+      token_secret: this.accessTokenSecret
     },
     qs: {
       screen_name: username
     }
   })
   .then(function(results) {
-    debug('Twitter API results', results && results.body);
+    debug('Twitter API results: %j', results && results.body);
     if (!results.body || !results.body.users) {
       return [];
     }
 
     return results.body.users;
   });
+};
+
+
+TwitterService.prototype.findFavorites = function() {
+  return request({
+    url: FAVORITES_API_ENDPOINT,
+    json: true,
+    oauth: {
+      consumer_key: this.consumerKey,
+      consumer_secret: this.consumerSecret,
+      token: this.accessToken,
+      token_secret: this.accessTokenSecret
+    }
+  });
+};
+
+TwitterService.prototype.sendTweet = function(status) {
+  return request({
+    method: 'POST',
+    url: TWEET_API_ENDPOINT,
+    json: true,
+    oauth: {
+      consumer_key: this.consumerKey,
+      consumer_secret: this.consumerSecret,
+      token: this.accessToken,
+      token_secret: this.accessTokenSecret
+    },
+    encoding: null,
+    headers: {
+      'content-type': 'application/x-www-form-urlencoded'
+    },
+    body: querystring.stringify({
+        status: status
+      }, '&', '=', {
+        encodeURIComponent: escapeTweet
+      })
+  })
+  .then(function(res) {
+    if(res.statusCode === 200) {
+      return;
+    }
+
+    var errorMessage = res.body;
+    if(res.body.errors) {
+      errorMessage = (res.body.errors || []).reduce(function(errorString, error) {
+        return errorString + (errorString.length > 0 ? ' -- ' : '') + error.code + ' ' + error.message;
+      }, '');
+    }
+    var errorString = 'Status: ' + res.statusCode + ' -- ' + errorMessage;
+
+    throw new StatusError(400, errorString);
+  });
+
 };
 
 module.exports = TwitterService;

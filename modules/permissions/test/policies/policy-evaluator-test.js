@@ -4,6 +4,7 @@ var assert = require('assert');
 var Promise = require('bluebird');
 var proxyquireNoCallThru = require("proxyquire").noCallThru();
 var PolicyDelegateTransportError = require('../../lib/policies/policy-delegate-transport-error');
+var ObjectID = require('mongodb').ObjectID;
 
 function getName(meta, index) {
   if (meta.name) {
@@ -319,6 +320,55 @@ var FIXTURES = [{
   handleReadAccessFailure: true,
   removeUserFromRoom: true,
   inRoom: true
+}, {
+  name: 'An org admin cannot access an INVITE only room',
+  inRoom: false,
+  membersPolicy: 'INVITE',
+  adminPolicy: 'X',
+  hasPolicyDelegate: true,
+  isInExtraMembers: false,
+  isInExtraAdmins: false,
+  expectedPolicy1: 'X',
+  expectedPolicyResult1: true,
+  read: false,
+  write: false,
+  join: false,
+  admin: false,
+  addUser: false,
+  handleReadAccessFailure: true,
+}, {
+  name: 'An org admin in an INVITE only room is an admin of the room',
+  inRoom: true,
+  hasPolicyDelegate: true,
+  recentSuccess: false,
+  expectRecordSuccessfulCheck: true,
+  membersPolicy: 'INVITE',
+  adminPolicy: 'X',
+  isInExtraMembers: false,
+  isInExtraAdmins: false,
+  expectedPolicy1: 'X',
+  expectedPolicyResult1: true,
+  read: true,
+  write: true,
+  join: true,
+  admin: true,
+  addUser: true
+}, {
+  name: 'An non-org-admin in an INVITE only room is not an admin of the room',
+  inRoom: true,
+  hasPolicyDelegate: true,
+  recentSuccess: false,
+  membersPolicy: 'INVITE',
+  adminPolicy: 'X',
+  isInExtraMembers: false,
+  isInExtraAdmins: false,
+  expectedPolicy1: 'X',
+  expectedPolicyResult1: false,
+  read: true,
+  write: true,
+  join: true,
+  admin: false,
+  addUser: true
 }];
 
 describe('policy-evaluator', function () {
@@ -369,7 +419,7 @@ describe('policy-evaluator', function () {
         './policy-check-rate-limiter': stubRateLimiter
       });
 
-      var userId = meta.anonymous ? null : 'user1';
+      var userId = meta.anonymous ? null : new ObjectID(1);
 
       var contextDelegate;
 
@@ -478,7 +528,7 @@ describe('policy-evaluator', function () {
           if (meta.handleReadAccessFailure) {
             assert(didCallHandleReadAccessFailure > 0);
           }
-          
+
           assert.strictEqual(didRemoveUserFromRoom, !!meta.removeUserFromRoom);
         });
     });

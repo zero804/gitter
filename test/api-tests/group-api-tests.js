@@ -22,13 +22,15 @@ describe('group-api', function() {
         { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() },
         { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
         { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() },
-        { lcUri: 'repo-group' }
+        { lcUri: 'repo-group' },
+        { lcUri: '_repo-group' }
       ],
       Troupe: [
         { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() + '/' + fixtureLoader.GITTER_INTEGRATION_REPO.toLowerCase() },
         { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() + '/lobby' },
         { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() + '/lobby' },
-        { lcUri: 'repo-group/lobby' }
+        { lcUri: 'repo-group/lobby' },
+        { lcUri: '_repo-group/lobby' },
       ]
     },
     user1: {
@@ -130,8 +132,7 @@ describe('group-api', function() {
         assert.strictEqual(group.uri, '_Repo-Group');
         var room = group.defaultRoom;
         assert.strictEqual(room.uri, '_Repo-Group/Lobby');
-        assert.strictEqual(room.providers.length, 1);
-        assert.strictEqual(room.providers[0], 'github');
+        assert.deepEqual(room.providers, ['github']);
       });
   });
 

@@ -6,6 +6,7 @@ var tar = require('gulp-tar');
 var git = require('gulp-git');
 var fs = require('fs');
 var mkdirp = require('mkdirp');
+var childProcessPromise = require('./child-process-promise');
 
 /**
  * Hook into the package stage
@@ -94,12 +95,9 @@ gulp.task('process:watch:server', function() {
 });
 
 gulp.task('process:watch:static', function() {
-  var child_process = require('child_process');
-  child_process.fork('./server/static', [], {
-    env: {
-      SERVE_STATIC_ASSETS: 1,
-      PORT: 5001
-    }
+  return childProcessPromise.fork('./server/static', [], {
+    SERVE_STATIC_ASSETS: 1,
+    PORT: 5001
   });
 });
 

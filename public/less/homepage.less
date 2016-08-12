@@ -649,10 +649,12 @@ h1:after, h2:after {
 }
 
 .trusted-by-list {
+  overflow: hidden;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  height: 7rem;
 
   margin-left: 0;
   list-style: none;
@@ -660,6 +662,8 @@ h1:after, h2:after {
 
 .trusted-by-list-item {
   flex-basis: 16rem;
+  flex-shrink: 0;
+  margin-bottom: 2rem;
   padding-left: 2rem;
   padding-right: 2rem;
 }
@@ -930,7 +934,7 @@ h1:after, h2:after {
 
 .price-plan__price {
   opacity: 1;
-  padding-bottom: 5px;
+  margin-bottom: 15px;
 
   font-size: 46px;
   line-height: 48px;

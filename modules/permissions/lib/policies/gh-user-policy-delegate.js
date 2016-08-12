@@ -1,8 +1,12 @@
 'use strict';
 
+var assert = require('assert');
 var Promise = require('bluebird');
 
 function GhUserPolicyDelegate(userId, userLoader, securityDescriptor) {
+  assert(userLoader, 'userLoader required');
+  assert(securityDescriptor, 'securityDescriptor required');
+
   this._userId = userId;
   this._userLoader = userLoader;
   this._securityDescriptor = securityDescriptor;

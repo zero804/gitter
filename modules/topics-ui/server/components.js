@@ -8,10 +8,8 @@ var suffix;
 
 if (process.env.NODE_ENV === 'dev') {
   var babelRegister = require("babel-register");  // eslint-disable-line node/no-unpublished-require
-  babelRegister({
-    cache: false,
-    extensions: [".jsx"]
-  });
+  var babelConfig = require('../dev/babel-config');
+  babelRegister(babelConfig);
 
   // Hotswapping of JSX modules
   var hotswapReloader = require('../dev/hotswap-reloader');

@@ -1,10 +1,15 @@
 'use strict';
 
-var debug = require('debug')('gitter:modules:collaborators');
+var debug = require('debug')('gitter:app:collaborators');
 var _ = require('lodash');
 var TwitterService = require('gitter-web-twitter');
 var identityService = require('gitter-web-identity');
 var avatars = require('gitter-web-avatars');
+var env = require('gitter-web-env');
+var config = env.config;
+
+var CONSUMER_KEY = config.get('twitteroauth:consumer_key');
+var CONSUMER_SECRET = config.get('twitteroauth:consumer_secret');
 
 function TwitterUserCollaboratorService(user, identity) {
   this.user = user;
@@ -13,7 +18,7 @@ function TwitterUserCollaboratorService(user, identity) {
 
 TwitterUserCollaboratorService.prototype.findCollaborators = function() {
   var username = this.identity.username;
-  var twitterService = new TwitterService(this.identity);
+  var twitterService = new TwitterService(CONSUMER_KEY, CONSUMER_SECRET, this.identity.accessToken, this.identity.accessTokenSecret);
 
   return twitterService.findFollowers(username)
     .then(function(followers) {
@@ -32,7 +37,11 @@ TwitterUserCollaboratorService.prototype.findCollaborators = function() {
           type: identityService.TWITTER_IDENTITY_PROVIDER
         };
       });
+    })
+    .catch(function(err) {
+      debug('Ran into error requesting followers', err, err.stack);
+      return [];
     });
-}
+};
 
 module.exports = TwitterUserCollaboratorService;

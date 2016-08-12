@@ -263,11 +263,11 @@ function createRoomForGitHubUri(user, uri, options) {
           var groupId = this.groupId = group._id;
 
           var sd = securityDescriptorGenerator.generate(user, {
-              linkPath: officialUri,
-              type: 'GH_'+githubType, // GH_USER, GH_ORG or GH_REPO
-              externalId: githubId,
-              security: githubType === 'ORG' ? 'PRIVATE' : security
-            });
+            linkPath: officialUri,
+            type: 'GH_' + githubType, // GH_USER, GH_ORG or GH_REPO
+            externalId: githubId,
+            security: githubType === 'ORG' ? 'PRIVATE' : security
+          });
 
           return mongooseUtils.upsert(persistence.Troupe, { lcUri: lcUri }, {
               $setOnInsert: {
@@ -559,7 +559,7 @@ function joinRoom(room, user, options) {
     .then(function() {
       var flags = userDefaultFlagsService.getDefaultFlagsForUser(user);
 
-      return roomMembershipService.addRoomMember(room._id, user._id, flags);
+      return roomMembershipService.addRoomMember(room._id, user._id, flags, room.groupId);
     })
     .then(function() {
       sendJoinStats(user, room, options.tracking);
@@ -743,7 +743,7 @@ function deleteRoom(troupe) {
         }))
         .then(function() {
           // Remove all the folk from the room
-          return roomMembershipService.removeRoomMembers(troupe._id, userIds);
+          return roomMembershipService.removeRoomMembers(troupe._id, userIds, troupe.groupId);
         });
     })
     .then(function() {
@@ -787,6 +787,8 @@ function createGroupRoom(user, group, roomInfo, securityDescriptor, options) {
       break
 
     case null:
+    case 'GROUP':
+      // TODO: this is not very descriptive
       roomType = 'group-room'; // or channel?
       break;
 
@@ -818,7 +820,7 @@ function createGroupRoom(user, group, roomInfo, securityDescriptor, options) {
     })
     .then(function() {
       var flags = userDefaultFlagsService.getDefaultFlagsForUser(user);
-      return roomMembershipService.addRoomMember(room._id, user._id, flags);
+      return roomMembershipService.addRoomMember(room._id, user._id, flags, group._id);
     })
     .then(function() {
       // Send the created room notification
