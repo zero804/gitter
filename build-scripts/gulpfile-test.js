@@ -9,8 +9,7 @@ var lcovMerger = require('lcov-result-merger');
 var path = require('path');
 var mkdirp = require('mkdirp');
 var glob = require('glob');
-var spawn = require('child_process').spawn;
-var _ = require('lodash');
+var childProcessPromise = require('./child-process-promise');
 var del = require('del');
 
 var argv = require('yargs')
@@ -70,7 +69,9 @@ var criticalOnly = argv['test-critical-only'];
 var testModules = {
 };
 
-var modulesWithTest = glob.sync('./modules/*/test');
+var modulesWithTest = glob.sync('./modules/*/test', {
+  ignore: './modules/topics-ui/**/*'
+});
 modulesWithTest.forEach(function(testDir) {
   var moduleDir = path.dirname(testDir);
   var moduleName = path.basename(moduleDir);
@@ -173,11 +174,8 @@ function spawnMochaProcess(moduleName, options, files) { // eslint-disable-line 
 
   args = args.concat(files);
   gutil.log('Running tests with', executable, args.join(' '));
-  return spawn(executable, args, {
-    stdio: 'inherit',
-    env: _.extend({}, process.env, env)
-  });
 
+  return childProcessPromise.spawn(executable, args, env);
 }
 
 var subTasks = [];
@@ -191,11 +189,9 @@ Object.keys(testModules).forEach(function(moduleName) {
   var testTaskName = 'test:test:' + moduleName;
   subTasks.push(testTaskName);
 
-  gulp.task(testTaskName, function(callback) {
-    var cmd = spawnMochaProcess(moduleName, definition.options, definition.files)
-    cmd.on('close', function (code) {
-      callback(code);
-    });
+  gulp.task(testTaskName, function() {
+    return spawnMochaProcess(moduleName, definition.options, definition.files)
+
   });
 
 });
@@ -216,8 +212,7 @@ if (RUN_TESTS_IN_PARALLEL) {
 /**
  * Hook into post test
  */
-if (process.env.JENKINS_URL) {
-  // Public code-coverage, only if we're using Jenkins
+if (generateCoverage) {
   gulp.task('test:post-test', ['test:post-test:merge-lcov', 'test:post-test:submit-codecov']);
 }
 
@@ -232,7 +227,9 @@ gulp.task('test:post-test:submit-codecov', ['test:post-test:merge-lcov'], functi
   process.env.CODECOV_TOKEN = "4d30a5c7-3839-4396-a2fd-d8f9a68a5c3a";
 
   return gulp.src('output/coverage-reports/merged/lcov.info')
-    .pipe(codecov())
+    .pipe(codecov({
+      disable: 'gcov'
+    }))
     .on('error', function(err) {
       gutil.log(err);
       this.emit('end');

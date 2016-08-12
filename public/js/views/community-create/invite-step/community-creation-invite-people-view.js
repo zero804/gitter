@@ -2,7 +2,6 @@
 
 var _ = require('underscore');
 var Backbone = require('backbone');
-var VirtualMultipleCollection = require('../virtual-multiple-collection');
 var apiClient = require('components/apiClient');
 
 var stepConstants = require('../step-constants');
@@ -44,6 +43,7 @@ module.exports = CommunityCreateBaseStepView.extend({
   initInviteListView: function(optionsForRegion) {
     this.inviteListView = new CommunityCreationPeopleListView(optionsForRegion({
       collection: this.inviteCollection,
+      communityCreateModel: this.communityCreateModel,
       model: new Backbone.Model({
         canRemove: true,
         canEditEmail: true
@@ -73,6 +73,8 @@ module.exports = CommunityCreateBaseStepView.extend({
 
     this.orgCollection = options.orgCollection;
     this.repoCollection = options.repoCollection;
+    this.inviteCollection = options.inviteCollection;
+    this.troubleInviteCollection = options.troubleInviteCollection;
 
     this.searchModel = new Backbone.Model({
       searchInput: ''
@@ -85,20 +87,16 @@ module.exports = CommunityCreateBaseStepView.extend({
       repoCollection: this.repoCollection
     })
 
-    this.inviteCollection = new VirtualMultipleCollection([], {
-      backingCollections: [
-        this.communityCreateModel.peopleToInvite,
-        this.communityCreateModel.emailsToInvite
-      ]
-    });
-  },
-
-  onDestroy: function() {
-    this.typeahead.destroy();
   },
 
   onStepNext: function() {
-    this.communityCreateModel.set('stepState', stepConstants.OVERVIEW);
+    // Only go to confirmation if there was trouble
+    if(this.troubleInviteCollection.length > 0) {
+      this.communityCreateModel.set('stepState', stepConstants.INVITE_CONFIRMATION);
+    }
+    else {
+      this.communityCreateModel.set('stepState', stepConstants.OVERVIEW);
+    }
   },
   onStepBack: function() {
     this.communityCreateModel.set('stepState', stepConstants.MAIN);

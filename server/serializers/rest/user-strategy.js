@@ -3,17 +3,21 @@
 
 var env = require('gitter-web-env');
 var winston = env.logger;
-var troupeService = require("../../services/troupe-service");
-var identityService = require("gitter-web-identity");
-var presenceService = require("gitter-web-presence");
 var Promise = require('bluebird');
-var collections = require("../../utils/collections");
-var GithubContributorService = require('gitter-web-github').GitHubContributorService;
-var getVersion = require('../get-model-version');
-var leanUserDao = require('../../services/daos/user-dao').full;
+var identityService = require('gitter-web-identity');
+var presenceService = require('gitter-web-presence');
+var avatars = require('gitter-web-avatars');
 var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 var userScopes = require('gitter-web-identity/lib/user-scopes');
 var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
+var GithubContributorService = require('gitter-web-github').GitHubContributorService;
+
+var collections = require('../../utils/collections');
+var getVersion = require('../get-model-version');
+var troupeService = require('../../services/troupe-service');
+var leanUserDao = require('../../services/daos/user-dao').full;
+
+
 
 function UserRoleInTroupeStrategy(options) {
   var contributors;
@@ -211,6 +215,7 @@ function UserStrategy(options) {
       username: user.username,
       displayName: displayNameForUser(user),
       url: '/' + user.username,
+      avatarUrl: avatars.getForUser(user),
       avatarUrlSmall: resolveUserAvatarUrl(user, 60),
       avatarUrlMedium: resolveUserAvatarUrl(user, 128),
       scopes: scopes,

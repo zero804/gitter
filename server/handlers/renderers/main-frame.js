@@ -11,7 +11,6 @@ var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var roomSort = require('gitter-realtime-client/lib/sorts-filters').pojo; /* <-- Don't use the default export
                                                                                           will bring in tons of client-side
                                                                                           libraries that we don't need */
-var roomNameTrimmer = require('../../../public/js/utils/room-name-trimmer');
 var getSubResources = require('./sub-resources');
 var generateMainFrameSnapshots = require('../../handlers/snapshots/main-frame');
 var fonts = require('../../web/fonts');
@@ -19,13 +18,12 @@ var fonts = require('../../web/fonts');
 function renderMainFrame(req, res, next, options) {
   var user = req.user;
   var userId = user && user.id;
-
+  var socialMetadataGenerator = options.socialMetadataGenerator;
   var selectedRoomId = req.troupe && req.troupe.id;
 
   Promise.all([
       contextGenerator.generateNonChatContext(req),
       restful.serializeTroupesForUser(userId),
-      options.socialMetaDataPromise,
       restful.serializeOrgsForUserId(userId).catch(function(err) {
         // Workaround for GitHub outage
         winston.error('Failed to serialize orgs:' + err, { exception: err });
@@ -34,7 +32,14 @@ function renderMainFrame(req, res, next, options) {
       restful.serializeGroupsForUserId(userId),
 
     ])
-    .spread(function (troupeContext, rooms, socialMetadata, orgs, groups) {
+    .spread(function (troupeContext, rooms, orgs, groups) {
+      // Generate social metadata if any
+      return [
+        troupeContext, rooms, orgs, groups,
+        socialMetadataGenerator && socialMetadataGenerator(troupeContext)
+      ]
+    })
+    .spread(function(troupeContext, rooms, orgs, groups, socialMetadata) {
       var chatAppLocation = options.subFrameLocation;
 
       var template, bootScriptName;
@@ -47,11 +52,11 @@ function renderMainFrame(req, res, next, options) {
         bootScriptName = 'router-nli-app';
       }
 
-      var hasCommunityCreate = req.fflip && req.fflip.has('community-create');
       var hasNewLeftMenu = !req.isPhone && req.fflip && req.fflip.has('left-menu');
       var extras = {
         suggestedMenuState: options.suggestedMenuState
       };
+
       var snapshots = troupeContext.snapshots = generateMainFrameSnapshots(req, troupeContext, rooms, groups, extras);
 
       if(snapshots && snapshots.leftMenu && snapshots.leftMenu.state) {
@@ -71,12 +76,10 @@ function renderMainFrame(req, res, next, options) {
         })
         .map(function(room) {
           room.selected = mongoUtils.objectIDsEqual(room.id, selectedRoomId);
-          room.name = roomNameTrimmer(room.name);
           return room;
         });
 
       res.render(template, {
-        hasCommunityCreate:     hasCommunityCreate,
         //left menu
         hasNewLeftMenu:         hasNewLeftMenu,
         leftMenuOrgs:           troupeContext.snapshots.orgs,

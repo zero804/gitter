@@ -1,5 +1,6 @@
 'use strict';
 
+var _ = require('underscore');
 var Backbone = require('backbone');
 var urlJoin = require('url-join');
 var stepConstants = require('./step-constants');
@@ -31,6 +32,7 @@ var CommunityCreateModel = Backbone.Model.extend({
     githubOrgId: null,
     githubRepoId: null,
     allowBadger: true,
+    allowTweetBadger: true
   },
 
   initialize: function() {
@@ -38,6 +40,13 @@ var CommunityCreateModel = Backbone.Model.extend({
     this.peopleToInvite = new PeopleToInviteCollection();
     // { emailAddress }
     this.emailsToInvite = new Backbone.Collection();
+  },
+
+  reset: function(options) {
+    // Get around the infinite recursion
+    this.clear(options).set(_.omit(this.defaults, 'active'));
+    this.peopleToInvite.reset([], options);
+    this.emailsToInvite.reset([], options);
   },
 
   getGithubProjectInfo: function(orgCollection, repoCollection) {
