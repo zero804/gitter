@@ -8,10 +8,15 @@ var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var policyCheckRateLimiter = require('./policy-check-rate-limiter');
 var PolicyDelegateTransportError = require('./policy-delegate-transport-error');
 var debug = require('debug')('gitter:app:permissions:policy-evaluator');
+var assert = require('assert');
 
 var SUCCESS_RESULT_CACHE_TIME = 5 * 60; // 5 minutes in seconds
 
 function PolicyEvaluator(userId, securityDescriptor, policyDelegate, contextDelegate) {
+  if (userId) {
+    assert(mongoUtils.isLikeObjectId(userId), 'userId must be an ObjectID');
+  }
+
   this._userId = userId;
   this._securityDescriptor = securityDescriptor;
   this._policyDelegate = policyDelegate;
@@ -64,23 +69,48 @@ PolicyEvaluator.prototype = {
 
     var adminPolicy = this._securityDescriptor.admins;
 
-    if (userIdIsIn(userId, this._securityDescriptor.extraAdmins)) {
+    if (this._isExtraAdmin()) {
       // The user is in extraAdmins...
       debug('canAdmin: allow access for extraAdmin');
       return true;
     }
 
     if (adminPolicy === 'MANUAL') {
-      debug('canAdmin: deny access for no extraAdmin');
       // If they're not in extraAdmins they're not an admin
+      debug('canAdmin: deny access for no extraAdmin');
       return false;
     }
 
-    if (!this._policyDelegate) {
+    var membersPolicy = this._securityDescriptor.members;
+    var contextDelegate = this._contextDelegate;
+    var policyDelegate = this._policyDelegate;
+
+    if (!policyDelegate) {
       debug('canAdmin: deny access no policy delegate');
 
       /* No further policy delegate, so no */
       return false;
+    }
+
+    // In invite room, in addition to being an admin you also need to
+    // be in the room in order to be an admin
+
+    if (membersPolicy === 'INVITE') {
+      if (userId && contextDelegate) {
+        return this._checkMembershipInContextForInviteRooms()
+          .bind(this)
+          .then(function(isMember) {
+            if (!isMember) {
+              // Not a member? Then user is not an admin,
+              // unless they are in extraAdmins, which will
+              // already have successfully returned above
+              return false;
+            }
+            return this._checkAuthedAdminWithGoodFaith();
+          });
+      } else {
+        return false;
+      }
     }
 
     debug('canAdmin: checking policy delegate with policy %s', adminPolicy);
@@ -121,7 +151,19 @@ PolicyEvaluator.prototype = {
 
     if (membersPolicy === 'INVITE') {
       if (userId && contextDelegate) {
-        return this._checkMembershipInContextForInviteRooms();
+        return this._checkMembershipInContextForInviteRooms()
+          .bind(this)
+          .then(function(result) {
+            if (result) {
+              return true;
+            }
+
+            // Not a member, but explicitly allowed via extraAdmins?
+            // Note: we do not do a full admin check as this would allow anyone
+            // from the owning room to be allowed into the PRIVATE room.
+            // See https://github.com/troupe/gitter-webapp/issues/1742
+            return this._isExtraAdmin();
+          })
       } else {
         return false;
       }
@@ -147,22 +189,21 @@ PolicyEvaluator.prototype = {
   }),
 
   /**
+   * Returns true iff the user is in extraAdmins
+   */
+  _isExtraAdmin: function() {
+    var userId = this._userId;
+
+    return userIdIsIn(userId, this._securityDescriptor.extraAdmins);
+  },
+
+  /**
    * User is in the room or has admin access
    */
   _checkMembershipInContextForInviteRooms: function() {
     var contextDelegate = this._contextDelegate;
 
-    return contextDelegate.isMember()
-      .bind(this)
-      .then(function(result) {
-        if (result) {
-          return true;
-        }
-
-        // Not a member, could they be an admin?
-        return this.canAdmin();
-      })
-
+    return contextDelegate.isMember();
   },
 
   /**
