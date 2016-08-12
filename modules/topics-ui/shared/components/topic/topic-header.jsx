@@ -29,7 +29,7 @@ export default React.createClass({
         <Panel>
           <header className="topic-header">
             <UserAvatar user={user}/>
-            <H1>{title}</H1>
+            <H1 className="topic-header__title">{title}</H1>
           </header>
         </Panel>
       </Container>
