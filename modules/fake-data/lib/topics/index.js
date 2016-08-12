@@ -32,6 +32,15 @@ module.exports = function getFakeTopicsList(){
         isFaved: getRandomBool(),
         isParticipating: getRandomBool(),
         isWatching: getRandomBool(),
+        user: {
+          id: 12345,
+          username: 'testy-mc-testface',
+          displayName: 'Testy McTestFace',
+          url: '/testy-mc-testface',
+          staff: true,
+          v: 1,
+          avatarUrl: 'https://avatars-04.gitter.im/group/iv/1/578f6877c2f0db084a23d707?s=44'
+        }
       };
 
       return topic;
