@@ -1,5 +1,6 @@
 "use strict";
 
+var restful = require('../../../services/restful');
 var restSerializer = require("../../../serializers/rest-serializer");
 var repoService = require("../../../services/repo-service");
 var createTextFilter = require('text-filter');
@@ -34,17 +35,14 @@ module.exports = {
   index: function(req) {
     if (!req.user) throw new StatusError(401);
 
-    if(req.query.q) {
+    if (req.query.q) {
       return indexQuery(req);
     }
 
-    var strategyOptions = { currentUserId: req.user.id };
+    if (req.query.type === 'unused') {
+      return restful.serializeUnusedReposForUser(req.user);
+    }
 
-    return repoService.getReposForUser(req.user)
-      .then(function(repos) {
-        var strategy = new restSerializer.GithubRepoStrategy(strategyOptions);
-
-        return restSerializer.serialize(repos, strategy);
-      });
+    return restful.serializeReposForUser(req.user);
   }
 };

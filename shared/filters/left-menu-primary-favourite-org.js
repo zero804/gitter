@@ -1,8 +1,9 @@
 'use strict';
 
 var favouriteFilter = require('./left-menu-primary-favourite');
-var getTroupeNameFromOrgName = require('../get-org-name-from-troupe-name');
 
-module.exports = function leftMenuFavouriteOrg(room, orgName) {
-  return favouriteFilter(room) && (getTroupeNameFromOrgName(room.name) === orgName) && room.roomMember;
+module.exports = function leftMenuFavouriteOrg(room, groupId) {
+  var id = '';
+  if(room.groupId && room.groupId.toString) { id = room.groupId.toString(); }
+  return favouriteFilter(room) && id === groupId && room.roomMember;
 };

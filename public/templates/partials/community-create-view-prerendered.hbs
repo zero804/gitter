@@ -1,0 +1,21 @@
+<div class="community-create-wrapper">
+  <button class="community-create-close-button js-community-create-close">
+    <img class="community-create-close-button-image" src="{{cdn 'images/svg/close.svg'}}" />
+  </button>
+
+  <div class="community-create-step-root js-community-create-main-step-root">
+    {{{ prerenderView "js/views/community-create/main-step/community-creation-main-view" }}}
+  </div>
+  <div class="community-create-step-root js-community-create-github-projects-step-root">
+    {{{ prerenderView "js/views/community-create/github-projects-step/community-creation-github-projects-view" }}}
+  </div>
+  <div class="community-create-step-root js-community-create-invite-people-step-root">
+    {{{ prerenderView "js/views/community-create/invite-step/community-creation-invite-people-view" }}}
+  </div>
+  <div class="community-create-step-root js-community-create-invite-confirmation-step-root">
+    {{{ prerenderView "js/views/community-create/invite-step/community-creation-invite-confirmation-view" }}}
+  </div>
+  <div class="community-create-step-root js-community-create-overview-step-root"
+    {{{ prerenderView "js/views/community-create/overview-step/community-creation-overview-view" }}}
+  </div>
+</div>

@@ -25,7 +25,7 @@ function show(message, callback) {
   });
 
   $(element).on('click', function(e) {
-    if (callback && callback(e)) {
+    if (callback && callback(message)) {
       e.preventDefault();
       e.stopPropagation();
     }

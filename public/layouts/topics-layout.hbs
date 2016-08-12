@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html class="no-js loading" lang="en">
+  <head>
+  	<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=IE10" />
+    {{> fonts}}
+    <link rel="stylesheet" href="{{cdn 'styles/topics.css' }}">
+    <link id="favicon" rel="shortcut icon" href='{{cdn "images/favicon-read.ico" }}'>
+  </head>
+  <body>
+    {{{body}}}
+
+    {{! window.context }}
+    {{{topic-context componentData}}}
+
+    {{! app bootstrap includes font loading }}
+    {{{ bootScript "topics-bootstrap" jsRoot=jsRoot }}}
+
+    {{! client side app }}
+    <script src="{{cdn 'topics/js/index.js'}}"></script>
+  </body>
+</html>

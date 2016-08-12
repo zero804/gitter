@@ -2,13 +2,16 @@
 
 var appEvents = require('utils/appevents');
 var cdn = require('gitter-web-cdn');
+var urlParser = require('utils/url-parser');
+var sessionMutex = require('utils/session-mutex');
+var context = require('utils/context');
+var onReady = require('utils/onready');
+
+var linkHandler = require('./link-handler');
+var webNotifications = require('./web-notifications');
 var WindowNotification = window.Notification;
 var webkitNotifications = window.webkitNotifications;
-var urlParser = require('../utils/url-parser');
-var linkHandler = require('./link-handler');
-var onReady = require('../utils/onready');
-var webNotifications = require('./web-notifications');
-var sessionMutex = require('../utils/session-mutex');
+
 
 /**
  * Returns "granted", "denied", "default" or undefined
@@ -91,21 +94,6 @@ function initUserNotifications() {
   //subscribe to notifications
   appEvents.on('user_notification', onUserNotification);
 
-  appEvents.on('app.version.mismatch', function() {
-    appEvents.trigger('user_notification', {
-      notificationKey: 'app.version.mismatch',
-      title: 'A new version of Gitter is available',
-      text: 'Click here to reload',
-      click: function() {
-        try {
-          window.parent.location.reload(true);
-        } catch (e) {
-          window.location.reload(true);
-        }
-      }
-    });
-  });
-
   appEvents.on('ajaxError', function() {
     appEvents.trigger('user_notification', {
       notificationKey: 'ajax.error',
@@ -133,7 +121,11 @@ function requestDesktopNotificationAccess() {
 }
 
 onReady(function() {
-  requestDesktopNotificationAccess();
+  // We don't show any notifications if you aren't logged in
+  // so we might as well not bother those people
+  if (context.isLoggedIn()) {
+    requestDesktopNotificationAccess();
+  }
 });
 
 module.exports = {

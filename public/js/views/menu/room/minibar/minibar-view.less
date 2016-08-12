@@ -98,6 +98,11 @@
 }
 
 .room-menu-options__item() {
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   position:   relative;
   color:      white;
   text-align: center;
@@ -106,6 +111,8 @@
   min-width:  @desktop-menu-width;
   height:     @desktop-header-height;
   min-height: @desktop-header-height;
+
+  line-height: @desktop-header-height;
 
   &:hover {
     cursor: pointer;
@@ -117,11 +124,12 @@
     height:      @mobile-header-height;
   }
 
-  .desktop & {
-    line-height: @desktop-header-height;
-    height:      @desktop-header-height;
+  //Marionette forces to use wrapper divs if we server render, ugh.
+  //This also reduces the hit boxes unless we stretch the wrapper divs l;ike this, double ugh
+  & > .room-menu-options__container {
+    width: 100%;
+    height: 100%;
   }
-
 
 }
 
@@ -225,9 +233,7 @@
 
 
 .room-menu-options__item-button {
-  display:          flex;
-  justify-content:  center;
-  align-items:      center;
+  display:          block;
   width:            100%;
   height:           100%;
   padding:          0;
@@ -241,6 +247,7 @@
   text-decoration:  none;
   font-size:        0;
   line-height:      0;
+  text-align:       center;
 
   &:hover {
     opacity:         1;
@@ -274,9 +281,8 @@
 .room-menu-options__item__avatar  {
   z-index:       2;
   position:      relative;
-  width:         2.34rem;
-  height:        2.34rem;
-  margin:        auto;
+  width:         22px;
+  height:        22px;
 
   border-radius: .2rem;
 
@@ -287,6 +293,9 @@
 }
 
 .room-menu-options__item__community-create-icon {
+  display: inline-block;
+  vertical-align: middle;
+  margin: auto;
   font-size: 2.4rem;
 }
 
@@ -414,7 +423,9 @@
 }
 
 .menu-toggle-icon {
-  margin: 0 auto;
+  display: inline-block;
+  vertical-align: middle;
+  margin: auto;
 
   fill: none;
   stroke: #ffffff;
@@ -428,4 +439,9 @@
   .menu-toggle-button:hover > & {
     transform: translateZ(0) rotateZ(90deg);
   }
+}
+
+.minibar-collection-list {
+  list-style: none;
+  margin-left: 0;
 }

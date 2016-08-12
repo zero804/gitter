@@ -2,51 +2,43 @@
 
 var Promise = require('bluebird');
 var PolicyEvaluator = require('./policies/policy-evaluator');
+var StaticPolicyEvaluator = require('./policies/static-policy-evaluator');
 var OneToOnePolicyEvaluator = require('./policies/one-to-one-policy-evaluator');
 var OneToOneUnconnectionPolicyEvalator = require('./policies/one-to-one-unconnected-policy-evaluator');
-var RoomContextDelegate = require('./policies/room-context-delegate');
-var OneToOneContextDelegate = require('./policies/one-to-one-room-context-delegate');
-var GhRepoPolicyDelegate = require('./policies/gh-repo-policy-delegate');
-var GhOrgPolicyDelegate = require('./policies/gh-org-policy-delegate');
-var GhOrgPolicyDelegateWithRepoFallback = require('./policies/gh-org-policy-delegate-with-repo-fallback');
-var GhUserPolicyDelegate = require('./policies/gh-user-policy-delegate');
+var RoomContextDelegate = require('./context-delegates/room-context-delegate');
+var OneToOneContextDelegate = require('./context-delegates/one-to-one-room-context-delegate');
 var StatusError = require('statuserror');
 var securityDescriptorService = require('./security-descriptor-service');
-var userLoaderFactory = require('./user-loader-factory');
 var debug = require('debug')('gitter:app:permissions:policy-factory');
+var PreCreationGhRepoPolicyEvaluator = require('./pre-creation/gh-repo-policy-evaluator');
+var PreCreationGhOrgPolicyEvaluator = require('./pre-creation/gh-org-policy-evaluator');
+var PreCreationGhUserPolicyEvaluator = require('./pre-creation/gh-user-policy-evaluator');
+var FallbackPolicyEvaluator = require('./pre-creation/fallback-policy-evaluator');
+var policyDelegateFactory = require('./policy-delegate-factory');
+var userLoaderFactory = require('./user-loader-factory');
 
-function getDelegateForSecurityDescriptor(userId, user, securityDescriptor, obtainAccessFromGitHubRepo) {
+function getPolicyDelegate(userId, user, securityDescriptor) {
   var userLoader = userLoaderFactory(userId, user);
-
-  switch(securityDescriptor.type) {
-    case 'GH_REPO':
-      return new GhRepoPolicyDelegate(userId, userLoader, securityDescriptor);
-
-    case 'GH_ORG':
-      if (obtainAccessFromGitHubRepo) {
-
-        return new GhOrgPolicyDelegateWithRepoFallback(userId, userLoader, securityDescriptor, obtainAccessFromGitHubRepo);
-      } else {
-        return new GhOrgPolicyDelegate(userId, userLoader, securityDescriptor);
-      }
-
-    case 'GH_USER':
-      // TODO: consider adding obtainAccessFromGitHubRepo support here too..
-      return new GhUserPolicyDelegate(userId, userLoader, securityDescriptor);
-    default:
-      return null;
-  }
+  return policyDelegateFactory(userId, userLoader, securityDescriptor);
 }
 
 function createPolicyFromDescriptor(userId, user, securityDescriptor, roomId) {
   if (securityDescriptor.type === 'ONE_TO_ONE') {
-    var oneToOneContextDelegate = new OneToOneContextDelegate(roomId);
+    if (!userId) {
+      // Anonymous users can never join a one-to-one
+      return new StaticPolicyEvaluator(false);
+    }
 
+    var oneToOneContextDelegate = new OneToOneContextDelegate(userId, roomId);
     return new OneToOnePolicyEvaluator(userId, securityDescriptor, oneToOneContextDelegate);
   }
 
-  var policyDelegate = getDelegateForSecurityDescriptor(userId, user, securityDescriptor);
-  var contextDelegate = new RoomContextDelegate(roomId);
+  var policyDelegate = getPolicyDelegate(userId, user, securityDescriptor);
+  var contextDelegate;
+  if (userId) {
+    // No point in providing a context delegate for an anonymous user
+    contextDelegate = new RoomContextDelegate(userId, roomId);
+  }
 
   return new PolicyEvaluator(userId, securityDescriptor, policyDelegate, contextDelegate);
 }
@@ -83,10 +75,22 @@ function createPolicyForGroupId(user, groupId) {
     .then(function(securityDescriptor) {
       if (!securityDescriptor) throw new StatusError(404);
 
-      var policyDelegate = getDelegateForSecurityDescriptor(userId, user, securityDescriptor);
+      var policyDelegate = getPolicyDelegate(userId, user, securityDescriptor);
       var contextDelegate = null; // No group context yet
 
-      return new PolicyEvaluator(user, securityDescriptor, policyDelegate, contextDelegate);
+      return new PolicyEvaluator(userId, securityDescriptor, policyDelegate, contextDelegate);
+    });
+}
+
+function createPolicyForGroupIdWithUserLoader(userId, userLoader, groupId) {
+  return securityDescriptorService.getForGroupUser(groupId, userId)
+    .then(function(securityDescriptor) {
+      if (!securityDescriptor) throw new StatusError(404);
+
+      var policyDelegate = policyDelegateFactory(userId, userLoader, securityDescriptor);
+      var contextDelegate = null; // No group context yet
+
+      return new PolicyEvaluator(userId, securityDescriptor, policyDelegate, contextDelegate);
     });
 }
 
@@ -98,10 +102,13 @@ function createPolicyForGroupIdWithRepoFallback(user, groupId, repoUri) {
     .then(function(securityDescriptor) {
       if (!securityDescriptor) throw new StatusError(404);
 
-      var policyDelegate = getDelegateForSecurityDescriptor(userId, user, securityDescriptor, repoUri);
+      var policyDelegate = getPolicyDelegate(userId, user, securityDescriptor);
       var contextDelegate = null; // No group context yet
 
-      return new PolicyEvaluator(user, securityDescriptor, policyDelegate, contextDelegate);
+      var primary = new PolicyEvaluator(userId, securityDescriptor, policyDelegate, contextDelegate);
+      var secondary = new PreCreationGhRepoPolicyEvaluator(user, repoUri);
+
+      return new FallbackPolicyEvaluator(primary, secondary);
     });
 }
 
@@ -129,12 +136,53 @@ function createPolicyForOneToOne(user, toUser) {
   return new OneToOneUnconnectionPolicyEvalator(user, toUser);
 }
 
+
+/**
+ * Pre-creation Policy Evaluator factory
+ */
+function getPreCreationPolicyEvaluator(user, type, uri) {
+  switch (type) {
+    case 'GH_ORG':
+      return new PreCreationGhOrgPolicyEvaluator(user, uri);
+
+    case 'GH_REPO':
+      return new PreCreationGhRepoPolicyEvaluator(user, uri);
+
+    case 'GH_USER':
+      return new PreCreationGhUserPolicyEvaluator(user, uri);
+
+    default:
+      throw new StatusError(400, 'type is not known: ' + type);
+  }
+
+}
+
+function getPreCreationPolicyEvaluatorWithRepoFallback(user, type, uri, fallbackRepoUri) {
+  var primary = getPreCreationPolicyEvaluator(user, type, uri);
+  if (!fallbackRepoUri) {
+    return primary;
+  }
+
+  // Use a fallback policy evaluator
+
+  // TODO: Should we be checking here that the repo is under the primary?
+  var secondary = new PreCreationGhRepoPolicyEvaluator(user, fallbackRepoUri);
+  return new FallbackPolicyEvaluator(primary, secondary);
+}
+
+
 module.exports = {
   createPolicyForRoomId: Promise.method(createPolicyForRoomId),
   createPolicyForRoom: Promise.method(createPolicyForRoom),
   createPolicyForGroupId: Promise.method(createPolicyForGroupId),
+  createPolicyForGroupIdWithUserLoader: Promise.method(createPolicyForGroupIdWithUserLoader),
   createPolicyForGroupIdWithRepoFallback: Promise.method(createPolicyForGroupIdWithRepoFallback),
   createPolicyForUserIdInRoomId: Promise.method(createPolicyForUserIdInRoomId),
   createPolicyForUserIdInRoom: Promise.method(createPolicyForUserIdInRoom),
   createPolicyForOneToOne: Promise.method(createPolicyForOneToOne),
+
+  // For things that have not yet been created
+  getPreCreationPolicyEvaluator: getPreCreationPolicyEvaluator,
+  getPreCreationPolicyEvaluatorWithRepoFallback: getPreCreationPolicyEvaluatorWithRepoFallback
+
 };

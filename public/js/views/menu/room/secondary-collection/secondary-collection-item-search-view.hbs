@@ -1,11 +1,7 @@
 <div class="room-item__container--search">
   <div class="room-item__container-body--search">
-    {{#if avatarSrcset}}
-      <img class="room-item__avatar--search"
-           src="{{ avatarSrcset.src }}"
-           srcset="{{ avatarSrcset.srcset }}"
-           height="{{ avatarSrcset.size }}"
-           width="{{ avatarSrcset.size }}" />
+    {{#if avatarUrl}}
+       <img class="room-item__avatar" {{{ avatarSrcSet avatarUrl 22 }}} >
     {{/if}}
     <p class="room-item__search-detail"><small>
       <a id="user-link" class="room-item__search__link" href="{{userUrl}}">{{userDisplayName}}</a>

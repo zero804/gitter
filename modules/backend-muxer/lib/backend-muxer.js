@@ -17,6 +17,8 @@ function resolveBackendForProvider(provider) {
 }
 
 function resolveUserBackends(user) {
+  var userBackends = [];
+
   return identityService.listForUser(user)
     .then(function(identities) {
       return identities.reduce(function(map, identity) {
@@ -25,14 +27,12 @@ function resolveUserBackends(user) {
       }, {});
     })
     .then(function(identityMap) {
-      var userBackends = [];
-
-      if (userScopes.isGitHubUser(user)) {
+      if (user && userScopes.isGitHubUser(user)) {
         var Backend = resolveBackendForProvider('github');
         userBackends.push(new Backend(user, identityMap.github));
       }
 
-      if (user.identities) {
+      if (user && user.identities) {
         user.identities.forEach(function(identity) {
           var Backend = resolveBackendForProvider(identity.provider);
           userBackends.push(new Backend(user, identityMap[identity.provider]));
@@ -111,12 +111,9 @@ BackendMuxer.prototype.findProfiles = function() {
   return this.findResults('getProfile');
 };
 
-BackendMuxer.prototype.getInviteUserSuggestions = function(type, linkPath) {
-  return this.getFirstResult('getInviteUserSuggestions', [type, linkPath]);
-};
-
 BackendMuxer.testOnly = {
-  getFirstResultForBackends: getFirstResultForBackends
+  getFirstResultForBackends: getFirstResultForBackends,
+  resolveUserBackends: resolveUserBackends
 };
 
 module.exports = BackendMuxer;

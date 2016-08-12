@@ -1,15 +1,15 @@
-/* eslint complexity: ["error", 14] */
+/* eslint complexity: ["error", 15] */
 'use strict';
 
 var _ = require('underscore');
 var urlJoin = require('url-join');
-var resolveRoomAvatarSrcSet = require('../avatars/resolve-room-avatar-srcset');
+var avatars = require('gitter-web-avatars');
 var roomNameShortener = require('../room-name-shortener');
-var parseRoomItemName = require('../get-org-menu-state-name-from-troupe-name');
+var getOrgNameFromTroupeName = require('../get-org-name-from-troupe-name');
+var getRoomNameFromTroupeName = require('../get-room-name-from-troupe-name');
 
 var clientEnv = require('gitter-client-env');
 
-var AVATAR_SIZE = 22;
 
 module.exports = function parseContentToTemplateData(data, state) {
   data.name = (data.name || data.uri || '');
@@ -27,21 +27,21 @@ module.exports = function parseContentToTemplateData(data, state) {
   if (data.displayName) {
     return _.extend({}, {
       name:         roomNameShortener(data.displayName),
-      avatarSrcset: resolveRoomAvatarSrcSet({ uri: data.username }, AVATAR_SIZE),
+      avatarUrl: avatars.getForUser(data),
       absoluteRoomUri: data.absoluteRoomUri
     });
   }
 
   if(data.isRecentSearch || data.isSearchRepoResult) {
-    var avatarSrcset = resolveRoomAvatarSrcSet({ uri: data.name }, AVATAR_SIZE);
+    var avatarUrl = avatars.getForGitHubUsername(data.name);
     // No avatars on recent searches
     if(data.isRecentSearch) {
-      avatarSrcset = null;
+      avatarUrl = null;
     }
 
     return _.extend({}, {
-      name:         roomNameShortener(data.name),
-      avatarSrcset: avatarSrcset,
+      name: roomNameShortener(data.name),
+      avatarUrl: avatarUrl
     });
   }
 
@@ -51,20 +51,36 @@ module.exports = function parseContentToTemplateData(data, state) {
   // Make sure we are lurking and we only have activity so we don't override mentions or unread indicators
   var lurkActivity = !!data.activity && (!hasMentions && !unreadItems);
 
-  var roomName = data.name;
+
+  var orgName = getOrgNameFromTroupeName(data.name);
+  var roomName = getRoomNameFromTroupeName(data.name);
+
+  var displayName = data.name;
+  var namePieces = undefined;
+
+  // TODO: Do we want this to be `defaultRoomName` from the group?
+  if(roomName === 'Lobby') {
+    displayName = orgName;
+  }
+  else if(orgName === roomName) {
+    namePieces = data.name.split('/');
+  }
   // Get rid of the org prefix, if viewing in a org bucket
-  if(state === 'org') {
-    roomName = parseRoomItemName(data.name);
+  else if(state === 'org') {
+    displayName = getRoomNameFromTroupeName(data.name);
   }
 
-  var uri = data.uri || (data.url || '').substring(1) || data.name;
+  // Truncate
+  displayName = roomNameShortener(displayName);
+
+
   return _.extend({}, data, {
-    avatarSrcset:  resolveRoomAvatarSrcSet({ uri: uri }, AVATAR_SIZE),
     isNotOneToOne: (data.githubType !== 'ONETOONE'),
-    name:          roomNameShortener(roomName),
-    mentions:      hasMentions,
-    unreadItems:   unreadItems,
-    lurkActivity:  lurkActivity,
-    isSearch:      (state === 'search'),
+    displayName: displayName,
+    namePieces: namePieces,
+    mentions: hasMentions,
+    unreadItems: unreadItems,
+    lurkActivity: lurkActivity,
+    isSearch: (state === 'search'),
   });
 };

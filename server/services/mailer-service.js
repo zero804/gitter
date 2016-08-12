@@ -24,8 +24,8 @@ function applyTemplate(templateName, data) {
 
 var VALID_TEMPLATES = {
   'added-to-room': addedToRoomMapping,
-  'invitation': invitationMapping,
-  'invitation-reminder': invitationMapping,
+  'invitation-v2': invitationMapping,
+  'invitation-reminder-v2': invitationMapping,
   'unread-notification': unreadNoticationMapping,
   'created-room': createdRoomMapping
 };
@@ -49,19 +49,20 @@ function addedToRoomMapping(data) {
     ROOMURI: data.roomUri,
     ROOMURL: data.roomUrl,
     UNSUB:   data.unsubscribeUrl,
-    LOGOURL: cdn('images/logo-text-blue-pink.png', {email: true})
+    LOGOURL: cdn('images/logo/gitter-logo-email-64.png', {email: true})
   };
 
 }
 
 function invitationMapping(data) {
   return {
-    NAME:    data.recipientName,
-    DATE:    data.date,
-    SENDER:  data.senderName,
+    NAME: data.recipientName,
+    DATE: data.date,
+    SENDER: data.senderName,
     ROOMURI: data.roomUri,
     ROOMURL: data.roomUrl,
-    LOGOURL: cdn('images/logo-text-blue-pink.png', { email: true })
+    INVITEURL: data.inviteUrl,
+    LOGOURL: cdn('images/logo/gitter-logo-email-64.png', { email: true })
   };
 }
 
@@ -76,14 +77,13 @@ function unreadNoticationMapping(data) {
     HTML:       applyTemplate("emails/unread_notification_html", data),
     MICRODATA:  applyTemplate("emails/unread_notification_microdata", data),
     PLAINTEXT:  applyTemplate("emails/unread_notification", data),
-    LOGOURL:    cdn('images/logo-text-blue-pink.png', {email: true})
+    LOGOURL:    cdn('images/logo/gitter-logo-email-64.png', {email: true})
   };
 
 }
 
 function createdRoomMapping(data) {
   var twitterSnippet = data.isPublic ? '<tr><td><br><a href="' + data.twitterURL + '" style="text-decoration: none" target="_blank" class="button-twitter">Share on Twitter</a></td></tr>' : '';
-  var orgNote = data.isOrg ? '<p>Note that only people within your organisation can join this room.</p>' : '';
 
   return {
     NAME:        data.recipientName,
@@ -92,8 +92,12 @@ function createdRoomMapping(data) {
     ROOMURL:     data.roomUrl,
     UNSUB:       data.unsubscribeUrl,
     TWITTERURL:  twitterSnippet,
-    ORGNOTE:     orgNote,
+    ORGNOTE:     '', // No used since splitsville
     ROOMTYPE:    data.roomType,
-    LOGOURL:     cdn('images/logo-text-blue-pink.png', {email: true})
+    LOGOURL:     cdn('images/logo/gitter-logo-email-64.png', {email: true})
   };
 }
+
+exports.testOnly = {
+  VALID_TEMPLATES: VALID_TEMPLATES
+};

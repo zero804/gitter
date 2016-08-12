@@ -37,7 +37,7 @@ module.exports = {
       uri: { type: String },
       tags: [String],
       lcUri: { type: String, 'default': function() { return this.uri ? this.uri.toLowerCase() : null; } },
-      githubType: { type: String, 'enum': ['REPO', 'ORG', 'ONETOONE', 'REPO_CHANNEL', 'ORG_CHANNEL', 'USER_CHANNEL'], required: true },
+      githubType: { type: String, 'enum': ['REPO', 'ORG', 'ONETOONE', 'REPO_CHANNEL', 'ORG_CHANNEL', 'USER_CHANNEL'] },
       lcOwner: { type: String, 'default': function() { return this.uri ? this.uri.split('/')[0].toLowerCase() : null; } },
       status: { type: String, "enum": ['ACTIVE', 'DELETED'], "default": 'ACTIVE'},  // DEPRECATED. TODO: remove this
       oneToOne: { type: Boolean, "default": false },
@@ -83,36 +83,6 @@ module.exports = {
     TroupeSchema.pre('save', function (next) {
       this.lcUri = this.uri ? this.uri.toLowerCase() : undefined;
       next();
-      // Put this somewhere when it finds a better home
-      // if (this.security !== 'PUBLIC') return next();
-      // if (this.)
-      // if(this.security !== 'PUBLIC' || this.tags && this.tags.length) {
-      //   // not worth tagging, or already tagged.
-      //   return next();
-      // }
-      //
-      // /* Don't tag test repos */
-      // if(this.githubType === 'REPO' && this.uri.indexOf("_test_") !== 0) {
-      //   var repoService = new RepoService(this.users[0]);
-      //   var self = this;
-      //
-      //   return repoService.getRepo(this.uri)
-      //     .then(function(repo) {
-      //       assert(repo, 'repo lookup failed');
-      //
-      //       self.tags = tagger(self, repo);
-      //     })
-      //     .catch(function(err) {
-      //       winston.warn('repo lookup or tagging failed for ' + this.uri + ' , skipping tagging for now', { exception: err });
-      //     })
-      //     .finally(function() {
-      //       next();
-      //     });
-      //
-      // }
-      //
-      // this.tags = tagger(this);
-      // next();
     });
 
     TroupeSchema.methods.addUserBan = function(options) {

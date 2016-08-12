@@ -8,46 +8,56 @@ var ProxyCollection = require('backbone-proxy-collection');
 var RecentSearchesCollection = require('../collections/recent-searches');
 var SuggestedOrgCollection = require('../collections/org-suggested-rooms');
 var apiClient = require('components/apiClient');
-var FilteredRoomCollection = require('../collections/filtered-room-collection.js');
+var context = require('utils/context');
+
+var FilteredMinibarGroupCollection = require('../collections/filtered-minibar-group-collection');
+var FilteredRoomCollection = require('../collections/filtered-room-collection');
+var FilteredFavouriteRoomCollection = require('../collections/filtered-favourite-room-collection');
 var SuggestedRoomsByRoomCollection = require('../collections/left-menu-suggested-by-room');
+var SuggestedRoomsByGroupName = require('../collections/org-suggested-rooms-by-name');
 var UserSuggestions = require('../collections/user-suggested-rooms');
 var SearchRoomPeopleCollection = require('../collections/left-menu-search-rooms-and-people');
 var SearchChatMessages = require('../collections/search-chat-messages');
-var perfTiming = require('components/perf-timing');
-var context = require('utils/context');
-var defaultCollectionFilter = require('gitter-web-shared/filters/left-menu-primary-default');
+
+var FavouriteCollectionModel = require('../views/menu/room/favourite-collection/favourite-collection-model');
+var PrimaryCollectionModel = require('../views/menu/room/primary-collection/primary-collection-model');
+var SecondaryCollectionModel = require('../views/menu/room/secondary-collection/secondary-collection-model');
+var TertiaryCollectionModel = require('../views/menu/room/tertiary-collection/tertiary-collection-model');
+var favouriteCollectionFilter = require('gitter-web-shared/filters/left-menu-primary-favourite');
+var MinibarItemModel = require('../views/menu/room/minibar/minibar-item-model');
+var MinibarPeopleModel = require('../views/menu/room/minibar/people-view/people-model');
+var MinibarTempOrgModel = require('../views/menu/room/minibar/temp-org-view/temp-org-model');
 
 var states = [
   'all',
   'search',
-  'favourite',
   'people',
   'org',
+  'temp-org'
 ];
 
 var SEARCH_DEBOUNCE_INTERVAL = 1000;
 
 module.exports = Backbone.Model.extend({
 
-  //TODO: Review these defaults once the pin
-  //behaviour is finalised
   defaults: {
-    state:                     '',
-    searchTerm:                '',
-    panelOpenState:            true,
-    roomMenuIsPinned:          true,
-    selectedOrgName:           '',
-    hasDismissedSuggestions:   false,
-    // 'keyboard', null (we can probably assume click from mouse)
-    activationSourceType:      null
+    state: '',
+    searchTerm: '',
+    roomMenuIsPinned: true,
+    groupId: '',
+    hasDismissedSuggestions: false,
   },
 
-  //TODO Remove all these delete statements and pass the object with the options hash
-  //not the attrs
-  //JP 27/1/16
-  initialize: function(attrs) {
+  constructor: function (attrs, options){
+    //It is the case that some users will have `selectedOrgName` saved in the DB
+    //Now we use groupId this will result in a totally broken app
+    //In this case we want to redirect the user to the all state to prevent broken stuff
+    if(attrs.state === 'org' && !attrs.groupId) { attrs.state = 'all'; }
+    Backbone.Model.prototype.constructor.call(this, attrs, options);
+  },
 
-    perfTiming.start('left-menu-init');
+  initialize: function(attrs) {
+    this.set('panelOpenState', this.get('roomMenuIsPinned'));
 
     if (!attrs || !attrs.bus) {
       throw new Error('A valid message bus must be passed when creating a new RoomMenuModel');
@@ -70,8 +80,9 @@ module.exports = Backbone.Model.extend({
     this._troupeModel = attrs.troupeModel;
     delete attrs.troupeModel;
 
+    this.dndCtrl = attrs.dndCtrl;
+    delete attrs.dndCtrl;
 
-    //TODO TEST THIS & THROW ERROR JP 25/1/16
     this._orgCollection = attrs.orgCollection;
 
     this._detailCollection = (attrs.detailCollection || new Backbone.Collection());
@@ -80,10 +91,14 @@ module.exports = Backbone.Model.extend({
     this.userModel = attrs.userModel;
     delete attrs.userModel;
 
+    this.groupsCollection = attrs.groupsCollection;
+    delete attrs.groupsCollection;
+
     //expose the public collection
     this.searchTerms = new RecentSearchesCollection(null);
     this.searchRoomAndPeople = new SearchRoomPeopleCollection(null, { roomMenuModel: this, roomCollection: this._roomCollection });
-    this.searchChatMessages = new SearchChatMessages(null, { roomMenuModel: this, roomModel: this._troupeModel });
+    this.searchMessageQueryModel = new Backbone.Model({ skip: 0 });
+    this.searchChatMessages = new SearchChatMessages(null, { roomMenuModel: this, roomModel: this._troupeModel, queryModel: this.searchMessageQueryModel });
     this.suggestedOrgs = new SuggestedOrgCollection({ contextModel: this, roomCollection: this._roomCollection });
     this.userSuggestions = new UserSuggestions(null, { contextModel: context.user() });
     this._suggestedRoomCollection = new SuggestedRoomsByRoomCollection({
@@ -93,17 +108,64 @@ module.exports = Backbone.Model.extend({
       suggestedOrgsCollection: this.suggestedOrgs,
     });
 
-    var models = this._roomCollection.filter(defaultCollectionFilter);
-    this.activeRoomCollection = new FilteredRoomCollection(models, {
+    this.suggestedRoomsByOrgName = new SuggestedRoomsByGroupName(null, { roomMenuModel: this });
+
+    var state = this.get('state');
+    this.minibarHomeModel = new MinibarItemModel({ name: 'all', type: 'all', active: (state === 'all') });
+    this.minibarSearchModel = new MinibarItemModel({ name: 'search', type: 'search', active: (state === 'search') });
+    this.minibarPeopleModel = new MinibarPeopleModel({ active: (state === 'people')}, { roomCollection: this._roomCollection });
+    this.minibarCommunityCreateModel = new MinibarItemModel({ name: 'Create Community', type: 'community-create' });
+    this.minibarCloseModel = new MinibarItemModel({ name: 'close', type: 'close' });
+    this.minibarTempOrgModel = new MinibarTempOrgModel(attrs.tempOrg, { troupe: context.troupe(), });
+
+    //Setup an inital active group model
+    this.groupsCollection.forEach(function(model){
+      if(state === 'org' && model.id === this.get('groupId')) {
+        model.set('active', true);
+      }
+    }.bind(this));
+
+    this.minibarCollection = new FilteredMinibarGroupCollection(null, {
+      collection: this.groupsCollection
+    });
+
+
+    this.activeRoomCollection = new FilteredRoomCollection(null, {
       roomModel:  this,
       collection: this._roomCollection,
     });
 
+    var favModels = this._roomCollection.filter(favouriteCollectionFilter);
+    this.favouriteCollection = new FilteredFavouriteRoomCollection(favModels, {
+      collection: this._roomCollection,
+      roomModel:  this,
+      dndCtrl:    this.dndCtrl,
+    });
 
+    this.favouriteCollectionModel = new FavouriteCollectionModel(null, {
+      collection: this.favouriteCollection,
+      roomMenuModel: this
+    });
 
     this.primaryCollection = new ProxyCollection({ collection: this.activeRoomCollection });
+    this.primaryCollectionModel = new PrimaryCollectionModel(null, {
+      collection: this.primaryCollection,
+      roomMenuModel: this
+    });
+
     this.secondaryCollection = new ProxyCollection({ collection: this.searchTerms });
+    this.secondaryCollectionModel = new SecondaryCollectionModel({}, {
+      collection: this.secondaryCollection,
+      roomMenuModel: this
+    });
+
     this.tertiaryCollection = new ProxyCollection({ collection: this._orgCollection });
+    this.tertiaryCollectionModel = new TertiaryCollectionModel({}, {
+      collection: this.tertiaryCollection,
+      roomMenuModel: this
+    });
+
+    this.searchFocusModel = new Backbone.Model({ focus: false });
 
     this.listenTo(this.primaryCollection, 'snapshot', this.onPrimaryCollectionSnapshot, this);
     this.snapshotTimeout = setTimeout(function(){
@@ -115,47 +177,27 @@ module.exports = Backbone.Model.extend({
     this.bus = attrs.bus;
     delete attrs.bus;
 
-    this.listenTo(this.bus, 'room-menu:change:state', this.onStateChangeCalled, this);
     this.listenTo(this, 'change:searchTerm', this.onSearchTermChange, this);
     this.listenTo(this, 'change:state', this.onSwitchState, this);
-    this.listenTo(this, 'change', _.throttle(this.save.bind(this), 1500));
+    this.listenTo(this, 'change', this.persistChanges);
+    this._throttledSave = _.throttle(this.save.bind(this), 1500, { leading: false });
     this.listenTo(context.troupe(), 'change:id', this.onRoomChange, this);
-
-    // TODO: Should we be doing this stuff inside the collection-models?
-    //   We do something similar with the search in the model itself so maybe...
-    this.listenTo(this.activeRoomCollection, 'filter-complete', this.fireUpdateActiveState, this);
-    this.listenTo(this.searchTerms, 'filter-complete', this.fireUpdateActiveState, this);
-    this.listenTo(this.suggestedOrgs, 'sync', this.fireUpdateActiveState, this);
-    this.listenTo(this.suggestedOrgs, 'reset', this.fireUpdateActiveState, this);
-    this.listenTo(this.userSuggestions, 'sync', this.fireUpdateActiveState, this);
-    this.listenTo(this.userSuggestions, 'reset', this.fireUpdateActiveState, this);
-    this.listenTo(this.searchRoomAndPeople, 'reset', this.fireUpdateActiveState, this);
-    this.listenTo(this.searchChatMessages, 'reset', this.fireUpdateActiveState, this);
-
-
-    //boot the model
+    this.listenTo(this.bus, 'left-menu-menu-bar:activate', this.onMenuBarActivateRequest, this);
     this.onSwitchState(this, this.get('state'));
   },
 
-  onStateChangeCalled: function(newState) {
-
-    if (states.indexOf(newState) === -1) {
-      throw new Error('Please only pass a valid state to roomMenuModel change state, you passed:' + newState);
-    }
-
-
-    perfTiming.start('left-menu-change');
-    this.set('state', newState);
-    perfTiming.end('left-menu-change');
-  },
-
-  //This may be redundant
-  setState: function(type) {
-    this.onStateChangeCalled(type);
+  //custom set to limit states that can be assigned
+  set: function (key, val){
+    var isChangingState = (key === 'state') || (_.isObject(key) && !!key.state);
+    if(!isChangingState) { return Backbone.Model.prototype.set.apply(this, arguments); }
+    var newState = _.isObject(key) ? key.state : val;
+    //If we are changing the models state value
+    if(states.indexOf(newState) === -1) { return; }
+    return Backbone.Model.prototype.set.apply(this, arguments);
   },
 
   onSwitchState: function(model, val) {
-    //TODO Test this JP 27/1/15
+    var searchFocus = false;
     switch (val) {
       case 'all':
         this.primaryCollection.switchCollection(this.activeRoomCollection);
@@ -167,11 +209,7 @@ module.exports = Backbone.Model.extend({
         this.primaryCollection.switchCollection(this.searchRoomAndPeople);
         this.secondaryCollection.switchCollection(this.searchChatMessages);
         this.tertiaryCollection.switchCollection(this.searchTerms);
-        break;
-
-      case 'favourite':
-        this.primaryCollection.switchCollection(this.activeRoomCollection);
-        this.secondaryCollection.switchCollection(this._suggestedRoomCollection);
+        searchFocus = true;
         break;
 
       case 'org':
@@ -180,6 +218,14 @@ module.exports = Backbone.Model.extend({
         this.tertiaryCollection.switchCollection(this._suggestedRoomCollection);
         break;
 
+      case 'temp-org':
+        this.set('groupId', null);
+        this.primaryCollection.switchCollection(this.activeRoomCollection);
+        this.secondaryCollection.switchCollection(this.suggestedRoomsByOrgName);
+        this.tertiaryCollection.switchCollection(this._suggestedRoomCollection);
+        break;
+
+
       default:
         this.primaryCollection.switchCollection(this.activeRoomCollection);
         this.secondaryCollection.switchCollection(new Backbone.Collection(null));
@@ -187,12 +233,8 @@ module.exports = Backbone.Model.extend({
         break;
     }
 
-    this.fireUpdateActiveState();
     this.trigger('change:state:post');
-  },
-
-  fireUpdateActiveState: function() {
-    this.trigger('update:collection-active-states');
+    this.searchFocusModel.set('focus', searchFocus);
   },
 
   onSearchTermChange: _.debounce(function() {
@@ -215,36 +257,31 @@ module.exports = Backbone.Model.extend({
     }, {});
   },
 
+  persistChanges: function() {
+    var includesPersistentChanges = Object.keys(this.changed).some(function(changedKey) {
+      if (changedKey === 'searchTerm') return false;
+      return this.defaults.hasOwnProperty(changedKey);
+    }, this);
+
+    if (includesPersistentChanges) {
+      this._throttledSave();
+    }
+  },
+
   //This can be changed to userPreferences once the data is maintained
   //JP 8/1/16
   sync: function(method, model, options) {
-    var self = this;
-
     //save
     if (method === 'create' || method === 'update' || method === 'patch') {
       return apiClient.user.put('/settings/leftRoomMenu', this.toJSON(), {
-          // No need to get the JSON back from the server...
-          dataType: 'text'
-        })
-        .then(function() { if (options.success) options.success.apply(self, arguments); })
-        .catch(function(err) { if (options.error) options.error(err); });
+        // No need to get the JSON back from the server...
+        dataType: 'text'
+      })
+      .then(function() {
+        if (options.success) options.success({});
+      })
+      .catch(function(err) { if (options.error) options.error(err); });
     }
-
-    //if we are in a mobile environment then the menu will never be pinned
-    if (this.get('isMobile')) {
-      window.troupeContext = {
-        leftRoomMenuState: {
-          roomMenuIsPinned: false,
-          panelOpenState:   false,
-        },
-      };
-    }
-
-    //The only time we need to fetch data is on page load
-    //so we can just pull it our of the troupe context
-    //JP 11/1/16
-    this.set(context.getLeftRoomMenuContext());
-    if (options.success) options.success();
   },
 
   onRoomChange: function (){
@@ -253,14 +290,30 @@ module.exports = Backbone.Model.extend({
 
     if(activeModel) { activeModel.set('active', false); }
     if(newlyActiveModel) { newlyActiveModel.set('active', true); }
+    if(!this.get('roomMenuIsPinned')) { this.set('panelOpenState', false); }
+  },
+
+  onMenuBarActivateRequest: function(data) {
+    data = data || {};
+    this.set({
+      panelOpenState: true,
+      profileMenuOpenState: false,
+      state: data.state,
+      groupId: data.groupId,
+    });
+  },
+
+  getCurrentGroup: function (){
+    if(this.get('state') !== 'org') { return false; }
+    return this.groupsCollection.get(this.get('groupId'));
   },
 
   _getModel: function (prop, val){
     var query = {}; query[prop] = val;
     return this.primaryCollection.findWhere(query) ||
-           this.secondaryCollection.findWhere(query) ||
-           this.tertiaryCollection.findWhere(query) ||
-           this._roomCollection.findWhere(query);
+      this.secondaryCollection.findWhere(query) ||
+        this.tertiaryCollection.findWhere(query) ||
+          this._roomCollection.findWhere(query);
   },
 
 });

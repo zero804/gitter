@@ -1,6 +1,7 @@
 "use strict";
 
 var path = require("path");
+var ProvidePlugin = require('webpack/lib/ProvidePlugin');
 var CommonsChunkPlugin = require("webpack/lib/optimize/CommonsChunkPlugin");
 var ContextReplacementPlugin = require("webpack/lib/ContextReplacementPlugin");
 
@@ -33,6 +34,9 @@ var webpackConfig = {
     "router-userhome": path.resolve(path.join(__dirname, './router-userhome.js')),
 
     "mobile-native-userhome": path.resolve(path.join(__dirname, "./mobile-native-userhome")),
+    "router-home-learn": path.resolve(path.join(__dirname, './router-home-learn')),
+    "early-bird": path.resolve(path.join(__dirname, './early-bird')),
+    "topics-bootstrap": path.resolve(path.join(__dirname, './topics-bootstrap')),
 
     vendor: [
       'utils/webpack',
@@ -48,7 +52,9 @@ var webpackConfig = {
       'raven-js',
       'keymaster',
       'moment',
-      'bluebird'
+      'bluebird',
+      'fuzzysearch',
+      'url-join'
     ]
   },
   output: {
@@ -70,7 +76,8 @@ var webpackConfig = {
             path.resolve(__dirname, '../../shared/handlebars/helpers')
           ],
           knownHelpers: [
-            'cdn'
+            'cdn',
+            'avatarSrcSet'
           ],
           partialsRootRelative: path.resolve(__dirname, '../templates/partials/') + path.sep
         }
@@ -86,6 +93,7 @@ var webpackConfig = {
       "utils": path.resolve(path.join(__dirname, "/utils/")),
       // "shared": path.resolve(path.join(__dirname, "../../shared/")),
       "views": path.resolve(path.join(__dirname, "./views/")),
+      "models": path.resolve(path.join(__dirname, "./models")),
       "collections": path.resolve(path.join(__dirname, "./collections")),
       "components": path.resolve(path.join(__dirname, "./components")),
       "template": path.resolve(path.join(__dirname, "./template")),
@@ -113,6 +121,7 @@ var webpackConfig = {
     },
   },
   plugins: [
+    new ProvidePlugin({ Promise: "bluebird" }),
     new CommonsChunkPlugin("vendor", "[name].js"),
     new ContextReplacementPlugin(/moment\/locale$/, /ar|cs|da|de|en-gb|es|fa|fr|hu|it|ja|ko|lt|nl|pl|pt|ru|sk|sv|ua|zh-cn/)
   ],

@@ -2,9 +2,10 @@
 var $ = require('jquery');
 var context = require('utils/context');
 var clientEnv = require('gitter-client-env');
+var onready = require('utils/onready');
 var HeaderView = require('views/app/headerView');
 var ArchiveNavigationView = require('views/archive/archive-navigation-view');
-var onready = require('./utils/onready');
+var RightToolBarModel = require('./models/right-toolbar-model');
 
 /* Set the timezone cookie */
 require('components/timezone-cookie');
@@ -48,8 +49,15 @@ onready(function() {
     window.parent.location.href = href;
   });
 
+
+  var rightToolbarModel = new RightToolBarModel({});
   // TODO: XXX move this across to a layoutview
-  new HeaderView({ model: context.troupe(), el: '#header', archives: true }).render();
+  new HeaderView({
+    el: '#header',
+    model: context.troupe(),
+    rightToolbarModel: rightToolbarModel,
+    archives: true
+  }).render();
 
   var archiveContext = context().archive;
 
@@ -59,20 +67,6 @@ onready(function() {
     nextDate: archiveContext.nextDate,
     previousDate: archiveContext.previousDate
   }).render();
-
-  // Adjust header manually: #nasty
-  var size = $('#header-wrapper').outerHeight() + 'px';
-  var ss = document.styleSheets[2];
-  try {
-    if (ss.insertRule) {
-      ss.insertRule('.trpChatContainer > div:first-child { padding-top: ' + size + ' }', ss.cssRules.length);
-    } else if (ss.addRule) {
-      ss.addRule('.trpChatContainer > div:first-child', 'padding-top:' + size);
-    }
-  } catch (err) {
-    // TODO: Handle the error? WC.
-  }
-
 
 
 });

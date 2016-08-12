@@ -1,17 +1,26 @@
 "use strict";
 
+var env = require('gitter-web-env');
+var logger = env.logger;
 var express = require('express');
 var mainFrameRenderer = require('../renderers/main-frame');
 var chatRenderer = require('../renderers/chat');
-var userNotSignedUpRenderer = require('../renderers/user-not-signed-up');
-var appMiddleware = require('./middleware');
+var uriContextResolverMiddleware = require('../uri-context/uri-context-resolver-middleware');
 var recentRoomService = require('../../services/recent-room-service');
-var isPhone = require('../../web/is-phone');
+var isPhoneMiddleware = require('../../web/middlewares/is-phone');
 var timezoneMiddleware = require('../../web/middlewares/timezone');
 var featureToggles = require('../../web/middlewares/feature-toggles');
 var archive = require('./archive');
 var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
 var StatusError = require('statuserror');
+var fixMongoIdQueryParam = require('../../web/fix-mongo-id-query-param');
+var url = require('url');
+var social = require('../social-metadata');
+var chatService = require('../../services/chat-service');
+var restSerializer = require("../../serializers/rest-serializer");
+var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
+var redirectErrorMiddleware = require('../uri-context/redirect-error-middleware');
+var topicsRenderers = require('../renderers/topics');
 
 function saveRoom(req) {
   var userId = req.user && req.user.id;
@@ -22,11 +31,32 @@ function saveRoom(req) {
   }
 }
 
+function getSocialMetaDataForRoom(room, aroundId) {
+    // TODO: change this to use policy
+    if (aroundId && room && securityDescriptorUtils.isPublic(room)) {
+      // If this is a permalinked chat, load special social meta-data....
+      return chatService.findByIdInRoom(room._id, aroundId)
+        .then(function(chat) {
+          var strategy = new restSerializer.ChatStrategy({
+            notLoggedIn: true,
+            troupeId: room._id
+          });
+
+          return restSerializer.serializeObject(chat, strategy);
+        })
+        .then(function(permalinkChatSerialized) {
+          return social.getMetadataForChatPermalink({ room: room, chat: permalinkChatSerialized });
+        });
+    }
+
+    return social.getMetadata({ room: room });
+}
+
 var mainFrameMiddlewarePipeline = [
   identifyRoute('app-main-frame'),
   featureToggles,
-  appMiddleware.uriContextResolverMiddleware({ create: 'not-repos' }),
-  appMiddleware.isPhoneMiddleware,
+  uriContextResolverMiddleware,
+  isPhoneMiddleware,
   timezoneMiddleware,
   function (req, res, next) {
     if (req.uriContext.ownUrl) {
@@ -47,23 +77,35 @@ var mainFrameMiddlewarePipeline = [
       chatRenderer.renderMobileChat(req, res, next);
 
     } else {
-      mainFrameRenderer.renderMainFrame(req, res, next, 'chat');
+      // Load the main-frame
+      var chatAppQuery = {};
+      var aroundId = fixMongoIdQueryParam(req.query.at);
+
+      if (aroundId) { chatAppQuery.at = aroundId; }
+
+      var subFrameLocation = url.format({
+        pathname: '/' + req.uriContext.uri + '/~chat',
+        query:    chatAppQuery,
+        hash:     '#initial'
+      });
+
+      var socialMetaDataPromise = getSocialMetaDataForRoom(req.troupe, aroundId);
+
+      mainFrameRenderer.renderMainFrame(req, res, next, {
+        subFrameLocation: subFrameLocation,
+        title: req.uriContext.uri,
+        socialMetaDataPromise: socialMetaDataPromise
+      });
     }
   },
-  function (err, req, res, next) {
-    if (err && err.userNotSignedUp && !isPhone(req)) {
-      userNotSignedUpRenderer.renderUserNotSignedUpMainFrame(req, res, next);
-      return;
-    }
-    return next(err);
-  }
+  redirectErrorMiddleware
 ];
 
 var chatMiddlewarePipeline = [
   identifyRoute('app-chat-frame'),
   featureToggles,
-  appMiddleware.uriContextResolverMiddleware({ create: 'not-repos'}),
-  appMiddleware.isPhoneMiddleware,
+  uriContextResolverMiddleware,
+  isPhoneMiddleware,
   timezoneMiddleware,
   function (req, res, next) {
     if (req.uriContext.accessDenied) {
@@ -84,20 +126,14 @@ var chatMiddlewarePipeline = [
     }
 
   },
-  function (err, req, res, next) {
-    if (err && err.userNotSignedUp) {
-      userNotSignedUpRenderer.renderUserNotSignedUp(req, res, next);
-      return;
-    }
-    return next(err);
-  }
+  redirectErrorMiddleware
 ];
 
 var embedMiddlewarePipeline = [
   identifyRoute('app-embed-frame'),
   featureToggles,
-  appMiddleware.uriContextResolverMiddleware({ create: false }),
-  appMiddleware.isPhoneMiddleware,
+  uriContextResolverMiddleware,
+  isPhoneMiddleware,
   timezoneMiddleware,
   function (req, res, next) {
     if(!req.uriContext.troupe) return next(new StatusError(404));
@@ -107,22 +143,36 @@ var embedMiddlewarePipeline = [
     } else {
       chatRenderer.renderNotLoggedInEmbeddedChat(req, res, next);
     }
-  }
+  },
+  redirectErrorMiddleware
 ];
 
 var cardMiddlewarePipeline = [
   identifyRoute('app-card-frame'),
-  appMiddleware.uriContextResolverMiddleware({ create: false }),
+  uriContextResolverMiddleware,
   timezoneMiddleware,
   function (req, res, next) {
-    if(!req.uriContext.troupe) return next(new StatusError(404));
-    if(req.uriContext.troupe.security !== 'PUBLIC') return next(new StatusError(403));
+    var troupe = req.uriContext.troupe;
+
+    if(!troupe) return next(new StatusError(404));
+    if (!securityDescriptorUtils.isPublic(troupe)) {
+      return next(new StatusError(403));
+    }
     if(!req.query.at) return next(new StatusError(400));
     chatRenderer.renderChatCard(req, res, next);
-  }
+  },
+  redirectErrorMiddleware
 ];
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
+
+router.get('/:roomPart1/topics',
+  identifyRoute('org-base-topic'),
+  featureToggles,
+  function(req, res, next){
+    return topicsRenderers.renderForum(req, res, next);
+  }
+);
 
 [
   '/:roomPart1/~chat',                         // ORG or ONE_TO_ONE
@@ -154,10 +204,16 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
   router.get(path + '/archives', archive.linksList);
   router.get(path + '/archives/all', archive.datesList);
   router.get(path + '/archives/:yyyy(\\d{4})/:mm(\\d{2})/:dd(\\d{2})', archive.chatArchive);
+
   router.get(path, mainFrameMiddlewarePipeline);
+
+  // Why would somebody be posting to a room
+  // TODO: This should probably be removed
   router.post(path,
-    appMiddleware.uriContextResolverMiddleware({ create: true }),
+    uriContextResolverMiddleware,
     function(req, res, next) {
+      logger.warn('POST to room', { path: req.originalUrl, userId: req.user && req.user.id });
+
       if(!req.uriContext.troupe || !req.uriContext.ownUrl) return next(new StatusError(404));
 
       // GET after POST

@@ -1,5 +1,7 @@
 "use strict";
 
+require('utils/font-setup');
+
 var onReady = require('./utils/onready');
 var Backbone = require('backbone');
 var appEvents = require('utils/appevents');
@@ -47,7 +49,7 @@ onReady(function(){
 
     routes: {
       '': 'index',
-      ':roomId/tags': 'onNavigateTags'
+      'tags/:roomId': 'onNavigateTags'
     },
 
     index: function(){

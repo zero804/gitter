@@ -3,17 +3,12 @@
 var $ = require('jquery');
 var Marionette = require('backbone.marionette');
 var urlParse = require('url-parse');
-
 var context = require('utils/context');
-var appEvents = require('utils/appevents');
 var frameUtils = require('utils/frame-utils');
-
 var modalRegion = require('components/modal-region');
 var LoginView = require('views/modals/login-view');
 var template = require('./tmpl/explore-view.hbs');
 var itemTemplate = require('../../../templates/partials/room_card.hbs');
-
-
 
 require('views/behaviors/isomorphic');
 
@@ -117,13 +112,7 @@ var ExploreView = Marionette.LayoutView.extend({
   },
 
   popCreate: function() {
-    if(context.hasFeature('community-create')) {
-      //appEvents.trigger('community-create-view:toggle', true);
-      frameUtils.postMessage({ type: 'community-create-view:toggle', active: true });
-    }
-    else {
-      frameUtils.postMessage({ type: 'route', hash: 'createroom' });
-    }
+    frameUtils.postMessage({ type: 'community-create-view:toggle', active: true });
   }
 });
 

@@ -18,19 +18,39 @@ var ActiveCollection = Backbone.Collection.extend({
     }
 
     this.backingCollection = options.collection;
+    this.listenTo(this.backingCollection, 'request', this.onCollectionRequest, this);
+    this.listenTo(this.backingCollection, 'reset', this.onCollectionReset, this);
+    this.listenTo(this.backingCollection, 'sync', this.onCollectionSync, this);
     this.listenTo(this.backingCollection, 'snapshot', this.onCollectionSnapshot, this);
     this.listenTo(this.backingCollection, 'remove', this.onItemRemoved, this);
-    this.listenTo(this.backingCollection, 'add', this.onItemAdded, this)
+    this.listenTo(this.backingCollection, 'add', this.onItemAdded, this);
 
     this.addModels(models);
   },
 
-
-  onItemAdded: function (model){
-    this.add(new ActiveItemModel(model.toJSON()));
+  fetch: function() {
+    return this.backingCollection.fetch.apply(this.backingCollection, arguments);
   },
-  onItemRemoved: function (model){
+
+  onItemAdded: function(model) {
+    this.add(new ActiveItemModel(model.attributes));
+  },
+  onItemRemoved: function(model) {
     this.remove(model);
+  },
+
+  onCollectionRequest: function() {
+    this.trigger('request');
+  },
+
+  onCollectionReset: function() {
+    this.addModels(this.backingCollection.models);
+    this.trigger('reset');
+  },
+
+  onCollectionSync: function() {
+    this.addModels(this.backingCollection.models);
+    this.trigger('sync');
   },
 
   onCollectionSnapshot: function() {
@@ -40,8 +60,8 @@ var ActiveCollection = Backbone.Collection.extend({
 
   addModels: function(models) {
     models = models || [];
-    this.set(models.map(function(model) {
-      return new ActiveItemModel(model.toJSON());
+    this.reset(models.map(function(model) {
+      return new ActiveItemModel(model.attributes);
     }));
   }
 });

@@ -47,9 +47,20 @@ GitHubRepoService.prototype.isCollaborator = function(repo, username) {
  *
  */
 GitHubRepoService.prototype.getCommits = function(repo, options) {
+  var query = {};
+
+  if (options && options.perPage) {
+    query.per_page = options.perPage;
+  }
+
+  if (options && options.author) {
+    query = { author: options.author }
+  }
+
   return tentacles.repoCommit.list(repo, {
     accessToken: this.accessToken,
-    firstPageOnly: options && options.firstPageOnly
+    firstPageOnly: options && options.firstPageOnly,
+    query: query
   });
 };
 
@@ -67,8 +78,16 @@ GitHubRepoService.prototype.getStargazers = function(repo, options) {
 /**
  * Returns a promise of the issues for a repo
  */
-GitHubRepoService.prototype.getIssues = function(repo) {
-  return tentacles.issue.listForRepo(repo, { query: { state: 'all' }, accessToken: this.accessToken })
+GitHubRepoService.prototype.getIssues = function(repo, options) {
+  var query = {
+    state: options && options.state || 'all',
+  }
+
+  return tentacles.issue.listForRepo(repo, {
+      query: query,
+      accessToken: this.accessToken,
+      firstPageOnly: options && options.firstPageOnly
+    })
     .then(function(returnedIssues) {
       var issues = [];
       returnedIssues.forEach(function(issue) {
@@ -99,9 +118,26 @@ GitHubRepoService.prototype.getAllReposForAuthUser = function() {
 
 /** TODO: deprecated */
 GitHubRepoService.prototype.getReposForUser = function(username, options) {
+  var query = {};
+
+  if (options) {
+    if (options.type) {
+      query.type = options.type;
+    }
+
+    if (options.sort) {
+      query.sort = options.sort;
+    }
+
+    if (options.perPage) {
+      query.per_page = options.perPage;
+    }
+  }
+
   return tentacles.repo.listForUser(username, {
-  accessToken: this.accessToken,
-    firstPageOnly: options && options.firstPageOnly
+    accessToken: this.accessToken,
+    firstPageOnly: options && options.firstPageOnly,
+    query: query
   });
 };
 

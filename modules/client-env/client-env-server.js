@@ -38,6 +38,8 @@ var troupeEnv = {
       retry: config.get('ws:fayeRetry')
     }
   },
+  avatarsUrl: config.get('avatar:officialHost'),
+  avatarCdns: config.get('avatar:hosts'),
   embed: {
     basepath: config.get('embed:basepath'),
     cacheBuster: config.get('embed:cacheBuster')

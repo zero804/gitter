@@ -13,11 +13,12 @@ var restSerializer = require("../serializers/rest-serializer");
 var unreadItemService = require("./unread-items");
 var chatService = require("./chat-service");
 var userService = require("./user-service");
-var userSearchService = require('./user-search-service');
+var userTypeahead = require('./typeaheads/user-typeahead');
 var eventService = require("./event-service");
 var roomService = require('./room-service');
 var roomMembershipService = require('./room-membership-service');
-var BackendMuxer = require('gitter-web-backend-muxer');
+var orgService = require("./org-service");
+var repoService = require("./repo-service");
 var userScopes = require('gitter-web-identity/lib/user-scopes');
 
 var survivalMode = !!process.env.SURVIVAL_MODE || false;
@@ -91,15 +92,15 @@ function serializeUsersForTroupe(troupeId, userId, options) {
     limit = MAX_USERS_LIMIT;
   }
 
-  if(searchTerm) {
-    if (survivalMode) {
+  if(typeof searchTerm === 'string') {
+    if (survivalMode || searchTerm.length < 1) {
       return Promise.resolve([]);
     }
 
-    return userSearchService.searchForUsersInRoom(searchTerm, troupeId, { limit: limit })
-      .then(function(resp) {
+    return userTypeahead.query(searchTerm, { roomId: troupeId })
+      .then(function(users) {
         var strategy = new restSerializer.UserStrategy();
-        return restSerializer.serialize(resp.results, strategy);
+        return restSerializer.serialize(users, strategy);
       });
 
   }
@@ -152,8 +153,7 @@ function serializeEventsForTroupe(troupeId, userId, callback) {
 }
 
 function serializeOrgsForUser(user) {
-  var backendMuxer = new BackendMuxer(user);
-  return backendMuxer.findOrgs()
+  return orgService.getOrgsForUser(user)
     .then(function(orgs) {
       var strategyOptions = { currentUserId: user.id };
       // TODO: not all organisations are going to be github ones in future!
@@ -168,6 +168,34 @@ function serializeOrgsForUserId(userId, options) {
       if(!user) return [];
 
       return serializeOrgsForUser(user, options);
+    });
+}
+
+function serializeUnusedOrgsForUser(user) {
+  return orgService.getUnusedOrgsForUser(user)
+    .then(function(orgs) {
+      var strategyOptions = { currentUserId: user.id };
+      var strategy = new restSerializer.GithubOrgStrategy(strategyOptions);
+      return restSerializer.serialize(orgs, strategy);
+    });
+
+}
+
+function serializeReposForUser(user) {
+  return repoService.getReposForUser(user)
+    .then(function(repos) {
+      var strategyOptions = { currentUserId: user.id };
+      var strategy = new restSerializer.GithubRepoStrategy(strategyOptions);
+      return restSerializer.serialize(repos, strategy);
+    });
+}
+
+function serializeUnusedReposForUser(user) {
+  return repoService.getUnusedReposForUser(user)
+    .then(function(repos) {
+      var strategyOptions = { currentUserId: user.id };
+      var strategy = new restSerializer.GithubRepoStrategy(strategyOptions);
+      return restSerializer.serialize(repos, strategy);
     });
 }
 
@@ -191,14 +219,35 @@ function serializeProfileForUsername(username) {
 }
 
 
-function serializeGroupsForUserId(userId) {
+function serializeGroupsForUserId(userId, options) {
   if (!userId) return [];
 
   return groupMembershipService.findGroupsForUser(userId)
     .then(function(groups) {
       if (!groups || !groups.length) return [];
 
-      var strategy = new restSerializer.GroupStrategy({ currentUserId: userId });
+      var strategy = new restSerializer.GroupStrategy({
+        currentUserId: userId,
+        lean: options && options.lean
+      });
+
+      return restSerializer.serialize(groups, strategy);
+    });
+}
+
+function serializeAdminGroupsForUser(user, options) {
+  if (!user) return [];
+
+  return groupMembershipService.findAdminGroupsForUser(user)
+    .then(function(groups) {
+      if (!groups || !groups.length) return [];
+
+      var strategy = new restSerializer.GroupStrategy({
+        currentUserId: user._id,
+        currentUser: user,
+        lean: options && options.lean
+      });
+
       return restSerializer.serialize(groups, strategy);
     });
 }
@@ -223,7 +272,11 @@ module.exports = {
   serializeEventsForTroupe: serializeEventsForTroupe,
   serializeOrgsForUser: serializeOrgsForUser,
   serializeOrgsForUserId: serializeOrgsForUserId,
+  serializeUnusedOrgsForUser: serializeUnusedOrgsForUser,
+  serializeReposForUser: serializeReposForUser,
+  serializeUnusedReposForUser: serializeUnusedReposForUser,
   serializeProfileForUsername: serializeProfileForUsername,
   serializeGroupsForUserId: Promise.method(serializeGroupsForUserId),
+  serializeAdminGroupsForUser: Promise.method(serializeAdminGroupsForUser),
   serializeRoomsForGroupId: serializeRoomsForGroupId
 }

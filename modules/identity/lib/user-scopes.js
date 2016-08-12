@@ -1,5 +1,7 @@
 'use strict';
 
+var isGitHubUsername = require('./is-github-username');
+
 var LEGACY_DEFAULT_SCOPE = {'user': 1, 'user:email': 1, 'user:follow':1, 'repo':1, 'public_repo': 1};
 
 function hasGitHubScope(user, scope) {
@@ -60,7 +62,7 @@ function getGitHubToken(user, scope) {
 }
 
 function isGitHubUser(user) {
-  return (user.username && user.username.indexOf('_') === -1);
+  return isGitHubUsername(user.username);
 }
 
 function isMissingTokens(user) {
@@ -70,9 +72,20 @@ function isMissingTokens(user) {
   return !user.githubToken && !user.githubUserToken;
 }
 
+/**
+ * Deprecated
+ */
+function getScopesHash(user) {
+  return {
+    'public_repo': hasGitHubScope(user, 'public_repo'),
+    'private_repo': hasGitHubScope(user, 'repo')
+  };
+}
+
 module.exports = {
   hasGitHubScope: hasGitHubScope,
   getGitHubToken: getGitHubToken,
   isGitHubUser: isGitHubUser,
-  isMissingTokens: isMissingTokens
+  isMissingTokens: isMissingTokens,
+  getScopesHash: getScopesHash
 };

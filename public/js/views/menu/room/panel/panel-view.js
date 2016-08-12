@@ -7,17 +7,12 @@ var toggleClass = require('utils/toggle-class');
 var PanelHeaderView = require('../header/header-view');
 var PanelFooterView = require('../footer/footer-view');
 var FavouriteCollectionView = require('../favourite-collection/favourite-collection-view');
-var FavouriteCollectionModel = require('../favourite-collection/favourite-collection-model');
 var PrimaryCollectionView = require('../primary-collection/primary-collection-view');
-var PrimaryCollectionModel = require('../primary-collection/primary-collection-model');
 var SecondaryCollectionView = require('../secondary-collection/secondary-collection-view');
-var SecondaryCollectionModel = require('../secondary-collection/secondary-collection-model');
 var TertiaryCollectionView = require('../tertiary-collection/tertiary-collection-view');
-var TertiaryCollectionModel = require('../tertiary-collection/tertiary-collection-model');
 var ProfileMenuView = require('../profile/profile-menu-view');
-var FilteredFavouriteRoomCollection = require('../../../../collections/filtered-favourite-room-collection.js');
 var SearchInputView = require('views/menu/room/search-input/search-input-view');
-var favouriteCollectionFilter = require('gitter-web-shared/filters/left-menu-primary-favourite');
+var NeverEndingStory = require('utils/never-ending-story');
 
 require('views/behaviors/isomorphic');
 
@@ -40,7 +35,7 @@ var PanelView = Marionette.LayoutView.extend({
   initHeader: function(optionsForRegion) {
     return new PanelHeaderView(optionsForRegion({
       model:     this.model,
-      userModel: this.model.userModel,
+      groupsCollection: this.model.groupsCollection,
     }));
   },
 
@@ -49,17 +44,22 @@ var PanelView = Marionette.LayoutView.extend({
   },
 
   initSearchInput: function(optionsForRegion) {
-    return new SearchInputView(optionsForRegion({ model: this.model, bus: this.bus }));
+    return new SearchInputView(optionsForRegion({
+      model: this.model,
+      bus: this.bus ,
+      searchFocusModel: this.model.searchFocusModel,
+    }));
   },
 
   initFavouriteCollection: function (optionsForRegion) {
     return new FavouriteCollectionView(optionsForRegion({
-      collection:     this.favCollection,
-      model:          this.favouriteCollectionModel,
+      collection:     this.model.favouriteCollection,
+      model:          this.model.favouriteCollectionModel,
       roomMenuModel:  this.model,
       bus:            this.bus,
       dndCtrl:        this.dndCtrl,
       roomCollection: this.model._roomCollection,
+      groupsCollection: this.model.groupsCollection,
     }));
 
   },
@@ -67,36 +67,39 @@ var PanelView = Marionette.LayoutView.extend({
   initPrimaryCollection: function(optionsForRegion) {
     return new PrimaryCollectionView(optionsForRegion({
       collection:     this.model.primaryCollection,
-      model:          this.primaryCollectionModel,
+      model:          this.model.primaryCollectionModel,
       roomMenuModel:  this.model,
       bus:            this.bus,
       dndCtrl:        this.dndCtrl,
       roomCollection: this.model._roomCollection,
+      groupsCollection: this.model.groupsCollection,
     }));
   },
 
   initSecondaryCollection: function(optionsForRegion) {
     return new SecondaryCollectionView(optionsForRegion({
       collection:        this.model.secondaryCollection,
-      model:             this.secondaryCollectionModel,
+      model:             this.model.secondaryCollectionModel,
       roomMenuModel:     this.model,
       bus:               this.bus,
       roomCollection:    this.model._roomCollection,
       primaryCollection: this.model.primaryCollection,
       userModel:         this.model.userModel,
       troupeModel:       this.model._troupeModel,
+      groupsCollection: this.model.groupsCollection,
     }));
   },
 
   initTertiaryCollection: function(optionsForRegion) {
     return new TertiaryCollectionView(optionsForRegion({
-      model:               this.tertiaryCollectionModel,
+      model:               this.model.tertiaryCollectionModel,
       collection:          this.model.tertiaryCollection,
       roomMenuModel:       this.model,
       bus:                 this.bus,
       primaryCollection:   this.model.primaryCollection,
       secondaryCollection: this.model.secondaryCollection,
       roomCollection:      this.model._roomCollection,
+      groupsCollection: this.model.groupsCollection,
     }));
   },
 
@@ -129,64 +132,10 @@ var PanelView = Marionette.LayoutView.extend({
     this.bus = attrs.bus;
     this.dndCtrl = attrs.dndCtrl;
     this.keyboardControllerView = attrs.keyboardControllerView;
-
-    //Sadly the favourite collection needs to be generated here rather than the room-menu-model
-    //because it has a dependency on the dnd-controller JP 1/4/16
-    var models = this.model._roomCollection.filter(favouriteCollectionFilter);
-    this.favCollection = new FilteredFavouriteRoomCollection(models, {
-      collection: this.model._roomCollection,
-      roomModel:  this.model,
-      dndCtrl:    this.dndCtrl,
-    });
-    this.listenTo(this.favCollection, 'filter-complete', function() {
-      this.model.trigger('update:collection-active-states');
-    }, this);
-
-
-    this.favouriteCollectionModel = new FavouriteCollectionModel(null, {
-      collection: this.favCollection,
-      roomMenuModel: this.model
-    });
-    this.primaryCollectionModel = new PrimaryCollectionModel(null, {
-      collection: this.model.primaryCollection,
-      roomMenuModel: this.model
-    });
-    this.secondaryCollectionModel = new SecondaryCollectionModel({}, {
-      collection: this.model.secondaryCollection,
-      roomMenuModel: this.model
-    });
-    this.tertiaryCollectionModel = new TertiaryCollectionModel({}, {
-      collection: this.model.tertiaryCollection,
-      roomMenuModel: this.model
-    });
-
-    this.keyboardControllerView.inject(this.keyboardControllerView.constants.ROOM_LIST_KEY, [
-      {
-        collection: this.favCollection,
-        getActive: function() {
-          return this.favouriteCollectionModel.get('active');
-        }.bind(this)
-      }, {
-        collection: this.model.primaryCollection,
-        getActive: function() {
-          return this.primaryCollectionModel.get('active');
-        }.bind(this)
-      }, {
-        collection: this.model.secondaryCollection,
-        getActive: function() {
-          return this.secondaryCollectionModel.get('active');
-        }.bind(this)
-      }, {
-        collection: this.model.tertiaryCollection,
-        getActive: function() {
-          return this.tertiaryCollectionModel.get('active');
-        }.bind(this)
-      }
-    ]);
-
-
+    this.queryModel = this.model.searchMessageQueryModel;
     this.listenTo(this.bus, 'ui:swipeleft', this.onSwipeLeft, this);
     this.listenTo(this.bus, 'focus.request.chat', this.onSearchItemSelected, this);
+    this.listenTo(this.model, 'change:state', this.onModelChangeState, this);
     this.$el.find('#search-results').show();
   },
 
@@ -234,8 +183,25 @@ var PanelView = Marionette.LayoutView.extend({
     this.ui.profileMenu[0].setAttribute('aria-hidden', !val);
   },
 
+  onModelChangeState: function (){
+    if(!this.neverendingstory) { return; }
+    var state = this.model.get('state');
+    if(state !== 'search') { return this.neverendingstory.disable(); }
+    return this.neverendingstory.enable();
+  },
+
+  scrollBottom: _.debounce(function (){
+    this.queryModel.set('isFetchingMoreSearchMessageResults', true);
+  }, 100),
+
   onRender: function() {
     this.ui.profileMenu[0].setAttribute('aria-hidden', !this.profileMenuOpenState);
+    if(!this.neverendingstory) {
+      this.neverendingstory = new NeverEndingStory(this.$el.find('.nano-content')[0]);
+      this.listenTo(this.neverendingstory, 'approaching.bottom', this.scrollBottom, this);
+      this.neverendingstory.disable();
+      this.onModelChangeState();
+    }
   },
 
   onDestroy: function() {

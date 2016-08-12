@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="no-js loading" lang="en">
+<html class="no-js loading {{#if hasCachedFonts}}fonts-loaded{{/if}}" lang="en">
 <head>
   <meta http-equiv="X-UA-Compatible" content="IE=IE10" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
@@ -18,6 +18,8 @@
   <link rel="subresource" href="{{ this }}">
   {{/each}}
 
+  {{> fonts}}
+
   {{#each dnsPrefetch}}
   <link rel="dns-prefetch" href="{{ this }}">
   {{/each}}
@@ -34,7 +36,7 @@
     <nav class="nli-menu">
 
       <h1 class="nli-menu__header">
-        Where developers come to talk
+        Where communities thrive
       </h1>
 
       <h2 class="nli-menu__features-header">
@@ -43,29 +45,15 @@
 
       <dl class="nli-menu__features">
 
-        <dd>Join over <strong>400k developers</strong></dd>
-        <dd>Join over <strong>40k communities</strong></dd>
-        <dd>Discuss <strong>projects &amp; code</strong></dd>
+        <dd>Join over <strong>500k people</strong></dd>
+        <dd>Join over <strong>50k communities</strong></dd>
         <dd>Create <strong>your own community</strong></dd>
-        <dd>Deeply integrated <strong>with GitHub</strong></dd>
 
       </dl>
-
-      <span class="nli-menu__price">Free, forever.</span>
-
-      <h2 class="nli-menu__features-header">
-        Great for Teams
-      </h2>
 
       <dl class="nli-menu__features">
-
-        <dd>Create a <strong>tighter team</strong></dd>
-        <dd>Collaborate <strong>smarter</strong></dd>
-        <dd>Free for rooms <strong>up to 25 people</strong></dd>
-
+        <dd><a href="/explore">Explore more communities</a></dd>
       </dl>
-
-      <span class="nli-menu__price">$5/user/month for larger teams</span>
 
       <small class="nli-menu__footer">Browser, <a href="/apps">Desktop</a> and <a href="/apps">Mobile</a> Apps.</small>
     </nav>

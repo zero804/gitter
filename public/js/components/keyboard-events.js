@@ -12,12 +12,7 @@ module.exports = (function() {
   // Attach keyboard events listeners as specified by the keymaster library
   // They will we emitted to appEvents with the `keyboard.` prefix
   // Use views/keyboard-events-mixin to attach handlers for these events to Backbone components
-
-  var platform = platformDetect();
-  // Set modifier keys for the OS
   var cmdKey = platformKeys.cmd;
-  var roomKey = platformKeys.room;
-  var room2Key = platformKeys.room2;
   var gitterKey = platformKeys.gitter;
 
   // Define different scopes for the key listeners
@@ -59,6 +54,7 @@ module.exports = (function() {
     else {
       scope = 'other';
     }
+
     key.setScope(scope);
     return true;
   };
@@ -97,13 +93,7 @@ module.exports = (function() {
       },{
       name: 'profile-menu.toggle',
       scope: 'button.profile-menu'
-      },{
-      name: 'room-list.start-nav',
-      scope: 'minibar.item'
-    }, {
-      name: 'room-list-item:activate',
-      scope: 'room-list.item'
-    }],
+      }],
     'enter': [{
       name: 'search.go',
       scope: 'input.search'
@@ -116,12 +106,6 @@ module.exports = (function() {
     },{
       name: 'profile-menu.toggle',
       scope: 'button.profile-menu'
-    },{
-      name: 'room-list.start-nav',
-      scope: 'minibar.item'
-    }, {
-      name: 'room-list-item:activate',
-      scope: 'room-list.item'
     }],
     'shift+enter': [{
       name: 'chat.compose.auto',
@@ -129,55 +113,57 @@ module.exports = (function() {
     }],
     'up': [{
       name: 'room.up',
-      scope: 'other'
+      scope: 'minibar.item'
+      },{
+      name: 'room.up',
+      scope: 'room-list.item'
       },{
       name: 'chat.edit.openLast',
       scope: 'input.chat'
       },{
       name: 'search.prev',
       scope: 'input.search'
-      },{
-      name: 'minibar-item.prev',
-      scope: 'minibar.item'
-      },{
-      name: 'room-list-item.prev',
-      scope: 'room-list.item'
-    }],
+      }],
     'down': [{
       name: 'room.down',
-      scope: 'other'
+      scope: 'minibar.item'
+      },{
+      name: 'room.down',
+      scope: 'room-list.item'
       },{
       name: 'search.next',
       scope: 'input.search'
-      },{
-      name: 'minibar-item.next',
+      }],
+    'right': [{
+      name: 'room.next',
       scope: 'minibar.item'
       },{
-      name: 'room-list-item.next',
+      name: 'room.next',
       scope: 'room-list.item'
     }],
-    'left': {
-      name: 'minibar.start-nav',
-      scope: 'room-list.item'
-    },
-    'right': {
-      name: 'room-list.start-nav',
+    'left': [{
+      name: 'room.prev',
       scope: 'minibar.item'
-    },
-    'tab': [{
-      name: 'maininput.tab.next',
-      scope: ['input.chat', 'input.chat.edit', 'input.search']
       },{
-      name: 'minibar-item.next',
+      name: 'room.prev',
+      scope: 'room-list.item'
+    }],
+    /* */
+    'tab': [{
+      name: 'room.tab',
       scope: 'minibar.item'
+      },{
+      name: 'room.tab',
+      scope: 'room-list.item'
     }],
     '⇧+tab': [{
-      name: 'maininput.tab.prev',
-      scope: ['input.chat', 'input.chat.edit', 'input.search']
-      },{
-      name: 'minibar-item.prev',
+      name: 'room.prev.tab',
       scope: 'minibar.item'
+      },{
+      name: 'room.prev.tab',
+      scope: 'room-list.item'
     }],
+    /* */
     'pageup': 'pageUp',
     'pagedown': 'pageDown',
     'q, r': {
@@ -199,48 +185,22 @@ module.exports = (function() {
     scope: 'input.chat.edit'
   }];
 
-  keyEvents[cmdKey + '+/, ' + cmdKey + '+' + gitterKey + '+/'] = 'chat.toggle';
-  keyEvents[cmdKey + '+' /*+ gitterKey*/ + '+s'] = 'focus.search';
-  keyEvents[cmdKey + '+' + gitterKey + '+c'] = 'focus.chat';
+  keyEvents[cmdKey + '+/, ' + cmdKey + '+' + gitterKey + '+/'] = { name: 'chat.toggle' };
+  keyEvents[cmdKey + '+' + '+s'] = 'focus.search';
+  keyEvents[cmdKey + '+' + gitterKey + '+c'] = { name:'focus.chat', scope: 'other' };
   keyEvents[cmdKey + '+' + gitterKey + '+m'] = 'help.markdown';
   keyEvents[cmdKey + '+' + gitterKey + '+k'] = 'help.keyboard';
+  keyEvents[cmdKey + '+' + gitterKey + '+up'] = { name:'room.up', scope: 'other' };
+  keyEvents[cmdKey + '+' + gitterKey + '+down'] = { name:'room.down', scope: 'other' };
+  keyEvents[cmdKey + '+' + gitterKey + '+left'] = { name:'room.prev', scope: 'other' };
+  keyEvents[cmdKey + '+' + gitterKey + '+right'] = { name:'room.next', scope: 'other' };
+  keyEvents[cmdKey + '+' + gitterKey + '+enter'] = { name:'room.enter', scope: 'other' };
 
-  var roomModifiers = cmdKey + '+' + roomKey;
-  if(platform !== 'Mac' && platform !== 'Windows') {
-    roomModifiers = roomKey + '+' + room2Key;
-  }
-
-  if(context.hasFeature('left-menu')) {
-    keyEvents[roomModifiers + '+up'] = 'left-menu.prev';
-    keyEvents[roomModifiers + '+down'] = 'left-menu.next';
-    keyEvents[roomModifiers + '+left'] = 'focus.minibar';
-    keyEvents[roomModifiers + '+right'] = 'focus.room-list';
-  }
-  else {
-    keyEvents[cmdKey + '+' + roomKey + '+up'] = 'room.up';
-    keyEvents[cmdKey + '+' + roomKey + '+down'] = 'room.down';
-    // keyEvents[cmdKey + '+' + roomKey + '+left'] = 'room.prev';
-    // keyEvents[cmdKey + '+' + roomKey + '+right'] = 'room.next';
-    keyEvents[cmdKey + '+' + roomKey + '+enter'] = 'room.enter';
-  }
-
-  if(context.hasFeature('left-menu')) {
-    /* * /
-    // TODO: This intereferes with AltGr, https://github.com/gitterHQ/gitter/issues/1251
-    // Go to a conversation by index in list
-    _.each('123456789'.split(''), function (n) {
-      keyEvents[roomModifiers + '+' + n] = 'minibar.' + n;
-    });
-    keyEvents[roomModifiers + '+0'] = 'minibar.10';
-    /* */
-  }
-  else {
-    // Go to a conversation by index in list
-    _.each('123456789'.split(''), function (n) {
-      keyEvents[cmdKey + '+' + roomKey + '+' + n] = 'room.' + n;
-    });
-    keyEvents[cmdKey + '+' + roomKey + '+0'] = 'room.10';
-  }
+  // Go to a conversation by index in list
+  _.each('123456789'.split(''), function (n) {
+    keyEvents[cmdKey + '+' + gitterKey + '+' + n] = 'room.' + n;
+  });
+  keyEvents[cmdKey + '+' + gitterKey + '+0'] = 'room.10';
 
   // Add listeners
 

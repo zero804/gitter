@@ -3,6 +3,8 @@
 var testRequire = require('../../test-require');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assertUtils = require('../../assert-utils')
+var env = require('gitter-web-env');
+var nconf = env.config;
 var serialize = testRequire('./serializers/serialize');
 var UserStrategy = testRequire('./serializers/rest/user-strategy');
 var UserIdStrategy = testRequire('./serializers/rest/user-id-strategy');
@@ -27,6 +29,7 @@ describe('user-strategy-test', function() {
       username: fixture.user1.username,
       displayName: fixture.user1.displayName,
       url: '/' + fixture.user1.username,
+      avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + fixture.user1.username,
       avatarUrlSmall: '/api/private/user-avatar/' + fixture.user1.username + '?s=60',
       avatarUrlMedium: '/api/private/user-avatar/' + fixture.user1.username + '?s=128',
       staff: false,
@@ -99,6 +102,7 @@ describe('user-strategy-test', function() {
             username: fixture.user2.username,
             displayName: fixture.user2.displayName,
             url: '/' + fixture.user2.username,
+            avatarUrl:  nconf.get('avatar:officialHost') + '/gh/u/githubuser',
             avatarUrlSmall: "https://avatars2.githubusercontent.com/githubuser?&s=60",
             avatarUrlMedium: "https://avatars2.githubusercontent.com/githubuser?&s=128",
             staff: false,

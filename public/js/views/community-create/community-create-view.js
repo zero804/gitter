@@ -1,30 +1,38 @@
 'use strict';
 
 var Marionette = require('backbone.marionette');
+var SimpleFilteredCollection = require('../../collections/simple-filtered-collection');
+var cocktail = require('cocktail');
 var toggleClass = require('utils/toggle-class');
+var appEvents = require('utils/appevents');
+var KeyboardEventMixin = require('views/keyboard-events-mixin');
+var VirtualMultipleCollection = require('./virtual-multiple-collection');
 
 require('views/behaviors/isomorphic');
 
 var template = require('./community-create-view.hbs');
 
+var stepConstants = require('./step-constants');
+var peopleToInviteStatusConstants = require('./people-to-invite-status-constants');
 var CommunityCreateStepViewModel = require('./community-create-step-view-model');
-var CommunityCreateGitHubProjectsStepViewModel = require('./community-create-github-projects-step-view-model');
+var CommunityCreatMainStepViewModel = require('./main-step/community-create-main-step-view-model');
+var CommunityCreateGitHubProjectsStepViewModel = require('./github-projects-step/community-create-github-projects-step-view-model');
+
 
 var ActiveCollection = require('./active-collection');
 
-var CommunityCreationMainView = require('./views/community-creation-main-view');
-var CommunityCreationGithubProjectsView = require('./views/community-creation-github-projects-view');
-var CommunityCreationInvitePeopleView = require('./views/community-creation-invite-people-view');
-var CommunityCreationOverviewView = require('./views/community-creation-overview-view');
+var CommunityCreationMainView = require('./main-step/community-creation-main-view');
+var CommunityCreationGithubProjectsView = require('./github-projects-step/community-creation-github-projects-view');
+var CommunityCreationInvitePeopleView = require('./invite-step/community-creation-invite-people-view');
+var CommunityCreationInviteConfirmationView = require('./invite-confirmation-step/community-creation-invite-confirmation-view');
+var CommunityCreationOverviewView = require('./overview-step/community-creation-overview-view');
 
 
 
-module.exports = Marionette.LayoutView.extend({
+var CommunityCreateView = Marionette.LayoutView.extend({
   template: template,
 
-  attributes: {
-    class: 'community-create-root-inner'
-  },
+  className: 'community-create-root-inner',
 
   ui: {
     close: '.js-community-create-close'
@@ -34,6 +42,7 @@ module.exports = Marionette.LayoutView.extend({
     Isomorphic: {
       mainStepView: { el: '.js-community-create-main-step-root', init: 'initMainStepView' },
       invitePeopleStepView: { el: '.js-community-create-invite-people-step-root', init: 'initInvitePeopleView' },
+      inviteConfirmationStepView: { el: '.js-community-create-invite-confirmation-step-root', init: 'initInviteConfirmationView' },
       githubProjectsStepView: { el: '.js-community-create-github-projects-step-root', init: 'initGitHubProjectsView' },
       overviewStepView: { el: '.js-community-create-overview-step-root', init: 'initOverviewView' },
     },
@@ -42,7 +51,9 @@ module.exports = Marionette.LayoutView.extend({
   initMainStepView: function(optionsForRegion) {
     this.mainStepView = new CommunityCreationMainView(optionsForRegion({
       model: this.mainStepViewModel,
-      communityCreateModel: this.model
+      communityCreateModel: this.model,
+      orgCollection: this.orgCollection,
+      repoCollection: this.repoCollection
     }));
     return this.mainStepView;
   },
@@ -52,7 +63,9 @@ module.exports = Marionette.LayoutView.extend({
       model: this.githubProjectsStepViewModel,
       communityCreateModel: this.model,
       orgCollection: this.orgCollection,
-      repoCollection: this.repoCollection
+      unusedOrgCollection: this.unusedOrgCollection,
+      repoCollection: this.repoCollection,
+      unusedRepoCollection: this.unusedRepoCollection
     }));
     return this.githubProjectsStepView;
   },
@@ -60,7 +73,20 @@ module.exports = Marionette.LayoutView.extend({
   initInvitePeopleView: function(optionsForRegion) {
     this.invitePeopleStepView = new CommunityCreationInvitePeopleView(optionsForRegion({
       model: this.invitePeopleStepViewModel,
-      communityCreateModel: this.model
+      communityCreateModel: this.model,
+      orgCollection: this.orgCollection,
+      repoCollection: this.repoCollection,
+      inviteCollection: this.inviteCollection,
+      troubleInviteCollection: this.troubleInviteCollection
+    }));
+    return this.invitePeopleStepView;
+  },
+
+  initInviteConfirmationView: function(optionsForRegion) {
+    this.invitePeopleStepView = new CommunityCreationInviteConfirmationView(optionsForRegion({
+      model: this.inviteConfirmationStepViewModel,
+      communityCreateModel: this.model,
+      troubleInviteCollection: this.troubleInviteCollection
     }));
     return this.invitePeopleStepView;
   },
@@ -69,14 +95,21 @@ module.exports = Marionette.LayoutView.extend({
     this.overviewStepView = new CommunityCreationOverviewView(optionsForRegion({
       model: this.overviewStepViewModel,
       communityCreateModel: this.model,
-      orgsCollection: this.orgCollection,
-      reposCollection: this.repoCollection
+      orgCollection: this.orgCollection,
+      repoCollection: this.repoCollection,
+      groupsCollection: this.groupsCollection,
+      inviteCollection: this.inviteCollection,
+      troubleInviteCollection: this.troubleInviteCollection
     }));
     return this.overviewStepView;
   },
 
   events: {
-    'click @ui.close': 'onViewCloseClicked'
+    'click @ui.close': 'closeView'
+  },
+
+  keyboardEvents: {
+    'document.escape': 'closeView'
   },
 
   modelEvents: {
@@ -86,47 +119,122 @@ module.exports = Marionette.LayoutView.extend({
 
   initialize: function(options) {
     var orgCollection = options.orgCollection;
+    var unusedOrgCollection = options.unusedOrgCollection;
     var repoCollection = options.repoCollection;
+    var unusedRepoCollection = options.unusedRepoCollection
 
     this.orgCollection = new ActiveCollection(orgCollection.models, {
       collection: orgCollection
+    });
+    this.unusedOrgCollection = new ActiveCollection(unusedOrgCollection.models, {
+      collection: unusedOrgCollection
     });
 
     this.repoCollection = new ActiveCollection(repoCollection.models, {
       collection: repoCollection
     });
+    this.unusedRepoCollection = new ActiveCollection(unusedRepoCollection.models, {
+      collection: unusedRepoCollection
+    });
 
-    this.mainStepViewModel = new CommunityCreateStepViewModel({ active: true });
-    this.githubProjectsStepViewModel = new CommunityCreateGitHubProjectsStepViewModel({ active: false });
-    this.invitePeopleStepViewModel = new CommunityCreateStepViewModel({ active: false });
-    this.overviewStepViewModel = new CommunityCreateStepViewModel({ active: false });
+    this.groupsCollection = options.groupsCollection;
+
+
+    this.inviteCollection = new VirtualMultipleCollection([], {
+      backingCollections: [
+        this.model.peopleToInvite,
+        this.model.emailsToInvite
+      ]
+    });
+
+    this.troubleInviteCollection = new SimpleFilteredCollection([], {
+      collection: this.inviteCollection,
+      filter: function(model) {
+        // Anyone who isn't ready or can't be covered by the Twitter Badger
+        return model.get('inviteStatus') !== peopleToInviteStatusConstants.READY && model.get('type') !== 'twitter';
+      }
+    });
+
+
+    this.mainStepViewModel = new CommunityCreatMainStepViewModel({
+      communityCreateModel: this.model,
+      active: true
+    });
+    this.githubProjectsStepViewModel = new CommunityCreateGitHubProjectsStepViewModel({
+      communityCreateModel: this.model,
+      active: false
+    });
+    this.invitePeopleStepViewModel = new CommunityCreateStepViewModel({
+      communityCreateModel: this.model,
+      active: false
+    });
+    this.inviteConfirmationStepViewModel = new CommunityCreateStepViewModel({
+      communityCreateModel: this.model,
+      active: false
+    });
+    this.overviewStepViewModel = new CommunityCreateStepViewModel({
+      communityCreateModel: this.model,
+      active: false
+    });
   },
 
   onStepChangeState: function() {
     var newStepState = this.model.get('stepState');
-    var stepConstants = this.model.STEP_CONSTANT_MAP;
 
-    var stepActiveMap = Object.keys(stepConstants).reduce(function(map, stepKey) {
-      var stepConstant = stepConstants[stepKey];
-      var value = false;
-      if(newStepState === stepConstant) {
-        value = true;
-      }
-      map[stepConstant] = value;
-      return map;
-    }, {});
-
-    this.mainStepViewModel.set({ active: stepActiveMap[stepConstants.main] });
-    this.githubProjectsStepViewModel.set({ active: stepActiveMap[stepConstants.githubProjects] });
-    this.invitePeopleStepViewModel.set({ active: stepActiveMap[stepConstants.invite] });
-    this.overviewStepViewModel.set({ active: stepActiveMap[stepConstants.overview] });
+    appEvents.trigger('stats.event', 'community.create.active.' + this.model.get('stepState'));
+    appEvents.trigger('track-event', 'community.create.active.' + this.model.get('stepState'));
+    this.mainStepViewModel.set({ active: newStepState === stepConstants.MAIN });
+    this.githubProjectsStepViewModel.set({ active: newStepState === stepConstants.GITHUB_PROJECTS });
+    this.invitePeopleStepViewModel.set({ active: newStepState === stepConstants.INVITE });
+    this.inviteConfirmationStepViewModel.set({ active: newStepState === stepConstants.INVITE_CONFIRMATION });
+    this.overviewStepViewModel.set({ active: newStepState === stepConstants.OVERVIEW });
   },
 
   onActiveChange: function() {
-    toggleClass(this.$el[0], 'active', this.model.get('active'));
+    var isActive = this.model.get('active');
+    toggleClass(this.$el[0], 'active', isActive);
+
+    if(isActive) {
+      appEvents.trigger('stats.event', 'community.create.enter');
+      appEvents.trigger('track-event', 'community.create.enter');
+    }
+
+    // Reset for next time if we are hiding create community
+    if(!isActive) {
+     this.model.reset({ silent: true });
+    }
   },
 
-  onViewCloseClicked: function() {
+  closeView: function() {
+    appEvents.trigger('stats.event', 'community.create.exit.' + this.model.get('stepState'));
+    appEvents.trigger('track-event', 'community.create.exit.' + this.model.get('stepState'));
     this.model.set('active', false);
+    window.location.hash = '#';
+  },
+
+  onRender: function() {
+    this.onActiveChange();
+  },
+
+  show: function() {
+    this.render();
+
+    var rootWrapperElement = document.createElement('div');
+    rootWrapperElement.classList.add('community-create-app-root');
+    rootWrapperElement.appendChild(this.el);
+    document.body.appendChild(rootWrapperElement);
+  },
+
+  hideInternal: function() {
+    this.destroy();
+  },
+
+  navigationalHide: function() {
+    this.closeView();
   }
 });
+
+
+cocktail.mixin(CommunityCreateView, KeyboardEventMixin);
+
+module.exports = CommunityCreateView;
