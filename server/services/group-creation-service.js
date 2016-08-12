@@ -20,7 +20,7 @@ var debug = require('debug')('gitter:app:group-creation-service');
  * @return inviteReport
  */
 var sendInvitesForRoom = Promise.method(function(user, room, invites) {
-  if (!invites || !invites.length) return;
+  if (!invites || !invites.length) return [];
 
   // Invite all the users
   return policyFactory.createPolicyForRoomId(user, room._id)
@@ -75,9 +75,6 @@ var sendTweetsForRoom = Promise.method(function(user, group, room, twitterHandle
 function sendInvitesAndTweetsPostRoomCreation(user, group, room, invites, allowTweeting) {
   return sendInvitesForRoom(user, room, invites)
     .tap(function(invitesReport) {
-      // Poor fix for https://github.com/troupe/gitter-webapp/issues/2041
-      if (!invitesReport) invitesReport = [];
-
       var successes = invitesReport.reduce(function(memo, report) {
         if (report.status === 'added') {
           memo++;
