@@ -1,10 +1,9 @@
 'use strict';
+
 var apiClient = require('components/apiClient');
 var Backbone = require('backbone');
 var SyncMixin = require('./sync-mixin');
-var _ = require('underscore');
-
-var FilteredCollection = require('backbone-filtered-collection');
+var SimpleFilteredCollection = require('gitter-realtime-client/lib/simple-filtered-collection');
 
 var SuggestedRoomsCollection = Backbone.Collection.extend({
   sync: SyncMixin.sync,
@@ -21,27 +20,20 @@ var SuggestedRoomsCollection = Backbone.Collection.extend({
 
 /* Filters out any rooms the user is already in, provided in options.roomCollection */
 
-var FilteredSuggestionsCollection = function(underlyingOptions) {
+var FilteredSuggestionsCollection = SimpleFilteredCollection.extend({
+  constructor: function(underlyingOptions) {
+    var roomsCollection = underlyingOptions.roomsCollection;
+    delete underlyingOptions.roomsCollection;
 
-  var roomsCollection = underlyingOptions.roomsCollection;
-  delete underlyingOptions.roomsCollection;
+    var underlyingCollection = this._underlyingCollection = new SuggestedRoomsCollection(null, underlyingOptions);
 
-  var underlyingCollection = this._underlyingCollection = new SuggestedRoomsCollection(null, underlyingOptions);
-
-  var options = {
-    collection: underlyingCollection,
-  };
-
-  FilteredCollection.call(this, options);
-
-  this.setFilter(function(model) {
-    return !roomsCollection.get(model.id);
-  });
-};
-
-FilteredSuggestionsCollection.prototype = _.extend(
-FilteredSuggestionsCollection.prototype,
-FilteredCollection.prototype, {
+    SimpleFilteredCollection.prototype.constructorcall(this, [], {
+      collection: underlyingCollection,
+      filter: function(model) {
+        return !roomsCollection.get(model.id);
+      }
+    });
+  },
 
   fetchForUser: function() {
     this._underlyingCollection.fetchForUser();

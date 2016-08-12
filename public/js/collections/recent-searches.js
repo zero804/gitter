@@ -1,9 +1,8 @@
 'use strict';
 
 var Backbone = require('backbone');
-var _ = require('underscore');
-var FilteredCollection = require('backbone-filtered-collection');
 var localStorageSync = require('../utils/local-storage-sync');
+var LimitedCollection = require('gitter-realtime-client/lib/limited-collection');
 
 var Model = Backbone.Model.extend({
   defaults: { name: null, avatarUrl: null, isRecentSearch: true },
@@ -13,17 +12,8 @@ var RecentSearchesCollection = Backbone.Collection.extend({
 
   model: Model,
 
-  constructor: function() {
-    Backbone.Collection.prototype.constructor.apply(this, arguments);
-  },
-
-  initialize: function() {
-    this.cid = 'left-menu-saved-searches';
-    this.fetch();
-  },
-
   comparator: function(a, b) {
-    return a.get('time') < b.get('time') ? 1 : -1;
+    return a.get('time') - b.get('time');
   },
 
   add: function(model) {
@@ -49,41 +39,73 @@ var RecentSearchesCollection = Backbone.Collection.extend({
   sync: localStorageSync.sync,
 });
 
-var FilteredRecentSearches = function(attrs, options) {
-  this.collection = new RecentSearchesCollection(null);
-  attrs = _.extend({}, attrs, { collection: this.collection });
-  FilteredCollection.call(this, attrs, options);
-};
 
-FilteredRecentSearches.prototype = _.extend(
-  FilteredRecentSearches.prototype,
-  FilteredCollection.prototype, {
+var FilteredRecentSearches = LimitedCollection.extend({
+  model: Model,
 
-  collectionFilter: function(model, index) { //jshint unused: true
-    return (index < 5);
+  constructor: function() {
+    var collection = new RecentSearchesCollection(null);
+
+    LimitedCollection.prototype.constructor.call(this, [], {
+      collection: collection,
+      maxLength: 5
+    });
   },
-
-  comparator: function(a, b) {
-    return a.get('time') < b.get('time') ? 1 : -1;
-  },
-
-  add: function() {
-    this.collection.add.apply(this.collection, arguments);
-    this.collection.sort();
-    this.setFilter();
-  },
-
-  remove: function() {
-    this.collection.remove.apply(this.collection, arguments);
-    this.collection.sort();
-    this.setFilter();
-  },
-
-  reset: function() {
-    this.collection.reset.apply(this.collection, arguments);
-    this.collection.sort();
-    this.setFilter();
-  },
+  //
+  // add: function() {
+  //   this._collection.add.apply(this.collection, arguments);
+  //   // this.collection.sort();
+  //   // this.setFilter();
+  // },
+  //
+  // remove: function() {
+  //   this._collection.remove.apply(this.collection, arguments);
+  //   // this.collection.sort();
+  //   // this.setFilter();
+  // },
+  //
+  // reset: function() {
+  //   this._collection.reset.apply(this.collection, arguments);
+  //   // this.collection.sort();
+  //   // this.setFilter();
+  // },
 });
+//
+//
+// var FilteredRecentSearches = function(attrs, options) {
+//   attrs = _.extend({}, attrs, { collection: this.collection });
+//   FilteredCollection.call(this, attrs, options);
+// };
+//
+// FilteredRecentSearches.prototype = _.extend(
+//   FilteredRecentSearches.prototype,
+//   FilteredCollection.prototype, {
+//
+//   collectionFilter: function(model, index) { //jshint unused: true
+//     return (index < 5);
+//   },
+//
+//   comparator: function(a, b) {
+//     return a.get('time') < b.get('time') ? 1 : -1;
+//   },
+//
+//   add: function() {
+//     this.collection.add.apply(this.collection, arguments);
+//     // this.collection.sort();
+//     // this.setFilter();
+//   },
+//
+//   remove: function() {
+//     this.collection.remove.apply(this.collection, arguments);
+//     // this.collection.sort();
+//     // this.setFilter();
+//   },
+//
+//   reset: function() {
+//     this.collection.reset.apply(this.collection, arguments);
+//     // this.collection.sort();
+//     // this.setFilter();
+//   },
+// });
 
 module.exports = FilteredRecentSearches;
