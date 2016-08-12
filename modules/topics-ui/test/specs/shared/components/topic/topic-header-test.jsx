@@ -44,4 +44,8 @@ describe('<TopicHeader/>', () => {
     equal(wrapper.find('.topic-header').length, 1);
   });
 
+  it('should render the right header', () => {
+    equal(wrapper.find('.topic-header__title').length, 1);
+  });
+
 });

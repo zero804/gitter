@@ -39,7 +39,7 @@ module.exports = function getFakeTopicsList(){
           url: '/testy-mc-testface',
           staff: true,
           v: 1,
-          avatarUrl: 'https://avatars-04.gitter.im/group/iv/1/578f6877c2f0db084a23d707?s=44'
+          avatarUrl: 'https://avatars-04.gitter.im/group/iv/1/578f6877c2f0db084a23d707?s=22'
         }
       };
 
