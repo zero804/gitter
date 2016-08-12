@@ -29,4 +29,8 @@ describe('<TopicHeader/>', () => {
     equal(wrapper.find('H1').length, 1);
   });
 
+  it('should render a custom container', () => {
+      equal(wrapper.find('.container--topic-header').length, 1);
+  });
+
 });
