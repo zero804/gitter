@@ -12,11 +12,16 @@ module.exports = function topicsStore(models) {
 
   //Get resource
   const getTopics = () => models;
+  const getById = (id) => models.reduce((memo, cur) => {
+    if(cur.id === id) { return cur };
+    return memo;
+  }, false);
 
   //Methods
   return {
     models: models,
-    getTopics: getTopics
+    getTopics: getTopics,
+    getById: getById
   };
 
 };
