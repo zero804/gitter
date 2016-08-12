@@ -23,13 +23,17 @@ export default React.createClass({
   render(){
 
     const { title, user } = this.props.topic;
+    const { displayName } = user;
 
     return (
       <Container className="container--topic-header">
         <Panel>
           <header className="topic-header">
             <UserAvatar user={user} width={44} height={44}/>
-            <H1 className="topic-header__title">{title}</H1>
+            <div>
+              <span className="topic-header__username">{displayName}</span>
+              <H1 className="topic-header__title">{title}</H1>
+            </div>
           </header>
         </Panel>
       </Container>

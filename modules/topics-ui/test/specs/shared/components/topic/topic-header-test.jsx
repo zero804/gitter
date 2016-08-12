@@ -47,4 +47,8 @@ describe('<TopicHeader/>', () => {
     equal(wrapper.find('.topic-header__title').length, 1);
   });
 
+  it('should render a user name', () => {
+    equal(wrapper.find('.topic-header__username').length, 1);
+  });
+
 });

@@ -1,4 +1,5 @@
 @import "../../colors";
+@import (less, reference) "~gitter-styleguide/css/components/headings.css";
 
 .topic-header {
   display: flex;
@@ -11,4 +12,11 @@
 .topic-header__title {
   color: @light;
   font-weight: 100;
+}
+
+.topic-header__username {
+  &:extend(.h5 all);
+  display:       block;
+  margin-bottom: -1.5rem;
+  color:         @topic-table-username-color;
 }
