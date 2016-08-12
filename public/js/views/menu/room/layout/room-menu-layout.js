@@ -1,23 +1,16 @@
 'use strict';
 
 var _ = require('underscore');
-var $ = require('jquery');
 var Marionette = require('backbone.marionette');
-var cocktail = require('cocktail');
 var fastdom = require('fastdom');
 var context = require('utils/context');
 var DNDCtrl = require('components/menu/room/dnd-controller');
-var localStore = require('components/local-store');
 var toggleClass = require('utils/toggle-class');
-var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
-var KeyboardEventMixin = require('views/keyboard-events-mixin');
 
 var RoomMenuModel = require('../../../../models/room-menu-model');
 var MiniBarView = require('../minibar/minibar-view');
 var PanelView = require('../panel/panel-view');
-var MinibarCollection = require('../minibar/minibar-collection');
 var KeyboardControllerView = require('../keyboard-controller/keyboard-controller-view');
-var KeyboardControllerModel = require('../keyboard-controller/keyboard-controller-model');
 
 var MINIBAR_ITEM_HEIGHT = 65;
 
@@ -37,11 +30,12 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
   initMiniBar: function(optionsForRegion) {
     return new MiniBarView(optionsForRegion({
       model:          this.model,
-      collection:     this.minibarCollection,
+      collection:     this.model.minibarCollection,
       bus:            this.bus,
       dndCtrl:        this.dndCtrl,
       roomCollection: this.model._roomCollection,
-      keyboardControllerView: this.keyboardControllerView
+      keyboardControllerView: this.keyboardControllerView,
+      groupsCollection: this.model.groupsCollection,
     }));
   },
 
@@ -76,60 +70,42 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
       throw new Error('A valid event bus needs to be passed to a new instance of RoomMenuLayout');
     }
 
-    this.bus = attrs.bus;
-
     //Room Collection
     if (!attrs || !attrs.roomCollection) {
       throw new Error('A valid room collection needs to be passed to a new instance of RoomMenyLayout');
     }
 
-
+    this.bus = attrs.bus;
     this.roomCollection = attrs.roomCollection;
-
-    //TODO TEST THIS & FIGURE OUT IF THEY ARE REQUIRED FOR MOBILE?
-    //JP 28/1/16
     this.orgCollection = attrs.orgCollection;
     this.suggestedRoomCollection = attrs.suggestedRoomCollection;
-
-    var orgsSnapshot = context.getSnapshot('orgs') || [];
-    this.minibarCollection = new MinibarCollection(orgsSnapshot, { roomCollection: this.roomCollection });
+    this.groupsCollection = attrs.groupsCollection;
 
     //Make a new model
-    this.model = new RoomMenuModel(_.extend({}, context.getSnapshot('leftMenu'), {
-      bus:                     this.bus,
-      roomCollection:          this.roomCollection,
-      orgCollection:           this.orgCollection,
-      userModel:               context.user(),
-      troupeModel:             context.troupe(),
-
-      //TODO id this the best way to do this? JP 12/1/16
-      isMobile:                $('body').hasClass('mobile'),
+    this.dndCtrl = new DNDCtrl();
+    var snapshot = context.getSnapshot('leftMenu');
+    this.model = new RoomMenuModel(_.extend({}, snapshot, {
+      bus: this.bus,
+      roomCollection: this.roomCollection,
+      orgCollection: this.orgCollection,
+      userModel: context.user(),
+      troupeModel: context.troupe(),
+      dndCtrl: this.dndCtrl,
+      groupsCollection: this.groupsCollection
     }));
 
-    this.keyboardControllerView = new KeyboardControllerView({
-      model: new KeyboardControllerModel(),
-      roomMenuModel: this.model,
+    this.minibarCollection = this.model.minibarCollection;
+
+    this.keyboardControls = new KeyboardControllerView({
+      model: this.model,
     });
 
-    //Make a new drag & drop control
-    this.dndCtrl = new DNDCtrl({ model: this.model });
+    this.minibarCollection = this.model.minibarCollection;
 
     window.addEventListener('resize', this._initNano.bind(this));
     this.listenTo(this.dndCtrl, 'dnd:start-drag', this.onDragStart.bind(this));
     this.listenTo(this.dndCtrl, 'dnd:end-drag', this.onDragEnd.bind(this));
     this.listenTo(this.bus, 'panel:render', this.onPanelRender, this);
-
-    //this.$el.find('#searc-results').show();
-
-    // Keeps track of the unload time so we can kinda detect if a refresh happened.
-    // We use this information with the left-menu state rehrydration
-
-    window.addEventListener('beforeunload', this.onPageUnload);
-  },
-
-  onPageUnload: function() {
-    var timeAtUnload = new Date().getTime();
-    document.cookie = 'previousUnloadTime=' + timeAtUnload + '; path=/';
   },
 
   onDragStart: function() {
@@ -153,7 +129,7 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
     if(!this.model.get('roomMenuIsPinned')) {
       var activeModel = this.minibarCollection.findWhere({ active: true });
       if (activeModel) {
-        activeModel.set('active', false);
+        activeModel.set({ active: false, focus: false });
       }
     }
   },
@@ -226,7 +202,5 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
 
 });
 
-
-cocktail.mixin(RoomMenuLayoutView, KeyboardEventMixin);
 
 module.exports = RoomMenuLayoutView;

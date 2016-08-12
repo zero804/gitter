@@ -1,17 +1,22 @@
 'use strict';
 
 var env = require('gitter-web-env');
-var logger = env.logger;
+var logger = env.logger.get('permissions');
 var Promise = require('bluebird');
 var _ = require('lodash');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var policyCheckRateLimiter = require('./policy-check-rate-limiter');
 var PolicyDelegateTransportError = require('./policy-delegate-transport-error');
 var debug = require('debug')('gitter:app:permissions:policy-evaluator');
+var assert = require('assert');
 
 var SUCCESS_RESULT_CACHE_TIME = 5 * 60; // 5 minutes in seconds
 
 function PolicyEvaluator(userId, securityDescriptor, policyDelegate, contextDelegate) {
+  if (userId) {
+    assert(mongoUtils.isLikeObjectId(userId), 'userId must be an ObjectID');
+  }
+
   this._userId = userId;
   this._securityDescriptor = securityDescriptor;
   this._policyDelegate = policyDelegate;
@@ -21,7 +26,17 @@ function PolicyEvaluator(userId, securityDescriptor, policyDelegate, contextDele
 PolicyEvaluator.prototype = {
   canRead: Promise.method(function() {
     debug('canRead');
-    return this._checkAccess(true); // With Good Faith
+    return this._checkAccess(true) // With Good Faith
+      .bind(this)
+      .tap(function(access) {
+        // If access is denied to the room, let the contextDelegate know
+        // so that it can appropriate action
+        if (!access && this._contextDelegate) {
+          return this._contextDelegate.handleReadAccessFailure();
+        }
+
+        return null;
+      })
   }),
 
   canWrite: Promise.method(function() {
@@ -54,23 +69,48 @@ PolicyEvaluator.prototype = {
 
     var adminPolicy = this._securityDescriptor.admins;
 
-    if (userIdIsIn(userId, this._securityDescriptor.extraAdmins)) {
+    if (this._isExtraAdmin()) {
       // The user is in extraAdmins...
       debug('canAdmin: allow access for extraAdmin');
       return true;
     }
 
     if (adminPolicy === 'MANUAL') {
-      debug('canAdmin: deny access for no extraAdmin');
       // If they're not in extraAdmins they're not an admin
+      debug('canAdmin: deny access for no extraAdmin');
       return false;
     }
 
-    if (!this._policyDelegate) {
+    var membersPolicy = this._securityDescriptor.members;
+    var contextDelegate = this._contextDelegate;
+    var policyDelegate = this._policyDelegate;
+
+    if (!policyDelegate) {
       debug('canAdmin: deny access no policy delegate');
 
       /* No further policy delegate, so no */
       return false;
+    }
+
+    // In invite room, in addition to being an admin you also need to
+    // be in the room in order to be an admin
+
+    if (membersPolicy === 'INVITE') {
+      if (userId && contextDelegate) {
+        return this._checkMembershipInContextForInviteRooms()
+          .bind(this)
+          .then(function(isMember) {
+            if (!isMember) {
+              // Not a member? Then user is not an admin,
+              // unless they are in extraAdmins, which will
+              // already have successfully returned above
+              return false;
+            }
+            return this._checkAuthedAdminWithGoodFaith();
+          });
+      } else {
+        return false;
+      }
     }
 
     debug('canAdmin: checking policy delegate with policy %s', adminPolicy);
@@ -84,12 +124,17 @@ PolicyEvaluator.prototype = {
     return this._checkAccess(true); // With Good Faith
   },
 
-  _checkAccess: function(useGoodFailChecks) {
+  _checkAccess: Promise.method(function(useGoodFailChecks) {
     // TODO: ADD BANS
     var userId = this._userId;
     var membersPolicy = this._securityDescriptor.members;
     var contextDelegate = this._contextDelegate;
     var policyDelegate = this._policyDelegate;
+
+    // Check if the user has been banned
+    if (userId && bansIncludesUserId(this._securityDescriptor.bans, userId)) {
+      return false;
+    }
 
     if (membersPolicy === 'PUBLIC') {
       debug('canRead: allowing access to PUBLIC');
@@ -106,7 +151,19 @@ PolicyEvaluator.prototype = {
 
     if (membersPolicy === 'INVITE') {
       if (userId && contextDelegate) {
-        return this._checkMembershipInContextForInviteRooms();
+        return this._checkMembershipInContextForInviteRooms()
+          .bind(this)
+          .then(function(result) {
+            if (result) {
+              return true;
+            }
+
+            // Not a member, but explicitly allowed via extraAdmins?
+            // Note: we do not do a full admin check as this would allow anyone
+            // from the owning room to be allowed into the PRIVATE room.
+            // See https://github.com/troupe/gitter-webapp/issues/1742
+            return this._isExtraAdmin();
+          })
       } else {
         return false;
       }
@@ -129,6 +186,15 @@ PolicyEvaluator.prototype = {
       return this._checkAnonymousAccessWithGoodFaith();
     }
 
+  }),
+
+  /**
+   * Returns true iff the user is in extraAdmins
+   */
+  _isExtraAdmin: function() {
+    var userId = this._userId;
+
+    return userIdIsIn(userId, this._securityDescriptor.extraAdmins);
   },
 
   /**
@@ -136,19 +202,8 @@ PolicyEvaluator.prototype = {
    */
   _checkMembershipInContextForInviteRooms: function() {
     var contextDelegate = this._contextDelegate;
-    var userId = this._userId; // User must be defined in this function....
 
-    return contextDelegate.isMember(userId)
-      .bind(this)
-      .then(function(result) {
-        if (result) {
-          return true;
-        }
-
-        // Not a member, could they be an admin?
-        return this.canAdmin();
-      })
-
+    return contextDelegate.isMember();
   },
 
   /**
@@ -229,7 +284,6 @@ PolicyEvaluator.prototype = {
     var securityDescriptor = this._securityDescriptor;
     var contextDelegate = this._contextDelegate;
     var membersPolicy = this._securityDescriptor.members;
-    var userId = this._userId; // User must be defined in this function....
 
     return this._checkPolicyCacheResult(membersPolicy)
       .catch(PolicyDelegateTransportError, function(err) {
@@ -241,9 +295,12 @@ PolicyEvaluator.prototype = {
           return false;
         }
 
-        return contextDelegate.isMember(userId)
+        return contextDelegate.isMember()
           .then(function(isMember) {
-            if (isMember) return true;
+            if (isMember) {
+              logger.error('Backend down but allowing user to access room on account of already being a member');
+              return true;
+            }
 
             return false;
           });
@@ -294,6 +351,19 @@ PolicyEvaluator.prototype = {
       })
   }
 };
+
+function bansIncludesUserId(bans, userId) {
+  if (!bans || !bans.length) return false;
+
+  if (bans.length === 1) {
+    return mongoUtils.objectIDsEqual(userId, bans[0].userId);
+  }
+
+  return _.some(bans, function(ban) {
+    return mongoUtils.objectIDsEqual(userId, ban.userId);
+  });
+}
+
 
 function userIdIsIn(userId, collection) {
   if (!collection || !collection.length) return false;

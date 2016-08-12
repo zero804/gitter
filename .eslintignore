@@ -1,8 +1,7 @@
 **/node_modules/*
+**/node_modules_linux/*
 public/repo/**
 output/**
-build-scripts/**
-gulpfile.js
 test/in-browser/old-n-busted/**
 test/in-browser/fixtures/coverage/**
 test/end-to-end/yslow/**
@@ -10,3 +9,5 @@ public/js/utils/base64.js
 config/mongo-docker/*
 test/in-browser/fixtures/build/*
 test/in-browser/fixtures/runner.js
+modules/*/output/**
+modules/topics-ui/test/fixtures/build/*

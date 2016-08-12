@@ -67,6 +67,14 @@ describe('backend-muxer', function() {
     });
   });
 
-
+  describe('resolveUserBackends', function() {
+    it('should return an empty array for an anonymous user', function() {
+      var resolveUserBackends = BackendMuxer.testOnly.resolveUserBackends;
+      return resolveUserBackends(null)
+        .then(function(backends) {
+          assert.strictEqual(backends.length, 0);
+        });
+    });
+  });
 
 });

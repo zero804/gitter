@@ -1,21 +1,23 @@
 'use strict';
 
-var BackendMuxer = require('gitter-web-backend-muxer');
+var debug = require('debug')('gitter:api:invite-user-suggestions');
+var collaboratorsService = require('gitter-web-collaborators');
 
-
-var resolveInviteUserSuggestions = function(req, res, next) {
+function resolveInviteUserSuggestions(req, res, next) {
   // null, 'GH_REPO', 'GH_ORG'
   var type = req.query.type;
   var linkPath = req.query.linkPath;
-  var user = req.user;
 
-  var backendMuxer = new BackendMuxer(user);
-
-  return backendMuxer.getInviteUserSuggestions(type, linkPath)
+  return collaboratorsService.findCollaborators(req.user, type, linkPath)
     .then(function(suggestions) {
+      debug('suggestions', suggestions);
       res.send(suggestions);
     })
+    .catch(function(err) {
+      debug('err', err, err.stack);
+      throw err;
+    })
     .catch(next);
-};
+}
 
 module.exports = resolveInviteUserSuggestions;

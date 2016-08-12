@@ -15,15 +15,16 @@ var _ = require('underscore');
 var FilteredCollection = require('backbone-filtered-collection');
 
 
-var roomsSnapshot = context.getSnapshot('rooms') || [];
+var roomsSnapshot = context.getSnapshot('allRooms') || [];
 var existingRooms = roomsSnapshot.map(function(data){
   return data.lastAccessTime ? _.extend(data, { lastAccessTime: moment(data.lastAccessTime) }) : data;
 });
 var troupeCollection = new troupeModels.TroupeCollection(existingRooms, { listen: true });
 
 
+var groupsSnapshot = context.getSnapshot('groups') || [];
 var groupCollection;
-groupCollection = new groupModels.GroupCollection([], { listen: true });
+groupCollection = new groupModels.Collection(groupsSnapshot, { listen: true });
 groupCollection.on('error', errorHandle.bind(null, 'group-collection'));
 
 // Adapt unread items to the groups collection

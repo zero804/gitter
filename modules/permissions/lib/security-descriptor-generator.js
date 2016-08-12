@@ -3,7 +3,6 @@
 var StatusError = require('statuserror');
 var assert = require('assert');
 
-
 function usernameMatchesUri(user, linkPath) {
   if (!user) return false;
   var currentUserName = user.username;
@@ -17,6 +16,9 @@ function usernameMatchesUri(user, linkPath) {
 function generateUserSecurityDescriptor(user, options) {
   var externalId = options.externalId;
   var linkPath = options.linkPath;
+  var security = options.security;
+
+  assert(linkPath, 'linkPath required');
 
   var extraAdmins;
   if (!user || usernameMatchesUri(user, linkPath)) {
@@ -25,21 +27,42 @@ function generateUserSecurityDescriptor(user, options) {
     extraAdmins = [user._id];
   }
 
-  return {
-    type: 'GH_USER',
-    members: 'PUBLIC',
-    admins: 'GH_USER_SAME',
-    public: true,
-    linkPath: linkPath,
-    externalId: externalId,
-    extraAdmins: extraAdmins
-  };
+  switch(security || null) {
+    case 'PUBLIC':
+    case null:
+      return {
+        type: 'GH_USER',
+        members: 'PUBLIC',
+        admins: 'GH_USER_SAME',
+        public: true,
+        linkPath: linkPath,
+        externalId: externalId,
+        extraAdmins: extraAdmins
+      };
+
+    case 'PRIVATE':
+      return {
+        type: 'GH_USER',
+        members: 'INVITE',
+        admins: 'GH_USER_SAME',
+        public: false,
+        linkPath: linkPath,
+        externalId: externalId,
+        extraAdmins: extraAdmins
+      };
+
+    default:
+      throw new StatusError(500, 'Unknown security type: ' + security);
+  }
+
 }
 
 function generateOrgSecurityDescriptor(user, options) {
   var externalId = options.externalId;
   var linkPath = options.linkPath;
   var security = options.security;
+
+  assert(linkPath, 'linkPath required');
 
   switch(security || null) {
     case 'PUBLIC':
@@ -72,6 +95,8 @@ function generateRepoSecurityDescriptor(user, options) {
   var externalId = options.externalId;
   var linkPath = options.linkPath;
   var security = options.security;
+  
+  assert(linkPath, 'linkPath required');
 
   switch (security) {
     case 'PUBLIC':
@@ -96,32 +121,6 @@ function generateRepoSecurityDescriptor(user, options) {
 
     default:
       throw new StatusError(500, 'Unknown security type: ' + security);
-  }
-}
-
-
-function generate(user, options) {
-  options.type = options.type || null;
-
-  if (options.type) {
-    assert(options.linkPath, 'linkPath required');
-  }
-
-  switch (options.type) {
-    case null:
-      return generateDefaultSecurityDescriptor(user, options);
-
-    case 'GH_USER':
-      return generateUserSecurityDescriptor(user, options);
-
-    case 'GH_REPO':
-      return generateRepoSecurityDescriptor(user, options);
-
-    case 'GH_ORG':
-      return generateOrgSecurityDescriptor(user, options);
-
-    default:
-      throw new StatusError(500, 'Unknown type: ' + options.type)
   }
 }
 
@@ -152,6 +151,66 @@ function generateDefaultSecurityDescriptor(user, options) {
     members: members,
     extraMembers: [],
     extraAdmins: [user._id]
+  }
+}
+
+function generateGroupSecurityDescriptor(user, options) {
+  var members;
+  var isPublic;
+
+  switch (options.security || null) {
+    case null:
+    case 'PUBLIC':
+      members = 'PUBLIC';
+      isPublic = true;
+      break;
+
+    case 'PRIVATE':
+      members = 'INVITE';
+      isPublic = false;
+      break;
+
+    default:
+      throw new StatusError(500, 'Unknown security type: ' + options.security);
+  }
+
+  var internalId = options.internalId;
+  if (!internalId) {
+    throw new StatusError(500, 'Group security descriptor types must have an internalId');
+  }
+
+  return {
+    type: 'GROUP',
+    admins: 'GROUP_ADMIN',
+    public: isPublic,
+    members: members,
+    extraMembers: [],
+    extraAdmins: [],
+    internalId: internalId
+  }
+}
+
+function generate(user, options) {
+  options.type = options.type || null;
+
+  switch (options.type) {
+    case null:
+      return generateDefaultSecurityDescriptor(user, options);
+
+    case 'GROUP':
+      return generateGroupSecurityDescriptor(user, options);
+
+    case 'GH_USER':
+      return generateUserSecurityDescriptor(user, options);
+
+    case 'GH_REPO':
+      return generateRepoSecurityDescriptor(user, options);
+
+    case 'GH_ORG':
+      return generateOrgSecurityDescriptor(user, options);
+
+    default:
+      throw new StatusError(500, 'Unknown type: ' + options.type)
   }
 }
 

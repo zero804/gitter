@@ -6,6 +6,7 @@ var Promise = require('bluebird');
 var assert = require('assert');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
+
 describe('group-api', function() {
   var app, request;
 
@@ -18,10 +19,19 @@ describe('group-api', function() {
     deleteDocuments: {
       User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }],
       Group: [
-              { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() },
-              { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
-              { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() } ],
-      Troupe: [ { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() + '/' + fixtureLoader.GITTER_INTEGRATION_REPO.toLowerCase() } ]
+        { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() },
+        { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
+        { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() },
+        { lcUri: 'repo-group' },
+        { lcUri: '_repo-group' }
+      ],
+      Troupe: [
+        { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() + '/' + fixtureLoader.GITTER_INTEGRATION_REPO.toLowerCase() },
+        { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() + '/lobby' },
+        { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() + '/lobby' },
+        { lcUri: 'repo-group/lobby' },
+        { lcUri: '_repo-group/lobby' },
+      ]
     },
     user1: {
       githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
@@ -59,12 +69,24 @@ describe('group-api', function() {
       .expect(200)
   });
 
+  it('GET /v1/groups?type=admin', function() {
+    return request(app)
+      .get('/v1/groups?type=admin')
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+  });
+
   it('POST /v1/groups (new style community)', function() {
     return request(app)
       .post('/v1/groups')
       .send({ uri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY, name: 'Test' })
       .set('x-access-token', fixture.user1.accessToken)
       .expect(200)
+      .then(function(result) {
+        var group = result.body;
+        assert.strictEqual(group.uri, fixtureLoader.GITTER_INTEGRATION_COMMUNITY);
+        assert.strictEqual(group.defaultRoom.uri, fixtureLoader.GITTER_INTEGRATION_COMMUNITY + '/Lobby');
+      });
   });
 
   it('POST /v1/groups (github org based)', function() {
@@ -80,6 +102,38 @@ describe('group-api', function() {
       })
       .set('x-access-token', fixture.user1.accessToken)
       .expect(200)
+      .then(function(result) {
+        var group = result.body;
+        assert.strictEqual(group.uri, fixtureLoader.GITTER_INTEGRATION_ORG);
+        assert.strictEqual(group.defaultRoom.uri, fixtureLoader.GITTER_INTEGRATION_ORG + '/Lobby');
+      });
+  });
+
+  it('POST /v1/groups (github repo based)', function() {
+    return request(app)
+      .post('/v1/groups')
+      .send({
+        name: 'Repo Group',
+        // Adding an _ in here otherwise the test might fail with a 409 if a
+        // user ever signs up to GitHub with that name before we split away
+        // from GitHub. See fixtureLoader.GITTER_INTEGRATION_COMMUNITY too.
+        uri: '_Repo-Group',
+        providers: ['github'],
+        addBadge: true,
+        security: {
+          type: 'GH_REPO',
+          linkPath: fixtureLoader.GITTER_INTEGRATION_REPO_FULL
+        }
+      })
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+      .then(function(result) {
+        var group = result.body;
+        assert.strictEqual(group.uri, '_Repo-Group');
+        var room = group.defaultRoom;
+        assert.strictEqual(room.uri, '_Repo-Group/Lobby');
+        assert.deepEqual(room.providers, ['github']);
+      });
   });
 
   it('GET /v1/groups/:groupId/rooms', function() {
@@ -112,13 +166,19 @@ describe('group-api', function() {
       .send({
         name: fixtureLoader.GITTER_INTEGRATION_REPO,
         topic: 'all about testing',
+        providers: ['github'],
         security: {
-          security: 'INHERITED',
+          security: 'PRIVATE',
           type: 'GH_REPO',
           linkPath: fixtureLoader.GITTER_INTEGRATION_USERNAME + '/' + fixtureLoader.GITTER_INTEGRATION_REPO
         }
       })
       .set('x-access-token', fixture.user1.accessToken)
-      .expect(200);
+      .expect(200)
+      .then(function(result) {
+        var room = result.body;
+        assert.strictEqual(room.providers.length, 1);
+        assert.strictEqual(room.providers[0], 'github');
+      });
   });
 });

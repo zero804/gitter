@@ -3,7 +3,7 @@ var Mutant = require('mutantjs');
 var _ = require('underscore');
 var rafUtils = require('utils/raf-utils');
 var isMobile = require('utils/is-mobile');
-var addPassiveScrollListener = require('./passive-scroll-listener');
+var passiveEventListener = require('./passive-event-listener');
 var raf = require('utils/raf');
 
 module.exports = (function() {
@@ -60,7 +60,7 @@ module.exports = (function() {
     }
 
     var _trackLocation = _.throttle(trackLocationAnimationFrame, 100);
-    addPassiveScrollListener(target, _trackLocation);
+    passiveEventListener.addEventListener(target, 'scroll', _trackLocation);
     window.addEventListener('resize', adjustScroll, false);
     window.addEventListener('focusin', adjustScroll, false);
     window.addEventListener('focusout', adjustScroll, false);

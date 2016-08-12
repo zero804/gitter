@@ -1,0 +1,20 @@
+{
+  "name": "gitter-web-twitter",
+  "version": "1.0.0",
+  "main": "lib/twitter-service.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha test/"
+  },
+  "dependencies": {
+    "bluebird": "^3.2.1",
+    "debug": "^2.2.0",
+    "gitter-web-env": "file:../env",
+    "request": "~2.40.0",
+    "statuserror": "^0.1.3"
+  },
+  "private": true
+}

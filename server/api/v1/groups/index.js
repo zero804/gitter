@@ -1,10 +1,68 @@
 "use strict";
 
-var restful = require("../../../services/restful");
+var Promise = require('bluebird');
 var StatusError = require('statuserror');
 var groupService = require('gitter-web-groups/lib/group-service');
-var restSerializer = require('../../../serializers/rest-serializer');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
+var groupCreationService = require('../../../services/group-creation-service');
+var inviteValidation = require('gitter-web-invites/lib/invite-validation');
+var restful = require("../../../services/restful");
+var restSerializer = require('../../../serializers/rest-serializer');
+var internalClientAccessOnly = require('../../../web/middlewares/internal-client-access-only');
+
+var MAX_BATCHED_INVITES = 100;
+
+function getInvites(invitesInput) {
+  if (!invitesInput || !invitesInput.length) return [];
+
+  if (invitesInput.length > MAX_BATCHED_INVITES) {
+    throw new StatusError(400, 'Too many batched invites.');
+  }
+
+  // This could throw, but it is the basic user-input validation that would
+  // have failed if the frontend didn't call the invite checker API like it
+  // should have anyway.
+  return invitesInput.map(function(input) {
+    return inviteValidation.parseAndValidateInput(input);
+  });
+}
+
+function getGroupOptions(body) {
+  var uri = body.uri ? String(body.uri) : undefined;
+  var name = body.name ? String(body.name) : undefined;
+  var defaultRoomName = body.defaultRoomName ? String(body.defaultRoomName) : undefined;
+
+  var providers;
+  if (body.providers && Array.isArray(body.providers)) {
+    var providersAreStrings = body.providers.every(function(s) {
+      return typeof s === 'string';
+    });
+
+    if (providersAreStrings) {
+      providers = body.providers;
+    }
+  }
+
+  var groupOptions = {
+    uri: uri,
+    name: name,
+    defaultRoom: {
+      defaultRoomName: defaultRoomName,
+      providers: providers
+    },
+    invites: getInvites(body.invites),
+    allowTweeting: body.allowTweeting
+  };
+
+  if (body.security) {
+    // for GitHub and future group types that are backed by other services
+    groupOptions.type = body.security.type ? String(body.security.type) : undefined;
+    groupOptions.linkPath = body.security.linkPath ? String(body.security.linkPath) : undefined;
+  }
+
+  return groupOptions;
+}
+
 
 module.exports = {
   id: 'group',
@@ -14,30 +72,53 @@ module.exports = {
       throw new StatusError(401);
     }
 
-    return restful.serializeGroupsForUserId(req.user._id);
+    var lean = req.query.lean && parseInt(req.query.lean, 10) || false;
+
+    if (req.query.type === 'admin') {
+      return restful.serializeAdminGroupsForUser(req.user, { lean: lean })
+    }
+
+    return restful.serializeGroupsForUserId(req.user._id, { lean: lean });
   },
 
   create: function(req) {
     var user = req.user;
 
+    // This is for internal clients only
+    if (!internalClientAccessOnly.isRequestFromInternalClient(req)) {
+      throw new StatusError(404);
+    }
+
     if (!req.user) {
       throw new StatusError(401);
     }
 
-    if (!req.authInfo || !req.authInfo.clientKey === 'web-internal') {
-      // This is a private API
-      throw new StatusError(404);
-    }
+    var groupCreationOptions = getGroupOptions(req.body);
 
-    var uri = String(req.body.uri);
-    var name = String(req.body.name);
-    var createOptions = { uri: uri, name: name };
-    if (req.body.security) {
-      // for GitHub and future group types that are backed by other services
-      createOptions.type = req.body.security.type;
-      createOptions.linkPath = req.body.security.linkPath;
-    }
-    return groupService.createGroup(user, createOptions);
+    return groupCreationService(user, groupCreationOptions)
+      .then(function(groupCreationResult) {
+        var group = groupCreationResult.group;
+        var defaultRoom = groupCreationResult.defaultRoom;
+
+        var groupStrategy = new restSerializer.GroupStrategy();
+        var troupeStrategy = new restSerializer.TroupeStrategy({
+          currentUserId: req.user.id,
+          includeTags: true,
+          includePermissions: true,
+          includeProviders: true,
+          includeBackend: true
+        });
+
+        return Promise.join(
+            restSerializer.serializeObject(group, groupStrategy),
+            restSerializer.serializeObject(defaultRoom, troupeStrategy),
+            function(serializedGroup, serializedRoom) {
+              serializedGroup.defaultRoom = serializedRoom;
+              serializedGroup.hookCreationFailedDueToMissingScope = groupCreationResult.hookCreationFailedDueToMissingScope;
+              return serializedGroup;
+            }
+          );
+      });
   },
 
   show: function(req) {
@@ -68,6 +149,7 @@ module.exports = {
 
   subresources: {
     'rooms': require('./rooms'),
+    'suggestedRooms': require('./suggested-rooms')
   }
 
 };

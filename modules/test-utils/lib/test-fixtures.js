@@ -98,6 +98,7 @@ function createExpectedFixtures(expected) {
       githubId:         possibleGenerate('githubId', generateGithubId),
       githubToken:      possibleGenerate('githubToken', generateGithubToken),
       username:         possibleGenerate('username', generateUsername),
+      gravatarImageUrl:  f.gravatarImageUrl,
       state:            f.state || undefined,
       staff:            f.staff || false
     });
@@ -169,7 +170,7 @@ function createExpectedFixtures(expected) {
       });
   }
 
-  function generateSecurityDescriptorForTroupeFixture(f) {
+  function generateSecurityDescriptorForTroupeFixture(f, fixture) {
     var securityDescriptor = f.securityDescriptor || {};
 
     var securityDescriptorType;
@@ -182,6 +183,7 @@ function createExpectedFixtures(expected) {
     var isPublic;
     var members;
     var admins;
+    var internalId;
 
     if ('public' in securityDescriptor) {
       isPublic = securityDescriptor.public;
@@ -217,6 +219,10 @@ function createExpectedFixtures(expected) {
       admins = 'MANUAL';
     }
 
+    if (securityDescriptor.internalId) {
+      internalId = fixture[securityDescriptor.internalId]._id;
+    }
+
     return {
       // Permissions stuff
       type: securityDescriptorType,
@@ -225,12 +231,13 @@ function createExpectedFixtures(expected) {
       public: isPublic,
       linkPath: securityDescriptor.linkPath,
       externalId: securityDescriptor.externalId,
+      internalId: internalId,
       extraMembers: securityDescriptor.extraMembers,
       extraAdmins: securityDescriptor.extraAdmins
     };
   }
 
-  function createTroupe(fixtureName, f) {
+  function createTroupe(fixtureName, f, fixture) {
     var oneToOneUsers;
 
     if (f.oneToOne && f.userIds) {
@@ -269,7 +276,7 @@ function createExpectedFixtures(expected) {
       providers: f.providers,
     };
 
-    doc.sd = generateSecurityDescriptorForTroupeFixture(f);
+    doc.sd = generateSecurityDescriptorForTroupeFixture(f, fixture);
 
     debug('Creating troupe %s with %j', fixtureName, doc);
     return persistence.Troupe.create(doc)
@@ -284,10 +291,23 @@ function createExpectedFixtures(expected) {
 
     var uri = f.uri || generateGroupUri();
 
+    var avatarVersion;
+    if(f.hasOwnProperty('avatarVersion')) {
+      avatarVersion = f.avatarVersion;
+    } else {
+      if (f.avatarUrl) {
+        avatarVersion = 1;
+      } else {
+        avatarVersion = 0;
+      }
+    }
+
     var doc = {
       name: f.name || uri,
       uri: uri,
-      lcUri: uri.toLowerCase()
+      lcUri: uri.toLowerCase(),
+      avatarUrl: f.avatarUrl || null,
+      avatarVersion: avatarVersion
     };
 
 
@@ -315,8 +335,6 @@ function createExpectedFixtures(expected) {
     doc.sd = securityDoc;
 
     debug('Creating group %s with %j', fixtureName, doc);
-
-    debug(doc);
 
     return persistence.Group.create(doc);
   }
@@ -517,7 +535,7 @@ function createExpectedFixtures(expected) {
         }
 
 
-        return createTroupe(key, expectedTroupe)
+        return createTroupe(key, expectedTroupe, fixture)
           .then(function(troupe) {
             fixture[key] = troupe;
           });
@@ -596,6 +614,9 @@ fixtureLoader.GITTER_INTEGRATION_ORG_ID = '19433202';
 fixtureLoader.GITTER_INTEGRATION_REPO = 'public-repo-1';
 fixtureLoader.GITTER_INTEGRATION_REPO_FULL = fixtureLoader.GITTER_INTEGRATION_USERNAME + '/' + fixtureLoader.GITTER_INTEGRATION_REPO;
 fixtureLoader.GITTER_INTEGRATION_REPO_ID = '59505414';
+fixtureLoader.GITTER_INTEGRATION_REPO2 = 'public-repo-2';
+fixtureLoader.GITTER_INTEGRATION_REPO2_FULL = fixtureLoader.GITTER_INTEGRATION_USERNAME + '/' + fixtureLoader.GITTER_INTEGRATION_REPO2;
+fixtureLoader.GITTER_INTEGRATION_REPO2_ID = '62724563';
 fixtureLoader.GITTER_INTEGRATION_COMMUNITY = '_I-heart-cats-Test-LOL';
 fixtureLoader.GITTER_INTEGRATION_ROOM = 'all-about-kitty-litter';
 

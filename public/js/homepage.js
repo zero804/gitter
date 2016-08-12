@@ -1,10 +1,13 @@
 "use strict";
+
+require('utils/font-setup');
+
 var $ = require('jquery');
 
 var urlParse = require('url-parse');
 var appEvents = require('utils/appevents');
 var context = require('utils/context');
-var mapMessageTemplate = require('./map-message.hbs');
+var mapMessageTemplate = require('./views/homepage/map-message.hbs');
 var roomNameTrimmer = require('utils/room-name-trimmer');
 var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 var apiClient = require('components/apiClient');
@@ -14,99 +17,83 @@ var modalRegion = require('components/modal-region');
 var LoginView = require('views/modals/login-view');
 
 require('utils/tracking');
+require('gitter-styleguide/css/components/buttons.css');
 
 var active = [];
 
 var featuredRooms = [
-  { uri: 'marionettejs/backbone.marionette',
-    name: 'Marionette',
-    language: 'JavaScript',
-    locale: 'en'
-  },
-  { uri: 'LaravelRUS/chat',
-    name: 'LaravelRUS',
-    channel: true,
-    language: 'PHP',
-    locale: 'ru'
-  },
-  { uri: 'gitterHQ/nodejs',
-    name: '#nodejs',
-    channel: true,
-    language: 'JavaScript',
-    locale: 'en'
-  },
-  { uri: 'lotus/chat',
-    name: 'Lotus',
-    channel: true,
-    language: 'Ruby',
-    locale: 'en'
-  },
-  { uri: 'FreeCodeCamp/FreeCodeCamp',
-    name: 'FreeCodeCamp',
-    channel: true,
-    language: 'JavaScript',
-    locale: 'en'
-  },
-  { uri: 'webpack/webpack',
-    name: 'WebPack',
-    language: 'JavaScript',
-    locale: 'en'
-  },
-  { uri: 'require-lx/group',
-    name: "require('lx')",
-    language: 'JavaScript',
-    locale: 'en'
-  },
-  { uri: 'angular-ui/ng-grid',
-    name: 'Angular UI',
-    language: 'JavaScript',
-    locale: 'en'
-  },
-  { uri: 'FreeCodeCamp/FreeCodeCamp',
-    name: 'FreeCodeCamp',
-    language: 'JavaScript',
-    locale: 'en'
-  },
-  { uri: 'Aurelia/Discuss',
-    name: 'Aurelia',
-    language: 'JavaScript',
-    locale: 'en'
-  },
-  { uri: 'Dogfalo/materialize',
-    name: 'Materialize',
-    language: 'CSS',
-    locale: 'en'
-  },
-  { uri: 'scala/scala',
-    name: 'Scala',
-    language: 'Scala',
-    locale: 'en'
-  },
-  { uri: 'jspm/jspm',
-    name: 'JSPM',
-    language: 'JavaScript',
-    locale: 'en'
-  },
-  { uri: 'postcss/postcss',
-    name: 'Postcss',
-    language: 'CSS',
-    locale: 'en'
-  },
-  { uri: 'lotus/chat',
-    name: 'Lotus',
-    language: 'Ruby',
-    locale: 'en'
-  },
-  { uri: 'neovim/neovim',
-    name: 'Neovim',
-    language: 'C',
-    locale: 'en'
-  },
-  { uri: 'BinaryMuse/fluxxor',
-    name: 'Fluxxor',
-    language: 'JavaScript',
-    locale: 'en'
-  }
+ { uri: 'angular-ui/ng-grid',
+   name: 'Angular UI',
+   language: 'JavaScript',
+   locale: 'en'
+ },
+ { uri: 'postcss/postcss',
+   name: 'Postcss',
+   language: 'CSS',
+   locale: 'en'
+ },
+ { uri: 'gitterHQ/nodejs',
+   name: '#nodejs',
+   channel: true,
+   language: 'JavaScript',
+   locale: 'en'
+ },
+ { uri: 'scala/scala',
+   name: 'Scala',
+   language: 'Scala',
+   locale: 'en'
+ },
+ { uri: 'FreeCodeCamp/FreeCodeCamp',
+   name: 'FreeCodeCamp',
+   channel: true,
+   language: 'JavaScript',
+   locale: 'en'
+ },
+ { uri: 'mozillascience/community',
+  name: 'Mozilla Science',
+  language: 'Mozilla Science Lab community',
+  locale: 'en'
+ },
+ { uri: 'openai/gym',
+   name: 'Open AI Gym',
+   language: 'Reinforcement Learning',
+   locale: 'en'
+ },
+ { uri: 'deeplearning4j/deeplearning4j',
+   name: 'Deeplearning4J',
+   language: 'Deep Learning for Java',
+   locale: 'en'
+ },
+ { uri: 'numenta/public',
+   name: 'Numenta',
+   language: 'Machine Intelligence Research',
+   locale: 'en'
+ },
+ { uri: 'Aurelia/Discuss',
+   name: 'Aurelia',
+   language: 'JavaScript',
+   locale: 'en'
+ },
+ { uri: 'Dogfalo/materialize',
+   name: 'Materialize',
+   language: 'CSS',
+   locale: 'en'
+ },
+ { uri: 'google/material-design-lite',
+  name: 'Material Design Lite',
+  language: 'Google Material Design Lite',
+  locale: 'en'
+ },
+ { uri: 'aws/aws-sdk-ruby',
+  name: 'AWS Ruby SDK',
+  language: 'The official AWS SDK for Ruby',
+  locale: 'en'
+ },
+ { uri: 'postcss/postcss',
+   name: 'PostCSS',
+   language: 'CSS',
+   locale: 'en'
+ }
 ];
 
 function random(array) {
@@ -190,10 +177,11 @@ function initAppsPanelScrollListener() {
 
 function initMapMessages() {
   //  Make sure we don't randomly generate people in the ocean
+  // Commented out coords are on south america that interfere with the cta buttons
   var coords = shuffle([
-    [64, 113], [150, 142], [194, 222], [345, 221], [275, 70],
+    [64, 113], [150, 142], /*[194, 222],*/ [345, 221], [275, 70],
     [340, 95], [490, 141], [531, 206], [579, 268], [345, 104],
-    [532, 21], [218, 48], [384, 226], [153, 226], [420, 157]
+    [532, 21], [218, 48], [384, 226], /*[153, 226],*/ [420, 157]
   ]);
 
   var $map = $('.map');
@@ -261,7 +249,14 @@ function removeItemFromMap($message) {
 
 function cycleElements($els, time) {
   $els.first().addClass('visible');
-  $els.parent().css('height', $els.outerHeight());
+  var tallestHeight = 0;
+  $els.each(function() {
+    var height = $(this).outerHeight();
+    if(height > tallestHeight) {
+      tallestHeight = height;
+    }
+  });
+  $els.parent().css('height', tallestHeight);
 
   setInterval(function () {
     var active = $els.filter('.visible').removeClass('visible').addClass('going');

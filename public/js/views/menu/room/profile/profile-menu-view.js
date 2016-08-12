@@ -6,14 +6,56 @@ var itemTemplate = require('./profile-menu-item-view.hbs');
 var fastdom = require('fastdom');
 var toggleClass = require('utils/toggle-class');
 var logout = require('utils/logout');
+var isMobile = require('utils/is-mobile');
+var isNative = require('utils/is-native');
+var context = require('utils/context');
 
-var profileCollection = new Backbone.Collection([
-  { name: 'Home', stub: '/home' },
-  { name: 'Billing', stub: 'http://billing.gitter.im/accounts'},
-  { name: 'Get Gitter Apps', stub: '/apps'},
-  //TODO Logout does not work JP 27/1/16
-  { name: 'Sign Out', stub: '/logout' }
-]);
+function getProfileCollection() {
+
+  var result = new Backbone.Collection([
+    { name: 'Home', stub: '/home' },
+    { name: 'Billing', stub: 'http://billing.gitter.im/accounts'},
+  ]);
+
+  var isWebApp = !isNative();
+  var isMobileApp = isMobile();
+
+  if(isWebApp && !isMobileApp) {
+    result.add({ name: 'Get Gitter Apps', stub: '/apps'});
+  }
+
+  var user = context.user();
+
+  // This is more fragile than i'd like it to be
+  function showHideRepoAccess() {
+    var scopes = user.get('scopes');
+    var existing = result.find(function(f) { return f.get('upgradeItem') });
+
+    if (!user.id || !scopes || scopes.private_repo) {
+      // Hide the scope
+      if (!existing) return;
+      result.remove(existing);
+    } else {
+      // Show the scope
+      if (existing) return;
+      var appsItem = result.find(function(f) { return f.get('stub') === '/apps' });
+
+      result.add({ name: 'Allow Private Repo Access', stub: '#upgraderepoaccess', upgradeItem: true }, {
+        at: result.indexOf(appsItem) + 1
+      });
+    }
+  }
+
+  showHideRepoAccess();
+  user.on('change:id', showHideRepoAccess);
+  user.on('change:scopes', showHideRepoAccess);
+
+  if(isWebApp) {
+    result.add({ name: 'Sign Out', stub: '/logout' });
+  }
+
+  return result;
+}
 
 var ItemView = Marionette.ItemView.extend({
   tagName: 'li',
@@ -27,8 +69,8 @@ module.exports = Marionette.CollectionView.extend({
   className: 'lm-profile-menu',
   childView: ItemView,
 
-  constructor: function (){
-    this.collection = profileCollection;
+  constructor: function() {
+    this.collection = getProfileCollection();
     Marionette.CollectionView.prototype.constructor.apply(this, arguments);
   },
 
@@ -51,7 +93,7 @@ module.exports = Marionette.CollectionView.extend({
     this.model.set('profileMenuOpenState', false);
   },
 
-  onItemClicked: function(e){
+  onItemClicked: function(e) {
     if(e.target.href && /\/logout$/.test(e.target.href)) {
       e.preventDefault();
       logout();

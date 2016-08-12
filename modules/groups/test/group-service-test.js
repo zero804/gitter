@@ -1,10 +1,30 @@
 'use strict';
 
-var groupService = require('../lib/group-service');
+var Promise = require('bluebird');
 var assert = require('assert');
-var StatusError = require('statuserror');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
+var proxyquireNoCallThru = require("proxyquire").noCallThru();
+var StatusError = require('statuserror');
+
+// stub out this check because otherwise we end up with a the tests all
+// clashing with the user that's required to have access to create those
+// groups..
+var groupService = proxyquireNoCallThru('../lib/group-service', {
+  './group-uri-checker': function() {
+    return Promise.resolve({
+      allowCreate: true
+    });
+  }
+});
+
+function compareSets(a, b) {
+  // Sort before comparing, but don't mutate them when sorting. Not that that
+  // matters at the time of writing, but just in case people start using this
+  // elsewhere.
+  // (Yes there are a million ways to do this.)
+  assert.deepEqual(a.slice().sort(), b.slice().sort());
+}
 
 describe('group-service', function() {
 
@@ -14,9 +34,13 @@ describe('group-service', function() {
       var fixture = fixtureLoader.setup({
         deleteDocuments: {
           User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }],
-          Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
-                  { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() },
-                  { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() }],
+          Group: [
+            { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
+            { lcUri: fixtureLoader.GITTER_INTEGRATION_REPO.toLowerCase() },
+            { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() },
+            { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() },
+            { lcUri: 'bob' }
+          ],
         },
         user1: {
           githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
@@ -51,19 +75,49 @@ describe('group-service', function() {
           })
       });
 
-      it('should create a group for an unknown GitHub owner', function() {
-        var groupUri = fixtureLoader.GITTER_INTEGRATION_USERNAME;
+      it('should create a group for a GitHub repo', function() {
+        var groupUri = fixtureLoader.GITTER_INTEGRATION_REPO;
+        var linkPath = fixtureLoader.GITTER_INTEGRATION_REPO_FULL;
         var user = fixture.user1;
         return groupService.createGroup(user, {
-            type: 'GH_GUESS',
+            type: 'GH_REPO',
             name: 'Bob',
             uri: groupUri,
-            linkPath: groupUri
+            linkPath: linkPath
           })
           .then(function(group) {
             assert.strictEqual(group.name, 'Bob');
             assert.strictEqual(group.uri, groupUri);
             assert.strictEqual(group.lcUri, groupUri.toLowerCase());
+            return securityDescriptorService.getForGroupUser(group._id, null);
+          })
+          .then(function(securityDescriptor) {
+            assert.deepEqual(securityDescriptor, {
+              admins: 'GH_REPO_PUSH',
+              externalId: fixtureLoader.GITTER_INTEGRATION_REPO_ID,
+              linkPath: linkPath,
+              members: 'PUBLIC',
+              public: true,
+              type: 'GH_REPO'
+            })
+          })
+      });
+
+      it('should create a group for an unknown GitHub owner', function() {
+        var user = fixture.user1;
+        return groupService.createGroup(user, {
+            type: 'GH_GUESS',
+            name: 'Bob',
+            // This also tests that you can have a group with an arbitrary uri
+            // that is backed by a github user/org with a linkPath that is
+            // different to the group's uri.
+            uri: 'Bob',
+            linkPath: fixtureLoader.GITTER_INTEGRATION_USERNAME
+          })
+          .then(function(group) {
+            assert.strictEqual(group.name, 'Bob');
+            assert.strictEqual(group.uri, 'Bob');
+            assert.strictEqual(group.lcUri, 'bob');
             return securityDescriptorService.getForGroupUser(group._id, null);
           })
           .then(function(securityDescriptor) {
@@ -98,6 +152,27 @@ describe('group-service', function() {
               members: 'PUBLIC'
             })
           })
+      });
+
+      it('should throw a 409 if a URL is not available', function() {
+        var user = fixture.user1;
+        var groupService = proxyquireNoCallThru('../lib/group-service', {
+          './group-uri-checker': function() {
+            return Promise.resolve({
+              allowCreate: false
+            });
+          }
+        });
+        groupService.createGroup(user, {
+            name: 'Bob',
+            uri: 'bob'
+          })
+          .then(function() {
+            assert.ok(false, 'Error Expected');
+          })
+          .catch(StatusError, function(err) {
+            assert.strictEqual(err.status, 409);
+          });
       });
     });
 
@@ -185,17 +260,23 @@ describe('group-service', function() {
       it('should find the roomIds for group for an anonymous user', function() {
         return groupService.findRoomsIdForGroup(fixture.group1._id)
           .then(function(roomIds) {
-            assert.deepEqual(roomIds.map(String), [
+            var roomStrings = roomIds.map(String);
+            roomStrings.sort();
+
+            var expectedStrings = [
               fixture.troupe1.id,
               fixture.troupe2.id,
-            ]);
+            ];
+            expectedStrings.sort();
+
+            assert.deepEqual(roomStrings, expectedStrings);
           });
       });
 
       it('should find the roomIds for group and user with troupes', function() {
         return groupService.findRoomsIdForGroup(fixture.group1._id, fixture.user1._id)
           .then(function(roomIds) {
-            assert.deepEqual(roomIds.map(String), [
+            compareSets(roomIds.map(String), [
               fixture.troupe1.id,
               fixture.troupe2.id,
               fixture.troupe3.id
@@ -206,7 +287,7 @@ describe('group-service', function() {
       it('should find the roomIds for group and user without troupes', function() {
         return groupService.findRoomsIdForGroup(fixture.group1._id, fixture.user2._id)
           .then(function(roomIds) {
-            assert.deepEqual(roomIds.map(String), [
+            compareSets(roomIds.map(String), [
               fixture.troupe1.id,
               fixture.troupe2.id,
             ]);

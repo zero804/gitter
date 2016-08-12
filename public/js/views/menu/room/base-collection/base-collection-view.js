@@ -1,11 +1,11 @@
 'use strict';
 
 var Marionette = require('backbone.marionette');
+var _ = require('underscore');
 var fastdom = require('fastdom');
 var template = require('./base-collection-view.hbs');
 var context = require('utils/context');
 var toggleClass = require('utils/toggle-class');
-var parseItemForTemplate = require('gitter-web-shared/parse/left-menu-primary-item');
 
 module.exports = Marionette.CompositeView.extend({
 
@@ -55,28 +55,59 @@ module.exports = Marionette.CompositeView.extend({
     this.collection = attrs.collection;
     this.roomMenuModel = attrs.roomMenuModel;
     this.roomCollection = attrs.roomCollection;
+    this.groupsCollection = attrs.groupsCollection;
     this.listenTo(this.roomMenuModel, 'change:hasDismissedSuggestions', this.onDismissSuggestionsUpdate, this);
+    this.listenTo(this.roomMenuModel, 'change:state', this.clearFocus, this);
+    this.listenTo(context.troupe(), 'change:id', this.onRoomUpdate, this);
     Marionette.CompositeView.prototype.constructor.apply(this, arguments);
+  },
+
+  initialize: function() {
+    var activeModel = this.collection.get(context.troupe().get('id'));
+    if(!activeModel) { return; }
+    //On init we set focus on the active element because we can reliably assume that a minibar item is visible
+    //which we can't for room-itmes as you can load the menu in an org state
+    activeModel.set({ active: true, focus: true });
   },
 
   onItemActivated: function(view) {
     var model = view.model;
     var url = view.getRoomUrl();
-    var name = view.getRoomName();
+    var name = view.getRoomTitle();
 
     //We have to explicitly check for false because search
     //results come through with `exists: false` for rooms yet to be created
     //whereas on room models `exists: undefined` :( JP 10/3/16
-    if (model.get('exists') === false) {
-      return this._openCreateRoomDialog(name);
+    // org-items have `room`, not exists
+    if (this.roomExistsForModel(model)) {
+      //default trigger navigation to an existing room
+      this._triggerNavigation(url, 'chat', name);
+      return;
     }
 
-    //default trigger navigation to an existing room
-    this._triggerNavigation(url, 'chat', name);
+    return this._openCreateRoomDialog(name);
+  },
+
+  /**
+   * Default implementation. Can be overridden.
+   */
+  roomExistsForModel: function(model) {
+    return model.get('exists') !== false;
   },
 
   onFilterComplete: function() {
     this.setActive();
+  },
+
+  serializeData: function (){
+    var data = this.model.toJSON();
+    var groupId = this.roomMenuModel.get('groupId');
+    var selectedGroup = this.groupsCollection.get(groupId);
+    var selectedGroupName = '';
+    if(selectedGroup) { selectedGroupName = selectedGroup.get('name'); }
+    return _.extend({}, data, {
+      selectedGroupName: selectedGroupName,
+    });
   },
 
   onBeforeRender: function() {
@@ -127,12 +158,38 @@ module.exports = Marionette.CompositeView.extend({
     return this.ui.dismissButton[0].classList.add('hidden');
   },
 
-  onDestroy: function() {
-    this.stopListening(context.troupe());
+  clearFocus: function (){
+    var elementsInFocus = this.collection.where({ focus: true });
+    elementsInFocus.forEach(function(model){
+      model.set('focus', false);
+    });
+  },
+
+  clearActive: function (){
+    var activeElements = this.collection.where({ active: true });
+    activeElements.forEach(function(model){
+      model.set('active', false);
+    });
+  },
+
+  focusActiveElement: function (){
+    var activeElement = this.collection.findWhere({ active: true });
+    if(!activeElement) { return; }
+    activeElement.set('focus', true);
+  },
+
+  onRoomUpdate: function (troupe, id){
+    this.clearFocus();
+    this.clearActive();
+    var model = this.collection.get(id);
+    if(!model) { return; }
+    model.set({ active: true, focus: true });
   },
 
   _triggerNavigation: function (url, type, name) {
+    this.clearFocus();
     this.bus.trigger('navigation', url, type, name);
+    this.focusActiveElement();
   },
 
   _navigateToHome: function () {

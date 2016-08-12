@@ -3,6 +3,7 @@
 var env = require('gitter-web-env');
 var nconf = env.config;
 var contextGenerator = require('../../web/context-generator');
+var fonts = require('../../web/fonts');
 
 var WELCOME_MESSAGES = [
   'Code for people',
@@ -44,6 +45,8 @@ function renderHomePage(req, res, next) {
       var showLinuxApp = !isOsx && !isWindows;
 
       res.render(page, {
+        hasCachedFonts: fonts.hasCachedFonts(req.cookies),
+        fonts: fonts.getFonts(),
         welcomeMessage: WELCOME_MESSAGES[Math.floor(Math.random() * WELCOME_MESSAGES.length)],
         showOsxApp: showOsxApp,
         showWindowsApp: showWindowsApp,
@@ -60,7 +63,9 @@ function renderMobileUserHome(req, res, next) {
   contextGenerator.generateNonChatContext(req)
   .then(function(troupeContext) {
     res.render('mobile/mobile-userhome', {
-      troupeName: req.uriContext.uri,
+      hasCachedFonts: fonts.hasCachedFonts(req.cookies),
+      fonts: fonts.getFonts(),
+      troupeName: troupeContext.troupe && troupeContext.troupe.uri || "Home",
       troupeContext: troupeContext,
       agent: req.headers['user-agent'],
       user: req.user
@@ -73,6 +78,8 @@ function renderMobileNativeUserhome(req, res) {
   contextGenerator.generateNonChatContext(req)
     .then(function(troupeContext) {
       res.render('mobile/native-userhome-app', {
+        hasCachedFonts: fonts.hasCachedFonts(req.cookies),
+        fonts: fonts.getFonts(),
         bootScriptName: 'mobile-native-userhome',
         troupeContext: troupeContext
       });

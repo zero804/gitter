@@ -4,8 +4,28 @@ var path = require('path');
 var glob = require('glob');
 var ProgressBarPlugin = require('progress-bar-webpack-plugin');
 
+
+var opts = require('yargs')
+  .option('nocoverage', {
+    type: 'boolean',
+    description: 'Age in minutes of the unread items'
+  })
+  .help('help')
+  .alias('help', 'h')
+  .argv;
+
+
+var preLoaders = [];
+if(!opts['nocoverage']) {
+  preLoaders.push({
+    test: /\.js$/,
+    exclude: /(test|node_modules|repo)/,
+    loader: 'istanbul-instrumenter',
+  });
+}
+
 module.exports = {
-  entry: glob.sync(path.resolve(__dirname, './specs/**/*-test.js')),
+  entry: path.resolve(__dirname, './fixtures/entry.js'),
   output: {
     path: path.join(__dirname, './fixtures/build'),
     filename: 'test.js',
@@ -14,13 +34,7 @@ module.exports = {
 
   devtool: 'inline-source-map',
   module: {
-    preLoaders: [
-      {
-        test: /\.js$/,
-        exclude: /(test|node_modules|repo)/,
-        loader: 'istanbul-instrumenter',
-      },
-    ],
+    preLoaders: preLoaders,
     loaders: [
       {
         test: /\.hbs$/,
@@ -30,7 +44,8 @@ module.exports = {
             path.resolve(__dirname, '../../shared/handlebars/helpers')
           ],
           knownHelpers: [
-            'cdn'
+            'cdn',
+            'avatarSrcSet'
           ],
           partialsRootRelative: path.resolve(__dirname, '../../public/templates/partials') + path.sep
         }
@@ -62,6 +77,7 @@ module.exports = {
       'components/apiClient':                               path.resolve(__dirname, './fixtures/helpers/apiclient.js'),
       'utils/appevents':                                    path.resolve(__dirname, './fixtures/helpers/appevents.js'),
       'filtered-collection':                                path.resolve(__dirname, '../../public/repo/filtered-collection/filtered-collection.js'),
+      'gitter-client-env':                                  path.resolve(__dirname, './fixtures/helpers/gitter-client-env.js'),
     },
   },
   node: {

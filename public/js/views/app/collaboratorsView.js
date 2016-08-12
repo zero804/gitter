@@ -10,7 +10,6 @@ var itemTemplate = require('./tmpl/collaboratorsItemView.hbs');
 var emptyViewTemplate = require('./tmpl/collaboratorsEmptyView.hbs');
 var appEvents = require('utils/appevents');
 var collaboratorsModels = require('collections/collaborators');
-var resolveUserAvatarSrcSet = require('gitter-web-shared/avatars/resolve-user-avatar-srcset');
 
 require('gitter-styleguide/css/components/buttons.css');
 require('gitter-styleguide/css/components/links.css');
@@ -39,50 +38,25 @@ module.exports = (function() {
       this.listenTo(this.stateModel, 'change', this.render);
     },
 
-    inviteUser: function() {
+    /**
+     * TODO: deal with non-GitHub users too
+     */
+    inviteGitHubUser: function(data) {
       var self = this;
+      var state = 'inviting';
 
-      var data = {
-        userId: this.stateModel.get('emailRequiredUserId'),
-        email: this.$el.find('.js-invite-email').val(),
-        roomId: context.getTroupeId(),
-      };
+      this.stateModel.set('state', state);
 
-      this.stateModel.set('state', 'inviting');
+      return apiClient.room.post('/invites', data)
+        .then(function(invite) {
+          if (invite.email) {
+            self.userModel.set('email', invite.email);
+          }
 
-      apiClient.priv.post('/invite-user', data)
-        .then(function() {
-          self.stateModel.set('state', 'invited');
-        })
-        .catch(function() {
-          self.stateModel.set('state', 'fail');
-        });
-
-      // stop the page reloading
-      return false;
-    },
-
-    addUser: function() {
-      var self = this;
-
-      var githubUser = this.userModel;
-
-      appEvents.triggerParent('track-event', 'welcome-add-user-click');
-
-      this.stateModel.set('state', 'adding');
-      apiClient.room.post('/users', { username: githubUser.get('username') })
-        .then(function(res) {
-          var user = res.user;
-
-          if (!user.invited) {
+          if (invite.status === 'added') {
             self.stateModel.set('state', 'added');
-          } else if (user.invited && user.email) {
+          } else if (invite.status === 'invited') {
             self.stateModel.set('state', 'invited');
-          } else {
-            self.stateModel.set({
-              emailRequiredUserId: user.id,
-              state: 'email_address_required',
-            });
           }
         })
         .catch(function(e) {
@@ -94,29 +68,51 @@ module.exports = (function() {
             self.stateModel.set('state', 'initial');
           } else if (e.status === 409) {
             self.stateModel.set('state', 'fail_409');
+          } else if (e.status === 428) {
+            self.stateModel.set({
+              state: 'email_address_required',
+            });
           } else {
             self.stateModel.set('state', 'fail');
           }
         });
     },
 
+    inviteUser: function() {
+      var email = this.$el.find('.js-invite-email').val();
+      this.userModel.set({ email: email });
+      this.inviteGitHubUser(this.userModel.toJSON());
+
+      // stop the page reloading
+      return false;
+    },
+
+    addUser: function() {
+      appEvents.triggerParent('track-event', 'welcome-add-user-click');
+
+      this.inviteGitHubUser(this.userModel.toJSON(), null);
+
+      return false;
+    },
+
     serializeData: function() {
       var state = this.stateModel.get('state');
-      var username = this.userModel.get('username');
+      var displayName = this.userModel.get('displayName');
+      var email = this.userModel.get('email');
 
       var states = {
-        initial:                { text: username, showAddButton: true },
+        initial:                { text: displayName, showAddButton: true },
         adding:                 { text: 'Adding…' },
-        added:                  { text: username + ' added' },
-        invited:                { text: username + ' invited' },
-        fail:                   { text: 'Unable to add ' + username },
-        fail_409:               { text: 'Unable to add person already in room' },
-        email_address_required: { text: 'Enter ' + username + '\'s email', showEmailForm: true },
+        added:                  { text: displayName + ' added' },
+        invited:                { text: email ? 'Invited ' + email : 'Invited' },
+        fail:                   { text: 'Unable to add ' + displayName },
+        fail_409:               { text: 'Already invited' },
+        email_address_required: { text: 'Enter ' + displayName + '\'s email', showEmailForm: true },
         inviting:               { text: 'Inviting…' },
       };
 
       var data = states[state] || states.initial;
-      data.avatarSrcSet = resolveUserAvatarSrcSet({ username: username }, 30);
+      data.avatarUrl = this.userModel.get('avatarUrl');
 
       return data;
     },
@@ -200,13 +196,6 @@ module.exports = (function() {
     },
 
     initialize: function() {
-      var ctx = context();
-      appEvents.triggerParent('track-event', 'welcome-add-user-suggestions', {
-        uri: ctx.troupe.uri,
-        security: ctx.troupe.security,
-        count: this.collection.length,
-      });
-
       //listen to room permission changes so we can refresh the collection
       this.listenTo(context.troupe(), 'change:permissions', this.onRoomChange, this);
     },
@@ -279,14 +268,14 @@ module.exports = (function() {
     },
 
     render: function() {
-      if (!this.shouldRender()) {
-        this.$el.hide();
-        appEvents.trigger('collaboratorsView:hide');
-        return this;
-      } else {
+      if (this.shouldRender()) {
         Marionette.CompositeView.prototype.render.apply(this, arguments);
         this.$el.show();
         appEvents.trigger('collaboratorsView:show');
+      } else {
+        this.$el.hide();
+        appEvents.trigger('collaboratorsView:hide');
+        return this;
       }
 
       return this;

@@ -2,12 +2,15 @@
 
 var env = require('gitter-web-env');
 var nconf = env.config;
+var express = require('express');
 var identifyRoute = env.middlewares.identifyRoute;
 var featureToggles = require('../web/middlewares/feature-toggles');
-var express = require('express');
+var langs = require('langs');
 var loginUtils = require('../web/login-utils');
 var social = require('./social-metadata');
-var langs = require('langs');
+var fonts = require('../web/fonts');
+var earlyBirdRenderer = require('./renderers/early-bird');
+
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
 router.get(nconf.get('web:homeurl'),
@@ -52,6 +55,8 @@ router.get(nconf.get('web:homeurl'),
       requestLangCode: requestLangCode,
       requestLangLocalName: requestLangLocalName,
       translated: translatedBy,
+      fonts: fonts.getFonts(),
+      hasCachedFonts: fonts.hasCachedFonts(req.cookies),
       socialMetadata: social.getMetadata(),
       billingBaseUrl: nconf.get('web:billingBaseUrl'),
       hasCommunityCreate: hasCommunityCreate
@@ -106,6 +111,11 @@ router.get('/-/unawesome-browser',
   function(req, res) {
     res.status(406/* Not Acceptable */).render('unawesome-browser', { });
   });
+
+router.get('/about/early-bird',
+  identifyRoute('earlybird'),
+  earlyBirdRenderer.renderEarlyBirdPage
+);
 
 // old campaign that still gets some hits
 router.get('/about/*',

@@ -2,23 +2,18 @@
 
 var env = require('gitter-web-env');
 var stats = env.stats;
-var config = env.config;
 var Promise = require('bluebird');
-var _ = require('lodash');
 var Group = require('gitter-web-persistence').Group;
 var Troupe = require('gitter-web-persistence').Troupe;
-var TroupeUser = require('gitter-web-persistence').TroupeUser;
 var assert = require('assert');
 var validateGroupName = require('gitter-web-validators/lib/validate-group-name');
-var validateGroupUri = require('gitter-web-validators/lib/validate-group-uri');
 var StatusError = require('statuserror');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var debug = require('debug')('gitter:app:groups:group-service');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var ensureAccessAndFetchDescriptor = require('gitter-web-permissions/lib/ensure-access-and-fetch-descriptor');
-var lazy = require('lazy.js');
-var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
-
+var checkIfGroupUriExists = require('./group-uri-checker');
+var groupRoomFinder = require('./group-room-finder');
 
 /**
  * Find a group given an id
@@ -65,11 +60,45 @@ function upsertGroup(user, groupInfo, securityDescriptor) {
         stats.event('new_group', {
           uri: uri,
           groupId: group._id,
-          userId: user._id
+          userId: user._id,
+          type: securityDescriptor.type === null ? 'none' : securityDescriptor.type
         });
       }
 
       return group;
+    });
+}
+
+function checkGroupUri(user, uri, options) {
+  assert(user, 'user required');
+  assert(uri, 'uri required');
+
+  // type can be null
+  var type = options.type;
+
+  // obtainAccessFromGitHubRepo can be undefined
+  var obtainAccessFromGitHubRepo = options.obtainAccessFromGitHubRepo;
+
+  // run the same validation that gets used by the group uri checker service
+  return checkIfGroupUriExists(user, uri, obtainAccessFromGitHubRepo)
+    .then(function(info) {
+      if (!info.allowCreate) {
+        // the frontend code should have prevented you from getting here
+        /*
+        NOTE: 409 because an invalid group uri would already have raised 400,
+        so the reason why you can't create the group is either because a group
+        or user already took that uri or because another github org or user
+        took that uri. This means it also mirrors the check-group-uri endpount.
+        */
+        throw new StatusError(409, 'User is not allowed to create a group for this URI.');
+      }
+
+      if (info.type === 'GH_ORG') {
+        if (type !== 'GH_ORG' && type !== 'GH_GUESS') {
+          // the frontend code should have prevented you from getting here
+          throw new StatusError(400, 'Group must be type GH_ORG: ' + type);
+        }
+      }
     });
 }
 
@@ -80,31 +109,22 @@ function ensureAccessAndFetchGroupInfo(user, options) {
   options = options || {};
 
   var name = options.name;
-  var uri = options.uri;
-  var security = options.security || 'PUBLIC';
-  assert(user, 'user required');
   assert(name, 'name required');
-  assert(uri, 'uri required');
-
   if (!validateGroupName(name)) {
     throw new StatusError(400, 'Invalid group name');
   }
 
-  if (!validateGroupUri(uri)) {
-    throw new StatusError(400, 'Invalid group uri: ' + uri);
-  }
+  // uri gets validated by checkGroupUri below
+  var uri = options.uri;
 
   // we only support public groups for now
+  var security = options.security || 'PUBLIC';
   if (security !== 'PUBLIC') {
     throw new StatusError(400, 'Invalid group security: ' + security);
   }
 
-  return findByUri(uri)
-    .then(function(group) {
-      if (group) {
-        throw new StatusError(400, 'Group uri already taken: ' + uri);
-      }
-
+  return checkGroupUri(user, uri, options)
+    .then(function() {
       return ensureAccessAndFetchDescriptor(user, options)
         .then(function(securityDescriptor) {
           return [{
@@ -112,7 +132,7 @@ function ensureAccessAndFetchGroupInfo(user, options) {
             uri: uri
           }, securityDescriptor];
         });
-    })
+    });
 }
 
 /**
@@ -177,195 +197,30 @@ function ensureGroupForGitHubRoomCreation(user, options) {
     });
 }
 
-function filterPrivateRoomsForUser(groupId, userId, troupeIds) {
-  return TroupeUser.distinct('troupeId', { userId: userId, troupeId: { $in: troupeIds } })
-    .exec()
-    .then(function(troupeIds) {
-      // TODO: add extraMember and extraAdmin rooms
-      return troupeIds;
-    })
-}
-
-/**
- * Returns true if a userId can be found in an array of objectIds
-
- * @private
- */
-function isInExtraArray(userId, arrayOfUserIds) {
-  if (!arrayOfUserIds || !arrayOfUserIds.length) return false;
-
-  return _.some(arrayOfUserIds, function(item) {
-    return mongoUtils.objectIDsEqual(item, userId);
-  });
-}
-
 function findRoomsIdForGroup(groupId, userId) {
   assert(groupId, 'groupId is required');
 
-  var query, select;
-  if (userId) {
-    query = { groupId: groupId };
-    select = {
-      _id: 1,
-      'sd.public': 1,
-      'sd.extraMembers': 1,
-      'sd.extraAdmins': 1,
-    };
-  } else {
-    query = { groupId: groupId, 'sd.public': true };
-    select = {
-      _id: 1,
-      'sd.public': 1,
-    };
-  }
-
-  return Troupe.find(query, select)
-    .then(function(troupes) {
-      if (!troupes.length) return [];
-
-      var troupeSeq = lazy(troupes);
-
-      var publicRooms = troupeSeq.filter(function(troupe) {
-          return troupe.sd && troupe.sd.public;
-        })
-        .map(function(f) {
-          return f._id;
-        });
-
-      if (!userId) {
-        return publicRooms.toArray();
-      }
-
-      var privateRoomSeq = troupeSeq.filter(function(troupe) {
-        return troupe.sd && !troupe.sd.public;
-      });
-
-      if (privateRoomSeq.isEmpty()) {
-        return publicRooms.toArray();
-      }
-
-      var explicitAccessPrivateRooms = privateRoomSeq.filter(function(troupe) {
-          if (isInExtraArray(userId, troupe.extraMembers)) return true;
-          if (isInExtraArray(userId, troupe.extraAdmins)) return true;
-
-          return false;
-        })
-        .map(function(f) {
-          return f._id;
-        });
-
-      var memberAccessPrivateRooms = privateRoomSeq.filter(function(troupe) {
-          if (isInExtraArray(userId, troupe.extraMembers)) return false;
-          if (isInExtraArray(userId, troupe.extraAdmins)) return false;
-
-          return true;
-        })
-        .map(function(f) {
-          return f._id;
-        });
-
-      var privatePlusExplicit = publicRooms.concat(explicitAccessPrivateRooms);
-
-      if (memberAccessPrivateRooms.isEmpty()) {
-        return privatePlusExplicit.toArray();
-      }
-
-      return filterPrivateRoomsForUser(groupId, userId, memberAccessPrivateRooms.toArray())
-        .then(function(accessiblePrivateRooms) {
-          return privatePlusExplicit.concat(lazy(accessiblePrivateRooms)).toArray();
-        });
-
-      // Resolve membership in private rooms
-
-    });
-}
-
-/**
- * Given an existing room, ensures that the room has a room
- */
-function ensureGroupForRoom(room, user) {
-  if (room.groupId) {
-    return findById(room.groupId);
-  }
-  var githubType = room.githubType;
-
-  // One-to-one rooms will never have a group
-  if (room.oneToOne || githubType === 'ONETOONE') {
-    return null;
-  }
-
-  var splitUri = room.uri.split('/');
-
-  var groupUri = splitUri[0];
-  var obtainAccessFromGitHubRepo;
-
-  switch(githubType) {
-    case 'REPO':
-      assert.strictEqual(splitUri.length, 2);
-      obtainAccessFromGitHubRepo = room.uri;
-      break;
-
-    case 'REPO_CHANNEL':
-      assert.strictEqual(splitUri.length, 3);
-      obtainAccessFromGitHubRepo = splitUri.slice(0, 2);
-      break;
-
-    case 'ORG':
-      assert.strictEqual(splitUri.length, 1);
-      break;
-
-    case 'USER_CHANNEL':
-    case 'ORG_CHANNEL':
-      assert.strictEqual(splitUri.length, 3);
-      break;
-
-    default:
-      throw new StatusError(500, 'Unknown room type: ' + room.githubType);
-  }
-
-  return findByUri(groupUri)
-    .then(function(group) {
-      if (group) return group;
-
-      return createGroup(user, {
-        type: 'GH_GUESS', // could be a GH_ORG or GH_USER
-        name: groupUri,
-        uri: groupUri,
-        linkPath: groupUri,
-        obtainAccessFromGitHubRepo: obtainAccessFromGitHubRepo
-      });
-    })
-    .tap(function(group) {
-      if (!group) return;
-      var groupId = group._id;
-      room.groupId = groupId;
-
-      return Troupe.update({ _id: room._id }, { $set: { groupId: groupId } })
+  return groupRoomFinder.queryForAccessibleRooms(groupId, userId)
+    .then(function(query) {
+      return Troupe.distinct('_id', query)
         .exec();
-
-      // The room is now part of the group.
-      // TODO: Technically we should issue a live collection update to all the rooms users
-      // but we're going to skip this for now.
     });
 }
 
-/**
- * A user is creating a channel. They need a group
- */
-function ensureGroupForUser(user) {
-  var groupUri = user.username;
-  return findByUri(groupUri)
-    .then(function(group) {
-      if (group) return group;
+function setAvatarForGroup(groupId, url) {
+  var query = { _id: groupId };
 
-      return createGroup(user, {
-        type: 'GH_USER',
-        name: groupUri,
-        uri: groupUri,
-        linkPath: groupUri
-      });
-    });
-  }
+  var update = {
+    $set: {
+      avatarUrl: url
+    },
+    $inc: {
+      avatarVersion: 1
+    }
+  };
+
+  return Group.findOneAndUpdate(query, update).exec();
+}
 
 module.exports = {
   findByUri: Promise.method(findByUri),
@@ -373,10 +228,9 @@ module.exports = {
   findByIds: findByIds,
   createGroup: Promise.method(createGroup),
   findRoomsIdForGroup: Promise.method(findRoomsIdForGroup),
+  setAvatarForGroup: setAvatarForGroup,
   migration: {
     upsertGroup: upsertGroup,
     ensureGroupForGitHubRoomCreation: ensureGroupForGitHubRoomCreation,
-    ensureGroupForRoom: Promise.method(ensureGroupForRoom),
-    ensureGroupForUser: Promise.method(ensureGroupForUser)
   }
 };

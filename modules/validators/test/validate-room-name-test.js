@@ -6,6 +6,7 @@ var assert = require('assert');
 describe('validate-room-name', function() {
 
   var FIXTURES = {
+    'foo': true,
     '321212332-1231223': true,
     'hasunderscoreatend_': true,
     '_underscoreatstart': true,
@@ -17,6 +18,11 @@ describe('validate-room-name', function() {
     '张德江访因展示标语被捕': true,
     'spaces ': false,
     'colons:': false,
+    'topics': false,
+    'archive': false,
+    'has.period': true,
+    'hasperiodatend.': true,
+    '.hasperiodatstart': true
   };
 
   Object.keys(FIXTURES).forEach(function(key) {

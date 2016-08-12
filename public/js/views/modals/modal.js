@@ -35,7 +35,11 @@ var ModalView = Marionette.LayoutView.extend({
   },
 
   serializeData: function() {
-    var menuItems = this.menuItems || this.options.menuItems;
+    var menuItems = this.menuItems || this.options.menuItems || [];
+    if (typeof menuItems === 'function') {
+      menuItems = menuItems.call(this);
+    }
+
     return {
       title: this.options.title,
       modalClassVariation: this.options.modalClassVariation,
@@ -71,6 +75,10 @@ var ModalView = Marionette.LayoutView.extend({
         }
       }, 100);
 
+    }
+    else if(!isCompact()) {
+      // Focus the modal overall so you can start navigating to the controls
+      this.el.focus();
     }
   },
 

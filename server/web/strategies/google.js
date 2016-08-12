@@ -8,6 +8,7 @@ var userService = require('../../services/user-service');
 var trackSignupOrLogin = require('../track-signup-or-login');
 var updateUserLocale = require('../update-user-locale');
 var passportLogin = require('../passport-login');
+var identityService = require('gitter-web-identity');
 
 function googleOauth2Callback(req, accessToken, refreshToken, params, profile, done) {
   var avatar = profile.photos[0].value; // is this always set?
@@ -18,7 +19,7 @@ function googleOauth2Callback(req, accessToken, refreshToken, params, profile, d
     gravatarImageUrl: avatar
   };
   var googleIdentity = {
-    provider: 'google',
+    provider: identityService.GOOGLE_IDENTITY_PROVIDER,
     providerKey: profile.id,
     displayName: profile.displayName,
     email: profile.email,

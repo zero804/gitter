@@ -14,6 +14,7 @@ var exploreService = require('../services/explore-service');
 var suggestionsService = require('../services/suggestions-service');
 var exploreTagUtils = require('../utils/explore-tag-utils');
 var generateExploreSnapshot = require('./snapshots/explore-snapshot');
+var fonts = require('../web/fonts');
 
 var processTagInput = function(input) {
   input = input || '';
@@ -110,6 +111,7 @@ router.get('/tags/:tags',
       var selectedTagMap = exploreTagUtils.getSelectedEntriesInTagMap(tagMap, selectedTagsInput);
 
       var hasSuggestedTag = false;
+
       // Mush into an array of selected tags
       var selectedBackendTags = Object.keys(selectedTagMap).reduce(function(prev, key) {
         // Check for the selected tag for easy reference later
@@ -122,46 +124,26 @@ router.get('/tags/:tags',
         return prev.concat(selectedTagMap[key].tags);
       }, []);
 
+      return Promise.try(function() {
+          if(!hasSuggestedTag || !isLoggedIn) return;
 
-      var getSuggestedRoomsPromise = Promise.resolve()
-        .then(function() {
-          if(hasSuggestedTag && isLoggedIn) {
-            return suggestionsService.findSuggestionsForUserId(user.id)
-              .then(function(suggestedRooms) {
-                suggestedRooms = suggestedRooms || [];
-                suggestedRooms = suggestedRooms.map(function(room) {
-                  room.tags = room.tags || [];
-                  room.tags.push(exploreTagUtils.tagConstants.SUGGESTED_BACKEND_TAG);
-                  return room;
-                });
+          return suggestionsService.findSuggestionsForUserId(user.id)
+            .then(function(suggestedRooms) {
+              if (!suggestedRooms || !suggestedRooms.length) return;
 
-                return suggestedRooms;
-              }, []);
+              return suggestedRooms.map(function(room) {
+                room.tags = room.tags || [];
+                room.tags.push(exploreTagUtils.tagConstants.SUGGESTED_BACKEND_TAG);
+                return room;
+              });
+            });
+        })
+        .then(function(userSuggestions) {
+          if (userSuggestions && userSuggestions.length) {
+            return userSuggestions;
           }
 
-          return [];
-        });
-
-      var getExploreRoomsPromise = getSuggestedRoomsPromise.then(function(suggestedRooms) {
-        if(suggestedRooms.length === 0) {
           return exploreService.fetchByTags(selectedBackendTags);
-        }
-
-        return [];
-      });
-
-
-      var gatherRoomsPromises = [
-        getSuggestedRoomsPromise,
-        getExploreRoomsPromise
-      ];
-
-      return Promise.all(gatherRoomsPromises)
-        .then(function(roomResults) {
-          // Mush the results into one array
-          return roomResults.reduce(function(prev, rooms) {
-            return prev.concat(rooms);
-          }, []);
         })
         .then(function(rooms) {
           var snapshots = generateExploreSnapshot({
@@ -170,15 +152,21 @@ router.get('/tags/:tags',
             selectedTags: selectedTagsInput,
             rooms: rooms
           });
+
           return snapshots;
         })
         .then(function(snapshots) {
+          // Anyone know why we're putting this on the
+          // context? Probably not.
           troupeContext.snapshots = snapshots;
+
           res.render('explore', _.extend({}, snapshots, {
             exploreBaseUrl: req.baseUrl,
             troupeContext: troupeContext,
             isLoggedIn: isLoggedIn,
-            createRoomUrl: urlJoin(clientEnv.basePath, '#createroom')
+            createRoomUrl: urlJoin(clientEnv.basePath, '#createroom'),
+            fonts: fonts.getFonts(),
+            hasCachedFonts: fonts.hasCachedFonts(req.cookies),
           }));
         })
         .catch(next);

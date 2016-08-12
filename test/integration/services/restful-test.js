@@ -5,6 +5,9 @@ var restful = testRequire('./services/restful');
 var userService = testRequire('./services/user-service');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assert = require('assert');
+var env = require('gitter-web-env');
+var nconf = env.config;
+
 
 var counter = 0;
 
@@ -152,8 +155,22 @@ describe('restful #slow', function() {
             id: fixture.group1.id,
             name: fixture.group1.name,
             uri: fixture.group1.uri,
-            avatarUrl: '/api/private/user-avatar/'+fixture.group1.uri+'?s=48',
+            backedBy: {
+              type: null,
+              linkPath: null
+            },
+            avatarUrl: nconf.get('avatar:officialHost') + '/group/i/' + fixture.group1.id,
+            hasAvatarSet: undefined
           }]);
+        });
+    });
+  });
+
+  describe('serializeAdminGroupsForUser', function() {
+    it('should do what it says on the tin', function() {
+      return restful.serializeAdminGroupsForUser(fixture.user1)
+        .then(function(result) {
+          assert.deepEqual(result, []);
         });
     });
   });

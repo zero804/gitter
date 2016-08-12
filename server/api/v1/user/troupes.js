@@ -119,7 +119,8 @@ module.exports = {
           currentUser: req.user,
           includePermissions: true,
           includeProviders: true,
-          includeGroups: true
+          includeGroups: true,
+          includeBackend: true
         });
 
         return restSerializer.serializeObject(troupeId, strategy);
@@ -142,7 +143,13 @@ module.exports = {
    * DELETE /users/:userId/rooms/:roomId
    */
   destroy: function(req) {
-    return roomService.hideRoomFromUser(req.params.userTroupeId, req.user._id);
+    return troupeService.findById(req.params.userTroupeId)
+      .then(function(troupe) {
+        if (!troupe) throw new StatusError(404);
+
+        return roomService.hideRoomFromUser(troupe, req.user._id);
+      });
+
   },
 
   load: function(req, id) {

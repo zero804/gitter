@@ -20,11 +20,17 @@ function findByIdForModel(Model, id, userId) {
     'sd.public': 1,
     'sd.linkPath': 1,
     'sd.externalId': 1,
+    'sd.internalId': 1,
   };
 
   if (userId) {
+    // For legacy reasons, bans hang off the base object (for now)
+    projection['bans'] = {
+      $elemMatch: {
+        userId: userId
+      }
+    };
     // TODO: selectively elemMath var elemMatch = { $elemMatch: { $eq: userId } };
-    // projection.bans = elemMatch; TODO ADD BANS
     projection['sd.extraMembers'] = 1;
     projection['sd.extraAdmins'] = 1;
   }
@@ -32,9 +38,14 @@ function findByIdForModel(Model, id, userId) {
   return Model.findById(id, projection, { lean: true })
     .exec()
     .then(function(doc) {
-      if (!doc) return null; // TODO: throw 404?
-      securityDescriptorValidator(doc.sd);
-      return doc.sd;
+      if (!doc || !doc.sd) return null; // TODO: throw 404?
+      var sd = doc.sd;
+      if (doc.bans) {
+        // Move the bans onto sd
+        sd.bans = doc.bans;
+      }
+      securityDescriptorValidator(sd);
+      return sd;
     });
 }
 
@@ -57,6 +68,7 @@ function insertForModel(Model, id, descriptor) {
     public: descriptor.public,
     linkPath: descriptor.linkPath,
     externalId: descriptor.externalId,
+    internalId: mongoUtils.asObjectID(descriptor.internalId),
   };
 
   var setOperation = {
@@ -133,6 +145,53 @@ function updateLinksForRepo(linkPath, newLinkPath, externalId) {
   return Promise.join(
     Troupe.update(query, update, { multi: true }).exec(),
     Group.update(query, update, { multi: true }).exec());
+
+  // TODO: consider sending live-collection updates
+}
+
+function updatePublicFlagForRepo(linkPath, isPublic) {
+  assert(linkPath, 'linkPath expected');
+  assert(isPublic === true || isPublic === false, 'isPublic must be a boolean');
+
+  var query = {
+    'sd.type': 'GH_REPO',
+    'sd.linkPath': linkPath
+  };
+
+  var update = {
+    $set: {
+      'sd.public': isPublic
+    }
+  };
+
+  return Promise.join(
+    Troupe.update(query, update, { multi: true }).exec(),
+    Group.update(query, update, { multi: true }).exec());
+
+  // TODO: consider sending live-collection updates
+}
+
+function getUsedLinkPathsForModel(Model, type, linkPaths) {
+  var query = {
+    'sd.type': type,
+    'sd.linkPath': {
+      $in: linkPaths
+    }
+  };
+  return Model.distinct('sd.linkPath', query).exec();
+}
+
+function getUsedLinkPaths(type, linkPaths) {
+  return Promise.join(
+    getUsedLinkPathsForModel(Group, type, linkPaths),
+    getUsedLinkPathsForModel(Troupe, type, linkPaths),
+    function(groups, repos) {
+      return groups.concat(repos)
+        .reduce(function(map, linkPath) {
+          map[linkPath] = true;
+          return map;
+        }, {});
+    });
 }
 
 module.exports = {
@@ -141,4 +200,6 @@ module.exports = {
   insertForRoom: insertForRoom,
   insertForGroup: insertForGroup,
   updateLinksForRepo: updateLinksForRepo,
+  updatePublicFlagForRepo: updatePublicFlagForRepo,
+  getUsedLinkPaths: getUsedLinkPaths
 };

@@ -2,6 +2,9 @@
 
 var testRequire = require('../../test-require');
 var assertUtils = require('../../assert-utils')
+var env = require('gitter-web-env');
+var nconf = env.config;
+var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var serialize = testRequire('./serializers/serialize');
 var GithubRepoStrategy = testRequire('./serializers/rest/github-repo-strategy');
@@ -78,6 +81,7 @@ describe('GithubRepoStrategy', function() {
             id: t.id,
             name: t.uri,
             topic: '',
+            avatarUrl:  nconf.get('avatar:officialHost') + '/gh/u/' + getOrgNameFromUri(t.uri),
             uri: t.uri,
             // NOTE: Why false here, but undefined in troupe-strategy-test.js?
             // Probably because it is being loaded from the database by
@@ -89,6 +93,7 @@ describe('GithubRepoStrategy', function() {
             githubType: 'REPO',
             security: 'PUBLIC',
             noindex: false,
+            public: true,
             v: 1
           },
           exists: true,
@@ -97,4 +102,3 @@ describe('GithubRepoStrategy', function() {
       });
   });
 });
-

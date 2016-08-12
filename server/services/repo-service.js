@@ -1,10 +1,9 @@
 "use strict";
 
-var env = require('gitter-web-env');
-var winston = env.logger;
-var GithubRepo = require('gitter-web-github').GitHubRepoService;
-var persistence = require('gitter-web-persistence');
 var Promise = require('bluebird');
+var GithubRepo = require('gitter-web-github').GitHubRepoService;
+var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
+var isGitHubUser = require('gitter-web-identity/lib/is-github-user');
 
 function applyFilters(array, filters) {
   // Filter out what needs filtering out
@@ -20,6 +19,11 @@ function applyFilters(array, filters) {
 function getReposForUser(user, options) {
   if(!options) options = {};
   var adminAccessOnly = 'adminAccessOnly' in options ? options.adminAccessOnly : false;
+
+  // TODO: Move this (saving Twitter users from 401 signout (see badCredentialsCheck))
+  if(!isGitHubUser(user)) {
+    return Promise.resolve([]);
+  }
 
   var ghRepo = new GithubRepo(user);
 
@@ -38,90 +42,35 @@ function getReposForUser(user, options) {
       return filteredUserRepos;
     });
 }
-exports.getReposForUser = getReposForUser;
 
-function createRegExpsForQuery(queryText) {
-  var normalized = ("" + queryText).trim().toLowerCase();
-  var parts = normalized.split(/[\s\'']+/)
-                        .filter(function(s) { return !!s; })
-                        .filter(function(s, index) { return index < 10; });
+/**
+ * Gets a list of repos for a user that aren't being used by a group or a room
+ * yet.
+ * @returns The promise of a list of repos for the user
+ */
+function getUnusedReposForUser(user, options) {
+  options = options || {};
 
-  return parts.map(function(i) {
-    return new RegExp("\\b" + i.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&"));
-  });
-}
-
-
-function findPublicReposWithRoom(user, query, options) {
-  if(!options) options = {};
-
-  var ghRepo = new GithubRepo(user);
-
-  var filters = createRegExpsForQuery(query);
-  if(!filters.length) return Promise.resolve([]);
-
-  // TODO: switch to `permissions`
-  return persistence.Troupe
-    .find({
-      $and: filters.map(function(re) {
-        return { lcUri: re };
-      }),
-      githubType: 'REPO',
-      security: 'PUBLIC'
+  return getReposForUser(user, options)
+    .bind({
+      repos: null
     })
-    .limit(options.limit || 20)
-    .exec()
-    .then(function(troupes) {
-      return Promise.map(troupes, function(troupe) {
-        if(troupe.security === 'PUBLIC') {
-          return troupe;
-        }
-        if(troupe.security) return null;
+    .then(function(repos) {
+      this.repos = repos;
 
-        return ghRepo.getRepo(troupe.uri)
-          .then(function(repo) {
-            if(!repo) return null;
-
-            if(repo.private) {
-              return null;
-            }
-
-            return troupe;
-          });
+      var linkPaths = repos.map(function(repo) {
+        return repo.full_name;
       });
+      return securityDescriptorService.getUsedLinkPaths('GH_REPO', linkPaths);
     })
-    .then(function(troupes) {
-      return troupes.filter(function(f) { return !!f; });
-    });
-}
-
-exports.findPublicReposWithRoom = findPublicReposWithRoom;
-
-
-function findReposByUris(uris) {
-  if(uris.length === 0) return Promise.resolve([]);
-
-  uris = uris.map(function(r) {
-    return r && r.toLowerCase();
-  });
-
-  winston.info("Querying findReposByUris for " + uris.length + " repositories");
-  return persistence.Troupe.find({
-      githubType: 'REPO',
-      lcUri: { $in: uris }
-    }, {
-      uri: 1,
-      githubId: 1,
-      security: 1
-    })
-    .exec()
-    .then(function(troupes) {
-      return troupes.map(function(t) {
-        return {
-          full_name: t.uri,
-          private: t.security === 'PRIVATE'
-        };
+    .then(function(usedLinkPaths) {
+      return this.repos.filter(function(repo) {
+        return !usedLinkPaths[repo.full_name];
       });
     });
 }
-exports.findReposByUris = findReposByUris;
+
+module.exports = {
+  getReposForUser: Promise.method(getReposForUser),
+  getUnusedReposForUser: Promise.method(getUnusedReposForUser)
+};

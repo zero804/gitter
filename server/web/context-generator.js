@@ -26,7 +26,7 @@ function generateNonChatContext(req) {
     ])
     .spread(function (reqContextHash, serializedUser, serializedTroupe, settings) {
       var suggestedRoomsHidden = settings && settings.suggestedRoomsHidden;
-      var leftRoomMenuState = settings && settings.leftRoomMenuState;
+      var leftRoomMenuState = settings && settings.leftRoomMenu;
 
       return _.extend({}, reqContextHash, {
         roomMember: roomMember,
@@ -109,7 +109,8 @@ function serializeTroupeId(troupeId, user) {
     includePermissions: true,
     includeOwner: true,
     includeProviders: true,
-    includeGroups: true
+    includeGroups: true,
+    includeBackend: true
   });
 
   return restSerializer.serializeObject(troupeId, strategy);
@@ -122,7 +123,8 @@ function serializeTroupe(troupe, user) {
     includePermissions: true,
     includeOwner: true,
     includeProviders: true,
-    includeGroups: true
+    includeGroups: true,
+    includeBackend: true
   });
 
   return restSerializer.serializeObject(troupe, strategy);

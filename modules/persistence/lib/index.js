@@ -1,7 +1,7 @@
 "use strict";
 
 var env = require('gitter-web-env');
-var winston = env.logger;
+var logger = env.logger.get('persistence');
 var errorReporter = env.errorReporter;
 var mongoose = require('gitter-web-mongoose-bluebird');
 var debug = require('debug')('gitter:infra:persistence-service');
@@ -25,7 +25,7 @@ mongoDebug.install(mongoose.mongo, {
 });
 
 connection.on('error', function(err) {
-  winston.info("MongoDB connection error", { exception: err });
+  logger.info("MongoDB connection error", { exception: err });
   errorReporter(err, { connection_error: true }, { module: 'persistence' });
 });
 
@@ -66,4 +66,5 @@ module.exports = createExports({
   Subscription: require('./schemas/subscription-schema'),
   FeatureToggle: require('./schemas/feature-toggle-schema'),
   TroupeRemovedUser: require('./schemas/troupe-removed-user-schema'),
+  TroupeInvite: require('./schemas/troupe-invite-schema'),
 });

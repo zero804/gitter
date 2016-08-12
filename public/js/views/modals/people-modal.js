@@ -40,11 +40,13 @@ var UserCollection = Backbone.Collection.extend({
   fetchWithLimit: function() {
     var self = this;
 
+    var data = { limit: this.limit };
+    if (this.searchTerm) {
+      data.q = this.searchTerm;
+    }
+
     this.fetch({
-      data: {
-        limit: this.limit,
-        q: this.searchTerm
-      },
+      data: data,
       success: function() {
         self.isFetched = true;
       }

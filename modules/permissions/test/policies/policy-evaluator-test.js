@@ -4,6 +4,7 @@ var assert = require('assert');
 var Promise = require('bluebird');
 var proxyquireNoCallThru = require("proxyquire").noCallThru();
 var PolicyDelegateTransportError = require('../../lib/policies/policy-delegate-transport-error');
+var ObjectID = require('mongodb').ObjectID;
 
 function getName(meta, index) {
   if (meta.name) {
@@ -76,7 +77,8 @@ var FIXTURES = [{
   write: false,
   join: false,
   admin: false,
-  addUser: false
+  addUser: false,
+  handleReadAccessFailure: true
 }, {
   name: 'Authed user accessing INVITE/MANUAL room, not in room',
   inRoom: true,
@@ -263,7 +265,8 @@ var FIXTURES = [{
   expectedPolicy2: 'Y',
   expectedPolicyResult2: 'throw',
   public: true,
-  read: true
+  read: true,
+  inRoom: false,
 }, {
   name: 'Authed user accessing X/Y public room, without recent success and with backend fail',
   hasPolicyDelegate: true,
@@ -276,13 +279,96 @@ var FIXTURES = [{
   expectedPolicy2: 'Y',
   expectedPolicyResult2: 'throw',
   public: false,
-  read: false
+  read: false,
+  handleReadAccessFailure: true
 }, {
   name: 'Authed user accessing X/Y room, without policy delegate',
   hasPolicyDelegate: false,
   membersPolicy: 'X',
   adminPolicy: 'Y',
-  read: false
+  read: false,
+  handleReadAccessFailure: true
+}, {
+  name: 'Authed user in private room, backend failed without recent success, should not be removed from room',
+  hasPolicyDelegate: true,
+  recentSuccess: false,
+  expectRecordSuccessfulCheck: false,
+  membersPolicy: 'X',
+  adminPolicy: 'Y',
+  expectedPolicy1: 'X',
+  expectedPolicyResult1: 'throw',
+  expectedPolicy2: 'Y',
+  expectedPolicyResult2: 'throw',
+  public: false,
+  read: true,
+  handleReadAccessFailure: false,
+  didRemoveUserFromRoom: false,
+  inRoom: true
+}, {
+  name: 'Authed user in private room, access denied, should be removed from room',
+  hasPolicyDelegate: true,
+  recentSuccess: false,
+  expectRecordSuccessfulCheck: false,
+  membersPolicy: 'X',
+  adminPolicy: 'Y',
+  expectedPolicy1: 'X',
+  expectedPolicyResult1: false,
+  expectedPolicy2: 'Y',
+  expectedPolicyResult2: false,
+  public: false,
+  read: false,
+  handleReadAccessFailure: true,
+  removeUserFromRoom: true,
+  inRoom: true
+}, {
+  name: 'An org admin cannot access an INVITE only room',
+  inRoom: false,
+  membersPolicy: 'INVITE',
+  adminPolicy: 'X',
+  hasPolicyDelegate: true,
+  isInExtraMembers: false,
+  isInExtraAdmins: false,
+  expectedPolicy1: 'X',
+  expectedPolicyResult1: true,
+  read: false,
+  write: false,
+  join: false,
+  admin: false,
+  addUser: false,
+  handleReadAccessFailure: true,
+}, {
+  name: 'An org admin in an INVITE only room is an admin of the room',
+  inRoom: true,
+  hasPolicyDelegate: true,
+  recentSuccess: false,
+  expectRecordSuccessfulCheck: true,
+  membersPolicy: 'INVITE',
+  adminPolicy: 'X',
+  isInExtraMembers: false,
+  isInExtraAdmins: false,
+  expectedPolicy1: 'X',
+  expectedPolicyResult1: true,
+  read: true,
+  write: true,
+  join: true,
+  admin: true,
+  addUser: true
+}, {
+  name: 'An non-org-admin in an INVITE only room is not an admin of the room',
+  inRoom: true,
+  hasPolicyDelegate: true,
+  recentSuccess: false,
+  membersPolicy: 'INVITE',
+  adminPolicy: 'X',
+  isInExtraMembers: false,
+  isInExtraAdmins: false,
+  expectedPolicy1: 'X',
+  expectedPolicyResult1: false,
+  read: true,
+  write: true,
+  join: true,
+  admin: false,
+  addUser: true
 }];
 
 describe('policy-evaluator', function () {
@@ -326,22 +412,33 @@ describe('policy-evaluator', function () {
         recordSuccessfulCheckCount: 0
       }
 
+      var didCallHandleReadAccessFailure = 0;
+      var didRemoveUserFromRoom = false;
+
       var PolicyEvaluator = proxyquireNoCallThru('../../lib/policies/policy-evaluator', {
         './policy-check-rate-limiter': stubRateLimiter
       });
 
-      var userId = meta.anonymous ? null : 'user1';
+      var userId = meta.anonymous ? null : new ObjectID(1);
 
-      var contextDelegate = {
-        isMember: Promise.method(function (_userId) {
-          if (!userId) {
-            assert.ok(false, 'Unexpected contextDelegate call');
-          }
+      var contextDelegate;
 
-          assert.strictEqual(_userId, userId);
-          return meta.inRoom;
-        })
-      };
+      // Only real users have a context delegate
+      if (userId) {
+        contextDelegate = {
+          isMember: Promise.method(function() {
+            return meta.inRoom;
+          }),
+
+          handleReadAccessFailure: Promise.method(function() {
+            assert(meta.handleReadAccessFailure, 'Unexpected call to handleReadAccessFailure');
+            didCallHandleReadAccessFailure++;
+            if (meta.inRoom) {
+              didRemoveUserFromRoom = true;
+            }
+          })
+        };
+      }
 
       var securityDescriptor = {
         members: meta.membersPolicy,
@@ -427,6 +524,12 @@ describe('policy-evaluator', function () {
           if (meta.expectRecordSuccessfulCheck) {
             assert(stubRateLimiter.recordSuccessfulCheckCount > 0);
           }
+
+          if (meta.handleReadAccessFailure) {
+            assert(didCallHandleReadAccessFailure > 0);
+          }
+
+          assert.strictEqual(didRemoveUserFromRoom, !!meta.removeUserFromRoom);
         });
     });
   })

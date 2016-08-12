@@ -180,6 +180,7 @@ function addRoomMember(troupeId, userId, flags, groupId) {
     })
     .then(function(alreadyInGroup) {
       this.alreadyInGroup = alreadyInGroup;
+      debug("Is member %s already in group %s? %s", userId, groupId, alreadyInGroup);
 
       return TroupeUser.findOneAndUpdate({
           troupeId: troupeId,
@@ -309,7 +310,7 @@ function removeRoomMembers(troupeId, userIds, groupId) {
           roomMembershipEvents.emit("group.members.removed", groupId, usersNoLongerInGroup);
         }
       }
-      
+
       // Async record the remove user
       removedUsers.addRemovedUsers(troupeId, userIds)
         .catch(function(err) {
@@ -681,6 +682,7 @@ function updateRoomMembershipFlagsForUser(userId, newFlags, overrideAll) {
     });
 }
 
+
 /* Exports */
 exports.findRoomIdsForUser = findRoomIdsForUser;
 exports.findRoomIdsForUserWithLurk = findRoomIdsForUserWithLurk;
@@ -709,6 +711,7 @@ exports.findMembershipModeForUsersInRoom = findMembershipModeForUsersInRoom;
 exports.findMembersForRoomForNotify = findMembersForRoomForNotify;
 exports.findMembersForRoomWithFlags = findMembersForRoomWithFlags;
 exports.updateRoomMembershipFlagsForUser = updateRoomMembershipFlagsForUser;
+
 
 /* Event emitter */
 exports.events = roomMembershipEvents;

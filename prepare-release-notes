@@ -1,0 +1,32 @@
+#!/bin/bash
+
+set -euo pipefail
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+PRS=$(${SCRIPT_DIR}/build-scripts/list-pr-differences master..HEAD)
+
+echo "| PR | Title | Author | Changes | Changed Files |"
+echo "|----|-------|--------|---------|---------------|"
+for i in ${PRS}; do
+  PR_BODY=$(curl --silent -n https://api.github.com/repos/troupe/gitter-webapp/pulls/$i)
+  title=$(echo ${PR_BODY} | jq '.title' | cut -d\" -f2)
+  user=$(echo ${PR_BODY} | jq '.user.login' | cut -d\" -f2)
+  additions=$(echo ${PR_BODY} | jq '.additions')
+  deletions=$(echo ${PR_BODY} | jq '.deletions')
+  changed_files=$(echo ${PR_BODY} | jq '.changed_files')
+  echo "| #${i} | $title | @${user} | +${additions} -${deletions} | ${changed_files} |"
+done
+
+echo '
+
+## Summary of Commits'
+
+echo '```'
+git summary master..HEAD
+echo '```
+
+## Summary of all-time commits, by number of lines committed
+```'
+#git summary --line
+echo '```'

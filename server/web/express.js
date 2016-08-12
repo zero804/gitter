@@ -12,8 +12,20 @@ var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var methodOverride = require('method-override');
 var session = require('express-session');
-var devMode = config.get('dev-mode');
 var appTag = require('./app-tag');
+
+
+/**
+ * Only serve static assets in dev mode,
+ * when we don't have a CDN
+ */
+function shouldServeStaticAssets() {
+  if (process.env.SERVE_STATIC_ASSETS) return true;
+  if (!config.get('dev-mode')) return false;
+  if (config.get('cdn:use')) return false;
+
+  return true;
+}
 
 // Naughty naughty naught, install some extra methods on the express prototype
 require('./http');
@@ -74,7 +86,7 @@ module.exports = {
       app.enable('view cache');
     }
 
-    if(devMode) {
+    if(shouldServeStaticAssets()) {
       /* Serve static content */
       require('./express-static').install(app);
     }

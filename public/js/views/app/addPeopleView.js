@@ -12,6 +12,14 @@ var Typeahead = require('views/controls/typeahead');
 var userSearchModels = require('collections/user-search');
 require('views/behaviors/widgets');
 
+var DEFAULT_AVATAR_UNTIL_AVATARS_SERVICE_ARRIVES = 'https://avatars.githubusercontent.com/u/0'
+/**
+ *  Ridiculously sloppy regexp based email validator, let the server
+ *  do the real validation
+ */
+function isEmailAddress(string) {
+  return /^[^@]+@[^@]+\.[^@]+$/.test(string);
+}
 
 var RowView = Marionette.ItemView.extend({
   events: {
@@ -36,13 +44,7 @@ var RowView = Marionette.ItemView.extend({
 
     var self = this;
 
-    var data = {
-      username: this.model.get('username'),
-      email: email,
-      roomId: context.getTroupeId()
-    };
-
-    apiClient.priv.post('/invite-user', data)
+    apiClient.room.post('/invites', { githubUsername: this.model.get('username'), email: email })
       .then(function() {
         model.set({
           email: email,
@@ -94,12 +96,6 @@ var View = Marionette.CompositeView.extend({
   selected: function (m) {
     this.addUserToRoom(m);
     this.typeahead.dropdown.hide();
-  },
-
-  strTemplate: function (str, o) {
-    return str.replace(/{{([a-z_$]+)}}/gi, function (m, k) { // jshint unused:true
-        return (typeof o[k] !== 'undefined' ? o[k] : '');
-    });
   },
 
   billingUrl: function() {
@@ -157,36 +153,63 @@ var View = Marionette.CompositeView.extend({
    *
    * m    BackboneModel - the user to be added to the room
    */
-  addUserToRoom: function (m) {
+  addUserToRoom: function (model) {
     var self = this;
 
     self.ui.loading.toggleClass('hide');
+    var username = model.get('username');
+    var email = model.get('email');
+    var body;
+    if (username) {
+      body = { githubUsername: username };
+    } else if (email) {
+      body = { email: email };
+    }
 
-    apiClient.room.post('/users', { username: m.get('username') })
-      .then(function(res) {
+    return apiClient.room.post('/invites', body)
+      .then(function(invite) {
         self.ui.loading.toggleClass('hide');
-        var user = res.user;
-        m.set({
-          added: !user.invited,
-          invited: user.invited && user.email,
-          unreachable: user.invited && !user.email,
+        model.set({
+          added: invite.status === 'added',
+          invited: invite.status === 'invited',
+          unreachable: false,
           timeAdded: Date.now(),
-          email: user.email,
-          user: user,
-          username: user.username
+          email: invite.email,
+          user: invite.user,
+          username: invite.user && invite.user.username
         });
 
-        self.collection.add(m);
+        self.collection.add(model);
         self.typeahead.clear();
       })
-      .catch(function (e) {
+      .catch(function(e) {
         self.ui.loading.toggleClass('hide');
-        var m = e.friendlyMessage || 'Error';
+        var message = e.friendlyMessage || 'Error';
 
         // XXX: why not use the payment required status code for this?
-        if (m.match(/has reached its limit/)) self.dialog.showPremium();
-        self.showValidationMessage(m);
+        if (message.match(/has reached its limit/)) {
+          self.dialog.showPremium();
+        }
+
         self.typeahead.clear();
+        switch(e.status) {
+          case 409:
+            message = model.get('username') + ' has already been invited';
+            break;
+          case 428:
+            model.set({
+              added: false,
+              invited: false,
+              unreachable: true,
+              timeAdded: Date.now(),
+              email: null,
+              user: null,
+            });
+            self.collection.add(model);
+            return;
+        }
+
+        self.showValidationMessage(message);
       });
   },
 
@@ -209,6 +232,24 @@ var View = Marionette.CompositeView.extend({
           return displayName && displayName.indexOf(input) >= 0 ||
                  username && username.indexOf(input) >= 0;
         };
+      },
+      fetch: function(input, collection, fetchSuccess) {
+        if (input.indexOf('@') >= 0) {
+          if (isEmailAddress(input)) {
+            this.collection.reset([{
+              displayName: input,
+              email: input,
+              avatarUrlSmall: DEFAULT_AVATAR_UNTIL_AVATARS_SERVICE_ARRIVES,
+              avatarUrlMedium: DEFAULT_AVATAR_UNTIL_AVATARS_SERVICE_ARRIVES
+            }]);
+          } else {
+            this.collection.reset([]);
+          }
+
+          return fetchSuccess();
+        }
+
+        this.collection.fetch({ data: { q: input }}, { add: true, remove: true, merge: true, success: fetchSuccess });
       }
     });
 

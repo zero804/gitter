@@ -1,8 +1,10 @@
-<html>
+<html class="{{#if hasCachedFonts}}fonts-loaded{{/if}}">
   <head>
+	  <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {{> fonts}}
     <link rel='stylesheet' type='text/css' href="{{ cdn 'styles/org-page.css' }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/octicons/2.0.2/octicons.min.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
 
   <body>
@@ -11,16 +13,16 @@
 
       <div class="org-page__org">
         <div class="org-page__org-logo">
-          <img width='64' height='64' src='https://avatars.githubusercontent.com/{{ org.login }}?s=128'>
+          <img {{{ avatarSrcSet group.avatarUrl 64 }}}>
         </div>
 
         <div class="org-page__org-details">
           <div class="org-page__name">
-            <h1>{{ org.login }}</h1>
+            <h1>{{ group.uri }}</h1>
           </div>
 
           <div class="org-page__description">
-            {{org.description}}
+            {{ group.description }}
           </div>
         </div>
 
@@ -32,7 +34,7 @@
         </div>
         {{else}}
           <div class="org-page__login">
-            Are you a member of {{ org.login }}?  <a class="btn secondary orange sorg-page__login__btn" href="/login?action=login&source=orgpage" target="_parent">Sign in</a>
+            Are you a member of {{ group.uri }}?  <a class="btn secondary orange sorg-page__login__btn" href="/login?action=login&source=orgpage" target="_parent">Sign in</a>
           </div>
         {{/if}}
       </div>
@@ -48,6 +50,7 @@
           {{orgUserCount}} {{pluralize orgUserCount 'Person' 'People' }}
         </div>
 
+        {{!--
         {{#if org.location}}
           <div class="org-page__detail"><i class="octicon octicon-location"></i> {{org.location}}</div>
         {{/if}}
@@ -55,6 +58,8 @@
         {{#if org.blog}}
           <div class="org-page__detail"><i class="octicon octicon-link"></i><a href="{{org.blog}}" target="_blank"> {{org.blog}}</a></div>
         {{/if}}
+        --}}
+
       </div>
     </header>
 
@@ -69,7 +74,7 @@
       {{/each}}
     </div>
 
-
+    {{#paginate pagination type="required"}}
     <div class='org-page__pagination'>
       <div class="pagination">
         <ul>
@@ -91,6 +96,8 @@
         </ul>
       </div>
     </div>
+    {{/paginate}}
+
 
     {{{ generateTroupeContext troupeContext }}}
     {{{ bootScript 'router-org-page' }}}

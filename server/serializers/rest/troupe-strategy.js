@@ -1,11 +1,13 @@
-/* eslint complexity: ["error", 16] */
+/* eslint complexity: ["error", 20] */
 "use strict";
 
+var Promise = require('bluebird');
 var debug = require('debug')('gitter:infra:serializer:troupe');
 var getVersion = require('../get-model-version');
 var UserIdStrategy = require('./user-id-strategy');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
-var Promise = require('bluebird');
+var avatars = require('gitter-web-avatars');
+var getRoomNameFromTroupeName = require('gitter-web-shared/get-room-name-from-troupe-name');
 
 var AllUnreadItemCountStrategy = require('./troupes/all-unread-item-count-strategy');
 var FavouriteTroupesForUserStrategy = require('./troupes/favourite-troupes-for-user-strategy');
@@ -14,9 +16,25 @@ var LurkAndActivityForUserStrategy = require('./troupes/lurk-and-activity-for-us
 var ProOrgStrategy = require('./troupes/pro-org-strategy');
 var RoomMembershipStrategy = require('./troupes/room-membership-strategy');
 var TagsStrategy = require('./troupes/tags-strategy');
-var TroupeOwnerIsOrgStrategy = require('./troupes/troupe-owner-is-org-strategy');
 var TroupePermissionsStrategy = require('./troupes/troupe-permissions-strategy');
 var GroupIdStrategy = require('./group-id-strategy');
+var TroupeBackendStrategy = require('./troupes/troupe-backend-strategy');
+
+
+function getAvatarUrlForTroupe(serializedTroupe, options) {
+  if (serializedTroupe.oneToOne && options && options.user) {
+    return avatars.getForUser(options.user);
+  }
+  else if(serializedTroupe.oneToOne && (!options || !options.user)) {
+    return avatars.getForRoomUri(options.name);
+  }
+  else if (options && options.group) {
+    return options.group.avatarUrl || avatars.getForGroup(options.group);
+  }
+  else {
+    return avatars.getForRoomUri(serializedTroupe.uri);
+  }
+}
 
 /**
  * Given the currentUser and a sequence of troupes
@@ -38,6 +56,69 @@ function oneToOneOtherUserSequence(currentUserId, troupes) {
     });
 }
 
+/** Best guess efforts */
+function guessLegacyGitHubType(item) {
+  if (item.githubType) {
+    return item.githubType;
+  }
+
+  if (item.oneToOne) {
+    return 'ONETOONE';
+  }
+
+  if (!item.sd) return 'REPO_CHANNEL'; // Could we do better?
+
+  var linkPath = item.sd.linkPath;
+
+  switch(item.sd.type) {
+    case 'GH_REPO':
+      if (item.uri === linkPath) {
+        return 'REPO';
+      } else {
+        return 'REPO_CHANNEL';
+      }
+      /* break */
+
+    case 'GH_ORG':
+      if (item.uri === linkPath) {
+        return 'REPO';
+      } else {
+        return 'REPO_CHANNEL';
+      }
+      /* break */
+
+    case 'GH_USER':
+      return 'USER_CHANNEL';
+  }
+
+  return 'REPO_CHANNEL';
+}
+
+/** Best guess efforts */
+function guessLegacySecurity(item) {
+  if (item.security) {
+    return item.security;
+  }
+
+  // One-to-one rooms in legacy had security=null
+  if (item.oneToOne) {
+    return undefined;
+  }
+
+  if (item.sd.public) {
+    return 'PUBLIC';
+  }
+
+  var type = item.sd.type;
+  if (type === 'GH_REPO' || type === 'GH_ORG') {
+    if (item.sd.linkPath && item.sd.linkPath !== item.uri) {
+      return 'INHERITED';
+    }
+  }
+
+  return 'PRIVATE';
+}
+
 function TroupeStrategy(options) {
   if (!options) options = {};
 
@@ -51,9 +132,9 @@ function TroupeStrategy(options) {
   var userIdStrategy;
   var proOrgStrategy;
   var permissionsStrategy;
-  var ownerIsOrgStrategy;
   var roomMembershipStrategy;
   var groupIdStrategy;
+  var backendStrategy;
 
   this.preload = function(items) { // eslint-disable-line max-statements
     if (items.isEmpty()) return;
@@ -107,28 +188,26 @@ function TroupeStrategy(options) {
       strategies.push(permissionsStrategy.preload(items));
     }
 
-    // Include the owner
-    if (options.includeOwner) {
-      ownerIsOrgStrategy = new TroupeOwnerIsOrgStrategy(options);
-      strategies.push(ownerIsOrgStrategy.preload(items));
-    }
-
     // Include the tags
     if (options.includeTags) {
       tagsStrategy = new TagsStrategy(options);
       strategies.push(tagsStrategy.preload(items));
     }
 
-    if (options.includeGroups) {
-      groupIdStrategy = new GroupIdStrategy(options);
-      var groupIds = items.map(function(troupe) {
-          return troupe.groupId;
-        })
-        .filter(function(f) {
-          return !!f;
-        });
+    groupIdStrategy = new GroupIdStrategy(options);
+    var groupIds = items.map(function(troupe) {
+        return troupe.groupId;
+      })
+      .filter(function(f) {
+        return !!f;
+      });
 
-      strategies.push(groupIdStrategy.preload(groupIds));
+    strategies.push(groupIdStrategy.preload(groupIds));
+
+
+    if (options.includeBackend) {
+      backendStrategy = new TroupeBackendStrategy();
+      // Backend strategy needs no mapping stage
     }
 
     return Promise.all(strategies)
@@ -177,6 +256,8 @@ function TroupeStrategy(options) {
   this.map = function(item) {
     var isPro = proOrgStrategy.map(item);
 
+    var group = groupIdStrategy && item.groupId ? groupIdStrategy.map(item.groupId) : undefined;
+
     var troupeName, troupeUrl;
     if (item.oneToOne) {
       var otherUser = resolveOneToOneOtherUser(item);
@@ -187,9 +268,16 @@ function TroupeStrategy(options) {
         return null;
       }
     } else {
-      troupeName = item.uri;
+      var roomName = getRoomNameFromTroupeName(item.uri);
+      troupeName = group ? group.name + '/' + getRoomNameFromTroupeName(item.uri) : item.uri;
+      if(roomName === item.uri) {
+        troupeName = group ? group.name : item.uri;
+      }
+
       troupeUrl = "/" + item.uri;
     }
+
+
 
     var unreadCounts = unreadItemStrategy && unreadItemStrategy.map(item.id);
     var providers = resolveProviders(item);
@@ -204,10 +292,25 @@ function TroupeStrategy(options) {
       }
     }
 
+    var isPublic;
+    if (item.oneToOne) {
+      // Double-check here
+      isPublic = false;
+    } else {
+      isPublic = item.sd.public;
+    }
+
+    var avatarUrl = getAvatarUrlForTroupe(item, {
+      name: troupeName,
+      group: group,
+      user: otherUser
+    });
+
     return {
       id: item.id || item._id,
       name: troupeName,
       topic: item.topic,
+      avatarUrl: avatarUrl,
       uri: item.uri,
       oneToOne: item.oneToOne,
       userCount: item.userCount,
@@ -219,17 +322,18 @@ function TroupeStrategy(options) {
       lurk: isLurking,
       activity: hasActivity,
       url: troupeUrl,
-      githubType: item.githubType,
-      security: item.security,
+      githubType: guessLegacyGitHubType(item),
+      security: guessLegacySecurity(item),
       premium: isPro,
       noindex: item.noindex,
       tags: tagsStrategy ? tagsStrategy.map(item) : undefined,
       providers: providers,
       permissions: permissionsStrategy ? permissionsStrategy.map(item) : undefined,
-      ownerIsOrg: ownerIsOrgStrategy ? ownerIsOrgStrategy.map(item) : undefined, // TODO: remove this once groups are in place
       roomMember: roomMembershipStrategy ? roomMembershipStrategy.map(item.id) : undefined,
-      group: groupIdStrategy && item.groupId ? groupIdStrategy.map(item.groupId) : undefined,
-      groupId: item.groupId || undefined,
+      groupId: item.groupId,
+      group: options.includeGroups ? group : undefined,
+      backend: backendStrategy ? backendStrategy.map(item) : undefined,
+      public: isPublic,
       v: getVersion(item)
     };
   };

@@ -16,7 +16,7 @@ module.exports = {
       });
   },
 
-  create: function(req) {
+  create: function(req, res) {
     return loadTroupeFromParam(req)
       .then(function(troupe) {
         var roomWithPolicyService = new RoomWithPolicyService(troupe, req.user, req.userRoomPolicy);
@@ -26,6 +26,13 @@ module.exports = {
         return roomWithPolicyService.banUserFromRoom(username, { removeMessages: removeMessages });
       })
       .then(function(ban) {
+        if (!ban) {
+          res.status(202);
+          return {
+            removed: true
+          };
+        }
+
         var strategy = new restSerializer.TroupeBanStrategy({ });
         return restSerializer.serializeObject(ban, strategy);
       });
