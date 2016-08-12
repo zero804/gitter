@@ -13,9 +13,6 @@ module.exports = function getFakeTopicsList(){
   if(!topics) {
     topics = _.range(getRandomInt(3, 10)).map(function(val){
 
-      var title = faker.commerce.productName();
-      var titleHTML = '<h1>' + title + '</h1>';
-
       var body = faker.hacker.phrase();
       var bodyHTML = '<p>' + body + '</p>';
 
@@ -27,7 +24,7 @@ module.exports = function getFakeTopicsList(){
 
       var topic = {
         id: val,
-        title: { text: title, html: titleHTML },
+        title: faker.commerce.productName(),
         body: { text: body, html: bodyHTML},
         repliesTotal: replies.length,
         replies: replies,

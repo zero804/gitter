@@ -34,4 +34,10 @@ describe('App', function(){
     assert.equal(wrapper.find('TopicContainer').length, 1);
   });
 
+  it('should provide a topicStore in the topic route', () => {
+    var route = new Backbone.Model({ route: 'topic', groupName: 'gitterHQ' });
+    const wrapper = shallow(<App router={route} />);
+    assert(wrapper.state('topicsStore'));
+  });
+
 });

@@ -10,7 +10,7 @@ describe('<TopicHeader/>', () => {
   let wrapper;
 
   beforeEach(() => {
-    wrapper = shallow(<TopicHeader/>);
+    wrapper = shallow(<TopicHeader topic={{ title: 'test' }}/>);
   });
 
   it('should render a continer element', () => {
@@ -22,7 +22,11 @@ describe('<TopicHeader/>', () => {
   });
 
   it('should render a header', () => {
-      equal(wrapper.find('header').length, 1);
+    equal(wrapper.find('header').length, 1);
+  });
+
+  it('should render a H1', () => {
+    equal(wrapper.find('H1').length, 1);
   });
 
 });

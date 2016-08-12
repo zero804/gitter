@@ -72,8 +72,15 @@ module.exports = React.createClass({
 
   getTopicState(){
     const { router } = this.props;
+
+    const topicsStore = (window.context.topicsStore || {});
+    const topic = (window.context.topic || {});
+    const topicId = topic.id;
+
     return Object.assign(this.getDefaultState(), {
       groupName: router.get('groupName'),
+      topicsStore: new TopicsStore(topicsStore.models, { router: router }),
+      topicId: topicId,
     });
   },
 

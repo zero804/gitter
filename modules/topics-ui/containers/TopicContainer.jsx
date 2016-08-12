@@ -6,11 +6,29 @@ import TopicHeader from '../shared/components/topic/topic-header.jsx';
 module.exports = createClass({
 
   displayName: 'TopicContainer',
-  propTypes: {},
+  propTypes: {
+
+    topicId: PropTypes.string.isRequired,
+
+    topicsStore: PropTypes.shape({
+      models: PropTypes.array.isRequired,
+      getTopic: PropTypes.func.isRequired,
+    }).isRequired,
+  },
+
+  getInitialState(){
+    const { topicsStore, topicId } = this.props;
+    return {
+      topic: topicsStore.getById(topicId)
+    }
+  },
 
   render(){
+
+    const { topic } = this.state;
+
     return (
-      <TopicHeader />
+      <TopicHeader topic={topic}/>
     );
   }
 });
