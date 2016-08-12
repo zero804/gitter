@@ -20,7 +20,7 @@ var debug = require('debug')('gitter:app:group-creation-service');
  * @return inviteReport
  */
 var sendInvitesForRoom = Promise.method(function(user, room, invites) {
-  if (!invites || !invites.length) return;
+  if (!invites || !invites.length) return [];
 
   // Invite all the users
   return policyFactory.createPolicyForRoomId(user, room._id)
@@ -46,8 +46,6 @@ var sendTweetsForRoom = Promise.method(function(user, group, room, twitterHandle
       if (!identity) return;
 
       user.twitterUsername = identity.username;
-
-
       debug('Sending tweets to: %j', twitterHandles);
 
       var usersToTweet = twitterHandles.map(function(twitterUsername) {
@@ -66,7 +64,8 @@ var sendTweetsForRoom = Promise.method(function(user, group, room, twitterHandle
         count: usersToTweet.length
       });
 
-      return twitterBadger.sendUserInviteTweets(user, usersToTweet, room.name, roomUrl);
+      var name = group.name || group.uri;
+      return twitterBadger.sendUserInviteTweets(user, usersToTweet, name, roomUrl);
     });
 });
 
@@ -106,11 +105,14 @@ function sendInvitesAndTweetsPostRoomCreation(user, group, room, invites, allowT
 
       return sendTweetsForRoom(user, group, room, twitterHandles)
         .catch(function(err) {
-          logger.error('Send tweets failed', { exception: err });
+          stats.event('group_tweets_failed', { userId: user.id, username: user.username, groupId: group._id, groupUri: group.uri });
+          logger.error('Group tweet send failed', { exception: err });
           errorReporter(err, { post_room_creation: "failed", step: "tweets" }, { module: 'group-creation' });
         });
     })
     .catch(function(err) {
+      stats.event('group_invites_failed', { userId: user.id, username: user.username, groupId: group._id, groupUri: group.uri });
+
       logger.error('Send invites failed', { exception: err });
       errorReporter(err, { post_room_creation: "failed", step: "invites" }, { module: 'group-creation' });
       return []; // No invites report for you
@@ -180,7 +182,7 @@ function groupCreationService(user, options) {
     })
     .then(function(invitesReport) {
       var group = this.group;
-      stats.event('new_group', { userId: user.id, username: user.username, groupId: group._id, groupUri: group.uri });
+      stats.event('group_process_complete', { userId: user.id, username: user.username, groupId: group._id, groupUri: group.uri });
 
       this.invitesReport = invitesReport;
       return this;
