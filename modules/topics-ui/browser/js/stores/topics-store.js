@@ -11,7 +11,12 @@ module.exports = Backbone.Collection.extend({
 
   model: Model,
 
-  getTopics: function(){
+  getTopics() {
     return this.models.map(model => model.toJSON());
+  },
+
+  getById(id){
+    return this.get(id).toJSON();
   }
+
 });
