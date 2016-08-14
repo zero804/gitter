@@ -5,7 +5,7 @@ var _ = require('underscore');
 var Marionette = require('backbone.marionette');
 var fuzzysearch = require('fuzzysearch');
 var urlJoin = require('url-join');
-var FilteredCollection = require('backbone-filtered-collection');
+var SimpleFilteredCollection = require('gitter-realtime-client/lib/filtered-rooms');
 var fastdom = require('fastdom');
 var toggleClass = require('utils/toggle-class');
 var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
@@ -110,7 +110,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
     this.repoCollection = attrs.repoCollection;
     this.hasRendered = false;
 
-    this.filteredRepoCollection = new FilteredCollection({
+    this.filteredRepoCollection = new SimpleFilteredCollection([], {
       collection: this.repoCollection
     });
 
