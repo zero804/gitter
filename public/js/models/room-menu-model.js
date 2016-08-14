@@ -19,7 +19,6 @@ var SuggestedRoomsByGroupName = require('../collections/org-suggested-rooms-by-n
 var UserSuggestions = require('../collections/user-suggested-rooms');
 var SearchRoomPeopleCollection = require('../collections/left-menu-search-rooms-and-people');
 var SearchChatMessages = require('../collections/search-chat-messages');
-var LimitedCollection = require('gitter-realtime-client/lib/limited-collection');
 
 var FavouriteCollectionModel = require('../views/menu/room/favourite-collection/favourite-collection-model');
 var PrimaryCollectionModel = require('../views/menu/room/primary-collection/primary-collection-model');
