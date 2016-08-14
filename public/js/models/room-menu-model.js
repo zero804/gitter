@@ -98,6 +98,7 @@ module.exports = Backbone.Model.extend({
 
     //expose the public collection
     this.searchTerms = new RecentSearchesCollection(null);
+    this.searchTerms.getUnderlying().fetch();
 
     this.searchRoomAndPeople = new SearchRoomPeopleCollection(null, {
       roomMenuModel: this,
@@ -248,7 +249,7 @@ module.exports = Backbone.Model.extend({
   },
 
   onSearchTermChange: _.debounce(function() {
-    this.searchTerms.add({ name: this.get('searchTerm') });
+    this.searchTerms.getUnderlying().add({ name: this.get('searchTerm') });
   }, SEARCH_DEBOUNCE_INTERVAL),
 
   onPrimaryCollectionSnapshot: function() {
