@@ -42,6 +42,7 @@ function TopicStrategy(options) {
     strategies.push(userStrategy.preload(userIds));
 
     // TODO: no category strategy necessary if options.category is passed in
+    // TODO: support options.categories for when called from ForumStrategy?
     categoryStrategy = new ForumCategoryIdStrategy();
     var categoryIds = topics.map(function(i) { return i.categoryId; });
     strategies.push(categoryStrategy.preload(categoryIds));
@@ -80,20 +81,29 @@ function TopicStrategy(options) {
       id: id,
       title: topic.title,
       slug: topic.slug,
-      text: topic.text,
-      html: topic.html,
+      body: {
+        text: topic.text,
+        html: topic.html,
+      },
       sticky: topic.sticky,
       tags: topic.tags,
+
       // TODO: support options.category
       category: mapCategory(topic.categoryId),
+
       // TODO: support options.user
       user: mapUser(topic.userId),
+
       sent: formatDate(topic.sent),
       editedAt: topic.editedAt ? formatDate(topic.editedAt) : null,
       lastModified: topic.lastModified ? formatDate(topic.lastModified) : null,
       v: getVersion(topic),
-      // TODO: fill out the unimplemented fake fields
-      // TODO: what about (sample) replies?
+      // TODO: repliesTotal
+      // TODO: replies
+      // TODO: participatingTotal
+      // TODO: isFaved
+      // TODO: isParticipating
+      // TODO: isWatching
     };
   };
 
