@@ -9,6 +9,7 @@ var RecentSearchesCollection = require('../collections/recent-searches');
 var SuggestedOrgCollection = require('../collections/org-suggested-rooms');
 var apiClient = require('components/apiClient');
 var context = require('utils/context');
+var autoModelSave = require('../utils/auto-model-save');
 
 var FilteredMinibarGroupCollection = require('../collections/filtered-minibar-group-collection');
 var FilteredRoomCollection = require('../collections/filtered-room-collection');
@@ -179,11 +180,11 @@ module.exports = Backbone.Model.extend({
 
     this.listenTo(this, 'change:searchTerm', this.onSearchTermChange, this);
     this.listenTo(this, 'change:state', this.onSwitchState, this);
-    this.listenTo(this, 'change', this.persistChanges);
-    this._throttledSave = _.throttle(this.save.bind(this), 1500, { leading: false });
     this.listenTo(context.troupe(), 'change:id', this.onRoomChange, this);
     this.listenTo(this.bus, 'left-menu-menu-bar:activate', this.onMenuBarActivateRequest, this);
     this.onSwitchState(this, this.get('state'));
+
+    autoModelSave(this, ['state', 'roomMenuIsPinned', 'groupId', 'hasDismissedSuggestions'], this.autoPersist);
   },
 
   //custom set to limit states that can be assigned
@@ -257,31 +258,14 @@ module.exports = Backbone.Model.extend({
     }, {});
   },
 
-  persistChanges: function() {
-    var includesPersistentChanges = Object.keys(this.changed).some(function(changedKey) {
-      if (changedKey === 'searchTerm') return false;
-      return this.defaults.hasOwnProperty(changedKey);
-    }, this);
-
-    if (includesPersistentChanges) {
-      this._throttledSave();
-    }
-  },
-
-  //This can be changed to userPreferences once the data is maintained
-  //JP 8/1/16
-  sync: function(method, model, options) {
-    //save
-    if (method === 'create' || method === 'update' || method === 'patch') {
-      return apiClient.user.put('/settings/leftRoomMenu', this.toJSON(), {
-        // No need to get the JSON back from the server...
-        dataType: 'text'
-      })
-      .then(function() {
-        if (options.success) options.success({});
-      })
-      .catch(function(err) { if (options.error) options.error(err); });
-    }
+  /**
+   * Used by autoModelSave
+   */
+  autoPersist: function() {
+    return apiClient.user.put('/settings/leftRoomMenu', this.toJSON(), {
+      // No need to get the JSON back from the server...
+      dataType: 'text'
+    });
   },
 
   onRoomChange: function (){

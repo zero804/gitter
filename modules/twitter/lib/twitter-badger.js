@@ -1,13 +1,11 @@
 'use strict';
 
-var debug = require('debug')('gitter:modules:twitter:badger');
 var Promise = require('bluebird');
 var env = require('gitter-web-env');
 var config = env.config;
 var TwitterService = require('./twitter-service');
-var StatusError = require('statuserror');
-
-var TWEET_MAX_CHARACTER_LIMIT = 140;
+var badgerMessageComposer = require('./badger-message-composer');
+var debug = require('debug')('gitter:app:twitter:badger');
 
 var CONSUMER_KEY = config.get('twitterbadger:consumer_key');
 var CONSUMER_SECRET = config.get('twitterbadger:consumer_secret');
@@ -16,7 +14,7 @@ var BADGER_ACCESS_TOKEN_SECRET = config.get('twitterbadger:access_token_secret')
 
 var twitterService = new TwitterService(CONSUMER_KEY, CONSUMER_SECRET, BADGER_ACCESS_TOKEN, BADGER_ACCESS_TOKEN_SECRET);
 
-var alwaysAllowedUsernames = [
+var DEVELOPMENT_TWITTER_ALLOWED = [
   'gitchat',
   'WeAreTroupe',
   'GitterBadger',
@@ -28,90 +26,64 @@ var alwaysAllowedUsernames = [
   'CutAndPastey',
   'escociao',
   'koholaa',
-  'NeverGitter'
-];
+  'NeverGitter',
+  'TestyTestymike'
+].reduce(function(memo, twitterUsername) {
+  memo[twitterUsername.toLowerCase()] = true;
+  return memo;
+}, {});
 
-var userFilter = function(user) {
-  if(process.env.NODE_ENV === 'prod') {
-    return true;
-  }
+var userFilter;
+if(process.env.NODE_ENV === 'prod') {
+  userFilter = function() { return true };
+} else {
+  userFilter = function(user) {
+    if (!user) return false;
+    if (!user.twitterUsername) return false;
 
-  // Some mocked users
-  if(/GitterTestUser/.test(user.twitterUsername)) {
-    return true;
-  }
+    // Some mocked users
+    if(/GitterTestUser/.test(user.twitterUsername)) {
+      return true;
+    }
 
-  var lcUsername = (user.twitterUsername || '').toLowerCase();
+    return DEVELOPMENT_TWITTER_ALLOWED[user.twitterUsername.toLowerCase()]
+  };
 
-  // We don't want to bother other users when testing (non-prod)
-  return alwaysAllowedUsernames.some(function(alwaysAllowedUsername) {
-    return lcUsername === alwaysAllowedUsername.toLowerCase();
-  });
-};
+}
 
 
 function sendUserInviteTweets(invitingUser, users, name, url) {
   if(!invitingUser) {
-    return Promise.reject(new Error('No user provided to show as the person inviting other users'));
+    throw new Error('No user provided to show as the person inviting other users');
   }
 
   if(!url) {
-    return Promise.reject(new Error('No url provided to point users to'));
+    throw new Error('No url provided to point users to');
   }
 
-  var mentionList = [];
-  users
+  var mentionList = users
     .filter(userFilter)
-    .forEach(function(user) {
-      if(user.twitterUsername) {
-        mentionList.push('@' + user.twitterUsername);
-      }
+    .filter(function(user) {
+      return user && user.twitterUsername;
+    })
+    .map(function(user) {
+      return '@' + user.twitterUsername;
     });
 
-  debug((invitingUser && invitingUser.username) + ' is inviting ' + mentionList.length + ' people via the Twitter Badger');
+  if (!mentionList) return [];
 
-  if(invitingUser && mentionList.length > 0) {
-    var invitingUserName = invitingUser.twitterUsername ? ('@' + invitingUser.twitterUsername) : invitingUser.username;
+  var invitingUserName = invitingUser.twitterUsername ? ('@' + invitingUser.twitterUsername) : invitingUser.username;
+  var tweets = badgerMessageComposer(invitingUserName, mentionList, name, url);
 
-    var baseMessagePre = 'Hey ';
-    var baseMessagePost = ' you\'ve been invited to the ' + name + ' community by ' + invitingUserName + '.\n' + url;
-    var baseMessageLength = baseMessagePre.length + baseMessagePost.length;
+  debug('Sending tweets: %j', tweets);
+  return Promise.map(tweets, function(tweet) {
+    return twitterService.sendTweet(tweet)
+      .return(tweet);
+  }, { concurrency: 1 });
 
-    // Split up the mentions into multiple tweets if necessary
-    var mentionStringBuckets = [''];
-    mentionList.forEach(function(mention) {
-      var currentMentionString = mentionStringBuckets[mentionStringBuckets.length - 1];
-      if(baseMessageLength + currentMentionString.length > TWEET_MAX_CHARACTER_LIMIT) {
-        mentionStringBuckets.push('');
-        currentMentionString = '';
-      }
-
-      mentionStringBuckets[mentionStringBuckets.length - 1] = (currentMentionString ? (currentMentionString + ' ') : '') + mention;
-    });
-
-    debug('Sending ' + mentionStringBuckets.length + ' invite tweets');
-
-    return Promise.all(mentionStringBuckets.map(function(mentionString) {
-      var message = baseMessagePre + mentionString + baseMessagePost;
-      return twitterService.sendTweet(message)
-        .then(function(res) {
-          if(res.statusCode === 200) {
-            return message;
-          }
-
-          var errorString = 'Status: ' + res.statusCode + ' -- ' + (res.body.errors || []).reduce(function(errorString, error) {
-            return errorString + (errorString.length > 0 ? ' -- ' : '') + error.code + ' ' + error.message;
-          }, '');
-
-          throw new StatusError(400, errorString);
-        });
-    }));
-  }
-
-  return Promise.resolve([]);
 }
 
 
 module.exports = {
-  sendUserInviteTweets: sendUserInviteTweets
+  sendUserInviteTweets: Promise.method(sendUserInviteTweets)
 };

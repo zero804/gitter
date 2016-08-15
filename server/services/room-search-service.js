@@ -83,7 +83,7 @@ exports.searchRooms = function(queryText, userId, privateRoomIds, options) {
         }
       },
       sort: [
-        { _score: { order : "desc"} }
+        { _score: { order: "desc"} }
       ],
     }
   };

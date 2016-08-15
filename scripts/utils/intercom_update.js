@@ -37,11 +37,11 @@ persistence.User.find(function (err, users) {
 
           if (email) {
             intercom.createUser({
-              "email" : email,
-              "user_id" : user.id,
-              "name" : user.displayName,
-              "created_at" : created_at,
-              "username" : user.username,
+              "email": email,
+              "user_id": user.id,
+              "name": user.displayName,
+              "created_at": created_at,
+              "username": user.username,
             },
             function(err, res) {
               if (err) console.log(err);
