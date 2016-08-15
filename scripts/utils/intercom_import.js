@@ -40,11 +40,11 @@ getAllUsers(function(err, users) {
             if (email) {
               console.log("Going to create a user in Intercom with " + user.username);
               intercom.createUser({
-                "email" : email,
-                "user_id" : user.id,
-                "name" : user.displayName,
-                "created_at" : created_at,
-                "username" : user.username,
+                "email": email,
+                "user_id": user.id,
+                "name": user.displayName,
+                "created_at": created_at,
+                "username": user.username,
                 // "companies" : [
                 //   {
                 //     "id" : 6,
