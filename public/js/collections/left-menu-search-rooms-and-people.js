@@ -32,8 +32,7 @@ function uniqByUrl(list) {
 }
 
 var SearchMessageAndPeople = Backbone.Collection.extend({
-  initialize: function(models, attrs) {//jshint unused: true
-
+  initialize: function(models, attrs) {
     if (!attrs || !attrs.roomMenuModel) {
       throw new Error('A valid instance of RoomMenuModel should be passed to a new LeftMenuSearchRoomsAndPeopleCollection');
     }
