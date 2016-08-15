@@ -123,7 +123,7 @@ module.exports = {
   },
 
   show: function(req) {
-    var group = req.params.group;
+    var group = req.group;
     var user = req.user;
     var userId = user && user._id;
 
