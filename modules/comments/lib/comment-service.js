@@ -7,10 +7,24 @@ var StatusError = require('statuserror');
 var Comment = require('gitter-web-persistence').Comment;
 var debug = require('debug')('gitter:app:topics:comment-service');
 var processText = require('gitter-web-text-processor');
+var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var markdownMajorVersion = require('gitter-markdown-processor').version.split('.')[0];
 var validators = require('gitter-web-validators');
 
 
+// TODO: we'll need better ways to get pages of comments per rely rather than
+// this function to just get all of it.
+function findByReplyIds(ids) {
+  if (!ids.length) return [];
+
+  return Comment.find({ replyId: { $in: ids } })
+    .lean()
+    .exec();
+}
+
+function findTotalsByReplyIds(ids) {
+  return mongooseUtils.getCountForIds(Comment, 'replyId', ids);
+}
 
 function validateComment(data) {
   if (!validators.validateMarkdown(data.text)) {
@@ -60,5 +74,7 @@ function createComment(user, reply, options) {
 }
 
 module.exports = {
+  findByReplyIds: findByReplyIds,
+  findTotalsByReplyIds: findTotalsByReplyIds,
   createComment: createComment
 };
