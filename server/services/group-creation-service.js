@@ -134,7 +134,7 @@ function groupCreationService(user, options) {
   var invites = options.invites;
   var defaultRoomOptions = options.defaultRoom;
   var allowTweeting = options.allowTweeting;
-  
+
   return groupService.createGroup(user, options)
     .bind({
       group: null,
