@@ -1,13 +1,23 @@
 "use strict";
 
 var Promise = require('bluebird');
+var Lazy = require('lazy.js');
+var _ = require('lodash');
 var getVersion = require('../get-model-version');
 var ForumCategoryIdStrategy = require('./forum-category-id-strategy');
+var ReplyStrategy = require('./reply-strategy');
 var UserIdStrategy = require('./user-id-strategy');
+var replyService = require('gitter-web-replies/lib/reply-service');
+
 
 function formatDate(d) {
   return d ? d.toISOString() : null;
 }
+
+function getIdString(obj) {
+  return obj.id || obj._id && obj._id.toHexString();
+}
+
 
 function TopicStrategy(options) {
   options = options || {};
@@ -30,24 +40,65 @@ function TopicStrategy(options) {
 
   var userStrategy;
   var categoryStrategy;
+  var replyStrategy;
+
+  var repliesMap;
+  var repliesTotalMap;
+
+  var loadReplies = Promise.method(function(topicIds) {
+    if (!options.includeReplies) return [];
+
+    // only load all these extra things if we're going to include replies
+    return Promise.join(
+      // TODO: cherry-pick just _some_ replies, not all of them
+      function(replies, repliesTotals) {
+        repliesTotalMap = repliesTotals;
+        return replies;
+    });
+  });
 
   this.preload = function(topics) {
     if (topics.isEmpty()) return;
 
+    var topicIds = topics.map(getIdString).toArray();
+
     var strategies = [];
 
-    // TODO: no user strategy necessary if options.user is passed in
-    userStrategy = new UserIdStrategy();
-    var userIds = topics.map(function(i) { return i.userId; });
-    strategies.push(userStrategy.preload(userIds));
+    return Promise.try(function() {
+        // load replies
+        if (options.includeReplies) {
+          return replyService.findByTopicIds(topicIds)
+            .then(function(replies) {
+              repliesMap = _.groupBy(replies, 'topicId');
 
-    // TODO: no category strategy necessary if options.category is passed in
-    // TODO: support options.categories for when called from ForumStrategy?
-    categoryStrategy = new ForumCategoryIdStrategy();
-    var categoryIds = topics.map(function(i) { return i.categoryId; });
-    strategies.push(categoryStrategy.preload(categoryIds));
+              replyStrategy = new ReplyStrategy();
+              strategies.push(replyStrategy.preload(Lazy(replies)));
+            });
+        }
+      })
+      .then(function() {
+        // load replyTotals
+        if (options.includeRepliesTotals) {
+          return replyService.findTotalsByTopicIds(topicIds)
+            .then(function(repliesTotals) {
+              repliesTotalMap = repliesTotals;
+            });
+        }
+      })
+      .then(function() {
+        // TODO: no user strategy necessary if options.user is passed in
+        userStrategy = new UserIdStrategy();
+        var userIds = topics.map(function(i) { return i.userId; });
+        strategies.push(userStrategy.preload(userIds));
 
-    return Promise.all(strategies);
+        // TODO: no category strategy necessary if options.category is passed in
+        // TODO: support options.categories for when called from ForumStrategy?
+        categoryStrategy = new ForumCategoryIdStrategy();
+        var categoryIds = topics.map(function(i) { return i.categoryId; });
+        strategies.push(categoryStrategy.preload(categoryIds));
+
+        return Promise.all(strategies);
+      });
   };
 
   function mapCategory(categoryId) {
@@ -77,6 +128,9 @@ function TopicStrategy(options) {
   this.map = function(topic) {
     var id = topic.id || topic._id && topic._id.toHexString();
 
+    var replies = options.includeReplies ? repliesMap[id] || [] : undefined;
+    var repliesTotal = options.includeRepliesTotals ? repliesTotalMap[id] || 0 : undefined;
+
     return {
       id: id,
       title: topic.title,
@@ -94,12 +148,16 @@ function TopicStrategy(options) {
       // TODO: support options.user
       user: mapUser(topic.userId),
 
+      // don't accidentally send all the replies with all the topics when
+      // serializing a forum..
+      replies: options.includeReplies ? replies.map(replyStrategy.map) : undefined,
+      repliesTotal: options.includeRepliesTotals ? repliesTotal : undefined,
+
       sent: formatDate(topic.sent),
       editedAt: topic.editedAt ? formatDate(topic.editedAt) : null,
       lastModified: topic.lastModified ? formatDate(topic.lastModified) : null,
       v: getVersion(topic),
-      // TODO: repliesTotal
-      // TODO: replies
+
       // TODO: participatingTotal
       // TODO: isFaved
       // TODO: isParticipating

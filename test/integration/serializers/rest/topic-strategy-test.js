@@ -32,9 +32,15 @@ describe('TopicStrategy', function() {
       forum: 'forum1'
     },
     topic1: {
+      user: 'user1',
       forum: 'forum1',
       category: 'category1',
+      sent: new Date('2014-01-01T00:00:00.000Z')
+    },
+    reply1: {
       user: 'user1',
+      forum: 'forum1',
+      topic: 'topic1',
       sent: new Date('2014-01-01T00:00:00.000Z')
     }
   });
@@ -74,6 +80,73 @@ describe('TopicStrategy', function() {
             staff: false,
             v: 1
           },
+          sent: '2014-01-01T00:00:00.000Z',
+          editedAt: null,
+          lastModified: null,
+          v:1
+        }])
+      });
+  });
+
+  it('should serialize a topic with includeReplies', function() {
+    var strategy = new TopicStrategy({ includeReplies: true, includeRepliesTotals: true});
+
+    var user = fixture.user1;
+    var category = fixture.category1;
+    var topic = fixture.topic1;
+    var reply = fixture.reply1;
+
+    return serialize([topic], strategy)
+      .then(function(s) {
+        assertUtils.assertSerializedEqual(s, [{
+          id: topic.id,
+          title: topic.title,
+          slug: topic.slug,
+          body: {
+            text: topic.text,
+            html: topic.html
+          },
+          sticky: topic.sticky,
+          tags: [],
+          category: {
+            id: category.id,
+            name: category.name,
+            slug: category.slug
+          },
+          user: {
+            id: user.id,
+            username: user.username,
+            displayName: user.displayName,
+            url: '/' + user.username,
+            avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
+            avatarUrlSmall: '/api/private/user-avatar/' + user.username + '?s=60',
+            avatarUrlMedium: '/api/private/user-avatar/' + user.username + '?s=128',
+            staff: false,
+            v: 1
+          },
+          replies: [{
+            id: reply.id,
+            body: {
+              text: reply.text,
+              html: reply.html
+            },
+            user: {
+              id: user.id,
+              username: user.username,
+              displayName: user.displayName,
+              url: '/' + user.username,
+              avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
+              avatarUrlSmall: '/api/private/user-avatar/' + user.username + '?s=60',
+              avatarUrlMedium: '/api/private/user-avatar/' + user.username + '?s=128',
+              staff: false,
+              v: 1
+            },
+            sent: '2014-01-01T00:00:00.000Z',
+            editedAt: null,
+            lastModified: null,
+            v:1
+          }],
+          repliesTotal: 1,
           sent: '2014-01-01T00:00:00.000Z',
           editedAt: null,
           lastModified: null,
