@@ -76,7 +76,7 @@ function addUsersToGroupRoom(userIds, roomId) {
   var req = bulkTools.createBulkUpdate(updates);
   return elasticClient.bulk(req)
     .then(function(res) {
-      var err = bulkTools.findPartialError(req, res);
+      var err = bulkTools.findErrors(req, res);
       if (err) throw err;
     });
 }
@@ -88,7 +88,7 @@ function removeUsersFromRoom(userIds, roomId) {
   var req = bulkTools.createBulkUpdate(updates);
   return elasticClient.bulk(req)
     .then(function(res) {
-      var err = bulkTools.findPartialError(req, res);
+      var err = bulkTools.findErrors(req, res);
       if (err) throw err;
     });
 }
