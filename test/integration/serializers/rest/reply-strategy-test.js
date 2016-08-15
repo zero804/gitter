@@ -39,6 +39,14 @@ describe('ReplyStrategy', function() {
       user: 'user1',
       topic: 'topic1',
       sent: new Date('2014-01-01T00:00:00.000Z')
+    },
+    comment1: {
+      forum: 'forum1',
+      category: 'category1',
+      user: 'user1',
+      topic: 'topic1',
+      reply: 'reply1',
+      sent: new Date('2014-01-01T00:00:00.000Z')
     }
   });
 
@@ -67,6 +75,63 @@ describe('ReplyStrategy', function() {
             staff: false,
             v: 1
           },
+          sent: '2014-01-01T00:00:00.000Z',
+          editedAt: null,
+          lastModified: null,
+          v:1
+        }])
+      });
+  });
+
+  it('should serialize a reply with includeComments', function() {
+    var strategy = new ReplyStrategy({ includeComments: true, includeCommentsTotals: true});
+
+    var user = fixture.user1;
+    var reply = fixture.reply1;
+    var comment = fixture.comment1;
+
+    return serialize([reply], strategy)
+      .then(function(s) {
+        assertUtils.assertSerializedEqual(s, [{
+          id: reply.id,
+          body: {
+            text: reply.text,
+            html: reply.html
+          },
+          user: {
+            id: user.id,
+            username: user.username,
+            displayName: user.displayName,
+            url: '/' + user.username,
+            avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
+            avatarUrlSmall: '/api/private/user-avatar/' + user.username + '?s=60',
+            avatarUrlMedium: '/api/private/user-avatar/' + user.username + '?s=128',
+            staff: false,
+            v: 1
+          },
+          comments: [{
+            id: comment.id,
+            body: {
+              text: comment.text,
+              html: comment.html,
+            },
+            user: {
+              id: user.id,
+              username: user.username,
+              displayName: user.displayName,
+              url: '/' + user.username,
+              avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
+              avatarUrlSmall: '/api/private/user-avatar/' + user.username + '?s=60',
+              avatarUrlMedium: '/api/private/user-avatar/' + user.username + '?s=128',
+              staff: false,
+              v: 1
+            },
+            sent: '2014-01-01T00:00:00.000Z',
+            editedAt: null,
+            lastModified: null,
+            v:1
+          }],
+          commentsTotal: 1,
           sent: '2014-01-01T00:00:00.000Z',
           editedAt: null,
           lastModified: null,
