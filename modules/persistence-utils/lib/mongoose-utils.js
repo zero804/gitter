@@ -1,5 +1,6 @@
 "use strict";
 
+var _ = require('lodash');
 var Promise = require('bluebird');
 var mongoUtils = require('./mongo-utils');
 var uniqueIds = require('mongodb-unique-ids');
@@ -17,7 +18,7 @@ function hashList(list) {
   }, {});
 }
 
-exports.attachNotificationListenersToSchema = function (schema, options) {
+function attachNotificationListenersToSchema(schema, options) {
   var blacklistHash = hashList(options.ignoredPaths);
   var whitelistHash = hashList(options.listenPaths);
 
@@ -87,7 +88,7 @@ exports.attachNotificationListenersToSchema = function (schema, options) {
     });
   }
 
-};
+}
 
 var MAX_UPSERT_ATTEMPTS = 2;
 var MONGO_DUPLICATE_KEY_ERROR = 11000;
@@ -120,7 +121,6 @@ function leanUpsert(schema, query, setOperation) {
       return !!doc;
     });
 }
-exports.leanUpsert = leanUpsert;
 
 /*
  * Returns a promise [document, updatedExisting]
@@ -128,18 +128,18 @@ exports.leanUpsert = leanUpsert;
  * perform an insert but looses the battle to another
  * insert, this function will retry
  */
-exports.upsert = function(schema, query, setOperation) {
+function upsert(schema, query, setOperation) {
   return leanUpsert(schema, query, setOperation)
     .then(function(existing) {
       // If doc is null then an insert occurred
       return Promise.all([schema.findOne(query).exec(), existing]);
     });
-};
+}
 
 /**
  * Returns a promise of documents
  */
-exports.findByIds = function(Model, ids, callback) {
+function findByIds(Model, ids, callback) {
   return Promise.try(function() {
     if (!ids || !ids.length) return [];
 
@@ -156,12 +156,12 @@ exports.findByIds = function(Model, ids, callback) {
     /* Usual case */
     return Model.where('_id')['in'](mongoUtils.asObjectIDs(idsIn(ids))).exec();
   }).nodeify(callback);
-};
+}
 
 /**
  * Returns a promise of lean documents
  */
-exports.findByIdsLean = function(Model, ids, select) {
+function findByIdsLean(Model, ids, select) {
   return Promise.try(function() {
     if (!ids || !ids.length) return [];
 
@@ -184,18 +184,73 @@ exports.findByIdsLean = function(Model, ids, select) {
       .then(mongoUtils.setIds);
 
   });
-};
+}
 
-exports.addIdToLean = function(object) {
+function addIdToLean(object) {
   if (object && object._id) { object.id = object._id.toString(); }
   return object;
-};
+}
 
-exports.addIdToLeanArray = function(objects) {
+function addIdToLeanArray(objects) {
   if (objects) {
     objects.forEach(function(f) {
       if (f && f._id) { f.id = f._id.toString(); }
     });
   }
   return objects;
+}
+
+function getCountForId(Model, field, id) {
+  var query = {};
+  query[field] = id;
+  return Model.count(query)
+    .read('secondaryPreferred')
+    .exec();
+}
+
+function getCountForIds(Model, field, ids) {
+  if (!ids || !ids.length) return {};
+
+  if (ids.length === 1) {
+    var singleId = ids[0];
+    return getCountForId(Model, field, singleId)
+      .then(function(count) {
+        var hash = {};
+        hash[singleId] = count;
+        return hash;
+      });
+  }
+
+  var query = {};
+  query[field] = { $in: ids }
+  return Model.aggregate([{
+      $match: query
+    }, {
+      $group: {
+        _id: '$' + field,
+        count: { $sum: 1 }
+      }
+    }])
+    .read('secondaryPreferred')
+    .exec()
+    .then(function(results) {
+      if (!results || !results.length) return {};
+
+      return _.reduce(results, function(memo, result) {
+        memo[result._id] = result.count;
+        return memo;
+      }, {});
+    });
+}
+
+module.exports = {
+  attachNotificationListenersToSchema: attachNotificationListenersToSchema,
+  leanUpsert: leanUpsert,
+  upsert: upsert,
+  findByIds: findByIds,
+  findByIdsLean: findByIdsLean,
+  addIdToLean: addIdToLean,
+  addIdToLeanArray: addIdToLeanArray,
+  getCountForId: getCountForId,
+  getCountForIds: getCountForIds
 };
