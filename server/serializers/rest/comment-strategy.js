@@ -54,16 +54,20 @@ function CommentStrategy(options) {
 
     return {
       id: id,
-      text: comment.text,
-      html: comment.html,
+      body: {
+        text: comment.text,
+        html: comment.html
+      },
+
       // TODO: should we incude which topic/reply it is for?
+
       // TODO: support options.user
       user: mapUser(comment.userId),
+
       sent: formatDate(comment.sent),
       editedAt: comment.editedAt ? formatDate(comment.editedAt) : null,
       lastModified: comment.lastModified ? formatDate(comment.lastModified) : null,
-      v: getVersion(comment),
-      // TODO: fill out the unimplemented fake fields
+      v: getVersion(comment)
     };
   };
 

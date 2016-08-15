@@ -52,8 +52,10 @@ describe('TopicStrategy', function() {
           id: topic.id,
           title: topic.title,
           slug: topic.slug,
-          text: topic.text,
-          html: topic.html,
+          body: {
+            text: topic.text,
+            html: topic.html
+          },
           sticky: topic.sticky,
           tags: [],
           category: {
@@ -94,8 +96,10 @@ describe('TopicStrategy', function() {
             id: topic.id,
             title: topic.title,
             slug: topic.slug,
-            text: topic.text,
-            html: topic.html,
+            body: {
+              text: topic.text,
+              html: topic.html,
+            },
             sticky: topic.sticky,
             tags: [],
             category: {
@@ -140,8 +144,10 @@ describe('TopicStrategy', function() {
             id: topic.id,
             title: topic.title,
             slug: topic.slug,
-            text: topic.text,
-            html: topic.html,
+            body: {
+              text: topic.text,
+              html: topic.html
+            },
             sticky: topic.sticky,
             tags: [],
             category: fixture.category1.id,

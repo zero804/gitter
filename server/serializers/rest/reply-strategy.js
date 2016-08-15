@@ -54,16 +54,22 @@ function ReplyStrategy(options) {
 
     return {
       id: id,
-      text: reply.text,
-      html: reply.html,
+      body: {
+        text: reply.text,
+        html: reply.html,
+      },
+
       // TODO: should we incude which topic it is for?
+
       // TODO: support options.user
       user: mapUser(reply.userId),
+
       sent: formatDate(reply.sent),
       editedAt: reply.editedAt ? formatDate(reply.editedAt) : null,
       lastModified: reply.lastModified ? formatDate(reply.lastModified) : null,
       v: getVersion(reply),
-      // TODO: fill out the unimplemented fake fields
+      // TODO: commentsTotal
+      // TODO: comments
     };
   };
 

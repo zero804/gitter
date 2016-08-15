@@ -52,8 +52,10 @@ describe('ReplyStrategy', function() {
       .then(function(s) {
         assertUtils.assertSerializedEqual(s, [{
           id: reply.id,
-          text: reply.text,
-          html: reply.html,
+          body: {
+            text: reply.text,
+            html: reply.html
+          },
           user: {
             id: user.id,
             username: user.username,
@@ -84,8 +86,10 @@ describe('ReplyStrategy', function() {
         assertUtils.assertSerializedEqual(s, {
           items: [{
             id: reply.id,
-            text: reply.text,
-            html: reply.html,
+            body: {
+              text: reply.text,
+              html: reply.html
+            },
             user: fixture.user1.id,
             sent: '2014-01-01T00:00:00.000Z',
             editedAt: null,
