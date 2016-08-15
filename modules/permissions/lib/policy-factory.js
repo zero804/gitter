@@ -136,9 +136,9 @@ function createPolicyForOneToOne(user, toUser) {
   return new OneToOneUnconnectionPolicyEvalator(user, toUser);
 }
 
-function createPolicyForForum(user, forum) {
+function createPolicyForForumId(user, forumId) {
   var userId = user && user._id;
-  var forumId = forum && forum._id;
+
   // maybe we could have just passed in the security descriptor rather and then
   // named this createPolicyForSecurityDescriptor?
   return securityDescriptorService.getForForumUser(forumId, userId)
@@ -150,6 +150,11 @@ function createPolicyForForum(user, forum) {
 
       return new PolicyEvaluator(userId, securityDescriptor, policyDelegate, contextDelegate);
     });
+}
+
+function createPolicyForForum(user, forum) {
+  var forumId = forum && forum._id;
+  return createPolicyForForumId(user, forumId);
 }
 
 /**
@@ -195,6 +200,7 @@ module.exports = {
   createPolicyForUserIdInRoomId: Promise.method(createPolicyForUserIdInRoomId),
   createPolicyForUserIdInRoom: Promise.method(createPolicyForUserIdInRoom),
   createPolicyForOneToOne: Promise.method(createPolicyForOneToOne),
+  createPolicyForForumId: Promise.method(createPolicyForForumId),
   createPolicyForForum: Promise.method(createPolicyForForum),
 
   // For things that have not yet been created
