@@ -25,7 +25,7 @@ var FilteredSuggestionsCollection = SimpleFilteredCollection.extend({
     var roomsCollection = underlyingOptions.roomsCollection;
     delete underlyingOptions.roomsCollection;
 
-    var underlyingCollection = this._underlyingCollection = new SuggestedRoomsCollection(null, underlyingOptions);
+    var underlyingCollection = new SuggestedRoomsCollection(null, underlyingOptions);
 
     SimpleFilteredCollection.prototype.constructor.call(this, [], {
       collection: underlyingCollection,
@@ -36,11 +36,11 @@ var FilteredSuggestionsCollection = SimpleFilteredCollection.extend({
   },
 
   fetchForUser: function() {
-    this._underlyingCollection.fetchForUser();
+    this.getUnderlying().fetchForUser();
   },
 
   fetchForRoom: function() {
-    this._underlyingCollection.fetchForRoom();
+    this.getUnderlying().fetchForRoom();
   },
 });
 
