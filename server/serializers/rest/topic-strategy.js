@@ -45,18 +45,6 @@ function TopicStrategy(options) {
   var repliesMap;
   var repliesTotalMap;
 
-  var loadReplies = Promise.method(function(topicIds) {
-    if (!options.includeReplies) return [];
-
-    // only load all these extra things if we're going to include replies
-    return Promise.join(
-      // TODO: cherry-pick just _some_ replies, not all of them
-      function(replies, repliesTotals) {
-        repliesTotalMap = repliesTotals;
-        return replies;
-    });
-  });
-
   this.preload = function(topics) {
     if (topics.isEmpty()) return;
 
