@@ -98,6 +98,7 @@ function applyAutoHooksForRepoRoom(user, troupe) {
 }
 
 function doPostGitHubRoomCreationTasks(troupe, user, options) {
+  var addBadge = options.addBadge;
   var roomUri = troupe.uri;
 
   debug('Executing doPostGitHubRoomCreationTasks for %s', roomUri);
@@ -128,7 +129,7 @@ function doPostGitHubRoomCreationTasks(troupe, user, options) {
     hookCreationFailedDueToMissingScope = true;
   }
 
-  if (securityDescriptorUtils.isPublic(troupe) && options.addBadge) {
+  if (securityDescriptorUtils.isPublic(troupe) && addBadge) {
     /* Do this asynchronously (don't chain the promise) */
     userSettingsService.getUserSettings(user.id, 'badger_optout')
       .then(function(badgerOptOut) {
@@ -145,7 +146,7 @@ function doPostGitHubRoomCreationTasks(troupe, user, options) {
         logger.error('Unable to send pull request for new room', { exception: err });
       });
   } else {
-    debug('Not adding a badger PR. Public %s, badgerEnabled: %s, addBadge: %s', securityDescriptorUtils.isPublic(troupe), badgerEnabled, options.addBadge);
+    debug('Not adding a badger PR. Public %s, addBadge: %s', securityDescriptorUtils.isPublic(troupe), addBadge);
   }
 
   return {
@@ -195,7 +196,7 @@ function ensureGroupForGitHubRoom(user, githubType, uri) {
  * @returns Promise of [troupe, hasJoinPermission] if the user is able to join/create the troupe
  */
 function createRoomForGitHubUri(user, uri, options) {
-  debug("createRoomForGitHubUri: %s", uri);
+  debug("createRoomForGitHubUri: %s options: %j", uri, options);
 
   if(!options) options = {};
 
@@ -292,7 +293,9 @@ function createRoomForGitHubUri(user, uri, options) {
 
           if (updateExisting) return;
 
-          return doPostGitHubRoomCreationTasks(troupe, user, options);
+          return doPostGitHubRoomCreationTasks(troupe, user, {
+            addBadge: options.addBadge
+          });
         })
         .then(function(postCreationResults) {
           /* Finally, return the results to the user */
@@ -763,11 +766,14 @@ function deleteRoom(troupe) {
 // This is the new way to add any type of room to a group and should replace
 // all the types of room creation except one-to-ones
 function createGroupRoom(user, group, roomInfo, securityDescriptor, options) {
+  debug("createGroupRoom: groupId=%s roomInfo=%j securityDescriptor=%j options=%j", group._id, roomInfo, securityDescriptor, options);
+
   options = options || {}; // options.tracking
   var uri = roomInfo.uri;
   var topic = roomInfo.topic;
   var lcUri = uri.toLowerCase();
   var providers = roomInfo.providers;
+  var addBadge = options.addBadge;
 
   // convert back to the old github-tied vars here
   var type = securityDescriptor.type || null;
@@ -846,7 +852,9 @@ function createGroupRoom(user, group, roomInfo, securityDescriptor, options) {
         endpoint it will be true in those cases as well.
         */
         // options can be addBadge
-        return doPostGitHubRoomCreationTasks(room, user, options);
+        return doPostGitHubRoomCreationTasks(room, user, {
+          addBadge: addBadge
+        });
       }
     })
     .then(function(postCreationResults) {
