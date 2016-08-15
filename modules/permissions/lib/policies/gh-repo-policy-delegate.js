@@ -63,6 +63,22 @@ GhRepoPolicyDelegate.prototype = {
     }
   }),
 
+  getAccessDetails: function(policyName) {
+    if (!this._userId) return null;
+
+    // No need to record access to a public repo
+    if (policyName === 'GH_REPO_ACCESS' && this._securityDescriptor.public) {
+      return null;
+    }
+
+    var sd = this._securityDescriptor;
+    return {
+      type: 'GH_REPO',
+      linkPath: sd.linkPath,
+      externalId: sd.externalId,
+    }
+  },
+
   /**
    * Returns a key used to skip checks
    */

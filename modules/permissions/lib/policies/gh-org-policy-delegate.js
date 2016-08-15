@@ -28,6 +28,17 @@ GhOrgPolicyDelegate.prototype = {
     return this._fetch();
   }),
 
+  getAccessDetails: function() {
+    if (!this._isValidUser()) return;
+
+    var sd = this._securityDescriptor;
+    return {
+      type: 'GH_ORG',
+      linkPath: sd.linkPath,
+      externalId: sd.externalId,
+    }
+  },
+
   getPolicyRateLimitKey: function(policyName) {
     if (!this._isValidUser()) return;
     var uri = this._securityDescriptor.linkPath;
