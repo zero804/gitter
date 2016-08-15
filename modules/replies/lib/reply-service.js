@@ -8,6 +8,7 @@ var Reply = require('gitter-web-persistence').Reply;
 var debug = require('debug')('gitter:app:topics:reply-service');
 var processText = require('gitter-web-text-processor');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var markdownMajorVersion = require('gitter-markdown-processor').version.split('.')[0];
 var validators = require('gitter-web-validators');
 
@@ -16,6 +17,20 @@ function findById(replyId) {
   return Reply.findById(replyId)
     .lean()
     .exec();
+}
+
+// TODO: we'll need better ways to get pages of reply results per topic rather
+// than this function to just get all of it.
+function findByTopicIds(ids) {
+  if (!ids.length) return [];
+
+  return Reply.find({ topicId: { $in: ids } })
+    .lean()
+    .exec();
+}
+
+function findTotalsByTopicIds(ids) {
+  return mongooseUtils.getCountForIds(Reply, 'topicId', ids);
 }
 
 function findByIdForForum(forumId, replyId) {
@@ -92,6 +107,8 @@ function createReply(user, topic, options) {
 
 module.exports = {
   findById: findById,
+  findByTopicIds: findByTopicIds,
+  findTotalsByTopicIds: findTotalsByTopicIds,
   findByIdForForum: findByIdForForum,
   findByIdForForumAndTopic: findByIdForForumAndTopic,
   createReply: createReply
