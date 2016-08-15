@@ -31,7 +31,14 @@ function findByIdForForum(forumId, categoryId) {
 
 function findByIds(ids) {
   return mongooseUtils.findByIds(ForumCategory, ids);
+}
 
+function findByForumIds(ids) {
+  if (!ids.length) return [];
+
+  return ForumCategory.find({ forumId: { $in: ids } })
+    .lean()
+    .exec();
 }
 
 function findBySlugForForum(forumId, slug) {
@@ -92,6 +99,7 @@ module.exports = {
   findById: findById,
   findByIdForForum: findByIdForForum,
   findByIds: findByIds,
+  findByForumIds: Promise.method(findByForumIds),
   findBySlugForForum: findBySlugForForum,
   createCategory: createCategory
 };

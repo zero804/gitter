@@ -8,6 +8,7 @@ var Topic = require('gitter-web-persistence').Topic;
 var debug = require('debug')('gitter:app:topics:topic-service');
 var processText = require('gitter-web-text-processor');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var markdownMajorVersion = require('gitter-markdown-processor').version.split('.')[0];
 var validators = require('gitter-web-validators');
 
@@ -16,6 +17,20 @@ function findById(topicId) {
   return Topic.findById(topicId)
     .lean()
     .exec();
+}
+
+// TODO: we'll need better ways to get pages of topic results per forum rather
+// than this function to just get all the topics.
+function findByForumIds(ids) {
+  if (!ids.length) return [];
+
+  return Topic.find({ forumId: { $in: ids } })
+    .lean()
+    .exec();
+}
+
+function findTotalsByForumIds(ids) {
+  return mongooseUtils.getCountForIds(Topic, 'forumId', ids);
 }
 
 function findByIdForForum(forumId, topicId) {
@@ -99,6 +114,8 @@ function createTopic(user, category, options) {
 
 module.exports = {
   findById: findById,
+  findByForumIds: Promise.method(findByForumIds),
+  findTotalsByForumIds: Promise.method(findTotalsByForumIds),
   findByIdForForum: findByIdForForum,
   createTopic: createTopic
 };
