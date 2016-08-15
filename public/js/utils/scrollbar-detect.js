@@ -18,6 +18,6 @@ function detect() {
 
 module.exports = function scrollbarDetect() {
   if (hasScrollBars !== undefined) return hasScrollBars;
-  
+
   return (hasScrollBars = detect());
 };
