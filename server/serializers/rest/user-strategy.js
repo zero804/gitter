@@ -16,14 +16,15 @@ var collections = require('../../utils/collections');
 var getVersion = require('../get-model-version');
 var troupeService = require('../../services/troupe-service');
 var leanUserDao = require('../../services/daos/user-dao').full;
-
+var adminFilter = require('gitter-web-permissions/lib/known-external-access/admin-filter')
 
 
 function UserRoleInTroupeStrategy(options) {
   var contributors;
-  var ownerLogin;
 
-  this.preload = function() {
+  this.preload = function(userIds) {
+    if (userIds.isEmpty()) return;
+
     return Promise.try(function() {
         if (options.includeRolesForTroupe) return options.includeRolesForTroupe;
 
@@ -35,50 +36,22 @@ function UserRoleInTroupeStrategy(options) {
       .then(function(troupe) {
         if (!troupe) return;
 
-        /* Only works for repos */
-        var linkPath = securityDescriptorUtils.getLinkPathIfType('GH_REPO', troupe);
-        if (!linkPath) return;
-        var userPromise;
+        return adminFilter(troupe, userIds);
+      })
+      .then(function(adminUserIds) {
+        if (adminUserIds) {
+          contributors = {};
 
-        if (options.currentUser) {
-          userPromise = Promise.resolve(options.currentUser);
-        } else if (options.currentUserId) {
-          userPromise = leanUserDao.findById(options.currentUserId);
-        }
-
-        if (userPromise) {
-          return userPromise.then(function(user) {
-            /* Need a user to perform the magic */
-            if (!user) return;
-            ownerLogin = linkPath.split('/')[0];
-
-            var contributorService = new GithubContributorService(user);
-            return contributorService.getContributors(linkPath)
-              .timeout(1000)
-              .then(function(githubContributors) {
-                contributors = {};
-                if (githubContributors) {
-                  githubContributors.forEach(function(contributor) {
-                    contributors[contributor.login] = 'contributor';
-                  });
-                }
-
-                // Temporary stop-gap solution until we can figure out
-                // who the admins are
-                contributors[ownerLogin] = 'admin';
-              })
-              .catch(function(err) {
-                /* Github Repo failure. Die quietely */
-                winston.info('Contributor fetch failed: ' + err);
-                return [];
-              });
+          adminUserIds.forEach(function(userId) {
+            contributors[userId] = 'admin';
           });
         }
-      });
+
+      })
   };
 
-  this.map = function(username) {
-    return contributors && contributors[username];
+  this.map = function(userId) {
+    return contributors && contributors[userId];
   };
 }
 
@@ -157,7 +130,9 @@ function UserStrategy(options) {
 
     if (options.includeRolesForTroupeId || options.includeRolesForTroupe) {
       userRoleInTroupeStrategy = new UserRoleInTroupeStrategy(options);
-      strategies.push(userRoleInTroupeStrategy.preload());
+      strategies.push(userRoleInTroupeStrategy.preload(users.map(function(user) {
+        return user._id;
+      })));
     }
 
     if (options.showPresenceForTroupeId) {
@@ -186,13 +161,14 @@ function UserStrategy(options) {
     }
 
     var obj;
+
     if (lean) {
       obj = {
         id: user.id,
         status: options.includeEmail ? user.status : undefined,
         username: user.username,
         online: userPresenceInTroupeStrategy && userPresenceInTroupeStrategy.map(user.id) || undefined,
-        role: userRoleInTroupeStrategy && userRoleInTroupeStrategy.map(user.username) || undefined,
+        role: userRoleInTroupeStrategy && userRoleInTroupeStrategy.map(user.id || user._id) || undefined,
         invited: user.state === 'INVITED' || undefined, // true or undefined
         removed: user.state === 'REMOVED' || undefined, // true or undefined
         v: getVersion(user)
@@ -221,7 +197,7 @@ function UserStrategy(options) {
       scopes: scopes,
       online: userPresenceInTroupeStrategy && userPresenceInTroupeStrategy.map(user.id) || undefined,
       staff: user.staff,
-      role: userRoleInTroupeStrategy && userRoleInTroupeStrategy.map(user.username) || undefined,
+      role: userRoleInTroupeStrategy && userRoleInTroupeStrategy.map(user.id || user._id) || undefined,
       providers: userProvidersStrategy && userProvidersStrategy.map(user.id) || undefined,
       /* TODO: when adding states use user.state and the respective string value desired */
       invited: user.state === 'INVITED' || undefined, // true or undefined
