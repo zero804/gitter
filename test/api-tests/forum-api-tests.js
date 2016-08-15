@@ -42,6 +42,7 @@ describe('forum-api', function() {
         var forum = result.body;
         assert.strictEqual(forum.id, fixture.forum1.id);
         assert.strictEqual(forum.topicsTotal, 1);
+        assert.strictEqual(forum.topics.length, 1);
         assert.strictEqual(forum.categories.length, 1);
       });
   });
