@@ -13,7 +13,7 @@ function getIdString(obj) {
   return obj.id || obj._id && obj._id.toHexString();
 }
 
-function ForumStrategy(options) {
+function ForumStrategy(/*options*/) {
   var categoryStrategy;
   var topicStrategy;
 

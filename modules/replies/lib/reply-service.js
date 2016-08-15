@@ -5,7 +5,6 @@ var stats = env.stats;
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
 var Reply = require('gitter-web-persistence').Reply;
-var debug = require('debug')('gitter:app:topics:reply-service');
 var processText = require('gitter-web-text-processor');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');

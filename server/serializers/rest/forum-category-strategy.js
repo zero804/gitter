@@ -1,10 +1,8 @@
 "use strict";
 
-var forumCategoryService = require("gitter-web-forum-categories/lib/forum-category-service");
 var collections = require('../../utils/collections');
-var getVersion = require('../get-model-version');
 
-function ForumCategoryStrategy(options) {
+function ForumCategoryStrategy(/*options*/) {
   this.preload = function(/*categories*/) {
     return;
   };

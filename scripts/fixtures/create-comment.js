@@ -8,7 +8,6 @@ var utils = require('./fixture-script-utils');
 var replyService = require('gitter-web-replies/lib/reply-service');
 
 
-var argv = yargs.argv;
 var opts = yargs
   .option('username', {
     required: true,
