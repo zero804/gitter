@@ -21,6 +21,12 @@ function findById(topicId) {
 
 // TODO: we'll need better ways to get pages of topic results per forum rather
 // than this function to just get all the topics.
+function findByForumId(id) {
+  return Topic.find({ forumId: id })
+    .lean()
+    .exec();
+}
+
 function findByForumIds(ids) {
   if (!ids.length) return [];
 
@@ -114,6 +120,7 @@ function createTopic(user, category, options) {
 
 module.exports = {
   findById: findById,
+  findByForumId: findByForumId,
   findByForumIds: Promise.method(findByForumIds),
   findTotalsByForumIds: Promise.method(findTotalsByForumIds),
   findByIdForForum: findByIdForForum,

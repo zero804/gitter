@@ -8,12 +8,25 @@ var Comment = require('gitter-web-persistence').Comment;
 var debug = require('debug')('gitter:app:topics:comment-service');
 var processText = require('gitter-web-text-processor');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var markdownMajorVersion = require('gitter-markdown-processor').version.split('.')[0];
 var validators = require('gitter-web-validators');
 
 
+function findById(commentId) {
+  return Comment.findById(commentId)
+    .lean()
+    .exec();
+}
+
 // TODO: we'll need better ways to get pages of comments per rely rather than
 // this function to just get all of it.
+function findByReplyId(id) {
+  return Comment.find({ replyId: id })
+    .lean()
+    .exec();
+}
+
 function findByReplyIds(ids) {
   if (!ids.length) return [];
 
@@ -24,6 +37,24 @@ function findByReplyIds(ids) {
 
 function findTotalsByReplyIds(ids) {
   return mongooseUtils.getCountForIds(Comment, 'replyId', ids);
+}
+
+function findByIdForForumTopicAndReply(forumId, topicId, replyId, commentId) {
+  return findById(commentId)
+    .then(function(comment) {
+      if (!comment) return null;
+
+      // make sure the comment is in the specified forum
+      if (!mongoUtils.objectIDsEqual(comment.forumId, forumId)) return null;
+
+      // make sure the comment is in the specified topic
+      if (!mongoUtils.objectIDsEqual(comment.topicId, topicId)) return null;
+
+      // make sure the comment is in the specified reply
+      if (!mongoUtils.objectIDsEqual(comment.replyId, replyId)) return null;
+
+      return comment;
+    });
 }
 
 function validateComment(data) {
@@ -74,7 +105,9 @@ function createComment(user, reply, options) {
 }
 
 module.exports = {
+  findByReplyId: findByReplyId,
   findByReplyIds: findByReplyIds,
   findTotalsByReplyIds: findTotalsByReplyIds,
+  findByIdForForumTopicAndReply: findByIdForForumTopicAndReply,
   createComment: createComment
 };

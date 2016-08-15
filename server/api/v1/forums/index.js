@@ -1,8 +1,10 @@
 "use strict";
 
+var StatusError = require('statuserror');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var forumService = require('gitter-web-forums/lib/forum-service');
 var restSerializer = require('../../../serializers/rest-serializer');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 
 module.exports = {
@@ -16,6 +18,8 @@ module.exports = {
   },
 
   load: function(req, id) {
+    if (!mongoUtils.isLikeObjectId(id)) throw new StatusError(400);
+
     return policyFactory.createPolicyForForumId(req.user, id)
       .then(function(policy) {
         req.userForumPolicy = policy;

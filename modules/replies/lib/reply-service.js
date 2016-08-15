@@ -21,6 +21,12 @@ function findById(replyId) {
 
 // TODO: we'll need better ways to get pages of reply results per topic rather
 // than this function to just get all of it.
+function findByTopicId(id) {
+  return Reply.find({ topicId: id })
+    .lean()
+    .exec();
+}
+
 function findByTopicIds(ids) {
   if (!ids.length) return [];
 
@@ -107,6 +113,7 @@ function createReply(user, topic, options) {
 
 module.exports = {
   findById: findById,
+  findByTopicId: findByTopicId,
   findByTopicIds: findByTopicIds,
   findTotalsByTopicIds: findTotalsByTopicIds,
   findByIdForForum: findByIdForForum,
