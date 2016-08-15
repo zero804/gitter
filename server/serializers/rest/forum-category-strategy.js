@@ -1,7 +1,5 @@
 "use strict";
 
-var collections = require('../../utils/collections');
-
 function ForumCategoryStrategy(/*options*/) {
   this.preload = function(/*categories*/) {
     return;
