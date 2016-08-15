@@ -1,30 +1,27 @@
 "use strict";
 
-var badgerService = require('../../services/badger-service');
 var troupeService = require('../../services/troupe-service');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
-var StatusError = require('statuserror');
+var RoomWithPolicyService = require('../../services/room-with-policy-service');
 
 module.exports = function (req, res, next) {
   var uri = "" + req.body.uri;
   var user = req.user;
 
   return troupeService.findByUri(uri)
+    .bind({
+      troupe: null
+    })
     .then(function(troupe) {
+      this.troupe = troupe;
       return policyFactory.createPolicyForRoom(user, troupe);
     })
     .then(function(policy) {
-      return policy.canAdmin();
+      var roomWithPolicyService = new RoomWithPolicyService(this.troupe, req.user, policy);
+      return roomWithPolicyService.sendBadgePullRequest();
     })
-    .then(function(isAdmin) {
-      if (!isAdmin) {
-        throw new StatusError(403, 'admin permissions required');
-      }
-
-      return badgerService.sendBadgePullRequest(uri, user);
-    })
-    .then(function(pr) {
-      res.send(pr);
+    .then(function() {
+      res.send({ success: true });
     })
     .catch(next);
 };
