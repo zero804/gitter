@@ -4,7 +4,6 @@ var testRequire = require('../test-require');
 var assert = require('assert');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var Promise = require('bluebird');
-var StatusError = require('statuserror');
 var ForumWithPolicyService = testRequire('./services/forum-with-policy-service');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 

@@ -3,7 +3,7 @@
 var env = require('gitter-web-env');
 var stats = env.stats;
 var Forum = require('gitter-web-persistence').Forum;
-var debug = require('debug')('gitter:app:topics:forum-service');
+
 
 function findById(forumId) {
   return Forum.findById(forumId)

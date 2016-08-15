@@ -8,7 +8,6 @@ var topicService = require('gitter-web-topics/lib/topic-service');
 var replyService = require('gitter-web-replies/lib/reply-service');
 var commentService = require('gitter-web-comments/lib/comment-service');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
-var debug = require('debug')('gitter:app:forum-with-policy-service');
 var secureMethod = require('../utils/secure-method');
 
 
@@ -99,7 +98,6 @@ ForumWithPolicyService.prototype.createTopic = secureMethod([allowWrite], functi
   this.assertForumId(category.forumId);
 
   var user = this.user;
-  var forum = this.forum;
 
   var createOptions = getTopicOptions(options);
   return topicService.createTopic(user, category, createOptions);

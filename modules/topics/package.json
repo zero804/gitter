@@ -13,10 +13,12 @@
   "dependencies": {
     "bluebird": "^3.2.1",
     "debug": "^2.2.0",
+    "gitter-markdown-processor": "^11.2.0",
     "gitter-web-env": "file:../env",
     "gitter-web-github": "file:../github",
     "gitter-web-persistence": "file:../persistence",
     "gitter-web-persistence-utils": "file:../persistence-utils",
+    "gitter-web-text-processor": "file:../text-processor",
     "gitter-web-validators": "file:../validators",
     "lodash": "^3.2.0",
     "statuserror": "^0.1.3"

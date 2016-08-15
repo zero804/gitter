@@ -8,7 +8,6 @@ var utils = require('./fixture-script-utils');
 var topicService = require('gitter-web-topics/lib/topic-service');
 
 
-var argv = yargs.argv;
 var opts = yargs
   .option('username', {
     required: true,

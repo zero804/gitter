@@ -8,7 +8,6 @@ var validators = require('gitter-web-validators');
 var ForumCategory = require('gitter-web-persistence').ForumCategory;
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
-var debug = require('debug')('gitter:app:topics:forum-category-service');
 
 
 function findById(categoryId) {

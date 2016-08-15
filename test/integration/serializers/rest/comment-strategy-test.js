@@ -77,7 +77,7 @@ describe('ReplyStrategy', function() {
           sent: '2014-01-01T00:00:00.000Z',
           editedAt: null,
           lastModified: null,
-          v:1
+          v: 1
         }])
       });
   });
@@ -101,7 +101,7 @@ describe('ReplyStrategy', function() {
             sent: '2014-01-01T00:00:00.000Z',
             editedAt: null,
             lastModified: null,
-            v:1
+            v: 1
           }],
           lookups: {
             users: makeHash(fixture.user1.id, {

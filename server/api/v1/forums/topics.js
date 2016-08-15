@@ -5,7 +5,6 @@ var StatusError = require('statuserror');
 var internalClientAccessOnly = require('../../../web/middlewares/internal-client-access-only');
 var forumCategoryService = require('gitter-web-forum-categories/lib/forum-category-service');
 var topicService = require('gitter-web-topics/lib/topic-service');
-var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var ForumWithPolicyService = require('../../../services/forum-with-policy-service');
 var restSerializer = require('../../../serializers/rest-serializer');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');

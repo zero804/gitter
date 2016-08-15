@@ -12,7 +12,6 @@ module.exports = {
 
   show: function(req) {
     var forum = req.forum;
-    var user = req.user;
     var strategy = new restSerializer.ForumStrategy();
     return restSerializer.serializeObject(forum, strategy);
   },

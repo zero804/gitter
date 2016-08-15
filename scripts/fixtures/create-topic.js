@@ -8,7 +8,6 @@ var utils = require('./fixture-script-utils');
 var categoryService = require('gitter-web-forum-categories/lib/forum-category-service');
 
 
-var argv = yargs.argv;
 var opts = yargs
   .option('username', {
     required: true,

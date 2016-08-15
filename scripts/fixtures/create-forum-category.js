@@ -5,7 +5,6 @@ var yargs = require('yargs');
 var faker = require('faker');
 var utils = require('./fixture-script-utils');
 
-var argv = yargs.argv;
 var opts = yargs
   .option('username', {
     required: true,
