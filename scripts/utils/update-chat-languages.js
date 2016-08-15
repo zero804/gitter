@@ -18,7 +18,7 @@ var runCalled = 0;
 var batchComplete;
 var running;
 
-var batch = new BatchStream({ size : BATCH_SIZE });
+var batch = new BatchStream({ size: BATCH_SIZE });
 
 var stream = persistence.ChatMessage
   .find({

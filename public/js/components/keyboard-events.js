@@ -187,14 +187,14 @@ module.exports = (function() {
 
   keyEvents[cmdKey + '+/, ' + cmdKey + '+' + gitterKey + '+/'] = { name: 'chat.toggle' };
   keyEvents[cmdKey + '+' + '+s'] = 'focus.search';
-  keyEvents[cmdKey + '+' + gitterKey + '+c'] = { name:'focus.chat', scope: 'other' };
+  keyEvents[cmdKey + '+' + gitterKey + '+c'] = { name: 'focus.chat', scope: 'other' };
   keyEvents[cmdKey + '+' + gitterKey + '+m'] = 'help.markdown';
   keyEvents[cmdKey + '+' + gitterKey + '+k'] = 'help.keyboard';
-  keyEvents[cmdKey + '+' + gitterKey + '+up'] = { name:'room.up', scope: 'other' };
-  keyEvents[cmdKey + '+' + gitterKey + '+down'] = { name:'room.down', scope: 'other' };
-  keyEvents[cmdKey + '+' + gitterKey + '+left'] = { name:'room.prev', scope: 'other' };
-  keyEvents[cmdKey + '+' + gitterKey + '+right'] = { name:'room.next', scope: 'other' };
-  keyEvents[cmdKey + '+' + gitterKey + '+enter'] = { name:'room.enter', scope: 'other' };
+  keyEvents[cmdKey + '+' + gitterKey + '+up'] = { name: 'room.up', scope: 'other' };
+  keyEvents[cmdKey + '+' + gitterKey + '+down'] = { name: 'room.down', scope: 'other' };
+  keyEvents[cmdKey + '+' + gitterKey + '+left'] = { name: 'room.prev', scope: 'other' };
+  keyEvents[cmdKey + '+' + gitterKey + '+right'] = { name: 'room.next', scope: 'other' };
+  keyEvents[cmdKey + '+' + gitterKey + '+enter'] = { name: 'room.enter', scope: 'other' };
 
   // Go to a conversation by index in list
   _.each('123456789'.split(''), function (n) {
