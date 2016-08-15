@@ -64,7 +64,7 @@ describe('topic-api', function() {
       .expect(200)
       .then(function(result) {
         var reply = result.body;
-        assert.strictEqual(reply.text, 'I am a reply.');
+        assert.strictEqual(reply.body.text, 'I am a reply.');
       });
   });
 
@@ -78,7 +78,7 @@ describe('topic-api', function() {
       .expect(200)
       .then(function(result) {
         var comment = result.body;
-        assert.strictEqual(comment.text, 'I am a comment.');
+        assert.strictEqual(comment.body.text, 'I am a comment.');
       });
   });
 });
