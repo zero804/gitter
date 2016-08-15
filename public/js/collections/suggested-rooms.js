@@ -27,7 +27,7 @@ var FilteredSuggestionsCollection = SimpleFilteredCollection.extend({
 
     var underlyingCollection = this._underlyingCollection = new SuggestedRoomsCollection(null, underlyingOptions);
 
-    SimpleFilteredCollection.prototype.constructorcall(this, [], {
+    SimpleFilteredCollection.prototype.constructor.call(this, [], {
       collection: underlyingCollection,
       filter: function(model) {
         return !roomsCollection.get(model.id);
