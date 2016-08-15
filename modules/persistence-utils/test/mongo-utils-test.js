@@ -220,4 +220,35 @@ describe('mongo-utils', function() {
 
   });
 
+  describe('unionModelsById', function() {
+    it('should union nothing', function() {
+      var result = underTest.unionModelsById([[],[],[]]);
+      assert.deepEqual(result, []);
+    });
+
+    it('should union disjoint items', function() {
+      var result = underTest.unionModelsById([[{ id: 1 }],[{ id: 2 }],[{ id: 3 }]]);
+      assert.deepEqual(result, [{ id: 1 }, { id: 2 }, { id: 3 }]);
+    });
+
+    it('should union overlapping items', function() {
+      var result = underTest.unionModelsById([[{ id: 1 }],[{ _id: 1 }],[{ _id: 1 }]]);
+      assert.deepEqual(result, [{ id: 1 } ]);
+    });
+
+    it('should union partially overlapping items - 1', function() {
+      var result = underTest.unionModelsById([[{ id: 1 }],[{ _id: 2 }],[{ _id: 1 }]]);
+      assert.deepEqual(result, [ { id: 1 }, { _id: 2} ]);
+    });
+    it('should union partially overlapping items - 2', function() {
+      var result = underTest.unionModelsById([[{ id: 2 }],[{ _id: 2 }],[{ _id: 1 }]]);
+      assert.deepEqual(result, [ { id: 2 }, { _id: 1} ]);
+    });
+
+    it('should union items with nulls', function() {
+      var result = underTest.unionModelsById([[{ id: 1 }], null ,[{ _id: 1 }]]);
+      assert.deepEqual(result, [ { id: 1 }]);
+    });
+  })
+
 });

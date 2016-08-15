@@ -22,7 +22,7 @@ describe('admin-discovery', function() {
           admins: 'GH_ORG_MEMBER',
           public: true,
           linkPath: URI,
-          externalId: null,
+          externalId: 'external3',
           extraAdmins: ['user1']
         }
       },
@@ -47,7 +47,7 @@ describe('admin-discovery', function() {
           });
       });
 
-      it('should return groups where the user is in the GH_ORG', function() {
+      it('should return groups where the user is in the GH_ORG by linkPath', function() {
         githubOrgs = {
           type: 'GH_ORG',
           linkPath: [URI]
@@ -60,7 +60,21 @@ describe('admin-discovery', function() {
           });
       });
 
+      it('should return groups where the user is in the GH_ORG by externalId', function() {
+        githubOrgs = {
+          type: 'GH_ORG',
+          externalId: 'external3'
+        }
+
+        return adminDiscovery.discoverAdminGroups(fixture.user2)
+          .then(function(groups) {
+            assert.strictEqual(groups.length, 1);
+            assert.strictEqual(String(groups[0]._id), String(fixture.group1._id));
+          });
+      });
+
     });
+
 
     it('should return rooms where the user is in extraAdmins', function() {
       return adminDiscovery.discoverAdminGroups(fixture.user1)

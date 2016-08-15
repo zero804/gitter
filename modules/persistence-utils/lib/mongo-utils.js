@@ -148,7 +148,6 @@ function setId(model) {
   model.id = serializeObjectId(model._id);
   return model;
 }
-exports.setId = setId;
 
 function setIds(array) {
   array.forEach(function(f) {
@@ -245,7 +244,6 @@ function conjunctionIds(terms, termIdentifiers) {
 
   return { $or: terms };
 }
-exports.conjunctionIds = conjunctionIds;
 
 function isMongoError(err) {
   // instanceof is not suitable since there may be multiple instances of
@@ -259,19 +257,44 @@ function mongoErrorWithCode(code) {
   }
 }
 
-exports.objectIDsEqual = objectIDsEqual;
-exports.isMongoError = isMongoError;
-exports.setIds = setIds;
-exports.isLikeObjectId = isLikeObjectId;
-exports.asObjectID = asObjectID;
-exports.asObjectIDs = asObjectIDs;
-exports.getDateFromObjectId = getDateFromObjectId;
-exports.getTimestampFromObjectId = getTimestampFromObjectId;
-exports.getNewObjectIdString = getNewObjectIdString;
-exports.serializeObjectId = serializeObjectId;
-exports.serializeObjectIds = serializeObjectIds;
-exports.createIdForTimestamp = createIdForTimestamp;
-exports.createIdForTimestampString = createIdForTimestampString;
-exports.fieldInPredicate = fieldInPredicate;
-exports.isMongoError = isMongoError;
-exports.mongoErrorWithCode = mongoErrorWithCode;
+/**
+ * Given an array of an array of models, return a
+ * unique list of models
+ */
+function unionModelsById(arrayOfModels) {
+  var idHash = {};
+  return _.reduce(arrayOfModels, function(result, models) {
+    if (!models) return result;
+
+    _.reduce(models, function(result, model) {
+      var id = model.id || model._id;
+      if (idHash[id]) return result;
+      idHash[id] = true;
+      result.push(model);
+      return result;
+    }, result);
+
+    return result;
+  }, []);
+}
+
+module.exports = {
+  objectIDsEqual: objectIDsEqual,
+  isMongoError: isMongoError,
+  setId: setId,
+  setIds: setIds,
+  isLikeObjectId: isLikeObjectId,
+  asObjectID: asObjectID,
+  asObjectIDs: asObjectIDs,
+  getDateFromObjectId: getDateFromObjectId,
+  getTimestampFromObjectId: getTimestampFromObjectId,
+  getNewObjectIdString: getNewObjectIdString,
+  serializeObjectId: serializeObjectId,
+  serializeObjectIds: serializeObjectIds,
+  createIdForTimestamp: createIdForTimestamp,
+  createIdForTimestampString: createIdForTimestampString,
+  fieldInPredicate: fieldInPredicate,
+  conjunctionIds: conjunctionIds,
+  mongoErrorWithCode: mongoErrorWithCode,
+  unionModelsById: unionModelsById
+}

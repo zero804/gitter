@@ -1,23 +1,38 @@
 'use strict';
 
+var assert = require('assert');
 var Promise = require('bluebird');
 var githubOrgAdminDiscovery = require('./github-org');
 var Group = require('gitter-web-persistence').Group;
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
+function singleOrInManyQuery(item) {
+  if (Array.isArray(item)) {
+    return { $in: item };
+  } else {
+    return item;
+  }
+}
 function descriptorSearchAsQuery(descriptorSearch) {
+  var disjunction = []
   var query = {
     'sd.type': descriptorSearch.type,
+    $or: disjunction
   };
 
   if (descriptorSearch.linkPath) {
-    if (Array.isArray(descriptorSearch.linkPath)) {
-      query['sd.linkPath'] = { $in: descriptorSearch.linkPath };
-    } else {
-      query['sd.linkPath'] = descriptorSearch.linkPath;
-    }
+    disjunction.push({
+      'sd.linkPath': singleOrInManyQuery(descriptorSearch.linkPath)
+    });
   }
 
-  // More query search things here in future?
+  if (descriptorSearch.externalId) {
+    disjunction.push({
+      'sd.externalId': singleOrInManyQuery(descriptorSearch.externalId)
+    });
+  }
+
+  assert(disjunction.length >= 1, 'At least one disjunction should have been provided')
 
   return query;
 }
@@ -49,27 +64,6 @@ function findModelsForExtraAdmin(Model, userId) {
     .exec();
 }
 
-/**
- * Given an array of an array of models, return a
- * unique list of models
- */
-function uniqueModels(arrayOfModels) {
-  var idHash = {};
-  var result = [];
-  arrayOfModels.forEach(function(models) {
-    if (!models) return;
-
-    models.forEach(function(model) {
-      var id = model._id;
-      if (idHash[id]) return;
-      idHash[id] = true;
-      result.push(model);
-    });
-  });
-
-  return result;
-}
-
 function discoverAdminGroups(user) {
   // Anonymous users don't have admin groups
   if (!user) return [];
@@ -80,7 +74,7 @@ function discoverAdminGroups(user) {
     // as it could result in too large a query (50k repos for example)
     findModelsForExtraAdmin(Group, user._id || user.id),
     function(orgModels, extraAdminModels) {
-      return uniqueModels([orgModels, extraAdminModels])
+      return mongoUtils.unionModelsById([orgModels, extraAdminModels])
     });
 }
 
