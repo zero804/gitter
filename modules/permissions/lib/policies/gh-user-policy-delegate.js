@@ -24,6 +24,10 @@ GhUserPolicyDelegate.prototype = {
     }
   }),
 
+  getAccessDetails: function() {
+    return null;
+  },
+
   /**
    * Returns a key used to skip checks
    */
