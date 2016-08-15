@@ -2,13 +2,11 @@
 
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
-var fakeData = require('gitter-web-fake-data');
 var internalClientAccessOnly = require('../../../web/middlewares/internal-client-access-only');
-var forumService = require('gitter-web-forums/lib/forum-service');
-var replyService = require('gitter-web-replies/lib/reply-service');
-var policyFactory = require('gitter-web-permissions/lib/policy-factory');
+var commentService = require('gitter-web-comments/lib/comment-service');
 var ForumWithPolicyService = require('../../../services/forum-with-policy-service');
 var restSerializer = require('../../../serializers/rest-serializer');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 
 function getCommentOptions(body) {
@@ -21,19 +19,36 @@ function getCommentOptions(body) {
 }
 
 module.exports = {
+  id: 'comment',
 
-  id: 'commentId',
+  index: function(req) {
+    var reply = req.reply;
 
-  index: function() {
-    return Promise.resolve(fakeData.getComments());
+    // TODO: don't just return all the comments, return a sample
+    return commentService.findByReplyId(reply._id)
+      .then(function(comments) {
+        var strategy = new restSerializer.CommentStrategy();
+        return restSerializer.serialize(comments, strategy);
+      });
   },
 
-  show: function() {
-    return Promise.resolve(fakeData.getComment());
+  show: function(req) {
+    var comment = req.comment;
+    var strategy = new restSerializer.CommentStrategy();
+    return restSerializer.serializeObject(comment, strategy);
+  },
+
+  load: function(req, id) {
+    if (!mongoUtils.isLikeObjectId(id)) throw new StatusError(400);
+
+    return commentService.findByIdForForumTopicAndReply(req.forum._id, req.topic._id, req.reply._id, id);
   },
 
   create: function(req) {
     var user = req.user;
+    var forum = req.forum;
+    var reply = req.reply;
+    var policy = req.userForumPolicy;
 
     // This is for internal clients only
     if (!internalClientAccessOnly.isRequestFromInternalClient(req)) {
@@ -44,29 +59,8 @@ module.exports = {
 
     var commentOptions = getCommentOptions(req.body);
 
-    // TODO: This should be handled by load methods in api/v1/forums/index.js,
-    // api/v1/forums/topics.js and api/v1/forums/replies.js, but we can't do
-    // that yet, because the other routes still have to return fake data for
-    // the moment and we don't want that throwing a 404.
-    return Promise.join(
-        forumService.findById(req.params.forumId),
-        replyService.findByIdForForumAndTopic(req.params.forumId, req.params.topicId, req.params.replyId)
-      )
-      .bind({})
-      .spread(function(forum, reply) {
-        if (!forum) throw new StatusError(404, 'Forum not found.');
-        if (!reply) throw new StatusError(404, 'Reply not found.');
-
-        this.forum = forum;
-        this.reply = reply;
-
-        // TODO: this can probably also be moved to middleware
-        return policyFactory.createPolicyForForum(user, forum);
-      })
-      .then(function(policy) {
-        var forumWithPolicyService = new ForumWithPolicyService(this.forum, user, policy);
-        return forumWithPolicyService.createComment(this.reply, commentOptions);
-      })
+    var forumWithPolicyService = new ForumWithPolicyService(forum, user, policy);
+    return forumWithPolicyService.createComment(reply, commentOptions)
       .then(function(comment) {
         var commentStrategy = new restSerializer.CommentStrategy();
         return restSerializer.serializeObject(comment, commentStrategy);

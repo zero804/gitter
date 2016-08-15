@@ -2,13 +2,13 @@
 
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
-var fakeData = require('gitter-web-fake-data');
 var internalClientAccessOnly = require('../../../web/middlewares/internal-client-access-only');
-var forumService = require('gitter-web-forums/lib/forum-service');
 var forumCategoryService = require('gitter-web-forum-categories/lib/forum-category-service');
+var topicService = require('gitter-web-topics/lib/topic-service');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var ForumWithPolicyService = require('../../../services/forum-with-policy-service');
 var restSerializer = require('../../../serializers/rest-serializer');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 
 function getTopicOptions(body) {
@@ -42,19 +42,42 @@ function getTopicOptions(body) {
 }
 
 module.exports = {
+  id: 'topic',
 
-  id: 'topicId',
+  index: function(req) {
+    var forum = req.forum;
 
-  index: function(){
-    return Promise.resolve(fakeData.getTopics());
+    // TODO: return a sample set, not all of them
+    return topicService.findByForumId(forum._id)
+      .then(function(topics) {
+        var strategy = new restSerializer.TopicStrategy({
+          // again: _some_ replies, not all of them
+          includeReplies: true,
+          includeRepliesTotals: true,
+        });
+        return restSerializer.serialize(topics, strategy);
+      });
   },
 
-  show: function (){
-    return Promise.resolve(fakeData.getTopic());
+  show: function(req) {
+    var topic = req.topic;
+    var strategy = new restSerializer.TopicStrategy({
+      includeReplies: true,
+      includeRepliesTotals: true,
+    });
+    return restSerializer.serializeObject(topic, strategy);
+  },
+
+  load: function(req, id) {
+    if (!mongoUtils.isLikeObjectId(id)) throw new StatusError(400);
+
+    return topicService.findByIdForForum(req.forum._id, id);
   },
 
   create: function(req) {
     var user = req.user;
+    var forum = req.forum;
+    var policy = req.userForumPolicy;
 
     // This is for internal clients only
     if (!internalClientAccessOnly.isRequestFromInternalClient(req)) {
@@ -69,28 +92,12 @@ module.exports = {
 
     var topicOptions = getTopicOptions(req.body);
 
-
-    // TODO: This should be handled by a load method in api/v1/forums/index.js,
-    // but we can't do that yet, because the other routes still have to return
-    // fake data for the moment and we don't want that throwing a 404.
-    return Promise.join(
-        forumService.findById(req.params.forumId),
-        forumCategoryService.findByIdForForum(req.params.forumId, categoryId)
-      )
-      .bind({})
-      .spread(function(forum, category) {
-        if (!forum) throw new StatusError(404, 'Forum not found.');
+    return forumCategoryService.findByIdForForum(forum._id, categoryId)
+      .then(function(category) {
         if (!category) throw new StatusError(404, 'Category not found.');
 
-        this.forum = forum;
-        this.category = category;
-
-        // TODO: this can probably also be moved to middleware
-        return policyFactory.createPolicyForForum(user, forum);
-      })
-      .then(function(policy) {
-        var forumWithPolicyService = new ForumWithPolicyService(this.forum, user, policy);
-        return forumWithPolicyService.createTopic(this.category, topicOptions);
+        var forumWithPolicyService = new ForumWithPolicyService(forum, user, policy);
+        return forumWithPolicyService.createTopic(category, topicOptions);
       })
       .then(function(topic) {
         var topicStrategy = new restSerializer.TopicStrategy();

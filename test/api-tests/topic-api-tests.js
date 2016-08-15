@@ -38,6 +38,36 @@ describe('topic-api', function() {
     }
   });
 
+  it('GET /v1/forums/:forumId/topics', function() {
+    return request(app)
+      .get('/v1/forums/' + fixture.forum1.id + '/topics')
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+      .then(function(result) {
+        var topics = result.body;
+
+        var topic = topics.find(function(t) {
+          return t.id === fixture.topic1.id;
+        });
+        assert.strictEqual(topic.id, fixture.topic1.id);
+        assert.strictEqual(topic.repliesTotal, 1);
+        assert.strictEqual(topic.replies.length, 1);
+      });
+  });
+
+  it('GET /v1/forums/:forumId/topics/:topicId', function() {
+    return request(app)
+      .get('/v1/forums/' + fixture.forum1.id + '/topics/' + fixture.topic1.id)
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+      .then(function(result) {
+        var topic = result.body;
+        assert.strictEqual(topic.id, fixture.topic1.id);
+        assert.strictEqual(topic.repliesTotal, 1);
+        assert.strictEqual(topic.replies.length, 1);
+      });
+  });
+
   it('POST /v1/forums/:forumId/topics', function() {
     return request(app)
       .post('/v1/forums/' + fixture.forum1.id + '/topics')
@@ -54,31 +84,4 @@ describe('topic-api', function() {
       });
   });
 
-  it('POST /v1/forums/:forumId/topics/:topicId/replies', function() {
-    return request(app)
-      .post('/v1/forums/' + fixture.forum1.id + '/topics/' + fixture.topic1.id + '/replies')
-      .send({
-        text: 'I am a reply.'
-      })
-      .set('x-access-token', fixture.user1.accessToken)
-      .expect(200)
-      .then(function(result) {
-        var reply = result.body;
-        assert.strictEqual(reply.body.text, 'I am a reply.');
-      });
-  });
-
-  it('POST /v1/forums/:forumId/topics/:topicId/replies/:replyId/comments', function() {
-    return request(app)
-      .post('/v1/forums/' + fixture.forum1.id + '/topics/' + fixture.topic1.id + '/replies/' + fixture.reply1.id + '/comments')
-      .send({
-        text: 'I am a comment.'
-      })
-      .set('x-access-token', fixture.user1.accessToken)
-      .expect(200)
-      .then(function(result) {
-        var comment = result.body;
-        assert.strictEqual(comment.body.text, 'I am a comment.');
-      });
-  });
 });
