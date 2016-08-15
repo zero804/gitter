@@ -12,7 +12,7 @@ function githubOrgAdminDiscovery(user) {
       return {
         type: 'GH_ORG',
         linkPath: orgs.map(function(org) {
-          org.login
+          return org.login;
         })
       }
     });
