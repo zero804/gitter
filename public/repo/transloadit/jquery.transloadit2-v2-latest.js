@@ -3,7 +3,380 @@ require('jquery.easing')(jQuery);
 
 // Nicked from https://github.com/transloadit/jquery-sdk/tree/v2.7.1
 // Version v2.7.1
+/*
+ * jQuery JSONP Core Plugin 2.4.0 (2012-08-21)
+ *
+ * https://github.com/jaubourg/jquery-jsonp
+ *
+ * Copyright (c) 2012 Julian Aubourg
+ *
+ * This document is licensed as free software under the terms of the
+ * MIT License: http://www.opensource.org/licenses/mit-license.php
+ */
+( function( $ ) {
 
+	// ###################### UTILITIES ##
+
+	// Noop
+	function noop() {
+	}
+
+	// Generic callback
+	function genericCallback( data ) {
+		lastValue = [ data ];
+	}
+
+	// Call if defined
+	function callIfDefined( method , object , parameters ) {
+		return method && method.apply( object.context || object , parameters );
+	}
+
+	// Give joining character given url
+	function qMarkOrAmp( url ) {
+		return /\?/ .test( url ) ? "&" : "?";
+	}
+
+	var // String constants (for better minification)
+		STR_ASYNC = "async",
+		STR_CHARSET = "charset",
+		STR_EMPTY = "",
+		STR_ERROR = "error",
+		STR_INSERT_BEFORE = "insertBefore",
+		STR_JQUERY_JSONP = "_jqjsp",
+		STR_ON = "on",
+		STR_ON_CLICK = STR_ON + "click",
+		STR_ON_ERROR = STR_ON + STR_ERROR,
+		STR_ON_LOAD = STR_ON + "load",
+		STR_ON_READY_STATE_CHANGE = STR_ON + "readystatechange",
+		STR_READY_STATE = "readyState",
+		STR_REMOVE_CHILD = "removeChild",
+		STR_SCRIPT_TAG = "<script>",
+		STR_SUCCESS = "success",
+		STR_TIMEOUT = "timeout",
+
+		// Window
+		win = window,
+		// Deferred
+		Deferred = $.Deferred,
+		// Head element
+		head = $( "head" )[ 0 ] || document.documentElement,
+		// Page cache
+		pageCache = {},
+		// Counter
+		count = 0,
+		// Last returned value
+		lastValue,
+
+		// ###################### DEFAULT OPTIONS ##
+		xOptionsDefaults = {
+			//beforeSend: undefined,
+			//cache: false,
+			callback: STR_JQUERY_JSONP,
+			//callbackParameter: undefined,
+			//charset: undefined,
+			//complete: undefined,
+			//context: undefined,
+			//data: "",
+			//dataFilter: undefined,
+			//error: undefined,
+			//pageCache: false,
+			//success: undefined,
+			//timeout: 0,
+			//traditional: false,
+			url: location.href
+		},
+
+		// opera demands sniffing :/
+		opera = win.opera,
+
+		// IE < 10
+		oldIE = !!$( "<div>" ).html( "<!--[if IE]><i><![endif]-->" ).find("i").length;
+
+	// ###################### MAIN FUNCTION ##
+	function jsonp( xOptions ) {
+
+		// Build data with default
+		xOptions = $.extend( {} , xOptionsDefaults , xOptions );
+
+		// References to xOptions members (for better minification)
+		var successCallback = xOptions.success,
+			errorCallback = xOptions.error,
+			completeCallback = xOptions.complete,
+			dataFilter = xOptions.dataFilter,
+			callbackParameter = xOptions.callbackParameter,
+			successCallbackName = xOptions.callback,
+			cacheFlag = xOptions.cache,
+			pageCacheFlag = xOptions.pageCache,
+			charset = xOptions.charset,
+			url = xOptions.url,
+			data = xOptions.data,
+			timeout = xOptions.timeout,
+			pageCached,
+
+			// Abort/done flag
+			done = 0,
+
+			// Life-cycle functions
+			cleanUp = noop,
+
+			// Support vars
+			supportOnload,
+			supportOnreadystatechange,
+
+			// Request execution vars
+			firstChild,
+			script,
+			scriptAfter,
+			timeoutTimer;
+
+		// If we have Deferreds:
+		// - substitute callbacks
+		// - promote xOptions to a promise
+		Deferred && Deferred(function( defer ) {
+			defer.done( successCallback ).fail( errorCallback );
+			successCallback = defer.resolve;
+			errorCallback = defer.reject;
+		}).promise( xOptions );
+
+		// Create the abort method
+		xOptions.abort = function() {
+			!( done++ ) && cleanUp();
+		};
+
+		// Call beforeSend if provided (early abort if false returned)
+		if ( callIfDefined( xOptions.beforeSend , xOptions , [ xOptions ] ) === !1 || done ) {
+			return xOptions;
+		}
+
+		// Control entries
+		url = url || STR_EMPTY;
+		data = data ? ( (typeof data) == "string" ? data : $.param( data , xOptions.traditional ) ) : STR_EMPTY;
+
+		// Build final url
+		url += data ? ( qMarkOrAmp( url ) + data ) : STR_EMPTY;
+
+		// Add callback parameter if provided as option
+		callbackParameter && ( url += qMarkOrAmp( url ) + encodeURIComponent( callbackParameter ) + "=?" );
+
+		// Add anticache parameter if needed
+		!cacheFlag && !pageCacheFlag && ( url += qMarkOrAmp( url ) + "_" + ( new Date() ).getTime() + "=" );
+
+		// Replace last ? by callback parameter
+		url = url.replace( /=\?(&|$)/ , "=" + successCallbackName + "$1" );
+
+		// Success notifier
+		function notifySuccess( json ) {
+
+			if ( !( done++ ) ) {
+
+				cleanUp();
+				// Pagecache if needed
+				pageCacheFlag && ( pageCache [ url ] = { s: [ json ] } );
+				// Apply the data filter if provided
+				dataFilter && ( json = dataFilter.apply( xOptions , [ json ] ) );
+				// Call success then complete
+				callIfDefined( successCallback , xOptions , [ json , STR_SUCCESS, xOptions ] );
+				callIfDefined( completeCallback , xOptions , [ xOptions , STR_SUCCESS ] );
+
+			}
+		}
+
+		// Error notifier
+		function notifyError( type ) {
+
+			if ( !( done++ ) ) {
+
+				// Clean up
+				cleanUp();
+				// If pure error (not timeout), cache if needed
+				pageCacheFlag && type != STR_TIMEOUT && ( pageCache[ url ] = type );
+				// Call error then complete
+				callIfDefined( errorCallback , xOptions , [ xOptions , type ] );
+				callIfDefined( completeCallback , xOptions , [ xOptions , type ] );
+
+			}
+		}
+
+		// Check page cache
+		if ( pageCacheFlag && ( pageCached = pageCache[ url ] ) ) {
+
+			pageCached.s ? notifySuccess( pageCached.s[ 0 ] ) : notifyError( pageCached );
+
+		} else {
+
+			// Install the generic callback
+			// (BEWARE: global namespace pollution ahoy)
+			win[ successCallbackName ] = genericCallback;
+
+			// Create the script tag
+			script = $( STR_SCRIPT_TAG )[ 0 ];
+			script.id = STR_JQUERY_JSONP + count++;
+
+			// Set charset if provided
+			if ( charset ) {
+				script[ STR_CHARSET ] = charset;
+			}
+
+			opera && opera.version() < 11.60 ?
+				// onerror is not supported: do not set as async and assume in-order execution.
+				// Add a trailing script to emulate the event
+				( ( scriptAfter = $( STR_SCRIPT_TAG )[ 0 ] ).text = "document.getElementById('" + script.id + "')." + STR_ON_ERROR + "()" )
+			:
+				// onerror is supported: set the script as async to avoid requests blocking each others
+				( script[ STR_ASYNC ] = STR_ASYNC )
+
+			;
+
+			// Internet Explorer: event/htmlFor trick
+			if ( oldIE ) {
+				script.htmlFor = script.id;
+				script.event = STR_ON_CLICK;
+			}
+
+			// Attached event handlers
+			script[ STR_ON_LOAD ] = script[ STR_ON_ERROR ] = script[ STR_ON_READY_STATE_CHANGE ] = function ( result ) {
+
+				// Test readyState if it exists
+				if ( !script[ STR_READY_STATE ] || !/i/.test( script[ STR_READY_STATE ] ) ) {
+
+					try {
+
+						script[ STR_ON_CLICK ] && script[ STR_ON_CLICK ]();
+
+					} catch( _ ) {}
+
+					result = lastValue;
+					lastValue = 0;
+					result ? notifySuccess( result[ 0 ] ) : notifyError( STR_ERROR );
+
+				}
+			};
+
+			// Set source
+			script.src = url;
+
+			// Re-declare cleanUp function
+			cleanUp = function( i ) {
+				timeoutTimer && clearTimeout( timeoutTimer );
+				script[ STR_ON_READY_STATE_CHANGE ] = script[ STR_ON_LOAD ] = script[ STR_ON_ERROR ] = null;
+				head[ STR_REMOVE_CHILD ]( script );
+				scriptAfter && head[ STR_REMOVE_CHILD ]( scriptAfter );
+			};
+
+			// Append main script
+			head[ STR_INSERT_BEFORE ]( script , ( firstChild = head.firstChild ) );
+
+			// Append trailing script if needed
+			scriptAfter && head[ STR_INSERT_BEFORE ]( scriptAfter , firstChild );
+
+			// If a timeout is needed, install it
+			timeoutTimer = timeout > 0 && setTimeout( function() {
+				notifyError( STR_TIMEOUT );
+			} , timeout );
+
+		}
+
+		return xOptions;
+	}
+
+	// ###################### SETUP FUNCTION ##
+	jsonp.setup = function( xOptions ) {
+		$.extend( xOptionsDefaults , xOptions );
+	};
+
+	// ###################### INSTALL in jQuery ##
+	$.jsonp = jsonp;
+
+} )( jQuery );
+/** @license jQuery Tools 1.2.3: Tero Piirainen | Public domain
+*/
+
+/**
+ * jQuery Tools 1.2.3 / Expose - Dim the lights
+ *
+ * NO COPYRIGHTS OR LICENSES. DO WHAT YOU LIKE.
+ *
+ * http://flowplayer.org/tools/toolbox/expose.html
+ *
+ * Since: Mar 2010
+ * Date:    Mon Jun 7 13:43:53 2010 +0000
+ */
+
+/**
+ * This version is by @pekeler as proposed in https://gist.github.com/pekeler/4965712
+ * and discussed in https://github.com/transloadit/jquery-sdk/issues/13#issuecomment-13645153
+ *
+ * https://github.com/jquerytools/jquerytools/blob/master/src/toolbox/toolbox.expose.js
+ * simplified, minimally tested in Safari 6.0.2, FF 18.0.2, Chrome 24.0.1312.57,
+ * IE9, IE8, IE7. Works with jQuery 1.9
+ */
+
+(function($) {
+	$.tools = $.tools || {version: '2013-02-15'};
+	var tool = $.tools.expose = {
+		conf: {
+			maskId: 'exposeMask',
+			loadSpeed: 'slow',
+			closeSpeed: 'fast',
+			zIndex: 9998,
+			opacity: 0.8,
+			startOpacity: 0,
+			color: '#fff'
+		}
+	};
+	var mask, exposed, loaded, config, overlayIndex;
+	$.mask = {
+		load: function(conf, els) {
+			if (loaded) { return this; }
+			conf = conf || config;
+			config = conf = $.extend($.extend({}, tool.conf), conf);
+			mask = $("#" + conf.maskId);
+			if (!mask.length) {
+				mask = $('<div/>').attr("id", conf.maskId);
+				$("body").append(mask);
+			}
+			mask.css({
+				position: 'fixed',
+				top: 0,
+				left: 0,
+				width: "100%",
+				height: "100%",
+				display: 'block',
+				opacity: conf.opacity,
+				zIndex: conf.zIndex,
+				backgroundColor: conf.color
+			});
+
+			if (els && els.length) {
+				overlayIndex = els.eq(0).css("zIndex");
+				exposed = els.css({ zIndex: Math.max(conf.zIndex + 1, overlayIndex == 'auto' ? 0 : overlayIndex)});
+			}
+
+			loaded = true;
+
+			return this;
+		},
+		close: function() {
+			if (loaded) {
+				mask.fadeOut(config.closeSpeed, function() {
+					if (exposed) {
+						exposed.css({zIndex: overlayIndex});
+					}
+				});
+				loaded = false;
+			}
+			return this;
+		}
+	};
+	$.fn.mask = function(conf) {
+		$.mask.load(conf);
+		return this;
+	};
+	$.fn.expose = function(conf) {
+		$.mask.load(conf, this);
+		return this;
+	};
+})(jQuery);
 /** @license jquery.transloadit2.js: Copyright (c) 2013 Transloadit Ltd | MIT License: http://www.opensource.org/licenses/mit-license.php
  *
  * Fork this on Github: http://github.com/transloadit/jquery-sdk
@@ -18,7 +391,7 @@ require('jquery.easing')(jQuery);
 
   var OPTIONS = {
     service                      : DEFAULT_SERVICE,
-    assets                       : PROTOCOL+'assets.transloadit.com/',
+    assets                       : PROTOCOL + 'assets.transloadit.com/',
     beforeStart                  : function() {return true;},
     onFileSelect                 : function() {},
     onStart                      : function() {},
@@ -47,31 +420,31 @@ require('jquery.easing')(jQuery);
   };
 
   var I18N = {
-    en: {
-      'errors.BORED_INSTANCE_ERROR': 'Could not find a bored instance.',
-      'errors.CONNECTION_ERROR': 'There was a problem connecting to the upload server',
-      'errors.unknown': 'There was an internal error.',
-      'errors.tryAgain': 'Please try your upload again.',
-      'errors.troubleshootDetails': 'If you would like our help to troubleshoot this, ' +
+    en : {
+      'errors.BORED_INSTANCE_ERROR' : 'Could not find a bored instance.',
+      'errors.CONNECTION_ERROR'     : 'There was a problem connecting to the upload server',
+      'errors.unknown'              : 'There was an internal error.',
+      'errors.tryAgain'             : 'Please try your upload again.',
+      'errors.troubleshootDetails'  : 'If you would like our help to troubleshoot this, ' +
           'please email us this information:',
-      cancel: 'Cancel',
-      details: 'Details',
-      startingUpload: 'Starting upload ...',
-      processingFiles: 'Upload done, now processing files ...',
-      uploadProgress: '%s / %s MB at %s kB/s | %s left'
+      cancel                        : 'Cancel',
+      details                       : 'Details',
+      startingUpload                : 'Starting upload ...',
+      processingFiles               : 'Upload done, now processing files ...',
+      uploadProgress                : '%s / %s MB at %s kB/s | %s left'
     },
-    ja: {
-      'errors.BORED_INSTANCE_ERROR': 'サーバー接続に問題があります',
-      'errors.CONNECTION_ERROR': 'サーバー接続に問題があります',
-      'errors.unknown': '通信環境に問題があります',
-      'errors.tryAgain': 'しばらくしてから再度投稿してください',
-      'errors.troubleshootDetails': '解決できない場合は、こちらにお問い合わせください ' +
+    ja : {
+      'errors.BORED_INSTANCE_ERROR' : 'サーバー接続に問題があります',
+      'errors.CONNECTION_ERROR'     : 'サーバー接続に問題があります',
+      'errors.unknown'              : '通信環境に問題があります',
+      'errors.tryAgain'             : 'しばらくしてから再度投稿してください',
+      'errors.troubleshootDetails'  : '解決できない場合は、こちらにお問い合わせください ' +
           '下記の情報をメールでお送りください:',
-      cancel: 'キャンセル',
-      details: '詳細',
-      startingUpload: '投稿中 ...',
-      processingFiles: '接続中',
-      uploadProgress: '%s MB / %s MB (%s kB / 秒)'
+      cancel                        : 'キャンセル',
+      details                       : '詳細',
+      startingUpload                : '投稿中 ...',
+      processingFiles               : '接続中',
+      uploadProgress                : '%s MB / %s MB (%s kB / 秒)'
     }
   };
   var CSS_LOADED = false;
@@ -221,7 +594,7 @@ require('jquery.easing')(jQuery);
           self.instance = instance.api2_host;
           self.start();
         },
-        error: function(xhr, status, jsonpErr) {
+        error             : function(xhr, status, jsonpErr) {
           if (canUseCustomBoredLogic && self._options['service'] === DEFAULT_SERVICE) {
             canUseCustomBoredLogic = false;
 
@@ -238,6 +611,11 @@ require('jquery.easing')(jQuery);
               }
 
               url = PROTOCOL + 'api2.' + theUrl + '/instances/bored';
+
+              if (PROTOCOL === 'https://') {
+                url = PROTOCOL + 'api2-' + theUrl + '/instances/bored';
+              }
+
               proceed();
             });
             return;
@@ -268,7 +646,6 @@ require('jquery.easing')(jQuery);
   };
 
   Uploader.prototype._findBoredInstanceUrl = function(cb) {
-    var self   = this;
     var region = this._options.region;
     var domain = 's3';
 
@@ -279,20 +656,33 @@ require('jquery.easing')(jQuery);
     var url = PROTOCOL + domain + '.amazonaws.com/infra-' + region;
     url    += '.transloadit.com/cached_instances.json';
 
-    $.ajax({
+    var self = this;
+    var opts = {
       url      : url,
-      datatype : 'json',
       timeout  : 5000,
-      success: function(result) {
+      datatype : 'json',
+      success  : function(result) {
         var instances = self._shuffle(result.uploaders);
         self._findResponsiveInstance(instances, 0, cb);
-      },
-      error: function(xhr, status) {
-        var msg = 'Could not query S3 for cached uploaders from url: ' + url;
+      }
+    };
+
+    opts.error = function(xhr, status) {
+      // retry from the crm if S3 let us down
+      opts.url = PROTOCOL + 'transloadit.com/' + region;
+      opts.url += '_cached_instances.json';
+
+      opts.error = function(xhr, status) {
+        var msg = 'Could not get cached uploaders from neither S3 or the crm';
+        msg += ' for region: ' + region;
         var err = new Error(msg);
         cb(err);
-      }
-    });
+      };
+
+      $.ajax(opts);
+    };
+
+    $.ajax(opts);
   };
 
   Uploader.prototype._findResponsiveInstance = function(instances, index, cb) {
@@ -308,10 +698,10 @@ require('jquery.easing')(jQuery);
       url               : PROTOCOL + url,
       timeout           : 3000,
       callbackParameter : 'callback',
-      success: function(result) {
+      success           : function(result) {
         cb(null, url);
       },
-      error: function(xhr, status) {
+      error             : function(xhr, status) {
         self._findResponsiveInstance(instances, index + 1, cb);
       }
     });
@@ -347,26 +737,34 @@ require('jquery.easing')(jQuery);
     // when the user hits cancel and so that we can .append(this.$files) to
     // this.$uploadForm, which moves (without a clone!) the file input fields in the dom
     this.$fileClones = $().not(document);
-    this.$files.each(function() {
-      var $clone = $(this).clone(true);
-      self.$fileClones = self.$fileClones.add($clone);
-      $clone.insertAfter(this);
-    });
 
-    this.$iframe = $('<iframe id="transloadit-'+this.assemblyId+'" name="transloadit-'+this.assemblyId+'"/>')
+    // We do not need file clones if we do an XHR upload, because we do not
+    // have a shadow form submitted to an iframe in that case.
+    if (!this._options.formData) {
+      this.$files.each(function() {
+        var $clone = $(this).clone(true);
+        self.$fileClones = self.$fileClones.add($clone);
+        $clone.insertAfter(this);
+      });
+    }
+
+    this.$iframe = $('<iframe id="transloadit-' + this.assemblyId + '" name="transloadit-' + this.assemblyId + '"/>')
       .appendTo('body')
       .hide();
 
-    var url = PROTOCOL+this.instance+'/assemblies/'+this.assemblyId+'?redirect=false';
+    var url = PROTOCOL + this.instance + '/assemblies/' + this.assemblyId + '?redirect=false';
 
     if (this._options.formData) {
-      var paramsFieldVal = this.$form.find("input[name=params]").val();
+      var assemblyParams = this._options.params;
+      if (this.$params) {
+        assemblyParams = this.$params.val();
+      }
 
       if (this._options.formData instanceof FormData) {
-        this._options.formData.append("params", paramsFieldVal);
+        this._options.formData.append("params", assemblyParams);
       } else {
-        var formData = new FormData(this.$form);
-        formData.append("params", paramsFieldVal);
+        var formData = new FormData(this.$form.get(0));
+        formData.append("params", assemblyParams);
 
         for (var i = 0; i < this._options.formData.length; i++) {
           var tupel = this._options.formData[i];
@@ -497,7 +895,7 @@ require('jquery.easing')(jQuery);
 
     if (this.params.redirect_url) {
       this.$form.attr('action', this.params.redirect_url);
-    } else if (this._options.autoSubmit && (this.$form.attr('action') == this._options.service+'assemblies')) {
+    } else if (this._options.autoSubmit && (this.$form.attr('action') == this._options.service + 'assemblies')) {
       alert('Error: input[name=params] does not include a redirect_url');
       return;
     }
@@ -520,7 +918,7 @@ require('jquery.easing')(jQuery);
     this.pollStarted = +new Date();
 
     var instance = 'status-' + this.instance;
-    var url      = PROTOCOL + instance + '/assemblies/'+this.assemblyId;
+    var url      = PROTOCOL + instance + '/assemblies/' + this.assemblyId;
 
     if (query) {
       url += query;
@@ -638,7 +1036,7 @@ require('jquery.easing')(jQuery);
         }, timeout);
         self.lastPoll = +new Date();
       },
-      error: function(xhr, status, jsonpErr) {
+      error             : function(xhr, status, jsonpErr) {
         if (self.ended) {
           return;
         }
@@ -739,18 +1137,18 @@ require('jquery.easing')(jQuery);
 
   Uploader.prototype.showModal = function() {
     this.$modal =
-      $('<div id="transloadit">'+
-        '<div class="content">'+
-          '<a href="#close" class="close">'+ this.i18n('cancel') +'</a>'+
-          '<p class="status"></p>'+
+      $('<div id="transloadit">' +
+        '<div class="content">' +
+          '<a href="#close" class="close">' + this.i18n('cancel') + '</a>' +
+          '<p class="status"></p>' +
           '<div class="progress progress-striped">' +
             '<div class="bar"><span class="percent"></span></div>' +
           '</div>' +
-          '<label>'+ this.i18n('startingUpload')+'</label>' +
-          '<p class="error"></p>'+
-          '<div class="error-details-toggle"><a href="#">'+ this.i18n('details') +'</a></div>' +
-          '<p class="error-details"></p>'+
-        '</div>'+
+          '<label>' + this.i18n('startingUpload') + '</label>' +
+          '<p class="error"></p>' +
+          '<div class="error-details-toggle"><a href="#">' + this.i18n('details') + '</a></div>' +
+          '<p class="error-details"></p>' +
+        '</div>' +
       '</div>')
       .appendTo('body');
 
@@ -800,7 +1198,7 @@ require('jquery.easing')(jQuery);
     this.$modal.$progress.hide();
     this.$modal.$label.hide();
 
-    var errorMsg = err.error+': ' + err.message + '<br /><br />';
+    var errorMsg = err.error + ': ' + err.message + '<br /><br />';
     errorMsg += (err.reason || '');
 
     var errorsRequiringDetails = [
@@ -903,9 +1301,9 @@ require('jquery.easing')(jQuery);
     this.$modal.$progressBar.stop().animate(
       {width: progress + '%'},
       {
-        duration: duration,
-        easing: 'linear',
-        progress: function(promise, currPercent, remainingMs) {
+        duration : duration,
+        easing   : 'linear',
+        progress : function(promise, currPercent, remainingMs) {
           var width = parseInt(self.$modal.$progressBar.css('width'), 10);
 
           var percent = (width * 100 / totalWidth).toFixed(0);
@@ -951,7 +1349,7 @@ require('jquery.easing')(jQuery);
       now.getUTCSeconds()
     );
 
-    var pad = function (n) {
+    var pad = function(n) {
       return n < 10 ? '0' + n : n;
     };
     var tz = d.getTimezoneOffset();
@@ -1045,7 +1443,7 @@ require('jquery.easing')(jQuery);
     var nsecs = options.nsecs != null ? options.nsecs : this._lastNSecs + 1;
 
     // Time since last uuid creation (in msecs)
-    var dt = (msecs - this._lastMSecs) + (nsecs - this._lastNSecs)/10000;
+    var dt = (msecs - this._lastMSecs) + (nsecs - this._lastNSecs) / 10000;
 
     // Per 4.2.1.2, Bump clockseq on clock regression
     if (dt < 0 && options.clockseq == null) {
@@ -1102,7 +1500,7 @@ require('jquery.easing')(jQuery);
     function unparse(_buf, offset) {
       var i = offset || 0, bth = _byteToHex;
 
-      return  bth[_buf[i++]] + bth[_buf[i++]] +
+      return bth[_buf[i++]] + bth[_buf[i++]] +
               bth[_buf[i++]] + bth[_buf[i++]] +
               bth[_buf[i++]] + bth[_buf[i++]] +
               bth[_buf[i++]] + bth[_buf[i++]] +
@@ -1136,7 +1534,7 @@ require('jquery.easing')(jQuery);
     var key  = args.shift();
     var locale = this._options.locale;
     var translated = I18N[locale] && I18N[locale][key] || I18N.en[key];
-    if(!translated) {
+    if (!translated) {
       throw new Error('Unknown i18n key: ' + key);
     }
 
