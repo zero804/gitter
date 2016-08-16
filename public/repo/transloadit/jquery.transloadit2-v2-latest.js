@@ -1,4 +1,8 @@
 var jQuery = require('jquery');
+require('jquery.easing')(jQuery);
+
+// Nicked from https://github.com/transloadit/jquery-sdk/tree/v2.7.1
+// Version v2.7.1
 
 /** @license jquery.transloadit2.js: Copyright (c) 2013 Transloadit Ltd | MIT License: http://www.opensource.org/licenses/mit-license.php
  *
