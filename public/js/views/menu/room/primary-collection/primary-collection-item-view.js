@@ -175,7 +175,7 @@ module.exports = BaseCollectionItemView.extend({
       this.ui.title.html(data.namePieces.reduce(function(html, piece) { return html + '<span class="room-item__title-piece">' + piece + '</span>'; }, ''));
     }
     else {
-      this.ui.title.text(data.displayName || data.name);
+      this.ui.title.html('<span class="room-item__title-piece">' + data.displayName || data.name + '</span>');
     }
   },
 });
