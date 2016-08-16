@@ -1,8 +1,7 @@
+
 var jQuery = require('jquery');
 require('jquery.easing')(jQuery);
 
-// Nicked from https://github.com/transloadit/jquery-sdk/tree/v2.7.1
-// Version v2.7.1
 /*
  * jQuery JSONP Core Plugin 2.4.0 (2012-08-21)
  *
