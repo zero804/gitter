@@ -173,6 +173,7 @@
     "devtool": "^2.0.1",
     "dragula": "^3.7.1",
     "eslint": "^2.9.0",
+    "eslint-plugin-jquery": "^1.0.1",
     "eslint-plugin-mocha": "^2.2.0",
     "eslint-plugin-node": "^1.2.1",
     "eslint-plugin-react": "^5.2.2",
