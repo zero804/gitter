@@ -9,6 +9,7 @@ var loadTroupeFromParam = require('./load-troupe-param');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var RoomWithPolicyService = require('../../../services/room-with-policy-service');
 var roomContextService = require('../../../services/room-context-service');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 function searchRooms(req) {
   var user = req.user;
@@ -144,6 +145,9 @@ module.exports = {
 
   load: function(req, id) {
     var userId = req.user && req.user._id;
+    if (!mongoUtils.isLikeObjectId(id)) {
+      throw new StatusError(400, 'Invalid MongoId: ' + id);
+    }
 
     return policyFactory.createPolicyForRoomId(req.user, id)
       .then(function(policy) {

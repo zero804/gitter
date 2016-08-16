@@ -2,8 +2,7 @@
 @import 'components/menu/menu.less';
 
 @minibar-top-offset: (3 * @desktop-header-height);
-@minibar-bottom-offset: @desktop-header-height;
-@minibar-bottom-offset-with-community-create: (2 * @desktop-header-height);
+@minibar-bottom-offset: (2 * @desktop-header-height);
 
 
 .room-menu-container {
@@ -54,10 +53,6 @@
   top: @minibar-top-offset;
   bottom: @minibar-bottom-offset;
   height: auto;
-
-  &.has-community-create {
-    bottom: @minibar-bottom-offset-with-community-create;
-  }
 
   & > .nano-pane {
     left: auto;
