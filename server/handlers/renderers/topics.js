@@ -27,5 +27,3 @@ function renderForum(req, res, next) {
 module.exports = {
   renderForum: renderForum,
 };
-
-//
