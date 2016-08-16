@@ -1,6 +1,5 @@
 "use strict";
 
-var Promise = require('bluebird');
 var StatusError = require('statuserror');
 var internalClientAccessOnly = require('../../../web/middlewares/internal-client-access-only');
 var forumCategoryService = require('gitter-web-forum-categories/lib/forum-category-service');
