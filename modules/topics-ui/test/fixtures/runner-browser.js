@@ -18,8 +18,7 @@ var requireAll = function(requireContext) {
     return requireContext(filePath);
   });
 };
-requireAll(require.context('../specs', true, /^\.\/.*-test\.js$/));
-requireAll(require.context('../specs', true, /^\.\/.*-test\.jsx$/));
+requireAll(require.context('../specs', true, /^\.\/.*-test\.jsx?$/));
 
 //Mocha config
 mocha.allowUncaught();
