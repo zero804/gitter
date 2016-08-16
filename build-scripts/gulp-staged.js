@@ -50,11 +50,15 @@ function configureTasks(config) {
     var postSteps = findStageTasks(config, postTaskName);
 
     if (preSteps.length) {
-      gulp.task(preTaskName, preSteps);
+      gulp.task(preTaskName, preSteps, function() {
+        gutil.log(preTaskName + ' complete');
+      });
     }
 
     if (postSteps.length) {
-      gulp.task(postTaskName, postSteps);
+      gulp.task(postTaskName, postSteps, function() {
+        gutil.log(postTaskName + ' complete');
+      });
     }
 
     var metaData = {
@@ -75,6 +79,7 @@ function configureTasks(config) {
     }
 
     gulp.task(stageName, previousStages, function(callback) {
+
       var seq = [];
       if (preSteps.length) {
         seq.push(preTaskName);
@@ -92,7 +97,17 @@ function configureTasks(config) {
         return callback();
       }
 
-      seq.push(callback);
+      gutil.log('Starting ' + stageName + ' stage', seq);
+
+      seq.push(function(err) {
+        if (err) {
+          gutil.log('Stage ' + stageName + ' failed');
+        } else {
+          gutil.log('Stage ' + stageName + ' complete');
+        }
+
+        callback(err);
+      });
 
       runSequence.apply(null, seq);
     });
