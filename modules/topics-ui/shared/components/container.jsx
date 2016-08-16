@@ -1,18 +1,19 @@
 "use strict";
 
-var React = require('react');
+import React, {PropTypes, createClass} from 'react';
+import classNames from 'classnames';
 
-module.exports = React.createClass({
+module.exports = createClass({
 
   displayName: 'Container',
   propTypes: {
-    className: React.PropTypes.string,
+    className: PropTypes.string,
   },
 
   render(){
 
     const { className } = this.props;
-    const compiledClass = !!className ? `container ${className}` : 'container';
+    const compiledClass = classNames('container', className);
 
     return (
       <div className={compiledClass} >{this.props.children}</div>
