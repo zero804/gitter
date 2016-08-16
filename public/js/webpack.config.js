@@ -98,7 +98,7 @@ var webpackConfig = {
       "components": path.resolve(path.join(__dirname, "./components")),
       "template": path.resolve(path.join(__dirname, "./template")),
       "bootstrap_tooltip": path.resolve(path.join(__dirname, "./utils/tooltip.js")),
-      "jquery": path.resolve(path.join(__dirname, "../repo/jquery/jquery.js")),
+      "jquery": require.resolve('jquery'),
       "mutant": path.resolve(path.join(__dirname, "../repo/mutant/mutant.js")),
       "cocktail": path.resolve(path.join(__dirname, "../repo/cocktail/cocktail.js")),
       "keymaster": path.resolve(path.join(__dirname, "../repo/keymaster/keymaster.js")),
