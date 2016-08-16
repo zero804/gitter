@@ -9,6 +9,10 @@
   "scripts": {
     "test": "mocha test/"
   },
+  "dependencies": {
+    "bluebird": "^3.2.1",
+    "gitter-web-persistence": "file:../persistence"
+  },
   "devDependencies": {
     "gitter-web-test-utils": "file:../test-utils"
   },
