@@ -26,6 +26,8 @@ module.exports = function getFakeTopicsList(){
         id: val,
         title: faker.commerce.productName(),
         body: { text: body, html: bodyHTML},
+        category: 'test',
+        tags: [ 'test1', 'test2', 'test3', 'test4', 'test5' ],
         repliesTotal: replies.length,
         replies: replies,
         participatingTotal: getRandomInt(8, 25),

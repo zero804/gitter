@@ -51,4 +51,8 @@ describe('<TopicHeader/>', () => {
     equal(wrapper.find('.topic-header__username').length, 1);
   });
 
+  it('should render a control row', () => {
+      equal(wrapper.find('.topic-header__control-row').length, 1);
+  });
+
 });
