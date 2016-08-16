@@ -20,7 +20,7 @@ function webpackPipeline(rootDir) {
   ],
   function(err){
     if(!err) { return; }
-    console.error(err);
+    console.error(err);// eslint-disable-line no-console
     process.exit(1);
   });
 }
