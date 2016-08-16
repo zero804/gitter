@@ -43,7 +43,7 @@ var View = Marionette.CollectionView.extend({
     this.collection.reset(features);
     return features.length;
   },
-  
+
   resetFromMode: function(mode) {
     var features = [];
     if (mode === 'all' || mode === 'announcement') {

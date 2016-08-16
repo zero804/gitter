@@ -61,7 +61,7 @@ function upsertGroup(user, groupInfo, securityDescriptor) {
           uri: uri,
           groupId: group._id,
           userId: user._id,
-          type: securityDescriptor.type
+          type: securityDescriptor.type === null ? 'none' : securityDescriptor.type
         });
       }
 

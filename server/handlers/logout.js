@@ -28,7 +28,7 @@ router.post('/',
       },
 
       json: function(){
-        res.send({ success:true, redirect: nconf.get('web:homeurl') });
+        res.send({ success: true, redirect: nconf.get('web:homeurl') });
       }
     });
   });
