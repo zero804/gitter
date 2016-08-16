@@ -2,6 +2,7 @@
 
 var gulp = require('gulp');
 var runSequence = require('run-sequence');
+var gutil = require('gulp-util');
 
 var argv = require('yargs')
   .option('skip-stage', {
@@ -28,15 +29,19 @@ function findStageTasks(config, stageName) {
   return items;
 }
 
+var stageMetaData = {};
+
 function configureTasks(config) {
 
   function createStageTask(stageName, previousStages) {
     if (shouldSkip(stageName)) return;
-    if (previousStages) {
-      previousStages = previousStages.filter(function(name) {
-        return !shouldSkip(name);
-      });
-    }
+
+    if (!previousStages) previousStages = [];
+
+    previousStages = previousStages.filter(function(name) {
+      return !shouldSkip(name);
+    });
+
     var preTaskName = 'pre-' + stageName;
     var postTaskName = 'post-' + stageName;
 
@@ -45,14 +50,36 @@ function configureTasks(config) {
     var postSteps = findStageTasks(config, postTaskName);
 
     if (preSteps.length) {
-      gulp.task(preTaskName, preSteps);
+      gulp.task(preTaskName, preSteps, function() {
+        gutil.log(preTaskName + ' complete');
+      });
     }
 
     if (postSteps.length) {
-      gulp.task(postTaskName, postSteps);
+      gulp.task(postTaskName, postSteps, function() {
+        gutil.log(postTaskName + ' complete');
+      });
     }
 
-    gulp.task(stageName, previousStages ? previousStages : [], function(callback) {
+    var metaData = {
+      dep: previousStages
+    };
+
+    stageMetaData[stageName] = metaData;
+    if (preSteps.length) {
+      metaData.pre = preSteps;
+    }
+
+    if (steps.length) {
+      metaData.main = steps;
+    }
+
+    if (postSteps.length) {
+      metaData.post = postSteps;
+    }
+
+    gulp.task(stageName, previousStages, function(callback) {
+
       var seq = [];
       if (preSteps.length) {
         seq.push(preTaskName);
@@ -70,11 +97,57 @@ function configureTasks(config) {
         return callback();
       }
 
-      seq.push(callback);
+      gutil.log('Starting ' + stageName + ' stage', seq);
+
+      seq.push(function(err) {
+        if (err) {
+          gutil.log('Stage ' + stageName + ' failed');
+        } else {
+          gutil.log('Stage ' + stageName + ' complete');
+        }
+
+        callback(err);
+      });
 
       runSequence.apply(null, seq);
     });
   }
+
+  gulp.task('display-stages', function() {
+    gutil.log('-------------------');
+    gutil.log('Stages');
+    gutil.log('-------------------');
+    Object.keys(stageMetaData).forEach(function(stageName) {
+      var meta = stageMetaData[stageName];
+      gutil.log('+', stageName);
+      if (meta.dep && meta.dep.length) {
+        gutil.log('   Dependencies:');
+        meta.dep.forEach(function(m) {
+          gutil.log('     ' + m);
+        });
+      }
+      if (meta.pre && meta.pre.length) {
+        gutil.log('   Pre-steps:')
+        meta.pre.forEach(function(m) {
+          gutil.log('     ' + m);
+        });
+      }
+
+      if (meta.main && meta.main.length) {
+        gutil.log('   Main:')
+        meta.main.forEach(function(m) {
+          gutil.log('     ' + m);
+        });
+      }
+
+      if (meta.post && meta.post.length) {
+        gutil.log('   Post-steps:');
+        meta.post.forEach(function(m) {
+          gutil.log('     ' + m);
+        });
+      }
+    })
+  });
 
   createStageTask('validate');
   createStageTask('test');
