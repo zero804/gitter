@@ -1,7 +1,6 @@
 'use strict';
 
 var path = require('path');
-var glob = require('glob');
 var ProgressBarPlugin = require('progress-bar-webpack-plugin');
 
 
@@ -66,7 +65,6 @@ module.exports = {
     ],
     alias: {
       jquery: require.resolve('jquery'),
-      cocktail: path.resolve(__dirname, '../../public/repo/cocktail/cocktail.js'),
       'backbone-sorted-collection': path.resolve(__dirname, '../../public/repo/backbone-sorted-collection/backbone-sorted-collection.js'),
       'bootstrap_tooltip': path.resolve(__dirname, '../../public/js/utils/tooltip.js'),
       'public': path.resolve(__dirname, '../../public'),

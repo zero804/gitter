@@ -1,66 +1,1142 @@
-/*
- jQuery Easing v1.3: Copyright (c) 2008 George McGinley Smith | BSD License: http://www.opensource.org/licenses/bsd-license.php
- jquery.transloadit2-v2.7.3.js: Copyright (c) 2016 Transloadit Ltd | MIT License: http://www.opensource.org/licenses/mit-license.php
+var jQuery = require('jquery');
 
- Fork this on Github: http://github.com/transloadit/jquery-sdk
+/** @license jquery.transloadit2.js: Copyright (c) 2013 Transloadit Ltd | MIT License: http://www.opensource.org/licenses/mit-license.php
+ *
+ * Fork this on Github: http://github.com/transloadit/jquery-sdk
+ *
+ * Transloadit servers allow browsers to cache jquery.transloadit2.js for 1 hour.
+ * keep this in mind when rolling out fixes.
+ */
+!function($) {
+  var PROTOCOL = (document.location.protocol == 'https:') ? 'https://' : 'http://';
 
- Transloadit servers allow browsers to cache jquery.transloadit2.js for 1 hour.
- keep this in mind when rolling out fixes.
- json2: Douglas Crockford | Public domain
- jQuery Tools 1.2.3: Tero Piirainen | Public domain
-*/
-jQuery.easing.jswing=jQuery.easing.swing;
-jQuery.extend(jQuery.easing,{def:"easeOutQuad",swing:function(e,a,b,d,c){return jQuery.easing[jQuery.easing.def](e,a,b,d,c)},easeInQuad:function(e,a,b,d,c){return d*(a/=c)*a+b},easeOutQuad:function(e,a,b,d,c){return-d*(a/=c)*(a-2)+b},easeInOutQuad:function(e,a,b,d,c){return 1>(a/=c/2)?d/2*a*a+b:-d/2*(--a*(a-2)-1)+b},easeInCubic:function(e,a,b,d,c){return d*(a/=c)*a*a+b},easeOutCubic:function(e,a,b,d,c){return d*((a=a/c-1)*a*a+1)+b},easeInOutCubic:function(e,a,b,d,c){return 1>(a/=c/2)?d/2*a*a*a+b:
-d/2*((a-=2)*a*a+2)+b},easeInQuart:function(e,a,b,d,c){return d*(a/=c)*a*a*a+b},easeOutQuart:function(e,a,b,d,c){return-d*((a=a/c-1)*a*a*a-1)+b},easeInOutQuart:function(e,a,b,d,c){return 1>(a/=c/2)?d/2*a*a*a*a+b:-d/2*((a-=2)*a*a*a-2)+b},easeInQuint:function(e,a,b,d,c){return d*(a/=c)*a*a*a*a+b},easeOutQuint:function(e,a,b,d,c){return d*((a=a/c-1)*a*a*a*a+1)+b},easeInOutQuint:function(e,a,b,d,c){return 1>(a/=c/2)?d/2*a*a*a*a*a+b:d/2*((a-=2)*a*a*a*a+2)+b},easeInSine:function(e,a,b,d,c){return-d*Math.cos(a/
-c*(Math.PI/2))+d+b},easeOutSine:function(e,a,b,d,c){return d*Math.sin(a/c*(Math.PI/2))+b},easeInOutSine:function(e,a,b,d,c){return-d/2*(Math.cos(Math.PI*a/c)-1)+b},easeInExpo:function(e,a,b,d,c){return 0==a?b:d*Math.pow(2,10*(a/c-1))+b},easeOutExpo:function(e,a,b,d,c){return a==c?b+d:d*(-Math.pow(2,-10*a/c)+1)+b},easeInOutExpo:function(e,a,b,d,c){return 0==a?b:a==c?b+d:1>(a/=c/2)?d/2*Math.pow(2,10*(a-1))+b:d/2*(-Math.pow(2,-10*--a)+2)+b},easeInCirc:function(e,a,b,d,c){return-d*(Math.sqrt(1-(a/=c)*
-a)-1)+b},easeOutCirc:function(e,a,b,d,c){return d*Math.sqrt(1-(a=a/c-1)*a)+b},easeInOutCirc:function(e,a,b,d,c){return 1>(a/=c/2)?-d/2*(Math.sqrt(1-a*a)-1)+b:d/2*(Math.sqrt(1-(a-=2)*a)+1)+b},easeInElastic:function(e,a,b,d,c){e=1.70158;var f=0,h=d;if(0==a)return b;if(1==(a/=c))return b+d;f||(f=.3*c);h<Math.abs(d)?(h=d,e=f/4):e=f/(2*Math.PI)*Math.asin(d/h);return-(h*Math.pow(2,10*--a)*Math.sin(2*(a*c-e)*Math.PI/f))+b},easeOutElastic:function(e,a,b,d,c){e=1.70158;var f=0,h=d;if(0==a)return b;if(1==(a/=
-c))return b+d;f||(f=.3*c);h<Math.abs(d)?(h=d,e=f/4):e=f/(2*Math.PI)*Math.asin(d/h);return h*Math.pow(2,-10*a)*Math.sin(2*(a*c-e)*Math.PI/f)+d+b},easeInOutElastic:function(e,a,b,d,c){e=1.70158;var f=0,h=d;if(0==a)return b;if(2==(a/=c/2))return b+d;f||(f=.3*c*1.5);h<Math.abs(d)?(h=d,e=f/4):e=f/(2*Math.PI)*Math.asin(d/h);return 1>a?-.5*h*Math.pow(2,10*--a)*Math.sin(2*(a*c-e)*Math.PI/f)+b:h*Math.pow(2,-10*--a)*Math.sin(2*(a*c-e)*Math.PI/f)*.5+d+b},easeInBack:function(e,a,b,d,c,f){void 0==f&&(f=1.70158);
-return d*(a/=c)*a*((f+1)*a-f)+b},easeOutBack:function(e,a,b,d,c,f){void 0==f&&(f=1.70158);return d*((a=a/c-1)*a*((f+1)*a+f)+1)+b},easeInOutBack:function(e,a,b,d,c,f){void 0==f&&(f=1.70158);return 1>(a/=c/2)?d/2*a*a*(((f*=1.525)+1)*a-f)+b:d/2*((a-=2)*a*(((f*=1.525)+1)*a+f)+2)+b},easeInBounce:function(e,a,b,d,c){return d-jQuery.easing.easeOutBounce(e,c-a,0,d,c)+b},easeOutBounce:function(e,a,b,d,c){return(a/=c)<1/2.75?7.5625*d*a*a+b:a<2/2.75?d*(7.5625*(a-=1.5/2.75)*a+.75)+b:a<2.5/2.75?d*(7.5625*(a-=
-2.25/2.75)*a+.9375)+b:d*(7.5625*(a-=2.625/2.75)*a+.984375)+b},easeInOutBounce:function(e,a,b,d,c){return a<c/2?.5*jQuery.easing.easeInBounce(e,2*a,0,d,c)+b:.5*jQuery.easing.easeOutBounce(e,2*a-c,0,d,c)+.5*d+b}});
-(function(e){function a(){}function b(a){u=[a]}function d(a,g,n){return a&&a.apply(g.context||g,n)}function c(c){function x(a){B++||(C(),D&&(n[r]={s:[a]}),E&&(a=E.apply(c,[a])),d(k,c,[a,"success",c]),d(w,c,[c,"success"]))}function p(a){B++||(C(),D&&"timeout"!=a&&(n[r]=a),d(t,c,[c,a]),d(w,c,[c,a]))}c=e.extend({},H,c);var k=c.success,t=c.error,w=c.complete,E=c.dataFilter,v=c.callbackParameter,I=c.callback,L=c.cache,D=c.pageCache,J=c.charset,r=c.url,y=c.data,K=c.timeout,F,B=0,C=a,q,A,G;h&&h(function(a){a.done(k).fail(t);
-k=a.resolve;t=a.reject}).promise(c);c.abort=function(){!B++&&C()};if(!1===d(c.beforeSend,c,[c])||B)return c;r=r||"";y=y?"string"==typeof y?y:e.param(y,c.traditional):"";r+=y?(/\?/.test(r)?"&":"?")+y:"";v&&(r+=(/\?/.test(r)?"&":"?")+encodeURIComponent(v)+"=?");L||D||(r+=(/\?/.test(r)?"&":"?")+"_"+(new Date).getTime()+"=");r=r.replace(/=\?(&|$)/,"="+I+"$1");D&&(F=n[r])?F.s?x(F.s[0]):p(F):(f[I]=b,q=e("<script>")[0],q.id="_jqjsp"+g++,J&&(q.charset=J),l&&11.6>l.version()?(A=e("<script>")[0]).text="document.getElementById('"+
-q.id+"').onerror()":q.async="async",M&&(q.htmlFor=q.id,q.event="onclick"),q.onload=q.onerror=q.onreadystatechange=function(a){if(!q.readyState||!/i/.test(q.readyState)){try{q.onclick&&q.onclick()}catch(g){}a=u;u=0;a?x(a[0]):p("error")}},q.src=r,C=function(a){G&&clearTimeout(G);q.onreadystatechange=q.onload=q.onerror=null;m.removeChild(q);A&&m.removeChild(A)},m.insertBefore(q,v=m.firstChild),A&&m.insertBefore(A,v),G=0<K&&setTimeout(function(){p("timeout")},K));return c}var f=window,h=e.Deferred,m=
-e("head")[0]||document.documentElement,n={},g=0,u,H={callback:"_jqjsp",url:location.href},l=f.opera,M=!!e("<div>").html("\x3c!--[if IE]><i><![endif]--\x3e").find("i").length;c.setup=function(a){e.extend(H,a)};e.jsonp=c})(jQuery);this.JSON||(this.JSON={});
-(function(){function e(a){return 10>a?"0"+a:a}function a(a){c.lastIndex=0;return c.test(a)?'"'+a.replace(c,function(a){var g=m[a];return"string"===typeof g?g:"\\u"+("0000"+a.charCodeAt(0).toString(16)).slice(-4)})+'"':'"'+a+'"'}function b(g,c){var d,l,e,z,x=f,p,k=c[g];k&&"object"===typeof k&&"function"===typeof k.toJSON&&(k=k.toJSON(g));"function"===typeof n&&(k=n.call(c,g,k));switch(typeof k){case "string":return a(k);case "number":return isFinite(k)?String(k):"null";case "boolean":case "null":return String(k);
-case "object":if(!k)return"null";f+=h;p=[];if("[object Array]"===Object.prototype.toString.apply(k)){z=k.length;for(d=0;d<z;d+=1)p[d]=b(d,k)||"null";e=0===p.length?"[]":f?"[\n"+f+p.join(",\n"+f)+"\n"+x+"]":"["+p.join(",")+"]";f=x;return e}if(n&&"object"===typeof n)for(z=n.length,d=0;d<z;d+=1)l=n[d],"string"===typeof l&&(e=b(l,k))&&p.push(a(l)+(f?": ":":")+e);else for(l in k)Object.hasOwnProperty.call(k,l)&&(e=b(l,k))&&p.push(a(l)+(f?": ":":")+e);e=0===p.length?"{}":f?"{\n"+f+p.join(",\n"+f)+"\n"+
-x+"}":"{"+p.join(",")+"}";f=x;return e}}"function"!==typeof Date.prototype.toJSON&&(Date.prototype.toJSON=function(a){return isFinite(this.valueOf())?this.getUTCFullYear()+"-"+e(this.getUTCMonth()+1)+"-"+e(this.getUTCDate())+"T"+e(this.getUTCHours())+":"+e(this.getUTCMinutes())+":"+e(this.getUTCSeconds())+"Z":null},String.prototype.toJSON=Number.prototype.toJSON=Boolean.prototype.toJSON=function(a){return this.valueOf()});var d=/[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
-c=/[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,f,h,m={"\b":"\\b","\t":"\\t","\n":"\\n","\f":"\\f","\r":"\\r",'"':'\\"',"\\":"\\\\"},n;"function"!==typeof JSON.stringify&&(JSON.stringify=function(a,d,c){var e;h=f="";if("number"===typeof c)for(e=0;e<c;e+=1)h+=" ";else"string"===typeof c&&(h=c);if((n=d)&&"function"!==typeof d&&("object"!==typeof d||"number"!==typeof d.length))throw Error("JSON.stringify");return b("",{"":a})});
-"function"!==typeof JSON.parse&&(JSON.parse=function(a,n){function c(a,g){var d,e,b=a[g];if(b&&"object"===typeof b)for(d in b)Object.hasOwnProperty.call(b,d)&&(e=c(b,d),void 0!==e?b[d]=e:delete b[d]);return n.call(a,g,b)}var e;a=String(a);d.lastIndex=0;d.test(a)&&(a=a.replace(d,function(a){return"\\u"+("0000"+a.charCodeAt(0).toString(16)).slice(-4)}));if(/^[\],:{}\s]*$/.test(a.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g,"@").replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g,
-"]").replace(/(?:^|:|,)(?:\s*\[)+/g,"")))return e=eval("("+a+")"),"function"===typeof n?c({"":e},""):e;throw new SyntaxError("JSON.parse");})})();
-(function(e){e.tools=e.tools||{version:"2013-02-15"};var a=e.tools.expose={conf:{maskId:"exposeMask",loadSpeed:"slow",closeSpeed:"fast",zIndex:9998,opacity:.8,startOpacity:0,color:"#fff"}},b,d,c,f,h;e.mask={load:function(m,n){if(c)return this;m=m||f;f=m=e.extend(e.extend({},a.conf),m);b=e("#"+m.maskId);b.length||(b=e("<div/>").attr("id",m.maskId),e("body").append(b));b.css({position:"fixed",top:0,left:0,width:"100%",height:"100%",display:"block",opacity:m.opacity,zIndex:m.zIndex,backgroundColor:m.color});
-n&&n.length&&(h=n.eq(0).css("zIndex"),d=n.css({zIndex:Math.max(m.zIndex+1,"auto"==h?0:h)}));c=!0;return this},close:function(){c&&(b.fadeOut(f.closeSpeed,function(){d&&d.css({zIndex:h})}),c=!1);return this}};e.fn.mask=function(a){e.mask.load(a);return this};e.fn.expose=function(a){e.mask.load(a,this);return this}})(jQuery);
-!function(e){function a(a,g){g=g||[];return a.replace(/(%[s])/g,function(a,n,d){return(a=g.shift())||0===a?a+"":""})}function b(){this.timer=this.documentTitle=this.instance=this.assemblyId=null;this._options={};this.uploads=[];this.results={};this.pollStarted=this.ended=null;this.pollRetries=0;this.started=!1;this.params=this.assembly=null;this.lastPoll=this.bytesReceivedBefore=0;this.$modal=this.$iframe=this.$fileClones=this.$files=this.$form=this.$params=null;this._clockseq=this._lastNSecs=this._lastMSecs=
-0;this._animatedTo100=!1;this._uploadFileIds=[];this._resultFileIds=[]}var d="https:"==document.location.protocol?"https://":"http://",c=d+"api2.transloadit.com/",f={service:c,assets:d+"assets.transloadit.com/",beforeStart:function(){return!0},onFileSelect:function(){},onStart:function(){},onProgress:function(){},onUpload:function(){},onResult:function(){},onCancel:function(){},onError:function(){},onSuccess:function(){},interval:2500,pollTimeout:8E3,poll404Retries:15,pollConnectionRetries:5,wait:!1,
-processZeroFiles:!0,triggerUploadOnFileSelection:!1,autoSubmit:!0,modal:!0,exclude:"",fields:!1,params:null,signature:null,region:"us-east-1",debug:!0,locale:"en"},h={en:{"errors.BORED_INSTANCE_ERROR":"Could not find a bored instance.","errors.CONNECTION_ERROR":"There was a problem connecting to the upload server","errors.unknown":"There was an internal error.","errors.tryAgain":"Please try your upload again.","errors.troubleshootDetails":"If you would like our help to troubleshoot this, please email us this information:",
-cancel:"Cancel",details:"Details",startingUpload:"Starting upload ...",processingFiles:"Upload done, now processing files ...",uploadProgress:"%s / %s MB at %s kB/s | %s left"},ja:{"errors.BORED_INSTANCE_ERROR":"\u30b5\u30fc\u30d0\u30fc\u63a5\u7d9a\u306b\u554f\u984c\u304c\u3042\u308a\u307e\u3059","errors.CONNECTION_ERROR":"\u30b5\u30fc\u30d0\u30fc\u63a5\u7d9a\u306b\u554f\u984c\u304c\u3042\u308a\u307e\u3059","errors.unknown":"\u901a\u4fe1\u74b0\u5883\u306b\u554f\u984c\u304c\u3042\u308a\u307e\u3059",
-"errors.tryAgain":"\u3057\u3070\u3089\u304f\u3057\u3066\u304b\u3089\u518d\u5ea6\u6295\u7a3f\u3057\u3066\u304f\u3060\u3055\u3044","errors.troubleshootDetails":"\u89e3\u6c7a\u3067\u304d\u306a\u3044\u5834\u5408\u306f\u3001\u3053\u3061\u3089\u306b\u304a\u554f\u3044\u5408\u308f\u305b\u304f\u3060\u3055\u3044 \u4e0b\u8a18\u306e\u60c5\u5831\u3092\u30e1\u30fc\u30eb\u3067\u304a\u9001\u308a\u304f\u3060\u3055\u3044:",cancel:"\u30ad\u30e3\u30f3\u30bb\u30eb",details:"\u8a73\u7d30",startingUpload:"\u6295\u7a3f\u4e2d ...",
-processingFiles:"\u63a5\u7d9a\u4e2d",uploadProgress:"%s MB / %s MB (%s kB / \u79d2)"}},m=!1;e.fn.transloadit=function(){var a=Array.prototype.slice.call(arguments),g,d;if(0!==this.length)if(1<this.length)this.each(function(){e.fn.transloadit.apply(e(this),a)});else{(1==a.length&&"object"==typeof a[0]||void 0===a[0])&&a.unshift("init");g=a.shift();"init"==g?(d=new b,a.unshift(this),this.data("transloadit.uploader",d)):d=this.data("transloadit.uploader");if(!d)throw Error("Element is not initialized for transloadit!");
-g=d[g].apply(d,a);return void 0===g?this:g}};e.fn.transloadit.i18n=h;b.prototype.init=function(a,g){this.$form=a;this.options(e.extend({},f,g||{}));var d=this;a.bind("submit.transloadit",function(){d.validate();d.detectFileInputs();d._options.processZeroFiles||0!==d.$files.length?d._options.beforeStart()&&d.getBoredInstance():d._options.beforeStart()&&d.submitForm();return!1});if(this._options.triggerUploadOnFileSelection)a.on("change",'input[type="file"]',function(){a.trigger("submit.transloadit")});
-a.on("change",'input[type="file"]',function(){d._options.onFileSelect(e(this).val(),e(this))});this.includeCss()};b.prototype.getBoredInstance=function(){function a(){e.jsonp({url:b,timeout:g._options.pollTimeout,callbackParameter:"callback",success:function(a){a.error?(g.ended=!0,a.url=b,g.renderError(a),g._options.onError(a)):(g.instance=a.api2_host,g.start())},error:function(e,h,z){f&&g._options.service===c?(f=!1,g._findBoredInstanceUrl(function(e,c){e?(g.ended=!0,e={error:"BORED_INSTANCE_ERROR",
-message:g.i18n("errors.BORED_INSTANCE_ERROR")+" "+e.message},g.renderError(e),g._options.onError(e)):(b=d+"api2."+c+"/instances/bored","https://"===d&&(b=d+"api2-"+c+"/instances/bored"),a())})):(g.ended=!0,e="JSONP bored instance request status: "+h+(", err: "+z),e={error:"CONNECTION_ERROR",message:g.i18n("errors.CONNECTION_ERROR"),reason:e,url:b},g.renderError(e),g._options.onError(e))}})}var g=this;this.instance=null;var b=this._options.service+"instances/bored",f=!0;a();this._options.modal&&this.showModal()};
-b.prototype._findBoredInstanceUrl=function(a){var g=this._options.region,b="s3";"us-east-1"!==g&&(b="s3-"+g);var b=d+b+".amazonaws.com/infra-"+g,c=this,l={url:b+".transloadit.com/cached_instances.json",timeout:5E3,datatype:"json",success:function(g){g=c._shuffle(g.uploaders);c._findResponsiveInstance(g,0,a)},error:function(b,c){l.url=d+"transloadit.com/"+g;l.url+="_cached_instances.json";l.error=function(d,e){var b;b="Could not get cached uploaders from neither S3 or the crm for region: "+g;a(Error(b))};
-e.ajax(l)}};e.ajax(l)};b.prototype._findResponsiveInstance=function(a,g,b){if(!a[g])return b(Error("No responsive uploaders"));var c=this,l=a[g];e.jsonp({url:d+l,timeout:3E3,callbackParameter:"callback",success:function(a){b(null,l)},error:function(d,e){c._findResponsiveInstance(a,g+1,b)}})};b.prototype._shuffle=function(a){for(var g=[],d,b=0;b<a.length;b++)d=Math.floor(Math.random()*(b+1)),g[b]=g[d],g[d]=a[b];return g};b.prototype.start=function(){var a=this;this.ended=this.started=!1;this.pollRetries=
-this.bytesReceivedBefore=0;this.uploads=[];this._animatedTo100=!1;this._uploadFileIds=[];this._resultFileIds=[];this.results={};this.assemblyId=this._genUuid();this.$fileClones=e().not(document);this._options.formData||this.$files.each(function(){var b=e(this).clone(!0);a.$fileClones=a.$fileClones.add(b);b.insertAfter(this)});this.$iframe=e('<iframe id="transloadit-'+this.assemblyId+'" name="transloadit-'+this.assemblyId+'"/>').appendTo("body").hide();var g=d+this.instance+"/assemblies/"+this.assemblyId+
-"?redirect=false";if(this._options.formData){var b=this.$form.find("input[name=params]").val();if(this._options.formData instanceof FormData)this._options.formData.append("params",b);else{var c=new FormData(this.$form);c.append("params",b);for(b=0;b<this._options.formData.length;b++){var l=this._options.formData[b];c.append(l[0],l[1],l[2])}this._options.formData=c}c=new XMLHttpRequest;c.open("POST",g);c.send(this._options.formData)}else{this.$uploadForm=e('<form enctype="multipart/form-data" />').attr("action",
-g).attr("target","transloadit-"+this.assemblyId).attr("method","POST").append(this.$files).appendTo("body").hide();g="[name=params], [name=signature]";!0===this._options.fields?g="*":"string"===typeof this._options.fields&&(g+=", "+this._options.fields);b=this.$form.find(":input[type!=file]").filter(g);g=b.filter("select");b=b.filter(function(){return!e(this).is("select")});b=b.filter("[type!=submit]");b=this.clone(b);this._options.params&&!this.$params&&(b=b.add('<input name="params" value=\''+JSON.stringify(this._options.params)+
-"'>"));this._options.signature&&(b=b.add('<input name="signature" value=\''+this._options.signature+"'>"));if("object"==typeof this._options.fields)for(c in this._options.fields)b=b.add('<input name="'+c+"\" value='"+this._options.fields[c]+"'>");b.prependTo(this.$uploadForm);g.each(function(){e('<input type="hidden"/>').attr("name",e(this).attr("name")).attr("value",e(this).val()).prependTo(a.$uploadForm)});this.$uploadForm.submit()}this.lastPoll=+new Date;setTimeout(function(){a._poll()},300)};
-b.prototype.clone=function(a){var b=a.clone();a=a.filter("textarea");for(var d=b.filter("textarea"),c=0;c<a.length;++c)e(d[c]).val(e(a[c]).val());return b};b.prototype.detectFileInputs=function(){var a=this.$form.find("input[type=file]").not(this._options.exclude);this._options.processZeroFiles||(a=a.filter(function(){return""!==this.value}));this.$files=a};b.prototype.validate=function(){if(this._options.params)this.params=this._options.params;else{var a=this.$form.find("input[name=params]");if(!a.length){alert("Could not find input[name=params] in your form.");
-return}this.$params=a;try{this.params=JSON.parse(a.val())}catch(b){alert("Error: input[name=params] seems to contain invalid JSON.");return}}this.params.redirect_url?this.$form.attr("action",this.params.redirect_url):this._options.autoSubmit&&this.$form.attr("action")==this._options.service+"assemblies"&&alert("Error: input[name=params] does not include a redirect_url")};b.prototype._poll=function(a){var b=this;if(!this.ended){var c=/(mozilla)(?:.*? rv:([\w.]+))?/.exec(navigator.userAgent),c=c&&c[1];
-this.documentTitle=document.title;c&&!this.documentTitle&&(document.title="Loading...");this.pollStarted=+new Date;var f=d+("status-"+this.instance)+"/assemblies/"+this.assemblyId;a&&(f+=a);e.jsonp({url:f,timeout:b._options.pollTimeout,callbackParameter:"callback",success:function(a){if(!b.ended)if(b.assembly=a,"ASSEMBLY_NOT_FOUND"==a.error)b.pollRetries++,b.pollRetries>b._options.poll404Retries?(document.title=b.documentTitle,b.ended=!0,b.renderError(a),b._options.onError(a)):setTimeout(function(){b._poll()},
-400);else if(a.error)b.ended=!0,b.renderError(a),document.title=b.documentTitle,b._options.onError(a);else{!b.started&&0<a.bytes_expected&&(b.started=!0,b._options.onStart(a));b.pollRetries=0;var d="ASSEMBLY_EXECUTING"===a.ok,c="ASSEMBLY_CANCELED"===a.ok,n="ASSEMBLY_COMPLETED"===a.ok;if(0<a.bytes_expected)b._options.onProgress(a.bytes_received,a.bytes_expected,a);for(var f=0;f<a.uploads.length;f++){var k=a.uploads[f];-1===e.inArray(k.id,b._uploadFileIds)&&(b._options.onUpload(k,a),b.uploads.push(k),
-b._uploadFileIds.push(k.id))}for(var u in a.results)for(b.results[u]=b.results[u]||[],f=0;f<a.results[u].length;f++){var k=a.results[u][f],h=u+"_"+k.id;-1===e.inArray(h,b._resultFileIds)&&(b._options.onResult(u,k,a),b.results[u].push(k),b._resultFileIds.push(h))}c?(b.ended=!0,document.title=b.documentTitle,b._options.onCancel(a)):(d=n||!b._options.wait&&d,0<a.bytes_expected&&b.renderProgress(a,d,b._options.wait),d?(b.ended=!0,document.title=b.documentTitle,a.uploads=b.uploads,a.results=b.results,
-b._options.onSuccess(a),setTimeout(function(){b._options.modal&&b.cancel();b.submitForm()},600)):(a=b.pollStarted-+new Date,b.timer=setTimeout(function(){b._poll()},a<b._options.interval?b._options.interval:a),b.lastPoll=+new Date))}},error:function(a,d,c){b.ended||(b.pollRetries++,b.pollRetries>b._options.pollConnectionRetries?(document.title=b.documentTitle,b.ended=!0,a="JSONP status poll request status: "+d+(", err: "+c),a={error:"CONNECTION_ERROR",message:b.i18n("errors.CONNECTION_ERROR"),reason:a,
-url:f},b.renderError(a),b._options.onError(a)):setTimeout(function(){b._poll()},350))}})}};b.prototype.stop=function(){document.title=this.documentTitle;this.ended=!0};b.prototype.cancel=function(){if(!this.ended){var a=this;this.$params&&this.$params.prependTo(this.$form);this.$fileClones.each(function(b){b=e(a.$files[b]).clone(!0);var d=e(this);b.insertAfter(d);d.remove()});clearTimeout(a.timer);this._poll("?method=delete");"Microsoft Internet Explorer"==navigator.appName&&this.$iframe[0].contentWindow.document.execCommand("Stop");
-setTimeout(function(){a.$iframe.remove()},500)}this._options.modal&&this.hideModal()};b.prototype.submitForm=function(){"multipart/form-data"===this.$form.attr("enctype")&&this.$form.removeAttr("enctype");null!==this.assembly&&e("<textarea/>").attr("name","transloadit").text(JSON.stringify(this.assembly)).prependTo(this.$form).hide();this._options.autoSubmit&&this.$form.unbind("submit.transloadit").submit()};b.prototype.hideModal=function(){e.mask.close();this.$modal.remove()};b.prototype.showModal=
-function(){this.$modal=e('<div id="transloadit"><div class="content"><a href="#close" class="close">'+this.i18n("cancel")+'</a><p class="status"></p><div class="progress progress-striped"><div class="bar"><span class="percent"></span></div></div><label>'+this.i18n("startingUpload")+'</label><p class="error"></p><div class="error-details-toggle"><a href="#">'+this.i18n("details")+'</a></div><p class="error-details"></p></div></div>').appendTo("body");e.extend(this.$modal,{$content:this.$modal.find(".content"),
-$close:this.$modal.find(".close"),$label:this.$modal.find("label"),$progress:this.$modal.find(".progress"),$percent:this.$modal.find(".progress .percent"),$progressBar:this.$modal.find(".progress .bar"),$error:this.$modal.find(".error"),$errorDetails:this.$modal.find(".error-details"),$errorDetailsToggle:this.$modal.find(".error-details-toggle")});var a=this;this.$modal.$error.hide();this.$modal.$errorDetails.hide();this.$modal.$errorDetailsToggle.hide();this.$modal.expose({api:!0,maskId:"transloadit_expose",
-opacity:.9,loadSpeed:250,closeOnEsc:!1,closeOnClick:!1});this.$modal.$close.click(function(){a.cancel();return!1})};b.prototype.renderError=function(a){if(this._options.modal){if(!this._options.debug)return this.cancel();this.$modal.$content.addClass("content-error");this.$modal.$progress.hide();this.$modal.$label.hide();var b=a.error+": "+a.message+"<br /><br />",b=b+(a.reason||"");if(-1===e.inArray(a.error,["CONNECTION_ERROR","BORED_INSTANCE_ERROR","ASSEMBLY_NOT_FOUND"]))this.$modal.$error.html(b).show();
-else{var c=this.i18n("errors.unknown")+"<br/>"+this.i18n("errors.tryAgain");this.$modal.$error.html(c).show();var f=a.assemblyId?a.assemblyId:this.assemblyId,l=this,h=null;e.getJSON(d+"jsonip.com/",function(a){h=a.ip}).always(function(){var c={endpoint:a.url,instance:l.instance,assembly_id:f,ip:h,time:l.getUTCDatetime(),agent:navigator.userAgent,poll_retries:l.pollRetries,error:b};e.post(d+"status.transloadit.com/client_error",c);var u=[],p;for(p in c)u.push(p+": "+c[p]);c=l.i18n("errors.troubleshootDetails")+
-"<br /><br />";l.$modal.$errorDetails.hide().html(c+u.join("<br />"));l.$modal.$errorDetailsToggle.show().find("a").off("click").on("click",function(a){a.preventDefault();l.$modal.$errorDetails.toggle()})})}}};b.prototype.renderProgress=function(a,b,d){if(this._options.modal){var c=a.bytes_received/a.bytes_expected*100;100<c&&(c=0);var e=a.bytes_received-this.bytesReceivedBefore,f=+new Date-this.lastPoll,h=100===c?1E3:2*this._options.interval,m=(a.bytes_received/1024/1024).toFixed(2),p=(a.bytes_expected/
-1024/1024).toFixed(2),k=(e/1024/(f/1E3)).toFixed(1),t=a.bytes_expected-a.bytes_received,f=(e/(f/1E3)).toFixed(1),w="";0<f&&(w=this._duration(t/f));txt=this.i18n("uploadProgress",m,p,k,w);this._animatedTo100||this.$modal.$label.text(txt);var E=parseInt(this.$modal.$progress.css("width"),10);this.bytesReceivedBefore=a.bytes_received;if(!(0>=e)||b){var v=this;b&&d&&(h=500);this.$modal.$progressBar.stop().animate({width:c+"%"},{duration:h,easing:"linear",progress:function(a,b,d){a=(100*parseInt(v.$modal.$progressBar.css("width"),
-10)/E).toFixed(0);100<a&&(a=100);13<a&&!v._animatedTo100&&v.$modal.$percent.text(a+"%");100!=a||v._animatedTo100||(v._animatedTo100=!0,setTimeout(function(){v.$modal.$label.text(v.i18n("processingFiles"));v.$modal.$progress.addClass("active");v.$modal.$percent.text("")},500))}})}}};b.prototype.includeCss=function(){!m&&this._options.modal&&(m=!0,e('<link rel="stylesheet" type="text/css" href="'+this._options.assets+'css/transloadit2-v2.7.3.css" />').appendTo("head"))};b.prototype.getUTCDatetime=function(){var a=
-new Date,a=new Date(a.getUTCFullYear(),a.getUTCMonth(),a.getUTCDate(),a.getUTCHours(),a.getUTCMinutes(),a.getUTCSeconds()),b=function(a){return 10>a?"0"+a:a},d=a.getTimezoneOffset(),c=(0<d?"-":"+")+b(parseInt(d/60,10));0!==d%60&&(c+=b(d%60));0===d&&(c="Z");return a.getFullYear()+"-"+b(a.getMonth()+1)+"-"+b(a.getDate())+"T"+b(a.getHours())+":"+b(a.getMinutes())+":"+b(a.getSeconds())+c};b.prototype._duration=function(a){var b=Math.floor(a/3600);a-=3600*b;var d=Math.floor(a/60);a-=60*d;var c="";0<b&&
-(c+=b+"h ");0<d&&(c+=d+"min ");0<a&&(a=a.toFixed(0),c+=a+"s");""===c&&(c="0s");return c};b.prototype._genUuid=function(a,b,c){function d(a,b){var c=b||0,e=p;return e[a[c++]]+e[a[c++]]+e[a[c++]]+e[a[c++]]+e[a[c++]]+e[a[c++]]+e[a[c++]]+e[a[c++]]+e[a[c++]]+e[a[c++]]+e[a[c++]]+e[a[c++]]+e[a[c++]]+e[a[c++]]+e[a[c++]]+e[a[c++]]}a=a||{};c=b&&c||0;var e=b||[],f=Array(16),h=function(){for(var a=0,b;16>a;a++)0===(a&3)&&(b=4294967296*Math.random()),f[a]=b>>>((a&3)<<3)&255;return f}(),m=[h[0]|1,h[1],h[2],h[3],
-h[4],h[5]];this._clockseq=(h[6]<<8|h[7])&16383;for(var h=null!=a.clockseq?a.clockseq:this._clockseq,p=[],k=0;256>k;k++)p[k]=(k+256).toString(16).substr(1);var k=null!=a.msecs?a.msecs:(new Date).getTime(),t=null!=a.nsecs?a.nsecs:this._lastNSecs+1,w=k-this._lastMSecs+(t-this._lastNSecs)/1E4;0>w&&null==a.clockseq&&(h=h+1&16383);(0>w||k>this._lastMSecs)&&null==a.nsecs&&(t=0);if(1E4<=t)throw Error("uuid.v1(): Can't create more than 10M uuids/sec");this._lastMSecs=k;this._lastNSecs=t;this._clockseq=h;k+=
-122192928E5;t=(1E4*(k&268435455)+t)%4294967296;e[c++]=t>>>24&255;e[c++]=t>>>16&255;e[c++]=t>>>8&255;e[c++]=t&255;k=k/4294967296*1E4&268435455;e[c++]=k>>>8&255;e[c++]=k&255;e[c++]=k>>>24&15|16;e[c++]=k>>>16&255;e[c++]=h>>>8|128;e[c++]=h&255;a=a.node||m;for(m=0;6>m;m++)e[c+m]=a[m];return b?b:d(e)};b.prototype.options=function(a){if(0===arguments.length)return this._options;e.extend(this._options,a)};b.prototype.option=function(a,b){if(1==arguments.length)return this._options[a];this._options[a]=b};
-b.prototype.i18n=function(){var b=Array.prototype.slice.call(arguments),c=b.shift(),d=this._options.locale,d=h[d]&&h[d][c]||h.en[c];if(!d)throw Error("Unknown i18n key: "+c);return a(d,b)}}(window.jQuery);
+  var DEFAULT_SERVICE = PROTOCOL + 'api2.transloadit.com/';
+
+  var OPTIONS = {
+    service                      : DEFAULT_SERVICE,
+    assets                       : PROTOCOL+'assets.transloadit.com/',
+    beforeStart                  : function() {return true;},
+    onFileSelect                 : function() {},
+    onStart                      : function() {},
+    onProgress                   : function() {},
+    onUpload                     : function() {},
+    onResult                     : function() {},
+    onCancel                     : function() {},
+    onError                      : function() {},
+    onSuccess                    : function() {},
+    interval                     : 2500,
+    pollTimeout                  : 8000,
+    poll404Retries               : 15,
+    pollConnectionRetries        : 5,
+    wait                         : false,
+    processZeroFiles             : true,
+    triggerUploadOnFileSelection : false,
+    autoSubmit                   : true,
+    modal                        : true,
+    exclude                      : '',
+    fields                       : false,
+    params                       : null,
+    signature                    : null,
+    region                       : 'us-east-1',
+    debug                        : true,
+    locale                       : 'en'
+  };
+
+  var I18N = {
+    en: {
+      'errors.BORED_INSTANCE_ERROR': 'Could not find a bored instance.',
+      'errors.CONNECTION_ERROR': 'There was a problem connecting to the upload server',
+      'errors.unknown': 'There was an internal error.',
+      'errors.tryAgain': 'Please try your upload again.',
+      'errors.troubleshootDetails': 'If you would like our help to troubleshoot this, ' +
+          'please email us this information:',
+      cancel: 'Cancel',
+      details: 'Details',
+      startingUpload: 'Starting upload ...',
+      processingFiles: 'Upload done, now processing files ...',
+      uploadProgress: '%s / %s MB at %s kB/s | %s left'
+    },
+    ja: {
+      'errors.BORED_INSTANCE_ERROR': 'サーバー接続に問題があります',
+      'errors.CONNECTION_ERROR': 'サーバー接続に問題があります',
+      'errors.unknown': '通信環境に問題があります',
+      'errors.tryAgain': 'しばらくしてから再度投稿してください',
+      'errors.troubleshootDetails': '解決できない場合は、こちらにお問い合わせください ' +
+          '下記の情報をメールでお送りください:',
+      cancel: 'キャンセル',
+      details: '詳細',
+      startingUpload: '投稿中 ...',
+      processingFiles: '接続中',
+      uploadProgress: '%s MB / %s MB (%s kB / 秒)'
+    }
+  };
+  var CSS_LOADED = false;
+
+  function sprintf(str, args) {
+    args = args || [];
+    return str.replace(/(%[s])/g, function(m, i, s) {
+      var arg = args.shift();
+      if (!arg && arg !== 0) {
+        return '';
+      }
+      return arg + '';
+    });
+  }
+
+  $.fn.transloadit = function() {
+    var args = Array.prototype.slice.call(arguments);
+    var method;
+    var uploader;
+    var r;
+
+    if (this.length === 0) {
+      return;
+    }
+
+    if (this.length > 1) {
+      this.each(function() {
+        $.fn.transloadit.apply($(this), args);
+      });
+      return;
+    }
+
+    if (args.length == 1 && typeof args[0] == 'object' || args[0] === undefined) {
+      args.unshift('init');
+    }
+
+    method = args.shift();
+    if (method == 'init') {
+      uploader = new Uploader();
+      args.unshift(this);
+      this.data('transloadit.uploader', uploader);
+    } else {
+      uploader = this.data('transloadit.uploader');
+    }
+
+    if (!uploader) {
+      throw new Error('Element is not initialized for transloadit!');
+    }
+
+    r = uploader[method].apply(uploader, args);
+    return (r === undefined) ? this : r;
+  };
+
+  $.fn.transloadit.i18n = I18N;
+
+  function Uploader() {
+    this.assemblyId = null;
+
+    this.instance      = null;
+    this.documentTitle = null;
+    this.timer         = null;
+    this._options      = {};
+    this.uploads       = [];
+    this.results       = {};
+    this.ended         = null;
+    this.pollStarted   = null;
+    this.pollRetries   = 0;
+    this.started       = false;
+    this.assembly      = null;
+    this.params        = null;
+
+    this.bytesReceivedBefore = 0;
+    this.lastPoll            = 0;
+
+    this.$params     = null;
+    this.$form       = null;
+    this.$files      = null;
+    this.$fileClones = null;
+    this.$iframe     = null;
+    this.$modal      = null;
+
+    this._lastMSecs = 0;
+    this._lastNSecs = 0;
+    this._clockseq  = 0;
+
+    this._animatedTo100 = false;
+    this._uploadFileIds = [];
+    this._resultFileIds = [];
+  }
+
+  Uploader.prototype.init = function($form, options) {
+    this.$form = $form;
+    this.options($.extend({}, OPTIONS, options || {}));
+
+    var self = this;
+    $form.bind('submit.transloadit', function() {
+      self.validate();
+      self.detectFileInputs();
+
+      if (!self._options['processZeroFiles'] && self.$files.length === 0) {
+        if (self._options.beforeStart()) {
+          self.submitForm();
+        }
+      } else {
+        if (self._options.beforeStart()) {
+          self.getBoredInstance();
+        }
+      }
+
+      return false;
+    });
+
+    if (this._options['triggerUploadOnFileSelection']) {
+      $form.on('change', 'input[type="file"]', function() {
+        $form.trigger('submit.transloadit');
+      });
+    }
+
+    $form.on('change', 'input[type="file"]', function() {
+      self._options.onFileSelect($(this).val(), $(this));
+    });
+
+    this.includeCss();
+  };
+
+  Uploader.prototype.getBoredInstance = function() {
+    var self = this;
+
+    this.instance              = null;
+    var url                    = this._options['service'] + 'instances/bored';
+    var canUseCustomBoredLogic = true;
+
+    function proceed() {
+      $.jsonp({
+        url               : url,
+        timeout           : self._options.pollTimeout,
+        callbackParameter : 'callback',
+        success           : function(instance) {
+          if (instance.error) {
+            self.ended   = true;
+            instance.url = url;
+            self.renderError(instance);
+            self._options.onError(instance);
+            return;
+          }
+
+          self.instance = instance.api2_host;
+          self.start();
+        },
+        error: function(xhr, status, jsonpErr) {
+          if (canUseCustomBoredLogic && self._options['service'] === DEFAULT_SERVICE) {
+            canUseCustomBoredLogic = false;
+
+            self._findBoredInstanceUrl(function(err, theUrl) {
+              if (err) {
+                self.ended = true;
+                err = {
+                  error   : 'BORED_INSTANCE_ERROR',
+                  message : self.i18n('errors.BORED_INSTANCE_ERROR') + ' ' + err.message
+                };
+                self.renderError(err);
+                self._options.onError(err);
+                return;
+              }
+
+              url = PROTOCOL + 'api2.' + theUrl + '/instances/bored';
+              proceed();
+            });
+            return;
+          }
+
+          self.ended = true;
+
+          var reason = 'JSONP bored instance request status: ' + status;
+          reason += ', err: ' + jsonpErr;
+
+          var err = {
+            error   : 'CONNECTION_ERROR',
+            message : self.i18n('errors.CONNECTION_ERROR'),
+            reason  : reason,
+            url     : url
+          };
+          self.renderError(err);
+          self._options.onError(err);
+        }
+      });
+    }
+
+    proceed();
+
+    if (this._options.modal) {
+      this.showModal();
+    }
+  };
+
+  Uploader.prototype._findBoredInstanceUrl = function(cb) {
+    var self   = this;
+    var region = this._options.region;
+    var domain = 's3';
+
+    if (region !== 'us-east-1') {
+      domain = 's3-' + region;
+    }
+
+    var url = PROTOCOL + domain + '.amazonaws.com/infra-' + region;
+    url    += '.transloadit.com/cached_instances.json';
+
+    $.ajax({
+      url      : url,
+      datatype : 'json',
+      timeout  : 5000,
+      success: function(result) {
+        var instances = self._shuffle(result.uploaders);
+        self._findResponsiveInstance(instances, 0, cb);
+      },
+      error: function(xhr, status) {
+        var msg = 'Could not query S3 for cached uploaders from url: ' + url;
+        var err = new Error(msg);
+        cb(err);
+      }
+    });
+  };
+
+  Uploader.prototype._findResponsiveInstance = function(instances, index, cb) {
+    if (!instances[index]) {
+      var err = new Error('No responsive uploaders');
+      return cb(err);
+    }
+
+    var self = this;
+    var url  = instances[index];
+
+    $.jsonp({
+      url               : PROTOCOL + url,
+      timeout           : 3000,
+      callbackParameter : 'callback',
+      success: function(result) {
+        cb(null, url);
+      },
+      error: function(xhr, status) {
+        self._findResponsiveInstance(instances, index + 1, cb);
+      }
+    });
+  };
+
+  Uploader.prototype._shuffle = function(arr) {
+    var shuffled = [];
+    var rand;
+    for (var i = 0; i < arr.length; i++) {
+      rand           = Math.floor(Math.random() * (i + 1));
+      shuffled[i]    = shuffled[rand];
+      shuffled[rand] = arr[i];
+    }
+    return shuffled;
+  };
+
+  Uploader.prototype.start = function() {
+    var self = this;
+
+    this.started             = false;
+    this.ended               = false;
+    this.bytesReceivedBefore = 0;
+    this.pollRetries         = 0;
+    this.uploads             = [];
+    this._animatedTo100      = false;
+    this._uploadFileIds      = [];
+    this._resultFileIds      = [];
+    this.results             = {};
+
+    this.assemblyId = this._genUuid();
+
+    // add a clone, so that we can restore the file input fields
+    // when the user hits cancel and so that we can .append(this.$files) to
+    // this.$uploadForm, which moves (without a clone!) the file input fields in the dom
+    this.$fileClones = $().not(document);
+    this.$files.each(function() {
+      var $clone = $(this).clone(true);
+      self.$fileClones = self.$fileClones.add($clone);
+      $clone.insertAfter(this);
+    });
+
+    this.$iframe = $('<iframe id="transloadit-'+this.assemblyId+'" name="transloadit-'+this.assemblyId+'"/>')
+      .appendTo('body')
+      .hide();
+
+    var url = PROTOCOL+this.instance+'/assemblies/'+this.assemblyId+'?redirect=false';
+
+    if (this._options.formData) {
+      var paramsFieldVal = this.$form.find("input[name=params]").val();
+
+      if (this._options.formData instanceof FormData) {
+        this._options.formData.append("params", paramsFieldVal);
+      } else {
+        var formData = new FormData(this.$form);
+        formData.append("params", paramsFieldVal);
+
+        for (var i = 0; i < this._options.formData.length; i++) {
+          var tupel = this._options.formData[i];
+          formData.append(tupel[0], tupel[1], tupel[2]);
+        }
+
+        this._options.formData = formData;
+      }
+
+      var f = new XMLHttpRequest();
+      f.open("POST", url);
+      f.send(this._options.formData);
+    } else {
+      this.$uploadForm = $('<form enctype="multipart/form-data" />')
+        .attr('action', url)
+        .attr('target', 'transloadit-' + this.assemblyId)
+        .attr('method', 'POST')
+
+        // using .append(this.$files.clone(true)) does not work here as it does
+        // not carry over the selected file value :/
+        // hence we need to clone file input fields beforehand and store them
+        // in self.$fileClones
+        .append(this.$files)
+        .appendTo('body')
+        .hide();
+
+      var fieldsFilter = '[name=params], [name=signature]';
+      if (this._options.fields === true) {
+        fieldsFilter = '*';
+      } else if (typeof this._options.fields === 'string') {
+        fieldsFilter += ', ' + this._options.fields;
+      }
+
+      var $fieldsToClone = this.$form.find(':input[type!=file]').filter(fieldsFilter);
+
+      // remove selects from $clones, because we have to clone them as hidden input
+      // fields, otherwise their values are not transferred properly
+      var $selects = $fieldsToClone.filter('select');
+
+      $fieldsToClone = $fieldsToClone.filter(function() {
+        return !$(this).is('select');
+      });
+
+      // filter out submit elements as they will cause funny behavior in the
+      // shadow form
+      $fieldsToClone = $fieldsToClone.filter('[type!=submit]');
+
+
+      var $clones = this.clone($fieldsToClone);
+
+      if (this._options.params && !this.$params) {
+        $clones = $clones.add('<input name="params" value=\'' + JSON.stringify(this._options.params) + '\'>');
+      }
+      if (this._options.signature) {
+        $clones = $clones.add('<input name="signature" value=\'' + this._options.signature + '\'>');
+      }
+
+      if (typeof this._options.fields == 'object') {
+        for (var fieldName in this._options.fields) {
+          var fieldValue = this._options.fields[fieldName];
+          $clones = $clones.add('<input name="' + fieldName + '" value=\'' + fieldValue + '\'>');
+        }
+      }
+
+      $clones.prependTo(this.$uploadForm);
+
+
+      // now add all selects as hidden fields
+      $selects.each(function() {
+        $('<input type="hidden"/>')
+          .attr('name', $(this).attr('name'))
+          .attr('value', $(this).val())
+          .prependTo(self.$uploadForm);
+      });
+
+      this.$uploadForm.submit();
+    }
+
+    this.lastPoll = +new Date();
+    setTimeout(function() {
+      self._poll();
+    }, 300);
+  };
+
+  Uploader.prototype.clone = function($obj) {
+    var $result         = $obj.clone();
+    var myTextareas     = $obj.filter('textarea');
+    var resultTextareas = $result.filter('textarea');
+
+    for (var i = 0; i < myTextareas.length; ++i) {
+      $(resultTextareas[i]).val($(myTextareas[i]).val());
+    }
+
+    return $result;
+  };
+
+  Uploader.prototype.detectFileInputs = function() {
+    var $files = this.$form
+      .find('input[type=file]')
+      .not(this._options.exclude);
+
+    if (!this._options['processZeroFiles']) {
+      $files = $files.filter(function() {
+        return this.value !== '';
+      });
+    }
+    this.$files = $files;
+  };
+
+  Uploader.prototype.validate = function() {
+    if (!this._options.params) {
+      var $params = this.$form.find('input[name=params]');
+      if (!$params.length) {
+        alert('Could not find input[name=params] in your form.');
+        return;
+      }
+
+      this.$params = $params;
+      try {
+        this.params = JSON.parse($params.val());
+      } catch (e) {
+        alert('Error: input[name=params] seems to contain invalid JSON.');
+        return;
+      }
+    } else {
+      this.params = this._options.params;
+    }
+
+    if (this.params.redirect_url) {
+      this.$form.attr('action', this.params.redirect_url);
+    } else if (this._options.autoSubmit && (this.$form.attr('action') == this._options.service+'assemblies')) {
+      alert('Error: input[name=params] does not include a redirect_url');
+      return;
+    }
+  };
+
+  Uploader.prototype._poll = function(query) {
+    var self = this;
+    if (this.ended) {
+      return;
+    }
+
+    // Reduce Firefox Title Flickering
+    var match = /(mozilla)(?:.*? rv:([\w.]+))?/.exec(navigator.userAgent);
+    var isMozilla = match && match[1];
+    this.documentTitle = document.title;
+    if (isMozilla && !this.documentTitle) {
+      document.title = 'Loading...';
+    }
+
+    this.pollStarted = +new Date();
+
+    var instance = 'status-' + this.instance;
+    var url      = PROTOCOL + instance + '/assemblies/'+this.assemblyId;
+
+    if (query) {
+      url += query;
+    }
+
+    $.jsonp({
+      url               : url,
+      timeout           : self._options.pollTimeout,
+      callbackParameter : 'callback',
+      success           : function(assembly) {
+        if (self.ended) {
+          return;
+        }
+
+        self.assembly = assembly;
+        if (assembly.error == 'ASSEMBLY_NOT_FOUND') {
+          self.pollRetries++;
+
+          if (self.pollRetries > self._options.poll404Retries) {
+            document.title = self.documentTitle;
+            self.ended = true;
+            self.renderError(assembly);
+            self._options.onError(assembly);
+            return;
+          }
+
+          setTimeout(function() {
+            self._poll();
+          }, 400);
+          return;
+        }
+        if (assembly.error) {
+          self.ended = true;
+          self.renderError(assembly);
+          document.title = self.documentTitle;
+          self._options.onError(assembly);
+          return;
+        }
+
+        if (!self.started && assembly.bytes_expected > 0) {
+          self.started = true;
+          self._options.onStart(assembly);
+        }
+
+        self.pollRetries = 0;
+        var isUploading = assembly.ok === 'ASSEMBLY_UPLOADING';
+        var isExecuting = assembly.ok === 'ASSEMBLY_EXECUTING';
+        var isCanceled  = assembly.ok === 'ASSEMBLY_CANCELED';
+        var isComplete  = assembly.ok === 'ASSEMBLY_COMPLETED';
+
+        if (assembly.bytes_expected > 0) {
+          self._options.onProgress(assembly.bytes_received, assembly.bytes_expected, assembly);
+        }
+
+        for (var i = 0; i < assembly.uploads.length; i++) {
+          var upload = assembly.uploads[i];
+
+          if ($.inArray(upload.id, self._uploadFileIds) === -1) {
+            self._options.onUpload(upload, assembly);
+            self.uploads.push(upload);
+            self._uploadFileIds.push(upload.id);
+          }
+        }
+
+        for (var step in assembly.results) {
+          self.results[step] = self.results[step] || [];
+
+          for (var j = 0; j < assembly.results[step].length; j++) {
+            var result   = assembly.results[step][j];
+            var resultId = step + '_' + result.id;
+
+            if ($.inArray(resultId, self._resultFileIds) === -1) {
+              self._options.onResult(step, result, assembly);
+              self.results[step].push(result);
+              self._resultFileIds.push(resultId);
+            }
+          }
+        }
+
+        if (isCanceled) {
+          self.ended = true;
+          document.title = self.documentTitle;
+          self._options.onCancel(assembly);
+          return;
+        }
+
+        var isEnded = isComplete || (!self._options['wait'] && isExecuting);
+
+        if (assembly.bytes_expected > 0) {
+          self.renderProgress(assembly, isEnded, self._options['wait']);
+        }
+
+        if (isEnded) {
+          self.ended = true;
+          document.title = self.documentTitle;
+          assembly.uploads = self.uploads;
+          assembly.results = self.results;
+          self._options.onSuccess(assembly);
+
+          // give the progressbar some time to finish to 100%
+          setTimeout(function() {
+            if (self._options.modal) {
+              self.cancel();
+            }
+            self.submitForm();
+          }, 600);
+          return;
+        }
+
+        var ping    = self.pollStarted - +new Date();
+        var timeout = ping < self._options.interval ? self._options.interval : ping;
+
+        self.timer = setTimeout(function() {
+          self._poll();
+        }, timeout);
+        self.lastPoll = +new Date();
+      },
+      error: function(xhr, status, jsonpErr) {
+        if (self.ended) {
+          return;
+        }
+
+        self.pollRetries++;
+        if (self.pollRetries > self._options.pollConnectionRetries) {
+          document.title = self.documentTitle;
+          self.ended = true;
+
+          var reason = 'JSONP status poll request status: ' + status;
+          reason += ', err: ' + jsonpErr;
+
+          var err = {
+            error   : 'CONNECTION_ERROR',
+            message : self.i18n('errors.CONNECTION_ERROR'),
+            reason  : reason,
+            url     : url
+          };
+          self.renderError(err);
+          self._options.onError(err);
+          return;
+        }
+
+        setTimeout(function() {
+          self._poll();
+        }, 350);
+      }
+    });
+  };
+
+  Uploader.prototype.stop = function() {
+    document.title = this.documentTitle;
+    this.ended = true;
+  };
+
+
+  Uploader.prototype.cancel = function() {
+    // @todo this has still a race condition if a new upload is started
+    // while the cancel request is still being executed. Shouldn't happen
+    // in real life, but needs fixing.
+
+    if (!this.ended) {
+      var self = this;
+      if (this.$params) {
+        this.$params.prependTo(this.$form);
+      }
+
+      this.$fileClones.each(function(i) {
+        var $original = $(self.$files[i]).clone(true);
+        var $clone = $(this);
+        $original.insertAfter($clone);
+        $clone.remove();
+      });
+      clearTimeout(self.timer);
+
+      this._poll('?method=delete');
+
+      if (navigator.appName == 'Microsoft Internet Explorer') {
+        this.$iframe[0].contentWindow.document.execCommand('Stop');
+      }
+
+      setTimeout(function() {
+        self.$iframe.remove();
+      }, 500);
+    }
+
+    if (this._options.modal) {
+      this.hideModal();
+    }
+  };
+
+  Uploader.prototype.submitForm = function() {
+    // prevent that files are uploaded to the final destination
+    // after all that is what we use this plugin for :)
+    if (this.$form.attr('enctype') === 'multipart/form-data') {
+      this.$form.removeAttr('enctype');
+    }
+
+    if (this.assembly !== null) {
+      $('<textarea/>')
+        .attr('name', 'transloadit')
+        .text(JSON.stringify(this.assembly))
+        .prependTo(this.$form)
+        .hide();
+    }
+
+    if (this._options.autoSubmit) {
+      this.$form
+        .unbind('submit.transloadit')
+        .submit();
+    }
+  };
+
+  Uploader.prototype.hideModal = function() {
+    $.mask.close();
+    this.$modal.remove();
+  };
+
+  Uploader.prototype.showModal = function() {
+    this.$modal =
+      $('<div id="transloadit">'+
+        '<div class="content">'+
+          '<a href="#close" class="close">'+ this.i18n('cancel') +'</a>'+
+          '<p class="status"></p>'+
+          '<div class="progress progress-striped">' +
+            '<div class="bar"><span class="percent"></span></div>' +
+          '</div>' +
+          '<label>'+ this.i18n('startingUpload')+'</label>' +
+          '<p class="error"></p>'+
+          '<div class="error-details-toggle"><a href="#">'+ this.i18n('details') +'</a></div>' +
+          '<p class="error-details"></p>'+
+        '</div>'+
+      '</div>')
+      .appendTo('body');
+
+    $.extend(this.$modal, {
+      '$content'            : this.$modal.find('.content'),
+      '$close'              : this.$modal.find('.close'),
+      '$label'              : this.$modal.find('label'),
+      '$progress'           : this.$modal.find('.progress'),
+      '$percent'            : this.$modal.find('.progress .percent'),
+      '$progressBar'        : this.$modal.find('.progress .bar'),
+      '$error'              : this.$modal.find('.error'),
+      '$errorDetails'       : this.$modal.find('.error-details'),
+      '$errorDetailsToggle' : this.$modal.find('.error-details-toggle')
+    });
+
+    var self = this;
+
+    this.$modal.$error.hide();
+    this.$modal.$errorDetails.hide();
+    this.$modal.$errorDetailsToggle.hide();
+
+    var expose = this.$modal.expose({
+      api          : true,
+      maskId       : 'transloadit_expose',
+      opacity      : 0.9,
+      loadSpeed    : 250,
+      closeOnEsc   : false,
+      closeOnClick : false
+    });
+
+    this.$modal.$close.click(function() {
+      self.cancel();
+      return false;
+    });
+  };
+
+  Uploader.prototype.renderError = function(err) {
+    if (!this._options.modal) {
+      return;
+    }
+
+    if (!this._options.debug) {
+      return this.cancel();
+    }
+
+    this.$modal.$content.addClass('content-error');
+    this.$modal.$progress.hide();
+    this.$modal.$label.hide();
+
+    var errorMsg = err.error+': ' + err.message + '<br /><br />';
+    errorMsg += (err.reason || '');
+
+    var errorsRequiringDetails = [
+      'CONNECTION_ERROR',
+      'BORED_INSTANCE_ERROR',
+      'ASSEMBLY_NOT_FOUND'
+    ];
+    if ($.inArray(err.error, errorsRequiringDetails) === -1) {
+      this.$modal.$error.html(errorMsg).show();
+      return;
+    }
+
+    var text = this.i18n('errors.unknown') + '<br/>' + this.i18n('errors.tryAgain');
+    this.$modal.$error.html(text).show();
+
+    var assemblyId = err.assemblyId ? err.assemblyId : this.assemblyId;
+    var self       = this;
+    var ip         = null;
+
+    $.getJSON(PROTOCOL + 'jsonip.com/', function(ipData) {
+      ip = ipData.ip;
+    })
+    .always(function() {
+      var details = {
+        endpoint     : err.url,
+        instance     : self.instance,
+        assembly_id  : assemblyId,
+        ip           : ip,
+        time         : self.getUTCDatetime(),
+        agent        : navigator.userAgent,
+        poll_retries : self.pollRetries,
+        error        : errorMsg
+      };
+      $.post(PROTOCOL + 'status.transloadit.com/client_error', details);
+
+      var detailsArr = [];
+      for (var key in details) {
+        detailsArr.push(key + ': ' + details[key]);
+      }
+
+      var detailsTxt = self.i18n('errors.troubleshootDetails') + '<br /><br />';
+      self.$modal.$errorDetails.hide().html(detailsTxt + detailsArr.join('<br />'));
+
+      self.$modal.$errorDetailsToggle.show().find('a')
+        .off('click')
+        .on('click', function(e) {
+          e.preventDefault();
+          self.$modal.$errorDetails.toggle();
+        });
+    });
+  };
+
+  Uploader.prototype.renderProgress = function(assembly, isAssemblyComplete, waitIsTrue) {
+    if (!this._options.modal) {
+      return;
+    }
+
+    var progress = assembly.bytes_received / assembly.bytes_expected * 100;
+    if (progress > 100) {
+      progress = 0;
+    }
+
+    var bytesReceived     = assembly.bytes_received - this.bytesReceivedBefore;
+    var timeSinceLastPoll = +new Date() - this.lastPoll;
+    var duration          = progress === 100 ? 1000 : this._options.interval * 2;
+
+    var mbReceived = (assembly.bytes_received / 1024 / 1024).toFixed(2);
+    var mbExpected = (assembly.bytes_expected / 1024 / 1024).toFixed(2);
+    var uploadRate = ((bytesReceived / 1024) / (timeSinceLastPoll / 1000)).toFixed(1);
+
+    var outstanding  = assembly.bytes_expected - assembly.bytes_received;
+    var speedInBytes = (bytesReceived / (timeSinceLastPoll / 1000)).toFixed(1);
+
+    var durationLeft = '';
+    if (speedInBytes > 0) {
+      durationLeft = this._duration(outstanding / speedInBytes);
+    }
+
+    txt = this.i18n('uploadProgress',
+      mbReceived, mbExpected, uploadRate, durationLeft
+    );
+
+    if (!this._animatedTo100) {
+      this.$modal.$label.text(txt);
+    }
+
+    var totalWidth           = parseInt(this.$modal.$progress.css('width'), 10);
+    this.bytesReceivedBefore = assembly.bytes_received;
+
+    if (bytesReceived <= 0 && !isAssemblyComplete) {
+      return;
+    }
+
+    var self = this;
+
+    if (isAssemblyComplete && waitIsTrue) {
+      duration = 500;
+    }
+
+    this.$modal.$progressBar.stop().animate(
+      {width: progress + '%'},
+      {
+        duration: duration,
+        easing: 'linear',
+        progress: function(promise, currPercent, remainingMs) {
+          var width = parseInt(self.$modal.$progressBar.css('width'), 10);
+
+          var percent = (width * 100 / totalWidth).toFixed(0);
+          if (percent > 100) {
+            percent = 100;
+          }
+          if (percent > 13 && !self._animatedTo100) {
+            self.$modal.$percent.text(percent + '%');
+          }
+
+          if (percent == 100 && !self._animatedTo100) {
+            self._animatedTo100 = true;
+
+            setTimeout(function() {
+              self.$modal.$label.text(self.i18n('processingFiles'));
+              self.$modal.$progress.addClass('active');
+              self.$modal.$percent.text('');
+            }, 500);
+          }
+        }
+      }
+    );
+  };
+
+  Uploader.prototype.includeCss = function() {
+    if (CSS_LOADED || !this._options.modal) {
+      return;
+    }
+
+    CSS_LOADED = true;
+    $('<link rel="stylesheet" type="text/css" href="' + this._options.assets + 'css/transloadit2-latest.css" />')
+      .appendTo('head');
+  };
+
+  Uploader.prototype.getUTCDatetime = function() {
+    var now = new Date();
+    var d = new Date(
+      now.getUTCFullYear(),
+      now.getUTCMonth(),
+      now.getUTCDate(),
+      now.getUTCHours(),
+      now.getUTCMinutes(),
+      now.getUTCSeconds()
+    );
+
+    var pad = function (n) {
+      return n < 10 ? '0' + n : n;
+    };
+    var tz = d.getTimezoneOffset();
+    var tzs = (tz > 0 ? "-" : "+") + pad(parseInt(tz / 60, 10));
+
+    if (tz % 60 !== 0) {
+      tzs += pad(tz % 60);
+    }
+
+    if (tz === 0) {
+      tzs = 'Z';
+    }
+
+    return d.getFullYear() + '-' +
+        pad(d.getMonth() + 1) + '-' +
+        pad(d.getDate()) + 'T' +
+        pad(d.getHours()) + ':' +
+        pad(d.getMinutes()) + ':' +
+        pad(d.getSeconds()) + tzs;
+  };
+
+  Uploader.prototype._duration = function(t) {
+    var min   = 60;
+    var h     = 60 * min;
+    var hours = Math.floor(t / h);
+
+    t -= hours * h;
+
+    var minutes = Math.floor(t / min);
+    t -= minutes * min;
+
+    var r = '';
+    if (hours > 0) {
+      r += hours + 'h ';
+    }
+    if (minutes > 0) {
+      r += minutes + 'min ';
+    }
+    if (t > 0) {
+      t = t.toFixed(0);
+      r += t + 's';
+    }
+
+    if (r === '') {
+      r = '0s';
+    }
+
+    return r;
+  };
+
+  Uploader.prototype._genUuid = function(options, buf, offset) {
+    options = options || {};
+
+    var i = buf && offset || 0;
+    var b = buf || [];
+
+    var _rnds = new Array(16);
+    var _rng = function() {
+      for (var j = 0, r; j < 16; j++) {
+        if ((j & 0x03) === 0) r = Math.random() * 0x100000000;
+        _rnds[j] = r >>> ((j & 0x03) << 3) & 0xff;
+      }
+
+      return _rnds;
+    };
+    var _seedBytes = _rng();
+
+    var _nodeId = [
+      _seedBytes[0] | 0x01,
+      _seedBytes[1], _seedBytes[2], _seedBytes[3], _seedBytes[4], _seedBytes[5]
+    ];
+
+    this._clockseq = (_seedBytes[6] << 8 | _seedBytes[7]) & 0x3fff;
+    var clockseq = options.clockseq != null ? options.clockseq : this._clockseq;
+
+    var _byteToHex = [];
+    var _hexToByte = {};
+    for (var j = 0; j < 256; j++) {
+      _byteToHex[j] = (j + 0x100).toString(16).substr(1);
+      _hexToByte[_byteToHex[j]] = j;
+    }
+
+    // UUID timestamps are 100 nano-second units since the Gregorian epoch,
+    // (1582-10-15 00:00).  JSNumbers aren't precise enough for this, so
+    // time is handled internally as 'msecs' (integer milliseconds) and 'nsecs'
+    // (100-nanoseconds offset from msecs) since unix epoch, 1970-01-01 00:00.
+    var msecs = options.msecs != null ? options.msecs : new Date().getTime();
+
+    // Per 4.2.1.2, use count of uuid's generated during the current clock
+    // cycle to simulate higher resolution clock
+    var nsecs = options.nsecs != null ? options.nsecs : this._lastNSecs + 1;
+
+    // Time since last uuid creation (in msecs)
+    var dt = (msecs - this._lastMSecs) + (nsecs - this._lastNSecs)/10000;
+
+    // Per 4.2.1.2, Bump clockseq on clock regression
+    if (dt < 0 && options.clockseq == null) {
+      clockseq = clockseq + 1 & 0x3fff;
+    }
+
+    // Reset nsecs if clock regresses (new clockseq) or we've moved onto a new
+    // time interval
+    if ((dt < 0 || msecs > this._lastMSecs) && options.nsecs == null) {
+      nsecs = 0;
+    }
+
+    // Per 4.2.1.2 Throw error if too many uuids are requested
+    if (nsecs >= 10000) {
+      throw new Error('uuid.v1(): Can\'t create more than 10M uuids/sec');
+    }
+
+    this._lastMSecs = msecs;
+    this._lastNSecs = nsecs;
+    this._clockseq = clockseq;
+
+    // Per 4.1.4 - Convert from unix epoch to Gregorian epoch
+    msecs += 12219292800000;
+
+    // `time_low`
+    var tl = ((msecs & 0xfffffff) * 10000 + nsecs) % 0x100000000;
+    b[i++] = tl >>> 24 & 0xff;
+    b[i++] = tl >>> 16 & 0xff;
+    b[i++] = tl >>> 8 & 0xff;
+    b[i++] = tl & 0xff;
+
+    // `time_mid`
+    var tmh = (msecs / 0x100000000 * 10000) & 0xfffffff;
+    b[i++] = tmh >>> 8 & 0xff;
+    b[i++] = tmh & 0xff;
+
+    // `time_high_and_version`
+    b[i++] = tmh >>> 24 & 0xf | 0x10; // include version
+    b[i++] = tmh >>> 16 & 0xff;
+
+    // `clock_seq_hi_and_reserved` (Per 4.2.2 - include variant)
+    b[i++] = clockseq >>> 8 | 0x80;
+
+    // `clock_seq_low`
+    b[i++] = clockseq & 0xff;
+
+    // `node`
+    var node = options.node || _nodeId;
+
+    for (var n = 0; n < 6; n++) {
+      b[i + n] = node[n];
+    }
+
+    function unparse(_buf, offset) {
+      var i = offset || 0, bth = _byteToHex;
+
+      return  bth[_buf[i++]] + bth[_buf[i++]] +
+              bth[_buf[i++]] + bth[_buf[i++]] +
+              bth[_buf[i++]] + bth[_buf[i++]] +
+              bth[_buf[i++]] + bth[_buf[i++]] +
+              bth[_buf[i++]] + bth[_buf[i++]] +
+              bth[_buf[i++]] + bth[_buf[i++]] +
+              bth[_buf[i++]] + bth[_buf[i++]] +
+              bth[_buf[i++]] + bth[_buf[i++]];
+    }
+
+    return buf ? buf : unparse(b);
+  };
+
+  Uploader.prototype.options = function(options) {
+    if (arguments.length === 0) {
+      return this._options;
+    }
+
+    $.extend(this._options, options);
+  };
+
+  Uploader.prototype.option = function(key, val) {
+    if (arguments.length == 1) {
+      return this._options[key];
+    }
+
+    this._options[key] = val;
+  };
+
+  Uploader.prototype.i18n = function() {
+    var args = Array.prototype.slice.call(arguments);
+    var key  = args.shift();
+    var locale = this._options.locale;
+    var translated = I18N[locale] && I18N[locale][key] || I18N.en[key];
+    if(!translated) {
+      throw new Error('Unknown i18n key: ' + key);
+    }
+
+    return sprintf(translated, args);
+  };
+
+}(jQuery);
