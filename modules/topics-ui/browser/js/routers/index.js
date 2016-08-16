@@ -1,8 +1,7 @@
 "use strict"
 
 var Backbone = require('backbone');
-var _ = require('lodash');
-var { subscribe }  = require('../dispatcher');
+var { subscribe } = require('../dispatcher');
 var navConstants = require('../constants/navigation');
 
 var _super = Backbone.Router.prototype;
