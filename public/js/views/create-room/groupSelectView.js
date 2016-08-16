@@ -21,6 +21,7 @@ var GroupSelectView = Marionette.ItemView.extend({
   template: template,
   initialize: function(options) {
     this.groupsCollection = options.groupsCollection;
+    this.dropdownClass = options.dropdownClass;
     this.selectedGroup = null;
     this.listenTo(this.groupsCollection, 'add remove change reset sync', this.reset);
   },
@@ -51,6 +52,7 @@ var GroupSelectView = Marionette.ItemView.extend({
         collection: this.groupsCollection,
         itemTemplate: itemTemplate,
         el: this.ui.input[0],
+        dropdownClass: this.dropdownClass,
         autoSelector: function(input) {
           return function(m) {
             var mName = m.get('name') || '';
