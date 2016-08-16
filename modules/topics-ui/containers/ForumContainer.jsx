@@ -26,7 +26,6 @@ module.exports = React.createClass({
   },
 
   componentDidMount(){
-    const { categoryStore } = this.props;
     subscribe(forumCatConstants.UPDATE_ACTIVE_CATEGORY, this.onCategoryUpdate, this);
   },
 
@@ -54,7 +53,7 @@ module.exports = React.createClass({
   onCategoryUpdate(){
     const { categoryStore } = this.props;
     this.setState({
-      categories: categoryStore.getCategories(),
+      categories: categoryStore.getCategories()
     })
   }
 
