@@ -1,22 +1,19 @@
 {
   "env": {
-    "commonjs": true,
-    "node": true,
     "mocha": true,
-    "es6": true
+    "es6": true,
+    "browser": true
   },
   "plugins": [
     "mocha",
     "react"
   ],
+  "parserOptions": {
+    "ecmaVersion": 6
+  },
   "rules": {
     "mocha/no-exclusive-tests": "error",
-    "node/no-unpublished-require": "off"
-  },
-  "parserOptions": {
-    "ecmaVersion": 6,
-    "ecmaFeatures": {
-      "jsx": true
-    }
+    "node/no-unpublished-require": "off",
+    "node/no-unsupported-features": "off"
   }
 }
