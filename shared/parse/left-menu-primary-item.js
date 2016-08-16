@@ -73,7 +73,6 @@ module.exports = function parseContentToTemplateData(data, state) {
   // Truncate
   displayName = roomNameShortener(displayName);
 
-
   return _.extend({}, data, {
     isNotOneToOne: (data.githubType !== 'ONETOONE'),
     displayName: displayName,
