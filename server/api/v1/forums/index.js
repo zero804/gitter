@@ -39,7 +39,7 @@ module.exports = {
 
   subresources: {
     'topics': require('./topics'),
-    // TODO: categories
+    'categories': require('./categories')
   },
 
 };

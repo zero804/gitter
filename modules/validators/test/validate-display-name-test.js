@@ -8,6 +8,7 @@ describe('validate-display-name', function() {
     'I love cats': true,
     ' I love cats': false,
     'I love cats ': false,
+    'I am a category': true,
     ' ': false,
     '': false
   };
