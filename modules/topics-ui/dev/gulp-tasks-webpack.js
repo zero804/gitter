@@ -7,9 +7,8 @@ var uglify = require('gulp-uglify');
 var filter = require('gulp-filter');
 var pump = require('pump');
 
-function webpackPipeline(rootDir, cb) {
+function webpackPipeline(rootDir) {
   var javascriptFileFilter = filter(['**/*.js'], { restore: true, passthrough: false });
-
   return pump([
     gulp.src(rootDir + '/webpack.config.js'),
     webpack(require('../webpack.config')),
@@ -18,7 +17,12 @@ function webpackPipeline(rootDir, cb) {
     uglify(),
     javascriptFileFilter.restore,
     sourcemaps.write('../maps')
-  ], cb);
+  ],
+  function(err){
+    if(!err) { return; }
+    console.error(err);
+    process.exit(1);
+  });
 }
 
 module.exports = webpackPipeline;
