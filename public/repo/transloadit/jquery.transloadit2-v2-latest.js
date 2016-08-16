@@ -1,8 +1,214 @@
 
 var jQuery = require('jquery');
-require('jquery.easing')(jQuery);
+
+/** @license jQuery Easing v1.3: Copyright (c) 2008 George McGinley Smith | BSD License: http://www.opensource.org/licenses/bsd-license.php
+*/
 
 /*
+ * jQuery Easing v1.3 - http://gsgd.co.uk/sandbox/jquery/easing/
+ *
+ * Uses the built in easing capabilities added In jQuery 1.1
+ * to offer multiple easing options
+ *
+ * TERMS OF USE - jQuery Easing
+ * 
+ * Open source under the BSD License. 
+ * 
+ * Copyright Â© 2008 George McGinley Smith
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without modification, 
+ * are permitted provided that the following conditions are met:
+ * 
+ * Redistributions of source code must retain the above copyright notice, this list of 
+ * conditions and the following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright notice, this list 
+ * of conditions and the following disclaimer in the documentation and/or other materials 
+ * provided with the distribution.
+ * 
+ * Neither the name of the author nor the names of contributors may be used to endorse 
+ * or promote products derived from this software without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY 
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ *  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ *  GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED 
+ * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED 
+ * OF THE POSSIBILITY OF SUCH DAMAGE. 
+ *
+*/
+
+// t: current time, b: begInnIng value, c: change In value, d: duration
+jQuery.easing['jswing'] = jQuery.easing['swing'];
+
+jQuery.extend( jQuery.easing,
+{
+	def: 'easeOutQuad',
+	swing: function (x, t, b, c, d) {
+		//alert(jQuery.easing.default);
+		return jQuery.easing[jQuery.easing.def](x, t, b, c, d);
+	},
+	easeInQuad: function (x, t, b, c, d) {
+		return c*(t/=d)*t + b;
+	},
+	easeOutQuad: function (x, t, b, c, d) {
+		return -c *(t/=d)*(t-2) + b;
+	},
+	easeInOutQuad: function (x, t, b, c, d) {
+		if ((t/=d/2) < 1) return c/2*t*t + b;
+		return -c/2 * ((--t)*(t-2) - 1) + b;
+	},
+	easeInCubic: function (x, t, b, c, d) {
+		return c*(t/=d)*t*t + b;
+	},
+	easeOutCubic: function (x, t, b, c, d) {
+		return c*((t=t/d-1)*t*t + 1) + b;
+	},
+	easeInOutCubic: function (x, t, b, c, d) {
+		if ((t/=d/2) < 1) return c/2*t*t*t + b;
+		return c/2*((t-=2)*t*t + 2) + b;
+	},
+	easeInQuart: function (x, t, b, c, d) {
+		return c*(t/=d)*t*t*t + b;
+	},
+	easeOutQuart: function (x, t, b, c, d) {
+		return -c * ((t=t/d-1)*t*t*t - 1) + b;
+	},
+	easeInOutQuart: function (x, t, b, c, d) {
+		if ((t/=d/2) < 1) return c/2*t*t*t*t + b;
+		return -c/2 * ((t-=2)*t*t*t - 2) + b;
+	},
+	easeInQuint: function (x, t, b, c, d) {
+		return c*(t/=d)*t*t*t*t + b;
+	},
+	easeOutQuint: function (x, t, b, c, d) {
+		return c*((t=t/d-1)*t*t*t*t + 1) + b;
+	},
+	easeInOutQuint: function (x, t, b, c, d) {
+		if ((t/=d/2) < 1) return c/2*t*t*t*t*t + b;
+		return c/2*((t-=2)*t*t*t*t + 2) + b;
+	},
+	easeInSine: function (x, t, b, c, d) {
+		return -c * Math.cos(t/d * (Math.PI/2)) + c + b;
+	},
+	easeOutSine: function (x, t, b, c, d) {
+		return c * Math.sin(t/d * (Math.PI/2)) + b;
+	},
+	easeInOutSine: function (x, t, b, c, d) {
+		return -c/2 * (Math.cos(Math.PI*t/d) - 1) + b;
+	},
+	easeInExpo: function (x, t, b, c, d) {
+		return (t==0) ? b : c * Math.pow(2, 10 * (t/d - 1)) + b;
+	},
+	easeOutExpo: function (x, t, b, c, d) {
+		return (t==d) ? b+c : c * (-Math.pow(2, -10 * t/d) + 1) + b;
+	},
+	easeInOutExpo: function (x, t, b, c, d) {
+		if (t==0) return b;
+		if (t==d) return b+c;
+		if ((t/=d/2) < 1) return c/2 * Math.pow(2, 10 * (t - 1)) + b;
+		return c/2 * (-Math.pow(2, -10 * --t) + 2) + b;
+	},
+	easeInCirc: function (x, t, b, c, d) {
+		return -c * (Math.sqrt(1 - (t/=d)*t) - 1) + b;
+	},
+	easeOutCirc: function (x, t, b, c, d) {
+		return c * Math.sqrt(1 - (t=t/d-1)*t) + b;
+	},
+	easeInOutCirc: function (x, t, b, c, d) {
+		if ((t/=d/2) < 1) return -c/2 * (Math.sqrt(1 - t*t) - 1) + b;
+		return c/2 * (Math.sqrt(1 - (t-=2)*t) + 1) + b;
+	},
+	easeInElastic: function (x, t, b, c, d) {
+		var s=1.70158;var p=0;var a=c;
+		if (t==0) return b;  if ((t/=d)==1) return b+c;  if (!p) p=d*.3;
+		if (a < Math.abs(c)) { a=c; var s=p/4; }
+		else var s = p/(2*Math.PI) * Math.asin (c/a);
+		return -(a*Math.pow(2,10*(t-=1)) * Math.sin( (t*d-s)*(2*Math.PI)/p )) + b;
+	},
+	easeOutElastic: function (x, t, b, c, d) {
+		var s=1.70158;var p=0;var a=c;
+		if (t==0) return b;  if ((t/=d)==1) return b+c;  if (!p) p=d*.3;
+		if (a < Math.abs(c)) { a=c; var s=p/4; }
+		else var s = p/(2*Math.PI) * Math.asin (c/a);
+		return a*Math.pow(2,-10*t) * Math.sin( (t*d-s)*(2*Math.PI)/p ) + c + b;
+	},
+	easeInOutElastic: function (x, t, b, c, d) {
+		var s=1.70158;var p=0;var a=c;
+		if (t==0) return b;  if ((t/=d/2)==2) return b+c;  if (!p) p=d*(.3*1.5);
+		if (a < Math.abs(c)) { a=c; var s=p/4; }
+		else var s = p/(2*Math.PI) * Math.asin (c/a);
+		if (t < 1) return -.5*(a*Math.pow(2,10*(t-=1)) * Math.sin( (t*d-s)*(2*Math.PI)/p )) + b;
+		return a*Math.pow(2,-10*(t-=1)) * Math.sin( (t*d-s)*(2*Math.PI)/p )*.5 + c + b;
+	},
+	easeInBack: function (x, t, b, c, d, s) {
+		if (s == undefined) s = 1.70158;
+		return c*(t/=d)*t*((s+1)*t - s) + b;
+	},
+	easeOutBack: function (x, t, b, c, d, s) {
+		if (s == undefined) s = 1.70158;
+		return c*((t=t/d-1)*t*((s+1)*t + s) + 1) + b;
+	},
+	easeInOutBack: function (x, t, b, c, d, s) {
+		if (s == undefined) s = 1.70158; 
+		if ((t/=d/2) < 1) return c/2*(t*t*(((s*=(1.525))+1)*t - s)) + b;
+		return c/2*((t-=2)*t*(((s*=(1.525))+1)*t + s) + 2) + b;
+	},
+	easeInBounce: function (x, t, b, c, d) {
+		return c - jQuery.easing.easeOutBounce (x, d-t, 0, c, d) + b;
+	},
+	easeOutBounce: function (x, t, b, c, d) {
+		if ((t/=d) < (1/2.75)) {
+			return c*(7.5625*t*t) + b;
+		} else if (t < (2/2.75)) {
+			return c*(7.5625*(t-=(1.5/2.75))*t + .75) + b;
+		} else if (t < (2.5/2.75)) {
+			return c*(7.5625*(t-=(2.25/2.75))*t + .9375) + b;
+		} else {
+			return c*(7.5625*(t-=(2.625/2.75))*t + .984375) + b;
+		}
+	},
+	easeInOutBounce: function (x, t, b, c, d) {
+		if (t < d/2) return jQuery.easing.easeInBounce (x, t*2, 0, c, d) * .5 + b;
+		return jQuery.easing.easeOutBounce (x, t*2-d, 0, c, d) * .5 + c*.5 + b;
+	}
+});
+
+/*
+ *
+ * TERMS OF USE - EASING EQUATIONS
+ * 
+ * Open source under the BSD License. 
+ * 
+ * Copyright Â© 2001 Robert Penner
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without modification, 
+ * are permitted provided that the following conditions are met:
+ * 
+ * Redistributions of source code must retain the above copyright notice, this list of 
+ * conditions and the following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright notice, this list 
+ * of conditions and the following disclaimer in the documentation and/or other materials 
+ * provided with the distribution.
+ * 
+ * Neither the name of the author nor the names of contributors may be used to endorse 
+ * or promote products derived from this software without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY 
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ *  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ *  GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED 
+ * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED 
+ * OF THE POSSIBILITY OF SUCH DAMAGE. 
+ *
+ *//*
  * jQuery JSONP Core Plugin 2.4.0 (2012-08-21)
  *
  * https://github.com/jaubourg/jquery-jsonp
@@ -390,7 +596,7 @@ require('jquery.easing')(jQuery);
 
   var OPTIONS = {
     service                      : DEFAULT_SERVICE,
-    assets                       : PROTOCOL + 'assets.transloadit.com/',
+    assets                       : PROTOCOL+'assets.transloadit.com/',
     beforeStart                  : function() {return true;},
     onFileSelect                 : function() {},
     onStart                      : function() {},
@@ -419,31 +625,31 @@ require('jquery.easing')(jQuery);
   };
 
   var I18N = {
-    en : {
-      'errors.BORED_INSTANCE_ERROR' : 'Could not find a bored instance.',
-      'errors.CONNECTION_ERROR'     : 'There was a problem connecting to the upload server',
-      'errors.unknown'              : 'There was an internal error.',
-      'errors.tryAgain'             : 'Please try your upload again.',
-      'errors.troubleshootDetails'  : 'If you would like our help to troubleshoot this, ' +
+    en: {
+      'errors.BORED_INSTANCE_ERROR': 'Could not find a bored instance.',
+      'errors.CONNECTION_ERROR': 'There was a problem connecting to the upload server',
+      'errors.unknown': 'There was an internal error.',
+      'errors.tryAgain': 'Please try your upload again.',
+      'errors.troubleshootDetails': 'If you would like our help to troubleshoot this, ' +
           'please email us this information:',
-      cancel                        : 'Cancel',
-      details                       : 'Details',
-      startingUpload                : 'Starting upload ...',
-      processingFiles               : 'Upload done, now processing files ...',
-      uploadProgress                : '%s / %s MB at %s kB/s | %s left'
+      cancel: 'Cancel',
+      details: 'Details',
+      startingUpload: 'Starting upload ...',
+      processingFiles: 'Upload done, now processing files ...',
+      uploadProgress: '%s / %s MB at %s kB/s | %s left'
     },
-    ja : {
-      'errors.BORED_INSTANCE_ERROR' : 'サーバー接続に問題があります',
-      'errors.CONNECTION_ERROR'     : 'サーバー接続に問題があります',
-      'errors.unknown'              : '通信環境に問題があります',
-      'errors.tryAgain'             : 'しばらくしてから再度投稿してください',
-      'errors.troubleshootDetails'  : '解決できない場合は、こちらにお問い合わせください ' +
+    ja: {
+      'errors.BORED_INSTANCE_ERROR': 'サーバー接続に問題があります',
+      'errors.CONNECTION_ERROR': 'サーバー接続に問題があります',
+      'errors.unknown': '通信環境に問題があります',
+      'errors.tryAgain': 'しばらくしてから再度投稿してください',
+      'errors.troubleshootDetails': '解決できない場合は、こちらにお問い合わせください ' +
           '下記の情報をメールでお送りください:',
-      cancel                        : 'キャンセル',
-      details                       : '詳細',
-      startingUpload                : '投稿中 ...',
-      processingFiles               : '接続中',
-      uploadProgress                : '%s MB / %s MB (%s kB / 秒)'
+      cancel: 'キャンセル',
+      details: '詳細',
+      startingUpload: '投稿中 ...',
+      processingFiles: '接続中',
+      uploadProgress: '%s MB / %s MB (%s kB / 秒)'
     }
   };
   var CSS_LOADED = false;
@@ -593,7 +799,7 @@ require('jquery.easing')(jQuery);
           self.instance = instance.api2_host;
           self.start();
         },
-        error             : function(xhr, status, jsonpErr) {
+        error: function(xhr, status, jsonpErr) {
           if (canUseCustomBoredLogic && self._options['service'] === DEFAULT_SERVICE) {
             canUseCustomBoredLogic = false;
 
@@ -610,11 +816,6 @@ require('jquery.easing')(jQuery);
               }
 
               url = PROTOCOL + 'api2.' + theUrl + '/instances/bored';
-
-              if (PROTOCOL === 'https://') {
-                url = PROTOCOL + 'api2-' + theUrl + '/instances/bored';
-              }
-
               proceed();
             });
             return;
@@ -645,6 +846,7 @@ require('jquery.easing')(jQuery);
   };
 
   Uploader.prototype._findBoredInstanceUrl = function(cb) {
+    var self   = this;
     var region = this._options.region;
     var domain = 's3';
 
@@ -655,33 +857,20 @@ require('jquery.easing')(jQuery);
     var url = PROTOCOL + domain + '.amazonaws.com/infra-' + region;
     url    += '.transloadit.com/cached_instances.json';
 
-    var self = this;
-    var opts = {
+    $.ajax({
       url      : url,
-      timeout  : 5000,
       datatype : 'json',
-      success  : function(result) {
+      timeout  : 5000,
+      success: function(result) {
         var instances = self._shuffle(result.uploaders);
         self._findResponsiveInstance(instances, 0, cb);
-      }
-    };
-
-    opts.error = function(xhr, status) {
-      // retry from the crm if S3 let us down
-      opts.url = PROTOCOL + 'transloadit.com/' + region;
-      opts.url += '_cached_instances.json';
-
-      opts.error = function(xhr, status) {
-        var msg = 'Could not get cached uploaders from neither S3 or the crm';
-        msg += ' for region: ' + region;
+      },
+      error: function(xhr, status) {
+        var msg = 'Could not query S3 for cached uploaders from url: ' + url;
         var err = new Error(msg);
         cb(err);
-      };
-
-      $.ajax(opts);
-    };
-
-    $.ajax(opts);
+      }
+    });
   };
 
   Uploader.prototype._findResponsiveInstance = function(instances, index, cb) {
@@ -697,10 +886,10 @@ require('jquery.easing')(jQuery);
       url               : PROTOCOL + url,
       timeout           : 3000,
       callbackParameter : 'callback',
-      success           : function(result) {
+      success: function(result) {
         cb(null, url);
       },
-      error             : function(xhr, status) {
+      error: function(xhr, status) {
         self._findResponsiveInstance(instances, index + 1, cb);
       }
     });
@@ -736,34 +925,26 @@ require('jquery.easing')(jQuery);
     // when the user hits cancel and so that we can .append(this.$files) to
     // this.$uploadForm, which moves (without a clone!) the file input fields in the dom
     this.$fileClones = $().not(document);
+    this.$files.each(function() {
+      var $clone = $(this).clone(true);
+      self.$fileClones = self.$fileClones.add($clone);
+      $clone.insertAfter(this);
+    });
 
-    // We do not need file clones if we do an XHR upload, because we do not
-    // have a shadow form submitted to an iframe in that case.
-    if (!this._options.formData) {
-      this.$files.each(function() {
-        var $clone = $(this).clone(true);
-        self.$fileClones = self.$fileClones.add($clone);
-        $clone.insertAfter(this);
-      });
-    }
-
-    this.$iframe = $('<iframe id="transloadit-' + this.assemblyId + '" name="transloadit-' + this.assemblyId + '"/>')
+    this.$iframe = $('<iframe id="transloadit-'+this.assemblyId+'" name="transloadit-'+this.assemblyId+'"/>')
       .appendTo('body')
       .hide();
 
-    var url = PROTOCOL + this.instance + '/assemblies/' + this.assemblyId + '?redirect=false';
+    var url = PROTOCOL+this.instance+'/assemblies/'+this.assemblyId+'?redirect=false';
 
     if (this._options.formData) {
-      var assemblyParams = this._options.params;
-      if (this.$params) {
-        assemblyParams = this.$params.val();
-      }
+      var paramsFieldVal = this.$form.find("input[name=params]").val();
 
       if (this._options.formData instanceof FormData) {
-        this._options.formData.append("params", assemblyParams);
+        this._options.formData.append("params", paramsFieldVal);
       } else {
-        var formData = new FormData(this.$form.get(0));
-        formData.append("params", assemblyParams);
+        var formData = new FormData(this.$form);
+        formData.append("params", paramsFieldVal);
 
         for (var i = 0; i < this._options.formData.length; i++) {
           var tupel = this._options.formData[i];
@@ -894,7 +1075,7 @@ require('jquery.easing')(jQuery);
 
     if (this.params.redirect_url) {
       this.$form.attr('action', this.params.redirect_url);
-    } else if (this._options.autoSubmit && (this.$form.attr('action') == this._options.service + 'assemblies')) {
+    } else if (this._options.autoSubmit && (this.$form.attr('action') == this._options.service+'assemblies')) {
       alert('Error: input[name=params] does not include a redirect_url');
       return;
     }
@@ -917,7 +1098,7 @@ require('jquery.easing')(jQuery);
     this.pollStarted = +new Date();
 
     var instance = 'status-' + this.instance;
-    var url      = PROTOCOL + instance + '/assemblies/' + this.assemblyId;
+    var url      = PROTOCOL + instance + '/assemblies/'+this.assemblyId;
 
     if (query) {
       url += query;
@@ -1035,7 +1216,7 @@ require('jquery.easing')(jQuery);
         }, timeout);
         self.lastPoll = +new Date();
       },
-      error             : function(xhr, status, jsonpErr) {
+      error: function(xhr, status, jsonpErr) {
         if (self.ended) {
           return;
         }
@@ -1136,18 +1317,18 @@ require('jquery.easing')(jQuery);
 
   Uploader.prototype.showModal = function() {
     this.$modal =
-      $('<div id="transloadit">' +
-        '<div class="content">' +
-          '<a href="#close" class="close">' + this.i18n('cancel') + '</a>' +
-          '<p class="status"></p>' +
+      $('<div id="transloadit">'+
+        '<div class="content">'+
+          '<a href="#close" class="close">'+ this.i18n('cancel') +'</a>'+
+          '<p class="status"></p>'+
           '<div class="progress progress-striped">' +
             '<div class="bar"><span class="percent"></span></div>' +
           '</div>' +
-          '<label>' + this.i18n('startingUpload') + '</label>' +
-          '<p class="error"></p>' +
-          '<div class="error-details-toggle"><a href="#">' + this.i18n('details') + '</a></div>' +
-          '<p class="error-details"></p>' +
-        '</div>' +
+          '<label>'+ this.i18n('startingUpload')+'</label>' +
+          '<p class="error"></p>'+
+          '<div class="error-details-toggle"><a href="#">'+ this.i18n('details') +'</a></div>' +
+          '<p class="error-details"></p>'+
+        '</div>'+
       '</div>')
       .appendTo('body');
 
@@ -1197,7 +1378,7 @@ require('jquery.easing')(jQuery);
     this.$modal.$progress.hide();
     this.$modal.$label.hide();
 
-    var errorMsg = err.error + ': ' + err.message + '<br /><br />';
+    var errorMsg = err.error+': ' + err.message + '<br /><br />';
     errorMsg += (err.reason || '');
 
     var errorsRequiringDetails = [
@@ -1300,9 +1481,9 @@ require('jquery.easing')(jQuery);
     this.$modal.$progressBar.stop().animate(
       {width: progress + '%'},
       {
-        duration : duration,
-        easing   : 'linear',
-        progress : function(promise, currPercent, remainingMs) {
+        duration: duration,
+        easing: 'linear',
+        progress: function(promise, currPercent, remainingMs) {
           var width = parseInt(self.$modal.$progressBar.css('width'), 10);
 
           var percent = (width * 100 / totalWidth).toFixed(0);
@@ -1348,7 +1529,7 @@ require('jquery.easing')(jQuery);
       now.getUTCSeconds()
     );
 
-    var pad = function(n) {
+    var pad = function (n) {
       return n < 10 ? '0' + n : n;
     };
     var tz = d.getTimezoneOffset();
@@ -1442,7 +1623,7 @@ require('jquery.easing')(jQuery);
     var nsecs = options.nsecs != null ? options.nsecs : this._lastNSecs + 1;
 
     // Time since last uuid creation (in msecs)
-    var dt = (msecs - this._lastMSecs) + (nsecs - this._lastNSecs) / 10000;
+    var dt = (msecs - this._lastMSecs) + (nsecs - this._lastNSecs)/10000;
 
     // Per 4.2.1.2, Bump clockseq on clock regression
     if (dt < 0 && options.clockseq == null) {
@@ -1499,7 +1680,7 @@ require('jquery.easing')(jQuery);
     function unparse(_buf, offset) {
       var i = offset || 0, bth = _byteToHex;
 
-      return bth[_buf[i++]] + bth[_buf[i++]] +
+      return  bth[_buf[i++]] + bth[_buf[i++]] +
               bth[_buf[i++]] + bth[_buf[i++]] +
               bth[_buf[i++]] + bth[_buf[i++]] +
               bth[_buf[i++]] + bth[_buf[i++]] +
@@ -1533,7 +1714,7 @@ require('jquery.easing')(jQuery);
     var key  = args.shift();
     var locale = this._options.locale;
     var translated = I18N[locale] && I18N[locale][key] || I18N.en[key];
-    if (!translated) {
+    if(!translated) {
       throw new Error('Unknown i18n key: ' + key);
     }
 
