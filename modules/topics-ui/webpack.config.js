@@ -31,8 +31,9 @@ var config = {
         include: path.resolve(__dirname, './browser/less'),
       },
       {
-        test: /\.jsx$/,
+        test: /\.jsx?$/,
         loader: 'babel',
+        exclude: /node_modules/,
         query: {
           presets: [
             "es2015",
