@@ -156,6 +156,7 @@
     "backbone-filtered-collection": "^1.5.2",
     "backbone-proxy-collection": "^2.3.0",
     "backbone-url-resolver": "^0.1.1",
+    "backbone.cocktail": "^0.5.13",
     "backbone.marionette": "^2.4.4",
     "beautify-benchmark": "^0.2.4",
     "benchmark": "^2.1.0",
