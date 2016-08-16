@@ -9,7 +9,9 @@ var { subscribe } = require('../../../browser/js/dispatcher');
 var navConstants = require('../../../browser/js/constants/navigation');
 
 var Collection = Backbone.Collection.extend({
-  getCategories(){ return this.models.map((m) => m.toJSON() ); }
+  getCategories(){
+    return this.models.map((m) => m.toJSON());
+  }
 });
 
 describe('<ForumContainer />', function(){
