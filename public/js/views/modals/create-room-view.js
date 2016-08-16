@@ -125,7 +125,8 @@ var CreateRoomView = Marionette.LayoutView.extend({
 
   onRender: function() {
     this.groupSelect = new GroupSelectView({
-      groupsCollection: this.groupsCollection
+      groupsCollection: this.groupsCollection,
+      dropdownClass: 'create-room-group-typeahead-dropdown',
     });
     this.groupSelectRegion.show(this.groupSelect);
 
