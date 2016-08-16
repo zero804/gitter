@@ -263,18 +263,22 @@ function mongoErrorWithCode(code) {
  */
 function unionModelsById(arrayOfModels) {
   var idHash = {};
+
   return _.reduce(arrayOfModels, function(result, models) {
     if (!models) return result;
 
-    _.reduce(models, function(result, model) {
+    return _.reduce(models, function(result, model) {
       var id = model.id || model._id;
+
+      // Already added? Then skip it
       if (idHash[id]) return result;
+
+      // Add to the hash and push to the result
       idHash[id] = true;
       result.push(model);
       return result;
     }, result);
 
-    return result;
   }, []);
 }
 
