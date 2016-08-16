@@ -56,8 +56,8 @@ gulp.task('topics:test:server', function() {
   });
 });
 
-gulp.task('topics:compile:webpack', function() {
-  return webpackPipeline(ROOT)
+gulp.task('topics:compile:webpack', function(cb) {
+  return webpackPipeline(ROOT, cb)
     .pipe(gulp.dest(getOutputPath('assets/js')));
 });
 
