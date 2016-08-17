@@ -98,10 +98,8 @@ var webpackConfig = {
       "components": path.resolve(path.join(__dirname, "./components")),
       "template": path.resolve(path.join(__dirname, "./template")),
       "bootstrap_tooltip": path.resolve(path.join(__dirname, "./utils/tooltip.js")),
-      "jquery": path.resolve(path.join(__dirname, "../repo/jquery/jquery.js")),
+      "jquery": require.resolve('jquery'),
       "mutant": path.resolve(path.join(__dirname, "../repo/mutant/mutant.js")),
-      "cocktail": path.resolve(path.join(__dirname, "../repo/cocktail/cocktail.js")),
-      "keymaster": path.resolve(path.join(__dirname, "../repo/keymaster/keymaster.js")),
       "emojify": path.resolve(path.join(__dirname, "../repo/emojify/emojify.js")),
       "jquery-iframely": path.resolve(path.join(__dirname, "../repo/jquery-iframely/jquery-iframely.js")),
       "jquery-textcomplete": path.resolve(path.join(__dirname, "../repo/jquery-textcomplete/jquery.textcomplete.js")),
@@ -109,7 +107,6 @@ var webpackConfig = {
       "transloadit": path.resolve(path.join(__dirname, "../repo/transloadit/jquery.transloadit2-v2-latest.js")),
       "zeroclipboard": path.resolve(path.join(__dirname, "../repo/zeroclipboard/zeroclipboard.js")),
       "jquery-sortable": path.resolve(path.join(__dirname, "../repo/jquery-sortable/jquery-sortable.js")),
-      "d3": path.resolve(path.join(__dirname, "../repo/d3/d3.js")),
 
       // Prevent duplicates
       "moment": path.resolve(path.join(__dirname, "utils/moment-wrapper")),
