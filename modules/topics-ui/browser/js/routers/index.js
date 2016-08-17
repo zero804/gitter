@@ -1,11 +1,8 @@
 "use strict"
 
 var Backbone = require('backbone');
-var qs = require('qs');
-var { subscribe, dispatch } = require('../dispatcher');
-
-var updateActiveFilter = require('../action-creators/forum/update-active-filter');
-var updateActiveSort = require('../action-creators/forum/update-active-sort');
+var {parse, stringify} = require('qs');
+var { subscribe } = require('../dispatcher');
 
 var navConstants = require('../constants/navigation');
 var forumCatConstants = require('../constants/forum-categories');
@@ -53,7 +50,7 @@ var Router = Backbone.Router.extend({
   },
 
   forums(groupName, categoryName, queryString){
-    const query = qs.parse(queryString || '');
+    const query = parse(queryString || '');
     this.model.set({
       route: 'forum' ,
       groupName: groupName,
@@ -84,12 +81,12 @@ var Router = Backbone.Router.extend({
     this.navigate(url, { trigger: true, replace: true });
   },
 
-  onFilterUpdate(model, val){
-    dispatch(updateActiveFilter(val));
+  onFilterUpdate(){
+    this.model.trigger(forumFilterConstants.UPDATE_ACTIVE_FILTER);
   },
 
-  onSortUpdate(model, val){
-    dispatch(updateActiveSort(val));
+  onSortUpdate(){
+    this.model.trigger(forumSortConstants.UPDATE_ACTIVE_SORT);
   },
 
   buildForumUrl(categoryName, filterName, tagName, sortName){
@@ -113,13 +110,13 @@ var Router = Backbone.Router.extend({
       `${groupName}/topics/categories/${categoryName}/`;
 
     //QUERY STRING
-    const query = qs.stringify({
+    const query = stringify({
       filter: filterName,
       tag: tagName,
       sort: sortName,
     });
 
-    if(!!query.length) { url = `${url}?${query}`; }
+    if(query.length) { url = `${url}?${query}`; }
 
     return url;
 

@@ -2,7 +2,7 @@
 
 module.exports = function roomNameShortener(name) {
   if (!name) return "";
-  
+
   var resultantName = '';
   name
     .split('/')

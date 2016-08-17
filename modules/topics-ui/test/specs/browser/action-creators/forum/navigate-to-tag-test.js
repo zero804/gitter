@@ -1,7 +1,8 @@
 "use strict";
 
+
 var assert = require('assert');
-var navigateToTag  = require('../../../../../browser/js/action-creators/forum/navigate-to-tag');
+var navigateToTag = require('../../../../../browser/js/action-creators/forum/navigate-to-tag');
 var forumTagConstants = require('../../../../../browser/js/constants/forum-tags');
 
 describe('navigateToTag', () => {
