@@ -2,8 +2,7 @@
 
 var Marionette = require('backbone.marionette');
 var _ = require('underscore');
-var cocktail = require('cocktail');
-var context = require('utils/context');
+var cocktail = require('backbone.cocktail');
 var KeyboardEventMixin = require('views/keyboard-events-mixin');
 
 var arrayBoundWrap = function(index, length) {
@@ -306,12 +305,12 @@ var KeyboardController = Marionette.ItemView.extend({
 
   queryAttrOnMinibar: function (attr, val){
     var q = {}; q[attr] = val;
-    return  (this.minibarHomeModel.get(attr) === val) && this.minibarHomeModel ||
+    return (this.minibarHomeModel.get(attr) === val) && this.minibarHomeModel ||
       (this.minibarSearchModel.get(attr) === val) && this.minibarSearchModel ||
       (this.minibarPeopleModel.get(attr) === val) && this.minibarPeopleModel ||
       (!this.minibarTempOrgModel.get('hidden') && this.minibarTempOrgModel.get(attr) === val && this.minibarTempOrgModel) ||
       this.minibarCollection.findWhere(q) ||
-      (context.hasFeature('community-create') && this.minibarCommunityCreateModel.get(attr) === val) && this.minibarCommunityCreateModel ||
+      (this.minibarCommunityCreateModel.get(attr) === val) && this.minibarCommunityCreateModel ||
       (this.minibarCloseModel.get(attr) === val) && this.minibarCloseModel;
   },
 
@@ -349,11 +348,10 @@ var KeyboardController = Marionette.ItemView.extend({
     }
 
     collection = collection.concat(this.minibarCollection.models);
-
-    if(context.hasFeature('community-create')) {
-      collection = collection.concat([ this.minibarCommunityCreateModel ]);
-    }
-    collection = collection.concat([ this.minibarCloseModel ]);
+    collection = collection.concat([
+      this.minibarCommunityCreateModel,
+      this.minibarCloseModel
+    ]);
     return collection;
   },
 

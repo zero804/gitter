@@ -1,8 +1,8 @@
 'use strict';
 
-var _ = require('underscore');
 var Backbone = require('backbone');
 var apiClient = require('components/apiClient');
+var autoModelSave = require('../utils/auto-model-save');
 
 module.exports = Backbone.Model.extend({
   defaults: {
@@ -10,9 +10,8 @@ module.exports = Backbone.Model.extend({
   },
 
   initialize: function() {
-    this.listenTo(this, 'change', _.throttle(this.save.bind(this), 1500));
+    autoModelSave(this, ['isPinned'], this.autoPersist);
   },
-
 
   toJSON: function() {
     // Get around circular structure
@@ -23,23 +22,13 @@ module.exports = Backbone.Model.extend({
     }, {});
   },
 
-  sync: function(method, model, options) {
-    var successCb = (options.success && options.success.bind(this)) || function() {};
-
-    // Save
-    if (method === 'create' || method === 'update' || method === 'patch') {
-       return apiClient.user.put('/settings/rightToolbar', this.toJSON(), {
-           // No need to get the JSON back from the server...
-           dataType: 'text'
-         })
-         .then(function(data) { successCb(data); })
-         .catch(function(err) { if (options.error) options.error(err); });
-    }
-
-    return apiClient.user.get('/settings/rightToolbar')
-       .then(function(result) {
-          this.set(result);
-          successCb();
-       }.bind(this));
+  /**
+   * Used by autoModelSave
+   */
+  autoPersist: function() {
+    return apiClient.user.put('/settings/rightToolbar', this.toJSON(), {
+      // No need to get the JSON back from the server...
+      dataType: 'text'
+    });
   }
 });

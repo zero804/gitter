@@ -9,11 +9,6 @@ module.exports = function navigateToCategory(category){
   }
 
   return {
-    /*
-     TODO -->
-     Move this into a specific event,
-     the NAVIGATE_TO event is too generic
-    */
     type: forumCatConstants.NAVIGATE_TO_CATEGORY,
     route: 'forum',
     category: category
