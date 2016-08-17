@@ -36,7 +36,7 @@ function findByForumIds(ids) {
 }
 
 function findTotalsByForumIds(ids) {
-  return mongooseUtils.getCountForIds(Topic, 'forumId', ids);
+  return mongooseUtils.getEstimatedCountForIds(Topic, 'forumId', ids);
 }
 
 function findByIdForForum(forumId, topicId) {

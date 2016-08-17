@@ -200,7 +200,7 @@ function addIdToLeanArray(objects) {
   return objects;
 }
 
-function getCountForId(Model, field, id) {
+function getEstimatedCountForId(Model, field, id) {
   var query = {};
   query[field] = id;
   return Model.count(query)
@@ -208,12 +208,12 @@ function getCountForId(Model, field, id) {
     .exec();
 }
 
-function getCountForIds(Model, field, ids) {
+function getEstimatedCountForIds(Model, field, ids) {
   if (!ids || !ids.length) return {};
 
   if (ids.length === 1) {
     var singleId = ids[0];
-    return getCountForId(Model, field, singleId)
+    return getEstimatedCountForId(Model, field, singleId)
       .then(function(count) {
         var hash = {};
         hash[singleId] = count;
@@ -251,6 +251,6 @@ module.exports = {
   findByIdsLean: findByIdsLean,
   addIdToLean: addIdToLean,
   addIdToLeanArray: addIdToLeanArray,
-  getCountForId: getCountForId,
-  getCountForIds: getCountForIds
+  getEstimatedCountForId: getEstimatedCountForId,
+  getEstimatedCountForIds: getEstimatedCountForIds
 };
