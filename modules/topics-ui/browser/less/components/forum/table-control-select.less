@@ -1,7 +1,11 @@
+@import "../../text";
+
+@unicode-down-arrow: '\2023';
+
 .table-control__select-decal {
   position: relative;
   &:after{
-    content:   '\2023';
+    content:   @unicode-down-arrow;
     position:  absolute;
     top:       1.6rem;
     right:     1rem;
@@ -24,7 +28,7 @@
   border-color: white;
 
   //FIXME how do we handle these deffinitions
-  font-family:    'Source Sans Pro', source-sans-pro, pt sans, calibri, sans-serif;
+  font-family:    @font-family;
   font-size:      1.2rem;
   color:          white;
   text-transform: uppercase;

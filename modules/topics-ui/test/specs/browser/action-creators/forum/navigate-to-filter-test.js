@@ -1,7 +1,7 @@
 "use strict";
 
 var assert = require('assert');
-var navigateToFilter  = require('../../../../../browser/js/action-creators/forum/navigate-to-filter');
+var navigateToFilter = require('../../../../../browser/js/action-creators/forum/navigate-to-filter');
 var forumFilterConstants = require('../../../../../browser/js/constants/forum-filters');
 
 describe('navigateToFilter', () => {

@@ -16,7 +16,7 @@ module.exports = {
       '&related=gitchat' +
       '&via=gitchat';
   },
-  
+
   generateFacebookShareUrl: function(uri) {
     assertRoom(uri);
 
