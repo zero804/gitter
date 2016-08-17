@@ -18,7 +18,6 @@ describe('<TopicsTableHeader/>', () => {
   });
 
   it('should render 4 th elements', () => {
-    console.log(wrapper.debug());
     equal(wrapper.find('th').length, 4);
   });
 
