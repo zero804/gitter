@@ -23,7 +23,7 @@ module.exports = React.createClass({
     const { router } = this.props;
     switch(router.get('route')) {
       case navConstatnts.FORUM_ROUTE: return this.getForumState();
-      case 'create-topic': return this.getCreateTopicState();
+      case navConstants.CREATE_TOPIC_ROUTE: return this.getCreateTopicState();
     }
   },
 
@@ -31,7 +31,7 @@ module.exports = React.createClass({
     const { route } = this.state;
     switch(route) {
       case navConstatnts.FORUM_ROUTE: return <ForumContainer {...this.state} />
-      case 'create-topic': return <ForumContainer {...this.state} />;
+      case navConstants.CREATE_TOPIC_ROUTE: return <ForumContainer {...this.state} />;
     }
   },
 
