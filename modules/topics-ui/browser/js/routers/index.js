@@ -1,8 +1,8 @@
 "use strict"
 
 var Backbone = require('backbone');
-var { subscribe } = require('../dispatcher');
-var navConstants = require('../constants/navigation');
+var { subscribe } = require('gitter-web-topics-ui/shared/dispatcher');
+var navConstants = require('gitter-web-topics-ui/shared/constants/navigation');
 
 var _super = Backbone.Router.prototype;
 

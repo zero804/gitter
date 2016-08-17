@@ -4,8 +4,8 @@ var assert = require('assert');
 var { shallow } = require('enzyme');
 var Backbone = require('backbone');
 var React = require('react');
-var App = require('../../../browser/js/app.jsx');
-var ForumContainer = require('../../../containers/ForumContainer.jsx');
+var App = require('gitter-web-topics-ui/browser/js/app.jsx');
+var ForumContainer = require('gitter-web-topics-ui/containers/ForumContainer.jsx');
 
 describe('App', function(){
 

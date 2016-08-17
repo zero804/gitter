@@ -4,7 +4,7 @@ var assert = require('assert');
 var React = require('react');
 var sinon = require('sinon');
 var { shallow } = require('enzyme');
-var CategoryListItem = require('../../../../../shared/components/forum/category-list-item.jsx');
+var CategoryListItem = require('gitter-web-topics-ui/containers/components/forum/category-list-item.jsx');
 
 describe('<CategoryListItem />', function(){
 

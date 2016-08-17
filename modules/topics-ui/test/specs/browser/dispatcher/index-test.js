@@ -3,7 +3,7 @@
 var assert = require('assert');
 var sinon = require('sinon');
 var Backbone = require('backbone');
-var dispatcher = require('../../../../browser/js/dispatcher');
+var dispatcher = require('gitter-web-topics-ui/shared/dispatcher');
 
 var events = Backbone.Events;
 
