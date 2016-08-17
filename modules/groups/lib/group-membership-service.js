@@ -46,7 +46,8 @@ function findGroupsForUser(userId) {
           uri: '$group.uri',
           lcUri: '$group.lcUri',
           sd: '$group.sd',
-          avatarVersion: '$group.avatarVersion'
+          avatarVersion: '$group.avatarVersion',
+          forumId: '$group.forumId'
         }
       }])
       .read('primaryPreferred')
