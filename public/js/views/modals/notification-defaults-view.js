@@ -10,10 +10,10 @@ var FeaturesView = require('./notification-features-collection-view');
 var View = Marionette.LayoutView.extend({
   template: template,
   events: {
-    'click #close-settings' : 'destroySettings',
-    'change @ui.options' : 'formChange',
-    'change @ui.override' : 'formChange',
-    'change @ui.sendEmailsCheckbox' : 'formChange',
+    'click #close-settings': 'destroySettings',
+    'change @ui.options': 'formChange',
+    'change @ui.override': 'formChange',
+    'change @ui.sendEmailsCheckbox': 'formChange',
   },
   modelEvents: {
     change: 'update'
@@ -93,7 +93,7 @@ var View = Marionette.LayoutView.extend({
     }
   },
 
-  destroySettings : function () {
+  destroySettings: function () {
     this.dialog.hide();
     this.dialog = null;
   },

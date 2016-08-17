@@ -2,7 +2,6 @@
 
 import React from 'react';
 import _ from 'lodash';
-import raf from 'raf';
 import {subscribe, unsubscribe, dispatch} from '../browser/js/dispatcher';
 
 import CategoryList from '../shared/components/forum/category-list.jsx';
@@ -30,6 +29,12 @@ module.exports = React.createClass({
     filterName: React.PropTypes.string,
     tagName: React.PropTypes.string,
     sortName: React.PropTypes.string,
+
+    //Client side only
+    router: React.PropTypes.shape({
+      on: React.PropTypes.func.isRequired,
+      off: React.PropTypes.func.isRequired,
+    }),
 
     //Categories ---
     categoryStore: React.PropTypes.shape({
@@ -65,18 +70,19 @@ module.exports = React.createClass({
   },
 
   componentDidMount(){
-    const { categoryStore } = this.props;
-    subscribe(forumCatConstants.UPDATE_ACTIVE_CATEGORY, this.onCategoryUpdate, this);
-    subscribe(forumTagConstants.UPDATE_ACTIVE_TAG, this.onTagUpdate, this);
-    subscribe(forumFilterConstants.UPDATE_ACTIVE_FILTER, this.onFilterUpdate, this);
-    subscribe(forumSortConstants.UPDATE_ACTIVE_SORT, this.onSortUpdate, this);
+    const { categoryStore, tagStore, router } = this.props;
+    categoryStore.on(forumCatConstants.UPDATE_ACTIVE_CATEGORY, this.onCategoryUpdate);
+    tagStore.on(forumTagConstants.UPDATE_ACTIVE_TAG, this.onTagUpdate, this);
+    router.on(forumFilterConstants.UPDATE_ACTIVE_FILTER, this.onFilterUpdate, this);
+    router.on(forumSortConstants.UPDATE_ACTIVE_SORT, this.onSortUpdate, this);
   },
 
   componentWillUnmount(){
-    unsubscribe(forumCatConstants.UPDATE_ACTIVE_CATEGORY, this.onCategoryUpdate, this);
-    unsubscribe(forumTagConstants.UPDATE_ACTIVE_TAG, this.onTagUpdate, this);
-    unsubscribe(forumFilterConstants.UPDATE_ACTIVE_FILTER, this.onFilterUpdate, this);
-    unsubscribe(forumSortConstants.UPDATE_ACTIVE_SORT, this.onSortUpdate, this);
+    const { categoryStore, tagStore, router } = this.props;
+    categoryStore.off(forumCatConstants.UPDATE_ACTIVE_CATEGORY, this.onCategoryUpdate);
+    tagStore.off(forumTagConstants.UPDATE_ACTIVE_TAG, this.onTagUpdate, this);
+    router.off(forumFilterConstants.UPDATE_ACTIVE_FILTER, this.onFilterUpdate, this);
+    router.off(forumSortConstants.UPDATE_ACTIVE_SORT, this.onSortUpdate, this);
   },
 
   render() {
@@ -122,30 +128,30 @@ module.exports = React.createClass({
 
   onCategoryUpdate(){
     const { categoryStore } = this.props;
-    raf(() => this.setState((state) => _.extend(state, {
+    this.setState((state) => _.extend(state, {
       categories: categoryStore.getCategories(),
       categoryName: categoryStore.getActiveCategoryName(),
-    })));
+    }));
   },
 
   onTagUpdate(){
     const { tagStore } = this.props;
-    raf(() => this.setState((state) => _.extend(state, {
+    this.setState((state) => _.extend(state, {
       tags: tagStore.getTags(),
       tagName: tagStore.getActiveTagName(),
-    })));
+    }));
   },
 
   onFilterUpdate(data){
-    raf(() => this.setState((state) => _.extend(state, {
+    this.setState((state) => _.extend(state, {
       filterName: data.filter,
-    })));
+    }));
   },
 
   onSortUpdate(data) {
     raf(() => this.setState((state) => _.extend(state, {
       sortName: data.sort,
     })));
-  },
+  }
 
 });
