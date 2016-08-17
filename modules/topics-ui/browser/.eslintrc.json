@@ -3,7 +3,17 @@
     "commonjs": true,
     "browser": true
   },
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module",
+    "ecmaFeatures": {
+        "jsx": true
+    }
+  },
+  "extends": [
+    "plugin:import/errors"
+  ],
   "rules": {
-    "node/no-unsupported-features": 0
+    "node/no-unsupported-features": [2, { "version": 6 }]
   }
 }
