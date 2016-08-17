@@ -9,6 +9,7 @@
     "batch-stream": "^0.1.2",
     "bluebird": "^3.2.1",
     "body-parser": "^1.13.2",
+    "classnames": "^2.2.5",
     "cld": "^2.4.5",
     "cliff": "^0.1.10",
     "connect-redis": "^3.1.0",
