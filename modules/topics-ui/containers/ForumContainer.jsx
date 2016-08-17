@@ -37,7 +37,6 @@ module.exports = React.createClass({
       off: React.PropTypes.func.isRequired,
     }),
 
-
     //Categories ---
     categoryStore: React.PropTypes.shape({
       models: React.PropTypes.array.isRequired,
@@ -73,7 +72,7 @@ module.exports = React.createClass({
 
   componentDidMount(){
     const { categoryStore, tagStore, router } = this.props;
-    categoryStore.on(UPDATE_ACTIVE_CATEGORY, this.onCategoryUpdate);
+    categoryStore.on(forumCatConstants.UPDATE_ACTIVE_CATEGORY, this.onCategoryUpdate);
     tagStore.on(forumTagConstants.UPDATE_ACTIVE_TAG, this.onTagUpdate, this);
     router.on(forumFilterConstants.UPDATE_ACTIVE_FILTER, this.onFilterUpdate, this);
     router.on(forumSortConstants.UPDATE_ACTIVE_SORT, this.onSortUpdate, this);
@@ -81,7 +80,7 @@ module.exports = React.createClass({
 
   componentWillUnmount(){
     const { categoryStore, tagStore, router } = this.props;
-    categoryStore.off(UPDATE_ACTIVE_CATEGORY, this.onCategoryUpdate);
+    categoryStore.off(forumCatConstants.UPDATE_ACTIVE_CATEGORY, this.onCategoryUpdate);
     tagStore.off(forumTagConstants.UPDATE_ACTIVE_TAG, this.onTagUpdate, this);
     router.off(forumFilterConstants.UPDATE_ACTIVE_FILTER, this.onFilterUpdate, this);
     router.off(forumSortConstants.UPDATE_ACTIVE_SORT, this.onSortUpdate, this);
