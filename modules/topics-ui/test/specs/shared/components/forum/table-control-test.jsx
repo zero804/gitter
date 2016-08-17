@@ -12,7 +12,7 @@ var TagCollection = Backbone.Collection.extend({
   getTags(){ return this.models.map((m) => m.toJSON() ); }
 });
 
-describe('<TableControl/>', () => {
+describe.skip('<TableControl/>', () => {
 
   let wrapper;
   let mounted;

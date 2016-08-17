@@ -17,7 +17,7 @@ module.exports = {
     if (req.query.type === 'admin') {
       return restful.serializeAdminGroupsForUser(req.user, { lean: lean })
     }
-    
+
     return restful.serializeGroupsForUserId(req.user._id, { lean: lean });
   },
 

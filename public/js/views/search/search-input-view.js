@@ -14,7 +14,7 @@ var SearchInputView = Marionette.ItemView.extend({
 
   events: {
     'click .js-activate-search': 'activate',
-    'click @ui.clearIcon' : 'clearSearchTerm',
+    'click @ui.clearIcon': 'clearSearchTerm',
     'click @ui.input': 'activate',
     'blur @ui.input': 'onBlur',
     'change @ui.input': 'handleChange',
