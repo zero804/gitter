@@ -30,7 +30,7 @@ gulp.task('topics:compile:babel', function() {
 
 gulp.task('topics:test', ['topics:test:server']);
 
-gulp.task('topics:test:server', function(){
+gulp.task('topics:test:server', function() {
   var executable = path.resolve(__dirname, './test/fixtures/runner-node.js');
   var env = { BLUEBIRD_DEBUG: 1, BABEL_DISABLE_CACHE: 1 };
 
