@@ -20,7 +20,7 @@ module.exports = React.createClass({
 
     return (
       <div className="table-control__select-decal">
-        <select className="table-control__select" onChange={ onChange } defaultValue={defaultVal}>
+        <select className="table-control__select" onChange={onChange} defaultValue={defaultVal}>
           {options.map((opt, index) => this.getChildOption(index, opt))}
         </select>
       </div>
