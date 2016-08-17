@@ -5,7 +5,7 @@ import React from 'react';
 import { mount } from 'enzyme';
 import TopicsTableHeader from '../../../../../shared/components/forum/topics-table-header.jsx';
 
-describe('<TopicsTableHeader/>', () => {
+describe.skip('<TopicsTableHeader/>', () => {
 
   let wrapper;
 
