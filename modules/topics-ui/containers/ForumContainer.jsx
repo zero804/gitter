@@ -66,6 +66,8 @@ module.exports = React.createClass({
 
   componentDidMount(){
     const { categoryStore } = this.props;
+    categoryStore.on(UPDATE_ACTIVE_CATEGORY, this.onCategoryUpdate);
+
     subscribe(forumCatConstants.UPDATE_ACTIVE_CATEGORY, this.onCategoryUpdate, this);
     subscribe(forumTagConstants.UPDATE_ACTIVE_TAG, this.onTagUpdate, this);
     subscribe(forumFilterConstants.UPDATE_ACTIVE_FILTER, this.onFilterUpdate, this);
@@ -73,6 +75,9 @@ module.exports = React.createClass({
   },
 
   componentWillUnmount(){
+    const { categoryStore } = this.props;
+    categoryStore.off(UPDATE_ACTIVE_CATEGORY, this.onCategoryUpdate);
+
     unsubscribe(forumCatConstants.UPDATE_ACTIVE_CATEGORY, this.onCategoryUpdate, this);
     unsubscribe(forumTagConstants.UPDATE_ACTIVE_TAG, this.onTagUpdate, this);
     unsubscribe(forumFilterConstants.UPDATE_ACTIVE_FILTER, this.onFilterUpdate, this);
@@ -146,6 +151,6 @@ module.exports = React.createClass({
     raf(() => this.setState((state) => _.extend(state, {
       sortName: data.sort,
     })));
-  },
+  }
 
 });

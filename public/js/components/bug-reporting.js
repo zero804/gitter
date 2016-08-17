@@ -34,7 +34,7 @@ function logUnhandledError(message, filename, lineno, colno, error) {
       message: message,
       filename: filename,
       lineno: lineno,
-      colno:colno,
+      colno: colno,
       error: error
     };
 

@@ -4,7 +4,7 @@ var moment = require('moment');
 var assert = require('assert');
 
 exports.makeDate = function makeDate(year, dayOfYear) {
-  return moment({ year :year }).add(dayOfYear - 1, 'day').toDate();
+  return moment({ year: year }).add(dayOfYear - 1, 'day').toDate();
 };
 
 exports.getStartOfWeek = function getStartOfWeek(momentDate) {

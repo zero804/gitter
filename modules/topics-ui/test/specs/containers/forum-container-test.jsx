@@ -14,7 +14,9 @@ var forumTagConstants = require('../../../browser/js/constants/forum-tags');
 
 //TODO move these into mock objects
 var CategoryCollection = Backbone.Collection.extend({
-  getCategories(){ return this.models.map((m) => m.toJSON() ); }
+  getCategories(){
+    return this.models.map((m) => m.toJSON());
+  }
 });
 var TagCollection = Backbone.Collection.extend({
   getTags(){ return this.models.map((m) => m.toJSON() ); }
