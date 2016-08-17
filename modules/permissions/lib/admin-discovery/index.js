@@ -42,7 +42,6 @@ function descriptorSearchAsQuery(descriptorSearch) {
  * is a GitHub org admin
  */
 function findModelsForOrgAdmin(Model, user) {
-  // TODO: check that the user is GitHub user
   return githubOrgAdminDiscovery(user)
     .then(function(descriptorSearch) {
       if (!descriptorSearch) return;
