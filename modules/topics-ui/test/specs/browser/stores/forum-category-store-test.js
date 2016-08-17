@@ -28,7 +28,7 @@ describe('ForumCategoryStore', function(){
   });
 
   it('should dispatch un active:update event when the active category changes', function(){
-    subscribe(forumCatConstants.UPDATE_ACTIVE_CATEGORY, handle)
+    categoryStore.on(forumCatConstants.UPDATE_ACTIVE_CATEGORY, handle)
     router.set('categoryName', 'test-1');
     assert.equal(handle.callCount, 1);
   });
