@@ -5,7 +5,7 @@ var yargs = require('yargs');
 var faker = require('faker');
 var StatusError = require('statuserror');
 var utils = require('./fixture-script-utils');
-var replyService = require('gitter-web-replies/lib/reply-service');
+var replyService = require('gitter-web-topics/lib/reply-service');
 
 
 var opts = yargs

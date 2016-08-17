@@ -10,7 +10,7 @@ var validateRoomName = require('gitter-web-validators/lib/validate-room-name');
 var validateProviders = require('gitter-web-validators/lib/validate-providers');
 var troupeService = require('./troupe-service');
 var groupService = require('gitter-web-groups/lib/group-service');
-var forumService = require('gitter-web-forums/lib/forum-service');
+var forumService = require('gitter-web-topics/lib/forum-service');
 var securityDescriptorGenerator = require('gitter-web-permissions/lib/security-descriptor-generator');
 
 /**
