@@ -7,7 +7,8 @@ module.exports = React.createClass({
 
   displayName: 'Container',
   propTypes: {
-    className: React.PropTypes.string
+    className: React.PropTypes.string,
+    children: React.PropTypes.node
   },
 
   render(){
