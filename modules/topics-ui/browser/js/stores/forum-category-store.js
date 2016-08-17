@@ -1,14 +1,14 @@
 "use strict"
 
-import {Collection} from 'backbone'
-import {UPDATE_ACTIVE_CATEGORY} from '../constants/forum-categories';
+const {Collection, Model} = require('backbone');
+const {UPDATE_ACTIVE_CATEGORY} = require('../constants/forum-categories');
 
-var Model = Backbone.Model.extend({
+var CategoryModel = Model.extend({
   defaults: { category: null },
 });
 
 module.exports = Collection.extend({
-  model: Model,
+  model: CategoryModel,
 
   initialize: function(models, attrs) {
     this.router = attrs.router;
