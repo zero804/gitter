@@ -2,7 +2,7 @@
 
 var Backbone = require('backbone');
 var qs = require('qs');
-var { subscribe, dispatch } = require('../dispatcher');
+var { subscribe } = require('../dispatcher');
 
 var updateActiveFilter = require('../action-creators/forum/update-active-filter');
 var updateActiveSort = require('../action-creators/forum/update-active-sort');
@@ -72,11 +72,11 @@ var Router = Backbone.Router.extend({
   },
 
   onFilterUpdate(model, val){
-    dispatch(updateActiveFilter(val));
+    this.model.trigger(forumFilterConstants.UPDATE_ACTIVE_FILTER);
   },
 
   onSortUpdate(model, val){
-    dispatch(updateActiveSort(val));
+    this.model.trigger(forumSortConstants.UPDATE_ACTIVE_SORT);
   },
 
   buildForumUrl(categoryName, filterName, tagName, sortName){
