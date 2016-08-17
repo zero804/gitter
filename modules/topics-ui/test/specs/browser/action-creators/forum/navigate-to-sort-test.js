@@ -1,7 +1,7 @@
 "use strict";
 
 var assert = require('assert');
-var navigateToSort  = require('../../../../../browser/js/action-creators/forum/navigate-to-sort');
+var navigateToSort = require('../../../../../browser/js/action-creators/forum/navigate-to-sort');
 var forumSortConstants = require('../../../../../browser/js/constants/forum-sorts');
 
 describe('navigateToSort', () => {

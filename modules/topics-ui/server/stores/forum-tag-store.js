@@ -1,9 +1,11 @@
 "use strict";
 
+var DEFAULT_TAG_VALUE = require('../../browser/js/constants/forum-tags').DEFAULT_TAG_VALUE;
+
 module.exports = function forumTagStore(tags, activeTagName){
 
   tags = (tags || []);
-  activeTagName = (activeTagName || 'all-tags');
+  activeTagName = (activeTagName || DEFAULT_TAG_VALUE);
 
   tags = tags.map((tag) => ({
     value: tag,
@@ -11,7 +13,11 @@ module.exports = function forumTagStore(tags, activeTagName){
     active: (tag === activeTagName)
   }));
 
-  tags.unshift({ value: 'all-tags', name: 'All Tags', active: (activeTagName === 'all-tags') });
+  tags.unshift({
+    value: DEFAULT_TAG_VALUE,
+    name: 'All Tags',
+    active: (activeTagName === DEFAULT_TAG_VALUE)
+  });
 
   const getTags = () => tags;
 
