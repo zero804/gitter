@@ -1,12 +1,12 @@
 "use strict";
 
-var React = require('react');
-var Container = require('../container.jsx');
-var Panel = require('../panel.jsx');
-var CategoryListItem = require('./category-list-item.jsx');
+import React from 'react';
+import Container from '../container.jsx';
+import Panel from '../panel';
+import CategoryListItem from './category-list-item';
 
 
-module.exports = React.createClass({
+export default React.createClass({
 
   displayName: 'CategoryList',
   propTypes: {

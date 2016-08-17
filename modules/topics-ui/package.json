@@ -46,6 +46,9 @@
     "presets": [
       "es2015",
       "react"
+    ],
+    "plugins": [
+      "jsx-strip-ext"
     ]
   }
 }

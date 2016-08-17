@@ -1,9 +1,8 @@
 "use strict";
 
-var React = require('react');
+import React from 'react';
 
-module.exports = React.createClass({
-
+export default React.createClass({
   displayName: 'CategoryListItem',
   propTypes: {
     category: React.PropTypes.string.isRequired,
@@ -16,7 +15,7 @@ module.exports = React.createClass({
     return this.props.active !== nextProps.active;
   },
 
-  render(){
+  render() {
     const { groupName, category, active } = this.props;
     const href = `/${groupName}/topics/categories/${category}`;
     const title = `${category} topics`;
@@ -29,7 +28,7 @@ module.exports = React.createClass({
     );
   },
 
-  onClick(e = { preventDefault: () => {}}){
+  onClick(e = { preventDefault: () => {}}) {
     e.preventDefault();
     const { onClick, category } = this.props;
     onClick(category);
