@@ -1,13 +1,12 @@
-"use strict";
 
-var assert = require('assert');
-var { shallow } = require('enzyme');
-var Backbone = require('backbone');
-var React = require('react');
-var App = require('gitter-web-topics-ui/browser/js/app.jsx');
-var ForumContainer = require('gitter-web-topics-ui/containers/ForumContainer.jsx');
+import assert from 'assert';
+import { shallow } from 'enzyme';
+import Backbone from 'backbone';
+import React from 'react';
+import App from 'gitter-web-topics-ui/browser/js/app.jsx';
+import ForumContainer from 'gitter-web-topics-ui/containers/ForumContainer.jsx';
 
-describe('App', function(){
+describe('App', function() {
 
   it('should set the right state when rendered with the forum route', function(){
     var route = new Backbone.Model({ route: 'forum', groupName: 'gitterHQ' });

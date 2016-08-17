@@ -28,7 +28,7 @@ gulp.task('topics:compile:babel', function() {
     .pipe(gulp.dest(getOutputPath('babel')));
 });
 
-gulp.task('topics:test', ['topics:test:server']);
+gulp.task('topics:test', [/*'topics:test:server', */'topics:test:shared']);
 
 gulp.task('topics:test:server', function() {
   var executable = path.resolve(__dirname, './test/fixtures/runner-node.js');
@@ -54,6 +54,10 @@ gulp.task('topics:test:server', function() {
       });
     });
   });
+});
+
+gulp.task('topics:test:shared', function() {
+
 });
 
 gulp.task('topics:compile:webpack', function(cb) {

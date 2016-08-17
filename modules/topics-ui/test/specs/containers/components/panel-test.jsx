@@ -1,9 +1,7 @@
-"use strict";
-
-var assert = require('assert');
-var React = require('react');
-var { shallow } = require('enzyme');
-var Panel = require('gitter-web-topics-ui/containers/components/panel.jsx');
+import assert from 'assert';
+import React from 'react';
+import { shallow } from 'enzyme';
+import Panel from 'gitter-web-topics-ui/containers/components/panel.jsx';
 
 describe('<Panel />', function(){
 

@@ -1,12 +1,10 @@
-"use strict";
-
-var assert = require('assert');
-var Backbone = require('backbone');
-var React = require('react');
-var { shallow } = require('enzyme');
-var ForumContainer = require('gitter-web-topics-ui/containers/ForumContainer.jsx');
-var { subscribe } = require('gitter-web-topics-ui/shared/dispatcher');
-var navConstants = require('gitter-web-topics-ui/shared/constants/navigation');
+import assert from 'assert';
+import Backbone from 'backbone';
+import React from 'react';
+import { shallow } from 'enzyme';
+import ForumContainer from 'gitter-web-topics-ui/containers/ForumContainer.jsx';
+import { subscribe } from 'gitter-web-topics-ui/shared/dispatcher';
+import navConstants from 'gitter-web-topics-ui/shared/constants/navigation';
 
 var Collection = Backbone.Collection.extend({
   getCategories(){

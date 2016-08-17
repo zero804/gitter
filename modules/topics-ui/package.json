@@ -10,6 +10,7 @@
   "author": "Gitter Team",
   "license": "ISC",
   "dependencies": {
+    "backbone": "1.2.3",
     "lodash": "^4.15.0",
     "react": "^15.2.1",
     "react-dom": "^15.2.1"
