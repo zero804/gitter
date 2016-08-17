@@ -10,6 +10,7 @@ var validateGroupName = require('gitter-web-validators/lib/validate-group-name')
 var StatusError = require('statuserror');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var debug = require('debug')('gitter:app:groups:group-service');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var ensureAccessAndFetchDescriptor = require('gitter-web-permissions/lib/ensure-access-and-fetch-descriptor');
 var checkIfGroupUriExists = require('./group-uri-checker');
@@ -223,7 +224,11 @@ function setAvatarForGroup(groupId, url) {
 }
 
 function setForumForGroup(groupId, forumId) {
-  var query = { _id: groupId };
+  var query = {
+    _id: groupId,
+    // only do the update if the group doesn't already have a forum
+    forumId: { $exists: false }
+  };
 
   var update = {
     $set: {
@@ -231,7 +236,16 @@ function setForumForGroup(groupId, forumId) {
     }
   };
 
-  return Group.findOneAndUpdate(query, update).exec();
+  return Group.findOneAndUpdate(query, update, { new: true })
+    .exec()
+    .then(function(group) {
+      if (!group || !mongoUtils.objectIDsEqual(group.forumId, forumId)) {
+        // NOTE: actually it could just be that the group doesn't exist at
+        // all..
+        throw new StatusError(409, 'Group already has a forum.');
+      }
+      return group;
+    });
 }
 
 module.exports = {
