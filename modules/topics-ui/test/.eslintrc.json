@@ -6,6 +6,7 @@
     "mocha"
   ],
   "rules": {
+    "node/no-unpublished-require": "off",
     "mocha/no-exclusive-tests": "error"
   }
 }

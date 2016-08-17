@@ -2,10 +2,10 @@
 var assert = require('assert');
 var Backbone = require('backbone');
 var router = require('../../../../browser/js/routers/index');
-var {dispatch} = require('gitter-web-topics-ui/shared/dispatcher/');
-var navConstants = require('gitter-web-topics-ui/shared/constants/navigation.js');
+var {dispatch} = require('../../../../shared/dispatcher/');
+var navConstants = require('../../../../shared/constants/navigation');
 
-describe('Router', function(){
+describe.skip('Router', function(){
 
   var trigger = {trigger: true};
 
