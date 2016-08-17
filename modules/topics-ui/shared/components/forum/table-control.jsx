@@ -7,6 +7,7 @@ import TableControlButton from './table-control-button.jsx';
 import TableControlSelect from './table-control-select.jsx';
 import navConstants from '../../../browser/js/constants/navigation';
 import forumSortConstants from '../../../browser/js/constants/forum-sorts';
+import forumFilterConstants from '../../../browser/js/constants/forum-filters';
 
 module.exports = React.createClass({
 
@@ -54,9 +55,9 @@ module.exports = React.createClass({
         <Panel className="panel--table-control">
           <nav>
             <ul className="table-control">
-              <li>{this.getChildTableControlButton('Activity', 'activity', filterName === 'activity')}</li>
-              <li>{this.getChildTableControlButton('My Topics', 'my-topics', filterName === 'my-topics')}</li>
-              <li className="tabel-control__divider">{this.getChildTableControlButton('Watched', 'watched', filterName === 'watched')}</li>
+              <li>{this.getChildTableControlButton('Activity', navConstants.DEFAULT_FILTER_NAME, filterName === navConstants.DEFAULT_FILTER_NAME)}</li>
+              <li>{this.getChildTableControlButton('My Topics', forumFilterConstants.FILTER_BY_TOPIC, filterName === forumFilterConstants.FILTER_BY_TOPIC)}</li>
+              <li className="tabel-control__divider">{this.getChildTableControlButton('Watched', forumFilterConstants.FILTER_BY_WATCHED, filterName === forumFilterConstants.FILTER_BY_WATCHED)}</li>
               <li><TableControlSelect options={tags} onChange={(tag) => tagChange(tag)} /></li>
               <li><TableControlSelect options={sortBy} onChange={(sort) => sortChange(sort)} /></li>
             </ul>
