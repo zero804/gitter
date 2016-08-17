@@ -3,6 +3,7 @@
 var childProcessPromise = require('./child-process-promise');
 var path = require('path');
 var es = require('event-stream');
+var gutil = require('gulp-util');
 
 function resolveBinary(moduleName) {
   var moduleLocation = require.resolve(moduleName);
@@ -80,6 +81,8 @@ function testRunner(options, files) {
   pushArg('--compilers', serializeCompilers(options.compilers));
 
   args = args.concat(files);
+
+  gutil.log('Spawning ', executable, args.join(' '))
   return childProcessPromise.spawn(executable, args, options.env);
 }
 
