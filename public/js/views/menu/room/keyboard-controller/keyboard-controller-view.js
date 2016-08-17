@@ -3,7 +3,6 @@
 var Marionette = require('backbone.marionette');
 var _ = require('underscore');
 var cocktail = require('cocktail');
-var context = require('utils/context');
 var KeyboardEventMixin = require('views/keyboard-events-mixin');
 
 var arrayBoundWrap = function(index, length) {
