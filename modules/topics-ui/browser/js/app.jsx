@@ -35,7 +35,7 @@ module.exports = React.createClass({
 
   getDefaultState(){
     const { router } = this.props;
-    return { route: router.get('route') };
+    return { route: router.get('route'), router: router };
   },
 
   getForumState(){
