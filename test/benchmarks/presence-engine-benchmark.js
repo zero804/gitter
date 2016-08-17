@@ -49,7 +49,7 @@ FakeClient.prototype = {
       case 0:
         nextPromise = this.connect();
         break;
-        
+
       case 1:
         nextPromise = this.signalEyeball();
         break;

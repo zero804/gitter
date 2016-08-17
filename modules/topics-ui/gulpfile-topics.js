@@ -30,7 +30,7 @@ gulp.task('topics:compile:babel', function() {
 
 gulp.task('topics:test', ['topics:test:server']);
 
-gulp.task('topics:test:server', function(){
+gulp.task('topics:test:server', function() {
   var executable = path.resolve(__dirname, './test/fixtures/runner-node.js');
   var env = { BLUEBIRD_DEBUG: 1, BABEL_DISABLE_CACHE: 1 };
 
@@ -56,8 +56,8 @@ gulp.task('topics:test:server', function(){
   });
 });
 
-gulp.task('topics:compile:webpack', function() {
-  return webpackPipeline(ROOT)
+gulp.task('topics:compile:webpack', function(cb) {
+  return webpackPipeline(ROOT, cb)
     .pipe(gulp.dest(getOutputPath('assets/js')));
 });
 

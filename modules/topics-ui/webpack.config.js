@@ -18,6 +18,9 @@ var config = {
     devtoolFallbackModuleFilenameTemplate: "[resource-path]?[hash]"
   },
   module: {
+    noParse: [
+      /\/sinon\.js/,
+    ],
     preLoaders: [
       {
         test: /.css$/,
@@ -31,8 +34,9 @@ var config = {
         include: path.resolve(__dirname, './browser/less'),
       },
       {
-        test: /\.jsx$/,
+        test: /\.jsx?$/,
         loader: 'babel',
+        exclude: /node_modules/,
         query: {
           presets: [
             "es2015",
@@ -44,8 +48,8 @@ var config = {
   },
   resolve: {
     alias: {
-      jquery: path.resolve(__dirname, './node_modules/jquery/dist/jquery.js'),
-      underscore: path.resolve(__dirname, './node_modules/lodash/index.js'),
+      jquery: require.resolve('jquery'),
+      underscore: require.resolve('lodash')
     }
   },
   plugins: [

@@ -5,6 +5,7 @@ const Backbone = require('backbone');
 const ForumContainer = require('../../containers/ForumContainer.jsx');
 const CategoryStore = require('./stores/forum-category-store');
 const TagStore = require('./stores/forum-tag-store');
+const navConstatnts = require('./constants/navigation');
 
 module.exports = React.createClass({
 
@@ -21,14 +22,14 @@ module.exports = React.createClass({
   getInitialState(){
     const { router } = this.props;
     switch(router.get('route')) {
-      case 'forum': return this.getForumState();
+      case navConstatnts.FORUM_ROUTE: return this.getForumState();
     }
   },
 
   render(){
     const { route } = this.state;
     switch(route) {
-      case 'forum': return <ForumContainer {...this.state} />
+      case navConstatnts.FORUM_ROUTE: return <ForumContainer {...this.state} />
     }
   },
 
