@@ -1,13 +1,11 @@
-"use strict"
-
-const {Collection, Model} = require('backbone');
-const {UPDATE_ACTIVE_CATEGORY} = require('gitter-web-topics-ui/shared/constants/forum-categories');
+import { Collection, Model } from 'backbone';
+import { UPDATE_ACTIVE_CATEGORY } from 'gitter-web-topics-ui/shared/constants/forum-categories';
 
 var CategoryModel = Model.extend({
   defaults: { category: null },
 });
 
-module.exports = Collection.extend({
+export default Collection.extend({
   model: CategoryModel,
 
   initialize: function(models, attrs) {

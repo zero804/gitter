@@ -2,9 +2,8 @@
 
 import React from 'react';
 import Container from '../container.jsx';
-import Panel from '../panel';
-import CategoryListItem from './category-list-item';
-
+import Panel from '../panel.jsx';
+import CategoryListItem from './category-list-item.jsx';
 
 export default React.createClass({
 

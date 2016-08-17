@@ -1,10 +1,7 @@
-"use strict"
 
-var Backbone = require('backbone');
-var { subscribe } = require('gitter-web-topics-ui/shared/dispatcher');
-var navConstants = require('gitter-web-topics-ui/shared/constants/navigation');
-
-var _super = Backbone.Router.prototype;
+import Backbone from 'backbone';
+import { subscribe } from 'gitter-web-topics-ui/shared/dispatcher';
+import navConstants from 'gitter-web-topics-ui/shared/constants/navigation';
 
 var RouteModel = Backbone.Model.extend({
   defaults: { route: null }
@@ -12,10 +9,12 @@ var RouteModel = Backbone.Model.extend({
 
 var Router = Backbone.Router.extend({
 
-  constructor: function(){
+  constructor: function() {
     this.model = new RouteModel();
     subscribe(navConstants.NAVIGATE_TO, this.navigateTo, this);
-    _super.constructor.call(this, ...arguments);
+    Router.__super__.clone.apply(this, arguments);
+
+    Backbone.Router.prototype.constructor.call(this, ...arguments);
   },
 
   routes: {
@@ -53,4 +52,4 @@ var Router = Backbone.Router.extend({
 
 var router = new Router();
 
-module.exports = router.model;
+export default router.model;

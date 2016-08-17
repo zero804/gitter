@@ -180,6 +180,7 @@
     "dragula": "^3.7.1",
     "enzyme": "^2.4.1",
     "eslint": "^2.9.0",
+    "eslint-plugin-import": "^1.13.0",
     "eslint-plugin-jquery": "^1.0.1",
     "eslint-plugin-mocha": "^2.2.0",
     "eslint-plugin-node": "^1.2.1",

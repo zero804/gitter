@@ -1,12 +1,10 @@
-'use strict';
+import React from 'react';
+import Backbone from 'backbone';
+import ForumContainer from 'gitter-web-topics-ui/containers/ForumContainer.jsx';
+import CategoryStore from './stores/forum-category-store';
+import navConstatnts from 'gitter-web-topics-ui/shared/constants/navigation';
 
-const React = require('react');
-const Backbone = require('backbone');
-const ForumContainer = require('gitter-web-topics-ui/containers/ForumContainer.jsx');
-const CategoryStore = require('./stores/forum-category-store');
-const navConstatnts = require('gitter-web-topics-ui/shared/constants/navigation');
-
-module.exports = React.createClass({
+export default React.createClass({
 
   displayName: 'App',
 
