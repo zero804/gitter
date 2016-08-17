@@ -1,6 +1,6 @@
 'use strict';
 
-var validateRoomName = require('../lib/validate-group-uri');
+var validateGroupUri = require('../lib/validate-group-uri');
 var assert = require('assert');
 
 describe('validate-group-uri', function() {
@@ -25,8 +25,8 @@ describe('validate-group-uri', function() {
     var name = result ? 'should validate' : 'should not validate';
 
     it(name + ' ' + key, function() {
-      assert.strictEqual(validateRoomName(key), result);
+      assert.strictEqual(validateGroupUri(key), result);
     });
   })
 
-})
+});

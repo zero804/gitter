@@ -1,7 +1,7 @@
 "use strict";
 
 var persistence = require('gitter-web-persistence');
-var processChat = require('../utils/markdown-processor');
+var processText = require('gitter-web-text-processor');
 var ObjectID = require('mongodb').ObjectID;
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
@@ -13,7 +13,7 @@ exports.newEventToTroupe = function(troupe, user, text, meta, payload, callback)
       if(!troupe) throw new StatusError(500, "Invalid troupe");
       if(!text) throw new StatusError(400, "Text required");
 
-      return processChat(text);
+      return processText(text);
     })
     .then(function(parsed) {
       var event = new persistence.Event();
