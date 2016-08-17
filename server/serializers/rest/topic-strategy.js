@@ -7,7 +7,7 @@ var getVersion = require('../get-model-version');
 var ForumCategoryIdStrategy = require('./forum-category-id-strategy');
 var ReplyStrategy = require('./reply-strategy');
 var UserIdStrategy = require('./user-id-strategy');
-var replyService = require('gitter-web-replies/lib/reply-service');
+var replyService = require('gitter-web-topics/lib/reply-service');
 
 
 function formatDate(d) {

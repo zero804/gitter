@@ -6,7 +6,7 @@ var _ = require('lodash');
 var getVersion = require('../get-model-version');
 var CommentStrategy = require('./comment-strategy');
 var UserIdStrategy = require('./user-id-strategy');
-var commentService = require('gitter-web-comments/lib/comment-service');
+var commentService = require('gitter-web-topics/lib/comment-service');
 
 
 function formatDate(d) {

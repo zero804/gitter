@@ -5,7 +5,7 @@ var yargs = require('yargs');
 var faker = require('faker');
 var StatusError = require('statuserror');
 var utils = require('./fixture-script-utils');
-var categoryService = require('gitter-web-forum-categories/lib/forum-category-service');
+var categoryService = require('gitter-web-topics/lib/forum-category-service');
 
 
 var opts = yargs

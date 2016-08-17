@@ -1,6 +1,6 @@
 "use strict";
 
-var forumCategoryService = require("gitter-web-forum-categories/lib/forum-category-service");
+var forumCategoryService = require("gitter-web-topics/lib/forum-category-service");
 var ForumCategoryStrategy = require('./forum-category-strategy');
 
 var idStrategyGenerator = require('../id-strategy-generator');

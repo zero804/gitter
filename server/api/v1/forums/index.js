@@ -2,7 +2,7 @@
 
 var StatusError = require('statuserror');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
-var forumService = require('gitter-web-forums/lib/forum-service');
+var forumService = require('gitter-web-topics/lib/forum-service');
 var restSerializer = require('../../../serializers/rest-serializer');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
