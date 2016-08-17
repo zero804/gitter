@@ -2,6 +2,7 @@
 
 var assert = require('assert');
 var Promise = require('bluebird');
+var isGitHubUser = require('gitter-web-identity/lib/is-github-user');
 
 function GhUserPolicyDelegate(userId, userLoader, securityDescriptor) {
   assert(userLoader, 'userLoader required');
@@ -41,6 +42,7 @@ GhUserPolicyDelegate.prototype = {
     return this._userLoader()
       .then(function(user) {
         if (!user) return false;
+        if (!isGitHubUser(user)) return false;
 
         var currentUserName = user.username;
         if (!currentUserName) return false;
