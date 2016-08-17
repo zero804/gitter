@@ -4,7 +4,6 @@ var assert = require('assert');
 var sinon = require('sinon');
 var Backbone = require('backbone');
 var CategoryStore = require('../../../../browser/js/stores/forum-category-store');
-var {subscribe} = require('../../../../browser/js/dispatcher');
 var forumCatConstants = require('../../../../browser/js/constants/forum-categories');
 
 describe('ForumCategoryStore', function(){
