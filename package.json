@@ -258,6 +258,7 @@
     "url-loader": "^0.5.7",
     "vinyl-file": "^2.0.0",
     "webpack": "^1.13.1",
+    "webpack-bundle-size-analyzer": "^2.0.2",
     "webpack-dev-middleware": "^1.6.1"
   },
   "engines": {
