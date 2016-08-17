@@ -10,6 +10,7 @@ var _ = require('lodash');
 var spawn = require('child_process').spawn;
 var Promise = require('bluebird');
 var testRunner = require('../../build-scripts/test-runner');
+var os = require('os');
 
 var ROOT = path.resolve(__dirname);
 var OUTPUT_DIR = path.join(ROOT, 'output/');
@@ -74,7 +75,8 @@ gulp.task('topics:test:unit', function() {
       reporter: 'lcov',
     },
     env: {
-      BABEL_ENV: 'test'
+      BABEL_ENV: 'test',
+      HOME: os.tmpdir()
     }
   }));
 });
