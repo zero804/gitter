@@ -33,7 +33,7 @@ describe('TagStore', () => {
   });
 
   it('should dispatch un active:update event when the active tag changes', function(){
-    subscribe(forumTagConstants.UPDATE_ACTIVE_TAG, handle)
+    tagStore.on(forumTagConstants.UPDATE_ACTIVE_TAG, handle)
     router.set('tagName', 1);
     assert.equal(handle.callCount, 1);
   });
