@@ -6,7 +6,7 @@ import React from 'react';
 import App from 'gitter-web-topics-ui/browser/js/app.jsx';
 import ForumContainer from 'gitter-web-topics-ui/containers/ForumContainer.jsx';
 
-describe('App', function() {
+describe.skip('App', function() {
 
   it('should set the right state when rendered with the forum route', function(){
     var route = new Backbone.Model({ route: 'forum', groupName: 'gitterHQ' });

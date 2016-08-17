@@ -12,8 +12,6 @@ var Router = Backbone.Router.extend({
   constructor: function() {
     this.model = new RouteModel();
     subscribe(navConstants.NAVIGATE_TO, this.navigateTo, this);
-    Router.__super__.clone.apply(this, arguments);
-
     Backbone.Router.prototype.constructor.call(this, ...arguments);
   },
 
