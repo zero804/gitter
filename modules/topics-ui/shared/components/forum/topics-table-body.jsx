@@ -8,8 +8,7 @@ export default React.createClass({
   propTypes: {
     topics: PropTypes.arrayOf(PropTypes.shape({
       title: PropTypes.shape({
-        text: PropTypes.string,
-        html: PropTypes.string,
+        text: PropTypes.string
       })
     }))
   },
