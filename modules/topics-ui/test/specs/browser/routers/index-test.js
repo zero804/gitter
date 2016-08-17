@@ -75,13 +75,13 @@ describe('Router', function(){
   });
 
   it('should dispacth the right event when the filter property updates', () => {
-    subscribe(forumFilterConstants.UPDATE_ACTIVE_FILTER, filterHandle);
+    router.on(forumFilterConstants.UPDATE_ACTIVE_FILTER, filterHandle);
     router.set('filterName', 'test');
     assert.equal(filterHandle.callCount, 1);
   });
 
   it('should dispacth the right event when the sort property updates', () => {
-    subscribe(forumSortConstants.UPDATE_ACTIVE_SORT, sortHandle);
+    router.on(forumSortConstants.UPDATE_ACTIVE_SORT, sortHandle);
     router.set('sortName', 'test');
     assert.equal(sortHandle.callCount, 1);
   });

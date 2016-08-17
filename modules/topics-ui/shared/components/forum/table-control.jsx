@@ -6,6 +6,7 @@ import Panel from '../panel.jsx';
 import TableControlButton from './table-control-button.jsx';
 import TableControlSelect from './table-control-select.jsx';
 import navConstants from '../../../browser/js/constants/navigation';
+import forumSortConstants from '../../../browser/js/constants/forum-sorts';
 
 module.exports = React.createClass({
 
@@ -37,10 +38,10 @@ module.exports = React.createClass({
     const { sortName } = this.props;
     return {
       sortBy: [
-        { name: 'Most Recent', value: 'most-recent', active: (sortName === 'most-recent') },
-        { name: 'Most Replies', value: 'most-replies', active: (sortName === 'most-replies') },
-        { name: 'Most Watchers', value: 'most-watchers', active: (sortName === 'most-watchers') },
-        { name: 'Most Likes', value: 'most-likes', active: (sortName === 'most-likes') },
+        { name: 'Most Recent', value: 'most-recent', active: (sortName === forumSortConstants.MOST_RECENT_SORT) },
+        { name: 'Most Replies', value: 'most-replies', active: (sortName === forumSortConstants.MOST_REPLY_SORT) },
+        { name: 'Most Watchers', value: 'most-watchers', active: (sortName === forumSortConstants.MOST_WATCHERS_SORT) },
+        { name: 'Most Likes', value: 'most-likes', active: (sortName === forumSortConstants.MOST_LIKES_SORT) },
       ]
     }
   },
