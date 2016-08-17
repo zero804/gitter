@@ -2,7 +2,6 @@
 
 import React from 'react';
 import _ from 'lodash';
-import raf from 'raf';
 import {subscribe, unsubscribe, dispatch} from '../browser/js/dispatcher';
 
 import CategoryList from '../shared/components/forum/category-list.jsx';
@@ -129,24 +128,24 @@ module.exports = React.createClass({
 
   onCategoryUpdate(){
     const { categoryStore } = this.props;
-    raf(() => this.setState((state) => _.extend(state, {
+    this.setState((state) => _.extend(state, {
       categories: categoryStore.getCategories(),
       categoryName: categoryStore.getActiveCategoryName(),
-    })));
+    }));
   },
 
   onTagUpdate(){
     const { tagStore } = this.props;
-    raf(() => this.setState((state) => _.extend(state, {
+    this.setState((state) => _.extend(state, {
       tags: tagStore.getTags(),
       tagName: tagStore.getActiveTagName(),
-    })));
+    }));
   },
 
   onFilterUpdate(data){
-    raf(() => this.setState((state) => _.extend(state, {
+    this.setState((state) => _.extend(state, {
       filterName: data.filter,
-    })));
+    }));
   },
 
   onSortUpdate(data) {
