@@ -3,7 +3,7 @@
 var assert = require('assert');
 var topicsStore = require('../../../../server/stores/topics-store');
 
-describe.only('topicsStore', () => {
+describe('topicsStore', () => {
 
   var models = [
     { id: 1 },

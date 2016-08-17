@@ -62,7 +62,7 @@ var Router = Backbone.Router.extend({
     });
   },
 
-  topic(id, slug, queryString){
+  topic(id, slug){
     this.model.set({
       route: 'topic',
     });
