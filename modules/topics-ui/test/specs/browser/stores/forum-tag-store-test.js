@@ -2,9 +2,9 @@
 
 var assert = require('assert');
 var sinon = require('sinon');
+var Backbone = require('backbone');
 var ForumTagStore = require('../../../../browser/js/stores/forum-tag-store');
 var forumTagConstants = require('../../../../browser/js/constants/forum-tags');
-var {subscribe} = require('../../../../browser/js/dispatcher');
 
 describe('TagStore', () => {
 

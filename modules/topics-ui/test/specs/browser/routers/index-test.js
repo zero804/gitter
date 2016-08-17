@@ -2,11 +2,9 @@
 
 var assert = require('assert');
 var Backbone = require('backbone');
-var sinon = require('sinon');
 var router = require('../../../../browser/js/routers/index');
 var sinon = require('sinon');
-var {dispatch, subscribe} = require('../../../../browser/js/dispatcher');
-var navConstants = require('../../../../browser/js/constants/navigation.js');
+var {dispatch} = require('../../../../browser/js/dispatcher');
 var forumCatConstants = require('../../../../browser/js/constants/forum-categories');
 var forumFilterConstants = require('../../../../browser/js/constants/forum-filters');
 var forumTagConstants = require('../../../../browser/js/constants/forum-tags');

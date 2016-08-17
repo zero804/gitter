@@ -68,11 +68,11 @@ var Router = Backbone.Router.extend({
     this.navigate(url, { trigger: true, replace: true });
   },
 
-  onFilterUpdate(model, val){
+  onFilterUpdate(){
     this.model.trigger(forumFilterConstants.UPDATE_ACTIVE_FILTER);
   },
 
-  onSortUpdate(model, val){
+  onSortUpdate(){
     this.model.trigger(forumSortConstants.UPDATE_ACTIVE_SORT);
   },
 
@@ -103,7 +103,7 @@ var Router = Backbone.Router.extend({
       sort: sortName,
     });
 
-    if(!!query.length) { url = `${url}?${query}`; }
+    if(query.length) { url = `${url}?${query}`; }
 
     return url;
 
