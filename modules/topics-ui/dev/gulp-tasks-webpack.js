@@ -4,20 +4,25 @@ var gulp = require('gulp');
 var webpack = require('gulp-webpack');
 var sourcemaps = require('gulp-sourcemaps');
 var uglify = require('gulp-uglify');
-var es = require('event-stream');
 var filter = require('gulp-filter');
+var pump = require('pump');
 
 function webpackPipeline(rootDir) {
   var javascriptFileFilter = filter(['**/*.js'], { restore: true, passthrough: false });
-
-  var jsStream = gulp.src(rootDir + '/webpack.config.js')
-    .pipe(webpack(require('../webpack.config')))
-    .pipe(sourcemaps.init({ /* loadMaps: true */ debug:true }))
-    .pipe(javascriptFileFilter) // Filter out everything except js files from here on
-    .pipe(uglify())
-
-  return es.merge(javascriptFileFilter.restore, jsStream)
-    .pipe(sourcemaps.write('../maps'));
+  return pump([
+    gulp.src(rootDir + '/webpack.config.js'),
+    webpack(require('../webpack.config')),
+    sourcemaps.init({ /* loadMaps: true */ debug:true }),
+    javascriptFileFilter,
+    uglify(),
+    javascriptFileFilter.restore,
+    sourcemaps.write('../maps')
+  ],
+  function(err){
+    if(!err) { return; }
+    console.error(err);// eslint-disable-line no-console
+    process.exit(1);
+  });
 }
 
 module.exports = webpackPipeline;

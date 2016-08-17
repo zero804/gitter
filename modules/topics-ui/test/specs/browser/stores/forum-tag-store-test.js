@@ -2,9 +2,9 @@
 
 var assert = require('assert');
 var sinon = require('sinon');
+var Backbone = require('backbone');
 var ForumTagStore = require('../../../../browser/js/stores/forum-tag-store');
 var forumTagConstants = require('../../../../browser/js/constants/forum-tags');
-var {subscribe} = require('../../../../browser/js/dispatcher');
 
 describe('TagStore', () => {
 
@@ -33,7 +33,7 @@ describe('TagStore', () => {
   });
 
   it('should dispatch un active:update event when the active tag changes', function(){
-    subscribe(forumTagConstants.UPDATE_ACTIVE_TAG, handle)
+    tagStore.on(forumTagConstants.UPDATE_ACTIVE_TAG, handle)
     router.set('tagName', 1);
     assert.equal(handle.callCount, 1);
   });

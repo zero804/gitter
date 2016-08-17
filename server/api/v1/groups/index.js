@@ -48,7 +48,8 @@ function getGroupOptions(body) {
     name: name,
     defaultRoom: {
       defaultRoomName: defaultRoomName,
-      providers: providers
+      providers: providers,
+      addBadge: !!body.addBadge
     },
     invites: getInvites(body.invites),
     allowTweeting: body.allowTweeting

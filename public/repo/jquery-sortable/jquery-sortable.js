@@ -1,3 +1,5 @@
+var $ = require('jquery');
+
 /* ===================================================
  *  jquery-sortable.js v0.9.11
  *  http://johnny.github.com/jquery-sortable/
@@ -109,7 +111,7 @@
     // Note that this default method only works, if every item only has one subcontainer
     serialize: function ($parent, $children, parentIsContainer) {
       var result = $.extend({}, $parent.data())
-      
+
       if(parentIsContainer)
         return $children
       else if ($children[0]){
@@ -353,7 +355,7 @@
             }
           }
         }
-        
+
         this.offsetParent = offsetParent
       }
       return this.offsetParent
@@ -545,11 +547,11 @@
     _serialize: function (parent, isContainer) {
       var that = this,
       childType = isContainer ? "item" : "container",
-      
+
       children = this.$getChildren(parent, childType).not(this.options.exclude).map(function () {
         return that._serialize($(this), !isContainer)
       }).get()
-      
+
       return this.rootGroup.options.serialize(parent, children, isContainer)
     },
     clearDimensions: function  () {
@@ -578,7 +580,7 @@
   }
 
   $.extend(Container.prototype, API)
-  
+
   /**
    * jQuery API
    *
@@ -603,5 +605,6 @@
     });
   };
 
-}(jQuery, window)
-;
+}($, window)
+
+module.exports = $;

@@ -1,10 +1,10 @@
 "use strict";
 
-var Backbone = require('backbone');
-var {dispatch} = require('../dispatcher');
-var updateActiveTag = require('../action-creators/forum/update-active-tag');
+const {Collection} = require('backbone');
+const {UPDATE_ACTIVE_TAG} = require('../constants/forum-tags');
 
-module.exports = Backbone.Collection.extend({
+
+module.exports = Collection.extend({
 
   initialize: function(models, attrs) {
     this.router = attrs.router;
@@ -14,7 +14,7 @@ module.exports = Backbone.Collection.extend({
   onTagUpdate(model, val){
     this.where({ active: true }).forEach((m) => m.set('active', false));
     this.findWhere({ value: val }).set('active', true);
-    dispatch(updateActiveTag(val));
+    this.trigger(UPDATE_ACTIVE_TAG);
   },
 
   getActiveTagName(){
