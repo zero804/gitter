@@ -31,7 +31,7 @@ function getComponent(componentName) {
     return factories[componentName];
   }
 
-  var component = require(path.resolve(__dirname, '..', componentPath, componentName + suffix));
+  var component = require(path.resolve(__dirname, '..', componentPath, componentName + suffix)).default;
   var Component = factories[componentName] = React.createFactory(component);
 
   return Component;

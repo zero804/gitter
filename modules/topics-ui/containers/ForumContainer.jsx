@@ -1,12 +1,12 @@
 'use strict';
 
-var React = require('react');
-var CategoryList = require('./components/forum/category-list.jsx');
-var {dispatch} = require('gitter-web-topics-ui/shared/dispatcher');
-var navigateToCategory = require('gitter-web-topics-ui/shared/action-creators/forum/navigate-to-category');
-var {UPDATE_ACTIVE_CATEGORY} = require('gitter-web-topics-ui/shared/constants/forum-categories');
+import React from 'react';
+import CategoryList from './components/forum/category-list.jsx';
+import { dispatch } from 'gitter-web-topics-ui/shared/dispatcher';
+import navigateToCategory from 'gitter-web-topics-ui/shared/action-creators/forum/navigate-to-category';
+import { UPDATE_ACTIVE_CATEGORY } from 'gitter-web-topics-ui/shared/constants/forum-categories';
 
-module.exports = React.createClass({
+export default React.createClass({
 
   displayName: 'ForumContainer',
 
