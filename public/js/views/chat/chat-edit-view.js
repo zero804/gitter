@@ -3,7 +3,7 @@ var Marionette = require('backbone.marionette');
 var appEvents = require('utils/appevents');
 var hasScrollBars = require('utils/scrollbar-detect');
 var KeyboardEventMixin = require('views/keyboard-events-mixin');
-var cocktail = require('cocktail');
+var cocktail = require('backbone.cocktail');
 var isMobile = require('utils/is-mobile');
 var RAF = require('utils/raf');
 
