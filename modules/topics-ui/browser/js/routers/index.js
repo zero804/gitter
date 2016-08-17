@@ -4,9 +4,6 @@ var Backbone = require('backbone');
 var qs = require('qs');
 var { subscribe } = require('../dispatcher');
 
-var updateActiveFilter = require('../action-creators/forum/update-active-filter');
-var updateActiveSort = require('../action-creators/forum/update-active-sort');
-
 var navConstants = require('../constants/navigation');
 var forumCatConstants = require('../constants/forum-categories');
 var forumFilterConstants = require('../constants/forum-filters');
