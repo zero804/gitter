@@ -1,7 +1,7 @@
 "use strict"
 
 var Backbone = require('backbone');
-var qs = require('qs');
+var {parse, stringify} = require('qs');
 var { subscribe } = require('../dispatcher');
 
 var navConstants = require('../constants/navigation');
@@ -37,7 +37,7 @@ var Router = Backbone.Router.extend({
   },
 
   forums(groupName, categoryName, queryString){
-    const query = qs.parse(queryString || '');
+    const query = parse(queryString || '');
     this.model.set({
       route: 'forum' ,
       groupName: groupName,
@@ -97,7 +97,7 @@ var Router = Backbone.Router.extend({
       `${groupName}/topics/categories/${categoryName}/`;
 
     //QUERY STRING
-    const query = qs.stringify({
+    const query = stringify({
       filter: filterName,
       tag: tagName,
       sort: sortName,
