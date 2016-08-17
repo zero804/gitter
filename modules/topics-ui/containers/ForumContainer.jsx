@@ -2,9 +2,9 @@
 
 var React = require('react');
 var CategoryList = require('../shared/components/forum/category-list.jsx');
-var {subscribe, unsubscribe, dispatch} = require('../browser/js/dispatcher');
+var {dispatch} = require('../browser/js/dispatcher');
 var navigateToCategory = require('../browser/js/action-creators/forum/navigate-to-category');
-var forumCatConstants = require('../browser/js/constants/forum-categories');
+var {UPDATE_ACTIVE_CATEGORY} = require('../browser/js/constants/forum-categories');
 
 module.exports = React.createClass({
 
@@ -26,11 +26,13 @@ module.exports = React.createClass({
   },
 
   componentDidMount(){
-    subscribe(forumCatConstants.UPDATE_ACTIVE_CATEGORY, this.onCategoryUpdate, this);
+    const { categoryStore } = this.props;
+    categoryStore.on(UPDATE_ACTIVE_CATEGORY, this.onCategoryUpdate);
   },
 
   componentWillUnmount(){
-    unsubscribe(forumCatConstants.UPDATE_ACTIVE_CATEGORY, this.onCategoryUpdate, this);
+    const { categoryStore } = this.props;
+    categoryStore.off(UPDATE_ACTIVE_CATEGORY, this.onCategoryUpdate);
   },
 
   render() {
