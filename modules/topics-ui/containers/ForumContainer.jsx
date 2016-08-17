@@ -1,10 +1,10 @@
 'use strict';
 
 var React = require('react');
-var CategoryList = require('../shared/components/forum/category-list.jsx');
-var {dispatch} = require('../browser/js/dispatcher');
-var navigateToCategory = require('../browser/js/action-creators/forum/navigate-to-category');
-var {UPDATE_ACTIVE_CATEGORY} = require('../browser/js/constants/forum-categories');
+var CategoryList = require('./components/forum/category-list.jsx');
+var {dispatch} = require('gitter-web-topics-ui/shared/dispatcher');
+var navigateToCategory = require('gitter-web-topics-ui/shared/action-creators/forum/navigate-to-category');
+var {UPDATE_ACTIVE_CATEGORY} = require('gitter-web-topics-ui/shared/constants/forum-categories');
 
 module.exports = React.createClass({
 

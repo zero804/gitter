@@ -2,9 +2,9 @@
 
 const React = require('react');
 const Backbone = require('backbone');
-const ForumContainer = require('../../containers/ForumContainer.jsx');
+const ForumContainer = require('gitter-web-topics-ui/containers/ForumContainer.jsx');
 const CategoryStore = require('./stores/forum-category-store');
-const navConstatnts = require('./constants/navigation');
+const navConstatnts = require('gitter-web-topics-ui/shared/constants/navigation');
 
 module.exports = React.createClass({
 

@@ -2,7 +2,7 @@
 
 var assert = require('assert');
 var React = require('react');
-var Container = require('../../../../shared/components/container.jsx');
+var Container = require('gitter-web-topics-ui/containers/components/container.jsx');
 var { shallow } = require('enzyme');
 
 describe('<Container />', function(){

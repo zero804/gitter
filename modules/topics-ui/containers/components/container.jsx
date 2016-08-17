@@ -1,13 +1,13 @@
 "use strict";
 
-import React, {PropTypes, createClass} from 'react';
-import classNames from 'classnames';
+var React = require('react');
+var classNames = require('classnames');
 
-module.exports = createClass({
+module.exports = React.createClass({
 
   displayName: 'Container',
   propTypes: {
-    className: PropTypes.string,
+    className: React.PropTypes.string
   },
 
   render(){

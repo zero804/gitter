@@ -3,7 +3,7 @@
 var assert = require('assert');
 var React = require('react');
 var { shallow } = require('enzyme');
-var Panel = require('../../../../shared/components/panel.jsx');
+var Panel = require('gitter-web-topics-ui/containers/components/panel.jsx');
 
 describe('<Panel />', function(){
 

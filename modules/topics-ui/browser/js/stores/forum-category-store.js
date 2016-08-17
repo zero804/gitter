@@ -1,7 +1,7 @@
 "use strict"
 
 const {Collection, Model} = require('backbone');
-const {UPDATE_ACTIVE_CATEGORY} = require('../constants/forum-categories');
+const {UPDATE_ACTIVE_CATEGORY} = require('gitter-web-topics-ui/shared/constants/forum-categories');
 
 var CategoryModel = Model.extend({
   defaults: { category: null },

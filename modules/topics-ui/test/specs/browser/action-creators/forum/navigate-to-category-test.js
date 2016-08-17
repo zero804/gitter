@@ -1,8 +1,8 @@
 "use strict";
 
 var assert = require('assert');
-var navigateToCategory = require('../../../../../browser/js/action-creators/forum/navigate-to-category');
-var navConstants = require('../../../../../browser/js/constants/navigation');
+var navigateToCategory = require('gitter-web-topics-ui/shared/action-creators/forum/navigate-to-category');
+var navConstants = require('gitter-web-topics-ui/shared/constants/navigation');
 
 describe('navigateToCategory', () => {
 

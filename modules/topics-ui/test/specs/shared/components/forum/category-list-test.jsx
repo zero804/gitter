@@ -4,10 +4,10 @@ var assert = require('assert');
 var React = require('react');
 var { shallow } = require('enzyme');
 var sinon = require('sinon');
-var CategoryList = require('../../../../../shared/components/forum/category-list.jsx');
-var Container = require('../../../../../shared/components/container.jsx');
-var Panel = require('../../../../../shared/components/panel.jsx');
-var CategoryListItem = require('../../../../../shared/components/forum/category-list-item.jsx');
+var CategoryList = require('gitter-web-topics-ui/containers/components/forum/category-list.jsx');
+var Container = require('gitter-web-topics-ui/containers/components/container.jsx');
+var Panel = require('gitter-web-topics-ui/containers/components/panel.jsx');
+var CategoryListItem = require('gitter-web-topics-ui/containers/components/forum/category-list-item.jsx');
 
 describe('<CategoryList />', function(){
 

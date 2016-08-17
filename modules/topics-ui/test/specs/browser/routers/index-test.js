@@ -3,8 +3,8 @@
 var assert = require('assert');
 var Backbone = require('backbone');
 var router = require('../../../../browser/js/routers/index');
-var {dispatch} = require('../../../../browser/js/dispatcher');
-var navConstants = require('../../../../browser/js/constants/navigation.js');
+var {dispatch} = require('gitter-web-topics-ui/shared/dispatcher/');
+var navConstants = require('gitter-web-topics-ui/shared/constants/navigation.js');
 
 describe('Router', function(){
 
