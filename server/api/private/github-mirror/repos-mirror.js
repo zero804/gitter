@@ -1,7 +1,7 @@
 "use strict";
 
 var Mirror = require('gitter-web-github').GitHubMirrorService('repo');
-var processChat = require('../../../utils/markdown-processor');
+var processText = require('gitter-web-text-processor');
 var util = require('util');
 var highlight = require('highlight.js');
 var StatusError = require('statuserror');
@@ -17,7 +17,7 @@ module.exports = function(req, res, next) {
   mirror.get(githubUri)
     .then(function(ghResponse) {
       if(req.query.renderMarkdown && ghResponse.body) {
-        return processChat(ghResponse.body)
+        return processText(ghResponse.body)
           .then(function(result) {
             ghResponse.body_html = result.html;
             return ghResponse;
