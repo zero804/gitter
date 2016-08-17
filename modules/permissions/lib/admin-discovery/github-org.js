@@ -3,8 +3,11 @@
 var Promise = require('bluebird');
 var GitHubMeService = require('gitter-web-github').GitHubMeService;
 var _ = require('lodash');
+var isGitHubUser = require('gitter-web-identity/lib/is-github-user');
 
 function githubOrgAdminDiscovery(user) {
+  if (!isGitHubUser(user)) return;
+
   var meService = new GitHubMeService(user);
   return meService.getOrgs()
     .then(function(orgs) {
