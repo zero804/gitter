@@ -2,7 +2,7 @@
 
 var appEvents = require('utils/appevents');
 var ChatInputView = require('views/chat/chatInputView');
-var cocktail = require('cocktail');
+var cocktail = require('backbone.cocktail');
 var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 var unreadItemsClient = require('components/unread-items-client');
 var UnreadBannerView = require('views/app/unreadBannerView');
