@@ -9,15 +9,15 @@ module.exports = React.createClass({
     category: React.PropTypes.string.isRequired,
     active: React.PropTypes.bool.isRequired,
     onClick: React.PropTypes.func.isRequired,
-    groupName: React.PropTypes.string.isRequired,
+    groupName: React.PropTypes.string.isRequired
   },
 
-  shouldComponentUpdate(nextProps, nextState) {
+  shouldComponentUpdate(nextProps) {
     return this.props.active !== nextProps.active;
   },
 
   render(){
-    const { groupName, category, active, onClick } = this.props;
+    const { groupName, category, active } = this.props;
     const href = `/${groupName}/topics/categories/${category}`;
     const title = `${category} topics`;
 

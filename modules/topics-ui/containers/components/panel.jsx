@@ -9,6 +9,7 @@ module.exports = React.createClass({
 
   propTypes: {
     className: React.PropTypes.string,
+    children: React.PropTypes.node
   },
 
   render(){

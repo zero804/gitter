@@ -12,7 +12,7 @@ module.exports = React.createClass({
   propTypes: {
     categories: React.PropTypes.array.isRequired,
     onCategoryClicked: React.PropTypes.func.isRequired,
-    groupName: React.PropTypes.string.isRequired,
+    groupName: React.PropTypes.string.isRequired
   },
 
   render(){
