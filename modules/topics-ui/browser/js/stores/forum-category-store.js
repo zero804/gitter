@@ -1,14 +1,13 @@
 "use strict"
 
-var Backbone = require('backbone');
-var { dispatch } = require('../dispatcher');
-var updateActiveCategory = require('../action-creators/forum/update-active-category');
+import {Collection} from 'backbone'
+import {UPDATE_ACTIVE_CATEGORY} from '../constants/forum-categories';
 
 var Model = Backbone.Model.extend({
   defaults: { category: null },
 });
 
-module.exports = Backbone.Collection.extend({
+module.exports = Collection.extend({
   model: Model,
 
   initialize: function(models, attrs) {
@@ -16,11 +15,6 @@ module.exports = Backbone.Collection.extend({
     this.listenTo(this.router, 'change:categoryName', this.onCategoryUpdate, this);
   },
 
-  /*
-   TODO -->
-   This functionality is pretty generic on the client,
-   we should abstract into a base client here
-   */
   getCategories: function() {
     return this.models.map(model => model.toJSON());
   },
@@ -28,7 +22,7 @@ module.exports = Backbone.Collection.extend({
   onCategoryUpdate(model, val){
     this.where({ active: true }).forEach((m) => m.set('active', false));
     this.findWhere({ category: val }).set('active', true);
-    dispatch(updateActiveCategory(val));
+    this.trigger(UPDATE_ACTIVE_CATEGORY);
   }
 
 });
