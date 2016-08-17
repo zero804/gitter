@@ -38,6 +38,9 @@ describe('group-api', function() {
       username: fixtureLoader.GITTER_INTEGRATION_USERNAME,
       accessToken: 'web-internal'
     },
+    user2: {
+      accessToken: 'web-internal'
+    },
     group1: {
       uri: fixtureLoader.GITTER_INTEGRATION_USERNAME,
       lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase(),
@@ -69,10 +72,17 @@ describe('group-api', function() {
       .expect(200)
   });
 
-  it('GET /v1/groups?type=admin', function() {
+  it('GET /v1/groups?type=admin for github user', function() {
     return request(app)
       .get('/v1/groups?type=admin')
       .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+  });
+
+  it('GET /v1/groups?type=admin for non-github user', function() {
+    return request(app)
+      .get('/v1/groups?type=admin')
+      .set('x-access-token', fixture.user2.accessToken)
       .expect(200)
   });
 
