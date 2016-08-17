@@ -76,6 +76,7 @@ gulp.task('topics:test:unit', function() {
     // },
     env: {
       BABEL_ENV: 'test',
+      BABEL_DISABLE_CACHE: 1,
       HOME: os.tmpdir()
     }
   }));
