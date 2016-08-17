@@ -1,20 +1,18 @@
-"use strict";
-
-var assert = require('assert');
-var React = require('react');
-var { shallow } = require('enzyme');
-var sinon = require('sinon');
-var CategoryList = require('gitter-web-topics-ui/containers/components/forum/category-list.jsx');
-var Container = require('gitter-web-topics-ui/containers/components/container.jsx');
-var Panel = require('gitter-web-topics-ui/containers/components/panel.jsx');
-var CategoryListItem = require('gitter-web-topics-ui/containers/components/forum/category-list-item.jsx');
+import assert from 'assert';
+import React from 'react';
+import { shallow } from 'enzyme';
+import sinon from 'sinon';
+import CategoryList from 'gitter-web-topics-ui/containers/components/forum/category-list.jsx';
+import Container from 'gitter-web-topics-ui/containers/components/container.jsx';
+import Panel from 'gitter-web-topics-ui/containers/components/panel.jsx';
+import CategoryListItem from 'gitter-web-topics-ui/containers/components/forum/category-list-item.jsx';
 
 describe('<CategoryList />', function(){
 
   const categories = [
     { category: 'all', active: true },
     { category: 'test-1', active: false },
-    { category: 'test-2', active: false },
+    { category: 'test-2', active: false }
   ];
   let wrapper;
   let clickHandle;

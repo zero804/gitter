@@ -1,4 +1,3 @@
-"use strict";
 
 var assert = require('assert');
 var Backbone = require('backbone');

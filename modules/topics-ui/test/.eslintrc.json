@@ -1,19 +1,11 @@
 {
   "env": {
-    "mocha": true,
-    "es6": true,
-    "browser": true
+    "mocha": true
   },
   "plugins": [
-    "mocha",
-    "react"
+    "mocha"
   ],
-  "parserOptions": {
-    "ecmaVersion": 6
-  },
   "rules": {
-    "mocha/no-exclusive-tests": "error",
-    "node/no-unpublished-require": "off",
-    "node/no-unsupported-features": "off"
+    "mocha/no-exclusive-tests": "error"
   }
 }

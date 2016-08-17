@@ -1,10 +1,8 @@
-"use strict";
-
-var assert = require('assert');
-var React = require('react');
-var sinon = require('sinon');
-var { shallow } = require('enzyme');
-var CategoryListItem = require('gitter-web-topics-ui/containers/components/forum/category-list-item.jsx');
+import assert from 'assert';
+import React from 'react';
+import sinon from 'sinon';
+import { shallow } from 'enzyme';
+import CategoryListItem from 'gitter-web-topics-ui/containers/components/forum/category-list-item.jsx';
 
 describe('<CategoryListItem />', function(){
 

@@ -1,5 +1,4 @@
 import React from 'react';
-import Backbone from 'backbone';
 import ForumContainer from 'gitter-web-topics-ui/containers/ForumContainer.jsx';
 import CategoryStore from './stores/forum-category-store';
 import navConstatnts from 'gitter-web-topics-ui/shared/constants/navigation';

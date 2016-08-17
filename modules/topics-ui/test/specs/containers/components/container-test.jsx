@@ -1,9 +1,7 @@
-"use strict";
-
-var assert = require('assert');
-var React = require('react');
-var Container = require('gitter-web-topics-ui/containers/components/container.jsx');
-var { shallow } = require('enzyme');
+import assert from 'assert';
+import React from 'react';
+import Container from 'gitter-web-topics-ui/containers/components/container.jsx';
+import { shallow } from 'enzyme';
 
 describe('<Container />', function(){
 

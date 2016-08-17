@@ -1,5 +1,3 @@
-'use strict';
-
 import React from 'react';
 import CategoryList from './components/forum/category-list.jsx';
 import { dispatch } from 'gitter-web-topics-ui/shared/dispatcher';
