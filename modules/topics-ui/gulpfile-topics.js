@@ -69,11 +69,11 @@ gulp.task('topics:test:unit', function() {
     compilers: {
       js: 'babel-register'
     },
-    nyc: {
-      cache: true,
-      reportDir: getOutputPath('coverage/'),
-      reporter: 'lcov',
-    },
+    // nyc: {
+    //   cache: true,
+    //   reportDir: getOutputPath('coverage/'),
+    //   reporter: 'lcov',
+    // },
     env: {
       BABEL_ENV: 'test',
       HOME: os.tmpdir()
