@@ -4,7 +4,7 @@ import sinon from 'sinon';
 import { shallow } from 'enzyme';
 import Input from '../../../../../../shared/containers/components/forms/input.jsx';
 
-describe.only('<Input/>', () => {
+describe('<Input/>', () => {
 
   let wrapper;
   let inputHandle;
@@ -41,7 +41,8 @@ describe.only('<Input/>', () => {
   });
 
   it('should call onChange after a change event', () => {
-    wrapper.find('input').at(0).simulate('change', {preventDefault: ()=>{}});
+    //TODO add fake event
+    wrapper.find('input').at(0).simulate('change', {preventDefault: ()=>{}, target:{value: ''}});
     equal(inputHandle.callCount, 1);
   });
 
