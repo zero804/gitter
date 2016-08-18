@@ -24,7 +24,8 @@ function GroupStrategy(options) {
         linkPath: group.sd.linkPath
       },
       avatarUrl: avatars.getForGroup(group),
-      hasAvatarSet: hasAvatarSet
+      hasAvatarSet: hasAvatarSet,
+      forumId: group.forumId
     };
   };
 }
