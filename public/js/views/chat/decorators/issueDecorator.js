@@ -9,7 +9,7 @@ var Popover = require('views/popover');
 var bodyTemplate = require('./tmpl/issuePopover.hbs');
 var titleTemplate = require('./tmpl/issuePopoverTitle.hbs');
 var footerTemplate = require('./tmpl/commitPopoverFooter.hbs');
-var SyncMixin = require('collections/sync-mixin');
+var SyncMixin = require('../../..collections/sync-mixin');
 
 
 var convertToIssueAnchor = function(element, githubIssueUrl) {

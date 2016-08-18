@@ -7,11 +7,11 @@ var context = require('./utils/context');
 var appEvents = require('./utils/appevents');
 var onready = require('./utils/onready');
 
-var chatModels = require('collections/chat');
-var troupeCollections = require('collections/instances/troupes');
-var repoModels = require('collections/repos');
+var chatModels = require('./collections/chat');
+var troupeCollections = require('./collections/instances/troupes');
+var repoModels = require('./collections/repos');
 var RepoCollection = repoModels.ReposCollection;
-var orgModels = require('collections/orgs');
+var orgModels = require('./collections/orgs');
 var OrgCollection = orgModels.OrgCollection;
 var CommunityCreateModel = require('views/community-create/community-create-model');
 

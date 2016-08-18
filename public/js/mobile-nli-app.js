@@ -2,7 +2,7 @@
 
 var $ = require('jquery');
 var appEvents = require('./utils/appevents');
-var chatModels = require('collections/chat');
+var chatModels = require('./collections/chat');
 var onready = require('./utils/onready');
 var MobileNliLayout = require('views/layouts/mobile-nli-layout');
 var FastClick = require('fastclick');

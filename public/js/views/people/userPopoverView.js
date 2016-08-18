@@ -7,7 +7,7 @@ var template = require('./tmpl/userPopoverView.hbs');
 var footerTemplate = require('./tmpl/userPopoverFooterView.hbs');
 var appEvents = require('../../utils/appevents');
 var context = require('../../utils/context');
-var SyncMixin = require('collections/sync-mixin');
+var SyncMixin = require('../../collections/sync-mixin');
 var avatars = require('gitter-web-avatars');
 
 module.exports = (function() {

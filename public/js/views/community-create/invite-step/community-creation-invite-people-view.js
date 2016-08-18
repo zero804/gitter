@@ -11,7 +11,7 @@ var CommunityCreateBaseStepView = require('../shared/community-creation-base-ste
 var CommunityCreationPeopleListView = require('../shared/community-creation-people-list-view');
 var UserResultListView = require('../shared/community-create-invite-user-result-list-view');
 
-var UserResultCollection = require('collections/community-create-user-result-collection');
+var UserResultCollection = require('../../..collections/community-create-user-result-collection');
 
 require('gitter-styleguide/css/components/headings.css');
 require('gitter-styleguide/css/components/buttons.css');

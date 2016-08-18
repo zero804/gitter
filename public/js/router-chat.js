@@ -14,9 +14,9 @@ var frameUtils = require('./utils/frame-utils');
 var liveContext = require('./components/live-context');
 var apiClient = require('./components/apiClient');
 var perfTiming = require('./components/perf-timing');
-var itemCollections = require('collections/instances/integrated-items');
-var chatCollection = require('collections/instances/chats-cached');
-var troupeCollections = require('collections/instances/troupes');
+var itemCollections = require('./collections/instances/integrated-items');
+var chatCollection = require('./collections/instances/chats-cached');
+var troupeCollections = require('./collections/instances/troupes');
 var ChatToolbarInputLayout = require('views/layouts/chat-toolbar-input');
 var DropTargetView = require('views/app/dropTargetView');
 
