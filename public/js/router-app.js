@@ -22,11 +22,9 @@ var SPARoomSwitcher = require('components/spa-room-switcher');
 var linkHandler = require('components/link-handler');
 var roomListGenerator = require('components/chat-cache/room-list-generator');
 var troupeCollections = require('collections/instances/troupes');
-var repoModels = require('collections/repos');
-var RepoCollection = repoModels.ReposCollection;
 var scopeUpgrader = require('components/scope-upgrader');
-var generateCreateGroupAndRoomRoutes = require('./generate-create-group-and-room-routes');
-
+var presentCreateRoomDialog = require('./ensured/present-create-room-dialog');
+var presentCreateCommunityDialog = require('./ensured/present-create-community-dialog');
 var AppLayout = require('views/layouts/app-layout');
 var LoadingView = require('views/app/loading-view');
 
@@ -247,18 +245,14 @@ onready(function() {
         context.setTroupeId(message.troupeId);
         titlebarUpdater.setRoomName(message.name);
         appEvents.trigger('context.troupeId', message.troupeId);
-      break;
+        break;
 
       case 'navigation':
         appEvents.trigger('navigation', message.url, message.urlType, message.title);
-      break;
+        break;
 
       case 'route':
         window.location.hash = '#' + message.hash;
-      break;
-
-      case 'community-create-view:toggle':
-        appEvents.trigger('community-create-view:toggle', message.active);
         break;
 
       //when the chat app requests the room list send it
@@ -318,9 +312,6 @@ onready(function() {
   var allRoomsCollection = troupeCollections.troupes;
   new RoomCollectionTracker(allRoomsCollection);
 
-  var repoCollection = new RepoCollection();
-
-
   allRoomsCollection.on('remove', function(model) {
     if (model.id === context.getTroupeId()) {
       //context.troupe().set('roomMember', false);
@@ -340,7 +331,6 @@ onready(function() {
     roomCollection: troupeCollections.troupes,
     //TODO ADD THIS TO MOBILE JP 25/1/16
     orgCollection: troupeCollections.orgs,
-    repoCollection: repoCollection,
     groupsCollection: troupeCollections.groups
   });
   appLayout.render();
@@ -427,14 +417,6 @@ onready(function() {
     postMessage(message);
   });
 
-
-  var createGroupAndRoomRoutes = generateCreateGroupAndRoomRoutes(appLayout, {
-    groupCollection: troupeCollections.groups,
-    roomCollection: troupeCollections.troupes,
-    orgCollection: troupeCollections.orgs,
-    repoCollection: repoCollection
-  });
-
   var Router = Backbone.Router.extend({
     routes: {
       // TODO: get rid of the pipes
@@ -460,8 +442,22 @@ onready(function() {
       });
     },
 
-    createRoom: createGroupAndRoomRoutes.createRoom,
-    createCommunity: createGroupAndRoomRoutes.createCommunity,
+    createRoom: function(initialRoomName) {
+      presentCreateRoomDialog({
+        dialogRegion: appLayout.dialogRegion,
+        roomCollection: troupeCollections.troupes,
+        roomMenuModel: appLayout.getRoomMenuModel(),
+        initialRoomName: initialRoomName
+      });
+    },
+
+    createCommunity: function() {
+      presentCreateCommunityDialog({
+        dialogRegion: appLayout.dialogRegion,
+        groups: troupeCollections.groups,
+        orgCollection: troupeCollections.orgs,
+      });
+    },
 
     upgradeRepoAccess: function(returnLocation) {
       scopeUpgrader('repo')

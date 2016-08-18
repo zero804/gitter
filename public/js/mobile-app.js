@@ -1,7 +1,6 @@
 "use strict";
 
 var $ = require('jquery');
-var _ = require('underscore');
 var Backbone = require('backbone');
 var context = require('utils/context');
 var appEvents = require('utils/appevents');
@@ -9,10 +8,8 @@ var onready = require('utils/onready');
 
 var chatModels = require('collections/chat');
 var troupeCollections = require('collections/instances/troupes');
-var repoModels = require('collections/repos');
-var RepoCollection = repoModels.ReposCollection;
-var generateCreateGroupAndRoomRoutes = require('./generate-create-group-and-room-routes');
-
+var presentCreateRoomDialog = require('./ensured/present-create-room-dialog');
+var presentCreateCommunityDialog = require('./ensured/present-create-community-dialog');
 var unreadItemsClient = require('components/unread-items-client');
 var RoomCollectionTracker = require('components/room-collection-tracker');
 var MobileLayout = require('views/layouts/mobile');
@@ -56,8 +53,9 @@ onready(function() {
     'chat': chatCollection
   });
 
-  var repoCollection = new RepoCollection();
-
+  appEvents.on('route', function(fragment) {
+    window.location.hash = '#' + fragment;
+  });
 
   var appView = new MobileLayout({
     model: context.troupe(),
@@ -67,18 +65,9 @@ onready(function() {
     //Left Menu Additions
     //roomCollection: troupeCollections.troupes
     orgCollection: troupeCollections.orgs,
-    repoCollection: repoCollection,
     groupsCollection: troupeCollections.groups
   });
   appView.render();
-
-
-  var createGroupAndRoomRoutes = generateCreateGroupAndRoomRoutes(appView, {
-    groupCollection: troupeCollections.groups,
-    roomCollection: troupeCollections.troupes,
-    orgCollection: troupeCollections.orgs,
-    repoCollection: repoCollection
-  });
 
   var Router = Backbone.Router.extend({
     routes: {
@@ -112,8 +101,22 @@ onready(function() {
       });
     },
 
-    createRoom: createGroupAndRoomRoutes.createRoom,
-    createCommunity: createGroupAndRoomRoutes.createCommunity
+    createRoom: function(initialRoomName) {
+      presentCreateRoomDialog({
+        dialogRegion: appView.dialogRegion,
+        roomCollection: troupeCollections.troupes,
+        roomMenuModel: null,
+        initialRoomName: initialRoomName
+      });
+    },
+
+    createCommunity: function() {
+      presentCreateCommunityDialog({
+        dialogRegion: appView.dialogRegion,
+        groups: troupeCollections.groups,
+        orgCollection: troupeCollections.orgs,
+      });
+    },
   });
 
   new Router();

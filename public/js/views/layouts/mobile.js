@@ -10,7 +10,6 @@ var ChatContainerView = require('views/chat/chatContainerView');
 var TroupeMenu = require('views/menu/old/troupeMenu');
 
 var CommunityCreateModel = require('../community-create/community-create-model');
-var CommunityCreateView = require('../community-create/community-create-view');
 
 //var RoomMenuLayout    = require('../menu/room/layout/room-menu-layout');
 //var appEvents         = require('utils/appevents');
@@ -75,12 +74,9 @@ module.exports = Marionette.LayoutView.extend({
     this.dialogRegion = modalRegion;
     this.roomCollection = options.roomCollection;
     this.orgCollection = options.orgCollection;
-    this.repoCollection = options.repoCollection;
     this.groupsCollection = options.groupsCollection;
 
     this.communityCreateModel = new CommunityCreateModel();
-
-    this.listenTo(appEvents, 'community-create-view:toggle', this.onCommunityCreateToggle, this);
   },
 
   onRender: function() {

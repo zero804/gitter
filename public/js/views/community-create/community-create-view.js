@@ -18,7 +18,6 @@ var CommunityCreateStepViewModel = require('./community-create-step-view-model')
 var CommunityCreatMainStepViewModel = require('./main-step/community-create-main-step-view-model');
 var CommunityCreateGitHubProjectsStepViewModel = require('./github-projects-step/community-create-github-projects-step-view-model');
 
-
 var ActiveCollection = require('./active-collection');
 
 var CommunityCreationMainView = require('./main-step/community-creation-main-view');
@@ -26,7 +25,6 @@ var CommunityCreationGithubProjectsView = require('./github-projects-step/commun
 var CommunityCreationInvitePeopleView = require('./invite-step/community-creation-invite-people-view');
 var CommunityCreationInviteConfirmationView = require('./invite-confirmation-step/community-creation-invite-confirmation-view');
 var CommunityCreationOverviewView = require('./overview-step/community-creation-overview-view');
-
 
 
 var CommunityCreateView = Marionette.LayoutView.extend({
@@ -113,7 +111,6 @@ var CommunityCreateView = Marionette.LayoutView.extend({
   },
 
   modelEvents: {
-    'change:active': 'onActiveChange',
     'change:stepState': 'onStepChangeState'
   },
 
@@ -190,30 +187,19 @@ var CommunityCreateView = Marionette.LayoutView.extend({
     this.overviewStepViewModel.set({ active: newStepState === stepConstants.OVERVIEW });
   },
 
-  onActiveChange: function() {
-    var isActive = this.model.get('active');
-    toggleClass(this.$el[0], 'active', isActive);
-
-    if(isActive) {
-      appEvents.trigger('stats.event', 'community.create.enter');
-      appEvents.trigger('track-event', 'community.create.enter');
-    }
-
-    // Reset for next time if we are hiding create community
-    if(!isActive) {
-     this.model.reset({ silent: true });
-    }
-  },
-
   closeView: function() {
-    appEvents.trigger('stats.event', 'community.create.exit.' + this.model.get('stepState'));
-    appEvents.trigger('track-event', 'community.create.exit.' + this.model.get('stepState'));
-    this.model.set('active', false);
     window.location.hash = '#';
   },
 
+  onDestroy: function() {
+    appEvents.trigger('stats.event', 'community.create.exit.' + this.model.get('stepState'));
+    appEvents.trigger('track-event', 'community.create.exit.' + this.model.get('stepState'));
+  },
+
   onRender: function() {
-    this.onActiveChange();
+    toggleClass(this.$el[0], 'active', true);
+    appEvents.trigger('stats.event', 'community.create.enter');
+    appEvents.trigger('track-event', 'community.create.enter');
   },
 
   show: function() {
@@ -225,13 +211,11 @@ var CommunityCreateView = Marionette.LayoutView.extend({
     document.body.appendChild(rootWrapperElement);
   },
 
-  hideInternal: function() {
+  /* Called after navigation to destroy an navigable dialog box */
+  navigationalHide: function() {
     this.destroy();
   },
 
-  navigationalHide: function() {
-    this.closeView();
-  }
 });
 
 

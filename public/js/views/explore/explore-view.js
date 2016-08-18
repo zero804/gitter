@@ -3,8 +3,7 @@
 var $ = require('jquery');
 var Marionette = require('backbone.marionette');
 var urlParse = require('url-parse');
-var context = require('utils/context');
-var frameUtils = require('utils/frame-utils');
+var appEvents = require('../../utils/appevents');
 var modalRegion = require('components/modal-region');
 var LoginView = require('views/modals/login-view');
 var template = require('./tmpl/explore-view.hbs');
@@ -112,7 +111,7 @@ var ExploreView = Marionette.LayoutView.extend({
   },
 
   popCreate: function() {
-    frameUtils.postMessage({ type: 'community-create-view:toggle', active: true });
+    appEvents.trigger('route', 'createcommunity');
   }
 });
 
