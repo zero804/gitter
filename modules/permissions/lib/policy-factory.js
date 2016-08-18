@@ -136,6 +136,26 @@ function createPolicyForOneToOne(user, toUser) {
   return new OneToOneUnconnectionPolicyEvalator(user, toUser);
 }
 
+function createPolicyForForumId(user, forumId) {
+  var userId = user && user._id;
+
+  // maybe we could have just passed in the security descriptor rather and then
+  // named this createPolicyForSecurityDescriptor?
+  return securityDescriptorService.getForForumUser(forumId, userId)
+    .then(function(securityDescriptor) {
+      if (!securityDescriptor) throw new StatusError(404);
+
+      var policyDelegate = getPolicyDelegate(userId, user, securityDescriptor);
+      var contextDelegate = null; // No forum context yet
+
+      return new PolicyEvaluator(userId, securityDescriptor, policyDelegate, contextDelegate);
+    });
+}
+
+function createPolicyForForum(user, forum) {
+  var forumId = forum && forum._id;
+  return createPolicyForForumId(user, forumId);
+}
 
 /**
  * Pre-creation Policy Evaluator factory
@@ -180,6 +200,8 @@ module.exports = {
   createPolicyForUserIdInRoomId: Promise.method(createPolicyForUserIdInRoomId),
   createPolicyForUserIdInRoom: Promise.method(createPolicyForUserIdInRoom),
   createPolicyForOneToOne: Promise.method(createPolicyForOneToOne),
+  createPolicyForForumId: Promise.method(createPolicyForForumId),
+  createPolicyForForum: Promise.method(createPolicyForForum),
 
   // For things that have not yet been created
   getPreCreationPolicyEvaluator: getPreCreationPolicyEvaluator,

@@ -1,0 +1,22 @@
+{
+  "name": "gitter-web-text-processor",
+  "version": "1.0.0",
+  "main": "lib/process-text.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha test/"
+  },
+  "private": true,
+  "dependencies": {
+    "bluebird": "^3.2.1",
+    "gitter-web-env": "file:../env",
+    "gitter-web-github": "file:../github",
+    "gitter-markdown-processor": "^11.2.0",
+    "shutdown": "^0.2.3"
+  },
+  "devDependencies": {
+  }
+}

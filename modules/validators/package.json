@@ -11,6 +11,7 @@
   },
   "private": true,
   "dependencies": {
+    "gitter-web-slugify": "file:../slugify",
     "xregexp": "^2.0.0"
   }
 }
