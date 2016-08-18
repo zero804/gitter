@@ -17,9 +17,6 @@
     }
   },
   "rules": {
-    "node/no-unpublished-import": "error",
-    "import/named": "off",
-    "import/default": "off",
     "node/no-unsupported-features": [
       "error",
       {

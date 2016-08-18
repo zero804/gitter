@@ -131,6 +131,16 @@ internal-mac:
     beta-internal: 10.0.0.140
   working_dir: ${WORKSPACE}
 
+internal-mac-np:
+  image: node:${NODE_VERSION}
+  restart: 'no'
+  volumes:
+   - ${WORKSPACE}:${WORKSPACE}
+   - ${WORKSPACE}/node_modules_linux:${WORKSPACE}/node_modules/
+  extra_hosts:
+    beta-internal: 10.0.0.140
+  working_dir: ${WORKSPACE}
+
 internal:
   image: node:${NODE_VERSION}
   restart: 'no'

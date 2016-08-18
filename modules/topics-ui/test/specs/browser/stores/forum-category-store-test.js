@@ -1,10 +1,8 @@
-"use strict";
-
-var assert = require('assert');
-var sinon = require('sinon');
-var Backbone = require('backbone');
-var CategoryStore = require('../../../../browser/js/stores/forum-category-store');
-var forumCatConstants = require('../../../../browser/js/constants/forum-categories');
+import assert from 'assert';
+import sinon from 'sinon';
+import Backbone from 'backbone';
+import CategoryStore from '../../../../browser/js/stores/forum-category-store';
+var forumCatConstants = require('../../../../shared/constants/forum-categories');
 
 describe('ForumCategoryStore', function(){
 

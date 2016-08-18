@@ -1,10 +1,7 @@
-"use strict"
 
-var Backbone = require('backbone');
-var { subscribe } = require('../dispatcher');
-var navConstants = require('../constants/navigation');
-
-var _super = Backbone.Router.prototype;
+import Backbone from 'backbone';
+import { subscribe } from '../../../shared/dispatcher';
+import * as navConstants from '../../../shared/constants/navigation';
 
 var RouteModel = Backbone.Model.extend({
   defaults: { route: null }
@@ -12,10 +9,10 @@ var RouteModel = Backbone.Model.extend({
 
 var Router = Backbone.Router.extend({
 
-  constructor: function(){
+  constructor: function() {
     this.model = new RouteModel();
     subscribe(navConstants.NAVIGATE_TO, this.navigateTo, this);
-    _super.constructor.call(this, ...arguments);
+    Backbone.Router.prototype.constructor.call(this, ...arguments);
   },
 
   routes: {
@@ -53,4 +50,4 @@ var Router = Backbone.Router.extend({
 
 var router = new Router();
 
-module.exports = router.model;
+export default router.model;

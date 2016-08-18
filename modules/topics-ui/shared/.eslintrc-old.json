@@ -7,8 +7,7 @@
     "node"
   ],
   "rules": {
-    "node/no-unpublished-require": "error",
-    "node/no-unpublished-import": "error",
+    "node/no-unpublished-require": 2,
     "node/no-unsupported-features": [
       "error",
       {

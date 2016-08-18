@@ -6,6 +6,7 @@ var sourcemaps = require('gulp-sourcemaps');
 var uglify = require('gulp-uglify');
 var filter = require('gulp-filter');
 var pump = require('pump');
+var gutil = require('gulp-util');
 
 function webpackPipeline(rootDir) {
   var javascriptFileFilter = filter(['**/*.js'], { restore: true, passthrough: false });
@@ -18,10 +19,11 @@ function webpackPipeline(rootDir) {
     javascriptFileFilter.restore,
     sourcemaps.write('../maps')
   ],
-  function(err){
-    if(!err) { return; }
-    console.error(err);// eslint-disable-line no-console
-    process.exit(1);
+  function(err) {
+    if (err) {
+      gutil.log(err);
+      process.exit(1);
+    }
   });
 }
 
