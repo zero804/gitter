@@ -65,12 +65,12 @@ var Router = Backbone.Router.extend({
     this.navigate(url, { trigger: true, replace: true });
   },
 
-  onFilterUpdate(){
-    this.model.trigger(forumFilterConstants.UPDATE_ACTIVE_FILTER);
+  onFilterUpdate(moidel, val){
+    this.model.trigger(forumFilterConstants.UPDATE_ACTIVE_FILTER, { filter: val });
   },
 
-  onSortUpdate(){
-    this.model.trigger(forumSortConstants.UPDATE_ACTIVE_SORT);
+  onSortUpdate(model, val){
+    this.model.trigger(forumSortConstants.UPDATE_ACTIVE_SORT, { sort: val });
   },
 
   buildForumUrl(categoryName, filterName, tagName, sortName){
