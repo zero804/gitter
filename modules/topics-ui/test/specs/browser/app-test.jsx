@@ -2,7 +2,7 @@ import assert from 'assert';
 import { shallow } from 'enzyme';
 import Backbone from 'backbone';
 import React from 'react';
-import App from 'gitter-web-topics-ui/browser/js/app.jsx';
+import App from '../../../browser/js/app.jsx';
 
 describe.skip('App', function() {
 

@@ -34,7 +34,7 @@ var config = {
         include: path.resolve(__dirname, './browser/less'),
       },
       {
-        test: /\.jsx?$/,
+        test: /\.(jsx|js)$/,
         loader: 'babel',
         exclude: /node_modules/,
         query: {
