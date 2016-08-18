@@ -1,10 +1,8 @@
 'use strict';
 
 var _ = require('underscore');
-var Promise = require('bluebird');
 var toggleClass = require('utils/toggle-class');
 var appEvents = require('utils/appevents');
-
 var stepConstants = require('../step-constants');
 var template = require('./community-creation-overview-view.hbs');
 var CommunityCreateBaseStepView = require('../shared/community-creation-base-step-view');
@@ -74,21 +72,6 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   onStepNext: function() {
     var communityCreateModel = this.communityCreateModel;
-
-    var type = null;
-    var linkPath = null;
-    var githubOrgId = communityCreateModel.get('githubOrgId');
-    var githubRepoId = communityCreateModel.get('githubRepoId');
-    var githubProjectModel = this.orgCollection.get(githubOrgId) || this.repoCollection.get(githubRepoId);
-    if(githubOrgId && githubProjectModel) {
-      type = 'GH_ORG';
-      linkPath = githubProjectModel.get('name').toLowerCase();
-    }
-    else if(githubRepoId && githubProjectModel) {
-      type = 'GH_REPO';
-      linkPath = githubProjectModel.get('uri');
-    }
-
     var groupData = this.getCreateData();
 
     return apiClient.post('/v1/groups', groupData)
@@ -112,9 +95,6 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   getSecurityData: function() {
     var communityCreateModel = this.communityCreateModel;
-
-    var type = null;
-    var linkPath = null;
 
     var githubOrgId = communityCreateModel.get('githubOrgId');
     // Org based?
@@ -140,7 +120,8 @@ module.exports = CommunityCreateBaseStepView.extend({
   getInviteData: function() {
     var communityCreateModel = this.communityCreateModel;
 
-    return [].concat(communityCreateModel.peopleToInvite.toJSON(), communityCreateModel.emailsToInvite.toJSON());
+    var invites = [].concat(communityCreateModel.peopleToInvite.toJSON(), communityCreateModel.emailsToInvite.toJSON());
+    return invites;
   },
 
   getCreateData: function() {
