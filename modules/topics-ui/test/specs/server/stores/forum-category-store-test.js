@@ -10,7 +10,7 @@ describe('CategoryStore', function(){
     {category: 'all', active: true },
     {category: 1, active: false },
     {category: 2, active: false },
-    {category: 3, active: false },
+    {category: 3, active: false }
   ];
 
   it('should return an object with models', function(){
