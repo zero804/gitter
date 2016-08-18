@@ -1,0 +1,20 @@
+"use strict";
+
+import assert from 'assert';
+import React from 'react';
+import { shallow } from 'enzyme';
+import {{properCase name}} from '../../../../shared/components{{subFolder}}{{dashCase name}}.jsx';
+
+describe('<{{properCase name}}/>', () => {
+
+  let wrapper;
+
+  beforeEach(() => {
+    wrapper = shallow(<{{properCase name}}/>);
+  });
+
+  it('should fail a test because you should write some', () => {
+    assert(false, 'Srsly, write some tests');
+  });
+
+});
