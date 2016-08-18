@@ -1,7 +1,7 @@
 'use strict';
 
 var Marionette = require('backbone.marionette');
-var Typeahead = require('views/controls/typeahead');
+var Typeahead = require('../controls/typeahead');
 var FilteredCollection = require('backbone-filtered-collection');
 
 

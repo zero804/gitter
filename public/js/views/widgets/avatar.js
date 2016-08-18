@@ -4,13 +4,13 @@ var Marionette = require('backbone.marionette');
 var context = require('../../utils/context');
 var isMobile = require('../../utils/is-mobile');
 var template = require('./tmpl/avatar.hbs');
-var UserPopoverView = require('views/people/userPopoverView');
-var widgets = require('views/behaviors/widgets');
+var UserPopoverView = require('../people/userPopoverView');
+var widgets = require('../behaviors/widgets');
 var resolveUserAvatarSrcSet = require('gitter-web-shared/avatars/resolve-user-avatar-srcset');
-var FastAttachMixin = require('views/fast-attach-mixin');
+var FastAttachMixin = require('../fast-attach-mixin');
 var avatars = require('gitter-web-avatars');
 
-require('views/behaviors/tooltip');
+require('../behaviors/tooltip');
 
 var AVATAR_SIZE_MEDIUM = 64;
 var AVATAR_SIZE_SMALL = 30;

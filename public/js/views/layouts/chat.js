@@ -2,15 +2,15 @@
 
 var Marionette = require('backbone.marionette');
 var modalRegion = require('../../components/modal-region');
-var ChatContainerView = require('views/chat/chatContainerView');
+var ChatContainerView = require('../chat/chatContainerView');
 
 /* Decorators */
-var issueDecorator = require('views/chat/decorators/issueDecorator');
-var commitDecorator = require('views/chat/decorators/commitDecorator');
-var mentionDecorator = require('views/chat/decorators/mentionDecorator');
-var embedDecorator = require('views/chat/decorators/embedDecorator');
-var emojiDecorator = require('views/chat/decorators/emojiDecorator');
-require('views/behaviors/isomorphic');
+var issueDecorator = require('../chat/decorators/issueDecorator');
+var commitDecorator = require('../chat/decorators/commitDecorator');
+var mentionDecorator = require('../chat/decorators/mentionDecorator');
+var embedDecorator = require('../chat/decorators/embedDecorator');
+var emojiDecorator = require('../chat/decorators/emojiDecorator');
+require('../behaviors/isomorphic');
 
 var ChatLayout = Marionette.LayoutView.extend({
   template: false,

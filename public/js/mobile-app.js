@@ -13,11 +13,11 @@ var repoModels = require('./collections/repos');
 var RepoCollection = repoModels.ReposCollection;
 var orgModels = require('./collections/orgs');
 var OrgCollection = orgModels.OrgCollection;
-var CommunityCreateModel = require('views/community-create/community-create-model');
+var CommunityCreateModel = require('./views/community-create/community-create-model');
 
 var unreadItemsClient = require('./components/unread-items-client');
 var RoomCollectionTracker = require('./components/room-collection-tracker');
-var MobileLayout = require('views/layouts/mobile');
+var MobileLayout = require('./views/layouts/mobile');
 
 //Remove when left menu is in place
 var FastClick = require('fastclick');
@@ -130,8 +130,8 @@ onready(function() {
     },
 
     notifications: function() {
-      require.ensure(['views/modals/notification-settings-view'], function(require) {
-        var NotificationSettingsView = require('views/modals/notification-settings-view');
+      require.ensure(['./views/modals/notification-settings-view'], function(require) {
+        var NotificationSettingsView = require('./views/modals/notification-settings-view');
         appView.dialogRegion.show(new NotificationSettingsView({ model: new Backbone.Model() }));
       });
     },
@@ -151,8 +151,8 @@ onready(function() {
       initializeUnusedRepoCollection();
       initializeUnusedOrgCollection();
 
-      require.ensure(['views/community-create/community-create-view'], function(require) {
-        var CommunityCreateView = require('views/community-create/community-create-view');
+      require.ensure(['./views/community-create/community-create-view'], function(require) {
+        var CommunityCreateView = require('./views/community-create/community-create-view');
         communityCreateModel.set('active', true);
         var communityCreateView = new CommunityCreateView({
           model: communityCreateModel,

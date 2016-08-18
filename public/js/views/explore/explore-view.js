@@ -6,11 +6,11 @@ var urlParse = require('url-parse');
 var context = require('../../utils/context');
 var frameUtils = require('../../utils/frame-utils');
 var modalRegion = require('../../components/modal-region');
-var LoginView = require('views/modals/login-view');
+var LoginView = require('../modals/login-view');
 var template = require('./tmpl/explore-view.hbs');
 var itemTemplate = require('../../../templates/partials/room_card.hbs');
 
-require('views/behaviors/isomorphic');
+require('../behaviors/isomorphic');
 
 
 var TagPillView = Marionette.ItemView.extend({
@@ -42,8 +42,8 @@ var RoomCardView = Marionette.ItemView.extend({
   tagName: 'div',
 
   popEditTagsModal: function() {
-    require.ensure(['views/modals/edit-tags-view'], function(require) {
-      var EditTagsView = require('views/modals/edit-tags-view');
+    require.ensure(['../modals/edit-tags-view'], function(require) {
+      var EditTagsView = require('../modals/edit-tags-view');
       var editTagsModal = new EditTagsView({
         roomId: 0 // FIXME: the room id
       });

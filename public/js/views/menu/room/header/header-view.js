@@ -5,7 +5,7 @@ var template = require('./header-view.hbs');
 var fastdom = require('fastdom');
 var toggleClass = require('../../../../utils/toggle-class');
 var cocktail = require('backbone.cocktail');
-var KeyboardEventMixin = require('views/keyboard-events-mixin');
+var KeyboardEventMixin = require('../../../keyboard-events-mixin');
 var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
 
 

@@ -28,17 +28,17 @@ var RepoCollection = repoModels.ReposCollection;
 var orgModels = require('./collections/orgs');
 var OrgCollection = orgModels.OrgCollection;
 var groupModels = require('./collections/groups');
-var CommunityCreateModel = require('views/community-create/community-create-model');
+var CommunityCreateModel = require('./views/community-create/community-create-model');
 var CreateRoomModel = require('./models/create-room-view-model');
 var scopeUpgrader = require('./components/scope-upgrader');
 
-var AppLayout = require('views/layouts/app-layout');
-var LoadingView = require('views/app/loading-view');
+var AppLayout = require('./views/layouts/app-layout');
+var LoadingView = require('./views/app/loading-view');
 
 require('./components/statsc');
-require('views/widgets/preload');
+require('./views/widgets/preload');
 require('./components/user-notifications');
-require('template/helpers/all');
+require('./template/helpers/all');
 require('./components/bug-reporting');
 require('./components/focus-events');
 
@@ -47,7 +47,7 @@ require('./utils/tracking');
 require('./components/ping');
 
 // Preload widgets
-require('views/widgets/avatar');
+require('./views/widgets/avatar');
 
 onready(function() {
   var chatIFrame = document.getElementById('content-frame');
@@ -507,8 +507,8 @@ onready(function() {
     },
 
     confirmRoom: function(uri) {
-      require.ensure(['views/modals/confirm-repo-room-view'], function(require) {
-        var confirmRepoRoomView = require('views/modals/confirm-repo-room-view');
+      require.ensure(['./views/modals/confirm-repo-room-view'], function(require) {
+        var confirmRepoRoomView = require('./views/modals/confirm-repo-room-view');
         appLayout.dialogRegion.show(new confirmRepoRoomView.Modal({
           uri: uri,
         }));
@@ -546,8 +546,8 @@ onready(function() {
         repoCollection.fetch();
       }
 
-      require.ensure(['views/modals/create-room-view'], function(require) {
-        var createRoomView = require('views/modals/create-room-view');
+      require.ensure(['./views/modals/create-room-view'], function(require) {
+        var createRoomView = require('./views/modals/create-room-view');
         var modal = new createRoomView.Modal({
           model: new CreateRoomModel(),
           initialGroupId: getSuitableGroupId(),
@@ -565,8 +565,8 @@ onready(function() {
       initializeUnusedRepoCollection();
       initializeUnusedOrgCollection();
 
-      require.ensure(['views/community-create/community-create-view'], function(require) {
-        var CommunityCreateView = require('views/community-create/community-create-view');
+      require.ensure(['./views/community-create/community-create-view'], function(require) {
+        var CommunityCreateView = require('./views/community-create/community-create-view');
         communityCreateModel.set('active', true);
         var communityCreateView = new CommunityCreateView({
           model: communityCreateModel,

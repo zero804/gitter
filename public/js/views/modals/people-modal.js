@@ -8,10 +8,10 @@ var itemTemplate = require('./tmpl/people-modal-result.hbs');
 var apiClient = require('../../components/apiClient');
 var template = require('./tmpl/people-modal.hbs');
 var SyncMixin = require('../../collections/sync-mixin');
-var InfiniteScrollBehavior = require('views/behaviors/infinite-scroll');
+var InfiniteScrollBehavior = require('../behaviors/infinite-scroll');
 var context = require('../../utils/context');
 
-require('views/behaviors/widgets');
+require('../behaviors/widgets');
 
 var RESULT_LIMIT = 25;
 

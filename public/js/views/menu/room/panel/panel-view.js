@@ -11,10 +11,10 @@ var PrimaryCollectionView = require('../primary-collection/primary-collection-vi
 var SecondaryCollectionView = require('../secondary-collection/secondary-collection-view');
 var TertiaryCollectionView = require('../tertiary-collection/tertiary-collection-view');
 var ProfileMenuView = require('../profile/profile-menu-view');
-var SearchInputView = require('views/menu/room/search-input/search-input-view');
+var SearchInputView = require('../../../menu/room/search-input/search-input-view');
 var NeverEndingStory = require('../../../../utils/never-ending-story');
 
-require('views/behaviors/isomorphic');
+require('../../../behaviors/isomorphic');
 
 var PanelView = Marionette.LayoutView.extend({
 

@@ -2,17 +2,17 @@
 
 var context = require('../../utils/context');
 var appEvents = require('../../utils/appevents');
-var ChatInputView = require('views/chat/chatInputView');
+var ChatInputView = require('../chat/chatInputView');
 var cocktail = require('backbone.cocktail');
-var KeyboardEventsMixin = require('views/keyboard-events-mixin');
+var KeyboardEventsMixin = require('../keyboard-events-mixin');
 var unreadItemsClient = require('../../components/unread-items-client');
-var UnreadBannerView = require('views/app/unreadBannerView');
+var UnreadBannerView = require('../app/unreadBannerView');
 var ChatToolbarLayout = require('./chat-toolbar');
-var CollaboratorsView = require('views/app/collaboratorsView');
-var JoinRoomView = require('views/chat/join-room-view');
+var CollaboratorsView = require('../app/collaboratorsView');
+var JoinRoomView = require('../chat/join-room-view');
 
 
-require('views/behaviors/isomorphic');
+require('../behaviors/isomorphic');
 
 var ChatToolbarInputLayout = ChatToolbarLayout.extend({
   monitorUnreadItems: true,

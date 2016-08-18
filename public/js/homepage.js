@@ -14,7 +14,7 @@ var apiClient = require('./components/apiClient');
 var onready = require('././utils/onready');
 
 var modalRegion = require('./components/modal-region');
-var LoginView = require('views/modals/login-view');
+var LoginView = require('./views/modals/login-view');
 
 require('./utils/tracking');
 require('gitter-styleguide/css/components/buttons.css');

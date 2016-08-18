@@ -14,17 +14,17 @@ var resultTemplate = require('./tmpl/result.hbs');
 var noResultsTemplate = require('./tmpl/no-results.hbs');
 var noRoomResultsTemplate = require('./tmpl/no-room-results.hbs');
 var textFilter = require('../../utils/text-filter');
-var KeyboardEventsMixin = require('views/keyboard-events-mixin');
+var KeyboardEventsMixin = require('../keyboard-events-mixin');
 var Promise = require('bluebird');
 var timeFormat = require('gitter-web-shared/time/time-format');
 var fullTimeFormat = require('gitter-web-shared/time/full-time-format');
 var FilteredCollection = require('backbone-filtered-collection');
 
-require('views/behaviors/widgets');
-require('views/behaviors/highlight');
-require('views/behaviors/isomorphic');
-require('views/behaviors/timeago');
-require('views/behaviors/tooltip');
+require('../behaviors/widgets');
+require('../behaviors/highlight');
+require('../behaviors/isomorphic');
+require('../behaviors/timeago');
+require('../behaviors/tooltip');
 
 module.exports = (function() {
 

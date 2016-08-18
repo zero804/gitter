@@ -6,22 +6,22 @@ var classnames = require('classnames');
 var context = require('../../utils/context');
 var clientEnv = require('gitter-client-env');
 var chatModels = require('../../collections/chat');
-var AvatarView = require('views/widgets/avatar');
+var AvatarView = require('../widgets/avatar');
 var Marionette = require('backbone.marionette');
 var moment = require('moment');
 var isMobile = require('../../utils/is-mobile');
 var isAndroid = require('../../utils/is-android');
 var DoubleTapper = require('../../utils/double-tapper');
-var Popover = require('views/popover');
+var Popover = require('../popover');
 var chatItemTemplate = require('./tmpl/chatItemView.hbs');
 var statusItemTemplate = require('./tmpl/statusItemView.hbs');
 var actionsTemplate = require('./tmpl/actionsView.hbs');
-var ChatEditView = require('views/chat/chat-edit-view');
+var ChatEditView = require('../chat/chat-edit-view');
 var appEvents = require('../../utils/appevents');
 var cocktail = require('backbone.cocktail');
 var chatCollapse = require('../../utils/collapsed-item-client');
-var LoadingCollectionMixin = require('views/loading-mixin');
-var FastAttachMixin = require('views/fast-attach-mixin');
+var LoadingCollectionMixin = require('../loading-mixin');
+var FastAttachMixin = require('../fast-attach-mixin');
 var timeFormat = require('gitter-web-shared/time/time-format');
 var fullTimeFormat = require('gitter-web-shared/time/full-time-format');
 var dataset = require('../../utils/dataset-shim');
@@ -29,12 +29,12 @@ var toggleClass = require('../../utils/toggle-class');
 
 var RAF = require('../../utils/raf');
 var toggle = require('../../utils/toggle');
-require('views/behaviors/unread-items');
-require('views/behaviors/widgets');
-require('views/behaviors/highlight');
-require('views/behaviors/last-message-seen');
-require('views/behaviors/timeago');
-require('views/behaviors/tooltip');
+require('../behaviors/unread-items');
+require('../behaviors/widgets');
+require('../behaviors/highlight');
+require('../behaviors/last-message-seen');
+require('../behaviors/timeago');
+require('../behaviors/tooltip');
 
 
 module.exports = (function() {

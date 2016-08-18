@@ -2,14 +2,14 @@
 
 var Marionette = require('backbone.marionette');
 var modalRegion = require('../../components/modal-region');
-var ChatContainerView = require('views/chat/chatContainerView');
-var MobileLoginButton = require('views/mobile/mobileLoginButton');
+var ChatContainerView = require('../chat/chatContainerView');
+var MobileLoginButton = require('../mobile/mobileLoginButton');
 
 /* Decorators */
-var emojiDecorator = require('views/chat/decorators/emojiDecorator');
-var mobileDecorator = require('views/chat/decorators/mobileDecorator');
+var emojiDecorator = require('../chat/decorators/emojiDecorator');
+var mobileDecorator = require('../chat/decorators/mobileDecorator');
 
-require('views/behaviors/isomorphic');
+require('../behaviors/isomorphic');
 
 module.exports = Marionette.LayoutView.extend({
   template: false,

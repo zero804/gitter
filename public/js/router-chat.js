@@ -17,16 +17,16 @@ var perfTiming = require('./components/perf-timing');
 var itemCollections = require('./collections/instances/integrated-items');
 var chatCollection = require('./collections/instances/chats-cached');
 var troupeCollections = require('./collections/instances/troupes');
-var ChatToolbarInputLayout = require('views/layouts/chat-toolbar-input');
-var DropTargetView = require('views/app/dropTargetView');
+var ChatToolbarInputLayout = require('./views/layouts/chat-toolbar-input');
+var DropTargetView = require('./views/app/dropTargetView');
 
 /* Set the timezone cookie */
 require('./components/timezone-cookie');
 
 require('./components/statsc');
-require('views/widgets/preload');
+require('./views/widgets/preload');
 require('./components/dozy');
-require('template/helpers/all');
+require('./template/helpers/all');
 require('./components/eyeballs-room-sync');
 require('./components/bug-reporting');
 require('./components/focus-events');
@@ -289,8 +289,8 @@ onready(function() {
     },
 
     people: function() {
-      require.ensure(['views/modals/people-modal'], function(require) {
-        var PeopleModal = require('views/modals/people-modal');
+      require.ensure(['./views/modals/people-modal'], function(require) {
+        var PeopleModal = require('./views/modals/people-modal');
 
         appView.dialogRegion.show(new PeopleModal({
           rosterCollection: itemCollections.roster
@@ -299,28 +299,28 @@ onready(function() {
     },
 
     notifications: function() {
-      require.ensure(['views/modals/notification-settings-view'], function(require) {
-        var NotificationSettingsView = require('views/modals/notification-settings-view');
+      require.ensure(['./views/modals/notification-settings-view'], function(require) {
+        var NotificationSettingsView = require('./views/modals/notification-settings-view');
         appView.dialogRegion.show(new NotificationSettingsView({ model: new Backbone.Model() }));
       });
     },
 
     markdown: function() {
-      require.ensure(['views/modals/markdown-view'], function(require) {
-        var MarkdownView = require('views/modals/markdown-view');
+      require.ensure(['./views/modals/markdown-view'], function(require) {
+        var MarkdownView = require('./views/modals/markdown-view');
         appView.dialogRegion.show(new MarkdownView({}));
       });
     },
 
     keys: function() {
-      require.ensure(['views/modals/keyboard-view'], function(require) {
-        var KeyboardView = require('views/modals/keyboard-view');
+      require.ensure(['./views/modals/keyboard-view'], function(require) {
+        var KeyboardView = require('./views/modals/keyboard-view');
         appView.dialogRegion.show(new KeyboardView({}));
       });
     },
 
     addPeople: function() {
-      require.ensure(['views/app/addPeopleView', 'views/modals/upgrade-to-pro-view'], function(require) {
+      require.ensure(['./views/app/addPeopleView', 'views/modals/upgrade-to-pro-view'], function(require) {
         var room = context.troupe();
         var maxFreeMembers = clientEnv.maxFreeOrgRoomMembers;
         var isOverLimit = room.get('security') !== 'PUBLIC' &&
@@ -329,10 +329,10 @@ onready(function() {
           room.get('userCount') >= maxFreeMembers;
 
         if (isOverLimit) {
-          var GetProViewModal = require('views/modals/upgrade-to-pro-view');
+          var GetProViewModal = require('./views/modals/upgrade-to-pro-view');
           appView.dialogRegion.show(new GetProViewModal({}));
         } else {
-          var AddPeopleViewModal = require('views/app/addPeopleView');
+          var AddPeopleViewModal = require('./views/app/addPeopleView');
           appView.dialogRegion.show(new AddPeopleViewModal({}));
         }
       });
@@ -340,23 +340,23 @@ onready(function() {
     },
 
     settings: function() {
-      require.ensure(['views/modals/room-settings-view'], function(require) {
-        var RoomSettingsModal = require('views/modals/room-settings-view');
+      require.ensure(['./views/modals/room-settings-view'], function(require) {
+        var RoomSettingsModal = require('./views/modals/room-settings-view');
         appView.dialogRegion.show(new RoomSettingsModal({ model: context.troupe() }));
       });
     },
 
     editTags: function() {
-      require.ensure(['views/modals/edit-tags-view'], function(require) {
-        var EditTagsView = require('views/modals/edit-tags-view');
+      require.ensure(['./views/modals/edit-tags-view'], function(require) {
+        var EditTagsView = require('./views/modals/edit-tags-view');
         appView.dialogRegion.show(new EditTagsView({roomId: context.troupe().get('id')}));
       });
     },
 
     integrations: function() {
       if (context.isTroupeAdmin()) {
-        require.ensure(['views/modals/integration-settings-view'], function(require) {
-          var IntegrationSettingsModal = require('views/modals/integration-settings-view');
+        require.ensure(['./views/modals/integration-settings-view'], function(require) {
+          var IntegrationSettingsModal = require('./views/modals/integration-settings-view');
 
           appView.dialogRegion.show(new IntegrationSettingsModal({}));
         });
@@ -366,16 +366,16 @@ onready(function() {
     },
 
     share: function() {
-      require.ensure(['views/modals/share-view'], function(require) {
-        var shareView = require('views/modals/share-view');
+      require.ensure(['./views/modals/share-view'], function(require) {
+        var shareView = require('./views/modals/share-view');
 
         appView.dialogRegion.show(new shareView.Modal({}));
       });
     },
 
     delete: function() {
-      require.ensure(['views/modals/delete-room-view'], function(require) {
-        var DeleteModal = require('views/modals/delete-room-view');
+      require.ensure(['./views/modals/delete-room-view'], function(require) {
+        var DeleteModal = require('./views/modals/delete-room-view');
 
         appView.dialogRegion.show(new DeleteModal({}));
       });
