@@ -24,7 +24,7 @@ var TopicsCollection = Backbone.Collection.extend({
   getTopics() { return this.models.map((m) => m.toJSON()); }
 });
 
-describe.skip('<ForumContainer />', function(){
+describe('<ForumContainer />', function(){
 
   let wrapper;
   let catCollection;
