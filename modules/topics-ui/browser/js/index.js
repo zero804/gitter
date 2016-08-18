@@ -1,12 +1,11 @@
-"use strict";
 
-require('../less/index.less');
+import '../less/index.less';
 
-const Backbone = require('backbone');
-const React = require('react');
-const reactDOM = require('react-dom');
-const app = require('./app.jsx');
-const router = require('./routers/index');
+import Backbone from 'backbone';
+import React from 'react';
+import reactDOM from 'react-dom';
+import app from './app.jsx';
+import router from './routers/index';
 
 const App = React.createFactory(app);
 const appRoot = document.getElementById('app-root');

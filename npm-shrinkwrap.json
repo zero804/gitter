@@ -95,7 +95,7 @@
           "dependencies": {
             "inherits": {
               "version": "2.0.1",
-              "from": "inherits@>=2.0.1 <2.1.0",
+              "from": "inherits@2.0.1",
               "resolved": "http://beta-internal:4873/inherits/-/inherits-2.0.1.tgz"
             },
             "setprototypeof": {
@@ -169,6 +169,11 @@
           }
         }
       }
+    },
+    "classnames": {
+      "version": "2.2.5",
+      "from": "classnames@>=2.2.5 <3.0.0",
+      "resolved": "http://beta-internal:4873/classnames/-/classnames-2.2.5.tgz"
     },
     "cld": {
       "version": "2.4.6",
@@ -279,7 +284,7 @@
                 },
                 "minimatch": {
                   "version": "3.0.3",
-                  "from": "minimatch@>=2.0.0 <3.0.0||>=3.0.0 <4.0.0",
+                  "from": "minimatch@>=3.0.2 <4.0.0",
                   "resolved": "http://beta-internal:4873/minimatch/-/minimatch-3.0.3.tgz",
                   "dependencies": {
                     "brace-expansion": {
@@ -385,7 +390,7 @@
       "dependencies": {
         "redis": {
           "version": "2.6.2",
-          "from": "redis@latest",
+          "from": "redis@>=2.1.0 <3.0.0",
           "resolved": "http://beta-internal:4873/redis/-/redis-2.6.2.tgz",
           "dependencies": {
             "double-ended-queue": {
@@ -1001,7 +1006,7 @@
                 "minimist": {
                   "version": "0.0.8",
                   "from": "minimist@0.0.8",
-                  "resolved": "http://beta-internal:4873/minimist/-/minimist-0.0.8.tgz"
+                  "resolved": "https://registry.npmjs.org/minimist/-/minimist-0.0.8.tgz"
                 }
               }
             },
@@ -1233,7 +1238,7 @@
         "rimraf": {
           "version": "2.2.8",
           "from": "rimraf@>=2.2.0 <2.3.0",
-          "resolved": "http://beta-internal:4873/rimraf/-/rimraf-2.2.8.tgz"
+          "resolved": "https://registry.npmjs.org/rimraf/-/rimraf-2.2.8.tgz"
         }
       }
     },
@@ -1250,6 +1255,7 @@
     "gitter-env": {
       "version": "0.26.0",
       "from": "gitter-env@>=0.26.0 <0.27.0",
+      "resolved": "http://beta-internal:4873/gitter-env/-/gitter-env-0.26.0.tgz",
       "dependencies": {
         "async": {
           "version": "0.8.0",
@@ -1977,7 +1983,7 @@
       "dependencies": {
         "redis": {
           "version": "2.6.2",
-          "from": "redis@latest",
+          "from": "redis@>=2.1.0 <3.0.0",
           "resolved": "http://beta-internal:4873/redis/-/redis-2.6.2.tgz",
           "dependencies": {
             "double-ended-queue": {
@@ -2388,6 +2394,11 @@
       "from": "shared",
       "resolved": "file:shared"
     },
+    "gitter-web-slugify": {
+      "version": "1.0.0",
+      "from": "modules/slugify",
+      "resolved": "file:modules/slugify"
+    },
     "gitter-web-split-tests": {
       "version": "1.0.0",
       "from": "modules/split-tests",
@@ -2398,14 +2409,29 @@
       "from": "modules/suggestions",
       "resolved": "file:modules/suggestions"
     },
+    "gitter-web-text-processor": {
+      "version": "1.0.0",
+      "from": "modules/text-processor",
+      "resolved": "file:modules/text-processor"
+    },
+    "gitter-web-topics": {
+      "version": "1.0.0",
+      "from": "modules/topics",
+      "resolved": "file:modules/topics"
+    },
     "gitter-web-topics-ui": {
       "version": "1.0.0",
       "from": "modules/topics-ui",
       "resolved": "file:modules/topics-ui",
       "dependencies": {
+        "backbone": {
+          "version": "1.2.3",
+          "from": "backbone@1.2.3",
+          "resolved": "http://beta-internal:4873/backbone/-/backbone-1.2.3.tgz"
+        },
         "lodash": {
           "version": "4.15.0",
-          "from": "lodash@>=4.14.0 <5.0.0",
+          "from": "lodash@>=4.15.0 <5.0.0",
           "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.15.0.tgz"
         }
       }
@@ -3009,7 +3035,7 @@
             "minimist": {
               "version": "0.0.8",
               "from": "minimist@0.0.8",
-              "resolved": "http://beta-internal:4873/minimist/-/minimist-0.0.8.tgz"
+              "resolved": "https://registry.npmjs.org/minimist/-/minimist-0.0.8.tgz"
             }
           }
         },
@@ -3069,7 +3095,7 @@
         },
         "parseurl": {
           "version": "1.3.1",
-          "from": "parseurl@>=1.3.1 <1.4.0",
+          "from": "parseurl@>=1.3.0 <1.4.0",
           "resolved": "http://beta-internal:4873/parseurl/-/parseurl-1.3.1.tgz"
         },
         "vary": {
@@ -3648,7 +3674,7 @@
       "dependencies": {
         "passport-oauth2": {
           "version": "1.3.0",
-          "from": "passport-oauth2@>=1.1.2 <2.0.0",
+          "from": "passport-oauth2@>=1.0.0 <2.0.0",
           "resolved": "http://beta-internal:4873/passport-oauth2/-/passport-oauth2-1.3.0.tgz",
           "dependencies": {
             "passport-strategy": {
@@ -3701,7 +3727,7 @@
       "dependencies": {
         "passport-oauth2": {
           "version": "1.3.0",
-          "from": "passport-oauth2@>=1.1.2 <2.0.0",
+          "from": "passport-oauth2@>=1.0.0 <2.0.0",
           "resolved": "http://beta-internal:4873/passport-oauth2/-/passport-oauth2-1.3.0.tgz",
           "dependencies": {
             "passport-strategy": {
@@ -4459,7 +4485,7 @@
         },
         "parseurl": {
           "version": "1.3.1",
-          "from": "parseurl@>=1.3.1 <1.4.0",
+          "from": "parseurl@>=1.3.0 <1.4.0",
           "resolved": "http://beta-internal:4873/parseurl/-/parseurl-1.3.1.tgz"
         }
       }
@@ -4478,6 +4504,37 @@
               "version": "0.6.2",
               "from": "ms@0.6.2",
               "resolved": "http://beta-internal:4873/ms/-/ms-0.6.2.tgz"
+            }
+          }
+        }
+      }
+    },
+    "slug": {
+      "version": "0.9.1",
+      "from": "slug@>=0.9.1 <0.10.0",
+      "resolved": "http://beta-internal:4873/slug/-/slug-0.9.1.tgz",
+      "dependencies": {
+        "unicode": {
+          "version": "0.6.1",
+          "from": "unicode@>=0.3.1",
+          "resolved": "http://beta-internal:4873/unicode/-/unicode-0.6.1.tgz",
+          "dependencies": {
+            "bufferstream": {
+              "version": "0.6.2",
+              "from": "bufferstream@>=0.6.2",
+              "resolved": "http://beta-internal:4873/bufferstream/-/bufferstream-0.6.2.tgz",
+              "dependencies": {
+                "bufferjs": {
+                  "version": "3.0.1",
+                  "from": "bufferjs@>=2.0.0",
+                  "resolved": "http://beta-internal:4873/bufferjs/-/bufferjs-3.0.1.tgz"
+                },
+                "buffertools": {
+                  "version": "2.1.4",
+                  "from": "buffertools@>=1.0.3",
+                  "resolved": "http://beta-internal:4873/buffertools/-/buffertools-2.1.4.tgz"
+                }
+              }
             }
           }
         }
@@ -5491,7 +5548,7 @@
                     },
                     "semver": {
                       "version": "5.3.0",
-                      "from": "semver@>=2.0.0 <3.0.0||>=3.0.0 <4.0.0||>=4.0.0 <5.0.0||>=5.0.0 <6.0.0",
+                      "from": "semver@>=5.1.0 <6.0.0",
                       "resolved": "http://beta-internal:4873/semver/-/semver-5.3.0.tgz"
                     },
                     "validate-npm-package-license": {
@@ -5506,7 +5563,7 @@
                           "dependencies": {
                             "spdx-license-ids": {
                               "version": "1.2.2",
-                              "from": "spdx-license-ids@>=1.0.2 <2.0.0",
+                              "from": "spdx-license-ids@>=1.0.0 <2.0.0",
                               "resolved": "http://beta-internal:4873/spdx-license-ids/-/spdx-license-ids-1.2.2.tgz"
                             }
                           }
@@ -5523,7 +5580,7 @@
                             },
                             "spdx-license-ids": {
                               "version": "1.2.2",
-                              "from": "spdx-license-ids@>=1.0.2 <2.0.0",
+                              "from": "spdx-license-ids@>=1.0.0 <2.0.0",
                               "resolved": "http://beta-internal:4873/spdx-license-ids/-/spdx-license-ids-1.2.2.tgz"
                             }
                           }
