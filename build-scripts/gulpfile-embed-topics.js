@@ -8,7 +8,7 @@ var restoreTimestamps = require('./gulp-restore-timestamps');
  */
 
 var TOPIC_RELOCATIONS = {
-  babel: 'output/app/modules/topics-ui/containers-compiled/',
+  babel: 'output/app/modules/topics-ui/shared/',
   assets: 'output/assets/topics/'
 }
 

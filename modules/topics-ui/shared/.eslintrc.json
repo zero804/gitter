@@ -18,8 +18,8 @@
   },
   "rules": {
     "node/no-unpublished-import": "error",
-    "import/named": "off",
-    "import/default": "off",
+    "import/named": "error",
+    "import/default": "error",
     "node/no-unsupported-features": [
       "error",
       {
