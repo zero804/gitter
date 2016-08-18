@@ -30,7 +30,7 @@ gulp.task('topics:compile:babel', function() {
     .pipe(gulp.dest(getOutputPath('babel')));
 });
 
-gulp.task('topics:test', [/*'topics:test:server', */'topics:test:unit']);
+gulp.task('topics:test', [/*'topics:test:server', 'topics:test:unit'*/]);
 
 gulp.task('topics:test:server', function() {
   var executable = path.resolve(__dirname, './test/fixtures/runner-node.js');
