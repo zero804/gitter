@@ -1,8 +1,8 @@
 "use strict";
 
 var path = require('path');
-var ExtractTextPlugin = require("extract-text-webpack-plugin");
-var getPostcssStack = require('gitter-styleguide/postcss-stack');
+var ExtractTextPlugin = require("extract-text-webpack-plugin");//eslint-disable-line node/no-unpublished-require
+var getPostcssStack = require('gitter-styleguide/postcss-stack');//eslint-disable-line node/no-unpublished-require
 
 var config = {
   devtool: 'source-map',
@@ -18,6 +18,9 @@ var config = {
     devtoolFallbackModuleFilenameTemplate: "[resource-path]?[hash]"
   },
   module: {
+    noParse: [
+      /\/sinon\.js/,
+    ],
     preLoaders: [
       {
         test: /.css$/,

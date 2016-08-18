@@ -15,7 +15,7 @@ export default React.createClass({
     const compiledClass = classNames('container', className);
 
     return (
-      <div className={compiledClass} >{this.props.children}</div>
+      <section className={compiledClass} >{this.props.children}</section>
     );
   }
 })
