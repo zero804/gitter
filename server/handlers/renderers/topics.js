@@ -7,13 +7,15 @@ var forumCategoryStore = require('gitter-web-topics-ui/server/stores/forum-categ
 var forumTagStore = require('gitter-web-topics-ui/server/stores/forum-tag-store');
 var navConstants = require('gitter-web-topics-ui/shared/constants/navigation');
 
-function renderForum(req, res, next) {
+function renderForum(req, res, next, options) {
 
   if (!req.fflip || !req.fflip.has('topics')) {
     return next(new StatusError(404));
   }
 
-  forumService.findByName(req.params.roomPart1)
+  options = (options || {});
+
+  forumService.findByName(req.params.groupName)
     .then(function(forum){
 
       var categoryName = (req.params.categoryName || navConstants.DEFAULT_CATEGORY_NAME);
@@ -28,11 +30,13 @@ function renderForum(req, res, next) {
         componentData: {
           forum: forum,
 
-          groupName: req.params.roomPart1,
+          groupName: req.params.groupName,
           categoryName: categoryName,
           filterName: filterName,
           tagName: tagName,
           sortName: sortName,
+
+          createTopic: options.createTopic,
 
           categoryStore: forumCategoryStore(forum.categories, categoryName),
           tagStore: forumTagStore(forum.tags, tagName),

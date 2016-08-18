@@ -21,6 +21,7 @@ export default React.createClass({
     const { router } = this.props;
     switch(router.get('route')) {
       case navConstatnts.FORUM_ROUTE: return this.getForumState();
+      case navConstants.CREATE_TOPIC_ROUTE: return this.getCreateTopicState();
     }
   },
 
@@ -28,6 +29,7 @@ export default React.createClass({
     const { route } = this.state;
     switch(route) {
       case navConstatnts.FORUM_ROUTE: return <ForumContainer {...this.state} />
+      case navConstants.CREATE_TOPIC_ROUTE: return <ForumContainer {...this.state} />;
     }
   },
 
@@ -49,6 +51,13 @@ export default React.createClass({
       sortName: router.get('sortName'),
       categoryStore: new CategoryStore(categoryStore.models, { router: router }),
       tagStore: new TagStore(tagStore.models, { router: router }),
+    });
+  },
+
+  getCreateTopicState(){
+    const { router } = this.props;
+    return Object.assign(this.getForumState(), {
+      createTopic: router.get('createTopic'),
     });
   }
 
