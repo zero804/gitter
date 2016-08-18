@@ -5,7 +5,31 @@
   padding:    2rem 4rem;
 }
 
+@decal-height:       1rem;
+@panel-border-width: 1rem;
+
+.m-panel--category-decal(){
+  content:          '';
+  display:          block;
+  position:         absolute;
+  top:              0;
+  left:             -@panel-border-width;
+  width:            ~"calc(" 100% ~"+" @panel-border-width ~")";
+  height:           @decal-height;
+  background-color: @topic-table-bg;
+}
+
 .panel--category {
-  border-left:      1rem solid desaturate(@jaffa, 10%);
+  position:         relative;
+  padding:          (@decal-height + .5rem) 4rem 2rem;
+  border-left:      @panel-border-width solid desaturate(@jaffa, 10%);
   background-color: lighten(@jaffa, 10%);
+
+  &:before { .m-panel--category-decal(); }
+}
+
+.panel--table-control {
+  padding-top:      .5rem;
+  border-left:      @panel-border-width solid desaturate(@caribbean, 10%);
+  background-color: lighten(@caribbean, 10%);
 }

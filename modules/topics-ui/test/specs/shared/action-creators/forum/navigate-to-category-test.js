@@ -1,11 +1,11 @@
 import assert from 'assert';
-import navigateToCategory from 'gitter-web-topics-ui/shared/action-creators/forum/navigate-to-category';
-import * as navConstants from 'gitter-web-topics-ui/shared/constants/navigation';
+import navigateToCategory from '../../../../../shared/action-creators/forum/navigate-to-category';
+import * as forumCatConstants from '../../../../../shared/constants/forum-categories';
 
 describe('navigateToCategory', () => {
 
   it('should provide the right event type', () => {
-    assert.equal(navigateToCategory('all').type, navConstants.NAVIGATE_TO);
+    assert.equal(navigateToCategory('all').type, forumCatConstants.NAVIGATE_TO_CATEGORY);
   });
 
   it('should provde the right route value', () => {

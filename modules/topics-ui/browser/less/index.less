@@ -1,7 +1,24 @@
 @import "~normalize.css";
+@import "./colors";
 
-html { font-size: 62.5%; }
-body { font-size: 1.6rem; }
+.m-cover-screen() { height: 100%; width: 100%; }
+.m-grad-background() {
+  background-position:   0 0;
+  background-repeat:     no-repeat;
+  background-attachment: fixed;
+  background-image: radial-gradient(
+    150rem at 0 -15rem,
+    @topic-bg-left,
+    @topic-bg-right
+  );
+}
+
+html {
+  .m-cover-screen();
+  .m-grad-background();
+  font-size: 62.5%;
+}
+body { .m-cover-screen(); font-size: 1.6rem; }
 
 //Generic
 @import "./components/container";
@@ -10,3 +27,6 @@ body { font-size: 1.6rem; }
 //Forum specific
 @import "./components/forum/category-list";
 @import "./components/forum/category-list-item";
+@import "./components/forum/table-control";
+@import "./components/forum/table-control-button";
+@import "./components/forum/table-control-select";

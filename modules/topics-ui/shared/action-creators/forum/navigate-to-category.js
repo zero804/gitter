@@ -1,5 +1,5 @@
 
-import * as navConstants from '../../constants/navigation';
+import * as forumCatConstants from '../../constants/forum-categories';
 
 export default function navigateToCategory(category) {
 
@@ -8,12 +8,7 @@ export default function navigateToCategory(category) {
   }
 
   return {
-    /*
-     TODO -->
-     Move this into a specific event,
-     the NAVIGATE_TO event is too generic
-    */
-    type: navConstants.NAVIGATE_TO,
+    type: forumCatConstants.NAVIGATE_TO_CATEGORY,
     route: 'forum',
     category: category
   };
