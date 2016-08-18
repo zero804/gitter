@@ -2,7 +2,7 @@ import assert from 'assert';
 import sinon from 'sinon';
 import Backbone from 'backbone';
 import CategoryStore from '../../../../browser/js/stores/forum-category-store';
-var forumCatConstants = require('../../../../shared/constants/forum-categories');
+import * as forumCatConstants from '../../../../shared/constants/forum-categories';
 
 describe('ForumCategoryStore', function(){
 
@@ -28,6 +28,10 @@ describe('ForumCategoryStore', function(){
     categoryStore.on(forumCatConstants.UPDATE_ACTIVE_CATEGORY, handle)
     router.set('categoryName', 'test-1');
     assert.equal(handle.callCount, 1);
+  });
+
+  it('should return the active category name from getActiveCategoryName()', () => {
+    assert.equal(categoryStore.getActiveCategoryName(), 'all');
   });
 
 });

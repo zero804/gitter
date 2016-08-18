@@ -17,9 +17,11 @@ export default React.createClass({
     const { categories } = this.props;
 
     return (
-      <Container>
+      <Container className="container--category">
         <Panel className="panel--category">
-          <ul className="category-list">{ categories.map(this.getChildCategory) }</ul>
+          <nav>
+            <ul className="category-list">{ categories.map(this.getChildCategory) }</ul>
+          </nav>
         </Panel>
       </Container>
     );

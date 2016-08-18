@@ -1,7 +1,9 @@
 import React from 'react';
 import ForumContainer from '../../shared/containers/ForumContainer.jsx';
 import CategoryStore from './stores/forum-category-store';
+import TagStore from './stores/forum-tag-store';
 import * as navConstatnts from '../../shared/constants/navigation';
+
 
 export default React.createClass({
 
@@ -31,15 +33,22 @@ export default React.createClass({
 
   getDefaultState(){
     const { router } = this.props;
-    return { route: router.get('route') };
+    return { route: router.get('route'), router: router };
   },
 
   getForumState(){
     const categoryStore = (window.context.categoryStore || {});
+    const tagStore = (window.context.tagStore || {});
     const { router } = this.props;
+
     return Object.assign(this.getDefaultState(), {
       groupName: router.get('groupName'),
+      categoryName: router.get('categoryName'),
+      filterName: router.get('filterName'),
+      tagName: router.get('tagName'),
+      sortName: router.get('sortName'),
       categoryStore: new CategoryStore(categoryStore.models, { router: router }),
+      tagStore: new TagStore(tagStore.models, { router: router }),
     });
   }
 

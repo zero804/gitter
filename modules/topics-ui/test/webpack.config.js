@@ -15,9 +15,10 @@ var config = _.extend({}, webpackConfig, {
   },
   resolve: {
     alias: {
-      mocha: path.resolve(__dirname, '../node_modules/mocha/mocha.js'),
-      mochaCss: path.resolve(__dirname, '../node_modules/mocha/mocha.css'),
-      jquery: path.resolve(__dirname, '../node_modules/jquery/dist/jquery.js'),
+      mocha: require.resolve('mocha/mocha.js'),
+      mochaCss: require.resolve('mocha/mocha.css'),
+      jquery: require.resolve('jquery/dist/jquery.js'),
+      sinon: require.resolve('sinon/pkg/sinon.js'),
     }
   }
 });
