@@ -564,8 +564,10 @@ function joinRoom(room, user, options) {
 
       return roomMembershipService.addRoomMember(room._id, user._id, flags, room.groupId);
     })
-    .then(function() {
-      sendJoinStats(user, room, options.tracking);
+    .then(function(wasAdded) {
+      if(wasAdded) {
+        sendJoinStats(user, room, options.tracking);
+      }
     });
 }
 
