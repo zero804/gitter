@@ -4,7 +4,6 @@ var _ = require('underscore');
 var Backbone = require('backbone');
 var urlJoin = require('url-join');
 var stepConstants = require('./step-constants');
-//var slugAvailabilityStatusConstants = require('./slug-availability-status-constants');
 var peopleToInviteStatusConstants = require('./people-to-invite-status-constants');
 
 var PeopleToInviteModel = Backbone.Model.extend({
@@ -12,11 +11,6 @@ var PeopleToInviteModel = Backbone.Model.extend({
     inviteStatus: peopleToInviteStatusConstants.PENDING
   }
 });
-
-var PeopleToInviteCollection = Backbone.Collection.extend({
-  model: PeopleToInviteModel
-});
-
 
 var CommunityCreateModel = Backbone.Model.extend({
   defaults: {
@@ -37,7 +31,10 @@ var CommunityCreateModel = Backbone.Model.extend({
 
   initialize: function() {
     // user models
-    this.peopleToInvite = new PeopleToInviteCollection();
+    this.peopleToInvite = new Backbone.Collection([], {
+      model: PeopleToInviteModel
+    });
+
     // { emailAddress }
     this.emailsToInvite = new Backbone.Collection();
   },

@@ -4,12 +4,12 @@ var _ = require('underscore');
 var Promise = require('bluebird');
 var toggleClass = require('utils/toggle-class');
 var appEvents = require('utils/appevents');
-var VirtualMultipleCollection = require('../virtual-multiple-collection');
 
 var stepConstants = require('../step-constants');
 var template = require('./community-creation-overview-view.hbs');
 var CommunityCreateBaseStepView = require('../shared/community-creation-base-step-view');
 var CommunityCreationPeopleListView = require('../shared/community-creation-people-list-view');
+var apiClient = require('../../../components/apiClient');
 
 require('gitter-styleguide/css/components/headings.css');
 require('gitter-styleguide/css/components/buttons.css');
@@ -89,50 +89,81 @@ module.exports = CommunityCreateBaseStepView.extend({
       linkPath = githubProjectModel.get('uri');
     }
 
-    var creatingGroupPromise = new Promise(function(resolve, reject) {
-      this.groupsCollection.create({
-        name: communityCreateModel.get('communityName'),
-        uri: communityCreateModel.get('communitySlug'),
-        type: 'org',
-        // This one is for the left-menu
-        linkPath: linkPath,
-        // This is for POSTing to the API
-        security: {
-          type: type,
-          linkPath: linkPath
-        },
-        invites: [].concat(communityCreateModel.peopleToInvite.toJSON(), communityCreateModel.emailsToInvite.toJSON()),
-        addBadge: communityCreateModel.get('allowBadger'),
-        // TODO: ADD UI option
-        allowTweeting: true
-      }, {
-        wait: true,
-        success: function(model, response) {
-          resolve(response);
-        },
-        error: function(model, response) {
-          reject(response);
-        }
+    var groupData = this.getCreateData();
+
+    return apiClient.post('/v1/groups', groupData)
+      .then(function(results) {
+        var defaultRoomName = results && results.defaultRoom && results.defaultRoom.name;
+        var defaultRoomUri = results && results.defaultRoom && results.defaultRoom.uri;
+
+        // Hide create community
+        communityCreateModel.set('active', false);
+
+        // Move to the default room
+        appEvents.trigger('navigation', '/' + defaultRoomUri, 'chat', defaultRoomName);
+        // Select the new community in the new left menu
+        appEvents.trigger('left-menu-menu-bar:activate', {
+          state: 'org',
+          groupId: results.id
+        });
       });
-    }.bind(this));
-
-    creatingGroupPromise.then(function(results) {
-      var defaultRoomName = results && results.defaultRoom && results.defaultRoom.name;
-      var defaultRoomUri = results && results.defaultRoom && results.defaultRoom.uri;
-
-      // Hide create community
-      communityCreateModel.set('active', false);
-
-      // Move to the default room
-      appEvents.trigger('navigation', '/' + defaultRoomUri, 'chat', defaultRoomName);
-      // Select the new community in the new left menu
-      appEvents.trigger('left-menu-menu-bar:activate', {
-        state: 'org',
-        groupId: results.id
-      });
-    });
 
   },
+
+  getSecurityData: function() {
+    var communityCreateModel = this.communityCreateModel;
+
+    var type = null;
+    var linkPath = null;
+
+    var githubOrgId = communityCreateModel.get('githubOrgId');
+    // Org based?
+    if (githubOrgId) {
+      var selectedOrg = this.orgCollection.get(githubOrgId);
+      return {
+        type: 'GH_ORG',
+        linkPath: selectedOrg.get('name')
+      }
+    }
+
+    // Repo based?
+    var githubRepoId = communityCreateModel.get('githubRepoId');
+    if (githubRepoId) {
+      var selectedRepo = this.repoCollection.get(githubRepoId);
+      return {
+        type: 'GH_REPO',
+        linkPath: selectedRepo.get('uri')
+      }
+    }
+  },
+
+  getInviteData: function() {
+    var communityCreateModel = this.communityCreateModel;
+
+    return [].concat(communityCreateModel.peopleToInvite.toJSON(), communityCreateModel.emailsToInvite.toJSON());
+  },
+
+  getCreateData: function() {
+    var communityCreateModel = this.communityCreateModel;
+
+    var security = this.getSecurityData();
+    var invites = this.getInviteData();
+
+    return {
+      name: communityCreateModel.get('communityName'),
+      uri: communityCreateModel.get('communitySlug'),
+      // type: 'org',
+      // This one is for the left-menu
+      // linkPath: linkPath,
+      // This is for POSTing to the API
+      security: security,
+      invites: invites,
+      addBadge: communityCreateModel.get('allowBadger'),
+      // TODO: ADD UI option
+      allowTweeting: true
+    };
+  },
+
   onStepBack: function() {
     // Only go back to confirmation if there was trouble initially
     if(this.troubleInviteCollection.length > 0) {
