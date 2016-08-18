@@ -1,9 +1,9 @@
 "use strict";
 
-var constants = require('../../constants/{{constantFile}}');
+import { {{constantCase name}} } from '../../constants/{{constantFile}}';
 
 module.exports = function {{camelCase name}}(){
   return {
-    type: constants.{{constantCase name}}
+    type: constantCase name}}
   };
 };
