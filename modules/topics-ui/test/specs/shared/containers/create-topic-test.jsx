@@ -24,4 +24,11 @@ describe.only('<CreateTopicContainer />', () => {
     equal(handle.callCount, 1);
   });
 
+ it('should dispatch a title update event when the title updates', () => {
+    const handle = spy();
+    subscribe(createConst.BODY_UPDATE, handle);
+    wrapper.find('CreateTopicModal').prop('onBodyChange')('This is some body copy');
+    equal(handle.callCount, 1);
+  });
+
 });
