@@ -2,7 +2,8 @@ import React from 'react';
 import ForumContainer from '../../shared/containers/ForumContainer.jsx';
 import CategoryStore from './stores/forum-category-store';
 import TagStore from './stores/forum-tag-store';
-import * as navConstatnts from '../../shared/constants/navigation';
+import TopicsStore from './stores/topics-store';
+import * as navConstants from '../../shared/constants/navigation';
 
 
 export default React.createClass({
@@ -20,7 +21,7 @@ export default React.createClass({
   getInitialState(){
     const { router } = this.props;
     switch(router.get('route')) {
-      case navConstatnts.FORUM_ROUTE: return this.getForumState();
+      case navConstants.FORUM_ROUTE: return this.getForumState();
       case navConstants.CREATE_TOPIC_ROUTE: return this.getCreateTopicState();
     }
   },
@@ -28,7 +29,7 @@ export default React.createClass({
   render(){
     const { route } = this.state;
     switch(route) {
-      case navConstatnts.FORUM_ROUTE: return <ForumContainer {...this.state} />
+      case navConstants.FORUM_ROUTE: return <ForumContainer {...this.state} />
       case navConstants.CREATE_TOPIC_ROUTE: return <ForumContainer {...this.state} />;
     }
   },
@@ -41,6 +42,7 @@ export default React.createClass({
   getForumState(){
     const categoryStore = (window.context.categoryStore || {});
     const tagStore = (window.context.tagStore || {});
+    const topicsStore = (window.context.topicsStore || {});
     const { router } = this.props;
 
     return Object.assign(this.getDefaultState(), {
@@ -51,6 +53,7 @@ export default React.createClass({
       sortName: router.get('sortName'),
       categoryStore: new CategoryStore(categoryStore.models, { router: router }),
       tagStore: new TagStore(tagStore.models, { router: router }),
+      topicsStore: new TopicsStore(topicsStore.models, { router: router })
     });
   },
 
