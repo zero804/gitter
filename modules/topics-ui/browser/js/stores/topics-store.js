@@ -1,7 +1,5 @@
 import { Model, Collection } from 'backbone';
 
-var Backbone = require('backbone');
-
 var TopicModel = Model.extend({
   defaults: {}
 });
