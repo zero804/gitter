@@ -4,9 +4,8 @@ import { dispatch } from '../dispatcher/index';
 import navigateToCategory from '../action-creators/forum/navigate-to-category';
 import _ from 'lodash';
 
-import CategoryList from '../shared/components/forum/category-list.jsx';
-import ForumTableControl from '../shared/components/forum/table-control.jsx';
-import CreateTopicModal from '../shared/components/topic/create-topic-modal.jsx';
+import ForumTableControl from './components/forum/table-control.jsx';
+import CreateTopicModal from './components/topic/create-topic-modal.jsx';
 
 import navigateToFilter from '../action-creators/forum/navigate-to-filter';
 import navigateToSort from '../action-creators/forum/navigate-to-sort';

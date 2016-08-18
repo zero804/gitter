@@ -1,5 +1,3 @@
-"use strict";
-
 import React, {PropTypes} from 'react';
 import Modal from '../modal.jsx';
 import Input from '../forms/input.jsx';

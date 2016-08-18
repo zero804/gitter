@@ -1,20 +1,3 @@
-
-<<<<<<< HEAD:modules/topics-ui/test/specs/containers/forum-container-test.jsx
-var assert = require('assert');
-var Backbone = require('backbone');
-var React = require('react');
-var sinon = require('sinon');
-var { shallow } = require('enzyme').shallow;
-var ForumContainer = require('../../../containers/ForumContainer.jsx');
-var { subscribe } = require('../../../browser/js/dispatcher');
-
-var ForumContainer = require('../../../containers/ForumContainer.jsx');
-
-var forumCatConstants = require('../../../browser/js/constants/forum-categories');
-var forumFilterConstants = require('../../../browser/js/constants/forum-filters');
-var forumSortConstants = require('../../../browser/js/constants/forum-sorts');
-var forumTagConstants = require('../../../browser/js/constants/forum-tags');
-=======
 import assert from 'assert';
 import Backbone from 'backbone';
 import React from 'react';
@@ -26,7 +9,6 @@ import * as forumCatConstants from '../../../../shared/constants/forum-categorie
 import * as forumFilterConstants from '../../../../shared/constants/forum-filters';
 import * as forumSortConstants from '../../../../shared/constants/forum-sorts';
 import * as forumTagConstants from '../../../../shared/constants/forum-tags';
->>>>>>> feature/forum-table-controls:modules/topics-ui/test/specs/shared/containers/forum-container-test.jsx
 
 //TODO move these into mock objects
 var CategoryCollection = Backbone.Collection.extend({
@@ -36,7 +18,7 @@ var CategoryCollection = Backbone.Collection.extend({
 });
 
 var TagCollection = Backbone.Collection.extend({
-  getTags(){ return this.models.map((m) => m.toJSON() ); }
+  getTags(){ return this.models.map((m) => m.toJSON()); }
 });
 
 describe.skip('<ForumContainer />', function(){
