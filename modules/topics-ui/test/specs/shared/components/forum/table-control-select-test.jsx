@@ -1,10 +1,8 @@
-"use strict";
-
 import assert from 'assert';
-import React from  'react';
+import React from 'react';
 import sinon from 'sinon';
 import { shallow } from 'enzyme';
-import TableControlSelect from '../../../../../shared/components/forum/table-control-select.jsx';
+import TableControlSelect from '../../../../../shared/containers/components/forum/table-control-select.jsx';
 
 describe('<TableControlSelect/>', () => {
 

@@ -1,16 +1,12 @@
-"use strict"
 
-var Backbone = require('backbone');
-var {parse, stringify} = require('qs');
-var { subscribe } = require('../dispatcher');
-
-var navConstants = require('../constants/navigation');
-var forumCatConstants = require('../constants/forum-categories');
-var forumFilterConstants = require('../constants/forum-filters');
-var forumTagConstants = require('../constants/forum-tags');
-var forumSortConstants = require('../constants/forum-sorts');
-
-var _super = Backbone.Router.prototype;
+import { parse, stringify } from 'qs';
+import Backbone from 'backbone';
+import { subscribe } from '../../../shared/dispatcher';
+import * as navConstants from '../../../shared/constants/navigation';
+import * as forumCatConstants from '../../../shared/constants/forum-categories';
+import * as forumFilterConstants from '../../../shared/constants/forum-filters';
+import * as forumTagConstants from '../../../shared/constants/forum-tags';
+import * as forumSortConstants from '../../../shared/constants/forum-sorts';
 
 var RouteModel = Backbone.Model.extend({
   //Do we need to use the constructor to get the default values out of the window.context
@@ -19,8 +15,9 @@ var RouteModel = Backbone.Model.extend({
 
 var Router = Backbone.Router.extend({
 
-  constructor: function(){
+  constructor: function() {
     this.model = new RouteModel();
+
     subscribe(forumCatConstants.NAVIGATE_TO_CATEGORY, this.updateForumCategory, this);
     subscribe(forumFilterConstants.NAVIGATE_TO_FILTER, this.updateForumFilter, this);
     subscribe(forumTagConstants.NAVIGATE_TO_TAG, this.updateForumTag, this);
@@ -29,7 +26,7 @@ var Router = Backbone.Router.extend({
     this.listenTo(this.model, 'change:filterName', this.onFilterUpdate, this);
     this.listenTo(this.model, 'change:sortName', this.onSortUpdate, this);
 
-    _super.constructor.call(this, ...arguments);
+    Backbone.Router.prototype.constructor.call(this, ...arguments);
   },
 
   routes: {
@@ -68,12 +65,12 @@ var Router = Backbone.Router.extend({
     this.navigate(url, { trigger: true, replace: true });
   },
 
-  onFilterUpdate(){
-    this.model.trigger(forumFilterConstants.UPDATE_ACTIVE_FILTER);
+  onFilterUpdate(moidel, val){
+    this.model.trigger(forumFilterConstants.UPDATE_ACTIVE_FILTER, { filter: val });
   },
 
-  onSortUpdate(){
-    this.model.trigger(forumSortConstants.UPDATE_ACTIVE_SORT);
+  onSortUpdate(model, val){
+    this.model.trigger(forumSortConstants.UPDATE_ACTIVE_SORT, { sort: val });
   },
 
   buildForumUrl(categoryName, filterName, tagName, sortName){
@@ -92,7 +89,7 @@ var Router = Backbone.Router.extend({
     if(sortName === navConstants.DEFAULT_SORT_NAME) { sortName = undefined; }
 
     //Base URL
-    let url = (categoryName === navConstants.DEFULT_CATEGORY_NAME) ?
+    let url = (categoryName === navConstants.DEFAULT_CATEGORY_NAME) ?
       `/${groupName}/topics/` :
       `${groupName}/topics/categories/${categoryName}/`;
 
@@ -113,4 +110,4 @@ var Router = Backbone.Router.extend({
 
 var router = new Router();
 
-module.exports = router.model;
+export default router.model;
