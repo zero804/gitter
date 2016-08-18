@@ -1,15 +1,12 @@
-"use strict";
-
-var assert = require('assert');
-var Backbone = require('backbone');
-var router = require('../../../../browser/js/routers/index');
-var sinon = require('sinon');
-var {dispatch} = require('../../../../browser/js/dispatcher');
-
-var forumCatConstants = require('../../../../browser/js/constants/forum-categories');
-var forumFilterConstants = require('../../../../browser/js/constants/forum-filters');
-var forumTagConstants = require('../../../../browser/js/constants/forum-tags');
-var forumSortConstants = require('../../../../browser/js/constants/forum-sorts');
+import assert from 'assert';
+import Backbone from 'backbone';
+import router from '../../../../browser/js/routers/index';
+import sinon from 'sinon';
+import { dispatch } from '../../../../shared/dispatcher';
+import * as forumCatConstants from '../../../../shared/constants/forum-categories';
+import * as forumFilterConstants from '../../../../shared/constants/forum-filters';
+import * as forumTagConstants from '../../../../shared/constants/forum-tags';
+import * as forumSortConstants from '../../../../shared/constants/forum-sorts';
 
 describe('Router', function(){
 
@@ -91,5 +88,22 @@ describe('Router', function(){
     assert.equal(router.get('route'), 'create-topic');
     assert.equal(router.get('createTopic'), true);
   });
+
+  it('should dispatch the right event when the filter name changes', () => {
+    var spy = sinon.spy();
+    router.on(forumFilterConstants.UPDATE_ACTIVE_FILTER, spy);
+    router.set('filterName', 'test');
+    assert.equal(spy.callCount, 1);
+    assert(spy.calledWithMatch({ filter: 'test' }));
+  });
+
+  it('should dispatch the right event when the filter name changes', () => {
+    var spy = sinon.spy();
+    router.on(forumSortConstants.UPDATE_ACTIVE_SORT, spy);
+    router.set('sortName', 'test');
+    assert.equal(spy.callCount, 1);
+    assert(spy.calledWithMatch({ sort: 'test' }));
+  });
+
 
 });
