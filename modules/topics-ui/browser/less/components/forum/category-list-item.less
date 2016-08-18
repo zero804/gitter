@@ -1,0 +1,15 @@
+@import (less, reference) "~gitter-styleguide/css/components/buttons.css";
+
+.m-category-list__item(){
+  margin-right:    2rem;
+  text-decoration: none;
+}
+
+.category-list__item {
+  &:extend(.subdued-button-clouds--xsmall all);
+  .m-category-list__item();
+}
+.category-list__item--active{
+  &:extend(.button-clouds--xsmall all);
+  .m-category-list__item();
+}
