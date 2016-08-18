@@ -3,7 +3,7 @@ import React from 'react';
 import { shallow } from 'enzyme';
 import CreateTopicModal from '../../../../../../shared/containers/components/topic/create-topic-modal.jsx';
 
-describe('<CreateTopicModal/>', () => {
+describe.only('<CreateTopicModal/>', () => {
 
   let wrapper;
   let activeWrapper;
@@ -58,7 +58,11 @@ describe('<CreateTopicModal/>', () => {
   });
 
   it('should render the editor with a name of body', () => {
-      equal(wrapper.find('Editor').at(0).prop('name'), 'body');
+    equal(wrapper.find('Editor').at(0).prop('name'), 'body');
+  });
+
+  it('should call onSubmit when submitted', () => {
+    wrapper.find('form').at(0).simulate('submit', 'this is the news');
   });
 
 });

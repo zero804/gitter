@@ -16,7 +16,7 @@ export default React.createClass({
     const { active } = this.props;
     return (
       <Modal active={active}>
-        <form name="create-topic">
+        <form name="create-topic" onSubmit={this.onSubmit}>
           <H1 className="create-topic__heading">New Topic</H1>
           <Input className="create-topic__input--name" name="title" placeholder="Add title ..."/>
           <Editor className="create-topic__editor--body" name="body"/>
@@ -26,6 +26,12 @@ export default React.createClass({
         </form>
       </Modal>
     );
+  },
+
+  onSubmit(e = { preventDefault: ()=>{} }){
+    console.log(...arguments);
+    //e.preventDefault();
+    console.log('this is working');
   }
 
 });
