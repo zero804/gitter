@@ -10,7 +10,10 @@ import * as forumSortConstants from '../../../shared/constants/forum-sorts';
 
 var RouteModel = Backbone.Model.extend({
   //Do we need to use the constructor to get the default values out of the window.context
-  defaults: { route: null }
+  defaults: {
+    route: null,
+    createTopic: false
+  }
 });
 
 var Router = Backbone.Router.extend({
@@ -30,7 +33,17 @@ var Router = Backbone.Router.extend({
   },
 
   routes: {
+    ':groupName/topics/create-topic(/)': 'createTopic',
     ':groupName/topics(/categories/:categoryName)(/)(?*queryString)': 'forums'
+  },
+
+  createTopic(groupName){
+    this.model.set({
+      route: 'create-topic',
+      groupName: groupName,
+      categoryName: navConstants.DEFAULT_CATEGORY_NAME,
+      createTopic: true,
+    });
   },
 
   forums(groupName, categoryName, queryString){

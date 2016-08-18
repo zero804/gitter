@@ -5,6 +5,7 @@ import navigateToCategory from '../action-creators/forum/navigate-to-category';
 import _ from 'lodash';
 
 import ForumTableControl from './components/forum/table-control.jsx';
+import CreateTopicModal from './components/topic/create-topic-modal.jsx';
 
 import navigateToFilter from '../action-creators/forum/navigate-to-filter';
 import navigateToSort from '../action-creators/forum/navigate-to-sort';
@@ -26,6 +27,7 @@ export default React.createClass({
     filterName: React.PropTypes.string,
     tagName: React.PropTypes.string,
     sortName: React.PropTypes.string,
+    createTopic: React.PropTypes.bool,
 
     //Client side only
     router: React.PropTypes.shape({
@@ -50,7 +52,8 @@ export default React.createClass({
     return {
       filterName: navConstants.DEFAULT_FILTER_NAME,
       tagName: navConstants.DEFAULT_TAG_NAME,
-      sortName: navConstants.DEFAULT_SORT_NAME
+      sortName: navConstants.DEFAULT_SORT_NAME,
+      createTopic: false,
     };
   },
 
@@ -61,8 +64,9 @@ export default React.createClass({
       filterName: this.props.filterName,
       tagName: this.props.tagName,
       sortName: this.props.sortName,
+      createTopic: this.props.createTopic,
       categories: categoryStore.getCategories(),
-      tags: tagStore.getTags()
+      tags: tagStore.getTags(),
     };
   },
 
@@ -83,7 +87,7 @@ export default React.createClass({
   },
 
   render() {
-    const { categories, categoryName, tags, filterName, tagName, sortName } = this.state;
+    const { categories, categoryName, tags, filterName, tagName, sortName, createTopic } = this.state;
     const { groupName } = this.props;
     return (
       <main>
@@ -103,6 +107,8 @@ export default React.createClass({
           filterChange={this.onFilterChange}
           sortChange={this.onSortChange}
           tagChange={this.onTagChange}/>
+
+        <CreateTopicModal active={createTopic} />
       </main>
     );
   },

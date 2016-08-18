@@ -1,4 +1,3 @@
-
 import assert from 'assert';
 import Backbone from 'backbone';
 import React from 'react';
@@ -19,7 +18,7 @@ var CategoryCollection = Backbone.Collection.extend({
 });
 
 var TagCollection = Backbone.Collection.extend({
-  getTags(){ return this.models.map((m) => m.toJSON() ); }
+  getTags(){ return this.models.map((m) => m.toJSON()); }
 });
 
 describe.skip('<ForumContainer />', function(){
@@ -65,6 +64,21 @@ describe.skip('<ForumContainer />', function(){
     subscribe(forumTagConstants.NAVIGATE_TO_TAG, tagChangeHandle);
     wrapper.find('ForumTableControl').prop('tagChange')('all');
     assert.equal(tagChangeHandle.callCount, 1);
+  });
+
+  it('should render an inactive modal by default', () => {
+    assert.equal(wrapper.find('CreateTopicModal').prop('active'), false);
+  });
+
+  it('should render an active modal from create-topic', () => {
+    wrapper = shallow(
+      <ForumContainer
+        categoryStore={catCollection}
+        tagStore={tagCollection}
+        createTopic={true}
+        groupName='gitterHQ' />
+    );
+    assert.equal(wrapper.find('CreateTopicModal').prop('active'), true);
   });
 
 });

@@ -1,8 +1,6 @@
-
 import assert from 'assert';
 import Backbone from 'backbone';
 import router from '../../../../browser/js/routers/index';
-
 import sinon from 'sinon';
 import { dispatch } from '../../../../shared/dispatcher';
 import * as forumCatConstants from '../../../../shared/constants/forum-categories';
@@ -82,6 +80,13 @@ describe('Router', function(){
     router.on(forumSortConstants.UPDATE_ACTIVE_SORT, sortHandle);
     router.set('sortName', 'test');
     assert.equal(sortHandle.callCount, 1);
+  });
+
+  it('should identify create topic', () => {
+    assert.equal(router.get('categoryName'), 'all');
+    Backbone.history.navigate('gitterHQ/topics/create-topic', trigger);
+    assert.equal(router.get('route'), 'create-topic');
+    assert.equal(router.get('createTopic'), true);
   });
 
   it('should dispatch the right event when the filter name changes', () => {

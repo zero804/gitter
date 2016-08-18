@@ -5,7 +5,7 @@ import React from 'react';
 import { shallow } from 'enzyme';
 import {{properCase name}} from '../../../../shared/components{{subFolder}}{{dashCase name}}.jsx';
 
-describe('<{{properCase name}}/>', () => {
+describe.only('<{{properCase name}}/>', () => {
 
   let wrapper;
 
