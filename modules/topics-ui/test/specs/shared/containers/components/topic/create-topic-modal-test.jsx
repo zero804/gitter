@@ -4,29 +4,33 @@ import React from 'react';
 import { shallow } from 'enzyme';
 import CreateTopicModal from '../../../../../../shared/containers/components/topic/create-topic-modal.jsx';
 
-describe.only('<CreateTopicModal/>', () => {
+describe('<CreateTopicModal/>', () => {
 
   let wrapper;
   let activeWrapper;
   let submitHandle;
   let titleChangeHandle;
+  let bodyChangeHandle;
 
   beforeEach(() => {
 
     submitHandle = sinon.spy();
     titleChangeHandle = sinon.spy();
+    bodyChangeHandle = sinon.spy();
 
     wrapper = shallow(
       <CreateTopicModal
-        active={false}
-        onTitleChange={titleChangeHandle}
-        onSubmit={submitHandle}/>);
+      active={false}
+      onTitleChange={titleChangeHandle}
+      onBodyChange={bodyChangeHandle}
+      onSubmit={submitHandle}/>);
 
     activeWrapper = shallow(
       <CreateTopicModal
-        active={true}
-        onTitleChange={titleChangeHandle}
-        onSubmit={submitHandle}/>
+      active={true}
+      onTitleChange={titleChangeHandle}
+      onBodyChange={bodyChangeHandle}
+      onSubmit={submitHandle}/>
     );
   });
 
@@ -85,7 +89,12 @@ describe.only('<CreateTopicModal/>', () => {
 
   it('should call onTitleChange when the input changes', () => {
     wrapper.find('Input').prop('onChange')();
-    assert.equal(titleChangeHandle.callCount, 1);
+    equal(titleChangeHandle.callCount, 1);
+  });
+
+  it('should call onBodyChange when the textarea changes', () => {
+    wrapper.find('Editor').prop('onChange')();
+    equal(bodyChangeHandle.callCount, 1);
   });
 
 });
