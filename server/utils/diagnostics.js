@@ -36,8 +36,7 @@ function getDateIdentifier() {
 }
 
 /* Heapdump and nodemon don't play nicely together */
-if(!process.env.NODEMON) {
-
+if(!process.env.NODEMON && process.env.NODE_ENV !== 'dev') {
   /* Heapdump is now always on */
   process.env.NODE_HEAPDUMP_OPTIONS = 'nosignal';
   var heapdump = require('heapdump');
