@@ -38,7 +38,7 @@ gulp.task('process:assemble:copy-app:files', function() {
       'shared/**',
       'redis-lua/**',
       'modules/**'
-    ], { base: "." })
+    ], { base: ".", nodir: true })
     .pipe(gulp.dest('output/app'));
 });
 
