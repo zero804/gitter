@@ -1,5 +1,5 @@
 import { Collection, Model } from 'backbone';
-import { UPDATE_ACTIVE_CATEGORY } from 'gitter-web-topics-ui/shared/constants/forum-categories';
+import { UPDATE_ACTIVE_CATEGORY } from '../../../shared/constants/forum-categories';
 
 var CategoryModel = Model.extend({
   defaults: { category: null },
