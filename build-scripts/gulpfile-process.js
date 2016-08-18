@@ -11,17 +11,16 @@ var childProcessPromise = require('./child-process-promise');
 /**
  * Hook into the package stage
  */
-gulp.task('process:package', ['process:package:copy-app']);
+gulp.task('process:assemble', ['process:assemble:copy-app']);
 
 /**
  * Hook into the post-package stage
  */
-gulp.task('process:post-package', ['process:post-package:tarball']);
+gulp.task('process:package', ['process:package:tarball']);
 
+gulp.task('process:assemble:copy-app', ['process:assemble:copy-app:files', 'process:assemble:copy-app:version']);
 
-gulp.task('process:package:copy-app', ['process:package:copy-app:files', 'process:package:copy-app:version']);
-
-gulp.task('process:package:copy-app:files', function() {
+gulp.task('process:assemble:copy-app:files', function() {
   return gulp.src([
       '.npmrc',
       'api.js',
@@ -43,7 +42,7 @@ gulp.task('process:package:copy-app:files', function() {
     .pipe(gulp.dest('output/app'));
 });
 
-gulp.task('process:package:copy-app:version', function(done) {
+gulp.task('process:assemble:copy-app:version', function(done) {
   git.revParse({ args: 'HEAD' }, function (err, commit) {
     if(err) return done(err);
 
@@ -76,7 +75,7 @@ gulp.task('process:package:copy-app:version', function(done) {
 
 });
 
-gulp.task('process:post-package:tarball', function () {
+gulp.task('process:package:tarball', function () {
   return gulp.src(['output/app/**'], { stat: true })
     .pipe(tar('app.tar'))
     .pipe(gzip({ append: true, gzipOptions: { level: 9 } }))

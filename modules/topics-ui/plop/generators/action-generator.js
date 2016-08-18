@@ -1,7 +1,7 @@
 "use strict";
 
 var path = require('path');
-var glob = require('glob');
+var glob = require('glob');//eslint-disable-line node/no-unpublished-require
 
 module.exports = function(plop){
 

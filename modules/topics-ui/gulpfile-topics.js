@@ -9,6 +9,8 @@ var babelPipeline = require('./dev/gulp-tasks-babel');
 var _ = require('lodash');
 var spawn = require('child_process').spawn;
 var Promise = require('bluebird');
+var testRunner = require('../../build-scripts/test-runner');
+var os = require('os');
 
 var ROOT = path.resolve(__dirname);
 var OUTPUT_DIR = path.join(ROOT, 'output/');
@@ -28,7 +30,7 @@ gulp.task('topics:compile:babel', function() {
     .pipe(gulp.dest(getOutputPath('babel')));
 });
 
-gulp.task('topics:test', ['topics:test:server']);
+gulp.task('topics:test', [/*'topics:test:server', 'topics:test:unit'*/]);
 
 gulp.task('topics:test:server', function() {
   var executable = path.resolve(__dirname, './test/fixtures/runner-node.js');
@@ -54,6 +56,29 @@ gulp.task('topics:test:server', function() {
       });
     });
   });
+});
+
+gulp.task('topics:test:unit', function() {
+  return gulp.src([
+    // ROOT + '/test/specs/browser/**/*.{js,jsx}',
+    ROOT + '/test/specs/server/**/*.{js,jsx}',
+    ROOT + '/test/specs/shared/**/*.{js,jsx}',
+  ])
+  .pipe(testRunner({
+    compilers: {
+      js: 'babel-register'
+    },
+    // nyc: {
+    //   cache: true,
+    //   reportDir: getOutputPath('coverage/'),
+    //   reporter: 'lcov',
+    // },
+    env: {
+      BABEL_ENV: 'test',
+      BABEL_DISABLE_CACHE: 1,
+      HOME: os.tmpdir()
+    }
+  }));
 });
 
 gulp.task('topics:compile:webpack', function(cb) {

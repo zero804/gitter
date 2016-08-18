@@ -9,7 +9,7 @@ var forumCategoryStore = require('gitter-web-topics-ui/server/stores/forum-categ
 var forumTagStore = require('gitter-web-topics-ui/server/stores/forum-tag-store');
 var forumTopicsStore = require('gitter-web-topics-ui/server/stores/topics-store');
 
-var navConstants = require('gitter-web-topics-ui/browser/js/constants/navigation');
+var navConstants = require('gitter-web-topics-ui/shared/constants/navigation');
 
 function renderForum(req, res, next, options) {
 

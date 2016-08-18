@@ -1,14 +1,14 @@
-"use strict";
+import { Model, Collection } from 'backbone';
 
 var Backbone = require('backbone');
 
-var Model = Backbone.Model.extend({
+var TopicModel = Model.extend({
   defaults: {}
 });
 
-module.exports = Backbone.Collection.extend({
+export default Collection.extend({
 
-  model: Model,
+  model: TopicModel,
 
   getTopics() {
     return this.models.map(model => model.toJSON());

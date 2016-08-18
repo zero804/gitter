@@ -1,17 +1,17 @@
-'use strict';
+import React from 'react';
 
-const React = require('react');
-const Backbone = require('backbone');
+//Containers
+import ForumContainer from '../../shared/containers/ForumContainer.jsx';
+import TopicContainer from '../../shared/containers/TopicContainer';
 
-const ForumContainer = require('../../containers/ForumContainer.jsx');
-const TopicContainer = require('../../containers/TopicContainer.jsx');
+//Stores
+import CategoryStore from './stores/forum-category-store';
+import TagStore from './stores/forum-tag-store';
+import TopicsStore from './stores/topics-store';
 
-const CategoryStore = require('./stores/forum-category-store');
-const TagStore = require('./stores/forum-tag-store');
-const TopicsStore = require('./stores/topics-store');
-const navConstatnts = require('./constants/navigation');
+import * as navConstants from '../../shared/constants/navigation';
 
-module.exports = React.createClass({
+export default React.createClass({
 
   displayName: 'App',
 
@@ -26,7 +26,7 @@ module.exports = React.createClass({
   getInitialState(){
     const { router } = this.props;
     switch(router.get('route')) {
-      case navConstatnts.FORUM_ROUTE: return this.getForumState();
+      case navConstants.FORUM_ROUTE: return this.getForumState();
       case navConstants.CREATE_TOPIC_ROUTE: return this.getCreateTopicState();
       case 'topic': return this.getTopicState();
     }
@@ -35,7 +35,7 @@ module.exports = React.createClass({
   render(){
     const { route } = this.state;
     switch(route) {
-      case navConstatnts.FORUM_ROUTE: return <ForumContainer {...this.state} />
+      case navConstants.FORUM_ROUTE: return <ForumContainer {...this.state} />
       case navConstants.CREATE_TOPIC_ROUTE: return <ForumContainer {...this.state} />;
       case 'topic': return <TopicContainer {...this.state} />;
     }
