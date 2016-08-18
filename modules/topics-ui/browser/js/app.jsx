@@ -2,7 +2,7 @@ import React from 'react';
 
 //Containers
 import ForumContainer from '../../shared/containers/ForumContainer.jsx';
-import TopicContainer from '../../shared/containers/TopicContainer';
+import TopicContainer from '../../shared/containers/TopicContainer.jsx';
 
 //Stores
 import CategoryStore from './stores/forum-category-store';
@@ -28,7 +28,7 @@ export default React.createClass({
     switch(router.get('route')) {
       case navConstants.FORUM_ROUTE: return this.getForumState();
       case navConstants.CREATE_TOPIC_ROUTE: return this.getCreateTopicState();
-      case 'topic': return this.getTopicState();
+      case navConstants.TOPIC_ROUTE: return this.getTopicState();
     }
   },
 
@@ -37,7 +37,7 @@ export default React.createClass({
     switch(route) {
       case navConstants.FORUM_ROUTE: return <ForumContainer {...this.state} />
       case navConstants.CREATE_TOPIC_ROUTE: return <ForumContainer {...this.state} />;
-      case 'topic': return <TopicContainer {...this.state} />;
+      case navConstants.TOPIC_ROUTE: return <TopicContainer {...this.state} />;
     }
   },
 
