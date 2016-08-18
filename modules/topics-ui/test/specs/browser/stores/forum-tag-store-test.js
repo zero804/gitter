@@ -1,10 +1,8 @@
-"use strict";
-
-var assert = require('assert');
-var sinon = require('sinon');
-var Backbone = require('backbone');
-var ForumTagStore = require('../../../../browser/js/stores/forum-tag-store');
-var forumTagConstants = require('../../../../browser/js/constants/forum-tags');
+import assert from 'assert';
+import sinon from 'sinon';
+import Backbone from 'backbone';
+import ForumTagStore from '../../../../browser/js/stores/forum-tag-store';
+import * as forumTagConstants from '../../../../shared/constants/forum-tags';
 
 describe('TagStore', () => {
 
