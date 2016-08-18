@@ -4,6 +4,6 @@ import { {{constantCase name}} } from '../../constants/{{constantFile}}';
 
 module.exports = function {{camelCase name}}(){
   return {
-    type: constantCase name}}
+    type: {{constantCase name}}
   };
 };

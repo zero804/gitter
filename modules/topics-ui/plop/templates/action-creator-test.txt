@@ -1,12 +1,12 @@
 import {equal} from 'assert';
 
 import createAction from '../../../../../shared/action-creators/{{actionBaseDir}}/{{dashCase name}}';
-import { {{constntCase name}} } from '../../../../../shared/constants/{{constantFile}}';
+import { {{constantCase name}} } from '../../../../../shared/constants/{{constantFile}}';
 
 describe('{{camelCase name}}', () => {
 
   it('should return the right type', () => {
-    equal(createAction().type, constantCase name}});
+    equal(createAction().type, {{constantCase name}});
   });
 
 });
