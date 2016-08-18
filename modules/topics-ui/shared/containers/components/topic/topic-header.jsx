@@ -1,5 +1,3 @@
-"use strict";
-
 import React, { PropTypes } from 'react';
 import Container from '../container.jsx';
 import Panel from '../panel.jsx';

@@ -1,10 +1,8 @@
-"use strict";
-
 import React, {PropTypes, createClass} from 'react';
-import TopicHeader from '../shared/components/topic/topic-header.jsx';
-import TopicBody from '../shared/components/topic/topic-body.jsx';
+import TopicHeader from './components/topic/topic-header.jsx';
+import TopicBody from './components/topic/topic-body.jsx';
 
-module.exports = createClass({
+export default createClass({
 
   displayName: 'TopicContainer',
   propTypes: {

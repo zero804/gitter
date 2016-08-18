@@ -1,9 +1,7 @@
-"use strict";
-
 import {equal} from 'assert';
 import React from 'react';
 import { shallow } from 'enzyme';
-import Avatar from '../../../../shared/components/avatar.jsx';
+import Avatar from '../../../../../shared/containers/components/avatar.jsx';
 
 describe('<Avatar/>', () => {
 
