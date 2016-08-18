@@ -6,6 +6,8 @@ import _ from 'lodash';
 
 import ForumTableControl from './components/forum/table-control.jsx';
 import CreateTopicModal from './components/topic/create-topic-modal.jsx';
+import TopicsTable from './components/topic/topics-table.jsx';
+
 
 import navigateToFilter from '../action-creators/forum/navigate-to-filter';
 import navigateToSort from '../action-creators/forum/navigate-to-sort';
@@ -46,6 +48,12 @@ export default React.createClass({
       models: React.PropTypes.array.isRequired,
       getTags: React.PropTypes.func.isRequired
     }).isRequired,
+
+    //Topics
+    topicsStore: React.PropTypes.shape({
+      models: React.PropTypes.array.isRequired,
+      getTopics: React.PropTypes.func.isRequired
+    }).isRequired,
   },
 
   getDefaultProps(){
@@ -58,7 +66,7 @@ export default React.createClass({
   },
 
   getInitialState(){
-    const { categoryStore, tagStore } = this.props;
+    const { categoryStore, tagStore, topicsStore } = this.props;
     return {
       categoryName: this.props.categoryName,
       filterName: this.props.filterName,
@@ -67,6 +75,7 @@ export default React.createClass({
       createTopic: this.props.createTopic,
       categories: categoryStore.getCategories(),
       tags: tagStore.getTags(),
+      topics: topicsStore.getTopics(),
     };
   },
 
@@ -87,7 +96,7 @@ export default React.createClass({
   },
 
   render() {
-    const { categories, categoryName, tags, filterName, tagName, sortName, createTopic } = this.state;
+    const { categories, categoryName, tags, filterName, tagName, sortName, createTopic, topics } = this.state;
     const { groupName } = this.props;
     return (
       <main>
@@ -107,6 +116,8 @@ export default React.createClass({
           filterChange={this.onFilterChange}
           sortChange={this.onSortChange}
           tagChange={this.onTagChange}/>
+
+        <TopicsTable topics={topics}/>
 
         <CreateTopicModal active={createTopic} />
       </main>

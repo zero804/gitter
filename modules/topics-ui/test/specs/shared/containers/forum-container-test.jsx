@@ -20,12 +20,16 @@ var CategoryCollection = Backbone.Collection.extend({
 var TagCollection = Backbone.Collection.extend({
   getTags(){ return this.models.map((m) => m.toJSON()); }
 });
+var TopicsCollection = Backbone.Collection.extend({
+  getTopics() { return this.models.map((m) => m.toJSON()); }
+});
 
 describe.skip('<ForumContainer />', function(){
 
   let wrapper;
   let catCollection;
   let tagCollection;
+  let topicsCollection;
   let catChangeHandle;
   let filterChangeHandle;
   let sortChangeHandle;
@@ -38,8 +42,15 @@ describe.skip('<ForumContainer />', function(){
     sortChangeHandle = sinon.spy();
     tagChangeHandle = sinon.spy();
     catCollection = new CategoryCollection([ { category: 'all', active: true } ]);
-    tagCollection = new TagCollection([{value: 'all-tags', name: 'All Tags', active: true }])
-    wrapper = shallow(<ForumContainer categoryStore={catCollection} tagStore={tagCollection} groupName='gitterHQ' />);
+    tagCollection = new TagCollection([{value: 'all-tags', name: 'All Tags', active: true }]);
+    topicsCollection = new TopicsCollection([]);
+    wrapper = shallow(
+      <ForumContainer
+        categoryStore={catCollection}
+        tagStore={tagCollection}
+        topicsStore={topicsCollection}
+        groupName='gitterHQ' />
+    );
   });
 
   it('should dispatch the right action when a category is clicked', function(){
@@ -75,10 +86,15 @@ describe.skip('<ForumContainer />', function(){
       <ForumContainer
         categoryStore={catCollection}
         tagStore={tagCollection}
+        topicsStore={topicsCollection}
         createTopic={true}
         groupName='gitterHQ' />
     );
     assert.equal(wrapper.find('CreateTopicModal').prop('active'), true);
+  });
+
+  it('should render a TopicsTable', () => {
+    assert.equal(wrapper.find('TopicsTable').length, 1);
   });
 
 });
