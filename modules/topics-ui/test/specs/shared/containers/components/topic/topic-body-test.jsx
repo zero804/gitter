@@ -1,9 +1,7 @@
-"use strict";
-
 import {equal} from 'assert';
 import React from 'react';
 import { shallow } from 'enzyme';
-import TopicBody from '../../../../../shared/components/topic/topic-body.jsx';
+import TopicBody from '../../../../../../shared/containers/components/topic/topic-body.jsx';
 
 describe('<TopicBody/>', () => {
 

@@ -1,7 +1,7 @@
 import {equal} from 'assert';
 import React from 'react';
 import { shallow } from 'enzyme';
-import TopicsTable from '../../../../../../shared/containers/components/topic/topics-table.jsx';
+import TopicsTable from '../../../../../../shared/containers/components/forum/topics-table.jsx';
 
 describe('<TopicsTable/>', () => {
 

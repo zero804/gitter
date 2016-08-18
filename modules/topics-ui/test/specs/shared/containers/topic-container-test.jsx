@@ -1,10 +1,8 @@
-"use strict";
-
-var {equal} = require('assert');
-var {shallow} = require('enzyme');
-var Backbone = require('backbone');
-var React = require('react');
-var TopicContainer = require('../../../containers/TopicContainer.jsx');
+import {equal} from 'assert';
+import {shallow} from 'enzyme';
+import Backbone from 'backbone';
+import React from 'react';
+import TopicContainer from '../../../../shared/containers/TopicContainer.jsx';
 
 var TopicStore = Backbone.Collection.extend({
   getById(){ return this.at(0).toJSON(); }

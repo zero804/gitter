@@ -6,7 +6,7 @@ import _ from 'lodash';
 
 import ForumTableControl from './components/forum/table-control.jsx';
 import CreateTopicModal from './components/topic/create-topic-modal.jsx';
-import TopicsTable from './components/topic/topics-table.jsx';
+import TopicsTable from './components/forum/topics-table.jsx';
 
 
 import navigateToFilter from '../action-creators/forum/navigate-to-filter';

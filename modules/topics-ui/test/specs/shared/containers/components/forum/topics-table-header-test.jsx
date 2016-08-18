@@ -1,7 +1,7 @@
 import {equal} from 'assert';
 import React from 'react';
 import { mount } from 'enzyme';
-import TopicsTableHeader from '../../../../../../shared/containers/components/topic/topics-table-header.jsx';
+import TopicsTableHeader from '../../../../../../shared/containers/components/forum/topics-table-header.jsx';
 
 describe.skip('<TopicsTableHeader/>', () => {
 
