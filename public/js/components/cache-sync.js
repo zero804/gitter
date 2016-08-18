@@ -1,6 +1,6 @@
 "use strict";
-var log = require('utils/log');
-var context = require('utils/context');
+var log = require('../utils/log');
+var context = require('../utils/context');
 
 module.exports = (function() {
 

@@ -1,9 +1,9 @@
 "use strict";
 
 var chatModels = require('../chat');
-var context = require('utils/context');
+var context = require('../../utils/context');
 var unreadItemsClient = require('components/unread-items-client');
-var errorHandle = require('utils/live-collection-error-handle');
+var errorHandle = require('../../utils/live-collection-error-handle');
 var ProxyCollection = require('backbone-proxy-collection');
 var Pool = require('../../components/chat-cache/pool');
 var appEvents = require('../../utils/appevents');

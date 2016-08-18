@@ -2,7 +2,7 @@
 var Marionette = require('backbone.marionette');
 var behaviourLookup = require('./lookup');
 var _ = require('underscore');
-var rafUtils = require('utils/raf-utils');
+var rafUtils = require('../../utils/raf-utils');
 var passiveEventListener = require('../../utils/passive-event-listener');
 
 var Behavior = Marionette.Behavior.extend({

@@ -2,7 +2,7 @@
 
 var Marionette = require('backbone.marionette');
 var template = require('./tmpl/unreadBannerTemplate.hbs');
-var appEvents = require('utils/appevents');
+var appEvents = require('../../utils/appevents');
 var unreadItemsClient = require('components/unread-items-client');
 require('views/behaviors/tooltip');
 

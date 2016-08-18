@@ -1,12 +1,12 @@
 "use strict";
 var Marionette = require('backbone.marionette');
 var modalRegion = require('components/modal-region');
-var appEvents = require('utils/appevents');
+var appEvents = require('../../utils/appevents');
 
 //OLD LEFT MENU
 var TroupeMenu = require('views/menu/old/troupeMenu');
-var context = require('utils/context');
-var isMobile = require('utils/is-mobile');
+var context = require('../../utils/context');
+var isMobile = require('../../utils/is-mobile');
 
 //NEW LEFT MENU
 var RoomMenuLayout = require('../menu/room/layout/room-menu-layout');

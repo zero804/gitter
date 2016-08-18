@@ -1,6 +1,6 @@
 "use strict";
 
-var context = require('utils/context');
+var context = require('../../utils/context');
 var Marionette = require('backbone.marionette');
 var behaviourLookup = require('./lookup');
 

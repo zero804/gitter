@@ -2,8 +2,8 @@
 
 var userModels = require('../users');
 var eventModels = require('../events');
-var appEvents = require('utils/appevents');
-var errorHandle = require('utils/live-collection-error-handle');
+var appEvents = require('../../utils/appevents');
+var errorHandle = require('../../utils/live-collection-error-handle');
 
 // TODO: find a better home for this....
 require('components/realtime-troupe-listener');

@@ -1,5 +1,5 @@
 "use strict";
-var roomNameTrimmer = require('utils/room-name-trimmer'); // TODO: move this to shared
+var roomNameTrimmer = require('../../../utils/room-name-trimmer'); // TODO: move this to shared
 var Marionette = require('backbone.marionette');
 var template = require('./tmpl/suggested-list-item.hbs');
 

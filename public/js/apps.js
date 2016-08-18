@@ -1,7 +1,7 @@
 "use strict";
 
-require('utils/tracking');
-var appEvents = require('utils/appevents');
+require('./utils/tracking');
+var appEvents = require('./utils/appevents');
 
 setTimeout(function() {
   document.getElementById('apps-panel').classList.add('visible');

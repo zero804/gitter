@@ -2,8 +2,8 @@
 
 var _ = require('underscore');
 var Promise = require('bluebird');
-var toggleClass = require('utils/toggle-class');
-var appEvents = require('utils/appevents');
+var toggleClass = require('../../../utils/toggle-class');
+var appEvents = require('../../../utils/appevents');
 var VirtualMultipleCollection = require('../virtual-multiple-collection');
 
 var stepConstants = require('../step-constants');

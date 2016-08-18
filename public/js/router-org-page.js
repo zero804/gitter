@@ -1,10 +1,10 @@
 "use strict";
 
-require('utils/font-setup');
+require('./utils/font-setup');
 
 var onReady = require('./utils/onready');
 var Backbone = require('backbone');
-var appEvents = require('utils/appevents');
+var appEvents = require('./utils/appevents');
 var modalRegion = require('components/modal-region');
 var _ = require('underscore');
 var clientEnv = require('gitter-client-env');
@@ -12,7 +12,7 @@ var clientEnv = require('gitter-client-env');
 require('gitter-styleguide/css/components/buttons.css');
 require('gitter-styleguide/css/components/headings.css');
 
-require('utils/tracking');
+require('./utils/tracking');
 
 onReady(function(){
 

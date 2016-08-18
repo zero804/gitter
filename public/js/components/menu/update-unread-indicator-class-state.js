@@ -1,6 +1,6 @@
 'use strict';
 
-var toggleClass = require('utils/toggle-class');
+var toggleClass = require('../../utils/toggle-class');
 
 var UNREAD_INDICATOR_STATE_CLASSES = {
   unreads: 'has-unreads',

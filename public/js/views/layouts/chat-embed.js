@@ -1,13 +1,13 @@
 "use strict";
 
-var appEvents = require('utils/appevents');
+var appEvents = require('../../utils/appevents');
 var ChatInputView = require('views/chat/chatInputView');
 var cocktail = require('backbone.cocktail');
 var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 var unreadItemsClient = require('components/unread-items-client');
 var UnreadBannerView = require('views/app/unreadBannerView');
 
-var context = require('utils/context');
+var context = require('../../utils/context');
 var JoinRoomView = require('views/chat/join-room-view');
 
 

@@ -3,9 +3,9 @@
 // var _ = require('underscore');
 var Marionette = require('backbone.marionette');
 var behaviourLookup = require('./lookup');
-var matchesSelector = require('utils/matches-selector');
-var RAF = require('utils/raf');
-var isCompact = require('utils/detect-compact');
+var matchesSelector = require('../../utils/matches-selector');
+var RAF = require('../../utils/raf');
+var isCompact = require('../../utils/detect-compact');
 
 require('bootstrap_tooltip');
 

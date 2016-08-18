@@ -3,7 +3,7 @@
 var _ = require('underscore');
 var Marionette = require('backbone.marionette');
 var fastdom = require('fastdom');
-var toggleClass = require('utils/toggle-class');
+var toggleClass = require('../../../../utils/toggle-class');
 var PanelHeaderView = require('../header/header-view');
 var PanelFooterView = require('../footer/footer-view');
 var FavouriteCollectionView = require('../favourite-collection/favourite-collection-view');
@@ -12,7 +12,7 @@ var SecondaryCollectionView = require('../secondary-collection/secondary-collect
 var TertiaryCollectionView = require('../tertiary-collection/tertiary-collection-view');
 var ProfileMenuView = require('../profile/profile-menu-view');
 var SearchInputView = require('views/menu/room/search-input/search-input-view');
-var NeverEndingStory = require('utils/never-ending-story');
+var NeverEndingStory = require('../../../../utils/never-ending-story');
 
 require('views/behaviors/isomorphic');
 

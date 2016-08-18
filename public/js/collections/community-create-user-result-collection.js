@@ -2,7 +2,7 @@
 
 var Backbone = require('backbone');
 var _ = require('underscore');
-var context = require('utils/context');
+var context = require('../utils/context');
 var ProxyCollection = require('backbone-proxy-collection');
 
 var userSearchModels = require('collections/user-search');

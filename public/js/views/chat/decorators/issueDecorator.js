@@ -1,9 +1,9 @@
 "use strict";
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
-var context = require('utils/context');
+var context = require('../../../utils/context');
 var apiClient = require('components/apiClient');
-var appEvents = require('utils/appevents');
+var appEvents = require('../../../utils/appevents');
 var moment = require('moment');
 var Popover = require('views/popover');
 var bodyTemplate = require('./tmpl/issuePopover.hbs');

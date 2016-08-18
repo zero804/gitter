@@ -3,8 +3,8 @@
 var Marionette = require('backbone.marionette');
 var SimpleFilteredCollection = require('../../collections/simple-filtered-collection');
 var cocktail = require('backbone.cocktail');
-var toggleClass = require('utils/toggle-class');
-var appEvents = require('utils/appevents');
+var toggleClass = require('../../utils/toggle-class');
+var appEvents = require('../../utils/appevents');
 var KeyboardEventMixin = require('views/keyboard-events-mixin');
 var VirtualMultipleCollection = require('./virtual-multiple-collection');
 

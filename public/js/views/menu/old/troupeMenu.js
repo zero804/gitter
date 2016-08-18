@@ -2,21 +2,21 @@
 var $ = require('jquery');
 var _ = require('underscore');
 var Marionette = require('backbone.marionette');
-var context = require('utils/context');
-var appEvents = require('utils/appevents');
-var isMobile = require('utils/is-mobile');
+var context = require('../../../utils/context');
+var appEvents = require('../../../utils/appevents');
+var isMobile = require('../../../utils/is-mobile');
 var troupeCollections = require('collections/instances/troupes');
 var FilteredSuggestedRoomCollection = require('collections/suggested-rooms').Filtered;
 var RoomCollectionView = require('./room-collection-view');
 var SuggestedCollectionView = require('./suggested-collection-view');
-var log = require('utils/log');
+var log = require('../../../utils/log');
 var cocktail = require('backbone.cocktail');
 var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 var CollectionWrapperViewTemplate = require('./tmpl/collection-wrapper-view.hbs');
 var ProfileView = require('./profileView');
 var OrgCollectionView = require('./orgCollectionView');
-var dataSet = require('utils/dataset-shim');
-var toggle = require('utils/toggle');
+var dataSet = require('../../../utils/dataset-shim');
+var toggle = require('../../../utils/toggle');
 
 require('views/behaviors/isomorphic');
 require('views/behaviors/tooltip');

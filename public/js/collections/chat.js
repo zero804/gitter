@@ -2,12 +2,12 @@
 
 var _ = require('underscore');
 var Backbone = require('backbone');
-var context = require('utils/context');
+var context = require('../utils/context');
 var moment = require('moment');
 var burstCalculator = require('../utils/burst-calculator');
 var InfiniteCollectionMixin = require('./infinite-mixin');
 var cocktail = require('backbone.cocktail');
-var log = require('utils/log');
+var log = require('../utils/log');
 var LiveCollection = require('gitter-realtime-client').LiveCollection;
 var realtime = require('components/realtime');
 var SyncMixin = require('./sync-mixin');

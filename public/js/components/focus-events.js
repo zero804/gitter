@@ -1,7 +1,7 @@
 "use strict";
 var $ = require('jquery');
 var _ = require('underscore');
-var appEvents = require('utils/appevents');
+var appEvents = require('../utils/appevents');
 
 module.exports = (function() {
 

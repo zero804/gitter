@@ -4,10 +4,10 @@ var Backbone = require('backbone');
 var _ = require('underscore');
 var itemTemplate = require('./primary-collection-item-view.hbs');
 var apiClient = require('components/apiClient');
-var context = require('utils/context');
-var appEvents = require('utils/appevents');
+var context = require('../../../../utils/context');
+var appEvents = require('../../../../utils/appevents');
 var parseForTemplate = require('gitter-web-shared/parse/left-menu-primary-item');
-var toggleClass = require('utils/toggle-class');
+var toggleClass = require('../../../../utils/toggle-class');
 var parseRoomItemName = require('gitter-web-shared/get-org-menu-state-name-from-troupe-name');
 var roomNameShortener = require('gitter-web-shared/room-name-shortener');
 

@@ -4,7 +4,7 @@ var _ = require('underscore');
 var BaseItemView = require('../base-item-view');
 var itemTemplate = require('./minibar-item-view.hbs');
 var updateUnreadIndicatorClassState = require('../../../../components/menu/update-unread-indicator-class-state');
-var toggleClass = require('utils/toggle-class');
+var toggleClass = require('../../../../utils/toggle-class');
 
 
 

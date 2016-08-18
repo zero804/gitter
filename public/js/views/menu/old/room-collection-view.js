@@ -2,16 +2,16 @@
 "use strict";
 var $ = require('jquery');
 var Popover = require('views/popover');
-var context = require('utils/context');
+var context = require('../../../utils/context');
 var apiClient = require('components/apiClient');
-var roomNameTrimmer = require('utils/room-name-trimmer');
+var roomNameTrimmer = require('../../../utils/room-name-trimmer');
 var Marionette = require('backbone.marionette');
 var roomListItemTemplate = require('./tmpl/room-list-item.hbs');
 var popoverTemplate = require('./tmpl/leave-buttons.hbs');
-var appEvents = require('utils/appevents');
-var dataset = require('utils/dataset-shim');
-var toggle = require('utils/toggle');
-var toggleClass = require('utils/toggle-class');
+var appEvents = require('../../../utils/appevents');
+var dataset = require('../../../utils/dataset-shim');
+var toggle = require('../../../utils/toggle');
+var toggleClass = require('../../../utils/toggle-class');
 var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 
 require('jquery-sortable');

@@ -1,6 +1,6 @@
 "use strict";
 
-var isMobile = require('utils/is-mobile');
+var isMobile = require('../../../utils/is-mobile');
 var apiClient = require('components/apiClient');
 var template = require('./tmpl/typeahead.hbs');
 

@@ -1,6 +1,6 @@
 "use strict";
 var _ = require('underscore');
-var appEvents = require('utils/appevents');
+var appEvents = require('../utils/appevents');
 require('components/keyboard-events');
 
 module.exports = (function() {

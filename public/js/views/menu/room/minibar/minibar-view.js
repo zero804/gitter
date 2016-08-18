@@ -1,8 +1,8 @@
 "use strict";
 
 var Marionette = require('backbone.marionette');
-var context = require('utils/context');
-var appEvents = require('utils/appevents');
+var context = require('../../../../utils/context');
+var appEvents = require('../../../../utils/appevents');
 var HomeView = require('./home-view/home-view');
 var SearchView = require('./search-view/search-view');
 var PeopleView = require('./people-view/people-view');

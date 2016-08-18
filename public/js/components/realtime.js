@@ -1,10 +1,10 @@
 "use strict";
 
-var context = require('utils/context');
+var context = require('../utils/context');
 var clientEnv = require('gitter-client-env');
-var appEvents = require('utils/appevents');
-var log = require('utils/log');
-var logout = require('utils/logout');
+var appEvents = require('../utils/appevents');
+var log = require('../utils/log');
+var logout = require('../utils/logout');
 var RealtimeClient = require('gitter-realtime-client').RealtimeClient;
 var wrapExtension = require('gitter-realtime-client').wrapExtension;
 var debug = require('debug-proxy')('app:realtime');

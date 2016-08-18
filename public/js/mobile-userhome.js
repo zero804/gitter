@@ -1,6 +1,6 @@
 "use strict";
 var $ = require('jquery');
-var appEvents = require('utils/appevents');
+var appEvents = require('./utils/appevents');
 var Backbone = require('backbone');
 var confirmRepoRoomView = require('views/modals/confirm-repo-room-view');
 var modalRegion = require('components/modal-region');
@@ -8,12 +8,12 @@ var onready = require('./utils/onready');
 var MobileUserhomeLayout = require('views/layouts/mobile-userhome');
 
 //Left Menu Additions
-//var gestures             = require('utils/gesture-controller');
+//var gestures             = require('./utils/gesture-controller');
 
 //Remove when Lef Menu is in
 var FastClick = require('fastclick');
 
-require('utils/tracking');
+require('./utils/tracking');
 
 // Preload widgets
 require('views/widgets/avatar');

@@ -1,8 +1,8 @@
 /* eslint complexity: ["error", 19] */
 'use strict';
 
-require('utils/initial-setup');
-require('utils/font-setup');
+require('./utils/initial-setup');
+require('./utils/font-setup');
 
 var debug = require('debug-proxy')('app:router-app');
 var $ = require('jquery');
@@ -10,11 +10,11 @@ var _ = require('underscore');
 var Backbone = require('backbone');
 var moment = require('moment');
 var clientEnv = require('gitter-client-env');
-var onready = require('utils/onready');
-var urlParser = require('utils/url-parser');
-var RAF = require('utils/raf');
-var appEvents = require('utils/appevents');
-var context = require('utils/context');
+var onready = require('./utils/onready');
+var urlParser = require('./utils/url-parser');
+var RAF = require('./utils/raf');
+var appEvents = require('./utils/appevents');
+var context = require('./utils/context');
 
 var TitlebarUpdater = require('components/titlebar');
 var realtime = require('components/realtime');
@@ -43,7 +43,7 @@ require('components/bug-reporting');
 require('components/focus-events');
 
 
-require('utils/tracking');
+require('./utils/tracking');
 require('components/ping');
 
 // Preload widgets

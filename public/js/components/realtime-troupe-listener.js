@@ -1,8 +1,8 @@
 "use strict";
 
-var context = require('utils/context');
+var context = require('../utils/context');
 var realtime = require('./realtime');
-var appEvents = require('utils/appevents');
+var appEvents = require('../utils/appevents');
 var realtimePresenceTracking = require('./realtime-presence-tracking');
 
 var subscribeCount = 0;

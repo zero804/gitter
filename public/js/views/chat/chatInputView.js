@@ -2,7 +2,7 @@
 
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
-var context = require('utils/context');
+var context = require('../../utils/context');
 var template = require('./tmpl/chatInputView.hbs');
 var ChatInputBoxView = require('./chat-input-box-view');
 var ChatInputButtons = require('./chat-input-buttons');

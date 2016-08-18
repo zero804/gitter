@@ -1,14 +1,14 @@
 "use strict";
 var $ = require('jquery');
 var Marionette = require('backbone.marionette');
-var context = require('utils/context');
+var context = require('../../utils/context');
 var clientEnv = require('gitter-client-env');
 var troupeCollections = require('collections/instances/troupes');
 var FilteredSuggestedRoomsCollection = require('collections/suggested-rooms').Filtered;
 var userHomeTemplate = require('./tmpl/userHomeTemplate.hbs');
 var OrgCollectionView = require('./homeOrgCollectionView');
 var SuggestedCollectionView = require('./suggested-room-collection-view');
-var isMobile = require('utils/is-mobile');
+var isMobile = require('../../utils/is-mobile');
 require('views/behaviors/isomorphic');
 
 module.exports = (function() {

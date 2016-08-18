@@ -1,6 +1,6 @@
 "use strict";
 
-var appEvents = require('utils/appevents');
+var appEvents = require('../../utils/appevents');
 
 var LoadingView = function(iframe, loadingFrame) {
   var self = this;

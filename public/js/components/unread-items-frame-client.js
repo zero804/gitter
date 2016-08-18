@@ -1,8 +1,8 @@
 "use strict";
 
 var _ = require('underscore');
-var context = require('utils/context');
-var appEvents = require('utils/appevents');
+var context = require('../utils/context');
+var appEvents = require('../utils/appevents');
 var debug = require('debug-proxy')('app:unread-items-frame');
 
 

@@ -1,9 +1,9 @@
 "use strict";
 var $ = require('jquery');
-var context = require('utils/context');
+var context = require('./utils/context');
 var clientEnv = require('gitter-client-env');
-var onready = require('utils/onready');
-var appEvents = require('utils/appevents');
+var onready = require('./utils/onready');
+var appEvents = require('./utils/appevents');
 var apiClient = require('components/apiClient');
 var HeaderView = require('views/app/headerView');
 var RightToolBarModel = require('./models/right-toolbar-model');
@@ -13,7 +13,7 @@ require('views/widgets/preload');
 require('components/dozy');
 require('template/helpers/all');
 require('components/bug-reporting');
-require('utils/tracking');
+require('./utils/tracking');
 require('components/ping');
 
 require('gitter-styleguide/css/components/buttons.css');

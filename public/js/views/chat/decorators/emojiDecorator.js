@@ -1,5 +1,5 @@
 "use strict";
-var emoji = require('utils/emoji');
+var emoji = require('../../../utils/emoji');
 
 module.exports = (function() {
 

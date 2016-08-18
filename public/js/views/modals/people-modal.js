@@ -9,7 +9,7 @@ var apiClient = require('components/apiClient');
 var template = require('./tmpl/people-modal.hbs');
 var SyncMixin = require('collections/sync-mixin');
 var InfiniteScrollBehavior = require('views/behaviors/infinite-scroll');
-var context = require('utils/context');
+var context = require('../../utils/context');
 
 require('views/behaviors/widgets');
 

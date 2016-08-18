@@ -2,7 +2,7 @@
 var _ = require('underscore');
 var utils = require('../utils/utils');
 var context = require('../utils/context');
-var appEvents = require('utils/appevents');
+var appEvents = require('../utils/appevents');
 var debug = require('debug-proxy')('app:infinite-mixin');
 
 module.exports = (function() {

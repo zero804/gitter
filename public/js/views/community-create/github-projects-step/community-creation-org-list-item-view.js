@@ -2,7 +2,7 @@
 
 var Marionette = require('backbone.marionette');
 var urlJoin = require('url-join');
-var toggleClass = require('utils/toggle-class');
+var toggleClass = require('../../../utils/toggle-class');
 var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 
 var CommunityCreationOrgListItemTemplate = require('./community-creation-org-list-item-view.hbs');

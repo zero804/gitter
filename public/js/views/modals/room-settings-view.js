@@ -1,12 +1,12 @@
 'use strict';
 
-var context = require('utils/context');
+var context = require('../../utils/context');
 var Marionette = require('backbone.marionette');
 var ModalView = require('./modal');
 var apiClient = require('components/apiClient');
 var roomSettingsTemplate = require('./tmpl/room-settings-view.hbs');
 var Promise = require('bluebird');
-var toggleClass = require('utils/toggle-class');
+var toggleClass = require('../../utils/toggle-class');
 
 var View = Marionette.ItemView.extend({
   template: roomSettingsTemplate,

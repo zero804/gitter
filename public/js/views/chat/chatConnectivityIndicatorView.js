@@ -3,7 +3,7 @@
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 var template = require('./tmpl/chatConnectivityIndicator.hbs');
-var appEvents = require('utils/appevents');
+var appEvents = require('../../utils/appevents');
 require('views/behaviors/tooltip');
 
 module.exports = Marionette.ItemView.extend({

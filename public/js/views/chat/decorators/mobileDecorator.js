@@ -1,6 +1,6 @@
 "use strict";
 var $ = require('jquery');
-var context = require('utils/context');
+var context = require('../../../utils/context');
 var link = require('./tmpl/link.hbs');
 
 module.exports = (function() {

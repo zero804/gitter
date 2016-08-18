@@ -5,8 +5,8 @@ var Backbone = require('backbone');
 var Popover = require('views/popover');
 var template = require('./tmpl/userPopoverView.hbs');
 var footerTemplate = require('./tmpl/userPopoverFooterView.hbs');
-var appEvents = require('utils/appevents');
-var context = require('utils/context');
+var appEvents = require('../../utils/appevents');
+var context = require('../../utils/context');
 var SyncMixin = require('collections/sync-mixin');
 var avatars = require('gitter-web-avatars');
 

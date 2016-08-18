@@ -1,8 +1,8 @@
 "use strict";
-var context = require('utils/context');
-var appEvents = require('utils/appevents');
-var platformDetect = require('utils/platformDetect');
-var platformKeys = require('utils/platform-keys');
+var context = require('../utils/context');
+var appEvents = require('../utils/appevents');
+var platformDetect = require('../utils/platformDetect');
+var platformKeys = require('../utils/platform-keys');
 var _ = require('underscore');
 var key = require('keymaster');
 

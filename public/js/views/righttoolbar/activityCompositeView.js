@@ -2,7 +2,7 @@
 var _ = require('underscore');
 var Marionette = require('backbone.marionette');
 var classnames = require('classnames');
-var appEvents = require('utils/appevents');
+var appEvents = require('../../utils/appevents');
 var issueDecorator = require('views/chat/decorators/issueDecorator');
 var commitDecorator = require('views/chat/decorators/commitDecorator');
 var mentionDecorator = require('views/chat/decorators/mentionDecorator');
@@ -27,11 +27,11 @@ var prerenderedTemplate = require('./tmpl/activity-item-prerendered.hbs');
 var activityTemplate = require('./tmpl/activity-composite.hbs');
 var activityEmptyTemplate = require('./tmpl/activity-empty.hbs');
 var activityDecorators = require('gitter-web-shared/activity/activity-decorators');
-var context = require('utils/context');
+var context = require('../../utils/context');
 var clientEnv = require('gitter-client-env');
 var timeFormat = require('gitter-web-shared/time/time-format');
 var fullTimeFormat = require('gitter-web-shared/time/full-time-format');
-var compositeViewRenderTemplate = require('utils/composite-view-render-template');
+var compositeViewRenderTemplate = require('../../utils/composite-view-render-template');
 
 require('views/behaviors/timeago');
 require('views/behaviors/tooltip');

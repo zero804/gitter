@@ -5,13 +5,13 @@ var template = require('./tmpl/chat-input-box.hbs');
 var drafty = require('components/drafty');
 var commands = require('./commands');
 var typeaheads = require('./typeaheads');
-var platformKeys = require('utils/platform-keys');
-var RAF = require('utils/raf');
+var platformKeys = require('../../utils/platform-keys');
+var RAF = require('../../utils/raf');
 var cocktail = require('backbone.cocktail');
 var KeyboardEventsMixin = require('views/keyboard-events-mixin');
-var appEvents = require('utils/appevents');
-var context = require('utils/context');
-var isMobile = require('utils/is-mobile');
+var appEvents = require('../../utils/appevents');
+var context = require('../../utils/context');
+var isMobile = require('../../utils/is-mobile');
 
 require('jquery-textcomplete');
 

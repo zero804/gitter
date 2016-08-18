@@ -1,9 +1,9 @@
 "use strict";
 
-require('utils/font-setup');
+require('./utils/font-setup');
 
-var appEvents = require('utils/appevents');
-var context = require('utils/context');
+var appEvents = require('./utils/appevents');
+var context = require('./utils/context');
 var Backbone = require('backbone');
 var itemCollections = require('collections/instances/integrated-items');
 var chatCollection = require('collections/instances/chats');
