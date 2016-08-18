@@ -6,11 +6,9 @@
   "plugins": [
     "node"
   ],
-  "extends": [
-    "eslint:recommended"
-  ],
   "rules": {
-    "node/no-unpublished-require": 2,
+    "node/no-unpublished-require": "error",
+    "node/no-unpublished-import": "error",
     "node/no-unsupported-features": [
       "error",
       {

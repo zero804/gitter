@@ -1,10 +1,8 @@
-"use strict";
-
 import assert from 'assert';
-import React from  'react';
+import React from 'react';
 import sinon from 'sinon';
 import { shallow } from 'enzyme';
-import TopicTableButton from '../../../../../shared/components/forum/table-control-button.jsx';
+import TopicTableButton from '../../../../../shared/containers/components/forum/table-control-button.jsx';
 
 describe('<TopicTableButton/>', () => {
 

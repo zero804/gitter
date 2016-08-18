@@ -5,7 +5,7 @@ var fonts = require('../../web/fonts');
 var forumService = require('gitter-web-forums').forumService;
 var forumCategoryStore = require('gitter-web-topics-ui/server/stores/forum-category-store');
 var forumTagStore = require('gitter-web-topics-ui/server/stores/forum-tag-store');
-var navConstants = require('gitter-web-topics-ui/browser/js/constants/navigation');
+var navConstants = require('gitter-web-topics-ui/shared/constants/navigation');
 
 function renderForum(req, res, next, options) {
 
