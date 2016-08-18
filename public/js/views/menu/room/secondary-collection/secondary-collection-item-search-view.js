@@ -8,7 +8,7 @@ var SecondaryCollectionItemView = require('./secondary-collection-item-view');
 
 var clientEnv = require('gitter-client-env');
 
-require('views/behaviors/highlight');
+require('../../../behaviors/highlight');
 
 module.exports = SecondaryCollectionItemView.extend({
   behaviors: {

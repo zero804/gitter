@@ -11,7 +11,7 @@ var TempOrgView = require('./temp-org-view/temp-org-view');
 var CollectionView = require('./minibar-collection-view');
 var CommunityCreateView = require('./minibar-community-create-item-view');
 
-require('views/behaviors/isomorphic');
+require('../../../behaviors/isomorphic');
 
 
 module.exports = Marionette.LayoutView.extend({

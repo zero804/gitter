@@ -7,7 +7,7 @@ var template = require('./tmpl/chatInputView.hbs');
 var ChatInputBoxView = require('./chat-input-box-view');
 var ChatInputButtons = require('./chat-input-buttons');
 
-require('views/behaviors/isomorphic');
+require('../behaviors/isomorphic');
 
 var ChatInputView = Marionette.LayoutView.extend({
 

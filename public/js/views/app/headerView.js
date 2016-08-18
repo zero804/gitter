@@ -14,12 +14,12 @@ var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
 
 var apiClient = require('../../components/apiClient');
 var userNotifications = require('../../components/user-notifications');
-var Dropdown = require('views/controls/dropdown');
-var KeyboardEventMixin = require('views/keyboard-events-mixin');
+var Dropdown = require('../controls/dropdown');
+var KeyboardEventMixin = require('../keyboard-events-mixin');
 var headerViewTemplate = require('./tmpl/headerViewTemplate.hbs');
 var getHeaderViewOptions = require('gitter-web-shared/templates/get-header-view-options');
 
-require('views/behaviors/tooltip');
+require('../behaviors/tooltip');
 require('transloadit');
 
 

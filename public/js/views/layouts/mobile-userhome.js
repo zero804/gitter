@@ -3,16 +3,16 @@
 var Marionette = require('backbone.marionette');
 var $ = require('jquery');
 var modalRegion = require('../../components/modal-region');
-var UserhomeView = require('views/userhome/userHomeView');
+var UserhomeView = require('../userhome/userHomeView');
 
 //TODO Move this into the upper js container
 //var appEvents    = require('../../utils/appevents');
 //var troupes      = require('../../collections/instances/troupes').troupes;
 //var RoomMenuLayout = require('../menu/room/layout/room-menu-layout');
 
-var TroupeMenu = require('views/menu/old/troupeMenu');
+var TroupeMenu = require('../menu/old/troupeMenu');
 
-require('views/behaviors/isomorphic');
+require('../behaviors/isomorphic');
 
 module.exports = Marionette.LayoutView.extend({
   template: false,

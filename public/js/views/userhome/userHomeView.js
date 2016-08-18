@@ -9,7 +9,7 @@ var userHomeTemplate = require('./tmpl/userHomeTemplate.hbs');
 var OrgCollectionView = require('./homeOrgCollectionView');
 var SuggestedCollectionView = require('./suggested-room-collection-view');
 var isMobile = require('../../utils/is-mobile');
-require('views/behaviors/isomorphic');
+require('../behaviors/isomorphic');
 
 module.exports = (function() {
 

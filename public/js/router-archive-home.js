@@ -9,13 +9,13 @@ var apiClient = require('./components/apiClient');
 var onready = require('./utils/onready');
 var appEvents = require('./utils/appevents');
 var heatmapUtils = require('./components/archive-heatmap-utils');
-var HeaderView = require('views/app/headerView');
+var HeaderView = require('./views/app/headerView');
 var RightToolBarModel = require('./models/right-toolbar-model');
 
 require('./components/timezone-cookie');
-require('views/widgets/preload');
+require('./views/widgets/preload');
 require('./components/dozy');
-require('template/helpers/all');
+require('./template/helpers/all');
 require('./components/bug-reporting');
 require('./utils/tracking');
 require('./components/ping');

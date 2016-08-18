@@ -3,12 +3,12 @@
 var Marionette = require('backbone.marionette');
 var hasScrollBars = require('../../utils/scrollbar-detect');
 var appEvents = require('../../utils/appevents');
-var ChatCollectionView = require('views/chat/chatCollectionView');
-var ChatConnectionIndicatorView = require('views/chat/chatConnectivityIndicatorView');
+var ChatCollectionView = require('../chat/chatCollectionView');
+var ChatConnectionIndicatorView = require('../chat/chatConnectivityIndicatorView');
 var context = require('../../utils/context');
 var unreadItemsClient = require('../../components/unread-items-client');
 
-require('views/behaviors/isomorphic');
+require('../behaviors/isomorphic');
 
 module.exports = Marionette.LayoutView.extend({
   behaviors: {

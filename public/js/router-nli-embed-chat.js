@@ -1,6 +1,6 @@
 "use strict";
 
-var ChatLayout = require('views/layouts/chat');
+var ChatLayout = require('./views/layouts/chat');
 var chatModels = require('./collections/chat');
 var onready = require('./utils/onready');
 var $ = require('jquery');
@@ -9,14 +9,14 @@ var $ = require('jquery');
 require('./components/timezone-cookie');
 
 require('./components/statsc');
-require('views/widgets/preload');
+require('./views/widgets/preload');
 require('./components/dozy');
-require('template/helpers/all');
+require('./template/helpers/all');
 require('./components/bug-reporting');
 require('./components/ping');
 
 // Preload widgets
-require('views/widgets/avatar');
+require('./views/widgets/avatar');
 
 var chatCollection = new chatModels.ChatCollection(null, { listen: true });
 chatCollection.on('add', function (item) {

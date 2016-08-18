@@ -2,10 +2,10 @@
 var $ = require('jquery');
 var appEvents = require('./utils/appevents');
 var Backbone = require('backbone');
-var confirmRepoRoomView = require('views/modals/confirm-repo-room-view');
+var confirmRepoRoomView = require('./views/modals/confirm-repo-room-view');
 var modalRegion = require('./components/modal-region');
 var onready = require('./utils/onready');
-var MobileUserhomeLayout = require('views/layouts/mobile-userhome');
+var MobileUserhomeLayout = require('./views/layouts/mobile-userhome');
 
 //Left Menu Additions
 //var gestures             = require('./utils/gesture-controller');
@@ -16,9 +16,9 @@ var FastClick = require('fastclick');
 require('./utils/tracking');
 
 // Preload widgets
-require('views/widgets/avatar');
+require('./views/widgets/avatar');
 require('./components/ping');
-require('template/helpers/all');
+require('./template/helpers/all');
 
 onready(function() {
 

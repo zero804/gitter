@@ -15,7 +15,7 @@ var KeyboardControllerView = require('../keyboard-controller/keyboard-controller
 var MINIBAR_ITEM_HEIGHT = 65;
 
 require('nanoscroller');
-require('views/behaviors/isomorphic');
+require('../../../behaviors/isomorphic');
 
 
 var RoomMenuLayoutView = Marionette.LayoutView.extend({

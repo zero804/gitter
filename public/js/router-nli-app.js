@@ -9,15 +9,15 @@ var TitlebarUpdater = require('./components/titlebar');
 var onready = require('./utils/onready');
 var debug = require('debug-proxy')('app:router-nli-app');
 
-require('views/widgets/preload');
+require('./views/widgets/preload');
 require('./components/user-notifications');
-require('template/helpers/all');
+require('./template/helpers/all');
 require('./components/bug-reporting');
 require('./utils/tracking');
 require('./components/ping');
 
 // Preload widgets
-require('views/widgets/avatar');
+require('./views/widgets/avatar');
 
 
 onready(function() {

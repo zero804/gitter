@@ -5,10 +5,10 @@ var SimpleFilteredCollection = require('../../collections/simple-filtered-collec
 var cocktail = require('backbone.cocktail');
 var toggleClass = require('../../utils/toggle-class');
 var appEvents = require('../../utils/appevents');
-var KeyboardEventMixin = require('views/keyboard-events-mixin');
+var KeyboardEventMixin = require('../keyboard-events-mixin');
 var VirtualMultipleCollection = require('./virtual-multiple-collection');
 
-require('views/behaviors/isomorphic');
+require('../behaviors/isomorphic');
 
 var template = require('./community-create-view.hbs');
 

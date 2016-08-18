@@ -1,7 +1,7 @@
 /* eslint complexity: ["error", 13] */
 "use strict";
 var $ = require('jquery');
-var Popover = require('views/popover');
+var Popover = require('../../popover');
 var context = require('../../../utils/context');
 var apiClient = require('../../../components/apiClient');
 var roomNameTrimmer = require('../../../utils/room-name-trimmer');

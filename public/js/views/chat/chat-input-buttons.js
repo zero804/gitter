@@ -4,9 +4,9 @@ var Marionette = require('backbone.marionette');
 var template = require('./tmpl/chat-input-buttons.hbs');
 var platformKeys = require('../../utils/platform-keys');
 var cocktail = require('backbone.cocktail');
-var KeyboardEventsMixin = require('views/keyboard-events-mixin');
+var KeyboardEventsMixin = require('../keyboard-events-mixin');
 var isMobile = require('../../utils/is-mobile');
-require('views/behaviors/tooltip');
+require('../behaviors/tooltip');
 
 
 var ChatInputButtons = Marionette.ItemView.extend({

@@ -12,8 +12,8 @@ var perfTiming = require('../../components/perf-timing');
 var debug = require('debug-proxy')('app:chat-collection-view');
 var collapsedItemsClient = require('../../utils/collapsed-item-client');
 
-require('views/behaviors/infinite-scroll');
-require('views/behaviors/smooth-scroll');
+require('../behaviors/infinite-scroll');
+require('../behaviors/smooth-scroll');
 
 module.exports = (function() {
 

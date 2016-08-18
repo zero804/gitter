@@ -11,15 +11,15 @@ var RoomCollectionView = require('./room-collection-view');
 var SuggestedCollectionView = require('./suggested-collection-view');
 var log = require('../../../utils/log');
 var cocktail = require('backbone.cocktail');
-var KeyboardEventsMixin = require('views/keyboard-events-mixin');
+var KeyboardEventsMixin = require('../../keyboard-events-mixin');
 var CollectionWrapperViewTemplate = require('./tmpl/collection-wrapper-view.hbs');
 var ProfileView = require('./profileView');
 var OrgCollectionView = require('./orgCollectionView');
 var dataSet = require('../../../utils/dataset-shim');
 var toggle = require('../../../utils/toggle');
 
-require('views/behaviors/isomorphic');
-require('views/behaviors/tooltip');
+require('../../behaviors/isomorphic');
+require('../../behaviors/tooltip');
 
 var apiClient = require('../../../components/apiClient');
 

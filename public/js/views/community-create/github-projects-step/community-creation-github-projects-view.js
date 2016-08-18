@@ -10,7 +10,7 @@ var SimpleFilteredCollection = require('../../../collections/simple-filtered-col
 var getRoomNameFromTroupeName = require('gitter-web-shared/get-room-name-from-troupe-name');
 var scopeUpgrader = require('../../../components/scope-upgrader');
 
-require('views/behaviors/isomorphic');
+require('../../behaviors/isomorphic');
 
 var stepConstants = require('../step-constants');
 var template = require('./community-creation-github-projects-view.hbs');

@@ -2,7 +2,7 @@
 
 var Marionette = require('backbone.marionette');
 var Backbone = require('backbone');
-var Popover = require('views/popover');
+var Popover = require('../popover');
 var template = require('./tmpl/userPopoverView.hbs');
 var footerTemplate = require('./tmpl/userPopoverFooterView.hbs');
 var appEvents = require('../../utils/appevents');

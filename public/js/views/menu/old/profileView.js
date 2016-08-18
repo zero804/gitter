@@ -8,7 +8,7 @@ var isNative = require('../../../utils/is-native');
 var template = require('./tmpl/profile.hbs');
 var logout = require('../../../utils/logout');
 
-require('views/behaviors/widgets');
+require('../../behaviors/widgets');
 
 module.exports = (function () {
 

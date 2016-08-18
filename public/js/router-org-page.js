@@ -61,8 +61,8 @@ onReady(function(){
     },
 
     onNavigateTags: function(roomId){
-      require.ensure(['views/modals/edit-tags-view'], function(require) {
-        var EditTagsView = require('views/modals/edit-tags-view');
+      require.ensure(['./views/modals/edit-tags-view'], function(require) {
+        var EditTagsView = require('./views/modals/edit-tags-view');
         modalRegion.show(new EditTagsView({ roomId: roomId }));
       });
     }

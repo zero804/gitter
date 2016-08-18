@@ -4,12 +4,12 @@ var $ = require('jquery');
 var context = require('../../utils/context');
 var appEvents = require('../../utils/appevents');
 var ChatLayout = require('./chat');
-var HeaderView = require('views/app/headerView');
+var HeaderView = require('../app/headerView');
 
 var RightToolBarModel = require('../../models/right-toolbar-model');
-var RightToolbarView = require('views/righttoolbar/rightToolbarView');
+var RightToolbarView = require('../righttoolbar/rightToolbarView');
 
-require('views/behaviors/isomorphic');
+require('../behaviors/isomorphic');
 
 module.exports = ChatLayout.extend({
   events: {

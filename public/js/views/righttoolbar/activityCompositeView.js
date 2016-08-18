@@ -3,9 +3,9 @@ var _ = require('underscore');
 var Marionette = require('backbone.marionette');
 var classnames = require('classnames');
 var appEvents = require('../../utils/appevents');
-var issueDecorator = require('views/chat/decorators/issueDecorator');
-var commitDecorator = require('views/chat/decorators/commitDecorator');
-var mentionDecorator = require('views/chat/decorators/mentionDecorator');
+var issueDecorator = require('../chat/decorators/issueDecorator');
+var commitDecorator = require('../chat/decorators/commitDecorator');
+var mentionDecorator = require('../chat/decorators/mentionDecorator');
 var debug = require('debug-proxy')('app:activity-composite-view');
 var githubPushTemplate = require('./tmpl/githubPush.hbs');
 var githubIssuesTemplate = require('./tmpl/githubIssues.hbs');
@@ -33,8 +33,8 @@ var timeFormat = require('gitter-web-shared/time/time-format');
 var fullTimeFormat = require('gitter-web-shared/time/full-time-format');
 var compositeViewRenderTemplate = require('../../utils/composite-view-render-template');
 
-require('views/behaviors/timeago');
-require('views/behaviors/tooltip');
+require('../behaviors/timeago');
+require('../behaviors/tooltip');
 
 module.exports = (function() {
 

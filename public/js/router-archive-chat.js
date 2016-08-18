@@ -3,22 +3,22 @@ var $ = require('jquery');
 var context = require('./utils/context');
 var clientEnv = require('gitter-client-env');
 var onready = require('./utils/onready');
-var HeaderView = require('views/app/headerView');
-var ArchiveNavigationView = require('views/archive/archive-navigation-view');
+var HeaderView = require('./views/app/headerView');
+var ArchiveNavigationView = require('./views/archive/archive-navigation-view');
 var RightToolBarModel = require('./models/right-toolbar-model');
 
 /* Set the timezone cookie */
 require('./components/timezone-cookie');
 
-require('views/widgets/preload');
+require('./views/widgets/preload');
 require('./components/dozy');
-require('template/helpers/all');
+require('./template/helpers/all');
 require('./components/bug-reporting');
 require('./utils/tracking');
 require('./components/ping');
 
 // Preload widgets
-require('views/widgets/avatar');
+require('./views/widgets/avatar');
 
 require('gitter-styleguide/css/components/buttons.css');
 
