@@ -1,7 +1,7 @@
 
 import Backbone from 'backbone';
-import { subscribe } from 'gitter-web-topics-ui/shared/dispatcher';
-import navConstants from 'gitter-web-topics-ui/shared/constants/navigation';
+import { subscribe } from '../../../shared/dispatcher';
+import navConstants from '../../../shared/constants/navigation';
 
 var RouteModel = Backbone.Model.extend({
   defaults: { route: null }
