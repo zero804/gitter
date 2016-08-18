@@ -1,6 +1,6 @@
 "use strict";
 
-var DEFAULT_TAG_VALUE = require('../../browser/js/constants/forum-tags').DEFAULT_TAG_VALUE;
+var DEFAULT_TAG_VALUE = require('../../shared/constants/forum-tags').DEFAULT_TAG_VALUE;
 
 module.exports = function forumTagStore(tags, activeTagName){
 

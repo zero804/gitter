@@ -1,7 +1,5 @@
-"use strict";
-
-var assert = require('assert');
-var Store = require('../../../../browser/js/stores/topics-store.js');
+import assert from 'assert';
+import Store from '../../../../browser/js/stores/topics-store.js';
 
 describe('TopicsStore', () => {
 
