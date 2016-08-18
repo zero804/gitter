@@ -1,4 +1,5 @@
 import { equal } from 'assert';
+import sinon from 'sinon';
 import React from 'react';
 import { shallow } from 'enzyme';
 import CreateTopicModal from '../../../../../../shared/containers/components/topic/create-topic-modal.jsx';
@@ -7,10 +8,26 @@ describe.only('<CreateTopicModal/>', () => {
 
   let wrapper;
   let activeWrapper;
+  let submitHandle;
+  let titleChangeHandle;
 
   beforeEach(() => {
-    wrapper = shallow(<CreateTopicModal active={false}/>);
-    activeWrapper = shallow(<CreateTopicModal active={true}/>);
+
+    submitHandle = sinon.spy();
+    titleChangeHandle = sinon.spy();
+
+    wrapper = shallow(
+      <CreateTopicModal
+        active={false}
+        onTitleChange={titleChangeHandle}
+        onSubmit={submitHandle}/>);
+
+    activeWrapper = shallow(
+      <CreateTopicModal
+        active={true}
+        onTitleChange={titleChangeHandle}
+        onSubmit={submitHandle}/>
+    );
   });
 
   it('should render a modal', () => {
@@ -62,7 +79,13 @@ describe.only('<CreateTopicModal/>', () => {
   });
 
   it('should call onSubmit when submitted', () => {
-    wrapper.find('form').at(0).simulate('submit', 'this is the news');
+    wrapper.find('form').at(0).simulate('submit', { preventDefault: () => {}});
+    equal(submitHandle.callCount, 1);
+  });
+
+  it('should call onTitleChange when the input changes', () => {
+    wrapper.find('Input').prop('onChange')();
+    assert.equal(titleChangeHandle.callCount, 1);
   });
 
 });
