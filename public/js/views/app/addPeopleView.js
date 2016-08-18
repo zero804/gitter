@@ -9,7 +9,7 @@ var template = require('./tmpl/addPeople.hbs');
 var userSearchItemTemplate = require('./tmpl/userSearchItem.hbs');
 var itemTemplate = require('./tmpl/addPeopleItemView.hbs');
 var Typeahead = require('views/controls/typeahead');
-var userSearchModels = require('collections/user-search');
+var userSearchModels = require('../../collections/user-search');
 require('views/behaviors/widgets');
 
 var DEFAULT_AVATAR_UNTIL_AVATARS_SERVICE_ARRIVES = 'https://avatars.githubusercontent.com/u/0'

@@ -9,7 +9,7 @@ var template = require('./tmpl/collaboratorsView.hbs');
 var itemTemplate = require('./tmpl/collaboratorsItemView.hbs');
 var emptyViewTemplate = require('./tmpl/collaboratorsEmptyView.hbs');
 var appEvents = require('../../utils/appevents');
-var collaboratorsModels = require('collections/collaborators');
+var collaboratorsModels = require('../../collections/collaborators');
 
 require('gitter-styleguide/css/components/buttons.css');
 require('gitter-styleguide/css/components/links.css');

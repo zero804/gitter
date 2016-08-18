@@ -1,7 +1,7 @@
 "use strict";
 
 var ChatLayout = require('views/layouts/chat');
-var chatModels = require('collections/chat');
+var chatModels = require('./collections/chat');
 var onready = require('./utils/onready');
 var $ = require('jquery');
 

@@ -4,7 +4,7 @@ var Marionette = require('backbone.marionette');
 var context = require('../../utils/context');
 var toggleClass = require('../../utils/toggle-class');
 
-var itemCollections = require('collections/instances/integrated-items');
+var itemCollections = require('../../collections/instances/integrated-items');
 var PeopleCollectionView = require('views/people/peopleCollectionView');
 var RepoInfoView = require('./repoInfo');
 var ActivityCompositeView = require('./activityCompositeView');

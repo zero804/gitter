@@ -2,7 +2,7 @@
 
 var onready = require('./utils/onready');
 var context = require('./utils/context');
-var chatCollection = require('collections/instances/chats');
+var chatCollection = require('./collections/instances/chats');
 var EmbedLayout = require('views/layouts/chat-embed');
 var Backbone = require('backbone');
 var apiClient = require('./components/apiClient');
