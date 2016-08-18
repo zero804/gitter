@@ -1,10 +1,9 @@
-"use strict";
 
-var navConstants = require('../../constants/navigation');
+import * as navConstants from '../../constants/navigation';
 
-module.exports = function navigateToCategory(category){
+export default function navigateToCategory(category) {
 
-  if(!category) {
+  if (!category) {
     throw new Error('navigateToCategory must be called with a category value');
   }
 
@@ -18,4 +17,4 @@ module.exports = function navigateToCategory(category){
     route: 'forum',
     category: category
   };
-};
+}

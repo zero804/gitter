@@ -4,7 +4,7 @@ import { shallow } from 'enzyme';
 import Backbone from 'backbone';
 import React from 'react';
 import App from 'gitter-web-topics-ui/browser/js/app.jsx';
-import ForumContainer from 'gitter-web-topics-ui/containers/ForumContainer.jsx';
+import ForumContainer from 'gitter-web-topics-ui/shared/containers/ForumContainer.jsx';
 
 describe.skip('App', function() {
 

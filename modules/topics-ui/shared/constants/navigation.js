@@ -1,6 +1,3 @@
-"use strict";
 
-module.exports = {
-  NAVIGATE_TO: 'navigate-to',
-  FORUM_ROUTE: 'forum'
-};
+export const NAVIGATE_TO = 'navigate-to';
+export const FORUM_ROUTE = 'forum';

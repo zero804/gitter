@@ -1,7 +1,7 @@
 import React from 'react';
-import ForumContainer from '../../containers/ForumContainer.jsx';
+import ForumContainer from '../../shared/containers/ForumContainer.jsx';
 import CategoryStore from './stores/forum-category-store';
-import navConstatnts from '../../shared/constants/navigation';
+import * as navConstatnts from '../../shared/constants/navigation';
 
 export default React.createClass({
 
