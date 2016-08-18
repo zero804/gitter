@@ -10,7 +10,7 @@ import * as forumFilterConstants from '../../../../shared/constants/forum-filter
 import * as forumTagConstants from '../../../../shared/constants/forum-tags';
 import * as forumSortConstants from '../../../../shared/constants/forum-sorts';
 
-describe.skip('Router', function(){
+describe('Router', function(){
 
   const trigger = {trigger: true};
   let filterHandle;
@@ -82,6 +82,22 @@ describe.skip('Router', function(){
     router.on(forumSortConstants.UPDATE_ACTIVE_SORT, sortHandle);
     router.set('sortName', 'test');
     assert.equal(sortHandle.callCount, 1);
+  });
+
+  it('should dispatch the right event when the filter name changes', () => {
+    var spy = sinon.spy();
+    router.on(forumFilterConstants.UPDATE_ACTIVE_FILTER, spy);
+    router.set('filterName', 'test');
+    assert.equal(spy.callCount, 1);
+    assert(spy.calledWithMatch({ filter: 'test' }));
+  });
+
+  it('should dispatch the right event when the filter name changes', () => {
+    var spy = sinon.spy();
+    router.on(forumSortConstants.UPDATE_ACTIVE_SORT, spy);
+    router.set('sortName', 'test');
+    assert.equal(spy.callCount, 1);
+    assert(spy.calledWithMatch({ sort: 'test' }));
   });
 
 
