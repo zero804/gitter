@@ -14,7 +14,7 @@ var toggle = require('../../../utils/toggle');
 var toggleClass = require('../../../utils/toggle-class');
 var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 
-require('jquery-sortable');
+require('jquery-sortable'); // eslint-disable-line node/no-missing-require
 
 
 module.exports = (function() {

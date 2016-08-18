@@ -39,14 +39,14 @@ var webpackConfig = {
     "topics-bootstrap": path.resolve(path.join(__dirname, './topics-bootstrap')),
 
     vendor: [
-      'utils/webpack',
-      'utils/context',
+      require.resolve('./utils/webpack'),
+      require.resolve('./utils/context'),
       'underscore',
       'jquery',
       'backbone',
       'backbone.marionette',
       'loglevel',
-      'utils/log',
+      require.resolve('./utils/log'),
       'handlebars/runtime',
       'gitter-realtime-client',
       'raven-js',
@@ -90,14 +90,6 @@ var webpackConfig = {
   },
   resolve: {
     alias: {
-      "utils": path.resolve(path.join(__dirname, "/utils/")),
-      // "shared": path.resolve(path.join(__dirname, "../../shared/")),
-      "views": path.resolve(path.join(__dirname, "./views/")),
-      "models": path.resolve(path.join(__dirname, "./models")),
-      "collections": path.resolve(path.join(__dirname, "./collections")),
-      "components": path.resolve(path.join(__dirname, "./components")),
-      "template": path.resolve(path.join(__dirname, "./template")),
-      "bootstrap_tooltip": path.resolve(path.join(__dirname, "./utils/tooltip.js")),
       "jquery": require.resolve('jquery'),
       "mutant": path.resolve(path.join(__dirname, "../repo/mutant/mutant.js")),
       "emojify": path.resolve(path.join(__dirname, "../repo/emojify/emojify.js")),

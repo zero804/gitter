@@ -320,7 +320,7 @@ onready(function() {
     },
 
     addPeople: function() {
-      require.ensure(['./views/app/addPeopleView', 'views/modals/upgrade-to-pro-view'], function(require) {
+      require.ensure(['./views/app/addPeopleView', './views/modals/upgrade-to-pro-view'], function(require) {
         var room = context.troupe();
         var maxFreeMembers = clientEnv.maxFreeOrgRoomMembers;
         var isOverLimit = room.get('security') !== 'PUBLIC' &&

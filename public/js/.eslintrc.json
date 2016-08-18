@@ -8,7 +8,6 @@
   ],
   "rules": {
     "node/no-unpublished-require": "off",
-    "node/no-missing-require": "off",
     "jquery/no-ajax": "off",
     "jquery/no-animate": "off",
     "jquery/no-attr": "off",

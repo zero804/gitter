@@ -1,7 +1,7 @@
 'use strict';
 
 var $ = require('jquery');
-require('jquery-iframely');
+require('jquery-iframely'); // eslint-disable-line node/no-missing-require
 var clientEnv = require('gitter-client-env');
 
 var iframelyProviders = ["youtube.com",

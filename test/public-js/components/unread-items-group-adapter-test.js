@@ -1,7 +1,7 @@
 'use strict';
 
 var unreadItemsGroupAdapter = require("proxyquire").noCallThru()('../../../public/js/components/unread-items-group-adapter', {
-  'utils/raf':
+  '../utils/raf':
     function(fn) {
       setImmediate(fn);
     }

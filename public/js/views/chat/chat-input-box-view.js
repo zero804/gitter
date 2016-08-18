@@ -13,7 +13,7 @@ var appEvents = require('../../utils/appevents');
 var context = require('../../utils/context');
 var isMobile = require('../../utils/is-mobile');
 
-require('jquery-textcomplete');
+require('jquery-textcomplete'); // eslint-disable-line node/no-missing-require
 
 var PLACEHOLDER = 'Click here to type a chat message. Supports GitHub flavoured markdown.';
 var PLACEHOLDER_MOBILE = 'Touch here to type a chat message.';
