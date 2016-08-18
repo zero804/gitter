@@ -24,14 +24,11 @@ module.exports = Marionette.LayoutView.extend({
         search: { el: '#minibar-search', init: 'initSearch' },
         people: { el: '#minibar-people', init: 'initPeople' },
         collectionView: { el: '#minibar-collection', init: 'initCollection' },
+        communityCreate: { el: '#minibar-community-create', init: 'initCommunityCreate' },
         close: { el: '#minibar-close', init: 'initClose' },
         tempOrg: { el: '#minibar-temp', init: 'initTemp' }
       },
     };
-
-    if(context.hasFeature('community-create')) {
-      behaviours.Isomorphic.communityCreate = { el: '#minibar-community-create', init: 'initCommunityCreate' };
-    }
 
     return behaviours;
   },

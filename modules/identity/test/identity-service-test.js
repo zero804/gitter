@@ -8,15 +8,23 @@ describe('identityService', function() {
   var fixture = {};
   before(fixtureLoader(fixture, {
     deleteDocuments: {
+      User: [
+        // use this as a proxy for githubId: null.
+        { username: '_fake_google_user1_test' },
+        // clean up the githubId has it is actually unique
+        { githubId: true },
+      ],
       Identity: [{ provider: 'google', providerKey: 'google-identity' }]
     },
     user1: {
+      // githubId has to be unique, so there can only be one null..
       githubId: null,
       githubToken: null,
+      username: '_fake_google_user1_test'
     },
     user2: {
       githubId: true,
-      githubToken: true
+      githubToken: true,
     },
     identity1: {
       user: 'user1',
@@ -28,8 +36,6 @@ describe('identityService', function() {
   after(function() {
     fixture.cleanup();
   });
-
-
 
   describe('getIdentityForUser', function() {
     it('works for non github users', function() {

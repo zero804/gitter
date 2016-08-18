@@ -17,7 +17,8 @@ var roomMembershipService = require('./room-membership-service');
 var roomService = require('./room-service');
 var assert = require('assert');
 var roomMetaService = require('./room-meta-service');
-var processMarkdown = require('../utils/markdown-processor');
+var processText = require('gitter-web-text-processor');
+
 var roomInviteService = require('./room-invite-service');
 var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
 var validateProviders = require('gitter-web-validators/lib/validate-providers');
@@ -267,7 +268,7 @@ RoomWithPolicyService.prototype.getRoomWelcomeMessage = secureMethod([allowJoin]
 RoomWithPolicyService.prototype.updateRoomWelcomeMessage = secureMethod([allowAdmin], function(data){
   if (!data || !data.welcomeMessage && data.welcomeMessage !== '') throw new StatusError(400);
 
-  return processMarkdown(data.welcomeMessage)
+  return processText(data.welcomeMessage)
     .bind(this)
     .then(function(welcomeMessage){
       return roomMetaService.upsertMetaKey(this.room.id, 'welcomeMessage', welcomeMessage)
@@ -356,6 +357,13 @@ function removeUserFromRoomAllowCurrentUser(userForRemove) {
  */
 RoomWithPolicyService.prototype.removeUserFromRoom = secureMethod([removeUserFromRoomAllowCurrentUser, allowAdmin], function(userForRemove) {
   return roomService.removeUserFromRoom(this.room, userForRemove);
+});
+
+/**
+ * Add an existing Gitter user to a room
+ */
+RoomWithPolicyService.prototype.sendBadgePullRequest = secureMethod([allowAdmin], function() {
+  return roomService.sendBadgePullRequest(this.room, this.user);
 });
 
 module.exports = RoomWithPolicyService;
