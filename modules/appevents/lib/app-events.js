@@ -1,6 +1,8 @@
 "use strict";
 
+var Promise = require('bluebird');
 var events = require('events');
+var assert = require('assert');
 
 function makeEmitter() {
   var localEventEmitter = new events.EventEmitter();
@@ -9,6 +11,30 @@ function makeEmitter() {
     /* This is only good for testing */
     removeAllListeners: function() {
       localEventEmitter.removeAllListeners()
+    },
+
+    // this is really useful for testing
+    addListener: function(eventName, expected) {
+      var promise = new Promise(function(resolve) {
+        localEventEmitter.on(eventName, function(res) {
+          // TODO: This probably only really works with dataChange2 for now.
+          // Make it more generic.
+
+          // First filter by url and operation, as other events may have been emitted
+          if (expected.url && expected.url !== res.url) return;
+          if (expected.operation && expected.operation !== res.operation) return;
+          // Check model with deepEqual
+          if (expected.model) {
+            resolve(assert.deepEqual(res.model, expected.model));
+          } else {
+            resolve();
+          }
+        });
+      });
+
+      return function() {
+        return promise;
+      };
     },
 
     newUnreadItem: function(userId, troupeId, items, online) {
@@ -196,6 +222,9 @@ var defaultListener = makeEmitter();
 module.exports = defaultListener;
 module.exports.testOnly = {
   makeEmitter: makeEmitter,
+  addListener: function(eventName, expected) {
+    return defaultListener.addListener(eventName, expected);
+  },
   removeAllListeners: function() {
     defaultListener.removeAllListeners();
   }
