@@ -5,7 +5,7 @@ var _ = require('underscore');
 var context = require('../../utils/context');
 var Marionette = require('backbone.marionette');
 var appEvents = require('../../utils/appevents');
-var apiClient = require('components/apiClient');
+var apiClient = require('../../components/apiClient');
 
 require('transloadit');
 

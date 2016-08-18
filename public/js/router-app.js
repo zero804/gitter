@@ -16,12 +16,12 @@ var RAF = require('./utils/raf');
 var appEvents = require('./utils/appevents');
 var context = require('./utils/context');
 
-var TitlebarUpdater = require('components/titlebar');
-var realtime = require('components/realtime');
-var RoomCollectionTracker = require('components/room-collection-tracker');
-var SPARoomSwitcher = require('components/spa-room-switcher');
-var linkHandler = require('components/link-handler');
-var roomListGenerator = require('components/chat-cache/room-list-generator');
+var TitlebarUpdater = require('./components/titlebar');
+var realtime = require('./components/realtime');
+var RoomCollectionTracker = require('./components/room-collection-tracker');
+var SPARoomSwitcher = require('./components/spa-room-switcher');
+var linkHandler = require('./components/link-handler');
+var roomListGenerator = require('./components/chat-cache/room-list-generator');
 var troupeCollections = require('collections/instances/troupes');
 var repoModels = require('collections/repos');
 var RepoCollection = repoModels.ReposCollection;
@@ -29,22 +29,22 @@ var orgModels = require('collections/orgs');
 var OrgCollection = orgModels.OrgCollection;
 var groupModels = require('collections/groups');
 var CommunityCreateModel = require('views/community-create/community-create-model');
-var CreateRoomModel = require('models/create-room-view-model');
-var scopeUpgrader = require('components/scope-upgrader');
+var CreateRoomModel = require('./models/create-room-view-model');
+var scopeUpgrader = require('./components/scope-upgrader');
 
 var AppLayout = require('views/layouts/app-layout');
 var LoadingView = require('views/app/loading-view');
 
-require('components/statsc');
+require('./components/statsc');
 require('views/widgets/preload');
-require('components/user-notifications');
+require('./components/user-notifications');
 require('template/helpers/all');
-require('components/bug-reporting');
-require('components/focus-events');
+require('./components/bug-reporting');
+require('./components/focus-events');
 
 
 require('./utils/tracking');
-require('components/ping');
+require('./components/ping');
 
 // Preload widgets
 require('views/widgets/avatar');
@@ -62,7 +62,7 @@ onready(function() {
   }
 
   /* TODO: add the link handler here? */
-  require('components/link-handler').installLinkHandler();
+  require('./components/link-handler').installLinkHandler();
 
   /*
    * Push State Management

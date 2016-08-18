@@ -2,7 +2,7 @@
 
 var Marionette = require('backbone.marionette');
 var $ = require('jquery');
-var modalRegion = require('components/modal-region');
+var modalRegion = require('../../components/modal-region');
 var UserhomeView = require('views/userhome/userHomeView');
 
 //TODO Move this into the upper js container

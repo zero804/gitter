@@ -8,7 +8,7 @@ var TagListView = require('views/app/tags/tagListView');
 var TagErrorView = require('views/app/tags/tagErrorView');
 var TagModel = require('collections/tag-collection').TagModel;
 var TagCollection = require('collections/tag-collection').TagCollection;
-var apiClient = require('components/apiClient');
+var apiClient = require('../../components/apiClient');
 var editTagsTemplate = require('./tmpl/edit-tags-view.hbs');
 
 require('views/behaviors/isomorphic');

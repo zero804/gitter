@@ -6,19 +6,19 @@ var Backbone = require('backbone');
 var onready = require('./utils/onready');
 var appEvents = require('./utils/appevents');
 var LoginView = require('views/modals/login-view');
-var modalRegion = require('components/modal-region');
+var modalRegion = require('./components/modal-region');
 var debug = require('debug-proxy')('app:login');
 var urlParse = require('url-parse');
 
 require('./utils/tracking');
 require('template/helpers/all');
 require('views/widgets/preload');
-require('components/timezone-cookie');
-require('components/bug-reporting');
-require('components/ping');
+require('./components/timezone-cookie');
+require('./components/bug-reporting');
+require('./components/ping');
 
 onready(function() {
-  require('components/link-handler').installLinkHandler();
+  require('./components/link-handler').installLinkHandler();
   appEvents.on('navigation', function(url) {
     window.location = url;
   });

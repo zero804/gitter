@@ -5,7 +5,7 @@ var Marionette = require('backbone.marionette');
 var $ = require('jquery');
 
 var appEvents = require('../../utils/appevents');
-var modalRegion = require('components/modal-region');
+var modalRegion = require('../../components/modal-region');
 var ChatContainerView = require('views/chat/chatContainerView');
 var TroupeMenu = require('views/menu/old/troupeMenu');
 

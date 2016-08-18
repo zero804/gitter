@@ -2,7 +2,7 @@
 
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
-var apiClient = require('components/apiClient');
+var apiClient = require('../../components/apiClient');
 var appEvents = require('../../utils/appevents');
 var ModalView = require('./modal');
 var template = require('./tmpl/confirm-repo-room.hbs');

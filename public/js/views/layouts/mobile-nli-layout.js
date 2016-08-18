@@ -1,7 +1,7 @@
 "use strict";
 
 var Marionette = require('backbone.marionette');
-var modalRegion = require('components/modal-region');
+var modalRegion = require('../../components/modal-region');
 var ChatContainerView = require('views/chat/chatContainerView');
 var MobileLoginButton = require('views/mobile/mobileLoginButton');
 

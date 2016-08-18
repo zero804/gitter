@@ -1,6 +1,6 @@
 "use strict";
 
-var apiClient = require('components/apiClient');
+var apiClient = require('../../components/apiClient');
 var context = require('../../utils/context');
 var appEvents = require('../../utils/appevents');
 var Rollers = require('../../utils/rollers');

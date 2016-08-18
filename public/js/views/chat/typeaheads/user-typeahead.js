@@ -2,7 +2,7 @@
 
 var isMobile = require('../../../utils/is-mobile');
 var context = require('../../../utils/context');
-var apiClient = require('components/apiClient');
+var apiClient = require('../../../components/apiClient');
 var template = require('./tmpl/typeahead.hbs');
 var _ = require('underscore');
 

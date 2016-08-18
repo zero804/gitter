@@ -2,7 +2,7 @@
 
 var _ = require('underscore');
 var Backbone = require('backbone');
-var apiClient = require('components/apiClient');
+var apiClient = require('../../../components/apiClient');
 
 var stepConstants = require('../step-constants');
 var peopleToInviteStatusConstants = require('../people-to-invite-status-constants');
