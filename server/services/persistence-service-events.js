@@ -1,5 +1,7 @@
 "use strict";
 
+var env = require('gitter-web-env');
+var config = env.config;
 var liveCollections = require('./live-collections');
 
 exports.install = function(persistenceService) {
@@ -80,5 +82,22 @@ exports.install = function(persistenceService) {
     }
   });
 
+  if (config.get('topics:useApi')) {
+    /**
+     * Topics
+     */
+    mongooseUtils.attachNotificationListenersToSchema(schemas.TopicSchema, {
+      onCreate: function(model, next) {
+        liveCollections.topics.emit("create", model);
+        next();
+      },
+
+      onRemove: function(model) {
+        liveCollections.topics.emit("remove", model);
+      }
+    });
+
+    // TODO: Categories, Replies, Comments
+  }
 
 };

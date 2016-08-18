@@ -1,6 +1,7 @@
 'use strict';
 
 var env = require('gitter-web-env');
+var config = env.config;
 var logger = env.logger;
 var errorReporter = env.errorReporter;
 var EventEmitter = require('events').EventEmitter;
@@ -14,6 +15,11 @@ var handlers = {
   users: './live-collection-users',
   groupMembers: './live-collection-group-members'
 };
+
+if (config.get('topics:useAPI')) {
+  handlers.topics = './live-collection-topics';
+  // TODO: categories? forums, replies, comments
+}
 
 var emitters;
 module.exports = makeEmitters();
