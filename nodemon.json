@@ -5,6 +5,7 @@
   "ignore": [
     ".git",
     "modules/topics-ui/containers/**"
+    "modules/topics-ui/output/**"
   ],
   "verbose": true,
   "env": {

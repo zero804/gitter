@@ -1,10 +1,7 @@
-"use strict";
+import { Collection } from 'backbone';
+import { UPDATE_ACTIVE_TAG } from '../../../shared/constants/forum-tags';
 
-const {Collection} = require('backbone');
-const {UPDATE_ACTIVE_TAG} = require('../constants/forum-tags');
-
-
-module.exports = Collection.extend({
+export default Collection.extend({
 
   initialize: function(models, attrs) {
     this.router = attrs.router;

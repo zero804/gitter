@@ -1,11 +1,9 @@
-"use strict";
-
 import assert from 'assert';
-import React from  'react';
+import React from 'react';
 import Backbone from 'backbone';
 import sinon from 'sinon';
 import { shallow, mount } from 'enzyme';
-import TableControl from '../../../../../shared/components/forum/table-control.jsx';
+import TableControl from '../../../../../shared/containers/components/forum/table-control.jsx';
 
 
 var TagCollection = Backbone.Collection.extend({

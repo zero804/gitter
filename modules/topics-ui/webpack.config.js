@@ -65,6 +65,7 @@ var config = {
   postcss: function(webpack) {
     return getPostcssStack(webpack);
   },
+  bail: true
 };
 
 module.exports = config;
