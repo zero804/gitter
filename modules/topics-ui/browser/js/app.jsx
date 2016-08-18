@@ -1,12 +1,46 @@
-'use strict';
+import React from 'react';
+import ForumContainer from '../../shared/containers/ForumContainer.jsx';
+import CategoryStore from './stores/forum-category-store';
+import * as navConstatnts from '../../shared/constants/navigation';
 
-var React = require('react');
-var ForumContainer = require('../../containers/ForumContainer.jsx');
+export default React.createClass({
 
-module.exports = React.createClass({
+  displayName: 'App',
+
+  propTypes: {
+    //System router
+    router: React.PropTypes.shape({
+      get: React.PropTypes.func.isRequired,
+      set: React.PropTypes.func.isRequired,
+    })
+  },
+
+  getInitialState(){
+    const { router } = this.props;
+    switch(router.get('route')) {
+      case navConstatnts.FORUM_ROUTE: return this.getForumState();
+    }
+  },
 
   render(){
-    return <ForumContainer {...this.props} />
+    const { route } = this.state;
+    switch(route) {
+      case navConstatnts.FORUM_ROUTE: return <ForumContainer {...this.state} />
+    }
   },
+
+  getDefaultState(){
+    const { router } = this.props;
+    return { route: router.get('route') };
+  },
+
+  getForumState(){
+    const categoryStore = (window.context.categoryStore || {});
+    const { router } = this.props;
+    return Object.assign(this.getDefaultState(), {
+      groupName: router.get('groupName'),
+      categoryStore: new CategoryStore(categoryStore.models, { router: router }),
+    });
+  }
 
 });

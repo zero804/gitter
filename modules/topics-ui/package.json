@@ -5,32 +5,45 @@
   "main": "server/index.js",
   "scripts": {
     "test": "node ./test/fixtures/runner-node.js",
-    "test-watch": "cd ./test && webpack -w & http-server"
+    "test-watch": "webpack -w --config ./test/webpack.config.js & http-server ./test/fixtures"
   },
   "author": "Gitter Team",
   "license": "ISC",
   "dependencies": {
-    "lodash": "^4.14.0",
+    "backbone": "1.2.3",
+    "classnames": "^2.2.3",
+    "lodash": "^4.15.0",
     "react": "^15.2.1",
     "react-dom": "^15.2.1"
   },
   "devDependencies": {
-    "glob": "^7.0.5",
-    "mocha": "^2.5.3",
     "babel-loader": "^6.2.4",
+    "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-plugin-istanbul": "^2.0.0",
     "babel-preset-es2015": "^6.9.0",
     "babel-preset-react": "^6.11.1",
-    "babel-register": "^6.11.5",
+    "babel-register": "^6.9.0",
     "css-loader": "^0.23.1",
-    "del": "^2.2.1",
+    "del": "^1.1.1",
+    "enzyme": "^2.4.1",
+    "eslint": "^2.9.0",
+    "eslint-plugin-mocha": "^2.2.0",
+    "extract-text-webpack-plugin": "^1.0.1",
+    "gitter-styleguide": "^1.6.6",
+    "gitter-web-qs": "file:../qs",
+    "glob": "^6.0.4",
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
     "gulp-filter": "^4.0.0",
+    "jquery": "^3.1.0",
     "less-loader": "^2.2.3",
+    "mocha": "^2.5.3",
+    "postcss-loader": "^0.8.2",
+    "pump": "^1.0.1",
+    "react-addons-test-utils": "^15.3.0",
     "style-loader": "^0.13.1",
     "webpack": "^1.13.1",
-    "webpack-dev-middleware": "^1.6.1",
-    "extract-text-webpack-plugin": "^1.0.1"
+    "webpack-dev-middleware": "^1.6.1"
   },
   "babel": {
     "presets": [
