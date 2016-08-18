@@ -5,7 +5,7 @@ var Promise = require('bluebird');
 var persistence = require('gitter-web-persistence');
 var shutdown = require('shutdown');
 var BatchStream = require('batch-stream');
-var markdownProcessor = require('../../server/utils/markdown-processor');
+var processText = require('gitter-web-text-processor');
 
 // @const
 var BATCH_SIZE = 200;
@@ -18,7 +18,7 @@ var runCalled = 0;
 var batchComplete;
 var running;
 
-var batch = new BatchStream({ size : BATCH_SIZE });
+var batch = new BatchStream({ size: BATCH_SIZE });
 
 var stream = persistence.ChatMessage
   .find({
@@ -85,7 +85,7 @@ function run(chatMessages) {
   if (runCalled % BATCH_SIZE === 0) logProgress();
 
   return Promise.all(chatMessages.map(function(chat) {
-    return markdownProcessor(chat.text)
+    return processText(chat.text)
       .then(function(result) {
         totalProcessed += 1;
         if(totalProcessed % 1000 === 0) {

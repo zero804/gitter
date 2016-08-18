@@ -13,7 +13,7 @@ metrics.init({ prefix: 'build.benchmarks.' });
 var os = require("os");
 
 csv
- .fromStream(process.stdin, { headers : ["date", "suite", "benchmark", "total", "iterations"] })
+ .fromStream(process.stdin, { headers: ["date", "suite", "benchmark", "total", "iterations"] })
  .on("data", function(data) {
    var benchmark = data.benchmark;
    if (!benchmark) return; // Ignore bad lines

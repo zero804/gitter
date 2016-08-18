@@ -69,12 +69,7 @@
     "yoda": "error",
     "no-nested-ternary": "warn",
     "no-whitespace-before-property": "error",
-    "no-trailing-spaces": [
-      "error",
-      {
-        "skipBlankLines": true
-      }
-    ],
+    "no-trailing-spaces": ["error"],
     "space-in-parens": [
       "warn",
       "never"

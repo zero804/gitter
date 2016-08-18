@@ -1,6 +1,6 @@
 "use strict";
 
-var MinibarItemView  = require('../minibar-item-view');
+var MinibarItemView = require('../minibar-item-view');
 var _ = require('underscore');
 var toggleClass = require('utils/toggle-class');
 var context = require('utils/context');
@@ -33,7 +33,7 @@ initialize: function(attrs, options) {
     var data = this.model.toJSON();
     var uri = getOrgNameFromUri(this.getRoomUri());
     var avatarUrl = avatars.getForRoomUri(uri);
-    return  _.extend({}, data,  _super.serializeData.apply(this, arguments), {
+    return _.extend({}, data, _super.serializeData.apply(this, arguments), {
       avatarUrl: avatarUrl,
     });
   },
