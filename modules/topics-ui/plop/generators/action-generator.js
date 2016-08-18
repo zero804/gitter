@@ -44,7 +44,7 @@ module.exports = function(plop){
         //Add the action type to a constant file
         type: 'modify',
         path: path.resolve(__dirname, '../../shared/constants/', data.constantFile),
-        pattern: /\Z/,
+        pattern: /\Z/, //TODO THIS DOESNT WORK :(
         template: "export const {{constantCase name}} = '{{dashCase name}}'"
       },
       {
