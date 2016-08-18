@@ -1,6 +1,5 @@
-"use strict";
-
 import React, { PropTypes } from 'react';
+import classNames from 'classnames';
 
 export default React.createClass({
 
@@ -8,12 +7,13 @@ export default React.createClass({
   propTypes: {
     name: PropTypes.string.isRequired,
     placeholder: PropTypes.string.isRequired,
+    className: PropTypes.string
   },
 
   render(){
 
     const { name, className, placeholder } = this.props;
-    const compiledClass = !!className ? `input ${className}` : 'input';
+    const compiledClass = classNames('input', className);
 
     return (
       <input className={compiledClass} name={name} placeholder={placeholder}/>

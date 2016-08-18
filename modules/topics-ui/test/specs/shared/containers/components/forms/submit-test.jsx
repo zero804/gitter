@@ -1,9 +1,7 @@
-"use strict";
-
 import {equal} from 'assert';
 import React from 'react';
 import { shallow } from 'enzyme';
-import Submit from '../../../../../shared/components/forms/submit.jsx';
+import Submit from '../../../../../../shared/containers/components/forms/submit.jsx';
 
 describe('<Submit/>', () => {
 

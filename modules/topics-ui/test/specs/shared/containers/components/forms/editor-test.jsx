@@ -1,9 +1,7 @@
-"use strict";
-
 import { equal } from 'assert';
 import React from 'react';
 import { shallow } from 'enzyme';
-import Editor from '../../../../../shared/components/forms/editor.jsx';
+import Editor from '../../../../../../shared/containers/components/forms/editor.jsx';
 
 describe('<Editor/>', () => {
 

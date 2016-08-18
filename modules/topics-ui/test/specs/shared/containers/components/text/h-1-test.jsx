@@ -1,9 +1,7 @@
-"use strict";
-
 import { equal } from 'assert';
 import React from 'react';
 import { shallow } from 'enzyme';
-import H1 from '../../../../../shared/components/text/h-1.jsx';
+import H1 from '../../../../../../shared/containers/components/text/h-1.jsx';
 
 describe('<H1/>', () => {
 

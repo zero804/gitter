@@ -1,18 +1,18 @@
-"use strict";
-
 import React, { PropTypes } from 'react';
+import classNames from 'classnames';
 
 export default React.createClass({
 
   displayName: 'Submit',
   propTypes: {
-    className: PropTypes.string
+    className: PropTypes.string,
+    children: PropTypes.node
   },
 
   render(){
 
     const { className } = this.props;
-    const compiledClass = !!className ? `submit-button ${className}` : 'submit-button';
+    const compiledClass = classNames('submit-button', className);
 
     return (
       <button type="submit" className={compiledClass}>
