@@ -35,8 +35,7 @@ function findRooms(groupId, user, currentPage) {
     })
     .then(function(roomBrowseResult) {
       var strategy = new restSerializer.SuggestedRoomStrategy({
-        currentUserId: userId,
-        currentUser: user
+        currentUserId: userId
       });
 
       return restSerializer.serialize(roomBrowseResult.results, strategy)

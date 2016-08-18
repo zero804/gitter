@@ -1,9 +1,14 @@
 "use strict";
 
-var env = require('gitter-web-env');
-var logger = env.logger;
-var estimatedChatsService = require('../../services/estimated-chats-service');
-var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
+var Promise = require('bluebird');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+
+var GroupIdStrategy = require('./group-id-strategy');
+var UserIdStrategy = require('./user-id-strategy');
+var resolveOneToOneOtherUser = require('../resolve-one-to-one-other-user');
+var getRoomNameAndUrl = require('../get-room-name-and-url');
+var getAvatarUrlForRoom = require('../get-avatar-url-for-room');
+var oneToOneOtherUserSequence = require('../one-to-tne-other-user-sequence');
 
 // function RoomMessageCountStrategy() {
 //   this.messageCounts = null;
@@ -31,10 +36,38 @@ var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avata
 //   name: 'RoomMessageCountStrategy'
 // };
 
-function SuggestedRoomStrategy() {
+function SuggestedRoomStrategy(options) {
   // var messageCountStrategy;
 
+  var currentUserId = options && mongoUtils.asObjectID(options.currentUserId);
+
+  var groupIdStrategy;
+  var userIdStrategy;
+
   this.preload = function(suggestedRooms) {
+    var strategies = [];
+
+
+    groupIdStrategy = new GroupIdStrategy(options);
+    var groupIds = suggestedRooms.map(function(troupe) {
+        return troupe.groupId;
+      })
+      .filter(function(f) {
+        return !!f;
+      });
+
+    strategies.push(groupIdStrategy.preload(groupIds));
+
+
+    if (currentUserId) {
+      // The other user in one-to-one rooms
+      var otherUserIds = oneToOneOtherUserSequence(currentUserId, suggestedRooms);
+      if (!otherUserIds.isEmpty()) {
+        userIdStrategy = new UserIdStrategy(options);
+        strategies.push(userIdStrategy.preload(otherUserIds));
+      }
+    }
+
     // if (suggestedRooms.isEmpty()) return;
     //
     // var troupeIds = suggestedRooms
@@ -47,6 +80,8 @@ function SuggestedRoomStrategy() {
     //
     // messageCountStrategy = new RoomMessageCountStrategy();
     // return messageCountStrategy.preload(troupeIds);
+
+    return Promise.all(strategies);
   };
 
   this.map = function(suggestedRoom) {
@@ -55,14 +90,34 @@ function SuggestedRoomStrategy() {
 
     var id = suggestedRoom.id || suggestedRoom._id;
 
+    var group = groupIdStrategy && suggestedRoom.groupId ? groupIdStrategy.map(suggestedRoom.groupId) : undefined;
+
     var providers = (suggestedRoom.providers && suggestedRoom.providers.length) ?
         suggestedRoom.providers :
         undefined;
 
+
+    var otherUser;
+    var slimOtherUser = resolveOneToOneOtherUser(suggestedRoom, currentUserId);
+    if(slimOtherUser) {
+      otherUser = userIdStrategy.map(slimOtherUser.userId);
+    }
+
+    var nameInfo = getRoomNameAndUrl(group, suggestedRoom, {
+      otherUser: otherUser
+    });
+    var troupeName = nameInfo.name;
+
+    var avatarUrl = getAvatarUrlForRoom(suggestedRoom, {
+      name: troupeName,
+      group: group,
+      user: otherUser
+    });
+
     return {
       id: id,
       uri: uri,
-      avatarUrl: resolveRoomAvatarUrl(suggestedRoom, 48),
+      avatarUrl: avatarUrl,
       userCount: suggestedRoom.userCount,
       messageCount: undefined, // messageCountStrategy.map(id),
       tags: suggestedRoom.tags,

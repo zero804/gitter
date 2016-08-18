@@ -3,23 +3,17 @@
 var testRequire = require('../../test-require');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assertUtils = require('../../assert-utils')
+var env = require('gitter-web-env');
+var nconf = env.config;
 var serialize = testRequire('./serializers/serialize');
 var SuggestedRoomStrategy = testRequire('./serializers/rest/suggested-room-strategy');
 
-
-// Using user channel rooms to prevent it from going to github unnecessarily,
-// but the fixtures aren't creating sane uris for USER_CHANNEL troupes where we
-// expect the first component to be the username of the user that created it,
-// so just use whatever it ended up generating.
-function guessAvatarUrl(url) {
-  return '/api/private/user-avatar/'+ url.split('/')[0] +'?s=48';
-}
 
 function getExpectedForSuggestion(suggestion) {
   return [{
     id: suggestion.id,
     uri: suggestion.uri,
-    avatarUrl: guessAvatarUrl(suggestion.uri),
+    avatarUrl: nconf.get('avatar:officialHost') + '/gh/u/' + suggestion.uri.split('/')[0],
     userCount: 1,
     // messageCount: 0,
     tags: [],

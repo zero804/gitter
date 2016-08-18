@@ -6,11 +6,7 @@
 >
   <header class="room-card__header">
     <a href="/{{ uri }}?source={{linkSource}}" target="_parent" tabindex="-1" class="room-card__header-link">
-      <img
-        src="{{roomAvatarSrcSet.src}}"
-        srcset="{{roomAvatarSrcSet.srcset}}"
-        class="room-card__header-avatar"
-      >
+      <img class="room-card__header-avatar" {{{ avatarSrcSet avatarUrl 40 }}}>
       <h3 class="room-card__heading">
         {{#if isPrivate}}
           <i class="room-card__heading-private-icon octicon octicon-lock"></i>
