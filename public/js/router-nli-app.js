@@ -5,23 +5,23 @@ require('./utils/font-setup');
 var appEvents = require('./utils/appevents');
 var context = require('./utils/context');
 var clientEnv = require('gitter-client-env');
-var TitlebarUpdater = require('components/titlebar');
+var TitlebarUpdater = require('./components/titlebar');
 var onready = require('./utils/onready');
 var debug = require('debug-proxy')('app:router-nli-app');
 
 require('views/widgets/preload');
-require('components/user-notifications');
+require('./components/user-notifications');
 require('template/helpers/all');
-require('components/bug-reporting');
+require('./components/bug-reporting');
 require('./utils/tracking');
-require('components/ping');
+require('./components/ping');
 
 // Preload widgets
 require('views/widgets/avatar');
 
 
 onready(function() {
-  require('components/link-handler').installLinkHandler();
+  require('./components/link-handler').installLinkHandler();
 
   appEvents.on('navigation', function(url/*, type, title*/) {
     window.location = url;

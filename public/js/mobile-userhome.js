@@ -3,7 +3,7 @@ var $ = require('jquery');
 var appEvents = require('./utils/appevents');
 var Backbone = require('backbone');
 var confirmRepoRoomView = require('views/modals/confirm-repo-room-view');
-var modalRegion = require('components/modal-region');
+var modalRegion = require('./components/modal-region');
 var onready = require('./utils/onready');
 var MobileUserhomeLayout = require('views/layouts/mobile-userhome');
 
@@ -17,7 +17,7 @@ require('./utils/tracking');
 
 // Preload widgets
 require('views/widgets/avatar');
-require('components/ping');
+require('./components/ping');
 require('template/helpers/all');
 
 onready(function() {
@@ -28,7 +28,7 @@ onready(function() {
   //Remove for Left Menu
   FastClick.attach(document.body);
 
-  require('components/link-handler').installLinkHandler();
+  require('./components/link-handler').installLinkHandler();
   appEvents.on('navigation', function(url) {
     window.location.href = url;
   });

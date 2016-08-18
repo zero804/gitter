@@ -8,14 +8,14 @@ var ArchiveNavigationView = require('views/archive/archive-navigation-view');
 var RightToolBarModel = require('./models/right-toolbar-model');
 
 /* Set the timezone cookie */
-require('components/timezone-cookie');
+require('./components/timezone-cookie');
 
 require('views/widgets/preload');
-require('components/dozy');
+require('./components/dozy');
 require('template/helpers/all');
-require('components/bug-reporting');
+require('./components/bug-reporting');
 require('./utils/tracking');
-require('components/ping');
+require('./components/ping');
 
 // Preload widgets
 require('views/widgets/avatar');

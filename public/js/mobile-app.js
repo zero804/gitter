@@ -15,8 +15,8 @@ var orgModels = require('collections/orgs');
 var OrgCollection = orgModels.OrgCollection;
 var CommunityCreateModel = require('views/community-create/community-create-model');
 
-var unreadItemsClient = require('components/unread-items-client');
-var RoomCollectionTracker = require('components/room-collection-tracker');
+var unreadItemsClient = require('./components/unread-items-client');
+var RoomCollectionTracker = require('./components/room-collection-tracker');
 var MobileLayout = require('views/layouts/mobile');
 
 //Remove when left menu is in place
@@ -28,7 +28,7 @@ var FastClick = require('fastclick');
 require('./utils/tracking');
 
 /* Set the timezone cookie */
-require('components/timezone-cookie');
+require('./components/timezone-cookie');
 
 // Preload widgets
 require('./views/widgets/avatar');
@@ -45,7 +45,7 @@ onready(function() {
   //Remove when left menu is in place
   FastClick.attach(document.body);
 
-  require('components/link-handler').installLinkHandler();
+  require('./components/link-handler').installLinkHandler();
   appEvents.on('navigation', function(url) {
     window.location.href = url;
   });

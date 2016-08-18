@@ -5,20 +5,20 @@ require('./utils/font-setup');
 var $ = require('jquery');
 var context = require('./utils/context');
 var clientEnv = require('gitter-client-env');
-var apiClient = require('components/apiClient');
+var apiClient = require('./components/apiClient');
 var onready = require('./utils/onready');
 var appEvents = require('./utils/appevents');
-var heatmapUtils = require('components/archive-heatmap-utils');
+var heatmapUtils = require('./components/archive-heatmap-utils');
 var HeaderView = require('views/app/headerView');
 var RightToolBarModel = require('./models/right-toolbar-model');
 
-require('components/timezone-cookie');
+require('./components/timezone-cookie');
 require('views/widgets/preload');
-require('components/dozy');
+require('./components/dozy');
 require('template/helpers/all');
-require('components/bug-reporting');
+require('./components/bug-reporting');
 require('./utils/tracking');
-require('components/ping');
+require('./components/ping');
 
 require('gitter-styleguide/css/components/buttons.css');
 
@@ -26,7 +26,7 @@ require('gitter-styleguide/css/components/buttons.css');
 
 onready(function() {
 
-  require('components/link-handler').installLinkHandler();
+  require('./components/link-handler').installLinkHandler();
   appEvents.on('navigation', function(url) {
     window.location = url;
   });

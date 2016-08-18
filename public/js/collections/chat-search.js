@@ -1,7 +1,7 @@
 "use strict";
 var Backbone = require('backbone');
 var chatModels = require('./chat');
-var apiClient = require('components/apiClient');
+var apiClient = require('../components/apiClient');
 var cocktail = require('backbone.cocktail');
 var context = require('../utils/context');
 var InfiniteCollectionMixin = require('./infinite-mixin');

@@ -5,12 +5,12 @@ var $ = require('jquery');
 var appEvents = require('./utils/appevents');
 var Backbone = require('backbone');
 var confirmRepoRoomView = require('views/modals/confirm-repo-room-view');
-var modalRegion = require('components/modal-region');
+var modalRegion = require('./components/modal-region');
 var onready = require('././utils/onready');
 
 // Preload widgets
 require('views/widgets/avatar');
-require('components/ping');
+require('./components/ping');
 
 onready(function() {
 

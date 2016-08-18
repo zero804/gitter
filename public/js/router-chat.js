@@ -11,9 +11,9 @@ var fullTimeFormat = require('gitter-web-shared/time/full-time-format');
 var onready = require('./utils/onready');
 var appEvents = require('./utils/appevents');
 var frameUtils = require('./utils/frame-utils');
-var liveContext = require('components/live-context');
-var apiClient = require('components/apiClient');
-var perfTiming = require('components/perf-timing');
+var liveContext = require('./components/live-context');
+var apiClient = require('./components/apiClient');
+var perfTiming = require('./components/perf-timing');
 var itemCollections = require('collections/instances/integrated-items');
 var chatCollection = require('collections/instances/chats-cached');
 var troupeCollections = require('collections/instances/troupes');
@@ -21,18 +21,18 @@ var ChatToolbarInputLayout = require('views/layouts/chat-toolbar-input');
 var DropTargetView = require('views/app/dropTargetView');
 
 /* Set the timezone cookie */
-require('components/timezone-cookie');
+require('./components/timezone-cookie');
 
-require('components/statsc');
+require('./components/statsc');
 require('views/widgets/preload');
-require('components/dozy');
+require('./components/dozy');
 require('template/helpers/all');
-require('components/eyeballs-room-sync');
-require('components/bug-reporting');
-require('components/focus-events');
+require('./components/eyeballs-room-sync');
+require('./components/bug-reporting');
+require('./components/focus-events');
 
 // Preload widgets
-require('components/ping');
+require('./components/ping');
 
 onready(function() {
 
@@ -53,7 +53,7 @@ onready(function() {
     }
  });
 
-  require('components/link-handler').installLinkHandler();
+  require('./components/link-handler').installLinkHandler();
 
   function parsePostMessage(e) {
     // Shortcut for performance

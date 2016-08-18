@@ -1,5 +1,5 @@
 'use strict';
-var apiClient = require('components/apiClient');
+var apiClient = require('../components/apiClient');
 var Backbone = require('backbone');
 var SyncMixin = require('./sync-mixin');
 var _ = require('underscore');

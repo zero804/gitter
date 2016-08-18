@@ -10,13 +10,13 @@ require('./utils/tracking');
 
 // Preload widgets
 require('views/widgets/avatar');
-require('components/ping');
+require('./components/ping');
 require('template/helpers/all');
 
 onready(function() {
   FastClick.attach(document.body);
 
-  require('components/link-handler').installLinkHandler();
+  require('./components/link-handler').installLinkHandler();
   appEvents.on('navigation', function(url) {
     window.location.href = url;
   });

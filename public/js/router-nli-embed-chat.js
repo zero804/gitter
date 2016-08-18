@@ -6,14 +6,14 @@ var onready = require('./utils/onready');
 var $ = require('jquery');
 
 /* Set the timezone cookie */
-require('components/timezone-cookie');
+require('./components/timezone-cookie');
 
-require('components/statsc');
+require('./components/statsc');
 require('views/widgets/preload');
-require('components/dozy');
+require('./components/dozy');
 require('template/helpers/all');
-require('components/bug-reporting');
-require('components/ping');
+require('./components/bug-reporting');
+require('./components/ping');
 
 // Preload widgets
 require('views/widgets/avatar');

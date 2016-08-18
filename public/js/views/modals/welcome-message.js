@@ -4,7 +4,7 @@ var Marionette = require('backbone.marionette');
 var ModalView = require('./modal');
 var context = require('../../utils/context');
 var template = require('./tmpl/welcome-message-view.hbs');
-var apiClient = require('components/apiClient');
+var apiClient = require('../../components/apiClient');
 
 var View = Marionette.ItemView.extend({
   template: template,

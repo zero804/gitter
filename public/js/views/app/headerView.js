@@ -12,8 +12,8 @@ var MenuBuilder = require('../../utils/menu-builder');
 var appEvents = require('../../utils/appevents');
 var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
 
-var apiClient = require('components/apiClient');
-var userNotifications = require('components/user-notifications');
+var apiClient = require('../../components/apiClient');
+var userNotifications = require('../../components/user-notifications');
 var Dropdown = require('views/controls/dropdown');
 var KeyboardEventMixin = require('views/keyboard-events-mixin');
 var headerViewTemplate = require('./tmpl/headerViewTemplate.hbs');

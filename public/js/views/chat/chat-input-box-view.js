@@ -2,7 +2,7 @@
 
 var Marionette = require('backbone.marionette');
 var template = require('./tmpl/chat-input-box.hbs');
-var drafty = require('components/drafty');
+var drafty = require('../../components/drafty');
 var commands = require('./commands');
 var typeaheads = require('./typeaheads');
 var platformKeys = require('../../utils/platform-keys');

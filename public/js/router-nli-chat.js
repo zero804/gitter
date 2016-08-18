@@ -15,20 +15,20 @@ var ChatToolbarLayout = require('views/layouts/chat-toolbar');
 var urlParse = require('url-parse');
 
 /* Set the timezone cookie */
-require('components/timezone-cookie');
+require('./components/timezone-cookie');
 
 require('views/widgets/preload');
-require('components/dozy');
+require('./components/dozy');
 require('template/helpers/all');
-require('components/bug-reporting');
+require('./components/bug-reporting');
 
 // Preload widgets
 require('views/widgets/avatar');
-require('components/ping');
+require('./components/ping');
 
 onready(function() {
 
-  require('components/link-handler').installLinkHandler();
+  require('./components/link-handler').installLinkHandler();
 
   appEvents.on('navigation', function(url) {
     // No pushState here. Open links within the parent...

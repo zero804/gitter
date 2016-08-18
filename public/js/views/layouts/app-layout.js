@@ -1,6 +1,6 @@
 "use strict";
 var Marionette = require('backbone.marionette');
-var modalRegion = require('components/modal-region');
+var modalRegion = require('../../components/modal-region');
 var appEvents = require('../../utils/appevents');
 
 //OLD LEFT MENU

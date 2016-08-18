@@ -1,7 +1,7 @@
 "use strict";
 
 var context = require('../utils/context');
-var realtime = require('components/realtime');
+var realtime = require('../components/realtime');
 var gitterRealtimeClient = require('gitter-realtime-client');
 var SyncMixin = require('./sync-mixin');
 

@@ -9,7 +9,7 @@ var InfiniteCollectionMixin = require('./infinite-mixin');
 var cocktail = require('backbone.cocktail');
 var log = require('../utils/log');
 var LiveCollection = require('gitter-realtime-client').LiveCollection;
-var realtime = require('components/realtime');
+var realtime = require('../components/realtime');
 var SyncMixin = require('./sync-mixin');
 var lookupParser = require('gitter-web-shared/lookup-parser');
 

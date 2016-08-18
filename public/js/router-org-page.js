@@ -5,7 +5,7 @@ require('./utils/font-setup');
 var onReady = require('./utils/onready');
 var Backbone = require('backbone');
 var appEvents = require('./utils/appevents');
-var modalRegion = require('components/modal-region');
+var modalRegion = require('./components/modal-region');
 var _ = require('underscore');
 var clientEnv = require('gitter-client-env');
 
@@ -16,7 +16,7 @@ require('./utils/tracking');
 
 onReady(function(){
 
-  require('components/link-handler').installLinkHandler();
+  require('./components/link-handler').installLinkHandler();
 
   //We are always within an iFrame to we can
   //change the parent url with NO FEAR!
