@@ -3,7 +3,6 @@
 var path = require('path');
 var React = require('react');
 
-var componentPath;
 var suffix;
 
 if (process.env.NODE_ENV === 'dev') {
@@ -13,14 +12,12 @@ if (process.env.NODE_ENV === 'dev') {
 
   // Hotswapping of JSX modules
   var hotswapReloader = require('../dev/hotswap-reloader');
-  hotswapReloader(path.resolve(__dirname, '..', 'containers'), function() {
+  hotswapReloader(path.resolve(__dirname, '..', 'shared', 'containers'), function() {
     factories = {};
   });
 
-  componentPath = 'containers';
   suffix = '.jsx';
 } else {
-  componentPath = 'containers-compiled';
   suffix = '';
 }
 
@@ -31,7 +28,7 @@ function getComponent(componentName) {
     return factories[componentName];
   }
 
-  var component = require(path.resolve(__dirname, '..', componentPath, componentName + suffix)).default;
+  var component = require('../shared/containers/' + componentName + suffix);
   var Component = factories[componentName] = React.createFactory(component);
 
   return Component;

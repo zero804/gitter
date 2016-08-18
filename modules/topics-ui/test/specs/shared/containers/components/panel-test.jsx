@@ -1,7 +1,7 @@
 import assert from 'assert';
 import React from 'react';
 import { shallow } from 'enzyme';
-import Panel from 'gitter-web-topics-ui/containers/components/panel.jsx';
+import Panel from '../../../../../shared/containers/components/panel.jsx';
 
 describe('<Panel />', function(){
 

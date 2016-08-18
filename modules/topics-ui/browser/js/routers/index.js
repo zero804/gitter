@@ -1,7 +1,7 @@
 
 import Backbone from 'backbone';
 import { subscribe } from '../../../shared/dispatcher';
-import navConstants from '../../../shared/constants/navigation';
+import * as navConstants from '../../../shared/constants/navigation';
 
 var RouteModel = Backbone.Model.extend({
   defaults: { route: null }

@@ -61,7 +61,6 @@ gulp.task('topics:test:server', function() {
 gulp.task('topics:test:unit', function() {
   return gulp.src([
     // ROOT + '/test/specs/browser/**/*.{js,jsx}',
-    ROOT + '/test/specs/containers/**/*.{js,jsx}',
     ROOT + '/test/specs/server/**/*.{js,jsx}',
     ROOT + '/test/specs/shared/**/*.{js,jsx}',
   ])

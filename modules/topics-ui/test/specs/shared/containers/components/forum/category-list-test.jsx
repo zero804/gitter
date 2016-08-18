@@ -2,10 +2,10 @@ import assert from 'assert';
 import React from 'react';
 import { shallow } from 'enzyme';
 import sinon from 'sinon';
-import CategoryList from 'gitter-web-topics-ui/containers/components/forum/category-list.jsx';
-import Container from 'gitter-web-topics-ui/containers/components/container.jsx';
-import Panel from 'gitter-web-topics-ui/containers/components/panel.jsx';
-import CategoryListItem from 'gitter-web-topics-ui/containers/components/forum/category-list-item.jsx';
+import CategoryList from '../../../../../../shared/containers/components/forum/category-list.jsx';
+import Container from '../../../../../../shared/containers/components/container.jsx';
+import Panel from '../../../../../../shared/containers/components/panel.jsx';
+import CategoryListItem from '../../../../../../shared/containers/components/forum/category-list-item.jsx';
 
 describe('<CategoryList />', function(){
 
@@ -18,7 +18,7 @@ describe('<CategoryList />', function(){
   let clickHandle;
   beforeEach(function(){
     clickHandle = sinon.spy();
-    wrapper = shallow(<CategoryList onCategoryClicked={clickHandle} categories={categories} groupName="gitterHQ"  />);
+    wrapper = shallow(<CategoryList onCategoryClicked={clickHandle} categories={categories} groupName="gitterHQ" />);
   });
 
   it('should render a single container', function(){

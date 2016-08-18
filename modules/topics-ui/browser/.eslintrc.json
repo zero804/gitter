@@ -17,8 +17,6 @@
     "plugin:import/errors"
   ],
   "rules": {
-    "import/default": "off",
-    "import/named": "off",
     "node/no-unsupported-features": [2, { "version": 6 }],
     "react/display-name": 2,
     "react/jsx-no-duplicate-props": 2,

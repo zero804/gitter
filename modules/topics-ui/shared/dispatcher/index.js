@@ -1,31 +1,27 @@
-"use strict";
-
 /*
  Right now this is a simple shim around Backbone.Events
  This will change with the introduction of mediator-js
  but right now this is the simplest thing
 */
 
-var Backbone = require('backbone');
+// THIS HAS CODE SMELL
 
-module.exports = {
+import Backbone from 'backbone';
 
   //todo remove
-  on: Backbone.Events.on,
-  off: Backbone.Events.off,
-  trigger: Backbone.Events.trigger,
+export const on = Backbone.Events.on;
+export const off = Backbone.Events.off;
+export const trigger = Backbone.Events.trigger;
 
-  subscribe: function(evt, handle, ctx){
-    Backbone.Events.on(evt, handle, ctx);
-  },
+export function subscribe(evt, handle, ctx){
+  Backbone.Events.on(evt, handle, ctx);
+}
 
-  unsubscribe: function(evt, handle){
-    Backbone.Events.off(evt, handle);
-  },
+export function unsubscribe(evt, handle){
+  Backbone.Events.off(evt, handle);
+}
 
-  dispatch: function(data){
-    var evt = data.type; delete data.type;
-    Backbone.Events.trigger(evt, data);
-  }
-
-};
+export function dispatch(data){
+  var evt = data.type; delete data.type;
+  Backbone.Events.trigger(evt, data);
+}

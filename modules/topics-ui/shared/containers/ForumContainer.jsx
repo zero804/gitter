@@ -1,8 +1,8 @@
 import React from 'react';
 import CategoryList from './components/forum/category-list.jsx';
-import { dispatch } from '../shared/dispatcher/index';
-import navigateToCategory from '../shared/action-creators/forum/navigate-to-category';
-import { UPDATE_ACTIVE_CATEGORY } from '../shared/constants/forum-categories';
+import { dispatch } from '../dispatcher/index';
+import navigateToCategory from '../action-creators/forum/navigate-to-category';
+import { UPDATE_ACTIVE_CATEGORY } from '../constants/forum-categories';
 
 export default React.createClass({
 

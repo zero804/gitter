@@ -1,8 +1,6 @@
-"use strict";
-
-var assert = require('assert');
-var navigateToCategory = require('gitter-web-topics-ui/shared/action-creators/forum/navigate-to-category');
-var navConstants = require('gitter-web-topics-ui/shared/constants/navigation');
+import assert from 'assert';
+import navigateToCategory from 'gitter-web-topics-ui/shared/action-creators/forum/navigate-to-category';
+import * as navConstants from 'gitter-web-topics-ui/shared/constants/navigation';
 
 describe('navigateToCategory', () => {
 

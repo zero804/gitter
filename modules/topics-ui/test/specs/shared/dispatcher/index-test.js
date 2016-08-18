@@ -1,9 +1,7 @@
-'use strict';
-
-const assert = require('assert');
-const sinon = require('sinon');
-const Backbone = require('backbone');
-const dispatcher = require('gitter-web-topics-ui/shared/dispatcher');
+import assert from 'assert';
+import sinon from 'sinon';
+import Backbone from 'backbone';
+import * as dispatcher from 'gitter-web-topics-ui/shared/dispatcher';
 
 var events = Backbone.Events;
 

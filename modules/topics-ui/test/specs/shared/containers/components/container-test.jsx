@@ -1,6 +1,6 @@
 import assert from 'assert';
 import React from 'react';
-import Container from 'gitter-web-topics-ui/containers/components/container.jsx';
+import Container from '../../../../../shared/containers/components/container.jsx';
 import { shallow } from 'enzyme';
 
 describe('<Container />', function(){

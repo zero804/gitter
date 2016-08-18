@@ -2,7 +2,7 @@ import assert from 'assert';
 import React from 'react';
 import sinon from 'sinon';
 import { shallow } from 'enzyme';
-import CategoryListItem from 'gitter-web-topics-ui/containers/components/forum/category-list-item.jsx';
+import CategoryListItem from '../../../../../../shared/containers/components/forum/category-list-item.jsx';
 
 describe('<CategoryListItem />', function(){
 

@@ -1,5 +1,2 @@
-"use strict";
 
-module.exports = {
-  UPDATE_ACTIVE_CATEGORY: 'update-active-category'
-};
+export const UPDATE_ACTIVE_CATEGORY = 'update-active-category';

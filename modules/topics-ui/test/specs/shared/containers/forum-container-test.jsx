@@ -2,9 +2,9 @@ import assert from 'assert';
 import Backbone from 'backbone';
 import React from 'react';
 import { shallow } from 'enzyme';
-import ForumContainer from 'gitter-web-topics-ui/containers/ForumContainer.jsx';
-import { subscribe } from 'gitter-web-topics-ui/shared/dispatcher';
-import navConstants from 'gitter-web-topics-ui/shared/constants/navigation';
+import ForumContainer from '../../../../shared/containers/ForumContainer.jsx';
+import { subscribe } from '../../../../shared/dispatcher';
+import * as navConstants from '../../../../shared/constants/navigation';
 
 var Collection = Backbone.Collection.extend({
   getCategories(){
