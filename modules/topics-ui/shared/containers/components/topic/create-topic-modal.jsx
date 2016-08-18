@@ -9,7 +9,9 @@ export default React.createClass({
 
   displayName: 'CreateTopicModal',
   propTypes: {
-    active: PropTypes.bool.isRequired
+    active: PropTypes.bool.isRequired,
+    onSubmit: PropTypes.func.isRequired,
+    onTitleChange: PropTypes.func.isRequired,
   },
 
   render(){
@@ -18,7 +20,7 @@ export default React.createClass({
       <Modal active={active}>
         <form name="create-topic" onSubmit={this.onSubmit}>
           <H1 className="create-topic__heading">New Topic</H1>
-          <Input className="create-topic__input--name" name="title" placeholder="Add title ..."/>
+          <Input className="create-topic__input--name" name="title" placeholder="Add title ..." onChange={this.onTitleChange}/>
           <Editor className="create-topic__editor--body" name="body"/>
           <div className="create-topic__control-row">
             <Submit className="create-topic__submit">Create Topic</Submit>
@@ -28,10 +30,14 @@ export default React.createClass({
     );
   },
 
+  onTitleChange(title){
+    console.log(title);
+    this.props.onTitleChange(title);
+  },
+
   onSubmit(e = { preventDefault: ()=>{} }){
-    console.log(...arguments);
-    //e.preventDefault();
-    console.log('this is working');
+    e.preventDefault();
+    this.props.onSubmit();
   }
 
 });
