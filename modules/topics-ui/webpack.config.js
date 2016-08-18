@@ -1,6 +1,7 @@
 "use strict";
 
 var path = require('path');
+var ExtractTextPlugin = require("extract-text-webpack-plugin"); //eslint-disable-line node/no-unpublished-require
 
 var config = {
   entry: {
@@ -17,6 +18,11 @@ var config = {
   module: {
     loaders: [
       {
+        test: /.less$/,
+        loader: ExtractTextPlugin.extract('style-loader', 'css-loader!less-loader'),
+        include: path.resolve(__dirname, './browser/less')
+      },
+      {
         test: /\.jsx$/,
         loader: 'babel',
         query: {
@@ -27,7 +33,10 @@ var config = {
         }
       }
     ]
-  }
+  },
+  plugins: [
+    new ExtractTextPlugin("style.css", { allChunks: false })
+  ]
 };
 
 module.exports = config;
