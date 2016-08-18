@@ -6,10 +6,10 @@ var Marionette = require('backbone.marionette');
 var cocktail = require('backbone.cocktail');
 var autolink = require('autolink');
 var clientEnv = require('gitter-client-env');
-var context = require('utils/context');
-var toggleClass = require('utils/toggle-class');
-var MenuBuilder = require('utils/menu-builder');
-var appEvents = require('utils/appevents');
+var context = require('../../utils/context');
+var toggleClass = require('../../utils/toggle-class');
+var MenuBuilder = require('../../utils/menu-builder');
+var appEvents = require('../../utils/appevents');
 var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
 
 var apiClient = require('components/apiClient');

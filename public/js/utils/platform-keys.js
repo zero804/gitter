@@ -1,6 +1,6 @@
 "use strict";
-var platformDetect = require('utils/platformDetect');
-var context = require('utils/context');
+var platformDetect = require('./platformDetect');
+var context = require('./context');
 
 module.exports = (function() {
 

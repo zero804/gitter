@@ -1,12 +1,12 @@
 "use strict";
-var context = require('utils/context');
+var context = require('../../../utils/context');
 var clientEnv = require('gitter-client-env');
 var Marionette = require('backbone.marionette');
-var appEvents = require('utils/appevents');
-var isMobile = require('utils/is-mobile');
-var isNative = require('utils/is-native');
+var appEvents = require('../../../utils/appevents');
+var isMobile = require('../../../utils/is-mobile');
+var isNative = require('../../../utils/is-native');
 var template = require('./tmpl/profile.hbs');
-var logout = require('utils/logout');
+var logout = require('../../../utils/logout');
 
 require('views/behaviors/widgets');
 

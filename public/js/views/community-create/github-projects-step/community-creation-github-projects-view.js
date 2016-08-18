@@ -2,8 +2,8 @@
 
 var _ = require('underscore');
 var Promise = require('bluebird');
-var toggleClass = require('utils/toggle-class');
-var context = require('utils/context');
+var toggleClass = require('../../../utils/toggle-class');
+var context = require('../../../utils/context');
 var slugify = require('slug');
 var fuzzysearch = require('fuzzysearch');
 var SimpleFilteredCollection = require('../../../collections/simple-filtered-collection');

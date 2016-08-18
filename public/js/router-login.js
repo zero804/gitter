@@ -3,14 +3,14 @@
 var _ = require('underscore');
 var $ = require('jquery');
 var Backbone = require('backbone');
-var appEvents = require('utils/appevents');
 var onready = require('./utils/onready');
+var appEvents = require('./utils/appevents');
 var LoginView = require('views/modals/login-view');
 var modalRegion = require('components/modal-region');
 var debug = require('debug-proxy')('app:login');
 var urlParse = require('url-parse');
 
-require('utils/tracking');
+require('./utils/tracking');
 require('template/helpers/all');
 require('views/widgets/preload');
 require('components/timezone-cookie');

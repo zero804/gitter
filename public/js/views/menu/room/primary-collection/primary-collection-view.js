@@ -9,9 +9,9 @@ var EmptyAllView = require('./primary-collection-item-all-empty-view');
 var EmptySearchView = require('./primary-collection-item-search-empty-view');
 var EmptyFavouriteView = require('./primary-collection-item-favourite-empty-view');
 var perfTiming = require('components/perf-timing');
-var compositeViewRenderTemplate = require('utils/composite-view-render-template');
-var domIndexById = require('utils/dom-index-by-id');
-var toggleClass = require('utils/toggle-class');
+var compositeViewRenderTemplate = require('../../../../utils/composite-view-render-template');
+var domIndexById = require('../../../../utils/dom-index-by-id');
+var toggleClass = require('../../../../utils/toggle-class');
 
 var PrimaryCollectionView = BaseCollectionView.extend({
 

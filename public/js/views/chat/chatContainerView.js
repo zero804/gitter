@@ -1,11 +1,11 @@
 "use strict";
 
 var Marionette = require('backbone.marionette');
-var hasScrollBars = require('utils/scrollbar-detect');
-var appEvents = require('utils/appevents');
+var hasScrollBars = require('../../utils/scrollbar-detect');
+var appEvents = require('../../utils/appevents');
 var ChatCollectionView = require('views/chat/chatCollectionView');
 var ChatConnectionIndicatorView = require('views/chat/chatConnectivityIndicatorView');
-var context = require('utils/context');
+var context = require('../../utils/context');
 var unreadItemsClient = require('components/unread-items-client');
 
 require('views/behaviors/isomorphic');

@@ -4,7 +4,7 @@ var Backbone = require('backbone');
 var LiveCollection = require('gitter-realtime-client').LiveCollection;
 var realtime = require('components/realtime');
 var SyncMixin = require('./sync-mixin');
-var context = require('utils/context');
+var context = require('../utils/context');
 
 var OrgModel = Backbone.Model.extend({
   idAttribute: 'name' // Unusual...

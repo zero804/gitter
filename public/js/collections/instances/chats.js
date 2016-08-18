@@ -1,9 +1,9 @@
 "use strict";
 
 var chatModels = require('../chat');
-var context = require('utils/context');
+var context = require('../../utils/context');
 var unreadItemsClient = require('components/unread-items-client');
-var errorHandle = require('utils/live-collection-error-handle');
+var errorHandle = require('../../utils/live-collection-error-handle');
 
 var chatCollection = new chatModels.ChatCollection(null, { listen: true });
 

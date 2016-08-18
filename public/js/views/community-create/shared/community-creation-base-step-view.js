@@ -1,7 +1,7 @@
 'use strict';
 
 var Marionette = require('backbone.marionette');
-var toggleClass = require('utils/toggle-class');
+var toggleClass = require('../../../utils/toggle-class');
 
 
 

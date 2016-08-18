@@ -1,8 +1,8 @@
 "use strict";
 
-var context = require('utils/context');
+var context = require('../../../utils/context');
 var UserPopoverView = require('views/people/userPopoverView');
-var dataset = require('utils/dataset-shim');
+var dataset = require('../../../utils/dataset-shim');
 
 module.exports = (function() {
 

@@ -1,8 +1,8 @@
 "use strict";
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
-var context = require('utils/context');
-var isMobile = require('utils/is-mobile');
+var context = require('../../utils/context');
+var isMobile = require('../../utils/is-mobile');
 var template = require('./tmpl/avatar.hbs');
 var UserPopoverView = require('views/people/userPopoverView');
 var widgets = require('views/behaviors/widgets');

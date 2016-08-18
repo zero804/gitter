@@ -3,9 +3,9 @@
 var $ = require('jquery');
 var _ = require('underscore');
 var Backbone = require('backbone');
-var context = require('utils/context');
-var appEvents = require('utils/appevents');
-var onready = require('utils/onready');
+var context = require('./utils/context');
+var appEvents = require('./utils/appevents');
+var onready = require('./utils/onready');
 
 var chatModels = require('collections/chat');
 var troupeCollections = require('collections/instances/troupes');
@@ -23,9 +23,9 @@ var MobileLayout = require('views/layouts/mobile');
 var FastClick = require('fastclick');
 
 //Left Menu Additions
-//var gestures              = require('utils/gesture-controller');
+//var gestures              = require('./utils/gesture-controller');
 
-require('utils/tracking');
+require('./utils/tracking');
 
 /* Set the timezone cookie */
 require('components/timezone-cookie');
@@ -35,7 +35,7 @@ require('./views/widgets/avatar');
 require('./components/ping');
 require('./components/eyeballs-room-sync');
 require('./template/helpers/all');
-require('./utils/gesture-controller');
+require('././utils/gesture-controller');
 
 onready(function() {
   //Ledt Menu Additions

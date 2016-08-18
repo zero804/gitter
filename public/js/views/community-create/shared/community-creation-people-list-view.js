@@ -5,7 +5,7 @@ var Marionette = require('backbone.marionette');
 var urlJoin = require('url-join');
 var clientEnv = require('gitter-client-env');
 var avatars = require('gitter-web-avatars');
-var toggleClass = require('utils/toggle-class');
+var toggleClass = require('../../../utils/toggle-class');
 var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 
 var peopleToInviteStatusConstants = require('../people-to-invite-status-constants');

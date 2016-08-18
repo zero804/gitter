@@ -1,7 +1,7 @@
 "use strict";
 
-var context = require('utils/context');
-var appEvents = require('utils/appevents');
+var context = require('../../utils/context');
+var appEvents = require('../../utils/appevents');
 var ChatInputView = require('views/chat/chatInputView');
 var cocktail = require('backbone.cocktail');
 var KeyboardEventsMixin = require('views/keyboard-events-mixin');

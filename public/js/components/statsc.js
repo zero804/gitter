@@ -1,8 +1,8 @@
 "use strict";
 var _ = require('underscore');
-var appEvents = require('utils/appevents');
+var appEvents = require('../utils/appevents');
 var apiClient = require('components/apiClient');
-var log = require('utils/log');
+var log = require('../utils/log');
 var context = require('../utils/context');
 var debug = require('debug-proxy')('app:stats');
 

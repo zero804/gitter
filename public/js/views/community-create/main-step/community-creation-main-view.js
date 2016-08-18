@@ -2,8 +2,8 @@
 
 var _ = require('underscore');
 var slugify = require('slug');
-var context = require('utils/context');
-var toggleClass = require('utils/toggle-class');
+var context = require('../../../utils/context');
+var toggleClass = require('../../../utils/toggle-class');
 var apiClient = require('components/apiClient');
 
 var stepConstants = require('../step-constants');

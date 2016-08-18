@@ -8,7 +8,7 @@ var ProxyCollection = require('backbone-proxy-collection');
 var RecentSearchesCollection = require('../collections/recent-searches');
 var SuggestedOrgCollection = require('../collections/org-suggested-rooms');
 var apiClient = require('components/apiClient');
-var context = require('utils/context');
+var context = require('../utils/context');
 var autoModelSave = require('../utils/auto-model-save');
 
 var FilteredMinibarGroupCollection = require('../collections/filtered-minibar-group-collection');

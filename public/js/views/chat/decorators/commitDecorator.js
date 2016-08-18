@@ -1,7 +1,7 @@
 "use strict";
 var $ = require('jquery');
 var Backbone = require('backbone');
-var appEvents = require('utils/appevents');
+var appEvents = require('../../../utils/appevents');
 var apiClient = require('components/apiClient');
 var Popover = require('views/popover');
 var template = require('./tmpl/commitPopover.hbs');

@@ -1,9 +1,9 @@
 "use strict";
 
-require('utils/font-setup');
+require('./utils/font-setup');
 
-var appEvents = require('utils/appevents');
-var context = require('utils/context');
+var appEvents = require('./utils/appevents');
+var context = require('./utils/context');
 var clientEnv = require('gitter-client-env');
 var TitlebarUpdater = require('components/titlebar');
 var onready = require('./utils/onready');
@@ -13,7 +13,7 @@ require('views/widgets/preload');
 require('components/user-notifications');
 require('template/helpers/all');
 require('components/bug-reporting');
-require('utils/tracking');
+require('./utils/tracking');
 require('components/ping');
 
 // Preload widgets

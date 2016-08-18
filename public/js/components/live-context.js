@@ -1,5 +1,5 @@
 "use strict";
-var context = require('utils/context');
+var context = require('../utils/context');
 var troupeModels = require('collections/troupes');
 var realtime = require('./realtime');
 var debug = require('debug-proxy')('app:live-context');

@@ -2,7 +2,7 @@
 
 var Marionette = require('backbone.marionette');
 var orgListItemTemplate = require('./tmpl/org-list-item.hbs');
-var appEvents = require('utils/appevents');
+var appEvents = require('../../../utils/appevents');
 var troupesCollections = require('collections/instances/troupes');
 var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 

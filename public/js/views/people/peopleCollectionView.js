@@ -1,7 +1,7 @@
 "use strict";
 
 var Marionette = require('backbone.marionette');
-var context = require('utils/context');
+var context = require('../../utils/context');
 var ModalView = require('views/modals/modal');
 var AvatarView = require('views/widgets/avatar');
 var collectionTemplate = require('./tmpl/peopleCollectionView.hbs');
