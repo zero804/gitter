@@ -1,14 +1,12 @@
-"use strict";
+import {equal} from 'assert';
 
-var assert = require('assert');
-
-var createAction = require('../../../../../browser/js/action-creators/{{actionBaseDir}}/{{dashCase name}}');
-var constants = require('../../../../../browser/js/constants/{{constantFile}}');
+import createAction from '../../../../../shared/action-creators/{{actionBaseDir}}/{{dashCase name}}';
+import { {{constntCase name}} } from '../../../../../shared/constants/{{constantFile}}';
 
 describe('{{camelCase name}}', () => {
 
   it('should return the right type', () => {
-    assert.equal(createAction().type, constants.{{constantCase name}});
+    equal(createAction().type, constantCase name}});
   });
 
 });
