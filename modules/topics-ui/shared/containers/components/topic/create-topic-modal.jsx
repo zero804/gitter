@@ -13,7 +13,6 @@ export default React.createClass({
     onSubmit: PropTypes.func.isRequired,
     onTitleChange: PropTypes.func.isRequired,
     onBodyChange: PropTypes.func.isRequired,
-    //
   },
 
   render(){

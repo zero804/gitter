@@ -5,12 +5,12 @@ var glob = require('glob');//eslint-disable-line node/no-unpublished-require
 
 module.exports = function(plop){
 
-  var baseConstFilePath = path.resolve(__dirname, '../../browser/js/constants');
+  var baseConstFilePath = path.resolve(__dirname, '../../shared/constants');
   var constFiles = glob.sync(baseConstFilePath + '/**/*.js').map(function(fullPath){
     return fullPath.replace(baseConstFilePath + '/', '');
   });
 
-  var baseActionCreatorsFolder = path.resolve(__dirname, '../../browser/js/action-creators');
+  var baseActionCreatorsFolder = path.resolve(__dirname, '../../shared/action-creators');
   var actionCreatorFolders = glob.sync(baseActionCreatorsFolder + '/*/').map(function(folderPath){
     return folderPath.replace(baseActionCreatorsFolder, '');
   });
@@ -43,18 +43,18 @@ module.exports = function(plop){
       return [{
         //Add the action type to a constant file
         type: 'modify',
-        path: path.resolve(__dirname, '../../browser/js/constants/', data.constantFile),
+        path: path.resolve(__dirname, '../../shared/constants/', data.constantFile),
         pattern: /};/gi,
         template: "  {{constantCase name}}: '{{dashCase name}}',\n};"
       },
       {
         type: 'add',
-        path: path.resolve(__dirname, '../../browser/js/action-creators', '.' + data.actionBaseDir) + '/{{dashCase name}}.js',
+        path: path.resolve(__dirname, '../../shared/action-creators', '.' + data.actionBaseDir) + '/{{dashCase name}}.js',
         templateFile: path.resolve(__dirname, '../templates/action-creator.txt')
       },
       {
         type: 'add',
-        path: path.resolve(__dirname, '../../test/specs/browser/action-creators', '.' + data.actionBaseDir) + '/{{dashCase name}}-test.js',
+        path: path.resolve(__dirname, '../../test/specs/shared/action-creators', '.' + data.actionBaseDir) + '/{{dashCase name}}-test.js',
         templateFile: path.resolve(__dirname, '../templates/action-creator-test.txt')
       }];
 
