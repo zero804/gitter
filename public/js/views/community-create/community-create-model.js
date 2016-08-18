@@ -39,13 +39,6 @@ var CommunityCreateModel = Backbone.Model.extend({
     this.emailsToInvite = new Backbone.Collection();
   },
 
-  reset: function(options) {
-    // Get around the infinite recursion
-    this.clear(options).set(_.omit(this.defaults, 'active'));
-    this.peopleToInvite.reset([], options);
-    this.emailsToInvite.reset([], options);
-  },
-
   getGithubProjectInfo: function(orgCollection, repoCollection) {
     var info = {
       name: null,

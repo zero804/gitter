@@ -71,7 +71,6 @@ module.exports = CommunityCreateBaseStepView.extend({
   },
 
   onStepNext: function() {
-    var communityCreateModel = this.communityCreateModel;
     var groupData = this.getCreateData();
 
     return apiClient.post('/v1/groups', groupData)
@@ -79,16 +78,17 @@ module.exports = CommunityCreateBaseStepView.extend({
         var defaultRoomName = results && results.defaultRoom && results.defaultRoom.name;
         var defaultRoomUri = results && results.defaultRoom && results.defaultRoom.uri;
 
-        // Hide create community
-        communityCreateModel.set('active', false);
-
         // Move to the default room
         appEvents.trigger('navigation', '/' + defaultRoomUri, 'chat', defaultRoomName);
+
         // Select the new community in the new left menu
         appEvents.trigger('left-menu-menu-bar:activate', {
           state: 'org',
           groupId: results.id
         });
+
+        // Hide create community
+        window.location = '#';
       });
 
   },
