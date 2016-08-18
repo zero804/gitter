@@ -89,13 +89,11 @@ describe('Router', function(){
     assert.equal(router.get('createTopic'), true);
   });
 
-<<<<<<< HEAD
   it('should have the right route param when on the topic page', () => {
     Backbone.history.navigate('gitterHQ/topics/topic/123/this-is-a-slug', trigger);
     assert.equal(router.get('route'), 'topic');
   });
 
-=======
   it('should dispatch the right event when the filter name changes', () => {
     var spy = sinon.spy();
     router.on(forumFilterConstants.UPDATE_ACTIVE_FILTER, spy);
@@ -111,7 +109,4 @@ describe('Router', function(){
     assert.equal(spy.callCount, 1);
     assert(spy.calledWithMatch({ sort: 'test' }));
   });
-
-
->>>>>>> develop
 });

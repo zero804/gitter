@@ -40,7 +40,7 @@ var Router = Backbone.Router.extend({
 
   createTopic(groupName){
     this.model.set({
-      route: 'create-topic',
+      route: navConstants.CREATE_TOPIC_ROUTE,
       groupName: groupName,
       categoryName: navConstants.DEFAULT_CATEGORY_NAME,
       createTopic: true,
@@ -50,7 +50,7 @@ var Router = Backbone.Router.extend({
   forums(groupName, categoryName, queryString){
     const query = parse(queryString || '');
     this.model.set({
-      route: 'forum' ,
+      route: navConstants.FORUM_ROUTE,
       groupName: groupName,
       categoryName: (categoryName || navConstants.DEFAULT_CATEGORY_NAME),
       filterName: (query.filter || navConstants.DEFAULT_FILTER_NAME),
@@ -59,7 +59,7 @@ var Router = Backbone.Router.extend({
     });
   },
 
-  topic(id){
+  topic(){
     this.model.set({
       route: 'topic',
     });
