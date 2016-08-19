@@ -43,9 +43,7 @@ var CommunityCreateView = Marionette.LayoutView.extend({
   initMainStepView: function(optionsForRegion) {
     this.mainStepView = new CommunityCreationMainView(optionsForRegion({
       model: this.mainStepViewModel,
-      communityCreateModel: this.model,
-      orgCollection: this.orgCollection,
-      repoCollection: this.repoCollection
+      communityCreateModel: this.model
     }));
 
     return this.mainStepView;
@@ -54,11 +52,7 @@ var CommunityCreateView = Marionette.LayoutView.extend({
   initGitHubProjectsView: function(optionsForRegion) {
     this.githubProjectsStepView = new CommunityCreationGithubProjectsView(optionsForRegion({
       model: this.githubProjectsStepViewModel,
-      communityCreateModel: this.model,
-      orgCollection: this.orgCollection,
-      unusedOrgCollection: this.unusedOrgCollection,
-      repoCollection: this.repoCollection,
-      unusedRepoCollection: this.unusedRepoCollection
+      communityCreateModel: this.model
     }));
 
     return this.githubProjectsStepView;
@@ -67,9 +61,7 @@ var CommunityCreateView = Marionette.LayoutView.extend({
   initInvitePeopleView: function(optionsForRegion) {
     this.invitePeopleStepView = new CommunityCreationInvitePeopleView(optionsForRegion({
       model: this.invitePeopleStepViewModel,
-      communityCreateModel: this.model,
-      orgCollection: this.orgCollection,
-      repoCollection: this.repoCollection,
+      communityCreateModel: this.model
     }));
 
     return this.invitePeopleStepView;
@@ -87,10 +79,6 @@ var CommunityCreateView = Marionette.LayoutView.extend({
     this.overviewStepView = new CommunityCreationOverviewView(optionsForRegion({
       model: this.overviewStepViewModel,
       communityCreateModel: this.model,
-      orgCollection: this.orgCollection,
-      repoCollection: this.repoCollection,
-      groupsCollection: this.groupsCollection,
-      inviteCollection: this.inviteCollection,
     }));
     return this.overviewStepView;
   },
@@ -107,35 +95,31 @@ var CommunityCreateView = Marionette.LayoutView.extend({
     'change:stepState': 'onStepChangeState'
   },
 
-  initialize: function(options) {
-    this.orgCollection = options.orgCollection;
-    this.unusedOrgCollection = options.unusedOrgCollection;
-    this.repoCollection = options.repoCollection;
-    this.unusedRepoCollection = options.unusedRepoCollection
-    this.groupsCollection = options.groupsCollection;
+  initialize: function() {
+    var communityCreateModel = this.model;
 
     this.mainStepViewModel = new CommunityCreatMainStepViewModel({
-      communityCreateModel: this.model,
+      communityCreateModel: communityCreateModel,
       active: true
     });
 
     this.githubProjectsStepViewModel = new CommunityCreateGitHubProjectsStepViewModel({
-      communityCreateModel: this.model,
+      communityCreateModel: communityCreateModel,
       active: false
     });
 
     this.invitePeopleStepViewModel = new CommunityCreateStepViewModel({
-      communityCreateModel: this.model,
+      communityCreateModel: communityCreateModel,
       active: false
     });
 
     this.inviteConfirmationStepViewModel = new CommunityCreateStepViewModel({
-      communityCreateModel: this.model,
+      communityCreateModel: communityCreateModel,
       active: false
     });
 
     this.overviewStepViewModel = new CommunityCreateStepViewModel({
-      communityCreateModel: this.model,
+      communityCreateModel: communityCreateModel,
       active: false
     });
   },

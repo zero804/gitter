@@ -1,7 +1,6 @@
 'use strict';
 
 function presentCommunityCreateDialog(options) {
-  var groupsCollection = options.groups;
   var dialogRegion = options.dialogRegion;
   var orgCollection = options.orgCollection;
 
@@ -23,23 +22,17 @@ function presentCommunityCreateDialog(options) {
     var repoCollection = new RepoCollection();
     var unusedOrgCollection = new OrgCollection();
 
-    // Fetch some data
-    repoCollection.fetch();
-    unusedRepoCollection.fetch({ data: { type: 'unused' } });
-    unusedOrgCollection.fetch({ data: { type: 'unused' } });
-
     var communityCreateModel = new CommunityCreateModel({ }, {
+      orgCollection: orgCollection,
       repoCollection: repoCollection,
-      orgCollection: orgCollection
+      unusedOrgCollection: unusedOrgCollection,
+      unusedRepoCollection: unusedRepoCollection,
     });
 
+    communityCreateModel.refreshGitHubCollections();
+
     var communityCreateView = new CommunityCreateView({
-      model: communityCreateModel,
-      orgCollection: orgCollection,
-      unusedOrgCollection: unusedOrgCollection,
-      repoCollection: repoCollection,
-      unusedRepoCollection: unusedRepoCollection,
-      groupsCollection: groupsCollection
+      model: communityCreateModel
     });
 
     dialogRegion.show(communityCreateView);

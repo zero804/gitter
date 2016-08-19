@@ -75,8 +75,6 @@ module.exports = Marionette.LayoutView.extend({
     this.roomCollection = options.roomCollection;
     this.orgCollection = options.orgCollection;
     this.groupsCollection = options.groupsCollection;
-
-    this.communityCreateModel = new CommunityCreateModel();
   },
 
   onRender: function() {

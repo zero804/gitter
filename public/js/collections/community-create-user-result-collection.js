@@ -21,11 +21,8 @@ var UserResultCollection = function(models, attrs, options) {
   if (!attrs || !attrs.communityCreateModel) {
     throw new Error('A valid instance of CommunityCreateModel should be passed to a new UserResultCollection');
   }
+
   this.communityCreateModel = attrs.communityCreateModel;
-
-  this.orgCollection = attrs.orgCollection;
-  this.repoCollection = attrs.repoCollection;
-
 
   this.userSearchCollection = new userSearchModels.Collection();
   this.userSuggestionCollection = new UserSuggestionCollection();

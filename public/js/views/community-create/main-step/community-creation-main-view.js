@@ -62,12 +62,8 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   }),
 
-  initialize: function(options) {
+  initialize: function() {
     _super.initialize.apply(this, arguments);
-
-    this.orgCollection = options.orgCollection;
-    this.repoCollection = options.repoCollection;
-
 
     var user = context.getUser();
     this.hasGitHubProvider = user && user.providers && user.providers.some(function(provider) {
@@ -123,29 +119,7 @@ module.exports = CommunityCreateBaseStepView.extend({
   },
 
   onCommunityInfoChange: function() {
-    if(!this.communityCreateModel.get('isUsingExplicitGitHubProject')) {
-      var communitySlug = this.communityCreateModel.get('communitySlug');
-      // TODO: Why does this match the first item always?
-      var matchingOrgItem = this.orgCollection.filter(function(org) {
-        return (org.get('name') || '').toLowerCase() === communitySlug;
-      })[0];
-      var matchingRepoItem = this.repoCollection.filter(function(repo) {
-        return (repo.get('uri') || '').toLowerCase() === communitySlug;
-      })[0];
-      if(matchingOrgItem) {
-        this.communityCreateModel.set('githubOrgId', matchingOrgItem.get('id'));
-        this.communityCreateModel.set('githubRepoId', null);
-      }
-      else if(matchingRepoItem) {
-        this.communityCreateModel.set('githubOrgId', null);
-        this.communityCreateModel.set('githubRepoId', matchingRepoItem.get('id'));
-      }
-      else {
-        this.communityCreateModel.set('githubOrgId', null);
-        this.communityCreateModel.set('githubRepoId', null);
-      }
-    }
-
+    this.communityCreateModel.updateGitHubInfoToMatchSlug();
     this.updateCommunityFields();
   },
 
@@ -158,10 +132,14 @@ module.exports = CommunityCreateBaseStepView.extend({
 
     if(this.hasGitHubProvider) {
       var githubProjectInfo = this.communityCreateModel.getGithubProjectInfo();
-      this.ui.associatedProjectName[0].textContent = githubProjectInfo.name;
-      this.ui.associatedProjectLink[0].setAttribute('href', githubProjectInfo.url);
-      toggleClass(this.ui.addAssociatedProjectCopy[0], 'active', !githubProjectInfo.name);
-      toggleClass(this.ui.hasAssociatedProjectCopy[0], 'active', !!githubProjectInfo.name);
+
+      var name = githubProjectInfo && githubProjectInfo.name || '';
+      var url = githubProjectInfo && githubProjectInfo.url || '';
+
+      this.ui.associatedProjectName[0].textContent = name;
+      this.ui.associatedProjectLink[0].setAttribute('href', url);
+      toggleClass(this.ui.addAssociatedProjectCopy[0], 'active', !githubProjectInfo);
+      toggleClass(this.ui.hasAssociatedProjectCopy[0], 'active', !!githubProjectInfo);
 
       var isBackedByRepo = !!this.communityCreateModel.get('githubRepoId');
       toggleClass(this.ui.associatedProjectBadgerOption[0], 'active', isBackedByRepo);
@@ -213,6 +191,7 @@ module.exports = CommunityCreateBaseStepView.extend({
     var slug = communityCreateModel.get('communitySlug');
 
     communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.PENDING);
+
     apiClient.priv.get('/check-group-uri', {
         uri: slug
       })
