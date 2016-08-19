@@ -7,13 +7,11 @@ var orgModels = require('../orgs');
 var unreadItemsClient = require('components/unread-items-frame-client');
 var unreadItemsGroupAdapter = require('components/unread-items-group-adapter');
 var appEvents = require('utils/appevents');
-var Sorted = require('backbone-sorted-collection');
 var errorHandle = require('utils/live-collection-error-handle');
 var context = require('utils/context');
 var moment = require('moment');
 var _ = require('underscore');
-var FilteredCollection = require('backbone-filtered-collection');
-
+var SimpleFilteredCollection = require('gitter-realtime-client/lib/simple-filtered-collection');
 
 var roomsSnapshot = context.getSnapshot('allRooms') || [];
 var existingRooms = roomsSnapshot.map(function(data){
@@ -35,20 +33,21 @@ orgsCollection.on('error', errorHandle.bind(null, 'org-collection'));
 
 unreadItemsClient.installTroupeListener(troupeCollection);
 
-function filterTroupeCollection(filter) {
-  var c = new FilteredCollection({ model: troupeModels.TroupeModel, collection: troupeCollection });
+function filterTroupeCollection(filter, comparator) {
+  var c = new SimpleFilteredCollection([], {
+    model: troupeModels.TroupeModel,
+    collection: troupeCollection,
+    comparator: comparator
+  });
   c.setFilter(filter);
-  var sorted = new Sorted(c);
-  return sorted;
+  return c;
 }
 
 // collection of favourited troupes
-var favourites = filterTroupeCollection(roomSort.favourites.filter);
-favourites.setSort(roomSort.favourites.sort);
+var favourites = filterTroupeCollection(roomSort.favourites.filter, roomSort.favourites.sort);
 
 // collection of recent troupes exc. favourites
-var recentRoomsNonFavourites = filterTroupeCollection(roomSort.recents.filter);
-recentRoomsNonFavourites.setSort(roomSort.recents.sort);
+var recentRoomsNonFavourites = filterTroupeCollection(roomSort.recents.filter, roomSort.recents.sort);
 
 appEvents.on('activity', function(message) {
   /* Lurk mode... */
