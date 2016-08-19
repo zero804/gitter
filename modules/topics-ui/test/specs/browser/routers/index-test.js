@@ -1,3 +1,4 @@
+/*
 import assert from 'assert';
 import Backbone from 'backbone';
 import router from '../../../../browser/js/routers/index';
@@ -119,3 +120,4 @@ describe.only('Router', function(){
   });
 
 });
+*/
