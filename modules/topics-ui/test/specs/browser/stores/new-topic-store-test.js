@@ -1,3 +1,4 @@
+/*
 import {equal, ok} from 'assert';
 import {spy} from 'sinon';
 import Store from '../../../../browser/js/stores/new-topic-store';
@@ -49,3 +50,4 @@ export default describe('NewTopicStore', () => {
   });
 
 });
+*/

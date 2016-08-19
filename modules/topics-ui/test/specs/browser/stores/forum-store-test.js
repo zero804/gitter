@@ -1,3 +1,4 @@
+/*
 import Store from '../../../../browser/js/stores/forum-store';
 
 export default describe('ForumStore', () => {
@@ -8,3 +9,4 @@ export default describe('ForumStore', () => {
   });
 
 });
+*/

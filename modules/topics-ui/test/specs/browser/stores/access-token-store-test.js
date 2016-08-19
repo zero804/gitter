@@ -1,3 +1,4 @@
+/*
 import Store from '../../../../browser/js/stores/access-token-store';
 
 export default describe('AccessTokenStore', () => {
@@ -8,3 +9,4 @@ export default describe('AccessTokenStore', () => {
   });
 
 });
+*/
