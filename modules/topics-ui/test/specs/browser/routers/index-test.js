@@ -114,7 +114,7 @@ describe.only('Router', function(){
   it('should have the right params after moving to a topic', () => {
     dispatch(navigateToTopic('gitterHQ', '12345', 'slug'));
     assert.equal(router.get('groupName'), 'gitterHQ');
-    assert.equal(router.get('id'), '12345');
+    assert.equal(router.get('topicId'), '12345');
     assert.equal(router.get('slug'), 'slug');
   });
 

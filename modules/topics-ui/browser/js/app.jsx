@@ -26,13 +26,18 @@ export default React.createClass({
     })
   },
 
+  componentDidMount(){
+    const {router} = this.props;
+    router.on('change:route', this.onRouteUpdate, this);
+  },
+
+  componentWillUnmount(){
+    const {router} = this.props;
+    router.off('change:route', this.onRouteUpdate, this);
+  },
+
   getInitialState(){
-    const { router } = this.props;
-    switch(router.get('route')) {
-      case navConstants.FORUM_ROUTE: return this.getForumState();
-      case navConstants.CREATE_TOPIC_ROUTE: return this.getCreateTopicState();
-      case navConstants.TOPIC_ROUTE: return this.getTopicState();
-    }
+    return this.getStateForRoute();
   },
 
   render(){
@@ -44,41 +49,45 @@ export default React.createClass({
     }
   },
 
+  //STATE -----------------------------------
+  getStateForRoute(){
+    const { router } = this.props;
+    switch(router.get('route')) {
+      case navConstants.FORUM_ROUTE: return this.getForumState();
+      case navConstants.CREATE_TOPIC_ROUTE: return this.getCreateTopicState();
+      case navConstants.TOPIC_ROUTE: return this.getTopicState();
+    }
+  },
+
   getDefaultState(){
     const { router } = this.props;
-    const accessTokenStore = new AccessTokenStore({ accessToken: window.context.accessTokenStore.token });
-    console.log(accessTokenStore);
-    return { route: router.get('route'), router: router, accessTokenStore: accessTokenStore };
+    const accessTokenStore = this.getAccessTokenStore();
+    return {
+      route: router.get('route'),
+      router: router,
+      accessTokenStore: accessTokenStore
+    };
   },
 
   getForumState(){
-    //This doesn't get passed to components it just backs the other stores
-    const forumStore = new ForumStore(window.context.forumStore.data);
-
-    //Pull data out of the context
-    const categoryStore = (window.context.categoryStore || {});
-    const tagStore = (window.context.tagStore || {});
-    const topicsStore = (window.context.topicsStore || {});
-
-    //Pull objects out of props
     const { router } = this.props;
-
     const defaults = this.getDefaultState();
 
     //Construct State
     return Object.assign(defaults, {
+
+      //Route params
       groupName: router.get('groupName'),
       categoryName: router.get('categoryName'),
       filterName: router.get('filterName'),
       tagName: router.get('tagName'),
       sortName: router.get('sortName'),
-      categoryStore: new CategoryStore(categoryStore.models, { router: router, forumStore: forumStore }),
-      tagStore: new TagStore(tagStore.models, { router: router, forumStore: forumStore }),
-      topicsStore: new TopicsStore(topicsStore.models, {
-        router: router,
-        forumStore: forumStore,
-        accessTokenStore: defaults.accessTokenStore
-      }),
+
+      //Stores
+      forumStore: this.getForumStore(),
+      categoryStore: this.getCategoryStore(),
+      tagStore: this.getTagStore(),
+      topicsStore: this.getTopicsStore(),
       newTopicStore: new NewTopicStore(),
     });
   },
@@ -91,16 +100,55 @@ export default React.createClass({
   },
 
   getTopicState(){
-    const { router } = this.props;
-
-    const topicsStore = (window.context.topicsStore || {});
-    const topicId = (window.context.topicId || 0);
-
+    var {router} = this.props;
     return Object.assign(this.getDefaultState(), {
       groupName: router.get('groupName'),
-      topicsStore: new TopicsStore(topicsStore.models, { router: router }),
-      topicId: topicId,
+      topicId: router.get('topicId'),
+      topicsStore: this.getTopicsStore()
     });
   },
+
+  //STORES -------------------------------
+
+  getAccessTokenStore(){
+    return (this.state.accessTokenStore ||
+      new AccessTokenStore({ accessToken: window.context.accessTokenStore.token }));
+  },
+
+  getForumStore(){
+    const forumStore = (window.context.forumStore || {});
+    return (this.state.forumStore || new ForumStore(forumStore.data));
+  },
+
+  getCategoryStore(){
+    const {router} = this.props;
+    const forumStore = this.getForumStore();
+    const categoryStore = (window.context.categoryStore || {});
+
+    return (this.state.categoryStore ||
+      new CategoryStore(categoryStore.models, { router: router, forumStore: forumStore }));
+  },
+
+  getTagStore(){
+    const {router} = this.props;
+    const forumStore = this.getForumStore();
+    const tagStore = (window.context.tagStore || {});
+
+    return  (this.state.tagStore ||
+      new TagStore(tagStore.models, { router: router, forumStore: forumStore }));
+  },
+
+  getTopicsStore(){
+    const {router} = this.props;
+    const topicsStore = (window.context.topicsStore || {});
+
+    return (this.state.topicsStore ||
+      new TopicsStore(topicsStore.models, { router: router }));
+  },
+
+  //EVENT HANDLES ---------------------------
+  onRouteUpdate(model, val){
+    this.setState(this.getStateForRoute());
+  }
 
 });

@@ -61,31 +61,31 @@ var Router = Backbone.Router.extend({
 
   topic(groupName, id, slug){
     this.model.set({
-      route: 'topic',
+      route: navConstants.TOPIC_ROUTE,
       groupName: groupName,
-      id: id,
+      topicId: id,
       slug: slug
     });
   },
 
   updateForumCategory(data){
     var url = this.buildForumUrl(data.category);
-    this.navigate(url, { trigger: true, replace: true });
+    this.navigate(url, { trigger: true });
   },
 
   updateForumFilter(data) {
     var url = this.buildForumUrl(undefined, data.filter);
-    this.navigate(url, { trigger: true, replace: true });
+    this.navigate(url, { trigger: true });
   },
 
   updateForumTag(data){
     var url = this.buildForumUrl(undefined, undefined, data.tag);
-    this.navigate(url, { trigger: true, replace: true });
+    this.navigate(url, { trigger: true });
   },
 
   updateForumSort(data){
     var url = this.buildForumUrl(undefined, undefined, undefined, data.sort);
-    this.navigate(url, { trigger: true, replace: true });
+    this.navigate(url, { trigger: true });
   },
 
   onFilterUpdate(moidel, val){
@@ -98,7 +98,7 @@ var Router = Backbone.Router.extend({
 
   navigateToTopic(data){
     const url = `/${data.groupName}/topics/topic/${data.id}/${data.slug}`;
-    this.navigate(url, { trigger: true, replace: true});
+    this.navigate(url, { trigger: true });
   },
 
   buildForumUrl(categoryName, filterName, tagName, sortName){
