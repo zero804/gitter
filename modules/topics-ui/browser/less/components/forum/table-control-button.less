@@ -1,0 +1,17 @@
+@import (less, reference) "~gitter-styleguide/css/components/buttons.css";
+
+.m-topic-control__button() {
+  padding:         .8em 1.75em;
+  margin-top:      1.5rem;
+  text-decoration: none;
+}
+
+.topic-control__button {
+  &:extend(.secondary-button-clouds--small all);
+  .m-topic-control__button();
+}
+
+.topic-control__button--active {
+  &:extend(.button-clouds--xsmall all);
+  .m-topic-control__button();
+}

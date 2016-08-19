@@ -1,9 +1,11 @@
 "use strict";
 
 var path = require('path');
-var ExtractTextPlugin = require("extract-text-webpack-plugin"); //eslint-disable-line node/no-unpublished-require
+var ExtractTextPlugin = require("extract-text-webpack-plugin");//eslint-disable-line node/no-unpublished-require
+var getPostcssStack = require('gitter-styleguide/postcss-stack');//eslint-disable-line node/no-unpublished-require
 
 var config = {
+  devtool: 'source-map',
   entry: {
     index: path.resolve(__dirname, './browser/js/index'),
   },
@@ -16,15 +18,25 @@ var config = {
     devtoolFallbackModuleFilenameTemplate: "[resource-path]?[hash]"
   },
   module: {
+    noParse: [
+      /\/sinon\.js/,
+    ],
+    preLoaders: [
+      {
+        test: /.css$/,
+        loader: 'postcss-loader',
+      },
+    ],
     loaders: [
       {
         test: /.less$/,
         loader: ExtractTextPlugin.extract('style-loader', 'css-loader!less-loader'),
-        include: path.resolve(__dirname, './browser/less')
+        include: path.resolve(__dirname, './browser/less'),
       },
       {
-        test: /\.jsx$/,
+        test: /\.jsx?$/,
         loader: 'babel',
+        exclude: /node_modules/,
         query: {
           presets: [
             "es2015",
@@ -34,9 +46,26 @@ var config = {
       }
     ]
   },
+  resolve: {
+    alias: {
+      jquery: require.resolve('jquery'),
+      underscore: require.resolve('lodash')
+    }
+  },
   plugins: [
     new ExtractTextPlugin("style.css", { allChunks: false })
-  ]
+  ],
+  externals: {
+    'cheerio': 'window',
+    'react/addons': true,
+    'react/lib/ExecutionEnvironment': true,
+    'react/lib/ReactContext': true,
+    fs: '{}',
+  },
+  postcss: function(webpack) {
+    return getPostcssStack(webpack);
+  },
+  bail: true
 };
 
 module.exports = config;
