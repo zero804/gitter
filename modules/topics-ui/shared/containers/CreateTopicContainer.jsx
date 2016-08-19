@@ -6,26 +6,37 @@ import bodyUpdate from '../action-creators/create-topic/body-update';
 import submit from '../action-creators/create-topic/submit';
 import * as consts from '../constants/create-topic';
 import submitNewTopic from '../action-creators/create-topic/submit-new-topic';
+import navigateToTopic from '../action-creators/topic/navigate-to-topic';
 
 export default createClass({
 
   displayName: 'CreateTopicContainer',
   propTypes: {
     active: PropTypes.bool,
+    groupName: PropTypes.string.isRequired,
     newTopicStore: React.PropTypes.shape({
       get: React.PropTypes.func.isRequired,
       set: React.PropTypes.func.isRequired
     }).isRequired,
+
+    //Topics
+    topicsStore: React.PropTypes.shape({
+      models: React.PropTypes.array.isRequired,
+      getTopics: React.PropTypes.func.isRequired
+    }).isRequired,
+
   },
 
   componentDidMount(){
-    const {newTopicStore} = this.props;
+    const {newTopicStore, topicsStore} = this.props;
     newTopicStore.on(consts.STORE_CREATE_NEW, this.onStoreCreateNew, this);
+    topicsStore.on(consts.TOPIC_CREATED, this.onTopicCreated, this);
   },
 
   componentWillUnmount(){
-    const {newTopicStore} = this.props;
+    const {newTopicStore, topicsStore} = this.props;
     newTopicStore.off(consts.STORE_CREATE_NEW, this.onStoreCreateNew, this);
+    topicsStore.off(consts.TOPIC_CREATED, this.onTopicCreated, this);
   },
 
   getDefaultProps(){
@@ -64,6 +75,12 @@ export default createClass({
       newTopicStore.get('title'),
       newTopicStore.get('body'))
     );
+  },
+
+  onTopicCreated(data){
+    console.log(data);
+    const {groupName} = this.props;
+    dispatch(navigateToTopic(groupName, data.topicId, data.slug));
   }
 
 });

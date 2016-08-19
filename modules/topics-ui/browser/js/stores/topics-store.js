@@ -1,6 +1,6 @@
 import { Model, Collection } from 'backbone';
 import {subscribe} from '../../../shared/dispatcher';
-import {SUBMIT_NEW_TOPIC} from '../../../shared/constants/create-topic';
+import {SUBMIT_NEW_TOPIC, TOPIC_CREATED} from '../../../shared/constants/create-topic';
 import $ from 'jquery';
 
 var TopicModel = Model.extend({
@@ -29,7 +29,10 @@ var TopicModel = Model.extend({
     })
   },
 
-  onSuccess(){},
+  onSuccess(attrs) {
+    this.set(attrs);
+    this.trigger(TOPIC_CREATED, this);
+  },
   onError(){}
 });
 
@@ -52,7 +55,14 @@ export default Collection.extend({
   },
 
   creatNewTopic(data){
-    this.create({ title: data.title, text: data.body });
+    const newTopic = this.create({ title: data.title, text: data.body });
+    newTopic.on(TOPIC_CREATED, ()=> {
+      debugger
+      this.trigger(TOPIC_CREATED, {
+        topicId: newTopic.get('id'),
+        slug: newTopic.get('slug')
+      });
+    })
   },
 
   //TODO Remove

@@ -14,7 +14,7 @@ export default React.createClass({
     const defaultVal = options.reduce(function(memo, option){
       if(!!option.active) { return option.value; }
       return memo;
-    });
+    }, '');
 
     return (
       <div className="table-control__select-decal">
