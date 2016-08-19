@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react';
+import TopicLink from '../links/topic-link.jsx';
 
 export default React.createClass({
 
@@ -26,9 +27,9 @@ export default React.createClass({
     return (
       <tr className="topics-table-body__row" key={`topics-table-row-${i}`}>
         <td className="topics-table-body__cell--first">
-          <a title={`View ${topic.title}`} href={href}>
+          <TopicLink groupName={groupName} topic={topic}>
             {topic.title}
-          </a>
+          </TopicLink>
         </td>
         <td className="topics-table-body__cell">0</td>
         <td className="topics-table-body__cell">0</td>

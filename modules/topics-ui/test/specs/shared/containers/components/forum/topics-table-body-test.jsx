@@ -30,9 +30,8 @@ describe('<TopicsTableBody/>', () => {
     equal(wrapper.find('tr').length, topics.length);
   });
 
-  it('should add the right url to the topic links', () => {
-    var href = wrapper.find('tr').at(0).find('td').at(0).find('a').prop('href');
-    equal(href, '/gitterHQ/topics/topic/1/1');
+  it('should renderChildRow a topic link', () => {
+    equal(wrapper.find('TopicLink').length, 1);
   });
 
 });
