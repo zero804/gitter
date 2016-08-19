@@ -126,7 +126,7 @@ export default React.createClass({
 
         <TopicsTable topics={topics}/>
 
-        <CreateTopicContainer newTopicStore={newTopicStore}/>
+        <CreateTopicContainer active={createTopic} newTopicStore={newTopicStore}/>
       </main>
     );
   },
