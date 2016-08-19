@@ -3,7 +3,6 @@
 var $ = require('jquery');
 var Marionette = require('backbone.marionette');
 var urlParse = require('url-parse');
-var context = require('../../utils/context');
 var frameUtils = require('../../utils/frame-utils');
 var modalRegion = require('../../components/modal-region');
 var LoginView = require('../modals/login-view');

@@ -5,7 +5,6 @@ var Marionette = require('backbone.marionette');
 var fastdom = require('fastdom');
 var context = require('../../../../utils/context');
 var DNDCtrl = require('../../../../components/menu/room/dnd-controller');
-var toggleClass = require('../../../../utils/toggle-class');
 
 var RoomMenuModel = require('../../../../models/room-menu-model');
 var MiniBarView = require('../minibar/minibar-view');
