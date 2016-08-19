@@ -7,7 +7,7 @@ var TopicModel = Model.extend({
   defaults: {},
   url(){
     const forumId = this.collection.getForumId();
-    return !this.get('id') ? `/api/v1/forums/${forumId}/topics` : '';
+    return this.get('id') ? '' : `/api/v1/forums/${forumId}/topics`;
   },
 
   sync(){
