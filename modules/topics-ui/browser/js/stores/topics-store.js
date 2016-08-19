@@ -6,13 +6,20 @@ import $ from 'jquery';
 var TopicModel = Model.extend({
   defaults: {},
   url(){
-    return !this.get('id') ? `/api/v1/forums/:forumId/topics` : '';
+    const forumId = this.collection.getForumId();
+    return !this.get('id') ? `/api/v1/forums/${forumId}/topics` : '';
   },
 
   sync(){
     //Need to abstract and pull in the apiClient here so this is a bodge
     const headers = { "x-access-token": this.collection.getAccessToken() }
-    const data = JSON.stringify(this.toJSON());
+    const catId = this.collection.getCategoryId();
+    console.log(catId);
+    const data = JSON.stringify(Object.assign(this.toJSON(), {
+      categoryId: catId,
+    }));
+
+    console.log(data);
 
     $.ajax({
       url: this.url(),
@@ -27,12 +34,10 @@ var TopicModel = Model.extend({
 
   onSuccess(){
     console.log('success');
-    debugger;
   },
 
   onError(){
     console.log('Errorzzzz');
-    debugger;
   }
 
 });
@@ -43,6 +48,7 @@ export default Collection.extend({
 
   initialize(models, attrs){
     this.accessTokenStore = attrs.accessTokenStore;
+    this.forumStore = attrs.forumStore;
     subscribe(SUBMIT_NEW_TOPIC, this.creatNewTopic, this);
   },
 
@@ -61,6 +67,15 @@ export default Collection.extend({
   //TODO Remove
   getAccessToken(){
     return this.accessTokenStore.get('accessToken');
+  },
+
+  getForumId(){
+    return this.forumStore.get('id');
+  },
+
+  //TODO REMOVE
+  getCategoryId(){
+    return this.forumStore.get('categories')[0].id;
   }
 
 });
