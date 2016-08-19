@@ -2,16 +2,13 @@
 
 var _ = require('underscore');
 var Backbone = require('backbone');
-var apiClient = require('components/apiClient');
-
 var stepConstants = require('../step-constants');
-var peopleToInviteStatusConstants = require('../people-to-invite-status-constants');
 var template = require('./community-creation-invite-people-view.hbs');
 var CommunityCreateBaseStepView = require('../shared/community-creation-base-step-view');
 var CommunityCreationPeopleListView = require('../shared/community-creation-people-list-view');
 var UserResultListView = require('../shared/community-create-invite-user-result-list-view');
-
 var UserResultCollection = require('collections/community-create-user-result-collection');
+var avatars = require('gitter-web-avatars');
 
 require('gitter-styleguide/css/components/headings.css');
 require('gitter-styleguide/css/components/buttons.css');
@@ -36,6 +33,7 @@ module.exports = CommunityCreateBaseStepView.extend({
     this.userResultListView = new UserResultListView(optionsForRegion({
       collection: this.userResultCollection
     }));
+
     this.listenTo(this.userResultListView, 'user:activated', this.onPersonSelected, this);
     return this.userResultListView;
   },
@@ -44,12 +42,10 @@ module.exports = CommunityCreateBaseStepView.extend({
     this.inviteListView = new CommunityCreationPeopleListView(optionsForRegion({
       collection: this.inviteCollection,
       communityCreateModel: this.communityCreateModel,
-      model: new Backbone.Model({
-        canRemove: true,
-        canEditEmail: true
-      })
+      allowRemove: true
     }));
-    this.listenTo(this.inviteListView, 'person:remove', this.onPersonRemoved, this);
+
+    this.listenTo(this.inviteListView, 'invite:remove', this.onInviteRemoved, this);
     return this.inviteListView;
   },
 
@@ -73,31 +69,33 @@ module.exports = CommunityCreateBaseStepView.extend({
 
     this.orgCollection = options.orgCollection;
     this.repoCollection = options.repoCollection;
-    this.inviteCollection = options.inviteCollection;
-    this.troubleInviteCollection = options.troubleInviteCollection;
+    this.inviteCollection = this.communityCreateModel.invites;
 
     this.searchModel = new Backbone.Model({
       searchInput: ''
     });
+
     this.userResultCollection = new UserResultCollection(null, {
       stepViewModel: this.model,
       searchModel: this.searchModel,
       communityCreateModel: this.communityCreateModel,
       orgCollection: this.orgCollection,
       repoCollection: this.repoCollection
-    })
-
+    });
   },
 
   onStepNext: function() {
-    // Only go to confirmation if there was trouble
-    if(this.troubleInviteCollection.length > 0) {
-      this.communityCreateModel.set('stepState', stepConstants.INVITE_CONFIRMATION);
+    var nextStep;
+    if (this.communityCreateModel.hasInvitesRequiringEmailEntry()) {
+      // Only go to confirmation if there was trouble
+      nextStep = stepConstants.INVITE_CONFIRMATION;
+    } else {
+      nextStep = stepConstants.OVERVIEW;
     }
-    else {
-      this.communityCreateModel.set('stepState', stepConstants.OVERVIEW);
-    }
+
+    this.communityCreateModel.set('stepState', nextStep);
   },
+
   onStepBack: function() {
     this.communityCreateModel.set('stepState', stepConstants.MAIN);
   },
@@ -107,43 +105,55 @@ module.exports = CommunityCreateBaseStepView.extend({
   },
 
   onPersonSelected: function(person) {
-    // We want the defaults added to the model as well
-    var newPerson = this.communityCreateModel.peopleToInvite.add(person.toJSON());
-    var checkInviteParams = {
-      githubUsername: newPerson.get('githubUsername'),
-      twitterUsername: newPerson.get('twitterUsername'),
-      emailAddress: newPerson.get('emailAddress')
-    };
-    // TODO: Make this more robust
-    // Currently using workaround for search endpoint, https://github.com/troupe/gitter-webapp/issues/1759#issuecomment-231992894
-    if(newPerson.get('id')) {
-      checkInviteParams.username = newPerson.get('username');
-    }
-    else if(!checkInviteParams.githubUsername) {
-      checkInviteParams.githubUsername = newPerson.get('username');
+    // The person can either be from user-search or from suggestions
+    // Unfortunately this means that the shape of the object will
+    // be different. For now, we just guess from the shape of the object
+
+    var type = person.get('type');
+    var externalId;
+    if (type) {
+      // Probably a suggestion
+      switch(type) {
+        case 'twitter':
+          externalId = person.get('twitterUsername');
+          break;
+
+        case 'github':
+          externalId = person.get('githubUsername');
+          break;
+
+        case 'gitter':
+          externalId = person.get('gitterUsername');
+      }
+
+      if (!externalId) {
+        type = 'gitter';
+        externalId = person.get('username');
+      }
+    } else {
+      // For now, search results come from GitHub
+      type = 'github';
+      externalId = person.get('username');
     }
 
-    apiClient.priv.get('/check-invite', checkInviteParams)
-      .then(function() {
-        newPerson.set('inviteStatus', peopleToInviteStatusConstants.READY);
-      })
-      .catch(function() {
-        newPerson.set('inviteStatus', peopleToInviteStatusConstants.NEEDS_EMAIL);
-      });
+    var avatarUrl = person.get('avatarUrl');
+    var displayName = person.get('displayName');
+
+    if (type && externalId) {
+      this.communityCreateModel.addInvitation(type, externalId, displayName, avatarUrl);
+    }
   },
 
-  onPersonRemoved: function(person) {
-    this.communityCreateModel.peopleToInvite.remove(person);
-    this.communityCreateModel.emailsToInvite.remove(person);
+  onInviteRemoved: function(invite) {
+    this.inviteCollection.remove(invite);
   },
 
   onEmailSubmit: function(e) {
     var newEmailAddress = this.ui.emailInput[0].value;
 
     if(newEmailAddress.length) {
-      this.communityCreateModel.emailsToInvite.add({
-        emailAddress: newEmailAddress
-      });
+      var avatarUrl = avatars.getForGravatarEmail(newEmailAddress);
+      this.communityCreateModel.addInvitation('email', newEmailAddress, newEmailAddress, avatarUrl);
     }
 
     // Clear the input

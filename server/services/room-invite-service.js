@@ -28,7 +28,6 @@ function createInviteForNewUser(room, invitingUser, type, externalId, emailAddre
         if (!isValidEmail(emailAddress)) {
           throw new StatusError(400);
         }
-
         return emailAddress;
       }
 

@@ -29,6 +29,32 @@ function validateIsString(value) {
 }
 
 function parseAndValidateInput(input) {
+  // Check for new cleaner method first...
+  if (input.type) {
+    if (!input.externalId) throw new StatusError(400);
+
+    switch(input.type) {
+      case 'email':
+        return {
+          type: input.type,
+          externalId: input.emailAddress,
+          emailAddress: input.emailAddress
+        };
+
+      case 'gitter':
+      case identityService.GITHUB_IDENTITY_PROVIDER:
+      case identityService.TWITTER_IDENTITY_PROVIDER:
+        return {
+          type: input.type,
+          externalId: input.externalId,
+          emailAddress: input.emailAddress
+        };
+      default:
+        throw new StatusError(400);
+    }
+  }
+
+  // Older (crappier) method
   var types = {};
 
   function addUserIdentifer(identifier, key) {

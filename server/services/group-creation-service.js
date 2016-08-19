@@ -75,19 +75,28 @@ var sendTweetsForRoom = Promise.method(function(user, group, room, twitterHandle
 function sendInvitesAndTweetsPostRoomCreation(user, group, room, invites, allowTweeting) {
   return sendInvitesForRoom(user, room, invites)
     .tap(function(invitesReport) {
-      var successes = invitesReport.reduce(function(memo, report) {
-        if (report.status === 'added') {
-          memo++;
+      var added = 0;
+      var invited = 0;
+
+      invitesReport.forEach(function(report) {
+        switch(report.status) {
+          case 'added':
+            added++;
+            break;
+          case 'invited':
+            invited++;
+            break;
         }
-        return memo;
-      }, 0);
+      });
 
       stats.event('new_group_invites', {
         userId: user.id,
         username: user.username,
         groupId: group._id,
         groupUri: group.uri,
-        count: successes
+        count: added + invited,
+        added: added,
+        invited: invited
       });
 
       var twitterHandles = invitesReport
