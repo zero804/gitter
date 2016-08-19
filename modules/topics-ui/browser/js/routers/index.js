@@ -1,4 +1,3 @@
-
 import { parse, stringify } from 'qs';
 import Backbone from 'backbone';
 import { subscribe } from '../../../shared/dispatcher';
@@ -25,6 +24,7 @@ var Router = Backbone.Router.extend({
     subscribe(forumFilterConstants.NAVIGATE_TO_FILTER, this.updateForumFilter, this);
     subscribe(forumTagConstants.NAVIGATE_TO_TAG, this.updateForumTag, this);
     subscribe(forumSortConstants.NAVIGATE_TO_SORT, this.updateForumSort, this);
+    subscribe(navConstants.NAVIGATE_TO_TOPIC, this.navigateToTopic, this);
 
     this.listenTo(this.model, 'change:filterName', this.onFilterUpdate, this);
     this.listenTo(this.model, 'change:sortName', this.onSortUpdate, this);
@@ -59,9 +59,12 @@ var Router = Backbone.Router.extend({
     });
   },
 
-  topic(){
+  topic(groupName, id, slug){
     this.model.set({
       route: 'topic',
+      groupName: groupName,
+      id: id,
+      slug: slug
     });
   },
 
@@ -91,6 +94,11 @@ var Router = Backbone.Router.extend({
 
   onSortUpdate(model, val){
     this.model.trigger(forumSortConstants.UPDATE_ACTIVE_SORT, { sort: val });
+  },
+
+  navigateToTopic(data){
+    const url = `/${data.groupName}/topics/topic/${data.id}/${data.slug}`;
+    this.navigate(url, { trigger: true, replace: true});
   },
 
   buildForumUrl(categoryName, filterName, tagName, sortName){

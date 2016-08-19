@@ -1,4 +1,5 @@
 export const NAVIGATE_TO = 'navigate-to';
+export const NAVIGATE_TO_TOPIC = 'navigate-to-topic';
 
 export const FORUM_ROUTE = 'forum';
 export const CREATE_TOPIC_ROUTE = 'create-topic';

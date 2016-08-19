@@ -30,8 +30,8 @@ describe('<TopicsTableBody/>', () => {
     equal(wrapper.find('tr').length, topics.length);
   });
 
-  it('should renderChildRow a topic link', () => {
-    equal(wrapper.find('TopicLink').length, 1);
+  it('should renderChildRow a topic link for each topic', () => {
+    equal(wrapper.find('TopicLink').length, topics.length);
   });
 
 });
