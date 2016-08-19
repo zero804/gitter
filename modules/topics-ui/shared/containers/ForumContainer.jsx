@@ -124,7 +124,7 @@ export default React.createClass({
           sortChange={this.onSortChange}
           tagChange={this.onTagChange}/>
 
-        <TopicsTable topics={topics}/>
+        <TopicsTable topics={topics} groupName={groupName}/>
 
         <CreateTopicContainer active={createTopic} newTopicStore={newTopicStore}/>
       </main>
