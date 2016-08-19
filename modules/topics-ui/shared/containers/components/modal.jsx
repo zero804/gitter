@@ -5,7 +5,7 @@ export default React.createClass({
   displayName: 'Modal',
   propTypes: {
     active: PropTypes.bool.isRequired,
-    children: React.PropTypes.node
+    children: PropTypes.node
   },
 
   render(){
