@@ -16,7 +16,7 @@ var handlers = {
   groupMembers: './live-collection-group-members'
 };
 
-if (config.get('topics:useAPI')) {
+if (config.get('topics:useApi')) {
   handlers.topics = './live-collection-topics';
   // TODO: categories? forums, replies, comments
 }
