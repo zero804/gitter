@@ -3,6 +3,7 @@ import CreateTopicModal from './components/topic/create-topic-modal.jsx';
 import { dispatch } from '../dispatcher';
 import titleUpdate from '../action-creators/create-topic/title-update';
 import bodyUpdate from '../action-creators/create-topic/body-update';
+import submit from '../action-creators/create-topic/submit';
 
 export default createClass({
 
@@ -23,6 +24,7 @@ export default createClass({
         active={active}
         onTitleChange={this.onTitleChange}
         onBodyChange={this.onBodyChange}
+        onSubmit={this.onSubmit}
         />
     );
   },
@@ -33,6 +35,10 @@ export default createClass({
 
   onBodyChange(body){
     dispatch(bodyUpdate(body));
+  },
+
+  onSubmit(){
+    dispatch(submit());
   }
 
 });
