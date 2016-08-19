@@ -63,7 +63,6 @@ export default React.createClass({
   getDefaultState(){
     const { router } = this.props;
     const accessTokenStore = this.getAccessTokenStore();
-    console.log(accessTokenStore);
     return { route: router.get('route'), router: router, accessTokenStore: accessTokenStore };
   },
 
