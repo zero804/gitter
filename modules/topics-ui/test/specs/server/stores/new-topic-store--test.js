@@ -1,5 +1,7 @@
-import {equal} from 'assert';
-import newTopicStore from '../../../../server/stores/new-topic-store';
+"use strict";
+
+var assert = require('assert');
+var newTopicStore = require('../../../../server/stores/new-topic-store');
 
 describe('newTopicStore', () => {
 

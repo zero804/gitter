@@ -4,7 +4,7 @@ import Store from '../../../../browser/js/stores/topics-store.js';
 import {dispatch} from '../../../../shared/dispatcher';
 import submitNewTopic from '../../../../shared/action-creators/create-topic/submit-new-topic';
 
-describe.only('TopicsStore', () => {
+export default describe('TopicsStore', () => {
 
   let store;
   const models = [
@@ -29,7 +29,6 @@ describe.only('TopicsStore', () => {
     stub(Store.prototype, 'create');
     store = new Store(models);
     dispatch(submitNewTopic('title', 'body'));
-    console.log(store.create.callCount);
     Store.prototype.create.restore();
   });
 

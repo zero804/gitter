@@ -1,13 +1,13 @@
 import {equal, ok} from 'assert';
 import {spy} from 'sinon';
 import Store from '../../../../browser/js/stores/new-topic-store';
-import {dispatch}  from '../../../../shared/dispatcher';
+import {dispatch} from '../../../../shared/dispatcher';
 import updateTitle from '../../../../shared/action-creators/create-topic/title-update';
 import {STORE_UPDATE, STORE_CREATE_NEW} from '../../../../shared/constants/create-topic';
 import updateBody from '../../../../shared/action-creators/create-topic/body-update';
 import submit from '../../../../shared/action-creators/create-topic/submit';
 
-describe('NewTopicStore', () => {
+export default describe('NewTopicStore', () => {
 
   let store;
   beforeEach(() => {

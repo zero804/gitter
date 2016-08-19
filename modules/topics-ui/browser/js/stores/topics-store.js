@@ -14,12 +14,9 @@ var TopicModel = Model.extend({
     //Need to abstract and pull in the apiClient here so this is a bodge
     const headers = { "x-access-token": this.collection.getAccessToken() }
     const catId = this.collection.getCategoryId();
-    console.log(catId);
     const data = JSON.stringify(Object.assign(this.toJSON(), {
       categoryId: catId,
     }));
-
-    console.log(data);
 
     $.ajax({
       url: this.url(),
@@ -32,14 +29,8 @@ var TopicModel = Model.extend({
     })
   },
 
-  onSuccess(){
-    console.log('success');
-  },
-
-  onError(){
-    console.log('Errorzzzz');
-  }
-
+  onSuccess(){},
+  onError(){}
 });
 
 export default Collection.extend({

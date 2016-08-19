@@ -1,7 +1,6 @@
-import {equal} from 'assert';
 import Store from '../../../../browser/js/stores/access-token-store';
 
-describe('AccessTokenStore', () => {
+export default describe('AccessTokenStore', () => {
 
   let store;
   beforeEach(() => {

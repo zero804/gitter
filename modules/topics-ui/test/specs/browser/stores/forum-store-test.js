@@ -1,7 +1,6 @@
-import {equal} from 'assert';
 import Store from '../../../../browser/js/stores/forum-store';
 
-describe('ForumStore', () => {
+export default describe('ForumStore', () => {
 
   let store;
   beforeEach(() => {

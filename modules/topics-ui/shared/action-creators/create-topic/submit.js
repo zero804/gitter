@@ -1,5 +1,3 @@
-"use strict";
-
 import { SUBMIT } from '../../constants/create-topic.js';
 
 module.exports = function submit(){
