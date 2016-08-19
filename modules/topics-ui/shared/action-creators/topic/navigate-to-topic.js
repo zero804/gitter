@@ -1,5 +1,3 @@
-"use strict";
-
 import { NAVIGATE_TO_TOPIC } from '../../constants/navigation.js';
 
 module.exports = function navigateToTopic(groupName, id, slug){

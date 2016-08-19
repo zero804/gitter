@@ -57,7 +57,6 @@ export default Collection.extend({
   creatNewTopic(data){
     const newTopic = this.create({ title: data.title, text: data.body });
     newTopic.on(TOPIC_CREATED, ()=> {
-      debugger
       this.trigger(TOPIC_CREATED, {
         topicId: newTopic.get('id'),
         slug: newTopic.get('slug')
