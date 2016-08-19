@@ -3,7 +3,7 @@ import React from 'react';
 import { shallow } from 'enzyme';
 import TopicBody from '../../../../../../shared/containers/components/topic/topic-body.jsx';
 
-describe('<TopicBody/>', () => {
+describe.skip('<TopicBody/>', () => {
 
   let wrapper;
 

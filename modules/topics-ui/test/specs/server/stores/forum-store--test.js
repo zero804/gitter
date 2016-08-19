@@ -1,7 +1,7 @@
 import {equal} from 'assert';
 import forumStore from '../../../../server/stores/forum-store';
 
-describe('forumStore', () => {
+describe.skip('forumStore', () => {
 
   var data = {};
 
