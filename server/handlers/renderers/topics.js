@@ -32,7 +32,7 @@ function renderForum(req, res, next, options) {
       console.log('-----------------------');
       console.log(group);
       console.log('-----------------------');
-      return forumService.findById(group._id);
+      return forumService.findById(group.forumId);
     })
     .then(function(forum){
       console.log('-----------------------');
