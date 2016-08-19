@@ -112,8 +112,7 @@ onready(function() {
 
     createCommunity: function() {
       presentCreateCommunityDialog({
-        dialogRegion: appView.dialogRegion,
-        orgCollection: troupeCollections.orgs,
+        dialogRegion: appView.dialogRegion
       });
     },
   });

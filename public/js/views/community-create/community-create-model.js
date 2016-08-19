@@ -32,8 +32,6 @@ var CommunityCreateModel = Backbone.Model.extend({
   },
 
   initialize: function(attrs, options) {
-    this.orgCollection = options.orgCollection;
-    this.repoCollection = options.repoCollection;
     this.unusedOrgCollection = options.unusedOrgCollection;
     this.unusedRepoCollection = options.unusedRepoCollection;
 
@@ -44,7 +42,7 @@ var CommunityCreateModel = Backbone.Model.extend({
     var githubOrgId = this.get('githubOrgId');
     // Org based?
     if (githubOrgId) {
-      var selectedOrg = this.orgCollection.find(function(org) {
+      var selectedOrg = this.unusedOrgCollection.find(function(org) {
         return org.get('id') === githubOrgId;
       });
 
@@ -59,11 +57,10 @@ var CommunityCreateModel = Backbone.Model.extend({
     // Repo based?
     var githubRepoId = this.get('githubRepoId');
     if (githubRepoId) {
-      var selectedRepo = this.repoCollection.find(function(repo) {
+      var selectedRepo = this.unusedRepoCollection.find(function(repo) {
         return repo.get('id') === githubRepoId;
       });
 
-      // var selectedRepo = this.repoCollection.get(githubRepoId);
       return {
         type: 'GH_REPO',
         linkPath: selectedRepo.get('uri'),
@@ -180,7 +177,6 @@ var CommunityCreateModel = Backbone.Model.extend({
     var resetRepos = !options || options.repo;
     return Promise.all([
       resetOrgs && this.resetCollection(this.unusedOrgCollection, { type: 'unused '}),
-      resetRepos && this.resetCollection(this.repoCollection, { }),
       resetRepos && this.resetCollection(this.unusedRepoCollection, { type: 'unused '}),
     ]);
   },
@@ -196,7 +192,7 @@ var CommunityCreateModel = Backbone.Model.extend({
     slug = slug.toLowerCase();
 
     // TODO: Why does this match the first item always?
-    var matchingOrgItem = this.orgCollection.filter(function(org) {
+    var matchingOrgItem = this.unusedOrgCollection.filter(function(org) {
       return (org.get('name') || '').toLowerCase() === slug;
     })[0];
 
@@ -207,7 +203,7 @@ var CommunityCreateModel = Backbone.Model.extend({
       };
     }
 
-    var matchingRepoItem = this.repoCollection.filter(function(repo) {
+    var matchingRepoItem = this.unusedRepoCollection.filter(function(repo) {
       return (repo.get('uri') || '').toLowerCase() === slug;
     })[0];
 
