@@ -5,6 +5,7 @@ import titleUpdate from '../action-creators/create-topic/title-update';
 import bodyUpdate from '../action-creators/create-topic/body-update';
 import submit from '../action-creators/create-topic/submit';
 import * as consts from '../constants/create-topic';
+import submitNewTopic from '../action-creators/create-topic/submit-new-topic';
 
 export default createClass({
 
@@ -59,7 +60,10 @@ export default createClass({
 
   onStoreCreateNew(){
     const {newTopicStore} = this.props;
-    console.log('working', newTopicStore);
+    dispatch(submitNewTopic(
+      newTopicStore.get('title'),
+      newTopicStore.get('body'))
+    );
   }
 
 });
