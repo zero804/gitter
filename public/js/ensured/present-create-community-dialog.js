@@ -2,7 +2,6 @@
 
 function presentCommunityCreateDialog(options) {
   var dialogRegion = options.dialogRegion;
-  var orgCollection = options.orgCollection;
 
   require.ensure([
     '../views/community-create/community-create-view',
@@ -23,7 +22,6 @@ function presentCommunityCreateDialog(options) {
     var unusedOrgCollection = new OrgCollection();
 
     var communityCreateModel = new CommunityCreateModel({ }, {
-      orgCollection: orgCollection,
       repoCollection: repoCollection,
       unusedOrgCollection: unusedOrgCollection,
       unusedRepoCollection: unusedRepoCollection,

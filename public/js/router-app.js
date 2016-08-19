@@ -453,8 +453,7 @@ onready(function() {
 
     createCommunity: function() {
       presentCreateCommunityDialog({
-        dialogRegion: appLayout.dialogRegion,
-        orgCollection: troupeCollections.orgs,
+        dialogRegion: appLayout.dialogRegion
       });
     },
 
