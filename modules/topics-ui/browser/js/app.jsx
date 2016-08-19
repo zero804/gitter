@@ -10,6 +10,7 @@ import TagStore from './stores/forum-tag-store';
 import TopicsStore from './stores/topics-store';
 import NewTopicStore from './stores/new-topic-store';
 import ForumStore from './stores/forum-store';
+import AccessTokenStore from './stores/access-token-store';
 
 import * as navConstants from '../../shared/constants/navigation';
 
@@ -45,7 +46,9 @@ export default React.createClass({
 
   getDefaultState(){
     const { router } = this.props;
-    return { route: router.get('route'), router: router };
+    const accessTokenStore = new AccessTokenStore({ accessToken: window.context.accessTokenStore.token });
+    console.log(accessTokenStore);
+    return { route: router.get('route'), router: router, accessTokenStore: accessTokenStore };
   },
 
   getForumState(){
@@ -60,8 +63,10 @@ export default React.createClass({
     //Pull objects out of props
     const { router } = this.props;
 
+    const defaults = this.getDefaultState();
+
     //Construct State
-    return Object.assign(this.getDefaultState(), {
+    return Object.assign(defaults, {
       groupName: router.get('groupName'),
       categoryName: router.get('categoryName'),
       filterName: router.get('filterName'),
@@ -69,7 +74,11 @@ export default React.createClass({
       sortName: router.get('sortName'),
       categoryStore: new CategoryStore(categoryStore.models, { router: router, forumStore: forumStore }),
       tagStore: new TagStore(tagStore.models, { router: router, forumStore: forumStore }),
-      topicsStore: new TopicsStore(topicsStore.models, { router: router, forumStore: forumStore }),
+      topicsStore: new TopicsStore(topicsStore.models, {
+        router: router,
+        forumStore: forumStore,
+        accessTokenStore: defaults.accessTokenStore
+      }),
       newTopicStore: new NewTopicStore(),
     });
   },
