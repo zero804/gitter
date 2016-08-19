@@ -28,11 +28,10 @@ function presentCommunityCreateDialog(options) {
     unusedRepoCollection.fetch({ data: { type: 'unused' } });
     unusedOrgCollection.fetch({ data: { type: 'unused' } });
 
-    var communityCreateModel = new CommunityCreateModel({
-      active: false
+    var communityCreateModel = new CommunityCreateModel({ }, {
+      repoCollection: repoCollection,
+      orgCollection: orgCollection
     });
-
-    communityCreateModel.set('active', true);
 
     var communityCreateView = new CommunityCreateView({
       model: communityCreateModel,

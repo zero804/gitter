@@ -6,7 +6,7 @@ var appEvents = require('utils/appevents');
 var stepConstants = require('../step-constants');
 var template = require('./community-creation-overview-view.hbs');
 var CommunityCreateBaseStepView = require('../shared/community-creation-base-step-view');
-var CommunityCreationPeopleListView = require('../shared/community-creation-people-list-view');
+var InviteListView = require('../shared/community-creation-people-list-view');
 var apiClient = require('../../../components/apiClient');
 
 require('gitter-styleguide/css/components/headings.css');
@@ -27,8 +27,8 @@ module.exports = CommunityCreateBaseStepView.extend({
   },
 
   initInviteListView: function(optionsForRegion) {
-    this.inviteListView = new CommunityCreationPeopleListView(optionsForRegion({
-      collection: this.inviteCollection,
+    this.inviteListView = new InviteListView(optionsForRegion({
+      collection: this.communityCreateModel.invites,
       communityCreateModel: this.communityCreateModel,
     }));
     return this.inviteListView;
@@ -52,8 +52,6 @@ module.exports = CommunityCreateBaseStepView.extend({
     this.orgCollection = options.orgCollection;
     this.repoCollection = options.repoCollection;
     this.groupsCollection = options.groupsCollection;
-    this.inviteCollection = options.inviteCollection;
-    this.troubleInviteCollection = options.troubleInviteCollection;
 
     this.listenTo(this.communityCreateModel, 'change:communityName change:communitySlug change:githubOrgId', this.onCommunityDataChange, this);
   },
@@ -63,7 +61,7 @@ module.exports = CommunityCreateBaseStepView.extend({
     data.communityName = this.communityCreateModel.get('communityName');
     data.communitySlug = this.communityCreateModel.get('communitySlug');
 
-    var githubProjectInfo = this.communityCreateModel.getGithubProjectInfo(this.orgCollection, this.repoCollection);
+    var githubProjectInfo = this.communityCreateModel.getGithubProjectInfo();
     data.githubName = githubProjectInfo.name;
     data.githubLink = githubProjectInfo.url;
 
@@ -71,7 +69,7 @@ module.exports = CommunityCreateBaseStepView.extend({
   },
 
   onStepNext: function() {
-    var groupData = this.getCreateData();
+    var groupData = this.communityCreateModel.getSerializedCreateData();
 
     return apiClient.post('/v1/groups', groupData)
       .then(function(results) {
@@ -93,66 +91,15 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   },
 
-  getSecurityData: function() {
-    var communityCreateModel = this.communityCreateModel;
-
-    var githubOrgId = communityCreateModel.get('githubOrgId');
-    // Org based?
-    if (githubOrgId) {
-      var selectedOrg = this.orgCollection.get(githubOrgId);
-      return {
-        type: 'GH_ORG',
-        linkPath: selectedOrg.get('name')
-      }
-    }
-
-    // Repo based?
-    var githubRepoId = communityCreateModel.get('githubRepoId');
-    if (githubRepoId) {
-      var selectedRepo = this.repoCollection.get(githubRepoId);
-      return {
-        type: 'GH_REPO',
-        linkPath: selectedRepo.get('uri')
-      }
-    }
-  },
-
-  getInviteData: function() {
-    var communityCreateModel = this.communityCreateModel;
-
-    var invites = [].concat(communityCreateModel.peopleToInvite.toJSON(), communityCreateModel.emailsToInvite.toJSON());
-    return invites;
-  },
-
-  getCreateData: function() {
-    var communityCreateModel = this.communityCreateModel;
-
-    var security = this.getSecurityData();
-    var invites = this.getInviteData();
-
-    return {
-      name: communityCreateModel.get('communityName'),
-      uri: communityCreateModel.get('communitySlug'),
-      // type: 'org',
-      // This one is for the left-menu
-      // linkPath: linkPath,
-      // This is for POSTing to the API
-      security: security,
-      invites: invites,
-      addBadge: communityCreateModel.get('allowBadger'),
-      // TODO: ADD UI option
-      allowTweeting: true
-    };
-  },
-
   onStepBack: function() {
-    // Only go back to confirmation if there was trouble initially
-    if(this.troubleInviteCollection.length > 0) {
-      this.communityCreateModel.set('stepState', stepConstants.INVITE_CONFIRMATION);
+    var prevStep;
+    if (this.communityCreateModel.hasInvitesRequiringEmailEntry()) {
+      // Only go back to confirmation if there was trouble initially
+      prevStep = stepConstants.INVITE_CONFIRMATION;
+    } else {
+      prevStep = stepConstants.INVITE;
     }
-    else {
-      this.communityCreateModel.set('stepState', stepConstants.INVITE);
-    }
+    this.communityCreateModel.set('stepState', prevStep);
   },
 
   onCommunityDataChange: function() {
