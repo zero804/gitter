@@ -5,7 +5,7 @@ var fonts = require('../../web/fonts');
 
 
 var groupService = require('gitter-web-groups');
-var forumService = require('gitter-web-topics');
+var forumService = require('gitter-web-topics/lib/forum-service');
 
 var topicService = require('gitter-web-forums').topicService;
 
@@ -15,37 +15,27 @@ var forumTopicsStore = require('gitter-web-topics-ui/server/stores/topics-store'
 
 var navConstants = require('gitter-web-topics-ui/shared/constants/navigation');
 
+var restSerializer = require('../../serializers/rest-serializer');
+
 
 function renderForum(req, res, next, options) {
 
   if (!req.fflip || !req.fflip.has('topics')) {
-    console.log('STATUSONG');
-    //return next(new StatusError(404));
+    return next(new StatusError(404));
   }
 
+  options = (options || {});
   var groupUri = req.params.groupName;
-  console.log('-----------------------');
-  console.log(groupUri);
-  console.log('-----------------------');
+
   groupService.findByUri(groupUri)
     .then(function(group){
-      console.log('-----------------------');
-      console.log(group);
-      console.log('-----------------------');
       return forumService.findById(group.forumId);
     })
     .then(function(forum){
-      console.log('-----------------------');
-      console.log(forum);
-      console.log('-----------------------');
+      var strategy = new restSerializer.ForumStrategy();
+      return restSerializer.serializeObject(forum, strategy);
     })
-
-  /*
-  options = (options || {});
-
-  forumService.findByName(req.params.groupName)
     .then(function(forum){
-
       var categoryName = (req.params.categoryName || navConstants.DEFAULT_CATEGORY_NAME);
       var filterName = (req.query.filter || navConstants.DEFAULT_FILTER_NAME);
       var tagName = (req.query.tag || navConstants.DEFAULT_TAG_NAME);
@@ -71,8 +61,7 @@ function renderForum(req, res, next, options) {
           topicsStore: forumTopicsStore(forum.topics),
         }
       });
-    });
-  */
+    })
 }
 
 
