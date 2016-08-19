@@ -7,7 +7,7 @@ import {STORE_UPDATE, STORE_CREATE_NEW} from '../../../../shared/constants/creat
 import updateBody from '../../../../shared/action-creators/create-topic/body-update';
 import submit from '../../../../shared/action-creators/create-topic/submit';
 
-describe.only('NewTopicStore', () => {
+describe('NewTopicStore', () => {
 
   let store;
   beforeEach(() => {

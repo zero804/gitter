@@ -77,20 +77,8 @@ describe('<ForumContainer />', function(){
     assert.equal(tagChangeHandle.callCount, 1);
   });
 
-  it('should render an inactive modal by default', () => {
-    assert.equal(wrapper.find('CreateTopicModal').prop('active'), false);
-  });
-
-  it('should render an active modal from create-topic', () => {
-    wrapper = shallow(
-      <ForumContainer
-        categoryStore={catCollection}
-        tagStore={tagCollection}
-        topicsStore={topicsCollection}
-        createTopic={true}
-        groupName='gitterHQ' />
-    );
-    assert.equal(wrapper.find('CreateTopicModal').prop('active'), true);
+  it('should render a CreateTopicContainer', () => {
+    assert.equal(wrapper.find('CreateTopicContainer').length, 1);
   });
 
   it('should render a TopicsTable', () => {
