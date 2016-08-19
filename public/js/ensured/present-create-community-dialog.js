@@ -17,14 +17,12 @@ function presentCommunityCreateDialog(options) {
     var RepoCollection = repoModels.ReposCollection;
     var OrgCollection = orgModels.OrgCollection;
 
-    var unusedRepoCollection = new RepoCollection();
-    var repoCollection = new RepoCollection();
-    var unusedOrgCollection = new OrgCollection();
+    var repos = new RepoCollection();
+    var orgs = new OrgCollection();
 
     var communityCreateModel = new CommunityCreateModel({ }, {
-      repoCollection: repoCollection,
-      unusedOrgCollection: unusedOrgCollection,
-      unusedRepoCollection: unusedRepoCollection,
+      orgs: orgs,
+      repos: repos,
     });
 
     communityCreateModel.refreshGitHubCollections();
