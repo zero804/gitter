@@ -104,7 +104,7 @@ export default React.createClass({
 
   render() {
     const { categories, categoryName, tags, filterName, tagName, sortName, createTopic, topics } = this.state;
-    const { groupName, newTopicStore } = this.props;
+    const { groupName, newTopicStore, topicsStore } = this.props;
     return (
       <main>
         <CategoryList
@@ -126,7 +126,11 @@ export default React.createClass({
 
         <TopicsTable topics={topics} groupName={groupName}/>
 
-        <CreateTopicContainer active={createTopic} newTopicStore={newTopicStore}/>
+        <CreateTopicContainer
+          groupName={groupName}
+          active={createTopic}
+          newTopicStore={newTopicStore}
+          topicsStore={topicsStore}/>
       </main>
     );
   },

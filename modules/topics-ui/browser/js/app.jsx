@@ -63,6 +63,7 @@ export default React.createClass({
   getDefaultState(){
     const { router } = this.props;
     const accessTokenStore = this.getAccessTokenStore();
+    console.log(accessTokenStore);
     return { route: router.get('route'), router: router, accessTokenStore: accessTokenStore };
   },
 
@@ -137,10 +138,16 @@ export default React.createClass({
 
   getTopicsStore(){
     const {router} = this.props;
+    const accessTokenStore = this.getAccessTokenStore();
+    const forumStore = this.getForumStore();
     const topicsStore = (window.context.topicsStore || {});
 
     if(this.hasRendered && this.state.topicsStore) { return this.state.topicsStore; }
-    return new TopicsStore(topicsStore.models, { router: router });
+    return new TopicsStore(topicsStore.models, {
+      router: router,
+      accessTokenStore: accessTokenStore,
+      forumStore: forumStore,
+    });
   },
 
   //EVENT HANDLES ---------------------------
