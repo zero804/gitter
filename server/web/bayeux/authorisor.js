@@ -36,6 +36,18 @@ var routes = [{
     validator: validateUserForSubTroupeSubscription,
     populator: populateSubSubTroupeCollection
   }, {
+    re: /^\/api\/v1\/forums\/(\w+)$/,
+    validator: validateUserForForumSubscription
+  }, {
+    re: /^\/api\/v1\/forums\/(\w+)\/topics$/,
+    validator: validateUserForForumSubscription
+  }, {
+    re: /^\/api\/v1\/forums\/(\w+)\/topics\/(\w+)\/replies$/,
+    validator: validateUserForForumSubscription
+  }, {
+    re: /^\/api\/v1\/forums\/(\w+)\/topics\/(\w+)\/replies(\w+)\/comments$/,
+    validator: validateUserForForumSubscription
+  }, {
     re: /^\/api\/v1\/user\/(\w+)\/(\w+)$/,
     validator: validateUserForUserSubscription,
     populator: populateSubUserCollection
@@ -95,6 +107,26 @@ function validateUserForSubTroupeSubscription(options) {
         logger.error('Unable to reassociate connection or update last access: ', { exception: err, userId: userId, troupeId: troupeId });
       });
   });
+}
+
+// This strategy ensures that a user can access a forum URL
+function validateUserForForumSubscription(options) {
+  var userId = options.userId;
+  var match = options.match;
+  //var ext = options.message && options.message.ext;
+
+  var forumId = match[1];
+
+  if (!mongoUtils.isLikeObjectId(forumId)) {
+    return Promise.reject(new StatusError(400, 'Invalid ID: ' + forumId));
+  }
+
+  return policyFactory.createPolicyForUserIdInForumId(userId, forumId)
+    .then(function(policy) {
+      return policy.canRead();
+    });
+
+  // TODO: should we handle ext.reassociate?
 }
 
 // This is only used by the native client. The web client publishes to
