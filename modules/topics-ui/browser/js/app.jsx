@@ -8,6 +8,7 @@ import TopicContainer from '../../shared/containers/TopicContainer.jsx';
 import CategoryStore from './stores/forum-category-store';
 import TagStore from './stores/forum-tag-store';
 import TopicsStore from './stores/topics-store';
+import NewTopicStore from './stores/new-topic-store';
 
 import * as navConstants from '../../shared/constants/navigation';
 
@@ -60,7 +61,8 @@ export default React.createClass({
       sortName: router.get('sortName'),
       categoryStore: new CategoryStore(categoryStore.models, { router: router }),
       tagStore: new TagStore(tagStore.models, { router: router }),
-      topicsStore: new TopicsStore(topicsStore.models, { router: router })
+      topicsStore: new TopicsStore(topicsStore.models, { router: router }),
+      newTopicStore: new NewTopicStore(),
     });
   },
 

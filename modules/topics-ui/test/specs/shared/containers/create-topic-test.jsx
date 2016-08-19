@@ -1,4 +1,5 @@
 import React from 'react';
+import Backbone from 'backbone';
 import { equal } from 'assert';
 import { shallow } from 'enzyme';
 import { subscribe } from '../../../../shared/dispatcher';
@@ -6,11 +7,14 @@ import { spy } from 'sinon';
 import CreateTopicContainer from '../../../../shared/containers/CreateTopicContainer.jsx';
 import * as createConst from '../../../../shared/constants/create-topic';
 
-describe('<CreateTopicContainer />', () => {
+describe.only('<CreateTopicContainer />', () => {
 
   let wrapper;
+  let newTopicStore;
+
   beforeEach(() => {
-    wrapper = shallow(<CreateTopicContainer />);
+    newTopicStore = new Backbone.Model({ title: 'title', body: 'body' });
+    wrapper = shallow(<CreateTopicContainer newTopicStore={newTopicStore} />);
   });
 
   it('should render the create topic modal', () => {
@@ -36,6 +40,10 @@ describe('<CreateTopicContainer />', () => {
     subscribe(createConst.SUBMIT, handle);
     wrapper.find('CreateTopicModal').at(0).prop('onSubmit')()
     equal(handle.callCount, 1);
+ });
+
+ it('should dispatch an event when the store emits a STORE_CREATE_NEW event', () => {
+
  });
 
 });
