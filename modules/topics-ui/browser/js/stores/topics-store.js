@@ -1,6 +1,7 @@
 import { Model, Collection } from 'backbone';
 import {subscribe} from '../../../shared/dispatcher';
 import {SUBMIT_NEW_TOPIC} from '../../../shared/constants/create-topic';
+import $ from 'jquery';
 
 var TopicModel = Model.extend({
   defaults: {},
@@ -10,7 +11,28 @@ var TopicModel = Model.extend({
 
   sync(){
     //Need to abstract and pull in the apiClient here so this is a bodge
-    console.log('working');
+    const headers = { "x-access-token": this.collection.getAccessToken() }
+    const data = JSON.stringify(this.toJSON());
+
+    $.ajax({
+      url: this.url(),
+      contentType: 'application/json',
+      type: 'POST',
+      headers: headers,
+      data: data,
+      success: this.onSuccess.bind(this),
+      error: this.onError.bind(this),
+    })
+  },
+
+  onSuccess(){
+    console.log('success');
+    debugger;
+  },
+
+  onError(){
+    console.log('Errorzzzz');
+    debugger;
   }
 
 });
@@ -19,7 +41,8 @@ export default Collection.extend({
 
   model: TopicModel,
 
-  initialize(){
+  initialize(models, attrs){
+    this.accessTokenStore = attrs.accessTokenStore;
     subscribe(SUBMIT_NEW_TOPIC, this.creatNewTopic, this);
   },
 
@@ -31,11 +54,13 @@ export default Collection.extend({
     return this.get(id).toJSON();
   },
 
-  creatNewTopic(title, body){
-    console.log('-----------------------');
-    console.log(title, body);
-    console.log('-----------------------');
-    this.create({ title: title, body: body });
+  creatNewTopic(data){
+    this.create({ title: data.title, text: data.body });
+  },
+
+  //TODO Remove
+  getAccessToken(){
+    return this.accessTokenStore.get('accessToken');
   }
 
 });
