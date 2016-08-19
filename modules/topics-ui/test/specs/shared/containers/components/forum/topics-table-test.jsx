@@ -9,7 +9,7 @@ describe('<TopicsTable/>', () => {
   let topics = [];
 
   beforeEach(() => {
-    wrapper = shallow(<TopicsTable topics={topics}/>);
+    wrapper = shallow(<TopicsTable topics={topics} groupname="gitterHQ"/>);
   });
 
   it('should render a container', () => {
