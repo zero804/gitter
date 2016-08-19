@@ -10,6 +10,7 @@ module.exports = function forumStore(data) {
 
   //Methods
   return {
-    get: get
+    get: get,
+    data: data
   };
 };
