@@ -6,8 +6,8 @@ var fonts = require('../../web/fonts');
 
 var groupService = require('gitter-web-groups');
 var forumService = require('gitter-web-topics/lib/forum-service');
+var topicService = require('gitter-web-topics/lib/topic-service');
 
-var topicService = require('gitter-web-forums').topicService;
 
 var forumCategoryStore = require('gitter-web-topics-ui/server/stores/forum-category-store');
 var forumTagStore = require('gitter-web-topics-ui/server/stores/forum-tag-store');
@@ -79,8 +79,6 @@ function renderForum(req, res, next, options) {
             }
           });
         })
-
-
     })
 
 }
@@ -92,26 +90,39 @@ function renderTopic(req, res, next) {
     return next(new StatusError(404));
   }
 
-  topicService.getAllTopics()
-    .then(function(topics){
+  var groupUri = req.params.groupName;
+  var topicId = req.params.topicId;
 
-      //TODO Remove this, its only for fake data
-      var topicId = topics[0].id += '';
-      //var topicId = req.params.topicId;
-
-      var topicStore = forumTopicsStore(topics);
-
-      res.render('topics/topic', {
-        layout: 'topics-layout',
-        hasCachedFonts: fonts.hasCachedFonts(req.cookies),
-        fonts: fonts.getFonts(),
-        componentData: {
-          groupName: req.params.groupName,
-          topicsStore: topicStore,
-          topicId: topicId,
-        }
-      });
-    });
+  return contextGenerator.generateNonChatContext(req)
+    .then(function(context){
+      return groupService.findByUri(groupUri)
+        .then(function(group){
+          return topicService.findByIdForForum(group.forumId, topicId);
+        })
+        .then(function(topic){
+          var strategy = new restSerializer.TopicStrategy({
+            includeReplies: true,
+            includeRepliesTotals: true,
+            // TODO: we'll probably include a sample of comments on those replies
+            // down the line.
+          });
+          return restSerializer.serializeObject(topic, strategy);
+        })
+        .then(function(topic){
+          var topicStore = forumTopicsStore([topic]);
+          return res.render('topics/topic', {
+            layout: 'topics-layout',
+            hasCachedFonts: fonts.hasCachedFonts(req.cookies),
+            fonts: fonts.getFonts(),
+            componentData: {
+              groupName: req.params.groupName,
+              topicsStore: topicStore,
+              topicId: topicId,
+              accessTokenStore: accessTokenStore(context.accessToken),
+            }
+          });
+        })
+    })
 }
 
 module.exports = {

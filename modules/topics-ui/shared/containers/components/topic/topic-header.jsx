@@ -36,7 +36,7 @@ export default React.createClass({
               </div>
             </section>
             <section className="topic-header__control-row">
-              <a className="topic-header__category-link" title="More {category} topics">{category}</a>
+              <a className="topic-header__category-link" title="More {category} topics">{category.name}</a>
               <ul className="topic-header__tag-list">{tags.map((tag, i) => this.buildTagView(tag, i))}</ul>
             </section>
           </header>
