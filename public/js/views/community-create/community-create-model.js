@@ -32,8 +32,8 @@ var CommunityCreateModel = Backbone.Model.extend({
   },
 
   initialize: function(attrs, options) {
-    this.unusedOrgCollection = options.unusedOrgCollection;
-    this.unusedRepoCollection = options.unusedRepoCollection;
+    this.orgs = options.orgs;
+    this.repos = options.repos;
 
     this.invites = new Backbone.Collection([]);
   },
@@ -42,7 +42,7 @@ var CommunityCreateModel = Backbone.Model.extend({
     var githubOrgId = this.get('githubOrgId');
     // Org based?
     if (githubOrgId) {
-      var selectedOrg = this.unusedOrgCollection.find(function(org) {
+      var selectedOrg = this.orgs.find(function(org) {
         return org.get('id') === githubOrgId;
       });
 
@@ -57,7 +57,7 @@ var CommunityCreateModel = Backbone.Model.extend({
     // Repo based?
     var githubRepoId = this.get('githubRepoId');
     if (githubRepoId) {
-      var selectedRepo = this.unusedRepoCollection.find(function(repo) {
+      var selectedRepo = this.repos.find(function(repo) {
         return repo.get('id') === githubRepoId;
       });
 
@@ -156,7 +156,7 @@ var CommunityCreateModel = Backbone.Model.extend({
     };
   },
 
-  resetCollection: function(collection, data) {
+  refreshCollection: function(collection, data) {
     data.cb = Date.now();
 
     return new Promise(function(resolve, reject) {
@@ -176,8 +176,8 @@ var CommunityCreateModel = Backbone.Model.extend({
     var resetOrgs = !options;
     var resetRepos = !options || options.repo;
     return Promise.all([
-      resetOrgs && this.resetCollection(this.unusedOrgCollection, { type: 'unused '}),
-      resetRepos && this.resetCollection(this.unusedRepoCollection, { type: 'unused '}),
+      resetOrgs && this.refreshCollection(this.orgs, { type: 'unused '}),
+      resetRepos && this.refreshCollection(this.repos, { type: 'unused '}),
     ]);
   },
 
@@ -192,7 +192,7 @@ var CommunityCreateModel = Backbone.Model.extend({
     slug = slug.toLowerCase();
 
     // TODO: Why does this match the first item always?
-    var matchingOrgItem = this.unusedOrgCollection.filter(function(org) {
+    var matchingOrgItem = this.orgs.filter(function(org) {
       return (org.get('name') || '').toLowerCase() === slug;
     })[0];
 
@@ -203,7 +203,7 @@ var CommunityCreateModel = Backbone.Model.extend({
       };
     }
 
-    var matchingRepoItem = this.unusedRepoCollection.filter(function(repo) {
+    var matchingRepoItem = this.repos.filter(function(repo) {
       return (repo.get('uri') || '').toLowerCase() === slug;
     })[0];
 

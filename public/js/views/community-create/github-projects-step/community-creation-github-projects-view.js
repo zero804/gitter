@@ -33,7 +33,7 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   initOrgListView: function(optionsForRegion) {
     this.orgListView = new CommunityCreationOrgListView(optionsForRegion({
-      collection: this.communityCreateModel.unusedOrgCollection
+      collection: this.communityCreateModel.orgs
     }));
     this.listenTo(this.orgListView, 'org:activated', this.onOrgSelectionChange, this);
     this.listenTo(this.orgListView, 'org:cleared', this.onOrgSelectionChange, this);
@@ -42,7 +42,7 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   initRepoListView: function(optionsForRegion) {
     this.repoListView = new CommunityCreationRepoListView(optionsForRegion({
-      collection: this.filteredUnusedRepoCollection
+      collection: this.filterRepos
     }));
     this.listenTo(this.repoListView, 'repo:activated', this.onRepoSelectionChange, this);
     this.listenTo(this.repoListView, 'repo:cleared', this.onRepoSelectionChange, this);
@@ -78,8 +78,8 @@ module.exports = CommunityCreateBaseStepView.extend({
   initialize: function() {
     _super.initialize.apply(this, arguments);
 
-    this.filteredUnusedRepoCollection = new SimpleFilteredCollection([], {
-      collection: this.communityCreateModel.unusedRepoCollection
+    this.filterRepos = new SimpleFilteredCollection([], {
+      collection: this.communityCreateModel.repos
     });
 
     this.debouncedApplyFilterToRepos = _.debounce(this.applyFilterToRepos.bind(this), 200);
@@ -166,7 +166,7 @@ module.exports = CommunityCreateBaseStepView.extend({
     }
 
     // Set any repo item that may be selected inactive
-    var previousActiveRepoModel = this.communityCreateModel.unusedRepoCollection.findWhere({ active: true });
+    var previousActiveRepoModel = this.communityCreateModel.repos.findWhere({ active: true });
     if(previousActiveRepoModel) {
       previousActiveRepoModel.set('active', false);
     }
@@ -194,7 +194,7 @@ module.exports = CommunityCreateBaseStepView.extend({
     }
 
     // Set any org item that may be selected inactive
-    var previousActiveOrgModel = this.communityCreateModel.unusedOrgCollection.findWhere({ active: true });
+    var previousActiveOrgModel = this.communityCreateModel.orgs.findWhere({ active: true });
     if(previousActiveOrgModel) {
       previousActiveOrgModel.set('active', false);
     }
@@ -224,7 +224,8 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   applyFilterToRepos: function() {
     var filterString = (this.model.get('repoFilter') || '').toLowerCase();
-    this.filteredUnusedRepoCollection.setFilter(function(model) {
+
+    this.filterRepos.setFilter(function(model) {
       var shouldShow = true;
       if(filterString && filterString.length > 0) {
         shouldShow = fuzzysearch(filterString, model.get('name').toLowerCase());
