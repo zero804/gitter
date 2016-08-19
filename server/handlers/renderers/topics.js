@@ -53,6 +53,7 @@ function renderForum(req, res, next, options) {
           var filterName = (req.query.filter || navConstants.DEFAULT_FILTER_NAME);
           var tagName = (req.query.tag || navConstants.DEFAULT_TAG_NAME);
           var sortName = (req.query.sort || navConstants.DEFAULT_SORT_NAME);
+          var createTopic = (options.createTopic || false);
 
           return res.render('topics/forum', {
             layout: 'topics-layout',
@@ -67,7 +68,7 @@ function renderForum(req, res, next, options) {
               tagName: tagName,
               sortName: sortName,
 
-              createTopic: options.createTopic,
+              createTopic: createTopic,
 
               categoryStore: forumCategoryStore(forum.categories, categoryName),
               tagStore: forumTagStore(forum.tags, tagName),
