@@ -113,7 +113,6 @@ onready(function() {
     createCommunity: function() {
       presentCreateCommunityDialog({
         dialogRegion: appView.dialogRegion,
-        groups: troupeCollections.groups,
         orgCollection: troupeCollections.orgs,
       });
     },

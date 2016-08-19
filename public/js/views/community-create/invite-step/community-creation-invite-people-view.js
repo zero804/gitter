@@ -40,7 +40,7 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   initInviteListView: function(optionsForRegion) {
     this.inviteListView = new CommunityCreationPeopleListView(optionsForRegion({
-      collection: this.inviteCollection,
+      collection: this.communityCreateModel.invites,
       communityCreateModel: this.communityCreateModel,
       allowRemove: true
     }));
@@ -64,12 +64,8 @@ module.exports = CommunityCreateBaseStepView.extend({
   }),
 
 
-  initialize: function(options) {
+  initialize: function() {
     _super.initialize.apply(this, arguments);
-
-    this.orgCollection = options.orgCollection;
-    this.repoCollection = options.repoCollection;
-    this.inviteCollection = this.communityCreateModel.invites;
 
     this.searchModel = new Backbone.Model({
       searchInput: ''
@@ -78,9 +74,7 @@ module.exports = CommunityCreateBaseStepView.extend({
     this.userResultCollection = new UserResultCollection(null, {
       stepViewModel: this.model,
       searchModel: this.searchModel,
-      communityCreateModel: this.communityCreateModel,
-      orgCollection: this.orgCollection,
-      repoCollection: this.repoCollection
+      communityCreateModel: this.communityCreateModel
     });
   },
 
@@ -145,7 +139,7 @@ module.exports = CommunityCreateBaseStepView.extend({
   },
 
   onInviteRemoved: function(invite) {
-    this.inviteCollection.remove(invite);
+    this.communityCreateModel.invites.remove(invite);
   },
 
   onEmailSubmit: function(e) {

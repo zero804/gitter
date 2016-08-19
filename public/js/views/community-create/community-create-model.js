@@ -1,11 +1,10 @@
 'use strict';
 
-// var _ = require('underscore');
 var Backbone = require('backbone');
 var urlJoin = require('url-join');
 var stepConstants = require('./step-constants');
 var apiClient = require('components/apiClient');
-
+var Promise = require('bluebird');
 var peopleToInviteStatusConstants = require('./people-to-invite-status-constants');
 
 var INVITE_STATUS_READY = peopleToInviteStatusConstants.READY;
@@ -35,29 +34,44 @@ var CommunityCreateModel = Backbone.Model.extend({
   initialize: function(attrs, options) {
     this.orgCollection = options.orgCollection;
     this.repoCollection = options.repoCollection;
+    this.unusedOrgCollection = options.unusedOrgCollection;
+    this.unusedRepoCollection = options.unusedRepoCollection;
+
     this.invites = new Backbone.Collection([]);
   },
 
-  getGithubProjectInfo: function(orgCollection, repoCollection) {
-    var info = {
-      name: null,
-      url: null
-    };
-
+  getGithubProjectInfo: function() {
     var githubOrgId = this.get('githubOrgId');
-    var githubRepoId = this.get('githubRepoId');
-    if(githubOrgId) {
-      var githubOrgModel = orgCollection.get(githubOrgId);
-      info.name = githubOrgModel.get('name');
-      info.url = urlJoin('https://github.com', githubOrgModel.get('name'));
-    }
-    else if(githubRepoId) {
-      var githubRepoModel = repoCollection.get(githubRepoId);
-      info.name = githubRepoModel.get('name');
-      info.url = urlJoin('https://github.com', githubRepoModel.get('uri'));
+    // Org based?
+    if (githubOrgId) {
+      var selectedOrg = this.orgCollection.find(function(org) {
+        return org.get('id') === githubOrgId;
+      });
+
+      return {
+        type: 'GH_ORG',
+        linkPath: selectedOrg.get('name'),
+        name: selectedOrg.get('name'),
+        url: urlJoin('https://github.com', selectedOrg.get('name'))
+      }
     }
 
-    return info;
+    // Repo based?
+    var githubRepoId = this.get('githubRepoId');
+    if (githubRepoId) {
+      var selectedRepo = this.repoCollection.find(function(repo) {
+        return repo.get('id') === githubRepoId;
+      });
+
+      // var selectedRepo = this.repoCollection.get(githubRepoId);
+      return {
+        type: 'GH_REPO',
+        linkPath: selectedRepo.get('uri'),
+        name: selectedRepo.get('name'),
+        url: urlJoin('https://github.com', selectedRepo.get('uri'))
+      }
+    }
+
   },
 
   addInvitation: function(type, externalId, displayName, avatarUrl) {
@@ -111,23 +125,11 @@ var CommunityCreateModel = Backbone.Model.extend({
   },
 
   getSecurityData: function() {
-    var githubOrgId = this.get('githubOrgId');
-    // Org based?
-    if (githubOrgId) {
-      var selectedOrg = this.orgCollection.get(githubOrgId);
+    var githubInfo = this.getGithubProjectInfo();
+    if (githubInfo) {
       return {
-        type: 'GH_ORG',
-        linkPath: selectedOrg.get('name')
-      }
-    }
-
-    // Repo based?
-    var githubRepoId = this.get('githubRepoId');
-    if (githubRepoId) {
-      var selectedRepo = this.repoCollection.get(githubRepoId);
-      return {
-        type: 'GH_REPO',
-        linkPath: selectedRepo.get('uri')
+        type: githubInfo.type,
+        linkPath: githubInfo.linkPath
       }
     }
   },
@@ -156,6 +158,79 @@ var CommunityCreateModel = Backbone.Model.extend({
       allowTweeting: true
     };
   },
+
+  resetCollection: function(collection, data) {
+    data.cb = Date.now();
+
+    return new Promise(function(resolve, reject) {
+      collection.fetch({
+        reset: true,
+        data: data,
+        success: function() {
+          resolve();
+        },
+        error: reject
+      });
+
+    });
+  },
+
+  refreshGitHubCollections: function(options) {
+    var resetOrgs = !options;
+    var resetRepos = !options || options.repo;
+    return Promise.all([
+      resetOrgs && this.resetCollection(this.unusedOrgCollection, { type: 'unused '}),
+      resetRepos && this.resetCollection(this.repoCollection, { }),
+      resetRepos && this.resetCollection(this.unusedRepoCollection, { type: 'unused '}),
+    ]);
+  },
+
+  findGitHubObjectForSlug: function(slug) {
+    if (!slug) {
+      return {
+        githubOrgId: null,
+        githubRepoId: null
+      };
+    }
+
+    slug = slug.toLowerCase();
+
+    // TODO: Why does this match the first item always?
+    var matchingOrgItem = this.orgCollection.filter(function(org) {
+      return (org.get('name') || '').toLowerCase() === slug;
+    })[0];
+
+    if (matchingOrgItem) {
+      return {
+        githubOrgId: matchingOrgItem.get('id'),
+        githubRepoId: null
+      };
+    }
+
+    var matchingRepoItem = this.repoCollection.filter(function(repo) {
+      return (repo.get('uri') || '').toLowerCase() === slug;
+    })[0];
+
+    if (matchingRepoItem) {
+      return {
+        githubOrgId: null,
+        githubRepoId: matchingRepoItem.get('id')
+      }
+    }
+
+    return {
+      githubOrgId: null,
+      githubRepoId: null
+    };
+
+  },
+
+  updateGitHubInfoToMatchSlug: function() {
+    if(this.get('isUsingExplicitGitHubProject')) return;
+    var communitySlug = this.get('communitySlug');
+    var githubInfo = this.findGitHubObjectForSlug(communitySlug);
+    this.set(githubInfo);
+  }
 });
 
 // Static Methods

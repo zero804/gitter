@@ -46,13 +46,8 @@ module.exports = CommunityCreateBaseStepView.extend({
     'click @ui.backStep': 'onStepBack',
   }),
 
-  initialize: function(options) {
+  initialize: function() {
     _super.initialize.apply(this, arguments);
-
-    this.orgCollection = options.orgCollection;
-    this.repoCollection = options.repoCollection;
-    this.groupsCollection = options.groupsCollection;
-
     this.listenTo(this.communityCreateModel, 'change:communityName change:communitySlug change:githubOrgId', this.onCommunityDataChange, this);
   },
 
@@ -62,8 +57,8 @@ module.exports = CommunityCreateBaseStepView.extend({
     data.communitySlug = this.communityCreateModel.get('communitySlug');
 
     var githubProjectInfo = this.communityCreateModel.getGithubProjectInfo();
-    data.githubName = githubProjectInfo.name;
-    data.githubLink = githubProjectInfo.url;
+    data.githubName = githubProjectInfo && githubProjectInfo.name || '';
+    data.githubLink = githubProjectInfo && githubProjectInfo.url || '';
 
     return data;
   },
