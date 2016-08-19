@@ -6,7 +6,8 @@ var context = require('utils/context');
 var SearchPeopleCollection = require('./search-people');
 var SearchRoomCollection = require('./search-rooms');
 var SearchRepoCollection = require('./search-repos');
-var FilteredCollection = require('backbone-filtered-collection');
+var SimpleFilteredCollection = require('gitter-realtime-client/lib/simple-filtered-collection');
+var LimitedCollection = require('gitter-realtime-client/lib/limited-collection');
 var fuzzysearch = require('fuzzysearch');
 
 function roomFilter(roomMenuModel, room) {
@@ -31,8 +32,7 @@ function uniqByUrl(list) {
 }
 
 var SearchMessageAndPeople = Backbone.Collection.extend({
-  initialize: function(models, attrs) {//jshint unused: true
-
+  initialize: function(models, attrs) {
     if (!attrs || !attrs.roomMenuModel) {
       throw new Error('A valid instance of RoomMenuModel should be passed to a new LeftMenuSearchRoomsAndPeopleCollection');
     }
@@ -47,8 +47,10 @@ var SearchMessageAndPeople = Backbone.Collection.extend({
     this.searchPeopleCollection = new SearchPeopleCollection(null, { contextModel: this.roomMenuModel });
     this.searchRoomCollection = new SearchRoomCollection(null, { contextModel: this.roomMenuModel });
     this.searchRepoCollection = new SearchRepoCollection(null, { contextModel: context.user() });
-    this.searchCurrentRooms = new FilteredCollection({ collection: this.roomCollection });
-    this.searchCurrentRooms.setFilter(_.partial(roomFilter, this.roomMenuModel));
+    this.searchCurrentRooms = new SimpleFilteredCollection([], {
+      collection: this.roomCollection,
+      filter: _.partial(roomFilter, this.roomMenuModel)
+    });
 
     this.listenTo(this.roomMenuModel, 'change:searchTerm', this.onSearchUpdate, this);
     this.listenTo(this.searchPeopleCollection, 'change add remove reset update', this.onCollectionChange, this);
@@ -88,14 +90,12 @@ var SearchMessageAndPeople = Backbone.Collection.extend({
 
 });
 
-var FilteredSearchMessageAndPeople = function(models, attrs, options){
-  this.collection = attrs.collection = new SearchMessageAndPeople(models, attrs);
-  FilteredCollection.call(this, attrs, options);
-};
-
-_.extend(FilteredSearchMessageAndPeople.prototype, FilteredCollection.prototype, {
-  collectionFilter: function(model, index){
-    return index < 6;
+var FilteredSearchMessageAndPeople = LimitedCollection.extend({
+  constructor: function(models, options) {
+    LimitedCollection.prototype.constructor.call(this, [], {
+      collection: new SearchMessageAndPeople(models, options),
+      maxLength: 6
+    });
   }
 });
 

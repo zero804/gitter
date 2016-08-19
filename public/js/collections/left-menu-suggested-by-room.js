@@ -1,8 +1,7 @@
 'use strict';
 
 var Backbone = require('backbone');
-var _ = require('underscore');
-var FilteredCollection = require('backbone-filtered-collection');
+var SimpleFilteredCollection = require('gitter-realtime-client/lib/simple-filtered-collection');
 var SuggestedRoomsByRoomCollection = require('./room-suggested-rooms');
 var SyncMixin = require('./sync-mixin');
 
@@ -17,20 +16,19 @@ var Model = Backbone.Model.extend({
 var SuggestedCollection = SuggestedRoomsByRoomCollection.extend({
   model: Model,
 
-  initialize: function(models, attrs, options) {
-
-    if (!attrs || !attrs.roomMenuModel) {
+  initialize: function(models, options) {
+    if (!options || !options.roomMenuModel) {
       throw new Error('A valid instance of a RoomMenuModel must be passed to a new instance of LeftMenuSuggestionsCollection');
     }
 
-    this.roomMenuModel = attrs.roomMenuModel;
+    this.roomMenuModel = options.roomMenuModel;
     this.listenTo(this.roomMenuModel, 'change:state', this.onDataUpdate, this);
 
-    if (!attrs || !attrs.troupeModel) {
+    if (!options || !options.troupeModel) {
       throw new Error('A valid instance of a TroupeModel must be passed to a new instance of LeftMenuSuggestionsCollection');
     }
 
-    this.troupeModel = attrs.troupeModel;
+    this.troupeModel = options.troupeModel;
     this.listenTo(this.troupeModel, 'change:id', this.onDataUpdate, this);
 
     this.contextModel = new SuggestionsContextModel(null, {
@@ -38,8 +36,8 @@ var SuggestedCollection = SuggestedRoomsByRoomCollection.extend({
       troupeModel:   this.troupeModel,
     });
 
-    attrs.contextModel = (attrs.contextModel || this.contextModel);
-    SuggestedRoomsByRoomCollection.prototype.initialize.call(this, models, attrs, options);
+    options.contextModel = (options.contextModel || this.contextModel);
+    SuggestedRoomsByRoomCollection.prototype.initialize.call(this, models, options);
 
   },
 
@@ -61,34 +59,33 @@ var SuggestedCollection = SuggestedRoomsByRoomCollection.extend({
     if(!this.contextModel.changed.roomId) { return }
 
     //If a user has previously dismissed suggestions never fetch()
-    if(this.roomMenuModel.get('hasDismissedSuggestions')) { return; }
+    if(this.roomMenuModel.get('hasDismissedSuggestions')) {
+      return;
+    }
+
     this.fetch();
   },
 
   sync: SyncMixin.sync,
 });
 
-var FilteredSuggestedCollection = function(attrs, options){
-    this.collection = new SuggestedCollection(null, attrs);
-    this.roomCollection = attrs.roomCollection;
-    this.suggestedOrgCollection = attrs.suggestedOrgsCollection;
-    this.collectionFilter = this.collectionFilter.bind(this);
-    attrs = _.extend({}, attrs, { collection: this.collection });
+var FilteredSuggestionsCollection = SimpleFilteredCollection.extend({
+  constructor: function(options) {
+    var collection = new SuggestedCollection(null, options);
+    var roomCollection = options.roomCollection;
 
-    this.listenTo(this.roomCollection, 'update', this.onCollectionSync, this);
-    FilteredCollection.call(this, attrs, options);
-};
+    SimpleFilteredCollection.prototype.constructor.call(this, [], {
+      collection: collection,
+      filter: function(model) {
+        return !roomCollection.get(model.get('id'));
+      }
+    });
 
-_.extend(FilteredSuggestedCollection.prototype, FilteredCollection.prototype, {
-
-  collectionFilter: function (model){
-    return !this.roomCollection.get(model.get('id'));
-  },
-
-  onCollectionSync: function (){
-    this.setFilter();
+    this.listenTo(roomCollection, 'update', function() {
+      this.setFilter();
+    });
   },
 
 });
 
-module.exports = FilteredSuggestedCollection;
+module.exports = FilteredSuggestionsCollection;

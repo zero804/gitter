@@ -1,7 +1,7 @@
 'use strict';
 
 var defaultFilter = require('gitter-web-shared/filters/left-menu-minibar-default');
-var SimpleFilteredCollection = require('./simple-filtered-collection');
+var SimpleFilteredCollection = require('gitter-realtime-client/lib/simple-filtered-collection');
 
 var FilteredMinibarGroupCollection = SimpleFilteredCollection.extend({
   /**

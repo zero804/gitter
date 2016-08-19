@@ -1,7 +1,7 @@
 'use strict';
 
 var Marionette = require('backbone.marionette');
-var SimpleFilteredCollection = require('../../collections/simple-filtered-collection');
+var SimpleFilteredCollection = require('gitter-realtime-client/lib/simple-filtered-collection');
 var cocktail = require('backbone.cocktail');
 var toggleClass = require('utils/toggle-class');
 var appEvents = require('utils/appevents');

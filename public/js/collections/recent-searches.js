@@ -1,29 +1,23 @@
 'use strict';
 
 var Backbone = require('backbone');
-var _ = require('underscore');
-var FilteredCollection = require('backbone-filtered-collection');
 var localStorageSync = require('../utils/local-storage-sync');
+var LimitedCollection = require('gitter-realtime-client/lib/limited-collection');
 
-var Model = Backbone.Model.extend({
+var MAX_SAVED_SEARCHES = 5;
+
+var RecentSearchModel = Backbone.Model.extend({
   defaults: { name: null, avatarUrl: null, isRecentSearch: true },
 });
 
 var RecentSearchesCollection = Backbone.Collection.extend({
+  model: RecentSearchModel,
 
-  model: Model,
-
-  constructor: function() {
-    Backbone.Collection.prototype.constructor.apply(this, arguments);
-  },
-
-  initialize: function() {
-    this.cid = 'left-menu-saved-searches';
-    this.fetch();
-  },
+  // Used by localStorageSync...
+  cid: 'left-menu-saved-searches',
 
   comparator: function(a, b) {
-    return a.get('time') < b.get('time') ? 1 : -1;
+    return b.get('time') - a.get('time');
   },
 
   add: function(model) {
@@ -43,46 +37,22 @@ var RecentSearchesCollection = Backbone.Collection.extend({
 
   //Limit the number of entries saved into local storage
   toJSON: function() {
-    return this.models.sort(this.comparator).slice(0, 5);
+    return this.models.sort(this.comparator).slice(0, MAX_SAVED_SEARCHES);
   },
 
   sync: localStorageSync.sync,
 });
 
-var FilteredRecentSearches = function(attrs, options) {
-  this.collection = new RecentSearchesCollection(null);
-  attrs = _.extend({}, attrs, { collection: this.collection });
-  FilteredCollection.call(this, attrs, options);
-};
+var FilteredRecentSearches = LimitedCollection.extend({
+  model: RecentSearchModel,
 
-FilteredRecentSearches.prototype = _.extend(
-  FilteredRecentSearches.prototype,
-  FilteredCollection.prototype, {
+  constructor: function() {
+    var collection = new RecentSearchesCollection(null);
 
-  collectionFilter: function(model, index) { //jshint unused: true
-    return (index < 5);
-  },
-
-  comparator: function(a, b) {
-    return a.get('time') < b.get('time') ? 1 : -1;
-  },
-
-  add: function() {
-    this.collection.add.apply(this.collection, arguments);
-    this.collection.sort();
-    this.setFilter();
-  },
-
-  remove: function() {
-    this.collection.remove.apply(this.collection, arguments);
-    this.collection.sort();
-    this.setFilter();
-  },
-
-  reset: function() {
-    this.collection.reset.apply(this.collection, arguments);
-    this.collection.sort();
-    this.setFilter();
+    LimitedCollection.prototype.constructor.call(this, [], {
+      collection: collection,
+      maxLength: MAX_SAVED_SEARCHES
+    });
   },
 });
 
