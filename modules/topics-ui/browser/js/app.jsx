@@ -29,6 +29,7 @@ export default React.createClass({
   componentDidMount(){
     const {router} = this.props;
     router.on('change:route', this.onRouteUpdate, this);
+    this.hasRendered = true;
   },
 
   componentWillUnmount(){
@@ -62,11 +63,7 @@ export default React.createClass({
   getDefaultState(){
     const { router } = this.props;
     const accessTokenStore = this.getAccessTokenStore();
-    return {
-      route: router.get('route'),
-      router: router,
-      accessTokenStore: accessTokenStore
-    };
+    return { route: router.get('route'), router: router, accessTokenStore: accessTokenStore };
   },
 
   getForumState(){
@@ -109,15 +106,15 @@ export default React.createClass({
   },
 
   //STORES -------------------------------
-
   getAccessTokenStore(){
-    return (this.state.accessTokenStore ||
-      new AccessTokenStore({ accessToken: window.context.accessTokenStore.token }));
+    if(this.hasRendered && this.state.accessTokenStore) { return this.state.accessTokenStore }
+    return new AccessTokenStore({ accessToken: window.context.accessTokenStore.token });
   },
 
   getForumStore(){
     const forumStore = (window.context.forumStore || {});
-    return (this.state.forumStore || new ForumStore(forumStore.data));
+    if(this.hasRendered && this.state.forumStore) { return this.state.forumStore; }
+    return new ForumStore(forumStore.data);
   },
 
   getCategoryStore(){
@@ -125,8 +122,8 @@ export default React.createClass({
     const forumStore = this.getForumStore();
     const categoryStore = (window.context.categoryStore || {});
 
-    return (this.state.categoryStore ||
-      new CategoryStore(categoryStore.models, { router: router, forumStore: forumStore }));
+    if(this.hasRendered && this.state.categoryStore) { return this.state.categoryStore; }
+    return new CategoryStore(categoryStore.models, { router: router, forumStore: forumStore });
   },
 
   getTagStore(){
@@ -134,16 +131,16 @@ export default React.createClass({
     const forumStore = this.getForumStore();
     const tagStore = (window.context.tagStore || {});
 
-    return  (this.state.tagStore ||
-      new TagStore(tagStore.models, { router: router, forumStore: forumStore }));
+    if(this.hasRendered && this.state.tagStore) { return this.state.tagStore; }
+    return new TagStore(tagStore.models, { router: router, forumStore: forumStore });
   },
 
   getTopicsStore(){
     const {router} = this.props;
     const topicsStore = (window.context.topicsStore || {});
 
-    return (this.state.topicsStore ||
-      new TopicsStore(topicsStore.models, { router: router }));
+    if(this.hasRendered && this.state.topicsStore) { return this.state.topicsStore; }
+    return new TopicsStore(topicsStore.models, { router: router });
   },
 
   //EVENT HANDLES ---------------------------
