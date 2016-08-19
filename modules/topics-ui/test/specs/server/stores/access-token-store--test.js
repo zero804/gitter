@@ -1,5 +1,7 @@
-import assert from 'assert';
-import accessTokenStore from '../../../../server/stores/access-token-store';
+"use strict";
+
+var assert = require('assert');
+var accessTokenStore = require('../../../../server/stores/access-token-store');
 
 describe('accessTokenStore', () => {
 
