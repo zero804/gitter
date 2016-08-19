@@ -17,7 +17,7 @@ export default createClass({
     }).isRequired,
   },
 
-  onComponentDidMount(){
+  componentDidMount(){
     const {newTopicStore} = this.props;
     newTopicStore.on(consts.STORE_CREATE_NEW, this.onStoreCreateNew, this);
   },
