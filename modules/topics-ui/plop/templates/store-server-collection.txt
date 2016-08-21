@@ -1,0 +1,22 @@
+"use strict";
+
+module.exports = function {{camelCase name}}Store(models) {
+
+  //Defaults
+  models = (models || []);
+
+  //Transform the server side models
+  models = models.map((model) => {
+    return model;
+  });
+
+  //Get resource
+  const get{{properCase name}} = () => models;
+
+  //Methods
+  return {
+    models: models,
+    get{{properCase name}}: get{{properCase name}}
+  };
+
+};

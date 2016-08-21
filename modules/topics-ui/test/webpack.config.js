@@ -5,17 +5,20 @@ var _ = require('lodash');
 var path = require('path');
 
 var config = _.extend({}, webpackConfig, {
+  devtool: 'source-map',
   entry: {
     runner: path.resolve(__dirname, './fixtures/runner-browser.js')
   },
   output: {
     filename: "[name].js",
-    path: path.resolve(__dirname, './build'),
+    path: path.resolve(__dirname, './fixtures/build'),
   },
   resolve: {
     alias: {
-      mocha: path.resolve(__dirname, '../node_modules/mocha/mocha.js'),
-      mochaCss: path.resolve(__dirname, '../node_modules/mocha/mocha.css'),
+      mocha: require.resolve('mocha/mocha.js'),
+      mochaCss: require.resolve('mocha/mocha.css'),
+      jquery: require.resolve('jquery/dist/jquery.js'),
+      sinon: require.resolve('sinon/pkg/sinon.js'),
     }
   }
 });
