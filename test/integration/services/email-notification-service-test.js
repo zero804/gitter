@@ -207,7 +207,7 @@ describe('email-notification-service', function() {
           assert.strictEqual(emailPayload.from, 'bob <support@gitter.im>');
           assert.strictEqual(emailPayload.to, 'x@troupetest.local');
           assert.strictEqual(emailPayload.data.roomUrl, BASE_EMAIL_PATH + '/a/b');
-          assert.strictEqual(emailPayload.data.inviteUrl, BASE_EMAIL_PATH + '/settings/accept-invite/x123');
+          assert.strictEqual(emailPayload.data.inviteUrl, BASE_EMAIL_PATH + '/settings/accept-invite/x123?source=email-invite');
           assert.strictEqual(emailPayload.data.roomUri, 'a/b');
           assert.strictEqual(emailPayload.data.senderName, 'bob');
         });
