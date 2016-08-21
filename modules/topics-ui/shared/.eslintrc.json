@@ -7,9 +7,19 @@
     "react"
   ],
   "extends": [
-    "eslint:recommended"
+    "plugin:import/errors"
   ],
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module",
+    "ecmaFeatures": {
+        "jsx": true
+    }
+  },
   "rules": {
+    "node/no-unpublished-import": "error",
+    "import/named": "error",
+    "import/default": "error",
     "node/no-unsupported-features": [
       "error",
       {
