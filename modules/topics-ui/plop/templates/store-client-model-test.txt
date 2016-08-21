@@ -1,0 +1,13 @@
+"use strict";
+
+var assert = require('assert');
+var {{properCaseName}}Store = require('../../../../browser/js/stores/{{dashCase name}}');
+
+describe('{{properCase name}}Store', () => {
+
+  let store;
+  beforeEach(() => {
+    store = new {{properCaseName}}Store();
+  });
+
+});

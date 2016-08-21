@@ -1,4 +1,47 @@
 @import "~normalize.css";
+@import "./colors";
 
-html { font-size: 62.5%; }
-body { font-size: 1.6rem; }
+.m-cover-screen() { height: 100%; width: 100%; }
+.m-grad-background() {
+  background-position:   0 0;
+  background-repeat:     no-repeat;
+  background-attachment: fixed;
+  background-image: radial-gradient(
+    150rem at 0 -15rem,
+    @topic-bg-left,
+    @topic-bg-right
+  );
+}
+
+html {
+  .m-cover-screen();
+  .m-grad-background();
+  font-size: 62.5%;
+}
+body { .m-cover-screen(); font-size: 1.6rem; }
+
+//Generic
+@import "./components/container";
+@import "./components/panel";
+@import "./components/modal";
+
+//Forms
+@import "./components/forms/input";
+@import "./components/forms/editor";
+@import "./components/forms/submit";
+
+//Text
+@import "./components/text/h1";
+
+//Forum specific
+@import "./components/forum/category-list";
+@import "./components/forum/category-list-item";
+@import "./components/forum/table-control";
+@import "./components/forum/table-control-button";
+@import "./components/forum/table-control-select";
+@import "./components/forum/topics-table";
+@import "./components/forum/topics-table-header";
+@import "./components/forum/topics-table-body";
+
+//Topics specific
+@import "./components/topics/create-topic-modal";
