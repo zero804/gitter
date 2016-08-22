@@ -45,7 +45,7 @@ export default React.createClass({
     );
   },
 
-  buildTagView(tag, i){
+  buildTagView(tag){
     return <a className="topic-header__tag-link" href="#">{tag}</a>
   },
 
