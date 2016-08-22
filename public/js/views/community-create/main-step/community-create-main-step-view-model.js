@@ -2,6 +2,7 @@
 
 var CommunityCreateStepViewModel = require('../community-create-step-view-model');
 var slugAvailabilityStatusConstants = require('../slug-availability-status-constants');
+var slugger = require('../../../utils/slugger');
 
 var CommunityCreateMainStepViewModel = CommunityCreateStepViewModel.extend({
   validate: function() {
@@ -18,7 +19,7 @@ var CommunityCreateMainStepViewModel = CommunityCreateStepViewModel.extend({
     }
     var communitySlug = this.communityCreateModel.get('communitySlug') || '';
     var hasCommunitySlug = communitySlug.length > 0;
-    var slugMatches = communitySlug.match(/[a-z0-9\-]+/);
+    var slugValid = slugger.isValid(communitySlug);
     if(!hasCommunitySlug) {
       errors.push({
         key: 'communitySlug',
@@ -31,7 +32,7 @@ var CommunityCreateMainStepViewModel = CommunityCreateStepViewModel.extend({
         message: 'Slug length must be 2 to 80 characters'
       });
     }
-    else if(!slugMatches || slugMatches[0] !== communitySlug || this.communityCreateModel.get('communitySlugAvailabilityStatus') === slugAvailabilityStatusConstants.INVALID) {
+    else if(!slugValid || this.communityCreateModel.get('communitySlugAvailabilityStatus') === slugAvailabilityStatusConstants.INVALID) {
       errors.push({
         key: 'communitySlug',
         message: 'Slug can only contain lowercase a-z and dashes -'

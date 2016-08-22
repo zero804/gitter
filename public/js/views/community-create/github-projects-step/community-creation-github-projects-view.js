@@ -3,7 +3,7 @@
 var _ = require('underscore');
 var toggleClass = require('utils/toggle-class');
 var context = require('utils/context');
-var slugify = require('slug');
+var slugger = require('../../../utils/slugger');
 var fuzzysearch = require('fuzzysearch');
 var SimpleFilteredCollection = require('../../../collections/simple-filtered-collection');
 var getRoomNameFromTroupeName = require('gitter-web-shared/get-room-name-from-troupe-name');
@@ -102,19 +102,18 @@ module.exports = CommunityCreateBaseStepView.extend({
       var selectedOrgName = this.model.get('selectedOrgName') || '';
       this.communityCreateModel.set({
         communityName: selectedOrgName,
-        communitySlug: slugify(selectedOrgName.toLowerCase()),
+        communitySlug: slugger(selectedOrgName),
         isUsingCustomSlug: false,
         githubOrgId: selectedOrgId,
         githubRepoId: null,
         isUsingExplicitGitHubProject: !!selectedOrgName
       });
-    }
-    else if(this.model.get('isRepoAreaActive')) {
+    } else if(this.model.get('isRepoAreaActive')) {
       var selectedRepoId = this.model.get('selectedRepoId');
       var selectedRepoName = getRoomNameFromTroupeName(this.model.get('selectedRepoName') || '');
       this.communityCreateModel.set({
         communityName: selectedRepoName,
-        communitySlug: slugify(selectedRepoName.toLowerCase()),
+        communitySlug: slugger(selectedRepoName),
         isUsingCustomSlug: false,
         githubOrgId: null,
         githubRepoId: selectedRepoId,

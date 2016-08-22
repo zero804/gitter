@@ -1,7 +1,7 @@
 'use strict';
 
 var _ = require('underscore');
-var slugify = require('slug');
+var slugger = require('../../../utils/slugger');
 var context = require('utils/context');
 var toggleClass = require('utils/toggle-class');
 var apiClient = require('components/apiClient');
@@ -153,7 +153,7 @@ module.exports = CommunityCreateBaseStepView.extend({
     var isSlugEmpty = !currentSlug || currentSlug.length === 0;
     if(isSlugEmpty || !isUsingCustomSlug) {
       this.communityCreateModel.set({
-        communitySlug: slugify(newCommunityName.toLowerCase()),
+        communitySlug: slugger(newCommunityName),
         // Reset back if we started doing an automatic slug again
         isUsingCustomSlug: isSlugEmpty ? false : isUsingCustomSlug
       });
