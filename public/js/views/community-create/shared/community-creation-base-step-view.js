@@ -2,8 +2,7 @@
 
 var Marionette = require('backbone.marionette');
 var toggleClass = require('utils/toggle-class');
-
-
+var _ = require('underscore');
 
 module.exports = Marionette.LayoutView.extend({
   template: false,
@@ -17,6 +16,11 @@ module.exports = Marionette.LayoutView.extend({
     'change:active': 'onActiveChange',
     'change': 'onChange',
     'invalid': 'onInvalid'
+  },
+
+  events: {
+    'click @ui.nextStep': 'onStepNext',
+    'click @ui.backStep': 'onStepBack',
   },
 
   initialize: function(options) {
@@ -48,5 +52,30 @@ module.exports = Marionette.LayoutView.extend({
     this.onActiveChange();
     this.model.isValid();
     this.applyValidMessages(true);
+  },
+
+  onStepNext: function(e) {
+    if (e) {
+      e.preventDefault();
+    }
+
+    var next = _.result(this, 'nextStep', null);
+    if (next) {
+      this.communityCreateModel.set('stepState', next);
+    }
+    return false;
+  },
+
+  onStepBack: function(e) {
+    if (e) {
+      e.preventDefault();
+    }
+
+    var prev = _.result(this, 'prevStep', null);
+    if (prev) {
+      this.communityCreateModel.set('stepState', prev);
+    }
+
+    return false;
   }
 });

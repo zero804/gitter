@@ -13,9 +13,7 @@ var avatars = require('gitter-web-avatars');
 require('gitter-styleguide/css/components/headings.css');
 require('gitter-styleguide/css/components/buttons.css');
 
-
 var _super = CommunityCreateBaseStepView.prototype;
-
 
 module.exports = CommunityCreateBaseStepView.extend({
   template: template,
@@ -57,8 +55,6 @@ module.exports = CommunityCreateBaseStepView.extend({
   }),
 
   events: _.extend({}, _super.events, {
-    'click @ui.nextStep': 'onStepNext',
-    'click @ui.backStep': 'onStepBack',
     'input @ui.peopleInput': 'onPeopleInputUpdate',
     'submit @ui.emailForm': 'onEmailSubmit'
   }),
@@ -78,21 +74,15 @@ module.exports = CommunityCreateBaseStepView.extend({
     });
   },
 
-  onStepNext: function() {
-    var nextStep;
+  nextStep: function() {
     if (this.communityCreateModel.hasInvitesRequiringEmailEntry()) {
       // Only go to confirmation if there was trouble
-      nextStep = stepConstants.INVITE_CONFIRMATION;
+      return stepConstants.INVITE_CONFIRMATION;
     } else {
-      nextStep = stepConstants.OVERVIEW;
+      return stepConstants.OVERVIEW;
     }
-
-    this.communityCreateModel.set('stepState', nextStep);
   },
-
-  onStepBack: function() {
-    this.communityCreateModel.set('stepState', stepConstants.MAIN);
-  },
+  prevStep: stepConstants.MAIN,
 
   onPeopleInputUpdate: function() {
     this.searchModel.set('searchInput', this.ui.peopleInput[0].value);

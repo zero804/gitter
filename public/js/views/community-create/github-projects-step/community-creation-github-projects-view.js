@@ -23,7 +23,8 @@ var _super = CommunityCreateBaseStepView.prototype;
 
 module.exports = CommunityCreateBaseStepView.extend({
   template: template,
-
+  nextStep: stepConstants.MAIN,
+  prevStep: stepConstants.MAIN,
   behaviors: {
     Isomorphic: {
       orgListView: { el: '.community-create-org-list-root', init: 'initOrgListView' },
@@ -62,8 +63,6 @@ module.exports = CommunityCreateBaseStepView.extend({
   }),
 
   events: _.extend({}, _super.events, {
-    'click @ui.nextStep': 'onStepNext',
-    'click @ui.backStep': 'onStepBack',
     'click @ui.orgsToggle': 'onOrgsAreaToggle',
     'click @ui.reposToggle': 'onReposAreaToggle',
     'input @ui.repoFilterInput': 'onRepoFilterInputChange',
@@ -122,13 +121,6 @@ module.exports = CommunityCreateBaseStepView.extend({
         isUsingExplicitGitHubProject: !!selectedRepoId
       });
     }
-  },
-
-  onStepNext: function() {
-    this.communityCreateModel.set('stepState', stepConstants.MAIN);
-  },
-  onStepBack: function() {
-    this.communityCreateModel.set('stepState', stepConstants.MAIN);
   },
 
   onOrgsAreaToggle: function() {
