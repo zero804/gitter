@@ -9,27 +9,13 @@ import * as forumCatConstants from '../../../../shared/constants/forum-categorie
 import * as forumFilterConstants from '../../../../shared/constants/forum-filters';
 import * as forumSortConstants from '../../../../shared/constants/forum-sorts';
 import * as forumTagConstants from '../../../../shared/constants/forum-tags';
-
-//TODO move these into mock objects
-var CategoryCollection = Backbone.Collection.extend({
-  getCategories(){
-    return this.models.map((m) => m.toJSON());
-  }
-});
-
-var TagCollection = Backbone.Collection.extend({
-  getTags(){ return this.models.map((m) => m.toJSON()); }
-});
-var TopicsCollection = Backbone.Collection.extend({
-  getTopics() { return this.models.map((m) => m.toJSON()); }
-});
+import categoryStore from '../../../mocks/category-store';
+import tagStore from '../../../mocks/tag-store';
+import topicsStore from '../../../mocks/topic-store';
 
 describe('<ForumContainer />', function(){
 
   let wrapper;
-  let catCollection;
-  let tagCollection;
-  let topicsCollection;
   let catChangeHandle;
   let filterChangeHandle;
   let sortChangeHandle;
@@ -41,14 +27,11 @@ describe('<ForumContainer />', function(){
     filterChangeHandle = sinon.spy();
     sortChangeHandle = sinon.spy();
     tagChangeHandle = sinon.spy();
-    catCollection = new CategoryCollection([ { category: 'all', active: true } ]);
-    tagCollection = new TagCollection([{value: 'all-tags', name: 'All Tags', active: true }]);
-    topicsCollection = new TopicsCollection([]);
     wrapper = shallow(
       <ForumContainer
-        categoryStore={catCollection}
-        tagStore={tagCollection}
-        topicsStore={topicsCollection}
+        categoryStore={categoryStore}
+        tagStore={tagStore}
+        topicsStore={topicsStore}
         groupName='gitterHQ' />
     );
   });

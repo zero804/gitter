@@ -6,14 +6,13 @@ import { subscribe, dispatch } from '../../../../shared/dispatcher';
 import { spy } from 'sinon';
 import CreateTopicContainer from '../../../../shared/containers/CreateTopicContainer.jsx';
 import * as createConst from '../../../../shared/constants/create-topic';
+import newTopicStore from '../../../mocks/new-topic-store';
 
 describe.skip('<CreateTopicContainer />', () => {
 
   let wrapper;
-  let newTopicStore;
 
   beforeEach(() => {
-    newTopicStore = new Backbone.Model({ title: 'title', body: 'body' });
     wrapper = mount(<CreateTopicContainer newTopicStore={newTopicStore} />);
   });
 
