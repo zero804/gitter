@@ -1,7 +1,5 @@
 'use strict';
 
-var Promise = require('bluebird');
-var assert = require('assert');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var appEvents = require('gitter-web-appevents');
 var topicService = require('gitter-web-topics/lib/topic-service');
