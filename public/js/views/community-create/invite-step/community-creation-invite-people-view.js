@@ -120,12 +120,15 @@ module.exports = CommunityCreateBaseStepView.extend({
           externalId = person.get('gitterUsername');
       }
 
+      // If all else fails, treat the user as a
+      // gitter user
       if (!externalId) {
         type = 'gitter';
         externalId = person.get('username');
       }
     } else {
       // For now, search results come from GitHub
+      // TODO: when we add a local user search, adjust the type here
       type = 'github';
       externalId = person.get('username');
     }
