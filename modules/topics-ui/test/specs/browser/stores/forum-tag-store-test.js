@@ -1,8 +1,8 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import Backbone from 'backbone';
 import ForumTagStore from '../../../../browser/js/stores/forum-tag-store';
 import * as forumTagConstants from '../../../../shared/constants/forum-tags';
+import mockRouter from '../../../mocks/router';
 
 describe('TagStore', () => {
 
@@ -19,8 +19,7 @@ describe('TagStore', () => {
       {value: 2, name: 2, active: false },
       {value: 3, name: 3, active: false },
     ];
-    router = new Backbone.Model({ route: 'forum', tagName: 'all-tags' });
-    tagStore = new ForumTagStore(tags, { router: router });
+    tagStore = new ForumTagStore(tags, { router: mockRouter });
   });
 
 

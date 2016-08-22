@@ -1,8 +1,8 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import Backbone from 'backbone';
 import CategoryStore from '../../../../browser/js/stores/forum-category-store';
 import * as forumCatConstants from '../../../../shared/constants/forum-categories';
+import mockRouter from '../../../mocks/router';
 
 describe('ForumCategoryStore', function(){
 
@@ -14,8 +14,7 @@ describe('ForumCategoryStore', function(){
   beforeEach(function(){
     handle = sinon.spy();
     categories = [ { category: 'all', active: true }, { category: 'test-1', active: false } ];
-    router = new Backbone.Model({ route: 'forum', categoryName: 'all' });
-    categoryStore = new CategoryStore(categories, { router: router });
+    categoryStore = new CategoryStore(categories, { router: mockRouter });
   });
 
   it('should update the active element when the route changes', function(){
