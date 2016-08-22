@@ -3,6 +3,8 @@
 var Promise = require('bluebird');
 var events = require('events');
 var assert = require('assert');
+var _ = require('lodash');
+
 
 function makeEmitter() {
   var localEventEmitter = new events.EventEmitter();
@@ -17,16 +19,10 @@ function makeEmitter() {
     addListener: function(eventName, expected) {
       var promise = new Promise(function(resolve) {
         localEventEmitter.on(eventName, function(res) {
-          // TODO: This probably only really works with dataChange2 for now.
-          // Make it more generic.
-
-          // First filter by url and operation, as other events may have been emitted
-          if (expected.url && expected.url !== res.url) return;
-          if (expected.operation && expected.operation !== res.operation) return;
-          // Check model with deepEqual
-          if (expected.model) {
-            resolve(assert.deepEqual(res.model, expected.model));
-          } else {
+          // NOTE: We can't reject here, because there could be other events
+          // with the same event name. Therefore it is best to just time out
+          // the test.
+          if (_.isMatch(res, expected)) {
             resolve();
           }
         });
