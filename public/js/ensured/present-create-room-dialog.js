@@ -4,6 +4,7 @@ var context = require('../utils/context');
 
 function presentCreateRoomDialog(options) {
   var roomCollection = options.roomCollection;
+  var groupsCollection = options.groupsCollection;
   var dialogRegion = options.dialogRegion;
   var roomMenuModel = options.roomMenuModel;
   var initialRoomName = options.initialRoomName;
@@ -44,25 +45,26 @@ function presentCreateRoomDialog(options) {
       return slimCurrentTroupe.get('groupId');
     }
 
-    var adminGroupsCollection = new groupModels.Collection([]);
-    adminGroupsCollection.fetch({ data: { type: 'admin' } })
+    var adminGroupsCollection = new groupModels.Collection(groupsCollection.models.slice());
+
+    adminGroupsCollection.fetch({ add: true, remove: true, reset: true, data: { type: 'admin' } })
       .then(function() {
         if(adminGroupsCollection.length === 0) {
           window.location.hash = '#createcommunity';
           return;
         }
-
-        var modal = new createRoomView.Modal({
-          model: new CreateRoomModel(),
-          initialGroupId: getSuitableGroupId(),
-          initialRoomName: initialRoomName,
-          groupsCollection: adminGroupsCollection,
-          roomCollection: roomCollection,
-          repoCollection: repoCollection
-        });
-
-        dialogRegion.show(modal);
       });
+
+      var modal = new createRoomView.Modal({
+        model: new CreateRoomModel(),
+        initialGroupId: getSuitableGroupId(),
+        initialRoomName: initialRoomName,
+        groupsCollection: adminGroupsCollection,
+        roomCollection: roomCollection,
+        repoCollection: repoCollection
+      });
+
+      dialogRegion.show(modal);
 
   });
 }

@@ -446,6 +446,7 @@ onready(function() {
       presentCreateRoomDialog({
         dialogRegion: appLayout.dialogRegion,
         roomCollection: troupeCollections.troupes,
+        groupsCollection: troupeCollections.groups,
         roomMenuModel: appLayout.getRoomMenuModel(),
         initialRoomName: initialRoomName
       });
