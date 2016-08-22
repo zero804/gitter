@@ -1,8 +1,8 @@
-import React, { PropTypes } from 'react';
+import React, { PropTypes, createClass } from 'react';
 import {dispatch} from '../../../dispatcher';
 import navigateToTopic from '../../../action-creators/topic/navigate-to-topic';
 
-export default React.createClass({
+export default createClass({
 
   displayName: 'TopicLink',
   propTypes: {
