@@ -6,7 +6,6 @@ import _ from 'lodash';
 
 import CreateTopicContainer from './CreateTopicContainer.jsx';
 import ForumTableControl from './components/forum/table-control.jsx';
-import CreateTopicModal from './components/topic/create-topic-modal.jsx';
 import TopicsTable from './components/forum/topics-table.jsx';
 
 
