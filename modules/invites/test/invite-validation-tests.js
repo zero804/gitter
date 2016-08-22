@@ -58,77 +58,132 @@ describe('parseAndValidateInput', function() {
   describe('parseAndValidateInput', function() {
     var parseAndValidateInput = inviteValidation.parseAndValidateInput;
 
-    it('should throw a 400 statuserror if no valid params are passed in', function() {
-      return Promise.try(function() {
-          return parseAndValidateInput({foo: 'bar'});
-        })
-        .then(function() {
-          assert.ok(false, 'Expected error.')
-        })
-        .catch(StatusError, function(err) {
-          assert.strictEqual(err.status, 400);
-        });
-    });
+    describe('old method', function() {
 
-    it('should throw a 400 statuserror if a non-string value is passed in', function() {
-      return Promise.try(function() {
-          return parseAndValidateInput({username: 1});
-        })
-        .then(function() {
-          assert.ok(false, 'Expected error.')
-        })
-        .catch(StatusError, function(err) {
-          assert.strictEqual(err.status, 400);
-        });
-    });
+      it('should throw a 400 statuserror if no valid params are passed in', function() {
+        return Promise.try(function() {
+            return parseAndValidateInput({foo: 'bar'});
+          })
+          .then(function() {
+            assert.ok(false, 'Expected error.')
+          })
+          .catch(StatusError, function(err) {
+            assert.strictEqual(err.status, 400);
+          });
+      });
 
-    it('should throw a 400 statuserror if multiple usernames are passed in', function() {
-      return Promise.try(function() {
-          return parseAndValidateInput({username: 'gitter', githubUsername: 'github'});
-        })
-        .then(function() {
-          assert.ok(false, 'Expected error.')
-        })
-        .catch(StatusError, function(err) {
-          assert.strictEqual(err.status, 400);
-        });
-    });
+      it('should throw a 400 statuserror if a non-string value is passed in', function() {
+        return Promise.try(function() {
+            return parseAndValidateInput({username: 1});
+          })
+          .then(function() {
+            assert.ok(false, 'Expected error.')
+          })
+          .catch(StatusError, function(err) {
+            assert.strictEqual(err.status, 400);
+          });
+      });
 
-    it('should return type gitter if username was passed in', function() {
-      var result = parseAndValidateInput({username: 'gitter'});
-      assert.deepStrictEqual(result, {
-        type: 'gitter',
-        externalId: 'gitter',
-        emailAddress: undefined
+      it('should throw a 400 statuserror if multiple usernames are passed in', function() {
+        return Promise.try(function() {
+            return parseAndValidateInput({username: 'gitter', githubUsername: 'github'});
+          })
+          .then(function() {
+            assert.ok(false, 'Expected error.')
+          })
+          .catch(StatusError, function(err) {
+            assert.strictEqual(err.status, 400);
+          });
+      });
+
+      it('should return type gitter if username was passed in', function() {
+        var result = parseAndValidateInput({username: 'gitter'});
+        assert.deepStrictEqual(result, {
+          type: 'gitter',
+          externalId: 'gitter',
+          emailAddress: undefined
+        });
+      });
+
+      it('should return type github if githubUsername was passed in', function() {
+        var result =parseAndValidateInput({githubUsername: 'github'});
+        assert.deepStrictEqual(result, {
+          type: 'github',
+          externalId: 'github',
+          emailAddress: undefined
+        });
+      });
+
+      it('should return type twitter if twitterUsername was passed in', function() {
+        var result = parseAndValidateInput({twitterUsername: 'twitter'});
+        assert.deepStrictEqual(result, {
+          type: 'twitter',
+          externalId: 'twitter',
+          emailAddress: undefined
+        });
+      });
+
+      it('should return the email address if one was passed in with a username', function() {
+        var result = parseAndValidateInput({twitterUsername: '__leroux', email: 'lerouxb@gmail.com'});
+        assert.deepStrictEqual(result, {
+          type: 'twitter',
+          externalId: '__leroux',
+          emailAddress: 'lerouxb@gmail.com'
+        });
       });
     });
 
-    it('should return type github if githubUsername was passed in', function() {
-      var result =parseAndValidateInput({githubUsername: 'github'});
-      assert.deepStrictEqual(result, {
-        type: 'github',
-        externalId: 'github',
-        emailAddress: undefined
+    describe('new method', function() {
+      it('should parse gitter invites', function() {
+        var invite = parseAndValidateInput({ type: 'gitter', externalId: 'suprememoocow' });
+        assert.deepEqual(invite, {
+          emailAddress: undefined,
+          externalId: "suprememoocow",
+          type: 'gitter'
+        });
       });
-    });
 
-    it('should return type twitter if twitterUsername was passed in', function() {
-      var result = parseAndValidateInput({twitterUsername: 'twitter'});
-      assert.deepStrictEqual(result, {
-        type: 'twitter',
-        externalId: 'twitter',
-        emailAddress: undefined
+      it('should parse twitter invites', function() {
+        var invite = parseAndValidateInput({ type: 'twitter', externalId: 'suprememoocow' });
+        assert.deepEqual(invite, {
+          emailAddress: undefined,
+          externalId: "suprememoocow",
+          type: 'twitter'
+        });
       });
-    });
 
-    it('should return the email address if one was passed in with a username', function() {
-      var result = parseAndValidateInput({twitterUsername: '__leroux', email: 'lerouxb@gmail.com'});
-      assert.deepStrictEqual(result, {
-        type: 'twitter',
-        externalId: '__leroux',
-        emailAddress: 'lerouxb@gmail.com'
+      it('should parse github invites', function() {
+        var invite = parseAndValidateInput({ type: 'github', externalId: 'suprememoocow' });
+        assert.deepEqual(invite, {
+          emailAddress: undefined,
+          externalId: "suprememoocow",
+          type: 'github'
+        });
+      });
+
+      it('should throw a 400 statuserror if an externalId is not supplied', function() {
+        return Promise.try(function() {
+            return parseAndValidateInput({ type: 'gitter' });
+          })
+          .then(function() {
+            assert.ok(false, 'Expected error.')
+          })
+          .catch(StatusError, function(err) {
+            assert.strictEqual(err.status, 400);
+          });
+      });
+
+      it('should throw a 400 statuserror if an invalid type is supplied', function() {
+        return Promise.try(function() {
+            return parseAndValidateInput({ type: 'wombat', externalId: 'wombatz' });
+          })
+          .then(function() {
+            assert.ok(false, 'Expected error.')
+          })
+          .catch(StatusError, function(err) {
+            assert.strictEqual(err.status, 400);
+          });
       });
     });
   });
 });
-
