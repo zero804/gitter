@@ -184,8 +184,8 @@ var CommunityCreateModel = Backbone.Model.extend({
     var resetOrgs = !options;
     var resetRepos = !options || options.repo;
     return Promise.all([
-      resetOrgs && this.refreshCollection(this.orgs, { type: 'unused '}),
-      resetRepos && this.refreshCollection(this.repos, { type: 'unused '}),
+      resetOrgs && this.refreshCollection(this.orgs, { }),
+      resetRepos && this.refreshCollection(this.repos, { }),
     ]);
   },
 
