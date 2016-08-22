@@ -16,7 +16,8 @@ module.exports = CommunityCreateBaseStepView.extend({
   template: template,
 
   className: 'community-create-step-wrapper community-create-invite-confirmation-step-wrapper',
-
+  nextStep: stepConstants.OVERVIEW,
+  prevStep: stepConstants.INVITE,
   behaviors: {
     Isomorphic: {
       troubleInviteListView: { el: '.community-create-trouble-invite-list-root', init: 'initTroubleInviteListView' }
@@ -38,8 +39,6 @@ module.exports = CommunityCreateBaseStepView.extend({
   }),
 
   events: _.extend({}, _super.events, {
-    'click @ui.nextStep': 'onStepNext',
-    'click @ui.backStep': 'onStepBack',
     'change @ui.allowTweetBadgerOptionInput': 'onAllowTweetBadgerInputChange'
   }),
 
@@ -48,13 +47,6 @@ module.exports = CommunityCreateBaseStepView.extend({
     if (this.troubleInviteListView) {
       this.troubleInviteListView.resortView();
     }
-  },
-
-  onStepNext: function() {
-    this.communityCreateModel.set('stepState', stepConstants.OVERVIEW);
-  },
-  onStepBack: function() {
-    this.communityCreateModel.set('stepState', stepConstants.INVITE);
   },
 
   onAllowTweetBadgerInputChange: function() {

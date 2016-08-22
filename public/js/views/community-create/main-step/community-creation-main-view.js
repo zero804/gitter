@@ -15,7 +15,7 @@ require('gitter-styleguide/css/components/headings.css');
 require('gitter-styleguide/css/components/buttons.css');
 
 
-var updateElementValueAndMaintatinSelection = function(el, newValue) {
+function updateElementValueAndMaintatinSelection(el, newValue) {
   var start = el.selectionStart;
   var end = el.selectionEnd;
 
@@ -25,8 +25,7 @@ var updateElementValueAndMaintatinSelection = function(el, newValue) {
   if(el === document.activeElement) {
     el.setSelectionRange(start, end);
   }
-};
-
+}
 
 var _super = CommunityCreateBaseStepView.prototype;
 
@@ -58,10 +57,6 @@ module.exports = CommunityCreateBaseStepView.extend({
     'change @ui.associatedProjectBadgerOptionInput': 'onBadgerInputChange'
   }),
 
-  modelEvents: _.extend({}, _super.modelEvents, {
-
-  }),
-
   initialize: function() {
     _super.initialize.apply(this, arguments);
 
@@ -82,12 +77,10 @@ module.exports = CommunityCreateBaseStepView.extend({
     return data;
   },
 
-  onStepNext: function(e) {
+  nextStep: function() {
     if(this.model.isValid()) {
-      this.communityCreateModel.set('stepState', stepConstants.INVITE);
+      return stepConstants.INVITE;
     }
-
-    e.preventDefault();
   },
 
   applyValidMessages: function(isValid, isAfterRender) {

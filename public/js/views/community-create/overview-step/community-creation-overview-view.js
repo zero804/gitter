@@ -41,11 +41,6 @@ module.exports = CommunityCreateBaseStepView.extend({
     githubName: '.community-create-overview-github-name'
   }),
 
-  events: _.extend({}, _super.events, {
-    'click @ui.nextStep': 'onStepNext',
-    'click @ui.backStep': 'onStepBack',
-  }),
-
   initialize: function() {
     _super.initialize.apply(this, arguments);
     this.listenTo(this.communityCreateModel, 'change:communityName change:communitySlug change:githubOrgId', this.onCommunityDataChange, this);
@@ -63,6 +58,9 @@ module.exports = CommunityCreateBaseStepView.extend({
     return data;
   },
 
+  /**
+   * @override
+   */
   onStepNext: function() {
     var communityCreateModel = this.communityCreateModel;
     var groupData = this.communityCreateModel.getSerializedCreateData();
@@ -87,15 +85,13 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   },
 
-  onStepBack: function() {
-    var prevStep;
+  prevStep: function() {
     if (this.communityCreateModel.hasInvitesRequiringEmailEntry()) {
       // Only go back to confirmation if there was trouble initially
-      prevStep = stepConstants.INVITE_CONFIRMATION;
+      return stepConstants.INVITE_CONFIRMATION;
     } else {
-      prevStep = stepConstants.INVITE;
+      return stepConstants.INVITE;
     }
-    this.communityCreateModel.set('stepState', prevStep);
   },
 
   onCommunityDataChange: function() {
