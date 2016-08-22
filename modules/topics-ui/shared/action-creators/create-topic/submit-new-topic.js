@@ -1,6 +1,6 @@
 import { SUBMIT_NEW_TOPIC } from '../../constants/create-topic.js';
 
-module.exports = function submitNewTopic(title, body){
+export default function submitNewTopic(title, body){
 
   //TODO add validate here
 
@@ -9,4 +9,4 @@ module.exports = function submitNewTopic(title, body){
     title: title,
     body: body
   };
-};
+}

@@ -1,8 +1,8 @@
 import { BODY_UPDATE } from '../../constants/create-topic.js';
 
-module.exports = function bodyUpdate(body){
+export default function bodyUpdate(body){
   return {
     type: BODY_UPDATE,
     body: body
   };
-};
+}
