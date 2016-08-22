@@ -3,7 +3,7 @@
 var context = require('../utils/context');
 
 function presentCreateRoomDialog(options) {
-  var roomCollection = options.troupes;
+  var roomCollection = options.roomCollection;
   var dialogRegion = options.dialogRegion;
   var roomMenuModel = options.roomMenuModel;
   var initialRoomName = options.initialRoomName;
