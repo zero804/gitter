@@ -105,6 +105,7 @@ onready(function() {
       presentCreateRoomDialog({
         dialogRegion: appView.dialogRegion,
         roomCollection: troupeCollections.troupes,
+        groupsCollection: troupeCollections.groups,
         roomMenuModel: null,
         initialRoomName: initialRoomName
       });
