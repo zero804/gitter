@@ -3,6 +3,7 @@ import {stub} from 'sinon';
 import Store from '../../../../browser/js/stores/topics-store.js';
 import {dispatch} from '../../../../shared/dispatcher';
 import submitNewTopic from '../../../../shared/action-creators/create-topic/submit-new-topic';
+import mockRouter from '../../../mocks/router';
 
 export default describe('TopicsStore', () => {
 
@@ -13,7 +14,7 @@ export default describe('TopicsStore', () => {
   ];
 
   beforeEach(() => {
-    store = new Store(models);
+    store = new Store(models, { router: mockRouter });
   });
 
   it('should provide a getTopics()', () => {
