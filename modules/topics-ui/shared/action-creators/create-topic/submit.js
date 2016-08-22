@@ -1,7 +1,7 @@
 import { SUBMIT } from '../../constants/create-topic.js';
 
-module.exports = function submit(){
+export default function submit(){
   return {
     type: SUBMIT
   };
-};
+}
