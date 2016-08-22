@@ -16,7 +16,13 @@ describe('<TopicLink/>', () => {
   }
 
   beforeEach(() => {
-    wrapper = shallow(<TopicLink groupName='gitterHQ' topic={topic}/>);
+    wrapper = shallow(
+      <TopicLink
+          groupName='gitterHQ'
+          topic={topic}>
+        Some content
+      </TopicLink>
+    );
   });
 
   it('should render an anchor', () => {
