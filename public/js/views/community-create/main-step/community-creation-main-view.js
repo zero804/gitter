@@ -14,6 +14,27 @@ var CommunityCreateBaseStepView = require('../shared/community-creation-base-ste
 require('gitter-styleguide/css/components/headings.css');
 require('gitter-styleguide/css/components/buttons.css');
 
+/**
+ * Map validation keys to UI fields
+ */
+function mapValidations(model, uiMappings) {
+  var modelIsValid = model.isValid();
+  var errors = !modelIsValid && model.validationError;
+
+  Object.keys(uiMappings).forEach(function(key) {
+    var uiElement = uiMappings[key];
+    var domElement = uiElement[0];
+    if (!domElement) return;
+    var message;
+    if (modelIsValid) {
+      message = '';
+    } else {
+      message = errors[key] || '';
+    }
+
+    domElement.setCustomValidity(message);
+  })
+}
 
 function updateElementValueAndMaintatinSelection(el, newValue) {
   var start = el.selectionStart;
@@ -83,24 +104,13 @@ module.exports = CommunityCreateBaseStepView.extend({
     }
   },
 
-  applyValidMessages: function(isValid, isAfterRender) {
-    _super.applyValidMessages.apply(this, arguments);
+  applyValidMessages: function() {
+    _super.applyValidMessages.call(this);
 
-    var communityNameErrorMessage = '';
-    var communitySlugErrorMessage = '';
-    if(!isValid && isAfterRender !== true) {
-      (this.model.validationError || []).forEach(function(validationError) {
-        if(validationError.key === 'communityName') {
-          communityNameErrorMessage = validationError.message;
-        }
-        if(validationError.key === 'communitySlug') {
-          communitySlugErrorMessage = validationError.message;
-        }
-      });
-    }
-
-    this.ui.communityNameInput[0].setCustomValidity(communityNameErrorMessage);
-    this.ui.communitySlugInput[0].setCustomValidity(communitySlugErrorMessage);
+    mapValidations(this.model, {
+      'communityName': this.ui.communityNameInput,
+      'communitySlug': this.ui.communitySlugInput
+    });
   },
 
   onGitHubProjectLinkActivated: function(e) {

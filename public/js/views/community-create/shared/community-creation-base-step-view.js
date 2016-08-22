@@ -14,8 +14,7 @@ module.exports = Marionette.LayoutView.extend({
 
   modelEvents: {
     'change:active': 'onActiveChange',
-    'change': 'onChange',
-    'invalid': 'onInvalid'
+    'change': 'onChange'
   },
 
   events: {
@@ -27,7 +26,6 @@ module.exports = Marionette.LayoutView.extend({
     this.model = options.model;
     this.communityCreateModel = options.communityCreateModel;
 
-    this.listenTo(this.communityCreateModel, 'invalid', this.onInvalid, this);
     this.listenTo(this.communityCreateModel, 'change', this.onChange, this);
   },
 
@@ -36,34 +34,31 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   onChange: function() {
-    this.applyValidMessages(this.model.isValid());
+    this.applyValidMessages();
   },
 
-  onInvalid: function() {
-    this.applyValidMessages(false);
-  },
-
-  applyValidMessages: function(isValid/*, isAfterRender*/) {
+  applyValidMessages: function() {
+    var isValid = this.model.isValid();
     toggleClass(this.ui.nextStep[0], 'disabled', !isValid);
-    //this.ui.nextStep[0][isValid ? 'removeAttribute' : 'setAttribute']('disabled', 'disabled');
   },
 
   onRender: function() {
     this.onActiveChange();
     this.model.isValid();
-    this.applyValidMessages(true);
+    this.applyValidMessages();
   },
 
   onStepNext: function(e) {
-    if (e) {
-      e.preventDefault();
-    }
-
     var next = _.result(this, 'nextStep', null);
     if (next) {
+      if (e) {
+        e.preventDefault();
+      }
+
       this.communityCreateModel.set('stepState', next);
+
+      return false;
     }
-    return false;
   },
 
   onStepBack: function(e) {
