@@ -78,7 +78,6 @@ export default createClass({
   },
 
   onTopicCreated(data){
-    console.log(data);
     const {groupName} = this.props;
     dispatch(navigateToTopic(groupName, data.topicId, data.slug));
   }
