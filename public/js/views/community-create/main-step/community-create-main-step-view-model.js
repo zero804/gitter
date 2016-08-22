@@ -13,7 +13,10 @@ var CommunityCreateMainStepViewModel = CommunityCreateStepViewModel.extend({
     var hasCommunityName = communityName.length > 0;
     if(!hasCommunityName) {
       errors.communityName = 'Please fill in the community name';
+    } else if (!/^[^\<\>]{1,80}$/.test(communityName)) {
+      errors.communityName = 'Invalid community name';
     }
+
 
     var communitySlug = this.communityCreateModel.get('communitySlug') || '';
     var hasCommunitySlug = communitySlug.length > 0;

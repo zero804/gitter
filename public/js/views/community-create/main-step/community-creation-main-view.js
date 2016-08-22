@@ -86,6 +86,8 @@ module.exports = CommunityCreateBaseStepView.extend({
       return provider === 'github';
     });
 
+    this.checkSlugAvailabilityDebounced = _.debounce(this.checkSlugAvailability.bind(this), 500);
+
     this.listenTo(this.communityCreateModel, 'change:communityName change:communitySlug', this.onCommunityInfoChange, this);
     this.listenTo(this.communityCreateModel, 'change:communitySlugAvailabilityStatus', this.updateSlugAvailabilityStatusIndicator, this);
   },
@@ -148,7 +150,7 @@ module.exports = CommunityCreateBaseStepView.extend({
       toggleClass(this.ui.associatedProjectBadgerOption[0], 'active', isBackedByRepo);
     }
 
-    this.checkSlugAvailability();
+    this.checkSlugAvailabilityDebounced();
   },
 
   onCommunityNameInputChange: function() {
