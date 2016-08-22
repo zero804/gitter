@@ -22,7 +22,9 @@ function presentCommunityCreateDialog(options) {
     var repos = new RepoCollection();
     var orgs = new OrgCollection();
 
-    var communityCreateModel = new CommunityCreateModel({ }, {
+    var communityCreateModel = new CommunityCreateModel({
+        active: true
+      }, {
       orgs: orgs,
       repos: repos,
     });
@@ -36,6 +38,19 @@ function presentCommunityCreateDialog(options) {
     // Track this event
     appEvents.trigger('stats.event', 'community.create.enter');
     appEvents.trigger('track-event', 'community.create.enter');
+
+    function onActiveChange() {
+      if (communityCreateModel.get('active')) return;
+      communityCreateModel.stopListening(communityCreateModel, 'change:active', onActiveChange);
+
+      var stepState = communityCreateModel.get('stepState');
+      appEvents.trigger('stats.event', 'community.create.exit.' + stepState);
+      appEvents.trigger('track-event', 'community.create.exit.' + stepState);
+
+      window.location = '#';
+    }
+
+    communityCreateModel.listenTo(communityCreateModel, 'change:active', onActiveChange);
 
     dialogRegion.show(communityCreateView);
 

@@ -135,12 +135,7 @@ var CommunityCreateView = Marionette.LayoutView.extend({
   },
 
   closeView: function() {
-    window.location = '#';
-  },
-
-  onDestroy: function() {
-    appEvents.trigger('stats.event', 'community.create.exit.' + this.model.get('stepState'));
-    appEvents.trigger('track-event', 'community.create.exit.' + this.model.get('stepState'));
+    this.model.set('active', false);
   },
 
   onRender: function() {

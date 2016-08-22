@@ -64,6 +64,7 @@ module.exports = CommunityCreateBaseStepView.extend({
   },
 
   onStepNext: function() {
+    var communityCreateModel = this.communityCreateModel;
     var groupData = this.communityCreateModel.getSerializedCreateData();
 
     return apiClient.post('/v1/groups', groupData)
@@ -81,7 +82,7 @@ module.exports = CommunityCreateBaseStepView.extend({
         });
 
         // Hide create community
-        window.location = '#';
+        communityCreateModel.set('active', false);
       });
 
   },
