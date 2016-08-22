@@ -107,8 +107,9 @@ export default React.createClass({
 
   //STORES -------------------------------
   getAccessTokenStore(){
+    const accessTokenStore = (window.context.accessTokenStore || {});
     if(this.hasRendered && this.state.accessTokenStore) { return this.state.accessTokenStore }
-    return new AccessTokenStore({ accessToken: window.context.accessTokenStore.token });
+    return new AccessTokenStore({ accessToken: accessTokenStore.token });
   },
 
   getForumStore(){

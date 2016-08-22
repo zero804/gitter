@@ -4,7 +4,7 @@ import Backbone from 'backbone';
 import React from 'react';
 import App from '../../../browser/js/app.jsx';
 
-describe.skip('App', function() {
+describe('App', function() {
 
   it('should set the right state when rendered with the forum route', function(){
     var route = new Backbone.Model({ route: 'forum', groupName: 'gitterHQ' });
