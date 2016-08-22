@@ -1,12 +1,11 @@
-"use strict";
-
 import React, { PropTypes } from 'react';
 
 export default React.createClass({
 
   displayName: 'Modal',
   propTypes: {
-    active: PropTypes.bool.isRequired
+    active: PropTypes.bool.isRequired,
+    children: PropTypes.node
   },
 
   render(){
