@@ -133,15 +133,15 @@ module.exports = CommunityCreateBaseStepView.extend({
     if(this.hasGitHubProvider) {
       var githubProjectInfo = this.communityCreateModel.getGithubProjectInfo();
 
-      var name = githubProjectInfo && githubProjectInfo.name || '';
-      var url = githubProjectInfo && githubProjectInfo.url || '';
+      var name = githubProjectInfo.name || '';
+      var url = githubProjectInfo.url || '';
+      var hasGitHubAssociation = !!githubProjectInfo.type;
+      var isBackedByRepo = githubProjectInfo.type === 'GH_REPO';
 
       this.ui.associatedProjectName[0].textContent = name;
       this.ui.associatedProjectLink[0].setAttribute('href', url);
-      toggleClass(this.ui.addAssociatedProjectCopy[0], 'active', !githubProjectInfo);
-      toggleClass(this.ui.hasAssociatedProjectCopy[0], 'active', !!githubProjectInfo);
-
-      var isBackedByRepo = !!this.communityCreateModel.get('githubRepoId');
+      toggleClass(this.ui.addAssociatedProjectCopy[0], 'active', !hasGitHubAssociation);
+      toggleClass(this.ui.hasAssociatedProjectCopy[0], 'active', hasGitHubAssociation);
       toggleClass(this.ui.associatedProjectBadgerOption[0], 'active', isBackedByRepo);
     }
 

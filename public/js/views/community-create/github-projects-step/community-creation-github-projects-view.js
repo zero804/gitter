@@ -42,7 +42,7 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   initRepoListView: function(optionsForRegion) {
     this.repoListView = new CommunityCreationRepoListView(optionsForRegion({
-      collection: this.filterRepos
+      collection: this.filteredRepos
     }));
     this.listenTo(this.repoListView, 'repo:activated', this.onRepoSelectionChange, this);
     this.listenTo(this.repoListView, 'repo:cleared', this.onRepoSelectionChange, this);
@@ -78,7 +78,7 @@ module.exports = CommunityCreateBaseStepView.extend({
   initialize: function() {
     _super.initialize.apply(this, arguments);
 
-    this.filterRepos = new SimpleFilteredCollection([], {
+    this.filteredRepos = new SimpleFilteredCollection([], {
       collection: this.communityCreateModel.repos
     });
 
@@ -225,7 +225,7 @@ module.exports = CommunityCreateBaseStepView.extend({
   applyFilterToRepos: function() {
     var filterString = (this.model.get('repoFilter') || '').toLowerCase();
 
-    this.filterRepos.setFilter(function(model) {
+    this.filteredRepos.setFilter(function(model) {
       var shouldShow = true;
       if(filterString && filterString.length > 0) {
         shouldShow = fuzzysearch(filterString, model.get('name').toLowerCase());

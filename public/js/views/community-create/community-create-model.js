@@ -40,6 +40,7 @@ var CommunityCreateModel = Backbone.Model.extend({
 
   getGithubProjectInfo: function() {
     var githubOrgId = this.get('githubOrgId');
+
     // Org based?
     if (githubOrgId) {
       var selectedOrg = this.orgs.find(function(org) {
@@ -67,6 +68,10 @@ var CommunityCreateModel = Backbone.Model.extend({
         name: selectedRepo.get('name'),
         url: urlJoin('https://github.com', selectedRepo.get('uri'))
       }
+    }
+
+    return {
+      type: null
     }
 
   },
@@ -123,12 +128,14 @@ var CommunityCreateModel = Backbone.Model.extend({
 
   getSecurityData: function() {
     var githubInfo = this.getGithubProjectInfo();
-    if (githubInfo) {
+    if (githubInfo && githubInfo.type) {
       return {
         type: githubInfo.type,
         linkPath: githubInfo.linkPath
       }
     }
+
+    return undefined; // No security info
   },
 
   getInviteData: function() {

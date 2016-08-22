@@ -57,8 +57,8 @@ module.exports = CommunityCreateBaseStepView.extend({
     data.communitySlug = this.communityCreateModel.get('communitySlug');
 
     var githubProjectInfo = this.communityCreateModel.getGithubProjectInfo();
-    data.githubName = githubProjectInfo && githubProjectInfo.name || '';
-    data.githubLink = githubProjectInfo && githubProjectInfo.url || '';
+    data.githubName = githubProjectInfo.name || '';
+    data.githubLink = githubProjectInfo.url || '';
 
     return data;
   },
