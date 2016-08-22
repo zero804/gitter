@@ -7,8 +7,8 @@ var CategoryStore = Backbone.Collection.extend({
   getTopics: function(){
     return this.models.map(function(model){ return model.toJSON(); });
   },
-  getById: function(id){
-    return this.get(id);
+  getById: function(){
+    return this.models[0].toJSON();
   }
 });
 
