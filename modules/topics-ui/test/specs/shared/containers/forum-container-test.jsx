@@ -30,6 +30,7 @@ describe('<ForumContainer />', function(){
     wrapper = shallow(
       <ForumContainer
         categoryStore={categoryStore}
+        categoryName="all"
         tagStore={tagStore}
         topicsStore={topicsStore}
         groupName='gitterHQ' />
