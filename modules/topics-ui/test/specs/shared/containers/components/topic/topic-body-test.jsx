@@ -2,13 +2,15 @@ import {equal} from 'assert';
 import React from 'react';
 import { shallow } from 'enzyme';
 import TopicBody from '../../../../../../shared/containers/components/topic/topic-body.jsx';
+import topics from '../../../../../mocks/data/topics';
 
-describe.skip('<TopicBody/>', () => {
+describe.only('<TopicBody/>', () => {
 
   let wrapper;
+  const topic = topics[0];
 
   beforeEach(() => {
-    wrapper = shallow(<TopicBody/>);
+    wrapper = shallow(<TopicBody topic={topic}/>);
   });
 
   it('should render a container', () => {

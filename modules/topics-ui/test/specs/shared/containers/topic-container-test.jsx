@@ -5,16 +5,12 @@ import React from 'react';
 import TopicContainer from '../../../../shared/containers/TopicContainer.jsx';
 import topicsStore from '../../../mocks/topic-store';
 
-var TopicStore = Backbone.Collection.extend({
-  getById(){ return this.at(0).toJSON(); }
-});
-
 describe('<TopicContainer />', () => {
 
   let wrapper;
 
   beforeEach(function(){
-    wrapper = shallow(<TopicContainer topicsStore={topicsStore} topicId={1} />);
+    wrapper = shallow(<TopicContainer topicsStore={topicsStore} topicId="1" />);
   });
 
   it('should render a TopicHeader component', () => {
