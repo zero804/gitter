@@ -1,5 +1,7 @@
 'use strict';
 
+var appEvents = require('../utils/appevents');
+
 function presentCommunityCreateDialog(options) {
   var dialogRegion = options.dialogRegion;
 
@@ -30,6 +32,10 @@ function presentCommunityCreateDialog(options) {
     var communityCreateView = new CommunityCreateView({
       model: communityCreateModel
     });
+
+    // Track this event
+    appEvents.trigger('stats.event', 'community.create.enter');
+    appEvents.trigger('track-event', 'community.create.enter');
 
     dialogRegion.show(communityCreateView);
 
