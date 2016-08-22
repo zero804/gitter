@@ -1,6 +1,7 @@
-/*
-import {equal} from 'assert';
-import forumStore from '../../../../server/stores/forum-store';
+"use strict"
+
+var assert = require('assert');
+var forumStore = require('../../../../server/stores/forum-store');
 
 describe.skip('forumStore', () => {
 
@@ -11,4 +12,3 @@ describe.skip('forumStore', () => {
   });
 
 });
-*/
