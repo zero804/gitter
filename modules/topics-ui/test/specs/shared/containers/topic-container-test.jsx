@@ -3,6 +3,7 @@ import {shallow} from 'enzyme';
 import Backbone from 'backbone';
 import React from 'react';
 import TopicContainer from '../../../../shared/containers/TopicContainer.jsx';
+import topicsStore from '../../../mocks/topic-store';
 
 var TopicStore = Backbone.Collection.extend({
   getById(){ return this.at(0).toJSON(); }
@@ -11,10 +12,8 @@ var TopicStore = Backbone.Collection.extend({
 describe('<TopicContainer />', () => {
 
   let wrapper;
-  let topicsStore;
 
   beforeEach(function(){
-    topicsStore = new TopicStore({ id: 1 }, { id: 2 });
     wrapper = shallow(<TopicContainer topicsStore={topicsStore} topicId={1} />);
   });
 
