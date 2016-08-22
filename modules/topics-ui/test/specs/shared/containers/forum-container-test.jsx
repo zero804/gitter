@@ -12,6 +12,7 @@ import * as forumTagConstants from '../../../../shared/constants/forum-tags';
 import categoryStore from '../../../mocks/category-store';
 import tagStore from '../../../mocks/tag-store';
 import topicsStore from '../../../mocks/topic-store';
+import newTopicStore from '../../../mocks/new-topic-store';
 
 describe('<ForumContainer />', function(){
 
@@ -33,6 +34,7 @@ describe('<ForumContainer />', function(){
         categoryName="all"
         tagStore={tagStore}
         topicsStore={topicsStore}
+        newTopicStore={newTopicStore}
         groupName='gitterHQ' />
     );
   });
