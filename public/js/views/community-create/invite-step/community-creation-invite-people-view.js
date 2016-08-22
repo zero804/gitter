@@ -7,7 +7,7 @@ var template = require('./community-creation-invite-people-view.hbs');
 var CommunityCreateBaseStepView = require('../shared/community-creation-base-step-view');
 var CommunityCreationPeopleListView = require('../shared/community-creation-people-list-view');
 var UserResultListView = require('../shared/community-create-invite-user-result-list-view');
-var UserResultCollection = require('collections/community-create-user-result-collection');
+var UserResultCollection = require('../shared/community-create-user-result-collection');
 var avatars = require('gitter-web-avatars');
 
 require('gitter-styleguide/css/components/headings.css');
