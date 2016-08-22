@@ -7,6 +7,7 @@ var apiClient = require('components/apiClient');
 var Promise = require('bluebird');
 var peopleToInviteStatusConstants = require('./people-to-invite-status-constants');
 
+var INVITE_STATUS_PENDING = peopleToInviteStatusConstants.PENDING;
 var INVITE_STATUS_READY = peopleToInviteStatusConstants.READY;
 var INVITE_STATUS_NEEDS_EMAIL = peopleToInviteStatusConstants.NEEDS_EMAIL;
 
@@ -83,7 +84,7 @@ var CommunityCreateModel = Backbone.Model.extend({
       return;
     }
 
-    var inviteStatus = null;
+    var inviteStatus = INVITE_STATUS_PENDING;
     var emailAddress = null;
 
     if (type === 'email') {
