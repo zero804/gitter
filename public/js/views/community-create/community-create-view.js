@@ -5,21 +5,18 @@ var cocktail = require('backbone.cocktail');
 var toggleClass = require('utils/toggle-class');
 var appEvents = require('utils/appevents');
 var KeyboardEventMixin = require('views/keyboard-events-mixin');
-
-require('views/behaviors/isomorphic');
-
 var template = require('./community-create-view.hbs');
-
 var stepConstants = require('./step-constants');
 var CommunityCreateStepViewModel = require('./community-create-step-view-model');
 var CommunityCreatMainStepViewModel = require('./main-step/community-create-main-step-view-model');
 var CommunityCreateGitHubProjectsStepViewModel = require('./github-projects-step/community-create-github-projects-step-view-model');
-
 var CommunityCreationMainView = require('./main-step/community-creation-main-view');
 var CommunityCreationGithubProjectsView = require('./github-projects-step/community-creation-github-projects-view');
 var CommunityCreationInvitePeopleView = require('./invite-step/community-creation-invite-people-view');
 var CommunityCreationInviteConfirmationView = require('./invite-confirmation-step/community-creation-invite-confirmation-view');
 var CommunityCreationOverviewView = require('./overview-step/community-creation-overview-view');
+
+require('views/behaviors/isomorphic');
 
 var CommunityCreateView = Marionette.LayoutView.extend({
   template: template,
@@ -148,8 +145,6 @@ var CommunityCreateView = Marionette.LayoutView.extend({
 
   onRender: function() {
     toggleClass(this.$el[0], 'active', true);
-    appEvents.trigger('stats.event', 'community.create.enter');
-    appEvents.trigger('track-event', 'community.create.enter');
   },
 
   show: function() {
