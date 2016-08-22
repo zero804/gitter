@@ -1,4 +1,3 @@
-/*
 import assert from 'assert';
 import {stub} from 'sinon';
 import Store from '../../../../browser/js/stores/topics-store.js';
@@ -34,4 +33,3 @@ export default describe('TopicsStore', () => {
   });
 
 });
-*/

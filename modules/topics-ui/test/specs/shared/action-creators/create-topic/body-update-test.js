@@ -1,4 +1,3 @@
-/*
 import {equal} from 'assert';
 
 import createAction from '../../../../../shared/action-creators//create-topic//body-update';
@@ -11,4 +10,3 @@ export default describe('bodyUpdate', () => {
   });
 
 });
-*/

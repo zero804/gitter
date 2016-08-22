@@ -1,4 +1,3 @@
-/*
 import {equal} from 'assert';
 
 import createAction from '../../../../../shared/action-creators//topic//navigate-to-topic';
@@ -11,4 +10,3 @@ describe('navigateToTopic', () => {
   });
 
 });
-*/

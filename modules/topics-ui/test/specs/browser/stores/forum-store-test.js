@@ -1,7 +1,6 @@
-/*
 import Store from '../../../../browser/js/stores/forum-store';
 
-export default describe('ForumStore', () => {
+describe('ForumStore', () => {
 
   let store;
   beforeEach(() => {
@@ -9,4 +8,3 @@ export default describe('ForumStore', () => {
   });
 
 });
-*/
