@@ -2,7 +2,6 @@
 
 var Promise = require('bluebird');
 var events = require('events');
-var assert = require('assert');
 var _ = require('lodash');
 
 

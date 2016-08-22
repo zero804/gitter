@@ -46,7 +46,7 @@ var opts = yargs
 
       return oauthService.findOrGenerateWebToken(user.id);
     })
-    .spread(function(token, webClient) {
+    .spread(function(token/*, webClient*/) {
       var forum = this.forum;
 
       var client = new RealtimeClient({
