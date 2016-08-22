@@ -4,17 +4,13 @@ import Store from '../../../../browser/js/stores/topics-store.js';
 import {dispatch} from '../../../../shared/dispatcher';
 import submitNewTopic from '../../../../shared/action-creators/create-topic/submit-new-topic';
 import mockRouter from '../../../mocks/router';
+import topics from '../../../mocks/data/topics';
 
 export default describe('TopicsStore', () => {
 
   let store;
-  const models = [
-    { id: 1 },
-    { id: 2 },
-  ];
-
   beforeEach(() => {
-    store = new Store(models, { router: mockRouter });
+    store = new Store(topics, { router: mockRouter });
   });
 
   it('should provide a getTopics()', () => {
@@ -22,13 +18,13 @@ export default describe('TopicsStore', () => {
   });
 
   it('should get a topic but id', () => {
-    assert.deepEqual(store.getById(1), models[0]);
+    assert.deepEqual(store.getById(1), topics[0]);
   });
 
   it.skip('should call create after the submit new topic event', () => {
     //Why is this called four times??
     stub(Store.prototype, 'create');
-    store = new Store(models);
+    store = new Store(topics);
     dispatch(submitNewTopic('title', 'body'));
     Store.prototype.create.restore();
   });
