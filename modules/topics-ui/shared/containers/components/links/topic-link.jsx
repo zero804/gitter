@@ -17,9 +17,9 @@ export default React.createClass({
 
   render(){
 
-    const {topic, groupname} = this.props;
+    const {topic, groupName} = this.props;
     const {slug, id, name} = topic;
-    const href = `/gitterHQ/topics/topic/${id}/${slug}`;
+    const href = `/${groupName}/topics/topic/${id}/${slug}`;
     const title = `View ${name}`;
 
     return (
