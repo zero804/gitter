@@ -76,18 +76,11 @@ _.extend(UserResultCollection.prototype, _super, {
 
   fetchSuggestions: function() {
     var githubProjectInfo = this.communityCreateModel.getGithubProjectInfo();
-    var type = null;
-
-    if(this.communityCreateModel.get('githubOrgId')) {
-      type = 'GH_ORG';
-    } else if(this.communityCreateModel.get('githubRepoId')) {
-      type = 'GH_REPO';
-    }
 
     this.userSuggestionCollection.fetch({
       data: {
-        type: type,
-        linkPath: githubProjectInfo.name
+        type: githubProjectInfo.type || undefined,
+        linkPath: githubProjectInfo.name || undefined
       }
     });
   },
