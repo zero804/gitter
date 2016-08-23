@@ -1,7 +1,7 @@
 'use strict';
 
 var _ = require('underscore');
-var slugify = require('slug');
+var slugger = require('../../../utils/slugger');
 var context = require('utils/context');
 var toggleClass = require('utils/toggle-class');
 var apiClient = require('components/apiClient');
@@ -14,8 +14,29 @@ var CommunityCreateBaseStepView = require('../shared/community-creation-base-ste
 require('gitter-styleguide/css/components/headings.css');
 require('gitter-styleguide/css/components/buttons.css');
 
+/**
+ * Map validation keys to UI fields
+ */
+function mapValidations(model, uiMappings) {
+  var modelIsValid = model.isValid();
+  var errors = !modelIsValid && model.validationError;
 
-var updateElementValueAndMaintatinSelection = function(el, newValue) {
+  Object.keys(uiMappings).forEach(function(key) {
+    var uiElement = uiMappings[key];
+    var domElement = uiElement[0];
+    if (!domElement) return;
+    var message;
+    if (modelIsValid) {
+      message = '';
+    } else {
+      message = errors[key] || '';
+    }
+
+    domElement.setCustomValidity(message);
+  })
+}
+
+function updateElementValueAndMaintatinSelection(el, newValue) {
   var start = el.selectionStart;
   var end = el.selectionEnd;
 
@@ -25,8 +46,7 @@ var updateElementValueAndMaintatinSelection = function(el, newValue) {
   if(el === document.activeElement) {
     el.setSelectionRange(start, end);
   }
-};
-
+}
 
 var _super = CommunityCreateBaseStepView.prototype;
 
@@ -58,21 +78,15 @@ module.exports = CommunityCreateBaseStepView.extend({
     'change @ui.associatedProjectBadgerOptionInput': 'onBadgerInputChange'
   }),
 
-  modelEvents: _.extend({}, _super.modelEvents, {
-
-  }),
-
-  initialize: function(options) {
+  initialize: function() {
     _super.initialize.apply(this, arguments);
-
-    this.orgCollection = options.orgCollection;
-    this.repoCollection = options.repoCollection;
-
 
     var user = context.getUser();
     this.hasGitHubProvider = user && user.providers && user.providers.some(function(provider) {
       return provider === 'github';
     });
+
+    this.checkSlugAvailabilityDebounced = _.debounce(this.checkSlugAvailability.bind(this), 500);
 
     this.listenTo(this.communityCreateModel, 'change:communityName change:communitySlug', this.onCommunityInfoChange, this);
     this.listenTo(this.communityCreateModel, 'change:communitySlugAvailabilityStatus', this.updateSlugAvailabilityStatusIndicator, this);
@@ -86,32 +100,19 @@ module.exports = CommunityCreateBaseStepView.extend({
     return data;
   },
 
-  onStepNext: function(e) {
+  nextStep: function() {
     if(this.model.isValid()) {
-      this.communityCreateModel.set('stepState', stepConstants.INVITE);
+      return stepConstants.INVITE;
     }
-
-    e.preventDefault();
   },
 
-  applyValidMessages: function(isValid, isAfterRender) {
-    _super.applyValidMessages.apply(this, arguments);
+  applyValidMessages: function() {
+    _super.applyValidMessages.call(this);
 
-    var communityNameErrorMessage = '';
-    var communitySlugErrorMessage = '';
-    if(!isValid && isAfterRender !== true) {
-      (this.model.validationError || []).forEach(function(validationError) {
-        if(validationError.key === 'communityName') {
-          communityNameErrorMessage = validationError.message;
-        }
-        if(validationError.key === 'communitySlug') {
-          communitySlugErrorMessage = validationError.message;
-        }
-      });
-    }
-
-    this.ui.communityNameInput[0].setCustomValidity(communityNameErrorMessage);
-    this.ui.communitySlugInput[0].setCustomValidity(communitySlugErrorMessage);
+    mapValidations(this.model, {
+      'communityName': this.ui.communityNameInput,
+      'communitySlug': this.ui.communitySlugInput
+    });
   },
 
   onGitHubProjectLinkActivated: function(e) {
@@ -123,29 +124,7 @@ module.exports = CommunityCreateBaseStepView.extend({
   },
 
   onCommunityInfoChange: function() {
-    if(!this.communityCreateModel.get('isUsingExplicitGitHubProject')) {
-      var communitySlug = this.communityCreateModel.get('communitySlug');
-      // TODO: Why does this match the first item always?
-      var matchingOrgItem = this.orgCollection.filter(function(org) {
-        return (org.get('name') || '').toLowerCase() === communitySlug;
-      })[0];
-      var matchingRepoItem = this.repoCollection.filter(function(repo) {
-        return (repo.get('uri') || '').toLowerCase() === communitySlug;
-      })[0];
-      if(matchingOrgItem) {
-        this.communityCreateModel.set('githubOrgId', matchingOrgItem.get('id'));
-        this.communityCreateModel.set('githubRepoId', null);
-      }
-      else if(matchingRepoItem) {
-        this.communityCreateModel.set('githubOrgId', null);
-        this.communityCreateModel.set('githubRepoId', matchingRepoItem.get('id'));
-      }
-      else {
-        this.communityCreateModel.set('githubOrgId', null);
-        this.communityCreateModel.set('githubRepoId', null);
-      }
-    }
-
+    this.communityCreateModel.updateGitHubInfoToMatchSlug();
     this.updateCommunityFields();
   },
 
@@ -157,17 +136,21 @@ module.exports = CommunityCreateBaseStepView.extend({
     updateElementValueAndMaintatinSelection(this.ui.communitySlugInput[0], communitySlug);
 
     if(this.hasGitHubProvider) {
-      var githubProjectInfo = this.communityCreateModel.getGithubProjectInfo(this.orgCollection, this.repoCollection);
-      this.ui.associatedProjectName[0].textContent = githubProjectInfo.name;
-      this.ui.associatedProjectLink[0].setAttribute('href', githubProjectInfo.url);
-      toggleClass(this.ui.addAssociatedProjectCopy[0], 'active', !githubProjectInfo.name);
-      toggleClass(this.ui.hasAssociatedProjectCopy[0], 'active', !!githubProjectInfo.name);
+      var githubProjectInfo = this.communityCreateModel.getGithubProjectInfo();
 
-      var isBackedByRepo = !!this.communityCreateModel.get('githubRepoId');
+      var name = githubProjectInfo.name || '';
+      var url = githubProjectInfo.url || '';
+      var hasGitHubAssociation = !!githubProjectInfo.type;
+      var isBackedByRepo = githubProjectInfo.type === 'GH_REPO';
+
+      this.ui.associatedProjectName[0].textContent = name;
+      this.ui.associatedProjectLink[0].setAttribute('href', url);
+      toggleClass(this.ui.addAssociatedProjectCopy[0], 'active', !hasGitHubAssociation);
+      toggleClass(this.ui.hasAssociatedProjectCopy[0], 'active', hasGitHubAssociation);
       toggleClass(this.ui.associatedProjectBadgerOption[0], 'active', isBackedByRepo);
     }
 
-    this.checkSlugAvailability();
+    this.checkSlugAvailabilityDebounced();
   },
 
   onCommunityNameInputChange: function() {
@@ -182,7 +165,7 @@ module.exports = CommunityCreateBaseStepView.extend({
     var isSlugEmpty = !currentSlug || currentSlug.length === 0;
     if(isSlugEmpty || !isUsingCustomSlug) {
       this.communityCreateModel.set({
-        communitySlug: slugify(newCommunityName.toLowerCase()),
+        communitySlug: slugger(newCommunityName),
         // Reset back if we started doing an automatic slug again
         isUsingCustomSlug: isSlugEmpty ? false : isUsingCustomSlug
       });
@@ -213,6 +196,7 @@ module.exports = CommunityCreateBaseStepView.extend({
     var slug = communityCreateModel.get('communitySlug');
 
     communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.PENDING);
+
     apiClient.priv.get('/check-group-uri', {
         uri: slug
       })

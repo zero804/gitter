@@ -300,6 +300,7 @@ RoomWithPolicyService.prototype.createRoomInvitation = secureMethod([allowAddUse
 RoomWithPolicyService.prototype.createRoomInvitations = secureMethod([allowAddUser], function(invites) {
   var room = this.room;
   var user = this.user;
+
   return Promise.map(invites, function(invite) {
     var type = invite.type;
     var externalId = invite.externalId;
@@ -310,6 +311,7 @@ RoomWithPolicyService.prototype.createRoomInvitations = secureMethod([allowAddUs
       externalId: externalId,
       emailAddress: emailAddress
     };
+
     return roomInviteService.createInvite(room, user, inviteInfo)
       .catch(StatusError, function(err) {
         /*
