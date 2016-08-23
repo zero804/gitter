@@ -123,7 +123,6 @@ var webpackConfig = {
     new ContextReplacementPlugin(/moment\/locale$/, /ar|cs|da|de|en-gb|es|fa|fr|hu|it|ja|ko|lt|nl|pl|pt|ru|sk|sv|ua|zh-cn/)
   ],
   bail: true,
-  recordsPath: '/tmp/records.json',
   postcss: function(webpack) {
     return getPostcssStack(webpack);
   },
@@ -135,6 +134,19 @@ if(devMode) {
   webpackConfig.cache = true;
 } else {
   webpackConfig.devtool = 'source-map';
-
 }
+
+if (process.env.WEBPACK_VISUALIZER) {
+  var Visualizer = require('webpack-visualizer-plugin');
+  webpackConfig.plugins.push(new Visualizer({ filename: '../../webpack.stats.html' }));
+}
+
+if (process.env.WEBPACK_STATS) {
+  var StatsWriterPlugin = require("webpack-stats-plugin").StatsWriterPlugin;
+  webpackConfig.plugins.push(new StatsWriterPlugin({
+    filename: '../../webpack.stats.json',
+    fields: null
+  }));
+}
+
 module.exports = webpackConfig;

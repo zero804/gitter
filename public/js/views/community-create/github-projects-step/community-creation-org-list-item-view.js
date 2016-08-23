@@ -23,10 +23,6 @@ var CommunityCreationOrgListItemView = Marionette.ItemView.extend({
     'change:active': 'onActiveChange'
   },
 
-  initialize: function(options) {
-
-  },
-
   serializeData: function() {
     var data = this.model.toJSON();
     data.absoluteUri = urlJoin('https://github.com', data.name);
