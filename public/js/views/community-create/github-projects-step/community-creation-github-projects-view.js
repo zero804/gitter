@@ -1,16 +1,15 @@
 'use strict';
 
 var _ = require('underscore');
-var Promise = require('bluebird');
 var toggleClass = require('../../../utils/toggle-class');
 var context = require('../../../utils/context');
-var slugify = require('slug');
+var slugger = require('../../../utils/slugger');
+
 var fuzzysearch = require('fuzzysearch');
 var SimpleFilteredCollection = require('../../../collections/simple-filtered-collection');
 var getRoomNameFromTroupeName = require('gitter-web-shared/get-room-name-from-troupe-name');
 var scopeUpgrader = require('../../../components/scope-upgrader');
 
-require('../../behaviors/isomorphic');
 
 var stepConstants = require('../step-constants');
 var template = require('./community-creation-github-projects-view.hbs');
@@ -18,6 +17,7 @@ var CommunityCreateBaseStepView = require('../shared/community-creation-base-ste
 var CommunityCreationOrgListView = require('./community-creation-org-list-view');
 var CommunityCreationRepoListView = require('./community-creation-repo-list-view');
 
+require('../../behaviors/isomorphic');
 
 require('gitter-styleguide/css/components/headings.css');
 require('gitter-styleguide/css/components/buttons.css');
@@ -27,7 +27,8 @@ var _super = CommunityCreateBaseStepView.prototype;
 
 module.exports = CommunityCreateBaseStepView.extend({
   template: template,
-
+  nextStep: stepConstants.MAIN,
+  prevStep: stepConstants.MAIN,
   behaviors: {
     Isomorphic: {
       orgListView: { el: '.community-create-org-list-root', init: 'initOrgListView' },
@@ -37,7 +38,7 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   initOrgListView: function(optionsForRegion) {
     this.orgListView = new CommunityCreationOrgListView(optionsForRegion({
-      collection: this.unusedOrgCollection
+      collection: this.communityCreateModel.orgs
     }));
     this.listenTo(this.orgListView, 'org:activated', this.onOrgSelectionChange, this);
     this.listenTo(this.orgListView, 'org:cleared', this.onOrgSelectionChange, this);
@@ -46,7 +47,7 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   initRepoListView: function(optionsForRegion) {
     this.repoListView = new CommunityCreationRepoListView(optionsForRegion({
-      collection: this.filteredUnusedRepoCollection
+      collection: this.filteredRepos
     }));
     this.listenTo(this.repoListView, 'repo:activated', this.onRepoSelectionChange, this);
     this.listenTo(this.repoListView, 'repo:cleared', this.onRepoSelectionChange, this);
@@ -66,8 +67,6 @@ module.exports = CommunityCreateBaseStepView.extend({
   }),
 
   events: _.extend({}, _super.events, {
-    'click @ui.nextStep': 'onStepNext',
-    'click @ui.backStep': 'onStepBack',
     'click @ui.orgsToggle': 'onOrgsAreaToggle',
     'click @ui.reposToggle': 'onReposAreaToggle',
     'input @ui.repoFilterInput': 'onRepoFilterInputChange',
@@ -79,19 +78,14 @@ module.exports = CommunityCreateBaseStepView.extend({
     'change:repoFilter': 'onRepoFilterChange'
   }),
 
-  initialize: function(options) {
+  initialize: function() {
     _super.initialize.apply(this, arguments);
 
-    this.orgCollection = options.orgCollection;
-    this.unusedOrgCollection = options.unusedOrgCollection;
-    this.repoCollection = options.repoCollection;
-    this.unusedRepoCollection = options.unusedRepoCollection;
-    this.filteredUnusedRepoCollection = new SimpleFilteredCollection([], {
-      collection: this.unusedRepoCollection
+    this.filteredRepos = new SimpleFilteredCollection([], {
+      collection: this.communityCreateModel.repos
     });
 
-    this.throttledApplyFilterToRepos = _.throttle(this.applyFilterToRepos, 500);
-    this.shortThrottledApplyFilterToRepos = _.throttle(this.applyFilterToRepos, 100);
+    this.debouncedApplyFilterToRepos = _.debounce(this.applyFilterToRepos.bind(this), 200);
   },
 
   serializeData: function() {
@@ -112,19 +106,18 @@ module.exports = CommunityCreateBaseStepView.extend({
       var selectedOrgName = this.model.get('selectedOrgName') || '';
       this.communityCreateModel.set({
         communityName: selectedOrgName,
-        communitySlug: slugify(selectedOrgName.toLowerCase()),
+        communitySlug: slugger(selectedOrgName),
         isUsingCustomSlug: false,
         githubOrgId: selectedOrgId,
         githubRepoId: null,
         isUsingExplicitGitHubProject: !!selectedOrgName
       });
-    }
-    else if(this.model.get('isRepoAreaActive')) {
+    } else if(this.model.get('isRepoAreaActive')) {
       var selectedRepoId = this.model.get('selectedRepoId');
       var selectedRepoName = getRoomNameFromTroupeName(this.model.get('selectedRepoName') || '');
       this.communityCreateModel.set({
         communityName: selectedRepoName,
-        communitySlug: slugify(selectedRepoName.toLowerCase()),
+        communitySlug: slugger(selectedRepoName),
         isUsingCustomSlug: false,
         githubOrgId: null,
         githubRepoId: selectedRepoId,
@@ -133,21 +126,11 @@ module.exports = CommunityCreateBaseStepView.extend({
     }
   },
 
-  onStepNext: function() {
-    this.communityCreateModel.set('stepState', stepConstants.MAIN);
-  },
-  onStepBack: function() {
-    this.communityCreateModel.set('stepState', stepConstants.MAIN);
-  },
-
   onOrgsAreaToggle: function() {
     this.setAreaActive('isOrgAreaActive');
   },
-  onReposAreaToggle: function() {
-    if(this.repoCollection.length === 0) {
-      this.repoCollection.fetch();
-    }
 
+  onReposAreaToggle: function() {
     this.setAreaActive('isRepoAreaActive');
   },
 
@@ -178,7 +161,7 @@ module.exports = CommunityCreateBaseStepView.extend({
     }
 
     // Set any repo item that may be selected inactive
-    var previousActiveRepoModel = this.repoCollection.findWhere({ active: true });
+    var previousActiveRepoModel = this.communityCreateModel.repos.findWhere({ active: true });
     if(previousActiveRepoModel) {
       previousActiveRepoModel.set('active', false);
     }
@@ -196,6 +179,7 @@ module.exports = CommunityCreateBaseStepView.extend({
       this.onStepNext();
     }
   },
+
   onRepoSelectionChange: function(activeModel) {
     var selectedRepoId = null;
     var selectedRepoName = null;
@@ -205,7 +189,7 @@ module.exports = CommunityCreateBaseStepView.extend({
     }
 
     // Set any org item that may be selected inactive
-    var previousActiveOrgModel = this.orgCollection.findWhere({ active: true });
+    var previousActiveOrgModel = this.communityCreateModel.orgs.findWhere({ active: true });
     if(previousActiveOrgModel) {
       previousActiveOrgModel.set('active', false);
     }
@@ -230,60 +214,19 @@ module.exports = CommunityCreateBaseStepView.extend({
   },
 
   onRepoFilterChange: function() {
-    // For people with thousands of repos, we want to hold off for perf
-    // This is an arbitrary number
-    if(this.repoCollection.length > 500) {
-      this.throttledApplyFilterToRepos();
-    }
-    else {
-      this.shortThrottledApplyFilterToRepos();
-    }
+    this.debouncedApplyFilterToRepos();
   },
 
   applyFilterToRepos: function() {
     var filterString = (this.model.get('repoFilter') || '').toLowerCase();
-    this.filteredUnusedRepoCollection.setFilter(function(model) {
+
+    this.filteredRepos.setFilter(function(model) {
       var shouldShow = true;
       if(filterString && filterString.length > 0) {
         shouldShow = fuzzysearch(filterString, model.get('name').toLowerCase());
       }
 
       return shouldShow;
-    });
-  },
-
-  fetchRepos: function() {
-    var self = this;
-    return new Promise(function(resolve, reject) {
-      self.repoCollection.fetch({
-        reset: true,
-        data: {
-          cb: Date.now()
-        },
-        success: function() {
-          resolve();
-        },
-        error: reject
-      });
-
-    });
-  },
-
-  fetchUnusedRepos: function() {
-    var self = this;
-    return new Promise(function(resolve, reject) {
-      self.unusedRepoCollection.fetch({
-        reset: true,
-        data: {
-          type: 'unused',
-          cb: Date.now()
-        },
-        success: function() {
-          resolve();
-        },
-        error: reject
-      });
-
     });
   },
 
@@ -294,13 +237,11 @@ module.exports = CommunityCreateBaseStepView.extend({
     scopeUpgrader('repo')
       .then(function() {
         self.ui.repoScopeMissingNote.hide();
-        return Promise.join(
-          self.fetchUnusedRepos(),
-          self.fetchRepos(),
-          function() {
-            self.applyFilterToRepos();
-          });
-      });
+        return self.communityCreateModel.refreshGitHubCollections({ repos: true })
+      })
+      .then(function() {
+        self.applyFilterToRepos();
+      })
 
     return false;
   }
