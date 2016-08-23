@@ -3,7 +3,7 @@
   "version": "13.4.0",
   "private": true,
   "dependencies": {
-    "@gitterhq/translations": "^1.2.2",
+    "@gitterhq/translations": "^1.3.0",
     "apn": "1.7.5",
     "async": "~0.9.0",
     "batch-stream": "^0.1.2",

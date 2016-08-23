@@ -2,9 +2,8 @@
 
 var _ = require('underscore');
 var ProxyCollection = require('backbone-proxy-collection');
-
-var userSearchModels = require('./user-search');
-var UserSuggestionCollection = require('./user-suggestions');
+var userSearchModels = require('../../../collections/user-search');
+var UserSuggestionCollection = require('../../../collections/user-suggestions');
 
 var _super = ProxyCollection.prototype;
 
@@ -22,11 +21,8 @@ var UserResultCollection = function(models, attrs, options) {
   if (!attrs || !attrs.communityCreateModel) {
     throw new Error('A valid instance of CommunityCreateModel should be passed to a new UserResultCollection');
   }
+
   this.communityCreateModel = attrs.communityCreateModel;
-
-  this.orgCollection = attrs.orgCollection;
-  this.repoCollection = attrs.repoCollection;
-
 
   this.userSearchCollection = new userSearchModels.Collection();
   this.userSuggestionCollection = new UserSuggestionCollection();
@@ -79,18 +75,12 @@ _.extend(UserResultCollection.prototype, _super, {
 
 
   fetchSuggestions: function() {
-    var githubProjectInfo = this.communityCreateModel.getGithubProjectInfo(this.orgCollection, this.repoCollection);
-    var type = null;
-    if(this.communityCreateModel.get('githubOrgId')) {
-      type = 'GH_ORG';
-    }
-    else if(this.communityCreateModel.get('githubRepoId')) {
-      type = 'GH_REPO';
-    }
+    var githubProjectInfo = this.communityCreateModel.getGithubProjectInfo();
+
     this.userSuggestionCollection.fetch({
       data: {
-        type: type,
-        linkPath: githubProjectInfo.name
+        type: githubProjectInfo.type || undefined,
+        linkPath: githubProjectInfo.name || undefined
       }
     });
   },

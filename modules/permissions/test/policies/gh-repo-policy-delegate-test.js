@@ -6,10 +6,12 @@ var proxyquireNoCallThru = require("proxyquire").noCallThru();
 
 describe('gh-repo-policy-delegate', function() {
 
-  var REPO1_PUSH_USER = { _id: '1', username: 'x' };
-  var NOT_REPO1_PUSH_USER = { _id: '2', username: 'y' };
-  var NO_ACCESS_REPO1_USER = { _id: '3', username: 'y' };
+  var REPO1_PUSH_USER = { _id: '1', username: 'x', githubToken: '1' };
+  var NOT_REPO1_PUSH_USER = { _id: '2', username: 'y', githubToken: '2' };
+  var NO_ACCESS_REPO1_USER = { _id: '3', username: 'y', githubToken: '3' };
+  var NON_GITHUB_USER = { _id: '3', username: 'zz' };
   var REPO1 = 'repo1';
+  var REPO2 = 'repo2';
 
   var FIXTURES = [
     { name: 'is repo push member, for repo access ', repo: REPO1, user: REPO1_PUSH_USER, policy: 'GH_REPO_ACCESS', expectedResult: true },
@@ -20,6 +22,12 @@ describe('gh-repo-policy-delegate', function() {
 
     { name: 'has no access to repo, for repo access', repo: REPO1, user: NO_ACCESS_REPO1_USER, policy: 'GH_REPO_ACCESS', expectedResult: false },
     { name: 'has no access to repo, for repo access', repo: REPO1, user: NO_ACCESS_REPO1_USER, policy: 'GH_REPO_PUSH', expectedResult: false },
+
+    { name: 'non github user can access public repo', repo: REPO1, user: NON_GITHUB_USER, policy: 'GH_REPO_ACCESS', expectedResult: true },
+    { name: 'non github user can not admin public repo', repo: REPO1, user: NON_GITHUB_USER, policy: 'GH_REPO_PUSH', expectedResult: false },
+
+    { name: 'non github user can access public room', repo: REPO2, user: NON_GITHUB_USER, policy: 'GH_REPO_ACCESS', sdPublic: true, expectedResult: true },
+    { name: 'non github user can not admin public room', repo: REPO2, user: NON_GITHUB_USER, policy: 'GH_REPO_PUSH', sdPublic: true, expectedResult: false },
 
     { name: 'invalid policy', repo: REPO1, user: REPO1_PUSH_USER, policy: 'INVALID', expectedResult: false },
   ];
@@ -49,6 +57,15 @@ describe('gh-repo-policy-delegate', function() {
         if (user === NO_ACCESS_REPO1_USER) {
           return null;
         }
+
+        if (user === NON_GITHUB_USER) {
+          return {
+            permissions: {
+              push: false,
+              admin: false,
+            }
+          };
+        }
       }
 
       return null;
@@ -66,7 +83,8 @@ describe('gh-repo-policy-delegate', function() {
   FIXTURES.forEach(function(meta) {
     it(meta.name, function() {
       var securityDescriptor = {
-        linkPath: meta.repo
+        linkPath: meta.repo,
+        public: !!meta.sdPublic
       }
 
 
