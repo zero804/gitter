@@ -75,7 +75,9 @@ export default Collection.extend({
 
   //TODO REMOVE
   getCategoryId(){
-    return this.forumStore.get('categories')[0].id;
+    //TODO This needs to be fleshed out when the UI is completed
+    categories = this.forumStore.get('categories');
+    if(categories[0]) { return categories[0].id; }
   }
 
 });
