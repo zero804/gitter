@@ -40,7 +40,8 @@ module.exports = {
         );
       })
       .then(function(suggestedRooms) {
-        return restSerializer.serialize(suggestedRooms, new restSerializer.SuggestedRoomStrategy({ }));
+        var strategy = restSerializer.TroupeStrategy.createSuggestionStrategy();
+        return restSerializer.serialize(suggestedRooms, strategy);
       });
   }
 
