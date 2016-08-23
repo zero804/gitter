@@ -340,6 +340,14 @@ var CreateRoomView = Marionette.LayoutView.extend({
   },
 
   onRoomNameChange: function() {
+    var group = this.getGroupFromId(this.model.get('groupId'));
+    var repoUriToFind = group.get('uri') + '/' + this.model.get('roomName');
+    var matchingRepo = this.repoCollection.findWhere({ uri: repoUriToFind });
+    // Auto-associate repo if the name matches
+    if(matchingRepo) {
+      this.model.set('associatedGithubProject', matchingRepo);
+    }
+
     this.debouncedCheckForRoomConflict();
     this.safeUpdateFields();
   },
