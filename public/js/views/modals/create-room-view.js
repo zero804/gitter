@@ -106,7 +106,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
   initialize: function(attrs) {
     this.model = attrs.model;
     this.groupsCollection = attrs.groupsCollection;
-    this.troupeCollection = attrs.troupeCollection;
+    this.roomCollection = attrs.roomCollection;
     this.repoCollection = attrs.repoCollection;
     this.hasRendered = false;
 
@@ -125,7 +125,8 @@ var CreateRoomView = Marionette.LayoutView.extend({
 
   onRender: function() {
     this.groupSelect = new GroupSelectView({
-      groupsCollection: this.groupsCollection
+      groupsCollection: this.groupsCollection,
+      dropdownClass: 'create-room-group-typeahead-dropdown',
     });
     this.groupSelectRegion.show(this.groupSelect);
 
@@ -339,6 +340,14 @@ var CreateRoomView = Marionette.LayoutView.extend({
   },
 
   onRoomNameChange: function() {
+    var group = this.getGroupFromId(this.model.get('groupId'));
+    var repoUriToFind = group.get('uri') + '/' + this.model.get('roomName');
+    var matchingRepo = this.repoCollection.findWhere({ uri: repoUriToFind });
+    // Auto-associate repo if the name matches
+    if(matchingRepo) {
+      this.model.set('associatedGithubProject', matchingRepo);
+    }
+
     this.debouncedCheckForRoomConflict();
     this.safeUpdateFields();
   },
@@ -348,7 +357,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
     var roomName = this.model.get('roomName');
 
     var repoCheckString = group.get('uri') + '/' + roomName;
-    var roomAlreadyExists = roomName && this.troupeCollection.findWhere({ uri: repoCheckString });
+    var roomAlreadyExists = roomName && this.roomCollection.findWhere({ uri: repoCheckString });
     if(roomAlreadyExists) {
       this.model.set('roomAvailabilityStatus', roomAvailabilityStatusConstants.UNAVAILABLE);
     }

@@ -98,10 +98,8 @@ var webpackConfig = {
       "components": path.resolve(path.join(__dirname, "./components")),
       "template": path.resolve(path.join(__dirname, "./template")),
       "bootstrap_tooltip": path.resolve(path.join(__dirname, "./utils/tooltip.js")),
-      "jquery": path.resolve(path.join(__dirname, "../repo/jquery/jquery.js")),
+      "jquery": require.resolve('jquery'),
       "mutant": path.resolve(path.join(__dirname, "../repo/mutant/mutant.js")),
-      "cocktail": path.resolve(path.join(__dirname, "../repo/cocktail/cocktail.js")),
-      "keymaster": path.resolve(path.join(__dirname, "../repo/keymaster/keymaster.js")),
       "emojify": path.resolve(path.join(__dirname, "../repo/emojify/emojify.js")),
       "jquery-iframely": path.resolve(path.join(__dirname, "../repo/jquery-iframely/jquery-iframely.js")),
       "jquery-textcomplete": path.resolve(path.join(__dirname, "../repo/jquery-textcomplete/jquery.textcomplete.js")),
@@ -110,7 +108,6 @@ var webpackConfig = {
       "zeroclipboard": path.resolve(path.join(__dirname, "../repo/zeroclipboard/zeroclipboard.js")),
       "backbone-sorted-collection": path.resolve(path.join(__dirname, "../repo/backbone-sorted-collection/backbone-sorted-collection.js")),
       "jquery-sortable": path.resolve(path.join(__dirname, "../repo/jquery-sortable/jquery-sortable.js")),
-      "d3": path.resolve(path.join(__dirname, "../repo/d3/d3.js")),
 
       // Prevent duplicates
       "moment": path.resolve(path.join(__dirname, "utils/moment-wrapper")),
@@ -126,7 +123,6 @@ var webpackConfig = {
     new ContextReplacementPlugin(/moment\/locale$/, /ar|cs|da|de|en-gb|es|fa|fr|hu|it|ja|ko|lt|nl|pl|pt|ru|sk|sv|ua|zh-cn/)
   ],
   bail: true,
-  recordsPath: '/tmp/records.json',
   postcss: function(webpack) {
     return getPostcssStack(webpack);
   },
@@ -138,6 +134,19 @@ if(devMode) {
   webpackConfig.cache = true;
 } else {
   webpackConfig.devtool = 'source-map';
-
 }
+
+if (process.env.WEBPACK_VISUALIZER) {
+  var Visualizer = require('webpack-visualizer-plugin');
+  webpackConfig.plugins.push(new Visualizer({ filename: '../../webpack.stats.html' }));
+}
+
+if (process.env.WEBPACK_STATS) {
+  var StatsWriterPlugin = require("webpack-stats-plugin").StatsWriterPlugin;
+  webpackConfig.plugins.push(new StatsWriterPlugin({
+    filename: '../../webpack.stats.json',
+    fields: null
+  }));
+}
+
 module.exports = webpackConfig;

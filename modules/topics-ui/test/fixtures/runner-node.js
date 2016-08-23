@@ -9,11 +9,13 @@ var babelRegister = require('babel-register');
 var babelConfig = require('../../dev/babel-config');
 
 babelRegister(babelConfig);
+require('jsdom-global')()
 
 var mocha = new Mocha({ useColors: true });
 
 
-glob.sync(path.resolve(__dirname, '../specs') + '/**/*.js').forEach(function(filePath){
+glob.sync(path.resolve(__dirname, '../specs') + '/**/*.{js,jsx}').forEach(function(filePath){
+  if(/browser/.test(filePath)) { return; }
   mocha.addFile(filePath);
 });
 
@@ -28,6 +30,7 @@ runner.on('end', function(){
   process.exit();
 });
 
-runner.on('fail', function(){
+runner.on('fail', function(i, err){
+  console.log(err.message);
   process.exit(1);
 });
