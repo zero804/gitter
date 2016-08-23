@@ -3,7 +3,6 @@ import CreateTopicModal from './components/topic/create-topic-modal.jsx';
 import { dispatch } from '../dispatcher';
 import titleUpdate from '../action-creators/create-topic/title-update';
 import bodyUpdate from '../action-creators/create-topic/body-update';
-import submit from '../action-creators/create-topic/submit';
 import * as consts from '../constants/create-topic';
 import submitNewTopic from '../action-creators/create-topic/submit-new-topic';
 import navigateToTopic from '../action-creators/topic/navigate-to-topic';
