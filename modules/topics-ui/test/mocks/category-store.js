@@ -1,7 +1,7 @@
 "use strict";
 
 var Backbone = require('backbone');
-var data = require('./data/categories');
+var data = require('./data/categories.js');
 
 var CategoryStore = Backbone.Collection.extend({
   getCategories: function(){
