@@ -19,7 +19,7 @@ describe('topicsStore', () => {
   });
 
   it('should get a model by id', () => {
-    assert(topicsStore(models).getById(1), models[0]);
+    assert.equal(topicsStore(models).getById(1), models[0]);
   });
 
 });
