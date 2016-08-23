@@ -9,7 +9,6 @@ module.exports = Backbone.Model.extend({
   initialize(){
     subscribe(consts.TITLE_UPDATE, this.onTitleUpdate, this);
     subscribe(consts.BODY_UPDATE, this.onBodyUpdate, this);
-    subscribe(consts.SUBMIT, this.onSubmitCalled, this);
   },
 
   onTitleUpdate(data){
@@ -20,13 +19,6 @@ module.exports = Backbone.Model.extend({
   onBodyUpdate(data){
     this.set('body', data.body);
     this.trigger(consts.STORE_UPDATE);
-  },
-
-  onSubmitCalled(){
-    this.trigger(consts.STORE_CREATE_NEW, {
-      title: this.get('title'),
-      body: this.get('body')
-    });
   }
 
 });

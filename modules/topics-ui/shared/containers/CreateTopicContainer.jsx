@@ -66,10 +66,6 @@ export default createClass({
   },
 
   onSubmit(){
-    dispatch(submit());
-  },
-
-  onStoreCreateNew(){
     const {newTopicStore} = this.props;
     dispatch(submitNewTopic(
       newTopicStore.get('title'),

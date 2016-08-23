@@ -77,7 +77,7 @@ export default Collection.extend({
   getCategoryId(){
     //TODO This needs to be fleshed out when the UI is completed
     const categories = this.forumStore.get('categories');
-    if(categories[0]) { return categories[0].id; }
+    if(categories && categories[0]) { return categories[0].id; }
   }
 
 });
