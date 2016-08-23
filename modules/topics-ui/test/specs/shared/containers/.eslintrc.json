@@ -17,6 +17,7 @@
     }
   },
   "rules": {
+    "import/no-commonjs": 2,
     "node/no-unsupported-features": [
       "error",
       {
