@@ -7,7 +7,7 @@ import _ from 'lodash';
 import CreateTopicContainer from './CreateTopicContainer.jsx';
 import ForumTableControl from './components/forum/table-control.jsx';
 import TopicsTable from './components/forum/topics-table.jsx';
-
+import SearchHeader from './components/search/search-header.jsx';
 
 import navigateToFilter from '../action-creators/forum/navigate-to-filter';
 import navigateToSort from '../action-creators/forum/navigate-to-sort';
@@ -106,6 +106,7 @@ export default React.createClass({
     const { groupName, newTopicStore, topicsStore } = this.props;
     return (
       <main>
+        <SearchHeader />
         <CategoryList
           groupName={ groupName }
           categories={ categories }
