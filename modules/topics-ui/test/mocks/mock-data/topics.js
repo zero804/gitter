@@ -1,6 +1,4 @@
-"use strict";
-
-module.exports = [
+export default [
   { title: '1', id: '1', slug: '1', name: '1', body: { html: 'test'}, category: "test", tags: [], user: { displayName: 'test-user', avatarUrl: 'test-src'}},
   { title: '2', id: '2', slug: '2', name: '2', body: { html: 'test'}, category: "test", tags: [], user: { displayName: 'test-user', avatarUrl: 'test-src'}},
   { title: '3', id: '3', slug: '3', name: '3', body: { html: 'test'}, category: "test", tags: [], user: { displayName: 'test-user', avatarUrl: 'test-src'}},
