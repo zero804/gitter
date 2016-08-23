@@ -1,15 +1,15 @@
 import {equal} from 'assert';
 import React from 'react';
 import { shallow } from 'enzyme';
-import TopicsTable from '../../../../../../shared/containers/components/topic/topics-table.jsx';
+import TopicsTable from '../../../../../../shared/containers/components/forum/topics-table.jsx';
+import topics from '../../../../../mocks/mock-data/topics';
 
 describe('<TopicsTable/>', () => {
 
   let wrapper;
-  let topics = [];
 
   beforeEach(() => {
-    wrapper = shallow(<TopicsTable topics={topics}/>);
+    wrapper = shallow(<TopicsTable topics={topics} groupName="gitterHQ"/>);
   });
 
   it('should render a container', () => {
