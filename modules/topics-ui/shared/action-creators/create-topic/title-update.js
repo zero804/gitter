@@ -5,4 +5,4 @@ export default function titleUpdate(title){
     type: TITLE_UPDATE,
     title: title
   };
-};
+}
