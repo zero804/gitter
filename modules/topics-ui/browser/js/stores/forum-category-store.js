@@ -23,7 +23,8 @@ export default Collection.extend({
 
   onCategoryUpdate(model, val){
     this.where({ active: true }).forEach((m) => m.set('active', false));
-    this.findWhere({ category: val }).set('active', true);
+    var activeModel = this.findWhere({ category: val });
+    if(activeModel) { activeModel.set('active', true); }
     this.trigger(UPDATE_ACTIVE_CATEGORY);
   }
 
