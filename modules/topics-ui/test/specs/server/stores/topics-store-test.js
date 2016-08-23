@@ -5,7 +5,10 @@ var topicsStore = require('../../../../server/stores/topics-store');
 
 describe('topicsStore', () => {
 
-  var models = [];
+  var models = [
+    { id: 1 },
+    { id: 2 }
+  ];
 
   it('should return an object with models', () => {
     assert(topicsStore(models).models);
@@ -13,6 +16,10 @@ describe('topicsStore', () => {
 
   it('should return an object with getTopics', () => {
     assert(topicsStore(models).getTopics);
+  });
+
+  it('should get a model by id', () => {
+    assert.equal(topicsStore(models).getById(1), models[0]);
   });
 
 });

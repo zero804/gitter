@@ -1,13 +1,13 @@
 import React, { PropTypes } from 'react';
+import TopicLink from '../links/topic-link.jsx';
 
 export default React.createClass({
 
   displayName: 'TopicsTableBody',
   propTypes: {
+    groupName: PropTypes.string.isRequired,
     topics: PropTypes.arrayOf(PropTypes.shape({
-      title: PropTypes.shape({
-        text: PropTypes.string
-      })
+      title: PropTypes.string.isRequired
     }))
   },
 
@@ -21,9 +21,16 @@ export default React.createClass({
   },
 
   renderChildRow(topic, i) {
+    var {groupName} = this.props;
+    //TODO add action to navigate
+    const href = `/${groupName}/topics/topic/${topic.id}/${topic.slug}`
     return (
       <tr className="topics-table-body__row" key={`topics-table-row-${i}`}>
-        <td className="topics-table-body__cell--first">{topic.title.text}</td>
+        <td className="topics-table-body__cell--first">
+          <TopicLink groupName={groupName} topic={topic}>
+            {topic.title}
+          </TopicLink>
+        </td>
         <td className="topics-table-body__cell">0</td>
         <td className="topics-table-body__cell">0</td>
         <td className="topics-table-body__cell--last">0</td>

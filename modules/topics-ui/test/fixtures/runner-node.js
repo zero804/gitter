@@ -9,6 +9,7 @@ var babelRegister = require('babel-register');
 var babelConfig = require('../../dev/babel-config');
 
 babelRegister(babelConfig);
+require('jsdom-global')()
 
 var mocha = new Mocha({ useColors: true });
 
@@ -29,6 +30,7 @@ runner.on('end', function(){
   process.exit();
 });
 
-runner.on('fail', function(){
+runner.on('fail', function(i, err){
+  console.log(err.message);
   process.exit(1);
 });
