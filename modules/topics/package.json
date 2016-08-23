@@ -1,7 +1,7 @@
 {
   "name": "gitter-web-topics",
   "version": "1.0.0",
-  "main": "lib/topic-service.js",
+  "main": "lib/index.js",
   "directories": {
     "lib": "lib",
     "test": "test"
