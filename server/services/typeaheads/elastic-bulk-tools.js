@@ -1,5 +1,7 @@
 'use strict';
 
+var IS_DEVELOPMENT = process.env.NODE_ENV === 'dev';
+
 module.exports = {
   // expects an array of updates where each element is a valid req for elasticClient.update
   createBulkUpdate: function(updates) {
@@ -19,6 +21,12 @@ module.exports = {
     };
   },
   findErrors: function(req, res) {
+    if (IS_DEVELOPMENT) {
+      // ERRORS for bulk updater disabled in dev until
+      // https://github.com/troupe/gitter-webapp/issues/2080
+      return;
+    }
+
     if (!res.errors) return;
 
     var errors = [];

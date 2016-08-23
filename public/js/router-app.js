@@ -6,7 +6,6 @@ require('utils/font-setup');
 
 var debug = require('debug-proxy')('app:router-app');
 var $ = require('jquery');
-var _ = require('underscore');
 var Backbone = require('backbone');
 var moment = require('moment');
 var clientEnv = require('gitter-client-env');
@@ -23,15 +22,9 @@ var SPARoomSwitcher = require('components/spa-room-switcher');
 var linkHandler = require('components/link-handler');
 var roomListGenerator = require('components/chat-cache/room-list-generator');
 var troupeCollections = require('collections/instances/troupes');
-var repoModels = require('collections/repos');
-var RepoCollection = repoModels.ReposCollection;
-var orgModels = require('collections/orgs');
-var OrgCollection = orgModels.OrgCollection;
-var groupModels = require('collections/groups');
-var CommunityCreateModel = require('views/community-create/community-create-model');
-var CreateRoomModel = require('models/create-room-view-model');
 var scopeUpgrader = require('components/scope-upgrader');
-
+var presentCreateRoomDialog = require('./ensured/present-create-room-dialog');
+var presentCreateCommunityDialog = require('./ensured/present-create-community-dialog');
 var AppLayout = require('views/layouts/app-layout');
 var LoadingView = require('views/app/loading-view');
 
@@ -252,18 +245,14 @@ onready(function() {
         context.setTroupeId(message.troupeId);
         titlebarUpdater.setRoomName(message.name);
         appEvents.trigger('context.troupeId', message.troupeId);
-      break;
+        break;
 
       case 'navigation':
         appEvents.trigger('navigation', message.url, message.urlType, message.title);
-      break;
+        break;
 
       case 'route':
         window.location.hash = '#' + message.hash;
-      break;
-
-      case 'community-create-view:toggle':
-        appEvents.trigger('community-create-view:toggle', message.active);
         break;
 
       //when the chat app requests the room list send it
@@ -323,58 +312,6 @@ onready(function() {
   var allRoomsCollection = troupeCollections.troupes;
   new RoomCollectionTracker(allRoomsCollection);
 
-  var repoCollection = new RepoCollection();
-  var unusedRepoCollection = new RepoCollection();
-  var unusedOrgCollection = new OrgCollection();
-
-  var initializeUnusedRepoCollection = _.once(function() {
-    unusedRepoCollection.fetch({
-      data: {
-          type: 'unused'
-        }
-      },
-      {
-        add: true,
-        remove: true,
-        merge: true
-      }
-    );
-  });
-
-  var initializeUnusedOrgCollection = _.once(function() {
-    unusedOrgCollection.fetch({
-      data: {
-          type: 'unused'
-        }
-      },
-      {
-        add: true,
-        remove: true,
-        merge: true
-      }
-    );
-  });
-
-  var adminGroupsCollection = new groupModels.Collection([]);
-  var initializeAdminGroupsCollection = _.once(function() {
-    adminGroupsCollection.fetch({
-      data: {
-          type: 'admin'
-        }
-      },
-      {
-        add: true,
-        remove: true,
-        merge: true
-      }
-    );
-  });
-
-  var communityCreateModel = new CommunityCreateModel({
-    active: false
-  });
-
-
   allRoomsCollection.on('remove', function(model) {
     if (model.id === context.getTroupeId()) {
       //context.troupe().set('roomMember', false);
@@ -394,7 +331,6 @@ onready(function() {
     roomCollection: troupeCollections.troupes,
     //TODO ADD THIS TO MOBILE JP 25/1/16
     orgCollection: troupeCollections.orgs,
-    repoCollection: repoCollection,
     groupsCollection: troupeCollections.groups
   });
   appLayout.render();
@@ -404,13 +340,6 @@ onready(function() {
   function postMessage(message) {
     chatIFrame.contentWindow.postMessage(JSON.stringify(message), clientEnv.basePath);
   }
-
-  appEvents.on('community-create-view:toggle', function(active) {
-    communityCreateModel.set('active', active);
-    if(active) {
-      window.location.hash = '#createcommunity';
-    }
-  });
 
   appEvents.on('navigation', function(url, type, title, options) {
     debug('navigation: %s', url);
@@ -488,17 +417,15 @@ onready(function() {
     postMessage(message);
   });
 
-
-
   var Router = Backbone.Router.extend({
     routes: {
       // TODO: get rid of the pipes
       '': 'hideModal',
       'upgraderepoaccess': 'upgradeRepoAccess',
       'upgraderepoaccess/:name': 'upgradeRepoAccess',
-      'createroom': 'createroom',
-      'createroom/:name': 'createroom',
       'confirm/*uri': 'confirmRoom',
+      'createroom': 'createRoom',
+      'createroom/:name': 'createRoom',
       'createcommunity': 'createCommunity'
     },
 
@@ -515,69 +442,19 @@ onready(function() {
       });
     },
 
-    createroom: function(initialRoomName) {
-      var getSuitableGroupId = function() {
-        var groupId = null;
-
-        var menuBarGroup = appLayout.getRoomMenuModel().getCurrentGroup();
-        if(menuBarGroup) {
-          groupId = menuBarGroup.get('id');
-        }
-        else {
-          var slimCurrentTroupe = context.troupe();
-          var currentTroupe = troupeCollections.troupes.get(slimCurrentTroupe.get('id'));
-
-          if(currentTroupe) {
-            groupId = currentTroupe.get('groupId');
-          }
-          // Last ditch effort, perhaps they are visiting a room they haven't joined
-          // on page load and we can see the full troupe
-          else {
-            groupId = slimCurrentTroupe.get('groupId');
-          }
-        }
-
-        return groupId;
-      };
-
-      initializeAdminGroupsCollection();
-
-      if(repoCollection.length === 0) {
-        repoCollection.fetch();
-      }
-
-      require.ensure(['views/modals/create-room-view'], function(require) {
-        var createRoomView = require('views/modals/create-room-view');
-        var modal = new createRoomView.Modal({
-          model: new CreateRoomModel(),
-          initialGroupId: getSuitableGroupId(),
-          initialRoomName: initialRoomName,
-          groupsCollection: adminGroupsCollection,
-          troupeCollection: troupeCollections.troupes,
-          repoCollection: repoCollection
-        });
-
-        appLayout.dialogRegion.show(modal);
+    createRoom: function(initialRoomName) {
+      presentCreateRoomDialog({
+        dialogRegion: appLayout.dialogRegion,
+        roomCollection: troupeCollections.troupes,
+        groupsCollection: troupeCollections.groups,
+        roomMenuModel: appLayout.getRoomMenuModel(),
+        initialRoomName: initialRoomName
       });
     },
 
     createCommunity: function() {
-      initializeUnusedRepoCollection();
-      initializeUnusedOrgCollection();
-
-      require.ensure(['views/community-create/community-create-view'], function(require) {
-        var CommunityCreateView = require('views/community-create/community-create-view');
-        communityCreateModel.set('active', true);
-        var communityCreateView = new CommunityCreateView({
-          model: communityCreateModel,
-          orgCollection: troupeCollections.orgs,
-          unusedOrgCollection: unusedOrgCollection,
-          repoCollection: repoCollection,
-          unusedRepoCollection: unusedRepoCollection,
-          groupsCollection: troupeCollections.groups
-        });
-
-        appLayout.dialogRegion.show(communityCreateView);
+      presentCreateCommunityDialog({
+        dialogRegion: appLayout.dialogRegion
       });
     },
 

@@ -1,12 +1,10 @@
 'use strict';
 
 var _ = require('underscore');
-
 var stepConstants = require('../step-constants');
 var template = require('./community-creation-invite-confirmation-view.hbs');
 var CommunityCreateBaseStepView = require('../shared/community-creation-base-step-view');
-var CommunityCreationTroublePeopleListView = require('../shared/community-creation-expanded-people-list-view');
-
+var ExpandedPeopleListView = require('../shared/community-creation-expanded-people-list-view');
 
 require('gitter-styleguide/css/components/headings.css');
 require('gitter-styleguide/css/components/buttons.css');
@@ -18,7 +16,8 @@ module.exports = CommunityCreateBaseStepView.extend({
   template: template,
 
   className: 'community-create-step-wrapper community-create-invite-confirmation-step-wrapper',
-
+  nextStep: stepConstants.OVERVIEW,
+  prevStep: stepConstants.INVITE,
   behaviors: {
     Isomorphic: {
       troubleInviteListView: { el: '.community-create-trouble-invite-list-root', init: 'initTroubleInviteListView' }
@@ -26,10 +25,12 @@ module.exports = CommunityCreateBaseStepView.extend({
   },
 
   initTroubleInviteListView: function(optionsForRegion) {
-    this.troubleInviteListView = new CommunityCreationTroublePeopleListView(optionsForRegion({
-      collection: this.troubleInviteCollection,
+    this.troubleInviteListView = new ExpandedPeopleListView(optionsForRegion({
+      collection: this.communityCreateModel.invites,
+      // Only show invites without an email address
       communityCreateModel: this.communityCreateModel
     }));
+
     return this.troubleInviteListView;
   },
 
@@ -38,22 +39,14 @@ module.exports = CommunityCreateBaseStepView.extend({
   }),
 
   events: _.extend({}, _super.events, {
-    'click @ui.nextStep': 'onStepNext',
-    'click @ui.backStep': 'onStepBack',
     'change @ui.allowTweetBadgerOptionInput': 'onAllowTweetBadgerInputChange'
   }),
 
-  initialize: function(options) {
-    _super.initialize.apply(this, arguments);
-
-    this.troubleInviteCollection = options.troubleInviteCollection;
-  },
-
-  onStepNext: function() {
-    this.communityCreateModel.set('stepState', stepConstants.OVERVIEW);
-  },
-  onStepBack: function() {
-    this.communityCreateModel.set('stepState', stepConstants.INVITE);
+  onActiveChange: function() {
+    _super.onActiveChange.call(this);
+    if (this.troubleInviteListView) {
+      this.troubleInviteListView.resortView();
+    }
   },
 
   onAllowTweetBadgerInputChange: function() {

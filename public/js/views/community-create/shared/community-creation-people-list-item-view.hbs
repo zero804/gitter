@@ -5,28 +5,9 @@
   data-vendor-username="{{ vendorUsername }}"
   data-vendor-type="{{ type }}">
 
-  {{!-- TODO: Only use avatarUrl when user?q has avatarUrl --}}
-  {{#if avatarUrl}}
-    <img class="community-create-invite-user-result-list-item-avatar" {{{ avatarSrcSet avatarUrl 44 }}}>
-  {{else if avatarSrcset}}
-    <img
-      class="community-create-invite-user-result-list-item-avatar"
-      src="{{ avatarSrcset.src }}"
-      srcset="{{ avatarSrcset.srcset }}"
-      height="{{ avatarSrcset.size }}"
-      width="{{ avatarSrcset.size }}" />
-  {{/if}}
+  <img class="community-create-invite-user-result-list-item-avatar" {{{ avatarSrcSet avatarUrl 44 }}}>
 
-  {{#if canEditEmail}}
-    <div class="community-create-people-list-item-overlay">
-      <input
-        type="email"
-        id="community-create-people-list-item-email-input"
-        class="community-create-people-list-item-email-input js-community-create-people-list-item-email-input"
-        placeholder="enter email address">
-    </div>
-  {{/if}}
-  {{#if canRemove}}
+  {{#if allowRemove}}
     <div class="community-create-people-list-item-remove-button-overlay">
       <button class="community-create-people-list-item-remove-button">
         <i class="icon-g-cancel"></i>
