@@ -4,7 +4,7 @@ import { shallow } from 'enzyme';
 import TopicHeader from '../../../../../../shared/containers/components/topic/topic-header.jsx';
 import topics from '../../../../../mocks/data/topics';
 
-describe('<TopicHeader/>', () => {
+describe.skip('<TopicHeader/>', () => {
 
   let wrapper;
   const topic = topics[0];
