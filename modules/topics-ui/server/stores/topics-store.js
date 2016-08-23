@@ -1,5 +1,7 @@
 "use strict";
 
+var _ = require('lodash');
+
 module.exports = function topicsStore(models) {
 
   //Defaults
@@ -12,11 +14,11 @@ module.exports = function topicsStore(models) {
 
   //Get resource
   const getTopics = () => models;
-  const getById = (id) => models.reduce((memo, cur) => {
-    if(cur.id === id) { return cur }
-    return memo;
-  }, false);
-
+  const getById = function(id){
+    var model = _.find(models, (model) => model.id === id);
+    if(!model) { return; }
+    return model;
+  }
   //Methods
   return {
     models: models,
