@@ -15,7 +15,7 @@ var addInvitePolicyFactory = require('gitter-web-permissions/lib/add-invite-poli
 /**
  * Accepts an invitation and return the room the user has just joined
  */
-function acceptInvite(user, secret) {
+function acceptInvite(user, secret, source) {
   assert(user);
 
   return invitesService.accept(user._id, secret)
@@ -48,6 +48,7 @@ function acceptInvite(user, secret) {
       var room = this.room;
       var invite = this.invite;
       stats.event("invite_accepted", {
+        source: source,
         userId: user && (user.id || user._id),
         troupeId: room && (room.id || room._id),
         type: invite.type,
