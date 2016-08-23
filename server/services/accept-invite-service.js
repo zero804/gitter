@@ -38,7 +38,7 @@ function acceptInvite(user, secret, options) {
     .then(function(policy) {
       var roomWithPolicyService = new RoomWithPolicyService(this.room, user, policy);
       var joinRoomOptions = {
-        source: options.source
+        source: options && options.source
       };
       return roomWithPolicyService.joinRoom(joinRoomOptions);
     })
