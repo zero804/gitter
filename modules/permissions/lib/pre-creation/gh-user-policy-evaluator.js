@@ -8,7 +8,7 @@ function GitHubRepoPolicyEvaluator(user, uri) {
   this.uri = uri;
 
   // TODO: currently assumes githubUsername == username
-  this._access = !!(user && user.username && user.username === uri);
+  this._access = !!(user && user.username && uri && user.username.toLowerCase() === uri.toLowerCase());
 }
 
 GitHubRepoPolicyEvaluator.prototype = {
