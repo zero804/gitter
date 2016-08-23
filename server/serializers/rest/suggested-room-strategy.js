@@ -8,7 +8,7 @@ var UserIdStrategy = require('./user-id-strategy');
 var resolveOneToOneOtherUser = require('../resolve-one-to-one-other-user');
 var getRoomNameAndUrl = require('../get-room-name-and-url');
 var getAvatarUrlForRoom = require('../get-avatar-url-for-room');
-var oneToOneOtherUserSequence = require('../one-to-tne-other-user-sequence');
+var oneToOneOtherUserSequence = require('../one-to-one-other-user-sequence');
 
 // function RoomMessageCountStrategy() {
 //   this.messageCounts = null;

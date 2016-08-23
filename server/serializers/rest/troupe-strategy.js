@@ -19,7 +19,7 @@ var getVersion = require('../get-model-version');
 var resolveOneToOneOtherUser = require('../resolve-one-to-one-other-user');
 var getRoomNameAndUrl = require('../get-room-name-and-url');
 var getAvatarUrlForRoom = require('../get-avatar-url-for-room');
-var oneToOneOtherUserSequence = require('../one-to-tne-other-user-sequence');
+var oneToOneOtherUserSequence = require('../one-to-one-other-user-sequence');
 
 /** Best guess efforts */
 function guessLegacyGitHubType(item) {
