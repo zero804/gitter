@@ -42,9 +42,15 @@ function renderForum(req, res, next, options) {
       //context.accessToken
       return groupService.findByUri(groupUri)
         .then(function(group){
+
+          if(!group || !group.forumId) { return next(new StatusError(404)); }
+
           return forumService.findById(group.forumId);
         })
         .then(function(forum){
+
+          if(!forum) { return next(new StatusError(404)); }
+
           var strategy = new restSerializer.ForumStrategy();
           return restSerializer.serializeObject(forum, strategy);
         })
