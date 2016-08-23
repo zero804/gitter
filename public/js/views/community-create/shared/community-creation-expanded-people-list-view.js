@@ -1,22 +1,20 @@
 'use strict';
 
 var _ = require('underscore');
-var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 var urlJoin = require('url-join');
 var clientEnv = require('gitter-client-env');
-var avatars = require('gitter-web-avatars');
 var toggleClass = require('utils/toggle-class');
-var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 
 var peopleToInviteStatusConstants = require('../people-to-invite-status-constants');
 var CommunityCreationPeopleListTemplate = require('./community-creation-expanded-people-list-view.hbs');
 var CommunityCreationPeopleListItemTemplate = require('./community-creation-expanded-people-list-item-view.hbs');
 var CommunityCreationPeopleListEmptyTemplate = require('./community-creation-expanded-people-list-empty-view.hbs');
+var CreateCommunityModel = require('../community-create-model');
 
 // Consider all constraints except a customError because we use
 // this to add a custom message on what to do to satisfy
-var isFormElementInvalid = function(el, useCustomError) {
+function isFormElementInvalid(el, useCustomError) {
   return el.validity.badInput ||
     (useCustomError ? el.validity.customError : false) ||
     el.validity.patternMismatch ||
@@ -27,11 +25,9 @@ var isFormElementInvalid = function(el, useCustomError) {
     el.validity.typeMismatch ||
     //el.validity.valid ||
     el.validity.valueMissing;
-};
+}
 
-
-
-var getStatusClassStates = function(type, inviteStatus, allowTweetBadger) {
+function getStatusClassStates(type, inviteStatus, allowTweetBadger) {
   var hasValidEmail = inviteStatus === peopleToInviteStatusConstants.READY_VALID_EMAIL;
   var isTwitter = type === 'twitter';
   var canShowTwitterStatus = isTwitter && allowTweetBadger;
@@ -41,10 +37,7 @@ var getStatusClassStates = function(type, inviteStatus, allowTweetBadger) {
     usingTweetBadger: canShowTwitterStatus && !hasValidEmail,
     isValid: hasValidEmail
   };
-};
-
-
-var AVATAR_SIZE = 44;
+}
 
 var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
   template: CommunityCreationPeopleListItemTemplate,
@@ -87,15 +80,7 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
     var twitterUsername = data.twitterUsername;
     var username = githubUsername || twitterUsername || data.username;
     data.vendorUsername = username;
-    var emailAddress = data.emailAddress;
-
     data.absoluteUri = urlJoin(clientEnv.basePath, username);
-
-    data.avatarSrcset = resolveRoomAvatarSrcSet({ uri: data.username }, AVATAR_SIZE);
-    if(emailAddress) {
-      data.avatarUrl = avatars.getForGravatarEmail(emailAddress);
-    }
-
     var statusStates = getStatusClassStates(data.type, data.inviteStatus, this.communityCreateModel.get('allowTweetBadger'));
     data = _.extend({}, data, statusStates);
 
@@ -131,7 +116,7 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
   },
 
   onEmailInputChange: function() {
-    var emailInputText = this.ui.emailInput[0].value;
+    var emailInputText = this.ui.emailInput.val();
     var isEmailValid = !isFormElementInvalid(this.ui.emailInput[0]);
     if(isEmailValid) {
       this.model.set('inviteStatus', peopleToInviteStatusConstants.READY_VALID_EMAIL);
@@ -161,23 +146,19 @@ var CommunityCreationPeopleListEmptyView = Marionette.ItemView.extend({
   template: CommunityCreationPeopleListEmptyTemplate,
 });
 
-var CommunityCreationPeopleListView = Marionette.CompositeView.extend({
-  model: new Backbone.Model(),
-
+var ExpandedPeopleListView = Marionette.CompositeView.extend({
   className: 'community-create-expanded-people-list-root-inner',
   template: CommunityCreationPeopleListTemplate,
   childView: CommunityCreationPeopleListItemView,
   emptyView: CommunityCreationPeopleListEmptyView,
   childViewContainer: '.community-create-expanded-people-list',
+  reorderOnSort: true,
+  filter: CreateCommunityModel.inviteNeedsEmailPredicate,
   childViewOptions: function() {
     return {
-      communityCreateModel: this.communityCreateModel
+      communityCreateModel: this.options.communityCreateModel
     };
-  },
-
-  initialize: function(options) {
-    this.communityCreateModel = options.communityCreateModel;
   }
 });
 
-module.exports = CommunityCreationPeopleListView;
+module.exports = ExpandedPeopleListView;
