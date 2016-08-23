@@ -59,6 +59,19 @@ describe('gh-user-policy-evaluator', function() {
         });
       });
 
+      it('The owner should always have full access even when the case is mismatched', function() {
+        var GhUserPolicyEvaluator = require('../../lib/pre-creation/gh-user-policy-evaluator');
+        var uri = fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase();
+
+        return expect(GhUserPolicyEvaluator, fixture.user1, uri, {
+          canRead: true,
+          canWrite: true,
+          canJoin: true,
+          canAdmin: true,
+          canAddUser: false
+        });
+      });
+
       it('Other users should not get access', function() {
         var GhUserPolicyEvaluator = require('../../lib/pre-creation/gh-user-policy-evaluator');
         var uri = fixtureLoader.GITTER_INTEGRATION_USERNAME;

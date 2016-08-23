@@ -149,11 +149,47 @@ function configureTasks(config) {
     })
   });
 
+  /**
+   * ------------------------------------------------
+   * Stage Definitions:
+   * ------------------------------------------------
+   */
+
+  /**
+   * Validation stage: is everything as we expect it to be
+   * before kicking off the build
+   */
   createStageTask('validate');
+
+  /**
+   * Test stage: does the code do what it should?
+   */
   createStageTask('test');
+
+  /**
+   * Compile stage: process the code into a new form
+   */
   createStageTask('compile', ['test', 'validate']);
-  createStageTask('package', ['compile', 'test']);
+
+  /**
+   * Assemble stage: gather all the files
+   */
+  createStageTask('assemble', ['compile']);
+
+  /**
+   * Package stage: create packaged artifacts
+   */
+  createStageTask('package', ['assemble']);
+
+  /**
+   * Clean stage: clean the environment
+   */
   createStageTask('clean');
+
+  /**
+   * Watch stage: watch the development environment and
+   * reload if required
+   */
   createStageTask('watch');
 
   gulp.task('default', ['package']);

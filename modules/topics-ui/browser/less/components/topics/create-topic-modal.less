@@ -1,0 +1,32 @@
+@import "../../colors";
+@import (less, reference) "~gitter-styleguide/css/components/headings.css";
+
+.create-topic__heading {
+  margin-bottom: 6rem;
+  color:         @create-modal-heading-color;
+  font-weight:   100;
+}
+
+.create-topic__input--name {
+  &:extend(.h2);
+  width:         100%;
+  margin-bottom: 4rem;
+  color:         @create-topic-name-color;
+  font-weight:   300;
+}
+
+.create-topic__editor--body {
+  width:      100%;
+  min-height: 25rem;
+}
+
+.create-topic__control-row {
+  width:          100%;
+  display:        flex;
+  flex-direction: row-reverse;
+  margin-top:     6rem;
+}
+
+.create-topic__submit {
+  flex-grow: 0;
+}

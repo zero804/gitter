@@ -1,0 +1,20 @@
+@import "../../colors";
+
+.input {
+  background: none;
+  outline: none;
+  border: none;
+
+  border-bottom: 1px solid @input-border-color;
+  transition:    border-bottom-color .2s ease-in;
+}
+
+.input--valid {
+  .input();
+  border-bottom-color: @caribbean;
+}
+
+.input--invalid {
+  .input();
+  border-bottom-color: @ruby;
+}
