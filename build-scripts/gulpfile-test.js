@@ -72,6 +72,7 @@ var testModules = {
 var modulesWithTest = glob.sync('./modules/*/test', {
   ignore: './modules/topics-ui/**/*'
 });
+
 modulesWithTest.forEach(function(testDir) {
   var moduleDir = path.dirname(testDir);
   var moduleName = path.basename(moduleDir);

@@ -1,12 +1,14 @@
-"use strict";
 
-require('../less/index.less');
+import '../less/index.less';
 
-var React = require('react');
-var reactDOM = require('react-dom');
-var app = require('./app.jsx');
-var App = React.createFactory(app);
-var appRoot = document.getElementById('app-root');
-var context = window.context;
+import Backbone from 'backbone';
+import React from 'react';
+import reactDOM from 'react-dom';
+import app from './app.jsx';
+import router from './routers/index';
 
-reactDOM.render(App(context), appRoot);
+const App = React.createFactory(app);
+const appRoot = document.getElementById('app-root');
+
+Backbone.history.start({ pushState: true });
+reactDOM.render(App({ router: router }), appRoot);

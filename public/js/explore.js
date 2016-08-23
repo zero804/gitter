@@ -7,11 +7,14 @@ var toggleClass = require('utils/toggle-class');
 var ExploreView = require('views/explore/explore-view');
 
 require('utils/tracking');
-require('utils/frame-utils');
+var frameUtils = require('utils/frame-utils');
 
 require('gitter-styleguide/css/components/buttons.css');
 require('gitter-styleguide/css/components/headings.css');
 
+appEvents.on('route', function(hash) {
+  frameUtils.postMessage({ type: 'route', hash: hash });
+});
 
 onready(function() {
 

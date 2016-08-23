@@ -12,9 +12,13 @@ mocha.setup('bdd');
 
 //Import all of our test files
 var requireAll = function(requireContext) {
-  return requireContext.keys().map(requireContext);
+  return requireContext.keys().map(function(filePath){
+    //Dont test server files in the browser
+    if(/server/.test(filePath)) { return; }
+    return requireContext(filePath);
+  });
 };
-requireAll(require.context('../specs', true, /^\.\/.*-test\.js$/));
+requireAll(require.context('../specs', true, /^\.\/.*-test\.jsx?$/));
 
 //Mocha config
 mocha.allowUncaught();

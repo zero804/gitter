@@ -4,12 +4,17 @@
 var Promise = require('bluebird');
 var isGitHubUser = require('gitter-web-identity/lib/is-github-user');
 
+function userUsernameMatchesUri(user, uri) {
+  if (!user || !user.username || !uri) return false;
+  return user.username.toLowerCase() === uri.toLowerCase();
+}
+
 function GitHubRepoPolicyEvaluator(user, uri) {
   this.user = user;
   this.uri = uri;
 
   // TODO: currently assumes githubUsername == username
-  this._access = isGitHubUser(user) && !!(user.username && user.username === uri);
+  this._access = isGitHubUser(user) && userUsernameMatchesUri(user, uri);
 }
 
 GitHubRepoPolicyEvaluator.prototype = {

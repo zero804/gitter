@@ -13,9 +13,9 @@ function forEmail(email, size) {
 
 function forChecksum(checksum, size) {
   if (size) {
-    return 'https://secure.gravatar.com/avatar/' + checksum + '?s=' + size;
+    return 'https://secure.gravatar.com/avatar/' + checksum + '?d=https%3A%2F%2Favatars.gitter.im%2Fdefault.png&s=' + size;
   } else {
-    return 'https://secure.gravatar.com/avatar/' + checksum;
+    return 'https://secure.gravatar.com/avatar/' + checksum + '?d=https%3A%2F%2Favatars.gitter.im%2Fdefault.png';
   }
 }
 

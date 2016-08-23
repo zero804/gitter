@@ -1,0 +1,14 @@
+"use strict";
+
+var assert = require('assert');
+
+var createAction = require('../../../../../browser/js/action-creators/{{actionBaseDir}}/{{dashCase name}}');
+var constants = require('../../../../../browser/js/constants/{{constantFile}}');
+
+describe('{{camelCase name}}', () => {
+
+  it('should return the right type', () => {
+    assert.equal(createAction().type, constants.{{constantCase name}});
+  });
+
+});
