@@ -1,7 +1,5 @@
-"use strict";
-
-var Backbone = require('backbone');
-var routeData = require('./mock-data/route');
+import Backbone from 'backbone';
+import routeData from './mock-data/route';
 
 var MockRouter = Backbone.Model.extend({});
 
@@ -11,4 +9,4 @@ afterEach(function(){
   router.set(routeData)
 })
 
-module.exports = router;
+export default router;

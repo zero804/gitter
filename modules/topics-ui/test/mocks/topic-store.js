@@ -1,7 +1,5 @@
-"use strict";
-
-var Backbone = require('backbone');
-var data = require('./mock-data/topics');
+import Backbone from 'backbone';
+import data from './mock-data/topics';
 
 var CategoryStore = Backbone.Collection.extend({
   getTopics: function(){
@@ -18,4 +16,4 @@ afterEach(function(){
   store.reset(data);
 });
 
-module.exports = store;
+export default store;

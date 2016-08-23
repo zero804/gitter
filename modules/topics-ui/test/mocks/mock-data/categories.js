@@ -1,6 +1,5 @@
-"use strict";
 
-module.exports = [
+export default [
   { category: 'all', active: true, slug: 'all' },
   { category: 'test-1', active: false, slug: 'test-1' },
   { category: 'test-2', active: false, slug: 'test-2' },
