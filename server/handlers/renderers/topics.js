@@ -42,9 +42,16 @@ function renderForum(req, res, next, options) {
       //context.accessToken
       return groupService.findByUri(groupUri)
         .then(function(group){
+
+          if (!group) { return next(new StatusError(404, 'Group not found.')); }
+          if (!group.forumId) { return next(new StatusError(404, 'Forum not found.')); }
+
           return forumService.findById(group.forumId);
         })
         .then(function(forum){
+
+          if(!forum) { return next(new StatusError(404, 'Forum not found')); }
+
           var strategy = new restSerializer.ForumStrategy();
           return restSerializer.serializeObject(forum, strategy);
         })
@@ -97,9 +104,16 @@ function renderTopic(req, res, next) {
     .then(function(context){
       return groupService.findByUri(groupUri)
         .then(function(group){
+
+          if (!group) { return next(new StatusError(404, 'Group not found.')); }
+          if (!group.forumId) { return next(new StatusError(404, 'Forum not found.')); }
+
           return topicService.findByIdForForum(group.forumId, topicId);
         })
         .then(function(topic){
+
+          if (!topic) { return next(new StatusError(404, 'Topic not found.')); }
+
           var strategy = new restSerializer.TopicStrategy({
             includeReplies: true,
             includeRepliesTotals: true,

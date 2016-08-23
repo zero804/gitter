@@ -1,11 +1,10 @@
-import {equal, ok} from 'assert';
+import {equal} from 'assert';
 import {spy} from 'sinon';
 import Store from '../../../../browser/js/stores/new-topic-store';
 import {dispatch} from '../../../../shared/dispatcher';
 import updateTitle from '../../../../shared/action-creators/create-topic/title-update';
-import {STORE_UPDATE, STORE_CREATE_NEW} from '../../../../shared/constants/create-topic';
+import {STORE_UPDATE} from '../../../../shared/constants/create-topic';
 import updateBody from '../../../../shared/action-creators/create-topic/body-update';
-import submit from '../../../../shared/action-creators/create-topic/submit';
 
 export default describe('NewTopicStore', () => {
 
@@ -36,16 +35,6 @@ export default describe('NewTopicStore', () => {
     store.on(STORE_UPDATE, handle);
     dispatch(updateBody('test'));
     equal(handle.callCount, 1);
-  });
-
-  it('should trigger an event on submit', () => {
-    const handle = spy();
-    store.on(STORE_CREATE_NEW, handle);
-    dispatch(updateTitle('title'));
-    dispatch(updateBody('body'));
-    dispatch(submit());
-    equal(handle.callCount, 1);
-    ok(handle.calledWithMatch({ title: 'title', body: 'body' }));
   });
 
 });

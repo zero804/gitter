@@ -1,7 +1,5 @@
-"use strict";
-
-var Backbone = require('backbone');
-var data = require('./data/new-topic');
+import Backbone from 'backbone';
+import data from './mock-data/new-topic';
 
 var NewTopicStore = Backbone.Model.extend({});
 
@@ -11,4 +9,4 @@ afterEach(function(){
   store.set(data);
 });
 
-module.exports = store;
+export default store;

@@ -7,7 +7,7 @@ var TopicModel = Model.extend({
   defaults: {},
   url(){
     const forumId = this.collection.getForumId();
-    return this.get('id') ? '' : `/api/v1/forums/${forumId}/topics`;
+    return this.get('id') ? null : `/api/v1/forums/${forumId}/topics`;
   },
 
   sync(){
@@ -75,7 +75,9 @@ export default Collection.extend({
 
   //TODO REMOVE
   getCategoryId(){
-    return this.forumStore.get('categories')[0].id;
+    //TODO This needs to be fleshed out when the UI is completed
+    const categories = this.forumStore.get('categories');
+    if(categories && categories[0]) { return categories[0].id; }
   }
 
 });

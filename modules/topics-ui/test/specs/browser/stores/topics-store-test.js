@@ -4,7 +4,7 @@ import Store from '../../../../browser/js/stores/topics-store.js';
 import {dispatch} from '../../../../shared/dispatcher';
 import submitNewTopic from '../../../../shared/action-creators/create-topic/submit-new-topic';
 import mockRouter from '../../../mocks/router';
-import topics from '../../../mocks/data/topics';
+import topics from '../../../mocks/mock-data/topics';
 
 export default describe('TopicsStore', () => {
 
