@@ -309,3 +309,12 @@ To get an idea of whats happening to serve your requests, use:
 ```shell
 DEBUG=gitter:app:*
 ```
+
+
+### Installing the correct `eslint` dependencies globally
+
+Some development environments need to use globally installed eslint modules.
+
+The quickest way to install these is using
+
+`./build-scripts/install-eslint-globals.sh`
