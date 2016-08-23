@@ -3,7 +3,7 @@ import Backbone from 'backbone';
 import {subscribe} from '../../../shared/dispatcher';
 import * as consts from '../../../shared/constants/create-topic';
 
-module.exports = Backbone.Model.extend({
+export default Backbone.Model.extend({
 
   defaults: {},
   initialize(){

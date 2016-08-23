@@ -1,15 +1,11 @@
-"use strict";
+import * as navConstants from '../../../shared/constants/navigation';
 
-var navConstants = require('../../../shared/constants/navigation');
-
-module.exports = {
-  route: 'forum',
-  createTopic: false,
-  groupName: 'gitterHQ',
-  categoryName: navConstants.DEFAULT_CATEGORY_NAME,
-  filterName:  navConstants.DEFAULT_FILTER_NAME,
-  tagName: navConstants.DEFAULT_TAG_NAME,
-  sortName:  navConstants.DEFAULT_SORT_NAME,
-  topicId: 1234567890,
-  slug: 'this-is-a-slug'
-}
+export const route = 'forum';
+export const createTopic = false;
+export const groupName = 'gitterHQ';
+export const categoryName = navConstants.DEFAULT_CATEGORY_NAME;
+export const filterName = navConstants.DEFAULT_FILTER_NAME;
+export const tagName = navConstants.DEFAULT_TAG_NAME;
+export const sortName = navConstants.DEFAULT_SORT_NAME;
+export const topicId = 1234567890;
+export const slug = 'this-is-a-slug'
