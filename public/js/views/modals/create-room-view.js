@@ -106,7 +106,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
   initialize: function(attrs) {
     this.model = attrs.model;
     this.groupsCollection = attrs.groupsCollection;
-    this.troupeCollection = attrs.troupeCollection;
+    this.roomCollection = attrs.roomCollection;
     this.repoCollection = attrs.repoCollection;
     this.hasRendered = false;
 
@@ -349,7 +349,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
     var roomName = this.model.get('roomName');
 
     var repoCheckString = group.get('uri') + '/' + roomName;
-    var roomAlreadyExists = roomName && this.troupeCollection.findWhere({ uri: repoCheckString });
+    var roomAlreadyExists = roomName && this.roomCollection.findWhere({ uri: repoCheckString });
     if(roomAlreadyExists) {
       this.model.set('roomAvailabilityStatus', roomAvailabilityStatusConstants.UNAVAILABLE);
     }
