@@ -7,7 +7,8 @@ module.exports = function forumCategoryStore(categories, categoryFilter) {
 
   categories = categories.map((data) => ({
     category: data.name,
-    active: (data.slug === categoryFilter)
+    active: (data.slug === categoryFilter),
+    slug: data.slug
   }));
 
   categories.unshift({ category: 'all', active: (categoryFilter === 'all') });
