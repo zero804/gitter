@@ -1632,7 +1632,7 @@
                         "extsprintf": {
                           "version": "1.0.2",
                           "from": "extsprintf@1.0.2",
-                          "resolved": "http://beta-internal:4873/extsprintf/-/extsprintf-1.0.2.tgz"
+                          "resolved": "https://registry.npmjs.org/extsprintf/-/extsprintf-1.0.2.tgz"
                         },
                         "json-schema": {
                           "version": "0.2.2",
@@ -4547,7 +4547,7 @@
                     "extsprintf": {
                       "version": "1.0.2",
                       "from": "extsprintf@1.0.2",
-                      "resolved": "http://beta-internal:4873/extsprintf/-/extsprintf-1.0.2.tgz"
+                      "resolved": "https://registry.npmjs.org/extsprintf/-/extsprintf-1.0.2.tgz"
                     },
                     "json-schema": {
                       "version": "0.2.2",
@@ -5083,7 +5083,7 @@
                     "extsprintf": {
                       "version": "1.0.2",
                       "from": "extsprintf@1.0.2",
-                      "resolved": "http://beta-internal:4873/extsprintf/-/extsprintf-1.0.2.tgz"
+                      "resolved": "https://registry.npmjs.org/extsprintf/-/extsprintf-1.0.2.tgz"
                     },
                     "json-schema": {
                       "version": "0.2.2",
@@ -5636,7 +5636,7 @@
           "dependencies": {
             "strip-ansi": {
               "version": "3.0.1",
-              "from": "strip-ansi@>=3.0.0 <4.0.0",
+              "from": "strip-ansi@>=3.0.1 <4.0.0",
               "resolved": "http://beta-internal:4873/strip-ansi/-/strip-ansi-3.0.1.tgz",
               "dependencies": {
                 "ansi-regex": {
