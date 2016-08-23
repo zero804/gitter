@@ -181,7 +181,7 @@ router.get('/accept-invite/:secret',
   ensureLoggedIn,
   function(req, res, next) {
     var secret = req.params.secret;
-    return acceptInviteService.acceptInvite(req.user, secret, req.query.source)
+    return acceptInviteService.acceptInvite(req.user, secret, { source: req.query.source })
       .then(function(room) {
         return resolveRoomUri(room, req.user._id);
       })
