@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react';
+import _ from 'lodash';
 
 export default React.createClass({
 
@@ -11,10 +12,10 @@ export default React.createClass({
   render(){
     const { options } = this.props;
     const { onChange } = this;
-    const defaultVal = options.reduce(function(memo, option){
-      if(!!option.active) { return option.value; }
-      return memo;
-    });
+    const activeOption = _.find(options, { active: true });
+    let defaultVal = null;
+    if(activeOption) { defaultVal = activeOption.value; }
+
 
     return (
       <div className="table-control__select-decal">

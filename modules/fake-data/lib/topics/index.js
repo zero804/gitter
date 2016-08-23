@@ -13,9 +13,6 @@ module.exports = function getFakeTopicsList(){
   if(!topics) {
     topics = _.range(getRandomInt(3, 10)).map(function(val){
 
-      var title = faker.commerce.productName();
-      var titleHTML = '<h1>' + title + '</h1>';
-
       var body = faker.hacker.phrase();
       var bodyHTML = '<p>' + body + '</p>';
 
@@ -27,14 +24,25 @@ module.exports = function getFakeTopicsList(){
 
       var topic = {
         id: val,
-        title: { text: title, html: titleHTML },
+        title: faker.commerce.productName(),
         body: { text: body, html: bodyHTML},
+        category: 'test',
+        tags: [ 'test1', 'test2', 'test3', 'test4', 'test5' ],
         repliesTotal: replies.length,
         replies: replies,
         participatingTotal: getRandomInt(8, 25),
         isFaved: getRandomBool(),
         isParticipating: getRandomBool(),
         isWatching: getRandomBool(),
+        user: {
+          id: 12345,
+          username: 'testy-mc-testface',
+          displayName: 'Testy McTestFace',
+          url: '/testy-mc-testface',
+          staff: true,
+          v: 1,
+          avatarUrl: 'https://avatars-04.gitter.im/group/iv/1/578f6877c2f0db084a23d707?s=22'
+        }
       };
 
       return topic;

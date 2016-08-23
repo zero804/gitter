@@ -1,4 +1,3 @@
-
 import * as forumCatConstants from '../../constants/forum-categories';
 
 export default function navigateToCategory(category) {

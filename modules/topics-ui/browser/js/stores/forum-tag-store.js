@@ -10,7 +10,8 @@ export default Collection.extend({
 
   onTagUpdate(model, val){
     this.where({ active: true }).forEach((m) => m.set('active', false));
-    this.findWhere({ value: val }).set('active', true);
+    const activeModel = this.findWhere({ value: val });
+    if(activeModel) { activeModel.set('active', true); }
     this.trigger(UPDATE_ACTIVE_TAG);
   },
 
