@@ -169,7 +169,6 @@
     "benchmark": "^2.1.0",
     "cal-heatmap": "^3.5.4",
     "chokidar": "^1.4.3",
-    "classnames": "^2.2.3",
     "concurrently": "^2.0.0",
     "css-loader": "^0.23.1",
     "css-mqpacker": "^3.0.0",
