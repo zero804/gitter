@@ -2,7 +2,7 @@ import {equal} from 'assert';
 import React from 'react';
 import { mount } from 'enzyme';
 import TopicsTableBody from '../../../../../../shared/containers/components/forum/topics-table-body.jsx';
-import topics from '../../../../../mocks/data/topics';
+import topics from '../../../../../mocks/mock-data/topics';
 
 describe('<TopicsTableBody/>', () => {
 
