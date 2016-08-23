@@ -15,16 +15,10 @@ export default createClass({
     }).isRequired,
   },
 
-  getInitialState(){
-    const { topicsStore, topicId } = this.props;
-    return {
-      topic: topicsStore.getById(topicId)
-    }
-  },
-
   render(){
 
-    const { topic } = this.state;
+    const { topicId, topicsStore } = this.props;
+    const topic = topicsStore.getById(topicId)
 
     return (
       <main>

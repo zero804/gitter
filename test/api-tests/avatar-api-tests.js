@@ -72,12 +72,12 @@ describe('avatar-api', function() {
     name: '/gravatar/e/:email',
     url: '/gravatar/e/andrewn@datatribe.net',
     expected: null,
-    proxyRedirect: '/fetch_lt/https://secure.gravatar.com/avatar/2644d6233d2c210258362f7f0f5138c2?s=128'
+    proxyRedirect: '/fetch_lt/https://secure.gravatar.com/avatar/2644d6233d2c210258362f7f0f5138c2?d=https%3A%2F%2Favatars.gitter.im%2Fdefault.png&s=128'
   }, {
     name: '/gravatar/m/:md5',
     url: '/gravatar/m/2644d6233d2c210258362f7f0f5138c2',
     expected: null,
-    proxyRedirect: '/fetch_lt/https://secure.gravatar.com/avatar/2644d6233d2c210258362f7f0f5138c2?s=128'
+    proxyRedirect: '/fetch_lt/https://secure.gravatar.com/avatar/2644d6233d2c210258362f7f0f5138c2?d=https%3A%2F%2Favatars.gitter.im%2Fdefault.png&s=128'
   }, {
     name: '/tw/i/:id/:filename',
     url: '/tw/i/378800000308609669/c5cc5261cc55da2dbca442eaf60920cc_normal.jpeg',

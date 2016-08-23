@@ -1,14 +1,12 @@
-"use strict";
-
-var Backbone = require('backbone');
-var data = require('./data/topics');
+import Backbone from 'backbone';
+import data from './mock-data/topics';
 
 var CategoryStore = Backbone.Collection.extend({
   getTopics: function(){
     return this.models.map(function(model){ return model.toJSON(); });
   },
-  getById: function(){
-    return this.models[0].toJSON();
+  getById: function(id){
+    return this.get(id).toJSON();
   }
 });
 
@@ -18,4 +16,4 @@ afterEach(function(){
   store.reset(data);
 });
 
-module.exports = store;
+export default store;

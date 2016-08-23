@@ -3,7 +3,7 @@ import sinon from 'sinon';
 import CategoryStore from '../../../../browser/js/stores/forum-category-store';
 import * as forumCatConstants from '../../../../shared/constants/forum-categories';
 import mockRouter from '../../../mocks/router';
-import categories from '../../../mocks/data/categories';
+import categories from '../../../mocks/mock-data/categories';
 
 describe('ForumCategoryStore', function(){
 

@@ -6,14 +6,16 @@ var proxyquireNoCallThru = require("proxyquire").noCallThru();
 
 describe('gh-org-policy-delegate', function() {
 
-  var ORG1_USER = { _id: 1, username: 'x' };
-  var NOT_ORG1_USER = { _id: 2, username: 'y' };
+  var ORG1_USER = { _id: 1, username: 'x', githubToken: '1' };
+  var NOT_ORG1_USER = { _id: 2, username: 'y', githubToken: '1' };
+  var NON_GITHUB_USER = { _id: 2, username: 'y' };
   var INVALID_USER = { _id: 3 };
   var ORG1 = 'org1';
 
   var FIXTURES = [
     { name: 'is org member', org: ORG1, user: ORG1_USER, policy: 'GH_ORG_MEMBER', expectedResult: true },
     { name: 'is not org member', org: ORG1, user: NOT_ORG1_USER, policy: 'GH_ORG_MEMBER', expectedResult: false },
+    { name: 'is not a github user', org: ORG1, user: NON_GITHUB_USER, policy: 'GH_ORG_MEMBER', expectedResult: false },
     { name: 'anonymous', org: ORG1, user: null, policy: 'GH_ORG_MEMBER', expectedResult: false },
     { name: 'user sans username', org: ORG1, user: INVALID_USER, policy: 'GH_ORG_MEMBER', expectedResult: false },
     { name: 'invalid policy', org: ORG1, user: INVALID_USER, policy: 'INVALID', expectedResult: false },

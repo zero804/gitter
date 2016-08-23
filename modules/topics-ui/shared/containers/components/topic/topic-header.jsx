@@ -10,7 +10,9 @@ export default React.createClass({
   propTypes: {
     topic: PropTypes.shape({
       title: PropTypes.string,
-      category: PropTypes.string,
+      category: PropTypes.shape({
+        category: PropTypes.string.isRequired,
+      }),
       tags: PropTypes.array,
       user: PropTypes.shape({
         avatarUrl: PropTypes.string.isRequired,
@@ -29,14 +31,14 @@ export default React.createClass({
         <Panel>
           <header>
             <section className="topic-header">
-              <UserAvatar user={user} width={44} height={44}/>
+              <UserAvatar className="topic-header__avatar" user={user} width={44} height={44}/>
               <div>
                 <span className="topic-header__username">{displayName}</span>
                 <H1 className="topic-header__title">{title}</H1>
               </div>
             </section>
             <section className="topic-header__control-row">
-              <a className="topic-header__category-link" title="More {category} topics">{category.name}</a>
+              <a className="topic-header__category-link" title={`More {category} topics`}>{category.category}</a>
               <ul className="topic-header__tag-list">{tags.map((tag, i) => this.buildTagView(tag, i))}</ul>
             </section>
           </header>

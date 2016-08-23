@@ -3,7 +3,6 @@ import CreateTopicModal from './components/topic/create-topic-modal.jsx';
 import { dispatch } from '../dispatcher';
 import titleUpdate from '../action-creators/create-topic/title-update';
 import bodyUpdate from '../action-creators/create-topic/body-update';
-import submit from '../action-creators/create-topic/submit';
 import * as consts from '../constants/create-topic';
 import submitNewTopic from '../action-creators/create-topic/submit-new-topic';
 import navigateToTopic from '../action-creators/topic/navigate-to-topic';
@@ -29,13 +28,11 @@ export default createClass({
 
   componentDidMount(){
     const {newTopicStore, topicsStore} = this.props;
-    newTopicStore.on(consts.STORE_CREATE_NEW, this.onStoreCreateNew, this);
     topicsStore.on(consts.TOPIC_CREATED, this.onTopicCreated, this);
   },
 
   componentWillUnmount(){
     const {newTopicStore, topicsStore} = this.props;
-    newTopicStore.off(consts.STORE_CREATE_NEW, this.onStoreCreateNew, this);
     topicsStore.off(consts.TOPIC_CREATED, this.onTopicCreated, this);
   },
 
@@ -66,10 +63,6 @@ export default createClass({
   },
 
   onSubmit(){
-    dispatch(submit());
-  },
-
-  onStoreCreateNew(){
     const {newTopicStore} = this.props;
     dispatch(submitNewTopic(
       newTopicStore.get('title'),

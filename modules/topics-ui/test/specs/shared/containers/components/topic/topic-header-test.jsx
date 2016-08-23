@@ -2,7 +2,7 @@ import {equal} from 'assert';
 import React from 'react';
 import { shallow } from 'enzyme';
 import TopicHeader from '../../../../../../shared/containers/components/topic/topic-header.jsx';
-import topics from '../../../../../mocks/data/topics';
+import topics from '../../../../../mocks/mock-data/topics';
 
 describe('<TopicHeader/>', () => {
 
@@ -52,7 +52,11 @@ describe('<TopicHeader/>', () => {
   });
 
   it('should render a control row', () => {
-      equal(wrapper.find('.topic-header__control-row').length, 1);
+    equal(wrapper.find('.topic-header__control-row').length, 1);
+  });
+
+  it('should render a custom avatar', () => {
+    equal(wrapper.find('.topic-header__avatar').length, 1);
   });
 
 });

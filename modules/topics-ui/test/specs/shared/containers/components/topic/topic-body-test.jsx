@@ -2,7 +2,7 @@ import {equal} from 'assert';
 import React from 'react';
 import { shallow } from 'enzyme';
 import TopicBody from '../../../../../../shared/containers/components/topic/topic-body.jsx';
-import topics from '../../../../../mocks/data/topics';
+import topics from '../../../../../mocks/mock-data/topics';
 
 describe('<TopicBody/>', () => {
 
