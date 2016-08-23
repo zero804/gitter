@@ -52,7 +52,11 @@ describe.skip('<TopicHeader/>', () => {
   });
 
   it('should render a control row', () => {
-      equal(wrapper.find('.topic-header__control-row').length, 1);
+    equal(wrapper.find('.topic-header__control-row').length, 1);
+  });
+
+  it('should render a custom avatar', () => {
+    equal(wrapper.find('.topic-header__avatar').length, 1);
   });
 
 });
