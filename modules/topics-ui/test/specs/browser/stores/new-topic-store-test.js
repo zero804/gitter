@@ -38,14 +38,4 @@ export default describe('NewTopicStore', () => {
     equal(handle.callCount, 1);
   });
 
-  it('should trigger an event on submit', () => {
-    const handle = spy();
-    store.on(STORE_CREATE_NEW, handle);
-    dispatch(updateTitle('title'));
-    dispatch(updateBody('body'));
-    dispatch(submit());
-    equal(handle.callCount, 1);
-    ok(handle.calledWithMatch({ title: 'title', body: 'body' }));
-  });
-
 });
