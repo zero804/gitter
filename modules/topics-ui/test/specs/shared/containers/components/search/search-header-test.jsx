@@ -16,7 +16,7 @@ describe('<SearchHeader/>', () => {
   });
 
   it('should render a panel', () => {
-      equal(wrapper.find('Panel').length, 1);
+    equal(wrapper.find('Panel').length, 1);
   });
 
 });
