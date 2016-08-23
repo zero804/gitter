@@ -71,4 +71,8 @@ describe('<ForumContainer />', function(){
     assert.equal(wrapper.find('TopicsTable').length, 1);
   });
 
+  it('should render a search header', () => {
+    assert.equal(wrapper.find('SearchHeader').length, 1);
+  });
+
 });
