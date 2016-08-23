@@ -97,14 +97,6 @@ function upsertUser(user) {
   return elasticClient.update(createUserUpdate(user))
 }
 
-module.exports = {
-  query: query,
-  reindex: reindex,
-  addUsersToGroupRoom: addUsersToGroupRoom,
-  removeUsersFromRoom: removeUsersFromRoom,
-  upsertUser: upsertUser
-};
-
 function createIndex(name) {
   debug('creating index %s', name);
   return elasticClient.indices.create({
@@ -352,3 +344,12 @@ function createRemoveMembershipUpdate(userId, roomId) {
     _retry_on_conflict: 3
   }
 }
+
+
+module.exports = {
+  query: query,
+  reindex: reindex,
+  addUsersToGroupRoom: addUsersToGroupRoom,
+  removeUsersFromRoom: removeUsersFromRoom,
+  upsertUser: upsertUser
+};

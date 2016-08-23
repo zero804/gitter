@@ -20,7 +20,7 @@ var chatService = require('../../services/chat-service');
 var restSerializer = require("../../serializers/rest-serializer");
 var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
 var redirectErrorMiddleware = require('../uri-context/redirect-error-middleware');
-var topicsRenderers = require('../renderers/topics');
+var topicRouter = require('./topics');
 
 function saveRoom(req) {
   var userId = req.user && req.user.id;
@@ -171,13 +171,8 @@ var cardMiddlewarePipeline = [
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
-router.get('/:roomPart1/topics',
-  identifyRoute('org-base-topic'),
-  featureToggles,
-  function(req, res, next){
-    return topicsRenderers.renderForum(req, res, next);
-  }
-);
+//Topics
+router.use('/:groupName/topics', topicRouter);
 
 [
   '/:roomPart1/~chat',                         // ORG or ONE_TO_ONE
@@ -225,5 +220,6 @@ router.get('/:roomPart1/topics',
       res.redirect(req.uri);
     });
 });
+
 
 module.exports = router;

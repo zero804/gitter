@@ -4,7 +4,7 @@ var Promise = require('bluebird');
 var RepoService = require('gitter-web-github').GitHubRepoService;
 var OrgService = require('gitter-web-github').GitHubOrgService;
 var GitHubIssueService = require('gitter-web-github').GitHubIssueService;
-var processChat = require('../../../utils/markdown-processor');
+var processText = require('gitter-web-text-processor');
 var StatusError = require('statuserror');
 var loadTroupeFromParam = require('./load-troupe-param');
 var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
@@ -106,7 +106,7 @@ module.exports = {
         if(!issue) throw new StatusError(404);
 
         if(req.query.renderMarkdown && issue.body) {
-          return processChat(issue.body)
+          return processText(issue.body)
             .then(function(result) {
               issue.body_html = result.html;
               return issue;

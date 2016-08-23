@@ -8,8 +8,10 @@ var roomService = require('./room-service');
 var secureMethod = require('../utils/secure-method');
 var validateRoomName = require('gitter-web-validators/lib/validate-room-name');
 var validateProviders = require('gitter-web-validators/lib/validate-providers');
-var groupService = require('gitter-web-groups/lib/group-service');
 var troupeService = require('./troupe-service');
+var groupService = require('gitter-web-groups/lib/group-service');
+var forumService = require('gitter-web-topics/lib/forum-service');
+var securityDescriptorGenerator = require('gitter-web-permissions/lib/security-descriptor-generator');
 
 /**
  * @private
@@ -142,5 +144,54 @@ GroupWithPolicyService.prototype._ensureAccessAndFetchRoomInfo = function(option
         });
     })
 }
+
+
+/**
+ * Allow admins to create a new forum
+ * @return {Promise} Promise of forum
+ */
+GroupWithPolicyService.prototype.createForum = secureMethod([allowAdmin], function() {
+  var user = this.user;
+  var group = this.group;
+
+  // For now we only allow one forum per group.
+  // We don't upsert into the existing one either.
+  // NOTE: should this check be part of an integration service too?
+  if (group.forumId) {
+    throw new StatusError(409, 'Group already has a forum.');
+  }
+
+  // TODO: this stuff should be moved to an integration service
+
+  // There is nothing configurable at this stage on forum level.
+  var forumInfo = {};
+
+  // TODO: this is hardcoded for now, but down the line the user should be able
+  // to make it PRIVATE too.
+  var securityDescriptor = securityDescriptorGenerator.generate(user, {
+    type: 'GROUP',
+    internalId: group._id,
+    security: 'PUBLIC'
+  });
+
+  return forumService.createForum(user, forumInfo, securityDescriptor)
+    .bind({
+      forum: null,
+      category: null
+    })
+    .then(function(forum) {
+      this.forum = forum;
+
+      // store the forum as the group's forum
+      return groupService.setForumForGroup(group._id, forum._id);
+    })
+    .then(function() {
+      return this.forum;
+    });
+});
+
+GroupWithPolicyService.prototype.setAvatar = secureMethod([allowAdmin], function(url) {
+  groupService.setAvatarForGroup(this.group._id, url);
+});
 
 module.exports = GroupWithPolicyService;

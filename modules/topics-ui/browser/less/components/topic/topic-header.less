@@ -1,0 +1,42 @@
+@import "../../colors";
+@import (less, reference) "~gitter-styleguide/css/components/headings.css";
+@import (less, reference) "~gitter-styleguide/css/components/buttons.css";
+
+.topic-header {
+  display: flex;
+}
+
+.topic-header__avatar {
+  margin-right: 2rem;
+}
+
+.topic-header__title {
+  color: @light;
+  font-weight: 100;
+}
+
+.topic-header__username {
+  &:extend(.h5 all);
+  display:       block;
+  margin-bottom: -1.5rem;
+  color:         @topic-username-color;
+}
+
+.topic-header__control-row {
+  display:         flex;
+  align-items:     center;
+  justify-content: flex-start;
+}
+
+.topic-header__category-link {
+  &:extend(.button-clouds--xsmall);
+}
+
+.topic-header__tag-list {
+  margin: 0;
+  padding: 0;
+}
+
+.topic-header__tag-link {
+  &:extend(.secondary-button-clouds--small);
+}
