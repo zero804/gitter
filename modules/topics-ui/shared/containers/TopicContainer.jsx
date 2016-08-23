@@ -17,7 +17,7 @@ export default createClass({
 
   render(){
 
-    const { topicId } = this.props;
+    const { topicId, topicsStore } = this.props;
     const topic = topicsStore.getById(topicId)
 
 
