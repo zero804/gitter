@@ -19,14 +19,21 @@ initialize: function(attrs, options) {
     this.listenTo(this.model, 'change:hidden', this.render, this);
   },
 
-  onRoomChange: function (model, val){
+  onRoomChange: function(model, val) {
+    var roomId = val;
     var groupUri = getOrgNameFromUri(this.getRoomUri());
     //For any /home/* url's just hide
-    if(/^home/.test(groupUri)) { return this.model.get('hidden', true); }
+    if(/^home/.test(groupUri)) { return this.model.set('hidden', true); }
     var hasGroup = !!this.groupCollection.findWhere({ uri: groupUri });
+    var hasJoinedRoom = !!this.roomCollection.get(roomId);
+
+    // Don't show the temp group if the group is already in the main list
+    // or if we already joined a room (like a one-to-one)
+    var shouldHideTempGroup = hasGroup || hasJoinedRoom;
+
     //Render so we can get the right src on the buttons img
     if(!hasGroup) { this.render(); }
-    this.model.set('hidden', hasGroup);
+    this.model.set('hidden', shouldHideTempGroup);
   },
 
   serializeData: function (){
