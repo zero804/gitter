@@ -3,7 +3,7 @@ import React from 'react';
 import { shallow } from 'enzyme';
 import SearchHeader from '../../../../../../shared/containers/components/search/search-header.jsx';
 
-describe('<SearchHeader/>', () => {
+describe.only('<SearchHeader/>', () => {
 
   let wrapper;
 
@@ -17,6 +17,14 @@ describe('<SearchHeader/>', () => {
 
   it('should render a panel', () => {
     equal(wrapper.find('Panel').length, 1);
+  });
+
+  it('should render a ForumCategoryLink', () => {
+    equal(wrapper.find('ForumCategoryLink').length, 1);
+  });
+
+  it('should render a h1', () => {
+    equal(wrapper.find('H1').length, 1);
   });
 
 });

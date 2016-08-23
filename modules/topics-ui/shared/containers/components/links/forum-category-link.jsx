@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 import navigateToCategory from '../../../action-creators/forum/navigate-to-category';
 import {dispatch} from '../../../dispatcher';
+import classNames from 'classnames';
 
 export default React.createClass({
 
@@ -12,12 +13,13 @@ export default React.createClass({
       category: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
     }),
-    onClick: PropTypes.func
+    onClick: PropTypes.func,
+    className: PropTypes.string
   },
 
   render(){
 
-    const {category, groupName} = this.props;
+    const {category, groupName, className} = this.props;
     const { slug } = category;
     //TODO, should do something about this
     const categoryName = category.category;
@@ -27,7 +29,7 @@ export default React.createClass({
       `/${groupName}/topics/categories/${slug}`;
 
     return (
-      <a title={title} href={href} onClick={this.onClick}>{this.props.children}</a>
+      <a title={title} href={href} className={className} onClick={this.onClick}>{this.props.children}</a>
     );
   },
 
@@ -35,7 +37,7 @@ export default React.createClass({
     e.preventDefault();
     const {onClick, category} = this.props;
     if(onClick) { return onClick(e, category); }
-    dispatch(navigateToCategory(category));
+    dispatch(navigateToCategory(category.slug));
   }
 
 });

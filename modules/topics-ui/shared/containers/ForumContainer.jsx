@@ -106,7 +106,7 @@ export default React.createClass({
     const { groupName, newTopicStore, topicsStore } = this.props;
     return (
       <main>
-        <SearchHeader />
+        <SearchHeader groupName={groupName}/>
         <CategoryList
           groupName={ groupName }
           categories={ categories }
