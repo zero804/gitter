@@ -20,7 +20,6 @@ export default createClass({
     const { topicId, topicsStore } = this.props;
     const topic = topicsStore.getById(topicId)
 
-
     return (
       <main>
         <TopicHeader topic={topic}/>

@@ -28,13 +28,11 @@ export default createClass({
 
   componentDidMount(){
     const {newTopicStore, topicsStore} = this.props;
-    newTopicStore.on(consts.STORE_CREATE_NEW, this.onStoreCreateNew, this);
     topicsStore.on(consts.TOPIC_CREATED, this.onTopicCreated, this);
   },
 
   componentWillUnmount(){
     const {newTopicStore, topicsStore} = this.props;
-    newTopicStore.off(consts.STORE_CREATE_NEW, this.onStoreCreateNew, this);
     topicsStore.off(consts.TOPIC_CREATED, this.onTopicCreated, this);
   },
 
