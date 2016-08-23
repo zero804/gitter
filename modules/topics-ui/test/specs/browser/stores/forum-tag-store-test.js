@@ -3,7 +3,7 @@ import sinon from 'sinon';
 import ForumTagStore from '../../../../browser/js/stores/forum-tag-store';
 import * as forumTagConstants from '../../../../shared/constants/forum-tags';
 import mockRouter from '../../../mocks/router';
-import tags from '../../../mocks/data/tags';
+import tags from '../../../mocks/mock-data/tags';
 
 describe('TagStore', () => {
 

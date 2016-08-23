@@ -1,7 +1,7 @@
 "use strict";
 
 var Backbone = require('backbone');
-var routeData = require('./data/route');
+var routeData = require('./mock-data/route');
 
 var MockRouter = Backbone.Model.extend({});
 

@@ -1,7 +1,7 @@
 "use strict";
 
 var Backbone = require('backbone');
-var data = require('./data/topics');
+var data = require('./mock-data/topics');
 
 var CategoryStore = Backbone.Collection.extend({
   getTopics: function(){

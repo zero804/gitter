@@ -1,7 +1,7 @@
 "use strict";
 
 var Backbone = require('backbone');
-var data = require('./data/tags');
+var data = require('./mock-data/tags');
 
 var CategoryStore = Backbone.Collection.extend({
   getTags: function(){

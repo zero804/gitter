@@ -1,7 +1,7 @@
 "use strict";
 
 var Backbone = require('backbone');
-var data = require('./data/new-topic');
+var data = require('./mock-data/new-topic');
 
 var NewTopicStore = Backbone.Model.extend({});
 
