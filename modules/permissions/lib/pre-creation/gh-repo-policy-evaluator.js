@@ -4,6 +4,7 @@ var Promise = require('bluebird');
 var debug = require('debug')('gitter:app:permissions:pre-creation:gh-repo-policy-evaluator');
 var PolicyDelegateTransportError = require('../policies/policy-delegate-transport-error');
 var GitHubRepoService = require('gitter-web-github').GitHubRepoService;
+var isGitHubUser = require('gitter-web-identity/lib/is-github-user');
 
 function GitHubRepoPolicyEvaluator(user, uri) {
   this.user = user;
@@ -48,6 +49,9 @@ GitHubRepoPolicyEvaluator.prototype = {
   }),
 
   canAdmin: Promise.method(function() {
+    // Non github users will never be an admin
+    if (!isGitHubUser(this.user)) return false;
+
     if (this._canAdmin) return this._canAdmin;
 
     debug('Will perform canAdmin');

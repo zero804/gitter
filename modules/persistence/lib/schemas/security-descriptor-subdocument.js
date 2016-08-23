@@ -37,9 +37,10 @@ var SecurityDescriptorSchema = new Schema({
   extraAdmins: { type: [ObjectId] },  // TODO: record who added etc?
 }, { strict: 'throw' });
 
+SecurityDescriptorSchema.index({ extraMembers: 1 }, { background: true });
+SecurityDescriptorSchema.index({ extraAdmins: 1 }, { background: true });
 
 function installIndexes(Schema, Model) {
-
   // Create a partial index for troupe security descriptors
   Model.collection.createIndex({
       'sd.type': 1,
