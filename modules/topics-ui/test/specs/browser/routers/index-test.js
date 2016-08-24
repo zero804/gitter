@@ -30,7 +30,6 @@ describe.only('Router', function(){
   });
 
   it('should start with the right default route', function(){
-    console.log(router.toJSON());
     assert.equal(router.get('route'), 'forum');
   });
 
