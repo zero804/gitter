@@ -43,7 +43,6 @@ export default React.createClass({
 
   render(){
     const { route } = this.state;
-    console.log(route);
     switch(route) {
       case navConstants.FORUM_ROUTE: return <ForumContainer {...this.state} />;
       case navConstants.CREATE_TOPIC_ROUTE: return <ForumContainer {...this.state} />;
