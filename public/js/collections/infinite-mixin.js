@@ -52,7 +52,7 @@ module.exports = (function() {
           self.trigger('fetch:latest:complete');
           self.setAtBottom(true);
 
-          var responseIds = response.map(utils.idTransform);
+          var responseIds = ((response && response.items) || []).map(utils.idTransform);
           var responseOverlaps = responseIds.some(function(id) {
             return existingIds[id];
           });
@@ -185,7 +185,7 @@ module.exports = (function() {
         data: data,
         success: function(collection, response) { // jshint unused:true
           self.trigger('fetch:at:complete');
-          var responseIds = response.map(utils.idTransform);
+          var responseIds = ((response && response.items) || []).map(utils.idTransform);
           var responseOverlaps = responseIds.some(function(id) {
             return existingIds[id];
           });
