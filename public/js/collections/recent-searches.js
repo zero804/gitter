@@ -16,6 +16,7 @@ var RecentSearchesCollection = Backbone.Collection.extend({
   // Used by localStorageSync...
   cid: 'left-menu-saved-searches',
 
+  autoResort: true,
   comparator: function(a, b) {
     return b.get('time') - a.get('time');
   },
