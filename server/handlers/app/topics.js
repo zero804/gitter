@@ -28,7 +28,7 @@ router.get('/',
 
 //Render the topics view
 router.get('/~topics',
-  identifyRoute('forum'),
+  identifyRoute('forum-embeded'),
   featureToggles,
   function(req, res, next){
 
@@ -43,6 +43,22 @@ router.get('/~topics',
 
 router.get('/categories/:categoryName',
   identifyRoute('forum'),
+  featureToggles,
+  function(req, res, next){
+
+    //No switch, no business
+    if (!req.fflip || !req.fflip.has('topics')) {
+      return next(new StatusError(404));
+    }
+
+    return mainFrameRenderers.renderMainFrame(req, res, next, {
+      subFrameLocation: '/' + req.params.groupName + '/topics/categories/' + req.params.categoryName + '/~topics'
+    });
+  }
+);
+
+router.get('/categories/:categoryName/~topics',
+  identifyRoute('forum-embedded'),
   featureToggles,
   function(req, res, next){
 
