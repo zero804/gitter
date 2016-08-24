@@ -41,6 +41,7 @@ export default Collection.extend({
   model: TopicModel,
 
   initialize(models, attrs){
+    console.log(models);
     this.accessTokenStore = attrs.accessTokenStore;
     this.forumStore = attrs.forumStore;
     subscribe(SUBMIT_NEW_TOPIC, this.creatNewTopic, this);

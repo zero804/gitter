@@ -2,6 +2,7 @@ import React, {PropTypes, createClass} from 'react';
 import TopicHeader from './components/topic/topic-header.jsx';
 import TopicBody from './components/topic/topic-body.jsx';
 import SearchHeader from './components/search/search-header.jsx';
+import TopicReplyEditor from './components/topic/topic-reply-editor.jsx';
 
 export default createClass({
 
@@ -27,6 +28,7 @@ export default createClass({
         <SearchHeader groupName={groupName}/>
         <TopicHeader topic={topic}/>
         <TopicBody topic={topic} />
+        <TopicReplyEditor />
       </main>
     );
   }

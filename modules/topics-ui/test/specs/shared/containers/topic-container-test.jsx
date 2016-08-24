@@ -4,7 +4,7 @@ import React from 'react';
 import TopicContainer from '../../../../shared/containers/TopicContainer.jsx';
 import topicsStore from '../../../mocks/topic-store';
 
-describe('<TopicContainer />', () => {
+describe.only('<TopicContainer />', () => {
 
   let wrapper;
 
@@ -27,6 +27,10 @@ describe('<TopicContainer />', () => {
 
   it('should render a SearchHeader', () => {
     equal(wrapper.find('SearchHeader').length, 1);
+  });
+
+  it('should render a TopicReplyEditor', () => {
+    equal(wrapper.find('TopicReplyEditor').length, 1);
   });
 
 });
