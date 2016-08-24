@@ -4,7 +4,7 @@ import React from 'react';
 import TopicContainer from '../../../../shared/containers/TopicContainer.jsx';
 import topicsStore from '../../../mocks/topic-store';
 
-describe.only('<TopicContainer />', () => {
+describe('<TopicContainer />', () => {
 
   let wrapper;
 
