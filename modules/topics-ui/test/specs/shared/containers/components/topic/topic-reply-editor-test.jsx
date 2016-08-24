@@ -23,4 +23,16 @@ describe('<TopicReplyEditor/>', () => {
     equal(wrapper.find('Editor').length, 1);
   });
 
+  it('should render the container with a custom class', () => {
+    equal(wrapper.find('.container--reply-editor').length, 1);
+  });
+
+  it('should render the panel with a custom class', () => {
+    equal(wrapper.find('.panel--reply-editor').length, 1);
+  });
+
+  it('should render a cutom editor class', () => {
+    equal(wrapper.find('.editor--reply').length, 1);
+  });
+
 });
