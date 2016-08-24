@@ -159,6 +159,10 @@ onready(function() {
     var iframeUrl = e.state;
     if (!iframeUrl) return;
 
+    //In the case of topics we want the topics app
+    //to handle the back button response so just bail here
+    if(/~topics$/.test(iframeUrl)) { return; }
+
     //generate title
     var urlDetails = urlParser.parse(iframeUrl);
     var pageTitle = urlDetails.pathname.split('/');
@@ -361,7 +365,14 @@ onready(function() {
       return;
     }
 
+    //Update windows location
     pushState(frameUrl, title, url);
+
+    //In the case of topics we want to update the windows location
+    //but we want to avoid reloading the frame, hence we cancel out here.
+    if(type === 'topics') { return; }
+
+    //Redirect the App
     roomSwitcher.change(frameUrl);
   });
 
@@ -426,7 +437,7 @@ onready(function() {
       'confirm/*uri': 'confirmRoom',
       'createroom': 'createRoom',
       'createroom/:name': 'createRoom',
-      'createcommunity': 'createCommunity'
+      'createcommunity': 'createCommunity',
     },
 
     hideModal: function() {
