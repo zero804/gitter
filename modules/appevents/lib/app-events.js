@@ -16,15 +16,22 @@ function makeEmitter() {
 
     // this is really useful for testing
     addListener: function(eventName, expected) {
+      var eventMatcher;
+
       var promise = new Promise(function(resolve) {
-        localEventEmitter.on(eventName, function(res) {
+        eventMatcher = function(res) {
           // NOTE: We can't reject here, because there could be other events
           // with the same event name. Therefore it is best to just time out
           // the test.
           if (_.isMatch(res, expected)) {
             resolve();
           }
-        });
+        };
+        localEventEmitter.on(eventName, eventMatcher);
+      });
+
+      promise.finally(function() {
+        localEventEmitter.removeListener(eventName, eventMatcher);
       });
 
       return function() {
