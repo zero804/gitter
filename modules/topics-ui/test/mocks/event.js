@@ -1,7 +1,8 @@
-"use strict";
-
-module.exports = {
+export default {
   preventDefault: function(){
 
+  },
+  target: {
+    value: ''
   }
 }

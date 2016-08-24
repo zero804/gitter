@@ -1,9 +1,9 @@
-import {equal, ok} from 'assert';
+import {equal} from 'assert';
 import React from 'react';
 import { shallow } from 'enzyme';
 import {spy} from 'sinon';
 import ForumCategoryLink from '../../../../../../shared/containers/components/links/forum-category-link.jsx';
-import categories from '../../../../../mocks/data/categories';
+import categories from '../../../../../mocks/mock-data/categories';
 import {NAVIGATE_TO_CATEGORY} from '../../../../../../shared/constants/forum-categories';
 import {subscribe} from '../../../../../../shared/dispatcher';
 import mockEvt from '../../../../../mocks/event';

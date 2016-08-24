@@ -4,7 +4,7 @@ import React from 'react';
 import App from '../../../browser/js/app.jsx';
 import mockRouter from '../../mocks/router';
 
-describe('App', function() {
+describe.skip('App', function() {
 
   it('should set the right state when rendered with the forum route', function(){
     const wrapper = shallow(<App router={mockRouter} />);
