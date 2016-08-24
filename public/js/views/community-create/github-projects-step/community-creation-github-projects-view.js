@@ -1,20 +1,24 @@
 'use strict';
 
 var _ = require('underscore');
-var toggleClass = require('utils/toggle-class');
-var context = require('utils/context');
+var toggleClass = require('../../../utils/toggle-class');
+var context = require('../../../utils/context');
 var slugger = require('../../../utils/slugger');
+
 var fuzzysearch = require('fuzzysearch');
 var SimpleFilteredCollection = require('gitter-realtime-client/lib/simple-filtered-collection');
 var getRoomNameFromTroupeName = require('gitter-web-shared/get-room-name-from-troupe-name');
 var scopeUpgrader = require('../../../components/scope-upgrader');
+
+
 var stepConstants = require('../step-constants');
 var template = require('./community-creation-github-projects-view.hbs');
 var CommunityCreateBaseStepView = require('../shared/community-creation-base-step-view');
 var CommunityCreationOrgListView = require('./community-creation-org-list-view');
 var CommunityCreationRepoListView = require('./community-creation-repo-list-view');
 
-require('views/behaviors/isomorphic');
+require('../../behaviors/isomorphic');
+
 require('gitter-styleguide/css/components/headings.css');
 require('gitter-styleguide/css/components/buttons.css');
 

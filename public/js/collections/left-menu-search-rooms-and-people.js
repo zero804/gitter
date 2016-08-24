@@ -2,7 +2,7 @@
 
 var Backbone = require('backbone');
 var _ = require('underscore');
-var context = require('utils/context');
+var context = require('../utils/context');
 var SearchPeopleCollection = require('./search-people');
 var SearchRoomCollection = require('./search-rooms');
 var SearchRepoCollection = require('./search-repos');

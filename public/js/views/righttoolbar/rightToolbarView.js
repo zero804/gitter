@@ -1,18 +1,18 @@
 "use strict";
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
-var context = require('utils/context');
-var toggleClass = require('utils/toggle-class');
+var context = require('../../utils/context');
+var toggleClass = require('../../utils/toggle-class');
 
-var itemCollections = require('collections/instances/integrated-items');
-var PeopleCollectionView = require('views/people/peopleCollectionView');
+var itemCollections = require('../../collections/instances/integrated-items');
+var PeopleCollectionView = require('../people/peopleCollectionView');
 var RepoInfoView = require('./repoInfo');
 var ActivityCompositeView = require('./activityCompositeView');
-var SearchView = require('views/search/searchView');
-var SearchInputView = require('views/search/search-input-view');
+var SearchView = require('../search/searchView');
+var SearchInputView = require('../search/search-input-view');
 var RepoInfoModel = require('../../collections/repo-info');
 
-require('views/behaviors/isomorphic');
+require('../behaviors/isomorphic');
 
 module.exports = (function() {
 
