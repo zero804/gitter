@@ -27,4 +27,8 @@ describe('<SearchHeader/>', () => {
     equal(wrapper.find('H1').length, 1);
   });
 
+  it('should render an Input', () => {
+    equal(wrapper.find('Input').length, 1);
+  j);
+
 });

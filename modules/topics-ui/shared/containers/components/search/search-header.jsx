@@ -3,6 +3,7 @@ import Container from '../container.jsx';
 import Panel from '../panel.jsx';
 import ForumCategoryLink from '../links/forum-category-link.jsx';
 import H1 from '../text/h-1.jsx';
+import Input from '../forms/input.jsx';
 
 export default React.createClass({
 
@@ -26,9 +27,14 @@ export default React.createClass({
                 Topics
             </ForumCategoryLink>
           </H1>
+          <Input name="Search Topics" onChange={this.onSearchUpdate}/>
         </Panel>
       </Container>
     );
+  },
+
+  onSearchUpdate(){
+
   }
 
 });
