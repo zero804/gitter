@@ -33,9 +33,9 @@ var Router = Backbone.Router.extend({
   },
 
   routes: {
-    ':groupName/topics/create-topic(/)': 'createTopic',
-    ':groupName/topics(/categories/:categoryName)(/)(?*queryString)': 'forums',
-    ':groupName/topics/topic/:id/:slug(/)(?*queryString)': 'topic'
+    ':groupName/topics/create-topic(/)~topics': 'createTopic',
+    ':groupName/topics(/categories/:categoryName)(/)~topics(?*queryString)': 'forums',
+    ':groupName/topics/topic/:id/:slug(/)~topics(?*queryString)': 'topic'
   },
 
   createTopic(groupName){
@@ -97,7 +97,7 @@ var Router = Backbone.Router.extend({
   },
 
   navigateToTopic(data){
-    const url = `/${data.groupName}/topics/topic/${data.id}/${data.slug}`;
+    const url = `/${data.groupName}/topics/topic/${data.id}/${data.slug}/~topics`;
     this.navigate(url, { trigger: true });
   },
 
@@ -128,7 +128,7 @@ var Router = Backbone.Router.extend({
       sort: sortName,
     });
 
-    if(query.length) { url = `${url}?${query}`; }
+    if(query.length) { url = `${url}~topics?${query}`; }
 
     return url;
 
