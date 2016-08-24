@@ -48,6 +48,7 @@ var Router = Backbone.Router.extend({
 
     //Remove the trailing slash
     if(appUrl[appUrl.length - 1] === '/') { appUrl = appUrl.substring(0, appUrl.length - 1); }
+    if(appUrl[0] !== '/') { appUrl = '/' + appUrl; }
 
     //Generate payload
     const json = JSON.stringify({ type: 'navigation', url: appUrl, urlType: 'topics' });
