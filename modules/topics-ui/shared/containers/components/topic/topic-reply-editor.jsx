@@ -12,10 +12,10 @@ export default React.createClass({
 
   render(){
     return (
-      <Container>
-        <Panel>
+      <Container className="container--reply-editor">
+        <Panel className="panel--reply-editor">
 
-          <Editor />
+          <Editor className="editor--reply"/>
         </Panel>
       </Container>
     );
