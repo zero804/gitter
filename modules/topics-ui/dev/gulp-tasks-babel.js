@@ -9,7 +9,7 @@ function babelPipeline(rootDir) {
       plugins: [
         "jsx-strip-ext",
         "add-module-exports"
-      ]
+      ].map(function(name) { return require.resolve('babel-plugin-' + name); })
     }));
 }
 
