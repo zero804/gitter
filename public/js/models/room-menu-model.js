@@ -141,6 +141,7 @@ module.exports = Backbone.Model.extend({
 
 
     this.activeRoomCollection = new FilteredRoomCollection(null, {
+      autoResort: true,
       roomModel:  this,
       collection: this._roomCollection,
     });
