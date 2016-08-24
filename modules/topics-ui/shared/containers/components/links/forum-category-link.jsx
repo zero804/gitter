@@ -1,7 +1,6 @@
 import React, { PropTypes } from 'react';
 import navigateToCategory from '../../../action-creators/forum/navigate-to-category';
 import {dispatch} from '../../../dispatcher';
-import classNames from 'classnames';
 
 export default React.createClass({
 
