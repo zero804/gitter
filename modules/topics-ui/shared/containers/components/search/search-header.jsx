@@ -17,7 +17,7 @@ export default React.createClass({
 
     return (
       <Container>
-        <Panel>
+        <Panel className="panel--topic-search">
           <H1>
             <ForumCategoryLink
               className="topic-search__all-topics-link"
