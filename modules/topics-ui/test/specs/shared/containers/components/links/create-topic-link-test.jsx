@@ -1,16 +1,20 @@
 import {equal} from 'assert';
+import {spy} from 'sinon';
 import React from 'react';
 import { shallow } from 'enzyme';
-import CreateTopicLink from '../../../../../../shared/containers/components/links/forum-category-link.jsx';
+import CreateTopicLink from '../../../../../../shared/containers/components/links/create-topic-link.jsx';
+import {subscribe} from '../../../../../../shared/dispatcher';
+import {NAVIGATE_TO_CREATE_TOPIC} from '../../../../../../shared/constants/create-topic';
+import mockEvt from '../../../../../mocks/event';
 
-describe.only('<CreateTopicLink/>', () => {
+describe('<CreateTopicLink/>', () => {
 
   let wrapper;
 
   beforeEach(() => {
     wrapper = shallow(
       <CreateTopicLink groupName="gitterHQ">
-        This is a link
+      This is a link
       </CreateTopicLink>
     );
   });
@@ -25,6 +29,13 @@ describe.only('<CreateTopicLink/>', () => {
 
   it('should render the a with the right href', () => {
     equal(wrapper.find('a').at(0).prop('href'), '/gitterHQ/topics/create-topic');
+  });
+
+  it('should dispatch the right event when the anchor is clicked', () => {
+    const handle = spy();
+    subscribe(NAVIGATE_TO_CREATE_TOPIC, handle);
+    wrapper.find('a').at(0).simulate('click', mockEvt);
+    equal(handle.callCount, 1);
   });
 
 });
