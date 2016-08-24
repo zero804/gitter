@@ -8,6 +8,8 @@ import * as forumFilterConstants from '../../../../shared/constants/forum-filter
 import * as forumTagConstants from '../../../../shared/constants/forum-tags';
 import * as forumSortConstants from '../../../../shared/constants/forum-sorts';
 import navigateToTopic from '../../../../shared/action-creators/topic/navigate-to-topic';
+import navigateToCreateTopic from '../../../../shared/action-creators/create-topic/navigate-to-create-topic';
+import navigateToCategory from '../../../../shared/action-creators/forum/navigate-to-category';
 
 describe('Router', function(){
 
@@ -116,6 +118,17 @@ describe('Router', function(){
     assert.equal(router.get('groupName'), 'gitterHQ');
     assert.equal(router.get('topicId'), '12345');
     assert.equal(router.get('slug'), 'slug');
+  });
+
+  it('should have the right params after moving to create topic', () => {
+    dispatch(navigateToCreateTopic());
+    assert(router.get('createTopic'));
+  });
+
+  it('should set createTopic to false when navigating from /create-topic to /topics', () => {
+    dispatch(navigateToCreateTopic());
+    dispatch(navigateToCategory('all'));
+    assert.equal(router.get('createTopic'), false);
   });
 
 });

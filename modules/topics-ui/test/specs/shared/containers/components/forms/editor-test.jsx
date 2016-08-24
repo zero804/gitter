@@ -3,6 +3,7 @@ import React from 'react';
 import sinon from 'sinon';
 import { shallow } from 'enzyme';
 import Editor from '../../../../../../shared/containers/components/forms/editor.jsx';
+import mockEvt from '../../../../../mocks/event';
 
 describe('<Editor/>', () => {
 
@@ -35,7 +36,7 @@ describe('<Editor/>', () => {
   });
 
   it('should call change when the text area updates', () => {
-    wrapper.find('textarea').simulate('change', {preventDefault: ()=>{}, target:{value: ''}});
+    wrapper.find('textarea').simulate('change', mockEvt);
     equal(changeHandle.callCount, 1);
   });
 

@@ -5,6 +5,7 @@ import { shallow } from 'enzyme';
 import TopicLink from '../../../../../../shared/containers/components/links/topic-link.jsx';
 import {subscribe} from '../../../../../../shared/dispatcher';
 import {NAVIGATE_TO_TOPIC} from '../../../../../../shared/constants/navigation.js';
+import mockEvt from '../../../../../mocks/event';
 
 describe('<TopicLink/>', () => {
 
@@ -40,7 +41,7 @@ describe('<TopicLink/>', () => {
   it('should dispatch the righ action when clicked', () => {
     const handle = spy();
     subscribe(NAVIGATE_TO_TOPIC, handle);
-    wrapper.find('a').simulate('click', {preventDefault: () => {}});
+    wrapper.find('a').simulate('click', mockEvt);
     equal(handle.callCount, 1);
   });
 
