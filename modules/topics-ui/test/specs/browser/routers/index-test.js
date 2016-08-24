@@ -9,7 +9,7 @@ import * as forumTagConstants from '../../../../shared/constants/forum-tags';
 import * as forumSortConstants from '../../../../shared/constants/forum-sorts';
 import navigateToTopic from '../../../../shared/action-creators/topic/navigate-to-topic';
 
-describe('Router', function(){
+describe.only('Router', function(){
 
   const trigger = {trigger: true};
   let filterHandle;
@@ -30,6 +30,7 @@ describe('Router', function(){
   });
 
   it('should start with the right default route', function(){
+    console.log(router.toJSON());
     assert.equal(router.get('route'), 'forum');
   });
 

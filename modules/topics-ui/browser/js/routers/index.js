@@ -40,6 +40,7 @@ var Router = Backbone.Router.extend({
   },
 
   navigate(url, options){
+
     //Remove ~topics from the url
     let appUrl = url.split('~')[0];
 
@@ -155,5 +156,13 @@ var Router = Backbone.Router.extend({
 });
 
 var router = new Router();
+
+//Deal with back/forward buttons
+window.parent.addEventListener('popstate', function(e) {
+  if(!e.state) { return; }
+  const url = e.state.replace(window.location.origin, '');
+  router.navigate(url, { trigger: true, replace: true });
+});
+
 
 export default router.model;
