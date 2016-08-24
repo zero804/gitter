@@ -1,4 +1,6 @@
 import React, { PropTypes } from 'react';
+import navigateToCreateTopic from '../../../action-creators/create-topic/navigate-to-create-topic';
+import {dispatch} from '../../../dispatcher';
 
 export default React.createClass({
 
@@ -6,6 +8,7 @@ export default React.createClass({
   propTypes: {
     children: PropTypes.node.isRequired,
     groupName: PropTypes.string.isRequired,
+    onClick: PropTypes.func
   },
 
   render(){
@@ -14,8 +17,15 @@ export default React.createClass({
     const href = `/${groupName}/topics/create-topic`;
 
     return (
-      <a title="Create a new topic" href={href}>{this.props.children}</a>
+      <a title="Create a new topic" href={href} onClick={this.onClick}>{this.props.children}</a>
     );
+  },
+
+  onClick(e){
+    e.preventDefault();
+    const {onClick} = this.props;
+    if(onClick) { return onClick(...arguments); }
+    dispatch(navigateToCreateTopic());
   }
 
 });
