@@ -81,6 +81,22 @@ router.get('/create-topic',
       return next(new StatusError(404));
     }
 
+    return mainFrameRenderers.renderMainFrame(req, res, next, {
+      subFrameLocation: '/' + req.params.groupName + '/topics/create-topic/~topics'
+    });
+  }
+);
+
+router.get('/create-topic/~topics',
+  identifyRoute('create-topic-embeded'),
+  featureToggles,
+  function(req, res, next){
+
+    //No switch, no business
+    if (!req.fflip || !req.fflip.has('topics')) {
+      return next(new StatusError(404));
+    }
+
     return topicsRenderers.renderForum(req, res, next, {
       createTopic: true
     });
