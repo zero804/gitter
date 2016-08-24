@@ -2,8 +2,8 @@
 
 var _ = require('underscore');
 var ProxyCollection = require('backbone-proxy-collection');
-var userSearchModels = require('collections/user-search');
-var UserSuggestionCollection = require('collections/user-suggestions');
+var userSearchModels = require('../../../collections/user-search');
+var UserSuggestionCollection = require('../../../collections/user-suggestions');
 
 var _super = ProxyCollection.prototype;
 

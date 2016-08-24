@@ -3,7 +3,7 @@
 var Backbone = require('backbone');
 var urlJoin = require('url-join');
 var stepConstants = require('./step-constants');
-var apiClient = require('components/apiClient');
+var apiClient = require('../../components/apiClient');
 var Promise = require('bluebird');
 var peopleToInviteStatusConstants = require('./people-to-invite-status-constants');
 

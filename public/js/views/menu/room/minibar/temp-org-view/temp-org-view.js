@@ -2,8 +2,8 @@
 
 var MinibarItemView = require('../minibar-item-view');
 var _ = require('underscore');
-var toggleClass = require('utils/toggle-class');
-var context = require('utils/context');
+var toggleClass = require('../../../../../utils/toggle-class');
+var context = require('../../../../../utils/context');
 var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
 var avatars = require('gitter-web-avatars');
 

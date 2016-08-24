@@ -1,9 +1,8 @@
 'use strict';
 
 var Marionette = require('backbone.marionette');
-var Typeahead = require('views/controls/typeahead');
+var Typeahead = require('../controls//typeahead');
 var SimpleFilteredCollection = require('gitter-realtime-client/lib/simple-filtered-collection');
-
 
 var FilteredSelect = Marionette.ItemView.extend({
   events: {
