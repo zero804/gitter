@@ -266,10 +266,10 @@ describe('policy-factory', function() {
       it('public group non-member', function() {
         return checkPolicyForGroup(fixture.user2, fixture.group1, {
           canRead: true,
-          canWrite: true, // hmm.
+          canWrite: true,
           canJoin: true,
           canAdmin: false,
-          canAddUser: true // hmm.
+          canAddUser: true
         });
       });
 
@@ -279,7 +279,7 @@ describe('policy-factory', function() {
           canWrite: true,
           canJoin: true,
           canAdmin: false,
-          canAddUser: true // hmm.
+          canAddUser: true
         });
       });
 
@@ -314,7 +314,7 @@ describe('policy-factory', function() {
       it("public forum non-member", function() {
         return checkPolicyForForum(fixture.user3, fixture.forum1, {
           canRead: true,
-          canWrite: true, // hmm.
+          canWrite: true,
           canJoin: true,
           canAdmin: false,
           canAddUser: true
