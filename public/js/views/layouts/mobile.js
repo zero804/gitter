@@ -3,13 +3,9 @@
 var context = require('../../utils/context');
 var Marionette = require('backbone.marionette');
 var $ = require('jquery');
-
-var appEvents = require('../../utils/appevents');
 var modalRegion = require('../../components/modal-region');
 var ChatContainerView = require('../chat/chatContainerView');
 var TroupeMenu = require('../menu/old/troupeMenu');
-
-var CommunityCreateModel = require('../community-create/community-create-model');
 
 //var RoomMenuLayout    = require('../menu/room/layout/room-menu-layout');
 //var appEvents         = require('../../utils/appevents');
