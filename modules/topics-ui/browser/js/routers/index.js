@@ -8,6 +8,7 @@ import * as forumTagConstants from '../../../shared/constants/forum-tags';
 import * as forumSortConstants from '../../../shared/constants/forum-sorts';
 import * as createTopicConstants from '../../../shared/constants/create-topic';
 
+
 var RouteModel = Backbone.Model.extend({
   //Do we need to use the constructor to get the default values out of the window.context
   defaults: {
@@ -35,9 +36,27 @@ var Router = Backbone.Router.extend({
   },
 
   routes: {
-    ':groupName/topics/create-topic(/)': 'createTopic',
-    ':groupName/topics(/categories/:categoryName)(/)(?*queryString)': 'forums',
-    ':groupName/topics/topic/:id/:slug(/)(?*queryString)': 'topic'
+    ':groupName/topics/create-topic(/)(~topics)': 'createTopic',
+    ':groupName/topics(/categories/:categoryName)(/)(~topics)(?*queryString)': 'forums',
+    ':groupName/topics/topic/:id/:slug(/)(~topics)(?*queryString)': 'topic'
+  },
+
+  navigate(url, options){
+
+    //Remove ~topics from the url
+    let appUrl = url.split('~')[0];
+
+    //Remove the trailing slash
+    if(appUrl[appUrl.length - 1] === '/') { appUrl = appUrl.substring(0, appUrl.length - 1); }
+
+    //Generate payload
+    const json = JSON.stringify({ type: 'navigation', url: appUrl, urlType: 'topics' });
+
+    //Proxy up to the frame
+    window.parent.postMessage(json, window.location.origin);
+
+    //Call super
+    Backbone.Router.prototype.navigate.call(this, url, options);
   },
 
   createTopic(groupName){
@@ -105,7 +124,7 @@ var Router = Backbone.Router.extend({
   },
 
   navigateToTopic(data){
-    const url = `/${data.groupName}/topics/topic/${data.id}/${data.slug}`;
+    const url = `/${data.groupName}/topics/topic/${data.id}/${data.slug}/~topics`;
     this.navigate(url, { trigger: true });
   },
 
@@ -136,7 +155,7 @@ var Router = Backbone.Router.extend({
       sort: sortName,
     });
 
-    if(query.length) { url = `${url}?${query}`; }
+    if(query.length) { url = `${url}~topics?${query}`; }
 
     return url;
 
@@ -145,5 +164,13 @@ var Router = Backbone.Router.extend({
 });
 
 var router = new Router();
+
+//Deal with back/forward buttons
+window.parent.addEventListener('popstate', function(e) {
+  if(!e.state) { return; }
+  const url = e.state.replace(window.location.origin, '');
+  router.navigate(url, { trigger: true, replace: true });
+});
+
 
 export default router.model;
