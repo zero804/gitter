@@ -25,10 +25,10 @@ onMongoConnect(function() {
     }, function(err) {
       if (err) throw err;
 
-      db.command({collMod: "col1", usePowerOf2Sizes : true }, function(err) {
+      db.command({collMod: "col1", usePowerOf2Sizes: true }, function(err) {
         if (err) throw err;
 
-        db.command({collMod: "col2", usePowerOf2Sizes : false }, function(err) {
+        db.command({collMod: "col2", usePowerOf2Sizes: false }, function(err) {
           if (err) throw err;
 
           speedy.run({

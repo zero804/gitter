@@ -8,9 +8,9 @@
         <span class="room-item__title-piece">{{this}}</span>
       {{~/each~}}
     {{else if displayName}}
-      {{displayName}}
+      <span class="room-item__title-piece">{{displayName}}</span>
     {{else}}
-      {{name}}
+      <span class="room-item__title-piece">{{name}}</span>
     {{/if}}
   </h2>
   {{#unless isSearch}}

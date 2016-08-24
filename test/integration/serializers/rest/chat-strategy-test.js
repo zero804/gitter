@@ -239,7 +239,7 @@ describe('chat-strategy-test', function() {
     });
 
     it("should serialize a message with lookups=['user']", function() {
-      var strategy = new ChatIdStrategy({ lookups:['user'], currentUserId: fixture.user1.id, troupeId: fixture.troupe1.id });
+      var strategy = new ChatIdStrategy({ lookups: ['user'], currentUserId: fixture.user1.id, troupeId: fixture.troupe1.id });
       return serialize([fixture.message1.id], strategy)
         .then(function(s) {
           assertUtils.assertSerializedEqual(s, expectedLookups);

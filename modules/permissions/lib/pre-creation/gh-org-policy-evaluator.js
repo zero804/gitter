@@ -5,6 +5,7 @@ var Promise = require('bluebird');
 var debug = require('debug')('gitter:app:permissions:pre-creation:gh-org-policy-evaluator');
 var PolicyDelegateTransportError = require('../policies/policy-delegate-transport-error');
 var GitHubOrgService = require('gitter-web-github').GitHubOrgService;
+var isGitHubUser = require('gitter-web-identity/lib/is-github-user');
 
 function GitHubRepoPolicyEvaluator(user, uri) {
   this.user = user;
@@ -36,9 +37,10 @@ GitHubRepoPolicyEvaluator.prototype = {
   }),
 
   _canAccess: function() {
-    // TODO: add a check that this is a GitHub user
-    // TODO: currently assuming that username === githubUsername
     if (!this.user || !this.user.username) return false;
+
+    // Non github users will never be an org member
+    if (!isGitHubUser(this.user)) return false;
 
     if (this._canAccessPromise) {
       return this._canAccessPromise;

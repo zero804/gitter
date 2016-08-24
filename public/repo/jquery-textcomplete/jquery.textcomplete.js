@@ -1,4 +1,5 @@
-define(["jquery"], function (jQuery){
+var $ = require('jquery');
+
 /*!
  * jQuery.textcomplete.js
  *
@@ -7,7 +8,7 @@ define(["jquery"], function (jQuery){
  * Author:      Yuku Takahashi
  */
 
-;(function ($) {
+(function ($) {
 
   'use strict';
 
@@ -456,7 +457,6 @@ define(["jquery"], function (jQuery){
     return this;
   };
 
-})(jQuery || window.Zepto);
+})($);
 
-return jQuery;
-});
+module.exports = $;

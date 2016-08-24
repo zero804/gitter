@@ -29,7 +29,7 @@ onready(function() {
       'autojoin': 'autojoin',
       'welcome-message': 'showWelcomeMessage'
     },
-    
+
     hideModal: function() {
       appView.dialogRegion.destroy();
     },

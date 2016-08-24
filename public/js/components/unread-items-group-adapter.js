@@ -64,7 +64,7 @@ function unreadItemsGroupAdapter(groupCollection, troupesCollection) {
     if (hasActivity) {
       return { mentions: false, unreadItems: false, activity: true, allHidden: false };
     }
-    
+
     return { mentions: false, unreadItems: false, activity: false, allHidden: allHidden };
   }
 

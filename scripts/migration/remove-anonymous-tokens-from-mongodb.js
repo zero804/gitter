@@ -29,7 +29,7 @@ function performDeletion() {
   return new Promise(function(resolve) {
     var count = 0;
     anonymousTokenStream()
-      .pipe(new BatchStream({ size : 1000 }))
+      .pipe(new BatchStream({ size: 1000 }))
       .pipe(through2Concurrent.obj({ maxConcurrency: 1 },
         function (docs, enc, callback) {
           var ids = docs.map(function(d) {

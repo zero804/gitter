@@ -196,13 +196,6 @@ module.exports = (function() {
     },
 
     initialize: function() {
-      var ctx = context();
-      appEvents.triggerParent('track-event', 'welcome-add-user-suggestions', {
-        uri: ctx.troupe.uri,
-        security: ctx.troupe.security,
-        count: this.collection.length,
-      });
-
       //listen to room permission changes so we can refresh the collection
       this.listenTo(context.troupe(), 'change:permissions', this.onRoomChange, this);
     },

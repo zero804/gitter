@@ -2,6 +2,7 @@
 
 var env = require('gitter-web-env');
 var logger = env.logger;
+var errorReporter = env.errorReporter;
 var EventEmitter = require('events').EventEmitter;
 
 // This is a bit crazy, but we need to get around node circular references
@@ -48,6 +49,7 @@ function install() {
         if (possiblePromise) {
           possiblePromise.catch(function(err) {
             logger.error('live-collection handler failed: ' + err, { exception: err });
+            errorReporter(err, { live_collection_handler: 'failed' }, { module: 'live-collection' });
           });
         }
       });

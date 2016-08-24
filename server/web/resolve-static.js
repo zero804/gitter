@@ -9,6 +9,6 @@ module.exports = function(staticPath) {
   if (!staticPath) {
     return baseDir;
   }
-  
+
   return path.join(baseDir, staticPath);
 };
