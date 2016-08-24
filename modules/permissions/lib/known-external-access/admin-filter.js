@@ -102,6 +102,8 @@ var adminFilterInternal = Promise.method(function(objectWithSd, userIds, nested)
   }
 
   if (objectWithSd.type === 'GROUP') {
+    // Deal with GROUP permissions by fetching the group securityDescriptor and
+    // recursively calling this method on that group
     if (nested || !objectWithSd.internalId) {
       return usersInExtraAdmins;
     } else {
@@ -121,6 +123,7 @@ var adminFilterInternal = Promise.method(function(objectWithSd, userIds, nested)
         });
     }
   } else {
+    // Not a group, deal with GH_ORG, GH_REPO and null here
     var query = getQueryForDescriptor(objectWithSd.sd);
     if (query) {
       return findUsersForQuery(query, usersNotInExtraAdmins.toArray())
@@ -135,7 +138,7 @@ var adminFilterInternal = Promise.method(function(objectWithSd, userIds, nested)
       return usersInExtraAdmins;
     }
   }
-})
+});
 
 function adminFilter(objectWithSd, userIds) {
   return adminFilterInternal(objectWithSd, lazy(userIds), false)
