@@ -63,7 +63,12 @@ export default React.createClass({
   getDefaultState(){
     const { router } = this.props;
     const accessTokenStore = this.getAccessTokenStore();
-    return { route: router.get('route'), router: router, accessTokenStore: accessTokenStore };
+    return {
+      groupName: router.get('groupName'),
+      route: router.get('route'),
+      router: router,
+      accessTokenStore: accessTokenStore
+    };
   },
 
   getForumState(){
@@ -74,7 +79,6 @@ export default React.createClass({
     return Object.assign(defaults, {
 
       //Route params
-      groupName: router.get('groupName'),
       categoryName: router.get('categoryName'),
       filterName: router.get('filterName'),
       tagName: router.get('tagName'),
