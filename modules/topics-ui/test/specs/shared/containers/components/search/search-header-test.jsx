@@ -3,7 +3,7 @@ import React from 'react';
 import { shallow } from 'enzyme';
 import SearchHeader from '../../../../../../shared/containers/components/search/search-header.jsx';
 
-describe.only('<SearchHeader/>', () => {
+describe('<SearchHeader/>', () => {
 
   let wrapper;
 
