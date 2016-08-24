@@ -9,7 +9,7 @@ import * as forumTagConstants from '../../../../shared/constants/forum-tags';
 import * as forumSortConstants from '../../../../shared/constants/forum-sorts';
 import navigateToTopic from '../../../../shared/action-creators/topic/navigate-to-topic';
 
-describe.only('Router', function(){
+describe('Router', function(){
 
   const trigger = {trigger: true};
   let filterHandle;
