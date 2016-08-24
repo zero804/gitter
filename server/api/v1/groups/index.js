@@ -43,6 +43,7 @@ function getGroupOptions(body) {
     }
   }
 
+  var invites = getInvites(body.invites);
   var groupOptions = {
     uri: uri,
     name: name,
@@ -51,7 +52,7 @@ function getGroupOptions(body) {
       providers: providers,
       addBadge: !!body.addBadge
     },
-    invites: getInvites(body.invites),
+    invites: invites,
     allowTweeting: body.allowTweeting
   };
 
@@ -123,7 +124,7 @@ module.exports = {
   },
 
   show: function(req) {
-    var group = req.params.group;
+    var group = req.group;
     var user = req.user;
     var userId = user && user._id;
 

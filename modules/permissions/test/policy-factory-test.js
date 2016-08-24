@@ -97,8 +97,6 @@ describe('policy-factory', function() {
       }
     });
 
-    after(function() { fixture.cleanup(); });
-
     describe('createPolicyForRoomId', function() {
       function checkPolicyForRoom(user, room, expected) {
         var roomId = room._id;

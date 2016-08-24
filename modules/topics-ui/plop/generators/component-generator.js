@@ -5,7 +5,7 @@ var glob = require('glob');//eslint-disable-line node/no-unpublished-require
 
 module.exports = function(plop) {
 
-  var baseComponentDir = path.resolve(__dirname, '../../shared/components');
+  var baseComponentDir = path.resolve(__dirname, '../../shared/containers/components');
   var baseComponentDirs = glob.sync(baseComponentDir + '/*/');
   var componentDirs = ['/'].concat(baseComponentDirs.map(function(folderPath){
     return folderPath.replace(baseComponentDir, '');
@@ -32,11 +32,11 @@ module.exports = function(plop) {
 
       return [{
         type: 'add',
-        path: path.resolve(__dirname, '../../shared/components/', '.' + data.subFolder) + '/{{dashCase name}}.jsx',
+        path: path.resolve(__dirname, '../../shared/containers/components/', '.' + data.subFolder) + '/{{dashCase name}}.jsx',
         templateFile: path.resolve(__dirname, '../templates/component.txt'),
       }, {
         type: 'add',
-        path: path.resolve(__dirname, '../../test/specs/shared/components', '.' + data.subFolder) + '/{{dashCase name}}-test.jsx',
+        path: path.resolve(__dirname, '../../test/specs/shared/containers//components', '.' + data.subFolder) + '/{{dashCase name}}-test.jsx',
         templateFile: path.resolve(__dirname, '../templates/component-test.txt'),
       }];
     }

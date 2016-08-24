@@ -12,6 +12,7 @@
       {
         "version": 4
       }
-    ]
+    ],
+    "import/default": "off"
   }
 }
