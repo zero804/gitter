@@ -148,7 +148,6 @@ module.exports = Marionette.CompositeView.extend({
 
   //We avoid re-rendering AT ALL TIMES so now we have to manually change content
   onHeaderChange: function (model, val){ //jshint unused: true
-
     this.ui.headerContent.html(val);
 
     //If this is a suggestion show the cancel button
