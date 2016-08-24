@@ -107,6 +107,28 @@ router.get('/topic/:topicId/:topicSlug',
   identifyRoute('topic'),
   featureToggles,
   function(req, res, next){
+
+    //No switch, no business
+    if (!req.fflip || !req.fflip.has('topics')) {
+      return next(new StatusError(404));
+    }
+
+    return mainFrameRenderers.renderMainFrame(req, res, next, {
+      subFrameLocation: '/' + req.params.groupName + '/topics/topic/' + req.params.topicId + '/' + req.params.topicSlug + '/~topics'
+    });
+  }
+);
+
+router.get('/topic/:topicId/:topicSlug/~topics',
+  identifyRoute('topic-embedded'),
+  featureToggles,
+  function(req, res, next){
+
+    //No switch, no business
+    if (!req.fflip || !req.fflip.has('topics')) {
+      return next(new StatusError(404));
+    }
+
     return topicsRenderers.renderTopic(req, res, next);
   }
 );
