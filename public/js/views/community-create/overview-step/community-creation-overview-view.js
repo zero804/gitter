@@ -1,8 +1,8 @@
 'use strict';
 
 var _ = require('underscore');
-var toggleClass = require('utils/toggle-class');
-var appEvents = require('utils/appevents');
+var toggleClass = require('../../../utils/toggle-class');
+var appEvents = require('../../../utils/appevents');
 var stepConstants = require('../step-constants');
 var template = require('./community-creation-overview-view.hbs');
 var CommunityCreateBaseStepView = require('../shared/community-creation-base-step-view');
