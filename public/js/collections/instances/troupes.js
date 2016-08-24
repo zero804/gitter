@@ -37,7 +37,8 @@ function filterTroupeCollection(filter, comparator) {
   var c = new SimpleFilteredCollection([], {
     model: troupeModels.TroupeModel,
     collection: troupeCollection,
-    comparator: comparator
+    comparator: comparator,
+    autoResort: true
   });
   c.setFilter(filter);
   return c;
