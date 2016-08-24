@@ -2,7 +2,7 @@
 
 var Marionette = require('backbone.marionette');
 var Typeahead = require('views/controls/typeahead');
-var FilteredCollection = require('backbone-filtered-collection');
+var SimpleFilteredCollection = require('gitter-realtime-client/lib/simple-filtered-collection');
 
 
 var FilteredSelect = Marionette.ItemView.extend({
@@ -19,7 +19,7 @@ var FilteredSelect = Marionette.ItemView.extend({
     this.itemTemplate = options.itemTemplate;
     this.dropdownClass = options.dropdownClass;
 
-    this.filteredCollection = new FilteredCollection({
+    this.filteredCollection = new SimpleFilteredCollection([], {
       collection: this.collection
     });
     this.refilter('', this.filteredCollection);
