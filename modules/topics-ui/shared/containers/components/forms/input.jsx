@@ -7,7 +7,8 @@ export default React.createClass({
   propTypes: {
     name: PropTypes.string.isRequired,
     placeholder: PropTypes.string.isRequired,
-    className: PropTypes.string
+    className: PropTypes.string,
+    onChange: PropTypes.func.isRequired,
   },
 
   render(){
@@ -16,8 +17,17 @@ export default React.createClass({
     const compiledClass = classNames('input', className);
 
     return (
-      <input className={compiledClass} name={name} placeholder={placeholder}/>
+      <input
+        className={compiledClass}
+        name={name}
+        placeholder={placeholder}
+        onChange={this.onChange}/>
     );
+  },
+
+  onChange(e){
+    e.preventDefault();
+    this.props.onChange(e.target.value);
   }
 
 });

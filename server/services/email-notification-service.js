@@ -65,7 +65,7 @@ function sendInvite(invitingUser, invite, room, isReminder, template, eventName)
   var senderName = (invitingUser.displayName || invitingUser.username);
   var date = moment(mongoUtils.getTimestampFromObjectId(invite._id)).format('Do MMMM YYYY');
   var emailBasePath = config.get("email:emailBasePath");
-  var inviteUrl = emailBasePath + '/settings/accept-invite/' + invite.secret;
+  var inviteUrl = emailBasePath + '/settings/accept-invite/' + invite.secret + '?source=email-invite';
   var roomUrl = emailBasePath + '/' + room.uri;
   var subject = senderName + ' invited you to join the ' + room.uri + ' chat on Gitter';
   if (isReminder) {

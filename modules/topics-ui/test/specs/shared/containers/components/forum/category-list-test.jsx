@@ -1,17 +1,12 @@
-
 import assert from 'assert';
 import React from 'react';
 import { shallow } from 'enzyme';
 import sinon from 'sinon';
 import CategoryList from '../../../../../../shared/containers/components/forum/category-list.jsx';
+import categories from '../../../../../mocks/mock-data/categories';
 
 describe('<CategoryList />', function(){
 
-  const categories = [
-    { category: 'all', active: true },
-    { category: 'test-1', active: false },
-    { category: 'test-2', active: false }
-  ];
   let wrapper;
   let clickHandle;
   beforeEach(function(){
