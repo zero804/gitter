@@ -1,7 +1,7 @@
 'use strict';
 
-var log = require('utils/log');
-var appEvents = require('utils/appevents');
+var log = require('./log');
+var appEvents = require('./appevents');
 
 module.exports = function(collectionName, collection, error) {
   appEvents.trigger('stats.event', 'live.collection.error');

@@ -3,9 +3,9 @@
 var $ = require('jquery');
 var Marionette = require('backbone.marionette');
 var moment = require('moment');
-var context = require('utils/context');
+var context = require('../../utils/context');
 var template = require('./tmpl/archive-navigation-view.hbs');
-var heatmapUtils = require('components/archive-heatmap-utils');
+var heatmapUtils = require('../../components/archive-heatmap-utils');
 
 module.exports = (function() {
 
