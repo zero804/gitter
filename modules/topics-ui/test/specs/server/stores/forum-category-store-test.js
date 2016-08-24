@@ -5,7 +5,7 @@ var categoryStore = require('../../../../server/stores/forum-category-store');
 
 describe('CategoryStore', function(){
 
-  const categories = [ 1, 2, 3];
+  const categories = [ {name: 1, slug: 1}, {name: 2, slug: 1}, {name: 3, slug: 1}];
   const parsedCategories = [
     {category: 'all', active: true },
     {category: 1, active: false },
@@ -14,10 +14,6 @@ describe('CategoryStore', function(){
   ];
 
   it('should return an object with models', function(){
-    /*
-     TODO -->
-     The models attribute is not used: REMOVE
-     */
     assert(categoryStore().models, 'should return a models property');
   });
 

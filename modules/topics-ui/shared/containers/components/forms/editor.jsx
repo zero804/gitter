@@ -7,7 +7,8 @@ export default React.createClass({
   propTypes: {
     className: PropTypes.string,
     name: PropTypes.string,
-    children: PropTypes.node
+    children: PropTypes.node,
+    onChange: PropTypes.func,
   },
 
   render(){
@@ -16,10 +17,15 @@ export default React.createClass({
     const compiledClass = classNames('editor', className);
 
     return (
-      <textarea className={compiledClass} name={name}>
+      <textarea className={compiledClass} name={name} onChange={this.onChange}>
         { this.props.children }
       </textarea>
     );
+  },
+
+  onChange(e){
+    e.preventDefault();
+    this.props.onChange(e.target.value);
   }
 
 });

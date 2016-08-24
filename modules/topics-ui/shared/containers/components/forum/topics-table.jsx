@@ -7,16 +7,17 @@ export default React.createClass({
 
   displayName: 'TopicsTable',
   propTypes: {
-    topics: PropTypes.array.isRequired
+    topics: PropTypes.array.isRequired,
+    groupName: PropTypes.string.isRequired
   },
 
   render(){
-    const { topics } = this.props;
+    const { topics, groupName } = this.props;
     return (
       <Container>
         <table className="topics-table">
           <TopicsTableHeader />
-          <TopicsTableBody topics={topics} />
+          <TopicsTableBody topics={topics} groupName={groupName} />
         </table>
       </Container>
     );

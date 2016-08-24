@@ -7,6 +7,7 @@ import * as forumCatConstants from '../../../../shared/constants/forum-categorie
 import * as forumFilterConstants from '../../../../shared/constants/forum-filters';
 import * as forumTagConstants from '../../../../shared/constants/forum-tags';
 import * as forumSortConstants from '../../../../shared/constants/forum-sorts';
+import navigateToTopic from '../../../../shared/action-creators/topic/navigate-to-topic';
 
 describe('Router', function(){
 
@@ -89,6 +90,11 @@ describe('Router', function(){
     assert.equal(router.get('createTopic'), true);
   });
 
+  it('should have the right route param when on the topic page', () => {
+    Backbone.history.navigate('gitterHQ/topics/topic/123/this-is-a-slug', trigger);
+    assert.equal(router.get('route'), 'topic');
+  });
+
   it('should dispatch the right event when the filter name changes', () => {
     var spy = sinon.spy();
     router.on(forumFilterConstants.UPDATE_ACTIVE_FILTER, spy);
@@ -105,5 +111,11 @@ describe('Router', function(){
     assert(spy.calledWithMatch({ sort: 'test' }));
   });
 
+  it('should have the right params after moving to a topic', () => {
+    dispatch(navigateToTopic('gitterHQ', '12345', 'slug'));
+    assert.equal(router.get('groupName'), 'gitterHQ');
+    assert.equal(router.get('topicId'), '12345');
+    assert.equal(router.get('slug'), 'slug');
+  });
 
 });

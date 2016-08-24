@@ -1,10 +1,8 @@
 "use strict";
 
 var Promise = require('bluebird');
-var persistence = require('gitter-web-persistence');
 var debug = require('debug')('gitter:tests:test-fixtures');
 var fixtureUtils = require('./fixture-utils');
-
 
 var fixtureSteps = [
   require('./delete-documents'),
@@ -97,6 +95,7 @@ fixtureLoader.createExpectedFixtures = createExpectedFixtures;
 // TODO: deprecate these, use them from fixtureUtils
 fixtureLoader.generateEmail = fixtureUtils.generateEmail;
 fixtureLoader.generateGithubId = fixtureUtils.generateGithubId;
+fixtureLoader.generateUri = fixtureUtils.generateUri;
 
 fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN = '***REMOVED***';
 fixtureLoader.GITTER_INTEGRATION_USERNAME = 'gitter-integration-tests';
