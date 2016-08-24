@@ -106,7 +106,7 @@ var View = Marionette.ItemView.extend({
   },
 
   formSubmit: function() {
-    var providers             = (this.ui.githubOnly.is(':checked')) ? ['github'] : [];
+    var providers = (this.ui.githubOnly.is(':checked')) ? ['github'] : [];
     var welcomeMessageContent = this.getWelcomeMessageContent();
 
     Promise.all([
