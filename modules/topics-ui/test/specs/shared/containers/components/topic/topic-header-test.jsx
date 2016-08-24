@@ -3,15 +3,17 @@ import React from 'react';
 import { shallow } from 'enzyme';
 import TopicHeader from '../../../../../../shared/containers/components/topic/topic-header.jsx';
 import topics from '../../../../../mocks/mock-data/topics';
+import categories from '../../../../../mocks/mock-data/categories';
 
 describe('<TopicHeader/>', () => {
 
   let wrapper;
   const topic = topics[0];
+  const category = categories[0];
 
   beforeEach(() => {
     wrapper = shallow(
-      <TopicHeader topic={topic}/>
+      <TopicHeader topic={topic} category={category}/>
     );
   });
 

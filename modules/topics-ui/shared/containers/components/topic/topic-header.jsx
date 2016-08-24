@@ -18,12 +18,18 @@ export default React.createClass({
         avatarUrl: PropTypes.string.isRequired,
         displayName: PropTypes.string.isRequired
       }).isRequired,
-    }).isRequired
+    }).isRequired,
+
+    category: PropTypes.shape({
+      category: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+    }).isRequired,
   },
 
   render(){
 
-    const { title, user, category, tags } = this.props.topic;
+    const { title, user, tags } = this.props.topic;
+    const { category } = this.props;
     const { displayName } = user;
 
     return (
