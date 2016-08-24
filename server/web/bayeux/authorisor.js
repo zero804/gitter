@@ -113,7 +113,6 @@ function validateUserForSubTroupeSubscription(options) {
 function validateUserForForumSubscription(options) {
   var userId = options.userId;
   var match = options.match;
-  //var ext = options.message && options.message.ext;
 
   var forumId = match[1];
 
@@ -125,8 +124,6 @@ function validateUserForForumSubscription(options) {
     .then(function(policy) {
       return policy.canRead();
     });
-
-  // TODO: should we handle ext.reassociate?
 }
 
 // This is only used by the native client. The web client publishes to
