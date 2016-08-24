@@ -1,21 +1,15 @@
 import {equal} from 'assert';
 import React from 'react';
-import { shallow } from 'enzyme';
-import TopicsTableBody from '../../../../../../shared/containers/components/topic/topics-table-body.jsx';
+import { mount } from 'enzyme';
+import TopicsTableBody from '../../../../../../shared/containers/components/forum/topics-table-body.jsx';
+import topics from '../../../../../mocks/mock-data/topics';
 
 describe('<TopicsTableBody/>', () => {
 
   let wrapper;
-  let topics = [
-    { title: { text: '1', html: '1' } },
-    { title: { text: '2', html: '2' } },
-    { title: { text: '3', html: '3' } },
-    { title: { text: '4', html: '4' } },
-    { title: { text: '5', html: '5' } },
-  ];
 
   beforeEach(() => {
-    wrapper = shallow(<TopicsTableBody topics={topics}/>);
+    wrapper = mount(<TopicsTableBody topics={topics} groupName="gitterHQ"/>);
   });
 
   it('should render a tbody', () => {
@@ -28,6 +22,10 @@ describe('<TopicsTableBody/>', () => {
 
   it('should render a tr from each topic', () => {
     equal(wrapper.find('tr').length, topics.length);
+  });
+
+  it('should renderChildRow a topic link for each topic', () => {
+    equal(wrapper.find('TopicLink').length, topics.length);
   });
 
 });
