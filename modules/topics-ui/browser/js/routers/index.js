@@ -93,7 +93,7 @@ var Router = Backbone.Router.extend({
 
   navigateToCreateTopic(){
     const groupName = this.model.get('groupName');
-    this.navigate(`/${groupName}/topics/create-topic`, { trigger: true });
+    this.navigate(`/${groupName}/topics/create-topic/~topics`, { trigger: true });
   },
 
   updateForumCategory(data){
@@ -116,7 +116,7 @@ var Router = Backbone.Router.extend({
     this.navigate(url, { trigger: true });
   },
 
-  onFilterUpdate(moidel, val){
+  onFilterUpdate(model, val){
     this.model.trigger(forumFilterConstants.UPDATE_ACTIVE_FILTER, { filter: val });
   },
 
@@ -170,7 +170,7 @@ var router = new Router();
 window.parent.addEventListener('popstate', function(e) {
   if(!e.state) { return; }
   const url = e.state.replace(window.location.origin, '');
-  router.navigate(url, { trigger: true, replace: true });
+  router.navigate(url, { trigger: true });
 });
 
 
