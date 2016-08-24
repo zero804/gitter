@@ -43,6 +43,7 @@ export default React.createClass({
 
   render(){
     const { route } = this.state;
+    console.log(route);
     switch(route) {
       case navConstants.FORUM_ROUTE: return <ForumContainer {...this.state} />;
       case navConstants.CREATE_TOPIC_ROUTE: return <ForumContainer {...this.state} />;
@@ -90,6 +91,7 @@ export default React.createClass({
       tagStore: this.getTagStore(),
       topicsStore: this.getTopicsStore(),
       newTopicStore: new NewTopicStore(),
+      createTopic: false,
     });
   },
 
@@ -155,7 +157,7 @@ export default React.createClass({
   },
 
   //EVENT HANDLES ---------------------------
-  onRouteUpdate(model, val){
+  onRouteUpdate(){
     this.setState(this.getStateForRoute());
   }
 
