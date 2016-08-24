@@ -1,4 +1,5 @@
 @import "../../colors.less";
+@import (less, reference) "~gitter-styleguide/css/components/buttons.css";
 
 .topic-search__all-topics-link {
   color:           @light;
@@ -10,3 +11,19 @@
   }
 }
 
+.topic-search__create-topic-link {
+  &:extend(.subdued-button-clouds--small all);
+  margin-left:     auto;
+  text-decoration: none;
+  white-space:     nowrap;
+}
+
+.topic-search__search-input {
+  width:            100%;
+  margin:           0 4rem;
+  padding:          1rem;
+  border-bottom:    none;
+  border-radius:    .4rem;
+  background-color: @search-input-bg;
+  color:            @light;
+}

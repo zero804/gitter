@@ -13,7 +13,7 @@ describe('<CreateTopicLink/>', () => {
 
   beforeEach(() => {
     wrapper = shallow(
-      <CreateTopicLink groupName="gitterHQ">
+      <CreateTopicLink groupName="gitterHQ" className="test">
       This is a link
       </CreateTopicLink>
     );
@@ -36,6 +36,10 @@ describe('<CreateTopicLink/>', () => {
     subscribe(NAVIGATE_TO_CREATE_TOPIC, handle);
     wrapper.find('a').at(0).simulate('click', mockEvt);
     equal(handle.callCount, 1);
+  });
+
+  it('should apply custom class names', () => {
+    equal(wrapper.find('.test').length, 1);
   });
 
 });
