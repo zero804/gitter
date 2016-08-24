@@ -59,7 +59,7 @@ var PrimaryCollectionView = BaseCollectionView.extend({
 
     this.listenTo(this.roomMenuModel, 'change:searchTerm', this.onSearchTermChange, this);
     this.listenTo(this.collection, 'filter-complete', this.onSearchTermChange, this);
-    this.listenTo(this.roomMenuModel, 'change:state:post', this.setActive, this);
+    this.listenTo(this.roomMenuModel, 'change:state:post', this.onStateChange, this);
 
     this.listenTo(this.dndCtrl, 'dnd:start-drag', this.onDragStart, this);
     this.listenTo(this.dndCtrl, 'dnd:end-drag', this.onDragEnd, this);
@@ -69,7 +69,7 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     BaseCollectionView.prototype.initialize.apply(this, arguments);
   },
 
-  onSearchTermChange: function() {
+  onStateChange: function() {
     if(this.ui.headerContent.length) {
       if(this.roomMenuModel.get('state') === 'search') {
         if (!!this.roomMenuModel.get('searchTerm')) {
@@ -85,6 +85,10 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     }
 
     this.setActive();
+  },
+
+  onSearchTermChange: function() {
+    this.onStateChange();
   },
 
   onDragStart: function () {
