@@ -41,9 +41,6 @@ function renderMainFrame(req, res, next, options) {
     })
     .spread(function(troupeContext, rooms, orgs, groups, socialMetadata) {
       var chatAppLocation = options.subFrameLocation;
-      console.log('----------------------');
-      console.log(chatAppLocation);
-      console.log('----------------------');
 
       var template, bootScriptName;
 

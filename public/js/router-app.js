@@ -361,7 +361,14 @@ onready(function() {
       return;
     }
 
+    //Update windows location
     pushState(frameUrl, title, url);
+
+    //In the case of topics we want to update the windows location
+    //but we want to avoid reloading the frame, hence we cancel out here.
+    if(type === 'topics') { return; }
+
+    //Redirect the App
     roomSwitcher.change(frameUrl);
   });
 
@@ -426,7 +433,7 @@ onready(function() {
       'confirm/*uri': 'confirmRoom',
       'createroom': 'createRoom',
       'createroom/:name': 'createRoom',
-      'createcommunity': 'createCommunity'
+      'createcommunity': 'createCommunity',
     },
 
     hideModal: function() {
