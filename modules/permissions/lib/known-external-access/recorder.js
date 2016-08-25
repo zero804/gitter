@@ -52,6 +52,9 @@ function handle(userId, type, policyName, linkPath, externalId, access) {
   }
 }
 
+/**
+ * Records whether a user was granted or denied access to a particular security policy
+ */
 function knownAccessRecorder(userId, type, policyName, linkPath, externalId, access) {
   if (!userId) return;
   if (!type) return;
