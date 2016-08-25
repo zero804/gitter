@@ -72,6 +72,7 @@ function findUsersForQuery(sdQuery, userIds) {
     });
   }
 
+  // Without this, a user could be an administrator of everything...
   assert(disjunction.length > 0);
 
   return KnownExternalAccess.distinct('userId', query)
