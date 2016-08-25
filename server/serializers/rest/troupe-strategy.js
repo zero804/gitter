@@ -1,4 +1,4 @@
-/* eslint complexity: ["error", 22] */
+/* eslint complexity: ["error", 23] */
 "use strict";
 
 var Promise = require('bluebird');
@@ -312,6 +312,10 @@ function TroupeStrategy(options) {
       id: id,
       name: troupeName,
       topic: item.topic,
+      // This is a fallback for the change to the suggestions API
+      // It can be removed once the mobile clients are using topic instead
+      // of description. See https://github.com/troupe/gitter-webapp/issues/2115
+      description: options.includeDescription ? item.topic : undefined,
       avatarUrl: avatarUrl,
       uri: uri,
       oneToOne: item.oneToOne,
@@ -352,6 +356,8 @@ TroupeStrategy.createSuggestionStrategy = function() {
     includeTags: true,
     includeProviders: true,
     includeExists: true,
+    // TODO: remove this option in future
+    includeDescription: true,
     currentUser: null,
     currentUserId: null
   });
