@@ -125,7 +125,7 @@ describe('TroupeStrategy', function() {
           name: u2.displayName,
           topic: '',
           avatarUrl: nconf.get('avatar:officialHost') + '/g/u/' + u2.username,
-          uri: t.uri,
+          uri: u2.username,
           oneToOne: true,
           userCount: 2,
           user: {
