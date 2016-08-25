@@ -110,16 +110,17 @@ var adminFilterInternal = Promise.method(function(securityDescriptor, userIds, n
     if (nested || !securityDescriptor.internalId) {
       return usersInExtraAdmins;
     } else {
-      return Group.findById(securityDescriptor.internalId)
+      return Group.findById(securityDescriptor.internalId, { sd: 1 })
         .read('secondaryPreferred')
         .lean()
         .exec()
         .then(function(group) {
-          if (!group) {
+          if (!group || !group.sd) {
             return usersNotInExtraAdmins;
           }
 
-          return adminFilterInternal(group, usersNotInExtraAdmins, true);
+          var securityDescriptor = group.sd;
+          return adminFilterInternal(securityDescriptor, usersNotInExtraAdmins, true);
         })
         .then(function(userIds) {
           return usersInExtraAdmins.concat(userIds);
