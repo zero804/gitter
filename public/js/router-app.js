@@ -159,10 +159,6 @@ onready(function() {
     var iframeUrl = e.state;
     if (!iframeUrl) return;
 
-    //In the case of topics we want the topics app
-    //to handle the back button response so just bail here
-    if(/~topics$/.test(iframeUrl)) { return; }
-
     //generate title
     var urlDetails = urlParser.parse(iframeUrl);
     var pageTitle = urlDetails.pathname.split('/');
