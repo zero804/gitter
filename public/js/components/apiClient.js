@@ -45,9 +45,9 @@
  *   })
  */
 var $ = require('jquery');
-var context = require('utils/context');
+var context = require('../utils/context');
 var clientEnv = require('gitter-client-env');
-var appEvents = require('utils/appevents');
+var appEvents = require('../utils/appevents');
 var debug = require('debug-proxy')('app:api-client');
 var Promise = require('bluebird');
 
