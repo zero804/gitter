@@ -3,6 +3,7 @@ import TopicHeader from './components/topic/topic-header.jsx';
 import TopicBody from './components/topic/topic-body.jsx';
 import SearchHeader from './components/search/search-header.jsx';
 import TopicReplyEditor from './components/topic/topic-reply-editor.jsx';
+import TopicReplyListHeader from './components/topic/topic-reply-list-header.jsx';
 
 export default createClass({
 
@@ -39,6 +40,7 @@ export default createClass({
         <SearchHeader groupName={groupName}/>
         <TopicHeader topic={topic} category={category}/>
         <TopicBody topic={topic} />
+        <TopicReplyListHeader replies={replies}/>
         <TopicReplyEditor />
       </main>
     );
