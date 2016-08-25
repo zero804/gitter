@@ -64,3 +64,6 @@ function knownAccessRecorder(userId, type, policyName, linkPath, externalId, acc
 }
 
 module.exports = knownAccessRecorder;
+module.exports.testOnly = {
+  handle: handle
+}

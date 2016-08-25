@@ -6,6 +6,7 @@ var Group = require('gitter-web-persistence').Group;
 var KnownExternalAccess = require('gitter-web-persistence').KnownExternalAccess;
 var _ = require('lodash');
 var assert = require('assert');
+var debug = require('debug')('gitter:app:permissions:admin-filter');
 
 function createHashFor(userIds) {
   return _.reduce(userIds, function(memo, userId) {
@@ -78,12 +79,12 @@ function findUsersForQuery(sdQuery, userIds) {
     .exec();
 }
 
-var adminFilterInternal = Promise.method(function(objectWithSd, userIds, nested) {
+var adminFilterInternal = Promise.method(function(securityDescriptor, userIds, nested) {
   // First step: check extraAdmins
   var usersInExtraAdmins, usersNotInExtraAdmins;
 
-  if (objectWithSd.extraAdmins && objectWithSd.extraAdmins.length) {
-    var extraAdminsHash = createHashFor(objectWithSd.extraAdmins);
+  if (securityDescriptor.extraAdmins && securityDescriptor.extraAdmins.length) {
+    var extraAdminsHash = createHashFor(securityDescriptor.extraAdmins);
 
     usersInExtraAdmins = userIds.filter(function(userId) {
       return extraAdminsHash[userId];
@@ -98,16 +99,17 @@ var adminFilterInternal = Promise.method(function(objectWithSd, userIds, nested)
   }
 
   if (usersNotInExtraAdmins.isEmpty()) {
+    debug('All users matched in extraAdmins')
     return usersInExtraAdmins;
   }
 
-  if (objectWithSd.type === 'GROUP') {
+  if (securityDescriptor.type === 'GROUP') {
     // Deal with GROUP permissions by fetching the group securityDescriptor and
     // recursively calling this method on that group
-    if (nested || !objectWithSd.internalId) {
+    if (nested || !securityDescriptor.internalId) {
       return usersInExtraAdmins;
     } else {
-      return Group.findById(objectWithSd.internalId)
+      return Group.findById(securityDescriptor.internalId)
         .read('secondaryPreferred')
         .lean()
         .exec()
@@ -124,8 +126,11 @@ var adminFilterInternal = Promise.method(function(objectWithSd, userIds, nested)
     }
   } else {
     // Not a group, deal with GH_ORG, GH_REPO and null here
-    var query = getQueryForDescriptor(objectWithSd.sd);
+    var query = getQueryForDescriptor(securityDescriptor);
+
     if (query) {
+      debug('Searching for users matching %j', query);
+
       return findUsersForQuery(query, usersNotInExtraAdmins.toArray())
         .then(function(adminUserIds) {
           if (!adminUserIds || !adminUserIds.length) {
@@ -141,7 +146,10 @@ var adminFilterInternal = Promise.method(function(objectWithSd, userIds, nested)
 });
 
 function adminFilter(objectWithSd, userIds) {
-  return adminFilterInternal(objectWithSd, lazy(userIds), false)
+  if (!userIds.length) return [];
+  if (!objectWithSd.sd) return [];
+
+  return adminFilterInternal(objectWithSd.sd, lazy(userIds), false)
     .then(function(userIds) {
       return userIds.toArray();
     });
