@@ -1,15 +1,15 @@
 "use strict";
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
-var context = require('utils/context');
-var apiClient = require('components/apiClient');
-var appEvents = require('utils/appevents');
+var context = require('../../../utils/context');
+var apiClient = require('../../../components/apiClient');
+var appEvents = require('../../../utils/appevents');
 var moment = require('moment');
-var Popover = require('views/popover');
+var Popover = require('../../popover');
 var bodyTemplate = require('./tmpl/issuePopover.hbs');
 var titleTemplate = require('./tmpl/issuePopoverTitle.hbs');
 var footerTemplate = require('./tmpl/commitPopoverFooter.hbs');
-var SyncMixin = require('collections/sync-mixin');
+var SyncMixin = require('../../../collections/sync-mixin');
 
 
 var convertToIssueAnchor = function(element, githubIssueUrl) {

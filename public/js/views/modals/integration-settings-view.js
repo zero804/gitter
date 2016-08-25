@@ -1,7 +1,7 @@
 "use strict";
 
 var Marionette = require('backbone.marionette');
-var context = require('utils/context');
+var context = require('../../utils/context');
 var ModalView = require('./modal');
 var template = require('./tmpl/integration-settings-view.hbs');
 

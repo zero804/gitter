@@ -1,16 +1,16 @@
 "use strict";
 var Marionette = require('backbone.marionette');
-var ModalView = require('views/modals/modal');
+var ModalView = require('../modals/modal');
 var Backbone = require('backbone');
-var context = require('utils/context');
+var context = require('../../utils/context');
 var clientEnv = require('gitter-client-env');
-var apiClient = require('components/apiClient');
+var apiClient = require('../../components/apiClient');
 var template = require('./tmpl/addPeople.hbs');
 var userSearchItemTemplate = require('./tmpl/userSearchItem.hbs');
 var itemTemplate = require('./tmpl/addPeopleItemView.hbs');
-var Typeahead = require('views/controls/typeahead');
-var userSearchModels = require('collections/user-search');
-require('views/behaviors/widgets');
+var Typeahead = require('../controls/typeahead');
+var userSearchModels = require('../../collections/user-search');
+require('../behaviors/widgets');
 
 var DEFAULT_AVATAR_UNTIL_AVATARS_SERVICE_ARRIVES = 'https://avatars.githubusercontent.com/u/0'
 /**

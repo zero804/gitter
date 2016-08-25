@@ -39,14 +39,14 @@ var webpackConfig = {
     "topics-bootstrap": path.resolve(path.join(__dirname, './topics-bootstrap')),
 
     vendor: [
-      'utils/webpack',
-      'utils/context',
+      require.resolve('./utils/webpack'),
+      require.resolve('./utils/context'),
       'underscore',
       'jquery',
       'backbone',
       'backbone.marionette',
       'loglevel',
-      'utils/log',
+      require.resolve('./utils/log'),
       'handlebars/runtime',
       'gitter-realtime-client',
       'raven-js',
@@ -90,14 +90,6 @@ var webpackConfig = {
   },
   resolve: {
     alias: {
-      "utils": path.resolve(path.join(__dirname, "/utils/")),
-      // "shared": path.resolve(path.join(__dirname, "../../shared/")),
-      "views": path.resolve(path.join(__dirname, "./views/")),
-      "models": path.resolve(path.join(__dirname, "./models")),
-      "collections": path.resolve(path.join(__dirname, "./collections")),
-      "components": path.resolve(path.join(__dirname, "./components")),
-      "template": path.resolve(path.join(__dirname, "./template")),
-      "bootstrap_tooltip": path.resolve(path.join(__dirname, "./utils/tooltip.js")),
       "jquery": require.resolve('jquery'),
       "mutant": path.resolve(path.join(__dirname, "../repo/mutant/mutant.js")),
       "emojify": path.resolve(path.join(__dirname, "../repo/emojify/emojify.js")),
@@ -106,7 +98,6 @@ var webpackConfig = {
       "autolink": path.resolve(path.join(__dirname, "../repo/autolink/autolink.js")),
       "transloadit": path.resolve(path.join(__dirname, "../repo/transloadit/jquery.transloadit2-v2-latest.js")),
       "zeroclipboard": path.resolve(path.join(__dirname, "../repo/zeroclipboard/zeroclipboard.js")),
-      "backbone-sorted-collection": path.resolve(path.join(__dirname, "../repo/backbone-sorted-collection/backbone-sorted-collection.js")),
       "jquery-sortable": path.resolve(path.join(__dirname, "../repo/jquery-sortable/jquery-sortable.js")),
 
       // Prevent duplicates
