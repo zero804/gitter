@@ -6,15 +6,12 @@ import TopicLink from '../../../../../../shared/containers/components/links/topi
 import {subscribe} from '../../../../../../shared/dispatcher';
 import {NAVIGATE_TO_TOPIC} from '../../../../../../shared/constants/navigation.js';
 import mockEvt from '../../../../../mocks/event';
+import categories from '../../../../../mocks/mock-data/categories';
 
 describe('<TopicLink/>', () => {
 
   let wrapper;
-  const topic = {
-    name: 'This is a test',
-    slug: 'this-is-a-test',
-    id: '12345'
-  }
+  const topic = categories[0];
 
   beforeEach(() => {
     wrapper = shallow(
@@ -31,11 +28,11 @@ describe('<TopicLink/>', () => {
   });
 
   it('should render the right href', () => {
-    equal(wrapper.find('a').at(0).prop('href'), '/gitterHQ/topics/topic/12345/this-is-a-test');
+    equal(wrapper.find('a').at(0).prop('href'), `/gitterHQ/topics/topic/${topic.id}/${topic.slug}`);
   });
 
   it('should render the right title', () => {
-    equal(wrapper.find('a').at(0).prop('title'), 'View This is a test');
+    equal(wrapper.find('a').at(0).prop('title'), `View ${topic.title}`);
   });
 
   it('should dispatch the righ action when clicked', () => {
