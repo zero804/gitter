@@ -11,7 +11,10 @@ var LimitedCollection = require('gitter-realtime-client/lib/limited-collection')
 var fuzzysearch = require('fuzzysearch');
 
 function roomFilter(roomMenuModel, room) {
-  return roomMenuModel.get('searchTerm') && fuzzysearch(roomMenuModel.get('searchTerm'), room.get('name'));
+  var searchTerm = (roomMenuModel.get('searchTerm') || '').toLowerCase();
+  var didMatchName = fuzzysearch(searchTerm, (room.get('name') || '').toLowerCase());
+  var didMatchUri = fuzzysearch(searchTerm, (room.get('uri') || '').toLowerCase());
+  return searchTerm.length > 0 && (didMatchName || didMatchUri);
 }
 
 //take a list of object which have a property of id and return a uniq array
@@ -56,6 +59,7 @@ var SearchMessageAndPeople = Backbone.Collection.extend({
     this.listenTo(this.searchPeopleCollection, 'change add remove reset update', this.onCollectionChange, this);
     this.listenTo(this.searchRoomCollection, 'change add remove reset update', this.onCollectionChange, this);
     this.listenTo(this.searchRepoCollection, 'change add remove reset update', this.onCollectionChange, this);
+    this.listenTo(this.searchCurrentRooms, 'change add remove reset update', this.onCollectionChange, this);
   },
 
   onSearchUpdate: function () {

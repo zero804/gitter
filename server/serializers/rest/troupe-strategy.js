@@ -258,12 +258,12 @@ function TroupeStrategy(options) {
 
     var group = groupIdStrategy && item.groupId ? groupIdStrategy.map(item.groupId) : undefined;
 
-    var troupeName, troupeUrl;
+    var troupeName, troupeUri;
     if (item.oneToOne) {
       var otherUser = resolveOneToOneOtherUser(item);
       if (otherUser) {
         troupeName = otherUser.displayName;
-        troupeUrl = "/" + otherUser.username;
+        troupeUri = otherUser.username;
       } else {
         return null;
       }
@@ -274,8 +274,10 @@ function TroupeStrategy(options) {
         troupeName = group ? group.name : item.uri;
       }
 
-      troupeUrl = "/" + item.uri;
+      troupeUri = item.uri;
     }
+
+    var troupeUrl = '/' + troupeUri;
 
 
 
@@ -311,7 +313,7 @@ function TroupeStrategy(options) {
       name: troupeName,
       topic: item.topic,
       avatarUrl: avatarUrl,
-      uri: item.uri,
+      uri: troupeUri,
       oneToOne: item.oneToOne,
       userCount: item.userCount,
       user: otherUser,
