@@ -123,6 +123,7 @@ describe('admin-filter-test', function() {
         // This also tests objecss with no extraAdmins....
 
         return recorder.testOnly.handle(userId2, 'GH_REPO', 'GH_REPO_PUSH', URI2, 'external_xx', true)
+          .delay(100) // Mongodb slave wait
           .then(function() {
             return adminFilter(fixture.group3, [userId1, userId2, userId3]);
           })
