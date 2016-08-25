@@ -7,6 +7,7 @@ describe('admin-filter-test', function() {
 
   describe('integration tests #slow', function() {
     var URI = fixtureLoader.generateUri();
+    var URI2 = fixtureLoader.generateUri();
     var adminFilter = require('../../lib/known-external-access/admin-filter');
     var recorder = require('../../lib/known-external-access/recorder');
 
@@ -32,6 +33,16 @@ describe('admin-filter-test', function() {
           admins: 'MANUAL',
           public: true,
           extraAdmins: ['user2']
+        }
+      },
+      group3: {
+        securityDescriptor: {
+          type: 'GH_REPO',
+          members: 'PUBLIC',
+          admins: 'GH_REPO_PUSH',
+          public: true,
+          linkPath: URI2,
+          externalId: null
         }
       },
 
@@ -87,8 +98,23 @@ describe('admin-filter-test', function() {
         .then(function(filtered) {
           assert.deepEqual(filtered.map(String), [userId2].map(String));
         })
+    });
 
-    })
+    it('should work with GH_REPO security descriptors', function() {
+      var userId1 = fixture.user1._id;
+      var userId2 = fixture.user2._id;
+      var userId3 = fixture.user3._id;
+
+      // This also tests objecss with no extraAdmins....
+
+      return recorder.testOnly.handle(userId2, 'GH_REPO', 'GH_REPO_PUSH', URI2, 'external_xx', true)
+        .then(function() {
+          return adminFilter(fixture.group3, [userId1, userId2, userId3]);
+        })
+        .then(function(filtered) {
+          assert.deepEqual(filtered.map(String), [userId2].map(String));
+        })
+    });
 
   });
 
