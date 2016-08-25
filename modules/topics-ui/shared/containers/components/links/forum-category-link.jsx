@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 import navigateToCategory from '../../../action-creators/forum/navigate-to-category';
 import {dispatch} from '../../../dispatcher';
+import {DEFAULT_CATEGORY_NAME} from '../../../constants/navigation';
 
 export default React.createClass({
 
@@ -23,7 +24,7 @@ export default React.createClass({
     //TODO, should do something about this
     const categoryName = category.category;
     const title = `View all ${categoryName} topics`;
-    const href = (categoryName === 'all') ?
+    const href = (categoryName === DEFAULT_CATEGORY_NAME) ?
       `/${groupName}/topics` :
       `/${groupName}/topics/categories/${slug}`;
 
