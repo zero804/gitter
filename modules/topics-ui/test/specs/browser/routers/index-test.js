@@ -144,7 +144,7 @@ describe('Router', function(){
 
   it('should set createTopic to false when navigating from /create-topic to /topics', () => {
     dispatch(navigateToCreateTopic());
-    dispatch(navigateToCategory('all'));
+    dispatch(navigateToCategory(navConstants.DEFAULT_CATEGORY_NAME));
     assert.equal(router.get('createTopic'), false);
   });
 
