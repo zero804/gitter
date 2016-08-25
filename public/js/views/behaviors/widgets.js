@@ -3,7 +3,7 @@
 var _ = require('underscore');
 var Marionette = require('backbone.marionette');
 var behaviourLookup = require('./lookup');
-var unsafeParseHtml = require('utils/unsafe-parse-html');
+var unsafeParseHtml = require('../../utils/unsafe-parse-html');
 
 module.exports = (function() {
   var cachedWidgets = {};

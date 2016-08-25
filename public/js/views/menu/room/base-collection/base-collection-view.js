@@ -4,8 +4,8 @@ var Marionette = require('backbone.marionette');
 var _ = require('underscore');
 var fastdom = require('fastdom');
 var template = require('./base-collection-view.hbs');
-var context = require('utils/context');
-var toggleClass = require('utils/toggle-class');
+var context = require('../../../../utils/context');
+var toggleClass = require('../../../../utils/toggle-class');
 
 module.exports = Marionette.CompositeView.extend({
 

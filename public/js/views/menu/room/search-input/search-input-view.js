@@ -4,10 +4,10 @@
 var Marionette = require('backbone.marionette');
 var _ = require('underscore');
 var cocktail = require('backbone.cocktail');
-var KeyboardEventMixin = require('views/keyboard-events-mixin');
+var KeyboardEventMixin = require('../../../keyboard-events-mixin');
 var template = require('./search-input-view.hbs');
-var toggleClass = require('utils/toggle-class');
-var RAF = require('utils/raf');
+var toggleClass = require('../../../../utils/toggle-class');
+var RAF = require('../../../../utils/raf');
 
 var SearchInputView = Marionette.ItemView.extend({
 
