@@ -2,14 +2,14 @@
 
 var $ = require('jquery');
 var Marionette = require('backbone.marionette');
-var context = require('utils/context');
+var context = require('../../utils/context');
 var clientEnv = require('gitter-client-env');
-var apiClient = require('components/apiClient');
-var social = require('utils/social');
+var apiClient = require('../../components/apiClient');
+var social = require('../../utils/social');
 var ModalView = require('./modal');
 var cdn = require('gitter-web-cdn');
 var template = require('./tmpl/share-view.hbs');
-var ZeroClipboard = require('zeroclipboard');
+var ZeroClipboard = require('zeroclipboard'); // eslint-disable-line node/no-missing-require
 var backendUtils = require('../../utils/backend-utils');
 
 require('gitter-styleguide/css/components/buttons.css');

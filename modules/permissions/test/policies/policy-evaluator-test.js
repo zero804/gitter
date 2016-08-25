@@ -482,6 +482,10 @@ describe('policy-evaluator', function () {
 
           getPolicyRateLimitKey: function () {
             return 'XXX';
+          },
+
+          getAccessDetails: function() {
+            return null;
           }
         }
       }

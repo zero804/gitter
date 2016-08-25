@@ -55,7 +55,12 @@ describe('add-invite-policy-factory', function() {
             this.hasPolicy = function() {
               return Promise.resolve(META.delegateResponse);
             };
+
             this.getPolicyRateLimitKey = function() {
+              return null;
+            };
+
+            this.getAccessDetails = function() {
               return null;
             };
           },

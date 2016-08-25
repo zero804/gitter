@@ -9,6 +9,7 @@ var policyCheckRateLimiter = require('./policy-check-rate-limiter');
 var PolicyDelegateTransportError = require('./policy-delegate-transport-error');
 var debug = require('debug')('gitter:app:permissions:policy-evaluator');
 var assert = require('assert');
+var knownAccessRecorder = require('../known-external-access/recorder');
 
 var SUCCESS_RESULT_CACHE_TIME = 5 * 60; // 5 minutes in seconds
 
@@ -340,8 +341,21 @@ PolicyEvaluator.prototype = {
     var policyDelegate = this._policyDelegate;
 
     return policyDelegate.hasPolicy(policyName)
+      .bind(this)
       .tap(function(access) {
+        var userId = this._userId;
+
+        if (userId) {
+          // Cache the access for admin user lookups
+          var accessDetails = policyDelegate.getAccessDetails(policyName);
+          if (accessDetails) {
+            // This is not chained to the promise
+            knownAccessRecorder(userId, accessDetails.type, policyName, accessDetails.linkPath, accessDetails.externalId, access);
+          }
+        }
+
         if (access) {
+          // If successful, cache the result for a short period
           var rateLimitKey = policyDelegate.getPolicyRateLimitKey(policyName);
 
           if (rateLimitKey) {

@@ -1,10 +1,10 @@
 "use strict";
 var Mutant = require('mutantjs');
 var _ = require('underscore');
-var rafUtils = require('utils/raf-utils');
-var isMobile = require('utils/is-mobile');
+var rafUtils = require('./raf-utils');
+var isMobile = require('./is-mobile');
 var passiveEventListener = require('./passive-event-listener');
-var raf = require('utils/raf');
+var raf = require('./raf');
 
 module.exports = (function() {
 

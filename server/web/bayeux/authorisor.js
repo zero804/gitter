@@ -36,6 +36,10 @@ var routes = [{
     validator: validateUserForSubTroupeSubscription,
     populator: populateSubSubTroupeCollection
   }, {
+    re: /^\/api\/v1\/forums\/(\w+)\/topics$/,
+    validator: validateUserForForumSubscription,
+    populator: populateTopicsCollection
+  }, {
     re: /^\/api\/v1\/user\/(\w+)\/(\w+)$/,
     validator: validateUserForUserSubscription,
     populator: populateSubUserCollection
@@ -95,6 +99,23 @@ function validateUserForSubTroupeSubscription(options) {
         logger.error('Unable to reassociate connection or update last access: ', { exception: err, userId: userId, troupeId: troupeId });
       });
   });
+}
+
+// This strategy ensures that a user can access a forum URL
+function validateUserForForumSubscription(options) {
+  var userId = options.userId;
+  var match = options.match;
+
+  var forumId = match[1];
+
+  if (!mongoUtils.isLikeObjectId(forumId)) {
+    return Promise.reject(new StatusError(400, 'Invalid ID: ' + forumId));
+  }
+
+  return policyFactory.createPolicyForUserIdInForumId(userId, forumId)
+    .then(function(policy) {
+      return policy.canRead();
+    });
 }
 
 // This is only used by the native client. The web client publishes to
@@ -254,6 +275,18 @@ function populateUserUnreadItemsCollection(options) {
 
   return restful.serializeUnreadItemsForTroupe(troupeId, userId)
     .then(dataToSnapshot('user.room.unreadItems'));
+}
+
+function populateTopicsCollection(options) {
+  var match = options.match;
+  var forumId = match[1];
+
+  if (!forumId) {
+    return Promise.resolve();
+  }
+
+  return restful.serializeTopicsForForumId(forumId)
+    .then(dataToSnapshot('forum.topics'));
 }
 
 // Authorize a sbscription message

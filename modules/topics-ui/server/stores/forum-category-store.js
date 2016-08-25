@@ -1,16 +1,22 @@
 "use strict";
 
+var navConstants = require('../../shared/constants/navigation');
+
 module.exports = function forumCategoryStore(categories, categoryFilter) {
 
   categories = (categories || []);
-  categoryFilter = (categoryFilter || 'all');
+  categoryFilter = (categoryFilter || navConstants.DEFAULT_CATEGORY_NAME);
 
-  categories = categories.map((cat) => ({
-    category: cat,
-    active: (cat === categoryFilter)
+  categories = categories.map((data) => ({
+    category: data.name,
+    active: (data.slug === categoryFilter),
+    slug: data.slug
   }));
 
-  categories.unshift({ category: 'all', active: (categoryFilter === 'all') });
+  categories.unshift({
+    category: navConstants.DEFAULT_CATEGORY_NAME,
+    active: (categoryFilter === navConstants.DEFAULT_CATEGORY_NAME)
+  });
 
   const getCategories = () => categories;
 

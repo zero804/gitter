@@ -1,22 +1,22 @@
 "use strict";
 var $ = require('jquery');
-var context = require('utils/context');
-var liveContext = require('components/live-context');
-var chatModels = require('collections/chat');
-var ChatCollectionView = require('views/chat/chatCollectionView');
-var unreadItemsClient = require('components/unread-items-client');
-var emojiDecorator = require('views/chat/decorators/emojiDecorator');
-var mobileDecorator = require('views/chat/decorators/mobileDecorator');
-var onready = require('./utils/onready');
+var context = require('./utils/context');
+var liveContext = require('./components/live-context');
+var chatModels = require('./collections/chat');
+var ChatCollectionView = require('./views/chat/chatCollectionView');
+var unreadItemsClient = require('./components/unread-items-client');
+var emojiDecorator = require('./views/chat/decorators/emojiDecorator');
+var mobileDecorator = require('./views/chat/decorators/mobileDecorator');
+var onready = require('././utils/onready');
 var FastClick = require('fastclick');
-var appEvents = require('utils/appevents');
+var appEvents = require('./utils/appevents');
 
 require('./components/eyeballs-room-sync');
-require('components/ping');
+require('./components/ping');
 
 // Preload widgets
-require('views/widgets/avatar');
-require('template/helpers/all');
+require('./views/widgets/avatar');
+require('./template/helpers/all');
 
 onready(function() {
   FastClick.attach(document.body);

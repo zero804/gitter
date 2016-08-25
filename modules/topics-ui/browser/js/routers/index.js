@@ -1,4 +1,3 @@
-
 import { parse, stringify } from 'qs';
 import Backbone from 'backbone';
 import { subscribe } from '../../../shared/dispatcher';
@@ -7,6 +6,7 @@ import * as forumCatConstants from '../../../shared/constants/forum-categories';
 import * as forumFilterConstants from '../../../shared/constants/forum-filters';
 import * as forumTagConstants from '../../../shared/constants/forum-tags';
 import * as forumSortConstants from '../../../shared/constants/forum-sorts';
+import * as createTopicConstants from '../../../shared/constants/create-topic';
 
 var RouteModel = Backbone.Model.extend({
   //Do we need to use the constructor to get the default values out of the window.context
@@ -25,6 +25,8 @@ var Router = Backbone.Router.extend({
     subscribe(forumFilterConstants.NAVIGATE_TO_FILTER, this.updateForumFilter, this);
     subscribe(forumTagConstants.NAVIGATE_TO_TAG, this.updateForumTag, this);
     subscribe(forumSortConstants.NAVIGATE_TO_SORT, this.updateForumSort, this);
+    subscribe(navConstants.NAVIGATE_TO_TOPIC, this.navigateToTopic, this);
+    subscribe(createTopicConstants.NAVIGATE_TO_CREATE_TOPIC, this.navigateToCreateTopic, this);
 
     this.listenTo(this.model, 'change:filterName', this.onFilterUpdate, this);
     this.listenTo(this.model, 'change:sortName', this.onSortUpdate, this);
@@ -34,12 +36,13 @@ var Router = Backbone.Router.extend({
 
   routes: {
     ':groupName/topics/create-topic(/)': 'createTopic',
-    ':groupName/topics(/categories/:categoryName)(/)(?*queryString)': 'forums'
+    ':groupName/topics(/categories/:categoryName)(/)(?*queryString)': 'forums',
+    ':groupName/topics/topic/:id/:slug(/)(?*queryString)': 'topic'
   },
 
   createTopic(groupName){
     this.model.set({
-      route: 'create-topic',
+      route: navConstants.CREATE_TOPIC_ROUTE,
       groupName: groupName,
       categoryName: navConstants.DEFAULT_CATEGORY_NAME,
       createTopic: true,
@@ -49,33 +52,48 @@ var Router = Backbone.Router.extend({
   forums(groupName, categoryName, queryString){
     const query = parse(queryString || '');
     this.model.set({
-      route: 'forum' ,
+      route: navConstants.FORUM_ROUTE,
       groupName: groupName,
       categoryName: (categoryName || navConstants.DEFAULT_CATEGORY_NAME),
       filterName: (query.filter || navConstants.DEFAULT_FILTER_NAME),
       tagName: (query.tag || navConstants.DEFAULT_TAG_NAME),
       sortName: (query.sort || navConstants.DEFAULT_SORT_NAME),
+      createTopic: false
     });
+  },
+
+  topic(groupName, id, slug){
+    this.model.set({
+      route: navConstants.TOPIC_ROUTE,
+      groupName: groupName,
+      topicId: id,
+      slug: slug
+    });
+  },
+
+  navigateToCreateTopic(){
+    const groupName = this.model.get('groupName');
+    this.navigate(`/${groupName}/topics/create-topic`, { trigger: true });
   },
 
   updateForumCategory(data){
     var url = this.buildForumUrl(data.category);
-    this.navigate(url, { trigger: true, replace: true });
+    this.navigate(url, { trigger: true });
   },
 
   updateForumFilter(data) {
     var url = this.buildForumUrl(undefined, data.filter);
-    this.navigate(url, { trigger: true, replace: true });
+    this.navigate(url, { trigger: true });
   },
 
   updateForumTag(data){
     var url = this.buildForumUrl(undefined, undefined, data.tag);
-    this.navigate(url, { trigger: true, replace: true });
+    this.navigate(url, { trigger: true });
   },
 
   updateForumSort(data){
     var url = this.buildForumUrl(undefined, undefined, undefined, data.sort);
-    this.navigate(url, { trigger: true, replace: true });
+    this.navigate(url, { trigger: true });
   },
 
   onFilterUpdate(moidel, val){
@@ -84,6 +102,11 @@ var Router = Backbone.Router.extend({
 
   onSortUpdate(model, val){
     this.model.trigger(forumSortConstants.UPDATE_ACTIVE_SORT, { sort: val });
+  },
+
+  navigateToTopic(data){
+    const url = `/${data.groupName}/topics/topic/${data.id}/${data.slug}`;
+    this.navigate(url, { trigger: true });
   },
 
   buildForumUrl(categoryName, filterName, tagName, sortName){
