@@ -2,9 +2,9 @@
 
 var Marionette = require('backbone.marionette');
 var template = require('./tmpl/unreadBannerTemplate.hbs');
-var appEvents = require('utils/appevents');
-var unreadItemsClient = require('components/unread-items-client');
-require('views/behaviors/tooltip');
+var appEvents = require('../../utils/appevents');
+var unreadItemsClient = require('../../components/unread-items-client');
+require('../behaviors/tooltip');
 
 var TopBannerView = Marionette.ItemView.extend({
   octicon: 'octicon-chevron-up',

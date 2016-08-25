@@ -1,7 +1,7 @@
 "use strict";
 
 var context = require('../utils/context');
-var apiClient = require('components/apiClient');
+var apiClient = require('./apiClient');
 var localStore = require('./local-store');
 var realtime = require('./realtime');
 var realtimePresenceTracking = require('./realtime-presence-tracking');

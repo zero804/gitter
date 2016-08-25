@@ -1,4 +1,4 @@
 "use strict";
 
-require('utils/font-setup');
 require('./utils/frame-utils');
+require('./utils/font-setup');
