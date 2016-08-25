@@ -6,6 +6,7 @@ import * as forumCatConstants from '../../../shared/constants/forum-categories';
 import * as forumFilterConstants from '../../../shared/constants/forum-filters';
 import * as forumTagConstants from '../../../shared/constants/forum-tags';
 import * as forumSortConstants from '../../../shared/constants/forum-sorts';
+import * as createTopicConstants from '../../../shared/constants/create-topic';
 
 var RouteModel = Backbone.Model.extend({
   //Do we need to use the constructor to get the default values out of the window.context
@@ -25,6 +26,7 @@ var Router = Backbone.Router.extend({
     subscribe(forumTagConstants.NAVIGATE_TO_TAG, this.updateForumTag, this);
     subscribe(forumSortConstants.NAVIGATE_TO_SORT, this.updateForumSort, this);
     subscribe(navConstants.NAVIGATE_TO_TOPIC, this.navigateToTopic, this);
+    subscribe(createTopicConstants.NAVIGATE_TO_CREATE_TOPIC, this.navigateToCreateTopic, this);
 
     this.listenTo(this.model, 'change:filterName', this.onFilterUpdate, this);
     this.listenTo(this.model, 'change:sortName', this.onSortUpdate, this);
@@ -56,6 +58,7 @@ var Router = Backbone.Router.extend({
       filterName: (query.filter || navConstants.DEFAULT_FILTER_NAME),
       tagName: (query.tag || navConstants.DEFAULT_TAG_NAME),
       sortName: (query.sort || navConstants.DEFAULT_SORT_NAME),
+      createTopic: false
     });
   },
 
@@ -66,6 +69,11 @@ var Router = Backbone.Router.extend({
       topicId: id,
       slug: slug
     });
+  },
+
+  navigateToCreateTopic(){
+    const groupName = this.model.get('groupName');
+    this.navigate(`/${groupName}/topics/create-topic`, { trigger: true });
   },
 
   updateForumCategory(data){

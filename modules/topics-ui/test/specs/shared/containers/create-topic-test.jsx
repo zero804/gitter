@@ -1,8 +1,7 @@
 import React from 'react';
-import Backbone from 'backbone';
-import { equal, ok } from 'assert';
+import { equal } from 'assert';
 import { mount } from 'enzyme';
-import { subscribe, dispatch } from '../../../../shared/dispatcher';
+import { subscribe } from '../../../../shared/dispatcher';
 import { spy } from 'sinon';
 import CreateTopicContainer from '../../../../shared/containers/CreateTopicContainer.jsx';
 import * as createConst from '../../../../shared/constants/create-topic';
