@@ -1,6 +1,6 @@
 "use strict";
 
-var $ = require('jquery-iframely');
+var $ = require('jquery-iframely'); // eslint-disable-line node/no-missing-require
 var embedGenerator = require('../../../utils/embed-generator');
 
 module.exports = (function() {

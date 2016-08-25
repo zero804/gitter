@@ -1,16 +1,38 @@
 import { equal } from 'assert';
+import sinon from 'sinon';
 import React from 'react';
 import { shallow } from 'enzyme';
 import CreateTopicModal from '../../../../../../shared/containers/components/topic/create-topic-modal.jsx';
+import mockEvt from '../../../../../mocks/event';
 
 describe('<CreateTopicModal/>', () => {
 
   let wrapper;
   let activeWrapper;
+  let submitHandle;
+  let titleChangeHandle;
+  let bodyChangeHandle;
 
   beforeEach(() => {
-    wrapper = shallow(<CreateTopicModal active={false}/>);
-    activeWrapper = shallow(<CreateTopicModal active={true}/>);
+
+    submitHandle = sinon.spy();
+    titleChangeHandle = sinon.spy();
+    bodyChangeHandle = sinon.spy();
+
+    wrapper = shallow(
+      <CreateTopicModal
+      active={false}
+      onTitleChange={titleChangeHandle}
+      onBodyChange={bodyChangeHandle}
+      onSubmit={submitHandle}/>);
+
+    activeWrapper = shallow(
+      <CreateTopicModal
+      active={true}
+      onTitleChange={titleChangeHandle}
+      onBodyChange={bodyChangeHandle}
+      onSubmit={submitHandle}/>
+    );
   });
 
   it('should render a modal', () => {
@@ -58,7 +80,22 @@ describe('<CreateTopicModal/>', () => {
   });
 
   it('should render the editor with a name of body', () => {
-      equal(wrapper.find('Editor').at(0).prop('name'), 'body');
+    equal(wrapper.find('Editor').at(0).prop('name'), 'body');
+  });
+
+  it('should call onSubmit when submitted', () => {
+    wrapper.find('form').at(0).simulate('submit', mockEvt);
+    equal(submitHandle.callCount, 1);
+  });
+
+  it('should call onTitleChange when the input changes', () => {
+    wrapper.find('Input').prop('onChange')();
+    equal(titleChangeHandle.callCount, 1);
+  });
+
+  it('should call onBodyChange when the textarea changes', () => {
+    wrapper.find('Editor').prop('onChange')();
+    equal(bodyChangeHandle.callCount, 1);
   });
 
 });

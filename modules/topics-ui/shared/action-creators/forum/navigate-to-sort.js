@@ -1,4 +1,3 @@
-
 import * as forumSortConstants from '../../constants/forum-sorts';
 
 export default function navigateToSort(sort){

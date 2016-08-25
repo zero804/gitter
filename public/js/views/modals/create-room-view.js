@@ -5,15 +5,15 @@ var _ = require('underscore');
 var Marionette = require('backbone.marionette');
 var fuzzysearch = require('fuzzysearch');
 var urlJoin = require('url-join');
-var FilteredCollection = require('backbone-filtered-collection');
+var SimpleFilteredCollection = require('gitter-realtime-client/lib/simple-filtered-collection');
 var fastdom = require('fastdom');
-var toggleClass = require('utils/toggle-class');
+var toggleClass = require('../../utils/toggle-class');
 var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
 var getRoomNameFromTroupeName = require('gitter-web-shared/get-room-name-from-troupe-name');
-var apiClient = require('components/apiClient');
-var appEvents = require('utils/appevents');
+var apiClient = require('../../components/apiClient');
+var appEvents = require('../../utils/appevents');
 var context = require('../../utils/context');
-var GroupSelectView = require('views/create-room/groupSelectView');
+var GroupSelectView = require('../create-room/groupSelectView');
 var ModalView = require('./modal');
 var FilteredSelect = require('./filtered-select');
 var roomAvailabilityStatusConstants = require('../create-room/room-availability-status-constants');
@@ -110,7 +110,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
     this.repoCollection = attrs.repoCollection;
     this.hasRendered = false;
 
-    this.filteredRepoCollection = new FilteredCollection({
+    this.filteredRepoCollection = new SimpleFilteredCollection([], {
       collection: this.repoCollection
     });
 

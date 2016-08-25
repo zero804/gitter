@@ -2,7 +2,7 @@
 
 var Marionette = require('backbone.marionette');
 var fuzzysearch = require('fuzzysearch');
-var Typeahead = require('views/controls/typeahead');
+var Typeahead = require('../controls/typeahead');
 var template = require('./tmpl/groupSelectView.hbs');
 var itemTemplate = require('./tmpl/parentItemView.hbs');
 
