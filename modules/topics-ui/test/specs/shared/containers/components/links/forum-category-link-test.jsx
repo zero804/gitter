@@ -7,6 +7,7 @@ import categories from '../../../../../mocks/mock-data/categories';
 import {NAVIGATE_TO_CATEGORY} from '../../../../../../shared/constants/forum-categories';
 import {subscribe} from '../../../../../../shared/dispatcher';
 import mockEvt from '../../../../../mocks/event';
+import {DEFAULT_CATEGORY_NAME} from '../../../../../../shared/constants/navigation';
 
 describe('<ForumCategoryLink/>', () => {
 
@@ -34,7 +35,13 @@ describe('<ForumCategoryLink/>', () => {
   });
 
   it('should generate a different link for the "all" category', () => {
-    wrapper = shallow(<ForumCategoryLink groupName="gitterHQ" category={{category: 'all', slug: 'all'}}>test</ForumCategoryLink>)
+    wrapper = shallow(
+      <ForumCategoryLink
+      groupName="gitterHQ"
+      category={{category: DEFAULT_CATEGORY_NAME, slug: 'all'}}>
+      test
+      </ForumCategoryLink>
+    )
     equal(wrapper.find('a').at(0).prop('href'), '/gitterHQ/topics');
   });
 
