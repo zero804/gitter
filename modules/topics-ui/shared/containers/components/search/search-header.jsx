@@ -5,6 +5,7 @@ import ForumCategoryLink from '../links/forum-category-link.jsx';
 import H1 from '../text/h-1.jsx';
 import Input from '../forms/input.jsx';
 import CreateTopicLink from '../links/create-topic-link.jsx';
+import {DEFAULT_CATEGORY_NAME} from '../../../constants/navigation';
 
 export default React.createClass({
 
@@ -24,7 +25,7 @@ export default React.createClass({
             <ForumCategoryLink
               className="topic-search__all-topics-link"
               groupName={groupName}
-              category={{ category: 'All', slug: 'all'}}>
+              category={{ category: 'All', slug: DEFAULT_CATEGORY_NAME}}>
                 Topics
             </ForumCategoryLink>
           </H1>
