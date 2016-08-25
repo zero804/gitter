@@ -44,9 +44,11 @@ function handle(userId, type, policyName, linkPath, externalId, access) {
       }
     }, {
       upsert: true
-    });
+    })
+    .exec()
   } else {
-    return KnownExternalAccess.remove(query);
+    return KnownExternalAccess.remove(query)
+      .exec();
   }
 }
 
