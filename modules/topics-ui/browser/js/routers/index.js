@@ -32,7 +32,7 @@ var Router = Backbone.Router.extend({
     this.listenTo(this.model, 'change:filterName', this.onFilterUpdate, this);
     this.listenTo(this.model, 'change:sortName', this.onSortUpdate, this);
 
-    Backbone.Router.prototype.constructor.call(this, ...arguments);
+    Backbone.Router.prototype.constructor.apply(this, arguments);
   },
 
   routes: {
