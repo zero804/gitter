@@ -1,10 +1,9 @@
 'use strict';
 
 var Backbone = require('backbone');
-var _ = require('underscore');
-var FilteredCollection = require('backbone-filtered-collection');
 var backboneUrlResolver = require('backbone-url-resolver');
 var SyncMixin = require('./sync-mixin');
+var SimpleFilteredCollection = require('gitter-realtime-client/lib/simple-filtered-collection');
 
 var Model = Backbone.Model.extend({
   defaults: {
@@ -46,29 +45,23 @@ var SuggestedCollection = Backbone.Collection.extend({
   sync: SyncMixin.sync,
 });
 
-var FilteredSuggestedCollection = function(attrs, options) {
-  this.collection = new SuggestedCollection(null, attrs, options);
-  this.roomCollection = attrs.roomCollection;
-  this.collectionFilter = this.collectionFilter.bind(this);
-  attrs = _.extend({}, attrs, { collection: this.collection });
+var FilteredSuggestionsCollection = SimpleFilteredCollection.extend({
+  constructor: function(options) {
+    var collection = new SuggestedCollection(null, options);
+    var roomCollection = options.roomCollection;
 
-  this.listenTo(this.roomCollection, 'update', this.onCollectionSync, this);
+    SimpleFilteredCollection.prototype.constructor.call(this, [], {
+      collection: collection,
+      filter: function(model) {
+        return !roomCollection.get(model.get('id'));
+      }
+    });
 
-  FilteredCollection.call(this, attrs, options);
-};
-
-FilteredSuggestedCollection.prototype = _.extend(
-  FilteredSuggestedCollection.prototype,
-  FilteredCollection.prototype, {
-
-  collectionFilter: function(model) {
-    return !this.roomCollection.get(model.get('id'));
-  },
-
-  onCollectionSync: function() {
-    this.setFilter();
+    this.listenTo(roomCollection, 'update', function() {
+      this.setFilter();
+    });
   },
 
 });
 
-module.exports = FilteredSuggestedCollection;
+module.exports = FilteredSuggestionsCollection;

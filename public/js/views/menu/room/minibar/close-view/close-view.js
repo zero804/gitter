@@ -1,7 +1,7 @@
 'use strict';
 
 var _ = require('underscore');
-var toggleClass = require('utils/toggle-class');
+var toggleClass = require('../../../../../utils/toggle-class');
 var template = require('./close-view.hbs');
 var ItemView = require('../minibar-item-view');
 
