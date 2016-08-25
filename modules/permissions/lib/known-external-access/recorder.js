@@ -5,16 +5,11 @@ var KnownExternalAccess = require('gitter-web-persistence').KnownExternalAccess;
 var env = require('gitter-web-env');
 var errorReporter = env.errorReporter;
 
-function handle(userId, type, policyName, linkPath, externalId, access) {
+function generateQuery(userId, type, policyName, linkPath, externalId) {
   var query = {
     userId: userId,
     type: type,
-    policyName: policyName,
-    $or: [{
-      linkPath: linkPath
-    }, {
-      externalId: externalId
-    }]
+    policyName: policyName
   };
 
   if (linkPath && externalId) {
@@ -23,16 +18,28 @@ function handle(userId, type, policyName, linkPath, externalId, access) {
     }, {
       externalId: externalId
     }];
-  } else if (linkPath) {
-    query.linkPath = linkPath;
-  } else if (externalId) {
-    query.externalId = externalId;
-  } else {
-    // This can never happen
-    assert(false, 'Expected linkPath or externalId');
+
+    return query;
   }
 
+  if (linkPath) {
+    query.linkPath = linkPath;
+    return query;
+  }
+
+  if (externalId) {
+    query.externalId = externalId;
+    return query;
+  }
+
+  assert(false, 'Expected linkPath or externalId');
+}
+
+function handle(userId, type, policyName, linkPath, externalId, access) {
+  var query = generateQuery(userId, type, policyName, linkPath, externalId);
+
   if (access) {
+    // User has access? Upsert
     return KnownExternalAccess.update(query, {
       $set: {
         userId: userId,
@@ -47,6 +54,7 @@ function handle(userId, type, policyName, linkPath, externalId, access) {
     })
     .exec()
   } else {
+    // User does not have access? Remove
     return KnownExternalAccess.remove(query)
       .exec();
   }
@@ -70,5 +78,6 @@ function knownAccessRecorder(userId, type, policyName, linkPath, externalId, acc
 
 module.exports = knownAccessRecorder;
 module.exports.testOnly = {
+  generateQuery: generateQuery,
   handle: handle
 }

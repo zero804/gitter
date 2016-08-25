@@ -3,7 +3,7 @@
 var assert = require('assert');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
-describe('admin-filter-test', function() {
+describe('admin-filter', function() {
 
   describe('integration tests #slow', function() {
 
