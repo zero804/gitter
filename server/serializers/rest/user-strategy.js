@@ -1,23 +1,16 @@
 /* eslint complexity: ["error", 19] */
 "use strict";
 
-var env = require('gitter-web-env');
-var winston = env.logger;
 var Promise = require('bluebird');
 var identityService = require('gitter-web-identity');
 var presenceService = require('gitter-web-presence');
 var avatars = require('gitter-web-avatars');
 var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 var userScopes = require('gitter-web-identity/lib/user-scopes');
-var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
-var GithubContributorService = require('gitter-web-github').GitHubContributorService;
-
 var collections = require('../../utils/collections');
 var getVersion = require('../get-model-version');
 var troupeService = require('../../services/troupe-service');
-var leanUserDao = require('../../services/daos/user-dao').full;
 var adminFilter = require('gitter-web-permissions/lib/known-external-access/admin-filter')
-
 
 function UserRoleInTroupeStrategy(options) {
   var contributors;
@@ -26,7 +19,9 @@ function UserRoleInTroupeStrategy(options) {
     if (userIds.isEmpty()) return;
 
     return Promise.try(function() {
-        if (options.includeRolesForTroupe) return options.includeRolesForTroupe;
+        if (options.includeRolesForTroupe) {
+          return options.includeRolesForTroupe;
+        }
 
         if (options.includeRolesForTroupeId) {
           // TODO: don't do this
@@ -34,7 +29,15 @@ function UserRoleInTroupeStrategy(options) {
         }
       })
       .then(function(troupe) {
-        if (!troupe) return;
+        if (!troupe || !troupe.sd) return;
+
+
+        if (troupe.sd.members === troupe.sd.admins) {
+          // If all members of the room are always
+          // admins, no point in showing who the
+          // admins are
+          return;
+        }
 
         return adminFilter(troupe, userIds);
       })

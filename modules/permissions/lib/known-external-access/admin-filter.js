@@ -184,6 +184,7 @@ var adminFilterInternal = Promise.method(function(securityDescriptor, userIds, n
 function adminFilter(objectWithSd, userIds) {
   if (!userIds.length) return [];
   if (!objectWithSd.sd) return [];
+  if (objectWithSd.sd.type === 'ONE_TO_ONE') return []; // No admins in one-to-one rooms
 
   return adminFilterInternal(objectWithSd.sd, lazy(userIds), false)
     .then(function(userIds) {
