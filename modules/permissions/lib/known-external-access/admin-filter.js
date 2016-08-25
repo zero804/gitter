@@ -15,6 +15,9 @@ function createHashFor(userIds) {
   }, {});
 }
 
+/**
+ * Build a query for KnownExternalAccess given a GH_REPO security descriptor
+ */
 function getQueryForGhRepo(securityDescriptor) {
   if (securityDescriptor.admins === 'GH_REPO_PUSH') {
     return {
@@ -26,6 +29,9 @@ function getQueryForGhRepo(securityDescriptor) {
   }
 }
 
+/**
+ * Build a query for KnownExternalAccess given a GH_ORG security descriptor
+ */
 function getQueryForGhOrg(securityDescriptor) {
   if (securityDescriptor.admins === 'GH_ORG_MEMBER') {
     return {
@@ -37,6 +43,9 @@ function getQueryForGhOrg(securityDescriptor) {
   }
 }
 
+/**
+ * Build a query for KnownExternalAccess given a security descriptor
+ */
 function getQueryForDescriptor(securityDescriptor) {
   switch(securityDescriptor.type) {
     case 'GH_REPO':
@@ -50,6 +59,13 @@ function getQueryForDescriptor(securityDescriptor) {
   }
 }
 
+/**
+ * Given a query and an array of users,
+ * find out which ones are known to have possibly been administrators by
+ * querying KnownExternalAccess.
+ *
+ * @return [userIds] userIds of known admins
+ */
 function findUsersForQuery(sdQuery, userIds) {
   var disjunction = [];
 
@@ -80,6 +96,11 @@ function findUsersForQuery(sdQuery, userIds) {
     .exec();
 }
 
+/**
+ * Given a security descriptor, a list of userIds returns which of those
+ * users are admins. Will recurse exactly one, if required to query the group
+ * given a group backed room
+ */
 var adminFilterInternal = Promise.method(function(securityDescriptor, userIds, nested) {
   // First step: check extraAdmins
   var usersInExtraAdmins, usersNotInExtraAdmins;
@@ -108,8 +129,11 @@ var adminFilterInternal = Promise.method(function(securityDescriptor, userIds, n
     // Deal with GROUP permissions by fetching the group securityDescriptor and
     // recursively calling this method on that group
     if (nested || !securityDescriptor.internalId) {
+      // nested == true would imply that a group references another group
+      // which would be a bad situation, so we don't recurse further
       return usersInExtraAdmins;
     } else {
+      // Fetch the group and recursively apply the filter to the group...
       return Group.findById(securityDescriptor.internalId, { sd: 1 })
         .read('secondaryPreferred')
         .lean()
@@ -147,6 +171,16 @@ var adminFilterInternal = Promise.method(function(securityDescriptor, userIds, n
   }
 });
 
+/**
+ * Given a group or room, which of the users are
+ * probably admins.
+ *
+ * Shouty McShoutFace says:
+ * THIS METHOD IS BEST GUESS ONLY AND SHOULD ONLY EVER BE USED FOR DISPLAY
+ * PURPOSES, NOT REAL SECURITY. USE POLICY FACTORY FOR SECURITY.
+ *
+ * HKAY?
+ */
 function adminFilter(objectWithSd, userIds) {
   if (!userIds.length) return [];
   if (!objectWithSd.sd) return [];
