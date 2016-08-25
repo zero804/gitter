@@ -56,8 +56,25 @@ var opts = yargs
 
       var forumId = forum._id;
 
-      client.subscribe('/v1/forums/' + forumId, onMessage);
-      client.subscribe('/v1/forums/' + forumId + '/topics', onMessage);
+      // NOTE: this one will be enabled later
+      //client.subscribe('/v1/forums/' + forumId, onMessage);
+
+      var topicsUri = '/v1/forums/' + forumId + '/topics';
+      client.registerSnapshotHandler(topicsUri, {
+        getSnapshotStateForChannel: function() {
+        },
+        getSnapshotState: function() {
+        },
+        getSubscribeOptions: function() {
+        },
+        handleSnapshot: function(snapshot, subscriptionChannel) {
+          console.log("SNAPSHOT", snapshot, subscriptionChannel);
+        }
+      });
+      client.subscribe(topicsUri, onMessage);
+
+      // NOTE: these will be enabled later
+      /*
       if (opts.topic) {
         var topicId = opts.topic;
         client.subscribe('/v1/forums/' + forumId + '/topics/' + topicId + '/replies', onMessage);
@@ -66,6 +83,7 @@ var opts = yargs
           client.subscribe('/v1/forums/' + forumId + '/topics/' + topicId + '/replies/' + replyId, onMessage);
         }
       }
+      */
     });
 
 

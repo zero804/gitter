@@ -41,10 +41,10 @@ describe('authorisor', function() {
           expectedError: true
         }]
       }, {
-        name: 'forum subscription',
+        name: 'forum topics subscription',
         meta: {
           forumId: '57bd75d9a8aefa74c58d9d6c',
-          subscription: "/api/v1/forums/57bd75d9a8aefa74c58d9d6c"
+          subscription: "/api/v1/forums/57bd75d9a8aefa74c58d9d6c/topics"
         },
         tests: [{
           name: 'has access',
