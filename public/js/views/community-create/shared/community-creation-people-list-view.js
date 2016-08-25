@@ -3,8 +3,7 @@
 var Marionette = require('backbone.marionette');
 var urlJoin = require('url-join');
 var clientEnv = require('gitter-client-env');
-var toggleClass = require('utils/toggle-class');
-
+var toggleClass = require('../../../utils/toggle-class');
 var peopleToInviteStatusConstants = require('../people-to-invite-status-constants');
 var CommunityCreationPeopleListTemplate = require('./community-creation-people-list-view.hbs');
 var CommunityCreationPeopleListItemTemplate = require('./community-creation-people-list-item-view.hbs');

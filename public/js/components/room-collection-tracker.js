@@ -1,7 +1,7 @@
 'use strict';
 
-var appEvents = require('utils/appevents');
-var urlParser = require('utils/url-parser');
+var appEvents = require('../utils/appevents');
+var urlParser = require('../utils/url-parser');
 
 function RoomCollectionTracker(collection) {
   this.collection = collection;

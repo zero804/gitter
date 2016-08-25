@@ -6,7 +6,7 @@ var cocktail = require('backbone.cocktail');
 var Mutant = require('mutantjs');
 var SelectableMixin = require('./selectable-mixin');
 var itemTemplate = require('./tmpl/dropdownItem.hbs');
-var dataset = require('utils/dataset-shim');
+var dataset = require('../../utils/dataset-shim');
 
 module.exports = (function() {
 

@@ -7,8 +7,8 @@ var _ = require('underscore');
 var ProxyCollection = require('backbone-proxy-collection');
 var RecentSearchesCollection = require('../collections/recent-searches');
 var SuggestedOrgCollection = require('../collections/org-suggested-rooms');
-var apiClient = require('components/apiClient');
-var context = require('utils/context');
+var apiClient = require('../components/apiClient');
+var context = require('../utils/context');
 var autoModelSave = require('../utils/auto-model-save');
 
 var FilteredMinibarGroupCollection = require('../collections/filtered-minibar-group-collection');
@@ -97,10 +97,19 @@ module.exports = Backbone.Model.extend({
 
     //expose the public collection
     this.searchTerms = new RecentSearchesCollection(null);
-    this.searchRoomAndPeople = new SearchRoomPeopleCollection(null, { roomMenuModel: this, roomCollection: this._roomCollection });
+    this.searchTerms.getUnderlying().fetch();
+
+    this.searchRoomAndPeople = new SearchRoomPeopleCollection(null, {
+      roomMenuModel: this,
+      roomCollection: this._roomCollection
+    });
+
     this.searchMessageQueryModel = new Backbone.Model({ skip: 0 });
     this.searchChatMessages = new SearchChatMessages(null, { roomMenuModel: this, roomModel: this._troupeModel, queryModel: this.searchMessageQueryModel });
-    this.suggestedOrgs = new SuggestedOrgCollection({ contextModel: this, roomCollection: this._roomCollection });
+    this.suggestedOrgs = new SuggestedOrgCollection({
+      contextModel: this,
+      roomCollection: this._roomCollection
+    });
     this.userSuggestions = new UserSuggestions(null, { contextModel: context.user() });
     this._suggestedRoomCollection = new SuggestedRoomsByRoomCollection({
       roomMenuModel:           this,
@@ -132,6 +141,7 @@ module.exports = Backbone.Model.extend({
 
 
     this.activeRoomCollection = new FilteredRoomCollection(null, {
+      autoResort: true,
       roomModel:  this,
       collection: this._roomCollection,
     });
@@ -239,7 +249,7 @@ module.exports = Backbone.Model.extend({
   },
 
   onSearchTermChange: _.debounce(function() {
-    this.searchTerms.add({ name: this.get('searchTerm') });
+    this.searchTerms.getUnderlying().add({ name: this.get('searchTerm') });
   }, SEARCH_DEBOUNCE_INTERVAL),
 
   onPrimaryCollectionSnapshot: function() {
