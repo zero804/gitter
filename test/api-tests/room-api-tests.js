@@ -100,7 +100,7 @@ describe('room-api', function() {
       })
   });
 
-  it('GET /v1/rooms/:roomId/suggestedRooms', function() {
+  it.skip('GET /v1/rooms/:roomId/suggestedRooms', function() {
     return request(app)
       .get('/v1/rooms/' + fixture.troupe1.id + '/suggestedRooms')
       .set('x-access-token', fixture.user1.accessToken)
