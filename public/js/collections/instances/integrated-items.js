@@ -2,11 +2,11 @@
 
 var userModels = require('../users');
 var eventModels = require('../events');
-var appEvents = require('utils/appevents');
-var errorHandle = require('utils/live-collection-error-handle');
+var appEvents = require('../../utils/appevents');
+var errorHandle = require('../../utils/live-collection-error-handle');
 
 // TODO: find a better home for this....
-require('components/realtime-troupe-listener');
+require('../../components/realtime-troupe-listener');
 
 var rosterCollection = new userModels.RosterCollection(null, { listen: true });
 var eventCollection = new eventModels.EventCollection(null, { listen: true, snapshot: true });

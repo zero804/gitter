@@ -3,17 +3,17 @@
 
 var $ = require('jquery');
 var Marionette = require('backbone.marionette');
-var appEvents = require('utils/appevents');
+var appEvents = require('../../utils/appevents');
 var chatItemView = require('./chatItemView');
-var Rollers = require('utils/rollers');
+var Rollers = require('../../utils/rollers');
 var isolateBurst = require('gitter-web-shared/burst/isolate-burst-bb');
-var context = require('utils/context');
+var context = require('../../utils/context');
 var perfTiming = require('../../components/perf-timing');
 var debug = require('debug-proxy')('app:chat-collection-view');
 var collapsedItemsClient = require('../../utils/collapsed-item-client');
 
-require('views/behaviors/infinite-scroll');
-require('views/behaviors/smooth-scroll');
+require('../behaviors/infinite-scroll');
+require('../behaviors/smooth-scroll');
 
 module.exports = (function() {
 
