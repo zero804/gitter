@@ -3,7 +3,7 @@
 var one2oneFilter = require('gitter-web-shared/filters/left-menu-primary-one2one');
 var orgFilter = require('gitter-web-shared/filters/left-menu-primary-org');
 var sortAndFilters = require('gitter-realtime-client/lib/sorts-filters').model;
-var SimpleFilteredCollection = require('./simple-filtered-collection');
+var SimpleFilteredCollection = require('gitter-realtime-client/lib/simple-filtered-collection');
 var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
 
 var FilteredRoomCollection = SimpleFilteredCollection.extend({

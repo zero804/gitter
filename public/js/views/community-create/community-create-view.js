@@ -2,9 +2,9 @@
 
 var Marionette = require('backbone.marionette');
 var cocktail = require('backbone.cocktail');
-var toggleClass = require('utils/toggle-class');
-var appEvents = require('utils/appevents');
-var KeyboardEventMixin = require('views/keyboard-events-mixin');
+var toggleClass = require('../../utils/toggle-class');
+var appEvents = require('../../utils/appevents');
+var KeyboardEventMixin = require('../keyboard-events-mixin');
 var template = require('./community-create-view.hbs');
 var stepConstants = require('./step-constants');
 var CommunityCreateStepViewModel = require('./community-create-step-view-model');
@@ -16,7 +16,7 @@ var CommunityCreationInvitePeopleView = require('./invite-step/community-creatio
 var CommunityCreationInviteConfirmationView = require('./invite-confirmation-step/community-creation-invite-confirmation-view');
 var CommunityCreationOverviewView = require('./overview-step/community-creation-overview-view');
 
-require('views/behaviors/isomorphic');
+require('../behaviors/isomorphic');
 
 var CommunityCreateView = Marionette.LayoutView.extend({
   template: template,

@@ -1,5 +1,5 @@
 "use strict";
-var appEvents = require('utils/appevents');
+var appEvents = require('../utils/appevents');
 var debug = require('debug-proxy')('app:dozy');
 
 module.exports = (function() {
