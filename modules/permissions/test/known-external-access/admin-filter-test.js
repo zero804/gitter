@@ -76,6 +76,7 @@ describe('admin-filter', function() {
         var userId3 = fixture.user3._id;
 
         return recorder.testOnly.handle(userId2, 'GH_ORG', 'GH_ORG_MEMBER', URI, 'external3', true)
+          .delay(100) // Give mongo time to write to secondary...
           .then(function() {
             return adminFilter(fixture.group1, [userId1, userId2, userId3]);
           })
