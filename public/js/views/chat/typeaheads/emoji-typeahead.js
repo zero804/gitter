@@ -1,7 +1,7 @@
 "use strict";
 
-var isMobile = require('utils/is-mobile');
-var emoji = require('utils/emoji');
+var isMobile = require('../../../utils/is-mobile');
+var emoji = require('../../../utils/emoji');
 var cdn = require('gitter-web-cdn');
 var template = require('./tmpl/emoji-typeahead.hbs');
 

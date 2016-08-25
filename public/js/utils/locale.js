@@ -1,5 +1,5 @@
 "use strict";
-var context = require('utils/context');
+var context = require('../utils/context');
 
 module.exports = (function() {
 

@@ -1,9 +1,9 @@
 "use strict";
 
 var Marionette = require('backbone.marionette');
-var context = require('utils/context');
+var context = require('../../utils/context');
 var appEvents = require('../../utils/appevents');
-var platformKeys = require('utils/platform-keys');
+var platformKeys = require('../../utils/platform-keys');
 var ModalView = require('./modal');
 var keyboardTemplate = require('./tmpl/keyboard-view.hbs');
 

@@ -1,6 +1,6 @@
 'use strict';
 
-var store = require('components/local-store');
+var store = require('../components/local-store');
 
 module.exports = {
   sync: function(method, model, options) {//jshint unused: true
