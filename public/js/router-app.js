@@ -26,6 +26,7 @@ var troupeCollections = require('./collections/instances/troupes');
 var scopeUpgrader = require('./components/scope-upgrader');
 var presentCreateRoomDialog = require('./ensured/present-create-room-dialog');
 var presentCreateCommunityDialog = require('./ensured/present-create-community-dialog');
+var presentPermissionsDialog = require('./ensured/present-permissions-dialog');
 var AppLayout = require('./views/layouts/app-layout');
 var LoadingView = require('./views/app/loading-view');
 
@@ -427,7 +428,8 @@ onready(function() {
       'confirm/*uri': 'confirmRoom',
       'createroom': 'createRoom',
       'createroom/:name': 'createRoom',
-      'createcommunity': 'createCommunity'
+      'createcommunity': 'createCommunity',
+      'permissions': 'permissions'
     },
 
     hideModal: function() {
@@ -455,6 +457,12 @@ onready(function() {
 
     createCommunity: function() {
       presentCreateCommunityDialog({
+        dialogRegion: appLayout.dialogRegion
+      });
+    },
+
+    permissions: function() {
+      presentPermissionsDialog({
         dialogRegion: appLayout.dialogRegion
       });
     },
