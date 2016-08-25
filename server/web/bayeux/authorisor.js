@@ -36,17 +36,9 @@ var routes = [{
     validator: validateUserForSubTroupeSubscription,
     populator: populateSubSubTroupeCollection
   }, {
-    re: /^\/api\/v1\/forums\/(\w+)$/,
-    validator: validateUserForForumSubscription
-  }, {
     re: /^\/api\/v1\/forums\/(\w+)\/topics$/,
-    validator: validateUserForForumSubscription
-  }, {
-    re: /^\/api\/v1\/forums\/(\w+)\/topics\/(\w+)\/replies$/,
-    validator: validateUserForForumSubscription
-  }, {
-    re: /^\/api\/v1\/forums\/(\w+)\/topics\/(\w+)\/replies(\w+)\/comments$/,
-    validator: validateUserForForumSubscription
+    validator: validateUserForForumSubscription,
+    populator: populateTopicsCollection
   }, {
     re: /^\/api\/v1\/user\/(\w+)\/(\w+)$/,
     validator: validateUserForUserSubscription,
@@ -283,6 +275,18 @@ function populateUserUnreadItemsCollection(options) {
 
   return restful.serializeUnreadItemsForTroupe(troupeId, userId)
     .then(dataToSnapshot('user.room.unreadItems'));
+}
+
+function populateTopicsCollection(options) {
+  var match = options.match;
+  var forumId = match[1];
+
+  if (!forumId) {
+    return Promise.resolve();
+  }
+
+  return restful.serializeTopicsForForumId(forumId)
+    .then(dataToSnapshot('forum.topics'));
 }
 
 // Authorize a sbscription message
