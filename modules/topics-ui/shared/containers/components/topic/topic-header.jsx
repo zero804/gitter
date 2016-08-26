@@ -8,6 +8,7 @@ export default React.createClass({
 
   displayName: 'TopicHeader',
   propTypes: {
+    groupName: PropTypes.string.isRequired,
     topic: PropTypes.shape({
       title: PropTypes.string,
       tags: PropTypes.array,
