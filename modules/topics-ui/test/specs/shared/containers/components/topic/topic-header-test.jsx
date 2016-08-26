@@ -5,7 +5,7 @@ import TopicHeader from '../../../../../../shared/containers/components/topic/to
 import topics from '../../../../../mocks/mock-data/topics';
 import categories from '../../../../../mocks/mock-data/categories';
 
-describe.only('<TopicHeader/>', () => {
+describe('<TopicHeader/>', () => {
 
   let wrapper;
   const topic = topics[0];
@@ -66,7 +66,7 @@ describe.only('<TopicHeader/>', () => {
   });
 
   it('should render a ForumTagLink ofr each tag', () => {
-     equal(wrapper.find('ForumTagLink').length, topic.tags.length);
+    equal(wrapper.find('ForumTagLink').length, topic.tags.length);
   });
 
 });
