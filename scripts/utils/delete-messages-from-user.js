@@ -9,6 +9,7 @@ var outputFile = Promise.promisify(fs.outputFile);
 var temp = require('temp');
 var mkdir = Promise.promisify(temp.mkdir);
 
+var onMongoConnect = require('../../server/utils/on-mongo-connect');
 var userService = require('../../server/services/user-service');
 var chatService = require('../../server/services/chat-service');
 var client = require('../../server/utils/elasticsearch-client');
@@ -43,8 +44,17 @@ var opts = require('yargs')
 var messageTextFilterRegex = opts.grep ? new RegExp(opts.grep, 'i') : null;
 
 
-var getQuery = userService.findByUsername(opts.username)
-  .then(function(user) {
+if(opts.dry) {
+  console.log('Dry-run: nothing will be deleted/saved');
+}
+
+
+var getUser = onMongoConnect()
+  .then(function() {
+    return userService.findByUsername(opts.username);
+  });
+
+var getQuery = getUser.then(function(user) {
     if(!user) {
       console.error('Could not find user with', opts.username);
       return;
