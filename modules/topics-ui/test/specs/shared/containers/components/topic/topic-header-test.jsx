@@ -5,7 +5,7 @@ import TopicHeader from '../../../../../../shared/containers/components/topic/to
 import topics from '../../../../../mocks/mock-data/topics';
 import categories from '../../../../../mocks/mock-data/categories';
 
-describe('<TopicHeader/>', () => {
+describe.only('<TopicHeader/>', () => {
 
   let wrapper;
   const topic = topics[0];
@@ -59,6 +59,10 @@ describe('<TopicHeader/>', () => {
 
   it('should render a custom avatar', () => {
     equal(wrapper.find('.topic-header__avatar').length, 1);
+  });
+
+  it('should render a ForumCategoryLink', () => {
+    equal(wrapper.find('ForumCategoryLink').length, 1);
   });
 
 });
