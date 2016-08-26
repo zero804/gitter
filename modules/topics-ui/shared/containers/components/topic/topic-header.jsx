@@ -4,6 +4,7 @@ import Panel from '../panel.jsx';
 import H1 from '../text/h-1.jsx';
 import UserAvatar from '../user/user-avatar.jsx';
 import ForumCategoryLink from '../links/forum-category-link.jsx';
+import ForumTagLink from '../links/forum-tag-link.jsx';
 
 export default React.createClass({
 
@@ -56,8 +57,13 @@ export default React.createClass({
     );
   },
 
-  buildTagView(tag){
-    return <a className="topic-header__tag-link" href="#">{tag}</a>
+  buildTagView(tag, index){
+    const {groupName} = this.props;
+    return (
+      <li key={`topic-header-tag-link-${index}`}>
+        <ForumTagLink groupName={groupName} tag={tag}/>
+      </li>
+    );
   },
 
 });
