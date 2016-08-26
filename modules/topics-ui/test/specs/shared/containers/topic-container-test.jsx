@@ -13,11 +13,11 @@ describe('<TopicContainer />', () => {
   beforeEach(function(){
     wrapper = shallow(
       <TopicContainer
-      topicsStore={topicsStore}
-      categoryStore={categoryStore}
-      repliesStore={repliesStore}
-      topicId="1"
-      groupName="gitterHQ"/>
+        topicsStore={topicsStore}
+        categoryStore={categoryStore}
+        repliesStore={repliesStore}
+        topicId="1"
+        groupName="gitterHQ"/>
     );
   });
 

@@ -2,13 +2,17 @@ import {equal} from 'assert';
 import React from 'react';
 import { shallow } from 'enzyme';
 import TopicReplyListHeader from '../../../../../../shared/containers/components/topic/topic-reply-list-header.jsx';
+import replies from '../../../../../mocks/mock-data/replies';
 
 describe('<TopicReplyListHeader/>', () => {
 
   let wrapper;
 
   beforeEach(() => {
-    wrapper = shallow(<TopicReplyListHeader/>);
+    wrapper = shallow(
+      <TopicReplyListHeader
+        replies={replies}/>
+    );
   });
 
   it('should render a container', () => {
