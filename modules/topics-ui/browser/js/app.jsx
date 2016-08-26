@@ -103,11 +103,17 @@ export default React.createClass({
 
   getTopicState(){
     var {router} = this.props;
+    const topicId = router.get('topicId');
+    const topicsStore = this.getTopicsStore();
+    const repliesStore = this.getRepliesStore();
+    const activeTopic = topicsStore.getById(topicId);
+    repliesStore.reset(activeTopic.replies);
+
     return Object.assign(this.getDefaultState(), {
       groupName: router.get('groupName'),
       topicId: router.get('topicId'),
-      topicsStore: this.getTopicsStore(),
-      repliesStore: this.getRepliesStore(),
+      topicsStore: topicsStore,
+      repliesStore: repliesStore,
       categoryStore: this.getCategoryStore(),
     });
   },
