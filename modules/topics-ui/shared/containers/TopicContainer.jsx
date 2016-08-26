@@ -40,7 +40,7 @@ export default createClass({
       <main>
         <SearchHeader groupName={groupName}/>
         <article>
-          <TopicHeader topic={topic} category={category}/>
+          <TopicHeader topic={topic} category={category} groupName={groupName}/>
           <TopicBody topic={topic} />
         </article>
         <TopicReplyListHeader replies={replies}/>
