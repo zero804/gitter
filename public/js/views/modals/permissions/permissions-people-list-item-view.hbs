@@ -1,0 +1,17 @@
+<a
+  href="{{ absoluteUri }}"
+  class="permissions-people-list-item-link"
+  target="_blank"
+  data-vendor-username="{{ vendorUsername }}"
+  data-vendor-type="{{ type }}">
+
+  <img class="permissions-invite-user-result-list-item-avatar" {{{ avatarSrcSet avatarUrl 44 }}}>
+
+  {{#if allowRemove}}
+    <div class="permissions-people-list-item-remove-button-overlay">
+      <button class="permissions-people-list-item-remove-button">
+        <i class="icon-g-cancel"></i>
+      </button>
+    </div>
+  {{/if}}
+</a>

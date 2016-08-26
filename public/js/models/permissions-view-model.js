@@ -7,6 +7,10 @@ var PermissionsViewModel = Backbone.Model.extend({
 
   },
 
+  initialize: function(attrs, options) {
+    this.adminCollection = new Backbone.Collection([]);
+  },
+
   validate: function() {
     var errors = [];
 
