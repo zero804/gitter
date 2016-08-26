@@ -31,4 +31,16 @@ describe('<TopicReplyList/>', () => {
     equal(wrapper.find('.panel--topic-reply-list').length, 1);
   });
 
+  it('should render a li for each reply', () => {
+    equal(wrapper.find('li').length, replies.length);
+  });
+
+  it('should render a TopicReplyListItem for each reply', () => {
+    equal(wrapper.find('TopicReplyListItem').length, replies.length);
+  });
+
+  it('should render the list with a custom class', () => {
+    equal(wrapper.find('topic-reply-list').length, 1);
+  });
+
 });

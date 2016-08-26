@@ -39,8 +39,10 @@ export default createClass({
     return (
       <main>
         <SearchHeader groupName={groupName}/>
-        <TopicHeader topic={topic} category={category}/>
-        <TopicBody topic={topic} />
+        <article>
+          <TopicHeader topic={topic} category={category}/>
+          <TopicBody topic={topic} />
+        </article>
         <TopicReplyListHeader replies={replies}/>
         <TopicReplyList replies={replies} />
         <TopicReplyEditor />
