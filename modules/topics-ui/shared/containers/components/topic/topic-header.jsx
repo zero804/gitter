@@ -61,7 +61,12 @@ export default React.createClass({
     const {groupName} = this.props;
     return (
       <li key={`topic-header-tag-link-${index}`}>
-        <ForumTagLink groupName={groupName} tag={tag}/>
+        <ForumTagLink
+          groupName={groupName}
+          tag={tag}
+          className="topic-header__tag-link">
+            {tag.name}
+        </ForumTagLink>
       </li>
     );
   },
