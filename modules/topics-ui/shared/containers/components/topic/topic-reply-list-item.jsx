@@ -24,7 +24,6 @@ export default React.createClass({
     const {reply} = this.props;
     const {user} = reply;
     const avatarDims = 15;
-    console.log(reply);
 
     return (
       <article className="topic-reply-list-item">
