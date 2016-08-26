@@ -42,7 +42,6 @@ describe('<ForumTagLink/>', () => {
     const handle = spy();
     subscribe(NAVIGATE_TO_TAG, handle);
     wrapper.find('a').simulate('click', mockEvt);
-    console.log(handle.callCount);
     equal(handle.callCount, 1);
   });
 
