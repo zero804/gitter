@@ -1,11 +1,11 @@
 'use strict';
 
 var $ = require('jquery');
-var context = require('utils/context');
+var context = require('../utils/context');
 var clientEnv = require('gitter-client-env');
-var appEvents = require('utils/appevents');
-var isValidRoomUri = require('utils/valid-room-uri');
-var dataset = require('utils/dataset-shim');
+var appEvents = require('../utils/appevents');
+var isValidRoomUri = require('../utils/valid-room-uri');
+var dataset = require('../utils/dataset-shim');
 
 function routeLink(target, options) {
   var targetOrigin = target.protocol + '//' + target.host;

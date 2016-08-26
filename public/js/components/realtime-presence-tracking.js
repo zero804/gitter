@@ -1,6 +1,6 @@
 "use strict";
 
-var context = require('utils/context');
+var context = require('../utils/context');
 var eyeballsDetector = require('./eyeballs-detector');
 var track = false;
 
