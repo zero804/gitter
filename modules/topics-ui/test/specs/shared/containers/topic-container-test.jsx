@@ -6,18 +6,18 @@ import topicsStore from '../../../mocks/topic-store';
 import categoryStore from '../../../mocks/category-store';
 import repliesStore from '../../../mocks/replies-store';
 
-describe('<TopicContainer />', () => {
+describe.only('<TopicContainer />', () => {
 
   let wrapper;
 
   beforeEach(function(){
     wrapper = shallow(
       <TopicContainer
-        topicsStore={topicsStore}
-        categoryStore={categoryStore}
-        repliesStore={repliesStore}
-        topicId="1"
-        groupName="gitterHQ"/>
+      topicsStore={topicsStore}
+      categoryStore={categoryStore}
+      repliesStore={repliesStore}
+      topicId="1"
+      groupName="gitterHQ"/>
     );
   });
 
@@ -39,6 +39,10 @@ describe('<TopicContainer />', () => {
 
   it('should render a TopicReplyListHeader', () => {
     equal(wrapper.find('TopicReplyListHeader').length, 1);
+  });
+
+  it('should render a TopicReplyList', () => {
+    equal(wrapper.find('TopicReplyList').length, 1);
   });
 
 });

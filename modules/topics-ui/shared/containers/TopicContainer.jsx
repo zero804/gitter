@@ -4,6 +4,7 @@ import TopicBody from './components/topic/topic-body.jsx';
 import SearchHeader from './components/search/search-header.jsx';
 import TopicReplyEditor from './components/topic/topic-reply-editor.jsx';
 import TopicReplyListHeader from './components/topic/topic-reply-list-header.jsx';
+import TopicReplyList from './components/topic/topic-reply-list.jsx';
 
 export default createClass({
 
@@ -41,6 +42,7 @@ export default createClass({
         <TopicHeader topic={topic} category={category}/>
         <TopicBody topic={topic} />
         <TopicReplyListHeader replies={replies}/>
+        <TopicReplyList replies={replies} />
         <TopicReplyEditor />
       </main>
     );
