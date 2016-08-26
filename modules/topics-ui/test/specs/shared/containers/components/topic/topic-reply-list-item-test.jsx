@@ -4,7 +4,7 @@ import { shallow } from 'enzyme';
 import TopicReplyListItem from '../../../../../../shared/containers/components/topic/topic-reply-list-item.jsx';
 import replies from '../../../../../mocks/mock-data/replies.js';
 
-describe('<TopicReplyListItem/>', () => {
+describe.only('<TopicReplyListItem/>', () => {
 
   let wrapper;
   const reply = replies[0];
@@ -45,6 +45,10 @@ describe('<TopicReplyListItem/>', () => {
 
   it('should render a custom class for the body', () => {
     equal(wrapper.find('.topic-reply-list-item__body').length, 1);
+  });
+
+  it('should render a class for the sent date', () => {
+     equal(wrapper.find('.topic-reply-list-item__sent').length, 1);
   });
 
 });
