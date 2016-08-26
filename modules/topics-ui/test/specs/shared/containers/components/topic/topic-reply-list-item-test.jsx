@@ -4,7 +4,7 @@ import { shallow } from 'enzyme';
 import TopicReplyListItem from '../../../../../../shared/containers/components/topic/topic-reply-list-item.jsx';
 import replies from '../../../../../mocks/mock-data/replies.js';
 
-describe.only('<TopicReplyListItem/>', () => {
+describe('<TopicReplyListItem/>', () => {
 
   let wrapper;
   const reply = replies[0];
