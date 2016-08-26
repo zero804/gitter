@@ -20,6 +20,7 @@ var roomMembershipService = require('./room-membership-service');
 var orgService = require("./org-service");
 var repoService = require("./repo-service");
 var userScopes = require('gitter-web-identity/lib/user-scopes');
+var topicService = require('gitter-web-topics/lib/topic-service');
 
 var survivalMode = !!process.env.SURVIVAL_MODE || false;
 
@@ -263,6 +264,19 @@ function serializeRoomsForGroupId(groupId, userId) {
     });
 }
 
+function serializeTopicsForForumId(forumId) {
+  // TODO: return a sample set, not all of them
+  return topicService.findByForumId(forumId)
+    .then(function(topics) {
+      var strategy = new restSerializer.TopicStrategy({
+        // again: _some_ replies, not all of them
+        includeReplies: true,
+        includeRepliesTotals: true,
+      });
+      return restSerializer.serialize(topics, strategy);
+    });
+}
+
 module.exports = {
   serializeTroupesForUser: serializeTroupesForUser,
   serializeChatsForTroupe: serializeChatsForTroupe,
@@ -278,5 +292,6 @@ module.exports = {
   serializeProfileForUsername: serializeProfileForUsername,
   serializeGroupsForUserId: Promise.method(serializeGroupsForUserId),
   serializeAdminGroupsForUser: Promise.method(serializeAdminGroupsForUser),
-  serializeRoomsForGroupId: serializeRoomsForGroupId
+  serializeRoomsForGroupId: serializeRoomsForGroupId,
+  serializeTopicsForForumId: serializeTopicsForForumId
 }

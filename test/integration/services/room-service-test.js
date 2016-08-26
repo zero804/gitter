@@ -842,36 +842,12 @@ describe('room-service', function() {
           return roomMembershipService.checkRoomMembership(fixture.troupeCanRemove._id, fixture.userFavourite._id)
         };
 
-        // Create an event listener with expected parameters
-        // If the test keeps pending, it means no event is emitted with these parameters
-        var addListenner = function(expected) {
-
-          var promise = new Promise(function(resolve) {
-            appEvents.onDataChange2(function(res) {
-              // First filter by url and operation, as other events may have been emitted
-              if (expected.url && expected.url !== res.url) return;
-              if (expected.operation && expected.operation !== res.operation) return;
-              // Check model with deepEqual
-              if (expected.model) {
-                resolve(assert.deepEqual(res.model, expected.model));
-              } else {
-                resolve();
-              }
-            });
-
-          });
-
-          return function() {
-            return promise;
-          };
-        };
-
         beforeEach(function() {
           return createFav();
         });
 
         it('should remove favourite', function() {
-          var checkEvent = addListenner({
+          var checkEvent = appEvents.addListener('dataChange2', {
             url: '/user/' + fixture.userFavourite.id + '/rooms',
             operation: 'patch',
             model: {
@@ -935,7 +911,7 @@ describe('room-service', function() {
         });
 
         it('should check if the proper event is emitted when the favourite is removed', function() {
-          var checkEvent = addListenner({
+          var checkEvent = appEvents.addListener('dataChange2', {
             url: '/user/' + fixture.userFavourite.id + '/rooms',
             operation: 'remove',
             model: {id: fixture.troupeEmpty.id}
