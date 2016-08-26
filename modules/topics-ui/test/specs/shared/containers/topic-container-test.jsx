@@ -6,7 +6,7 @@ import topicsStore from '../../../mocks/topic-store';
 import categoryStore from '../../../mocks/category-store';
 import repliesStore from '../../../mocks/replies-store';
 
-describe.only('<TopicContainer />', () => {
+describe('<TopicContainer />', () => {
 
   let wrapper;
 
