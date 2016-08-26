@@ -1,4 +1,5 @@
 "use strict";
+var parseReply = require('../../shared/parse/reply');
 
 module.exports = function repliesStore(models) {
 
@@ -6,9 +7,7 @@ module.exports = function repliesStore(models) {
   models = (models || []);
 
   //Transform the server side models
-  models = models.map((model) => {
-    return model;
-  });
+  models = models.map(parseReply);
 
   //Get resource
   const getReplies = () => models;

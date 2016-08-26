@@ -7,7 +7,7 @@ export default React.createClass({
   propTypes: {
     reply: PropTypes.shape({
 
-      sent: PropTypes.string.isRequired,
+      formattedSentDate: PropTypes.string.isRequired,
       body: PropTypes.shape({
         html: PropTypes.string.isRequired
       }).isRequired,
@@ -24,11 +24,13 @@ export default React.createClass({
     const {reply} = this.props;
     const {user} = reply;
     const avatarDims = 15;
+    console.log(reply);
 
     return (
       <article className="topic-reply-list-item">
         <header className="topic-reply-list-item__header">
           <UserAvatar user={user} width={avatarDims} height={avatarDims}/>
+          <span className="topic-reply-list-item__sent">{reply.formattedSentDate}</span>
         </header>
         <section
           className="topic-reply-list-item__body"

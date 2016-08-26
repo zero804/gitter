@@ -16,7 +16,8 @@
     "lodash": "^4.15.0",
     "react": "^15.2.1",
     "react-dom": "^15.2.1",
-    "sinon": "^1.17.5"
+    "sinon": "^1.17.5",
+    "moment": "^2.10.3"
   },
   "devDependencies": {
     "babel-loader": "^6.2.4",

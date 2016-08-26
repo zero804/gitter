@@ -40,7 +40,7 @@ describe('<TopicReplyList/>', () => {
   });
 
   it('should render the list with a custom class', () => {
-    equal(wrapper.find('topic-reply-list').length, 1);
+    equal(wrapper.find('.topic-reply-list').length, 1);
   });
 
 });
