@@ -132,7 +132,7 @@ var Router = Backbone.Router.extend({
   buildForumUrl(categoryName, filterName, tagName, sortName){
 
     var groupName = this.model.get('groupName');
-    categoryName = categoryName || this.model.get('categoryName');
+    categoryName = (categoryName || this.model.get('categoryName') || navConstants.DEFAULT_CATEGORY_NAME);
 
     //Get current values and cancel anything that is a default
     filterName = (filterName || this.model.get('filterName'));
@@ -146,8 +146,8 @@ var Router = Backbone.Router.extend({
 
     //Base URL
     let url = (categoryName === navConstants.DEFAULT_CATEGORY_NAME) ?
-      `/${groupName}/topics/` :
-      `${groupName}/topics/categories/${categoryName}/`;
+      `/${groupName}/topics/~topics` :
+      `${groupName}/topics/categories/${categoryName}/~topics`;
 
     //QUERY STRING
     const query = stringify({
@@ -156,8 +156,7 @@ var Router = Backbone.Router.extend({
       sort: sortName,
     });
 
-    if(query.length) { url = `${url}~topics?${query}`; }
-
+    if(query.length) { url = `${url}?${query}`; }
     return url;
 
   },
