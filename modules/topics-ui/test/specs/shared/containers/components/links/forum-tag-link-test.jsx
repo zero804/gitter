@@ -7,7 +7,7 @@ import {subscribe} from '../../../../../../shared/dispatcher';
 import {NAVIGATE_TO_TAG} from '../../../../../../shared/constants/forum-tags';
 import mockEvt from '../../../../../mocks/event';
 
-describe.only('<ForumTagLink/>', () => {
+describe('<ForumTagLink/>', () => {
 
   let wrapper;
 
