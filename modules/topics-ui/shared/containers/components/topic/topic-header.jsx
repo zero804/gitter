@@ -3,6 +3,7 @@ import Container from '../container.jsx';
 import Panel from '../panel.jsx';
 import H1 from '../text/h-1.jsx';
 import UserAvatar from '../user/user-avatar.jsx';
+import ForumCategoryLink from '../links/forum-category-link.jsx';
 
 export default React.createClass({
 
@@ -25,8 +26,8 @@ export default React.createClass({
 
   render(){
 
-    const { title, user, tags } = this.props.topic;
-    const { category } = this.props;
+    const { category, groupName, topic } = this.props;
+    const { title, user, tags } = topic;
     const { displayName } = user;
 
     return (
@@ -41,7 +42,12 @@ export default React.createClass({
               </div>
             </section>
             <section className="topic-header__control-row">
-              <a className="topic-header__category-link" title={`More {category.category} topics`}>{category.category}</a>
+              <ForumCategoryLink
+                className="topic-header__category-link"
+                category={category}
+                groupName={groupName}>
+                  {category.category}
+              </ForumCategoryLink>
               <ul className="topic-header__tag-list">{tags.map((tag, i) => this.buildTagView(tag, i))}</ul>
             </section>
           </header>
