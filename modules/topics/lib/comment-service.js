@@ -3,13 +3,12 @@
 var env = require('gitter-web-env');
 var stats = env.stats;
 var Promise = require('bluebird');
-var StatusError = require('statuserror');
 var Comment = require('gitter-web-persistence').Comment;
 var processText = require('gitter-web-text-processor');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var markdownMajorVersion = require('gitter-markdown-processor').version.split('.')[0];
-var validators = require('gitter-web-validators');
+var validateComment = require('./validate-comment');
 
 
 function findById(commentId) {
@@ -54,14 +53,6 @@ function findByIdForForumTopicAndReply(forumId, topicId, replyId, commentId) {
 
       return comment;
     });
-}
-
-function validateComment(data) {
-  if (!validators.validateMarkdown(data.text)) {
-    throw new StatusError(400, 'Text is invalid.')
-  }
-
-  return data;
 }
 
 function createComment(user, reply, options) {
