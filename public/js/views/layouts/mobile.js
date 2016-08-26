@@ -1,26 +1,22 @@
 "use strict";
 
-var context = require('utils/context');
+var context = require('../../utils/context');
 var Marionette = require('backbone.marionette');
 var $ = require('jquery');
-
-var appEvents = require('utils/appevents');
-var modalRegion = require('components/modal-region');
-var ChatContainerView = require('views/chat/chatContainerView');
-var TroupeMenu = require('views/menu/old/troupeMenu');
-
-var CommunityCreateModel = require('../community-create/community-create-model');
+var modalRegion = require('../../components/modal-region');
+var ChatContainerView = require('../chat/chatContainerView');
+var TroupeMenu = require('../menu/old/troupeMenu');
 
 //var RoomMenuLayout    = require('../menu/room/layout/room-menu-layout');
-//var appEvents         = require('utils/appevents');
+//var appEvents         = require('../../utils/appevents');
 
 /* Decorators */
-var emojiDecorator = require('views/chat/decorators/emojiDecorator');
-var mobileDecorator = require('views/chat/decorators/mobileDecorator');
-var ChatInputView = require('views/chat/chatInputView');
-var JoinRoomView = require('views/chat/join-room-view');
+var emojiDecorator = require('../chat/decorators/emojiDecorator');
+var mobileDecorator = require('../chat/decorators/mobileDecorator');
+var ChatInputView = require('../chat/chatInputView');
+var JoinRoomView = require('../chat/join-room-view');
 
-require('views/behaviors/isomorphic');
+require('../behaviors/isomorphic');
 
 
 module.exports = Marionette.LayoutView.extend({

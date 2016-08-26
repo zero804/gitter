@@ -1,6 +1,6 @@
 "use strict";
 var $ = require('jquery');
-var appEvents = require('utils/appevents');
+var appEvents = require('../utils/appevents');
 var cdn = require('gitter-web-cdn');
 
 module.exports = (function() {
