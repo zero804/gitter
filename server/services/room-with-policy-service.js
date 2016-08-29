@@ -57,6 +57,9 @@ function allowAddUser() {
  * @return {Promise} Promise of room
  */
 RoomWithPolicyService.prototype.updateTags = secureMethod([allowStaff, allowAdmin], function(tags) {
+  // null will ruin your day.
+  tags = tags || '';
+
   var reservedTagTestRegex = (/:/);
   var isStaff = this.user.staff;
   var room = this.room;
