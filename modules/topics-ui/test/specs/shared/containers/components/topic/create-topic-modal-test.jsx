@@ -3,6 +3,7 @@ import sinon from 'sinon';
 import React from 'react';
 import { shallow } from 'enzyme';
 import CreateTopicModal from '../../../../../../shared/containers/components/topic/create-topic-modal.jsx';
+import mockEvt from '../../../../../mocks/event';
 
 describe('<CreateTopicModal/>', () => {
 
@@ -83,7 +84,7 @@ describe('<CreateTopicModal/>', () => {
   });
 
   it('should call onSubmit when submitted', () => {
-    wrapper.find('form').at(0).simulate('submit', { preventDefault: () => {}});
+    wrapper.find('form').at(0).simulate('submit', mockEvt);
     equal(submitHandle.callCount, 1);
   });
 
