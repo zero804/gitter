@@ -4,7 +4,18 @@ var Backbone = require('backbone');
 
 var PermissionsViewModel = Backbone.Model.extend({
   defaults: {
-    entity: null
+    entity: null,
+    securityDescriptor: {
+      type: undefined,
+      linkPath: undefined,
+      public: undefined,
+      externalId: undefined,
+      internalId: undefined,
+      //extraAdmins: see `adminCollection`
+      //extraMembers: NA
+    },
+    requestingSecurityDescriptorStatus: null,
+    submitSecurityDescriptorStatus: null
   },
 
   initialize: function(attrs, options) {
