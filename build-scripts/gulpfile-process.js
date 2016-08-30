@@ -1,6 +1,7 @@
 'use strict';
 
 var gulp = require('gulp');
+var path = require('path');
 var gzip = require('gulp-gzip');
 var tar = require('gulp-tar');
 var git = require('gulp-git');
@@ -89,6 +90,11 @@ gulp.task('process:watch:server', function() {
   nodemon({
     debug: true,
     script: 'web.js',
+    ignore: [
+      path.resolve(__dirname, '../modules/topics-ui/browser'),
+      path.resolve(__dirname, '../modules/topics-ui/shared'),
+      path.resolve(__dirname, '../modules/topics-ui/test'),
+    ],
     args: ['--cdn:use', 'true']
   });
 });
