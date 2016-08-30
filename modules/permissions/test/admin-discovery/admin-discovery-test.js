@@ -8,6 +8,8 @@ var proxyquireNoCallThru = require("proxyquire").noCallThru();
 
 describe('admin-discovery', function() {
   describe('integration tests #slow', function() {
+    fixtureLoader.disableMongoTableScans();
+
     var adminDiscovery;
     var githubOrgs;
     var URI = fixtureLoader.generateUri();

@@ -24,6 +24,8 @@ describe('room-context-delegate', function() {
       permCheckFailedUserId = null;
     })
 
+    fixtureLoader.disableMongoTableScans();
+
     var fixture = fixtureLoader.setup({
       user1: {},
       user2: {},
