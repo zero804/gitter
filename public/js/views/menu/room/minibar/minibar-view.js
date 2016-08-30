@@ -1,8 +1,7 @@
 "use strict";
 
 var Marionette = require('backbone.marionette');
-var context = require('utils/context');
-var appEvents = require('utils/appevents');
+var appEvents = require('../../../../utils/appevents');
 var HomeView = require('./home-view/home-view');
 var SearchView = require('./search-view/search-view');
 var PeopleView = require('./people-view/people-view');
@@ -11,7 +10,7 @@ var TempOrgView = require('./temp-org-view/temp-org-view');
 var CollectionView = require('./minibar-collection-view');
 var CommunityCreateView = require('./minibar-community-create-item-view');
 
-require('views/behaviors/isomorphic');
+require('../../../behaviors/isomorphic');
 
 
 module.exports = Marionette.LayoutView.extend({

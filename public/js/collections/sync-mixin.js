@@ -1,7 +1,7 @@
 'use strict';
 
 var _ = require('underscore');
-var apiClient = require('components/apiClient');
+var apiClient = require('../components/apiClient');
 
 var methodMap = {
   'create': 'post',

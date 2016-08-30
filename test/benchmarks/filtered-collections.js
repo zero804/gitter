@@ -1,8 +1,7 @@
 'use strict';
 
 var makeBenchmark = require('../make-benchmark');
-var SimpleFilteredCollection = require('../../public/js/collections/simple-filtered-collection');
-var BackboneFilteredCollection = require('backbone-filtered-collection');
+var SimpleFilteredCollection = require('gitter-realtime-client/lib/simple-filtered-collection');
 var Backbone = require('backbone');
 
 function stall() {
@@ -37,22 +36,10 @@ function makeNewCollections() {
   return collection;
 }
 
-function makeOldCollections() {
-  var collection = new Backbone.Collection([]);
-  var filteredCollection = new BackboneFilteredCollection({ collection: collection });
-  filteredCollection.setFilter(defaultFilter);
-  addSlowEvents(filteredCollection);
-  collection._filteredVersion = filteredCollection;
-  return collection;
-}
-
 var newStatic = makeNewCollections();
-var oldStatic = makeOldCollections();
-
 
 for (var i = 0; i < ITERATIONS; i++) {
   newStatic.add({ id: i, i: i });
-  oldStatic.add({ id: i, i: i });
 }
 
 makeBenchmark({
@@ -65,23 +52,9 @@ makeBenchmark({
       }
     },
 
-    'old adds': function() {
-      var collection = makeOldCollections();
-      for(var i = 0; i < ITERATIONS; i++) {
-        collection.add({ id: i, i: i });
-      }
-    },
-
     'new changes': function() {
       for(var i = 0; i < ITERATIONS; i++) {
         var c = newStatic.at(i);
-        c.set({ i: c.get('i') + 1 });
-      }
-    },
-
-    'old changes': function() {
-      for(var i = 0; i < ITERATIONS; i++) {
-        var c = oldStatic.at(i);
         c.set({ i: c.get('i') + 1 });
       }
     },
@@ -101,22 +74,6 @@ makeBenchmark({
         }
       }
     },
-
-    'old change filter': function() {
-      oldStatic.comparator = function(a, b) {
-        return a.get('i') - b.get('i');
-      }
-
-      for(var i = 0; i < 10; i++) {
-        if (i % 2 === 0) {
-          oldStatic._filteredVersion.setFilter(function(model) {
-            return model.get('i') % 3 === 0;
-          });
-        } else {
-          oldStatic._filteredVersion.setFilter(defaultFilter);
-        }
-      }
-    }
 
   }
 });

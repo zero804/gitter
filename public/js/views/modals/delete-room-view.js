@@ -3,9 +3,9 @@
 var Marionette = require('backbone.marionette');
 var Backbone = require('backbone');
 var ModalView = require('./modal');
-var context = require('utils/context');
-var apiClient = require('components/apiClient');
-var appEvents = require('utils/appevents');
+var context = require('../../utils/context');
+var apiClient = require('../../components/apiClient');
+var appEvents = require('../../utils/appevents');
 var template = require('./tmpl/delete-room-view.hbs');
 
 var View = Marionette.ItemView.extend({

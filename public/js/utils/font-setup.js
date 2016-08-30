@@ -1,7 +1,7 @@
 "use strict";
 
 var FontFaceObserver = require('fontfaceobserver');
-var RAF = require('utils/raf');
+var RAF = require('./raf');
 var cookie = require('tiny-cookie');
 
 
@@ -20,4 +20,3 @@ font.load().then(function () {
     cookie.set('webfontsLoaded', true, { expires: now.toGMTString() });
   });
 });
-

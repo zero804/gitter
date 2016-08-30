@@ -5,7 +5,7 @@
 
 var assert = require('assert');
 var LoadingView = require('proxyquire').noCallThru()('../../../../public/js/views/app/loading-view', {
-  'utils/appevents': { on: function() {}},
+  '../../utils/appevents': { on: function() {}},
 });
 
 describe('loading-view', function() {

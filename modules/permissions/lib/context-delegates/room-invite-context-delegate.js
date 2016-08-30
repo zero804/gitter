@@ -1,6 +1,5 @@
 'use strict';
 
-
 var env = require('gitter-web-env');
 var logger = env.logger.get('permissions');
 var assert = require('assert');

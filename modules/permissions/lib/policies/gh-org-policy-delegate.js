@@ -4,6 +4,7 @@ var assert = require('assert');
 var Promise = require('bluebird');
 var GitHubOrgService = require('gitter-web-github').GitHubOrgService;
 var PolicyDelegateTransportError = require('./policy-delegate-transport-error');
+var isGitHubUser = require('gitter-web-identity/lib/is-github-user');
 
 function GhOrgPolicyDelegate(userId, userLoader, securityDescriptor) {
   assert(userLoader, 'userLoader required');
@@ -28,6 +29,17 @@ GhOrgPolicyDelegate.prototype = {
     return this._fetch();
   }),
 
+  getAccessDetails: function() {
+    if (!this._isValidUser()) return;
+
+    var sd = this._securityDescriptor;
+    return {
+      type: 'GH_ORG',
+      linkPath: sd.linkPath,
+      externalId: sd.externalId,
+    }
+  },
+
   getPolicyRateLimitKey: function(policyName) {
     if (!this._isValidUser()) return;
     var uri = this._securityDescriptor.linkPath;
@@ -48,6 +60,7 @@ GhOrgPolicyDelegate.prototype = {
 
     this._fetchPromise = this._userLoader()
       .then(function(user) {
+        if (!isGitHubUser(user)) return false;
         var ghOrg = new GitHubOrgService(user);
         return ghOrg.member(uri, user.username);
       })
