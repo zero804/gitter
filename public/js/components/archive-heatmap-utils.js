@@ -15,7 +15,7 @@ var changeElementType = function($el, newType) {
   var attrs = {};
 
   $.each($el[0].attributes, function(idx, attr) {
-      attrs[attr.nodeName] = attr.nodeValue;
+      attrs[attr.name] = attr.value;
   });
 
   $el.replaceWith(function() {
