@@ -8,6 +8,8 @@ describe('one-to-one-room-context-delegate', function() {
 
   describe('integration tests #slow', function() {
 
+    fixtureLoader.disableMongoTableScans();
+
     var fixture = fixtureLoader.setup({
       user1: {},
       user2: {},

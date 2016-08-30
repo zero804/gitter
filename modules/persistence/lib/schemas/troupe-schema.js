@@ -94,8 +94,6 @@ module.exports = {
 
     var Troupe = mongooseConnection.model('Troupe', TroupeSchema);
 
-    securityDescriptor.installIndexes(TroupeSchema, Troupe);
-
     return {
       model: Troupe,
       schema: TroupeSchema
