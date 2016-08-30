@@ -1,34 +1,34 @@
 "use strict";
 
-require('utils/font-setup');
+require('./utils/font-setup');
 
-var appEvents = require('utils/appevents');
-var context = require('utils/context');
+var appEvents = require('./utils/appevents');
+var context = require('./utils/context');
 var Backbone = require('backbone');
-var itemCollections = require('collections/instances/integrated-items');
-var chatCollection = require('collections/instances/chats');
-var PeopleModal = require('views/modals/people-modal');
-var LoginView = require('views/modals/login-view');
+var itemCollections = require('./collections/instances/integrated-items');
+var chatCollection = require('./collections/instances/chats');
+var PeopleModal = require('./views/modals/people-modal');
+var LoginView = require('./views/modals/login-view');
 var onready = require('./utils/onready');
 var frameUtils = require('./utils/frame-utils');
-var ChatToolbarLayout = require('views/layouts/chat-toolbar');
+var ChatToolbarLayout = require('./views/layouts/chat-toolbar');
 var urlParse = require('url-parse');
 
 /* Set the timezone cookie */
-require('components/timezone-cookie');
+require('./components/timezone-cookie');
 
-require('views/widgets/preload');
-require('components/dozy');
-require('template/helpers/all');
-require('components/bug-reporting');
+require('./views/widgets/preload');
+require('./components/dozy');
+require('./template/helpers/all');
+require('./components/bug-reporting');
 
 // Preload widgets
-require('views/widgets/avatar');
-require('components/ping');
+require('./views/widgets/avatar');
+require('./components/ping');
 
 onready(function() {
 
-  require('components/link-handler').installLinkHandler();
+  require('./components/link-handler').installLinkHandler();
 
   appEvents.on('navigation', function(url) {
     // No pushState here. Open links within the parent...

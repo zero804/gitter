@@ -9,23 +9,39 @@ export default React.createClass({
 
   displayName: 'CreateTopicModal',
   propTypes: {
-    active: PropTypes.bool.isRequired
+    active: PropTypes.bool.isRequired,
+    onSubmit: PropTypes.func.isRequired,
+    onTitleChange: PropTypes.func.isRequired,
+    onBodyChange: PropTypes.func.isRequired,
   },
 
   render(){
     const { active } = this.props;
     return (
       <Modal active={active}>
-        <form name="create-topic">
+        <form name="create-topic" onSubmit={this.onSubmit}>
           <H1 className="create-topic__heading">New Topic</H1>
-          <Input className="create-topic__input--name" name="title" placeholder="Add title ..."/>
-          <Editor className="create-topic__editor--body" name="body"/>
+          <Input className="create-topic__input--name" name="title" placeholder="Add title ..." onChange={this.onTitleChange}/>
+          <Editor className="create-topic__editor--body" name="body" onChange={this.onBodyChange}/>
           <div className="create-topic__control-row">
             <Submit className="create-topic__submit">Create Topic</Submit>
           </div>
         </form>
       </Modal>
     );
+  },
+
+  onTitleChange(title){
+    this.props.onTitleChange(title);
+  },
+
+  onBodyChange(body){
+    this.props.onBodyChange(body);
+  },
+
+  onSubmit(e){
+    e.preventDefault();
+    this.props.onSubmit();
   }
 
 });

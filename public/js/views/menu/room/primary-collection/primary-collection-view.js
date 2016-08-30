@@ -8,10 +8,10 @@ var BaseCollectionView = require('../base-collection/base-collection-view');
 var EmptyAllView = require('./primary-collection-item-all-empty-view');
 var EmptySearchView = require('./primary-collection-item-search-empty-view');
 var EmptyFavouriteView = require('./primary-collection-item-favourite-empty-view');
-var perfTiming = require('components/perf-timing');
-var compositeViewRenderTemplate = require('utils/composite-view-render-template');
-var domIndexById = require('utils/dom-index-by-id');
-var toggleClass = require('utils/toggle-class');
+var perfTiming = require('../../../../components/perf-timing');
+var compositeViewRenderTemplate = require('../../../../utils/composite-view-render-template');
+var domIndexById = require('../../../../utils/dom-index-by-id');
+var toggleClass = require('../../../../utils/toggle-class');
 
 var PrimaryCollectionView = BaseCollectionView.extend({
 
@@ -59,7 +59,7 @@ var PrimaryCollectionView = BaseCollectionView.extend({
 
     this.listenTo(this.roomMenuModel, 'change:searchTerm', this.onSearchTermChange, this);
     this.listenTo(this.collection, 'filter-complete', this.onSearchTermChange, this);
-    this.listenTo(this.roomMenuModel, 'change:state:post', this.setActive, this);
+    this.listenTo(this.roomMenuModel, 'change:state:post', this.onStateChange, this);
 
     this.listenTo(this.dndCtrl, 'dnd:start-drag', this.onDragStart, this);
     this.listenTo(this.dndCtrl, 'dnd:end-drag', this.onDragEnd, this);
@@ -69,7 +69,7 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     BaseCollectionView.prototype.initialize.apply(this, arguments);
   },
 
-  onSearchTermChange: function() {
+  onStateChange: function() {
     if(this.ui.headerContent.length) {
       if(this.roomMenuModel.get('state') === 'search') {
         if (!!this.roomMenuModel.get('searchTerm')) {
@@ -85,6 +85,10 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     }
 
     this.setActive();
+  },
+
+  onSearchTermChange: function() {
+    this.onStateChange();
   },
 
   onDragStart: function () {

@@ -1,2 +1,2 @@
 "use strict";
-require('utils/font-setup');
+require('./utils/font-setup');

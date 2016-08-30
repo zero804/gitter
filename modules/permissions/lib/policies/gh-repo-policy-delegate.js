@@ -5,6 +5,7 @@ var Promise = require('bluebird');
 var GitHubRepoService = require('gitter-web-github').GitHubRepoService;
 var PolicyDelegateTransportError = require('./policy-delegate-transport-error');
 var debug = require('debug')('gitter:app:permissions:gh-repo-policy-delegate');
+var isGitHubUser = require('gitter-web-identity/lib/is-github-user');
 
 function GhRepoPolicyDelegate(userId, userLoader, securityDescriptor) {
   assert(userLoader, 'userLoader required');
@@ -28,7 +29,11 @@ GhRepoPolicyDelegate.prototype = {
           return true;
         }
 
-        return this._fetch()
+        return this._userLoader()
+          .bind(this)
+          .then(function(user) {
+            return this._fetch(user);
+          })
           .then(function(repoInfo) {
             var result = !!repoInfo;
             debug('Access check returned %s', result);
@@ -43,7 +48,14 @@ GhRepoPolicyDelegate.prototype = {
           return false;
         }
 
-        return this._fetch()
+        return this._userLoader()
+          .bind(this)
+          .then(function(user) {
+            // Non-github users will never have push access
+            if (!isGitHubUser(user)) return null;
+
+            return this._fetch(user);
+          })
           .then(function(repoInfo) {
             /* Can't see the repo? no access */
             if(!repoInfo) {
@@ -63,6 +75,22 @@ GhRepoPolicyDelegate.prototype = {
     }
   }),
 
+  getAccessDetails: function(policyName) {
+    if (!this._userId) return null;
+
+    // No need to record access to a public repo
+    if (policyName === 'GH_REPO_ACCESS' && this._securityDescriptor.public) {
+      return null;
+    }
+
+    var sd = this._securityDescriptor;
+    return {
+      type: 'GH_REPO',
+      linkPath: sd.linkPath,
+      externalId: sd.externalId,
+    }
+  },
+
   /**
    * Returns a key used to skip checks
    */
@@ -77,7 +105,7 @@ GhRepoPolicyDelegate.prototype = {
     return "GH_REPO:" + (userId || 'anon') + ":" + uri + ":" + policyName;
   },
 
-  _fetch: function() {
+  _fetch: function(user) {
     if (this._fetchPromise) {
       return this._fetchPromise;
     }
@@ -85,11 +113,8 @@ GhRepoPolicyDelegate.prototype = {
     var uri = this._securityDescriptor.linkPath;
     debug('Fetching repo %s from github', uri);
 
-    this._fetchPromise = this._userLoader()
-      .then(function(user) {
-        var repoService = new GitHubRepoService(user);
-        return repoService.getRepo(uri);
-      })
+    var repoService = new GitHubRepoService(user);
+    this._fetchPromise = repoService.getRepo(uri)
       .catch(function(err) {
         debug('Exeception while fetching repo')
 
