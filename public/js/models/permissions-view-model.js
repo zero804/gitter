@@ -4,11 +4,14 @@ var Backbone = require('backbone');
 
 var PermissionsViewModel = Backbone.Model.extend({
   defaults: {
-
+    entity: null
   },
 
   initialize: function(attrs, options) {
-    this.adminCollection = new Backbone.Collection([]);
+    options = options || {};
+
+    this.groupCollection = options.groupCollection || new Backbone.Collection([]);
+    this.adminCollection = new Backbone.Collection(options.adminCollection ? options.adminCollection.models : []);
   },
 
   validate: function() {

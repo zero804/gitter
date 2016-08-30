@@ -1,6 +1,10 @@
 'use strict';
 
+var context = require('../utils/context');
+
 function presentPermissionsDialog(options) {
+  var roomCollection = options.roomCollection;
+  var groupCollection = options.groupCollection;
   var dialogRegion = options.dialogRegion;
 
   require.ensure([
@@ -10,11 +14,18 @@ function presentPermissionsDialog(options) {
     var PermissionsModel = require('../models/permissions-view-model');
     var permissionsView = require('../views/modals/permissions-view');
 
-      var modal = new permissionsView.Modal({
-        model: new PermissionsModel(),
-      });
+    var slimCurrentRoom = context.troupe();
+    var currentRoom = roomCollection.get(slimCurrentRoom.get('id'));
 
-      dialogRegion.show(modal);
+    var modal = new permissionsView.Modal({
+      model: new PermissionsModel({
+        entity: currentRoom
+      }, {
+        groupCollection: groupCollection
+      }),
+    });
+
+    dialogRegion.show(modal);
 
   });
 }

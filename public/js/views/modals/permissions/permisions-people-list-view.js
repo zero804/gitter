@@ -18,6 +18,12 @@ var PermissionsPeopleListItemView = Marionette.ItemView.extend({
   triggers: {
     'click @ui.removeButton': 'item:remove'
   },
+
+  serializeData: function() {
+    var data = this.model.toJSON();
+
+    return data;
+  }
 });
 
 var PermissionsPeopleListEmptyView = Marionette.ItemView.extend({
@@ -46,7 +52,7 @@ var PermissionsPeopleListView = Marionette.CompositeView.extend({
   },
 
   onItemRemoved: function(view) {
-    this.trigger('invite:remove', view.model);
+    this.trigger('user:remove', view.model);
   }
 });
 
