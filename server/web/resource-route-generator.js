@@ -55,10 +55,15 @@ module.exports = function resourceRoute(routeIdentifier, resource) {
   }
 
   mount('get', '/', 'index');
-  mount('get', '/new', 'new');
+  mount('get', '/new', 'new'); // TODO: remove this
   mount('post', '/', 'create');
+
+  mount('put', '/', 'updateRoot');
+  mount('patch', '/', 'patchRoot');
+  mount('delete', '/', 'destroyRoot');
+
   mount('get', '/:' + idParam, 'show');
-  mount('get', '/:' + idParam + '/edit', 'edit');
+  mount('get', '/:' + idParam + '/edit', 'edit'); // TODO: remove this
   mount('put', '/:' + idParam, 'update');
   mount('patch', '/:' + idParam, 'patch');
   mount('delete', '/:' + idParam, 'destroy');
