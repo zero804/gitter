@@ -16,6 +16,11 @@ var forumCategoryService = require('gitter-web-topics/lib/forum-category-service
 var validateCategory = require('gitter-web-topics/lib/validate-category');
 var securityDescriptorGenerator = require('gitter-web-permissions/lib/security-descriptor-generator');
 
+
+// Not sure what would be a good number, but this is here "just in case" for
+// now.
+var MAX_INITIAL_CATEGORIES = 5;
+
 /**
  * @private
  */
@@ -32,6 +37,10 @@ function allowAdmin() {
 
 function getCategoriesInfo(categoryNames) {
   if (!categoryNames || !categoryNames.length) return undefined;
+
+  if (categoryNames.length > MAX_INITIAL_CATEGORIES) {
+    throw new StatusError(400, 'Too many categories.');
+  }
 
   /*
   Ordinarily we try and validate things as low down as possible, but we don't
