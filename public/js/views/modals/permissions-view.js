@@ -171,16 +171,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
 
     toggleClass(this.ui.permissionsOptionsWrapper[0], 'disabled', !sd || (sd && sd.type === null));
 
-
-    var modelIsValid = this.model.isValid();
-    var errors = !modelIsValid && this.model.validationError;
-
-    var errorStrings = errors.map(function(error) {
-      return error.message;
-    });
-    var errorMessage = errorStrings.join('\n');
-
-    this.ui.modelError.text(errorMessage);
+    this.updateModelErrors();
   },
 
   onRequestingSecurityDescriptorStatusChange: function() {
@@ -197,15 +188,25 @@ var CreateRoomView = Marionette.LayoutView.extend({
     var status = this.model.get('submitSecurityDescriptorStatus');
     var statusString = '';
 
-    if(status === submitSecurityDescriptorStatusConstants.ERROR_NEED_TO_REQUEST_SD_BEFORE_UPDATE) {
-      statusString = 'Security descriptor needs to sync before submission';
-    }
     if(status === submitSecurityDescriptorStatusConstants.ERROR) {
       statusString = 'Problem submitting security descriptor';
     }
 
     this.ui.submissionError.text(statusString);
   },
+
+  updateModelErrors: function() {
+    var modelIsValid = this.model.isValid();
+    var errors = !modelIsValid && this.model.validationError;
+
+    var errorStrings = errors.map(function(error) {
+      return error.message;
+    });
+    var errorMessage = errorStrings.join('\n');
+
+    this.ui.modelError.text(errorMessage);
+  },
+
 
   getPermissionOptions: function() {
     var entity = this.model.get('entity');
@@ -272,8 +273,8 @@ var CreateRoomView = Marionette.LayoutView.extend({
   fetchSecurityDescriptor: function() {
     this.model.set('requestingSecurityDescriptorStatus', requestingSecurityDescriptorStatusConstants.PENDING);
     var securityApiUrl = urlJoin(this.getApiEndpointForEntity(), 'security');
-    //return apiClient.get(securityApiUrl)
-    return Promise.resolve({ type: null })
+    return apiClient.get(securityApiUrl)
+    //return Promise.resolve({ type: null })
       .bind(this)
       .then(function(sd) {
         // TODO: Verify works once API is in place
@@ -299,17 +300,11 @@ var CreateRoomView = Marionette.LayoutView.extend({
   },
 
   submitNewSecurityDescriptor: function() {
-    var requestingSecurityDescriptorStatus = this.model.get('requestingSecurityDescriptorStatus');
-
     var modelIsValid = this.model.isValid();
     var errors = !modelIsValid && this.model.validationError;
 
-    // If the original SD hasn't been spliced into our data, then it's a no-go
-    if(requestingSecurityDescriptorStatus !== requestingSecurityDescriptorStatusConstants.COMPLETE) {
-      this.model.set('submitSecurityDescriptorStatus', submitSecurityDescriptorStatusConstants.ERROR_NEED_TO_REQUEST_SD_BEFORE_UPDATE);
-      return;
-    }
-    else if(errors) {
+    if(errors) {
+      this.updateModelErrors();
       return;
     }
 

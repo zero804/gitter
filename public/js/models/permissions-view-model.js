@@ -1,6 +1,7 @@
 'use strict';
 
 var Backbone = require('backbone');
+var requestingSecurityDescriptorStatusConstants = require('../views/modals/permissions/requesting-security-descriptor-status-constants');
 
 var PermissionsViewModel = Backbone.Model.extend({
   defaults: {
@@ -29,11 +30,20 @@ var PermissionsViewModel = Backbone.Model.extend({
     var errors = [];
 
     var sd = this.get('securityDescriptor');
+    var requestingSecurityDescriptorStatus = this.get('requestingSecurityDescriptorStatus');
 
     if(sd.type === null && this.adminCollection.length === 0) {
       errors.push({
         key: 'extra-admins',
         message: 'At least one admin needs to be added when manual type set.'
+      });
+    }
+
+    // If the original SD hasn't been spliced into our data, then it's a no-go
+    if(requestingSecurityDescriptorStatus !== requestingSecurityDescriptorStatusConstants.COMPLETE) {
+      errors.push({
+        key: 'security-descriptor',
+        message: 'Security descriptor needs to sync before submission.'
       });
     }
 
