@@ -52,6 +52,9 @@ function findByIdForForum(forumId, topicId) {
 
 
 function createTopic(user, category, options) {
+  // these should be passed in from forum.tags
+  var allowedTags = options.allowedTags || [];
+
   var data = {
     forumId: category.forumId,
     categoryId: category._id,
@@ -65,8 +68,7 @@ function createTopic(user, category, options) {
 
   return Promise.try(function() {
       return validateTopic(data, {
-        // TODO: somehow either pass in the forum's tags or read them out
-        //allowedTags: forum.tags
+        allowedTags: allowedTags
       });
     })
     .bind({})
