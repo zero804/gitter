@@ -34,9 +34,7 @@ function findRooms(groupId, user, currentPage) {
       limit: ROOMS_PER_PAGE
     })
     .then(function(roomBrowseResult) {
-      var strategy = new restSerializer.SuggestedRoomStrategy({
-        currentUserId: userId
-      });
+      var strategy = restSerializer.TroupeStrategy.createSuggestionStrategy();
 
       return restSerializer.serialize(roomBrowseResult.results, strategy)
         .then(function(serializedRooms) {
