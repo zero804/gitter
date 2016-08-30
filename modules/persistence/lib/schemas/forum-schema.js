@@ -15,8 +15,6 @@ module.exports = {
   install: function(mongooseConnection) {
     var Model = mongooseConnection.model('Forum', ForumSchema);
 
-    securityDescriptor.installIndexes(ForumSchema, Model);
-
     return {
       model: Model,
       schema: ForumSchema
