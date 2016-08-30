@@ -61,7 +61,7 @@ function installIndexes(Schema, Model) {
     } , {
       background: true,
       partialFilterExpression: {
-        externalId: { $exists: true }
+        'sd.externalId': { $exists: true }
       }
     },
     function(err) {
@@ -74,7 +74,7 @@ function installIndexes(Schema, Model) {
     } , {
       background: true,
       partialFilterExpression: {
-        internalId: { $exists: true }
+        'sd.internalId': { $exists: true }
       }
     },
     function(err) {
