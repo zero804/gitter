@@ -1,46 +1,47 @@
 /* eslint complexity: ["error", 19] */
 'use strict';
 
-require('utils/initial-setup');
-require('utils/font-setup');
+require('./utils/initial-setup');
+require('./utils/font-setup');
 
 var debug = require('debug-proxy')('app:router-app');
 var $ = require('jquery');
 var Backbone = require('backbone');
 var moment = require('moment');
 var clientEnv = require('gitter-client-env');
-var onready = require('utils/onready');
-var urlParser = require('utils/url-parser');
-var RAF = require('utils/raf');
-var appEvents = require('utils/appevents');
-var context = require('utils/context');
 
-var TitlebarUpdater = require('components/titlebar');
-var realtime = require('components/realtime');
-var RoomCollectionTracker = require('components/room-collection-tracker');
-var SPARoomSwitcher = require('components/spa-room-switcher');
-var linkHandler = require('components/link-handler');
-var roomListGenerator = require('components/chat-cache/room-list-generator');
-var troupeCollections = require('collections/instances/troupes');
-var scopeUpgrader = require('components/scope-upgrader');
+var onready = require('./utils/onready');
+var urlParser = require('./utils/url-parser');
+var RAF = require('./utils/raf');
+var appEvents = require('./utils/appevents');
+var context = require('./utils/context');
+
+var TitlebarUpdater = require('./components/titlebar');
+var realtime = require('./components/realtime');
+var RoomCollectionTracker = require('./components/room-collection-tracker');
+var SPARoomSwitcher = require('./components/spa-room-switcher');
+var linkHandler = require('./components/link-handler');
+var roomListGenerator = require('./components/chat-cache/room-list-generator');
+var troupeCollections = require('./collections/instances/troupes');
+var scopeUpgrader = require('./components/scope-upgrader');
 var presentCreateRoomDialog = require('./ensured/present-create-room-dialog');
 var presentCreateCommunityDialog = require('./ensured/present-create-community-dialog');
-var AppLayout = require('views/layouts/app-layout');
-var LoadingView = require('views/app/loading-view');
+var AppLayout = require('./views/layouts/app-layout');
+var LoadingView = require('./views/app/loading-view');
 
-require('components/statsc');
-require('views/widgets/preload');
-require('components/user-notifications');
-require('template/helpers/all');
-require('components/bug-reporting');
-require('components/focus-events');
+require('./components/statsc');
+require('./views/widgets/preload');
+require('./components/user-notifications');
+require('./template/helpers/all');
+require('./components/bug-reporting');
+require('./components/focus-events');
 
 
-require('utils/tracking');
-require('components/ping');
+require('./utils/tracking');
+require('./components/ping');
 
 // Preload widgets
-require('views/widgets/avatar');
+require('./views/widgets/avatar');
 
 onready(function() {
   var chatIFrame = document.getElementById('content-frame');
@@ -55,7 +56,7 @@ onready(function() {
   }
 
   /* TODO: add the link handler here? */
-  require('components/link-handler').installLinkHandler();
+  require('./components/link-handler').installLinkHandler();
 
   /*
    * Push State Management
@@ -361,7 +362,14 @@ onready(function() {
       return;
     }
 
+    //Update windows location
     pushState(frameUrl, title, url);
+
+    //In the case of topics we want to update the windows location
+    //but we want to avoid reloading the frame, hence we cancel out here.
+    if(type === 'topics') { return; }
+
+    //Redirect the App
     roomSwitcher.change(frameUrl);
   });
 
@@ -426,7 +434,7 @@ onready(function() {
       'confirm/*uri': 'confirmRoom',
       'createroom': 'createRoom',
       'createroom/:name': 'createRoom',
-      'createcommunity': 'createCommunity'
+      'createcommunity': 'createCommunity',
     },
 
     hideModal: function() {
@@ -434,8 +442,8 @@ onready(function() {
     },
 
     confirmRoom: function(uri) {
-      require.ensure(['views/modals/confirm-repo-room-view'], function(require) {
-        var confirmRepoRoomView = require('views/modals/confirm-repo-room-view');
+      require.ensure(['./views/modals/confirm-repo-room-view'], function(require) {
+        var confirmRepoRoomView = require('./views/modals/confirm-repo-room-view');
         appLayout.dialogRegion.show(new confirmRepoRoomView.Modal({
           uri: uri,
         }));

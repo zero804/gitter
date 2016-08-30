@@ -1,14 +1,14 @@
 "use strict";
 var _ = require('underscore');
-var context = require('utils/context');
+var context = require('../utils/context');
 var realtime = require('./realtime');
 var apiClient = require('./apiClient');
 var debug = require('debug-proxy')('app:unread-items-client');
 var Backbone = require('backbone');
-var appEvents = require('utils/appevents');
+var appEvents = require('../utils/appevents');
 var UnreadItemStore = require('./unread-items-client-store');
-var log = require('utils/log');
-var raf = require('utils/raf')
+var log = require('../utils/log');
+var raf = require('../utils/raf')
 var passiveEventListener = require('../utils/passive-event-listener');
 var eyeballsDetector = require('./eyeballs-detector');
 
