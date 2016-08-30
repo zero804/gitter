@@ -107,6 +107,8 @@ export default React.createClass({
     const topicsStore = this.getTopicsStore();
     const repliesStore = this.getRepliesStore();
     const activeTopic = topicsStore.getById(topicId);
+
+    console.log(activeTopic.replies);
     repliesStore.reset(activeTopic.replies);
 
     return Object.assign(this.getDefaultState(), {
