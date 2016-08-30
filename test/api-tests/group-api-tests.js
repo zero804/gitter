@@ -191,4 +191,21 @@ describe('group-api', function() {
         assert.strictEqual(room.providers[0], 'github');
       });
   });
+
+  it('PUT /v1/groups/:groupId with forum: {...}', function() {
+    return request(app)
+      .put('/v1/groups/' + fixture.group1.id)
+      .send({
+        forum: {
+          tags: ['monkey', 'banana'],
+          categories: ['General', 'Announcements', 'FAQ']
+        }
+      })
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+      .then(function(result) {
+        var group = result.body;
+        assert.ok(group.forumId);
+      });
+  });
 });

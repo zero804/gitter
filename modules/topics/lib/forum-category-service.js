@@ -33,6 +33,7 @@ function findByIds(ids) {
 }
 
 function findByForumId(id) {
+  // TODO: sort by order
   return ForumCategory.find({ forumId: id })
     .lean()
     .exec();
@@ -41,6 +42,7 @@ function findByForumId(id) {
 function findByForumIds(ids) {
   if (!ids.length) return [];
 
+  // TODO: sort by order
   return ForumCategory.find({ forumId: { $in: ids } })
     .lean()
     .exec();
@@ -58,9 +60,13 @@ function createCategory(user, forum, categoryInfo) {
     forumId: forum._id,
     name: categoryInfo.name,
     slug: categoryInfo.slug,
-    // TODO: uncomment as soon as we added it to the schema
-    //order: categoryInfo.order
   };
+
+  // see https://github.com/Automattic/mongoose/issues/2901. Mongoose is weird
+  // about undefined or null in updates whereas they work fine in creates.
+  if (categoryInfo.order) {
+    data.order = categoryInfo.order
+  }
 
   return Promise.try(function() {
       return validateCategory(data);

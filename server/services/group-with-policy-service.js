@@ -2,6 +2,7 @@
 
 var assert = require('assert');
 var StatusError = require('statuserror');
+var slugify = require('gitter-web-slugify');
 var ensureAccessAndFetchDescriptor = require('gitter-web-permissions/lib/ensure-access-and-fetch-descriptor');
 var debug = require('debug')('gitter:app:group-with-policy-service');
 var roomService = require('./room-service');
@@ -11,6 +12,8 @@ var validateProviders = require('gitter-web-validators/lib/validate-providers');
 var troupeService = require('./troupe-service');
 var groupService = require('gitter-web-groups/lib/group-service');
 var forumService = require('gitter-web-topics/lib/forum-service');
+var forumCategoryService = require('gitter-web-topics/lib/forum-category-service');
+var validateCategory = require('gitter-web-topics/lib/validate-category');
 var securityDescriptorGenerator = require('gitter-web-permissions/lib/security-descriptor-generator');
 
 /**
@@ -25,6 +28,38 @@ function validateRoomSecurity(type, security) {
 
 function allowAdmin() {
   return this.policy.canAdmin();
+}
+
+function getCategoriesInfo(categoryNames) {
+  if (!categoryNames || !categoryNames.length) return undefined;
+
+  /*
+  Ordinarily we try and validate things as low down as possible, but we don't
+  want to add a forum and then crash a moment later when trying to add a
+  category, so we have to make very sure that things will work ahead of time.
+  */
+
+  var categorySlugMap = {};
+  return categoryNames.map(function(name, index) {
+    var slug = slugify(name);
+
+    if (categorySlugMap[slug]) {
+      throw new StatusError(400, 'Duplicate category slug.')
+    }
+
+    var categoryInfo = {
+      name: name,
+      slug: slug,
+      order: index
+    };
+
+    // this will throw a 400 error if some of it is wrong
+    validateCategory(categoryInfo);
+
+    categorySlugMap[slug] = true;
+
+    return categoryInfo;
+  });
 }
 
 function GroupWithPolicyService(group, user, policy) {
@@ -150,7 +185,12 @@ GroupWithPolicyService.prototype._ensureAccessAndFetchRoomInfo = function(option
  * Allow admins to create a new forum
  * @return {Promise} Promise of forum
  */
-GroupWithPolicyService.prototype.createForum = secureMethod([allowAdmin], function() {
+GroupWithPolicyService.prototype.createForum = secureMethod([allowAdmin], function(options) {
+  options = options || {};
+
+  var tags = options.tags;
+  var categoryNames = options.categories;
+
   var user = this.user;
   var group = this.group;
 
@@ -161,10 +201,16 @@ GroupWithPolicyService.prototype.createForum = secureMethod([allowAdmin], functi
     throw new StatusError(409, 'Group already has a forum.');
   }
 
-  // TODO: this stuff should be moved to an integration service
+  var categoriesInfo;
+  if (categoryNames && categoryNames.length) {
+    // this can throw a 400 so that things are validated before we ever start
+    // inserting things
+    categoriesInfo = getCategoriesInfo(categoryNames);
+  }
 
-  // There is nothing configurable at this stage on forum level.
-  var forumInfo = {};
+  var forumInfo = {
+    tags: tags
+  };
 
   // TODO: this is hardcoded for now, but down the line the user should be able
   // to make it PRIVATE too.
@@ -184,6 +230,14 @@ GroupWithPolicyService.prototype.createForum = secureMethod([allowAdmin], functi
 
       // store the forum as the group's forum
       return groupService.setForumForGroup(group._id, forum._id);
+    })
+    .then(function() {
+      // add the default categories if they were specified and just skip this
+      // step if not
+      if (categoriesInfo) {
+        var forum = this.forum;
+        return forumCategoryService.createCategories(user, forum, categoriesInfo);
+      }
     })
     .then(function() {
       return this.forum;
