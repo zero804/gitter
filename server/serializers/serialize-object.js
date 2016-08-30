@@ -28,7 +28,7 @@ module.exports = Promise.method(function serializeObject(item, strat) {
 
       reportOnStrategy(strat, start, 1);
 
-      var serialized = seq.map(strat.map)
+      var serialized = seq.map(strat.map.bind(strat))
         .filter(function(f) {
           return f !== undefined && f !== null;
         });
