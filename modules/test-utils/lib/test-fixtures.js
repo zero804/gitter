@@ -90,6 +90,33 @@ fixtureLoader.setup = function(expected) {
 
   return fixture;
 };
+
+fixtureLoader.disableMongoTableScans = function() {
+  var mongoTableScans = require('./mongo-table-scans');
+  var didDisable;
+
+  before(function() {
+    return mongoTableScans.isDisabled()
+      .then(function(isDisabled) {
+        if (isDisabled) return;
+
+        return mongoTableScans.disable()
+          .then(function() {
+            return didDisable = true;
+          });
+      })
+  });
+
+  after(function() {
+    if (didDisable) {
+      return mongoTableScans.enable()
+        .then(function() {
+          didDisable = false;
+        })
+    }
+  });
+
+};
 fixtureLoader.createExpectedFixtures = createExpectedFixtures;
 
 // TODO: deprecate these, use them from fixtureUtils
