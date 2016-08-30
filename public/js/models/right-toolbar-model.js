@@ -1,7 +1,7 @@
 'use strict';
 
 var Backbone = require('backbone');
-var apiClient = require('components/apiClient');
+var apiClient = require('../components/apiClient');
 var autoModelSave = require('../utils/auto-model-save');
 
 module.exports = Backbone.Model.extend({

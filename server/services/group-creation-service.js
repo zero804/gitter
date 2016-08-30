@@ -54,7 +54,7 @@ var sendTweetsForRoom = Promise.method(function(user, group, room, twitterHandle
         };
       });
 
-      var roomUrl = room.lcUri ? (clientEnv['basePath'] + '/' + room.lcUri) : undefined;
+      var roomUrl = room.lcUri ? (clientEnv['basePath'] + '/' + room.lcUri + '?source=twitter-badger') : undefined;
 
       stats.event('new_group_tweets', {
         userId: user.id,

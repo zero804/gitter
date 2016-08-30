@@ -3,7 +3,7 @@
 var _ = require('underscore');
 var Marionette = require('backbone.marionette');
 var fastdom = require('fastdom');
-var toggleClass = require('utils/toggle-class');
+var toggleClass = require('../../../../utils/toggle-class');
 var PanelHeaderView = require('../header/header-view');
 var PanelFooterView = require('../footer/footer-view');
 var FavouriteCollectionView = require('../favourite-collection/favourite-collection-view');
@@ -11,10 +11,10 @@ var PrimaryCollectionView = require('../primary-collection/primary-collection-vi
 var SecondaryCollectionView = require('../secondary-collection/secondary-collection-view');
 var TertiaryCollectionView = require('../tertiary-collection/tertiary-collection-view');
 var ProfileMenuView = require('../profile/profile-menu-view');
-var SearchInputView = require('views/menu/room/search-input/search-input-view');
-var NeverEndingStory = require('utils/never-ending-story');
+var SearchInputView = require('../../../menu/room/search-input/search-input-view');
+var NeverEndingStory = require('../../../../utils/never-ending-story');
 
-require('views/behaviors/isomorphic');
+require('../../../behaviors/isomorphic');
 
 var PanelView = Marionette.LayoutView.extend({
 

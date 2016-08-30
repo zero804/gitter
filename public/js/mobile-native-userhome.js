@@ -1,16 +1,16 @@
 "use strict";
-var context = require('utils/context');
-var UserHomeView = require('views/userhome/userHomeView');
+var context = require('./utils/context');
+var UserHomeView = require('./views/userhome/userHomeView');
 var $ = require('jquery');
-var appEvents = require('utils/appevents');
+var appEvents = require('./utils/appevents');
 var Backbone = require('backbone');
-var confirmRepoRoomView = require('views/modals/confirm-repo-room-view');
-var modalRegion = require('components/modal-region');
-var onready = require('./utils/onready');
+var confirmRepoRoomView = require('./views/modals/confirm-repo-room-view');
+var modalRegion = require('./components/modal-region');
+var onready = require('././utils/onready');
 
 // Preload widgets
-require('views/widgets/avatar');
-require('components/ping');
+require('./views/widgets/avatar');
+require('./components/ping');
 
 onready(function() {
 

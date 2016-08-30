@@ -9,27 +9,14 @@ import * as forumCatConstants from '../../../../shared/constants/forum-categorie
 import * as forumFilterConstants from '../../../../shared/constants/forum-filters';
 import * as forumSortConstants from '../../../../shared/constants/forum-sorts';
 import * as forumTagConstants from '../../../../shared/constants/forum-tags';
+import categoryStore from '../../../mocks/category-store';
+import tagStore from '../../../mocks/tag-store';
+import topicsStore from '../../../mocks/topic-store';
+import newTopicStore from '../../../mocks/new-topic-store';
 
-//TODO move these into mock objects
-var CategoryCollection = Backbone.Collection.extend({
-  getCategories(){
-    return this.models.map((m) => m.toJSON());
-  }
-});
-
-var TagCollection = Backbone.Collection.extend({
-  getTags(){ return this.models.map((m) => m.toJSON()); }
-});
-var TopicsCollection = Backbone.Collection.extend({
-  getTopics() { return this.models.map((m) => m.toJSON()); }
-});
-
-describe.skip('<ForumContainer />', function(){
+describe('<ForumContainer />', function(){
 
   let wrapper;
-  let catCollection;
-  let tagCollection;
-  let topicsCollection;
   let catChangeHandle;
   let filterChangeHandle;
   let sortChangeHandle;
@@ -41,14 +28,13 @@ describe.skip('<ForumContainer />', function(){
     filterChangeHandle = sinon.spy();
     sortChangeHandle = sinon.spy();
     tagChangeHandle = sinon.spy();
-    catCollection = new CategoryCollection([ { category: 'all', active: true } ]);
-    tagCollection = new TagCollection([{value: 'all-tags', name: 'All Tags', active: true }]);
-    topicsCollection = new TopicsCollection([]);
     wrapper = shallow(
       <ForumContainer
-        categoryStore={catCollection}
-        tagStore={tagCollection}
-        topicsStore={topicsCollection}
+        categoryStore={categoryStore}
+        categoryName="all"
+        tagStore={tagStore}
+        topicsStore={topicsStore}
+        newTopicStore={newTopicStore}
         groupName='gitterHQ' />
     );
   });
@@ -77,24 +63,16 @@ describe.skip('<ForumContainer />', function(){
     assert.equal(tagChangeHandle.callCount, 1);
   });
 
-  it('should render an inactive modal by default', () => {
-    assert.equal(wrapper.find('CreateTopicModal').prop('active'), false);
-  });
-
-  it('should render an active modal from create-topic', () => {
-    wrapper = shallow(
-      <ForumContainer
-        categoryStore={catCollection}
-        tagStore={tagCollection}
-        topicsStore={topicsCollection}
-        createTopic={true}
-        groupName='gitterHQ' />
-    );
-    assert.equal(wrapper.find('CreateTopicModal').prop('active'), true);
+  it('should render a CreateTopicContainer', () => {
+    assert.equal(wrapper.find('CreateTopicContainer').length, 1);
   });
 
   it('should render a TopicsTable', () => {
     assert.equal(wrapper.find('TopicsTable').length, 1);
+  });
+
+  it('should render a search header', () => {
+    assert.equal(wrapper.find('SearchHeader').length, 1);
   });
 
 });

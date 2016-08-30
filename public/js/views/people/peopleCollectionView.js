@@ -1,13 +1,13 @@
 "use strict";
 
 var Marionette = require('backbone.marionette');
-var context = require('utils/context');
-var ModalView = require('views/modals/modal');
-var AvatarView = require('views/widgets/avatar');
+var context = require('../../utils/context');
+var ModalView = require('../modals/modal');
+var AvatarView = require('../widgets/avatar');
 var collectionTemplate = require('./tmpl/peopleCollectionView.hbs');
 var remainingTempate = require('./tmpl/remainingView.hbs');
 
-require('views/behaviors/isomorphic');
+require('../behaviors/isomorphic');
 
 var PeopleCollectionView = Marionette.CollectionView.extend({
   tagName: 'ul',

@@ -2,10 +2,10 @@
 
 var Marionette = require('backbone.marionette');
 var _ = require('underscore');
-var apiClient = require('components/apiClient');
+var apiClient = require('../../components/apiClient');
 var ModalView = require('./modal');
 var template = require('./tmpl/notification-settings-view.hbs');
-var userNotifications = require('components/user-notifications');
+var userNotifications = require('../../components/user-notifications');
 var FeaturesView = require('./notification-features-collection-view');
 
 var OPTIONS = {

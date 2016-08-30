@@ -1,8 +1,8 @@
 "use strict";
 
-var context = require('utils/context');
+var context = require('./context');
 var clientEnv = require('gitter-client-env');
-var appEvents = require('utils/appevents');
+var appEvents = require('./appevents');
 var splitTests = require('gitter-web-split-tests');
 var _ = require('underscore');
 

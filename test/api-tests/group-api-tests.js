@@ -38,6 +38,9 @@ describe('group-api', function() {
       username: fixtureLoader.GITTER_INTEGRATION_USERNAME,
       accessToken: 'web-internal'
     },
+    user2: {
+      accessToken: 'web-internal'
+    },
     group1: {
       uri: fixtureLoader.GITTER_INTEGRATION_USERNAME,
       lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase(),
@@ -69,10 +72,17 @@ describe('group-api', function() {
       .expect(200)
   });
 
-  it('GET /v1/groups?type=admin', function() {
+  it('GET /v1/groups?type=admin for github user', function() {
     return request(app)
       .get('/v1/groups?type=admin')
       .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+  });
+
+  it('GET /v1/groups?type=admin for non-github user', function() {
+    return request(app)
+      .get('/v1/groups?type=admin')
+      .set('x-access-token', fixture.user2.accessToken)
       .expect(200)
   });
 
@@ -179,6 +189,30 @@ describe('group-api', function() {
         var room = result.body;
         assert.strictEqual(room.providers.length, 1);
         assert.strictEqual(room.providers[0], 'github');
+      });
+  });
+
+  it('GET /v1/groups/:groupId/suggestedRooms', function() {
+    return request(app)
+      .get('/v1/groups/' + fixture.group1.id + '/suggestedRooms')
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+      .then(function(result) {
+        // For now, this is a very loose test, to prove
+        // https://github.com/troupe/gitter-webapp/pull/2067
+        // We can extend it later
+        var suggestions = result.body;
+        assert(Array.isArray(suggestions));
+        assert(suggestions.length > 0);
+        suggestions.forEach(function(suggestion) {
+          assert(suggestion.hasOwnProperty('uri'));
+          assert(suggestion.hasOwnProperty('avatarUrl'));
+          assert(suggestion.hasOwnProperty('userCount'));
+          assert(suggestion.hasOwnProperty('tags'));
+          assert(suggestion.hasOwnProperty('description'));
+          assert(suggestion.hasOwnProperty('exists'));
+          assert(suggestion.exists === true && suggestion.id || suggestion.exists === false && !suggestion.id);
+        });
       });
   });
 });

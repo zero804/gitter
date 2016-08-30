@@ -1,6 +1,9 @@
 "use strict";
 
+var Promise = require('bluebird');
 var events = require('events');
+var _ = require('lodash');
+
 
 function makeEmitter() {
   var localEventEmitter = new events.EventEmitter();
@@ -9,6 +12,31 @@ function makeEmitter() {
     /* This is only good for testing */
     removeAllListeners: function() {
       localEventEmitter.removeAllListeners()
+    },
+
+    // this is really useful for testing
+    addListener: function(eventName, expected) {
+      var eventMatcher;
+
+      var promise = new Promise(function(resolve) {
+        eventMatcher = function(res) {
+          // NOTE: We can't reject here, because there could be other events
+          // with the same event name. Therefore it is best to just time out
+          // the test.
+          if (_.isMatch(res, expected)) {
+            resolve();
+          }
+        };
+        localEventEmitter.on(eventName, eventMatcher);
+      });
+
+      promise.finally(function() {
+        localEventEmitter.removeListener(eventName, eventMatcher);
+      });
+
+      return function() {
+        return promise;
+      };
     },
 
     newUnreadItem: function(userId, troupeId, items, online) {
@@ -196,6 +224,9 @@ var defaultListener = makeEmitter();
 module.exports = defaultListener;
 module.exports.testOnly = {
   makeEmitter: makeEmitter,
+  addListener: function(eventName, expected) {
+    return defaultListener.addListener(eventName, expected);
+  },
   removeAllListeners: function() {
     defaultListener.removeAllListeners();
   }
