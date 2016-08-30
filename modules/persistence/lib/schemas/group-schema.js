@@ -24,8 +24,6 @@ module.exports = {
   install: function(mongooseConnection) {
     var Model = mongooseConnection.model('Group', GroupSchema);
 
-    securityDescriptor.installIndexes(GroupSchema, Model);
-
     return {
       model: Model,
       schema: GroupSchema
