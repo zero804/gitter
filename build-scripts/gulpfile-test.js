@@ -91,6 +91,11 @@ testModules['api-tests'] = {
   isCritical: false
 };
 
+testModules['live-collections'] = {
+  files: ['./test/live-collections'],
+  isCritical: true
+};
+
 testModules.integration = {
   files: ['./test/integration/', './test/public-js/'],
   isCritical: true

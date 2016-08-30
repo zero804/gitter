@@ -1,5 +1,5 @@
 import Backbone from 'backbone';
-import routeData from './mock-data/route';
+import * as routeData from './mock-data/route';
 
 var MockRouter = Backbone.Model.extend({});
 
