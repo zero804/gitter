@@ -7,6 +7,7 @@ var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 describe('gh-user-policy-evaluator', function() {
 
   describe('#slow', function() {
+    fixtureLoader.disableMongoTableScans();
 
     function expect(GhUserPolicyEvaluator, user, uri, expected) {
       var evaluator = new GhUserPolicyEvaluator(user, uri);
