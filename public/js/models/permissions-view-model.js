@@ -28,13 +28,12 @@ var PermissionsViewModel = Backbone.Model.extend({
   validate: function() {
     var errors = [];
 
-    var foo = this.get('foo') || '';
+    var sd = this.get('securityDescriptor');
 
-    var hasFoo = foo.length > 0;
-    if(!hasFoo) {
+    if(sd.type === null && this.adminCollection.length === 0) {
       errors.push({
-        key: 'foo',
-        message: 'Please fill in foo'
+        key: 'extra-admins',
+        message: 'At least one admin needs to be added when manual type set.'
       });
     }
 

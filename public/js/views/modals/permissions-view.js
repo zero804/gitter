@@ -27,6 +27,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
     permissionsOptionsSelect: '.js-permissions-options-select',
     permissionsOptionsSpinner: '.js-permissions-options-spinner',
     permissionsOptionsErrorIcon: '.js-permissions-options-error-icon',
+    modelError: '.js-permissions-model-error',
     submissionError: '.js-permissions-submission-error'
   },
 
@@ -169,6 +170,17 @@ var CreateRoomView = Marionette.LayoutView.extend({
     }.bind(this));
 
     toggleClass(this.ui.permissionsOptionsWrapper[0], 'disabled', !sd || (sd && sd.type === null));
+
+
+    var modelIsValid = this.model.isValid();
+    var errors = !modelIsValid && this.model.validationError;
+
+    var errorStrings = errors.map(function(error) {
+      return error.message;
+    });
+    var errorMessage = errorStrings.join('\n');
+
+    this.ui.modelError.text(errorMessage);
   },
 
   onRequestingSecurityDescriptorStatusChange: function() {
@@ -289,9 +301,15 @@ var CreateRoomView = Marionette.LayoutView.extend({
   submitNewSecurityDescriptor: function() {
     var requestingSecurityDescriptorStatus = this.model.get('requestingSecurityDescriptorStatus');
 
+    var modelIsValid = this.model.isValid();
+    var errors = !modelIsValid && this.model.validationError;
+
     // If the original SD hasn't been spliced into our data, then it's a no-go
     if(requestingSecurityDescriptorStatus !== requestingSecurityDescriptorStatusConstants.COMPLETE) {
       this.model.set('submitSecurityDescriptorStatus', submitSecurityDescriptorStatusConstants.ERROR_NEED_TO_REQUEST_SD_BEFORE_UPDATE);
+      return;
+    }
+    else if(errors) {
       return;
     }
 
