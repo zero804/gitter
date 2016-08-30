@@ -8,14 +8,13 @@ var ForumCategorySchema = new Schema({
   name: { type: String, required: true },
   slug: { type: String, required: true },
   forumId: { type: ObjectId, required: true },
-
-  // TODO: sort order, security descriptor, etc.
-
-}, { strict: 'throw' });
+  order: { type: Number, required: false }
+}, { strict: "throw" });
 
 ForumCategorySchema.schemaTypeName = 'ForumCategorySchema';
 ForumCategorySchema.index({ forumId: 1 });
 ForumCategorySchema.index({ forumId: 1, slug: 1 }, { unique: true });
+ForumCategorySchema.index({ order: 1 });
 
 module.exports = {
   install: function(mongooseConnection) {
