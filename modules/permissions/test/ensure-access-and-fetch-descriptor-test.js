@@ -7,6 +7,7 @@ var ensureAccessAndFetchDescriptor = require('gitter-web-permissions/lib/ensure-
 
 describe('ensure-access-and-fetch-descriptor #slow', function() {
   this.timeout(10000);
+  fixtureLoader.disableMongoTableScans();
 
   var fixture = fixtureLoader.setup({
     user1: {
