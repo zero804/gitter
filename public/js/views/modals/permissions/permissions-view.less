@@ -1,10 +1,36 @@
 
+@permissions-people-list-item-avatar-size: 4.4rem;
+@permissions-people-list-item-padding: 1rem;
+@permissions-people-list-item-height: @permissions-people-list-item-avatar-size + (2 * @permissions-people-list-item-padding);
+@permissions-people-list-remove-button-width: 5rem;
+
+
+
+.permissions-add-admin-description {
+  margin-top: .5em;
+  margin-bottom: 1em;
+}
+
 .permissions-people-input {
   /* Reset forms.less :( */
   box-sizing: border-box;
   display: block;
   width: 100%;
   height: auto;
+}
+
+.permissions-admin-list-wrapper {
+  overflow: auto;
+  max-height: 5 * @permissions-people-list-item-height;
+  margin-top: .5rem;
+
+  @media (max-height: 800px) {
+    max-height: 4 * @permissions-people-list-item-height;
+  }
+
+  @media (max-height: 700px) {
+    max-height: 3 * @permissions-people-list-item-height;
+  }
 }
 
 .permissions-admin-list-root {
@@ -25,11 +51,11 @@
   display: flex;
   align-items: center;
 
-  padding: 1rem;
+  padding: @permissions-people-list-item-padding;
 
   transition: background-color .2s ease;
 
-  &:nth-child(even) {
+  &:nth-child(odd) {
     background-color: rgba(0, 0, 0, .08);
   }
 
@@ -59,6 +85,7 @@
 }
 
 .permissions-people-list-item-remove-button {
+  width: @permissions-people-list-remove-button-width;
   background-color: transparent;
   border: 0;
 }
@@ -68,13 +95,57 @@
   &:extend(.permissions-people-list-item);
 
   transition: opacity .2s ease;
-
-  &.disabled {
-    opacity: .65;
-  }
 }
 
 .permissions-admin-list-permission-options-select {
+  width: 100%;
+  height: auto;
   margin-top: 0;
   margin-bottom: 0;
+}
+
+.permissions-admin-list-permission-options-spinner {
+  display: inline-block;
+
+  animation-name: permissions-options-spinner-rotate;
+  animation-duration: .75s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+.permissions-admin-list-permission-options-error-icon {
+  display: inline-block;
+
+  animation-name: permissions-options-error-flash;
+  animation-duration: .75s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+  animation-direction: alternate;
+}
+
+@keyframes permissions-options-spinner-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes permissions-options-error-flash {
+  from {
+    color: @trpDarkGrey;
+  }
+  to {
+    opacity: fade(@trpDarkGrey, 50%);
+  }
+}
+
+.permissions-admin-list-permission-options-status-wrapper {
+  width: @permissions-people-list-remove-button-width;
+  text-align: center;
+}
+
+.permission-submission-error {
+  color: @ruby;
 }
