@@ -1,0 +1,80 @@
+
+.permissions-people-input {
+  /* Reset forms.less :( */
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.permissions-admin-list-root {
+
+}
+
+.permissions-people-list-wrapper {
+
+}
+
+.permissions-people-list {
+  margin-left: 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.permissions-people-list-item {
+  display: flex;
+  align-items: center;
+
+  padding: 1rem;
+
+  transition: background-color .2s ease;
+
+  &:nth-child(even) {
+    background-color: rgba(0, 0, 0, .08);
+  }
+
+  &:hover,
+  &:focus {
+    background-color: rgba(0, 0, 0, .04);
+  }
+}
+
+.permissions-people-list-item-avatar {
+  width: 44px;
+  margin-right: 2rem;
+  border-radius: 4px;
+}
+
+.permissions-people-list-item-name {
+  flex: 1;
+}
+
+.permissions-people-list-item-display-name {
+  margin-right: .75em;
+  font-weight: bold;
+}
+
+.permissions-people-list-item-username {
+
+}
+
+.permissions-people-list-item-remove-button {
+  background-color: transparent;
+  border: 0;
+}
+
+
+.permissions-admin-list-permission-options-wrapper {
+  &:extend(.permissions-people-list-item);
+
+  transition: opacity .2s ease;
+
+  &.disabled {
+    opacity: .65;
+  }
+}
+
+.permissions-admin-list-permission-options-select {
+  margin-top: 0;
+  margin-bottom: 0;
+}

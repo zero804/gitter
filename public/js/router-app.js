@@ -470,6 +470,8 @@ onready(function() {
 
     permissions: function() {
       presentPermissionsDialog({
+        roomCollection: troupeCollections.troupes,
+        groupCollection: troupeCollections.groups,
         dialogRegion: appLayout.dialogRegion
       });
     },

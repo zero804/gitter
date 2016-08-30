@@ -1,7 +1,43 @@
 <div>
-  <input
-    class="permissions-people-input js-permissions-people-input" placeholder="Search for people...">
+  <section>
+    <h2>
+      Add Admins
+    </h2>
 
+    <p>
+      Admins can delete the room, edit permissions, ban people, and edit room info like the welcome message and topic.
+    </p>
 
-  <div class="permissions-admin-list-root js-permissions-admin-list-root"></div>
+    <input
+      class="permissions-people-input js-permissions-people-input"
+      placeholder="Search for people...">
+  </section>
+
+  <hr>
+
+  <section>
+    <h2>
+      Current Admins
+    </h2>
+
+    <section>
+      <div class="permissions-admin-list-permission-options-wrapper {{#unless isPermissionOptsEnabled}}disabled{{/unless}} js-permissions-options-wrapper">
+        <img class="permissions-people-list-item-avatar" {{{ avatarSrcSet avatarUrl 44 }}}>
+
+        <div class="permissions-people-list-item-name">
+          <select class="permissions-admin-list-permission-options-select js-permissions-options-select">
+            {{#each permissionOptions}}
+              <option value="{{ this.value }}" {{#if this.selected}}selected{{/if}}>{{ this.label }}</option>
+            {{/each}}
+          </select>
+        </div>
+
+        <input
+          type="checkbox"
+          class="js-permissions-options-checkbox"
+          {{#if isPermissionOptsEnabled}}checked{{/if}}>
+      </div>
+      <div class="permissions-admin-list-root js-permissions-admin-list-root"></div>
+    </section>
+  </div>
 </div>
