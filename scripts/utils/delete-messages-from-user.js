@@ -9,6 +9,7 @@ var outputFile = Promise.promisify(fs.outputFile);
 var temp = require('temp');
 var mkdir = Promise.promisify(temp.mkdir);
 
+var onMongoConnect = require('../../server/utils/on-mongo-connect');
 var userService = require('../../server/services/user-service');
 var chatService = require('../../server/services/chat-service');
 var client = require('../../server/utils/elasticsearch-client');
@@ -26,12 +27,34 @@ var opts = require('yargs')
     default: 100,
     description: 'Number of documents to find and delete'
   })
+  .option('grep', {
+    alias: 'g',
+    description: 'The regex filter to match against the message text'
+  })
+  .option('dry', {
+    type: 'boolean',
+    default: false,
+    description: 'Dry run: whether to actually delete the messages'
+  })
   .help('help')
   .alias('help', 'h')
   .argv;
 
-var getQuery = userService.findByUsername(opts.username)
-  .then(function(user) {
+
+var messageTextFilterRegex = opts.grep ? new RegExp(opts.grep, 'i') : null;
+
+
+if(opts.dry) {
+  console.log('Dry-run: nothing will be deleted/saved');
+}
+
+
+var getUser = onMongoConnect()
+  .then(function() {
+    return userService.findByUsername(opts.username);
+  });
+
+var getQuery = getUser.then(function(user) {
     if(!user) {
       console.error('Could not find user with', opts.username);
       return;
@@ -66,22 +89,36 @@ var getQuery = userService.findByUsername(opts.username)
   });
 
 
+
 var clearMessages = getQuery.then(function(queryRequest) {
     return Promise.resolve(client.search(queryRequest))
   })
   .then(function(response) {
-    var messageIds = response.hits.hits.map(function(hit) {
-      return hit._id;
+    var hits = (response && response.hits && response.hits.hits) ? response.hits.hits : [];
+    console.log('Found ' + hits.length + ' messages');
+
+    var filteredHits = hits;
+    if(messageTextFilterRegex) {
+      filteredHits = hits.filter(function(hit) {
+          return hit._source && hit._source.text && hit._source.text.match(messageTextFilterRegex);
+        });
+    }
+
+    var messageIds = filteredHits.map(function(hit) {
+        return hit._id;
+      });
+
+    var getMessages = chatService.findByIds(messageIds);
+
+    var getExistentMesssages = getMessages.then(function(messages) {
+      return messages.filter(function(message) {
+        return !!message;
+      });
     });
-    console.log('Clearing', messageIds.length, messageIds);
 
-    /* */
-    var getMessages = Promise.all(messageIds.map(function(messageId) {
-      return chatService.findById(messageId);
-    }));
+    return getExistentMesssages.then(function(messages) {
+      console.log('Working with', messages.length + '/' + messageIds.length);
 
-
-    return getMessages.then(function(messages) {
       var now = new Date();
       var filename = 'messages-' + opts.username + '-bak-' + now.getFullYear() + '-' + now.getMonth() + '-' + now.getDate() + '--' + now.getTime() + '.json';
       var saveLog = mkdir('gitter-delete-message-bak')
@@ -97,7 +134,9 @@ var clearMessages = getQuery.then(function(queryRequest) {
           html: ''
         });
 
-        return message.save();
+        if(!opts.dry) {
+          return message.save();
+        }
       });
 
       return Promise.all([saveLog, clearMessages]);

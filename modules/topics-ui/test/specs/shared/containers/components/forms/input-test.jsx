@@ -3,6 +3,7 @@ import React from 'react';
 import sinon from 'sinon';
 import { shallow } from 'enzyme';
 import Input from '../../../../../../shared/containers/components/forms/input.jsx';
+import mockEvt from '../../../../../mocks/event';
 
 describe('<Input/>', () => {
 
@@ -41,8 +42,7 @@ describe('<Input/>', () => {
   });
 
   it('should call onChange after a change event', () => {
-    //TODO add fake event
-    wrapper.find('input').at(0).simulate('change', {preventDefault: ()=>{}, target:{value: ''}});
+    wrapper.find('input').at(0).simulate('change', mockEvt);
     equal(inputHandle.callCount, 1);
   });
 
