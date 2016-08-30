@@ -8,7 +8,7 @@ var ForumCategorySchema = new Schema({
   name: { type: String, required: true },
   slug: { type: String, required: true },
   forumId: { type: ObjectId, required: true },
-  order: { type: Number, required: false }
+  order: { type: Number, "default": 10000000000, required: false }
 }, { strict: "throw" });
 
 ForumCategorySchema.schemaTypeName = 'ForumCategorySchema';
