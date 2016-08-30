@@ -14,6 +14,7 @@ function singleOrInManyQuery(item) {
     return item;
   }
 }
+
 function descriptorSearchAsQuery(descriptorSearch) {
   var disjunction = []
   var query = {
