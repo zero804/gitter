@@ -22,7 +22,7 @@ var convertToIssueAnchor = function(element, githubIssueUrl) {
     var attrNamedNodeMap = element.attributes;
     Object.keys(attrNamedNodeMap).forEach(function(index) {
       var attr = attrNamedNodeMap[index];
-      newElement.setAttribute(attr.nodeName, attr.nodeValue);
+      newElement.setAttribute(attr.name, attr.value);
     });
 
     newElement.setAttribute('href', githubIssueUrl);
