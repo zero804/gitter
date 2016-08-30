@@ -1,17 +1,26 @@
 "use strict";
 
 var avatars = require('gitter-web-avatars');
+var SecurityDescriptorStrategy = require('./security-descriptor-strategy');
 
 function GroupStrategy(options) {
-  this.preload = function(/*groups*/) {
-    return;
-  };
+  this.options = options || {};
+}
 
-  this.map = function(group) {
+GroupStrategy.prototype = {
+  name: 'GroupStrategy',
+
+  preload: function() {
+    this.securityDescriptorStrategy = new SecurityDescriptorStrategy();
+    return;
+  },
+
+  map: function(group) {
+    var options = this.options;
     var id = group.id || group._id && group._id.toHexString();
 
     var hasAvatarSet = undefined;
-    if(options && options.includeHasAvatarSet) {
+    if(options.includeHasAvatarSet) {
       hasAvatarSet = group.avatarVersion > 0 || group.sd.type === 'GH_ORG' || group.sd.type === 'GH_REPO' || group.sd.type === 'GH_USER';
     }
 
@@ -19,19 +28,13 @@ function GroupStrategy(options) {
       id: id,
       name: group.name,
       uri: group.uri,
-      backedBy: {
-        type: group.sd.type,
-        linkPath: group.sd.linkPath
-      },
+      backedBy: this.securityDescriptorStrategy.map(group.sd),
       avatarUrl: avatars.getForGroup(group),
       hasAvatarSet: hasAvatarSet,
       forumId: group.forumId
     };
-  };
-}
 
-GroupStrategy.prototype = {
-  name: 'GroupStrategy',
+  }
 };
 
 module.exports = GroupStrategy;
