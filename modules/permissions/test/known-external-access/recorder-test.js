@@ -2,9 +2,12 @@
 
 var assert = require('assert');
 var recorder = require('../../lib/known-external-access/recorder');
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
 describe('recorder', function() {
   describe('generateQuery', function() {
+    fixtureLoader.disableMongoTableScans();
+
     var FIXTURES = [{
       name: 'should handle both linkPath and externalId',
       userId: '1',
