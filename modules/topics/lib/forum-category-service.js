@@ -33,8 +33,8 @@ function findByIds(ids) {
 }
 
 function findByForumId(id) {
-  // TODO: sort by order
   return ForumCategory.find({ forumId: id })
+    .sort('order _id')
     .lean()
     .exec();
 }
@@ -42,8 +42,8 @@ function findByForumId(id) {
 function findByForumIds(ids) {
   if (!ids.length) return [];
 
-  // TODO: sort by order
   return ForumCategory.find({ forumId: { $in: ids } })
+    .sort('order _id')
     .lean()
     .exec();
 }
@@ -53,7 +53,6 @@ function findBySlugForForum(forumId, slug) {
     .lean()
     .exec();
 }
-
 
 function createCategory(user, forum, categoryInfo) {
   var data = {
