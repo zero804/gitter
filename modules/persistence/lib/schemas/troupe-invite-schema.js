@@ -27,24 +27,25 @@ module.exports = {
     TroupeInviteSchema.index({ secret: 1 }, { unique: true, sparse: true });
     TroupeInviteSchema.index({ reminderSent: 1 }); // Prevent table scans on finding emails that need reminders sent out
 
-    var TroupeInvite = mongooseConnection.model('TroupeInvite', TroupeInviteSchema);
-
     // Only allow a single pending invite
     // per external id
-    TroupeInvite.collection.createIndex({
+    TroupeInviteSchema.extraIndices = [{
+      keys: {
         troupeId: 1,
         type: 1,
         externalId: 1
-      } , {
+      },
+      options: {
         background: true,
         unique: true,
         partialFilterExpression: {
           state: 'PENDING'
         }
-      },
-      function(err) {
-        if (err) throw err;
-      });
+      }
+    }];
+
+    var TroupeInvite = mongooseConnection.model('TroupeInvite', TroupeInviteSchema);
+
     return {
       model: TroupeInvite,
       schema: TroupeInviteSchema
