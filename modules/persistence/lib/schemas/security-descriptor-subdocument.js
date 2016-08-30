@@ -40,50 +40,44 @@ var SecurityDescriptorSchema = new Schema({
 SecurityDescriptorSchema.index({ extraMembers: 1 }, { background: true });
 SecurityDescriptorSchema.index({ extraAdmins: 1 }, { background: true });
 
-function installIndexes(Schema, Model) {
-  // Create a partial index for troupe security descriptors
-  Model.collection.createIndex({
-      'sd.type': 1,
-      'sd.linkPath': 1
-    } , {
-      background: true,
-      partialFilterExpression: {
-        'sd.linkPath': { $exists: true }
-      }
-    },
-    function(err) {
-      if (err) throw err;
-    });
-
-  Model.collection.createIndex({
-      'sd.type': 1,
-      'sd.externalId': 1
-    } , {
-      background: true,
-      partialFilterExpression: {
-        externalId: { $exists: true }
-      }
-    },
-    function(err) {
-      if (err) throw err;
-    });
-
-  Model.collection.createIndex({
-      'sd.type': 1,
-      'sd.internalId': 1
-    } , {
-      background: true,
-      partialFilterExpression: {
-        internalId: { $exists: true }
-      }
-    },
-    function(err) {
-      if (err) throw err;
-    });
-
-}
+SecurityDescriptorSchema.extraIndices = [{
+  keys: {
+    'sd.type': 1,
+    'sd.linkPath': 1
+  },
+  options: {
+    name: 'partial_sd_type_sd_linkPath',
+    background: true,
+    partialFilterExpression: {
+      'sd.linkPath': { $exists: true }
+    }
+  }
+}, {
+  keys: {
+    'sd.type': 1,
+    'sd.externalId': 1
+  },
+  options: {
+    name: 'partial_sd_type_sd_externalId',
+    background: true,
+    partialFilterExpression: {
+      'sd.externalId': { $exists: true }
+    }
+  }
+}, {
+  keys: {
+    'sd.type': 1,
+    'sd.internalId': 1
+  },
+  options: {
+    name: 'partial_sd_type_sd_internalId',
+    background: true,
+    partialFilterExpression: {
+      'sd.internalId': { $exists: true }
+    }
+  }
+}];
 
 module.exports = {
-  Schema: SecurityDescriptorSchema,
-  installIndexes: installIndexes
+  Schema: SecurityDescriptorSchema
 };
