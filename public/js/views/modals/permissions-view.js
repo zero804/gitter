@@ -2,12 +2,14 @@
 
 var Promise = require('bluebird');
 var _ = require('lodash');
+var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 var fuzzysearch = require('fuzzysearch');
 var urlJoin = require('url-join');
+var avatars = require('gitter-web-avatars');
 var toggleClass = require('../../utils/toggle-class');
 var apiClient = require('../../components/apiClient');
-var avatars = require('gitter-web-avatars');
+
 var ModalView = require('./modal');
 var Typeahead = require('../controls/typeahead');
 var userSearchModels = require('../../collections/user-search');
@@ -15,10 +17,12 @@ var userSearchItemTemplate = require('../app/tmpl/userSearchItem.hbs');
 var PermissionsPeopleListView = require('./permissions/permisions-people-list-view');
 var requestingSecurityDescriptorStatusConstants = require('./permissions/requesting-security-descriptor-status-constants');
 var submitSecurityDescriptorStatusConstants = require('./permissions/requesting-security-descriptor-status-constants');
-
 var template = require('./tmpl/permissions-view.hbs');
 
-var CreateRoomView = Marionette.LayoutView.extend({
+require('../behaviors/isomorphic');
+
+
+var PermissionsView = Marionette.LayoutView.extend({
   template: template,
 
   ui: {
@@ -339,17 +343,51 @@ var CreateRoomView = Marionette.LayoutView.extend({
 var Modal = ModalView.extend({
   disableAutoFocus: true,
 
-  initialize: function(options) {
-    options = options || {};
-    options.title = options.title || 'Community Permissions';
-
-    ModalView.prototype.initialize.call(this, options);
-    this.view = new CreateRoomView(options);
+  modelEvents: {
+    'change:entity': 'onEntityChange'
   },
 
-  menuItems: function() {
-    var options = this.options || {};
-    var model = options.model;
+  initialize: function(options) {
+    options = options || {};
+    options.title = this.getModalTitle();
+    this.options = options;
+
+    options.menuItems = new Backbone.Collection(this.generateMenuItems().concat(options.menuItems || []));
+
+    ModalView.prototype.initialize.call(this, options);
+    this.view = new PermissionsView(_.extend({}, options, {
+      menuItemCollection: options.menuItems
+    }));
+  },
+
+  onEntityChange: function() {
+    this.updateModalTitle();
+    this.updateMenuItems();
+  },
+
+  updateModalTitle: function() {
+    this.ui.title.text(this.getModalTitle());
+  },
+
+  updateMenuItems: function() {
+    this.options.menuItems.set(this.generateMenuItems(), { merge: true });
+  },
+
+  getModalTitle: function() {
+    var model = this.model;
+    var entity = model && model.get('entity');
+
+    var title = 'Community Permissions';
+
+    if(entity) {
+      title = entity.get('name') + ' Permissions';
+    }
+
+    return title;
+  },
+
+  generateMenuItems: function() {
+    var model = this.model;
     var entity = model && model.get('entity');
 
     var items = [];
@@ -380,6 +418,6 @@ var Modal = ModalView.extend({
 
 
 module.exports = {
-  View: CreateRoomView,
+  View: PermissionsView,
   Modal: Modal
 };
