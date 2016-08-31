@@ -12,9 +12,14 @@ var fuzzysearch = require('fuzzysearch');
 
 function roomFilter(roomMenuModel, room) {
   var searchTerm = (roomMenuModel.get('searchTerm') || '').toLowerCase();
-  var didMatchName = fuzzysearch(searchTerm, (room.get('name') || '').toLowerCase());
-  var didMatchUri = fuzzysearch(searchTerm, (room.get('uri') || '').toLowerCase());
-  return searchTerm.length > 0 && (didMatchName || didMatchUri);
+
+  var name = (room.get('name') || '').toLowerCase();
+  var uri = (room.get('url') || '').replace(/^\//, '').toLowerCase();
+
+  return searchTerm.length > 0 && (
+      fuzzysearch(searchTerm, name) ||
+      fuzzysearch(searchTerm, uri)
+    );
 }
 
 //take a list of object which have a property of id and return a uniq array
