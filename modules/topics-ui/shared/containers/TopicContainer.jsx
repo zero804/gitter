@@ -5,6 +5,8 @@ import SearchHeader from './components/search/search-header.jsx';
 import TopicReplyEditor from './components/topic/topic-reply-editor.jsx';
 import TopicReplyListHeader from './components/topic/topic-reply-list-header.jsx';
 import TopicReplyList from './components/topic/topic-reply-list.jsx';
+import {dispatch} from '../dispatcher';
+import updateReplyBody from '../action-creators/create-reply/body-update';
 
 export default createClass({
 
@@ -51,8 +53,12 @@ export default createClass({
         </article>
         <TopicReplyListHeader replies={replies}/>
         <TopicReplyList replies={replies} />
-        <TopicReplyEditor user={currentUser}/>
+        <TopicReplyEditor user={currentUser} onChange={this.onEditorUpdate}/>
       </main>
     );
+  },
+
+  onEditorUpdate(val){
+    dispatch(updateReplyBody(val));
   }
 });

@@ -108,6 +108,7 @@ export default React.createClass({
     var {router} = this.props;
     const topicId = router.get('topicId');
     const topicsStore = this.getTopicsStore();
+    console.log(topicsStore);
     const repliesStore = this.getRepliesStore();
     const activeTopic = topicsStore.getById(topicId);
 
