@@ -13,7 +13,8 @@ module.exports = {
 
     return groupRoomSuggestions.findUnjoinedRoomsInGroup(req.group._id, userId)
       .then(function(suggestions) {
-        return restSerializer.serialize(suggestions, new restSerializer.SuggestedRoomStrategy({ }));
+        var strategy = restSerializer.TroupeStrategy.createSuggestionStrategy();
+        return restSerializer.serialize(suggestions, strategy);
       });
   }
 };
