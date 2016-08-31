@@ -10,6 +10,7 @@ var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var GroupWithPolicyService = require('../../server/services/group-with-policy-service');
 var ForumWithPolicyService = require('../../server/services/forum-with-policy-service');
 
+
 function getGroupWithPolicyService(username, groupUri) {
   return Promise.join(
       userService.findByUsername(username),
@@ -58,8 +59,26 @@ function getForumWithPolicyService(username, groupUri) {
     });
 }
 
+function getUser(username) {
+  return userService.findByUsername(username);
+}
+
+function getForum(uri) {
+  return groupService.findByUri(uri)
+    .then(function(group) {
+      if (!group) throw new StatusError(404, 'Group not found.');
+      if (!group.forumId) throw new StatusError(404, 'The group has no forum.');
+      return forumService.findById(group.forumId);
+    });
+}
+
 function runScript(run) {
+  require('../../server/event-listeners').install();
+
   run()
+    // Without this delay, the bayeux event probably won't go out to the
+    // subscribers. It will make you sad :(
+    .delay(5000)
     .then(function() {
       shutdown.shutdownGracefully();
     })
@@ -74,5 +93,7 @@ function runScript(run) {
 module.exports = {
   getGroupWithPolicyService: getGroupWithPolicyService,
   getForumWithPolicyService: getForumWithPolicyService,
+  getUser: getUser,
+  getForum: getForum,
   runScript: runScript
 };

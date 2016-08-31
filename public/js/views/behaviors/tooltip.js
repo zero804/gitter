@@ -3,11 +3,11 @@
 // var _ = require('underscore');
 var Marionette = require('backbone.marionette');
 var behaviourLookup = require('./lookup');
-var matchesSelector = require('utils/matches-selector');
-var RAF = require('utils/raf');
-var isCompact = require('utils/detect-compact');
+var matchesSelector = require('../../utils/matches-selector');
+var RAF = require('../../utils/raf');
+var isCompact = require('../../utils/detect-compact');
 
-require('bootstrap_tooltip');
+require('../../utils/tooltip');
 
 // if a an element was created in this event loop under
 // the user's pointer, this function will trigger a mouseover.

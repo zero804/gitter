@@ -1,6 +1,6 @@
 "use strict";
 var Marionette = require('backbone.marionette');
-var highlight = require('utils/highlight');
+var highlight = require('../../utils/highlight');
 var behaviourLookup = require('./lookup');
 
 module.exports = (function() {

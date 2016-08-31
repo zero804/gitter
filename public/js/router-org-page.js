@@ -1,22 +1,22 @@
 "use strict";
 
-require('utils/font-setup');
+require('./utils/font-setup');
 
 var onReady = require('./utils/onready');
 var Backbone = require('backbone');
-var appEvents = require('utils/appevents');
-var modalRegion = require('components/modal-region');
+var appEvents = require('./utils/appevents');
+var modalRegion = require('./components/modal-region');
 var _ = require('underscore');
 var clientEnv = require('gitter-client-env');
 
 require('gitter-styleguide/css/components/buttons.css');
 require('gitter-styleguide/css/components/headings.css');
 
-require('utils/tracking');
+require('./utils/tracking');
 
 onReady(function(){
 
-  require('components/link-handler').installLinkHandler();
+  require('./components/link-handler').installLinkHandler();
 
   //We are always within an iFrame to we can
   //change the parent url with NO FEAR!
@@ -61,8 +61,8 @@ onReady(function(){
     },
 
     onNavigateTags: function(roomId){
-      require.ensure(['views/modals/edit-tags-view'], function(require) {
-        var EditTagsView = require('views/modals/edit-tags-view');
+      require.ensure(['./views/modals/edit-tags-view'], function(require) {
+        var EditTagsView = require('./views/modals/edit-tags-view');
         modalRegion.show(new EditTagsView({ roomId: roomId }));
       });
     }
