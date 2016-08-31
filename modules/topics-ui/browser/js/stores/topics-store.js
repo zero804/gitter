@@ -63,7 +63,9 @@ export default Collection.extend({
   },
 
   getById(id){
-    return this.get(id).toJSON();
+    const model = this.get(id);
+    if(!model){ return; }
+    return model.toJSON();
   },
 
   creatNewTopic(data){
