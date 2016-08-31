@@ -13,7 +13,7 @@ export default React.createClass({
 
   render(){
 
-    const { className, name}  = this.props;
+    const { className, name} = this.props;
     const compiledClass = classNames('editor', className);
 
     return (
