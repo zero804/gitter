@@ -7,6 +7,7 @@ import TopicReplyListHeader from './components/topic/topic-reply-list-header.jsx
 import TopicReplyList from './components/topic/topic-reply-list.jsx';
 import {dispatch} from '../dispatcher';
 import updateReplyBody from '../action-creators/create-reply/body-update';
+import submitNewReply from '../action-creators/create-reply/submit-new-reply';
 
 export default createClass({
 
@@ -31,7 +32,11 @@ export default createClass({
 
     currentUserStore: PropTypes.shape({
       getCurrentUser: PropTypes.func.isRequired
-    }).isRequired
+    }).isRequired,
+
+    newReplyStore: PropTypes.shape({
+      get: PropTypes.func.isRequired,
+    })
 
   },
 
@@ -53,12 +58,21 @@ export default createClass({
         </article>
         <TopicReplyListHeader replies={replies}/>
         <TopicReplyList replies={replies} />
-        <TopicReplyEditor user={currentUser} onChange={this.onEditorUpdate}/>
+        <TopicReplyEditor
+          user={currentUser}
+          onChange={this.onEditorUpdate}
+          onEnter={this.onEditorSubmit}/>
       </main>
     );
   },
 
   onEditorUpdate(val){
     dispatch(updateReplyBody(val));
+  },
+
+  onEditorSubmit(){
+    const {newReplyStore} = this.props;
+    dispatch(submitNewReply(newReplyStore.get('text')));
   }
+
 });

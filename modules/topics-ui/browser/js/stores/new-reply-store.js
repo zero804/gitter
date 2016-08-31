@@ -11,4 +11,5 @@ export default ReplyStore.extend({
   onReplyBodyUpdate(data){
     this.set('text', data.value);
   }
+
 });

@@ -3,12 +3,13 @@ import {spy} from 'sinon';
 import {shallow} from 'enzyme';
 import {subscribe} from '../../../../shared/dispatcher';
 import React from 'react';
+import Backbone from 'backbone';
 import TopicContainer from '../../../../shared/containers/TopicContainer.jsx';
 import topicsStore from '../../../mocks/topic-store';
 import categoryStore from '../../../mocks/category-store';
 import repliesStore from '../../../mocks/replies-store';
 import currentUserStore from '../../../mocks/current-user-store';
-import {BODY_UPDATE} from '../../../../shared/constants/create-reply';
+import {BODY_UPDATE, SUBMIT_NEW_REPLY} from '../../../../shared/constants/create-reply';
 
 describe('<TopicContainer />', () => {
 
@@ -21,6 +22,7 @@ describe('<TopicContainer />', () => {
         categoryStore={categoryStore}
         repliesStore={repliesStore}
         currentUserStore={currentUserStore}
+        newReplyStore={new Backbone.Model()}
         topicId="1"
         groupName="gitterHQ"/>
     );
@@ -64,6 +66,16 @@ describe('<TopicContainer />', () => {
     equal(
       handle.callCount, 1,
       'Failed to dispatch the correct action when the editor updated'
+    );
+  });
+
+  it('should dispatch the right action when the enter key is pressed on the editor', () => {
+    const handle = spy();
+    subscribe(SUBMIT_NEW_REPLY, handle);
+    wrapper.find('TopicReplyEditor').at(0).prop('onEnter')();
+    equal(
+      handle.callCount, 1,
+      'Failed to dispatch the correct action when the enter key was pressed'
     );
   });
 

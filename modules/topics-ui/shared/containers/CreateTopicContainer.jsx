@@ -48,8 +48,7 @@ export default createClass({
         active={active}
         onTitleChange={this.onTitleChange}
         onBodyChange={this.onBodyChange}
-        onSubmit={this.onSubmit}
-        />
+        onSubmit={this.onSubmit}/>
     );
   },
 
