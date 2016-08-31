@@ -6,7 +6,7 @@ var validateDisplayName = require('./validate-display-name');
 var MAX_TAGS = 100;
 
 function validateTags(tags, allowedTags) {
-  if (!tags) return;
+  if (!tags) return true;
 
   if (tags.length > MAX_TAGS) {
     return false;

@@ -8,6 +8,11 @@ describe('validate-tags', function() {
     assert.strictEqual(validateTags(['foo', 'bar', 'baz']), true);
   });
 
+  it('should allow null/undefined as tags are always optional', function() {
+    var tags = undefined;
+    assert.strictEqual(validateTags(tags), true);
+  });
+
   it('should check max length', function() {
     var tags = [];
     for (var i=0; i<101; i++) {
