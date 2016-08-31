@@ -108,7 +108,6 @@ export default React.createClass({
     var {router} = this.props;
     const topicId = router.get('topicId');
     const topicsStore = this.getTopicsStore();
-    console.log(topicsStore);
     const repliesStore = this.getRepliesStore();
     const activeTopic = topicsStore.getById(topicId);
 
@@ -174,11 +173,19 @@ export default React.createClass({
   },
 
   getRepliesStore(){
+
     const {router} = this.props;
     const repliesStore = (window.context.repliesStore || {});
+    const accessTokenStore = this.getAccessTokenStore();
+    const forumStore = this.getForumStore();
+    const topicsStore = this.getTopicsStore();
+
     if(this.hasRendered && this.state.repliesStore) { return this.state.repliesStore; }
     return new RepliesStore(repliesStore.models, {
       router: router,
+      accessTokenStore: accessTokenStore,
+      forumStore: forumStore,
+      topicsStore: topicsStore,
     });
   },
 

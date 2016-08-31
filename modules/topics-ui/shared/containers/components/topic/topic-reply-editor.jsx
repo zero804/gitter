@@ -12,6 +12,7 @@ export default React.createClass({
       avatarUrl: PropTypes.string.isRequired
     }).isRequired,
     onChange: PropTypes.func.isRequired,
+    onEnter: PropTypes.func.isRequired,
   },
 
   render(){
@@ -22,7 +23,7 @@ export default React.createClass({
       <Container className="container--reply-editor">
         <Panel className="panel--reply-editor">
           <UserAvatar user={user} className="avatar--reply-editor" width={30} height={30}/>
-          <Editor className="editor--reply" onChange={this.onChange}/>
+          <Editor className="editor--reply" onChange={this.onChange} onEnter={this.onEnter}/>
         </Panel>
       </Container>
     );
@@ -30,6 +31,10 @@ export default React.createClass({
 
   onChange(val){
     this.props.onChange(val);
+  },
+
+  onEnter(){
+    this.props.onEnter();
   }
 
 });

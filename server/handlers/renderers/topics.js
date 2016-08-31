@@ -51,45 +51,45 @@ function renderForum(req, res, next, options) {
 
           return forumService.findById(group.forumId);
         })
-        .then(function(forum){
+      .then(function(forum){
 
-          if(!forum) { return next(new StatusError(404, 'Forum not found')); }
+        if(!forum) { return next(new StatusError(404, 'Forum not found')); }
 
-          var strategy = new restSerializer.ForumStrategy();
-          return restSerializer.serializeObject(forum, strategy);
-        })
-        .then(function(forum){
-          var categoryName = (req.params.categoryName || navConstants.DEFAULT_CATEGORY_NAME);
-          var filterName = (req.query.filter || navConstants.DEFAULT_FILTER_NAME);
-          var tagName = (req.query.tag || navConstants.DEFAULT_TAG_NAME);
-          var sortName = (req.query.sort || navConstants.DEFAULT_SORT_NAME);
-          var createTopic = (options.createTopic || false);
+        var strategy = new restSerializer.ForumStrategy();
+        return restSerializer.serializeObject(forum, strategy);
+      })
+      .then(function(forum){
+        var categoryName = (req.params.categoryName || navConstants.DEFAULT_CATEGORY_NAME);
+        var filterName = (req.query.filter || navConstants.DEFAULT_FILTER_NAME);
+        var tagName = (req.query.tag || navConstants.DEFAULT_TAG_NAME);
+        var sortName = (req.query.sort || navConstants.DEFAULT_SORT_NAME);
+        var createTopic = (options.createTopic || false);
 
-          return res.render('topics/forum', {
-            layout: 'topics-layout',
-            hasCachedFonts: fonts.hasCachedFonts(req.cookies),
-            fonts: fonts.getFonts(),
-            componentData: {
-              forum: forum,
+        return res.render('topics/forum', {
+          layout: 'topics-layout',
+          hasCachedFonts: fonts.hasCachedFonts(req.cookies),
+          fonts: fonts.getFonts(),
+          componentData: {
+            forum: forum,
 
-              groupName: req.params.groupName,
-              categoryName: categoryName,
-              filterName: filterName,
-              tagName: tagName,
-              sortName: sortName,
+            groupName: req.params.groupName,
+            categoryName: categoryName,
+            filterName: filterName,
+            tagName: tagName,
+            sortName: sortName,
 
-              createTopic: createTopic,
+            createTopic: createTopic,
 
-              categoryStore: forumCategoryStore(forum.categories, categoryName),
-              tagStore: forumTagStore(forum.tags, tagName),
-              topicsStore: forumTopicsStore(forum.topics),
-              newTopicStore: newTopicStore(),
-              forumStore: forumStore(forum),
-              accessTokenStore: accessTokenStore(context.accessToken),
-              currentUserStore: currentUserStore(context.user),
-            }
-          });
-        })
+            categoryStore: forumCategoryStore(forum.categories, categoryName),
+            tagStore: forumTagStore(forum.tags, tagName),
+            topicsStore: forumTopicsStore(forum.topics),
+            newTopicStore: newTopicStore(),
+            forumStore: forumStore(forum),
+            accessTokenStore: accessTokenStore(context.accessToken),
+            currentUserStore: currentUserStore(context.user),
+          }
+        });
+      })
     })
 
 }
@@ -112,35 +112,46 @@ function renderTopic(req, res, next) {
           if (!group) { return next(new StatusError(404, 'Group not found.')); }
           if (!group.forumId) { return next(new StatusError(404, 'Forum not found.')); }
 
-          return topicService.findByIdForForum(group.forumId, topicId);
-        })
-        .then(function(topic){
+          return forumService.findById(group.forumId)
+            .then(function(forum){
+              if(!forum) { return next(new StatusError(404, 'Forum not found')); }
+              var strategy = new restSerializer.ForumStrategy();
+              return restSerializer.serializeObject(forum, strategy);
+            })
+          .then(function(forum){
+            return topicService.findByIdForForum(group.forumId, topicId)
+              .then(function(topic){
 
-          if (!topic) { return next(new StatusError(404, 'Topic not found.')); }
+                if (!topic) { return next(new StatusError(404, 'Topic not found.')); }
 
-          var strategy = new restSerializer.TopicStrategy({
-            includeReplies: true,
-            includeRepliesTotals: true,
-            // TODO: we'll probably include a sample of comments on those replies
-            // down the line.
-          });
-          return restSerializer.serializeObject(topic, strategy);
-        })
-        .then(function(topic){
-          var topicStore = forumTopicsStore([topic]);
-          return res.render('topics/topic', {
-            layout: 'topics-layout',
-            hasCachedFonts: fonts.hasCachedFonts(req.cookies),
-            fonts: fonts.getFonts(),
-            componentData: {
-              groupName: req.params.groupName,
-              topicsStore: topicStore,
-              topicId: topicId,
-              accessTokenStore: accessTokenStore(context.accessToken),
-              currentUserStore: currentUserStore(context.user),
-              repliesStore: repliesStore(topic.replies),
-              categoryStore: forumCategoryStore([topic.category]),
-            }
+                var strategy = new restSerializer.TopicStrategy({
+                  includeReplies: true,
+                  includeRepliesTotals: true,
+                  // TODO: we'll probably include a sample of comments on those replies
+                  // down the line.
+                });
+                return restSerializer.serializeObject(topic, strategy);
+              })
+            .then(function(topic){
+              var topicStore = forumTopicsStore([topic]);
+              return res.render('topics/topic', {
+                layout: 'topics-layout',
+                hasCachedFonts: fonts.hasCachedFonts(req.cookies),
+                fonts: fonts.getFonts(),
+                componentData: {
+                  forum: forum,
+                  groupName: req.params.groupName,
+                  topicsStore: topicStore,
+                  topicId: topicId,
+                  accessTokenStore: accessTokenStore(context.accessToken),
+                  currentUserStore: currentUserStore(context.user),
+                  repliesStore: repliesStore(topic.replies),
+                  categoryStore: forumCategoryStore([topic.category]),
+                  forumStore: forumStore(forum),
+                }
+              });
+            })
+
           });
         })
     })
