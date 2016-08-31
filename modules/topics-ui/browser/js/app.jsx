@@ -13,6 +13,7 @@ import ForumStore from './stores/forum-store';
 import AccessTokenStore from './stores/access-token-store';
 import {RepliesStore} from './stores/replies-store';
 import CurrentUserStore from './stores/current-user-store';
+import NewReplyStore from './stores/new-reply-store';
 
 import * as navConstants from '../../shared/constants/navigation';
 
@@ -116,6 +117,7 @@ export default React.createClass({
       topicsStore: topicsStore,
       repliesStore: repliesStore,
       categoryStore: this.getCategoryStore(),
+      newReplyStore: new NewReplyStore(),
     });
   },
 
