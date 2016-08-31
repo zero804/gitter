@@ -7,6 +7,7 @@ var errorReporter = env.errorReporter;
 var mongoose = require('gitter-web-mongoose-bluebird');
 var debug = require('debug')('gitter:infra:persistence-service');
 var mongoDebug = require('node-mongodb-debug-log');
+var indexManager = require('./index-manager');
 
 // Install inc and dec number fields in mongoose
 require('mongoose-number')(mongoose);
@@ -36,13 +37,30 @@ function createExports(schemas) {
     }
   };
 
+  var models = [];
+
   Object.keys(schemas).forEach(function(key) {
     var module = schemas[key];
     var m = module.install(mongoose);
-
-    ex[key] = m.model;
+    var model = m.model;
+    ex[key] = model;
+    models.push(model)
     ex.schemas[key + 'Schema'] = m.schema;
   });
+
+  if (process.env.NO_AUTO_INDEX) {
+    logger.info('Skipping auto indexing');
+  } else {
+    // Automatically do this at startup, for now
+    indexManager.ensureIndices(models)
+      .then(function() {
+        logger.info("Indices configured");
+      })
+      .catch(function(err) {
+        logger.info("Index failure", { exception: err });
+        errorReporter(err, { index_error: true }, { module: 'persistence' });
+      });
+  }
 
   return ex;
 }
