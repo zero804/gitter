@@ -5,7 +5,7 @@ import { shallow } from 'enzyme';
 import Editor from '../../../../../../shared/containers/components/forms/editor.jsx';
 import mockEvt from '../../../../../mocks/event';
 
-describe('<Editor/>', () => {
+describe.only('<Editor/>', () => {
 
   let wrapper;
   let changeHandle;
@@ -13,8 +13,11 @@ describe('<Editor/>', () => {
   beforeEach(() => {
     changeHandle = sinon.spy();
     wrapper = shallow(
-      <Editor className="test" name="test" onChange={changeHandle}>
-        thi sis some text
+      <Editor
+        className="test"
+        name="test"
+        onChange={changeHandle}>
+        This is some text
       </Editor>
     );
   });

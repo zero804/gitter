@@ -15,7 +15,6 @@ export default createClass({
     groupName: PropTypes.string.isRequired,
     newTopicStore: React.PropTypes.shape({
       get: React.PropTypes.func.isRequired,
-      set: React.PropTypes.func.isRequired
     }).isRequired,
 
     //Topics
@@ -27,12 +26,12 @@ export default createClass({
   },
 
   componentDidMount(){
-    const {newTopicStore, topicsStore} = this.props;
+    const {topicsStore} = this.props;
     topicsStore.on(consts.TOPIC_CREATED, this.onTopicCreated, this);
   },
 
   componentWillUnmount(){
-    const {newTopicStore, topicsStore} = this.props;
+    const {topicsStore} = this.props;
     topicsStore.off(consts.TOPIC_CREATED, this.onTopicCreated, this);
   },
 

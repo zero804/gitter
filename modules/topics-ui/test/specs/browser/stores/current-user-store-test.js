@@ -8,8 +8,9 @@ describe('CurrentUserStore', () => {
     store = new Store();
   });
 
-  it('should pass a test', () => {
-    assert(true);
+  it('getCurrentUser', () => {
+    const msg = 'should contain a getCurrentUser function';
+    assert(store.getCurrentUser, msg);
   });
 
 });
