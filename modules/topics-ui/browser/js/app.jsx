@@ -11,7 +11,7 @@ import TopicsStore from './stores/topics-store';
 import NewTopicStore from './stores/new-topic-store';
 import ForumStore from './stores/forum-store';
 import AccessTokenStore from './stores/access-token-store';
-import RepliesStore from './stores/replies-store';
+import {RepliesStore} from './stores/replies-store';
 import CurrentUserStore from './stores/current-user-store';
 
 import * as navConstants from '../../shared/constants/navigation';
