@@ -1,7 +1,6 @@
 'use strict';
 
 var _ = require('underscore');
-var resolveRoomAvatarSrcSet = require('../../avatars/resolve-room-avatar-srcset');
 var validateTag = require('../../validation/validate-tag').validateTag;
 
 // via http://stackoverflow.com/a/17633552/796832
@@ -37,7 +36,6 @@ module.exports = function(room, options) {
   result.canEditTags = opts.isStaff;
   result.roomNameParts = result.uri.split('/');
   result.topic = room.topic || room.description;
-  result.roomAvatarSrcSet = resolveRoomAvatarSrcSet({ uri: result.uri }, 40);
   if(room.messageCount) {
     result.messageCountSiPrefixed = formatNumberWithSiPrefix(room.messageCount);
   }
