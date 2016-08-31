@@ -4,7 +4,7 @@ import { shallow } from 'enzyme';
 import TopicReplyEditor from '../../../../../../shared/containers/components/topic/topic-reply-editor.jsx';
 import currentUser from '../../../../../mocks/mock-data/current-user';
 
-describe.only('<TopicReplyEditor/>', () => {
+describe('<TopicReplyEditor/>', () => {
 
   let wrapper;
 
