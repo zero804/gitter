@@ -23,7 +23,6 @@ function createForum(user, forumInfo, securityDescriptor) {
   return Promise.try(function() {
       return validateForum(data);
     })
-    .bind({})
     .then(function(insertData) {
       return Forum.create(insertData)
         .then(function(forum) {
