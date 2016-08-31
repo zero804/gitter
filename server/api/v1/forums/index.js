@@ -1,20 +1,45 @@
 "use strict";
 
-var Promise = require('bluebird');
 var StatusError = require('statuserror');
-var getForum = require('gitter-web-fake-data').getForum;
+var policyFactory = require('gitter-web-permissions/lib/policy-factory');
+var forumService = require('gitter-web-topics/lib/forum-service');
+var restSerializer = require('../../../serializers/rest-serializer');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+
 
 module.exports = {
+  id: 'forum',
 
-  id: 'forumId',
-
-  show: function(req){
-    if(!req.user) { throw new StatusError(404); }
-    return Promise.resolve(getForum());
+  show: function(req) {
+    var forum = req.forum;
+    var strategy = new restSerializer.ForumStrategy();
+    return restSerializer.serializeObject(forum, strategy);
   },
+
+  load: function(req, id) {
+    if (!mongoUtils.isLikeObjectId(id)) throw new StatusError(400);
+
+    return policyFactory.createPolicyForForumId(req.user, id)
+      .then(function(policy) {
+        req.userForumPolicy = policy;
+
+        return req.method === 'GET' ?
+          policy.canRead() :
+          policy.canWrite();
+      })
+      .then(function(access) {
+        if (!access) return null;
+
+        return forumService.findById(id);
+      });
+  },
+
+  // TODO: create
+  // TODO: change tags?
 
   subresources: {
     'topics': require('./topics'),
+    'categories': require('./categories')
   },
 
 };

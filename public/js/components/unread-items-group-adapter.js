@@ -1,6 +1,6 @@
 "use strict";
 
-var raf = require('utils/raf')
+var raf = require('../utils/raf')
 
 /**
  * Copies unread-item info from the troupes collection onto the groups collection
@@ -64,7 +64,7 @@ function unreadItemsGroupAdapter(groupCollection, troupesCollection) {
     if (hasActivity) {
       return { mentions: false, unreadItems: false, activity: true, allHidden: false };
     }
-    
+
     return { mentions: false, unreadItems: false, activity: false, allHidden: allHidden };
   }
 

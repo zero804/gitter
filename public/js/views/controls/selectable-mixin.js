@@ -1,5 +1,5 @@
 "use strict";
-var dataset = require('utils/dataset-shim');
+var dataset = require('../../utils/dataset-shim');
 
 module.exports = (function() {
 

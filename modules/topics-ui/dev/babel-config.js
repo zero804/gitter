@@ -1,4 +1,7 @@
 module.exports = {
   cache: false,
-  extensions: [".jsx"]
+  extensions: [".js", ".jsx"],
+  plugins: [
+    "add-module-exports"
+  ].map(function(name) { return require.resolve('babel-plugin-' + name); })
 };

@@ -3,9 +3,9 @@
 var Marionette = require('backbone.marionette');
 var template = require('./header-view.hbs');
 var fastdom = require('fastdom');
-var toggleClass = require('utils/toggle-class');
-var cocktail = require('cocktail');
-var KeyboardEventMixin = require('views/keyboard-events-mixin');
+var toggleClass = require('../../../../utils/toggle-class');
+var cocktail = require('backbone.cocktail');
+var KeyboardEventMixin = require('../../../keyboard-events-mixin');
 var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
 
 

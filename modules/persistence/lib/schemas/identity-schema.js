@@ -27,22 +27,21 @@ module.exports = {
     IdentitySchema.index({ userId: 1, provider: 1 }, { unique: true });
     IdentitySchema.index({ provider: 1, providerKey: 1 }, { unique: true });
 
-    var Identity = mongooseConnection.model('Identity', IdentitySchema);
-
-    // Create a partial index
-    Identity.collection.createIndex({
+    IdentitySchema.extraIndices = [{
+      keys: {
         provider: 1,
         username: 1
-      } , {
+      },
+      options: {
         background: true,
         unique: true,
         partialFilterExpression: {
           username: { $exists: true },
         }
-      },
-      function(err) {
-        if (err) throw err;
-      });
+      }
+    }];
+
+    var Identity = mongooseConnection.model('Identity', IdentitySchema);
 
     // Do we want to create a unique index based off email?
     // IdentitySchema.index({ provider: 1, email: 1 }, { unique: true });

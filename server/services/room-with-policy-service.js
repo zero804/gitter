@@ -17,7 +17,8 @@ var roomMembershipService = require('./room-membership-service');
 var roomService = require('./room-service');
 var assert = require('assert');
 var roomMetaService = require('./room-meta-service');
-var processMarkdown = require('../utils/markdown-processor');
+var processText = require('gitter-web-text-processor');
+
 var roomInviteService = require('./room-invite-service');
 var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
 var validateProviders = require('gitter-web-validators/lib/validate-providers');
@@ -56,6 +57,9 @@ function allowAddUser() {
  * @return {Promise} Promise of room
  */
 RoomWithPolicyService.prototype.updateTags = secureMethod([allowStaff, allowAdmin], function(tags) {
+  // null will ruin your day.
+  tags = tags || '';
+
   var reservedTagTestRegex = (/:/);
   var isStaff = this.user.staff;
   var room = this.room;
@@ -267,7 +271,7 @@ RoomWithPolicyService.prototype.getRoomWelcomeMessage = secureMethod([allowJoin]
 RoomWithPolicyService.prototype.updateRoomWelcomeMessage = secureMethod([allowAdmin], function(data){
   if (!data || !data.welcomeMessage && data.welcomeMessage !== '') throw new StatusError(400);
 
-  return processMarkdown(data.welcomeMessage)
+  return processText(data.welcomeMessage)
     .bind(this)
     .then(function(welcomeMessage){
       return roomMetaService.upsertMetaKey(this.room.id, 'welcomeMessage', welcomeMessage)
@@ -299,6 +303,7 @@ RoomWithPolicyService.prototype.createRoomInvitation = secureMethod([allowAddUse
 RoomWithPolicyService.prototype.createRoomInvitations = secureMethod([allowAddUser], function(invites) {
   var room = this.room;
   var user = this.user;
+
   return Promise.map(invites, function(invite) {
     var type = invite.type;
     var externalId = invite.externalId;
@@ -309,6 +314,7 @@ RoomWithPolicyService.prototype.createRoomInvitations = secureMethod([allowAddUs
       externalId: externalId,
       emailAddress: emailAddress
     };
+
     return roomInviteService.createInvite(room, user, inviteInfo)
       .catch(StatusError, function(err) {
         /*
@@ -356,6 +362,13 @@ function removeUserFromRoomAllowCurrentUser(userForRemove) {
  */
 RoomWithPolicyService.prototype.removeUserFromRoom = secureMethod([removeUserFromRoomAllowCurrentUser, allowAdmin], function(userForRemove) {
   return roomService.removeUserFromRoom(this.room, userForRemove);
+});
+
+/**
+ * Add an existing Gitter user to a room
+ */
+RoomWithPolicyService.prototype.sendBadgePullRequest = secureMethod([allowAdmin], function() {
+  return roomService.sendBadgePullRequest(this.room, this.user);
 });
 
 module.exports = RoomWithPolicyService;

@@ -7,6 +7,7 @@ var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 describe('gh-user-policy-evaluator', function() {
 
   describe('#slow', function() {
+    fixtureLoader.disableMongoTableScans();
 
     function expect(GhUserPolicyEvaluator, user, uri, expected) {
       var evaluator = new GhUserPolicyEvaluator(user, uri);
@@ -49,6 +50,19 @@ describe('gh-user-policy-evaluator', function() {
       it('The owner should always have full access', function() {
         var GhUserPolicyEvaluator = require('../../lib/pre-creation/gh-user-policy-evaluator');
         var uri = fixtureLoader.GITTER_INTEGRATION_USERNAME;
+
+        return expect(GhUserPolicyEvaluator, fixture.user1, uri, {
+          canRead: true,
+          canWrite: true,
+          canJoin: true,
+          canAdmin: true,
+          canAddUser: false
+        });
+      });
+
+      it('The owner should always have full access even when the case is mismatched', function() {
+        var GhUserPolicyEvaluator = require('../../lib/pre-creation/gh-user-policy-evaluator');
+        var uri = fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase();
 
         return expect(GhUserPolicyEvaluator, fixture.user1, uri, {
           canRead: true,

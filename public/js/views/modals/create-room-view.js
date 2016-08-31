@@ -5,15 +5,15 @@ var _ = require('underscore');
 var Marionette = require('backbone.marionette');
 var fuzzysearch = require('fuzzysearch');
 var urlJoin = require('url-join');
-var FilteredCollection = require('backbone-filtered-collection');
+var SimpleFilteredCollection = require('gitter-realtime-client/lib/simple-filtered-collection');
 var fastdom = require('fastdom');
-var toggleClass = require('utils/toggle-class');
+var toggleClass = require('../../utils/toggle-class');
 var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
 var getRoomNameFromTroupeName = require('gitter-web-shared/get-room-name-from-troupe-name');
-var apiClient = require('components/apiClient');
-var appEvents = require('utils/appevents');
+var apiClient = require('../../components/apiClient');
+var appEvents = require('../../utils/appevents');
 var context = require('../../utils/context');
-var GroupSelectView = require('views/create-room/groupSelectView');
+var GroupSelectView = require('../create-room/groupSelectView');
 var ModalView = require('./modal');
 var FilteredSelect = require('./filtered-select');
 var roomAvailabilityStatusConstants = require('../create-room/room-availability-status-constants');
@@ -106,11 +106,11 @@ var CreateRoomView = Marionette.LayoutView.extend({
   initialize: function(attrs) {
     this.model = attrs.model;
     this.groupsCollection = attrs.groupsCollection;
-    this.troupeCollection = attrs.troupeCollection;
+    this.roomCollection = attrs.roomCollection;
     this.repoCollection = attrs.repoCollection;
     this.hasRendered = false;
 
-    this.filteredRepoCollection = new FilteredCollection({
+    this.filteredRepoCollection = new SimpleFilteredCollection([], {
       collection: this.repoCollection
     });
 
@@ -125,7 +125,8 @@ var CreateRoomView = Marionette.LayoutView.extend({
 
   onRender: function() {
     this.groupSelect = new GroupSelectView({
-      groupsCollection: this.groupsCollection
+      groupsCollection: this.groupsCollection,
+      dropdownClass: 'create-room-group-typeahead-dropdown',
     });
     this.groupSelectRegion.show(this.groupSelect);
 
@@ -186,6 +187,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
 
     // You should be stopped before this in the UI validation but a good sanity check
     if(!selectedGroup) {
+      this.model.set('roomAvailabilityStatus', roomAvailabilityStatusConstants.GROUP_REQUIRED);
       throw new Error('A group needs to be selected in order to create a room');
     }
 
@@ -338,6 +340,14 @@ var CreateRoomView = Marionette.LayoutView.extend({
   },
 
   onRoomNameChange: function() {
+    var group = this.getGroupFromId(this.model.get('groupId'));
+    var repoUriToFind = group.get('uri') + '/' + this.model.get('roomName');
+    var matchingRepo = this.repoCollection.findWhere({ uri: repoUriToFind });
+    // Auto-associate repo if the name matches
+    if(matchingRepo) {
+      this.model.set('associatedGithubProject', matchingRepo);
+    }
+
     this.debouncedCheckForRoomConflict();
     this.safeUpdateFields();
   },
@@ -347,7 +357,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
     var roomName = this.model.get('roomName');
 
     var repoCheckString = group.get('uri') + '/' + roomName;
-    var roomAlreadyExists = roomName && this.troupeCollection.findWhere({ uri: repoCheckString });
+    var roomAlreadyExists = roomName && this.roomCollection.findWhere({ uri: repoCheckString });
     if(roomAlreadyExists) {
       this.model.set('roomAvailabilityStatus', roomAvailabilityStatusConstants.UNAVAILABLE);
     }
@@ -436,7 +446,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
       // Validation and Errors
       var roomAvailabilityStatusMessage = '';
       (this.model.validationError || []).forEach(function(validationError) {
-        if(validationError.key === 'roomName') {
+        if(validationError.key === 'group' || validationError.key === 'roomName') {
           roomAvailabilityStatusMessage = validationError.message;
         }
       }.bind(this));

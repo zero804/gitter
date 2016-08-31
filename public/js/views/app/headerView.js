@@ -3,23 +3,23 @@
 var _ = require('underscore');
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
-var cocktail = require('cocktail');
-var autolink = require('autolink');
+var cocktail = require('backbone.cocktail');
+var autolink = require('autolink');  // eslint-disable-line node/no-missing-require
 var clientEnv = require('gitter-client-env');
-var context = require('utils/context');
-var toggleClass = require('utils/toggle-class');
-var MenuBuilder = require('utils/menu-builder');
-var appEvents = require('utils/appevents');
+var context = require('../../utils/context');
+var toggleClass = require('../../utils/toggle-class');
+var MenuBuilder = require('../../utils/menu-builder');
+var appEvents = require('../../utils/appevents');
 var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
 
-var apiClient = require('components/apiClient');
-var userNotifications = require('components/user-notifications');
-var Dropdown = require('views/controls/dropdown');
-var KeyboardEventMixin = require('views/keyboard-events-mixin');
+var apiClient = require('../../components/apiClient');
+var userNotifications = require('../../components/user-notifications');
+var Dropdown = require('../controls/dropdown');
+var KeyboardEventMixin = require('../keyboard-events-mixin');
 var headerViewTemplate = require('./tmpl/headerViewTemplate.hbs');
 var getHeaderViewOptions = require('gitter-web-shared/templates/get-header-view-options');
 
-require('views/behaviors/tooltip');
+require('../behaviors/tooltip');
 require('transloadit');
 
 

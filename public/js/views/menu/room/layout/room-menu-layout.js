@@ -3,9 +3,8 @@
 var _ = require('underscore');
 var Marionette = require('backbone.marionette');
 var fastdom = require('fastdom');
-var context = require('utils/context');
-var DNDCtrl = require('components/menu/room/dnd-controller');
-var toggleClass = require('utils/toggle-class');
+var context = require('../../../../utils/context');
+var DNDCtrl = require('../../../../components/menu/room/dnd-controller');
 
 var RoomMenuModel = require('../../../../models/room-menu-model');
 var MiniBarView = require('../minibar/minibar-view');
@@ -15,7 +14,7 @@ var KeyboardControllerView = require('../keyboard-controller/keyboard-controller
 var MINIBAR_ITEM_HEIGHT = 65;
 
 require('nanoscroller');
-require('views/behaviors/isomorphic');
+require('../../../behaviors/isomorphic');
 
 
 var RoomMenuLayoutView = Marionette.LayoutView.extend({
@@ -145,10 +144,6 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
     if (this.model.get('roomMenuIsPinned')) { return; }
 
     this.model.set('panelOpenState', false);
-  },
-
-  onRender: function() {
-    toggleClass(this.ui.minibarInner[0], 'has-community-create', context.hasFeature('community-create'));
   },
 
   onChildRender: function () {

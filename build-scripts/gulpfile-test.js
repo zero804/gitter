@@ -72,6 +72,7 @@ var testModules = {
 var modulesWithTest = glob.sync('./modules/*/test', {
   ignore: './modules/topics-ui/**/*'
 });
+
 modulesWithTest.forEach(function(testDir) {
   var moduleDir = path.dirname(testDir);
   var moduleName = path.basename(moduleDir);
@@ -88,6 +89,11 @@ testModules['api-tests'] = {
     timeout: 30000
   },
   isCritical: false
+};
+
+testModules['live-collections'] = {
+  files: ['./test/live-collections'],
+  isCritical: true
 };
 
 testModules.integration = {

@@ -1,15 +1,13 @@
 'use strict';
 
 var _ = require('underscore');
-var Promise = require('bluebird');
-var toggleClass = require('utils/toggle-class');
-var appEvents = require('utils/appevents');
-var VirtualMultipleCollection = require('../virtual-multiple-collection');
-
+var toggleClass = require('../../../utils/toggle-class');
+var appEvents = require('../../../utils/appevents');
 var stepConstants = require('../step-constants');
 var template = require('./community-creation-overview-view.hbs');
 var CommunityCreateBaseStepView = require('../shared/community-creation-base-step-view');
-var CommunityCreationPeopleListView = require('../shared/community-creation-people-list-view');
+var InviteListView = require('../shared/community-creation-people-list-view');
+var apiClient = require('../../../components/apiClient');
 
 require('gitter-styleguide/css/components/headings.css');
 require('gitter-styleguide/css/components/buttons.css');
@@ -29,8 +27,8 @@ module.exports = CommunityCreateBaseStepView.extend({
   },
 
   initInviteListView: function(optionsForRegion) {
-    this.inviteListView = new CommunityCreationPeopleListView(optionsForRegion({
-      collection: this.inviteCollection,
+    this.inviteListView = new InviteListView(optionsForRegion({
+      collection: this.communityCreateModel.invites,
       communityCreateModel: this.communityCreateModel,
     }));
     return this.inviteListView;
@@ -43,20 +41,8 @@ module.exports = CommunityCreateBaseStepView.extend({
     githubName: '.community-create-overview-github-name'
   }),
 
-  events: _.extend({}, _super.events, {
-    'click @ui.nextStep': 'onStepNext',
-    'click @ui.backStep': 'onStepBack',
-  }),
-
-  initialize: function(options) {
+  initialize: function() {
     _super.initialize.apply(this, arguments);
-
-    this.orgCollection = options.orgCollection;
-    this.repoCollection = options.repoCollection;
-    this.groupsCollection = options.groupsCollection;
-    this.inviteCollection = options.inviteCollection;
-    this.troubleInviteCollection = options.troubleInviteCollection;
-
     this.listenTo(this.communityCreateModel, 'change:communityName change:communitySlug change:githubOrgId', this.onCommunityDataChange, this);
   },
 
@@ -65,81 +51,46 @@ module.exports = CommunityCreateBaseStepView.extend({
     data.communityName = this.communityCreateModel.get('communityName');
     data.communitySlug = this.communityCreateModel.get('communitySlug');
 
-    var githubProjectInfo = this.communityCreateModel.getGithubProjectInfo(this.orgCollection, this.repoCollection);
-    data.githubName = githubProjectInfo.name;
-    data.githubLink = githubProjectInfo.url;
+    var githubProjectInfo = this.communityCreateModel.getGithubProjectInfo();
+    data.githubName = githubProjectInfo.name || '';
+    data.githubLink = githubProjectInfo.url || '';
 
     return data;
   },
 
+  /**
+   * @override
+   */
   onStepNext: function() {
     var communityCreateModel = this.communityCreateModel;
+    var groupData = this.communityCreateModel.getSerializedCreateData();
 
-    var type = null;
-    var linkPath = null;
-    var githubOrgId = communityCreateModel.get('githubOrgId');
-    var githubRepoId = communityCreateModel.get('githubRepoId');
-    var githubProjectModel = this.orgCollection.get(githubOrgId) || this.repoCollection.get(githubRepoId);
-    if(githubOrgId && githubProjectModel) {
-      type = 'GH_ORG';
-      linkPath = githubProjectModel.get('name').toLowerCase();
-    }
-    else if(githubRepoId && githubProjectModel) {
-      type = 'GH_REPO';
-      linkPath = githubProjectModel.get('uri');
-    }
+    return apiClient.post('/v1/groups', groupData)
+      .then(function(results) {
+        var defaultRoomName = results && results.defaultRoom && results.defaultRoom.name;
+        var defaultRoomUri = results && results.defaultRoom && results.defaultRoom.uri;
 
-    var creatingGroupPromise = new Promise(function(resolve, reject) {
-      this.groupsCollection.create({
-        name: communityCreateModel.get('communityName'),
-        uri: communityCreateModel.get('communitySlug'),
-        type: 'org',
-        // This one is for the left-menu
-        linkPath: linkPath,
-        // This is for POSTing to the API
-        security: {
-          type: type,
-          linkPath: linkPath
-        },
-        invites: [].concat(communityCreateModel.peopleToInvite.toJSON(), communityCreateModel.emailsToInvite.toJSON()),
-        addBadge: communityCreateModel.get('allowBadger'),
-        // TODO: ADD UI option
-        allowTweeting: true
-      }, {
-        wait: true,
-        success: function(model, response) {
-          resolve(response);
-        },
-        error: function(model, response) {
-          reject(response);
-        }
+        // Move to the default room
+        appEvents.trigger('navigation', '/' + defaultRoomUri, 'chat', defaultRoomName);
+
+        // Select the new community in the new left menu
+        appEvents.trigger('left-menu-menu-bar:activate', {
+          state: 'org',
+          groupId: results.id
+        });
+
+        // Hide create community
+        communityCreateModel.set('active', false);
       });
-    }.bind(this));
-
-    creatingGroupPromise.then(function(results) {
-      var defaultRoomName = results && results.defaultRoom && results.defaultRoom.name;
-      var defaultRoomUri = results && results.defaultRoom && results.defaultRoom.uri;
-
-      // Hide create community
-      communityCreateModel.set('active', false);
-
-      // Move to the default room
-      appEvents.trigger('navigation', '/' + defaultRoomUri, 'chat', defaultRoomName);
-      // Select the new community in the new left menu
-      appEvents.trigger('left-menu-menu-bar:activate', {
-        state: 'org',
-        groupId: results.id
-      });
-    });
 
   },
-  onStepBack: function() {
-    // Only go back to confirmation if there was trouble initially
-    if(this.troubleInviteCollection.length > 0) {
-      this.communityCreateModel.set('stepState', stepConstants.INVITE_CONFIRMATION);
-    }
-    else {
-      this.communityCreateModel.set('stepState', stepConstants.INVITE);
+
+  prevStep: function() {
+    if (this.communityCreateModel.hasInvitesRequiringEmailEntry()) {
+      // Only go back to confirmation if there was trouble initially
+      return stepConstants.INVITE_CONFIRMATION;
+    } else {
+      return stepConstants.INVITE;
     }
   },
 

@@ -1,0 +1,14 @@
+"use strict";
+
+var assert = require('assert');
+var {{camelCase name}}Store = require('../../../../server/stores/{{dashCase name}}');
+
+describe('{{camelCase name}}Store', () => {
+
+  var data = {};
+
+  it('should an object with get{{properCase name}}', () => {
+    assert({{camelCase name}}Store(data).get);
+  });
+
+});

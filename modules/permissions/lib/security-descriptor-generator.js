@@ -95,7 +95,7 @@ function generateRepoSecurityDescriptor(user, options) {
   var externalId = options.externalId;
   var linkPath = options.linkPath;
   var security = options.security;
-  
+
   assert(linkPath, 'linkPath required');
 
   switch (security) {

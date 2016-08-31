@@ -2,7 +2,7 @@
 
 var Marionette = require('backbone.marionette');
 var urlJoin = require('url-join');
-var toggleClass = require('utils/toggle-class');
+var toggleClass = require('../../../utils/toggle-class');
 var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 var roomNameFromTroupeName = require('gitter-web-shared/get-room-name-from-troupe-name');
 
@@ -22,10 +22,6 @@ var CommunityCreationRepoListItemView = Marionette.ItemView.extend({
   modelEvents: {
     'change:hidden': 'onHiddenChange',
     'change:active': 'onActiveChange'
-  },
-
-  initialize: function() {
-
   },
 
   serializeData: function() {

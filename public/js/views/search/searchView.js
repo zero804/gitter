@@ -1,30 +1,30 @@
 "use strict";
 
-var apiClient = require('components/apiClient');
-var context = require('utils/context');
-var appEvents = require('utils/appevents');
-var Rollers = require('utils/rollers');
+var apiClient = require('../../components/apiClient');
+var context = require('../../utils/context');
+var appEvents = require('../../utils/appevents');
+var Rollers = require('../../utils/rollers');
 var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 var _ = require('underscore');
-var cocktail = require('cocktail');
-var ChatSearchModels = require('collections/chat-search');
+var cocktail = require('backbone.cocktail');
+var ChatSearchModels = require('../../collections/chat-search');
 var resultTemplate = require('./tmpl/result.hbs');
 var noResultsTemplate = require('./tmpl/no-results.hbs');
 var noRoomResultsTemplate = require('./tmpl/no-room-results.hbs');
-var textFilter = require('utils/text-filter');
-var KeyboardEventsMixin = require('views/keyboard-events-mixin');
+var textFilter = require('../../utils/text-filter');
+var KeyboardEventsMixin = require('../keyboard-events-mixin');
 var Promise = require('bluebird');
 var timeFormat = require('gitter-web-shared/time/time-format');
 var fullTimeFormat = require('gitter-web-shared/time/full-time-format');
-var FilteredCollection = require('backbone-filtered-collection');
+var SimpleFilteredCollection = require('gitter-realtime-client/lib/simple-filtered-collection');
 
-require('views/behaviors/widgets');
-require('views/behaviors/highlight');
-require('views/behaviors/isomorphic');
-require('views/behaviors/timeago');
-require('views/behaviors/tooltip');
+require('../behaviors/widgets');
+require('../behaviors/highlight');
+require('../behaviors/isomorphic');
+require('../behaviors/timeago');
+require('../behaviors/tooltip');
 
 module.exports = (function() {
 
@@ -404,15 +404,19 @@ module.exports = (function() {
       masterCollection.comparator = 'priority';
 
       // filtered collections
-      this.rooms = new FilteredCollection({ model: Backbone.Model, collection: masterCollection });
-      this.chats = new FilteredCollection({ model: Backbone.Model, collection: masterCollection });
-
-      this.rooms.setFilter(function (model) {
-        return !!model.get('url');
+      this.rooms = new SimpleFilteredCollection([], {
+        model: Backbone.Model,
+        collection: masterCollection,
+        filter: function(model) {
+          return !!model.get('url');
+        }
       });
 
-      this.chats.setFilter(function (model) {
-        return !!model.get('text');
+      this.chats = new SimpleFilteredCollection([], {
+        model: Backbone.Model, collection: masterCollection,
+        filter: function(model) {
+          return !!model.get('text');
+        }
       });
 
       // making navigation and filtered collections accessible

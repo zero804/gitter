@@ -16,9 +16,11 @@
     "dolph": "^0.2.0",
     "gitter-web-appevents": "file:../appevents",
     "gitter-web-env": "file:../env",
+    "gitter-web-identity": "file:../identity",
     "gitter-web-github": "file:../github",
     "gitter-web-persistence": "file:../persistence",
     "gitter-web-persistence-utils": "file:../persistence-utils",
+    "lazy.js": "^0.4.2",
     "lodash": "^3.2.0",
     "statuserror": "^0.1.3"
   },

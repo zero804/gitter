@@ -1,17 +1,19 @@
 'use strict';
 
-require('utils/font-setup');
-var appEvents = require('utils/appevents');
-var onready = require('utils/onready');
-var toggleClass = require('utils/toggle-class');
-var ExploreView = require('views/explore/explore-view');
-
-require('utils/tracking');
-require('utils/frame-utils');
+require('./utils/font-setup');
+var appEvents = require('./utils/appevents');
+var onready = require('./utils/onready');
+var toggleClass = require('./utils/toggle-class');
+var ExploreView = require('./views/explore/explore-view');
+var frameUtils = require('./utils/frame-utils');
+require('./utils/tracking');
 
 require('gitter-styleguide/css/components/buttons.css');
 require('gitter-styleguide/css/components/headings.css');
 
+appEvents.on('route', function(hash) {
+  frameUtils.postMessage({ type: 'route', hash: hash });
+});
 
 onready(function() {
 

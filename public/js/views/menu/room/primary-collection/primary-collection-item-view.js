@@ -3,11 +3,11 @@
 var Backbone = require('backbone');
 var _ = require('underscore');
 var itemTemplate = require('./primary-collection-item-view.hbs');
-var apiClient = require('components/apiClient');
-var context = require('utils/context');
-var appEvents = require('utils/appevents');
+var apiClient = require('../../../../components/apiClient');
+var context = require('../../../../utils/context');
+var appEvents = require('../../../../utils/appevents');
 var parseForTemplate = require('gitter-web-shared/parse/left-menu-primary-item');
-var toggleClass = require('utils/toggle-class');
+var toggleClass = require('../../../../utils/toggle-class');
 var parseRoomItemName = require('gitter-web-shared/get-org-menu-state-name-from-troupe-name');
 var roomNameShortener = require('gitter-web-shared/room-name-shortener');
 
@@ -175,7 +175,7 @@ module.exports = BaseCollectionItemView.extend({
       this.ui.title.html(data.namePieces.reduce(function(html, piece) { return html + '<span class="room-item__title-piece">' + piece + '</span>'; }, ''));
     }
     else {
-      this.ui.title.text(data.displayName || data.name);
+      this.ui.title.html('<span class="room-item__title-piece">' + data.displayName || data.name + '</span>');
     }
   },
 });

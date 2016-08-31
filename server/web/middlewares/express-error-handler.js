@@ -71,7 +71,7 @@ module.exports = function(err, req, res, next) { // eslint-disable-line no-unuse
     html: function() {
       res.render(template , _.extend({
          status: status,
-         homeUrl : config.get('web:homeurl'),
+         homeUrl: config.get('web:homeurl'),
          user: req.user,
          userMissingPrivateRepoScope: req.user && !userScopes.hasGitHubScope(req.user, 'repo'),
          message: message,

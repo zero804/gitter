@@ -1,0 +1,35 @@
+@import "../../text";
+
+@unicode-down-arrow: '\2023';
+
+.table-control__select-decal {
+  position: relative;
+  &:after{
+    content:   @unicode-down-arrow;
+    position:  absolute;
+    top:       1.6rem;
+    right:     1rem;
+    color:     white;
+    font-size: 2.5rem;
+    transform: rotate(90deg);
+    pointer-events: none;
+  }
+}
+
+.table-control__select {
+  //FIXME -> add autoprefixer
+  -webkit-appearance: none;
+  background:         none;
+  outline:            none;
+
+  padding:      .7rem 3rem .7rem 1rem;
+  margin-left:  2rem;
+  margin-top:   1.5rem;
+  border-color: white;
+
+  //FIXME how do we handle these deffinitions
+  font-family:    @font-family;
+  font-size:      1.2rem;
+  color:          white;
+  text-transform: uppercase;
+}
