@@ -60,6 +60,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
   initialize: function(/*attrs, options*/) {
     this.initializeForEntity();
     this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
+    this.listenTo(this.model.adminCollection, 'add remove', this.onAdminCollectionChange);
   },
 
   menuItemClicked: function(button) {
@@ -122,7 +123,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
       }
     });
 
-    this.listenTo(this.typeahead, 'selected', this.onPersonSelected);
+    this.listenTo(this.typeahead, 'selected', this.onAdminSelected);
 
     this.onRequestingSecurityDescriptorStatusChange();
   },
@@ -139,7 +140,12 @@ var CreateRoomView = Marionette.LayoutView.extend({
     });
   },
 
-  onPersonSelected: function(user) {
+  onAdminCollectionChange: function() {
+    this.updateModelErrors();
+  },
+
+  onAdminSelected: function(user) {
+    this.ui.peopleInput.val('');
     this.model.adminCollection.add([user]);
     this.typeahead.dropdown.hide();
   },
@@ -199,7 +205,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
     var modelIsValid = this.model.isValid();
     var errors = !modelIsValid && this.model.validationError;
 
-    var errorStrings = errors.map(function(error) {
+    var errorStrings = (errors || []).map(function(error) {
       return error.message;
     });
     var errorMessage = errorStrings.join('\n');
@@ -273,8 +279,8 @@ var CreateRoomView = Marionette.LayoutView.extend({
   fetchSecurityDescriptor: function() {
     this.model.set('requestingSecurityDescriptorStatus', requestingSecurityDescriptorStatusConstants.PENDING);
     var securityApiUrl = urlJoin(this.getApiEndpointForEntity(), 'security');
-    return apiClient.get(securityApiUrl)
-    //return Promise.resolve({ type: null })
+    //return apiClient.get(securityApiUrl)
+    return Promise.resolve({ type: null })
       .bind(this)
       .then(function(sd) {
         // TODO: Verify works once API is in place
