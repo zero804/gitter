@@ -18,44 +18,39 @@ KnownExternalAccessSchema.index({ type: 1, linkPath: 1 }, { background: true });
 KnownExternalAccessSchema.index({ type: 1, externalId: 1 }, { background: true });
 KnownExternalAccessSchema.schemaTypeName = 'KnownExternalAccessSchema';
 
+KnownExternalAccessSchema.extraIndices = [{
+  keys: {
+    userId: 1,
+    type: 1,
+    policyName: 1,
+    linkPath: 1,
+  },
+  options: {
+    background: true,
+    unique: true,
+    partialFilterExpression: {
+      linkPath: { $exists: true },
+    }
+  }
+}, {
+  keys: {
+    userId: 1,
+    type: 1,
+    policyName: 1,
+    externalId: 1,
+  },
+  options: {
+    background: true,
+    unique: true,
+    partialFilterExpression: {
+      externalId: { $exists: true },
+    }
+  }
+}];
+
 module.exports = {
   install: function(mongooseConnection) {
     var model = mongooseConnection.model('KnownExternalAccess', KnownExternalAccessSchema);
-
-    // Unique index on linkPath + user + type
-    model.collection.createIndex({
-        userId: 1,
-        type: 1,
-        policyName: 1,
-        linkPath: 1,
-      } , {
-        background: true,
-        unique: true,
-        partialFilterExpression: {
-          linkPath: { $exists: true },
-        }
-      },
-      function(err) {
-        if (err) throw err;
-      });
-
-    // Unique index on externalId + user + type
-    model.collection.createIndex({
-        userId: 1,
-        type: 1,
-        policyName: 1,
-        externalId: 1,
-      } , {
-        background: true,
-        unique: true,
-        partialFilterExpression: {
-          externalId: { $exists: true },
-        }
-      },
-      function(err) {
-        if (err) throw err;
-      });
-
 
     return {
       model: model,

@@ -20,7 +20,8 @@ module.exports = {
         res.set('Cache-Control', 'public, max-age=' + EXPIRES_SECONDS);
         res.set('Expires', new Date(Date.now() + EXPIRES_MILLISECONDS).toUTCString());
 
-        return restSerializer.serialize(suggestedRooms, new restSerializer.SuggestedRoomStrategy());
+        var strategy = restSerializer.TroupeStrategy.createSuggestionStrategy();
+        return restSerializer.serialize(suggestedRooms, strategy);
       });
   }
 };
