@@ -76,7 +76,7 @@ function addUsersToGroupRoom(userIds, roomId) {
   var req = bulkTools.createBulkUpdate(updates);
   return elasticClient.bulk(req)
     .then(function(res) {
-      var err = bulkTools.findPartialError(req, res);
+      var err = bulkTools.findErrors(req, res);
       if (err) throw err;
     });
 }
@@ -88,7 +88,7 @@ function removeUsersFromRoom(userIds, roomId) {
   var req = bulkTools.createBulkUpdate(updates);
   return elasticClient.bulk(req)
     .then(function(res) {
-      var err = bulkTools.findPartialError(req, res);
+      var err = bulkTools.findErrors(req, res);
       if (err) throw err;
     });
 }
@@ -96,14 +96,6 @@ function removeUsersFromRoom(userIds, roomId) {
 function upsertUser(user) {
   return elasticClient.update(createUserUpdate(user))
 }
-
-module.exports = {
-  query: query,
-  reindex: reindex,
-  addUsersToGroupRoom: addUsersToGroupRoom,
-  removeUsersFromRoom: removeUsersFromRoom,
-  upsertUser: upsertUser
-};
 
 function createIndex(name) {
   debug('creating index %s', name);
@@ -352,3 +344,12 @@ function createRemoveMembershipUpdate(userId, roomId) {
     _retry_on_conflict: 3
   }
 }
+
+
+module.exports = {
+  query: query,
+  reindex: reindex,
+  addUsersToGroupRoom: addUsersToGroupRoom,
+  removeUsersFromRoom: removeUsersFromRoom,
+  upsertUser: upsertUser
+};

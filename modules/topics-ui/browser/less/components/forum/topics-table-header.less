@@ -1,0 +1,28 @@
+@import (less, reference) "~gitter-styleguide/css/components/headings.css";
+@import "../../colors";
+@import "../../dims";
+
+.topics-table-header {
+  background:    @light;
+  border-bottom: 1px solid @topic-table-header-color;
+  color:         @topic-table-header-color;
+}
+
+.topics-table-header__cell {
+  &:extend(.h5);
+  padding:        4rem 1rem 1rem;
+  text-align:     center;
+  text-transform: uppercase;
+}
+
+.topics-table-header__cell--first {
+  &:extend(.topics-table-header__cell);
+  width:        80%;
+  padding-left: @panel-horiz-padding + @panel-border-width;
+  text-align:   left;
+}
+
+.topics-table-header__cell--last {
+  &:extend(.topics-table-header__cell);
+  padding-right: @panel-horiz-padding + @panel-border-width;
+}

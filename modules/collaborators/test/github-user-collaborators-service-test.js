@@ -25,6 +25,6 @@ describe('gitter-user-collaborators-service-test', function() {
           assert(Array.isArray(results));
         });
     });
-    
+
   });
 })

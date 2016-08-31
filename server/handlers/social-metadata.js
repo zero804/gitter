@@ -2,35 +2,28 @@
 
 var env = require('gitter-web-env');
 var nconf = env.config;
-var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-url');
-var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
-
-var METADATA_IMAGE_SIZE = 256;
+var avatars = require('gitter-web-avatars');
 
 function getMetadata(options) {
   var room = options && options.room;
 
-  var resolveRoom = (room && room.uri) ? room : {uri: 'gitterHQ'};
-  var image = resolveRoomAvatarUrl(resolveRoom, METADATA_IMAGE_SIZE);
-
   var title = room && room.uri || 'Gitter';
   var description = room && room.topic || 'Where developers come to talk.';
+  var imageUrl = room && room.avatarUrl || avatars.getDefault();
 
   return {
     'og:title': title,
     'og:description': description,
     'og:type': 'website',
-    'og:image': image,
+    'og:image': imageUrl,
     'fb:app_id': nconf.get('facebook:app-id'),
     'twitter:card': 'summary',
     'twitter:site': '@gitchat',
     'twitter:title': title,
     'twitter:description': description,
-    'twitter:image': image
+    'twitter:image': imageUrl
   };
 }
-
-module.exports.getMetadata = getMetadata;
 
 function getMetadataForChatPermalink(options) {
   var room = options && options.room;
@@ -40,23 +33,25 @@ function getMetadataForChatPermalink(options) {
 
   var fromUser = chat.fromUser;
 
-  var image = resolveUserAvatarUrl(fromUser, METADATA_IMAGE_SIZE);
-
   var title = room && room.uri || 'Gitter';
   var description = '@' + fromUser.username + ': ' + chat.text;
+  var imageUrl = room && room.avatarUrl || avatars.getDefault();
 
   return {
     'og:title': title,
     'og:description': description,
     'og:type': 'website',
-    'og:image': image,
+    'og:image': imageUrl,
     'fb:app_id': nconf.get('facebook:app-id'),
     'twitter:card': 'summary',
     'twitter:site': '@gitchat',
     'twitter:title': title,
     'twitter:description': description,
-    'twitter:image': image
+    'twitter:image': imageUrl
   };
 }
 
-module.exports.getMetadataForChatPermalink = getMetadataForChatPermalink;
+module.exports = {
+  getMetadata: getMetadata,
+  getMetadataForChatPermalink: getMetadataForChatPermalink
+};

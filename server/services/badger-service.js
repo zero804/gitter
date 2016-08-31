@@ -12,19 +12,19 @@ var troupeTemplate = require('../utils/troupe-template');
 var templatePromise = troupeTemplate.compile('github-pull-request-body');
 
 var StatusError = require('statuserror');
-var badger = require('readme-badger');
+var readmeBadger = require('readme-badger');
 var path = require('path');
 
-function insertBadge(repo, content, fileExt, user) {
-  var imageUrl = conf.get('web:badgeBaseUrl') + '/' + repo + '.svg';
-  var linkUrl = conf.get('web:basepath') + '/' + repo + '?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge';
-  var altText = 'Join the chat at ' + conf.get('web:basepath') + '/' + repo;
+function insertBadge(roomUri, content, fileExt, user) {
+  var imageUrl = conf.get('web:badgeBaseUrl') + '/' + roomUri + '.svg';
+  var linkUrl = conf.get('web:basepath') + '/' + roomUri + '?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge';
+  var altText = 'Join the chat at ' + conf.get('web:basepath') + '/' + roomUri;
 
-  if(!badger.hasImageSupport(fileExt)) {
+  if(!readmeBadger.hasImageSupport(fileExt)) {
     stats.event('badger.inserted_plaintext', { userId: user.id, fileExt: fileExt });
   }
 
-  return badger.addBadge(content, fileExt, imageUrl, linkUrl, altText);
+  return readmeBadger.addBadge(content, fileExt, imageUrl, linkUrl, altText);
 }
 
 function Client(token) {
@@ -198,12 +198,11 @@ function ReadmeUpdater(context) {
         var existingReadme = findReadme(tree.tree, readme && readme.path);
 
         if(existingReadme) {
-
           var content = new Buffer(readme.content, 'base64').toString('utf8');
           var fileExt = path.extname(existingReadme.path).substring(1);
 
-          content = insertBadge(context.sourceRepo, content, fileExt, context.user);
-          context.insertedPlaintext = !badger.hasImageSupport(fileExt);
+          content = insertBadge(context.roomUri, content, fileExt, context.user);
+          context.insertedPlaintext = !readmeBadger.hasImageSupport(fileExt);
 
           context.readmeFileName = existingReadme.path;
           var readmeNode = {
@@ -233,7 +232,7 @@ function ReadmeUpdater(context) {
           tree: [newReadme]
         };
 
-              });
+      });
   }
 
   function prepareTreeForCommit(branchRef) {
@@ -300,38 +299,41 @@ function ReadmeUpdater(context) {
   };
 }
 
-function updateFileAndCreatePullRequest(sourceRepo, user, branchPrefix) {
+function updateFileAndCreatePullRequest(sourceRepo, roomUri, user, branchPrefix) {
   return new ReadmeUpdater({
-    token: '***REMOVED***',
-    sourceRepo: sourceRepo,
-    user: user,
-    branchPrefix: branchPrefix,
-    badgeContent: getBadgeMarkdown(sourceRepo, 'badge'),
-    badgeContentBody: getBadgeMarkdown(sourceRepo, 'body_badge')
-  }).perform();
+      token: '***REMOVED***',
+      sourceRepo: sourceRepo,
+      roomUri: roomUri,
+      user: user,
+      branchPrefix: branchPrefix,
+      badgeContent: getBadgeMarkdown(roomUri, 'badge'),
+      badgeContentBody: getBadgeMarkdown(roomUri, 'body_badge')
+    })
+    .perform();
 }
 
-function getBadgeMarkdown(repo, content) {
+function getBadgeMarkdown(roomUri, content) {
   var contentLink = content ? '&utm_content=' + content : '';
 
-  var imageUrl = conf.get('web:badgeBaseUrl') + '/' + repo + '.svg';
-  var linkUrl = conf.get('web:basepath') + '/' + repo + '?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge' + contentLink;
+  var imageUrl = conf.get('web:badgeBaseUrl') + '/' + roomUri + '.svg';
+  var linkUrl = conf.get('web:basepath') + '/' + roomUri + '?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge' + contentLink;
+
   return '\n[![Gitter](' + imageUrl + ')](' + linkUrl + ')';
 }
 
-function sendBadgePullRequest(repo, user) {
+function sendBadgePullRequest(repo, roomUri, user) {
 
   // The name of this stat is due to historical reasons
-  stats.event('badger.clicked', { userId: user.id });
+  stats.event('badger.clicked', { userId: user.id, repo: repo, roomUri: roomUri });
 
-  return updateFileAndCreatePullRequest(repo, user.username, 'gitter-badge')
+  return updateFileAndCreatePullRequest(repo, roomUri, user.username, 'gitter-badge')
     .then(function (pr) {
-      stats.event('badger.succeeded', { userId: user.id });
+      stats.event('badger.succeeded', { userId: user.id, repo: repo, roomUri: roomUri });
       return pr;
     })
     .catch(function(err) {
-      stats.event('badger.failed', { userId: user.id });
-      logger.error("Badger failed", { exception: err, uri: repo });
+      stats.event('badger.failed', { userId: user.id, repo: repo, roomUri: roomUri });
+      logger.error("Badger failed", { exception: err, uri: repo, roomUri: roomUri });
 
       // dont swollow this error, the client needs to be notified of our failure
       throw err;

@@ -7,6 +7,7 @@ var Promise = require('bluebird');
 var EventEmitter = require('events').EventEmitter;
 var _ = require('lodash');
 var securityDescriptorAdminFilter = require('gitter-web-permissions/lib/security-descriptor-admin-filter');
+var adminDiscovery = require('gitter-web-permissions/lib/admin-discovery');
 
 var groupMembershipEvents = new EventEmitter();
 
@@ -45,7 +46,8 @@ function findGroupsForUser(userId) {
           uri: '$group.uri',
           lcUri: '$group.lcUri',
           sd: '$group.sd',
-          avatarVersion: '$group.avatarVersion'
+          avatarVersion: '$group.avatarVersion',
+          forumId: '$group.forumId'
         }
       }])
       .read('primaryPreferred')
@@ -56,7 +58,12 @@ function findGroupsForUser(userId) {
 }
 
 function findAdminGroupsForUser(user) {
-  return findGroupsForUser(user._id)
+  return Promise.join(
+    adminDiscovery.discoverAdminGroups(user),
+    findGroupsForUser(user._id),
+    function(discoveredGroups, membershipGroups) {
+      return mongoUtils.unionModelsById([discoveredGroups, membershipGroups]);
+    })
     .then(function(groups) {
       return securityDescriptorAdminFilter(user, groups);
     });

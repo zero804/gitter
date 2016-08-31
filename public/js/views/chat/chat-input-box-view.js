@@ -2,18 +2,18 @@
 
 var Marionette = require('backbone.marionette');
 var template = require('./tmpl/chat-input-box.hbs');
-var drafty = require('components/drafty');
+var drafty = require('../../components/drafty');
 var commands = require('./commands');
 var typeaheads = require('./typeaheads');
-var platformKeys = require('utils/platform-keys');
-var RAF = require('utils/raf');
-var cocktail = require('cocktail');
-var KeyboardEventsMixin = require('views/keyboard-events-mixin');
-var appEvents = require('utils/appevents');
-var context = require('utils/context');
-var isMobile = require('utils/is-mobile');
+var platformKeys = require('../../utils/platform-keys');
+var RAF = require('../../utils/raf');
+var cocktail = require('backbone.cocktail');
+var KeyboardEventsMixin = require('../keyboard-events-mixin');
+var appEvents = require('../../utils/appevents');
+var context = require('../../utils/context');
+var isMobile = require('../../utils/is-mobile');
 
-require('jquery-textcomplete');
+require('jquery-textcomplete'); // eslint-disable-line node/no-missing-require
 
 var PLACEHOLDER = 'Click here to type a chat message. Supports GitHub flavoured markdown.';
 var PLACEHOLDER_MOBILE = 'Touch here to type a chat message.';

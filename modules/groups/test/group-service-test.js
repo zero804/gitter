@@ -6,6 +6,7 @@ var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
 var proxyquireNoCallThru = require("proxyquire").noCallThru();
 var StatusError = require('statuserror');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 // stub out this check because otherwise we end up with a the tests all
 // clashing with the user that's required to have access to create those
@@ -295,7 +296,30 @@ describe('group-service', function() {
       });
     });
 
-    describe('ensureGroupForRoom', function() {
+    describe('setForumForGroup', function() {
+      var fixture = fixtureLoader.setup({
+        group1: {},
+        group2: { forum: 'forum2' },
+        forum1: {},
+        forum2: {}
+      });
+
+      it("should set a group's forum", function() {
+        return groupService.setForumForGroup(fixture.group1._id, fixture.forum1._id)
+          .then(function(group) {
+            assert.ok(mongoUtils.objectIDsEqual(group.forumId, fixture.forum1.id));
+          });
+      });
+
+      it("should throw an error if the group already has a forum", function() {
+        return groupService.setForumForGroup(fixture.group2._id, fixture.forum1._id)
+          .then(function() {
+            assert.ok(false, "Expected error.");
+          })
+          .catch(StatusError, function(err) {
+            assert.strictEqual(err.status, 409);
+          });
+      });
     });
 
   });

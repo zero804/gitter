@@ -13,7 +13,7 @@ function addRemovedUser(roomId, userId) {
 
 function addRemovedUsers(roomId, userIds) {
   if (!userIds || !userIds.length) return;
-  
+
   var now = Date.now();
   debug('Recording %s users as removed from room roomId=%s', userIds.length, roomId);
 

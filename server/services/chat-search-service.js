@@ -124,13 +124,13 @@ function performQuery(troupeId, parsedQuery, options) {
         fields: {
           text: {
             matched_fields: ["text"],
-            type : "fvh"
+            type: "fvh"
           }
         },
       },
       sort: [
-        { _score: { order : "desc"} },
-        { sent: { order : "desc"} }
+        { _score: { order: "desc"} },
+        { sent: { order: "desc"} }
       ],
     }
   };

@@ -1,6 +1,6 @@
 'use strict';
 
-var debug = require('debug')('gitter:modules:collaborators');
+var debug = require('debug')('gitter:app:collaborators');
 var _ = require('lodash');
 var TwitterService = require('gitter-web-twitter');
 var identityService = require('gitter-web-identity');

@@ -160,7 +160,8 @@ describe('restful #slow', function() {
               linkPath: null
             },
             avatarUrl: nconf.get('avatar:officialHost') + '/group/i/' + fixture.group1.id,
-            hasAvatarSet: undefined
+            hasAvatarSet: undefined,
+            forumId: undefined
           }]);
         });
     });

@@ -181,12 +181,13 @@ router.get('/accept-invite/:secret',
   ensureLoggedIn,
   function(req, res, next) {
     var secret = req.params.secret;
-    return acceptInviteService.acceptInvite(req.user, secret)
+    return acceptInviteService.acceptInvite(req.user, secret, { source: req.query.source })
       .then(function(room) {
         return resolveRoomUri(room, req.user._id);
       })
       .then(function(roomUri) {
-        res.relativeRedirect(roomUri);
+        var encodedUri = encodeURI(roomUri);
+        res.relativeRedirect(encodedUri);
       })
       .catch(StatusError, function(err) {
         if (err.status >= 500) throw err;

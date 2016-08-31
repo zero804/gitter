@@ -145,7 +145,7 @@ describe('chat-strategy-test', function() {
           username: fixture.user1.username,
           displayName: fixture.user1.displayName,
           url: '/' + fixture.user1.username,
-          avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + fixture.user1.username,
+          avatarUrl: nconf.get('avatar:officialHost') + '/g/u/' + fixture.user1.username,
           avatarUrlSmall: '/api/private/user-avatar/' + fixture.user1.username + '?s=60',
           avatarUrlMedium: '/api/private/user-avatar/' + fixture.user1.username + '?s=128',
           staff: false,
@@ -239,7 +239,7 @@ describe('chat-strategy-test', function() {
     });
 
     it("should serialize a message with lookups=['user']", function() {
-      var strategy = new ChatIdStrategy({ lookups:['user'], currentUserId: fixture.user1.id, troupeId: fixture.troupe1.id });
+      var strategy = new ChatIdStrategy({ lookups: ['user'], currentUserId: fixture.user1.id, troupeId: fixture.troupe1.id });
       return serialize([fixture.message1.id], strategy)
         .then(function(s) {
           assertUtils.assertSerializedEqual(s, expectedLookups);

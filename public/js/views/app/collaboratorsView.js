@@ -2,14 +2,14 @@
 
 var Marionette = require('backbone.marionette');
 var Backbone = require('backbone');
-var context = require('utils/context');
-var social = require('utils/social');
-var apiClient = require('components/apiClient');
+var context = require('../../utils/context');
+var social = require('../../utils/social');
+var apiClient = require('../../components/apiClient');
 var template = require('./tmpl/collaboratorsView.hbs');
 var itemTemplate = require('./tmpl/collaboratorsItemView.hbs');
 var emptyViewTemplate = require('./tmpl/collaboratorsEmptyView.hbs');
-var appEvents = require('utils/appevents');
-var collaboratorsModels = require('collections/collaborators');
+var appEvents = require('../../utils/appevents');
+var collaboratorsModels = require('../../collections/collaborators');
 
 require('gitter-styleguide/css/components/buttons.css');
 require('gitter-styleguide/css/components/links.css');
@@ -196,13 +196,6 @@ module.exports = (function() {
     },
 
     initialize: function() {
-      var ctx = context();
-      appEvents.triggerParent('track-event', 'welcome-add-user-suggestions', {
-        uri: ctx.troupe.uri,
-        security: ctx.troupe.security,
-        count: this.collection.length,
-      });
-
       //listen to room permission changes so we can refresh the collection
       this.listenTo(context.troupe(), 'change:permissions', this.onRoomChange, this);
     },

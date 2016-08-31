@@ -179,7 +179,7 @@ var fixOrgChannel = Promise.method(function(update) {
       return channel.save()
         .then(function() {
           if (!requiresRename) return;
-          
+
           return uriLookupService.removeBadUri(oldUri.toLowerCase())
             .then(function() {
               return uriLookupService.reserveUriForTroupeId(troupeId, newLcUri);

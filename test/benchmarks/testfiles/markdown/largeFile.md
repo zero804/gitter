@@ -120,7 +120,7 @@ https://highlightjs.org/
     }
 
     function open(node) {
-      function attr_str(a) {return ' ' + a.nodeName + '="' + escape(a.value) + '"';}
+      function attr_str(a) {return ' ' + a.name + '="' + escape(a.value) + '"';}
       result += '<' + tag(node) + Array.prototype.map.call(node.attributes, attr_str).join('') + '>';
     }
 

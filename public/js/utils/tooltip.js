@@ -1,8 +1,8 @@
 "use strict";
 
-var jQuery = require('jquery');
-var isMobile = require('utils/is-mobile');
-var detectCompact = require('utils/detect-compact');
+var $ = require('jquery');
+var isMobile = require('./is-mobile');
+var detectCompact = require('./detect-compact');
 
 module.exports = (function() {
 
@@ -409,8 +409,8 @@ module.exports = (function() {
     return this
   }
 
-}(window.jQuery);
+}($);
 
-return jQuery;
+return $;
 
 })();

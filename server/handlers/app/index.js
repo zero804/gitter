@@ -20,7 +20,7 @@ var chatService = require('../../services/chat-service');
 var restSerializer = require("../../serializers/rest-serializer");
 var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
 var redirectErrorMiddleware = require('../uri-context/redirect-error-middleware');
-var topicsRenderers = require('../renderers/topics');
+var topicRouter = require('./topics');
 
 function saveRoom(req) {
   var userId = req.user && req.user.id;
@@ -31,25 +31,29 @@ function saveRoom(req) {
   }
 }
 
-function getSocialMetaDataForRoom(room, aroundId) {
-    // TODO: change this to use policy
-    if (aroundId && room && securityDescriptorUtils.isPublic(room)) {
-      // If this is a permalinked chat, load special social meta-data....
-      return chatService.findByIdInRoom(room._id, aroundId)
-        .then(function(chat) {
-          var strategy = new restSerializer.ChatStrategy({
-            notLoggedIn: true,
-            troupeId: room._id
-          });
-
-          return restSerializer.serializeObject(chat, strategy);
-        })
-        .then(function(permalinkChatSerialized) {
-          return social.getMetadataForChatPermalink({ room: room, chat: permalinkChatSerialized });
+function getSocialMetaDataForRoom(room, serializedRoom, aroundId) {
+  // TODO: change this to use policy
+  if (aroundId && room && securityDescriptorUtils.isPublic(room)) {
+    // If this is a permalinked chat, load special social meta-data....
+    return chatService.findByIdInRoom(room._id, aroundId)
+      .then(function(chat) {
+        var chatStrategy = new restSerializer.ChatStrategy({
+          notLoggedIn: true,
+          troupeId: room._id
         });
-    }
 
-    return social.getMetadata({ room: room });
+
+        return restSerializer.serializeObject(chat, chatStrategy);
+      })
+      .then(function(permalinkChatSerialized) {
+        return social.getMetadataForChatPermalink({
+          room: serializedRoom,
+          chat: permalinkChatSerialized
+        });
+      });
+  }
+
+  return social.getMetadata({ room: serializedRoom });
 }
 
 var mainFrameMiddlewarePipeline = [
@@ -89,12 +93,13 @@ var mainFrameMiddlewarePipeline = [
         hash:     '#initial'
       });
 
-      var socialMetaDataPromise = getSocialMetaDataForRoom(req.troupe, aroundId);
-
       mainFrameRenderer.renderMainFrame(req, res, next, {
         subFrameLocation: subFrameLocation,
         title: req.uriContext.uri,
-        socialMetaDataPromise: socialMetaDataPromise
+        socialMetadataGenerator: function(troupeContext) {
+          var serializedRoom = troupeContext.troupe;
+          return getSocialMetaDataForRoom(req.troupe, serializedRoom, aroundId);
+        }
       });
     }
   },
@@ -166,13 +171,8 @@ var cardMiddlewarePipeline = [
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
-router.get('/:roomPart1/topics',
-  identifyRoute('org-base-topic'),
-  featureToggles,
-  function(req, res, next){
-    return topicsRenderers.renderForum(req, res, next);
-  }
-);
+//Topics
+router.use('/:groupName/topics', topicRouter);
 
 [
   '/:roomPart1/~chat',                         // ORG or ONE_TO_ONE
@@ -220,5 +220,6 @@ router.get('/:roomPart1/topics',
       res.redirect(req.uri);
     });
 });
+
 
 module.exports = router;

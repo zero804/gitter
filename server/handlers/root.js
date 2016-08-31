@@ -43,8 +43,6 @@ router.get(nconf.get('web:homeurl'),
     /* i18n doesn't like empty strings. Use a dash as a proxy */
     if (translatedBy === "-") translatedBy = "";
 
-    var hasCommunityCreate = req.fflip && req.fflip.has('community-create');
-
     // when the viewer is not logged in:
     res.render('homepage', {
       bootScriptName: 'homepage',
@@ -58,8 +56,7 @@ router.get(nconf.get('web:homeurl'),
       fonts: fonts.getFonts(),
       hasCachedFonts: fonts.hasCachedFonts(req.cookies),
       socialMetadata: social.getMetadata(),
-      billingBaseUrl: nconf.get('web:billingBaseUrl'),
-      hasCommunityCreate: hasCommunityCreate
+      billingBaseUrl: nconf.get('web:billingBaseUrl')
     });
   });
 

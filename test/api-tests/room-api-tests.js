@@ -98,7 +98,29 @@ describe('room-api', function() {
         var body = result.body;
         assert.strictEqual(body.user.username, fixture.user1.username);
       })
-  })
+  });
 
+  it('GET /v1/rooms/:roomId/suggestedRooms', function() {
+    return request(app)
+      .get('/v1/rooms/' + fixture.troupe1.id + '/suggestedRooms')
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+      .then(function(result) {
+        // For now, this is a very loose test, to prove
+        // https://github.com/troupe/gitter-webapp/pull/2067
+        // We can extend it later
+        var suggestions = result.body;
+        assert(Array.isArray(suggestions));
+        suggestions.forEach(function(suggestion) {
+          assert(suggestion.hasOwnProperty('uri'));
+          assert(suggestion.hasOwnProperty('avatarUrl'));
+          assert(suggestion.hasOwnProperty('userCount'));
+          assert(suggestion.hasOwnProperty('tags'));
+          assert(suggestion.hasOwnProperty('description'));
+          assert(suggestion.hasOwnProperty('exists'));
+          assert(suggestion.exists === true && suggestion.id || suggestion.exists === false && !suggestion.id);
+        });
+      });
+  });
 
 })

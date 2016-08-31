@@ -105,6 +105,7 @@ internal-min:
     - mongo2
     - mongo3
     - sentinel1
+    - neo4j
   environment:
     SU_TO_USER: ${SU_TO_USER}
     SU_TO_UID: ${SU_TO_UID}
@@ -124,6 +125,17 @@ internal-mac:
     - mongo2
     - mongo3
     - sentinel1
+    - neo4j
+  volumes:
+   - ${WORKSPACE}:${WORKSPACE}
+   - ${WORKSPACE}/node_modules_linux:${WORKSPACE}/node_modules/
+  extra_hosts:
+    beta-internal: 10.0.0.140
+  working_dir: ${WORKSPACE}
+
+internal-mac-np:
+  image: node:${NODE_VERSION}
+  restart: 'no'
   volumes:
    - ${WORKSPACE}:${WORKSPACE}
    - ${WORKSPACE}/node_modules_linux:${WORKSPACE}/node_modules/
