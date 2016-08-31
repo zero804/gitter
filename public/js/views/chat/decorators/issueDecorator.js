@@ -11,19 +11,20 @@ var titleTemplate = require('./tmpl/issuePopoverTitle.hbs');
 var footerTemplate = require('./tmpl/commitPopoverFooter.hbs');
 var SyncMixin = require('../../../collections/sync-mixin');
 
-
-var convertToIssueAnchor = function(element, githubIssueUrl) {
+function convertToIssueAnchor(element, githubIssueUrl) {
   var resultantElement = element;
   if(element.tagName !== 'a') {
     var newElement = document.createElement('a');
     newElement.innerHTML = element.innerHTML;
     element.parentNode.replaceChild(newElement, element);
 
-    var attrNamedNodeMap = element.attributes;
-    Object.keys(attrNamedNodeMap).forEach(function(index) {
-      var attr = attrNamedNodeMap[index];
-      newElement.setAttribute(attr.nodeName, attr.nodeValue);
-    });
+    if (element.hasAttributes()) {
+      var attributes = element.attributes;
+      for(var i = attributes.length - 1; i >= 0; i--) {
+        var attr = attributes[i];
+        newElement.setAttribute(attr.name, attr.value);
+       }
+    }
 
     newElement.setAttribute('href', githubIssueUrl);
     newElement.setAttribute('target', '_blank');
@@ -32,9 +33,7 @@ var convertToIssueAnchor = function(element, githubIssueUrl) {
   }
 
   return resultantElement;
-};
-
-
+}
 
 function getIssueState(repo, issueNumber) {
   var issue = repo + '/' + issueNumber;

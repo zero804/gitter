@@ -23,7 +23,8 @@ module.exports = function getSnapshotsForPageContext(options) {
   }
   var selectedTagMap = exploreTagUtils.generateSelectedTagMap(tagMap, opts.selectedTags);
 
-  return restSerializer.serialize(opts.rooms, new restSerializer.SuggestedRoomStrategy())
+  var strategy = restSerializer.TroupeStrategy.createSuggestionStrategy();
+  return restSerializer.serialize(opts.rooms, strategy)
     .then(function(rooms) {
       var resultantRooms = rooms.map(function(roomObj) {
         return generateRoomCardContext(roomObj);
