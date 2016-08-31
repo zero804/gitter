@@ -11,19 +11,19 @@ export default createClass({
     topic: PropTypes.shape({
       id: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired
+      title: PropTypes.string.isRequired
     }).isRequired,
   },
 
   render(){
 
     const {topic, groupName} = this.props;
-    const {slug, id, name} = topic;
+    const {slug, id, title} = topic;
     const href = `/${groupName}/topics/topic/${id}/${slug}`;
-    const title = `View ${name}`;
+    const elementTitle = `View ${title}`;
 
     return (
-      <a href={href} title={title} onClick={this.onClick}>{this.props.children}</a>
+      <a href={href} title={elementTitle} onClick={this.onClick}>{this.props.children}</a>
     );
   },
 

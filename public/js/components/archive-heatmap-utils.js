@@ -3,9 +3,9 @@
 var $ = require('jquery');
 
 var CalHeatMap = require('@gitterhq/cal-heatmap');
-var apiClient = require('components/apiClient');
-var getTimezoneInfo = require('utils/detect-timezone');
-var context = require('utils/context');
+var apiClient = require('./apiClient');
+var getTimezoneInfo = require('../utils/detect-timezone');
+var context = require('../utils/context');
 
 var SPACEBAR_KEY = 32;
 var ENTER_KEY = 13;
@@ -15,7 +15,7 @@ var changeElementType = function($el, newType) {
   var attrs = {};
 
   $.each($el[0].attributes, function(idx, attr) {
-      attrs[attr.nodeName] = attr.nodeValue;
+      attrs[attr.name] = attr.value;
   });
 
   $el.replaceWith(function() {

@@ -16,7 +16,22 @@ describe('policy-factory', function() {
       user3: {},
       user4: {},
       user5: {},
+      forum1: {
+        // ideally this would link back to the group, but that makes the
+        // required fixture loader code super complicated..
+        securityDescriptor: {
+          type: null,
+          members: 'PUBLIC',
+          admins: 'MANUAL',
+          public: true,
+          linkPath: null,
+          externalId: null,
+          extraMembers: ['user2'],
+          extraAdmins: ['user1']
+        }
+      },
       group1: {
+        forum: 'forum1',
         securityDescriptor: {
           type: null,
           members: 'PUBLIC',
@@ -229,6 +244,110 @@ describe('policy-factory', function() {
       });
 
     });
+
+    describe('createPolicyForGroupId', function() {
+      function checkPolicyForGroup(user, group, expected) {
+        var groupId = group._id;
+
+        return policyFactory.createPolicyForGroupId(user, groupId)
+          .then(function(policy) {
+            return Promise.props({
+              canRead: policy.canRead(),
+              canWrite: policy.canWrite(),
+              canJoin: policy.canJoin(),
+              canAdmin: policy.canAdmin(),
+              canAddUser: policy.canAddUser(),
+            });
+          })
+          .then(function(results) {
+            assert.deepEqual(results, expected);
+          });
+      }
+
+      it('public group non-member', function() {
+        return checkPolicyForGroup(fixture.user2, fixture.group1, {
+          canRead: true,
+          canWrite: true,
+          canJoin: true,
+          canAdmin: false,
+          canAddUser: true
+        });
+      });
+
+      it('public group member (via room membership)', function() {
+        return checkPolicyForGroup(fixture.user3, fixture.group1, {
+          canRead: true,
+          canWrite: true,
+          canJoin: true,
+          canAdmin: false,
+          canAddUser: true
+        });
+      });
+
+      it('public group admin (via extra-admins)', function() {
+        return checkPolicyForGroup(fixture.user1, fixture.group1, {
+          canRead: true,
+          canWrite: true,
+          canJoin: true,
+          canAdmin: true,
+          canAddUser: true
+        });
+      });
+    });
+
+    describe('createPolicyForForum', function() {
+      function checkPolicyForForum(user, forum, expected) {
+        return policyFactory.createPolicyForForum(user, forum)
+          .then(function(policy) {
+            return Promise.props({
+              canRead: policy.canRead(),
+              canWrite: policy.canWrite(),
+              canJoin: policy.canJoin(),
+              canAdmin: policy.canAdmin(),
+              canAddUser: policy.canAddUser(),
+            });
+          })
+          .then(function(results) {
+            assert.deepEqual(results, expected);
+          });
+      }
+
+      it("public forum non-member", function() {
+        return checkPolicyForForum(fixture.user3, fixture.forum1, {
+          canRead: true,
+          canWrite: true,
+          canJoin: true,
+          canAdmin: false,
+          canAddUser: true
+        });
+      });
+
+      it("public forum member", function() {
+        return checkPolicyForForum(fixture.user2, fixture.forum1, {
+          canRead: true,
+          canWrite: true,
+          canJoin: true,
+          canAdmin: false,
+          canAddUser: true
+        });
+      });
+
+      it("public forum admin", function() {
+        return checkPolicyForForum(fixture.user1, fixture.forum1, {
+          canRead: true,
+          canWrite: true,
+          canJoin: true,
+          canAdmin: true,
+          canAddUser: true
+        });
+      });
+    });
+
+    // TODO
+    //createPolicyForGroupIdWithUserLoader
+    //createPolicyForGroupIdWithRepoFallback
+    //getPreCreationPolicyEvaluator
+    //getPreCreationPolicyEvaluatorWithRepoFallback
 
   });
 });

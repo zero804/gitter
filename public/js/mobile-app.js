@@ -2,28 +2,28 @@
 
 var $ = require('jquery');
 var Backbone = require('backbone');
-var context = require('utils/context');
-var appEvents = require('utils/appevents');
-var onready = require('utils/onready');
+var context = require('./utils/context');
+var appEvents = require('./utils/appevents');
+var onready = require('./utils/onready');
 
-var chatModels = require('collections/chat');
-var troupeCollections = require('collections/instances/troupes');
+var chatModels = require('./collections/chat');
+var troupeCollections = require('./collections/instances/troupes');
 var presentCreateRoomDialog = require('./ensured/present-create-room-dialog');
 var presentCreateCommunityDialog = require('./ensured/present-create-community-dialog');
-var unreadItemsClient = require('components/unread-items-client');
-var RoomCollectionTracker = require('components/room-collection-tracker');
-var MobileLayout = require('views/layouts/mobile');
+var unreadItemsClient = require('./components/unread-items-client');
+var RoomCollectionTracker = require('./components/room-collection-tracker');
+var MobileLayout = require('./views/layouts/mobile');
 
 //Remove when left menu is in place
 var FastClick = require('fastclick');
 
 //Left Menu Additions
-//var gestures              = require('utils/gesture-controller');
+//var gestures              = require('./utils/gesture-controller');
 
-require('utils/tracking');
+require('./utils/tracking');
 
 /* Set the timezone cookie */
-require('components/timezone-cookie');
+require('./components/timezone-cookie');
 
 // Preload widgets
 require('./views/widgets/avatar');
@@ -40,7 +40,7 @@ onready(function() {
   //Remove when left menu is in place
   FastClick.attach(document.body);
 
-  require('components/link-handler').installLinkHandler();
+  require('./components/link-handler').installLinkHandler();
   appEvents.on('navigation', function(url) {
     window.location.href = url;
   });
@@ -84,8 +84,8 @@ onready(function() {
     },
 
     notifications: function() {
-      require.ensure(['views/modals/notification-settings-view'], function(require) {
-        var NotificationSettingsView = require('views/modals/notification-settings-view');
+      require.ensure(['./views/modals/notification-settings-view'], function(require) {
+        var NotificationSettingsView = require('./views/modals/notification-settings-view');
         appView.dialogRegion.show(new NotificationSettingsView({ model: new Backbone.Model() }));
       });
     },

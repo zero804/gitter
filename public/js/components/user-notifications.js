@@ -1,11 +1,11 @@
 'use strict';
 
-var appEvents = require('utils/appevents');
+var appEvents = require('../utils/appevents');
 var cdn = require('gitter-web-cdn');
-var urlParser = require('utils/url-parser');
-var sessionMutex = require('utils/session-mutex');
-var context = require('utils/context');
-var onReady = require('utils/onready');
+var urlParser = require('../utils/url-parser');
+var sessionMutex = require('../utils/session-mutex');
+var context = require('../utils/context');
+var onReady = require('../utils/onready');
 
 var linkHandler = require('./link-handler');
 var webNotifications = require('./web-notifications');

@@ -105,6 +105,7 @@ internal-min:
     - mongo2
     - mongo3
     - sentinel1
+    - neo4j
   environment:
     SU_TO_USER: ${SU_TO_USER}
     SU_TO_UID: ${SU_TO_UID}
@@ -124,6 +125,7 @@ internal-mac:
     - mongo2
     - mongo3
     - sentinel1
+    - neo4j
   volumes:
    - ${WORKSPACE}:${WORKSPACE}
    - ${WORKSPACE}/node_modules_linux:${WORKSPACE}/node_modules/

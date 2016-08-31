@@ -6,7 +6,7 @@ export default React.createClass({
   displayName: 'Input',
   propTypes: {
     name: PropTypes.string.isRequired,
-    placeholder: PropTypes.string.isRequired,
+    placeholder: PropTypes.string,
     className: PropTypes.string,
     onChange: PropTypes.func.isRequired,
   },

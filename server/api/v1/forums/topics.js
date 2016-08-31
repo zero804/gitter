@@ -7,6 +7,7 @@ var forumCategoryService = require('gitter-web-topics/lib/forum-category-service
 var topicService = require('gitter-web-topics/lib/topic-service');
 var ForumWithPolicyService = require('../../../services/forum-with-policy-service');
 var restSerializer = require('../../../serializers/rest-serializer');
+var restful = require('../../../services/restful');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 
@@ -46,16 +47,7 @@ module.exports = {
   index: function(req) {
     var forum = req.forum;
 
-    // TODO: return a sample set, not all of them
-    return topicService.findByForumId(forum._id)
-      .then(function(topics) {
-        var strategy = new restSerializer.TopicStrategy({
-          // again: _some_ replies, not all of them
-          includeReplies: true,
-          includeRepliesTotals: true,
-        });
-        return restSerializer.serialize(topics, strategy);
-      });
+    return restful.serializeTopicsForForumId(forum._id);
   },
 
   show: function(req) {
