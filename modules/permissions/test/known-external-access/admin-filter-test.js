@@ -6,6 +6,7 @@ var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 describe('admin-filter', function() {
 
   describe('integration tests #slow', function() {
+    fixtureLoader.disableMongoTableScans();
 
     describe('non group security types', function() {
       var URI = fixtureLoader.generateUri();

@@ -9,6 +9,7 @@ var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 describe('security-descriptor-service', function() {
   describe('integration tests #slow', function() {
+    fixtureLoader.disableMongoTableScans();
 
     permissionCombinations.forEach(function(descriptor, index) {
       it('should insert and read combination #' + index, function() {
@@ -40,6 +41,7 @@ describe('security-descriptor-service', function() {
 
   describe('updateLinksForRepo #slow', function() {
     var fixture = {};
+    fixtureLoader.disableMongoTableScans();
 
     before(fixtureLoader(fixture, {
       troupe1: {
