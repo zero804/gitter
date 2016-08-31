@@ -1,10 +1,11 @@
-import {equal} from 'assert';
+import {equal, ok} from 'assert';
 import {shallow} from 'enzyme';
 import React from 'react';
 import TopicContainer from '../../../../shared/containers/TopicContainer.jsx';
 import topicsStore from '../../../mocks/topic-store';
 import categoryStore from '../../../mocks/category-store';
 import repliesStore from '../../../mocks/replies-store';
+import currentUserStore from '../../../mocks/current-user-store';
 
 describe('<TopicContainer />', () => {
 
@@ -13,11 +14,12 @@ describe('<TopicContainer />', () => {
   beforeEach(function(){
     wrapper = shallow(
       <TopicContainer
-      topicsStore={topicsStore}
-      categoryStore={categoryStore}
-      repliesStore={repliesStore}
-      topicId="1"
-      groupName="gitterHQ"/>
+        topicsStore={topicsStore}
+        categoryStore={categoryStore}
+        repliesStore={repliesStore}
+        currentUserStore={currentUserStore}
+        topicId="1"
+        groupName="gitterHQ"/>
     );
   });
 
@@ -43,6 +45,13 @@ describe('<TopicContainer />', () => {
 
   it('should render a TopicReplyList', () => {
     equal(wrapper.find('TopicReplyList').length, 1);
+  });
+
+  it('should pass the currentUser to the editor', () => {
+    ok(
+      wrapper.find('TopicReplyEditor').prop('user'),
+      'currentUser was not passed to TopicReplyEditor'
+    );
   });
 
 });

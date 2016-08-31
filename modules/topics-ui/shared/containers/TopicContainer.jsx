@@ -26,13 +26,19 @@ export default createClass({
     categoryStore: PropTypes.shape({
       getCategories: PropTypes.func.isRequired,
     }).isRequired,
+
+    currentUserStore: PropTypes.shape({
+      getCurrentUser: PropTypes.func.isRequired
+    }).isRequired
+
   },
 
   render(){
 
-    const { topicId, topicsStore, groupName, repliesStore, categoryStore } = this.props;
+    const { topicId, topicsStore, groupName, repliesStore, categoryStore, currentUserStore } = this.props;
     const topic = topicsStore.getById(topicId)
     const replies = repliesStore.getReplies();
+    const currentUser = currentUserStore.getCurrentUser();
     //TODO Improve this
     const category = categoryStore.getCategories()[1];
 
@@ -45,7 +51,7 @@ export default createClass({
         </article>
         <TopicReplyListHeader replies={replies}/>
         <TopicReplyList replies={replies} />
-        <TopicReplyEditor />
+        <TopicReplyEditor user={currentUser}/>
       </main>
     );
   }
