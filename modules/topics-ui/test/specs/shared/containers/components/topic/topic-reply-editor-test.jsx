@@ -8,14 +8,17 @@ import currentUser from '../../../../../mocks/mock-data/current-user';
 describe('<TopicReplyEditor/>', () => {
 
   let wrapper;
-  let handle;
+  let changeHandle;
+  let enterHandle;
 
   beforeEach(() => {
-    handle = spy();
+    changeHandle = spy();
+    enterHandle = spy();
     wrapper = shallow(
       <TopicReplyEditor
         user={currentUser}
-        onChange={handle}/>
+        onChange={changeHandle}
+        onEnter={enterHandle}/>
     );
   });
 
@@ -65,7 +68,12 @@ describe('<TopicReplyEditor/>', () => {
 
   it('should call onChange when the editor changes', () => {
     wrapper.find('Editor').prop('onChange')();
-    equal(handle.callCount, 1, 'ReplyEditor failed to call onChange');
+    equal(changeHandle.callCount, 1, 'ReplyEditor failed to call onChange');
+  });
+
+  it('should call onEnter when the editor calls onEnter', () => {
+    wrapper.find('Editor').prop('onEnter')();
+    equal(enterHandle.callCount, 1, 'ReplyEditor failed to call onEnter');
   });
 
 });
