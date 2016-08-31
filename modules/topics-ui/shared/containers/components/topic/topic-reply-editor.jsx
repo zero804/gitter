@@ -10,7 +10,8 @@ export default React.createClass({
   propTypes: {
     user: PropTypes.shape({
       avatarUrl: PropTypes.string.isRequired
-    }).isRequired
+    }).isRequired,
+    onChange: PropTypes.func.isRequired,
   },
 
   render(){
@@ -21,10 +22,14 @@ export default React.createClass({
       <Container className="container--reply-editor">
         <Panel className="panel--reply-editor">
           <UserAvatar user={user} className="avatar--reply-editor" width={30} height={30}/>
-          <Editor className="editor--reply"/>
+          <Editor className="editor--reply" onChange={this.onChange}/>
         </Panel>
       </Container>
     );
+  },
+
+  onChange(val){
+    this.props.onChange(val);
   }
 
 });

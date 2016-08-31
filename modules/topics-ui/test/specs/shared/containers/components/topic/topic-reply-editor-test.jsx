@@ -1,4 +1,5 @@
-import {equal} from 'assert';
+import {equal, ok} from 'assert';
+import {spy} from 'sinon';
 import React from 'react';
 import { shallow } from 'enzyme';
 import TopicReplyEditor from '../../../../../../shared/containers/components/topic/topic-reply-editor.jsx';
@@ -7,10 +8,14 @@ import currentUser from '../../../../../mocks/mock-data/current-user';
 describe('<TopicReplyEditor/>', () => {
 
   let wrapper;
+  let handle;
 
   beforeEach(() => {
+    handle = spy();
     wrapper = shallow(
-      <TopicReplyEditor user={currentUser}/>
+      <TopicReplyEditor
+        user={currentUser}
+        onChange={handle}/>
     );
   });
 
@@ -49,6 +54,18 @@ describe('<TopicReplyEditor/>', () => {
   it('should render the UserAvatar with the right dimensions', () => {
     equal(wrapper.find('UserAvatar').prop('width'), 30);
     equal(wrapper.find('UserAvatar').prop('height'), 30);
+  });
+
+  it('should pass an onChange call back to the editor', () => {
+    ok(
+      wrapper.find('Editor').prop('onChange'),
+      'TopicReplyEditor failed to provide onChange callback to the editor'
+    );
+  });
+
+  it('should call onChange when the editor changes', () => {
+    wrapper.find('Editor').prop('onChange')();
+    equal(handle.callCount, 1, 'ReplyEditor failed to call onChange');
   });
 
 });
