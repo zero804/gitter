@@ -6,6 +6,7 @@ var internalClientAccessOnly = require('../../../web/middlewares/internal-client
 var replyService = require('gitter-web-topics/lib/reply-service');
 var ForumWithPolicyService = require('../../../services/forum-with-policy-service');
 var restSerializer = require('../../../serializers/rest-serializer');
+var restful = require('../../../services/restful');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 
@@ -24,16 +25,7 @@ module.exports = {
   index: function(req) {
     var topic = req.topic;
 
-    // TODO: return a sample set, not all of them
-    return replyService.findByTopicId(topic._id)
-      .then(function(replies) {
-        var strategy = new restSerializer.ReplyStrategy({
-          // again: _some_ replies, not all of them
-          includeComments: true,
-          includeCommentsTotals: true,
-        });
-        return restSerializer.serialize(replies, strategy);
-      });
+    return restful.serializeRepliesForTopicId(topic._id);
   },
 
   show: function(req) {
