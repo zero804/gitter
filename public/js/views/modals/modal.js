@@ -2,56 +2,73 @@
 
 var $ = require('jquery');
 var _ = require('underscore');
+var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 var modalTemplate = require('./tmpl/modal.hbs');
+var ModalFooterButtonListView = require('./modal-footer-button-list-view');
 var isCompact = require('../../utils/detect-compact');
 
 require('../../template/helpers/all');
+require('../behaviors/isomorphic');
 require('gitter-styleguide/css/components/modals.css');
 
 var ModalView = Marionette.LayoutView.extend({
   template: modalTemplate,
-  className: "modal",
+  className: 'modal',
+
+  ui: {
+    title: '.js-modal-title-text'
+  },
 
   events: {
     'click .close':                     'hide',
     'click [data-action=close]':        'hide',
-    'click [data-component=modal-btn]': 'onMenuItemClicked'
   },
 
   regions: {
-    'modalBody': '#modal-body-region'
+    modalBody: '#modal-body-region',
+    modalFooter: '#modal-footer-region'
   },
 
   initialize: function(options) {
     this.options = {
+      // Backbone Collection or array of items
       menuItems: [],
       title: null,
-      modalClassVariation: null
+      modalClassVariation: null,
+      backdrop: true
     };
     _.extend(this.options, options);
 
     this.view = this.options.view || this.view;
+
+    if(this.options.menuItems && this.options.menuItems.models) {
+      this.menuItemCollection = this.options.menuItems;
+    }
+    else {
+      var menuItems = this.options.menuItems || [];
+      if (typeof menuItems === 'function') {
+        menuItems = menuItems.call(this);
+      }
+
+      this.menuItemCollection = new Backbone.Collection(menuItems);
+    }
+
+    this.footerView = new ModalFooterButtonListView({
+      collection: this.menuItemCollection
+    });
+    this.listenTo(this.footerView, 'item:activate', this.onMenuItemActivated, this);
   },
 
   serializeData: function() {
-    var menuItems = this.menuItems || this.options.menuItems || [];
-    if (typeof menuItems === 'function') {
-      menuItems = menuItems.call(this);
-    }
-
     return {
       title: this.options.title,
-      modalClassVariation: this.options.modalClassVariation,
-      hasMenuItems: !!menuItems.length,
-      menuItems: menuItems
+      modalClassVariation: this.options.modalClassVariation
     };
   },
 
-  onMenuItemClicked: function(e) {
-    e.preventDefault();
-
-    var action = $(e.target).attr('data-action');
+  onMenuItemActivated: function(itemModel) {
+    var action = itemModel.get('action');
     this.view.trigger('menuItemClicked', action);
     this.trigger('menuItemClicked', action);
   },
@@ -61,6 +78,7 @@ var ModalView = Marionette.LayoutView.extend({
     this.$el.hide();
 
     this.modalBody.show(this.view);
+    this.modalFooter.show(this.footerView);
 
     if(!isCompact() && !this.disableAutoFocus) {
       window.setTimeout(function() {
@@ -239,7 +257,7 @@ var ModalView = Marionette.LayoutView.extend({
     }
 
     function keydown(e) {
-      if(e.which == 27) that.hide();
+      if(e.which === 27) that.hide();
     }
 
   }
