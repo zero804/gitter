@@ -8,6 +8,7 @@ var policyFactory = require('../lib/policy-factory');
 
 describe('policy-factory', function() {
   describe('integration tests #slow', function() {
+    fixtureLoader.disableMongoTableScans();
 
     var fixture = fixtureLoader.setup({
       user1: {},
