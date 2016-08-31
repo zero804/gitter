@@ -5,7 +5,7 @@ import { shallow } from 'enzyme';
 import Editor from '../../../../../../shared/containers/components/forms/editor.jsx';
 import mockEvt from '../../../../../mocks/event';
 
-describe.only('<Editor/>', () => {
+describe('<Editor/>', () => {
 
   let wrapper;
   let changeHandle;

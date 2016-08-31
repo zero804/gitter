@@ -1,11 +1,11 @@
 import assert from 'assert';
-import Store from '../../../../browser/js/stores/replies-store';
+import {RepliesStore} from '../../../../browser/js/stores/replies-store';
 
 describe('RepliesStore', () => {
 
   let store;
   beforeEach(() => {
-    store = new Store();
+    store = new RepliesStore();
   });
 
   it('should provide a getReplies()', () => {
