@@ -19,6 +19,7 @@
     "sinon": "^1.17.5"
   },
   "devDependencies": {
+    "highlight.js": "8.6.0",
     "babel-loader": "^6.2.4",
     "babel-plugin-add-module-exports": "^0.2.1",
     "babel-plugin-istanbul": "^2.0.0",
