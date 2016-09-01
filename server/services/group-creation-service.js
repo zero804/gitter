@@ -157,29 +157,20 @@ function groupCreationService(user, options) {
     })
     .then(function(userGroupPolicy) {
       var group = this.group;
-      var groupWithPolicyService = new GroupWithPolicyService(this.group, user, userGroupPolicy);
+      var groupWithPolicyService = new GroupWithPolicyService(group, user, userGroupPolicy);
 
       var defaultRoomName = defaultRoomOptions.defaultRoomName || 'Lobby';
+      var githubRepoForAssociation;
+
+      if (group.sd.type === 'GH_REPO') {
+        githubRepoForAssociation = group.sd.linkPath;
+      }
 
       return groupWithPolicyService.createRoom({
         name: defaultRoomName,
-
-        // default rooms are always public
         security: 'PUBLIC',
-
-        // New way:
-        // type: 'GROUP',
-
-        // Old way
-        // use the same backing object for the default room
-        type: group.sd.type,
-        linkPath: group.sd.linkPath,
-
-        // only github repo based rooms have the default room automatically
-        // integrated with github
-        // This is going to have to change in the new GROUP world
-        runPostGitHubRoomCreationTasks: group.sd.type === 'GH_REPO',
-
+        type: 'GROUP',
+        associateWithGitHubRepo: githubRepoForAssociation,
         addBadge: defaultRoomOptions.addBadge,
         providers: defaultRoomOptions.providers
       });
