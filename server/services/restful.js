@@ -21,6 +21,7 @@ var orgService = require("./org-service");
 var repoService = require("./repo-service");
 var userScopes = require('gitter-web-identity/lib/user-scopes');
 var topicService = require('gitter-web-topics/lib/topic-service');
+var replyService = require('gitter-web-topics/lib/reply-service');
 
 var survivalMode = !!process.env.SURVIVAL_MODE || false;
 
@@ -277,6 +278,19 @@ function serializeTopicsForForumId(forumId) {
     });
 }
 
+function serializeRepliesForTopicId(topicId) {
+  // TODO: return a sample set, not all of them
+  return replyService.findByTopicId(topicId)
+    .then(function(replies) {
+      var strategy = new restSerializer.ReplyStrategy({
+        // again: _some_ replies, not all of them
+        includeComments: true,
+        includeCommentsTotals: true,
+      });
+      return restSerializer.serialize(replies, strategy);
+    });
+}
+
 module.exports = {
   serializeTroupesForUser: serializeTroupesForUser,
   serializeChatsForTroupe: serializeChatsForTroupe,
@@ -293,5 +307,6 @@ module.exports = {
   serializeGroupsForUserId: Promise.method(serializeGroupsForUserId),
   serializeAdminGroupsForUser: Promise.method(serializeAdminGroupsForUser),
   serializeRoomsForGroupId: serializeRoomsForGroupId,
-  serializeTopicsForForumId: serializeTopicsForForumId
+  serializeTopicsForForumId: serializeTopicsForForumId,
+  serializeRepliesForTopicId: serializeRepliesForTopicId,
 }

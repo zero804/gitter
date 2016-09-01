@@ -1,4 +1,4 @@
-/* eslint complexity: ["error", 20] */
+/* eslint complexity: ["error", 23] */
 "use strict";
 
 var Promise = require('bluebird');
@@ -145,8 +145,10 @@ function TroupeStrategy(options) {
     var strategies = [];
 
     // Pro-org
-    proOrgStrategy = new ProOrgStrategy(options);
-    strategies.push(proOrgStrategy.preload(items));
+    if (options.includePremium !== false) {
+      proOrgStrategy = new ProOrgStrategy(options);
+      strategies.push(proOrgStrategy.preload(items));
+    }
 
     // Room Membership
     if (currentUserId || options.isRoomMember !== undefined) {
@@ -253,8 +255,10 @@ function TroupeStrategy(options) {
   }
 
   this.map = function(item) {
-    var isPro = proOrgStrategy.map(item);
+    var id = item.id || item._id
+    var uri = item.uri;
 
+    var isPro = proOrgStrategy ? proOrgStrategy.map(item) : undefined;
     var group = groupIdStrategy && item.groupId ? groupIdStrategy.map(item.groupId) : undefined;
 
     var troupeName, troupeUrl;
@@ -267,27 +271,25 @@ function TroupeStrategy(options) {
         return null;
       }
     } else {
-      var roomName = getRoomNameFromTroupeName(item.uri);
-      troupeName = group ? group.name + '/' + getRoomNameFromTroupeName(item.uri) : item.uri;
-      if(roomName === item.uri) {
-        troupeName = group ? group.name : item.uri;
+      var roomName = getRoomNameFromTroupeName(uri);
+      troupeName = group ? group.name + '/' + getRoomNameFromTroupeName(uri) : uri;
+      if(roomName === uri) {
+        troupeName = group ? group.name : uri;
       }
 
-      troupeUrl = "/" + item.uri;
+      troupeUrl = "/" + uri;
     }
 
-
-
-    var unreadCounts = unreadItemStrategy && unreadItemStrategy.map(item.id);
+    var unreadCounts = unreadItemStrategy && unreadItemStrategy.map(id);
     var providers = resolveProviders(item);
 
     var isLurking;
     var hasActivity;
     if (lurkActivityStrategy) {
-      isLurking = lurkActivityStrategy.mapLurkStatus(item.id);
+      isLurking = lurkActivityStrategy.mapLurkStatus(id);
       if (isLurking) {
         // Can only have activity if you're lurking
-        hasActivity = lurkActivityStrategy.mapActivity(item.id);
+        hasActivity = lurkActivityStrategy.mapActivity(id);
       }
     }
 
@@ -306,33 +308,38 @@ function TroupeStrategy(options) {
     });
 
     return {
-      id: item.id || item._id,
+      id: id,
       name: troupeName,
       topic: item.topic,
+      // This is a fallback for the change to the suggestions API
+      // It can be removed once the mobile clients are using topic instead
+      // of description. See https://github.com/troupe/gitter-webapp/issues/2115
+      description: options.includeDescription ? item.topic : undefined,
       avatarUrl: avatarUrl,
-      uri: item.uri,
+      uri: uri,
       oneToOne: item.oneToOne,
       userCount: item.userCount,
       user: otherUser,
       unreadItems: unreadCounts ? unreadCounts.unreadItems : undefined,
       mentions: unreadCounts ? unreadCounts.mentions : undefined,
-      lastAccessTime: lastAccessTimeStrategy ? lastAccessTimeStrategy.map(item.id) : undefined,
-      favourite: favouriteStrategy ? favouriteStrategy.map(item.id) : undefined,
+      lastAccessTime: lastAccessTimeStrategy ? lastAccessTimeStrategy.map(id) : undefined,
+      favourite: favouriteStrategy ? favouriteStrategy.map(id) : undefined,
       lurk: isLurking,
       activity: hasActivity,
       url: troupeUrl,
       githubType: guessLegacyGitHubType(item),
       security: guessLegacySecurity(item),
       premium: isPro,
-      noindex: item.noindex,
+      noindex: item.noindex, // TODO: this should not always be here
       tags: tagsStrategy ? tagsStrategy.map(item) : undefined,
       providers: providers,
       permissions: permissionsStrategy ? permissionsStrategy.map(item) : undefined,
-      roomMember: roomMembershipStrategy ? roomMembershipStrategy.map(item.id) : undefined,
+      roomMember: roomMembershipStrategy ? roomMembershipStrategy.map(id) : undefined,
       groupId: item.groupId,
       group: options.includeGroups ? group : undefined,
       backend: securityDescriptorStrategy ? securityDescriptorStrategy.map(item.sd) : undefined,
       public: isPublic,
+      exists: options.includeExists ? !!id : undefined,
       v: getVersion(item)
     };
   };
@@ -341,6 +348,19 @@ function TroupeStrategy(options) {
 TroupeStrategy.prototype = {
   name: 'TroupeStrategy'
 };
+
+TroupeStrategy.createSuggestionStrategy = function() {
+  return new TroupeStrategy({
+    includePremium: false,
+    includeTags: true,
+    includeProviders: true,
+    includeExists: true,
+    // TODO: remove this option in future
+    includeDescription: true,
+    currentUser: null,
+    currentUserId: null
+  });
+}
 
 module.exports = TroupeStrategy;
 module.exports.testOnly = {
