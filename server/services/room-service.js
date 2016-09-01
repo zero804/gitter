@@ -2,14 +2,11 @@
 
 var env = require('gitter-web-env');
 var logger = env.logger;
-var nconf = env.config;
 var stats = env.stats;
-var errorReporter = env.errorReporter;
 
 var appEvents = require('gitter-web-appevents');
 var assert = require('assert');
 var Promise = require('bluebird');
-var request = require('request');
 var _ = require('lodash');
 var persistence = require('gitter-web-persistence');
 var uriLookupService = require("./uri-lookup-service");
@@ -27,8 +24,6 @@ var emailNotificationService = require('./email-notification-service');
 var emailAddressService = require('./email-address-service');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
-var badger = require('./badger-service');
-var userSettingsService = require('./user-settings-service');
 var roomSearchService = require('./room-search-service');
 var assertJoinRoomChecks = require('./assert-join-room-checks');
 var unreadItemService = require('./unread-items');
@@ -37,14 +32,10 @@ var roomMembershipService = require('./room-membership-service');
 var recentRoomService = require('./recent-room-service');
 var uriResolver = require('./uri-resolver');
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
-var userScopes = require('gitter-web-identity/lib/user-scopes');
 var groupService = require('gitter-web-groups/lib/group-service');
 var securityDescriptorGenerator = require('gitter-web-permissions/lib/security-descriptor-generator');
-var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
-var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
 var liveCollections = require('./live-collections');
-
-var badgerEnabled = nconf.get('autoPullRequest:enabled');
+var roomRepoService = require('./room-repo-service');
 
 /**
  * sendJoinStats() sends information to MixPanels about a join_room event
@@ -68,88 +59,6 @@ function extendStatusError(statusCode, options) {
   var err = new StatusError(statusCode);
   _.extend(err, options);
   return err;
-}
-
-function applyAutoHooksForRepoRoom(user, troupe) {
-  validate.expect(user, 'user is required');
-  validate.expect(troupe, 'troupe is required');
-  validate.expect(securityDescriptorUtils.isType('GH_REPO', troupe), 'Auto hooks can only be used on repo rooms. This room is a '+ troupe.githubType);
-
-  logger.info("Requesting autoconfigured integrations");
-
-  var linkPath = securityDescriptorUtils.getLinkPathIfType('GH_REPO', troupe);
-  validate.expect(linkPath, 'Auto hooks can only be used on repo rooms.');
-
-  return new Promise(function(resolve, reject) {
-    request.post({
-      url: nconf.get('webhooks:basepath') + '/troupes/' + troupe.id + '/hooks',
-      json: {
-        service: 'github',
-        endpoint: 'gitter',
-        githubToken: user.githubToken || user.githubUserToken,
-        autoconfigure: 1,
-        repo: linkPath /* The URI is also the repo name */
-      }
-    }, function(err, resp, body) {
-      if(err) return reject(err);
-      resolve(body);
-    });
-  });
-
-}
-
-function associateRoomWithGitHubRepo(troupe, user, options) {
-  var addBadge = options.addBadge;
-  var roomUri = troupe.uri;
-  var repoUri = options.repoUri;
-  assert(repoUri, 'repoUri required');
-
-  debug('Executing associateRoomWithGitHubRepo for %s', repoUri);
-
-  if (!user) return; // Can this ever happen?
-
-  /* Created here */
-  /* TODO: Later we'll need to handle private repos too */
-  var hasScope = userScopes.hasGitHubScope(user, "public_repo");
-  var hookCreationFailedDueToMissingScope;
-  if (hasScope) {
-    debug('User has public_repo scope. Will attempt to setup webhooks for this room');
-
-    /* Do this asynchronously */
-    applyAutoHooksForRepoRoom(user, troupe)
-      .catch(function(err) {
-        logger.error("Unable to apply hooks for new room", { exception: err });
-        errorReporter(err, { uri: roomUri, repoUri: repoUri, user: user.username }, { module: 'room-service' });
-      });
-  } else {
-    debug('User lacks public_repo scope.');
-    hookCreationFailedDueToMissingScope = true;
-  }
-
-  if (securityDescriptorUtils.isPublic(troupe) && addBadge) {
-    /* Do this asynchronously (don't chain the promise) */
-    userSettingsService.getUserSettings(user.id, 'badger_optout')
-      .then(function(badgerOptOut) {
-        // If the user has opted out never send the pull request
-        if (badgerOptOut) {
-          debug('User opted out of badger PRs: ' + user.id);
-          return;
-        }
-
-        return sendBadgePullRequestForRepo(troupe, user, repoUri);
-      })
-      .catch(function(err) {
-        errorReporter(err, { roomUri: roomUri, repoUri: repoUri, user: user.username }, { module: 'room-service' });
-        logger.error('Unable to send pull request for new room', { exception: err });
-      });
-  } else {
-    debug('Not adding a badger PR. Public %s, addBadge: %s', securityDescriptorUtils.isPublic(troupe), addBadge);
-  }
-
-  return {
-    hookCreationFailedDueToMissingScope: hookCreationFailedDueToMissingScope
-  };
-
 }
 
 function getOwnerFromRepoFullName(repoName) {
@@ -292,7 +201,7 @@ function createRoomForGitHubUri(user, uri, options) {
 
           if (!options.associateWithGitHubRepo) return;
 
-          return associateRoomWithGitHubRepo(troupe, user, {
+          return roomRepoService.associateRoomToRepo(troupe, user, {
             repoUri: options.associateWithGitHubRepo,
             addBadge: options.addBadge
           });
@@ -849,7 +758,7 @@ function createGroupRoom(user, group, roomInfo, securityDescriptor, options) {
     .then(function() {
       if (!options.associateWithGitHubRepo) return;
 
-      return associateRoomWithGitHubRepo(room, user, {
+      return roomRepoService.associateRoomToRepo(room, user, {
         repoUri: options.associateWithGitHubRepo,
         addBadge: addBadge
       });
@@ -878,67 +787,11 @@ function updateTopic(roomId, topic) {
     });
 }
 
-var findAssociatedGithubRepoForRoom = Promise.method(function(room) {
-  if (!room) return null;
-
-  var linkPath = securityDescriptorUtils.getLinkPathIfType('GH_REPO', room);
-  if (linkPath) return linkPath;
-
-  if (!room.groupId) return null;
-
-  return securityDescriptorService.getForGroupUser(room.groupId, null)
-    .then(function(sd) {
-      if (sd.type === 'GH_REPO') return sd.linkPath;
-
-      return null;
-    });
-});
-
-/**
- * Send a pull request. If the repoUri is not specified, will try to
- * guess it from the room and/or group
- */
-function sendBadgePullRequest(room, user, repoUri) {
-  assert(room, 'room required');
-  assert(user, 'user required');
-
-  if (repoUri) {
-    return sendBadgePullRequestForRepo(room, user, repoUri);
-  }
-
-  return findAssociatedGithubRepoForRoom(room)
-    .then(function(repoUri) {
-      if (!repoUri) throw StatusError(400, 'Room is not associated with a GitHub repo');
-
-      return sendBadgePullRequestForRepo(room, user, repoUri);
-    });
-}
-
-function sendBadgePullRequestForRepo(room, user, repoUri) {
-  assert(room, 'room required');
-  assert(user, 'user required');
-  assert(repoUri, 'repoUri required');
-
-  var roomUri = room.uri;
-  validate.expect(roomUri, 'room must have a uri');
-
-  debug('Sending a badger PR for repo=%s, uri=%s', repoUri, roomUri);
-
-  // Badgers Go!
-  if (badgerEnabled) {
-    return badger.sendBadgePullRequest(repoUri, roomUri, user);
-  } else {
-    debug('Badger is disabled in this environment. Would have sent a badge request to repo %s for room %s', repoUri, roomUri);
-  }
-}
-
 module.exports = {
-  applyAutoHooksForRepoRoom: applyAutoHooksForRepoRoom,
   findAllRoomsIdsForUserIncludingMentions: findAllRoomsIdsForUserIncludingMentions,
   createRoomByUri: createRoomByUri,
   joinRoom: Promise.method(joinRoom),
   addUserToRoom: addUserToRoom,
-  findAssociatedGithubRepoForRoom: findAssociatedGithubRepoForRoom,
   removeUserFromRoom: Promise.method(removeUserFromRoom),
   removeRoomMemberById: removeRoomMemberById,
   hideRoomFromUser: hideRoomFromUser,
@@ -947,7 +800,6 @@ module.exports = {
   deleteRoom: deleteRoom,
   createGroupRoom: createGroupRoom,
   updateTopic: updateTopic,
-  sendBadgePullRequest: Promise.method(sendBadgePullRequest),
   testOnly: {
     updateUserDateAdded: updateUserDateAdded,
     createRoomForGitHubUri: createRoomForGitHubUri,
