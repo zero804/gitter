@@ -120,6 +120,34 @@ function renderMainFrame(req, res, next, options) {
     .catch(next);
 }
 
+
+function renderMobileMainFrame(req, res, next, options) {
+  var socialMetadataGenerator = options.socialMetadataGenerator;
+  var bootScriptName = 'router-mobile-app';
+
+  contextGenerator.generateNonChatContext(req)
+    .then(function(troupeContext) {
+      return Promise.all([
+        Promise.resolve(troupeContext),
+        socialMetadataGenerator && socialMetadataGenerator(troupeContext)
+      ]);
+    })
+    .spread(function(troupeContext, socialMetadata) {
+
+      res.render('mobile/mobile-app', {
+        troupeContext: troupeContext,
+        fonts: fonts.getFonts(),
+        hasCachedFonts: fonts.hasCachedFonts(req.cookies),
+        socialMetadata: socialMetadata,
+        subresources: getSubResources(bootScriptName),
+        bootScriptName: bootScriptName,
+        title: options.title,
+        subFrameLocation: options.subFrameLocation
+      });
+    });
+}
+
 module.exports = exports = {
-  renderMainFrame: renderMainFrame
+  renderMainFrame: renderMainFrame,
+  renderMobileMainFrame: renderMobileMainFrame
 };
