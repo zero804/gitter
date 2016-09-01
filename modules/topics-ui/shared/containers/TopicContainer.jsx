@@ -8,6 +8,7 @@ import TopicReplyList from './components/topic/topic-reply-list.jsx';
 import {dispatch} from '../dispatcher';
 import updateReplyBody from '../action-creators/create-reply/body-update';
 import submitNewReply from '../action-creators/create-reply/submit-new-reply';
+import {REPLY_CREATED} from '../constants/create-reply';
 
 export default createClass({
 
@@ -40,11 +41,29 @@ export default createClass({
 
   },
 
+  componentDidMount(){
+    const {repliesStore} = this.props;
+    repliesStore.on(REPLY_CREATED, this.updateReplies, this);
+  },
+
+  componentWillUnmount(){
+    const {repliesStore} = this.props;
+    repliesStore.off(REPLY_CREATED, this.updateReplies, this);
+  },
+
+  getInitialState(){
+    const {repliesStore} = this.props;
+    return {
+      replies: repliesStore.getReplies()
+    };
+  },
+
+
   render(){
 
-    const { topicId, topicsStore, groupName, repliesStore, categoryStore, currentUserStore } = this.props;
+    const { topicId, topicsStore, groupName, categoryStore, currentUserStore } = this.props;
+    const {replies} = this.state;
     const topic = topicsStore.getById(topicId)
-    const replies = repliesStore.getReplies();
     const currentUser = currentUserStore.getCurrentUser();
     //TODO Improve this
     const category = categoryStore.getCategories()[1];
@@ -73,6 +92,13 @@ export default createClass({
   onEditorSubmit(){
     const {newReplyStore} = this.props;
     dispatch(submitNewReply(newReplyStore.get('text')));
+  },
+
+  updateReplies(){
+    const {repliesStore} = this.props;
+    this.setState((state) => Object.assign(state, {
+      replies: repliesStore.getReplies()
+    }));
   }
 
 });
