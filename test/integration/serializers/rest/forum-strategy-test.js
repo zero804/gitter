@@ -18,7 +18,15 @@ describe('ForumStrategy', function() {
     user1: {},
     forum1: {},
     category1: {
-      forum: 'forum1'
+      forum: 'forum1',
+    },
+    category2: {
+      forum: 'forum1',
+      order: 2
+    },
+    category3: {
+      forum: 'forum1',
+      order: 1
     },
     topic1: {
       user: 'user1',
@@ -33,7 +41,9 @@ describe('ForumStrategy', function() {
 
     var user = fixture.user1;
     var forum = fixture.forum1;
-    var category = fixture.category1;
+    var category1 = fixture.category1;
+    var category2 = fixture.category2;
+    var category3 = fixture.category3;
     var topic = fixture.topic1;
 
     return serialize([forum], strategy)
@@ -42,9 +52,17 @@ describe('ForumStrategy', function() {
           id: forum.id,
           tags: [],
           categories: [{
-            id: category.id,
-            name: category.name,
-            slug: category.slug
+            id: category3.id,
+            name: category3.name,
+            slug: category3.slug,
+          }, {
+            id: category2.id,
+            name: category2.name,
+            slug: category2.slug,
+          }, {
+            id: category1.id,
+            name: category1.name,
+            slug: category1.slug,
           }],
           topics: [{
             id: topic.id,
@@ -57,9 +75,9 @@ describe('ForumStrategy', function() {
             sticky: topic.sticky,
             tags: [],
             category: {
-              id: category.id,
-              name: category.name,
-              slug: category.slug
+              id: category1.id,
+              name: category1.name,
+              slug: category1.slug
             },
             user: {
               id: user.id,

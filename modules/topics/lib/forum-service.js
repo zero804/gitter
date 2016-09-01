@@ -2,7 +2,9 @@
 
 var env = require('gitter-web-env');
 var stats = env.stats;
+var Promise = require('bluebird');
 var Forum = require('gitter-web-persistence').Forum;
+var validateForum = require('./validate-forum');
 
 
 function findById(forumId) {
@@ -13,10 +15,12 @@ function findById(forumId) {
 
 function createForum(user, forumInfo, securityDescriptor) {
   // we can't upsert because there's nothing unique on a Forum to check against
-  var insertData = {
+  var data = {
     tags: forumInfo.tags || [],
     sd: securityDescriptor
   };
+
+  var insertData = validateForum(data);
   return Forum.create(insertData)
     .then(function(forum) {
       stats.event('new_forum', {
@@ -31,5 +35,5 @@ function createForum(user, forumInfo, securityDescriptor) {
 
 module.exports = {
   findById: findById,
-  createForum: createForum
+  createForum: Promise.method(createForum)
 };
