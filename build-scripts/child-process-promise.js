@@ -6,8 +6,9 @@ var onExit = require('signal-exit');
 var child_process = require('child_process');
 
 function childProcessToPromise(executable, command) {
-  var removeOnExit = onExit(function() {
-    command.kill();
+  var removeOnExit = onExit(function(code, signal) {
+    // Kill the command using the same signal as we received
+    command.kill(signal);
   });
 
   return new Promise(function(resolve, reject) {
