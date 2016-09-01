@@ -160,17 +160,19 @@ function groupCreationService(user, options) {
       var groupWithPolicyService = new GroupWithPolicyService(group, user, userGroupPolicy);
 
       var defaultRoomName = defaultRoomOptions.defaultRoomName || 'Lobby';
-      var githubRepoForAssociation;
+      var associateWithGitHubRepo;
 
+      // If the group is backed by a REPO
+      // associate the lobby room with that repo
       if (group.sd.type === 'GH_REPO') {
-        githubRepoForAssociation = group.sd.linkPath;
+        associateWithGitHubRepo = group.sd.linkPath;
       }
 
       return groupWithPolicyService.createRoom({
         name: defaultRoomName,
         security: 'PUBLIC',
         type: 'GROUP',
-        associateWithGitHubRepo: githubRepoForAssociation,
+        associateWithGitHubRepo: associateWithGitHubRepo,
         addBadge: defaultRoomOptions.addBadge,
         providers: defaultRoomOptions.providers
       });

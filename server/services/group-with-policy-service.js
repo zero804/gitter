@@ -45,6 +45,7 @@ GroupWithPolicyService.prototype.createRoom = secureMethod([allowAdmin], functio
   var providers = options.providers;
   var security = options.security;
   var name = options.name;
+  var associateWithGitHubRepo = options.associateWithGitHubRepo;
 
   var user = this.user;
   var group = this.group;
@@ -67,17 +68,9 @@ GroupWithPolicyService.prototype.createRoom = secureMethod([allowAdmin], functio
     .spread(function(roomInfo, securityDescriptor) {
       debug("Upserting %j", roomInfo);
 
-      // For now, we use the room security to decide whether a room
-      // is associated with a github repo. In future this could also
-      // be a parameter passed from the client
-      var githubRepoForRoomAssociation;
-      if (securityDescriptor.type === 'GH_REPO') {
-        githubRepoForRoomAssociation = securityDescriptor.linkPath;
-      }
-
       return roomService.createGroupRoom(user, group, roomInfo, securityDescriptor, {
         tracking: options.tracking,
-        associateWithGitHubRepo: githubRepoForRoomAssociation,
+        associateWithGitHubRepo: associateWithGitHubRepo,
         addBadge: options.addBadge
       })
     })
