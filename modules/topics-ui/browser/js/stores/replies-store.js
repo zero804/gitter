@@ -2,7 +2,7 @@ import Backbone from 'backbone';
 import $ from 'jquery';
 import parseReply from '../../../shared/parse/reply';
 import {subscribe} from '../../../shared/dispatcher';
-import {SUBMIT_NEW_REPLY} from '../../../shared/constants/create-reply';
+import {SUBMIT_NEW_REPLY, REPLY_CREATED} from '../../../shared/constants/create-reply';
 
 export const ReplyStore = Backbone.Model.extend({
   defaults: {},
@@ -30,9 +30,10 @@ export const ReplyStore = Backbone.Model.extend({
 
   onSuccess(attrs) {
     this.set(attrs);
+    this.trigger(REPLY_CREATED, this);
   },
-  onError(err){
-  },
+
+  onError(err){},
 });
 
 export const RepliesStore = Backbone.Collection.extend({
@@ -53,6 +54,9 @@ export const RepliesStore = Backbone.Collection.extend({
 
   createNewReply(data){
     const newReply = this.create({ text: data.body });
+    newReply.on(REPLY_CREATED, () => {
+      this.trigger(REPLY_CREATED);
+    });
   },
 
   getAccessToken(){
