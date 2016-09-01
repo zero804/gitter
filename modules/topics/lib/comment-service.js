@@ -64,22 +64,14 @@ function createComment(user, reply, options) {
     text: options.text || '',
   };
 
-  return Promise.try(function() {
-      return validateComment(data);
-    })
-    .bind({})
-    .then(function(insertData) {
-      this.insertData = insertData;
-      return processText(options.text)
-    })
+  var insertData = validateComment(data);
+  return processText(options.text)
     .then(function(parsedMessage) {
-      var data = this.insertData;
+      insertData.html = parsedMessage.html;
+      insertData.lang = parsedMessage.lang;
+      insertData._md = parsedMessage.markdownProcessingFailed ? -markdownMajorVersion : markdownMajorVersion;
 
-      data.html = parsedMessage.html;
-      data.lang = parsedMessage.lang;
-      data._md = parsedMessage.markdownProcessingFailed ? -markdownMajorVersion : markdownMajorVersion;
-
-      return Comment.create(data);
+      return Comment.create(insertData);
     })
     .then(function(comment) {
       stats.event('new_comment', {
@@ -99,5 +91,5 @@ module.exports = {
   findByReplyIds: findByReplyIds,
   findTotalsByReplyIds: findTotalsByReplyIds,
   findByIdForForumTopicAndReply: findByIdForForumTopicAndReply,
-  createComment: createComment
+  createComment: Promise.method(createComment)
 };
