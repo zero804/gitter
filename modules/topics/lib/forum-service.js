@@ -20,24 +20,20 @@ function createForum(user, forumInfo, securityDescriptor) {
     sd: securityDescriptor
   };
 
-  return Promise.try(function() {
-      return validateForum(data);
-    })
-    .then(function(insertData) {
-      return Forum.create(insertData)
-        .then(function(forum) {
-          stats.event('new_forum', {
-            // TODO: groupId would probably have been handy here? But leaky.
-            forumId: forum._id,
-            userId: user._id
-          });
+  var insertData = validateForum(data);
+  return Forum.create(insertData)
+    .then(function(forum) {
+      stats.event('new_forum', {
+        // TODO: groupId would probably have been handy here? But leaky.
+        forumId: forum._id,
+        userId: user._id
+      });
 
-          return forum;
-        });
+      return forum;
     });
 }
 
 module.exports = {
   findById: findById,
-  createForum: createForum
+  createForum: Promise.method(createForum)
 };

@@ -66,27 +66,17 @@ function createTopic(user, category, options) {
     text: options.text || '',
   };
 
-  return Promise.try(function() {
-      return validateTopic(data, {
-        allowedTags: allowedTags
-      });
-    })
-    .bind({})
-    .then(function(insertData) {
-      this.insertData = insertData;
-      return processText(options.text)
-    })
+  var insertData = validateTopic(data, { allowedTags: allowedTags });
+  return processText(options.text)
     .then(function(parsedMessage) {
-      var data = this.insertData;
-
-      data.html = parsedMessage.html;
-      data.lang = parsedMessage.lang;
-      data._md = parsedMessage.markdownProcessingFailed ? -markdownMajorVersion : markdownMajorVersion;
+      insertData.html = parsedMessage.html;
+      insertData.lang = parsedMessage.lang;
+      insertData._md = parsedMessage.markdownProcessingFailed ? -markdownMajorVersion : markdownMajorVersion;
       // urls, issues, mentions?
 
-      debug("Creating topic with %j", data);
+      debug("Creating topic with %j", insertData);
 
-      return Topic.create(data);
+      return Topic.create(insertData);
     })
     .then(function(topic) {
       stats.event('new_topic', {
@@ -105,5 +95,5 @@ module.exports = {
   findByForumIds: Promise.method(findByForumIds),
   findTotalsByForumIds: Promise.method(findTotalsByForumIds),
   findByIdForForum: findByIdForForum,
-  createTopic: createTopic
+  createTopic: Promise.method(createTopic)
 };

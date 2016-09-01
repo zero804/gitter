@@ -72,22 +72,14 @@ function createReply(user, topic, options) {
     text: options.text || '',
   };
 
-  return Promise.try(function() {
-      return validateReply(data);
-    })
-    .bind({})
-    .then(function(insertData) {
-      this.insertData = insertData;
-      return processText(options.text);
-    })
+  var insertData = validateReply(data);
+  return processText(options.text)
     .then(function(parsedMessage) {
-      var data = this.insertData;
+      insertData.html = parsedMessage.html;
+      insertData.lang = parsedMessage.lang;
+      insertData._md = parsedMessage.markdownProcessingFailed ? -markdownMajorVersion : markdownMajorVersion;
 
-      data.html = parsedMessage.html;
-      data.lang = parsedMessage.lang;
-      data._md = parsedMessage.markdownProcessingFailed ? -markdownMajorVersion : markdownMajorVersion;
-
-      return Reply.create(data);
+      return Reply.create(insertData);
     })
     .then(function(reply) {
       stats.event('new_reply', {
@@ -108,5 +100,5 @@ module.exports = {
   findTotalsByTopicIds: findTotalsByTopicIds,
   findByIdForForum: findByIdForForum,
   findByIdForForumAndTopic: findByIdForForumAndTopic,
-  createReply: createReply
+  createReply: Promise.method(createReply)
 };

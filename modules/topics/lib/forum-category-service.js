@@ -67,33 +67,29 @@ function createCategory(user, forum, categoryInfo) {
     data.order = categoryInfo.order
   }
 
-  return Promise.try(function() {
-      return validateCategory(data);
-    })
-    .then(function(insertData) {
-      var query = {
-        forumId: forum._id,
-        slug: categoryInfo.slug
-      };
-      return mongooseUtils.upsert(ForumCategory, query, {
-        $setOnInsert: insertData
-      });
-    })
-    .spread(function(category, updatedExisting) {
-      if (updatedExisting) {
-        throw new StatusError(409);
-      }
+  var insertData = validateCategory(data);
+  var query = {
+    forumId: forum._id,
+    slug: categoryInfo.slug
+  };
+  return mongooseUtils.upsert(ForumCategory, query, {
+    $setOnInsert: insertData
+  })
+  .spread(function(category, updatedExisting) {
+    if (updatedExisting) {
+      throw new StatusError(409);
+    }
 
-      stats.event('new_forum_category', {
-        forumId: forum._id,
-        categoryId: category._id,
-        userId: user._id,
-        name: category.name,
-        slug: category.slug
-      });
-
-      return category;
+    stats.event('new_forum_category', {
+      forumId: forum._id,
+      categoryId: category._id,
+      userId: user._id,
+      name: category.name,
+      slug: category.slug
     });
+
+    return category;
+  });
 }
 
 function createCategories(user, forum, categoriesInfo) {
@@ -112,6 +108,6 @@ module.exports = {
   findByForumId: findByForumId,
   findByForumIds: Promise.method(findByForumIds),
   findBySlugForForum: findBySlugForForum,
-  createCategory: createCategory,
+  createCategory: Promise.method(createCategory),
   createCategories: createCategories
 };
