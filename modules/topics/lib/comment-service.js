@@ -62,6 +62,8 @@ function updateLastModifiedForTopicAndReply(topicId, replyId) {
     Topic.findById(topicId).exec(),
     Reply.findById(replyId).exec(),
     function(fatTopic, fatReply) {
+      fatTopic.lastModified.save();
+      fatReply.lastModified.save();
       return Promise.join(
         fatTopic.save(),
         fatReply.save());
