@@ -1,5 +1,7 @@
+import slugify from 'gitter-web-slugify';
+
 export default function parseTag(tag) {
-  var slug = tag.replace(/\s/g, '-').toLowerCase();
+  const slug = slugify(tag);
   return {
     name: tag,
     value: slug,
