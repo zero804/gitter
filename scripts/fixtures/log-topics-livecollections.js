@@ -33,59 +33,65 @@ var opts = yargs
   .argv;
 
 
-  return Promise.join(
-      utils.getUser(opts.username),
-      utils.getForum(opts.group))
-    .bind({})
-    .spread(function(user, forum) {
-      if (!user) throw new StatusError(404, 'User not found.');
-      if (!forum) throw new StatusError(404, 'Forum not found.');
+return Promise.join(
+    utils.getUser(opts.username),
+    utils.getForum(opts.group))
+  .bind({})
+  .spread(function(user, forum) {
+    if (!user) throw new StatusError(404, 'User not found.');
+    if (!forum) throw new StatusError(404, 'Forum not found.');
 
-      this.user = user;
-      this.forum = forum;
+    this.user = user;
+    this.forum = forum;
 
-      return oauthService.findOrGenerateWebToken(user.id);
-    })
-    .spread(function(token/*, webClient*/) {
-      var forum = this.forum;
+    return oauthService.findOrGenerateWebToken(user.id);
+  })
+  .spread(function(token/*, webClient*/) {
+    var forum = this.forum;
 
-      var client = new RealtimeClient({
-        token: token,
-        fayeUrl: config.get('ws:fayeUrl')
-      });
-
-      var forumId = forum._id;
-
-      // NOTE: this one will be enabled later
-      //client.subscribe('/v1/forums/' + forumId, onMessage);
-
-      var topicsUri = '/v1/forums/' + forumId + '/topics';
-      client.registerSnapshotHandler(topicsUri, {
-        getSnapshotStateForChannel: function() {
-        },
-        getSnapshotState: function() {
-        },
-        getSubscribeOptions: function() {
-        },
-        handleSnapshot: function(snapshot, subscriptionChannel) {
-          console.log("SNAPSHOT", snapshot, subscriptionChannel);
-        }
-      });
-      client.subscribe(topicsUri, onMessage);
-
-      // NOTE: these will be enabled later
-      /*
-      if (opts.topic) {
-        var topicId = opts.topic;
-        client.subscribe('/v1/forums/' + forumId + '/topics/' + topicId + '/replies', onMessage);
-        if (opts.reply) {
-          var replyId = opts.reply;
-          client.subscribe('/v1/forums/' + forumId + '/topics/' + topicId + '/replies/' + replyId, onMessage);
-        }
-      }
-      */
+    var client = new RealtimeClient({
+      token: token,
+      fayeUrl: config.get('ws:fayeUrl')
     });
 
+    var forumId = forum._id;
+
+    // NOTE: this one will be enabled later
+    //client.subscribe('/v1/forums/' + forumId, onMessage);
+
+    var topicsUri = '/v1/forums/' + forumId + '/topics';
+    registerSnapshotHandler(client, topicsUri);
+    client.subscribe(topicsUri, onMessage);
+
+    if (opts.topic) {
+      var topicId = opts.topic;
+      var repliesUri = '/v1/forums/' + forumId + '/topics/' + topicId + '/replies';
+      registerSnapshotHandler(client, repliesUri);
+      client.subscribe(repliesUri, onMessage);
+
+      /*
+      // NOTE: this will be enabled later
+      if (opts.reply) {
+        var replyId = opts.reply;
+        client.subscribe('/v1/forums/' + forumId + '/topics/' + topicId + '/replies/' + replyId, onMessage);
+      }
+      */
+    }
+  });
+
+function registerSnapshotHandler(client, uri) {
+  client.registerSnapshotHandler(uri, {
+    getSnapshotStateForChannel: function() {
+    },
+    getSnapshotState: function() {
+    },
+    getSubscribeOptions: function() {
+    },
+    handleSnapshot: function(snapshot, subscriptionChannel) {
+      console.log("snapshot for " + uri + ':', snapshot, subscriptionChannel);
+    }
+  });
+}
 
 function onMessage(message) {
   console.log(message);
