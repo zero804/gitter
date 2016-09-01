@@ -3,6 +3,7 @@
 var env = require('gitter-web-env');
 var stats = env.stats;
 var Promise = require('bluebird');
+var Topic = require('gitter-web-persistence').Topic;
 var Reply = require('gitter-web-persistence').Reply;
 var processText = require('gitter-web-text-processor');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
@@ -64,6 +65,21 @@ function findByIdForForumAndTopic(forumId, topicId, replyId) {
     });
 }
 
+function updateLastModifiedForTopic(topicId) {
+  // Load the topic again to get a fat object so we can call save() on it
+  return Topic.findById(topicId)
+    .exec()
+    .then(function(fatTopic) {
+      if (!fatTopic) return;
+
+      // Use mongoose's save event to update the topic's last modified value so
+      // that it will fire a persistence event for the live collections.
+      // For now.
+      fatTopic.lastModified = new Date();
+      return fatTopic.save();
+    });
+}
+
 function createReply(user, topic, options) {
   var data = {
     forumId: topic.forumId,
@@ -81,7 +97,18 @@ function createReply(user, topic, options) {
 
       return Reply.create(insertData);
     })
+    .bind({
+      reply: undefined
+    })
     .then(function(reply) {
+      this.reply = reply;
+
+      return updateLastModifiedForTopic(topic._id);
+    })
+
+    .then(function() {
+      var reply = this.reply;
+
       stats.event('new_reply', {
         userId: user._id,
         forumId: topic.forumId,

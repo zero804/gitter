@@ -10,7 +10,9 @@ function serializeReplyToTopic(operation, reply) {
   var topicId = reply.topicId;
   var url = '/forums/' + forumId + '/topics/' + topicId + '/replies';
 
-  var strategy = new restSerializer.ReplyStrategy();
+  var strategy = new restSerializer.ReplyStrategy({
+    includeCommentsTotals: true
+  });
   return restSerializer.serializeObject(reply, strategy)
     .then(function(serializedReply) {
       appEvents.dataChange2(url, operation, serializedReply, 'reply');
