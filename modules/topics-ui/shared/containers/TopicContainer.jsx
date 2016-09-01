@@ -42,19 +42,22 @@ export default createClass({
   },
 
   componentDidMount(){
-    const {repliesStore} = this.props;
+    const {repliesStore, newReplyStore} = this.props;
     repliesStore.on(REPLY_CREATED, this.updateReplies, this);
+    newReplyStore.on('change:text', this.updateReplyContent, this);
   },
 
   componentWillUnmount(){
-    const {repliesStore} = this.props;
+    const {repliesStore, newReplyStore} = this.props;
     repliesStore.off(REPLY_CREATED, this.updateReplies, this);
+    newReplyStore.off('change:text', this.updateReplyContent, this);
   },
 
   getInitialState(){
     const {repliesStore} = this.props;
     return {
-      replies: repliesStore.getReplies()
+      replies: repliesStore.getReplies(),
+      newReplyContent: '',
     };
   },
 
@@ -62,7 +65,7 @@ export default createClass({
   render(){
 
     const { topicId, topicsStore, groupName, categoryStore, currentUserStore } = this.props;
-    const {replies} = this.state;
+    const {replies, newReplyContent} = this.state;
     const topic = topicsStore.getById(topicId)
     const currentUser = currentUserStore.getCurrentUser();
     //TODO Improve this
@@ -79,6 +82,7 @@ export default createClass({
         <TopicReplyList replies={replies} />
         <TopicReplyEditor
           user={currentUser}
+          value={newReplyContent}
           onChange={this.onEditorUpdate}
           onEnter={this.onEditorSubmit}/>
       </main>
@@ -92,12 +96,26 @@ export default createClass({
   onEditorSubmit(){
     const {newReplyStore} = this.props;
     dispatch(submitNewReply(newReplyStore.get('text')));
+    //Clear input
+    newReplyStore.clear();
+    this.setState((state) => Object.assign(state, {
+      newReplyContent: '',
+    }));
+  },
+
+  updateReplyContent(){
+    const {newReplyStore} = this.props;
+    const newReplyContent = newReplyStore.get('text');
+    this.setState((state) => Object.assign(state, {
+      newReplyContent: newReplyContent,
+    }));
   },
 
   updateReplies(){
     const {repliesStore} = this.props;
     this.setState((state) => Object.assign(state, {
-      replies: repliesStore.getReplies()
+      replies: repliesStore.getReplies(),
+      newReplyContent: '',
     }));
   }
 
