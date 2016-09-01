@@ -11,7 +11,7 @@ module.exports = createSecurityResource({
         return troupe.sd;
       });
   },
-  subresources: {
+  subresourcesRoot: {
     'extraAdmins': require('./security-extra-admins')
   }
 })
