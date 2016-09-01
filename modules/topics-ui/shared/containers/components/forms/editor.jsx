@@ -11,17 +11,19 @@ export default React.createClass({
     children: PropTypes.node,
     onChange: PropTypes.func,
     onEnter: PropTypes.func,
+    value: PropTypes.string,
   },
 
   render(){
 
-    const { className, name} = this.props;
+    const { className, name, value } = this.props;
     const compiledClass = classNames('editor', className);
 
     return (
       <textarea
         className={compiledClass}
         name={name}
+        value={value}
         onChange={this.onChange}
         onKeyDown={this.onKeyPressed}>
         { this.props.children }

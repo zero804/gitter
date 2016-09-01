@@ -8,6 +8,7 @@ export default React.createClass({
 
   displayName: 'TopicReplyEditor',
   propTypes: {
+    value: PropTypes.string,
     user: PropTypes.shape({
       avatarUrl: PropTypes.string.isRequired
     }).isRequired,
@@ -17,13 +18,17 @@ export default React.createClass({
 
   render(){
 
-    const {user} = this.props;
+    const {user, value} = this.props;
 
     return (
       <Container className="container--reply-editor">
         <Panel className="panel--reply-editor">
           <UserAvatar user={user} className="avatar--reply-editor" width={30} height={30}/>
-          <Editor className="editor--reply" onChange={this.onChange} onEnter={this.onEnter}/>
+          <Editor
+            className="editor--reply"
+            onChange={this.onChange}
+            onEnter={this.onEnter}
+            value={value}/>
         </Panel>
       </Container>
     );
