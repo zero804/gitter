@@ -97,7 +97,21 @@ exports.install = function(persistenceService) {
       }
     });
 
-    // TODO: Categories, Replies, Comments
+    /**
+     * Replies
+     */
+    mongooseUtils.attachNotificationListenersToSchema(schemas.ReplySchema, {
+      onCreate: function(model, next) {
+        liveCollections.replies.emit("create", model);
+        next();
+      },
+
+      onRemove: function(model) {
+        liveCollections.replies.emit("remove", model);
+      }
+    });
+
+    // TODO: Categories, Comments
   }
 
 };

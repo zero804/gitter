@@ -40,6 +40,10 @@ var routes = [{
     validator: validateUserForForumSubscription,
     populator: populateTopicsCollection
   }, {
+    re: /^\/api\/v1\/forums\/(\w+)\/topics\/(\w+)\/replies$/,
+    validator: validateUserForForumSubscription,
+    populator: populateRepliesCollection
+  }, {
     re: /^\/api\/v1\/user\/(\w+)\/(\w+)$/,
     validator: validateUserForUserSubscription,
     populator: populateSubUserCollection
@@ -287,6 +291,19 @@ function populateTopicsCollection(options) {
 
   return restful.serializeTopicsForForumId(forumId)
     .then(dataToSnapshot('forum.topics'));
+}
+
+function populateRepliesCollection(options) {
+  var match = options.match;
+  var forumId = match[1];
+  var topicId = match[2];
+
+  if (!forumId || !topicId) {
+    return Promise.resolve();
+  }
+
+  return restful.serializeRepliesForTopicId(topicId)
+    .then(dataToSnapshot('forum.replies'));
 }
 
 // Authorize a sbscription message
