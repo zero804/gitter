@@ -103,7 +103,8 @@
                     'TEXTAREA': 1,
                     'A': 1,
                     'PRE': 1,
-                    'CODE': 1
+                    'CODE': 1,
+                    'MATH': 1
                 }
             };
 
@@ -262,7 +263,11 @@
                             return NodeFilter.FILTER_ACCEPT;
                         }
 
-                        if(ignoredTags[node.tagName] || node.classList.contains('no-emojify')) {
+                        if(ignoredTags[node.tagName]) {
+                            return NodeFilter.FILTER_REJECT;
+                        }
+
+                        if(node.classList && node.classList.contains('no-emojify')) {
                             return NodeFilter.FILTER_REJECT;
                         }
 
