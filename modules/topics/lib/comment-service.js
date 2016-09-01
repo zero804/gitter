@@ -3,6 +3,8 @@
 var env = require('gitter-web-env');
 var stats = env.stats;
 var Promise = require('bluebird');
+var Topic = require('gitter-web-persistence').Topic;
+var Reply = require('gitter-web-persistence').Reply;
 var Comment = require('gitter-web-persistence').Comment;
 var processText = require('gitter-web-text-processor');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
@@ -55,6 +57,17 @@ function findByIdForForumTopicAndReply(forumId, topicId, replyId, commentId) {
     });
 }
 
+function updateLastModifiedForTopicAndReply(topicId, replyId) {
+  return Promise.join(
+    Topic.findById(topicId).exec(),
+    Reply.findById(replyId).exec(),
+    function(fatTopic, fatReply) {
+      return Promise.join(
+        fatTopic.save(),
+        fatReply.save());
+    });
+}
+
 function createComment(user, reply, options) {
   var data = {
     forumId: reply.forumId,
@@ -73,7 +86,17 @@ function createComment(user, reply, options) {
 
       return Comment.create(insertData);
     })
+    .bind({
+      comment: undefined
+    })
     .then(function(comment) {
+      this.comment = comment;
+
+      return updateLastModifiedForTopicAndReply(reply.topicId, reply._id);
+    })
+    .then(function() {
+      var comment = this.comment;
+
       stats.event('new_comment', {
         userId: user._id,
         forumId: reply.forumId,
