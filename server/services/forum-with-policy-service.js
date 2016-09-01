@@ -98,8 +98,13 @@ ForumWithPolicyService.prototype.createTopic = secureMethod([allowWrite], functi
   this.assertForumId(category.forumId);
 
   var user = this.user;
+  var forum = this.forum;
 
   var createOptions = getTopicOptions(options);
+
+  // only tags already on the forum are allowed to be used in the topic
+  createOptions.allowedTags = forum.tags;
+
   return topicService.createTopic(user, category, createOptions);
 });
 
