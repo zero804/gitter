@@ -77,7 +77,8 @@ getUserFromMongo(opts)
     });
   })
   .then(function(suggestedRooms) {
-    return restSerializer.serialize(suggestedRooms, new restSerializer.SuggestedRoomStrategy());
+    var strategy = restSerializer.TroupeStrategy.createSuggestionStrategy();
+    return restSerializer.serialize(suggestedRooms, strategy);
   })
   .then(function(suggestions) {
     // we use big avatars in the emails
