@@ -38,18 +38,13 @@ describe('group-creation-service', function() {
         assert.strictEqual(defaultRoom.uri, uri + '/Lobby');
         assert.strictEqual(defaultRoom.lcUri, uri + '/lobby');
 
-        assert.strictEqual(defaultRoom.sd.type, null);
+        assert.strictEqual(defaultRoom.sd.type, 'GROUP');
         assert.strictEqual(defaultRoom.sd.members, 'PUBLIC');
-        assert.strictEqual(defaultRoom.sd.admins, 'MANUAL');
+        assert.strictEqual(defaultRoom.sd.admins, 'GROUP_ADMIN');
 
         // Coming soon to a cinema near you....
-        // assert.strictEqual(String(defaultRoom.sd.internalId), group.id);
-        // assert.deepEqual(defaultRoom.sd.extraAdmins.map(String), []);
-
-        // But for the moment
-        assert.equal(defaultRoom.sd.internalId, null);
-        assert.deepEqual(defaultRoom.sd.extraAdmins.map(String), [fixture.user1.id]);
-
+        assert.strictEqual(String(defaultRoom.sd.internalId), group.id);
+        assert.deepEqual(defaultRoom.sd.extraAdmins.map(String), []);
         assert.deepEqual(defaultRoom.sd.extraMembers.map(String), []);
       });
     });
@@ -90,17 +85,12 @@ describe('group-creation-service', function() {
         assert.strictEqual(defaultRoom.uri, uri + '/Lobby');
         assert.strictEqual(defaultRoom.lcUri, uri + '/lobby');
 
-        assert.strictEqual(defaultRoom.sd.type, null);
+        assert.strictEqual(defaultRoom.sd.type, 'GROUP');
         assert.strictEqual(defaultRoom.sd.members, 'PUBLIC');
-        assert.strictEqual(defaultRoom.sd.admins, 'MANUAL');
+        assert.strictEqual(defaultRoom.sd.admins, 'GROUP_ADMIN');
 
-        // Coming soon to a cinema near you....
-        // assert.strictEqual(String(defaultRoom.sd.internalId), group.id);
-        // assert.deepEqual(defaultRoom.sd.extraAdmins.map(String), []);
-
-        // But for the moment
-        assert.equal(defaultRoom.sd.internalId, null);
-        assert.deepEqual(defaultRoom.sd.extraAdmins.map(String), [fixture.user1.id]);
+        assert.equal(String(defaultRoom.sd.internalId), group.id);
+        assert.deepEqual(defaultRoom.sd.extraAdmins.map(String), []);
 
         assert.deepEqual(defaultRoom.sd.extraMembers.map(String), []);
       });

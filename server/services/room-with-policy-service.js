@@ -367,8 +367,8 @@ RoomWithPolicyService.prototype.removeUserFromRoom = secureMethod([removeUserFro
 /**
  * Add an existing Gitter user to a room
  */
-RoomWithPolicyService.prototype.sendBadgePullRequest = secureMethod([allowAdmin], function() {
-  return roomService.sendBadgePullRequest(this.room, this.user);
+RoomWithPolicyService.prototype.sendBadgePullRequest = secureMethod([allowAdmin], function(repoUri) {
+  return roomService.sendBadgePullRequest(this.room, this.user, repoUri);
 });
 
 module.exports = RoomWithPolicyService;
