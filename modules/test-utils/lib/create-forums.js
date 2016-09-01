@@ -31,6 +31,7 @@ function createForum(fixtureName, f) {
   };
 
   var doc = {
+    tags: f.tags,
     sd: securityDoc
   };
 
