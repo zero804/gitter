@@ -24,8 +24,8 @@ SecurityResourceRoute.prototype.index = function(req) {
 SecurityResourceRoute.prototype.updateRoot = function(req) {
   return this.getSecurityDescriptorWithPolicyService(req)
     .then(function(sdService) {
-      var change = req.body; // TODO: add validation here
-      return sdService.update(change);
+      var newType = req.body.type;
+      return sdService.updateType(newType);
     })
     .then(function(securityDescriptor) {
       var strategy = restSerializer.SecurityDescriptorStrategy.full()

@@ -1,10 +1,16 @@
 'use strict';
 
+var persistence = require('gitter-web-persistence');
 var assert = require('assert');
 var securityDescriptorValidator = require('../security-descriptor-validator');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var transform = require('./transform');
 
-function findByIdForModel(Model, id, userId) {
+function SecurityDescriptorService(Model) {
+  this.Model = Model;
+}
+
+SecurityDescriptorService.prototype.findById = function(id, userId) {
   var projection = {
     _id: 0,
     'sd.type': 1,
@@ -28,7 +34,7 @@ function findByIdForModel(Model, id, userId) {
     projection['sd.extraAdmins'] = 1;
   }
 
-  return Model.findById(id, projection, { lean: true })
+  return this.Model.findById(id, projection, { lean: true })
     .exec()
     .then(function(doc) {
       if (!doc || !doc.sd) return null; // TODO: throw 404?
@@ -40,31 +46,31 @@ function findByIdForModel(Model, id, userId) {
       securityDescriptorValidator(sd);
       return sd;
     });
-}
+};
 
-function findExtraAdminsForModel(Model, id) {
-  return Model.findById(id, { 'sd.extraAdmins': 1 }, { lean: true })
+SecurityDescriptorService.prototype.findExtraAdmins = function findExtraAdminsForModel(id) {
+  return this.Model.findById(id, { 'sd.extraAdmins': 1 }, { lean: true })
     .exec()
     .then(function(doc) {
       if (!doc || !doc.sd || !doc.sd.extraAdmins) return [];
       return doc.sd.extraAdmins;
     });
-}
+};
 
-function findExtraMembersForModel(Model, id) {
-  return Model.findById(id, { 'sd.extraMembers': 1 }, { lean: true })
+SecurityDescriptorService.prototype.findExtraMembers = function findExtraMembersForModel(id) {
+  return this.Model.findById(id, { 'sd.extraMembers': 1 }, { lean: true })
     .exec()
     .then(function(doc) {
       if (!doc || !doc.sd || !doc.sd.extraMembers) return [];
       return doc.sd.extraMembers;
     });
-}
+};
 
-function addExtraAdminForModel(Model, id, userId) {
+SecurityDescriptorService.prototype.addExtraAdmin = function(id, userId) {
   assert(userId, 'userId required');
   userId = mongoUtils.asObjectID(userId);
 
-  return Model.findByIdAndUpdate(id, {
+  return this.Model.findByIdAndUpdate(id, {
       $addToSet: {
         'sd.extraAdmins': userId
       }
@@ -76,13 +82,13 @@ function addExtraAdminForModel(Model, id, userId) {
       }
     })
     .exec();
-}
+};
 
-function removeExtraAdminForModel(Model, id, userId) {
+SecurityDescriptorService.prototype.removeExtraAdmin = function(id, userId) {
   assert(userId, 'userId required');
   userId = mongoUtils.asObjectID(userId);
 
-  return Model.findByIdAndUpdate(id, {
+  return this.Model.findByIdAndUpdate(id, {
       $pullAll: {
         'sd.extraAdmins': [userId]
       }
@@ -97,10 +103,34 @@ function removeExtraAdminForModel(Model, id, userId) {
 }
 
 
+SecurityDescriptorService.prototype.updateSecurityDescriptor = function(id, sd) {
+  securityDescriptorValidator(sd);
+  return this.Model.findByIdAndUpdate(id, {
+      $set: {
+        'sd': sd
+      }
+    }, {
+      new: true
+    })
+    .exec()
+    .then(function(doc) {
+      return doc && doc.sd;
+    })
+}
+
+SecurityDescriptorService.prototype.modifyType = function(id, newType, options) {
+  return this.findById(id)
+    .bind(this)
+    .then(function(sd) {
+      return transform(this.Model, sd, newType, options);
+    })
+    .then(function(newSd) {
+      return this.updateSecurityDescriptor(id, newSd);
+    });
+}
+
 module.exports = {
-  findByIdForModel: findByIdForModel,
-  findExtraAdminsForModel: findExtraAdminsForModel,
-  findExtraMembersForModel: findExtraMembersForModel,
-  addExtraAdminForModel: addExtraAdminForModel,
-  removeExtraAdminForModel: removeExtraAdminForModel
+  room: new SecurityDescriptorService(persistence.Troupe),
+  group: new SecurityDescriptorService(persistence.Group),
+  forum: new SecurityDescriptorService(persistence.Forum),
 }
