@@ -62,7 +62,7 @@ var CreateRoomViewModel = Backbone.Model.extend({
     else if(this.get('roomAvailabilityStatus') === roomAvailabilityStatusConstants.INSUFFICIENT_PERMISSIONS) {
       errors.push({
         key: 'roomName',
-        message: 'You don\'t have sufficient permissions to create this room'
+        message: 'You don\'t have sufficient permissions to create this room. Are you an admin?'
       });
     }
     else if(this.get('roomAvailabilityStatus') === roomAvailabilityStatusConstants.GROUP_REQUIRED) {
