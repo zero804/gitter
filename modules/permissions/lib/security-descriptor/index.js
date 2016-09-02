@@ -51,7 +51,7 @@ SecurityDescriptorService.prototype.findById = function(id, userId) {
 };
 
 SecurityDescriptorService.prototype.findExtraAdmins = function findExtraAdminsForModel(id) {
-  return this.Model.findById(id, { 'sd.extraAdmins': 1 }, { lean: true })
+  return this.Model.findById(id, { _id: 0, 'sd.extraAdmins': 1 }, { lean: true })
     .exec()
     .then(function(doc) {
       if (!doc || !doc.sd || !doc.sd.extraAdmins) return [];
@@ -60,7 +60,7 @@ SecurityDescriptorService.prototype.findExtraAdmins = function findExtraAdminsFo
 };
 
 SecurityDescriptorService.prototype.findExtraMembers = function findExtraMembersForModel(id) {
-  return this.Model.findById(id, { 'sd.extraMembers': 1 }, { lean: true })
+  return this.Model.findById(id, { _id: 0, 'sd.extraMembers': 1 }, { lean: true })
     .exec()
     .then(function(doc) {
       if (!doc || !doc.sd || !doc.sd.extraMembers) return [];
@@ -75,7 +75,7 @@ SecurityDescriptorService.prototype.addExtraAdmin = function(id, userId) {
   return checkUsersValid([userId])
     .bind(this)
     .then(function() {
-      return this.Model.findByIdAndUpdate(id, {
+      return this.Model.update({ _id: id }, {
           $addToSet: {
             'sd.extraAdmins': userId
           }
@@ -88,13 +88,16 @@ SecurityDescriptorService.prototype.addExtraAdmin = function(id, userId) {
         })
         .exec();
     })
+    .then(function(result) {
+      return result && result.nModified === 1;
+    })
 };
 
 SecurityDescriptorService.prototype.removeExtraAdmin = function(id, userId) {
   assert(userId, 'userId required');
   userId = mongoUtils.asObjectID(userId);
 
-  return this.Model.findByIdAndUpdate(id, {
+  return this.Model.update({ _id: id }, {
       $pullAll: {
         'sd.extraAdmins': [userId]
       }
@@ -105,7 +108,10 @@ SecurityDescriptorService.prototype.removeExtraAdmin = function(id, userId) {
         'sd.extraAdmins': 1
       }
     })
-    .exec();
+    .exec()
+    .then(function(result) {
+      return result && result.nModified === 1;
+    })
 }
 
 
