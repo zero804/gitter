@@ -26,12 +26,6 @@ SecurityDescriptorWithPolicy.prototype.get = secureMethod([allowAdmin], function
   return this.sd;
 });
 
-SecurityDescriptorWithPolicy.prototype.updateType = secureMethod([allowAdmin], function(newType) {
-  return this.securityDescriptorService.modifyType(this.id, newType, {
-      groupId: this.ownerGroupId
-    });
-});
-
 SecurityDescriptorWithPolicy.prototype.addExtraAdmin = secureMethod([allowAdmin], function(userId) {
   return this.securityDescriptorService.addExtraAdmin(this.id, userId);
 });
@@ -43,6 +37,13 @@ SecurityDescriptorWithPolicy.prototype.removeExtraAdmin = secureMethod([allowAdm
 SecurityDescriptorWithPolicy.prototype.listExtraAdmins = secureMethod([allowAdmin], function() {
   return this.securityDescriptorService.findExtraAdmins(this.id);
 });
+
+SecurityDescriptorWithPolicy.prototype.update = secureMethod([allowAdmin], function(update) {
+  return this.securityDescriptorService.update(this.id, update, {
+      groupId: this.ownerGroupId
+    });
+});
+
 
 function createForGroup(group, policy) {
   return new SecurityDescriptorWithPolicy(securityDescriptorService.group, group._id, group.sd, policy, null);
