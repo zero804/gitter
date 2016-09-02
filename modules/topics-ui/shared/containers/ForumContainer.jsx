@@ -58,7 +58,6 @@ export default React.createClass({
     //New Topic
     newTopicStore: React.PropTypes.shape({
       get: React.PropTypes.func.isRequired,
-      set: React.PropTypes.func.isRequired
     }).isRequired,
   },
 
