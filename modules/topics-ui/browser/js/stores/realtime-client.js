@@ -1,6 +1,6 @@
 import clientEnv from 'gitter-client-env';
 import {RealtimeClient} from 'gitter-realtime-client';
-import _ from 'lodash';
+import _ from 'underscore';
 
 let client;
 
