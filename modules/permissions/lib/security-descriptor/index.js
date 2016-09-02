@@ -1,5 +1,5 @@
 'use strict';
-require('longjohn')
+
 var persistence = require('gitter-web-persistence');
 var assert = require('assert');
 var securityDescriptorValidator = require('../security-descriptor-validator');
