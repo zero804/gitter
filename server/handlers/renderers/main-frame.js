@@ -123,7 +123,6 @@ function renderMainFrame(req, res, next, options) {
 
 function renderMobileMainFrame(req, res, next, options) {
   var socialMetadataGenerator = options.socialMetadataGenerator;
-  var bootScriptName = 'router-mobile-app';
 
   contextGenerator.generateNonChatContext(req)
     .then(function(troupeContext) {
@@ -133,6 +132,8 @@ function renderMobileMainFrame(req, res, next, options) {
       ]);
     })
     .spread(function(troupeContext, socialMetadata) {
+
+      var bootScriptName = 'router-mobile-app';
 
       res.render('mobile/mobile-app', {
         troupeContext: troupeContext,
