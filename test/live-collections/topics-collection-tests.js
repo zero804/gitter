@@ -63,7 +63,7 @@ describe('topics-live-collection', function() {
       operation: 'patch',
       type: 'topic',
       model: {
-        id: fixture.topic1.id,
+        id: fixture.topic1.id.toString(),
         // this is topic1's first reply
         repliesTotal: 1
       },
@@ -94,7 +94,7 @@ describe('topics-live-collection', function() {
       operation: 'patch',
       type: 'topic',
       model: {
-        id: fixture.topic2.id
+        id: fixture.topic2.id.toString()
       },
     });
 

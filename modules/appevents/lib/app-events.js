@@ -10,27 +10,6 @@ var debug = require('debug')('gitter:app:events');
 // might never clean up after itself even when your test times out
 var LISTENER_TIMEOUT = 10000;
 
-// Pretty sure there's a bug in _.isMatch
-function isMatch(object, source) {
-  return Object.keys(source).every(function(key) {
-    var objectValue = object[key];
-
-    // all keys must exist in the target object
-    if (objectValue === undefined) return false;
-
-    var sourceValue = source[key];
-    if (_.isObject(sourceValue)) {
-      // recurse on objects
-      return isMatch(objectValue, sourceValue);
-    } else {
-      // simple values must match
-      return objectValue === sourceValue;
-    }
-
-    // TODO: support arrays
-  });
-}
-
 function makeEmitter() {
   var localEventEmitter = new events.EventEmitter();
 
@@ -49,8 +28,7 @@ function makeEmitter() {
           // NOTE: We can't reject here, because there could be other events
           // with the same event name. Therefore it is best to just time out
           // the test.
-          //if (_.isMatch(res, expected)) {
-          if (isMatch(res, expected)) {
+          if (_.isMatch(res, expected)) {
             debug('match!: %j', res);
             resolve(res);
           } else {
