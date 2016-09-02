@@ -1,15 +1,27 @@
 'use strict';
 
-function SecurityResourceRoute(options) {
+var restSerializer = require("../../../serializers/rest-serializer");
+
+function SecurityResourceExtraAdminsRoute(options) {
   this.id = options.id;
+  this.subresources = options.subresources;
+  this.subresourcesRoot = options.subresourcesRoot;
+
+  this.getSecurityDescriptorWithPolicyService = options.getSecurityDescriptorWithPolicyService;
 }
 
-SecurityResourceRoute.prototype.index = function(/*req, res*/) {
-  return [];
+SecurityResourceExtraAdminsRoute.prototype.index = function(req) {
+  return this.getSecurityDescriptorWithPolicyService(req)
+    .then(function(sdService) {
+      return sdService.listExtraAdmins();
+    })
+    .then(function(userIds) {
+      var strategy = new restSerializer.UserIdStrategy({ });
+      return restSerializer.serialize(userIds, strategy);
+    });
 }
 
-function createSecurityResource(options) {
-  return new SecurityResourceRoute(options);
-}
+// TODO: post/create
+// TODO: delete by userId
 
-module.exports = createSecurityResource;
+module.exports = SecurityResourceExtraAdminsRoute;

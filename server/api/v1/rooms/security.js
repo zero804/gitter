@@ -1,14 +1,15 @@
 "use strict";
 
 var loadTroupeFromParam = require('./load-troupe-param');
-var createSecurityResource = require('../common/create-security-resource');
+var SecurityResourceRoute = require('../common/create-security-resource');
+var sdWithPolicyFactory = require('../../../services/security-descriptor-with-policy-service');
 
-module.exports = createSecurityResource({
+module.exports = new SecurityResourceRoute({
   id: 'roomSecurity',
   getSecurityDescriptor: function(req) {
     return loadTroupeFromParam(req)
       .then(function(troupe) {
-        return troupe.sd;
+        return sdWithPolicyFactory.createForRoom(troupe._id, troupe.sd, req.userRoomPolicy);
       });
   },
   subresourcesRoot: {
