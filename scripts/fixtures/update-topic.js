@@ -3,7 +3,6 @@
 
 var Promise = require('bluebird');
 var yargs = require('yargs');
-var faker = require('faker');
 var StatusError = require('statuserror');
 var utils = require('./fixture-script-utils');
 var topicService = require('gitter-web-topics/lib/topic-service');
