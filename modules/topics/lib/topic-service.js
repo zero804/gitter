@@ -3,14 +3,13 @@
 var env = require('gitter-web-env');
 var stats = env.stats;
 var Promise = require('bluebird');
-var StatusError = require('statuserror');
 var Topic = require('gitter-web-persistence').Topic;
 var debug = require('debug')('gitter:app:topics:topic-service');
 var processText = require('gitter-web-text-processor');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var markdownMajorVersion = require('gitter-markdown-processor').version.split('.')[0];
-var validators = require('gitter-web-validators');
+var validateTopic = require('./validate-topic');
 
 
 function findById(topicId) {
@@ -51,28 +50,11 @@ function findByIdForForum(forumId, topicId) {
     });
 }
 
-function validateTopic(data, options) {
-  options = options || {};
-  options.allowedTags = options.allowedTags || [];
-
-  if (!validators.validateDisplayName(data.title)) {
-    throw new StatusError(400, 'Title is invalid.')
-  }
-
-  if (!validators.validateSlug(data.slug)) {
-    throw new StatusError(400, 'Slug is invalid.')
-  }
-
-  if (!validators.validateMarkdown(data.text)) {
-    throw new StatusError(400, 'Text is invalid.')
-  }
-
-  // TODO: validate data.tags against options.allowedTags
-
-  return data;
-}
 
 function createTopic(user, category, options) {
+  // these should be passed in from forum.tags
+  var allowedTags = options.allowedTags || [];
+
   var data = {
     forumId: category.forumId,
     categoryId: category._id,
@@ -84,28 +66,17 @@ function createTopic(user, category, options) {
     text: options.text || '',
   };
 
-  return Promise.try(function() {
-      return validateTopic(data, {
-        // TODO: somehow either pass in the forum's tags or read them out
-        //allowedTags: forum.tags
-      });
-    })
-    .bind({})
-    .then(function(insertData) {
-      this.insertData = insertData;
-      return processText(options.text)
-    })
+  var insertData = validateTopic(data, { allowedTags: allowedTags });
+  return processText(options.text)
     .then(function(parsedMessage) {
-      var data = this.insertData;
-
-      data.html = parsedMessage.html;
-      data.lang = parsedMessage.lang;
-      data._md = parsedMessage.markdownProcessingFailed ? -markdownMajorVersion : markdownMajorVersion;
+      insertData.html = parsedMessage.html;
+      insertData.lang = parsedMessage.lang;
+      insertData._md = parsedMessage.markdownProcessingFailed ? -markdownMajorVersion : markdownMajorVersion;
       // urls, issues, mentions?
 
-      debug("Creating topic with %j", data);
+      debug("Creating topic with %j", insertData);
 
-      return Topic.create(data);
+      return Topic.create(insertData);
     })
     .then(function(topic) {
       stats.event('new_topic', {
@@ -124,5 +95,5 @@ module.exports = {
   findByForumIds: Promise.method(findByForumIds),
   findTotalsByForumIds: Promise.method(findTotalsByForumIds),
   findByIdForForum: findByIdForForum,
-  createTopic: createTopic
+  createTopic: Promise.method(createTopic)
 };

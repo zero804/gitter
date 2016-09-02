@@ -27,17 +27,17 @@ var liveCollectionTopics = {
   },
 
   // TODO: call patch
-  patch: function(topicId, forumId, patch) {
+  patch: function(forumId, topicId, patch) {
     var url = "/forums/" + forumId + "/topics";
     var patchMessage = _.extend({ }, patch, { id: topicId });
     appEvents.dataChange2(url, "patch", patchMessage, 'topic');
   },
 
   remove: function(topic) {
-    return this.removeId(topic._id, topic.forumId);
+    return this.removeId(topic.forumId, topic._id);
   },
 
-  removeId: function(topicId, forumId) {
+  removeId: function(forumId, topicId) {
     var url = "/forums/" + forumId + "/topics";
     appEvents.dataChange2(url, "remove", { id: topicId }, 'topic');
   }

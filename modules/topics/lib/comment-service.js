@@ -3,13 +3,12 @@
 var env = require('gitter-web-env');
 var stats = env.stats;
 var Promise = require('bluebird');
-var StatusError = require('statuserror');
 var Comment = require('gitter-web-persistence').Comment;
 var processText = require('gitter-web-text-processor');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var markdownMajorVersion = require('gitter-markdown-processor').version.split('.')[0];
-var validators = require('gitter-web-validators');
+var validateComment = require('./validate-comment');
 
 
 function findById(commentId) {
@@ -56,14 +55,6 @@ function findByIdForForumTopicAndReply(forumId, topicId, replyId, commentId) {
     });
 }
 
-function validateComment(data) {
-  if (!validators.validateMarkdown(data.text)) {
-    throw new StatusError(400, 'Text is invalid.')
-  }
-
-  return data;
-}
-
 function createComment(user, reply, options) {
   var data = {
     forumId: reply.forumId,
@@ -73,22 +64,14 @@ function createComment(user, reply, options) {
     text: options.text || '',
   };
 
-  return Promise.try(function() {
-      return validateComment(data);
-    })
-    .bind({})
-    .then(function(insertData) {
-      this.insertData = insertData;
-      return processText(options.text)
-    })
+  var insertData = validateComment(data);
+  return processText(options.text)
     .then(function(parsedMessage) {
-      var data = this.insertData;
+      insertData.html = parsedMessage.html;
+      insertData.lang = parsedMessage.lang;
+      insertData._md = parsedMessage.markdownProcessingFailed ? -markdownMajorVersion : markdownMajorVersion;
 
-      data.html = parsedMessage.html;
-      data.lang = parsedMessage.lang;
-      data._md = parsedMessage.markdownProcessingFailed ? -markdownMajorVersion : markdownMajorVersion;
-
-      return Comment.create(data);
+      return Comment.create(insertData);
     })
     .then(function(comment) {
       stats.event('new_comment', {
@@ -108,5 +91,5 @@ module.exports = {
   findByReplyIds: findByReplyIds,
   findTotalsByReplyIds: findTotalsByReplyIds,
   findByIdForForumTopicAndReply: findByIdForForumTopicAndReply,
-  createComment: createComment
+  createComment: Promise.method(createComment)
 };
