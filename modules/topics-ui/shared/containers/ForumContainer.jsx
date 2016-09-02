@@ -29,7 +29,7 @@ export default React.createClass({
     filterName: React.PropTypes.string,
     tagName: React.PropTypes.string,
     sortName: React.PropTypes.string,
-    createTopic: React.PropTypes.bool,
+    createTopic: React.PropTypes.bool.isRequired,
 
     //Client side only
     router: React.PropTypes.shape({
@@ -66,8 +66,7 @@ export default React.createClass({
     return {
       filterName: navConstants.DEFAULT_FILTER_NAME,
       tagName: navConstants.DEFAULT_TAG_NAME,
-      sortName: navConstants.DEFAULT_SORT_NAME,
-      createTopic: false,
+      sortName: navConstants.DEFAULT_SORT_NAME
     };
   },
 
@@ -91,6 +90,7 @@ export default React.createClass({
     tagStore.on(forumTagConstants.UPDATE_ACTIVE_TAG, this.onTagUpdate, this);
     router.on(forumFilterConstants.UPDATE_ACTIVE_FILTER, this.onFilterUpdate, this);
     router.on(forumSortConstants.UPDATE_ACTIVE_SORT, this.onSortUpdate, this);
+    router.on('change:createTopic', this.onCreateTopicChange, this);
   },
 
   componentWillUnmount(){
@@ -153,7 +153,7 @@ export default React.createClass({
 
   onCategoryUpdate(){
     const { categoryStore } = this.props;
-    this.setState((state) => _.extend(state, {
+    this.setState((state) => Object.assign(state, {
       categories: categoryStore.getCategories(),
       categoryName: categoryStore.getActiveCategoryName(),
     }));
@@ -161,21 +161,28 @@ export default React.createClass({
 
   onTagUpdate(){
     const { tagStore } = this.props;
-    this.setState((state) => _.extend(state, {
+    this.setState((state) => Object.assign(state, {
       tags: tagStore.getTags(),
       tagName: tagStore.getActiveTagName(),
     }));
   },
 
   onFilterUpdate(data){
-    this.setState((state) => _.extend(state, {
+    this.setState((state) => Object.assign(state, {
       filterName: data.filter,
     }));
   },
 
   onSortUpdate(data) {
-    this.setState((state) => _.extend(state, {
+    this.setState((state) => Object.assign(state, {
       sortName: data.sort,
+    }));
+  },
+
+  onCreateTopicChange(){
+    const {router} = this.props;
+    this.setState((state) => Object.assign(state, {
+      createTopic: router.get('createTopic')
     }));
   }
 
