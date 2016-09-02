@@ -5,6 +5,7 @@ var Promise = require('bluebird');
 var githubOrgAdminDiscovery = require('./github-org');
 var Group = require('gitter-web-persistence').Group;
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var adminGroupFinder = require('../known-external-access/admin-group-finder');
 
 function singleOrInManyQuery(item) {
   if (Array.isArray(item)) {
@@ -13,21 +14,23 @@ function singleOrInManyQuery(item) {
     return item;
   }
 }
+
 function descriptorSearchAsQuery(descriptorSearch) {
   var disjunction = []
   var query = {
-    'sd.type': descriptorSearch.type,
     $or: disjunction
   };
 
   if (descriptorSearch.linkPath) {
     disjunction.push({
+      'sd.type': descriptorSearch.type,
       'sd.linkPath': singleOrInManyQuery(descriptorSearch.linkPath)
     });
   }
 
   if (descriptorSearch.externalId) {
     disjunction.push({
+      'sd.type': descriptorSearch.type,
       'sd.externalId': singleOrInManyQuery(descriptorSearch.externalId)
     });
   }
@@ -66,14 +69,14 @@ function findModelsForExtraAdmin(Model, userId) {
 function discoverAdminGroups(user) {
   // Anonymous users don't have admin groups
   if (!user) return [];
+  var userId = user._id || user.id;
 
   return Promise.join(
     findModelsForOrgAdmin(Group, user),
-    // findRepoModels would go here, but will not be implemented for now
-    // as it could result in too large a query (50k repos for example)
-    findModelsForExtraAdmin(Group, user._id || user.id),
-    function(orgModels, extraAdminModels) {
-      return mongoUtils.unionModelsById([orgModels, extraAdminModels])
+    adminGroupFinder.findAdminGroupsOfTypeForUserId('GH_REPO', userId),
+    findModelsForExtraAdmin(Group, userId),
+    function(orgModels, repoModels, extraAdminModels) {
+      return mongoUtils.unionModelsById([orgModels, repoModels, extraAdminModels])
     });
 }
 
