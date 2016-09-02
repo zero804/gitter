@@ -17,14 +17,6 @@ describe('CategoryStore', function(){
     assert(categoryStore().models, 'should return a models property');
   });
 
-  it('should return the payload its proved with', function(){
-    assert.deepEqual(categoryStore(categories).models, parsedCategories);
-  });
-
-  it('should return models when getCategories is called', function(){
-    assert.deepEqual(categoryStore(categories).getCategories(), parsedCategories);
-  });
-
   it('should add an initial category of all', function(){
     assert.equal(categoryStore(categories).getCategories()[0].category, 'all');
   });
