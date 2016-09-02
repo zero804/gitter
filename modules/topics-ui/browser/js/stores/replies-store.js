@@ -5,6 +5,7 @@ import {subscribe} from '../../../shared/dispatcher';
 import {SUBMIT_NEW_REPLY, REPLY_CREATED} from '../../../shared/constants/create-reply';
 import LiveCollection from './live-collection';
 import {getRealtimeClient} from './realtime-client';
+import dispatchOnChangeMixin from './mixins/dispatch-on-change';
 
 export const ReplyStore = Backbone.Model.extend({
   defaults: {},
@@ -38,7 +39,7 @@ export const ReplyStore = Backbone.Model.extend({
   onSuccess() {this.trigger(REPLY_CREATED, this);}
 });
 
-export const RepliesStore = LiveCollection.extend({
+export const RepliesStore = dispatchOnChangeMixin(LiveCollection.extend({
 
   model: ReplyStore,
   client: getRealtimeClient(),
@@ -55,6 +56,7 @@ export const RepliesStore = LiveCollection.extend({
     this.router = attrs.router;
     this.forumStore = attrs.forumStore;
     this.topicsStore = attrs.topicsStore;
+    this.currentUserStore = attrs.currentUserStore;
     subscribe(SUBMIT_NEW_REPLY, this.createNewReply, this);
   },
 
@@ -65,9 +67,9 @@ export const RepliesStore = LiveCollection.extend({
   },
 
   createNewReply(data){
-    const newReply = this.create({ text: data.body });
-    newReply.on(REPLY_CREATED, () => {
-      this.trigger(REPLY_CREATED);
+    const newReply = this.create({
+      text: data.body,
+      user: this.currentUserStore.getCurrentUser()
     });
   },
 
@@ -85,4 +87,4 @@ export const RepliesStore = LiveCollection.extend({
     return topic.get('id');
   }
 
-});
+}));

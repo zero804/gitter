@@ -1,6 +1,6 @@
 export default function dipatchOnChangeMixin(Constructor){
 
-  Constructor.prototype.events = [];
+  Constructor.prototype.events = (Constructor.prototype.events || []);
   const events = ['add', 'remove', 'reset', 'sync', 'snapshot'];
 
   Constructor.prototype.onChange = function(fn, ctx){

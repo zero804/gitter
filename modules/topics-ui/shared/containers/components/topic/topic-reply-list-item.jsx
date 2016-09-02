@@ -8,9 +8,7 @@ export default React.createClass({
     reply: PropTypes.shape({
 
       formattedSentDate: PropTypes.string.isRequired,
-      body: PropTypes.shape({
-        html: PropTypes.string.isRequired
-      }).isRequired,
+      displayText: PropTypes.string.isRequired,
 
       user: PropTypes.shape({
         avatarUrl: PropTypes.string.isRequired,
@@ -33,7 +31,7 @@ export default React.createClass({
         </header>
         <section
           className="topic-reply-list-item__body"
-          dangerouslySetInnerHTML={{ __html: reply.body.html}}>
+          dangerouslySetInnerHTML={{ __html: reply.displayText }}>
         </section>
         <footer></footer>
       </article>

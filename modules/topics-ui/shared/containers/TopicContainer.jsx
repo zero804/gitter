@@ -43,13 +43,13 @@ export default createClass({
 
   componentDidMount(){
     const {repliesStore, newReplyStore} = this.props;
-    repliesStore.on(REPLY_CREATED, this.updateReplies, this);
+    repliesStore.onChange(this.updateReplies, this);
     newReplyStore.on('change:text', this.updateReplyContent, this);
   },
 
   componentWillUnmount(){
     const {repliesStore, newReplyStore} = this.props;
-    repliesStore.off(REPLY_CREATED, this.updateReplies, this);
+    repliesStore.removeListeners();
     newReplyStore.off('change:text', this.updateReplyContent, this);
   },
 
