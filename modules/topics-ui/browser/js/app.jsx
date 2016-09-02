@@ -178,6 +178,7 @@ export default React.createClass({
     const accessTokenStore = this.getAccessTokenStore();
     const forumStore = this.getForumStore();
     const topicsStore = this.getTopicsStore();
+    const currentUserStore = this.getCurrentUserStore();
 
     if(this.hasRendered && this.state.repliesStore) { return this.state.repliesStore; }
     return new RepliesStore(repliesStore.models, {
@@ -185,6 +186,7 @@ export default React.createClass({
       accessTokenStore: accessTokenStore,
       forumStore: forumStore,
       topicsStore: topicsStore,
+      currentUserStore: currentUserStore
     });
   },
 
