@@ -29,7 +29,9 @@ export const ReplyStore = Backbone.Model.extend({
         options.success(data);
         this.onSuccess();
       },
-      error: this.onError.bind(this),
+      error: () => {
+        //Dome some error shiz
+      }
     })
   },
 
@@ -40,9 +42,16 @@ export const RepliesStore = LiveCollection.extend({
 
   model: ReplyStore,
   client: getRealtimeClient(),
-  listen: true,
   urlTemplate: '/v1/forums/:forumId/topics/:topicId/replies',
 
+  constructor(models, attrs){
+    this.contextModel = attrs.contextModel = new Backbone.Model({
+      forumId: attrs.forumStore.get('id'),
+      topicId: attrs.router.get('topicId'),
+    });
+    attrs.listen = true;
+    LiveCollection.prototype.constructor.apply(this, [models, attrs]);
+  },
 
   initialize(models, attrs){
     this.accessTokenStore = attrs.accessTokenStore;
