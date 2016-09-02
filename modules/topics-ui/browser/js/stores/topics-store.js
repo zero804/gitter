@@ -34,9 +34,8 @@ var TopicModel = Model.extend({
     this.set(attrs);
     this.trigger(TOPIC_CREATED, this);
   },
-  onError(){
 
-  },
+  onError(){},
 
   toJSON() {
     var data = this.attributes;
@@ -63,12 +62,14 @@ export default Collection.extend({
   },
 
   getById(id){
-    return this.get(id).toJSON();
+    const model = this.get(id);
+    if(!model){ return; }
+    return model.toJSON();
   },
 
   creatNewTopic(data){
     const newTopic = this.create({ title: data.title, text: data.body });
-    newTopic.on(TOPIC_CREATED, ()=> {
+    newTopic.on(TOPIC_CREATED, () => {
       this.trigger(TOPIC_CREATED, {
         topicId: newTopic.get('id'),
         slug: newTopic.get('slug')
