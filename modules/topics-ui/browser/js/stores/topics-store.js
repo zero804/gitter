@@ -7,12 +7,12 @@ import {getRealtimeClient} from './realtime-client';
 import LiveCollection from './live-collection';
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
 import {getAccessToken} from './access-token-store';
+import {getForumId} from './forum-store';
 
 var TopicModel = Backbone.Model.extend({
   defaults: {},
   url(){
-    const forumId = this.collection.getForumId();
-    return this.get('id') ? null : `/api/v1/forums/${forumId}/topics`;
+    return this.get('id') ? null : `/api/v1/forums/${getForumId()}/topics`;
   },
 
   sync(){
@@ -57,14 +57,13 @@ export default dispatchOnChangeMixin(LiveCollection.extend({
   model: TopicModel,
   client: getRealtimeClient(),
   urlTemplate: '/v1/forums/:forumId/topics',
-  getContextModel(attrs){
+  getContextModel(){
     return new Backbone.Model({
-      forumId: attrs.forumStore.get('id')
+      forumId: getForumId()
     });
   },
 
-  initialize(models, attrs){
-    this.forumStore = attrs.forumStore;
+  initialize(){
     subscribe(SUBMIT_NEW_TOPIC, this.creatNewTopic, this);
   },
 
@@ -84,10 +83,6 @@ export default dispatchOnChangeMixin(LiveCollection.extend({
       topicId: model.get('id'),
       slug: model.get('slug')
     }));
-  },
-
-  getForumId(){
-    return this.forumStore.get('id');
   },
 
   //TODO REMOVE

@@ -14,6 +14,7 @@ import {RepliesStore} from './stores/replies-store';
 import NewReplyStore from './stores/new-reply-store';
 
 import {getCurrentUserStore} from './stores/current-user-store';
+import {getForumStore} from './stores/forum-store';
 
 import * as navConstants from '../../shared/constants/navigation';
 
@@ -70,6 +71,7 @@ export default React.createClass({
       route: router.get('route'),
       router: router,
       currentUserStore: getCurrentUserStore(),
+      forumStore: getForumStore(),
     };
   },
 
@@ -87,7 +89,6 @@ export default React.createClass({
       sortName: router.get('sortName'),
 
       //Stores
-      forumStore: this.getForumStore(),
       categoryStore: this.getCategoryStore(),
       tagStore: this.getTagStore(),
       topicsStore: this.getTopicsStore(),
@@ -118,40 +119,30 @@ export default React.createClass({
     });
   },
 
-  //STORES -------------------------------
-  getForumStore(){
-    const forumStore = (window.context.forumStore || {});
-    if(this.hasRendered && this.state.forumStore) { return this.state.forumStore; }
-    return new ForumStore(forumStore.data);
-  },
 
   getCategoryStore(){
     const {router} = this.props;
-    const forumStore = this.getForumStore();
     const categoryStore = (window.context.categoryStore || {});
 
     if(this.hasRendered && this.state.categoryStore) { return this.state.categoryStore; }
-    return new CategoryStore(categoryStore.models, { router: router, forumStore: forumStore });
+    return new CategoryStore(categoryStore.models, { router: router });
   },
 
   getTagStore(){
     const {router} = this.props;
-    const forumStore = this.getForumStore();
     const tagStore = (window.context.tagStore || {});
 
     if(this.hasRendered && this.state.tagStore) { return this.state.tagStore; }
-    return new TagStore(tagStore.models, { router: router, forumStore: forumStore });
+    return new TagStore(tagStore.models, { router: router });
   },
 
   getTopicsStore(){
     const {router} = this.props;
-    const forumStore = this.getForumStore();
     const topicsStore = (window.context.topicsStore || {});
 
     if(this.hasRendered && this.state.topicsStore) { return this.state.topicsStore; }
     return new TopicsStore(topicsStore.models, {
       router: router,
-      forumStore: forumStore,
     });
   },
 
@@ -159,13 +150,11 @@ export default React.createClass({
 
     const {router} = this.props;
     const repliesStore = (window.context.repliesStore || {});
-    const forumStore = this.getForumStore();
     const topicsStore = this.getTopicsStore();
 
     if(this.hasRendered && this.state.repliesStore) { return this.state.repliesStore; }
     return new RepliesStore(repliesStore.models, {
       router: router,
-      forumStore: forumStore,
       topicsStore: topicsStore,
     });
   },
