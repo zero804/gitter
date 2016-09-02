@@ -7,7 +7,7 @@ import {getRealtimeClient} from './realtime-client';
 import LiveCollection from './live-collection';
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
 import {getAccessToken} from './access-token-store';
-import {getForumId} from './forum-store';
+import {getForumId, getForumStore} from './forum-store';
 
 var TopicModel = Backbone.Model.extend({
   defaults: {},
@@ -57,6 +57,7 @@ export default dispatchOnChangeMixin(LiveCollection.extend({
   model: TopicModel,
   client: getRealtimeClient(),
   urlTemplate: '/v1/forums/:forumId/topics',
+
   getContextModel(){
     return new Backbone.Model({
       forumId: getForumId()
@@ -88,7 +89,7 @@ export default dispatchOnChangeMixin(LiveCollection.extend({
   //TODO REMOVE
   getCategoryId(){
     //TODO This needs to be fleshed out when the UI is completed
-    const categories = this.forumStore.get('categories');
+    const categories = getForumStore().get('categories');
     if(categories && categories[0]) { return categories[0].id; }
   }
 
