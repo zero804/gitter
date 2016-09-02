@@ -16,7 +16,7 @@ SecurityResourceRoute.prototype.index = function(req) {
       return sdService.get();
     })
     .then(function(securityDescriptor) {
-      var strategy = new restSerializer.SecurityDescriptorStrategy({ });
+      var strategy = restSerializer.SecurityDescriptorStrategy.full();
       return restSerializer.serializeObject(securityDescriptor, strategy);
     });
 }
@@ -28,7 +28,7 @@ SecurityResourceRoute.prototype.updateRoot = function(req) {
       return sdService.update(change);
     })
     .then(function(securityDescriptor) {
-      var strategy = new restSerializer.SecurityDescriptorStrategy({ });
+      var strategy = restSerializer.SecurityDescriptorStrategy.full()
       return restSerializer.serializeObject(securityDescriptor, strategy);
     });
 }

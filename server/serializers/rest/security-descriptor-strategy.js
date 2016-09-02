@@ -1,10 +1,9 @@
 "use strict";
 
-
-function SecurityDescriptorStrategy() {
+function SimpleSecurityDescriptorStrategy() {
 }
 
-SecurityDescriptorStrategy.prototype = {
+SimpleSecurityDescriptorStrategy.prototype = {
   preload: function() {
     return;
   },
@@ -19,7 +18,54 @@ SecurityDescriptorStrategy.prototype = {
     };
   },
 
-  name: 'SecurityDescriptorStrategy'
+  mapFull: function(sd) {
+    if (!sd) return;
+    if (sd.type === 'ONE_TO_ONE') return;
+
+    return {
+      type: sd.type || undefined,
+      linkPath: sd.linkPath || undefined,
+      admins: sd.admins || undefined,
+      members: sd.members || undefined
+    };
+  },
+
+  name: 'SimpleSecurityDescriptorStrategy'
 };
 
-module.exports = SecurityDescriptorStrategy;
+function FullSecurityDescriptorStrategy() {
+}
+
+FullSecurityDescriptorStrategy.prototype = {
+  preload: function() {
+    return;
+  },
+
+  map: function(sd) {
+    if (!sd) return;
+    if (sd.type === 'ONE_TO_ONE') return;
+
+    return {
+      type: sd.type || undefined,
+      linkPath: sd.linkPath || undefined,
+      admins: sd.admins || undefined,
+      members: sd.members || undefined
+    };
+  },
+
+  name: 'FullSecurityDescriptorStrategy'
+};
+
+
+function simple() {
+  return new SimpleSecurityDescriptorStrategy();
+}
+
+function full() {
+  return new FullSecurityDescriptorStrategy();
+}
+
+module.exports = {
+  full: full,
+  simple: simple
+};

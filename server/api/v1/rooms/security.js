@@ -6,7 +6,7 @@ var sdWithPolicyFactory = require('../../../services/security-descriptor-with-po
 
 module.exports = new SecurityResourceRoute({
   id: 'roomSecurity',
-  getSecurityDescriptor: function(req) {
+  getSecurityDescriptorWithPolicyService: function(req) {
     return loadTroupeFromParam(req)
       .then(function(troupe) {
         return sdWithPolicyFactory.createForRoom(troupe._id, troupe.sd, req.userRoomPolicy);

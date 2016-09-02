@@ -1,0 +1,90 @@
+'use strict';
+
+process.env.DISABLE_API_LISTEN = '1';
+
+var Promise = require('bluebird');
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
+var assert = require('assert');
+var _ = require('lodash');
+
+describe('room-security-api', function() {
+  var app, request;
+
+  before(function() {
+    request = require("supertest-as-promised")(Promise);
+    app = require('../../server/api');
+  });
+
+  var fixture = fixtureLoader.setup({
+    user1: {
+      accessToken: 'web-internal'
+    },
+    user2: {
+      accessToken: 'web-internal'
+    },
+    troupe1: {
+      securityDescriptor: {
+        type: null,
+        members: 'PUBLIC',
+        admins: 'MANUAL',
+        extraAdmins: ['user1']
+      },
+      users: ['user1'],
+      group: 'group1'
+    }
+  });
+
+  it('GET /v1/rooms/:roomId/security', function() {
+    var roomId = fixture.troupe1.id;
+    return request(app)
+      .get('/v1/rooms/' + roomId + '/security')
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+      .then(function(res) {
+        assert.deepEqual(res.body, { admins: 'MANUAL', members: 'PUBLIC' })
+      });
+  });
+
+  it('GET /v1/rooms/:roomId/security/extraAdmins', function() {
+    var roomId = fixture.troupe1.id;
+    return request(app)
+      .get('/v1/rooms/' + roomId + '/security/extraAdmins')
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+      .then(function(res) {
+        var users = res.body;
+        assert(Array.isArray(users));
+        assert.strictEqual(users.length, 1);
+        assert.strictEqual(users[0].id, fixture.user1.id);
+      });
+  });
+
+  it('POST /v1/rooms/:roomId/security/extraAdmins', function() {
+    var roomId = fixture.troupe1.id;
+    return request(app)
+      .post('/v1/rooms/' + roomId + '/security/extraAdmins')
+      .send({
+        id: fixture.user2.id
+      })
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+      .then(function(res) {
+        var user = res.body;
+
+        assert.strictEqual(user.id, fixture.user2.id);
+      });
+  });
+
+  it('DELETE /v1/rooms/:roomId/security/extraAdmins/:userId', function() {
+    var roomId = fixture.troupe1.id;
+    var userId = fixture.user2.id;
+    return request(app)
+      .del('/v1/rooms/' + roomId + '/security/extraAdmins/' + userId)
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(204)
+      .then(function() {
+
+      })
+  });
+
+})
