@@ -10,7 +10,6 @@ import TagStore from './stores/forum-tag-store';
 import TopicsStore from './stores/topics-store';
 import NewTopicStore from './stores/new-topic-store';
 import ForumStore from './stores/forum-store';
-import {getAccessToken} from './stores/access-token-store';
 import {RepliesStore} from './stores/replies-store';
 import CurrentUserStore from './stores/current-user-store';
 import NewReplyStore from './stores/new-reply-store';
