@@ -6,5 +6,5 @@ exports.install = function() {
   if (installed) return;
   installed = true;
 
-  require('../services/live-collections').install();
+  require('../services/live-collection-handlers').install();
 };

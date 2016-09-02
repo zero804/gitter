@@ -60,6 +60,7 @@
     "gitter-web-intercom": "file:modules/intercom",
     "gitter-web-invites": "file:modules/invites",
     "gitter-web-linkedin-backend": "file:modules/linkedin-backend",
+    "gitter-web-live-collection-events": "file:modules/live-collection-events",
     "gitter-web-mongoose-bluebird": "file:modules/mongoose-bluebird",
     "gitter-web-permissions": "file:modules/permissions",
     "gitter-web-persistence": "file:modules/persistence",

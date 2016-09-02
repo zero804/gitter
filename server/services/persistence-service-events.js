@@ -2,7 +2,7 @@
 
 var env = require('gitter-web-env');
 var config = env.config;
-var liveCollections = require('./live-collections');
+var liveCollections = require('gitter-web-live-collection-events');
 
 exports.install = function(persistenceService) {
 
