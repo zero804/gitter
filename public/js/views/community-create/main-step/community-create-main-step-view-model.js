@@ -1,3 +1,4 @@
+/* eslint complexity: ["error", 13] */
 'use strict';
 
 var CommunityCreateStepViewModel = require('../community-create-step-view-model');
@@ -17,17 +18,19 @@ var CommunityCreateMainStepViewModel = CommunityCreateStepViewModel.extend({
       errors.communityName = 'Invalid community name';
     }
 
-
     var communitySlug = this.communityCreateModel.get('communitySlug') || '';
     var hasCommunitySlug = communitySlug.length > 0;
     var slugValid = slugger.isValid(communitySlug);
+    var slugAvailabilityStatus = this.communityCreateModel.get('communitySlugAvailabilityStatus');
     if(!hasCommunitySlug) {
       errors.communitySlug = 'Please fill in the community slug';
     } else if(communitySlug.length < 2 || communitySlug.length > 80) {
       errors.communitySlug = 'Slug length must be 2 to 80 characters';
-    } else if(!slugValid || this.communityCreateModel.get('communitySlugAvailabilityStatus') === slugAvailabilityStatusConstants.INVALID) {
+    } else if(!slugValid || slugAvailabilityStatus === slugAvailabilityStatusConstants.INVALID) {
       errors.communitySlug = 'Slug contains invalid characters';
-    } else if(this.communityCreateModel.get('communitySlugAvailabilityStatus') === slugAvailabilityStatusConstants.UNAVAILABLE) {
+    } else if(slugAvailabilityStatus === slugAvailabilityStatusConstants.NEEDS_MORE_PERMISSIONS && this.communityCreateModel.get('githubOrgId')) {
+      errors.communitySlug = 'Allow private repo access on the GitHub org or make your org membership public';
+    } else if(slugAvailabilityStatus === slugAvailabilityStatusConstants.UNAVAILABLE) {
       errors.communitySlug = 'This address is not available';
     }
 
