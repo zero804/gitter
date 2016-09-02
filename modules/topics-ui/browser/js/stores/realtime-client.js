@@ -4,12 +4,12 @@ import _ from 'underscore';
 
 let client;
 
-var accessToken = window.context.accessTokenStore.token;
-if(!accessToken) { throw new Error('Client has no access token'); }
+const serverTokenStore = (window.context.accessTokenStore || {});
+const accessToken = (serverTokenStore.token || '');
 
 function authProvider(callback) {
-  var mobile = false;
-  var authMessage = _.extend({
+  const mobile = false;
+  const authMessage = _.extend({
     token: accessToken,
     version: clientEnv['version'],
     connType: mobile ? 'mobile' : 'online',
@@ -20,11 +20,9 @@ function authProvider(callback) {
 }
 
 export function getRealtimeClient(){
-
+  if(!accessToken.length) { return; }
   if(!client) {
-
-    var c = clientEnv['websockets'] || {};
-
+    const c = clientEnv['websockets'] || {};
     client = new RealtimeClient({
       token: accessToken ,
       fayeUrl: c.fayeUrl,
