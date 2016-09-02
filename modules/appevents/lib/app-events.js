@@ -3,7 +3,12 @@
 var Promise = require('bluebird');
 var events = require('events');
 var _ = require('lodash');
+var debug = require('debug')('gitter:app:events');
 
+
+// make sure that the promises returned by addListener time out, otherwise it
+// might never clean up after itself even when your test times out
+var LISTENER_TIMEOUT = 10000;
 
 function makeEmitter() {
   var localEventEmitter = new events.EventEmitter();
@@ -24,18 +29,21 @@ function makeEmitter() {
           // with the same event name. Therefore it is best to just time out
           // the test.
           if (_.isMatch(res, expected)) {
-            resolve();
+            debug('match!: %j', res);
+            resolve(res);
+          } else {
+            debug("No match: %j against %j", res, expected);
           }
         };
         localEventEmitter.on(eventName, eventMatcher);
       });
 
-      promise.finally(function() {
-        localEventEmitter.removeListener(eventName, eventMatcher);
-      });
-
       return function() {
-        return promise;
+        return promise
+          .timeout(LISTENER_TIMEOUT)
+          .finally(function() {
+            localEventEmitter.removeListener(eventName, eventMatcher);
+          });
       };
     },
 
