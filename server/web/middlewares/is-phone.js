@@ -3,7 +3,7 @@
 var isPhone = require('../is-phone');
 
 function isPhoneMiddleware(req, res, next) {
-  req.isPhone = isPhone(req) || (req.fflip && req.fflip.has('force-phone'));
+  req.isPhone = isPhone(req);
   next();
 }
 
