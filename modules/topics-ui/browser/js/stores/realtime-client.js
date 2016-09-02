@@ -1,6 +1,7 @@
 import clientEnv from 'gitter-client-env';
 import {RealtimeClient} from 'gitter-realtime-client';
 import _ from 'underscore';
+import {getAccessToken} from './access-token-store';
 
 let client;
 
@@ -10,7 +11,7 @@ const accessToken = (serverTokenStore.token || '');
 function authProvider(callback) {
   const mobile = false;
   const authMessage = _.extend({
-    token: accessToken,
+    token: getAccessToken(),
     version: clientEnv['version'],
     connType: mobile ? 'mobile' : 'online',
     client: mobile ? 'mobweb' : 'web',
@@ -24,7 +25,7 @@ export function getRealtimeClient(){
   if(!client) {
     const c = clientEnv['websockets'] || {};
     client = new RealtimeClient({
-      token: accessToken ,
+      token: getAccessToken(),
       fayeUrl: c.fayeUrl,
       authProvider: authProvider,
       fayeOptions: c.options,

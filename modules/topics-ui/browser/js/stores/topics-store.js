@@ -6,6 +6,7 @@ import parseTag from '../../../shared/parse/tag';
 import {getRealtimeClient} from './realtime-client';
 import LiveCollection from './live-collection';
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
+import {getAccessToken} from './access-token-store';
 
 var TopicModel = Backbone.Model.extend({
   defaults: {},
@@ -16,7 +17,7 @@ var TopicModel = Backbone.Model.extend({
 
   sync(){
     //Need to abstract and pull in the apiClient here so this is a bodge
-    const headers = { "x-access-token": this.collection.getAccessToken() }
+    const headers = { "x-access-token": getAccessToken() }
     const catId = this.collection.getCategoryId();
     const data = JSON.stringify(Object.assign(this.toJSON(), {
       categoryId: catId,
@@ -63,7 +64,6 @@ export default dispatchOnChangeMixin(LiveCollection.extend({
   },
 
   initialize(models, attrs){
-    this.accessTokenStore = attrs.accessTokenStore;
     this.forumStore = attrs.forumStore;
     subscribe(SUBMIT_NEW_TOPIC, this.creatNewTopic, this);
   },
@@ -84,11 +84,6 @@ export default dispatchOnChangeMixin(LiveCollection.extend({
       topicId: model.get('id'),
       slug: model.get('slug')
     }));
-  },
-
-  //TODO Remove
-  getAccessToken(){
-    return this.accessTokenStore.get('accessToken');
   },
 
   getForumId(){
