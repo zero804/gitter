@@ -3,6 +3,7 @@
 var env = require('gitter-web-env');
 var stats = env.stats;
 var Promise = require('bluebird');
+var StatusError = require('statuserror');
 var Topic = require('gitter-web-persistence').Topic;
 var debug = require('debug')('gitter:app:topics:topic-service');
 var processText = require('gitter-web-text-processor');
@@ -10,6 +11,8 @@ var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var markdownMajorVersion = require('gitter-markdown-processor').version.split('.')[0];
 var validateTopic = require('./validate-topic');
+var validateTags = require('gitter-web-validators').validateTags;
+var liveCollections = require('gitter-web-live-collection-events');
 
 
 function findById(topicId) {
@@ -89,11 +92,54 @@ function createTopic(user, category, options) {
     });
 }
 
+function setTopicTags(user, topic, tags, options) {
+  tags = tags || [];
+
+  options = options || {};
+  // alternatively we could have passed a full forum object just to get to
+  // forum.tags
+  options.allowedTags = options.allowedTags || [];
+
+  if (!validateTags(tags, options.allowedTags)) {
+    throw new StatusError(400, 'Tags are invalid.');
+  }
+
+  var userId = user._id;
+  var forumId = topic.forumId;
+  var topicId = topic._id;
+
+  var query = {
+    _id: topicId
+  };
+  var update = {
+    $set: {
+      tags: tags
+    }
+  };
+  return Topic.findOneAndUpdate(query, update, { new: true })
+    .lean()
+    .exec()
+    .then(function(updatedTopic) {
+      // log a stats event
+      stats.event('update_topic_tags', {
+        userId: userId,
+        forumId: forumId,
+        topicId: topicId,
+        tags: tags
+      });
+
+      liveCollections.topics.emit('patch', forumId, topicId, { tags: updatedTopic.tags });
+
+      return updatedTopic;
+    });
+}
+
 module.exports = {
   findById: findById,
   findByForumId: findByForumId,
   findByForumIds: Promise.method(findByForumIds),
   findTotalsByForumIds: Promise.method(findTotalsByForumIds),
   findByIdForForum: findByIdForForum,
-  createTopic: Promise.method(createTopic)
+  createTopic: Promise.method(createTopic),
+  setTopicTags: Promise.method(setTopicTags)
 };
