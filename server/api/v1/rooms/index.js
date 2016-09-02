@@ -168,6 +168,7 @@ module.exports = {
   },
 
   subresources: {
+    'issues-info': require('./issues-info'),
     'issues': require('./issues'),
     'issue-state': require('./issue-state'),
     'users': require('./users'),
