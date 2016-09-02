@@ -19,12 +19,12 @@ function isMatch(object, source) {
     if (objectValue === undefined) return false;
 
     var sourceValue = source[key];
-    if (_.isObject(sourceValue))  {
+    if (_.isObject(sourceValue)) {
       // recurse on objects
       return isMatch(objectValue, sourceValue);
     } else {
       // simple values must match
-      return objectValue == sourceValue;
+      return objectValue === sourceValue;
     }
 
     // TODO: support arrays
