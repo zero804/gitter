@@ -7,6 +7,7 @@ import LiveCollection from './live-collection';
 import {getRealtimeClient} from './realtime-client';
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
 import {getAccessToken} from './access-token-store';
+import {getCurrentUser} from './current-user-store';
 
 export const ReplyStore = Backbone.Model.extend({
   defaults: {},
@@ -50,7 +51,6 @@ export const RepliesStore = dispatchOnChangeMixin(LiveCollection.extend({
     this.router = attrs.router;
     this.forumStore = attrs.forumStore;
     this.topicsStore = attrs.topicsStore;
-    this.currentUserStore = attrs.currentUserStore;
     subscribe(SUBMIT_NEW_REPLY, this.createNewReply, this);
   },
 
@@ -63,7 +63,7 @@ export const RepliesStore = dispatchOnChangeMixin(LiveCollection.extend({
   createNewReply(data){
     this.create({
       text: data.body,
-      user: this.currentUserStore.getCurrentUser()
+      user: getCurrentUser(),
     });
   },
 
