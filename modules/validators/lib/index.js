@@ -10,4 +10,5 @@ module.exports = {
   validateProviders: require('./validate-providers'),
   validateRoomName: require('./validate-room-name'),
   validateSlug: require('./validate-slug'),
+  validateTags: require('./validate-tags'),
 };

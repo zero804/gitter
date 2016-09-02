@@ -108,7 +108,7 @@
     "node/no-unsupported-features": [
       "error",
       {
-        "version": 0.1
+        "version": 4
       }
     ]
   }
