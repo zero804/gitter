@@ -15,6 +15,7 @@ var chatService = require('./chat-service');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var roomMembershipService = require('./room-membership-service');
 var roomService = require('./room-service');
+var roomRepoService = require('./room-repo-service');
 var assert = require('assert');
 var roomMetaService = require('./room-meta-service');
 var processText = require('gitter-web-text-processor');
@@ -367,8 +368,27 @@ RoomWithPolicyService.prototype.removeUserFromRoom = secureMethod([removeUserFro
 /**
  * Add an existing Gitter user to a room
  */
-RoomWithPolicyService.prototype.sendBadgePullRequest = secureMethod([allowAdmin], function() {
-  return roomService.sendBadgePullRequest(this.room, this.user);
+RoomWithPolicyService.prototype.sendBadgePullRequest = secureMethod([allowAdmin], function(repoUri) {
+  return (repoUri ? Promise.resolve(repoUri) : roomRepoService.findAssociatedGithubRepoForRoom(this.room))
+    .bind(this)
+    .then(function(repoUri) {
+      if (!repoUri) throw new StatusError(400, 'Room not associated with repo');
+
+      return roomRepoService.sendBadgePullRequestForRepo(this.room, this.user, repoUri);
+    });
+});
+
+/**
+ * Add an existing Gitter user to a room
+ */
+RoomWithPolicyService.prototype.autoConfigureHooks = secureMethod([allowAdmin], function() {
+  return roomRepoService.findAssociatedGithubRepoForRoom(this.room)
+    .bind(this)
+    .then(function(repoUri) {
+      if (!repoUri) throw new StatusError(400, 'Room not associated with repo');
+
+      return roomRepoService.autoConfigureHooksForRoom(this.user, this.room, repoUri);
+    });
 });
 
 module.exports = RoomWithPolicyService;
