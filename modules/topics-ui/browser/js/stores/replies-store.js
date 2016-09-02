@@ -3,7 +3,7 @@ import $ from 'jquery';
 import parseReply from '../../../shared/parse/reply';
 import {subscribe} from '../../../shared/dispatcher';
 import {SUBMIT_NEW_REPLY, REPLY_CREATED} from '../../../shared/constants/create-reply';
-import {LiveCollection} from 'gitter-realtime-client';
+import LiveCollection from './live-collection';
 import {getRealtimeClient} from './realtime-client';
 
 export const ReplyStore = Backbone.Model.extend({
@@ -43,16 +43,10 @@ export const RepliesStore = LiveCollection.extend({
   model: ReplyStore,
   client: getRealtimeClient(),
   urlTemplate: '/v1/forums/:forumId/topics/:topicId/replies',
-
-  constructor(models, attrs){
-    this.contextModel = attrs.contextModel = new Backbone.Model({
+  getContextModel(attrs){
+    return new Backbone.Model({
       forumId: attrs.forumStore.get('id'),
       topicId: attrs.router.get('topicId'),
-    });
-    attrs.listen = true;
-    LiveCollection.prototype.constructor.apply(this, [models, attrs]);
-    this.listenTo(this, 'all', (t) => {
-      console.log('EVT: -->', t);
     });
   },
 
