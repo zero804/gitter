@@ -36,8 +36,10 @@ function convertToIssueAnchor(element, githubIssueUrl) {
 }
 
 function getIssueState(repo, issueNumber) {
-  var issue = repo + '/' + issueNumber;
-  return apiClient.priv.get('/issue-state', { q: issue })
+  var issue = (repo ? (repo + '/') : '') + issueNumber;
+  return apiClient.room.get('/issue-state', {
+      q: issue
+    })
     .then(function(states) {
       return states[0];
     });
@@ -105,7 +107,14 @@ var IssueModel = Backbone.Model.extend({
   idAttribute: 'number',
   urlRoot: function() {
     var repo = this.get('repo');
-    return '/private/gh/repos/' + repo + '/issues/';
+
+    var endpoint = '/private/gh/repos/' + repo + '/issues/';
+
+    if(!repo) {
+      endpoint = apiClient.room.uri('/issues');
+    }
+
+    return endpoint;
   },
   sync: SyncMixin.sync
 });
@@ -117,38 +126,37 @@ function getGitHubIssueUrl(repo, issueNumber) {
 
 var decorator = {
   decorate: function(view) {
+    var room = context.troupe();
     var roomRepo = getRoomRepo();
 
     Array.prototype.forEach.call(view.el.querySelectorAll('*[data-link-type="issue"]'), function(issueElement) {
       var repo = issueElement.dataset.issueRepo || roomRepo;
-      if(repo) {
-        var issueNumber = issueElement.dataset.issue;
-        var githubIssueUrl = getGitHubIssueUrl(repo, issueNumber);
+      var issueNumber = issueElement.dataset.issue;
+      var githubIssueUrl = getGitHubIssueUrl(repo, issueNumber);
 
-        issueElement = convertToIssueAnchor(issueElement, githubIssueUrl);
+      issueElement = convertToIssueAnchor(issueElement, githubIssueUrl);
 
-        getIssueState(repo, issueNumber)
-          .then(function(state) {
-            if(state) {
-              // We depend on this to style the issue after making sure it is an issue
-              issueElement.classList.add('is-existent');
+      getIssueState(repo, issueNumber, room.get('id'))
+        .then(function(state) {
+          if(state) {
+            // We depend on this to style the issue after making sure it is an issue
+            issueElement.classList.add('is-existent');
 
-              // dont change the issue state colouring for the activity feed
-              if(!issueElement.classList.contains('open') && !issueElement.classList.contains('closed')) {
-                issueElement.classList.add(state);
-              }
-
-              // Hook up all of the listeners
-              issueElement.addEventListener('click', showPopover);
-              issueElement.addEventListener('mouseover', showPopoverLater);
-
-              view.once('destroy', function() {
-                issueElement.removeEventListener('click', showPopover);
-                issueElement.removeEventListener('mouseover', showPopoverLater);
-              });
+            // dont change the issue state colouring for the activity feed
+            if(!issueElement.classList.contains('open') && !issueElement.classList.contains('closed')) {
+              issueElement.classList.add(state);
             }
-          });
-      }
+
+            // Hook up all of the listeners
+            issueElement.addEventListener('click', showPopover);
+            issueElement.addEventListener('mouseover', showPopoverLater);
+
+            view.once('destroy', function() {
+              issueElement.removeEventListener('click', showPopover);
+              issueElement.removeEventListener('mouseover', showPopoverLater);
+            });
+          }
+        });
 
       function getModel() {
         var model = new IssueModel({
