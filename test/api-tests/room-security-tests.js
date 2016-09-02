@@ -5,7 +5,6 @@ process.env.DISABLE_API_LISTEN = '1';
 var Promise = require('bluebird');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assert = require('assert');
-var _ = require('lodash');
 
 describe('room-security-api', function() {
   var app, request;
@@ -30,8 +29,20 @@ describe('room-security-api', function() {
         extraAdmins: ['user1']
       },
       users: ['user1'],
+    },
+    group1: {
+    },
+    troupe2: {
+      securityDescriptor: {
+        type: null,
+        members: 'PUBLIC',
+        admins: 'MANUAL',
+        extraAdmins: ['user1']
+      },
+      users: ['user1'],
       group: 'group1'
-    }
+    },
+
   });
 
   it('GET /v1/rooms/:roomId/security', function() {
@@ -42,6 +53,20 @@ describe('room-security-api', function() {
       .expect(200)
       .then(function(res) {
         assert.deepEqual(res.body, { admins: 'MANUAL', members: 'PUBLIC' })
+      });
+  });
+
+  it('PUT /v1/rooms/:roomId/security', function() {
+    var roomId = fixture.troupe2.id;
+    return request(app)
+      .put('/v1/rooms/' + roomId + '/security')
+      .send({
+        type: 'GROUP'
+      })
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+      .then(function(res) {
+        assert.deepEqual(res.body, { type: 'GROUP', admins: 'GROUP_ADMIN', members: 'PUBLIC' })
       });
   });
 

@@ -9,7 +9,7 @@ module.exports = new SecurityResourceExtraAdminsRoute({
   getSecurityDescriptorWithPolicyService: function(req) {
     return loadTroupeFromParam(req)
       .then(function(troupe) {
-        return sdWithPolicyFactory.createForRoom(troupe._id, troupe.sd, req.userRoomPolicy);
+        return sdWithPolicyFactory.createForRoom(troupe, req.userRoomPolicy);
       });
   },
 })

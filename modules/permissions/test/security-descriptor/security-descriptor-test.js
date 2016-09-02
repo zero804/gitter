@@ -2,8 +2,7 @@
 
 var assert = require('assert');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
-var Group = require('gitter-web-persistence').Group;
-var dataAccess = require('../../lib/security-descriptor/data-access');
+var securityDescriptorService = require('../../lib/security-descriptor');
 
 describe('data-access-test', function() {
 
@@ -45,7 +44,7 @@ describe('data-access-test', function() {
     describe('findByIdForModel', function() {
       it('should findById without a user', function() {
         var groupId1 = fixture.group1.id;
-        return dataAccess.findByIdForModel(Group, groupId1)
+        return securityDescriptorService.group.findById(groupId1)
           .then(function(sd) {
             assert.strictEqual(sd.type, null);
             assert.strictEqual(sd.members, 'PUBLIC');
@@ -57,7 +56,7 @@ describe('data-access-test', function() {
       it('should findById with a user', function() {
         var groupId1 = fixture.group1.id;
         var userId1 = fixture.user1.id;
-        return dataAccess.findByIdForModel(Group, groupId1, userId1)
+        return securityDescriptorService.group.findById(groupId1, userId1)
           .then(function(sd) {
             assert.strictEqual(sd.type, null);
             assert.strictEqual(sd.members, 'PUBLIC');
@@ -70,7 +69,7 @@ describe('data-access-test', function() {
     describe('findExtraAdminsForModel', function() {
       it('should find extra admins when there are', function() {
         var groupId1 = fixture.group1.id;
-        return dataAccess.findExtraAdminsForModel(Group, groupId1)
+        return securityDescriptorService.group.findExtraAdmins(groupId1)
           .then(function(extraAdmins) {
             assert.deepEqual(extraAdmins.map(String), [fixture.user2.id]);
           });
@@ -78,7 +77,7 @@ describe('data-access-test', function() {
 
       it('should not find extra admins when there are none', function() {
         var groupId2 = fixture.group2.id;
-        return dataAccess.findExtraAdminsForModel(Group, groupId2)
+        return securityDescriptorService.group.findExtraAdmins(groupId2)
           .then(function(extraAdmins) {
             assert.deepEqual(extraAdmins.map(String), []);
           });
@@ -88,7 +87,7 @@ describe('data-access-test', function() {
     describe('findExtraMembersForModel', function() {
       it('should find extra admins when there are', function() {
         var groupId1 = fixture.group1.id;
-        return dataAccess.findExtraMembersForModel(Group, groupId1)
+        return securityDescriptorService.group.findExtraMembers(groupId1)
           .then(function(extraAdmins) {
             assert.deepEqual(extraAdmins.map(String), [fixture.user1.id]);
           });
@@ -96,7 +95,7 @@ describe('data-access-test', function() {
 
       it('should not find extra admins when there are none', function() {
         var groupId2 = fixture.group2.id;
-        return dataAccess.findExtraMembersForModel(Group, groupId2)
+        return securityDescriptorService.group.findExtraMembers(groupId2)
           .then(function(extraAdmins) {
             assert.deepEqual(extraAdmins.map(String), []);
           });
@@ -107,7 +106,7 @@ describe('data-access-test', function() {
       it('should add a user not in extraAdmins', function() {
         var groupId3 = fixture.group3.id;
         var userId1 = fixture.user1.id;
-        return dataAccess.addExtraAdminForModel(Group, groupId3, userId1)
+        return securityDescriptorService.group.addExtraAdmin(groupId3, userId1)
           .then(function() {
           });
       });

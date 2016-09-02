@@ -10,6 +10,9 @@ function SecurityResourceExtraAdminsRoute(options) {
   this.getSecurityDescriptorWithPolicyService = options.getSecurityDescriptorWithPolicyService;
 }
 
+/**
+ * List extraAdmins on a descriptor
+ */
 SecurityResourceExtraAdminsRoute.prototype.index = function(req) {
   return this.getSecurityDescriptorWithPolicyService(req)
     .then(function(sdService) {
@@ -21,6 +24,9 @@ SecurityResourceExtraAdminsRoute.prototype.index = function(req) {
     });
 }
 
+/**
+ * Add an extraAdmin to a descriptor
+ */
 SecurityResourceExtraAdminsRoute.prototype.create = function(req) {
   var userId = req.body.id;
   // Validation....
@@ -35,6 +41,9 @@ SecurityResourceExtraAdminsRoute.prototype.create = function(req) {
     });
 }
 
+/**
+ * Remove an extraAdmin from a descriptor
+ */
 SecurityResourceExtraAdminsRoute.prototype.destroy = function(req, res) {
   var userId = req.params[this.id]
   return this.getSecurityDescriptorWithPolicyService(req)
