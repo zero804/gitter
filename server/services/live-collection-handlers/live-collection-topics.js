@@ -23,12 +23,10 @@ var liveCollectionTopics = {
     return serializeTopicToForum("create", topic);
   },
 
-  // TODO: actually call update
   update: function(topic) {
     return serializeTopicToForum("update", topic);
   },
 
-  // TODO: call patch
   patch: function(forumId, topicId, patch) {
     var url = "/forums/" + forumId + "/topics";
     var patchMessage = _.extend({ }, patch, { id: topicId });

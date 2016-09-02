@@ -5,6 +5,8 @@ var stats = env.stats;
 var Promise = require('bluebird');
 var Topic = require('gitter-web-persistence').Topic;
 var Reply = require('gitter-web-persistence').Reply;
+var debug = require('debug')('gitter:app:topics:reply-service');
+var liveCollections = require('gitter-web-live-collection-events');
 var processText = require('gitter-web-text-processor');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
@@ -34,8 +36,20 @@ function findByTopicIds(ids) {
     .exec();
 }
 
-function findTotalsByTopicIds(ids) {
-  return mongooseUtils.getEstimatedCountForIds(Reply, 'topicId', ids);
+function findTotalByTopicId(id, options) {
+  options = options || {};
+
+  return mongooseUtils.getEstimatedCountForId(Reply, 'topicId', id, {
+    read: options.read
+  });
+}
+
+function findTotalsByTopicIds(ids, options) {
+  options = options || {};
+
+  return mongooseUtils.getEstimatedCountForIds(Reply, 'topicId', ids, {
+    read: options.read
+  });
 }
 
 function findByIdForForum(forumId, replyId) {
@@ -65,18 +79,51 @@ function findByIdForForumAndTopic(forumId, topicId, replyId) {
     });
 }
 
-function updateLastModifiedForTopic(topicId) {
-  // Load the topic again to get a fat object so we can call save() on it
-  return Topic.findById(topicId)
-    .exec()
-    .then(function(fatTopic) {
-      if (!fatTopic) return;
+function updateRepliesTotal(topicId) {
+  debug("updateRepliesTotal %s", topicId);
 
-      // Use mongoose's save event to update the topic's last modified value so
-      // that it will fire a persistence event for the live collections.
-      // For now.
-      fatTopic.lastModified = new Date();
-      return fatTopic.save();
+  var query = {
+    _id: topicId
+  };
+
+  var lastModified = new Date();
+
+  var update = {
+    $max: {
+      lastModified: lastModified
+    }
+  };
+
+  return Topic.findOneAndUpdate(query, update, { new: true })
+    .exec()
+    .bind({
+      topic: undefined
+    })
+    .then(function(topic) {
+      this.topic = topic;
+
+      if (topic) {
+        debug("topic.lastModified: %s, lastModified: %s", topic.lastModified, lastModified)
+      }
+
+      if (!topic || topic.lastModified.getTime() !== lastModified.getTime()) {
+        debug('We lost the topic update race.');
+        return;
+      }
+
+      // if this update won, then patch the live collection with the latest
+      // lastModified value and also the new total replies.
+      return findTotalByTopicId(topicId)
+        .then(function(repliesTotal) {
+          liveCollections.topics.emit('patch', topic.forumId, topicId, {
+            lastModified: lastModified,
+            repliesTotal: repliesTotal
+          })
+        });
+    })
+    .then(function() {
+      // return the topic that got updated (if it was updated).
+      return this.topic;
     });
 }
 
@@ -103,7 +150,7 @@ function createReply(user, topic, options) {
     .then(function(reply) {
       this.reply = reply;
 
-      return updateLastModifiedForTopic(topic._id);
+      return updateRepliesTotal(topic._id);
     })
 
     .then(function() {
@@ -124,6 +171,7 @@ module.exports = {
   findById: findById,
   findByTopicId: findByTopicId,
   findByTopicIds: findByTopicIds,
+  findTotalByTopicId: findTotalByTopicId,
   findTotalsByTopicIds: findTotalsByTopicIds,
   findByIdForForum: findByIdForForum,
   findByIdForForumAndTopic: findByIdForForumAndTopic,
