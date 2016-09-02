@@ -230,7 +230,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
       }.bind(this))
       .catch(function(err) {
         var status = err.status;
-        var message = 'Unable to create channel.';
+        var message = 'Unable to create room.';
 
         switch (status) {
           case 400:
