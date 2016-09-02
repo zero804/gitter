@@ -38,6 +38,15 @@ describe('data-access-test', function() {
           admins: 'MANUAL',
           public: true,
         }
+      },
+      group4: {
+        securityDescriptor: {
+          type: null,
+          members: 'PUBLIC',
+          admins: 'MANUAL',
+          public: true,
+          extraAdmins: ['user1']
+        }
       }
     });
 
@@ -107,8 +116,42 @@ describe('data-access-test', function() {
         var groupId3 = fixture.group3.id;
         var userId1 = fixture.user1.id;
         return securityDescriptorService.group.addExtraAdmin(groupId3, userId1)
-          .then(function() {
+          .then(function(modified) {
+            assert.strictEqual(modified, true);
+            return securityDescriptorService.group.findExtraAdmins(groupId3);
+          })
+          .then(function(userIds) {
+            assert(userIds.some(function(userId) {
+              return String(userId) === String(userId1);
+            }));
+
+            return securityDescriptorService.group.addExtraAdmin(groupId3, userId1);
+          })
+          .then(function(modified) {
+            assert.strictEqual(modified, false);
           });
+      });
+    });
+
+    describe('removeExtraAdmin', function() {
+      it('should remove a user in extraAdmins', function() {
+        var groupId4 = fixture.group4.id;
+        var userId1 = fixture.user1.id;
+        return securityDescriptorService.group.removeExtraAdmin(groupId4, userId1)
+          .then(function(modified) {
+            assert.strictEqual(modified, true);
+            return securityDescriptorService.group.findExtraAdmins(groupId4);
+          })
+          .then(function(userIds) {
+            assert(!userIds.some(function(userId) {
+              return String(userId) === String(userId1);
+            }));
+
+            return securityDescriptorService.group.removeExtraAdmin(groupId4, userId1);
+          })
+          .then(function(modified) {
+            assert.strictEqual(modified, false);
+          })
       });
     });
 
