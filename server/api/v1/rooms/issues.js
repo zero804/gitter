@@ -8,6 +8,7 @@ var processText = require('gitter-web-text-processor');
 var StatusError = require('statuserror');
 var loadTroupeFromParam = require('./load-troupe-param');
 var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
+var roomRepoService = require('../../../services/room-repo-service');
 
 function getEightSuggestedIssues(issues, includeRepo) {
   var suggestedIssues = [];
@@ -58,7 +59,7 @@ module.exports = {
         return loadTroupeFromParam(req)
           .then(function(troupe) {
             return [
-              securityDescriptorUtils.getLinkPathIfType('GH_REPO', troupe),
+              roomRepoService.findAssociatedGithubRepoForRoom(troupe),
               securityDescriptorUtils.getLinkPathIfType('GH_ORG', troupe),
             ];
           });
@@ -94,7 +95,9 @@ module.exports = {
   show: function(req) {
     return loadTroupeFromParam(req)
       .then(function(troupe) {
-        var repoUri = securityDescriptorUtils.getLinkPathIfType('GH_REPO', troupe);
+        return roomRepoService.findAssociatedGithubRepoForRoom(troupe);
+      })
+      .then(function(repoUri) {
         if(!repoUri) throw new StatusError(404);
 
         var issueNumber = req.params.issue;
