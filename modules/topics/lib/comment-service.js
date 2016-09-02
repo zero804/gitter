@@ -94,7 +94,7 @@ function updateCommentsTotal(topicId, replyId) {
         debug("topic.lastModified: %s, lastModified: %s", topic.lastModified, lastModified)
       }
 
-      if (topic && topic.lastModified.toString() === lastModified.toString()) {
+      if (topic && topic.lastModified.getTime() === lastModified.getTime()) {
         // if the topic update won, patch the topics live collection
         liveCollections.topics.emit('patch', topic.forumId, topicId, {
           lastModified: lastModified
