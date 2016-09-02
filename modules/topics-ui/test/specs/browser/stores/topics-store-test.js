@@ -18,7 +18,7 @@ export default describe('TopicsStore', () => {
   });
 
   it('should get a topic but id', () => {
-    assert.deepEqual(store.getById(1), topics[0]);
+    assert.deepEqual(store.getById(1).id, topics[0].id);
   });
 
   it.skip('should call create after the submit new topic event', () => {

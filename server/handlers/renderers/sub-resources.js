@@ -21,7 +21,8 @@ var SUBRESOURCE_MAPPINGS = {
   'userhome': ['userhome'],
   'router-chat': ['router-chat'],
   'router-nli-chat': ['router-nli-chat'],
-  'mobile-app': ['mobile-app']
+  'mobile-chat': ['mobile-chat'],
+  'router-mobile-app': ['mobile-app']
 };
 
 var CACHED_SUBRESOURCES = Object.keys(SUBRESOURCE_MAPPINGS).reduce(function(memo, key) {

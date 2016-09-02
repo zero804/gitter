@@ -10,7 +10,7 @@ var MobileUserhomeLayout = require('./views/layouts/mobile-userhome');
 //Left Menu Additions
 //var gestures             = require('./utils/gesture-controller');
 
-//Remove when Lef Menu is in
+//Remove when Left Menu is in
 var FastClick = require('fastclick');
 
 require('./utils/tracking');
