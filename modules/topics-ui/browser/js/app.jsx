@@ -10,7 +10,7 @@ import TagStore from './stores/forum-tag-store';
 import TopicsStore from './stores/topics-store';
 import NewTopicStore from './stores/new-topic-store';
 import ForumStore from './stores/forum-store';
-import AccessTokenStore from './stores/access-token-store';
+import {getAccessToken} from './stores/access-token-store';
 import {RepliesStore} from './stores/replies-store';
 import CurrentUserStore from './stores/current-user-store';
 import NewReplyStore from './stores/new-reply-store';
@@ -69,7 +69,6 @@ export default React.createClass({
       groupName: router.get('groupName'),
       route: router.get('route'),
       router: router,
-      accessTokenStore: this.getAccessTokenStore(),
       currentUserStore: this.getCurrentUserStore(),
     };
   },
@@ -106,7 +105,6 @@ export default React.createClass({
 
   getTopicState(){
     var {router} = this.props;
-    const topicId = router.get('topicId');
     const topicsStore = this.getTopicsStore();
     const repliesStore = this.getRepliesStore();
 
@@ -121,11 +119,6 @@ export default React.createClass({
   },
 
   //STORES -------------------------------
-  getAccessTokenStore(){
-    const accessTokenStore = (window.context.accessTokenStore || {});
-    if(this.hasRendered && this.state.accessTokenStore) { return this.state.accessTokenStore }
-    return new AccessTokenStore({ accessToken: accessTokenStore.token });
-  },
 
   getCurrentUserStore(){
     const currentUserStore = (window.context.currentUserStore || {});
@@ -159,14 +152,12 @@ export default React.createClass({
 
   getTopicsStore(){
     const {router} = this.props;
-    const accessTokenStore = this.getAccessTokenStore();
     const forumStore = this.getForumStore();
     const topicsStore = (window.context.topicsStore || {});
 
     if(this.hasRendered && this.state.topicsStore) { return this.state.topicsStore; }
     return new TopicsStore(topicsStore.models, {
       router: router,
-      accessTokenStore: accessTokenStore,
       forumStore: forumStore,
     });
   },
@@ -175,7 +166,6 @@ export default React.createClass({
 
     const {router} = this.props;
     const repliesStore = (window.context.repliesStore || {});
-    const accessTokenStore = this.getAccessTokenStore();
     const forumStore = this.getForumStore();
     const topicsStore = this.getTopicsStore();
     const currentUserStore = this.getCurrentUserStore();
@@ -183,7 +173,6 @@ export default React.createClass({
     if(this.hasRendered && this.state.repliesStore) { return this.state.repliesStore; }
     return new RepliesStore(repliesStore.models, {
       router: router,
-      accessTokenStore: accessTokenStore,
       forumStore: forumStore,
       topicsStore: topicsStore,
       currentUserStore: currentUserStore
