@@ -11,7 +11,7 @@ GroupStrategy.prototype = {
   name: 'GroupStrategy',
 
   preload: function() {
-    this.securityDescriptorStrategy = new SecurityDescriptorStrategy();
+    this.securityDescriptorStrategy = SecurityDescriptorStrategy.simple();
     return;
   },
 

@@ -21,7 +21,30 @@ SecurityResourceExtraAdminsRoute.prototype.index = function(req) {
     });
 }
 
-// TODO: post/create
-// TODO: delete by userId
+SecurityResourceExtraAdminsRoute.prototype.create = function(req) {
+  var userId = req.body.id;
+  // Validation....
+
+  return this.getSecurityDescriptorWithPolicyService(req)
+    .then(function(sdService) {
+      return sdService.addExtraAdmin(userId);
+    })
+    .then(function() {
+      var strategy = new restSerializer.UserIdStrategy({ });
+      return restSerializer.serializeObject(userId, strategy);
+    });
+}
+
+SecurityResourceExtraAdminsRoute.prototype.destroy = function(req, res) {
+  var userId = req.params[this.id]
+  return this.getSecurityDescriptorWithPolicyService(req)
+    .then(function(sdService) {
+      return sdService.removeExtraAdmin(userId);
+    })
+    .then(function() {
+      res.status(204);
+      return null;
+    });
+}
 
 module.exports = SecurityResourceExtraAdminsRoute;
