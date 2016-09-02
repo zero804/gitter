@@ -145,7 +145,7 @@ describe('chat-strategy-test', function() {
           username: fixture.user1.username,
           displayName: fixture.user1.displayName,
           url: '/' + fixture.user1.username,
-          avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + fixture.user1.username,
+          avatarUrl: nconf.get('avatar:officialHost') + '/g/u/' + fixture.user1.username,
           avatarUrlSmall: '/api/private/user-avatar/' + fixture.user1.username + '?s=60',
           avatarUrlMedium: '/api/private/user-avatar/' + fixture.user1.username + '?s=128',
           staff: false,

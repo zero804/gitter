@@ -20,7 +20,9 @@ var adminPolicy = {
 describe('forum-with-policy-service #slow', function() {
   var fixture = fixtureLoader.setup({
     user1: {},
-    forum1: {},
+    forum1: {
+      tags: ['cats', 'dogs']
+    },
     category1: {
       forum: 'forum1'
     },
