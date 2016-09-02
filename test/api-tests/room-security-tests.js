@@ -42,6 +42,16 @@ describe('room-security-api', function() {
       users: ['user1'],
       group: 'group1'
     },
+    troupe3: {
+      securityDescriptor: {
+        type: null,
+        members: 'PUBLIC',
+        admins: 'MANUAL',
+        extraAdmins: ['user1']
+      },
+      users: ['user1'],
+      group: 'group1'
+    },
 
   });
 
@@ -56,7 +66,7 @@ describe('room-security-api', function() {
       });
   });
 
-  it('PUT /v1/rooms/:roomId/security', function() {
+  it('PUT /v1/rooms/:roomId/security - no changes to extraAdmins', function() {
     var roomId = fixture.troupe2.id;
     return request(app)
       .put('/v1/rooms/' + roomId + '/security')
@@ -67,6 +77,24 @@ describe('room-security-api', function() {
       .expect(200)
       .then(function(res) {
         assert.deepEqual(res.body, { type: 'GROUP', admins: 'GROUP_ADMIN', members: 'PUBLIC' })
+      });
+  });
+
+  it('PUT /v1/rooms/:roomId/security - updated extraAdmins', function() {
+    var roomId = fixture.troupe3.id;
+    return request(app)
+      .put('/v1/rooms/' + roomId + '/security')
+      .send({
+        type: null,
+        extraAdmins: [fixture.user1.id, fixture.user2.id]
+      })
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+      .then(function(res) {
+        assert.deepEqual(res.body, {
+          admins: 'MANUAL',
+          members: 'PUBLIC'
+        })
       });
   });
 

@@ -4,7 +4,7 @@ var StatusError = require('statuserror');
 var Group = require('gitter-web-persistence').Group;
 var Promise = require('bluebird');
 
-function transformFromUnbackedToGroup(sd, groupId) {
+function transformToGroup(sd, groupId) {
   var isPublic = sd.public;
   var members;
 
@@ -22,12 +22,12 @@ function transformFromUnbackedToGroup(sd, groupId) {
     linkPath: null,
     internalId: groupId,
     externalId: null,
-    extraAdmins: [],
-    extraMembers: []
+    extraAdmins: sd.extraAdmins || [],
+    extraMembers: sd.extraMembers || []
   }
 }
 
-function transformFromGitHubBackedToGroup(sd, groupId) {
+function transformToUnbacked(sd) {
   var isPublic = sd.public;
   var members;
 
@@ -38,56 +38,19 @@ function transformFromGitHubBackedToGroup(sd, groupId) {
   }
 
   return {
-    type: 'GROUP',
+    type: null,
     members: members,
-    admins: 'GROUP_ADMIN',
+    admins: 'MANUAL',
     public: isPublic,
     linkPath: null,
-    internalId: groupId,
+    internalId: null,
     externalId: null,
-    extraAdmins: [],
-    extraMembers: []
+    extraAdmins: sd.extraAdmins || [],
+    extraMembers: sd.extraMembers || []
   }
 }
 
-// function transformFromGitHubBackedToUnbacked(Model, sd, newType, options) {
-//
-// }
-
-
-// /**
-//  * Transform from GROUP to null
-//  */
-// function transformFromGroupToUnbacked(Model, sd) {
-//   var isPublic = sd.public;
-//   var members;
-//
-//   if (isPublic) {
-//     members = 'PUBLIC';
-//   } else {
-//     members = 'INVITE';
-//   }
-//
-//   return {
-//     type: null,
-//     members: members,
-//     admins: 'MANUAL',
-//     public: isPublic,
-//     linkPath: null,
-//     internalId: null,
-//     externalId: null,
-//     extraAdmins: [], // TODO: XXX: prepopulate this
-//     extraMembers: []
-//   }
-// }
-
-function transform(Model, sd, newType, options) {
-  var groupId = options && options.groupId;
-  // Idempotent?
-  if (sd.type === newType) {
-    return sd;
-  }
-
+function validateTransformation(Model, sd, newType, groupId) {
   // Trying to get a group backed by a group
   if (Model === Group && newType === 'GROUP') {
     throw new StatusError(400, 'Groups cannot be backed by groups');
@@ -96,6 +59,16 @@ function transform(Model, sd, newType, options) {
   if (newType === 'GROUP' && !groupId) {
     throw new StatusError(400, 'groupId required');
   }
+}
+
+function transform(Model, sd, newType, options) {
+  var groupId = options && options.groupId;
+  // Idempotent?
+  if (sd.type === newType) {
+    return sd;
+  }
+
+  validateTransformation(Model, sd, newType, groupId);
 
   switch(sd.type) {
     case 'ONE_TO_ONE':
@@ -105,25 +78,24 @@ function transform(Model, sd, newType, options) {
     case null:
       // Unbacked can only become groups right now...
       if (newType !== 'GROUP') break;
-
-      return transformFromUnbackedToGroup(sd, groupId);
+      return transformToGroup(sd, groupId);
 
     case 'GH_ORG':
     case 'GH_REPO':
     case 'GH_USER':
       switch(newType) {
-        // case null:
-        //   return transformFromGitHubBackedToUnbacked(Model, sd, newType, options);
+        case null:
+          return transformToUnbacked(sd);
         case 'GROUP':
-          return transformFromGitHubBackedToGroup(sd, groupId);
+          return transformToGroup(sd, groupId);
       }
       break;
 
     case 'GROUP':
       // Groups can only become unbacked right now...
-      // if (newType !== null) break;
-      //
-      // return transformFromGroupToUnbacked(sd);
+      if (newType !== null) break;
+
+      return transformToUnbacked(sd);
   }
 
   throw new StatusError(400, 'Cannot transform from ' + sd.type + ' to ' + newType);
