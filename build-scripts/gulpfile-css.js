@@ -11,6 +11,7 @@ gulp.task('css:compile', ['css:compile:mobile', 'css:compile:desktop']);
 
 var cssMobileStyleBuilder = styleBuilder([
   'public/less/mobile-app.less',
+  'public/less/mobile-chat.less',
   'public/less/mobile-nli-app.less',
   'public/less/mobile-userhome.less',
   'public/less/mobile-native-userhome.less'
