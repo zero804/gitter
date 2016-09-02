@@ -95,7 +95,7 @@
           "dependencies": {
             "inherits": {
               "version": "2.0.1",
-              "from": "inherits@2.0.1",
+              "from": "inherits@>=2.0.1 <2.1.0",
               "resolved": "http://beta-internal:4873/inherits/-/inherits-2.0.1.tgz"
             },
             "setprototypeof": {
@@ -284,7 +284,7 @@
                 },
                 "minimatch": {
                   "version": "3.0.3",
-                  "from": "minimatch@>=2.0.0 <3.0.0||>=3.0.0 <4.0.0",
+                  "from": "minimatch@>=3.0.2 <4.0.0",
                   "resolved": "http://beta-internal:4873/minimatch/-/minimatch-3.0.3.tgz",
                   "dependencies": {
                     "brace-expansion": {
@@ -1640,7 +1640,7 @@
                         "extsprintf": {
                           "version": "1.0.2",
                           "from": "extsprintf@1.0.2",
-                          "resolved": "https://registry.npmjs.org/extsprintf/-/extsprintf-1.0.2.tgz"
+                          "resolved": "http://beta-internal:4873/extsprintf/-/extsprintf-1.0.2.tgz"
                         },
                         "json-schema": {
                           "version": "0.2.2",
@@ -2361,6 +2361,11 @@
       "from": "modules/linkedin-backend",
       "resolved": "file:modules/linkedin-backend"
     },
+    "gitter-web-live-collection-events": {
+      "version": "1.0.0",
+      "from": "modules/live-collection-events",
+      "resolved": "file:modules/live-collection-events"
+    },
     "gitter-web-mongoose-bluebird": {
       "version": "1.0.0",
       "from": "modules/mongoose-bluebird",
@@ -2941,7 +2946,7 @@
                         "extsprintf": {
                           "version": "1.0.2",
                           "from": "extsprintf@1.0.2",
-                          "resolved": "https://registry.npmjs.org/extsprintf/-/extsprintf-1.0.2.tgz"
+                          "resolved": "http://beta-internal:4873/extsprintf/-/extsprintf-1.0.2.tgz"
                         },
                         "json-schema": {
                           "version": "0.2.2",
@@ -3426,7 +3431,7 @@
               "dependencies": {
                 "semver": {
                   "version": "5.3.0",
-                  "from": "semver@>=5.1.0 <6.0.0",
+                  "from": "semver@>=2.0.0 <3.0.0||>=3.0.0 <4.0.0||>=4.0.0 <5.0.0||>=5.0.0 <6.0.0",
                   "resolved": "http://beta-internal:4873/semver/-/semver-5.3.0.tgz"
                 },
                 "resolve-from": {
@@ -3958,7 +3963,7 @@
       "dependencies": {
         "passport-oauth2": {
           "version": "1.3.0",
-          "from": "passport-oauth2@>=1.0.0 <2.0.0",
+          "from": "passport-oauth2@>=1.1.2 <2.0.0",
           "resolved": "http://beta-internal:4873/passport-oauth2/-/passport-oauth2-1.3.0.tgz",
           "dependencies": {
             "passport-strategy": {
@@ -4011,7 +4016,7 @@
       "dependencies": {
         "passport-oauth2": {
           "version": "1.3.0",
-          "from": "passport-oauth2@>=1.0.0 <2.0.0",
+          "from": "passport-oauth2@>=1.1.2 <2.0.0",
           "resolved": "http://beta-internal:4873/passport-oauth2/-/passport-oauth2-1.3.0.tgz",
           "dependencies": {
             "passport-strategy": {
@@ -4581,7 +4586,7 @@
                     "extsprintf": {
                       "version": "1.0.2",
                       "from": "extsprintf@1.0.2",
-                      "resolved": "https://registry.npmjs.org/extsprintf/-/extsprintf-1.0.2.tgz"
+                      "resolved": "http://beta-internal:4873/extsprintf/-/extsprintf-1.0.2.tgz"
                     },
                     "json-schema": {
                       "version": "0.2.2",
@@ -5136,7 +5141,7 @@
                     "extsprintf": {
                       "version": "1.0.2",
                       "from": "extsprintf@1.0.2",
-                      "resolved": "https://registry.npmjs.org/extsprintf/-/extsprintf-1.0.2.tgz"
+                      "resolved": "http://beta-internal:4873/extsprintf/-/extsprintf-1.0.2.tgz"
                     },
                     "json-schema": {
                       "version": "0.2.2",
@@ -5935,7 +5940,7 @@
               "dependencies": {
                 "chalk": {
                   "version": "1.1.3",
-                  "from": "chalk@>=1.0.0 <2.0.0",
+                  "from": "chalk@>=1.1.1 <2.0.0",
                   "resolved": "http://beta-internal:4873/chalk/-/chalk-1.1.3.tgz",
                   "dependencies": {
                     "ansi-styles": {
@@ -6079,7 +6084,7 @@
                     "extsprintf": {
                       "version": "1.0.2",
                       "from": "extsprintf@1.0.2",
-                      "resolved": "https://registry.npmjs.org/extsprintf/-/extsprintf-1.0.2.tgz"
+                      "resolved": "http://beta-internal:4873/extsprintf/-/extsprintf-1.0.2.tgz"
                     },
                     "json-schema": {
                       "version": "0.2.2",
@@ -6276,7 +6281,7 @@
           "dependencies": {
             "strip-ansi": {
               "version": "3.0.1",
-              "from": "strip-ansi@>=3.0.0 <4.0.0",
+              "from": "strip-ansi@>=3.0.1 <4.0.0",
               "resolved": "http://beta-internal:4873/strip-ansi/-/strip-ansi-3.0.1.tgz",
               "dependencies": {
                 "ansi-regex": {
