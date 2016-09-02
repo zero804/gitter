@@ -51,6 +51,9 @@ export const RepliesStore = LiveCollection.extend({
     });
     attrs.listen = true;
     LiveCollection.prototype.constructor.apply(this, [models, attrs]);
+    this.listenTo(this, 'all', (t) => {
+      console.log('EVT: -->', t);
+    });
   },
 
   initialize(models, attrs){
