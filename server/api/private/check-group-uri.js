@@ -11,8 +11,7 @@ function checkGroupUri(req, res, next) {
         });
       } else if(!info.allowCreate && info.type === 'GH_ORG') {
         res.sendStatus(403);
-      }
-      else {
+      } else {
         res.sendStatus(409);
       }
     })
