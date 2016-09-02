@@ -5,6 +5,7 @@ import $ from 'jquery';
 import parseTag from '../../../shared/parse/tag';
 import {getRealtimeClient} from './realtime-client';
 import LiveCollection from './live-collection';
+import dispatchOnChangeMixin from './mixins/dispatch-on-change';
 
 var TopicModel = Backbone.Model.extend({
   defaults: {},
@@ -50,7 +51,7 @@ var TopicModel = Backbone.Model.extend({
 
 });
 
-export default LiveCollection.extend({
+export default dispatchOnChangeMixin(LiveCollection.extend({
 
   model: TopicModel,
   client: getRealtimeClient(),
@@ -78,13 +79,11 @@ export default LiveCollection.extend({
   },
 
   creatNewTopic(data){
-    const newTopic = this.create({ title: data.title, text: data.body });
-    newTopic.on(TOPIC_CREATED, () => {
-      this.trigger(TOPIC_CREATED, {
-        topicId: newTopic.get('id'),
-        slug: newTopic.get('slug')
-      });
-    })
+    const model = this.create({ title: data.title, text: data.body });
+    model.once(TOPIC_CREATED, () => this.trigger(TOPIC_CREATED, {
+      topicId: model.get('id'),
+      slug: model.get('slug')
+    }));
   },
 
   //TODO Remove
@@ -103,4 +102,4 @@ export default LiveCollection.extend({
     if(categories && categories[0]) { return categories[0].id; }
   }
 
-});
+}));

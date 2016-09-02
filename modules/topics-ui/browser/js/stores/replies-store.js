@@ -67,7 +67,7 @@ export const RepliesStore = dispatchOnChangeMixin(LiveCollection.extend({
   },
 
   createNewReply(data){
-    const newReply = this.create({
+    this.create({
       text: data.body,
       user: this.currentUserStore.getCurrentUser()
     });
