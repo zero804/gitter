@@ -1,12 +1,12 @@
-import { Model, Collection } from 'backbone';
+import Backbone from 'backbone';
 import {subscribe} from '../../../shared/dispatcher';
 import {SUBMIT_NEW_TOPIC, TOPIC_CREATED} from '../../../shared/constants/create-topic';
 import $ from 'jquery';
 import parseTag from '../../../shared/parse/tag';
 import {getRealtimeClient} from './realtime-client';
-import {LiveCollection} from 'gitter-realtime-client';
+import LiveCollection from './live-collection';
 
-var TopicModel = Model.extend({
+var TopicModel = Backbone.Model.extend({
   defaults: {},
   url(){
     const forumId = this.collection.getForumId();
@@ -55,17 +55,9 @@ export default LiveCollection.extend({
   model: TopicModel,
   client: getRealtimeClient(),
   urlTemplate: '/v1/forums/:forumId/topics',
-
-  constructor(models, attrs){
-    attrs.listen = true;
-    this.contextModel = new Model({
+  getContextModel(attrs){
+    return new Backbone.Model({
       forumId: attrs.forumStore.get('id')
-    });
-
-    LiveCollection.prototype.constructor.apply(this, [models, attrs]);
-
-    this.listenTo(this, 'all', (t) => {
-      console.log('TOPIC EVENT', t);
     });
   },
 
