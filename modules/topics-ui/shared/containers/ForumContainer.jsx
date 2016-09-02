@@ -99,6 +99,7 @@ export default React.createClass({
     tagStore.off(forumTagConstants.UPDATE_ACTIVE_TAG, this.onTagUpdate, this);
     router.off(forumFilterConstants.UPDATE_ACTIVE_FILTER, this.onFilterUpdate, this);
     router.off(forumSortConstants.UPDATE_ACTIVE_SORT, this.onSortUpdate, this);
+    router.off('change:createTopic', this.onCreateTopicChange, this);
   },
 
   render() {
