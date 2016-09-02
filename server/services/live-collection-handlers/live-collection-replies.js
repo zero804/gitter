@@ -30,7 +30,7 @@ var liveCollectionReplies = {
 
   patch: function(forumId, topicId, replyId, patch) {
     var url = '/forums/' + forumId + '/topics/' + topicId + '/replies';
-    var patchMessage = _.extend({ }, patch, { id: replyId });
+    var patchMessage = _.extend({ }, patch, { id: replyId.toString() });
     appEvents.dataChange2(url, 'patch', patchMessage, 'reply');
   },
 

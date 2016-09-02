@@ -55,7 +55,7 @@ describe('replies-live-collection', function() {
       operation: 'patch',
       type: 'reply',
       model: {
-        id: fixture.reply1.id,
+        id: fixture.reply1.id.toString(),
         commentsTotal: 1
       }
     });

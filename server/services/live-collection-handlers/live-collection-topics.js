@@ -29,7 +29,7 @@ var liveCollectionTopics = {
 
   patch: function(forumId, topicId, patch) {
     var url = "/forums/" + forumId + "/topics";
-    var patchMessage = _.extend({ }, patch, { id: topicId });
+    var patchMessage = _.extend({ }, patch, { id: topicId.toString() });
     appEvents.dataChange2(url, "patch", patchMessage, 'topic');
   },
 
