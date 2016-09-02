@@ -11,8 +11,9 @@ import TopicsStore from './stores/topics-store';
 import NewTopicStore from './stores/new-topic-store';
 import ForumStore from './stores/forum-store';
 import {RepliesStore} from './stores/replies-store';
-import CurrentUserStore from './stores/current-user-store';
 import NewReplyStore from './stores/new-reply-store';
+
+import {getCurrentUserStore} from './stores/current-user-store';
 
 import * as navConstants from '../../shared/constants/navigation';
 
@@ -68,7 +69,7 @@ export default React.createClass({
       groupName: router.get('groupName'),
       route: router.get('route'),
       router: router,
-      currentUserStore: this.getCurrentUserStore(),
+      currentUserStore: getCurrentUserStore(),
     };
   },
 
@@ -118,13 +119,6 @@ export default React.createClass({
   },
 
   //STORES -------------------------------
-
-  getCurrentUserStore(){
-    const currentUserStore = (window.context.currentUserStore || {});
-    if(this.hasRendered && this.state.currentUserStore) { return this.state.currentUserStore }
-    return new CurrentUserStore(currentUserStore.data);
-  },
-
   getForumStore(){
     const forumStore = (window.context.forumStore || {});
     if(this.hasRendered && this.state.forumStore) { return this.state.forumStore; }
@@ -167,14 +161,12 @@ export default React.createClass({
     const repliesStore = (window.context.repliesStore || {});
     const forumStore = this.getForumStore();
     const topicsStore = this.getTopicsStore();
-    const currentUserStore = this.getCurrentUserStore();
 
     if(this.hasRendered && this.state.repliesStore) { return this.state.repliesStore; }
     return new RepliesStore(repliesStore.models, {
       router: router,
       forumStore: forumStore,
       topicsStore: topicsStore,
-      currentUserStore: currentUserStore
     });
   },
 
