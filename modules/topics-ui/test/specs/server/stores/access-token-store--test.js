@@ -7,8 +7,13 @@ describe('accessTokenStore', () => {
 
   var data = {};
 
-  it('should an object with getAccessToken', () => {
-    assert(accessTokenStore(data).get);
+  it('should export a getAccessToken', () => {
+    assert(accessTokenStore(data).getAccessToken);
+  });
+
+
+it('should export a getAccessToken', () => {
+    assert(accessTokenStore(data).token);
   });
 
 });
