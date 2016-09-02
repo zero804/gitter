@@ -16,8 +16,6 @@ var userSettingsService = require('../../server/services/user-settings-service')
 var restSerializer = require('../../server/serializers/rest-serializer');
 var intercom = require('gitter-web-intercom');
 var getIntercomStream = require('intercom-stream');
-var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
-
 
 var opts = require('yargs')
   .option('segment', {
@@ -60,7 +58,7 @@ function getRoomsForUserId(userId) {
 }
 
 stream
-  .pipe(through2Concurrent.obj({maxConcurrency: 10},
+  .pipe(through2Concurrent.obj({ maxConcurrency: 10 },
   function(intercomUser, enc, callback) {
     var userId = intercomUser.user_id;
     var username = intercomUser.custom_attributes.username;
@@ -81,14 +79,10 @@ stream
         });
       })
       .then(function(suggestedRooms) {
-        return restSerializer.serialize(suggestedRooms, new restSerializer.SuggestedRoomStrategy());
+        var strategy = restSerializer.TroupeStrategy.createSuggestionStrategy();
+        return restSerializer.serialize(suggestedRooms, strategy);
       })
       .then(function(suggestions) {
-        // we use big avatars in the emails
-        suggestions.forEach(function(room) {
-          room.avatarUrl = resolveRoomAvatarUrl(room, 160);
-        });
-
         var suggestionsString = _.pluck(suggestions, 'uri').join(', ');
         console.log("Suggestions for", username + ':', suggestionsString);
 
@@ -109,7 +103,7 @@ stream
 
         return intercom.client.users.create(profile);
       })
-      .then(function(result) {
+      .then(function() {
         console.log('Done with', username);
       })
       //.nodeify(callback);
@@ -122,7 +116,7 @@ stream
         callback(err)
       });
   }))
-  .on('data', function(intercomUser) {
+  .on('data', function() {
   })
   .on('end', function() {
     console.log('done');

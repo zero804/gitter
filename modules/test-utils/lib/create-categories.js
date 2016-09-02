@@ -15,7 +15,8 @@ function createCategory(fixtureName, f) {
   var doc = {
     name: name,
     slug: f.slug || slugify(name),
-    forumId: f.forum && f.forum._id
+    forumId: f.forum && f.forum._id,
+    order: f.order
   };
 
   debug('Creating forum category %s with %j', fixtureName, doc);
