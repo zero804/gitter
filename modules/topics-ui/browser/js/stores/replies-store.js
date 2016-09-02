@@ -2,19 +2,19 @@ import Backbone from 'backbone';
 import $ from 'jquery';
 import parseReply from '../../../shared/parse/reply';
 import {subscribe} from '../../../shared/dispatcher';
-import {SUBMIT_NEW_REPLY, REPLY_CREATED} from '../../../shared/constants/create-reply';
+import {SUBMIT_NEW_REPLY} from '../../../shared/constants/create-reply';
 import LiveCollection from './live-collection';
 import {getRealtimeClient} from './realtime-client';
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
 import {getAccessToken} from './access-token-store';
 import {getCurrentUser} from './current-user-store';
+import {getForumId} from './forum-store'
 
 export const ReplyStore = Backbone.Model.extend({
   defaults: {},
   url(){
-    const forumId = this.collection.getForumId();
     const topicId = this.collection.getTopicId();
-    return this.get('id') ? null : `/api/v1/forums/${forumId}/topics/${topicId}/replies`;
+    return this.get('id') ? null : `/api/v1/forums/${getForumId()}/topics/${topicId}/replies`;
   },
 
   sync(method, model, options){
@@ -30,9 +30,8 @@ export const ReplyStore = Backbone.Model.extend({
       data: data,
       success: options.success
     });
-  },
+  }
 
-  onSuccess() {this.trigger(REPLY_CREATED, this);}
 });
 
 export const RepliesStore = dispatchOnChangeMixin(LiveCollection.extend({
@@ -40,16 +39,16 @@ export const RepliesStore = dispatchOnChangeMixin(LiveCollection.extend({
   model: ReplyStore,
   client: getRealtimeClient(),
   urlTemplate: '/v1/forums/:forumId/topics/:topicId/replies',
+
   getContextModel(attrs){
     return new Backbone.Model({
-      forumId: attrs.forumStore.get('id'),
+      forumId: getForumId(),
       topicId: attrs.router.get('topicId'),
     });
   },
 
   initialize(models, attrs){
     this.router = attrs.router;
-    this.forumStore = attrs.forumStore;
     this.topicsStore = attrs.topicsStore;
     subscribe(SUBMIT_NEW_REPLY, this.createNewReply, this);
   },
@@ -67,14 +66,8 @@ export const RepliesStore = dispatchOnChangeMixin(LiveCollection.extend({
     });
   },
 
-  getForumId(){
-    return this.forumStore.get('id');
-  },
-
   getTopicId(){
-    const topic = this.topicsStore.get(this.router.get('topicId'));
-    if(!topic) { return; }
-    return topic.get('id');
+    return this.router.get('topicId');
   }
 
 }));

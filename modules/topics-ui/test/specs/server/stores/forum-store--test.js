@@ -7,8 +7,12 @@ describe.skip('forumStore', () => {
 
   var data = {};
 
-  it('should an object with getForum', () => {
-    assert(forumStore(data).get);
+  it('should expose a data object', () => {
+    assert(forumStore(data).data);
+  });
+
+  it('should expose a getForum function', () => {
+    assert(ForumStore(data).getForum);
   });
 
 });
