@@ -39,6 +39,7 @@ var TopicModel = Model.extend({
 
   toJSON() {
     var data = this.attributes;
+    data.tags = (data.tags || []);
     return Object.assign({}, data, {
       tags: data.tags.map(parseTag)
     });

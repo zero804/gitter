@@ -3,6 +3,8 @@ import $ from 'jquery';
 import parseReply from '../../../shared/parse/reply';
 import {subscribe} from '../../../shared/dispatcher';
 import {SUBMIT_NEW_REPLY, REPLY_CREATED} from '../../../shared/constants/create-reply';
+import {LiveCollection} from 'gitter-realtime-client';
+import {getRealtimeClient} from './realtime-client';
 
 export const ReplyStore = Backbone.Model.extend({
   defaults: {},
@@ -12,7 +14,7 @@ export const ReplyStore = Backbone.Model.extend({
     return this.get('id') ? null : `/api/v1/forums/${forumId}/topics/${topicId}/replies`;
   },
 
-  sync(){
+  sync(method, model, options){
     //Need to abstract and pull in the apiClient here so this is a bodge
     const headers = { "x-access-token": this.collection.getAccessToken() }
     const data = JSON.stringify(this.toJSON());
@@ -23,22 +25,24 @@ export const ReplyStore = Backbone.Model.extend({
       type: 'POST',
       headers: headers,
       data: data,
-      success: this.onSuccess.bind(this),
+      success: (data) => {
+        options.success(data);
+        this.onSuccess();
+      },
       error: this.onError.bind(this),
     })
   },
 
-  onSuccess(attrs) {
-    this.set(attrs);
-    this.trigger(REPLY_CREATED, this);
-  },
-
-  onError(err){},
+  onSuccess() {this.trigger(REPLY_CREATED, this);}
 });
 
-export const RepliesStore = Backbone.Collection.extend({
+export const RepliesStore = LiveCollection.extend({
 
   model: ReplyStore,
+  client: getRealtimeClient(),
+  listen: true,
+  urlTemplate: '/v1/forums/:forumId/topics/:topicId/replies',
+
 
   initialize(models, attrs){
     this.accessTokenStore = attrs.accessTokenStore;
@@ -49,7 +53,9 @@ export const RepliesStore = Backbone.Collection.extend({
   },
 
   getReplies: function(){
-    return this.models.map(model => parseReply(model.toJSON()));
+    return this.models.map(model => {
+      return parseReply(model.toJSON())
+    });
   },
 
   createNewReply(data){

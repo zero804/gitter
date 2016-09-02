@@ -71,6 +71,7 @@ function renderForum(req, res, next, options) {
           fonts: fonts.getFonts(),
           componentData: {
             forum: forum,
+            context: context,
 
             groupName: req.params.groupName,
             categoryName: categoryName,
@@ -140,6 +141,7 @@ function renderTopic(req, res, next) {
                 fonts: fonts.getFonts(),
                 componentData: {
                   forum: forum,
+                  context: context,
                   groupName: req.params.groupName,
                   topicsStore: topicStore,
                   topicId: topicId,
