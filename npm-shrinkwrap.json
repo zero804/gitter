@@ -390,7 +390,7 @@
       "dependencies": {
         "redis": {
           "version": "2.6.2",
-          "from": "redis@latest",
+          "from": "redis@>=2.1.0 <3.0.0",
           "resolved": "http://beta-internal:4873/redis/-/redis-2.6.2.tgz",
           "dependencies": {
             "double-ended-queue": {
