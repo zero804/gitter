@@ -1,0 +1,30 @@
+@import "../../colors.less";
+@import (less, reference) "~gitter-styleguide/css/components/buttons.css";
+
+
+.topic-reply-list-header__heading {
+  margin-right: auto;
+  font-size:    2rem;
+  color:        @topic-reply-list-heading-color;
+  white-space:  nowrap;
+}
+
+.topic-reply-list-header__filter-list {
+  list-style:  none;
+  display:     flex;
+  align-items: center;
+  margin:      0;
+  padding:     0;
+}
+
+.topic-reply-list-header__filter-button {
+  &:extend(.secondary-button-thunder--small all);
+  padding: .8em 1em;
+  //TODO, this should be in the styleguide
+  &:hover { cursor: pointer; }
+}
+
+.topic-reply-list-header__filter-button--active {
+  &:extend(.button-clouds--xsmall all);
+  &:hover { cursor: pointer; }
+}

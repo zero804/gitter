@@ -61,9 +61,14 @@ router.get(new RegExp('/explore(.*)?'),
     var exploreParam = req.params[0] || '';
     var subFrameLocation = urlJoin('/home/~explore', exploreParam);
 
-    mainFrameRenderer.renderMainFrame(req, res, next, {
+    var renderer = mainFrameRenderer.renderMainFrame
+    if (req.isPhone) {
+      renderer = mainFrameRenderer.renderMobileMainFrame;
+    }
+
+    renderer(req, res, next, {
       subFrameLocation: subFrameLocation,
-      title: 'Explore ' + exploreParam.split('/').join(', '),
+      title: 'Explore',
       suggestedMenuState: 'search'
     });
   });

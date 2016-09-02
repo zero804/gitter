@@ -9,6 +9,9 @@ function checkGroupUri(req, res, next) {
         res.send({
           type: info.type
         });
+      // This is clearly a GitHub permsisions issue
+      } else if(!info.allowCreate && info.type === 'GH_ORG') {
+        res.sendStatus(403);
       } else {
         res.sendStatus(409);
       }

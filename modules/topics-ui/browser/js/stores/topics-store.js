@@ -2,6 +2,7 @@ import { Model, Collection } from 'backbone';
 import {subscribe} from '../../../shared/dispatcher';
 import {SUBMIT_NEW_TOPIC, TOPIC_CREATED} from '../../../shared/constants/create-topic';
 import $ from 'jquery';
+import parseTag from '../../../shared/parse/tag';
 
 var TopicModel = Model.extend({
   defaults: {},
@@ -33,7 +34,18 @@ var TopicModel = Model.extend({
     this.set(attrs);
     this.trigger(TOPIC_CREATED, this);
   },
-  onError(){}
+  onError(){
+
+  },
+
+  toJSON() {
+    var data = this.attributes;
+    return Object.assign({}, data, {
+      tags: data.tags.map(parseTag)
+    });
+  }
+
+
 });
 
 export default Collection.extend({
