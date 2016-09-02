@@ -5,7 +5,6 @@ import * as consts from '../../../shared/constants/create-topic';
 
 export default Backbone.Model.extend({
 
-  defaults: {},
   initialize(){
     subscribe(consts.TITLE_UPDATE, this.onTitleUpdate, this);
     subscribe(consts.BODY_UPDATE, this.onBodyUpdate, this);
