@@ -18,7 +18,7 @@ import * as forumFilterConstants from '../constants/forum-filters';
 import * as forumSortConstants from '../constants/forum-sorts';
 import * as navConstants from '../constants/navigation';
 
-export default React.createClass({
+const ForumContainer = React.createClass({
   displayName: 'ForumContainer',
 
   propTypes: {
@@ -195,3 +195,5 @@ export default React.createClass({
   }
 
 });
+
+export default ForumContainer;
