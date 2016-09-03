@@ -10,7 +10,7 @@ import updateReplyBody from '../action-creators/create-reply/body-update';
 import submitNewReply from '../action-creators/create-reply/submit-new-reply';
 import {REPLY_CREATED} from '../constants/create-reply';
 
-export default createClass({
+const TopicContainer = createClass({
 
   displayName: 'TopicContainer',
   propTypes: {
@@ -120,3 +120,5 @@ export default createClass({
   }
 
 });
+
+export default TopicContainer;
