@@ -1,18 +1,23 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import CategoryStore from '../../../../browser/js/stores/forum-category-store';
 import * as forumCatConstants from '../../../../shared/constants/forum-categories';
 import mockRouter from '../../../mocks/router';
 import categories from '../../../mocks/mock-data/categories';
 
-describe('ForumCategoryStore', function(){
 
+import injector from 'inject-loader!../../../../browser/js/stores/forum-category-store';
+const {getForumCategoryStore} = injector({
+  '../routers/index': mockRouter
+});
+
+
+describe('ForumCategoryStore', function(){
   let categoryStore;
   let handle;
 
   beforeEach(function(){
     handle = sinon.spy();
-    categoryStore = new CategoryStore(categories, { router: mockRouter });
+    categoryStore = getForumCategoryStore(categories);
   });
 
   it('should update the active element when the route changes', function(){
