@@ -9,12 +9,13 @@ import {getCurrentUser} from './current-user-store';
 import {getForumId} from './forum-store'
 import router from '../routers';
 import {BaseModel} from './base-model';
+import {NAVIGATE_TO_TOPIC} from '../../../shared/constants/navigation';
 
 export const ReplyStore = BaseModel.extend({
   url(){
     return this.get('id') ?
-      null :
-      `/api/v1/forums/${getForumId()}/topics/${router.get('topicId')}/replies`;
+    null :
+    `/api/v1/forums/${getForumId()}/topics/${router.get('topicId')}/replies`;
   },
 });
 
@@ -33,9 +34,11 @@ export const RepliesStore = LiveCollection.extend({
 
   initialize(){
     subscribe(SUBMIT_NEW_REPLY, this.createNewReply, this);
+    subscribe(NAVIGATE_TO_TOPIC, this.onNavigateToTopic, this);
+    router.on('change:topicId', this.onActiveTopicUpdate, this);
   },
 
-  getReplies: function(){
+  getReplies(){
     return this.models.map(model => {
       return parseReply(model.toJSON())
     });
@@ -46,7 +49,16 @@ export const RepliesStore = LiveCollection.extend({
       text: data.body,
       user: getCurrentUser(),
     });
+  },
+
+  onActiveTopicUpdate(router, topicId){
+    this.contextModel.set('topicId', topicId);
+  },
+
+  onNavigateToTopic(){
+    this.reset([]);
   }
+
 });
 
 dispatchOnChangeMixin(RepliesStore);
