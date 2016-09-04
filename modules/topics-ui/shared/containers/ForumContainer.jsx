@@ -144,6 +144,7 @@ const ForumContainer = React.createClass({
           active={createTopic}
           onTitleChange={this.onTitleChange}
           onBodyChange={this.onBodyChange}
+          onClose={this.onCreateTopicClose}
           onSubmit={this.onSubmit}/>
 
       </main>
@@ -156,6 +157,11 @@ const ForumContainer = React.createClass({
   onTagChange(tag){ dispatch(navigateToTag(tag));},
   onTitleChange(title){ dispatch(titleUpdate(title));},
   onBodyChange(body){ dispatch(bodyUpdate(body));},
+
+  onCreateTopicClose(){
+    const {categoryStore} = this.props;
+    dispatch(navigateToCategory(categoryStore.getActiveCategoryName()));
+  },
 
   onSubmit(){
     const {newTopicStore} = this.props;

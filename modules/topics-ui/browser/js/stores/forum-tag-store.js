@@ -20,7 +20,9 @@ export const ForumTagStore = Collection.extend({
   },
 
   getActiveTagName(){
-    return this.findWhere({ active: true }).get('value');
+    const model = this.findWhere({ active: true });
+    if(!model) { return; }
+    model.get('value');
   },
 
   getTags: function() {
