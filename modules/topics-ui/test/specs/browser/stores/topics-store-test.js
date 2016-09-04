@@ -1,17 +1,22 @@
 import assert from 'assert';
 import {stub} from 'sinon';
-import Store from '../../../../browser/js/stores/topics-store.js';
 import {dispatch} from '../../../../shared/dispatcher';
 import submitNewTopic from '../../../../shared/action-creators/create-topic/submit-new-topic';
-import mockRouter from '../../../mocks/router';
+
+//Mocks
 import topics from '../../../mocks/mock-data/topics';
 import forumStore from '../../../mocks/forum-store';
+
+import injector from 'inject-loader!../../../../browser/js/stores/topics-store.js';
+const {getTopicsStore} = injector({
+  './forum-store': forumStore
+});
 
 describe('TopicsStore', () => {
 
   let store;
   beforeEach(() => {
-    store = new Store(topics, { router: mockRouter, forumStore: forumStore });
+    store = getTopicsStore(topics);
   });
 
   it('should provide a getTopics()', () => {
