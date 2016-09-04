@@ -1,11 +1,15 @@
 import { Collection } from 'backbone';
 import { UPDATE_ACTIVE_TAG } from '../../../shared/constants/forum-tags';
+import router from '../routers/index';
+import dispatchOnChangeMixin from './mixins/dispatch-on-change';
 
-export default Collection.extend({
+const serverStore = (window.context.forumTagStore || {});
+const serverData = (serverStore || []);
 
-  initialize: function(models, attrs) {
-    this.router = attrs.router;
-    this.listenTo(this.router, 'change:tagName', this.onTagUpdate, this);
+export const ForumTagStore = Collection.extend({
+
+  initialize: function() {
+    this.listenTo(router, 'change:tagName', this.onTagUpdate, this);
   },
 
   onTagUpdate(model, val){
@@ -23,3 +27,13 @@ export default Collection.extend({
     return this.models.map(model => model.toJSON());
   },
 });
+
+dispatchOnChangeMixin(ForumTagStore);
+
+
+let store;
+export function getForumTagStore(data){
+  if(!store) { store = new ForumTagStore(serverData); }
+  if(data) { store.set(data); }
+  return store;
+}

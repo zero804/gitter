@@ -14,7 +14,7 @@ module.exports = function repliesStore(models) {
 
   //Methods
   return {
-    models: models,
+    data: models,
     getReplies: getReplies
   };
 

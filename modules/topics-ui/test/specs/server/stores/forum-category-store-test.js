@@ -4,7 +4,7 @@ var assert = require('assert');
 var categoryStore = require('../../../../server/stores/forum-category-store');
 var categories = require('../../../mocks/mock-data/categories');
 
-describe.only('CategoryStore', function(){
+describe('CategoryStore', function(){
 
   let store;
   //The sample data already contains an 'all' category that is removed here

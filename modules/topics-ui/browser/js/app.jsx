@@ -5,16 +5,15 @@ import ForumContainer from '../../shared/containers/ForumContainer.jsx';
 import TopicContainer from '../../shared/containers/TopicContainer.jsx';
 
 //Stores
-import CategoryStore from './stores/forum-category-store';
-import TagStore from './stores/forum-tag-store';
-import TopicsStore from './stores/topics-store';
 import NewTopicStore from './stores/new-topic-store';
-import ForumStore from './stores/forum-store';
-import {RepliesStore} from './stores/replies-store';
 import NewReplyStore from './stores/new-reply-store';
 
 import {getCurrentUserStore} from './stores/current-user-store';
 import {getForumStore} from './stores/forum-store';
+import {getForumTagStore} from './stores/forum-tag-store';
+import {getForumCategoryStore} from './stores/forum-category-store';
+import {getTopicsStore} from './stores/topics-store';
+import {getRepliesStore} from './stores/replies-store';
 
 import * as navConstants from '../../shared/constants/navigation';
 
@@ -77,21 +76,17 @@ export default React.createClass({
 
   getForumState(){
     const { router } = this.props;
-    const defaults = this.getDefaultState();
-
     //Construct State
-    return Object.assign(defaults, {
-
+    return Object.assign(this.getDefaultState(), {
       //Route params
       categoryName: router.get('categoryName'),
       filterName: router.get('filterName'),
       tagName: router.get('tagName'),
       sortName: router.get('sortName'),
-
       //Stores
-      categoryStore: this.getCategoryStore(),
-      tagStore: this.getTagStore(),
-      topicsStore: this.getTopicsStore(),
+      categoryStore: getForumCategoryStore(),
+      tagStore: getForumTagStore(),
+      topicsStore: getTopicsStore(),
       newTopicStore: new NewTopicStore(),
       createTopic: false,
     });
@@ -106,56 +101,13 @@ export default React.createClass({
 
   getTopicState(){
     var {router} = this.props;
-    const topicsStore = this.getTopicsStore();
-    const repliesStore = this.getRepliesStore();
-
     return Object.assign(this.getDefaultState(), {
       groupName: router.get('groupName'),
       topicId: router.get('topicId'),
-      topicsStore: topicsStore,
-      repliesStore: repliesStore,
-      categoryStore: this.getCategoryStore(),
+      topicsStore: getTopicsStore(),
+      repliesStore: getRepliesStore(),
+      categoryStore: getForumCategoryStore(),
       newReplyStore: new NewReplyStore(),
-    });
-  },
-
-
-  getCategoryStore(){
-    const {router} = this.props;
-    const categoryStore = (window.context.categoryStore || {});
-
-    if(this.hasRendered && this.state.categoryStore) { return this.state.categoryStore; }
-    return new CategoryStore(categoryStore.models, { router: router });
-  },
-
-  getTagStore(){
-    const {router} = this.props;
-    const tagStore = (window.context.tagStore || {});
-
-    if(this.hasRendered && this.state.tagStore) { return this.state.tagStore; }
-    return new TagStore(tagStore.models, { router: router });
-  },
-
-  getTopicsStore(){
-    const {router} = this.props;
-    const topicsStore = (window.context.topicsStore || {});
-
-    if(this.hasRendered && this.state.topicsStore) { return this.state.topicsStore; }
-    return new TopicsStore(topicsStore.models, {
-      router: router,
-    });
-  },
-
-  getRepliesStore(){
-
-    const {router} = this.props;
-    const repliesStore = (window.context.repliesStore || {});
-    const topicsStore = this.getTopicsStore();
-
-    if(this.hasRendered && this.state.repliesStore) { return this.state.repliesStore; }
-    return new RepliesStore(repliesStore.models, {
-      router: router,
-      topicsStore: topicsStore,
     });
   },
 

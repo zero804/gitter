@@ -9,12 +9,14 @@ import dispatchOnChangeMixin from './mixins/dispatch-on-change';
 import {getAccessToken} from './access-token-store';
 import {getCurrentUser} from './current-user-store';
 import {getForumId} from './forum-store'
+import router from '../routers';
 
 export const ReplyStore = Backbone.Model.extend({
   defaults: {},
   url(){
-    const topicId = this.collection.getTopicId();
-    return this.get('id') ? null : `/api/v1/forums/${getForumId()}/topics/${topicId}/replies`;
+    return this.get('id') ?
+      null :
+      `/api/v1/forums/${getForumId()}/topics/${router.get('topicId')}/replies`;
   },
 
   sync(method, model, options){
@@ -34,7 +36,7 @@ export const ReplyStore = Backbone.Model.extend({
 
 });
 
-export const RepliesStore = dispatchOnChangeMixin(LiveCollection.extend({
+export const RepliesStore = LiveCollection.extend({
 
   model: ReplyStore,
   client: getRealtimeClient(),
@@ -43,13 +45,11 @@ export const RepliesStore = dispatchOnChangeMixin(LiveCollection.extend({
   getContextModel(attrs){
     return new Backbone.Model({
       forumId: getForumId(),
-      topicId: attrs.router.get('topicId'),
+      topicId: router.get('topicId'),
     });
   },
 
-  initialize(models, attrs){
-    this.router = attrs.router;
-    this.topicsStore = attrs.topicsStore;
+  initialize(){
     subscribe(SUBMIT_NEW_REPLY, this.createNewReply, this);
   },
 
@@ -64,10 +64,17 @@ export const RepliesStore = dispatchOnChangeMixin(LiveCollection.extend({
       text: data.body,
       user: getCurrentUser(),
     });
-  },
-
-  getTopicId(){
-    return this.router.get('topicId');
   }
+});
 
-}));
+dispatchOnChangeMixin(RepliesStore);
+
+const serverStore = (window.context.repliesStore.data || {});
+const serverData = (serverStore || {});
+let store;
+
+export function getRepliesStore(data){
+  if(!store){ store = new RepliesStore(serverData); }
+  if(data) { store.set(data); }
+  return store;
+}

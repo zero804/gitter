@@ -68,6 +68,7 @@ const TopicContainer = createClass({
     const {replies, newReplyContent} = this.state;
     const topic = topicsStore.getById(topicId)
     const currentUser = currentUserStore.getCurrentUser();
+
     //TODO Improve this
     const category = categoryStore.getCategories()[1];
 

@@ -9,7 +9,7 @@ import dispatchOnChangeMixin from './mixins/dispatch-on-change';
 import {getAccessToken} from './access-token-store';
 import {getForumId, getForumStore} from './forum-store';
 
-var TopicModel = Backbone.Model.extend({
+export const TopicModel = Backbone.Model.extend({
   defaults: {},
   url(){
     return this.get('id') ? null : `/api/v1/forums/${getForumId()}/topics`;
@@ -52,7 +52,7 @@ var TopicModel = Backbone.Model.extend({
 
 });
 
-export default dispatchOnChangeMixin(LiveCollection.extend({
+export const TopicsStore = LiveCollection.extend({
 
   model: TopicModel,
   client: getRealtimeClient(),
@@ -93,4 +93,15 @@ export default dispatchOnChangeMixin(LiveCollection.extend({
     if(categories && categories[0]) { return categories[0].id; }
   }
 
-}));
+});
+
+dispatchOnChangeMixin(TopicsStore);
+
+const serverStore = (window.context.topicsStore || {});
+const serverData = (serverStore.data || {});
+let store;
+export function getTopicsStore(data){
+  if(!store) { store = new TopicsStore(serverData); }
+  if(data) { store.set(data); }
+  return store;
+}

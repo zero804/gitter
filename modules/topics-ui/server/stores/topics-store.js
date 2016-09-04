@@ -21,7 +21,7 @@ module.exports = function topicsStore(models) {
   }
   //Methods
   return {
-    models: models,
+    data: models,
     getTopics: getTopics,
     getById: getById
   };

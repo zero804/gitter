@@ -12,7 +12,7 @@ describe.skip('forumStore', () => {
   });
 
   it('should expose a getForum function', () => {
-    assert(ForumStore(data).getForum);
+    assert(forumStore(data).getForum);
   });
 
 });
