@@ -1,39 +1,21 @@
 import Backbone from 'backbone';
-import $ from 'jquery';
 import parseReply from '../../../shared/parse/reply';
 import {subscribe} from '../../../shared/dispatcher';
 import {SUBMIT_NEW_REPLY} from '../../../shared/constants/create-reply';
 import LiveCollection from './live-collection';
 import {getRealtimeClient} from './realtime-client';
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
-import {getAccessToken} from './access-token-store';
 import {getCurrentUser} from './current-user-store';
 import {getForumId} from './forum-store'
 import router from '../routers';
+import {BaseModel} from './base-model';
 
-export const ReplyStore = Backbone.Model.extend({
-  defaults: {},
+export const ReplyStore = BaseModel.extend({
   url(){
     return this.get('id') ?
       null :
       `/api/v1/forums/${getForumId()}/topics/${router.get('topicId')}/replies`;
   },
-
-  sync(method, model, options){
-    //Need to abstract and pull in the apiClient here so this is a bodge
-    const headers = { "x-access-token": getAccessToken() }
-    const data = JSON.stringify(this.toJSON());
-
-    $.ajax({
-      url: this.url(),
-      contentType: 'application/json',
-      type: 'POST',
-      headers: headers,
-      data: data,
-      success: options.success
-    });
-  }
-
 });
 
 export const RepliesStore = LiveCollection.extend({
@@ -70,7 +52,7 @@ export const RepliesStore = LiveCollection.extend({
 dispatchOnChangeMixin(RepliesStore);
 
 const serverStore = (window.context.repliesStore|| {});
-const serverData = (serverStore.data || {});
+const serverData = (serverStore.data || [])
 let store;
 
 export function getRepliesStore(data){
