@@ -3,20 +3,25 @@ import CategoryList from './components/forum/category-list.jsx';
 import { dispatch } from '../dispatcher/index';
 import navigateToCategory from '../action-creators/forum/navigate-to-category';
 
-import CreateTopicContainer from './CreateTopicContainer.jsx';
 import ForumTableControl from './components/forum/table-control.jsx';
 import TopicsTable from './components/forum/topics-table.jsx';
 import SearchHeader from './components/search/search-header.jsx';
+import CreateTopicModal from './components/topic/create-topic-modal.jsx';
 
 import navigateToFilter from '../action-creators/forum/navigate-to-filter';
 import navigateToSort from '../action-creators/forum/navigate-to-sort';
 import navigateToTag from '../action-creators/forum/navigate-to-tag';
+import titleUpdate from '../action-creators/create-topic/title-update';
+import bodyUpdate from '../action-creators/create-topic/body-update';
+import submitNewTopic from '../action-creators/create-topic/submit-new-topic';
+import navigateToTopic from '../action-creators/topic/navigate-to-topic';
 
 import * as forumCatConstants from '../constants/forum-categories';
 import * as forumTagConstants from '../constants/forum-tags';
 import * as forumFilterConstants from '../constants/forum-filters';
 import * as forumSortConstants from '../constants/forum-sorts';
 import * as navConstants from '../constants/navigation';
+import * as consts from '../constants/create-topic';
 
 const ForumContainer = React.createClass({
   displayName: 'ForumContainer',
@@ -84,9 +89,13 @@ const ForumContainer = React.createClass({
 
   componentDidMount(){
     const { categoryStore, tagStore, router, topicsStore } = this.props;
+
     topicsStore.onChange(this.onTopicsUpdate, this);
+    topicsStore.on(consts.TOPIC_CREATED, this.onTopicCreated, this);
+
     categoryStore.on(forumCatConstants.UPDATE_ACTIVE_CATEGORY, this.onCategoryUpdate);
     tagStore.on(forumTagConstants.UPDATE_ACTIVE_TAG, this.onTagUpdate, this);
+
     router.on(forumFilterConstants.UPDATE_ACTIVE_FILTER, this.onFilterUpdate, this);
     router.on(forumSortConstants.UPDATE_ACTIVE_SORT, this.onSortUpdate, this);
     router.on('change:createTopic', this.onCreateTopicChange, this);
@@ -94,9 +103,13 @@ const ForumContainer = React.createClass({
 
   componentWillUnmount(){
     const { categoryStore, tagStore, router, topicsStore } = this.props;
+
     topicsStore.removeListeners();
+    topicsStore.off(consts.TOPIC_CREATED, this.onTopicCreated, this);
+
     categoryStore.off(forumCatConstants.UPDATE_ACTIVE_CATEGORY, this.onCategoryUpdate);
     tagStore.off(forumTagConstants.UPDATE_ACTIVE_TAG, this.onTagUpdate, this);
+
     router.off(forumFilterConstants.UPDATE_ACTIVE_FILTER, this.onFilterUpdate, this);
     router.off(forumSortConstants.UPDATE_ACTIVE_SORT, this.onSortUpdate, this);
     router.off('change:createTopic', this.onCreateTopicChange, this);
@@ -104,7 +117,7 @@ const ForumContainer = React.createClass({
 
   render() {
     const { categories, categoryName, tags, filterName, tagName, sortName, createTopic, topics } = this.state;
-    const { groupName, newTopicStore, topicsStore } = this.props;
+    const { groupName } = this.props;
     return (
       <main>
         <SearchHeader groupName={groupName}/>
@@ -127,29 +140,34 @@ const ForumContainer = React.createClass({
 
         <TopicsTable topics={topics} groupName={groupName}/>
 
-        <CreateTopicContainer
-          groupName={groupName}
+        <CreateTopicModal
           active={createTopic}
-          newTopicStore={newTopicStore}
-          topicsStore={topicsStore}/>
+          onTitleChange={this.onTitleChange}
+          onBodyChange={this.onBodyChange}
+          onSubmit={this.onSubmit}/>
+
       </main>
     );
   },
 
-  onCategoryClicked(category){
-    dispatch(navigateToCategory(category));
+  onCategoryClicked(category){ dispatch(navigateToCategory(category));},
+  onFilterChange(filter){ dispatch(navigateToFilter(filter));},
+  onSortChange(sort) { dispatch(navigateToSort(sort));},
+  onTagChange(tag){ dispatch(navigateToTag(tag));},
+  onTitleChange(title){ dispatch(titleUpdate(title));},
+  onBodyChange(body){ dispatch(bodyUpdate(body));},
+
+  onSubmit(){
+    const {newTopicStore} = this.props;
+    dispatch(submitNewTopic(
+      newTopicStore.get('title'),
+      newTopicStore.get('body'))
+    );
   },
 
-  onFilterChange(filter){
-    dispatch(navigateToFilter(filter));
-  },
-
-  onSortChange(sort) {
-    dispatch(navigateToSort(sort));
-  },
-
-  onTagChange(tag){
-    dispatch(navigateToTag(tag));
+  onTopicCreated(data){
+    const {groupName} = this.props;
+    dispatch(navigateToTopic(groupName, data.topicId, data.slug));
   },
 
   onCategoryUpdate(){
