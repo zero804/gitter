@@ -10,8 +10,8 @@ describe('topicsStore', () => {
     { id: 2 }
   ];
 
-  it('should return an object with models', () => {
-    assert(topicsStore(models).models);
+  it('should return an object with data', () => {
+    assert(topicsStore(models).data);
   });
 
   it('should return an object with getTopics', () => {
