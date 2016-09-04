@@ -42,7 +42,7 @@ export const RepliesStore = LiveCollection.extend({
   client: getRealtimeClient(),
   urlTemplate: '/v1/forums/:forumId/topics/:topicId/replies',
 
-  getContextModel(attrs){
+  getContextModel(){
     return new Backbone.Model({
       forumId: getForumId(),
       topicId: router.get('topicId'),
@@ -69,8 +69,8 @@ export const RepliesStore = LiveCollection.extend({
 
 dispatchOnChangeMixin(RepliesStore);
 
-const serverStore = (window.context.repliesStore.data || {});
-const serverData = (serverStore || {});
+const serverStore = (window.context.repliesStore|| {});
+const serverData = (serverStore.data || {});
 let store;
 
 export function getRepliesStore(data){
