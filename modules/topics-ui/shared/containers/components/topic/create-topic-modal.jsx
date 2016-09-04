@@ -13,12 +13,13 @@ export default React.createClass({
     onSubmit: PropTypes.func.isRequired,
     onTitleChange: PropTypes.func.isRequired,
     onBodyChange: PropTypes.func.isRequired,
+    onClose: PropTypes.func.isRequired,
   },
 
   render(){
     const { active } = this.props;
     return (
-      <Modal active={active}>
+      <Modal active={active} onClose={this.onClose}>
         <form name="create-topic" onSubmit={this.onSubmit}>
           <H1 className="create-topic__heading">New Topic</H1>
           <Input className="create-topic__input--name" name="title" placeholder="Add title ..." onChange={this.onTitleChange}/>
@@ -42,6 +43,10 @@ export default React.createClass({
   onSubmit(e){
     e.preventDefault();
     this.props.onSubmit();
+  },
+
+  onClose(){
+    this.props.onClose();
   }
 
 });
