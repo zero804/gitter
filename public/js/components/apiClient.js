@@ -269,6 +269,9 @@ function getClient(fullUrlFunction, baseUrlFunction) {
       memo[method] = operation.bind(memo, fullUrlFunction, baseUrlFunction, method, defaultOptions);
       return memo;
     }, {
+      uri: function(relativeUrl) {
+        return baseUrlFunction() + relativeUrl;
+      },
       url: function(relativeUrl) {
         return fullUrlFunction(baseUrlFunction, relativeUrl);
       },

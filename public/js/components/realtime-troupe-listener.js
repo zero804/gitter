@@ -27,7 +27,7 @@ var templateSubscription = realtime.getClient().subscribeTemplate({
   },
 
   handleSnapshot: function(snapshot) {
-    // Make sure that snapshot.id == troupe.id as we may have quickly chenged
+    // Make sure that snapshot.id == troupe.id as we may have quickly changed
     // rooms multiple times
     if (context.getTroupeId() !== snapshot.id) return;
     context.setTroupe(snapshot);
