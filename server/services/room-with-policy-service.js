@@ -15,6 +15,7 @@ var chatService = require('./chat-service');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var roomMembershipService = require('./room-membership-service');
 var roomService = require('./room-service');
+var roomRepoService = require('./room-repo-service');
 var assert = require('assert');
 var roomMetaService = require('./room-meta-service');
 var processText = require('gitter-web-text-processor');
@@ -358,17 +359,36 @@ function removeUserFromRoomAllowCurrentUser(userForRemove) {
 }
 
 /**
- * Add an existing Gitter user to a room
+ * Remove a user from a room
  */
 RoomWithPolicyService.prototype.removeUserFromRoom = secureMethod([removeUserFromRoomAllowCurrentUser, allowAdmin], function(userForRemove) {
   return roomService.removeUserFromRoom(this.room, userForRemove);
 });
 
 /**
- * Add an existing Gitter user to a room
+ * Send a pull request badger post room creation
  */
-RoomWithPolicyService.prototype.sendBadgePullRequest = secureMethod([allowAdmin], function() {
-  return roomService.sendBadgePullRequest(this.room, this.user);
+RoomWithPolicyService.prototype.sendBadgePullRequest = secureMethod([allowAdmin], function(repoUri) {
+  return (repoUri ? Promise.resolve(repoUri) : roomRepoService.findAssociatedGithubRepoForRoom(this.room))
+    .bind(this)
+    .then(function(repoUri) {
+      if (!repoUri) throw new StatusError(400, 'Room not associated with repo');
+
+      return roomRepoService.sendBadgePullRequestForRepo(this.room, this.user, repoUri);
+    });
+});
+
+/**
+ * configure room/repo hooks post room creation
+ */
+RoomWithPolicyService.prototype.autoConfigureHooks = secureMethod([allowAdmin], function() {
+  return roomRepoService.findAssociatedGithubRepoForRoom(this.room)
+    .bind(this)
+    .then(function(repoUri) {
+      if (!repoUri) throw new StatusError(400, 'Room not associated with repo');
+
+      return roomRepoService.autoConfigureHooksForRoom(this.user, this.room, repoUri);
+    });
 });
 
 module.exports = RoomWithPolicyService;

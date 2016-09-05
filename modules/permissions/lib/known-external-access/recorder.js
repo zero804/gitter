@@ -6,21 +6,32 @@ var env = require('gitter-web-env');
 var errorReporter = env.errorReporter;
 
 function generateQuery(userId, type, policyName, linkPath, externalId) {
-  var query = {
+  var query;
+
+  if (linkPath && externalId) {
+    // Or the whole query to allow mongodb to optimise
+    query = {
+      $or: [{
+        userId: userId,
+        type: type,
+        policyName: policyName,
+        linkPath: linkPath
+      }, {
+        userId: userId,
+        type: type,
+        policyName: policyName,
+        externalId: externalId
+      }]
+    };
+
+    return query;
+  }
+
+  query = {
     userId: userId,
     type: type,
     policyName: policyName
   };
-
-  if (linkPath && externalId) {
-    query.$or = [{
-      linkPath: linkPath
-    }, {
-      externalId: externalId
-    }];
-
-    return query;
-  }
 
   if (linkPath) {
     query.linkPath = linkPath;
@@ -35,28 +46,63 @@ function generateQuery(userId, type, policyName, linkPath, externalId) {
   assert(false, 'Expected linkPath or externalId');
 }
 
+/**
+ * Returns true if a row was inserted or removed
+ */
 function handle(userId, type, policyName, linkPath, externalId, access) {
   var query = generateQuery(userId, type, policyName, linkPath, externalId);
 
   if (access) {
     // User has access? Upsert
+    var setFields = {
+      userId: userId,
+      type: type,
+      policyName: policyName,
+      linkPath: linkPath,
+      accessTime: new Date()
+    };
+
+    if (externalId) {
+      setFields.externalId = externalId;
+    }
+
     return KnownExternalAccess.update(query, {
-      $set: {
-        userId: userId,
-        type: type,
-        policyName: policyName,
-        linkPath: linkPath,
-        externalId: externalId,
-        accessTime: new Date()
-      }
-    }, {
-      upsert: true
-    })
-    .exec()
+        $set: setFields
+      }, {
+        upsert: true
+      })
+      .exec()
+      .then(function(response) {
+        return !!(response && response.upserted && response.upserted.length === 1);
+      })
+      .catch(function(err) {
+        if (err.code === 11000) {
+          // Duplicates can happen,
+          // remove all matching and re-add
+          return KnownExternalAccess.remove(query)
+            .exec()
+            .then(function() {
+              return KnownExternalAccess.update(query, {
+                  $set: setFields
+                }, {
+                  upsert: true
+                })
+                .exec()
+                .then(function(response) {
+                  return !!(response && response.upserted && response.upserted.length === 1);
+                })
+            })
+        }
+
+        throw err;
+      })
   } else {
     // User does not have access? Remove
     return KnownExternalAccess.remove(query)
-      .exec();
+      .exec()
+      .then(function(response) {
+        return !!(response && response.result && response.result.n > 0);
+      });
   }
 }
 

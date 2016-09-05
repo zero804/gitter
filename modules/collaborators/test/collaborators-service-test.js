@@ -8,7 +8,7 @@ function assertNoDuplicates(collaborators) {
   var logins = {};
   collaborators.forEach(function(collaborator) {
     // TODO: add other services into this test
-    assert(!logins[collaborator.githubUsername]);
+    assert(!logins[collaborator.externalId]);
     logins[collaborator.githubUsername] = true;
   });
 }
@@ -19,7 +19,8 @@ describe('collaborators-service #slow', function() {
       .then(function(collaborators) {
         assert(Array.isArray(collaborators));
         assert(collaborators.length > 0);
-        assert(collaborators[0].githubUsername);
+        assert(collaborators[0].externalId);
+        assert(collaborators[0].type === 'github');
         assertNoDuplicates(collaborators);
       });
   });
@@ -29,7 +30,8 @@ describe('collaborators-service #slow', function() {
       .then(function(collaborators) {
         assert(Array.isArray(collaborators));
         assert(collaborators.length > 0);
-        assert(collaborators[0].githubUsername);
+        assert(collaborators[0].externalId);
+        assert(collaborators[0].type === 'github');
         assertNoDuplicates(collaborators);
       });
   });
@@ -48,7 +50,8 @@ describe('collaborators-service #slow', function() {
       .then(function(collaborators) {
         assert(Array.isArray(collaborators));
         assert(collaborators.length > 0);
-        assert(collaborators[0].githubUsername);
+        assert(collaborators[0].externalId);
+        assert(collaborators[0].type === 'github');
         assertNoDuplicates(collaborators);
       });
   });

@@ -95,7 +95,7 @@
           "dependencies": {
             "inherits": {
               "version": "2.0.1",
-              "from": "inherits@2.0.1",
+              "from": "inherits@>=2.0.1 <2.1.0",
               "resolved": "http://beta-internal:4873/inherits/-/inherits-2.0.1.tgz"
             },
             "setprototypeof": {
@@ -390,7 +390,7 @@
       "dependencies": {
         "redis": {
           "version": "2.6.2",
-          "from": "redis@latest",
+          "from": "redis@>=2.1.0 <3.0.0",
           "resolved": "http://beta-internal:4873/redis/-/redis-2.6.2.tgz",
           "dependencies": {
             "double-ended-queue": {
@@ -3431,7 +3431,7 @@
               "dependencies": {
                 "semver": {
                   "version": "5.3.0",
-                  "from": "semver@>=5.1.0 <6.0.0",
+                  "from": "semver@>=2.0.0 <3.0.0||>=3.0.0 <4.0.0||>=4.0.0 <5.0.0||>=5.0.0 <6.0.0",
                   "resolved": "http://beta-internal:4873/semver/-/semver-5.3.0.tgz"
                 },
                 "resolve-from": {

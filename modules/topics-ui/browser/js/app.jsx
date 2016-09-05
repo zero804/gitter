@@ -11,7 +11,9 @@ import TopicsStore from './stores/topics-store';
 import NewTopicStore from './stores/new-topic-store';
 import ForumStore from './stores/forum-store';
 import AccessTokenStore from './stores/access-token-store';
-import RepliesStore from './stores/replies-store';
+import {RepliesStore} from './stores/replies-store';
+import CurrentUserStore from './stores/current-user-store';
+import NewReplyStore from './stores/new-reply-store';
 
 import * as navConstants from '../../shared/constants/navigation';
 
@@ -68,6 +70,7 @@ export default React.createClass({
       route: router.get('route'),
       router: router,
       accessTokenStore: this.getAccessTokenStore(),
+      currentUserStore: this.getCurrentUserStore(),
     };
   },
 
@@ -113,6 +116,7 @@ export default React.createClass({
       topicsStore: topicsStore,
       repliesStore: repliesStore,
       categoryStore: this.getCategoryStore(),
+      newReplyStore: new NewReplyStore(),
     });
   },
 
@@ -121,6 +125,12 @@ export default React.createClass({
     const accessTokenStore = (window.context.accessTokenStore || {});
     if(this.hasRendered && this.state.accessTokenStore) { return this.state.accessTokenStore }
     return new AccessTokenStore({ accessToken: accessTokenStore.token });
+  },
+
+  getCurrentUserStore(){
+    const currentUserStore = (window.context.currentUserStore || {});
+    if(this.hasRendered && this.state.currentUserStore) { return this.state.currentUserStore }
+    return new CurrentUserStore(currentUserStore.data);
   },
 
   getForumStore(){
@@ -162,11 +172,19 @@ export default React.createClass({
   },
 
   getRepliesStore(){
+
     const {router} = this.props;
     const repliesStore = (window.context.repliesStore || {});
+    const accessTokenStore = this.getAccessTokenStore();
+    const forumStore = this.getForumStore();
+    const topicsStore = this.getTopicsStore();
+
     if(this.hasRendered && this.state.repliesStore) { return this.state.repliesStore; }
     return new RepliesStore(repliesStore.models, {
       router: router,
+      accessTokenStore: accessTokenStore,
+      forumStore: forumStore,
+      topicsStore: topicsStore,
     });
   },
 
