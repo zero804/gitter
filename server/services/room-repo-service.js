@@ -13,7 +13,7 @@ var userSettingsService = require('./user-settings-service');
 var debug = require('debug')('gitter:app:room-repo-service');
 var userScopes = require('gitter-web-identity/lib/user-scopes');
 var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
-var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
+var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor');
 
 var badgerEnabled = nconf.get('autoPullRequest:enabled');
 
@@ -107,7 +107,7 @@ function findAssociatedGithubRepoForRoom(room) {
 
   if (!room.groupId) return null;
 
-  return securityDescriptorService.getForGroupUser(room.groupId, null)
+  return securityDescriptorService.group.findById(room.groupId, null)
     .then(function(sd) {
       if (sd.type === 'GH_REPO') return sd.linkPath;
 
