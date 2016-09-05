@@ -17,12 +17,6 @@ var PermissionsPeopleListItemView = Marionette.ItemView.extend({
 
   triggers: {
     'click @ui.removeButton': 'item:remove'
-  },
-
-  serializeData: function() {
-    var data = this.model.toJSON();
-
-    return data;
   }
 });
 
