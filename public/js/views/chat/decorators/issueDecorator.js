@@ -12,7 +12,6 @@ var bodyTemplate = require('./tmpl/issuePopover.hbs');
 var titleTemplate = require('./tmpl/issuePopoverTitle.hbs');
 var footerTemplate = require('./tmpl/commitPopoverFooter.hbs');
 var SyncMixin = require('../../../collections/sync-mixin');
-var troupeCollections = require('../../../collections/instances/troupes');
 
 
 function isGitHubUser(user) {
