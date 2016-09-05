@@ -6,10 +6,12 @@ export default React.createClass({
   displayName: 'TopicReplyListItem',
   propTypes: {
     reply: PropTypes.shape({
-
+      text: PropTypes.string,
+      body: PropTypes.shape({
+        html: PropTypes.string,
+        text: PropTypes.string,
+      }),
       formattedSentDate: PropTypes.string.isRequired,
-      displayText: PropTypes.string.isRequired,
-
       user: PropTypes.shape({
         avatarUrl: PropTypes.string.isRequired,
       }).isRequired
