@@ -17,8 +17,7 @@ export const TopicModel = BaseModel.extend({
     var data = this.attributes;
     data.tags = (data.tags || []);
     return Object.assign({}, data, {
-      tags: data.tags.map(parseTag),
-      categoryId: this.collection.getCategoryId(),
+      tags: data.tags.map(parseTag)
     });
   }
 });
@@ -50,20 +49,19 @@ export const TopicsStore = LiveCollection.extend({
   },
 
   creatNewTopic(data){
-    const model = this.create({ title: data.title, text: data.body }, { wait: true });
+
+    const model = this.create({
+      title: data.title,
+      text: data.body,
+      categoryId: data.categoryId
+    }, { wait: true });
+
     model.once('add', () => {
       this.trigger(TOPIC_CREATED, {
         topicId: model.get('id'),
         slug: model.get('slug')
       });
     });
-  },
-
-  //TODO REMOVE
-  getCategoryId(){
-    //TODO This needs to be fleshed out when the UI is completed
-    const categories = getForumStore().get('categories');
-    if(categories && categories[0]) { return categories[0].id; }
   }
 
 });

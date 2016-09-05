@@ -172,8 +172,9 @@ const ForumContainer = React.createClass({
     const {newTopicStore} = this.props;
     dispatch(submitNewTopic(
       newTopicStore.get('title'),
-      newTopicStore.get('body'))
-    );
+      newTopicStore.get('body'),
+      newTopicStore.get('categoryId')
+    ));
   },
 
   onTopicCreated(data){

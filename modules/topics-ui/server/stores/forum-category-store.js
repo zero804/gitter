@@ -1,6 +1,7 @@
 "use strict";
 
 var navConstants = require('../../shared/constants/navigation');
+var _ = require('lodash');
 
 module.exports = function forumCategoryStore(categories, categoryFilter) {
 
@@ -27,11 +28,14 @@ module.exports = function forumCategoryStore(categories, categoryFilter) {
     value: c.id,
   }));
 
+  const getById = (id) => _.find(categories, (cat) => cat.id === id);
+
   const getCategories = () => categories;
 
   return {
     data: categories,
     getCategories: getCategories,
     mapForSelectControl: mapForSelectControl,
+    getById: getById
   };
 };

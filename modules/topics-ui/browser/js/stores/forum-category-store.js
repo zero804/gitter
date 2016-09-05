@@ -37,6 +37,12 @@ export const ForumCategoryStore = Collection.extend({
     }))
   },
 
+  getById(id){
+    const model = this.get(id);
+    if(!model) { return; }
+    return model.toJSON();
+  }
+
 });
 
 dispatchOnChangeMixin(ForumCategoryStore);
