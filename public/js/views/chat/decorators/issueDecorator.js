@@ -98,7 +98,7 @@ var FooterView = Marionette.ItemView.extend({
   }
 });
 
-var repoToRoomMapCache = {};
+var roomIdToRepoUriCache = {};
 function getRoomRepo() {
   var room = context.troupe();
   if(!room) {
@@ -106,7 +106,7 @@ function getRoomRepo() {
   }
 
   var roomId = room.get('id');
-  var repoFromCache = repoToRoomMapCache[roomId];
+  var repoFromCache = roomIdToRepoUriCache[roomId];
   if(repoFromCache) {
     return Promise.resolve(repoFromCache);
   }
@@ -116,7 +116,7 @@ function getRoomRepo() {
     // Check if the snapshot already came in
     var associatedRepo = room.get('associatedRepo');
     if(associatedRepo || associatedRepo === false) {
-      repoToRoomMapCache[roomId] = associatedRepo;
+      roomIdToRepoUriCache[roomId] = associatedRepo;
       resolve(associatedRepo);
     }
     // Wait for the realtime-troupe-listener snapshot to come in
@@ -127,7 +127,7 @@ function getRoomRepo() {
         // The room could have changed since the request came back in
         if(roomId === updatedRoomId) {
           var repoUri = updatedRoom.get('associatedRepo');
-          repoToRoomMapCache[updatedRoomId] = repoUri;
+          roomIdToRepoUriCache[updatedRoomId] = repoUri;
           resolve(repoUri);
         }
 
