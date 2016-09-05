@@ -98,43 +98,64 @@ var FooterView = Marionette.ItemView.extend({
   }
 });
 
-var roomIdToRepoUriCache = {};
+var associatedRepoMemoization = null;
+
+/**
+ * Rememoize after room change
+ */
+context.troupe().on('change:id', function() {
+  associatedRepoMemoization = null;
+});
+
 function getRoomRepo() {
   var room = context.troupe();
   if(!room) {
     return Promise.reject('No current room');
   }
 
+  if (associatedRepoMemoization) return associatedRepoMemoization;
+
   var roomId = room.get('id');
-  var repoFromCache = roomIdToRepoUriCache[roomId];
-  if(repoFromCache) {
-    return Promise.resolve(repoFromCache);
-  }
+  var unlisten;
 
   // Only runs if the cache misses
-  return new Promise(function(resolve, reject) {
+  associatedRepoMemoization = new Promise(function(resolve, reject) {
     // Check if the snapshot already came in
     var associatedRepo = room.get('associatedRepo');
-    if(associatedRepo || associatedRepo === false) {
-      roomIdToRepoUriCache[roomId] = associatedRepo;
-      resolve(associatedRepo);
-    }
-    // Wait for the realtime-troupe-listener snapshot to come in
-    else {
-      context.troupe().once('change:associatedRepo', function() {
-        var updatedRoom = context.troupe();
-        var updatedRoomId = updatedRoom.get('id');
-        // The room could have changed since the request came back in
-        if(roomId === updatedRoomId) {
-          var repoUri = updatedRoom.get('associatedRepo');
-          roomIdToRepoUriCache[updatedRoomId] = repoUri;
-          resolve(repoUri);
-        }
 
-        reject(new Error('Room no longer matches the one you were trying to get the associatedRepo from: ' + roomId + ', now' + updatedRoomId))
-      }.bind(this));
+    if(associatedRepo || associatedRepo === false) {
+      return resolve(associatedRepo || null);
     }
-  }.bind(this));
+
+    // Wait for the realtime-troupe-listener snapshot to come in
+    function onChange() {
+      var updatedRoomId = room.get('id');
+
+      // The room could have changed since the request came back in
+      if(roomId !== updatedRoomId) {
+        return reject(new Error('Expired'));
+      }
+
+      var associatedRepo = room.get('associatedRepo');
+
+      if(associatedRepo || associatedRepo === false) {
+        return resolve(associatedRepo || null);
+      }
+    }
+
+    unlisten = function() {
+      room.off('change', onChange);
+    }
+
+    room.once('change', onChange);
+  })
+  .finally(function() {
+    if (unlisten) {
+      unlisten();
+    }
+  });
+
+  return associatedRepoMemoization;
 }
 
 function createPopover(model, targetElement) {
