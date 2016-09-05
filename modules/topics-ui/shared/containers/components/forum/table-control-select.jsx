@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
 import _ from 'lodash';
+import Select from '../forms/select.jsx';
 
 export default React.createClass({
 
@@ -11,29 +12,24 @@ export default React.createClass({
 
   render(){
     const { options } = this.props;
+    console.log(options);
     const { onChange } = this;
     const activeOption = _.find(options, { active: true });
     let defaultVal = null;
     if(activeOption) { defaultVal = activeOption.value; }
 
-
+    //TODO remove
+    const mappedOptions = options.map((m) => Object.assign(m, {
+      label: m.name
+    }));
     return (
       <div className="table-control__select-decal">
-        <select className="table-control__select" onChange={onChange} defaultValue={defaultVal}>
-          {options.map((opt, index) => this.getChildOption(index, opt))}
-        </select>
+        <Select
+          className="table-control__select"
+          options={mappedOptions}
+          onChange={onChange}
+          defaultValue={defaultVal} />
       </div>
-    );
-  },
-
-  getChildOption(index, opts){
-    const { name, value } = opts;
-    return (
-      <option key={`table-control-select-index-${index}`}
-        label={name}
-        value={value}>
-          {name}
-      </option>
     );
   },
 
