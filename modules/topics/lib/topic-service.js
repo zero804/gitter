@@ -34,8 +34,12 @@ function findByForumIds(ids) {
     .exec();
 }
 
-function findTotalsByForumIds(ids) {
-  return mongooseUtils.getEstimatedCountForIds(Topic, 'forumId', ids);
+function findTotalsByForumIds(ids, options) {
+  options = options || {};
+
+  return mongooseUtils.getEstimatedCountForIds(Topic, 'forumId', ids, {
+    read: options.read
+  });
 }
 
 function findByIdForForum(forumId, topicId) {

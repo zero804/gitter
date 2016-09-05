@@ -34,7 +34,7 @@ var uriResolver = require('./uri-resolver');
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 var groupService = require('gitter-web-groups/lib/group-service');
 var securityDescriptorGenerator = require('gitter-web-permissions/lib/security-descriptor-generator');
-var liveCollections = require('./live-collections');
+var liveCollections = require('gitter-web-live-collection-events');
 var roomRepoService = require('./room-repo-service');
 
 /**
