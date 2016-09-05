@@ -3,6 +3,8 @@
 var assert = require('assert');
 var recorder = require('../../lib/known-external-access/recorder');
 var ObjectID = require('mongodb').ObjectID;
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
+
 describe('recorder', function() {
   describe('generateQuery', function() {
     var userId = new ObjectID();
@@ -78,6 +80,8 @@ describe('recorder', function() {
     });
 
     describe('operations #slow', function() {
+      fixtureLoader.disableMongoTableScans();
+
       FIXTURES.forEach(function(meta) {
         it(meta.name, function() {
           return recorder.testOnly.handle(meta.userId, meta.type, meta.policyName, meta.linkPath, meta.externalId, true)
@@ -101,6 +105,8 @@ describe('recorder', function() {
     });
 
     describe('Additional tests #slow', function() {
+      fixtureLoader.disableMongoTableScans();
+
       it('should handle externalIds and linkPaths are equivalent', function() {
         var userId = new ObjectID();
 
