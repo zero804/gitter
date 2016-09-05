@@ -42,7 +42,6 @@ describe('group-creation-service', function() {
         assert.strictEqual(defaultRoom.sd.members, 'PUBLIC');
         assert.strictEqual(defaultRoom.sd.admins, 'GROUP_ADMIN');
 
-        // Coming soon to a cinema near you....
         assert.strictEqual(String(defaultRoom.sd.internalId), group.id);
         assert.deepEqual(defaultRoom.sd.extraAdmins.map(String), []);
         assert.deepEqual(defaultRoom.sd.extraMembers.map(String), []);
