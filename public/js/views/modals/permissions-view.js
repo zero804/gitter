@@ -73,7 +73,7 @@ var PermissionsView = Marionette.LayoutView.extend({
         var entity = this.model.get('entity');
         var groupId = entity && entity.get('groupId');
 
-        var group = null;
+        var group = entity.get('group');
         if(groupId) {
           group = this.model.groupCollection.get(groupId);
         }
@@ -95,7 +95,6 @@ var PermissionsView = Marionette.LayoutView.extend({
     data.groupAvatarUrl = avatars.getForGroupId(data.entity.groupId || data.entity.id);
     data.permissionOpts = this.getPermissionOptions();
 
-    //console.log('data', data);
     return data;
   },
 
@@ -116,7 +115,8 @@ var PermissionsView = Marionette.LayoutView.extend({
       fetch: function(input, collection, fetchSuccess) {
         this.collection.fetch({
           data: {
-            q: input
+            q: input,
+            type: 'gitter'
           }
         }, {
           add: true,
@@ -165,9 +165,11 @@ var PermissionsView = Marionette.LayoutView.extend({
   },
 
   onEntityChange: function() {
+    this.model.set({
+      securityDescriptor: null
+    });
     this.model.adminCollection.reset();
     this.initializeForEntity();
-    this.render();
   },
 
   onSecurityDescriptorChange: function() {
@@ -233,30 +235,34 @@ var PermissionsView = Marionette.LayoutView.extend({
     else if(sd && sd.type === 'GH_REPO') {
       permissionOpts.push({
         value: 'GH_REPO',
-        label: 'People with push access to GitHub\'s' + sd.linkPath,
+        label: 'People with push access to GitHub\'s ' + sd.linkPath,
         selected: sd.type === 'GH_REPO'
       });
     }
 
     var hasGitHubOpts = permissionOpts.length > 0;
 
-    permissionOpts.unshift({
-      value: 'null',
-      label: 'Only people you manually add below can admin',
-      selected: sd.type === null
-    });
+    if(sd) {
+      permissionOpts.unshift({
+        value: 'null',
+        label: 'Only people you manually add below can admin',
+        selected: !sd.type
+      });
 
-    var groupId = entity.get('groupId');
-    var group = null;
-    if(groupId) {
-      group = this.model.groupCollection.get(groupId);
+      var groupId = entity.get('groupId');
+      var group = null;
+      if(groupId) {
+        group = this.model.groupCollection.get(groupId);
+      }
     }
 
-    permissionOpts.unshift({
-      value: 'GROUP',
-      label: 'Admins of the ' + (group ? (group.get('name') + ' ') : '') + 'community',
-      selected: !hasGitHubOpts
-    });
+    if(sd) {
+      permissionOpts.unshift({
+        value: 'GROUP',
+        label: 'Admins of the ' + (group ? (group.get('name') + ' ') : '') + 'community',
+        selected: !hasGitHubOpts || sd.type === 'GROUP'
+      });
+    }
 
     return permissionOpts;
   },
@@ -283,17 +289,15 @@ var PermissionsView = Marionette.LayoutView.extend({
   fetchSecurityDescriptor: function() {
     this.model.set('requestingSecurityDescriptorStatus', requestingSecurityDescriptorStatusConstants.PENDING);
     var securityApiUrl = urlJoin(this.getApiEndpointForEntity(), 'security');
-    //return apiClient.get(securityApiUrl)
-    return Promise.resolve({ type: null })
+    return apiClient.get(securityApiUrl)
       .bind(this)
       .then(function(sd) {
-        // TODO: Verify works once API is in place
         this.model.set({
           securityDescriptor: sd,
           requestingSecurityDescriptorStatus: requestingSecurityDescriptorStatusConstants.COMPLETE
         });
       })
-      .catch(function(err) {
+      .catch(function() {
         //console.log('err', err, err.stack);
         this.model.set('requestingSecurityDescriptorStatus', requestingSecurityDescriptorStatusConstants.ERROR);
       });
@@ -304,7 +308,6 @@ var PermissionsView = Marionette.LayoutView.extend({
 
     if(entity) {
       this.model.adminCollection.url = urlJoin(this.getApiEndpointForEntity(), 'security/extraAdmins');
-        // TODO: Verify works once API is in place
       this.model.adminCollection.fetch();
     }
   },
@@ -325,13 +328,19 @@ var PermissionsView = Marionette.LayoutView.extend({
     });
 
     this.model.set('submitSecurityDescriptorStatus', submitSecurityDescriptorStatusConstants.PENDING);
-    return apiClient.put(securityApiUrl)
+    return apiClient.put(securityApiUrl, sd)
       .bind(this)
       .then(function(updatedSd) {
-        //console.log('updatedSd', updatedSd);
-        this.model.set('submitSecurityDescriptorStatus', submitSecurityDescriptorStatusConstants.COMPLETE);
+        this.model.set({
+          securityDescriptor: updatedSd,
+          submitSecurityDescriptorStatus: submitSecurityDescriptorStatusConstants.COMPLETE
+        });
+
+        // Close the modal
+        this.dialog.hide();
+        this.dialog = null;
       })
-      .catch(function(err) {
+      .catch(function() {
         //console.log('err', err, err.stack);
         this.model.set('submitSecurityDescriptorStatus', submitSecurityDescriptorStatusConstants.ERROR);
       });

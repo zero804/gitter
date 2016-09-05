@@ -2,6 +2,7 @@
 
 var Backbone = require('backbone');
 var requestingSecurityDescriptorStatusConstants = require('../views/modals/permissions/requesting-security-descriptor-status-constants');
+var SyncMixin = require('../collections/sync-mixin');
 
 var PermissionsViewModel = Backbone.Model.extend({
   defaults: {
@@ -24,6 +25,7 @@ var PermissionsViewModel = Backbone.Model.extend({
 
     this.groupCollection = options.groupCollection || new Backbone.Collection([]);
     this.adminCollection = new Backbone.Collection(options.adminCollection ? options.adminCollection.models : []);
+    this.adminCollection.sync = SyncMixin.sync;
   },
 
   validate: function() {
@@ -32,7 +34,7 @@ var PermissionsViewModel = Backbone.Model.extend({
     var sd = this.get('securityDescriptor');
     var requestingSecurityDescriptorStatus = this.get('requestingSecurityDescriptorStatus');
 
-    if(sd.type === null && this.adminCollection.length === 0) {
+    if(sd && !sd.type && this.adminCollection.length === 0) {
       errors.push({
         key: 'extra-admins',
         message: 'At least one admin needs to be added when manual type set.'

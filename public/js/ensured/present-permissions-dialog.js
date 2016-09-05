@@ -15,7 +15,8 @@ function presentPermissionsDialog(options) {
     var permissionsView = require('../views/modals/permissions-view');
 
     var slimCurrentRoom = context.troupe();
-    var currentRoom = roomCollection.get(slimCurrentRoom.get('id'));
+    // Try to get something better otherwise work with the slim version
+    var currentRoom = roomCollection.get(slimCurrentRoom.get('id')) || slimCurrentRoom;
 
     var modal = new permissionsView.Modal({
       model: new PermissionsModel({
