@@ -116,8 +116,9 @@ const ForumContainer = React.createClass({
   },
 
   render() {
-    const { categories, categoryName, tags, filterName, tagName, sortName, createTopic, topics } = this.state;
-    const { groupName } = this.props;
+    const { categoryName, tags, filterName, tagName, sortName, createTopic, topics } = this.state;
+    const { groupName, categoryStore } = this.props;
+    const categories = categoryStore.getCategories();
     return (
       <main>
         <SearchHeader groupName={groupName}/>
@@ -142,6 +143,7 @@ const ForumContainer = React.createClass({
 
         <CreateTopicModal
           active={createTopic}
+          categories={categoryStore.mapForSelectControl()}
           onTitleChange={this.onTitleChange}
           onBodyChange={this.onBodyChange}
           onClose={this.onCreateTopicClose}

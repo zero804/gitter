@@ -19,12 +19,18 @@ export default React.createClass({
   },
 
   render(){
-    const {options, onChange, classsName } = this.props;
-    const className = classNames('select', className);
+    const {options, onChange, className } = this.props;
+
+    const compiledClass = classNames('select', className);
+    const decalClassName = className ? `${className}--decal` : null;
+    const compiledDecalClass = classNames('select__decal', decalClassName);
+
     return (
-      <select className={className} onChange={onChange}>
-        { options.map(this.buildChildOption) }
-      </select>
+      <div className={compiledDecalClass}>
+        <select className={compiledClass} onChange={onChange}>
+          { options.map(this.buildChildOption) }
+        </select>
+      </div>
     );
   },
 
@@ -32,7 +38,7 @@ export default React.createClass({
     const {label, value} = option;
     return (
       <option key={`select-option-${label}-${index}`}
-        label="label"
+        label={label}
         value={value}>
         {label}
       </option>

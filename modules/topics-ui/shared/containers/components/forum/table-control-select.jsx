@@ -12,24 +12,17 @@ export default React.createClass({
 
   render(){
     const { options } = this.props;
-    console.log(options);
     const { onChange } = this;
     const activeOption = _.find(options, { active: true });
     let defaultVal = null;
     if(activeOption) { defaultVal = activeOption.value; }
 
-    //TODO remove
-    const mappedOptions = options.map((m) => Object.assign(m, {
-      label: m.name
-    }));
     return (
-      <div className="table-control__select-decal">
-        <Select
-          className="table-control__select"
-          options={mappedOptions}
-          onChange={onChange}
-          defaultValue={defaultVal} />
-      </div>
+      <Select
+        className="table-control__select"
+        options={options}
+        onChange={onChange}
+        defaultValue={defaultVal} />
     );
   },
 
