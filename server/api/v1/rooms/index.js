@@ -53,7 +53,8 @@ module.exports = {
       includePermissions: true,
       includeProviders: true,
       includeGroups: true,
-      includeBackend: true
+      includeBackend: true,
+      includeAssociatedRepo: true
     });
 
     return restSerializer.serializeObject(req.params.troupeId, strategy);
@@ -168,7 +169,6 @@ module.exports = {
   },
 
   subresources: {
-    'issues-info': require('./issues-info'),
     'issues': require('./issues'),
     'issue-state': require('./issue-state'),
     'users': require('./users'),
