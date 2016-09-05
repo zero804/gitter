@@ -92,6 +92,11 @@ exports.install = function(persistenceService) {
         next();
       },
 
+      onUpdate: function(model, next) {
+        liveCollections.topics.emit('update', model);
+        next();
+      },
+
       onRemove: function(model) {
         liveCollections.topics.emit("remove", model);
       }
@@ -103,6 +108,11 @@ exports.install = function(persistenceService) {
     mongooseUtils.attachNotificationListenersToSchema(schemas.ReplySchema, {
       onCreate: function(model, next) {
         liveCollections.replies.emit("create", model);
+        next();
+      },
+
+      onUpdate: function(model, next) {
+        liveCollections.replies.emit('update', model);
         next();
       },
 
