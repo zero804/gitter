@@ -26,7 +26,6 @@ var troupeCollections = require('./collections/instances/troupes');
 var scopeUpgrader = require('./components/scope-upgrader');
 var presentCreateRoomDialog = require('./ensured/present-create-room-dialog');
 var presentCreateCommunityDialog = require('./ensured/present-create-community-dialog');
-var presentPermissionsDialog = require('./ensured/present-permissions-dialog');
 var AppLayout = require('./views/layouts/app-layout');
 var LoadingView = require('./views/app/loading-view');
 
@@ -464,14 +463,6 @@ onready(function() {
 
     createCommunity: function() {
       presentCreateCommunityDialog({
-        dialogRegion: appLayout.dialogRegion
-      });
-    },
-
-    permissions: function() {
-      presentPermissionsDialog({
-        roomCollection: troupeCollections.troupes,
-        groupCollection: troupeCollections.groups,
         dialogRegion: appLayout.dialogRegion
       });
     },
