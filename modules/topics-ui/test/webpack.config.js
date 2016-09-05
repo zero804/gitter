@@ -5,7 +5,7 @@ var _ = require('lodash');
 var path = require('path');
 
 var config = _.extend({}, webpackConfig, {
-  devtool: 'source-map',
+  devtool: 'eval',
   entry: {
     runner: path.resolve(__dirname, './fixtures/runner-browser.js')
   },
@@ -19,6 +19,7 @@ var config = _.extend({}, webpackConfig, {
       mochaCss: require.resolve('mocha/mocha.css'),
       jquery: require.resolve('jquery/dist/jquery.js'),
       sinon: require.resolve('sinon/pkg/sinon.js'),
+      'gitter-realtime-client': path.resolve(__dirname, './mocks/realtime.js')
     }
   }
 });

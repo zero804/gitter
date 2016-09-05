@@ -18,7 +18,9 @@
     "react-dom": "^15.2.1",
     "sinon": "^1.17.5",
     "moment": "^2.10.3",
-    "gitter-web-slugify": "file:../slugify"
+    "gitter-realtime-client": "^1.6.1",
+    "gitter-web-slugify": "file:../slugify",
+    "gitter-client-env": "file:../client-env"
   },
   "devDependencies": {
     "highlight.js": "8.6.0",
