@@ -1,26 +1,22 @@
 "use strict";
 
-var Promise = require('bluebird');
 var roomRepoService = require('../../../services/room-repo-service');
 
-
 function AssociatedRepoStrategy(/*options*/) {
-  this.associatedRepos = {};
+  this.associatedRepos = null;
 }
 
 AssociatedRepoStrategy.prototype = {
   preload: function(items) {
-    return Promise.all(items.toArray().map(function(item) {
-      return roomRepoService.findAssociatedGithubRepoForRoom(item)
-        .bind(this)
-        .then(function(repoUri) {
-          this.associatedRepos[item.id] = repoUri;
-        })
-    }.bind(this)))
+    return roomRepoService.findAssociatedGithubRepoForRooms(items.toArray())
+      .bind(this)
+      .then(function(results) {
+        this.associatedRepos = results;
+      });
   },
 
-  map: function(id) {
-    return this.associatedRepos[id] || false;
+  map: function(item) {
+    return this.associatedRepos[item.id || item._id] || false;
   },
 
   name: 'AssociatedRepoStrategy'

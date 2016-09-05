@@ -171,7 +171,7 @@ function getGitHubIssueUrl(repo, issueNumber) {
 var decorator = {
   decorate: function(view) {
     Array.prototype.forEach.call(view.el.querySelectorAll('*[data-link-type="issue"]'), function(issueElement) {
-      Promise.resolve().then(function() {
+      Promise.try(function() {
           var repoFromElement = issueElement.dataset.issueRepo;
           if(repoFromElement) {
             return Promise.resolve(repoFromElement)
@@ -188,16 +188,14 @@ var decorator = {
           var backedBy = currentGroup && currentGroup.get('backedBy');
           if(repo) {
             anchorUrl = getGitHubIssueUrl(repo, issueNumber);
-          }
-          else if(!repo && currentRoom.get('oneToOne')) {
+          } else if(!repo && currentRoom.get('oneToOne')) {
             var currentUser = context.user();
             var otherUser = currentRoom.get('user');
             currentUser.get('providers')
             if(currentUser && isGitHubUser(currentUser) && otherUser && isGitHubUser(otherUser)) {
               anchorUrl = 'https://github.com/issues?utf8=%E2%9C%93&q=' + issueNumber + '+%28involves%3A' + currentUser.get('username') + '+OR+involves%3A' + otherUser.username + '+%29';
             }
-          }
-          else if(backedBy && backedBy.type === 'GH_ORG') {
+          } else if(backedBy && backedBy.type === 'GH_ORG') {
             // TODO
             anchorUrl = 'https://github.com/issues?utf8=%E2%9C%93&q=' + issueNumber + '++user%3A' + backedBy.linkPath + '+';
           }

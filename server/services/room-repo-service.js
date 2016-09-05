@@ -99,7 +99,7 @@ function associateRoomToRepo(room, user, options) {
 
 }
 
-function findAssociatedGithubRepoForRoom(room) {
+var findAssociatedGithubRepoForRoom = Promise.method(function (room) {
   if (!room) return null;
 
   var linkPath = securityDescriptorUtils.getLinkPathIfType('GH_REPO', room);
@@ -112,6 +112,80 @@ function findAssociatedGithubRepoForRoom(room) {
       if (sd.type === 'GH_REPO') return sd.linkPath;
 
       return null;
+    });
+});
+
+/**
+ * Given an array of rooms, returns the repos associated with those
+ * rooms, in a hash, keyed by the room.id
+ */
+function findAssociatedGithubRepoForRooms(rooms) {
+  var result = {};
+  var groupSet;
+  if (!rooms || !rooms.length) return result;
+
+  // Only one room? Use a singler, faster method
+  if (rooms.length === 1) {
+    var singleRoom = rooms[0];
+
+    return findAssociatedGithubRepoForRoom(singleRoom)
+      .then(function(repoUri) {
+        if (repoUri) {
+          result[singleRoom.id || singleRoom._id] = repoUri;
+        }
+        return result;
+      });
+  }
+
+  rooms.forEach(function(room) {
+    var linkPath = securityDescriptorUtils.getLinkPathIfType('GH_REPO', room);
+    var roomId = room.id || room._id;
+
+    if (linkPath) {
+      result[roomId] = linkPath;
+      return;
+    }
+
+    var groupId = room.groupId;
+    if (groupId) {
+      if (!groupSet) {
+        groupSet = {};
+      }
+
+      if (!groupSet[groupId]) {
+        groupSet[groupId] = [];
+      }
+
+      groupSet[groupId].push(roomId);
+    }
+  });
+
+  // If everything that we can resolve has been resolved, continue
+  // no further...
+  if (!groupSet) {
+    return result;
+  }
+
+  // Lookup the security descriptors for the given groupIds
+  var groupIds = Object.keys(groupSet);
+  return securityDescriptorService.group.findByIdsSelect(groupIds, { type: 1, linkPath: 1 })
+    .then(function(groups) {
+      groups.forEach(function(group) {
+        var groupId = group._id || group.id;
+
+        var linkPath = securityDescriptorUtils.getLinkPathIfType('GH_REPO', group);
+
+        if (linkPath) {
+          var roomIds = groupSet[groupId];
+          if (roomIds) {
+            roomIds.forEach(function(roomId) {
+              result[roomId] = linkPath;
+            })
+          }
+        }
+      });
+
+      return result;
     });
 }
 
@@ -136,6 +210,7 @@ function sendBadgePullRequestForRepo(room, user, repoUri) {
 module.exports = {
   autoConfigureHooksForRoom: autoConfigureHooksForRoom,
   associateRoomToRepo: Promise.method(associateRoomToRepo),
-  findAssociatedGithubRepoForRoom: Promise.method(findAssociatedGithubRepoForRoom),
+  findAssociatedGithubRepoForRoom: findAssociatedGithubRepoForRoom,
+  findAssociatedGithubRepoForRooms: Promise.method(findAssociatedGithubRepoForRooms),
   sendBadgePullRequestForRepo: Promise.method(sendBadgePullRequestForRepo),
 };

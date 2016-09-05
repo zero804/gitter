@@ -335,7 +335,7 @@ function TroupeStrategy(options) {
       activity: hasActivity,
       url: troupeUrl,
       githubType: guessLegacyGitHubType(item),
-      associatedRepo: associatedRepoStrategy ? associatedRepoStrategy.map(id) : undefined,
+      associatedRepo: associatedRepoStrategy ? associatedRepoStrategy.map(item) : undefined,
       security: guessLegacySecurity(item),
       premium: isPro,
       noindex: item.noindex, // TODO: this should not always be here
