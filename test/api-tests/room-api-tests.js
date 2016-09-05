@@ -72,6 +72,18 @@ describe('room-api', function() {
       });
   });
 
+  it('GET /v1/rooms/:roomId/issues', function() {
+    return request(app)
+      .get('/v1/rooms/' + fixture.troupe1.id + '/issues')
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+      .then(function(result) {
+        var issues = result.body;
+
+        assert.deepEqual(issues, []);
+      });
+  });
+
   it('POST /v1/rooms/ with a room', function() {
     return request(app)
       .post('/v1/rooms')

@@ -155,5 +155,37 @@ describe('data-access-test', function() {
       });
     });
 
+    describe('findByIdsSelect', function() {
+      it('should return multiple values', function() {
+        var groupId1 = fixture.group1.id;
+        var groupId2 = fixture.group2.id;
+        var groupId4 = fixture.group4.id;
+
+        return securityDescriptorService.group.findByIdsSelect([groupId1, groupId2, groupId4], { linkPath: 1, type: 1 })
+          .then(function(results) {
+            results.forEach(function(x) {
+              x._id = String(x._id);
+            });
+
+            assert.deepEqual(results, [{
+              _id: groupId1,
+              sd: {
+                type: null
+              }
+            }, {
+              _id: groupId2,
+              sd: {
+                type: null
+              }
+            }, {
+              _id: groupId4,
+              sd: {
+                type: null
+              }
+            }]);
+          });
+      })
+    });
+
   });
 });

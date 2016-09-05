@@ -8,6 +8,7 @@ var processText = require('gitter-web-text-processor');
 var StatusError = require('statuserror');
 var loadTroupeFromParam = require('./load-troupe-param');
 var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
+var roomRepoService = require('../../../services/room-repo-service');
 
 function getEightSuggestedIssues(issues, includeRepo) {
   var suggestedIssues = [];
@@ -52,40 +53,47 @@ module.exports = {
     var issueNumber = req.query.issueNumber || '';
 
     return Promise.try(function() {
-        if (repoName) return [repoName];
+        if (repoName) {
+          return {
+            type: 'GH_REPO',
+            linkPath: repoName
+          }
+        }
 
         // Resolve the repo name from the room
         return loadTroupeFromParam(req)
           .then(function(troupe) {
-            return [
-              securityDescriptorUtils.getLinkPathIfType('GH_REPO', troupe),
-              securityDescriptorUtils.getLinkPathIfType('GH_ORG', troupe),
-            ];
+            return roomRepoService.findAssociatedGithubObjectForRoom(troupe);
           });
       })
       .bind({
         includeRepo: false
       })
-      .spread(function(repoName, orgName) {
-        if (repoName) {
+      .then(function(backingObject) {
+        if (!backingObject) return;
+
+        var type = backingObject.type;
+        var linkPath = backingObject.linkPath;
+
+        if (type === 'GH_REPO') {
           var repoService = new RepoService(req.user);
 
-          return repoService.getIssues(repoName, {
+          return repoService.getIssues(linkPath, {
             firstPageOnly: !issueNumber
           });
         }
 
-        if (orgName) {
+        if (type === 'GH_ORG') {
           var orgService = new OrgService(req.user);
           this.includeRepo = true;
-          return orgService.getIssues(orgName, {
+          return orgService.getIssues(linkPath, {
             firstPageOnly: true // Only fetch the first page for org issues
           });
         }
-
-        return [];
       })
       .then(function(issues) {
+        if (!issues) return [];
+
         var matches = issueNumber ? getTopEightMatchingIssues(issues, issueNumber, this.includeRepo) : getEightSuggestedIssues(issues, this.includeRepo);
         return matches;
       });
@@ -94,7 +102,9 @@ module.exports = {
   show: function(req) {
     return loadTroupeFromParam(req)
       .then(function(troupe) {
-        var repoUri = securityDescriptorUtils.getLinkPathIfType('GH_REPO', troupe);
+        return roomRepoService.findAssociatedGithubRepoForRoom(troupe);
+      })
+      .then(function(repoUri) {
         if(!repoUri) throw new StatusError(404);
 
         var issueNumber = req.params.issue;
