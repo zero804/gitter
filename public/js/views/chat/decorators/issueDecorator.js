@@ -89,11 +89,11 @@ var FooterView = Marionette.ItemView.extend({
   onMentionClick: function() {
     getRoomRepo()
       .then(function(roomRepo) {
-      var modelRepo = this.model.get('repo');
-      var modelNumber = this.model.get('number');
-      var mentionText = (modelRepo === roomRepo) ? '#' + modelNumber : modelRepo + '#' + modelNumber;
-      appEvents.trigger('input.append', mentionText);
-    });
+        var modelRepo = this.model.get('repo');
+        var modelNumber = this.model.get('number');
+        var mentionText = (modelRepo === roomRepo) ? '#' + modelNumber : modelRepo + '#' + modelNumber;
+        appEvents.trigger('input.append', mentionText);
+      });
 
     this.parentPopover.hide();
   }
@@ -113,7 +113,7 @@ function getRoomRepo() {
   }
 
   // Only runs if the cache misses
-  return new Promise(function(resolve/*, reject*/) {
+  return new Promise(function(resolve, reject) {
     // Check if the snapshot already came in
     var associatedRepo = room.get('associatedRepo');
     if(associatedRepo || associatedRepo === false) {
@@ -124,12 +124,15 @@ function getRoomRepo() {
     else {
       context.troupe().once('change:associatedRepo', function() {
         var updatedRoom = context.troupe();
+        var updatedRoomId = updatedRoom.get('id');
         // The room could have changed since the request came back in
-        if(roomId === updatedRoom.get('id')) {
+        if(roomId === updatedRoomId) {
           var repoUri = updatedRoom.get('associatedRepo');
-          repoToRoomMapCache[updatedRoom.get('id')] = repoUri;
+          repoToRoomMapCache[updatedRoomId] = repoUri;
           resolve(repoUri);
         }
+
+        reject(new Error('Room no longer matches the one you were trying to get the associatedRepo from: ' + roomId + ', now' + updatedRoomId))
       }.bind(this));
     }
   }.bind(this));
