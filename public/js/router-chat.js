@@ -19,6 +19,7 @@ var chatCollection = require('./collections/instances/chats-cached');
 var troupeCollections = require('./collections/instances/troupes');
 var ChatToolbarInputLayout = require('./views/layouts/chat-toolbar-input');
 var DropTargetView = require('./views/app/dropTargetView');
+var presentPermissionsDialog = require('./ensured/present-permissions-dialog');
 
 /* Set the timezone cookie */
 require('./components/timezone-cookie');
@@ -264,6 +265,7 @@ onready(function() {
       'integrations': 'integrations',
       'add': 'addPeople',
       'settings': 'settings',
+      'permissions': 'permissions',
       'tags': 'editTags',
       'autojoin': 'autojoin',
       'notification-defaults': 'notificationDefaults',
@@ -345,6 +347,15 @@ onready(function() {
         appView.dialogRegion.show(new RoomSettingsModal({ model: context.troupe() }));
       });
     },
+
+    permissions: function() {
+      presentPermissionsDialog({
+        roomCollection: troupeCollections.troupes,
+        groupCollection: troupeCollections.groups,
+        dialogRegion: appView.dialogRegion
+      });
+    },
+
 
     editTags: function() {
       require.ensure(['./views/modals/edit-tags-view'], function(require) {

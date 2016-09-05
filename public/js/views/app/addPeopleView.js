@@ -2,17 +2,18 @@
 var Marionette = require('backbone.marionette');
 var ModalView = require('../modals/modal');
 var Backbone = require('backbone');
-var context = require('../../utils/context');
 var clientEnv = require('gitter-client-env');
+var avatars = require('gitter-web-avatars');
+var context = require('../../utils/context');
 var apiClient = require('../../components/apiClient');
+var Typeahead = require('../controls/typeahead');
+var userSearchModels = require('../../collections/user-search');
 var template = require('./tmpl/addPeople.hbs');
 var userSearchItemTemplate = require('./tmpl/userSearchItem.hbs');
 var itemTemplate = require('./tmpl/addPeopleItemView.hbs');
-var Typeahead = require('../controls/typeahead');
-var userSearchModels = require('../../collections/user-search');
 require('../behaviors/widgets');
 
-var DEFAULT_AVATAR_UNTIL_AVATARS_SERVICE_ARRIVES = 'https://avatars.githubusercontent.com/u/0'
+var DEFAULT_AVATAR_UNTIL_AVATARS_SERVICE_ARRIVES = avatars.getDefault();
 /**
  *  Ridiculously sloppy regexp based email validator, let the server
  *  do the real validation
