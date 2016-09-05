@@ -4,11 +4,13 @@ import sinon, {spy} from 'sinon';
 import { shallow } from 'enzyme';
 import ForumContainer from '../../../../shared/containers/ForumContainer.jsx';
 import { subscribe } from '../../../../shared/dispatcher';
+
 import * as forumCatConstants from '../../../../shared/constants/forum-categories';
 import * as forumFilterConstants from '../../../../shared/constants/forum-filters';
 import * as forumSortConstants from '../../../../shared/constants/forum-sorts';
 import * as forumTagConstants from '../../../../shared/constants/forum-tags';
 import * as createConst from '../../../../shared/constants/create-topic';
+
 import categoryStore from '../../../mocks/category-store';
 import tagStore from '../../../mocks/tag-store';
 import topicsStore from '../../../mocks/topic-store';
@@ -94,6 +96,13 @@ describe('<ForumContainer />', function(){
     const handle = spy();
     subscribe(createConst.SUBMIT_NEW_TOPIC, handle);
     wrapper.find('CreateTopicModal').at(0).prop('onSubmit')()
+    equal(handle.callCount, 1);
+  });
+
+  it('should dispatch the right action when the create topic category changes', () => {
+    const handle = spy();
+    subscribe(createConst.CATEGORY_UPDATE, handle);
+    wrapper.find('CreateTopicModal').at(0).prop('onCategoryChange')('1');
     equal(handle.callCount, 1);
   });
 
