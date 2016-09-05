@@ -9,7 +9,7 @@ var GithubIssueStateService = require('gitter-web-github').GitHubIssueStateServi
 var StatusError = require('statuserror');
 
 var EXPIRES_SECONDS = 180;
-var EXPIRES_MILLISECONDS = 180 * 1000;
+var EXPIRES_MILLISECONDS = EXPIRES_SECONDS * 1000;
 
 module.exports = function(req, res, next) {
   var issue = req.query.q;

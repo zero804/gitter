@@ -126,7 +126,8 @@ module.exports = {
           includeTags: true,
           includePermissions: true,
           includeProviders: true,
-          includeBackend: true
+          includeBackend: true,
+          includeAssociatedRepo: true
         });
 
         return Promise.join(

@@ -12,6 +12,14 @@ var bodyTemplate = require('./tmpl/issuePopover.hbs');
 var titleTemplate = require('./tmpl/issuePopoverTitle.hbs');
 var footerTemplate = require('./tmpl/commitPopoverFooter.hbs');
 var SyncMixin = require('../../../collections/sync-mixin');
+var troupeCollections = require('../../../collections/instances/troupes');
+
+
+function isGitHubUser(user) {
+  return user && user.get('providers').some(function(provider) {
+    return provider === 'github';
+  });
+}
 
 function convertToIssueAnchor(element, githubIssueUrl) {
   var resultantElement = element;
@@ -90,22 +98,40 @@ var FooterView = Marionette.ItemView.extend({
   }
 });
 
-var repoToRoomMap = {};
+var repoToRoomMapCache = {};
 function getRoomRepo() {
   var room = context.troupe();
+  if(!room) {
+    return Promise.reject('No current room');
+  }
+
   var roomId = room.get('id');
-  var repoFromCache = repoToRoomMap[roomId];
+  var repoFromCache = repoToRoomMapCache[roomId];
   if(repoFromCache) {
     return Promise.resolve(repoFromCache);
   }
 
-  return apiClient.room.get('/issues-info')
-    .then(function(info) {
-      var uri = info && info.repos && info.repos[0] && info.repos[0].uri;
-      // Store it in the cache
-      repoToRoomMap[roomId] = uri;
-      return uri;
-    });
+  // Only runs if the cache misses
+  return new Promise(function(resolve/*, reject*/) {
+    // Check if the snapshot already came in
+    var associatedRepo = room.get('associatedRepo');
+    if(associatedRepo) {
+      repoToRoomMapCache[roomId] = associatedRepo;
+      resolve(associatedRepo);
+    }
+    // Wait for the realtime-troupe-listener snapshot to come in
+    else {
+      context.troupe().once('change:associatedRepo', function() {
+        var updatedRoom = context.troupe();
+        // The room could have changed since the request came back in
+        if(roomId === updatedRoom.get('id')) {
+          var repoUri = updatedRoom.get('associatedRepo');
+          repoToRoomMapCache[updatedRoom.get('id')] = repoUri;
+          resolve(repoUri);
+        }
+      }.bind(this));
+    }
+  }.bind(this));
 }
 
 function createPopover(model, targetElement) {
@@ -141,71 +167,98 @@ function getGitHubIssueUrl(repo, issueNumber) {
 
 var decorator = {
   decorate: function(view) {
-    getRoomRepo()
-      .then(function(roomRepo) {
-      Array.prototype.forEach.call(view.el.querySelectorAll('*[data-link-type="issue"]'), function(issueElement) {
-        var repo = issueElement.dataset.issueRepo || roomRepo;
-        var issueNumber = issueElement.dataset.issue;
-        var githubIssueUrl = getGitHubIssueUrl(repo, issueNumber);
+    Array.prototype.forEach.call(view.el.querySelectorAll('*[data-link-type="issue"]'), function(issueElement) {
+      Promise.resolve().then(function() {
+          var repoFromElement = issueElement.dataset.issueRepo;
+          if(repoFromElement) {
+            return Promise.resolve(repoFromElement)
+          }
 
-        issueElement = convertToIssueAnchor(issueElement, githubIssueUrl);
+          return getRoomRepo();
+        })
+        .then(function(repo) {
+          var issueNumber = issueElement.dataset.issue;
+          var anchorUrl = '';
 
-        getIssueState(repo, issueNumber)
-          .then(function(state) {
-            if(state) {
-              // We depend on this to style the issue after making sure it is an issue
-              issueElement.classList.add('is-existent');
+          var currentRoom = context.troupe();
+          var currentGroup = troupeCollections.groups.get(currentRoom.get('groupId'));
+          var backedBy = currentGroup && currentGroup.get('backedBy');
+          if(repo) {
+            anchorUrl = getGitHubIssueUrl(repo, issueNumber);
+          }
+          else if(!repo && currentRoom.get('oneToOne')) {
+            var currentUser = context.user();
+            var otherUser = currentRoom.get('user');
+            currentUser.get('providers')
+            if(currentUser && isGitHubUser(currentUser) && otherUser && isGitHubUser(otherUser)) {
+              anchorUrl = 'https://github.com/issues?utf8=%E2%9C%93&q=822+%28involves%3A' + currentUser.get('username') + '+OR+involves%3Asuprememoocow+%29';
+            }
+          }
+          else if(backedBy && backedBy.type === 'GH_ORG') {
+            // TODO
+            // https://github.com/issues?utf8=%E2%9C%93&q=822++user%3AgitterHQ+
+          }
 
-              // dont change the issue state colouring for the activity feed
-              if(!issueElement.classList.contains('open') && !issueElement.classList.contains('closed')) {
-                issueElement.classList.add(state);
+          issueElement = convertToIssueAnchor(issueElement, anchorUrl);
+
+          getIssueState(repo, issueNumber)
+            .then(function(state) {
+              if(state) {
+                // We depend on this to style the issue after making sure it is an issue
+                issueElement.classList.add('is-existent');
+
+                // dont change the issue state colouring for the activity feed
+                if(!issueElement.classList.contains('open') && !issueElement.classList.contains('closed')) {
+                  issueElement.classList.add(state);
+                }
+
+                // Hook up all of the listeners
+                issueElement.addEventListener('click', showPopover);
+                issueElement.addEventListener('mouseover', showPopoverLater);
+
+                view.once('destroy', function() {
+                  issueElement.removeEventListener('click', showPopover);
+                  issueElement.removeEventListener('mouseover', showPopoverLater);
+                });
               }
+            });
 
-              // Hook up all of the listeners
-              issueElement.addEventListener('click', showPopover);
-              issueElement.addEventListener('mouseover', showPopoverLater);
+          function getModel() {
+            var model = new IssueModel({
+              repo: repo,
+              number: issueNumber,
+              html_url: anchorUrl
+            });
 
-              view.once('destroy', function() {
-                issueElement.removeEventListener('click', showPopover);
-                issueElement.removeEventListener('mouseover', showPopoverLater);
-              });
-            }
-          });
+            model.fetch({
+              data: { renderMarkdown: true },
+              error: function() {
+                model.set({ error: true });
+              }
+            });
+            return model;
+          }
+          function showPopover(e, model) {
+            if(!model) model = getModel();
 
-        function getModel() {
-          var model = new IssueModel({
-            repo: repo,
-            number: issueNumber,
-            html_url: githubIssueUrl
-          });
+            var popover = createPopover(model, e.target);
+            popover.show();
+            Popover.singleton(view, popover);
 
-          model.fetch({
-            data: { renderMarkdown: true },
-            error: function() {
-              model.set({ error: true });
-            }
-          });
-          return model;
-        }
-        function showPopover(e, model) {
-          if(!model) model = getModel();
+            e.preventDefault();
+          }
 
-          var popover = createPopover(model, e.target);
-          popover.show();
-          Popover.singleton(view, popover);
+          function showPopoverLater(e) {
+            var model = getModel();
 
-          e.preventDefault();
-        }
-
-        function showPopoverLater(e) {
-          var model = getModel();
-
-          Popover.hoverTimeout(e, function() {
-            showPopover(e, model);
-          });
-        }
-      });
+            Popover.hoverTimeout(e, function() {
+              showPopover(e, model);
+            });
+          }
+        });
     });
+
+
   }
 };
 

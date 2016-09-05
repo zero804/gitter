@@ -11,12 +11,12 @@ var loadTroupeFromParam = require('./load-troupe-param');
 var StatusError = require('statuserror');
 
 var EXPIRES_SECONDS = 180;
-var EXPIRES_MILLISECONDS = 180 * 1000;
+var EXPIRES_MILLISECONDS = EXPIRES_SECONDS * 1000;
 
 module.exports = {
   id: 'issue-state',
 
-  index: function(req) {
+  index: function(req, res) {
     var issue = req.query.q;
 
     return Promise.try(function() {
@@ -45,6 +45,8 @@ module.exports = {
             return service.getIssueState(repo, issueNumber);
         })
         .then(function(results) {
+          res.setHeader('Cache-Control', 'public, max-age=' + EXPIRES_SECONDS);
+          res.setHeader('Expires', new Date(Date.now() + EXPIRES_MILLISECONDS).toUTCString());
           return [results];
         })
     })
