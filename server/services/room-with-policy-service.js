@@ -359,14 +359,14 @@ function removeUserFromRoomAllowCurrentUser(userForRemove) {
 }
 
 /**
- * Add an existing Gitter user to a room
+ * Remove a user from a room
  */
 RoomWithPolicyService.prototype.removeUserFromRoom = secureMethod([removeUserFromRoomAllowCurrentUser, allowAdmin], function(userForRemove) {
   return roomService.removeUserFromRoom(this.room, userForRemove);
 });
 
 /**
- * Add an existing Gitter user to a room
+ * Send a pull request badger post room creation
  */
 RoomWithPolicyService.prototype.sendBadgePullRequest = secureMethod([allowAdmin], function(repoUri) {
   return (repoUri ? Promise.resolve(repoUri) : roomRepoService.findAssociatedGithubRepoForRoom(this.room))
@@ -379,7 +379,7 @@ RoomWithPolicyService.prototype.sendBadgePullRequest = secureMethod([allowAdmin]
 });
 
 /**
- * Add an existing Gitter user to a room
+ * configure room/repo hooks post room creation
  */
 RoomWithPolicyService.prototype.autoConfigureHooks = secureMethod([allowAdmin], function() {
   return roomRepoService.findAssociatedGithubRepoForRoom(this.room)
