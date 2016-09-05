@@ -207,7 +207,7 @@ function TroupeStrategy(options) {
 
 
     if (options.includeBackend) {
-      securityDescriptorStrategy = SecurityDescriptorStrategy.simple();
+      securityDescriptorStrategy = SecurityDescriptorStrategy.slim();
       // Backend strategy needs no mapping stage
     }
 
