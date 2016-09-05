@@ -96,7 +96,7 @@ module.exports = {
         var updatedTroupe = req.body;
 
         if(updatedTroupe.autoConfigureHooks) {
-          promises.push(roomService.applyAutoHooksForRepoRoom(req.user, troupe));
+          promises.push(roomWithPolicyService.autoConfigureHooks());
         }
 
         if(updatedTroupe.hasOwnProperty('topic')) {

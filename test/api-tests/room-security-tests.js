@@ -98,6 +98,17 @@ describe('room-security-api', function() {
       });
   });
 
+  it('PUT /v1/rooms/:roomId/security - no extraAdmins', function() {
+    var roomId = fixture.troupe3.id;
+    return request(app)
+      .put('/v1/rooms/' + roomId + '/security')
+      .send({
+        extraAdmins: []
+      })
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(400);
+  });
+
   it('GET /v1/rooms/:roomId/security/extraAdmins', function() {
     var roomId = fixture.troupe1.id;
     return request(app)
