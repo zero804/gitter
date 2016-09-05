@@ -89,7 +89,7 @@ module.exports = CommunityCreateBaseStepView.extend({
     this.checkSlugAvailabilityDebounced = _.debounce(this.checkSlugAvailability.bind(this), 500);
 
     this.listenTo(this.communityCreateModel, 'change:communityName change:communitySlug', this.onCommunityInfoChange, this);
-    this.listenTo(this.communityCreateModel, 'change:communitySlugAvailabilityStatus', this.updateSlugAvailabilityStatusIndicator, this);
+    this.listenTo(this.communityCreateModel, 'change:communitySlugAvailabilityStatus', this.onSlugAvailabilityStatusChange, this);
   },
 
 
@@ -209,6 +209,9 @@ module.exports = CommunityCreateBaseStepView.extend({
         if(status === 409) {
           communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.UNAVAILABLE);
         }
+        else if(status === 403) {
+          communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.NEEDS_MORE_PERMISSIONS);
+        }
         else {
           communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.INVALID);
         }
@@ -216,12 +219,15 @@ module.exports = CommunityCreateBaseStepView.extend({
       });
   }, 300),
 
+  onSlugAvailabilityStatusChange: function() {
+    this.updateSlugAvailabilityStatusIndicator();
+  },
 
   updateSlugAvailabilityStatusIndicator: function() {
     var status = this.communityCreateModel.get('communitySlugAvailabilityStatus');
 
     this.ui.communitySlugInputWrapper.toggleClass('pending', status === slugAvailabilityStatusConstants.PENDING);
     this.ui.communitySlugInputWrapper.toggleClass('available', status === slugAvailabilityStatusConstants.AVAILABLE);
-    this.ui.communitySlugInputWrapper.toggleClass('unavailable', status === slugAvailabilityStatusConstants.UNAVAILABLE || status === slugAvailabilityStatusConstants.INVALID);
+    this.ui.communitySlugInputWrapper.toggleClass('unavailable', status === slugAvailabilityStatusConstants.NEEDS_MORE_PERMISSIONS || status === slugAvailabilityStatusConstants.UNAVAILABLE || status === slugAvailabilityStatusConstants.INVALID);
   }
 });
