@@ -62,7 +62,11 @@ describe('room-security-api', function() {
       .set('x-access-token', fixture.user1.accessToken)
       .expect(200)
       .then(function(res) {
-        assert.deepEqual(res.body, { admins: 'MANUAL', members: 'PUBLIC' })
+        assert.deepEqual(res.body, {
+          type: null,
+          admins: 'MANUAL',
+          members: 'PUBLIC'
+        })
       });
   });
 
@@ -92,6 +96,7 @@ describe('room-security-api', function() {
       .expect(200)
       .then(function(res) {
         assert.deepEqual(res.body, {
+          type: null,
           admins: 'MANUAL',
           members: 'PUBLIC'
         })
