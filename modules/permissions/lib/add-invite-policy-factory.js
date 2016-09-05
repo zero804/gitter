@@ -10,7 +10,7 @@ var GhRepoPolicyDelegate = require('./policies/gh-repo-policy-delegate');
 var GhOrgPolicyDelegate = require('./policies/gh-org-policy-delegate');
 var GhUserPolicyDelegate = require('./policies/gh-user-policy-delegate');
 var StatusError = require('statuserror');
-var securityDescriptorService = require('./security-descriptor-service');
+var securityDescriptorService = require('./security-descriptor');
 var userLoaderFactory = require('./user-loader-factory');
 var assert = require('assert');
 
@@ -48,7 +48,7 @@ function createPolicyForRoomInvite(user, room, inviteSecret) {
 
   // TODO: optimise this as we may already have the information we need on the room...
   // in which case we shouldn't have to refetch it from mongo
-  return securityDescriptorService.getForRoomUser(roomId, userId)
+  return securityDescriptorService.room.findById(roomId, userId)
     .then(function(securityDescriptor) {
       if (!securityDescriptor) throw new StatusError(404);
 
@@ -84,7 +84,7 @@ function createPolicyForRoomAdd(user, room) {
 
   // TODO: optimise this as we may already have the information we need on the room...
   // in which case we shouldn't have to refetch it from mongo
-  return securityDescriptorService.getForRoomUser(roomId, userId)
+  return securityDescriptorService.room.findById(roomId, userId)
     .then(function(securityDescriptor) {
       if (!securityDescriptor) throw new StatusError(404);
 
