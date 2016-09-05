@@ -36,8 +36,7 @@ describe('GroupStrategy', function() {
           name: group.name,
           uri: group.uri,
           backedBy: {
-            type: group.sd.type,
-            linkPath: group.sd.linkPath
+            type: null
           },
           avatarUrl: nconf.get('avatar:officialHost') + '/group/i/' + group.id
         }]);
@@ -54,8 +53,7 @@ describe('GroupStrategy', function() {
           name: group.name,
           uri: group.uri,
           backedBy: {
-            type: group.sd.type,
-            linkPath: group.sd.linkPath
+            type: null
           },
           avatarUrl: nconf.get('avatar:officialHost') + '/group/iv/' + group.avatarVersion + '/' + group.id
         }]);
@@ -72,8 +70,7 @@ describe('GroupStrategy', function() {
           name: group.name,
           uri: group.uri,
           backedBy: {
-            type: group.sd.type,
-            linkPath: group.sd.linkPath
+            type: null
           },
           avatarUrl: nconf.get('avatar:officialHost') + '/group/i/' + group.id,
           hasAvatarSet: false
@@ -91,8 +88,7 @@ describe('GroupStrategy', function() {
           name: group.name,
           uri: group.uri,
           backedBy: {
-            type: group.sd.type,
-            linkPath: group.sd.linkPath
+            type: null
           },
           avatarUrl: nconf.get('avatar:officialHost') + '/group/iv/' + group.avatarVersion + '/' + group.id,
           hasAvatarSet: true

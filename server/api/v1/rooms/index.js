@@ -179,6 +179,7 @@ module.exports = {
     'events': require('./events'),
     'meta': require('./meta'),
     'invites': require('./invites'),
+    'security': require('./security')
   }
 
 };
