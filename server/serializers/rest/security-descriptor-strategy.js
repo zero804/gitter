@@ -13,20 +13,8 @@ SimpleSecurityDescriptorStrategy.prototype = {
     if (sd.type === 'ONE_TO_ONE') return;
 
     return {
-      type: sd.type || undefined,
+      type: sd.type || null,
       linkPath: sd.linkPath || undefined,
-    };
-  },
-
-  mapFull: function(sd) {
-    if (!sd) return;
-    if (sd.type === 'ONE_TO_ONE') return;
-
-    return {
-      type: sd.type || undefined,
-      linkPath: sd.linkPath || undefined,
-      admins: sd.admins || undefined,
-      members: sd.members || undefined
     };
   },
 
@@ -46,7 +34,7 @@ FullSecurityDescriptorStrategy.prototype = {
     if (sd.type === 'ONE_TO_ONE') return;
 
     return {
-      type: sd.type || undefined,
+      type: sd.type || null,
       linkPath: sd.linkPath || undefined,
       admins: sd.admins || undefined,
       members: sd.members || undefined
@@ -57,7 +45,7 @@ FullSecurityDescriptorStrategy.prototype = {
 };
 
 
-function simple() {
+function slim() {
   return new SimpleSecurityDescriptorStrategy();
 }
 
@@ -67,5 +55,5 @@ function full() {
 
 module.exports = {
   full: full,
-  simple: simple
+  slim: slim
 };
