@@ -37,7 +37,7 @@ describe('transform-test', function() {
     },
     groupId: groupId
   }, {
-    name: 'group remove backing',
+    name: 'group remove backing, public',
     Model: persistence.Group,
     newType: null,
     in: {
@@ -65,7 +65,7 @@ describe('transform-test', function() {
     },
     groupId: groupId
   }, {
-    name: 'room switch from github to group',
+    name: 'room switch from github to group, public',
     Model: persistence.Troupe,
     newType: 'GROUP',
     in: {
@@ -85,6 +85,62 @@ describe('transform-test', function() {
       members: 'PUBLIC',
       admins: 'GROUP_ADMIN',
       public: true,
+      linkPath: null,
+      internalId: groupId,
+      externalId: null,
+      extraAdmins: ['a'],
+      extraMembers: ['b']
+    },
+    groupId: groupId
+  }, {
+    name: 'group remove backing, private',
+    Model: persistence.Group,
+    newType: null,
+    in: {
+      type: 'GH_REPO',
+      members: 'GH_REPO_ACCESS',
+      admins: 'GH_REPO_PUSH',
+      public: false,
+      linkPath: 'x/y',
+      internalId: null,
+      externalId: '1',
+      extraAdmins: ['a'],
+      extraMembers: ['b']
+
+    },
+    out: {
+      type: null,
+      members: 'INVITE',
+      admins: 'MANUAL',
+      public: false,
+      linkPath: null,
+      internalId: null,
+      externalId: null,
+      extraAdmins: ['a'],
+      extraMembers: ['b']
+    },
+    groupId: groupId
+  }, {
+    name: 'room switch from github to group, private',
+    Model: persistence.Troupe,
+    newType: 'GROUP',
+    in: {
+      type: 'GH_REPO',
+      members: 'GH_REPO_ACCESS',
+      admins: 'GH_REPO_PUSH',
+      public: false,
+      linkPath: 'x/y',
+      internalId: null,
+      externalId: '1',
+      extraAdmins: ['a'],
+      extraMembers: ['b']
+
+    },
+    out: {
+      type: 'GROUP',
+      members: 'INVITE',
+      admins: 'GROUP_ADMIN',
+      public: false,
       linkPath: null,
       internalId: groupId,
       externalId: null,
