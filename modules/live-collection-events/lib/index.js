@@ -2,21 +2,14 @@
 
 var EventEmitter = require('events').EventEmitter;
 
-var handlers = [
-  'events',
-  'chats',
-  'rooms',
-  'roomMembers',
-  'users',
-  'groupMembers',
-  'topics',
-  'replies'
-];
+module.exports = {
+  events: new EventEmitter(),
+  chats: new EventEmitter(),
+  rooms: new EventEmitter(),
+  roomMembers: new EventEmitter(),
+  users: new EventEmitter(),
+  groupMembers: new EventEmitter(),
+  topics: new EventEmitter(),
+  replies: new EventEmitter()
+};
 
-var emitters = handlers.reduce(function(memo, category) {
-    var emitter = new EventEmitter();
-    memo[category] = emitter;
-    return memo;
-  }, {});
-
-module.exports = emitters;
