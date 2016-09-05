@@ -46,9 +46,9 @@ function convertToIssueAnchor(element, githubIssueUrl) {
 }
 
 function getIssueState(repo, issueNumber) {
-  var issue = (repo ? (repo + '/') : '') + issueNumber;
-  return apiClient.room.get('/issue-state', {
-      q: issue
+  return apiClient.priv.get('/issue-state', {
+      r: repo,
+      i: issueNumber
     })
     .then(function(states) {
       return states[0];
