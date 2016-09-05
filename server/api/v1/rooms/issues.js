@@ -70,6 +70,8 @@ module.exports = {
         includeRepo: false
       })
       .then(function(backingObject) {
+        if (!backingObject) return;
+
         var type = backingObject.type;
         var linkPath = backingObject.linkPath;
 
@@ -88,10 +90,10 @@ module.exports = {
             firstPageOnly: true // Only fetch the first page for org issues
           });
         }
-
-        return [];
       })
       .then(function(issues) {
+        if (!issues) return [];
+
         var matches = issueNumber ? getTopEightMatchingIssues(issues, issueNumber, this.includeRepo) : getEightSuggestedIssues(issues, this.includeRepo);
         return matches;
       });
