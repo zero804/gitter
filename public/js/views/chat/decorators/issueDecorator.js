@@ -36,7 +36,7 @@ function convertToIssueAnchor(element, githubIssueUrl) {
        }
     }
 
-    newElement.setAttribute('href', githubIssueUrl);
+    newElement.setAttribute('href', githubIssueUrl || '');
     newElement.setAttribute('target', '_blank');
 
     resultantElement = newElement;
@@ -168,6 +168,33 @@ function getGitHubIssueUrl(repo, issueNumber) {
   return 'https://github.com/' + repo + '/issues/' + issueNumber;
 }
 
+function getAnchorUrl(githubRepo, issueNumber) {
+  var currentRoom = context.troupe();
+  var currentGroup = context.group();
+  var backedBy = currentGroup && currentGroup.get('backedBy');
+  if(githubRepo) {
+    return getGitHubIssueUrl(githubRepo, issueNumber);
+  }
+
+  // One-to-ones
+  if(!githubRepo && currentRoom.get('oneToOne')) {
+    var currentUser = context.user();
+    var otherUser = currentRoom.get('user');
+
+    if(currentUser && isGitHubUser(currentUser) && otherUser && isGitHubUser(otherUser)) {
+      return 'https://github.com/issues?utf8=%E2%9C%93&q=' + issueNumber + '+%28involves%3A' + currentUser.get('username') + '+OR+involves%3A' + otherUser.username + '+%29';
+    }
+
+    return null;
+  }
+
+  // We don't know the REPO, but we know the org?
+  if(backedBy && backedBy.type === 'GH_ORG') {
+    return 'https://github.com/issues?utf8=%E2%9C%93&q=' + issueNumber + '+user%3A' + backedBy.linkPath;
+  }
+
+}
+
 var decorator = {
   decorate: function(view) {
     Array.prototype.forEach.call(view.el.querySelectorAll('*[data-link-type="issue"]'), function(issueElement) {
@@ -181,48 +208,33 @@ var decorator = {
         })
         .then(function(repo) {
           var issueNumber = issueElement.dataset.issue;
-          var anchorUrl = '';
-
-          var currentRoom = context.troupe();
-          var currentGroup = context.group();
-          var backedBy = currentGroup && currentGroup.get('backedBy');
-          if(repo) {
-            anchorUrl = getGitHubIssueUrl(repo, issueNumber);
-          } else if(!repo && currentRoom.get('oneToOne')) {
-            var currentUser = context.user();
-            var otherUser = currentRoom.get('user');
-            currentUser.get('providers')
-            if(currentUser && isGitHubUser(currentUser) && otherUser && isGitHubUser(otherUser)) {
-              anchorUrl = 'https://github.com/issues?utf8=%E2%9C%93&q=' + issueNumber + '+%28involves%3A' + currentUser.get('username') + '+OR+involves%3A' + otherUser.username + '+%29';
-            }
-          } else if(backedBy && backedBy.type === 'GH_ORG') {
-            // TODO
-            anchorUrl = 'https://github.com/issues?utf8=%E2%9C%93&q=' + issueNumber + '++user%3A' + backedBy.linkPath + '+';
-          }
+          var anchorUrl = getAnchorUrl(repo, issueNumber) || '';
 
           issueElement = convertToIssueAnchor(issueElement, anchorUrl);
 
-          getIssueState(repo, issueNumber)
-            .then(function(state) {
-              if(state) {
-                // We depend on this to style the issue after making sure it is an issue
-                issueElement.classList.add('is-existent');
+          if (repo && issueNumber) {
+            getIssueState(repo, issueNumber)
+              .then(function(state) {
+                if(state) {
+                  // We depend on this to style the issue after making sure it is an issue
+                  issueElement.classList.add('is-existent');
 
-                // dont change the issue state colouring for the activity feed
-                if(!issueElement.classList.contains('open') && !issueElement.classList.contains('closed')) {
-                  issueElement.classList.add(state);
+                  // dont change the issue state colouring for the activity feed
+                  if(!issueElement.classList.contains('open') && !issueElement.classList.contains('closed')) {
+                    issueElement.classList.add(state);
+                  }
+
+                  // Hook up all of the listeners
+                  issueElement.addEventListener('click', showPopover);
+                  issueElement.addEventListener('mouseover', showPopoverLater);
+
+                  view.once('destroy', function() {
+                    issueElement.removeEventListener('click', showPopover);
+                    issueElement.removeEventListener('mouseover', showPopoverLater);
+                  });
                 }
-
-                // Hook up all of the listeners
-                issueElement.addEventListener('click', showPopover);
-                issueElement.addEventListener('mouseover', showPopoverLater);
-
-                view.once('destroy', function() {
-                  issueElement.removeEventListener('click', showPopover);
-                  issueElement.removeEventListener('mouseover', showPopoverLater);
-                });
-              }
-            });
+              });
+          }
 
           function getModel() {
             var model = new IssueModel({

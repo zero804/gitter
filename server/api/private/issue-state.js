@@ -1,10 +1,8 @@
 "use strict";
 
-
 var env = require('gitter-web-env');
 var logger = env.logger;
 var stats = env.stats;
-var Promise = require('bluebird');
 var GithubIssueStateService = require('gitter-web-github').GitHubIssueStateService;
 var StatusError = require('statuserror');
 
@@ -12,10 +10,10 @@ var EXPIRES_SECONDS = 180;
 var EXPIRES_MILLISECONDS = EXPIRES_SECONDS * 1000;
 
 function getRepoAndIssueNumber(query) {
+  // The new way...
   var repo = query.r ? String(query.r) : undefined;
   var issueNumber = query.i ? String(query.i) : undefined;
 
-  // The new way...
   if (repo && issueNumber) {
     return {
       repo: repo,
@@ -40,7 +38,7 @@ function getRepoAndIssueNumber(query) {
 module.exports = function(req, res, next) {
   var repoAndIssue = getRepoAndIssueNumber(req.query);
 
-  if (!repoAndIssue) {
+  if (!repoAndIssue || !repoAndIssue.repo || !repoAndIssue.issueNumber) {
     return next(new StatusError(400));
   }
 
