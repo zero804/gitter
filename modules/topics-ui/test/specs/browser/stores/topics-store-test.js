@@ -5,12 +5,13 @@ import {dispatch} from '../../../../shared/dispatcher';
 import submitNewTopic from '../../../../shared/action-creators/create-topic/submit-new-topic';
 import mockRouter from '../../../mocks/router';
 import topics from '../../../mocks/mock-data/topics';
+import forumStore from '../../../mocks/forum-store';
 
-export default describe('TopicsStore', () => {
+describe('TopicsStore', () => {
 
   let store;
   beforeEach(() => {
-    store = new Store(topics, { router: mockRouter });
+    store = new Store(topics, { router: mockRouter, forumStore: forumStore });
   });
 
   it('should provide a getTopics()', () => {
