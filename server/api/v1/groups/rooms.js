@@ -10,7 +10,11 @@ function getCreateOptions(input) {
   var name = input.name ? String(input.name) : undefined;
   var topic = input.topic ? String(input.topic) : undefined;
   var createOptions = { name: name, topic: topic };
+  var linkPath;
+
   if (input.security) {
+    linkPath = input.security.linkPath ? String(input.security.linkPath) : undefined;
+
     // PUBLIC or PRIVATE
     createOptions.security = input.security.security ? String(input.security.security) : undefined;
     assert(createOptions.security, 'security required');
@@ -19,7 +23,7 @@ function getCreateOptions(input) {
     createOptions.type = input.security.type ? String(input.security.type) : null;
     if (createOptions.type) {
       // for GitHub and future room types that are backed by other services
-      createOptions.linkPath = input.security.linkPath ? String(input.security.linkPath) : undefined;
+      createOptions.linkPath = linkPath;
       assert(createOptions.linkPath, 'linkPath required');
     }
   } else {
@@ -32,9 +36,13 @@ function getCreateOptions(input) {
     createOptions.providers = input.providers;
   }
 
-  // only github repo based rooms have the default room automatically
-  // integrated with github
-  createOptions.runPostGitHubRoomCreationTasks = createOptions.type === 'GH_REPO';
+  // If the backing type of the room is a repo,
+  // attempt to associate the room with that repo.
+  // In future, we could do this for any type of room
+  if (createOptions.type === 'GH_REPO') {
+    createOptions.associateWithGitHubRepo = linkPath;
+  }
+
   createOptions.addBadge = !!input.addBadge
 
   // keep tracking info around for sendStats
