@@ -60,7 +60,7 @@ GitHubRepoCollaboratorService.prototype.findCollaborators = function() {
       return _.map(filtered, function(member) {
         return {
           displayName: member.login,
-          githubUsername: member.login,
+          externalId: member.login,
           avatarUrl: avatars.getForGitHubUsername(member.login),
           type: identityService.GITHUB_IDENTITY_PROVIDER
         }

@@ -1,6 +1,5 @@
 'use strict';
 
-var Promise = require('bluebird');
 var _ = require('lodash');
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');

@@ -27,7 +27,7 @@ GitHubOrgCollaboratorService.prototype.findCollaborators = function() {
       return _.map(candidates, function(member) {
         return {
           displayName: member.login,
-          githubUsername: member.login,
+          externalId: member.login,
           avatarUrl: avatars.getForGitHubUsername(member.login),
           type: identityService.GITHUB_IDENTITY_PROVIDER
         }
