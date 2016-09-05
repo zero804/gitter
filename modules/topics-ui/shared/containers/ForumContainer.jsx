@@ -15,6 +15,7 @@ import titleUpdate from '../action-creators/create-topic/title-update';
 import bodyUpdate from '../action-creators/create-topic/body-update';
 import submitNewTopic from '../action-creators/create-topic/submit-new-topic';
 import navigateToTopic from '../action-creators/topic/navigate-to-topic';
+import categoryUpdate from '../action-creators/create-topic/category-update';
 
 import * as forumCatConstants from '../constants/forum-categories';
 import * as forumTagConstants from '../constants/forum-tags';
@@ -146,6 +147,7 @@ const ForumContainer = React.createClass({
           categories={categoryStore.mapForSelectControl()}
           onTitleChange={this.onTitleChange}
           onBodyChange={this.onBodyChange}
+          onCategoryChange={this.onCategoryChange}
           onClose={this.onCreateTopicClose}
           onSubmit={this.onSubmit}/>
 
@@ -159,6 +161,7 @@ const ForumContainer = React.createClass({
   onTagChange(tag){ dispatch(navigateToTag(tag));},
   onTitleChange(title){ dispatch(titleUpdate(title));},
   onBodyChange(body){ dispatch(bodyUpdate(body));},
+  onCategoryChange(id) { dispatch(categoryUpdate(id));},
 
   onCreateTopicClose(){
     const {categoryStore} = this.props;
