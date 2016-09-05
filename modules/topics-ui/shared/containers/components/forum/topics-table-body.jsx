@@ -26,14 +26,14 @@ export default React.createClass({
     const href = `/${groupName}/topics/topic/${topic.id}/${topic.slug}`
     return (
       <tr className="topics-table-body__row" key={`topics-table-row-${i}`}>
-        <td className="topics-table-body__cell--first">
+        <td className="topics-table-body__cell">
           <TopicLink groupName={groupName} topic={topic}>
             {topic.title}
           </TopicLink>
         </td>
         <td className="topics-table-body__cell">0</td>
         <td className="topics-table-body__cell">0</td>
-        <td className="topics-table-body__cell--last">0</td>
+        <td className="topics-table-body__cell">0</td>
       </tr>
     );
   }

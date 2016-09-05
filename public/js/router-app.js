@@ -435,6 +435,7 @@ onready(function() {
       'createroom': 'createRoom',
       'createroom/:name': 'createRoom',
       'createcommunity': 'createCommunity',
+      'permissions': 'permissions'
     },
 
     hideModal: function() {

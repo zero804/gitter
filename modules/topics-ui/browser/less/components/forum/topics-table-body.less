@@ -16,16 +16,15 @@
   padding:    1rem;
   text-align: center;
   color:      @topic-table-header-color;
-}
 
-.topics-table-body__cell--first {
-  &:extend(.topics-table-body__cell);
-  padding-left: @panel-horiz-padding + @panel-border-width;
-  text-align:   left;
-  color:        @topic-table-cell-color;
-}
+  &:first-child {
+    padding-left: @panel-horiz-padding + @panel-border-width;
+    text-align:   left;
+    color:        @topic-table-cell-color;
+  }
 
-.topics-table-body__cell--last {
-  &:extend(.topics-table-body__cell);
-  padding-right: @panel-horiz-padding + @panel-border-width;
+  &:last-child {
+    padding-right: @panel-horiz-padding + @panel-border-width;
+  }
+
 }
