@@ -1,10 +1,13 @@
-import { Model, Collection } from 'backbone';
+import Backbone from 'backbone';
 import {subscribe} from '../../../shared/dispatcher';
 import {SUBMIT_NEW_TOPIC, TOPIC_CREATED} from '../../../shared/constants/create-topic';
 import $ from 'jquery';
 import parseTag from '../../../shared/parse/tag';
+import {getRealtimeClient} from './realtime-client';
+import LiveCollection from './live-collection';
+import dispatchOnChangeMixin from './mixins/dispatch-on-change';
 
-var TopicModel = Model.extend({
+var TopicModel = Backbone.Model.extend({
   defaults: {},
   url(){
     const forumId = this.collection.getForumId();
@@ -39,6 +42,7 @@ var TopicModel = Model.extend({
 
   toJSON() {
     var data = this.attributes;
+    data.tags = (data.tags || []);
     return Object.assign({}, data, {
       tags: data.tags.map(parseTag)
     });
@@ -47,9 +51,16 @@ var TopicModel = Model.extend({
 
 });
 
-export default Collection.extend({
+export default dispatchOnChangeMixin(LiveCollection.extend({
 
   model: TopicModel,
+  client: getRealtimeClient(),
+  urlTemplate: '/v1/forums/:forumId/topics',
+  getContextModel(attrs){
+    return new Backbone.Model({
+      forumId: attrs.forumStore.get('id')
+    });
+  },
 
   initialize(models, attrs){
     this.accessTokenStore = attrs.accessTokenStore;
@@ -68,13 +79,11 @@ export default Collection.extend({
   },
 
   creatNewTopic(data){
-    const newTopic = this.create({ title: data.title, text: data.body });
-    newTopic.on(TOPIC_CREATED, () => {
-      this.trigger(TOPIC_CREATED, {
-        topicId: newTopic.get('id'),
-        slug: newTopic.get('slug')
-      });
-    })
+    const model = this.create({ title: data.title, text: data.body });
+    model.once(TOPIC_CREATED, () => this.trigger(TOPIC_CREATED, {
+      topicId: model.get('id'),
+      slug: model.get('slug')
+    }));
   },
 
   //TODO Remove
@@ -93,4 +102,4 @@ export default Collection.extend({
     if(categories && categories[0]) { return categories[0].id; }
   }
 
-});
+}));
