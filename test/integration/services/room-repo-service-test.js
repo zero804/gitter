@@ -36,12 +36,53 @@ describe('room-repo-service #slow', function(){
       },
       group: 'group1'
     },
+    troupe7: {
+      group: 'group2'
+    },
+    group2: {
+
+    }
 
   });
 
   before(function() {
     roomRepoService = testRequire('./services/room-repo-service');
   });
+
+  describe('findAssociatedGithubObjectForRoom', function() {
+    it('should deal with rooms with no backing object', function() {
+      return roomRepoService.findAssociatedGithubObjectForRoom(fixture.troupe1)
+        .then(function(result) {
+          assert.deepEqual(result, null);
+        });
+    });
+
+    it('should deal with groups with no backing object', function() {
+      return roomRepoService.findAssociatedGithubObjectForRoom(fixture.troupe7)
+        .then(function(result) {
+          assert.deepEqual(result, null);
+        });
+    });
+
+    it('should deal with rooms backed by a repo', function() {
+      return roomRepoService.findAssociatedGithubObjectForRoom(fixture.troupe5)
+        .then(function(result) {
+          assert.deepEqual(result, {
+            type: 'GH_REPO',
+            linkPath: '1/2'
+          });
+        });
+    });
+    it('should deal with groups backed by a repo', function() {
+      return roomRepoService.findAssociatedGithubObjectForRoom(fixture.troupe4)
+        .then(function(result) {
+          assert.deepEqual(result, {
+            type: 'GH_REPO',
+            linkPath: 'x/y'
+          });
+        });
+    });
+  })
 
   describe('findAssociatedGithubRepoForRooms', function() {
     it('should deal with no rooms', function() {

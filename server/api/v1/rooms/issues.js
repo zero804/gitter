@@ -53,33 +53,38 @@ module.exports = {
     var issueNumber = req.query.issueNumber || '';
 
     return Promise.try(function() {
-        if (repoName) return [repoName];
+        if (repoName) {
+          return {
+            type: 'GH_REPO',
+            linkPath: repoName
+          }
+        }
 
         // Resolve the repo name from the room
         return loadTroupeFromParam(req)
           .then(function(troupe) {
-            return [
-              roomRepoService.findAssociatedGithubRepoForRoom(troupe),
-              securityDescriptorUtils.getLinkPathIfType('GH_ORG', troupe),
-            ];
+            return roomRepoService.findAssociatedGithubObjectForRoom(troupe);
           });
       })
       .bind({
         includeRepo: false
       })
-      .spread(function(repoName, orgName) {
-        if (repoName) {
+      .then(function(backingObject) {
+        var type = backingObject.type;
+        var linkPath = backingObject.linkPath;
+
+        if (type === 'GH_REPO') {
           var repoService = new RepoService(req.user);
 
-          return repoService.getIssues(repoName, {
+          return repoService.getIssues(linkPath, {
             firstPageOnly: !issueNumber
           });
         }
 
-        if (orgName) {
+        if (type === 'GH_ORG') {
           var orgService = new OrgService(req.user);
           this.includeRepo = true;
-          return orgService.getIssues(orgName, {
+          return orgService.getIssues(linkPath, {
             firstPageOnly: true // Only fetch the first page for org issues
           });
         }

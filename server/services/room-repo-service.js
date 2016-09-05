@@ -115,6 +115,36 @@ var findAssociatedGithubRepoForRoom = Promise.method(function (room) {
     });
 });
 
+var findAssociatedGithubObjectForRoom = Promise.method(function (room) {
+  if (!room) return null;
+  var sd = room.sd;
+  if (!sd) return null;
+  switch(sd.type) {
+    case 'GH_REPO':
+    case 'GH_ORG':
+      return {
+        type: sd.type,
+        linkPath: sd.linkPath
+      };
+  }
+
+  if (!room.groupId) return null;
+
+  return securityDescriptorService.group.findById(room.groupId, null)
+    .then(function(sd) {
+      switch(sd.type) {
+        case 'GH_REPO':
+        case 'GH_ORG':
+          return {
+            type: sd.type,
+            linkPath: sd.linkPath
+          };
+      }
+
+      return null;
+    });
+});
+
 /**
  * Given an array of rooms, returns the repos associated with those
  * rooms, in a hash, keyed by the room.id
@@ -212,5 +242,6 @@ module.exports = {
   associateRoomToRepo: Promise.method(associateRoomToRepo),
   findAssociatedGithubRepoForRoom: findAssociatedGithubRepoForRoom,
   findAssociatedGithubRepoForRooms: Promise.method(findAssociatedGithubRepoForRooms),
+  findAssociatedGithubObjectForRoom: findAssociatedGithubObjectForRoom,
   sendBadgePullRequestForRepo: Promise.method(sendBadgePullRequestForRepo),
 };
