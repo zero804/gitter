@@ -16,7 +16,8 @@ var troupeCollections = require('../../../collections/instances/troupes');
 
 
 function isGitHubUser(user) {
-  return user && user.get('providers').some(function(provider) {
+  // Handle Backbone model or pojo
+  return user && (user.providers || user.get('providers')).some(function(provider) {
     return provider === 'github';
   });
 }
@@ -115,7 +116,7 @@ function getRoomRepo() {
   return new Promise(function(resolve/*, reject*/) {
     // Check if the snapshot already came in
     var associatedRepo = room.get('associatedRepo');
-    if(associatedRepo) {
+    if(associatedRepo || associatedRepo === false) {
       repoToRoomMapCache[roomId] = associatedRepo;
       resolve(associatedRepo);
     }
@@ -181,7 +182,7 @@ var decorator = {
           var anchorUrl = '';
 
           var currentRoom = context.troupe();
-          var currentGroup = troupeCollections.groups.get(currentRoom.get('groupId'));
+          var currentGroup = context.group();
           var backedBy = currentGroup && currentGroup.get('backedBy');
           if(repo) {
             anchorUrl = getGitHubIssueUrl(repo, issueNumber);
@@ -191,12 +192,12 @@ var decorator = {
             var otherUser = currentRoom.get('user');
             currentUser.get('providers')
             if(currentUser && isGitHubUser(currentUser) && otherUser && isGitHubUser(otherUser)) {
-              anchorUrl = 'https://github.com/issues?utf8=%E2%9C%93&q=822+%28involves%3A' + currentUser.get('username') + '+OR+involves%3Asuprememoocow+%29';
+              anchorUrl = 'https://github.com/issues?utf8=%E2%9C%93&q=' + issueNumber + '+%28involves%3A' + currentUser.get('username') + '+OR+involves%3A' + otherUser.username + '+%29';
             }
           }
           else if(backedBy && backedBy.type === 'GH_ORG') {
             // TODO
-            // https://github.com/issues?utf8=%E2%9C%93&q=822++user%3AgitterHQ+
+            anchorUrl = 'https://github.com/issues?utf8=%E2%9C%93&q=' + issueNumber + '++user%3A' + backedBy.linkPath + '+';
           }
 
           issueElement = convertToIssueAnchor(issueElement, anchorUrl);

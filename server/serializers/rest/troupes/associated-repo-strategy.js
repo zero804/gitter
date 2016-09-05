@@ -20,7 +20,7 @@ AssociatedRepoStrategy.prototype = {
   },
 
   map: function(id) {
-    return this.associatedRepos[id];
+    return this.associatedRepos[id] || false;
   },
 
   name: 'AssociatedRepoStrategy'
