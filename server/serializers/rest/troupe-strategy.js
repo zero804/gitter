@@ -18,8 +18,7 @@ var RoomMembershipStrategy = require('./troupes/room-membership-strategy');
 var TagsStrategy = require('./troupes/tags-strategy');
 var TroupePermissionsStrategy = require('./troupes/troupe-permissions-strategy');
 var GroupIdStrategy = require('./group-id-strategy');
-var TroupeBackendStrategy = require('./troupes/troupe-backend-strategy');
-
+var SecurityDescriptorStrategy = require('./security-descriptor-strategy');
 
 function getAvatarUrlForTroupe(serializedTroupe, options) {
   if (serializedTroupe.oneToOne && options && options.user) {
@@ -134,7 +133,7 @@ function TroupeStrategy(options) {
   var permissionsStrategy;
   var roomMembershipStrategy;
   var groupIdStrategy;
-  var backendStrategy;
+  var securityDescriptorStrategy;
 
   this.preload = function(items) { // eslint-disable-line max-statements
     if (items.isEmpty()) return;
@@ -208,7 +207,7 @@ function TroupeStrategy(options) {
 
 
     if (options.includeBackend) {
-      backendStrategy = new TroupeBackendStrategy();
+      securityDescriptorStrategy = SecurityDescriptorStrategy.slim();
       // Backend strategy needs no mapping stage
     }
 
@@ -338,7 +337,7 @@ function TroupeStrategy(options) {
       roomMember: roomMembershipStrategy ? roomMembershipStrategy.map(id) : undefined,
       groupId: item.groupId,
       group: options.includeGroups ? group : undefined,
-      backend: backendStrategy ? backendStrategy.map(item) : undefined,
+      backend: securityDescriptorStrategy ? securityDescriptorStrategy.map(item.sd) : undefined,
       public: isPublic,
       exists: options.includeExists ? !!id : undefined,
       v: getVersion(item)

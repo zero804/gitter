@@ -21,9 +21,11 @@ module.exports = function(serializerDirectory) {
     });
 
     var Strategy = require('./' + serializerDirectory + '/' + baseName);
-    Strategy.prototype.strategyType = serializerDirectory; // Not ideal
+    if (Strategy.prototype) {
+      Strategy.prototype.strategyType = serializerDirectory; // Not ideal
+    }
 
-    e[strategyName] = require('./' + serializerDirectory + '/' + baseName);
+    e[strategyName] = Strategy;
   });
 
   return e;

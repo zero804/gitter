@@ -3,7 +3,7 @@
 var Promise = require('bluebird');
 var assert = require('assert');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
-var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
+var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor');
 var proxyquireNoCallThru = require("proxyquire").noCallThru();
 var StatusError = require('statuserror');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
@@ -62,7 +62,7 @@ describe('group-service', function() {
             assert.strictEqual(group.name, 'Bob');
             assert.strictEqual(group.uri, groupUri);
             assert.strictEqual(group.lcUri, groupUri.toLowerCase());
-            return securityDescriptorService.getForGroupUser(group._id, null);
+            return securityDescriptorService.group.findById(group._id, null);
           })
           .then(function(securityDescriptor) {
             assert.deepEqual(securityDescriptor, {
@@ -90,7 +90,7 @@ describe('group-service', function() {
             assert.strictEqual(group.name, 'Bob');
             assert.strictEqual(group.uri, groupUri);
             assert.strictEqual(group.lcUri, groupUri.toLowerCase());
-            return securityDescriptorService.getForGroupUser(group._id, null);
+            return securityDescriptorService.group.findById(group._id, null);
           })
           .then(function(securityDescriptor) {
             assert.deepEqual(securityDescriptor, {
@@ -119,7 +119,7 @@ describe('group-service', function() {
             assert.strictEqual(group.name, 'Bob');
             assert.strictEqual(group.uri, 'Bob');
             assert.strictEqual(group.lcUri, 'bob');
-            return securityDescriptorService.getForGroupUser(group._id, null);
+            return securityDescriptorService.group.findById(group._id, null);
           })
           .then(function(securityDescriptor) {
             assert.deepEqual(securityDescriptor, {
@@ -143,7 +143,7 @@ describe('group-service', function() {
             assert.strictEqual(group.name, 'Bob');
             assert.strictEqual(group.uri, fixtureLoader.GITTER_INTEGRATION_COMMUNITY);
             assert.strictEqual(group.lcUri, fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase());
-            return securityDescriptorService.getForGroupUser(group._id, null);
+            return securityDescriptorService.group.findById(group._id, null);
           })
           .then(function(securityDescriptor) {
             assert.deepEqual(securityDescriptor, {
@@ -212,7 +212,7 @@ describe('group-service', function() {
           obtainAccessFromGitHubRepo: fixtureLoader.GITTER_INTEGRATION_REPO_FULL
         })
         .then(function(group) {
-          return securityDescriptorService.getForGroupUser(group._id, fixture.user1._id);
+          return securityDescriptorService.group.findById(group._id, fixture.user1._id);
         })
         .then(function(securityDescriptor) {
           assert.deepEqual({
@@ -233,7 +233,7 @@ describe('group-service', function() {
           name: 'BOB'
         })
         .then(function(group) {
-          return securityDescriptorService.getForGroupUser(group._id, fixture.user1._id);
+          return securityDescriptorService.group.findById(group._id, fixture.user1._id);
         })
         .then(function(securityDescriptor) {
           assert.strictEqual(securityDescriptor.admins, 'GH_USER_SAME');

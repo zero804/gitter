@@ -6,7 +6,7 @@ var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
 var GroupWithPolicyService = testRequire('./services/group-with-policy-service');
-var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
+var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor');
 var groupService = require('gitter-web-groups/lib/group-service');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
@@ -99,7 +99,7 @@ describe('group-with-policy-service #slow', function() {
       })
       .then(function(createRoomResult) {
         var room = createRoomResult.troupe;
-        return securityDescriptorService.getForRoomUser(room._id, null);
+        return securityDescriptorService.room.findById(room._id, null);
       })
       .then(function(securityDescriptor) {
         assert.deepEqual(securityDescriptor, {
@@ -122,7 +122,7 @@ describe('group-with-policy-service #slow', function() {
       })
       .then(function(createRoomResult) {
         var room = createRoomResult.troupe;
-        return securityDescriptorService.getForRoomUser(room._id, null);
+        return securityDescriptorService.room.findById(room._id, null);
       })
       .then(function(securityDescriptor) {
         assert.deepEqual(securityDescriptor, {
@@ -146,7 +146,7 @@ describe('group-with-policy-service #slow', function() {
       })
       .then(function(createRoomResult) {
         var room = createRoomResult.troupe;
-        return securityDescriptorService.getForRoomUser(room._id, null);
+        return securityDescriptorService.room.findById(room._id, null);
       })
       .then(function(securityDescriptor) {
         assert.deepEqual(securityDescriptor, {
@@ -177,7 +177,7 @@ describe('group-with-policy-service #slow', function() {
         assert.equal(room.topic, topic);
         assert.equal(room.groupId, fixture.group2.id);
 
-        return securityDescriptorService.getForRoomUser(room._id, null);
+        return securityDescriptorService.room.findById(room._id, null);
       })
       .then(function(securityDescriptor) {
         assert.deepEqual(securityDescriptor, {
@@ -199,7 +199,7 @@ describe('group-with-policy-service #slow', function() {
       })
       .then(function(createRoomResult) {
         var room = createRoomResult.troupe;
-        return securityDescriptorService.getForRoomUser(room._id, null);
+        return securityDescriptorService.room.findById(room._id, null);
       })
       .then(function(securityDescriptor) {
         assert.deepEqual(securityDescriptor, {
@@ -256,7 +256,7 @@ describe('group-with-policy-service #slow', function() {
       })
       .then(function(createRoomResult) {
         var room = createRoomResult.troupe;
-        return securityDescriptorService.getForRoomUser(room._id, null);
+        return securityDescriptorService.room.findById(room._id, null);
       })
       .then(function(securityDescriptor) {
         assert.deepEqual(securityDescriptor, {
@@ -279,7 +279,7 @@ describe('group-with-policy-service #slow', function() {
       })
       .then(function(createRoomResult) {
         var room = createRoomResult.troupe;
-        return securityDescriptorService.getForRoomUser(room._id, null);
+        return securityDescriptorService.room.findById(room._id, null);
       })
       .then(function(securityDescriptor) {
         assert.deepEqual(securityDescriptor, {
@@ -304,7 +304,7 @@ describe('group-with-policy-service #slow', function() {
       })
       .then(function(createRoomResult) {
         var room = createRoomResult.troupe;
-        return securityDescriptorService.getForRoomUser(room._id, null);
+        return securityDescriptorService.room.findById(room._id, null);
       })
       .then(function(securityDescriptor) {
         assert.deepEqual(securityDescriptor, {
@@ -327,7 +327,7 @@ describe('group-with-policy-service #slow', function() {
       })
       .then(function(createRoomResult) {
         var room = createRoomResult.troupe;
-        return securityDescriptorService.getForRoomUser(room._id, null);
+        return securityDescriptorService.room.findById(room._id, null);
       })
       .then(function(securityDescriptor) {
         assert.deepEqual(securityDescriptor, {
