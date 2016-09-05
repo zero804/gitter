@@ -94,7 +94,7 @@ export default React.createClass({
 
   componentWillUnmount(){
     const { categoryStore, tagStore, router, topicsStore } = this.props;
-    topicsStore.removeListeners();
+    topicsStore.removeListeners(this.onTopicsUpdate, this);
     categoryStore.off(forumCatConstants.UPDATE_ACTIVE_CATEGORY, this.onCategoryUpdate);
     tagStore.off(forumTagConstants.UPDATE_ACTIVE_TAG, this.onTagUpdate, this);
     router.off(forumFilterConstants.UPDATE_ACTIVE_FILTER, this.onFilterUpdate, this);
