@@ -7,10 +7,10 @@ describe('ForumStore', () => {
 
   const tags = [ 1, 2, 3];
   const parsedTags = [
-    {value: 'all-values', name: 'All values', active: true },
-    {value: 1, name: 1, active: false },
-    {value: 2, name: 2, active: false },
-    {value: 3, name: 3, active: false },
+    {value: 'all-values', label: 'All values', active: true },
+    {value: 1, label: 1, active: false },
+    {value: 2, label: 2, active: false },
+    {value: 3, label: 3, active: false },
   ];
 
   it('should return an object with data', () => {
@@ -22,7 +22,7 @@ describe('ForumStore', () => {
   });
 
   it('should add an initial category of all', function(){
-    assert.equal(tagStore(tags).data[0].name, 'All Tags');
+    assert.equal(tagStore(tags).data[0].label, 'All Tags');
   });
 
   it('should assign the correct default active state', () => {

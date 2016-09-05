@@ -1,12 +1,12 @@
-import { Collection } from 'backbone';
+import Backbone from 'backbone';
 import { UPDATE_ACTIVE_TAG } from '../../../shared/constants/forum-tags';
 import router from '../routers/index';
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
 
-const serverStore = (window.context.forumTagStore || {});
-const serverData = (serverStore || []);
+const serverStore = (window.context.tagStore || {});
+const serverData = (serverStore.data || []);
 
-export const ForumTagStore = Collection.extend({
+export const ForumTagStore = Backbone.Collection.extend({
 
   initialize: function() {
     this.listenTo(router, 'change:tagName', this.onTagUpdate, this);

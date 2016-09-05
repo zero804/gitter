@@ -3,12 +3,12 @@ import React from 'react';
 import { shallow } from 'enzyme';
 import Select from '../../../../../../shared/containers/components/forms/select.jsx';
 
-describe.only('<Select/>', () => {
+describe('<Select/>', () => {
 
   let wrapper;
   const options = [
-    { label: 'test1', value: 1 },
-    { label: 'test2', value: 2 }
+    { label: 'test1', value: '1' },
+    { label: 'test2', value: '2' }
   ]
   const defaultValue = 'test1';
 
@@ -25,7 +25,7 @@ describe.only('<Select/>', () => {
   });
 
   it('should render an option for each option', () => {
-    assert.equal(wrapper.find('options').length, options.length);
+    assert.equal(wrapper.find('option').length, options.length);
   });
 
 });

@@ -17,7 +17,7 @@ module.exports = function forumTagStore(tags, activeTagName){
 
   tags.unshift({
     value: DEFAULT_TAG_VALUE,
-    name: 'All Tags',
+    label: 'All Tags',
     active: (activeTagName === DEFAULT_TAG_VALUE)
   });
 
