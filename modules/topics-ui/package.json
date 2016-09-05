@@ -16,9 +16,12 @@
     "lodash": "^4.15.0",
     "react": "^15.2.1",
     "react-dom": "^15.2.1",
-    "sinon": "^1.17.5"
+    "sinon": "^1.17.5",
+    "moment": "^2.10.3",
+    "gitter-web-slugify": "file:../slugify"
   },
   "devDependencies": {
+    "highlight.js": "8.6.0",
     "babel-loader": "^6.2.4",
     "babel-plugin-add-module-exports": "^0.2.1",
     "babel-plugin-istanbul": "^2.0.0",
@@ -38,6 +41,7 @@
     "gulp-babel": "^6.1.2",
     "gulp-filter": "^4.0.0",
     "jquery": "^3.1.0",
+    "jsdom": "^9.4.5",
     "jsdom-global": "^2.1.0",
     "less-loader": "^2.2.3",
     "mocha": "^2.5.3",

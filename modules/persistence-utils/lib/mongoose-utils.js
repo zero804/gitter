@@ -200,15 +200,21 @@ function addIdToLeanArray(objects) {
   return objects;
 }
 
-function getEstimatedCountForId(Model, field, id) {
+function getEstimatedCountForId(Model, field, id, options) {
+  options = options || {};
+  options.read = options.read || 'secondaryPreferred';
+
   var query = {};
   query[field] = id;
   return Model.count(query)
-    .read('secondaryPreferred')
+    .read(options.read)
     .exec();
 }
 
-function getEstimatedCountForIds(Model, field, ids) {
+function getEstimatedCountForIds(Model, field, ids, options) {
+  options = options || {};
+  options.read = options.read || 'secondaryPreferred';
+
   if (!ids || !ids.length) return {};
 
   if (ids.length === 1) {
@@ -231,7 +237,7 @@ function getEstimatedCountForIds(Model, field, ids) {
         count: { $sum: 1 }
       }
     }])
-    .read('secondaryPreferred')
+    .read(options.read)
     .exec()
     .then(function(results) {
       if (!results || !results.length) return {};
