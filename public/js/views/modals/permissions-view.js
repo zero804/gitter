@@ -297,7 +297,6 @@ var PermissionsView = Marionette.LayoutView.extend({
         });
       })
       .catch(function() {
-        //console.log('err', err, err.stack);
         this.model.set('requestingSecurityDescriptorStatus', requestingSecurityDescriptorStatusConstants.ERROR);
       });
   },
@@ -340,7 +339,6 @@ var PermissionsView = Marionette.LayoutView.extend({
         this.dialog = null;
       })
       .catch(function() {
-        //console.log('err', err, err.stack);
         this.model.set('submitSecurityDescriptorStatus', submitSecurityDescriptorStatusConstants.ERROR);
       });
   }
