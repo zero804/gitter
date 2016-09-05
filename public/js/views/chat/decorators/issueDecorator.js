@@ -147,7 +147,7 @@ function getRoomRepo() {
       room.off('change', onChange);
     }
 
-    room.once('change', onChange);
+    room.on('change', onChange);
   })
   .finally(function() {
     if (unlisten) {
@@ -183,8 +183,6 @@ var IssueModel = Backbone.Model.extend({
   },
   sync: SyncMixin.sync
 });
-
-
 
 function getAnchorUrl(githubRepo, issueNumber) {
   var currentRoom = context.troupe();
