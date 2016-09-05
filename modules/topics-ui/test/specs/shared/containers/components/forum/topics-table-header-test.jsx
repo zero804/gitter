@@ -24,15 +24,7 @@ describe('<TopicsTableHeader/>', () => {
   });
 
   it('should render the th elements with the right class', () => {
-    equal(wrapper.find('.topics-table-header__cell').length, 2);
-  });
-
-  it('it should render one first element', () => {
-    equal(wrapper.find('.topics-table-header__cell--first').length, 1);
-  });
-
-  it('it should render one last element', () => {
-    equal(wrapper.find('.topics-table-header__cell--last').length, 1);
+    equal(wrapper.find('.topics-table-header__cell').length, 4);
   });
 
 });
