@@ -3,6 +3,7 @@
 var persistence = require('gitter-web-persistence');
 var assert = require('assert');
 var securityDescriptorValidator = require('../security-descriptor-validator');
+var securityDescriptorWriteValidator = require('../security-descriptor-write-validator');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var transform = require('./transform');
 var StatusError = require('statuserror');
@@ -35,6 +36,27 @@ SecurityDescriptorService.prototype.findById = function(id, userId) {
     projection['sd.extraMembers'] = 1;
     projection['sd.extraAdmins'] = 1;
   }
+
+  return this.Model.findById(id, projection, { lean: true })
+    .exec()
+    .then(function(doc) {
+      if (!doc || !doc.sd) return null; // TODO: throw 404?
+      var sd = doc.sd;
+      if (doc.bans) {
+        // Move the bans onto sd
+        sd.bans = doc.bans;
+      }
+      securityDescriptorValidator(sd);
+      return sd;
+    });
+};
+
+SecurityDescriptorService.prototype.findByIdAll = function(id) {
+  var projection = {
+    _id: 0,
+    'sd': 1,
+    'bans': 1
+  };
 
   return this.Model.findById(id, projection, { lean: true })
     .exec()
@@ -116,7 +138,7 @@ SecurityDescriptorService.prototype.removeExtraAdmin = function(id, userId) {
 
 
 SecurityDescriptorService.prototype.updateSecurityDescriptor = function(id, sd) {
-  securityDescriptorValidator(sd);
+  securityDescriptorWriteValidator(sd);
 
   return this.Model.findByIdAndUpdate(id, {
       $set: {
@@ -174,7 +196,7 @@ SecurityDescriptorService.prototype.update = function(id, update, options) {
     throw new StatusError(400, 'Invalid update');
   }
 
-  return this.findById(id)
+  return this.findByIdAll(id)
     .bind(this)
     .tap(function(sd) {
       // Before we make any changes,
