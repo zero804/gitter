@@ -35,4 +35,10 @@ describe('App', function() {
     assert.equal(wrapper.state('createTopic'), false);
   });
 
+  it('should provide a newReplyStore when in the topic route', () => {
+    mockRouter.set({ route: navConstants.TOPIC_ROUTE, groupName: 'gitterHQ', topicId: '1' });
+    let wrapper = shallow(<App router={mockRouter} />);
+    assert(wrapper.state('newReplyStore'), 'App failed to create newTopicStore');
+  });
+
 });

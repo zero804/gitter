@@ -8,7 +8,7 @@ var env = require('gitter-web-env');
 var stats = env.stats;
 var errorReporter = env.errorReporter;
 var roomMembershipService = require('../services/room-membership-service');
-var liveCollections = require('../services/live-collections');
+var liveCollections = require('gitter-web-live-collection-events');
 var unreadItemService = require('../services/unread-items');
 var _ = require('lodash');
 

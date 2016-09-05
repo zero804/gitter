@@ -7,7 +7,7 @@ var ChatMessage = require('gitter-web-persistence').ChatMessage;
 var assert = require('assert');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var Promise = require('bluebird');
-var liveCollections = require('./live-collections');
+var liveCollections = require('gitter-web-live-collection-events');
 
 var batcher = new RedisBatcher('readby2', 600, batchUpdateReadbyBatch);
 
