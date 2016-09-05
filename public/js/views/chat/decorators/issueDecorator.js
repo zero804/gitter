@@ -185,114 +185,121 @@ var IssueModel = Backbone.Model.extend({
 });
 
 
-function getGitHubIssueUrl(repo, issueNumber) {
-  return 'https://github.com/' + repo + '/issues/' + issueNumber;
-}
 
 function getAnchorUrl(githubRepo, issueNumber) {
   var currentRoom = context.troupe();
   var currentGroup = context.group();
   var backedBy = currentGroup && currentGroup.get('backedBy');
+
   if(githubRepo) {
-    return getGitHubIssueUrl(githubRepo, issueNumber);
+    return 'https://github.com/' + githubRepo + '/issues/' + issueNumber;
   }
+
+  var currentUser = context.user();
 
   // One-to-ones
   if(!githubRepo && currentRoom.get('oneToOne')) {
-    var currentUser = context.user();
     var otherUser = currentRoom.get('user');
 
     if(currentUser && isGitHubUser(currentUser) && otherUser && isGitHubUser(otherUser)) {
-      return 'https://github.com/issues?utf8=%E2%9C%93&q=' + issueNumber + '+%28involves%3A' + currentUser.get('username') + '+OR+involves%3A' + otherUser.username + '+%29';
+      return 'https://github.com/issues?q=' + issueNumber + '+%28involves%3A' + currentUser.get('username') + '+OR+involves%3A' + otherUser.username + '+%29';
     }
-
-    return null;
   }
 
   // We don't know the REPO, but we know the org?
   if(backedBy && backedBy.type === 'GH_ORG') {
-    return 'https://github.com/issues?utf8=%E2%9C%93&q=' + issueNumber + '+user%3A' + backedBy.linkPath;
+    return 'https://github.com/issues?q=' + issueNumber + '+user%3A' + backedBy.linkPath;
   }
 
+  if (currentUser && isGitHubUser(currentUser)) {
+    return 'https://github.com/issues?q=' + issueNumber + '+involves:' + currentUser.get('username');
+  }
+
+  return 'https://github.com/issues?q=' + issueNumber;
+}
+
+function bindAnchorToIssue(view, issueElement, repo, issueNumber, anchorUrl) {
+  // Lazy model, will be fetched when it's needed, but not before
+  function getModel() {
+    var model = new IssueModel({
+      repo: repo,
+      number: issueNumber,
+      html_url: anchorUrl
+    });
+
+    model.fetch({
+      data: { renderMarkdown: true },
+      error: function() {
+        model.set({ error: true });
+      }
+    });
+    return model;
+  }
+
+  function showPopover(e, model) {
+    if(!model) model = getModel();
+
+    var popover = createPopover(model, e.target);
+    popover.show();
+    Popover.singleton(view, popover);
+
+    e.preventDefault();
+  }
+
+  function showPopoverLater(e) {
+    var model = getModel();
+
+    Popover.hoverTimeout(e, function() {
+      showPopover(e, model);
+    });
+  }
+
+  // Hook up all of the listeners
+  issueElement.addEventListener('click', showPopover);
+  issueElement.addEventListener('mouseover', showPopoverLater);
+
+  view.once('destroy', function() {
+    issueElement.removeEventListener('click', showPopover);
+    issueElement.removeEventListener('mouseover', showPopoverLater);
+  });
 }
 
 var decorator = {
   decorate: function(view) {
     Array.prototype.forEach.call(view.el.querySelectorAll('*[data-link-type="issue"]'), function(issueElement) {
-      Promise.try(function() {
-          var repoFromElement = issueElement.dataset.issueRepo;
-          if(repoFromElement) {
-            return Promise.resolve(repoFromElement)
-          }
+      return Promise.try(function() {
+        var repoFromElement = issueElement.dataset.issueRepo;
 
-          return getRoomRepo();
-        })
-        .then(function(repo) {
-          var issueNumber = issueElement.dataset.issue;
-          var anchorUrl = getAnchorUrl(repo, issueNumber) || '';
+        if(repoFromElement) {
+          return repoFromElement;
+        }
 
-          issueElement = convertToIssueAnchor(issueElement, anchorUrl);
+        return getRoomRepo();
+      })
+      .then(function(repo) {
+        var issueNumber = issueElement.dataset.issue;
+        var anchorUrl = getAnchorUrl(repo, issueNumber) || '';
+        issueElement = convertToIssueAnchor(issueElement, anchorUrl);
 
-          if (repo && issueNumber) {
-            getIssueState(repo, issueNumber)
-              .then(function(state) {
-                if(state) {
-                  // We depend on this to style the issue after making sure it is an issue
-                  issueElement.classList.add('is-existent');
+        if (repo && issueNumber) {
+          getIssueState(repo, issueNumber)
+            .then(function(state) {
+              if(!state) return;
 
-                  // dont change the issue state colouring for the activity feed
-                  if(!issueElement.classList.contains('open') && !issueElement.classList.contains('closed')) {
-                    issueElement.classList.add(state);
-                  }
+              // We depend on this to style the issue after making sure it is an issue
+              issueElement.classList.add('is-existent');
 
-                  // Hook up all of the listeners
-                  issueElement.addEventListener('click', showPopover);
-                  issueElement.addEventListener('mouseover', showPopoverLater);
-
-                  view.once('destroy', function() {
-                    issueElement.removeEventListener('click', showPopover);
-                    issueElement.removeEventListener('mouseover', showPopoverLater);
-                  });
-                }
-              });
-          }
-
-          function getModel() {
-            var model = new IssueModel({
-              repo: repo,
-              number: issueNumber,
-              html_url: anchorUrl
-            });
-
-            model.fetch({
-              data: { renderMarkdown: true },
-              error: function() {
-                model.set({ error: true });
+              // dont change the issue state colouring for the activity feed
+              if(!issueElement.classList.contains('open') && !issueElement.classList.contains('closed')) {
+                issueElement.classList.add(state);
               }
+
+              bindAnchorToIssue(view, issueElement, repo, issueNumber, anchorUrl);
             });
-            return model;
-          }
-          function showPopover(e, model) {
-            if(!model) model = getModel();
+        }
 
-            var popover = createPopover(model, e.target);
-            popover.show();
-            Popover.singleton(view, popover);
-
-            e.preventDefault();
-          }
-
-          function showPopoverLater(e) {
-            var model = getModel();
-
-            Popover.hoverTimeout(e, function() {
-              showPopover(e, model);
-            });
-          }
-        });
+      });
     });
-
-
   }
 };
 
