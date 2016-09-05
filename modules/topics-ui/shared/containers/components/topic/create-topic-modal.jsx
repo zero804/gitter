@@ -68,8 +68,9 @@ export default React.createClass({
     this.props.onClose();
   },
 
-  onCategoryChange(e){
-    this.props.onCategoryChange(e.value);
+  onCategoryChange(val){
+    this.props.onCategoryChange(val);
   }
+
 
 });

@@ -148,7 +148,7 @@ function renderTopic(req, res, next) {
                   accessTokenStore: accessTokenStore(context.accessToken),
                   currentUserStore: currentUserStore(context.user),
                   repliesStore: repliesStore(topic.replies),
-                  categoryStore: forumCategoryStore([topic.category]),
+                  categoryStore: forumCategoryStore(forum.categories),
                   forumStore: forumStore(forum),
                 }
               });

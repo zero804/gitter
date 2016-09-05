@@ -27,7 +27,7 @@ export default React.createClass({
 
     return (
       <div className={compiledDecalClass}>
-        <select className={compiledClass} onChange={onChange}>
+        <select className={compiledClass} onChange={this.onChange}>
           { options.map(this.buildChildOption) }
         </select>
       </div>
@@ -43,6 +43,11 @@ export default React.createClass({
         {label}
       </option>
     );
+  },
+
+  onChange(e) {
+    e.preventDefault();
+    this.props.onChange(e.target.value);
   }
 
 });
