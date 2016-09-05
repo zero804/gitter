@@ -10,17 +10,20 @@ export default React.createClass({
 
   displayName: 'CreateTopicModal',
   propTypes: {
+
     active: PropTypes.bool.isRequired,
+
     categories: PropTypes.arrayOf(PropTypes.shape({
       selected: PropTypes.bool.isRequired,
       label: PropTypes.string.isRequired,
-      //The all category has a value of null
       value: PropTypes.string,
     })).isRequired,
+
     onSubmit: PropTypes.func.isRequired,
     onTitleChange: PropTypes.func.isRequired,
     onBodyChange: PropTypes.func.isRequired,
     onCategoryChange: PropTypes.func.isRequired,
+    //onTagsChange: ProptTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
   },
 
@@ -37,6 +40,11 @@ export default React.createClass({
               options={categories}
               className="select--create-topic-category"
               onChange={this.onCategoryChange}/>
+            <Input
+              className="create-topic__input--tags"
+              name="title"
+              placeholder="Add tags ..."
+              onChange={this.onTagsChange}/>
           </div>
           <Editor
             className="create-topic__editor--body"
