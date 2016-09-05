@@ -72,7 +72,7 @@ var PermissionsView = Marionette.LayoutView.extend({
         var entity = this.model.get('entity');
         var groupId = entity && entity.get('groupId');
 
-        var group = entity.get('group');
+        var group = entity && entity.get('group');
         if(groupId) {
           group = this.model.groupCollection.get(groupId);
         }
