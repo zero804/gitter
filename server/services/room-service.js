@@ -41,7 +41,7 @@ var userScopes = require('gitter-web-identity/lib/user-scopes');
 var groupService = require('gitter-web-groups/lib/group-service');
 var securityDescriptorGenerator = require('gitter-web-permissions/lib/security-descriptor-generator');
 var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
-var liveCollections = require('./live-collections');
+var liveCollections = require('gitter-web-live-collection-events');
 
 var badgerEnabled = nconf.get('autoPullRequest:enabled');
 

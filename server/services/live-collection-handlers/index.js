@@ -4,7 +4,7 @@ var env = require('gitter-web-env');
 var config = env.config;
 var logger = env.logger;
 var errorReporter = env.errorReporter;
-var EventEmitter = require('events').EventEmitter;
+var liveCollectionEvents = require('gitter-web-live-collection-events');
 
 // This is a bit crazy, but we need to get around node circular references
 var handlers = {
@@ -22,18 +22,8 @@ if (config.get('topics:useApi')) {
   // TODO: categories? forums, replies, comments
 }
 
-var emitters;
-module.exports = makeEmitters();
-module.exports.install = install;
-
-function makeEmitters() {
-  emitters = {};
-  return Object.keys(handlers).reduce(function(memo, category) {
-    var emitter = new EventEmitter();
-    emitters[category] = emitter; // SIDE EFFECT!
-    memo[category] = emitter;
-    return memo;
-  }, {});
+module.exports = {
+  install: install
 }
 
 var installed = false;
@@ -41,12 +31,13 @@ function install() {
   if (installed) return;
   installed = true;
 
-  Object.keys(emitters).forEach(function(category) {
-    var emitter = emitters[category];
+  Object.keys(handlers).forEach(function(category) {
+    var handlerModuleName = handlers[category];
+    var emitter = liveCollectionEvents[category];
 
     // Don't load the library until install is called otherwise
     // we'll introduce circular references
-    var lib = require(handlers[category]); // Load the handler
+    var lib = require(handlerModuleName); // Load the handler
 
     Object.keys(lib).forEach(function(eventName) {
       emitter.on(eventName, function() {
