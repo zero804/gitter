@@ -63,7 +63,7 @@ export default React.createClass({
           groupName={groupName}
           tag={tag}
           className="topic-header__tag-link">
-            {tag.name}
+            {tag.label}
         </ForumTagLink>
       </li>
     );

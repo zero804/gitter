@@ -45,19 +45,16 @@ const ForumContainer = React.createClass({
 
     //Categories ---
     categoryStore: React.PropTypes.shape({
-      models: React.PropTypes.array.isRequired,
       getCategories: React.PropTypes.func.isRequired
     }).isRequired,
 
     //Tags -----
     tagStore: React.PropTypes.shape({
-      models: React.PropTypes.array.isRequired,
       getTags: React.PropTypes.func.isRequired
     }).isRequired,
 
     //Topics
     topicsStore: React.PropTypes.shape({
-      models: React.PropTypes.array.isRequired,
       getTopics: React.PropTypes.func.isRequired
     }).isRequired,
 
@@ -173,7 +170,6 @@ const ForumContainer = React.createClass({
 
   onSubmit(){
     const {newTopicStore} = this.props;
-    debugger
     dispatch(submitNewTopic(
       newTopicStore.get('title'),
       newTopicStore.get('body'),

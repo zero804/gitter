@@ -12,15 +12,15 @@ export default React.createClass({
     children: PropTypes.node.isRequired,
     tag: PropTypes.shape({
       value: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
+      label: PropTypes.string.isRequired,
     }).isRequired,
   },
 
   render(){
 
     const {tag, groupName, className} = this.props;
-    const {name, value} = tag;
-    const title = `View all ${name} topics`;
+    const {label, value} = tag;
+    const title = `View all ${label} topics`;
     const href = `/${groupName}/topics?tag=${value}`;
 
     return (

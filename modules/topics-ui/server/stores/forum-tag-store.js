@@ -11,7 +11,7 @@ module.exports = function forumTagStore(tags, activeTagName){
 
   tags = tags.map((tag) => {
     return Object.assign(parseTag(tag), {
-      active: (tag === activeTagName)
+      active: (tag === activeTagName),
     });
   });
 
@@ -21,9 +21,14 @@ module.exports = function forumTagStore(tags, activeTagName){
     active: (activeTagName === DEFAULT_TAG_VALUE)
   });
 
+  const getTagsByValue = (values) => {
+    return values.map((value) => _.find(tags, (t) => t.label === value));
+  }
+
   return {
     data: tags,
     getTags: () => tags,
-    getActiveTagName: () => _.find(tags, (tag) => tag.active)[0].value
+    getActiveTagName: () => _.find(tags, (tag) => tag.active)[0].value,
+    getTagsByValue: getTagsByValue,
   };
 };
