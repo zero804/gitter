@@ -8,7 +8,7 @@ var OneToOneUnconnectionPolicyEvalator = require('./policies/one-to-one-unconnec
 var RoomContextDelegate = require('./context-delegates/room-context-delegate');
 var OneToOneContextDelegate = require('./context-delegates/one-to-one-room-context-delegate');
 var StatusError = require('statuserror');
-var securityDescriptorService = require('./security-descriptor-service');
+var securityDescriptorService = require('./security-descriptor');
 var debug = require('debug')('gitter:app:permissions:policy-factory');
 var PreCreationGhRepoPolicyEvaluator = require('./pre-creation/gh-repo-policy-evaluator');
 var PreCreationGhOrgPolicyEvaluator = require('./pre-creation/gh-org-policy-evaluator');
@@ -46,7 +46,7 @@ function createPolicyFromDescriptor(userId, user, securityDescriptor, roomId) {
 function createPolicyForRoomId(user, roomId) {
   var userId = user && user._id;
 
-  return securityDescriptorService.getForRoomUser(roomId, userId)
+  return securityDescriptorService.room.findById(roomId, userId)
     .then(function(securityDescriptor) {
       if (!securityDescriptor) throw new StatusError(404);
 
@@ -60,7 +60,7 @@ function createPolicyForRoom(user, room) {
 
   // TODO: optimise this as we may already have the information we need on the room...
   // in which case we shouldn't have to refetch it from mongo
-  return securityDescriptorService.getForRoomUser(roomId, userId)
+  return securityDescriptorService.room.findById(roomId, userId)
     .then(function(securityDescriptor) {
       if (!securityDescriptor) throw new StatusError(404);
 
@@ -71,7 +71,7 @@ function createPolicyForRoom(user, room) {
 function createPolicyForGroupId(user, groupId) {
   var userId = user && user._id;
 
-  return securityDescriptorService.getForGroupUser(groupId, userId)
+  return securityDescriptorService.group.findById(groupId, userId)
     .then(function(securityDescriptor) {
       if (!securityDescriptor) throw new StatusError(404);
 
@@ -83,7 +83,7 @@ function createPolicyForGroupId(user, groupId) {
 }
 
 function createPolicyForGroupIdWithUserLoader(userId, userLoader, groupId) {
-  return securityDescriptorService.getForGroupUser(groupId, userId)
+  return securityDescriptorService.group.findById(groupId, userId)
     .then(function(securityDescriptor) {
       if (!securityDescriptor) throw new StatusError(404);
 
@@ -98,7 +98,7 @@ function createPolicyForGroupIdWithRepoFallback(user, groupId, repoUri) {
   debug('Create policy factory with repo fallback: repo=%s', repoUri);
   var userId = user && user._id;
 
-  return securityDescriptorService.getForGroupUser(groupId, userId)
+  return securityDescriptorService.group.findById(groupId, userId)
     .then(function(securityDescriptor) {
       if (!securityDescriptor) throw new StatusError(404);
 
@@ -113,7 +113,7 @@ function createPolicyForGroupIdWithRepoFallback(user, groupId, repoUri) {
 }
 
 function createPolicyForUserIdInRoomId(userId, roomId) {
-  return securityDescriptorService.getForRoomUser(roomId, userId)
+  return securityDescriptorService.room.findById(roomId, userId)
     .then(function(securityDescriptor) {
       if (!securityDescriptor) throw new StatusError(404);
 
@@ -124,7 +124,7 @@ function createPolicyForUserIdInRoomId(userId, roomId) {
 function createPolicyForUserIdInRoom(userId, room) {
   var roomId = room._id;
 
-  return securityDescriptorService.getForRoomUser(roomId, userId)
+  return securityDescriptorService.room.findById(roomId, userId)
     .then(function(securityDescriptor) {
       if (!securityDescriptor) throw new StatusError(404);
 
@@ -152,7 +152,7 @@ function createPolicyForUserIdInForumId(userId, forumId, user) {
 
   // maybe we could have just passed in the security descriptor rather and then
   // named this createPolicyForSecurityDescriptor?
-  return securityDescriptorService.getForForumUser(forumId, userId)
+  return securityDescriptorService.forum.findById(forumId, userId)
     .then(function(securityDescriptor) {
       if (!securityDescriptor) throw new StatusError(404);
 

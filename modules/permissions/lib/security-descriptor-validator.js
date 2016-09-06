@@ -55,6 +55,7 @@ function validateGroupDescriptor(descriptor) {
   }
 
   switch(descriptor.admins) {
+    case 'MANUAL': // Not sure why you would want this, but it's valid
     case 'GROUP_ADMIN':
       break;
     default:
@@ -296,6 +297,7 @@ function validateBasicDescriptor(descriptor) {
   }
 
   validateExtraUserIds(descriptor);
+
 }
 
 function validate(descriptor) {

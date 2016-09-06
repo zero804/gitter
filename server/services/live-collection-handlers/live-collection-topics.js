@@ -9,7 +9,9 @@ function serializeTopicToForum(operation, topic) {
   var forumId = topic.forumId;
   var url = "/forums/" + forumId + "/topics";
 
-  var strategy = new restSerializer.TopicStrategy();
+  var strategy = new restSerializer.TopicStrategy({
+    includeRepliesTotals: true
+  });
   return restSerializer.serializeObject(topic, strategy)
     .then(function(serializedTopic) {
       appEvents.dataChange2(url, operation, serializedTopic, 'topic');
@@ -21,15 +23,13 @@ var liveCollectionTopics = {
     return serializeTopicToForum("create", topic);
   },
 
-  // TODO: actually call update
   update: function(topic) {
     return serializeTopicToForum("update", topic);
   },
 
-  // TODO: call patch
   patch: function(forumId, topicId, patch) {
     var url = "/forums/" + forumId + "/topics";
-    var patchMessage = _.extend({ }, patch, { id: topicId });
+    var patchMessage = _.extend({ }, patch, { id: topicId.toString() });
     appEvents.dataChange2(url, "patch", patchMessage, 'topic');
   },
 
