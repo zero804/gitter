@@ -6,7 +6,6 @@ var yargs = require('yargs');
 var githubIssueSource = require('./github-issue-source');
 var githubIssueCommentSource = require('./github-issue-comment-source');
 var Promise = require('bluebird');
-var utils = require('../fixtures/fixture-script-utils');
 var categoryService = require('gitter-web-topics/lib/forum-category-service');
 var StatusError = require('statuserror');
 var userService = require('../../server/services/user-service');
@@ -38,7 +37,7 @@ Importer.prototype = {
         groupService.findByUri(groupUri))
       .bind({})
       .spread(function(user, group) {
-        if (!user) throw new StatusError(404, 'User not found.');;
+        if (!user) throw new StatusError(404, 'User not found.');
         if (!group) throw new StatusError(404, 'Group not found.');
 
         if (!group.forumId) throw new StatusError(404, "The group doesn't have a forum yet");
