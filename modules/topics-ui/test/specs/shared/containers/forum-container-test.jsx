@@ -106,4 +106,11 @@ describe('<ForumContainer />', function(){
     equal(handle.callCount, 1);
   });
 
+  it('should dispatch the right action then the create topic tags change', () => {
+    const handle = spy();
+    subscribe(createConst.TAGS_UPDATE, handle);
+    wrapper.find('CreateTopicModal').at(0).prop('onTagsChange')(['1', '2', '3']);
+    equal(handle.callCount, 1);
+  });
+
 });

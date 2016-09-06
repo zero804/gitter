@@ -9,6 +9,7 @@ export default Backbone.Model.extend({
     subscribe(consts.TITLE_UPDATE, this.onTitleUpdate, this);
     subscribe(consts.BODY_UPDATE, this.onBodyUpdate, this);
     subscribe(consts.CATEGORY_UPDATE, this.onCategoryUpdate, this);
+    subscribe(consts.TAGS_UPDATE, this.onTagsUpdate, this);
   },
 
   onTitleUpdate(data){
@@ -21,6 +22,10 @@ export default Backbone.Model.extend({
 
   onCategoryUpdate(data){
     this.set('categoryId', data.categoryId);
+  },
+
+  onTagsUpdate(data){
+    this.set('tags', data.tags);
   }
 
 });

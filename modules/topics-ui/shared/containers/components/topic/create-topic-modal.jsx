@@ -23,7 +23,7 @@ export default React.createClass({
     onTitleChange: PropTypes.func.isRequired,
     onBodyChange: PropTypes.func.isRequired,
     onCategoryChange: PropTypes.func.isRequired,
-    //onTagsChange: ProptTypes.func.isRequired,
+    onTagsChange: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
   },
 
@@ -78,6 +78,11 @@ export default React.createClass({
 
   onCategoryChange(val){
     this.props.onCategoryChange(val);
+  },
+
+  onTagsChange(tagString){
+    const tags = tagString.split(',');
+    this.props.onTagsChange(tags);
   }
 
 

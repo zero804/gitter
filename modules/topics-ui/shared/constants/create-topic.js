@@ -7,3 +7,4 @@ export const TOPIC_CREATED = 'topic-created';
 export const NAVIGATE_TO_CREATE_TOPIC = 'navigate-to-create-topic';
 export const CLOSE_CREATE_TOPIC = 'close-create-topic'
 export const CATEGORY_UPDATE = 'category-update'
+export const TAGS_UPDATE = 'tags-update'
