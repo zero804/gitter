@@ -53,7 +53,8 @@ module.exports = {
       includePermissions: true,
       includeProviders: true,
       includeGroups: true,
-      includeBackend: true
+      includeBackend: true,
+      includeAssociatedRepo: true
     });
 
     return restSerializer.serializeObject(req.params.troupeId, strategy);
@@ -96,7 +97,7 @@ module.exports = {
         var updatedTroupe = req.body;
 
         if(updatedTroupe.autoConfigureHooks) {
-          promises.push(roomService.applyAutoHooksForRepoRoom(req.user, troupe));
+          promises.push(roomWithPolicyService.autoConfigureHooks());
         }
 
         if(updatedTroupe.hasOwnProperty('topic')) {
@@ -177,6 +178,7 @@ module.exports = {
     'events': require('./events'),
     'meta': require('./meta'),
     'invites': require('./invites'),
+    'security': require('./security')
   }
 
 };

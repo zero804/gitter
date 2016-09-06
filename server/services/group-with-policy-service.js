@@ -89,6 +89,7 @@ GroupWithPolicyService.prototype.createRoom = secureMethod([allowAdmin], functio
   var providers = options.providers;
   var security = options.security;
   var name = options.name;
+  var associateWithGitHubRepo = options.associateWithGitHubRepo;
 
   var user = this.user;
   var group = this.group;
@@ -113,7 +114,7 @@ GroupWithPolicyService.prototype.createRoom = secureMethod([allowAdmin], functio
 
       return roomService.createGroupRoom(user, group, roomInfo, securityDescriptor, {
         tracking: options.tracking,
-        runPostGitHubRoomCreationTasks: options.runPostGitHubRoomCreationTasks,
+        associateWithGitHubRepo: associateWithGitHubRepo,
         addBadge: options.addBadge
       })
     })

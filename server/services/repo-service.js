@@ -2,7 +2,7 @@
 
 var Promise = require('bluebird');
 var GithubRepo = require('gitter-web-github').GitHubRepoService;
-var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
+var securityDescriptorFinder = require('gitter-web-permissions/lib/security-descriptor/finder');
 var isGitHubUser = require('gitter-web-identity/lib/is-github-user');
 
 function applyFilters(array, filters) {
@@ -61,7 +61,7 @@ function getUnusedReposForUser(user, options) {
       var linkPaths = repos.map(function(repo) {
         return repo.full_name;
       });
-      return securityDescriptorService.getUsedLinkPaths('GH_REPO', linkPaths);
+      return securityDescriptorFinder.getUsedLinkPaths('GH_REPO', linkPaths);
     })
     .then(function(usedLinkPaths) {
       return this.repos.filter(function(repo) {
