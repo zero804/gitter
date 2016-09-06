@@ -49,7 +49,7 @@ const TopicContainer = createClass({
 
   componentWillUnmount(){
     const {repliesStore, newReplyStore} = this.props;
-    repliesStore.removeListeners();
+    repliesStore.removeListeners(this.updateReplies, this);
     newReplyStore.off('change:text', this.updateReplyContent, this);
   },
 

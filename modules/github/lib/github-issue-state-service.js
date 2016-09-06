@@ -20,4 +20,3 @@ GitHubIssueStateService.prototype.getIssueState = function(repo, issueNumber) {
 module.exports = wrap(GitHubIssueStateService, function() {
   return ['']; // Cache across all users NB NB NB NB
 });
-

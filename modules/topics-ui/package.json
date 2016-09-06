@@ -23,6 +23,7 @@
     "gitter-client-env": "file:../client-env"
   },
   "devDependencies": {
+    "highlight.js": "8.6.0",
     "babel-loader": "^6.2.4",
     "babel-plugin-add-module-exports": "^0.2.1",
     "babel-plugin-istanbul": "^2.0.0",
@@ -43,6 +44,7 @@
     "gulp-filter": "^4.0.0",
     "inject-loader": "^2.0.1",
     "jquery": "^3.1.0",
+    "jsdom": "^9.4.5",
     "jsdom-global": "^2.1.0",
     "less-loader": "^2.2.3",
     "mocha": "^2.5.3",
