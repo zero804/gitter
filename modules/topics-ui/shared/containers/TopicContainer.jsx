@@ -32,6 +32,7 @@ const TopicContainer = createClass({
 
     tagStore: PropTypes.shape({
       getTags: PropTypes.func.isRequired,
+      getTagsByValue: PropTypes.func.isRequired,
     }).isRequired,
 
     currentUserStore: PropTypes.shape({
@@ -67,18 +68,23 @@ const TopicContainer = createClass({
 
   render(){
 
-    const { topicId, topicsStore, groupName, categoryStore, currentUserStore } = this.props;
+    const { topicId, topicsStore, groupName, categoryStore, currentUserStore, tagStore } = this.props;
     const {replies, newReplyContent} = this.state;
     const topic = topicsStore.getById(topicId)
     const currentUser = currentUserStore.getCurrentUser();
     const topicCategory = topic.category;
     const category = categoryStore.getById(topicCategory.id);
+    const tags = tagStore.getTagsByValue(topic.tags);
 
     return (
       <main>
         <SearchHeader groupName={groupName}/>
         <article>
-          <TopicHeader topic={topic} category={category} groupName={groupName}/>
+          <TopicHeader
+            topic={topic}
+            category={category}
+            groupName={groupName}
+            tags={tags}/>
           <TopicBody topic={topic} />
         </article>
         <TopicReplyListHeader replies={replies}/>

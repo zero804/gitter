@@ -149,6 +149,7 @@ function renderTopic(req, res, next) {
                   currentUserStore: currentUserStore(context.user),
                   repliesStore: repliesStore(topic.replies),
                   categoryStore: forumCategoryStore(forum.categories),
+                  tagStore: forumTagStore(forum.tags),
                   forumStore: forumStore(forum),
                 }
               });
