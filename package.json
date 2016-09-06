@@ -168,6 +168,7 @@
     "backbone.marionette": "^2.4.4",
     "beautify-benchmark": "^0.2.4",
     "benchmark": "^2.1.0",
+    "cheerio": "^0.22.0",
     "chokidar": "^1.4.3",
     "concurrently": "^2.0.0",
     "css-loader": "^0.23.1",

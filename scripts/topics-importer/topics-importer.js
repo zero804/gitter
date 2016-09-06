@@ -13,6 +13,7 @@ var groupService = require('gitter-web-groups/lib/group-service');
 var forumService = require('gitter-web-topics/lib/forum-service');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var ForumWithPolicyService = require('../../server/services/forum-with-policy-service');
+var cheerio = require('cheerio')
 
 var opts = yargs
   .option('repoUri', {
@@ -24,6 +25,18 @@ var opts = yargs
   .argv;
 
 function Importer() {
+}
+
+function processMarkdown(markdown) {
+  var $ = cheerio.load(markdown)
+  $('img').each(function(i, el) {
+    var e = $(el);
+    var src = e.attr('src') || '';
+    var alt = e.attr('alt') || '';
+    $(el).replaceWith('![' + alt + '](' + src + ')')
+  });
+
+  return $.html().trim();
 }
 
 Importer.prototype = {
@@ -62,8 +75,6 @@ Importer.prototype = {
 
   createIssue: function(issue) {
     // Create a topic for each issue...
-    console.log(issue)
-    console.log(issue.user);
     var username = issue.user.login;
     return this.getForumWithPolicyService(username, 'gitterHQ')
       .then(function(forumWithPolicyService) {
@@ -73,7 +84,7 @@ Importer.prototype = {
       .then(function(category) {
         return this.forumWithPolicyService.createTopic(category, {
           title: issue.title.trim(),
-          text: issue.body ? issue.body.trim() : "No body"
+          text: issue.body ? processMarkdown(issue.body) : "No body"
         });
       })
   },
@@ -84,7 +95,7 @@ Importer.prototype = {
     return this.getForumWithPolicyService(username, 'gitterHQ')
       .then(function(forumWithPolicyService) {
         return forumWithPolicyService.createReply(topic, {
-          text: comment.body.trim()
+          text: processMarkdown(comment.body)
         });
       })
   }
@@ -97,6 +108,7 @@ function doImport(opts) {
 
     source
       .flatMap(function(issue) {
+        // Create a topic for each issue
         return importer.createIssue(issue)
           .then(function(topic) {
             return {
@@ -108,6 +120,7 @@ function doImport(opts) {
           });
       })
       .flatMap(function(item) {
+        // FlatMap the issue comments onto the issue
         var issueNumber = item.issue.number;
         return githubIssueCommentSource({ repoUri: opts.repoUri, issueNumber: issueNumber });
       }, function(item, comment) {
@@ -117,6 +130,7 @@ function doImport(opts) {
         }
       })
       .flatMap(function(item) {
+        // Create a reply for each issue comment
         var comment = item.comment;
         var topic = item.topic;
 
