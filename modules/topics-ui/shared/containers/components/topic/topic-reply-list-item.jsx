@@ -6,10 +6,12 @@ export default React.createClass({
   displayName: 'TopicReplyListItem',
   propTypes: {
     reply: PropTypes.shape({
-
+      text: PropTypes.string,
+      body: PropTypes.shape({
+        html: PropTypes.string,
+        text: PropTypes.string,
+      }),
       formattedSentDate: PropTypes.string.isRequired,
-      displayText: PropTypes.string.isRequired,
-
       user: PropTypes.shape({
         avatarUrl: PropTypes.string.isRequired,
       }).isRequired
@@ -29,13 +31,27 @@ export default React.createClass({
           <UserAvatar user={user} width={avatarDims} height={avatarDims}/>
           <span className="topic-reply-list-item__sent">{reply.formattedSentDate}</span>
         </header>
-        <section
-          className="topic-reply-list-item__body"
-          dangerouslySetInnerHTML={{ __html: reply.displayText }}>
-        </section>
+        {this.getReplyContent(reply)}
         <footer></footer>
       </article>
     );
-  }
+  },
+
+  getReplyContent(){
+    const {reply} = this.props;
+    const body = (reply.body || {});
+    if(body.html) {
+      return (
+        <section
+          className="topic-reply-list-item__body"
+          dangerouslySetInnerHTML={{ __html: body.html }} />
+      );
+    }
+    return (
+      <section className="topic-reply-list-item__body">
+        {reply.text}
+      </section>
+    );
+  },
 
 });

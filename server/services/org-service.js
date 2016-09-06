@@ -1,8 +1,7 @@
 'use strict';
 
 var BackendMuxer = require('gitter-web-backend-muxer');
-var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
-
+var securityDescriptorFinder = require('gitter-web-permissions/lib/security-descriptor/finder');
 
 function getOrgsForUser(user) {
   var backendMuxer = new BackendMuxer(user);
@@ -20,7 +19,7 @@ function getUnusedOrgsForUser(user) {
       var linkPaths = orgs.map(function(org) {
         return org.login;
       });
-      return securityDescriptorService.getUsedLinkPaths('GH_ORG', linkPaths);
+      return securityDescriptorFinder.getUsedLinkPaths('GH_ORG', linkPaths);
     })
     .then(function(usedLinkPaths) {
       return this.orgs.filter(function(org) {

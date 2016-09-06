@@ -8,8 +8,9 @@ export default function dipatchOnChangeMixin(Constructor){
     this.listenTo(this, evts, fn, ctx);
   }
 
-  Constructor.prototype.removeListeners = function(){
-    this.stopListening();
+  Constructor.prototype.removeListeners = function(fn, ctx){
+    var evts = events.concat(this.events).join(' ');
+    this.stopListening(this, evts, fn, ctx);
   }
 
   return Constructor;
