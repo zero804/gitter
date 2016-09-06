@@ -8,7 +8,6 @@ import TopicReplyList from './components/topic/topic-reply-list.jsx';
 import {dispatch} from '../dispatcher';
 import updateReplyBody from '../action-creators/create-reply/body-update';
 import submitNewReply from '../action-creators/create-reply/submit-new-reply';
-import {REPLY_CREATED} from '../constants/create-reply';
 
 const TopicContainer = createClass({
 
@@ -29,6 +28,10 @@ const TopicContainer = createClass({
 
     categoryStore: PropTypes.shape({
       getCategories: PropTypes.func.isRequired,
+    }).isRequired,
+
+    tagStore: PropTypes.shape({
+      getTags: PropTypes.func.isRequired,
     }).isRequired,
 
     currentUserStore: PropTypes.shape({

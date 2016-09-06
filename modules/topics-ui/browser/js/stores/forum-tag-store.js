@@ -25,9 +25,13 @@ export const ForumTagStore = Backbone.Collection.extend({
     model.get('value');
   },
 
-  getTags: function() {
+  getTags() {
     return this.models.map(model => model.toJSON());
   },
+
+  getTagsByValue(values){
+    return values.map((val) => this.findWhere({label: val}).toJSON());
+  }
 });
 
 dispatchOnChangeMixin(ForumTagStore);
