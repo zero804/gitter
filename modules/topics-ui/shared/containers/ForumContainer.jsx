@@ -16,6 +16,7 @@ import bodyUpdate from '../action-creators/create-topic/body-update';
 import submitNewTopic from '../action-creators/create-topic/submit-new-topic';
 import navigateToTopic from '../action-creators/topic/navigate-to-topic';
 import categoryUpdate from '../action-creators/create-topic/category-update';
+import tagsUpdate from '../action-creators/create-topic/tags-update'
 
 import * as forumCatConstants from '../constants/forum-categories';
 import * as forumTagConstants from '../constants/forum-tags';
@@ -138,7 +139,7 @@ const ForumContainer = React.createClass({
           tags={tags}
           filterChange={this.onFilterChange}
           sortChange={this.onSortChange}
-          tagChange={this.onTagChange}/>
+          tagChange={this.onTagsChange}/>
 
         <TopicsTable topics={topics} groupName={groupName}/>
 
@@ -148,6 +149,7 @@ const ForumContainer = React.createClass({
           onTitleChange={this.onTitleChange}
           onBodyChange={this.onBodyChange}
           onCategoryChange={this.onCategoryChange}
+          onTagsChange={this.onTopicTagsChange}
           onClose={this.onCreateTopicClose}
           onSubmit={this.onSubmit}/>
 
@@ -158,10 +160,11 @@ const ForumContainer = React.createClass({
   onCategoryClicked(category){ dispatch(navigateToCategory(category));},
   onFilterChange(filter){ dispatch(navigateToFilter(filter));},
   onSortChange(sort) { dispatch(navigateToSort(sort));},
-  onTagChange(tag){ dispatch(navigateToTag(tag));},
+  onTagsChange(tag){ dispatch(navigateToTag(tag));},
   onTitleChange(title){ dispatch(titleUpdate(title));},
   onBodyChange(body){ dispatch(bodyUpdate(body));},
   onCategoryChange(id) { dispatch(categoryUpdate(id));},
+  onTopicTagsChange(tags) { dispatch(tagsUpdate(tags)); },
 
   onCreateTopicClose(){
     const {categoryStore} = this.props;
@@ -170,10 +173,12 @@ const ForumContainer = React.createClass({
 
   onSubmit(){
     const {newTopicStore} = this.props;
+    debugger
     dispatch(submitNewTopic(
       newTopicStore.get('title'),
       newTopicStore.get('body'),
-      newTopicStore.get('categoryId')
+      newTopicStore.get('categoryId'),
+      newTopicStore.get('tags')
     ));
   },
 

@@ -5,7 +5,7 @@ import parseTag from '../../../shared/parse/tag';
 import {getRealtimeClient} from './realtime-client';
 import LiveCollection from './live-collection';
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
-import {getForumId, getForumStore} from './forum-store';
+import {getForumId} from './forum-store';
 import {BaseModel} from './base-model';
 
 export const TopicModel = BaseModel.extend({
@@ -19,7 +19,17 @@ export const TopicModel = BaseModel.extend({
     return Object.assign({}, data, {
       tags: data.tags.map(parseTag)
     });
+  },
+
+  getDataToSave(){
+    const data = this.toJSON();
+    const tags = (data.tags || []);
+
+    return Object.assign({}, data, {
+      tags: tags.map((t) => t.label),
+    });
   }
+
 });
 
 export const TopicsStore = LiveCollection.extend({
@@ -53,7 +63,8 @@ export const TopicsStore = LiveCollection.extend({
     const model = this.create({
       title: data.title,
       text: data.body,
-      categoryId: data.categoryId
+      categoryId: data.categoryId,
+      tags: data.tags
     }, { wait: true });
 
     model.once('add', () => {
