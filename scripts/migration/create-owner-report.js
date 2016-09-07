@@ -13,6 +13,7 @@ var installMigrationSchemas = require('./migration-schemas').install;
 var onMongoConnect = require('../../server/utils/on-mongo-connect');
 var userService = require('../../server/services/user-service');
 var through2Concurrent = require('through2-concurrent');
+var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs')
 
 var migrationSchemas;
 
@@ -63,7 +64,7 @@ function getBatchedRooms() {
         }
       }
     ])
-    .read('secondaryPreferred')
+    .read(mongoReadPrefs.secondaryPreferred)
     .cursor({ batchSize: 1000 })
     .exec()
     .stream();
@@ -155,14 +156,14 @@ function findBatchWarnings(opts) {
 /*
 function findGitHubOrg(lcUri) {
   return migrationSchemas.GitHubOrg.findOne({ lcUri: lcUri })
-    .read('secondaryPreferred')
+    .read(mongoReadPrefs.secondaryPreferred)
     .lean()
     .exec();
 }
 
 function findGitHubUser(lcUri) {
   return migrationSchemas.GitHubUser.findOne({ lcUri: lcUri })
-    .read('secondaryPreferred')
+    .read(mongoReadPrefs.secondaryPreferred)
     .lean()
     .exec();
 }
@@ -170,7 +171,7 @@ function findGitHubUser(lcUri) {
 
 function findGithubUserById(githubId) {
   return migrationSchemas.GitHubUser.findOne({ githubId: githubId })
-    .read('secondaryPreferred')
+    .read(mongoReadPrefs.secondaryPreferred)
     .lean()
     .exec()
 }
