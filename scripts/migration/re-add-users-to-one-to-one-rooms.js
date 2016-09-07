@@ -8,6 +8,7 @@ var userService = require('../../server/services/user-service');
 var collections = require('../../server/utils/collections');
 var roomMembershipService = require('../../server/services/room-membership-service');
 var roomMembershipFlags = require('../../server/services/room-membership-flags');
+var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs')
 
 var Promise = require('bluebird');
 
@@ -45,7 +46,7 @@ function getMissingUsers() {
         troupeUserId1: { $arrayElemAt: ['$users.userId', 0] }
       }
     }])
-    .read('secondaryPreferred')
+    .read(mongoReadPrefs.secondaryPreferred)
     .exec()
     .then(function(results) {
       var missingUsers = [];

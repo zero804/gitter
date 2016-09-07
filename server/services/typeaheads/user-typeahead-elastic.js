@@ -12,6 +12,7 @@ var userService = require('../user-service');
 var collections = require('../../utils/collections');
 var uuid = require('node-uuid');
 var debug = require('debug')('gitter:app:user-typeahead');
+var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs')
 
 var INDEX_PREFIX = 'typeahead_';
 var READ_INDEX_ALIAS = 'typeahead-read';
@@ -170,7 +171,7 @@ function reindexUsers() {
   return new Promise(function(resolve, reject) {
     var userStream = persistence.User.find()
       .lean()
-      .read('secondaryPreferred')
+      .read(mongoReadPrefs.secondaryPreferred)
       .batchSize(BATCH_SIZE)
       .stream();
 
@@ -235,7 +236,7 @@ function reindexMemberships() {
       }
     ])
     .allowDiskUse(true)
-    .read('secondaryPreferred')
+    .read(mongoReadPrefs.secondaryPreferred)
     .cursor({ batchSize: BATCH_SIZE })
     .exec()
     .stream();
