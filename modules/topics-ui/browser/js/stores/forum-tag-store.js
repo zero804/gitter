@@ -4,7 +4,7 @@ import router from '../routers/index';
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
 
 const serverStore = (window.context.tagStore || {});
-const serverData = (serverStore._data || []);
+const serverData = (serverStore.data || []);
 
 export const ForumTagStore = Backbone.Collection.extend({
 
@@ -39,6 +39,7 @@ export const ForumTagStore = Backbone.Collection.extend({
 
   pluckValues(){
     //For some reason pluck doesn't work here :(
+    //We slice here to remove the "All Tags" entry
     return this.models.slice(1).map(m => m.get('label'));
   }
 

@@ -19,7 +19,7 @@ export default React.createClass({
   },
 
   render(){
-    const {options, onChange, className } = this.props;
+    const { options, className } = this.props;
 
     const compiledClass = classNames('select', className);
     const decalClassName = className ? `${className}--decal` : null;
