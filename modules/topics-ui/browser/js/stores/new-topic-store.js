@@ -2,12 +2,23 @@
 import Backbone from 'backbone';
 import {subscribe} from '../../../shared/dispatcher';
 import * as consts from '../../../shared/constants/create-topic';
+import dispatchOnChangeMixin from './mixins/dispatch-on-change';
 
-export default Backbone.Model.extend({
+const NewTopicStore = Backbone.Model.extend({
 
   defaults: {
+    title: '',
+    body: '',
+    categoryId: '',
     tags: [],
   },
+
+  events: [
+    'change:title',
+    'change:body',
+    'change:categoryId',
+    'change:tags',
+  ],
 
   initialize(){
     subscribe(consts.TITLE_UPDATE, this.onTitleUpdate, this);
@@ -34,6 +45,14 @@ export default Backbone.Model.extend({
     if(currentTags.indexOf(tag) !== -1) { return; }
     currentTags.push(tag);
     this.set('tags', currentTags);
-  }
+    this.trigger('change:tags');
+  },
+
+  getNewTopic(){
+    return this.toJSON();
+  },
 
 });
+
+dispatchOnChangeMixin(NewTopicStore);
+export default NewTopicStore;
