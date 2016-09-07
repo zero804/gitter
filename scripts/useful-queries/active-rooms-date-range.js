@@ -5,6 +5,7 @@
 var shutdown = require('shutdown');
 var persistence = require('gitter-web-persistence');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs')
 
 
 function getNumActiveRoomsForRange(objIdMin, objIdMax) {
@@ -52,7 +53,7 @@ function getNumActiveRoomsForRange(objIdMin, objIdMax) {
       }
     ])
 
-    .read('secondaryPreferred')
+    .read(mongoReadPrefs.secondaryPreferred)
     .exec();
 }
 

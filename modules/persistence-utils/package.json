@@ -11,6 +11,7 @@
   "private": true,
   "dependencies": {
     "bluebird": "^3.2.1",
+    "gitter-web-env": "file:../env",
     "lodash": "^3.2.0",
     "mongodb": "2.1.18",
     "mongodb-unique-ids": "^0.1.2"

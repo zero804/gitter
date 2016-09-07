@@ -10,6 +10,7 @@ var through2Concurrent = require('through2-concurrent');
 var BatchStream = require('batch-stream');
 var _ = require('lodash');
 var Promise = require('bluebird');
+var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs')
 
 var mongoose = require('gitter-web-mongoose-bluebird');
 var Schema = mongoose.Schema;
@@ -36,7 +37,7 @@ function preloadUserTroupeSettings(userId) {
     var query = userId ? { userId: userId } : { };
     return UserTroupeSettings.find(query, { userId: 1, troupeId: 1, 'settings.notifications.push': 1, _id: 0 })
       .lean()
-      .read('secondaryPreferred')
+      .read(mongoReadPrefs.secondaryPreferred)
       .stream()
       .on('error', reject)
       .on('end', function() {
@@ -166,7 +167,7 @@ function getTroupeUsersBatchedStream(userId) {
 
   return persistence.TroupeUser
     .find(query)
-    .read('secondaryPreferred')
+    .read(mongoReadPrefs.secondaryPreferred)
     .stream()
     .pipe(new BatchStream({ size: 4096 }));
 }

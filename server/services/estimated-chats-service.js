@@ -3,10 +3,11 @@
 var ChatMessage = require('gitter-web-persistence').ChatMessage;
 var _ = require('lodash');
 var Promise = require('bluebird');
+var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs')
 
 function getEstimatedMessageCountForRoomId(roomId) {
   return ChatMessage.count({ toTroupeId: roomId })
-    .read('secondaryPreferred')
+    .read(mongoReadPrefs.secondaryPreferred)
     .exec();
 }
 
@@ -31,7 +32,7 @@ function getEstimatedMessageCountForRoomIds(roomIds) {
         count: { $sum: 1 }
       }
     }])
-    .read('secondaryPreferred')
+    .read(mongoReadPrefs.secondaryPreferred)
     .exec()
     .then(function(results) {
       if (!results || !results.length) return {};
