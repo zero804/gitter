@@ -75,12 +75,14 @@ const TopicContainer = createClass({
     const topicCategory = topic.category;
     const category = categoryStore.getById(topicCategory.id);
 
-
+    //TODO remove
+    //This is here because sometimes you can get un-parsed tags
+    //we need to hydrate the client stores with the raw SS data
+    //not the parsed data which will avoid nesting and incosistent data
     const tagValues = topic.tags.map(function(t){
       return t.label ? t.label : t;
     });
     const tags = tagStore.getTagsByValue(tagValues);
-    console.log(tags, tagValues, topic.tags);
 
     return (
       <main>

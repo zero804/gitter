@@ -13,6 +13,7 @@ export default React.createClass({
   propTypes: {
 
     active: PropTypes.bool.isRequired,
+    tagValues: PropTypes.arrayOf(PropTypes.string).isRequired,
 
     categories: PropTypes.arrayOf(PropTypes.shape({
       selected: PropTypes.bool.isRequired,
@@ -29,7 +30,7 @@ export default React.createClass({
   },
 
   render(){
-    const { active, categories } = this.props;
+    const { active, categories, tagValues } = this.props;
 
     return (
       <Modal active={active} onClose={this.onClose}>
@@ -41,12 +42,11 @@ export default React.createClass({
               options={categories}
               className="select--create-topic-category"
               onChange={this.onCategoryChange}/>
-            <TextTypeAhead name="test" completions={[ 'test-1', 'test-2', 'test-3' ]} />
-            <Input
-              className="create-topic__input--tags"
-              name="title"
+            <TextTypeAhead
+              name="test"
               placeholder="Add tags ..."
-              onChange={this.onTagsChange}/>
+              className="create-topic__input--tags"
+              completions={['test-1', 'test-2', 'test-3', 'test-4']} />
           </div>
           <Editor
             className="create-topic__editor--body"
