@@ -4,7 +4,7 @@ import _ from 'lodash';
 import classNames from 'classnames';
 
 import Input from './input.jsx';
-import {ESC_KEY, TAB_KEY, UP_KEY, DOWN_KEY} from '../../../../shared/constants/keys';
+import {ENTER_KEY, TAB_KEY, UP_KEY, DOWN_KEY} from '../../../../shared/constants/keys';
 
 const arrayBoundWrap = function(index, length) {
   return ((index % length) + length) % length;
@@ -35,11 +35,13 @@ export default React.createClass({
 
   render(){
     const {name, className, placeholder} = this.props;
+    const {value} = this.state;
     const compiledClass = classNames('type-ahead-wrapper', className);
     return (
       <div className={compiledClass} onKeyDown={this.onKeyDown}>
         <Input
           name={name}
+          value={value}
           className="type-ahead-input"
           placeholder={placeholder}
           autoComplete="off"
@@ -82,8 +84,9 @@ export default React.createClass({
     if(e.keyCode === UP_KEY) { return this.cycleCompletions(-1); }
     if(e.keyCode === DOWN_KEY) { return this.cycleCompletions(1); }
 
-    if(e.keyCode !== ESC_KEY && e.keyCode !== TAB_KEY) { return; }
+    if(e.keyCode !== ENTER_KEY && e.keyCode !== TAB_KEY) { return; }
     const {value} = this.state;
+    e.preventDefault();
     this.submit(value);
   },
 
@@ -93,7 +96,6 @@ export default React.createClass({
   },
 
   submit(val){
-    console.log('submit');
     this.props.onSubmit(val);
     this.setState((state) => Object.assign(state, {
       value: ''

@@ -4,9 +4,9 @@ import {spy} from 'sinon';
 import { mount } from 'enzyme';
 import TextTypeAhead from '../../../../../../shared/containers/components/forms/text-type-ahead.jsx';
 import mockEvent from '../../../../../mocks/event';
-import {ESC_KEY, TAB_KEY, UP_KEY, DOWN_KEY} from '../../../../../../shared/constants/keys';
+import {ENTER_KEY, TAB_KEY, UP_KEY, DOWN_KEY} from '../../../../../../shared/constants/keys';
 
-describe.only('<TextTypeAhead/>', () => {
+describe('<TextTypeAhead/>', () => {
 
   let wrapper;
   let changeHandle;
@@ -44,8 +44,8 @@ describe.only('<TextTypeAhead/>', () => {
     equal(changeHandle.callCount, 1);
   });
 
-  it('should call onChange when ESC is pressed', () => {
-    mockEvent.keyCode = ESC_KEY;
+  it('should call onChange when ENTER is pressed', () => {
+    mockEvent.keyCode = ENTER_KEY;
     wrapper.find('.type-ahead-wrapper').simulate('keyDown', mockEvent);
     equal(changeHandle.callCount, 1);
   });
