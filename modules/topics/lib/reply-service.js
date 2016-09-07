@@ -12,7 +12,7 @@ var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var markdownMajorVersion = require('gitter-markdown-processor').version.split('.')[0];
 var validateReply = require('./validate-reply');
-
+var _ = require('lodash');
 
 function findById(replyId) {
   return Reply.findById(replyId)
@@ -167,6 +167,45 @@ function createReply(user, topic, options) {
     });
 }
 
+/**
+ * Given a set of topicIds, returns a hash
+ * of userIds of users replying to those messages
+ */
+function findSampleReplyingUserIdsForTopics(topicIds) {
+  return Reply.aggregate([{
+      $match: {
+        topicId: { $in: topicIds }
+      }
+    }, {
+      $project: {
+        _id: 0,
+        topicId: 1,
+        userId: 1
+      }
+    }, {
+      $group: {
+        _id: "$topicId",
+        userIds: {
+          $addToSet: "$userId"
+        }
+      }
+    }, {
+      $project: {
+        _id: 1,
+        userIds: { $slice: ["$userIds", 5] }
+      }
+    }])
+    .read('secondaryPreferred')
+    .exec()
+    .then(function(docs) {
+      return _.reduce(docs, function(memo, doc) {
+        memo[doc._id] = doc.userIds;
+        return memo;
+      }, {})
+
+    });
+}
+
 module.exports = {
   findById: findById,
   findByTopicId: findByTopicId,
@@ -175,5 +214,6 @@ module.exports = {
   findTotalsByTopicIds: findTotalsByTopicIds,
   findByIdForForum: findByIdForForum,
   findByIdForForumAndTopic: findByIdForForumAndTopic,
-  createReply: Promise.method(createReply)
+  createReply: Promise.method(createReply),
+  findSampleReplyingUserIdsForTopics: findSampleReplyingUserIdsForTopics
 };

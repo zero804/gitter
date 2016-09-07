@@ -8,7 +8,6 @@ var assertUtils = require('../../assert-utils')
 var serialize = testRequire('./serializers/serialize');
 var TopicStrategy = testRequire('./serializers/rest/topic-strategy');
 
-
 // TODO: move this somewhere reusable otherwise we'll end up with it
 // copy/pasted everywhere
 function makeHash() {
@@ -46,7 +45,7 @@ describe('TopicStrategy', function() {
   });
 
   it('should serialize a topic', function() {
-    var strategy = new TopicStrategy();
+    var strategy = TopicStrategy.standard();
 
     var topic = fixture.topic1;
     var category = fixture.category1;
@@ -73,13 +72,15 @@ describe('TopicStrategy', function() {
             id: user.id,
             username: user.username,
             displayName: user.displayName,
-            url: '/' + user.username,
             avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
-            avatarUrlSmall: '/api/private/user-avatar/' + user.username + '?s=60',
-            avatarUrlMedium: '/api/private/user-avatar/' + user.username + '?s=128',
-            staff: false,
-            v: 1
           },
+          repliesTotal: 1,
+          replyingUsers: [{
+            "id": user.id,
+            "username": user.username,
+            "displayName": user.displayName,
+            "avatarUrl":  nconf.get('avatar:officialHost') + '/g/u/' + user.username
+          }],
           sent: '2014-01-01T00:00:00.000Z',
           editedAt: null,
           lastModified: null,
@@ -89,7 +90,7 @@ describe('TopicStrategy', function() {
   });
 
   it('should serialize a topic with includeReplies', function() {
-    var strategy = new TopicStrategy({ includeReplies: true, includeRepliesTotals: true});
+    var strategy = TopicStrategy.full();
 
     var user = fixture.user1;
     var category = fixture.category1;
@@ -117,12 +118,7 @@ describe('TopicStrategy', function() {
             id: user.id,
             username: user.username,
             displayName: user.displayName,
-            url: '/' + user.username,
-            avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
-            avatarUrlSmall: '/api/private/user-avatar/' + user.username + '?s=60',
-            avatarUrlMedium: '/api/private/user-avatar/' + user.username + '?s=128',
-            staff: false,
-            v: 1
+            avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username
           },
           replies: [{
             id: reply.id,
@@ -134,12 +130,7 @@ describe('TopicStrategy', function() {
               id: user.id,
               username: user.username,
               displayName: user.displayName,
-              url: '/' + user.username,
-              avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
-              avatarUrlSmall: '/api/private/user-avatar/' + user.username + '?s=60',
-              avatarUrlMedium: '/api/private/user-avatar/' + user.username + '?s=128',
-              staff: false,
-              v: 1
+              avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username
             },
             sent: '2014-01-01T00:00:00.000Z',
             editedAt: null,
@@ -147,6 +138,12 @@ describe('TopicStrategy', function() {
             v: 1
           }],
           repliesTotal: 1,
+          replyingUsers: [{
+            id: user.id,
+            username: user.username,
+            displayName: user.displayName,
+            avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username
+          }],
           sent: '2014-01-01T00:00:00.000Z',
           editedAt: null,
           lastModified: null,
@@ -191,12 +188,7 @@ describe('TopicStrategy', function() {
               id: user.id,
               username: user.username,
               displayName: user.displayName,
-              url: '/' + user.username,
               avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
-              avatarUrlSmall: '/api/private/user-avatar/' + user.username + '?s=60',
-              avatarUrlMedium: '/api/private/user-avatar/' + user.username + '?s=128',
-              staff: false,
-              v: 1
             })
           }
         })
@@ -228,12 +220,7 @@ describe('TopicStrategy', function() {
               id: user.id,
               username: user.username,
               displayName: user.displayName,
-              url: '/' + user.username,
               avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
-              avatarUrlSmall: '/api/private/user-avatar/' + user.username + '?s=60',
-              avatarUrlMedium: '/api/private/user-avatar/' + user.username + '?s=128',
-              staff: false,
-              v: 1
             },
             sent: '2014-01-01T00:00:00.000Z',
             editedAt: null,
@@ -251,4 +238,3 @@ describe('TopicStrategy', function() {
       });
   });
 });
-
