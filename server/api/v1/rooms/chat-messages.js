@@ -90,9 +90,15 @@ module.exports = {
   },
 
   show: function(req) {
-    // TODO: ensure troupeId matches
-    var strategy = new restSerializer.ChatIdStrategy({ currentUserId: req.user.id, troupeId: req.params.troupeId });
-    return restSerializer.serializeObject(req.params.chatMessageId, strategy);
+    return chatService.findById(req.params.chatMessageId)
+      .then(function(chatMessage) {
+        if(chatMessage.toTroupeId.toString() === req.params.troupeId) {
+          var strategy = new restSerializer.ChatIdStrategy({ currentUserId: req.user.id, troupeId: req.params.troupeId });
+          return restSerializer.serializeObject(req.params.chatMessageId, strategy);
+        }
+
+        throw new StatusError(422, 'Message belongs to a different room than what was specified: ' + chatMessage.toTroupeId);
+      });
   },
 
   update: function(req) {
