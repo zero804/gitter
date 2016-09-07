@@ -26,41 +26,22 @@ function createQueryFromKnownAccess(type, knownAccesses) {
     .reduce(function(memo, knownAccess) {
       var linkPath = knownAccess.linkPath;
       var externalId = knownAccess.externalId;
-
-      if (linkPath && externalId) {
-        memo.push({
-          'sd.type': type,
-          'sd.admins': knownAccess.policyName,
-          'sd.linkPath': linkPath
-        });
-
-        memo.push({
-          'sd.type': type,
-          'sd.admins': knownAccess.policyName,
-          'sd.externalId': externalId
-        });
-
-        return memo;
-      }
+      var policyName = knownAccess.policyName;
 
       if (linkPath) {
         memo.push({
           'sd.type': type,
-          'sd.admins': knownAccess.policyName,
+          'sd.admins': policyName,
           'sd.linkPath': linkPath,
         });
-
-        return memo;
       }
 
       if (externalId) {
         memo.push({
           'sd.type': type,
-          'sd.admins': knownAccess.policyName,
+          'sd.admins': policyName,
           'sd.externalId': externalId
         });
-
-        return memo;
       }
 
       return memo;
