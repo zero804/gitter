@@ -68,12 +68,7 @@ describe('ReplyStrategy', function() {
             id: user.id,
             username: user.username,
             displayName: user.displayName,
-            url: '/' + user.username,
             avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
-            avatarUrlSmall: '/api/private/user-avatar/' + user.username + '?s=60',
-            avatarUrlMedium: '/api/private/user-avatar/' + user.username + '?s=128',
-            staff: false,
-            v: 1
           },
           sent: '2014-01-01T00:00:00.000Z',
           editedAt: null,
@@ -102,12 +97,7 @@ describe('ReplyStrategy', function() {
             id: user.id,
             username: user.username,
             displayName: user.displayName,
-            url: '/' + user.username,
             avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
-            avatarUrlSmall: '/api/private/user-avatar/' + user.username + '?s=60',
-            avatarUrlMedium: '/api/private/user-avatar/' + user.username + '?s=128',
-            staff: false,
-            v: 1
           },
           comments: [{
             id: comment.id,
@@ -119,12 +109,7 @@ describe('ReplyStrategy', function() {
               id: user.id,
               username: user.username,
               displayName: user.displayName,
-              url: '/' + user.username,
               avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
-              avatarUrlSmall: '/api/private/user-avatar/' + user.username + '?s=60',
-              avatarUrlMedium: '/api/private/user-avatar/' + user.username + '?s=128',
-              staff: false,
-              v: 1
             },
             sent: '2014-01-01T00:00:00.000Z',
             editedAt: null,
@@ -166,16 +151,10 @@ describe('ReplyStrategy', function() {
               id: user.id,
               username: user.username,
               displayName: user.displayName,
-              url: '/' + user.username,
               avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
-              avatarUrlSmall: '/api/private/user-avatar/' + user.username + '?s=60',
-              avatarUrlMedium: '/api/private/user-avatar/' + user.username + '?s=128',
-              staff: false,
-              v: 1
             })
           }
         })
       });
   });
 });
-
