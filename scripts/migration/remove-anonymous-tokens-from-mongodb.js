@@ -6,7 +6,6 @@ var onMongoConnect = require('../../server/utils/on-mongo-connect');
 var through2Concurrent = require('through2-concurrent');
 var BatchStream = require('batch-stream');
 var Promise = require('bluebird');
-var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs')
 
 function anonymousTokenStream() {
   return persistence.OAuthAccessToken.find({ userId: null }, { _id: 1 })
