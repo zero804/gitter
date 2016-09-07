@@ -24,9 +24,14 @@ export const TopicModel = BaseModel.extend({
   getDataToSave(){
     const data = this.toJSON();
     const tags = (data.tags || []);
+    //Tags are parsed on the server during a pre-render
+    //but not on an update from the realtime connection
+    //need to sort this out. Below is a temp fix.
+    const parsedTags = tags[0].label ?
+      tags : tags.map((t) => t.label);
 
     return Object.assign({}, data, {
-      tags: tags.map((t) => t.label),
+      tags: parsedTags
     });
   }
 

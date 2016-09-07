@@ -1,6 +1,7 @@
 import React, {PropTypes} from 'react';
 import Modal from '../modal.jsx';
 import Input from '../forms/input.jsx';
+import TextTypeAhead from '../forms/text-type-ahead.jsx';
 import H1 from '../text/h-1.jsx';
 import Editor from '../forms/editor.jsx';
 import Submit from '../forms/submit.jsx';
@@ -40,6 +41,7 @@ export default React.createClass({
               options={categories}
               className="select--create-topic-category"
               onChange={this.onCategoryChange}/>
+            <TextTypeAhead name="test" completions={[ 'test-1', 'test-2', 'test-3' ]} />
             <Input
               className="create-topic__input--tags"
               name="title"

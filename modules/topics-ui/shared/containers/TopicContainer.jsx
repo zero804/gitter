@@ -74,7 +74,13 @@ const TopicContainer = createClass({
     const currentUser = currentUserStore.getCurrentUser();
     const topicCategory = topic.category;
     const category = categoryStore.getById(topicCategory.id);
-    const tags = tagStore.getTagsByValue(topic.tags);
+
+
+    const tagValues = topic.tags.map(function(t){
+      return t.label ? t.label : t;
+    });
+    const tags = tagStore.getTagsByValue(tagValues);
+    console.log(tags, tagValues, topic.tags);
 
     return (
       <main>
