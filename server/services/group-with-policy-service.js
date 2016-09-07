@@ -255,7 +255,7 @@ GroupWithPolicyService.prototype.createForum = secureMethod([allowAdmin], functi
 });
 
 GroupWithPolicyService.prototype.setAvatar = secureMethod([allowAdmin], function(url) {
-  groupService.setAvatarForGroup(this.group._id, url);
+  return groupService.setAvatarForGroup(this.group._id, url);
 });
 
 module.exports = GroupWithPolicyService;
