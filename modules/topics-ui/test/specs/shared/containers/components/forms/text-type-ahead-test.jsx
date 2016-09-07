@@ -28,7 +28,6 @@ describe.only('<TextTypeAhead/>', () => {
 
   it('should render a ul when the input has content', () => {
     equal(wrapper.find('ul').length, 0);
-    mockEvent.target.value = 'test';
     wrapper.find('Input').at(0).prop('onChange')('test');
     equal(wrapper.find('ul').length, 1, 'failed to render the ul');
     equal(wrapper.find('li').length, completions.length, 'failed to render the li\'s');
@@ -48,6 +47,12 @@ describe.only('<TextTypeAhead/>', () => {
   it('should call onChange when ESC is pressed', () => {
     mockEvent.keyCode = ESC_KEY;
     wrapper.find('.type-ahead-wrapper').simulate('keyDown', mockEvent);
+    equal(changeHandle.callCount, 1);
+  });
+
+  it('should call onChange when a type ahead item is clicked', () => {
+    wrapper.find('Input').at(0).prop('onChange')('test');
+    wrapper.find('li').at(0).simulate('click', mockEvent);
     equal(changeHandle.callCount, 1);
   });
 

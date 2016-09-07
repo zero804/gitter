@@ -4,7 +4,7 @@ import router from '../routers/index';
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
 
 const serverStore = (window.context.tagStore || {});
-const serverData = (serverStore.data || []);
+const serverData = (serverStore._data || []);
 
 export const ForumTagStore = Backbone.Collection.extend({
 
@@ -35,7 +35,13 @@ export const ForumTagStore = Backbone.Collection.extend({
       if(!model) { return; }
       return model.toJSON();
     });
+  },
+
+  pluckValues(){
+    //For some reason pluck doesn't work here :(
+    return this.models.slice(1).map(m => m.get('label'));
   }
+
 });
 
 dispatchOnChangeMixin(ForumTagStore);

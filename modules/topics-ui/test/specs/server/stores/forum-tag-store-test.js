@@ -49,4 +49,9 @@ describe('ForumStore', () => {
     })
   });
 
+  it('should return a collection of values from pluckValues', () => {
+    const result = store.pluckValues();
+    assert.deepEqual(result, tags);
+  });
+
 });

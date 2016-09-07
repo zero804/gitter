@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 import fuzzysearch from 'fuzzysearch';
 import _ from 'lodash';
+import classNames from 'classnames';
 
 import Input from './input.jsx';
 import {ESC_KEY, TAB_KEY, UP_KEY, DOWN_KEY} from '../../../../shared/constants/keys';
@@ -18,11 +19,13 @@ export default React.createClass({
     onSubmit: PropTypes.func.isRequired,
     value: PropTypes.string,
     placeholder: PropTypes.string,
+    className: PropTypes.string,
   },
 
   getInitialState(){
     return {
       value: this.props.value,
+      shouldShowTypeAhead: true,
       completions: this.props.completions.map((c) => ({
         value: c,
         active: false
@@ -31,17 +34,26 @@ export default React.createClass({
   },
 
   render(){
-    const {name} = this.props;
+    const {name, className, placeholder} = this.props;
+    const compiledClass = classNames('type-ahead-wrapper', className);
     return (
-      <div className="type-ahead-wrapper" onKeyDown={this.onKeyDown}>
-        <Input name={name} onChange={this.onInputChange}/>
+      <div className={compiledClass} onKeyDown={this.onKeyDown}>
+        <Input
+          name={name}
+          className="type-ahead-input"
+          placeholder={placeholder}
+          autoComplete="off"
+          onBlur={this.disableCompletions}
+          onFocus={this.enableCompletions}
+          onChange={this.onInputChange}/>
         {this.getCompletions()}
       </div>
     );
   },
 
   getCompletions(){
-    const {value} = this.state;
+    const {value, shouldShowTypeAhead} = this.state;
+    if(!shouldShowTypeAhead) { return; }
     if(!value || !value.length) { return; }
 
     const { completions } = this.state;
@@ -50,24 +62,20 @@ export default React.createClass({
 
     return (
       <ul className="type-ahead">
-        {matchingCompletions.map(function(completion, i){
-          const className = completion.active ? 'type-ahead__child--active' : 'type-ahead__child'
-          return (
-            <li
-              key={`type-ahead-${completion.value}-${i}`}
-              className={className}>
-              {completion.value}
-            </li>
-          );
-        })}
+      {matchingCompletions.map((completion, i) => {
+        const className = completion.active ? 'type-ahead__child--active' : 'type-ahead__child'
+        return (
+          <li
+          key={`type-ahead-${completion.value}-${i}`}
+          onClick={this.onItemClicked}
+          onMouseOver={this.clearActiveCompletions}
+          className={className}>
+          {completion.value}
+          </li>
+        );
+      })}
       </ul>
     );
-  },
-
-  onInputChange(val){
-    this.setState((state) => Object.assign(state, {
-      value: val,
-    }));
   },
 
   onKeyDown(e){
@@ -76,7 +84,26 @@ export default React.createClass({
 
     if(e.keyCode !== ESC_KEY && e.keyCode !== TAB_KEY) { return; }
     const {value} = this.state;
-    this.props.onSubmit(value)
+    this.submit(value);
+  },
+
+  onItemClicked(e){
+    e.preventDefault();
+    this.submit(e.target.value);
+  },
+
+  submit(val){
+    console.log('submit');
+    this.props.onSubmit(val);
+    this.setState((state) => Object.assign(state, {
+      value: ''
+    }));
+  },
+
+  onInputChange(val){
+    this.setState((state) => Object.assign(state, {
+      value: val,
+    }));
   },
 
   cycleCompletions(dir){
@@ -99,6 +126,27 @@ export default React.createClass({
     this.setState((state) => Object.assign(state, {
       completions: newCompletions,
     }));
-  }
+  },
+
+  clearActiveCompletions(){
+    const {completions} = this.state;
+    this.setState((state) => Object.assign(state, {
+      completions: completions.map((c) => Object.assign(c, {
+        active: false,
+      })),
+    }));
+  },
+
+  disableCompletions(){
+    this.setState((state) => Object.assign(state, {
+      shouldShowTypeAhead: false
+    }));
+  },
+
+  enableCompletions(){
+    this.setState((state) => Object.assign(state, {
+      shouldShowTypeAhead: true
+    }));
+  },
 
 });
