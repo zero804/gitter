@@ -1,12 +1,13 @@
 "use strict";
 
+var Promise = require('bluebird');
+var _ = require('underscore');
+var StatusError = require('statuserror');
 var chatService = require('../../../services/chat-service');
 var restSerializer = require('../../../serializers/rest-serializer');
 var userAgentTagger = require('../../../web/user-agent-tagger');
-var _ = require('underscore');
-var StatusError = require('statuserror');
 var loadTroupeFromParam = require('./load-troupe-param');
-var Promise = require('bluebird');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 
 function parseLookups(lookups) {
@@ -92,12 +93,11 @@ module.exports = {
   show: function(req) {
     return chatService.findById(req.params.chatMessageId)
       .then(function(chatMessage) {
-        if(chatMessage.toTroupeId.toString() === req.params.troupeId) {
-          var strategy = new restSerializer.ChatIdStrategy({ currentUserId: req.user.id, troupeId: req.params.troupeId });
-          return restSerializer.serializeObject(req.params.chatMessageId, strategy);
-        }
+        if (!chatMessage) throw new StatusError(404);
+        if(!mongoUtils.objectIDsEqual(chatMessage.toTroupeId, req.params.troupeId)) throw new StatusError(404);
 
-        throw new StatusError(422, 'Message belongs to a different room than what was specified: ' + chatMessage.toTroupeId);
+        var strategy = new restSerializer.ChatIdStrategy({ currentUserId: req.user.id, troupeId: req.params.troupeId });
+        return restSerializer.serializeObject(req.params.chatMessageId, strategy);
       });
   },
 
@@ -105,6 +105,8 @@ module.exports = {
     return Promise.all([loadTroupeFromParam(req), chatService.findById(req.params.chatMessageId)])
       .spread(function(troupe, chatMessage) {
         if (!chatMessage) throw new StatusError(404);
+        if(!mongoUtils.objectIDsEqual(chatMessage.toTroupeId, req.params.troupeId)) throw new StatusError(404);
+
         return chatService.updateChatMessage(troupe, chatMessage, req.user, req.body.text);
       })
       .then(function(chatMessage) {
