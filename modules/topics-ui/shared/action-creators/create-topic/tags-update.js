@@ -4,6 +4,6 @@ export default function tagsUpdate(tag){
   //TODO validate
   return {
     type: TAGS_UPDATE,
-    tags: tag
+    tag: tag
   };
 }
