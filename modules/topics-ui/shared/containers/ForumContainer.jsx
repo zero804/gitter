@@ -102,17 +102,16 @@ export default React.createClass({
   },
 
   render() {
-    const { categories, categoryName, tags, filterName, tagName, sortName, createTopic, topics } = this.state;
-    const { groupName, newTopicStore, topicsStore } = this.props;
+    const { categoryName, tags, filterName, tagName, sortName, createTopic, topics } = this.state;
+    const { groupName, newTopicStore, topicsStore, categoryStore } = this.props;
+    const categories = categoryStore.getCategories();
 
     return (
       <main>
         <SearchHeader groupName={groupName}/>
         <CategoryList
           groupName={ groupName }
-          categories={ categories }
-          //Change this attribute name to categoryChange
-          onCategoryClicked={ this.onCategoryClicked } />
+          categories={ categories }/>
 
         <ForumTableControl
           groupName={groupName}
