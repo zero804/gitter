@@ -38,9 +38,7 @@ export default React.createClass({
 
   render(){
     const { active, categories, tagValues, newTopic } = this.props;
-    const { title, body, categoryId, tags } = newTopic;
-
-    console.log(tags);
+    const { title, body, categoryId } = newTopic;
 
     return (
       <Modal active={active} onClose={this.onClose}>
@@ -66,7 +64,7 @@ export default React.createClass({
               onSubmit={this.onTagsChange}
               completions={tagValues} />
           </div>
-
+          {this.getTagsRow()}
           <Editor
             className="create-topic__editor--body"
             name="body"
@@ -79,6 +77,29 @@ export default React.createClass({
           </div>
         </form>
       </Modal>
+    );
+  },
+
+  getTagsRow(){
+    const {newTopic} = this.props;
+    const {tags} = newTopic;
+    if(!tags.length) { return; }
+    return (
+      <div className="create-topic__details-row">
+        <ul className="create-topic__tags">
+          {tags.map(this.getTagRowChild)}
+        </ul>
+      </div>
+    );
+  },
+
+  getTagRowChild(tagString, i){
+    return (
+      <li key={`tag-row-child-${tagString}-${i}`}>
+        <button className="create-topic__tags__child">
+          {tagString}
+        </button>
+      </li>
     );
   },
 
