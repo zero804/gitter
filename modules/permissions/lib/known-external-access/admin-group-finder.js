@@ -7,22 +7,6 @@ var Group = require('gitter-web-persistence').Group;
 // Only search in last 100 used items
 var MAX_ITEMS = 100;
 
-function valueIfAllEqual(array, iterator) {
-  if (!array.length) return null;
-
-  var first = iterator(array[0]);
-  if (!first) return null;
-
-  if (array.length === 1) return first;
-  for (var i = 1; i < array.length; i++) {
-    if (iterator(array[i]) !== first) {
-      return null;
-    }
-  }
-
-  return first;
-}
-
 function findKnownAccessOfTypeForUser(type, userId) {
   var query = {
     userId: userId,
@@ -38,59 +22,57 @@ function findKnownAccessOfTypeForUser(type, userId) {
 }
 
 function createQueryFromKnownAccess(type, knownAccesses) {
-  var allPolicyNamesEqual = valueIfAllEqual(knownAccesses, function(item) {
-    return item.policyName;
-  });
-
   var disjunction = knownAccesses
-    .map(function(knownAccess) {
-      var query;
+    .reduce(function(memo, knownAccess) {
       var linkPath = knownAccess.linkPath;
       var externalId = knownAccess.externalId;
 
-      if (allPolicyNamesEqual) {
-        query = {};
-      } else {
-        query = {
-          'sd.admins': knownAccess.policyName
-        }
-      }
-
       if (linkPath && externalId) {
-        query.$or = [{
+        memo.push({
+          'sd.type': type,
+          'sd.admins': knownAccess.policyName,
           'sd.linkPath': linkPath
-        }, {
-          'sd.externalId': externalId
-        }];
+        });
 
-        return query;
+        memo.push({
+          'sd.type': type,
+          'sd.admins': knownAccess.policyName,
+          'sd.externalId': externalId
+        });
+
+        return memo;
       }
 
       if (linkPath) {
-        query['sd.linkPath'] = linkPath;
-        return query;
+        memo.push({
+          'sd.type': type,
+          'sd.admins': knownAccess.policyName,
+          'sd.linkPath': linkPath,
+        });
+
+        return memo;
       }
 
       if (externalId) {
-        query['sd.externalId'] = externalId;
-        return query;
+        memo.push({
+          'sd.type': type,
+          'sd.admins': knownAccess.policyName,
+          'sd.externalId': externalId
+        });
+
+        return memo;
       }
 
-      return null;
-    })
-    .filter(Boolean);
+      return memo;
+    }, []);
 
   // No good matches, return null
   if (!disjunction.length) return null;
 
   var query = {
-    'sd.type': type,
     $or: disjunction
   };
 
-  if (allPolicyNamesEqual) {
-    query['sd.admins'] = allPolicyNamesEqual;
-  }
 
   return query;
 }
