@@ -28,7 +28,6 @@ module.exports = function forumTagStore(tags, activeTagName){
   const pluckValues = () => _.map(tags, 'value').slice(1); //Remove "all-tags"
 
   return {
-    _data: tags,
     data: tags,
     getTags: () => tags,
     getActiveTagName: () => _.find(tags, (tag) => tag.active)[0].value,
