@@ -40,11 +40,14 @@ const NewTopicStore = Backbone.Model.extend({
   },
 
   onTagsUpdate(data){
-    const tag = data.tags;
+    const tag = data.tag;
     const currentTags = this.get('tags');
     if(currentTags.indexOf(tag) !== -1) { return; }
     currentTags.push(tag);
     this.set('tags', currentTags);
+    //We have to trigger here beacuse backbone will not pickup this change
+    //event if we were to `[].concat(currentTags)` we still wouldn't get a
+    //change ecebt :(
     this.trigger('change:tags');
   },
 
