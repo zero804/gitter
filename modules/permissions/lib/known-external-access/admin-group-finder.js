@@ -3,6 +3,7 @@
 var Promise = require('bluebird');
 var KnownExternalAccess = require('gitter-web-persistence').KnownExternalAccess;
 var Group = require('gitter-web-persistence').Group;
+var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs')
 
 // Only search in last 100 used items
 var MAX_ITEMS = 100;
@@ -17,7 +18,7 @@ function findKnownAccessOfTypeForUser(type, userId) {
     .lean()
     .sort({ accessTime: -1 })
     .limit(MAX_ITEMS)
-    .read('secondaryPreferred')
+    .read(mongoReadPrefs.secondaryPreferred)
     .exec();
 }
 
@@ -70,7 +71,7 @@ function findAdminGroupsOfTypeForUserId(type, userId) {
 
       return Group.find(query)
         .lean()
-        .read('secondaryPreferred')
+        .read(mongoReadPrefs.secondaryPreferred)
         .exec();
     })
 }
