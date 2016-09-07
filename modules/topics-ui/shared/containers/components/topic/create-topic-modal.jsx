@@ -46,7 +46,8 @@ export default React.createClass({
               name="test"
               placeholder="Add tags ..."
               className="create-topic__input--tags"
-              completions={['test-1', 'test-2', 'test-3', 'test-4']} />
+              onSubmit={this.onTagsChange}
+              completions={tagValues} />
           </div>
           <Editor
             className="create-topic__editor--body"
@@ -70,6 +71,7 @@ export default React.createClass({
   },
 
   onSubmit(e){
+    console.log('submit');
     e.preventDefault();
     this.props.onSubmit();
   },
@@ -82,9 +84,9 @@ export default React.createClass({
     this.props.onCategoryChange(val);
   },
 
-  onTagsChange(tagString){
-    const tags = tagString.split(',');
-    this.props.onTagsChange(tags);
+  onTagsChange(tag){
+    console.log(tag);
+    this.props.onTagsChange(tag);
   }
 
 

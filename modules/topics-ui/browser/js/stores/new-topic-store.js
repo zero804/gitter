@@ -5,6 +5,10 @@ import * as consts from '../../../shared/constants/create-topic';
 
 export default Backbone.Model.extend({
 
+  defaults: {
+    tags: [],
+  },
+
   initialize(){
     subscribe(consts.TITLE_UPDATE, this.onTitleUpdate, this);
     subscribe(consts.BODY_UPDATE, this.onBodyUpdate, this);
@@ -25,7 +29,11 @@ export default Backbone.Model.extend({
   },
 
   onTagsUpdate(data){
-    this.set('tags', data.tags);
+    const tag = data.tags;
+    const currentTags = this.get('tags');
+    if(currentTags.indexOf(tag) !== -1) { return; }
+    currentTags.push(tag);
+    this.set('tags', currentTags);
   }
 
 });
