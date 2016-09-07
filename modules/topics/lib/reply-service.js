@@ -13,6 +13,7 @@ var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var markdownMajorVersion = require('gitter-markdown-processor').version.split('.')[0];
 var validateReply = require('./validate-reply');
 var _ = require('lodash');
+var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs')
 
 function findById(replyId) {
   return Reply.findById(replyId)
@@ -195,7 +196,7 @@ function findSampleReplyingUserIdsForTopics(topicIds) {
         userIds: { $slice: ["$userIds", 5] }
       }
     }])
-    .read('secondaryPreferred')
+    .read(mongoReadPrefs.secondaryPreferred)
     .exec()
     .then(function(docs) {
       return _.reduce(docs, function(memo, doc) {
