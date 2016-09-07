@@ -36,7 +36,7 @@ export const TopicsStore = LiveCollection.extend({
   },
 
   initialize(){
-    subscribe(SUBMIT_NEW_TOPIC, this.creatNewTopic, this);
+    subscribe(SUBMIT_NEW_TOPIC, this.createNewTopic, this);
   },
 
   getTopics() {
@@ -49,7 +49,7 @@ export const TopicsStore = LiveCollection.extend({
     return model.toJSON();
   },
 
-  creatNewTopic(data){
+  createNewTopic(data){
     const model = this.create({ title: data.title, text: data.body }, { wait: true });
     model.once('add', () => {
       this.trigger(TOPIC_CREATED, {
