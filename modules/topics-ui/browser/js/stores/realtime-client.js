@@ -5,9 +5,6 @@ import {getAccessToken} from './access-token-store';
 
 let client;
 
-const serverTokenStore = (window.context.accessTokenStore || {});
-const accessToken = (serverTokenStore.token || '');
-
 function authProvider(callback) {
   const mobile = false;
   const authMessage = _.extend({
@@ -21,7 +18,6 @@ function authProvider(callback) {
 }
 
 export function getRealtimeClient(){
-  if(!accessToken.length) { return; }
   if(!client) {
     const c = clientEnv['websockets'] || {};
     client = new RealtimeClient({
