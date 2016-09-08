@@ -65,7 +65,7 @@ function ReplyStrategy(options) {
       })
       .then(function() {
         // TODO: no user strategy necessary if options.user is passed in
-        userStrategy = new UserIdStrategy();
+        userStrategy = UserIdStrategy.slim();
         var userIds = replies.map(function(i) { return i.userId; });
         strategies.push(userStrategy.preload(userIds));
 

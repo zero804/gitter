@@ -8,7 +8,7 @@ describe('repliesStore', () => {
   var models = [];
 
   it('should return an object with models', () => {
-    assert(repliesStore(models).models);
+    assert(repliesStore(models).data);
   });
 
   it('should return an object with getReplies', () => {

@@ -46,9 +46,7 @@ export default React.createClass({
               <ForumCategoryLink
                 className="topic-header__category-link"
                 category={category}
-                groupName={groupName}>
-                  {category.category}
-              </ForumCategoryLink>
+                groupName={groupName}>{category.category}</ForumCategoryLink>
               <ul className="topic-header__tag-list">{tags.map((tag, i) => this.buildTagView(tag, i))}</ul>
             </section>
           </header>

@@ -125,12 +125,7 @@ function renderTopic(req, res, next) {
 
                 if (!topic) { return next(new StatusError(404, 'Topic not found.')); }
 
-                var strategy = new restSerializer.TopicStrategy({
-                  includeReplies: true,
-                  includeRepliesTotals: true,
-                  // TODO: we'll probably include a sample of comments on those replies
-                  // down the line.
-                });
+                var strategy = restSerializer.TopicStrategy.full();
                 return restSerializer.serializeObject(topic, strategy);
               })
             .then(function(topic){
@@ -156,7 +151,10 @@ function renderTopic(req, res, next) {
 
           });
         })
-    })
+    });
+
+    //TODO Catch some errors
+
 }
 
 module.exports = {

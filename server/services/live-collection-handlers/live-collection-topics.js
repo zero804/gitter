@@ -9,9 +9,7 @@ function serializeTopicToForum(operation, topic) {
   var forumId = topic.forumId;
   var url = "/forums/" + forumId + "/topics";
 
-  var strategy = new restSerializer.TopicStrategy({
-    includeRepliesTotals: true
-  });
+  var strategy = restSerializer.TopicStrategy.standard();
   return restSerializer.serializeObject(topic, strategy)
     .then(function(serializedTopic) {
       appEvents.dataChange2(url, operation, serializedTopic, 'topic');
