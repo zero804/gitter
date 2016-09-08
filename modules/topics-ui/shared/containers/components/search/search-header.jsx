@@ -31,7 +31,7 @@ export default React.createClass({
           </H1>
           <Input
             name="Search Topics"
-            placeholder="🔍  search for topics, replies and comments"
+            placeholder="Search for topics, replies and comments"
             onChange={this.onSearchUpdate}
             className="topic-search__search-input"/>
           <CreateTopicLink groupName={groupName} className="topic-search__create-topic-link">
