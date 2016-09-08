@@ -3,7 +3,6 @@
 var Marionette = require('backbone.marionette');
 var PermissionsPeopleListTemplate = require('./permissions-people-list-view.hbs');
 var PermissionsPeopleListItemTemplate = require('./permissions-people-list-item-view.hbs');
-var PermissionsPeopleListEmptyTemplate = require('./permissions-people-list-empty-view.hbs');
 
 
 var PermissionsPeopleListItemView = Marionette.ItemView.extend({
@@ -20,14 +19,9 @@ var PermissionsPeopleListItemView = Marionette.ItemView.extend({
   }
 });
 
-var PermissionsPeopleListEmptyView = Marionette.ItemView.extend({
-  template: PermissionsPeopleListEmptyTemplate,
-});
-
 var PermissionsPeopleListView = Marionette.CompositeView.extend({
   template: PermissionsPeopleListTemplate,
   childView: PermissionsPeopleListItemView,
-  emptyView: PermissionsPeopleListEmptyView,
   childViewContainer: '.permissions-people-list',
 
   childViewOptions: function() {
