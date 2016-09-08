@@ -30,6 +30,8 @@ var PermissionsView = Marionette.LayoutView.extend({
     permissionsOptionsSelect: '.js-permissions-options-select',
     permissionsOptionsSpinner: '.js-permissions-options-spinner',
     permissionsOptionsErrorIcon: '.js-permissions-options-error-icon',
+    extraAdminsNote: '.js-permissions-extra-admins-note',
+    sdWarning: '.js-permissions-sd-warning',
     modelError: '.js-permissions-model-error',
     submissionError: '.js-permissions-submission-error'
   },
@@ -160,7 +162,11 @@ var PermissionsView = Marionette.LayoutView.extend({
 
   initializeForEntity: function() {
     this.fetchSecurityDescriptor()
+      .bind(this)
       .then(function() {
+        var sd = this.model.get('securityDescriptor');
+        this.model.set('initialSecurityDescriptorType', sd && sd.type);
+
         var permissionOpts = this.getPermissionOptions();
 
         this.ui.permissionsOptionsSelect.html('');
@@ -180,6 +186,18 @@ var PermissionsView = Marionette.LayoutView.extend({
   },
 
   onSecurityDescriptorChange: function() {
+    var sd = this.model.get('securityDescriptor');
+    var sdType = sd && sd.type;
+    toggleClass(this.ui.extraAdminsNote[0], 'hidden', !sdType);
+
+    var sdWarningString = '';
+    var initialSdType = this.model.get('initialSecurityDescriptorType');
+    var isInitialSdTypeGitHubBased = initialSdType === 'GH_ORG' || initialSdType === 'GH_REPO';
+    if(isInitialSdTypeGitHubBased && initialSdType !== sdType) {
+      sdWarningString = 'Warning, switching away from GitHub-based administrators is permanent. Once you have applied these changes, you cannot go back to GitHub based administrators.';
+    }
+    this.ui.sdWarning.text(sdWarningString);
+
     this.updateModelErrors();
   },
 
