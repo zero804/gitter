@@ -1,12 +1,18 @@
 import Backbone from 'backbone';
+import _ from 'lodash';
 import {subscribe} from '../../../shared/dispatcher';
-import {SUBMIT_NEW_TOPIC, TOPIC_CREATED} from '../../../shared/constants/create-topic';
+import SimpleFilteredCollection from 'gitter-realtime-client/lib/simple-filtered-collection';
+
+import LiveCollection from './live-collection';
+import {BaseModel} from './base-model';
+
 import parseTag from '../../../shared/parse/tag';
 import {getRealtimeClient} from './realtime-client';
-import LiveCollection from './live-collection';
-import dispatchOnChangeMixin from './mixins/dispatch-on-change';
 import {getForumId, getForumStore} from './forum-store';
-import {BaseModel} from './base-model';
+import router from '../routers';
+
+import dispatchOnChangeMixin from './mixins/dispatch-on-change';
+import {SUBMIT_NEW_TOPIC, TOPIC_CREATED} from '../../../shared/constants/create-topic';
 
 export const TopicModel = BaseModel.extend({
   url(){
@@ -23,7 +29,7 @@ export const TopicModel = BaseModel.extend({
   }
 });
 
-export const TopicsStore = LiveCollection.extend({
+export const TopicsLiveCollection = LiveCollection.extend({
 
   model: TopicModel,
   client: getRealtimeClient(),
@@ -39,16 +45,6 @@ export const TopicsStore = LiveCollection.extend({
     subscribe(SUBMIT_NEW_TOPIC, this.createNewTopic, this);
   },
 
-  getTopics() {
-    return this.models.map(model => model.toJSON());
-  },
-
-  getById(id){
-    const model = this.get(id);
-    if(!model){ return; }
-    return model.toJSON();
-  },
-
   createNewTopic(data){
     const model = this.create({ title: data.title, text: data.body }, { wait: true });
     model.once('add', () => {
@@ -59,14 +55,43 @@ export const TopicsStore = LiveCollection.extend({
     });
   },
 
-  //TODO REMOVE
-  getCategoryId(){
-    //TODO This needs to be fleshed out when the UI is completed
-    const categories = getForumStore().get('categories');
-    if(categories && categories[0]) { return categories[0].id; }
+});
+
+export class TopicsStore {
+
+  constructor(models, options){
+    _.extend(this, Backbone.Events);
+
+    this.topicCollection = new TopicsLiveCollection(models, options);
+    this.collection = new SimpleFilteredCollection([], Object.assign({}, options, {
+      collection: this.topicCollection,
+      filter: this.filterFn,
+    }));
+    this.listenTo(router, 'change:categoryName', this.onRouterUpdate, this);
   }
 
-});
+  filterFn(model){
+    const categoryName = router.get('categoryName');
+    const category = model.get('category');
+    return category.slug === categoryName;
+  }
+
+  getTopics(){
+    return this.collection.models.map((m) => m.toJSON());
+  }
+
+  getById(id){
+    const model = this.collection.get(id);
+    if(!model) { return; }
+    return model.toJSON();
+  }
+
+  onRouterUpdate(){
+    this.collection.setFilter(this.filterFn);
+  }
+}
+
+
 
 dispatchOnChangeMixin(TopicsStore);
 

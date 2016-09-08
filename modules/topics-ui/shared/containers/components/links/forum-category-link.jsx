@@ -36,7 +36,6 @@ export default React.createClass({
   onClick(e){
     e.preventDefault();
     const {onClick, category} = this.props;
-    console.log(category);
     if(onClick) { return onClick(e, category); }
     dispatch(navigateToCategory(category.slug));
   }

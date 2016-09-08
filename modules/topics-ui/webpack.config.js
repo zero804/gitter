@@ -49,7 +49,6 @@ var config = {
   resolve: {
     alias: {
       jquery: require.resolve('jquery'),
-      underscore: require.resolve('lodash'),
       backbone: require.resolve('backbone/backbone.js'),
     }
   },
