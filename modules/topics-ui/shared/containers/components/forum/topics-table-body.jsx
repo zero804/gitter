@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
 import TopicLink from '../links/topic-link.jsx';
+import UserAvatar from '../user/user-avatar.jsx';
 
 export default React.createClass({
 
@@ -21,13 +22,20 @@ export default React.createClass({
   },
 
   renderChildRow(topic, i) {
-    var {groupName} = this.props;
-    //TODO add action to navigate
-    const href = `/${groupName}/topics/topic/${topic.id}/${topic.slug}`
+    const {groupName} = this.props;
+    const {user} = topic;
     return (
       <tr className="topics-table-body__row" key={`topics-table-row-${i}`}>
-        <td className="topics-table-body__cell">
-          <TopicLink groupName={groupName} topic={topic}>
+        <td className="topics-table-body__cell--details">
+          <UserAvatar
+            className="topics-table-body__cell__avatar"
+            user={user}
+            width={28}
+            height={28}/>
+          <TopicLink
+            className="topics-table-body__cell__link"
+            groupName={groupName}
+            topic={topic}>
             {topic.title}
           </TopicLink>
         </td>
