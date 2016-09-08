@@ -6,12 +6,6 @@ var categoryStore = require('../../../../server/stores/forum-category-store');
 describe('CategoryStore', function(){
 
   const categories = [ {name: 1, slug: 1}, {name: 2, slug: 1}, {name: 3, slug: 1}];
-  const parsedCategories = [
-    {category: 'all', active: true },
-    {category: 1, active: false },
-    {category: 2, active: false },
-    {category: 3, active: false }
-  ];
 
   it('should return an object with models', function(){
     assert(categoryStore().models, 'should return a models property');
