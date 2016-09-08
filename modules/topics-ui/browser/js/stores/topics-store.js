@@ -59,36 +59,39 @@ export const TopicsLiveCollection = LiveCollection.extend({
 
 export class TopicsStore {
 
-  constructor(models, options){
+  constructor(models, options) {
     _.extend(this, Backbone.Events);
 
     this.topicCollection = new TopicsLiveCollection(models, options);
-    this.collection = new SimpleFilteredCollection([], Object.assign({}, options, {
+
+    this.collection = new SimpleFilteredCollection([], {
       collection: this.topicCollection,
-      filter: this.filterFn,
-    }));
+      filter: this.getFilter(),
+    });
+
     this.listenTo(router, 'change:categoryName', this.onRouterUpdate, this);
   }
 
-  filterFn(model){
+  getFilter() {
     const categoryName = router.get('categoryName');
-    const category = model.get('category');
-    return true
-    //return category.slug === categoryName;
+
+    return function(model) {
+      return model.get('category') === categoryName;
+    };
   }
 
-  getTopics(){
+  getTopics() {
     return this.collection.models.map((m) => m.toJSON());
   }
 
-  getById(id){
+  getById(id) {
     const model = this.collection.get(id);
     if(!model) { return; }
     return model.toJSON();
   }
 
-  onRouterUpdate(){
-    this.collection.setFilter(this.filterFn);
+  onRouterUpdate() {
+    this.collection.setFilter(this.getFilter());
   }
 }
 

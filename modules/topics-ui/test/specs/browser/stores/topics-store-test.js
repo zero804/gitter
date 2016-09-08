@@ -26,7 +26,7 @@ describe('TopicsStore', () => {
     assert.deepEqual(store.getById('1').id, topics[0].id);
   });
 
-  it.only('should filter by category when the router is in the right state', () => {
+  it('should filter by category when the router is in the right state', () => {
     mockRouter.set({ router: 'forum', categoryName: 'test-1' });
     const result = store.getTopics();
     assert(result.length);
