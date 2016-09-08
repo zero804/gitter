@@ -13,6 +13,8 @@ import router from '../routers';
 
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
 import {SUBMIT_NEW_TOPIC, TOPIC_CREATED} from '../../../shared/constants/create-topic';
+import {DEFAULT_CATEGORY_NAME, DEFAULT_TAG_NAME} from '../../../shared/constants/navigation';
+import {FILTER_BY_TOPIC} from '../../../shared/constants/forum-filters';
 
 export const TopicModel = BaseModel.extend({
   url(){
@@ -69,22 +71,33 @@ export class TopicsStore {
       filter: this.getFilter(),
     });
 
-    this.listenTo(router, 'change:categoryName', this.onRouterUpdate, this);
+    this.listenTo(router, 'change:categoryName change:tagName change:filterName', this.onRouterUpdate, this);
   }
 
   getFilter() {
-    // Why is this called name, when the tests actually
-    // use the slug? @cutandpastey?
-    const categoryName = router.get('categoryName');
-    if (categoryName && categoryName !== "all") {
-      return function(model) {
-        var category = model.get('category');
-        return category && (category.slug === categoryName);
-      };
-    } else {
-      return function() {
-        return true;
-      }
+    const categorySlug = (router.get('categoryName') || DEFAULT_CATEGORY_NAME);
+    const tagName = (router.get('tagName') || DEFAULT_TAG_NAME);
+
+    console.log(categorySlug, tagName);
+
+    return function(model){
+      //filter by category
+      const category = (model.get('category') || {});
+      let categoryResult = false;
+      if(categorySlug === DEFAULT_CATEGORY_NAME) { categoryResult = true; }
+      if(category.slug === categorySlug) { categoryResult = true; }
+
+      if(categoryResult === false) { return false; }
+
+      const tags = (model.get('tags') || []);
+      let tagResult = false;
+      if(tagName === DEFAULT_TAG_NAME) { tagResult = true; }
+      else { tagResult = tags.some((t) => t === tagName); }
+
+      if(tagResult === false) { return false; }
+
+      return true;
+
     }
   }
 
