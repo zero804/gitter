@@ -46,7 +46,7 @@ module.exports = function topicsStore(models, category, tag, filter, user) {
   }
   //Methods
   return {
-    models: models,
+    data: models,
     getTopics: getTopics,
     getById: getById
   };

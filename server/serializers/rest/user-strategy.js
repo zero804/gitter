@@ -226,5 +226,23 @@ UserStrategy.prototype = {
   name: 'UserStrategy'
 };
 
+function SlimUserStrategy() {
 
+}
+SlimUserStrategy.prototype = {
+  preload: function() {},
+  map: function(user) {
+    return {
+      id: user.id,
+      username: user.username,
+      displayName: user.displayName,
+      avatarUrl: avatars.getForUser(user),
+    };
+  },
+  name: 'SlimUserStrategy'
+}
+
+UserStrategy.slim = function() {
+  return new SlimUserStrategy();
+}
 module.exports = UserStrategy;
