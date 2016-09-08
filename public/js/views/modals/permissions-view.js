@@ -3,6 +3,7 @@
 var _ = require('lodash');
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
+var $ = require('jquery');
 var fuzzysearch = require('fuzzysearch');
 var urlJoin = require('url-join');
 var avatars = require('gitter-web-avatars');
@@ -173,7 +174,13 @@ var PermissionsView = Marionette.LayoutView.extend({
 
         this.ui.permissionsOptionsSelect.html('');
         permissionOpts.forEach(function(opt) {
-          this.ui.permissionsOptionsSelect.append('<option value="' + opt.value + '" ' + (opt.selected ? 'selected' : '') + '>' + opt.label + '</option>');
+          var optionEl = $('<option></option>');
+          optionEl.text(opt.label);
+          optionEl.attr('value', opt.value);
+          if(opt.selected) {
+            optionEl.attr('selected', opt.selected);
+          }
+          optionEl.appendTo(this.ui.permissionsOptionsSelect);
         }.bind(this));
       })
     this.fetchAdminUsers();
@@ -280,7 +287,7 @@ var PermissionsView = Marionette.LayoutView.extend({
       permissionOpts.push({
         value: 'GROUP',
         label: 'Any administrator of the ' + (group ? (group.get('name') + ' ') : '') + 'community on Gitter',
-        selected: !hasGitHubOpts || sd.type === 'GROUP'
+        selected: !hasGitHubOpts && sd.type === 'GROUP'
       });
     }
 
