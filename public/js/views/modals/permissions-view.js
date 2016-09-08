@@ -159,7 +159,15 @@ var PermissionsView = Marionette.LayoutView.extend({
 
 
   initializeForEntity: function() {
-    this.fetchSecurityDescriptor();
+    this.fetchSecurityDescriptor()
+      .then(function() {
+        var permissionOpts = this.getPermissionOptions();
+
+        this.ui.permissionsOptionsSelect.html('');
+        permissionOpts.forEach(function(opt) {
+          this.ui.permissionsOptionsSelect.append('<option value="' + opt.value + '" ' + (opt.selected ? 'selected' : '') + '>' + opt.label + '</option>');
+        }.bind(this));
+      })
     this.fetchAdminUsers();
   },
 
@@ -172,16 +180,6 @@ var PermissionsView = Marionette.LayoutView.extend({
   },
 
   onSecurityDescriptorChange: function() {
-    var sd = this.model.get('securityDescriptor');
-    var permissionOpts = this.getPermissionOptions();
-
-    this.ui.permissionsOptionsSelect.html('');
-    permissionOpts.forEach(function(opt) {
-      this.ui.permissionsOptionsSelect.append('<option value="' + opt.value + '" ' + (opt.selected ? 'selected' : '') + '>' + opt.label + '</option>');
-    }.bind(this));
-
-    toggleClass(this.ui.permissionsOptionsWrapper[0], 'disabled', !sd || (sd && sd.type === null));
-
     this.updateModelErrors();
   },
 
@@ -227,14 +225,14 @@ var PermissionsView = Marionette.LayoutView.extend({
     if(sd && sd.type === 'GH_ORG') {
       permissionOpts.push({
         value: 'GH_ORG',
-        label: 'Members of GitHub\'s' + sd.linkPath,
+        label: 'Any member of the ' + sd.linkPath + ' organization on GitHub',
         selected: sd.type === 'GH_ORG'
       });
     }
     else if(sd && sd.type === 'GH_REPO') {
       permissionOpts.push({
         value: 'GH_REPO',
-        label: 'People with push access to GitHub\'s ' + sd.linkPath,
+        label: 'Anyone with push access to the ' + sd.linkPath + ' repo on GitHub',
         selected: sd.type === 'GH_REPO'
       });
     }
@@ -242,24 +240,25 @@ var PermissionsView = Marionette.LayoutView.extend({
     var hasGitHubOpts = permissionOpts.length > 0;
 
     if(sd) {
-      permissionOpts.unshift({
-        value: 'null',
-        label: 'Only people you manually add below can admin',
-        selected: !sd.type
-      });
-
       var groupId = entity.get('groupId');
       var group = null;
       if(groupId) {
         group = this.model.groupCollection.get(groupId);
       }
+
+      permissionOpts.push({
+        value: 'GROUP',
+        label: 'Any administrator of the ' + (group ? (group.get('name') + ' ') : '') + 'community on Gitter',
+        selected: !hasGitHubOpts || sd.type === 'GROUP'
+      });
     }
 
     if(sd) {
-      permissionOpts.unshift({
-        value: 'GROUP',
-        label: 'Admins of the ' + (group ? (group.get('name') + ' ') : '') + 'community',
-        selected: !hasGitHubOpts || sd.type === 'GROUP'
+      permissionOpts.push({
+        value: 'null',
+        label: 'Only the users listed below',
+        // This accounts for undefined or null
+        selected: !sd.type
       });
     }
 
@@ -386,7 +385,10 @@ var Modal = ModalView.extend({
     var title = 'Community Permissions';
 
     if(entity) {
-      title = entity.get('name') + ' Permissions';
+      // TODO: Better way to tell if it is a room or how to determine associated endpoint???
+      var isRoom = entity && entity.get('groupId');
+
+      title = entity.get('name') + ' ' + (isRoom ? 'Room' : 'Community') + ' Permissions';
     }
 
     return title;
