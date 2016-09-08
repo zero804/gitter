@@ -23,14 +23,20 @@ describe('TopicsStore', () => {
   });
 
   it('should get a topic but id', () => {
-    assert.deepEqual(store.getById('1').id, topics[0].id);
+    var topicWithId1 = store.getById('1');
+    assert(topicWithId1);
+    assert.strictEqual(topicWithId1.id, '1');
   });
 
   it('should filter by category when the router is in the right state', () => {
     mockRouter.set({ router: 'forum', categoryName: 'test-1' });
     const result = store.getTopics();
     assert(result.length);
-    result.forEach((m) => assert.equal(m.category.slug, 'test-1'));
+    result.forEach((m) => {
+      var category = m.get('category');
+      assert(category);
+      assert.strictEqual(category.slug, 'test-1')
+    });
   });
 
 });

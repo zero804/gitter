@@ -73,15 +73,23 @@ export class TopicsStore {
   }
 
   getFilter() {
+    // Why is this called name, when the tests actually
+    // use the slug? @cutandpastey?
     const categoryName = router.get('categoryName');
-
-    return function(model) {
-      return model.get('category') === categoryName;
-    };
+    if (categoryName && categoryName !== "all") {
+      return function(model) {
+        var category = model.get('category');
+        return category && (category.slug === categoryName);
+      };
+    } else {
+      return function() {
+        return true;
+      }
+    }
   }
 
   getTopics() {
-    return this.collection.models.map((m) => m.toJSON());
+    return this.collection.toJSON();
   }
 
   getById(id) {
