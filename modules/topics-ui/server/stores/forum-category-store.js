@@ -15,7 +15,8 @@ module.exports = function forumCategoryStore(categories, categoryFilter) {
 
   categories.unshift({
     category: navConstants.DEFAULT_CATEGORY_NAME,
-    active: (categoryFilter === navConstants.DEFAULT_CATEGORY_NAME)
+    active: (categoryFilter === navConstants.DEFAULT_CATEGORY_NAME),
+    slug: navConstants.DEFAULT_CATEGORY_NAME,
   });
 
   const getCategories = () => categories;
