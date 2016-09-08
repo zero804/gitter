@@ -14,6 +14,6 @@
     "gitter-web-env": "file:../env",
     "lodash": "^3.2.0",
     "mongodb": "^2.2.9",
-    "mongodb-unique-ids": "^0.1.2"
+    "mongodb-unique-ids": "^0.2.0"
   }
 }
