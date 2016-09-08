@@ -4,6 +4,7 @@ var _ = require('lodash');
 var Promise = require('bluebird');
 var mongoUtils = require('./mongo-utils');
 var uniqueIds = require('mongodb-unique-ids');
+var mongoReadPrefs = require('./mongo-read-prefs')
 
 function idsIn(ids) {
   return uniqueIds(ids).filter(function(id) { return !!id; });
@@ -202,7 +203,7 @@ function addIdToLeanArray(objects) {
 
 function getEstimatedCountForId(Model, field, id, options) {
   options = options || {};
-  options.read = options.read || 'secondaryPreferred';
+  options.read = options.read || mongoReadPrefs.secondaryPreferred;
 
   var query = {};
   query[field] = id;
@@ -213,7 +214,7 @@ function getEstimatedCountForId(Model, field, id, options) {
 
 function getEstimatedCountForIds(Model, field, ids, options) {
   options = options || {};
-  options.read = options.read || 'secondaryPreferred';
+  options.read = options.read || mongoReadPrefs.secondaryPreferred;
 
   if (!ids || !ids.length) return {};
 
