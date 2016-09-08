@@ -70,7 +70,23 @@ function getUnusedReposForUser(user, options) {
     });
 }
 
+/**
+ *
+ * @returns The promise of a list of repos for the user
+ */
+function getAdminReposForUser(user, options) {
+  options = options || {};
+
+  return getReposForUser(user, options)
+    .then(function(repos) {
+      return repos.filter(function(repo) {
+        return repo.permissions && repo.permissions.admin;
+      });
+    });
+}
+
 module.exports = {
   getReposForUser: Promise.method(getReposForUser),
-  getUnusedReposForUser: Promise.method(getUnusedReposForUser)
+  getUnusedReposForUser: Promise.method(getUnusedReposForUser),
+  getAdminReposForUser: Promise.method(getAdminReposForUser)
 };
