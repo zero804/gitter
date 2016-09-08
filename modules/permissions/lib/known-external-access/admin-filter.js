@@ -7,6 +7,7 @@ var KnownExternalAccess = require('gitter-web-persistence').KnownExternalAccess;
 var _ = require('lodash');
 var assert = require('assert');
 var debug = require('debug')('gitter:app:permissions:admin-filter');
+var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs')
 
 function createHashFor(userIds) {
   return _.reduce(userIds, function(memo, userId) {
@@ -92,7 +93,7 @@ function findUsersForQuery(sdQuery, userIds) {
   assert(disjunction.length > 0);
 
   return KnownExternalAccess.distinct('userId', query)
-    .read('secondaryPreferred')
+    .read(mongoReadPrefs.secondaryPreferred)
     .exec();
 }
 
@@ -135,7 +136,7 @@ var adminFilterInternal = Promise.method(function(securityDescriptor, userIds, n
     } else {
       // Fetch the group and recursively apply the filter to the group...
       return Group.findById(securityDescriptor.internalId, { sd: 1 })
-        .read('secondaryPreferred')
+        .read(mongoReadPrefs.secondaryPreferred)
         .lean()
         .exec()
         .then(function(group) {

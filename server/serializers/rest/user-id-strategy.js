@@ -7,4 +7,9 @@ var idStrategyGenerator = require('../id-strategy-generator');
 
 var UserIdStrategy = idStrategyGenerator('UserIdStrategy', UserStrategy, userService.findByIds);
 
+UserIdStrategy.slim = function(options) {
+  var strategy = UserStrategy.slim(options);
+  return UserIdStrategy.withStrategy(strategy);
+}
+
 module.exports = UserIdStrategy;
