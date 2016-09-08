@@ -102,7 +102,7 @@
     "method-override": "^2.3.4",
     "mixpanel": "~0.0.19",
     "moment": "^2.10.3",
-    "mongodb": "2.1.18",
+    "mongodb": "^2.2.9",
     "mongodb-unique-ids": "^0.1.2",
     "mongoose": "^4.5.3",
     "mongoose-number": "^0.1.1",
