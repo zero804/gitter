@@ -269,11 +269,7 @@ function serializeTopicsForForumId(forumId) {
   // TODO: return a sample set, not all of them
   return topicService.findByForumId(forumId)
     .then(function(topics) {
-      var strategy = new restSerializer.TopicStrategy({
-        // again: _some_ replies, not all of them
-        includeReplies: true,
-        includeRepliesTotals: true,
-      });
+      var strategy = restSerializer.TopicStrategy.full();
       return restSerializer.serialize(topics, strategy);
     });
 }

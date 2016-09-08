@@ -11,11 +11,11 @@ export default React.createClass({
   },
 
   componentDidMount(){
-    window.addEventListener('keyup', this.onKeyPressed);
+    window.addEventListener('keyup', this.onKeyPressed); // eslint-disable-line no-undef
   },
 
   componentWillUnmount(){
-    window.removeEventListener('keyup', this.onKeyPressed);
+    window.removeEventListener('keyup', this.onKeyPressed); // eslint-disable-line no-undef
   },
 
   render(){
