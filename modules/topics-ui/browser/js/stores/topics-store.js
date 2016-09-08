@@ -73,7 +73,8 @@ export class TopicsStore {
   filterFn(model){
     const categoryName = router.get('categoryName');
     const category = model.get('category');
-    return category.slug === categoryName;
+    return true
+    //return category.slug === categoryName;
   }
 
   getTopics(){
