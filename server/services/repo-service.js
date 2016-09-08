@@ -80,7 +80,7 @@ function getAdminReposForUser(user, options) {
   return getReposForUser(user, options)
     .then(function(repos) {
       return repos.filter(function(repo) {
-        return repo.permissions && repo.permissions.admin;
+        return repo.permissions && (repo.permissions.push || repo.permissions.admin);
       });
     });
 }
