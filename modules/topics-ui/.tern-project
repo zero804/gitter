@@ -1,0 +1,22 @@
+{
+  "plugins": {
+    "modules": {},
+    "es_modules": {},
+    "node": {},
+    "node-express": {},
+    "jsx": {},
+    "complete_strings": {},
+    "browser-extension": {},
+    "doc_comment": {
+      "fullDocs": true
+    }
+  },
+  "libs": [
+    "ecma5",
+    "ecma6",
+    "browser",
+    "jquery",
+    "underscore"
+  ],
+  "ecmaVersion": 6
+}

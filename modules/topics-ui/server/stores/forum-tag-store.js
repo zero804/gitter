@@ -2,6 +2,7 @@
 
 var DEFAULT_TAG_VALUE = require('../../shared/constants/forum-tags').DEFAULT_TAG_VALUE;
 var parseTag = require('../../shared/parse/tag');
+var _ = require('lodash');
 
 module.exports = function forumTagStore(tags, activeTagName){
 
@@ -20,10 +21,9 @@ module.exports = function forumTagStore(tags, activeTagName){
     active: (activeTagName === DEFAULT_TAG_VALUE)
   });
 
-  const getTags = () => tags;
-
   return {
-    models: tags,
-    getTags: getTags
+    data: tags,
+    getTags: () => tags,
+    getActiveTagName: () => _.find(tags, (tag) => tag.active)[0].value
   };
 };

@@ -151,7 +151,10 @@ function renderTopic(req, res, next) {
 
           });
         })
-    })
+    });
+
+    //TODO Catch some errors
+
 }
 
 module.exports = {
