@@ -3,6 +3,7 @@
   "version": "13.4.0",
   "private": true,
   "dependencies": {
+    "fuzzysearch": "^1.0.3",
     "@gitterhq/translations": "^1.3.0",
     "apn": "1.7.5",
     "async": "~0.9.0",
@@ -193,7 +194,6 @@
     "faye": "^1.1.2",
     "file-loader": "^0.9.0",
     "fontfaceobserver": "^1.7.1",
-    "fuzzysearch": "^1.0.3",
     "gitter-handlebars-loader": "^1.2.0",
     "gitter-styleguide": "^1.6.6",
     "gitter-web-test-utils": "file:modules/test-utils",
