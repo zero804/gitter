@@ -12,7 +12,7 @@
 
   <section>
     <div class="permissions-admin-list-permission-options-wrapper js-permissions-options-wrapper">
-      <img class="permissions-people-list-item-avatar" {{{ avatarSrcSet groupAvatarUrl 44 }}}>
+      <img class="permissions-admin-list-permission-options-avatar" {{{ avatarSrcSet groupAvatarUrl 44 }}}>
 
       <div class="permissions-people-list-item-name">
         <select class="permissions-admin-list-permission-options-select js-permissions-options-select">
@@ -44,18 +44,18 @@
       Additionally, grant admin access to these specific users:
     </p>
 
-    <section class="permissions-admin-list-wrapper scroller">
+    <section class="permissions-admin-list-wrapper scroller js-permissions-admin-list">
       <div class="permissions-admin-list-root js-permissions-admin-list-root"></div>
     </section>
 
     <input
       class="permissions-people-input js-permissions-people-input"
-      placeholder="Search for people...">
+      placeholder="Search for people to add as admins...">
   </section>
 
   <section class="permissions-error-section">
-    <div class="permission-error js-permissions-sd-warning"></div>
-    <div class="permission-error js-permissions-model-error"></div>
-    <div class="permission-error js-permissions-submission-error"></div>
+    <div class="permission-error hidden js-permissions-sd-warning"></div>
+    <div class="permission-error hidden js-permissions-model-error"></div>
+    <div class="permission-error hidden js-permissions-submission-error"></div>
   </section>
 </div>

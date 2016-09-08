@@ -1,14 +1,19 @@
 
-@permissions-people-list-item-avatar-size: 4.4rem;
+@permissions-options-avatar-size: 4.4rem;
+@permissions-people-list-item-avatar-size: 2.2rem;
 @permissions-people-list-item-padding: 1rem;
 @permissions-people-list-item-height: @permissions-people-list-item-avatar-size + (2 * @permissions-people-list-item-padding);
 @permissions-people-list-remove-button-width: 5rem;
+
+@subuded-text-color: fade(@trpDarkGrey, 60%);
 
 
 
 .permissions-add-admin-description {
   margin-top: .5em;
-  margin-bottom: 1em;
+  margin-bottom: 0;
+
+  color: @subuded-text-color;
 }
 
 .permissions-people-input {
@@ -16,18 +21,23 @@
   box-sizing: border-box;
   display: block;
   width: 100%;
-  height: auto;
+  height: 2em;
+  padding-left: @permissions-people-list-item-padding;
+  padding-right: @permissions-people-list-item-padding;
 }
 
 .permissions-extra-admins-note {
   margin-top: 0;
-  margin-bottom: 0;
+  margin-bottom: .5em;
 }
 
 .permissions-admin-list-wrapper {
   overflow: auto;
   max-height: 5 * @permissions-people-list-item-height;
-  margin-top: .5rem;
+  margin-top: .5em;
+  margin-bottom: 1em;
+
+  border: 1px solid @trpLightGrey;
 
   @media (max-height: 800px) {
     max-height: 4 * @permissions-people-list-item-height;
@@ -48,6 +58,7 @@
 
 .permissions-people-list {
   margin-left: 0;
+  margin-bottom: 0;
   padding-left: 0;
   list-style: none;
 }
@@ -60,20 +71,20 @@
 
   transition: background-color .2s ease;
 
-  &:nth-child(odd) {
-    background-color: rgba(0, 0, 0, .08);
+  &:nth-child(even) {
+    background-color: rgba(0, 0, 0, .05);
   }
 
   &:hover,
   &:focus {
-    background-color: rgba(0, 0, 0, .04);
+    background-color: rgba(0, 0, 0, .025);
   }
 }
 
 .permissions-people-list-item-avatar {
-  width: 44px;
+  width: @permissions-people-list-item-avatar-size;
   margin-right: 1rem;
-  border-radius: 4px;
+  border-radius: 2px;
 }
 
 .permissions-people-list-item-name {
@@ -82,11 +93,10 @@
 
 .permissions-people-list-item-display-name {
   margin-right: .75em;
-  font-weight: bold;
 }
 
 .permissions-people-list-item-username {
-
+  color: @subuded-text-color;
 }
 
 .permissions-people-list-item-remove-button {
@@ -97,16 +107,25 @@
 
 
 .permissions-admin-list-permission-options-wrapper {
-  &:extend(.permissions-people-list-item);
+  display: flex;
+  align-items: center;
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
 
-  transition: opacity .2s ease;
+.permissions-admin-list-permission-options-avatar {
+  width: @permissions-options-avatar-size;
+  margin-right: 1rem;
+  border-radius: 4px;
 }
 
 .permissions-admin-list-permission-options-select {
   width: 100%;
-  height: auto;
+  height: 2em;
   margin-top: 0;
   margin-bottom: 0;
+
+  font-size: inherit;
 }
 
 .permissions-admin-list-permission-options-spinner {
@@ -164,9 +183,10 @@
 
 
 .permissions-error-section {
-  margin-top: 1em;
+  margin-top: 1.5em;
 }
 
 .permission-error {
+  margin-top: 1em;
   color: @ruby;
 }

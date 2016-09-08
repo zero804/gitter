@@ -34,6 +34,7 @@ var PermissionsView = Marionette.LayoutView.extend({
     permissionsOptionsGithubIcon: '.js-permissions-options-github-icon',
     permissionsOptionsGitterIcon: '.js-permissions-options-gitter-icon',
     extraAdminsNote: '.js-permissions-extra-admins-note',
+    extraAdminsList: '.js-permissions-admin-list',
     sdWarning: '.js-permissions-sd-warning',
     modelError: '.js-permissions-model-error',
     submissionError: '.js-permissions-submission-error'
@@ -134,6 +135,7 @@ var PermissionsView = Marionette.LayoutView.extend({
     this.listenTo(this.typeahead, 'selected', this.onAdminSelected);
 
     this.onRequestingSecurityDescriptorStatusChange();
+    this.onAdminCollectionChange();
   },
 
 
@@ -149,6 +151,7 @@ var PermissionsView = Marionette.LayoutView.extend({
   },
 
   onAdminCollectionChange: function() {
+    toggleClass(this.ui.extraAdminsList[0], 'hidden', this.model.adminCollection.length === 0);
     this.updateModelErrors();
   },
 
@@ -206,6 +209,7 @@ var PermissionsView = Marionette.LayoutView.extend({
       sdWarningString = 'Warning, switching away from GitHub-based administrators is permanent. Once you have applied these changes, you cannot go back to GitHub based administrators.';
     }
     this.ui.sdWarning.text(sdWarningString);
+    toggleClass(this.ui.sdWarning[0], 'hidden', sdWarningString.length === 0);
 
     this.updatePermissionOptionsIcons();
     this.updateModelErrors();
@@ -224,6 +228,7 @@ var PermissionsView = Marionette.LayoutView.extend({
     }
 
     this.ui.submissionError.text(statusString);
+    toggleClass(this.ui.submissionError[0], 'hidden', statusString.length === 0);
   },
 
   updateModelErrors: function() {
@@ -236,6 +241,7 @@ var PermissionsView = Marionette.LayoutView.extend({
     var errorMessage = errorStrings.join('\n');
 
     this.ui.modelError.text(errorMessage);
+    toggleClass(this.ui.modelError[0], 'hidden', errorMessage.length === 0);
   },
 
   updatePermissionOptionsIcons: function() {
