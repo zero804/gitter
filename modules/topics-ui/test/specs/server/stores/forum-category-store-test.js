@@ -18,6 +18,7 @@ describe('CategoryStore', function(){
 
   it('should add an initial category of all', function(){
     assert.equal(store.data[0].category, 'all');
+    assert.equal(store.data[0].slug, 'all');
   });
 
   it('should add active to the all category no filter is passed', function(){

@@ -1,7 +1,7 @@
 import assert from 'assert';
 import React from 'react';
 import sinon from 'sinon';
-import { shallow } from 'enzyme';
+import { shallow, mount } from 'enzyme';
 import CategoryListItem from '../../../../../../shared/containers/components/forum/category-list-item.jsx';
 
 describe('<CategoryListItem />', function(){
@@ -12,17 +12,8 @@ describe('<CategoryListItem />', function(){
     wrapper = shallow(<CategoryListItem category="test" active={false} onClick={clickHandle} groupName='gitterHQ' />);
   });
 
-  it('should render a anchor', function(){
-    assert.equal(wrapper.find('a').length, 1);
-  });
-
   it('should render the correct class', function(){
     assert.equal(wrapper.find('.category-list__item').length, 1);
-  });
-
-  it('should render the correct class in the active state', function(){
-    wrapper = shallow(<CategoryListItem category="test" active={true} onClick={() => true} groupName='gitterHQ' />);
-    assert.equal(wrapper.find('.category-list__item--active').length, 1);
   });
 
   it('should call the click handler when clicked', function(){

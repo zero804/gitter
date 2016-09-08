@@ -24,7 +24,7 @@ export const ForumCategoryStore = Collection.extend({
 
   onCategoryUpdate(model, val){
     this.where({ active: true }).forEach((m) => m.set('active', false));
-    var activeModel = this.findWhere({ category: val });
+    var activeModel = this.findWhere({ slug: val });
     if(activeModel) { activeModel.set('active', true); }
     this.trigger(UPDATE_ACTIVE_CATEGORY);
   }
