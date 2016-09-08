@@ -201,6 +201,15 @@ function serializeUnusedReposForUser(user) {
     });
 }
 
+function serializeAdminReposForUser(user) {
+  return repoService.getAdminReposForUser(user)
+    .then(function(repos) {
+      var strategyOptions = { currentUserId: user.id };
+      var strategy = new restSerializer.GithubRepoStrategy(strategyOptions);
+      return restSerializer.serialize(repos, strategy);
+    });
+}
+
 function serializeProfileForUsername(username) {
   return userService.findByUsername(username)
     .then(function(user) {
@@ -299,6 +308,7 @@ module.exports = {
   serializeUnusedOrgsForUser: serializeUnusedOrgsForUser,
   serializeReposForUser: serializeReposForUser,
   serializeUnusedReposForUser: serializeUnusedReposForUser,
+  serializeAdminReposForUser: serializeAdminReposForUser,
   serializeProfileForUsername: serializeProfileForUsername,
   serializeGroupsForUserId: Promise.method(serializeGroupsForUserId),
   serializeAdminGroupsForUser: Promise.method(serializeAdminGroupsForUser),
