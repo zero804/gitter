@@ -30,6 +30,8 @@ var PermissionsView = Marionette.LayoutView.extend({
     permissionsOptionsSelect: '.js-permissions-options-select',
     permissionsOptionsSpinner: '.js-permissions-options-spinner',
     permissionsOptionsErrorIcon: '.js-permissions-options-error-icon',
+    permissionsOptionsGithubIcon: '.js-permissions-options-github-icon',
+    permissionsOptionsGitterIcon: '.js-permissions-options-gitter-icon',
     extraAdminsNote: '.js-permissions-extra-admins-note',
     sdWarning: '.js-permissions-sd-warning',
     modelError: '.js-permissions-model-error',
@@ -198,17 +200,12 @@ var PermissionsView = Marionette.LayoutView.extend({
     }
     this.ui.sdWarning.text(sdWarningString);
 
+    this.updatePermissionOptionsIcons();
     this.updateModelErrors();
   },
 
   onRequestingSecurityDescriptorStatusChange: function() {
-    var state = this.model.get('requestingSecurityDescriptorStatus');
-    if(this.ui.permissionsOptionsSpinner.length > 0) {
-      toggleClass(this.ui.permissionsOptionsSpinner[0], 'hidden', state !== requestingSecurityDescriptorStatusConstants.PENDING);
-    }
-    if(this.ui.permissionsOptionsErrorIcon.length > 0) {
-      toggleClass(this.ui.permissionsOptionsErrorIcon[0], 'hidden', state !== requestingSecurityDescriptorStatusConstants.ERROR);
-    }
+    this.updatePermissionOptionsIcons();
   },
 
   onSubmitSecurityDescriptorStatusChange: function() {
@@ -232,6 +229,22 @@ var PermissionsView = Marionette.LayoutView.extend({
     var errorMessage = errorStrings.join('\n');
 
     this.ui.modelError.text(errorMessage);
+  },
+
+  updatePermissionOptionsIcons: function() {
+    var state = this.model.get('requestingSecurityDescriptorStatus');
+    var isSpinnerHidden = state !== requestingSecurityDescriptorStatusConstants.PENDING;
+    var isErrorIconHidden = state !== requestingSecurityDescriptorStatusConstants.ERROR;
+    toggleClass(this.ui.permissionsOptionsSpinner[0], 'hidden', isSpinnerHidden);
+    toggleClass(this.ui.permissionsOptionsErrorIcon[0], 'hidden', isErrorIconHidden);
+
+    var sd = this.model.get('securityDescriptor');
+    var sdType = sd && sd.type;
+
+    if(isSpinnerHidden && isErrorIconHidden) {
+      toggleClass(this.ui.permissionsOptionsGithubIcon[0], 'hidden', sdType !== 'GH_ORG' && sdType !== 'GH_REPO');
+      toggleClass(this.ui.permissionsOptionsGitterIcon[0], 'hidden', sdType !== 'GROUP' && sdType);
+    }
   },
 
 
