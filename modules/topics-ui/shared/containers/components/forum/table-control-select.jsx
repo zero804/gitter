@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import _ from 'lodash';
+import _ from 'underscore';
 
 export default React.createClass({
 
