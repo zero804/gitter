@@ -23,16 +23,21 @@ export default React.createClass({
 
     const {reply} = this.props;
     const {user} = reply;
-    const avatarDims = 15;
+    const avatarDims = 30;
 
     return (
       <article className="topic-reply-list-item">
-        <header className="topic-reply-list-item__header">
-          <UserAvatar user={user} width={avatarDims} height={avatarDims}/>
-          <span className="topic-reply-list-item__sent">{reply.formattedSentDate}</span>
-        </header>
-        {this.getReplyContent(reply)}
-        <footer></footer>
+        <div className="topic-reply-list-item__content">
+          <div className="topic-reply-list-item__user-details">
+            <UserAvatar user={user} width={avatarDims} height={avatarDims}/>
+            <span className="topic-reply-list-item__sent">{reply.formattedSentDate}</span>
+          </div>
+          {this.getReplyContent(reply)}
+        </div>
+        <footer className="topic-reply-list-item__footer">
+          <span className="topic-reply-list-item__likes">10 Likes</span>
+          <span className="topic-reply-list-item__comments">2 Comments</span>
+        </footer>
       </article>
     );
   },
@@ -42,7 +47,7 @@ export default React.createClass({
     const body = (reply.body || {});
     if(body.html) {
       return (
-        <section
+        <div
           className="topic-reply-list-item__body"
           dangerouslySetInnerHTML={{ __html: body.html }} />
       );
