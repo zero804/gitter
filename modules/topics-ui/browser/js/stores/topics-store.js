@@ -1,60 +1,42 @@
-import { Model, Collection } from 'backbone';
+import Backbone from 'backbone';
 import {subscribe} from '../../../shared/dispatcher';
 import {SUBMIT_NEW_TOPIC, TOPIC_CREATED} from '../../../shared/constants/create-topic';
-import $ from 'jquery';
 import parseTag from '../../../shared/parse/tag';
+import {getRealtimeClient} from './realtime-client';
+import LiveCollection from './live-collection';
+import dispatchOnChangeMixin from './mixins/dispatch-on-change';
+import {getForumId, getForumStore} from './forum-store';
+import {BaseModel} from './base-model';
 
-var TopicModel = Model.extend({
-  defaults: {},
+export const TopicModel = BaseModel.extend({
   url(){
-    const forumId = this.collection.getForumId();
-    return this.get('id') ? null : `/api/v1/forums/${forumId}/topics`;
+    return this.get('id') ? null : `/api/v1/forums/${getForumId()}/topics`;
   },
-
-  sync(){
-    //Need to abstract and pull in the apiClient here so this is a bodge
-    const headers = { "x-access-token": this.collection.getAccessToken() }
-    const catId = this.collection.getCategoryId();
-    const data = JSON.stringify(Object.assign(this.toJSON(), {
-      categoryId: catId,
-    }));
-
-    $.ajax({
-      url: this.url(),
-      contentType: 'application/json',
-      type: 'POST',
-      headers: headers,
-      data: data,
-      success: this.onSuccess.bind(this),
-      error: this.onError.bind(this),
-    })
-  },
-
-  onSuccess(attrs) {
-    this.set(attrs);
-    this.trigger(TOPIC_CREATED, this);
-  },
-
-  onError(){},
 
   toJSON() {
     var data = this.attributes;
+    data.tags = (data.tags || []);
     return Object.assign({}, data, {
-      tags: data.tags.map(parseTag)
+      tags: data.tags.map(parseTag),
+      categoryId: this.collection.getCategoryId(),
     });
   }
-
-
 });
 
-export default Collection.extend({
+export const TopicsStore = LiveCollection.extend({
 
   model: TopicModel,
+  client: getRealtimeClient(),
+  urlTemplate: '/v1/forums/:forumId/topics',
 
-  initialize(models, attrs){
-    this.accessTokenStore = attrs.accessTokenStore;
-    this.forumStore = attrs.forumStore;
-    subscribe(SUBMIT_NEW_TOPIC, this.creatNewTopic, this);
+  getContextModel(){
+    return new Backbone.Model({
+      forumId: getForumId()
+    });
+  },
+
+  initialize(){
+    subscribe(SUBMIT_NEW_TOPIC, this.createNewTopic, this);
   },
 
   getTopics() {
@@ -67,30 +49,32 @@ export default Collection.extend({
     return model.toJSON();
   },
 
-  creatNewTopic(data){
-    const newTopic = this.create({ title: data.title, text: data.body });
-    newTopic.on(TOPIC_CREATED, () => {
+  createNewTopic(data){
+    const model = this.create({ title: data.title, text: data.body }, { wait: true });
+    model.once('add', () => {
       this.trigger(TOPIC_CREATED, {
-        topicId: newTopic.get('id'),
-        slug: newTopic.get('slug')
+        topicId: model.get('id'),
+        slug: model.get('slug')
       });
-    })
-  },
-
-  //TODO Remove
-  getAccessToken(){
-    return this.accessTokenStore.get('accessToken');
-  },
-
-  getForumId(){
-    return this.forumStore.get('id');
+    });
   },
 
   //TODO REMOVE
   getCategoryId(){
     //TODO This needs to be fleshed out when the UI is completed
-    const categories = this.forumStore.get('categories');
+    const categories = getForumStore().get('categories');
     if(categories && categories[0]) { return categories[0].id; }
   }
 
 });
+
+dispatchOnChangeMixin(TopicsStore);
+
+const serverStore = (window.context.topicsStore || {});
+const serverData = (serverStore.data || []);
+let store;
+export function getTopicsStore(data){
+  if(!store) { store = new TopicsStore(serverData); }
+  if(data) { store.set(data); }
+  return store;
+}

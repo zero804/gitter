@@ -44,7 +44,7 @@ function ForumStrategy(/*options*/) {
 
         // TODO: pass in the categories so TopicStrategy doesn't end up loading
         // the same stuff again. Or maybe serialize as lookups?
-        topicStrategy = new TopicStrategy();
+        topicStrategy = TopicStrategy.standard();
         strategies.push(topicStrategy.preload(Lazy(topics)));
 
         return Promise.all(strategies);

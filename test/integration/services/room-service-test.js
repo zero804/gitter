@@ -125,7 +125,7 @@ describe('room-service', function() {
     it('should find or create a room for an organization', function() {
       var groupId = new ObjectID();
       var uriResolver = mockito.mockFunction();
-      var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
+      var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor');
 
       var roomService = testRequire.withProxies("./services/room-service", {
         './uri-resolver': uriResolver,
@@ -173,7 +173,7 @@ describe('room-service', function() {
           assert.equal(uriContext.troupe.uri, 'gitterTest');
           assert.equal(uriContext.troupe.userCount, 0);
 
-          return securityDescriptorService.getForRoomUser(uriContext.troupe._id, fixture.user1._id);
+          return securityDescriptorService.room.findById(uriContext.troupe._id, fixture.user1._id);
         })
         .then(function(securityDescriptor) {
           securityDescriptorValidator(securityDescriptor);
@@ -192,7 +192,7 @@ describe('room-service', function() {
     });
 
     it('should find or create a room for a person', function() {
-      var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
+      var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor');
       var roomService = testRequire("./services/room-service");
 
       return roomService.createRoomByUri(fixture.user1, fixture.user2.username)
@@ -200,7 +200,7 @@ describe('room-service', function() {
         .then(function(uriContext) {
           this.uriContext = uriContext;
           assert(uriContext.troupe);
-          return securityDescriptorService.getForRoomUser(uriContext.troupe._id, fixture.user1._id);
+          return securityDescriptorService.room.findById(uriContext.troupe._id, fixture.user1._id);
         })
         .then(function(securityDescriptor) {
           securityDescriptorValidator(securityDescriptor);
@@ -215,7 +215,7 @@ describe('room-service', function() {
     });
 
     it('should create a room for a repo', function() {
-      var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
+      var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor');
       var groupId = new ObjectID();
       var roomService = testRequire.withProxies("./services/room-service", {
         'gitter-web-groups/lib/group-service': {
@@ -257,7 +257,7 @@ describe('room-service', function() {
         .bind({})
         .then(function(uriContext) {
           this.uriContext = uriContext;
-          return securityDescriptorService.getForRoomUser(uriContext.troupe._id, fixture.user1._id);
+          return securityDescriptorService.room.findById(uriContext.troupe._id, fixture.user1._id);
         })
         .then(function(securityDescriptor) {
           securityDescriptorValidator(securityDescriptor);
@@ -343,7 +343,7 @@ describe('room-service', function() {
     it('should create a room for a repo ignoring the case', function() {
       var groupId = new ObjectID();
 
-      var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
+      var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor');
       var roomService = testRequire.withProxies("./services/room-service", {
         'gitter-web-groups/lib/group-service': {
           migration: {
@@ -388,7 +388,7 @@ describe('room-service', function() {
           assert(uriContext.troupe.lcUri === 'gitterhq/sandbox');
           assert(uriContext.troupe.uri === 'gitterHQ/sandbox');
 
-          return securityDescriptorService.getForRoomUser(uriContext.troupe._id, fixture.user1._id);
+          return securityDescriptorService.room.findById(uriContext.troupe._id, fixture.user1._id);
         })
         .then(function(securityDescriptor) {
           securityDescriptorValidator(securityDescriptor);

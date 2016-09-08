@@ -10,7 +10,7 @@ import updateReplyBody from '../action-creators/create-reply/body-update';
 import submitNewReply from '../action-creators/create-reply/submit-new-reply';
 import {REPLY_CREATED} from '../constants/create-reply';
 
-export default createClass({
+const TopicContainer = createClass({
 
   displayName: 'TopicContainer',
   propTypes: {
@@ -43,13 +43,13 @@ export default createClass({
 
   componentDidMount(){
     const {repliesStore, newReplyStore} = this.props;
-    repliesStore.on(REPLY_CREATED, this.updateReplies, this);
+    repliesStore.onChange(this.updateReplies, this);
     newReplyStore.on('change:text', this.updateReplyContent, this);
   },
 
   componentWillUnmount(){
     const {repliesStore, newReplyStore} = this.props;
-    repliesStore.off(REPLY_CREATED, this.updateReplies, this);
+    repliesStore.removeListeners(this.updateReplies, this);
     newReplyStore.off('change:text', this.updateReplyContent, this);
   },
 
@@ -68,6 +68,7 @@ export default createClass({
     const {replies, newReplyContent} = this.state;
     const topic = topicsStore.getById(topicId)
     const currentUser = currentUserStore.getCurrentUser();
+
     //TODO Improve this
     const category = categoryStore.getCategories()[1];
 
@@ -120,3 +121,5 @@ export default createClass({
   }
 
 });
+
+export default TopicContainer;

@@ -215,7 +215,8 @@ var HeaderView = Marionette.ItemView.extend({
       menuBuilder.addConditional(isAdmin, settingMenuItem);
 
       menuBuilder.addConditional(staffOrAdmin, { title: 'Tags', href: '#tags' });
-      menuBuilder.addConditional(isPublic && staffOrAdmin ,{ title: 'Settings', href: '#settings' });
+      menuBuilder.addConditional(staffOrAdmin, { title: 'Settings', href: '#settings' });
+      menuBuilder.addConditional(staffOrAdmin, { title: 'Permissions', href: '#permissions' });
       menuBuilder.addDivider();
 
       menuBuilder.add({ title: 'Archives', href: url + '/archives/all', target: '_blank'});

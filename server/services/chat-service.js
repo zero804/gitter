@@ -23,6 +23,7 @@ var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-trou
 var recentRoomService = require("./recent-room-service");
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
+var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs')
 
 var useHints = true;
 
@@ -392,7 +393,7 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
           q = q.skip(skip);
 
           if (!options.readPreference) {
-            q = q.read('secondaryPreferred');
+            q = q.read(mongoReadPrefs.secondaryPreferred);
           }
         }
 

@@ -89,6 +89,7 @@ GroupWithPolicyService.prototype.createRoom = secureMethod([allowAdmin], functio
   var providers = options.providers;
   var security = options.security;
   var name = options.name;
+  var associateWithGitHubRepo = options.associateWithGitHubRepo;
 
   var user = this.user;
   var group = this.group;
@@ -113,7 +114,7 @@ GroupWithPolicyService.prototype.createRoom = secureMethod([allowAdmin], functio
 
       return roomService.createGroupRoom(user, group, roomInfo, securityDescriptor, {
         tracking: options.tracking,
-        runPostGitHubRoomCreationTasks: options.runPostGitHubRoomCreationTasks,
+        associateWithGitHubRepo: associateWithGitHubRepo,
         addBadge: options.addBadge
       })
     })
@@ -254,7 +255,7 @@ GroupWithPolicyService.prototype.createForum = secureMethod([allowAdmin], functi
 });
 
 GroupWithPolicyService.prototype.setAvatar = secureMethod([allowAdmin], function(url) {
-  groupService.setAvatarForGroup(this.group._id, url);
+  return groupService.setAvatarForGroup(this.group._id, url);
 });
 
 module.exports = GroupWithPolicyService;

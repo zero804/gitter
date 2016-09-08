@@ -1,23 +1,20 @@
 "use strict";
 
 var Promise = require('bluebird');
-var Lazy = require('lazy.js');
-var _ = require('lodash');
 var getVersion = require('../get-model-version');
 var ForumCategoryIdStrategy = require('./forum-category-id-strategy');
-var ReplyStrategy = require('./reply-strategy');
+var RepliesForTopicStrategy = require('./topics/replies-for-topic-strategy');
+var RepliesTotalsForTopicStrategy = require('./topics/replies-totals-for-topic-strategy');
+var TopicReplyingUsersStrategy = require('./topics/topic-replying-users-strategy');
 var UserIdStrategy = require('./user-id-strategy');
-var replyService = require('gitter-web-topics/lib/reply-service');
-
 
 function formatDate(d) {
   return d ? d.toISOString() : null;
 }
 
-function getIdString(obj) {
-  return obj.id || obj._id && obj._id.toHexString();
+function getId(obj) {
+  return obj._id || obj.id;
 }
-
 
 function TopicStrategy(options) {
   options = options || {};
@@ -40,53 +37,50 @@ function TopicStrategy(options) {
 
   var userStrategy;
   var categoryStrategy;
-  var replyStrategy;
 
-  var repliesMap;
-  var repliesTotalMap;
+  // var repliesMap;
+  // var repliesTotalMap;
+  var repliesForTopicStrategy;
+  var repliesTotalsForTopicStrategy;
+  var replyingUsersStrategy;
 
   this.preload = function(topics) {
     if (topics.isEmpty()) return;
 
-    var topicIds = topics.map(getIdString).toArray();
+    var topicIds = topics.map(getId);
 
     var strategies = [];
 
-    return Promise.try(function() {
-        // load replies
-        if (options.includeReplies) {
-          return replyService.findByTopicIds(topicIds)
-            .then(function(replies) {
-              repliesMap = _.groupBy(replies, 'topicId');
+    // load replies
+    if (options.includeReplies) {
+      repliesForTopicStrategy = new RepliesForTopicStrategy();
+      strategies.push(repliesForTopicStrategy.preload(topicIds));
+    }
 
-              replyStrategy = new ReplyStrategy();
-              strategies.push(replyStrategy.preload(Lazy(replies)));
-            });
-        }
-      })
-      .then(function() {
-        // load replyTotals
-        if (options.includeRepliesTotals) {
-          return replyService.findTotalsByTopicIds(topicIds)
-            .then(function(repliesTotals) {
-              repliesTotalMap = repliesTotals;
-            });
-        }
-      })
-      .then(function() {
-        // TODO: no user strategy necessary if options.user is passed in
-        userStrategy = new UserIdStrategy();
-        var userIds = topics.map(function(i) { return i.userId; });
-        strategies.push(userStrategy.preload(userIds));
+    // load replyTotals
+    if (options.includeRepliesTotals) {
+      repliesTotalsForTopicStrategy = new RepliesTotalsForTopicStrategy();
+      strategies.push(repliesTotalsForTopicStrategy.preload(topicIds));
+    }
 
-        // TODO: no category strategy necessary if options.category is passed in
-        // TODO: support options.categories for when called from ForumStrategy?
-        categoryStrategy = new ForumCategoryIdStrategy();
-        var categoryIds = topics.map(function(i) { return i.categoryId; });
-        strategies.push(categoryStrategy.preload(categoryIds));
+    // load replyTotals
+    if (options.includeReplyingUsers) {
+      replyingUsersStrategy = new TopicReplyingUsersStrategy();
+      strategies.push(replyingUsersStrategy.preload(topicIds));
+    }
 
-        return Promise.all(strategies);
-      });
+    // TODO: no user strategy necessary if options.user is passed in
+    userStrategy = UserIdStrategy.slim();
+    var userIds = topics.map(function(i) { return i.userId; });
+    strategies.push(userStrategy.preload(userIds));
+
+    // TODO: no category strategy necessary if options.category is passed in
+    // TODO: support options.categories for when called from ForumStrategy?
+    categoryStrategy = new ForumCategoryIdStrategy();
+    var categoryIds = topics.map(function(i) { return i.categoryId; });
+    strategies.push(categoryStrategy.preload(categoryIds));
+
+    return Promise.all(strategies);
   };
 
   function mapCategory(categoryId) {
@@ -116,9 +110,6 @@ function TopicStrategy(options) {
   this.map = function(topic) {
     var id = topic.id || topic._id && topic._id.toHexString();
 
-    var replies = options.includeReplies ? repliesMap[id] || [] : undefined;
-    var repliesTotal = options.includeRepliesTotals ? repliesTotalMap[id] || 0 : undefined;
-
     return {
       id: id,
       title: topic.title,
@@ -138,8 +129,9 @@ function TopicStrategy(options) {
 
       // don't accidentally send all the replies with all the topics when
       // serializing a forum..
-      replies: options.includeReplies ? replies.map(replyStrategy.map) : undefined,
-      repliesTotal: options.includeRepliesTotals ? repliesTotal : undefined,
+      replies: repliesForTopicStrategy ? repliesForTopicStrategy.map(id) : undefined,
+      repliesTotal: repliesTotalsForTopicStrategy ? repliesTotalsForTopicStrategy.map(id) : undefined,
+      replyingUsers: replyingUsersStrategy ? replyingUsersStrategy.map(id): undefined,
 
       sent: formatDate(topic.sent),
       editedAt: topic.editedAt ? formatDate(topic.editedAt) : null,
@@ -171,5 +163,21 @@ function TopicStrategy(options) {
 TopicStrategy.prototype = {
   name: 'TopicStrategy',
 };
+
+TopicStrategy.full = function() {
+  return new TopicStrategy({
+    includeReplyingUsers: true,
+    includeReplies: true,
+    includeRepliesTotals: true
+  })
+}
+
+TopicStrategy.standard = function() {
+  return new TopicStrategy({
+    includeReplyingUsers: true,
+    includeReplies: false,
+    includeRepliesTotals: true
+  })
+}
 
 module.exports = TopicStrategy;

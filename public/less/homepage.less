@@ -685,13 +685,18 @@ h1:after, h2:after {
 /**
  *   Integrations panel
  */
-#integrations-panel, #apps-panel, footer, #testimonials-panel {
+#integrations-panel, #apps-panel, #bottom-panel, #testimonials-panel {
   padding: 100px 0 100px;
 
   font-size: 16px;
   line-height: 26px;
 
   color: #918b80;
+
+  @media (max-width: 1200px) {
+    padding-bottom: 40px;
+    height: auto;
+  }
 }
 
 #integrations-panel .wrap, #apps-panel .wrap {
@@ -700,18 +705,17 @@ h1:after, h2:after {
 
 #integrations-panel h1, #integrations-panel h1 + p,
   #apps-panel h1, #apps-panel h1 + p,
-  footer h1, footer h1 + p,
   #testimonials-panel h1, #testimonials-panel h1 + p {
   width: 450px;
   color: #726c61;
 }
 
-#integrations-panel p, #apps-panel p, footer p, #testimonials-panel p {
+#integrations-panel p, #apps-panel p, #testimonials-panel p {
   padding: 15px 0;
   width: 450px;
 }
 
-#integrations-panel h1 + p, #apps-panel h1 + p, footer h1 + p, #testimonials-panel h1 + p {
+#integrations-panel h1 + p, #apps-panel h1 + p, #testimonials-panel h1 + p {
   padding-top: 15px;
 
   font-size: 21px;
@@ -1079,16 +1083,12 @@ h1:after, h2:after {
   color: inherit;
 }
 
-footer h1 {
-  margin-bottom: 50px;
-}
-
-footer {
+#bottom-panel {
   padding-bottom: 40px;
 }
 
 /* actual footer */
-footer small {
+#bottom-panel small {
   display: block;
 
   clear: both;
@@ -1100,24 +1100,29 @@ footer small {
   color: #a2a098;
 }
 
-footer small span, footer small a {
+#bottom-panel small span, #bottom-panel small a {
   line-height: 25px;
 }
 
-footer small span {
+#bottom-panel small span {
   float: left;
 }
 
-footer a {
+#bottom-panel a {
   color: #aeaca5;
 }
 
-footer p.translation {
+#bottom-panel p.translation {
+  margin-top: .5em;
   font-size: 12pt;
-  text-align: center;
+  text-align: left;
+
+  @media (max-width: 1200px) {
+    text-align: center;
+  }
 }
 
-footer small a {
+#bottom-panel small a {
   float: right;
   margin-left: 50px;
 
@@ -1125,7 +1130,7 @@ footer small a {
   text-decoration: none;
 }
 
-footer small a:hover {
+#bottom-panel small a:hover {
   color: #ea9448;
 }
 

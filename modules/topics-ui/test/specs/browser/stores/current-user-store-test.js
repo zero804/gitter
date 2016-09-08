@@ -1,16 +1,15 @@
-import assert from 'assert';
-import Store from '../../../../browser/js/stores/current-user-store';
+import {ok} from 'assert';
+import * as store from '../../../../browser/js/stores/current-user-store';
 
 describe('CurrentUserStore', () => {
 
-  let store;
-  beforeEach(() => {
-    store = new Store();
+  it('it should expose a getCurrentUserStore function', () => {
+    ok(store.getCurrentUserStore);
   });
 
-  it('getCurrentUser', () => {
-    const msg = 'should contain a getCurrentUser function';
-    assert(store.getCurrentUser, msg);
+  it('should export a getCurrentUser function', () => {
+    const user = store.getCurrentUserStore();
+    ok(user.getCurrentUser);
   });
 
 });
