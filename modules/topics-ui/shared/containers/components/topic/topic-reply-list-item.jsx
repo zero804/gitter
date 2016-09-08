@@ -29,7 +29,11 @@ export default React.createClass({
       <article className="topic-reply-list-item">
         <div className="topic-reply-list-item__content">
           <div className="topic-reply-list-item__user-details">
-            <UserAvatar user={user} width={avatarDims} height={avatarDims}/>
+            <UserAvatar
+              className="topic-reply-list-item__avatar"
+              user={user}
+              width={avatarDims}
+              height={avatarDims}/>
             <span className="topic-reply-list-item__sent">{reply.formattedSentDate}</span>
           </div>
           {this.getReplyContent(reply)}
