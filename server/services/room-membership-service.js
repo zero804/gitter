@@ -683,6 +683,48 @@ function updateRoomMembershipFlagsForUser(userId, newFlags, overrideAll) {
 }
 
 
+function findRoomIdsForUserMatchingQuery(userId, query) {
+  var matchTerms = Object.keys(query).reduce(function(memo, key) {
+    var value = query[key];
+    memo['troupe.' + key] = value;
+    return memo;
+  }, {});
+
+  return TroupeUser.aggregate([{
+    $match: {
+      userId: mongoUtils.asObjectID(userId)
+    }
+  }, {
+    $project: {
+      _id: "$troupeId"
+    }
+  }, {
+    $lookup: {
+        from: 'troupes',
+        localField: '_id',
+        foreignField: '_id',
+        as: 'troupe'
+      }
+  }, {
+    $unwind: "$troupe"
+  }, {
+    $match: matchTerms
+  }, {
+    $project: {
+      '_id': 1
+    }
+  }])
+  .then(function(docs) {
+    return _.map(docs, function(doc) {
+      return doc._id;
+    })
+  })
+}
+
+function findPrivateRoomIdsForUser(userId) {
+  return findRoomIdsForUserMatchingQuery(userId, { 'sd.public': false });
+}
+
 /* Exports */
 exports.findRoomIdsForUser = findRoomIdsForUser;
 exports.findRoomIdsForUserWithLurk = findRoomIdsForUserWithLurk;
@@ -711,7 +753,7 @@ exports.findMembershipModeForUsersInRoom = findMembershipModeForUsersInRoom;
 exports.findMembersForRoomForNotify = findMembersForRoomForNotify;
 exports.findMembersForRoomWithFlags = findMembersForRoomWithFlags;
 exports.updateRoomMembershipFlagsForUser = updateRoomMembershipFlagsForUser;
-
+exports.findPrivateRoomIdsForUser = findPrivateRoomIdsForUser;
 
 /* Event emitter */
 exports.events = roomMembershipEvents;
