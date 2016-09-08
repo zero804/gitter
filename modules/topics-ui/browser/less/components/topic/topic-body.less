@@ -1,3 +1,15 @@
+@import (less, reference) "~gitter-styleguide/css/components/buttons.css";
+
 .topic-body__content {
+  padding: 3rem 0;
   font-size: 1.4rem;
+}
+
+.topic-body__footer {
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+.topic-body__footer__action {
+  &:extend(.secondary-button-jaffa--small);
 }
