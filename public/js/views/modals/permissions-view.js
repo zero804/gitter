@@ -3,6 +3,7 @@
 var _ = require('lodash');
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
+var $ = require('jquery');
 var fuzzysearch = require('fuzzysearch');
 var urlJoin = require('url-join');
 var avatars = require('gitter-web-avatars');
@@ -30,6 +31,11 @@ var PermissionsView = Marionette.LayoutView.extend({
     permissionsOptionsSelect: '.js-permissions-options-select',
     permissionsOptionsSpinner: '.js-permissions-options-spinner',
     permissionsOptionsErrorIcon: '.js-permissions-options-error-icon',
+    permissionsOptionsGithubIcon: '.js-permissions-options-github-icon',
+    permissionsOptionsGitterIcon: '.js-permissions-options-gitter-icon',
+    extraAdminsNote: '.js-permissions-extra-admins-note',
+    extraAdminsList: '.js-permissions-admin-list',
+    sdWarning: '.js-permissions-sd-warning',
     modelError: '.js-permissions-model-error',
     submissionError: '.js-permissions-submission-error'
   },
@@ -129,6 +135,7 @@ var PermissionsView = Marionette.LayoutView.extend({
     this.listenTo(this.typeahead, 'selected', this.onAdminSelected);
 
     this.onRequestingSecurityDescriptorStatusChange();
+    this.onAdminCollectionChange();
   },
 
 
@@ -144,6 +151,7 @@ var PermissionsView = Marionette.LayoutView.extend({
   },
 
   onAdminCollectionChange: function() {
+    toggleClass(this.ui.extraAdminsList[0], 'hidden', this.model.adminCollection.length === 0);
     this.updateModelErrors();
   },
 
@@ -159,7 +167,25 @@ var PermissionsView = Marionette.LayoutView.extend({
 
 
   initializeForEntity: function() {
-    this.fetchSecurityDescriptor();
+    this.fetchSecurityDescriptor()
+      .bind(this)
+      .then(function() {
+        var sd = this.model.get('securityDescriptor');
+        this.model.set('initialSecurityDescriptorType', sd && sd.type);
+
+        var permissionOpts = this.getPermissionOptions();
+
+        this.ui.permissionsOptionsSelect.html('');
+        permissionOpts.forEach(function(opt) {
+          var optionEl = $('<option></option>');
+          optionEl.text(opt.label);
+          optionEl.attr('value', opt.value);
+          if(opt.selected) {
+            optionEl.attr('selected', opt.selected);
+          }
+          optionEl.appendTo(this.ui.permissionsOptionsSelect);
+        }.bind(this));
+      })
     this.fetchAdminUsers();
   },
 
@@ -173,26 +199,24 @@ var PermissionsView = Marionette.LayoutView.extend({
 
   onSecurityDescriptorChange: function() {
     var sd = this.model.get('securityDescriptor');
-    var permissionOpts = this.getPermissionOptions();
+    var sdType = sd && sd.type;
+    toggleClass(this.ui.extraAdminsNote[0], 'hidden', !sdType);
 
-    this.ui.permissionsOptionsSelect.html('');
-    permissionOpts.forEach(function(opt) {
-      this.ui.permissionsOptionsSelect.append('<option value="' + opt.value + '" ' + (opt.selected ? 'selected' : '') + '>' + opt.label + '</option>');
-    }.bind(this));
+    var sdWarningString = '';
+    var initialSdType = this.model.get('initialSecurityDescriptorType');
+    var isInitialSdTypeGitHubBased = initialSdType === 'GH_ORG' || initialSdType === 'GH_REPO';
+    if(isInitialSdTypeGitHubBased && initialSdType !== sdType) {
+      sdWarningString = 'Warning, switching away from GitHub-based administrators is permanent. Once you have applied these changes, you cannot go back to GitHub based administrators.';
+    }
+    this.ui.sdWarning.text(sdWarningString);
+    toggleClass(this.ui.sdWarning[0], 'hidden', sdWarningString.length === 0);
 
-    toggleClass(this.ui.permissionsOptionsWrapper[0], 'disabled', !sd || (sd && sd.type === null));
-
+    this.updatePermissionOptionsIcons();
     this.updateModelErrors();
   },
 
   onRequestingSecurityDescriptorStatusChange: function() {
-    var state = this.model.get('requestingSecurityDescriptorStatus');
-    if(this.ui.permissionsOptionsSpinner.length > 0) {
-      toggleClass(this.ui.permissionsOptionsSpinner[0], 'hidden', state !== requestingSecurityDescriptorStatusConstants.PENDING);
-    }
-    if(this.ui.permissionsOptionsErrorIcon.length > 0) {
-      toggleClass(this.ui.permissionsOptionsErrorIcon[0], 'hidden', state !== requestingSecurityDescriptorStatusConstants.ERROR);
-    }
+    this.updatePermissionOptionsIcons();
   },
 
   onSubmitSecurityDescriptorStatusChange: function() {
@@ -204,6 +228,7 @@ var PermissionsView = Marionette.LayoutView.extend({
     }
 
     this.ui.submissionError.text(statusString);
+    toggleClass(this.ui.submissionError[0], 'hidden', statusString.length === 0);
   },
 
   updateModelErrors: function() {
@@ -216,6 +241,23 @@ var PermissionsView = Marionette.LayoutView.extend({
     var errorMessage = errorStrings.join('\n');
 
     this.ui.modelError.text(errorMessage);
+    toggleClass(this.ui.modelError[0], 'hidden', errorMessage.length === 0);
+  },
+
+  updatePermissionOptionsIcons: function() {
+    var state = this.model.get('requestingSecurityDescriptorStatus');
+    var isSpinnerHidden = state !== requestingSecurityDescriptorStatusConstants.PENDING;
+    var isErrorIconHidden = state !== requestingSecurityDescriptorStatusConstants.ERROR;
+    toggleClass(this.ui.permissionsOptionsSpinner[0], 'hidden', isSpinnerHidden);
+    toggleClass(this.ui.permissionsOptionsErrorIcon[0], 'hidden', isErrorIconHidden);
+
+    var sd = this.model.get('securityDescriptor');
+    var sdType = sd && sd.type;
+
+    if(isSpinnerHidden && isErrorIconHidden) {
+      toggleClass(this.ui.permissionsOptionsGithubIcon[0], 'hidden', sdType !== 'GH_ORG' && sdType !== 'GH_REPO');
+      toggleClass(this.ui.permissionsOptionsGitterIcon[0], 'hidden', sdType !== 'GROUP' && sdType);
+    }
   },
 
 
@@ -227,14 +269,14 @@ var PermissionsView = Marionette.LayoutView.extend({
     if(sd && sd.type === 'GH_ORG') {
       permissionOpts.push({
         value: 'GH_ORG',
-        label: 'Members of GitHub\'s' + sd.linkPath,
+        label: 'Any member of the ' + sd.linkPath + ' organization on GitHub',
         selected: sd.type === 'GH_ORG'
       });
     }
     else if(sd && sd.type === 'GH_REPO') {
       permissionOpts.push({
         value: 'GH_REPO',
-        label: 'People with push access to GitHub\'s ' + sd.linkPath,
+        label: 'Anyone with push access to the ' + sd.linkPath + ' repo on GitHub',
         selected: sd.type === 'GH_REPO'
       });
     }
@@ -242,24 +284,25 @@ var PermissionsView = Marionette.LayoutView.extend({
     var hasGitHubOpts = permissionOpts.length > 0;
 
     if(sd) {
-      permissionOpts.unshift({
-        value: 'null',
-        label: 'Only people you manually add below can admin',
-        selected: !sd.type
-      });
-
       var groupId = entity.get('groupId');
       var group = null;
       if(groupId) {
         group = this.model.groupCollection.get(groupId);
       }
+
+      permissionOpts.push({
+        value: 'GROUP',
+        label: 'Any administrator of the ' + (group ? (group.get('name') + ' ') : '') + 'community on Gitter',
+        selected: !hasGitHubOpts && sd.type === 'GROUP'
+      });
     }
 
     if(sd) {
-      permissionOpts.unshift({
-        value: 'GROUP',
-        label: 'Admins of the ' + (group ? (group.get('name') + ' ') : '') + 'community',
-        selected: !hasGitHubOpts || sd.type === 'GROUP'
+      permissionOpts.push({
+        value: 'null',
+        label: 'Only the users listed below',
+        // This accounts for undefined or null
+        selected: !sd.type
       });
     }
 
@@ -386,7 +429,10 @@ var Modal = ModalView.extend({
     var title = 'Community Permissions';
 
     if(entity) {
-      title = entity.get('name') + ' Permissions';
+      // TODO: Better way to tell if it is a room or how to determine associated endpoint???
+      var isRoom = entity && entity.get('groupId');
+
+      title = entity.get('name') + ' ' + (isRoom ? 'Room' : 'Community') + ' Permissions';
     }
 
     return title;
