@@ -94,29 +94,8 @@ module.exports = CommunityCreateBaseStepView.extend({
     // be different. For now, we just guess from the shape of the object
 
     var type = person.get('type');
-    var externalId;
-    if (type) {
-      // Probably a suggestion
-      switch(type) {
-        case 'twitter':
-          externalId = person.get('twitterUsername');
-          break;
-
-        case 'github':
-          externalId = person.get('githubUsername');
-          break;
-
-        case 'gitter':
-          externalId = person.get('gitterUsername');
-      }
-
-      // If all else fails, treat the user as a
-      // gitter user
-      if (!externalId) {
-        type = 'gitter';
-        externalId = person.get('username');
-      }
-    } else {
+    var externalId = person.get('externalId');
+    if(!type) {
       // For now, search results come from GitHub
       // TODO: when we add a local user search, adjust the type here
       type = 'github';

@@ -46,7 +46,7 @@ var ModalView = Marionette.LayoutView.extend({
       this.menuItemCollection = this.options.menuItems;
     }
     else {
-      var menuItems = this.options.menuItems || [];
+      var menuItems = this.menuItems || this.options.menuItems || [];
       if (typeof menuItems === 'function') {
         menuItems = menuItems.call(this);
       }
