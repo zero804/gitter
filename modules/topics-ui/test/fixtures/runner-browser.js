@@ -10,6 +10,7 @@ require('mocha');
 //Setup global describe/it functions
 mocha.setup('bdd');
 
+
 //Import all of our test files
 var requireAll = function(requireContext) {
   return requireContext.keys().map(function(filePath){
@@ -31,6 +32,8 @@ window.onerror = function(err) {
 
 //Start mocha
 window.onload = function(){
+  //Mock out required context objects
+  window.context.accessTokenStore = { token: '' };
   mocha.run(function(){
     mocha.bail();
   });

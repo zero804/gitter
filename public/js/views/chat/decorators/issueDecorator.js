@@ -1,4 +1,6 @@
 "use strict";
+
+var Promise = require('bluebird');
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 var context = require('../../../utils/context');
@@ -10,6 +12,14 @@ var bodyTemplate = require('./tmpl/issuePopover.hbs');
 var titleTemplate = require('./tmpl/issuePopoverTitle.hbs');
 var footerTemplate = require('./tmpl/commitPopoverFooter.hbs');
 var SyncMixin = require('../../../collections/sync-mixin');
+
+
+function isGitHubUser(user) {
+  // Handle Backbone model or pojo
+  return user && (user.providers || user.get('providers')).some(function(provider) {
+    return provider === 'github';
+  });
+}
 
 function convertToIssueAnchor(element, githubIssueUrl) {
   var resultantElement = element;
@@ -26,7 +36,7 @@ function convertToIssueAnchor(element, githubIssueUrl) {
        }
     }
 
-    newElement.setAttribute('href', githubIssueUrl);
+    newElement.setAttribute('href', githubIssueUrl || '');
     newElement.setAttribute('target', '_blank');
 
     resultantElement = newElement;
@@ -36,8 +46,10 @@ function convertToIssueAnchor(element, githubIssueUrl) {
 }
 
 function getIssueState(repo, issueNumber) {
-  var issue = repo + '/' + issueNumber;
-  return apiClient.priv.get('/issue-state', { q: issue })
+  return apiClient.priv.get('/issue-state', {
+      r: repo,
+      i: issueNumber
+    })
     .then(function(states) {
       return states[0];
     });
@@ -74,21 +86,76 @@ var FooterView = Marionette.ItemView.extend({
     change: 'render'
   },
   onMentionClick: function() {
-    var roomRepo = getRoomRepo();
-    var modelRepo = this.model.get('repo');
-    var modelNumber = this.model.get('number');
-    var mentionText = (modelRepo === roomRepo) ? '#' + modelNumber : modelRepo + '#' + modelNumber;
-    appEvents.trigger('input.append', mentionText);
+    getRoomRepo()
+      .then(function(roomRepo) {
+        var modelRepo = this.model.get('repo');
+        var modelNumber = this.model.get('number');
+        var mentionText = (modelRepo === roomRepo) ? '#' + modelNumber : modelRepo + '#' + modelNumber;
+        appEvents.trigger('input.append', mentionText);
+      });
+
     this.parentPopover.hide();
   }
 });
 
+var associatedRepoMemoization = null;
+
+/**
+ * Rememoize after room change
+ */
+context.troupe().on('change:id', function() {
+  associatedRepoMemoization = null;
+});
+
 function getRoomRepo() {
   var room = context.troupe();
-  var backend = room.get('backend');
-  if (!backend || backend.type !== 'GH_REPO') return;
+  if(!room) {
+    return Promise.reject('No current room');
+  }
 
-  return backend.linkPath;
+  if (associatedRepoMemoization) return associatedRepoMemoization;
+
+  var roomId = room.get('id');
+  var unlisten;
+
+  // Only runs if the cache misses
+  associatedRepoMemoization = new Promise(function(resolve, reject) {
+    // Check if the snapshot already came in
+    var associatedRepo = room.get('associatedRepo');
+
+    if(associatedRepo || associatedRepo === false) {
+      return resolve(associatedRepo || null);
+    }
+
+    // Wait for the realtime-troupe-listener snapshot to come in
+    function onChange() {
+      var updatedRoomId = room.get('id');
+
+      // The room could have changed since the request came back in
+      if(roomId !== updatedRoomId) {
+        return reject(new Error('Expired'));
+      }
+
+      var associatedRepo = room.get('associatedRepo');
+
+      if(associatedRepo || associatedRepo === false) {
+        return resolve(associatedRepo || null);
+      }
+    }
+
+    unlisten = function() {
+      room.off('change', onChange);
+    }
+
+    room.on('change', onChange);
+  })
+  .finally(function() {
+    if (unlisten) {
+      unlisten();
+    }
+  });
+
+  return associatedRepoMemoization;
 }
 
 function createPopover(model, targetElement) {
@@ -105,81 +172,131 @@ var IssueModel = Backbone.Model.extend({
   idAttribute: 'number',
   urlRoot: function() {
     var repo = this.get('repo');
-    return '/private/gh/repos/' + repo + '/issues/';
+
+    var endpoint = '/private/gh/repos/' + repo + '/issues/';
+
+    if(!repo) {
+      endpoint = apiClient.room.uri('/issues');
+    }
+
+    return endpoint;
   },
   sync: SyncMixin.sync
 });
 
+function getAnchorUrl(githubRepo, issueNumber) {
+  var currentRoom = context.troupe();
+  var currentGroup = context.group();
+  var backedBy = currentGroup && currentGroup.get('backedBy');
 
-function getGitHubIssueUrl(repo, issueNumber) {
-  return 'https://github.com/' + repo + '/issues/' + issueNumber;
+  if(githubRepo) {
+    return 'https://github.com/' + githubRepo + '/issues/' + issueNumber;
+  }
+
+  var currentUser = context.user();
+
+  // One-to-ones
+  if(!githubRepo && currentRoom.get('oneToOne')) {
+    var otherUser = currentRoom.get('user');
+
+    if(currentUser && isGitHubUser(currentUser) && otherUser && isGitHubUser(otherUser)) {
+      return 'https://github.com/issues?q=' + issueNumber + '+%28involves%3A' + currentUser.get('username') + '+OR+involves%3A' + otherUser.username + '+%29';
+    }
+  }
+
+  // We don't know the REPO, but we know the org?
+  if(backedBy && backedBy.type === 'GH_ORG') {
+    return 'https://github.com/issues?q=' + issueNumber + '+user%3A' + backedBy.linkPath;
+  }
+
+  if (currentUser && isGitHubUser(currentUser)) {
+    return 'https://github.com/issues?q=' + issueNumber + '+involves:' + currentUser.get('username');
+  }
+
+  return 'https://github.com/issues?q=' + issueNumber;
+}
+
+function bindAnchorToIssue(view, issueElement, repo, issueNumber, anchorUrl) {
+  // Lazy model, will be fetched when it's needed, but not before
+  function getModel() {
+    var model = new IssueModel({
+      repo: repo,
+      number: issueNumber,
+      html_url: anchorUrl
+    });
+
+    model.fetch({
+      data: { renderMarkdown: true },
+      error: function() {
+        model.set({ error: true });
+      }
+    });
+    return model;
+  }
+
+  function showPopover(e, model) {
+    if(!model) model = getModel();
+
+    var popover = createPopover(model, e.target);
+    popover.show();
+    Popover.singleton(view, popover);
+
+    e.preventDefault();
+  }
+
+  function showPopoverLater(e) {
+    var model = getModel();
+
+    Popover.hoverTimeout(e, function() {
+      showPopover(e, model);
+    });
+  }
+
+  // Hook up all of the listeners
+  issueElement.addEventListener('click', showPopover);
+  issueElement.addEventListener('mouseover', showPopoverLater);
+
+  view.once('destroy', function() {
+    issueElement.removeEventListener('click', showPopover);
+    issueElement.removeEventListener('mouseover', showPopoverLater);
+  });
 }
 
 var decorator = {
   decorate: function(view) {
-    var roomRepo = getRoomRepo();
-
     Array.prototype.forEach.call(view.el.querySelectorAll('*[data-link-type="issue"]'), function(issueElement) {
-      var repo = issueElement.dataset.issueRepo || roomRepo;
-      var issueNumber = issueElement.dataset.issue;
-      var githubIssueUrl = getGitHubIssueUrl(repo, issueNumber);
+      return Promise.try(function() {
+        var repoFromElement = issueElement.dataset.issueRepo;
 
-      issueElement = convertToIssueAnchor(issueElement, githubIssueUrl);
+        if(repoFromElement) {
+          return repoFromElement;
+        }
 
-      getIssueState(repo, issueNumber)
-        .then(function(state) {
-          if(state) {
-            // We depend on this to style the issue after making sure it is an issue
-            issueElement.classList.add('is-existent');
+        return getRoomRepo();
+      })
+      .then(function(repo) {
+        var issueNumber = issueElement.dataset.issue;
+        var anchorUrl = getAnchorUrl(repo, issueNumber) || '';
+        issueElement = convertToIssueAnchor(issueElement, anchorUrl);
 
-            // dont change the issue state colouring for the activity feed
-            if(!issueElement.classList.contains('open') && !issueElement.classList.contains('closed')) {
-              issueElement.classList.add(state);
-            }
+        if (repo && issueNumber) {
+          getIssueState(repo, issueNumber)
+            .then(function(state) {
+              if(!state) return;
 
-            // Hook up all of the listeners
-            issueElement.addEventListener('click', showPopover);
-            issueElement.addEventListener('mouseover', showPopoverLater);
+              // We depend on this to style the issue after making sure it is an issue
+              issueElement.classList.add('is-existent');
 
-            view.once('destroy', function() {
-              issueElement.removeEventListener('click', showPopover);
-              issueElement.removeEventListener('mouseover', showPopoverLater);
+              // dont change the issue state colouring for the activity feed
+              if(!issueElement.classList.contains('open') && !issueElement.classList.contains('closed')) {
+                issueElement.classList.add(state);
+              }
+
+              bindAnchorToIssue(view, issueElement, repo, issueNumber, anchorUrl);
             });
-          }
-        });
+        }
 
-      function getModel() {
-        var model = new IssueModel({
-          repo: repo,
-          number: issueNumber,
-          html_url: githubIssueUrl
-        });
-
-        model.fetch({
-          data: { renderMarkdown: true },
-          error: function() {
-            model.set({ error: true });
-          }
-        });
-        return model;
-      }
-      function showPopover(e, model) {
-        if(!model) model = getModel();
-
-        var popover = createPopover(model, e.target);
-        popover.show();
-        Popover.singleton(view, popover);
-
-        e.preventDefault();
-      }
-
-      function showPopoverLater(e) {
-        var model = getModel();
-
-        Popover.hoverTimeout(e, function() {
-          showPopover(e, model);
-        });
-      }
+      });
     });
   }
 };

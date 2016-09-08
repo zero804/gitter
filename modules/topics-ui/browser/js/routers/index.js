@@ -8,7 +8,6 @@ import * as forumTagConstants from '../../../shared/constants/forum-tags';
 import * as forumSortConstants from '../../../shared/constants/forum-sorts';
 import * as createTopicConstants from '../../../shared/constants/create-topic';
 
-
 var RouteModel = Backbone.Model.extend({
   //Do we need to use the constructor to get the default values out of the window.context
   defaults: {

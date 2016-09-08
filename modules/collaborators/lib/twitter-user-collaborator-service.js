@@ -32,7 +32,7 @@ TwitterUserCollaboratorService.prototype.findCollaborators = function() {
       return _.map(followers, function(follower) {
         return {
           displayName: follower.name,
-          twitterUsername: follower.screen_name,
+          externalId: follower.screen_name,
           avatarUrl: avatars.getForTwitterUrl(follower.profile_image_url_https),
           type: identityService.TWITTER_IDENTITY_PROVIDER
         };

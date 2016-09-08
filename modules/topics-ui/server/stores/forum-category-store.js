@@ -8,7 +8,7 @@ module.exports = function forumCategoryStore(categories, categoryFilter) {
   categoryFilter = (categoryFilter || navConstants.DEFAULT_CATEGORY_NAME);
 
   categories = categories.map((data) => ({
-    category: data.name,
+    category: (data.name || data.category),
     active: (data.slug === categoryFilter),
     slug: data.slug
   }));
@@ -21,7 +21,7 @@ module.exports = function forumCategoryStore(categories, categoryFilter) {
   const getCategories = () => categories;
 
   return {
-    models: (categories || []),
+    data: categories,
     getCategories: getCategories
   };
 };

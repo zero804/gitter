@@ -66,9 +66,11 @@ describe('add-invite-policy-factory', function() {
           },
           './policies/gh-org-policy-delegate': function() {},
           './policies/gh-user-policy-delegate': function() {},
-          './security-descriptor-service': {
-            getForRoomUser: function() {
-              return Promise.resolve(META.sd);
+          './security-descriptor': {
+            room: {
+              findById: function() {
+                return Promise.resolve(META.sd);
+              }
             }
           }
         });

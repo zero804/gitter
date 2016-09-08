@@ -9,6 +9,7 @@ var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var onMongoConnect = require('../../server/utils/on-mongo-connect');
 var userService = require('../../server/services/user-service');
 var securityDescriptorGenerator = require('gitter-web-permissions/lib/security-descriptor-generator');
+var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs')
 
 
 function getGroupableRooms(matchMissingOnly) {
@@ -65,7 +66,7 @@ function getGroupableRooms(matchMissingOnly) {
         }
       }
     ])
-    .read('secondaryPreferred')
+    .read(mongoReadPrefs.secondaryPreferred)
     .cursor({ batchSize: 1000 })
     // Why exec() before stream() unlike every other instance of .stream() in
     // the app? Aggregate returns different cursors/reponses to find and the

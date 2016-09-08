@@ -8,7 +8,7 @@ var EventEmitter = require('events').EventEmitter;
 var _ = require('lodash');
 var securityDescriptorAdminFilter = require('gitter-web-permissions/lib/security-descriptor-admin-filter');
 var adminDiscovery = require('gitter-web-permissions/lib/admin-discovery');
-
+var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs')
 var groupMembershipEvents = new EventEmitter();
 
 function findGroupsForUser(userId) {
@@ -91,7 +91,7 @@ function findRoomIdsForUserInGroup(groupId, userId) {
           troupeId: '$troupeId'
         }
       }])
-      .read('secondaryPreferred')
+      .read(mongoReadPrefs.secondaryPreferred)
       .exec()
       .then(function(results) {
         if (!results || !results.length) {
@@ -126,7 +126,7 @@ function findRoomIdsForUserInGroups(userId, groupIds) {
           troupeId: '$troupeId'
         }
       }])
-      .read('secondaryPreferred')
+      .read(mongoReadPrefs.secondaryPreferred)
       .exec()
       .then(function(results) {
         if (!results || !results.length) {
