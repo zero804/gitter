@@ -17,7 +17,7 @@
     "gitter-web-identity": "file:../identity",
     "gitter-web-avatars": "file:../avatars",
     "gitter-web-github": "file:../github",
-    "mongodb": "^2.1.18",
+    "mongodb": "~2.1.18",
     "node-uuid": "^1.4.0",
     "statuserror": "^0.1.3"
   }
