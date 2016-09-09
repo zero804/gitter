@@ -1,7 +1,7 @@
 "use strict";
 
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
-var heatmapService = require('../../services/chat-heatmap-service');
+var chatHeapmapAggregator = require('gitter-web-elasticsearch/lib/chat-heatmap-aggregrator');
 var moment = require('moment');
 var StatusError = require('statuserror');
 var debug = require('debug')('gitter:app:chat-heapmap-route');
@@ -23,7 +23,7 @@ module.exports = function(req, res, next) {
 
       debug('Searching troupeId=%s start=%s end=%s tz=%s', roomId, start, end, tz)
 
-      return heatmapService.getHeatmapForRoom(roomId, start, end, tz);
+      return chatHeapmapAggregator.getHeatmapForRoom(roomId, start, end, tz);
     })
     .then(function(chatActivity) {
       res.send(chatActivity);

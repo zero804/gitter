@@ -1,6 +1,6 @@
 'use strict';
 
-var esClient = require('../utils/elasticsearch-client');
+var esClient = require('./elasticsearch-client');
 var Promise = require('bluebird');
 
 function findRoomHumanLanguage(roomId) {
@@ -33,7 +33,7 @@ function findRoomHumanLanguage(roomId) {
     }
   };
 
-  return Promise.resolve(esClient.search(query))
+  return esClient.search(query)
     .then(function(results) {
       if (!results.aggregations.lang.buckets.length) return;
 
@@ -47,4 +47,4 @@ function findRoomHumanLanguage(roomId) {
     });
 }
 
-module.exports = findRoomHumanLanguage;
+module.exports = Promise.method(findRoomHumanLanguage);

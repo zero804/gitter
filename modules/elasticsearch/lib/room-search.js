@@ -1,6 +1,7 @@
 "use strict";
 
-var client = require('../utils/elasticsearch-client');
+var Promise = require('bluebird');
+var client = require('./elasticsearch-client');
 var _ = require('lodash');
 
 var PUBLIC_ROOMS_QUERY = {
@@ -23,10 +24,45 @@ function privateRooms(privateRoomIds) {
   }
 }
 
-exports.searchRooms = function(queryText, userId, privateRoomIds, options) {
+function or() {
+  var terms = Array.prototype.slice.call(arguments);
+  return {
+    bool: {
+      should: terms,
+      minimum_should_match: 1
+    }
+  }
+}
+
+function and() {
+  var terms = Array.prototype.slice.call(arguments);
+  return {
+    bool: {
+      must: terms
+    }
+  }
+}
+
+function searchRooms(queryText, userId, privateRoomIds, options) {
   options = _.defaults(options, { limit: 5 });
 
   var queryTextEscaped = queryText.replace(/([^\s]+\/([^\s]+(\/[^\s]+)?)?)/g,'"$1"');
+
+  var queryTerms = or({
+    prefix: {
+      uri: {
+        value: queryText
+      }
+    }
+  },{
+    query_string: {
+      query: queryTextEscaped,
+      default_operator: 'AND',
+      lenient: true
+    }
+  });
+
+  var roomRestrictionTerms = or(PUBLIC_ROOMS_QUERY, privateRooms(privateRoomIds));
 
   var queryRequest = {
     size: options.limit || 10,
@@ -37,34 +73,7 @@ exports.searchRooms = function(queryText, userId, privateRoomIds, options) {
       fields: ["_id"],
       query: {
         function_score: {
-          query: {
-            bool: {
-              must: [{
-                bool: {
-                  should: [{
-                    prefix: {
-                      uri: {
-                        value: queryText
-                      }
-                    }
-                  },{
-                    query_string: {
-                      query: queryTextEscaped,
-                      default_operator: 'AND',
-                      lenient: true
-                    }
-                  }],
-                  minimum_should_match: 1
-                }
-              }],
-              should: [
-                PUBLIC_ROOMS_QUERY,
-                privateRooms(privateRoomIds)
-              ],
-              minimum_number_should_match: 1
-            }
-
-          },
+          query: and(queryTerms, roomRestrictionTerms),
           functions: [{
             field_value_factor: {
               field: "userCount",
@@ -86,4 +95,8 @@ exports.searchRooms = function(queryText, userId, privateRoomIds, options) {
         return hit._id;
       });
     });
-};
+}
+
+module.exports = {
+  searchRooms: Promise.method(searchRooms)
+}
