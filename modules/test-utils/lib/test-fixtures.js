@@ -144,5 +144,8 @@ fixtureLoader.GITTER_INTEGRATION_COMMUNITY = '_I-heart-cats-Test-LOL';
 fixtureLoader.GITTER_INTEGRATION_ROOM = 'all-about-kitty-litter';
 
 fixtureLoader.GITTER_INTEGRATION_REPO_WITH_COLLAB = 'gitter-integration-tests-organisation/gitter-integration-tests-organisation-repo-1';
+fixtureLoader.GITTER_INTEGRATION_REPO_WITH_COLLAB2 = 'gitter-integration-tests-organisation/gitter-integration-tests-organisation-repo-2';
+fixtureLoader.GITTER_INTEGRATION_REPO_WITH_COLLAB_ONLY_READ = 'gitter-integration-tests-organisation/gitter-integration-tests-organisation-collaborator-read';
+
 
 module.exports = fixtureLoader;
