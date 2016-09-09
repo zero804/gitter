@@ -24,7 +24,7 @@ var emailNotificationService = require('./email-notification-service');
 var emailAddressService = require('./email-address-service');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
-var roomSearchService = require('./room-search-service');
+var roomSearch = require('gitter-web-elasticsearch/lib/room-search');
 var assertJoinRoomChecks = require('./assert-join-room-checks');
 var unreadItemService = require('./unread-items');
 var debug = require('debug')('gitter:app:room-service');
@@ -612,7 +612,7 @@ function findBanByUsername(troupeId, bannedUsername) {
 function searchRooms(userId, queryText, options) {
   return roomMembershipService.findPrivateRoomIdsForUser(userId)
     .then(function(privateRoomIds) {
-      return roomSearchService.searchRooms(queryText, userId, privateRoomIds, options);
+      return roomSearch.searchRooms(queryText, userId, privateRoomIds, options);
     })
     .then(function(roomIds) {
       return troupeService.findByIds(roomIds)

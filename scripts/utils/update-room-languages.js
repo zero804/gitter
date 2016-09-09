@@ -2,7 +2,7 @@
 'use strict';
 
 var persistence = require('gitter-web-persistence');
-var findRoomHumanLanguage = require('../../server/services/find-room-human-language');
+var roomHumanLanguageAggregator = require('gitter-web-elasticsearch/lib/room-human-language-aggregator');
 var shutdown = require('shutdown');
 var es = require('event-stream');
 
@@ -25,7 +25,7 @@ stream.pipe(es.through(function(data) {
 
   var self = this;
 
-  return findRoomHumanLanguage(data._id)
+  return roomHumanLanguageAggregator(data._id)
     .then(function(lang) {
       if (lang) {
         console.log('Updating ', data.uri, ' to ', lang);

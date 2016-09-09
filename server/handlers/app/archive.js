@@ -6,7 +6,7 @@ var identifyRoute = env.middlewares.identifyRoute;
 var moment = require('moment');
 var uriContextResolverMiddleware = require('../uri-context/uri-context-resolver-middleware');
 var chatService = require('../../services/chat-service');
-var heatmapService = require('../../services/chat-heatmap-service');
+var chatHeapmapAggregator = require('gitter-web-elasticsearch/lib/chat-heatmap-aggregrator');
 var restSerializer = require('../../serializers/rest-serializer');
 var contextGenerator = require('../../web/context-generator');
 var Promise = require('bluebird');
@@ -143,7 +143,7 @@ exports.linksList = [
       .then(function() {
         return [
           policy.canAdmin(),
-          heatmapService.getHeatmapForRoom(troupe.id),
+          chatHeapmapAggregator.getHeatmapForRoom(troupe.id),
           contextGenerator.generateTroupeContext(req)
         ];
       })
