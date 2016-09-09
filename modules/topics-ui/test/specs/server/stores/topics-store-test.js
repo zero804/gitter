@@ -5,6 +5,7 @@ var topicsStore = require('../../../../server/stores/topics-store');
 var topics = require('../../../mocks/mock-data/topics');
 var navConstants = require('../../../../shared/constants/navigation');
 var forumFilterConstants = require('../../../../shared/constants/forum-filters');
+var forumSortConstants = require('../../../../shared/constants/forum-sorts');
 
 describe('topicsStore', () => {
 
@@ -42,6 +43,7 @@ describe('topicsStore', () => {
       undefined,
       forumFilterConstants.FILTER_BY_TOPIC,
       { username: 'cutandpastey' },
+      forumSortConstants.MOST_RECENT_SORT,
       '2'
     );
     assert.equal(result.data.length, 2);
