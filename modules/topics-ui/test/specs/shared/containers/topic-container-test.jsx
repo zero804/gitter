@@ -10,6 +10,7 @@ import categoryStore from '../../../mocks/category-store';
 import repliesStore from '../../../mocks/replies-store';
 import currentUserStore from '../../../mocks/current-user-store';
 import {BODY_UPDATE, SUBMIT_NEW_REPLY} from '../../../../shared/constants/create-reply';
+import tagStore from '../../../mocks/tag-store';
 
 describe('<TopicContainer />', () => {
 
@@ -19,6 +20,7 @@ describe('<TopicContainer />', () => {
     wrapper = shallow(
       <TopicContainer
         topicsStore={topicsStore}
+        tagStore={tagStore}
         categoryStore={categoryStore}
         repliesStore={repliesStore}
         currentUserStore={currentUserStore}

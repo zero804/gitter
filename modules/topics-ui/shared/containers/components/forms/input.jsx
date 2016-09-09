@@ -8,12 +8,21 @@ export default React.createClass({
     name: PropTypes.string.isRequired,
     placeholder: PropTypes.string,
     className: PropTypes.string,
+    autoComplete: PropTypes.string,
     onChange: PropTypes.func.isRequired,
+    onFocus: PropTypes.func,
+    onBlur: PropTypes.func,
+  },
+
+  getDefaultProps(){
+    return {
+      autoComplete: "on",
+    };
   },
 
   render(){
 
-    const { name, className, placeholder } = this.props;
+    const { name, className, placeholder, autoComplete, onFocus, onBlur } = this.props;
     const compiledClass = classNames('input', className);
 
     return (
@@ -21,6 +30,9 @@ export default React.createClass({
         className={compiledClass}
         name={name}
         placeholder={placeholder}
+        autoComplete={autoComplete}
+        onFocus={onFocus}
+        onBlur={onBlur}
         onChange={this.onChange}/>
     );
   },

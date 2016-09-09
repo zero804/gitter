@@ -27,6 +27,20 @@ export const ForumCategoryStore = Collection.extend({
     var activeModel = this.findWhere({ slug: val });
     if(activeModel) { activeModel.set('active', true); }
     this.trigger(UPDATE_ACTIVE_CATEGORY);
+  },
+
+  mapForSelectControl(){
+    return this.models.map((m) => ({
+      selected: m.get('active'),
+      label: m.get('category'),
+      value: m.get('id')
+    }))
+  },
+
+  getById(id){
+    const model = this.get(id);
+    if(!model) { return; }
+    return model.toJSON();
   }
 
 });

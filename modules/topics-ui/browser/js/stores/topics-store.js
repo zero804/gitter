@@ -13,6 +13,7 @@ import router from '../routers';
 import {getCurrentUser} from '../stores/current-user-store';
 
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
+
 import {SUBMIT_NEW_TOPIC, TOPIC_CREATED} from '../../../shared/constants/create-topic';
 import {DEFAULT_CATEGORY_NAME, DEFAULT_TAG_NAME} from '../../../shared/constants/navigation';
 import {FILTER_BY_TOPIC} from '../../../shared/constants/forum-filters';
@@ -28,7 +29,18 @@ export const TopicModel = BaseModel.extend({
     return Object.assign({}, data, {
       tags: data.tags.map(parseTag)
     });
+  },
+
+  getDataToSave(){
+    const data = this.toJSON();
+    const tags = (data.tags || []);
+    const parsedTags = tags.map((t) => t.label);
+
+    return Object.assign({}, data, {
+      tags: parsedTags
+    });
   }
+
 });
 
 export const TopicsLiveCollection = LiveCollection.extend({
@@ -48,7 +60,14 @@ export const TopicsLiveCollection = LiveCollection.extend({
   },
 
   createNewTopic(data){
-    const model = this.create({ title: data.title, text: data.body }, { wait: true });
+
+    const model = this.create({
+      title: data.title,
+      text: data.body,
+      categoryId: data.categoryId,
+      tags: data.tags
+    }, { wait: true });
+
     model.once('add', () => {
       this.trigger(TOPIC_CREATED, {
         topicId: model.get('id'),
@@ -121,7 +140,6 @@ export class TopicsStore {
   }
 
   onRouterUpdate() {
-    console.log('router update');
     this.collection.setFilter(this.getFilter());
   }
 }

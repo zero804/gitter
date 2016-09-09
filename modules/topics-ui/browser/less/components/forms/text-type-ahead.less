@@ -1,0 +1,53 @@
+@import "../../colors.less";
+
+.type-ahead-wrapper {
+  display: inline-flex;
+  position: relative;
+}
+
+.type-ahead-input {
+  width: 100%;
+}
+
+.type-ahead {
+  list-style: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: white;
+  z-index: 1;
+  box-shadow: rgba(0,0,0,.1) 0 1rem 1rem;
+  border: 1px solid @create-topic-type-ahead-border;
+  border-top: none;
+}
+
+.m-type-ahead-seleted() {
+  background-color: @create-topic-type-ahead-highlight;
+  color: white;
+  border-bottom-color: @create-topic-type-ahead-highlight;
+}
+
+.type-ahead__child {
+  width: 100%;
+  height: 150%;
+  box-sizing: border-box;
+  padding: 1rem;
+  background-color: white;
+  border-bottom: 1px solid @create-topic-type-ahead-border;
+
+  &:hover {
+    .m-type-ahead-seleted();
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.type-ahead__child--active {
+  .type-ahead__child();
+  .m-type-ahead-seleted();
+}
