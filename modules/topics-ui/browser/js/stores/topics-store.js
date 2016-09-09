@@ -94,7 +94,7 @@ export class TopicsStore {
         if(sort === MOST_WATCHERS_SORT) {
           return (a.get('replyingUsers').length > b.get('replyingUsers').length) ? -1 : 1;
         }
-        return new Date(a.get('sent')) - new Date(b.get('sent')) ;
+        return new Date(b.get('sent')) - new Date(a.get('sent')) ;
       }
     });
 
@@ -106,7 +106,8 @@ export class TopicsStore {
       this.trigger(type, collection, val);
     });
 
-    this.listenTo(this.topicCollection, TOPIC_CREATED, function(topicId, slug){
+    this.listenTo(this.topicCollection, TOPIC_CREATED, (topicId, slug) => {
+      this.collection.setFilter(this.getFilter());
       this.trigger(TOPIC_CREATED, topicId, slug);
     });
   }
@@ -118,6 +119,7 @@ export class TopicsStore {
     const filterName = router.get('filterName');
 
     return function(model){
+
       //filter by category
       const category = (model.get('category') || {});
       let categoryResult = false;

@@ -75,6 +75,7 @@ const TopicContainer = createClass({
     const topicCategory = topic.category;
     const category = categoryStore.getById(topicCategory.id);
 
+
     //TODO remove
     //This is here because sometimes you can get un-parsed tags
     //we need to hydrate the client stores with the raw SS data

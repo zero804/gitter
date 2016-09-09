@@ -40,7 +40,7 @@ module.exports = function topicsStore(models, category, tag, filter, sort, user)
   }
 
   if(sort === forumSortConstants.MOST_RECENT_SORT) {
-    models.sort((a, b) => new Date(a.sent) - new Date(b.sent));
+    models.sort((a, b) => new Date(b.sent) - new Date(a.sent));
   }
 
   if(sort === forumSortConstants.MOST_WATCHERS_SORT) {
