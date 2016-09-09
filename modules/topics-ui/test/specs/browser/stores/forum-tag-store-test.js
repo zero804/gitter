@@ -1,9 +1,13 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import ForumTagStore from '../../../../browser/js/stores/forum-tag-store';
 import * as forumTagConstants from '../../../../shared/constants/forum-tags';
 import mockRouter from '../../../mocks/router';
 import tags from '../../../mocks/mock-data/tags';
+
+import injector from 'inject-loader!../../../../browser/js/stores/forum-tag-store';
+const {getForumTagStore} = injector({
+  '../routers/index': mockRouter
+});
 
 describe('TagStore', () => {
 
@@ -12,7 +16,7 @@ describe('TagStore', () => {
 
   beforeEach(function(){
     handle = sinon.spy();
-    tagStore = new ForumTagStore(tags, { router: mockRouter });
+    tagStore = getForumTagStore(tags);
   });
 
 

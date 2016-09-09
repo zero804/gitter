@@ -1,0 +1,32 @@
+{
+  "shared/containers/components/*.jsx": {
+    "alternate": "test/specs/shared/containers/components/{}-test.jsx",
+    "type": "component"
+  },
+
+  "test/specs/shared/containers/components/*-test.jsx": {
+    "alternate": "shared/containers/components/{}.jsx",
+    "type": "component-test",
+    "dispatch": "mocha-webpack --webpack-config webpack.config.js {file}"
+  },
+
+  "browser/js/*.js": {
+    "alternate": "test/specs/browser/{}-test.js",
+    "type": "browser"
+  },
+
+  "test/specs/browser/*-test.js": {
+    "alternate": "browser/js/{}.js",
+    "type": "browser-test"
+  },
+
+  "server/*.js": {
+    "alternate": "test/specs/server/{}-test.js",
+    "type": "node"
+  },
+
+  "test/specs/server/*-test.js": {
+    "alternate": "server/{}.js",
+    "type": "browser-test"
+  }
+}

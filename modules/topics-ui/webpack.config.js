@@ -5,7 +5,7 @@ var ExtractTextPlugin = require("extract-text-webpack-plugin");//eslint-disable-
 var getPostcssStack = require('gitter-styleguide/postcss-stack');//eslint-disable-line node/no-unpublished-require
 
 var config = {
-  devtool: 'source-map',
+  devtool: 'eval',
   entry: {
     index: path.resolve(__dirname, './browser/js/index'),
   },
