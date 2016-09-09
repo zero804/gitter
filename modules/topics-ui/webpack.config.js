@@ -48,7 +48,8 @@ var config = {
   },
   resolve: {
     alias: {
-      jquery: require.resolve('jquery')
+      jquery: require.resolve('jquery'),
+      backbone: require.resolve('backbone/backbone.js'),
     }
   },
   plugins: [

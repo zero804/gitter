@@ -14,9 +14,6 @@ export default React.createClass({
 
   render(){
     const { topics } = this.props;
-console.log('-----------------------');
-console.log(topics);
-console.log('-----------------------');
     return (
       <tbody className="topics-table-body">
       {topics.map((topic, i) => this.renderChildRow(topic, i))}
