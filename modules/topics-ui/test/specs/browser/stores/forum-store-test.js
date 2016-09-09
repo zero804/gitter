@@ -1,15 +1,23 @@
 import {ok} from 'assert';
-import Store from '../../../../browser/js/stores/forum-store';
+import * as store from '../../../../browser/js/stores/forum-store';
 
 describe('ForumStore', () => {
 
-  let store;
-  beforeEach(() => {
-    store = new Store();
+  it('should export a getForumStore function', () => {
+    ok(store.getForumStore);
   });
 
-  it('should have at least one test', () => {
-    ok(store);
+  it('should expose a getForum function on the store', () => {
+    const s = store.getForumStore();
+    ok(s.getForum);
+  });
+
+  it('should expose a getForum function', () => {
+    ok(store.getForum);
+  });
+
+  it('should expose a getForumId function', () => {
+    ok(store.getForumId);
   });
 
 });

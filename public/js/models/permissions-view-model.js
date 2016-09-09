@@ -7,6 +7,7 @@ var SyncMixin = require('../collections/sync-mixin');
 var PermissionsViewModel = Backbone.Model.extend({
   defaults: {
     entity: null,
+    initialSecurityDescriptorType: undefined,
     securityDescriptor: {
       type: undefined,
       linkPath: undefined,
