@@ -17,6 +17,7 @@ import dispatchOnChangeMixin from './mixins/dispatch-on-change';
 import {SUBMIT_NEW_TOPIC, TOPIC_CREATED} from '../../../shared/constants/create-topic';
 import {DEFAULT_CATEGORY_NAME, DEFAULT_TAG_NAME} from '../../../shared/constants/navigation';
 import {FILTER_BY_TOPIC} from '../../../shared/constants/forum-filters';
+import {MOST_WATCHERS_SORT} from '../../../shared/constants/forum-sorts';
 
 export const TopicModel = BaseModel.extend({
   url(){
@@ -88,9 +89,17 @@ export class TopicsStore {
     this.collection = new SimpleFilteredCollection([], {
       collection: this.topicCollection,
       filter: this.getFilter(),
+      comparator: (a, b) => {
+        const sort = router.get('sortName');
+        if(sort === MOST_WATCHERS_SORT) {
+          return (a.get('replyingUsers').length > b.get('replyingUsers').length) ? -1 : 1;
+        }
+        return new Date(a.get('sent')) - new Date(b.get('sent')) ;
+      }
     });
 
     this.listenTo(router, 'change:categoryName change:tagName change:filterName', this.onRouterUpdate, this);
+    this.listenTo(router, 'change:sortName', this.onSortUpdate, this);
 
     //Proxy events from the filtered collection
     this.listenTo(this.collection, 'all', function(type, collection ,val){
@@ -142,11 +151,15 @@ export class TopicsStore {
   onRouterUpdate() {
     this.collection.setFilter(this.getFilter());
   }
+
+  onSortUpdate(){
+    this.collection.sort();
+  }
 }
 
 
 
-dispatchOnChangeMixin(TopicsStore);
+dispatchOnChangeMixin(TopicsStore, ['sort']);
 
 const serverStore = (window.context.topicsStore || {});
 const serverData = (serverStore.data || []);
