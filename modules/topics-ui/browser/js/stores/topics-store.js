@@ -105,6 +105,10 @@ export class TopicsStore {
     this.listenTo(this.collection, 'all', function(type, collection ,val){
       this.trigger(type, collection, val);
     });
+
+    this.listenTo(this.topicCollection, TOPIC_CREATED, function(topicId, slug){
+      this.trigger(TOPIC_CREATED, topicId, slug);
+    });
   }
 
   getFilter() {
