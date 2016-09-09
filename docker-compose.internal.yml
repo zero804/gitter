@@ -95,17 +95,6 @@ elasticsearchsetup:
   working_dir: /src
   entrypoint: [ "/src/scripts/docker/es/setup-elasticsearch.sh" ]
 
-setup:
-  image: node:${NODE_VERSION}
-  restart: 'no'
-  links:
-    - elasticsearchsetup
-    - mongosetup
-  volumes:
-   - ${WORKSPACE}:/src
-  working_dir: /src
-  entrypoint: [ "/bin/sleep", "1" ]
-
 internal-min:
   image: node:${NODE_VERSION}
   restart: 'no'
