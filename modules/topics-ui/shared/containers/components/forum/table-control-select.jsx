@@ -26,9 +26,9 @@ export default React.createClass({
     );
   },
 
-  onChange(e){
+  onChange(value){
     const { onChange } = this.props;
-    onChange(e.target.value);
+    onChange(value);
   }
 
 })
