@@ -35,7 +35,7 @@ describe('TagStore', () => {
 
   it('should get tags by values', () => {
     const values = [ tags[0].label, tags[1].label ];
-    const result = tagStore.getTagsByValue(values);
+    const result = tagStore.getTagsByLabel(values);
     assert.equal(result.length, values.length);
     result.forEach((t, i) => {
       assert.equal(t.label, values[i]);

@@ -29,7 +29,7 @@ export const ForumTagStore = Backbone.Collection.extend({
     return this.models.map(model => model.toJSON());
   },
 
-  getTagsByValue(values){
+  getTagsByLabel(values){
     return values.map((val) => {
       const model = this.findWhere({label: val});
       if(!model) { return; }
