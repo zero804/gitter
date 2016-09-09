@@ -39,7 +39,7 @@ describe('ForumStore', () => {
 
   it('should return an array of tags by value', () => {
     const values = [tags[0], tags[1]]
-    const result = store.getTagsByValue(values);
+    const result = store.getTagsByLabel(values);
 
     assert.equal(result.length, values.length);
 
