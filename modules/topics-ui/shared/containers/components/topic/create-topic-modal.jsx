@@ -25,8 +25,12 @@ export default React.createClass({
       title: PropTypes.string.isRequired,
       body: PropTypes.string.isRequired,
       categoryId: PropTypes.string.isRequired,
-      tags: PropTypes.array.isRequird,
     }).isRequired,
+
+    tags: PropTypes.arrayOf(PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      value: PropTypes.string.isRequired,
+    })),
 
     onSubmit: PropTypes.func.isRequired,
     onTitleChange: PropTypes.func.isRequired,
@@ -81,8 +85,7 @@ export default React.createClass({
   },
 
   getTagsRow(){
-    const {newTopic} = this.props;
-    const {tags} = newTopic;
+    const {tags} = this.props;
     if(!tags.length) { return; }
     return (
       <div className="create-topic__details-row">
@@ -93,11 +96,11 @@ export default React.createClass({
     );
   },
 
-  getTagRowChild(tagString, i){
+  getTagRowChild(tag, i){
     return (
-      <li key={`tag-row-child-${tagString}-${i}`}>
+      <li key={`tag-row-child-${tag.value}-${i}`}>
         <button className="create-topic__tags__child">
-          {tagString}
+          {tag.label}
         </button>
       </li>
     );

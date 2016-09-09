@@ -122,6 +122,7 @@ const ForumContainer = React.createClass({
 
     const categories = categoryStore.getCategories();
     const tagValues = tagStore.pluckValues();
+    const newTopicTags = tagStore.getTagsByLabel(newTopic.tags);
 
     return (
       <main>
@@ -148,6 +149,7 @@ const ForumContainer = React.createClass({
         <CreateTopicModal
           active={createTopic}
           newTopic={newTopic}
+          tags={newTopicTags}
           categories={categoryStore.mapForSelectControl()}
           tagValues={tagValues}
           onTitleChange={this.onTitleChange}
