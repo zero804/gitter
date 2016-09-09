@@ -610,24 +610,8 @@ function findBanByUsername(troupeId, bannedUsername) {
 }
 
 function searchRooms(userId, queryText, options) {
-
-  return persistence.Troupe
-    .find({
-      'users.userId': userId,
-      $or: [{
-          'githubType': 'ORG'
-        },{
-          'security': 'PRIVATE'
-      }]
-    }, {
-      _id: 1
-    })
-    .exec()
-    .then(function(rooms) {
-      var privateRoomIds = rooms.map(function(t) {
-        return t._id;
-      });
-
+  return roomMembershipService.findPrivateRoomIdsForUser(userId)
+    .then(function(privateRoomIds) {
       return roomSearchService.searchRooms(queryText, userId, privateRoomIds, options);
     })
     .then(function(roomIds) {

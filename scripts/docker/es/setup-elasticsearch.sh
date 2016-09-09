@@ -16,6 +16,7 @@ export INDEX_NAME=gitter${INDEX_VERSION}
 export USER_RIVER=gitterUserRiver${INDEX_VERSION}
 export CHAT_RIVER=gitterChatRiver${INDEX_VERSION}
 export ROOM_RIVER=gitterRoomRiver${INDEX_VERSION}
+export GROUP_RIVER=gitterGroupRiver${INDEX_VERSION}
 export ES_URL=http://elasticsearch:9200
 
 while ! curl -q --fail "${ES_URL}"; do sleep 1; done

@@ -57,6 +57,29 @@ EOD
 
 sleep 2
 
+curl -q --fail -vi -XPUT "$ES_URL/_river/$GROUP_RIVER/_meta?pretty=true" -d @- << EOD
+{
+  "type": "mongodb",
+  "mongodb": {
+    "servers": [
+      { "host": "$MONGO_HOST_1", "port": $MONGO_PORT_1 },
+      { "host": "$MONGO_HOST_2", "port": $MONGO_PORT_2 }
+    ],
+    "options": { },
+    "db": "gitter",
+    "collection": "groups",
+    "scriptType": "groovy",
+    "script": "$(inline $SCRIPT_DIR/scripts/river/group.groovy)"
+  },
+  "index": {
+    "name": "$INDEX_NAME",
+    "type": "group"
+  }
+}
+EOD
+
+sleep 2
+
 curl -q --fail -vi -XPUT "$ES_URL/_river/$ROOM_RIVER/_meta?pretty=true" -d @- << EOD
 {
   "type": "mongodb",
