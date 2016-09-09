@@ -8,6 +8,7 @@ const CurrentUserStore = Backbone.Model.extend({
 const serverStore = (window.context.currentUserStore || {});
 const serverData = (serverStore.data || {});
 let store;
+
 export function getCurrentUserStore(data){
   if(!store) { store = new CurrentUserStore(serverData); }
   if(data) { store.set(data); }
