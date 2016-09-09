@@ -18,7 +18,7 @@ const {TopicsStore} = injector({
   '../stores/current-user-store': currentUserStore
 });
 
-describe.only('TopicsStore', () => {
+describe('TopicsStore', () => {
 
   let store;
   beforeEach(() => {

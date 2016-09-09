@@ -1,12 +1,12 @@
-import { Collection } from 'backbone';
+import Backbone from 'backbone';
 import { UPDATE_ACTIVE_TAG } from '../../../shared/constants/forum-tags';
 import router from '../routers/index';
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
 
-const serverStore = (window.context.forumTagStore || {});
-const serverData = (serverStore || []);
+const serverStore = (window.context.tagStore || {});
+const serverData = (serverStore.data || []);
 
-export const ForumTagStore = Collection.extend({
+export const ForumTagStore = Backbone.Collection.extend({
 
   initialize: function() {
     this.listenTo(router, 'change:tagName', this.onTagUpdate, this);
@@ -25,9 +25,24 @@ export const ForumTagStore = Collection.extend({
     model.get('value');
   },
 
-  getTags: function() {
+  getTags() {
     return this.models.map(model => model.toJSON());
   },
+
+  getTagsByValue(values){
+    return values.map((val) => {
+      const model = this.findWhere({label: val});
+      if(!model) { return; }
+      return model.toJSON();
+    });
+  },
+
+  pluckValues(){
+    //For some reason pluck doesn't work here :(
+    //We slice here to remove the "All Tags" entry
+    return this.models.slice(1).map(m => m.get('label'));
+  }
+
 });
 
 dispatchOnChangeMixin(ForumTagStore);

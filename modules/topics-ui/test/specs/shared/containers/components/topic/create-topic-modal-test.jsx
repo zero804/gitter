@@ -12,26 +12,39 @@ describe('<CreateTopicModal/>', () => {
   let submitHandle;
   let titleChangeHandle;
   let bodyChangeHandle;
+  let tagChangeHandle;
+  const newTopic = {
+    title: '',
+    body: '',
+    categoryId: '1',
+    tags: [],
+  }
 
   beforeEach(() => {
 
     submitHandle = sinon.spy();
     titleChangeHandle = sinon.spy();
     bodyChangeHandle = sinon.spy();
+    tagChangeHandle = sinon.spy();
 
     wrapper = shallow(
       <CreateTopicModal
-      active={false}
-      onTitleChange={titleChangeHandle}
-      onBodyChange={bodyChangeHandle}
-      onSubmit={submitHandle}/>);
+        newTopic={newTopic}
+        active={false}
+        onTitleChange={titleChangeHandle}
+        onBodyChange={bodyChangeHandle}
+        onSubmit={submitHandle}
+        onTagsChange={tagChangeHandle}/>
+    );
 
     activeWrapper = shallow(
       <CreateTopicModal
-      active={true}
-      onTitleChange={titleChangeHandle}
-      onBodyChange={bodyChangeHandle}
-      onSubmit={submitHandle}/>
+        newTopic={newTopic}
+        active={true}
+        onTitleChange={titleChangeHandle}
+        onBodyChange={bodyChangeHandle}
+        onSubmit={submitHandle}
+        onTagsChange={tagChangeHandle}/>
     );
   });
 
@@ -89,12 +102,12 @@ describe('<CreateTopicModal/>', () => {
   });
 
   it('should call onTitleChange when the input changes', () => {
-    wrapper.find('Input').prop('onChange')();
+    wrapper.find('Input').at(0).prop('onChange')();
     equal(titleChangeHandle.callCount, 1);
   });
 
   it('should call onBodyChange when the textarea changes', () => {
-    wrapper.find('Editor').prop('onChange')();
+    wrapper.find('Editor').at(0).prop('onChange')();
     equal(bodyChangeHandle.callCount, 1);
   });
 

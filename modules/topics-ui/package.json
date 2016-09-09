@@ -21,6 +21,7 @@
     "moment": "^2.10.3",
     "gitter-realtime-client": "^1.6.1",
     "gitter-web-slugify": "file:../slugify",
+    "fuzzysearch": "^1.0.3",
     "gitter-client-env": "file:../client-env"
   },
   "devDependencies": {
