@@ -106,6 +106,7 @@ const ForumContainer = React.createClass({
     const { categoryStore, tagStore, router, topicsStore } = this.props;
 
     topicsStore.removeListeners(this.onTopicsUpdate, this);
+    newTopicStore.removeListeners(this.onNewTopicUpdate, this);
     topicsStore.off(consts.TOPIC_CREATED, this.onTopicCreated, this);
 
     categoryStore.off(forumCatConstants.UPDATE_ACTIVE_CATEGORY, this.onCategoryUpdate);
