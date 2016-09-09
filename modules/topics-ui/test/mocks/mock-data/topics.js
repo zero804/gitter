@@ -17,7 +17,7 @@ export default [
     body: { html: 'test'},
     category: { name: 'Test 2', slug: 'test-2'},
     tags: [ '2', '3', '4' ],
-    user: { username: 'test-user', avatarUrl: 'test-src'}
+    user: { username: 'test', avatarUrl: 'test-src'}
   },
   {
     title: '3',
@@ -36,7 +36,7 @@ export default [
     body: { html: 'test'},
     category: { name: 'Test 4', slug: 'test-4'},
     tags: [ '4', '5', '6' ],
-    user: { username: 'test-user', avatarUrl: 'test-src'}
+    user: { username: 'test', avatarUrl: 'test-src'}
   },
   {
     title: '5',

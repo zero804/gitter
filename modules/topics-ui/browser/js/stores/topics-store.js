@@ -8,8 +8,9 @@ import {BaseModel} from './base-model';
 
 import parseTag from '../../../shared/parse/tag';
 import {getRealtimeClient} from './realtime-client';
-import {getForumId, getForumStore} from './forum-store';
+import {getForumId } from './forum-store';
 import router from '../routers';
+import {getCurrentUser} from '../stores/current-user-store';
 
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
 import {SUBMIT_NEW_TOPIC, TOPIC_CREATED} from '../../../shared/constants/create-topic';
@@ -25,8 +26,7 @@ export const TopicModel = BaseModel.extend({
     var data = this.attributes;
     data.tags = (data.tags || []);
     return Object.assign({}, data, {
-      tags: data.tags.map(parseTag),
-      categoryId: this.collection.getCategoryId(),
+      tags: data.tags.map(parseTag)
     });
   }
 });
@@ -72,13 +72,18 @@ export class TopicsStore {
     });
 
     this.listenTo(router, 'change:categoryName change:tagName change:filterName', this.onRouterUpdate, this);
+
+    //Proxy events from the filtered collection
+    this.listenTo(this.collection, 'all', function(type, collection ,val){
+      this.trigger(type, collection, val);
+    });
   }
 
   getFilter() {
     const categorySlug = (router.get('categoryName') || DEFAULT_CATEGORY_NAME);
     const tagName = (router.get('tagName') || DEFAULT_TAG_NAME);
-
-    console.log(categorySlug, tagName);
+    const currentUser = getCurrentUser();
+    const filterName = router.get('filterName');
 
     return function(model){
       //filter by category
@@ -96,6 +101,10 @@ export class TopicsStore {
 
       if(tagResult === false) { return false; }
 
+      if(filterName === FILTER_BY_TOPIC && model.get('user').username !== currentUser.username) {
+        return false;
+      }
+
       return true;
 
     }
@@ -112,6 +121,7 @@ export class TopicsStore {
   }
 
   onRouterUpdate() {
+    console.log('router update');
     this.collection.setFilter(this.getFilter());
   }
 }
