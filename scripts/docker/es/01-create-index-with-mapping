@@ -21,7 +21,7 @@ if ! curl -q --fail -vi -XGET "$ES_URL/$INDEX_NAME/_settings"; then
 EOD
 fi
 
-sleep 10
+sleep 0.5
 
 ## Update the language analyzers
 curl -q --fail -XPOST "$ES_URL/$INDEX_NAME/_close"
