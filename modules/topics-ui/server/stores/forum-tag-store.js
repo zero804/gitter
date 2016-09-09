@@ -21,17 +21,17 @@ module.exports = function forumTagStore(tags, activeTagName){
     active: (activeTagName === DEFAULT_TAG_VALUE)
   });
 
-  const getTagsByValue = (values) => {
+  const getTagsByLabel = (values) => {
     return values.map((value) => _.find(tags, (t) => t.label === value));
   }
 
-  const pluckValues = () => _.map(tags, 'value').slice(1); //Remove "all-tags"
+  const pluckValues = () => _.map(tags, 'value').filter((t) => t !== DEFAULT_TAG_VALUE)
 
   return {
     data: tags,
     getTags: () => tags,
     getActiveTagName: () => _.find(tags, (tag) => tag.active)[0].value,
-    getTagsByValue: getTagsByValue,
+    getTagsByLabel: getTagsByLabel,
     pluckValues: pluckValues
   };
 };

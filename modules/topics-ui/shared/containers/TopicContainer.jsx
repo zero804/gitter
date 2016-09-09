@@ -32,7 +32,7 @@ const TopicContainer = createClass({
 
     tagStore: PropTypes.shape({
       getTags: PropTypes.func.isRequired,
-      getTagsByValue: PropTypes.func.isRequired,
+      getTagsByLabel: PropTypes.func.isRequired,
     }).isRequired,
 
     currentUserStore: PropTypes.shape({
@@ -82,7 +82,7 @@ const TopicContainer = createClass({
     const tagValues = topic.tags.map(function(t){
       return t.label ? t.label : t;
     });
-    const tags = tagStore.getTagsByValue(tagValues);
+    const tags = tagStore.getTagsByLabel(tagValues);
 
     return (
       <main>

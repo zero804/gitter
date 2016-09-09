@@ -1,5 +1,6 @@
 import Backbone from 'backbone';
 import { UPDATE_ACTIVE_TAG } from '../../../shared/constants/forum-tags';
+import {DEFAULT_TAG_VALUE} from '../../../shared/constants/forum-tags';
 import router from '../routers/index';
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
 
@@ -29,7 +30,7 @@ export const ForumTagStore = Backbone.Collection.extend({
     return this.models.map(model => model.toJSON());
   },
 
-  getTagsByValue(values){
+  getTagsByLabel(values){
     return values.map((val) => {
       const model = this.findWhere({label: val});
       if(!model) { return; }
@@ -40,7 +41,9 @@ export const ForumTagStore = Backbone.Collection.extend({
   pluckValues(){
     //For some reason pluck doesn't work here :(
     //We slice here to remove the "All Tags" entry
-    return this.models.slice(1).map(m => m.get('label'));
+    return this.models
+      .filter((t) => t.value !== DEFAULT_TAG_VALUE)
+      .map(m => m.get('label'));
   }
 
 });
