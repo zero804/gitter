@@ -11,6 +11,9 @@ import TopicsStore from './stores/topics-store';
 import NewTopicStore from './stores/new-topic-store';
 import ForumStore from './stores/forum-store';
 import AccessTokenStore from './stores/access-token-store';
+import {RepliesStore} from './stores/replies-store';
+import CurrentUserStore from './stores/current-user-store';
+import NewReplyStore from './stores/new-reply-store';
 
 import * as navConstants from '../../shared/constants/navigation';
 
@@ -62,12 +65,12 @@ export default React.createClass({
 
   getDefaultState(){
     const { router } = this.props;
-    const accessTokenStore = this.getAccessTokenStore();
     return {
       groupName: router.get('groupName'),
       route: router.get('route'),
       router: router,
-      accessTokenStore: accessTokenStore
+      accessTokenStore: this.getAccessTokenStore(),
+      currentUserStore: this.getCurrentUserStore(),
     };
   },
 
@@ -103,10 +106,17 @@ export default React.createClass({
 
   getTopicState(){
     var {router} = this.props;
+    const topicId = router.get('topicId');
+    const topicsStore = this.getTopicsStore();
+    const repliesStore = this.getRepliesStore();
+
     return Object.assign(this.getDefaultState(), {
       groupName: router.get('groupName'),
       topicId: router.get('topicId'),
-      topicsStore: this.getTopicsStore()
+      topicsStore: topicsStore,
+      repliesStore: repliesStore,
+      categoryStore: this.getCategoryStore(),
+      newReplyStore: new NewReplyStore(),
     });
   },
 
@@ -115,6 +125,12 @@ export default React.createClass({
     const accessTokenStore = (window.context.accessTokenStore || {});
     if(this.hasRendered && this.state.accessTokenStore) { return this.state.accessTokenStore }
     return new AccessTokenStore({ accessToken: accessTokenStore.token });
+  },
+
+  getCurrentUserStore(){
+    const currentUserStore = (window.context.currentUserStore || {});
+    if(this.hasRendered && this.state.currentUserStore) { return this.state.currentUserStore }
+    return new CurrentUserStore(currentUserStore.data);
   },
 
   getForumStore(){
@@ -152,6 +168,25 @@ export default React.createClass({
       router: router,
       accessTokenStore: accessTokenStore,
       forumStore: forumStore,
+    });
+  },
+
+  getRepliesStore(){
+
+    const {router} = this.props;
+    const repliesStore = (window.context.repliesStore || {});
+    const accessTokenStore = this.getAccessTokenStore();
+    const forumStore = this.getForumStore();
+    const topicsStore = this.getTopicsStore();
+    const currentUserStore = this.getCurrentUserStore();
+
+    if(this.hasRendered && this.state.repliesStore) { return this.state.repliesStore; }
+    return new RepliesStore(repliesStore.models, {
+      router: router,
+      accessTokenStore: accessTokenStore,
+      forumStore: forumStore,
+      topicsStore: topicsStore,
+      currentUserStore: currentUserStore
     });
   },
 

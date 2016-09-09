@@ -4,7 +4,7 @@
 var env = require('gitter-web-env');
 var logger = env.logger;
 var GithubRepoService = require('gitter-web-github').GitHubRepoService;
-var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor-service');
+var securityDescriptorUpdater = require('gitter-web-permissions/lib/security-descriptor/updater');
 
 /**
  * Will change a security descriptor to public but
@@ -22,7 +22,7 @@ function checkRepoPrivacy(uri) {
           uri: uri
         });
 
-        return securityDescriptorService.updatePublicFlagForRepo(uri, true);
+        return securityDescriptorUpdater.updatePublicFlagForRepo(uri, true);
       }
 
       logger.info('GitHub repo not found. It may either be private or deleting. Ignoring for now', {

@@ -3,6 +3,7 @@
 var assert = require('assert');
 var slugify = require('gitter-web-slugify');
 var StatusError = require('statuserror');
+var forumService = require('gitter-web-topics/lib/forum-service');
 var forumCategoryService = require('gitter-web-topics/lib/forum-category-service');
 var topicService = require('gitter-web-topics/lib/topic-service');
 var replyService = require('gitter-web-topics/lib/reply-service');
@@ -17,6 +18,24 @@ function allowAdmin() {
 
 function allowWrite() {
   return this.policy.canWrite();
+}
+
+function matchForum(object) {
+  /*
+  Suppose a user posts to /v1/forums/:forumId/topics/:topicId/replies. This
+  makes sure that that topic is actually in the same forum. Otherwise you can
+  craft a URL that will do the security validation against one forum, but allow
+  you to then perform actions against any category/topic/reply/comment/whatever
+  in any other forum. (Depending obviously on what the code did before we got
+  here.) That wouldn't be good.
+
+  object is the first param which can be category, topic, reply or comment, all
+  of which have forumId properties that have to match this forum's id.
+  */
+  if (!mongoUtils.objectIDsEqual(object.forumId, this.forum._id)) {
+    // not sure what would be the best HTTP status code here
+    throw new StatusError(403, 'forumId does not match');
+  }
 }
 
 function ForumWithPolicyService(forum, user, policy) {
@@ -71,21 +90,6 @@ function getCommentOptions(options) {
   return opts;
 }
 
-ForumWithPolicyService.prototype.assertForumId = function(forumId) {
-  /*
-  Suppose a user posts to /v1/forums/:forumId/topics/:topicId/replies. This
-  makes sure that that topic is actually in the same forum. Otherwise you can
-  craft a URL that will do the security validation against one forum, but allow
-  you to then perform actions against any category/topic/reply/comment/whatever
-  in any other forum. (Depending obviously on what the code did before we got
-  here.) That wouldn't be good.
-  */
-  if (!mongoUtils.objectIDsEqual(forumId, this.forum._id)) {
-    // not sure what would be the best HTTP status code here
-    throw new StatusError(403, 'forumId does not match');
-  }
-};
-
 ForumWithPolicyService.prototype.createCategory = secureMethod([allowAdmin], function(options) {
   var user = this.user;
   var forum = this.forum;
@@ -94,32 +98,44 @@ ForumWithPolicyService.prototype.createCategory = secureMethod([allowAdmin], fun
   return forumCategoryService.createCategory(user, forum, categoryOptions);
 });
 
-ForumWithPolicyService.prototype.createTopic = secureMethod([allowWrite], function(category, options) {
-  this.assertForumId(category.forumId);
-
+ForumWithPolicyService.prototype.createTopic = secureMethod([allowWrite, matchForum], function(category, options) {
   var user = this.user;
+  var forum = this.forum;
 
   var createOptions = getTopicOptions(options);
+
+  // only tags already on the forum are allowed to be used in the topic
+  createOptions.allowedTags = forum.tags;
+
   return topicService.createTopic(user, category, createOptions);
 });
 
-ForumWithPolicyService.prototype.createReply = secureMethod([allowWrite], function(topic, options) {
-  this.assertForumId(topic.forumId);
-
+ForumWithPolicyService.prototype.createReply = secureMethod([allowWrite, matchForum], function(topic, options) {
   var user = this.user;
 
   var createOptions = getReplyOptions(options);
   return replyService.createReply(user, topic, createOptions);
 });
 
-ForumWithPolicyService.prototype.createComment = secureMethod([allowWrite], function(reply, options) {
-  this.assertForumId(reply.forumId);
-
+ForumWithPolicyService.prototype.createComment = secureMethod([allowWrite, matchForum], function(reply, options) {
   var user = this.user;
 
   var createOptions = getCommentOptions(options);
   return commentService.createComment(user, reply, createOptions);
 });
 
+ForumWithPolicyService.prototype.setForumTags = secureMethod([allowAdmin], function(tags) {
+  var user = this.user;
+  var forum = this.forum;
+
+  return forumService.setForumTags(user, forum, tags);
+});
+
+ForumWithPolicyService.prototype.setTopicTags = secureMethod([allowAdmin, matchForum], function(topic, tags) {
+  var user = this.user;
+  var forum = this.forum;
+
+  return topicService.setTopicTags(user, topic, tags, { allowedTags: forum.tags });
+});
 
 module.exports = ForumWithPolicyService;
