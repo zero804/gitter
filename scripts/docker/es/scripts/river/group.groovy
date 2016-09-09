@@ -1,16 +1,5 @@
 def d = ctx.document;
 
-if(d.status == 'DELETED') {
-  ctx.deleted = true;
-}
-
-def groupId = d.groupId;
-if(groupId != null) {
-  ctx._parent = groupId;
-} else {
-  ctx._parent = 'none';
-}
-
 def sd = null;
 
 if (d.sd) {
@@ -30,8 +19,6 @@ if (d.sd) {
 ctx.document = [
   _id: d._id,
   uri: d.uri,
-  topic: d.topic,
-  tags: d.tags,
-  userCount: d.userCount,
+  name: d.name,
   sd: sd
 ];

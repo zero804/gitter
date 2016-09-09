@@ -1,8 +1,27 @@
 "use strict";
 
-var Promise = require('bluebird');
 var client = require('../utils/elasticsearch-client');
-var _ = require('underscore');
+var _ = require('lodash');
+
+var PUBLIC_ROOMS_QUERY = {
+    "nested": {
+      "path": "sd",
+      "query": {
+        "term": {
+          "sd.public": true
+        }
+      }
+    }
+};
+
+function privateRooms(privateRoomIds) {
+  return {
+    ids: {
+      type: "room",
+      values: privateRoomIds
+    }
+  }
+}
 
 exports.searchRooms = function(queryText, userId, privateRoomIds, options) {
   options = _.defaults(options, { limit: 5 });
@@ -39,35 +58,8 @@ exports.searchRooms = function(queryText, userId, privateRoomIds, options) {
                 }
               }],
               should: [
-                {
-                  term: {
-                    security: "PUBLIC"
-                  }
-                },{
-                  term: {
-                    ownerUserId: userId
-                  }
-                },{
-                  ids: {
-                    type: "room",
-                    values: privateRoomIds
-                  }
-                },{
-                  bool: {
-                    must: [
-                      {
-                        term: {
-                          security: "INHERITED"
-                        }
-                      },{
-                        terms: {
-                          parentId: privateRoomIds,
-                          minimum_should_match: 1
-                        }
-                      }
-                    ]
-                  }
-                }
+                PUBLIC_ROOMS_QUERY,
+                privateRooms(privateRoomIds)
               ],
               minimum_number_should_match: 1
             }

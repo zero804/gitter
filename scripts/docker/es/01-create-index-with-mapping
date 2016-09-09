@@ -98,9 +98,75 @@ curl -q --fail -vi -XPUT "$ES_URL/$INDEX_NAME/_mapping/chat?pretty=true" -d @- <
 }
 EOD
 
+curl -q --fail -vi -XPUT "$ES_URL/$INDEX_NAME/_mapping/group?pretty=true" -d @- << EOD
+{
+  "group": {
+    "dynamic" : "strict",
+    "properties": {
+      "uri": {
+        "type": "string",
+        "norms": {
+          "enabled": false
+        }
+      },
+      "name": {
+        "type": "string",
+        "norms": {
+          "enabled": false
+        }
+      },
+      "sd": {
+        "type": "nested",
+        "properties": {
+          "type": {
+            "type": "string",
+            "index": "not_analyzed"
+          },
+          "members": {
+            "type": "string",
+            "index": "not_analyzed"
+          },
+          "admins": {
+            "type": "string",
+            "index": "not_analyzed"
+          },
+          "public": {
+            "type": "boolean"
+          },
+          "linkPath": {
+            "type": "string",
+            "index": "not_analyzed"
+          },
+          "externalId": {
+            "type": "string",
+            "index": "not_analyzed"
+          },
+          "internalId": {
+            "type": "string",
+            "index": "not_analyzed"
+          },
+          "extraMembers": {
+            "type": "string",
+            "index": "not_analyzed"
+          },
+          "extraAdmins": {
+            "type": "string",
+            "index": "not_analyzed"
+          }
+        }
+      }
+    }
+  }
+}
+EOD
+
+
 curl -q --fail -vi -XPUT "$ES_URL/$INDEX_NAME/_mapping/room?pretty=true" -d @- << EOD
 {
   "room": {
+    "_parent": {
+      "type": "group"
+    },
     "dynamic" : "strict",
     "properties": {
       "uri": {
@@ -127,27 +193,50 @@ curl -q --fail -vi -XPUT "$ES_URL/$INDEX_NAME/_mapping/room?pretty=true" -d @- <
           "enabled": false
         }
       },
-      "security": {
-        "type": "string",
-        "index": "not_analyzed"
-      },
-      "githubType": {
-        "type": "string",
-        "index": "not_analyzed"
-      },
-      "parentId": {
-        "type": "string",
-        "index": "not_analyzed"
-      },
-      "ownerUserId": {
-        "type": "string",
-        "index": "not_analyzed"
-      },
       "userCount": {
         "type" : "integer",
         "null_value" : 0
+      },
+      "sd": {
+        "type": "nested",
+        "properties": {
+          "type": {
+            "type": "string",
+            "index": "not_analyzed"
+          },
+          "members": {
+            "type": "string",
+            "index": "not_analyzed"
+          },
+          "admins": {
+            "type": "string",
+            "index": "not_analyzed"
+          },
+          "public": {
+            "type": "boolean"
+          },
+          "linkPath": {
+            "type": "string",
+            "index": "not_analyzed"
+          },
+          "externalId": {
+            "type": "string",
+            "index": "not_analyzed"
+          },
+          "internalId": {
+            "type": "string",
+            "index": "not_analyzed"
+          },
+          "extraMembers": {
+            "type": "string",
+            "index": "not_analyzed"
+          },
+          "extraAdmins": {
+            "type": "string",
+            "index": "not_analyzed"
+          }
+        }
       }
-
     }
   }
 }
