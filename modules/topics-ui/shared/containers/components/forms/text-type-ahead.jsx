@@ -69,7 +69,7 @@ export default React.createClass({
         return (
           <li
           key={`type-ahead-${completion.value}-${i}`}
-          onClick={this.onItemClicked}
+          onMouseDown={this.onItemClicked}
           onMouseOver={this.clearActiveCompletions}
           className={className}>
           {completion.value}
@@ -85,14 +85,16 @@ export default React.createClass({
     if(e.keyCode === DOWN_KEY) { return this.cycleCompletions(1); }
 
     if(e.keyCode !== ENTER_KEY && e.keyCode !== TAB_KEY) { return; }
-    const {value} = this.state;
     e.preventDefault();
+    const {completions} = this.state;
+    const activeCompletion = _.find(completions, (c) => c.active);
+    const value = activeCompletion.value;
     this.submit(value);
   },
 
   onItemClicked(e){
     e.preventDefault();
-    this.submit(e.target.value);
+    this.submit(e.target.innerHTML);
   },
 
   submit(val){
