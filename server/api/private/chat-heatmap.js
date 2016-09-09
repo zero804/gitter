@@ -1,7 +1,7 @@
 "use strict";
 
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
-var chatHeapmapAggregator = require('gitter-web-elasticsearch/lib/chat-heatmap-aggregrator');
+var chatHeapmapAggregator = require('gitter-web-elasticsearch/lib/chat-heatmap-aggregator');
 var moment = require('moment');
 var StatusError = require('statuserror');
 var debug = require('debug')('gitter:app:chat-heapmap-route');
