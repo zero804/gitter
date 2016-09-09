@@ -80,7 +80,7 @@ elasticsearch:
   environment:
     ANNOUNCE_ES_HOST:
   working_dir: /src
-  entrypoint: [ "/src/scripts/docker/es/start-elasticsearch.sh" ]
+  entrypoint: [ "/src/scripts/docker/es/start-elasticsearch.sh", "fast"]
 
 elasticsearchsetup:
   image: elasticsearch:1.4.2
