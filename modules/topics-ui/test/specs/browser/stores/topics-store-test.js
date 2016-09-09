@@ -5,12 +5,13 @@ import {dispatch} from '../../../../shared/dispatcher';
 import submitNewTopic from '../../../../shared/action-creators/create-topic/submit-new-topic';
 import mockRouter from '../../../mocks/router';
 import topics from '../../../mocks/mock-data/topics';
+import forumStore from '../../../mocks/forum-store';
 
-export default describe('TopicsStore', () => {
+describe('TopicsStore', () => {
 
   let store;
   beforeEach(() => {
-    store = new Store(topics, { router: mockRouter });
+    store = new Store(topics, { router: mockRouter, forumStore: forumStore });
   });
 
   it('should provide a getTopics()', () => {
@@ -18,7 +19,7 @@ export default describe('TopicsStore', () => {
   });
 
   it('should get a topic but id', () => {
-    assert.deepEqual(store.getById(1), topics[0]);
+    assert.deepEqual(store.getById(1).id, topics[0].id);
   });
 
   it.skip('should call create after the submit new topic event', () => {

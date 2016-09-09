@@ -3,13 +3,15 @@
 var env = require('gitter-web-env');
 var stats = env.stats;
 var Promise = require('bluebird');
-var StatusError = require('statuserror');
+var Topic = require('gitter-web-persistence').Topic;
 var Reply = require('gitter-web-persistence').Reply;
+var debug = require('debug')('gitter:app:topics:reply-service');
+var liveCollections = require('gitter-web-live-collection-events');
 var processText = require('gitter-web-text-processor');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var markdownMajorVersion = require('gitter-markdown-processor').version.split('.')[0];
-var validators = require('gitter-web-validators');
+var validateReply = require('./validate-reply');
 
 
 function findById(replyId) {
@@ -34,8 +36,20 @@ function findByTopicIds(ids) {
     .exec();
 }
 
-function findTotalsByTopicIds(ids) {
-  return mongooseUtils.getEstimatedCountForIds(Reply, 'topicId', ids);
+function findTotalByTopicId(id, options) {
+  options = options || {};
+
+  return mongooseUtils.getEstimatedCountForId(Reply, 'topicId', id, {
+    read: options.read
+  });
+}
+
+function findTotalsByTopicIds(ids, options) {
+  options = options || {};
+
+  return mongooseUtils.getEstimatedCountForIds(Reply, 'topicId', ids, {
+    read: options.read
+  });
 }
 
 function findByIdForForum(forumId, replyId) {
@@ -65,12 +79,52 @@ function findByIdForForumAndTopic(forumId, topicId, replyId) {
     });
 }
 
-function validateReply(data) {
-  if (!validators.validateMarkdown(data.text)) {
-    throw new StatusError(400, 'Text is invalid.')
-  }
+function updateRepliesTotal(topicId) {
+  debug("updateRepliesTotal %s", topicId);
 
-  return data;
+  var query = {
+    _id: topicId
+  };
+
+  var lastModified = new Date();
+
+  var update = {
+    $max: {
+      lastModified: lastModified
+    }
+  };
+
+  return Topic.findOneAndUpdate(query, update, { new: true })
+    .exec()
+    .bind({
+      topic: undefined
+    })
+    .then(function(topic) {
+      this.topic = topic;
+
+      if (topic) {
+        debug("topic.lastModified: %s, lastModified: %s", topic.lastModified, lastModified)
+      }
+
+      if (!topic || topic.lastModified.getTime() !== lastModified.getTime()) {
+        debug('We lost the topic update race.');
+        return;
+      }
+
+      // if this update won, then patch the live collection with the latest
+      // lastModified value and also the new total replies.
+      return findTotalByTopicId(topicId)
+        .then(function(repliesTotal) {
+          liveCollections.topics.emit('patch', topic.forumId, topicId, {
+            lastModified: lastModified,
+            repliesTotal: repliesTotal
+          })
+        });
+    })
+    .then(function() {
+      // return the topic that got updated (if it was updated).
+      return this.topic;
+    });
 }
 
 function createReply(user, topic, options) {
@@ -81,24 +135,27 @@ function createReply(user, topic, options) {
     text: options.text || '',
   };
 
-  return Promise.try(function() {
-      return validateReply(data);
-    })
-    .bind({})
-    .then(function(insertData) {
-      this.insertData = insertData;
-      return processText(options.text);
-    })
+  var insertData = validateReply(data);
+  return processText(options.text)
     .then(function(parsedMessage) {
-      var data = this.insertData;
+      insertData.html = parsedMessage.html;
+      insertData.lang = parsedMessage.lang;
+      insertData._md = parsedMessage.markdownProcessingFailed ? -markdownMajorVersion : markdownMajorVersion;
 
-      data.html = parsedMessage.html;
-      data.lang = parsedMessage.lang;
-      data._md = parsedMessage.markdownProcessingFailed ? -markdownMajorVersion : markdownMajorVersion;
-
-      return Reply.create(data);
+      return Reply.create(insertData);
+    })
+    .bind({
+      reply: undefined
     })
     .then(function(reply) {
+      this.reply = reply;
+
+      return updateRepliesTotal(topic._id);
+    })
+
+    .then(function() {
+      var reply = this.reply;
+
       stats.event('new_reply', {
         userId: user._id,
         forumId: topic.forumId,
@@ -114,8 +171,9 @@ module.exports = {
   findById: findById,
   findByTopicId: findByTopicId,
   findByTopicIds: findByTopicIds,
+  findTotalByTopicId: findTotalByTopicId,
   findTotalsByTopicIds: findTotalsByTopicIds,
   findByIdForForum: findByIdForForum,
   findByIdForForumAndTopic: findByIdForForumAndTopic,
-  createReply: createReply
+  createReply: Promise.method(createReply)
 };

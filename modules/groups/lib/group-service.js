@@ -142,7 +142,7 @@ function ensureAccessAndFetchGroupInfo(user, options) {
 function createGroup(user, options) {
   return ensureAccessAndFetchGroupInfo(user, options)
     .spread(function(groupInfo, securityDescriptor) {
-      debug("Upserting %j", groupInfo);
+      debug("Upserting %j with securityDescriptor=%j", groupInfo, securityDescriptor);
       return upsertGroup(user, groupInfo, securityDescriptor);
     });
 }

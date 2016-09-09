@@ -146,7 +146,7 @@ function renderChatPage(req, res, next) {
 function renderMobileChat(req, res, next) {
   return renderChat(req, res, {
     template: 'mobile/mobile-chat',
-    script: 'mobile-app',
+    script: 'mobile-chat',
     isMobile: true
   }, next);
 }

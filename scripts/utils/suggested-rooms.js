@@ -43,7 +43,8 @@ function lookupByRooms() {
         })
     })
     .then(function(suggestedRooms) {
-      return restSerializer.serialize(suggestedRooms, new restSerializer.SuggestedRoomStrategy());
+      var strategy = restSerializer.TroupeStrategy.createSuggestionStrategy();
+      return restSerializer.serialize(suggestedRooms, strategy);
     })
     .then(function(suggestions) {
       console.log(suggestions.length, "results");
@@ -86,7 +87,8 @@ function lookupByUsername() {
       });
     })
     .then(function(suggestedRooms) {
-      return restSerializer.serialize(suggestedRooms, new restSerializer.SuggestedRoomStrategy());
+      var strategy = restSerializer.TroupeStrategy.createSuggestionStrategy();
+      return restSerializer.serialize(suggestedRooms, strategy);
     })
     .then(function(suggestions) {
       console.log(suggestions.length, "results");

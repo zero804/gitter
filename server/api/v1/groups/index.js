@@ -9,6 +9,8 @@ var inviteValidation = require('gitter-web-invites/lib/invite-validation');
 var restful = require("../../../services/restful");
 var restSerializer = require('../../../serializers/rest-serializer');
 var internalClientAccessOnly = require('../../../web/middlewares/internal-client-access-only');
+var GroupWithPolicyService = require('../../../services/group-with-policy-service');
+
 
 var MAX_BATCHED_INVITES = 100;
 
@@ -27,23 +29,29 @@ function getInvites(invitesInput) {
   });
 }
 
+function validateStringArray(input, errorMessage) {
+  if (!input) return undefined;
+
+  if (!Array.isArray(input)) throw new StatusError(400, errorMessage);
+
+  var valuesAreStrings = input.every(function(s) {
+    return typeof s === 'string';
+  });
+
+  if (valuesAreStrings) {
+    return input;
+  } else {
+    throw new StatusError(400, errorMessage);
+  }
+}
+
 function getGroupOptions(body) {
   var uri = body.uri ? String(body.uri) : undefined;
   var name = body.name ? String(body.name) : undefined;
   var defaultRoomName = body.defaultRoomName ? String(body.defaultRoomName) : undefined;
-
-  var providers;
-  if (body.providers && Array.isArray(body.providers)) {
-    var providersAreStrings = body.providers.every(function(s) {
-      return typeof s === 'string';
-    });
-
-    if (providersAreStrings) {
-      providers = body.providers;
-    }
-  }
-
+  var providers = validateStringArray(body.providers, "Providers must be strings.");
   var invites = getInvites(body.invites);
+
   var groupOptions = {
     uri: uri,
     name: name,
@@ -63,6 +71,16 @@ function getGroupOptions(body) {
   }
 
   return groupOptions;
+}
+
+function getForumOptions(body) {
+  var tags = validateStringArray(body.tags, "Tags must be strings.");
+  var categories = validateStringArray(body.categories, "Categories must be strings.");
+
+  return {
+    tags: tags,
+    categories: categories
+  };
 }
 
 
@@ -123,6 +141,35 @@ module.exports = {
       });
   },
 
+  update: function(req) {
+    var group = req.group;
+    var user = req.user;
+    var userGroupPolicy = req.userGroupPolicy;
+
+    var groupWithPolicyService = new GroupWithPolicyService(group, user, userGroupPolicy);
+
+    var promises = [];
+
+    if (req.body.forum) {
+      var forumOptions = getForumOptions(req.body.forum);
+      promises.push(groupWithPolicyService.createForum(forumOptions));
+    }
+
+    if (!promises.length) {
+      throw new StatusError(400, 'Nothing to update.');
+    }
+
+    return Promise.all(promises)
+      .then(function() {
+        // reload the group so we get the updated forumId, etc.
+        return groupService.findById(group._id);
+      })
+      .then(function(group) {
+        var strategy = new restSerializer.GroupStrategy({ currentUserId: user._id, currentUser: user });
+        return restSerializer.serializeObject(group, strategy);
+      });
+  },
+
   show: function(req) {
     var group = req.group;
     var user = req.user;
@@ -151,7 +198,8 @@ module.exports = {
 
   subresources: {
     'rooms': require('./rooms'),
-    'suggestedRooms': require('./suggested-rooms')
+    'suggestedRooms': require('./suggested-rooms'),
+    'security': require('./security')
   }
 
 };
