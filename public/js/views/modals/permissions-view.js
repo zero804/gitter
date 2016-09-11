@@ -283,13 +283,13 @@ var PermissionsView = Marionette.LayoutView.extend({
 
     var hasGitHubOpts = permissionOpts.length > 0;
 
-    if(sd) {
-      var groupId = entity.get('groupId');
-      var group = null;
-      if(groupId) {
-        group = this.model.groupCollection.get(groupId);
-      }
 
+    var groupId = entity && entity.get('groupId');
+    var group = entity && entity.get('group');
+    if(groupId) {
+      group = this.model.groupCollection.get(groupId);
+    }
+    if(sd && group) {
       permissionOpts.push({
         value: 'GROUP',
         label: 'Any administrator of the ' + (group ? (group.get('name') + ' ') : '') + 'community on Gitter',
