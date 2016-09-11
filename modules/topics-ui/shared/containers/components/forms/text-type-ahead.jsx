@@ -69,7 +69,7 @@ export default React.createClass({
         return (
           <li
           key={`type-ahead-${completion.value}-${i}`}
-          onMouseDown={this.onItemClicked}
+          onMouseDown={this.onItemClicked.bind(this, completion)}
           onMouseOver={this.clearActiveCompletions}
           className={className}>
           {completion.value}
@@ -92,9 +92,9 @@ export default React.createClass({
     this.submit(value);
   },
 
-  onItemClicked(e){
+  onItemClicked(completion, e){
     e.preventDefault();
-    this.submit(e.target.innerHTML);
+    this.submit(completion.value);
   },
 
   submit(val){
