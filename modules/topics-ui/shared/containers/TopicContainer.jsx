@@ -78,7 +78,7 @@ const TopicContainer = createClass({
     //TODO remove
     //This is here because sometimes you can get un-parsed tags
     //we need to hydrate the client stores with the raw SS data
-    //not the parsed data which will avoid nesting and incosistent data
+    //not the parsed data which will avoid nesting and inconsistent data
     const tagValues = topic.tags.map(function(t){
       return t.label ? t.label : t;
     });
