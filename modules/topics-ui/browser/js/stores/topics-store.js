@@ -92,7 +92,7 @@ export class TopicsStore {
       comparator: (a, b) => {
         const sort = router.get('sortName');
         if(sort === MOST_WATCHERS_SORT) {
-          return (a.get('replyingUsers').length > b.get('replyingUsers').length) ? -1 : 1;
+          return (b.get('replyingUsers').length - a.get('replyingUsers').length);
         }
         return new Date(b.get('sent')) - new Date(a.get('sent')) ;
       }
