@@ -6,7 +6,7 @@ import TextTypeAhead from '../../../../../../shared/containers/components/forms/
 import mockEvent from '../../../../../mocks/event';
 import {ENTER_KEY, TAB_KEY, UP_KEY, DOWN_KEY} from '../../../../../../shared/constants/keys';
 
-describe.only('<TextTypeAhead/>', () => {
+describe('<TextTypeAhead/>', () => {
 
   let wrapper;
   let changeHandle;
