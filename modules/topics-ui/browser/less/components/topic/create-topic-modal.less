@@ -1,5 +1,6 @@
 @import "../../colors";
 @import (less, reference) "~gitter-styleguide/css/components/headings.css";
+@import (less, reference) "~gitter-styleguide/css/components/buttons.css";
 
 .create-topic__heading {
   margin-bottom: 6rem;
@@ -29,4 +30,37 @@
 
 .create-topic__submit {
   flex-grow: 0;
+}
+
+.select--create-topic-category--decal{
+  &:after {
+    color: @input-border-color;
+    transform: rotate(90deg) translateX(-150%);
+  }
+}
+.select--create-topic-category{
+  border-color: @input-border-color;
+  color: @create-topic-name-color;
+}
+
+.create-topic__details-row {
+  margin-bottom: 3rem;
+  display: flex;
+}
+
+.create-topic__input--tags {
+  width: 100%;
+  margin-left: 2rem;
+}
+
+.create-topic__tags {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+}
+
+.create-topic__tags__child {
+  &:extend(.button-caribbean--xsmall);
+  margin-right: 1rem;
 }

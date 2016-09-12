@@ -10,6 +10,12 @@ module.exports = function newTopicStore(data) {
 
   //Methods
   return {
-    get: get
+    get: get,
+    getNewTopic: () => ({
+      title: '',
+      body: '',
+      categroyId: '',
+      tags: [],
+    })
   };
 };

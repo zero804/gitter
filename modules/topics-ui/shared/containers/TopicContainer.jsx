@@ -8,7 +8,6 @@ import TopicReplyList from './components/topic/topic-reply-list.jsx';
 import {dispatch} from '../dispatcher';
 import updateReplyBody from '../action-creators/create-reply/body-update';
 import submitNewReply from '../action-creators/create-reply/submit-new-reply';
-import {REPLY_CREATED} from '../constants/create-reply';
 
 const TopicContainer = createClass({
 
@@ -29,6 +28,11 @@ const TopicContainer = createClass({
 
     categoryStore: PropTypes.shape({
       getCategories: PropTypes.func.isRequired,
+    }).isRequired,
+
+    tagStore: PropTypes.shape({
+      getTags: PropTypes.func.isRequired,
+      getTagsByLabel: PropTypes.func.isRequired,
     }).isRequired,
 
     currentUserStore: PropTypes.shape({
@@ -64,19 +68,31 @@ const TopicContainer = createClass({
 
   render(){
 
-    const { topicId, topicsStore, groupName, categoryStore, currentUserStore } = this.props;
+    const { topicId, topicsStore, groupName, categoryStore, currentUserStore, tagStore } = this.props;
     const {replies, newReplyContent} = this.state;
     const topic = topicsStore.getById(topicId)
     const currentUser = currentUserStore.getCurrentUser();
+    const topicCategory = topic.category;
+    const category = categoryStore.getById(topicCategory.id);
 
-    //TODO Improve this
-    const category = categoryStore.getCategories()[1];
+    //TODO remove
+    //This is here because sometimes you can get un-parsed tags
+    //we need to hydrate the client stores with the raw SS data
+    //not the parsed data which will avoid nesting and inconsistent data
+    const tagValues = topic.tags.map(function(t){
+      return t.label ? t.label : t;
+    });
+    const tags = tagStore.getTagsByLabel(tagValues);
 
     return (
       <main>
         <SearchHeader groupName={groupName}/>
         <article>
-          <TopicHeader topic={topic} category={category} groupName={groupName}/>
+          <TopicHeader
+            topic={topic}
+            category={category}
+            groupName={groupName}
+            tags={tags}/>
           <TopicBody topic={topic} />
         </article>
         <TopicReplyListHeader replies={replies}/>
