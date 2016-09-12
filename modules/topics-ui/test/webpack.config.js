@@ -19,7 +19,8 @@ var config = _.extend({}, webpackConfig, {
       mochaCss: require.resolve('mocha/mocha.css'),
       jquery: require.resolve('jquery/dist/jquery.js'),
       sinon: require.resolve('sinon/pkg/sinon.js'),
-      'gitter-realtime-client': path.resolve(__dirname, './mocks/realtime.js')
+      'gitter-realtime-client/lib/simple-filtered-collection': require.resolve('gitter-realtime-client/lib/simple-filtered-collection'),
+      'gitter-realtime-client': path.resolve(__dirname, './mocks/realtime.js'),
     }
   }
 });

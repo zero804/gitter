@@ -13,7 +13,7 @@ export default React.createClass({
       avatarUrl: PropTypes.string.isRequired
     }).isRequired,
     onChange: PropTypes.func.isRequired,
-    onEnter: PropTypes.func.isRequired,
+    onSubmit: PropTypes.func.isRequired,
   },
 
   render(){
@@ -26,9 +26,14 @@ export default React.createClass({
           <UserAvatar user={user} className="avatar--reply-editor" width={30} height={30}/>
           <Editor
             className="editor--reply"
+            placeholder="Your reply here. Use Markdown, BBCode, or HTML to format. Drag or paste images ..."
             onChange={this.onChange}
-            onEnter={this.onEnter}
             value={value}/>
+          <button
+            className="topic-reply-editor__submit"
+            onClick={this.onSubmitClicked}>
+            Reply
+          </button>
         </Panel>
       </Container>
     );
@@ -38,8 +43,9 @@ export default React.createClass({
     this.props.onChange(val);
   },
 
-  onEnter(){
-    this.props.onEnter();
+  onSubmitClicked(e){
+    e.preventDefault();
+    this.props.onSubmit();
   }
 
 });

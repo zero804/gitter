@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import _ from 'lodash';
+import _ from 'underscore';
 import Select from '../forms/select.jsx';
 
 export default React.createClass({
@@ -26,9 +26,9 @@ export default React.createClass({
     );
   },
 
-  onChange(e){
+  onChange(value){
     const { onChange } = this.props;
-    onChange(e.target.value);
+    onChange(value);
   }
 
 })

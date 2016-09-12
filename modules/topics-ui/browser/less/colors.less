@@ -15,10 +15,10 @@
 @topic-table-bg:                   @light;
 @topic-container-category-bg:      fadeout(@light, 90%);
 @topic-container-table-control-bg: fadeout(@light, 90%);
-@topic-table-cell-odd-bg:          @pampas;
+@topic-table-cell-odd-bg:          lighten(@pampas, 4%);
 @topic-table-header-color:         lighten(@dark, 80%);
 @topic-table-cell-color:           lighten(@dark, 10%);
-@topic-table-cell-border:          darken(@pampas, 10%);
+@topic-table-cell-border:          darken(@pampas, 1%);
 
 //Forms
 @input-border-color: lighten(@dark, 80%);
@@ -32,6 +32,7 @@
 @create-topic-body-color:    lighten(@dark, 10%);
 @create-topic-type-ahead-highlight: desaturate(@caribbean, 10%);
 @create-topic-type-ahead-border: lighten(@dark, 90%);
+@create-topic-close-btn-color: rgba(204, 204, 204, .5);
 
 //Topic
 @topic-username-color:           fadeout(@light, 60%);
@@ -40,6 +41,8 @@
 @topic-reply-body-color:         lighten(@dark, 50%);
 @topic-reply-list-header-bg:     @pampas;
 @topic-reply-list-heading-color: darken(@pampas, 20%);
+@topic-reply-sent-details-color: darken(@pampas, 26%);
+
 
 //Search
 @search-input-bg: fadeout(@light, 80%);

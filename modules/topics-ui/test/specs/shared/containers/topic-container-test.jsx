@@ -10,6 +10,7 @@ import categoryStore from '../../../mocks/category-store';
 import repliesStore from '../../../mocks/replies-store';
 import currentUserStore from '../../../mocks/current-user-store';
 import {BODY_UPDATE, SUBMIT_NEW_REPLY} from '../../../../shared/constants/create-reply';
+import tagStore from '../../../mocks/tag-store';
 
 describe('<TopicContainer />', () => {
 
@@ -19,6 +20,7 @@ describe('<TopicContainer />', () => {
     wrapper = shallow(
       <TopicContainer
         topicsStore={topicsStore}
+        tagStore={tagStore}
         categoryStore={categoryStore}
         repliesStore={repliesStore}
         currentUserStore={currentUserStore}
@@ -72,7 +74,7 @@ describe('<TopicContainer />', () => {
   it('should dispatch the right action when the enter key is pressed on the editor', () => {
     const handle = spy();
     subscribe(SUBMIT_NEW_REPLY, handle);
-    wrapper.find('TopicReplyEditor').at(0).prop('onEnter')();
+    wrapper.find('TopicReplyEditor').at(0).prop('onSubmit')();
     equal(
       handle.callCount, 1,
       'Failed to dispatch the correct action when the enter key was pressed'
