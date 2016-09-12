@@ -74,7 +74,7 @@ describe('<TopicContainer />', () => {
   it('should dispatch the right action when the enter key is pressed on the editor', () => {
     const handle = spy();
     subscribe(SUBMIT_NEW_REPLY, handle);
-    wrapper.find('TopicReplyEditor').at(0).prop('onEnter')();
+    wrapper.find('TopicReplyEditor').at(0).prop('onSubmit')();
     equal(
       handle.callCount, 1,
       'Failed to dispatch the correct action when the enter key was pressed'
