@@ -22,7 +22,11 @@ function presentCreateRoomDialog(options) {
 
     var RepoCollection = repoModels.ReposCollection;
     var repoCollection = new RepoCollection();
-    repoCollection.fetch();
+    repoCollection.fetch({
+      data: {
+        type: 'admin'
+      }
+    });
 
     function getSuitableGroupId() {
       if (roomMenuModel) {

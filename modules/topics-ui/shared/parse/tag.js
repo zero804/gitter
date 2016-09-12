@@ -3,7 +3,7 @@ import slugify from 'gitter-web-slugify';
 export default function parseTag(tag) {
   const slug = slugify(tag);
   return {
-    name: tag,
+    label: tag,
     value: slug,
   }
 }

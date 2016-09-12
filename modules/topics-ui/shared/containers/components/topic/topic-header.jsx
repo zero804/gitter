@@ -11,9 +11,14 @@ export default React.createClass({
   displayName: 'TopicHeader',
   propTypes: {
     groupName: PropTypes.string.isRequired,
+
+    tags: PropTypes.arrayOf(PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      value: PropTypes.string.isRequired,
+    })).isRequired,
+
     topic: PropTypes.shape({
       title: PropTypes.string,
-      tags: PropTypes.array,
       user: PropTypes.shape({
         avatarUrl: PropTypes.string.isRequired,
         displayName: PropTypes.string.isRequired
@@ -27,10 +32,9 @@ export default React.createClass({
 
   render(){
 
-    const { category, groupName, topic } = this.props;
-    const { title, user, tags } = topic;
+    const { category, groupName, topic, tags } = this.props;
+    const { title, user } = topic;
     const { displayName } = user;
-
     return (
       <Container className="container--topic-header">
         <Panel>
@@ -63,7 +67,7 @@ export default React.createClass({
           groupName={groupName}
           tag={tag}
           className="topic-header__tag-link">
-            {tag.name}
+            {tag.label}
         </ForumTagLink>
       </li>
     );

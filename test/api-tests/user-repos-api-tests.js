@@ -33,6 +33,11 @@ describe('user-repos #slow', function() {
       githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
       username: fixtureLoader.GITTER_INTEGRATION_USERNAME,
       accessToken: 'web-internal'
+    },
+    user2: {
+      githubToken: fixtureLoader.GITTER_INTEGRATION_COLLAB_USER_SCOPE_TOKEN,
+      username: fixtureLoader.GITTER_INTEGRATION_COLLAB_USERNAME,
+      accessToken: 'web-internal'
     }
   });
 
@@ -85,6 +90,21 @@ describe('user-repos #slow', function() {
         assert(repos.every(function(repo) {
           return repo.name !== fixtureLoader.GITTER_INTEGRATION_REPO_FULL
         }));
-      })
+      });
+  });
+
+
+  it('GET /v1/user/:userId/repos?type=admin', function() {
+    return request(app)
+      .get('/v1/user/' + fixture.user2.id + '/repos?type=admin')
+      .set('x-access-token', fixture.user2.accessToken)
+      .expect(200)
+      .then(function(result) {
+        var repos = result.body;
+
+        assert(repos.some(function(repo) {
+          return repo.name !== fixtureLoader.GITTER_INTEGRATION_REPO_WITH_COLLAB_ONLY_READ
+        }));
+      });
   });
 });
