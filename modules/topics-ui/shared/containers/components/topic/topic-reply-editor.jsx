@@ -13,7 +13,7 @@ export default React.createClass({
       avatarUrl: PropTypes.string.isRequired
     }).isRequired,
     onChange: PropTypes.func.isRequired,
-    onEnter: PropTypes.func.isRequired,
+    onSubmit: PropTypes.func.isRequired,
   },
 
   render(){
@@ -28,7 +28,6 @@ export default React.createClass({
             className="editor--reply"
             placeholder="Your reply here. Use Markdown, BBCode, or HTML to format. Drag or paste images ..."
             onChange={this.onChange}
-            onEnter={this.onEnter}
             value={value}/>
           <button
             className="topic-reply-editor__submit"
@@ -44,13 +43,9 @@ export default React.createClass({
     this.props.onChange(val);
   },
 
-  onEnter(){
-    //this.props.onEnter();
-  },
-
   onSubmitClicked(e){
     e.preventDefault();
-    this.props.onEnter();
+    this.props.onSubmit();
   }
 
 });

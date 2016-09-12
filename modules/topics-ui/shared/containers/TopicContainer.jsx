@@ -18,7 +18,6 @@ const TopicContainer = createClass({
     groupName: PropTypes.string.isRequired,
 
     topicsStore: PropTypes.shape({
-      models: PropTypes.array.isRequired,
       getById: PropTypes.func.isRequired,
     }).isRequired,
 
@@ -102,7 +101,7 @@ const TopicContainer = createClass({
           user={currentUser}
           value={newReplyContent}
           onChange={this.onEditorUpdate}
-          onEnter={this.onEditorSubmit}/>
+          onSubmit={this.onEditorSubmit}/>
       </main>
     );
   },

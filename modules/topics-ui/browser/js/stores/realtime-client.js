@@ -14,7 +14,6 @@ function authProvider(callback) {
     client: mobile ? 'mobweb' : 'web',
   });
   return callback(authMessage);
-
 }
 
 export function getRealtimeClient(){
