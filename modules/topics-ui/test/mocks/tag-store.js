@@ -6,7 +6,7 @@ var CategoryStore = Backbone.Collection.extend({
     return this.models.map(function(model){ return model.toJSON(); });
   },
   pluckValues: () => ['', ''],
-  getTagsByValue: () => [],
+  getTagsByLabel: () => [],
 });
 
 var store = new CategoryStore(data);

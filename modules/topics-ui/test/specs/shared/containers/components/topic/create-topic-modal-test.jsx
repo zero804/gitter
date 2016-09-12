@@ -4,6 +4,8 @@ import React from 'react';
 import { shallow } from 'enzyme';
 import CreateTopicModal from '../../../../../../shared/containers/components/topic/create-topic-modal.jsx';
 import mockEvt from '../../../../../mocks/event';
+import tags from '../../../../../mocks/mock-data/tags';
+import categories from '../../../../../mocks/mock-data/categories';
 
 describe('<CreateTopicModal/>', () => {
 
@@ -20,6 +22,7 @@ describe('<CreateTopicModal/>', () => {
     tags: [],
   }
 
+
   beforeEach(() => {
 
     submitHandle = sinon.spy();
@@ -30,6 +33,8 @@ describe('<CreateTopicModal/>', () => {
     wrapper = shallow(
       <CreateTopicModal
         newTopic={newTopic}
+        tags={tags}
+        categories={categories}
         active={false}
         onTitleChange={titleChangeHandle}
         onBodyChange={bodyChangeHandle}
@@ -39,6 +44,8 @@ describe('<CreateTopicModal/>', () => {
 
     activeWrapper = shallow(
       <CreateTopicModal
+        tags={tags}
+        categories={categories}
         newTopic={newTopic}
         active={true}
         onTitleChange={titleChangeHandle}

@@ -24,6 +24,7 @@ requireAll(require.context('../specs', true, /^\.\/.*-test\.jsx?$/));
 //Mocha config
 mocha.allowUncaught();
 mocha.checkLeaks();
+mocha.allowUncaught();
 
 //Throw errors
 window.onerror = function(err) {
