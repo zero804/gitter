@@ -12,6 +12,7 @@ module.exports = (function() {
     initialize: function() {
       this.atTop = false;
       this.atBottom = true;
+      this._currentFetchCount = 0;
       // TODO: deal with state on RESET
     },
 
@@ -32,7 +33,7 @@ module.exports = (function() {
     fetchLatest: function(options, callback, context) {
       var self = this;
       if(this.atBottom) return;
-      if(this.loading) return;
+      if(this._currentFetchCount > 0) return;
 
       var loadLimit = this.getLoadLimit();
 
@@ -43,6 +44,7 @@ module.exports = (function() {
 
       debug('Fetch latest: options=%j data=%j', options, data);
       this.trigger('fetch:latest');
+      this._currentFetchCount += 1;
       this.fetch({
         remove: ('remove' in options) ? options.remove : false,
         add: ('add' in options) ? options.add : true,
@@ -78,10 +80,13 @@ module.exports = (function() {
           }
 
           if(callback) callback.call(context);
+
+          self.currentFetchCount -= 1;
         },
         error: function (err) {
           self.trigger('fetch:latest:complete');
           if (callback) callback.call(context || null, err);
+          self.currentFetchCount -= 1;
         }
       });
 
@@ -89,7 +94,7 @@ module.exports = (function() {
 
     fetchMoreBefore: function(options, callback, context) {
       if(this.atTop) return;
-      if(this.loading) return;
+      if(this._currentFetchCount > 0) return;
 
       var beforeId;
       if(this.length) {
@@ -104,6 +109,7 @@ module.exports = (function() {
       var self = this;
       debug('Fetch before: options=%j data=%j', options, data);
       this.trigger('fetch:before');
+      this._currentFetchCount += 1;
       this.fetch({
         remove: ('remove' in options) ? options.remove : false,
         add: ('add' in options) ? options.add : true,
@@ -119,10 +125,12 @@ module.exports = (function() {
           self.trimBottom();
 
           if(callback) callback.call(context);
+          self.currentFetchCount -= 1;
         },
         error: function(err) {
           self.trigger('fetch:before:complete');
           if(callback) callback.call(err);
+          self.currentFetchCount -= 1;
         }
       });
     },
@@ -130,7 +138,7 @@ module.exports = (function() {
     fetchMoreAfter: function(options, callback, context) {
       var self = this;
       if(this.atBottom) return;
-      if(this.loading) return;
+      if(this._currentFetchCount > 0) return;
 
       var afterId;
       if(this.length) {
@@ -143,6 +151,7 @@ module.exports = (function() {
 
       debug('Fetch after: options=%j data=%j', options, data);
       this.trigger('fetch:after');
+      this._currentFetchCount += 1;
       this.fetch({
         remove: ('remove' in options) ? options.remove : false,
         add: ('add' in options) ? options.add : true,
@@ -158,10 +167,12 @@ module.exports = (function() {
           self.trimTop();
 
           if(callback) callback.call(context);
+          self.currentFetchCount -= 1;
         },
         error: function(err) {
           self.trigger('fetch:after:completed');
           if(callback) callback.call(err);
+          self.currentFetchCount -= 1;
         }
       });
     },
@@ -169,7 +180,7 @@ module.exports = (function() {
     fetchAtPoint: function(query, options, callback, context) {
       if (!options) options = {};
       // if(this.atTop) return; // Already at the top
-      if(this.loading) return;
+      if(this._currentFetchCount > 1) return;
 
       var loadLimit = this.getLoadLimit();
 
@@ -181,6 +192,7 @@ module.exports = (function() {
 
       debug('Fetch around: options=%j data=%j', options, data);
       this.trigger('fetch:at');
+      this._currentFetchCount += 1;
       this.fetch({
         remove: ('remove' in options) ? options.remove : false,
         add: ('add' in options) ? options.add : true,
@@ -212,10 +224,12 @@ module.exports = (function() {
           self.trimBottom();
 
           if(callback) callback.call(context);
+          self.currentFetchCount -= 1;
         },
         error: function(err) {
           self.trigger('fetch:at:complete');
           if(callback) callback.call(err);
+          self.currentFetchCount -= 1;
         }
       });
     },
