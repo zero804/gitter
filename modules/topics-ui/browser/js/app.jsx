@@ -71,6 +71,8 @@ export default React.createClass({
       router: router,
       currentUserStore: getCurrentUserStore(),
       forumStore: getForumStore(),
+      categoryStore: getForumCategoryStore(),
+      tagStore: getForumTagStore(),
     };
   },
 
@@ -84,8 +86,6 @@ export default React.createClass({
       tagName: router.get('tagName'),
       sortName: router.get('sortName'),
       //Stores
-      categoryStore: getForumCategoryStore(),
-      tagStore: getForumTagStore(),
       topicsStore: getTopicsStore(),
       newTopicStore: new NewTopicStore(),
       createTopic: false,
@@ -106,7 +106,6 @@ export default React.createClass({
       topicId: router.get('topicId'),
       topicsStore: getTopicsStore(),
       repliesStore: getRepliesStore(),
-      categoryStore: getForumCategoryStore(),
       newReplyStore: new NewReplyStore(),
     });
   },

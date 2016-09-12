@@ -2,30 +2,30 @@
 
 @unicode-down-arrow: '\2023';
 
-.table-control__select-decal {
+.select__decal {
+
   position: relative;
+  display: inline-block;
+
   &:after{
     content:   @unicode-down-arrow;
     position:  absolute;
-    top:       1.6rem;
+    top:       50%;
     right:     1rem;
     color:     white;
     font-size: 2.5rem;
-    transform: rotate(90deg);
+    transform: rotate(90deg) translateX(-50%);
     pointer-events: none;
   }
 }
 
-.table-control__select {
+.select {
   //FIXME -> add autoprefixer
   -webkit-appearance: none;
   background:         none;
   outline:            none;
-
-  padding:      .7rem 3rem .7rem 1rem;
-  margin-left:  2rem;
-  margin-top:   1.5rem;
   border-color: white;
+  padding:      .7rem 3rem .7rem 1rem;
 
   //FIXME how do we handle these deffinitions
   font-family:    @font-family;

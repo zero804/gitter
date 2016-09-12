@@ -37,4 +37,11 @@ describe('ForumCategoryStore', function(){
     assert.equal(categoryStore.getActiveCategoryName(), 'all');
   });
 
+  it('should have a mapForSelectControl function that transfoms the data', () => {
+    categoryStore.mapForSelectControl().forEach((c) => {
+      assert(c.label);
+      assert(c.value);
+    });
+  });
+
 });

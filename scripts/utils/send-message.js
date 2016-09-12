@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 /*jslint node:true, unused:true */
-"use strict";
+'use strict';
 
+var _ = require('lodash');
 var userService = require('../../server/services/user-service');
 var troupeService = require('../../server/services/troupe-service');
 var chatService = require('../../server/services/chat-service');
 var oneToOneRoomService = require('../../server/services/one-to-one-room-service');
+var loremIpsum = require('lorem-ipsum');
 
 require('../../server/event-listeners').install();
 var Promise = require('bluebird');
@@ -14,21 +16,27 @@ var shutdown = require('shutdown');
 
 var opts = require('yargs')
   .option('uri', {
-    description: "uri of room to list presence for"
+    description: 'uri of room to list presence for'
   })
   .option('fromUser', {
-    description: "id of room to list presence for"
+    description: 'id of room to list presence for'
   })
   .option('toUser', {
-    description: "id of room to list presence for"
+    description: 'id of room to list presence for'
+  })
+  .option('numberOfMessages', {
+    type: 'number',
+    description: 'number of messages to send',
+    default: 1
   })
   .help('help')
   .alias('help', 'h')
   .argv;
 
 function getTroupe(fromUser) {
-  if (opts.uri)
+  if (opts.uri) {
     return troupeService.findByUri(opts.uri);
+  }
 
   if (!opts.toUser) {
     return Promise.reject(new Error('Please specify either a uri or a fromUser and toUser'));
@@ -51,12 +59,18 @@ userService.findByUsername(opts.fromUser)
   })
   .spread(function(fromUser, troupe) {
     if (!troupe) throw new Error('Room not found');
-    return chatService.newChatMessageToTroupe(troupe, fromUser, { text: 'test message' });
+    return _.range(opts.numberOfMessages).reduce(function(chain, num) {
+      return chain.then(function() {
+        return chatService.newChatMessageToTroupe(troupe, fromUser, {
+          text: 'Test message ' + num + ': ' + loremIpsum({ count: 1 })
+        });
+      });
+    }, Promise.resolve());
   })
   .then(function(result) {
     console.log(result);
   })
-  .delay(10000)
+  .delay(2000)
   .catch(function(err) {
     console.error(err.stack);
   })
