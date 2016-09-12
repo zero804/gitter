@@ -103,9 +103,10 @@ const ForumContainer = React.createClass({
   },
 
   componentWillUnmount(){
-    const { categoryStore, tagStore, router, topicsStore } = this.props;
+    const { categoryStore, tagStore, router, topicsStore, newTopicStore } = this.props;
 
     topicsStore.removeListeners(this.onTopicsUpdate, this);
+    newTopicStore.removeListeners(this.onNewTopicUpdate, this);
     topicsStore.off(consts.TOPIC_CREATED, this.onTopicCreated, this);
 
     categoryStore.off(forumCatConstants.UPDATE_ACTIVE_CATEGORY, this.onCategoryUpdate);
@@ -118,7 +119,7 @@ const ForumContainer = React.createClass({
 
   render() {
     const { categoryName, tags, filterName, tagName, sortName, createTopic, topics, newTopic } = this.state;
-    const { groupName, categoryStore, tagStore, newTopicStore } = this.props;
+    const { groupName, categoryStore, tagStore } = this.props;
 
     const categories = categoryStore.getCategories();
     const tagValues = tagStore.pluckValues();
@@ -129,9 +130,7 @@ const ForumContainer = React.createClass({
         <SearchHeader groupName={groupName}/>
         <CategoryList
           groupName={ groupName }
-          categories={ categories }
-          //Change this attribute name to categoryChange
-          onCategoryClicked={ this.onCategoryClicked } />
+          categories={ categories }/>
 
         <ForumTableControl
           groupName={groupName}

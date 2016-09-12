@@ -1,9 +1,11 @@
 @import "../../colors.less";
 @import (less, reference) "~gitter-styleguide/css/components/buttons.css";
+@import "../../text";
 
 .topic-search__all-topics-link {
   color:           @light;
   font-weight:     300;
+  font-size:        3.5rem;
   text-decoration: none;
 
   &:hover {
@@ -13,17 +15,23 @@
 
 .topic-search__create-topic-link {
   &:extend(.subdued-button-clouds--small all);
+  display: flex;
+  align-items: center;
+  height: 3.8rem;
   margin-left:     auto;
   text-decoration: none;
   white-space:     nowrap;
+  line-height: 1.4rem;
 }
 
 .topic-search__search-input {
   width:            100%;
   margin:           0 4rem;
   padding:          1rem;
+  padding-left: 1.5rem;
   border-bottom:    none;
   border-radius:    .4rem;
   background-color: @search-input-bg;
   color:            @light;
+  font-family: @font-family;
 }
