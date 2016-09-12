@@ -49,6 +49,7 @@
     "gitter-web-cache-wrapper": "file:modules/cache-wrapper",
     "gitter-web-cdn": "file:modules/cdn",
     "gitter-web-collaborators": "file:modules/collaborators",
+    "gitter-web-elasticsearch": "file:modules/elasticsearch",
     "gitter-web-env": "file:modules/env",
     "gitter-web-fake-data": "file:modules/fake-data",
     "gitter-web-forums": "file:modules/forums",
