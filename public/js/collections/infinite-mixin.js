@@ -12,7 +12,7 @@ module.exports = (function() {
     initialize: function() {
       this.atTop = false;
       this.atBottom = true;
-      this.currentFetchCount = 0;
+      this._currentFetchCount = 0;
       // TODO: deal with state on RESET
     },
 
@@ -33,7 +33,7 @@ module.exports = (function() {
     fetchLatest: function(options, callback, context) {
       var self = this;
       if(this.atBottom) return;
-      if(this.currentFetchCount > 0) return;
+      if(this._currentFetchCount > 0) return;
 
       var loadLimit = this.getLoadLimit();
 
@@ -44,7 +44,7 @@ module.exports = (function() {
 
       debug('Fetch latest: options=%j data=%j', options, data);
       this.trigger('fetch:latest');
-      this.currentFetchCount += 1;
+      this._currentFetchCount += 1;
       this.fetch({
         remove: ('remove' in options) ? options.remove : false,
         add: ('add' in options) ? options.add : true,
@@ -94,7 +94,7 @@ module.exports = (function() {
 
     fetchMoreBefore: function(options, callback, context) {
       if(this.atTop) return;
-      if(this.currentFetchCount > 0) return;
+      if(this._currentFetchCount > 0) return;
 
       var beforeId;
       if(this.length) {
@@ -109,7 +109,7 @@ module.exports = (function() {
       var self = this;
       debug('Fetch before: options=%j data=%j', options, data);
       this.trigger('fetch:before');
-      this.currentFetchCount += 1;
+      this._currentFetchCount += 1;
       this.fetch({
         remove: ('remove' in options) ? options.remove : false,
         add: ('add' in options) ? options.add : true,
@@ -138,7 +138,7 @@ module.exports = (function() {
     fetchMoreAfter: function(options, callback, context) {
       var self = this;
       if(this.atBottom) return;
-      if(this.currentFetchCount > 0) return;
+      if(this._currentFetchCount > 0) return;
 
       var afterId;
       if(this.length) {
@@ -151,7 +151,7 @@ module.exports = (function() {
 
       debug('Fetch after: options=%j data=%j', options, data);
       this.trigger('fetch:after');
-      this.currentFetchCount += 1;
+      this._currentFetchCount += 1;
       this.fetch({
         remove: ('remove' in options) ? options.remove : false,
         add: ('add' in options) ? options.add : true,
@@ -180,7 +180,7 @@ module.exports = (function() {
     fetchAtPoint: function(query, options, callback, context) {
       if (!options) options = {};
       // if(this.atTop) return; // Already at the top
-      if(this.currentFetchCount > 1) return;
+      if(this._currentFetchCount > 1) return;
 
       var loadLimit = this.getLoadLimit();
 
@@ -192,7 +192,7 @@ module.exports = (function() {
 
       debug('Fetch around: options=%j data=%j', options, data);
       this.trigger('fetch:at');
-      this.currentFetchCount += 1;
+      this._currentFetchCount += 1;
       this.fetch({
         remove: ('remove' in options) ? options.remove : false,
         add: ('add' in options) ? options.add : true,
