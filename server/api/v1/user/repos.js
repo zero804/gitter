@@ -41,6 +41,8 @@ module.exports = {
 
     if (req.query.type === 'unused') {
       return restful.serializeUnusedReposForUser(req.user);
+    } else if(req.query.type === 'admin') {
+      return restful.serializeAdminReposForUser(req.user);
     }
 
     return restful.serializeReposForUser(req.user);
