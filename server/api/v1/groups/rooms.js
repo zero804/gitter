@@ -21,7 +21,7 @@ function getCreateOptions(input) {
 
     // type defaults to null, not undefined
     createOptions.type = input.security.type ? String(input.security.type) : null;
-    if (createOptions.type) {
+    if (createOptions.type && createOptions.type !== 'GROUP') {
       // for GitHub and future room types that are backed by other services
       createOptions.linkPath = linkPath;
       assert(createOptions.linkPath, 'linkPath required');

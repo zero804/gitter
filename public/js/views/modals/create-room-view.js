@@ -74,9 +74,9 @@ var CreateRoomView = Marionette.LayoutView.extend({
     roomDetailSection: '.js-create-room-detail-section',
     onlyGithubUsersOption: '.js-create-room-only-github-users-option',
     onlyGithubUsersOptionInput: '.js-create-room-only-github-users-option-input',
-    onlyOrgUsersOption: '.js-create-room-only-org-users-option',
-    onlyOrgUsersOptionInput: '.js-create-room-only-org-users-option-input',
-    onlyOrgUsersOptionOrgName: '.js-create-room-only-org-users-option-org-name',
+    onlyGroupUsersOption: '.js-create-room-only-group-users-option',
+    onlyGroupUsersOptionInput: '.js-create-room-only-group-users-option-input',
+    onlyGroupUsersOptionOrgName: '.js-create-room-only-group-users-option-org-name',
     allowBadgerOption: '.js-create-room-allow-badger',
     allowBadgerOptionInput: '.js-create-room-allow-badger-option-input',
     roomAvailabilityStatusMessage: '.js-room-availability-status-message'
@@ -91,7 +91,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
     'click @ui.clearNameButton': 'onNameClearActivated',
     'change @ui.securityOptions': 'onSecurityChange',
     'change @ui.onlyGithubUsersOptionInput': 'onOnlyGitHubUsersOptionChange',
-    'change @ui.onlyOrgUsersOptionInput': 'onOnlyOrgUsersOptionChange',
+    'change @ui.onlyGroupUsersOptionInput': 'onOnlyGroupUsersOptionChange',
     'change @ui.allowBadgerOptionInput': 'onAllowBadgerOptionChange'
   },
 
@@ -182,7 +182,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
     var associatedGithubProject = this.model.get('associatedGithubProject');
     var security = this.model.get('security');
     var onlyGithubUsers = this.model.get('onlyGithubUsers');
-    var onlyOrgUsers = this.model.get('onlyOrgUsers');
+    var onlyGroupUsers = this.model.get('onlyGroupUsers');
     var allowBadger = this.model.get('allowBadger');
 
     // You should be stopped before this in the UI validation but a good sanity check
@@ -197,10 +197,9 @@ var CreateRoomView = Marionette.LayoutView.extend({
       type = 'GH_REPO';
       linkPath = associatedGithubProject.get('uri');
     }
-    else if((onlyOrgUsers && security === 'PRIVATE') || security === 'PUBLIC') {
-      var backedBy = selectedGroup.get('backedBy');
-      type = backedBy.type;
-      linkPath = backedBy.linkPath;
+    else if((onlyGroupUsers && security === 'PRIVATE') || security === 'PUBLIC') {
+      type = 'GROUP';
+      linkPath = null;
     }
 
     var apiUrl = urlJoin('/v1/groups/', selectedGroup.get('id'), '/rooms');
@@ -308,8 +307,8 @@ var CreateRoomView = Marionette.LayoutView.extend({
     this.model.set('onlyGithubUsers', this.ui.onlyGithubUsersOptionInput[0].checked);
   },
 
-  onOnlyOrgUsersOptionChange: function() {
-    this.model.set('onlyOrgUsers', this.ui.onlyOrgUsersOptionInput[0].checked);
+  onOnlyGroupUsersOptionChange: function() {
+    this.model.set('onlyGroupUsers', this.ui.onlyGroupUsersOptionInput[0].checked);
   },
 
   onAllowBadgerOptionChange: function() {
@@ -428,9 +427,9 @@ var CreateRoomView = Marionette.LayoutView.extend({
       var shouldHideOnlyGitHubUsersOption = !isBackedByGitHub || security !== 'PUBLIC';
       toggleClass(this.ui.onlyGithubUsersOption[0], 'hidden', shouldHideOnlyGitHubUsersOption);
 
-      var shouldHideOnlyOrgUsersOption = !isBackedByGitHub || security !== 'PRIVATE';
-      toggleClass(this.ui.onlyOrgUsersOption[0], 'hidden', shouldHideOnlyOrgUsersOption);
-      this.ui.onlyOrgUsersOptionOrgName[0].textContent = groupBackedBy && groupBackedBy.linkPath;
+      var shouldHideOnlyGroupUsersOption = !isBackedByGitHub || security !== 'PRIVATE';
+      toggleClass(this.ui.onlyGroupUsersOption[0], 'hidden', shouldHideOnlyGroupUsersOption);
+      this.ui.onlyGroupUsersOptionOrgName[0].textContent = groupBackedBy && groupBackedBy.linkPath;
 
       var groupBackedByRepo = null;
       if(groupBackedBy && groupBackedBy.type === 'GH_REPO') {
@@ -441,7 +440,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
       var shouldHideAllowBadgerOption = !(isGroupBackedByRepo || isAssociatedWithPublicRepo) || security !== 'PUBLIC';
       toggleClass(this.ui.allowBadgerOption[0], 'hidden', shouldHideAllowBadgerOption);
 
-      toggleClass(this.ui.roomDetailSection[0], 'hidden', shouldHideOnlyGitHubUsersOption && shouldHideOnlyOrgUsersOption && shouldHideAllowBadgerOption);
+      toggleClass(this.ui.roomDetailSection[0], 'hidden', shouldHideOnlyGitHubUsersOption && shouldHideOnlyGroupUsersOption && shouldHideAllowBadgerOption);
 
       // Validation and Errors
       var roomAvailabilityStatusMessage = '';
