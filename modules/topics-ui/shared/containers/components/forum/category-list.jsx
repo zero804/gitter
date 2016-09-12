@@ -8,7 +8,6 @@ export default React.createClass({
   displayName: 'CategoryList',
   propTypes: {
     categories: React.PropTypes.array.isRequired,
-    onCategoryClicked: React.PropTypes.func.isRequired,
     groupName: React.PropTypes.string.isRequired
   },
 
@@ -27,15 +26,13 @@ export default React.createClass({
     );
   },
 
-  getChildCategory(model, index){
-    const { onCategoryClicked, groupName } = this.props;
+  getChildCategory(category, index){
+    const { groupName } = this.props;
     return (
       <li key={`forum-category-list-item-${index}`}>
         <CategoryListItem
-          category={model.category}
-          active={model.active}
-          groupName={groupName}
-          onClick={ () => onCategoryClicked(model.category) } />
+          category={category}
+          groupName={groupName}/>
       </li>
     );
   }

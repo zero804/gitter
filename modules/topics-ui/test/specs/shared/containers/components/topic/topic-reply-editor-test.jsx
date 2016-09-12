@@ -71,9 +71,4 @@ describe('<TopicReplyEditor/>', () => {
     equal(changeHandle.callCount, 1, 'ReplyEditor failed to call onChange');
   });
 
-  it('should call onEnter when the editor calls onEnter', () => {
-    wrapper.find('Editor').prop('onEnter')();
-    equal(enterHandle.callCount, 1, 'ReplyEditor failed to call onEnter');
-  });
-
 });

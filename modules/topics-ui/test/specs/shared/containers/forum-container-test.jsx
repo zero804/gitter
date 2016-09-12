@@ -41,12 +41,6 @@ describe('<ForumContainer />', function(){
     );
   });
 
-  it('should dispatch the right action when a category is clicked', function(){
-    subscribe(forumCatConstants.NAVIGATE_TO_CATEGORY, catChangeHandle);
-    wrapper.find('CategoryList').prop('onCategoryClicked')('all');
-    assert.equal(catChangeHandle.callCount, 1);
-  });
-
   it('should dispatch the right action when a filter changes', () => {
     subscribe(forumFilterConstants.NAVIGATE_TO_FILTER, filterChangeHandle);
     wrapper.find('ForumTableControl').prop('filterChange')('all');

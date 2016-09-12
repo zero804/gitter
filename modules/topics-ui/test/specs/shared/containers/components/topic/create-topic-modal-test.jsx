@@ -1,9 +1,11 @@
-import { equal, ok } from 'assert';
+import { equal } from 'assert';
 import sinon from 'sinon';
 import React from 'react';
 import { shallow } from 'enzyme';
 import CreateTopicModal from '../../../../../../shared/containers/components/topic/create-topic-modal.jsx';
 import mockEvt from '../../../../../mocks/event';
+import tags from '../../../../../mocks/mock-data/tags';
+import categories from '../../../../../mocks/mock-data/categories';
 
 describe('<CreateTopicModal/>', () => {
 
@@ -13,6 +15,13 @@ describe('<CreateTopicModal/>', () => {
   let titleChangeHandle;
   let bodyChangeHandle;
   let tagChangeHandle;
+  const newTopic = {
+    title: '',
+    body: '',
+    categoryId: '1',
+    tags: [],
+  }
+
 
   beforeEach(() => {
 
@@ -23,6 +32,9 @@ describe('<CreateTopicModal/>', () => {
 
     wrapper = shallow(
       <CreateTopicModal
+        newTopic={newTopic}
+        tags={tags}
+        categories={categories}
         active={false}
         onTitleChange={titleChangeHandle}
         onBodyChange={bodyChangeHandle}
@@ -32,6 +44,9 @@ describe('<CreateTopicModal/>', () => {
 
     activeWrapper = shallow(
       <CreateTopicModal
+        tags={tags}
+        categories={categories}
+        newTopic={newTopic}
         active={true}
         onTitleChange={titleChangeHandle}
         onBodyChange={bodyChangeHandle}
@@ -101,11 +116,6 @@ describe('<CreateTopicModal/>', () => {
   it('should call onBodyChange when the textarea changes', () => {
     wrapper.find('Editor').at(0).prop('onChange')();
     equal(bodyChangeHandle.callCount, 1);
-  });
-
-  it('should call onTagsChanged with an array when the input changes', () => {
-    wrapper.find('.create-topic__input--tags').at(0).prop('onChange')('1,2,3');
-    ok(tagChangeHandle.calledWithMatch(['1', '2', '3']));
   });
 
 });

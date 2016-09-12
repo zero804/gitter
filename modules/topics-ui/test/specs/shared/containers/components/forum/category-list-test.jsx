@@ -38,14 +38,4 @@ describe('<CategoryList />', function(){
     assert.equal(wrapper.find('CategoryListItem').length, categories.length);
   });
 
-  it('should call the onCategoryClicked when a child button is clicked', function(){
-    wrapper.find('CategoryListItem').at(0).simulate('click');
-    assert.equal(clickHandle.callCount, 1);
-  });
-
-  it('should call clickHandle with the correct arguments', function(){
-    wrapper.find('CategoryListItem').at(0).simulate('click');
-    assert(clickHandle.calledWith('all'));
-  });
-
 });
