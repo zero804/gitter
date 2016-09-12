@@ -17,7 +17,7 @@ export default React.createClass({
     name: PropTypes.string.isRequired,
     completions: PropTypes.arrayOf(PropTypes.string).isRequired,
     onSubmit: PropTypes.func.isRequired,
-    value: PropTypes.string.isRequired,
+    value: PropTypes.string,
     placeholder: PropTypes.string,
     className: PropTypes.string,
   },
