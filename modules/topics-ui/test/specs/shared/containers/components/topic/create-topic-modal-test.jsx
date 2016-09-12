@@ -1,4 +1,4 @@
-import { equal } from 'assert';
+import { equal, ok } from 'assert';
 import sinon from 'sinon';
 import React from 'react';
 import { shallow } from 'enzyme';
@@ -12,26 +12,31 @@ describe('<CreateTopicModal/>', () => {
   let submitHandle;
   let titleChangeHandle;
   let bodyChangeHandle;
+  let tagChangeHandle;
 
   beforeEach(() => {
 
     submitHandle = sinon.spy();
     titleChangeHandle = sinon.spy();
     bodyChangeHandle = sinon.spy();
+    tagChangeHandle = sinon.spy();
 
     wrapper = shallow(
       <CreateTopicModal
-      active={false}
-      onTitleChange={titleChangeHandle}
-      onBodyChange={bodyChangeHandle}
-      onSubmit={submitHandle}/>);
+        active={false}
+        onTitleChange={titleChangeHandle}
+        onBodyChange={bodyChangeHandle}
+        onSubmit={submitHandle}
+        onTagsChange={tagChangeHandle}/>
+    );
 
     activeWrapper = shallow(
       <CreateTopicModal
-      active={true}
-      onTitleChange={titleChangeHandle}
-      onBodyChange={bodyChangeHandle}
-      onSubmit={submitHandle}/>
+        active={true}
+        onTitleChange={titleChangeHandle}
+        onBodyChange={bodyChangeHandle}
+        onSubmit={submitHandle}
+        onTagsChange={tagChangeHandle}/>
     );
   });
 
@@ -89,13 +94,18 @@ describe('<CreateTopicModal/>', () => {
   });
 
   it('should call onTitleChange when the input changes', () => {
-    wrapper.find('Input').prop('onChange')();
+    wrapper.find('Input').at(0).prop('onChange')();
     equal(titleChangeHandle.callCount, 1);
   });
 
   it('should call onBodyChange when the textarea changes', () => {
-    wrapper.find('Editor').prop('onChange')();
+    wrapper.find('Editor').at(0).prop('onChange')();
     equal(bodyChangeHandle.callCount, 1);
+  });
+
+  it('should call onTagsChanged with an array when the input changes', () => {
+    wrapper.find('.create-topic__input--tags').at(0).prop('onChange')('1,2,3');
+    ok(tagChangeHandle.calledWithMatch(['1', '2', '3']));
   });
 
 });

@@ -28,5 +28,20 @@ describe('CategoryStore', function(){
     assert(categoryStore(data, 'test-1').getCategories()[1].active);
   });
 
+  it('should allow categories to be mapped for select controls', () => {
+    store.mapForSelectControl().forEach((i, index) => {
+      //Ignore the "all" category
+      if(index === 0) { return; }
+      assert(i.label, 'has a label');
+      assert(i.value, 'has a value');
+    });
+  });
+
+  it('should allow you to get by id', () => {
+    const expected = categories[1];
+    const result = store.getById(expected.id);
+    assert.deepEqual(result, expected);
+  });
+
 
 });

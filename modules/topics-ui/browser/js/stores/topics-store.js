@@ -5,7 +5,7 @@ import parseTag from '../../../shared/parse/tag';
 import {getRealtimeClient} from './realtime-client';
 import LiveCollection from './live-collection';
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
-import {getForumId, getForumStore} from './forum-store';
+import {getForumId} from './forum-store';
 import {BaseModel} from './base-model';
 
 export const TopicModel = BaseModel.extend({
@@ -17,10 +17,20 @@ export const TopicModel = BaseModel.extend({
     var data = this.attributes;
     data.tags = (data.tags || []);
     return Object.assign({}, data, {
-      tags: data.tags.map(parseTag),
-      categoryId: this.collection.getCategoryId(),
+      tags: data.tags.map(parseTag)
+    });
+  },
+
+  getDataToSave(){
+    const data = this.toJSON();
+    const tags = (data.tags || []);
+    const parsedTags = tags.map((t) => t.label);
+
+    return Object.assign({}, data, {
+      tags: parsedTags
     });
   }
+
 });
 
 export const TopicsStore = LiveCollection.extend({
@@ -50,20 +60,20 @@ export const TopicsStore = LiveCollection.extend({
   },
 
   createNewTopic(data){
-    const model = this.create({ title: data.title, text: data.body }, { wait: true });
+
+    const model = this.create({
+      title: data.title,
+      text: data.body,
+      categoryId: data.categoryId,
+      tags: data.tags
+    }, { wait: true });
+
     model.once('add', () => {
       this.trigger(TOPIC_CREATED, {
         topicId: model.get('id'),
         slug: model.get('slug')
       });
     });
-  },
-
-  //TODO REMOVE
-  getCategoryId(){
-    //TODO This needs to be fleshed out when the UI is completed
-    const categories = getForumStore().get('categories');
-    if(categories && categories[0]) { return categories[0].id; }
   }
 
 });

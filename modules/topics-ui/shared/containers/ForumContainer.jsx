@@ -15,6 +15,8 @@ import titleUpdate from '../action-creators/create-topic/title-update';
 import bodyUpdate from '../action-creators/create-topic/body-update';
 import submitNewTopic from '../action-creators/create-topic/submit-new-topic';
 import navigateToTopic from '../action-creators/topic/navigate-to-topic';
+import categoryUpdate from '../action-creators/create-topic/category-update';
+import tagsUpdate from '../action-creators/create-topic/tags-update'
 
 import * as forumCatConstants from '../constants/forum-categories';
 import * as forumTagConstants from '../constants/forum-tags';
@@ -43,19 +45,16 @@ const ForumContainer = React.createClass({
 
     //Categories ---
     categoryStore: React.PropTypes.shape({
-      models: React.PropTypes.array.isRequired,
       getCategories: React.PropTypes.func.isRequired
     }).isRequired,
 
     //Tags -----
     tagStore: React.PropTypes.shape({
-      models: React.PropTypes.array.isRequired,
       getTags: React.PropTypes.func.isRequired
     }).isRequired,
 
     //Topics
     topicsStore: React.PropTypes.shape({
-      models: React.PropTypes.array.isRequired,
       getTopics: React.PropTypes.func.isRequired
     }).isRequired,
 
@@ -74,7 +73,7 @@ const ForumContainer = React.createClass({
   },
 
   getInitialState(){
-    const { categoryStore, tagStore, topicsStore } = this.props;
+    const { categoryStore, tagStore, topicsStore, newTopicStore } = this.props;
     return {
       categoryName: this.props.categoryName,
       filterName: this.props.filterName,
@@ -84,13 +83,15 @@ const ForumContainer = React.createClass({
       categories: categoryStore.getCategories(),
       tags: tagStore.getTags(),
       topics: topicsStore.getTopics(),
+      newTopic: newTopicStore.getNewTopic(),
     };
   },
 
   componentDidMount(){
-    const { categoryStore, tagStore, router, topicsStore } = this.props;
+    const { categoryStore, tagStore, router, topicsStore, newTopicStore } = this.props;
 
     topicsStore.onChange(this.onTopicsUpdate, this);
+    newTopicStore.onChange(this.onNewTopicUpdate, this);
     topicsStore.on(consts.TOPIC_CREATED, this.onTopicCreated, this);
 
     categoryStore.on(forumCatConstants.UPDATE_ACTIVE_CATEGORY, this.onCategoryUpdate);
@@ -116,8 +117,13 @@ const ForumContainer = React.createClass({
   },
 
   render() {
-    const { categories, categoryName, tags, filterName, tagName, sortName, createTopic, topics } = this.state;
-    const { groupName } = this.props;
+    const { categoryName, tags, filterName, tagName, sortName, createTopic, topics, newTopic } = this.state;
+    const { groupName, categoryStore, tagStore, newTopicStore } = this.props;
+
+    const categories = categoryStore.getCategories();
+    const tagValues = tagStore.pluckValues();
+    const newTopicTags = tagStore.getTagsByLabel(newTopic.tags);
+
     return (
       <main>
         <SearchHeader groupName={groupName}/>
@@ -136,14 +142,20 @@ const ForumContainer = React.createClass({
           tags={tags}
           filterChange={this.onFilterChange}
           sortChange={this.onSortChange}
-          tagChange={this.onTagChange}/>
+          tagChange={this.onTagsChange}/>
 
         <TopicsTable topics={topics} groupName={groupName}/>
 
         <CreateTopicModal
           active={createTopic}
+          newTopic={newTopic}
+          tags={newTopicTags}
+          categories={categoryStore.mapForSelectControl()}
+          tagValues={tagValues}
           onTitleChange={this.onTitleChange}
           onBodyChange={this.onBodyChange}
+          onCategoryChange={this.onCategoryChange}
+          onTagsChange={this.onTopicTagsChange}
           onClose={this.onCreateTopicClose}
           onSubmit={this.onSubmit}/>
 
@@ -154,9 +166,11 @@ const ForumContainer = React.createClass({
   onCategoryClicked(category){ dispatch(navigateToCategory(category));},
   onFilterChange(filter){ dispatch(navigateToFilter(filter));},
   onSortChange(sort) { dispatch(navigateToSort(sort));},
-  onTagChange(tag){ dispatch(navigateToTag(tag));},
+  onTagsChange(tag){ dispatch(navigateToTag(tag));},
   onTitleChange(title){ dispatch(titleUpdate(title));},
   onBodyChange(body){ dispatch(bodyUpdate(body));},
+  onCategoryChange(id) { dispatch(categoryUpdate(id));},
+  onTopicTagsChange(tags) { dispatch(tagsUpdate(tags)); },
 
   onCreateTopicClose(){
     const {categoryStore} = this.props;
@@ -167,8 +181,10 @@ const ForumContainer = React.createClass({
     const {newTopicStore} = this.props;
     dispatch(submitNewTopic(
       newTopicStore.get('title'),
-      newTopicStore.get('body'))
-    );
+      newTopicStore.get('body'),
+      newTopicStore.get('categoryId'),
+      newTopicStore.get('tags')
+    ));
   },
 
   onTopicCreated(data){
@@ -216,7 +232,15 @@ const ForumContainer = React.createClass({
     this.setState((state) => Object.assign(state, {
       topics: topicsStore.getTopics(),
     }))
-  }
+  },
+
+  onNewTopicUpdate(){
+    const {newTopicStore} = this.props;
+    this.setState((state) => Object.assign(state, {
+      newTopic: newTopicStore.getNewTopic(),
+    }));
+  },
+
 
 });
 
