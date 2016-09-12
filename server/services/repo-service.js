@@ -5,20 +5,12 @@ var GithubRepo = require('gitter-web-github').GitHubRepoService;
 var securityDescriptorFinder = require('gitter-web-permissions/lib/security-descriptor/finder');
 var isGitHubUser = require('gitter-web-identity/lib/is-github-user');
 
-function applyFilters(array, filters) {
-  // Filter out what needs filtering out
-  return filters.reduce(function(memo, filter) {
-      return memo.filter(filter);
-    }, array);
-}
-
 /**
  * Gets a list of repos for a user
  * @returns The promise of a list of repos for the user
  */
 function getReposForUser(user, options) {
   if(!options) options = {};
-  var adminAccessOnly = 'adminAccessOnly' in options ? options.adminAccessOnly : false;
 
   // TODO: Move this (saving Twitter users from 401 signout (see badCredentialsCheck))
   if(!isGitHubUser(user)) {
@@ -26,21 +18,7 @@ function getReposForUser(user, options) {
   }
 
   var ghRepo = new GithubRepo(user);
-
-  return ghRepo.getAllReposForAuthUser()
-    .then(function(userRepos) {
-      var repoFilters = [];
-
-      if(adminAccessOnly) {
-        repoFilters.push(function(r) { return r.permissions.admin; });
-      }
-
-      // Filter out what needs filtering out
-      var filteredUserRepos = applyFilters(userRepos, repoFilters);
-      filteredUserRepos.sort(function(a,b) { return Date.parse(b.pushed_at) - Date.parse(a.pushed_at); });
-
-      return filteredUserRepos;
-    });
+  return ghRepo.getAllReposForAuthUser();
 }
 
 /**
