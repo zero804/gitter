@@ -17,7 +17,7 @@ export default React.createClass({
     name: PropTypes.string.isRequired,
     completions: PropTypes.arrayOf(PropTypes.string).isRequired,
     onSubmit: PropTypes.func.isRequired,
-    value: PropTypes.string,
+    value: PropTypes.string.isRequired,
     placeholder: PropTypes.string,
     className: PropTypes.string,
   },
@@ -88,6 +88,10 @@ export default React.createClass({
     e.preventDefault();
     const {completions} = this.state;
     const activeCompletion = _.find(completions, (c) => c.active);
+
+
+    //Bail if nothing is active
+    if(!activeCompletion) { return; }
     const value = activeCompletion.value;
     this.submit(value);
   },
