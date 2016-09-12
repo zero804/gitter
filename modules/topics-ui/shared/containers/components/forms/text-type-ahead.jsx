@@ -23,13 +23,16 @@ export default React.createClass({
   },
 
   getInitialState(){
+    const completions =
+    this.props.completions.map((c) => ({
+      value: c,
+      active: false
+    }));
     return {
       value: this.props.value,
       shouldShowTypeAhead: true,
-      completions: this.props.completions.map((c) => ({
-        value: c,
-        active: false
-      })),
+      activeCompletions: completions,
+      allCompletions: completions,
     };
   },
 
@@ -58,18 +61,17 @@ export default React.createClass({
     if(!shouldShowTypeAhead) { return; }
     if(!value || !value.length) { return; }
 
-    const { completions } = this.state;
-    const matchingCompletions = completions.filter((c) => fuzzysearch(value, c.value));
-    if(!matchingCompletions.length) { return; }
+    const { activeCompletions } = this.state;
+    if(!activeCompletions.length) { return; }
 
     return (
       <ul className="type-ahead">
-      {matchingCompletions.map((completion, i) => {
+      {activeCompletions.map((completion, i) => {
         const className = completion.active ? 'type-ahead__child--active' : 'type-ahead__child'
         return (
           <li
           key={`type-ahead-${completion.value}-${i}`}
-          onClick={this.onItemClicked}
+          onMouseDown={this.onItemClicked.bind(this, completion)}
           onMouseOver={this.clearActiveCompletions}
           className={className}>
           {completion.value}
@@ -85,14 +87,20 @@ export default React.createClass({
     if(e.keyCode === DOWN_KEY) { return this.cycleCompletions(1); }
 
     if(e.keyCode !== ENTER_KEY && e.keyCode !== TAB_KEY) { return; }
-    const {value} = this.state;
     e.preventDefault();
+    const {activeCompletions} = this.state;
+    const activeCompletion = _.find(activeCompletions, (c) => c.active);
+
+
+    //Bail if nothing is active
+    if(!activeCompletion) { return; }
+    const value = activeCompletion.value;
     this.submit(value);
   },
 
-  onItemClicked(e){
+  onItemClicked(completion, e){
     e.preventDefault();
-    this.submit(e.target.value);
+    this.submit(completion.value);
   },
 
   submit(val){
@@ -105,35 +113,36 @@ export default React.createClass({
   onInputChange(val){
     this.setState((state) => Object.assign(state, {
       value: val,
+      activeCompletions: state.allCompletions.filter((c) => fuzzysearch(val, c.value)),
     }));
   },
 
   cycleCompletions(dir){
-    const {completions} = this.state;
-    const activeCompletion = _.find(completions, (c) => c.active);
+    const {activeCompletions} = this.state;
+    const activeCompletion = _.find(activeCompletions, (c) => c.active);
 
     //clear active completion
-    let index = completions.indexOf(activeCompletion);
+    let index = activeCompletions.indexOf(activeCompletion);
 
     //In the case nothing is selected an we are moving backwards
     //we select the last item in the list (0 + -1)
     if(index === -1 && dir === -1) { index = 0; }
 
-    const nextIndex = arrayBoundWrap(index + dir, completions.length);
+    const nextIndex = arrayBoundWrap(index + dir, activeCompletions.length);
 
-    const newCompletions = completions.map((c, i) => Object.assign(c, {
+    const newCompletions = activeCompletions.map((c, i) => Object.assign(c, {
       active: (i === nextIndex),
     }))
 
     this.setState((state) => Object.assign(state, {
-      completions: newCompletions,
+      activeCompletions: newCompletions,
     }));
   },
 
   clearActiveCompletions(){
-    const {completions} = this.state;
+    const {activeCompletions} = this.state;
     this.setState((state) => Object.assign(state, {
-      completions: completions.map((c) => Object.assign(c, {
+      activeCompletions: activeCompletions.map((c) => Object.assign(c, {
         active: false,
       })),
     }));

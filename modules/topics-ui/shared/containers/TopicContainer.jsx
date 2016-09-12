@@ -18,7 +18,6 @@ const TopicContainer = createClass({
     groupName: PropTypes.string.isRequired,
 
     topicsStore: PropTypes.shape({
-      models: PropTypes.array.isRequired,
       getById: PropTypes.func.isRequired,
     }).isRequired,
 
@@ -75,6 +74,7 @@ const TopicContainer = createClass({
     const topicCategory = topic.category;
     const category = categoryStore.getById(topicCategory.id);
 
+
     //TODO remove
     //This is here because sometimes you can get un-parsed tags
     //we need to hydrate the client stores with the raw SS data
@@ -101,7 +101,7 @@ const TopicContainer = createClass({
           user={currentUser}
           value={newReplyContent}
           onChange={this.onEditorUpdate}
-          onEnter={this.onEditorSubmit}/>
+          onSubmit={this.onEditorSubmit}/>
       </main>
     );
   },

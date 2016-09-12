@@ -29,7 +29,9 @@ describe('NewTopicStore', () => {
   });
 
   it('should update the tags when the right action is fired', () => {
-    dispatch(tagsUpdate(['1', '2', '3']));
+    dispatch(tagsUpdate('1'));
+    dispatch(tagsUpdate('2'));
+    dispatch(tagsUpdate('3'));
     deepEqual(store.get('tags'), ['1', '2', '3']);
   });
 

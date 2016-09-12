@@ -123,6 +123,24 @@ describe('mongo-utils', function() {
       ];
 
       FIXTURES.forEach(function(fixture, index) {
+
+        /****************************************************
+         * Note to the reader:
+         * If you are here because of a broken test, please
+         * read on....
+         *****************************************************
+         * This test ensures that mongo.ObjectID.equals works
+         * as expected. However, if, after a shrinkwrap this
+         * stops working, the most likely reason is that
+         * mongoose has started using a new version of the
+         * mongodb than what we're using the base package.json
+         *
+         * To fix the problem:
+         * Update the mongodb dependency to match the
+         * one being used by mongoose, and also
+         * make sure that all submodules that depend on
+         * mongodb are also updated
+         */
         it('should handle case #' + index, function() {
           var a = new fixture.A.ObjectID('571f97883f33e1a227b8ab85');
           var b = new fixture.B.ObjectID('571f97883f33e1a227b8ab85');

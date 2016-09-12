@@ -15,6 +15,10 @@ export default React.createClass({
     placeholder: PropTypes.string,
   },
 
+  onComponentDidMount(){
+
+  },
+
   render(){
 
     const { className, name, value, placeholder } = this.props;
@@ -22,6 +26,7 @@ export default React.createClass({
 
     return (
       <textarea
+        ref="editor"
         className={compiledClass}
         name={name}
         value={value}

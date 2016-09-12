@@ -19,24 +19,12 @@ describe('<TopicReplyListItem/>', () => {
     equal(wrapper.find('article').length, 1);
   });
 
-  it('should render a header', () => {
-    equal(wrapper.find('header').length, 1);
-  });
-
   it('should render a topic-reply-lite-item class', () => {
     equal(wrapper.find('.topic-reply-list-item').length, 1);
   });
 
-  it('should render a topic-reply-lite-item__header class', () => {
-    equal(wrapper.find('.topic-reply-list-item__header').length, 1);
-  });
-
   it('should render a UserAvatar', () => {
     equal(wrapper.find('UserAvatar').length, 1);
-  });
-
-  it('should render a section', () => {
-    equal(wrapper.find('section').length, 1);
   });
 
   it('should render a footer', () => {

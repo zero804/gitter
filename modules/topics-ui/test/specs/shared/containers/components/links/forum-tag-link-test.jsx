@@ -14,7 +14,7 @@ describe('<ForumTagLink/>', () => {
   beforeEach(() => {
     wrapper = shallow(
       <ForumTagLink
-        tag={{ value: 'tag', name: 'Tag' }}
+        tag={{ value: 'tag', label: 'Tag' }}
         groupName="gitterHQ"
         className="test">
           Link

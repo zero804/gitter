@@ -20,10 +20,14 @@ export default React.createClass({
     return (
       <Container className="container--topic-body">
         <Panel className="panel--topic-body">
-          <div
+          <section
             className="topic-body__content"
             dangerouslySetInnerHTML={{ __html: topic.body.html}}>
-          </div>
+          </section>
+          <footer className="topic-body__footer">
+            <button className="topic-body__footer__action">Share</button>
+            <button className="topic-body__footer__action">Watch</button>
+          </footer>
         </Panel>
       </Container>
     );
