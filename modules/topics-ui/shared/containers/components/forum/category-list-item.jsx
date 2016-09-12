@@ -6,8 +6,6 @@ export default createClass({
   propTypes: {
     groupName: PropTypes.string.isRequired,
     category: PropTypes.shape({
-      category: PropTypes.string.isRequired,
-      slug: PropTypes.string.isRequired,
       active: PropTypes.bool.isRequired,
     }).isRequired,
   },
