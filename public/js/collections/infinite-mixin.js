@@ -81,12 +81,12 @@ module.exports = (function() {
 
           if(callback) callback.call(context);
 
-          self.currentFetchCount -= 1;
+          self._currentFetchCount -= 1;
         },
         error: function (err) {
           self.trigger('fetch:latest:complete');
           if (callback) callback.call(context || null, err);
-          self.currentFetchCount -= 1;
+          self._currentFetchCount -= 1;
         }
       });
 
@@ -125,12 +125,12 @@ module.exports = (function() {
           self.trimBottom();
 
           if(callback) callback.call(context);
-          self.currentFetchCount -= 1;
+          self._currentFetchCount -= 1;
         },
         error: function(err) {
           self.trigger('fetch:before:complete');
           if(callback) callback.call(err);
-          self.currentFetchCount -= 1;
+          self._currentFetchCount -= 1;
         }
       });
     },
@@ -167,12 +167,12 @@ module.exports = (function() {
           self.trimTop();
 
           if(callback) callback.call(context);
-          self.currentFetchCount -= 1;
+          self._currentFetchCount -= 1;
         },
         error: function(err) {
           self.trigger('fetch:after:completed');
           if(callback) callback.call(err);
-          self.currentFetchCount -= 1;
+          self._currentFetchCount -= 1;
         }
       });
     },
@@ -224,12 +224,12 @@ module.exports = (function() {
           self.trimBottom();
 
           if(callback) callback.call(context);
-          self.currentFetchCount -= 1;
+          self._currentFetchCount -= 1;
         },
         error: function(err) {
           self.trigger('fetch:at:complete');
           if(callback) callback.call(err);
-          self.currentFetchCount -= 1;
+          self._currentFetchCount -= 1;
         }
       });
     },

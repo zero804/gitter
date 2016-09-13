@@ -12,8 +12,7 @@ var mkdir = Promise.promisify(temp.mkdir);
 var onMongoConnect = require('../../server/utils/on-mongo-connect');
 var userService = require('../../server/services/user-service');
 var chatService = require('../../server/services/chat-service');
-var client = require('../../server/utils/elasticsearch-client');
-
+var chatsForUserSearch = require('gitter-web-elasticsearch/lib/chats-for-user-search');
 
 var opts = require('yargs')
   .option('username', {
@@ -48,50 +47,19 @@ if(opts.dry) {
   console.log('Dry-run: nothing will be deleted/saved');
 }
 
-
-var getUser = onMongoConnect()
+var clearMessages = onMongoConnect()
   .then(function() {
     return userService.findByUsername(opts.username);
-  });
-
-var getQuery = getUser.then(function(user) {
+  })
+  .then(function(user) {
     if(!user) {
       console.error('Could not find user with', opts.username);
       return;
     }
 
-    var queryRequest = {
-      timeout: 500,
-      index: 'gitter-primary',
-      type: 'chat',
-      body: {
-        query: {
-          "bool": {
-            "must": [
-              {
-                "term": {
-                  "fromUserId": user.id
-                }
-              }
-            ],
-            "must_not": [],
-            "should": []
-          }
-        },
-        "from": 0,
-        "size": opts.limit,
-        "sort": [],
-        "aggs": {}
-      }
-    };
-
-    return queryRequest;
-  });
-
-
-
-var clearMessages = getQuery.then(function(queryRequest) {
-    return Promise.resolve(client.search(queryRequest))
+    return chatsForUserSearch.searchChatsForUserId(user.id, {
+      limit: opts.limit
+    });
   })
   .then(function(response) {
     var hits = (response && response.hits && response.hits.hits) ? response.hits.hits : [];
