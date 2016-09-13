@@ -3,10 +3,9 @@
 'use strict';
 
 var shutdown = require('shutdown');
+var onMongoConnect = require('../../server/utils/on-mongo-connect');
 var persistence = require('gitter-web-persistence');
 var uriLookupService = require('../../server/services/uri-lookup-service');
-
-
 
 var readline = require('readline');
 var Promise = require('bluebird');
@@ -60,22 +59,19 @@ function confirm() {
   });
 }
 
-persistence.Group.find({ lcUri: lcOld })
-  .exec()
+onMongoConnect()
+  .then(function() {
+    return persistence.Group.findOne({ lcUri: lcOld }).exec();
+  })
   .then(function(group) {
     if(!group) {
       throw new Error('Group not found');
     }
 
-    console.log('Group', group);
-
     return persistence.Troupe.find({ groupId: group._id })
       .exec()
       .then(function(rooms) {
-        console.log('rooms', rooms);
-
         var newUris = rooms.map(function(f) {
-
           return mapUri(f.uri, opts.old, opts.new);
         });
 
@@ -97,6 +93,7 @@ persistence.Group.find({ lcUri: lcOld })
             group.name = opts.new;
             group.uri = opts.new;
             group.lcUri = lcNew;
+            // Assumes the new name is also the org name
             if(group.sd.type === 'GH_ORG') {
               group.sd.linkPath = opts.new;
             }
@@ -131,7 +128,6 @@ persistence.Group.find({ lcUri: lcOld })
 
       });
   })
-
 
   .delay(2000)
   .then(function() {
