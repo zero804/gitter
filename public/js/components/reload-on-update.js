@@ -10,20 +10,20 @@ var clientEnv = require('gitter-client-env');
 var currentVersion = clientEnv['version'];
 var debug = require('debug-proxy')('app:reload-on-update');
 var frameUtils = require('../utils/frame-utils');
+var ConditionalDebouncer = require('../utils/conditional-debouncer');
 var eyeballsDetector = require('./eyeballs-detector');
 
 var RELOAD_COUNTDOWN_TIMER = 15 * 60 * 1000; /* 15 minutes */
 var TIME_BEFORE_RELOAD = 2 * 60 * 1000; /* 2 minutes */
 
-var awaitingReloadOpportunity = false;
 var reloadCountdownTimer;
-var reloadTimer = null;
-var isOnline = true;
+var reloadListener;
 
 /**
  * Reload now
  */
 function reloadNow() {
+  debug("The time has come. To say fair's fair. To pay the rent. To pay our share.");
   if (frameUtils.hasParentFrameSameOrigin()) {
     window.parent.location.reload(true);
   } else {
@@ -32,80 +32,88 @@ function reloadNow() {
 }
 
 /**
- * Is now a good time to reload?
+ * The reload listener listens to all the things that could
+ * cancel a reload and postpones the reload until all conditions are
+ * go
  */
-function checkReloadOpportunity() {
-  if (!awaitingReloadOpportunity) return;
+function ReloadListener() {
+  this.onlineChangeBound = this.onlineChange.bind(this);
+  this.eyeballsChangeBound = this.eyeballsChange.bind(this);
 
-  if (isOnline && !eyeballsDetector.getEyeballs()) {
-    /* Give the user 10 more seconds */
-    if (!reloadTimer) {
-      reloadTimer = setTimeout(reloadNow, TIME_BEFORE_RELOAD);
+  this.listen();
+}
+
+ReloadListener.prototype = {
+  listen: function() {
+    var conditions = {
+      eyeballsOff: !eyeballsDetector.getEyeballs()
+    };
+
+    // If the browser supports onLine...
+    if (Navigator.prototype.hasOwnProperty('onLine')) {
+      conditions.online = window.navigator.onLine;
+      window.addEventListener('online', this.onlineChangeBound);
+      window.addEventListener('offline', this.onlineChangeBound);
     }
-  } else {
-    delayReload();
+
+    eyeballsDetector.events.on('change', this.eyeballsChangeBound);
+
+    this.conditionalDebouncer = new ConditionalDebouncer(conditions, TIME_BEFORE_RELOAD, reloadNow);
+  },
+
+  onlineChange: function(e) {
+    if (!this.conditionalDebouncer) return;
+    var isOnline = e.type === 'online';
+    this.conditionalDebouncer.set('online', isOnline);
+  },
+
+  eyeballsChange: function(eyeballsStatus) {
+    if (!this.conditionalDebouncer) return;
+    this.conditionalDebouncer.set('eyeballsOff', !eyeballsStatus);
+  },
+
+  destroy: function() {
+    this.conditionalDebouncer.cancel();
+    this.conditionalDebouncer = null;
+
+    if (Navigator.prototype.hasOwnProperty('onLine')) {
+      window.removeEventListener('online', this.onlineChangeBound);
+      window.removeEventListener('offline', this.onlineChangeBound);
+    }
+
+    eyeballsDetector.events.off('change', this.eyeballsChangeBound);
   }
 }
 
-/* User went offline or eyeballs on, wait some more */
-function delayReload() {
-  clearTimeout(reloadTimer);
-  reloadTimer = null;
-}
-
-/**
- * Countdown timer has completed. Await for any opportunity to
- * reload the browser, when the user is eyeballs off but
- * connected to the internet (we don't want the reload to fail)
- */
-function awaitReloadOpportunity() {
-  if (awaitingReloadOpportunity) return;
-  awaitingReloadOpportunity = true;
-  checkReloadOpportunity();
-}
-
-
-var listenersInstalled = false;
-function installListeners() {
-  if (listenersInstalled) return;
-
-  /**
-   * Fired when the browser status changes
-   */
-  function updateOnlineStatus(e) {
-    isOnline = e.type === 'online';
-    checkReloadOpportunity();
-  }
-
-  eyeballsDetector.events.on('change', function() {
-    checkReloadOpportunity();
-  });
-
-  window.addEventListener('online', updateOnlineStatus);
-  window.addEventListener('offline', updateOnlineStatus);
-
-  listenersInstalled = true;
-}
 
 /**
  * Wait for a timeout before forcing the user to upgrade
  */
 function startReloadTimer() {
-  if (reloadCountdownTimer) return;
+  if (reloadCountdownTimer || reloadListener) return;
   debug('Application version mismatch');
 
-  installListeners();
-
-  reloadCountdownTimer = window.setTimeout(awaitReloadOpportunity, RELOAD_COUNTDOWN_TIMER);
+  // Ensure that the deployment has definitely completely before
+  // we start trying to reload
+  reloadCountdownTimer = setTimeout(function() {
+    if (reloadListener) return;
+    reloadListener = new ReloadListener();
+  }, RELOAD_COUNTDOWN_TIMER);
 }
 
 /**
  * Cancel the reload countdown
  */
 function cancelReload() {
-  if (!reloadCountdownTimer) return
-  window.clearTimeout(reloadCountdownTimer);
-  reloadCountdownTimer = null;
+  if (reloadCountdownTimer) {
+    clearTimeout(reloadCountdownTimer);
+    reloadCountdownTimer = null;
+  }
+
+  if (reloadListener) {
+    reloadListener.destroy();
+    reloadListener = null;
+  }
 }
 
 function reportServerVersion(version) {
