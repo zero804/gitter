@@ -126,9 +126,6 @@ function validateUserForForumSubscription(options) {
     .then(function(policy) {
       return policy.canRead();
     });
-
-  // TODO: erm. what if the topic (match[2]) isn't in the forum or the reply
-  // (match[3]) isn't in the topic?
 }
 
 function validateUserForTopicSubscription(options) {
