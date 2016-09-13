@@ -69,17 +69,17 @@ return Promise.join(
       registerSnapshotHandler(client, repliesUri);
       client.subscribe(repliesUri, onMessage);
 
-      /*
-      // NOTE: this will be enabled later
       if (opts.reply) {
         var replyId = opts.reply;
-        client.subscribe('/v1/forums/' + forumId + '/topics/' + topicId + '/replies/' + replyId, onMessage);
+        var commentsUri = '/v1/forums/' + forumId + '/topics/' + topicId + '/replies/' + replyId + '/comments';
+        registerSnapshotHandler(client, commentsUri);
+        client.subscribe(commentsUri, onMessage);
       }
-      */
     }
   });
 
 function registerSnapshotHandler(client, uri) {
+  console.log('Listening out for snapshots on ' + uri);
   client.registerSnapshotHandler(uri, {
     getSnapshotStateForChannel: function() {
     },
