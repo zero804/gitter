@@ -81,8 +81,13 @@
           {{! JP 5/1/15
               NANO SCROLLER DOES SUPER WEIRD THINGS WITH Z-INDEXES SO THE FOOTER COMES FIRST }}
           <footer id="panel-footer" class="panel-footer-container"></footer>
+
           <div class="nano-content panel-content">
-            <div id="search-input" class="left-menu-search-root"></div>
+            <div id="left-menu-topics-area" class="left-menu-topics-root">
+              {{{ prerenderView "js/views/menu/room/topics-area/topics-area-view" }}}
+            </div>
+
+            <div id="search-input" class="left-menu-search-root {{#unless hasCategories}}hidden{{/unless}}"></div>
 
             <section id="favourite-collection" class="left-menu-collection">
               <div class="favourite-collection loaded active">

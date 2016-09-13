@@ -8,6 +8,8 @@ var PRERENDERED_VIEWS = [
   "js/views/menu/room/layout/room-menu-layout",
   "js/views/menu/room/primary-collection/primary-collection-item-view",
   "js/views/menu/room/minibar/minibar-item-view",
+  "js/views/menu/room/topics-area/topics-area-view",
+  "js/views/menu/room/topics-area/category-item-view",
 
   //OLD SEARCH
   "js/views/search/tmpl/search-input",
