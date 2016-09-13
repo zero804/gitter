@@ -69,6 +69,20 @@ describe('authorisor', function() {
           expectedError: true
         }]
       }, {
+        name: 'reply comments subscription',
+        meta: {
+          forumId: '57bd75d9a8aefa74c58d9d6c',
+          subscription: "/api/v1/forums/57bd75d9a8aefa74c58d9d6c/topics/57c6e136f388d1e978b8e7d1/replies/57d7d83984cf3beb9c6e6f1a/comments"
+        },
+        tests: [{
+          name: 'has access',
+          canAccessForum: true
+        },{
+          name: 'has no access',
+          canAccessForum: false,
+          expectedError: true
+        }]
+      }, {
         name: 'user subscription (own userId)',
         meta: {
           subscription: "/api/v1/user/53d8a945451e506ad636c9ba"

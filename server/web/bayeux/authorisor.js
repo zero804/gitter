@@ -44,6 +44,10 @@ var routes = [{
     validator: validateUserForForumSubscription,
     populator: populateRepliesCollection
   }, {
+    re: /^\/api\/v1\/forums\/(\w+)\/topics\/(\w+)\/replies\/(\w+)\/comments$/,
+    validator: validateUserForForumSubscription,
+    populator: populateCommentsCollection
+  }, {
     re: /^\/api\/v1\/user\/(\w+)\/(\w+)$/,
     validator: validateUserForUserSubscription,
     populator: populateSubUserCollection
@@ -120,6 +124,9 @@ function validateUserForForumSubscription(options) {
     .then(function(policy) {
       return policy.canRead();
     });
+
+  // TODO: erm. what if the topic (match[2]) isn't in the forum or the reply
+  // (match[3]) isn't in the topic?
 }
 
 // This is only used by the native client. The web client publishes to
@@ -305,6 +312,20 @@ function populateRepliesCollection(options) {
 
   return restful.serializeRepliesForTopicId(topicId)
     .then(dataToSnapshot('forum.replies'));
+}
+
+function populateCommentsCollection(options) {
+  var match = options.match;
+  var forumId = match[1];
+  var topicId = match[2];
+  var replyId = match[3];
+
+  if (!forumId || !topicId || replyId) {
+    return Promise.resolve();
+  }
+
+  return restful.serializeCommentsForReplyId(replyId)
+    .then(dataToSnapshot('forum.comments'));
 }
 
 // Authorize a sbscription message
