@@ -98,7 +98,6 @@ function messageHandler(uri) {
   return function onMessage(message) {
     console.log(uri, message);
     if (message && message.model && message.model.lastModified) {
-      // why you log {}?
       console.log("lastModified: " + message.model.lastModified);
     }
   }
