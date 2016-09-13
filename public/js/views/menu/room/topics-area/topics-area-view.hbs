@@ -1,0 +1,9 @@
+<h2 class="collection__title">
+  Topics
+</h2>
+
+<div class="collection-list js-left-menu-topics-category-list">
+  {{#each forum.categories}}
+    {{{ prerenderView "js/views/menu/room/topics-area/category-item-view" }}}
+  {{/each}}
+</div>

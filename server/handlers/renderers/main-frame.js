@@ -7,6 +7,7 @@ var statsd = env.createStatsClient({ prefix: nconf.get('stats:statsd:prefix')});
 var Promise = require('bluebird');
 var contextGenerator = require('../../web/context-generator');
 var restful = require('../../services/restful');
+var forumCategoryService = require('gitter-web-topics').forumCategoryService;
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var roomSort = require('gitter-realtime-client/lib/sorts-filters').pojo; /* <-- Don't use the default export
                                                                                           will bring in tons of client-side
@@ -21,25 +22,24 @@ function renderMainFrame(req, res, next, options) {
   var socialMetadataGenerator = options.socialMetadataGenerator;
   var selectedRoomId = req.troupe && req.troupe.id;
 
-  Promise.all([
-      contextGenerator.generateNonChatContext(req),
-      restful.serializeTroupesForUser(userId),
-      restful.serializeOrgsForUserId(userId).catch(function(err) {
-        // Workaround for GitHub outage
-        winston.error('Failed to serialize orgs:' + err, { exception: err });
-        return [];
-      }),
-      restful.serializeGroupsForUserId(userId),
+  contextGenerator.generateNonChatContext(req)
+    .then(function(troupeContext) {
+      var forumId = troupeContext.troupe && troupeContext.troupe.group && troupeContext.troupe.group.forumId;
 
-    ])
-    .spread(function (troupeContext, rooms, orgs, groups) {
-      // Generate social metadata if any
-      return [
-        troupeContext, rooms, orgs, groups,
-        socialMetadataGenerator && socialMetadataGenerator(troupeContext)
-      ]
+      return Promise.all([
+          troupeContext,
+          restful.serializeTroupesForUser(userId),
+          restful.serializeOrgsForUserId(userId).catch(function(err) {
+            // Workaround for GitHub outage
+            winston.error('Failed to serialize orgs:' + err, { exception: err });
+            return [];
+          }),
+          restful.serializeGroupsForUserId(userId),
+          socialMetadataGenerator && socialMetadataGenerator(troupeContext),
+          forumCategoryService.findByForumId(forumId)
+        ]);
     })
-    .spread(function(troupeContext, rooms, orgs, groups, socialMetadata) {
+    .spread(function(troupeContext, rooms, orgs, groups, socialMetadata, forumCategories) {
       var chatAppLocation = options.subFrameLocation;
 
       var template, bootScriptName;
@@ -54,7 +54,8 @@ function renderMainFrame(req, res, next, options) {
 
       var hasNewLeftMenu = !req.isPhone && req.fflip && req.fflip.has('left-menu');
       var extras = {
-        suggestedMenuState: options.suggestedMenuState
+        suggestedMenuState: options.suggestedMenuState,
+        forumCategories: forumCategories
       };
 
       var snapshots = troupeContext.snapshots = generateMainFrameSnapshots(req, troupeContext, rooms, groups, extras);
@@ -93,6 +94,7 @@ function renderMainFrame(req, res, next, options) {
         cssFileName:            "styles/" + bootScriptName + ".css",
         troupeName:             options.title,
         troupeContext:          troupeContext,
+        forum:                  snapshots.forum,
         chatAppLocation:        chatAppLocation,
         agent:                  req.headers['user-agent'],
         subresources:           getSubResources(bootScriptName),

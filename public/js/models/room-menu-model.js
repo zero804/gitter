@@ -19,6 +19,7 @@ var SuggestedRoomsByGroupName = require('../collections/org-suggested-rooms-by-n
 var UserSuggestions = require('../collections/user-suggested-rooms');
 var SearchRoomPeopleCollection = require('../collections/left-menu-search-rooms-and-people');
 var SearchChatMessages = require('../collections/search-chat-messages');
+var ForumCategoryCollection = require('../collections/forum-category-collection');
 
 var FavouriteCollectionModel = require('../views/menu/room/favourite-collection/favourite-collection-model');
 var PrimaryCollectionModel = require('../views/menu/room/primary-collection/primary-collection-model');
@@ -177,6 +178,11 @@ module.exports = Backbone.Model.extend({
     });
 
     this.searchFocusModel = new Backbone.Model({ focus: false });
+
+    this.forumCategoryCollection = new ForumCategoryCollection(null, {
+      roomMenuModel: this,
+      groupsCollection: this.groupsCollection
+    });
 
     this.listenTo(this.primaryCollection, 'snapshot', this.onPrimaryCollectionSnapshot, this);
     this.snapshotTimeout = setTimeout(function(){
