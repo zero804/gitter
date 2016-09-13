@@ -1,8 +1,8 @@
 "use strict";
 
-var client = require('../utils/elasticsearch-client');
-var Promise = require('bluebird');
+var client = require('./elasticsearch-client');
 var assert = require('assert');
+var Promise = require('bluebird');
 
 /**
  * returns heatmap to be used by cal-heatmap https://kamisama.github.io/cal-heatmap/#data-format
@@ -11,7 +11,7 @@ var assert = require('assert');
  *
  * startMonth and endMonth are optional, limits heatmap for archive nav view.
  */
-exports.getHeatmapForRoom = function(roomId, startMonth, endMonth, tz) {
+function getHeatmapForRoom(roomId, startMonth, endMonth, tz) {
   assert(roomId, 'roomId required');
 
   tz = '' + (tz || '0:00');
@@ -71,4 +71,8 @@ exports.getHeatmapForRoom = function(roomId, startMonth, endMonth, tz) {
         return memo;
       }, {});
     });
+}
+
+module.exports = {
+  getHeatmapForRoom: Promise.method(getHeatmapForRoom)
 };
