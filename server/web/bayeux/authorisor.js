@@ -320,7 +320,7 @@ function populateCommentsCollection(options) {
   var topicId = match[2];
   var replyId = match[3];
 
-  if (!forumId || !topicId || replyId) {
+  if (!forumId || !topicId || !replyId) {
     return Promise.resolve();
   }
 
