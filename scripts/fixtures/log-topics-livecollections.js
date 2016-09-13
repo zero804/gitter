@@ -57,23 +57,24 @@ return Promise.join(
     var forumId = forum._id;
 
     // NOTE: this one will be enabled later
-    //client.subscribe('/v1/forums/' + forumId, onMessage);
+    //var forumUrl = '/v1/forums/' + forumId;
+    //client.subscribe(forumUrl, messageHandler(forumUrl));
 
     var topicsUri = '/v1/forums/' + forumId + '/topics';
     registerSnapshotHandler(client, topicsUri);
-    client.subscribe(topicsUri, onMessage);
+    client.subscribe(topicsUri, messageHandler(topicsUri));
 
     if (opts.topic) {
       var topicId = opts.topic;
       var repliesUri = '/v1/forums/' + forumId + '/topics/' + topicId + '/replies';
       registerSnapshotHandler(client, repliesUri);
-      client.subscribe(repliesUri, onMessage);
+      client.subscribe(repliesUri, messageHandler(repliesUri));
 
       if (opts.reply) {
         var replyId = opts.reply;
         var commentsUri = '/v1/forums/' + forumId + '/topics/' + topicId + '/replies/' + replyId + '/comments';
         registerSnapshotHandler(client, commentsUri);
-        client.subscribe(commentsUri, onMessage);
+        client.subscribe(commentsUri, messageHandler(commentsUri));
       }
     }
   });
@@ -93,7 +94,13 @@ function registerSnapshotHandler(client, uri) {
   });
 }
 
-function onMessage(message) {
-  console.log(message);
+function messageHandler(uri) {
+  return function onMessage(message) {
+    console.log(uri, message);
+    if (message && message.model && message.model.lastModified) {
+      // why you log {}?
+      console.log("lastModified: " + message.model.lastModified);
+    }
+  }
 }
 
