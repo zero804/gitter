@@ -72,7 +72,8 @@ describe('replies-live-collection', function() {
           .then(function(reply) {
             // lastModified must now exist and match the one we got in the event.
             assert.ok(reply.lastModified);
-            assert.strictEqual(reply.lastModified.getTime(), event.model.lastModified.getTime());
+            var lastModified = new Date(event.model.lastModified);
+            assert.strictEqual(reply.lastModified.getTime(), lastModified.getTime());
           });
       });
   });
