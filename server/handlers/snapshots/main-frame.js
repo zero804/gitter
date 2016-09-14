@@ -56,7 +56,10 @@ module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, group
     roomMenuIsPinned = lastLeftMenuSnapshot.roomMenuIsPinned;
   }
 
-  var forumCategories = extras.forumCategories;
+  var forumCategories = (extras.forumCategories || []).map(function(category) {
+    category.groupUri = extras.forumGroup && extras.forumGroup.uri;
+    return category;
+  });
 
   return {
     leftMenu: _.extend({}, lastLeftMenuSnapshot, {

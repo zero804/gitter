@@ -3,11 +3,11 @@
 var Marionette = require('backbone.marionette');
 var parseForTemplate = require('gitter-web-shared/parse/forum-category-item');
 
-var itemTemplate = require('./category-item-view.hbs');
-
+var template = require('./category-item-view.hbs');
 
 module.exports = Marionette.ItemView.extend({
-  template: itemTemplate,
+  tagName: 'li',
+  template: template,
 
   initialize: function() {
 

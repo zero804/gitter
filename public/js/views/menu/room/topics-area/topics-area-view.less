@@ -1,8 +1,19 @@
 @import "trp3Vars";
-@import "../../../../../less/components/menu/room/menu-text.less";
+@import (reference) "../../../../../less/components/menu/room/menu-text.less";
 
 .left-menu-forum-category-item {
   .room-menu-text();
-  
-  margin-left: @desktop-menu-left-padding;
+
+  display: block;
+  margin-left: (@desktop-menu-left-padding / 2);
+  margin-right: (@desktop-menu-left-padding / 2);
+  padding-left: (@desktop-menu-left-padding / 2);
+
+  transition: background-color .2s ease;
+
+  &:hover,
+  &:focus {
+    .room-item-active();
+    text-decoration: none;
+  }
 }
