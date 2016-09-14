@@ -29,8 +29,6 @@ var View = Marionette.ItemView.extend({
 
   serializeData: function() {
     return {
-      hasLeftMenuFeature: context.hasFeature('left-menu'),
-
       cmdKey: platformKeys.cmd,
       gitterKey: platformKeys.gitter
     };
