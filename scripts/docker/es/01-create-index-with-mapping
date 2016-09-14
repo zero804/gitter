@@ -21,134 +21,21 @@ if ! curl -q --fail -vi -XGET "$ES_URL/$INDEX_NAME/_settings"; then
 EOD
 fi
 
-sleep 10
+sleep 0.5
 
 ## Update the language analyzers
-curl -q -XPOST "$ES_URL/$INDEX_NAME/_close"
+curl -q --fail -XPOST "$ES_URL/$INDEX_NAME/_close"
 
 for l in $SCRIPT_DIR/languages/*.json; do
   curl -q --fail -vi -XPUT "$ES_URL/$INDEX_NAME/_settings?pretty=true" -d @$l
 done
 
-curl -q -XPOST "$ES_URL/$INDEX_NAME/_open"
+curl -q --fail -XPOST "$ES_URL/$INDEX_NAME/_open"
 
-curl -q --fail -vi -XPUT "$ES_URL/$INDEX_NAME/_mapping/user?pretty=true" -d @- << EOD
-{
-  "user": {
-    "dynamic" : "strict",
-    "properties": {
-      "displayName": {
-        "type": "string",
-        "norms": {
-          "enabled": false
-        }
-      },
-      "username": {
-        "type": "string",
-        "norms": {
-          "enabled": false
-        }
-      }
-    }
-  }
-}
-EOD
+curl --fail -vi -XPUT "$ES_URL/$INDEX_NAME/_mapping/user?pretty=true" -d @"${SCRIPT_DIR}/mappings/user-mapping.json"
 
-curl -q --fail -vi -XPUT "$ES_URL/$INDEX_NAME/_mapping/chat?pretty=true" -d @- << EOD
-{
-  "chat": {
-    "_parent": {
-      "type": "user"
-    },
-    "dynamic" : "strict",
-    "properties": {
-      "text": {
-        "type": "string",
-        "index": "analyzed",
-        "term_vector": "with_positions_offsets",
-        "norms": {
-          "enabled": false
-        }
-      },
-      "lang": {
-        "type": "string",
-        "index": "not_analyzed"
-      },
-      "pub": {
-        "type": "boolean",
-        "index": "not_analyzed"
-      },
-      "sent": {
-        "type": "date"
-      },
-      "toTroupeId": {
-        "type": "string",
-        "index": "not_analyzed"
-      },
-      "fromUserId": {
-        "type": "string",
-        "index": "not_analyzed"
-      },
-      "_analyzer": {
-        "type": "string",
-        "index": "not_analyzed"
-      }
-    }
-  }
-}
-EOD
+curl --fail -vi -XPUT "$ES_URL/$INDEX_NAME/_mapping/chat?pretty=true" -d @"${SCRIPT_DIR}/mappings/chat-mapping.json"
 
-curl -q --fail -vi -XPUT "$ES_URL/$INDEX_NAME/_mapping/room?pretty=true" -d @- << EOD
-{
-  "room": {
-    "dynamic" : "strict",
-    "properties": {
-      "uri": {
-        "type": "string",
-        "index": "analyzed",
-        "term_vector": "with_positions_offsets",
-        "norms": {
-          "enabled": false
-        }
-      },
-      "topic": {
-        "type": "string",
-        "index": "analyzed",
-        "term_vector": "with_positions_offsets",
-        "norms": {
-          "enabled": false
-        }
-      },
-      "tags": {
-        "type": "string",
-        "index": "analyzed",
-        "index_name" : "tag",
-        "norms": {
-          "enabled": false
-        }
-      },
-      "security": {
-        "type": "string",
-        "index": "not_analyzed"
-      },
-      "githubType": {
-        "type": "string",
-        "index": "not_analyzed"
-      },
-      "parentId": {
-        "type": "string",
-        "index": "not_analyzed"
-      },
-      "ownerUserId": {
-        "type": "string",
-        "index": "not_analyzed"
-      },
-      "userCount": {
-        "type" : "integer",
-        "null_value" : 0
-      }
+curl --fail -vi -XPUT "$ES_URL/$INDEX_NAME/_mapping/group?pretty=true" -d @"${SCRIPT_DIR}/mappings/group-mapping.json"
 
-    }
-  }
-}
-EOD
+curl --fail -vi -XPUT "$ES_URL/$INDEX_NAME/_mapping/room?pretty=true" -d @"${SCRIPT_DIR}/mappings/room-mapping.json"
