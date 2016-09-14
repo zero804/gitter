@@ -3,7 +3,6 @@
 var env = require('gitter-web-env');
 var stats = env.stats;
 var Promise = require('bluebird');
-var moment = require('moment');
 var Topic = require('gitter-web-persistence').Topic;
 var Reply = require('gitter-web-persistence').Reply;
 var debug = require('debug')('gitter:app:topics:reply-service');
@@ -118,7 +117,7 @@ function updateRepliesTotal(topicId) {
       return findTotalByTopicId(topicId)
         .then(function(repliesTotal) {
           liveCollections.topics.emit('patch', topic.forumId, topicId, {
-            lastModified: moment(lastModified).toISOString(),
+            lastModified: lastModified.toISOString(),
             repliesTotal: repliesTotal
           })
         });
