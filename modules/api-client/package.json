@@ -1,0 +1,17 @@
+{
+  "name": "gitter-web-api-client",
+  "version": "0.1.0",
+  "description": "",
+  "private": true,
+  "main": "lib/api-client.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "bluebird": "^3.2.1",
+    "debug-proxy": "^0.2.0",
+    "gitter-client-env": "file:../client-env",
+    "jquery": "2.1.0",
+    "lodash": "^3.2.0"
+  }
+}
