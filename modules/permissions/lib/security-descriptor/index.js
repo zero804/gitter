@@ -72,6 +72,19 @@ SecurityDescriptorService.prototype.findByIdAll = function(id) {
     });
 };
 
+SecurityDescriptorService.prototype.findByIdsSelect = function(ids, select) {
+  var projection = {
+    _id: 1,
+  };
+
+  Object.keys(select).forEach(function(key) {
+    projection['sd.' + key] = select[key];
+  })
+
+  return this.Model.find({ _id: { $in: ids } }, projection, { lean: true })
+    .exec();
+};
+
 SecurityDescriptorService.prototype.findExtraAdmins = function findExtraAdminsForModel(id) {
   return this.Model.findById(id, { _id: 0, 'sd.extraAdmins': 1 }, { lean: true })
     .exec()

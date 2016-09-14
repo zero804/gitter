@@ -4,6 +4,8 @@ import React from 'react';
 import { shallow } from 'enzyme';
 import CreateTopicModal from '../../../../../../shared/containers/components/topic/create-topic-modal.jsx';
 import mockEvt from '../../../../../mocks/event';
+import tags from '../../../../../mocks/mock-data/tags';
+import categories from '../../../../../mocks/mock-data/categories';
 
 describe('<CreateTopicModal/>', () => {
 
@@ -12,26 +14,44 @@ describe('<CreateTopicModal/>', () => {
   let submitHandle;
   let titleChangeHandle;
   let bodyChangeHandle;
+  let tagChangeHandle;
+  const newTopic = {
+    title: '',
+    body: '',
+    categoryId: '1',
+    tags: [],
+  }
+
 
   beforeEach(() => {
 
     submitHandle = sinon.spy();
     titleChangeHandle = sinon.spy();
     bodyChangeHandle = sinon.spy();
+    tagChangeHandle = sinon.spy();
 
     wrapper = shallow(
       <CreateTopicModal
-      active={false}
-      onTitleChange={titleChangeHandle}
-      onBodyChange={bodyChangeHandle}
-      onSubmit={submitHandle}/>);
+        newTopic={newTopic}
+        tags={tags}
+        categories={categories}
+        active={false}
+        onTitleChange={titleChangeHandle}
+        onBodyChange={bodyChangeHandle}
+        onSubmit={submitHandle}
+        onTagsChange={tagChangeHandle}/>
+    );
 
     activeWrapper = shallow(
       <CreateTopicModal
-      active={true}
-      onTitleChange={titleChangeHandle}
-      onBodyChange={bodyChangeHandle}
-      onSubmit={submitHandle}/>
+        tags={tags}
+        categories={categories}
+        newTopic={newTopic}
+        active={true}
+        onTitleChange={titleChangeHandle}
+        onBodyChange={bodyChangeHandle}
+        onSubmit={submitHandle}
+        onTagsChange={tagChangeHandle}/>
     );
   });
 
@@ -89,12 +109,12 @@ describe('<CreateTopicModal/>', () => {
   });
 
   it('should call onTitleChange when the input changes', () => {
-    wrapper.find('Input').prop('onChange')();
+    wrapper.find('Input').at(0).prop('onChange')();
     equal(titleChangeHandle.callCount, 1);
   });
 
   it('should call onBodyChange when the textarea changes', () => {
-    wrapper.find('Editor').prop('onChange')();
+    wrapper.find('Editor').at(0).prop('onChange')();
     equal(bodyChangeHandle.callCount, 1);
   });
 

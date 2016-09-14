@@ -12,19 +12,26 @@ export default React.createClass({
     onChange: PropTypes.func,
     onEnter: PropTypes.func,
     value: PropTypes.string,
+    placeholder: PropTypes.string,
+  },
+
+  onComponentDidMount(){
+
   },
 
   render(){
 
-    const { className, name, value } = this.props;
+    const { className, name, value, placeholder } = this.props;
     const compiledClass = classNames('editor', className);
 
     return (
       <textarea
+        ref="editor"
         className={compiledClass}
         name={name}
         value={value}
         onChange={this.onChange}
+        placeholder={placeholder}
         onKeyDown={this.onKeyPressed}>
         { this.props.children }
       </textarea>

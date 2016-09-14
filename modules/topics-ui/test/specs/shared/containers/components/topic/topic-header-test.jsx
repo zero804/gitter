@@ -13,7 +13,11 @@ describe('<TopicHeader/>', () => {
 
   beforeEach(() => {
     wrapper = shallow(
-      <TopicHeader topic={topic} category={category} groupName="gitterHQ"/>
+      <TopicHeader
+        tags={topic.tags}
+        topic={topic}
+        category={category}
+        groupName="gitterHQ"/>
     );
   });
 

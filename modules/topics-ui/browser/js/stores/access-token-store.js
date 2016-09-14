@@ -1,5 +1,4 @@
-import Backbone from 'backbone';
+const serverStore = (window.context.accessTokenStore || {});
+const token = (serverStore.token || '');
 
-export default Backbone.Model.extend({
-  defaults: {}
-});
+export const getAccessToken = () => token;

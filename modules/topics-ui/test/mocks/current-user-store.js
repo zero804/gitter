@@ -2,7 +2,7 @@ import Backbone from 'backbone';
 import data from './mock-data/current-user';
 
 const CurrentUserStore = Backbone.Model.extend({
-  getCurrentUser() { return this.toJSON(); }
+  getCurrentUser() { return data; }
 });
 
 const store = new CurrentUserStore(data);

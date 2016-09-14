@@ -110,7 +110,8 @@ function serializeTroupeId(troupeId, user) {
     includeOwner: true,
     includeProviders: true,
     includeGroups: true,
-    includeBackend: true
+    includeBackend: true,
+    includeAssociatedRepo: true
   });
 
   return restSerializer.serializeObject(troupeId, strategy);
@@ -124,7 +125,8 @@ function serializeTroupe(troupe, user) {
     includeOwner: true,
     includeProviders: true,
     includeGroups: true,
-    includeBackend: true
+    includeBackend: true,
+    includeAssociatedRepo: true
   });
 
   return restSerializer.serializeObject(troupe, strategy);

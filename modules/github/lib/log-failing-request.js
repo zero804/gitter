@@ -1,6 +1,8 @@
 'use strict';
 
-var logger = require('gitter-web-env').logger;
+var env = require('gitter-web-env');
+var logger = env.logger.get('github');
+
 var obfuscateToken = require('./obfuscate-token');
 var _ = require('lodash');
 
@@ -20,8 +22,9 @@ function sanitizeHeaders(headers) {
 
 module.exports = function(options, callback, request) {
   request(options, function(error, response, body) {
-    var statusCode = response && response.statusCode >= 400;
+    var statusCode = response && response.statusCode;
     var loggableStatusCode = statusCode && statusCode >= 400 && statusCode !== 404;
+
     if (error || loggableStatusCode) {
       logger.error("Error while communicating with GitHub", {
         exception: error,

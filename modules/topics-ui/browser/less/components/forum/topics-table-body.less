@@ -1,3 +1,4 @@
+@import "../../colors.less";
 @import (less, reference) "~gitter-styleguide/css/components/headings.css";
 
 .topics-table-body {
@@ -27,4 +28,30 @@
     padding-right: @panel-horiz-padding + @panel-border-width;
   }
 
+}
+
+.topics-table-body__cell--details {
+  .topics-table-body__cell();
+  display: flex;
+}
+
+.topics-table-body__cell__link{
+  color: @dark;
+  text-decoration: none;
+}
+
+.topics-table-body__cell__avatar {
+  margin-right: 1rem;
+  border-radius: .2rem;
+}
+
+.topics-table-body__user-list {
+  display: flex;
+  flex-direction: row-reverse;
+  margin: 0;
+  padding: 0;
+}
+
+.topics-table-body__user-list__item {
+  margin-right: .2rem;
 }

@@ -83,7 +83,7 @@ function renderForum(req, res, next, options) {
 
             categoryStore: forumCategoryStore(forum.categories, categoryName),
             tagStore: forumTagStore(forum.tags, tagName),
-            topicsStore: forumTopicsStore(forum.topics),
+            topicsStore: forumTopicsStore(forum.topics, categoryName, tagName, filterName, sortName, context.user),
             newTopicStore: newTopicStore(),
             forumStore: forumStore(forum),
             accessTokenStore: accessTokenStore(context.accessToken),
@@ -125,12 +125,7 @@ function renderTopic(req, res, next) {
 
                 if (!topic) { return next(new StatusError(404, 'Topic not found.')); }
 
-                var strategy = new restSerializer.TopicStrategy({
-                  includeReplies: true,
-                  includeRepliesTotals: true,
-                  // TODO: we'll probably include a sample of comments on those replies
-                  // down the line.
-                });
+                var strategy = restSerializer.TopicStrategy.full();
                 return restSerializer.serializeObject(topic, strategy);
               })
             .then(function(topic){
@@ -148,7 +143,8 @@ function renderTopic(req, res, next) {
                   accessTokenStore: accessTokenStore(context.accessToken),
                   currentUserStore: currentUserStore(context.user),
                   repliesStore: repliesStore(topic.replies),
-                  categoryStore: forumCategoryStore([topic.category]),
+                  categoryStore: forumCategoryStore(forum.categories),
+                  tagStore: forumTagStore(forum.tags),
                   forumStore: forumStore(forum),
                 }
               });
@@ -156,7 +152,10 @@ function renderTopic(req, res, next) {
 
           });
         })
-    })
+    });
+
+    //TODO Catch some errors
+
 }
 
 module.exports = {

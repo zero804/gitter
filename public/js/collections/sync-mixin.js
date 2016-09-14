@@ -46,7 +46,9 @@ module.exports = {
       promise = promise.catch(options.error); // Backbone will trigger the 'error' event
     }
 
-    model.trigger('request', model, null, options);
+    model.trigger('request', model, null, _.extend({}, options, {
+      method: method
+    }));
     return promise;
   }
 };

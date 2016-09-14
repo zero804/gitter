@@ -2,11 +2,11 @@
 
 var persistence = require('gitter-web-persistence');
 var Promise = require('bluebird');
-var client = require('../utils/elasticsearch-client');
 var collections = require('../utils/collections');
 var _ = require('underscore');
 var userService = require('./user-service');
 var roomMembershipService = require('./room-membership-service');
+var userSearch = require('gitter-web-elasticsearch/lib/user-search');
 
 var LARGE_ROOM_SIZE_THRESHOLD = 200;
 
@@ -80,88 +80,9 @@ function difference(ids, excludeIds) {
   return ids.filter(function(i) { return !o[i]; });
 }
 
-function performQuery(queryText, options) {
-  var queryRequest = {
-    size: options.limit || 10,
-    timeout: 500,
-    index: 'gitter-primary',
-    type: 'user',
-    body: {
-      fields: ["_id"],
-      query: {
-        query_string: {
-          query: queryText,
-          default_operator: "AND"
-        }
-      },
-      sort: [
-        { _score: { order: "desc"} }
-      ],
-    }
-  };
-
-  return client.search(queryRequest).then(elasticResponseToUserIds);
-}
-
-function elasticsearchUserTypeahead(queryText, options) {
-
-  // Normal searches dont work well for typeaheads
-  // e.g searching "maldito" normally wouldnt match malditogeek.
-  // but phrase_prefix handles that.
-  //
-  // Completion Suggester is faster, but requires us to completely
-  // reindex and supply a room context
-
-  options = options || {};
-  var limit = options.limit || 10;
-  var userIds = options.userIds;
-
-  var query = {
-    multi_match: {
-      query: queryText,
-      type: "phrase_prefix",
-      fields: [
-        "username",
-        "displayName"
-      ]
-    }
-  };
-
-  if (userIds) {
-    query = {
-      filtered: {
-        filter: { ids: { values: userIds } },
-        query: query
-      }
-    };
-  }
-
-  var queryRequest = {
-    size: limit,
-    timeout: 500,
-    index: 'gitter-primary',
-    type: 'user',
-    body: {
-      fields: ["_id"],
-      query: query,
-      sort: [
-        { _score: { order: "desc"} }
-      ],
-    }
-  };
-
-  return client.search(queryRequest).then(elasticResponseToUserIds);
-}
-
-function elasticResponseToUserIds(response) {
-  return response.hits.hits.map(function(hit) {
-    return hit._id;
-  });
-}
-
 exports.globalUserSearch = function(queryText, options, callback) {
   options = _.defaults(options, { limit: 5 });
-  return performQuery(queryText, options)
+  return userSearch.searchGlobalUsers(queryText, options)
     .then(function(userIds) {
       if(!userIds || !userIds.length) return [];
       return userService.findByIds(userIds)
@@ -188,7 +109,7 @@ function searchForUsersInSmallRoom(queryText, roomId, options) {
     .then(function(userIds) {
       if (!userIds || !userIds.length) return [];
 
-      return elasticsearchUserTypeahead(queryText, { limit: limit, userIds: userIds });
+      return userSearch.elasticsearchUserTypeahead(queryText, { limit: limit, userIds: userIds });
     })
     .then(function(userIds) {
       return userService.findByIds(userIds)
@@ -212,7 +133,7 @@ function searchForUsersInLargeRoom(queryText, roomId, options) {
 
   // no guarentee that these users are in the room
   // so we get a decent chunk and then filter by membership
-  return elasticsearchUserTypeahead(queryText, { limit: 500 })
+  return userSearch.elasticsearchUserTypeahead(queryText, { limit: 500 })
     .then(function(userIds) {
       return roomMembershipService.findMembershipForUsersInRoom(roomId, userIds);
     })

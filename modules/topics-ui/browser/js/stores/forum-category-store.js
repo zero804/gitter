@@ -1,16 +1,17 @@
 import { Collection, Model } from 'backbone';
 import { UPDATE_ACTIVE_CATEGORY } from '../../../shared/constants/forum-categories';
+import router from '../routers/index';
+import dispatchOnChangeMixin from './mixins/dispatch-on-change';
 
 var CategoryModel = Model.extend({
   defaults: { category: null },
 });
 
-export default Collection.extend({
+export const ForumCategoryStore = Collection.extend({
   model: CategoryModel,
 
-  initialize: function(models, attrs) {
-    this.router = attrs.router;
-    this.listenTo(this.router, 'change:categoryName', this.onCategoryUpdate, this);
+  initialize: function() {
+    this.listenTo(router, 'change:categoryName', this.onCategoryUpdate, this);
   },
 
   getCategories: function() {
@@ -23,9 +24,34 @@ export default Collection.extend({
 
   onCategoryUpdate(model, val){
     this.where({ active: true }).forEach((m) => m.set('active', false));
-    var activeModel = this.findWhere({ category: val });
+    var activeModel = this.findWhere({ slug: val });
     if(activeModel) { activeModel.set('active', true); }
     this.trigger(UPDATE_ACTIVE_CATEGORY);
+  },
+
+  mapForSelectControl(){
+    return this.models.map((m) => ({
+      selected: m.get('active'),
+      label: m.get('category'),
+      value: m.get('id')
+    }))
+  },
+
+  getById(id){
+    const model = this.get(id);
+    if(!model) { return; }
+    return model.toJSON();
   }
 
 });
+
+dispatchOnChangeMixin(ForumCategoryStore);
+
+const serverStore = (window.context.categoryStore || {});
+const serverData = (serverStore.data || []);
+let store;
+export function getForumCategoryStore(data) {
+  if(!store) { store = new ForumCategoryStore(serverData); }
+  if(data) { store.reset(data); }
+  return store;
+}
