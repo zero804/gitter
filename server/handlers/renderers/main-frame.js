@@ -8,6 +8,7 @@ var Promise = require('bluebird');
 var contextGenerator = require('../../web/context-generator');
 var restful = require('../../services/restful');
 var forumCategoryService = require('gitter-web-topics').forumCategoryService;
+var groupService = require('gitter-web-groups');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var roomSort = require('gitter-realtime-client/lib/sorts-filters').pojo; /* <-- Don't use the default export
                                                                                           will bring in tons of client-side
@@ -24,7 +25,16 @@ function renderMainFrame(req, res, next, options) {
 
   contextGenerator.generateNonChatContext(req)
     .then(function(troupeContext) {
-      var forumId = troupeContext.troupe && troupeContext.troupe.group && troupeContext.troupe.group.forumId;
+      var lastLeftMenuSnapshot = (troupeContext.leftRoomMenuState || {});
+      var groupId = (lastLeftMenuSnapshot.groupId || '');
+
+      return Promise.all([
+          troupeContext,
+          groupService.findById(groupId),
+        ]);
+    })
+    .spread(function(troupeContext, forumGroup) {
+      var forumId = forumGroup.forumId;
 
       return Promise.all([
           troupeContext,
@@ -36,10 +46,11 @@ function renderMainFrame(req, res, next, options) {
           }),
           restful.serializeGroupsForUserId(userId),
           socialMetadataGenerator && socialMetadataGenerator(troupeContext),
+          forumGroup,
           forumCategoryService.findByForumId(forumId)
         ]);
     })
-    .spread(function(troupeContext, rooms, orgs, groups, socialMetadata, forumCategories) {
+    .spread(function(troupeContext, rooms, orgs, groups, socialMetadata, forumGroup, forumCategories) {
       var chatAppLocation = options.subFrameLocation;
 
       var template, bootScriptName;
@@ -53,8 +64,10 @@ function renderMainFrame(req, res, next, options) {
       }
 
       var hasNewLeftMenu = !req.isPhone && req.fflip && req.fflip.has('left-menu');
+
       var extras = {
         suggestedMenuState: options.suggestedMenuState,
+        forumGroup: forumGroup,
         forumCategories: forumCategories
       };
 

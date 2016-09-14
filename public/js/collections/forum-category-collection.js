@@ -27,7 +27,10 @@ var ForumCategoryCollection = Backbone.Collection.extend({
       apiClient.get(urlJoin('/v1/forums/', forumId))
         .bind(this)
         .then(function(forum) {
-          this.reset(forum.categories);
+          this.reset(forum.categories.map(function(category) {
+            category.groupUri = group.get('uri');
+            return category;
+          }));
         });
     }
   },
