@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
-import _ from 'lodash';
+import _ from 'underscore';
+import Select from '../forms/select.jsx';
 
 export default React.createClass({
 
@@ -16,30 +17,18 @@ export default React.createClass({
     let defaultVal = null;
     if(activeOption) { defaultVal = activeOption.value; }
 
-
     return (
-      <div className="table-control__select-decal">
-        <select className="table-control__select" onChange={onChange} defaultValue={defaultVal}>
-          {options.map((opt, index) => this.getChildOption(index, opt))}
-        </select>
-      </div>
+      <Select
+        className="table-control__select"
+        options={options}
+        onChange={onChange}
+        defaultValue={defaultVal} />
     );
   },
 
-  getChildOption(index, opts){
-    const { name, value } = opts;
-    return (
-      <option key={`table-control-select-index-${index}`}
-        label={name}
-        value={value}>
-          {name}
-      </option>
-    );
-  },
-
-  onChange(e){
+  onChange(value){
     const { onChange } = this.props;
-    onChange(e.target.value);
+    onChange(value);
   }
 
 })

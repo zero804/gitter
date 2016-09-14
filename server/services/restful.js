@@ -201,6 +201,15 @@ function serializeUnusedReposForUser(user) {
     });
 }
 
+function serializeAdminReposForUser(user) {
+  return repoService.getAdminReposForUser(user)
+    .then(function(repos) {
+      var strategyOptions = { currentUserId: user.id };
+      var strategy = new restSerializer.GithubRepoStrategy(strategyOptions);
+      return restSerializer.serialize(repos, strategy);
+    });
+}
+
 function serializeProfileForUsername(username) {
   return userService.findByUsername(username)
     .then(function(user) {
@@ -269,11 +278,7 @@ function serializeTopicsForForumId(forumId) {
   // TODO: return a sample set, not all of them
   return topicService.findByForumId(forumId)
     .then(function(topics) {
-      var strategy = new restSerializer.TopicStrategy({
-        // again: _some_ replies, not all of them
-        includeReplies: true,
-        includeRepliesTotals: true,
-      });
+      var strategy = restSerializer.TopicStrategy.full();
       return restSerializer.serialize(topics, strategy);
     });
 }
@@ -303,6 +308,7 @@ module.exports = {
   serializeUnusedOrgsForUser: serializeUnusedOrgsForUser,
   serializeReposForUser: serializeReposForUser,
   serializeUnusedReposForUser: serializeUnusedReposForUser,
+  serializeAdminReposForUser: serializeAdminReposForUser,
   serializeProfileForUsername: serializeProfileForUsername,
   serializeGroupsForUserId: Promise.method(serializeGroupsForUserId),
   serializeAdminGroupsForUser: Promise.method(serializeAdminGroupsForUser),

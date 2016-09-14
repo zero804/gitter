@@ -1,35 +1,35 @@
-import React from 'react';
+import React, {PropTypes, createClass} from 'react';
+import ForumCategoryLink from '../links/forum-category-link.jsx';
 
-export default React.createClass({
+export default createClass({
   displayName: 'CategoryListItem',
   propTypes: {
-    category: React.PropTypes.string.isRequired,
-    active: React.PropTypes.bool.isRequired,
-    onClick: React.PropTypes.func.isRequired,
-    groupName: React.PropTypes.string.isRequired
+    groupName: PropTypes.string.isRequired,
+    category: PropTypes.shape({
+      active: PropTypes.bool.isRequired,
+    }).isRequired,
   },
 
   shouldComponentUpdate(nextProps) {
-    return this.props.active !== nextProps.active;
+    const {active} = this.props.category;
+    return active !== nextProps.active;
   },
 
   render() {
-    const { groupName, category, active } = this.props;
-    const href = `/${groupName}/topics/categories/${category}`;
-    const title = `${category} topics`;
+    const { category, groupName } = this.props;
+    const {active} = category;
 
     let className = 'category-list__item';
     if(active) { className = 'category-list__item--active'; }
 
     return (
-      <a href={href} title={title} className={ className } onClick={this.onClick}>{ category }</a>
+      <ForumCategoryLink
+        className={className}
+        groupName={groupName}
+        category={category}>
+        {category.category}
+      </ForumCategoryLink>
     );
   },
-
-  onClick(e = { preventDefault: () => {}}) {
-    e.preventDefault();
-    const { onClick, category } = this.props;
-    onClick(category);
-  }
 
 });

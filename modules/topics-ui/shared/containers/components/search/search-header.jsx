@@ -29,7 +29,11 @@ export default React.createClass({
                 Topics
             </ForumCategoryLink>
           </H1>
-          <Input name="Search Topics" onChange={this.onSearchUpdate} className="topic-search__search-input"/>
+          <Input
+            name="Search Topics"
+            placeholder="Search for topics, replies and comments"
+            onChange={this.onSearchUpdate}
+            className="topic-search__search-input"/>
           <CreateTopicLink groupName={groupName} className="topic-search__create-topic-link">
             Create Topic
           </CreateTopicLink>

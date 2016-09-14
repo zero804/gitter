@@ -2,12 +2,11 @@
 
 module.exports = function accessTokenStore(token) {
 
-  //Get data
-  const get = () => token;
+  const getAccessToken = () => token
 
   //Methods
   return {
-    get: get,
-    token: token
+    token: token,
+    getAccessToken: getAccessToken
   };
 };

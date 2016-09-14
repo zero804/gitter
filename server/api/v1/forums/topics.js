@@ -9,7 +9,6 @@ var restSerializer = require('../../../serializers/rest-serializer');
 var restful = require('../../../services/restful');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
-
 function getTopicOptions(body) {
   var title = body.title ? String(body.title) : undefined;
   var slug = body.slug ? String(body.slug) : undefined;
@@ -51,17 +50,8 @@ module.exports = {
 
   show: function(req) {
     var topic = req.topic;
-    var strategy = new restSerializer.TopicStrategy({
-      includeReplies: true,
-      includeRepliesTotals: true,
-    });
+    var strategy = restSerializer.TopicStrategy.full();
     return restSerializer.serializeObject(topic, strategy);
-  },
-
-  load: function(req, id) {
-    if (!mongoUtils.isLikeObjectId(id)) throw new StatusError(400);
-
-    return topicService.findByIdForForum(req.forum._id, id);
   },
 
   create: function(req) {
@@ -90,9 +80,15 @@ module.exports = {
         return forumWithPolicyService.createTopic(category, topicOptions);
       })
       .then(function(topic) {
-        var topicStrategy = new restSerializer.TopicStrategy();
+        var topicStrategy = restSerializer.TopicStrategy.standard();
         return restSerializer.serializeObject(topic, topicStrategy);
       });
+  },
+
+  load: function(req, id) {
+    if (!mongoUtils.isLikeObjectId(id)) throw new StatusError(400);
+
+    return topicService.findByIdForForum(req.forum._id, id);
   },
 
   subresources: {

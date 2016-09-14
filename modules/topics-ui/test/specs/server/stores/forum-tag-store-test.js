@@ -5,37 +5,53 @@ var tagStore = require('../../../../server/stores/forum-tag-store');
 
 describe('ForumStore', () => {
 
-  const tags = [ 1, 2, 3];
-  const parsedTags = [
-    {value: 'all-values', name: 'All values', active: true },
-    {value: 1, name: 1, active: false },
-    {value: 2, name: 2, active: false },
-    {value: 3, name: 3, active: false },
-  ];
+  const tags = [ 'test-1', 'test-2', 'test-3' ];
+  let store;
 
-  it('should return an object with models', () => {
-    assert(tagStore().models);
+  beforeEach(() => store = tagStore(tags));
+
+  it('should return an object with data', () => {
+    assert(store.data);
   });
 
-  it('should return the payload its proved with', () => {
-    assert.equal(tagStore(tags, 1).models.length, parsedTags.length);
+  it('should return a getTags function', () => {
+    assert(store.getTags);
   });
+
+  it('should return a getActiveTagName function', () => {
+    assert(store.getActiveTagName);
+  });
+
 
   it('should add an initial category of all', function(){
-    assert.equal(tagStore(tags).models[0].name, 'All Tags');
+    assert.equal(store.data[0].label, 'All Tags');
   });
 
   it('should assign the correct default active state', () => {
-    assert(tagStore(tags).models[0].active);
+    assert(store.data[0].active);
   });
 
   it('should assign the correct active state when a tag is passed', () => {
-    assert(tagStore(tags, 1).models[1].active);
+    store = tagStore(tags, tags[0])
+    //All tags is added so the index is bumped here bu one
+    assert(store.data[1].active);
   });
 
-  it('should return the same from models and getTags', () => {
-    const store = tagStore(tags, 1);
-    assert.deepEqual(store.getTags(), store.models);
+  it('should return an array of tags by value', () => {
+    const values = [tags[0], tags[1]]
+    const result = store.getTagsByLabel(values);
+
+    assert.equal(result.length, values.length);
+
+    result.forEach((t, i) => {
+      assert.equal(t.label, values[i]);
+      assert(t.value);
+    })
+  });
+
+  it('should return a collection of values from pluckValues', () => {
+    const result = store.pluckValues();
+    assert.deepEqual(result, tags);
   });
 
 });

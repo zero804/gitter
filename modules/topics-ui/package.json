@@ -14,12 +14,14 @@
     "backbone": "1.2.3",
     "classnames": "^2.2.3",
     "lodash": "^4.15.0",
+    "underscore": "^1.8.3",
     "react": "^15.2.1",
     "react-dom": "^15.2.1",
     "sinon": "^1.17.5",
     "moment": "^2.10.3",
     "gitter-realtime-client": "^1.6.1",
     "gitter-web-slugify": "file:../slugify",
+    "fuzzysearch": "^1.0.3",
     "gitter-client-env": "file:../client-env"
   },
   "devDependencies": {
@@ -42,6 +44,7 @@
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
     "gulp-filter": "^4.0.0",
+    "inject-loader": "^2.0.1",
     "jquery": "^3.1.0",
     "jsdom": "^9.4.5",
     "jsdom-global": "^2.1.0",
@@ -56,7 +59,7 @@
     "react-addons-test-utils": "^15.2.1",
     "require-all": "^2.0.0",
     "style-loader": "^0.13.1",
-    "webpack": "^1.13.1",
+    "webpack": "1.12.15",
     "webpack-dev-middleware": "^1.6.1"
   },
   "babel": {

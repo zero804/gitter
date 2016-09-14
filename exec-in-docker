@@ -41,6 +41,8 @@ function finish {
 trap finish EXIT
 
 docker-compose -p "${PROJECT_NAME}" -f docker-compose.internal.yml run --rm mongosetup
+docker-compose -p "${PROJECT_NAME}" -f docker-compose.internal.yml run --rm elasticsearchsetup
+
 docker-compose -p "${PROJECT_NAME}" -f docker-compose.internal.yml run \
     -e "JENKINS_URL=${JENKINS_URL:-}" \
     -e "GIT_COMMIT=${GIT_COMMIT:-}" \

@@ -1070,6 +1070,58 @@ describe('room-membership-service', function() {
       });
 
     });
+
+    describe('findPrivateRoomIdsForUser', function() {
+      var fixture = fixtureLoader.setup({
+        user1: {},
+        user2: {},
+        troupe1: {
+          securityDescriptor: {
+            public: false
+          },
+          users: ['user1']
+        },
+        troupe2: {
+          securityDescriptor: {
+            public: true
+          },
+          users: ['user2', 'user1']
+        },
+        troupe3: {
+          securityDescriptor: {
+            public: false
+          },
+          users: ['user1']
+        }
+      });
+
+      function contains(ids, expectedIds) {
+        return expectedIds.every(function(expectedId) {
+          return ids.some(function(x) {
+            return String(expectedId) === String(x);
+          });
+        });
+      }
+
+      it('should find private rooms', function() {
+        var userId1 = fixture.user1.id;
+
+        return roomMembershipService.findPrivateRoomIdsForUser(userId1)
+          .then(function(roomIds) {
+            assert.strictEqual(roomIds.length, 2);
+            assert(contains(roomIds, [fixture.troupe1.id, fixture.troupe3.id]));
+          });
+      });
+
+      it('should handle users without private rooms', function() {
+        var userId1 = fixture.user2.id;
+
+        return roomMembershipService.findPrivateRoomIdsForUser(userId1)
+          .then(function(roomIds) {
+            assert.deepEqual(roomIds, []);
+          });
+      });
+    })
   });
 
 });
