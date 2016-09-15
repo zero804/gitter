@@ -581,10 +581,13 @@
   margin-bottom: @secondary-input-spacing-bottom;
 
   &:after {
-    position: absolute;
-    right: 0;
-
     content: '';
+
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+
     font-family: 'fontello';
 
     transition: color .2s ease;
