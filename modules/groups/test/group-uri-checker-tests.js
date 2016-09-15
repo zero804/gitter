@@ -28,6 +28,18 @@ describe('group-uri-checker #slow', function() {
       username: fixtureLoader.GITTER_INTEGRATION_COLLAB_USERNAME
     },
     group1: {},
+    group2: {
+      uri: fixtureLoader.GITTER_INTEGRATION_ORG,
+      lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase(),
+      securityDescriptor: {
+        externalId: fixtureLoader.GITTER_INTEGRATION_ORG_ID,
+        linkPath: fixtureLoader.GITTER_INTEGRATION_ORG,
+        public: true,
+        admins: 'GH_ORG_MEMBER',
+        members: 'PUBLIC',
+        type: 'GH_ORG'
+      },
+    },
     troupe1: {}
   });
 
@@ -51,18 +63,31 @@ describe('group-uri-checker #slow', function() {
   });
   */
 
-  it('should not allow creation if a group with that uri exists', function() {
+  it('should not allow creation if a group with that uri already exists', function() {
     return groupUriChecker(fixture.user1, fixture.group1.uri)
       .then(function(info) {
         assert.strictEqual(info.allowCreate, false);
+        assert.strictEqual(info.localUriExists, true);
+      });
+  });
+
+  it('should not allow creation if a group with that uri already exists and pertains to a GitHub org', function() {
+    return groupUriChecker(fixture.user1, fixtureLoader.GITTER_INTEGRATION_ORG)
+      .then(function(info) {
+        assert.strictEqual(info.allowCreate, false);
+        assert.strictEqual(info.localUriExists, true);
       });
   });
 
   it('should allow creation if a gh org with that login exists and the user has admin access', function() {
+    // TODO: How do I ignore group2 at this point?
+    // I need to test with a group associated with the integration org above
+    // And without the group here
     return groupUriChecker(fixture.user1, fixtureLoader.GITTER_INTEGRATION_ORG)
       .then(function(info) {
         assert.strictEqual(info.type, 'GH_ORG');
         assert.strictEqual(info.allowCreate, true);
+        assert.strictEqual(info.localUriExists, false);
       });
   });
 
@@ -72,6 +97,7 @@ describe('group-uri-checker #slow', function() {
       .then(function(info) {
         assert.strictEqual(info.type, null);
         assert.strictEqual(info.allowCreate, true);
+        assert.strictEqual(info.localUriExists, false);
       });
   });
 
@@ -80,6 +106,7 @@ describe('group-uri-checker #slow', function() {
     return groupUriChecker(fixture.user1, fixtureLoader.GITTER_INTEGRATION_USERNAME)
       .then(function(info) {
         assert.strictEqual(info.allowCreate, true);
+        assert.strictEqual(info.localUriExists, false);
       });
   });
 
@@ -87,24 +114,27 @@ describe('group-uri-checker #slow', function() {
     return groupUriChecker(fixture.user2, fixtureLoader.GITTER_INTEGRATION_USERNAME)
       .then(function(info) {
         assert.strictEqual(info.allowCreate, false);
+        assert.strictEqual(info.localUriExists, false);
       });
   });
 
-  it("should allow creation if a user with repo access to a repo for a gh user tries to create a group for that gh user", function() {
+  it("should allow creation if user with repo access to the repo (collaborator)", function() {
     // This is for the jashkenas/backbone case when it has to upsert jashkenas
     // when any contributor for that repo comes along.
     // NOTE that we're passing in obtainAccessFromGitHubRepo
     return groupUriChecker(fixture.user2, fixtureLoader.GITTER_INTEGRATION_USERNAME, fixtureLoader.GITTER_INTEGRATION_REPO_FULL)
       .then(function(info) {
         assert.strictEqual(info.allowCreate, true);
+        assert.strictEqual(info.localUriExists, false);
       });
   });
 
-  it("should not allow creation if a user without repo access to a repo for a gh user tries to create a group for that gh user", function() {
+  it("should not allow creation if user without repo access to the repo", function() {
     // simular to above, this is the case where you DON'T have push access.
     return groupUriChecker(fixture.user2, fixtureLoader.GITTER_INTEGRATION_USERNAME, fixtureLoader.GITTER_INTEGRATION_REPO2_FULL)
       .then(function(info) {
         assert.strictEqual(info.allowCreate, false);
+        assert.strictEqual(info.localUriExists, false);
       });
   });
 });
