@@ -12,6 +12,7 @@
     "debug-proxy": "^0.2.0",
     "gitter-client-env": "file:../client-env",
     "jquery": "2.1.0",
-    "lodash": "^3.2.0"
+    "lodash": "^3.2.0",
+    "url-join": "0.0.1"
   }
 }

@@ -47,8 +47,8 @@
 var Promise = require('bluebird');
 var $ = require('jquery');
 var _ = require('lodash');
-var clientEnv = require('gitter-client-env');
 var debug = require('debug-proxy')('app:api-client');
+var urlJoin = require('url-join');
 
 
 /* @const */
@@ -79,40 +79,22 @@ var OPERATIONS = [
   ['delete', POST_DEFAULTS]
 ];
 
-function makeApiUrl(baseUrlFunction, url) {
-  if(!url) url = '';
-
-  var baseUrl = clientEnv['apiBasePath'];
-
-  if(!baseUrlFunction) {
-    return baseUrl + url;
-  }
-
-  return baseUrl + baseUrlFunction() + url;
-}
-
-function makeWebUrl(baseUrlFunction, url) {
+function makeUrl(baseUrlFunction, url) {
   if(!url) url = '';
 
   if(!baseUrlFunction) {
     return url;
   }
 
-  return baseUrlFunction() + url;
-}
-
-function makeChannel(baseUrlFunction, url) {
-  if(!url) url = '';
-
-  if(!baseUrlFunction) {
-    return url;
-  }
-
-  return baseUrlFunction() + url;
+  return baseUrlFunction()
+    .then(function(baseUrl) {
+      return urlJoin(baseUrl, url);
+    });
 }
 
 function operation(fullUrlFunction, baseUrlFunction, method, defaultOptions, url, data, options) {
   options = _.extend({}, defaultOptions, options);
+  var config = this.config;
 
   // If we're doing a DELETE but have no data, unset the contentType
   if((method === 'delete' || method === 'put') && !data) {
@@ -127,7 +109,9 @@ function operation(fullUrlFunction, baseUrlFunction, method, defaultOptions, url
     dataSerialized = data;
   }
 
-  return this.config.getAccessToken()
+  return Promise.try(function() {
+      return config.getAccessToken();
+    })
     .then(function(accessToken) {
 
       var promise = new Promise(function(resolve, reject) {
@@ -137,8 +121,7 @@ function operation(fullUrlFunction, baseUrlFunction, method, defaultOptions, url
           headers['x-access-token'] = accessToken;
         }
 
-        // TODO: drop jquery `ajax`
-        var fullUrl = fullUrlFunction(baseUrlFunction, url);
+        var getFullUrlPromise = fullUrlFunction(baseUrlFunction, url);
 
         function makeError(jqXhr, textStatus, errorThrown) {
           var json = jqXhr.responseJSON;
@@ -154,39 +137,46 @@ function operation(fullUrlFunction, baseUrlFunction, method, defaultOptions, url
           return e;
         }
 
-        debug('%s: %s', method, fullUrl);
-        $.ajax({
-          url: fullUrl,
-          contentType: options.contentType,
-          dataType: options.dataType,
-          type: method,
-          global: options.global,
-          data: dataSerialized,
-          timeout: options.timeout,
-          async: options.async,
-          headers: headers,
-          success: function(data, textStatus, xhr) {
-            var status = xhr.status;
-            if (status >= 400 && status !== 1223) {
+        getFullUrlPromise.then(function(fullUrl) {
+          debug('%s: %s', method, fullUrl);
+          // TODO: drop jquery `ajax`
+          $.ajax({
+            url: fullUrl,
+            contentType: options.contentType,
+            dataType: options.dataType,
+            type: method,
+            global: options.global,
+            data: dataSerialized,
+            timeout: options.timeout,
+            async: options.async,
+            headers: headers,
+            success: function(data, textStatus, xhr) {
+              var status = xhr.status;
+              if (status >= 400 && status !== 1223) {
 
-              var e = new Error(textStatus);
-              e.status = status;
-              return reject(makeError(xhr, textStatus, 'HTTP Status ' + status));
+                var e = new Error(textStatus);
+                e.status = status;
+                return reject(makeError(xhr, textStatus, 'HTTP Status ' + status));
+              }
+
+              resolve(data);
+            },
+            error: function(xhr, textStatus, errorThrown) {
+              return reject(makeError(xhr, textStatus, errorThrown));
             }
-
-            resolve(data);
-          },
-          error: function(xhr, textStatus, errorThrown) {
-            return reject(makeError(xhr, textStatus, errorThrown));
-          }
+          });
         });
       });
 
       if(options.global) {
         promise.catch(function(err) {
           /* Asyncronously notify */
-          this.config.onApiError(err.status, err.statusText, err.method, err.url);
-        }.bind(this));
+          if(config.onApiError) {
+            config.onApiError(err.status, err.statusText, err.method, err.url);
+          } else {
+            throw err;
+          }
+        });
       }
 
       return promise;
@@ -196,9 +186,17 @@ function operation(fullUrlFunction, baseUrlFunction, method, defaultOptions, url
 
 
 
-function getClient(fullUrlFunction, baseUrlFunction) {
-  baseUrlFunction = baseUrlFunction || function() {
+function getClient(fullUrlFunction, uriFunction) {
+  var config = this.config;
+  uriFunction = Promise.method(uriFunction || function() {
     return '';
+  }).bind(this);
+
+  var baseUrlFunction = function() {
+    return uriFunction()
+      .then(function(uri) {
+        return urlJoin(config.baseUrl, uri);
+      });
   };
 
   return OPERATIONS
@@ -206,47 +204,76 @@ function getClient(fullUrlFunction, baseUrlFunction) {
       var method = descriptor[0];
       var defaultOptions = descriptor[1];
 
-      memo[method] = operation.bind(this, fullUrlFunction, baseUrlFunction.bind(this), method, defaultOptions);
+      memo[method] = operation.bind(this, fullUrlFunction, baseUrlFunction, method, defaultOptions);
       return memo;
     }.bind(this), {
       uri: function(relativeUrl) {
-        return baseUrlFunction() + relativeUrl;
+        return Promise.try(function() {
+            return uriFunction();
+          })
+          .then(function(uri) {
+            return urlJoin(uri, relativeUrl);
+          });
       },
-      url: function(relativeUrl) {
+      url: Promise.method(function(relativeUrl) {
         return fullUrlFunction(baseUrlFunction, relativeUrl);
-      },
-      channel: function(relativeUrl) {
-        return makeChannel(baseUrlFunction, relativeUrl);
-      },
-      channelGenerator: function(relativeUrl) {
+      }),
+      channel: Promise.method(function(relativeUrl) {
+        return makeUrl(baseUrlFunction, relativeUrl);
+      }),
+      // TODO: This needs to be sync for backbone collections, hmmmm
+      // http://stackoverflow.com/q/32998480/796832
+      channelGenerator: Promise.method(function(relativeUrl) {
         return function() {
-          return makeChannel(baseUrlFunction, relativeUrl);
+          return makeUrl(baseUrlFunction, relativeUrl);
         };
-      }
+      })
     });
 }
 
 var client = {
   config: {
-    getAccessToken: function() { return Promise.resolve(); },
-    getUserId: function() { return Promise.resolve(); },
-    getTroupeId: function() { return Promise.resolve(); },
-    onApiError: function() {}
+    baseUrl: '',
+    getAccessToken: null,
+    getUserId: null,
+    getTroupeId: null,
+    onApiError: null
   }
 };
 
-module.exports = _.extend(client, getClient.bind(client)(makeApiUrl), {
-  user: getClient.bind(client)(makeApiUrl, function() {
-    return '/v1/user/' + this.config.getUserId();
-  }),
-  room: getClient.bind(client)(makeApiUrl, function() {
-    return '/v1/rooms/' + this.config.getTroupeId();
-  }),
-  userRoom: getClient.bind(client)(makeApiUrl, function() {
-    return '/v1/user/' + this.config.getUserId() + '/rooms/' + this.config.getTroupeId();
-  }),
-  priv: getClient.bind(client)(makeApiUrl, function() {
-    return '/private';
-  }),
-  web: getClient.bind(client)(makeWebUrl)
+module.exports = _.extend(client, getClient.bind(client)(makeUrl), {
+  user: getClient.bind(client)(makeUrl, function() {
+    var config = this.config;
+    return Promise.try(function() {
+        return config.getUserId();
+      })
+      .then(function(userId) {
+        return urlJoin('/v1/user/', userId);
+      });
+  }.bind(client)),
+  room: getClient.bind(client)(makeUrl, function() {
+    var config = this.config;
+    return Promise.try(function() {
+        return config.getTroupeId();
+      })
+      .then(function(troupeId) {
+        return urlJoin('/v1/rooms/', troupeId);
+      });
+  }.bind(client)),
+  userRoom: getClient.bind(client)(makeUrl, function() {
+    var config = this.config;
+    return Promise.try(function() {
+        return [
+          config.getUserId(),
+          config.getTroupeId()
+        ]
+      })
+      .spread(function(userId, troupeId) {
+        return urlJoin('/v1/user/', userId, '/rooms/', troupeId);
+      });
+  }.bind(client)),
+  priv: getClient.bind(client)(makeUrl, function() {
+    return urlJoin('/private');
+  }.bind(client)),
+  web: getClient.bind(client)(makeUrl)
 });

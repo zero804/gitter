@@ -1,6 +1,7 @@
 'use strict';
 
 var _ = require('lodash');
+var clientEnv = require('gitter-client-env');
 var context = require('./utils/context');
 var appEvents = require('./utils/appevents');
 var apiClient = require('gitter-web-api-client');
@@ -55,6 +56,7 @@ function handleApiError(status, statusText, method, url) {
 
 
 apiClient.config = _.extend(apiClient.config, {
+  baseUrl: clientEnv['apiBasePath'],
   getAccessToken: context.getAccessToken,
   getUserId: context.getUserId,
   getTroupeId: context.getTroupeId,
