@@ -12,7 +12,12 @@ function TopicsForForumStrategy(/*options*/) {
 
 TopicsForForumStrategy.prototype = {
   preload: function(forumIds) {
-    return topicService.findByForumIds(forumIds.toArray())
+    // TODO: filter & sort based on passed in options or defaults
+    var options = {
+      // filter: {}
+      // sort: {}
+    };
+    return topicService.findByForumIds(forumIds.toArray(), options)
       .bind(this)
       .then(function(topics) {
         this.topicsByForum = _.groupBy(topics, 'forumId');
