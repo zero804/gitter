@@ -74,7 +74,7 @@ function buildTopicQuery(forumId, filter) {
   }
 
   // short-circuit if we don't have to lookup anything
-  if (Object.keys(lookups).length == 0) return Promise.resolve(query);
+  if (Object.keys(lookups).length === 0) return Promise.resolve(query);
 
   return Promise.props(lookups)
     .then(function(results) {
