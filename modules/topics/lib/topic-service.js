@@ -2,6 +2,7 @@
 
 var env = require('gitter-web-env');
 var stats = env.stats;
+var assert = require('assert');
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
 var persistence = require('gitter-web-persistence');
@@ -46,8 +47,16 @@ function lookupUserIdForUsername(username) {
     .exec();
 }
 
-function buildTopicQuery(forumId, filter) {
-  var query = { forumId: forumId };
+function buildTopicQuery(forumIds, filter) {
+  assert(forumIds.length > 0);
+
+  var query = {};
+
+  if (forumIds.length === 1) {
+    query.forumId = forumIds[0];
+  } else {
+    query.forumId = { $in: forumIds };
+  }
 
   if (filter.tags) {
     query.tags = { $all: filter.tags };
@@ -65,7 +74,10 @@ function buildTopicQuery(forumId, filter) {
   var lookups = {};
 
   if (filter.category) {
-    lookups.category = lookupCategoryIdForForumAndSlug(forumId, filter.category);
+    // TODO: this only works for one forumId and in theory we could be calling
+    // it with multiple ones when coming via the ForumStrategy, but in that
+    // case filtering by a category probably doesn't make much sense anyway.
+    lookups.category = lookupCategoryIdForForumAndSlug(forumIds[0], filter.category);
   }
 
   if (filter.username) {
@@ -109,7 +121,7 @@ function findByForumId(forumId, options) {
     throw new StatusError(400, 'Sort is invalid.');
   }
 
-  return buildTopicQuery(forumId, filter)
+  return buildTopicQuery([forumId], filter)
     .then(function(query) {
       return Topic.find(query)
         .sort(sort)
@@ -118,12 +130,29 @@ function findByForumId(forumId, options) {
     });
 }
 
-function findByForumIds(ids) {
-  if (!ids.length) return [];
+function findByForumIds(forumIds, options) {
+  if (!forumIds.length) return [];
 
-  return Topic.find({ forumId: { $in: ids } })
-    .lean()
-    .exec();
+  options = options || {};
+
+  var filter = options.filter || {};
+  var sort = options.sort || { _id: 1 };
+
+  if (!validateTopicFilter(filter)) {
+    throw new StatusError(400, 'Filter is invalid.');
+  }
+
+  if (!validateTopicSort(sort)) {
+    throw new StatusError(400, 'Sort is invalid.');
+  }
+
+  return buildTopicQuery(forumIds, filter)
+    .then(function(query) {
+      return Topic.find(query)
+        .sort(sort)
+        .lean()
+        .exec();
+    });
 }
 
 function findTotalsByForumIds(ids, options) {
