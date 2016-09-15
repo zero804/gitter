@@ -39,12 +39,11 @@
   }
 
   @keyframes sync-keyframes {
-    0% { opacity: 1 }
-    50% { opacity: 1 }
-    55% { opacity: 0.4 }
-    60% { opacity: 0.6 }
-    65% { opacity: 0.4 }
-    100% { opacity: 0.4 }
+    0% { opacity: 0.8 }
+    10% { opacity: 0.4 }
+    20% { opacity: 0.8 }
+    30% { opacity: 0.4 }
+    100% { opacity: 0.6 }
   }
 
   &.fast {
@@ -52,12 +51,16 @@
   }
 
   &.syncing {
-    animation: sync-keyframes 5s ease-out;
-    animation-iteration-count: 1;
+    animation: sync-keyframes 6s ease-out;
+    animation-delay: 2s;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
     transition: opacity .25s ease-in-out;
+    opacity: 1
   }
 
-  &.syncerror {
+  &.syncerror,
+  body:not(.mobile) &:hover.syncerror {
     background-color: #edb2bd;
   }
 

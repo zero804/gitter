@@ -126,13 +126,6 @@ exports.newChatMessageToTroupe = function(troupe, user, data) {
   var sentAt = new Date();
 
   return Promise.try(function() {
-    if (data.text === 'GET ON THE PLANE') {
-      return Promise.delay(100000)
-      .then(function() {
-        throw new StatusError(500, "I ain't getting on no plane")
-      })
-    }
-
     if(!troupe) throw new StatusError(404, 'Unknown room');
 
     /* You have to have text */
