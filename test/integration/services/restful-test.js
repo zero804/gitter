@@ -288,10 +288,10 @@ describe('restful #slow', function() {
         return restful.serializeTopicsForForumId(fixture.forum1._id)
           .then(function(topics) {
             assert.ok(matchIds(topics, [
-              fixture.topic1.id,
-              fixture.topic2.id,
-              fixture.topic3.id,
               fixture.topic4.id,
+              fixture.topic3.id,
+              fixture.topic2.id,
+              fixture.topic1.id,
             ]));
 
             var topic = topics.find(function(t) {
@@ -312,8 +312,8 @@ describe('restful #slow', function() {
         return restful.serializeTopicsForForumId(fixture.forum1._id, options)
           .then(function(topics) {
             assert.ok(matchIds(topics, [
-              fixture.topic1.id,
               fixture.topic2.id,
+              fixture.topic1.id,
             ]));
           });
       });
@@ -328,9 +328,9 @@ describe('restful #slow', function() {
         return restful.serializeTopicsForForumId(fixture.forum1._id, options)
           .then(function(topics) {
             assert.ok(matchIds(topics, [
-              fixture.topic1.id,
-              fixture.topic2.id,
               fixture.topic3.id,
+              fixture.topic2.id,
+              fixture.topic1.id,
             ]));
           });
       });
@@ -345,8 +345,8 @@ describe('restful #slow', function() {
         return restful.serializeTopicsForForumId(fixture.forum1._id, options)
           .then(function(topics) {
             assert.ok(matchIds(topics, [
-              fixture.topic1.id,
               fixture.topic3.id,
+              fixture.topic1.id,
             ]));
           });
       });
@@ -362,9 +362,9 @@ describe('restful #slow', function() {
         return restful.serializeTopicsForForumId(fixture.forum1._id, options)
           .then(function(topics) {
             assert.ok(matchIds(topics, [
-              fixture.topic2.id,
-              fixture.topic3.id,
               fixture.topic4.id,
+              fixture.topic3.id,
+              fixture.topic2.id,
             ]));
           });
       });
