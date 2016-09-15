@@ -3,7 +3,6 @@
 var env = require('gitter-web-env');
 var stats = env.stats;
 var Promise = require('bluebird');
-var moment = require('moment');
 var Topic = require('gitter-web-persistence').Topic;
 var Reply = require('gitter-web-persistence').Reply;
 var Comment = require('gitter-web-persistence').Comment;
@@ -98,7 +97,7 @@ function updateCommentsTotal(topicId, replyId) {
       if (topic && topic.lastModified.getTime() === lastModified.getTime()) {
         // if the topic update won, patch the topics live collection
         liveCollections.topics.emit('patch', topic.forumId, topicId, {
-          lastModified: moment(lastModified).toISOString()
+          lastModified: lastModified.toISOString()
         });
       } else {
         debug('We lost the topic update race.');
@@ -113,7 +112,7 @@ function updateCommentsTotal(topicId, replyId) {
         return findTotalByReplyId(replyId)
           .then(function(commentsTotal) {
             liveCollections.replies.emit('patch', reply.forumId, reply.topicId, replyId, {
-              lastModified: moment(lastModified).toISOString(),
+              lastModified: lastModified.toISOString(),
               commentsTotal: commentsTotal
             });
           });
