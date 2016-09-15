@@ -28,6 +28,7 @@ var ChatModel = Backbone.Model.extend({
   },
 
   triggerSynced: function() {
+    this._syncErrorTime = null;
     this.trigger('syncStatusChange', 'synced');
   },
 
@@ -77,6 +78,10 @@ var ChatModel = Backbone.Model.extend({
     delete d.html;
 
     return d;
+  },
+
+  hasSyncError: function() {
+    return !!this._syncErrorTime;
   },
 
   sync: SyncMixin.sync,
