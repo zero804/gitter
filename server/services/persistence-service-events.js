@@ -121,7 +121,26 @@ exports.install = function(persistenceService) {
       }
     });
 
-    // TODO: Categories, Comments
+    /**
+     * Comments
+     */
+    mongooseUtils.attachNotificationListenersToSchema(schemas.CommentSchema, {
+      onCreate: function(model, next) {
+        liveCollections.comments.emit("create", model);
+        next();
+      },
+
+      onUpdate: function(model, next) {
+        liveCollections.comments.emit('update', model);
+        next();
+      },
+
+      onRemove: function(model) {
+        liveCollections.comments.emit("remove", model);
+      }
+    });
+
+    // TODO: Categories? Forums?
   }
 
 };

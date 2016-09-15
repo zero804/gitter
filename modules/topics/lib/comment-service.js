@@ -97,7 +97,7 @@ function updateCommentsTotal(topicId, replyId) {
       if (topic && topic.lastModified.getTime() === lastModified.getTime()) {
         // if the topic update won, patch the topics live collection
         liveCollections.topics.emit('patch', topic.forumId, topicId, {
-          lastModified: lastModified
+          lastModified: lastModified.toISOString()
         });
       } else {
         debug('We lost the topic update race.');
@@ -112,7 +112,7 @@ function updateCommentsTotal(topicId, replyId) {
         return findTotalByReplyId(replyId)
           .then(function(commentsTotal) {
             liveCollections.replies.emit('patch', reply.forumId, reply.topicId, replyId, {
-              lastModified: lastModified,
+              lastModified: lastModified.toISOString(),
               commentsTotal: commentsTotal
             });
           });
