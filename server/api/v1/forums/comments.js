@@ -6,6 +6,7 @@ var internalClientAccessOnly = require('../../../web/middlewares/internal-client
 var commentService = require('gitter-web-topics/lib/comment-service');
 var ForumWithPolicyService = require('../../../services/forum-with-policy-service');
 var restSerializer = require('../../../serializers/rest-serializer');
+var restful = require('../../../services/restful');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 
@@ -24,12 +25,7 @@ module.exports = {
   index: function(req) {
     var reply = req.reply;
 
-    // TODO: don't just return all the comments, return a sample
-    return commentService.findByReplyId(reply._id)
-      .then(function(comments) {
-        var strategy = new restSerializer.CommentStrategy();
-        return restSerializer.serialize(comments, strategy);
-      });
+    return restful.serializeCommentsForReplyId(reply._id);
   },
 
   show: function(req) {
