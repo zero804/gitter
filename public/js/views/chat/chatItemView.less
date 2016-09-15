@@ -55,13 +55,18 @@
     animation-delay: 2s;
     animation-iteration-count: infinite;
     animation-direction: alternate;
-    transition: opacity .25s ease-in-out;
-    opacity: 1
   }
 
   &.syncerror,
   body:not(.mobile) &:hover.syncerror {
     background-color: #edb2bd;
+    background-image: repeating-linear-gradient(
+      90deg,
+      #edb2bd,
+      #edb2bd 10px,
+      #eeb5bf 10px,
+      #eeb5bf 20px
+    );
   }
 
   &.syncerror .chat-item__from {
