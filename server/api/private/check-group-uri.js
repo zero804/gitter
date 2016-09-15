@@ -10,7 +10,7 @@ function checkGroupUri(req, res, next) {
           type: info.type
         });
       // This is clearly a GitHub permsisions issue
-      } else if(!info.allowCreate && info.type === 'GH_ORG') {
+      } else if(!info.localUriExists && info.type === 'GH_ORG') {
         res.sendStatus(403);
       } else {
         res.sendStatus(409);
