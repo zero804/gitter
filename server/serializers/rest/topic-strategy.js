@@ -63,7 +63,7 @@ function TopicStrategy(options) {
       strategies.push(repliesTotalsForTopicStrategy.preload(topicIds));
     }
 
-    // load replyTotals
+    // load replyingUsers
     if (options.includeReplyingUsers) {
       replyingUsersStrategy = new TopicReplyingUsersStrategy();
       strategies.push(replyingUsersStrategy.preload(topicIds));
