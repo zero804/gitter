@@ -106,7 +106,7 @@ function checkIfGroupUriExists(user, uri, obtainAccessFromGitHubRepo) {
 
       debug('localUriExists: %s, githubUriExists: %s', localUriExists, githubUriExists);
 
-      var allowCreate;
+      var allowCreate = false;
       if (localUriExists) {
         allowCreate = false;
       } else if (githubUriExists) {
