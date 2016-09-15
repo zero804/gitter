@@ -30,6 +30,10 @@
   background-color: white;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 
+  body:not(.mobile) &:not(.syncerror):hover {
+      background-color: rgba(240,240,240,.3);
+  }
+
   &.chat-item__highlighted {
     background-color: @permalink-highlight-bg;
   }
@@ -57,8 +61,7 @@
     animation-direction: alternate;
   }
 
-  &.syncerror,
-  body:not(.mobile) &:hover.syncerror {
+  &.syncerror {
     background-color: #edb2bd;
     background-image: repeating-linear-gradient(
       90deg,
@@ -141,10 +144,6 @@
   &:last-child {
     &.burstStart { padding-bottom: @chat-spacing*2; }
   }
-}
-
-body:not(.mobile) .chat-item:hover {
-    background-color: rgba(240,240,240,.3);
 }
 
 .chat-item__aside {
