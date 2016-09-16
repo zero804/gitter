@@ -33,13 +33,15 @@ describe('ReplyStrategy', function() {
       forum: 'forum1',
       category: 'category1',
       user: 'user1',
+      repliesTotal: 1
     },
     reply1: {
       forum: 'forum1',
       category: 'category1',
       user: 'user1',
       topic: 'topic1',
-      sent: new Date(LONG_AGO)
+      sent: new Date(LONG_AGO),
+      commentsTotal: 1
     },
     comment1: {
       forum: 'forum1',

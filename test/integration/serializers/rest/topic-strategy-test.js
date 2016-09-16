@@ -35,7 +35,8 @@ describe('TopicStrategy', function() {
       user: 'user1',
       forum: 'forum1',
       category: 'category1',
-      sent: new Date(LONG_AGO)
+      sent: new Date(LONG_AGO),
+      repliesTotal: 1
     },
     reply1: {
       user: 'user1',
