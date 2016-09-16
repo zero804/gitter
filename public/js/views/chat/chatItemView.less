@@ -30,6 +30,10 @@
   background-color: white;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 
+  body:not(.mobile) &:not(.syncerror):hover {
+      background-color: rgba(240,240,240,.3);
+  }
+
   &.chat-item__highlighted {
     background-color: @permalink-highlight-bg;
   }
@@ -39,12 +43,11 @@
   }
 
   @keyframes sync-keyframes {
-    0% { opacity: 1 }
-    50% { opacity: 1 }
-    55% { opacity: 0.4 }
-    60% { opacity: 0.6 }
-    65% { opacity: 0.4 }
-    100% { opacity: 0.4 }
+    0% { opacity: 0.8 }
+    10% { opacity: 0.4 }
+    20% { opacity: 0.8 }
+    30% { opacity: 0.4 }
+    100% { opacity: 0.6 }
   }
 
   &.fast {
@@ -52,13 +55,21 @@
   }
 
   &.syncing {
-    animation: sync-keyframes 5s ease-out;
-    animation-iteration-count: 1;
-    transition: opacity .25s ease-in-out;
+    animation: sync-keyframes 6s ease-out;
+    animation-delay: 2s;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
   }
 
   &.syncerror {
     background-color: #edb2bd;
+    background-image: repeating-linear-gradient(
+      90deg,
+      #edb2bd,
+      #edb2bd 10px,
+      #eeb5bf 10px,
+      #eeb5bf 20px
+    );
   }
 
   &.syncerror .chat-item__from {
@@ -133,10 +144,6 @@
   &:last-child {
     &.burstStart { padding-bottom: @chat-spacing*2; }
   }
-}
-
-body:not(.mobile) .chat-item:hover {
-    background-color: rgba(240,240,240,.3);
 }
 
 .chat-item__aside {
