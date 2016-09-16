@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "description": "",
   "private": true,
-  "main": "lib/generate-api-client.js",
+  "main": "lib/api-client.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "backbone": "1.2.3",
     "bluebird": "^3.2.1",
     "debug-proxy": "^0.2.0",
     "gitter-client-env": "file:../client-env",

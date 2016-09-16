@@ -38,10 +38,20 @@ function makeError(method, fullUrl, jqXhr, textStatus, errorThrown) {
   return e;
 }
 
-function Resource(config, urlRoot, baseUrlFn) {
+function Resource(client, config, urlRoot, baseUrl) {
+  this._client = client;
   this._config = config;
   this._urlRoot = urlRoot;
-  this._baseUrlFn = baseUrlFn;
+
+  if (typeof baseUrl === 'string') {
+    // BaseURL is a static string
+    this._baseUrlFn = function() {
+      return baseUrl;
+    }
+  } else {
+    // BaseURL is a function
+    this._baseUrlFn = baseUrl.bind(client);
+  }
 }
 
 Resource.prototype = {
@@ -98,15 +108,15 @@ Resource.prototype = {
   },
 
   uri: function(relativeUrl) {
-    return this._uriFunction() + relativeUrl;
+    return this.channel(relativeUrl);
   },
 
   url: function(relativeUrl) {
-    return this._fullUrlFunction(this.baseUrlFunction, relativeUrl);
+    return this._urlRoot + this.channel(relativeUrl);
   },
 
   channel: function(relativeUrl) {
-    var base = this.baseUrlFn();
+    var base = this._baseUrlFn();
 
     if (relativeUrl) {
       return base + relativeUrl;
@@ -119,11 +129,7 @@ Resource.prototype = {
     return this.channel.bind(this, relativeUrl);
   },
 
-  _resolveFullUrl: function(relativeUrl) {
-    return this._urlRoot + this.channel(relativeUrl);
-  },
-
-  _execute: function(method, url, data, options) {
+  _execute: function(method, relativeUrl, data, options) {
       var dataSerialized;
       if(options.contentType === JSON_MIME_TYPE) {
         dataSerialized = JSON.stringify(data);
@@ -132,9 +138,11 @@ Resource.prototype = {
         dataSerialized = data;
       }
 
-      return this._getAccessToken()
+      return this._client._getAccessToken()
         .bind(this)
         .then(function(accessToken) {
+          var fullUrl = this.url(relativeUrl);
+          var isGlobal = options.global !== false;
 
           var promise = new Promise(function(resolve, reject) {
             var headers = {};
@@ -142,8 +150,6 @@ Resource.prototype = {
             if (accessToken) {
               headers['x-access-token'] = accessToken;
             }
-
-            var fullUrl = this._resolveFullUrl(url);
 
             debug('%s: %s', method, fullUrl);
 
@@ -153,7 +159,7 @@ Resource.prototype = {
               contentType: options.contentType,
               dataType: options.dataType,
               type: method,
-              global: options.global,
+              global: isGlobal,
               data: dataSerialized,
               timeout: options.timeout,
               async: options.async,
@@ -161,9 +167,6 @@ Resource.prototype = {
               success: function(data, textStatus, xhr) {
                 var status = xhr.status;
                 if (status >= 400 && status !== 1223) {
-
-                  var e = new Error(textStatus);
-                  e.status = status;
                   return reject(makeError(method, fullUrl, xhr, textStatus, 'HTTP Status ' + status));
                 }
 
@@ -173,23 +176,20 @@ Resource.prototype = {
                 return reject(makeError(method, fullUrl, xhr, textStatus, errorThrown));
               }
             });
-          });
+          })
+          .bind(this);
 
-          if(options.global) {
+          if(isGlobal) {
             promise.catch(function(err) {
               /* Asyncronously notify */
-              this._config.onApiError(err.status, err.statusText, err.method, err.url);
+              this._client.trigger('error', err);
               throw err;
-            }.bind(this));
+            });
           }
 
           return promise;
         });
-  },
-
-  _getAccessToken: Promise.method(function() {
-    return this._config.getAccessToken();
-  }),
+  }
 }
 
 module.exports = Resource;
