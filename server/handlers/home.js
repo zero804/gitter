@@ -77,6 +77,7 @@ router.get('/learn',
   identifyRoute('home-learn-main'),
   ensureLoggedIn,
   featureToggles,
+  isPhoneMiddleware,
   function (req, res, next) {
     var renderer = mainFrameRenderer.renderMainFrame
     if (req.isPhone) {
