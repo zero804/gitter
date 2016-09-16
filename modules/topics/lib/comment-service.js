@@ -78,29 +78,45 @@ function updateCommentsTotal(topicId, replyId) {
   var nowTime = now.getTime();
   var nowString = now.toISOString();
 
-  var update = {
-    $max: {
-      lastChanged: now,
-      lastModified: now
-    }
-  };
 
-  return Promise.join(
-    Topic.findOneAndUpdate({ _id: topicId }, update, { new: true }).exec(),
-    Reply.findOneAndUpdate({ _id: replyId }, update, { new: true }).exec())
+  return findTotalByReplyId(replyId)
     .bind({
       topic: undefined,
-      reply: undefined
+      reply: undefined,
+    })
+    .then(function(commentsTotal) {
+      var topicUpdate = {
+        $max: {
+          lastChanged: now,
+          lastModified: now,
+        }
+      };
+
+      var replyUpdate = {
+        $max: {
+          lastChanged: now,
+          lastModified: now,
+          commentsTotal: commentsTotal
+        }
+      };
+
+      return Promise.join(
+        Topic.findOneAndUpdate({ _id: topicId }, topicUpdate, { new: true }).exec(),
+        Reply.findOneAndUpdate({ _id: replyId }, replyUpdate, { new: true }).exec())
     })
     .spread(function(topic, reply) {
       this.topic = topic;
       this.reply = reply;
 
       if (topic) {
-        debug("topic.lastChanged: %s, topic.lastModified: %s, lastModified: %s", topic.lastChanged, topic.lastModified, now);
+        debug("Topic updated: %j", {
+          now: now,
+          lastChanged: topic.lastChanged,
+          lastModified: topic.lastModified,
+        });
       }
 
-      if (topic && topic.lastChanged.getTime() === nowTime && topic.lastModified.getTime() === nowTime) {
+      if (topic && topic.lastModified.getTime() === nowTime) {
         // if the topic update won, patch the topics live collection
         liveCollections.topics.emit('patch', topic.forumId, topicId, {
           lastChanged: nowString,
@@ -111,19 +127,21 @@ function updateCommentsTotal(topicId, replyId) {
       }
 
       if (reply) {
-        debug("reply.lastChanged: %s, reply.lastModified: %s, lastModified: %s", reply.lastChanged, reply.lastModified, now);
+        debug("Reply updated: %j", {
+          now: now,
+          lastChanged: reply.lastChanged,
+          lastModified: reply.lastModified,
+          commentsTotal: reply.commentsTotal
+        });
       }
 
-      if (reply && reply.lastChanged.getTime() === nowTime && reply.lastModified.getTime() === nowTime) {
+      if (reply && reply.lastModified.getTime() === nowTime) {
         // if the reply update won, patch the replies live collection
-        return findTotalByReplyId(replyId)
-          .then(function(commentsTotal) {
-            liveCollections.replies.emit('patch', reply.forumId, reply.topicId, replyId, {
-              lastChanged: nowString,
-              lastModified: nowString,
-              commentsTotal: commentsTotal
-            });
-          });
+        liveCollections.replies.emit('patch', reply.forumId, reply.topicId, replyId, {
+          lastChanged: nowString,
+          lastModified: nowString,
+          commentsTotal: reply.commentsTotal
+        });
       } else {
         debug('We lost the reply update race.');
       }

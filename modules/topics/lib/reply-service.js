@@ -91,40 +91,48 @@ function updateRepliesTotal(topicId) {
   var nowTime = now.getTime();
   var nowString = now.toISOString();
 
-  var update = {
-    $max: {
-      lastChanged: now,
-      lastModified: now,
-    }
-  };
 
-  return Topic.findOneAndUpdate(query, update, { new: true })
-    .exec()
+  return findTotalByTopicId(topicId)
     .bind({
       topic: undefined
+    })
+    .then(function(repliesTotal) {
+      var update = {
+        $max: {
+          lastChanged: now,
+          lastModified: now,
+          repliesTotal: repliesTotal
+        }
+      };
+
+      return Topic.findOneAndUpdate(query, update, { new: true })
+        .exec();
     })
     .then(function(topic) {
       this.topic = topic;
 
       if (topic) {
-        debug("topic.lastChanged: %s, topic.lastModified: %slastModified: %s", topic.lastChanged, topic.lastModified, now);
+        debug("Topic updated: %j", {
+          now: now,
+          lastChanged: topic.lastChanged,
+          lastModified: topic.lastModified,
+          repliesTotal: topic.repliesTotal
+        });
       }
 
-      if (!topic || topic.lastChanged.getTime() !== nowTime || topic.lastModified.getTime() !== nowTime) {
+      // we only have to check the one field to know
+      if (!topic || topic.lastModified.getTime() !== nowTime) {
         debug('We lost the topic update race.');
         return;
       }
 
       // if this update won, then patch the live collection with the latest
       // lastChanged & lastModified values and also the new total replies.
-      return findTotalByTopicId(topicId)
-        .then(function(repliesTotal) {
-          liveCollections.topics.emit('patch', topic.forumId, topicId, {
-            lastChanged: nowString,
-            lastModified: nowString,
-            repliesTotal: repliesTotal
-          })
-        });
+      liveCollections.topics.emit('patch', topic.forumId, topicId, {
+        lastChanged: nowString,
+        lastModified: nowString,
+        repliesTotal: topic.repliesTotal
+      })
     })
     .then(function() {
       // return the topic that got updated (if it was updated).
