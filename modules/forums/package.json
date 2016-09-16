@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "bluebird": "^3.4.1",
-    "gitter-web-fake-data": "file:../fake-data"
+    "gitter-web-fake-data": "file:../fake-data",
+    "gitter-web-persistence": "file:../persistence"
   }
 }
