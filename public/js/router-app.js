@@ -4,9 +4,6 @@
 require('./utils/initial-setup');
 require('./utils/font-setup');
 
-// TODO: remove, just for testing
-require('./test-api-client');
-
 var debug = require('debug-proxy')('app:router-app');
 var $ = require('jquery');
 var Backbone = require('backbone');

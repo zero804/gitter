@@ -5,7 +5,7 @@ require('./utils/font-setup');
 var $ = require('jquery');
 var context = require('./utils/context');
 var clientEnv = require('gitter-client-env');
-var apiClient = require('./components/apiClient');
+var apiClient = require('./components/api-client');
 var onready = require('./utils/onready');
 var appEvents = require('./utils/appevents');
 var heatmapUtils = require('./components/archive-heatmap-utils');
