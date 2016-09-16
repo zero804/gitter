@@ -2,9 +2,9 @@
 
 var _ = require('lodash');
 var clientEnv = require('gitter-client-env');
-var context = require('./utils/context');
-var appEvents = require('./utils/appevents');
-var apiClient = require('gitter-web-api-client');
+var context = require('../utils/context');
+var appEvents = require('../utils/appevents');
+var generateApiClient = require('gitter-web-api-client');
 
 
 // Minimize the number of different errors which are actually the same
@@ -55,6 +55,8 @@ function handleApiError(status, statusText, method, url) {
 }
 
 
+var apiClient = generateApiClient();
+
 apiClient.config = _.extend(apiClient.config, {
   baseUrl: clientEnv['apiBasePath'],
   getAccessToken: context.getAccessToken,
@@ -64,10 +66,4 @@ apiClient.config = _.extend(apiClient.config, {
 });
 
 
-apiClient.room.get('/chatMessages')
-  .then(function(messages) {
-    console.log('messages', messages);
-  })
-  .catch(function(err) {
-    console.log('err', err, err.stack);
-  });
+module.exports = apiClient;

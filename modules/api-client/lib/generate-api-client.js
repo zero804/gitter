@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 /**
  * API Client
  *
@@ -44,30 +44,28 @@
  *     window.alert('I am a failure: ' + err.status);
  *   })
  */
-var $ = require('jquery');
-var context = require('../utils/context');
-var clientEnv = require('gitter-client-env');
-var appEvents = require('../utils/appevents');
-var debug = require('debug-proxy')('app:api-client');
 var Promise = require('bluebird');
+var $ = require('jquery');
+var _ = require('lodash');
+var debug = require('debug-proxy')('app:api-client');
 
 
 /* @const */
 var DEFAULT_TIMEOUT = 60 * 1000;
 
 /* @const */
-var JSON_MIME_TYPE = "application/json";
+var JSON_MIME_TYPE = 'application/json';
 
 /* @const */
 var GET_DEFAULTS = {
   timeout: DEFAULT_TIMEOUT,
-  dataType: "json"
+  dataType: 'json'
 };
 
 /* @const */
 var POST_DEFAULTS = {
   timeout: DEFAULT_TIMEOUT,
-  dataType: "json",
+  dataType: 'json',
   contentType: JSON_MIME_TYPE,
 };
 
@@ -80,40 +78,15 @@ var OPERATIONS = [
   ['delete', POST_DEFAULTS]
 ];
 
-function makeApiUrl(baseUrlFunction, url) {
+function makeUrl(baseUrlFunction, url) {
   if(!url) url = '';
-
-  var baseUrl = clientEnv['apiBasePath'];
-
-  if(!baseUrlFunction) {
-    return baseUrl + url;
-  }
-
-  return baseUrl + baseUrlFunction() + url;
-}
-
-function makeWebUrl(baseUrlFunction, url) {
-  if(!url) url = '';
-
-  if(!baseUrlFunction) {
-    return url;
-  }
-
-  return baseUrlFunction() + url;
-}
-
-function makeChannel(baseUrlFunction, url) {
-  if(!url) url = '';
-
-  if(!baseUrlFunction) {
-    return url;
-  }
 
   return baseUrlFunction() + url;
 }
 
 function operation(fullUrlFunction, baseUrlFunction, method, defaultOptions, url, data, options) {
-  options = defaults(options, defaultOptions);
+  options = _.extend({}, defaultOptions, options);
+  var config = this.config;
 
   // If we're doing a DELETE but have no data, unset the contentType
   if((method === 'delete' || method === 'put') && !data) {
@@ -128,7 +101,10 @@ function operation(fullUrlFunction, baseUrlFunction, method, defaultOptions, url
     dataSerialized = data;
   }
 
-  return context.getAccessToken()
+  return Promise.try(function() {
+      return config.getAccessToken();
+    })
+    .bind(this)
     .then(function(accessToken) {
 
       var promise = new Promise(function(resolve, reject) {
@@ -138,14 +114,13 @@ function operation(fullUrlFunction, baseUrlFunction, method, defaultOptions, url
           headers['x-access-token'] = accessToken;
         }
 
-        // TODO: drop jquery `ajax`
         var fullUrl = fullUrlFunction(baseUrlFunction, url);
 
         function makeError(jqXhr, textStatus, errorThrown) {
           var json = jqXhr.responseJSON;
           var friendlyMessage = json && (json.message || json.error);
 
-          var e = new Error(friendlyMessage || errorThrown || textStatus || "AJAX error");
+          var e = new Error(friendlyMessage || errorThrown || textStatus || 'AJAX error');
           e.url = fullUrl;
           e.friendlyMessage = friendlyMessage;
           e.response = json;
@@ -156,6 +131,7 @@ function operation(fullUrlFunction, baseUrlFunction, method, defaultOptions, url
         }
 
         debug('%s: %s', method, fullUrl);
+        // TODO: drop jquery `ajax`
         $.ajax({
           url: fullUrl,
           contentType: options.contentType,
@@ -172,7 +148,7 @@ function operation(fullUrlFunction, baseUrlFunction, method, defaultOptions, url
 
               var e = new Error(textStatus);
               e.status = status;
-              return reject(makeError(xhr, textStatus, "HTTP Status " + status));
+              return reject(makeError(xhr, textStatus, 'HTTP Status ' + status));
             }
 
             resolve(data);
@@ -186,13 +162,8 @@ function operation(fullUrlFunction, baseUrlFunction, method, defaultOptions, url
       if(options.global) {
         promise.catch(function(err) {
           /* Asyncronously notify */
-          handleApiError(err.status, err.statusText, err.method, err.url);
-        });
-      }
-
-      if (options.context) {
-        // TODO: remove this option
-        promise.bind(context);
+          this.config.onApiError(err.status, err.statusText, err.method, err.url);
+        }.bind(this));
       }
 
       return promise;
@@ -200,104 +171,70 @@ function operation(fullUrlFunction, baseUrlFunction, method, defaultOptions, url
 
 }
 
-// Minimize the number of different errors which are actually the same
-// This is useful for Sentry http://app.getsentry.com
-var routes = {
-  githubIssues: /^\/api\/private\/gh\/[^/]+\/[^/]+\/issues/,
-  githubUsers: /^\/api\/private\/gh\/users\//,
-};
-
-function findRouteForUrl(url) {
-  var r = Object.keys(routes);
-  for(var i = 0; i < r.length; i++) {
-    var routeName = r[i];
-    var re = routes[routeName];
-
-    if(re.test(url)) return routeName;
-  }
-}
-
-function handleApiError(status, statusText, method, url) {
-  var route = findRouteForUrl(url);
-
-  if(statusText === 'error' && status === 404) {
-    /* Unreachable server */
-    appEvents.trigger('bugreport', 'ajaxError: unreachable: '+ method + ' ' + (route || url), {
-      tags: {
-        type: 'ajax',
-        subtype: 'unreachable',
-        url: url
-      }
-    });
-
-  } else if(status < 500) {
-    // 400 errors are the problem of the ajax caller, not the global handler
-    return;
-
-  } else {
-    appEvents.trigger('bugreport', 'ajaxError: HTTP ' + status + ' on ' + method + ' ' + (route || url), {
-      tags: {
-        type: 'ajax',
-        subtype: 'HTTP' + status,
-        url: url
-      }
-    });
-  }
-
-  appEvents.trigger('ajaxError');
-}
 
 
-// Util functions
-function defaults(options, defaultValues) {
-  if(!options) options = {};
-  Object.keys(defaultValues).forEach(function(key) {
-    if(options[key] === undefined) {
-      // Only using a shallow clone for simplicity
-      options[key] = defaultValues[key];
-    }
-  });
-  return options;
-}
+function getClient(fullUrlFunction, uriFunction) {
+  var config = this.config;
+  fullUrlFunction = fullUrlFunction.bind(this);
+  uriFunction = (uriFunction || function() {
+    return '';
+  }).bind(this);
 
-function getClient(fullUrlFunction, baseUrlFunction) {
+  var baseUrlFunction = function() {
+    return config.baseUrl + uriFunction();
+  };
+
   return OPERATIONS
     .reduce(function(memo, descriptor) {
       var method = descriptor[0];
       var defaultOptions = descriptor[1];
 
-      memo[method] = operation.bind(memo, fullUrlFunction, baseUrlFunction, method, defaultOptions);
+      memo[method] = operation.bind(this, fullUrlFunction, baseUrlFunction, method, defaultOptions);
       return memo;
-    }, {
+    }.bind(this), {
       uri: function(relativeUrl) {
-        return baseUrlFunction() + relativeUrl;
+        return uriFunction() + relativeUrl;
       },
       url: function(relativeUrl) {
         return fullUrlFunction(baseUrlFunction, relativeUrl);
       },
       channel: function(relativeUrl) {
-        return makeChannel(baseUrlFunction, relativeUrl);
+        return makeUrl(baseUrlFunction, relativeUrl);
       },
       channelGenerator: function(relativeUrl) {
         return function() {
-          return makeChannel(baseUrlFunction, relativeUrl);
-        };
+          return makeUrl(baseUrlFunction, relativeUrl);
+        }.bind(this);
       }
     });
 }
 
-module.exports = defaults(getClient(makeApiUrl), {
-  user: getClient(makeApiUrl, function() {
-    return '/v1/user/' + context.getUserId();
-  }),
-  room: getClient(makeApiUrl, function() {
-    return '/v1/rooms/' + context.getTroupeId();
-  }),
-  userRoom: getClient(makeApiUrl, function() {
-    return '/v1/user/' + context.getUserId() + '/rooms/' + context.getTroupeId();
-  }),
-  priv: getClient(makeApiUrl, function() {
-    return '/private';
-  }),
-  web: getClient(makeWebUrl)
-});
+
+
+module.exports = function() {
+  var client = {
+    config: {
+      baseUrl: '',
+      getAccessToken: function() { return ''; },
+      getUserId: function() { return ''; },
+      getTroupeId: function() { return ''; },
+      onApiError: function() {}
+    }
+  };
+
+  return _.extend(client, getClient.bind(client)(makeUrl), {
+    user: getClient.bind(client)(makeUrl, function() {
+      return '/v1/user/' + this.config.getUserId();
+    }),
+    room: getClient.bind(client)(makeUrl, function() {
+      return '/v1/rooms/' + this.config.getTroupeId();
+    }),
+    userRoom: getClient.bind(client)(makeUrl, function() {
+      return '/v1/user/' + this.config.getUserId() + '/rooms/' + this.config.getTroupeId();
+    }),
+    priv: getClient.bind(client)(makeUrl, function() {
+      return '/private';
+    }),
+    web: getClient.bind(client)(makeUrl)
+  });
+}

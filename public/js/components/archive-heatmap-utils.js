@@ -3,7 +3,7 @@
 var $ = require('jquery');
 
 var CalHeatMap = require('@gitterhq/cal-heatmap');
-var apiClient = require('./apiClient');
+var apiClient = require('./api-client');
 var getTimezoneInfo = require('../utils/detect-timezone');
 var context = require('../utils/context');
 

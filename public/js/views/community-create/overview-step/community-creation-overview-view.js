@@ -7,7 +7,7 @@ var stepConstants = require('../step-constants');
 var template = require('./community-creation-overview-view.hbs');
 var CommunityCreateBaseStepView = require('../shared/community-creation-base-step-view');
 var InviteListView = require('../shared/community-creation-people-list-view');
-var apiClient = require('../../../components/apiClient');
+var apiClient = require('../../../components/api-client');
 
 require('gitter-styleguide/css/components/headings.css');
 require('gitter-styleguide/css/components/buttons.css');

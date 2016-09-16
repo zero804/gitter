@@ -21,7 +21,7 @@ var toggle = require('../../../utils/toggle');
 require('../../behaviors/isomorphic');
 require('../../behaviors/tooltip');
 
-var apiClient = require('../../../components/apiClient');
+var apiClient = require('../../../components/api-client');
 
 require('nanoscroller');
 
