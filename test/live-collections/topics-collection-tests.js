@@ -70,14 +70,19 @@ describe('topics-live-collection', function() {
       })
       .then(checkEvent)
       .then(function(event) {
-        // the patch event must also contain lastModified
+        // the patch event must also contain lastChanged & lastModified
+        assert.ok(event.model.lastChanged);
         assert.ok(event.model.lastModified);
 
         return topicService.findById(fixture.topic1._id)
           .then(function(topic) {
-            // lastModified must now exist and match the one we got in the event.
+            // lastChanged & lastModified must now match the one we got in the
+            // patch event.
+            assert.ok(topic.lastChanged);
             assert.ok(topic.lastModified);
+            var lastChanged = new Date(event.model.lastChanged);
             var lastModified = new Date(event.model.lastModified);
+            assert.strictEqual(topic.lastChanged.getTime(), lastChanged.getTime());
             assert.strictEqual(topic.lastModified.getTime(), lastModified.getTime());
           });
       });
@@ -103,9 +108,13 @@ describe('topics-live-collection', function() {
 
         return topicService.findById(fixture.topic2._id)
           .then(function(topic) {
-            // lastModified must now exist and match the one we got in the event.
+            // lastChanged & lastModified must now match the one we got in the
+            // patch event.
+            assert.ok(topic.lastChanged);
             assert.ok(topic.lastModified);
+            var lastChanged = new Date(event.model.lastChanged);
             var lastModified = new Date(event.model.lastModified);
+            assert.strictEqual(topic.lastChanged.getTime(), lastChanged.getTime());
             assert.strictEqual(topic.lastModified.getTime(), lastModified.getTime());
           });
       });
