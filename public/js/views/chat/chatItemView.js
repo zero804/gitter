@@ -393,7 +393,7 @@ module.exports = (function() {
 
     onEditSave: function(newText) {
       if (this.isEditing) {
-        if (this.canEdit() && newText != this.model.get('text')) {
+        if (this.canEdit() && newText !== this.model.get('text')) {
           this.model.set('text', newText);
           this.model.set('html', null);
           this.model.save();
@@ -664,11 +664,11 @@ module.exports = (function() {
 
       this.listenTo(actions, 'render', function() {
         this.ui.actions.addClass('selected');
-      }.bind(this));
+      });
 
       this.listenTo(actions, 'destroy', function() {
         this.ui.actions.removeClass('selected');
-      }.bind(this));
+      });
 
       actions.show();
       ReadByPopover.singleton(this, actions);
@@ -712,12 +712,12 @@ module.exports = (function() {
     },
 
     onTouchend: function() {
-      if (!this.isDragging) {
-        // its a tap!
-        this.onTap();
-      } else {
+      if(this.isDragging) {
         // just a drag finishing. not a tap.
         this.isDragging = false;
+      } else {
+        // its a tap!
+        this.onTap();
       }
     },
 
@@ -767,9 +767,9 @@ module.exports = (function() {
 
     onSyncStatusChange: function(newState) {
       this.$el
-        .toggleClass('synced', newState == 'synced')
-        .toggleClass('syncing', newState == 'syncing')
-        .toggleClass('syncerror', newState == 'syncerror');
+        .toggleClass('synced', newState === 'synced')
+        .toggleClass('syncing', newState === 'syncing')
+        .toggleClass('syncerror', newState === 'syncerror');
     },
 
     getPermalinkUrl: function() {
@@ -836,45 +836,84 @@ module.exports = (function() {
       'click .js-chat-action-edit': 'edit',
       'click .js-chat-action-reply': 'reply',
       'click .js-chat-action-quote': 'quote',
-      'click .js-chat-action-delete': 'delete'
+      'click .js-chat-action-delete': 'delete',
+      'click .js-chat-action-retry': 'retry',
+      'click .js-chat-action-cancel': 'cancel',
     },
+
     toggleCollapse: function() {
       this.chatItemView.triggerMethod('toggleCollapse');
     },
+
     edit: function() {
       this.chatItemView.triggerMethod('toggleEdit');
     },
+
     reply: function() {
       var mention = "@" + this.model.get('fromUser').username + " ";
       appEvents.trigger('input.append', mention);
     },
+
     quote: function() {
       appEvents.trigger('input.append', "> " + this.model.get('text'), { newLine: true });
     },
+
     delete: function() {
       this.model.set('text', '');
       this.model.save();
     },
-    serializeData: function() {
-      var deleted = !this.model.get('text');
-      var data = {actions: [
-        {name: 'reply', description: 'Reply'}
-      ]};
 
-      if (!deleted) data.actions.push({name: 'quote', description: 'Quote'});
+    retry: function() {
+      this.model.save();
+    },
 
-      // FIXME Can't really use a triggerMethod here, maybe move the logic of canEdit() to this view?
-      if (!deleted && this.chatItemView.canEdit()) {
-        data.actions.push({name: 'edit', description: 'Edit'});
-        data.actions.push({name: 'delete', description: 'Delete'});
+    cancel: function() {
+      var model = this.model;
+      if (model.id) {
+        model.fetch();
       } else {
-        data.actions.push({name: 'edit', description: 'Edit', disabled: true});
-        data.actions.push({name: 'delete', description: 'Delete', disabled: true});
+        model.collection.remove(model);
+      }
+    },
+
+    serializeData: function() {
+      var hasSyncError = this.model.hasSyncError();
+      if (hasSyncError) {
+        return {
+          actions: [
+            { name: 'retry', description: 'Retry' },
+            { name: 'cancel', description: 'Cancel' },
+          ]
+        };
       }
 
+      var deleted = !this.model.get('text');
+      var canCollapse = !deleted && this.model.get('isCollapsible');
+      var isPersisted = !!this.model.id;
+      var canEdit = !deleted && this.chatItemView.canEdit() && !isPersisted;
 
-      if (!deleted && this.model.get('isCollapsible')) {
-        var action = this.model.get('collapsed') ? {name: 'expand', description: 'Expand'} : {name: 'collapse', description: 'Collapse'};
+      var data = {
+        actions: [
+          { name: 'reply', description: 'Reply', disabled: !isPersisted }
+        ]
+      };
+
+      if (!deleted) {
+        data.actions.push({ name: 'quote', description: 'Quote', disabled: !isPersisted });
+      }
+
+      data.actions.push({ name: 'edit', description: 'Edit', disabled: !canEdit });
+      data.actions.push({ name: 'delete', description: 'Delete', disabled: !canEdit });
+
+      if (canCollapse) {
+        var action;
+
+        if (this.model.get('collapsed')) {
+          action = { name: 'expand', description: 'Expand' };
+        } else {
+          action = { name: 'collapse', description: 'Collapse'};
+        }
+
         data.actions.push(action);
       }
 
@@ -885,7 +924,10 @@ module.exports = (function() {
   var ActionsPopover = Popover.extend({
     initialize: function(options) {
       Popover.prototype.initialize.apply(this, arguments);
-      this.view = new ActionsView({ model: this.model, chatItemView: options.chatItemView });
+      this.view = new ActionsView({
+        model: this.model,
+        chatItemView: options.chatItemView
+      });
     },
     events: {
       'click': 'hide'
