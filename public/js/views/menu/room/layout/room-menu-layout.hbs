@@ -83,7 +83,7 @@
           <footer id="panel-footer" class="panel-footer-container"></footer>
 
           <div class="nano-content panel-content">
-            <div id="search-input" class="left-menu-search-root {{#unless hasCategories}}hidden{{/unless}}"></div>
+            <div id="search-input" class="left-menu-search-root"></div>
 
             <section id="favourite-collection" class="left-menu-collection">
               <div class="favourite-collection loaded active">
@@ -118,19 +118,21 @@
             <section id="secondary-collection" class="left-menu-collection"></section>
             <section id="tertiary-collection" class="left-menu-collection"></section>
 
-            <div id="left-menu-topics-area" class="left-menu-topics-root">
+            <div id="left-menu-topics-area" class="left-menu-topics-root {{#unless forum.hasCategories}}hidden{{/unless}}">
               <div>
                 <h2 class="collection__title">
                   Topics
                 </h2>
 
-                <ul class="collection-list js-left-menu-topics-category-list">
-                  {{#each forum.categories}}
-                    <li>
-                      {{{ prerenderView "js/views/menu/room/topics-area/category-item-view" }}}
-                    </li>
-                  {{/each}}
-                </ul>
+                <div class="js-left-menu-topics-category-list-root">
+                  <ul class="collection-list">
+                    {{#each forum.categories}}
+                      <li>
+                        {{{ prerenderView "js/views/menu/room/topics-area/category-item-view" }}}
+                      </li>
+                    {{/each}}
+                  </ul>
+                </div>
               </div>
             </div>
 

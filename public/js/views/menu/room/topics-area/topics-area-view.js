@@ -1,15 +1,28 @@
 'use strict';
 
 var Marionette = require('backbone.marionette');
-var ItemView = require('./category-item-view');
+var CategoryCollectionView = require('./category-collection-view');
 
 var template = require('./topics-area-view.hbs');
 
-var TopicsAreaView = Marionette.CompositeView.extend({
+require('../../../behaviors/isomorphic');
+
+var TopicsAreaView = Marionette.LayoutView.extend({
   className: 'left-menu-topics-area-inner',
   template: template,
-  childView: ItemView,
-  childViewContainer: '.js-left-menu-topics-category-list',
+
+
+  behaviors: {
+    Isomorphic: {
+      topicsCategoryList: { el: '.js-left-menu-topics-category-list-root', init: 'initCategoryCollectionView' },
+    },
+  },
+
+  initCategoryCollectionView: function(optionsForRegion) {
+    return new CategoryCollectionView(optionsForRegion({
+      collection: this.collection
+    }));
+  },
 
   initialize: function() {
 
