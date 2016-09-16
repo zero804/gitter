@@ -134,10 +134,9 @@ function TopicStrategy(options) {
       replyingUsers: replyingUsersStrategy ? replyingUsersStrategy.map(id): undefined,
 
       sent: formatDate(topic.sent),
-      editedAt: topic.editedAt ? formatDate(topic.editedAt) : null,
-      // TODO: drop these || null bits once we've migrated
-      lastChanged: topic.lastChanged ? formatDate(topic.lastChanged) : null,
-      lastModified: topic.lastModified ? formatDate(topic.lastModified) : null,
+      editedAt: formatDate(topic.editedAt),
+      lastChanged: formatDate(topic.lastChanged),
+      lastModified: formatDate(topic.lastModified),
       v: getVersion(topic),
 
       // TODO: participatingTotal
