@@ -35,7 +35,7 @@ var liveCollectionReplies = {
   },
 
   remove: function(reply) {
-    return this.removeId(reply.forumId, reply.topicId, reply.replyId);
+    return this.removeId(reply.forumId, reply.topicId, reply._id);
   },
 
   removeId: function(forumId, topicId, replyId) {
