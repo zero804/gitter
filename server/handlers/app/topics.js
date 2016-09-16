@@ -6,6 +6,7 @@ var topicsRenderers = require('../renderers/topics');
 var mainFrameRenderers = require('../renderers/main-frame');
 var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
 var featureToggles = require('../../web/middlewares/feature-toggles');
+var isPhoneMiddleware = require('../../web/middlewares/is-phone');
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
@@ -13,6 +14,7 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
 router.get('/',
   identifyRoute('forum'),
   featureToggles,
+  isPhoneMiddleware,
   function(req, res, next){
 
     //No switch, no business
@@ -20,7 +22,12 @@ router.get('/',
       return next(new StatusError(404));
     }
 
-    return mainFrameRenderers.renderMainFrame(req, res, next, {
+    var renderer = mainFrameRenderers.renderMainFrame
+    if (req.isPhone) {
+      renderer = mainFrameRenderers.renderMobileMainFrame;
+    }
+
+    return renderer(req, res, next, {
       subFrameLocation: '/' + req.params.groupName + '/topics/~topics'
     });
   }

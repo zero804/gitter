@@ -1,6 +1,11 @@
 'use strict';
 
 var Promise = require('bluebird');
+// Prevent "Error: cannot enable cancellation after promises are in use" in
+// scripts that use RealtimeClient.
+Promise.config({
+  cancellation: true
+});
 var StatusError = require('statuserror');
 var shutdown = require('shutdown');
 var userService = require('../../server/services/user-service');

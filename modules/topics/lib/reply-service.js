@@ -117,7 +117,7 @@ function updateRepliesTotal(topicId) {
       return findTotalByTopicId(topicId)
         .then(function(repliesTotal) {
           liveCollections.topics.emit('patch', topic.forumId, topicId, {
-            lastModified: lastModified,
+            lastModified: lastModified.toISOString(),
             repliesTotal: repliesTotal
           })
         });
