@@ -184,7 +184,7 @@ describe('restful #slow', function() {
       troupe2: { group: 'group1', security: 'PRIVATE' },
     });
 
-    it('should serializer the rooms for a group', function() {
+    it('should serialize the rooms for a group', function() {
       return restful.serializeRoomsForGroupId(fixture.group1._id, fixture.user1._id)
         .then(function(result) {
           assert.strictEqual(result.length, 1);
@@ -194,4 +194,76 @@ describe('restful #slow', function() {
     });
   });
 
+  describe('topics-related restful serializers', function() {
+    var fixture = fixtureLoader.setup({
+      user1: {
+        accessToken: 'web-internal'
+      },
+      forum1: {
+        securityDescriptor: {
+          extraAdmins: ['user1']
+        }
+      },
+      category1: {
+        forum: 'forum1'
+      },
+      topic1: {
+        user: 'user1',
+        forum: 'forum1',
+        category: 'category1'
+      },
+      reply1: {
+        user: 'user1',
+        forum: 'forum1',
+        topic: 'topic1'
+      },
+      comment1: {
+        user: 'user1',
+        forum: 'forum1',
+        topic: 'topic1',
+        reply: 'reply1',
+      }
+    });
+
+    describe('serializeTopicsForForumId', function() {
+      it('should serialize topics in a forum', function() {
+        return restful.serializeTopicsForForumId(fixture.forum1._id)
+          .then(function(topics) {
+            var topic = topics.find(function(t) {
+              return t.id === fixture.topic1.id;
+            });
+            assert.strictEqual(topic.id, fixture.topic1.id);
+            assert.strictEqual(topic.repliesTotal, 1);
+            assert.strictEqual(topic.replies.length, 1);
+          });
+      });
+    });
+
+    describe('serializeRepliesForTopicId', function() {
+      it('should serialize replies in a topic', function() {
+        return restful.serializeRepliesForTopicId(fixture.topic1._id)
+          .then(function(replies) {
+            var reply = replies.find(function(r) {
+              return r.id === fixture.reply1.id;
+            });
+            assert.strictEqual(reply.id, fixture.reply1.id);
+            assert.strictEqual(reply.commentsTotal, 1);
+            assert.strictEqual(reply.comments.length, 1);
+          });
+      });
+    });
+
+    describe('serializeCommentsForReplyId', function() {
+      it('should serialize comments in a reply', function() {
+        return restful.serializeCommentsForReplyId(fixture.reply1._id)
+          .then(function(comments) {
+            var comment = comments.find(function(c) {
+              return c.id === fixture.comment1.id;
+            });
+            assert.strictEqual(comment.id, fixture.comment1.id);
+          });
+      });
+    });
+
+  });
 });
