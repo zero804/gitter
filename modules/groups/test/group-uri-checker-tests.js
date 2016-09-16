@@ -6,7 +6,7 @@ var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var groupUriChecker = require('../lib/group-uri-checker');
 
 
-var deleteDocuments =  {
+var deleteDocuments = {
   User: [
     { username: fixtureLoader.GITTER_INTEGRATION_USERNAME },
     { username: fixtureLoader.GITTER_INTEGRATION_COLLAB_USERNAME },
