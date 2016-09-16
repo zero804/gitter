@@ -8,15 +8,18 @@ var debug = require('debug')('gitter:tests:test-fixtures');
 function createReply(fixtureName, f) {
   debug('Creating %s', fixtureName);
 
+  var sent = f.sent || new Date();
+
   var doc = {
     forumId: f.forum && f.forum._id,
     userId: f.user && f.user._id,
     topicId: f.topic && f.topic._id,
     text: f.text,
     html: f.html,
-    sent: f.sent,
+    sent: sent,
     editedAt: f.editedAt,
-    lastModified: f.lastModified,
+    lastChanged: f.lastChanged || sent,
+    lastModified: f.lastModified || sent,
     lang: f.lang,
     _md: f._md
   };
