@@ -26,6 +26,7 @@ function createTopic(fixtureName, f) {
     editedAt: f.editedAt,
     lastChanged: f.lastChanged || sent,
     lastModified: f.lastModified || sent,
+    repliesTotal: f.repliesTotal,
     lang: f.lang,
     _md: f._md
   };

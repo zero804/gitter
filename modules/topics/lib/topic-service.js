@@ -62,12 +62,9 @@ function buildTopicQuery(forumIds, filter) {
     query.tags = { $all: filter.tags };
   }
 
-  if (filter.modifiedSince) {
+  if (filter.since) {
     // either new topics or ones that have been updated (new reply/comment)
-    query.$or = [
-      { sent: { $gte: filter.modifiedSince } },
-      { lastModified: { $gte: filter.modifiedSince } }
-    ];
+    query.lastChanged = { $gte: filter.since };
   }
 
   // we might have to look up the category by forumId&slug or user by username

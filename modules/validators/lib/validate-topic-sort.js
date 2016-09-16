@@ -2,10 +2,8 @@
 
 var KNOWN_SORT_KEYS = [
   '_id',
-  'sent',
-  'editedAt',
-  'lastModified',
-  //'repliesTotal', // TODO: add this field to the schema first
+  'lastChanged',
+  'repliesTotal',
 ];
 
 function validateTopicSort(sort) {

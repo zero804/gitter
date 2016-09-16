@@ -15,13 +15,11 @@ describe('validate-topic-filter', function() {
     [{_id: false}, false],
     [{_id: 'moo'}, false],
 
-    [{sent: 1}, true],
-    [{editedAt: 1}, true],
-    [{lastModified: 1}, true],
+    [{lastChanged: 1}, true],
 
-    //[{repliesTotal: 1}, true],
+    [{repliesTotal: 1}, true],
 
-    [{lastModified: 1, _id: 1}, true],
+    [{lastChanged: 1, _id: 1}, true],
   ];
 
   FIXTURES.forEach(function(fixture) {

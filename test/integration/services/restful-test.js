@@ -212,6 +212,7 @@ describe('restful #slow', function() {
   describe('topics-related restful serializers', function() {
     var oneMonthAgo = moment().subtract(1, 'months').toDate();
     var oneWeekAgo = moment().subtract(1, 'weeks').toDate();
+    var yesterday = moment().subtract(1, 'days').toDate();
     var today = new Date();
 
 
@@ -240,7 +241,8 @@ describe('restful #slow', function() {
         forum: 'forum1',
         category: 'category1',
         tags: ['foo', 'bar', 'baz'],
-        sent: oneMonthAgo
+        sent: oneMonthAgo,
+        repliesTotal: 1 // this doesn't get auto-filled yet.
       },
       topic2: {
         title: 'topic2',
@@ -249,8 +251,9 @@ describe('restful #slow', function() {
         category: 'category1',
         tags: ['foo', 'bar'],
         sent: oneWeekAgo,
-        editedAt: today,
-        lastModified: today
+        editedAt: yesterday,
+        lastChanged: yesterday,
+        repliesTotal: 2
       },
       topic3: {
         title: 'topic3',
@@ -260,7 +263,7 @@ describe('restful #slow', function() {
         tags: ['foo'],
         sent: oneMonthAgo,
         editedAt: oneWeekAgo,
-        lastModified: oneWeekAgo
+        lastChanged: oneWeekAgo
       },
       topic4: {
         title: 'topic4',
@@ -273,7 +276,8 @@ describe('restful #slow', function() {
       reply1: {
         user: 'user1',
         forum: 'forum1',
-        topic: 'topic1'
+        topic: 'topic1',
+        commentsTotal: 1 // doesn't get filled in yet..
       },
       comment1: {
         user: 'user1',
@@ -354,9 +358,7 @@ describe('restful #slow', function() {
       it('should filter by topics with activity', function() {
         var options = {
           filter: {
-            // either sent is after oneWeekAgo OR lastModified is after it
-            // oneWeekAgo
-            modifiedSince: oneWeekAgo
+            since: oneWeekAgo
           }
         };
         return restful.serializeTopicsForForumId(fixture.forum1._id, options)
@@ -403,10 +405,11 @@ describe('restful #slow', function() {
           });
       });
 
-      it('should sort by sent (created date)', function() {
+
+      it('should sort by lastChanged', function() {
         var options = {
           sort: {
-            sent: 1
+            lastChanged: 1
           }
         };
         return restful.serializeTopicsForForumId(fixture.forum1._id, options)
@@ -420,48 +423,40 @@ describe('restful #slow', function() {
           });
       });
 
-      it('should sort by editedAt (edited date)', function() {
+      it('should sort by number of replies', function() {
         var options = {
           sort: {
-            editedAt: 1
+            repliesTotal: -1
           }
         };
         return restful.serializeTopicsForForumId(fixture.forum1._id, options)
           .then(function(topics) {
-            // 0 and 1 have editedAt set to null, so their exact order is
-            // unknown, but they will appear at the start.
-            var knownOrder = [topics[2], topics[3]];
+            // 3 & 4 have no replies, so their order is undefined in this case
+            var knownOrder = [topics[0], topics[1]];
             assert.ok(matchIds(knownOrder, [
-              fixture.topic3.id,
               fixture.topic2.id,
+              fixture.topic1.id,
             ]));
           });
       });
 
-      it('should sort by lastModified (edited or reply/comment added)', function() {
+      it('should handle multiple sort keys', function() {
         var options = {
           sort: {
-            lastModified: 1
+            repliesTotal: -1,
+            lastChanged: 1,
           }
         };
         return restful.serializeTopicsForForumId(fixture.forum1._id, options)
           .then(function(topics) {
-            // 0 and 1 have lastModified set to null, so their exact order is
-            // unknown, but they will appear at the start.
-            var knownOrder = [topics[2], topics[3]];
-            assert.ok(matchIds(knownOrder, [
-              fixture.topic3.id,
+            assert.ok(matchIds(topics, [
               fixture.topic2.id,
+              fixture.topic1.id,
+              fixture.topic3.id,
+              fixture.topic4.id,
             ]));
           });
       });
-
-      // TODO: Would be nice to have ONE date field we can use to filter/sort
-      // across sent AND lastUpdated so you can just ask for things that are
-      // new since X and have it come back in that order.
-
-      // TODO:
-      //it('should sort by number of replies');
     });
 
     describe('serializeRepliesForTopicId', function() {
