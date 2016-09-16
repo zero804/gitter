@@ -5,9 +5,9 @@ var context = require('./utils/context');
 var chatCollection = require('./collections/instances/chats');
 var EmbedLayout = require('./views/layouts/chat-embed');
 var Backbone = require('backbone');
-var apiClient = require('./components/apiClient');
-
-
+var Router = require('./routes/router');
+var roomRoutes = require('./routes/room-routes');
+var notificationRoutes = require('./routes/notification-routes');
 
 /* Set the timezone cookie */
 require('./components/timezone-cookie');
@@ -23,41 +23,6 @@ require('./components/ping');
 require('./views/widgets/avatar');
 
 onready(function() {
-  var Router = Backbone.Router.extend({
-    routes: {
-      '': 'hideModal',
-      'autojoin': 'autojoin',
-      'welcome-message': 'showWelcomeMessage'
-    },
-
-    hideModal: function() {
-      appView.dialogRegion.destroy();
-    },
-
-    autojoin: function() {
-      if (context.roomHasWelcomeMessage()) {
-        this.showWelcomeMessage();
-        return;
-      }
-
-      apiClient.user
-        .post('/rooms', { id: context.troupe().id })
-        .bind(this)
-        .then(function(body) {
-          context.setTroupe(body);
-        });
-    },
-
-    showWelcomeMessage: function (){
-      require.ensure(['./views/modals/welcome-message'], function(require){
-        var WelcomeMessageView = require('./views/modals/welcome-message');
-        appView.dialogRegion.show(new WelcomeMessageView.Modal());
-      });
-    },
-  });
-
-  new Router();
-
   var appView = new EmbedLayout({
     el: 'body',
     model: context.troupe(),
@@ -65,6 +30,22 @@ onready(function() {
     chatCollection: chatCollection
   });
   appView.render();
+
+
+
+  new Router({
+    dialogRegion: appView.dialogRegion,
+    routes: [
+      notificationRoutes(),
+      roomRoutes({
+        rosterCollection: null,
+        // TODO: remove these two options:
+        // https://github.com/troupe/gitter-webapp/issues/2211
+        rooms: null,
+        groups: null
+      }),
+    ]
+  });
 
   Backbone.history.start();
 
