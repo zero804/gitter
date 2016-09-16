@@ -29,7 +29,7 @@ describe('topic-api', function() {
     topic1: {
       user: 'user1',
       forum: 'forum1',
-      category: 'category1'
+      category: 'category1',
     },
     reply1: {
       user: 'user1',
@@ -50,7 +50,6 @@ describe('topic-api', function() {
           return t.id === fixture.topic1.id;
         });
         assert.strictEqual(topic.id, fixture.topic1.id);
-        assert.strictEqual(topic.repliesTotal, 1);
         assert.strictEqual(topic.replies.length, 1);
       });
   });
@@ -63,7 +62,6 @@ describe('topic-api', function() {
       .then(function(result) {
         var topic = result.body;
         assert.strictEqual(topic.id, fixture.topic1.id);
-        assert.strictEqual(topic.repliesTotal, 1);
         assert.strictEqual(topic.replies.length, 1);
       });
   });
