@@ -55,15 +55,12 @@ function handleApiError(status, statusText, method, url) {
 }
 
 
-var apiClient = generateApiClient();
-
-apiClient.config = _.extend(apiClient.config, {
+var apiClient = generateApiClient({
   baseUrl: clientEnv['apiBasePath'],
   getAccessToken: context.getAccessToken,
   getUserId: context.getUserId,
   getTroupeId: context.getTroupeId,
   onApiError: handleApiError
 });
-
 
 module.exports = apiClient;

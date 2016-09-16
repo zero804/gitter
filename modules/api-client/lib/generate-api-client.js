@@ -174,15 +174,14 @@ function operation(fullUrlFunction, baseUrlFunction, method, defaultOptions, url
 
 
 function getClient(fullUrlFunction, uriFunction) {
-  var config = this.config;
   fullUrlFunction = fullUrlFunction.bind(this);
   uriFunction = (uriFunction || function() {
     return '';
   }).bind(this);
 
   var baseUrlFunction = function() {
-    return config.baseUrl + uriFunction();
-  };
+    return this.config.baseUrl + uriFunction();
+  }.bind(this);
 
   return OPERATIONS
     .reduce(function(memo, descriptor) {
@@ -199,27 +198,28 @@ function getClient(fullUrlFunction, uriFunction) {
         return fullUrlFunction(baseUrlFunction, relativeUrl);
       },
       channel: function(relativeUrl) {
-        return makeUrl(baseUrlFunction, relativeUrl);
+        return makeUrl(uriFunction, relativeUrl);
       },
       channelGenerator: function(relativeUrl) {
         return function() {
-          return makeUrl(baseUrlFunction, relativeUrl);
-        }.bind(this);
+          return makeUrl(uriFunction, relativeUrl);
+        };
       }
     });
 }
 
 
+var configDefaults = {
+  baseUrl: '',
+  getAccessToken: function() { return ''; },
+  getUserId: function() { return ''; },
+  getTroupeId: function() { return ''; },
+  onApiError: function() {}
+};
 
-module.exports = function() {
+module.exports = function(config) {
   var client = {
-    config: {
-      baseUrl: '',
-      getAccessToken: function() { return ''; },
-      getUserId: function() { return ''; },
-      getTroupeId: function() { return ''; },
-      onApiError: function() {}
-    }
+    config: _.extend({}, configDefaults, config)
   };
 
   return _.extend(client, getClient.bind(client)(makeUrl), {
