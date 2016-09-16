@@ -44,27 +44,29 @@
  *     window.alert('I am a failure: ' + err.status);
  *   })
  */
+
+var Promise = require('bluebird');
 var _ = require('underscore');
+var Backbone = require('backbone');
 var Resource = require('./resource');
 
 var CONFIG_DEFAULTS = {
-  baseUrl: '',
-  getAccessToken: function() { return ''; },
+  baseUrl: 'https://api.gitter.im/',
+  accessToken: '',
   getUserId: function() { return ''; },
-  getTroupeId: function() { return ''; },
-  onApiError: function() {}
+  getTroupeId: function() { return ''; }
 };
 
+function ApiClient(config) {
+  this._config = config = _.extend({}, CONFIG_DEFAULTS, config);
 
-function Client(config) {
-  config = _.extend({}, CONFIG_DEFAULTS, config);
   var apiBasePath = config.baseUrl;
 
-  var base = this.base = new Resource(config);
+  var base = this.base = new Resource(this, config, apiBasePath, '');
 
-  // Prune public methods from base onto the client
+  // Splice public methods from base onto the client
   // to maintain backwards compatibility
-  Object.keys(base).forEach(function(key) {
+  Object.keys(Resource.prototype).forEach(function(key) {
     if (key.indexOf('_') === 0) return;
     var v = base[key];
     if (typeof v !== 'function') return;
@@ -72,31 +74,44 @@ function Client(config) {
   }, this)
 
   /* /v1/user/:currentUserId/ */
-  this.user = new Resource(config, apiBasePath, function() {
-    return '/v1/user/' + this.config.getUserId();
-  });
+  this.user = new Resource(this, config, apiBasePath, this._getUserUrl);
 
   /* /v1/rooms/:currentRoomId/ */
-  this.room = new Resource(config, apiBasePath, function() {
-    return '/v1/rooms/' + this.config.getTroupeId();
-  });
+  this.room = new Resource(this, config, apiBasePath, this._getRoomUrl);
 
   /* /v1/user/:currentUserId/rooms/:currentRoomId/ */
-  this.userRoom = new Resource(config, apiBasePath, function() {
-    return '/v1/user/' + this.config.getUserId() + '/rooms/' + this.config.getTroupeId();
-  });
+  this.userRoom = new Resource(this, config, apiBasePath, this._getUserRoomUrl);
 
   /* /private */
-  this.priv = new Resource(config, apiBasePath, function() {
-    return '/private';
-  });
+  this.priv = new Resource(this, config, apiBasePath, '/private');
 
   // The Web resource doesn't use the basepath
-  this.web = new Resource(config, '', function() {
-    return '';
-  });
+  this.web = new Resource(this, config, '', '');
 }
 
-module.exports = function(config) {
-  return new Client(config);
-}
+_.extend(ApiClient.prototype, Backbone.Events, {
+  _getUserUrl: function() {
+    return '/v1/user/' + this._config.getUserId();
+  },
+
+  _getRoomUrl: function() {
+    return '/v1/rooms/' + this._config.getTroupeId();
+  },
+
+  _getUserRoomUrl: function() {
+    return '/v1/user/' + this._config.getUserId() + '/rooms/' + this._config.getTroupeId();
+  },
+
+  _getAccessToken: Promise.method(function() {
+    var accessToken = this._config.accessToken;
+
+    if (typeof accessToken === 'function') {
+      return accessToken();
+    }
+
+    return accessToken;
+  }),
+
+});
+
+module.exports = ApiClient;

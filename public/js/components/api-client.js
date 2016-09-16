@@ -3,7 +3,7 @@
 var clientEnv = require('gitter-client-env');
 var context = require('../utils/context');
 var appEvents = require('../utils/appevents');
-var generateApiClient = require('gitter-web-api-client');
+var ApiClient = require('gitter-web-api-client');
 
 
 // Minimize the number of different errors which are actually the same
@@ -54,12 +54,15 @@ function handleApiError(status, statusText, method, url) {
 }
 
 
-var apiClient = generateApiClient({
+var apiClient = new ApiClient({
   baseUrl: clientEnv['apiBasePath'],
-  getAccessToken: context.getAccessToken,
+  accessToken: context.getAccessToken,
   getUserId: context.getUserId,
-  getTroupeId: context.getTroupeId,
-  onApiError: handleApiError
+  getTroupeId: context.getTroupeId
+});
+
+apiClient.on('error', function(err) {
+  handleApiError(err.status, err.statusText, err.method, err.url);
 });
 
 module.exports = apiClient;
