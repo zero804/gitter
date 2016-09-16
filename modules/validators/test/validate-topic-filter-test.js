@@ -23,11 +23,11 @@ describe('validate-topic-filter', function() {
     [{username: 1}, false],
     [{username: {}}, false],
 
-    [{modifiedSince: new Date()}, true],
-    [{modifiedSince: new Date().toISOString()}, false],
-    [{modifiedSince: 1}, false],
-    [{modifiedSince: 'yesterday'}, false],
-    [{modifiedSince: {}}, false],
+    [{since: new Date()}, true],
+    [{since: new Date().toISOString()}, false],
+    [{since: 1}, false],
+    [{since: 'yesterday'}, false],
+    [{since: {}}, false],
 
     [{username: 'foo', category: 'general', tags: ['foo', 'bar', 'baz']}, true],
   ];

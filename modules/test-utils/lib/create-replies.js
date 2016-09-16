@@ -20,6 +20,7 @@ function createReply(fixtureName, f) {
     editedAt: f.editedAt,
     lastChanged: f.lastChanged || sent,
     lastModified: f.lastModified || sent,
+    commentsTotal: f.commentsTotal,
     lang: f.lang,
     _md: f._md
   };

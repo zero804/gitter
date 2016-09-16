@@ -18,15 +18,15 @@ function validateUsernameFilter(username) {
   return validateUsername(username);
 }
 
-function validateModifiedSinceFilter(modifiedSince) {
-  return _.isDate(modifiedSince);
+function validateSinceFilter(since) {
+  return _.isDate(since);
 }
 
 var knownFilters = {
   tags: validateTagsFilter,
   category: validateCategoryFilter,
   username: validateUsernameFilter,
-  modifiedSince: validateModifiedSinceFilter
+  since: validateSinceFilter
 };
 
 function validateTopicFilter(filter) {
