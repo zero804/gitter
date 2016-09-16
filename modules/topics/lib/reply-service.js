@@ -87,40 +87,52 @@ function updateRepliesTotal(topicId) {
     _id: topicId
   };
 
-  var lastModified = new Date();
+  var now = new Date();
+  var nowTime = now.getTime();
+  var nowString = now.toISOString();
 
-  var update = {
-    $max: {
-      lastModified: lastModified
-    }
-  };
 
-  return Topic.findOneAndUpdate(query, update, { new: true })
-    .exec()
+  return findTotalByTopicId(topicId)
     .bind({
       topic: undefined
+    })
+    .then(function(repliesTotal) {
+      var update = {
+        $max: {
+          lastChanged: now,
+          lastModified: now,
+          repliesTotal: repliesTotal
+        }
+      };
+
+      return Topic.findOneAndUpdate(query, update, { new: true })
+        .exec();
     })
     .then(function(topic) {
       this.topic = topic;
 
       if (topic) {
-        debug("topic.lastModified: %s, lastModified: %s", topic.lastModified, lastModified)
+        debug("Topic updated: %j", {
+          now: now,
+          lastChanged: topic.lastChanged,
+          lastModified: topic.lastModified,
+          repliesTotal: topic.repliesTotal
+        });
       }
 
-      if (!topic || topic.lastModified.getTime() !== lastModified.getTime()) {
+      // we only have to check the one field to know
+      if (!topic || topic.lastModified.getTime() !== nowTime) {
         debug('We lost the topic update race.');
         return;
       }
 
       // if this update won, then patch the live collection with the latest
-      // lastModified value and also the new total replies.
-      return findTotalByTopicId(topicId)
-        .then(function(repliesTotal) {
-          liveCollections.topics.emit('patch', topic.forumId, topicId, {
-            lastModified: lastModified.toISOString(),
-            repliesTotal: repliesTotal
-          })
-        });
+      // lastChanged & lastModified values and also the new total replies.
+      liveCollections.topics.emit('patch', topic.forumId, topicId, {
+        lastChanged: nowString,
+        lastModified: nowString,
+        repliesTotal: topic.repliesTotal
+      })
     })
     .then(function() {
       // return the topic that got updated (if it was updated).
@@ -137,6 +149,10 @@ function createReply(user, topic, options) {
   };
 
   var insertData = validateReply(data);
+
+  // make these all be the exact same instant
+  insertData.sent = insertData.lastChanged = insertData.lastModified = new Date();
+
   return processText(options.text)
     .then(function(parsedMessage) {
       insertData.html = parsedMessage.html;

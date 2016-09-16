@@ -134,8 +134,9 @@ function TopicStrategy(options) {
       replyingUsers: replyingUsersStrategy ? replyingUsersStrategy.map(id): undefined,
 
       sent: formatDate(topic.sent),
-      editedAt: topic.editedAt ? formatDate(topic.editedAt) : null,
-      lastModified: topic.lastModified ? formatDate(topic.lastModified) : null,
+      editedAt: formatDate(topic.editedAt),
+      lastChanged: formatDate(topic.lastChanged),
+      lastModified: formatDate(topic.lastModified),
       v: getVersion(topic),
 
       // TODO: participatingTotal
