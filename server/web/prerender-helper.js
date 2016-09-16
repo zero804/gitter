@@ -11,10 +11,6 @@ var PRERENDERED_VIEWS = [
   "js/views/menu/room/topics-area/topics-area-view",
   "js/views/menu/room/topics-area/category-item-view",
 
-  //OLD SEARCH
-  "js/views/search/tmpl/search-input",
-  "js/views/search/tmpl/search",
-
   //OLD MENU
   "js/views/menu/old/tmpl/troupeMenu",
   "js/views/menu/old/tmpl/profile",

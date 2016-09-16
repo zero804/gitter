@@ -63,8 +63,6 @@ function renderMainFrame(req, res, next, options) {
         bootScriptName = 'router-nli-app';
       }
 
-      var hasNewLeftMenu = !req.isPhone && req.fflip && req.fflip.has('left-menu');
-
       var extras = {
         suggestedMenuState: options.suggestedMenuState,
         forumGroup: forumGroup,
@@ -95,7 +93,6 @@ function renderMainFrame(req, res, next, options) {
 
       res.render(template, {
         //left menu
-        hasNewLeftMenu:         hasNewLeftMenu,
         leftMenuOrgs:           troupeContext.snapshots.orgs,
         roomMenuIsPinned:       snapshots.leftMenu.roomMenuIsPinned,
 
@@ -116,7 +113,7 @@ function renderMainFrame(req, res, next, options) {
         menuHeaderExpanded:     false,
         user:                   user,
         orgs:                   orgs,
-        isPhone:            req.isPhone,
+        isPhone:                req.isPhone,
         //TODO Remove this when left-menu switch goes away JP 23/2/16
         rooms: {
           favourites: rooms

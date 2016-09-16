@@ -58,7 +58,24 @@ describe('authorisor', function() {
         name: 'topic replies subscription',
         meta: {
           forumId: '57bd75d9a8aefa74c58d9d6c',
+          topicId: '57c6e136f388d1e978b8e7d1',
           subscription: "/api/v1/forums/57bd75d9a8aefa74c58d9d6c/topics/57c6e136f388d1e978b8e7d1/replies"
+        },
+        tests: [{
+          name: 'has access',
+          canAccessForum: true
+        },{
+          name: 'has no access',
+          canAccessForum: false,
+          expectedError: true
+        }]
+      }, {
+        name: 'reply comments subscription',
+        meta: {
+          forumId: '57bd75d9a8aefa74c58d9d6c',
+          topicId: '57c6e136f388d1e978b8e7d1',
+          replyId: '57d7d83984cf3beb9c6e6f1a',
+          subscription: "/api/v1/forums/57bd75d9a8aefa74c58d9d6c/topics/57c6e136f388d1e978b8e7d1/replies/57d7d83984cf3beb9c6e6f1a/comments"
         },
         tests: [{
           name: 'has access',
@@ -123,6 +140,25 @@ describe('authorisor', function() {
         'gitter-web-permissions/lib/policy-factory': {
           createPolicyForUserIdInRoomId: createPolicyForUserIdInRoomId,
           createPolicyForUserIdInForumId: createPolicyForUserIdInForumId
+        },
+        'gitter-web-topics/lib/topic-service': {
+          findByIdForForum: function(forumId, topicId) {
+            if (forumId === meta.forumId && topicId === meta.topicId) {
+              return Promise.resolve(true); // not really a topic
+            } else {
+              return Promise.resolve(null);
+            }
+          }
+        },
+        'gitter-web-topics/lib/reply-service': {
+          findByIdForForumAndTopic: function(forumId, topicId, replyId) {
+
+            if (forumId === meta.forumId && topicId === meta.topicId && replyId === meta.replyId) {
+              return Promise.resolve(true); // not really a reply
+            } else {
+              return Promise.resolve(null);
+            }
+          }
         },
         'gitter-web-presence': presenceServiceMock,
         '../../services/restful': restfulMock
