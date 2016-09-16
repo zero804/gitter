@@ -19,7 +19,9 @@ var chatCollection = require('./collections/instances/chats-cached');
 var troupeCollections = require('./collections/instances/troupes');
 var ChatToolbarInputLayout = require('./views/layouts/chat-toolbar-input');
 var DropTargetView = require('./views/app/dropTargetView');
-var presentPermissionsDialog = require('./ensured/present-permissions-dialog');
+var Router = require('./routes/router');
+var roomRoutes = require('./routes/room-routes');
+var notificationRoutes = require('./routes/notification-routes');
 
 /* Set the timezone cookie */
 require('./components/timezone-cookie');
@@ -253,166 +255,20 @@ onready(function() {
   /* Drag and drop */
   new DropTargetView({ template: false, el: 'body' }).render();
 
-  var Router = Backbone.Router.extend({
-    routes: {
-      '': 'hideModal',
-      'share': 'share',
-      'delete': 'delete',
-      'people': 'people',
-      'notifications': 'notifications',
-      'markdown': 'markdown',
-      'keys': 'keys',
-      'integrations': 'integrations',
-      'add': 'addPeople',
-      'settings': 'settings',
-      'permissions': 'permissions',
-      'tags': 'editTags',
-      'autojoin': 'autojoin',
-      'notification-defaults': 'notificationDefaults',
-      'welcome-message': 'showWelcomeMessage'
-    },
-
-    autojoin: function() {
-      if (context.roomHasWelcomeMessage()) {
-        this.showWelcomeMessage();
-        return;
-      }
-
-      apiClient.user
-        .post('/rooms', { id: context.troupe().id })
-        .bind(this)
-        .then(function(body) {
-          context.setTroupe(body);
-        });
-    },
-
-    hideModal: function() {
-      appView.dialogRegion.destroy();
-    },
-
-    people: function() {
-      require.ensure(['./views/modals/people-modal'], function(require) {
-        var PeopleModal = require('./views/modals/people-modal');
-
-        appView.dialogRegion.show(new PeopleModal({
-          rosterCollection: itemCollections.roster
-        }));
-      });
-    },
-
-    notifications: function() {
-      require.ensure(['./views/modals/notification-settings-view'], function(require) {
-        var NotificationSettingsView = require('./views/modals/notification-settings-view');
-        appView.dialogRegion.show(new NotificationSettingsView({ model: new Backbone.Model() }));
-      });
-    },
-
-    markdown: function() {
-      require.ensure(['./views/modals/markdown-view'], function(require) {
-        var MarkdownView = require('./views/modals/markdown-view');
-        appView.dialogRegion.show(new MarkdownView({}));
-      });
-    },
-
-    keys: function() {
-      require.ensure(['./views/modals/keyboard-view'], function(require) {
-        var KeyboardView = require('./views/modals/keyboard-view');
-        appView.dialogRegion.show(new KeyboardView({}));
-      });
-    },
-
-    addPeople: function() {
-      require.ensure(['./views/app/addPeopleView', './views/modals/upgrade-to-pro-view'], function(require) {
-        var room = context.troupe();
-        var maxFreeMembers = clientEnv.maxFreeOrgRoomMembers;
-        var isOverLimit = room.get('security') !== 'PUBLIC' &&
-          room.get('githubType').indexOf('ORG') >= 0 &&
-          !room.get('premium') &&
-          room.get('userCount') >= maxFreeMembers;
-
-        if (isOverLimit) {
-          var GetProViewModal = require('./views/modals/upgrade-to-pro-view');
-          appView.dialogRegion.show(new GetProViewModal({}));
-        } else {
-          var AddPeopleViewModal = require('./views/app/addPeopleView');
-          appView.dialogRegion.show(new AddPeopleViewModal({}));
-        }
-      });
-
-    },
-
-    settings: function() {
-      require.ensure(['./views/modals/room-settings-view'], function(require) {
-        var RoomSettingsModal = require('./views/modals/room-settings-view');
-        appView.dialogRegion.show(new RoomSettingsModal({ model: context.troupe() }));
-      });
-    },
-
-    permissions: function() {
-      presentPermissionsDialog({
-        roomCollection: troupeCollections.troupes,
-        groupCollection: troupeCollections.groups,
-        dialogRegion: appView.dialogRegion
-      });
-    },
-
-
-    editTags: function() {
-      require.ensure(['./views/modals/edit-tags-view'], function(require) {
-        var EditTagsView = require('./views/modals/edit-tags-view');
-        appView.dialogRegion.show(new EditTagsView({roomId: context.troupe().get('id')}));
-      });
-    },
-
-    integrations: function() {
-      if (context.isTroupeAdmin()) {
-        require.ensure(['./views/modals/integration-settings-view'], function(require) {
-          var IntegrationSettingsModal = require('./views/modals/integration-settings-view');
-
-          appView.dialogRegion.show(new IntegrationSettingsModal({}));
-        });
-      } else {
-        window.location = '#';
-      }
-    },
-
-    share: function() {
-      require.ensure(['./views/modals/share-view'], function(require) {
-        var shareView = require('./views/modals/share-view');
-
-        appView.dialogRegion.show(new shareView.Modal({}));
-      });
-    },
-
-    delete: function() {
-      require.ensure(['./views/modals/delete-room-view'], function(require) {
-        var DeleteModal = require('./views/modals/delete-room-view');
-
-        appView.dialogRegion.show(new DeleteModal({}));
-      });
-    },
-
-    notificationDefaults: function() {
-      require.ensure(['./views/modals/notification-defaults-view'], function(require) {
-        var NotificationDefaultsView = require('./views/modals/notification-defaults-view');
-
-        appView.dialogRegion.show(new NotificationDefaultsView({
-          model: new Backbone.Model()
-        }));
-
-      });
-    },
-
-    showWelcomeMessage: function (){
-      require.ensure(['./views/modals/welcome-message'], function(require){
-        var WelcomeMessageView = require('./views/modals/welcome-message');
-        appView.dialogRegion.show(new WelcomeMessageView.Modal());
-      });
-    },
-
+  var router = new Router({
+    dialogRegion: appView.dialogRegion,
+    routes: [
+      notificationRoutes(),
+      roomRoutes({
+        rosterCollection: itemCollections.roster,
+        // TODO: remove these two options:
+        // https://github.com/troupe/gitter-webapp/issues/2211
+        rooms: troupeCollections.troupes,
+        groups: troupeCollections.groups
+      }),
+    ]
   });
 
-  var router = new Router();
 
   var showingHelp = false;
   var hideHelp = function() {
