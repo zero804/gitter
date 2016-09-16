@@ -135,6 +135,8 @@ function TopicStrategy(options) {
 
       sent: formatDate(topic.sent),
       editedAt: topic.editedAt ? formatDate(topic.editedAt) : null,
+      // TODO: drop these || null bits once we've migrated
+      lastChanged: topic.lastChanged ? formatDate(topic.lastChanged) : null,
       lastModified: topic.lastModified ? formatDate(topic.lastModified) : null,
       v: getVersion(topic),
 

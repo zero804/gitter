@@ -54,10 +54,6 @@ describe('topics-live-collection', function() {
   });
 
   it('should emit a patch event when adding a reply', function() {
-    // this test depends on the fact that topic.lastModified is not set at the
-    // start
-    assert.ok(!fixture.topic1.lastModified);
-
     var checkEvent = appEvents.addListener('dataChange2', {
       url: '/forums/' + fixture.forum1.id + '/topics',
       operation: 'patch',
@@ -88,8 +84,6 @@ describe('topics-live-collection', function() {
   });
 
   it('should emit a patch event when adding a comment', function() {
-    assert.ok(!fixture.topic2.lastModified);
-
     var checkEvent = appEvents.addListener('dataChange2', {
       url: '/forums/' + fixture.forum1.id + '/topics',
       operation: 'patch',

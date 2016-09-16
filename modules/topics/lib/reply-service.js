@@ -137,6 +137,10 @@ function createReply(user, topic, options) {
   };
 
   var insertData = validateReply(data);
+
+  // make these all be the exact same instant
+  insertData.sent = insertData.lastChanged = insertData.lastUpdated = new Date();
+
   return processText(options.text)
     .then(function(parsedMessage) {
       insertData.html = parsedMessage.html;

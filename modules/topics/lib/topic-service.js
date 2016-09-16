@@ -74,6 +74,10 @@ function createTopic(user, category, options) {
   };
 
   var insertData = validateTopic(data, { allowedTags: allowedTags });
+
+  // make these all be the exact same instant
+  insertData.sent = insertData.lastChanged = insertData.lastUpdated = new Date();
+
   return processText(options.text)
     .then(function(parsedMessage) {
       insertData.html = parsedMessage.html;

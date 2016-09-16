@@ -9,7 +9,7 @@ var commentService = require('gitter-web-topics/lib/comment-service');
 
 require('../../server/event-listeners').install();
 
-describe('replies-live-collection', function() {
+describe('replies-live-collection #slow', function() {
   var fixture = fixtureLoader.setup({
     user1: {},
     forum1: {},
@@ -48,8 +48,6 @@ describe('replies-live-collection', function() {
   });
 
   it('should emit a patch event when adding a comment', function() {
-    assert.ok(!fixture.reply1.lastModified);
-
     var checkEvent = appEvents.addListener('dataChange2', {
       url: '/forums/' + fixture.forum1.id + '/topics/' + fixture.topic1.id + '/replies',
       operation: 'patch',
