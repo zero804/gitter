@@ -36,7 +36,7 @@ var PanelView = Marionette.LayoutView.extend({
 
   initHeader: function(optionsForRegion) {
     return new PanelHeaderView(optionsForRegion({
-      model:     this.model,
+      model: this.model,
       groupsCollection: this.model.groupsCollection,
     }));
   },
