@@ -118,7 +118,6 @@ function renderChat(req, res, options, next) {
             isRightToolbarPinned: isRightToolbarPinned,
 
             //Feature Switch Left Menu
-            hasNewLeftMenu: req.fflip && req.fflip.has('left-menu'),
             troupeTopic: troupeContext.troupe.topic,
             premium: troupeContext.troupe.premium,
             troupeFavourite: troupeContext.troupe.favourite,
