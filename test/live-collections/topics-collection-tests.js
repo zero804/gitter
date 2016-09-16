@@ -81,7 +81,8 @@ describe('topics-live-collection', function() {
           .then(function(topic) {
             // lastModified must now exist and match the one we got in the event.
             assert.ok(topic.lastModified);
-            assert.strictEqual(topic.lastModified.getTime(), event.model.lastModified.getTime());
+            var lastModified = new Date(event.model.lastModified);
+            assert.strictEqual(topic.lastModified.getTime(), lastModified.getTime());
           });
       });
   });
@@ -110,7 +111,8 @@ describe('topics-live-collection', function() {
           .then(function(topic) {
             // lastModified must now exist and match the one we got in the event.
             assert.ok(topic.lastModified);
-            assert.strictEqual(topic.lastModified.getTime(), event.model.lastModified.getTime());
+            var lastModified = new Date(event.model.lastModified);
+            assert.strictEqual(topic.lastModified.getTime(), lastModified.getTime());
           });
       });
   });
