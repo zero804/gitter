@@ -96,9 +96,6 @@ describe('group-uri-checker #slow', function() {
 
 
     it('should allow creation if a gh org with that login exists and the user has admin access', function() {
-      // TODO: How do I ignore group2 at this point?
-      // I need to test with a group associated with the integration org above
-      // And without the group here
       return groupUriChecker(fixture.user1, fixtureLoader.GITTER_INTEGRATION_ORG)
         .then(function(info) {
           assert.strictEqual(info.type, 'GH_ORG');
