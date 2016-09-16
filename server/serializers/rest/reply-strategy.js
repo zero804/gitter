@@ -50,6 +50,7 @@ function ReplyStrategy(options) {
             .then(function(comments) {
               commentsMap = _.groupBy(comments, 'replyId');
 
+              // TODO: move to CommentsForReplyStrategy
               commentStrategy = new CommentStrategy();
               strategies.push(commentStrategy.preload(Lazy(comments)));
             });
@@ -108,6 +109,7 @@ function ReplyStrategy(options) {
 
       sent: formatDate(reply.sent),
       editedAt: reply.editedAt ? formatDate(reply.editedAt) : null,
+      lastChanged: reply.lastChanged ? formatDate(reply.lastChanged) : null,
       lastModified: reply.lastModified ? formatDate(reply.lastModified) : null,
       v: getVersion(reply)
     };

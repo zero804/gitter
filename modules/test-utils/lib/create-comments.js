@@ -17,7 +17,6 @@ function createComment(fixtureName, f) {
     html: f.html,
     sent: f.sent,
     editedAt: f.editedAt,
-    lastModified: f.lastModified,
     lang: f.lang,
     _md: f._md
   };

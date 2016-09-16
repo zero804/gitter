@@ -13,7 +13,9 @@ var ReplySchema = new Schema({
   userId: {type: ObjectId, required: true},
   sent: { type: Date, "default": Date.now },
   editedAt: { type: Date, "default": null },
-  lastModified: { type: Date, "default": null },
+  lastChanged: { type: Date, "default": Date.now },
+  lastModified: { type: Date, "default": Date.now },
+  commentsTotal: { type: Number, "default": 0 },
   lang: {type: String },
   _tv: { type: 'MongooseNumber', 'default': 0 },
   _md: {type: Number }
@@ -22,6 +24,8 @@ var ReplySchema = new Schema({
 ReplySchema.schemaTypeName = 'ReplySchema';
 ReplySchema.index({ forumId: 1 });
 ReplySchema.index({ topicId: 1 });
+ReplySchema.index({ lastChanged: 1 });
+ReplySchema.index({ commentsTotal: 1 });
 
 installVersionIncMiddleware(ReplySchema);
 
