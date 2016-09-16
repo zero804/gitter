@@ -74,11 +74,14 @@ function findByIdForForumTopicAndReply(forumId, topicId, replyId, commentId) {
 function updateCommentsTotal(topicId, replyId) {
   debug("updateCommentsTotal %s %s", topicId, replyId);
 
-  var lastModified = new Date();
+  var now = new Date();
+  var nowTime = now.getTime();
+  var nowString = now.toISOString();
 
   var update = {
     $max: {
-      lastModified: lastModified
+      lastChanged: now,
+      lastModified: now
     }
   };
 
@@ -90,29 +93,34 @@ function updateCommentsTotal(topicId, replyId) {
       reply: undefined
     })
     .spread(function(topic, reply) {
+      this.topic = topic;
+      this.reply = reply;
+
       if (topic) {
-        debug("topic.lastModified: %s, lastModified: %s", topic.lastModified, lastModified)
+        debug("topic.lastChanged: %s, topic.lastModified: %s, lastModified: %s", topic.lastChanged, topic.lastModified, now);
       }
 
-      if (topic && topic.lastModified.getTime() === lastModified.getTime()) {
+      if (topic && topic.lastChanged.getTime() === nowTime && topic.lastModified.getTime() === nowTime) {
         // if the topic update won, patch the topics live collection
         liveCollections.topics.emit('patch', topic.forumId, topicId, {
-          lastModified: lastModified.toISOString()
+          lastChanged: nowString,
+          lastModified: nowString,
         });
       } else {
         debug('We lost the topic update race.');
       }
 
       if (reply) {
-        debug("reply.lastModified: %s, lastModified: %s", reply.lastModified, lastModified)
+        debug("reply.lastChanged: %s, reply.lastModified: %s, lastModified: %s", reply.lastChanged, reply.lastModified, now);
       }
 
-      if (reply && reply.lastModified.getTime() === lastModified.getTime()) {
+      if (reply && reply.lastChanged.getTime() === nowTime && reply.lastModified.getTime() === nowTime) {
         // if the reply update won, patch the replies live collection
         return findTotalByReplyId(replyId)
           .then(function(commentsTotal) {
             liveCollections.replies.emit('patch', reply.forumId, reply.topicId, replyId, {
-              lastModified: lastModified.toISOString(),
+              lastChanged: nowString,
+              lastModified: nowString,
               commentsTotal: commentsTotal
             });
           });
