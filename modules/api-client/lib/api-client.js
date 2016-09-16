@@ -48,7 +48,6 @@ var Promise = require('bluebird');
 var $ = require('jquery');
 var _ = require('lodash');
 var debug = require('debug-proxy')('app:api-client');
-var urlJoin = require('url-join');
 
 
 /* @const */
@@ -82,14 +81,13 @@ var OPERATIONS = [
 function makeUrl(baseUrlFunction, url) {
   if(!url) url = '';
 
+  var baseUrl = this.config.baseUrl;
+
   if(!baseUrlFunction) {
-    return url;
+    return baseUrl + url;
   }
 
-  return baseUrlFunction()
-    .then(function(baseUrl) {
-      return urlJoin(baseUrl, url);
-    });
+  return baseUrl + baseUrlFunction() + url;
 }
 
 function operation(fullUrlFunction, baseUrlFunction, method, defaultOptions, url, data, options) {
@@ -112,6 +110,7 @@ function operation(fullUrlFunction, baseUrlFunction, method, defaultOptions, url
   return Promise.try(function() {
       return config.getAccessToken();
     })
+    .bind(this)
     .then(function(accessToken) {
 
       var promise = new Promise(function(resolve, reject) {
@@ -121,7 +120,7 @@ function operation(fullUrlFunction, baseUrlFunction, method, defaultOptions, url
           headers['x-access-token'] = accessToken;
         }
 
-        var getFullUrlPromise = fullUrlFunction(baseUrlFunction, url);
+        var fullUrl = fullUrlFunction(baseUrlFunction, url);
 
         function makeError(jqXhr, textStatus, errorThrown) {
           var json = jqXhr.responseJSON;
@@ -137,46 +136,40 @@ function operation(fullUrlFunction, baseUrlFunction, method, defaultOptions, url
           return e;
         }
 
-        getFullUrlPromise.then(function(fullUrl) {
-          debug('%s: %s', method, fullUrl);
-          // TODO: drop jquery `ajax`
-          $.ajax({
-            url: fullUrl,
-            contentType: options.contentType,
-            dataType: options.dataType,
-            type: method,
-            global: options.global,
-            data: dataSerialized,
-            timeout: options.timeout,
-            async: options.async,
-            headers: headers,
-            success: function(data, textStatus, xhr) {
-              var status = xhr.status;
-              if (status >= 400 && status !== 1223) {
+        debug('%s: %s', method, fullUrl);
+        // TODO: drop jquery `ajax`
+        $.ajax({
+          url: fullUrl,
+          contentType: options.contentType,
+          dataType: options.dataType,
+          type: method,
+          global: options.global,
+          data: dataSerialized,
+          timeout: options.timeout,
+          async: options.async,
+          headers: headers,
+          success: function(data, textStatus, xhr) {
+            var status = xhr.status;
+            if (status >= 400 && status !== 1223) {
 
-                var e = new Error(textStatus);
-                e.status = status;
-                return reject(makeError(xhr, textStatus, 'HTTP Status ' + status));
-              }
-
-              resolve(data);
-            },
-            error: function(xhr, textStatus, errorThrown) {
-              return reject(makeError(xhr, textStatus, errorThrown));
+              var e = new Error(textStatus);
+              e.status = status;
+              return reject(makeError(xhr, textStatus, 'HTTP Status ' + status));
             }
-          });
+
+            resolve(data);
+          },
+          error: function(xhr, textStatus, errorThrown) {
+            return reject(makeError(xhr, textStatus, errorThrown));
+          }
         });
       });
 
       if(options.global) {
         promise.catch(function(err) {
           /* Asyncronously notify */
-          if(config.onApiError) {
-            config.onApiError(err.status, err.statusText, err.method, err.url);
-          } else {
-            throw err;
-          }
-        });
+          this.config.onApiError(err.status, err.statusText, err.method, err.url);
+        }.bind(this));
       }
 
       return promise;
@@ -186,18 +179,11 @@ function operation(fullUrlFunction, baseUrlFunction, method, defaultOptions, url
 
 
 
-function getClient(fullUrlFunction, uriFunction) {
-  var config = this.config;
-  uriFunction = Promise.method(uriFunction || function() {
+function getClient(fullUrlFunction, baseUrlFunction) {
+  fullUrlFunction = fullUrlFunction.bind(this);
+  baseUrlFunction = (baseUrlFunction || function() {
     return '';
   }).bind(this);
-
-  var baseUrlFunction = function() {
-    return uriFunction()
-      .then(function(uri) {
-        return urlJoin(config.baseUrl, uri);
-      });
-  };
 
   return OPERATIONS
     .reduce(function(memo, descriptor) {
@@ -208,72 +194,44 @@ function getClient(fullUrlFunction, uriFunction) {
       return memo;
     }.bind(this), {
       uri: function(relativeUrl) {
-        return Promise.try(function() {
-            return uriFunction();
-          })
-          .then(function(uri) {
-            return urlJoin(uri, relativeUrl);
-          });
+        return baseUrlFunction() + relativeUrl;
       },
-      url: Promise.method(function(relativeUrl) {
+      url: function(relativeUrl) {
         return fullUrlFunction(baseUrlFunction, relativeUrl);
-      }),
-      channel: Promise.method(function(relativeUrl) {
+      },
+      channel: function(relativeUrl) {
         return makeUrl(baseUrlFunction, relativeUrl);
-      }),
-      // TODO: This needs to be sync for backbone collections, hmmmm
-      // http://stackoverflow.com/q/32998480/796832
-      channelGenerator: Promise.method(function(relativeUrl) {
+      },
+      channelGenerator: function(relativeUrl) {
         return function() {
           return makeUrl(baseUrlFunction, relativeUrl);
         };
-      })
+      }
     });
 }
 
 var client = {
   config: {
     baseUrl: '',
-    getAccessToken: null,
-    getUserId: null,
-    getTroupeId: null,
-    onApiError: null
+    getAccessToken: function() { return ''; },
+    getUserId: function() { return ''; },
+    getTroupeId: function() { return ''; },
+    onApiError: function() {}
   }
 };
 
 module.exports = _.extend(client, getClient.bind(client)(makeUrl), {
   user: getClient.bind(client)(makeUrl, function() {
-    var config = this.config;
-    return Promise.try(function() {
-        return config.getUserId();
-      })
-      .then(function(userId) {
-        return urlJoin('/v1/user/', userId);
-      });
-  }.bind(client)),
+    return '/v1/user/' + this.config.getUserId();
+  }),
   room: getClient.bind(client)(makeUrl, function() {
-    var config = this.config;
-    return Promise.try(function() {
-        return config.getTroupeId();
-      })
-      .then(function(troupeId) {
-        return urlJoin('/v1/rooms/', troupeId);
-      });
-  }.bind(client)),
+    return '/v1/rooms/' + this.config.getTroupeId();
+  }),
   userRoom: getClient.bind(client)(makeUrl, function() {
-    var config = this.config;
-    return Promise.try(function() {
-        return [
-          config.getUserId(),
-          config.getTroupeId()
-        ]
-      })
-      .spread(function(userId, troupeId) {
-        return urlJoin('/v1/user/', userId, '/rooms/', troupeId);
-      });
-  }.bind(client)),
+    return '/v1/user/' + this.config.getUserId() + '/rooms/' + this.config.getTroupeId();
+  }),
   priv: getClient.bind(client)(makeUrl, function() {
-    return urlJoin('/private');
-  }.bind(client)),
+    return '/private';
+  }),
   web: getClient.bind(client)(makeUrl)
 });
