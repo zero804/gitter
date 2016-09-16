@@ -5,7 +5,10 @@ var ItemView = require('./category-item-view');
 
 var CategoryCollectionView = Marionette.CollectionView.extend({
   tagName: 'ul',
-  className: 'collection-list',
+  className: function() {
+    console.log('CategoryCollectionView-className');
+    return 'collection-list';
+  },
   childView: ItemView
 });
 

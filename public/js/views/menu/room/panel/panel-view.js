@@ -46,6 +46,7 @@ var PanelView = Marionette.LayoutView.extend({
   },
 
   initTopicsArea: function(optionsForRegion) {
+    console.log('this.model.forumCategoryCollection', this.model.forumCategoryCollection);
     return new TopicsAreaView(optionsForRegion({
       model: this.model,
       collection: this.model.forumCategoryCollection

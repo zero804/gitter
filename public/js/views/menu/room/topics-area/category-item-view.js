@@ -9,12 +9,36 @@ module.exports = Marionette.ItemView.extend({
   tagName: 'li',
   template: template,
 
-  initialize: function() {
+  ui: {
+    link: '.js-left-menu-forum-category-item-link'
+  },
 
+  initialize: function() {
+    this.listenTo(this.model, 'change:focus', this.onModelChangeFocus, this);
   },
 
   serializeData: function() {
     var data = parseForTemplate(this.model.toJSON());
     return data;
+  },
+
+
+  onModelChangeFocus: function() {
+    var hasFocus = this.model.get('focus');
+    if(hasFocus) {
+      this.focusElement();
+    } else {
+      this.blurElement();
+    }
+  },
+
+  focusElement: function (){
+    this.el.classList.add('focus');
+    this.ui.link.focus();
+  },
+
+ blurElement: function (){
+    this.el.classList.remove('focus');
+    this.ui.link.blur();
   },
 });

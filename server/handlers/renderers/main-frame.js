@@ -91,6 +91,7 @@ function renderMainFrame(req, res, next, options) {
           return room;
         });
 
+      console.log('snapshots.forum', snapshots.forum);
       res.render(template, {
         //left menu
         leftMenuOrgs:           troupeContext.snapshots.orgs,
