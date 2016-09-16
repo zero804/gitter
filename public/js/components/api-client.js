@@ -1,6 +1,5 @@
 'use strict';
 
-var _ = require('lodash');
 var clientEnv = require('gitter-client-env');
 var context = require('../utils/context');
 var appEvents = require('../utils/appevents');
