@@ -11,6 +11,7 @@ module.exports = function parseContentToTemplateData(data) {
     id: data.id || data._id,
     name: data.name,
     slug: data.slug,
+    groupUri: data.groupUri,
     absoluteRoomUrl: absoluteRoomUrl
   };
 };

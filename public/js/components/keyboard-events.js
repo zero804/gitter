@@ -47,7 +47,7 @@ module.exports = (function() {
     else if(tag.classList.contains('room-menu-options__item-button')) {
       scope = 'minibar.item';
     }
-    else if(tag.classList.contains('room-item__container')) {
+    else if(tag.classList.contains('room-item__container') || tag.classList.contains('js-left-menu-forum-category-item-link')) {
       scope = 'room-list.item';
     }
     else {
