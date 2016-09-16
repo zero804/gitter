@@ -4,7 +4,6 @@ var Promise = require('bluebird');
 var getVersion = require('../get-model-version');
 var ForumCategoryIdStrategy = require('./forum-category-id-strategy');
 var RepliesForTopicStrategy = require('./topics/replies-for-topic-strategy');
-var RepliesTotalsForTopicStrategy = require('./topics/replies-totals-for-topic-strategy');
 var TopicReplyingUsersStrategy = require('./topics/topic-replying-users-strategy');
 var UserIdStrategy = require('./user-id-strategy');
 
@@ -38,10 +37,7 @@ function TopicStrategy(options) {
   var userStrategy;
   var categoryStrategy;
 
-  // var repliesMap;
-  // var repliesTotalMap;
   var repliesForTopicStrategy;
-  var repliesTotalsForTopicStrategy;
   var replyingUsersStrategy;
 
   this.preload = function(topics) {
@@ -55,12 +51,6 @@ function TopicStrategy(options) {
     if (options.includeReplies) {
       repliesForTopicStrategy = new RepliesForTopicStrategy();
       strategies.push(repliesForTopicStrategy.preload(topicIds));
-    }
-
-    // load replyTotals
-    if (options.includeRepliesTotals) {
-      repliesTotalsForTopicStrategy = new RepliesTotalsForTopicStrategy();
-      strategies.push(repliesTotalsForTopicStrategy.preload(topicIds));
     }
 
     // load replyingUsers
@@ -127,10 +117,8 @@ function TopicStrategy(options) {
       // TODO: support options.user
       user: mapUser(topic.userId),
 
-      // don't accidentally send all the replies with all the topics when
-      // serializing a forum..
       replies: repliesForTopicStrategy ? repliesForTopicStrategy.map(id) : undefined,
-      repliesTotal: repliesTotalsForTopicStrategy ? repliesTotalsForTopicStrategy.map(id) : undefined,
+      repliesTotal: options.includeRepliesTotals ? topic.repliesTotal : undefined,
       replyingUsers: replyingUsersStrategy ? replyingUsersStrategy.map(id): undefined,
 
       sent: formatDate(topic.sent),

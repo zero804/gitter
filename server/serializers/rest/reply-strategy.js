@@ -35,7 +35,6 @@ function ReplyStrategy(options) {
   var commentStrategy;
 
   var commentsMap;
-  var commentsTotalMap;
 
   this.preload = function(replies) {
     if (replies.isEmpty()) return;
@@ -53,14 +52,6 @@ function ReplyStrategy(options) {
               // TODO: move to CommentsForReplyStrategy
               commentStrategy = new CommentStrategy();
               strategies.push(commentStrategy.preload(Lazy(comments)));
-            });
-        }
-      })
-      .then(function() {
-        if (options.includeCommentsTotals) {
-          return commentService.findTotalsByReplyIds(replyIds)
-            .then(function(commentsTotals) {
-              commentsTotalMap = commentsTotals;
             });
         }
       })
@@ -90,7 +81,6 @@ function ReplyStrategy(options) {
     var id = reply.id || reply._id && reply._id.toHexString();
 
     var comments = options.includeComments ? commentsMap[id] || [] : undefined;
-    var commentsTotal = options.includeCommentsTotals ? commentsTotalMap[id] || 0 : undefined;
 
     return {
       id: id,
@@ -105,7 +95,7 @@ function ReplyStrategy(options) {
       user: mapUser(reply.userId),
 
       comments: options.includeComments ? comments.map(commentStrategy.map) : undefined,
-      commentsTotal: options.includeCommentsTotals ? commentsTotal : undefined,
+      commentsTotal: options.includeCommentsTotals ? reply.commentsTotal : undefined,
 
       sent: formatDate(reply.sent),
       editedAt: formatDate(reply.editedAt),
