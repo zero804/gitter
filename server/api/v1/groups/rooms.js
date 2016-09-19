@@ -6,8 +6,8 @@ var restful = require('../../../services/restful')
 var GroupWithPolicyService = require('../../../services/group-with-policy-service');
 var restSerializer = require('../../../serializers/rest-serializer');
 
-function castString(v) {
-  return v ? String(v) : undefined;
+function castString(v, defaultValue) {
+  return v ? String(v) : defaultValue;
 }
 
 function getCreateOptions(input) {
@@ -17,14 +17,14 @@ function getCreateOptions(input) {
   var linkPath;
 
   if (input.security) {
-    linkPath = castString(input.security.linkPath);
+    linkPath = castString(input.security.linkPath, undefined);
 
     // PUBLIC or PRIVATE
-    createOptions.security = castString(input.security.security);
+    createOptions.security = castString(input.security.security, undefined);
     assert(createOptions.security, 'security required');
 
     // type defaults to null, not undefined
-    createOptions.type = castString(input.security.type);
+    createOptions.type = castString(input.security.type, null);
     switch(createOptions.type) {
       case null:
       case 'GROUP':
