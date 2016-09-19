@@ -6,7 +6,7 @@ var Search = require('..').GitHubFastSearch;
 
 var FAKE_USER = { username: 'gittertestbot', githubToken: '***REMOVED***'};
 
-describe('github-fast-search #slow', function() {
+describe('github-fast-search #slow #github', function() {
   it('should find suprememoocow', function(done) {
     var search = new Search(FAKE_USER);
 
