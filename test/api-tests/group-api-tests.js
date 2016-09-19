@@ -170,7 +170,7 @@ describe('group-api', function() {
       })
   });
 
-  it('POST /v1/groups/:groupId/rooms', function() {
+  it('POST /v1/groups/:groupId/rooms with GH_REPO security', function() {
     return request(app)
       .post('/v1/groups/' + fixture.group1.id + '/rooms')
       .send({
@@ -189,6 +189,29 @@ describe('group-api', function() {
         var room = result.body;
         assert.strictEqual(room.providers.length, 1);
         assert.strictEqual(room.providers[0], 'github');
+      });
+  });
+
+  it('POST /v1/groups/:groupId/rooms with GROUP security', function() {
+    return request(app)
+      .post('/v1/groups/' + fixture.group1.id + '/rooms')
+      .send({
+        name: fixtureLoader.generateUri(),
+        topic: 'all about testing',
+        security: {
+          security: 'PRIVATE',
+          type: 'GROUP',
+        }
+      })
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+      .then(function(result) {
+        var room = result.body;
+        assert.strictEqual(room.groupId, fixture.group1.id);
+        assert.strictEqual(room.public, false);
+        assert.deepEqual(room.backend, {
+          type: 'GROUP'
+        });
       });
   });
 
