@@ -5,7 +5,7 @@ process.env.DISABLE_API_LISTEN = '1';
 var Promise = require('bluebird');
 var assert = require('assert');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
-
+var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor')
 
 describe('group-api', function() {
   var app, request;
@@ -192,7 +192,7 @@ describe('group-api', function() {
       });
   });
 
-  it('POST /v1/groups/:groupId/rooms with GROUP security', function() {
+  it('POST /v1/groups/:groupId/rooms with PRIVATE GROUP security', function() {
     return request(app)
       .post('/v1/groups/' + fixture.group1.id + '/rooms')
       .send({
@@ -212,6 +212,48 @@ describe('group-api', function() {
         assert.deepEqual(room.backend, {
           type: 'GROUP'
         });
+
+        return securityDescriptorService.room.findById(room.id);
+      })
+      .then(function(descriptor) {
+        assert.strictEqual(String(descriptor.internalId), fixture.group1.id);
+        assert.strictEqual(descriptor.members, 'INVITE');
+        assert.strictEqual(descriptor.public, false);
+        assert.strictEqual(descriptor.admins, 'GROUP_ADMIN');
+        assert.strictEqual(descriptor.type, 'GROUP');
+      });
+  });
+
+  it('POST /v1/groups/:groupId/rooms with INHERITED GROUP security', function() {
+    return request(app)
+      .post('/v1/groups/' + fixture.group1.id + '/rooms')
+      .send({
+        name: fixtureLoader.generateUri(),
+        topic: 'all about testing',
+        security: {
+          security: 'INHERITED',
+          type: 'GROUP',
+        }
+      })
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+      .then(function(result) {
+        var room = result.body;
+        assert.strictEqual(room.groupId, fixture.group1.id);
+        assert.strictEqual(room.public, false);
+        assert.deepEqual(room.backend, {
+          type: 'GROUP'
+        });
+
+        return securityDescriptorService.room.findById(room.id);
+      })
+      .then(function(descriptor) {
+        assert.strictEqual(String(descriptor.internalId), fixture.group1.id);
+        assert.strictEqual(descriptor.members, 'INVITE_OR_ADMIN');
+        assert.strictEqual(descriptor.public, false);
+        assert.strictEqual(descriptor.admins, 'GROUP_ADMIN');
+        assert.strictEqual(descriptor.type, 'GROUP');
+
       });
   });
 
