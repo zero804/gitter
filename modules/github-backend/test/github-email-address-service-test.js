@@ -5,7 +5,7 @@ var assert = require('assert');
 var TOKEN = '***REMOVED***';
 var USERNAME = 'gittertestbot';
 
-describe("email-address-service", function() {
+describe("email-address-service #github", function() {
 
   describe('integration #slow', function() {
     it('should return the validated email address if the user has a token', function() {

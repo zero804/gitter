@@ -19,7 +19,7 @@ function filterScopes(list) {
   };
 }
 
-describe('github-scope-tests  #slow', function() {
+describe('github-scope-tests #slow #github', function() {
   describe('email', function() {
     scopeFixtures.scopes.filter(filterScopes('user,user:email')).forEach(function(c) {
       var FAKE_USER = { username: c.username, githubToken: c.githubToken };

@@ -49,6 +49,10 @@ ul.dropdown {
   top: 0;
   left: 0;
 
+  // Deal with https://github.com/troupe/gitter-webapp/issues/2208
+  // background not being applied to typeahead
+  background: @white;
+
   &.dropdown-hidden {
     opacity: 0;
     display: none;
