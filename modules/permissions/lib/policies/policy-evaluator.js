@@ -186,7 +186,6 @@ PolicyEvaluator.prototype = {
               if (result) {
                 return true;
               } else {
-                // TODO: XXX this should not stay this way...
                 // Not a member, but explicitly allowed via extraAdmins?
                 // Note: we do not do a full admin check as this would allow anyone
                 // from the owning room to be allowed into the PRIVATE room.
