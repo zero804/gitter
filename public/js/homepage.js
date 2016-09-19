@@ -10,7 +10,7 @@ var context = require('./utils/context');
 var mapMessageTemplate = require('./views/homepage/map-message.hbs');
 var roomNameTrimmer = require('./utils/room-name-trimmer');
 var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-url');
-var apiClient = require('./components/apiClient');
+var apiClient = require('./components/api-client');
 var onready = require('././utils/onready');
 
 var modalRegion = require('./components/modal-region');

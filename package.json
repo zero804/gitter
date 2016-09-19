@@ -43,6 +43,7 @@
     "gitter-realtime-client": "^1.6.1",
     "gitter-redis-scripto": "^0.2.2",
     "gitter-services": "git+https://github.com/gitterHQ/services.git#1.19.0",
+    "gitter-web-api-client": "file:modules/api-client",
     "gitter-web-appevents": "file:modules/appevents",
     "gitter-web-avatars": "file:modules/avatars",
     "gitter-web-backend-muxer": "file:modules/backend-muxer",

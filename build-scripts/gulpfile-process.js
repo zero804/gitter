@@ -94,6 +94,7 @@ gulp.task('process:watch:server', function() {
       path.resolve(__dirname, '../modules/topics-ui/browser'),
       path.resolve(__dirname, '../modules/topics-ui/shared'),
       path.resolve(__dirname, '../modules/topics-ui/test'),
+      path.resolve(__dirname, '../modules/api-client'),
     ],
     args: ['--cdn:use', 'true']
   });
