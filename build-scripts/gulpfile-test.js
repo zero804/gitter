@@ -147,7 +147,7 @@ function spawnMochaProcess(moduleName, options, files) { // eslint-disable-line 
     argGrep = '#slow';
     argInvert = true;
     argBail = true;
-  } else if (JSON.parse(process.env.DISABLE_GITHUB_TESTS)) {
+  } else if (process.env.DISABLE_GITHUB_TESTS && JSON.parse(process.env.DISABLE_GITHUB_TESTS)) {
     argGrep = '#github';
     argInvert = true;
   }
