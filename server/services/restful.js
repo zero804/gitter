@@ -275,9 +275,9 @@ function serializeRoomsForGroupId(groupId, userId) {
     });
 }
 
-function serializeTopicsForForumId(forumId) {
+function serializeTopicsForForumId(forumId, options) {
   // TODO: return a sample set, not all of them
-  return topicService.findByForumId(forumId)
+  return topicService.findByForumId(forumId, options)
     .then(function(topics) {
       var strategy = restSerializer.TopicStrategy.full();
       return restSerializer.serialize(topics, strategy);
