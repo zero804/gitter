@@ -5,7 +5,7 @@ var GithubUserService = require('..').GitHubUserService;
 
 var FAKE_USER = { username: 'gittertestbot', githubToken: '***REMOVED***'};
 
-describe('github-user-service #slow', function() {
+describe('github-user-service #slow #github', function() {
   it('getUser', function(done) {
     var gh = new GithubUserService(FAKE_USER);
 

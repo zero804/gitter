@@ -5,7 +5,7 @@ var githubUriValidator = require('..').GitHubUriValidator;
 
 var FAKE_USER = { username: 'gittertestbot', githubToken: '***REMOVED***'};
 
-describe('github-user-service #slow', function() {
+describe('github-user-service #slow #github', function() {
   it('validate real org', function() {
     return githubUriValidator(FAKE_USER, 'gitterHQ')
       .then(function(result) {
