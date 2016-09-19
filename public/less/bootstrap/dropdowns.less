@@ -1,8 +1,8 @@
 // DROPDOWN MENUS
 // --------------
 
-div.textcomplete-wrapper ul.dropdown-menu,
-ul.dropdown {
+.textcomplete-wrapper .dropdown-menu,
+.dropdown {
   opacity: 1;
   padding: 1px;
   text-align: left;
@@ -17,21 +17,14 @@ ul.dropdown {
   list-style: none;
   background-color: @white;
   border-color: #ccc;
-  border-color: rgba(0,0,0,.2);
+  border-color: rgba(0, 0, 0, .2);
   border-style: solid;
   border-width: 1px;
   border-radius: 4px;
 
-  -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-          box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-  background-clip: padding-box;
-  -webkit-bg-clip: padding-box;
-     -moz-bg-clip: padding;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
 
-  -webkit-transition: opacity 150ms ease-in-out;
-     -moz-transition: opacity 150ms ease-in-out;
-       -o-transition: opacity 150ms ease-in-out;
-          transition: opacity 150ms ease-in-out;
+  transition: opacity 150ms ease-in-out;
 
   li {
     margin: 5px;
@@ -48,10 +41,6 @@ ul.dropdown {
   position: absolute;
   top: 0;
   left: 0;
-
-  // Deal with https://github.com/troupe/gitter-webapp/issues/2208
-  // background not being applied to typeahead
-  background: @white;
 
   &.dropdown-hidden {
     opacity: 0;
