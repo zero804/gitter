@@ -106,7 +106,7 @@ function checkIfGroupUriExists(user, uri, obtainAccessFromGitHubRepo) {
 
       debug('localUriExists: %s, githubUriExists: %s', localUriExists, githubUriExists);
 
-      var allowCreate;
+      var allowCreate = false;
       if (localUriExists) {
         allowCreate = false;
       } else if (githubUriExists) {
@@ -126,7 +126,8 @@ function checkIfGroupUriExists(user, uri, obtainAccessFromGitHubRepo) {
         // The future group will either be org-based or of type null which
         // is just the new types that aren't backed by GitHub.
         type: (githubInfo && githubInfo.type === 'ORG') ? 'GH_ORG' : null,
-        allowCreate: allowCreate
+        allowCreate: allowCreate,
+        localUriExists: localUriExists
       };
     });
 }

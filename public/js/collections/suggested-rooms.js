@@ -1,6 +1,6 @@
 'use strict';
 
-var apiClient = require('../components/apiClient');
+var apiClient = require('../components/api-client');
 var Backbone = require('backbone');
 var SyncMixin = require('./sync-mixin');
 var SimpleFilteredCollection = require('gitter-realtime-client/lib/simple-filtered-collection');

@@ -6,8 +6,9 @@ var testRequire = require('../../test-require');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assertUtils = require('../../assert-utils')
 var serialize = testRequire('./serializers/serialize');
-var ReplyStrategy = testRequire('./serializers/rest/reply-strategy');
+var CommentStrategy = testRequire('./serializers/rest/comment-strategy');
 
+var LONG_AGO = '2014-01-01T00:00:00.000Z';
 
 function makeHash() {
   var hash = {};
@@ -17,7 +18,7 @@ function makeHash() {
   return hash;
 }
 
-describe('ReplyStrategy', function() {
+describe('CommentStrategy', function() {
   var blockTimer = require('../../block-timer');
   before(blockTimer.on);
   after(blockTimer.off);
@@ -45,12 +46,12 @@ describe('ReplyStrategy', function() {
       user: 'user1',
       topic: 'topic1',
       reply: 'reply1',
-      sent: new Date('2014-01-01T00:00:00.000Z')
+      sent: new Date(LONG_AGO)
     }
   });
 
   it('should serialize a comment', function() {
-    var strategy = new ReplyStrategy();
+    var strategy = new CommentStrategy();
 
     var comment = fixture.comment1;
     var user = fixture.user1;
@@ -69,16 +70,15 @@ describe('ReplyStrategy', function() {
             displayName: user.displayName,
             avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
           },
-          sent: '2014-01-01T00:00:00.000Z',
+          sent: LONG_AGO,
           editedAt: null,
-          lastModified: null,
           v: 1
         }])
       });
   });
 
   it("should serialize a reply with lookups=['user']", function() {
-    var strategy = new ReplyStrategy({ lookups: ['user'] });
+    var strategy = new CommentStrategy({ lookups: ['user'] });
 
     var comment = fixture.comment1;
     var user = fixture.user1;
@@ -93,9 +93,8 @@ describe('ReplyStrategy', function() {
               html: comment.html,
             },
             user: fixture.user1.id,
-            sent: '2014-01-01T00:00:00.000Z',
+            sent: LONG_AGO,
             editedAt: null,
-            lastModified: null,
             v: 1
           }],
           lookups: {
