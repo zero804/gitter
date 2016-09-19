@@ -8,11 +8,12 @@ var onready = require('./utils/onready');
 
 var chatModels = require('./collections/chat');
 var troupeCollections = require('./collections/instances/troupes');
-var presentCreateRoomDialog = require('./ensured/present-create-room-dialog');
-var presentCreateCommunityDialog = require('./ensured/present-create-community-dialog');
 var unreadItemsClient = require('./components/unread-items-client');
 var RoomCollectionTracker = require('./components/room-collection-tracker');
 var MobileLayout = require('./views/layouts/mobile');
+var Router = require('./routes/router');
+var createRoutes = require('./routes/create-routes');
+var roomRoutes = require('./routes/room-routes');
 
 //Remove when left menu is in place
 var FastClick = require('fastclick');
@@ -31,6 +32,7 @@ require('./components/ping');
 require('./components/eyeballs-room-sync');
 require('./template/helpers/all');
 require('./utils/gesture-controller');
+
 
 onready(function() {
   //Ledt Menu Additions
@@ -69,56 +71,23 @@ onready(function() {
   });
   appView.render();
 
-  var Router = Backbone.Router.extend({
-    routes: {
-      "": "hideModal",
-      "notifications": "notifications",
-      'notification-defaults': 'notificationDefaults',
-      'createroom': 'createRoom',
-      'createroom/:name': 'createRoom',
-      'createcommunity': 'createCommunity'
-    },
-
-    hideModal: function() {
-      appView.dialogRegion.destroy();
-    },
-
-    notifications: function() {
-      require.ensure(['./views/modals/notification-settings-view'], function(require) {
-        var NotificationSettingsView = require('./views/modals/notification-settings-view');
-        appView.dialogRegion.show(new NotificationSettingsView({ model: new Backbone.Model() }));
-      });
-    },
-
-    notificationDefaults: function() {
-      require.ensure(['./views/modals/notification-defaults-view'], function(require) {
-        var NotificationDefaultsView = require('./views/modals/notification-defaults-view');
-
-        appView.dialogRegion.show(new NotificationDefaultsView({
-          model: new Backbone.Model()
-        }));
-
-      });
-    },
-
-    createRoom: function(initialRoomName) {
-      presentCreateRoomDialog({
-        dialogRegion: appView.dialogRegion,
-        roomCollection: troupeCollections.troupes,
-        groupsCollection: troupeCollections.groups,
-        roomMenuModel: null,
-        initialRoomName: initialRoomName
-      });
-    },
-
-    createCommunity: function() {
-      presentCreateCommunityDialog({
-        dialogRegion: appView.dialogRegion
-      });
-    },
+  new Router({
+    dialogRegion: appView.dialogRegion,
+    routes: [
+      roomRoutes({
+        rosterCollection: null,
+        // TODO: remove these two options:
+        // https://github.com/troupe/gitter-webapp/issues/2211
+        rooms: null,
+        groups: null
+      }),
+      createRoutes({
+        rooms: troupeCollections.troupes,
+        groups: troupeCollections.groups,
+        roomMenuModel: null
+      }),
+    ]
   });
-
-  new Router();
 
   $('html').removeClass('loading');
 
