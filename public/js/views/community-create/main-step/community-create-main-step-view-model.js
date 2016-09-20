@@ -1,4 +1,4 @@
-/* eslint complexity: ["error", 13] */
+/* eslint complexity: ["error", 14] */
 'use strict';
 
 var CommunityCreateStepViewModel = require('../community-create-step-view-model');
@@ -32,6 +32,8 @@ var CommunityCreateMainStepViewModel = CommunityCreateStepViewModel.extend({
       errors.communitySlug = 'Allow private repo access on the GitHub org or make your org membership public';
     } else if(slugAvailabilityStatus === slugAvailabilityStatusConstants.UNAVAILABLE) {
       errors.communitySlug = 'This address is not available';
+    } else if(slugAvailabilityStatus === slugAvailabilityStatusConstants.PENDING) {
+      errors.communitySlug = 'Checking availability';
     }
 
     return Object.keys(errors).length > 0 ? errors : undefined;
