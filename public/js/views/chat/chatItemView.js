@@ -890,7 +890,7 @@ module.exports = (function() {
       var deleted = !this.model.get('text');
       var canCollapse = !deleted && this.model.get('isCollapsible');
       var isPersisted = !!this.model.id;
-      var canEdit = !deleted && this.chatItemView.canEdit() && !isPersisted;
+      var canEdit = !deleted && this.chatItemView.canEdit() && isPersisted;
 
       var data = {
         actions: [
