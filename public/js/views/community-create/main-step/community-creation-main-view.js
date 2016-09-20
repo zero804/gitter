@@ -4,7 +4,7 @@ var _ = require('underscore');
 var slugger = require('../../../utils/slugger');
 var context = require('../../../utils/context');
 var toggleClass = require('../../../utils/toggle-class');
-var apiClient = require('../../../components/apiClient');
+var apiClient = require('../../../components/api-client');
 
 var stepConstants = require('../step-constants');
 var slugAvailabilityStatusConstants = require('../slug-availability-status-constants');
@@ -85,8 +85,6 @@ module.exports = CommunityCreateBaseStepView.extend({
     this.hasGitHubProvider = user && user.providers && user.providers.some(function(provider) {
       return provider === 'github';
     });
-
-    this.checkSlugAvailabilityDebounced = _.debounce(this.checkSlugAvailability.bind(this), 500);
 
     this.listenTo(this.communityCreateModel, 'change:communityName change:communitySlug', this.onCommunityInfoChange, this);
     this.listenTo(this.communityCreateModel, 'change:communitySlugAvailabilityStatus', this.onSlugAvailabilityStatusChange, this);
@@ -190,7 +188,12 @@ module.exports = CommunityCreateBaseStepView.extend({
     });
   },
 
-  checkSlugAvailability: _.throttle(function() {
+  checkSlugAvailabilityDebounced: function() {
+    this.communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.PENDING);
+    this._checkSlugAvailabilityDebounced();
+  },
+
+  _checkSlugAvailabilityDebounced: _.debounce(function() {
     var communityCreateModel = this.communityCreateModel;
     var model = this.model;
     var slug = communityCreateModel.get('communitySlug');

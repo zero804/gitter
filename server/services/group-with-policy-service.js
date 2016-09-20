@@ -25,9 +25,14 @@ var MAX_INITIAL_CATEGORIES = 5;
  * @private
  */
 function validateRoomSecurity(type, security) {
+  if (type === 'GROUP' && security === 'INHERITED') {
+    return true;
+  }
+
   if (security === 'PUBLIC' || security === 'PRIVATE') {
     return true;
   }
+
   return false;
 }
 

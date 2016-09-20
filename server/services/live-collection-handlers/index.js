@@ -19,7 +19,8 @@ var handlers = {
 if (config.get('topics:useApi')) {
   handlers.topics = './live-collection-topics';
   handlers.replies = './live-collection-replies';
-  // TODO: categories? forums, replies, comments
+  handlers.comments = './live-collection-comments';
+  // TODO: categories? forums?
 }
 
 module.exports = {

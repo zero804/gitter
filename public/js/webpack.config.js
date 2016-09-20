@@ -48,6 +48,7 @@ var webpackConfig = {
       'backbone.marionette',
       'loglevel',
       require.resolve('./utils/log'),
+      require.resolve('./components/api-client'),
       'handlebars/runtime',
       'gitter-realtime-client',
       'raven-js',
