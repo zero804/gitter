@@ -86,8 +86,6 @@ module.exports = CommunityCreateBaseStepView.extend({
       return provider === 'github';
     });
 
-    this.checkSlugAvailabilityDebounced = _.debounce(this.checkSlugAvailability.bind(this), 500);
-
     this.listenTo(this.communityCreateModel, 'change:communityName change:communitySlug', this.onCommunityInfoChange, this);
     this.listenTo(this.communityCreateModel, 'change:communitySlugAvailabilityStatus', this.onSlugAvailabilityStatusChange, this);
   },
@@ -190,7 +188,12 @@ module.exports = CommunityCreateBaseStepView.extend({
     });
   },
 
-  checkSlugAvailability: _.throttle(function() {
+  checkSlugAvailabilityDebounced: function() {
+    this.communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.PENDING);
+    this._checkSlugAvailabilityDebounced();
+  },
+
+  _checkSlugAvailabilityDebounced: _.debounce(function() {
     var communityCreateModel = this.communityCreateModel;
     var model = this.model;
     var slug = communityCreateModel.get('communitySlug');
