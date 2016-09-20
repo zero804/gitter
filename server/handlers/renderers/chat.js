@@ -122,7 +122,7 @@ function renderChat(req, res, options, next) {
             premium: troupeContext.troupe.premium,
             troupeFavourite: troupeContext.troupe.favourite,
             headerView: getHeaderViewOptions(troupeContext.troupe),
-            canChangeGroupAvatar: isStaff || isAdmin,
+            canChangeGroupAvatar: !troupe.groupId && (isStaff || isAdmin),
             isAdmin: isAdmin,
             isNativeDesktopApp: troupeContext.isNativeDesktopApp
           }, options.extras);
