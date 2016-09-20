@@ -66,6 +66,22 @@ describe('subscriber-service', function() {
           })
           .then(function(result) {
             assert.deepEqual(result.map(String), [userId1, userId2].map(String));
+            return subscriberService.removeSubscriber(id, userId1);
+          })
+          .then(function(result) {
+            assert.strictEqual(true, result);
+            return subscriberService.removeSubscriber(id, userId1);
+          })
+          .then(function(result) {
+            assert.strictEqual(false, result);
+            return subscriberService.removeSubscriber(id, userId2);
+          })
+          .then(function(result) {
+            assert.strictEqual(true, result);
+            return subscriberService.listForItem(id)
+          })
+          .then(function(result) {
+            assert.deepEqual(result, []);
           });
       }
 

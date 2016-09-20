@@ -37,10 +37,31 @@ function addSubscriber(forumObject, userId) {
   .then(function(existing) {
     return !existing;
   });
+}
 
+/**
+ * Remove a subscriber from an object. Returns true if the operation
+ * modified the collection (ie, the user was not already a subscriber)
+ */
+function removeSubscriber(forumObject, userId) {
+  assert(forumObject.type !== ForumObject.TYPE.Comment);
+
+  var query = {
+    userId: userId,
+    forumId: forumObject.forumId,
+    topicId: forumObject.topicId,
+    replyId: forumObject.replyId
+  };
+
+  return ForumNotification.remove(query)
+    .exec()
+    .then(function(result) {
+      return result && result.result && result.result.n > 0;
+    });
 }
 
 module.exports = {
   listForItem: listForItem,
-  addSubscriber: addSubscriber
+  addSubscriber: addSubscriber,
+  removeSubscriber: removeSubscriber
 }
