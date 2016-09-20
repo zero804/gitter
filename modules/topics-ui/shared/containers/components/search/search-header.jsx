@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react';
 import Container from '../container.jsx';
 import Panel from '../panel.jsx';
 import ForumCategoryLink from '../links/forum-category-link.jsx';
+import WatchForumLink from '../links/watch-forum-link.jsx';
 import H1 from '../text/h-1.jsx';
 import Input from '../forms/input.jsx';
 import CreateTopicLink from '../links/create-topic-link.jsx';
@@ -11,12 +12,14 @@ export default React.createClass({
 
   displayName: 'SearchHeader',
   propTypes: {
+    forumId: PropTypes.string.isRequired,
     groupName: PropTypes.string.isRequired,
+    isWatching: PropTypes.bool,
   },
 
   render(){
 
-    const {groupName} = this.props;
+    const {forumId, groupName, isWatching} = this.props;
 
     return (
       <Container>
@@ -34,6 +37,8 @@ export default React.createClass({
             placeholder="Search for topics, replies and comments"
             onChange={this.onSearchUpdate}
             className="topic-search__search-input"/>
+
+          <WatchForumLink forumId={forumId} isWatching={isWatching} className="topic-search__watch-forum-link" />
           <CreateTopicLink groupName={groupName} className="topic-search__create-topic-link">
             Create Topic
           </CreateTopicLink>

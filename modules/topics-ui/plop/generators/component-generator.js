@@ -32,12 +32,12 @@ module.exports = function(plop) {
 
       return [{
         type: 'add',
-        // The plop templates don't work with back slashes :(
+        // The plop templates don't work with backslashes :(
         path: path.join(path.resolve(__dirname, '../../shared/containers/components/', data.subFolder), './{{dashCase name}}.jsx').replace(/\\/g, '/'),
         templateFile: path.resolve(__dirname, '../templates/component.txt'),
       }, {
         type: 'add',
-        // The plop templates don't work with back slashes :(
+        // The plop templates don't work with backslashes :(
         path: path.join(path.resolve(__dirname, '../../test/specs/shared/containers/components', data.subFolder), './{{dashCase name}}-test.jsx').replace(/\\/g, '/'),
         templateFile: path.resolve(__dirname, '../templates/component-test.txt'),
       }];

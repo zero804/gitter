@@ -11,6 +11,15 @@ module.exports = function forumStore(data) {
   //Methods
   return {
     get: get,
-    data: data
+    data: data,
+    getForum: () => {
+      return data;
+    },
+    getForumId: () => {
+      return data.id;
+    },
+    getIsWatching: () => {
+      return data.isWatching;
+    },
   };
 };

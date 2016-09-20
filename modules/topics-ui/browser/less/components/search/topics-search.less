@@ -2,6 +2,9 @@
 @import (less, reference) "~gitter-styleguide/css/components/buttons.css";
 @import "../../text";
 
+@topic-search-horizontal-spacing: 4rem;
+
+
 .topic-search__all-topics-link {
   color:           @light;
   font-weight:     300;
@@ -18,15 +21,19 @@
   display: flex;
   align-items: center;
   height: 3.8rem;
-  margin-left:     auto;
+  margin-left: @topic-search-horizontal-spacing / 2;
   text-decoration: none;
   white-space:     nowrap;
   line-height: 1.4rem;
 }
 
+.topic-search__watch-forum-link {
+  .topic-search__create-topic-link();
+}
+
 .topic-search__search-input {
   width:            100%;
-  margin:           0 4rem;
+  margin-left: @topic-search-horizontal-spacing;
   padding:          1rem;
   padding-left: 1.5rem;
   border-bottom:    none;
