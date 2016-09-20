@@ -35,6 +35,8 @@ function renderForum(req, res, next, options) {
     return next(new StatusError(404));
   }
 
+  var userId = req.user && req.user._id;
+
   options = (options || {});
   var groupUri = req.params.groupName;
 
@@ -55,9 +57,12 @@ function renderForum(req, res, next, options) {
         if(!forum) { return next(new StatusError(404, 'Forum not found')); }
 
         var topicsOptions = getTopicsFilterSortOptions(req.query);
-        var strategy = new restSerializer.ForumStrategy({
+
+        var strategy = new restSerializer.ForumStrategy.full({
+          currentUserId: userId,
           topics: topicsOptions
         });
+
         return restSerializer.serializeObject(forum, strategy);
       })
       .then(function(forum){
@@ -106,6 +111,7 @@ function renderTopic(req, res, next) {
 
   var groupUri = req.params.groupName;
   var topicId = req.params.topicId;
+  var userId = req.user && req.user._id;
 
   return contextGenerator.generateNonChatContext(req)
     .then(function(context){
@@ -120,7 +126,12 @@ function renderTopic(req, res, next) {
               if(!forum) { return next(new StatusError(404, 'Forum not found')); }
               // TODO: how do we know which topics options to pass in to the
               // forum strategy? Maybe it shouldn't include any topics at all?
-              var strategy = new restSerializer.ForumStrategy();
+
+              var strategy = new restSerializer.ForumStrategy.full({
+                currentUserId: userId,
+                topics: null // Fix @lerouxb?
+              });
+
               return restSerializer.serializeObject(forum, strategy);
             })
           .then(function(forum){

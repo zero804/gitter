@@ -15,9 +15,14 @@ module.exports = {
   show: function(req) {
     var forum = req.forum;
     var topicsOptions = getTopicsFilterSortOptions(req.query);
-    var strategy = new restSerializer.ForumStrategy({
+
+    var userId = req.user && req.user._id;
+
+    var strategy = new restSerializer.ForumStrategy.full({
+      currentUserId: userId,
       topics: topicsOptions
     });
+
     return restSerializer.serializeObject(forum, strategy);
   },
 
