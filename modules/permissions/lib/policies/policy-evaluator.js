@@ -129,7 +129,6 @@ PolicyEvaluator.prototype = {
     // TODO: ADD BANS
     var userId = this._userId;
     var membersPolicy = this._securityDescriptor.members;
-    var contextDelegate = this._contextDelegate;
     var policyDelegate = this._policyDelegate;
 
     // Check if the user has been banned
@@ -150,24 +149,8 @@ PolicyEvaluator.prototype = {
       return true;
     }
 
-    if (membersPolicy === 'INVITE') {
-      if (userId && contextDelegate) {
-        return this._checkMembershipInContextForInviteRooms()
-          .bind(this)
-          .then(function(result) {
-            if (result) {
-              return true;
-            }
-
-            // Not a member, but explicitly allowed via extraAdmins?
-            // Note: we do not do a full admin check as this would allow anyone
-            // from the owning room to be allowed into the PRIVATE room.
-            // See https://github.com/troupe/gitter-webapp/issues/1742
-            return this._isExtraAdmin();
-          })
-      } else {
-        return false;
-      }
+    if (membersPolicy === 'INVITE' || membersPolicy === 'INVITE_OR_ADMIN') {
+      return this._checkAccessForInviteMembersPolicy();
     }
 
     if (!policyDelegate) {
@@ -189,6 +172,34 @@ PolicyEvaluator.prototype = {
 
   }),
 
+  _checkAccessForInviteMembersPolicy: function() {
+    var userId = this._userId;
+    var membersPolicy = this._securityDescriptor.members;
+    var contextDelegate = this._contextDelegate;
+
+    assert(membersPolicy === 'INVITE' ||
+      membersPolicy === 'INVITE_OR_ADMIN');
+
+    if (userId && contextDelegate) {
+      return this._checkMembershipInContextForInviteRooms()
+        .bind(this)
+        .then(function(result) {
+          if (result) {
+            return true;
+          } else {
+            // Not a member, but explicitly allowed via extraAdmins?
+            // Note: we do not do a full admin check as this would allow anyone
+            // from the owning room to be allowed into the PRIVATE room.
+            // See https://github.com/troupe/gitter-webapp/issues/1742
+            // return this._isExtraAdmin();
+            return this.canAdmin();
+          }
+        })
+    } else {
+      return false;
+    }
+  },
+
   /**
    * Returns true iff the user is in extraAdmins
    */
@@ -203,7 +214,6 @@ PolicyEvaluator.prototype = {
    */
   _checkMembershipInContextForInviteRooms: function() {
     var contextDelegate = this._contextDelegate;
-
     return contextDelegate.isMember();
   },
 
