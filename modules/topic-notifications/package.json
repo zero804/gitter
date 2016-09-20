@@ -11,8 +11,8 @@
   },
   "private": true,
   "dependencies": {
-    "gitter-web-persistence": "../persistence",
-    "gitter-web-persistence-utils": "../persistence-utils",
+    "gitter-web-persistence": "file:../persistence",
+    "gitter-web-persistence-utils": "file:../persistence-utils",
     "mongodb": "~2.1.18"
   },
   "devDependencies": {
