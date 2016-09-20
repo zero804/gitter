@@ -43,6 +43,12 @@ const ForumContainer = React.createClass({
       off: React.PropTypes.func.isRequired,
     }),
 
+    //Forum
+    forumStore: React.PropTypes.shape({
+      getForumId: React.PropTypes.func.isRequired,
+      getIsWatching: React.PropTypes.func.isRequired
+    }).isRequired,
+
     //Categories ---
     categoryStore: React.PropTypes.shape({
       getCategories: React.PropTypes.func.isRequired
@@ -73,8 +79,11 @@ const ForumContainer = React.createClass({
   },
 
   getInitialState(){
-    const { categoryStore, tagStore, topicsStore, newTopicStore } = this.props;
+    const { forumStore, categoryStore, tagStore, topicsStore, newTopicStore } = this.props;
+
     return {
+      forumId: forumStore.getForumId(),
+      isWatchingForum: forumStore.getIsWatching(),
       categoryName: this.props.categoryName,
       filterName: this.props.filterName,
       tagName: this.props.tagName,
@@ -88,8 +97,9 @@ const ForumContainer = React.createClass({
   },
 
   componentDidMount(){
-    const { categoryStore, tagStore, router, topicsStore, newTopicStore } = this.props;
+    const { forumStore, categoryStore, tagStore, router, topicsStore, newTopicStore } = this.props;
 
+    forumStore.onChange(this.onForumUpdate, this);
     topicsStore.onChange(this.onTopicsUpdate, this);
     newTopicStore.onChange(this.onNewTopicUpdate, this);
     topicsStore.on(consts.TOPIC_CREATED, this.onTopicCreated, this);
@@ -118,7 +128,7 @@ const ForumContainer = React.createClass({
   },
 
   render() {
-    const { categoryName, tags, filterName, tagName, sortName, createTopic, topics, newTopic } = this.state;
+    const { forumId, isWatchingForum, categoryName, tags, filterName, tagName, sortName, createTopic, topics, newTopic } = this.state;
     const { groupName, categoryStore, tagStore } = this.props;
 
     const categories = categoryStore.getCategories();
@@ -127,7 +137,10 @@ const ForumContainer = React.createClass({
 
     return (
       <main>
-        <SearchHeader groupName={groupName}/>
+        <SearchHeader
+          forumId={forumId}
+          groupName={groupName}
+          isWatching={isWatchingForum}/>
         <CategoryList
           groupName={ groupName }
           categories={ categories }/>
@@ -189,6 +202,14 @@ const ForumContainer = React.createClass({
   onTopicCreated(data){
     const {groupName} = this.props;
     dispatch(navigateToTopic(groupName, data.topicId, data.slug));
+  },
+
+  onForumUpdate() {
+    const { forumStore } = this.props;
+    this.setState((state) => Object.assign(state, {
+      forumId: forumStore.getForumId(),
+      isWatchingForum: forumStore.getIsWatching(),
+    }));
   },
 
   onCategoryUpdate(){

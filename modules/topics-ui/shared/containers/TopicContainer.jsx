@@ -17,6 +17,12 @@ const TopicContainer = createClass({
     topicId: PropTypes.string.isRequired,
     groupName: PropTypes.string.isRequired,
 
+    //Forum
+    forumStore: React.PropTypes.shape({
+      getForumId: React.PropTypes.func.isRequired,
+      getIsWatching: React.PropTypes.func.isRequired
+    }).isRequired,
+
     topicsStore: PropTypes.shape({
       getById: PropTypes.func.isRequired,
     }).isRequired,
@@ -45,7 +51,8 @@ const TopicContainer = createClass({
   },
 
   componentDidMount(){
-    const {repliesStore, newReplyStore} = this.props;
+    const {forumStore, repliesStore, newReplyStore} = this.props;
+    forumStore.onChange(this.onForumUpdate, this);
     repliesStore.onChange(this.updateReplies, this);
     newReplyStore.on('change:text', this.updateReplyContent, this);
   },
@@ -57,8 +64,10 @@ const TopicContainer = createClass({
   },
 
   getInitialState(){
-    const {repliesStore} = this.props;
+    const {forumStore, repliesStore} = this.props;
     return {
+      forumId: forumStore.getForumId(),
+      isWatchingForum: forumStore.getIsWatching(),
       replies: repliesStore.getReplies(),
       newReplyContent: '',
     };
@@ -67,7 +76,7 @@ const TopicContainer = createClass({
 
   render(){
 
-    const { topicId, topicsStore, groupName, categoryStore, currentUserStore, tagStore } = this.props;
+    const { forumId, isWatchingForum, topicId, topicsStore, groupName, categoryStore, currentUserStore, tagStore } = this.props;
     const {replies, newReplyContent} = this.state;
     const topic = topicsStore.getById(topicId)
     const currentUser = currentUserStore.getCurrentUser();
@@ -86,7 +95,10 @@ const TopicContainer = createClass({
 
     return (
       <main>
-        <SearchHeader groupName={groupName}/>
+        <SearchHeader
+          forumId={forumId}
+          groupName={groupName}
+          isWatching={isWatchingForum}/>
         <article>
           <TopicHeader
             topic={topic}
@@ -117,6 +129,14 @@ const TopicContainer = createClass({
     newReplyStore.clear();
     this.setState((state) => Object.assign(state, {
       newReplyContent: '',
+    }));
+  },
+
+  onForumUpdate() {
+    const { forumStore } = this.props;
+    this.setState((state) => Object.assign(state, {
+      forumId: forumStore.getForumId(),
+      isWatchingForum: forumStore.getIsWatching()
     }));
   },
 
