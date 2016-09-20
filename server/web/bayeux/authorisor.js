@@ -331,7 +331,9 @@ function populateTopicsCollection(options) {
     return Promise.resolve();
   }
 
-  return restful.serializeTopicsForForumId(forumId)
+  var snapshotOptions = options.snapshot || {};
+
+  return restful.serializeTopicsForForumId(forumId, snapshotOptions)
     .then(dataToSnapshot('forum.topics'));
 }
 
