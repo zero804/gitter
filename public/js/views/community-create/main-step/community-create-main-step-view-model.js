@@ -1,4 +1,4 @@
-/* eslint complexity: ["error", 13] */
+/* eslint complexity: ["error", 14] */
 'use strict';
 
 var CommunityCreateStepViewModel = require('../community-create-step-view-model');
