@@ -197,7 +197,14 @@ var CreateRoomView = Marionette.LayoutView.extend({
       type = 'GH_REPO';
       linkPath = associatedGithubProject.get('uri');
     }
-    else if((onlyGroupUsers && security === 'PRIVATE') || security === 'PUBLIC') {
+    else if(onlyGroupUsers && security === 'PRIVATE') {
+      type = 'GROUP';
+      linkPath = null;
+      // Re-defining `security` sucks but is the only way to get `INVITE_OR_ADMIN` members
+      // See https://github.com/troupe/gitter-webapp/pull/2224#discussion_r79404352
+      security = 'INHERITED';
+    }
+    else if(security === 'PUBLIC') {
       type = 'GROUP';
       linkPath = null;
     }
@@ -208,8 +215,8 @@ var CreateRoomView = Marionette.LayoutView.extend({
       security: {
         // null or GH_ORG or GH_REPO
         type: type,
-        security: security,
-        linkPath: linkPath
+        linkPath: linkPath,
+        security: security
       },
       addBadge: allowBadger
     };
