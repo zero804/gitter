@@ -4,28 +4,17 @@ var Promise = require('bluebird');
 var CategoriesForForumStrategy = require('./topics/categories-for-forum-strategy');
 var TopicsForForumStrategy = require('./topics/topics-for-forum-strategy');
 var topicService = require('gitter-web-topics/lib/topic-service');
-
+var ForumSubscriptionStrategy = require('./topics/forum-subscription-strategy');
 
 function getId(obj) {
   return obj._id || obj.id;
 }
 
-function ForumStrategy(options) {
-  options = options || {};
+function ForumStrategy() {
+}
 
-  var categoriesForForumStrategy;
-  var topicsForForumStrategy;
-
-  var topicsTotalMap;
-
-  function loadTopicsTotals(forumIds) {
-    return topicService.findTotalsByForumIds(forumIds)
-      .then(function(topicsTotals) {
-        topicsTotalMap = topicsTotals;
-      });
-  }
-
-  this.preload = function(forums) {
+ForumStrategy.prototype = {
+  preload: function(forums) {
     if (forums.isEmpty()) return;
 
     var forumIds = forums.map(getId);
@@ -34,35 +23,52 @@ function ForumStrategy(options) {
 
     // TODO: this will probably be removed in favor of having forum.topicsTotal
     // in the schema. Also: it is not a strategy.
-    promises.push(loadTopicsTotals(forumIds.toArray()))
+    promises.push(this.loadTopicsTotals(forumIds))
+    promises.push(this.categoriesForForumStrategy.preload(forumIds));
+    promises.push(this.topicsForForumStrategy.preload(forumIds));
 
-    categoriesForForumStrategy = new CategoriesForForumStrategy();
-    promises.push(categoriesForForumStrategy.preload(forumIds));
-
-    topicsForForumStrategy = new TopicsForForumStrategy(options.topics);
-    promises.push(topicsForForumStrategy.preload(forumIds));
+    if (this.subscriptionStrategy)
 
     return Promise.all(promises);
+  },
 
-  }
+  // TODO: this will probably be removed in favor of having forum.topicsTotal
+  // in the schema. Also: it is not a strategy.
+  // @lerouxb to refactor ;-)
+  loadTopicsTotals: function(forumIds) {
+    return topicService.findTotalsByForumIds(forumIds.toArray())
+      .bind(this)
+      .then(function(topicsTotals) {
+        this.topicsTotalMap = topicsTotals;
+      });
+  },
 
-  this.map = function(forum) {
+  map: function(forum) {
     var id = forum.id || forum._id && forum._id.toHexString();
 
-    var topicsTotal = topicsTotalMap[id] || 0;
+    var topicsTotal = this.topicsTotalMap[id] || 0;
 
     return {
       id: id,
       tags: forum.tags,
-      categories: categoriesForForumStrategy.map(id),
-      topics: topicsForForumStrategy.map(id),
-      topicsTotal: topicsTotal
+      categories: this.categoriesForForumStrategy.map(id),
+      topics: this.topicsForForumStrategy.map(id),
+      subscribed: this.subscriptionStrategy ? this.subscriptionStrategy.map(forum) : undefined,
+      topicsTotal: topicsTotal // TODO: drop this?
     };
-  }
-}
+  },
 
-ForumStrategy.prototype = {
   name: 'ForumStrategy',
 };
+
+
+ForumStrategy.full = function(options) {
+  var strategy = new ForumStrategy();
+  strategy.topicsForForumStrategy = new TopicsForForumStrategy(options && options.topics);
+  strategy.subscriptionStrategy = new ForumSubscriptionStrategy(options && options.currentUserId);
+  strategy.categoriesForForumStrategy = new CategoriesForForumStrategy();
+
+  return strategy;
+}
 
 module.exports = ForumStrategy;

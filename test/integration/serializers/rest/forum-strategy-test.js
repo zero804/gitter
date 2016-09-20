@@ -38,7 +38,7 @@ describe('ForumStrategy', function() {
   });
 
   it('should serialize a forum', function() {
-    var strategy = new ForumStrategy();
+    var strategy = ForumStrategy.full();
 
     var user = fixture.user1;
     var forum = fixture.forum1;
@@ -94,6 +94,7 @@ describe('ForumStrategy', function() {
             lastModified: LONG_AGO,
             v: 1
           }],
+          subscribed: false,
           topicsTotal: 1
         }])
       });
