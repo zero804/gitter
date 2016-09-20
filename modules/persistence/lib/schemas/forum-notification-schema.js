@@ -31,42 +31,6 @@ ForumNotificationSchema.index({
   background: true,
 });
 
-// Only allow a single pending invite
-// per external id
-// ForumNotificationSchema.extraIndices = [{
-//   keys: {
-//     forumId: 1,
-//     topicId: 1,
-//     replyId: 1
-//   },
-//   options: {
-//     background: true,
-//     partialFilterExpression: {
-//       topicId: { $exists: true },
-//       replyId: { $exists: true },
-//     }
-//   },
-// },{
-//   keys: {
-//     forumId: 1,
-//     topicId: 1,
-//   },
-//   options: {
-//     background: true,
-//     partialFilterExpression: {
-//       topicId: { $exists: true },
-//     }
-//   },
-// },{
-//   keys: {
-//     forumId: 1
-//   },
-//   options: {
-//     background: true
-//   },
-//
-// }];
-
 module.exports = {
   install: function(mongooseConnection) {
     var Model = mongooseConnection.model('ForumNotification', ForumNotificationSchema);
