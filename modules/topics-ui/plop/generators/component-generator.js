@@ -8,7 +8,7 @@ module.exports = function(plop) {
   var baseComponentDir = path.resolve(__dirname, '../../shared/containers/components');
   var baseComponentDirs = glob.sync(baseComponentDir + '/*/');
   var componentDirs = ['/'].concat(baseComponentDirs.map(function(folderPath){
-    return folderPath.replace(baseComponentDir, '');
+    return path.relative(baseComponentDir, folderPath);
   }));
 
   plop.setGenerator('component', {
@@ -32,11 +32,13 @@ module.exports = function(plop) {
 
       return [{
         type: 'add',
-        path: path.resolve(__dirname, '../../shared/containers/components/', '.' + data.subFolder) + '/{{dashCase name}}.jsx',
+        // The plop templates don't work with back slashes :(
+        path: path.join(path.resolve(__dirname, '../../shared/containers/components/', data.subFolder), './{{dashCase name}}.jsx').replace(/\\/g, '/'),
         templateFile: path.resolve(__dirname, '../templates/component.txt'),
       }, {
         type: 'add',
-        path: path.resolve(__dirname, '../../test/specs/shared/containers//components', '.' + data.subFolder) + '/{{dashCase name}}-test.jsx',
+        // The plop templates don't work with back slashes :(
+        path: path.join(path.resolve(__dirname, '../../test/specs/shared/containers/components', data.subFolder), './{{dashCase name}}-test.jsx').replace(/\\/g, '/'),
         templateFile: path.resolve(__dirname, '../templates/component-test.txt'),
       }];
     }
