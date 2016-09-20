@@ -48,12 +48,12 @@ describe('get-topics-filter-sort-options', function() {
       }
     }, {
       input: {
-        sort: '-lastChanged,-_id'
+        sort: '-lastChanged,-id'
       },
       output: {
         sort: {
           lastChanged: -1,
-          _id: -1
+          id: -1
         }
       }
     }, {

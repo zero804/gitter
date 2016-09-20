@@ -51,10 +51,15 @@ function parseSort(value) {
     // lastChanged -> { lastChanged: 1 }
     if (!value) return;
 
-    if (value[0] === '-') {
-      sort[value.slice(1)] = -1;
+    // Key is the database key that will be used. Usually it matches with the
+    // input on the URI, but in the id -> _id case, it doesn't. Probably more
+    // cases in future.
+    var key = (value === '_id') ? '_id' : value;
+
+    if (key[0] === '-') {
+      sort[key.slice(1)] = -1;
     } else {
-      sort[value] = 1;
+      sort[key] = 1;
     }
   });
 
@@ -69,7 +74,7 @@ function getTopicsFilterSortOptions(query) {
   var keys = Object.keys(query);
   keys.forEach(function(key) {
     if (key === 'sort') {
-      // example: sort=-repliesTotal,-_id -> {repliesTotal: -1, _id: -1}
+      // example: sort=-repliesTotal,-id -> {repliesTotal: -1, _id: -1}
       sort = parseSort(query.sort);
       return;
     }
