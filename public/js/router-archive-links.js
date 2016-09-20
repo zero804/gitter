@@ -4,7 +4,7 @@ var context = require('./utils/context');
 var clientEnv = require('gitter-client-env');
 var onready = require('./utils/onready');
 var appEvents = require('./utils/appevents');
-var apiClient = require('./components/apiClient');
+var apiClient = require('./components/api-client');
 var HeaderView = require('./views/app/headerView');
 var RightToolBarModel = require('./models/right-toolbar-model');
 

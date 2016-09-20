@@ -118,12 +118,11 @@ function renderChat(req, res, options, next) {
             isRightToolbarPinned: isRightToolbarPinned,
 
             //Feature Switch Left Menu
-            hasNewLeftMenu: req.fflip && req.fflip.has('left-menu'),
             troupeTopic: troupeContext.troupe.topic,
             premium: troupeContext.troupe.premium,
             troupeFavourite: troupeContext.troupe.favourite,
             headerView: getHeaderViewOptions(troupeContext.troupe),
-            canChangeGroupAvatar: isStaff || isAdmin,
+            canChangeGroupAvatar: !troupe.groupId && (isStaff || isAdmin),
             isAdmin: isAdmin,
             isNativeDesktopApp: troupeContext.isNativeDesktopApp
           }, options.extras);

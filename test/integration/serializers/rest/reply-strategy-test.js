@@ -8,6 +8,7 @@ var assertUtils = require('../../assert-utils')
 var serialize = testRequire('./serializers/serialize');
 var ReplyStrategy = testRequire('./serializers/rest/reply-strategy');
 
+var LONG_AGO = '2014-01-01T00:00:00.000Z';
 
 function makeHash() {
   var hash = {};
@@ -32,13 +33,15 @@ describe('ReplyStrategy', function() {
       forum: 'forum1',
       category: 'category1',
       user: 'user1',
+      repliesTotal: 1
     },
     reply1: {
       forum: 'forum1',
       category: 'category1',
       user: 'user1',
       topic: 'topic1',
-      sent: new Date('2014-01-01T00:00:00.000Z')
+      sent: new Date(LONG_AGO),
+      commentsTotal: 1
     },
     comment1: {
       forum: 'forum1',
@@ -46,7 +49,7 @@ describe('ReplyStrategy', function() {
       user: 'user1',
       topic: 'topic1',
       reply: 'reply1',
-      sent: new Date('2014-01-01T00:00:00.000Z')
+      sent: new Date(LONG_AGO)
     }
   });
 
@@ -70,9 +73,10 @@ describe('ReplyStrategy', function() {
             displayName: user.displayName,
             avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
           },
-          sent: '2014-01-01T00:00:00.000Z',
+          sent: LONG_AGO,
           editedAt: null,
-          lastModified: null,
+          lastChanged: LONG_AGO,
+          lastModified: LONG_AGO,
           v: 1
         }])
       });
@@ -111,15 +115,15 @@ describe('ReplyStrategy', function() {
               displayName: user.displayName,
               avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
             },
-            sent: '2014-01-01T00:00:00.000Z',
+            sent: LONG_AGO,
             editedAt: null,
-            lastModified: null,
             v: 1
           }],
           commentsTotal: 1,
-          sent: '2014-01-01T00:00:00.000Z',
+          sent: LONG_AGO,
           editedAt: null,
-          lastModified: null,
+          lastChanged: LONG_AGO,
+          lastModified: LONG_AGO,
           v: 1
         }])
       });
@@ -141,9 +145,10 @@ describe('ReplyStrategy', function() {
               html: reply.html
             },
             user: fixture.user1.id,
-            sent: '2014-01-01T00:00:00.000Z',
+            sent: LONG_AGO,
             editedAt: null,
-            lastModified: null,
+            lastChanged: LONG_AGO,
+            lastModified: LONG_AGO,
             v: 1
           }],
           lookups: {

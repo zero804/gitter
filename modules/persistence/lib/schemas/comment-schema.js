@@ -14,7 +14,6 @@ var CommentSchema = new Schema({
   userId: {type: ObjectId, required: true},
   sent: { type: Date, "default": Date.now },
   editedAt: { type: Date, "default": null },
-  lastModified: { type: Date, "default": null },
   lang: {type: String },
   _tv: { type: 'MongooseNumber', 'default': 0 },
   _md: {type: Number }

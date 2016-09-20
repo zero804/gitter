@@ -24,8 +24,6 @@ function validateTags(tags, allowedTags) {
   var usedTags = {};
 
   return tags.every(function(tag) {
-    tag = String(tag);
-
     if (!validateDisplayName(tag)) {
       return false;
     }

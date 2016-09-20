@@ -1,68 +1,60 @@
 "use strict";
 
 var Promise = require('bluebird');
-var Lazy = require('lazy.js');
-var _ = require('lodash');
-var forumCategoryService = require('gitter-web-topics/lib/forum-category-service');
+var CategoriesForForumStrategy = require('./topics/categories-for-forum-strategy');
+var TopicsForForumStrategy = require('./topics/topics-for-forum-strategy');
 var topicService = require('gitter-web-topics/lib/topic-service');
-var ForumCategoryStrategy = require('./forum-category-strategy');
-var TopicStrategy = require('./topic-strategy');
 
 
-function getIdString(obj) {
-  return obj.id || obj._id && obj._id.toHexString();
+function getId(obj) {
+  return obj._id || obj.id;
 }
 
 function ForumStrategy(/*options*/) {
-  var categoryStrategy;
-  var topicStrategy;
+  var categoriesForForumStrategy;
+  var topicsForForumStrategy;
 
-  var categoriesMap;
-  var topicsMap;
   var topicsTotalMap;
+
+  function loadTopicsTotals(forumIds) {
+    return topicService.findTotalsByForumIds(forumIds)
+      .then(function(topicsTotals) {
+        topicsTotalMap = topicsTotals;
+      });
+  }
 
   this.preload = function(forums) {
     if (forums.isEmpty()) return;
 
-    var forumIds = forums.map(getIdString).toArray();
+    var forumIds = forums.map(getId);
 
-    return Promise.join(
-      forumCategoryService.findByForumIds(forumIds),
-      // TODO: There should be a way to cherry-pick and sort just some topics
-      // rather than ALL the topics in the forum.
-      topicService.findByForumIds(forumIds),
-      topicService.findTotalsByForumIds(forumIds),
-      function(categories, topics, topicsTotals) {
-        categoriesMap = _.groupBy(categories, 'forumId');
-        topicsMap = _.groupBy(topics, 'forumId');
-        topicsTotalMap = topicsTotals;
+    var promises = [];
 
-        var strategies = [];
+    // TODO: this will probably be removed in favor of having forum.topicsTotal
+    // in the schema. Also: it is not a strategy.
+    promises.push(loadTopicsTotals(forumIds.toArray()))
 
-        categoryStrategy = new ForumCategoryStrategy();
-        strategies.push(categoryStrategy.preload(Lazy(categories)));
+    categoriesForForumStrategy = new CategoriesForForumStrategy();
+    promises.push(categoriesForForumStrategy.preload(forumIds));
 
-        // TODO: pass in the categories so TopicStrategy doesn't end up loading
-        // the same stuff again. Or maybe serialize as lookups?
-        topicStrategy = TopicStrategy.standard();
-        strategies.push(topicStrategy.preload(Lazy(topics)));
+    // TODO: send options down the line?
+    topicsForForumStrategy = new TopicsForForumStrategy();
+    promises.push(topicsForForumStrategy.preload(forumIds));
 
-        return Promise.all(strategies);
-      });
+    return Promise.all(promises);
+
   }
 
   this.map = function(forum) {
-    var id = getIdString(forum);
+    var id = forum.id || forum._id && forum._id.toHexString();
 
-    var categories = categoriesMap[id] || [];
-    var topics = topicsMap[id] || [];
     var topicsTotal = topicsTotalMap[id] || 0;
 
     return {
       id: id,
       tags: forum.tags,
-      categories: categories.map(categoryStrategy.map),
-      topics: topics.map(topicStrategy.map),
+      categories: categoriesForForumStrategy.map(id),
+      topics: topicsForForumStrategy.map(id),
       topicsTotal: topicsTotal
     };
   }

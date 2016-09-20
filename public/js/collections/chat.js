@@ -28,6 +28,7 @@ var ChatModel = Backbone.Model.extend({
   },
 
   triggerSynced: function() {
+    this._syncErrorTime = null;
     this.trigger('syncStatusChange', 'synced');
   },
 
@@ -37,6 +38,7 @@ var ChatModel = Backbone.Model.extend({
   },
 
   triggerSyncError: function() {
+    this._syncErrorTime = moment();
     this.trigger('syncStatusChange', 'syncerror');
   },
 
@@ -78,9 +80,12 @@ var ChatModel = Backbone.Model.extend({
     return d;
   },
 
+  hasSyncError: function() {
+    return !!this._syncErrorTime;
+  },
+
   sync: SyncMixin.sync,
 });
-
 
 var ChatCollection = LiveCollection.extend({
   model: ChatModel,
@@ -91,9 +96,9 @@ var ChatCollection = LiveCollection.extend({
 
   urlTemplate: '/v1/rooms/:troupeId/chatMessages',
   contextModel: context.contextModel(),
-  comparator: function(chat1, chat2) {
-    var s1 = chat1.get('sent');
-    var s2 = chat2.get('sent');
+  comparator: function(c1, c2) {
+    var s1 = c1.get('sent') || c1._syncErrorTime;
+    var s2 = c2.get('sent') || c2._syncErrorTime;
     if (!s1) {
       if (!s2) return 0; // null === null
       return 1; // null > s2

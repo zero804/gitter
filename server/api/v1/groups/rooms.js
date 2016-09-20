@@ -6,26 +6,40 @@ var restful = require('../../../services/restful')
 var GroupWithPolicyService = require('../../../services/group-with-policy-service');
 var restSerializer = require('../../../serializers/rest-serializer');
 
+function castString(v, defaultValue) {
+  return v ? String(v) : defaultValue;
+}
+
 function getCreateOptions(input) {
-  var name = input.name ? String(input.name) : undefined;
-  var topic = input.topic ? String(input.topic) : undefined;
+  var name = castString(input.name);
+  var topic = castString(input.topic);
   var createOptions = { name: name, topic: topic };
   var linkPath;
 
   if (input.security) {
-    linkPath = input.security.linkPath ? String(input.security.linkPath) : undefined;
+    linkPath = castString(input.security.linkPath, undefined);
 
     // PUBLIC or PRIVATE
-    createOptions.security = input.security.security ? String(input.security.security) : undefined;
+    createOptions.security = castString(input.security.security, undefined);
     assert(createOptions.security, 'security required');
 
-    // type defaults to null, not undefined
-    createOptions.type = input.security.type ? String(input.security.type) : null;
-    if (createOptions.type && createOptions.type !== 'GROUP') {
-      // for GitHub and future room types that are backed by other services
-      createOptions.linkPath = linkPath;
-      assert(createOptions.linkPath, 'linkPath required');
+    // `type` defaults to null, not undefined
+    createOptions.type = castString(input.security.type, null);
+    switch(createOptions.type) {
+      case null:
+      case 'GROUP':
+        assert(!linkPath, 'linkPath cannot be specified');
+        break;
+
+      case 'GH_REPO':
+      case 'GH_ORG':
+        assert(linkPath, 'linkPath required');
+        break;
     }
+
+    // for GitHub and future room types that are backed by other services
+    createOptions.linkPath = linkPath;
+
   } else {
     createOptions.security = 'PUBLIC';
   }
@@ -80,6 +94,7 @@ module.exports = {
           currentUserId: req.user.id,
           currentUser: req.user,
           includeRolesForTroupe: room,
+          includeBackend: true,
           // include all these because it will replace the troupe in the context
           includeTags: true,
           includeProviders: true,
