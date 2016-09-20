@@ -95,6 +95,7 @@ if (config.get('topics:useApi')) {
   schemas.Topic = require('./schemas/topic-schema');
   schemas.Reply = require('./schemas/reply-schema');
   schemas.Comment = require('./schemas/comment-schema');
+  schemas.ForumNotification = require('./schemas/forum-notification-schema');
 }
 
 module.exports = createExports(schemas);
