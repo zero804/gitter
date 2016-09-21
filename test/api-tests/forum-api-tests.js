@@ -18,6 +18,8 @@ describe('forum-api', function() {
     user1: {
       accessToken: 'web-internal'
     },
+    user2: {
+    },
     forum1: {
       securityDescriptor: {
         extraAdmins: ['user1']
@@ -71,11 +73,18 @@ describe('forum-api', function() {
       });
   });
 
-  it('DELETE /v1/forums/:forumId/subscribers', function() {
+  it('DELETE /v1/forums/:forumId/subscribers/:userId - yourself', function() {
     return request(app)
       .del('/v1/forums/' + fixture.forum1.id + '/subscribers/' + fixture.user1.id)
       .set('x-access-token', fixture.user1.accessToken)
       .expect(204)
+  });
+
+  it('DELETE /v1/forums/:forumId/subscribers/:userId - another user', function() {
+    return request(app)
+      .del('/v1/forums/' + fixture.forum1.id + '/subscribers/' + fixture.user2.id)
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(403)
   });
 
 });
