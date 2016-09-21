@@ -97,7 +97,7 @@ var HeaderView = Marionette.ItemView.extend({
 
     var isStaff = context.isStaff();
     var isAdmin = context.isTroupeAdmin();
-    var canChangeGroupAvatar = isStaff || isAdmin;
+    var canChangeGroupAvatar = data.groupId && (isStaff || isAdmin);
     _.extend(data, {
       headerView: getHeaderViewOptions(data),
       user: !!context.isLoggedIn(),

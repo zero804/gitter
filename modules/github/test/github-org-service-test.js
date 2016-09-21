@@ -5,7 +5,7 @@ var assert = require("assert");
 var GithubOrgService = require('..').GitHubOrgService;
 var GITTER_TEST_BOT = { username: 'gittertestbot', githubToken: '***REMOVED***'};
 
-describe('github-org-service #slow', function() {
+describe('github-org-service #slow #github', function() {
 
   describe('members', function() {
 

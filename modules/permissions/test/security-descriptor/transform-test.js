@@ -110,7 +110,7 @@ describe('transform-test', function() {
     },
     out: {
       type: null,
-      members: 'INVITE',
+      members: 'INVITE_OR_ADMIN',
       admins: 'MANUAL',
       public: false,
       linkPath: null,
@@ -138,7 +138,7 @@ describe('transform-test', function() {
     },
     out: {
       type: 'GROUP',
-      members: 'INVITE',
+      members: 'INVITE_OR_ADMIN',
       admins: 'GROUP_ADMIN',
       public: false,
       linkPath: null,

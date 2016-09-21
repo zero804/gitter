@@ -5,7 +5,7 @@ var GitHubOrgCollaboratorService = require('../lib/github-org-collaborator-servi
 var assert = require('assert');
 
 
-describe('gitter-org-collaborators-service-test', function() {
+describe('gitter-org-collaborators-service-test #github', function() {
   describe('integration #slow', function() {
     var fixture = fixtureLoader.setup({
       deleteDocuments: {
