@@ -142,14 +142,12 @@ ForumWithPolicyService.prototype.setForumTags = secureMethod([allowAdmin], funct
 
 ForumWithPolicyService.prototype.setTopicTitle = secureMethod([allowWrite, matchForum], function(topic, title) {
   var user = this.user;
-  var forum = this.forum;
 
   return topicService.setTopicTitle(user, topic, title);
 });
 
 ForumWithPolicyService.prototype.setTopicSlug = secureMethod([allowWrite, matchForum], function(topic, slug) {
   var user = this.user;
-  var forum = this.forum;
 
   return topicService.setTopicSlug(user, topic, slug);
 });
@@ -163,14 +161,12 @@ ForumWithPolicyService.prototype.setTopicTags = secureMethod([allowWrite, matchF
 
 ForumWithPolicyService.prototype.setTopicSticky = secureMethod([allowWrite, matchForum], function(topic, sticky) {
   var user = this.user;
-  var forum = this.forum;
 
   return topicService.setTopicSticky(user, topic, sticky);
 });
 
 ForumWithPolicyService.prototype.setTopicText = secureMethod([allowWrite, matchForum], function(topic, text) {
   var user = this.user;
-  var forum = this.forum;
 
   return topicService.setTopicText(user, topic, text);
 });
