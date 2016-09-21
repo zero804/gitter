@@ -17,6 +17,7 @@ var SecurityDescriptorSchema = new Schema({
     null,              // For one-to-one
     'PUBLIC',          // Anyone
     'INVITE',          // Only invited users can join (private)
+    'INVITE_OR_ADMIN', // Invited users or admins
     'GH_REPO_ACCESS',  // for GH_REPO, must be able to see the repo
     'GH_REPO_PUSH',    // for GH_REPO, must have repo push or admin
     'GH_ORG_MEMBER',   // for GH_ORG, must be org member

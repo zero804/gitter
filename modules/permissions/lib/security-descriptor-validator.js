@@ -45,6 +45,7 @@ function validateGroupDescriptor(descriptor) {
       break;
 
     case 'INVITE':
+    case 'INVITE_OR_ADMIN':
       if (descriptor.public) {
         throw new StatusError(403, 'Invalid public attribute: ' + descriptor.public);
       }
@@ -81,12 +82,13 @@ function validateGroupDescriptor(descriptor) {
   validateExtraUserIds(descriptor);
 }
 
-function validateGhRepoDescriptor(descriptor) {
+function validateGhRepoDescriptor(descriptor) { // eslint-disable-line complexity
   var usesGH = false;
 
   switch(descriptor.members) {
     case 'PUBLIC':
     case 'INVITE':
+    case 'INVITE_OR_ADMIN':
       break;
     case 'GH_REPO_ACCESS':
     case 'GH_REPO_PUSH':
@@ -144,6 +146,7 @@ function validateGhOrgDescriptor(descriptor) {
   switch(descriptor.members) {
     case 'PUBLIC':
     case 'INVITE':
+    case 'INVITE_OR_ADMIN':
       break;
     case 'GH_ORG_MEMBER':
       usesGH = true;
@@ -197,6 +200,7 @@ function validateGhUserDescriptor(descriptor) {
   switch(descriptor.members) {
     case 'PUBLIC':
     case 'INVITE':
+    case 'INVITE_OR_ADMIN':
       break;
     default:
       throw new StatusError(403, 'Invalid members attribute: ' + descriptor.members);
@@ -269,6 +273,7 @@ function validateBasicDescriptor(descriptor) {
   switch(descriptor.members) {
     case 'PUBLIC':
     case 'INVITE':
+    case 'INVITE_OR_ADMIN':
       break;
     default:
       throw new StatusError(403, 'Invalid members attribute');
