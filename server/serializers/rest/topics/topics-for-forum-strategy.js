@@ -40,8 +40,11 @@ TopicsForForumStrategy.prototype = {
 };
 
 
-TopicsForForumStrategy.full = function(options) {
-  var strategy = new TopicsForForumStrategy({ topicsFilterSort: options && options.topicsFilterSort });
+TopicsForForumStrategy.standard = function(options) {
+  var strategy = new TopicsForForumStrategy({
+    topicsFilterSort: options && options.topicsFilterSort
+  });
+
   var currentUserId = options && options.currentUserId;
 
   strategy.topicStrategy = TopicStrategy.standard({

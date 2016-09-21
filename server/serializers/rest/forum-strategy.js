@@ -61,18 +61,30 @@ ForumStrategy.prototype = {
   name: 'ForumStrategy',
 };
 
-
-ForumStrategy.full = function(options) {
+/**
+ * Forum WITHOUT nested topics
+ */
+ForumStrategy.standard = function(options) {
   var strategy = new ForumStrategy();
   var currentUserId = options && options.currentUserId;
 
-  strategy.topicsForForumStrategy = TopicsForForumStrategy.full({
+  strategy.subscriptionStrategy = new ForumSubscriptionStrategy(currentUserId);
+  strategy.categoriesForForumStrategy = new CategoriesForForumStrategy();
+
+  return strategy;
+}
+
+/**
+ * Forum WITH nested topics
+ */
+ForumStrategy.nested = function(options) {
+  var strategy = ForumStrategy.standard(options);
+  var currentUserId = options && options.currentUserId;
+
+  strategy.topicsForForumStrategy = TopicsForForumStrategy.standard({
     currentUserId: currentUserId,
     topicsFilterSort: options && options.topicsFilterSort
   });
-
-  strategy.subscriptionStrategy = new ForumSubscriptionStrategy(currentUserId);
-  strategy.categoriesForForumStrategy = new CategoriesForForumStrategy();
 
   return strategy;
 }

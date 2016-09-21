@@ -17,31 +17,20 @@ function getId(obj) {
 }
 
 function TopicStrategy(options) {
-  options = options || {};
-
-  // useLookups will be set to true if there are any lookups that this strategy
-  // understands.
-  var useLookups = false;
-  var userLookups;
-  var categoryLookups;
   if (options.lookups) {
     if (options.lookups.indexOf('user') !== -1) {
-      useLookups = true;
-      userLookups = {};
+      this.userLookups = {};
     }
+
     if (options.lookups.indexOf('category') !== -1) {
-      useLookups = true;
-      categoryLookups = {};
+      this.categoryLookups = {};
     }
   }
+}
 
-  var userStrategy;
-  var categoryStrategy;
-  var repliesForTopicStrategy;
-  var replyingUsersStrategy;
-  var topicSubscriptionStrategy;
+TopicStrategy.prototype = {
 
-  this.preload = function(topics) {
+  preload: function(topics) {
     if (topics.isEmpty()) return;
 
     var topicIds = topics.map(getId);
@@ -49,59 +38,51 @@ function TopicStrategy(options) {
     var strategies = [];
 
     // load replies
-    if (options.includeReplies) {
-      repliesForTopicStrategy = new RepliesForTopicStrategy();
-      strategies.push(repliesForTopicStrategy.preload(topicIds));
+    if (this.repliesForTopicStrategy) {
+      strategies.push(this.repliesForTopicStrategy.preload(topicIds));
     }
 
     // load replyingUsers
-    if (options.includeReplyingUsers) {
-      replyingUsersStrategy = new TopicReplyingUsersStrategy();
-      strategies.push(replyingUsersStrategy.preload(topicIds));
+    if (this.replyingUsersStrategy) {
+      strategies.push(this.replyingUsersStrategy.preload(topicIds));
     }
 
-    // TODO: no user strategy necessary if options.user is passed in
-    userStrategy = UserIdStrategy.slim();
     var userIds = topics.map(function(i) { return i.userId; });
-    strategies.push(userStrategy.preload(userIds));
+    strategies.push(this.userStrategy.preload(userIds));
 
-    // TODO: no category strategy necessary if options.category is passed in
-    // TODO: support options.categories for when called from ForumStrategy?
-    categoryStrategy = new ForumCategoryIdStrategy();
     var categoryIds = topics.map(function(i) { return i.categoryId; });
-    strategies.push(categoryStrategy.preload(categoryIds));
+    strategies.push(this.categoryStrategy.preload(categoryIds));
 
-    topicSubscriptionStrategy = new TopicSubscriptionStrategy({ currentUserId: options.userId });
-    strategies.push(topicSubscriptionStrategy.preload(topics));
+    strategies.push(this.topicSubscriptionStrategy.preload(topics));
 
     return Promise.all(strategies);
-  };
+  },
 
-  function mapCategory(categoryId) {
-    if (categoryLookups) {
-      if (!categoryLookups[categoryId]) {
-        categoryLookups[categoryId] = categoryStrategy.map(categoryId);
+  mapCategory: function(categoryId) {
+    if (this.categoryLookups) {
+      if (!this.categoryLookups[categoryId]) {
+        this.categoryLookups[categoryId] = this.categoryStrategy.map(categoryId);
       }
 
       return categoryId;
     } else {
-      return categoryStrategy.map(categoryId);
+      return this.categoryStrategy.map(categoryId);
     }
-  }
+  },
 
-  function mapUser(userId) {
-    if (userLookups) {
-      if (!userLookups[userId]) {
-        userLookups[userId] = userStrategy.map(userId);
+  mapUser: function(userId) {
+    if (this.userLookups) {
+      if (!this.userLookups[userId]) {
+        this.userLookups[userId] = this.userStrategy.map(userId);
       }
 
       return userId;
     } else {
-      return userStrategy.map(userId);
+      return this.userStrategy.map(userId);
     }
-  }
+  },
 
-  this.map = function(topic) {
+  map: function(topic) {
     var id = topic.id || topic._id && topic._id.toHexString();
 
     return {
@@ -115,17 +96,14 @@ function TopicStrategy(options) {
       sticky: topic.sticky,
       tags: topic.tags,
 
-      // TODO: support options.category
-      category: mapCategory(topic.categoryId),
+      category: this.mapCategory(topic.categoryId),
+      user: this.mapUser(topic.userId),
 
-      // TODO: support options.user
-      user: mapUser(topic.userId),
+      subscribed: this.topicSubscriptionStrategy ? this.topicSubscriptionStrategy.map(topic) : undefined,
 
-      subscribed: topicSubscriptionStrategy ? topicSubscriptionStrategy.map(topic) : undefined,
-
-      replies: repliesForTopicStrategy ? repliesForTopicStrategy.map(id) : undefined,
-      repliesTotal: options.includeRepliesTotals ? topic.repliesTotal : undefined,
-      replyingUsers: replyingUsersStrategy ? replyingUsersStrategy.map(id): undefined,
+      replies: this.repliesForTopicStrategy ? this.repliesForTopicStrategy.map(id) : undefined,
+      repliesTotal: topic.repliesTotal,
+      replyingUsers: this.replyingUsersStrategy ? this.replyingUsersStrategy.map(id): undefined,
 
       sent: formatDate(topic.sent),
       editedAt: formatDate(topic.editedAt),
@@ -136,45 +114,60 @@ function TopicStrategy(options) {
       // TODO: participatingTotal
       // TODO: isFaved
       // TODO: isParticipating
-      // TODO: isWatching
     };
-  };
+  },
 
-  this.postProcess = function(serialized) {
-    if (useLookups) {
+  postProcess: function(serialized) {
+    if (this.userLookups || this.categoryLookups) {
       return {
         items: serialized.toArray(),
         lookups: {
-          users: userLookups,
-          categories: categoryLookups
+          users: this.userLookups,
+          categories: this.categoryLookups
         }
       };
     } else {
       return serialized.toArray();
     }
-  }
-}
+  },
 
-TopicStrategy.prototype = {
   name: 'TopicStrategy',
 };
 
-TopicStrategy.full = function(options) {
-  return new TopicStrategy({
-    currentUserId: options && options.currentUserId,
+/**
+ * Returns topics WITHOUT any nested replies
+ */
+TopicStrategy.standard = function(options) {
+  var currentUserId = options && options.currentUserId;
+
+  var strategy = new TopicStrategy({
+    currentUserId: currentUserId,
     includeReplyingUsers: true,
-    includeReplies: true,
-    includeRepliesTotals: true
-  })
+    lookups: options && options.lookups
+  });
+
+  strategy.userStrategy = UserIdStrategy.slim();
+  strategy.replyingUsersStrategy = new TopicReplyingUsersStrategy();
+  strategy.categoryStrategy = new ForumCategoryIdStrategy();
+  strategy.topicSubscriptionStrategy = new TopicSubscriptionStrategy({
+    currentUserId: currentUserId
+  });
+
+  return strategy;
 }
 
-TopicStrategy.standard = function(options) {
-  return new TopicStrategy({
-    currentUserId: options && options.currentUserId,
-    includeReplyingUsers: true,
-    includeReplies: false,
-    includeRepliesTotals: true
+/**
+ * Returns topics with selected nested replies
+ */
+TopicStrategy.nested = function(options) {
+  var strategy = TopicStrategy.standard(options);
+
+  // Added nested strategies to the standard
+  strategy.repliesForTopicStrategy = RepliesForTopicStrategy.standard({
+    currentUserId:  options && options.currentUserId
   })
+
+  return strategy;
 }
 
 module.exports = TopicStrategy;

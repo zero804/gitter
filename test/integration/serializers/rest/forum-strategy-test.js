@@ -38,7 +38,7 @@ describe('ForumStrategy', function() {
   });
 
   it('should serialize a forum', function() {
-    var strategy = ForumStrategy.full();
+    var strategy = ForumStrategy.nested();
 
     var user = fixture.user1;
     var forum = fixture.forum1;

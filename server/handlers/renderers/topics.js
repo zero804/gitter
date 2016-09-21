@@ -56,7 +56,7 @@ function renderForum(req, res, next, options) {
 
         if(!forum) { return next(new StatusError(404, 'Forum not found')); }
 
-        var strategy = restSerializer.ForumStrategy.full({
+        var strategy = restSerializer.ForumStrategy.nested({
           currentUserId: userId,
           topicsFilterSort: getTopicsFilterSortOptions(req.query)
         });
@@ -125,7 +125,7 @@ function renderTopic(req, res, next) {
               // TODO: how do we know which topics options to pass in to the
               // forum strategy? Maybe it shouldn't include any topics at all?
 
-              var strategy = restSerializer.ForumStrategy.full({
+              var strategy = restSerializer.ForumStrategy.nested({
                 currentUserId: userId,
                 topicsFilterSort: null
               });
@@ -138,7 +138,10 @@ function renderTopic(req, res, next) {
 
                 if (!topic) { return next(new StatusError(404, 'Topic not found.')); }
 
-                var strategy = restSerializer.TopicStrategy.full();
+                var strategy = restSerializer.TopicStrategy.nested({
+                  currentUserId: userId
+                });
+
                 return restSerializer.serializeObject(topic, strategy);
               })
             .then(function(topic){

@@ -17,7 +17,7 @@ module.exports = {
 
     var userId = req.user && req.user._id;
 
-    var strategy = new restSerializer.ForumStrategy.full({
+    var strategy = restSerializer.ForumStrategy.nested({
       currentUserId: userId,
       topicsFilterSort: getTopicsFilterSortOptions(req.query)
     });

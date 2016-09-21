@@ -275,24 +275,26 @@ function serializeRoomsForGroupId(groupId, userId) {
     });
 }
 
-function serializeTopicsForForumId(forumId, options) {
+function serializeTopicsForForumId(forumId, userId, options) {
   // TODO: return a sample set, not all of them
   return topicService.findByForumId(forumId, options)
     .then(function(topics) {
-      var strategy = restSerializer.TopicStrategy.full();
+      var strategy = restSerializer.TopicStrategy.nested({
+        currentUserId: userId
+      });
+
       return restSerializer.serialize(topics, strategy);
     });
 }
 
-function serializeRepliesForTopicId(topicId) {
+function serializeRepliesForTopicId(topicId, userId) {
   // TODO: return a sample set, not all of them
   return replyService.findByTopicId(topicId)
     .then(function(replies) {
-      var strategy = new restSerializer.ReplyStrategy({
-        // again: _some_ replies, not all of them
-        includeComments: true,
-        includeCommentsTotals: true,
+      var strategy = restSerializer.ReplyStrategy.nested({
+        currentUserId: userId
       });
+
       return restSerializer.serialize(replies, strategy);
     });
 }

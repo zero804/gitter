@@ -47,7 +47,7 @@ describe('TopicStrategy', function() {
   });
 
   it('should serialize a topic', function() {
-    var strategy = TopicStrategy.standard();
+    var strategy = TopicStrategy.standard({});
 
     var topic = fixture.topic1;
     var category = fixture.category1;
@@ -93,13 +93,15 @@ describe('TopicStrategy', function() {
       });
   });
 
-  it('should serialize a topic with includeReplies', function() {
-    var strategy = TopicStrategy.full();
-
+  it('should serialize a topic with nested replies', function() {
     var user = fixture.user1;
     var category = fixture.category1;
     var topic = fixture.topic1;
     var reply = fixture.reply1;
+
+    var strategy = TopicStrategy.nested({
+      currentUserId: user._id
+    });
 
     return serialize([topic], strategy)
       .then(function(s) {
@@ -137,6 +139,7 @@ describe('TopicStrategy', function() {
               displayName: user.displayName,
               avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username
             },
+            commentsTotal: 0,
             sent: LONG_AGO,
             editedAt: null,
             lastChanged: LONG_AGO,
@@ -160,7 +163,7 @@ describe('TopicStrategy', function() {
   });
 
   it("should serialize a topic with lookups=['user']", function() {
-    var strategy = new TopicStrategy({ lookups: ['user'] });
+    var strategy = TopicStrategy.standard({ lookups: ['user'] });
 
     var topic = fixture.topic1;
     var category = fixture.category1;
@@ -186,6 +189,13 @@ describe('TopicStrategy', function() {
             },
             user: fixture.user1.id,
             subscribed: false,
+            repliesTotal: 1,
+            replyingUsers: [{
+              id: user.id,
+              username: user.username,
+              displayName: user.displayName,
+              avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username
+            }],
             sent: LONG_AGO,
             editedAt: null,
             lastChanged: LONG_AGO,
@@ -205,7 +215,7 @@ describe('TopicStrategy', function() {
   });
 
   it("should serialize a topic with lookups=['category']", function() {
-    var strategy = new TopicStrategy({ lookups: ['category'] });
+    var strategy = TopicStrategy.standard({ lookups: ['category'] });
 
     var topic = fixture.topic1;
     var category = fixture.category1;
@@ -232,6 +242,13 @@ describe('TopicStrategy', function() {
               avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
             },
             subscribed: false,
+            repliesTotal: 1,
+            replyingUsers: [{
+              id: user.id,
+              username: user.username,
+              displayName: user.displayName,
+              avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username
+            }],
             sent: LONG_AGO,
             editedAt: null,
             lastChanged: LONG_AGO,
