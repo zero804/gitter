@@ -56,11 +56,9 @@ function renderForum(req, res, next, options) {
 
         if(!forum) { return next(new StatusError(404, 'Forum not found')); }
 
-        var topicsOptions = getTopicsFilterSortOptions(req.query);
-
-        var strategy = new restSerializer.ForumStrategy.full({
+        var strategy = restSerializer.ForumStrategy.full({
           currentUserId: userId,
-          topics: topicsOptions
+          topicsFilterSort: getTopicsFilterSortOptions(req.query)
         });
 
         return restSerializer.serializeObject(forum, strategy);
@@ -127,9 +125,9 @@ function renderTopic(req, res, next) {
               // TODO: how do we know which topics options to pass in to the
               // forum strategy? Maybe it shouldn't include any topics at all?
 
-              var strategy = new restSerializer.ForumStrategy.full({
+              var strategy = restSerializer.ForumStrategy.full({
                 currentUserId: userId,
-                topics: null // Fix @lerouxb?
+                topicsFilterSort: null
               });
 
               return restSerializer.serializeObject(forum, strategy);
