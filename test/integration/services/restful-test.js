@@ -7,6 +7,8 @@ var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assert = require('assert');
 var env = require('gitter-web-env');
 var nconf = env.config;
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var moment = require('moment');
 
 
 var counter = 0;
@@ -41,6 +43,19 @@ var hardcodedGitHubUser = {
 var hardcodedLocation = 'Cape Town';
 function ensureGitHubUser(options) {
   return userService.findOrCreateUserForGithubId(options);
+}
+
+// Make sure things is an array of objects with mongo ids matching the passed
+// in ids exactly in order. Useful for making sure a set of search results
+// match exactly what you expected.
+function matchIds(things, ids) {
+  if (things.length !== ids.length) return false;
+
+  return things.every(function(thing, index) {
+    var thingId = thing._id || thing.id;
+    var id = ids[index];
+    return mongoUtils.objectIDsEqual(thingId, id);
+  });
 }
 
 describe('restful #slow', function() {
@@ -195,11 +210,21 @@ describe('restful #slow', function() {
   });
 
   describe('topics-related restful serializers', function() {
+    var oneMonthAgo = moment().subtract(1, 'months').toDate();
+    var oneWeekAgo = moment().subtract(1, 'weeks').toDate();
+    var yesterday = moment().subtract(1, 'days').toDate();
+    var today = new Date();
+
+
     var fixture = fixtureLoader.setup({
       user1: {
         accessToken: 'web-internal'
       },
+      user2: {
+        accessToken: 'web-internal'
+      },
       forum1: {
+        tags: ['foo', 'bar', 'baz'],
         securityDescriptor: {
           extraAdmins: ['user1']
         }
@@ -207,15 +232,52 @@ describe('restful #slow', function() {
       category1: {
         forum: 'forum1'
       },
+      category2: {
+        forum: 'forum1'
+      },
       topic1: {
+        title: 'topic1',
         user: 'user1',
         forum: 'forum1',
-        category: 'category1'
+        category: 'category1',
+        tags: ['foo', 'bar', 'baz'],
+        sent: oneMonthAgo,
+        repliesTotal: 1 // this doesn't get auto-filled yet.
+      },
+      topic2: {
+        title: 'topic2',
+        user: 'user2',
+        forum: 'forum1',
+        category: 'category1',
+        tags: ['foo', 'bar'],
+        sent: oneWeekAgo,
+        editedAt: yesterday,
+        lastChanged: yesterday,
+        repliesTotal: 2
+      },
+      topic3: {
+        title: 'topic3',
+        user: 'user1',
+        forum: 'forum1',
+        category: 'category1',
+        tags: ['foo'],
+        sent: oneMonthAgo,
+        editedAt: oneWeekAgo,
+        lastChanged: oneWeekAgo
+      },
+      topic4: {
+        title: 'topic4',
+        user: 'user2',
+        forum: 'forum1',
+        category: 'category2',
+        tags: ['bar'],
+        sent: today
       },
       reply1: {
         user: 'user1',
         forum: 'forum1',
-        topic: 'topic1'
+        topic: 'topic1',
+        commentsTotal: 1 // doesn't get filled in yet..
       },
       comment1: {
         user: 'user1',
@@ -229,12 +291,170 @@ describe('restful #slow', function() {
       it('should serialize topics in a forum', function() {
         return restful.serializeTopicsForForumId(fixture.forum1._id)
           .then(function(topics) {
+            assert.ok(matchIds(topics, [
+              fixture.topic4.id,
+              fixture.topic3.id,
+              fixture.topic2.id,
+              fixture.topic1.id,
+            ]));
+
             var topic = topics.find(function(t) {
               return t.id === fixture.topic1.id;
             });
             assert.strictEqual(topic.id, fixture.topic1.id);
             assert.strictEqual(topic.repliesTotal, 1);
             assert.strictEqual(topic.replies.length, 1);
+          });
+      });
+
+      it('should filter by tags', function() {
+        var options = {
+          filter: {
+            tags: ['foo', 'bar']
+          }
+        };
+        return restful.serializeTopicsForForumId(fixture.forum1._id, options)
+          .then(function(topics) {
+            assert.ok(matchIds(topics, [
+              fixture.topic2.id,
+              fixture.topic1.id,
+            ]));
+          });
+      });
+
+      it('should filter by category', function() {
+        var options = {
+          filter: {
+            // slug as opposed to categoryId
+            category: fixture.category1.slug
+          }
+        };
+        return restful.serializeTopicsForForumId(fixture.forum1._id, options)
+          .then(function(topics) {
+            assert.ok(matchIds(topics, [
+              fixture.topic3.id,
+              fixture.topic2.id,
+              fixture.topic1.id,
+            ]));
+          });
+      });
+
+      it('should filter by user', function() {
+        var options = {
+          filter: {
+            // username as opposed to userId
+            username: fixture.user1.username
+          }
+        };
+        return restful.serializeTopicsForForumId(fixture.forum1._id, options)
+          .then(function(topics) {
+            assert.ok(matchIds(topics, [
+              fixture.topic3.id,
+              fixture.topic1.id,
+            ]));
+          });
+      });
+
+      it('should filter by topics with activity', function() {
+        var options = {
+          filter: {
+            since: oneWeekAgo
+          }
+        };
+        return restful.serializeTopicsForForumId(fixture.forum1._id, options)
+          .then(function(topics) {
+            assert.ok(matchIds(topics, [
+              fixture.topic4.id,
+              fixture.topic3.id,
+              fixture.topic2.id,
+            ]));
+          });
+      });
+
+      it('should sort by _id (same as created date, usually)', function() {
+        var options = {
+          sort: {
+            _id: 1
+          }
+        };
+        return restful.serializeTopicsForForumId(fixture.forum1._id, options)
+          .then(function(topics) {
+            assert.ok(matchIds(topics, [
+              fixture.topic1.id,
+              fixture.topic2.id,
+              fixture.topic3.id,
+              fixture.topic4.id,
+            ]));
+          });
+      });
+
+      it('should sort in reverse', function() {
+        var options = {
+          sort: {
+            _id: -1
+          }
+        };
+        return restful.serializeTopicsForForumId(fixture.forum1._id, options)
+          .then(function(topics) {
+            assert.ok(matchIds(topics, [
+              fixture.topic4.id,
+              fixture.topic3.id,
+              fixture.topic2.id,
+              fixture.topic1.id,
+            ]));
+          });
+      });
+
+
+      it('should sort by lastChanged', function() {
+        var options = {
+          sort: {
+            lastChanged: 1
+          }
+        };
+        return restful.serializeTopicsForForumId(fixture.forum1._id, options)
+          .then(function(topics) {
+            assert.ok(matchIds(topics, [
+              fixture.topic1.id,
+              fixture.topic3.id,
+              fixture.topic2.id,
+              fixture.topic4.id,
+            ]));
+          });
+      });
+
+      it('should sort by number of replies', function() {
+        var options = {
+          sort: {
+            repliesTotal: -1
+          }
+        };
+        return restful.serializeTopicsForForumId(fixture.forum1._id, options)
+          .then(function(topics) {
+            // 3 & 4 have no replies, so their order is undefined in this case
+            var knownOrder = [topics[0], topics[1]];
+            assert.ok(matchIds(knownOrder, [
+              fixture.topic2.id,
+              fixture.topic1.id,
+            ]));
+          });
+      });
+
+      it('should handle multiple sort keys', function() {
+        var options = {
+          sort: {
+            repliesTotal: -1,
+            lastChanged: 1,
+          }
+        };
+        return restful.serializeTopicsForForumId(fixture.forum1._id, options)
+          .then(function(topics) {
+            assert.ok(matchIds(topics, [
+              fixture.topic2.id,
+              fixture.topic1.id,
+              fixture.topic3.id,
+              fixture.topic4.id,
+            ]));
           });
       });
     });

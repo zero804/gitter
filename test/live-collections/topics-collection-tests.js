@@ -54,10 +54,6 @@ describe('topics-live-collection', function() {
   });
 
   it('should emit a patch event when adding a reply', function() {
-    // this test depends on the fact that topic.lastModified is not set at the
-    // start
-    assert.ok(!fixture.topic1.lastModified);
-
     var checkEvent = appEvents.addListener('dataChange2', {
       url: '/forums/' + fixture.forum1.id + '/topics',
       operation: 'patch',
@@ -74,22 +70,25 @@ describe('topics-live-collection', function() {
       })
       .then(checkEvent)
       .then(function(event) {
-        // the patch event must also contain lastModified
+        // the patch event must also contain lastChanged & lastModified
+        assert.ok(event.model.lastChanged);
         assert.ok(event.model.lastModified);
 
         return topicService.findById(fixture.topic1._id)
           .then(function(topic) {
-            // lastModified must now exist and match the one we got in the event.
+            // lastChanged & lastModified must now match the one we got in the
+            // patch event.
+            assert.ok(topic.lastChanged);
             assert.ok(topic.lastModified);
+            var lastChanged = new Date(event.model.lastChanged);
             var lastModified = new Date(event.model.lastModified);
+            assert.strictEqual(topic.lastChanged.getTime(), lastChanged.getTime());
             assert.strictEqual(topic.lastModified.getTime(), lastModified.getTime());
           });
       });
   });
 
   it('should emit a patch event when adding a comment', function() {
-    assert.ok(!fixture.topic2.lastModified);
-
     var checkEvent = appEvents.addListener('dataChange2', {
       url: '/forums/' + fixture.forum1.id + '/topics',
       operation: 'patch',
@@ -109,9 +108,13 @@ describe('topics-live-collection', function() {
 
         return topicService.findById(fixture.topic2._id)
           .then(function(topic) {
-            // lastModified must now exist and match the one we got in the event.
+            // lastChanged & lastModified must now match the one we got in the
+            // patch event.
+            assert.ok(topic.lastChanged);
             assert.ok(topic.lastModified);
+            var lastChanged = new Date(event.model.lastChanged);
             var lastModified = new Date(event.model.lastModified);
+            assert.strictEqual(topic.lastChanged.getTime(), lastChanged.getTime());
             assert.strictEqual(topic.lastModified.getTime(), lastModified.getTime());
           });
       });

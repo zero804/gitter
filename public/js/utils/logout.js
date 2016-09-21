@@ -1,6 +1,6 @@
 "use strict";
 
-var apiClient = require('../components/apiClient');
+var apiClient = require('../components/api-client');
 
 function navigate(href) {
   try {

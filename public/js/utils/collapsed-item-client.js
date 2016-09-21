@@ -1,5 +1,5 @@
 "use strict";
-var apiClient = require('../components/apiClient');
+var apiClient = require('../components/api-client');
 
 
 module.exports = {

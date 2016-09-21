@@ -76,7 +76,7 @@ function generateTypeahead(options) {
   return proxyquire('../../../../../public/js/views/chat/typeaheads/user-typeahead', {
     'utils/is-mobile': function() { return false; },
     'utils/context': context,
-    'components/apiClient': {},
+    'components/api-client': {},
     'collections/instances/integrated-items': { chats: chats },
     './tmpl/typeahead.hbs': function() {}
   })();

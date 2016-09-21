@@ -1,4 +1,4 @@
-/* eslint complexity: ["error", 19] */
+/* eslint complexity: ["error", 18] */
 'use strict';
 
 require('./utils/initial-setup');
@@ -23,11 +23,12 @@ var SPARoomSwitcher = require('./components/spa-room-switcher');
 var linkHandler = require('./components/link-handler');
 var roomListGenerator = require('./components/chat-cache/room-list-generator');
 var troupeCollections = require('./collections/instances/troupes');
-var scopeUpgrader = require('./components/scope-upgrader');
-var presentCreateRoomDialog = require('./ensured/present-create-room-dialog');
-var presentCreateCommunityDialog = require('./ensured/present-create-community-dialog');
 var AppLayout = require('./views/layouts/app-layout');
 var LoadingView = require('./views/app/loading-view');
+var Router = require('./routes/router');
+var notificationRoutes = require('./routes/notification-routes');
+var createRoutes = require('./routes/create-routes');
+var upgradeAccessRoutes = require('./routes/upgrade-access-routes');
 
 require('./components/statsc');
 require('./views/widgets/preload');
@@ -68,20 +69,19 @@ onready(function() {
   window.history.replaceState(chatIFrame.src, '', window.location.href);
 
   function initChatCache() {
-    //if we don't have any troupes in the troupeCollection
-    //wait for it to sync before posting the message
-    if(!troupeCollections.troupes.length) {
+    if(troupeCollections.troupes.length) {
+      postMessage({
+        type: 'roomList',
+        rooms: roomListGenerator(troupeCollections.troupes),
+      });
+    } else {
+      //if we don't have any troupes in the troupeCollection
+      //wait for it to sync before posting the message
       troupeCollections.troupes.once('sync', function(){
         postMessage({
           type: 'roomList',
           rooms: roomListGenerator(troupeCollections.troupes),
         });
-      });
-    }
-    else {
-      postMessage({
-        type: 'roomList',
-        rooms: roomListGenerator(troupeCollections.troupes),
       });
     }
   }
@@ -145,7 +145,7 @@ onready(function() {
   });
 
   function pushState(state, title, url) {
-    if (state == window.history.state) {
+    if (state === window.history.state) {
       // Don't repush the same state...
       return;
     }
@@ -425,57 +425,19 @@ onready(function() {
     postMessage(message);
   });
 
-  var Router = Backbone.Router.extend({
-    routes: {
-      // TODO: get rid of the pipes
-      '': 'hideModal',
-      'upgraderepoaccess': 'upgradeRepoAccess',
-      'upgraderepoaccess/:name': 'upgradeRepoAccess',
-      'confirm/*uri': 'confirmRoom',
-      'createroom': 'createRoom',
-      'createroom/:name': 'createRoom',
-      'createcommunity': 'createCommunity',
-      'permissions': 'permissions'
-    },
-
-    hideModal: function() {
-      appLayout.dialogRegion.destroy();
-    },
-
-    confirmRoom: function(uri) {
-      require.ensure(['./views/modals/confirm-repo-room-view'], function(require) {
-        var confirmRepoRoomView = require('./views/modals/confirm-repo-room-view');
-        appLayout.dialogRegion.show(new confirmRepoRoomView.Modal({
-          uri: uri,
-        }));
-      });
-    },
-
-    createRoom: function(initialRoomName) {
-      presentCreateRoomDialog({
-        dialogRegion: appLayout.dialogRegion,
-        roomCollection: troupeCollections.troupes,
-        groupsCollection: troupeCollections.groups,
-        roomMenuModel: appLayout.getRoomMenuModel(),
-        initialRoomName: initialRoomName
-      });
-    },
-
-    createCommunity: function() {
-      presentCreateCommunityDialog({
-        dialogRegion: appLayout.dialogRegion
-      });
-    },
-
-    upgradeRepoAccess: function(returnLocation) {
-      scopeUpgrader('repo')
-        .then(function() {
-          window.location.href = '#' + (returnLocation || '');
-        });
-    }
+  new Router({
+    dialogRegion: appLayout.dialogRegion,
+    routes: [
+      notificationRoutes(),
+      createRoutes({
+        rooms: troupeCollections.troupes,
+        groups: troupeCollections.groups,
+        roomMenuModel: appLayout.getRoomMenuModel()
+      }),
+      upgradeAccessRoutes()
+    ]
   });
 
-  new Router();
   Backbone.history.start();
 
   if (context.popEvent('invite_failed')) {

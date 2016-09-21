@@ -13,7 +13,7 @@ function assertNoDuplicates(collaborators) {
   });
 }
 
-describe('collaborators-service #slow', function() {
+describe('collaborators-service #slow #github', function() {
   it('should return collaborators for a PUBLIC REPO', function() {
     return collaboratorsService.findCollaborators(FAKE_USER, 'GH_REPO', 'gitterHQ/gitter')
       .then(function(collaborators) {
