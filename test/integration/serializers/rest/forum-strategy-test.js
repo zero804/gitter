@@ -86,6 +86,7 @@ describe('ForumStrategy', function() {
               displayName: user.displayName,
               avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
             },
+            subscribed: false,
             repliesTotal: 0,
             replyingUsers: [],
             sent: LONG_AGO,
