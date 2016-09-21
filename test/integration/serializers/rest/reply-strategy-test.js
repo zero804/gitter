@@ -54,7 +54,7 @@ describe('ReplyStrategy', function() {
   });
 
   it('should serialize a reply', function() {
-    var strategy = new ReplyStrategy();
+    var strategy = ReplyStrategy.standard();
 
     var reply = fixture.reply1;
     var user = fixture.user1;
@@ -73,6 +73,7 @@ describe('ReplyStrategy', function() {
             displayName: user.displayName,
             avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
           },
+          commentsTotal: 1,
           sent: LONG_AGO,
           editedAt: null,
           lastChanged: LONG_AGO,
@@ -82,8 +83,8 @@ describe('ReplyStrategy', function() {
       });
   });
 
-  it('should serialize a reply with includeComments', function() {
-    var strategy = new ReplyStrategy({ includeComments: true, includeCommentsTotals: true});
+  it('should serialize a reply with nested comments', function() {
+    var strategy = ReplyStrategy.nested();
 
     var user = fixture.user1;
     var reply = fixture.reply1;
@@ -130,7 +131,7 @@ describe('ReplyStrategy', function() {
   });
 
   it("should serialize a reply with lookups=['user']", function() {
-    var strategy = new ReplyStrategy({ lookups: ['user'] });
+    var strategy = ReplyStrategy.standard({ lookups: ['user'] });
 
     var reply = fixture.reply1;
     var user = fixture.user1;
@@ -145,6 +146,7 @@ describe('ReplyStrategy', function() {
               html: reply.html
             },
             user: fixture.user1.id,
+            commentsTotal: 1,
             sent: LONG_AGO,
             editedAt: null,
             lastChanged: LONG_AGO,

@@ -1,86 +1,53 @@
 "use strict";
 
 var Promise = require('bluebird');
-var Lazy = require('lazy.js');
-var _ = require('lodash');
 var getVersion = require('../get-model-version');
-var CommentStrategy = require('./comment-strategy');
 var UserIdStrategy = require('./user-id-strategy');
-var commentService = require('gitter-web-topics/lib/comment-service');
-
+var CommentsForReplyStrategy = require('./topics/comments-for-reply-strategy');
 
 function formatDate(d) {
   return d ? d.toISOString() : null;
 }
 
-function getIdString(obj) {
-  return obj.id || obj._id && obj._id.toHexString();
+function ReplyStrategy(options) {
+  var doUserLookups = options && options.lookups && options.lookups.indexOf('user') >= 0;
+  this.userLookups = doUserLookups ? {} : null;
 }
 
-function ReplyStrategy(options) {
-  options = options || {};
-
-  // useLookups will be set to true if there are any lookups that this strategy
-  // understands.
-  var useLookups = false;
-  var userLookups;
-  if (options.lookups) {
-    if (options.lookups.indexOf('user') !== -1) {
-      useLookups = true;
-      userLookups = {};
-    }
-  }
-
-  var userStrategy;
-  var commentStrategy;
-
-  var commentsMap;
-
-  this.preload = function(replies) {
+ReplyStrategy.prototype = {
+  preload: function(replies) {
     if (replies.isEmpty()) return;
-
-    var replyIds = replies.map(getIdString).toArray();
 
     var strategies = [];
 
-    return Promise.try(function() {
-        if (options.includeComments) {
-          return commentService.findByReplyIds(replyIds)
-            .then(function(comments) {
-              commentsMap = _.groupBy(comments, 'replyId');
-
-              // TODO: move to CommentsForReplyStrategy
-              commentStrategy = new CommentStrategy();
-              strategies.push(commentStrategy.preload(Lazy(comments)));
-            });
-        }
-      })
-      .then(function() {
-        // TODO: no user strategy necessary if options.user is passed in
-        userStrategy = UserIdStrategy.slim();
-        var userIds = replies.map(function(i) { return i.userId; });
-        strategies.push(userStrategy.preload(userIds));
-
-        return Promise.all(strategies);
+    if (this.commentsForReplyStrategy) {
+      var replyIds = replies.map(function(reply) {
+        return reply._id;
       });
-  };
 
-  function mapUser(userId) {
-    if (userLookups) {
-      if (!userLookups[userId]) {
-        userLookups[userId] = userStrategy.map(userId);
+      strategies.push(this.commentsForReplyStrategy.preload(replyIds));
+    }
+
+    var userIds = replies.map(function(i) { return i.userId; });
+    strategies.push(this.userStrategy.preload(userIds));
+
+    return Promise.all(strategies);
+  },
+
+  mapUser: function(userId) {
+    if (this.userLookups) {
+      if (!this.userLookups[userId]) {
+        this.userLookups[userId] = this.userStrategy.map(userId);
       }
 
       return userId;
     } else {
-      return userStrategy.map(userId);
+      return this.userStrategy.map(userId);
     }
-  }
+  },
 
-  this.map = function(reply) {
+  map: function(reply) {
     var id = reply.id || reply._id && reply._id.toHexString();
-
-    var comments = options.includeComments ? commentsMap[id] || [] : undefined;
 
     return {
       id: id,
@@ -89,13 +56,10 @@ function ReplyStrategy(options) {
         html: reply.html,
       },
 
-      // TODO: should we incude which topic it is for?
+      user: this.mapUser(reply.userId),
 
-      // TODO: support options.user
-      user: mapUser(reply.userId),
-
-      comments: options.includeComments ? comments.map(commentStrategy.map) : undefined,
-      commentsTotal: options.includeCommentsTotals ? reply.commentsTotal : undefined,
+      comments: this.commentsForReplyStrategy ? this.commentsForReplyStrategy.map(id) : undefined,
+      commentsTotal: reply.commentsTotal,
 
       sent: formatDate(reply.sent),
       editedAt: formatDate(reply.editedAt),
@@ -103,24 +67,48 @@ function ReplyStrategy(options) {
       lastModified: formatDate(reply.lastModified),
       v: getVersion(reply)
     };
-  };
+  },
 
-  this.postProcess = function(serialized) {
-    if (useLookups) {
+  postProcess: function(serialized) {
+    if (this.userLookups) {
       return {
         items: serialized.toArray(),
         lookups: {
-          users: userLookups
+          users: this.userLookups
         }
       };
     } else {
       return serialized.toArray();
     }
-  }
-}
+  },
 
-ReplyStrategy.prototype = {
   name: 'ReplyStrategy',
 };
+
+
+/**
+ * Returns replies WITHOUT any nested comments
+ */
+ReplyStrategy.standard = function(options) {
+  var strategy = new ReplyStrategy({
+    lookups: options && options.lookups
+  });
+  strategy.userStrategy = UserIdStrategy.slim();
+  return strategy;
+}
+
+/**
+ * Returns replies WITH selected nested comments
+ */
+ReplyStrategy.nested = function(options) {
+  var strategy = ReplyStrategy.standard(options);
+
+  strategy.commentsForReplyStrategy = CommentsForReplyStrategy.standard({
+    currentUserId: options && options.currentUserId
+  });
+
+  return strategy;
+}
+
 
 module.exports = ReplyStrategy;
