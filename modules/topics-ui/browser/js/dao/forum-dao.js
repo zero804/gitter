@@ -11,7 +11,7 @@ const ForumDao = function() {
 ForumDao.prototype.onAttemptWatchStateUpdate = function(data) {
   var {userId, forumId, isWatching} = data;
   if(isWatching) {
-    apiClient.post(urlJoin('/forum/', forumId, '/subscribers'), {})
+    apiClient.post(urlJoin('/v1/forums/', forumId, '/subscribers'), {})
       .then(function() {
         dispatch(updateForumWatchState(forumId, FORUM_WATCH_STATE.WATCHING));
       })
@@ -21,9 +21,7 @@ ForumDao.prototype.onAttemptWatchStateUpdate = function(data) {
       });
   }
   else {
-    apiClient.delete(urlJoin('/forum/', forumId, '/subscribers'), {
-        forumSubscriber: userId
-      })
+    apiClient.delete(urlJoin('/v1/forums/', forumId, '/subscribers/', userId), {})
       .then(function() {
         dispatch(updateForumWatchState(forumId, FORUM_WATCH_STATE.NOT_WATCHING));
       })
