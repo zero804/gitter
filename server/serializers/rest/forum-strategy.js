@@ -64,8 +64,14 @@ ForumStrategy.prototype = {
 
 ForumStrategy.full = function(options) {
   var strategy = new ForumStrategy();
-  strategy.topicsForForumStrategy = new TopicsForForumStrategy(options && options.topics);
-  strategy.subscriptionStrategy = new ForumSubscriptionStrategy(options && options.currentUserId);
+  var currentUserId = options && options.currentUserId;
+
+  strategy.topicsForForumStrategy = TopicsForForumStrategy.full({
+    currentUserId: currentUserId,
+    topicsFilterSort: options && options.topicsFilterSort
+  });
+
+  strategy.subscriptionStrategy = new ForumSubscriptionStrategy(currentUserId);
   strategy.categoriesForForumStrategy = new CategoriesForForumStrategy();
 
   return strategy;
