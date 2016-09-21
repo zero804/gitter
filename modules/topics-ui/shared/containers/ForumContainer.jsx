@@ -49,6 +49,10 @@ const ForumContainer = React.createClass({
       getWatchState: React.PropTypes.func.isRequired
     }).isRequired,
 
+    currentUserStore: PropTypes.shape({
+      getCurrentUser: PropTypes.func.isRequired
+    }).isRequired,
+
     //Categories ---
     categoryStore: React.PropTypes.shape({
       getCategories: React.PropTypes.func.isRequired
@@ -129,8 +133,9 @@ const ForumContainer = React.createClass({
 
   render() {
     const { forumId, forumWatchState, categoryName, tags, filterName, tagName, sortName, createTopic, topics, newTopic } = this.state;
-    const { groupName, categoryStore, tagStore } = this.props;
+    const { currentUserStore, groupName, categoryStore, tagStore } = this.props;
 
+    const currentUser = currentUserStore.getCurrentUser();
     const categories = categoryStore.getCategories();
     const tagValues = tagStore.pluckValues();
     const newTopicTags = tagStore.getTagsByLabel(newTopic.tags);
@@ -138,6 +143,7 @@ const ForumContainer = React.createClass({
     return (
       <main>
         <SearchHeader
+          userId={currentUser.id}
           forumId={forumId}
           groupName={groupName}
           watchState={forumWatchState}/>

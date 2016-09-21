@@ -14,6 +14,7 @@ export default React.createClass({
 
   displayName: 'SearchHeader',
   propTypes: {
+    userId: PropTypes.string.isRequired,
     forumId: PropTypes.string.isRequired,
     groupName: PropTypes.string.isRequired,
     watchState: PropTypes.oneOf(_.values(FORUM_WATCH_STATE))
@@ -21,7 +22,7 @@ export default React.createClass({
 
   render(){
 
-    const {forumId, groupName, watchState} = this.props;
+    const {userId, forumId, groupName, watchState} = this.props;
 
     return (
       <Container>
@@ -41,6 +42,7 @@ export default React.createClass({
             className="topic-search__search-input"/>
 
           <WatchForumLink
+            userId={userId}
             forumId={forumId}
             watchState={watchState}
             className="topic-search__watch-forum-link"

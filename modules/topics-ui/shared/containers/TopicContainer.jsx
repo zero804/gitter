@@ -78,7 +78,7 @@ const TopicContainer = createClass({
 
     const { forumStore, topicId, topicsStore, groupName, categoryStore, currentUserStore, tagStore } = this.props;
     const {replies, newReplyContent} = this.state;
-    const topic = topicsStore.getById(topicId)
+    const topic = topicsStore.getById(topicId);
     const currentUser = currentUserStore.getCurrentUser();
     const topicCategory = topic.category;
     const category = categoryStore.getById(topicCategory.id);
@@ -98,6 +98,7 @@ const TopicContainer = createClass({
     return (
       <main>
         <SearchHeader
+          userId={currentUser.id}
           forumId={forumId}
           groupName={groupName}
           forumWatchState={forumWatchState}/>

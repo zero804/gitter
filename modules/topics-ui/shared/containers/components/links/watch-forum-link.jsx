@@ -12,6 +12,7 @@ export default React.createClass({
   displayName: 'WatchForumLink',
 
   propTypes: {
+    userId: PropTypes.string.isRequired,
     forumId: PropTypes.string.isRequired,
     children: PropTypes.node,
     onClick: PropTypes.func,
@@ -68,11 +69,11 @@ export default React.createClass({
 
   onClick(e){
     e.preventDefault();
-    const {forumId, onClick, watchState} = this.props;
+    const {userId, forumId, onClick, watchState} = this.props;
     if(onClick) { return onClick(...arguments); }
 
     var desiredIsWatching = (watchState !== FORUM_WATCH_STATE.WATCHING);
-    dispatch(attemptUpdateForumWatchState(forumId, desiredIsWatching));
+    dispatch(attemptUpdateForumWatchState(forumId, userId, desiredIsWatching));
   }
 
 });
