@@ -139,6 +139,7 @@ describe('TopicStrategy', function() {
               displayName: user.displayName,
               avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username
             },
+            subscribed: false,
             commentsTotal: 0,
             sent: LONG_AGO,
             editedAt: null,

@@ -73,6 +73,7 @@ describe('ReplyStrategy', function() {
             displayName: user.displayName,
             avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
           },
+          subscribed: false,
           commentsTotal: 1,
           sent: LONG_AGO,
           editedAt: null,
@@ -104,6 +105,7 @@ describe('ReplyStrategy', function() {
             displayName: user.displayName,
             avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
           },
+          subscribed: false,
           comments: [{
             id: comment.id,
             body: {
@@ -146,6 +148,7 @@ describe('ReplyStrategy', function() {
               html: reply.html
             },
             user: fixture.user1.id,
+            subscribed: false,
             commentsTotal: 1,
             sent: LONG_AGO,
             editedAt: null,

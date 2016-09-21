@@ -4,6 +4,7 @@ var Promise = require('bluebird');
 var getVersion = require('../get-model-version');
 var UserIdStrategy = require('./user-id-strategy');
 var CommentsForReplyStrategy = require('./topics/comments-for-reply-strategy');
+var ReplySubscriptionStrategy = require('./topics/reply-subscription-strategy');
 
 function formatDate(d) {
   return d ? d.toISOString() : null;
@@ -26,6 +27,10 @@ ReplyStrategy.prototype = {
       });
 
       strategies.push(this.commentsForReplyStrategy.preload(replyIds));
+    }
+
+    if (this.subscriptionStrategy) {
+      strategies.push(this.subscriptionStrategy.preload(replies));
     }
 
     var userIds = replies.map(function(i) { return i.userId; });
@@ -57,6 +62,7 @@ ReplyStrategy.prototype = {
       },
 
       user: this.mapUser(reply.userId),
+      subscribed: this.subscriptionStrategy ? this.subscriptionStrategy.map(reply) : undefined,
 
       comments: this.commentsForReplyStrategy ? this.commentsForReplyStrategy.map(id) : undefined,
       commentsTotal: reply.commentsTotal,
@@ -90,9 +96,12 @@ ReplyStrategy.prototype = {
  * Returns replies WITHOUT any nested comments
  */
 ReplyStrategy.standard = function(options) {
+  var currentUserId = options && options.currentUserId;
   var strategy = new ReplyStrategy({
     lookups: options && options.lookups
   });
+
+  strategy.subscriptionStrategy = new ReplySubscriptionStrategy(currentUserId);
   strategy.userStrategy = UserIdStrategy.slim();
   return strategy;
 }
