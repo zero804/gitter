@@ -9,9 +9,9 @@ const ForumDao = function() {
 };
 
 ForumDao.prototype.onAttemptWatchStateUpdate = function(data) {
-  var {forumId, isWatching} = data;
+  var {userId, forumId, isWatching} = data;
   if(isWatching) {
-    apiClient.post(urlJoin('/forum/', forumId, '/watchers'), {})
+    apiClient.post(urlJoin('/forum/', forumId, '/subscribers'), {})
       .then(function() {
         dispatch(updateForumWatchState(forumId, FORUM_WATCH_STATE.WATCHING));
       })
@@ -20,14 +20,17 @@ ForumDao.prototype.onAttemptWatchStateUpdate = function(data) {
         dispatch(updateForumWatchState(forumId, isWatching ? FORUM_WATCH_STATE.NOT_WATCHING : FORUM_WATCH_STATE.WATCHING));
       });
   }
-  else {apiClient.delete(urlJoin('/forum/', forumId, '/watchers'), {})
-    .then(function() {
-      dispatch(updateForumWatchState(forumId, FORUM_WATCH_STATE.NOT_WATCHING));
-    })
-    .catch(function() {
-      // Return back to previous state
-      dispatch(updateForumWatchState(forumId, isWatching ? FORUM_WATCH_STATE.NOT_WATCHING : FORUM_WATCH_STATE.WATCHING));
-    });
+  else {
+    apiClient.delete(urlJoin('/forum/', forumId, '/subscribers'), {
+        forumSubscriber: userId
+      })
+      .then(function() {
+        dispatch(updateForumWatchState(forumId, FORUM_WATCH_STATE.NOT_WATCHING));
+      })
+      .catch(function() {
+        // Return back to previous state
+        dispatch(updateForumWatchState(forumId, isWatching ? FORUM_WATCH_STATE.NOT_WATCHING : FORUM_WATCH_STATE.WATCHING));
+      });
   }
 };
 
