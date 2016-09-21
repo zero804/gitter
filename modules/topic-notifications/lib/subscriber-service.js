@@ -44,7 +44,7 @@ function addSubscriber(forumObject, userId) {
 
 /**
  * Remove a subscriber from an object. Returns true if the operation
- * modified the collection (ie, the user was not already a subscriber)
+ * modified the collection (ie, the user is already a subscriber)
  */
 function removeSubscriber(forumObject, userId) {
   assert(forumObject.type !== ForumObject.TYPE.Comment);
