@@ -152,7 +152,12 @@ ForumWithPolicyService.prototype.setTopicTags = secureMethod([allowWrite, matchF
   return topicService.setTopicTags(user, topic, tags, { allowedTags: forum.tags });
 });
 
-// TODO: setTopicSticky NOTE: it is actually a number, not a boolean
+ForumWithPolicyService.prototype.setTopicSticky = secureMethod([allowWrite, matchForum], function(topic, sticky) {
+  var user = this.user;
+  var forum = this.forum;
+
+  return topicService.setTopicSticky(user, topic, sticky);
+});
 
 ForumWithPolicyService.prototype.setTopicText = secureMethod([allowWrite, matchForum], function(topic, text) {
   var user = this.user;

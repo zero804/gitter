@@ -82,6 +82,7 @@ describe('topic-api', function() {
       slug: 'foo',
       tags: ['cats', 'dogs'],
       text: '**hello**',
+      sticky: 1,
       categoryId: fixture.category2._id
     };
     return request(app)
@@ -97,6 +98,7 @@ describe('topic-api', function() {
         assert.deepEqual(topic.tags, update.tags);
         assert.strictEqual(topic.body.text, update.text);
         assert.strictEqual(topic.body.html, '<strong>hello</strong>');
+        assert.strictEqual(topic.sticky, update.sticky);
         assert(mongoUtils.objectIDsEqual(topic.category.id, update.categoryId));
       });
   });

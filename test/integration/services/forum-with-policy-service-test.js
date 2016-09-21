@@ -68,14 +68,14 @@ describe('forum-with-policy-service #slow', function() {
     return forumWithPolicyService.createTopic(fixture.category1, {
         title: 'foo',
         tags: ['cats', 'dogs'],
-        sticky: true,
+        sticky: 1,
         text: 'This is **my** story.'
       })
       .then(function(topic) {
         assert.strictEqual(topic.title, 'foo');
         assert(mongoUtils.objectIDsEqual(topic.categoryId, fixture.category1._id));
         assert.deepEqual(topic.tags.slice(), ['cats', 'dogs']);
-        assert.ok(topic.sticky);
+        assert.strictEqual(topic.sticky, 1);
         assert.strictEqual(topic.text, 'This is **my** story.');
         assert.strictEqual(topic.html, 'This is <strong>my</strong> story.');
       });
@@ -143,7 +143,12 @@ describe('forum-with-policy-service #slow', function() {
       });
   });
 
-  it("should allow members to set a topic's sticky number");
+  it("should allow members to set a topic's sticky number", function() {
+    return forumWithPolicyService.setTopicSticky(fixture.topic1, 1)
+      .then(function(topic) {
+        assert.strictEqual(topic.sticky, 1);
+      });
+  });
 
   it("should allow members to set a topic's text", function() {
     return forumWithPolicyService.setTopicText(fixture.topic1, "**baz**")
