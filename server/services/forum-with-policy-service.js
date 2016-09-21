@@ -131,11 +131,45 @@ ForumWithPolicyService.prototype.setForumTags = secureMethod([allowAdmin], funct
   return forumService.setForumTags(user, forum, tags);
 });
 
-ForumWithPolicyService.prototype.setTopicTags = secureMethod([allowAdmin, matchForum], function(topic, tags) {
+ForumWithPolicyService.prototype.setTopicTitle = secureMethod([allowWrite, matchForum], function(topic, title) {
+  var user = this.user;
+  var forum = this.forum;
+
+  return topicService.setTopicTitle(user, topic, title);
+});
+
+ForumWithPolicyService.prototype.setTopicSlug = secureMethod([allowWrite, matchForum], function(topic, slug) {
+  var user = this.user;
+  var forum = this.forum;
+
+  return topicService.setTopicSlug(user, topic, slug);
+});
+
+ForumWithPolicyService.prototype.setTopicTags = secureMethod([allowWrite, matchForum], function(topic, tags) {
   var user = this.user;
   var forum = this.forum;
 
   return topicService.setTopicTags(user, topic, tags, { allowedTags: forum.tags });
+});
+
+// TODO: setTopicSticky NOTE: it is actually a number, not a boolean
+
+ForumWithPolicyService.prototype.setTopicText = secureMethod([allowWrite, matchForum], function(topic, text) {
+  var user = this.user;
+  var forum = this.forum;
+
+  return topicService.setTopicText(user, topic, text);
+});
+
+ForumWithPolicyService.prototype.setTopicCategory = secureMethod([allowWrite, matchForum], function(topic, category) {
+  var user = this.user;
+  var forum = this.forum;
+
+  if (!mongoUtils.objectIDsEqual(category.forumId, forum._id)) {
+    throw new StatusError(403, 'forumId does not match');
+  }
+
+  return topicService.setTopicCategory(user, topic, category);
 });
 
 module.exports = ForumWithPolicyService;

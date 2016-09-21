@@ -1,5 +1,6 @@
 "use strict";
 
+var Promise = require('bluebird');
 var StatusError = require('statuserror');
 var internalClientAccessOnly = require('../../../web/middlewares/internal-client-access-only');
 var forumCategoryService = require('gitter-web-topics/lib/forum-category-service');
@@ -9,21 +10,19 @@ var restSerializer = require('../../../serializers/rest-serializer');
 var restful = require('../../../services/restful');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
-function getTopicOptions(body) {
+function getTags(tags) {
+  if (!Array.isArray(tags)) {
+    throw new StatusError(400, 'Tags must be an array.');
+  }
+  return tags.map(function(tag) {
+    return String(tag);
+  });
+}
+
+function getCreateTopicOptions(body) {
   var title = body.title ? String(body.title) : undefined;
   var slug = body.slug ? String(body.slug) : undefined;
-
-  var tags;
-  if (body.tags && Array.isArray(body.tags)) {
-    var tagsAreStrings = body.tags.every(function(s) {
-      return typeof s === 'string';
-    });
-
-    if (tagsAreStrings) {
-      tags = body.tags;
-    }
-  }
-
+  var tags = body.tags ? getTags(body.tags) : undefined;
   var sticky = body.sticky ? !!body.sticky : undefined;
   var text = body.text ? String(body.text) : undefined;
 
@@ -38,6 +37,7 @@ function getTopicOptions(body) {
     sticky: sticky
   };
 }
+
 
 module.exports = {
   id: 'topic',
@@ -70,7 +70,7 @@ module.exports = {
     var categoryId = req.body.categoryId ? String(req.body.categoryId) : undefined;
     if (!categoryId) throw new StatusError(400, 'categoryId required.');
 
-    var topicOptions = getTopicOptions(req.body);
+    var topicOptions = getCreateTopicOptions(req.body);
 
     return forumCategoryService.findByIdForForum(forum._id, categoryId)
       .then(function(category) {
@@ -82,6 +82,70 @@ module.exports = {
       .then(function(topic) {
         var topicStrategy = restSerializer.TopicStrategy.standard();
         return restSerializer.serializeObject(topic, topicStrategy);
+      });
+  },
+
+  patch: function(req) {
+    var user = req.user;
+    var forum = req.forum;
+    var policy = req.userForumPolicy;
+    var topic = req.topic;
+
+    var forumWithPolicyService = new ForumWithPolicyService(forum, user, policy);
+    var body = req.body;
+    var promises = [];
+
+    var title;
+    if (body.hasOwnProperty('title')) {
+      title = String(body.title);
+      promises.push(forumWithPolicyService.setTopicTitle(topic, title));
+    }
+
+    var slug;
+    if (body.hasOwnProperty('slug')) {
+      slug = String(body.slug);
+      promises.push(forumWithPolicyService.setTopicSlug(topic, slug));
+    }
+
+    var tags;
+    if (body.hasOwnProperty('tags')) {
+      tags = getTags(body.tags);
+      promises.push(forumWithPolicyService.setTopicTags(topic, tags));
+    }
+
+    /*
+    var sticky;
+    if (body.hasOwnProperty('sticky')) {
+      sticky = !!body.sticky;
+      promises.push(forumWithPolicyService.setTopicSticky(topic, sticky));
+    }
+    */
+
+    var text;
+    if (body.hasOwnProperty('text')) {
+      text = String(body.text);
+      promises.push(forumWithPolicyService.setTopicText(topic, text));
+    }
+
+    var categoryId;
+    var categoryPromise;
+    if (body.hasOwnProperty('categoryId')) {
+      categoryId = String(body.categoryId);
+      categoryPromise = forumCategoryService.findByIdForForum(forum._id, categoryId)
+        .then(function(category) {
+          if (!category) throw new StatusError(404, 'Category not found.');
+          return forumWithPolicyService.setTopicCategory(topic, category);
+        });
+      promises.push(categoryPromise);
+    }
+
+    return Promise.all(promises)
+      .then(function() {
+        return topicService.findByIdForForum(forum._id, topic._id);
+      })
+      .then(function(updatedTopic) {
+        var strategy = restSerializer.TopicStrategy.standard();
+        return restSerializer.serializeObject(updatedTopic, strategy);
       });
   },
 
