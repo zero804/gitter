@@ -6,6 +6,7 @@ var assert = require('assert');
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
 var persistence = require('gitter-web-persistence');
+var _ = require('lodash');
 var Topic = persistence.Topic;
 var ForumCategory = persistence.ForumCategory;
 var User = persistence.User;
@@ -16,9 +17,6 @@ var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var markdownMajorVersion = require('gitter-markdown-processor').version.split('.')[0];
 var validateTopic = require('./validate-topic');
 var validators = require('gitter-web-validators');
-var validateTags = validators.validateTags;
-var validateTopicFilter = validators.validateTopicFilter;
-var validateTopicSort = validators.validateTopicSort;
 var liveCollections = require('gitter-web-live-collection-events');
 
 
@@ -110,11 +108,11 @@ function findByForumId(forumId, options) {
   var filter = options.filter || {};
   var sort = options.sort || { _id: -1 };
 
-  if (!validateTopicFilter(filter)) {
+  if (!validators.validateTopicFilter(filter)) {
     throw new StatusError(400, 'Filter is invalid.');
   }
 
-  if (!validateTopicSort(sort)) {
+  if (!validators.validateTopicSort(sort)) {
     throw new StatusError(400, 'Sort is invalid.');
   }
 
@@ -135,11 +133,11 @@ function findByForumIds(forumIds, options) {
   var filter = options.filter || {};
   var sort = options.sort || { _id: 1 };
 
-  if (!validateTopicFilter(filter)) {
+  if (!validators.validateTopicFilter(filter)) {
     throw new StatusError(400, 'Filter is invalid.');
   }
 
-  if (!validateTopicSort(sort)) {
+  if (!validators.validateTopicSort(sort)) {
     throw new StatusError(400, 'Sort is invalid.');
   }
 
@@ -215,15 +213,84 @@ function createTopic(user, category, options) {
     });
 }
 
+/* private */
+function updateTopic(topicId, fields) {
+  var query = {
+    _id: topicId
+  };
+  var update = {
+    $set: fields
+  };
+  return Topic.findOneAndUpdate(query, update, { new: true })
+    .lean()
+    .exec();
+}
+
+function setTopicTitle(user, topic, title) {
+  if (title === topic.title) return topic;
+
+  if (!validators.validateDisplayName(title)) {
+    throw new StatusError(400, 'Title is invalid.');
+  }
+
+  var userId = user._id;
+  var forumId = topic.forumId;
+  var topicId = topic._id;
+
+  return updateTopic(topicId, { title: title })
+    .then(function(updatedTopic) {
+      // log a stats event
+      stats.event('update_topic_title', {
+        userId: userId,
+        forumId: forumId,
+        topicId: topicId,
+        title: title
+      });
+
+      liveCollections.topics.emit('patch', forumId, topicId, { title: updatedTopic.title });
+
+      return updatedTopic;
+    });
+}
+
+function setTopicSlug(user, topic, slug) {
+  if (slug === topic.slug) return topic;
+
+  if (!validators.validateSlug(slug)) {
+    throw new StatusError(400, 'Slug is invalid.');
+  }
+
+  var userId = user._id;
+  var forumId = topic.forumId;
+  var topicId = topic._id;
+
+  return updateTopic(topicId, { slug: slug })
+    .then(function(updatedTopic) {
+      // log a stats event
+      stats.event('update_topic_slug', {
+        userId: userId,
+        forumId: forumId,
+        topicId: topicId,
+        slug: slug
+      });
+
+      liveCollections.topics.emit('patch', forumId, topicId, { slug: updatedTopic.slug });
+
+      return updatedTopic;
+    });
+}
+
 function setTopicTags(user, topic, tags, options) {
   tags = tags || [];
+
+  if (_.isEqual(tags, topic.tags)) return topic;
 
   options = options || {};
   // alternatively we could have passed a full forum object just to get to
   // forum.tags
   options.allowedTags = options.allowedTags || [];
 
-  if (!validateTags(tags, options.allowedTags)) {
+  if (!validators.validateTags(tags, options.allowedTags)) {
     throw new StatusError(400, 'Tags are invalid.');
   }
 
@@ -231,17 +298,7 @@ function setTopicTags(user, topic, tags, options) {
   var forumId = topic.forumId;
   var topicId = topic._id;
 
-  var query = {
-    _id: topicId
-  };
-  var update = {
-    $set: {
-      tags: tags
-    }
-  };
-  return Topic.findOneAndUpdate(query, update, { new: true })
-    .lean()
-    .exec()
+  return updateTopic(topicId, { tags: tags })
     .then(function(updatedTopic) {
       // log a stats event
       stats.event('update_topic_tags', {
@@ -257,6 +314,73 @@ function setTopicTags(user, topic, tags, options) {
     });
 }
 
+// TODO: setTopicSticky
+
+function setTopicText(user, topic, text) {
+  if (text === topic.text) return topic;
+
+  if (!validators.validateMarkdown(text)) {
+    throw new StatusError(400, 'Text is invalid.');
+  }
+
+  var userId = user._id;
+  var forumId = topic.forumId;
+  var topicId = topic._id;
+
+  return processText(text)
+    .then(function(parsedMessage) {
+      return updateTopic(topicId, {
+          text: text,
+          html: parsedMessage.html,
+          lang: parsedMessage.lang,
+          _md: parsedMessage.markdownProcessingFailed ? -markdownMajorVersion : markdownMajorVersion
+      })
+    })
+    .then(function(updatedTopic) {
+      // log a stats event
+      stats.event('update_topic_text', {
+        userId: userId,
+        forumId: forumId,
+        topicId: topicId,
+        text: text
+      });
+
+      liveCollections.topics.emit('patch', forumId, topicId, {
+        body: {
+          text: updatedTopic.text,
+          html: updatedTopic.html
+        }
+      });
+
+      return updatedTopic;
+    });
+}
+
+function setTopicCategory(user, topic, category) {
+  if (mongoUtils.objectIDsEqual(category._id, topic.categoryId)) return topic;
+
+  var userId = user._id;
+  var forumId = topic.forumId;
+  var topicId = topic._id;
+
+  return updateTopic(topicId, { categoryId: category._id })
+    .then(function(updatedTopic) {
+      // log a stats event
+      stats.event('update_topic_category', {
+        userId: userId,
+        forumId: forumId,
+        topicId: topicId,
+        categoryId: category._id
+      });
+
+      liveCollections.topics.emit('patch', forumId, topicId, {
+        categoryId: category._id
+      });
+
+      return updatedTopic;
+    });
+}
+
 module.exports = {
   findById: findById,
   findByForumId: findByForumId,
@@ -264,5 +388,9 @@ module.exports = {
   findTotalsByForumIds: Promise.method(findTotalsByForumIds),
   findByIdForForum: findByIdForForum,
   createTopic: Promise.method(createTopic),
-  setTopicTags: Promise.method(setTopicTags)
+  setTopicTitle: Promise.method(setTopicTitle),
+  setTopicSlug: Promise.method(setTopicSlug),
+  setTopicTags: Promise.method(setTopicTags),
+  setTopicText: Promise.method(setTopicText),
+  setTopicCategory: Promise.method(setTopicCategory),
 };
