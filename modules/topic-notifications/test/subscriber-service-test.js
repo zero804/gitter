@@ -54,7 +54,7 @@ describe('subscriber-service', function() {
             return subscriberService.addSubscriber(id, userId1)
           })
           .then(function(result) {
-            assert.strictEqual(true, result);
+            assert.strictEqual(result, true);
             return subscriberService.createSubscriptionVisitorForUser(userId1, id.type, [id])
           })
           .then(function(subscriptionVisitor) {
@@ -62,7 +62,7 @@ describe('subscriber-service', function() {
             return subscriberService.addSubscriber(id, userId1);
           })
           .then(function(result) {
-            assert.strictEqual(false, result);
+            assert.strictEqual(result, false);
             return subscriberService.listForItem(id)
           })
           .then(function(result) {
@@ -70,7 +70,7 @@ describe('subscriber-service', function() {
             return subscriberService.addSubscriber(id, userId2);
           })
           .then(function(result) {
-            assert.strictEqual(true, result);
+            assert.strictEqual(result, true);
             return subscriberService.listForItem(id)
           })
           .then(function(result) {
@@ -78,15 +78,15 @@ describe('subscriber-service', function() {
             return subscriberService.removeSubscriber(id, userId1);
           })
           .then(function(result) {
-            assert.strictEqual(true, result);
+            assert.strictEqual(result, true);
             return subscriberService.removeSubscriber(id, userId1);
           })
           .then(function(result) {
-            assert.strictEqual(false, result);
+            assert.strictEqual(result, false);
             return subscriberService.removeSubscriber(id, userId2);
           })
           .then(function(result) {
-            assert.strictEqual(true, result);
+            assert.strictEqual(result, true);
             return subscriberService.listForItem(id)
           })
           .then(function(result) {

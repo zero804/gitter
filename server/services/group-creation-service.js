@@ -1,7 +1,7 @@
 "use strict";
 
 var env = require('gitter-web-env');
-var logger = env.logger;
+var logger = env.logger.get('group-creation');
 var errorReporter = env.errorReporter;
 var stats = env.stats;
 
@@ -189,7 +189,16 @@ function groupCreationService(user, options) {
 
       this.invitesReport = invitesReport;
       return this;
-    });
+    })
+    .catch(function(e) {
+      logger.error('Group creation failure', {
+        exception: e,
+        username: user && user.username,
+        userId: user && user._id,
+        options: options
+      })
+      throw e;
+    })
 }
 
 module.exports = Promise.method(groupCreationService);
