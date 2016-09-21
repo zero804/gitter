@@ -5,10 +5,13 @@ var StatusError = require('statuserror');
 var internalClientAccessOnly = require('../../../web/middlewares/internal-client-access-only');
 var forumCategoryService = require('gitter-web-topics/lib/forum-category-service');
 var topicService = require('gitter-web-topics/lib/topic-service');
+var getTopicsFilterSortOptions = require('gitter-web-topics/lib/get-topics-filter-sort-options');
 var ForumWithPolicyService = require('../../../services/forum-with-policy-service');
 var restSerializer = require('../../../serializers/rest-serializer');
 var restful = require('../../../services/restful');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var SubscribersResource = require('./subscribers-resource');
+var ForumObject = require('gitter-web-topic-notifications/lib/forum-object');
 
 function getTags(tags) {
   if (!Array.isArray(tags)) {
@@ -45,7 +48,8 @@ module.exports = {
   index: function(req) {
     var forum = req.forum;
 
-    return restful.serializeTopicsForForumId(forum._id);
+    var options = getTopicsFilterSortOptions(req.query);
+    return restful.serializeTopicsForForumId(forum._id, options);
   },
 
   show: function(req) {
@@ -155,6 +159,12 @@ module.exports = {
 
   subresources: {
     'replies': require('./replies'),
+    'subscribers': new SubscribersResource({
+      id: 'topicSubscriber',
+      getForumObject: function(req) {
+        return ForumObject.createForTopic(req.forum._id, req.topic._id);
+      }
+    })
   },
 
 };
