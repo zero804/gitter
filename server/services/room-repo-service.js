@@ -109,7 +109,7 @@ var findAssociatedGithubRepoForRoom = Promise.method(function (room) {
 
   return securityDescriptorService.group.findById(room.groupId, null)
     .then(function(sd) {
-      if (sd.type === 'GH_REPO') return sd.linkPath;
+      if (sd && sd.type === 'GH_REPO') return sd.linkPath;
 
       return null;
     });
