@@ -6,7 +6,7 @@ var groupId = mongoUtils.getNewObjectIdString();
 var securityDescriptorValidator = require('../lib/security-descriptor-validator');
 
 var TYPES = ['GROUP', 'GH_REPO', 'GH_ORG', 'ONE_TO_ONE', 'GH_USER', null];
-var MEMBERS = ['PUBLIC', 'INVITE', 'GH_REPO_ACCESS', 'GH_REPO_PUSH', 'GH_ORG_MEMBER', null];
+var MEMBERS = ['PUBLIC', 'INVITE', 'INVITE_OR_ADMIN', 'GH_REPO_ACCESS', 'GH_REPO_PUSH', 'GH_ORG_MEMBER', null];
 var ADMINS = ['GROUP_ADMIN', 'MANUAL', 'GH_REPO_PUSH', 'GH_ORG_MEMBER', 'GH_USER_SAME', null];
 var PUBLICS = [true, false, undefined, null];
 var LINK_PATHS = ['gitterHQ', 'gitterHQ/test', null];

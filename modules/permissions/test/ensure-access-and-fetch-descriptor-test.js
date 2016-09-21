@@ -10,6 +10,9 @@ describe('ensure-access-and-fetch-descriptor #slow', function() {
   fixtureLoader.disableMongoTableScans();
 
   var fixture = fixtureLoader.setup({
+    deleteDocuments: {
+      User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }]
+    },
     user1: {
       githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
       username: fixtureLoader.GITTER_INTEGRATION_USERNAME,

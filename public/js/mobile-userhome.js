@@ -2,10 +2,12 @@
 var $ = require('jquery');
 var appEvents = require('./utils/appevents');
 var Backbone = require('backbone');
-var confirmRepoRoomView = require('./views/modals/confirm-repo-room-view');
 var modalRegion = require('./components/modal-region');
 var onready = require('./utils/onready');
 var MobileUserhomeLayout = require('./views/layouts/mobile-userhome');
+var Router = require('./routes/router');
+var createRoutes = require('./routes/create-routes');
+var confirmSuggestedRoutes = require('./routes/confirm-suggestion-routes');
 
 //Left Menu Additions
 //var gestures             = require('./utils/gesture-controller');
@@ -38,18 +40,19 @@ onready(function() {
     el: 'body'
   }).render();
 
-  var Router = Backbone.Router.extend({
-    routes: {
-      'confirmSuggested/*uri': function(uri) {
-        modalRegion.show(new confirmRepoRoomView.Modal({ uri: uri }));
-      },
-      '': function() {
-        modalRegion.destroy();
-      }
-    }
+
+  new Router({
+    dialogRegion: modalRegion,
+    routes: [
+      createRoutes({
+        rooms: null, //troupeCollections.troupes,
+        groups: null, // troupeCollections.groups,
+        roomMenuModel: null
+      }),
+      confirmSuggestedRoutes()
+    ]
   });
 
-  new Router();
   Backbone.history.start();
 
   $('html').removeClass('loading');

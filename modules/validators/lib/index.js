@@ -11,4 +11,7 @@ module.exports = {
   validateRoomName: require('./validate-room-name'),
   validateSlug: require('./validate-slug'),
   validateTags: require('./validate-tags'),
+  validateTopicFilter: require('./validate-topic-filter'),
+  validateTopicSort: require('./validate-topic-sort'),
+  validateUsername: require('./validate-username'),
 };
