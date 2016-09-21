@@ -1,31 +1,40 @@
 import Backbone from 'backbone';
 import {subscribe} from '../../../shared/dispatcher';
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
-import { TOGGLE_FORUM_WATCH_STATE } from '../../../shared/constants/forum.js';
+import { UPDATE_FORUM_WATCH_STATE, ATTEMPT_UPDATE_FORUM_WATCH_STATE, FORUM_WATCH_STATE } from '../../../shared/constants/forum.js';
 
 const ForumStore = Backbone.Model.extend({
+  defaults: {
+    watchState: FORUM_WATCH_STATE.NOT_WATCHING
+  },
+
   events: [
     'change:id',
-    'change:isWatching'
+    'change:watchState'
   ],
 
   initialize: function() {
-    subscribe(TOGGLE_FORUM_WATCH_STATE, this.onWatchStateUpdate, this);
+    subscribe(ATTEMPT_UPDATE_FORUM_WATCH_STATE, this.onAttemptWatchStateUpdate, this);
+    subscribe(UPDATE_FORUM_WATCH_STATE, this.onWatchStateUpdate, this);
+  },
+
+  onAttemptWatchStateUpdate: function() {
+    this.set({
+      watchState: FORUM_WATCH_STATE.PENDING
+    });
   },
 
   onWatchStateUpdate: function(data) {
-    var {desiredState} = data;
+    var {state} = data;
 
-    // Toggle if no state was provided
-    var newState = (desiredState !== undefined) ? desiredState : !this.get('isWatching');
     this.set({
-      isWatching: newState
+      watchState: state
     });
   },
 
   getForum(){ return this.toJSON(); },
   getForumId() { return this.get('id'); },
-  getIsWatching() { return this.get('isWatching'); }
+  getWatchState() { return this.get('watchState'); }
 });
 
 dispatchOnChangeMixin(ForumStore);
@@ -49,6 +58,6 @@ export function getForumId(){
   return getForumStore().getForumId()
 }
 
-export function getIsWatching(){
-  return getForumStore().getIsWatching()
+export function getWatchState(){
+  return getForumStore().getWatchState()
 }

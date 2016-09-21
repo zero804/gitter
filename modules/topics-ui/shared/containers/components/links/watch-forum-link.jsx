@@ -1,6 +1,11 @@
+import _ from 'underscore';
 import React, { PropTypes } from 'react';
-import toggleForumWatchState from '../../../action-creators/forum/toggle-forum-watch-state';
+import classNames from 'classnames';
 import {dispatch} from '../../../dispatcher';
+
+import attemptUpdateForumWatchState from '../../../action-creators/forum/attempt-update-forum-watch-state';
+import { FORUM_WATCH_STATE } from '../../../constants/forum.js';
+
 
 export default React.createClass({
 
@@ -11,33 +16,63 @@ export default React.createClass({
     children: PropTypes.node,
     onClick: PropTypes.func,
     className: PropTypes.string,
+    itemClassName: PropTypes.string,
     href: PropTypes.string,
-    isWatching: PropTypes.bool,
+    watchState: PropTypes.oneOf(_.values(FORUM_WATCH_STATE))
   },
 
-  render(){
+  render() {
+    const {children, className, href, itemClassName, watchState} = this.props;
 
-    const {children, className, href, isWatching} = this.props;
+    var compiledClassNames = className + ' ' + classNames({
+      pending: watchState === FORUM_WATCH_STATE.PENDING
+    })
 
-    var watchText = isWatching ? 'Unfollow' : 'Follow';
+    var watchNodes = [
+      <span
+        key="unfollow"
+        className={classNames({
+          [itemClassName]: true,
+          hidden: watchState !== FORUM_WATCH_STATE.WATCHING
+        })}>
+        Unfollow
+      </span>,
+      <span
+        key="follow"
+        className={classNames({
+          [itemClassName]: true,
+          hidden: watchState !== FORUM_WATCH_STATE.NOT_WATCHING
+        })}>
+        Follow
+      </span>,
+      <span
+        key="pending"
+        className={classNames({
+          [itemClassName]: true,
+          hidden: watchState !== FORUM_WATCH_STATE.PENDING
+        })}>
+        ...
+      </span>
+    ];
 
     return (
-      <a
-        title={watchText}
+      <button
         href={href}
-        className={className}
+        className={compiledClassNames}
         onClick={this.onClick}>
-        {children || watchText}
-      </a>
+        {children || watchNodes}
+      </button>
     );
   },
 
 
   onClick(e){
     e.preventDefault();
-    const {forumId, onClick} = this.props;
+    const {forumId, onClick, watchState} = this.props;
     if(onClick) { return onClick(...arguments); }
-    dispatch(toggleForumWatchState(forumId));
+
+    var desiredIsWatching = (watchState !== FORUM_WATCH_STATE.WATCHING);
+    dispatch(attemptUpdateForumWatchState(forumId, desiredIsWatching));
   }
 
 });

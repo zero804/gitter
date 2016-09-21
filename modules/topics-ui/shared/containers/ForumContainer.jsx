@@ -46,7 +46,7 @@ const ForumContainer = React.createClass({
     //Forum
     forumStore: React.PropTypes.shape({
       getForumId: React.PropTypes.func.isRequired,
-      getIsWatching: React.PropTypes.func.isRequired
+      getWatchState: React.PropTypes.func.isRequired
     }).isRequired,
 
     //Categories ---
@@ -83,7 +83,7 @@ const ForumContainer = React.createClass({
 
     return {
       forumId: forumStore.getForumId(),
-      isWatchingForum: forumStore.getIsWatching(),
+      forumWatchState: forumStore.getWatchState(),
       categoryName: this.props.categoryName,
       filterName: this.props.filterName,
       tagName: this.props.tagName,
@@ -128,7 +128,7 @@ const ForumContainer = React.createClass({
   },
 
   render() {
-    const { forumId, isWatchingForum, categoryName, tags, filterName, tagName, sortName, createTopic, topics, newTopic } = this.state;
+    const { forumId, forumWatchState, categoryName, tags, filterName, tagName, sortName, createTopic, topics, newTopic } = this.state;
     const { groupName, categoryStore, tagStore } = this.props;
 
     const categories = categoryStore.getCategories();
@@ -140,7 +140,7 @@ const ForumContainer = React.createClass({
         <SearchHeader
           forumId={forumId}
           groupName={groupName}
-          isWatching={isWatchingForum}/>
+          watchState={forumWatchState}/>
         <CategoryList
           groupName={ groupName }
           categories={ categories }/>
@@ -208,7 +208,7 @@ const ForumContainer = React.createClass({
     const { forumStore } = this.props;
     this.setState((state) => Object.assign(state, {
       forumId: forumStore.getForumId(),
-      isWatchingForum: forumStore.getIsWatching(),
+      forumWatchState: forumStore.getWatchState(),
     }));
   },
 
