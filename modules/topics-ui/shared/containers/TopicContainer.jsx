@@ -20,7 +20,7 @@ const TopicContainer = createClass({
     //Forum
     forumStore: React.PropTypes.shape({
       getForumId: React.PropTypes.func.isRequired,
-      getIsWatching: React.PropTypes.func.isRequired
+      getWatchState: React.PropTypes.func.isRequired
     }).isRequired,
 
     topicsStore: PropTypes.shape({
@@ -67,7 +67,7 @@ const TopicContainer = createClass({
     const {forumStore, repliesStore} = this.props;
     return {
       forumId: forumStore.getForumId(),
-      isWatchingForum: forumStore.getIsWatching(),
+      forumWatchState: forumStore.getWatchState(),
       replies: repliesStore.getReplies(),
       newReplyContent: '',
     };
@@ -76,12 +76,14 @@ const TopicContainer = createClass({
 
   render(){
 
-    const { forumId, isWatchingForum, topicId, topicsStore, groupName, categoryStore, currentUserStore, tagStore } = this.props;
+    const { forumStore, topicId, topicsStore, groupName, categoryStore, currentUserStore, tagStore } = this.props;
     const {replies, newReplyContent} = this.state;
     const topic = topicsStore.getById(topicId)
     const currentUser = currentUserStore.getCurrentUser();
     const topicCategory = topic.category;
     const category = categoryStore.getById(topicCategory.id);
+    const forumId = forumStore.getForumId();
+    const forumWatchState = forumStore.getWatchState();
 
 
     //TODO remove
@@ -98,7 +100,7 @@ const TopicContainer = createClass({
         <SearchHeader
           forumId={forumId}
           groupName={groupName}
-          isWatching={isWatchingForum}/>
+          forumWatchState={forumWatchState}/>
         <article>
           <TopicHeader
             topic={topic}
@@ -136,7 +138,7 @@ const TopicContainer = createClass({
     const { forumStore } = this.props;
     this.setState((state) => Object.assign(state, {
       forumId: forumStore.getForumId(),
-      isWatchingForum: forumStore.getIsWatching()
+      forumWatchState: forumStore.getWatchState()
     }));
   },
 
