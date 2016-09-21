@@ -40,6 +40,7 @@ describe('topic-api', function() {
       user: 'user1',
       forum: 'forum1',
       category: 'category1',
+      tags: ['cats']
     },
     reply1: {
       user: 'user1',
@@ -56,12 +57,33 @@ describe('topic-api', function() {
       .then(function(result) {
         var topics = result.body;
 
+        assert.strictEqual(topics.length, 2);
+
         var topic = topics.find(function(t) {
           return t.id === fixture.topic1.id;
         });
         assert.strictEqual(topic.id, fixture.topic1.id);
         assert.strictEqual(topic.replies.length, 1);
       });
+  });
+
+  it('GET /v1/forums/:forumId/topics?tags=cats', function() {
+    return request(app)
+      .get('/v1/forums/' + fixture.forum1.id + '/topics?tags=cats')
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+      .then(function(result) {
+        var topics = result.body;
+
+        assert.strictEqual(topics.length, 1);
+
+        var topic = topics.find(function(t) {
+          return t.id === fixture.topic2.id;
+        });
+        assert.strictEqual(topic.id, fixture.topic2.id);
+        assert.strictEqual(topic.replies.length, 0);
+      });
+
   });
 
   it('GET /v1/forums/:forumId/topics/:topicId', function() {
@@ -79,7 +101,7 @@ describe('topic-api', function() {
   it('PATCH /v1/forums/:forumId/topics/:topicId', function() {
     var update = {
       title: 'Foo',
-      slug: 'foo',
+      slug: 'cats',
       tags: ['cats', 'dogs'],
       text: '**hello**',
       sticky: 1,
@@ -117,6 +139,37 @@ describe('topic-api', function() {
         var topic = result.body;
         assert.strictEqual(topic.title, 'I am a topic');
       });
+  });
+
+  it('GET /v1/forums/:forumId/topics/:topicId/subscribers', function() {
+    return request(app)
+      .get('/v1/forums/' + fixture.forum1.id + '/topics/' + fixture.topic1.id + '/subscribers')
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+      .then(function(result) {
+        var body = result.body;
+        assert(Array.isArray(body))
+      });
+  });
+
+  it('POST /v1/forums/:forumId/topics/:topicId/subscribers', function() {
+    return request(app)
+      .post('/v1/forums/' + fixture.forum1.id + '/topics/' + fixture.topic1.id + '/subscribers')
+      .send({
+      })
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+      .then(function(result) {
+        var body = result.body;
+        assert.strictEqual(body.id, fixture.user1.id)
+      });
+  });
+
+  it('DELETE /v1/forums/:forumId/topics/:topicId/subscribers', function() {
+    return request(app)
+      .del('/v1/forums/' + fixture.forum1.id + '/topics/' + fixture.topic1.id + '/subscribers/' + fixture.user1.id)
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(204)
   });
 
 });
