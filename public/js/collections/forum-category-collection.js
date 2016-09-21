@@ -2,7 +2,7 @@
 
 var Backbone = require('backbone');
 var urlJoin = require('url-join');
-var apiClient = require('../components/apiClient');
+var apiClient = require('../components/api-client');
 
 var ForumCategoryCollection = Backbone.Collection.extend({
   initialize: function(models, options) {
