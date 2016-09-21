@@ -25,6 +25,10 @@ const TopicContainer = createClass({
       getReplies: PropTypes.func.isRequired
     }).isRequired,
 
+    commentsStore: PropTypes.shape({
+      getComments: PropTypes.func.isRequired,
+    }),
+
     categoryStore: PropTypes.shape({
       getCategories: PropTypes.func.isRequired,
     }).isRequired,
