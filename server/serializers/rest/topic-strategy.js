@@ -6,6 +6,7 @@ var ForumCategoryIdStrategy = require('./forum-category-id-strategy');
 var RepliesForTopicStrategy = require('./topics/replies-for-topic-strategy');
 var TopicReplyingUsersStrategy = require('./topics/topic-replying-users-strategy');
 var UserIdStrategy = require('./user-id-strategy');
+var TopicSubscriptionStrategy = require('./topics/topic-subscription-strategy');
 
 function formatDate(d) {
   return d ? d.toISOString() : null;
@@ -36,9 +37,9 @@ function TopicStrategy(options) {
 
   var userStrategy;
   var categoryStrategy;
-
   var repliesForTopicStrategy;
   var replyingUsersStrategy;
+  var topicSubscriptionStrategy;
 
   this.preload = function(topics) {
     if (topics.isEmpty()) return;
@@ -69,6 +70,9 @@ function TopicStrategy(options) {
     categoryStrategy = new ForumCategoryIdStrategy();
     var categoryIds = topics.map(function(i) { return i.categoryId; });
     strategies.push(categoryStrategy.preload(categoryIds));
+
+    topicSubscriptionStrategy = new TopicSubscriptionStrategy({ currentUserId: options.userId });
+    strategies.push(topicSubscriptionStrategy.preload(topics));
 
     return Promise.all(strategies);
   };
@@ -117,6 +121,8 @@ function TopicStrategy(options) {
       // TODO: support options.user
       user: mapUser(topic.userId),
 
+      subscribed: topicSubscriptionStrategy ? topicSubscriptionStrategy.map(topic) : undefined,
+
       replies: repliesForTopicStrategy ? repliesForTopicStrategy.map(id) : undefined,
       repliesTotal: options.includeRepliesTotals ? topic.repliesTotal : undefined,
       replyingUsers: replyingUsersStrategy ? replyingUsersStrategy.map(id): undefined,
@@ -153,16 +159,18 @@ TopicStrategy.prototype = {
   name: 'TopicStrategy',
 };
 
-TopicStrategy.full = function() {
+TopicStrategy.full = function(options) {
   return new TopicStrategy({
+    currentUserId: options && options.currentUserId,
     includeReplyingUsers: true,
     includeReplies: true,
     includeRepliesTotals: true
   })
 }
 
-TopicStrategy.standard = function() {
+TopicStrategy.standard = function(options) {
   return new TopicStrategy({
+    currentUserId: options && options.currentUserId,
     includeReplyingUsers: true,
     includeReplies: false,
     includeRepliesTotals: true

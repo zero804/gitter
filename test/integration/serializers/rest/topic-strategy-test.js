@@ -76,6 +76,7 @@ describe('TopicStrategy', function() {
             displayName: user.displayName,
             avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
           },
+          subscribed: false,
           repliesTotal: 1,
           replyingUsers: [{
             "id": user.id,
@@ -123,6 +124,7 @@ describe('TopicStrategy', function() {
             displayName: user.displayName,
             avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username
           },
+          subscribed: false,
           replies: [{
             id: reply.id,
             body: {
@@ -183,6 +185,7 @@ describe('TopicStrategy', function() {
               slug: category.slug
             },
             user: fixture.user1.id,
+            subscribed: false,
             sent: LONG_AGO,
             editedAt: null,
             lastChanged: LONG_AGO,
@@ -228,6 +231,7 @@ describe('TopicStrategy', function() {
               displayName: user.displayName,
               avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
             },
+            subscribed: false,
             sent: LONG_AGO,
             editedAt: null,
             lastChanged: LONG_AGO,
