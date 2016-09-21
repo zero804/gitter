@@ -83,7 +83,7 @@ SubscriptionVisitor.prototype.isSubscribed = function(forumObject) {
   return !!(this.resultsHash[forumId + topicId + replyId]);
 }
 
-function isUserSubscribed(userId, type, forumObjects) {
+function createSubscriptionVisitorForUser(userId, type, forumObjects) {
   assert(type !== ForumObject.TYPE.Comment);
   if (!forumObjects.length) {
     return new SubscriptionVisitor();
@@ -102,7 +102,7 @@ function isUserSubscribed(userId, type, forumObjects) {
       replyIds = [];
 
       if (type !== ForumObject.TYPE.Reply) {
-        assert(false, 'isUserSubscribed requires a forum, topic or reply');
+        assert(false, 'createSubscriptionVisitorForUser requires a forum, topic or reply');
       }
     }
   }
@@ -143,5 +143,5 @@ module.exports = {
   listForItem: listForItem,
   addSubscriber: addSubscriber,
   removeSubscriber: removeSubscriber,
-  isUserSubscribed: Promise.method(isUserSubscribed)
+  createSubscriptionVisitorForUser: Promise.method(createSubscriptionVisitorForUser)
 }

@@ -18,7 +18,7 @@ ReplySubscriptionStrategy.prototype = {
       return ForumObject.createForReply(reply.forumId, reply.topicId, reply._id);
     });
 
-    return subscriberService.isUserSubscribed(this.currentUserId, ForumObject.TYPE.Reply, forumObjects.toArray())
+    return subscriberService.createSubscriptionVisitorForUser(this.currentUserId, ForumObject.TYPE.Reply, forumObjects.toArray())
       .bind(this)
       .then(function(subscriptionVisitor) {
         this.subscriptionVisitor = subscriptionVisitor;
