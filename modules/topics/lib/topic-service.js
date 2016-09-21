@@ -182,7 +182,7 @@ function createTopic(user, category, options) {
     title: options.title,
     slug: options.slug,
     tags: options.tags || [],
-    sticky: options.sticky || false,
+    sticky: options.sticky,
     text: options.text || '',
   };
 
@@ -314,7 +314,32 @@ function setTopicTags(user, topic, tags, options) {
     });
 }
 
-// TODO: setTopicSticky
+function setTopicSticky(user, topic, sticky) {
+  if (sticky === topic.sticky) return sticky;
+
+  if (!validators.validateSticky(sticky)) {
+    throw new StatusError(400, 'Sticky is invalid.');
+  }
+
+  var userId = user._id;
+  var forumId = topic.forumId;
+  var topicId = topic._id;
+
+  return updateTopic(topicId, { sticky: sticky })
+    .then(function(updatedTopic) {
+      // log a stats event
+      stats.event('update_topic_sticky', {
+        userId: userId,
+        forumId: forumId,
+        topicId: topicId,
+        sticky: sticky
+      });
+
+      liveCollections.topics.emit('patch', forumId, topicId, { sticky: updatedTopic.sticky });
+
+      return updatedTopic;
+    });
+}
 
 function setTopicText(user, topic, text) {
   if (text === topic.text) return topic;
@@ -391,6 +416,7 @@ module.exports = {
   setTopicTitle: Promise.method(setTopicTitle),
   setTopicSlug: Promise.method(setTopicSlug),
   setTopicTags: Promise.method(setTopicTags),
+  setTopicSticky: Promise.method(setTopicSticky),
   setTopicText: Promise.method(setTopicText),
   setTopicCategory: Promise.method(setTopicCategory),
 };

@@ -23,7 +23,7 @@ function getCreateTopicOptions(body) {
   var title = body.title ? String(body.title) : undefined;
   var slug = body.slug ? String(body.slug) : undefined;
   var tags = body.tags ? getTags(body.tags) : undefined;
-  var sticky = body.sticky ? !!body.sticky : undefined;
+  var sticky = body.sticky ? parseInt(body.sticky, 10) : undefined;
   var text = body.text ? String(body.text) : undefined;
 
   return {
@@ -113,13 +113,11 @@ module.exports = {
       promises.push(forumWithPolicyService.setTopicTags(topic, tags));
     }
 
-    /*
     var sticky;
     if (body.hasOwnProperty('sticky')) {
-      sticky = !!body.sticky;
+      sticky = parseInt(body.sticky, 10);
       promises.push(forumWithPolicyService.setTopicSticky(topic, sticky));
     }
-    */
 
     var text;
     if (body.hasOwnProperty('text')) {
