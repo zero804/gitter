@@ -93,6 +93,7 @@ var schemas = {
   Topic: require('./schemas/topic-schema'),
   Reply: require('./schemas/reply-schema'),
   Comment: require('./schemas/comment-schema'),
+  ForumNotification: require('./schemas/forum-notification-schema'),
 };
 
 module.exports = createExports(schemas);

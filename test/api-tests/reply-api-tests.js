@@ -86,4 +86,38 @@ describe('reply-api', function() {
       });
   });
 
+
+
+  it('GET /v1/forums/:forumId/topics/:topicId/replies/:replyId/subscribers', function() {
+    return request(app)
+      .get('/v1/forums/' + fixture.forum1.id + '/topics/' + fixture.topic1.id + '/replies/' + fixture.reply1.id + '/subscribers')
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+      .then(function(result) {
+        var body = result.body;
+        assert(Array.isArray(body))
+      });
+  });
+
+  it('POST /v1/forums/:forumId/topics/:topicId/replies/:replyId/subscribers', function() {
+    return request(app)
+      .post('/v1/forums/' + fixture.forum1.id + '/topics/' + fixture.topic1.id + '/replies/' + fixture.reply1.id + '/subscribers')
+      .send({
+      })
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+      .then(function(result) {
+        var body = result.body;
+        assert.strictEqual(body.id, fixture.user1.id)
+      });
+  });
+
+  it('DELETE /v1/forums/:forumId/topics/:topicId/replies/:replyId/subscribers', function() {
+    return request(app)
+      .del('/v1/forums/' + fixture.forum1.id + '/topics/' + fixture.topic1.id + '/replies/' + fixture.reply1.id + '/subscribers/' + fixture.user1.id)
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(204)
+  });
+
+
 });
