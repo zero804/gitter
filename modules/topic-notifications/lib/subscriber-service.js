@@ -19,7 +19,7 @@ function listForItem(forumObject) {
 
 /**
  * Add a subscriber for an object. Returns true if the operation
- * modified the collection (ie, the user was not already a subscriber)
+ * modified the collection (ie, when the user is not already a subscriber)
  */
 function addSubscriber(forumObject, userId) {
   assert(forumObject.type !== ForumObject.TYPE.Comment);
