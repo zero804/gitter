@@ -10,7 +10,9 @@ function getId(obj) {
   return obj._id || obj.id;
 }
 
-function ForumStrategy(/*options*/) {
+function ForumStrategy(options) {
+  options = options || {};
+
   var categoriesForForumStrategy;
   var topicsForForumStrategy;
 
@@ -37,8 +39,7 @@ function ForumStrategy(/*options*/) {
     categoriesForForumStrategy = new CategoriesForForumStrategy();
     promises.push(categoriesForForumStrategy.preload(forumIds));
 
-    // TODO: send options down the line?
-    topicsForForumStrategy = new TopicsForForumStrategy();
+    topicsForForumStrategy = new TopicsForForumStrategy(options.topics);
     promises.push(topicsForForumStrategy.preload(forumIds));
 
     return Promise.all(promises);
