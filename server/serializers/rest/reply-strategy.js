@@ -101,7 +101,9 @@ ReplyStrategy.standard = function(options) {
     lookups: options && options.lookups
   });
 
-  strategy.subscriptionStrategy = new ReplySubscriptionStrategy(currentUserId);
+  strategy.subscriptionStrategy = new ReplySubscriptionStrategy({
+    currentUserId: currentUserId
+  });
   strategy.userStrategy = UserIdStrategy.slim();
   return strategy;
 }

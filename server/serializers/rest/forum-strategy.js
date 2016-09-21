@@ -27,7 +27,9 @@ ForumStrategy.prototype = {
     promises.push(this.categoriesForForumStrategy.preload(forumIds));
     promises.push(this.topicsForForumStrategy.preload(forumIds));
 
-    if (this.subscriptionStrategy)
+    if (this.subscriptionStrategy) {
+      promises.push(this.subscriptionStrategy.preload(forums));
+    }
 
     return Promise.all(promises);
   },
@@ -68,7 +70,9 @@ ForumStrategy.standard = function(options) {
   var strategy = new ForumStrategy();
   var currentUserId = options && options.currentUserId;
 
-  strategy.subscriptionStrategy = new ForumSubscriptionStrategy(currentUserId);
+  strategy.subscriptionStrategy = new ForumSubscriptionStrategy({
+    currentUserId: currentUserId
+  });
   strategy.categoriesForForumStrategy = new CategoriesForForumStrategy();
 
   return strategy;

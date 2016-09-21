@@ -6,7 +6,11 @@ var testRequire = require('../../test-require');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assertUtils = require('../../assert-utils')
 var serialize = testRequire('./serializers/serialize');
+var serializeObject = testRequire('./serializers/serialize-object');
 var TopicStrategy = testRequire('./serializers/rest/topic-strategy');
+var subscriberService = require('gitter-web-topic-notifications/lib/subscriber-service');
+var ForumObject = require('gitter-web-topic-notifications/lib/forum-object');
+var assert = require('assert');
 
 var LONG_AGO = '2014-01-01T00:00:00.000Z';
 
@@ -20,7 +24,7 @@ function makeHash() {
   return hash;
 }
 
-describe('TopicStrategy', function() {
+describe('TopicStrategy #slow', function() {
   var blockTimer = require('../../block-timer');
   before(blockTimer.on);
   after(blockTimer.off);
@@ -265,5 +269,39 @@ describe('TopicStrategy', function() {
           }
         })
       });
+  });
+
+  it('should tell a user when they are subscribed to a forum', function() {
+    var forumObject = ForumObject.createForTopic(fixture.forum1._id, fixture.topic1._id);
+    var userId = fixture.user1._id;
+
+    return subscriberService.addSubscriber(forumObject, userId)
+      .then(function() {
+        var strategy = TopicStrategy.nested({
+          currentUserId: userId
+        });
+
+        return serializeObject(fixture.topic1, strategy);
+      })
+      .then(function(serialized) {
+        assert.strictEqual(serialized.subscribed, true);
+      });
+  });
+
+  it('should tell a user when they are subscribed to a reply within a topic', function() {
+    var forumObject = ForumObject.createForReply(fixture.forum1._id, fixture.topic1._id, fixture.reply1._id);
+    var userId = fixture.user1._id;
+
+    return subscriberService.addSubscriber(forumObject, userId)
+      .then(function() {
+        var strategy = TopicStrategy.nested({
+          currentUserId: userId
+        });
+
+        return serializeObject(fixture.topic1, strategy);
+      })
+      .then(function(serialized) {
+        assert.strictEqual(serialized.replies[0].subscribed, true);
+      })
   });
 });
