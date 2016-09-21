@@ -9,6 +9,8 @@ var ForumWithPolicyService = require('../../../services/forum-with-policy-servic
 var restSerializer = require('../../../serializers/rest-serializer');
 var restful = require('../../../services/restful');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var SubscribersResource = require('./subscribers-resource');
+var ForumObject = require('gitter-web-topic-notifications/lib/forum-object');
 
 function getTopicOptions(body) {
   var title = body.title ? String(body.title) : undefined;
@@ -95,6 +97,12 @@ module.exports = {
 
   subresources: {
     'replies': require('./replies'),
+    'subscribers': new SubscribersResource({
+      id: 'topicSubscriber',
+      getForumObject: function(req) {
+        return ForumObject.createForTopic(req.forum._id, req.topic._id);
+      }
+    })
   },
 
 };
