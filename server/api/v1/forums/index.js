@@ -3,6 +3,7 @@
 var StatusError = require('statuserror');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var forumService = require('gitter-web-topics/lib/forum-service');
+var getTopicsFilterSortOptions = require('gitter-web-topics/lib/get-topics-filter-sort-options');
 var restSerializer = require('../../../serializers/rest-serializer');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
@@ -12,7 +13,10 @@ module.exports = {
 
   show: function(req) {
     var forum = req.forum;
-    var strategy = new restSerializer.ForumStrategy();
+    var topicsOptions = getTopicsFilterSortOptions(req.query);
+    var strategy = new restSerializer.ForumStrategy({
+      topics: topicsOptions
+    });
     return restSerializer.serializeObject(forum, strategy);
   },
 
