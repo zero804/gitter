@@ -41,6 +41,53 @@ function getCreateTopicOptions(body) {
   };
 }
 
+function collectPatchActions(forumWithPolicyService, topic, body) {
+  var promises = [];
+
+  var title;
+  if (body.hasOwnProperty('title')) {
+    title = String(body.title);
+    promises.push(forumWithPolicyService.setTopicTitle(topic, title));
+  }
+
+  var slug;
+  if (body.hasOwnProperty('slug')) {
+    slug = String(body.slug);
+    promises.push(forumWithPolicyService.setTopicSlug(topic, slug));
+  }
+
+  var tags;
+  if (body.hasOwnProperty('tags')) {
+    tags = getTags(body.tags);
+    promises.push(forumWithPolicyService.setTopicTags(topic, tags));
+  }
+
+  var sticky;
+  if (body.hasOwnProperty('sticky')) {
+    sticky = parseInt(body.sticky, 10);
+    promises.push(forumWithPolicyService.setTopicSticky(topic, sticky));
+  }
+
+  var text;
+  if (body.hasOwnProperty('text')) {
+    text = String(body.text);
+    promises.push(forumWithPolicyService.setTopicText(topic, text));
+  }
+
+  var categoryId;
+  var categoryPromise;
+  if (body.hasOwnProperty('categoryId')) {
+    categoryId = String(body.categoryId);
+    categoryPromise = forumCategoryService.findByIdForForum(topic.forumId, categoryId)
+      .then(function(category) {
+        if (!category) throw new StatusError(404, 'Category not found.');
+        return forumWithPolicyService.setTopicCategory(topic, category);
+      });
+    promises.push(categoryPromise);
+  }
+
+  return promises;
+}
 
 module.exports = {
   id: 'topic',
@@ -96,50 +143,7 @@ module.exports = {
     var topic = req.topic;
 
     var forumWithPolicyService = new ForumWithPolicyService(forum, user, policy);
-    var body = req.body;
-    var promises = [];
-
-    var title;
-    if (body.hasOwnProperty('title')) {
-      title = String(body.title);
-      promises.push(forumWithPolicyService.setTopicTitle(topic, title));
-    }
-
-    var slug;
-    if (body.hasOwnProperty('slug')) {
-      slug = String(body.slug);
-      promises.push(forumWithPolicyService.setTopicSlug(topic, slug));
-    }
-
-    var tags;
-    if (body.hasOwnProperty('tags')) {
-      tags = getTags(body.tags);
-      promises.push(forumWithPolicyService.setTopicTags(topic, tags));
-    }
-
-    var sticky;
-    if (body.hasOwnProperty('sticky')) {
-      sticky = parseInt(body.sticky, 10);
-      promises.push(forumWithPolicyService.setTopicSticky(topic, sticky));
-    }
-
-    var text;
-    if (body.hasOwnProperty('text')) {
-      text = String(body.text);
-      promises.push(forumWithPolicyService.setTopicText(topic, text));
-    }
-
-    var categoryId;
-    var categoryPromise;
-    if (body.hasOwnProperty('categoryId')) {
-      categoryId = String(body.categoryId);
-      categoryPromise = forumCategoryService.findByIdForForum(forum._id, categoryId)
-        .then(function(category) {
-          if (!category) throw new StatusError(404, 'Category not found.');
-          return forumWithPolicyService.setTopicCategory(topic, category);
-        });
-      promises.push(categoryPromise);
-    }
+    var promises = collectPatchActions(forumWithPolicyService, topic, req.body);
 
     return Promise.all(promises)
       .then(function() {
