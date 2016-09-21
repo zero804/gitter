@@ -5,7 +5,8 @@ var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var forumService = require('gitter-web-topics/lib/forum-service');
 var restSerializer = require('../../../serializers/rest-serializer');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
-
+var SubscribersResource = require('./subscribers-resource');
+var ForumObject = require('gitter-web-topic-notifications/lib/forum-object');
 
 module.exports = {
   id: 'forum',
@@ -23,6 +24,7 @@ module.exports = {
       .then(function(policy) {
         req.userForumPolicy = policy;
 
+        // TODO: this is no longer required if we're using the policy service
         return req.method === 'GET' ?
           policy.canRead() :
           policy.canWrite();
@@ -39,7 +41,13 @@ module.exports = {
 
   subresources: {
     'topics': require('./topics'),
-    'categories': require('./categories')
+    'categories': require('./categories'),
+    'subscribers': new SubscribersResource({
+      id: 'forumSubscriber',
+      getForumObject: function(req) {
+        return ForumObject.createForForum(req.forum._id)
+      }
+    })
   },
 
 };
