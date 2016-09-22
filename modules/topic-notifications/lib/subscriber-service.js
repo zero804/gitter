@@ -1,7 +1,7 @@
 'use strict';
 
 var Promise = require('bluebird');
-var ForumNotification = require('gitter-web-persistence').ForumNotification;
+var ForumSubscription = require('gitter-web-persistence').ForumSubscription;
 var ForumObject = require('./forum-object');
 var assert = require('assert');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
@@ -11,11 +11,22 @@ var _ = require('lodash');
 /**
  * List all the subscribers on a forum object
  */
-function listForItem(forumObject) {
+function listForItem(forumObject, options) {
   assert(forumObject.type !== ForumObject.TYPE.Comment);
 
-  var query = { forumId: forumObject.forumId, topicId: forumObject.topicId, replyId: forumObject.replyId };
-  return ForumNotification.distinct('userId', query)
+  var query = {
+    forumId: forumObject.forumId,
+    topicId: forumObject.topicId,
+    replyId: forumObject.replyId
+  };
+
+  if (options) {
+    if (options.auto === true || options.auto === false) {
+      query.auto = options.auto;
+    }
+  }
+
+  return ForumSubscription.distinct('userId', query)
     .lean()
     .exec();
 }
@@ -34,7 +45,7 @@ function addSubscriber(forumObject, userId) {
     replyId: forumObject.replyId
   };
 
-  return mongooseUtils.leanUpsert(ForumNotification, query, {
+  return mongooseUtils.leanUpsert(ForumSubscription, query, {
     $setOnInsert: query
   })
   .then(function(existing) {
@@ -56,7 +67,7 @@ function removeSubscriber(forumObject, userId) {
     replyId: forumObject.replyId
   };
 
-  return ForumNotification.remove(query)
+  return ForumSubscription.remove(query)
     .exec()
     .then(function(result) {
       return result && result.result && result.result.n > 0;
@@ -131,7 +142,7 @@ function createSubscriptionVisitorForUser(userId, type, forumObjects) {
     replyId: replyIds ? { $in: replyIds } : { $eq: null },
   };
 
-  return ForumNotification.find(query, { _id: 0, forumId: 1, topicId: 1, replyId: 1 })
+  return ForumSubscription.find(query, { _id: 0, forumId: 1, topicId: 1, replyId: 1 })
     .lean()
     .exec()
     .then(function(results) {
