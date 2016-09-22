@@ -66,7 +66,6 @@ const TopicContainer = createClass({
 
 
   render(){
-
     const { topicId, topicsStore, groupName, categoryStore, currentUserStore, tagStore } = this.props;
     const {replies, newReplyContent} = this.state;
     const topic = topicsStore.getById(topicId)
@@ -85,17 +84,6 @@ const TopicContainer = createClass({
     });
     const tags = tagStore.getTagsByLabel(tagValues);
 
-    var replyEditor;
-    if(isSignedIn) {
-      replyEditor = (
-        <TopicReplyEditor
-          user={currentUser}
-          value={newReplyContent}
-          onChange={this.onEditorUpdate}
-          onSubmit={this.onEditorSubmit}/>
-      );
-    }
-
     return (
       <main>
         <SearchHeader
@@ -111,7 +99,12 @@ const TopicContainer = createClass({
         </article>
         <TopicReplyListHeader replies={replies}/>
         <TopicReplyList replies={replies} />
-        {replyEditor}
+        <TopicReplyEditor
+          user={currentUser}
+          value={newReplyContent}
+          onChange={this.onEditorUpdate}
+          onSubmit={this.onEditorSubmit}
+          onEditorClick={this.onEditorClick}/>
       </main>
     );
   },
@@ -121,13 +114,34 @@ const TopicContainer = createClass({
   },
 
   onEditorSubmit(){
-    const {newReplyStore} = this.props;
-    dispatch(submitNewReply(newReplyStore.get('text')));
-    //Clear input
-    newReplyStore.clear();
-    this.setState((state) => Object.assign(state, {
-      newReplyContent: '',
-    }));
+    const {currentUserStore, newReplyStore} = this.props;
+    const currentUser = currentUserStore.getCurrentUser();
+    var isSignedIn = currentUser.id;
+
+
+    if(isSignedIn) {
+      dispatch(submitNewReply(newReplyStore.get('text')));
+      //Clear input
+      newReplyStore.clear();
+      this.setState((state) => Object.assign(state, {
+        newReplyContent: '',
+      }));
+    }
+    else {
+      // TODO: basePath
+      window.location = '/login';
+    }
+  },
+
+  onEditorClick() {
+    const { currentUserStore } = this.props;
+    const currentUser = currentUserStore.getCurrentUser();
+    var isSignedIn = currentUser.id;
+
+    if(!isSignedIn) {
+      // TODO: basePath
+      window.location = '/login';
+    }
   },
 
   updateReplyContent(){
