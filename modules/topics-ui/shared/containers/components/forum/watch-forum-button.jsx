@@ -1,19 +1,15 @@
 import _ from 'underscore';
 import React, { PropTypes } from 'react';
 import classNames from 'classnames';
-import {dispatch} from '../../../dispatcher';
 
-import attemptUpdateForumWatchState from '../../../action-creators/forum/attempt-update-forum-watch-state';
 import { FORUM_WATCH_STATE } from '../../../constants/forum.js';
 
 
 export default React.createClass({
 
-  displayName: 'WatchForumLink',
+  displayName: 'WatchForumButton',
 
   propTypes: {
-    userId: PropTypes.string.isRequired,
-    forumId: PropTypes.string.isRequired,
     children: PropTypes.node,
     onClick: PropTypes.func,
     className: PropTypes.string,
@@ -29,29 +25,35 @@ export default React.createClass({
       pending: watchState === FORUM_WATCH_STATE.PENDING
     })
 
+    var unfollowCompiledClassNames = classNames({
+      [itemClassName]: true,
+      hidden: watchState !== FORUM_WATCH_STATE.WATCHING
+    });
+
+    var followCompiledClassNames = classNames({
+      [itemClassName]: true,
+      hidden: watchState !== FORUM_WATCH_STATE.NOT_WATCHING
+    });
+
+    var pendingCompiledClassNames = classNames({
+      [itemClassName]: true,
+      hidden: watchState !== FORUM_WATCH_STATE.PENDING
+    });
+
     var watchNodes = [
       <span
         key="unfollow"
-        className={classNames({
-          [itemClassName]: true,
-          hidden: watchState !== FORUM_WATCH_STATE.WATCHING
-        })}>
+        className={unfollowCompiledClassNames}>
         Unfollow
       </span>,
       <span
         key="follow"
-        className={classNames({
-          [itemClassName]: true,
-          hidden: watchState !== FORUM_WATCH_STATE.NOT_WATCHING
-        })}>
+        className={followCompiledClassNames}>
         Follow
       </span>,
       <span
         key="pending"
-        className={classNames({
-          [itemClassName]: true,
-          hidden: watchState !== FORUM_WATCH_STATE.PENDING
-        })}>
+        className={pendingCompiledClassNames}>
         ...
       </span>
     ];
@@ -69,11 +71,8 @@ export default React.createClass({
 
   onClick(e){
     e.preventDefault();
-    const {userId, forumId, onClick, watchState} = this.props;
+    const {onClick} = this.props;
     if(onClick) { return onClick(...arguments); }
-
-    var desiredIsWatching = (watchState !== FORUM_WATCH_STATE.WATCHING);
-    dispatch(attemptUpdateForumWatchState(forumId, userId, desiredIsWatching));
   }
 
 });

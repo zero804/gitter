@@ -76,15 +76,12 @@ const TopicContainer = createClass({
 
   render(){
 
-    const { forumStore, topicId, topicsStore, groupName, categoryStore, currentUserStore, tagStore } = this.props;
-    const {replies, newReplyContent} = this.state;
+    const { topicId, topicsStore, groupName, categoryStore, currentUserStore, tagStore } = this.props;
+    const {forumId, forumWatchState, replies, newReplyContent} = this.state;
     const topic = topicsStore.getById(topicId);
     const currentUser = currentUserStore.getCurrentUser();
     const topicCategory = topic.category;
     const category = categoryStore.getById(topicCategory.id);
-    const forumId = forumStore.getForumId();
-    const forumWatchState = forumStore.getWatchState();
-
 
     //TODO remove
     //This is here because sometimes you can get un-parsed tags

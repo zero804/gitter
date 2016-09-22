@@ -1,14 +1,14 @@
 import assert from 'assert';
 import React from 'react';
 import { shallow } from 'enzyme';
-import WatchForumLink from '../../../../shared/componentslinksfollow-forum-link.jsx';
+import WatchForumButton from '../../../../../../shared/containers/components/forum/watch-forum-button.jsx';
 
-describe.only('<WatchForumLink/>', () => {
+describe('<WatchForumButton/>', () => {
 
   let wrapper;
 
   beforeEach(() => {
-    wrapper = shallow(<WatchForumLink/>);
+    wrapper = shallow(<WatchForumButton/>);
   });
 
   it('should fail a test because you should write some', () => {
