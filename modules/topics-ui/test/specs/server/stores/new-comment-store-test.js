@@ -1,7 +1,7 @@
 "use strict";
 
 var assert = require('assert');
-var newCommentStoreStore = require('../../../../server/stores/new-comment-store-store');
+var newCommentStoreStore = require('../../../../server/stores/new-comment-store');
 
 describe('newCommentStoreStore', () => {
 

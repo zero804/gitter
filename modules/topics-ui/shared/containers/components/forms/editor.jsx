@@ -13,19 +13,21 @@ export default React.createClass({
     onEnter: PropTypes.func,
     value: PropTypes.string,
     placeholder: PropTypes.string,
+    autoFocus: PropTypes.bool,
   },
 
-  onComponentDidMount(){
-
+  getDefaultProps(){
+    return { autoFocus: false }
   },
 
   render(){
 
-    const { className, name, value, placeholder } = this.props;
+    const { className, name, value, placeholder, autoFocus } = this.props;
     const compiledClass = classNames('editor', className);
 
     return (
       <textarea
+        autoFocus={autoFocus}
         ref="editor"
         className={compiledClass}
         name={name}

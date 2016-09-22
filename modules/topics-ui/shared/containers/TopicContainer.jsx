@@ -10,8 +10,8 @@ import updateReplyBody from '../action-creators/create-reply/body-update';
 import submitNewReply from '../action-creators/create-reply/submit-new-reply';
 import updateCommentBody from '../action-creators/create-comment/body-update';
 import submitNewComment from '../action-creators/create-comment/submit-new-comment';
-
 import showReplyComments from '../action-creators/topic/show-reply-comments';
+
 const TopicContainer = createClass({
 
   displayName: 'TopicContainer',
@@ -56,21 +56,25 @@ const TopicContainer = createClass({
   },
 
   componentDidMount(){
-    const {repliesStore, newReplyStore, commentsStore} = this.props;
+    const {repliesStore, newReplyStore, commentsStore, newCommentStore} = this.props;
     repliesStore.onChange(this.updateReplies, this);
     commentsStore.onChange(this.updateComments, this);
+    newCommentStore.onChange(this.updateNewComment, this);
+
     newReplyStore.on('change:text', this.updateReplyContent, this);
   },
 
   componentWillUnmount(){
-    const {repliesStore, newReplyStore} = this.props;
+    const {repliesStore, newReplyStore, commentsStore, newCommentStore} = this.props;
     repliesStore.removeListeners(this.updateReplies, this);
+    commentsStore.removeListeners(this.updateComments, this);
+    newCommentStore.removeListeners(this.updateNewComment, this);
+
     newReplyStore.off('change:text', this.updateReplyContent, this);
   },
 
   getInitialState(){
     return {
-      replies: this.getParsedReplies(),
       newReplyContent: '',
     };
   },
@@ -78,7 +82,7 @@ const TopicContainer = createClass({
 
   render(){
 
-    const { topicId, topicsStore, groupName, categoryStore, currentUserStore, tagStore } = this.props;
+    const { topicId, topicsStore, groupName, categoryStore, currentUserStore, tagStore, newCommentStore } = this.props;
     const {replies, newReplyContent} = this.state;
     const topic = topicsStore.getById(topicId)
     const currentUser = currentUserStore.getCurrentUser();
@@ -94,6 +98,8 @@ const TopicContainer = createClass({
     });
     const tags = tagStore.getTagsByLabel(tagValues);
 
+    const parsedReplies = this.getParsedReplies();
+
     return (
       <main>
         <SearchHeader groupName={groupName}/>
@@ -105,9 +111,10 @@ const TopicContainer = createClass({
             tags={tags}/>
           <TopicBody topic={topic} />
         </article>
-        <TopicReplyListHeader replies={replies}/>
+        <TopicReplyListHeader replies={parsedReplies}/>
         <TopicReplyList
-          replies={replies}
+          newCommentContent={newCommentStore.get('text')}
+          replies={parsedReplies}
           submitNewComment={this.submitNewComment}
           onNewCommentUpdate={this.onNewCommentUpdate}
           onReplyCommentsClicked={this.onReplyCommentsClicked}/>
@@ -151,9 +158,7 @@ const TopicContainer = createClass({
   },
 
   updateComments(){
-    this.setState((state) => Object.assign({}, state, {
-      replies: this.getParsedReplies(),
-    }));
+    this.forceUpdate();
   },
 
   getParsedReplies(){
@@ -173,8 +178,14 @@ const TopicContainer = createClass({
   },
 
   submitNewComment(){
-    dispatch(submitNewComment());
-  }
+    const {newCommentStore} = this.props;
+    dispatch(submitNewComment(
+      newCommentStore.get('replyId'),
+      newCommentStore.get('text')
+    ));
+  },
+
+  updateNewComment(){ this.forceUpdate(); }
 
 });
 

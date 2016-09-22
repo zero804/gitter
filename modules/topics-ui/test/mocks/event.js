@@ -1,7 +1,6 @@
 export default {
-  preventDefault: function(){
-
-  },
+  preventDefault: function(){},
+  stopPropagation: function(){},
   target: {
     value: ''
   }
