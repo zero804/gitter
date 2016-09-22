@@ -12,11 +12,23 @@ export default React.createClass({
   displayName: 'SearchHeader',
   propTypes: {
     groupName: PropTypes.string.isRequired,
+    isSignedIn: PropTypes.bool
   },
 
   render(){
 
-    const {groupName} = this.props;
+    const {groupName, isSignedIn} = this.props;
+
+    let createTopicHref;
+    if(!isSignedIn) {
+      // TODO: use basePath
+      createTopicHref = '/login';
+    }
+
+    let disableCreateTopicNavigation = false;
+    if(!isSignedIn) {
+      disableCreateTopicNavigation = true;
+    }
 
     return (
       <Container>
@@ -34,7 +46,11 @@ export default React.createClass({
             placeholder="Search for topics, replies and comments"
             onChange={this.onSearchUpdate}
             className="topic-search__search-input"/>
-          <CreateTopicLink groupName={groupName} className="topic-search__create-topic-link">
+          <CreateTopicLink
+            groupName={groupName}
+            className="topic-search__create-topic-link"
+            href={createTopicHref}
+            disableNavigation={disableCreateTopicNavigation}>
             Create Topic
           </CreateTopicLink>
         </Panel>
