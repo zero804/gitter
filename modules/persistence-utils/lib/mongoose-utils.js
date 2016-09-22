@@ -125,10 +125,7 @@ function leanUpsert(schema, query, setOperation) {
 
 /**
  * Performs a safe upsert,
- * returns an Promise of a boolean indicating
- * that the document already exists
- *   - true: means the query matched an existing document
- *   - false: means a new document was inserted
+ * returns an Promise of the mongodb update result
  */
 function safeUpsertUpdate(schema, query, setOperation) {
   var attempts = 0;
