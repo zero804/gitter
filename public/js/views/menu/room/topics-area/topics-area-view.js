@@ -9,7 +9,6 @@ require('../../../behaviors/isomorphic');
 
 var TopicsAreaView = Marionette.LayoutView.extend({
   className: function() {
-    console.log('TopicsAreaView-className');
     return 'left-menu-topics-area-inner';
   },
   template: template,
@@ -21,18 +20,9 @@ var TopicsAreaView = Marionette.LayoutView.extend({
   },
 
   initCategoryCollectionView: function(optionsForRegion) {
-    console.log('initCategoryCollectionView');
     return new CategoryCollectionView(optionsForRegion({
       collection: this.collection
     }));
-  },
-
-  initialize: function() {
-    console.log('TopicsAreaView');
-  },
-
-  onRender: function() {
-    console.log('TopicsAreaView-render', this.el);
   }
 
 });
