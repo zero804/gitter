@@ -1,6 +1,5 @@
 "use strict";
 
-var Promise = require('bluebird');
 var StatusError = require('statuserror');
 var internalClientAccessOnly = require('../../../web/middlewares/internal-client-access-only');
 var replyService = require('gitter-web-topics/lib/reply-service');
@@ -8,6 +7,8 @@ var ForumWithPolicyService = require('../../../services/forum-with-policy-servic
 var restSerializer = require('../../../serializers/rest-serializer');
 var restful = require('../../../services/restful');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var SubscribersResource = require('./subscribers-resource');
+var ForumObject = require('gitter-web-topic-notifications/lib/forum-object');
 
 
 function getReplyOptions(body) {
@@ -68,5 +69,11 @@ module.exports = {
 
   subresources: {
     'comments': require('./comments'),
+    'subscribers': new SubscribersResource({
+      id: 'replySubscriber',
+      getForumObject: function(req) {
+        return ForumObject.createForReply(req.forum._id, req.topic._id, req.reply._id);
+      }
+    })
   },
 };
