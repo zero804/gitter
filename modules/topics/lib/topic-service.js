@@ -227,7 +227,11 @@ function updateTopic(topicId, fields) {
     _id: topicId
   };
   var update = {
-    $set: fields
+    $set: fields,
+    $max: {
+      // certainly modified, but not necessarily changed or edited.
+      lastModified: new Date()
+    }
   };
   return Topic.findOneAndUpdate(query, update, { new: true })
     .lean()
@@ -247,7 +251,6 @@ function setTopicTitle(user, topic, title) {
 
   return updateTopic(topicId, { title: title })
     .then(function(updatedTopic) {
-      // log a stats event
       stats.event('update_topic_title', {
         userId: userId,
         forumId: forumId,
@@ -255,7 +258,10 @@ function setTopicTitle(user, topic, title) {
         title: title
       });
 
-      liveCollections.topics.emit('patch', forumId, topicId, { title: updatedTopic.title });
+      liveCollections.topics.emit('patch', forumId, topicId, {
+        title: updatedTopic.title,
+        lastModified: updatedTopic.lastModified.toISOString()
+      });
 
       return updatedTopic;
     });
@@ -274,7 +280,6 @@ function setTopicSlug(user, topic, slug) {
 
   return updateTopic(topicId, { slug: slug })
     .then(function(updatedTopic) {
-      // log a stats event
       stats.event('update_topic_slug', {
         userId: userId,
         forumId: forumId,
@@ -282,7 +287,10 @@ function setTopicSlug(user, topic, slug) {
         slug: slug
       });
 
-      liveCollections.topics.emit('patch', forumId, topicId, { slug: updatedTopic.slug });
+      liveCollections.topics.emit('patch', forumId, topicId, {
+        slug: updatedTopic.slug,
+        lastModified: updatedTopic.lastModified.toISOString()
+      });
 
       return updatedTopic;
     });
@@ -308,7 +316,6 @@ function setTopicTags(user, topic, tags, options) {
 
   return updateTopic(topicId, { tags: tags })
     .then(function(updatedTopic) {
-      // log a stats event
       stats.event('update_topic_tags', {
         userId: userId,
         forumId: forumId,
@@ -316,7 +323,10 @@ function setTopicTags(user, topic, tags, options) {
         tags: tags
       });
 
-      liveCollections.topics.emit('patch', forumId, topicId, { tags: updatedTopic.tags });
+      liveCollections.topics.emit('patch', forumId, topicId, {
+        tags: updatedTopic.tags,
+        lastModified: updatedTopic.lastModified.toISOString()
+      });
 
       return updatedTopic;
     });
@@ -335,7 +345,6 @@ function setTopicSticky(user, topic, sticky) {
 
   return updateTopic(topicId, { sticky: sticky })
     .then(function(updatedTopic) {
-      // log a stats event
       stats.event('update_topic_sticky', {
         userId: userId,
         forumId: forumId,
@@ -343,7 +352,10 @@ function setTopicSticky(user, topic, sticky) {
         sticky: sticky
       });
 
-      liveCollections.topics.emit('patch', forumId, topicId, { sticky: updatedTopic.sticky });
+      liveCollections.topics.emit('patch', forumId, topicId, {
+        sticky: updatedTopic.sticky,
+        lastModified: updatedTopic.lastModified.toISOString()
+      });
 
       return updatedTopic;
     });
@@ -363,6 +375,8 @@ function setTopicText(user, topic, text) {
   return processText(text)
     .then(function(parsedMessage) {
       return updateTopic(topicId, {
+          // changed edited date because the text changed
+          editedAt: new Date(),
           text: text,
           html: parsedMessage.html,
           lang: parsedMessage.lang,
@@ -370,7 +384,6 @@ function setTopicText(user, topic, text) {
       })
     })
     .then(function(updatedTopic) {
-      // log a stats event
       stats.event('update_topic_text', {
         userId: userId,
         forumId: forumId,
@@ -381,8 +394,10 @@ function setTopicText(user, topic, text) {
       liveCollections.topics.emit('patch', forumId, topicId, {
         body: {
           text: updatedTopic.text,
-          html: updatedTopic.html
-        }
+          html: updatedTopic.html,
+        },
+        editedAt: updatedTopic.editedAt.toISOString(),
+        lastModified: updatedTopic.lastModified.toISOString()
       });
 
       return updatedTopic;
@@ -398,7 +413,6 @@ function setTopicCategory(user, topic, category) {
 
   return updateTopic(topicId, { categoryId: category._id })
     .then(function(updatedTopic) {
-      // log a stats event
       stats.event('update_topic_category', {
         userId: userId,
         forumId: forumId,
@@ -407,7 +421,8 @@ function setTopicCategory(user, topic, category) {
       });
 
       liveCollections.topics.emit('patch', forumId, topicId, {
-        categoryId: category._id
+        categoryId: updatedTopic.categoryId,
+        lastModified: updatedTopic.lastModified.toISOString()
       });
 
       return updatedTopic;
