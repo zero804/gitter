@@ -8,6 +8,7 @@ import TopicReplyList from './components/topic/topic-reply-list.jsx';
 import {dispatch} from '../dispatcher';
 import updateReplyBody from '../action-creators/create-reply/body-update';
 import submitNewReply from '../action-creators/create-reply/submit-new-reply';
+import updateCommentBody from '../action-creators/create-comment/body-update';
 
 import showReplyComments from '../action-creators/topic/show-reply-comments';
 const TopicContainer = createClass({
@@ -167,7 +168,7 @@ const TopicContainer = createClass({
   },
 
   onNewCommentUpdate(replyId, val) {
-    //TODO
+    dispatch(updateCommentBody(replyId, val));
   },
 
   submitNewComment(){
