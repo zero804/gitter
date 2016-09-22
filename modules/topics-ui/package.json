@@ -19,9 +19,10 @@
     "react-dom": "^15.3.1",
     "sinon": "^1.17.5",
     "moment": "^2.10.3",
+    "fuzzysearch": "^1.0.3",
+    "gitter-web-avatars": "file:../avatars",
     "gitter-realtime-client": "^1.6.1",
     "gitter-web-slugify": "file:../slugify",
-    "fuzzysearch": "^1.0.3",
     "gitter-client-env": "file:../client-env"
   },
   "devDependencies": {

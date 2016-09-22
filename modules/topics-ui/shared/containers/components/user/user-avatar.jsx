@@ -19,7 +19,7 @@ export default React.createClass({
   render(){
     const { width, height, className } = this.props;
     let { avatarUrl, displayName } = this.props.user;
-    const compiledClass = classNames("avatar--user", className);
+    const compiledClass = classNames('avatar--user', className);
 
     if(!avatarUrl) {
       avatarUrl = avatars.getDefault();
