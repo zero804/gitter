@@ -9,12 +9,20 @@ describe('add-invite-policy-factory', function() {
   describe('createPolicyForRoomAdd', function() {
 
     var FIXTURES = [{
-      name: 'should allow any user to be added to private unbacked rooms',
+      name: 'should allow any user to be added to private INVITE unbacked rooms',
       delegateResponse: false,
       expectedCanJoin: true,
       sd: {
         type: null,
         members: 'INVITE'
+      }
+    }, {
+      name: 'should allow any user to be added to private INVITE_OR_ADMIN unbacked rooms',
+      delegateResponse: false,
+      expectedCanJoin: true,
+      sd: {
+        type: null,
+        members: 'INVITE_OR_ADMIN'
       }
     }, {
       name: 'should allow any user to be added to public unbacked rooms',

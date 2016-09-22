@@ -9,10 +9,6 @@ var PRERENDERED_VIEWS = [
   "js/views/menu/room/primary-collection/primary-collection-item-view",
   "js/views/menu/room/minibar/minibar-item-view",
 
-  //OLD SEARCH
-  "js/views/search/tmpl/search-input",
-  "js/views/search/tmpl/search",
-
   //OLD MENU
   "js/views/menu/old/tmpl/troupeMenu",
   "js/views/menu/old/tmpl/profile",

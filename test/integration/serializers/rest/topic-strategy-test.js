@@ -8,6 +8,8 @@ var assertUtils = require('../../assert-utils')
 var serialize = testRequire('./serializers/serialize');
 var TopicStrategy = testRequire('./serializers/rest/topic-strategy');
 
+var LONG_AGO = '2014-01-01T00:00:00.000Z';
+
 // TODO: move this somewhere reusable otherwise we'll end up with it
 // copy/pasted everywhere
 function makeHash() {
@@ -17,7 +19,6 @@ function makeHash() {
   }
   return hash;
 }
-
 
 describe('TopicStrategy', function() {
   var blockTimer = require('../../block-timer');
@@ -34,13 +35,14 @@ describe('TopicStrategy', function() {
       user: 'user1',
       forum: 'forum1',
       category: 'category1',
-      sent: new Date('2014-01-01T00:00:00.000Z')
+      sent: new Date(LONG_AGO),
+      repliesTotal: 1
     },
     reply1: {
       user: 'user1',
       forum: 'forum1',
       topic: 'topic1',
-      sent: new Date('2014-01-01T00:00:00.000Z')
+      sent: new Date(LONG_AGO)
     }
   });
 
@@ -81,9 +83,10 @@ describe('TopicStrategy', function() {
             "displayName": user.displayName,
             "avatarUrl":  nconf.get('avatar:officialHost') + '/g/u/' + user.username
           }],
-          sent: '2014-01-01T00:00:00.000Z',
+          sent: LONG_AGO,
           editedAt: null,
-          lastModified: null,
+          lastChanged: LONG_AGO,
+          lastModified: LONG_AGO,
           v: 1
         }])
       });
@@ -132,9 +135,10 @@ describe('TopicStrategy', function() {
               displayName: user.displayName,
               avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username
             },
-            sent: '2014-01-01T00:00:00.000Z',
+            sent: LONG_AGO,
             editedAt: null,
-            lastModified: null,
+            lastChanged: LONG_AGO,
+            lastModified: LONG_AGO,
             v: 1
           }],
           repliesTotal: 1,
@@ -144,9 +148,10 @@ describe('TopicStrategy', function() {
             displayName: user.displayName,
             avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username
           }],
-          sent: '2014-01-01T00:00:00.000Z',
+          sent: LONG_AGO,
           editedAt: null,
-          lastModified: null,
+          lastChanged: LONG_AGO,
+          lastModified: LONG_AGO,
           v: 1
         }])
       });
@@ -178,9 +183,10 @@ describe('TopicStrategy', function() {
               slug: category.slug
             },
             user: fixture.user1.id,
-            sent: '2014-01-01T00:00:00.000Z',
+            sent: LONG_AGO,
             editedAt: null,
-            lastModified: null,
+            lastChanged: LONG_AGO,
+            lastModified: LONG_AGO,
             v: 1
           }],
           lookups: {
@@ -222,9 +228,10 @@ describe('TopicStrategy', function() {
               displayName: user.displayName,
               avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
             },
-            sent: '2014-01-01T00:00:00.000Z',
+            sent: LONG_AGO,
             editedAt: null,
-            lastModified: null,
+            lastChanged: LONG_AGO,
+            lastModified: LONG_AGO,
             v: 1
           }],
           lookups: {

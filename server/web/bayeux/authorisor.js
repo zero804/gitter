@@ -14,6 +14,8 @@ var Promise = require('bluebird');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var debug = require('debug')('gitter:app:bayeux-authorisor');
 var recentRoomService = require('../../services/recent-room-service');
+var topicService = require('gitter-web-topics/lib/topic-service');
+var replyService = require('gitter-web-topics/lib/reply-service');
 
 var survivalMode = !!process.env.SURVIVAL_MODE || false;
 
@@ -41,8 +43,12 @@ var routes = [{
     populator: populateTopicsCollection
   }, {
     re: /^\/api\/v1\/forums\/(\w+)\/topics\/(\w+)\/replies$/,
-    validator: validateUserForForumSubscription,
+    validator: validateUserForTopicSubscription,
     populator: populateRepliesCollection
+  }, {
+    re: /^\/api\/v1\/forums\/(\w+)\/topics\/(\w+)\/replies\/(\w+)\/comments$/,
+    validator: validateUserForReplySubscription,
+    populator: populateCommentsCollection
   }, {
     re: /^\/api\/v1\/user\/(\w+)\/(\w+)$/,
     validator: validateUserForUserSubscription,
@@ -119,6 +125,41 @@ function validateUserForForumSubscription(options) {
   return policyFactory.createPolicyForUserIdInForumId(userId, forumId)
     .then(function(policy) {
       return policy.canRead();
+    });
+}
+
+function validateUserForTopicSubscription(options) {
+  var match = options.match;
+
+  var forumId = match[1];
+  var topicId = match[2];
+
+  // first make sure that the topic exists and is actually in the specified
+  // forum
+  return topicService.findByIdForForum(forumId, topicId)
+    .then(function(topic) {
+      if (!topic) return false;
+
+      // then pass the options along to see if the user can access this forum
+      return validateUserForForumSubscription(options);
+    });
+}
+
+function validateUserForReplySubscription(options) {
+  var match = options.match;
+
+  var forumId = match[1];
+  var topicId = match[2];
+  var replyId = match[3];
+
+  // first make sure that the reply exists and is actually in the specified
+  // forum and topic
+  return replyService.findByIdForForumAndTopic(forumId, topicId, replyId)
+    .then(function(reply) {
+      if (!reply) return false;
+
+      // then pass the options along to see if the user can access this forum
+      return validateUserForForumSubscription(options);
     });
 }
 
@@ -290,7 +331,9 @@ function populateTopicsCollection(options) {
     return Promise.resolve();
   }
 
-  return restful.serializeTopicsForForumId(forumId)
+  var snapshotOptions = options.snapshot || {};
+
+  return restful.serializeTopicsForForumId(forumId, snapshotOptions)
     .then(dataToSnapshot('forum.topics'));
 }
 
@@ -305,6 +348,20 @@ function populateRepliesCollection(options) {
 
   return restful.serializeRepliesForTopicId(topicId)
     .then(dataToSnapshot('forum.replies'));
+}
+
+function populateCommentsCollection(options) {
+  var match = options.match;
+  var forumId = match[1];
+  var topicId = match[2];
+  var replyId = match[3];
+
+  if (!forumId || !topicId || !replyId) {
+    return Promise.resolve();
+  }
+
+  return restful.serializeCommentsForReplyId(replyId)
+    .then(dataToSnapshot('forum.comments'));
 }
 
 // Authorize a sbscription message

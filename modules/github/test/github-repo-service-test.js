@@ -6,7 +6,7 @@ var GitHubRepoService = require('..').GitHubRepoService;
 
 var FAKE_USER = { username: 'gittertestbot', githubToken: '***REMOVED***'};
 
-describe('github-repo-service #slow', function() {
+describe('github-repo-service #slow #github', function() {
   var ghRepo;
 
 

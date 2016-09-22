@@ -12,7 +12,7 @@ var MenuBuilder = require('../../utils/menu-builder');
 var appEvents = require('../../utils/appevents');
 var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
 
-var apiClient = require('../../components/apiClient');
+var apiClient = require('../../components/api-client');
 var userNotifications = require('../../components/user-notifications');
 var Dropdown = require('../controls/dropdown');
 var KeyboardEventMixin = require('../keyboard-events-mixin');
@@ -97,7 +97,7 @@ var HeaderView = Marionette.ItemView.extend({
 
     var isStaff = context.isStaff();
     var isAdmin = context.isTroupeAdmin();
-    var canChangeGroupAvatar = isStaff || isAdmin;
+    var canChangeGroupAvatar = data.groupId && (isStaff || isAdmin);
     _.extend(data, {
       headerView: getHeaderViewOptions(data),
       user: !!context.isLoggedIn(),

@@ -56,7 +56,6 @@ describe('reply-api', function() {
           return r.id === fixture.reply1.id;
         });
         assert.strictEqual(reply.id, fixture.reply1.id);
-        assert.strictEqual(reply.commentsTotal, 1);
         assert.strictEqual(reply.comments.length, 1);
       });
   });
@@ -69,7 +68,6 @@ describe('reply-api', function() {
       .then(function(result) {
         var reply = result.body;
         assert.strictEqual(reply.id, fixture.reply1.id);
-        assert.strictEqual(reply.commentsTotal, 1);
         assert.strictEqual(reply.comments.length, 1);
       });
   });
@@ -87,5 +85,39 @@ describe('reply-api', function() {
         assert.strictEqual(reply.body.text, 'I am a reply.');
       });
   });
+
+
+
+  it('GET /v1/forums/:forumId/topics/:topicId/replies/:replyId/subscribers', function() {
+    return request(app)
+      .get('/v1/forums/' + fixture.forum1.id + '/topics/' + fixture.topic1.id + '/replies/' + fixture.reply1.id + '/subscribers')
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+      .then(function(result) {
+        var body = result.body;
+        assert(Array.isArray(body))
+      });
+  });
+
+  it('POST /v1/forums/:forumId/topics/:topicId/replies/:replyId/subscribers', function() {
+    return request(app)
+      .post('/v1/forums/' + fixture.forum1.id + '/topics/' + fixture.topic1.id + '/replies/' + fixture.reply1.id + '/subscribers')
+      .send({
+      })
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+      .then(function(result) {
+        var body = result.body;
+        assert.strictEqual(body.id, fixture.user1.id)
+      });
+  });
+
+  it('DELETE /v1/forums/:forumId/topics/:topicId/replies/:replyId/subscribers', function() {
+    return request(app)
+      .del('/v1/forums/' + fixture.forum1.id + '/topics/' + fixture.topic1.id + '/replies/' + fixture.reply1.id + '/subscribers/' + fixture.user1.id)
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(204)
+  });
+
 
 });
