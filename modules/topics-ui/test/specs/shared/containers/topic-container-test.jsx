@@ -15,7 +15,7 @@ import {SHOW_REPLY_COMMENTS} from '../../../../shared/constants/topic';
 import commentsStore from '../../../mocks/comments-store';
 import {COMMENT_BODY_UPDATE, SUBMIT_NEW_COMMENT} from '../../../../shared/constants/create-comment';
 
-describe.only('<TopicContainer />', () => {
+describe('<TopicContainer />', () => {
 
   let wrapper;
 
