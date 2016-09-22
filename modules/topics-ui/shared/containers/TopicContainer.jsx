@@ -9,6 +9,7 @@ import {dispatch} from '../dispatcher';
 import updateReplyBody from '../action-creators/create-reply/body-update';
 import submitNewReply from '../action-creators/create-reply/submit-new-reply';
 import updateCommentBody from '../action-creators/create-comment/body-update';
+import submitNewComment from '../action-creators/create-comment/submit-new-comment';
 
 import showReplyComments from '../action-creators/topic/show-reply-comments';
 const TopicContainer = createClass({
@@ -172,7 +173,7 @@ const TopicContainer = createClass({
   },
 
   submitNewComment(){
-    //TODO
+    dispatch(submitNewComment());
   }
 
 });

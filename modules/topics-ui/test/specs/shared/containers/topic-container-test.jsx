@@ -13,7 +13,7 @@ import {BODY_UPDATE, SUBMIT_NEW_REPLY} from '../../../../shared/constants/create
 import tagStore from '../../../mocks/tag-store';
 import {SHOW_REPLY_COMMENTS} from '../../../../shared/constants/topic';
 import commentsStore from '../../../mocks/comments-store';
-import {COMMENT_BODY_UPDATE} from '../../../../shared/constants/create-comment';
+import {COMMENT_BODY_UPDATE, SUBMIT_NEW_COMMENT} from '../../../../shared/constants/create-comment';
 
 describe.only('<TopicContainer />', () => {
 
@@ -96,6 +96,13 @@ describe.only('<TopicContainer />', () => {
     const handle = spy();
     subscribe(COMMENT_BODY_UPDATE, handle);
     wrapper.find('TopicReplyList').at(0).prop('onNewCommentUpdate')();
+    equal(handle.callCount, 1);
+  });
+
+  it('should dispatch the right event when the comment is submitted', () => {
+    const handle = spy();
+    subscribe(SUBMIT_NEW_COMMENT, handle);
+    wrapper.find('TopicReplyList').at(0).prop('submitNewComment')();
     equal(handle.callCount, 1);
   });
 
