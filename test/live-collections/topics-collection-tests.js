@@ -13,8 +13,14 @@ require('../../server/event-listeners').install();
 describe('topics-live-collection', function() {
   var fixture = fixtureLoader.setup({
     user1: {},
-    forum1: {},
+    forum1: {
+      tags: ['cats', 'dogs']
+    },
     category1: {
+      forum: 'forum1'
+    },
+    // for changing the category
+    category2: {
       forum: 'forum1'
     },
     // for patching the topic when adding a reply
@@ -25,6 +31,22 @@ describe('topics-live-collection', function() {
     },
     // for patching the topic when adding a comment to its reply
     topic2: {
+      user: 'user1',
+      forum: 'forum1',
+      category: 'category1'
+    },
+    // for other smaller patches
+    topic3: {
+      user: 'user1',
+      forum: 'forum1',
+      category: 'category1'
+    },
+    topic4: {
+      user: 'user1',
+      forum: 'forum1',
+      category: 'category1'
+    },
+    topic5: {
       user: 'user1',
       forum: 'forum1',
       category: 'category1'
@@ -117,6 +139,133 @@ describe('topics-live-collection', function() {
             assert.strictEqual(topic.lastChanged.getTime(), lastChanged.getTime());
             assert.strictEqual(topic.lastModified.getTime(), lastModified.getTime());
           });
+      });
+  });
+
+  it('should emit an update event when changing the title', function() {
+    var checkEvent = appEvents.addListener('dataChange2', {
+      url: '/forums/' + fixture.forum1.id + '/topics',
+      operation: 'update',
+      type: 'topic',
+      model: {
+        id: fixture.topic3.id.toString(),
+        title: 'new title'
+      },
+    });
+
+    return topicService.updateTopic(fixture.user1, fixture.topic3, {
+        title: 'new title'
+      })
+      .then(checkEvent)
+      .then(function(event) {
+        // the patch event must also contain lastModified
+        assert.ok(event.model.lastModified);
+      });
+  });
+
+  it('should emit an update event when changing the slug', function() {
+    var checkEvent = appEvents.addListener('dataChange2', {
+      url: '/forums/' + fixture.forum1.id + '/topics',
+      operation: 'update',
+      type: 'topic',
+      model: {
+        id: fixture.topic4.id.toString(),
+        slug: 'new-slug'
+      },
+    });
+
+    return topicService.updateTopic(fixture.user1, fixture.topic4, {
+        slug: 'new-slug'
+      })
+      .then(checkEvent)
+      .then(function(event) {
+        // the patch event must also contain lastModified
+        assert.ok(event.model.lastModified);
+      });
+  });
+
+  it('should emit an update event when changing the text', function() {
+    var checkEvent = appEvents.addListener('dataChange2', {
+      url: '/forums/' + fixture.forum1.id + '/topics',
+      operation: 'update',
+      type: 'topic',
+      model: {
+        id: fixture.topic5.id.toString(),
+        body: {
+          text: 'new text',
+          html: 'new text',
+        }
+      },
+    });
+
+    return topicService.updateTopic(fixture.user1, fixture.topic5, {
+        text: 'new text'
+      })
+      .then(checkEvent)
+      .then(function(event) {
+        // the patch event must also contain editedAt & lastModified
+        assert.ok(event.model.editedAt);
+        assert.ok(event.model.lastModified);
+      });
+  });
+
+  it('should emit a patch event when changing the tags', function() {
+    var checkEvent = appEvents.addListener('dataChange2', {
+      url: '/forums/' + fixture.forum1.id + '/topics',
+      operation: 'patch',
+      type: 'topic',
+      model: {
+        id: fixture.topic3.id.toString(),
+        tags: ['cats', 'dogs']
+      },
+    });
+
+    return topicService.setTopicTags(fixture.user1, fixture.topic3, ['cats', 'dogs'], {
+        allowedTags: fixture.forum1.tags
+      })
+      .then(checkEvent)
+      .then(function(event) {
+        // the patch event must also contain lastModified
+        assert.ok(event.model.lastModified);
+      });
+  });
+
+  it('should emit a patch event when changing the sticky number', function() {
+    var checkEvent = appEvents.addListener('dataChange2', {
+      url: '/forums/' + fixture.forum1.id + '/topics',
+      operation: 'patch',
+      type: 'topic',
+      model: {
+        id: fixture.topic3.id.toString(),
+        sticky: 1
+      },
+    });
+
+    return topicService.setTopicSticky(fixture.user1, fixture.topic3, 1)
+      .then(checkEvent)
+      .then(function(event) {
+        // the patch event must also contain lastModified
+        assert.ok(event.model.lastModified);
+      });
+  });
+
+  it('should emit an update event when changing the category', function() {
+    var checkEvent = appEvents.addListener('dataChange2', {
+      url: '/forums/' + fixture.forum1.id + '/topics',
+      operation: 'update',
+      type: 'topic',
+      model: {
+        id: fixture.topic3.id.toString(),
+      },
+    });
+
+    return topicService.setTopicCategory(fixture.user1, fixture.topic3, fixture.category2)
+      .then(checkEvent)
+      .then(function(event) {
+        // the patch event must also contain lastModified
+        assert.ok(event.model.lastModified);
+
+        assert.strictEqual(event.model.category.id.toString(), fixture.category2._id.toString());
       });
   });
 });
