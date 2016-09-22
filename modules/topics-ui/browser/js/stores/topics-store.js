@@ -18,6 +18,7 @@ import {SUBMIT_NEW_TOPIC, TOPIC_CREATED} from '../../../shared/constants/create-
 import {DEFAULT_CATEGORY_NAME, DEFAULT_TAG_NAME} from '../../../shared/constants/navigation';
 import {FILTER_BY_TOPIC} from '../../../shared/constants/forum-filters';
 import {MOST_WATCHERS_SORT} from '../../../shared/constants/forum-sorts';
+import { UPDATE_TOPIC_SUBSCRIPTION_STATE, REQUEST_UPDATE_TOPIC_SUBSCRIPTION_STATE, SUBSCRIPTION_STATE } from '../../../shared/constants/forum.js';
 
 export const TopicModel = BaseModel.extend({
   url(){
@@ -102,7 +103,7 @@ export class TopicsStore {
     this.listenTo(router, 'change:sortName', this.onSortUpdate, this);
 
     //Proxy events from the filtered collection
-    this.listenTo(this.collection, 'all', function(type, collection ,val){
+    this.listenTo(this.collection, 'all', (type, collection ,val) => {
       this.trigger(type, collection, val);
     });
 
@@ -110,6 +111,9 @@ export class TopicsStore {
       this.collection.setFilter(this.getFilter());
       this.trigger(TOPIC_CREATED, topicId, slug);
     });
+
+    subscribe(REQUEST_UPDATE_TOPIC_SUBSCRIPTION_STATE, this.onRequestSubscriptionStateUpdate, this);
+    subscribe(UPDATE_TOPIC_SUBSCRIPTION_STATE, this.onSubscriptionStateUpdate, this);
   }
 
   getFilter() {
@@ -161,11 +165,29 @@ export class TopicsStore {
   onSortUpdate(){
     this.collection.sort();
   }
+
+  onRequestSubscriptionStateUpdate(data) {
+    var {topicId} = data;
+    this.collection.get(topicId).set({
+      subscriptionState: SUBSCRIPTION_STATE.PENDING
+    });
+  }
+
+  onSubscriptionStateUpdate(data) {
+    var {topicId, state} = data;
+    this.collection.get(topicId).set({
+      subscriptionState: state
+    });
+  }
 }
 
 
 
-dispatchOnChangeMixin(TopicsStore, ['sort']);
+dispatchOnChangeMixin(TopicsStore, [
+  'sort',
+  //'change:id', //TODO: uncomment
+  'change:subscriptionState'
+]);
 
 const serverStore = (window.context.topicsStore || {});
 const serverData = (serverStore.data || []);

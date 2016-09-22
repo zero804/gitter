@@ -6,11 +6,11 @@ import Panel from '../panel.jsx';
 import H1 from '../text/h-1.jsx';
 import Input from '../forms/input.jsx';
 import ForumCategoryLink from '../links/forum-category-link.jsx';
-import WatchForumButton from '../forum/watch-forum-button.jsx';
+import SubscribeButton from '../forum/subscribe-button.jsx';
 import CreateTopicLink from '../links/create-topic-link.jsx';
 import {DEFAULT_CATEGORY_NAME} from '../../../constants/navigation';
-import { FORUM_WATCH_STATE } from '../../../constants/forum.js';
-import attemptUpdateForumWatchState from '../../../action-creators/forum/attempt-update-forum-watch-state';
+import { SUBSCRIPTION_STATE } from '../../../constants/forum.js';
+import requestUpdateForumSubscriptionState from '../../../action-creators/forum/request-update-forum-subscription-state';
 
 
 export default React.createClass({
@@ -20,11 +20,11 @@ export default React.createClass({
     userId: PropTypes.string.isRequired,
     forumId: PropTypes.string.isRequired,
     groupName: PropTypes.string.isRequired,
-    watchState: PropTypes.oneOf(_.values(FORUM_WATCH_STATE))
+    subscriptionState: PropTypes.oneOf(_.values(SUBSCRIPTION_STATE)).isRequired
   },
 
   render(){
-    const {groupName, watchState} = this.props;
+    const {groupName, subscriptionState} = this.props;
 
     return (
       <Container>
@@ -43,11 +43,14 @@ export default React.createClass({
             onChange={this.onSearchUpdate}
             className="topic-search__search-input"/>
 
-          <WatchForumButton
-            watchState={watchState}
+          <SubscribeButton
+            subscriptionState={subscriptionState}
             className="topic-search__watch-forum-button"
             itemClassName="topic-search__watch-forum-button-text-item"
-            onClick={this.onWatchForumButtonClick}/>
+            subscribedText="Unfollow"
+            unsubscribedText="Follow"
+            pendingText="..."
+            onClick={this.onSubscribeButtonClick}/>
           <CreateTopicLink groupName={groupName} className="topic-search__create-topic-link">
             Create Topic
           </CreateTopicLink>
@@ -60,11 +63,11 @@ export default React.createClass({
 
   },
 
-  onWatchForumButtonClick() {
-    const {userId, forumId, watchState} = this.props;
+  onSubscribeButtonClick() {
+    const {userId, forumId, subscriptionState} = this.props;
 
-    var desiredIsWatching = (watchState !== FORUM_WATCH_STATE.WATCHING);
-    dispatch(attemptUpdateForumWatchState(forumId, userId, desiredIsWatching));
+    var desiredIsSubscribed = (subscriptionState !== SUBSCRIPTION_STATE.SUBSCRIBED);
+    dispatch(requestUpdateForumSubscriptionState(forumId, userId, desiredIsSubscribed));
   }
 
 });

@@ -4,7 +4,7 @@ import { shallow } from 'enzyme';
 import {spy} from 'sinon';
 import proxyquire from 'proxyquire';
 import SearchHeader from '../../../../../../shared/containers/components/search/search-header.jsx';
-import { FORUM_WATCH_STATE } from '../../../../../../shared/constants/forum.js';
+import { SUBSCRIPTION_STATE } from '../../../../../../shared/constants/forum.js';
 
 const proxyquireNoCallThru = proxyquire.noCallThru();
 
@@ -38,8 +38,8 @@ describe('<SearchHeader/>', () => {
       equal(wrapper.find('Input').length, 1);
     });
 
-    it('should render a WatchForumButton', () => {
-      equal(wrapper.find('WatchForumButton').length, 1);
+    it('should render a SubscribeButton', () => {
+      equal(wrapper.find('SubscribeButton').length, 1);
     });
 
     it('should render a CreateTopicLink', () => {
@@ -61,28 +61,28 @@ describe('<SearchHeader/>', () => {
     const FIXTURE_FORUM_ID = '456';
 
     let wrapper;
-    let attemptUpdateForumWatchStateSpy;
+    let requestUpdateForumSubscriptionStateSpy;
     beforeEach(() => {
-      attemptUpdateForumWatchStateSpy = spy(() => {});
+      requestUpdateForumSubscriptionStateSpy = spy(() => {});
       const mockNoOpDispatcher = { dispatch() {} };
 
       const SearchHeaderWithMockedThings = proxyquireNoCallThru('../../../../../../shared/containers/components/search/search-header.jsx', {
         '../../../dispatcher':  mockNoOpDispatcher,
-        '../../../action-creators/forum/attempt-update-forum-watch-state': attemptUpdateForumWatchStateSpy
+        '../../../action-creators/forum/request-update-forum-subscription-state': requestUpdateForumSubscriptionStateSpy
       });
 
       wrapper = shallow(<SearchHeaderWithMockedThings
         forumId={FIXTURE_FORUM_ID}
         userId={FIXTURE_USER_ID}
-        watchState={FORUM_WATCH_STATE.NOT_WATCHING}/>
+        subscriptionState={SUBSCRIPTION_STATE.UNSUBSCRIBED}/>
       );
     });
 
-    it('should call `attemptUpdateForumWatchState` with correct arguments', () => {
-      equal(attemptUpdateForumWatchStateSpy.callCount, 0);
-      wrapper.instance().onWatchForumButtonClick();
-      equal(attemptUpdateForumWatchStateSpy.callCount, 1);
-      var args = attemptUpdateForumWatchStateSpy.getCall(0).args;
+    it('should call `requestUpdateForumSubscriptionState` with correct arguments', () => {
+      equal(requestUpdateForumSubscriptionStateSpy.callCount, 0);
+      wrapper.instance().onSubscribeButtonClick();
+      equal(requestUpdateForumSubscriptionStateSpy.callCount, 1);
+      var args = requestUpdateForumSubscriptionStateSpy.getCall(0).args;
       equal(args.length, 3);
       deepEqual(args, [FIXTURE_FORUM_ID, FIXTURE_USER_ID, true]);
     });

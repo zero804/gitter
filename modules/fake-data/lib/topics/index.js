@@ -33,7 +33,7 @@ module.exports = function getFakeTopicsList(){
         participatingTotal: getRandomInt(8, 25),
         isFaved: getRandomBool(),
         isParticipating: getRandomBool(),
-        isWatching: getRandomBool(),
+        isSubscribed: getRandomBool(),
         user: {
           id: 12345,
           username: 'testy-mc-testface',

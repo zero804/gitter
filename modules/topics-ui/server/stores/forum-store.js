@@ -7,7 +7,7 @@ module.exports = function forumStore(initialData) {
   initialData = (initialData || {});
 
   var data = _.extend({}, initialData, {
-    watchState: initialData.subscribed ? forumConstants.FORUM_WATCH_STATE.WATCHING : forumConstants.FORUM_WATCH_STATE.NOT_WATCHING
+    subscriptionState: initialData.subscribed ? forumConstants.SUBSCRIPTION_STATE.SUBSCRIBED : forumConstants.SUBSCRIPTION_STATE.UNSUBSCRIBED
   });
   delete data.subscribed;
 
@@ -25,8 +25,8 @@ module.exports = function forumStore(initialData) {
     getForumId: () => {
       return data.id;
     },
-    getWatchState: () => {
-      return data.watchState;
+    getSubscriptionState: () => {
+      return data.subscriptionState;
     },
   };
 };
