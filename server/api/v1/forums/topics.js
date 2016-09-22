@@ -49,12 +49,15 @@ module.exports = {
     var forum = req.forum;
 
     var options = getTopicsFilterSortOptions(req.query);
-    return restful.serializeTopicsForForumId(forum._id, options);
+    var userId = req.user && req.user._id;
+    return restful.serializeTopicsForForumId(forum._id, userId, options);
   },
 
   show: function(req) {
     var topic = req.topic;
-    var strategy = restSerializer.TopicStrategy.full();
+    var strategy = restSerializer.TopicStrategy.nested({
+      currentUserId: req.user && req.user._id
+    });
     return restSerializer.serializeObject(topic, strategy);
   },
 
