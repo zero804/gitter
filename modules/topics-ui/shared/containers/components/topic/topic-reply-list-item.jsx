@@ -17,6 +17,7 @@ export default React.createClass({
       }).isRequired
 
     }).isRequired,
+    onCommentsClicked: PropTypes.func.isRequired,
   },
 
   render(){
@@ -40,7 +41,11 @@ export default React.createClass({
         </div>
         <footer className="topic-reply-list-item__footer">
           <span className="topic-reply-list-item__likes">10 Likes</span>
-          <span className="topic-reply-list-item__comments">2 Comments</span>
+          <button
+            className="topic-reply-list-item__comments"
+            onClick={this.onCommentsClicked}>
+            2 Comments
+          </button>
         </footer>
       </article>
     );
@@ -62,5 +67,11 @@ export default React.createClass({
       </section>
     );
   },
+
+  onCommentsClicked(e){
+    e.preventDefault();
+    const {reply} = this.props;
+    this.props.onCommentsClicked(reply.id);
+  }
 
 });

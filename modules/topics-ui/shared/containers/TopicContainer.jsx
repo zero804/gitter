@@ -9,6 +9,7 @@ import {dispatch} from '../dispatcher';
 import updateReplyBody from '../action-creators/create-reply/body-update';
 import submitNewReply from '../action-creators/create-reply/submit-new-reply';
 
+import showReplyComments from '../action-creators/topic/show-reply-comments';
 const TopicContainer = createClass({
 
   displayName: 'TopicContainer',
@@ -99,7 +100,9 @@ const TopicContainer = createClass({
           <TopicBody topic={topic} />
         </article>
         <TopicReplyListHeader replies={replies}/>
-        <TopicReplyList replies={replies} />
+        <TopicReplyList
+          replies={replies}
+          onReplyCommentsClicked={this.onReplyCommentsClicked}/>
         <TopicReplyEditor
           user={currentUser}
           value={newReplyContent}
@@ -150,6 +153,10 @@ const TopicContainer = createClass({
     return repliesStore.getReplies().map((reply) => Object.assign({}, reply, {
       comments: commentsStore.getCommentsByReplyId(reply.id),
     }))
+  },
+
+  onReplyCommentsClicked(replyId){
+    dispatch(showReplyComments(replyId));
   }
 
 });
