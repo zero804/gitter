@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
 import UserAvatar from '../user/user-avatar.jsx';
+import CommentEditor from './comment-editor.jsx';
 
 export default React.createClass({
 
@@ -18,6 +19,8 @@ export default React.createClass({
 
     }).isRequired,
     onCommentsClicked: PropTypes.func.isRequired,
+    onNewCommentUpdate: PropTypes.func.isRequired,
+    submitNewComment: PropTypes.func.isRequired,
   },
 
   render(){
@@ -47,6 +50,7 @@ export default React.createClass({
             2 Comments
           </button>
         </footer>
+        {this.getComments()}
       </article>
     );
   },
@@ -68,10 +72,31 @@ export default React.createClass({
     );
   },
 
+  getComments(){
+    const {reply} = this.props;
+    if(!reply.isCommenting) { return; }
+    return (
+      <section className="reply-comment-list">
+        <CommentEditor
+          onEnter={this.submitNewComment}
+          onChange={this.onNewCommentUpdate} />
+      </section>
+    );
+  },
+
   onCommentsClicked(e){
     e.preventDefault();
     const {reply} = this.props;
     this.props.onCommentsClicked(reply.id);
-  }
+  },
+
+  onNewCommentUpdate(val){
+    const {reply} = this.props;
+    this.props.onNewCommentUpdate(reply.id, val);
+  },
+
+  submitNewComment(){
+    this.props.submitNewComment();
+  },
 
 });

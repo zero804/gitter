@@ -41,6 +41,10 @@ export const CommentsStore = LiveCollection.extend({
     return this.toJSON();
   },
 
+  getActiveReplyId(){
+    return this.contextModel.get('replyId');
+  },
+
   onRequestNewComments({replyId}){
     this.contextModel.set('replyId', replyId);
   },
