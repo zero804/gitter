@@ -13,7 +13,7 @@ export default React.createClass({
     }).isRequired
   },
 
-  render(){
+  render() {
 
     const { topic } = this.props;
 
