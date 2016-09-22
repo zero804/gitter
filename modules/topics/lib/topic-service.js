@@ -390,10 +390,7 @@ function setTopicCategory(user, topic, category) {
         categoryId: category._id
       });
 
-      liveCollections.topics.emit('patch', forumId, topicId, {
-        categoryId: updatedTopic.categoryId.toString(),
-        lastModified: updatedTopic.lastModified.toISOString()
-      });
+      liveCollections.topics.emit('update', updatedTopic);
 
       return updatedTopic;
     });
