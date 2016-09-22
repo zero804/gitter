@@ -34,6 +34,11 @@ describe('forum-with-policy-service #slow', function() {
       forum: 'forum1',
       category: 'category1'
     },
+    topic2: {
+      user: 'user1',
+      forum: 'forum1',
+      category: 'category1'
+    },
     reply1: {
       user: 'user1',
       forum: 'forum1',
@@ -120,16 +125,38 @@ describe('forum-with-policy-service #slow', function() {
   });
 
   it("should allow members to set a topic's title", function() {
-    return forumWithPolicyService.setTopicTitle(fixture.topic1, "foo")
+    return forumWithPolicyService.updateTopic(fixture.topic1, { title: "foo" })
       .then(function(topic) {
         assert.strictEqual(topic.title, "foo");
       });
   });
 
   it("should allow members to set a topic's slug", function() {
-    return forumWithPolicyService.setTopicSlug(fixture.topic1, "bar")
+    return forumWithPolicyService.updateTopic(fixture.topic1, { slug: "bar" })
       .then(function(topic) {
         assert.strictEqual(topic.slug, "bar");
+      });
+  });
+
+  it("should allow members to set a topic's text", function() {
+    return forumWithPolicyService.updateTopic(fixture.topic1, { text: "**baz**" })
+      .then(function(topic) {
+        assert.strictEqual(topic.text, "**baz**");
+        assert.strictEqual(topic.html, "<strong>baz</strong>");
+      });
+  });
+
+  it("should allow members to update all the topic's core fields in one go", function() {
+    return forumWithPolicyService.updateTopic(fixture.topic2, {
+        title: 'foo',
+        slug: 'bar',
+        text: '**baz**'
+      })
+      .then(function(topic) {
+        assert.strictEqual(topic.title, 'foo');
+        assert.strictEqual(topic.slug, 'bar');
+        assert.strictEqual(topic.text, '**baz**');
+        assert.strictEqual(topic.html, '<strong>baz</strong>');
       });
   });
 
@@ -147,14 +174,6 @@ describe('forum-with-policy-service #slow', function() {
     return forumWithPolicyService.setTopicSticky(fixture.topic1, 1)
       .then(function(topic) {
         assert.strictEqual(topic.sticky, 1);
-      });
-  });
-
-  it("should allow members to set a topic's text", function() {
-    return forumWithPolicyService.setTopicText(fixture.topic1, "**baz**")
-      .then(function(topic) {
-        assert.strictEqual(topic.text, "**baz**");
-        assert.strictEqual(topic.html, "<strong>baz</strong>");
       });
   });
 

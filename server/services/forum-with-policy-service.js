@@ -140,16 +140,10 @@ ForumWithPolicyService.prototype.setForumTags = secureMethod([allowAdmin], funct
   return forumService.setForumTags(user, forum, tags);
 });
 
-ForumWithPolicyService.prototype.setTopicTitle = secureMethod([allowWrite, matchForum], function(topic, title) {
+ForumWithPolicyService.prototype.updateTopic = secureMethod([allowWrite, matchForum], function(topic, fields) {
   var user = this.user;
 
-  return topicService.setTopicTitle(user, topic, title);
-});
-
-ForumWithPolicyService.prototype.setTopicSlug = secureMethod([allowWrite, matchForum], function(topic, slug) {
-  var user = this.user;
-
-  return topicService.setTopicSlug(user, topic, slug);
+  return topicService.updateTopic(user, topic, fields);
 });
 
 ForumWithPolicyService.prototype.setTopicTags = secureMethod([allowWrite, matchForum], function(topic, tags) {
@@ -163,12 +157,6 @@ ForumWithPolicyService.prototype.setTopicSticky = secureMethod([allowWrite, matc
   var user = this.user;
 
   return topicService.setTopicSticky(user, topic, sticky);
-});
-
-ForumWithPolicyService.prototype.setTopicText = secureMethod([allowWrite, matchForum], function(topic, text) {
-  var user = this.user;
-
-  return topicService.setTopicText(user, topic, text);
 });
 
 ForumWithPolicyService.prototype.setTopicCategory = secureMethod([allowWrite, matchForum], function(topic, category) {

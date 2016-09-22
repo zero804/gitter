@@ -44,16 +44,23 @@ function getCreateTopicOptions(body) {
 function collectPatchActions(forumWithPolicyService, topic, body) {
   var promises = [];
 
-  var title;
-  if (body.hasOwnProperty('title')) {
-    title = String(body.title);
-    promises.push(forumWithPolicyService.setTopicTitle(topic, title));
-  }
+  var fields;
+  if (body.hasOwnProperty('title') || body.hasOwnProperty('slug') || body.hasOwnProperty('text')) {
+    fields = {};
 
-  var slug;
-  if (body.hasOwnProperty('slug')) {
-    slug = String(body.slug);
-    promises.push(forumWithPolicyService.setTopicSlug(topic, slug));
+    if (body.hasOwnProperty('title')) {
+      fields.title = String(body.title);
+    }
+
+    if (body.hasOwnProperty('slug')) {
+      fields.slug = String(body.slug);
+    }
+
+    if (body.hasOwnProperty('text')) {
+      fields.text = String(body.text);
+    }
+
+    promises.push(forumWithPolicyService.updateTopic(topic, fields));
   }
 
   var tags;
@@ -66,12 +73,6 @@ function collectPatchActions(forumWithPolicyService, topic, body) {
   if (body.hasOwnProperty('sticky')) {
     sticky = parseInt(body.sticky, 10);
     promises.push(forumWithPolicyService.setTopicSticky(topic, sticky));
-  }
-
-  var text;
-  if (body.hasOwnProperty('text')) {
-    text = String(body.text);
-    promises.push(forumWithPolicyService.setTopicText(topic, text));
   }
 
   var categoryId;
