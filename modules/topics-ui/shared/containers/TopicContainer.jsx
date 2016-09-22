@@ -1,11 +1,11 @@
 import React, {PropTypes, createClass} from 'react';
+import {dispatch} from '../dispatcher';
 import TopicHeader from './components/topic/topic-header.jsx';
 import TopicBody from './components/topic/topic-body.jsx';
 import SearchHeader from './components/search/search-header.jsx';
 import TopicReplyEditor from './components/topic/topic-reply-editor.jsx';
 import TopicReplyListHeader from './components/topic/topic-reply-list-header.jsx';
 import TopicReplyList from './components/topic/topic-reply-list.jsx';
-import {dispatch} from '../dispatcher';
 import updateReplyBody from '../action-creators/create-reply/body-update';
 import submitNewReply from '../action-creators/create-reply/submit-new-reply';
 
@@ -20,7 +20,7 @@ const TopicContainer = createClass({
     //Forum
     forumStore: React.PropTypes.shape({
       getForumId: React.PropTypes.func.isRequired,
-      getWatchState: React.PropTypes.func.isRequired
+      getSubscriptionState: React.PropTypes.func.isRequired
     }).isRequired,
 
     topicsStore: PropTypes.shape({
@@ -51,23 +51,27 @@ const TopicContainer = createClass({
   },
 
   componentDidMount(){
-    const {forumStore, repliesStore, newReplyStore} = this.props;
+    const {forumStore, topicsStore, repliesStore, newReplyStore} = this.props;
     forumStore.onChange(this.onForumUpdate, this);
+    topicsStore.onChange(this.onTopicsUpdate, this);
     repliesStore.onChange(this.updateReplies, this);
     newReplyStore.on('change:text', this.updateReplyContent, this);
   },
 
   componentWillUnmount(){
-    const {repliesStore, newReplyStore} = this.props;
+    const {forumStore, topicsStore, repliesStore, newReplyStore} = this.props;
+    forumStore.removeListeners(this.onForumUpdate, this);
+    topicsStore.removeListeners(this.onTopicsUpdate, this);
     repliesStore.removeListeners(this.updateReplies, this);
     newReplyStore.off('change:text', this.updateReplyContent, this);
   },
 
   getInitialState(){
-    const {forumStore, repliesStore} = this.props;
+    const {forumStore, topicsStore, repliesStore, topicId} = this.props;
     return {
       forumId: forumStore.getForumId(),
-      forumWatchState: forumStore.getWatchState(),
+      forumSubscriptionState: forumStore.getSubscriptionState(),
+      topic: topicsStore.getById(topicId),
       replies: repliesStore.getReplies(),
       newReplyContent: '',
     };
@@ -76,9 +80,8 @@ const TopicContainer = createClass({
 
   render(){
 
-    const { topicId, topicsStore, groupName, categoryStore, currentUserStore, tagStore } = this.props;
-    const {forumId, forumWatchState, replies, newReplyContent} = this.state;
-    const topic = topicsStore.getById(topicId);
+    const { groupName, categoryStore, currentUserStore, tagStore } = this.props;
+    const {topic, forumId, forumSubscriptionState, replies, newReplyContent} = this.state;
     const currentUser = currentUserStore.getCurrentUser();
     const topicCategory = topic.category;
     const category = categoryStore.getById(topicCategory.id);
@@ -98,14 +101,17 @@ const TopicContainer = createClass({
           userId={currentUser.id}
           forumId={forumId}
           groupName={groupName}
-          watchState={forumWatchState}/>
+          subscriptionState={forumSubscriptionState}/>
         <article>
           <TopicHeader
             topic={topic}
             category={category}
             groupName={groupName}
             tags={tags}/>
-          <TopicBody topic={topic} />
+          <TopicBody
+            userId={currentUser.id}
+            forumId={forumId}
+            topic={topic} />
         </article>
         <TopicReplyListHeader replies={replies}/>
         <TopicReplyList replies={replies} />
@@ -136,7 +142,14 @@ const TopicContainer = createClass({
     const { forumStore } = this.props;
     this.setState((state) => Object.assign(state, {
       forumId: forumStore.getForumId(),
-      forumWatchState: forumStore.getWatchState()
+      forumSubscriptionState: forumStore.getSubscriptionState()
+    }));
+  },
+
+  onTopicsUpdate() {
+    const { topicsStore, topicId } = this.props;
+    this.setState((state) => Object.assign(state, {
+      topic: topicsStore.getById(topicId)
     }));
   },
 

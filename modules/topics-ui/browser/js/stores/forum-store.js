@@ -1,40 +1,40 @@
 import Backbone from 'backbone';
 import {subscribe} from '../../../shared/dispatcher';
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
-import { UPDATE_FORUM_WATCH_STATE, ATTEMPT_UPDATE_FORUM_WATCH_STATE, FORUM_WATCH_STATE } from '../../../shared/constants/forum.js';
+import { UPDATE_FORUM_SUBSCRIPTION_STATE, REQUEST_UPDATE_FORUM_SUBSCRIPTION_STATE, SUBSCRIPTION_STATE } from '../../../shared/constants/forum.js';
 
 const ForumStore = Backbone.Model.extend({
   defaults: {
-    watchState: FORUM_WATCH_STATE.NOT_WATCHING
+    subscriptionState: SUBSCRIPTION_STATE.UNSUBSCRIBED
   },
 
   events: [
     'change:id',
-    'change:watchState'
+    'change:subscriptionState'
   ],
 
-  initialize: function() {
-    subscribe(ATTEMPT_UPDATE_FORUM_WATCH_STATE, this.onAttemptWatchStateUpdate, this);
-    subscribe(UPDATE_FORUM_WATCH_STATE, this.onWatchStateUpdate, this);
+  initialize() {
+    subscribe(REQUEST_UPDATE_FORUM_SUBSCRIPTION_STATE, this.onRequestSubscriptionStateUpdate, this);
+    subscribe(UPDATE_FORUM_SUBSCRIPTION_STATE, this.onSubscriptionStateUpdate, this);
   },
 
-  onAttemptWatchStateUpdate: function() {
+  onRequestSubscriptionStateUpdate() {
     this.set({
-      watchState: FORUM_WATCH_STATE.PENDING
+      subscriptionState: SUBSCRIPTION_STATE.PENDING
     });
   },
 
-  onWatchStateUpdate: function(data) {
+  onSubscriptionStateUpdate(data) {
     var {state} = data;
 
     this.set({
-      watchState: state
+      subscriptionState: state
     });
   },
 
   getForum(){ return this.toJSON(); },
   getForumId() { return this.get('id'); },
-  getWatchState() { return this.get('watchState'); }
+  getSubscriptionState() { return this.get('subscriptionState'); }
 });
 
 dispatchOnChangeMixin(ForumStore);
@@ -58,6 +58,6 @@ export function getForumId(){
   return getForumStore().getForumId()
 }
 
-export function getWatchState(){
-  return getForumStore().getWatchState()
+export function getSubscriptionState(){
+  return getForumStore().getSubscriptionState()
 }

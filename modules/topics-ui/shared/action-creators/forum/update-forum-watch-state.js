@@ -1,8 +1,8 @@
-import { UPDATE_FORUM_WATCH_STATE } from '../../constants/forum.js';
+import { UPDATE_FORUM_SUBSCRIPTION_STATE } from '../../constants/forum.js';
 
 export default function updateForumWatchState(forumId, state) {
   return {
-    type: UPDATE_FORUM_WATCH_STATE,
+    type: UPDATE_FORUM_SUBSCRIPTION_STATE,
     forumId,
     state
   };

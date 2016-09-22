@@ -46,7 +46,7 @@ const ForumContainer = React.createClass({
     //Forum
     forumStore: PropTypes.shape({
       getForumId: PropTypes.func.isRequired,
-      getWatchState: PropTypes.func.isRequired
+      getSubscriptionState: PropTypes.func.isRequired
     }).isRequired,
 
     currentUserStore: PropTypes.shape({
@@ -87,7 +87,7 @@ const ForumContainer = React.createClass({
 
     return {
       forumId: forumStore.getForumId(),
-      forumWatchState: forumStore.getWatchState(),
+      forumSubscriptionState: forumStore.getSubscriptionState(),
       categoryName: this.props.categoryName,
       filterName: this.props.filterName,
       tagName: this.props.tagName,
@@ -117,8 +117,9 @@ const ForumContainer = React.createClass({
   },
 
   componentWillUnmount(){
-    const { categoryStore, tagStore, router, topicsStore, newTopicStore } = this.props;
+    const { forumStore, categoryStore, tagStore, router, topicsStore, newTopicStore } = this.props;
 
+    forumStore.removeListeners(this.onForumUpdate, this);
     topicsStore.removeListeners(this.onTopicsUpdate, this);
     newTopicStore.removeListeners(this.onNewTopicUpdate, this);
     topicsStore.off(consts.TOPIC_CREATED, this.onTopicCreated, this);
@@ -132,7 +133,7 @@ const ForumContainer = React.createClass({
   },
 
   render() {
-    const { forumId, forumWatchState, categoryName, tags, filterName, tagName, sortName, createTopic, topics, newTopic } = this.state;
+    const { forumId, forumSubscriptionState, categoryName, tags, filterName, tagName, sortName, createTopic, topics, newTopic } = this.state;
     const { currentUserStore, groupName, categoryStore, tagStore } = this.props;
 
     const currentUser = currentUserStore.getCurrentUser();
@@ -146,7 +147,7 @@ const ForumContainer = React.createClass({
           userId={currentUser.id}
           forumId={forumId}
           groupName={groupName}
-          watchState={forumWatchState}/>
+          subscriptionState={forumSubscriptionState}/>
         <CategoryList
           groupName={ groupName }
           categories={ categories }/>
@@ -214,7 +215,7 @@ const ForumContainer = React.createClass({
     const { forumStore } = this.props;
     this.setState((state) => Object.assign(state, {
       forumId: forumStore.getForumId(),
-      forumWatchState: forumStore.getWatchState(),
+      forumSubscriptionState: forumStore.getSubscriptionState(),
     }));
   },
 

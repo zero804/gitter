@@ -19,7 +19,7 @@ describe.skip('forumStore', () => {
     assert(forumStore(data).getForumId);
   });
 
-  it('should expose a getWatchState function', () => {
-    assert(forumStore(data).getWatchState);
+  it('should expose a getSubscriptionState function', () => {
+    assert(forumStore(data).getSubscriptionState);
   });
 });

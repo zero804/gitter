@@ -5,6 +5,7 @@ var _ = require('lodash');
 var navConstants = require('../../shared/constants/navigation');
 var forumFilterConstants = require('../../shared/constants/forum-filters');
 var forumSortConstants = require('../../shared/constants/forum-sorts');
+var forumConstants = require('../../shared/constants/forum.js');
 
 module.exports = function topicsStore(models, category, tag, filter, sort, user) {
 
@@ -18,6 +19,9 @@ module.exports = function topicsStore(models, category, tag, filter, sort, user)
 
   //Transform the server side models
   models = models.map((model) => {
+    model.subscriptionState = model.subscribed ? forumConstants.SUBSCRIPTION_STATE.SUBSCRIBED : forumConstants.SUBSCRIPTION_STATE.UNSUBSCRIBED
+    delete model.subscribed;
+
     return model;
   });
 

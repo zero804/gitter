@@ -2,14 +2,14 @@ import {equal, ok} from 'assert';
 import React from 'react';
 import { mount } from 'enzyme';
 import {spy} from 'sinon';
-import WatchForumButton from '../../../../../../shared/containers/components/forum/watch-forum-button.jsx';
-import { FORUM_WATCH_STATE } from '../../../../../../shared/constants/forum.js';
+import SubscribeButton from '../../../../../../shared/containers/components/forum/subscribe-button.jsx';
+import { SUBSCRIPTION_STATE } from '../../../../../../shared/constants/forum.js';
 
 const FIXTURE_CLASS_NAME = 'some-button';
 const FIXTURE_ITEM_CLASS_NAME = 'some-test-item';
 
 
-describe('<WatchForumButton/>', () => {
+describe('<SubscribeButton/>', () => {
 
   describe('', () => {
     let wrapper;
@@ -18,7 +18,7 @@ describe('<WatchForumButton/>', () => {
     beforeEach(() => {
       onClickCb = spy();
       wrapper = mount(
-        <WatchForumButton
+        <SubscribeButton
           className={FIXTURE_CLASS_NAME}
           itemClassName={FIXTURE_ITEM_CLASS_NAME}
           onClick={onClickCb} />
@@ -53,9 +53,9 @@ describe('<WatchForumButton/>', () => {
 
     beforeEach(() => {
       wrapper = mount(
-        <WatchForumButton>
+        <SubscribeButton>
           <span>test</span>
-        </WatchForumButton>
+        </SubscribeButton>
       );
     });
 
@@ -66,14 +66,14 @@ describe('<WatchForumButton/>', () => {
   });
 
 
-  describe('with `watchState`', () => {
+  describe('with `subscriptionState`', () => {
     let wrapper;
-    let watchState;
+    let subscriptionState;
 
     beforeEach(() => {
       wrapper = mount(
-        <WatchForumButton
-          watchState={watchState}/>
+        <SubscribeButton
+          subscriptionState={subscriptionState}/>
       );
     });
 
@@ -85,28 +85,28 @@ describe('<WatchForumButton/>', () => {
     };
 
     it('should show unfollow item when watching forum', () => {
-      watchState = FORUM_WATCH_STATE.WATCHING;
+      subscriptionState = SUBSCRIPTION_STATE.SUBSCRIBED;
       testChildHiddenState({
-        unfollow: false,
-        follow: true,
+        subscribed: false,
+        unsubscribed: true,
         pending: true
       })
     });
 
     it('should show follow item when not watching forum', () => {
-      watchState = FORUM_WATCH_STATE.NOT_WATCHING;
+      subscriptionState = SUBSCRIPTION_STATE.UNSUBSCRIBED;
       testChildHiddenState({
-        unfollow: true,
-        follow: false,
+        subscribed: true,
+        unsubscribed: false,
         pending: true
       })
     });
 
     it('should show pending item when sending out request', () => {
-      watchState = FORUM_WATCH_STATE.PENDING;
+      subscriptionState = SUBSCRIPTION_STATE.PENDING;
       testChildHiddenState({
-        unfollow: true,
-        follow: true,
+        subscribed: true,
+        unsubscribed: true,
         pending: false
       })
     });

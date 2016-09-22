@@ -20,8 +20,8 @@ describe('ForumStore', () => {
     ok(store.getForumId);
   });
 
-  it('should expose a getWatchState function', () => {
-    ok(store.getWatchState);
+  it('should expose a getSubscriptionState function', () => {
+    ok(store.getSubscriptionState);
   });
 
 });
