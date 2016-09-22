@@ -185,7 +185,6 @@ export class TopicsStore {
 
 dispatchOnChangeMixin(TopicsStore, [
   'sort',
-  //'change:id', //TODO: uncomment
   'change:subscriptionState'
 ]);
 

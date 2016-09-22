@@ -83,6 +83,7 @@ const TopicContainer = createClass({
     const { groupName, categoryStore, currentUserStore, tagStore } = this.props;
     const {topic, forumId, forumSubscriptionState, replies, newReplyContent} = this.state;
     const currentUser = currentUserStore.getCurrentUser();
+    const userId = currentUser.id;
     const topicCategory = topic.category;
     const category = categoryStore.getById(topicCategory.id);
 
@@ -98,7 +99,7 @@ const TopicContainer = createClass({
     return (
       <main>
         <SearchHeader
-          userId={currentUser.id}
+          userId={userId}
           forumId={forumId}
           groupName={groupName}
           subscriptionState={forumSubscriptionState}/>
@@ -109,12 +110,16 @@ const TopicContainer = createClass({
             groupName={groupName}
             tags={tags}/>
           <TopicBody
-            userId={currentUser.id}
+            userId={userId}
             forumId={forumId}
             topic={topic} />
         </article>
         <TopicReplyListHeader replies={replies}/>
-        <TopicReplyList replies={replies} />
+        <TopicReplyList
+          userId={userId}
+          forumId={forumId}
+          topicId={topic.id}
+          replies={replies} />
         <TopicReplyEditor
           user={currentUser}
           value={newReplyContent}
