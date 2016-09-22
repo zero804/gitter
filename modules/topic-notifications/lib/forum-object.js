@@ -40,6 +40,21 @@ ForumObject.prototype = {
       default:
         assert.ok(false, 'Unknown type');
     }
+  },
+
+  hasParent: function() {
+    switch(this.type) {
+      case TYPE.Forum:
+        return false;
+
+      case TYPE.Topic:
+      case TYPE.Reply:
+      case TYPE.Comment:
+        return true;
+
+      default:
+        assert.ok(false, 'Unknown type');
+    }
   }
 }
 
