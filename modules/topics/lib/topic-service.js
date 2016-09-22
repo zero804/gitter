@@ -405,6 +405,8 @@ function setTopicText(user, topic, text) {
 }
 
 function setTopicCategory(user, topic, category) {
+  assert(category._id);
+
   if (mongoUtils.objectIDsEqual(category._id, topic.categoryId)) return topic;
 
   var userId = user._id;
@@ -421,7 +423,7 @@ function setTopicCategory(user, topic, category) {
       });
 
       liveCollections.topics.emit('patch', forumId, topicId, {
-        categoryId: updatedTopic.categoryId,
+        categoryId: updatedTopic.categoryId.toString(),
         lastModified: updatedTopic.lastModified.toISOString()
       });
 
