@@ -14,6 +14,7 @@ import tagStore from '../../../mocks/tag-store';
 import {SHOW_REPLY_COMMENTS} from '../../../../shared/constants/topic';
 import commentsStore from '../../../mocks/comments-store';
 import {COMMENT_BODY_UPDATE, SUBMIT_NEW_COMMENT} from '../../../../shared/constants/create-comment';
+import newCommentStore from '../../../mocks/new-comment-store';
 
 describe('<TopicContainer />', () => {
 
@@ -22,6 +23,7 @@ describe('<TopicContainer />', () => {
   beforeEach(function(){
     wrapper = shallow(
       <TopicContainer
+        newCommentStore={newCommentStore}
         commentsStore={commentsStore}
         topicsStore={topicsStore}
         tagStore={tagStore}

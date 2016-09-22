@@ -8,6 +8,7 @@ export default React.createClass({
   displayName: 'TopicReplyList',
   propTypes: {
     replies: PropTypes.array.isRequired,
+    newCommentContent: PropTypes.string,
     onReplyCommentsClicked: PropTypes.func.isRequired,
     onNewCommentUpdate: PropTypes.func.isRequired,
     submitNewComment: PropTypes.func.isRequired,
@@ -27,9 +28,11 @@ export default React.createClass({
   },
 
   buildReplyListItem(reply, index) {
+    const {newCommentContent} = this.props;
     return (
       <li key={`reply-list-item-${index}`}>
         <TopicReplyListItem
+          newCommentContent={newCommentContent}
           reply={reply}
           submitNewComment={this.submitNewComment}
           onNewCommentUpdate={this.onNewCommentUpdate}

@@ -1,5 +1,5 @@
 import {equal} from 'assert';
-import {NewCommentStore} from '../../../../browser/js/stores/new-comment-store-store';
+import NewCommentStore from '../../../../browser/js/stores/new-comment-store-store';
 import {dispatch} from '../../../../shared/dispatcher';
 import commentBodyUpdate from '../../../../shared/action-creators/create-comment/body-update';
 import showReplyComments from '../../../../shared/action-creators/topic/show-reply-comments';

@@ -153,7 +153,7 @@ function renderTopic(req, res, next) {
                   tagStore: forumTagStore(forum.tags),
                   forumStore: forumStore(forum),
                   commentsStore: commentsStore([]),
-                  newCommentStore: newCommentStroe(),
+                  newCommentStore: newCommentStore(),
                 }
               });
             })

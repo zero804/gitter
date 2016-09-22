@@ -1,6 +1,8 @@
 import React, { PropTypes } from 'react';
 import UserAvatar from '../user/user-avatar.jsx';
 import CommentEditor from './comment-editor.jsx';
+import CommentItem from './comment-item.jsx';
+import FeedItem from './feed-item.jsx';
 
 export default React.createClass({
 
@@ -21,37 +23,21 @@ export default React.createClass({
     onCommentsClicked: PropTypes.func.isRequired,
     onNewCommentUpdate: PropTypes.func.isRequired,
     submitNewComment: PropTypes.func.isRequired,
+    newCommentContent: PropTypes.string
   },
 
   render(){
-
     const {reply} = this.props;
-    const {user} = reply;
-    const avatarDims = 30;
-
     return (
-      <article className="topic-reply-list-item">
-        <div className="topic-reply-list-item__content">
-          <div className="topic-reply-list-item__user-details">
-            <UserAvatar
-              className="topic-reply-list-item__avatar"
-              user={user}
-              width={avatarDims}
-              height={avatarDims}/>
-            <span className="topic-reply-list-item__sent">{reply.formattedSentDate}</span>
-          </div>
-          {this.getReplyContent(reply)}
-        </div>
-        <footer className="topic-reply-list-item__footer">
-          <span className="topic-reply-list-item__likes">10 Likes</span>
-          <button
-            className="topic-reply-list-item__comments"
-            onClick={this.onCommentsClicked}>
-            2 Comments
-          </button>
-        </footer>
+      <FeedItem
+        item={reply}
+        primaryLabel="Likes"
+        primaryValue={10}
+        secondaryLabel="Comments"
+        secondaryValue={2}
+        onSecondaryClicked={this.onCommentsClicked}>
         {this.getComments()}
-      </article>
+      </FeedItem>
     );
   },
 
@@ -73,14 +59,33 @@ export default React.createClass({
   },
 
   getComments(){
-    const {reply} = this.props;
+    const {reply, newCommentContent} = this.props;
     if(!reply.isCommenting) { return; }
     return (
       <section className="reply-comment-list">
+        <ul className="reply-comment-list__comments">
+          {this.getCommentList()}
+        </ul>
         <CommentEditor
+          autoFocus={true}
+          value={newCommentContent}
           onEnter={this.submitNewComment}
           onChange={this.onNewCommentUpdate} />
       </section>
+    );
+  },
+
+  getCommentList(){
+    const {reply} = this.props;
+    return reply.comments.map((comment, i) => this.getComment(comment, i))
+  },
+
+  getComment(comment, index){
+    const {reply} = this.props;
+    return (
+      <CommentItem
+        key={`comment-list-item-${reply.id}-${index}`}
+        comment={comment} />
     );
   },
 
