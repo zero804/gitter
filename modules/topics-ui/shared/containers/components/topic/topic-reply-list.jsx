@@ -7,6 +7,9 @@ export default React.createClass({
 
   displayName: 'TopicReplyList',
   propTypes: {
+    userId: PropTypes.string.isRequired,
+    forumId: PropTypes.string.isRequired,
+    topicId: PropTypes.string.isRequired,
     replies: PropTypes.array.isRequired,
   },
 
@@ -24,9 +27,15 @@ export default React.createClass({
   },
 
   buildReplyListItem(reply, index) {
+    const {userId, forumId, topicId} = this.props;
+
     return (
       <li key={`reply-list-item-${index}`}>
-        <TopicReplyListItem reply={reply} />
+        <TopicReplyListItem
+          userId={userId}
+          forumId={forumId}
+          topicId={topicId}
+          reply={reply} />
       </li>
     );
   }

@@ -1,10 +1,17 @@
 import React, { PropTypes } from 'react';
+import {dispatch} from '../../../dispatcher';
 import UserAvatar from '../user/user-avatar.jsx';
+import SubscribeButton from '../forum/subscribe-button.jsx';
+import { SUBSCRIPTION_STATE } from '../../../constants/forum.js';
+import requestUpdateReplySubscriptionState from '../../../action-creators/forum/request-update-reply-subscription-state';
 
 export default React.createClass({
 
   displayName: 'TopicReplyListItem',
   propTypes: {
+    userId: PropTypes.string.isRequired,
+    forumId: PropTypes.string.isRequired,
+    topicId: PropTypes.string.isRequired,
     reply: PropTypes.shape({
       text: PropTypes.string,
       body: PropTypes.shape({
@@ -24,6 +31,7 @@ export default React.createClass({
     const {reply} = this.props;
     const {user} = reply;
     const avatarDims = 30;
+    const subscriptionState = reply.subscriptionState;
 
     return (
       <article className="topic-reply-list-item">
@@ -41,6 +49,14 @@ export default React.createClass({
         <footer className="topic-reply-list-item__footer">
           <span className="topic-reply-list-item__likes">10 Likes</span>
           <span className="topic-reply-list-item__comments">2 Comments</span>
+          <SubscribeButton
+            subscriptionState={subscriptionState}
+            className="topic-reply-list-item__footer__subscribe-action"
+            itemClassName="topic-reply-list-item__footer__subscribe-action-text-item"
+            subscribedText="Stop Watching"
+            unsubscribedText="Watch"
+            pendingText="..."
+            onClick={this.onSubscribeButtonClick}/>
         </footer>
       </article>
     );
@@ -62,5 +78,15 @@ export default React.createClass({
       </section>
     );
   },
+
+
+  onSubscribeButtonClick() {
+    const {userId, forumId, topicId, reply} = this.props;
+    const replyId = reply.id;
+    const subscriptionState = reply.subscriptionState;
+
+    var desiredIsSubscribed = (subscriptionState !== SUBSCRIPTION_STATE.SUBSCRIBED);
+    dispatch(requestUpdateReplySubscriptionState(forumId, topicId, replyId, userId, desiredIsSubscribed));
+  }
 
 });

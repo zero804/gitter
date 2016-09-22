@@ -10,6 +10,7 @@ import {getForumId} from './forum-store'
 import router from '../routers';
 import {BaseModel} from './base-model';
 import {NAVIGATE_TO_TOPIC} from '../../../shared/constants/navigation';
+import { UPDATE_REPLY_SUBSCRIPTION_STATE, REQUEST_UPDATE_REPLY_SUBSCRIPTION_STATE, SUBSCRIPTION_STATE } from '../../../shared/constants/forum.js';
 
 export const ReplyStore = BaseModel.extend({
   url(){
@@ -35,6 +36,8 @@ export const RepliesStore = LiveCollection.extend({
   initialize(){
     subscribe(SUBMIT_NEW_REPLY, this.createNewReply, this);
     subscribe(NAVIGATE_TO_TOPIC, this.onNavigateToTopic, this);
+    subscribe(REQUEST_UPDATE_REPLY_SUBSCRIPTION_STATE, this.onRequestSubscriptionStateUpdate, this);
+    subscribe(UPDATE_REPLY_SUBSCRIPTION_STATE, this.onSubscriptionStateUpdate, this);
     router.on('change:topicId', this.onActiveTopicUpdate, this);
   },
 
@@ -57,11 +60,27 @@ export const RepliesStore = LiveCollection.extend({
 
   onNavigateToTopic(){
     this.reset([]);
+  },
+
+  onRequestSubscriptionStateUpdate(data) {
+    var {replyId} = data;
+    this.get(replyId).set({
+      subscriptionState: SUBSCRIPTION_STATE.PENDING
+    });
+  },
+
+  onSubscriptionStateUpdate(data) {
+    var {replyId, state} = data;
+    this.get(replyId).set({
+      subscriptionState: state
+    });
   }
 
 });
 
-dispatchOnChangeMixin(RepliesStore);
+dispatchOnChangeMixin(RepliesStore, [
+  'change:subscriptionState'
+]);
 
 const serverStore = (window.context.repliesStore|| {});
 const serverData = (serverStore.data || [])

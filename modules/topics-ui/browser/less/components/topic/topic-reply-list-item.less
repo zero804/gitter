@@ -56,3 +56,27 @@
 .topic-reply-list-item__avatar {
   border-radius: .2rem;
 }
+
+
+.topic-reply-list-item__footer__subscribe-action {
+  .m-details-text();
+
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+
+  background-color: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.topic-reply-list-item__footer__subscribe-action-text-item {
+  width: 100%;
+  height: 0;
+  line-height: 0;
+
+  &.hidden {
+    opacity: 0;
+  }
+}
