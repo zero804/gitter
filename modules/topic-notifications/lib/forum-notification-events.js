@@ -2,6 +2,7 @@
 
 var ForumObject = require('./forum-object');
 var subscriberService = require('./subscriber-service');
+var notificationService = require('./notification-service');
 
 /**
  * Called when a new topic is created
@@ -16,6 +17,9 @@ function createTopic(topic) {
     })
     .then(function() {
       return subscriberService.listForItem(topicRef, { exclude: this.authorUserId });
+    })
+    .tap(function(userIds) {
+      return notificationService.createNotifications(topicRef, userIds);
     });
 }
 
@@ -32,6 +36,9 @@ function createReply(reply) {
     })
     .then(function() {
       return subscriberService.listForItem(replyRef, { exclude: this.authorUserId });
+    })
+    .tap(function(userIds) {
+      return notificationService.createNotifications(replyRef, userIds);
     });
 }
 
@@ -40,6 +47,7 @@ function createReply(reply) {
  */
 function createComment(comment) {
   var replyRef = ForumObject.createForReply(comment.forumId, comment.topicId, comment.replyId);
+  var commentRef = ForumObject.createForComment(comment.forumId, comment.topicId, comment.replyId, comment._id);
 
   var authorUserId = comment.userId;
   return subscriberService.addSubscriber(replyRef, authorUserId)
@@ -48,7 +56,11 @@ function createComment(comment) {
     })
     .then(function() {
       return subscriberService.listForItem(replyRef, { exclude: this.authorUserId });
+    })
+    .tap(function(userIds) {
+      return notificationService.createNotifications(commentRef, userIds);
     });
+
 }
 
 module.exports = {
