@@ -61,7 +61,9 @@ return Promise.join(
     //client.subscribe(forumUrl, messageHandler(forumUrl));
 
     var topicsUri = '/v1/forums/' + forumId + '/topics';
-    registerSnapshotHandler(client, topicsUri);
+    registerSnapshotHandler(client, topicsUri, {
+      sort: { repliesTotal: 1 }
+    });
     client.subscribe(topicsUri, messageHandler(topicsUri));
 
     if (opts.topic) {
@@ -79,12 +81,13 @@ return Promise.join(
     }
   });
 
-function registerSnapshotHandler(client, uri) {
+function registerSnapshotHandler(client, uri, snapshotState) {
   console.log('Listening out for snapshots on ' + uri);
   client.registerSnapshotHandler(uri, {
     getSnapshotStateForChannel: function() {
     },
     getSnapshotState: function() {
+      return snapshotState;
     },
     getSubscribeOptions: function() {
     },
