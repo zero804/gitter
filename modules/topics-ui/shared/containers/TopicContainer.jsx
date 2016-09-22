@@ -98,7 +98,7 @@ const TopicContainer = createClass({
           userId={currentUser.id}
           forumId={forumId}
           groupName={groupName}
-          forumWatchState={forumWatchState}/>
+          watchState={forumWatchState}/>
         <article>
           <TopicHeader
             topic={topic}

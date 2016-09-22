@@ -10,16 +10,15 @@ export default React.createClass({
   displayName: 'WatchForumButton',
 
   propTypes: {
+    watchState: PropTypes.oneOf(_.values(FORUM_WATCH_STATE)).isRequired,
     children: PropTypes.node,
     onClick: PropTypes.func,
     className: PropTypes.string,
-    itemClassName: PropTypes.string,
-    href: PropTypes.string,
-    watchState: PropTypes.oneOf(_.values(FORUM_WATCH_STATE))
+    itemClassName: PropTypes.string
   },
 
   render() {
-    const {children, className, href, itemClassName, watchState} = this.props;
+    const {children, className, itemClassName, watchState} = this.props;
 
     var compiledClassNames = className + ' ' + classNames({
       pending: watchState === FORUM_WATCH_STATE.PENDING
