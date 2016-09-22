@@ -7,6 +7,7 @@ import TopicContainer from '../../shared/containers/TopicContainer.jsx';
 //Stores
 import NewTopicStore from './stores/new-topic-store';
 import NewReplyStore from './stores/new-reply-store';
+import NewCommentStore from './stores/new-comment-store-store';
 
 import {getCurrentUserStore} from './stores/current-user-store';
 import {getForumStore} from './stores/forum-store';
@@ -109,6 +110,7 @@ export default React.createClass({
       repliesStore: getRepliesStore(),
       newReplyStore: new NewReplyStore(),
       commentsStore: getCommentsStore(),
+      newCommentStore: new NewCommentStore(),
     });
   },
 

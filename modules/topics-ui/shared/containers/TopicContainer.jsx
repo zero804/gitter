@@ -45,7 +45,11 @@ const TopicContainer = createClass({
 
     newReplyStore: PropTypes.shape({
       get: PropTypes.func.isRequired,
-    })
+    }),
+
+    newCommentStore: PropTypes.shape({
+      get: PropTypes.func.isRequired,
+    }),
 
   },
 
