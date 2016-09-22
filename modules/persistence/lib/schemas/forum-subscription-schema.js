@@ -9,8 +9,7 @@ var ForumSubscriptionSchema = new Schema({
   forumId: { type: ObjectId, required: true },
   topicId: { type: ObjectId },
   replyId: { type: ObjectId },
-  // Was this subscription created automatically?
-  auto: { type: Boolean }
+  enabled: { type: Boolean }
 }, { strict: 'throw' });
 
 ForumSubscriptionSchema.schemaTypeName = 'ForumSubscriptionSchema';
