@@ -13,7 +13,7 @@ var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var markdownMajorVersion = require('gitter-markdown-processor').version.split('.')[0];
 var validateComment = require('./validate-comment');
-
+var topicNotificationEvents = require('gitter-web-topic-notifications/lib/forum-notification-events');
 
 function findById(commentId) {
   return Comment.findById(commentId)
@@ -172,6 +172,9 @@ function createComment(user, reply, options) {
     })
     .bind({
       comment: undefined
+    })
+    .tap(function(comment) {
+      return topicNotificationEvents.createComment(comment);
     })
     .then(function(comment) {
       this.comment = comment;
