@@ -249,14 +249,13 @@ describe('topics-live-collection', function() {
       });
   });
 
-  it('should emit a patch event when changing the category', function() {
+  it('should emit an update event when changing the category', function() {
     var checkEvent = appEvents.addListener('dataChange2', {
       url: '/forums/' + fixture.forum1.id + '/topics',
-      operation: 'patch',
+      operation: 'update',
       type: 'topic',
       model: {
         id: fixture.topic3.id.toString(),
-        categoryId: fixture.category2._id.toString()
       },
     });
 
@@ -265,6 +264,8 @@ describe('topics-live-collection', function() {
       .then(function(event) {
         // the patch event must also contain lastModified
         assert.ok(event.model.lastModified);
+
+        assert.strictEqual(event.model.category.id.toString(), fixture.category2._id.toString());
       });
   });
 });
