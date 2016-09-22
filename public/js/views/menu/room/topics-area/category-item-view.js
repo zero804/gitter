@@ -7,6 +7,15 @@ var template = require('./category-item-view.hbs');
 
 module.exports = Marionette.ItemView.extend({
   tagName: 'li',
+
+  attributes: function() {
+    var id = this.model.get('id');
+    return {
+      'data-id': id,
+      id: id,
+    };
+  },
+
   template: template,
 
   ui: {

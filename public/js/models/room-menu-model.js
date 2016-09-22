@@ -180,7 +180,6 @@ module.exports = Backbone.Model.extend({
     this.searchFocusModel = new Backbone.Model({ focus: false });
 
     var forumSnapshot = context.getSnapshot('forum');
-    console.log('forumSnapshot', forumSnapshot.categories);
     this.forumCategoryCollection = new ForumCategoryCollection(forumSnapshot && forumSnapshot.categories, {
       roomMenuModel: this,
       groupsCollection: this.groupsCollection

@@ -127,7 +127,7 @@
                 <div class="js-left-menu-topics-category-list-root">
                   <ul class="collection-list">
                     {{#each forum.categories}}
-                      <li>
+                      <li data-id="{{id}}" id="{{id}}">
                         {{{ prerenderView "js/views/menu/room/topics-area/category-item-view" }}}
                       </li>
                     {{/each}}
