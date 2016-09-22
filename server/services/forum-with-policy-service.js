@@ -10,14 +10,22 @@ var replyService = require('gitter-web-topics/lib/reply-service');
 var commentService = require('gitter-web-topics/lib/comment-service');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var secureMethod = require('../utils/secure-method');
-
+var subscriberService = require('gitter-web-topic-notifications/lib/subscriber-service');
 
 function allowAdmin() {
   return this.policy.canAdmin();
 }
 
+function allowRead() {
+  return this.policy.canRead();
+}
+
 function allowWrite() {
   return this.policy.canWrite();
+}
+
+function allowAnyone() {
+  return true;
 }
 
 function matchForum(object) {
@@ -34,9 +42,10 @@ function matchForum(object) {
   */
   if (!mongoUtils.objectIDsEqual(object.forumId, this.forum._id)) {
     // not sure what would be the best HTTP status code here
-    throw new StatusError(403, 'forumId does not match');
+    throw new StatusError(404, 'forumId does not match');
   }
 }
+
 
 function ForumWithPolicyService(forum, user, policy) {
   assert(forum, 'Forum required');
@@ -137,5 +146,20 @@ ForumWithPolicyService.prototype.setTopicTags = secureMethod([allowAdmin, matchF
 
   return topicService.setTopicTags(user, topic, tags, { allowedTags: forum.tags });
 });
+
+/**
+ * Subscription bits
+ */
+ ForumWithPolicyService.prototype.listSubscribers = secureMethod([allowAdmin, matchForum], function(forumObject) {
+   return subscriberService.listForItem(forumObject);
+ });
+
+ ForumWithPolicyService.prototype.subscribe = secureMethod([allowRead, matchForum], function(forumObject) {
+   return subscriberService.addSubscriber(forumObject, this.user._id);
+ });
+
+ ForumWithPolicyService.prototype.unsubscribe = secureMethod([allowAnyone, matchForum], function(forumObject) {
+   return subscriberService.removeSubscriber(forumObject, this.user._id);
+ });
 
 module.exports = ForumWithPolicyService;

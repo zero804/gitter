@@ -1,7 +1,6 @@
 'use strict';
 
 var env = require('gitter-web-env');
-var config = env.config;
 var logger = env.logger;
 var errorReporter = env.errorReporter;
 var liveCollectionEvents = require('gitter-web-live-collection-events');
@@ -13,15 +12,13 @@ var handlers = {
   rooms: './live-collection-rooms',
   roomMembers: './live-collection-room-members',
   users: './live-collection-users',
-  groupMembers: './live-collection-group-members'
-};
+  groupMembers: './live-collection-group-members',
 
-if (config.get('topics:useApi')) {
-  handlers.topics = './live-collection-topics';
-  handlers.replies = './live-collection-replies';
-  handlers.comments = './live-collection-comments';
-  // TODO: categories? forums?
-}
+  /* Topics */
+  topics: './live-collection-topics',
+  replies: './live-collection-replies',
+  comments: './live-collection-comments',
+};
 
 module.exports = {
   install: install

@@ -155,14 +155,14 @@
               "resolved": "http://beta-internal:4873/media-typer/-/media-typer-0.3.0.tgz"
             },
             "mime-types": {
-              "version": "2.1.11",
+              "version": "2.1.12",
               "from": "mime-types@>=2.1.11 <2.2.0",
-              "resolved": "http://beta-internal:4873/mime-types/-/mime-types-2.1.11.tgz",
+              "resolved": "http://beta-internal:4873/mime-types/-/mime-types-2.1.12.tgz",
               "dependencies": {
                 "mime-db": {
-                  "version": "1.23.0",
-                  "from": "mime-db@>=1.23.0 <1.24.0",
-                  "resolved": "http://beta-internal:4873/mime-db/-/mime-db-1.23.0.tgz"
+                  "version": "1.24.0",
+                  "from": "mime-db@>=1.24.0 <1.25.0",
+                  "resolved": "http://beta-internal:4873/mime-db/-/mime-db-1.24.0.tgz"
                 }
               }
             }
@@ -256,9 +256,9 @@
           "resolved": "http://beta-internal:4873/rimraf/-/rimraf-2.5.4.tgz",
           "dependencies": {
             "glob": {
-              "version": "7.0.6",
+              "version": "7.1.0",
               "from": "glob@>=7.0.5 <8.0.0",
-              "resolved": "http://beta-internal:4873/glob/-/glob-7.0.6.tgz",
+              "resolved": "https://registry.npmjs.org/glob/-/glob-7.1.0.tgz",
               "dependencies": {
                 "fs.realpath": {
                   "version": "1.0.0",
@@ -284,7 +284,7 @@
                 },
                 "minimatch": {
                   "version": "3.0.3",
-                  "from": "minimatch@>=2.0.0 <3.0.0||>=3.0.0 <4.0.0",
+                  "from": "minimatch@>=3.0.2 <4.0.0",
                   "resolved": "http://beta-internal:4873/minimatch/-/minimatch-3.0.3.tgz",
                   "dependencies": {
                     "brace-expansion": {
@@ -390,7 +390,7 @@
       "dependencies": {
         "redis": {
           "version": "2.6.2",
-          "from": "redis@latest",
+          "from": "redis@>=2.1.0 <3.0.0",
           "resolved": "http://beta-internal:4873/redis/-/redis-2.6.2.tgz",
           "dependencies": {
             "double-ended-queue": {
@@ -588,7 +588,7 @@
         "ms": {
           "version": "0.7.1",
           "from": "ms@0.7.1",
-          "resolved": "http://beta-internal:4873/ms/-/ms-0.7.1.tgz"
+          "resolved": "https://registry.npmjs.org/ms/-/ms-0.7.1.tgz"
         }
       }
     },
@@ -742,14 +742,14 @@
           "resolved": "http://beta-internal:4873/accepts/-/accepts-1.3.3.tgz",
           "dependencies": {
             "mime-types": {
-              "version": "2.1.11",
+              "version": "2.1.12",
               "from": "mime-types@>=2.1.11 <2.2.0",
-              "resolved": "http://beta-internal:4873/mime-types/-/mime-types-2.1.11.tgz",
+              "resolved": "http://beta-internal:4873/mime-types/-/mime-types-2.1.12.tgz",
               "dependencies": {
                 "mime-db": {
-                  "version": "1.23.0",
-                  "from": "mime-db@>=1.23.0 <1.24.0",
-                  "resolved": "http://beta-internal:4873/mime-db/-/mime-db-1.23.0.tgz"
+                  "version": "1.24.0",
+                  "from": "mime-db@>=1.24.0 <1.25.0",
+                  "resolved": "http://beta-internal:4873/mime-db/-/mime-db-1.24.0.tgz"
                 }
               }
             },
@@ -915,7 +915,7 @@
             },
             "mime": {
               "version": "1.3.4",
-              "from": "mime@1.3.4",
+              "from": "mime@>=1.3.4 <1.4.0",
               "resolved": "http://beta-internal:4873/mime/-/mime-1.3.4.tgz"
             },
             "ms": {
@@ -946,14 +946,14 @@
               "resolved": "http://beta-internal:4873/media-typer/-/media-typer-0.3.0.tgz"
             },
             "mime-types": {
-              "version": "2.1.11",
+              "version": "2.1.12",
               "from": "mime-types@>=2.1.11 <2.2.0",
-              "resolved": "http://beta-internal:4873/mime-types/-/mime-types-2.1.11.tgz",
+              "resolved": "http://beta-internal:4873/mime-types/-/mime-types-2.1.12.tgz",
               "dependencies": {
                 "mime-db": {
-                  "version": "1.23.0",
-                  "from": "mime-db@>=1.23.0 <1.24.0",
-                  "resolved": "http://beta-internal:4873/mime-db/-/mime-db-1.23.0.tgz"
+                  "version": "1.24.0",
+                  "from": "mime-db@>=1.24.0 <1.25.0",
+                  "resolved": "http://beta-internal:4873/mime-db/-/mime-db-1.24.0.tgz"
                 }
               }
             }
@@ -1486,9 +1486,9 @@
                       "resolved": "http://beta-internal:4873/async/-/async-2.0.1.tgz",
                       "dependencies": {
                         "lodash": {
-                          "version": "4.15.0",
+                          "version": "4.16.1",
                           "from": "lodash@>=4.8.0 <5.0.0",
-                          "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.15.0.tgz"
+                          "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.16.1.tgz"
                         }
                       }
                     }
@@ -1553,9 +1553,9 @@
                       }
                     },
                     "is-my-json-valid": {
-                      "version": "2.13.1",
+                      "version": "2.14.0",
                       "from": "is-my-json-valid@>=2.12.4 <3.0.0",
-                      "resolved": "http://beta-internal:4873/is-my-json-valid/-/is-my-json-valid-2.13.1.tgz",
+                      "resolved": "http://beta-internal:4873/is-my-json-valid/-/is-my-json-valid-2.14.0.tgz",
                       "dependencies": {
                         "generate-function": {
                           "version": "2.0.0",
@@ -1736,14 +1736,14 @@
                   "resolved": "http://beta-internal:4873/json-stringify-safe/-/json-stringify-safe-5.0.1.tgz"
                 },
                 "mime-types": {
-                  "version": "2.1.11",
+                  "version": "2.1.12",
                   "from": "mime-types@>=2.1.7 <2.2.0",
-                  "resolved": "http://beta-internal:4873/mime-types/-/mime-types-2.1.11.tgz",
+                  "resolved": "http://beta-internal:4873/mime-types/-/mime-types-2.1.12.tgz",
                   "dependencies": {
                     "mime-db": {
-                      "version": "1.23.0",
-                      "from": "mime-db@>=1.23.0 <1.24.0",
-                      "resolved": "http://beta-internal:4873/mime-db/-/mime-db-1.23.0.tgz"
+                      "version": "1.24.0",
+                      "from": "mime-db@>=1.24.0 <1.25.0",
+                      "resolved": "http://beta-internal:4873/mime-db/-/mime-db-1.24.0.tgz"
                     }
                   }
                 },
@@ -1782,9 +1782,9 @@
           }
         },
         "lodash": {
-          "version": "4.15.0",
+          "version": "4.16.1",
           "from": "lodash@>=4.6.1 <5.0.0",
-          "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.15.0.tgz"
+          "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.16.1.tgz"
         },
         "mandrill-api": {
           "version": "1.0.45",
@@ -2007,7 +2007,7 @@
       "dependencies": {
         "redis": {
           "version": "2.6.2",
-          "from": "redis@latest",
+          "from": "redis@>=2.1.0 <3.0.0",
           "resolved": "http://beta-internal:4873/redis/-/redis-2.6.2.tgz",
           "dependencies": {
             "double-ended-queue": {
@@ -2274,6 +2274,11 @@
       "from": "modules/api-client",
       "resolved": "file:modules/api-client",
       "dependencies": {
+        "backbone": {
+          "version": "1.2.3",
+          "from": "backbone@1.2.3",
+          "resolved": "http://beta-internal:4873/backbone/-/backbone-1.2.3.tgz"
+        },
         "debug-proxy": {
           "version": "0.2.0",
           "from": "debug-proxy@>=0.2.0 <0.3.0",
@@ -2332,9 +2337,9 @@
       "resolved": "file:modules/fake-data",
       "dependencies": {
         "lodash": {
-          "version": "4.15.0",
+          "version": "4.16.1",
           "from": "lodash@>=4.13.1 <5.0.0",
-          "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.15.0.tgz"
+          "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.16.1.tgz"
         }
       }
     },
@@ -2453,6 +2458,11 @@
       "from": "modules/text-processor",
       "resolved": "file:modules/text-processor"
     },
+    "gitter-web-topic-notifications": {
+      "version": "1.0.0",
+      "from": "modules/topic-notifications",
+      "resolved": "file:modules/topic-notifications"
+    },
     "gitter-web-topics": {
       "version": "1.0.0",
       "from": "modules/topics",
@@ -2469,14 +2479,14 @@
           "resolved": "http://beta-internal:4873/backbone/-/backbone-1.2.3.tgz"
         },
         "lodash": {
-          "version": "4.15.0",
+          "version": "4.16.1",
           "from": "lodash@>=4.15.0 <5.0.0",
-          "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.15.0.tgz"
+          "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.16.1.tgz"
         },
         "sinon": {
-          "version": "1.17.5",
+          "version": "1.17.6",
           "from": "sinon@>=1.17.5 <2.0.0",
-          "resolved": "http://beta-internal:4873/sinon/-/sinon-1.17.5.tgz",
+          "resolved": "http://beta-internal:4873/sinon/-/sinon-1.17.6.tgz",
           "dependencies": {
             "formatio": {
               "version": "1.1.1",
@@ -2814,9 +2824,9 @@
                       "resolved": "http://beta-internal:4873/async/-/async-2.0.1.tgz",
                       "dependencies": {
                         "lodash": {
-                          "version": "4.15.0",
+                          "version": "4.16.1",
                           "from": "lodash@>=4.8.0 <5.0.0",
-                          "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.15.0.tgz"
+                          "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.16.1.tgz"
                         }
                       }
                     }
@@ -2881,9 +2891,9 @@
                       }
                     },
                     "is-my-json-valid": {
-                      "version": "2.13.1",
+                      "version": "2.14.0",
                       "from": "is-my-json-valid@>=2.12.4 <3.0.0",
-                      "resolved": "http://beta-internal:4873/is-my-json-valid/-/is-my-json-valid-2.13.1.tgz",
+                      "resolved": "http://beta-internal:4873/is-my-json-valid/-/is-my-json-valid-2.14.0.tgz",
                       "dependencies": {
                         "generate-function": {
                           "version": "2.0.0",
@@ -3064,14 +3074,14 @@
                   "resolved": "http://beta-internal:4873/json-stringify-safe/-/json-stringify-safe-5.0.1.tgz"
                 },
                 "mime-types": {
-                  "version": "2.1.11",
+                  "version": "2.1.12",
                   "from": "mime-types@>=2.1.7 <2.2.0",
-                  "resolved": "http://beta-internal:4873/mime-types/-/mime-types-2.1.11.tgz",
+                  "resolved": "http://beta-internal:4873/mime-types/-/mime-types-2.1.12.tgz",
                   "dependencies": {
                     "mime-db": {
-                      "version": "1.23.0",
-                      "from": "mime-db@>=1.23.0 <1.24.0",
-                      "resolved": "http://beta-internal:4873/mime-db/-/mime-db-1.23.0.tgz"
+                      "version": "1.24.0",
+                      "from": "mime-db@>=1.24.0 <1.25.0",
+                      "resolved": "http://beta-internal:4873/mime-db/-/mime-db-1.24.0.tgz"
                     }
                   }
                 },
@@ -3361,9 +3371,9 @@
           "resolved": "http://beta-internal:4873/rimraf/-/rimraf-2.5.4.tgz",
           "dependencies": {
             "glob": {
-              "version": "7.0.6",
+              "version": "7.1.0",
               "from": "glob@>=7.0.5 <8.0.0",
-              "resolved": "http://beta-internal:4873/glob/-/glob-7.0.6.tgz",
+              "resolved": "https://registry.npmjs.org/glob/-/glob-7.1.0.tgz",
               "dependencies": {
                 "fs.realpath": {
                   "version": "1.0.0",
@@ -3483,7 +3493,7 @@
         },
         "parseurl": {
           "version": "1.3.1",
-          "from": "parseurl@>=1.3.0 <1.4.0",
+          "from": "parseurl@>=1.3.1 <1.4.0",
           "resolved": "http://beta-internal:4873/parseurl/-/parseurl-1.3.1.tgz"
         },
         "vary": {
@@ -3499,9 +3509,9 @@
       "resolved": "http://beta-internal:4873/mixpanel/-/mixpanel-0.0.20.tgz"
     },
     "moment": {
-      "version": "2.15.0",
+      "version": "2.15.1",
       "from": "moment@>=2.10.3 <3.0.0",
-      "resolved": "http://beta-internal:4873/moment/-/moment-2.15.0.tgz"
+      "resolved": "http://beta-internal:4873/moment/-/moment-2.15.1.tgz"
     },
     "mongodb": {
       "version": "2.1.21",
@@ -3511,7 +3521,7 @@
         "es6-promise": {
           "version": "3.0.2",
           "from": "es6-promise@3.0.2",
-          "resolved": "http://beta-internal:4873/es6-promise/-/es6-promise-3.0.2.tgz"
+          "resolved": "https://registry.npmjs.org/es6-promise/-/es6-promise-3.0.2.tgz"
         },
         "mongodb-core": {
           "version": "1.3.21",
@@ -3584,7 +3594,7 @@
         "async": {
           "version": "1.5.2",
           "from": "async@1.5.2",
-          "resolved": "http://beta-internal:4873/async/-/async-1.5.2.tgz"
+          "resolved": "https://registry.npmjs.org/async/-/async-1.5.2.tgz"
         },
         "bson": {
           "version": "0.4.23",
@@ -3594,12 +3604,12 @@
         "hooks-fixed": {
           "version": "1.2.0",
           "from": "hooks-fixed@1.2.0",
-          "resolved": "http://beta-internal:4873/hooks-fixed/-/hooks-fixed-1.2.0.tgz"
+          "resolved": "https://registry.npmjs.org/hooks-fixed/-/hooks-fixed-1.2.0.tgz"
         },
         "kareem": {
           "version": "1.1.3",
           "from": "kareem@1.1.3",
-          "resolved": "http://beta-internal:4873/kareem/-/kareem-1.1.3.tgz"
+          "resolved": "https://registry.npmjs.org/kareem/-/kareem-1.1.3.tgz"
         },
         "mongodb": {
           "version": "2.1.18",
@@ -3609,7 +3619,7 @@
             "es6-promise": {
               "version": "3.0.2",
               "from": "es6-promise@3.0.2",
-              "resolved": "http://beta-internal:4873/es6-promise/-/es6-promise-3.0.2.tgz"
+              "resolved": "https://registry.npmjs.org/es6-promise/-/es6-promise-3.0.2.tgz"
             },
             "mongodb-core": {
               "version": "1.3.18",
@@ -3667,17 +3677,17 @@
         "mpath": {
           "version": "0.2.1",
           "from": "mpath@0.2.1",
-          "resolved": "http://beta-internal:4873/mpath/-/mpath-0.2.1.tgz"
+          "resolved": "https://registry.npmjs.org/mpath/-/mpath-0.2.1.tgz"
         },
         "mpromise": {
           "version": "0.5.5",
           "from": "mpromise@0.5.5",
-          "resolved": "http://beta-internal:4873/mpromise/-/mpromise-0.5.5.tgz"
+          "resolved": "https://registry.npmjs.org/mpromise/-/mpromise-0.5.5.tgz"
         },
         "mquery": {
           "version": "1.11.0",
           "from": "mquery@1.11.0",
-          "resolved": "http://beta-internal:4873/mquery/-/mquery-1.11.0.tgz",
+          "resolved": "https://registry.npmjs.org/mquery/-/mquery-1.11.0.tgz",
           "dependencies": {
             "bluebird": {
               "version": "2.10.2",
@@ -3704,7 +3714,7 @@
         "regexp-clone": {
           "version": "0.0.1",
           "from": "regexp-clone@0.0.1",
-          "resolved": "http://beta-internal:4873/regexp-clone/-/regexp-clone-0.0.1.tgz"
+          "resolved": "https://registry.npmjs.org/regexp-clone/-/regexp-clone-0.0.1.tgz"
         },
         "sliced": {
           "version": "1.0.1",
@@ -4125,7 +4135,7 @@
       "dependencies": {
         "passport-oauth2": {
           "version": "1.3.0",
-          "from": "passport-oauth2@>=1.0.0 <2.0.0",
+          "from": "passport-oauth2@>=1.1.2 <2.0.0",
           "resolved": "http://beta-internal:4873/passport-oauth2/-/passport-oauth2-1.3.0.tgz",
           "dependencies": {
             "passport-strategy": {
@@ -4178,7 +4188,7 @@
       "dependencies": {
         "passport-oauth2": {
           "version": "1.3.0",
-          "from": "passport-oauth2@>=1.0.0 <2.0.0",
+          "from": "passport-oauth2@>=1.1.2 <2.0.0",
           "resolved": "http://beta-internal:4873/passport-oauth2/-/passport-oauth2-1.3.0.tgz",
           "dependencies": {
             "passport-strategy": {
@@ -4259,9 +4269,9 @@
       "resolved": "http://beta-internal:4873/permessage-deflate/-/permessage-deflate-0.1.5.tgz"
     },
     "react": {
-      "version": "15.3.1",
-      "from": "react@>=15.2.1 <16.0.0",
-      "resolved": "http://beta-internal:4873/react/-/react-15.3.1.tgz",
+      "version": "15.3.2",
+      "from": "react@>=15.3.1 <16.0.0",
+      "resolved": "http://beta-internal:4873/react/-/react-15.3.2.tgz",
       "dependencies": {
         "fbjs": {
           "version": "0.8.4",
@@ -4353,9 +4363,9 @@
       }
     },
     "react-dom": {
-      "version": "15.3.1",
-      "from": "react-dom@>=15.2.1 <16.0.0",
-      "resolved": "http://beta-internal:4873/react-dom/-/react-dom-15.3.1.tgz"
+      "version": "15.3.2",
+      "from": "react-dom@>=15.3.1 <16.0.0",
+      "resolved": "http://beta-internal:4873/react-dom/-/react-dom-15.3.2.tgz"
     },
     "readme-badger": {
       "version": "0.1.2",
@@ -4493,9 +4503,9 @@
       "resolved": "http://beta-internal:4873/request-extensible/-/request-extensible-0.1.1.tgz",
       "dependencies": {
         "request": {
-          "version": "2.74.0",
+          "version": "2.75.0",
           "from": "request@>=2.53.0 <3.0.0",
-          "resolved": "http://beta-internal:4873/request/-/request-2.74.0.tgz",
+          "resolved": "http://beta-internal:4873/request/-/request-2.75.0.tgz",
           "dependencies": {
             "aws-sign2": {
               "version": "0.6.0",
@@ -4579,21 +4589,14 @@
               "resolved": "http://beta-internal:4873/forever-agent/-/forever-agent-0.6.1.tgz"
             },
             "form-data": {
-              "version": "1.0.1",
-              "from": "form-data@>=1.0.0-rc4 <1.1.0",
-              "resolved": "http://beta-internal:4873/form-data/-/form-data-1.0.1.tgz",
+              "version": "2.0.0",
+              "from": "form-data@>=2.0.0 <2.1.0",
+              "resolved": "http://beta-internal:4873/form-data/-/form-data-2.0.0.tgz",
               "dependencies": {
-                "async": {
-                  "version": "2.0.1",
-                  "from": "async@>=2.0.1 <3.0.0",
-                  "resolved": "http://beta-internal:4873/async/-/async-2.0.1.tgz",
-                  "dependencies": {
-                    "lodash": {
-                      "version": "4.15.0",
-                      "from": "lodash@>=4.8.0 <5.0.0",
-                      "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.15.0.tgz"
-                    }
-                  }
+                "asynckit": {
+                  "version": "0.4.0",
+                  "from": "asynckit@>=0.4.0 <0.5.0",
+                  "resolved": "http://beta-internal:4873/asynckit/-/asynckit-0.4.0.tgz"
                 }
               }
             },
@@ -4656,9 +4659,9 @@
                   }
                 },
                 "is-my-json-valid": {
-                  "version": "2.13.1",
+                  "version": "2.14.0",
                   "from": "is-my-json-valid@>=2.12.4 <3.0.0",
-                  "resolved": "http://beta-internal:4873/is-my-json-valid/-/is-my-json-valid-2.13.1.tgz",
+                  "resolved": "http://beta-internal:4873/is-my-json-valid/-/is-my-json-valid-2.14.0.tgz",
                   "dependencies": {
                     "generate-function": {
                       "version": "2.0.0",
@@ -4839,14 +4842,14 @@
               "resolved": "http://beta-internal:4873/json-stringify-safe/-/json-stringify-safe-5.0.1.tgz"
             },
             "mime-types": {
-              "version": "2.1.11",
+              "version": "2.1.12",
               "from": "mime-types@>=2.1.7 <2.2.0",
-              "resolved": "http://beta-internal:4873/mime-types/-/mime-types-2.1.11.tgz",
+              "resolved": "http://beta-internal:4873/mime-types/-/mime-types-2.1.12.tgz",
               "dependencies": {
                 "mime-db": {
-                  "version": "1.23.0",
-                  "from": "mime-db@>=1.23.0 <1.24.0",
-                  "resolved": "http://beta-internal:4873/mime-db/-/mime-db-1.23.0.tgz"
+                  "version": "1.24.0",
+                  "from": "mime-db@>=1.24.0 <1.25.0",
+                  "resolved": "http://beta-internal:4873/mime-db/-/mime-db-1.24.0.tgz"
                 }
               }
             },
@@ -4955,7 +4958,7 @@
         },
         "parseurl": {
           "version": "1.3.1",
-          "from": "parseurl@>=1.3.0 <1.4.0",
+          "from": "parseurl@>=1.3.1 <1.4.0",
           "resolved": "http://beta-internal:4873/parseurl/-/parseurl-1.3.1.tgz"
         }
       }
@@ -5048,9 +5051,9 @@
           "resolved": "http://beta-internal:4873/create-error/-/create-error-0.3.1.tgz"
         },
         "request": {
-          "version": "2.74.0",
+          "version": "2.75.0",
           "from": "request@>=2.53.0 <3.0.0",
-          "resolved": "http://beta-internal:4873/request/-/request-2.74.0.tgz",
+          "resolved": "http://beta-internal:4873/request/-/request-2.75.0.tgz",
           "dependencies": {
             "aws-sign2": {
               "version": "0.6.0",
@@ -5134,21 +5137,14 @@
               "resolved": "http://beta-internal:4873/forever-agent/-/forever-agent-0.6.1.tgz"
             },
             "form-data": {
-              "version": "1.0.1",
-              "from": "form-data@>=1.0.0-rc4 <1.1.0",
-              "resolved": "http://beta-internal:4873/form-data/-/form-data-1.0.1.tgz",
+              "version": "2.0.0",
+              "from": "form-data@>=2.0.0 <2.1.0",
+              "resolved": "http://beta-internal:4873/form-data/-/form-data-2.0.0.tgz",
               "dependencies": {
-                "async": {
-                  "version": "2.0.1",
-                  "from": "async@>=2.0.1 <3.0.0",
-                  "resolved": "http://beta-internal:4873/async/-/async-2.0.1.tgz",
-                  "dependencies": {
-                    "lodash": {
-                      "version": "4.15.0",
-                      "from": "lodash@>=4.8.0 <5.0.0",
-                      "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.15.0.tgz"
-                    }
-                  }
+                "asynckit": {
+                  "version": "0.4.0",
+                  "from": "asynckit@>=0.4.0 <0.5.0",
+                  "resolved": "http://beta-internal:4873/asynckit/-/asynckit-0.4.0.tgz"
                 }
               }
             },
@@ -5211,9 +5207,9 @@
                   }
                 },
                 "is-my-json-valid": {
-                  "version": "2.13.1",
+                  "version": "2.14.0",
                   "from": "is-my-json-valid@>=2.12.4 <3.0.0",
-                  "resolved": "http://beta-internal:4873/is-my-json-valid/-/is-my-json-valid-2.13.1.tgz",
+                  "resolved": "http://beta-internal:4873/is-my-json-valid/-/is-my-json-valid-2.14.0.tgz",
                   "dependencies": {
                     "generate-function": {
                       "version": "2.0.0",
@@ -5394,14 +5390,14 @@
               "resolved": "http://beta-internal:4873/json-stringify-safe/-/json-stringify-safe-5.0.1.tgz"
             },
             "mime-types": {
-              "version": "2.1.11",
+              "version": "2.1.12",
               "from": "mime-types@>=2.1.7 <2.2.0",
-              "resolved": "http://beta-internal:4873/mime-types/-/mime-types-2.1.11.tgz",
+              "resolved": "http://beta-internal:4873/mime-types/-/mime-types-2.1.12.tgz",
               "dependencies": {
                 "mime-db": {
-                  "version": "1.23.0",
-                  "from": "mime-db@>=1.23.0 <1.24.0",
-                  "resolved": "http://beta-internal:4873/mime-db/-/mime-db-1.23.0.tgz"
+                  "version": "1.24.0",
+                  "from": "mime-db@>=1.24.0 <1.25.0",
+                  "resolved": "http://beta-internal:4873/mime-db/-/mime-db-1.24.0.tgz"
                 }
               }
             },
@@ -5556,9 +5552,9 @@
                   "resolved": "http://beta-internal:4873/rimraf/-/rimraf-2.5.4.tgz",
                   "dependencies": {
                     "glob": {
-                      "version": "7.0.6",
+                      "version": "7.1.0",
                       "from": "glob@>=7.0.5 <8.0.0",
-                      "resolved": "http://beta-internal:4873/glob/-/glob-7.0.6.tgz",
+                      "resolved": "https://registry.npmjs.org/glob/-/glob-7.1.0.tgz",
                       "dependencies": {
                         "fs.realpath": {
                           "version": "1.0.0",
@@ -5633,7 +5629,7 @@
           "dependencies": {
             "chalk": {
               "version": "1.1.3",
-              "from": "chalk@>=1.1.1 <2.0.0",
+              "from": "chalk@>=1.1.3 <2.0.0",
               "resolved": "http://beta-internal:4873/chalk/-/chalk-1.1.3.tgz",
               "dependencies": {
                 "ansi-styles": {
@@ -6087,9 +6083,9 @@
                   "resolved": "http://beta-internal:4873/async/-/async-2.0.1.tgz",
                   "dependencies": {
                     "lodash": {
-                      "version": "4.15.0",
+                      "version": "4.16.1",
                       "from": "lodash@>=4.8.0 <5.0.0",
-                      "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.15.0.tgz"
+                      "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.16.1.tgz"
                     }
                   }
                 }
@@ -6102,7 +6098,7 @@
               "dependencies": {
                 "chalk": {
                   "version": "1.1.3",
-                  "from": "chalk@>=1.0.0 <2.0.0",
+                  "from": "chalk@>=1.1.1 <2.0.0",
                   "resolved": "http://beta-internal:4873/chalk/-/chalk-1.1.3.tgz",
                   "dependencies": {
                     "ansi-styles": {
@@ -6154,9 +6150,9 @@
                   }
                 },
                 "is-my-json-valid": {
-                  "version": "2.13.1",
+                  "version": "2.14.0",
                   "from": "is-my-json-valid@>=2.12.4 <3.0.0",
-                  "resolved": "http://beta-internal:4873/is-my-json-valid/-/is-my-json-valid-2.13.1.tgz",
+                  "resolved": "http://beta-internal:4873/is-my-json-valid/-/is-my-json-valid-2.14.0.tgz",
                   "dependencies": {
                     "generate-function": {
                       "version": "2.0.0",
@@ -6337,14 +6333,14 @@
               "resolved": "http://beta-internal:4873/json-stringify-safe/-/json-stringify-safe-5.0.1.tgz"
             },
             "mime-types": {
-              "version": "2.1.11",
+              "version": "2.1.12",
               "from": "mime-types@>=2.1.7 <2.2.0",
-              "resolved": "http://beta-internal:4873/mime-types/-/mime-types-2.1.11.tgz",
+              "resolved": "http://beta-internal:4873/mime-types/-/mime-types-2.1.12.tgz",
               "dependencies": {
                 "mime-db": {
-                  "version": "1.23.0",
-                  "from": "mime-db@>=1.23.0 <1.24.0",
-                  "resolved": "http://beta-internal:4873/mime-db/-/mime-db-1.23.0.tgz"
+                  "version": "1.24.0",
+                  "from": "mime-db@>=1.24.0 <1.25.0",
+                  "resolved": "http://beta-internal:4873/mime-db/-/mime-db-1.24.0.tgz"
                 }
               }
             },
@@ -6443,7 +6439,7 @@
           "dependencies": {
             "strip-ansi": {
               "version": "3.0.1",
-              "from": "strip-ansi@>=3.0.0 <4.0.0",
+              "from": "strip-ansi@>=3.0.1 <4.0.0",
               "resolved": "http://beta-internal:4873/strip-ansi/-/strip-ansi-3.0.1.tgz",
               "dependencies": {
                 "ansi-regex": {
@@ -6720,7 +6716,7 @@
             },
             "strip-ansi": {
               "version": "3.0.1",
-              "from": "strip-ansi@>=3.0.0 <4.0.0",
+              "from": "strip-ansi@>=3.0.1 <4.0.0",
               "resolved": "http://beta-internal:4873/strip-ansi/-/strip-ansi-3.0.1.tgz",
               "dependencies": {
                 "ansi-regex": {
