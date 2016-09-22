@@ -15,11 +15,14 @@ module.exports = function commentsStore(models) {
 
   const getCommentsByReplyId = () => [];
 
+  const getActiveReplyId = () => null;
+
   //Methods
   return {
     models: models,
     getComments: getComments,
-    getCommentsByReplyId: getCommentsByReplyId
+    getCommentsByReplyId: getCommentsByReplyId,
+    getActiveReplyId: getActiveReplyId
   };
 
 };

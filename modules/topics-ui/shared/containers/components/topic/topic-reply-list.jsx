@@ -9,6 +9,8 @@ export default React.createClass({
   propTypes: {
     replies: PropTypes.array.isRequired,
     onReplyCommentsClicked: PropTypes.func.isRequired,
+    onNewCommentUpdate: PropTypes.func.isRequired,
+    submitNewComment: PropTypes.func.isRequired,
   },
 
   render(){
@@ -29,6 +31,8 @@ export default React.createClass({
       <li key={`reply-list-item-${index}`}>
         <TopicReplyListItem
           reply={reply}
+          submitNewComment={this.submitNewComment}
+          onNewCommentUpdate={this.onNewCommentUpdate}
           onCommentsClicked={this.onReplyCommentsClicked}/>
       </li>
     );
@@ -36,6 +40,14 @@ export default React.createClass({
 
   onReplyCommentsClicked(replyId){
     this.props.onReplyCommentsClicked(replyId);
+  },
+
+  onNewCommentUpdate(replyId, val) {
+    this.props.onNewCommentUpdate(replyId, val);
+  },
+
+  submitNewComment(){
+    this.props.submitNewComment();
   }
 
 });

@@ -9,7 +9,7 @@ export default React.createClass({
     className: PropTypes.string,
     name: PropTypes.string,
     children: PropTypes.node,
-    onChange: PropTypes.func,
+    onChange: PropTypes.func.isRequired,
     onEnter: PropTypes.func,
     value: PropTypes.string,
     placeholder: PropTypes.string,
@@ -46,6 +46,8 @@ export default React.createClass({
   onKeyPressed(e) {
     const {onEnter} = this.props;
     if(e.keyCode === ENTER_KEY && onEnter){
+      e.preventDefault();
+      e.stopPropagation();
       onEnter();
     }
   }

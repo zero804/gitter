@@ -102,6 +102,8 @@ const TopicContainer = createClass({
         <TopicReplyListHeader replies={replies}/>
         <TopicReplyList
           replies={replies}
+          submitNewComment={this.submitNewComment}
+          onNewCommentUpdate={this.onNewCommentUpdate}
           onReplyCommentsClicked={this.onReplyCommentsClicked}/>
         <TopicReplyEditor
           user={currentUser}
@@ -152,11 +154,20 @@ const TopicContainer = createClass({
     const {repliesStore, commentsStore} = this.props;
     return repliesStore.getReplies().map((reply) => Object.assign({}, reply, {
       comments: commentsStore.getCommentsByReplyId(reply.id),
+      isCommenting: commentsStore.getActiveReplyId() === reply.id,
     }))
   },
 
   onReplyCommentsClicked(replyId){
     dispatch(showReplyComments(replyId));
+  },
+
+  onNewCommentUpdate(replyId, val) {
+    //TODO
+  },
+
+  submitNewComment(){
+    //TODO
   }
 
 });
