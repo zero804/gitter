@@ -8,7 +8,7 @@ var fuzzysearch = require('fuzzysearch');
 var urlJoin = require('url-join');
 var avatars = require('gitter-web-avatars');
 var toggleClass = require('../../utils/toggle-class');
-var apiClient = require('../../components/apiClient');
+var apiClient = require('../../components/api-client');
 
 var ModalView = require('./modal');
 var Typeahead = require('../controls/typeahead');

@@ -4,7 +4,7 @@ var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var GitHubUserCollaboratorService = require('../lib/github-user-collaborator-service');
 var assert = require('assert');
 
-describe('gitter-user-collaborators-service-test', function() {
+describe('gitter-user-collaborators-service-test #github', function() {
   describe('integration #slow', function() {
     var fixture = fixtureLoader.setup({
       deleteDocuments: {

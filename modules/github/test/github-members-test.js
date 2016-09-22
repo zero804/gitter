@@ -5,7 +5,7 @@ var assert = require('assert');
 var Promise = require('bluebird');
 var proxyquireNoCallThru = require("proxyquire").noCallThru();
 
-describe('github-members', function() {
+describe('github-members #github', function() {
 
   describe('mocks', function() {
 

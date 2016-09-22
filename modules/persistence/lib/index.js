@@ -1,7 +1,6 @@
 "use strict";
 
 var env = require('gitter-web-env');
-var config = env.config;
 var logger = env.logger.get('persistence');
 var errorReporter = env.errorReporter;
 var mongoose = require('gitter-web-mongoose-bluebird');
@@ -87,14 +86,14 @@ var schemas = {
   TroupeRemovedUser: require('./schemas/troupe-removed-user-schema'),
   TroupeInvite: require('./schemas/troupe-invite-schema'),
   KnownExternalAccess: require('./schemas/known-external-access-schema'),
-};
 
-if (config.get('topics:useApi')) {
-  schemas.Forum = require('./schemas/forum-schema');
-  schemas.ForumCategory = require('./schemas/forum-category-schema');
-  schemas.Topic = require('./schemas/topic-schema');
-  schemas.Reply = require('./schemas/reply-schema');
-  schemas.Comment = require('./schemas/comment-schema');
-}
+  /* Topics */
+  Forum: require('./schemas/forum-schema'),
+  ForumCategory: require('./schemas/forum-category-schema'),
+  Topic: require('./schemas/topic-schema'),
+  Reply: require('./schemas/reply-schema'),
+  Comment: require('./schemas/comment-schema'),
+  ForumNotification: require('./schemas/forum-notification-schema'),
+};
 
 module.exports = createExports(schemas);

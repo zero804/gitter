@@ -6,7 +6,7 @@ var GitHubIssueService = require('..').GitHubIssueService;
 
 var FAKE_USER = { username: 'gittertestbot', githubToken: '***REMOVED***'};
 
-describe('github-issue-service #slow', function() {
+describe('github-issue-service #slow #github', function() {
   it('return the state', function(done) {
     var underTest = new GitHubIssueService(FAKE_USER);
 

@@ -77,8 +77,14 @@ router.get('/learn',
   identifyRoute('home-learn-main'),
   ensureLoggedIn,
   featureToggles,
+  isPhoneMiddleware,
   function (req, res, next) {
-    mainFrameRenderer.renderMainFrame(req, res, next, {
+    var renderer = mainFrameRenderer.renderMainFrame
+    if (req.isPhone) {
+      renderer = mainFrameRenderer.renderMobileMainFrame;
+    }
+
+    renderer(req, res, next, {
       subFrameLocation: '/learn/~learn',
       title: 'Learn',
       suggestedMenuState: 'search'

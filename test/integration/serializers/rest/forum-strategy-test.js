@@ -8,6 +8,7 @@ var assertUtils = require('../../assert-utils')
 var serialize = testRequire('./serializers/serialize');
 var ForumStrategy = testRequire('./serializers/rest/forum-strategy');
 
+var LONG_AGO = '2014-01-01T00:00:00.000Z';
 
 describe('ForumStrategy', function() {
   var blockTimer = require('../../block-timer');
@@ -32,7 +33,7 @@ describe('ForumStrategy', function() {
       user: 'user1',
       forum: 'forum1',
       category: 'category1',
-      sent: new Date('2014-01-01T00:00:00.000Z')
+      sent: new Date(LONG_AGO)
     }
   });
 
@@ -87,9 +88,10 @@ describe('ForumStrategy', function() {
             },
             repliesTotal: 0,
             replyingUsers: [],
-            sent: '2014-01-01T00:00:00.000Z',
+            sent: LONG_AGO,
             editedAt: null,
-            lastModified: null,
+            lastChanged: LONG_AGO,
+            lastModified: LONG_AGO,
             v: 1
           }],
           topicsTotal: 1

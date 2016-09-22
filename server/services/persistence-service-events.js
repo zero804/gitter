@@ -82,46 +82,63 @@ exports.install = function(persistenceService) {
     }
   });
 
-  if (config.get('topics:useApi')) {
-    /**
-     * Topics
-     */
-    mongooseUtils.attachNotificationListenersToSchema(schemas.TopicSchema, {
-      onCreate: function(model, next) {
-        liveCollections.topics.emit("create", model);
-        next();
-      },
+  /**
+   * Topics
+   */
+  mongooseUtils.attachNotificationListenersToSchema(schemas.TopicSchema, {
+    onCreate: function(model, next) {
+      liveCollections.topics.emit("create", model);
+      next();
+    },
 
-      onUpdate: function(model, next) {
-        liveCollections.topics.emit('update', model);
-        next();
-      },
+    onUpdate: function(model, next) {
+      liveCollections.topics.emit('update', model);
+      next();
+    },
 
-      onRemove: function(model) {
-        liveCollections.topics.emit("remove", model);
-      }
-    });
+    onRemove: function(model) {
+      liveCollections.topics.emit("remove", model);
+    }
+  });
 
-    /**
-     * Replies
-     */
-    mongooseUtils.attachNotificationListenersToSchema(schemas.ReplySchema, {
-      onCreate: function(model, next) {
-        liveCollections.replies.emit("create", model);
-        next();
-      },
+  /**
+   * Replies
+   */
+  mongooseUtils.attachNotificationListenersToSchema(schemas.ReplySchema, {
+    onCreate: function(model, next) {
+      liveCollections.replies.emit("create", model);
+      next();
+    },
 
-      onUpdate: function(model, next) {
-        liveCollections.replies.emit('update', model);
-        next();
-      },
+    onUpdate: function(model, next) {
+      liveCollections.replies.emit('update', model);
+      next();
+    },
 
-      onRemove: function(model) {
-        liveCollections.replies.emit("remove", model);
-      }
-    });
+    onRemove: function(model) {
+      liveCollections.replies.emit("remove", model);
+    }
+  });
 
-    // TODO: Categories, Comments
-  }
+  /**
+   * Comments
+   */
+  mongooseUtils.attachNotificationListenersToSchema(schemas.CommentSchema, {
+    onCreate: function(model, next) {
+      liveCollections.comments.emit("create", model);
+      next();
+    },
+
+    onUpdate: function(model, next) {
+      liveCollections.comments.emit('update', model);
+      next();
+    },
+
+    onRemove: function(model) {
+      liveCollections.comments.emit("remove", model);
+    }
+  });
+
+  // TODO: Categories? Forums?
 
 };
