@@ -1,5 +1,4 @@
 import Backbone from 'backbone';
-import _ from 'lodash';
 import {subscribe} from '../../../shared/dispatcher';
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
 import { UPDATE_FORUM_WATCH_STATE, ATTEMPT_UPDATE_FORUM_WATCH_STATE, FORUM_WATCH_STATE } from '../../../shared/constants/forum.js';
