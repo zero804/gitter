@@ -15,7 +15,9 @@
     "gitter-web-persistence": "file:../persistence",
     "gitter-web-persistence-utils": "file:../persistence-utils",
     "lodash": "^3.2.0",
-    "mongodb": "~2.1.18"
+    "mongodb": "~2.1.18",
+    "rx": "^4.1.0",
+    "rx-node": "^1.0.2"
   },
   "devDependencies": {
     "gitter-web-test-utils": "file:../test-utils"
