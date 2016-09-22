@@ -22,6 +22,8 @@ var validateTopicSort = validators.validateTopicSort;
 var liveCollections = require('gitter-web-live-collection-events');
 
 
+var TOPIC_RESULT_LIMIT = 100;
+
 function findById(topicId) {
   return Topic.findById(topicId)
     .lean()
@@ -122,6 +124,10 @@ function findByForumId(forumId, options) {
     .then(function(query) {
       return Topic.find(query)
         .sort(sort)
+        // TODO: kinda useless without being able to the filter at some value
+        // (before id, after id..) and it should probably be configurable up to
+        // a limit, but this should do for now.
+        .limit(TOPIC_RESULT_LIMIT)
         .lean()
         .exec();
     });
@@ -147,6 +153,8 @@ function findByForumIds(forumIds, options) {
     .then(function(query) {
       return Topic.find(query)
         .sort(sort)
+        // TODO: same as above
+        .limit(TOPIC_RESULT_LIMIT)
         .lean()
         .exec();
     });
