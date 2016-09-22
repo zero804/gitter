@@ -25,15 +25,14 @@ module.exports = {
 
   index: function(req) {
     var topic = req.topic;
-
-    return restful.serializeRepliesForTopicId(topic._id);
+    var userId = req.user && req.user._id;
+    return restful.serializeRepliesForTopicId(topic._id, userId);
   },
 
   show: function(req) {
     var reply = req.reply;
-    var strategy = new restSerializer.ReplyStrategy({
-      includeComments: true,
-      includeCommentsTotals: true,
+    var strategy = restSerializer.ReplyStrategy.nested({
+      currentUserId: req.user && req.user._id
     });
     return restSerializer.serializeObject(reply, strategy);
   },
@@ -62,8 +61,11 @@ module.exports = {
     var forumWithPolicyService = new ForumWithPolicyService(forum, user, policy);
     return forumWithPolicyService.createReply(topic, replyOptions)
       .then(function(reply) {
-        var replyStrategy = new restSerializer.ReplyStrategy();
-        return restSerializer.serializeObject(reply, replyStrategy);
+        var strategy = restSerializer.ReplyStrategy.standard({
+          currentUserId: req.user && req.user._id
+        });
+
+        return restSerializer.serializeObject(reply, strategy);
       });
   },
 

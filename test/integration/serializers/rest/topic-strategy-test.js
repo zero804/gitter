@@ -6,7 +6,11 @@ var testRequire = require('../../test-require');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assertUtils = require('../../assert-utils')
 var serialize = testRequire('./serializers/serialize');
+var serializeObject = testRequire('./serializers/serialize-object');
 var TopicStrategy = testRequire('./serializers/rest/topic-strategy');
+var subscriberService = require('gitter-web-topic-notifications/lib/subscriber-service');
+var ForumObject = require('gitter-web-topic-notifications/lib/forum-object');
+var assert = require('assert');
 
 var LONG_AGO = '2014-01-01T00:00:00.000Z';
 
@@ -20,7 +24,7 @@ function makeHash() {
   return hash;
 }
 
-describe('TopicStrategy', function() {
+describe('TopicStrategy #slow', function() {
   var blockTimer = require('../../block-timer');
   before(blockTimer.on);
   after(blockTimer.off);
@@ -47,7 +51,7 @@ describe('TopicStrategy', function() {
   });
 
   it('should serialize a topic', function() {
-    var strategy = TopicStrategy.standard();
+    var strategy = TopicStrategy.standard({});
 
     var topic = fixture.topic1;
     var category = fixture.category1;
@@ -76,6 +80,7 @@ describe('TopicStrategy', function() {
             displayName: user.displayName,
             avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
           },
+          subscribed: false,
           repliesTotal: 1,
           replyingUsers: [{
             "id": user.id,
@@ -92,13 +97,15 @@ describe('TopicStrategy', function() {
       });
   });
 
-  it('should serialize a topic with includeReplies', function() {
-    var strategy = TopicStrategy.full();
-
+  it('should serialize a topic with nested replies', function() {
     var user = fixture.user1;
     var category = fixture.category1;
     var topic = fixture.topic1;
     var reply = fixture.reply1;
+
+    var strategy = TopicStrategy.nested({
+      currentUserId: user._id
+    });
 
     return serialize([topic], strategy)
       .then(function(s) {
@@ -123,6 +130,7 @@ describe('TopicStrategy', function() {
             displayName: user.displayName,
             avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username
           },
+          subscribed: false,
           replies: [{
             id: reply.id,
             body: {
@@ -135,6 +143,8 @@ describe('TopicStrategy', function() {
               displayName: user.displayName,
               avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username
             },
+            subscribed: false,
+            commentsTotal: 0,
             sent: LONG_AGO,
             editedAt: null,
             lastChanged: LONG_AGO,
@@ -158,7 +168,7 @@ describe('TopicStrategy', function() {
   });
 
   it("should serialize a topic with lookups=['user']", function() {
-    var strategy = new TopicStrategy({ lookups: ['user'] });
+    var strategy = TopicStrategy.standard({ lookups: ['user'] });
 
     var topic = fixture.topic1;
     var category = fixture.category1;
@@ -183,6 +193,14 @@ describe('TopicStrategy', function() {
               slug: category.slug
             },
             user: fixture.user1.id,
+            subscribed: false,
+            repliesTotal: 1,
+            replyingUsers: [{
+              id: user.id,
+              username: user.username,
+              displayName: user.displayName,
+              avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username
+            }],
             sent: LONG_AGO,
             editedAt: null,
             lastChanged: LONG_AGO,
@@ -202,7 +220,7 @@ describe('TopicStrategy', function() {
   });
 
   it("should serialize a topic with lookups=['category']", function() {
-    var strategy = new TopicStrategy({ lookups: ['category'] });
+    var strategy = TopicStrategy.standard({ lookups: ['category'] });
 
     var topic = fixture.topic1;
     var category = fixture.category1;
@@ -228,6 +246,14 @@ describe('TopicStrategy', function() {
               displayName: user.displayName,
               avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
             },
+            subscribed: false,
+            repliesTotal: 1,
+            replyingUsers: [{
+              id: user.id,
+              username: user.username,
+              displayName: user.displayName,
+              avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username
+            }],
             sent: LONG_AGO,
             editedAt: null,
             lastChanged: LONG_AGO,
@@ -243,5 +269,39 @@ describe('TopicStrategy', function() {
           }
         })
       });
+  });
+
+  it('should tell a user when they are subscribed to a forum', function() {
+    var forumObject = ForumObject.createForTopic(fixture.forum1._id, fixture.topic1._id);
+    var userId = fixture.user1._id;
+
+    return subscriberService.addSubscriber(forumObject, userId)
+      .then(function() {
+        var strategy = TopicStrategy.nested({
+          currentUserId: userId
+        });
+
+        return serializeObject(fixture.topic1, strategy);
+      })
+      .then(function(serialized) {
+        assert.strictEqual(serialized.subscribed, true);
+      });
+  });
+
+  it('should tell a user when they are subscribed to a reply within a topic', function() {
+    var forumObject = ForumObject.createForReply(fixture.forum1._id, fixture.topic1._id, fixture.reply1._id);
+    var userId = fixture.user1._id;
+
+    return subscriberService.addSubscriber(forumObject, userId)
+      .then(function() {
+        var strategy = TopicStrategy.nested({
+          currentUserId: userId
+        });
+
+        return serializeObject(fixture.topic1, strategy);
+      })
+      .then(function(serialized) {
+        assert.strictEqual(serialized.replies[0].subscribed, true);
+      })
   });
 });
