@@ -8,6 +8,7 @@ export default React.createClass({
   displayName: 'TopicReplyList',
   propTypes: {
     replies: PropTypes.array.isRequired,
+    onReplyCommentsClicked: PropTypes.func.isRequired,
   },
 
   render(){
@@ -26,9 +27,15 @@ export default React.createClass({
   buildReplyListItem(reply, index) {
     return (
       <li key={`reply-list-item-${index}`}>
-        <TopicReplyListItem reply={reply} />
+        <TopicReplyListItem
+          reply={reply}
+          onCommentsClicked={this.onReplyCommentsClicked}/>
       </li>
     );
+  },
+
+  onReplyCommentsClicked(replyId){
+    this.props.onReplyCommentsClicked(replyId);
   }
 
 });
