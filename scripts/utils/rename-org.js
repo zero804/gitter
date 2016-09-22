@@ -113,6 +113,22 @@ onMongoConnect()
               if (lcOldName !== lcNewName) {
                 room.renamedLcUris.addToSet(lcOldName);
               }
+
+              // Update the legacy field if it exists
+              if(room.lcOwner) {
+                room.lcOwner = opts.new;
+              }
+
+              if(room.sd.type === 'GH_ORG') {
+                room.sd.linkPath = opts.new;
+              }
+              else if(room.sd.type === 'GH_REPO') {
+                var linkpathPieces = room.sd.linkPath.split('/');
+                var repoName = linkpathPieces[1];
+                room.sd.linkPath = opts.new + '/' + repoName;
+              }
+
+
               console.log('Updating ', oldName, ' to ', newName);
 
               return room.save()
