@@ -14,25 +14,37 @@ export default React.createClass({
     }).isRequired,
     onChange: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
+    onEditorClick: PropTypes.func
   },
 
   render(){
 
     const {user, value} = this.props;
+    var isSignedIn = user.id;
+
+    var submitText = 'Reply';
+    if(!isSignedIn) {
+      submitText = 'Sign in to reply';
+    }
 
     return (
       <Container className="container--reply-editor">
         <Panel className="panel--reply-editor">
-          <UserAvatar user={user} className="avatar--reply-editor" width={30} height={30}/>
+          <UserAvatar
+            user={user}
+            className="avatar--reply-editor"
+            width={30}
+            height={30}/>
           <Editor
             className="editor--reply"
             placeholder="Your reply here. Use Markdown, BBCode, or HTML to format. Drag or paste images ..."
             onChange={this.onChange}
+            onClick={this.onEditorClick}
             value={value}/>
           <button
             className="topic-reply-editor__submit"
             onClick={this.onSubmitClicked}>
-            Reply
+            {submitText}
           </button>
         </Panel>
       </Container>
@@ -46,6 +58,14 @@ export default React.createClass({
   onSubmitClicked(e){
     e.preventDefault();
     this.props.onSubmit();
+  },
+
+  onEditorClick() {
+    const { onEditorClick } = this.props;
+    console.log('onEditorClick', onEditorClick);
+    if(onEditorClick) {
+      onEditorClick(...arguments);
+    }
   }
 
 });
