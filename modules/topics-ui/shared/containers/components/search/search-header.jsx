@@ -24,8 +24,7 @@ export default React.createClass({
   },
 
   render(){
-
-    const {userId, forumId, groupName, watchState} = this.props;
+    const {groupName, watchState} = this.props;
 
     return (
       <Container>
