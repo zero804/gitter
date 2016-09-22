@@ -1,14 +1,17 @@
 import _ from 'underscore';
 import React, { PropTypes } from 'react';
+import {dispatch} from '../../../dispatcher';
 import Container from '../container.jsx';
 import Panel from '../panel.jsx';
 import H1 from '../text/h-1.jsx';
 import Input from '../forms/input.jsx';
 import ForumCategoryLink from '../links/forum-category-link.jsx';
-import WatchForumLink from '../links/watch-forum-link.jsx';
+import WatchForumButton from '../forum/watch-forum-button.jsx';
 import CreateTopicLink from '../links/create-topic-link.jsx';
 import {DEFAULT_CATEGORY_NAME} from '../../../constants/navigation';
 import { FORUM_WATCH_STATE } from '../../../constants/forum.js';
+import attemptUpdateForumWatchState from '../../../action-creators/forum/attempt-update-forum-watch-state';
+
 
 export default React.createClass({
 
@@ -41,12 +44,11 @@ export default React.createClass({
             onChange={this.onSearchUpdate}
             className="topic-search__search-input"/>
 
-          <WatchForumLink
-            userId={userId}
-            forumId={forumId}
+          <WatchForumButton
             watchState={watchState}
-            className="topic-search__watch-forum-link"
-            itemClassName="topic-search__watch-forum-link-text-item"/>
+            className="topic-search__watch-forum-button"
+            itemClassName="topic-search__watch-forum-button-text-item"
+            onClick={this.onWatchForumButtonClick}/>
           <CreateTopicLink groupName={groupName} className="topic-search__create-topic-link">
             Create Topic
           </CreateTopicLink>
@@ -57,6 +59,13 @@ export default React.createClass({
 
   onSearchUpdate(){
 
+  },
+
+  onWatchForumButtonClick() {
+    const {userId, forumId, watchState} = this.props;
+
+    var desiredIsWatching = (watchState !== FORUM_WATCH_STATE.WATCHING);
+    dispatch(attemptUpdateForumWatchState(forumId, userId, desiredIsWatching));
   }
 
 });

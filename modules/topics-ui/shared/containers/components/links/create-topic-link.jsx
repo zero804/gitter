@@ -7,7 +7,7 @@ export default React.createClass({
   displayName: 'CreateTopicLink',
   propTypes: {
     groupName: PropTypes.string.isRequired,
-    children: PropTypes.node,
+    children: PropTypes.node.isRequired,
     onClick: PropTypes.func,
     className: PropTypes.string,
   },
