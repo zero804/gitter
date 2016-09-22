@@ -10,7 +10,7 @@ export default React.createClass({
   propTypes: {
     value: PropTypes.string,
     user: PropTypes.shape({
-      avatarUrl: PropTypes.string.isRequired
+      avatarUrl: PropTypes.string
     }).isRequired,
     onChange: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
@@ -20,7 +20,7 @@ export default React.createClass({
   render(){
 
     const {user, value} = this.props;
-    var isSignedIn = user.id;
+    var isSignedIn = !!user.id;
 
     var submitText = 'Reply';
     if(!isSignedIn) {
