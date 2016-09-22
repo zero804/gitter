@@ -13,8 +13,9 @@ import {BODY_UPDATE, SUBMIT_NEW_REPLY} from '../../../../shared/constants/create
 import tagStore from '../../../mocks/tag-store';
 import {SHOW_REPLY_COMMENTS} from '../../../../shared/constants/topic';
 import commentsStore from '../../../mocks/comments-store';
+import {COMMENT_BODY_UPDATE} from '../../../../shared/constants/create-comment';
 
-describe('<TopicContainer />', () => {
+describe.only('<TopicContainer />', () => {
 
   let wrapper;
 
@@ -88,6 +89,13 @@ describe('<TopicContainer />', () => {
     const handle = spy();
     subscribe(SHOW_REPLY_COMMENTS, handle);
     wrapper.find('TopicReplyList').at(0).prop('onReplyCommentsClicked')();
+    equal(handle.callCount, 1);
+  });
+
+  it('should dispatch the right event when the new topic content updates', () => {
+    const handle = spy();
+    subscribe(COMMENT_BODY_UPDATE, handle);
+    wrapper.find('TopicReplyList').at(0).prop('onNewCommentUpdate')();
     equal(handle.callCount, 1);
   });
 
