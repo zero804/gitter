@@ -9,9 +9,22 @@ var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var _ = require('lodash');
 
 /**
+ * Push an item to an array if it's not a particular value
+ */
+function pushItemIfNot(array, item, excludedItem) {
+  if (excludedItem) {
+    if (!mongoUtils.objectIDsEqual(item, excludedItem)) {
+      array.push(item);
+    }
+  } else {
+    array.push(item);
+  }
+}
+
+/**
  * List all the subscribers on a forum object
  */
-function listForItem(forumObject) {
+function listForItem(forumObject, options) {
   assert(forumObject.type !== ForumObject.TYPE.Comment);
 
   var query;
@@ -42,6 +55,9 @@ function listForItem(forumObject) {
     .lean()
     .sort({ userId: 1, forumId: 1, topicId: 1, replyId: 1 })
     .exec()
+    .bind({
+      exclude: options && options.exclude
+    })
     .then(function(results) {
       // Iterate through the results to figure out which users
       // are subscribed to the item.
@@ -67,10 +83,10 @@ function listForItem(forumObject) {
 
       for (var i = 0; i < results.length; i++) {
         var result = results[i];
-        if (currentUserId) {
+        if (i > 0) {
           if (!mongoUtils.objectIDsEqual(result.userId, currentUserId)) {
             if (currentState) {
-              userIds.push(currentUserId);
+              pushItemIfNot(userIds, currentUserId, this.exclude);
             }
           }
         }
@@ -80,7 +96,7 @@ function listForItem(forumObject) {
 
       // Append the last entry, if the final state is enabled.
       if (currentUserId && currentState) {
-        userIds.push(currentUserId);
+        pushItemIfNot(userIds, currentUserId, this.exclude);
       }
 
       return userIds;
