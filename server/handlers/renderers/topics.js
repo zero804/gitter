@@ -3,11 +3,10 @@
 var StatusError = require('statuserror');
 var fonts = require('../../web/fonts');
 
-
 var groupService = require('gitter-web-groups');
 var forumService = require('gitter-web-topics/lib/forum-service');
 var topicService = require('gitter-web-topics/lib/topic-service');
-
+var getTopicsFilterSortOptions = require('gitter-web-topics/lib/get-topics-filter-sort-options');
 
 var forumCategoryStore = require('gitter-web-topics-ui/server/stores/forum-category-store');
 var forumTagStore = require('gitter-web-topics-ui/server/stores/forum-tag-store');
@@ -55,7 +54,10 @@ function renderForum(req, res, next, options) {
 
         if(!forum) { return next(new StatusError(404, 'Forum not found')); }
 
-        var strategy = new restSerializer.ForumStrategy();
+        var topicsOptions = getTopicsFilterSortOptions(req.query);
+        var strategy = new restSerializer.ForumStrategy({
+          topics: topicsOptions
+        });
         return restSerializer.serializeObject(forum, strategy);
       })
       .then(function(forum){
@@ -116,6 +118,8 @@ function renderTopic(req, res, next) {
           return forumService.findById(group.forumId)
             .then(function(forum){
               if(!forum) { return next(new StatusError(404, 'Forum not found')); }
+              // TODO: how do we know which topics options to pass in to the
+              // forum strategy? Maybe it shouldn't include any topics at all?
               var strategy = new restSerializer.ForumStrategy();
               return restSerializer.serializeObject(forum, strategy);
             })
