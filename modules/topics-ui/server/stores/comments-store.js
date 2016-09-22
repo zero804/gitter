@@ -13,10 +13,13 @@ module.exports = function commentsStore(models) {
   //Get resource
   const getComments = () => models;
 
+  const getCommentsByReplyId = () => [];
+
   //Methods
   return {
     models: models,
-    getComments: getComments
+    getComments: getComments,
+    getCommentsByReplyId: getCommentsByReplyId
   };
 
 };

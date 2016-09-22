@@ -49,8 +49,9 @@ const TopicContainer = createClass({
   },
 
   componentDidMount(){
-    const {repliesStore, newReplyStore} = this.props;
+    const {repliesStore, newReplyStore, commentsStore} = this.props;
     repliesStore.onChange(this.updateReplies, this);
+    commentsStore.onChange(this.updateComments, this);
     newReplyStore.on('change:text', this.updateReplyContent, this);
   },
 
@@ -61,9 +62,8 @@ const TopicContainer = createClass({
   },
 
   getInitialState(){
-    const {repliesStore} = this.props;
     return {
-      replies: repliesStore.getReplies(),
+      replies: this.getParsedReplies(),
       newReplyContent: '',
     };
   },
@@ -77,7 +77,6 @@ const TopicContainer = createClass({
     const currentUser = currentUserStore.getCurrentUser();
     const topicCategory = topic.category;
     const category = categoryStore.getById(topicCategory.id);
-
 
     //TODO remove
     //This is here because sometimes you can get un-parsed tags
@@ -138,6 +137,19 @@ const TopicContainer = createClass({
       replies: repliesStore.getReplies(),
       newReplyContent: '',
     }));
+  },
+
+  updateComments(){
+    this.setState((state) => Object.assign({}, state, {
+      replies: this.getParsedReplies(),
+    }));
+  },
+
+  getParsedReplies(){
+    const {repliesStore, commentsStore} = this.props;
+    return repliesStore.getReplies().map((reply) => Object.assign({}, reply, {
+      comments: commentsStore.getCommentsByReplyId(reply.id),
+    }))
   }
 
 });

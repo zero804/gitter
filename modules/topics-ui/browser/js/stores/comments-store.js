@@ -1,4 +1,7 @@
 import Backbone from 'backbone';
+import {getRealtimeClient} from './realtime-client';
+import {getForumId} from './forum-store';
+import LiveCollection from './live-collection';
 import { BaseModel } from './base-model';
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
 
@@ -8,15 +11,25 @@ export const CommentStore = BaseModel.extend({
   }
 });
 
-export const CommentsStore = Backbone.Collection.extend({
+export const CommentsStore = LiveCollection.extend({
+  model: CommentStore,
+  client: getRealtimeClient(),
+  urlTemplate: '/v1/forums/:forumId/topics/:topicId/comments',
+
   getContextModel(){
     return new Backbone.Model({
+      forumId: getForumId(),
       replyId: null,
     });
   },
 
   getComments(){
-    //TODO
+    return this.toJSON();
+  },
+
+  getCommentsByReplyId(id){
+    if(id !== this.contextModel.get('replyId')) { return; }
+    return this.toJSON();
   }
 
 });
