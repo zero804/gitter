@@ -71,6 +71,7 @@ const TopicContainer = createClass({
     const {replies, newReplyContent} = this.state;
     const topic = topicsStore.getById(topicId)
     const currentUser = currentUserStore.getCurrentUser();
+    var isSignedIn = currentUser.id;
     const topicCategory = topic.category;
     const category = categoryStore.getById(topicCategory.id);
 
@@ -84,9 +85,22 @@ const TopicContainer = createClass({
     });
     const tags = tagStore.getTagsByLabel(tagValues);
 
+    var replyEditor;
+    if(isSignedIn) {
+      replyEditor = (
+        <TopicReplyEditor
+          user={currentUser}
+          value={newReplyContent}
+          onChange={this.onEditorUpdate}
+          onSubmit={this.onEditorSubmit}/>
+      );
+    }
+
     return (
       <main>
-        <SearchHeader groupName={groupName}/>
+        <SearchHeader
+          groupName={groupName}
+          isSignedIn={isSignedIn}/>
         <article>
           <TopicHeader
             topic={topic}
@@ -97,11 +111,7 @@ const TopicContainer = createClass({
         </article>
         <TopicReplyListHeader replies={replies}/>
         <TopicReplyList replies={replies} />
-        <TopicReplyEditor
-          user={currentUser}
-          value={newReplyContent}
-          onChange={this.onEditorUpdate}
-          onSubmit={this.onEditorSubmit}/>
+        {replyEditor}
       </main>
     );
   },
