@@ -112,7 +112,7 @@ function srcSetForUser(user, size) {
 
   if (typeof window !== 'undefined') {
     // fallback for retina displays without srcset support (e.g native android webviews)
-    options.srcSize = size * (window.devicePixelRatio || 1);
+    options.srcSize = size * (window.devicePixelRatio || 1); // eslint-disable-line no-undef
   }
 
   if (url.hostname === 'pbs.twimg.com') {

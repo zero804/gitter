@@ -1,10 +1,12 @@
 "use strict";
 
-var _ = require('underscore');
-var safeJson = require('../utils/safe-json');
+var _ = require('lodash');
+var safeJson = require('./safe-json');
 var util = require('util');
 var clientEnv = require('gitter-client-env');
 var cdn = require('gitter-web-cdn');
+var pluralize = require('../shared/helpers/pluralize');
+var when = require('../shared/helpers/when');
 
 exports.cdn = function(url, parameters) {
   return cdn(url, parameters ? parameters.hash:null);
@@ -64,8 +66,8 @@ exports.generateTroupeContext = function(troupeContext, parameters) {
           '</script>';
 };
 
-exports.pluralize = require('../../shared/handlebars/helpers/pluralize');
-exports.when = require('../../shared/handlebars/helpers/when');
+exports.pluralize = pluralize;
+exports.when = when;
 
   exports.toLowerCase = function (str) {
   return str.toLowerCase();
