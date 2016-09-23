@@ -86,7 +86,6 @@ module.exports = {
     var user = req.user;
     var forum = req.forum;
     var policy = req.userForumPolicy;
-    var topic = req.topic;
     var reply = req.reply;
 
     var forumWithPolicyService = new ForumWithPolicyService(forum, user, policy);
@@ -94,13 +93,12 @@ module.exports = {
 
     return Promise.all(promises)
       .then(function() {
-        return replyService.findByIdForForumAndTopic(forum._id, topic._id, reply._id);
+        return replyService.findByIdForForumAndTopic(forum._id, reply.topicId, reply._id);
       })
       .then(function(updatedReply) {
         var strategy = restSerializer.ReplyStrategy.standard();
         return restSerializer.serializeObject(updatedReply, strategy);
       });
-
   },
 
   subresources: {
