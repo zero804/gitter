@@ -29,7 +29,10 @@ var VALID_TEMPLATES = {
   'invitation-v2': invitationMapping,
   'invitation-reminder-v2': invitationMapping,
   'unread-notification': unreadNoticationMapping,
-  'created-room': createdRoomMapping
+  'created-room': createdRoomMapping,
+  'new-topic': newTopicMapping,
+  'new-topic-reply': newTopicReplyMapping,
+  'new-topic-comment': newTopicCommentMapping,
 };
 
 exports.sendEmail = function(options) {
@@ -97,6 +100,34 @@ function createdRoomMapping(data) {
     ORGNOTE:     '', // No used since splitsville
     ROOMTYPE:    data.roomType,
     LOGOURL:     cdn('images/logo/gitter-logo-email-64.png', {email: true})
+  };
+}
+
+
+function newTopicMapping(data) {
+  return {
+    // HTML:       applyTemplate("unread_notification_html", data),
+    // MICRODATA:  applyTemplate("unread_notification_microdata", data),
+    PLAINTEXT:  applyTemplate("topic_new_topic_notification", data),
+    LOGOURL:    cdn('images/logo/gitter-logo-email-64.png', {email: true})
+  };
+}
+
+function newTopicReplyMapping(data) {
+  return {
+    // HTML:       applyTemplate("unread_notification_html", data),
+    // MICRODATA:  applyTemplate("unread_notification_microdata", data),
+    PLAINTEXT:  applyTemplate("topic_new_reply_notification", data),
+    LOGOURL:    cdn('images/logo/gitter-logo-email-64.png', {email: true})
+  };
+}
+
+function newTopicCommentMapping(data) {
+  return {
+    // HTML:       applyTemplate("unread_notification_html", data),
+    // MICRODATA:  applyTemplate("unread_notification_microdata", data),
+    PLAINTEXT:  applyTemplate("topic_new_comment_notification", data),
+    LOGOURL:    cdn('images/logo/gitter-logo-email-64.png', {email: true})
   };
 }
 
