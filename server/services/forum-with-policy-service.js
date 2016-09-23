@@ -24,11 +24,16 @@ function allowWrite() {
   return this.policy.canWrite();
 }
 
+function allowOwner(object) {
+  // Users can edit/delete topics, replies or comments they created
+  return mongoUtils.objectIDsEqual(object.userId, this.user._id);
+}
+
 function allowAnyone() {
   return true;
 }
 
-function matchForum(object) {
+function matchForum(fn) {
   /*
   Suppose a user posts to /v1/forums/:forumId/topics/:topicId/replies. This
   makes sure that that topic is actually in the same forum. Otherwise you can
@@ -40,9 +45,17 @@ function matchForum(object) {
   object is the first param which can be category, topic, reply or comment, all
   of which have forumId properties that have to match this forum's id.
   */
-  if (!mongoUtils.objectIDsEqual(object.forumId, this.forum._id)) {
-    // not sure what would be the best HTTP status code here
-    throw new StatusError(404, 'forumId does not match');
+
+  return function() {
+    var args = Array.prototype.slice.call(arguments);
+    var object = args[0];
+
+    if (!mongoUtils.objectIDsEqual(object.forumId, this.forum._id)) {
+      // not sure what would be the best HTTP status code here
+      throw new StatusError(404, 'forumId does not match');
+    }
+
+    return fn.apply(this, args);
   }
 }
 
@@ -110,7 +123,7 @@ ForumWithPolicyService.prototype.createCategory = secureMethod([allowAdmin], fun
   return forumCategoryService.createCategory(user, forum, categoryOptions);
 });
 
-ForumWithPolicyService.prototype.createTopic = secureMethod([allowWrite, matchForum], function(category, options) {
+ForumWithPolicyService.prototype.createTopic = matchForum(secureMethod([allowWrite], function(category, options) {
   var user = this.user;
   var forum = this.forum;
 
@@ -120,21 +133,21 @@ ForumWithPolicyService.prototype.createTopic = secureMethod([allowWrite, matchFo
   createOptions.allowedTags = forum.tags;
 
   return topicService.createTopic(user, category, createOptions);
-});
+}));
 
-ForumWithPolicyService.prototype.createReply = secureMethod([allowWrite, matchForum], function(topic, options) {
+ForumWithPolicyService.prototype.createReply = matchForum(secureMethod([allowWrite], function(topic, options) {
   var user = this.user;
 
   var createOptions = getReplyOptions(options);
   return replyService.createReply(user, topic, createOptions);
-});
+}));
 
-ForumWithPolicyService.prototype.createComment = secureMethod([allowWrite, matchForum], function(reply, options) {
+ForumWithPolicyService.prototype.createComment = matchForum(secureMethod([allowWrite], function(reply, options) {
   var user = this.user;
 
   var createOptions = getCommentOptions(options);
   return commentService.createComment(user, reply, createOptions);
-});
+}));
 
 /**
  * Forum update
@@ -149,26 +162,26 @@ ForumWithPolicyService.prototype.setForumTags = secureMethod([allowAdmin], funct
 /**
  * Topic update
  */
-ForumWithPolicyService.prototype.updateTopic = secureMethod([allowWrite, matchForum], function(topic, fields) {
+ForumWithPolicyService.prototype.updateTopic = matchForum(secureMethod([allowOwner, allowAdmin], function(topic, fields) {
   var user = this.user;
 
   return topicService.updateTopic(user, topic, fields);
-});
+}));
 
-ForumWithPolicyService.prototype.setTopicTags = secureMethod([allowWrite, matchForum], function(topic, tags) {
+ForumWithPolicyService.prototype.setTopicTags = matchForum(secureMethod([allowOwner, allowAdmin], function(topic, tags) {
   var user = this.user;
   var forum = this.forum;
 
   return topicService.setTopicTags(user, topic, tags, { allowedTags: forum.tags });
-});
+}));
 
-ForumWithPolicyService.prototype.setTopicSticky = secureMethod([allowWrite, matchForum], function(topic, sticky) {
+ForumWithPolicyService.prototype.setTopicSticky = matchForum(secureMethod([allowAdmin], function(topic, sticky) {
   var user = this.user;
 
   return topicService.setTopicSticky(user, topic, sticky);
-});
+}));
 
-ForumWithPolicyService.prototype.setTopicCategory = secureMethod([allowWrite, matchForum], function(topic, category) {
+ForumWithPolicyService.prototype.setTopicCategory = matchForum(secureMethod([allowOwner, allowAdmin], function(topic, category) {
   var user = this.user;
   var forum = this.forum;
 
@@ -177,30 +190,30 @@ ForumWithPolicyService.prototype.setTopicCategory = secureMethod([allowWrite, ma
   }
 
   return topicService.setTopicCategory(user, topic, category);
-});
+}));
 
 /**
  * Reply update
  */
-ForumWithPolicyService.prototype.updateReply = secureMethod([allowWrite, matchForum], function(reply, fields) {
+ForumWithPolicyService.prototype.updateReply = matchForum(secureMethod([allowOwner, allowAdmin], function(reply, fields) {
   var user = this.user;
 
   return replyService.updateReply(user, reply, fields);
-});
+}));
 
 /**
  * Subscription bits
  */
-ForumWithPolicyService.prototype.listSubscribers = secureMethod([allowAdmin, matchForum], function(forumObject) {
+ForumWithPolicyService.prototype.listSubscribers = matchForum(secureMethod([allowAdmin], function(forumObject) {
    return subscriberService.listForItem(forumObject);
- });
+}));
 
-ForumWithPolicyService.prototype.subscribe = secureMethod([allowRead, matchForum], function(forumObject) {
+ForumWithPolicyService.prototype.subscribe = matchForum(secureMethod([allowRead], function(forumObject) {
    return subscriberService.addSubscriber(forumObject, this.user._id);
- });
+}));
 
-ForumWithPolicyService.prototype.unsubscribe = secureMethod([allowAnyone, matchForum], function(forumObject) {
+ForumWithPolicyService.prototype.unsubscribe = matchForum(secureMethod([allowAnyone], function(forumObject) {
    return subscriberService.removeSubscriber(forumObject, this.user._id);
- });
+}));
 
 module.exports = ForumWithPolicyService;

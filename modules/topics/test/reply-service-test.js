@@ -77,7 +77,6 @@ describe('reply-service #slow', function() {
       it('should return users', function() {
         return replyService.findSampleReplyingUserIdsForTopics([fixture.topic1._id])
           .then(function(result) {
-            console.log(result);
             assert.deepEqual(Object.keys(result), [fixture.topic1.id]);
             assert.deepEqual(result[fixture.topic1._id].map(String), [fixture.user2.id]);
           })
