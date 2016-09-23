@@ -31,6 +31,7 @@ export default React.createClass({
     return (
       <FeedItem
         item={reply}
+        onChange={(value) => this.onReplyUpdate(reply.id, value)}
         primaryLabel="Likes"
         primaryValue={10}
         secondaryLabel="Comments"
@@ -38,23 +39,6 @@ export default React.createClass({
         onSecondaryClicked={this.onCommentsClicked}>
         {this.getComments()}
       </FeedItem>
-    );
-  },
-
-  getReplyContent(){
-    const {reply} = this.props;
-    const body = (reply.body || {});
-    if(body.html) {
-      return (
-        <div
-          className="topic-reply-list-item__body"
-          dangerouslySetInnerHTML={{ __html: body.html }} />
-      );
-    }
-    return (
-      <section className="topic-reply-list-item__body">
-        {reply.text}
-      </section>
     );
   },
 
@@ -85,6 +69,7 @@ export default React.createClass({
     return (
       <CommentItem
         key={`comment-list-item-${reply.id}-${index}`}
+        onChange={(val) => this.onCommentUpdate(comment.id, val)}
         comment={comment} />
     );
   },
@@ -103,5 +88,13 @@ export default React.createClass({
   submitNewComment(){
     this.props.submitNewComment();
   },
+
+  onReplyUpdate(replyId, value){
+    console.log('reply', replyId, value);
+  },
+
+  onCommentUpdate(commentId, value){
+    console.log('comment', commentId, value);
+  }
 
 });
