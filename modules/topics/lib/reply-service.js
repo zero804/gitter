@@ -173,7 +173,7 @@ function createReply(user, topic, options) {
     .then(function() {
       var reply = this.reply;
 
-      stats.event('new_reply', {
+      stats.event('new_topic_reply', {
         userId: user._id,
         forumId: topic.forumId,
         topicId: topic._id,
