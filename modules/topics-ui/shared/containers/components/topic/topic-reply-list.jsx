@@ -1,7 +1,6 @@
 import React, { PropTypes } from 'react';
 import Container from '../container.jsx';
 import Panel from '../panel.jsx';
-import TopicReplyListItem from './topic-reply-list-item.jsx';
 
 export default React.createClass({
 
@@ -11,7 +10,6 @@ export default React.createClass({
   },
 
   render(){
-    const {replies} = this.props;
     return (
       <Container>
         <Panel className="panel--topic-reply-list">

@@ -1,5 +1,4 @@
 import React, { PropTypes } from 'react';
-import UserAvatar from '../user/user-avatar.jsx';
 import CommentEditor from './comment-editor.jsx';
 import CommentItem from './comment-item.jsx';
 import FeedItem from './feed-item.jsx';
@@ -90,11 +89,11 @@ export default React.createClass({
   },
 
   onReplyUpdate(replyId, value){
-    console.log('reply', replyId, value);
+    //console.log('reply', replyId, value);
   },
 
   onCommentUpdate(commentId, value){
-    console.log('comment', commentId, value);
+    //console.log('comment', commentId, value);
   }
 
 });
