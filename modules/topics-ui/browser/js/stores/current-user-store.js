@@ -1,7 +1,13 @@
 import Backbone from 'backbone';
 
 const CurrentUserStore = Backbone.Model.extend({
-  getCurrentUser(){ return this.toJSON(); }
+  getCurrentUser() {
+    return this.toJSON();
+  },
+
+  getIsSignedIn() {
+    return !!this.get('id');
+  }
 });
 
 

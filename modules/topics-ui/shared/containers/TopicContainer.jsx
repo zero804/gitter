@@ -36,7 +36,8 @@ const TopicContainer = createClass({
     }).isRequired,
 
     currentUserStore: PropTypes.shape({
-      getCurrentUser: PropTypes.func.isRequired
+      getCurrentUser: PropTypes.func.isRequired,
+      getIsSignedIn: PropTypes.func.isRequired,
     }).isRequired,
 
     newReplyStore: PropTypes.shape({
@@ -71,7 +72,7 @@ const TopicContainer = createClass({
     const {replies, newReplyContent} = this.state;
     const topic = topicsStore.getById(topicId)
     const currentUser = currentUserStore.getCurrentUser();
-    var isSignedIn = !!currentUser.id;
+    const isSignedIn = currentUserStore.getIsSignedIn();
     const topicCategory = topic.category;
     const category = categoryStore.getById(topicCategory.id);
 
@@ -102,6 +103,7 @@ const TopicContainer = createClass({
         <TopicReplyList replies={replies} />
         <TopicReplyEditor
           user={currentUser}
+          isSignedIn={isSignedIn}
           value={newReplyContent}
           onChange={this.onEditorUpdate}
           onSubmit={this.onEditorSubmit}
@@ -116,8 +118,7 @@ const TopicContainer = createClass({
 
   onEditorSubmit(){
     const {currentUserStore, newReplyStore} = this.props;
-    const currentUser = currentUserStore.getCurrentUser();
-    var isSignedIn = !!currentUser.id;
+    const isSignedIn = currentUserStore.getIsSignedIn();
 
 
     if(isSignedIn) {
@@ -135,8 +136,7 @@ const TopicContainer = createClass({
 
   onEditorClick() {
     const { currentUserStore } = this.props;
-    const currentUser = currentUserStore.getCurrentUser();
-    var isSignedIn = !!currentUser.id;
+    const isSignedIn = currentUserStore.getIsSignedIn();
 
     if(!isSignedIn) {
       frameUtils.postMessage({ type: 'route-silent', hash: 'login' });
