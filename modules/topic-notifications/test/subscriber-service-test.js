@@ -164,6 +164,9 @@ describe('subscriber-service', function() {
 
         return subscriberService.addSubscriber(idForum, userId1)
           .then(function() {
+            return subscriberService.removeSubscriber(idTopic, userId1);
+          })
+          .then(function() {
             return subscriberService.createSubscriptionVisitorForUser(userId1, ForumObject.TYPE.Topic, [idTopic])
           })
           .then(function(subscriptionVisitor) {

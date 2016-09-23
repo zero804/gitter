@@ -11,13 +11,13 @@ describe('mongoose-utils', function() {
 
   var username, x, y;
 
-  before(function() {
+  beforeEach(function() {
      username = '_test_' + Date.now();
      x = 'Bob ' + Date.now();
      y = 'Bob ' + (Date.now() + 1000);
   });
 
-  after(function(done) {
+  afterEach(function(done) {
     persistence.User.remove({ username: username }, done);
   });
 
@@ -29,7 +29,14 @@ describe('mongoose-utils', function() {
         assert.strictEqual(doc.displayName, x);
       })
       .nodeify(done);
+  });
 
+  it('should leanUpsertRaw', function() {
+    return mongooseUtils.safeUpsertUpdate(persistence.User, { username: username }, { $set: { displayName: y } })
+      .then(function(result) {
+        assert.strictEqual(result.nModified, 0);
+        assert.strictEqual(result.upserted.length, 1);
+      });
   });
 
   it('should create a new document', function(done) {
