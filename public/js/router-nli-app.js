@@ -25,6 +25,26 @@ require('./views/widgets/avatar');
 
 
 onready(function() {
+
+  var router = new Router({
+    dialogRegion: modalRegion,
+    routes: [{
+      'login': function(query) {
+        var dialogRegion = this.dialogRegion;
+
+        require.ensure(['./views/modals/login-view'], function(require) {
+          var LoginView = require('./views/modals/login-view');
+
+          var options = (query) ? urlParse('?'+query, true).query : {};
+          dialogRegion.show(new LoginView(options));
+        });
+      },
+    }]
+  });
+
+  Backbone.history.start();
+
+
   require('./components/link-handler').installLinkHandler();
 
   appEvents.on('navigation', function(url/*, type, title*/) {
@@ -103,6 +123,7 @@ onready(function() {
     return true;
   };
 
+
   window.addEventListener('message', function(e) {
     if(e.origin !== clientEnv['basePath']) {
       debug('Ignoring message from %s', e.origin);
@@ -132,6 +153,14 @@ onready(function() {
         window.location.hash = '#' + message.hash;
         break;
 
+      case 'route-silent':
+        console.log('route-silent', message);
+        var routeCb = router.routes[message.hash].bind(router);
+        if(routeCb) {
+          routeCb();
+        }
+        break;
+
       // case 'realtime.testConnection':
       //   var reason = message.reason;
       //   realtime.testConnection('chat.' + reason);
@@ -148,21 +177,4 @@ onready(function() {
 
 
 
-  new Router({
-    dialogRegion: modalRegion,
-    routes: [{
-      'login': function(query) {
-        var dialogRegion = this.dialogRegion;
-
-        require.ensure(['./views/modals/login-view'], function(require) {
-          var LoginView = require('./views/modals/login-view');
-
-          var options = (query) ? urlParse('?'+query, true).query : {};
-          dialogRegion.show(new LoginView(options));
-        });
-      },
-    }]
-  });
-
-  Backbone.history.start();
 });

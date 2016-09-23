@@ -62,7 +62,6 @@ export default React.createClass({
 
   onEditorClick() {
     const { onEditorClick } = this.props;
-    console.log('onEditorClick', onEditorClick);
     if(onEditorClick) {
       onEditorClick(...arguments);
     }
