@@ -17,7 +17,15 @@ var getSubResources = require('./sub-resources');
 var generateMainFrameSnapshots = require('../../handlers/snapshots/main-frame');
 var fonts = require('../../web/fonts');
 
-
+function getLeftMenuForumGroupInfo(leftMenuGroupId) {
+  return groupService.findById(leftMenuGroupId)
+    .then(function(leftMenuForumGroup) {
+      return Promise.all([
+        leftMenuForumGroup,
+        leftMenuForumGroup && forumCategoryService.findByForumId(leftMenuForumGroup.forumId),
+      ]);
+    });
+}
 
 function getTroupeContextAndDerivedInfo(req, socialMetadataGenerator) {
   return contextGenerator.generateNonChatContext(req)
@@ -27,16 +35,19 @@ function getTroupeContextAndDerivedInfo(req, socialMetadataGenerator) {
 
       return Promise.all([
           troupeContext,
-          groupService.findById(leftMenuGroupId),
-          socialMetadataGenerator && socialMetadataGenerator(troupeContext)
+          socialMetadataGenerator && socialMetadataGenerator(troupeContext),
+          getLeftMenuForumGroupInfo(leftMenuGroupId),
         ]);
     })
-    .spread(function(troupeContext, leftMenuForumGroup, socialMetadata) {
+    .spread(function(troupeContext, socialMetadata, leftMenuForumGroupInfo) {
+      var leftMenuForumGroup = leftMenuForumGroupInfo[0];
+      var leftMenuForumGroupCategories = leftMenuForumGroupInfo[1];
+
       return Promise.all([
         troupeContext,
+        socialMetadata,
         leftMenuForumGroup,
-        leftMenuForumGroup && forumCategoryService.findByForumId(leftMenuForumGroup.forumId),
-        socialMetadata
+        leftMenuForumGroupCategories
       ]);
     });
 }
@@ -61,9 +72,9 @@ function renderMainFrame(req, res, next, options) {
     ])
     .spread(function(troupeContextAndDerivedInfo, rooms, orgs, groups) {
       var troupeContext = troupeContextAndDerivedInfo[0];
-      var leftMenuForumGroup = troupeContextAndDerivedInfo[1];
-      var leftMenuForumGroupCategories = troupeContextAndDerivedInfo[2];
-      var socialMetadata = troupeContextAndDerivedInfo[3];
+      var socialMetadata = troupeContextAndDerivedInfo[1];
+      var leftMenuForumGroup = troupeContextAndDerivedInfo[2];
+      var leftMenuForumGroupCategories = troupeContextAndDerivedInfo[3];
       var chatAppLocation = options.subFrameLocation;
 
       var template, bootScriptName;
