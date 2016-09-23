@@ -154,10 +154,9 @@ onready(function() {
         break;
 
       case 'route-silent':
-        console.log('route-silent', message);
-        var routeCb = router.routes[message.hash].bind(router);
+        var routeCb = router.routes[message.hash];
         if(routeCb) {
-          routeCb();
+          routeCb.apply(router, message.args);
         }
         break;
 

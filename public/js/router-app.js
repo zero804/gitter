@@ -44,7 +44,24 @@ require('./components/ping');
 // Preload widgets
 require('./views/widgets/avatar');
 
-onready(function() {
+onready(function() { // eslint-disable-line max-statements
+
+  var router = new Router({
+    dialogRegion: appLayout.dialogRegion,
+    routes: [
+      notificationRoutes(),
+      createRoutes({
+        rooms: troupeCollections.troupes,
+        groups: troupeCollections.groups,
+        roomMenuModel: appLayout.getRoomMenuModel()
+      }),
+      upgradeAccessRoutes()
+    ]
+  });
+
+  Backbone.history.start();
+
+
   var chatIFrame = document.getElementById('content-frame');
   var titlebarUpdater = new TitlebarUpdater();
 
@@ -256,6 +273,13 @@ onready(function() {
         window.location.hash = '#' + message.hash;
         break;
 
+      case 'route-silent':
+        var routeCb = router.routes[message.hash];
+        if(routeCb) {
+          routeCb.apply(router, message.args);
+        }
+        break;
+
       //when the chat app requests the room list send it
       case 'request:roomList':
         initChatCache();
@@ -425,20 +449,6 @@ onready(function() {
     postMessage(message);
   });
 
-  new Router({
-    dialogRegion: appLayout.dialogRegion,
-    routes: [
-      notificationRoutes(),
-      createRoutes({
-        rooms: troupeCollections.troupes,
-        groups: troupeCollections.groups,
-        roomMenuModel: appLayout.getRoomMenuModel()
-      }),
-      upgradeAccessRoutes()
-    ]
-  });
-
-  Backbone.history.start();
 
   if (context.popEvent('invite_failed')) {
     appEvents.trigger('user_notification', {

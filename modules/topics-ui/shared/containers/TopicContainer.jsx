@@ -1,6 +1,5 @@
 import React, {PropTypes, createClass} from 'react';
 import {dispatch} from '../dispatcher';
-import frameUtils from 'gitter-web-frame-utils';
 import TopicHeader from './components/topic/topic-header.jsx';
 import TopicBody from './components/topic/topic-body.jsx';
 import SearchHeader from './components/search/search-header.jsx';
@@ -9,6 +8,11 @@ import TopicReplyListHeader from './components/topic/topic-reply-list-header.jsx
 import TopicReplyList from './components/topic/topic-reply-list.jsx';
 import updateReplyBody from '../action-creators/create-reply/body-update';
 import submitNewReply from '../action-creators/create-reply/submit-new-reply';
+import requestSignIn from '../action-creators/forum/request-sign-in';
+
+const EDITOR_SUBMIT_LINK_SOURCE = 'topics-reply-editor-submit-button';
+const EDITOR_CLICK_LINK_SOURCE = 'topics-reply-editor-click';
+
 
 const TopicContainer = createClass({
 
@@ -130,7 +134,7 @@ const TopicContainer = createClass({
       }));
     }
     else {
-      frameUtils.postMessage({ type: 'route-silent', hash: 'login' });
+      requestSignIn(EDITOR_SUBMIT_LINK_SOURCE);
     }
   },
 
@@ -139,7 +143,7 @@ const TopicContainer = createClass({
     const isSignedIn = currentUserStore.getIsSignedIn();
 
     if(!isSignedIn) {
-      frameUtils.postMessage({ type: 'route-silent', hash: 'login' });
+      requestSignIn(EDITOR_CLICK_LINK_SOURCE);
     }
   },
 

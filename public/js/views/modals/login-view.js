@@ -18,6 +18,9 @@ var View = Marionette.ItemView.extend({
     this.action = options.action || '';
     this.source = options.source || '';
     this.returnTo = options.returnTo || '';
+    if(options.returnTo === 'CURRENT') {
+      this.returnTo = window.location.pathname;
+    }
 
     this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
   },

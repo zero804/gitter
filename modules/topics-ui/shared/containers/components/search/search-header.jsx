@@ -1,5 +1,4 @@
 import React, { PropTypes } from 'react';
-import frameUtils from 'gitter-web-frame-utils';
 import Container from '../container.jsx';
 import Panel from '../panel.jsx';
 import ForumCategoryLink from '../links/forum-category-link.jsx';
@@ -7,6 +6,7 @@ import H1 from '../text/h-1.jsx';
 import Input from '../forms/input.jsx';
 import CreateTopicLink from '../links/create-topic-link.jsx';
 import {DEFAULT_CATEGORY_NAME} from '../../../constants/navigation';
+import requestSignIn from '../../../action-creators/forum/request-sign-in';
 
 const CREATE_TOPIC_LINK_SOURCE = 'topics-header-create-topic-link';
 
@@ -70,7 +70,7 @@ export default React.createClass({
     const {isSignedIn} = this.props;
 
     if(!isSignedIn) {
-      frameUtils.postMessage({ type: 'route-silent', hash: 'login' });
+      requestSignIn(CREATE_TOPIC_LINK_SOURCE);
       e.preventDefault();
     }
   }
