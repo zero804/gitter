@@ -1,9 +1,10 @@
 'use strict';
 
+var Promise = require('bluebird');
 var env = require('gitter-web-env');
 var logger = env.logger;
 
-var uriLookupService = require("./uri-lookup-service");
+var uriLookupService = require('./uri-lookup-service');
 var userService = require('./user-service');
 var troupeService = require('./troupe-service');
 var groupService = require('gitter-web-groups/lib/group-service');
@@ -31,8 +32,13 @@ function resolveFromLookup(uriLookup, userId) {
 
   if(uriLookup.troupeId) {
     /* The uri is for a room */
-    return troupeService.findByIdLeanWithMembership(uriLookup.troupeId, userId)
-      .spread(function(troupe, roomMember) {
+    return Promise.all([
+        groupService.findById(uriLookup.groupId),
+        troupeService.findByIdLeanWithMembership(uriLookup.troupeId, userId)
+      ])
+      .spread(function(group, troupeAndRoomMember) {
+        var troupe = troupeAndRoomMember[0];
+        var roomMember = troupeAndRoomMember[1];
         if(!troupe) return null;
 
         return {
@@ -40,7 +46,7 @@ function resolveFromLookup(uriLookup, userId) {
           uri: troupe.uri,
           room: troupe,
           roomMember: roomMember,
-          group: null
+          group: group
         };
       });
   }
