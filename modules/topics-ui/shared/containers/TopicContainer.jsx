@@ -1,4 +1,6 @@
 import React, {PropTypes, createClass} from 'react';
+import {dispatch} from '../dispatcher';
+
 import TopicHeader from './components/topic/topic-header.jsx';
 import TopicBody from './components/topic/topic-body.jsx';
 import SearchHeader from './components/search/search-header.jsx';
@@ -6,13 +8,15 @@ import TopicReplyEditor from './components/topic/topic-reply-editor.jsx';
 import TopicReplyListHeader from './components/topic/topic-reply-list-header.jsx';
 import TopicReplyList from './components/topic/topic-reply-list.jsx';
 import TopicReplyListItem from './components/topic/topic-reply-list-item.jsx';
-import {dispatch} from '../dispatcher';
-import updateReplyBody from '../action-creators/create-reply/body-update';
+
 import submitNewReply from '../action-creators/create-reply/submit-new-reply';
 import updateCommentBody from '../action-creators/create-comment/body-update';
 import submitNewComment from '../action-creators/create-comment/submit-new-comment';
 import showReplyComments from '../action-creators/topic/show-reply-comments';
 import updateReply from '../action-creators/topic/update-reply';
+import updateReplyBody from '../action-creators/create-reply/body-update';
+import cancelUpdateReply from '../action-creators/topic/cancel-update-reply';
+import saveUpdatedReply from '../action-creators/topic/save-update-reply';
 
 const TopicContainer = createClass({
 
@@ -137,7 +141,9 @@ const TopicContainer = createClass({
         onCommentsClicked={this.onReplyCommentsClicked}
         onNewCommentUpdate={this.onNewCommentUpdate}
         submitNewComment={this.submitNewComment}
-        onReplyUpdate={this.onReplyUpdate}/>
+        onReplyEditUpdate={this.onReplyEditUpdate}
+        onReplyEditCancel={this.onReplyEditCancel}
+        onReplyEditSaved={this.onReplyEditSaved}/>
     );
   },
 
@@ -201,8 +207,16 @@ const TopicContainer = createClass({
 
   updateNewComment(){ this.forceUpdate(); },
 
-  onReplyUpdate(replyId, value){
+  onReplyEditUpdate(replyId, value){
     dispatch(updateReply(replyId, value));
+  },
+
+  onReplyEditCancel(replyId) {
+    dispatch(cancelUpdateReply(replyId));
+  },
+
+  onReplyEditSaved(replyId){
+    dispatch(saveUpdatedReply(replyId));
   }
 
 });

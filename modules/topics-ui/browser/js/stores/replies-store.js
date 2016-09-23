@@ -13,7 +13,7 @@ import dispatchOnChangeMixin from './mixins/dispatch-on-change';
 
 import {NAVIGATE_TO_TOPIC} from '../../../shared/constants/navigation';
 import {SUBMIT_NEW_REPLY} from '../../../shared/constants/create-reply';
-import {UPDATE_REPLY} from '../../../shared/constants/topic';
+import {UPDATE_REPLY, CANCEL_UPDATE_REPLY, SAVE_UPDATE_REPLY} from '../../../shared/constants/topic';
 
 export const ReplyStore = BaseModel.extend({
   url(){
@@ -41,6 +41,8 @@ export const RepliesStore = LiveCollection.extend({
     subscribe(SUBMIT_NEW_REPLY, this.createNewReply, this);
     subscribe(NAVIGATE_TO_TOPIC, this.onNavigateToTopic, this);
     subscribe(UPDATE_REPLY, this.updateReplyText, this);
+    subscribe(CANCEL_UPDATE_REPLY, this.cancelEditReply, this);
+    subscribe(SAVE_UPDATE_REPLY, this.saveUpdatedModel, this);
     router.on('change:topicId', this.onActiveTopicUpdate, this);
   },
 
@@ -69,6 +71,18 @@ export const RepliesStore = LiveCollection.extend({
     const model = this.get(replyId);
     if(!model) { return; }
     model.set('text', text);
+  },
+
+  cancelEditReply({replyId}) {
+    const model = this.get(replyId);
+    if(!model) { return; }
+    model.set('text', null);
+  },
+
+  saveUpdatedModel({replyId}){
+    const model = this.get(replyId);
+    if(!model) { return; }
+    model.save();
   }
 
 });

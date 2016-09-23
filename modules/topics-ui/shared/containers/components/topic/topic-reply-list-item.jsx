@@ -23,21 +23,25 @@ export default React.createClass({
     onNewCommentUpdate: PropTypes.func.isRequired,
     submitNewComment: PropTypes.func.isRequired,
     newCommentContent: PropTypes.string,
-    onReplyUpdate: PropTypes.func.isRequired
+    onReplyEditUpdate: PropTypes.func.isRequired,
+    onReplyEditCancel: PropTypes.func.isRequired,
+    onReplyEditSaved: PropTypes.func.isRequired,
   },
 
   render(){
     const {reply} = this.props;
     return (
       <FeedItem
-        item={reply}
-        onChange={(value) => this.onReplyUpdate(reply.id, value)}
-        primaryLabel="Likes"
-        primaryValue={10}
-        secondaryLabel="Comments"
-        secondaryValue={2}
-        onSecondaryClicked={this.onCommentsClicked}>
-        {this.getComments()}
+      item={reply}
+      onChange={(value) => this.onReplyEditUpdate(reply.id, value)}
+      onCancel={() => this.onReplyEditCancel(reply.id)}
+      onSave={() => this.onReplyEditSaved(reply.id)}
+      primaryLabel="Likes"
+      primaryValue={10}
+      secondaryLabel="Comments"
+      secondaryValue={2}
+      onSecondaryClicked={this.onCommentsClicked}>
+      {this.getComments()}
       </FeedItem>
     );
   },
@@ -68,9 +72,9 @@ export default React.createClass({
     const {reply} = this.props;
     return (
       <CommentItem
-        key={`comment-list-item-${reply.id}-${index}`}
-        onChange={(val) => this.onCommentUpdate(comment.id, val)}
-        comment={comment} />
+      key={`comment-list-item-${reply.id}-${index}`}
+      onChange={(val) => this.onCommentUpdate(comment.id, val)}
+      comment={comment} />
     );
   },
 
@@ -89,8 +93,16 @@ export default React.createClass({
     this.props.submitNewComment();
   },
 
-  onReplyUpdate(replyId, value){
-    this.props.onReplyUpdate(replyId, value);
+  onReplyEditUpdate(replyId, value){
+    this.props.onReplyEditUpdate(replyId, value);
+  },
+
+  onReplyEditCancel(replyId){
+    this.props.onReplyEditCancel(replyId);
+  },
+
+  onReplyEditSaved(replyId){
+    this.props.onReplyEditSaved(replyId)
   },
 
   onCommentUpdate(commentId, value){
