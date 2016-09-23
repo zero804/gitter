@@ -22,7 +22,8 @@ export default React.createClass({
     onCommentsClicked: PropTypes.func.isRequired,
     onNewCommentUpdate: PropTypes.func.isRequired,
     submitNewComment: PropTypes.func.isRequired,
-    newCommentContent: PropTypes.string
+    newCommentContent: PropTypes.string,
+    onReplyUpdate: PropTypes.func.isRequired
   },
 
   render(){
@@ -89,7 +90,7 @@ export default React.createClass({
   },
 
   onReplyUpdate(replyId, value){
-    //console.log('reply', replyId, value);
+    this.props.onReplyUpdate(replyId, value);
   },
 
   onCommentUpdate(commentId, value){
