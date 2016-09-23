@@ -22,15 +22,28 @@ export default React.createClass({
 
     const {groupName, isSignedIn} = this.props;
 
-    let createTopicHref;
-    if(!isSignedIn) {
-      // TODO: use basePath
-      createTopicHref = `/login?source=${CREATE_TOPIC_LINK_SOURCE}`;
-    }
 
-    let disableCreateTopicNavigation = false;
+    let createTopicButton = (
+      <CreateTopicLink
+        groupName={groupName}
+        className="topic-search__create-topic-link">
+        Create Topic
+      </CreateTopicLink>
+    );
     if(!isSignedIn) {
-      disableCreateTopicNavigation = true;
+      // TODO: Use basePath
+      // TODO: Add `returnTo` but using `window.location.pathname` is tricky here because
+      // the server-side render does not like it. We could module out `window`
+      const loginUrl = `/login?source=${CREATE_TOPIC_LINK_SOURCE}`;
+
+      createTopicButton = (
+        <a
+          href={loginUrl}
+          className="topic-search__create-topic-link"
+          onClick={this.onCreateTopicSignInLinkClick}>
+          Create Topic
+        </a>
+      )
     }
 
     return (
@@ -49,14 +62,7 @@ export default React.createClass({
             placeholder="Search for topics, replies and comments"
             onChange={this.onSearchUpdate}
             className="topic-search__search-input"/>
-          <CreateTopicLink
-            groupName={groupName}
-            className="topic-search__create-topic-link"
-            href={createTopicHref}
-            disableNavigation={disableCreateTopicNavigation}
-            onClick={this.onCreateTopicLinkClick}>
-            Create Topic
-          </CreateTopicLink>
+          {createTopicButton}
         </Panel>
       </Container>
     );
@@ -66,13 +72,9 @@ export default React.createClass({
 
   },
 
-  onCreateTopicLinkClick(e) {
-    const {isSignedIn} = this.props;
-
-    if(!isSignedIn) {
-      requestSignIn(CREATE_TOPIC_LINK_SOURCE);
-      e.preventDefault();
-    }
+  onCreateTopicSignInLinkClick(e) {
+    requestSignIn(CREATE_TOPIC_LINK_SOURCE);
+    e.preventDefault();
   }
 
 });
