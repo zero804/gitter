@@ -33,6 +33,7 @@ function handleOrgPageInFrame(req, res, next) {
 router.get('/:groupUri/rooms',
   identifyRoute('group-rooms-mainframe'),
   featureToggles,
+  isPhoneMiddleware,
   groupContextResolverMiddleware,
   handleOrgPageInFrame,
   redirectErrorMiddleware);

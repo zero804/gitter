@@ -36,5 +36,15 @@ describe('validate-tags', function() {
     var tags = ['foo', 'foo'];
     assert.strictEqual(validateTags(tags), false);
   });
+
+  it('should not validate numbers', function() {
+    var tags = [1];
+    assert.strictEqual(validateTags(tags), false);
+  });
+
+  it('should not validate objects', function() {
+    var tags = [{}];
+    assert.strictEqual(validateTags(tags), false);
+  });
 });
 

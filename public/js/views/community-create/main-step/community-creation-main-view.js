@@ -4,7 +4,7 @@ var _ = require('underscore');
 var slugger = require('../../../utils/slugger');
 var context = require('../../../utils/context');
 var toggleClass = require('../../../utils/toggle-class');
-var apiClient = require('../../../components/apiClient');
+var apiClient = require('../../../components/api-client');
 
 var stepConstants = require('../step-constants');
 var slugAvailabilityStatusConstants = require('../slug-availability-status-constants');
