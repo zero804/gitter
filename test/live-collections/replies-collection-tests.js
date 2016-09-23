@@ -79,4 +79,29 @@ describe('replies-live-collection #slow', function() {
           });
       });
   });
+
+  it('should emit an update event when changing the text', function() {
+    var checkEvent = appEvents.addListener('dataChange2', {
+      url: '/forums/' + fixture.forum1.id + '/topics/' + fixture.topic1.id + '/replies',
+      operation: 'update',
+      type: 'reply',
+      model: {
+        id: fixture.reply1.id.toString(),
+        body: {
+          text: 'new text',
+          html: 'new text',
+        }
+      },
+    });
+
+    return replyService.updateReply(fixture.user1, fixture.reply1, {
+        text: 'new text'
+      })
+      .then(checkEvent)
+      .then(function(event) {
+        // the patch event must also contain editedAt & lastModified
+        assert.ok(event.model.editedAt);
+        assert.ok(event.model.lastModified);
+      });
+  });
 });
