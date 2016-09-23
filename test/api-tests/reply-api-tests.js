@@ -56,7 +56,6 @@ describe('reply-api', function() {
           return r.id === fixture.reply1.id;
         });
         assert.strictEqual(reply.id, fixture.reply1.id);
-        assert.strictEqual(reply.commentsTotal, 1);
         assert.strictEqual(reply.comments.length, 1);
       });
   });
@@ -69,7 +68,6 @@ describe('reply-api', function() {
       .then(function(result) {
         var reply = result.body;
         assert.strictEqual(reply.id, fixture.reply1.id);
-        assert.strictEqual(reply.commentsTotal, 1);
         assert.strictEqual(reply.comments.length, 1);
       });
   });

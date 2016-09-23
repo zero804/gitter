@@ -12,6 +12,7 @@
   "private": true,
   "dependencies": {
     "gitter-web-slugify": "file:../slugify",
+    "lodash": "^3.2.0",
     "xregexp": "^2.0.0"
   }
 }

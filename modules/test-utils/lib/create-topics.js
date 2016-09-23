@@ -11,6 +11,7 @@ function createTopic(fixtureName, f) {
   debug('Creating %s', fixtureName);
 
   var title = f.title || fixtureUtils.generateName();
+  var sent = f.sent || new Date();
   var doc = {
     title: title,
     slug: f.slug || slugify(title),
@@ -21,9 +22,11 @@ function createTopic(fixtureName, f) {
     sticky: f.sticky,
     text: f.text,
     html: f.html,
-    sent: f.sent,
+    sent: sent,
     editedAt: f.editedAt,
-    lastModified: f.lastModified,
+    lastChanged: f.lastChanged || sent,
+    lastModified: f.lastModified || sent,
+    repliesTotal: f.repliesTotal,
     lang: f.lang,
     _md: f._md
   };

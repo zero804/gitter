@@ -235,7 +235,6 @@ var ChatInputBoxView = Marionette.ItemView.extend({
     var newMessage = {
       text: text,
       fromUser: context.getUser(),
-      sent: null,
     };
 
     if (isStatusMessage(text)) {

@@ -2,16 +2,23 @@
 
 var env = require('gitter-web-env');
 var stats = env.stats;
+var assert = require('assert');
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
-var Topic = require('gitter-web-persistence').Topic;
+var persistence = require('gitter-web-persistence');
+var Topic = persistence.Topic;
+var ForumCategory = persistence.ForumCategory;
+var User = persistence.User;
 var debug = require('debug')('gitter:app:topics:topic-service');
 var processText = require('gitter-web-text-processor');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var markdownMajorVersion = require('gitter-markdown-processor').version.split('.')[0];
 var validateTopic = require('./validate-topic');
-var validateTags = require('gitter-web-validators').validateTags;
+var validators = require('gitter-web-validators');
+var validateTags = validators.validateTags;
+var validateTopicFilter = validators.validateTopicFilter;
+var validateTopicSort = validators.validateTopicSort;
 var liveCollections = require('gitter-web-live-collection-events');
 
 
@@ -21,20 +28,128 @@ function findById(topicId) {
     .exec();
 }
 
-// TODO: we'll need better ways to get pages of topic results per forum rather
-// than this function to just get all the topics.
-function findByForumId(id) {
-  return Topic.find({ forumId: id })
+function lookupCategoryIdForForumAndSlug(forumId, slug) {
+  return ForumCategory.findOne({
+      forumId: forumId,
+      slug: slug
+    })
     .lean()
+    .select('_id')
     .exec();
 }
 
-function findByForumIds(ids) {
-  if (!ids.length) return [];
-
-  return Topic.find({ forumId: { $in: ids } })
+function lookupUserIdForUsername(username) {
+  return User.findOne({
+      username: username
+    })
     .lean()
+    .select('_id')
     .exec();
+}
+
+function buildTopicQuery(forumIds, filter) {
+  assert(forumIds.length > 0);
+
+  var query = {};
+
+  if (forumIds.length === 1) {
+    query.forumId = forumIds[0];
+  } else {
+    query.forumId = { $in: forumIds };
+  }
+
+  if (filter.tags) {
+    query.tags = { $all: filter.tags };
+  }
+
+  if (filter.since) {
+    // either new topics or ones that have been updated (new reply/comment)
+    query.lastChanged = { $gte: filter.since };
+  }
+
+  // we might have to look up the category by forumId&slug or user by username
+  var lookups = {};
+
+  if (filter.category) {
+    // TODO: this only works for one forumId and in theory we could be calling
+    // it with multiple ones when coming via the ForumStrategy, but in that
+    // case filtering by a category probably doesn't make much sense anyway.
+    lookups.category = lookupCategoryIdForForumAndSlug(forumIds[0], filter.category);
+  }
+
+  if (filter.username) {
+    // calling this username and not user so it matches the filter key
+    lookups.username = lookupUserIdForUsername(filter.username);
+  }
+
+  // short-circuit if we don't have to lookup anything
+  if (Object.keys(lookups).length === 0) return Promise.resolve(query);
+
+  return Promise.props(lookups)
+    .then(function(results) {
+      if (filter.category) {
+        if (!results.category) throw new StatusError(404, 'Category not found.');
+
+        query.categoryId = results.category._id;
+      }
+
+      if (filter.username) {
+        if (!results.username) throw new StatusError(404, 'Username not found.');
+
+        query.userId = results.username._id;
+      }
+
+      return query;
+    });
+}
+
+// TODO: we'll need better ways to get pages of topic results.
+function findByForumId(forumId, options) {
+  options = options || {};
+
+  var filter = options.filter || {};
+  var sort = options.sort || { _id: -1 };
+
+  if (!validateTopicFilter(filter)) {
+    throw new StatusError(400, 'Filter is invalid.');
+  }
+
+  if (!validateTopicSort(sort)) {
+    throw new StatusError(400, 'Sort is invalid.');
+  }
+
+  return buildTopicQuery([forumId], filter)
+    .then(function(query) {
+      return Topic.find(query)
+        .sort(sort)
+        .lean()
+        .exec();
+    });
+}
+
+function findByForumIds(forumIds, options) {
+  if (!forumIds.length) return [];
+
+  options = options || {};
+
+  var filter = options.filter || {};
+  var sort = options.sort || { _id: 1 };
+
+  if (!validateTopicFilter(filter)) {
+    throw new StatusError(400, 'Filter is invalid.');
+  }
+
+  if (!validateTopicSort(sort)) {
+    throw new StatusError(400, 'Sort is invalid.');
+  }
+
+  return buildTopicQuery(forumIds, filter)
+    .then(function(query) {
+      return Topic.find(query)
+        .sort(sort)
+        .lean()
+        .exec();
+    });
 }
 
 function findTotalsByForumIds(ids, options) {
@@ -74,6 +189,10 @@ function createTopic(user, category, options) {
   };
 
   var insertData = validateTopic(data, { allowedTags: allowedTags });
+
+  // make these all be the exact same instant
+  insertData.sent = insertData.lastChanged = insertData.lastModified = new Date();
+
   return processText(options.text)
     .then(function(parsedMessage) {
       insertData.html = parsedMessage.html;

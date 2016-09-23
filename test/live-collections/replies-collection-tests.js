@@ -9,7 +9,7 @@ var commentService = require('gitter-web-topics/lib/comment-service');
 
 require('../../server/event-listeners').install();
 
-describe('replies-live-collection', function() {
+describe('replies-live-collection #slow', function() {
   var fixture = fixtureLoader.setup({
     user1: {},
     forum1: {},
@@ -48,8 +48,6 @@ describe('replies-live-collection', function() {
   });
 
   it('should emit a patch event when adding a comment', function() {
-    assert.ok(!fixture.reply1.lastModified);
-
     var checkEvent = appEvents.addListener('dataChange2', {
       url: '/forums/' + fixture.forum1.id + '/topics/' + fixture.topic1.id + '/replies',
       operation: 'patch',
@@ -70,9 +68,14 @@ describe('replies-live-collection', function() {
 
         return replyService.findById(fixture.reply1._id)
           .then(function(reply) {
-            // lastModified must now exist and match the one we got in the event.
+            // lastChanged & lastModified must now match the one we got in the
+            // patch event.
+            assert.ok(reply.lastChanged);
             assert.ok(reply.lastModified);
-            assert.strictEqual(reply.lastModified.getTime(), event.model.lastModified.getTime());
+            var lastChanged = new Date(event.model.lastChanged);
+            var lastModified = new Date(event.model.lastModified);
+            assert.strictEqual(reply.lastChanged.getTime(), lastChanged.getTime());
+            assert.strictEqual(reply.lastModified.getTime(), lastModified.getTime());
           });
       });
   });

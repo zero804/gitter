@@ -65,8 +65,7 @@ function CommentStrategy(options) {
       user: mapUser(comment.userId),
 
       sent: formatDate(comment.sent),
-      editedAt: comment.editedAt ? formatDate(comment.editedAt) : null,
-      lastModified: comment.lastModified ? formatDate(comment.lastModified) : null,
+      editedAt: formatDate(comment.editedAt),
       v: getVersion(comment)
     };
   };
