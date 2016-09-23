@@ -25,19 +25,19 @@ export default React.createClass({
     const formattedSentDate = moment(item.sent).format('MMM Do')
 
     return (
-      <article className="topic-reply-list-item">
-        <div className="topic-reply-list-item__content">
-          <div className="topic-reply-list-item__user-details">
+      <article className="feed-item">
+        <div className="feed-item__content">
+          <div className="feed-item__user-details">
             <UserAvatar
-              className="topic-reply-list-item__avatar"
+              className="feed-item__avatar"
               user={user}
               width={avatarDims}
               height={avatarDims}/>
-            <span className="topic-reply-list-item__sent">{formattedSentDate}</span>
+            <span className="feed-item__sent">{formattedSentDate}</span>
           </div>
           {this.getItemContent()}
         </div>
-        <footer className="topic-reply-list-item__footer">
+        <footer className="feed-item__footer">
           {this.getPrimaryContent()}
           {this.getSecondaryContent()}
         </footer>
@@ -50,7 +50,7 @@ export default React.createClass({
     const {primaryLabel, primaryValue} = this.props;
     if(!primaryLabel){ return; }
     return (
-      <span className="topic-reply-list-item__likes">
+      <span className="feed-item__likes">
         {primaryValue} {primaryLabel}
       </span>
     );
@@ -62,7 +62,7 @@ export default React.createClass({
 
     return (
       <button
-        className="topic-reply-list-item__comments"
+        className="feed-item__comments"
         onClick={this.props.onSecondaryClicked}>
         {secondaryValue} {secondaryLabel}
       </button>
@@ -75,12 +75,12 @@ export default React.createClass({
     if(body.html) {
       return (
         <div
-          className="topic-reply-list-item__body"
+          className="feed-item__body"
           dangerouslySetInnerHTML={{ __html: body.html }} />
       );
     }
     return (
-      <section className="topic-reply-list-item__body">
+      <section className="feed-item__body">
         {item.text}
       </section>
     );

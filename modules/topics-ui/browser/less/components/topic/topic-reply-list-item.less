@@ -1,66 +1,6 @@
 @import "../../colors.less";
 @import "../../text.less";
 
-.topic-reply-list-item {
-  display: flex;
-  flex-direction: column;
-}
-
-.topic-reply-list-item__user-details {
-  width: 5rem;
-  padding-top: .5rem;
-}
-
-.topic-reply-list-item__content {
-  display: flex;
-}
-
-.topic-reply-list-item__body {
-  width: 100%;
-  padding: 2rem;
-  border: 1px solid @topic-body-border-color;
-  background-color: @light;
-  font-family: @font-family;
-
-  img {
-    max-width: 100%;
-  }
-}
-
-.topic-reply-list-item__footer {
-  padding: 1rem 0 2rem 6.5rem;
-}
-
-.m-details-text() {
-  font-size: 1.2rem;
-  color: @dark;
-  text-transform: uppercase;
-  font-family: @font-family;
-  color: @topic-reply-sent-details-color;
-}
-
-.topic-reply-list-item__likes {
-  .m-details-text();
-  margin-right: 1rem;
-}
-
-.topic-reply-list-item__comments {
-  .m-details-text();
-  outline: none;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
-.topic-reply-list-item__sent {
-  .m-details-text();
-  font-size: 1.5rem;
-}
-
-.topic-reply-list-item__avatar {
-  border-radius: .2rem;
-}
-
 .reply-comment-list {
   box-sizing: border-box;
   width: 100%;
