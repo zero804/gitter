@@ -115,10 +115,10 @@ function srcSetForUser(user, size) {
     options.srcSize = size * (window.devicePixelRatio || 1);
   }
 
-  if (url.hostname == 'pbs.twimg.com') {
+  if (url.hostname === 'pbs.twimg.com') {
     return getSrcSetForTwitterUrl(url, options);
 
-  } else if (url.hostname == 'media.licdn.com') {
+  } else if (url.hostname === 'media.licdn.com') {
     return getSrcSetForLinkedInUrl(url, options);
 
   } else {

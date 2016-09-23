@@ -74,7 +74,7 @@ exports.when = require('../../shared/handlebars/helpers/when');
 exports.pad = function(options) {
   var content = "" + options.fn(this);
   var width = options.hash.width || 40;
-  var directionRight = options.hash.direction ? options.hash.direction == "right" : true;
+  var directionRight = options.hash.direction ? options.hash.direction === "right" : true;
 
   while (content.length < width) {
     if (directionRight) {
