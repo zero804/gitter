@@ -3,7 +3,7 @@
 'use strict';
 
 var shutdown = require('shutdown');
-var onMongoConnect = require('../../server/utils/on-mongo-connect');
+var onMongoConnect = require('gitter-web-persistence-utils/lib/on-mongo-connect');
 var persistence = require('gitter-web-persistence');
 var uriLookupService = require('../../server/services/uri-lookup-service');
 
