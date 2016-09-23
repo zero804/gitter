@@ -3,15 +3,17 @@
 var env = require('gitter-web-env');
 var mailer = env.mailer;
 
-var troupeTemplate = require('../utils/troupe-template');
+var troupeTemplate = require('gitter-web-templates/lib/troupe-template');
 var Promise = require('bluebird');
 var cdn = require('gitter-web-cdn');
-
+var path = require('path');
 
 var CACHED = { };
 function getCachedTemplate(templateName) {
   if(CACHED[templateName]) return CACHED[templateName];
-  CACHED[templateName] = troupeTemplate.compile(templateName);
+
+  var templateFile = path.join(__dirname, '/../../public/templates/', templateName + '.hbs');
+  CACHED[templateName] = troupeTemplate.compile(templateFile);
   return CACHED[templateName];
 }
 
