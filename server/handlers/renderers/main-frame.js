@@ -17,40 +17,53 @@ var getSubResources = require('./sub-resources');
 var generateMainFrameSnapshots = require('../../handlers/snapshots/main-frame');
 var fonts = require('../../web/fonts');
 
+
+
+function getTroupeContextAndDerivedInfo(req, socialMetadataGenerator) {
+  return contextGenerator.generateNonChatContext(req)
+    .then(function(troupeContext) {
+      var lastLeftMenuSnapshot = (troupeContext.leftRoomMenuState || {});
+      var leftMenuGroupId = (lastLeftMenuSnapshot.groupId || '');
+
+      return Promise.all([
+          troupeContext,
+          groupService.findById(leftMenuGroupId),
+          socialMetadataGenerator && socialMetadataGenerator(troupeContext)
+        ]);
+    })
+    .spread(function(troupeContext, leftMenuForumGroup, socialMetadata) {
+      return Promise.all([
+        troupeContext,
+        leftMenuForumGroup,
+        leftMenuForumGroup && forumCategoryService.findByForumId(leftMenuForumGroup.forumId),
+        socialMetadata
+      ]);
+    });
+}
+
+
+
 function renderMainFrame(req, res, next, options) {
   var user = req.user;
   var userId = user && user.id;
   var socialMetadataGenerator = options.socialMetadataGenerator;
   var selectedRoomId = req.troupe && req.troupe.id;
 
-  contextGenerator.generateNonChatContext(req)
-    .then(function(troupeContext) {
-      var lastLeftMenuSnapshot = (troupeContext.leftRoomMenuState || {});
-      var groupId = (lastLeftMenuSnapshot.groupId || '');
-
-      return Promise.all([
-          troupeContext,
-          groupService.findById(groupId),
-        ]);
-    })
-    .spread(function(troupeContext, forumGroup) {
-      var forumId = forumGroup.forumId;
-
-      return Promise.all([
-          troupeContext,
-          restful.serializeTroupesForUser(userId),
-          restful.serializeOrgsForUserId(userId).catch(function(err) {
-            // Workaround for GitHub outage
-            winston.error('Failed to serialize orgs:' + err, { exception: err });
-            return [];
-          }),
-          restful.serializeGroupsForUserId(userId),
-          socialMetadataGenerator && socialMetadataGenerator(troupeContext),
-          forumGroup,
-          forumCategoryService.findByForumId(forumId)
-        ]);
-    })
-    .spread(function(troupeContext, rooms, orgs, groups, socialMetadata, forumGroup, forumCategories) {
+  Promise.all([
+      getTroupeContextAndDerivedInfo(req, socialMetadataGenerator),
+      restful.serializeTroupesForUser(userId),
+      restful.serializeOrgsForUserId(userId).catch(function(err) {
+        // Workaround for GitHub outage
+        winston.error('Failed to serialize orgs:' + err, { exception: err });
+        return [];
+      }),
+      restful.serializeGroupsForUserId(userId),
+    ])
+    .spread(function(troupeContextAndDerivedInfo, rooms, orgs, groups) {
+      var troupeContext = troupeContextAndDerivedInfo[0];
+      var leftMenuForumGroup = troupeContextAndDerivedInfo[1];
+      var leftMenuForumGroupCategories = troupeContextAndDerivedInfo[2];
+      var socialMetadata = troupeContextAndDerivedInfo[3];
       var chatAppLocation = options.subFrameLocation;
 
       var template, bootScriptName;
@@ -65,8 +78,8 @@ function renderMainFrame(req, res, next, options) {
 
       var extras = {
         suggestedMenuState: options.suggestedMenuState,
-        forumGroup: forumGroup,
-        forumCategories: forumCategories
+        leftMenuForumGroup: leftMenuForumGroup,
+        leftMenuForumGroupCategories: leftMenuForumGroupCategories
       };
 
       var snapshots = troupeContext.snapshots = generateMainFrameSnapshots(req, troupeContext, rooms, groups, extras);
