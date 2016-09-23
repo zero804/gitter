@@ -76,7 +76,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
     onlyGithubUsersOptionInput: '.js-create-room-only-github-users-option-input',
     onlyGroupUsersOption: '.js-create-room-only-group-users-option',
     onlyGroupUsersOptionInput: '.js-create-room-only-group-users-option-input',
-    onlyGroupUsersOptionOrgName: '.js-create-room-only-group-users-option-org-name',
+    onlyGroupUsersOptionGroupName: '.js-create-room-only-group-users-option-group-name',
     allowBadgerOption: '.js-create-room-allow-badger',
     allowBadgerOptionInput: '.js-create-room-allow-badger-option-input',
     roomAvailabilityStatusMessage: '.js-room-availability-status-message'
@@ -434,9 +434,9 @@ var CreateRoomView = Marionette.LayoutView.extend({
       var shouldHideOnlyGitHubUsersOption = !isBackedByGitHub || security !== 'PUBLIC';
       toggleClass(this.ui.onlyGithubUsersOption[0], 'hidden', shouldHideOnlyGitHubUsersOption);
 
-      var shouldHideOnlyGroupUsersOption = !isBackedByGitHub || security !== 'PRIVATE';
+      var shouldHideOnlyGroupUsersOption = security !== 'PRIVATE';
       toggleClass(this.ui.onlyGroupUsersOption[0], 'hidden', shouldHideOnlyGroupUsersOption);
-      this.ui.onlyGroupUsersOptionOrgName[0].textContent = groupBackedBy && groupBackedBy.linkPath;
+      this.ui.onlyGroupUsersOptionGroupName[0].textContent = group.get('name');
 
       var groupBackedByRepo = null;
       if(groupBackedBy && groupBackedBy.type === 'GH_REPO') {
