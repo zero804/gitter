@@ -8,8 +8,9 @@ var format = require('util').format;
 var github = require('octonode');
 var _ = require('underscore');
 var Promise = require('bluebird');
-var troupeTemplate = require('../utils/troupe-template');
-var templatePromise = troupeTemplate.compile('github-pull-request-body');
+var troupeTemplate = require('gitter-web-templates/lib/troupe-template');
+
+var templatePromise = troupeTemplate.compile(__dirname + '/../../public/templates/github-pull-request-body.hbs');
 
 var StatusError = require('statuserror');
 var readmeBadger = require('readme-badger');
