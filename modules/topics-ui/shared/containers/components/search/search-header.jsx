@@ -70,9 +70,7 @@ export default React.createClass({
     const {isSignedIn} = this.props;
 
     if(!isSignedIn) {
-      //appEvents.trigger('route', 'login');
-      //appEvents.on('navigation', `#login?source=${CREATE_TOPIC_LINK_SOURCE}`
-      frameUtils.postMessage({ type: 'route', hash: 'login' });
+      frameUtils.postMessage({ type: 'route-silent', hash: 'login' });
       e.preventDefault();
     }
   }

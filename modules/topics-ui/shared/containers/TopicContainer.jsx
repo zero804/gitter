@@ -1,11 +1,12 @@
 import React, {PropTypes, createClass} from 'react';
+import {dispatch} from '../dispatcher';
+import frameUtils from 'gitter-web-frame-utils';
 import TopicHeader from './components/topic/topic-header.jsx';
 import TopicBody from './components/topic/topic-body.jsx';
 import SearchHeader from './components/search/search-header.jsx';
 import TopicReplyEditor from './components/topic/topic-reply-editor.jsx';
 import TopicReplyListHeader from './components/topic/topic-reply-list-header.jsx';
 import TopicReplyList from './components/topic/topic-reply-list.jsx';
-import {dispatch} from '../dispatcher';
 import updateReplyBody from '../action-creators/create-reply/body-update';
 import submitNewReply from '../action-creators/create-reply/submit-new-reply';
 
@@ -116,7 +117,7 @@ const TopicContainer = createClass({
   onEditorSubmit(){
     const {currentUserStore, newReplyStore} = this.props;
     const currentUser = currentUserStore.getCurrentUser();
-    var isSignedIn = currentUser.id;
+    var isSignedIn = !!currentUser.id;
 
 
     if(isSignedIn) {
@@ -128,19 +129,17 @@ const TopicContainer = createClass({
       }));
     }
     else {
-      // TODO: basePath
-      window.location = '/login';
+      frameUtils.postMessage({ type: 'route-silent', hash: 'login' });
     }
   },
 
   onEditorClick() {
     const { currentUserStore } = this.props;
     const currentUser = currentUserStore.getCurrentUser();
-    var isSignedIn = currentUser.id;
+    var isSignedIn = !!currentUser.id;
 
     if(!isSignedIn) {
-      // TODO: basePath
-      window.location = '/login';
+      frameUtils.postMessage({ type: 'route-silent', hash: 'login' });
     }
   },
 
