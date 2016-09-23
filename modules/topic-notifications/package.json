@@ -12,9 +12,13 @@
   "private": true,
   "dependencies": {
     "bluebird": "^3.2.1",
+    "gitter-web-env": "file:../env",
+    "gitter-web-mailer": "file:../mailer",
     "gitter-web-persistence": "file:../persistence",
     "gitter-web-persistence-utils": "file:../persistence-utils",
+    "gitter-web-backend-muxer": "file:../backend-muxer",
     "lodash": "^3.2.0",
+    "moment": "^2.10.3",
     "mongodb": "~2.1.18",
     "rx": "^4.1.0",
     "rx-node": "^1.0.2"
