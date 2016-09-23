@@ -230,6 +230,8 @@ function updateReply(user, reply, fields) {
   // you can only update the text field for now.
   var text = fields.text;
 
+  if (text === reply.text) return reply;
+
   if (!validators.validateMarkdown(text)) {
     throw new StatusError(400, 'Text is invalid.');
   }
