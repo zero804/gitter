@@ -123,6 +123,29 @@ function leanUpsert(schema, query, setOperation) {
     });
 }
 
+/**
+ * Performs a safe upsert,
+ * returns an Promise of the mongodb update result
+ */
+function safeUpsertUpdate(schema, query, setOperation) {
+  var attempts = 0;
+
+  function performUpdate() {
+    attempts++;
+    return schema.update(query, setOperation, { upsert: true })
+      .exec()
+      .catch(function(err) {
+        if (attempts >= MAX_UPSERT_ATTEMPTS) throw err;
+        if (!mongoUtils.isMongoError(err)) throw err;
+        if (err.code !== MONGO_DUPLICATE_KEY_ERROR) throw err;
+
+        return performUpdate();
+      });
+  }
+
+  return performUpdate();
+}
+
 /*
  * Returns a promise [document, updatedExisting]
  * If mongo experiences a contention where it tries to
@@ -253,6 +276,7 @@ function getEstimatedCountForIds(Model, field, ids, options) {
 module.exports = {
   attachNotificationListenersToSchema: attachNotificationListenersToSchema,
   leanUpsert: leanUpsert,
+  safeUpsertUpdate: safeUpsertUpdate,
   upsert: upsert,
   findByIds: findByIds,
   findByIdsLean: findByIdsLean,
