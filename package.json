@@ -75,6 +75,7 @@
     "gitter-web-slugify": "file:modules/slugify",
     "gitter-web-split-tests": "file:modules/split-tests",
     "gitter-web-suggestions": "file:modules/suggestions",
+    "gitter-web-templates": "file:modules/templates",
     "gitter-web-text-processor": "file:modules/text-processor",
     "gitter-web-topic-notifications": "file:modules/topic-notifications",
     "gitter-web-topics": "file:modules/topics",
