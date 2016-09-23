@@ -1,15 +1,19 @@
 import Backbone from 'backbone';
-import parseReply from '../../../shared/parse/reply';
-import {subscribe} from '../../../shared/dispatcher';
-import {SUBMIT_NEW_REPLY} from '../../../shared/constants/create-reply';
 import LiveCollection from './live-collection';
-import {getRealtimeClient} from './realtime-client';
-import dispatchOnChangeMixin from './mixins/dispatch-on-change';
+import {BaseModel} from './base-model';
+import {subscribe} from '../../../shared/dispatcher';
+
+import router from '../routers';
 import {getCurrentUser} from './current-user-store';
 import {getForumId} from './forum-store'
-import router from '../routers';
-import {BaseModel} from './base-model';
+import {getRealtimeClient} from './realtime-client';
+
+import parseReply from '../../../shared/parse/reply';
+import dispatchOnChangeMixin from './mixins/dispatch-on-change';
+
 import {NAVIGATE_TO_TOPIC} from '../../../shared/constants/navigation';
+import {SUBMIT_NEW_REPLY} from '../../../shared/constants/create-reply';
+import {UPDATE_REPLY} from '../../../shared/constants/topic';
 
 export const ReplyStore = BaseModel.extend({
   url(){
@@ -24,6 +28,7 @@ export const RepliesStore = LiveCollection.extend({
   model: ReplyStore,
   client: getRealtimeClient(),
   urlTemplate: '/v1/forums/:forumId/topics/:topicId/replies',
+  events: [ 'change:text' ],
 
   getContextModel(){
     return new Backbone.Model({
@@ -35,6 +40,7 @@ export const RepliesStore = LiveCollection.extend({
   initialize(){
     subscribe(SUBMIT_NEW_REPLY, this.createNewReply, this);
     subscribe(NAVIGATE_TO_TOPIC, this.onNavigateToTopic, this);
+    subscribe(UPDATE_REPLY, this.updateReplyText, this);
     router.on('change:topicId', this.onActiveTopicUpdate, this);
   },
 
@@ -57,6 +63,12 @@ export const RepliesStore = LiveCollection.extend({
 
   onNavigateToTopic(){
     this.reset([]);
+  },
+
+  updateReplyText({replyId, text}) {
+    const model = this.get(replyId);
+    if(!model) { return; }
+    model.set('text', text);
   }
 
 });

@@ -100,13 +100,16 @@ export default React.createClass({
     const {item} = this.props;
     const {text, body} = item;
 
+    console.log(item);
+
     if(isEditing) {
-      const markdownContent = body.text;
+      let content = text;
+      if(!text) { content = body.text }
       return (
         <EditableContent
           className="feed-item__body"
           onChange={this.onChange}
-          markdownContent={markdownContent}
+          markdownContent={content}
           isEditing={true}/>
       );
     }

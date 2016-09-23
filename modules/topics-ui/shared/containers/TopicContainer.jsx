@@ -12,6 +12,7 @@ import submitNewReply from '../action-creators/create-reply/submit-new-reply';
 import updateCommentBody from '../action-creators/create-comment/body-update';
 import submitNewComment from '../action-creators/create-comment/submit-new-comment';
 import showReplyComments from '../action-creators/topic/show-reply-comments';
+import updateReply from '../action-creators/topic/update-reply';
 
 const TopicContainer = createClass({
 
@@ -62,7 +63,7 @@ const TopicContainer = createClass({
     commentsStore.onChange(this.updateComments, this);
     newCommentStore.onChange(this.updateNewComment, this);
 
-    newReplyStore.on('change:text', this.updateReplyContent, this);
+    newReplyStore.on('change:text', this.updateNewReplyContent, this);
   },
 
   componentWillUnmount(){
@@ -71,7 +72,7 @@ const TopicContainer = createClass({
     commentsStore.removeListeners(this.updateComments, this);
     newCommentStore.removeListeners(this.updateNewComment, this);
 
-    newReplyStore.off('change:text', this.updateReplyContent, this);
+    newReplyStore.off('change:text', this.updateNewReplyContent, this);
   },
 
   getInitialState(){
@@ -119,8 +120,8 @@ const TopicContainer = createClass({
         <TopicReplyEditor
           user={currentUser}
           value={newReplyContent}
-          onChange={this.onEditorUpdate}
-          onSubmit={this.onEditorSubmit}/>
+          onChange={this.onNewReplyEditorUpdate}
+          onSubmit={this.onNewReplyEditorSubmit}/>
       </main>
     );
   },
@@ -132,19 +133,19 @@ const TopicContainer = createClass({
       <TopicReplyListItem
         reply={reply}
         key={`topic-reply-list-item-${reply.id}-${index}`}
-        onCommentsClicked={this.onReplyCommentsClicked}
         newCommentContent={newCommentStore.get('text')}
-        submitNewComment={this.submitNewComment}
+        onCommentsClicked={this.onReplyCommentsClicked}
         onNewCommentUpdate={this.onNewCommentUpdate}
-        onReplyCommentsClicked={this.onReplyCommentsClicked}/>
+        submitNewComment={this.submitNewComment}
+        onReplyUpdate={this.onReplyUpdate}/>
     );
   },
 
-  onEditorUpdate(val){
+  onNewReplyEditorUpdate(val){
     dispatch(updateReplyBody(val));
   },
 
-  onEditorSubmit(){
+  onNewReplyEditorSubmit(){
     const {newReplyStore} = this.props;
     dispatch(submitNewReply(newReplyStore.get('text')));
     //Clear input
@@ -154,7 +155,7 @@ const TopicContainer = createClass({
     }));
   },
 
-  updateReplyContent(){
+  updateNewReplyContent(){
     const {newReplyStore} = this.props;
     const newReplyContent = newReplyStore.get('text');
     this.setState((state) => Object.assign(state, {
@@ -198,7 +199,11 @@ const TopicContainer = createClass({
     ));
   },
 
-  updateNewComment(){ this.forceUpdate(); }
+  updateNewComment(){ this.forceUpdate(); },
+
+  onReplyUpdate(replyId, value){
+    dispatch(updateReply(replyId, value));
+  }
 
 });
 
