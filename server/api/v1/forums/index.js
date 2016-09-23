@@ -14,10 +14,14 @@ module.exports = {
 
   show: function(req) {
     var forum = req.forum;
-    var topicsOptions = getTopicsFilterSortOptions(req.query);
-    var strategy = new restSerializer.ForumStrategy({
-      topics: topicsOptions
+
+    var userId = req.user && req.user._id;
+
+    var strategy = restSerializer.ForumStrategy.nested({
+      currentUserId: userId,
+      topicsFilterSort: getTopicsFilterSortOptions(req.query)
     });
+
     return restSerializer.serializeObject(forum, strategy);
   },
 
