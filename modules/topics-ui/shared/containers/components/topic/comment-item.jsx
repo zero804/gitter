@@ -9,15 +9,21 @@ export default React.createClass({
       body: PropTypes.shape({
         text: PropTypes.string.isRequired,
       })
-    })
+    }),
+    onChange: PropTypes.func.isRequired
   },
 
   render(){
     const {comment} = this.props;
     return (
       <FeedItem
+        onChange={this.onChange}
         item={comment}/>
     );
+  },
+
+  onChange(val){
+    this.props.onChange(val);
   }
 
 });

@@ -7,11 +7,7 @@ export default React.createClass({
 
   displayName: 'TopicReplyList',
   propTypes: {
-    replies: PropTypes.array.isRequired,
-    newCommentContent: PropTypes.string,
-    onReplyCommentsClicked: PropTypes.func.isRequired,
-    onNewCommentUpdate: PropTypes.func.isRequired,
-    submitNewComment: PropTypes.func.isRequired,
+    children: PropTypes.node.isRequired,
   },
 
   render(){
@@ -20,37 +16,11 @@ export default React.createClass({
       <Container>
         <Panel className="panel--topic-reply-list">
           <ul className="topic-reply-list">
-            {replies.map((reply, i) => this.buildReplyListItem(reply, i))}
+            {this.props.children}
           </ul>
         </Panel>
       </Container>
     );
-  },
-
-  buildReplyListItem(reply, index) {
-    const {newCommentContent} = this.props;
-    return (
-      <li key={`reply-list-item-${index}`}>
-        <TopicReplyListItem
-          newCommentContent={newCommentContent}
-          reply={reply}
-          submitNewComment={this.submitNewComment}
-          onNewCommentUpdate={this.onNewCommentUpdate}
-          onCommentsClicked={this.onReplyCommentsClicked}/>
-      </li>
-    );
-  },
-
-  onReplyCommentsClicked(replyId){
-    this.props.onReplyCommentsClicked(replyId);
-  },
-
-  onNewCommentUpdate(replyId, val) {
-    this.props.onNewCommentUpdate(replyId, val);
-  },
-
-  submitNewComment(){
-    this.props.submitNewComment();
   }
 
 });

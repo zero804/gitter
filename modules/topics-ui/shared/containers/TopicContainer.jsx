@@ -5,6 +5,7 @@ import SearchHeader from './components/search/search-header.jsx';
 import TopicReplyEditor from './components/topic/topic-reply-editor.jsx';
 import TopicReplyListHeader from './components/topic/topic-reply-list-header.jsx';
 import TopicReplyList from './components/topic/topic-reply-list.jsx';
+import TopicReplyListItem from './components/topic/topic-reply-list-item.jsx';
 import {dispatch} from '../dispatcher';
 import updateReplyBody from '../action-creators/create-reply/body-update';
 import submitNewReply from '../action-creators/create-reply/submit-new-reply';
@@ -112,18 +113,30 @@ const TopicContainer = createClass({
           <TopicBody topic={topic} />
         </article>
         <TopicReplyListHeader replies={parsedReplies}/>
-        <TopicReplyList
-          newCommentContent={newCommentStore.get('text')}
-          replies={parsedReplies}
-          submitNewComment={this.submitNewComment}
-          onNewCommentUpdate={this.onNewCommentUpdate}
-          onReplyCommentsClicked={this.onReplyCommentsClicked}/>
+        <TopicReplyList>
+          {parsedReplies.map(this.getReplyListItem)}
+        </TopicReplyList>
         <TopicReplyEditor
           user={currentUser}
           value={newReplyContent}
           onChange={this.onEditorUpdate}
           onSubmit={this.onEditorSubmit}/>
       </main>
+    );
+  },
+
+
+  getReplyListItem(reply, index){
+    const {newCommentStore} = this.props;
+    return (
+      <TopicReplyListItem
+        reply={reply}
+        key={`topic-reply-list-item-${reply.id}-${index}`}
+        onCommentsClicked={this.onReplyCommentsClicked}
+        newCommentContent={newCommentStore.get('text')}
+        submitNewComment={this.submitNewComment}
+        onNewCommentUpdate={this.onNewCommentUpdate}
+        onReplyCommentsClicked={this.onReplyCommentsClicked}/>
     );
   },
 
