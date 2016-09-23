@@ -16,6 +16,7 @@ var validateReply = require('./validate-reply');
 var validators = require('gitter-web-validators');
 var _ = require('lodash');
 var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs')
+var topicNotificationEvents = require('gitter-web-topic-notifications/lib/forum-notification-events');
 
 function findById(replyId) {
   return Reply.findById(replyId)
@@ -166,12 +167,14 @@ function createReply(user, topic, options) {
     .bind({
       reply: undefined
     })
+    .tap(function(reply) {
+      return topicNotificationEvents.createReply(reply);
+    })
     .then(function(reply) {
       this.reply = reply;
 
       return updateRepliesTotal(topic._id);
     })
-
     .then(function() {
       var reply = this.reply;
 

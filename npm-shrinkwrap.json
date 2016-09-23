@@ -717,7 +717,7 @@
         "pause-stream": {
           "version": "0.0.11",
           "from": "pause-stream@0.0.11",
-          "resolved": "http://beta-internal:4873/pause-stream/-/pause-stream-0.0.11.tgz"
+          "resolved": "https://registry.npmjs.org/pause-stream/-/pause-stream-0.0.11.tgz"
         },
         "split": {
           "version": "0.3.3",
@@ -915,13 +915,13 @@
             },
             "mime": {
               "version": "1.3.4",
-              "from": "mime@>=1.3.4 <1.4.0",
+              "from": "mime@1.3.4",
               "resolved": "http://beta-internal:4873/mime/-/mime-1.3.4.tgz"
             },
             "ms": {
               "version": "0.7.1",
               "from": "ms@0.7.1",
-              "resolved": "http://beta-internal:4873/ms/-/ms-0.7.1.tgz"
+              "resolved": "https://registry.npmjs.org/ms/-/ms-0.7.1.tgz"
             },
             "statuses": {
               "version": "1.3.0",
@@ -2398,6 +2398,11 @@
       "from": "modules/live-collection-events",
       "resolved": "file:modules/live-collection-events"
     },
+    "gitter-web-mailer": {
+      "version": "1.0.0",
+      "from": "modules/mailer",
+      "resolved": "file:modules/mailer"
+    },
     "gitter-web-mongoose-bluebird": {
       "version": "1.0.0",
       "from": "modules/mongoose-bluebird",
@@ -2452,6 +2457,11 @@
       "version": "1.0.0",
       "from": "modules/suggestions",
       "resolved": "file:modules/suggestions"
+    },
+    "gitter-web-templates": {
+      "version": "1.0.0",
+      "from": "modules/templates",
+      "resolved": "file:modules/templates"
     },
     "gitter-web-text-processor": {
       "version": "1.0.0",
@@ -3521,7 +3531,7 @@
         "es6-promise": {
           "version": "3.0.2",
           "from": "es6-promise@3.0.2",
-          "resolved": "https://registry.npmjs.org/es6-promise/-/es6-promise-3.0.2.tgz"
+          "resolved": "http://beta-internal:4873/es6-promise/-/es6-promise-3.0.2.tgz"
         },
         "mongodb-core": {
           "version": "1.3.21",
@@ -3604,12 +3614,12 @@
         "hooks-fixed": {
           "version": "1.2.0",
           "from": "hooks-fixed@1.2.0",
-          "resolved": "https://registry.npmjs.org/hooks-fixed/-/hooks-fixed-1.2.0.tgz"
+          "resolved": "http://beta-internal:4873/hooks-fixed/-/hooks-fixed-1.2.0.tgz"
         },
         "kareem": {
           "version": "1.1.3",
           "from": "kareem@1.1.3",
-          "resolved": "https://registry.npmjs.org/kareem/-/kareem-1.1.3.tgz"
+          "resolved": "http://beta-internal:4873/kareem/-/kareem-1.1.3.tgz"
         },
         "mongodb": {
           "version": "2.1.18",
@@ -3619,7 +3629,7 @@
             "es6-promise": {
               "version": "3.0.2",
               "from": "es6-promise@3.0.2",
-              "resolved": "https://registry.npmjs.org/es6-promise/-/es6-promise-3.0.2.tgz"
+              "resolved": "http://beta-internal:4873/es6-promise/-/es6-promise-3.0.2.tgz"
             },
             "mongodb-core": {
               "version": "1.3.18",
@@ -3704,7 +3714,7 @@
         "ms": {
           "version": "0.7.1",
           "from": "ms@0.7.1",
-          "resolved": "http://beta-internal:4873/ms/-/ms-0.7.1.tgz"
+          "resolved": "https://registry.npmjs.org/ms/-/ms-0.7.1.tgz"
         },
         "muri": {
           "version": "1.1.0",
@@ -4954,7 +4964,7 @@
         "ms": {
           "version": "0.7.1",
           "from": "ms@0.7.1",
-          "resolved": "http://beta-internal:4873/ms/-/ms-0.7.1.tgz"
+          "resolved": "https://registry.npmjs.org/ms/-/ms-0.7.1.tgz"
         },
         "parseurl": {
           "version": "1.3.1",
@@ -6098,7 +6108,7 @@
               "dependencies": {
                 "chalk": {
                   "version": "1.1.3",
-                  "from": "chalk@>=1.1.1 <2.0.0",
+                  "from": "chalk@>=1.0.0 <2.0.0",
                   "resolved": "http://beta-internal:4873/chalk/-/chalk-1.1.3.tgz",
                   "dependencies": {
                     "ansi-styles": {

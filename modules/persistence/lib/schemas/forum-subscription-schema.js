@@ -4,16 +4,17 @@ var mongoose = require('gitter-web-mongoose-bluebird');
 var Schema = mongoose.Schema;
 var ObjectId = Schema.ObjectId;
 
-var ForumNotificationSchema = new Schema({
+var ForumSubscriptionSchema = new Schema({
   userId: { type: ObjectId, required: true },
   forumId: { type: ObjectId, required: true },
   topicId: { type: ObjectId },
   replyId: { type: ObjectId },
+  enabled: { type: Boolean }
 }, { strict: 'throw' });
 
-ForumNotificationSchema.schemaTypeName = 'ForumNotificationSchema';
+ForumSubscriptionSchema.schemaTypeName = 'ForumSubscriptionSchema';
 
-ForumNotificationSchema.index({
+ForumSubscriptionSchema.index({
   userId: 1,
   forumId: 1,
   topicId: 1,
@@ -23,7 +24,7 @@ ForumNotificationSchema.index({
   unique: true,
 });
 
-ForumNotificationSchema.index({
+ForumSubscriptionSchema.index({
   forumId: 1,
   topicId: 1,
   replyId: 1
@@ -33,11 +34,11 @@ ForumNotificationSchema.index({
 
 module.exports = {
   install: function(mongooseConnection) {
-    var Model = mongooseConnection.model('ForumNotification', ForumNotificationSchema);
+    var Model = mongooseConnection.model('ForumSubscription', ForumSubscriptionSchema);
 
     return {
       model: Model,
-      schema: ForumNotificationSchema
+      schema: ForumSubscriptionSchema
     };
   }
 };
