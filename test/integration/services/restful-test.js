@@ -289,7 +289,9 @@ describe('restful #slow', function() {
 
     describe('serializeTopicsForForumId', function() {
       it('should serialize topics in a forum', function() {
-        return restful.serializeTopicsForForumId(fixture.forum1._id)
+        var userId = fixture.user1._id;
+
+        return restful.serializeTopicsForForumId(fixture.forum1._id, userId)
           .then(function(topics) {
             assert.ok(matchIds(topics, [
               fixture.topic4.id,
@@ -313,7 +315,8 @@ describe('restful #slow', function() {
             tags: ['foo', 'bar']
           }
         };
-        return restful.serializeTopicsForForumId(fixture.forum1._id, options)
+        var userId = fixture.user1._id;
+        return restful.serializeTopicsForForumId(fixture.forum1._id, userId, options)
           .then(function(topics) {
             assert.ok(matchIds(topics, [
               fixture.topic2.id,
@@ -329,7 +332,8 @@ describe('restful #slow', function() {
             category: fixture.category1.slug
           }
         };
-        return restful.serializeTopicsForForumId(fixture.forum1._id, options)
+        var userId = fixture.user1._id;
+        return restful.serializeTopicsForForumId(fixture.forum1._id, userId, options)
           .then(function(topics) {
             assert.ok(matchIds(topics, [
               fixture.topic3.id,
@@ -346,7 +350,8 @@ describe('restful #slow', function() {
             username: fixture.user1.username
           }
         };
-        return restful.serializeTopicsForForumId(fixture.forum1._id, options)
+        var userId = fixture.user1._id;
+        return restful.serializeTopicsForForumId(fixture.forum1._id, userId, options)
           .then(function(topics) {
             assert.ok(matchIds(topics, [
               fixture.topic3.id,
@@ -361,7 +366,8 @@ describe('restful #slow', function() {
             since: oneWeekAgo
           }
         };
-        return restful.serializeTopicsForForumId(fixture.forum1._id, options)
+        var userId = fixture.user1._id;
+        return restful.serializeTopicsForForumId(fixture.forum1._id, userId, options)
           .then(function(topics) {
             assert.ok(matchIds(topics, [
               fixture.topic4.id,
@@ -377,7 +383,8 @@ describe('restful #slow', function() {
             _id: 1
           }
         };
-        return restful.serializeTopicsForForumId(fixture.forum1._id, options)
+        var userId = fixture.user1._id;
+        return restful.serializeTopicsForForumId(fixture.forum1._id, userId, options)
           .then(function(topics) {
             assert.ok(matchIds(topics, [
               fixture.topic1.id,
@@ -394,7 +401,8 @@ describe('restful #slow', function() {
             _id: -1
           }
         };
-        return restful.serializeTopicsForForumId(fixture.forum1._id, options)
+        var userId = fixture.user1._id;
+        return restful.serializeTopicsForForumId(fixture.forum1._id, userId, options)
           .then(function(topics) {
             assert.ok(matchIds(topics, [
               fixture.topic4.id,
@@ -412,7 +420,8 @@ describe('restful #slow', function() {
             lastChanged: 1
           }
         };
-        return restful.serializeTopicsForForumId(fixture.forum1._id, options)
+        var userId = fixture.user1._id;
+        return restful.serializeTopicsForForumId(fixture.forum1._id, userId, options)
           .then(function(topics) {
             assert.ok(matchIds(topics, [
               fixture.topic1.id,
@@ -429,7 +438,8 @@ describe('restful #slow', function() {
             repliesTotal: -1
           }
         };
-        return restful.serializeTopicsForForumId(fixture.forum1._id, options)
+        var userId = fixture.user1._id;
+        return restful.serializeTopicsForForumId(fixture.forum1._id, userId, options)
           .then(function(topics) {
             // 3 & 4 have no replies, so their order is undefined in this case
             var knownOrder = [topics[0], topics[1]];
@@ -447,7 +457,8 @@ describe('restful #slow', function() {
             lastChanged: 1,
           }
         };
-        return restful.serializeTopicsForForumId(fixture.forum1._id, options)
+        var userId = fixture.user1._id;
+        return restful.serializeTopicsForForumId(fixture.forum1._id, userId, options)
           .then(function(topics) {
             assert.ok(matchIds(topics, [
               fixture.topic2.id,
@@ -461,7 +472,8 @@ describe('restful #slow', function() {
 
     describe('serializeRepliesForTopicId', function() {
       it('should serialize replies in a topic', function() {
-        return restful.serializeRepliesForTopicId(fixture.topic1._id)
+        var userId = fixture.user1._id;
+        return restful.serializeRepliesForTopicId(fixture.topic1._id, userId)
           .then(function(replies) {
             var reply = replies.find(function(r) {
               return r.id === fixture.reply1.id;

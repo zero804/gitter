@@ -181,7 +181,7 @@ function createComment(user, reply, options) {
     .then(function() {
       var comment = this.comment;
 
-      stats.event('new_comment', {
+      stats.event('new_topic_comment', {
         userId: user._id,
         forumId: reply.forumId,
         topicId: reply.topicId,
