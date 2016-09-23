@@ -1,11 +1,10 @@
 "use strict";
 
-var testRequire = require('./test-require');
 /* Force a connection */
 require('gitter-web-persistence');
-var env = testRequire('gitter-web-env');
+var env = require('gitter-web-env');
 var Promise = require('bluebird');
-var onMongoConnect = testRequire('./utils/on-mongo-connect');
+var onMongoConnect = require('gitter-web-persistence-utils/lib/on-mongo-connect');
 
 process.traceDeprecation = true;
 

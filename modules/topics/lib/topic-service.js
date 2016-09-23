@@ -18,7 +18,7 @@ var markdownMajorVersion = require('gitter-markdown-processor').version.split('.
 var validateTopic = require('./validate-topic');
 var validators = require('gitter-web-validators');
 var liveCollections = require('gitter-web-live-collection-events');
-
+var topicNotificationEvents = require('gitter-web-topic-notifications/lib/forum-notification-events');
 
 var TOPIC_RESULT_LIMIT = 100;
 
@@ -208,6 +208,9 @@ function createTopic(user, category, options) {
       debug("Creating topic with %j", insertData);
 
       return Topic.create(insertData);
+    })
+    .tap(function(topic) {
+      return topicNotificationEvents.createTopic(topic);
     })
     .then(function(topic) {
       stats.event('new_topic', {
