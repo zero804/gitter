@@ -131,7 +131,7 @@ describe('email-notification-service', function() {
             return Promise.resolve(lang);
           }
         },
-        './mailer-service': {
+        'gitter-web-mailer': {
           sendEmail: function(pPayload) {
             emailPayload = pPayload;
             return Promise.resolve();
@@ -177,7 +177,7 @@ describe('email-notification-service', function() {
     beforeEach(function() {
       emailPayload = null;
       emailNotificationService = testRequire.withProxies("./services/email-notification-service", {
-        './mailer-service': {
+        'gitter-web-mailer': {
           sendEmail: function(pPayload) {
             emailPayload = pPayload;
             return Promise.resolve();

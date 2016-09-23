@@ -390,7 +390,7 @@
       "dependencies": {
         "redis": {
           "version": "2.6.2",
-          "from": "redis@latest",
+          "from": "redis@>=2.1.0 <3.0.0",
           "resolved": "http://beta-internal:4873/redis/-/redis-2.6.2.tgz",
           "dependencies": {
             "double-ended-queue": {
@@ -588,7 +588,7 @@
         "ms": {
           "version": "0.7.1",
           "from": "ms@0.7.1",
-          "resolved": "http://beta-internal:4873/ms/-/ms-0.7.1.tgz"
+          "resolved": "https://registry.npmjs.org/ms/-/ms-0.7.1.tgz"
         }
       }
     },
@@ -717,7 +717,7 @@
         "pause-stream": {
           "version": "0.0.11",
           "from": "pause-stream@0.0.11",
-          "resolved": "http://beta-internal:4873/pause-stream/-/pause-stream-0.0.11.tgz"
+          "resolved": "https://registry.npmjs.org/pause-stream/-/pause-stream-0.0.11.tgz"
         },
         "split": {
           "version": "0.3.3",
@@ -743,7 +743,7 @@
           "dependencies": {
             "mime-types": {
               "version": "2.1.12",
-              "from": "mime-types@>=2.1.7 <2.2.0",
+              "from": "mime-types@>=2.1.11 <2.2.0",
               "resolved": "http://beta-internal:4873/mime-types/-/mime-types-2.1.12.tgz",
               "dependencies": {
                 "mime-db": {
@@ -921,7 +921,7 @@
             "ms": {
               "version": "0.7.1",
               "from": "ms@0.7.1",
-              "resolved": "http://beta-internal:4873/ms/-/ms-0.7.1.tgz"
+              "resolved": "https://registry.npmjs.org/ms/-/ms-0.7.1.tgz"
             },
             "statuses": {
               "version": "1.3.0",
@@ -947,7 +947,7 @@
             },
             "mime-types": {
               "version": "2.1.12",
-              "from": "mime-types@>=2.1.7 <2.2.0",
+              "from": "mime-types@>=2.1.11 <2.2.0",
               "resolved": "http://beta-internal:4873/mime-types/-/mime-types-2.1.12.tgz",
               "dependencies": {
                 "mime-db": {
@@ -2007,7 +2007,7 @@
       "dependencies": {
         "redis": {
           "version": "2.6.2",
-          "from": "redis@latest",
+          "from": "redis@>=2.1.0 <3.0.0",
           "resolved": "http://beta-internal:4873/redis/-/redis-2.6.2.tgz",
           "dependencies": {
             "double-ended-queue": {
@@ -2398,6 +2398,11 @@
       "from": "modules/live-collection-events",
       "resolved": "file:modules/live-collection-events"
     },
+    "gitter-web-mailer": {
+      "version": "1.0.0",
+      "from": "modules/mailer",
+      "resolved": "file:modules/mailer"
+    },
     "gitter-web-mongoose-bluebird": {
       "version": "1.0.0",
       "from": "modules/mongoose-bluebird",
@@ -2764,7 +2769,7 @@
                         },
                         "inherits": {
                           "version": "2.0.3",
-                          "from": "inherits@>=2.0.0 <3.0.0",
+                          "from": "inherits@>=2.0.1 <2.1.0",
                           "resolved": "http://beta-internal:4873/inherits/-/inherits-2.0.3.tgz"
                         },
                         "isarray": {
@@ -3498,7 +3503,7 @@
         },
         "parseurl": {
           "version": "1.3.1",
-          "from": "parseurl@>=1.3.0 <1.4.0",
+          "from": "parseurl@>=1.3.1 <1.4.0",
           "resolved": "http://beta-internal:4873/parseurl/-/parseurl-1.3.1.tgz"
         },
         "vary": {
@@ -3709,7 +3714,7 @@
         "ms": {
           "version": "0.7.1",
           "from": "ms@0.7.1",
-          "resolved": "http://beta-internal:4873/ms/-/ms-0.7.1.tgz"
+          "resolved": "https://registry.npmjs.org/ms/-/ms-0.7.1.tgz"
         },
         "muri": {
           "version": "1.1.0",
@@ -4140,7 +4145,7 @@
       "dependencies": {
         "passport-oauth2": {
           "version": "1.3.0",
-          "from": "passport-oauth2@>=1.0.0 <2.0.0",
+          "from": "passport-oauth2@>=1.1.2 <2.0.0",
           "resolved": "http://beta-internal:4873/passport-oauth2/-/passport-oauth2-1.3.0.tgz",
           "dependencies": {
             "passport-strategy": {
@@ -4193,7 +4198,7 @@
       "dependencies": {
         "passport-oauth2": {
           "version": "1.3.0",
-          "from": "passport-oauth2@>=1.0.0 <2.0.0",
+          "from": "passport-oauth2@>=1.1.2 <2.0.0",
           "resolved": "http://beta-internal:4873/passport-oauth2/-/passport-oauth2-1.3.0.tgz",
           "dependencies": {
             "passport-strategy": {
@@ -4959,11 +4964,11 @@
         "ms": {
           "version": "0.7.1",
           "from": "ms@0.7.1",
-          "resolved": "http://beta-internal:4873/ms/-/ms-0.7.1.tgz"
+          "resolved": "https://registry.npmjs.org/ms/-/ms-0.7.1.tgz"
         },
         "parseurl": {
           "version": "1.3.1",
-          "from": "parseurl@>=1.3.0 <1.4.0",
+          "from": "parseurl@>=1.3.1 <1.4.0",
           "resolved": "http://beta-internal:4873/parseurl/-/parseurl-1.3.1.tgz"
         }
       }
@@ -6103,7 +6108,7 @@
               "dependencies": {
                 "chalk": {
                   "version": "1.1.3",
-                  "from": "chalk@>=1.1.1 <2.0.0",
+                  "from": "chalk@>=1.0.0 <2.0.0",
                   "resolved": "http://beta-internal:4873/chalk/-/chalk-1.1.3.tgz",
                   "dependencies": {
                     "ansi-styles": {
