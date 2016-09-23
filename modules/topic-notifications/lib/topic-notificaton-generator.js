@@ -1,9 +1,11 @@
 'use strict';
 
+var Promise = require('bluebird');
 var RxNode = require('rx-node');
 var ForumNotification = require('gitter-web-persistence').ForumNotification;
 var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs')
 var mailerService = require('gitter-web-mailer');
+var notificationService = require('./notification-service');
 var BackendMuxer = require('gitter-web-backend-muxer');
 var moment = require('moment');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
@@ -232,18 +234,24 @@ function generateCommentNotification(emailAddress, notification) {
 }
 
 function generateEmailForNotification(notification) {
-  return resolveEmailAddress(notification.user)
-    .then(function(emailAddress) {
-      if (notification.commentId) {
-        return generateCommentNotification(emailAddress, notification);
-      }
+  return Promise.join(
+      notificationService.markNotificationAsEmailSent(notification._id),
+      resolveEmailAddress(notification.user),
+      function(obtainedLocked, emailAddress) {
 
-      if (notification.replyId) {
-        return generateReplyNotification(emailAddress, notification);
-      }
+        // Another process has already sent this email
+        if (!obtainedLocked) return;
 
-      return generateTopicNotification(emailAddress, notification);
-    })
+        if (notification.commentId) {
+          return generateCommentNotification(emailAddress, notification);
+        }
+
+        if (notification.replyId) {
+          return generateReplyNotification(emailAddress, notification);
+        }
+
+        return generateTopicNotification(emailAddress, notification);
+      });
 
 }
 
