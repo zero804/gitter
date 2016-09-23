@@ -17,6 +17,10 @@ function validateTopic(data, options) {
     throw new StatusError(400, 'Slug is invalid.');
   }
 
+  if (!validators.validateSticky(data.sticky)) {
+    throw new StatusError(400, 'Sticky is invalid.');
+  }
+
   if (!validators.validateMarkdown(data.text)) {
     throw new StatusError(400, 'Text is invalid.');
   }
