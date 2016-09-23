@@ -16,6 +16,8 @@ export const BaseModel = Backbone.Model.extend({
     const headers = { "x-access-token": getAccessToken() }
     const data = JSON.stringify(this.getDataToSave());
 
+    //TODO NEED TO ADD UPDATE METHOD
+
     if(method === 'create') {
       $.ajax({
         url: model.url(),

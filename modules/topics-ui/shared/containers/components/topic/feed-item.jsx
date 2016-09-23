@@ -20,6 +20,8 @@ export default React.createClass({
     secondaryValue: PropTypes.number,
     onSecondaryClicked: PropTypes.func,
     onChange: PropTypes.func.isRequired,
+    onCancel: PropTypes.func.isRequired,
+    onSave: PropTypes.func.isRequired,
   },
 
   getDefaultProps(){
@@ -73,12 +75,14 @@ export default React.createClass({
         [
           <button
             key={`feed-item-edit-${item.id}-save`}
-            className="feed-item__edit-control__save">
+            className="feed-item__edit-control__save"
+            onClick={this.onSaveClicked}>
             Save
           </button>,
           <button
             key={`feed-item-edit-${item.id}-cancel`}
-            className="feed-item__edit-control__cancel">
+            className="feed-item__edit-control__cancel"
+            onClick={this.onCancelClicked}>
             Cancel
           </button>,
 
@@ -99,8 +103,6 @@ export default React.createClass({
     const {isEditing} = this.state;
     const {item} = this.props;
     const {text, body} = item;
-
-    console.log(item);
 
     if(isEditing) {
       let content = text;
@@ -162,11 +164,23 @@ export default React.createClass({
     e.preventDefault();
     this.setState({
       isEditing: true,
-    })
+    });
   },
 
   onChange(val){
     this.props.onChange(val);
+  },
+
+  onCancelClicked(e){
+    e.preventDefault();
+    this.props.onCancel();
+    this.setState({ isEditing: false });
+  },
+
+  onSaveClicked(e){
+    e.preventDefault();
+    this.props.onSave();
+    this.setState({ isEditing: false });
   }
 
 });

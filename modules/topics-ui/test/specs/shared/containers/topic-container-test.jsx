@@ -16,7 +16,13 @@ import commentsStore from '../../../mocks/comments-store';
 import newCommentStore from '../../../mocks/new-comment-store';
 
 
-import {SHOW_REPLY_COMMENTS, UPDATE_REPLY} from '../../../../shared/constants/topic';
+import {
+  SHOW_REPLY_COMMENTS,
+  UPDATE_REPLY,
+  CANCEL_UPDATE_REPLY,
+  SAVE_UPDATE_REPLY
+} from '../../../../shared/constants/topic';
+
 import {BODY_UPDATE, SUBMIT_NEW_REPLY} from '../../../../shared/constants/create-reply';
 import {COMMENT_BODY_UPDATE, SUBMIT_NEW_COMMENT} from '../../../../shared/constants/create-comment';
 
@@ -115,7 +121,21 @@ describe('<TopicContainer />', () => {
   it('should dispatch the right event when a reply updates', () => {
     const handle = spy();
     subscribe(UPDATE_REPLY, handle);
-    wrapper.find('TopicReplyListItem').at(0).prop('onReplyUpdate')();
+    wrapper.find('TopicReplyListItem').at(0).prop('onReplyEditUpdate')();
+    equal(handle.callCount, 1);
+  });
+
+  it('should ispatch the right event when the reply edit is canceled', () => {
+    const handle = spy();
+    subscribe(CANCEL_UPDATE_REPLY, handle);
+    wrapper.find('TopicReplyListItem').at(0).prop('onReplyEditCancel')();
+    equal(handle.callCount, 1);
+  });
+
+  it('should dispatch the right action when the reply edit is saved', () => {
+    const handle = spy();
+    subscribe(SAVE_UPDATE_REPLY, handle);
+    wrapper.find('TopicReplyListItem').at(0).prop('onReplyEditSaved')();
     equal(handle.callCount, 1);
   });
 
