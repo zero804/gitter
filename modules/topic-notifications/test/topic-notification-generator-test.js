@@ -2,11 +2,9 @@
 
 var Promise = require('bluebird');
 var assert = require('assert');
-var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
-var forumNotificationEvents = require('../lib/forum-notification-events');
-var subscriberService = require('../lib/subscriber-service');
 var ForumObject = require('../lib/forum-object');
 var notificationService = require('../lib/notification-service');
+var topicNotificationGenerator = require('../lib/topic-notificaton-generator');
 var RxNode = require('rx-node');
 var ObjectID = require('mongodb').ObjectID;
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
@@ -31,7 +29,7 @@ describe('forum-notification-events', function() {
           notificationService.createNotifications(replyRef, [userId])
         )
         .then(function() {
-          var stream = notificationService.streamNotificationsForEmail({ userId: userId })
+          var stream = topicNotificationGenerator.streamNotificationsForEmail({ userId: userId })
           var observable = RxNode.fromReadableStream(stream);
 
           return observable
