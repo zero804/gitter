@@ -158,7 +158,7 @@ describe('topics-live-collection', function() {
       })
       .then(checkEvent)
       .then(function(event) {
-        // the patch event must also contain lastModified
+        // the event must also contain lastModified
         assert.ok(event.model.lastModified);
       });
   });
@@ -179,7 +179,7 @@ describe('topics-live-collection', function() {
       })
       .then(checkEvent)
       .then(function(event) {
-        // the patch event must also contain lastModified
+        // the event must also contain lastModified
         assert.ok(event.model.lastModified);
       });
   });
@@ -203,7 +203,7 @@ describe('topics-live-collection', function() {
       })
       .then(checkEvent)
       .then(function(event) {
-        // the patch event must also contain editedAt & lastModified
+        // the event must also contain editedAt & lastModified
         assert.ok(event.model.editedAt);
         assert.ok(event.model.lastModified);
       });
@@ -262,7 +262,7 @@ describe('topics-live-collection', function() {
     return topicService.setTopicCategory(fixture.user1, fixture.topic3, fixture.category2)
       .then(checkEvent)
       .then(function(event) {
-        // the patch event must also contain lastModified
+        // the event must also contain lastModified
         assert.ok(event.model.lastModified);
 
         assert.strictEqual(event.model.category.id.toString(), fixture.category2._id.toString());

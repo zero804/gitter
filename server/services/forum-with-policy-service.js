@@ -99,6 +99,9 @@ function getCommentOptions(options) {
   return opts;
 }
 
+/**
+ * Adding things
+ */
 ForumWithPolicyService.prototype.createCategory = secureMethod([allowAdmin], function(options) {
   var user = this.user;
   var forum = this.forum;
@@ -133,6 +136,9 @@ ForumWithPolicyService.prototype.createComment = secureMethod([allowWrite, match
   return commentService.createComment(user, reply, createOptions);
 });
 
+/**
+ * Forum update
+ */
 ForumWithPolicyService.prototype.setForumTags = secureMethod([allowAdmin], function(tags) {
   var user = this.user;
   var forum = this.forum;
@@ -140,6 +146,9 @@ ForumWithPolicyService.prototype.setForumTags = secureMethod([allowAdmin], funct
   return forumService.setForumTags(user, forum, tags);
 });
 
+/**
+ * Topic update
+ */
 ForumWithPolicyService.prototype.updateTopic = secureMethod([allowWrite, matchForum], function(topic, fields) {
   var user = this.user;
 
@@ -168,6 +177,15 @@ ForumWithPolicyService.prototype.setTopicCategory = secureMethod([allowWrite, ma
   }
 
   return topicService.setTopicCategory(user, topic, category);
+});
+
+/**
+ * Reply update
+ */
+ForumWithPolicyService.prototype.updateReply = secureMethod([allowWrite, matchForum], function(reply, fields) {
+  var user = this.user;
+
+  return replyService.updateReply(user, reply, fields);
 });
 
 /**

@@ -184,4 +184,13 @@ describe('forum-with-policy-service #slow', function() {
       });
   });
 
+  it("should allow members to update all the reply's core fields in one go", function() {
+    return forumWithPolicyService.updateReply(fixture.reply1, {
+        text: '**baz**'
+      })
+      .then(function(reply) {
+        assert.strictEqual(reply.text, '**baz**');
+        assert.strictEqual(reply.html, '<strong>baz</strong>');
+      });
+  });
 });

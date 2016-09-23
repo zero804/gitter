@@ -3,6 +3,7 @@
 var env = require('gitter-web-env');
 var stats = env.stats;
 var Promise = require('bluebird');
+var StatusError = require('statuserror');
 var Topic = require('gitter-web-persistence').Topic;
 var Reply = require('gitter-web-persistence').Reply;
 var debug = require('debug')('gitter:app:topics:reply-service');
@@ -12,6 +13,7 @@ var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var markdownMajorVersion = require('gitter-markdown-processor').version.split('.')[0];
 var validateReply = require('./validate-reply');
+var validators = require('gitter-web-validators');
 var _ = require('lodash');
 var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs')
 
@@ -184,6 +186,87 @@ function createReply(user, topic, options) {
     });
 }
 
+/* private */
+function makeTopicUpdater(topicId, lastModified) {
+  return function() {
+    var query = {
+      _id: topicId
+    };
+    var update = {
+      $max: {
+        lastModified: lastModified
+      }
+    };
+    return Topic.findOneAndUpdate(query, update, { new: true })
+      .lean()
+      .exec();
+  };
+}
+
+/* private */
+function updateReplyFields(topicId, replyId, fields) {
+  var lastModified = new Date();
+
+  var query = {
+    _id: replyId
+  };
+  var update = {
+    $set: fields,
+    $max: {
+      lastModified: lastModified
+    }
+  };
+  var updateTopicLastModified = makeTopicUpdater(topicId, lastModified);
+  return Reply.findOneAndUpdate(query, update, { new: true })
+    .lean()
+    .exec()
+    .tap(updateTopicLastModified);
+}
+
+function updateReply(user, reply, fields) {
+  // you can only update the text field for now.
+  var text = fields.text;
+
+  if (!validators.validateMarkdown(text)) {
+    throw new StatusError(400, 'Text is invalid.');
+  }
+
+  var userId = user._id;
+  var forumId = reply.forumId;
+  var topicId = reply.topicId;
+  var replyId = reply._id;
+
+  return processText(text)
+    .then(function(parsedMessage) {
+      return updateReplyFields(topicId, replyId, {
+        editedAt: new Date(),
+        text: text,
+        html: parsedMessage.html,
+        lang: parsedMessage.lang,
+        _md: parsedMessage.markdownProcessingFailed ? -markdownMajorVersion : markdownMajorVersion
+      });
+    })
+    .then(function(updatedReply) {
+      stats.event('update_topic_reply', {
+        userId: userId,
+        forumId: forumId,
+        topicId: topicId,
+        replyId: replyId
+      });
+
+      // Might as well issue an update rather than a patch because almost the
+      // entire thing changed.
+      liveCollections.replies.emit('update', updatedReply);
+
+      // The topic was updated at the same time as the reply
+      liveCollections.topics.emit('patch', forumId, topicId, {
+        lastModified: updatedReply.lastModified.toISOString(),
+      });
+
+      return updatedReply;
+    });
+}
+
 /**
  * Given a set of topicIds, returns a hash
  * of userIds of users replying to those messages
@@ -232,5 +315,6 @@ module.exports = {
   findByIdForForum: findByIdForForum,
   findByIdForForumAndTopic: findByIdForForumAndTopic,
   createReply: Promise.method(createReply),
+  updateReply: Promise.method(updateReply),
   findSampleReplyingUserIdsForTopics: findSampleReplyingUserIdsForTopics
 };
