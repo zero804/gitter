@@ -7,7 +7,7 @@ function hasParentFrameSameOrigin() {
   if (window.parent === window) return false; // This is the top window
   try {
     // This should always return true if you can access the parent origin
-    return window.location.host == window.parent.location.host;
+    return window.location.host === window.parent.location.host;
   } catch(e) {
     // Cross-origin. So No.
     return false;
