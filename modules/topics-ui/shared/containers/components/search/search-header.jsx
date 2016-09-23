@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react';
+import frameUtils from 'gitter-web-frame-utils';
 import Container from '../container.jsx';
 import Panel from '../panel.jsx';
 import ForumCategoryLink from '../links/forum-category-link.jsx';
@@ -6,6 +7,8 @@ import H1 from '../text/h-1.jsx';
 import Input from '../forms/input.jsx';
 import CreateTopicLink from '../links/create-topic-link.jsx';
 import {DEFAULT_CATEGORY_NAME} from '../../../constants/navigation';
+
+const CREATE_TOPIC_LINK_SOURCE = 'topics-header-create-topic-link';
 
 export default React.createClass({
 
@@ -22,7 +25,7 @@ export default React.createClass({
     let createTopicHref;
     if(!isSignedIn) {
       // TODO: use basePath
-      createTopicHref = '/login';
+      createTopicHref = `/login?source=${CREATE_TOPIC_LINK_SOURCE}`;
     }
 
     let disableCreateTopicNavigation = false;
@@ -50,7 +53,8 @@ export default React.createClass({
             groupName={groupName}
             className="topic-search__create-topic-link"
             href={createTopicHref}
-            disableNavigation={disableCreateTopicNavigation}>
+            disableNavigation={disableCreateTopicNavigation}
+            onClick={this.onCreateTopicLinkClick}>
             Create Topic
           </CreateTopicLink>
         </Panel>
@@ -60,6 +64,17 @@ export default React.createClass({
 
   onSearchUpdate(){
 
+  },
+
+  onCreateTopicLinkClick(e) {
+    const {isSignedIn} = this.props;
+
+    if(!isSignedIn) {
+      //appEvents.trigger('route', 'login');
+      //appEvents.on('navigation', `#login?source=${CREATE_TOPIC_LINK_SOURCE}`
+      frameUtils.postMessage({ type: 'route', hash: 'login' });
+      e.preventDefault();
+    }
   }
 
 });

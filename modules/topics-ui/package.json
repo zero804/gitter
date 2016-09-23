@@ -23,7 +23,8 @@
     "gitter-web-avatars": "file:../avatars",
     "gitter-realtime-client": "^1.6.1",
     "gitter-web-slugify": "file:../slugify",
-    "gitter-client-env": "file:../client-env"
+    "gitter-client-env": "file:../client-env",
+    "gitter-web-frame-utils": "file:../frame-utils"
   },
   "devDependencies": {
     "highlight.js": "8.6.0",

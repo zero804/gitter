@@ -2,12 +2,16 @@
 
 require('./utils/font-setup');
 
+var Backbone = require('backbone');
+var urlParse = require('url-parse');
+var clientEnv = require('gitter-client-env');
 var appEvents = require('./utils/appevents');
 var context = require('./utils/context');
-var clientEnv = require('gitter-client-env');
-var TitlebarUpdater = require('./components/titlebar');
 var onready = require('./utils/onready');
+var TitlebarUpdater = require('./components/titlebar');
 var debug = require('debug-proxy')('app:router-nli-app');
+var modalRegion = require('./components/modal-region');
+var Router = require('./routes/router');
 
 require('./views/widgets/preload');
 require('./components/user-notifications');
@@ -142,4 +146,23 @@ onready(function() {
     }
   });
 
+
+
+  new Router({
+    dialogRegion: modalRegion,
+    routes: [{
+      'login': function(query) {
+        var dialogRegion = this.dialogRegion;
+
+        require.ensure(['./views/modals/login-view'], function(require) {
+          var LoginView = require('./views/modals/login-view');
+
+          var options = (query) ? urlParse('?'+query, true).query : {};
+          dialogRegion.show(new LoginView(options));
+        });
+      },
+    }]
+  });
+
+  Backbone.history.start();
 });
