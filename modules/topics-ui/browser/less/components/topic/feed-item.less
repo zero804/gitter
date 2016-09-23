@@ -1,5 +1,6 @@
 @import "../../colors.less";
 @import "../../text.less";
+@import (less, reference) "~gitter-styleguide/css/components/buttons.css";
 
 .feed-item {
   display: flex;
@@ -28,7 +29,9 @@
 }
 
 .feed-item__footer {
-  padding: 1rem 0 2rem 6.5rem;
+  display: flex;
+  align-items: center;
+  padding: 1rem 0 2rem 4.5rem;
 }
 
 .m-details-text() {
@@ -55,6 +58,29 @@
 .feed-item__sent {
   .m-details-text();
   font-size: 1.5rem;
+}
+
+.feed-item__edit-control {
+  .m-details-text();
+  border: none;
+  background: none;
+  outline: none;
+  margin-left: auto;
+  color: @dark;
+  cursor: pointer;
+}
+
+.feed-item__edit-control__save {
+  &:extend(.button-caribbean--xsmall);
+  margin-left: auto;
+  margin-right: 1rem;
+  cursor: pointer;
+}
+
+.feed-item__edit-control__cancel {
+  &:extend(.button-ruby--xsmall);
+  &:hover { background-color: white; }
+  cursor: pointer;
 }
 
 .feed-item__avatar {

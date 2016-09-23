@@ -64,10 +64,34 @@ export default React.createClass({
   },
 
   getEditControl(){
-    const {canEdit} = this.props;
+    const {canEdit, item} = this.props;
+    const {isEditing} = this.state;
     if(!canEdit){ return; }
+
+    if(isEditing) {
+      return (
+        [
+          <button
+            key={`feed-item-edit-${item.id}-save`}
+            className="feed-item__edit-control__save">
+            Save
+          </button>,
+          <button
+            key={`feed-item-edit-${item.id}-cancel`}
+            className="feed-item__edit-control__cancel">
+            Cancel
+          </button>,
+
+        ]
+      );
+    }
+
     return (
-      <button onClick={this.onEditClicked}>Edit</button>
+      <button
+        className="feed-item__edit-control"
+        onClick={this.onEditClicked}>
+        Edit
+      </button>
     );
   },
 
@@ -75,32 +99,36 @@ export default React.createClass({
     const {isEditing} = this.state;
     const {item} = this.props;
     const {text, body} = item;
-    const {html} = body;
-    const markdownContent = body.text;
 
     if(isEditing) {
-      return <EditableContent
-        className="feed-item__body"
-        onChange={this.onChange}
-        markdownContent={markdownContent}
-        isEditing={true}/>
+      const markdownContent = body.text;
+      return (
+        <EditableContent
+          className="feed-item__body"
+          onChange={this.onChange}
+          markdownContent={markdownContent}
+          isEditing={true}/>
+      );
     }
 
     if(item.text) {
-      return <EditableContent
-        className="feed-item__body"
-        onChange={this.onChange}
-        textContent={text}
-        isEditing={false}/>
+      return (
+        <EditableContent
+          className="feed-item__body"
+          onChange={this.onChange}
+          textContent={text}
+          isEditing={false}/>
+      );
     }
 
-    if(item.body.text) {
-      return <EditableContent
+    const {html} = body;
+    return (
+      <EditableContent
         className="feed-item__body"
         onChange={this.onChange}
         htmlContent={html}
         isEditing={false}/>
-    }
+    );
 
   },
 
