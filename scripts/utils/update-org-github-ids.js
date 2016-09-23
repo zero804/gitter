@@ -2,7 +2,7 @@
 'use strict';
 
 var persistence = require('gitter-web-persistence');
-var onMongoConnect = require('../../server/utils/on-mongo-connect');
+var onMongoConnect = require('gitter-web-persistence-utils/lib/on-mongo-connect');
 var through2Concurrent = require('through2-concurrent');
 var Promise = require('bluebird');
 var GitHubOrgService = require('gitter-web-github').GitHubOrgService;

@@ -9,7 +9,7 @@ var outputFile = Promise.promisify(fs.outputFile);
 var temp = require('temp');
 var mkdir = Promise.promisify(temp.mkdir);
 
-var onMongoConnect = require('../../server/utils/on-mongo-connect');
+var onMongoConnect = require('gitter-web-persistence-utils/lib/on-mongo-connect');
 var userService = require('../../server/services/user-service');
 var chatService = require('../../server/services/chat-service');
 var chatsForUserSearch = require('gitter-web-elasticsearch/lib/chats-for-user-search');
