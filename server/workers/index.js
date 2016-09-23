@@ -1,6 +1,6 @@
 "use strict";
 
-var onMongoConnect = require('../utils/on-mongo-connect');
+var onMongoConnect = require('gitter-web-persistence-utils/lib/on-mongo-connect');
 var debug = require('debug')('gitter:infra:workers');
 
 var listening = false;

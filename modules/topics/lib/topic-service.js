@@ -6,6 +6,7 @@ var assert = require('assert');
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
 var persistence = require('gitter-web-persistence');
+var _ = require('lodash');
 var Topic = persistence.Topic;
 var ForumCategory = persistence.ForumCategory;
 var User = persistence.User;
@@ -16,11 +17,8 @@ var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var markdownMajorVersion = require('gitter-markdown-processor').version.split('.')[0];
 var validateTopic = require('./validate-topic');
 var validators = require('gitter-web-validators');
-var validateTags = validators.validateTags;
-var validateTopicFilter = validators.validateTopicFilter;
-var validateTopicSort = validators.validateTopicSort;
 var liveCollections = require('gitter-web-live-collection-events');
-
+var topicNotificationEvents = require('gitter-web-topic-notifications/lib/forum-notification-events');
 
 var TOPIC_RESULT_LIMIT = 100;
 
@@ -112,11 +110,11 @@ function findByForumId(forumId, options) {
   var filter = options.filter || {};
   var sort = options.sort || { _id: -1 };
 
-  if (!validateTopicFilter(filter)) {
+  if (!validators.validateTopicFilter(filter)) {
     throw new StatusError(400, 'Filter is invalid.');
   }
 
-  if (!validateTopicSort(sort)) {
+  if (!validators.validateTopicSort(sort)) {
     throw new StatusError(400, 'Sort is invalid.');
   }
 
@@ -141,11 +139,11 @@ function findByForumIds(forumIds, options) {
   var filter = options.filter || {};
   var sort = options.sort || { _id: 1 };
 
-  if (!validateTopicFilter(filter)) {
+  if (!validators.validateTopicFilter(filter)) {
     throw new StatusError(400, 'Filter is invalid.');
   }
 
-  if (!validateTopicSort(sort)) {
+  if (!validators.validateTopicSort(sort)) {
     throw new StatusError(400, 'Sort is invalid.');
   }
 
@@ -180,7 +178,6 @@ function findByIdForForum(forumId, topicId) {
     });
 }
 
-
 function createTopic(user, category, options) {
   // these should be passed in from forum.tags
   var allowedTags = options.allowedTags || [];
@@ -192,7 +189,7 @@ function createTopic(user, category, options) {
     title: options.title,
     slug: options.slug,
     tags: options.tags || [],
-    sticky: options.sticky || false,
+    sticky: options.sticky,
     text: options.text || '',
   };
 
@@ -212,6 +209,9 @@ function createTopic(user, category, options) {
 
       return Topic.create(insertData);
     })
+    .tap(function(topic) {
+      return topicNotificationEvents.createTopic(topic);
+    })
     .then(function(topic) {
       stats.event('new_topic', {
         userId: user._id,
@@ -223,15 +223,104 @@ function createTopic(user, category, options) {
     });
 }
 
+/* private */
+function updateTopicFields(topicId, fields) {
+  var query = {
+    _id: topicId
+  };
+  var update = {
+    $set: fields,
+    $max: {
+      // certainly modified, but not necessarily changed or edited.
+      lastModified: new Date()
+    }
+  };
+  return Topic.findOneAndUpdate(query, update, { new: true })
+    .lean()
+    .exec();
+}
+
+function updateTopic(user, topic, fields) {
+  // This function is for updating the core user fields: title, slug & text.
+
+  // before doing anything else, see if any of the fields actually changed
+  var unchanged = Object.keys(fields).every(function(key) {
+    return fields[key] === topic[key];
+  });
+  if (unchanged) return topic;
+
+  // Only update the known fields. Not just anything that gets passed in.
+  var known = {};
+  if (fields.hasOwnProperty('title')) {
+    if (!validators.validateDisplayName(fields.title)) {
+      throw new StatusError(400, 'Title is invalid.');
+    }
+    known.title = fields.title;
+  }
+  if (fields.hasOwnProperty('slug')) {
+    if (!validators.validateSlug(fields.slug)) {
+      throw new StatusError(400, 'Slug is invalid.');
+    }
+    known.slug = fields.slug;
+  }
+  if (fields.hasOwnProperty('text')) {
+    if (!validators.validateMarkdown(fields.text)) {
+      throw new StatusError(400, 'Text is invalid.');
+    }
+    known.text = fields.text;
+  }
+
+  var userId = user._id;
+  var forumId = topic.forumId;
+  var topicId = topic._id;
+
+  return Promise.try(function() {
+      // If the text field was passed in, also render the new markdown and
+      // update the related fields too.
+      if (known.text) {
+        return processText(known.text)
+          .then(function(parsedMessage) {
+            return {
+              editedAt: new Date(),
+              text: known.text,
+              html: parsedMessage.html,
+              lang: parsedMessage.lang,
+              _md: parsedMessage.markdownProcessingFailed ? -markdownMajorVersion : markdownMajorVersion
+            }
+          });
+      } else {
+        // no text, no text/markdown related fields to update
+        return {};
+      }
+    })
+    .then(function(textFields) {
+      var update = Object.assign({}, known, textFields);
+      return updateTopicFields(topicId, update)
+    })
+    .then(function(updatedTopic) {
+      stats.event('update_topic', {
+        userId: userId,
+        forumId: forumId,
+        topicId: topicId
+      });
+
+      liveCollections.topics.emit('update', updatedTopic);
+
+      return updatedTopic;
+    });
+}
+
 function setTopicTags(user, topic, tags, options) {
   tags = tags || [];
+
+  if (_.isEqual(tags, topic.tags)) return topic;
 
   options = options || {};
   // alternatively we could have passed a full forum object just to get to
   // forum.tags
   options.allowedTags = options.allowedTags || [];
 
-  if (!validateTags(tags, options.allowedTags)) {
+  if (!validators.validateTags(tags, options.allowedTags)) {
     throw new StatusError(400, 'Tags are invalid.');
   }
 
@@ -239,19 +328,8 @@ function setTopicTags(user, topic, tags, options) {
   var forumId = topic.forumId;
   var topicId = topic._id;
 
-  var query = {
-    _id: topicId
-  };
-  var update = {
-    $set: {
-      tags: tags
-    }
-  };
-  return Topic.findOneAndUpdate(query, update, { new: true })
-    .lean()
-    .exec()
+  return updateTopicFields(topicId, { tags: tags })
     .then(function(updatedTopic) {
-      // log a stats event
       stats.event('update_topic_tags', {
         userId: userId,
         forumId: forumId,
@@ -259,7 +337,63 @@ function setTopicTags(user, topic, tags, options) {
         tags: tags
       });
 
-      liveCollections.topics.emit('patch', forumId, topicId, { tags: updatedTopic.tags });
+      liveCollections.topics.emit('patch', forumId, topicId, {
+        tags: updatedTopic.tags,
+        lastModified: updatedTopic.lastModified.toISOString()
+      });
+
+      return updatedTopic;
+    });
+}
+
+function setTopicSticky(user, topic, sticky) {
+  if (sticky === topic.sticky) return sticky;
+
+  if (!validators.validateSticky(sticky)) {
+    throw new StatusError(400, 'Sticky is invalid.');
+  }
+
+  var userId = user._id;
+  var forumId = topic.forumId;
+  var topicId = topic._id;
+
+  return updateTopicFields(topicId, { sticky: sticky })
+    .then(function(updatedTopic) {
+      stats.event('update_topic_sticky', {
+        userId: userId,
+        forumId: forumId,
+        topicId: topicId,
+        sticky: sticky
+      });
+
+      liveCollections.topics.emit('patch', forumId, topicId, {
+        sticky: updatedTopic.sticky,
+        lastModified: updatedTopic.lastModified.toISOString()
+      });
+
+      return updatedTopic;
+    });
+}
+
+function setTopicCategory(user, topic, category) {
+  assert(category._id);
+
+  if (mongoUtils.objectIDsEqual(category._id, topic.categoryId)) return topic;
+
+  var userId = user._id;
+  var forumId = topic.forumId;
+  var topicId = topic._id;
+
+  return updateTopicFields(topicId, { categoryId: category._id })
+    .then(function(updatedTopic) {
+      stats.event('update_topic_category', {
+        userId: userId,
+        forumId: forumId,
+        topicId: topicId,
+        categoryId: category._id
+      });
+
+      liveCollections.topics.emit('update', updatedTopic);
 
       return updatedTopic;
     });
@@ -272,5 +406,8 @@ module.exports = {
   findTotalsByForumIds: Promise.method(findTotalsByForumIds),
   findByIdForForum: findByIdForForum,
   createTopic: Promise.method(createTopic),
-  setTopicTags: Promise.method(setTopicTags)
+  updateTopic: Promise.method(updateTopic),
+  setTopicTags: Promise.method(setTopicTags),
+  setTopicSticky: Promise.method(setTopicSticky),
+  setTopicCategory: Promise.method(setTopicCategory),
 };
