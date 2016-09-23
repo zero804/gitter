@@ -36,7 +36,7 @@ function lookupUri(uri) {
 
       return Promise.all([
         repoStyle ? null : persistence.User.findOne({ username: uri }, 'username', { lean: true }).exec(),
-        persistence.Troupe.findOne({ lcUri: lcUri }, 'uri', { lean: true }).exec()
+        persistence.Troupe.findOne({ lcUri: lcUri }, 'uri groupId', { lean: true }).exec()
       ]).spread(function(user, troupe) {
         debug('Found user? %s found troupe? %s', !!user, !!troupe);
 
@@ -53,9 +53,13 @@ function lookupUri(uri) {
         if(troupe) {
           return persistence.UriLookup.findOneAndUpdate(
             { $or: [{ uri: lcUri }, { troupeId: troupe._id }] },
-            { $set: { uri: lcUri, troupeId: troupe._id }, $unset: { userId: '' } },
+            { $set: { uri: lcUri, groupId: troupe.groupId, troupeId: troupe._id }, $unset: { userId: '' } },
             { upsert: true, new: true })
-            .exec();
+            .exec()
+            .then(function(uriLookup) {
+              uriLookup.groupId = troupe.groupId;
+              return uriLookup;
+            });
         }
 
         /* Last ditch attempt. Look for a room that has been renamed */
