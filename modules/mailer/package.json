@@ -1,0 +1,19 @@
+{
+  "name": "gitter-web-mailer",
+  "version": "1.0.0",
+  "main": "lib/mailer-service.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha test/"
+  },
+  "dependencies": {
+    "bluebird": "^3.2.1",
+    "gitter-web-cdn": "file:../cdn",
+    "gitter-web-env": "file:../env",
+    "gitter-web-templates": "file:modules/templates"
+  },
+  "private": true
+}
