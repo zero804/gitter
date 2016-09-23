@@ -43,4 +43,14 @@ describe('comment-service #slow', function() {
         assert.strictEqual(comment.html, 'Hello <strong>there</strong>');
       });
   });
+
+  it("should update a comment's text", function() {
+    return commentService.updateComment(fixture.user1, fixture.comment1, {
+        text: 'hello **there**'
+      })
+      .then(function(comment) {
+        assert.strictEqual(comment.text, 'hello **there**');
+        assert.strictEqual(comment.html, 'hello <strong>there</strong>');
+      });
+  });
 });
