@@ -66,18 +66,37 @@ export default React.createClass({
     }
 
     return (
-      <section>
+      <section
+        className={compiledEditorClass}>
         <Editor
           value={text}
-          className={compiledEditorClass}
           onChange={this.onContentUpdate} />
-        <footer></footer>
+        <footer className="editable-content__footer">
+          <button
+            className="editable-content__save"
+            onClick={this.onSaveClicked}>
+            Update
+          </button>
+          <button
+            className="editable-content__cancel"
+            onClick={this.onCancelClicked}>
+            Cancel
+          </button>
+        </footer>
       </section>
     );
   },
 
   onContentUpdate(val){
     this.props.onChange(val);
+  },
+
+  onCancelClicked(e){
+    e.preventDefault();
+  },
+
+  onSavedClicked(e){
+    e.preventDefault();
   }
 
 });
