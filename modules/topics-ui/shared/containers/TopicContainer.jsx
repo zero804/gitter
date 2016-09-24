@@ -233,7 +233,7 @@ const TopicContainer = createClass({
     dispatch(cancelUpdateReply(replyId));
   },
 
-  EditonReplyEditSaved(replyId){
+  onReplyEditSaved(replyId){
     dispatch(saveUpdatedReply(replyId));
   },
 
