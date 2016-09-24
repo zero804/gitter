@@ -6,12 +6,16 @@ export default React.createClass({
 
   displayName: 'EditableContent',
   propTypes: {
+    content: PropTypes.shape({
+      text: PropTypes.string,
+      body: PropTypes.shape({
+        text: PropTypes.string,
+        html: PropTypes.string,
+      })
+    }).isRequired,
     className: PropTypes.string,
     editorClassName: PropTypes.string,
     isEditing: PropTypes.bool,
-    htmlContent: PropTypes.string,
-    textContent: PropTypes.string,
-    markdownContent: PropTypes.string,
     onChange: PropTypes.func.isRequired,
   },
 
@@ -20,30 +24,55 @@ export default React.createClass({
   },
 
   render(){
-    const {isEditing, textContent, htmlContent, markdownContent, className, editorClassName} = this.props;
+    const {isEditing} = this.props;
+    if(!isEditing) { return this.getDisplayContent(); }
+    return this.getEditorContent();
+  },
+
+  getDisplayContent(){
+    const {content, className} = this.props;
     const compiledClass = classNames('editable-content', className);
-    const compiledEditorClass = classNames("editable-content__editor", editorClassName);
-    if(!isEditing) {
-      if(textContent) { //Unsafe User generated Content
-        return (
-          <section className={compiledClass}>
-            {textContent}
-          </section>
-        );
-      }
-      //Safe from server markdown
+    //If we are not editing the content and the content
+    //has a property of text we can assume it has only just been submitted
+    //to the server so we treat it as dirty.
+    if(content.text) {
       return (
-        <div
-          className={compiledClass}
-          dangerouslySetInnerHTML={{ __html: htmlContent }} />
+        <section className={compiledClass}>
+          {content.text}
+        </section>
       );
     }
-    //Editable Content
+
+    //Once a request has returned from the server the text property will be deleted
+    //and rendered markdown will be present so we can render a such.
     return (
-      <Editor
-        value={markdownContent}
-        className={compiledEditorClass}
-        onChange={this.onContentUpdate} />
+      <div
+        className={compiledClass}
+        dangerouslySetInnerHTML={{ __html: content.body.html }} />
+    );
+  },
+
+  getEditorContent(){
+    const {content, editorClassName} = this.props;
+    const compiledEditorClass = classNames("editable-content__editor", editorClassName);
+
+    //Assume we want the initial text content of the resource from the server
+    let text = content.body.text;
+
+    //If we have a property of text we can assume this is the updated content we require
+    //we should account for a updated text content of '' if a user deleted everything
+    if(content.text || content.text === '') {
+      text = content.text;
+    }
+
+    return (
+      <section>
+        <Editor
+          value={text}
+          className={compiledEditorClass}
+          onChange={this.onContentUpdate} />
+        <footer></footer>
+      </section>
     );
   },
 
