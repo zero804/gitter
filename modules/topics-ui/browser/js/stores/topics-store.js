@@ -18,7 +18,7 @@ import {SUBMIT_NEW_TOPIC, TOPIC_CREATED} from '../../../shared/constants/create-
 import {DEFAULT_CATEGORY_NAME, DEFAULT_TAG_NAME} from '../../../shared/constants/navigation';
 import {FILTER_BY_TOPIC} from '../../../shared/constants/forum-filters';
 import {MOST_WATCHERS_SORT} from '../../../shared/constants/forum-sorts';
-import {UPDATE_TOPIC} from '../../../shared/constants/topic';
+import {UPDATE_TOPIC, UPDATE_CANCEL_TOPIC, UPDATE_SAVE_TOPIC} from '../../../shared/constants/topic';
 
 export const TopicModel = BaseModel.extend({
   url(){
@@ -60,6 +60,8 @@ export const TopicsLiveCollection = LiveCollection.extend({
   initialize(){
     subscribe(SUBMIT_NEW_TOPIC, this.createNewTopic, this);
     subscribe(UPDATE_TOPIC, this.onTopicUpdate, this);
+    subscribe(UPDATE_CANCEL_TOPIC, this.onTopicEditCancel, this);
+    subscribe(UPDATE_SAVE_TOPIC, this.onTopicEditSaved, this);
   },
 
   createNewTopic(data){
@@ -84,7 +86,21 @@ export const TopicsLiveCollection = LiveCollection.extend({
     const model = this.get(topicId);
     if(!model) { return; }
     model.set('text', text);
-  }
+  },
+
+  onTopicEditCancel(){
+    const topicId = router.get('topicId');
+    const model = this.get(topicId);
+    if(!model) { return; }
+    model.set('text', null);
+  },
+
+  onTopicEditSaved(){
+    const topicId = router.get('topicId');
+    const model = this.get(topicId);
+    if(!model) { return; }
+    model.save();
+  },
 
 });
 
