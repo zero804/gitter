@@ -48,35 +48,13 @@ export default React.createClass({
   getContent(){
     const {isEditing} = this.state;
     const {topic} = this.props;
-
-    if(isEditing) {
-      let content = topic.text;
-      if(!content) { content = topic.body.text; }
-      return (
-        <EditableContent
-          editorClassName="topic-body__content--editor"
-          onChange={this.onTopicUpdate}
-          markdownContent={content}
-          isEditing={true}/>
-      );
-    }
-
-    if(topic.text) {
-      return (
-        <EditableContent
-          editorClassName="topic-body__content--editor"
-          onChange={this.onTopicUpdate}
-          textContent={topic.body.text}
-          isEditing={false}/>
-      );
-    }
-
     return (
       <EditableContent
         className="topic-body__content"
+        editorClassName="topic-body__content--editor"
+        content={topic}
         onChange={this.onTopicUpdate}
-        htmlContent={topic.body.html}
-        isEditing={false}/>
+        isEditing={isEditing}/>
     );
   },
 
