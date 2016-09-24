@@ -43,4 +43,6 @@ describe('RepliesStore', () => {
     assert.equal(store.get('1').get('text'), null);
   });
 
+  //TODO test the save actions
+
 });
