@@ -1,14 +1,23 @@
 import Backbone from 'backbone';
-import {getRealtimeClient} from './realtime-client';
-import {getForumId} from './forum-store';
 import LiveCollection from './live-collection';
 import { BaseModel } from './base-model';
+
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
 import {subscribe} from '../../../shared/dispatcher';
-import {SHOW_REPLY_COMMENTS} from '../../../shared/constants/topic';
+
+import {getRealtimeClient} from './realtime-client';
+import {getForumId} from './forum-store';
 import router from '../routers';
-import {SUBMIT_NEW_COMMENT} from '../../../shared/constants/create-comment';
 import {getCurrentUser} from './current-user-store';
+
+import {
+  SHOW_REPLY_COMMENTS,
+  UPDATE_COMMENT,
+  UPDATE_CANCEL_COMMENT,
+  UPDATE_SAVE_COMMENT
+} from '../../../shared/constants/topic';
+
+import {SUBMIT_NEW_COMMENT} from '../../../shared/constants/create-comment';
 
 export const CommentStore = BaseModel.extend({
   url(){
@@ -32,6 +41,9 @@ export const CommentsStore = LiveCollection.extend({
   initialize(){
     subscribe(SHOW_REPLY_COMMENTS, this.onRequestNewComments, this);
     subscribe(SUBMIT_NEW_COMMENT, this.onSubmitNewComment, this);
+    subscribe(UPDATE_COMMENT, this.onCommentUpdate, this);
+    subscribe(UPDATE_CANCEL_COMMENT, this.onCommmentEditCanceled, this);
+    subscribe(UPDATE_SAVE_COMMENT, this.onCommentSave, this);
     this.listenTo(router, 'change:replyId', this.onReplyIdUpdate, this);
   },
 
@@ -63,6 +75,24 @@ export const CommentsStore = LiveCollection.extend({
       user: getCurrentUser(),
     })
   },
+
+  onCommentUpdate({commentId, text}){
+    const model = this.get(commentId);
+    if(!model) { return; }
+    model.set('text', text);
+  },
+
+  onCommmentEditCanceled({commentId}){
+    const model = this.get(commentId);
+    if(!model) { return; }
+    model.set('text', null);
+  },
+
+  onCommentSave({commentId}) {
+    const model = this.get(commentId);
+    if(!model) { return; }
+    model.save();
+  }
 
 });
 
