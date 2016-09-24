@@ -9,6 +9,7 @@ import currentUserStore from '../../../mocks/current-user-store';
 
 //Actions
 import updateTopic from '../../../../shared/action-creators/topic/update-topic';
+import updateCancelTopic from '../../../../shared/action-creators/topic/update-cancel-topic';
 
 //Const
 import {
@@ -100,6 +101,14 @@ describe('TopicsStore', () => {
     const model = store.collection.get('1');
     const result = model.get('text');
     assert.equal(result, expected);
+  });
+
+  it.skip('should set the text of the right model when the topic edit cancel event fires', () => {
+    mockRouter.set('topicId', '1');
+    dispatch(updateCancelTopic());
+    const model = store.collection.get('1');
+    const result = model.get('text');
+    assert.equal(result, null);
   });
 
 });

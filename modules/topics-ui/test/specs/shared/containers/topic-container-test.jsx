@@ -25,12 +25,14 @@ import {
   UPDATE_CANCEL_COMMENT,
   UPDATE_SAVE_COMMENT,
   UPDATE_TOPIC,
+  UPDATE_SAVE_TOPIC,
+  UPDATE_CANCEL_TOPIC
 } from '../../../../shared/constants/topic';
 
 import {BODY_UPDATE, SUBMIT_NEW_REPLY} from '../../../../shared/constants/create-reply';
 import {COMMENT_BODY_UPDATE, SUBMIT_NEW_COMMENT} from '../../../../shared/constants/create-comment';
 
-describe('<TopicContainer />', () => {
+describe.only('<TopicContainer />', () => {
 
   let wrapper;
 
@@ -167,7 +169,21 @@ describe('<TopicContainer />', () => {
   it('should dispatch the right event when the topic content updates', () => {
     const handle = spy();
     subscribe(UPDATE_TOPIC, handle);
-    wrapper.find('TopicBody').at(0).prop('onTopicUpdate')();
+    wrapper.find('TopicBody').at(0).prop('onTopicEditUpdate')();
+    equal(handle.callCount, 1);
+  });
+
+  it('should dispatch the right action when the topic edit cancels', () => {
+    const handle = spy();
+    subscribe(UPDATE_CANCEL_TOPIC, handle);
+    wrapper.find('TopicBody').at(0).prop('onTopicEditCancel')();
+    equal(handle.callCount, 1);
+  });
+
+  it('should dispatch the right action when the topic edit cancels', () => {
+    const handle = spy();
+    subscribe(UPDATE_SAVE_TOPIC, handle);
+    wrapper.find('TopicBody').at(0).prop('onTopicEditSave')();
     equal(handle.callCount, 1);
   });
 

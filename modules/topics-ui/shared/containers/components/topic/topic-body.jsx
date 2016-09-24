@@ -12,7 +12,9 @@ export default React.createClass({
         html: PropTypes.string
       }).isRequired,
     }).isRequired,
-    onTopicUpdate: PropTypes.func.isRequired,
+    onTopicEditUpdate: PropTypes.func.isRequired,
+    onTopicEditCancel: PropTypes.func.isRequired,
+    onTopicEditSave: PropTypes.func.isRequired,
   },
 
   getInitialState(){
@@ -53,20 +55,30 @@ export default React.createClass({
         className="topic-body__content"
         editorClassName="topic-body__content--editor"
         content={topic}
-        onChange={this.onTopicUpdate}
+        onChange={this.onTopicEditUpdate}
+        onSave={this.onTopicEditSave}
+        onCancel={this.onTopicEditCancel}
         isEditing={isEditing}/>
     );
   },
 
   onEditTopicClicked(e){
     e.preventDefault();
-    this.setState((state) => Object.assign({}, state, {
-      isEditing: true,
-    }))
+    this.setState({ isEditing: true });
   },
 
-  onTopicUpdate(value){
-    this.props.onTopicUpdate(value);
+  onTopicEditUpdate(value){
+    this.props.onTopicEditUpdate(value);
+  },
+
+  onTopicEditSave(){
+    this.props.onTopicEditSave();
+    this.setState({ isEditing: false });
+  },
+
+  onTopicEditCancel(){
+    this.props.onTopicEditCancel();
+    this.setState({ isEditing: false });
   }
 
 });

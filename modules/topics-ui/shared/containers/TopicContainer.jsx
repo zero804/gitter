@@ -21,6 +21,8 @@ import updateComment from '../action-creators/topic/update-comment.js';
 import updateCancelComment from '../action-creators/topic/update-cancel-comment.js';
 import updateSaveComment from '../action-creators/topic/update-save-comment.js';
 import updateTopic from '../action-creators/topic/update-topic';
+import updateCancelTopic from '../action-creators/topic/update-cancel-topic';
+import updateSaveTopic from '../action-creators/topic/update-save-topic';
 
 const TopicContainer = createClass({
 
@@ -123,7 +125,9 @@ const TopicContainer = createClass({
             tags={tags}/>
           <TopicBody
             topic={topic}
-            onTopicUpdate={this.onTopicUpdate}/>
+            onTopicEditUpdate={this.onTopicEditUpdate}
+            onTopicEditCancel={this.onTopicEditCancel}
+            onTopicEditSave={this.onTopicEditSave}/>
         </article>
         <TopicReplyListHeader replies={parsedReplies}/>
         <TopicReplyList>
@@ -229,7 +233,7 @@ const TopicContainer = createClass({
     dispatch(cancelUpdateReply(replyId));
   },
 
-  onReplyEditSaved(replyId){
+  EditonReplyEditSaved(replyId){
     dispatch(saveUpdatedReply(replyId));
   },
 
@@ -245,8 +249,16 @@ const TopicContainer = createClass({
     dispatch(updateSaveComment(commentId));
   },
 
-  onTopicUpdate(value){
+  onTopicEditUpdate(value){
     dispatch(updateTopic(value));
+  },
+
+  onTopicEditCancel(){
+    dispatch(updateCancelTopic());
+  },
+
+  onTopicEditSave(){
+    dispatch(updateSaveTopic());
   }
 
 });
