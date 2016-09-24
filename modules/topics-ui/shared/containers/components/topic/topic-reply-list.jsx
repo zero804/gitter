@@ -14,10 +14,18 @@ export default React.createClass({
       <Container>
         <Panel className="panel--topic-reply-list">
           <ul className="topic-reply-list">
-            {this.props.children}
+            {this.props.children.map(this.mapChild)}
           </ul>
         </Panel>
       </Container>
+    );
+  },
+
+  mapChild(child, index) {
+    return (
+      <li key={`reply-list-item-${index}`}>
+        {child}
+      </li>
     );
   }
 
