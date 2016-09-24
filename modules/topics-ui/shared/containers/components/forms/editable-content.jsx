@@ -17,6 +17,8 @@ export default React.createClass({
     editorClassName: PropTypes.string,
     isEditing: PropTypes.bool,
     onChange: PropTypes.func.isRequired,
+    onCancel: PropTypes.func.isRequired,
+    onSave: PropTypes.func.isRequired,
   },
 
   getDefaultProps(){
@@ -93,10 +95,12 @@ export default React.createClass({
 
   onCancelClicked(e){
     e.preventDefault();
+    this.props.onCancel();
   },
 
-  onSavedClicked(e){
+  onSaveClicked(e){
     e.preventDefault();
+    this.props.onSave();
   }
 
 });
