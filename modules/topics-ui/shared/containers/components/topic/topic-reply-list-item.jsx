@@ -19,6 +19,7 @@ export default React.createClass({
       }).isRequired
 
     }).isRequired,
+    currentUser: PropTypes.object.isRequired,
     onCommentsClicked: PropTypes.func.isRequired,
     onNewCommentUpdate: PropTypes.func.isRequired,
     submitNewComment: PropTypes.func.isRequired,
@@ -50,7 +51,7 @@ export default React.createClass({
   },
 
   getComments(){
-    const {reply, newCommentContent} = this.props;
+    const {reply, newCommentContent, currentUser} = this.props;
     if(!reply.isCommenting) { return; }
     return (
       <section className="reply-comment-list">
@@ -59,6 +60,7 @@ export default React.createClass({
         </ul>
         <CommentEditor
           autoFocus={true}
+          currentUser={currentUser}
           value={newCommentContent}
           onEnter={this.submitNewComment}
           onChange={this.onNewCommentUpdate} />

@@ -9,12 +9,12 @@ import TopicReplyListHeader from './components/topic/topic-reply-list-header.jsx
 import TopicReplyList from './components/topic/topic-reply-list.jsx';
 import TopicReplyListItem from './components/topic/topic-reply-list-item.jsx';
 
+import updateReplyBody from '../action-creators/create-reply/body-update';
 import submitNewReply from '../action-creators/create-reply/submit-new-reply';
 import updateCommentBody from '../action-creators/create-comment/body-update';
 import submitNewComment from '../action-creators/create-comment/submit-new-comment';
 import showReplyComments from '../action-creators/topic/show-reply-comments';
 import updateReply from '../action-creators/topic/update-reply';
-import updateReplyBody from '../action-creators/create-reply/body-update';
 import cancelUpdateReply from '../action-creators/topic/cancel-update-reply';
 import saveUpdatedReply from '../action-creators/topic/save-update-reply';
 import updateComment from '../action-creators/topic/update-comment.js';
@@ -91,8 +91,8 @@ const TopicContainer = createClass({
 
   render(){
 
-    const { topicId, topicsStore, groupName, categoryStore, currentUserStore, tagStore, newCommentStore } = this.props;
-    const {replies, newReplyContent} = this.state;
+    const { topicId, topicsStore, groupName, categoryStore, currentUserStore, tagStore} = this.props;
+    const {newReplyContent} = this.state;
     const topic = topicsStore.getById(topicId)
     const currentUser = currentUserStore.getCurrentUser();
     const topicCategory = topic.category;
@@ -135,11 +135,13 @@ const TopicContainer = createClass({
 
 
   getReplyListItem(reply, index){
-    const {newCommentStore} = this.props;
+    const {newCommentStore, currentUserStore} = this.props;
+    const currentUser = currentUserStore.getCurrentUser();
     return (
       <TopicReplyListItem
         reply={reply}
         key={`topic-reply-list-item-${reply.id}-${index}`}
+        currentUser={currentUser}
         newCommentContent={newCommentStore.get('text')}
         onCommentsClicked={this.onReplyCommentsClicked}
         onNewCommentUpdate={this.onNewCommentUpdate}
@@ -149,7 +151,7 @@ const TopicContainer = createClass({
         onReplyEditSaved={this.onReplyEditSaved}
         onCommentEditUpdate={this.onReplyEditUpdate}
         onCommentEditCancel={this.onCommentEditCancel}
-        onCommentEditSaved={this.onCommentEditSaved}/>
+        onCommentEditSave={this.onCommentEditSave}/>
     );
   },
 
@@ -233,7 +235,7 @@ const TopicContainer = createClass({
     dispatch(updateCancelComment(replyId));
   },
 
-  onCommentEditSaved(replyId){
+  onCommentEditSave(replyId){
     dispatch(updateSaveComment(replyId));
   }
 
