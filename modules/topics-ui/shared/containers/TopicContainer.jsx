@@ -1,11 +1,13 @@
 import React, {PropTypes, createClass} from 'react';
+import {dispatch} from '../dispatcher';
+
 import TopicHeader from './components/topic/topic-header.jsx';
 import TopicBody from './components/topic/topic-body.jsx';
 import SearchHeader from './components/search/search-header.jsx';
 import TopicReplyEditor from './components/topic/topic-reply-editor.jsx';
 import TopicReplyListHeader from './components/topic/topic-reply-list-header.jsx';
 import TopicReplyList from './components/topic/topic-reply-list.jsx';
-import {dispatch} from '../dispatcher';
+
 import updateReplyBody from '../action-creators/create-reply/body-update';
 import submitNewReply from '../action-creators/create-reply/submit-new-reply';
 import updateCommentBody from '../action-creators/create-comment/body-update';
@@ -83,7 +85,7 @@ const TopicContainer = createClass({
   render(){
 
     const { topicId, topicsStore, groupName, categoryStore, currentUserStore, tagStore, newCommentStore } = this.props;
-    const {replies, newReplyContent} = this.state;
+    const {newReplyContent} = this.state;
     const topic = topicsStore.getById(topicId)
     const currentUser = currentUserStore.getCurrentUser();
     const topicCategory = topic.category;
@@ -113,6 +115,7 @@ const TopicContainer = createClass({
         </article>
         <TopicReplyListHeader replies={parsedReplies}/>
         <TopicReplyList
+          currentUser={currentUser}
           newCommentContent={newCommentStore.get('text')}
           replies={parsedReplies}
           submitNewComment={this.submitNewComment}
