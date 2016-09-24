@@ -66,30 +66,6 @@ export default React.createClass({
   },
 
   getEditControl(){
-    const {canEdit, item} = this.props;
-    const {isEditing} = this.state;
-    if(!canEdit){ return; }
-
-    if(isEditing) {
-      return (
-        [
-          <button
-            key={`feed-item-edit-${item.id}-save`}
-            className="feed-item__edit-control__save"
-            onClick={this.onSaveClicked}>
-            Save
-          </button>,
-          <button
-            key={`feed-item-edit-${item.id}-cancel`}
-            className="feed-item__edit-control__cancel"
-            onClick={this.onCancelClicked}>
-            Cancel
-          </button>,
-
-        ]
-      );
-    }
-
     return (
       <button
         className="feed-item__edit-control"
@@ -107,6 +83,8 @@ export default React.createClass({
         className="feed-item__body"
         content={item}
         onChange={this.onChange}
+        onCancel={this.onCancelClicked}
+        onSave={this.onSaveClicked}
         isEditing={isEditing}/>
     );
 
@@ -146,14 +124,12 @@ export default React.createClass({
     this.props.onChange(val);
   },
 
-  onCancelClicked(e){
-    e.preventDefault();
+  onCancelClicked(){
     this.props.onCancel();
     this.setState({ isEditing: false });
   },
 
-  onSaveClicked(e){
-    e.preventDefault();
+  onSaveClicked(){
     this.props.onSave();
     this.setState({ isEditing: false });
   }
