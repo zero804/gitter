@@ -1,10 +1,16 @@
 import assert from 'assert';
+import {dispatch} from '../../../../shared/dispatcher';
 
 //Mocks
 import topics from '../../../mocks/mock-data/topics';
 import forumStore from '../../../mocks/forum-store';
 import mockRouter from '../../../mocks/router';
 import currentUserStore from '../../../mocks/current-user-store';
+
+//Actions
+import updateTopic from '../../../../shared/action-creators/topic/update-topic';
+
+//Const
 import {
   DEFAULT_CATEGORY_NAME,
   DEFAULT_TAG_NAME
@@ -85,6 +91,15 @@ describe('TopicsStore', () => {
     });
     const result = store.getTopics();
     assert.strictEqual(result.length, 2);
+  });
+
+  it.skip('should update the right topic when the topic update action is fired', () => {
+    const expected = 'this is a test';
+    mockRouter.set('topicId', '1');
+    dispatch(updateTopic(expected));
+    const model = store.collection.get('1');
+    const result = model.get('text');
+    assert.equal(result, expected);
   });
 
 });

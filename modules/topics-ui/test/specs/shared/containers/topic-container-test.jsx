@@ -23,7 +23,8 @@ import {
   SAVE_UPDATE_REPLY,
   UPDATE_COMMENT,
   UPDATE_CANCEL_COMMENT,
-  UPDATE_SAVE_COMMENT
+  UPDATE_SAVE_COMMENT,
+  UPDATE_TOPIC,
 } from '../../../../shared/constants/topic';
 
 import {BODY_UPDATE, SUBMIT_NEW_REPLY} from '../../../../shared/constants/create-reply';
@@ -149,17 +150,24 @@ describe('<TopicContainer />', () => {
     equal(handle.callCount, 1);
   });
 
-  it('should ispatch the right event when the reply edit is canceled', () => {
+  it('should dispatch the right event when the comment edit is canceled', () => {
     const handle = spy();
     subscribe(UPDATE_CANCEL_COMMENT, handle);
     wrapper.find('TopicReplyListItem').at(0).prop('onCommentEditCancel')();
     equal(handle.callCount, 1);
   });
 
-  it('should dispatch the right action when the reply edit is saved', () => {
+  it('should dispatch the right action when the comment edit is saved', () => {
     const handle = spy();
     subscribe(UPDATE_SAVE_COMMENT, handle);
-    wrapper.find('TopicReplyListItem').at(0).prop('onCommentEditSaved')();
+    wrapper.find('TopicReplyListItem').at(0).prop('onCommentEditSave')();
+    equal(handle.callCount, 1);
+  });
+
+  it('should dispatch the right event when the topic content updates', () => {
+    const handle = spy();
+    subscribe(UPDATE_TOPIC, handle);
+    wrapper.find('TopicBody').at(0).prop('onTopicUpdate')();
     equal(handle.callCount, 1);
   });
 

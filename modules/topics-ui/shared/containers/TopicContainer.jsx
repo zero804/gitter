@@ -20,6 +20,7 @@ import saveUpdatedReply from '../action-creators/topic/save-update-reply';
 import updateComment from '../action-creators/topic/update-comment.js';
 import updateCancelComment from '../action-creators/topic/update-cancel-comment.js';
 import updateSaveComment from '../action-creators/topic/update-save-comment.js';
+import updateTopic from '../action-creators/topic/update-topic';
 
 const TopicContainer = createClass({
 
@@ -65,19 +66,21 @@ const TopicContainer = createClass({
   },
 
   componentDidMount(){
-    const {repliesStore, newReplyStore, commentsStore, newCommentStore} = this.props;
+    const {repliesStore, newReplyStore, commentsStore, newCommentStore, topicsStore} = this.props;
     repliesStore.onChange(this.updateReplies, this);
     commentsStore.onChange(this.updateComments, this);
     newCommentStore.onChange(this.updateNewComment, this);
+    topicsStore.onChange(this.updateTopics, this);
 
     newReplyStore.on('change:text', this.updateNewReplyContent, this);
   },
 
   componentWillUnmount(){
-    const {repliesStore, newReplyStore, commentsStore, newCommentStore} = this.props;
+    const {repliesStore, newReplyStore, commentsStore, newCommentStore, topicsStore} = this.props;
     repliesStore.removeListeners(this.updateReplies, this);
     commentsStore.removeListeners(this.updateComments, this);
     newCommentStore.removeListeners(this.updateNewComment, this);
+    topicsStore.removeListeners(this.updateTopics, this);
 
     newReplyStore.off('change:text', this.updateNewReplyContent, this);
   },
@@ -118,7 +121,9 @@ const TopicContainer = createClass({
             category={category}
             groupName={groupName}
             tags={tags}/>
-          <TopicBody topic={topic} />
+          <TopicBody
+            topic={topic}
+            onTopicUpdate={this.onTopicUpdate}/>
         </article>
         <TopicReplyListHeader replies={parsedReplies}/>
         <TopicReplyList>
@@ -149,7 +154,7 @@ const TopicContainer = createClass({
         onReplyEditUpdate={this.onReplyEditUpdate}
         onReplyEditCancel={this.onReplyEditCancel}
         onReplyEditSaved={this.onReplyEditSaved}
-        onCommentEditUpdate={this.onReplyEditUpdate}
+        onCommentEditUpdate={this.onCommentEditUpdate}
         onCommentEditCancel={this.onCommentEditCancel}
         onCommentEditSave={this.onCommentEditSave}/>
     );
@@ -214,6 +219,7 @@ const TopicContainer = createClass({
   },
 
   updateNewComment(){ this.forceUpdate(); },
+  updateTopics() { this.forceUpdate(); },
 
   onReplyEditUpdate(replyId, value){
     dispatch(updateReply(replyId, value));
@@ -237,6 +243,10 @@ const TopicContainer = createClass({
 
   onCommentEditSave(commentId){
     dispatch(updateSaveComment(commentId));
+  },
+
+  onTopicUpdate(value){
+    dispatch(updateTopic(value));
   }
 
 });
