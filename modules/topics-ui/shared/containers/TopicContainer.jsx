@@ -227,16 +227,16 @@ const TopicContainer = createClass({
     dispatch(saveUpdatedReply(replyId));
   },
 
-  onCommentEditUpdate(replyId, value){
-    dispatch(updateComment(replyId, value));
+  onCommentEditUpdate(commentId, value){
+    dispatch(updateComment(commentId, value));
   },
 
-  onCommentEditCancel(replyId) {
-    dispatch(updateCancelComment(replyId));
+  onCommentEditCancel(commentId) {
+    dispatch(updateCancelComment(commentId));
   },
 
-  onCommentEditSave(replyId){
-    dispatch(updateSaveComment(replyId));
+  onCommentEditSave(commentId){
+    dispatch(updateSaveComment(commentId));
   }
 
 });
