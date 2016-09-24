@@ -32,7 +32,7 @@ import {
 import {BODY_UPDATE, SUBMIT_NEW_REPLY} from '../../../../shared/constants/create-reply';
 import {COMMENT_BODY_UPDATE, SUBMIT_NEW_COMMENT} from '../../../../shared/constants/create-comment';
 
-describe.only('<TopicContainer />', () => {
+describe('<TopicContainer />', () => {
 
   let wrapper;
 
