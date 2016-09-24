@@ -17,6 +17,9 @@ import updateReply from '../action-creators/topic/update-reply';
 import updateReplyBody from '../action-creators/create-reply/body-update';
 import cancelUpdateReply from '../action-creators/topic/cancel-update-reply';
 import saveUpdatedReply from '../action-creators/topic/save-update-reply';
+import updateComment from '../action-creators/topic/update-comment.js';
+import updateCancelComment from '../action-creators/topic/update-cancel-comment.js';
+import updateSaveComment from '../action-creators/topic/update-save-comment.js';
 
 const TopicContainer = createClass({
 
@@ -143,7 +146,10 @@ const TopicContainer = createClass({
         submitNewComment={this.submitNewComment}
         onReplyEditUpdate={this.onReplyEditUpdate}
         onReplyEditCancel={this.onReplyEditCancel}
-        onReplyEditSaved={this.onReplyEditSaved}/>
+        onReplyEditSaved={this.onReplyEditSaved}
+        onCommentEditUpdate={this.onReplyEditUpdate}
+        onCommentEditCancel={this.onCommentEditCancel}
+        onCommentEditSaved={this.onCommentEditSaved}/>
     );
   },
 
@@ -217,6 +223,18 @@ const TopicContainer = createClass({
 
   onReplyEditSaved(replyId){
     dispatch(saveUpdatedReply(replyId));
+  },
+
+  onCommentEditUpdate(replyId, value){
+    dispatch(updateComment(replyId, value));
+  },
+
+  onCommentEditCancel(replyId) {
+    dispatch(updateCancelComment(replyId));
+  },
+
+  onCommentEditSaved(replyId){
+    dispatch(updateSaveComment(replyId));
   }
 
 });

@@ -26,22 +26,25 @@ export default React.createClass({
     onReplyEditUpdate: PropTypes.func.isRequired,
     onReplyEditCancel: PropTypes.func.isRequired,
     onReplyEditSaved: PropTypes.func.isRequired,
+    onCommentEditUpdate: PropTypes.func.isRequired,
+    onCommentEditCancel: PropTypes.func.isRequired,
+    onCommentEditSave: PropTypes.func.isRequired,
   },
 
   render(){
     const {reply} = this.props;
     return (
       <FeedItem
-      item={reply}
-      onChange={(value) => this.onReplyEditUpdate(reply.id, value)}
-      onCancel={() => this.onReplyEditCancel(reply.id)}
-      onSave={() => this.onReplyEditSaved(reply.id)}
-      primaryLabel="Likes"
-      primaryValue={10}
-      secondaryLabel="Comments"
-      secondaryValue={2}
-      onSecondaryClicked={this.onCommentsClicked}>
-      {this.getComments()}
+        item={reply}
+        onChange={this.onReplyEditUpdate}
+        onCancel={this.onReplyEditCancel}
+        onSave={this.onReplyEditSaved}
+        primaryLabel="Likes"
+        primaryValue={10}
+        secondaryLabel="Comments"
+        secondaryValue={2}
+        onSecondaryClicked={this.onCommentsClicked}>
+        {this.getComments()}
       </FeedItem>
     );
   },
@@ -72,9 +75,11 @@ export default React.createClass({
     const {reply} = this.props;
     return (
       <CommentItem
-      key={`comment-list-item-${reply.id}-${index}`}
-      onChange={(val) => this.onCommentUpdate(comment.id, val)}
-      comment={comment} />
+        key={`comment-list-item-${reply.id}-${index}`}
+        comment={comment}
+        onChange={this.onCommentEditUpdate.bind(this, comment.id)}
+        onCancel={this.onCommentEditCancel.bind(this, comment.id)}
+        onSave={this.onCommentEditSave.bind(this, comment.id)}/>
     );
   },
 
@@ -93,20 +98,34 @@ export default React.createClass({
     this.props.submitNewComment();
   },
 
-  onReplyEditUpdate(replyId, value){
-    this.props.onReplyEditUpdate(replyId, value);
+  onReplyEditUpdate(value){
+    const {reply} = this.props;
+    const {id} = reply;
+    this.props.onReplyEditUpdate(id, value);
   },
 
-  onReplyEditCancel(replyId){
-    this.props.onReplyEditCancel(replyId);
+  onReplyEditCancel(){
+    const {reply} = this.props;
+    const {id} = reply;
+    this.props.onReplyEditCancel(id);
   },
 
-  onReplyEditSaved(replyId){
-    this.props.onReplyEditSaved(replyId)
+  onReplyEditSaved(){
+    const {reply} = this.props;
+    const {id} = reply;
+    this.props.onReplyEditSaved(id)
   },
 
-  onCommentUpdate(commentId, value){
-    //console.log('comment', commentId, value);
-  }
+  onCommentEditUpdate(commentId, value){
+    this.props.onCommentEditUpdate(commentId, value);
+  },
+
+  onCommentEditCancel(commentId){
+    this.props.onCommentEditCancel(commentId);
+  },
+
+  onCommentEditSave(commentId){
+    this.props.onCommentEditSave(commentId);
+  },
 
 });
