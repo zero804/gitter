@@ -7,6 +7,7 @@ export default React.createClass({
   displayName: 'EditableContent',
   propTypes: {
     className: PropTypes.string,
+    editorClassName: PropTypes.string,
     isEditing: PropTypes.bool,
     htmlContent: PropTypes.string,
     textContent: PropTypes.string,
@@ -19,8 +20,9 @@ export default React.createClass({
   },
 
   render(){
-    const {isEditing, textContent, htmlContent, markdownContent, className} = this.props;
+    const {isEditing, textContent, htmlContent, markdownContent, className, editorClassName} = this.props;
     const compiledClass = classNames('editable-content', className);
+    const compiledEditorClass = classNames("editable-content__editor", editorClassName);
     if(!isEditing) {
       if(textContent) { //Unsafe User generated Content
         return (
@@ -40,7 +42,7 @@ export default React.createClass({
     return (
       <Editor
         value={markdownContent}
-        className="editable-content__editor"
+        className={compiledEditorClass}
         onChange={this.onContentUpdate} />
     );
   },
