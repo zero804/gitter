@@ -20,13 +20,16 @@ import {
   SHOW_REPLY_COMMENTS,
   UPDATE_REPLY,
   CANCEL_UPDATE_REPLY,
-  SAVE_UPDATE_REPLY
+  SAVE_UPDATE_REPLY,
+  UPDATE_COMMENT,
+  UPDATE_CANCEL_COMMENT,
+  UPDATE_SAVE_COMMENT
 } from '../../../../shared/constants/topic';
 
 import {BODY_UPDATE, SUBMIT_NEW_REPLY} from '../../../../shared/constants/create-reply';
 import {COMMENT_BODY_UPDATE, SUBMIT_NEW_COMMENT} from '../../../../shared/constants/create-comment';
 
-describe('<TopicContainer />', () => {
+describe.only('<TopicContainer />', () => {
 
   let wrapper;
 
@@ -136,6 +139,27 @@ describe('<TopicContainer />', () => {
     const handle = spy();
     subscribe(SAVE_UPDATE_REPLY, handle);
     wrapper.find('TopicReplyListItem').at(0).prop('onReplyEditSaved')();
+    equal(handle.callCount, 1);
+  });
+
+  it('should dispatch the right event when a comment updates', () => {
+    const handle = spy();
+    subscribe(UPDATE_COMMENT, handle);
+    wrapper.find('TopicReplyListItem').at(0).prop('onCommentEditUpdate')();
+    equal(handle.callCount, 1);
+  });
+
+  it('should ispatch the right event when the reply edit is canceled', () => {
+    const handle = spy();
+    subscribe(UPDATE_CANCEL_COMMENT, handle);
+    wrapper.find('TopicReplyListItem').at(0).prop('onCommentEditCancel')();
+    equal(handle.callCount, 1);
+  });
+
+  it('should dispatch the right action when the reply edit is saved', () => {
+    const handle = spy();
+    subscribe(UPDATE_SAVE_COMMENT, handle);
+    wrapper.find('TopicReplyListItem').at(0).prop('onCommentEditSaved')();
     equal(handle.callCount, 1);
   });
 
