@@ -19,7 +19,8 @@ function newUser(options) {
   assert(githubId, 'githubId required');
   assert(options.username, 'username required');
 
-  var hellbanned = false;
+  var hellbanned = undefined;
+
   // Deal with spammer situation of 25 Sep 2016
   if (/^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$/.test(options.username)) {
     winston.info('Auto-hellbanning account', {
