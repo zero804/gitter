@@ -19,6 +19,15 @@ function newUser(options) {
   assert(githubId, 'githubId required');
   assert(options.username, 'username required');
 
+  var hellbanned = false;
+  // Deal with spammer situation of 25 Sep 2016
+  if (/^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$/.test(options.username)) {
+    winston.info('Auto-hellbanning account', {
+      username: options.username
+    })
+    hellbanned = true;
+  }
+
   var insertFields = {
     githubId:           githubId,
     githubUserToken:    options.githubUserToken,
@@ -29,7 +38,8 @@ function newUser(options) {
     username:           options.username,
     invitedByUser:      options.invitedByUser,
     displayName:        options.displayName,
-    state:              options.state
+    state:              options.state,
+    hellbanned:         hellbanned
   };
 
   if (options.emails && options.emails.length) {
