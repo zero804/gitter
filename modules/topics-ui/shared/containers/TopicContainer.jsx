@@ -13,6 +13,10 @@ import submitNewReply from '../action-creators/create-reply/submit-new-reply';
 import updateCommentBody from '../action-creators/create-comment/body-update';
 import submitNewComment from '../action-creators/create-comment/submit-new-comment';
 import showReplyComments from '../action-creators/topic/show-reply-comments';
+import { SUBSCRIPTION_STATE_SUBSCRIBED } from '../constants/forum.js';
+import requestUpdateTopicSubscriptionState from '../action-creators/forum/request-update-topic-subscription-state';
+import requestUpdateReplySubscriptionState from '../action-creators/forum/request-update-reply-subscription-state';
+
 
 const TopicContainer = createClass({
 
@@ -33,6 +37,7 @@ const TopicContainer = createClass({
     }).isRequired,
 
     repliesStore: PropTypes.shape({
+      getById: PropTypes.func.isRequired,
       getReplies: PropTypes.func.isRequired
     }).isRequired,
 
@@ -132,9 +137,8 @@ const TopicContainer = createClass({
             groupName={groupName}
             tags={tags}/>
           <TopicBody
-            userId={userId}
-            forumId={forumId}
-            topic={topic} />
+            topic={topic}
+            onSubscribeButtonClick={this.onTopicSubscribeButtonClick} />
         </article>
         <TopicReplyListHeader replies={parsedReplies}/>
         <TopicReplyList
@@ -146,7 +150,8 @@ const TopicContainer = createClass({
           replies={parsedReplies}
           submitNewComment={this.submitNewComment}
           onNewCommentUpdate={this.onNewCommentUpdate}
-          onReplyCommentsClicked={this.onReplyCommentsClicked}/>
+          onReplyCommentsClicked={this.onReplyCommentsClicked}
+          onItemSubscribeButtonClick={this.onReplySubscribeButtonClick}/>
         <TopicReplyEditor
           user={currentUser}
           value={newReplyContent}
@@ -205,6 +210,8 @@ const TopicContainer = createClass({
     this.forceUpdate();
   },
 
+  updateNewComment(){ this.forceUpdate(); },
+
   getParsedReplies(){
     const {repliesStore, commentsStore} = this.props;
     return repliesStore.getReplies().map((reply) => Object.assign({}, reply, {
@@ -213,9 +220,37 @@ const TopicContainer = createClass({
     }))
   },
 
+  onTopicSubscribeButtonClick() {
+    const { currentUserStore, topicsStore, topicId } = this.props;
+    const { forumId } = this.state;
+
+    const currentUser = currentUserStore.getCurrentUser();
+    const userId = currentUser.id;
+    const topic = topicsStore.getById(topicId);
+    const subscriptionState = topic.subscriptionState;
+    const desiredIsSubscribed = (subscriptionState !== SUBSCRIPTION_STATE_SUBSCRIBED);
+
+    dispatch(requestUpdateTopicSubscriptionState(forumId, topicId, userId, desiredIsSubscribed));
+  },
+
+
+  onReplySubscribeButtonClick(e, replyId) {
+    const {currentUserStore, repliesStore, topicId} = this.props;
+    const { forumId } = this.state;
+
+    const currentUser = currentUserStore.getCurrentUser();
+    const userId = currentUser.id;
+    const reply = repliesStore.getById(replyId);
+    const subscriptionState = reply.subscriptionState;
+    const desiredIsSubscribed = (subscriptionState !== SUBSCRIPTION_STATE_SUBSCRIBED);
+
+    dispatch(requestUpdateReplySubscriptionState(forumId, topicId, replyId, userId, desiredIsSubscribed));
+  },
+
   onReplyCommentsClicked(replyId){
     dispatch(showReplyComments(replyId));
   },
+
 
   onNewCommentUpdate(replyId, val) {
     dispatch(updateCommentBody(replyId, val));
@@ -227,9 +262,7 @@ const TopicContainer = createClass({
       newCommentStore.get('replyId'),
       newCommentStore.get('text')
     ));
-  },
-
-  updateNewComment(){ this.forceUpdate(); }
+  }
 
 });
 
