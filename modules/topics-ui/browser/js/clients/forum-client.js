@@ -48,22 +48,22 @@ var generateRequestSubscriptionUpdateCb = function(action) {
 
 
 
-const ForumDao = function() {
+const ForumClient = function() {
   subscribe(REQUEST_UPDATE_FORUM_SUBSCRIPTION_STATE, this.onRequestForumSubscriptionStateUpdate, this);
   subscribe(REQUEST_UPDATE_TOPIC_SUBSCRIPTION_STATE, this.onRequestTopicSubscriptionStateUpdate, this);
   subscribe(REQUEST_UPDATE_REPLY_SUBSCRIPTION_STATE, this.onRequestReplySubscriptionStateUpdate, this);
 };
 
-ForumDao.prototype.onRequestForumSubscriptionStateUpdate = generateRequestSubscriptionUpdateCb(function(forumId, topicId, replyId, subscriptionState) {
+ForumClient.prototype.onRequestForumSubscriptionStateUpdate = generateRequestSubscriptionUpdateCb(function(forumId, topicId, replyId, subscriptionState) {
   return updateForumWatchState(forumId, subscriptionState);
 });
 
-ForumDao.prototype.onRequestTopicSubscriptionStateUpdate = generateRequestSubscriptionUpdateCb(function(forumId, topicId, replyId, subscriptionState) {
+ForumClient.prototype.onRequestTopicSubscriptionStateUpdate = generateRequestSubscriptionUpdateCb(function(forumId, topicId, replyId, subscriptionState) {
   return updateTopicWatchState(forumId, topicId, subscriptionState);
 });
 
-ForumDao.prototype.onRequestReplySubscriptionStateUpdate = generateRequestSubscriptionUpdateCb(function(forumId, topicId, replyId, subscriptionState) {
+ForumClient.prototype.onRequestReplySubscriptionStateUpdate = generateRequestSubscriptionUpdateCb(function(forumId, topicId, replyId, subscriptionState) {
   return updateReplyWatchState(forumId, topicId, replyId, subscriptionState);
 });
 
-export default ForumDao;
+export default ForumClient;
