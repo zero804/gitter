@@ -1,8 +1,7 @@
-import _ from 'underscore';
 import React, { PropTypes } from 'react';
 import classNames from 'classnames';
 
-import { SUBSCRIPTION_STATE } from '../../../constants/forum.js';
+import { SUBSCRIPTION_STATE_SUBSCRIBED, SUBSCRIPTION_STATE_UNSUBSCRIBED, SUBSCRIPTION_STATE_PENDING } from '../../../constants/forum.js';
 
 
 export default React.createClass({
@@ -10,7 +9,11 @@ export default React.createClass({
   displayName: 'SubscribeButton',
 
   propTypes: {
-    subscriptionState: PropTypes.oneOf(_.values(SUBSCRIPTION_STATE)).isRequired,
+    subscriptionState: PropTypes.oneOf([
+      SUBSCRIPTION_STATE_SUBSCRIBED,
+      SUBSCRIPTION_STATE_UNSUBSCRIBED,
+      SUBSCRIPTION_STATE_PENDING
+    ]).isRequired,
     children: PropTypes.node,
     onClick: PropTypes.func,
     className: PropTypes.string,
@@ -29,22 +32,22 @@ export default React.createClass({
     pendingText = pendingText || 'Pending';
 
     var compiledClassNames = className + ' ' + classNames({
-      pending: subscriptionState === SUBSCRIPTION_STATE.PENDING
+      pending: subscriptionState === SUBSCRIPTION_STATE_PENDING
     })
 
     var subscribedCompiledClassNames = classNames({
       [itemClassName]: true,
-      hidden: subscriptionState !== SUBSCRIPTION_STATE.SUBSCRIBED
+      hidden: subscriptionState !== SUBSCRIPTION_STATE_SUBSCRIBED
     });
 
     var unsubscribedCompiledClassNames = classNames({
       [itemClassName]: true,
-      hidden: subscriptionState !== SUBSCRIPTION_STATE.UNSUBSCRIBED
+      hidden: subscriptionState !== SUBSCRIPTION_STATE_UNSUBSCRIBED
     });
 
     var pendingCompiledClassNames = classNames({
       [itemClassName]: true,
-      hidden: subscriptionState !== SUBSCRIPTION_STATE.PENDING
+      hidden: subscriptionState !== SUBSCRIPTION_STATE_PENDING
     });
 
     var watchNodes = [

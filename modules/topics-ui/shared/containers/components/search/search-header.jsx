@@ -1,4 +1,3 @@
-import _ from 'underscore';
 import React, { PropTypes } from 'react';
 import {dispatch} from '../../../dispatcher';
 import Container from '../container.jsx';
@@ -9,7 +8,7 @@ import ForumCategoryLink from '../links/forum-category-link.jsx';
 import SubscribeButton from '../forum/subscribe-button.jsx';
 import CreateTopicLink from '../links/create-topic-link.jsx';
 import {DEFAULT_CATEGORY_NAME} from '../../../constants/navigation';
-import { SUBSCRIPTION_STATE } from '../../../constants/forum.js';
+import { SUBSCRIPTION_STATE_SUBSCRIBED, SUBSCRIPTION_STATE_UNSUBSCRIBED, SUBSCRIPTION_STATE_PENDING } from '../../../constants/forum.js';
 import requestUpdateForumSubscriptionState from '../../../action-creators/forum/request-update-forum-subscription-state';
 
 
@@ -20,7 +19,11 @@ export default React.createClass({
     userId: PropTypes.string.isRequired,
     forumId: PropTypes.string.isRequired,
     groupName: PropTypes.string.isRequired,
-    subscriptionState: PropTypes.oneOf(_.values(SUBSCRIPTION_STATE)).isRequired
+    subscriptionState: PropTypes.oneOf([
+      SUBSCRIPTION_STATE_SUBSCRIBED,
+      SUBSCRIPTION_STATE_UNSUBSCRIBED,
+      SUBSCRIPTION_STATE_PENDING
+    ]).isRequired
   },
 
   render(){
@@ -66,7 +69,7 @@ export default React.createClass({
   onSubscribeButtonClick() {
     const {userId, forumId, subscriptionState} = this.props;
 
-    var desiredIsSubscribed = (subscriptionState !== SUBSCRIPTION_STATE.SUBSCRIBED);
+    var desiredIsSubscribed = (subscriptionState !== SUBSCRIPTION_STATE_SUBSCRIBED);
     dispatch(requestUpdateForumSubscriptionState(forumId, userId, desiredIsSubscribed));
   }
 
