@@ -63,7 +63,6 @@ export const TopicsLiveCollection = LiveCollection.extend({
   },
 
   createNewTopic(data){
-
     const model = this.create({
       title: data.title,
       text: data.body,
@@ -171,14 +170,20 @@ export class TopicsStore {
 
   onRequestSubscriptionStateUpdate(data) {
     var {topicId} = data;
-    this.collection.get(topicId).set({
+    var topic = this.collection.get(topicId);
+    if(!topic) { return; }
+
+    topic.set({
       subscriptionState: SUBSCRIPTION_STATE_PENDING
     });
   }
 
   onSubscriptionStateUpdate(data) {
     var {topicId, state} = data;
-    this.collection.get(topicId).set({
+    var topic = this.collection.get(topicId);
+    if(!topic) { return; }
+
+    topic.set({
       subscriptionState: state
     });
   }
