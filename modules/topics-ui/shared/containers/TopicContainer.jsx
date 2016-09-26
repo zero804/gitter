@@ -1,13 +1,18 @@
 import React, {PropTypes, createClass} from 'react';
+import {dispatch} from '../dispatcher';
+
 import TopicHeader from './components/topic/topic-header.jsx';
 import TopicBody from './components/topic/topic-body.jsx';
 import SearchHeader from './components/search/search-header.jsx';
 import TopicReplyEditor from './components/topic/topic-reply-editor.jsx';
 import TopicReplyListHeader from './components/topic/topic-reply-list-header.jsx';
 import TopicReplyList from './components/topic/topic-reply-list.jsx';
-import {dispatch} from '../dispatcher';
+
 import updateReplyBody from '../action-creators/create-reply/body-update';
 import submitNewReply from '../action-creators/create-reply/submit-new-reply';
+import updateCommentBody from '../action-creators/create-comment/body-update';
+import submitNewComment from '../action-creators/create-comment/submit-new-comment';
+import showReplyComments from '../action-creators/topic/show-reply-comments';
 
 const TopicContainer = createClass({
 
@@ -25,6 +30,10 @@ const TopicContainer = createClass({
       getReplies: PropTypes.func.isRequired
     }).isRequired,
 
+    commentsStore: PropTypes.shape({
+      getComments: PropTypes.func.isRequired,
+    }),
+
     categoryStore: PropTypes.shape({
       getCategories: PropTypes.func.isRequired,
     }).isRequired,
@@ -40,26 +49,34 @@ const TopicContainer = createClass({
 
     newReplyStore: PropTypes.shape({
       get: PropTypes.func.isRequired,
-    })
+    }),
+
+    newCommentStore: PropTypes.shape({
+      get: PropTypes.func.isRequired,
+    }),
 
   },
 
   componentDidMount(){
-    const {repliesStore, newReplyStore} = this.props;
+    const {repliesStore, newReplyStore, commentsStore, newCommentStore} = this.props;
     repliesStore.onChange(this.updateReplies, this);
+    commentsStore.onChange(this.updateComments, this);
+    newCommentStore.onChange(this.updateNewComment, this);
+
     newReplyStore.on('change:text', this.updateReplyContent, this);
   },
 
   componentWillUnmount(){
-    const {repliesStore, newReplyStore} = this.props;
+    const {repliesStore, newReplyStore, commentsStore, newCommentStore} = this.props;
     repliesStore.removeListeners(this.updateReplies, this);
+    commentsStore.removeListeners(this.updateComments, this);
+    newCommentStore.removeListeners(this.updateNewComment, this);
+
     newReplyStore.off('change:text', this.updateReplyContent, this);
   },
 
   getInitialState(){
-    const {repliesStore} = this.props;
     return {
-      replies: repliesStore.getReplies(),
       newReplyContent: '',
     };
   },
@@ -67,13 +84,12 @@ const TopicContainer = createClass({
 
   render(){
 
-    const { topicId, topicsStore, groupName, categoryStore, currentUserStore, tagStore } = this.props;
-    const {replies, newReplyContent} = this.state;
+    const { topicId, topicsStore, groupName, categoryStore, currentUserStore, tagStore, newCommentStore } = this.props;
+    const {newReplyContent} = this.state;
     const topic = topicsStore.getById(topicId)
     const currentUser = currentUserStore.getCurrentUser();
     const topicCategory = topic.category;
     const category = categoryStore.getById(topicCategory.id);
-
 
     //TODO remove
     //This is here because sometimes you can get un-parsed tags
@@ -83,6 +99,8 @@ const TopicContainer = createClass({
       return t.label ? t.label : t;
     });
     const tags = tagStore.getTagsByLabel(tagValues);
+
+    const parsedReplies = this.getParsedReplies();
 
     return (
       <main>
@@ -95,8 +113,14 @@ const TopicContainer = createClass({
             tags={tags}/>
           <TopicBody topic={topic} />
         </article>
-        <TopicReplyListHeader replies={replies}/>
-        <TopicReplyList replies={replies} />
+        <TopicReplyListHeader replies={parsedReplies}/>
+        <TopicReplyList
+          currentUser={currentUser}
+          newCommentContent={newCommentStore.get('text')}
+          replies={parsedReplies}
+          submitNewComment={this.submitNewComment}
+          onNewCommentUpdate={this.onNewCommentUpdate}
+          onReplyCommentsClicked={this.onReplyCommentsClicked}/>
         <TopicReplyEditor
           user={currentUser}
           value={newReplyContent}
@@ -134,7 +158,37 @@ const TopicContainer = createClass({
       replies: repliesStore.getReplies(),
       newReplyContent: '',
     }));
-  }
+  },
+
+  updateComments(){
+    this.forceUpdate();
+  },
+
+  getParsedReplies(){
+    const {repliesStore, commentsStore} = this.props;
+    return repliesStore.getReplies().map((reply) => Object.assign({}, reply, {
+      comments: commentsStore.getCommentsByReplyId(reply.id),
+      isCommenting: commentsStore.getActiveReplyId() === reply.id,
+    }))
+  },
+
+  onReplyCommentsClicked(replyId){
+    dispatch(showReplyComments(replyId));
+  },
+
+  onNewCommentUpdate(replyId, val) {
+    dispatch(updateCommentBody(replyId, val));
+  },
+
+  submitNewComment(){
+    const {newCommentStore} = this.props;
+    dispatch(submitNewComment(
+      newCommentStore.get('replyId'),
+      newCommentStore.get('text')
+    ));
+  },
+
+  updateNewComment(){ this.forceUpdate(); }
 
 });
 
