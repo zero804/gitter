@@ -1,6 +1,6 @@
 'use strict';
 
-var mailerService = require('../../server/services/mailer-service');
+var mailerService = require('gitter-web-mailer');
 var fs = require('fs');
 var path = require('path');
 var handlebars = require('handlebars');

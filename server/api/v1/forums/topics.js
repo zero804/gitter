@@ -1,5 +1,6 @@
 "use strict";
 
+var Promise = require('bluebird');
 var StatusError = require('statuserror');
 var internalClientAccessOnly = require('../../../web/middlewares/internal-client-access-only');
 var forumCategoryService = require('gitter-web-topics/lib/forum-category-service');
@@ -12,22 +13,20 @@ var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var SubscribersResource = require('./subscribers-resource');
 var ForumObject = require('gitter-web-topic-notifications/lib/forum-object');
 
-function getTopicOptions(body) {
+function getTags(tags) {
+  if (!Array.isArray(tags)) {
+    throw new StatusError(400, 'Tags must be an array.');
+  }
+  return tags.map(function(tag) {
+    return String(tag);
+  });
+}
+
+function getCreateTopicOptions(body) {
   var title = body.title ? String(body.title) : undefined;
   var slug = body.slug ? String(body.slug) : undefined;
-
-  var tags;
-  if (body.tags && Array.isArray(body.tags)) {
-    var tagsAreStrings = body.tags.every(function(s) {
-      return typeof s === 'string';
-    });
-
-    if (tagsAreStrings) {
-      tags = body.tags;
-    }
-  }
-
-  var sticky = body.sticky ? !!body.sticky : undefined;
+  var tags = body.tags ? getTags(body.tags) : undefined;
+  var sticky = body.sticky ? parseInt(body.sticky, 10) : undefined;
   var text = body.text ? String(body.text) : undefined;
 
   return {
@@ -42,6 +41,55 @@ function getTopicOptions(body) {
   };
 }
 
+function collectPatchActions(forumWithPolicyService, topic, body) {
+  var promises = [];
+
+  var fields;
+  if (body.hasOwnProperty('title') || body.hasOwnProperty('slug') || body.hasOwnProperty('text')) {
+    fields = {};
+
+    if (body.hasOwnProperty('title')) {
+      fields.title = String(body.title);
+    }
+
+    if (body.hasOwnProperty('slug')) {
+      fields.slug = String(body.slug);
+    }
+
+    if (body.hasOwnProperty('text')) {
+      fields.text = String(body.text);
+    }
+
+    promises.push(forumWithPolicyService.updateTopic(topic, fields));
+  }
+
+  var tags;
+  if (body.hasOwnProperty('tags')) {
+    tags = getTags(body.tags);
+    promises.push(forumWithPolicyService.setTopicTags(topic, tags));
+  }
+
+  var sticky;
+  if (body.hasOwnProperty('sticky')) {
+    sticky = parseInt(body.sticky, 10);
+    promises.push(forumWithPolicyService.setTopicSticky(topic, sticky));
+  }
+
+  var categoryId;
+  var categoryPromise;
+  if (body.hasOwnProperty('categoryId')) {
+    categoryId = String(body.categoryId);
+    categoryPromise = forumCategoryService.findByIdForForum(topic.forumId, categoryId)
+      .then(function(category) {
+        if (!category) throw new StatusError(404, 'Category not found.');
+        return forumWithPolicyService.setTopicCategory(topic, category);
+      });
+    promises.push(categoryPromise);
+  }
+
+  return promises;
+}
+
 module.exports = {
   id: 'topic',
 
@@ -49,12 +97,15 @@ module.exports = {
     var forum = req.forum;
 
     var options = getTopicsFilterSortOptions(req.query);
-    return restful.serializeTopicsForForumId(forum._id, options);
+    var userId = req.user && req.user._id;
+    return restful.serializeTopicsForForumId(forum._id, userId, options);
   },
 
   show: function(req) {
     var topic = req.topic;
-    var strategy = restSerializer.TopicStrategy.full();
+    var strategy = restSerializer.TopicStrategy.nested({
+      currentUserId: req.user && req.user._id
+    });
     return restSerializer.serializeObject(topic, strategy);
   },
 
@@ -74,7 +125,7 @@ module.exports = {
     var categoryId = req.body.categoryId ? String(req.body.categoryId) : undefined;
     if (!categoryId) throw new StatusError(400, 'categoryId required.');
 
-    var topicOptions = getTopicOptions(req.body);
+    var topicOptions = getCreateTopicOptions(req.body);
 
     return forumCategoryService.findByIdForForum(forum._id, categoryId)
       .then(function(category) {
@@ -86,6 +137,25 @@ module.exports = {
       .then(function(topic) {
         var topicStrategy = restSerializer.TopicStrategy.standard();
         return restSerializer.serializeObject(topic, topicStrategy);
+      });
+  },
+
+  patch: function(req) {
+    var user = req.user;
+    var forum = req.forum;
+    var policy = req.userForumPolicy;
+    var topic = req.topic;
+
+    var forumWithPolicyService = new ForumWithPolicyService(forum, user, policy);
+    var promises = collectPatchActions(forumWithPolicyService, topic, req.body);
+
+    return Promise.all(promises)
+      .then(function() {
+        return topicService.findByIdForForum(forum._id, topic._id);
+      })
+      .then(function(updatedTopic) {
+        var strategy = restSerializer.TopicStrategy.standard();
+        return restSerializer.serializeObject(updatedTopic, strategy);
       });
   },
 

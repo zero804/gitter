@@ -5,7 +5,7 @@
 
 var shutdown = require('shutdown');
 var persistence = require('gitter-web-persistence');
-var onMongoConnect = require('../../server/utils/on-mongo-connect');
+var onMongoConnect = require('gitter-web-persistence-utils/lib/on-mongo-connect');
 var es = require('event-stream');
 var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs')
 
