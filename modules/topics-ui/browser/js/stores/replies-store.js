@@ -64,14 +64,20 @@ export const RepliesStore = LiveCollection.extend({
 
   onRequestSubscriptionStateUpdate(data) {
     var {replyId} = data;
-    this.get(replyId).set({
+    var reply = this.get(replyId);
+    if(!reply) { return; }
+
+    reply.set({
       subscriptionState: SUBSCRIPTION_STATE_PENDING
     });
   },
 
   onSubscriptionStateUpdate(data) {
     var {replyId, state} = data;
-    this.get(replyId).set({
+    var reply = this.get(replyId);
+    if(!reply) { return; }
+
+    reply.set({
       subscriptionState: state
     });
   }
