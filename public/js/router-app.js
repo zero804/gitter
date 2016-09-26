@@ -461,4 +461,10 @@ onready(function() {
     });
   }
 
+
+  setTimeout(function() {
+    var fingerprint = require('./components/fingerprint');
+    fingerprint();
+  }, 5000);
+
 });
