@@ -1,13 +1,18 @@
 import React, {PropTypes, createClass} from 'react';
 import {dispatch} from '../dispatcher';
+
 import TopicHeader from './components/topic/topic-header.jsx';
 import TopicBody from './components/topic/topic-body.jsx';
 import SearchHeader from './components/search/search-header.jsx';
 import TopicReplyEditor from './components/topic/topic-reply-editor.jsx';
 import TopicReplyListHeader from './components/topic/topic-reply-list-header.jsx';
 import TopicReplyList from './components/topic/topic-reply-list.jsx';
+
 import updateReplyBody from '../action-creators/create-reply/body-update';
 import submitNewReply from '../action-creators/create-reply/submit-new-reply';
+import updateCommentBody from '../action-creators/create-comment/body-update';
+import submitNewComment from '../action-creators/create-comment/submit-new-comment';
+import showReplyComments from '../action-creators/topic/show-reply-comments';
 
 const TopicContainer = createClass({
 
@@ -31,6 +36,10 @@ const TopicContainer = createClass({
       getReplies: PropTypes.func.isRequired
     }).isRequired,
 
+    commentsStore: PropTypes.shape({
+      getComments: PropTypes.func.isRequired,
+    }),
+
     categoryStore: PropTypes.shape({
       getCategories: PropTypes.func.isRequired,
     }).isRequired,
@@ -46,42 +55,53 @@ const TopicContainer = createClass({
 
     newReplyStore: PropTypes.shape({
       get: PropTypes.func.isRequired,
-    })
+    }),
+
+    newCommentStore: PropTypes.shape({
+      get: PropTypes.func.isRequired,
+    }),
 
   },
 
   componentDidMount(){
-    const {forumStore, topicsStore, repliesStore, newReplyStore} = this.props;
+    const {forumStore, topicsStore, repliesStore, newReplyStore, commentsStore, newCommentStore} = this.props;
     forumStore.onChange(this.onForumUpdate, this);
     topicsStore.onChange(this.onTopicsUpdate, this);
+
     repliesStore.onChange(this.updateReplies, this);
     newReplyStore.on('change:text', this.updateReplyContent, this);
+
+    commentsStore.onChange(this.updateComments, this);
+    newCommentStore.onChange(this.updateNewComment, this);
   },
 
   componentWillUnmount(){
-    const {forumStore, topicsStore, repliesStore, newReplyStore} = this.props;
+    const {forumStore, topicsStore, repliesStore, newReplyStore, commentsStore, newCommentStore} = this.props;
     forumStore.removeListeners(this.onForumUpdate, this);
     topicsStore.removeListeners(this.onTopicsUpdate, this);
+
     repliesStore.removeListeners(this.updateReplies, this);
     newReplyStore.off('change:text', this.updateReplyContent, this);
+
+    commentsStore.removeListeners(this.updateComments, this);
+    newCommentStore.removeListeners(this.updateNewComment, this);
   },
 
-  getInitialState(){
-    const {forumStore, topicsStore, repliesStore, topicId} = this.props;
+  getInitialState() {
+    const { forumStore, topicsStore, topicId } = this.props;
     return {
       forumId: forumStore.getForumId(),
       forumSubscriptionState: forumStore.getSubscriptionState(),
       topic: topicsStore.getById(topicId),
-      replies: repliesStore.getReplies(),
       newReplyContent: '',
     };
   },
 
 
   render(){
-
-    const { groupName, categoryStore, currentUserStore, tagStore } = this.props;
-    const {topic, forumId, forumSubscriptionState, replies, newReplyContent} = this.state;
+    const { topicId, topicsStore, groupName, categoryStore, currentUserStore, tagStore, newCommentStore } = this.props;
+    const {forumId, forumSubscriptionState, newReplyContent} = this.state;
+    const topic = topicsStore.getById(topicId);
     const currentUser = currentUserStore.getCurrentUser();
     const userId = currentUser.id;
     const topicCategory = topic.category;
@@ -95,6 +115,8 @@ const TopicContainer = createClass({
       return t.label ? t.label : t;
     });
     const tags = tagStore.getTagsByLabel(tagValues);
+
+    const parsedReplies = this.getParsedReplies();
 
     return (
       <main>
@@ -114,12 +136,17 @@ const TopicContainer = createClass({
             forumId={forumId}
             topic={topic} />
         </article>
-        <TopicReplyListHeader replies={replies}/>
+        <TopicReplyListHeader replies={parsedReplies}/>
         <TopicReplyList
           userId={userId}
+          user={currentUser}
           forumId={forumId}
           topicId={topic.id}
-          replies={replies} />
+          newCommentContent={newCommentStore.get('text')}
+          replies={parsedReplies}
+          submitNewComment={this.submitNewComment}
+          onNewCommentUpdate={this.onNewCommentUpdate}
+          onReplyCommentsClicked={this.onReplyCommentsClicked}/>
         <TopicReplyEditor
           user={currentUser}
           value={newReplyContent}
@@ -172,7 +199,37 @@ const TopicContainer = createClass({
       replies: repliesStore.getReplies(),
       newReplyContent: '',
     }));
-  }
+  },
+
+  updateComments(){
+    this.forceUpdate();
+  },
+
+  getParsedReplies(){
+    const {repliesStore, commentsStore} = this.props;
+    return repliesStore.getReplies().map((reply) => Object.assign({}, reply, {
+      comments: commentsStore.getCommentsByReplyId(reply.id),
+      isCommenting: commentsStore.getActiveReplyId() === reply.id,
+    }))
+  },
+
+  onReplyCommentsClicked(replyId){
+    dispatch(showReplyComments(replyId));
+  },
+
+  onNewCommentUpdate(replyId, val) {
+    dispatch(updateCommentBody(replyId, val));
+  },
+
+  submitNewComment(){
+    const {newCommentStore} = this.props;
+    dispatch(submitNewComment(
+      newCommentStore.get('replyId'),
+      newCommentStore.get('text')
+    ));
+  },
+
+  updateNewComment(){ this.forceUpdate(); }
 
 });
 
