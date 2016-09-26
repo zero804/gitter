@@ -32,7 +32,7 @@ export const CommentsStore = LiveCollection.extend({
   initialize(){
     subscribe(SHOW_REPLY_COMMENTS, this.onRequestNewComments, this);
     subscribe(SUBMIT_NEW_COMMENT, this.onSubmitNewComment, this);
-    this.listenTo(router, 'change:replyId', this.onReplyIdUpdate, this);
+    this.listenTo(router, 'change:topicId', this.onTopicIdUpdate, this);
   },
 
   getComments(){
@@ -52,7 +52,7 @@ export const CommentsStore = LiveCollection.extend({
     this.contextModel.set('replyId', replyId);
   },
 
-  onReplyIdUpdate(router, topicId){
+  onTopicIdUpdate(router, topicId){
     this.contextModel.set('topicId', topicId);
   },
 
