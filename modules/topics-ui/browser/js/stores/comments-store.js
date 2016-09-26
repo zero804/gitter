@@ -19,14 +19,16 @@ import {
 
 import {SUBMIT_NEW_COMMENT} from '../../../shared/constants/create-comment';
 
-export const CommentStore = BaseModel.extend({
+export const CommentModel = BaseModel.extend({
   url(){
-    return `/api/v1/forums/${getForumId()}/topics/${router.get('topicId')}/replies/${this.get('replyId')}/comments`;
+    return this.get('id') ?
+    `/api/v1/forums/${getForumId()}/topics/${router.get('topicId')}/replies/${this.get('replyId')}/comments`:
+    `/api/v1/forums/${getForumId()}/topics/${router.get('topicId')}/replies/${this.get('replyId')}/comments/${this.get('id')}`;
   }
 });
 
 export const CommentsStore = LiveCollection.extend({
-  model: CommentStore,
+  model: CommentModel,
   client: getRealtimeClient(),
   urlTemplate: '/v1/forums/:forumId/topics/:topicId/replies/:replyId/comments',
   events: ['change:text'],
@@ -45,7 +47,7 @@ export const CommentsStore = LiveCollection.extend({
     subscribe(UPDATE_COMMENT, this.onCommentUpdate, this);
     subscribe(UPDATE_CANCEL_COMMENT, this.onCommmentEditCanceled, this);
     subscribe(UPDATE_SAVE_COMMENT, this.onCommentSave, this);
-    this.listenTo(router, 'change:replyId', this.onReplyIdUpdate, this);
+    this.listenTo(router, 'change:topicId', this.onTopicIdUpdate, this);
   },
 
   getComments(){
@@ -65,7 +67,7 @@ export const CommentsStore = LiveCollection.extend({
     this.contextModel.set('replyId', replyId);
   },
 
-  onReplyIdUpdate(router, topicId){
+  onTopicIdUpdate(router, topicId){
     this.contextModel.set('topicId', topicId);
   },
 

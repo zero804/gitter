@@ -2,7 +2,7 @@
 'use strict';
 
 var typeahead = require('../../server/services/typeaheads/user-typeahead-elastic');
-var onMongoConnect = require('../../server/utils/on-mongo-connect');
+var onMongoConnect = require('gitter-web-persistence-utils/lib/on-mongo-connect');
 var shutdown = require('shutdown');
 
 onMongoConnect()

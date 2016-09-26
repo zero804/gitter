@@ -15,17 +15,17 @@ import {NAVIGATE_TO_TOPIC} from '../../../shared/constants/navigation';
 import {SUBMIT_NEW_REPLY} from '../../../shared/constants/create-reply';
 import {UPDATE_REPLY, CANCEL_UPDATE_REPLY, SAVE_UPDATE_REPLY} from '../../../shared/constants/topic';
 
-export const ReplyStore = BaseModel.extend({
+export const ReplyModel = BaseModel.extend({
   url(){
     return this.get('id') ?
-    null :
+    `/api/v1/forums/${getForumId()}/topics/${router.get('topicId')}/replies/${this.get('id')}`:
     `/api/v1/forums/${getForumId()}/topics/${router.get('topicId')}/replies`;
   },
 });
 
 export const RepliesStore = LiveCollection.extend({
 
-  model: ReplyStore,
+  model: ReplyModel,
   client: getRealtimeClient(),
   urlTemplate: '/v1/forums/:forumId/topics/:topicId/replies',
   events: [ 'change:text' ],

@@ -18,6 +18,7 @@ export default React.createClass({
     secondaryLabel: PropTypes.string,
     primaryValue: PropTypes.number,
     secondaryValue: PropTypes.number,
+    onPrimaryClicked: PropTypes.func,
     onSecondaryClicked: PropTypes.func,
     onChange: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
@@ -94,7 +95,9 @@ export default React.createClass({
     const {primaryLabel, primaryValue} = this.props;
     if(!primaryLabel){ return; }
     return (
-      <span className="feed-item__likes">
+      <span
+        className="feed-item__likes"
+        onClick={this.props.onPrimaryClicked}>
         {primaryValue} {primaryLabel}
       </span>
     );

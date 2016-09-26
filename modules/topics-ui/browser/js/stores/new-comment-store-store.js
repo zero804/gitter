@@ -4,7 +4,7 @@ import {COMMENT_BODY_UPDATE, SUBMIT_NEW_COMMENT} from '../../../shared/constants
 import {SHOW_REPLY_COMMENTS} from '../../../shared/constants/topic';
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
 
-export default dispatchOnChangeMixin(Backbone.Model.extend({
+const NewCommentStore = Backbone.Model.extend({
 
   defaults: {
     text: '',
@@ -28,4 +28,8 @@ export default dispatchOnChangeMixin(Backbone.Model.extend({
     this.set({ replyId: null, text: '' });
   }
 
-}), 'change:text');
+});
+
+dispatchOnChangeMixin(NewCommentStore, 'change: text');
+
+export default NewCommentStore;
