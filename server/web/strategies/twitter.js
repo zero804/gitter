@@ -9,6 +9,7 @@ var trackSignupOrLogin = require('../track-signup-or-login');
 var updateUserLocale = require('../update-user-locale');
 var passportLogin = require('../passport-login');
 var identityService = require('gitter-web-identity');
+var callbackUrlBuilder = require('./callback-url-builder');
 
 //function twitterOauthCallback(req, accessToken, refreshToken, params, profile, done) {
 function twitterOauthCallback(req, token, tokenSecret, profile, done) {
@@ -47,7 +48,7 @@ var twitterStrategy = new TwitterStrategy({
     consumerKey: config.get('twitteroauth:consumer_key'),
     consumerSecret: config.get('twitteroauth:consumer_secret'),
     userProfileURL: "https://api.twitter.com/1.1/account/verify_credentials.json?include_email=true",
-    callbackURL: config.get('web:basepath') + '/login/twitter/callback',
+    callbackURL: callbackUrlBuilder('twitter'),
     passReqToCallback: true
   }, twitterOauthCallback);
 
