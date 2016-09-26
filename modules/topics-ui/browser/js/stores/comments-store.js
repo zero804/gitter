@@ -10,14 +10,14 @@ import router from '../routers';
 import {SUBMIT_NEW_COMMENT} from '../../../shared/constants/create-comment';
 import {getCurrentUser} from './current-user-store';
 
-export const CommentStore = BaseModel.extend({
+export const CommentModel = BaseModel.extend({
   url(){
     return `/api/v1/forums/${getForumId()}/topics/${router.get('topicId')}/replies/${this.get('replyId')}/comments`;
   }
 });
 
 export const CommentsStore = LiveCollection.extend({
-  model: CommentStore,
+  model: CommentModel,
   client: getRealtimeClient(),
   urlTemplate: '/v1/forums/:forumId/topics/:topicId/replies/:replyId/comments',
 
