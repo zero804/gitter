@@ -88,6 +88,14 @@ function addUser(req, accessToken, githubUserProfile) {
   };
 
   debug('About to create GitHub user %j', githubUser);
+  logger.info('About to create github user', {
+    username: githubUserProfile.login,
+    displayName: githubUserProfile.name,
+
+    // TODO: fix this emergency code....
+    userAgent: req.headers && req.headers['user-agent'],
+    forwardedFor: req.headers && req.headers['x-forwarded-for']
+  });
 
   return userService.findOrCreateUserForGithubId(githubUser)
     .then(function(user) {

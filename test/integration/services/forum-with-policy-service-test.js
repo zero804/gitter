@@ -26,7 +26,15 @@ describe('forum-with-policy-service #slow', function() {
     category1: {
       forum: 'forum1'
     },
+    category2: {
+      forum: 'forum1'
+    },
     topic1: {
+      user: 'user1',
+      forum: 'forum1',
+      category: 'category1'
+    },
+    topic2: {
       user: 'user1',
       forum: 'forum1',
       category: 'category1'
@@ -65,14 +73,14 @@ describe('forum-with-policy-service #slow', function() {
     return forumWithPolicyService.createTopic(fixture.category1, {
         title: 'foo',
         tags: ['cats', 'dogs'],
-        sticky: true,
+        sticky: 1,
         text: 'This is **my** story.'
       })
       .then(function(topic) {
         assert.strictEqual(topic.title, 'foo');
         assert(mongoUtils.objectIDsEqual(topic.categoryId, fixture.category1._id));
         assert.deepEqual(topic.tags.slice(), ['cats', 'dogs']);
-        assert.ok(topic.sticky);
+        assert.strictEqual(topic.sticky, 1);
         assert.strictEqual(topic.text, 'This is **my** story.');
         assert.strictEqual(topic.html, 'This is <strong>my</strong> story.');
       });
@@ -104,6 +112,76 @@ describe('forum-with-policy-service #slow', function() {
         assert.strictEqual(comment.html, '<strong>hi!</strong>');
       });
 
+  });
+
+  it("should allow admins to set a forum's tags", function() {
+    // deliberately making the new set a superset if the existing ones in case
+    // tests run out of order
+    var tags = ['cats', 'dogs', 'mice'];
+    return forumWithPolicyService.setForumTags(tags)
+      .then(function(forum) {
+        assert.deepEqual(forum.tags, tags);
+      });
+  });
+
+  it("should allow members to set a topic's title", function() {
+    return forumWithPolicyService.updateTopic(fixture.topic1, { title: "foo" })
+      .then(function(topic) {
+        assert.strictEqual(topic.title, "foo");
+      });
+  });
+
+  it("should allow members to set a topic's slug", function() {
+    return forumWithPolicyService.updateTopic(fixture.topic1, { slug: "bar" })
+      .then(function(topic) {
+        assert.strictEqual(topic.slug, "bar");
+      });
+  });
+
+  it("should allow members to set a topic's text", function() {
+    return forumWithPolicyService.updateTopic(fixture.topic1, { text: "**baz**" })
+      .then(function(topic) {
+        assert.strictEqual(topic.text, "**baz**");
+        assert.strictEqual(topic.html, "<strong>baz</strong>");
+      });
+  });
+
+  it("should allow members to update all the topic's core fields in one go", function() {
+    return forumWithPolicyService.updateTopic(fixture.topic2, {
+        title: 'foo',
+        slug: 'bar',
+        text: '**baz**'
+      })
+      .then(function(topic) {
+        assert.strictEqual(topic.title, 'foo');
+        assert.strictEqual(topic.slug, 'bar');
+        assert.strictEqual(topic.text, '**baz**');
+        assert.strictEqual(topic.html, '<strong>baz</strong>');
+      });
+  });
+
+  it("should allow members to set a topic's tags", function() {
+    assert.strictEqual(fixture.topic1.tags.length, 0);
+
+    var tags = ['cats', 'dogs'];
+    return forumWithPolicyService.setTopicTags(fixture.topic1, tags)
+      .then(function(topic) {
+        assert.deepEqual(topic.tags, tags);
+      });
+  });
+
+  it("should allow members to set a topic's sticky number", function() {
+    return forumWithPolicyService.setTopicSticky(fixture.topic1, 1)
+      .then(function(topic) {
+        assert.strictEqual(topic.sticky, 1);
+      });
+  });
+
+  it("should allow members to set a topic's category", function() {
+    return forumWithPolicyService.setTopicCategory(fixture.topic1, fixture.category2)
+      .then(function(topic) {
+        assert(mongoUtils.objectIDsEqual(topic.categoryId, fixture.category2._id));
+      });
   });
 
 });

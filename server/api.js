@@ -12,7 +12,7 @@ var nconf = env.config;
 var express = require('express');
 var http = require('http');
 var serverStats = require('./utils/server-stats');
-var onMongoConnect = require('./utils/on-mongo-connect');
+var onMongoConnect = require('gitter-web-persistence-utils/lib/on-mongo-connect');
 
 var app = express();
 
