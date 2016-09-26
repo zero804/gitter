@@ -1,9 +1,12 @@
 'use strict';
 
+var env = require('gitter-web-env');
+var logger = env.logger.get('spam-detection');
 var Promise = require('bluebird');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var duplicateChatDetector = require('./duplicate-chat-detector');
 var User = require('gitter-web-persistence').User;
+var stats = env.stats;
 
 var PROBATION_PERIOD = 86400 * 1000; // First day
 
@@ -33,6 +36,16 @@ function detect(user, parsedMessage) {
   return duplicateChatDetector(userId, parsedMessage.text)
     .tap(function(isSpamming) {
       if (!isSpamming) return;
+
+      logger.warn('Auto spam detector to hellban user for suspicious activity', {
+        userId: user._id,
+        username: user.username,
+        text: parsedMessage.text,
+      });
+
+      stats.event('auto_hellban_user', {
+        userId: user._id
+      });
 
       return hellbanUser(userId);
     })

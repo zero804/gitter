@@ -29,6 +29,12 @@ describe('chat-spam-detection', function() {
           assert.strictEqual(isSpammy, expected);
         });
       })
+      .then(function() {
+        return User.findById(fixture.user1._id);
+      })
+      .then(function(user) {
+        assert.strictEqual(user.hellbanned, true);
+      });
     });
 
 
