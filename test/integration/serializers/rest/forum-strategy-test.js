@@ -6,11 +6,15 @@ var testRequire = require('../../test-require');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assertUtils = require('../../assert-utils')
 var serialize = testRequire('./serializers/serialize');
+var serializeObject = testRequire('./serializers/serialize-object');
 var ForumStrategy = testRequire('./serializers/rest/forum-strategy');
+var subscriberService = require('gitter-web-topic-notifications/lib/subscriber-service');
+var ForumObject = require('gitter-web-topic-notifications/lib/forum-object');
+var assert = require('assert');
 
 var LONG_AGO = '2014-01-01T00:00:00.000Z';
 
-describe('ForumStrategy', function() {
+describe('ForumStrategy #slow', function() {
   var blockTimer = require('../../block-timer');
   before(blockTimer.on);
   after(blockTimer.off);
@@ -38,7 +42,7 @@ describe('ForumStrategy', function() {
   });
 
   it('should serialize a forum', function() {
-    var strategy = new ForumStrategy();
+    var strategy = ForumStrategy.nested();
 
     var user = fixture.user1;
     var forum = fixture.forum1;
@@ -86,6 +90,7 @@ describe('ForumStrategy', function() {
               displayName: user.displayName,
               avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
             },
+            subscribed: false,
             repliesTotal: 0,
             replyingUsers: [],
             sent: LONG_AGO,
@@ -94,8 +99,44 @@ describe('ForumStrategy', function() {
             lastModified: LONG_AGO,
             v: 1
           }],
+          subscribed: false,
           topicsTotal: 1
         }])
       });
   });
+
+  it('should tell a user when they are subscribed to a forum', function() {
+    var forumObject = ForumObject.createForForum(fixture.forum1._id);
+    var userId = fixture.user1._id;
+
+    return subscriberService.addSubscriber(forumObject, userId)
+      .then(function() {
+        var strategy = ForumStrategy.nested({
+          currentUserId: userId
+        });
+
+        return serializeObject(fixture.forum1, strategy);
+      })
+      .then(function(serialized) {
+        assert.strictEqual(serialized.subscribed, true);
+      })
+  });
+
+  it('should tell a user when they are subscribed to a topic within a forum', function() {
+    var forumObject = ForumObject.createForTopic(fixture.forum1._id, fixture.topic1._id);
+    var userId = fixture.user1._id;
+
+    return subscriberService.addSubscriber(forumObject, userId)
+      .then(function() {
+        var strategy = ForumStrategy.nested({
+          currentUserId: userId
+        });
+
+        return serializeObject(fixture.forum1, strategy);
+      })
+      .then(function(serialized) {
+        assert.strictEqual(serialized.topics[0].subscribed, true);
+      })
+  });
+
 });

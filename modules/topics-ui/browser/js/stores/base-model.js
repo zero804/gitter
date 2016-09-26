@@ -10,24 +10,39 @@ export const BaseModel = Backbone.Model.extend({
     return this.toJSON();
   },
 
-  sync(method, model, options){
+  parse(res){
+    //We only update text when the user locally updates a resource
+    //when we get data from the server we need to wipe this out
+    return Object.assign({}, res, {
+      text: null,
+    });
+  },
 
+  sync(method, model, options){
     //Need to abstract and pull in the apiClient here so this is a bodge
     const headers = { "x-access-token": getAccessToken() }
     const data = JSON.stringify(this.getDataToSave());
+    const defaults = {
+      url: model.url(),
+      contentType: 'application/json',
+      headers: headers,
+      data: data,
+      success: options.success,
+      error: options.error
+    }
 
-    //TODO NEED TO ADD UPDATE METHOD
+    if(method === 'update') {
+      $.ajax(Object.assign({}, defaults, {
+        method: 'PATCH',
+        //When we update a resource locally we change the `text` property
+        data: JSON.stringify({ text: model.get('text') }),
+      }));
+    }
 
     if(method === 'create') {
-      $.ajax({
-        url: model.url(),
-        contentType: 'application/json',
-        type: 'POST',
-        headers: headers,
-        data: data,
-        success: options.success,
-        error: options.error
-      });
+      $.ajax(Object.assign({}, defaults, {
+        method: 'POST'
+      }));
     }
 
   }

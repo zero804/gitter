@@ -22,7 +22,9 @@ import {UPDATE_TOPIC, UPDATE_CANCEL_TOPIC, UPDATE_SAVE_TOPIC} from '../../../sha
 
 export const TopicModel = BaseModel.extend({
   url(){
-    return this.get('id') ? null : `/api/v1/forums/${getForumId()}/topics`;
+    return this.get('id') ?
+    `/api/v1/forums/${getForumId()}/topics/${this.get('id')}`:
+    `/api/v1/forums/${getForumId()}/topics`;
   },
 
   toJSON() {
@@ -99,7 +101,7 @@ export const TopicsLiveCollection = LiveCollection.extend({
     const topicId = router.get('topicId');
     const model = this.get(topicId);
     if(!model) { return; }
-    model.save();
+    model.save({ text: model.get('text') });
   },
 
 });

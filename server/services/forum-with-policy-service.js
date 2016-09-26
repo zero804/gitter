@@ -140,25 +140,48 @@ ForumWithPolicyService.prototype.setForumTags = secureMethod([allowAdmin], funct
   return forumService.setForumTags(user, forum, tags);
 });
 
-ForumWithPolicyService.prototype.setTopicTags = secureMethod([allowAdmin, matchForum], function(topic, tags) {
+ForumWithPolicyService.prototype.updateTopic = secureMethod([allowWrite, matchForum], function(topic, fields) {
+  var user = this.user;
+
+  return topicService.updateTopic(user, topic, fields);
+});
+
+ForumWithPolicyService.prototype.setTopicTags = secureMethod([allowWrite, matchForum], function(topic, tags) {
   var user = this.user;
   var forum = this.forum;
 
   return topicService.setTopicTags(user, topic, tags, { allowedTags: forum.tags });
 });
 
+ForumWithPolicyService.prototype.setTopicSticky = secureMethod([allowWrite, matchForum], function(topic, sticky) {
+  var user = this.user;
+
+  return topicService.setTopicSticky(user, topic, sticky);
+});
+
+ForumWithPolicyService.prototype.setTopicCategory = secureMethod([allowWrite, matchForum], function(topic, category) {
+  var user = this.user;
+  var forum = this.forum;
+
+  if (!mongoUtils.objectIDsEqual(category.forumId, forum._id)) {
+    throw new StatusError(403, 'forumId does not match');
+  }
+
+  return topicService.setTopicCategory(user, topic, category);
+});
+
 /**
  * Subscription bits
  */
- ForumWithPolicyService.prototype.listSubscribers = secureMethod([allowAdmin, matchForum], function(forumObject) {
+ForumWithPolicyService.prototype.listSubscribers = secureMethod([allowAdmin, matchForum], function(forumObject) {
    return subscriberService.listForItem(forumObject);
  });
 
- ForumWithPolicyService.prototype.subscribe = secureMethod([allowRead, matchForum], function(forumObject) {
+ForumWithPolicyService.prototype.subscribe = secureMethod([allowRead, matchForum], function(forumObject) {
    return subscriberService.addSubscriber(forumObject, this.user._id);
  });
 
- ForumWithPolicyService.prototype.unsubscribe = secureMethod([allowAnyone, matchForum], function(forumObject) {
+ForumWithPolicyService.prototype.unsubscribe = secureMethod([allowAnyone, matchForum], function(forumObject) {
    return subscriberService.removeSubscriber(forumObject, this.user._id);
  });
 
