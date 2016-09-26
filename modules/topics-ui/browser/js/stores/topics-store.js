@@ -19,7 +19,7 @@ import {SUBMIT_NEW_TOPIC, TOPIC_CREATED} from '../../../shared/constants/create-
 import {DEFAULT_CATEGORY_NAME, DEFAULT_TAG_NAME} from '../../../shared/constants/navigation';
 import {FILTER_BY_TOPIC} from '../../../shared/constants/forum-filters';
 import {MOST_WATCHERS_SORT} from '../../../shared/constants/forum-sorts';
-import { UPDATE_TOPIC_SUBSCRIPTION_STATE, REQUEST_UPDATE_TOPIC_SUBSCRIPTION_STATE, SUBSCRIPTION_STATE } from '../../../shared/constants/forum.js';
+import { UPDATE_TOPIC_SUBSCRIPTION_STATE, REQUEST_UPDATE_TOPIC_SUBSCRIPTION_STATE, SUBSCRIPTION_STATE_PENDING } from '../../../shared/constants/forum.js';
 
 export const TopicModel = BaseModel.extend({
   url(){
