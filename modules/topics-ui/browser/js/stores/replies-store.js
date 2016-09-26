@@ -11,7 +11,7 @@ import router from '../routers';
 import {BaseModel} from './base-model';
 import {NAVIGATE_TO_TOPIC} from '../../../shared/constants/navigation';
 
-export const ReplyStore = BaseModel.extend({
+export const ReplyModel = BaseModel.extend({
   url(){
     return this.get('id') ?
     null :
@@ -21,7 +21,7 @@ export const ReplyStore = BaseModel.extend({
 
 export const RepliesStore = LiveCollection.extend({
 
-  model: ReplyStore,
+  model: ReplyModel,
   client: getRealtimeClient(),
   urlTemplate: '/v1/forums/:forumId/topics/:topicId/replies',
 
