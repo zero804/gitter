@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 import Editor from '../forms/editor.jsx';
 import UserAvatar from '../user/user-avatar.jsx';
+import moment from 'moment';
 
 export default React.createClass({
 
@@ -15,20 +16,28 @@ export default React.createClass({
 
   render(){
     const {value, autoFocus, currentUser} = this.props;
+    const formattedSentDate = moment().format('MMM Do');
     return (
-      <div className="reply-comment-editor">
-        <UserAvatar
-          width={30}
-          height={30}
-          className="reply-comment-editor__avatar"
-          user={currentUser} />
+      <section className="reply-comment-editor">
+        <aside className="reply-comment-editor__details">
+          <UserAvatar
+            width={30}
+            height={30}
+            className="reply-comment-editor__avatar"
+            user={currentUser} />
+          <span
+            className="reply-comment-editor__sent">
+            {formattedSentDate}
+          </span>
+        </aside>
         <Editor
           autoFocus={autoFocus}
+          placeholder="Your reply here. Use Markdown, BBCode, or HTML to format. Drag or paste images ..."
           className="reply-comment-editor__editor"
           value={value}
           onEnter={this.onEnter}
           onChange={this.onChange}/>
-      </div>
+      </section>
     );
   },
 
