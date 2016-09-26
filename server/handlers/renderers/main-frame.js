@@ -18,7 +18,7 @@ var generateMainFrameSnapshots = require('../../handlers/snapshots/main-frame');
 var fonts = require('../../web/fonts');
 
 function getLeftMenuForumGroupInfo(leftMenuGroupId) {
-  return groupService.findById(leftMenuGroupId)
+  return Promise.resolve(leftMenuGroupId && groupService.findById(leftMenuGroupId))
     .then(function(leftMenuForumGroup) {
       return Promise.all([
         leftMenuForumGroup,
@@ -40,8 +40,8 @@ function getTroupeContextAndDerivedInfo(req, socialMetadataGenerator) {
         ]);
     })
     .spread(function(troupeContext, socialMetadata, leftMenuForumGroupInfo) {
-      var leftMenuForumGroup = leftMenuForumGroupInfo[0];
-      var leftMenuForumGroupCategories = leftMenuForumGroupInfo[1];
+      var leftMenuForumGroup = leftMenuForumGroupInfo ? leftMenuForumGroupInfo[0] : null;
+      var leftMenuForumGroupCategories = leftMenuForumGroupInfo ? leftMenuForumGroupInfo[1] : null;
 
       return Promise.all([
         troupeContext,
