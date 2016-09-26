@@ -13,7 +13,7 @@ describe('duplicate-chat-detector', function() {
       var userId = Date.now();
 
       return Promise.each(FIXTURE, function(expected) {
-        return duplicateChatDetector(userId, 'This is the text')
+        return duplicateChatDetector(userId, '01234567890123456789012')
           .then(function(result) {
             assert.strictEqual(result, expected);
           });

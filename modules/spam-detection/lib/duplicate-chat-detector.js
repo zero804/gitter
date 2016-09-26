@@ -13,8 +13,6 @@ var redisClient = env.ioredis.createClient(config.get('redis_nopersist'), {
 });
 
 var TTL = 86400;
-var MAX_DUPLICATE_MESSAGES = 10;
-var WARN_DUPLICATE_MESSAGES = 8;
 
 function defineCommand(name, script, keys) {
   redisClient.defineCommand(name, {
@@ -25,10 +23,43 @@ function defineCommand(name, script, keys) {
 
 defineCommand('spamDetectionCountChatForUser', 'count-chat-for-user', 1);
 
+function getWarnAndBanThresholds(text) {
+  // This should catch emojis etc
+  if (text.length < 10) {
+    return {
+      warn: 40,
+      ban: 50
+    };
+  }
+
+  if (text.length < 20) {
+    return {
+      warn: 16,
+      ban: 20
+    };
+  }
+
+  return {
+    warn: 8,
+    ban: 10
+  };
+}
+
 function addHash(userId, hash, text) {
+  var thresholds = getWarnAndBanThresholds(text);
+
   return redisClient.spamDetectionCountChatForUser('dup:' + String(userId), hash, TTL)
+    .bind({
+      thresholds: thresholds,
+      text: text,
+      userId: userId
+    })
     .then(function(count) {
-      if (count > WARN_DUPLICATE_MESSAGES) {
+      var thresholds = this.thresholds;
+      var userId = this.userId;
+      var text = this.text;
+
+      if (count > thresholds.warn) {
         logger.warn('User sending duplicate messages', {
           count: count,
           text: text,
@@ -36,7 +67,7 @@ function addHash(userId, hash, text) {
         });
       }
 
-      return count > MAX_DUPLICATE_MESSAGES;
+      return count > thresholds.ban;
     })
 
 }
