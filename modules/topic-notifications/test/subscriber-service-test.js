@@ -47,9 +47,18 @@ describe('subscriber-service', function() {
       var userId2 = new ObjectID();
 
       function testForForumObject(id) {
-        return subscriberService.addSubscriber(id, userId1)
+        return subscriberService.createSubscriptionVisitorForUser(userId1, id.type, [id])
+          .then(function(subscriptionVisitor) {
+            assert.strictEqual(subscriptionVisitor.isSubscribed(id), false);
+
+            return subscriberService.addSubscriber(id, userId1)
+          })
           .then(function(result) {
             assert.strictEqual(result, true);
+            return subscriberService.createSubscriptionVisitorForUser(userId1, id.type, [id])
+          })
+          .then(function(subscriptionVisitor) {
+            assert.strictEqual(subscriptionVisitor.isSubscribed(id), true);
             return subscriberService.addSubscriber(id, userId1);
           })
           .then(function(result) {
@@ -82,6 +91,10 @@ describe('subscriber-service', function() {
           })
           .then(function(result) {
             assert.deepEqual(result, []);
+            return subscriberService.createSubscriptionVisitorForUser(userId1, id.type, [id])
+          })
+          .then(function(subscriptionVisitor) {
+            assert.strictEqual(subscriptionVisitor.isSubscribed(id), false);
           });
       }
 
@@ -102,6 +115,82 @@ describe('subscriber-service', function() {
 
     });
 
+    describe('createSubscriptionVisitorForUser', function() {
+      it('should handle empty arrays', function() {
+        var forumId = new ObjectID();
+        var userId1 = new ObjectID();
+        var id = ForumObject.createForForum(forumId);
+
+        return subscriberService.createSubscriptionVisitorForUser(userId1, ForumObject.TYPE.Forum, [])
+          .then(function(subscriptionVisitor) {
+            assert.strictEqual(subscriptionVisitor.isSubscribed(id), false);
+          })
+
+      });
+
+      it('should handle multiple items', function() {
+        var forumId = new ObjectID();
+        var topicId = new ObjectID();
+        var replyId1 = new ObjectID();
+        var replyId2 = new ObjectID();
+        var replyId3 = new ObjectID();
+        var userId1 = new ObjectID();
+
+        var id1 = ForumObject.createForReply(forumId, topicId, replyId1);
+        var id2 = ForumObject.createForReply(forumId, topicId, replyId2);
+        var id3 = ForumObject.createForReply(forumId, topicId, replyId3);
+
+        return subscriberService.addSubscriber(id1, userId1)
+          .then(function() {
+            return subscriberService.addSubscriber(id2, userId1)
+          })
+          .then(function() {
+            return subscriberService.createSubscriptionVisitorForUser(userId1, ForumObject.TYPE.Reply, [id1, id2, id3])
+          })
+          .then(function(subscriptionVisitor) {
+            assert.strictEqual(subscriptionVisitor.isSubscribed(id1), true);
+            assert.strictEqual(subscriptionVisitor.isSubscribed(id2), true);
+            assert.strictEqual(subscriptionVisitor.isSubscribed(id3), false);
+          });
+      });
+
+      it('should return correct results when the user is subscribed to a forum but not a topic', function() {
+        var forumId = new ObjectID();
+        var topicId = new ObjectID();
+        var userId1 = new ObjectID();
+
+        var idForum = ForumObject.createForForum(forumId);
+        var idTopic = ForumObject.createForTopic(forumId, topicId);
+
+        return subscriberService.addSubscriber(idForum, userId1)
+          .then(function() {
+            return subscriberService.removeSubscriber(idTopic, userId1);
+          })
+          .then(function() {
+            return subscriberService.createSubscriptionVisitorForUser(userId1, ForumObject.TYPE.Topic, [idTopic])
+          })
+          .then(function(subscriptionVisitor) {
+            assert.strictEqual(subscriptionVisitor.isSubscribed(idTopic), false);
+          });
+      });
+
+      it('should return correct results when the user is subscribed to a topic but not a forum', function() {
+        var forumId = new ObjectID();
+        var topicId = new ObjectID();
+        var userId1 = new ObjectID();
+
+        var idForum = ForumObject.createForForum(forumId);
+        var idTopic = ForumObject.createForTopic(forumId, topicId);
+
+        return subscriberService.addSubscriber(idTopic, userId1)
+          .then(function() {
+            return subscriberService.createSubscriptionVisitorForUser(userId1, ForumObject.TYPE.Forum, [idForum])
+          })
+          .then(function(subscriptionVisitor) {
+            assert.strictEqual(subscriptionVisitor.isSubscribed(idForum), false);
+          });
+      });
+    })
   });
 
 });

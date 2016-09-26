@@ -5,6 +5,7 @@ process.env.DISABLE_API_LISTEN = '1';
 var Promise = require('bluebird');
 var assert = require('assert');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 describe('topic-api', function() {
   var app, request;
@@ -19,11 +20,15 @@ describe('topic-api', function() {
       accessToken: 'web-internal'
     },
     forum1: {
+      tags: ['cats', 'dogs'],
       securityDescriptor: {
         extraAdmins: ['user1']
       }
     },
     category1: {
+      forum: 'forum1'
+    },
+    category2: {
       forum: 'forum1'
     },
     topic1: {
@@ -35,7 +40,7 @@ describe('topic-api', function() {
       user: 'user1',
       forum: 'forum1',
       category: 'category1',
-      tags: ['foo']
+      tags: ['cats']
     },
     reply1: {
       user: 'user1',
@@ -62,9 +67,9 @@ describe('topic-api', function() {
       });
   });
 
-  it('GET /v1/forums/:forumId/topics?tags=foo', function() {
+  it('GET /v1/forums/:forumId/topics?tags=cats', function() {
     return request(app)
-      .get('/v1/forums/' + fixture.forum1.id + '/topics?tags=foo')
+      .get('/v1/forums/' + fixture.forum1.id + '/topics?tags=cats')
       .set('x-access-token', fixture.user1.accessToken)
       .expect(200)
       .then(function(result) {
@@ -90,6 +95,33 @@ describe('topic-api', function() {
         var topic = result.body;
         assert.strictEqual(topic.id, fixture.topic1.id);
         assert.strictEqual(topic.replies.length, 1);
+      });
+  });
+
+  it('PATCH /v1/forums/:forumId/topics/:topicId', function() {
+    var update = {
+      title: 'Foo',
+      slug: 'cats',
+      tags: ['cats', 'dogs'],
+      text: '**hello**',
+      sticky: 1,
+      categoryId: fixture.category2._id
+    };
+    return request(app)
+      .patch('/v1/forums/' + fixture.forum1.id + '/topics/' + fixture.topic2.id)
+      .send(update)
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+      .then(function(result) {
+        var topic = result.body;
+
+        assert.strictEqual(topic.title, update.title);
+        assert.strictEqual(topic.slug, update.slug);
+        assert.deepEqual(topic.tags, update.tags);
+        assert.strictEqual(topic.body.text, update.text);
+        assert.strictEqual(topic.body.html, '<strong>hello</strong>');
+        assert.strictEqual(topic.sticky, update.sticky);
+        assert(mongoUtils.objectIDsEqual(topic.category.id, update.categoryId));
       });
   });
 

@@ -37,6 +37,8 @@ function renderForum(req, res, next, options) {
     return next(new StatusError(404));
   }
 
+  var userId = req.user && req.user._id;
+
   options = (options || {});
   var groupUri = req.params.groupName;
 
@@ -56,10 +58,11 @@ function renderForum(req, res, next, options) {
 
         if(!forum) { return next(new StatusError(404, 'Forum not found')); }
 
-        var topicsOptions = getTopicsFilterSortOptions(req.query);
-        var strategy = new restSerializer.ForumStrategy({
-          topics: topicsOptions
+        var strategy = restSerializer.ForumStrategy.nested({
+          currentUserId: userId,
+          topicsFilterSort: getTopicsFilterSortOptions(req.query)
         });
+
         return restSerializer.serializeObject(forum, strategy);
       })
       .then(function(forum){
@@ -108,6 +111,7 @@ function renderTopic(req, res, next) {
 
   var groupUri = req.params.groupName;
   var topicId = req.params.topicId;
+  var userId = req.user && req.user._id;
 
   return contextGenerator.generateNonChatContext(req)
     .then(function(context){
@@ -122,7 +126,12 @@ function renderTopic(req, res, next) {
               if(!forum) { return next(new StatusError(404, 'Forum not found')); }
               // TODO: how do we know which topics options to pass in to the
               // forum strategy? Maybe it shouldn't include any topics at all?
-              var strategy = new restSerializer.ForumStrategy();
+
+              var strategy = restSerializer.ForumStrategy.nested({
+                currentUserId: userId,
+                topicsFilterSort: null
+              });
+
               return restSerializer.serializeObject(forum, strategy);
             })
           .then(function(forum){
@@ -131,7 +140,10 @@ function renderTopic(req, res, next) {
 
                 if (!topic) { return next(new StatusError(404, 'Topic not found.')); }
 
-                var strategy = restSerializer.TopicStrategy.full();
+                var strategy = restSerializer.TopicStrategy.nested({
+                  currentUserId: userId
+                });
+
                 return restSerializer.serializeObject(topic, strategy);
               })
             .then(function(topic){

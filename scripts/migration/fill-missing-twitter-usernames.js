@@ -5,7 +5,7 @@ var Promise = require('bluebird');
 var shutdown = require('shutdown');
 var through2Concurrent = require('through2-concurrent');
 var persistence = require('gitter-web-persistence');
-var onMongoConnect = require('../../server/utils/on-mongo-connect');
+var onMongoConnect = require('gitter-web-persistence-utils/lib/on-mongo-connect');
 
 function fillTwitterUsernames() {
   return new Promise(function(resolve, reject) {
