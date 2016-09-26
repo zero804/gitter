@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react';
 import {dispatch} from '../../../dispatcher';
 import UserAvatar from '../user/user-avatar.jsx';
 import SubscribeButton from '../forum/subscribe-button.jsx';
-import { SUBSCRIPTION_STATE } from '../../../constants/forum.js';
+import { SUBSCRIPTION_STATE_SUBSCRIBED } from '../../../constants/forum.js';
 import requestUpdateReplySubscriptionState from '../../../action-creators/forum/request-update-reply-subscription-state';
 
 export default React.createClass({
@@ -85,7 +85,7 @@ export default React.createClass({
     const replyId = reply.id;
     const subscriptionState = reply.subscriptionState;
 
-    var desiredIsSubscribed = (subscriptionState !== SUBSCRIPTION_STATE.SUBSCRIBED);
+    var desiredIsSubscribed = (subscriptionState !== SUBSCRIPTION_STATE_SUBSCRIBED);
     dispatch(requestUpdateReplySubscriptionState(forumId, topicId, replyId, userId, desiredIsSubscribed));
   }
 

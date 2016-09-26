@@ -5,7 +5,6 @@ var _ = require('lodash');
 var navConstants = require('../../shared/constants/navigation');
 var forumFilterConstants = require('../../shared/constants/forum-filters');
 var forumSortConstants = require('../../shared/constants/forum-sorts');
-var forumConstants = require('../../shared/constants/forum.js');
 var parseTopic = require('../../shared/parse/topic');
 
 module.exports = function topicsStore(models, category, tag, filter, sort, user) {

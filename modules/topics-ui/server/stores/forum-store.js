@@ -7,7 +7,7 @@ module.exports = function forumStore(initialData) {
   initialData = (initialData || {});
 
   var data = _.extend({}, initialData, {
-    subscriptionState: initialData.subscribed ? forumConstants.SUBSCRIPTION_STATE.SUBSCRIBED : forumConstants.SUBSCRIPTION_STATE.UNSUBSCRIBED
+    subscriptionState: initialData.subscribed ? forumConstants.SUBSCRIPTION_STATE_SUBSCRIBED : forumConstants.SUBSCRIPTION_STATE_UNSUBSCRIBED
   });
   delete data.subscribed;
 

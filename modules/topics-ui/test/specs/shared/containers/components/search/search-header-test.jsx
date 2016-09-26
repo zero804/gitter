@@ -4,7 +4,7 @@ import { shallow } from 'enzyme';
 import {spy} from 'sinon';
 import proxyquire from 'proxyquire';
 import SearchHeader from '../../../../../../shared/containers/components/search/search-header.jsx';
-import { SUBSCRIPTION_STATE } from '../../../../../../shared/constants/forum.js';
+import { SUBSCRIPTION_STATE_UNSUBSCRIBED } from '../../../../../../shared/constants/forum.js';
 
 const proxyquireNoCallThru = proxyquire.noCallThru();
 
@@ -74,7 +74,7 @@ describe('<SearchHeader/>', () => {
       wrapper = shallow(<SearchHeaderWithMockedThings
         forumId={FIXTURE_FORUM_ID}
         userId={FIXTURE_USER_ID}
-        subscriptionState={SUBSCRIPTION_STATE.UNSUBSCRIBED}/>
+        subscriptionState={SUBSCRIPTION_STATE_UNSUBSCRIBED}/>
       );
     });
 

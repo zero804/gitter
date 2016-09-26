@@ -4,7 +4,13 @@ import {subscribe, dispatch} from '../../../shared/dispatcher';
 import updateForumWatchState from '../../../shared/action-creators/forum/update-forum-watch-state';
 import updateTopicWatchState from '../../../shared/action-creators/forum/update-topic-watch-state';
 import updateReplyWatchState from '../../../shared/action-creators/forum/update-reply-watch-state';
-import { SUBSCRIPTION_STATE, REQUEST_UPDATE_FORUM_SUBSCRIPTION_STATE, REQUEST_UPDATE_TOPIC_SUBSCRIPTION_STATE, REQUEST_UPDATE_REPLY_SUBSCRIPTION_STATE } from '../../../shared/constants/forum.js';
+import {
+  SUBSCRIPTION_STATE_SUBSCRIBED,
+  SUBSCRIPTION_STATE_UNSUBSCRIBED,
+  REQUEST_UPDATE_FORUM_SUBSCRIPTION_STATE,
+  REQUEST_UPDATE_TOPIC_SUBSCRIPTION_STATE,
+  REQUEST_UPDATE_REPLY_SUBSCRIPTION_STATE
+} from '../../../shared/constants/forum.js';
 import apiClient from '../utils/api-client';
 
 var generateRequestSubscriptionUpdateCb = function(action) {
@@ -23,19 +29,19 @@ var generateRequestSubscriptionUpdateCb = function(action) {
         if(isSubscribed) {
           return apiClient.post(urlJoin(subscribersEndpoint, '/subscribers'), {})
             .then(function() {
-              dispatch(action(forumId, topicId, replyId, SUBSCRIPTION_STATE.SUBSCRIBED));
+              dispatch(action(forumId, topicId, replyId, SUBSCRIPTION_STATE_SUBSCRIBED));
             });
         }
         else {
           return apiClient.delete(urlJoin(subscribersEndpoint, '/subscribers/', userId), {})
             .then(function() {
-              dispatch(action(forumId, topicId, replyId, SUBSCRIPTION_STATE.UNSUBSCRIBED));
+              dispatch(action(forumId, topicId, replyId, SUBSCRIPTION_STATE_UNSUBSCRIBED));
             });
         }
       })
       .catch(function() {
         // Return back to previous state
-        dispatch(action(forumId, topicId, replyId, isSubscribed ? SUBSCRIPTION_STATE.UNSUBSCRIBED : SUBSCRIPTION_STATE.SUBSCRIBED));
+        dispatch(action(forumId, topicId, replyId, isSubscribed ? SUBSCRIPTION_STATE_UNSUBSCRIBED : SUBSCRIPTION_STATE_SUBSCRIBED));
       });
   };
 }

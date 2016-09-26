@@ -3,7 +3,7 @@ import {dispatch} from '../../../dispatcher';
 import Container from '../container.jsx';
 import Panel from '../panel.jsx';
 import SubscribeButton from '../forum/subscribe-button.jsx';
-import { SUBSCRIPTION_STATE } from '../../../constants/forum.js';
+import { SUBSCRIPTION_STATE_SUBSCRIBED } from '../../../constants/forum.js';
 import requestUpdateTopicSubscriptionState from '../../../action-creators/forum/request-update-topic-subscription-state';
 
 export default React.createClass({
@@ -53,7 +53,7 @@ export default React.createClass({
     const topicId = topic.id;
     const subscriptionState = topic.subscriptionState;
 
-    var desiredIsSubscribed = (subscriptionState !== SUBSCRIPTION_STATE.SUBSCRIBED);
+    var desiredIsSubscribed = (subscriptionState !== SUBSCRIPTION_STATE_SUBSCRIBED);
     dispatch(requestUpdateTopicSubscriptionState(forumId, topicId, userId, desiredIsSubscribed));
   }
 

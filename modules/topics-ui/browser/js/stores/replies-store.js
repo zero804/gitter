@@ -10,7 +10,7 @@ import {getForumId} from './forum-store'
 import router from '../routers';
 import {BaseModel} from './base-model';
 import {NAVIGATE_TO_TOPIC} from '../../../shared/constants/navigation';
-import { UPDATE_REPLY_SUBSCRIPTION_STATE, REQUEST_UPDATE_REPLY_SUBSCRIPTION_STATE, SUBSCRIPTION_STATE } from '../../../shared/constants/forum.js';
+import { UPDATE_REPLY_SUBSCRIPTION_STATE, REQUEST_UPDATE_REPLY_SUBSCRIPTION_STATE, SUBSCRIPTION_STATE_PENDING } from '../../../shared/constants/forum.js';
 
 export const ReplyStore = BaseModel.extend({
   url(){
@@ -65,7 +65,7 @@ export const RepliesStore = LiveCollection.extend({
   onRequestSubscriptionStateUpdate(data) {
     var {replyId} = data;
     this.get(replyId).set({
-      subscriptionState: SUBSCRIPTION_STATE.PENDING
+      subscriptionState: SUBSCRIPTION_STATE_PENDING
     });
   },
 

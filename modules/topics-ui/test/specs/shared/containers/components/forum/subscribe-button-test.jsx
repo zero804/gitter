@@ -3,7 +3,7 @@ import React from 'react';
 import { mount } from 'enzyme';
 import {spy} from 'sinon';
 import SubscribeButton from '../../../../../../shared/containers/components/forum/subscribe-button.jsx';
-import { SUBSCRIPTION_STATE } from '../../../../../../shared/constants/forum.js';
+import { SUBSCRIPTION_STATE_SUBSCRIBED, SUBSCRIPTION_STATE_UNSUBSCRIBED, SUBSCRIPTION_STATE_PENDING } from '../../../../../../shared/constants/forum.js';
 
 const FIXTURE_CLASS_NAME = 'some-button';
 const FIXTURE_ITEM_CLASS_NAME = 'some-test-item';
@@ -85,7 +85,7 @@ describe('<SubscribeButton/>', () => {
     };
 
     it('should show unfollow item when watching forum', () => {
-      subscriptionState = SUBSCRIPTION_STATE.SUBSCRIBED;
+      subscriptionState = SUBSCRIPTION_STATE_SUBSCRIBED;
       testChildHiddenState({
         subscribed: false,
         unsubscribed: true,
@@ -94,7 +94,7 @@ describe('<SubscribeButton/>', () => {
     });
 
     it('should show follow item when not watching forum', () => {
-      subscriptionState = SUBSCRIPTION_STATE.UNSUBSCRIBED;
+      subscriptionState = SUBSCRIPTION_STATE_UNSUBSCRIBED;
       testChildHiddenState({
         subscribed: true,
         unsubscribed: false,
@@ -103,7 +103,7 @@ describe('<SubscribeButton/>', () => {
     });
 
     it('should show pending item when sending out request', () => {
-      subscriptionState = SUBSCRIPTION_STATE.PENDING;
+      subscriptionState = SUBSCRIPTION_STATE_PENDING;
       testChildHiddenState({
         subscribed: true,
         unsubscribed: true,

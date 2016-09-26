@@ -1,11 +1,11 @@
 import Backbone from 'backbone';
 import {subscribe} from '../../../shared/dispatcher';
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
-import { UPDATE_FORUM_SUBSCRIPTION_STATE, REQUEST_UPDATE_FORUM_SUBSCRIPTION_STATE, SUBSCRIPTION_STATE } from '../../../shared/constants/forum.js';
+import { UPDATE_FORUM_SUBSCRIPTION_STATE, REQUEST_UPDATE_FORUM_SUBSCRIPTION_STATE, SUBSCRIPTION_STATE_UNSUBSCRIBED, SUBSCRIPTION_STATE_PENDING } from '../../../shared/constants/forum.js';
 
 const ForumStore = Backbone.Model.extend({
   defaults: {
-    subscriptionState: SUBSCRIPTION_STATE.UNSUBSCRIBED
+    subscriptionState: SUBSCRIPTION_STATE_UNSUBSCRIBED
   },
 
   events: [
@@ -20,7 +20,7 @@ const ForumStore = Backbone.Model.extend({
 
   onRequestSubscriptionStateUpdate() {
     this.set({
-      subscriptionState: SUBSCRIPTION_STATE.PENDING
+      subscriptionState: SUBSCRIPTION_STATE_PENDING
     });
   },
 

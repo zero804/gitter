@@ -172,7 +172,7 @@ export class TopicsStore {
   onRequestSubscriptionStateUpdate(data) {
     var {topicId} = data;
     this.collection.get(topicId).set({
-      subscriptionState: SUBSCRIPTION_STATE.PENDING
+      subscriptionState: SUBSCRIPTION_STATE_PENDING
     });
   }
 
