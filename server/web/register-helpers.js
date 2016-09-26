@@ -1,6 +1,6 @@
 'use strict';
 
-var hbsHelpers = require('./hbs-helpers');
+var hbsHelpers = require('gitter-web-templates/lib/hbs-helpers');
 var avatarImgSrcSetHbsHelper = require('gitter-web-avatars/shared/avatar-img-srcset-hbs-helper');
 
 module.exports = function(hbs) {
