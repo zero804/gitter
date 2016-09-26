@@ -41,6 +41,12 @@ export const RepliesStore = LiveCollection.extend({
     router.on('change:topicId', this.onActiveTopicUpdate, this);
   },
 
+  getById(id) {
+    const model = this.get(id);
+    if(!model) { return; }
+    return parseReply(model.toJSON());
+  },
+
   getReplies(){
     return this.models.map(model => {
       return parseReply(model.toJSON());

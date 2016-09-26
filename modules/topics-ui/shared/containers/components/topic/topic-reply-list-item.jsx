@@ -1,11 +1,6 @@
 import React, { PropTypes } from 'react';
-import {dispatch} from '../../../dispatcher';
-import UserAvatar from '../user/user-avatar.jsx';
 
 import SubscribeButton from '../forum/subscribe-button.jsx';
-import { SUBSCRIPTION_STATE_SUBSCRIBED } from '../../../constants/forum.js';
-import requestUpdateReplySubscriptionState from '../../../action-creators/forum/request-update-reply-subscription-state';
-
 import CommentEditor from './comment-editor.jsx';
 import CommentItem from './comment-item.jsx';
 import FeedItem from './feed-item.jsx';
@@ -33,7 +28,8 @@ export default React.createClass({
     onCommentsClicked: PropTypes.func.isRequired,
     onNewCommentUpdate: PropTypes.func.isRequired,
     submitNewComment: PropTypes.func.isRequired,
-    newCommentContent: PropTypes.string
+    newCommentContent: PropTypes.string,
+    onSubscribeButtonClick: PropTypes.func
   },
 
   render(){
@@ -108,20 +104,15 @@ export default React.createClass({
     );
   },
 
-
-  onSubscribeButtonClick() {
-    const {userId, forumId, topicId, reply} = this.props;
-    const replyId = reply.id;
-    const subscriptionState = reply.subscriptionState;
-
-    var desiredIsSubscribed = (subscriptionState !== SUBSCRIPTION_STATE_SUBSCRIBED);
-    dispatch(requestUpdateReplySubscriptionState(forumId, topicId, replyId, userId, desiredIsSubscribed));
-  },
-
   onCommentsClicked(e){
     e.preventDefault();
     const {reply} = this.props;
     this.props.onCommentsClicked(reply.id);
+  },
+
+  onSubscribeButtonClick(e) {
+    const {reply, onSubscribeButtonClick} = this.props;
+    onSubscribeButtonClick(e, reply.id);
   },
 
   onNewCommentUpdate(val) {
