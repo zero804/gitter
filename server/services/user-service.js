@@ -319,7 +319,16 @@ var userService = {
     setUnset('iana', timezoneInfo.iana);
 
     return persistence.User.update({ _id: userId }, update).exec();
-  }
+  },
+
+  hellbanUser: function(userId) {
+    return persistence.User.update({ _id: userId }, {
+        $set: {
+          hellbanned: true
+        }
+      })
+      .exec();
+  },
 
 };
 
