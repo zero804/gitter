@@ -43,7 +43,7 @@ export const RepliesStore = LiveCollection.extend({
 
   getReplies(){
     return this.models.map(model => {
-      return parseReply(model.toJSON())
+      return parseReply(model.toJSON());
     });
   },
 

@@ -6,6 +6,7 @@ import SimpleFilteredCollection from 'gitter-realtime-client/lib/simple-filtered
 import LiveCollection from './live-collection';
 import {BaseModel} from './base-model';
 
+import parseTopic from '../../../shared/parse/topic';
 import parseTag from '../../../shared/parse/tag';
 import {getRealtimeClient} from './realtime-client';
 import {getForumId } from './forum-store';
@@ -149,13 +150,15 @@ export class TopicsStore {
   }
 
   getTopics() {
-    return this.collection.toJSON();
+    return this.collection.map(model => {
+      return parseTopic(model.toJSON());
+    });
   }
 
   getById(id) {
     const model = this.collection.get(id);
     if(!model) { return; }
-    return model.toJSON();
+    return parseTopic(model.toJSON());
   }
 
   onRouterUpdate() {
