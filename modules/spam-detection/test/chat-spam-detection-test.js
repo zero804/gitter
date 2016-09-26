@@ -22,7 +22,7 @@ describe('chat-spam-detection', function() {
 
       return Promise.each(COUNTER, function(v, index) {
         return chatSpamDetection.detect(fixture.user1, {
-          text: 'This is spam.'
+          text: '0123456789012345678912'
         })
         .then(function(isSpammy) {
           var expected = index >= 10;
