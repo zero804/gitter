@@ -10,6 +10,7 @@ var ObjectID = require('mongodb').ObjectID;
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var mailerTemplate = require('gitter-web-mailer/lib/mailer-template');
+var fs = require('fs');
 
 describe('forum-notification-events', function() {
 
@@ -127,6 +128,11 @@ describe('forum-notification-events', function() {
             return mailerTemplate('topic_new_topic_notification_html', {
               notification: notification.data
             });
+          })
+          .then(function(html) {
+            if (process.env.WRITE_TEMPLATES) {
+              fs.writeFileSync(__dirname + '/topic.html', html);
+            }
           });
       });
     });
@@ -174,6 +180,11 @@ describe('forum-notification-events', function() {
             return mailerTemplate('topic_new_reply_notification_html', {
               notification: notification.data
             });
+          })
+          .then(function(html) {
+            if (process.env.WRITE_TEMPLATES) {
+              fs.writeFileSync(__dirname + '/reply.html', html);
+            }
           });
       });
     });
@@ -230,6 +241,11 @@ describe('forum-notification-events', function() {
             return mailerTemplate('topic_new_comment_notification_html', {
               notification: notification.data
             });
+          })
+          .then(function(html) {
+            if (process.env.WRITE_TEMPLATES) {
+              fs.writeFileSync(__dirname + '/comment.html', html);
+            }
           });
       });
     });
