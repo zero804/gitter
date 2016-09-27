@@ -155,7 +155,6 @@ const TopicContainer = createClass({
     });
     const tags = tagStore.getTagsByLabel(tagValues);
 
-    console.log('RENDER');
     return (
       <main>
         <SearchHeader groupName={groupName}/>
