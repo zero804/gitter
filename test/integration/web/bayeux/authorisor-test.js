@@ -41,6 +41,20 @@ describe('authorisor', function() {
           expectedError: true
         }]
       }, {
+        name: 'forum categories subscription',
+        meta: {
+          forumId: '57bd75d9a8aefa74c58d9d6c',
+          subscription: "/api/v1/forums/57bd75d9a8aefa74c58d9d6c/categories"
+        },
+        tests: [{
+          name: 'has access',
+          canAccessForum: true
+        },{
+          name: 'has no access',
+          canAccessForum: false,
+          expectedError: true
+        }]
+      }, {
         name: 'forum topics subscription',
         meta: {
           forumId: '57bd75d9a8aefa74c58d9d6c',

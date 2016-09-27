@@ -7,7 +7,9 @@ var StatusError = require('statuserror');
 var ForumCategory = require('gitter-web-persistence').ForumCategory;
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
+var liveCollections = require('gitter-web-live-collection-events');
 var validateCategory = require('./validate-category');
+
 
 
 function findById(categoryId) {
@@ -87,6 +89,8 @@ function createCategory(user, forum, categoryInfo) {
       name: category.name,
       slug: category.slug
     });
+
+    liveCollections.categories.emit('create', category);
 
     return category;
   });

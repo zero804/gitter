@@ -38,6 +38,10 @@ var routes = [{
     validator: validateUserForSubTroupeSubscription,
     populator: populateSubSubTroupeCollection
   }, {
+    re: /^\/api\/v1\/forums\/(\w+)\/categories/,
+    validator: validateUserForForumSubscription,
+    populator: populateCategoriesCollection
+  }, {
     re: /^\/api\/v1\/forums\/(\w+)\/topics$/,
     validator: validateUserForForumSubscription,
     populator: populateTopicsCollection
@@ -321,6 +325,19 @@ function populateUserUnreadItemsCollection(options) {
 
   return restful.serializeUnreadItemsForTroupe(troupeId, userId)
     .then(dataToSnapshot('user.room.unreadItems'));
+}
+
+function populateCategoriesCollection(options) {
+  var userId = options.userId;
+  var match = options.match;
+  var forumId = match[1];
+
+  if (!forumId) {
+    return Promise.resolve();
+  }
+
+  return restful.serializeCategoriesForForumId(forumId)
+    .then(dataToSnapshot('forum.categories'));
 }
 
 function populateTopicsCollection(options) {
