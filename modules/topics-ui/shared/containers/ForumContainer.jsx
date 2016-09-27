@@ -124,7 +124,7 @@ const ForumContainer = React.createClass({
 
   render() {
     const { categoryName, tags, filterName, tagName, sortName, createTopic, topics, newTopic } = this.state;
-    const { groupName, categoryStore, tagStore } = this.props;
+    const { groupName, currentUserStore, categoryStore, tagStore } = this.props;
 
     const isSignedIn = currentUserStore.getIsSignedIn();
 
