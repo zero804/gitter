@@ -2,7 +2,7 @@
 
 var persistence = require('gitter-web-persistence');
 var Promise = require('bluebird');
-var collections = require('../utils/collections');
+var collections = require('gitter-web-utils/lib/collections');
 var _ = require('underscore');
 var userService = require('./user-service');
 var roomMembershipService = require('./room-membership-service');
