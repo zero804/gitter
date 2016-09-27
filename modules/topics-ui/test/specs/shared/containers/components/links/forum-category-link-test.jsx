@@ -16,7 +16,7 @@ describe('<ForumCategoryLink/>', () => {
 
   beforeEach(() => {
     wrapper = shallow(
-      <ForumCategoryLink groupName="gitterHQ" category={category}>
+      <ForumCategoryLink groupUri="gitterHQ" category={category}>
       Some test text
       </ForumCategoryLink>
     );
@@ -37,7 +37,7 @@ describe('<ForumCategoryLink/>', () => {
   it('should generate a different link for the "all" category', () => {
     wrapper = shallow(
       <ForumCategoryLink
-      groupName="gitterHQ"
+      groupUri="gitterHQ"
       category={{category: DEFAULT_CATEGORY_NAME, slug: 'all'}}>
       test
       </ForumCategoryLink>

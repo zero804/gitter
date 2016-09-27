@@ -8,14 +8,14 @@ export default React.createClass({
   displayName: 'CommentEditor',
   propTypes: {
     value: PropTypes.string,
-    currentUser: PropTypes.object.isRequired,
+    user: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
     onEnter: PropTypes.func.isRequired,
     autoFocus: PropTypes.bool,
   },
 
   render(){
-    const {value, autoFocus, currentUser} = this.props;
+    const {value, autoFocus, user} = this.props;
     const formattedSentDate = moment().format('MMM Do');
     return (
       <section className="reply-comment-editor">
@@ -24,7 +24,7 @@ export default React.createClass({
             width={30}
             height={30}
             className="reply-comment-editor__avatar"
-            user={currentUser} />
+            user={user} />
           <span
             className="reply-comment-editor__sent">
             {formattedSentDate}
