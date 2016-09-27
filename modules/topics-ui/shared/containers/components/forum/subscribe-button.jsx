@@ -23,13 +23,18 @@ export default React.createClass({
     pendingText: PropTypes.string
   },
 
+  getDefaultProps() {
+    return {
+      subscribedText: 'Unsubsrcibe',
+      unsubscribedText: 'Subscribe',
+      pendingText: 'Pending'
+    };
+  },
+
   render() {
     const {children, className, itemClassName, subscriptionState} = this.props;
 
     let {subscribedText, unsubscribedText, pendingText} = this.props;
-    subscribedText = subscribedText || 'Unsubsrcibe';
-    unsubscribedText = unsubscribedText || 'Subscribe';
-    pendingText = pendingText || 'Pending';
 
     var compiledClassNames = className + ' ' + classNames({
       pending: subscriptionState === SUBSCRIPTION_STATE_PENDING
