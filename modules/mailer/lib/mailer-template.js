@@ -1,8 +1,13 @@
 "use strict";
 
+var env = require('gitter-web-env');
+var config = env.config;
 var fs = require('fs');
 var HandlebarsWrapper = require('gitter-web-templates/lib/handlebars-wrapper');
 var path = require('path');
+var _ = require('lodash');
+
+var emailBasePath = config.get('email:emailBasePath');
 
 var handlebarsWrapper = new HandlebarsWrapper();
 
@@ -27,7 +32,10 @@ function getCachedTemplate(templateName) {
 function mailerTemplate(templateName, data) {
   return getCachedTemplate(templateName)
     .then(function(template) {
-      return template(data);
+      return template(_.extend({ }, data, {
+        emailBasePath: emailBasePath,
+        // Other globals go here...
+      }));
     });
 }
 

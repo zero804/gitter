@@ -170,6 +170,8 @@ function simpleNotificationStream(options) {
       $project: {
         'user': 1,
         'forum._id': 1,
+        'forum.uri': 1,
+        'forum.name': 1,
         'topic': 1,
         'topicAuthorUser._id': 1,
         'topicAuthorUser.displayName': 1,
@@ -222,7 +224,7 @@ function generateTopicNotification(emailAddress, notification) {
     },
     data: {
       date: date,
-      notification: notification
+      notification: notification.data
     }
   });
 }
@@ -244,7 +246,7 @@ function generateReplyNotification(emailAddress, notification) {
     },
     data: {
       date: date,
-      notification: notification
+      notification: notification.data
     }
   });
 }
@@ -266,7 +268,7 @@ function generateCommentNotification(emailAddress, notification) {
     },
     data: {
       date: date,
-      notification: notification
+      notification: notification.data
     }
   });
 }
@@ -274,17 +276,17 @@ function generateCommentNotification(emailAddress, notification) {
 function generateEmailForNotification(notification) {
   return Promise.join(
       notificationService.markNotificationAsEmailSent(notification._id),
-      resolveEmailAddress(notification.user),
+      resolveEmailAddress(notification.recipient),
       function(obtainedLocked, emailAddress) {
 
         // Another process has already sent this email
         if (!obtainedLocked) return;
 
-        if (notification.commentId) {
+        if (notification.comment) {
           return generateCommentNotification(emailAddress, notification);
         }
 
-        if (notification.replyId) {
+        if (notification.reply) {
           return generateReplyNotification(emailAddress, notification);
         }
 

@@ -85,7 +85,7 @@ describe('forum-notification-events', function() {
               assert.strictEqual(String(notification.recipient._id), String(userId));
 
               // Check that the forum matches
-              assert.strictEqual(String(notification.data.forum._id), String(forumId));
+              assert.strictEqual(notification.data.forum.id, String(forumId));
             });
 
           });
