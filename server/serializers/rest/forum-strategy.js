@@ -5,6 +5,8 @@ var CategoriesForForumStrategy = require('./topics/categories-for-forum-strategy
 var TopicsForForumStrategy = require('./topics/topics-for-forum-strategy');
 var topicService = require('gitter-web-topics/lib/topic-service');
 var ForumSubscriptionStrategy = require('./topics/forum-subscription-strategy');
+var ForumPermissionsStrategy = require('./topics/forum-permissions-strategy');
+
 
 function getId(obj) {
   return obj._id || obj.id;
@@ -25,11 +27,11 @@ ForumStrategy.prototype = {
     // in the schema. Also: it is not a strategy.
     promises.push(this.loadTopicsTotals(forumIds))
     promises.push(this.categoriesForForumStrategy.preload(forumIds));
-    promises.push(this.topicsForForumStrategy.preload(forumIds));
-
-    if (this.subscriptionStrategy) {
-      promises.push(this.subscriptionStrategy.preload(forums));
+    if (this.topicsForForumStrategy) {
+      promises.push(this.topicsForForumStrategy.preload(forumIds));
     }
+    promises.push(this.subscriptionStrategy.preload(forums));
+    promises.push(this.permissionsStrategy.preload(forums));
 
     return Promise.all(promises);
   },
@@ -54,9 +56,10 @@ ForumStrategy.prototype = {
       id: id,
       tags: forum.tags,
       categories: this.categoriesForForumStrategy.map(id),
-      topics: this.topicsForForumStrategy.map(id),
-      subscribed: this.subscriptionStrategy ? this.subscriptionStrategy.map(forum) : undefined,
-      topicsTotal: topicsTotal // TODO: drop this?
+      topics: this.topicsForForumStrategy ? this.topicsForForumStrategy.map(id) : undefined,
+      subscribed: this.subscriptionStrategy.map(forum),
+      topicsTotal: topicsTotal, // TODO: drop this?
+      permissions: this.permissionsStrategy.map(forum)
     };
   },
 
@@ -68,12 +71,28 @@ ForumStrategy.prototype = {
  */
 ForumStrategy.standard = function(options) {
   var strategy = new ForumStrategy();
-  var currentUserId = options && options.currentUserId;
+  var currentUser;
+  var currentUserId;
+  if (options) {
+    if (options.currentUser) {
+      currentUser = options.currentUser;
+      currentUserId = currentUser._id;
+    }
+    if (options.currentUserId) {
+      currentUserId = options.currentUserId;
+    }
+  }
 
   strategy.subscriptionStrategy = new ForumSubscriptionStrategy({
     currentUserId: currentUserId
   });
+
   strategy.categoriesForForumStrategy = new CategoriesForForumStrategy();
+
+  strategy.permissionsStrategy = new ForumPermissionsStrategy({
+    currentUser: currentUser,
+    currentUserId: currentUserId
+  });
 
   return strategy;
 }
