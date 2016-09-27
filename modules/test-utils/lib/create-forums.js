@@ -3,7 +3,7 @@
 var Promise = require('bluebird');
 var Forum = require('gitter-web-persistence').Forum;
 var debug = require('debug')('gitter:tests:test-fixtures');
-
+var fixtureUtils = require('./fixture-utils');
 
 
 function createForum(fixtureName, f) {
@@ -30,7 +30,12 @@ function createForum(fixtureName, f) {
     extraAdmins: securityDescriptor.extraAdmins
   };
 
+  var uri = f.uri || (fixtureUtils.generateUri() + '/topics');
+
   var doc = {
+    name: f.name || fixtureUtils.generateName(),
+    uri: uri,
+    lcUri: uri.toLowerCase(),
     tags: f.tags,
     sd: securityDoc
   };
