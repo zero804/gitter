@@ -23,11 +23,12 @@ export default React.createClass({
       SUBSCRIPTION_STATE_SUBSCRIBED,
       SUBSCRIPTION_STATE_UNSUBSCRIBED,
       SUBSCRIPTION_STATE_PENDING
-    ]).isRequired
+    ]).isRequired,
+    onSubscribeButtonClick: PropTypes.func.isRequired
   },
 
   render(){
-    const {groupName, subscriptionState} = this.props;
+    const {groupName, subscriptionState, onSubscribeButtonClick} = this.props;
 
     return (
       <Container>
@@ -53,7 +54,7 @@ export default React.createClass({
             subscribedText="Unfollow"
             unsubscribedText="Follow"
             pendingText="..."
-            onClick={this.onSubscribeButtonClick}/>
+            onClick={onSubscribeButtonClick}/>
           <CreateTopicLink
             groupName={groupName}
             className="topic-search__create-topic-link">
@@ -67,12 +68,5 @@ export default React.createClass({
   onSearchUpdate(){
 
   },
-
-  onSubscribeButtonClick() {
-    const {userId, forumId, subscriptionState} = this.props;
-
-    var desiredIsSubscribed = (subscriptionState !== SUBSCRIPTION_STATE_SUBSCRIBED);
-    dispatch(requestUpdateForumSubscriptionState(forumId, userId, desiredIsSubscribed));
-  }
 
 });
