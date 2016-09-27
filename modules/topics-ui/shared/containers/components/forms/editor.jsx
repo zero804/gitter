@@ -11,6 +11,7 @@ export default React.createClass({
     children: PropTypes.node,
     onChange: PropTypes.func.isRequired,
     onEnter: PropTypes.func,
+    onClick: PropTypes.func,
     value: PropTypes.string,
     placeholder: PropTypes.string,
     autoFocus: PropTypes.bool,
@@ -34,6 +35,7 @@ export default React.createClass({
         value={value}
         onChange={this.onChange}
         placeholder={placeholder}
+        onClick={this.onClick}
         onKeyDown={this.onKeyPressed}>
         { this.props.children }
       </textarea>
@@ -43,6 +45,13 @@ export default React.createClass({
   onChange(e){
     e.preventDefault();
     this.props.onChange(e.target.value);
+  },
+
+  onClick() {
+    const { onClick } = this.props;
+    if(onClick) {
+      onClick(...arguments);
+    }
   },
 
   onKeyPressed(e) {

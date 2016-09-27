@@ -6,12 +6,15 @@ import H1 from '../text/h-1.jsx';
 import Input from '../forms/input.jsx';
 import CreateTopicLink from '../links/create-topic-link.jsx';
 import {DEFAULT_CATEGORY_NAME} from '../../../constants/navigation';
+import requestSignIn from '../../../action-creators/forum/request-sign-in';
+
+const CREATE_TOPIC_LINK_SOURCE = 'topics-header-create-topic-link';
 
 export default React.createClass({
 
   displayName: 'SearchHeader',
   propTypes: {
-    groupName: PropTypes.string.isRequired,
+    groupName: PropTypes.string.isRequired
   },
 
   render(){
@@ -34,7 +37,9 @@ export default React.createClass({
             placeholder="Search for topics, replies and comments"
             onChange={this.onSearchUpdate}
             className="topic-search__search-input"/>
-          <CreateTopicLink groupName={groupName} className="topic-search__create-topic-link">
+          <CreateTopicLink
+            groupName={groupName}
+            className="topic-search__create-topic-link">
             Create Topic
           </CreateTopicLink>
         </Panel>
@@ -44,6 +49,6 @@ export default React.createClass({
 
   onSearchUpdate(){
 
-  }
+  },
 
 });

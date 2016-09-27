@@ -5,7 +5,7 @@ var appEvents = require('./utils/appevents');
 var onready = require('./utils/onready');
 var toggleClass = require('./utils/toggle-class');
 var ExploreView = require('./views/explore/explore-view');
-var frameUtils = require('./utils/frame-utils');
+var frameUtils = require('gitter-web-frame-utils');
 require('./utils/tracking');
 
 require('gitter-styleguide/css/components/buttons.css');

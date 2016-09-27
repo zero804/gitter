@@ -1,0 +1,15 @@
+{
+  "name": "gitter-web-frame-utils",
+  "version": "0.1.0",
+  "description": "",
+  "private": true,
+  "main": "frame-utils.js",
+  "browser": "frame-utils-browser.js",
+  "dependencies": {
+    "debug-proxy": "^0.2.0",
+    "gitter-client-env": "file:../client-env"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
