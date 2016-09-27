@@ -7,6 +7,9 @@ import * as forumFilterConstants from '../../../shared/constants/forum-filters';
 import * as forumTagConstants from '../../../shared/constants/forum-tags';
 import * as forumSortConstants from '../../../shared/constants/forum-sorts';
 import * as createTopicConstants from '../../../shared/constants/create-topic';
+import {getIsSignedIn} from '../stores/current-user-store';
+import requestSignIn from '../../../shared/action-creators/forum/request-sign-in';
+
 
 var RouteModel = Backbone.Model.extend({
   //Do we need to use the constructor to get the default values out of the window.context
@@ -90,9 +93,18 @@ var Router = Backbone.Router.extend({
     });
   },
 
-  navigateToCreateTopic(){
-    const groupName = this.model.get('groupName');
-    this.navigate(`/${groupName}/topics/create-topic/~topics`, { trigger: true });
+  navigateToCreateTopic(data) {
+    const { source } = data;
+
+    if(getIsSignedIn()) {
+        const groupName = this.model.get('groupName');
+        this.navigate(`/${groupName}/topics/create-topic/~topics`, { trigger: true });
+    }
+    else {
+      requestSignIn(source);
+      return;
+    }
+
   },
 
   updateForumCategory(data){

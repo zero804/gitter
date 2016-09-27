@@ -9,7 +9,7 @@
 var clientEnv = require('gitter-client-env');
 var currentVersion = clientEnv['version'];
 var debug = require('debug-proxy')('app:reload-on-update');
-var frameUtils = require('../utils/frame-utils');
+var frameUtils = require('gitter-web-frame-utils');
 var ConditionalDebouncer = require('../utils/conditional-debouncer');
 var eyeballsDetector = require('./eyeballs-detector');
 
