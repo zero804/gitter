@@ -471,4 +471,10 @@ onready(function() { // eslint-disable-line max-statements
     });
   }
 
+
+  setTimeout(function() {
+    var fingerprint = require('./components/fingerprint');
+    fingerprint();
+  }, 5000);
+
 });

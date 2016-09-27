@@ -1,0 +1,34 @@
+@import "../../colors";
+
+.reply-comment-editor {
+  display: flex;
+  width: 100%;
+  margin-bottom: 4rem;
+}
+
+.reply-comment-editor__avatar {
+  border-radius: .2rem;
+  margin-bottom: .3rem;
+}
+
+.reply-comment-editor__editor {
+  width: 100%;
+  background-color: @topic-reply-body-color;
+}
+
+.reply-comment-editor__details {
+  display: flex;
+  flex-direction: column;
+  width: 5rem;
+  margin-top: .5rem;
+}
+
+//TODO stolen from feed-item__sent
+//need to cenralise this into a component
+.reply-comment-editor__sent {
+  font-size: 1.5rem;
+  color: @dark;
+  text-transform: uppercase;
+  font-family: @font-family;
+  color: @topic-reply-sent-details-color;
+}
