@@ -2,7 +2,6 @@
 'use strict';
 
 var yargs = require('yargs');
-var faker = require('faker');
 var StatusError = require('statuserror');
 var utils = require('./fixture-script-utils');
 var categoryService = require('gitter-web-topics/lib/forum-category-service');
@@ -22,12 +21,12 @@ var opts = yargs
     description: 'category slug of the category you want to post to'
   })
   .option('title', {
-    required: false,
-    description: 'topic title (optional)'
+    required: true,
+    description: 'topic title'
   })
   .option('text', {
-    required: false,
-    description: 'topic text (optional)'
+    required: true,
+    description: 'topic text'
   })
   .help('help')
   .alias('help', 'h')
@@ -44,8 +43,8 @@ utils.runScript(function() {
 
       var forumWithPolicyService = this.forumWithPolicyService;
       return forumWithPolicyService.createTopic(category, {
-        title: opts.title || faker.commerce.productName(),
-        text: opts.text || faker.hacker.phrase(),
+        title: opts.title,
+        text: opts.text,
         // TODO: slug
         // TODO: tags
         // TODO: sticky
