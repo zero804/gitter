@@ -1,5 +1,42 @@
-New Topic!!
+<table class="row">
+  <tr>
+    <td class="wrapper last">
+      <table class="twelve columns">
+        <tr>
+          <td>
+            <h2>Hey, there's a new topic in {{ forum.name }}</h2>
+            <table>
+              <tr>
+                <td class="avatar"><img {{{ avatarSrcSet topicAuthorUser.avatarUrl 24 }}} class="avatar"></td>
+                <td class="chat"><strong>{{ topicAuthorUser.username }}</strong></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>{{ topic.title }}</td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>{{ topic.html }}</td>
+              </tr>
+            </table>
+            <br>
+            <table>
+              <tr>
+                <td class="avatar">
+                  <a href="{{../emailBasePath}}{{troupe.url}}#utm_source=notification&utm_medium=email&utm_campaign=unread-notifications" style="text-decoration: none" class="button-green">Open topic</a>
+                </td>
+                {{!--<td class="chat">
+                  <a href=" { { ../../emailBasePath } }{ { troupe.url } }#notifications">Notification settings</a>&nbsp;
+                </td>--}}
+              </tr>
+            </table>
+            <br>
+            <hr>
+            <br>
+          </td>
+          <td class="expander"></td>
+        </tr>
+      </table>
 
-From: {{ notification.topicAuthor.username }}
-Title: {{ notification.topic.title }}
-Text: {{ notification.topic.text }}
+  </tr>
+</table>
