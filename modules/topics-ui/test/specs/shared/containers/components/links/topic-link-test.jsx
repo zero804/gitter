@@ -16,7 +16,7 @@ describe('<TopicLink/>', () => {
   beforeEach(() => {
     wrapper = shallow(
       <TopicLink
-          groupName='gitterHQ'
+          groupUri='gitterHQ'
           topic={topic}>
         Some content
       </TopicLink>

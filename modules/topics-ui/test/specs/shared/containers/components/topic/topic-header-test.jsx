@@ -17,7 +17,7 @@ describe('<TopicHeader/>', () => {
         tags={topic.tags}
         topic={topic}
         category={category}
-        groupName="gitterHQ"/>
+        groupUri="gitterHQ"/>
     );
   });
 

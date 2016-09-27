@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 import Container from '../container.jsx';
 import Panel from '../panel.jsx';
+import WatchButton from '../forum/watch-button.jsx';
 
 export default React.createClass({
 
@@ -10,12 +11,14 @@ export default React.createClass({
       body: PropTypes.shape({
         html: PropTypes.string
       }).isRequired,
-    }).isRequired
+    }).isRequired,
+    onSubscribeButtonClick: PropTypes.func
   },
 
-  render(){
+  render() {
 
-    const { topic } = this.props;
+    const { topic, onSubscribeButtonClick } = this.props;
+    const subscriptionState = topic.subscriptionState;
 
     return (
       <Container className="container--topic-body">
@@ -26,11 +29,16 @@ export default React.createClass({
           </section>
           <footer className="topic-body__footer">
             <button className="topic-body__footer__action">Share</button>
-            <button className="topic-body__footer__action">Watch</button>
+            <WatchButton
+              subscriptionState={subscriptionState}
+              className="topic-body__footer__subscribe-action"
+              itemClassName="topic-body__footer__subscribe-action-text-item"
+              onClick={onSubscribeButtonClick}/>
           </footer>
         </Panel>
       </Container>
     );
-  }
+  },
+
 
 });

@@ -8,7 +8,7 @@ export default React.createClass({
   displayName: 'CategoryList',
   propTypes: {
     categories: React.PropTypes.array.isRequired,
-    groupName: React.PropTypes.string.isRequired
+    groupUri: React.PropTypes.string.isRequired
   },
 
   render(){
@@ -27,12 +27,12 @@ export default React.createClass({
   },
 
   getChildCategory(category, index){
-    const { groupName } = this.props;
+    const { groupUri } = this.props;
     return (
       <li key={`forum-category-list-item-${index}`}>
         <CategoryListItem
           category={category}
-          groupName={groupName}/>
+          groupUri={groupUri}/>
       </li>
     );
   }
