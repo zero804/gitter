@@ -14,8 +14,7 @@ export default React.createClass({
 
   displayName: 'SearchHeader',
   propTypes: {
-    groupName: PropTypes.string.isRequired,
-    isSignedIn: PropTypes.bool
+    groupName: PropTypes.string.isRequired
   },
 
   render(){
@@ -51,10 +50,5 @@ export default React.createClass({
   onSearchUpdate(){
 
   },
-
-  onCreateTopicSignInLinkClick(e) {
-    //requestSignIn(CREATE_TOPIC_LINK_SOURCE);
-    e.preventDefault();
-  }
 
 });
