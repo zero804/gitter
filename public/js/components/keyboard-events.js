@@ -7,6 +7,41 @@ var key = require('keymaster');
 
 module.exports = (function() {
 
+  function getScope(element) {
+    if (element.id === 'chat-input-textarea') {
+      return 'input.chat';
+    }
+
+    if (element.id === 'list-search-input' || element.classList.contains('js-search-input')) {
+      return 'input.search';
+    }
+
+    if (/^trpChatInput/.test(element.className)) {
+      return 'input.chat.edit';
+    }
+
+    if (/^(INPUT|TEXTAREA|SELECT)$/.test(element.tagName)) {
+      return 'input.other';
+    }
+
+    if (element.classList.contains('js-room-topic-edit-activator')) {
+      return 'button.room-topic-edit';
+    }
+
+    if (element.classList.contains('js-profile-menu-toggle')) {
+      return 'button.profile-menu';
+    }
+
+    if(element.classList.contains('room-menu-options__item-button')) {
+      return 'minibar.item';
+    }
+
+    if(element.classList.contains('room-item__container') || element.classList.contains('js-left-menu-forum-category-item-link')) {
+      return 'room-list.item';
+    }
+
+    return 'other';
+  }
 
   // Attach keyboard events listeners as specified by the keymaster library
   // They will we emitted to appEvents with the `keyboard.` prefix
@@ -21,39 +56,13 @@ module.exports = (function() {
   // - 'input.other' for other inputs (including textarea and select)
   // - 'other' for the rest
   key.filter = function (event) {
-    var scope, tag = event.target || event.srcElement;
+    var tag = event.target || event.srcElement;
 
     if (tag.getAttribute('data-prevent-keys') === 'on') {
       return false; // Prevent triggering
     }
-    if (tag.id === 'chat-input-textarea') {
-      scope = 'input.chat';
-    }
-    else if (tag.id === 'list-search-input' || tag.classList.contains('js-search-input')) {
-      scope = 'input.search';
-    }
-    else if (/^trpChatInput/.test(tag.className)) {
-      scope = 'input.chat.edit';
-    }
-    else if (/^(INPUT|TEXTAREA|SELECT)$/.test(tag.tagName)) {
-      scope = 'input.other';
-    }
-    else if (tag.classList.contains('js-room-topic-edit-activator')) {
-      scope = 'button.room-topic-edit';
-    }
-    else if (tag.classList.contains('js-profile-menu-toggle')) {
-      scope = 'button.profile-menu';
-    }
-    else if(tag.classList.contains('room-menu-options__item-button')) {
-      scope = 'minibar.item';
-    }
-    else if(tag.classList.contains('room-item__container') || tag.classList.contains('js-left-menu-forum-category-item-link')) {
-      scope = 'room-list.item';
-    }
-    else {
-      scope = 'other';
-    }
 
+    var scope = getScope(tag);
     key.setScope(scope);
     return true;
   };

@@ -18,41 +18,43 @@ var generateMainFrameSnapshots = require('../../handlers/snapshots/main-frame');
 var fonts = require('../../web/fonts');
 
 function getLeftMenuForumGroupInfo(leftMenuGroupId) {
-  return Promise.resolve(leftMenuGroupId && groupService.findById(leftMenuGroupId))
-    .then(function(leftMenuForumGroup) {
-      return Promise.all([
-        leftMenuForumGroup,
-        leftMenuForumGroup && forumCategoryService.findByForumId(leftMenuForumGroup.forumId),
-      ]);
+  return groupService.findById(leftMenuGroupId)
+    .then(function(group) {
+      var forumId = group && group.forumId;
+
+      return Promise.props({
+        group: group,
+        forumCategories: forumId && forumCategoryService.findByForumId(forumId)
+      });
     });
 }
 
 function getTroupeContextAndDerivedInfo(req, socialMetadataGenerator) {
   return contextGenerator.generateNonChatContext(req)
-    .then(function(troupeContext) {
-      var lastLeftMenuSnapshot = (troupeContext.leftRoomMenuState || {});
-      var leftMenuGroupId = (lastLeftMenuSnapshot.groupId || '');
-
-      return Promise.all([
-          troupeContext,
-          socialMetadataGenerator && socialMetadataGenerator(troupeContext),
-          getLeftMenuForumGroupInfo(leftMenuGroupId),
-        ]);
+    .bind({
+      troupeContext: null,
+      socialMetadata: null,
+      leftMenuGroup: null,
+      leftMenuGroupForumCategories: null
     })
-    .spread(function(troupeContext, socialMetadata, leftMenuForumGroupInfo) {
-      var leftMenuForumGroup = leftMenuForumGroupInfo ? leftMenuForumGroupInfo[0] : null;
-      var leftMenuForumGroupCategories = leftMenuForumGroupInfo ? leftMenuForumGroupInfo[1] : null;
+    .then(function(troupeContext) {
+      this.troupeContext = troupeContext;
 
-      return Promise.all([
-        troupeContext,
-        socialMetadata,
-        leftMenuForumGroup,
-        leftMenuForumGroupCategories
-      ]);
+      var leftMenuGroupId = troupeContext.leftRoomMenuState && troupeContext.leftRoomMenuState.groupId;
+
+      return [
+        socialMetadataGenerator && socialMetadataGenerator(troupeContext),
+        leftMenuGroupId && getLeftMenuForumGroupInfo(leftMenuGroupId),
+      ];
+    })
+    .spread(function(socialMetadata, leftMenuGroupInfo) {
+      this.socialMetadata = socialMetadata;
+      this.leftMenuGroup = leftMenuGroupInfo && leftMenuGroupInfo.group;
+      this.leftMenuGroupForumCategories = leftMenuGroupInfo && leftMenuGroupInfo.forumCategories;
+
+      return this;
     });
 }
-
-
 
 function renderMainFrame(req, res, next, options) {
   var user = req.user;
@@ -71,10 +73,10 @@ function renderMainFrame(req, res, next, options) {
       restful.serializeGroupsForUserId(userId),
     ])
     .spread(function(troupeContextAndDerivedInfo, rooms, orgs, groups) {
-      var troupeContext = troupeContextAndDerivedInfo[0];
-      var socialMetadata = troupeContextAndDerivedInfo[1];
-      var leftMenuForumGroup = troupeContextAndDerivedInfo[2];
-      var leftMenuForumGroupCategories = troupeContextAndDerivedInfo[3];
+      var troupeContext = troupeContextAndDerivedInfo.troupeContext;
+      var socialMetadata = troupeContextAndDerivedInfo.socialMetadata;
+      var leftMenuForumGroup = troupeContextAndDerivedInfo.leftMenuGroup;
+      var leftMenuForumGroupCategories = troupeContextAndDerivedInfo.leftMenuGroupForumCategories;
       var chatAppLocation = options.subFrameLocation;
 
       var template, bootScriptName;
@@ -87,13 +89,11 @@ function renderMainFrame(req, res, next, options) {
         bootScriptName = 'router-nli-app';
       }
 
-      var extras = {
+      var snapshots = troupeContext.snapshots = generateMainFrameSnapshots(req, troupeContext, rooms, groups, {
         suggestedMenuState: options.suggestedMenuState,
         leftMenuForumGroup: leftMenuForumGroup,
         leftMenuForumGroupCategories: leftMenuForumGroupCategories
-      };
-
-      var snapshots = troupeContext.snapshots = generateMainFrameSnapshots(req, troupeContext, rooms, groups, extras);
+      });
 
       if(snapshots && snapshots.leftMenu && snapshots.leftMenu.state) {
         // `gitter.web.prerender-left-menu`
