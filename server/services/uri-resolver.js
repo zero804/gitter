@@ -33,7 +33,7 @@ function resolveFromLookup(uriLookup, userId) {
   if(uriLookup.troupeId) {
     /* The uri is for a room */
     return Promise.all([
-        groupService.findById(uriLookup.groupId),
+        uriLookup.groupId && groupService.findById(uriLookup.groupId),
         troupeService.findByIdLeanWithMembership(uriLookup.troupeId, userId)
       ])
       .spread(function(group, troupeAndRoomMember) {

@@ -78,7 +78,7 @@ describe('room-context-service', function() {
     .then(function(/*roomContext*/) {
     })
     .catch(function(err) {
-      assert(err.status === 404);
+      assert.strictEqual(err.status, 404);
     })
     .nodeify(done);
   });
@@ -97,8 +97,8 @@ describe('room-context-service', function() {
     .then(function(/*roomContext*/) {
       assert.ok(false);
     }, function(err) {
-      assert(err.status === 301);
-      assert(err.path === '/home/explore');
+      assert.strictEqual(err.status, 301);
+      assert.strictEqual(err.path, '/home/explore');
     })
   });
 
@@ -107,7 +107,7 @@ describe('room-context-service', function() {
     .then(function(/*roomContext*/) {
       assert.ok(false);
     }, function(err) {
-      assert(err.status === 401);
+      assert.strictEqual(err.status, 401);
     });
   });
 
