@@ -9,10 +9,10 @@ var webPathBase = config.get('web:basepath');
 
 function stagingCallbackUrlBuilder(service) {
   //  http://nginx-router.service.beta.gitter/callback/github/2196-who-watches-the-watchers
-  if (typeof(service) === 'undefined') {
-    return oauthRedirectorBasePath + '/callback/' + stagingBranchName;
-  } else {
+  if (service) {
     return oauthRedirectorBasePath + '/callback/' + service + '/' + stagingBranchName;
+  } else {
+    return oauthRedirectorBasePath + '/callback/' + stagingBranchName;
   }
 }
 
