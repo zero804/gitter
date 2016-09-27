@@ -72,8 +72,6 @@ describe('<SearchHeader/>', () => {
       });
 
       wrapper = shallow(<SearchHeaderWithMockedThings
-        forumId={FIXTURE_FORUM_ID}
-        userId={FIXTURE_USER_ID}
         subscriptionState={SUBSCRIPTION_STATE_UNSUBSCRIBED}/>
       );
     });
@@ -84,7 +82,7 @@ describe('<SearchHeader/>', () => {
       equal(requestUpdateForumSubscriptionStateSpy.callCount, 1);
       var args = requestUpdateForumSubscriptionStateSpy.getCall(0).args;
       equal(args.length, 3);
-      deepEqual(args, [FIXTURE_FORUM_ID, FIXTURE_USER_ID, true]);
+      deepEqual(args, [FIXTURE_FORUM_ID, true]);
     });
   });
 

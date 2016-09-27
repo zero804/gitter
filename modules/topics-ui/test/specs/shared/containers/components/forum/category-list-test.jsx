@@ -11,7 +11,7 @@ describe('<CategoryList />', function(){
   let clickHandle;
   beforeEach(function(){
     clickHandle = sinon.spy();
-    wrapper = shallow(<CategoryList onCategoryClicked={clickHandle} categories={categories} groupName="gitterHQ" />);
+    wrapper = shallow(<CategoryList onCategoryClicked={clickHandle} categories={categories} groupUri="gitterHQ" />);
   });
 
   it('should render a single container', function(){

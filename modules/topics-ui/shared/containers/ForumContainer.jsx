@@ -30,7 +30,7 @@ const ForumContainer = React.createClass({
 
   propTypes: {
     //Route parameters ---
-    groupName: PropTypes.string.isRequired,
+    groupUri: PropTypes.string.isRequired,
     categoryName: PropTypes.string.isRequired,
     filterName: PropTypes.string,
     tagName: PropTypes.string,
@@ -135,7 +135,7 @@ const ForumContainer = React.createClass({
 
   render() {
     const { forumId, forumSubscriptionState, categoryName, tags, filterName, tagName, sortName, createTopic, topics, newTopic } = this.state;
-    const { currentUserStore, groupName, categoryStore, tagStore } = this.props;
+    const { currentUserStore, groupUri, categoryStore, tagStore } = this.props;
 
     const currentUser = currentUserStore.getCurrentUser();
     const categories = categoryStore.getCategories();
@@ -147,14 +147,14 @@ const ForumContainer = React.createClass({
         <SearchHeaderContainer
           userId={currentUser.id}
           forumId={forumId}
-          groupName={groupName}
+          groupUri={groupUri}
           subscriptionState={forumSubscriptionState}/>
         <CategoryList
-          groupName={ groupName }
+          groupUri={ groupUri }
           categories={ categories }/>
 
         <ForumTableControl
-          groupName={groupName}
+          groupUri={groupUri}
           categoryName={categoryName}
           filterName={filterName}
           tagName={tagName}
@@ -164,7 +164,7 @@ const ForumContainer = React.createClass({
           sortChange={this.onSortChange}
           tagChange={this.onTagsChange}/>
 
-        <TopicsTable topics={topics} groupName={groupName}/>
+        <TopicsTable topics={topics} groupUri={groupUri}/>
 
         <CreateTopicModal
           active={createTopic}
@@ -208,8 +208,8 @@ const ForumContainer = React.createClass({
   },
 
   onTopicCreated(data){
-    const {groupName} = this.props;
-    dispatch(navigateToTopic(groupName, data.topicId, data.slug));
+    const {groupUri} = this.props;
+    dispatch(navigateToTopic(groupUri, data.topicId, data.slug));
   },
 
   onForumUpdate() {

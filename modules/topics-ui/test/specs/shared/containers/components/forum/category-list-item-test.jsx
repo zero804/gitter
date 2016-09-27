@@ -9,7 +9,7 @@ describe('<CategoryListItem />', function(){
   let wrapper;
   let clickHandle = sinon.spy();
   beforeEach(function(){
-    wrapper = shallow(<CategoryListItem category="test" active={false} onClick={clickHandle} groupName='gitterHQ' />);
+    wrapper = shallow(<CategoryListItem category="test" active={false} onClick={clickHandle} groupUri='gitterHQ' />);
   });
 
   it('should render the correct class', function(){

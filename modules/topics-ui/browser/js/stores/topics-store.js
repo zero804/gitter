@@ -168,8 +168,7 @@ export class TopicsStore {
     this.collection.sort();
   }
 
-  onRequestSubscriptionStateUpdate(data) {
-    var {topicId} = data;
+  onRequestSubscriptionStateUpdate({topicId}) {
     var topic = this.collection.get(topicId);
     if(!topic) { return; }
 

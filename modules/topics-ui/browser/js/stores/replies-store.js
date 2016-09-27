@@ -68,8 +68,7 @@ export const RepliesStore = LiveCollection.extend({
     this.reset([]);
   },
 
-  onRequestSubscriptionStateUpdate(data) {
-    var {replyId} = data;
+  onRequestSubscriptionStateUpdate({replyId}) {
     var reply = this.get(replyId);
     if(!reply) { return; }
 

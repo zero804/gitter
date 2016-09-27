@@ -10,9 +10,7 @@ export default React.createClass({
 
   displayName: 'SearchHeaderContainer',
   propTypes: {
-    userId: PropTypes.string.isRequired,
-    forumId: PropTypes.string.isRequired,
-    groupName: PropTypes.string.isRequired,
+    groupUri: PropTypes.string.isRequired,
     subscriptionState: PropTypes.oneOf([
       SUBSCRIPTION_STATE_SUBSCRIBED,
       SUBSCRIPTION_STATE_UNSUBSCRIBED,
@@ -21,14 +19,12 @@ export default React.createClass({
   },
 
   render(){
-    const { userId, forumId, groupName, subscriptionState } = this.props;
+    const {groupUri, subscriptionState } = this.props;
 
     return (
       <Container>
         <SearchHeader
-          userId={userId}
-          forumId={forumId}
-          groupName={groupName}
+          groupUri={groupUri}
           subscriptionState={subscriptionState}
           onSubscribeButtonClick={this.onSubscribeButtonClick}/>
       </Container>
@@ -37,10 +33,10 @@ export default React.createClass({
 
 
   onSubscribeButtonClick() {
-    const {userId, forumId, subscriptionState} = this.props;
+    const {subscriptionState} = this.props;
 
-    var desiredIsSubscribed = (subscriptionState !== SUBSCRIPTION_STATE_SUBSCRIBED);
-    dispatch(requestUpdateForumSubscriptionState(forumId, userId, desiredIsSubscribed));
+    const desiredIsSubscribed = (subscriptionState !== SUBSCRIPTION_STATE_SUBSCRIBED);
+    dispatch(requestUpdateForumSubscriptionState(desiredIsSubscribed));
   }
 
 });

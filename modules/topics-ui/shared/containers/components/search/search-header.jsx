@@ -16,9 +16,7 @@ export default React.createClass({
 
   displayName: 'SearchHeader',
   propTypes: {
-    userId: PropTypes.string.isRequired,
-    forumId: PropTypes.string.isRequired,
-    groupName: PropTypes.string.isRequired,
+    groupUri: PropTypes.string.isRequired,
     subscriptionState: PropTypes.oneOf([
       SUBSCRIPTION_STATE_SUBSCRIBED,
       SUBSCRIPTION_STATE_UNSUBSCRIBED,
@@ -28,7 +26,7 @@ export default React.createClass({
   },
 
   render(){
-    const {groupName, subscriptionState, onSubscribeButtonClick} = this.props;
+    const {groupUri, subscriptionState, onSubscribeButtonClick} = this.props;
 
     return (
       <Container>
@@ -36,7 +34,7 @@ export default React.createClass({
           <H1>
             <ForumCategoryLink
               className="topic-search__all-topics-link"
-              groupName={groupName}
+              groupUri={groupUri}
               category={{ category: 'All', slug: DEFAULT_CATEGORY_NAME}}>
                 Topics
             </ForumCategoryLink>
@@ -56,7 +54,7 @@ export default React.createClass({
             pendingText="..."
             onClick={onSubscribeButtonClick}/>
           <CreateTopicLink
-            groupName={groupName}
+            groupUri={groupUri}
             className="topic-search__create-topic-link">
             Create Topic
           </CreateTopicLink>

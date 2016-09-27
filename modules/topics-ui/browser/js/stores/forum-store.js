@@ -24,9 +24,7 @@ const ForumStore = Backbone.Model.extend({
     });
   },
 
-  onSubscriptionStateUpdate(data) {
-    var {state} = data;
-
+  onSubscriptionStateUpdate({state}) {
     this.set({
       subscriptionState: state
     });
