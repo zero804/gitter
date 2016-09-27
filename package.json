@@ -55,6 +55,7 @@
     "gitter-web-fake-data": "file:modules/fake-data",
     "gitter-web-fingerprinting": "file:modules/fingerprinting",
     "gitter-web-forums": "file:modules/forums",
+    "gitter-web-frame-utils": "file:modules/frame-utils",
     "gitter-web-github": "file:modules/github",
     "gitter-web-github-backend": "file:modules/github-backend",
     "gitter-web-google-backend": "file:modules/google-backend",
