@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "gitter-web-serialization": "file:../serialization",
-    "gitter-web-user-serialization": "file:modules/user-serialization"
+    "gitter-web-user-serialization": "file:../user-serialization"
   },
   "private": true
 }

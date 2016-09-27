@@ -17,6 +17,7 @@
     "gitter-web-persistence": "file:../persistence",
     "gitter-web-persistence-utils": "file:../persistence-utils",
     "gitter-web-backend-muxer": "file:../backend-muxer",
+    "gitter-web-topic-serialization": "file:../topic-serialization",
     "lodash": "^3.2.0",
     "moment": "^2.10.3",
     "mongodb": "~2.1.18",

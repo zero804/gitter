@@ -717,7 +717,7 @@
         "pause-stream": {
           "version": "0.0.11",
           "from": "pause-stream@0.0.11",
-          "resolved": "https://registry.npmjs.org/pause-stream/-/pause-stream-0.0.11.tgz"
+          "resolved": "http://beta-internal:4873/pause-stream/-/pause-stream-0.0.11.tgz"
         },
         "split": {
           "version": "0.3.3",
@@ -915,7 +915,7 @@
             },
             "mime": {
               "version": "1.3.4",
-              "from": "mime@>=1.3.4 <1.4.0",
+              "from": "mime@1.3.4",
               "resolved": "http://beta-internal:4873/mime/-/mime-1.3.4.tgz"
             },
             "ms": {
@@ -2007,7 +2007,7 @@
       "dependencies": {
         "redis": {
           "version": "2.6.2",
-          "from": "redis@>=2.1.0 <3.0.0",
+          "from": "redis@latest",
           "resolved": "http://beta-internal:4873/redis/-/redis-2.6.2.tgz",
           "dependencies": {
             "double-ended-queue": {
@@ -2488,15 +2488,15 @@
       "from": "modules/topic-notifications",
       "resolved": "file:modules/topic-notifications"
     },
-    "gitter-web-topics": {
-      "version": "1.0.0",
-      "from": "modules/topics",
-      "resolved": "file:modules/topics"
-    },
     "gitter-web-topic-serialization": {
       "version": "1.0.0",
       "from": "modules/topic-serialization",
       "resolved": "file:modules/topic-serialization"
+    },
+    "gitter-web-topics": {
+      "version": "1.0.0",
+      "from": "modules/topics",
+      "resolved": "file:modules/topics"
     },
     "gitter-web-topics-ui": {
       "version": "1.0.0",
@@ -6148,7 +6148,7 @@
               "dependencies": {
                 "chalk": {
                   "version": "1.1.3",
-                  "from": "chalk@>=1.0.0 <2.0.0",
+                  "from": "chalk@>=1.1.1 <2.0.0",
                   "resolved": "http://beta-internal:4873/chalk/-/chalk-1.1.3.tgz",
                   "dependencies": {
                     "ansi-styles": {
@@ -6557,7 +6557,7 @@
                 },
                 "pinkie-promise": {
                   "version": "2.0.1",
-                  "from": "pinkie-promise@>=2.0.1 <3.0.0",
+                  "from": "pinkie-promise@>=2.0.0 <3.0.0",
                   "resolved": "http://beta-internal:4873/pinkie-promise/-/pinkie-promise-2.0.1.tgz",
                   "dependencies": {
                     "pinkie": {
@@ -6766,7 +6766,7 @@
             },
             "strip-ansi": {
               "version": "3.0.1",
-              "from": "strip-ansi@>=3.0.1 <4.0.0",
+              "from": "strip-ansi@>=3.0.0 <4.0.0",
               "resolved": "http://beta-internal:4873/strip-ansi/-/strip-ansi-3.0.1.tgz",
               "dependencies": {
                 "ansi-regex": {
