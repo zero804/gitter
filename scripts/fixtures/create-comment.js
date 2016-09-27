@@ -2,7 +2,6 @@
 'use strict';
 
 var yargs = require('yargs');
-var faker = require('faker');
 var StatusError = require('statuserror');
 var utils = require('./fixture-script-utils');
 var replyService = require('gitter-web-topics/lib/reply-service');
@@ -22,8 +21,8 @@ var opts = yargs
     description: 'reply id of the reply you want to comment on'
   })
   .option('text', {
-    required: false,
-    description: 'comment text (optional)'
+    required: true,
+    description: 'comment text'
   })
   .help('help')
   .alias('help', 'h')
@@ -40,7 +39,7 @@ utils.runScript(function() {
 
       var forumWithPolicyService = this.forumWithPolicyService;
       return forumWithPolicyService.createComment(reply, {
-        text: opts.text || faker.hacker.phrase(),
+        text: opts.text,
       })
     })
     .then(function(comment) {

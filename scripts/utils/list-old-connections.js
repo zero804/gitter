@@ -4,12 +4,8 @@
 
 var env = require('gitter-web-env');
 var config = env.config;
-var userService = require('../../server/services/user-service');
-var troupeService = require('../../server/services/troupe-service');
-var collections = require('../../server/utils/collections');
 var presence = require('gitter-web-presence');
 var _ = require('lodash');
-var Promise = require('bluebird');
 
 var shutdown = require('shutdown');
 
@@ -50,4 +46,3 @@ stream.on('end', function() {
   console.log(socketsbyAge.slice(0, 100));
   shutdown.shutdownGracefully();
 });
-
