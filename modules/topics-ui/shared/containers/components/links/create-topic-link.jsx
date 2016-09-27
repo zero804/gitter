@@ -6,7 +6,7 @@ export default React.createClass({
 
   displayName: 'CreateTopicLink',
   propTypes: {
-    groupName: PropTypes.string.isRequired,
+    groupUri: PropTypes.string.isRequired,
     children: PropTypes.node.isRequired,
     onClick: PropTypes.func,
     className: PropTypes.string
@@ -14,9 +14,9 @@ export default React.createClass({
 
   render(){
 
-    const {groupName, className} = this.props;
+    const {groupUri, className} = this.props;
 
-    const createTopicHref = `/${groupName}/topics/create-topic`;
+    const createTopicHref = `/${groupUri}/topics/create-topic`;
 
     return (
       <a

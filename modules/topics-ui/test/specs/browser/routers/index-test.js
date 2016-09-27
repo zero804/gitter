@@ -36,8 +36,8 @@ describe('Router', function(){
     assert.equal(router.get('route'), navConstants.FORUM_ROUTE);
   });
 
-  it('should have the right inital groupName', function(){
-    assert.equal(router.get('groupName'), 'gitterHQ');
+  it('should have the right inital groupUri', function(){
+    assert.equal(router.get('groupUri'), 'gitterHQ');
   });
 
   it('should have the right inital categoryName', function(){
@@ -132,7 +132,7 @@ describe('Router', function(){
 
   it('should have the right params after moving to a topic', () => {
     dispatch(navigateToTopic('gitterHQ', '12345', 'slug'));
-    assert.equal(router.get('groupName'), 'gitterHQ');
+    assert.equal(router.get('groupUri'), 'gitterHQ');
     assert.equal(router.get('topicId'), '12345');
     assert.equal(router.get('slug'), 'slug');
   });

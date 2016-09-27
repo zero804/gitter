@@ -28,7 +28,7 @@ const TopicContainer = createClass({
   propTypes: {
 
     topicId: PropTypes.string.isRequired,
-    groupName: PropTypes.string.isRequired,
+    groupUri: PropTypes.string.isRequired,
 
     //Forum
     forumStore: React.PropTypes.shape({
@@ -109,7 +109,7 @@ const TopicContainer = createClass({
 
 
   render(){
-    const { topicId, topicsStore, groupName, categoryStore, currentUserStore, tagStore, newCommentStore } = this.props;
+    const { topicId, topicsStore, groupUri, categoryStore, currentUserStore, tagStore, newCommentStore } = this.props;
     const {forumId, forumSubscriptionState, newReplyContent} = this.state;
 
     const topic = topicsStore.getById(topicId);
@@ -135,13 +135,13 @@ const TopicContainer = createClass({
         <SearchHeaderContainer
           userId={userId}
           forumId={forumId}
-          groupName={groupName}
+          groupUri={groupUri}
           subscriptionState={forumSubscriptionState}/>
         <article>
           <TopicHeader
             topic={topic}
             category={category}
-            groupName={groupName}
+            groupUri={groupUri}
             tags={tags}/>
           <TopicBody
             topic={topic}
@@ -256,7 +256,7 @@ const TopicContainer = createClass({
     const subscriptionState = topic.subscriptionState;
     const desiredIsSubscribed = (subscriptionState !== SUBSCRIPTION_STATE_SUBSCRIBED);
 
-    dispatch(requestUpdateTopicSubscriptionState(forumId, topicId, userId, desiredIsSubscribed));
+    dispatch(requestUpdateTopicSubscriptionState(topicId, desiredIsSubscribed));
   },
 
 
@@ -270,7 +270,7 @@ const TopicContainer = createClass({
     const subscriptionState = reply.subscriptionState;
     const desiredIsSubscribed = (subscriptionState !== SUBSCRIPTION_STATE_SUBSCRIBED);
 
-    dispatch(requestUpdateReplySubscriptionState(forumId, topicId, replyId, userId, desiredIsSubscribed));
+    dispatch(requestUpdateReplySubscriptionState(replyId, desiredIsSubscribed));
   },
 
   onReplyCommentsClicked(replyId){

@@ -37,7 +37,7 @@ describe('<ForumContainer />', function(){
         tagStore={tagStore}
         topicsStore={topicsStore}
         newTopicStore={newTopicStore}
-        groupName='gitterHQ' />
+        groupUri='gitterHQ' />
     );
   });
 

@@ -1,6 +1,11 @@
 import urlJoin from 'url-join';
 import Promise from 'bluebird';
 import {subscribe, dispatch} from '../../../shared/dispatcher';
+
+import router from '../routers';
+import {getCurrentUser} from '../stores/current-user-store';
+import {getForumId} from '../stores/forum-store';
+
 import updateForumSubscriptionState from '../../../shared/action-creators/forum/update-forum-subscription-state';
 import updateTopicSubscriptionState from '../../../shared/action-creators/forum/update-topic-subscription-state';
 import updateReplySubscriptionState from '../../../shared/action-creators/forum/update-reply-subscription-state';
@@ -20,7 +25,13 @@ import apiClient from '../utils/api-client';
 // Takes an action-creator to dispatch
 const generateRequestSubscriptionUpdateCallback = function(action) {
   return function(data) {
-    const {userId, forumId, topicId, replyId, isSubscribed} = data;
+    const {
+      topicId = router.get('topicId'),
+      replyId,
+      isSubscribed
+    } = data;
+    const { id: userId } = getCurrentUser();
+    const forumId = getForumId();
 
     // Figure out the API endpoint we should post/delete on
     var subscribersEndpoint = urlJoin('/v1/forums/', forumId);
@@ -73,12 +84,12 @@ ForumClient.prototype.onRequestForumSubscriptionStateUpdate = generateRequestSub
 
 // Curry the generic action creator into the topic action
 ForumClient.prototype.onRequestTopicSubscriptionStateUpdate = generateRequestSubscriptionUpdateCallback((forumId, topicId, replyId, subscriptionState) => {
-  return updateTopicSubscriptionState(forumId, topicId, subscriptionState);
+  return updateTopicSubscriptionState(topicId, subscriptionState);
 });
 
 // Curry the generic action creator into the reply action
 ForumClient.prototype.onRequestReplySubscriptionStateUpdate = generateRequestSubscriptionUpdateCallback((forumId, topicId, replyId, subscriptionState) => {
-  return updateReplySubscriptionState(forumId, topicId, replyId, subscriptionState);
+  return updateReplySubscriptionState(replyId, subscriptionState);
 });
 
 export default ForumClient;
