@@ -124,9 +124,7 @@ const ForumContainer = React.createClass({
 
   render() {
     const { categoryName, tags, filterName, tagName, sortName, createTopic, topics, newTopic } = this.state;
-    const { groupName, currentUserStore, categoryStore, tagStore } = this.props;
-
-    const isSignedIn = currentUserStore.getIsSignedIn();
+    const { groupName, categoryStore, tagStore } = this.props;
 
     const categories = categoryStore.getCategories();
     const tagValues = tagStore.pluckValues();
@@ -135,8 +133,7 @@ const ForumContainer = React.createClass({
     return (
       <main>
         <SearchHeader
-          groupName={groupName}
-          isSignedIn={isSignedIn}/>
+          groupName={groupName}/>
         <CategoryList
           groupName={ groupName }
           categories={ categories }/>

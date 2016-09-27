@@ -112,8 +112,7 @@ const TopicContainer = createClass({
     return (
       <main>
         <SearchHeader
-          groupName={groupName}
-          isSignedIn={isSignedIn}/>
+          groupName={groupName}/>
         <article>
           <TopicHeader
             topic={topic}
