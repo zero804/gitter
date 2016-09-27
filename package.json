@@ -85,6 +85,7 @@
     "gitter-web-topics-ui": "file:modules/topics-ui",
     "gitter-web-twitter": "file:modules/twitter",
     "gitter-web-twitter-backend": "file:modules/twitter-backend",
+    "gitter-web-utils": "file:modules/utils",
     "gitter-web-validators": "file:modules/validators",
     "glob": "^6.0.4",
     "handlebars": "~3.0.3",
