@@ -1,5 +1,6 @@
 import React, {PropTypes, createClass} from 'react';
 import {dispatch} from '../dispatcher';
+import canEdit from '../utils/can-edit';
 
 import TopicHeader from './components/topic/topic-header.jsx';
 import TopicBody from './components/topic/topic-body.jsx';
@@ -31,6 +32,10 @@ const TopicContainer = createClass({
 
     topicId: PropTypes.string.isRequired,
     groupName: PropTypes.string.isRequired,
+
+    forumStore: PropTypes.shape({
+      getForum: PropTypes.func.isRequired,
+    }).isRequired,
 
     topicsStore: PropTypes.shape({
       getById: PropTypes.func.isRequired,
@@ -93,13 +98,51 @@ const TopicContainer = createClass({
     };
   },
 
+  getParsedTopic(){
+    const { topicId, topicsStore, forumStore, currentUserStore } = this.props;
+    const topic = topicsStore.getById(topicId);
+    const forum = forumStore.getForum();
+    const currentUser = currentUserStore.getCurrentUser();
+    return Object.assign({}, topic, {
+      canEdit: canEdit(forum, currentUser, topic),
+    });
+  },
+
+  //TODO We need to cache this result somewhere
+  //otherwise this is going to get very time consuming
+  getParsedReplies(){
+    const {repliesStore, commentsStore, forumStore, currentUserStore} = this.props;
+    const forum = forumStore.getForum();
+    const currentUser = currentUserStore.getCurrentUser();
+
+    return repliesStore.getReplies().map((reply) => Object.assign({}, reply, {
+      comments: this.getParsedCommentsForReply(reply.id),
+      isCommenting: commentsStore.getActiveReplyId() === reply.id,
+      canEdit: canEdit(forum, currentUser, reply)
+    }));
+  },
+
+  //TODO need to cache here as well
+  getParsedCommentsForReply(replyId) {
+    const {commentsStore, forumStore, currentUserStore} = this.props;
+    const forum = forumStore.getForum();
+    const currentUser = currentUserStore.getCurrentUser();
+
+    return commentsStore.getCommentsByReplyId(replyId)
+    .map((comment) => Object.assign({}, comment, {
+      canEdit: canEdit(forum, currentUser, comment)
+    }));
+  },
+
 
   render(){
 
-    const { topicId, topicsStore, groupName, categoryStore, currentUserStore, tagStore} = this.props;
+    const { groupName, categoryStore, currentUserStore, tagStore} = this.props;
     const {newReplyContent} = this.state;
-    const topic = topicsStore.getById(topicId)
     const currentUser = currentUserStore.getCurrentUser();
+
+    const topic = this.getParsedTopic();
+    const parsedReplies = this.getParsedReplies();
     const topicCategory = topic.category;
     const category = categoryStore.getById(topicCategory.id);
 
@@ -112,8 +155,7 @@ const TopicContainer = createClass({
     });
     const tags = tagStore.getTagsByLabel(tagValues);
 
-    const parsedReplies = this.getParsedReplies();
-
+    console.log('RENDER');
     return (
       <main>
         <SearchHeader groupName={groupName}/>
@@ -196,14 +238,6 @@ const TopicContainer = createClass({
 
   updateComments(){
     this.forceUpdate();
-  },
-
-  getParsedReplies(){
-    const {repliesStore, commentsStore} = this.props;
-    return repliesStore.getReplies().map((reply) => Object.assign({}, reply, {
-      comments: commentsStore.getCommentsByReplyId(reply.id),
-      isCommenting: commentsStore.getActiveReplyId() === reply.id,
-    }))
   },
 
   onReplyCommentsClicked(replyId){

@@ -19,7 +19,7 @@ export default function canEdit(forum, user, resource = defaultResource){
   user = (user || defaultUser);
 
   //User is admin
-  const {permissions} = forum;
+  const permissions = (forum.permissions || {});
   if(permissions.admin) { return true; }
 
   //User owns resource
