@@ -8,7 +8,7 @@ var errorReporter = env.errorReporter;
 var logger = env.logger.get('chat');
 
 var ChatMessage = require('gitter-web-persistence').ChatMessage;
-var collections = require("../utils/collections");
+var collections = require('gitter-web-utils/lib/collections');
 var userService = require("./user-service");
 var processText = require('gitter-web-text-processor');
 var Promise = require('bluebird');
