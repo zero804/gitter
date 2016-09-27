@@ -3,7 +3,7 @@
 var troupeService = require("../../services/troupe-service");
 var TroupeStrategy = require('./troupe-strategy');
 
-var idStrategyGenerator = require('../id-strategy-generator');
+var idStrategyGenerator = require('gitter-web-serialization/lib/id-strategy-generator');
 var TroupeIdStrategy = idStrategyGenerator('TroupeIdStrategy', TroupeStrategy, troupeService.findByIds);
 
 module.exports = TroupeIdStrategy;
