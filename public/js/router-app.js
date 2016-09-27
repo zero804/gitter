@@ -1,4 +1,4 @@
-/* eslint complexity: ["error", 18] */
+/* eslint complexity: ["error", 20] */
 'use strict';
 
 require('./utils/initial-setup');
@@ -152,7 +152,7 @@ onready(function() { // eslint-disable-line max-statements
     // Set the last access time immediately to prevent
     // delay in hidden rooms becoming visible only
     // once we get the server-side update
-    var liveCollectionTroupe = troupeCollections.troupes.get(troupe.id)
+    var liveCollectionTroupe = troupeCollections.troupes.get(troupe.id);
     if (liveCollectionTroupe) {
       liveCollectionTroupe.set('lastAccessTime', moment());
     }
