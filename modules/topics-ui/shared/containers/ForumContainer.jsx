@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import CategoryList from './components/forum/category-list.jsx';
 import { dispatch } from '../dispatcher/index';
 import navigateToCategory from '../action-creators/forum/navigate-to-category';
@@ -30,37 +30,42 @@ const ForumContainer = React.createClass({
 
   propTypes: {
     //Route parameters ---
-    groupName: React.PropTypes.string.isRequired,
-    categoryName: React.PropTypes.string.isRequired,
-    filterName: React.PropTypes.string,
-    tagName: React.PropTypes.string,
-    sortName: React.PropTypes.string,
-    createTopic: React.PropTypes.bool.isRequired,
+    groupName: PropTypes.string.isRequired,
+    categoryName: PropTypes.string.isRequired,
+    filterName: PropTypes.string,
+    tagName: PropTypes.string,
+    sortName: PropTypes.string,
+    createTopic: PropTypes.bool.isRequired,
 
     //Client side only
-    router: React.PropTypes.shape({
-      on: React.PropTypes.func.isRequired,
-      off: React.PropTypes.func.isRequired,
+    router: PropTypes.shape({
+      on: PropTypes.func.isRequired,
+      off: PropTypes.func.isRequired,
     }),
 
+    currentUserStore: PropTypes.shape({
+      getCurrentUser: PropTypes.func.isRequired,
+      getIsSignedIn: PropTypes.func.isRequired,
+    }).isRequired,
+
     //Categories ---
-    categoryStore: React.PropTypes.shape({
-      getCategories: React.PropTypes.func.isRequired
+    categoryStore: PropTypes.shape({
+      getCategories: PropTypes.func.isRequired
     }).isRequired,
 
     //Tags -----
-    tagStore: React.PropTypes.shape({
-      getTags: React.PropTypes.func.isRequired
+    tagStore: PropTypes.shape({
+      getTags: PropTypes.func.isRequired
     }).isRequired,
 
     //Topics
-    topicsStore: React.PropTypes.shape({
-      getTopics: React.PropTypes.func.isRequired
+    topicsStore: PropTypes.shape({
+      getTopics: PropTypes.func.isRequired
     }).isRequired,
 
     //New Topic
-    newTopicStore: React.PropTypes.shape({
-      get: React.PropTypes.func.isRequired,
+    newTopicStore: PropTypes.shape({
+      get: PropTypes.func.isRequired,
     }).isRequired,
   },
 
@@ -127,7 +132,8 @@ const ForumContainer = React.createClass({
 
     return (
       <main>
-        <SearchHeader groupName={groupName}/>
+        <SearchHeader
+          groupName={groupName}/>
         <CategoryList
           groupName={ groupName }
           categories={ categories }/>

@@ -284,7 +284,7 @@
                 },
                 "minimatch": {
                   "version": "3.0.3",
-                  "from": "minimatch@>=3.0.2 <4.0.0",
+                  "from": "minimatch@>=2.0.0 <3.0.0||>=3.0.0 <4.0.0",
                   "resolved": "http://beta-internal:4873/minimatch/-/minimatch-3.0.3.tgz",
                   "dependencies": {
                     "brace-expansion": {
@@ -390,7 +390,7 @@
       "dependencies": {
         "redis": {
           "version": "2.6.2",
-          "from": "redis@latest",
+          "from": "redis@>=2.1.0 <3.0.0",
           "resolved": "http://beta-internal:4873/redis/-/redis-2.6.2.tgz",
           "dependencies": {
             "double-ended-queue": {
@@ -583,7 +583,7 @@
     "debug": {
       "version": "2.2.0",
       "from": "debug@>=2.2.0 <3.0.0",
-      "resolved": "https://registry.npmjs.org/debug/-/debug-2.2.0.tgz",
+      "resolved": "http://beta-internal:4873/debug/-/debug-2.2.0.tgz",
       "dependencies": {
         "ms": {
           "version": "0.7.1",
@@ -717,7 +717,7 @@
         "pause-stream": {
           "version": "0.0.11",
           "from": "pause-stream@0.0.11",
-          "resolved": "https://registry.npmjs.org/pause-stream/-/pause-stream-0.0.11.tgz"
+          "resolved": "http://beta-internal:4873/pause-stream/-/pause-stream-0.0.11.tgz"
         },
         "split": {
           "version": "0.3.3",
@@ -915,7 +915,7 @@
             },
             "mime": {
               "version": "1.3.4",
-              "from": "mime@>=1.3.4 <1.4.0",
+              "from": "mime@1.3.4",
               "resolved": "http://beta-internal:4873/mime/-/mime-1.3.4.tgz"
             },
             "ms": {
@@ -2007,7 +2007,7 @@
       "dependencies": {
         "redis": {
           "version": "2.6.2",
-          "from": "redis@latest",
+          "from": "redis@>=2.1.0 <3.0.0",
           "resolved": "http://beta-internal:4873/redis/-/redis-2.6.2.tgz",
           "dependencies": {
             "double-ended-queue": {
@@ -2353,6 +2353,18 @@
       "from": "modules/forums",
       "resolved": "file:modules/forums"
     },
+    "gitter-web-frame-utils": {
+      "version": "0.1.0",
+      "from": "modules/frame-utils",
+      "resolved": "file:modules/frame-utils",
+      "dependencies": {
+        "debug-proxy": {
+          "version": "0.2.0",
+          "from": "debug-proxy@>=0.2.0 <0.3.0",
+          "resolved": "http://beta-internal:4873/debug-proxy/-/debug-proxy-0.2.0.tgz"
+        }
+      }
+    },
     "gitter-web-github": {
       "version": "1.0.0",
       "from": "modules/github",
@@ -2442,6 +2454,11 @@
       "version": "0.1.0",
       "from": "modules/qs",
       "resolved": "file:modules/qs"
+    },
+    "gitter-web-serialization": {
+      "version": "1.0.0",
+      "from": "modules/serialization",
+      "resolved": "file:modules/serialization"
     },
     "gitter-web-shared": {
       "version": "1.0.0",
@@ -2548,6 +2565,11 @@
       "version": "1.0.0",
       "from": "modules/twitter-backend",
       "resolved": "file:modules/twitter-backend"
+    },
+    "gitter-web-user-serialization": {
+      "version": "1.0.0",
+      "from": "modules/user-serialization",
+      "resolved": "file:modules/user-serialization"
     },
     "gitter-web-utils": {
       "version": "1.0.0",
@@ -3518,7 +3540,7 @@
         },
         "parseurl": {
           "version": "1.3.1",
-          "from": "parseurl@>=1.3.1 <1.4.0",
+          "from": "parseurl@>=1.3.0 <1.4.0",
           "resolved": "http://beta-internal:4873/parseurl/-/parseurl-1.3.1.tgz"
         },
         "vary": {
@@ -3702,12 +3724,12 @@
         "mpath": {
           "version": "0.2.1",
           "from": "mpath@0.2.1",
-          "resolved": "https://registry.npmjs.org/mpath/-/mpath-0.2.1.tgz"
+          "resolved": "http://beta-internal:4873/mpath/-/mpath-0.2.1.tgz"
         },
         "mpromise": {
           "version": "0.5.5",
           "from": "mpromise@0.5.5",
-          "resolved": "https://registry.npmjs.org/mpromise/-/mpromise-0.5.5.tgz"
+          "resolved": "http://beta-internal:4873/mpromise/-/mpromise-0.5.5.tgz"
         },
         "mquery": {
           "version": "1.11.0",
@@ -3739,7 +3761,7 @@
         "regexp-clone": {
           "version": "0.0.1",
           "from": "regexp-clone@0.0.1",
-          "resolved": "https://registry.npmjs.org/regexp-clone/-/regexp-clone-0.0.1.tgz"
+          "resolved": "http://beta-internal:4873/regexp-clone/-/regexp-clone-0.0.1.tgz"
         },
         "sliced": {
           "version": "1.0.1",
@@ -4632,7 +4654,7 @@
               "dependencies": {
                 "chalk": {
                   "version": "1.1.3",
-                  "from": "chalk@>=1.1.1 <2.0.0",
+                  "from": "chalk@>=1.1.3 <2.0.0",
                   "resolved": "http://beta-internal:4873/chalk/-/chalk-1.1.3.tgz",
                   "dependencies": {
                     "ansi-styles": {
@@ -4983,7 +5005,7 @@
         },
         "parseurl": {
           "version": "1.3.1",
-          "from": "parseurl@>=1.3.1 <1.4.0",
+          "from": "parseurl@>=1.3.0 <1.4.0",
           "resolved": "http://beta-internal:4873/parseurl/-/parseurl-1.3.1.tgz"
         }
       }
@@ -5654,7 +5676,7 @@
           "dependencies": {
             "chalk": {
               "version": "1.1.3",
-              "from": "chalk@>=1.1.3 <2.0.0",
+              "from": "chalk@>=1.1.1 <2.0.0",
               "resolved": "http://beta-internal:4873/chalk/-/chalk-1.1.3.tgz",
               "dependencies": {
                 "ansi-styles": {
@@ -6123,7 +6145,7 @@
               "dependencies": {
                 "chalk": {
                   "version": "1.1.3",
-                  "from": "chalk@>=1.1.1 <2.0.0",
+                  "from": "chalk@>=1.0.0 <2.0.0",
                   "resolved": "http://beta-internal:4873/chalk/-/chalk-1.1.3.tgz",
                   "dependencies": {
                     "ansi-styles": {
@@ -6464,7 +6486,7 @@
           "dependencies": {
             "strip-ansi": {
               "version": "3.0.1",
-              "from": "strip-ansi@>=3.0.0 <4.0.0",
+              "from": "strip-ansi@>=3.0.1 <4.0.0",
               "resolved": "http://beta-internal:4873/strip-ansi/-/strip-ansi-3.0.1.tgz",
               "dependencies": {
                 "ansi-regex": {
@@ -6741,7 +6763,7 @@
             },
             "strip-ansi": {
               "version": "3.0.1",
-              "from": "strip-ansi@>=3.0.0 <4.0.0",
+              "from": "strip-ansi@>=3.0.1 <4.0.0",
               "resolved": "http://beta-internal:4873/strip-ansi/-/strip-ansi-3.0.1.tgz",
               "dependencies": {
                 "ansi-regex": {

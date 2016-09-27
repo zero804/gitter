@@ -5,7 +5,7 @@ var template = require('./tmpl/join-room-view.hbs');
 var context = require('../../utils/context');
 var apiClient = require('../../components/api-client');
 var urlParse = require('url-parse');
-var frameUtils = require('../../utils/frame-utils');
+var frameUtils = require('gitter-web-frame-utils');
 var userCanJoinRoom = require('gitter-web-shared/rooms/user-can-join-room');
 var makeRoomProviderSentence = require('gitter-web-shared/rooms/make-room-provider-sentence');
 

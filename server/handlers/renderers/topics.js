@@ -26,17 +26,6 @@ var contextGenerator = require('../../web/context-generator.js');
 
 
 function renderForum(req, res, next, options) {
-
-  //No switch, no business
-  if (!req.fflip || !req.fflip.has('topics')) {
-    return next(new StatusError(404));
-  }
-
-  //Have to be logged in to get here
-  if(!req.user) {
-    return next(new StatusError(404));
-  }
-
   var userId = req.user && req.user._id;
 
   options = (options || {});
@@ -104,11 +93,6 @@ function renderForum(req, res, next, options) {
 
 
 function renderTopic(req, res, next) {
-
-  if (!req.fflip || !req.fflip.has('topics')) {
-    return next(new StatusError(404));
-  }
-
   var groupUri = req.params.groupName;
   var topicId = req.params.topicId;
   var userId = req.user && req.user._id;
