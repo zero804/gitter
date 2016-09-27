@@ -6,6 +6,8 @@ set -x
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+export NO_AUTO_INDEX=1
+
 GITTER_USERNAME=${GITTER_USERNAME:-suprememoocow}
 GROUP_URI=${GROUP_URI:-gitterHQ}
 GITHUB_REPO_URI=${GITHUB_REPO_URI:-troupe/gitter-webapp}
