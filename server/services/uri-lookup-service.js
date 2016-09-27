@@ -51,9 +51,17 @@ function lookupUri(uri) {
 
         /* Found a room. Add to cache and continue */
         if(troupe) {
+          var newRoomFields = {
+            uri: lcUri,
+            troupeId: troupe._id
+          };
+          if(troupe.groupId) {
+            newRoomFields.groupId = troupe.groupId;
+          }
+
           return persistence.UriLookup.findOneAndUpdate(
             { $or: [{ uri: lcUri }, { troupeId: troupe._id }] },
-            { $set: { uri: lcUri, groupId: troupe.groupId, troupeId: troupe._id }, $unset: { userId: '' } },
+            { $set: newRoomFields, $unset: { userId: '' } },
             { upsert: true, new: true })
             .exec()
             .then(function(uriLookup) {
