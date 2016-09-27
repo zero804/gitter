@@ -16,8 +16,19 @@ export default React.createClass({
     const {comment} = this.props;
     return (
       <FeedItem
-        item={comment}/>
+        item={comment}
+        footerChildren={this.getFeedItemFooterChildren()}/>
     );
+  },
+
+  getFeedItemFooterChildren(){
+    return [
+      <span
+        key="likes"
+        className="feed-item__likes">
+        10 Likes
+      </span>
+    ];
   }
 
 });

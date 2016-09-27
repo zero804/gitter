@@ -10,6 +10,7 @@ import {getForumId} from './forum-store'
 import router from '../routers';
 import {BaseModel} from './base-model';
 import {NAVIGATE_TO_TOPIC} from '../../../shared/constants/navigation';
+import { UPDATE_REPLY_SUBSCRIPTION_STATE, REQUEST_UPDATE_REPLY_SUBSCRIPTION_STATE, SUBSCRIPTION_STATE_PENDING } from '../../../shared/constants/forum.js';
 
 export const ReplyModel = BaseModel.extend({
   url(){
@@ -35,12 +36,20 @@ export const RepliesStore = LiveCollection.extend({
   initialize(){
     subscribe(SUBMIT_NEW_REPLY, this.createNewReply, this);
     subscribe(NAVIGATE_TO_TOPIC, this.onNavigateToTopic, this);
+    subscribe(REQUEST_UPDATE_REPLY_SUBSCRIPTION_STATE, this.onRequestSubscriptionStateUpdate, this);
+    subscribe(UPDATE_REPLY_SUBSCRIPTION_STATE, this.onSubscriptionStateUpdate, this);
     router.on('change:topicId', this.onActiveTopicUpdate, this);
+  },
+
+  getById(id) {
+    const model = this.get(id);
+    if(!model) { return; }
+    return parseReply(model.toJSON());
   },
 
   getReplies(){
     return this.models.map(model => {
-      return parseReply(model.toJSON())
+      return parseReply(model.toJSON());
     });
   },
 
@@ -57,11 +66,32 @@ export const RepliesStore = LiveCollection.extend({
 
   onNavigateToTopic(){
     this.reset([]);
+  },
+
+  onRequestSubscriptionStateUpdate({replyId}) {
+    var reply = this.get(replyId);
+    if(!reply) { return; }
+
+    reply.set({
+      subscriptionState: SUBSCRIPTION_STATE_PENDING
+    });
+  },
+
+  onSubscriptionStateUpdate(data) {
+    var {replyId, state} = data;
+    var reply = this.get(replyId);
+    if(!reply) { return; }
+
+    reply.set({
+      subscriptionState: state
+    });
   }
 
 });
 
-dispatchOnChangeMixin(RepliesStore);
+dispatchOnChangeMixin(RepliesStore, [
+  'change:subscriptionState'
+]);
 
 const serverStore = (window.context.repliesStore|| {});
 const serverData = (serverStore.data || [])

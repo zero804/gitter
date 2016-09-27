@@ -12,7 +12,7 @@ export default React.createClass({
   displayName: 'ForumTableControl',
   propTypes: {
     //Route params
-    groupName: PropTypes.string.isRequired,
+    groupUri: PropTypes.string.isRequired,
     categoryName: PropTypes.string.isRequired,
     filterName: PropTypes.string,
     tagName: PropTypes.string,
@@ -46,7 +46,7 @@ export default React.createClass({
   },
 
   render(){
-    const { groupName, tags, sortChange, tagChange, filterName, tagName, sortName } = this.props;
+    const { groupUri, tags, sortChange, tagChange, filterName, tagName, sortName } = this.props;
     const { sortBy } = this.state;
     return (
       <Container className="container--table-control">
@@ -66,12 +66,12 @@ export default React.createClass({
   },
 
   getChildTableControlButton(title, value, active=false){
-    const { groupName, categoryName, filterChange } = this.props;
+    const { groupUri, categoryName, filterChange } = this.props;
     return (
       <TableControlButton
         title={title}
         value={value}
-        groupName={groupName}
+        groupUri={groupUri}
         category={categoryName}
         active={active}
         onClick={(filter) => filterChange(filter)}/>

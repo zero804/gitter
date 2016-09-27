@@ -7,13 +7,13 @@ export default React.createClass({
     title: PropTypes.string.isRequired,
     value: PropTypes.string.isRequired,
     active: PropTypes.bool.isRequired,
-    groupName: PropTypes.string.isRequired,
+    groupUri: PropTypes.string.isRequired,
     category: PropTypes.string,
     onClick: PropTypes.func.isRequired,
   },
 
   render(){
-    const { title, active, groupName, category, value } = this.props;
+    const { title, active, groupUri, category, value } = this.props;
     const titleContent = `Filter current topics by ${title}`;
 
     const className = !!active ?
@@ -21,8 +21,8 @@ export default React.createClass({
       'topic-control__button';
 
     const href = !!category ?
-      `/${groupName}/topics/categories/${category}?filter=${value}` :
-      `/${groupName}/topics?filter=${value}`
+      `/${groupUri}/topics/categories/${category}?filter=${value}` :
+      `/${groupUri}/topics?filter=${value}`
 
     return (
       <a className={className} href={href} title={titleContent} onClick={this.onClick}>{title}</a>
