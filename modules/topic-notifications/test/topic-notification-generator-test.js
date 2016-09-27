@@ -72,20 +72,20 @@ describe('forum-notification-events', function() {
           .then(function(notifications) {
             assert.strictEqual(notifications.length, 3);
 
-            assert.strictEqual(String(notifications[0].topic._id), String(topicId1));
-            assert.strictEqual(String(notifications[1].topic._id), String(topicId2));
-            assert.strictEqual(String(notifications[2].topic._id), String(topicId1));
+            assert.strictEqual(notifications[0].data.topic.id, String(topicId1));
+            assert.strictEqual(notifications[1].data.topic.id, String(topicId2));
+            assert.strictEqual(notifications[2].data.topic.id, String(topicId1));
 
-            assert(!notifications[0].reply);
-            assert(!notifications[1].reply);
-            assert.strictEqual(String(notifications[2].reply._id), String(replyId));
+            assert(!notifications[0].data.reply);
+            assert(!notifications[1].data.reply);
+            assert.strictEqual(notifications[2].data.reply.id, String(replyId));
 
             notifications.forEach(function(notification) {
               // Check that the user matches
-              assert.strictEqual(String(notification.user._id), String(userId));
+              assert.strictEqual(String(notification.recipient._id), String(userId));
 
               // Check that the forum matches
-              assert.strictEqual(String(notification.forum._id), String(forumId));
+              assert.strictEqual(String(notification.data.forum._id), String(forumId));
             });
 
           });
