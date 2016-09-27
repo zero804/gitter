@@ -5,7 +5,7 @@ var nconf = env.config;
 var testRequire = require('../../test-require');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assertUtils = require('../../assert-utils')
-var serialize = testRequire('./serializers/serialize');
+var serialize = require('gitter-web-serialization/lib/serialize');
 var CommentStrategy = testRequire('./serializers/rest/comment-strategy');
 
 var LONG_AGO = '2014-01-01T00:00:00.000Z';
