@@ -9,18 +9,19 @@ export default React.createClass({
     groupName: PropTypes.string.isRequired,
     children: PropTypes.node.isRequired,
     onClick: PropTypes.func,
-    className: PropTypes.string,
+    className: PropTypes.string
   },
 
   render(){
 
     const {groupName, className} = this.props;
-    const href = `/${groupName}/topics/create-topic`;
+
+    const createTopicHref = `/${groupName}/topics/create-topic`;
 
     return (
       <a
         title="Create a new topic"
-        href={href}
+        href={createTopicHref}
         className={className}
         onClick={this.onClick}>
         {this.props.children}
@@ -29,10 +30,10 @@ export default React.createClass({
   },
 
   onClick(e){
-    e.preventDefault();
     const {onClick} = this.props;
     if(onClick) { return onClick(...arguments); }
     dispatch(navigateToCreateTopic());
+    e.preventDefault();
   }
 
 });

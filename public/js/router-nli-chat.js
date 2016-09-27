@@ -10,7 +10,7 @@ var chatCollection = require('./collections/instances/chats');
 var PeopleModal = require('./views/modals/people-modal');
 var LoginView = require('./views/modals/login-view');
 var onready = require('./utils/onready');
-var frameUtils = require('./utils/frame-utils');
+var frameUtils = require('gitter-web-frame-utils');
 var ChatToolbarLayout = require('./views/layouts/chat-toolbar');
 var urlParse = require('url-parse');
 

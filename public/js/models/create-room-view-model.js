@@ -11,7 +11,7 @@ var CreateRoomViewModel = Backbone.Model.extend({
     allowBadger: true,
     security: 'PUBLIC',
     onlyGithubUsers: false,
-    onlyOrgUsers: false,
+    onlyGroupUsers: false,
 
     // roomAvailabilityStatusConstants
     roomAvailabilityStatus: null
