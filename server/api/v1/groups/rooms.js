@@ -23,7 +23,7 @@ function getCreateOptions(input) {
     createOptions.security = castString(input.security.security, undefined);
     assert(createOptions.security, 'security required');
 
-    // type defaults to null, not undefined
+    // `type` defaults to null, not undefined
     createOptions.type = castString(input.security.type, null);
     switch(createOptions.type) {
       case null:
