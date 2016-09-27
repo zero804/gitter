@@ -1,7 +1,7 @@
 "use strict";
 
 var Promise = require('bluebird');
-var getVersion = require('../get-model-version');
+var getVersion = require('gitter-web-serialization/lib/get-model-version');
 var UserIdStrategy = require('./user-id-strategy');
 
 function formatDate(d) {
