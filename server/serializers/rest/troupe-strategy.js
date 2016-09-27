@@ -3,12 +3,11 @@
 
 var Promise = require('bluebird');
 var debug = require('debug')('gitter:infra:serializer:troupe');
-var getVersion = require('../get-model-version');
+var getVersion = require('gitter-web-serialization/lib/get-model-version');
 var UserIdStrategy = require('./user-id-strategy');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var avatars = require('gitter-web-avatars');
 var getRoomNameFromTroupeName = require('gitter-web-shared/get-room-name-from-troupe-name');
-
 var AllUnreadItemCountStrategy = require('./troupes/all-unread-item-count-strategy');
 var FavouriteTroupesForUserStrategy = require('./troupes/favourite-troupes-for-user-strategy');
 var LastTroupeAccessTimesForUserStrategy = require('./troupes/last-access-times-for-user-strategy');

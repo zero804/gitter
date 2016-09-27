@@ -8,7 +8,7 @@ var avatars = require('gitter-web-avatars');
 var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 var userScopes = require('gitter-web-identity/lib/user-scopes');
 var collections = require('gitter-web-utils/lib/collections');
-var getVersion = require('../get-model-version');
+var getVersion = require('gitter-web-serialization/lib/get-model-version');
 var troupeService = require('../../services/troupe-service');
 var adminFilter = require('gitter-web-permissions/lib/known-external-access/admin-filter')
 
