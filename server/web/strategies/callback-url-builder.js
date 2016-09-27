@@ -3,7 +3,7 @@
 var env = require('gitter-web-env');
 var config = env.config;
 
-var stagingBranchName = process.env.GITTER_WEB_STAGING_BRANCH_NAME;
+var stagingBranchName = process.env.GIT_TAG;
 var oauthRedirectorBasePath = config.get('web:oauthRedirectorBasepath');
 var webPathBase = config.get('web:basepath');
 
@@ -18,9 +18,9 @@ function stagingCallbackUrlBuilder(service) {
 
 function standardCallbackUrlBuilder(service) {
   if (service) {
-    return webPathBase + '/login/callback';
-  } else {
     return webPathBase + '/login/' + service + '/callback';
+  } else {
+    return webPathBase + '/login/callback';
   }
 }
 
