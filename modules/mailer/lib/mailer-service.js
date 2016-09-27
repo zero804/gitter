@@ -3,15 +3,17 @@
 var env = require('gitter-web-env');
 var mailer = env.mailer;
 
-var troupeTemplate = require('../utils/troupe-template');
+var troupeTemplate = require('gitter-web-templates/lib/troupe-template');
 var Promise = require('bluebird');
 var cdn = require('gitter-web-cdn');
-
+var path = require('path');
 
 var CACHED = { };
 function getCachedTemplate(templateName) {
   if(CACHED[templateName]) return CACHED[templateName];
-  CACHED[templateName] = troupeTemplate.compile(templateName);
+
+  var templateFile = path.join(__dirname, '../templates', templateName + '.hbs');
+  CACHED[templateName] = troupeTemplate.compile(templateFile);
   return CACHED[templateName];
 }
 
@@ -74,9 +76,9 @@ function unreadNoticationMapping(data) {
     ROOMURI:    data.roomUri,
     ROOMURL:    data.roomUrl,
     UNSUB:      data.unsubscribeUrl,
-    HTML:       applyTemplate("emails/unread_notification_html", data),
-    MICRODATA:  applyTemplate("emails/unread_notification_microdata", data),
-    PLAINTEXT:  applyTemplate("emails/unread_notification", data),
+    HTML:       applyTemplate("unread_notification_html", data),
+    MICRODATA:  applyTemplate("unread_notification_microdata", data),
+    PLAINTEXT:  applyTemplate("unread_notification", data),
     LOGOURL:    cdn('images/logo/gitter-logo-email-64.png', {email: true})
   };
 
