@@ -83,6 +83,7 @@
     "gitter-web-text-processor": "file:modules/text-processor",
     "gitter-web-topic-notifications": "file:modules/topic-notifications",
     "gitter-web-topics": "file:modules/topics",
+    "gitter-web-topic-serialization": "file:modules/topic-serialization",
     "gitter-web-topics-ui": "file:modules/topics-ui",
     "gitter-web-twitter": "file:modules/twitter",
     "gitter-web-twitter-backend": "file:modules/twitter-backend",
