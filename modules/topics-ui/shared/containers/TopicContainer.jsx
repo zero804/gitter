@@ -3,7 +3,7 @@ import {dispatch} from '../dispatcher';
 
 import TopicHeader from './components/topic/topic-header.jsx';
 import TopicBody from './components/topic/topic-body.jsx';
-import SearchHeader from './components/search/search-header.jsx';
+import SearchHeaderContainer from './components/search/SearchHeaderContainer.jsx';
 import TopicReplyEditor from './components/topic/topic-reply-editor.jsx';
 import TopicReplyListHeader from './components/topic/topic-reply-list-header.jsx';
 import TopicReplyList from './components/topic/topic-reply-list.jsx';
@@ -132,7 +132,7 @@ const TopicContainer = createClass({
 
     return (
       <main>
-        <SearchHeader
+        <SearchHeaderContainer
           userId={userId}
           forumId={forumId}
           groupName={groupName}

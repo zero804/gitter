@@ -5,7 +5,7 @@ import navigateToCategory from '../action-creators/forum/navigate-to-category';
 
 import ForumTableControl from './components/forum/table-control.jsx';
 import TopicsTable from './components/forum/topics-table.jsx';
-import SearchHeader from './components/search/search-header.jsx';
+import SearchHeaderContainer from './components/search/SearchHeaderContainer.jsx';
 import CreateTopicModal from './components/topic/create-topic-modal.jsx';
 
 import navigateToFilter from '../action-creators/forum/navigate-to-filter';
@@ -144,7 +144,7 @@ const ForumContainer = React.createClass({
 
     return (
       <main>
-        <SearchHeader
+        <SearchHeaderContainer
           userId={currentUser.id}
           forumId={forumId}
           groupName={groupName}
