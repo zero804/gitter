@@ -1,5 +1,5 @@
 import {ok} from 'assert';
-import canEdit from '../../../../browser/js/utils/can-edit.js';
+import canEdit from '../../../../shared/utils/can-edit.js';
 
 describe('canEdit', () => {
 
