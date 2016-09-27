@@ -1,11 +1,42 @@
-New Reply!
+{{> topic_html_email_header }}
 
-On Topic:
+<table class="row">
+  <tr>
+    <td class="wrapper last">
+      <table class="twelve columns">
+        <tr>
+          <td>
+            <h2>Yes! A new reply to a topic.</h2>
+            <table>
+              <tr>
+                <td></td>
+                <td>{{ notification.topic.title }}</td>
+              </tr>
+              <tr>
+                <td class="avatar"><img {{{ avatarSrcSet notification.reply.user.avatarUrl 24 }}} class="avatar"></td>
+                <td class="chat"><strong>{{ notification.reply.user.username }}</strong></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>{{ notification.reply.body.html }}</td>
+              </tr>
+            </table>
+            <br>
+            <table>
+              <tr>
+                <td class="avatar">
+                  <a href="{{ emailBasePath }}/{{ notification.reply.uri }}" style="text-decoration: none" class="button-green">Open topic</a>
+                </td>
+              </tr>
+            </table>
+            <br>
+            <hr>
+            <br>
+          </td>
+          <td class="expander"></td>
+        </tr>
+      </table>
 
-From: {{ notification.topicAuthor.username }}
-Title: {{ notification.topic.title }}
-Text: {{ notification.topic.text }}
-
-The Reply is:
-From: {{ notification.replyAuthorUser.username }}
-Text: {{ notification.reply.text }}
+  </tr>
+</table>
+{{> topic_html_email_footer }}

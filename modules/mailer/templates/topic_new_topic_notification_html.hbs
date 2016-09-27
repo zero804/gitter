@@ -1,10 +1,11 @@
+{{> topic_html_email_header }}
 <table class="row">
   <tr>
     <td class="wrapper last">
       <table class="twelve columns">
         <tr>
           <td>
-            <h2>Hey, there's a new topic in {{ forum.name }}</h2>
+            <h2>Hey, there's a new topic in {{ notification.forum.name }}</h2>
             <table>
               <tr>
                 <td class="avatar"><img {{{ avatarSrcSet notification.topic.user.avatarUrl 24 }}} class="avatar"></td>
@@ -12,7 +13,7 @@
               </tr>
               <tr>
                 <td></td>
-                <td>{{ notification.topic.body.title }}</td>
+                <td>{{ notification.topic.title }}</td>
               </tr>
               <tr>
                 <td></td>
@@ -37,3 +38,4 @@
 
   </tr>
 </table>
+{{> topic_html_email_footer }}
