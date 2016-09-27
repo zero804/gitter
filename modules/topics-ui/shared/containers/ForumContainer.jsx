@@ -1,4 +1,4 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import CategoryList from './components/forum/category-list.jsx';
 import { dispatch } from '../dispatcher/index';
 import navigateToCategory from '../action-creators/forum/navigate-to-category';
@@ -50,7 +50,8 @@ const ForumContainer = React.createClass({
     }).isRequired,
 
     currentUserStore: PropTypes.shape({
-      getCurrentUser: PropTypes.func.isRequired
+      getCurrentUser: PropTypes.func.isRequired,
+      getIsSignedIn: PropTypes.func.isRequired,
     }).isRequired,
 
     //Categories ---

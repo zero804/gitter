@@ -54,7 +54,9 @@ export default React.createClass({
             unsubscribedText="Follow"
             pendingText="..."
             onClick={this.onSubscribeButtonClick}/>
-          <CreateTopicLink groupName={groupName} className="topic-search__create-topic-link">
+          <CreateTopicLink
+            groupName={groupName}
+            className="topic-search__create-topic-link">
             Create Topic
           </CreateTopicLink>
         </Panel>

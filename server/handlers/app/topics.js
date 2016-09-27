@@ -7,6 +7,7 @@ var mainFrameRenderers = require('../renderers/main-frame');
 var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
 var featureToggles = require('../../web/middlewares/feature-toggles');
 var isPhoneMiddleware = require('../../web/middlewares/is-phone');
+var contextGenerator = require('../../web/context-generator.js');
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
@@ -16,12 +17,6 @@ router.get('/',
   featureToggles,
   isPhoneMiddleware,
   function(req, res, next){
-
-    //No switch, no business
-    if (!req.fflip || !req.fflip.has('topics')) {
-      return next(new StatusError(404));
-    }
-
     var renderer = mainFrameRenderers.renderMainFrame
     if (req.isPhone) {
       renderer = mainFrameRenderers.renderMobileMainFrame;
@@ -38,12 +33,6 @@ router.get('/~topics',
   identifyRoute('forum-embeded'),
   featureToggles,
   function(req, res, next){
-
-    //No switch, no business
-    if (!req.fflip || !req.fflip.has('topics')) {
-      return next(new StatusError(404));
-    }
-
     return topicsRenderers.renderForum(req, res, next);
   }
 );
@@ -52,12 +41,6 @@ router.get('/categories/:categoryName',
   identifyRoute('forum'),
   featureToggles,
   function(req, res, next){
-
-    //No switch, no business
-    if (!req.fflip || !req.fflip.has('topics')) {
-      return next(new StatusError(404));
-    }
-
     return mainFrameRenderers.renderMainFrame(req, res, next, {
       subFrameLocation: '/' + req.params.groupName + '/topics/categories/' + req.params.categoryName + '/~topics'
     });
@@ -68,12 +51,6 @@ router.get('/categories/:categoryName/~topics',
   identifyRoute('forum-embedded'),
   featureToggles,
   function(req, res, next){
-
-    //No switch, no business
-    if (!req.fflip || !req.fflip.has('topics')) {
-      return next(new StatusError(404));
-    }
-
     return topicsRenderers.renderForum(req, res, next);
   }
 );
@@ -81,16 +58,21 @@ router.get('/categories/:categoryName/~topics',
 router.get('/create-topic',
   identifyRoute('create-topic'),
   featureToggles,
-  function(req, res, next){
+  function(req, res, next) {
 
-    //No switch, no business
-    if (!req.fflip || !req.fflip.has('topics')) {
-      return next(new StatusError(404));
-    }
+    return contextGenerator.generateNonChatContext(req)
+      .then(function(context) {
+        var user = context.user;
+        var isSignedIn = !!user;
 
-    return mainFrameRenderers.renderMainFrame(req, res, next, {
-      subFrameLocation: '/' + req.params.groupName + '/topics/create-topic/~topics'
-    });
+        if(!isSignedIn) {
+          return res.redirect('/login');
+        }
+
+        return mainFrameRenderers.renderMainFrame(req, res, next, {
+          subFrameLocation: '/' + req.params.groupName + '/topics/create-topic/~topics'
+        });
+      });
   }
 );
 
@@ -98,15 +80,19 @@ router.get('/create-topic/~topics',
   identifyRoute('create-topic-embeded'),
   featureToggles,
   function(req, res, next){
+    return contextGenerator.generateNonChatContext(req)
+      .then(function(context) {
+        var user = context.user;
+        var isSignedIn = !!user;
 
-    //No switch, no business
-    if (!req.fflip || !req.fflip.has('topics')) {
-      return next(new StatusError(404));
-    }
+        if(!isSignedIn) {
+          return res.redirect('/login');
+        }
 
-    return topicsRenderers.renderForum(req, res, next, {
-      createTopic: true
-    });
+        return topicsRenderers.renderForum(req, res, next, {
+          createTopic: true
+        });
+      });
   }
 );
 
@@ -114,12 +100,6 @@ router.get('/topic/:topicId/:topicSlug',
   identifyRoute('topic'),
   featureToggles,
   function(req, res, next){
-
-    //No switch, no business
-    if (!req.fflip || !req.fflip.has('topics')) {
-      return next(new StatusError(404));
-    }
-
     return mainFrameRenderers.renderMainFrame(req, res, next, {
       subFrameLocation: '/' + req.params.groupName + '/topics/topic/' + req.params.topicId + '/' + req.params.topicSlug + '/~topics'
     });
@@ -130,12 +110,6 @@ router.get('/topic/:topicId/:topicSlug/~topics',
   identifyRoute('topic-embedded'),
   featureToggles,
   function(req, res, next){
-
-    //No switch, no business
-    if (!req.fflip || !req.fflip.has('topics')) {
-      return next(new StatusError(404));
-    }
-
     return topicsRenderers.renderTopic(req, res, next);
   }
 );

@@ -16,7 +16,7 @@ function cdnSubResources(resources, jsRoot) {
 
 var SUBRESOURCE_MAPPINGS = {
   'router-app': ['router-app', 'router-chat'],
-  'mobile-nli-app': ['mobile-nli-app', 'router-nli-chat'],
+  'mobile-nli-chat': ['mobile-nli-chat', 'router-nli-chat'],
   'mobile-userhome': ['mobile-userhome'],
   'userhome': ['userhome'],
   'router-chat': ['router-chat'],

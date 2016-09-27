@@ -1,4 +1,4 @@
 "use strict";
 
-require('./utils/frame-utils');
+require('gitter-web-frame-utils');
 require('./utils/font-setup');

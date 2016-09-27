@@ -16,6 +16,10 @@ import showReplyComments from '../action-creators/topic/show-reply-comments';
 import { SUBSCRIPTION_STATE_SUBSCRIBED } from '../constants/forum.js';
 import requestUpdateTopicSubscriptionState from '../action-creators/forum/request-update-topic-subscription-state';
 import requestUpdateReplySubscriptionState from '../action-creators/forum/request-update-reply-subscription-state';
+import requestSignIn from '../action-creators/forum/request-sign-in';
+
+const EDITOR_SUBMIT_LINK_SOURCE = 'topics-reply-editor-submit-button';
+const EDITOR_CLICK_LINK_SOURCE = 'topics-reply-editor-click';
 
 
 const TopicContainer = createClass({
@@ -55,7 +59,8 @@ const TopicContainer = createClass({
     }).isRequired,
 
     currentUserStore: PropTypes.shape({
-      getCurrentUser: PropTypes.func.isRequired
+      getCurrentUser: PropTypes.func.isRequired,
+      getIsSignedIn: PropTypes.func.isRequired,
     }).isRequired,
 
     newReplyStore: PropTypes.shape({
@@ -106,9 +111,11 @@ const TopicContainer = createClass({
   render(){
     const { topicId, topicsStore, groupName, categoryStore, currentUserStore, tagStore, newCommentStore } = this.props;
     const {forumId, forumSubscriptionState, newReplyContent} = this.state;
+
     const topic = topicsStore.getById(topicId);
     const currentUser = currentUserStore.getCurrentUser();
     const userId = currentUser.id;
+    const isSignedIn = currentUserStore.getIsSignedIn();
     const topicCategory = topic.category;
     const category = categoryStore.getById(topicCategory.id);
 
@@ -154,9 +161,11 @@ const TopicContainer = createClass({
           onItemSubscribeButtonClick={this.onReplySubscribeButtonClick}/>
         <TopicReplyEditor
           user={currentUser}
+          isSignedIn={isSignedIn}
           value={newReplyContent}
           onChange={this.onEditorUpdate}
-          onSubmit={this.onEditorSubmit}/>
+          onSubmit={this.onEditorSubmit}
+          onEditorClick={this.onEditorClick}/>
       </main>
     );
   },
@@ -166,13 +175,30 @@ const TopicContainer = createClass({
   },
 
   onEditorSubmit(){
-    const {newReplyStore} = this.props;
-    dispatch(submitNewReply(newReplyStore.get('text')));
-    //Clear input
-    newReplyStore.clear();
-    this.setState((state) => Object.assign(state, {
-      newReplyContent: '',
-    }));
+    const {currentUserStore, newReplyStore} = this.props;
+    const isSignedIn = currentUserStore.getIsSignedIn();
+
+
+    if(isSignedIn) {
+      dispatch(submitNewReply(newReplyStore.get('text')));
+      //Clear input
+      newReplyStore.clear();
+      this.setState((state) => Object.assign(state, {
+        newReplyContent: '',
+      }));
+    }
+    else {
+      requestSignIn(EDITOR_SUBMIT_LINK_SOURCE);
+    }
+  },
+
+  onEditorClick() {
+    const { currentUserStore } = this.props;
+    const isSignedIn = currentUserStore.getIsSignedIn();
+
+    if(!isSignedIn) {
+      requestSignIn(EDITOR_CLICK_LINK_SOURCE);
+    }
   },
 
   onForumUpdate() {

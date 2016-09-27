@@ -3,7 +3,7 @@
 var testRequire = require('../../test-require');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assertUtils = require('../../assert-utils')
-var serialize = testRequire('./serializers/serialize');
+var serialize = require('gitter-web-serialization/lib/serialize');
 var ForumCategoryStrategy = testRequire('./serializers/rest/forum-category-strategy');
 
 
@@ -32,4 +32,3 @@ describe('ForumCategoryStrategy', function() {
       });
   });
 });
-
