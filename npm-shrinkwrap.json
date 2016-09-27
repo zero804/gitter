@@ -611,7 +611,7 @@
       "dependencies": {
         "chalk": {
           "version": "1.1.3",
-          "from": "chalk@>=1.1.1 <2.0.0",
+          "from": "chalk@>=1.0.0 <2.0.0",
           "resolved": "http://beta-internal:4873/chalk/-/chalk-1.1.3.tgz",
           "dependencies": {
             "ansi-styles": {
@@ -915,7 +915,7 @@
             },
             "mime": {
               "version": "1.3.4",
-              "from": "mime@1.3.4",
+              "from": "mime@>=1.3.4 <1.4.0",
               "resolved": "http://beta-internal:4873/mime/-/mime-1.3.4.tgz"
             },
             "ms": {
@@ -2549,6 +2549,11 @@
       "from": "modules/twitter-backend",
       "resolved": "file:modules/twitter-backend"
     },
+    "gitter-web-utils": {
+      "version": "1.0.0",
+      "from": "modules/utils",
+      "resolved": "file:modules/utils"
+    },
     "gitter-web-validators": {
       "version": "1.0.0",
       "from": "modules/validators",
@@ -4155,7 +4160,7 @@
       "dependencies": {
         "passport-oauth2": {
           "version": "1.3.0",
-          "from": "passport-oauth2@>=1.0.0 <2.0.0",
+          "from": "passport-oauth2@>=1.1.2 <2.0.0",
           "resolved": "http://beta-internal:4873/passport-oauth2/-/passport-oauth2-1.3.0.tgz",
           "dependencies": {
             "passport-strategy": {
@@ -4208,7 +4213,7 @@
       "dependencies": {
         "passport-oauth2": {
           "version": "1.3.0",
-          "from": "passport-oauth2@>=1.0.0 <2.0.0",
+          "from": "passport-oauth2@>=1.1.2 <2.0.0",
           "resolved": "http://beta-internal:4873/passport-oauth2/-/passport-oauth2-1.3.0.tgz",
           "dependencies": {
             "passport-strategy": {
@@ -5557,9 +5562,9 @@
               "resolved": "http://beta-internal:4873/fs-extra/-/fs-extra-0.26.5.tgz",
               "dependencies": {
                 "graceful-fs": {
-                  "version": "4.1.6",
+                  "version": "4.1.8",
                   "from": "graceful-fs@>=4.1.2 <5.0.0",
-                  "resolved": "http://beta-internal:4873/graceful-fs/-/graceful-fs-4.1.6.tgz"
+                  "resolved": "http://beta-internal:4873/graceful-fs/-/graceful-fs-4.1.8.tgz"
                 },
                 "jsonfile": {
                   "version": "2.4.0",
@@ -5659,7 +5664,7 @@
           "dependencies": {
             "chalk": {
               "version": "1.1.3",
-              "from": "chalk@>=1.1.1 <2.0.0",
+              "from": "chalk@>=1.1.3 <2.0.0",
               "resolved": "http://beta-internal:4873/chalk/-/chalk-1.1.3.tgz",
               "dependencies": {
                 "ansi-styles": {
@@ -5791,9 +5796,9 @@
                   "resolved": "http://beta-internal:4873/load-json-file/-/load-json-file-1.1.0.tgz",
                   "dependencies": {
                     "graceful-fs": {
-                      "version": "4.1.6",
+                      "version": "4.1.8",
                       "from": "graceful-fs@>=4.1.2 <5.0.0",
-                      "resolved": "http://beta-internal:4873/graceful-fs/-/graceful-fs-4.1.6.tgz"
+                      "resolved": "http://beta-internal:4873/graceful-fs/-/graceful-fs-4.1.8.tgz"
                     },
                     "parse-json": {
                       "version": "2.2.0",
@@ -5892,9 +5897,9 @@
                   "resolved": "http://beta-internal:4873/path-type/-/path-type-1.1.0.tgz",
                   "dependencies": {
                     "graceful-fs": {
-                      "version": "4.1.6",
+                      "version": "4.1.8",
                       "from": "graceful-fs@>=4.1.2 <5.0.0",
-                      "resolved": "http://beta-internal:4873/graceful-fs/-/graceful-fs-4.1.6.tgz"
+                      "resolved": "http://beta-internal:4873/graceful-fs/-/graceful-fs-4.1.8.tgz"
                     },
                     "pify": {
                       "version": "2.3.0",
@@ -6560,9 +6565,9 @@
                   "resolved": "http://beta-internal:4873/load-json-file/-/load-json-file-1.1.0.tgz",
                   "dependencies": {
                     "graceful-fs": {
-                      "version": "4.1.6",
+                      "version": "4.1.8",
                       "from": "graceful-fs@>=4.1.2 <5.0.0",
-                      "resolved": "http://beta-internal:4873/graceful-fs/-/graceful-fs-4.1.6.tgz"
+                      "resolved": "http://beta-internal:4873/graceful-fs/-/graceful-fs-4.1.8.tgz"
                     },
                     "parse-json": {
                       "version": "2.2.0",
@@ -6673,9 +6678,9 @@
                   "resolved": "http://beta-internal:4873/path-type/-/path-type-1.1.0.tgz",
                   "dependencies": {
                     "graceful-fs": {
-                      "version": "4.1.6",
+                      "version": "4.1.8",
                       "from": "graceful-fs@>=4.1.2 <5.0.0",
-                      "resolved": "http://beta-internal:4873/graceful-fs/-/graceful-fs-4.1.6.tgz"
+                      "resolved": "http://beta-internal:4873/graceful-fs/-/graceful-fs-4.1.8.tgz"
                     },
                     "pify": {
                       "version": "2.3.0",

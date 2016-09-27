@@ -5,7 +5,7 @@ var util = require("util");
 var BaseRetentionAnalyser = require('./base-cohort-analyser');
 var Troupe = require('gitter-web-persistence').Troupe;
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
-var collections = require('../../server/utils/collections');
+var collections = require('gitter-web-utils/lib/collections');
 
 function UserRoomsRetentionAnalyser() {
   BaseRetentionAnalyser.apply(this, arguments);
