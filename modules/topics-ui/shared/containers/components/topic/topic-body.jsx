@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 import Container from '../container.jsx';
 import Panel from '../panel.jsx';
-import SubscribeButton from '../forum/subscribe-button.jsx';
+import WatchButton from '../forum/watch-button.jsx';
 
 export default React.createClass({
 
@@ -29,13 +29,10 @@ export default React.createClass({
           </section>
           <footer className="topic-body__footer">
             <button className="topic-body__footer__action">Share</button>
-            <SubscribeButton
+            <WatchButton
               subscriptionState={subscriptionState}
               className="topic-body__footer__subscribe-action"
               itemClassName="topic-body__footer__subscribe-action-text-item"
-              subscribedText="Stop Watching"
-              unsubscribedText="Watch"
-              pendingText="..."
               onClick={onSubscribeButtonClick}/>
           </footer>
         </Panel>

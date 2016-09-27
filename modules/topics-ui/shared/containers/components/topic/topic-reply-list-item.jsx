@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 
-import SubscribeButton from '../forum/subscribe-button.jsx';
+import WatchButton from '../forum/watch-button.jsx';
 import CommentEditor from './comment-editor.jsx';
 import CommentItem from './comment-item.jsx';
 import FeedItem from './feed-item.jsx';
@@ -60,14 +60,11 @@ export default React.createClass({
         onClick={this.onCommentsClicked}>
         2 Comments
       </button>,
-      <SubscribeButton
+      <WatchButton
         key="subscribe"
         subscriptionState={subscriptionState}
         className="topic-reply-list-item__footer__subscribe-action"
         itemClassName="topic-reply-list-item__footer__subscribe-action-text-item"
-        subscribedText="Stop Watching"
-        unsubscribedText="Watch"
-        pendingText="..."
         onClick={this.onSubscribeButtonClick}/>
     ];
   },
