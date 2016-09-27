@@ -5,6 +5,7 @@ var internalClientAccessOnly = require('../../../web/middlewares/internal-client
 var forumCategoryService = require('gitter-web-topics/lib/forum-category-service');
 var ForumWithPolicyService = require('../../../services/forum-with-policy-service');
 var restSerializer = require('../../../serializers/rest-serializer');
+var restful = require('../../../services/restful');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 
@@ -26,12 +27,7 @@ module.exports = {
 
   index: function(req) {
     var forum = req.forum;
-
-    return forumCategoryService.findByForumId(forum._id)
-      .then(function(categories) {
-        var strategy = new restSerializer.ForumCategoryStrategy();
-        return restSerializer.serialize(categories, strategy);
-      });
+    return restful.serializeCategoriesForForumId(forum._id);
   },
 
   show: function(req) {
