@@ -75,6 +75,7 @@
     "gitter-web-qs": "file:modules/qs",
     "gitter-web-shared": "file:shared",
     "gitter-web-slugify": "file:modules/slugify",
+    "gitter-web-spam-detection": "file:modules/spam-detection",
     "gitter-web-split-tests": "file:modules/split-tests",
     "gitter-web-suggestions": "file:modules/suggestions",
     "gitter-web-templates": "file:modules/templates",
