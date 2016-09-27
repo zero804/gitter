@@ -46,6 +46,16 @@ require('./views/widgets/avatar');
 
 onready(function() { // eslint-disable-line max-statements
 
+  var appLayout = new AppLayout({
+    template: false,
+    el: 'body',
+    roomCollection: troupeCollections.troupes,
+    //TODO ADD THIS TO MOBILE JP 25/1/16
+    orgCollection: troupeCollections.orgs,
+    groupsCollection: troupeCollections.groups
+  });
+  appLayout.render();
+
   var router = new Router({
     dialogRegion: appLayout.dialogRegion,
     routes: [
@@ -350,15 +360,6 @@ onready(function() { // eslint-disable-line max-statements
   });
 
 
-  var appLayout = new AppLayout({
-    template: false,
-    el: 'body',
-    roomCollection: troupeCollections.troupes,
-    //TODO ADD THIS TO MOBILE JP 25/1/16
-    orgCollection: troupeCollections.orgs,
-    groupsCollection: troupeCollections.groups
-  });
-  appLayout.render();
 
 
 
