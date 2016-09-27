@@ -21,6 +21,43 @@ function ForumObject(type, forumId, topicId, replyId, commentId) {
   this.commentId = commentId;
 }
 
+ForumObject.prototype = {
+  getParent: function() {
+    switch(this.type) {
+      case TYPE.Forum:
+        assert.ok(false, 'Cannot call getParent on a forum');
+        return;
+
+      case TYPE.Topic:
+        return ForumObject.createForForum(this.forumId);
+
+      case TYPE.Reply:
+        return ForumObject.createForTopic(this.forumId, this.topicId);
+
+      case TYPE.Comment:
+        return ForumObject.createForReply(this.forumId, this.topicId, this.replyId);
+
+      default:
+        assert.ok(false, 'Unknown type');
+    }
+  },
+
+  hasParent: function() {
+    switch(this.type) {
+      case TYPE.Forum:
+        return false;
+
+      case TYPE.Topic:
+      case TYPE.Reply:
+      case TYPE.Comment:
+        return true;
+
+      default:
+        assert.ok(false, 'Unknown type');
+    }
+  }
+}
+
 /*
  * Statics
  */
