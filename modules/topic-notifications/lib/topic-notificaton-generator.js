@@ -9,6 +9,7 @@ var notificationService = require('./notification-service');
 var BackendMuxer = require('gitter-web-backend-muxer');
 var moment = require('moment');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var AggregatedUserNotificationStrategy = require('gitter-web-topic-serialization/lib/notifications/aggregated-user-notification-strategy');
 
 function resolveEmailAddress(user) {
   var backendMuxer = new BackendMuxer(user);
@@ -193,7 +194,15 @@ function simpleNotificationStream(options) {
 }
 
 function notificationObserver(options) {
-  return RxNode.fromReadableStream(simpleNotificationStream(options));
+  var strategy = new AggregatedUserNotificationStrategy();
+
+  return RxNode.fromReadableStream(simpleNotificationStream(options))
+    .map(function(item) {
+      return {
+        recipient: item.user,
+        data: strategy.map(item)
+      };
+    })
 }
 
 function generateTopicNotification(emailAddress, notification) {
