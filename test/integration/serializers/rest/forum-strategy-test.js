@@ -55,6 +55,8 @@ describe('ForumStrategy #slow', function() {
       .then(function(s) {
         assertUtils.assertSerializedEqual(s, [{
           id: forum.id,
+          name: forum.name,
+          uri: forum.uri,
           tags: [],
           categories: [{
             id: category3.id,

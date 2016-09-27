@@ -42,7 +42,9 @@ describe('group-with-policy-service #slow', function() {
             { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() + '/' + fixtureLoader.GITTER_INTEGRATION_ROOM.toLowerCase() },
             { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() + '/' + fixtureLoader.GITTER_INTEGRATION_ROOM.toLowerCase() },
             { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() + '/' + fixtureLoader.GITTER_INTEGRATION_ROOM.toLowerCase() },
-
+          ],
+          Forum: [
+            { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() + '/topics' }
           ]
         },
         user1: {

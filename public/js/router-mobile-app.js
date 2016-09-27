@@ -9,7 +9,7 @@ var MobileAppLayout = require('./views/layouts/mobile-app');
 var FastClick = require('fastclick');
 
 require('./utils/font-setup');
-require('./utils/frame-utils');
+require('gitter-web-frame-utils');
 require('./utils/tracking');
 
 // Preload widgets
