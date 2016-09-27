@@ -63,7 +63,7 @@ module.exports = Backbone.Model.extend({
     Backbone.Model.prototype.constructor.call(this, attrs, options);
   },
 
-  initialize: function(attrs) {
+  initialize: function(attrs) { // eslint-disable-line max-statements
     this.set('panelOpenState', this.get('roomMenuIsPinned'));
 
     if (!attrs || !attrs.bus) {
@@ -186,7 +186,7 @@ module.exports = Backbone.Model.extend({
 
     var forumSnapshot = context.getSnapshot('forum');
     this.forumCategoryContextModel = new ForumCategoryContextModel();
-    this.forumCategoryCollection = new ForumCategoryCollection(forumSnapshot && forumSnapshot.categories,  { contextModel: this.forumCategoryContextModel });
+    this.forumCategoryCollection = new ForumCategoryCollection(forumSnapshot && forumSnapshot.categories, { contextModel: this.forumCategoryContextModel });
 
     this.listenTo(this.primaryCollection, 'snapshot', this.onPrimaryCollectionSnapshot, this);
     this.snapshotTimeout = setTimeout(function(){
