@@ -71,6 +71,11 @@ function simpleNotificationStream(options) {
   return ForumNotification.aggregate([{
       $match: query
     }, {
+      // Sort by order of creation
+      $sort: {
+        _id: 1
+      }
+    }, {
       $lookup: {
         from: "users",
         localField: "userId",
@@ -160,11 +165,35 @@ function simpleNotificationStream(options) {
         path: "$commentAuthorUser",
         preserveNullAndEmptyArrays: true
       }
+    }, {
+      $project: {
+        'user': 1,
+        'forum._id': 1,
+        'topic': 1,
+        'topicAuthorUser._id': 1,
+        'topicAuthorUser.displayName': 1,
+        'topicAuthorUser.githubId': 1,
+        'topicAuthorUser.username': 1,
+        'reply': 1,
+        'replyAuthorUser._id': 1,
+        'replyAuthorUser.displayName': 1,
+        'replyAuthorUser.githubId': 1,
+        'replyAuthorUser.username': 1,
+        'comment': 1,
+        'commentAuthorUser._id': 1,
+        'commentAuthorUser.displayName': 1,
+        'commentAuthorUser.githubId': 1,
+        'commentAuthorUser.username': 1,
+      },
     }])
     .read(mongoReadPrefs.secondaryPreferred)
     .cursor({ batchSize: 100 })
     .exec()
     .stream();
+}
+
+function notificationObserver(options) {
+  return RxNode.fromReadableStream(simpleNotificationStream(options));
 }
 
 function generateTopicNotification(emailAddress, notification) {
@@ -256,9 +285,7 @@ function generateEmailForNotification(notification) {
 }
 
 function generateNotifications(options) {
-  var observable = RxNode.fromReadableStream(simpleNotificationStream(options));
-
-  return observable
+  return notificationObserver(options)
     .flatMap(generateEmailForNotification)
     .count()
     .toPromise()
@@ -266,5 +293,6 @@ function generateNotifications(options) {
 
 module.exports = {
   generateNotifications: generateNotifications,
+  notificationObserver: notificationObserver,
   streamNotificationsForEmail: streamNotificationsForEmail
 };
