@@ -24,6 +24,12 @@ describe('comments-live-collection #slow', function() {
       user: 'user1',
       forum: 'forum1',
       topic: 'topic1'
+    },
+    comment1: {
+      user: 'user1',
+      forum: 'forum1',
+      topic: 'topic1',
+      reply: 'reply1'
     }
   });
 
@@ -48,7 +54,7 @@ describe('comments-live-collection #slow', function() {
     var checkEvent = appEvents.addListener('dataChange2', {
       url: '/forums/' + fixture.forum1.id + '/topics/' + fixture.topic1.id + '/replies/' + fixture.reply1.id + '/comments',
       operation: 'update',
-      type: 'reply',
+      type: 'comment',
       model: {
         id: fixture.comment1.id.toString(),
         body: {
@@ -63,9 +69,8 @@ describe('comments-live-collection #slow', function() {
       })
       .then(checkEvent)
       .then(function(event) {
-        // the patch event must also contain editedAt & lastModified
+        // the patch event must also contain editedAt
         assert.ok(event.model.editedAt);
-        assert.ok(event.model.lastModified);
       });
   });
 });
