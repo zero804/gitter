@@ -1,6 +1,6 @@
 "use strict";
 
-var UserIdStrategy = require('./user-id-strategy');
+var UserIdStrategy = require('gitter-web-user-serialization/lib/notifications/user-id-strategy');
 
 function TroupeStrategy(options) {
   if(!options) options = {};
