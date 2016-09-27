@@ -2,7 +2,6 @@
 'use strict';
 
 var yargs = require('yargs');
-var faker = require('faker');
 var utils = require('./fixture-script-utils');
 
 var opts = yargs
@@ -15,8 +14,8 @@ var opts = yargs
     description: 'group uri of the group containing the forum'
   })
   .option('name', {
-    required: false,
-    description: 'category name (optional)'
+    required: true,
+    description: 'category name'
   })
   .help('help')
   .alias('help', 'h')
@@ -26,7 +25,7 @@ utils.runScript(function() {
   return utils.getForumWithPolicyService(opts.username, opts.group)
     .then(function(forumWithPolicyService) {
       return forumWithPolicyService.createCategory({
-        name: opts.name || faker.commerce.productName()
+        name: opts.name
       })
     })
     .then(function(category) {
