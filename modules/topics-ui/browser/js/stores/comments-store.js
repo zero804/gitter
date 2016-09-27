@@ -55,7 +55,7 @@ export const CommentsStore = LiveCollection.extend({
   },
 
   getCommentsByReplyId(id){
-    if(id !== this.contextModel.get('replyId')) { return; }
+    if(id !== this.contextModel.get('replyId')) { return []; }
     return this.toJSON();
   },
 

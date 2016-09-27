@@ -8,9 +8,14 @@ module.exports = function forumStore(data) {
   //Get data
   const get = (key) => data[key];
 
+  const getForum = () => data;
+  const getForumId = () => data.id
+
   //Methods
   return {
     get: get,
-    data: data
+    data: data,
+    getForum: getForum,
+    getForumId: getForumId,
   };
 };

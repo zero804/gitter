@@ -11,6 +11,7 @@ export default React.createClass({
       body: PropTypes.shape({
         html: PropTypes.string
       }).isRequired,
+      canEdit: PropTypes.bool.isRequired,
     }).isRequired,
     onTopicEditUpdate: PropTypes.func.isRequired,
     onTopicEditCancel: PropTypes.func.isRequired,
@@ -38,8 +39,14 @@ export default React.createClass({
   },
 
   getEditButton(){
+    //Don't show the button if we are editing
     const {isEditing} = this.state;
     if(isEditing) { return; }
+
+    //Only show the edit button if the user has permission
+    const {canEdit} = this.props.topic;
+    if(!canEdit) { return; }
+
     return (
       <button
         onClick={this.onEditTopicClicked}

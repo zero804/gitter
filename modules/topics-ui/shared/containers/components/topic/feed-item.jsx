@@ -11,6 +11,7 @@ export default React.createClass({
     children: PropTypes.node,
     item: PropTypes.shape({
       sent: PropTypes.string.isRequired,
+      canEdit: PropTypes.bool.isRequired,
     }),
     canEdit: PropTypes.bool,
     isEditing: PropTypes.bool,
@@ -27,7 +28,7 @@ export default React.createClass({
 
   getDefaultProps(){
     //TODO Change to false
-    return { canEdit: true, value: '' }
+    return { value: '' }
   },
 
   getInitialState(){
@@ -67,6 +68,12 @@ export default React.createClass({
   },
 
   getEditControl(){
+
+    //Only show the edit button if we have
+    //the correct permissions
+    const {canEdit} = this.props.item;
+    if(!canEdit) { return; }
+
     return (
       <button
         className="feed-item__edit-control"
