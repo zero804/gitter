@@ -4,7 +4,6 @@
 var env = require('gitter-web-env');
 var config = env.config;
 var redisClient = env.ioredis.createClient(null, { keyPrefix: 'github:stats:' });
-var stats = env.stats;
 var Tentacles = require('tentacles');
 var Promise = require('bluebird');
 var shutdown = require('shutdown');
