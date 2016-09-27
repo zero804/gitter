@@ -3,7 +3,7 @@
 var userService = require("../../services/user-service");
 var UserStrategy = require('./user-strategy');
 
-var idStrategyGenerator = require('../id-strategy-generator');
+var idStrategyGenerator = require('gitter-web-serialization/lib/id-strategy-generator');
 
 var UserIdStrategy = idStrategyGenerator('UserIdStrategy', UserStrategy, userService.findByIds);
 

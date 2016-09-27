@@ -1,7 +1,7 @@
 "use strict";
 
 var Promise = require('bluebird');
-var getVersion = require('../get-model-version');
+var getVersion = require('gitter-web-serialization/lib/get-model-version');
 var ForumCategoryIdStrategy = require('./forum-category-id-strategy');
 var RepliesForTopicStrategy = require('./topics/replies-for-topic-strategy');
 var TopicReplyingUsersStrategy = require('./topics/topic-replying-users-strategy');

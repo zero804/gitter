@@ -1,7 +1,7 @@
 "use strict";
 
 var roomMembershipService = require('../../../services/room-membership-service');
-var collections = require('../../../utils/collections');
+var collections = require('gitter-web-utils/lib/collections');
 
 function RoomMembershipStrategy(options) {
   this.userId = options.userId || options.currentUserId;
