@@ -5,6 +5,7 @@ var _ = require('lodash');
 var navConstants = require('../../shared/constants/navigation');
 var forumFilterConstants = require('../../shared/constants/forum-filters');
 var forumSortConstants = require('../../shared/constants/forum-sorts');
+var parseTopic = require('../../shared/parse/topic');
 
 module.exports = function topicsStore(models, category, tag, filter, sort, user) {
 
@@ -18,7 +19,7 @@ module.exports = function topicsStore(models, category, tag, filter, sort, user)
 
   //Transform the server side models
   models = models.map((model) => {
-    return model;
+    return parseTopic(model);
   });
 
   //Filter based on the currently selected category

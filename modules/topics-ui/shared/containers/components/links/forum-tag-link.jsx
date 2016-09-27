@@ -8,7 +8,7 @@ export default React.createClass({
   propTypes: {
     className: PropTypes.string,
     onClick: PropTypes.func,
-    groupName: PropTypes.string.isRequired,
+    groupUri: PropTypes.string.isRequired,
     children: PropTypes.node.isRequired,
     tag: PropTypes.shape({
       value: PropTypes.string.isRequired,
@@ -18,10 +18,10 @@ export default React.createClass({
 
   render(){
 
-    const {tag, groupName, className} = this.props;
+    const {tag, groupUri, className} = this.props;
     const {label, value} = tag;
     const title = `View all ${label} topics`;
-    const href = `/${groupName}/topics?tag=${value}`;
+    const href = `/${groupUri}/topics?tag=${value}`;
 
     return (
       <a title={title}

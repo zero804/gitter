@@ -68,7 +68,7 @@ export default React.createClass({
   getDefaultState(){
     const { router } = this.props;
     return {
-      groupName: router.get('groupName'),
+      groupUri: router.get('groupUri'),
       route: router.get('route'),
       router: router,
       currentUserStore: getCurrentUserStore(),
@@ -104,7 +104,7 @@ export default React.createClass({
   getTopicState(){
     var {router} = this.props;
     return Object.assign(this.getDefaultState(), {
-      groupName: router.get('groupName'),
+      groupUri: router.get('groupUri'),
       topicId: router.get('topicId'),
       topicsStore: getTopicsStore(),
       repliesStore: getRepliesStore(),

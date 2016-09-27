@@ -15,7 +15,7 @@ describe('<ForumTagLink/>', () => {
     wrapper = shallow(
       <ForumTagLink
         tag={{ value: 'tag', label: 'Tag' }}
-        groupName="gitterHQ"
+        groupUri="gitterHQ"
         className="test">
           Link
       </ForumTagLink>

@@ -7,12 +7,16 @@ export default React.createClass({
 
   displayName: 'TopicReplyList',
   propTypes: {
-    currentUser: PropTypes.object.isRequired,
+    userId: PropTypes.string.isRequired,
+    user: PropTypes.object.isRequired,
+    forumId: PropTypes.string.isRequired,
+    topicId: PropTypes.string.isRequired,
     replies: PropTypes.array.isRequired,
     newCommentContent: PropTypes.string,
     onReplyCommentsClicked: PropTypes.func.isRequired,
     onNewCommentUpdate: PropTypes.func.isRequired,
     submitNewComment: PropTypes.func.isRequired,
+    onItemSubscribeButtonClick: PropTypes.func
   },
 
   render(){
@@ -29,16 +33,20 @@ export default React.createClass({
   },
 
   buildReplyListItem(reply, index) {
-    const {newCommentContent, currentUser} = this.props;
+    const {userId, forumId, topicId, newCommentContent, user, onItemSubscribeButtonClick} = this.props;
     return (
       <li key={`reply-list-item-${index}`}>
         <TopicReplyListItem
+          userId={userId}
+          forumId={forumId}
+          topicId={topicId}
           reply={reply}
-          currentUser={currentUser}
+          user={user}
           newCommentContent={newCommentContent}
           submitNewComment={this.submitNewComment}
           onNewCommentUpdate={this.onNewCommentUpdate}
-          onCommentsClicked={this.onReplyCommentsClicked}/>
+          onCommentsClicked={this.onReplyCommentsClicked}
+          onSubscribeButtonClick={onItemSubscribeButtonClick}/>
       </li>
     );
   },

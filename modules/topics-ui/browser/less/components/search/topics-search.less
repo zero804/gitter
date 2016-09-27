@@ -2,6 +2,19 @@
 @import (less, reference) "~gitter-styleguide/css/components/buttons.css";
 @import "../../text";
 
+@topic-search-horizontal-spacing: 4rem;
+
+.topic-search-button() {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 3.8rem;
+  margin-left: @topic-search-horizontal-spacing / 2;
+  text-decoration: none;
+  white-space:     nowrap;
+  line-height: 1.4rem;
+}
+
 .topic-search__all-topics-link {
   color:           @light;
   font-weight:     300;
@@ -15,18 +28,64 @@
 
 .topic-search__create-topic-link {
   &:extend(.subdued-button-clouds--small all);
-  display: flex;
-  align-items: center;
-  height: 3.8rem;
-  margin-left:     auto;
-  text-decoration: none;
-  white-space:     nowrap;
-  line-height: 1.4rem;
+  .topic-search-button();
 }
+
+.topic-search__watch-forum-button {
+  &:extend(.secondary-button-clouds--small all);
+  .topic-search-button();
+  flex-wrap: wrap;
+  cursor: pointer;
+
+  &.pending:after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: .05em;
+    right: 0;
+    transform: translateX(-100%);
+
+    display: block;
+    width: 35%;
+    height: 2px;
+
+    opacity: 1;
+    background-color: currentColor;
+
+    animation-name: pending-stripe-animation;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+  }
+}
+
+.topic-search__watch-forum-button-text-item {
+  width: 100%;
+  height: 0;
+  line-height: 0;
+
+  &.hidden {
+    opacity: 0;
+  }
+}
+
+@keyframes pending-stripe-animation {
+  0% {
+    left: 0;
+    width: 0;
+  }
+  50% {
+    width: 35%;
+  }
+  100% {
+    left: 100%;
+    width: 0;
+  }
+}
+
 
 .topic-search__search-input {
   width:            100%;
-  margin:           0 4rem;
+  margin-left: @topic-search-horizontal-spacing;
   padding:          1rem;
   padding-left: 1.5rem;
   border-bottom:    none;
