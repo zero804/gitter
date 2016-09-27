@@ -20,31 +20,7 @@ export default React.createClass({
 
   render(){
 
-    const {groupName, isSignedIn} = this.props;
-
-
-    let createTopicButton = (
-      <CreateTopicLink
-        groupName={groupName}
-        className="topic-search__create-topic-link">
-        Create Topic
-      </CreateTopicLink>
-    );
-    if(!isSignedIn) {
-      // TODO: Use basePath
-      // TODO: Add `returnTo` but using `window.location.pathname` is tricky here because
-      // the server-side render does not like it. We could module out `window`
-      const loginUrl = `/login?source=${CREATE_TOPIC_LINK_SOURCE}`;
-
-      createTopicButton = (
-        <a
-          href={loginUrl}
-          className="topic-search__create-topic-link"
-          onClick={this.onCreateTopicSignInLinkClick}>
-          Create Topic
-        </a>
-      )
-    }
+    const {groupName} = this.props;
 
     return (
       <Container>
@@ -62,7 +38,11 @@ export default React.createClass({
             placeholder="Search for topics, replies and comments"
             onChange={this.onSearchUpdate}
             className="topic-search__search-input"/>
-          {createTopicButton}
+          <CreateTopicLink
+            groupName={groupName}
+            className="topic-search__create-topic-link">
+            Create Topic
+          </CreateTopicLink>
         </Panel>
       </Container>
     );
@@ -73,7 +53,7 @@ export default React.createClass({
   },
 
   onCreateTopicSignInLinkClick(e) {
-    requestSignIn(CREATE_TOPIC_LINK_SOURCE);
+    //requestSignIn(CREATE_TOPIC_LINK_SOURCE);
     e.preventDefault();
   }
 

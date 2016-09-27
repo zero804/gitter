@@ -1,6 +1,5 @@
 import { parse, stringify } from 'qs';
 import Backbone from 'backbone';
-import frameUtils from 'gitter-web-frame-utils';
 import { subscribe } from '../../../shared/dispatcher';
 import * as navConstants from '../../../shared/constants/navigation';
 import * as forumCatConstants from '../../../shared/constants/forum-categories';
@@ -8,6 +7,9 @@ import * as forumFilterConstants from '../../../shared/constants/forum-filters';
 import * as forumTagConstants from '../../../shared/constants/forum-tags';
 import * as forumSortConstants from '../../../shared/constants/forum-sorts';
 import * as createTopicConstants from '../../../shared/constants/create-topic';
+import {getIsSignedIn} from '../stores/current-user-store';
+import requestSignIn from '../../../shared/action-creators/forum/request-sign-in';
+
 
 var RouteModel = Backbone.Model.extend({
   //Do we need to use the constructor to get the default values out of the window.context
@@ -42,6 +44,7 @@ var Router = Backbone.Router.extend({
   },
 
   navigate(url, options){
+
     //Remove ~topics from the url
     let appUrl = url.split('~')[0];
 
@@ -49,8 +52,11 @@ var Router = Backbone.Router.extend({
     if(appUrl[appUrl.length - 1] === '/') { appUrl = appUrl.substring(0, appUrl.length - 1); }
     if(appUrl[0] !== '/') { appUrl = '/' + appUrl; }
 
+    //Generate payload
+    const json = JSON.stringify({ type: 'navigation', url: appUrl, urlType: 'topics' });
+
     //Proxy up to the frame
-    frameUtils.postMessage({ type: 'navigation', url: appUrl, urlType: 'topics' });
+    window.parent.postMessage(json, window.location.origin);
 
     //Call super
     Backbone.Router.prototype.navigate.call(this, url, options);
@@ -87,9 +93,18 @@ var Router = Backbone.Router.extend({
     });
   },
 
-  navigateToCreateTopic(){
-    const groupName = this.model.get('groupName');
-    this.navigate(`/${groupName}/topics/create-topic/~topics`, { trigger: true });
+  navigateToCreateTopic(data) {
+    const { source } = data;
+
+    if(getIsSignedIn()) {
+        const groupName = this.model.get('groupName');
+        this.navigate(`/${groupName}/topics/create-topic/~topics`, { trigger: true });
+    }
+    else {
+      requestSignIn(source);
+      return;
+    }
+
   },
 
   updateForumCategory(data){

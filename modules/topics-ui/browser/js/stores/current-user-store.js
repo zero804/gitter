@@ -24,3 +24,7 @@ export function getCurrentUserStore(data){
 export function getCurrentUser(){
   return getCurrentUserStore().getCurrentUser();
 }
+
+export function getIsSignedIn(){
+  return getCurrentUserStore().getIsSignedIn();
+}
