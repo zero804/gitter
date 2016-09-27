@@ -7,7 +7,12 @@ export default React.createClass({
 
   displayName: 'TopicReplyList',
   propTypes: {
+    currentUser: PropTypes.object.isRequired,
     replies: PropTypes.array.isRequired,
+    newCommentContent: PropTypes.string,
+    onReplyCommentsClicked: PropTypes.func.isRequired,
+    onNewCommentUpdate: PropTypes.func.isRequired,
+    submitNewComment: PropTypes.func.isRequired,
   },
 
   render(){
@@ -24,11 +29,30 @@ export default React.createClass({
   },
 
   buildReplyListItem(reply, index) {
+    const {newCommentContent, currentUser} = this.props;
     return (
       <li key={`reply-list-item-${index}`}>
-        <TopicReplyListItem reply={reply} />
+        <TopicReplyListItem
+          reply={reply}
+          currentUser={currentUser}
+          newCommentContent={newCommentContent}
+          submitNewComment={this.submitNewComment}
+          onNewCommentUpdate={this.onNewCommentUpdate}
+          onCommentsClicked={this.onReplyCommentsClicked}/>
       </li>
     );
+  },
+
+  onReplyCommentsClicked(replyId){
+    this.props.onReplyCommentsClicked(replyId);
+  },
+
+  onNewCommentUpdate(replyId, val) {
+    this.props.onNewCommentUpdate(replyId, val);
+  },
+
+  submitNewComment(){
+    this.props.submitNewComment();
   }
 
 });
