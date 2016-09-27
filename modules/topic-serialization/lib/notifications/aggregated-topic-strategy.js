@@ -7,9 +7,11 @@ function AggregatedTopicStrategy() {
 }
 
 AggregatedTopicStrategy.prototype = {
-  map: function(item, authorUser) {
+  map: function(item, authorUser, owningForum) {
+    var id = item.id || item._id && item._id.toHexString();
+
     return {
-      id: item.id || item._id && item._id.toHexString(),
+      id: id,
       title: item.title,
       slug: item.slug,
       body: {
@@ -25,6 +27,9 @@ AggregatedTopicStrategy.prototype = {
       editedAt: item.editedAt,
       lastChanged: item.lastChanged,
       lastModified: item.lastModified,
+
+      // TODO: permalink?
+      uri: owningForum.uri + '/topic/' + id + '/' + item.slug
     }
   },
 

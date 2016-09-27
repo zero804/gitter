@@ -7,9 +7,12 @@ function AggregatedReplyStrategy() {
 }
 
 AggregatedReplyStrategy.prototype = {
-  map: function(item, authorUser) {
+  map: function(item, authorUser, owningTopic, owningForum) {
+    var owningTopicId = owningTopic.id || (owningTopic._id && owningTopic._id.toHexString());
+
     return {
       id: item.id || item._id && item._id.toHexString(),
+
       body: {
         text: item.text,
         html: item.html,
@@ -21,6 +24,9 @@ AggregatedReplyStrategy.prototype = {
       editedAt: item.editedAt,
       lastChanged: item.lastChanged,
       lastModified: item.lastModified,
+
+      // TODO: permalink?
+      uri: owningForum.uri + '/topic/' + owningTopicId + '/' + item.slug
     };
   },
 

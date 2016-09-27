@@ -7,7 +7,9 @@ function AggregatedCommentStrategy() {
 }
 
 AggregatedCommentStrategy.prototype = {
-  map: function(item, authorUser) {
+  map: function(item, authorUser, owningComment, owningTopic, owningForum) {
+    var owningTopicId = owningTopic.id || (owningTopic._id && owningTopic._id.toHexString());
+
     return {
       id: item.id || item._id && item._id.toHexString(),
       body: {
@@ -17,6 +19,9 @@ AggregatedCommentStrategy.prototype = {
       user: this.userStrategy.map(authorUser),
       sent: item.sent,
       editedAt: item.editedAt,
+
+      // TODO: permalink?
+      uri: owningForum.uri + '/topic/' + owningTopicId + '/' + item.slug
     };
   },
 
