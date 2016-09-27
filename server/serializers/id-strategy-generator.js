@@ -1,6 +1,6 @@
 "use strict";
 
-var collections = require("../utils/collections");
+var collections = require('gitter-web-utils/lib/collections');
 var Promise = require('bluebird');
 var debug = require('debug')('gitter:infra:serializer:id-loader');
 var Lazy = require('lazy.js');
