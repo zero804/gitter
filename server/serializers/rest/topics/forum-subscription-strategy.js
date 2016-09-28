@@ -1,7 +1,7 @@
 'use strict';
 
 var subscriberService = require('gitter-web-topic-notifications/lib/subscriber-service');
-var ForumObject = require('gitter-web-topic-notifications/lib/forum-object');
+var ForumObject = require('gitter-web-topic-models/lib/forum-object');
 
 function ForumSubscriptionStrategy(options) {
   this.subscriptionVisitor = null;

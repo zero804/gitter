@@ -2,7 +2,7 @@
 
 var Promise = require('bluebird');
 var ForumSubscription = require('gitter-web-persistence').ForumSubscription;
-var ForumObject = require('./forum-object');
+var ForumObject = require('gitter-web-topic-models/lib/forum-object');
 var assert = require('assert');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
