@@ -7,31 +7,31 @@
         <tr>
           <td>
             <h2>Yes! A new reply to a topic.</h2>
+            <br>
+            <h3>{{ notification.topic.title }}</h3>
+            <br>
             <table>
               <tr>
-                <td></td>
-                <td>{{ notification.topic.title }}</td>
-              </tr>
-              <tr>
-                <td class="avatar"><img {{{ avatarSrcSet notification.reply.user.avatarUrl 24 }}} class="avatar"></td>
+                <td class="avatar"><img height="24" width="24" {{{ avatarSrcSet notification.reply.user.avatarUrl 24 }}} class="avatar"></td>
                 <td class="chat"><strong>{{ notification.reply.user.username }}</strong></td>
               </tr>
               <tr>
-                <td></td>
-                <td>{{{ notification.reply.body.html }}}</td>
+                <td colspan="2"><br>{{{ notification.reply.body.html }}}</td>
               </tr>
             </table>
             <br>
             <table>
               <tr>
-                <td class="avatar">
+                <td>
                   <a href="{{ emailBasePath }}/{{ notification.reply.uri }}" style="text-decoration: none" class="button-green">Open topic</a>
                 </td>
               </tr>
             </table>
             <br>
-            <hr>
             <br>
+            <hr>
+            Topics are currently in beta. You can't reply via email, yet.
+            <hr>
           </td>
           <td class="expander"></td>
         </tr>
