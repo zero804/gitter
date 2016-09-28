@@ -45,6 +45,8 @@ ForumStrategy.prototype = {
       name: forum.name,
       uri: forum.uri,
       tags: forum.tags,
+      // TODO: we're gonna drop categories & topics at some stage as they have
+      // their own live collections, REST APIs, etc.
       categories: this.categoriesForForumStrategy.map(id),
       topics: this.topicsForForumStrategy ? this.topicsForForumStrategy.map(id) : undefined,
       subscribed: this.subscriptionStrategy ? this.subscriptionStrategy.map(forum) : undefined,
