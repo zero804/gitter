@@ -7,6 +7,7 @@ import TopicContainer from '../../shared/containers/TopicContainer.jsx';
 //Stores
 import NewTopicStore from './stores/new-topic-store';
 import NewReplyStore from './stores/new-reply-store';
+import NewCommentStore from './stores/new-comment-store-store';
 
 import {getCurrentUserStore} from './stores/current-user-store';
 import {getForumStore} from './stores/forum-store';
@@ -14,6 +15,7 @@ import {getForumTagStore} from './stores/forum-tag-store';
 import {getForumCategoryStore} from './stores/forum-category-store';
 import {getTopicsStore} from './stores/topics-store';
 import {getRepliesStore} from './stores/replies-store';
+import {getCommentsStore} from './stores/comments-store';
 
 import * as navConstants from '../../shared/constants/navigation';
 
@@ -66,7 +68,7 @@ export default React.createClass({
   getDefaultState(){
     const { router } = this.props;
     return {
-      groupName: router.get('groupName'),
+      groupUri: router.get('groupUri'),
       route: router.get('route'),
       router: router,
       currentUserStore: getCurrentUserStore(),
@@ -102,11 +104,13 @@ export default React.createClass({
   getTopicState(){
     var {router} = this.props;
     return Object.assign(this.getDefaultState(), {
-      groupName: router.get('groupName'),
+      groupUri: router.get('groupUri'),
       topicId: router.get('topicId'),
       topicsStore: getTopicsStore(),
       repliesStore: getRepliesStore(),
       newReplyStore: new NewReplyStore(),
+      commentsStore: getCommentsStore(),
+      newCommentStore: new NewCommentStore(),
     });
   },
 

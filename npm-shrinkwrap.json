@@ -390,7 +390,7 @@
       "dependencies": {
         "redis": {
           "version": "2.6.2",
-          "from": "redis@>=2.1.0 <3.0.0",
+          "from": "redis@latest",
           "resolved": "http://beta-internal:4873/redis/-/redis-2.6.2.tgz",
           "dependencies": {
             "double-ended-queue": {
@@ -583,7 +583,7 @@
     "debug": {
       "version": "2.2.0",
       "from": "debug@>=2.2.0 <3.0.0",
-      "resolved": "https://registry.npmjs.org/debug/-/debug-2.2.0.tgz",
+      "resolved": "http://beta-internal:4873/debug/-/debug-2.2.0.tgz",
       "dependencies": {
         "ms": {
           "version": "0.7.1",
@@ -666,9 +666,9 @@
           "resolved": "http://beta-internal:4873/promise/-/promise-7.1.1.tgz",
           "dependencies": {
             "asap": {
-              "version": "2.0.4",
+              "version": "2.0.5",
               "from": "asap@>=2.0.3 <2.1.0",
-              "resolved": "http://beta-internal:4873/asap/-/asap-2.0.4.tgz"
+              "resolved": "http://beta-internal:4873/asap/-/asap-2.0.5.tgz"
             }
           }
         }
@@ -717,7 +717,7 @@
         "pause-stream": {
           "version": "0.0.11",
           "from": "pause-stream@0.0.11",
-          "resolved": "https://registry.npmjs.org/pause-stream/-/pause-stream-0.0.11.tgz"
+          "resolved": "http://beta-internal:4873/pause-stream/-/pause-stream-0.0.11.tgz"
         },
         "split": {
           "version": "0.3.3",
@@ -921,7 +921,7 @@
             "ms": {
               "version": "0.7.1",
               "from": "ms@0.7.1",
-              "resolved": "https://registry.npmjs.org/ms/-/ms-0.7.1.tgz"
+              "resolved": "http://beta-internal:4873/ms/-/ms-0.7.1.tgz"
             },
             "statuses": {
               "version": "1.3.0",
@@ -1130,11 +1130,6 @@
           "resolved": "http://beta-internal:4873/utils-merge/-/utils-merge-1.0.0.tgz"
         }
       }
-    },
-    "faker": {
-      "version": "3.1.0",
-      "from": "faker@>=3.1.0 <4.0.0",
-      "resolved": "http://beta-internal:4873/faker/-/faker-3.1.0.tgz"
     },
     "fast-csv": {
       "version": "0.6.0",
@@ -1486,9 +1481,9 @@
                       "resolved": "http://beta-internal:4873/async/-/async-2.0.1.tgz",
                       "dependencies": {
                         "lodash": {
-                          "version": "4.16.1",
+                          "version": "4.16.2",
                           "from": "lodash@>=4.8.0 <5.0.0",
-                          "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.16.1.tgz"
+                          "resolved": "http://beta-internal:4873/lodash/-/lodash-4.16.2.tgz"
                         }
                       }
                     }
@@ -1782,9 +1777,9 @@
           }
         },
         "lodash": {
-          "version": "4.16.1",
+          "version": "4.16.2",
           "from": "lodash@>=4.6.1 <5.0.0",
-          "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.16.1.tgz"
+          "resolved": "http://beta-internal:4873/lodash/-/lodash-4.16.2.tgz"
         },
         "mandrill-api": {
           "version": "1.0.45",
@@ -2007,7 +2002,7 @@
       "dependencies": {
         "redis": {
           "version": "2.6.2",
-          "from": "redis@>=2.1.0 <3.0.0",
+          "from": "redis@latest",
           "resolved": "http://beta-internal:4873/redis/-/redis-2.6.2.tgz",
           "dependencies": {
             "double-ended-queue": {
@@ -2331,22 +2326,22 @@
       "from": "modules/env",
       "resolved": "file:modules/env"
     },
-    "gitter-web-fake-data": {
+    "gitter-web-fingerprinting": {
       "version": "1.0.0",
-      "from": "modules/fake-data",
-      "resolved": "file:modules/fake-data",
+      "from": "modules/fingerprinting",
+      "resolved": "file:modules/fingerprinting"
+    },
+    "gitter-web-frame-utils": {
+      "version": "0.1.0",
+      "from": "modules/frame-utils",
+      "resolved": "file:modules/frame-utils",
       "dependencies": {
-        "lodash": {
-          "version": "4.16.1",
-          "from": "lodash@>=4.13.1 <5.0.0",
-          "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.16.1.tgz"
+        "debug-proxy": {
+          "version": "0.2.0",
+          "from": "debug-proxy@>=0.2.0 <0.3.0",
+          "resolved": "http://beta-internal:4873/debug-proxy/-/debug-proxy-0.2.0.tgz"
         }
       }
-    },
-    "gitter-web-forums": {
-      "version": "1.0.0",
-      "from": "modules/forums",
-      "resolved": "file:modules/forums"
     },
     "gitter-web-github": {
       "version": "1.0.0",
@@ -2438,6 +2433,11 @@
       "from": "modules/qs",
       "resolved": "file:modules/qs"
     },
+    "gitter-web-serialization": {
+      "version": "1.0.0",
+      "from": "modules/serialization",
+      "resolved": "file:modules/serialization"
+    },
     "gitter-web-shared": {
       "version": "1.0.0",
       "from": "shared",
@@ -2447,6 +2447,11 @@
       "version": "1.0.0",
       "from": "modules/slugify",
       "resolved": "file:modules/slugify"
+    },
+    "gitter-web-spam-detection": {
+      "version": "1.0.0",
+      "from": "modules/spam-detection",
+      "resolved": "file:modules/spam-detection"
     },
     "gitter-web-split-tests": {
       "version": "1.0.0",
@@ -2489,9 +2494,9 @@
           "resolved": "http://beta-internal:4873/backbone/-/backbone-1.2.3.tgz"
         },
         "lodash": {
-          "version": "4.16.1",
+          "version": "4.16.2",
           "from": "lodash@>=4.15.0 <5.0.0",
-          "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.16.1.tgz"
+          "resolved": "http://beta-internal:4873/lodash/-/lodash-4.16.2.tgz"
         },
         "sinon": {
           "version": "1.17.6",
@@ -2538,6 +2543,16 @@
       "version": "1.0.0",
       "from": "modules/twitter-backend",
       "resolved": "file:modules/twitter-backend"
+    },
+    "gitter-web-user-serialization": {
+      "version": "1.0.0",
+      "from": "modules/user-serialization",
+      "resolved": "file:modules/user-serialization"
+    },
+    "gitter-web-utils": {
+      "version": "1.0.0",
+      "from": "modules/utils",
+      "resolved": "file:modules/utils"
     },
     "gitter-web-validators": {
       "version": "1.0.0",
@@ -2834,9 +2849,9 @@
                       "resolved": "http://beta-internal:4873/async/-/async-2.0.1.tgz",
                       "dependencies": {
                         "lodash": {
-                          "version": "4.16.1",
+                          "version": "4.16.2",
                           "from": "lodash@>=4.8.0 <5.0.0",
-                          "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.16.1.tgz"
+                          "resolved": "http://beta-internal:4873/lodash/-/lodash-4.16.2.tgz"
                         }
                       }
                     }
@@ -3503,7 +3518,7 @@
         },
         "parseurl": {
           "version": "1.3.1",
-          "from": "parseurl@>=1.3.1 <1.4.0",
+          "from": "parseurl@>=1.3.0 <1.4.0",
           "resolved": "http://beta-internal:4873/parseurl/-/parseurl-1.3.1.tgz"
         },
         "vary": {
@@ -3697,7 +3712,7 @@
         "mquery": {
           "version": "1.11.0",
           "from": "mquery@1.11.0",
-          "resolved": "https://registry.npmjs.org/mquery/-/mquery-1.11.0.tgz",
+          "resolved": "http://beta-internal:4873/mquery/-/mquery-1.11.0.tgz",
           "dependencies": {
             "bluebird": {
               "version": "2.10.2",
@@ -3714,7 +3729,7 @@
         "ms": {
           "version": "0.7.1",
           "from": "ms@0.7.1",
-          "resolved": "https://registry.npmjs.org/ms/-/ms-0.7.1.tgz"
+          "resolved": "http://beta-internal:4873/ms/-/ms-0.7.1.tgz"
         },
         "muri": {
           "version": "1.1.0",
@@ -4145,7 +4160,7 @@
       "dependencies": {
         "passport-oauth2": {
           "version": "1.3.0",
-          "from": "passport-oauth2@>=1.1.2 <2.0.0",
+          "from": "passport-oauth2@>=1.0.0 <2.0.0",
           "resolved": "http://beta-internal:4873/passport-oauth2/-/passport-oauth2-1.3.0.tgz",
           "dependencies": {
             "passport-strategy": {
@@ -4198,7 +4213,7 @@
       "dependencies": {
         "passport-oauth2": {
           "version": "1.3.0",
-          "from": "passport-oauth2@>=1.1.2 <2.0.0",
+          "from": "passport-oauth2@>=1.0.0 <2.0.0",
           "resolved": "http://beta-internal:4873/passport-oauth2/-/passport-oauth2-1.3.0.tgz",
           "dependencies": {
             "passport-strategy": {
@@ -4304,9 +4319,9 @@
               "resolved": "http://beta-internal:4873/isomorphic-fetch/-/isomorphic-fetch-2.2.1.tgz",
               "dependencies": {
                 "node-fetch": {
-                  "version": "1.6.1",
+                  "version": "1.6.3",
                   "from": "node-fetch@>=1.0.1 <2.0.0",
-                  "resolved": "http://beta-internal:4873/node-fetch/-/node-fetch-1.6.1.tgz",
+                  "resolved": "http://beta-internal:4873/node-fetch/-/node-fetch-1.6.3.tgz",
                   "dependencies": {
                     "encoding": {
                       "version": "0.1.12",
@@ -4340,9 +4355,9 @@
               "resolved": "http://beta-internal:4873/promise/-/promise-7.1.1.tgz",
               "dependencies": {
                 "asap": {
-                  "version": "2.0.4",
+                  "version": "2.0.5",
                   "from": "asap@>=2.0.3 <2.1.0",
-                  "resolved": "http://beta-internal:4873/asap/-/asap-2.0.4.tgz"
+                  "resolved": "http://beta-internal:4873/asap/-/asap-2.0.5.tgz"
                 }
               }
             },
@@ -4964,11 +4979,11 @@
         "ms": {
           "version": "0.7.1",
           "from": "ms@0.7.1",
-          "resolved": "https://registry.npmjs.org/ms/-/ms-0.7.1.tgz"
+          "resolved": "http://beta-internal:4873/ms/-/ms-0.7.1.tgz"
         },
         "parseurl": {
           "version": "1.3.1",
-          "from": "parseurl@>=1.3.1 <1.4.0",
+          "from": "parseurl@>=1.3.0 <1.4.0",
           "resolved": "http://beta-internal:4873/parseurl/-/parseurl-1.3.1.tgz"
         }
       }
@@ -5537,9 +5552,9 @@
               "resolved": "http://beta-internal:4873/fs-extra/-/fs-extra-0.26.5.tgz",
               "dependencies": {
                 "graceful-fs": {
-                  "version": "4.1.6",
+                  "version": "4.1.8",
                   "from": "graceful-fs@>=4.1.2 <5.0.0",
-                  "resolved": "http://beta-internal:4873/graceful-fs/-/graceful-fs-4.1.6.tgz"
+                  "resolved": "http://beta-internal:4873/graceful-fs/-/graceful-fs-4.1.8.tgz"
                 },
                 "jsonfile": {
                   "version": "2.4.0",
@@ -5679,9 +5694,9 @@
               }
             },
             "cross-spawn": {
-              "version": "4.0.0",
+              "version": "4.0.2",
               "from": "cross-spawn@>=4.0.0 <5.0.0",
-              "resolved": "http://beta-internal:4873/cross-spawn/-/cross-spawn-4.0.0.tgz",
+              "resolved": "http://beta-internal:4873/cross-spawn/-/cross-spawn-4.0.2.tgz",
               "dependencies": {
                 "lru-cache": {
                   "version": "4.0.1",
@@ -5771,9 +5786,9 @@
                   "resolved": "http://beta-internal:4873/load-json-file/-/load-json-file-1.1.0.tgz",
                   "dependencies": {
                     "graceful-fs": {
-                      "version": "4.1.6",
+                      "version": "4.1.8",
                       "from": "graceful-fs@>=4.1.2 <5.0.0",
-                      "resolved": "http://beta-internal:4873/graceful-fs/-/graceful-fs-4.1.6.tgz"
+                      "resolved": "http://beta-internal:4873/graceful-fs/-/graceful-fs-4.1.8.tgz"
                     },
                     "parse-json": {
                       "version": "2.2.0",
@@ -5837,7 +5852,7 @@
                     },
                     "semver": {
                       "version": "5.3.0",
-                      "from": "semver@>=2.0.0 <3.0.0||>=3.0.0 <4.0.0||>=4.0.0 <5.0.0||>=5.0.0 <6.0.0",
+                      "from": "semver@>=5.1.0 <6.0.0",
                       "resolved": "http://beta-internal:4873/semver/-/semver-5.3.0.tgz"
                     },
                     "validate-npm-package-license": {
@@ -5872,9 +5887,9 @@
                   "resolved": "http://beta-internal:4873/path-type/-/path-type-1.1.0.tgz",
                   "dependencies": {
                     "graceful-fs": {
-                      "version": "4.1.6",
+                      "version": "4.1.8",
                       "from": "graceful-fs@>=4.1.2 <5.0.0",
-                      "resolved": "http://beta-internal:4873/graceful-fs/-/graceful-fs-4.1.6.tgz"
+                      "resolved": "http://beta-internal:4873/graceful-fs/-/graceful-fs-4.1.8.tgz"
                     },
                     "pify": {
                       "version": "2.3.0",
@@ -6093,9 +6108,9 @@
                   "resolved": "http://beta-internal:4873/async/-/async-2.0.1.tgz",
                   "dependencies": {
                     "lodash": {
-                      "version": "4.16.1",
+                      "version": "4.16.2",
                       "from": "lodash@>=4.8.0 <5.0.0",
-                      "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.16.1.tgz"
+                      "resolved": "http://beta-internal:4873/lodash/-/lodash-4.16.2.tgz"
                     }
                   }
                 }
@@ -6108,7 +6123,7 @@
               "dependencies": {
                 "chalk": {
                   "version": "1.1.3",
-                  "from": "chalk@>=1.0.0 <2.0.0",
+                  "from": "chalk@>=1.1.1 <2.0.0",
                   "resolved": "http://beta-internal:4873/chalk/-/chalk-1.1.3.tgz",
                   "dependencies": {
                     "ansi-styles": {
@@ -6449,7 +6464,7 @@
           "dependencies": {
             "strip-ansi": {
               "version": "3.0.1",
-              "from": "strip-ansi@>=3.0.1 <4.0.0",
+              "from": "strip-ansi@>=3.0.0 <4.0.0",
               "resolved": "http://beta-internal:4873/strip-ansi/-/strip-ansi-3.0.1.tgz",
               "dependencies": {
                 "ansi-regex": {
@@ -6540,9 +6555,9 @@
                   "resolved": "http://beta-internal:4873/load-json-file/-/load-json-file-1.1.0.tgz",
                   "dependencies": {
                     "graceful-fs": {
-                      "version": "4.1.6",
+                      "version": "4.1.8",
                       "from": "graceful-fs@>=4.1.2 <5.0.0",
-                      "resolved": "http://beta-internal:4873/graceful-fs/-/graceful-fs-4.1.6.tgz"
+                      "resolved": "http://beta-internal:4873/graceful-fs/-/graceful-fs-4.1.8.tgz"
                     },
                     "parse-json": {
                       "version": "2.2.0",
@@ -6653,9 +6668,9 @@
                   "resolved": "http://beta-internal:4873/path-type/-/path-type-1.1.0.tgz",
                   "dependencies": {
                     "graceful-fs": {
-                      "version": "4.1.6",
+                      "version": "4.1.8",
                       "from": "graceful-fs@>=4.1.2 <5.0.0",
-                      "resolved": "http://beta-internal:4873/graceful-fs/-/graceful-fs-4.1.6.tgz"
+                      "resolved": "http://beta-internal:4873/graceful-fs/-/graceful-fs-4.1.8.tgz"
                     },
                     "pify": {
                       "version": "2.3.0",
@@ -6726,7 +6741,7 @@
             },
             "strip-ansi": {
               "version": "3.0.1",
-              "from": "strip-ansi@>=3.0.1 <4.0.0",
+              "from": "strip-ansi@>=3.0.0 <4.0.0",
               "resolved": "http://beta-internal:4873/strip-ansi/-/strip-ansi-3.0.1.tgz",
               "dependencies": {
                 "ansi-regex": {

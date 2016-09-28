@@ -1,6 +1,6 @@
 "use strict";
 
-var collections = require("../../utils/collections");
+var collections = require('gitter-web-utils/lib/collections');
 var TroupeStrategy = require('./troupe-strategy');
 var leanTroupeDao = require('../../services/daos/troupe-dao').full;
 var Lazy = require('lazy.js');

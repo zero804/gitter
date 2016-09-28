@@ -7,7 +7,7 @@ var troupeService = require('../../server/services/troupe-service');
 var oneToOneRoomService = require('../../server/services/one-to-one-room-service');
 var categoriseUsersInRoom = require('../../server/services/categorise-users-in-room');
 var roomMembershipService = require('../../server/services/room-membership-service');
-var collections = require('../../server/utils/collections');
+var collections = require('gitter-web-utils/lib/collections');
 var Promise = require('bluebird');
 
 var shutdown = require('shutdown');

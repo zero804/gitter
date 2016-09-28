@@ -15,4 +15,11 @@ describe.skip('forumStore', () => {
     assert(forumStore(data).getForum);
   });
 
+  it('should expose a getForumId function', () => {
+    assert(forumStore(data).getForumId);
+  });
+
+  it('should expose a getSubscriptionState function', () => {
+    assert(forumStore(data).getSubscriptionState);
+  });
 });

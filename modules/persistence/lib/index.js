@@ -86,6 +86,7 @@ var schemas = {
   TroupeRemovedUser: require('./schemas/troupe-removed-user-schema'),
   TroupeInvite: require('./schemas/troupe-invite-schema'),
   KnownExternalAccess: require('./schemas/known-external-access-schema'),
+  Fingerprint: require('./schemas/fingerprint-schema'),
 
   /* Topics */
   Forum: require('./schemas/forum-schema'),

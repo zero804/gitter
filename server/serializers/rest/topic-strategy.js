@@ -1,7 +1,7 @@
 "use strict";
 
 var Promise = require('bluebird');
-var getVersion = require('../get-model-version');
+var getVersion = require('gitter-web-serialization/lib/get-model-version');
 var ForumCategoryIdStrategy = require('./forum-category-id-strategy');
 var RepliesForTopicStrategy = require('./topics/replies-for-topic-strategy');
 var TopicReplyingUsersStrategy = require('./topics/topic-replying-users-strategy');
@@ -53,7 +53,9 @@ TopicStrategy.prototype = {
     var categoryIds = topics.map(function(i) { return i.categoryId; });
     strategies.push(this.categoryStrategy.preload(categoryIds));
 
-    strategies.push(this.topicSubscriptionStrategy.preload(topics));
+    if (this.topicSubscriptionStrategy) {
+      strategies.push(this.topicSubscriptionStrategy.preload(topics));
+    }
 
     return Promise.all(strategies);
   },
@@ -149,9 +151,12 @@ TopicStrategy.standard = function(options) {
   strategy.userStrategy = UserIdStrategy.slim();
   strategy.replyingUsersStrategy = new TopicReplyingUsersStrategy();
   strategy.categoryStrategy = new ForumCategoryIdStrategy();
-  strategy.topicSubscriptionStrategy = new TopicSubscriptionStrategy({
-    currentUserId: currentUserId
-  });
+
+  if (currentUserId) {
+    strategy.topicSubscriptionStrategy = new TopicSubscriptionStrategy({
+      currentUserId: currentUserId
+    });
+  }
 
   return strategy;
 }
@@ -164,7 +169,7 @@ TopicStrategy.nested = function(options) {
 
   // Added nested strategies to the standard
   strategy.repliesForTopicStrategy = RepliesForTopicStrategy.standard({
-    currentUserId:  options && options.currentUserId
+    currentUserId: options && options.currentUserId
   })
 
   return strategy;

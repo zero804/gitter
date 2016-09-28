@@ -20,6 +20,10 @@ var opts = yargs
     required: true,
     description: 'repo to import issues from'
   })
+  .option('groupUri', {
+    required: true,
+    description: 'group'
+  })
   .help('help')
   .alias('help', 'h')
   .argv;
@@ -73,10 +77,10 @@ Importer.prototype = {
       });
   },
 
-  createIssue: function(issue) {
+  createIssue: function(issue, groupUri) {
     // Create a topic for each issue...
     var username = issue.user.login;
-    return this.getForumWithPolicyService(username, 'gitterHQ')
+    return this.getForumWithPolicyService(username, groupUri)
       .then(function(forumWithPolicyService) {
         this.forumWithPolicyService = forumWithPolicyService;
         return categoryService.findBySlugForForum(this.forum._id, 'issues');
@@ -89,10 +93,10 @@ Importer.prototype = {
       })
   },
 
-  createReply: function(topic, comment) {
+  createReply: function(topic, comment, groupUri) {
     var username = comment.user.login;
 
-    return this.getForumWithPolicyService(username, 'gitterHQ')
+    return this.getForumWithPolicyService(username, groupUri)
       .then(function(forumWithPolicyService) {
         return forumWithPolicyService.createReply(topic, {
           text: processMarkdown(comment.body)
@@ -109,7 +113,7 @@ function doImport(opts) {
     source
       .flatMap(function(issue) {
         // Create a topic for each issue
-        return importer.createIssue(issue)
+        return importer.createIssue(issue, opts.groupUri)
           .then(function(topic) {
             return {
               forumWithPolicy: this.forumWithPolicyService,
@@ -134,7 +138,7 @@ function doImport(opts) {
         var comment = item.comment;
         var topic = item.topic;
 
-        return importer.createReply(topic, comment);
+        return importer.createReply(topic, comment, opts.groupUri);
       })
       .subscribe(
       function() { },

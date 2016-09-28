@@ -7,7 +7,7 @@ export default createClass({
   displayName: 'TopicLink',
   propTypes: {
     children: PropTypes.node.isRequired,
-    groupName: PropTypes.string.isRequired,
+    groupUri: PropTypes.string.isRequired,
     topic: PropTypes.shape({
       id: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
@@ -18,9 +18,9 @@ export default createClass({
 
   render(){
 
-    const {topic, groupName, className} = this.props;
+    const {topic, groupUri, className} = this.props;
     const {slug, id, title} = topic;
-    const href = `/${groupName}/topics/topic/${id}/${slug}`;
+    const href = `/${groupUri}/topics/topic/${id}/${slug}`;
     const elementTitle = `View ${title}`;
 
     return (
@@ -36,9 +36,9 @@ export default createClass({
 
   onClick(e){
     e.preventDefault();
-    const {topic, groupName} = this.props;
+    const {topic, groupUri} = this.props;
     const {id, slug} = topic;
-    dispatch(navigateToTopic(groupName, id, slug));
+    dispatch(navigateToTopic(groupUri, id, slug));
   }
 
 });

@@ -223,8 +223,12 @@ GroupWithPolicyService.prototype.createForum = secureMethod([allowAdmin], functi
     categoriesInfo = getCategoriesInfo(categoryNames);
   }
 
+  var forumUri = group.uri + '/topics';
+
   var forumInfo = {
-    tags: tags
+    tags: tags,
+    uri: forumUri,
+    name: group.name || group.uri
   };
 
   // TODO: this is hardcoded for now, but down the line the user should be able
