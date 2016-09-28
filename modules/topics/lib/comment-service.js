@@ -200,22 +200,8 @@ function createComment(user, reply, options) {
     });
 }
 
-/* private */
-function makeLastModifiedUpdater(Model, id, lastModified) {
-  return function() {
-    var query = {
-      _id: id
-    };
-    var update = {
-      $max: {
-        lastModified: lastModified
-      }
-    };
-    return Model.findOneAndUpdate(query, update, { new: true })
-      .lean()
-      .exec();
-  };
-}
+var updateTopicLastModified = mongooseUtils.makeLastModifiedUpdater(Topic);
+var updateReplyLastModified = mongooseUtils.makeLastModifiedUpdater(Reply);
 
 /* private */
 function updateCommentFields(topicId, replyId, commentId, fields) {
@@ -225,15 +211,19 @@ function updateCommentFields(topicId, replyId, commentId, fields) {
     _id: commentId
   };
   var update = {
-    $set: fields
+    $set: fields,
+    $max: {
+      lastModified: lastModified
+    }
   };
-  var updateTopicLastModified = makeLastModifiedUpdater(Topic, topicId, lastModified);
-  var updateReplyLastModified = makeLastModifiedUpdater(Reply, replyId, lastModified);
   return Comment.findOneAndUpdate(query, update, { new: true })
     .lean()
     .exec()
-    .tap(updateReplyLastModified)
-    .tap(updateTopicLastModified);
+    .tap(function() {
+      return Promise.join(
+        updateReplyLastModified(commentId, lastModified),
+        updateTopicLastModified(commentId, lastModified));
+    });
 }
 
 function updateComment(user, comment, fields) {
