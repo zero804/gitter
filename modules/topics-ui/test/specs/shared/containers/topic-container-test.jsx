@@ -44,8 +44,8 @@ describe('<TopicContainer />', () => {
     equal(wrapper.find('TopicBody').length, 1);
   });
 
-  it('should render a SearchHeader', () => {
-    equal(wrapper.find('SearchHeader').length, 1);
+  it('should render a SearchHeaderContainer', () => {
+    equal(wrapper.find('SearchHeaderContainer').length, 1);
   });
 
   it('should render a TopicReplyEditor', () => {
