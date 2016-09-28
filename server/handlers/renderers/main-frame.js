@@ -7,6 +7,8 @@ var statsd = env.createStatsClient({ prefix: nconf.get('stats:statsd:prefix')});
 var Promise = require('bluebird');
 var contextGenerator = require('../../web/context-generator');
 var restful = require('../../services/restful');
+var forumCategoryService = require('gitter-web-topics').forumCategoryService;
+var groupService = require('gitter-web-groups');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var roomSort = require('gitter-realtime-client/lib/sorts-filters').pojo; /* <-- Don't use the default export
                                                                                           will bring in tons of client-side
@@ -15,6 +17,45 @@ var getSubResources = require('./sub-resources');
 var generateMainFrameSnapshots = require('../../handlers/snapshots/main-frame');
 var fonts = require('../../web/fonts');
 
+function getLeftMenuForumGroupInfo(leftMenuGroupId) {
+  return groupService.findById(leftMenuGroupId)
+    .then(function(group) {
+      var forumId = group && group.forumId;
+
+      return Promise.props({
+        group: group,
+        forumCategories: forumId && forumCategoryService.findByForumId(forumId)
+      });
+    });
+}
+
+function getTroupeContextAndDerivedInfo(req, socialMetadataGenerator) {
+  return contextGenerator.generateNonChatContext(req)
+    .bind({
+      troupeContext: null,
+      socialMetadata: null,
+      leftMenuGroup: null,
+      leftMenuGroupForumCategories: null
+    })
+    .then(function(troupeContext) {
+      this.troupeContext = troupeContext;
+
+      var leftMenuGroupId = troupeContext.leftRoomMenuState && troupeContext.leftRoomMenuState.groupId;
+
+      return [
+        socialMetadataGenerator && socialMetadataGenerator(troupeContext),
+        leftMenuGroupId && getLeftMenuForumGroupInfo(leftMenuGroupId),
+      ];
+    })
+    .spread(function(socialMetadata, leftMenuGroupInfo) {
+      this.socialMetadata = socialMetadata;
+      this.leftMenuGroup = leftMenuGroupInfo && leftMenuGroupInfo.group;
+      this.leftMenuGroupForumCategories = leftMenuGroupInfo && leftMenuGroupInfo.forumCategories;
+
+      return this;
+    });
+}
+
 function renderMainFrame(req, res, next, options) {
   var user = req.user;
   var userId = user && user.id;
@@ -22,7 +63,7 @@ function renderMainFrame(req, res, next, options) {
   var selectedRoomId = req.troupe && req.troupe.id;
 
   Promise.all([
-      contextGenerator.generateNonChatContext(req),
+      getTroupeContextAndDerivedInfo(req, socialMetadataGenerator),
       restful.serializeTroupesForUser(userId),
       restful.serializeOrgsForUserId(userId).catch(function(err) {
         // Workaround for GitHub outage
@@ -30,16 +71,12 @@ function renderMainFrame(req, res, next, options) {
         return [];
       }),
       restful.serializeGroupsForUserId(userId),
-
     ])
-    .spread(function (troupeContext, rooms, orgs, groups) {
-      // Generate social metadata if any
-      return [
-        troupeContext, rooms, orgs, groups,
-        socialMetadataGenerator && socialMetadataGenerator(troupeContext)
-      ]
-    })
-    .spread(function(troupeContext, rooms, orgs, groups, socialMetadata) {
+    .spread(function(troupeContextAndDerivedInfo, rooms, orgs, groups) {
+      var troupeContext = troupeContextAndDerivedInfo.troupeContext;
+      var socialMetadata = troupeContextAndDerivedInfo.socialMetadata;
+      var leftMenuForumGroup = troupeContextAndDerivedInfo.leftMenuGroup;
+      var leftMenuForumGroupCategories = troupeContextAndDerivedInfo.leftMenuGroupForumCategories;
       var chatAppLocation = options.subFrameLocation;
 
       var template, bootScriptName;
@@ -52,11 +89,11 @@ function renderMainFrame(req, res, next, options) {
         bootScriptName = 'router-nli-app';
       }
 
-      var extras = {
-        suggestedMenuState: options.suggestedMenuState
-      };
-
-      var snapshots = troupeContext.snapshots = generateMainFrameSnapshots(req, troupeContext, rooms, groups, extras);
+      var snapshots = troupeContext.snapshots = generateMainFrameSnapshots(req, troupeContext, rooms, groups, {
+        suggestedMenuState: options.suggestedMenuState,
+        leftMenuForumGroup: leftMenuForumGroup,
+        leftMenuForumGroupCategories: leftMenuForumGroupCategories
+      });
 
       if(snapshots && snapshots.leftMenu && snapshots.leftMenu.state) {
         // `gitter.web.prerender-left-menu`
@@ -91,6 +128,7 @@ function renderMainFrame(req, res, next, options) {
         cssFileName:            "styles/" + bootScriptName + ".css",
         troupeName:             options.title,
         troupeContext:          troupeContext,
+        forum:                  snapshots.forum,
         chatAppLocation:        chatAppLocation,
         agent:                  req.headers['user-agent'],
         subresources:           getSubResources(bootScriptName),

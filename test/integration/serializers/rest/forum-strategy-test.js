@@ -5,8 +5,8 @@ var nconf = env.config;
 var testRequire = require('../../test-require');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assertUtils = require('../../assert-utils')
-var serialize = testRequire('./serializers/serialize');
-var serializeObject = testRequire('./serializers/serialize-object');
+var serialize = require('gitter-web-serialization/lib/serialize');
+var serializeObject = require('gitter-web-serialization/lib/serialize-object');
 var ForumStrategy = testRequire('./serializers/rest/forum-strategy');
 var subscriberService = require('gitter-web-topic-notifications/lib/subscriber-service');
 var ForumObject = require('gitter-web-topic-notifications/lib/forum-object');
@@ -64,6 +64,8 @@ describe('ForumStrategy #slow', function() {
       .then(function(s) {
         assertUtils.assertSerializedEqual(s, [{
           id: forum.id,
+          name: forum.name,
+          uri: forum.uri,
           tags: [],
           categories: [{
             id: category3.id,
