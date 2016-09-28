@@ -20,8 +20,15 @@ describe('ForumStrategy #slow', function() {
   after(blockTimer.off);
 
   var fixture = fixtureLoader.setup({
-    user1: {},
-    forum1: {},
+    user1: {
+      accessToken: 'web-internal'
+    },
+    user2: {},
+    forum1: {
+      securityDescriptor: {
+        extraAdmins: ['user1']
+      }
+    },
     category1: {
       forum: 'forum1',
     },
@@ -42,7 +49,9 @@ describe('ForumStrategy #slow', function() {
   });
 
   it('should serialize a forum', function() {
-    var strategy = ForumStrategy.nested();
+    var strategy = ForumStrategy.nested({
+      currentUser: fixture.user1
+    });
 
     var user = fixture.user1;
     var forum = fixture.forum1;
@@ -100,7 +109,10 @@ describe('ForumStrategy #slow', function() {
             v: 1
           }],
           subscribed: false,
-          topicsTotal: 1
+          topicsTotal: 1,
+          permissions: {
+            admin: true
+          }
         }])
       });
   });
@@ -137,6 +149,19 @@ describe('ForumStrategy #slow', function() {
       .then(function(serialized) {
         assert.strictEqual(serialized.topics[0].subscribed, true);
       })
+  });
+
+  it('should tell a user when they are an admin of the forum', function() {
+    var strategy = ForumStrategy.standard({
+      currentUser: fixture.user2
+    });
+
+    return serializeObject(fixture.forum1, strategy)
+      .then(function(serialized) {
+        // user1 is an admin and it is tested in the big one above, user2 is
+        // not an admin and is tested here.
+        assert.strictEqual(serialized.permissions.admin, false);
+      });
   });
 
 });

@@ -72,6 +72,23 @@ describe('reply-api', function() {
       });
   });
 
+  it('PATCH /v1/forums/:forumId/topics/:topicId/replies/:replyId', function() {
+    var update = {
+      text: '**hello**',
+    };
+    return request(app)
+      .patch('/v1/forums/' + fixture.forum1.id + '/topics/' + fixture.topic1.id + '/replies/' + fixture.reply1.id)
+      .send(update)
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+      .then(function(result) {
+        var reply = result.body;
+
+        assert.strictEqual(reply.body.text, update.text);
+        assert.strictEqual(reply.body.html, '<strong>hello</strong>');
+      });
+  });
+
   it('POST /v1/forums/:forumId/topics/:topicId/replies', function() {
     return request(app)
       .post('/v1/forums/' + fixture.forum1.id + '/topics/' + fixture.topic1.id + '/replies')
