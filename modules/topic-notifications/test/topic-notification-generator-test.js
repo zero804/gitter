@@ -104,10 +104,9 @@ describe('forum-notification-events', function() {
           user: 'user1',
           forum: 'forum1',
           category: 'category1',
-          sent: new Date('2014-01-01T00:00:00.000Z'),
-          title: 'Hello',
-          html: '<strong>Hello</strong>',
-          text: '**Hello**'
+          title: 'How do I create amazing things in backbone without knowing how to code?',
+          html: '<p>Hi there.</p><p>I recently learned how to switch on my computer and this person I met at Whole Foods was telling me he built a Facebook clone using backbone. I want to write an app that puts moustaches onto videos of dogs, how can I do that with backbone?</p><p>lol</p><p>smiley face</p>',
+          text: 'Hi there./nI recently learned how to switch on my computer and this person I met at Whole Foods was telling me he built a Facebook clone using backbone. I want to write an app that puts moustaches onto videos of dogs, how can I do that with backbone?/nlol/nsmiley face'
         },
       });
 
@@ -148,17 +147,17 @@ describe('forum-notification-events', function() {
           user: 'user1',
           forum: 'forum1',
           category: 'category1',
-          title: 'Hello',
-          html: '<strong>Hello</strong>',
-          text: '**Hello**'
+          title: 'How do I create amazing things in backbone without knowing how to code?',
+          html: '<p>Hi there.</p><p>I recently learned how to switch on my computer and this person I met at Whole Foods was telling me he built a Facebook clone using backbone. I want to write an app that puts moustaches onto videos of dogs, how can I do that with backbone?</p><p>lol</p><p>smiley face</p>',
+          text: 'Hi there./nI recently learned how to switch on my computer and this person I met at Whole Foods was telling me he built a Facebook clone using backbone. I want to write an app that puts moustaches onto videos of dogs, how can I do that with backbone?/nlol/nsmiley face'
         },
         reply1: {
           forum: 'forum1',
           category: 'category1',
           user: 'user1',
           topic: 'topic1',
-          text: '*Goodbye*',
-          html: '<strong>Goodbye</strong>',
+          html: '<p>Firstly, welcome to coding. </p><p>Secondly, if you just recompile your kernel to add RFC 2549 compliance, that should stand you in good stead for your future endevaours.</p><p>Secondly, backbone is so last century. Some people would recommend using React, but that is so last year. What you really need is my latest framework called themostcurrenthipframework.io. It is better than all the other ones because it does almost exactly the same thing, but you need 500 files of scaffholding for it to work before you do anything.</p><p>Then just put the name of your app in the config, a picture of a moustache in /public/resources/v7_LATEST/images/pngs/, and submit it to the app store.</p> ',
+          text: 'Firstly, welcome to coding./nSecondly, if you just recompile your kernel to add RFC 2549 compliance, that should stand you in good stead for your future endevaours./nSecondly, backbone is so last century. Some people would recommend using React, but that is so last year. What you really need is my latest framework called themostcurrenthipframework.io. It is better than all the other ones because it does almost exactly the same thing, but you need 500 files of scaffholding for it to work before you do anything./nThen just put the name of your app in the config, a picture of a moustache in /public/resources/v7_LATEST/images/pngs/, and submit it to the app store.'
         },
       });
 
@@ -200,25 +199,25 @@ describe('forum-notification-events', function() {
           user: 'user1',
           forum: 'forum1',
           category: 'category1',
-          title: 'Hello',
-          html: '<strong>Hello</strong>',
-          text: '**Hello**'
+          title: 'How do I create amazing things in backbone without knowing how to code?',
+          html: '<p>Hi there.</p><p>I recently learned how to switch on my computer and this person I met at Whole Foods was telling me he built a Facebook clone using backbone. I want to write an app that puts moustaches onto videos of dogs, how can I do that with backbone?</p><p>lol</p><p>smiley face</p>',
+          text: 'Hi there./nI recently learned how to switch on my computer and this person I met at Whole Foods was telling me he built a Facebook clone using backbone. I want to write an app that puts moustaches onto videos of dogs, how can I do that with backbone?/nlol/nsmiley face'
         },
         reply1: {
           forum: 'forum1',
           category: 'category1',
           user: 'user1',
           topic: 'topic1',
-          text: '*Goodbye*',
-          html: '<strong>Goodbye</strong>',
+          html: '<p>Firstly, welcome to coding. </p><p>Secondly, if you just recompile your kernel to add RFC 2549 compliance, that should stand you in good stead for your future endevaours.</p><p>Secondly, backbone is so last century. Some people would recommend using React, but that is so last year. What you really need is my latest framework called themostcurrenthipframework.io. It is better than all the other ones because it does almost exactly the same thing, but you need 500 files of scaffholding for it to work before you do anything.</p><p>Then just put the name of your app in the config, a picture of a moustache in /public/resources/v7_LATEST/images/pngs/, and submit it to the app store.</p> ',
+          text: 'Firstly, welcome to coding./nSecondly, if you just recompile your kernel to add RFC 2549 compliance, that should stand you in good stead for your future endevaours./nSecondly, backbone is so last century. Some people would recommend using React, but that is so last year. What you really need is my latest framework called themostcurrenthipframework.io. It is better than all the other ones because it does almost exactly the same thing, but you need 500 files of scaffholding for it to work before you do anything./nThen just put the name of your app in the config, a picture of a moustache in /public/resources/v7_LATEST/images/pngs/, and submit it to the app store.'
         },
         comment1: {
           user: 'user1',
           forum: 'forum1',
           topic: 'topic1',
           reply: 'reply1',
-          text: '*xxx*',
-          html: '<strong>xxx</strong>',
+          html: '<strong>Seriously dude</strong> if you just right click and choose make moustache dog app, it will be much easier.',
+          text: '**Seriously dude** if you just right click and choose make moustache dog app, it will be much easier.'
         }
       });
 
