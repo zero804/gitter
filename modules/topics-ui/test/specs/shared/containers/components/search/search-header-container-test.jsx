@@ -1,11 +1,11 @@
 import { equal, deepEqual } from 'assert';
 import React from 'react';
-import sinon, {spy} from 'sinon';
+import { spy } from 'sinon';
 import { shallow } from 'enzyme';
-import SearchHeaderContainer from '../../../../shared/containers/components/search/SearchHeaderContainer.jsx';
-import { subscribe } from '../../../../shared/dispatcher';
+import SearchHeaderContainer from '../../../../../../shared/containers/components/search/SearchHeaderContainer.jsx';
+import { subscribe } from '../../../../../../shared/dispatcher';
 
-import { REQUEST_UPDATE_FORUM_SUBSCRIPTION_STATE, SUBSCRIPTION_STATE_UNSUBSCRIBED } from '../../../../shared/constants/forum';
+import { REQUEST_UPDATE_FORUM_SUBSCRIPTION_STATE, SUBSCRIPTION_STATE_UNSUBSCRIBED } from '../../../../../../shared/constants/forum';
 
 describe('<SearchHeaderContainer />', function(){
 

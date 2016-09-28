@@ -4,6 +4,16 @@ var webpackConfig = require('../webpack.config.js');
 var _ = require('lodash');
 var path = require('path');
 
+var moduleConfig = _.extend({}, (webpackConfig.module || {}), {
+  loaders: (webpackConfig.module.loaders || []).concat([
+    {
+      // Fix via https://github.com/webpack/webpack/issues/177#issuecomment-151916287
+      test: /sinon\.js$/,
+      loader: "imports?define=>false,require=>false"
+    }
+  ])
+});
+
 var config = _.extend({}, webpackConfig, {
   devtool: 'eval',
   entry: {
@@ -13,6 +23,7 @@ var config = _.extend({}, webpackConfig, {
     filename: "[name].js",
     path: path.resolve(__dirname, './fixtures/build'),
   },
+  module: moduleConfig,
   resolve: {
     alias: {
       mocha: require.resolve('mocha/mocha.js'),
