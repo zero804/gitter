@@ -23,7 +23,7 @@ router.get('/',
     }
 
     return renderer(req, res, next, {
-      subFrameLocation: '/' + req.params.groupName + '/topics/~topics'
+      subFrameLocation: '/' + req.params.groupUri + '/topics/~topics'
     });
   }
 );
@@ -42,7 +42,7 @@ router.get('/categories/:categoryName',
   featureToggles,
   function(req, res, next){
     return mainFrameRenderers.renderMainFrame(req, res, next, {
-      subFrameLocation: '/' + req.params.groupName + '/topics/categories/' + req.params.categoryName + '/~topics'
+      subFrameLocation: '/' + req.params.groupUri + '/topics/categories/' + req.params.categoryName + '/~topics'
     });
   }
 );
@@ -70,7 +70,7 @@ router.get('/create-topic',
         }
 
         return mainFrameRenderers.renderMainFrame(req, res, next, {
-          subFrameLocation: '/' + req.params.groupName + '/topics/create-topic/~topics'
+          subFrameLocation: '/' + req.params.groupUri + '/topics/create-topic/~topics'
         });
       });
   }
@@ -101,7 +101,7 @@ router.get('/topic/:topicId/:topicSlug',
   featureToggles,
   function(req, res, next){
     return mainFrameRenderers.renderMainFrame(req, res, next, {
-      subFrameLocation: '/' + req.params.groupName + '/topics/topic/' + req.params.topicId + '/' + req.params.topicSlug + '/~topics'
+      subFrameLocation: '/' + req.params.groupUri + '/topics/topic/' + req.params.topicId + '/' + req.params.topicSlug + '/~topics'
     });
   }
 );

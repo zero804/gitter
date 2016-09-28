@@ -6,6 +6,7 @@ import SimpleFilteredCollection from 'gitter-realtime-client/lib/simple-filtered
 import LiveCollection from './live-collection';
 import {BaseModel} from './base-model';
 
+import parseTopic from '../../../shared/parse/topic';
 import parseTag from '../../../shared/parse/tag';
 import {getRealtimeClient} from './realtime-client';
 import {getForumId } from './forum-store';
@@ -19,6 +20,11 @@ import {DEFAULT_CATEGORY_NAME, DEFAULT_TAG_NAME} from '../../../shared/constants
 import {FILTER_BY_TOPIC} from '../../../shared/constants/forum-filters';
 import {MOST_WATCHERS_SORT} from '../../../shared/constants/forum-sorts';
 import {UPDATE_TOPIC, UPDATE_CANCEL_TOPIC, UPDATE_SAVE_TOPIC} from '../../../shared/constants/topic';
+import {
+  UPDATE_TOPIC_SUBSCRIPTION_STATE,
+  REQUEST_UPDATE_TOPIC_SUBSCRIPTION_STATE,
+  SUBSCRIPTION_STATE_PENDING
+} from '../../../shared/constants/forum.js';
 
 export const TopicModel = BaseModel.extend({
   url(){
@@ -67,7 +73,6 @@ export const TopicsLiveCollection = LiveCollection.extend({
   },
 
   createNewTopic(data){
-
     const model = this.create({
       title: data.title,
       text: data.body,
@@ -129,7 +134,7 @@ export class TopicsStore {
     this.listenTo(router, 'change:sortName', this.onSortUpdate, this);
 
     //Proxy events from the filtered collection
-    this.listenTo(this.collection, 'all', function(type, collection ,val){
+    this.listenTo(this.collection, 'all', (type, collection ,val) => {
       this.trigger(type, collection, val);
     });
 
@@ -137,6 +142,9 @@ export class TopicsStore {
       this.collection.setFilter(this.getFilter());
       this.trigger(TOPIC_CREATED, topicId, slug);
     });
+
+    subscribe(REQUEST_UPDATE_TOPIC_SUBSCRIPTION_STATE, this.onRequestSubscriptionStateUpdate, this);
+    subscribe(UPDATE_TOPIC_SUBSCRIPTION_STATE, this.onSubscriptionStateUpdate, this);
   }
 
   getFilter() {
@@ -172,13 +180,15 @@ export class TopicsStore {
   }
 
   getTopics() {
-    return this.collection.toJSON();
+    return this.collection.map(model => {
+      return parseTopic(model.toJSON());
+    });
   }
 
   getById(id) {
     const model = this.collection.get(id);
     if(!model) { return; }
-    return model.toJSON();
+    return parseTopic(model.toJSON());
   }
 
   onRouterUpdate() {
@@ -188,11 +198,32 @@ export class TopicsStore {
   onSortUpdate(){
     this.collection.sort();
   }
+
+  onRequestSubscriptionStateUpdate({topicId}) {
+    var topic = this.collection.get(topicId);
+    if(!topic) { return; }
+
+    topic.set({
+      subscriptionState: SUBSCRIPTION_STATE_PENDING
+    });
+  }
+
+  onSubscriptionStateUpdate(data) {
+    var {topicId, state} = data;
+    var topic = this.collection.get(topicId);
+    if(!topic) { return; }
+
+    topic.set({
+      subscriptionState: state
+    });
+  }
 }
 
-
-
-dispatchOnChangeMixin(TopicsStore, ['sort', 'change:text']);
+dispatchOnChangeMixin(TopicsStore, [
+  'sort',
+  'change:text',
+  'change:subscriptionState'
+]);
 
 const serverStore = (window.context.topicsStore || {});
 const serverData = (serverStore.data || []);

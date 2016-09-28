@@ -9,7 +9,7 @@ describe('<TopicsTableBody/>', () => {
   let wrapper;
 
   beforeEach(() => {
-    wrapper = mount(<TopicsTableBody topics={topics} groupName="gitterHQ"/>);
+    wrapper = mount(<TopicsTableBody topics={topics} groupUri="gitterHQ"/>);
   });
 
   it('should render a tbody', () => {

@@ -10,7 +10,7 @@ export default React.createClass({
 
   displayName: 'TopicHeader',
   propTypes: {
-    groupName: PropTypes.string.isRequired,
+    groupUri: PropTypes.string.isRequired,
 
     tags: PropTypes.arrayOf(PropTypes.shape({
       label: PropTypes.string.isRequired,
@@ -32,7 +32,7 @@ export default React.createClass({
 
   render(){
 
-    const { category, groupName, topic, tags } = this.props;
+    const { category, groupUri, topic, tags } = this.props;
     const { title, user } = topic;
     const { displayName } = user;
     return (
@@ -50,7 +50,7 @@ export default React.createClass({
               <ForumCategoryLink
                 className="topic-header__category-link"
                 category={category}
-                groupName={groupName}>{category.category}</ForumCategoryLink>
+                groupUri={groupUri}>{category.category}</ForumCategoryLink>
               <ul className="topic-header__tag-list">{tags.map((tag, i) => this.buildTagView(tag, i))}</ul>
             </section>
           </header>
@@ -60,11 +60,11 @@ export default React.createClass({
   },
 
   buildTagView(tag, index){
-    const {groupName} = this.props;
+    const {groupUri} = this.props;
     return (
       <li key={`topic-header-tag-link-${index}`}>
         <ForumTagLink
-          groupName={groupName}
+          groupUri={groupUri}
           tag={tag}
           className="topic-header__tag-link">
             {tag.label}

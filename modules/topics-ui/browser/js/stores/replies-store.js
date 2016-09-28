@@ -14,6 +14,11 @@ import dispatchOnChangeMixin from './mixins/dispatch-on-change';
 import {NAVIGATE_TO_TOPIC} from '../../../shared/constants/navigation';
 import {SUBMIT_NEW_REPLY} from '../../../shared/constants/create-reply';
 import {UPDATE_REPLY, CANCEL_UPDATE_REPLY, SAVE_UPDATE_REPLY} from '../../../shared/constants/topic';
+import {
+  UPDATE_REPLY_SUBSCRIPTION_STATE,
+  REQUEST_UPDATE_REPLY_SUBSCRIPTION_STATE,
+  SUBSCRIPTION_STATE_PENDING
+} from '../../../shared/constants/forum.js';
 
 export const ReplyModel = BaseModel.extend({
   url(){
@@ -43,12 +48,20 @@ export const RepliesStore = LiveCollection.extend({
     subscribe(UPDATE_REPLY, this.updateReplyText, this);
     subscribe(CANCEL_UPDATE_REPLY, this.cancelEditReply, this);
     subscribe(SAVE_UPDATE_REPLY, this.saveUpdatedModel, this);
+    subscribe(REQUEST_UPDATE_REPLY_SUBSCRIPTION_STATE, this.onRequestSubscriptionStateUpdate, this);
+    subscribe(UPDATE_REPLY_SUBSCRIPTION_STATE, this.onSubscriptionStateUpdate, this);
     router.on('change:topicId', this.onActiveTopicUpdate, this);
+  },
+
+  getById(id) {
+    const model = this.get(id);
+    if(!model) { return; }
+    return parseReply(model.toJSON());
   },
 
   getReplies(){
     return this.models.map(model => {
-      return parseReply(model.toJSON())
+      return parseReply(model.toJSON());
     });
   },
 
@@ -83,11 +96,33 @@ export const RepliesStore = LiveCollection.extend({
     const model = this.get(replyId);
     if(!model) { return; }
     model.save();
+  },
+
+  onRequestSubscriptionStateUpdate({replyId}) {
+    var reply = this.get(replyId);
+    if(!reply) { return; }
+
+    reply.set({
+      subscriptionState: SUBSCRIPTION_STATE_PENDING
+    });
+  },
+
+  onSubscriptionStateUpdate(data) {
+    var {replyId, state} = data;
+    var reply = this.get(replyId);
+    if(!reply) { return; }
+
+    reply.set({
+      subscriptionState: state
+    });
   }
 
 });
 
-dispatchOnChangeMixin(RepliesStore);
+dispatchOnChangeMixin(RepliesStore, [
+  'change:subscriptionState',
+  'change:text'
+]);
 
 const serverStore = (window.context.repliesStore|| {});
 const serverData = (serverStore.data || [])

@@ -17,19 +17,28 @@ const NewCommentStore = Backbone.Model.extend({
   },
 
   onCommentBodyUpdate({replyId, val}){
-    this.set({ replyId: replyId, text: val});
+    this.set({
+      replyId: replyId,
+      text: val
+    });
   },
 
   onCommentFocusReset(){
-    this.set({ replyId: null, text: '' });
+    this.set({
+      replyId: null,
+      text: ''
+    });
   },
 
   onCommentSubmitted(){
-    this.set({ replyId: null, text: '' });
+    this.set({
+      replyId: null,
+      text: ''
+    });
   }
 
 });
 
-dispatchOnChangeMixin(NewCommentStore, 'change: text');
+dispatchOnChangeMixin(NewCommentStore, 'change:text');
 
 export default NewCommentStore;

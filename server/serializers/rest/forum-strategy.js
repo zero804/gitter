@@ -52,6 +52,8 @@ ForumStrategy.prototype = {
 
     return {
       id: id,
+      name: forum.name,
+      uri: forum.uri,
       tags: forum.tags,
       categories: this.categoriesForForumStrategy.map(id),
       topics: this.topicsForForumStrategy.map(id),

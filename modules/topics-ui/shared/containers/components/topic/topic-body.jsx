@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react';
 import Container from '../container.jsx';
 import Panel from '../panel.jsx';
 import EditableContent from '../forms/editable-content.jsx';
+import WatchButton from '../forum/watch-button.jsx';
 
 export default React.createClass({
 
@@ -16,14 +17,18 @@ export default React.createClass({
     onTopicEditUpdate: PropTypes.func.isRequired,
     onTopicEditCancel: PropTypes.func.isRequired,
     onTopicEditSave: PropTypes.func.isRequired,
+    onSubscribeButtonClick: PropTypes.func
   },
 
   getInitialState(){
     return { isEditing: false }
   },
 
-  render(){
-    //TODO need to add permissions into this
+  render() {
+
+    const { topic, onSubscribeButtonClick } = this.props;
+    const subscriptionState = topic.subscriptionState;
+
     return (
       <Container className="container--topic-body">
         <Panel className="panel--topic-body">
@@ -32,6 +37,11 @@ export default React.createClass({
             <button className="topic-body__footer__action">Share</button>
             <button className="topic-body__footer__action">Watch</button>
             {this.getEditButton()}
+            <WatchButton
+              subscriptionState={subscriptionState}
+              className="topic-body__footer__subscribe-action"
+              itemClassName="topic-body__footer__subscribe-action-text-item"
+              onClick={onSubscribeButtonClick}/>
           </footer>
         </Panel>
       </Container>

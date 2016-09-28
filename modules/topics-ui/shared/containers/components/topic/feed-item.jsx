@@ -8,11 +8,18 @@ export default React.createClass({
   displayName: 'FeedItem',
   propTypes: {
     value: PropTypes.string,
-    children: PropTypes.node,
     item: PropTypes.shape({
       sent: PropTypes.string.isRequired,
       canEdit: PropTypes.bool.isRequired,
-    }),
+    }).isRequired,
+    children: React.PropTypes.oneOfType([
+      React.PropTypes.arrayOf(React.PropTypes.node),
+      React.PropTypes.node
+    ]),
+    footerChildren: React.PropTypes.oneOfType([
+      React.PropTypes.arrayOf(React.PropTypes.node),
+      React.PropTypes.node
+    ]),
     canEdit: PropTypes.bool,
     isEditing: PropTypes.bool,
     primaryLabel: PropTypes.string,
@@ -37,11 +44,12 @@ export default React.createClass({
 
   render(){
 
-    const {item} = this.props;
+    const {item, children, footerChildren} = this.props;
     const {user} = item;
     const avatarDims = 30;
-    const formattedSentDate = moment(item.sent).format('MMM Do')
+    const formattedSentDate = item.sent && moment(item.sent).format('MMM Do');
 
+    /* The EditControl situation is BS. It needs to be fixed  */
     return (
       <article className="feed-item">
         <div className="feed-item__content">
@@ -58,11 +66,10 @@ export default React.createClass({
           {this.getItemContent()}
         </div>
         <footer className="feed-item__footer">
-          {this.getPrimaryContent()}
-          {this.getSecondaryContent()}
+          {footerChildren}
           {this.getEditControl()}
         </footer>
-        {this.props.children}
+        {children}
       </article>
     );
   },
@@ -98,30 +105,6 @@ export default React.createClass({
 
   },
 
-  getPrimaryContent(){
-    const {primaryLabel, primaryValue} = this.props;
-    if(!primaryLabel){ return; }
-    return (
-      <span
-        className="feed-item__likes"
-        onClick={this.props.onPrimaryClicked}>
-        {primaryValue} {primaryLabel}
-      </span>
-    );
-  },
-
-  getSecondaryContent(){
-    const {secondaryLabel, secondaryValue} = this.props;
-    if(!secondaryLabel){ return; }
-
-    return (
-      <button
-        className="feed-item__comments"
-        onClick={this.props.onSecondaryClicked}>
-        {secondaryValue} {secondaryLabel}
-      </button>
-    );
-  },
 
   onEditClicked(e){
     e.preventDefault();

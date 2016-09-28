@@ -1,21 +1,28 @@
 "use strict";
 
-module.exports = function forumStore(data) {
+var _ = require('lodash');
+var forumConstants = require('../../shared/constants/forum.js');
 
-  //Defaults
-  data = (data || {});
+module.exports = function forumStore(initialData) {
+  initialData = (initialData || {});
 
-  //Get data
-  const get = (key) => data[key];
-
-  const getForum = () => data;
-  const getForumId = () => data.id
+  var data = _.extend({}, initialData, {
+    subscriptionState: initialData.subscribed ? forumConstants.SUBSCRIPTION_STATE_SUBSCRIBED : forumConstants.SUBSCRIPTION_STATE_UNSUBSCRIBED
+  });
+  delete data.subscribed;
 
   //Methods
   return {
-    get: get,
     data: data,
-    getForum: getForum,
-    getForumId: getForumId,
+    get: (key) => data[key],
+    getForum: () => {
+      return data;
+    },
+    getForumId: () => {
+      return data.id;
+    },
+    getSubscriptionState: () => {
+      return data.subscriptionState;
+    },
   };
 };

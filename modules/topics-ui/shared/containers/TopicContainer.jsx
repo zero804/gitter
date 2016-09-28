@@ -4,7 +4,7 @@ import canEdit from '../utils/can-edit';
 
 import TopicHeader from './components/topic/topic-header.jsx';
 import TopicBody from './components/topic/topic-body.jsx';
-import SearchHeader from './components/search/search-header.jsx';
+import SearchHeaderContainer from './components/search/SearchHeaderContainer.jsx';
 import TopicReplyEditor from './components/topic/topic-reply-editor.jsx';
 import TopicReplyListHeader from './components/topic/topic-reply-list-header.jsx';
 import TopicReplyList from './components/topic/topic-reply-list.jsx';
@@ -24,8 +24,11 @@ import updateSaveComment from '../action-creators/topic/update-save-comment.js';
 import updateTopic from '../action-creators/topic/update-topic';
 import updateCancelTopic from '../action-creators/topic/update-cancel-topic';
 import updateSaveTopic from '../action-creators/topic/update-save-topic';
+import requestUpdateTopicSubscriptionState from '../action-creators/forum/request-update-topic-subscription-state';
+import requestUpdateReplySubscriptionState from '../action-creators/forum/request-update-reply-subscription-state';
 import requestSignIn from '../action-creators/forum/request-sign-in';
 
+import { SUBSCRIPTION_STATE_SUBSCRIBED } from '../constants/forum.js';
 const EDITOR_SUBMIT_LINK_SOURCE = 'topics-reply-editor-submit-button';
 const EDITOR_CLICK_LINK_SOURCE = 'topics-reply-editor-click';
 
@@ -35,10 +38,12 @@ const TopicContainer = createClass({
   propTypes: {
 
     topicId: PropTypes.string.isRequired,
-    groupName: PropTypes.string.isRequired,
+    groupUri: PropTypes.string.isRequired,
 
-    forumStore: PropTypes.shape({
-      getForum: PropTypes.func.isRequired,
+    //Forum
+    forumStore: React.PropTypes.shape({
+      getForumId: React.PropTypes.func.isRequired,
+      getSubscriptionState: React.PropTypes.func.isRequired
     }).isRequired,
 
     topicsStore: PropTypes.shape({
@@ -46,6 +51,7 @@ const TopicContainer = createClass({
     }).isRequired,
 
     repliesStore: PropTypes.shape({
+      getById: PropTypes.func.isRequired,
       getReplies: PropTypes.func.isRequired
     }).isRequired,
 
@@ -78,27 +84,38 @@ const TopicContainer = createClass({
   },
 
   componentDidMount(){
-    const {repliesStore, newReplyStore, commentsStore, newCommentStore, topicsStore} = this.props;
+    const {forumStore, topicsStore, repliesStore, newReplyStore, commentsStore, newCommentStore} = this.props;
+
+    forumStore.onChange(this.onForumUpdate, this);
+    topicsStore.onChange(this.onTopicsUpdate, this);
     repliesStore.onChange(this.updateReplies, this);
     commentsStore.onChange(this.updateComments, this);
-    newCommentStore.onChange(this.updateNewComment, this);
     topicsStore.onChange(this.updateTopics, this);
 
+    newCommentStore.onChange(this.updateNewComment, this);
     newReplyStore.on('change:text', this.updateNewReplyContent, this);
   },
 
+
   componentWillUnmount(){
-    const {repliesStore, newReplyStore, commentsStore, newCommentStore, topicsStore} = this.props;
+    const {forumStore, topicsStore, repliesStore, newReplyStore, commentsStore, newCommentStore} = this.props;
+
+    forumStore.removeListeners(this.onForumUpdate, this);
+    topicsStore.removeListeners(this.onTopicsUpdate, this);
     repliesStore.removeListeners(this.updateReplies, this);
     commentsStore.removeListeners(this.updateComments, this);
-    newCommentStore.removeListeners(this.updateNewComment, this);
     topicsStore.removeListeners(this.updateTopics, this);
 
+    newCommentStore.removeListeners(this.updateNewComment, this);
     newReplyStore.off('change:text', this.updateNewReplyContent, this);
   },
 
-  getInitialState(){
+  getInitialState() {
+    const { forumStore, topicsStore, topicId } = this.props;
     return {
+      forumId: forumStore.getForumId(),
+      forumSubscriptionState: forumStore.getSubscriptionState(),
+      topic: topicsStore.getById(topicId),
       newReplyContent: '',
     };
   },
@@ -142,13 +159,15 @@ const TopicContainer = createClass({
 
   render(){
 
-    const { groupName, categoryStore, currentUserStore, tagStore} = this.props;
-    const {newReplyContent} = this.state;
+    const { categoryStore, currentUserStore, tagStore, groupUri} = this.props;
+    const {forumId, forumSubscriptionState, newReplyContent} = this.state;
 
     const topic = this.getParsedTopic();
     const parsedReplies = this.getParsedReplies();
 
+
     const currentUser = currentUserStore.getCurrentUser();
+    const userId = currentUser.id;
     const isSignedIn = currentUserStore.getIsSignedIn();
     const topicCategory = topic.category;
     const category = categoryStore.getById(topicCategory.id);
@@ -164,13 +183,16 @@ const TopicContainer = createClass({
 
     return (
       <main>
-        <SearchHeader
-          groupName={groupName}/>
+        <SearchHeaderContainer
+          userId={userId}
+          forumId={forumId}
+          groupUri={groupUri}
+          subscriptionState={forumSubscriptionState}/>
         <article>
           <TopicHeader
             topic={topic}
             category={category}
-            groupName={groupName}
+            groupUri={groupUri}
             tags={tags}/>
           <TopicBody
             topic={topic}
@@ -182,6 +204,7 @@ const TopicContainer = createClass({
         <TopicReplyList>
           {parsedReplies.map(this.getReplyListItem)}
         </TopicReplyList>
+        <TopicReplyListHeader replies={parsedReplies}/>
         <TopicReplyEditor
           user={currentUser}
           isSignedIn={isSignedIn}
@@ -195,13 +218,13 @@ const TopicContainer = createClass({
 
 
   getReplyListItem(reply, index){
-    const {newCommentStore, currentUserStore} = this.props;
+    const {newCommentStore, currentUserStore } = this.props;
     const currentUser = currentUserStore.getCurrentUser();
     return (
       <TopicReplyListItem
         reply={reply}
         key={`topic-reply-list-item-${reply.id}-${index}`}
-        currentUser={currentUser}
+        user={currentUser}
         newCommentContent={newCommentStore.get('text')}
         onCommentsClicked={this.onReplyCommentsClicked}
         onNewCommentUpdate={this.onNewCommentUpdate}
@@ -211,7 +234,8 @@ const TopicContainer = createClass({
         onReplyEditSaved={this.onReplyEditSaved}
         onCommentEditUpdate={this.onCommentEditUpdate}
         onCommentEditCancel={this.onCommentEditCancel}
-        onCommentEditSave={this.onCommentEditSave}/>
+        onCommentEditSave={this.onCommentEditSave}
+        onSubscribeButtonClick={this.onTopicSubscribeButtonClick} />
     );
   },
 
@@ -246,7 +270,22 @@ const TopicContainer = createClass({
     }
   },
 
-  updateNewReplyContent(){
+  onForumUpdate() {
+    const { forumStore } = this.props;
+    this.setState((state) => Object.assign(state, {
+      forumId: forumStore.getForumId(),
+      forumSubscriptionState: forumStore.getSubscriptionState()
+    }));
+  },
+
+  onTopicsUpdate() {
+    const { topicsStore, topicId } = this.props;
+    this.setState((state) => Object.assign(state, {
+      topic: topicsStore.getById(topicId)
+    }));
+  },
+
+  updateReplyContent(){
     const {newReplyStore} = this.props;
     const newReplyContent = newReplyStore.get('text');
     this.setState((state) => Object.assign(state, {
@@ -262,13 +301,33 @@ const TopicContainer = createClass({
     }));
   },
 
-  updateComments(){
-    this.forceUpdate();
+  updateComments(){ this.forceUpdate(); },
+  updateNewComment(){ this.forceUpdate(); },
+  updateTopics() { this.forceUpdate(); },
+
+  onTopicSubscribeButtonClick() {
+    const { topicsStore, topicId } = this.props;
+    const topic = topicsStore.getById(topicId);
+    const subscriptionState = topic.subscriptionState;
+    const desiredIsSubscribed = (subscriptionState !== SUBSCRIPTION_STATE_SUBSCRIBED);
+    dispatch(requestUpdateTopicSubscriptionState(topicId, desiredIsSubscribed));
+  },
+
+
+  onReplySubscribeButtonClick(e, replyId) {
+    const { repliesStore } = this.props;
+
+    const reply = repliesStore.getById(replyId);
+    const subscriptionState = reply.subscriptionState;
+    const desiredIsSubscribed = (subscriptionState !== SUBSCRIPTION_STATE_SUBSCRIBED);
+
+    dispatch(requestUpdateReplySubscriptionState(replyId, desiredIsSubscribed));
   },
 
   onReplyCommentsClicked(replyId){
     dispatch(showReplyComments(replyId));
   },
+
 
   onNewCommentUpdate(replyId, val) {
     dispatch(updateCommentBody(replyId, val));
@@ -282,8 +341,6 @@ const TopicContainer = createClass({
     ));
   },
 
-  updateNewComment(){ this.forceUpdate(); },
-  updateTopics() { this.forceUpdate(); },
 
   onReplyEditUpdate(replyId, value){
     dispatch(updateReply(replyId, value));
