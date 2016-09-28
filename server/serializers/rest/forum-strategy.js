@@ -21,40 +21,24 @@ ForumStrategy.prototype = {
 
     var forumIds = forums.map(getId);
 
-    var promises = [];
+    var strategies = [];
 
-    // TODO: this will probably be removed in favor of having forum.topicsTotal
-    // in the schema. Also: it is not a strategy.
-    promises.push(this.loadTopicsTotals(forumIds))
-    promises.push(this.categoriesForForumStrategy.preload(forumIds));
+    strategies.push(this.categoriesForForumStrategy.preload(forumIds));
     if (this.topicsForForumStrategy) {
-      promises.push(this.topicsForForumStrategy.preload(forumIds));
+      strategies.push(this.topicsForForumStrategy.preload(forumIds));
     }
     if (this.subscriptionStrategy) {
-      promises.push(this.subscriptionStrategy.preload(forums));
+      strategies.push(this.subscriptionStrategy.preload(forums));
     }
     if (this.permissionsStrategy) {
-      promises.push(this.permissionsStrategy.preload(forums));
+      strategies.push(this.permissionsStrategy.preload(forums));
     }
 
-    return Promise.all(promises);
-  },
-
-  // TODO: this will probably be removed in favor of having forum.topicsTotal
-  // in the schema. Also: it is not a strategy.
-  // @lerouxb to refactor ;-)
-  loadTopicsTotals: function(forumIds) {
-    return topicService.findTotalsByForumIds(forumIds.toArray())
-      .bind(this)
-      .then(function(topicsTotals) {
-        this.topicsTotalMap = topicsTotals;
-      });
+    return Promise.all(strategies);
   },
 
   map: function(forum) {
     var id = forum.id || forum._id && forum._id.toHexString();
-
-    var topicsTotal = this.topicsTotalMap[id] || 0;
 
     return {
       id: id,
@@ -64,7 +48,6 @@ ForumStrategy.prototype = {
       categories: this.categoriesForForumStrategy.map(id),
       topics: this.topicsForForumStrategy ? this.topicsForForumStrategy.map(id) : undefined,
       subscribed: this.subscriptionStrategy ? this.subscriptionStrategy.map(forum) : undefined,
-      topicsTotal: topicsTotal, // TODO: drop this?
       permissions: this.permissionsStrategy ? this.permissionsStrategy.map(forum) : undefined
     };
   },
