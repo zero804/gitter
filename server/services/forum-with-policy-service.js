@@ -211,6 +211,15 @@ ForumWithPolicyService.prototype.updateComment = matchForum(secureMethod([allowO
 }));
 
 /**
+ * Category update
+ */
+ForumWithPolicyService.prototype.updateCategory = matchForum(secureMethod([allowAdmin], function(category, fields) {
+  var user = this.user;
+
+  return forumCategoryService.updateCategory(user, category, fields)
+}));
+
+/**
  * Subscription bits
  */
 ForumWithPolicyService.prototype.listSubscribers = matchForum(secureMethod([allowAdmin], function(forumObject) {
