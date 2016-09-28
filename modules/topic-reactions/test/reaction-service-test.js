@@ -2,7 +2,6 @@
 
 var assert = require('assert');
 var reactionService = require('../lib/reaction-service');
-var ObjectID = require('mongodb').ObjectID;
 var ForumObject = require('gitter-web-topic-models/lib/forum-object');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
@@ -73,7 +72,7 @@ describe('reaction-service', function() {
 
           return reactionService.addReaction(ref, userId, 'like')
             .then(function(result) {
-              assert.strictEqual(result, true);
+              assert.deepEqual(result, { like: 1 });
               return find();
             })
             .then(function(o) {
@@ -81,7 +80,7 @@ describe('reaction-service', function() {
               return reactionService.addReaction(ref, userId, 'like')
             })
             .then(function(result) {
-              assert.strictEqual(result, false);
+              assert.strictEqual(result, null);
               return find();
             })
             .then(function(o){
@@ -89,7 +88,7 @@ describe('reaction-service', function() {
               return reactionService.removeReaction(ref, userId, 'like')
             })
             .then(function(result) {
-              assert.strictEqual(result, true);
+              assert.deepEqual(result, { like: 0 });
               return find();
             })
             .then(function(o) {
@@ -97,7 +96,7 @@ describe('reaction-service', function() {
               return reactionService.removeReaction(ref, userId, 'like')
             })
             .then(function(result) {
-              assert.strictEqual(result, false);
+              assert.strictEqual(result, null);
               return find();
             })
             .then(function(o) {
