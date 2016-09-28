@@ -15,28 +15,10 @@ describe('<TopicReplyListItem/>', () => {
     );
   });
 
-  it('should render an article', () => {
-    equal(wrapper.find('article').length, 1);
+  it('should render a FeedItem', () => {
+    equal(wrapper.find('FeedItem').length, 1);
   });
 
-  it('should render a topic-reply-lite-item class', () => {
-    equal(wrapper.find('.topic-reply-list-item').length, 1);
-  });
-
-  it('should render a UserAvatar', () => {
-    equal(wrapper.find('UserAvatar').length, 1);
-  });
-
-  it('should render a footer', () => {
-    equal(wrapper.find('footer').length, 1);
-  });
-
-  it('should render a custom class for the body', () => {
-    equal(wrapper.find('.topic-reply-list-item__body').length, 1);
-  });
-
-  it('should render a class for the sent date', () => {
-     equal(wrapper.find('.topic-reply-list-item__sent').length, 1);
-  });
+  it('should render FeedItem with these footer actions');
 
 });

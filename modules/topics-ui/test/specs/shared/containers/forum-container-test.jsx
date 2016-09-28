@@ -2,10 +2,9 @@ import assert, { equal, deepEqual } from 'assert';
 import React from 'react';
 import sinon, {spy} from 'sinon';
 import { shallow } from 'enzyme';
-import ForumContainer from '../../../../shared/containers/ForumContainer.jsx';
 import { subscribe } from '../../../../shared/dispatcher';
+import ForumContainer from '../../../../shared/containers/ForumContainer.jsx';
 
-import * as forumConstants from '../../../../shared/constants/forum';
 import * as forumFilterConstants from '../../../../shared/constants/forum-filters';
 import * as forumSortConstants from '../../../../shared/constants/forum-sorts';
 import * as forumTagConstants from '../../../../shared/constants/forum-tags';

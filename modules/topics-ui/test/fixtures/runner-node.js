@@ -15,7 +15,13 @@ require('jsdom-global')();
 var opts = require('yargs')
   .option('grep', {
     alias: 'g',
-    description: 'Filter for only certain tests'
+    description: 'only run tests matching <pattern>'
+  })
+  .option('invert', {
+    alias: 'i',
+    type: 'boolean',
+    description: 'inverts --grep matches',
+    default: false
   })
   .option('full-trace', {
     type: 'boolean',
@@ -33,6 +39,7 @@ var opts = require('yargs')
 var mocha = new Mocha({
   useColors: true,
   grep: opts.grep,
+  invert: opts.invert,
   fullTrace: opts.fullTrace,
   bail: opts.bail
 });
