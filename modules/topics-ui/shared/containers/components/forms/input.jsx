@@ -12,18 +12,24 @@ export default React.createClass({
     onChange: PropTypes.func.isRequired,
     onFocus: PropTypes.func,
     onBlur: PropTypes.func,
+    valid: PropTypes.func
   },
 
   getDefaultProps(){
     return {
-      autoComplete: "on",
+      autoComplete: "on"
     };
   },
 
   render(){
 
-    const { name, className, placeholder, autoComplete, onFocus, onBlur } = this.props;
-    const compiledClass = classNames('input', className);
+    const { name, className, placeholder, autoComplete, onFocus, onBlur, valid } = this.props;
+
+    const compiledClass = classNames({
+      input: true,
+      //valid: (valid === true),
+      invalid: (valid === false),
+    }, className);
 
     return (
       <input

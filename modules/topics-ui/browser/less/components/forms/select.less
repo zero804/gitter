@@ -6,6 +6,13 @@
 
   position: relative;
   display: inline-block;
+  transition: color .2s ease-in;
+
+  &.invalid {
+    &:after {
+      color: @ruby;
+    }
+  }
 
   &:after{
     content:   @unicode-down-arrow;
@@ -32,4 +39,9 @@
   font-size:      1.2rem;
   color:          white;
   text-transform: uppercase;
+  transition: border-color .2s ease-in;
+
+  &.invalid {
+    border-color: @ruby;
+  }
 }
