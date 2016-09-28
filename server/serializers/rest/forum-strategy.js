@@ -72,10 +72,13 @@ ForumStrategy.standard = function(options) {
   var strategy = new ForumStrategy();
   var currentUserId = options && options.currentUserId;
 
-  strategy.subscriptionStrategy = new ForumSubscriptionStrategy({
-    currentUserId: currentUserId
-  });
   strategy.categoriesForForumStrategy = new CategoriesForForumStrategy();
+
+  if (currentUserId) {
+    strategy.subscriptionStrategy = new ForumSubscriptionStrategy({
+      currentUserId: currentUserId
+    });
+  }
 
   return strategy;
 }
