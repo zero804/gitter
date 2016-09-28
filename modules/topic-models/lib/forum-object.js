@@ -1,15 +1,20 @@
 'use strict';
 
 var assert = require('assert');
+var persistence = require('gitter-web-persistence');
 
 var TYPE = {
   Forum: {
+    model: persistence.Forum
   },
   Topic: {
+    model: persistence.Topic
   },
   Reply: {
+    model: persistence.Reply
   },
   Comment: {
+    model: persistence.Comment
   }
 }
 

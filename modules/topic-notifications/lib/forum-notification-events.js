@@ -1,6 +1,6 @@
 'use strict';
 
-var ForumObject = require('./forum-object');
+var ForumObject = require('gitter-web-topic-models/lib/forum-object');
 var subscriberService = require('./subscriber-service');
 
 /**

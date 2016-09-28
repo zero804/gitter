@@ -8,7 +8,7 @@ var restSerializer = require('../../../serializers/rest-serializer');
 var restful = require('../../../services/restful');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var SubscribersResource = require('./subscribers-resource');
-var ForumObject = require('gitter-web-topic-notifications/lib/forum-object');
+var ForumObject = require('gitter-web-topic-models/lib/forum-object');
 
 
 function getReplyOptions(body) {

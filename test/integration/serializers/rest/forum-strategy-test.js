@@ -9,7 +9,7 @@ var serialize = require('gitter-web-serialization/lib/serialize');
 var serializeObject = require('gitter-web-serialization/lib/serialize-object');
 var ForumStrategy = testRequire('./serializers/rest/forum-strategy');
 var subscriberService = require('gitter-web-topic-notifications/lib/subscriber-service');
-var ForumObject = require('gitter-web-topic-notifications/lib/forum-object');
+var ForumObject = require('gitter-web-topic-models/lib/forum-object');
 var assert = require('assert');
 
 var LONG_AGO = '2014-01-01T00:00:00.000Z';

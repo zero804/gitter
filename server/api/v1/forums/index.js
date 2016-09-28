@@ -7,7 +7,7 @@ var getTopicsFilterSortOptions = require('gitter-web-topics/lib/get-topics-filte
 var restSerializer = require('../../../serializers/rest-serializer');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var SubscribersResource = require('./subscribers-resource');
-var ForumObject = require('gitter-web-topic-notifications/lib/forum-object');
+var ForumObject = require('gitter-web-topic-models/lib/forum-object');
 
 module.exports = {
   id: 'forum',

@@ -95,6 +95,7 @@ var schemas = {
   Reply: require('./schemas/reply-schema'),
   Comment: require('./schemas/comment-schema'),
   ForumSubscription: require('./schemas/forum-subscription-schema'),
+  ForumReaction: require('./schemas/forum-reaction-schema'),
 };
 
 module.exports = createExports(schemas);
