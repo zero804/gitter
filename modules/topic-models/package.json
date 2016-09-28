@@ -10,6 +10,7 @@
     "test": "mocha test/"
   },
   "dependencies": {
+    "gitter-web-live-collection-events": "file:../live-collection-events",
     "gitter-web-persistence": "file:../persistence"
   },
   "private": true

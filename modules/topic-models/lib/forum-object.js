@@ -2,6 +2,7 @@
 
 var assert = require('assert');
 var persistence = require('gitter-web-persistence');
+var liveCollections = require('gitter-web-live-collection-events');
 
 var TYPE = {
   Forum: {
@@ -10,6 +11,9 @@ var TYPE = {
       return {
         _id: item.forumId
       };
+    },
+    liveCollectionPatch: function(/*item, patch*/) {
+      // TODO: add a patch
     }
   },
   Topic: {
@@ -19,6 +23,9 @@ var TYPE = {
         _id: item.topicId,
         forumId: item.forumId
       };
+    },
+    liveCollectionPatch: function(item, patch) {
+      return liveCollections.topics.emit('patch', item.forumId, item.topicId, patch);
     }
   },
   Reply: {
@@ -29,6 +36,9 @@ var TYPE = {
         forumId: item.forumId,
         topicId: item.topicId,
       };
+    },
+    liveCollectionPatch: function(item, patch) {
+      return liveCollections.replies.emit('patch', item.forumId, item.topicId, item.replyId, patch);
     }
   },
   Comment: {
@@ -40,6 +50,9 @@ var TYPE = {
         topicId: item.topicId,
         replyId: item.replyId
       };
+    },
+    liveCollectionPatch: function(item, patch) {
+      return liveCollections.comments.emit('patch', item.forumId, item.topicId, item.replyId, item.commentId, patch);
     }
   }
 }
@@ -90,7 +103,12 @@ ForumObject.prototype = {
 
   getQuery: function() {
     return this.type.getQuery(this);
+  },
+
+  liveCollectionPatch: function(patch) {
+    return this.type.liveCollectionPatch(this, patch);
   }
+
 }
 
 /*
