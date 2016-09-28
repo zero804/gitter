@@ -25,6 +25,9 @@ describe('category-api', function() {
     },
     category1: {
       forum: 'forum1'
+    },
+    category2: {
+      forum: 'forum1'
     }
   });
 
@@ -46,6 +49,7 @@ describe('category-api', function() {
         });
       });
   });
+
   it('GET /v1/forums/:forumId/categories/:categoryId', function() {
     return request(app)
       .get('/v1/forums/' + fixture.forum1.id + '/categories/' + fixture.category1.id)
@@ -58,6 +62,24 @@ describe('category-api', function() {
           name: fixture.category1.name,
           slug: fixture.category1.slug
         });
+      });
+  });
+
+  it('PATCH /v1/forums/:forumId/categories/:categoryId', function() {
+    var update = {
+      name: 'Foo',
+      slug: 'cats',
+    };
+    return request(app)
+      .patch('/v1/forums/' + fixture.forum1.id + '/categories/' + fixture.category2.id)
+      .send(update)
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+      .then(function(result) {
+        var category = result.body;
+
+        assert.strictEqual(category.name, update.name);
+        assert.strictEqual(category.slug, update.slug);
       });
   });
 

@@ -1,5 +1,6 @@
 "use strict";
 
+var Promise = require('bluebird');
 var StatusError = require('statuserror');
 var internalClientAccessOnly = require('../../../web/middlewares/internal-client-access-only');
 var forumCategoryService = require('gitter-web-topics/lib/forum-category-service');
@@ -20,6 +21,29 @@ function getCategoryOptions(body) {
     // optional:
     slug: slug,
   };
+}
+
+function collectPatchActions(forumWithPolicyService, category, body) {
+  var promises = [];
+
+  var fields;
+  if (body.hasOwnProperty('name') || body.hasOwnProperty('slug')) {
+    fields = {};
+
+    if (body.hasOwnProperty('name')) {
+      fields.name = String(body.name);
+    }
+
+    if (body.hasOwnProperty('slug')) {
+      fields.slug = String(body.slug);
+    }
+
+    promises.push(forumWithPolicyService.updateCategory(category, fields));
+  }
+
+  // TODO: setCategoryOrder
+
+  return promises;
 }
 
 module.exports = {
@@ -61,6 +85,25 @@ module.exports = {
       .then(function(category) {
         var categoryStrategy = new restSerializer.ForumCategoryStrategy();
         return restSerializer.serializeObject(category, categoryStrategy);
+      });
+  },
+
+  patch: function(req) {
+    var user = req.user;
+    var forum = req.forum;
+    var policy = req.userForumPolicy;
+    var category = req.forumCategory;
+
+    var forumWithPolicyService = new ForumWithPolicyService(forum, user, policy);
+    var promises = collectPatchActions(forumWithPolicyService, category, req.body);
+
+    return Promise.all(promises)
+      .then(function() {
+        return forumCategoryService.findByIdForForum(forum._id, category._id);
+      })
+      .then(function(updatedCategory) {
+        var strategy = new restSerializer.ForumCategoryStrategy();
+        return restSerializer.serializeObject(updatedCategory, strategy);
       });
   }
 };
