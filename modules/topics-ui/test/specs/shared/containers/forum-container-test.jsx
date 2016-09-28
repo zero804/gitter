@@ -1,4 +1,4 @@
-import assert, { equal, deepEqual } from 'assert';
+import assert, { equal } from 'assert';
 import React from 'react';
 import sinon, {spy} from 'sinon';
 import { shallow } from 'enzyme';
