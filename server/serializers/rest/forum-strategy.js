@@ -63,7 +63,9 @@ function getCurrentUserFromOptions(options) {
 
 function getCurrentUserIdFromOptions(options) {
   if (options && options.currentUserId) return options.currentUserId;
-  return options && options.currentUser;
+  if (options && options.currentUser) {
+    return options.currentUser._id || options.currentUser.id;
+  }
 }
 
 /**
