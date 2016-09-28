@@ -188,22 +188,7 @@ function createReply(user, topic, options) {
     });
 }
 
-/* private */
-function makeTopicUpdater(topicId, lastModified) {
-  return function() {
-    var query = {
-      _id: topicId
-    };
-    var update = {
-      $max: {
-        lastModified: lastModified
-      }
-    };
-    return Topic.findOneAndUpdate(query, update, { new: true })
-      .lean()
-      .exec();
-  };
-}
+var updateTopicLastModified = mongooseUtils.makeLastModifiedUpdater(Topic);
 
 /* private */
 function updateReplyFields(topicId, replyId, fields) {
@@ -218,11 +203,12 @@ function updateReplyFields(topicId, replyId, fields) {
       lastModified: lastModified
     }
   };
-  var updateTopicLastModified = makeTopicUpdater(topicId, lastModified);
   return Reply.findOneAndUpdate(query, update, { new: true })
     .lean()
     .exec()
-    .tap(updateTopicLastModified);
+    .tap(function() {
+      return updateTopicLastModified(topicId, lastModified);
+    });
 }
 
 function updateReply(user, reply, fields) {

@@ -273,6 +273,21 @@ function getEstimatedCountForIds(Model, field, ids, options) {
     });
 }
 
+function makeLastModifiedUpdater(Model) {
+  return function(id, lastModified) {
+    var query = {
+      _id: id
+    };
+    var update = {
+      $max: {
+        lastModified: lastModified
+      }
+    };
+    return Model.update(query, update)
+      .exec();
+  };
+}
+
 module.exports = {
   attachNotificationListenersToSchema: attachNotificationListenersToSchema,
   leanUpsert: leanUpsert,
@@ -283,5 +298,6 @@ module.exports = {
   addIdToLean: addIdToLean,
   addIdToLeanArray: addIdToLeanArray,
   getEstimatedCountForId: getEstimatedCountForId,
-  getEstimatedCountForIds: getEstimatedCountForIds
+  getEstimatedCountForIds: getEstimatedCountForIds,
+  makeLastModifiedUpdater: makeLastModifiedUpdater
 };
