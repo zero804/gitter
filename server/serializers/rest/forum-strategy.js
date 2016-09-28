@@ -59,7 +59,7 @@ ForumStrategy.prototype = {
       tags: forum.tags,
       categories: this.categoriesForForumStrategy.map(id),
       topics: this.topicsForForumStrategy ? this.topicsForForumStrategy.map(id) : undefined,
-      subscribed: this.subscriptionStrategy.map(forum),
+      subscribed: this.subscriptionStrategy ? this.subscriptionStrategy.map(forum) : undefined,
       topicsTotal: topicsTotal, // TODO: drop this?
       permissions: this.permissionsStrategy.map(forum)
     };
@@ -85,12 +85,16 @@ ForumStrategy.standard = function(options) {
     }
   }
 
-  strategy.subscriptionStrategy = new ForumSubscriptionStrategy({
-    currentUserId: currentUserId
-  });
+  if (currentUserId) {
+    strategy.subscriptionStrategy = new ForumSubscriptionStrategy({
+      currentUserId: currentUserId
+    });
+  }
 
   strategy.categoriesForForumStrategy = new CategoriesForForumStrategy();
 
+
+  // TODO: not to be put in the standard strategy...
   strategy.permissionsStrategy = new ForumPermissionsStrategy({
     currentUser: currentUser,
     currentUserId: currentUserId
