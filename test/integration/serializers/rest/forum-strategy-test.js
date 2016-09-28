@@ -105,8 +105,7 @@ describe('ForumStrategy #slow', function() {
             editedAt: null,
             lastChanged: LONG_AGO,
             v: 1
-          }],
-          topicsTotal: 1
+          }]
         }])
       });
   });
@@ -171,7 +170,6 @@ describe('ForumStrategy #slow', function() {
             v: 1
           }],
           subscribed: false,
-          topicsTotal: 1,
           permissions: {
             admin: true
           }
