@@ -164,6 +164,10 @@ function createComment(user, reply, options) {
   };
 
   var insertData = validateComment(data);
+
+  // make these all be the exact same instant
+  insertData.sent = insertData.lastChanged = insertData.lastModified = new Date();
+
   return processText(options.text)
     .then(function(parsedMessage) {
       insertData.html = parsedMessage.html;
@@ -293,6 +297,7 @@ function updateComment(user, comment, fields) {
 }
 
 module.exports = {
+  findById: findById,
   findByReplyId: findByReplyId,
   findByReplyIds: findByReplyIds,
   findTotalByReplyId: findTotalByReplyId,
