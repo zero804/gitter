@@ -1,6 +1,5 @@
 'use strict';
 
-var assert = require('assert');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var appEvents = require('gitter-web-appevents');
 var forumCategoryService = require('gitter-web-topics/lib/forum-category-service');

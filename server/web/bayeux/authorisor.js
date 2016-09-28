@@ -328,7 +328,6 @@ function populateUserUnreadItemsCollection(options) {
 }
 
 function populateCategoriesCollection(options) {
-  var userId = options.userId;
   var match = options.match;
   var forumId = match[1];
 
