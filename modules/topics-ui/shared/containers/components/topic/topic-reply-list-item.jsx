@@ -1,9 +1,10 @@
 import React, { PropTypes } from 'react';
 
-import WatchButton from '../forum/watch-button.jsx';
 import CommentEditor from './comment-editor.jsx';
 import CommentItem from './comment-item.jsx';
 import FeedItem from './feed-item.jsx';
+import WatchButton from '../forum/watch-button.jsx';
+import ReactionButton from '../forum/reaction-button.jsx';
 
 export default React.createClass({
 
@@ -13,6 +14,7 @@ export default React.createClass({
     forumId: PropTypes.string.isRequired,
     topicId: PropTypes.string.isRequired,
     reply: PropTypes.shape({
+      id: PropTypes.string,
       text: PropTypes.string,
       body: PropTypes.shape({
         html: PropTypes.string,
@@ -29,7 +31,9 @@ export default React.createClass({
     onNewCommentUpdate: PropTypes.func.isRequired,
     submitNewComment: PropTypes.func.isRequired,
     newCommentContent: PropTypes.string,
-    onSubscribeButtonClick: PropTypes.func
+    onSubscribeButtonClick: PropTypes.func,
+    onReplyReactionPick: PropTypes.func,
+    onCommentReactionPick: PropTypes.func
   },
 
   render(){
@@ -49,11 +53,6 @@ export default React.createClass({
     const subscriptionState = reply.subscriptionState;
 
     return [
-      <span
-        key="likes"
-        className="feed-item__likes">
-        10 Likes
-      </span>,
       <button
         key="comments"
         className="feed-item__comments"
@@ -65,7 +64,16 @@ export default React.createClass({
         subscriptionState={subscriptionState}
         className="topic-reply-list-item__footer__subscribe-action"
         itemClassName="topic-reply-list-item__footer__subscribe-action-text-item"
-        onClick={this.onSubscribeButtonClick}/>
+        onClick={this.onSubscribeButtonClick}/>,
+      <ReactionButton
+        key="reactions"
+        onReactionPick={this.onReactionPick}/>,
+      <button className="topic-reply-list-item__footer__reaction-item">
+        👍 <span className="topic-reply-list-item__footer__reaction-item-count">2</span>
+      </button>,
+      <button className="topic-reply-list-item__footer__reaction-item">
+        🎉 <span className="topic-reply-list-item__footer__reaction-item-count">1</span>
+      </button>
     ];
   },
 
@@ -97,7 +105,8 @@ export default React.createClass({
     return (
       <CommentItem
         key={`comment-list-item-${reply.id}-${index}`}
-        comment={comment} />
+        comment={comment}
+        onReactionPick={this.onCommentReactionPick} />
     );
   },
 
@@ -109,7 +118,24 @@ export default React.createClass({
 
   onSubscribeButtonClick(e) {
     const {reply, onSubscribeButtonClick} = this.props;
-    onSubscribeButtonClick(e, reply.id);
+    if(onSubscribeButtonClick) {
+      onSubscribeButtonClick(e, reply.id);
+    }
+  },
+
+  onReactionPick(reactionKey, isReacting) {
+    const {reply, onReplyReactionPick} = this.props;
+    if(onReplyReactionPick) {
+      onReplyReactionPick(reply.id, reactionKey, isReacting);
+    }
+  },
+
+  onCommentReactionPick(commentId, reactionKey, isReacting) {
+    // TODO: pass it up further
+    const {reply, onCommentReactionPick} = this.props;
+    if(onCommentReactionPick) {
+      onCommentReactionPick(reply.id, commentId, reactionKey, isReacting);
+    }
   },
 
   onNewCommentUpdate(val) {

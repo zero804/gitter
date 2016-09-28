@@ -14,7 +14,10 @@ export default React.createClass({
       SUBSCRIPTION_STATE_UNSUBSCRIBED,
       SUBSCRIPTION_STATE_PENDING
     ]).isRequired,
-    children: PropTypes.node,
+    children:  React.PropTypes.oneOfType([
+      React.PropTypes.arrayOf(React.PropTypes.node),
+      React.PropTypes.node
+    ]),
     onClick: PropTypes.func,
     className: PropTypes.string,
     itemClassName: PropTypes.string,
