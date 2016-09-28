@@ -130,10 +130,9 @@ function updateRepliesTotal(topicId) {
       }
 
       // if this update won, then patch the live collection with the latest
-      // lastChanged & lastModified values and also the new total replies.
+      // lastChanged values and also the new total replies.
       liveCollections.topics.emit('patch', topic.forumId, topicId, {
         lastChanged: nowString,
-        lastModified: nowString,
         repliesTotal: topic.repliesTotal
       })
     })
@@ -262,11 +261,6 @@ function updateReply(user, reply, fields) {
       // Might as well issue an update rather than a patch because almost the
       // entire thing changed.
       liveCollections.replies.emit('update', updatedReply);
-
-      // The topic was updated at the same time as the reply
-      liveCollections.topics.emit('patch', forumId, topicId, {
-        lastModified: updatedReply.lastModified.toISOString(),
-      });
 
       return updatedReply;
     });

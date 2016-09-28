@@ -81,7 +81,6 @@ describe('ReplyStrategy #slow', function() {
           sent: LONG_AGO,
           editedAt: null,
           lastChanged: LONG_AGO,
-          lastModified: LONG_AGO,
           v: 1
         }])
       });
@@ -112,7 +111,6 @@ describe('ReplyStrategy #slow', function() {
           sent: LONG_AGO,
           editedAt: null,
           lastChanged: LONG_AGO,
-          lastModified: LONG_AGO,
           v: 1
         }])
       });
@@ -142,7 +140,6 @@ describe('ReplyStrategy #slow', function() {
           sent: LONG_AGO,
           editedAt: null,
           lastChanged: LONG_AGO,
-          lastModified: LONG_AGO,
           v: 1
         }])
       });
@@ -191,7 +188,6 @@ describe('ReplyStrategy #slow', function() {
           sent: LONG_AGO,
           editedAt: null,
           lastChanged: LONG_AGO,
-          lastModified: LONG_AGO,
           v: 1
         }])
       });
@@ -239,7 +235,6 @@ describe('ReplyStrategy #slow', function() {
           sent: LONG_AGO,
           editedAt: null,
           lastChanged: LONG_AGO,
-          lastModified: LONG_AGO,
           v: 1
         }])
       });
@@ -265,7 +260,6 @@ describe('ReplyStrategy #slow', function() {
             sent: LONG_AGO,
             editedAt: null,
             lastChanged: LONG_AGO,
-            lastModified: LONG_AGO,
             v: 1
           }],
           lookups: {

@@ -71,7 +71,6 @@ describe('comment-api', function() {
       });
   });
 
-
   it('PATCH /v1/forums/:forumId/topics/:topicId/replies/:replyId/comments/:commentId', function() {
     var update = {
       text: '**hello**',
