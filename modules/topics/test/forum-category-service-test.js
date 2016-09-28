@@ -8,6 +8,9 @@ describe('forum-category-service #slow', function() {
   var fixture = fixtureLoader.setup({
     user1: {},
     forum1: {},
+    category1: {
+      forum: 'forum1'
+    }
   });
 
   it('should add a category', function() {
@@ -17,6 +20,17 @@ describe('forum-category-service #slow', function() {
       })
       .then(function(category) {
         assert.strictEqual(category.name, 'foo');
+      });
+  });
+
+  it('should update a category', function() {
+    return forumCategoryService.updateCategory(fixture.user1, fixture.category1, {
+        name: 'foo',
+        slug: 'bar',
+      })
+      .then(function(category) {
+        assert.strictEqual(category.name, 'foo');
+        assert.strictEqual(category.slug, 'bar');
       });
   });
 });
