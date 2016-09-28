@@ -48,7 +48,7 @@ describe('<TopicContainer />', () => {
         currentUserStore={currentUserStore}
         newReplyStore={new Backbone.Model()}
         topicId="1"
-        groupName="gitterHQ"/>
+        groupUri="gitterHQ"/>
     );
   });
 

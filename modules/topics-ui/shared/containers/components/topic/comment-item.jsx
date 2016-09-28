@@ -19,10 +19,11 @@ export default React.createClass({
     const {comment} = this.props;
     return (
       <FeedItem
+        item={comment}
         onChange={this.onChange}
         onCancel={this.onCancel}
         onSave={this.onSave}
-        item={comment}/>
+        footerChildren={this.getFeedItemFooterChildren()}/>
     );
   },
 
@@ -37,5 +38,15 @@ export default React.createClass({
   onSave(val){
     this.props.onSave(val);
   },
+
+  getFeedItemFooterChildren(){
+    return [
+      <span
+        key="likes"
+        className="feed-item__likes">
+        10 Likes
+      </span>
+    ];
+  }
 
 });

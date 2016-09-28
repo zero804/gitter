@@ -9,9 +9,27 @@ var babelRegister = require('babel-register');
 var babelConfig = require('../../dev/babel-config');
 
 babelRegister(babelConfig);
-require('jsdom-global')()
+require('jsdom-global')();
 
-var mocha = new Mocha({ useColors: true });
+
+var opts = require('yargs')
+  .option('grep', {
+    alias: 'g',
+    description: 'Filter for only certain tests'
+  })
+  .option('full-trace', {
+    type: 'boolean',
+    description: 'Full stack trace'
+  })
+  .help('help')
+  .alias('help', 'h')
+  .argv;
+
+var mocha = new Mocha({
+  useColors: true,
+  grep: opts.grep,
+  fullTrace: opts.fullTrace
+});
 
 
 glob.sync(path.resolve(__dirname, '../specs') + '/**/*.{js,jsx}').forEach(function(filePath){
@@ -31,6 +49,6 @@ runner.on('end', function(){
 });
 
 runner.on('fail', function(i, err){
-  console.log(err.message);
+  console.log(err.message, err.stack);
   process.exit(1);
 });

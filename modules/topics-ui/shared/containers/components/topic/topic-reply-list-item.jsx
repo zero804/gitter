@@ -1,4 +1,6 @@
 import React, { PropTypes } from 'react';
+
+import WatchButton from '../forum/watch-button.jsx';
 import CommentEditor from './comment-editor.jsx';
 import CommentItem from './comment-item.jsx';
 import FeedItem from './feed-item.jsx';
@@ -7,6 +9,7 @@ export default React.createClass({
 
   displayName: 'TopicReplyListItem',
   propTypes: {
+    user: PropTypes.object.isRequired,
     reply: PropTypes.shape({
       text: PropTypes.string,
       body: PropTypes.shape({
@@ -19,7 +22,6 @@ export default React.createClass({
       }).isRequired
 
     }).isRequired,
-    currentUser: PropTypes.object.isRequired,
     onCommentsClicked: PropTypes.func.isRequired,
     onNewCommentUpdate: PropTypes.func.isRequired,
     submitNewComment: PropTypes.func.isRequired,
@@ -30,10 +32,12 @@ export default React.createClass({
     onCommentEditUpdate: PropTypes.func.isRequired,
     onCommentEditCancel: PropTypes.func.isRequired,
     onCommentEditSave: PropTypes.func.isRequired,
+    onSubscribeButtonClick: PropTypes.func
   },
 
   render(){
     const {reply} = this.props;
+
     return (
       <FeedItem
         item={reply}
@@ -44,14 +48,40 @@ export default React.createClass({
         primaryValue={10}
         secondaryLabel="Comments"
         secondaryValue={2}
-        onSecondaryClicked={this.onCommentsClicked}>
+        onSecondaryClicked={this.onCommentsClicked}
+        footerChildren={this.getFeedItemFooterChildren()}>
         {this.getComments()}
       </FeedItem>
     );
   },
 
+  getFeedItemFooterChildren(){
+    const {reply} = this.props;
+    const subscriptionState = reply.subscriptionState;
+
+    return [
+      <span
+        key="likes"
+        className="feed-item__likes">
+        10 Likes
+      </span>,
+      <button
+        key="comments"
+        className="feed-item__comments"
+        onClick={this.onCommentsClicked}>
+        2 Comments
+      </button>,
+      <WatchButton
+        key="subscribe"
+        subscriptionState={subscriptionState}
+        className="topic-reply-list-item__footer__subscribe-action"
+        itemClassName="topic-reply-list-item__footer__subscribe-action-text-item"
+        onClick={this.onSubscribeButtonClick}/>
+    ];
+  },
+
   getComments(){
-    const {reply, newCommentContent, currentUser} = this.props;
+    const {reply, newCommentContent, user} = this.props;
     if(!reply.isCommenting) { return; }
     return (
       <section className="reply-comment-list">
@@ -60,7 +90,7 @@ export default React.createClass({
         </ul>
         <CommentEditor
           autoFocus={true}
-          currentUser={currentUser}
+          user={user}
           value={newCommentContent}
           onEnter={this.submitNewComment}
           onChange={this.onNewCommentUpdate} />
@@ -91,7 +121,12 @@ export default React.createClass({
     this.props.onCommentsClicked(reply.id);
   },
 
-  onNewCommentUpdate(val){
+  onSubscribeButtonClick(e) {
+    const {reply, onSubscribeButtonClick} = this.props;
+    onSubscribeButtonClick(e, reply.id);
+  },
+
+  onNewCommentUpdate(val) {
     const {reply} = this.props;
     this.props.onNewCommentUpdate(reply.id, val);
   },

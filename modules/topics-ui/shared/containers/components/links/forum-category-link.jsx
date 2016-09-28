@@ -8,7 +8,7 @@ export default React.createClass({
   displayName: 'ForumCategoryLink',
   propTypes: {
     children: PropTypes.node.isRequired,
-    groupName: PropTypes.string.isRequired,
+    groupUri: PropTypes.string.isRequired,
     category: PropTypes.shape({
       category: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
@@ -19,14 +19,14 @@ export default React.createClass({
 
   render(){
 
-    const {category, groupName, className} = this.props;
+    const {category, groupUri, className} = this.props;
     const { slug } = category;
     //TODO, should do something about this
     const categoryName = category.category;
     const title = `View all ${categoryName} topics`;
     const href = (categoryName === DEFAULT_CATEGORY_NAME) ?
-      `/${groupName}/topics` :
-      `/${groupName}/topics/categories/${slug}`;
+      `/${groupUri}/topics` :
+      `/${groupUri}/topics/categories/${slug}`;
 
     return (
       <a title={title} href={href} className={className} onClick={this.onClick}>{this.props.children}</a>

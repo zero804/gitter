@@ -19,8 +19,14 @@ function findById(forumId) {
 }
 
 function createForum(user, forumInfo, securityDescriptor) {
+  var uri = forumInfo.uri; // TODO: validate
+  var name = forumInfo.name; // TODO: validate
+
   // we can't upsert because there's nothing unique on a Forum to check against
   var data = {
+    uri: uri,
+    lcUri: uri.toLowerCase(),
+    name: name,
     tags: forumInfo.tags || [],
     sd: securityDescriptor
   };
@@ -31,7 +37,8 @@ function createForum(user, forumInfo, securityDescriptor) {
       stats.event('new_forum', {
         // TODO: groupId would probably have been handy here? But leaky.
         forumId: forum._id,
-        userId: user._id
+        userId: user._id,
+        uri: uri
       });
 
       return forum;
