@@ -104,7 +104,6 @@ describe('ForumStrategy #slow', function() {
             sent: LONG_AGO,
             editedAt: null,
             lastChanged: LONG_AGO,
-            lastModified: LONG_AGO,
             v: 1
           }],
           topicsTotal: 1
@@ -169,7 +168,6 @@ describe('ForumStrategy #slow', function() {
             sent: LONG_AGO,
             editedAt: null,
             lastChanged: LONG_AGO,
-            lastModified: LONG_AGO,
             v: 1
           }],
           subscribed: false,
@@ -216,14 +214,23 @@ describe('ForumStrategy #slow', function() {
   });
 
   it('should tell a user when they are an admin of the forum', function() {
-    var strategy = ForumStrategy.standard({
+    var strategy = ForumStrategy.permissions({
+      currentUser: fixture.user1
+    });
+
+    return serializeObject(fixture.forum1, strategy)
+      .then(function(serialized) {
+        assert.strictEqual(serialized.permissions.admin, true);
+      });
+  });
+
+  it('should tell a user when they are NOT an admin of the forum', function() {
+    var strategy = ForumStrategy.permissions({
       currentUser: fixture.user2
     });
 
     return serializeObject(fixture.forum1, strategy)
       .then(function(serialized) {
-        // user1 is an admin and it is tested in the big one above, user2 is
-        // not an admin and is tested here.
         assert.strictEqual(serialized.permissions.admin, false);
       });
   });

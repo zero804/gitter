@@ -30,8 +30,12 @@ ForumStrategy.prototype = {
     if (this.topicsForForumStrategy) {
       promises.push(this.topicsForForumStrategy.preload(forumIds));
     }
-    promises.push(this.subscriptionStrategy.preload(forums));
-    promises.push(this.permissionsStrategy.preload(forums));
+    if (this.subscriptionStrategy) {
+      promises.push(this.subscriptionStrategy.preload(forums));
+    }
+    if (this.permissionsStrategy) {
+      promises.push(this.permissionsStrategy.preload(forums));
+    }
 
     return Promise.all(promises);
   },
@@ -61,29 +65,29 @@ ForumStrategy.prototype = {
       topics: this.topicsForForumStrategy ? this.topicsForForumStrategy.map(id) : undefined,
       subscribed: this.subscriptionStrategy ? this.subscriptionStrategy.map(forum) : undefined,
       topicsTotal: topicsTotal, // TODO: drop this?
-      permissions: this.permissionsStrategy.map(forum)
+      permissions: this.permissionsStrategy ? this.permissionsStrategy.map(forum) : undefined
     };
   },
 
   name: 'ForumStrategy',
 };
 
+function getCurrentUserFromOptions(options) {
+  return options && options.currentUser;
+}
+
+function getCurrentUserIdFromOptions(options) {
+  if (options && options.currentUserId) return options.currentUserId;
+  return options && options.currentUser;
+}
+
 /**
- * Forum WITHOUT nested topics
+ * Forum WITHOUT nested topics or permissions
  */
 ForumStrategy.standard = function(options) {
   var strategy = new ForumStrategy();
-  var currentUser;
-  var currentUserId;
-  if (options) {
-    if (options.currentUser) {
-      currentUser = options.currentUser;
-      currentUserId = currentUser._id;
-    }
-    if (options.currentUserId) {
-      currentUserId = options.currentUserId;
-    }
-  }
+
+  var currentUserId = getCurrentUserIdFromOptions(options);
 
   if (currentUserId) {
     strategy.subscriptionStrategy = new ForumSubscriptionStrategy({
@@ -93,22 +97,35 @@ ForumStrategy.standard = function(options) {
 
   strategy.categoriesForForumStrategy = new CategoriesForForumStrategy();
 
-
-  // TODO: not to be put in the standard strategy...
-  strategy.permissionsStrategy = new ForumPermissionsStrategy({
-    currentUser: currentUser,
-    currentUserId: currentUserId
-  });
-
   return strategy;
-}
+};
 
 /**
- * Forum WITH nested topics
+ * Forum with permissions but no nested topics
+ */
+ForumStrategy.permissions = function(options) {
+  var strategy = ForumStrategy.standard(options);
+
+  var currentUser = getCurrentUserFromOptions(options);
+  var currentUserId = getCurrentUserIdFromOptions(options);
+
+  if (currentUser || currentUserId) {
+    strategy.permissionsStrategy = new ForumPermissionsStrategy({
+      currentUser: currentUser,
+      currentUserId: currentUserId
+    });
+  }
+
+  return strategy;
+};
+
+/**
+ * Forum WITH nested topics and permissions
  */
 ForumStrategy.nested = function(options) {
-  var strategy = ForumStrategy.standard(options);
-  var currentUserId = options && options.currentUserId;
+  var strategy = ForumStrategy.permissions(options);
+
+  var currentUserId = getCurrentUserIdFromOptions(options);
 
   strategy.topicsForForumStrategy = TopicsForForumStrategy.standard({
     currentUserId: currentUserId,
@@ -116,6 +133,6 @@ ForumStrategy.nested = function(options) {
   });
 
   return strategy;
-}
+};
 
 module.exports = ForumStrategy;
