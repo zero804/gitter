@@ -1,6 +1,6 @@
 'use strict';
 
-var getVersion = require('../get-model-version');
+var getVersion = require('gitter-web-serialization/lib/get-model-version');
 
 function formatDate(d) {
   return d ? d.toISOString() : null;

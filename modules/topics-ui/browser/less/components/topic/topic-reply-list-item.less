@@ -11,3 +11,33 @@
   margin: 0;
   padding: 0;
 }
+
+
+.topic-reply-list-item__footer__subscribe-action {
+  .m-details-text();
+
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+
+  background-color: transparent;
+  border: 0;
+  cursor: pointer;
+
+  &:hover,
+  &:focus {
+    outline: none;
+    text-decoration: underline;
+  }
+}
+
+.topic-reply-list-item__footer__subscribe-action-text-item {
+  width: 100%;
+  height: 0;
+  line-height: 0;
+
+  &.hidden {
+    opacity: 0;
+  }
+}

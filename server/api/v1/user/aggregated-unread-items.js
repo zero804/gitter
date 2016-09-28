@@ -1,7 +1,7 @@
 "use strict";
 
 var unreadItemService = require("../../../services/unread-items");
-var collections = require('../../../utils/collections');
+var collections = require('gitter-web-utils/lib/collections');
 var restSerializer = require('../../../serializers/rest-serializer');
 
 module.exports = {

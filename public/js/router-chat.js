@@ -10,7 +10,7 @@ var fullTimeFormat = require('gitter-web-shared/time/full-time-format');
 
 var onready = require('./utils/onready');
 var appEvents = require('./utils/appevents');
-var frameUtils = require('./utils/frame-utils');
+var frameUtils = require('gitter-web-frame-utils');
 var liveContext = require('./components/live-context');
 var apiClient = require('./components/api-client');
 var perfTiming = require('./components/perf-timing');

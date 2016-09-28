@@ -26,21 +26,10 @@ var contextGenerator = require('../../web/context-generator.js');
 
 
 function renderForum(req, res, next, options) {
-
-  //No switch, no business
-  if (!req.fflip || !req.fflip.has('topics')) {
-    return next(new StatusError(404));
-  }
-
-  //Have to be logged in to get here
-  if(!req.user) {
-    return next(new StatusError(404));
-  }
-
   var userId = req.user && req.user._id;
 
   options = (options || {});
-  var groupUri = req.params.groupName;
+  var groupUri = req.params.groupUri;
 
   return contextGenerator.generateNonChatContext(req)
     .then(function(context){
@@ -80,7 +69,7 @@ function renderForum(req, res, next, options) {
             forum: forum,
             context: context,
 
-            groupName: req.params.groupName,
+            groupUri: req.params.groupUri,
             categoryName: categoryName,
             filterName: filterName,
             tagName: tagName,
@@ -104,12 +93,7 @@ function renderForum(req, res, next, options) {
 
 
 function renderTopic(req, res, next) {
-
-  if (!req.fflip || !req.fflip.has('topics')) {
-    return next(new StatusError(404));
-  }
-
-  var groupUri = req.params.groupName;
+  var groupUri = req.params.groupUri;
   var topicId = req.params.topicId;
   var userId = req.user && req.user._id;
 
@@ -155,7 +139,7 @@ function renderTopic(req, res, next) {
                 componentData: {
                   forum: forum,
                   context: context,
-                  groupName: req.params.groupName,
+                  groupUri: req.params.groupUri,
                   topicsStore: topicStore,
                   topicId: topicId,
                   accessTokenStore: accessTokenStore(context.accessToken),

@@ -6,9 +6,16 @@ export default React.createClass({
 
   displayName: 'FeedItem',
   propTypes: {
-    children: PropTypes.node,
+    children: React.PropTypes.oneOfType([
+      React.PropTypes.arrayOf(React.PropTypes.node),
+      React.PropTypes.node
+    ]),
+    footerChildren: React.PropTypes.oneOfType([
+      React.PropTypes.arrayOf(React.PropTypes.node),
+      React.PropTypes.node
+    ]),
     item: PropTypes.shape({
-      sent: PropTypes.string.isRequired,
+      sent: PropTypes.string,
     }),
     primaryLabel: PropTypes.string,
     secondaryLabel: PropTypes.string,
@@ -20,10 +27,10 @@ export default React.createClass({
 
   render(){
 
-    const {item} = this.props;
+    const {item, children, footerChildren} = this.props;
     const {user} = item;
     const avatarDims = 30;
-    const formattedSentDate = moment(item.sent).format('MMM Do')
+    const formattedSentDate = item.sent && moment(item.sent).format('MMM Do');
 
     return (
       <article className="feed-item">
@@ -39,36 +46,10 @@ export default React.createClass({
           {this.getItemContent()}
         </div>
         <footer className="feed-item__footer">
-          {this.getPrimaryContent()}
-          {this.getSecondaryContent()}
+          {footerChildren}
         </footer>
-        {this.props.children}
+        {children}
       </article>
-    );
-  },
-
-  getPrimaryContent(){
-    const {primaryLabel, primaryValue} = this.props;
-    if(!primaryLabel){ return; }
-    return (
-      <span
-        className="feed-item__likes"
-        onClick={this.props.onPrimaryClicked}>
-        {primaryValue} {primaryLabel}
-      </span>
-    );
-  },
-
-  getSecondaryContent(){
-    const {secondaryLabel, secondaryValue} = this.props;
-    if(!secondaryLabel){ return; }
-
-    return (
-      <button
-        className="feed-item__comments"
-        onClick={this.props.onSecondaryClicked}>
-        {secondaryValue} {secondaryLabel}
-      </button>
     );
   },
 

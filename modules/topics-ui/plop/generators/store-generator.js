@@ -41,17 +41,20 @@ module.exports = function(plop) {
 
       return [{
         type: 'add',
-        path: path.resolve(__dirname, '../../server/stores/{{dashCase name}}-store.js'),
+        // The plop templates don't work with backslashes :(
+        path: path.resolve(__dirname, '../../server/stores/{{dashCase name}}-store.js').replace(/\\/g, '/'),
         templateFile: serverSideTemplate
       },
       {
         type: 'add',
-        path: path.resolve(__dirname, '../../test/specs/server/stores/{{dashCase name}}-store--test.js'),
+        // The plop templates don't work with backslashes :(
+        path: path.resolve(__dirname, '../../test/specs/server/stores/{{dashCase name}}-store--test.js').replace(/\\/g, '/'),
         templateFile: serverSideTestTemplate,
       },
       {
         type: 'add',
-        path: path.resolve(__dirname, '../../browser/js/stores/{{dashCase name}}-store.js'),
+        // The plop templates don't work with backslashes :(
+        path: path.resolve(__dirname, '../../browser/js/stores/{{dashCase name}}-store.js').replace(/\\/g, '/'),
         templateFile: clientSideTemplate
       },
       {
