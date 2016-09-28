@@ -25,12 +25,11 @@ export default React.createClass({
       title: PropTypes.string.isRequired,
       body: PropTypes.string.isRequired,
       categoryId: PropTypes.string.isRequired,
+      tags: PropTypes.arrayOf(PropTypes.shape({
+        label: PropTypes.string.isRequired,
+        value: PropTypes.string.isRequired,
+      }))
     }).isRequired,
-
-    tags: PropTypes.arrayOf(PropTypes.shape({
-      label: PropTypes.string.isRequired,
-      value: PropTypes.string.isRequired,
-    })),
 
     onSubmit: PropTypes.func.isRequired,
     onTitleChange: PropTypes.func.isRequired,
@@ -85,7 +84,7 @@ export default React.createClass({
   },
 
   getTagsRow(){
-    const {tags} = this.props;
+    const {tags} = this.props.newTopic;
     if(!tags.length) { return; }
     return (
       <div className="create-topic__details-row">
