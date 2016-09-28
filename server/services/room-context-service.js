@@ -90,6 +90,7 @@ function findContextForUri(user, uri, options) {
                 }
 
                 return {
+                  group: resolvedGroup,
                   troupe: resolvedTroupe,
                   policy: policy,
                   uri: resolvedTroupe.uri,
