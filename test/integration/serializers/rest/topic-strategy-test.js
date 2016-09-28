@@ -50,12 +50,12 @@ describe('TopicStrategy #slow', function() {
     }
   });
 
-  it('should serialize a topic', function() {
-    var strategy = TopicStrategy.standard({});
-
+  it('should serialize a topic with a userId', function() {
     var topic = fixture.topic1;
     var category = fixture.category1;
     var user = fixture.user1;
+
+    var strategy = TopicStrategy.standard({ currentUserId: user._id });
 
     return serialize([topic], strategy)
       .then(function(s) {
@@ -97,7 +97,53 @@ describe('TopicStrategy #slow', function() {
       });
   });
 
-  it('should serialize a topic with nested replies', function() {
+  it('should serialize a topic without a userId', function() {
+    var topic = fixture.topic1;
+    var category = fixture.category1;
+    var user = fixture.user1;
+
+    var strategy = TopicStrategy.standard();
+
+    return serialize([topic], strategy)
+      .then(function(s) {
+        assertUtils.assertSerializedEqual(s, [{
+          id: topic.id,
+          title: topic.title,
+          slug: topic.slug,
+          body: {
+            text: topic.text,
+            html: topic.html
+          },
+          sticky: topic.sticky,
+          tags: [],
+          category: {
+            id: category.id,
+            name: category.name,
+            slug: category.slug
+          },
+          user: {
+            id: user.id,
+            username: user.username,
+            displayName: user.displayName,
+            avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
+          },
+          repliesTotal: 1,
+          replyingUsers: [{
+            "id": user.id,
+            "username": user.username,
+            "displayName": user.displayName,
+            "avatarUrl":  nconf.get('avatar:officialHost') + '/g/u/' + user.username
+          }],
+          sent: LONG_AGO,
+          editedAt: null,
+          lastChanged: LONG_AGO,
+          lastModified: LONG_AGO,
+          v: 1
+        }])
+      });
+  });
+
+  it('should serialize a topic with nested replies with a userId', function() {
     var user = fixture.user1;
     var category = fixture.category1;
     var topic = fixture.topic1;
@@ -167,6 +213,72 @@ describe('TopicStrategy #slow', function() {
       });
   });
 
+  it('should serialize a topic with nested replies without a userId', function() {
+    var user = fixture.user1;
+    var category = fixture.category1;
+    var topic = fixture.topic1;
+    var reply = fixture.reply1;
+
+    var strategy = TopicStrategy.nested({});
+
+    return serialize([topic], strategy)
+      .then(function(s) {
+        assertUtils.assertSerializedEqual(s, [{
+          id: topic.id,
+          title: topic.title,
+          slug: topic.slug,
+          body: {
+            text: topic.text,
+            html: topic.html
+          },
+          sticky: topic.sticky,
+          tags: [],
+          category: {
+            id: category.id,
+            name: category.name,
+            slug: category.slug
+          },
+          user: {
+            id: user.id,
+            username: user.username,
+            displayName: user.displayName,
+            avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username
+          },
+          replies: [{
+            id: reply.id,
+            body: {
+              text: reply.text,
+              html: reply.html
+            },
+            user: {
+              id: user.id,
+              username: user.username,
+              displayName: user.displayName,
+              avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username
+            },
+            commentsTotal: 0,
+            sent: LONG_AGO,
+            editedAt: null,
+            lastChanged: LONG_AGO,
+            lastModified: LONG_AGO,
+            v: 1
+          }],
+          repliesTotal: 1,
+          replyingUsers: [{
+            id: user.id,
+            username: user.username,
+            displayName: user.displayName,
+            avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username
+          }],
+          sent: LONG_AGO,
+          editedAt: null,
+          lastChanged: LONG_AGO,
+          lastModified: LONG_AGO,
+          v: 1
+        }])
+      });
+  });
+
   it("should serialize a topic with lookups=['user']", function() {
     var strategy = TopicStrategy.standard({ lookups: ['user'] });
 
@@ -193,7 +305,6 @@ describe('TopicStrategy #slow', function() {
               slug: category.slug
             },
             user: fixture.user1.id,
-            subscribed: false,
             repliesTotal: 1,
             replyingUsers: [{
               id: user.id,
@@ -246,7 +357,6 @@ describe('TopicStrategy #slow', function() {
               displayName: user.displayName,
               avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
             },
-            subscribed: false,
             repliesTotal: 1,
             replyingUsers: [{
               id: user.id,
