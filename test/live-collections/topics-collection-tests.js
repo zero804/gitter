@@ -35,17 +35,19 @@ describe('topics-live-collection #slow', function() {
       forum: 'forum1',
       category: 'category1'
     },
-    // for other smaller patches
+    // for other smaller patches directly to topic
     topic3: {
       user: 'user1',
       forum: 'forum1',
       category: 'category1'
     },
+    // for changing the category
     topic4: {
       user: 'user1',
       forum: 'forum1',
       category: 'category1'
     },
+    // to be deleted
     topic5: {
       user: 'user1',
       forum: 'forum1',
@@ -153,12 +155,12 @@ describe('topics-live-collection #slow', function() {
       operation: 'update',
       type: 'topic',
       model: {
-        id: fixture.topic4.id.toString(),
+        id: fixture.topic3.id.toString(),
         slug: 'new-slug'
       },
     });
 
-    return topicService.updateTopic(fixture.user1, fixture.topic4, {
+    return topicService.updateTopic(fixture.user1, fixture.topic3, {
         slug: 'new-slug'
       })
       .then(checkEvent);
@@ -170,7 +172,7 @@ describe('topics-live-collection #slow', function() {
       operation: 'update',
       type: 'topic',
       model: {
-        id: fixture.topic5.id.toString(),
+        id: fixture.topic3.id.toString(),
         body: {
           text: 'new text',
           html: 'new text',
@@ -178,7 +180,7 @@ describe('topics-live-collection #slow', function() {
       },
     });
 
-    return topicService.updateTopic(fixture.user1, fixture.topic5, {
+    return topicService.updateTopic(fixture.user1, fixture.topic3, {
         text: 'new text'
       })
       .then(checkEvent)
@@ -226,14 +228,28 @@ describe('topics-live-collection #slow', function() {
       operation: 'update',
       type: 'topic',
       model: {
-        id: fixture.topic3.id.toString(),
+        id: fixture.topic4.id.toString(),
       },
     });
 
-    return topicService.setTopicCategory(fixture.user1, fixture.topic3, fixture.category2)
+    return topicService.setTopicCategory(fixture.user1, fixture.topic4, fixture.category2)
       .then(checkEvent)
       .then(function(event) {
         assert.strictEqual(event.model.category.id.toString(), fixture.category2._id.toString());
       });
+  });
+
+  it('should emit a remove event when deleting the topic', function() {
+    var checkEvent = appEvents.addListener('dataChange2', {
+      url: '/forums/' + fixture.forum1.id + '/topics',
+      operation: 'remove',
+      type: 'topic',
+      model: {
+        id: fixture.topic5.id.toString(),
+      }
+    });
+
+    return topicService.deleteTopic(fixture.user1, fixture.topic5)
+      .then(checkEvent);
   });
 });
