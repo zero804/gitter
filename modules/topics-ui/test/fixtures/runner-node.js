@@ -21,6 +21,11 @@ var opts = require('yargs')
     type: 'boolean',
     description: 'Full stack trace'
   })
+  .option('bail', {
+    type: 'boolean',
+    description: 'Whether to bail on first failure',
+    default: true
+  })
   .help('help')
   .alias('help', 'h')
   .argv;
@@ -28,7 +33,8 @@ var opts = require('yargs')
 var mocha = new Mocha({
   useColors: true,
   grep: opts.grep,
-  fullTrace: opts.fullTrace
+  fullTrace: opts.fullTrace,
+  bail: opts.bail
 });
 
 
@@ -46,9 +52,4 @@ var runner = mocha.run(function(failures){
 
 runner.on('end', function(){
   process.exit();
-});
-
-runner.on('fail', function(i, err){
-  console.log(err.message, err.stack);
-  process.exit(1);
 });
