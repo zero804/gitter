@@ -18,7 +18,7 @@ function makeHash() {
   return hash;
 }
 
-describe('CommentStrategy', function() {
+describe('CommentStrategy #slow', function() {
   var blockTimer = require('../../block-timer');
   before(blockTimer.on);
   after(blockTimer.off);

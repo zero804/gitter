@@ -122,7 +122,6 @@ function updateCommentsTotal(topicId, replyId) {
         // if the topic update won, patch the topics live collection
         liveCollections.topics.emit('patch', topic.forumId, topicId, {
           lastChanged: nowString,
-          lastModified: nowString,
         });
       } else {
         debug('We lost the topic update race.');
@@ -141,7 +140,6 @@ function updateCommentsTotal(topicId, replyId) {
         // if the reply update won, patch the replies live collection
         liveCollections.replies.emit('patch', reply.forumId, reply.topicId, replyId, {
           lastChanged: nowString,
-          lastModified: nowString,
           commentsTotal: reply.commentsTotal
         });
       } else {
@@ -266,8 +264,6 @@ function updateComment(user, comment, fields) {
       });
     })
     .then(function(updatedComment) {
-      this.updatedComment = updatedComment;
-
       stats.event('update_topic_comment', {
         userId: userId,
         forumId: forumId,
@@ -278,21 +274,7 @@ function updateComment(user, comment, fields) {
 
       liveCollections.comments.emit('update', updatedComment);
 
-      // load the reply's lastModified date so we can patch the topic&reply
-      // collections.
-      return Reply.findById(replyId, { lastModified: true });
-    })
-    .then(function(reply) {
-      // The topic and reply were updated at the same time
-      liveCollections.topics.emit('patch', forumId, topicId, {
-        lastModified: reply.lastModified.toISOString(),
-      });
-
-      liveCollections.replies.emit('patch', forumId, topicId, replyId, {
-        lastModified: reply.lastModified.toISOString(),
-      });
-
-      return this.updatedComment;
+      return updatedComment;
     });
 }
 
