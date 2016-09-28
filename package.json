@@ -80,6 +80,7 @@
     "gitter-web-templates": "file:modules/templates",
     "gitter-web-text-processor": "file:modules/text-processor",
     "gitter-web-topic-notifications": "file:modules/topic-notifications",
+    "gitter-web-topic-reactions": "file:modules/topic-reactions",
     "gitter-web-topics": "file:modules/topics",
     "gitter-web-topics-ui": "file:modules/topics-ui",
     "gitter-web-twitter": "file:modules/twitter",
