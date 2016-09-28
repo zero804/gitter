@@ -1,3 +1,5 @@
+import { SUBSCRIPTION_STATE_UNSUBSCRIBED } from '../../../shared/constants/forum';
+
 export default [
   {
     title: '1',
@@ -8,7 +10,8 @@ export default [
     category: { name: 'Test 1', slug: 'test-1'},
     tags: [ '1', '2', '3' ],
     user: { username: 'cutandpastey', avatarUrl: 'test-src'},
-    replyingUsers: []
+    replyingUsers: [],
+    subscriptionState: SUBSCRIPTION_STATE_UNSUBSCRIBED
   },
   {
     title: '2',
@@ -19,7 +22,8 @@ export default [
     category: { name: 'Test 2', slug: 'test-2'},
     tags: [ '2', '3', '4' ],
     user: { username: 'test', avatarUrl: 'test-src'},
-    replyingUsers: []
+    replyingUsers: [],
+    subscriptionState: SUBSCRIPTION_STATE_UNSUBSCRIBED
   },
   {
     title: '3',
@@ -30,7 +34,8 @@ export default [
     category: { name: 'Test 3', slug: 'test-3'},
     tags: [ '3', '4', '5' ],
     user: { username: 'cutandpastey', avatarUrl: 'test-src'},
-    replyingUsers: []
+    replyingUsers: [],
+    subscriptionState: SUBSCRIPTION_STATE_UNSUBSCRIBED
   },
   {
     title: '4',
@@ -40,7 +45,8 @@ export default [
     category: { name: 'Test 4', slug: 'test-4'},
     tags: [ '4', '5', '6' ],
     user: { username: 'test', avatarUrl: 'test-src'},
-    replyingUsers: []
+    replyingUsers: [],
+    subscriptionState: SUBSCRIPTION_STATE_UNSUBSCRIBED
   },
   {
     title: '5',
@@ -51,6 +57,7 @@ export default [
     category: { name: 'Test 5', slug: 'test-5'},
     tags: [ '5', '6', '7' ],
     user: { username: 'test-user', avatarUrl: 'test-src'},
-    replyingUsers: []
+    replyingUsers: [],
+    subscriptionState: SUBSCRIPTION_STATE_UNSUBSCRIBED
   },
 ];
