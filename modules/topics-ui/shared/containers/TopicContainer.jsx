@@ -16,6 +16,8 @@ import showReplyComments from '../action-creators/topic/show-reply-comments';
 import { SUBSCRIPTION_STATE_SUBSCRIBED } from '../constants/forum.js';
 import requestUpdateTopicSubscriptionState from '../action-creators/forum/request-update-topic-subscription-state';
 import requestUpdateReplySubscriptionState from '../action-creators/forum/request-update-reply-subscription-state';
+import requestUpdateReplyReactions from '../action-creators/forum/request-update-reply-reactions';
+import requestUpdateCommentReactions from '../action-creators/forum/request-update-comment-reactions';
 import requestSignIn from '../action-creators/forum/request-sign-in';
 
 const EDITOR_SUBMIT_LINK_SOURCE = 'topics-reply-editor-submit-button';
@@ -158,7 +160,9 @@ const TopicContainer = createClass({
           submitNewComment={this.submitNewComment}
           onNewCommentUpdate={this.onNewCommentUpdate}
           onReplyCommentsClicked={this.onReplyCommentsClicked}
-          onItemSubscribeButtonClick={this.onReplySubscribeButtonClick}/>
+          onReplySubscribeButtonClick={this.onReplySubscribeButtonClick}
+          onReplyReactionPick={this.onReplyReactionPick}
+          onCommentReactionPick={this.onCommentReactionPick} />
         <TopicReplyEditor
           user={currentUser}
           isSignedIn={isSignedIn}
@@ -271,6 +275,18 @@ const TopicContainer = createClass({
     const desiredIsSubscribed = (subscriptionState !== SUBSCRIPTION_STATE_SUBSCRIBED);
 
     dispatch(requestUpdateReplySubscriptionState(replyId, desiredIsSubscribed));
+  },
+
+  onReplyReactionPick(replyId, reactionKey, isReacting) {
+    // TODO: dispatch event and listen in `forum-client`
+    console.log('onReplyReactionPick', replyId, reactionKey, isReacting);
+    dispatch(requestUpdateReplyReactions(replyId, reactionKey, isReacting));
+  },
+
+  onCommentReactionPick(replyId, commentId, reactionKey, isReacting) {
+    // TODO: dispatch event and listen in `forum-client`
+    console.log('onCommentReactionPick', replyId, commentId, reactionKey, isReacting);
+    dispatch(requestUpdateCommentReactions(replyId, commentId, reactionKey, isReacting));
   },
 
   onReplyCommentsClicked(replyId){
