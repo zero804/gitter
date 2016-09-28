@@ -1,16 +1,18 @@
-import assert, { equal } from 'assert';
+import assert, { equal, deepEqual } from 'assert';
 import React from 'react';
 import sinon, {spy} from 'sinon';
 import { shallow } from 'enzyme';
 import ForumContainer from '../../../../shared/containers/ForumContainer.jsx';
 import { subscribe } from '../../../../shared/dispatcher';
 
-import * as forumCatConstants from '../../../../shared/constants/forum-categories';
+import * as forumConstants from '../../../../shared/constants/forum';
 import * as forumFilterConstants from '../../../../shared/constants/forum-filters';
 import * as forumSortConstants from '../../../../shared/constants/forum-sorts';
 import * as forumTagConstants from '../../../../shared/constants/forum-tags';
 import * as createConst from '../../../../shared/constants/create-topic';
 
+import forumStore from '../../../mocks/forum-store';
+import currentUserStore from '../../../mocks/current-user-store';
 import categoryStore from '../../../mocks/category-store';
 import tagStore from '../../../mocks/tag-store';
 import topicsStore from '../../../mocks/topic-store';
@@ -19,19 +21,19 @@ import newTopicStore from '../../../mocks/new-topic-store';
 describe('<ForumContainer />', function(){
 
   let wrapper;
-  let catChangeHandle;
   let filterChangeHandle;
   let sortChangeHandle;
   let tagChangeHandle;
 
 
   beforeEach(function(){
-    catChangeHandle = sinon.spy();
     filterChangeHandle = sinon.spy();
     sortChangeHandle = sinon.spy();
     tagChangeHandle = sinon.spy();
     wrapper = shallow(
       <ForumContainer
+        forumStore={forumStore}
+        currentUserStore={currentUserStore}
         categoryStore={categoryStore}
         categoryName="all"
         tagStore={tagStore}
@@ -63,8 +65,8 @@ describe('<ForumContainer />', function(){
     assert.equal(wrapper.find('TopicsTable').length, 1);
   });
 
-  it('should render a search header', () => {
-    assert.equal(wrapper.find('SearchHeader').length, 1);
+  it('should render a SearchHeaderContainer', () => {
+    assert.equal(wrapper.find('SearchHeaderContainer').length, 1);
   });
 
   it('should render the create topic modal', () => {

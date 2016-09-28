@@ -1,5 +1,4 @@
 import React, { PropTypes } from 'react';
-import {dispatch} from '../../../dispatcher';
 import Container from '../container.jsx';
 import Panel from '../panel.jsx';
 import H1 from '../text/h-1.jsx';
