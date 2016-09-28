@@ -5,6 +5,18 @@ var ForumObject = require('gitter-web-topic-models/lib/forum-object');
 var assert = require('assert');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 
+function updateReactionTotals(forumObject, reaction, inc) {
+  var Model = forumObject.type.model;
+  var query = forumObject.getQuery();
+  var incOp = {};
+  incOp['reactionCounts.' + reaction] = inc;
+
+  return Model.update(query, {
+      $inc: incOp
+    })
+    .exec();
+}
+
 function addReaction(forumObject, userId, reaction) {
   assert(forumObject.type !== ForumObject.TYPE.Forum);
   assert(reaction);
@@ -29,7 +41,11 @@ function addReaction(forumObject, userId, reaction) {
     }
   })
   .then(function(result) {
-    return !!(result.nModified || result.upserted && result.upserted.length);
+    var modified = !!(result.nModified || result.upserted && result.upserted.length);
+    if (!modified) return false;
+
+    return updateReactionTotals(forumObject, reaction, +1)
+      .return(true);
   });
 }
 
@@ -49,8 +65,12 @@ function removeReaction(forumObject, userId, reaction) {
   return ForumReaction.remove(query)
     .exec()
     .then(function(result) {
-      return result.result.n > 0;
-    });
+      var modified = result.result.n > 0;
+      if (!modified) return false;
+
+      return updateReactionTotals(forumObject, reaction, -1)
+        .return(true);
+    })
 }
 
 

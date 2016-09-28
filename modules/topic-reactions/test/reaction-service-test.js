@@ -11,42 +11,97 @@ describe('reaction-service', function() {
   describe('integration tests #slow', function() {
     fixtureLoader.disableMongoTableScans();
 
-    var forumId = new ObjectID();
-    var topicId = new ObjectID();
-    var replyId = new ObjectID();
-    var commentId = new ObjectID();
-    var userId = new ObjectID();
+    var fixture = fixtureLoader.setup({
+      user1: {},
+      forum1: {},
+      category1: {
+        forum: 'forum1',
+      },
+      topic1: {
+        user: 'user1',
+        forum: 'forum1',
+        category: 'category1',
+        sent: new Date('2014-01-01T00:00:00.000Z')
+      },
+      reply1: {
+        forum: 'forum1',
+        category: 'category1',
+        user: 'user1',
+        topic: 'topic1',
+        sent: new Date('2014-01-01T00:00:00.000Z')
+      },
+      comment1: {
+        user: 'user1',
+        forum: 'forum1',
+        topic: 'topic1',
+        reply: 'reply1'
+      }
+    });
 
     var FIXTURE = [{
       name: 'topic',
-      ref: ForumObject.createForTopic(forumId, topicId)
+      ref: function() {
+        return ForumObject.createForTopic(fixture.forum1._id, fixture.topic1._id);
+      }
     },{
       name: 'reply',
-      ref: ForumObject.createForReply(forumId, topicId, replyId)
+      ref: function() {
+        return ForumObject.createForReply(fixture.forum1._id, fixture.topic1._id, fixture.reply1._id)
+      }
     },{
       name: 'comment',
-      ref: ForumObject.createForComment(forumId, topicId, replyId, commentId)
+      ref: function() {
+        return ForumObject.createForComment(fixture.forum1._id, fixture.topic1._id, fixture.reply1._id, fixture.comment1._id)
+      }
     }];
 
     FIXTURE.forEach(function(meta) {
       describe(meta.name, function() {
 
         it('should allow liking an disliking idempotently', function() {
-          return reactionService.addReaction(meta.ref, userId, 'like')
+          var ref = meta.ref();
+          var userId = fixture.user1._id;
+
+          function find() {
+            var Model = ref.type.model;
+            var query = ref.getQuery();
+
+            return Model.findOne(query)
+              .lean()
+              .exec();
+          }
+
+          return reactionService.addReaction(ref, userId, 'like')
             .then(function(result) {
               assert.strictEqual(result, true);
-              return reactionService.addReaction(meta.ref, userId, 'like')
+              return find();
+            })
+            .then(function(o) {
+              assert.strictEqual(o.reactionCounts.like, 1);
+              return reactionService.addReaction(ref, userId, 'like')
             })
             .then(function(result) {
               assert.strictEqual(result, false);
-              return reactionService.removeReaction(meta.ref, userId, 'like')
+              return find();
+            })
+            .then(function(o){
+              assert.strictEqual(o.reactionCounts.like, 1);
+              return reactionService.removeReaction(ref, userId, 'like')
             })
             .then(function(result) {
               assert.strictEqual(result, true);
-              return reactionService.removeReaction(meta.ref, userId, 'like')
+              return find();
+            })
+            .then(function(o) {
+              assert.strictEqual(o.reactionCounts.like, 0);
+              return reactionService.removeReaction(ref, userId, 'like')
             })
             .then(function(result) {
               assert.strictEqual(result, false);
+              return find();
+            })
+            .then(function(o) {
+              assert.strictEqual(o.reactionCounts.like, 0);
             })
 
         });

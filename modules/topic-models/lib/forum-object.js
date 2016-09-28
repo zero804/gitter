@@ -5,16 +5,42 @@ var persistence = require('gitter-web-persistence');
 
 var TYPE = {
   Forum: {
-    model: persistence.Forum
+    model: persistence.Forum,
+    getQuery: function(item) {
+      return {
+        _id: item.forumId
+      };
+    }
   },
   Topic: {
-    model: persistence.Topic
+    model: persistence.Topic,
+    getQuery: function(item) {
+      return {
+        _id: item.topicId,
+        forumId: item.forumId
+      };
+    }
   },
   Reply: {
-    model: persistence.Reply
+    model: persistence.Reply,
+    getQuery: function(item) {
+      return {
+        _id: item.replyId,
+        forumId: item.forumId,
+        topicId: item.topicId,
+      };
+    }
   },
   Comment: {
-    model: persistence.Comment
+    model: persistence.Comment,
+    getQuery: function(item) {
+      return {
+        _id: item.commentId,
+        forumId: item.forumId,
+        topicId: item.topicId,
+        replyId: item.replyId
+      };
+    }
   }
 }
 
@@ -60,6 +86,10 @@ ForumObject.prototype = {
       default:
         assert.ok(false, 'Unknown type');
     }
+  },
+
+  getQuery: function() {
+    return this.type.getQuery(this);
   }
 }
 
