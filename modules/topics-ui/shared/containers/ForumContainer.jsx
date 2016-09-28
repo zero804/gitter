@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import CategoryList from './components/forum/category-list.jsx';
 import { dispatch } from '../dispatcher/index';
 import navigateToCategory from '../action-creators/forum/navigate-to-category';
 
 import ForumTableControl from './components/forum/table-control.jsx';
 import TopicsTable from './components/forum/topics-table.jsx';
-import SearchHeader from './components/search/search-header.jsx';
+import SearchHeaderContainer from './components/search/SearchHeaderContainer.jsx';
 import CreateTopicModal from './components/topic/create-topic-modal.jsx';
 
 import navigateToFilter from '../action-creators/forum/navigate-to-filter';
@@ -30,37 +30,48 @@ const ForumContainer = React.createClass({
 
   propTypes: {
     //Route parameters ---
-    groupName: React.PropTypes.string.isRequired,
-    categoryName: React.PropTypes.string.isRequired,
-    filterName: React.PropTypes.string,
-    tagName: React.PropTypes.string,
-    sortName: React.PropTypes.string,
-    createTopic: React.PropTypes.bool.isRequired,
+    groupUri: PropTypes.string.isRequired,
+    categoryName: PropTypes.string.isRequired,
+    filterName: PropTypes.string,
+    tagName: PropTypes.string,
+    sortName: PropTypes.string,
+    createTopic: PropTypes.bool.isRequired,
 
     //Client side only
-    router: React.PropTypes.shape({
-      on: React.PropTypes.func.isRequired,
-      off: React.PropTypes.func.isRequired,
+    router: PropTypes.shape({
+      on: PropTypes.func.isRequired,
+      off: PropTypes.func.isRequired,
     }),
 
+    //Forum
+    forumStore: PropTypes.shape({
+      getForumId: PropTypes.func.isRequired,
+      getSubscriptionState: PropTypes.func.isRequired
+    }).isRequired,
+
+    currentUserStore: PropTypes.shape({
+      getCurrentUser: PropTypes.func.isRequired,
+      getIsSignedIn: PropTypes.func.isRequired,
+    }).isRequired,
+
     //Categories ---
-    categoryStore: React.PropTypes.shape({
-      getCategories: React.PropTypes.func.isRequired
+    categoryStore: PropTypes.shape({
+      getCategories: PropTypes.func.isRequired
     }).isRequired,
 
     //Tags -----
-    tagStore: React.PropTypes.shape({
-      getTags: React.PropTypes.func.isRequired
+    tagStore: PropTypes.shape({
+      getTags: PropTypes.func.isRequired
     }).isRequired,
 
     //Topics
-    topicsStore: React.PropTypes.shape({
-      getTopics: React.PropTypes.func.isRequired
+    topicsStore: PropTypes.shape({
+      getTopics: PropTypes.func.isRequired
     }).isRequired,
 
     //New Topic
-    newTopicStore: React.PropTypes.shape({
-      get: React.PropTypes.func.isRequired,
+    newTopicStore: PropTypes.shape({
+      get: PropTypes.func.isRequired,
     }).isRequired,
   },
 
@@ -73,8 +84,11 @@ const ForumContainer = React.createClass({
   },
 
   getInitialState(){
-    const { categoryStore, tagStore, topicsStore, newTopicStore } = this.props;
+    const { forumStore, categoryStore, tagStore, topicsStore, newTopicStore } = this.props;
+
     return {
+      forumId: forumStore.getForumId(),
+      forumSubscriptionState: forumStore.getSubscriptionState(),
       categoryName: this.props.categoryName,
       filterName: this.props.filterName,
       tagName: this.props.tagName,
@@ -88,8 +102,9 @@ const ForumContainer = React.createClass({
   },
 
   componentDidMount(){
-    const { categoryStore, tagStore, router, topicsStore, newTopicStore } = this.props;
+    const { forumStore, categoryStore, tagStore, router, topicsStore, newTopicStore } = this.props;
 
+    forumStore.onChange(this.onForumUpdate, this);
     topicsStore.onChange(this.onTopicsUpdate, this);
     newTopicStore.onChange(this.onNewTopicUpdate, this);
     topicsStore.on(consts.TOPIC_CREATED, this.onTopicCreated, this);
@@ -103,8 +118,9 @@ const ForumContainer = React.createClass({
   },
 
   componentWillUnmount(){
-    const { categoryStore, tagStore, router, topicsStore, newTopicStore } = this.props;
+    const { forumStore, categoryStore, tagStore, router, topicsStore, newTopicStore } = this.props;
 
+    forumStore.removeListeners(this.onForumUpdate, this);
     topicsStore.removeListeners(this.onTopicsUpdate, this);
     newTopicStore.removeListeners(this.onNewTopicUpdate, this);
     topicsStore.off(consts.TOPIC_CREATED, this.onTopicCreated, this);
@@ -118,22 +134,27 @@ const ForumContainer = React.createClass({
   },
 
   render() {
-    const { categoryName, tags, filterName, tagName, sortName, createTopic, topics, newTopic } = this.state;
-    const { groupName, categoryStore, tagStore } = this.props;
+    const { forumId, forumSubscriptionState, categoryName, tags, filterName, tagName, sortName, createTopic, topics, newTopic } = this.state;
+    const { currentUserStore, groupUri, categoryStore, tagStore } = this.props;
 
+    const currentUser = currentUserStore.getCurrentUser();
     const categories = categoryStore.getCategories();
     const tagValues = tagStore.pluckValues();
     const newTopicTags = tagStore.getTagsByLabel(newTopic.tags);
 
     return (
       <main>
-        <SearchHeader groupName={groupName}/>
+        <SearchHeaderContainer
+          userId={currentUser.id}
+          forumId={forumId}
+          groupUri={groupUri}
+          subscriptionState={forumSubscriptionState}/>
         <CategoryList
-          groupName={ groupName }
+          groupUri={ groupUri }
           categories={ categories }/>
 
         <ForumTableControl
-          groupName={groupName}
+          groupUri={groupUri}
           categoryName={categoryName}
           filterName={filterName}
           tagName={tagName}
@@ -143,7 +164,7 @@ const ForumContainer = React.createClass({
           sortChange={this.onSortChange}
           tagChange={this.onTagsChange}/>
 
-        <TopicsTable topics={topics} groupName={groupName}/>
+        <TopicsTable topics={topics} groupUri={groupUri}/>
 
         <CreateTopicModal
           active={createTopic}
@@ -187,8 +208,16 @@ const ForumContainer = React.createClass({
   },
 
   onTopicCreated(data){
-    const {groupName} = this.props;
-    dispatch(navigateToTopic(groupName, data.topicId, data.slug));
+    const {groupUri} = this.props;
+    dispatch(navigateToTopic(groupUri, data.topicId, data.slug));
+  },
+
+  onForumUpdate() {
+    const { forumStore } = this.props;
+    this.setState((state) => Object.assign(state, {
+      forumId: forumStore.getForumId(),
+      forumSubscriptionState: forumStore.getSubscriptionState(),
+    }));
   },
 
   onCategoryUpdate(){

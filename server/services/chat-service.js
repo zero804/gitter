@@ -8,7 +8,7 @@ var errorReporter = env.errorReporter;
 var logger = env.logger.get('chat');
 
 var ChatMessage = require('gitter-web-persistence').ChatMessage;
-var collections = require("../utils/collections");
+var collections = require('gitter-web-utils/lib/collections');
 var userService = require("./user-service");
 var processText = require('gitter-web-text-processor');
 var Promise = require('bluebird');
@@ -24,6 +24,7 @@ var recentRoomService = require("./recent-room-service");
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
 var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs')
+var chatSpamDetection = require('gitter-web-spam-detection/lib/chat-spam-detection');
 
 var useHints = true;
 
@@ -135,6 +136,22 @@ exports.newChatMessageToTroupe = function(troupe, user, data) {
     // TODO: validate message
     return processText(data.text);
   })
+  .bind({
+    hellbanned: user.hellbanned
+  })
+  .tap(function(parsedMessage) {
+    if (this.hellbanned) {
+      return;
+    }
+
+    return chatSpamDetection.detect(user, parsedMessage)
+      .bind(this)
+      .then(function(isSpamming) {
+        if (isSpamming) {
+          this.hellbanned = true;
+        }
+      })
+  })
   .then(function(parsedMessage) {
     return [parsedMessage, resolveMentions(troupe, user, parsedMessage)];
   })
@@ -158,7 +175,10 @@ exports.newChatMessageToTroupe = function(troupe, user, data) {
 
     // hellban for users
     // dont write message to db, just fake it for the troll / asshole
-    if (user.hellbanned) return chatMessage;
+    if (this.hellbanned) {
+      return chatMessage;
+    }
+
     return chatMessage.save()
       .then(function() {
         var lastAccessTime = mongoUtils.getDateFromObjectId(chatMessage._id);

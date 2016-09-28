@@ -1,7 +1,7 @@
 "use strict";
 
 var Promise = require('bluebird');
-var getVersion = require('../get-model-version');
+var getVersion = require('gitter-web-serialization/lib/get-model-version');
 var UserIdStrategy = require('./user-id-strategy');
 var CommentsForReplyStrategy = require('./topics/comments-for-reply-strategy');
 var ReplySubscriptionStrategy = require('./topics/reply-subscription-strategy');
@@ -101,10 +101,14 @@ ReplyStrategy.standard = function(options) {
     lookups: options && options.lookups
   });
 
-  strategy.subscriptionStrategy = new ReplySubscriptionStrategy({
-    currentUserId: currentUserId
-  });
   strategy.userStrategy = UserIdStrategy.slim();
+
+  if (currentUserId) {
+    strategy.subscriptionStrategy = new ReplySubscriptionStrategy({
+      currentUserId: currentUserId
+    });
+  }
+
   return strategy;
 }
 

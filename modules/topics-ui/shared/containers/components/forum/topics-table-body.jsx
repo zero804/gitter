@@ -6,7 +6,7 @@ export default React.createClass({
 
   displayName: 'TopicsTableBody',
   propTypes: {
-    groupName: PropTypes.string.isRequired,
+    groupUri: PropTypes.string.isRequired,
     topics: PropTypes.arrayOf(PropTypes.shape({
       title: PropTypes.string.isRequired
     }))
@@ -22,7 +22,7 @@ export default React.createClass({
   },
 
   renderChildRow(topic, i) {
-    const {groupName} = this.props;
+    const {groupUri} = this.props;
     const {user, replyingUsers} = topic;
     return (
       <tr className="topics-table-body__row" key={`topics-table-row-${i}`}>
@@ -34,7 +34,7 @@ export default React.createClass({
             height={28}/>
           <TopicLink
             className="topics-table-body__cell__link"
-            groupName={groupName}
+            groupUri={groupUri}
             topic={topic}>
             {topic.title}
           </TopicLink>

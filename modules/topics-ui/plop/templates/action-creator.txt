@@ -1,9 +1,7 @@
-"use strict";
-
 import { {{constantCase name}} } from '../../constants/{{constantFile}}';
 
-module.exports = function {{camelCase name}}(){
+export default function {{camelCase name}}() {
   return {
     type: {{constantCase name}}
   };
-};
+}

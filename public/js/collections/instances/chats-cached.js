@@ -9,7 +9,7 @@ var Pool = require('../../components/chat-cache/pool');
 var appEvents = require('../../utils/appevents');
 var Promise = require('bluebird');
 var selectCacheCandidates = require('../../components/chat-cache/select-cache-candidates');
-var frameUtils = require('../../utils/frame-utils');
+var frameUtils = require('gitter-web-frame-utils');
 
 function invokeChatPreload(pool, rooms) {
   var cacheRooms = selectCacheCandidates(pool.size, rooms);
