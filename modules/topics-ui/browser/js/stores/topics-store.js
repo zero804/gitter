@@ -71,6 +71,7 @@ export const TopicModel = BaseModel.extend({
     subscribe(BODY_UPDATE, this.onBodyUpdate, this);
     subscribe(CATEGORY_UPDATE, this.onCategoryUpdate, this);
     subscribe(TAGS_UPDATE, this.onTagsUpdate, this);
+    subscribe(SUBMIT_NEW_TOPIC, this.onRequestSave, this);
   },
 
   //When we change state, mainly through saving the model we need to
@@ -81,6 +82,7 @@ export const TopicModel = BaseModel.extend({
     unsubscribe(BODY_UPDATE, this.onBodyUpdate, this);
     unsubscribe(CATEGORY_UPDATE, this.onCategoryUpdate, this);
     unsubscribe(TAGS_UPDATE, this.onTagsUpdate, this);
+    unsubscribe(SUBMIT_NEW_TOPIC, this.onRequestSave, this);
   },
 
   onChangeState(){
@@ -124,6 +126,11 @@ export const TopicModel = BaseModel.extend({
       this.trigger('change:tags');
   },
 
+  onRequestSave() {
+    this.listenTo(this, 'all', (t) => console.log(t));
+    this.save();
+  },
+
   //The API endpoints used to save and update the model
   //we know we have not previously saved a model if we have no idea
   //so we derive a different url respectively
@@ -131,6 +138,26 @@ export const TopicModel = BaseModel.extend({
     return this.get('id') ?
     `/api/v1/forums/${getForumId()}/topics/${this.get('id')}`:
     `/api/v1/forums/${getForumId()}/topics`;
+  },
+
+  validate(attributes){
+    let errors = new Map();
+
+    console.log(attributes);
+
+    if(!attributes.title.length) {
+      errors.set('title', 'A new Topic requires a title');
+    }
+
+    if(!attributes.body.length) {
+      errors.set('body', 'A new Topic requires content');
+    }
+
+    if(!attributes.categoryId.length) {
+      errors.set('categoryId', 'A new Topic must have a category');
+    }
+
+    return errors.size ? errors : null;
   },
 
   //TODO clean this, we shouldn't have to parse tags here
@@ -176,7 +203,6 @@ export const TopicsLiveCollection = LiveCollection.extend({
   },
 
   initialize(){
-    subscribe(SUBMIT_NEW_TOPIC, this.createNewTopic, this);
     subscribe(UPDATE_TOPIC, this.onTopicUpdate, this);
     subscribe(UPDATE_CANCEL_TOPIC, this.onTopicEditCancel, this);
     subscribe(UPDATE_SAVE_TOPIC, this.onTopicEditSaved, this);
@@ -193,22 +219,6 @@ export const TopicsLiveCollection = LiveCollection.extend({
     LiveCollection.prototype.handleSnapshot.apply(this, arguments);
     if(!draftModel) { return; }
     this.add(draftModel);
-  },
-
-  createNewTopic(data){
-    const model = this.create({
-      title: data.title,
-      text: data.body,
-      categoryId: data.categoryId,
-      tags: data.tags
-    }, { wait: true });
-
-    model.once('add', () => {
-      this.trigger(TOPIC_CREATED, {
-        topicId: model.get('id'),
-        slug: model.get('slug')
-      });
-    });
   },
 
   //When a user updates the content of a pre-existing topic then update here
@@ -292,6 +302,8 @@ export class TopicsStore {
       this.trigger(type, collection, val);
     });
 
+    this.listenTo(this.topicCollection, 'all', (t) => console.log(t));
+
 
     //Proxy up events from a draft model that is being updated
     this.listenTo(this.topicCollection, 'change:title', (model, val, options) => {
@@ -309,6 +321,11 @@ export class TopicsStore {
     this.listenTo(this.topicCollection, 'change:tags', (model, val, options) => {
       this.trigger('change:tags', model, val, options);
     });
+
+    this.listenTo(this.topicCollection, 'invalid', (model, val, options) => {
+      this.trigger('invalid', model, val, options);
+    });
+
 
     //TODO figure out why we need to call a filter here
     //I think this is due to a race condition, manually calling here fixes this
@@ -374,7 +391,11 @@ export class TopicsStore {
     if(!model) { return { title: '', body: '', categoryId: '', tags: [] } }
 
     //Or just return the model
-    return model.toJSON();
+    return Object.assign({}, model.attributes, {
+      //Add the validation errors into the returned data
+      //so we can show validation errors
+      validationError: model.validationError
+    });
   }
 
   //Get a model by its ID attribute
@@ -425,6 +446,7 @@ dispatchOnChangeMixin(TopicsStore, [
   'change:body',
   'change:categoryId',
   'change:tags',
+  'invalid'
 ]);
 
 const serverStore = (window.context.topicsStore || {});
