@@ -9,7 +9,7 @@ var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var fixture = {};
 
 describe('room-context-service', function() {
-  var createPolicyForRoom, roomContextService, access;
+  var createPolicyForRoom, createPolicyForOneToOne, roomContextService, access;
 
   before(fixtureLoader(fixture, {
     user1: {},
@@ -22,6 +22,7 @@ describe('room-context-service', function() {
 
   beforeEach(function() {
     createPolicyForRoom = mockito.mockFunction();
+    createPolicyForOneToOne = mockito.mockFunction();
     access = false;
 
     mockito.when(createPolicyForRoom)().then(function() {
@@ -32,9 +33,21 @@ describe('room-context-service', function() {
       });
     });
 
+    mockito.when(createPolicyForOneToOne)().then(function() {
+      return Promise.resolve({
+        canRead: function() {
+          return Promise.resolve(access);
+        },
+        canJoin: function() {
+          return Promise.resolve(access);
+        }
+      });
+    });
+
     roomContextService = testRequire.withProxies("./services/room-context-service", {
       'gitter-web-permissions/lib/policy-factory': {
-        createPolicyForRoom: createPolicyForRoom
+        createPolicyForRoom: createPolicyForRoom,
+        createPolicyForOneToOne: createPolicyForOneToOne
       }
     });
 
@@ -65,7 +78,7 @@ describe('room-context-service', function() {
     .then(function(/*roomContext*/) {
     })
     .catch(function(err) {
-      assert(err.status === 404);
+      assert.strictEqual(err.status, 404);
     })
     .nodeify(done);
   });
@@ -84,8 +97,8 @@ describe('room-context-service', function() {
     .then(function(/*roomContext*/) {
       assert.ok(false);
     }, function(err) {
-      assert(err.status === 301);
-      assert(err.path === '/home/explore');
+      assert.strictEqual(err.status, 301);
+      assert.strictEqual(err.path, '/home/explore');
     })
   });
 
@@ -94,7 +107,7 @@ describe('room-context-service', function() {
     .then(function(/*roomContext*/) {
       assert.ok(false);
     }, function(err) {
-      assert(err.status === 401);
+      assert.strictEqual(err.status, 401);
     });
   });
 
