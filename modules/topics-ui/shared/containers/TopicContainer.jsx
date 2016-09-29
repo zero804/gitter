@@ -123,6 +123,7 @@ const TopicContainer = createClass({
   getParsedTopic(){
     const { topicId, topicsStore, forumStore, currentUserStore } = this.props;
     const topic = topicsStore.getById(topicId);
+    //console.log(topic);
     const forum = forumStore.getForum();
     const currentUser = currentUserStore.getCurrentUser();
     return Object.assign({}, topic, {
@@ -164,7 +165,6 @@ const TopicContainer = createClass({
 
     const topic = this.getParsedTopic();
     const parsedReplies = this.getParsedReplies();
-
 
     const currentUser = currentUserStore.getCurrentUser();
     const userId = currentUser.id;
