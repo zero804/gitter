@@ -137,7 +137,7 @@ function findByForumIds(forumIds, options) {
   options = options || {};
 
   var filter = options.filter || {};
-  var sort = options.sort || { _id: 1 };
+  var sort = options.sort || { _id: -1 };
 
   if (!validators.validateTopicFilter(filter)) {
     throw new StatusError(400, 'Filter is invalid.');
