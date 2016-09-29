@@ -70,14 +70,17 @@ describe('ForumStrategy #slow', function() {
             id: category3.id,
             name: category3.name,
             slug: category3.slug,
+            v: 1
           }, {
             id: category2.id,
             name: category2.name,
             slug: category2.slug,
+            v: 1
           }, {
             id: category1.id,
             name: category1.name,
             slug: category1.slug,
+            v: 1
           }],
           topics: [{
             id: topic.id,
@@ -92,7 +95,8 @@ describe('ForumStrategy #slow', function() {
             category: {
               id: category1.id,
               name: category1.name,
-              slug: category1.slug
+              slug: category1.slug,
+              v: 1
             },
             user: {
               id: user.id,
@@ -132,14 +136,17 @@ describe('ForumStrategy #slow', function() {
             id: category3.id,
             name: category3.name,
             slug: category3.slug,
+            v: 1
           }, {
             id: category2.id,
             name: category2.name,
             slug: category2.slug,
+            v: 1
           }, {
             id: category1.id,
             name: category1.name,
             slug: category1.slug,
+            v: 1
           }],
           topics: [{
             id: topic.id,
@@ -154,7 +161,8 @@ describe('ForumStrategy #slow', function() {
             category: {
               id: category1.id,
               name: category1.name,
-              slug: category1.slug
+              slug: category1.slug,
+              v: 1
             },
             user: {
               id: user.id,
