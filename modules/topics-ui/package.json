@@ -25,7 +25,6 @@
     "gitter-client-env": "file:../client-env",
     "gitter-web-avatars": "file:../avatars",
     "gitter-web-frame-utils": "file:../frame-utils",
-    "gitter-web-isomorphic-dom-utility": "file:../isomorphic-dom-utility",
     "gitter-web-slugify": "file:../slugify",
     "url-join": "0.0.1"
   },
