@@ -13,10 +13,11 @@ import {NAVIGATE_TO_TOPIC} from '../../../shared/constants/navigation';
 import { UPDATE_REPLY_SUBSCRIPTION_STATE, REQUEST_UPDATE_REPLY_SUBSCRIPTION_STATE, SUBSCRIPTION_STATE_PENDING } from '../../../shared/constants/forum.js';
 
 export const ReplyModel = BaseModel.extend({
-  url(){
+  // Why doesn't this just come from it's owner collection?
+  url() {
     return this.get('id') ?
     null :
-    `/api/v1/forums/${getForumId()}/topics/${router.get('topicId')}/replies`;
+    `/v1/forums/${getForumId()}/topics/${router.get('topicId')}/replies`;
   },
 });
 
