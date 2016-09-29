@@ -1,5 +1,5 @@
 {
-  "name": "gitter-web-topic-notifications",
+  "name": "gitter-web-topic-reactions",
   "version": "1.0.0",
   "main": "lib/index.js",
   "directories": {
@@ -9,24 +9,17 @@
   "scripts": {
     "test": "mocha test/"
   },
-  "private": true,
   "dependencies": {
     "bluebird": "^3.2.1",
-    "debug": "^2.2.0",
-    "gitter-web-backend-muxer": "file:../backend-muxer",
-    "gitter-web-env": "file:../env",
-    "gitter-web-mailer": "file:../mailer",
     "gitter-web-persistence": "file:../persistence",
     "gitter-web-persistence-utils": "file:../persistence-utils",
     "gitter-web-topic-models": "file:../topic-models",
-    "gitter-web-topic-serialization": "file:../topic-serialization",
     "lodash": "^3.2.0",
-    "moment": "^2.10.3",
     "mongodb": "~2.1.18",
-    "rx": "^4.1.0",
-    "rx-node": "^1.0.2"
+    "statuserror": "^0.1.3"
   },
   "devDependencies": {
     "gitter-web-test-utils": "file:../test-utils"
-  }
+  },
+  "private": true
 }
