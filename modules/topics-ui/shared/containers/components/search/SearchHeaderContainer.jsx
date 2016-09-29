@@ -22,12 +22,10 @@ export default React.createClass({
     const {groupUri, subscriptionState } = this.props;
 
     return (
-      <Container>
-        <SearchHeader
-          groupUri={groupUri}
-          subscriptionState={subscriptionState}
-          onSubscribeButtonClick={this.onSubscribeButtonClick}/>
-      </Container>
+      <SearchHeader
+        groupUri={groupUri}
+        subscriptionState={subscriptionState}
+        onSubscribeButtonClick={this.onSubscribeButtonClick}/>
     );
   },
 

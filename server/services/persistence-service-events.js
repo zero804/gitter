@@ -139,6 +139,26 @@ exports.install = function(persistenceService) {
     }
   });
 
-  // TODO: Categories? Forums?
+  /**
+   * Categories
+   */
+  mongooseUtils.attachNotificationListenersToSchema(schemas.ForumCategorySchema, {
+    // NOTE: this one is not actually used due to the fact that adding a
+    // category goes via an upsert. So we fire the event manually.
+    onCreate: function(model, next) {
+      liveCollections.categories.emit("create", model);
+      next();
+    },
+
+    onUpdate: function(model, next) {
+      liveCollections.categories.emit('update', model);
+      next();
+    },
+
+    onRemove: function(model) {
+      liveCollections.categories.emit("remove", model);
+    }
+  });
+
 
 };
