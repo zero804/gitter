@@ -92,8 +92,8 @@ export const TopicModel = BaseModel.extend({
   },
 
   //Update the models title when a user updates it through the UI
-  onTitleUpdate(data){
-    this.set('title', data.title);
+  onTitleUpdate({ title }){
+    this.set('title', title);
   },
 
   //Update the models body
