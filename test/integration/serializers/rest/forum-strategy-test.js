@@ -11,6 +11,7 @@ var ForumStrategy = testRequire('./serializers/rest/forum-strategy');
 var subscriberService = require('gitter-web-topic-notifications/lib/subscriber-service');
 var ForumObject = require('gitter-web-topic-models/lib/forum-object');
 var assert = require('assert');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 var LONG_AGO = '2014-01-01T00:00:00.000Z';
 
@@ -20,8 +21,15 @@ describe('ForumStrategy #slow', function() {
   after(blockTimer.off);
 
   var fixture = fixtureLoader.setup({
-    user1: {},
-    forum1: {},
+    user1: {
+      accessToken: 'web-internal'
+    },
+    user2: {},
+    forum1: {
+      securityDescriptor: {
+        extraAdmins: ['user1']
+      }
+    },
     category1: {
       forum: 'forum1',
     },
@@ -97,10 +105,8 @@ describe('ForumStrategy #slow', function() {
             sent: LONG_AGO,
             editedAt: null,
             lastChanged: LONG_AGO,
-            lastModified: LONG_AGO,
             v: 1
-          }],
-          topicsTotal: 1
+          }]
         }])
       });
   });
@@ -162,11 +168,12 @@ describe('ForumStrategy #slow', function() {
             sent: LONG_AGO,
             editedAt: null,
             lastChanged: LONG_AGO,
-            lastModified: LONG_AGO,
             v: 1
           }],
           subscribed: false,
-          topicsTotal: 1
+          permissions: {
+            admin: true
+          }
         }])
       });
   });
@@ -203,6 +210,59 @@ describe('ForumStrategy #slow', function() {
       .then(function(serialized) {
         assert.strictEqual(serialized.topics[0].subscribed, true);
       })
+  });
+
+  it('should tell a user when they are an admin of the forum', function() {
+    var strategy = ForumStrategy.permissions({
+      // this one sends the whole user
+      currentUser: fixture.user1
+    });
+
+    return serializeObject(fixture.forum1, strategy)
+      .then(function(serialized) {
+        assert.strictEqual(serialized.permissions.admin, true);
+      });
+  });
+
+  it('should tell a user when they are NOT an admin of the forum', function() {
+    var strategy = ForumStrategy.permissions({
+      // this one sends the user id
+      currentUserId: fixture.user2._id
+    });
+
+    return serializeObject(fixture.forum1, strategy)
+      .then(function(serialized) {
+        assert.strictEqual(serialized.permissions.admin, false);
+      });
+  });
+
+  describe('getCurrentUserFromOptions', function() {
+    var getCurrentUserFromOptions = ForumStrategy.testOnly.getCurrentUserFromOptions;
+
+    it('should return currentUser if present', function() {
+      assert.strictEqual(getCurrentUserFromOptions({ currentUser: fixture.user1}), fixture.user1);
+    });
+
+    it('should return undefined if currentUser is not present', function() {
+      assert.strictEqual(getCurrentUserFromOptions(), undefined);
+    });
+  });
+
+  describe('getCurrentUserIdFromOptions', function() {
+    var getCurrentUserIdFromOptions = ForumStrategy.testOnly.getCurrentUserIdFromOptions;
+    it('should return currentUserId if present', function() {
+      var id = getCurrentUserIdFromOptions({ currentUserId: fixture.user1._id});
+      assert(mongoUtils.objectIDsEqual(id, fixture.user1._id));
+    });
+
+    it("should return currentUser's id if currentUser is present", function() {
+      var id = getCurrentUserIdFromOptions({ currentUser: fixture.user1});
+      assert(mongoUtils.objectIDsEqual(id, fixture.user1._id));
+    });
+
+    it('should return undefined if neither are present', function() {
+      assert.strictEqual(getCurrentUserIdFromOptions(), undefined);
+    });
   });
 
 });
