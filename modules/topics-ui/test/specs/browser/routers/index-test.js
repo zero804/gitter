@@ -3,14 +3,18 @@ import Backbone from 'backbone';
 import router from '../../../../browser/js/routers/index';
 import sinon from 'sinon';
 import { dispatch } from '../../../../shared/dispatcher';
+
 import * as forumCatConstants from '../../../../shared/constants/forum-categories';
 import * as forumFilterConstants from '../../../../shared/constants/forum-filters';
 import * as forumTagConstants from '../../../../shared/constants/forum-tags';
 import * as forumSortConstants from '../../../../shared/constants/forum-sorts';
 import * as navConstants from '../../../../shared/constants/navigation';
+
 import navigateToTopic from '../../../../shared/action-creators/topic/navigate-to-topic';
 import navigateToCreateTopic from '../../../../shared/action-creators/create-topic/navigate-to-create-topic';
 import navigateToCategory from '../../../../shared/action-creators/forum/navigate-to-category';
+
+import forumStore from '../../../../browser/js/stores/current-user-store';
 
 describe('Router', function(){
 
@@ -25,6 +29,11 @@ describe('Router', function(){
     Backbone.history.start({
       pushState: false,
     });
+
+    // For mocking the user is signed in
+    forumStore.set({
+      id: '123'
+    })
   });
 
   afterEach(function(){
