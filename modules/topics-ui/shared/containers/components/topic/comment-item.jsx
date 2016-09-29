@@ -17,6 +17,7 @@ export default React.createClass({
 
   render(){
     const {comment} = this.props;
+    console.log('comment', comment);
     return (
       <FeedItem
         item={comment}
