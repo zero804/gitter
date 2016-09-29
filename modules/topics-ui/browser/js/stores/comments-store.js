@@ -35,13 +35,13 @@ export const CommentsStore = LiveCollection.extend({
     this.listenTo(router, 'change:topicId', this.onTopicIdUpdate, this);
   },
 
-  getComments(){
-    return this.toJSON();
+  getComments() {
+    return this.toPOJO();
   },
 
   getCommentsByReplyId(id){
     if(id !== this.contextModel.get('replyId')) { return; }
-    return this.toJSON();
+    return this.toPOJO();
   },
 
   getActiveReplyId(){
