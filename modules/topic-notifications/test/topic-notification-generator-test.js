@@ -1,7 +1,7 @@
 "use strict";
 
 var assert = require('assert');
-var ForumObject = require('../lib/forum-object');
+var ForumObject = require('gitter-web-topic-models/lib/forum-object');
 var notificationService = require('../lib/notification-service');
 var topicNotificationGenerator = require('../lib/topic-notificaton-generator');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');

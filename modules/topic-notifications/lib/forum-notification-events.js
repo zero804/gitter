@@ -1,9 +1,10 @@
 'use strict';
 
+var ForumObject = require('gitter-web-topic-models/lib/forum-object');
+
 var env = require('gitter-web-env');
 var stats = env.stats;
 
-var ForumObject = require('./forum-object');
 var subscriberService = require('./subscriber-service');
 var notificationService = require('./notification-service');
 
