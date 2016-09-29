@@ -1,7 +1,7 @@
 import assert from 'assert';
 import React from 'react';
 import { shallow } from 'enzyme';
-import ReactionButton from '../../../../shared/componentsforumreaction-button.jsx';
+import ReactionButton from '../../../../../../shared/containers/components/forum/reaction-button.jsx';
 
 describe('<ReactionButton/>', () => {
 
