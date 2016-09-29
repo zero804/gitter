@@ -26,17 +26,6 @@ ForumNotificationSchema.index({
   unique: true,
 });
 
-ForumNotificationSchema.index({
-  userId: 1,
-  forumId: 1,
-  topicId: 1,
-  replyId: 1,
-  commentId: 1
-}, {
-  background: true,
-  unique: true,
-});
-
 // This index allows us to find out who needs an email...
 ForumNotificationSchema.extraIndices = [{
   keys: {
