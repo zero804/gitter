@@ -70,6 +70,7 @@ export const RepliesStore = LiveCollection.extend({
     this.create({
       text: data.body,
       user: getCurrentUser(),
+      sent: new Date().toISOString(),
     });
   },
 
