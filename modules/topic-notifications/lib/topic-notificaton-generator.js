@@ -224,7 +224,7 @@ function generateTopicNotification(emailAddress, notification) {
     to:             emailAddress,
     subject:        subject,
     tracking: {
-      event: 'new-topic',
+      event: 'topic_notification_email',
       data: { email: emailAddress }
     },
     data: {
@@ -246,7 +246,7 @@ function generateReplyNotification(emailAddress, notification) {
     to:             emailAddress,
     subject:        subject,
     tracking: {
-      event: 'new-topic-reply',
+      event: 'reply_notification_email',
       data: { email: emailAddress }
     },
     data: {
@@ -268,7 +268,7 @@ function generateCommentNotification(emailAddress, notification) {
     to:             emailAddress,
     subject:        subject,
     tracking: {
-      event: 'new-topic-comment',
+      event: 'comment_notification_email',
       data: { email: emailAddress }
     },
     data: {
