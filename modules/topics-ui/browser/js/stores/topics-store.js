@@ -192,35 +192,6 @@ export class TopicsStore {
       subscriptionState: state
     });
   }
-
-  onReactionsUpdate({ topicId, reactionKey, isReacting }) {
-    console.log('topics-onReactionsUpdate', topicId, reactionKey, isReacting);
-    const topic = this.collection.get(topicId);
-    if(!topic) { return; }
-
-    if(isReacting) {
-      const reactionCounts = topic.get('reactionCounts') || {};
-      const ownReactions = topic.get('ownReactions') || {};
-      const existingCount = reactionCounts[reactionKey] || 0;
-
-      let newCount = existingCount;
-      if(isReacting === true && ownReactions[reactionKey] === false) {
-        newCount += 1;
-      }
-      else if(isReacting === false && ownReactions[reactionKey] === true) {
-        newCount -= 1;
-      }
-
-      topic.set({
-        reactionCounts: _.extend({}, reactionCounts, {
-          [reactionKey]: newCount
-        }),
-        ownReactions: _.extend({}, ownReactions, {
-          [reactionKey]: isReacting
-        })
-      });
-    }
-  }
 }
 
 

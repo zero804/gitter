@@ -2,7 +2,6 @@ import _ from 'lodash';
 
 const onReactionsUpdate = function({ topicId, replyId, commentId, reactionKey, isReacting }) {
   const id = topicId || replyId || commentId;
-  console.log('onReactionsUpdate', id, reactionKey, isReacting);
   const topic = this.collection.get(id);
   if(!topic) { return; }
 
