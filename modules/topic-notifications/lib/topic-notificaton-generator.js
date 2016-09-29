@@ -1,5 +1,8 @@
 'use strict';
 
+var env = require('gitter-web-env');
+var stats = env.stats;
+
 var Promise = require('bluebird');
 var RxNode = require('rx-node');
 var ForumNotification = require('gitter-web-persistence').ForumNotification;
@@ -168,6 +171,7 @@ function simpleNotificationStream(options) {
       }
     }, {
       $project: {
+        '_id': 1,
         'user': 1,
         'forum._id': 1,
         'forum.uri': 1,
@@ -201,6 +205,7 @@ function notificationObserver(options) {
   return RxNode.fromReadableStream(simpleNotificationStream(options))
     .map(function(item) {
       return {
+        _id: item._id,
         recipient: item.user,
         data: strategy.map(item)
       };
@@ -277,20 +282,31 @@ function generateEmailForNotification(notification) {
   return Promise.join(
       notificationService.markNotificationAsEmailSent(notification._id),
       resolveEmailAddress(notification.recipient),
-      function(obtainedLocked, emailAddress) {
-
+      function(lockObtained, emailAddress) {
         // Another process has already sent this email
-        if (!obtainedLocked) return;
+        if (!lockObtained) return;
 
+        var promise;
+        var type;
         if (notification.comment) {
-          return generateCommentNotification(emailAddress, notification);
+          type = 'comment';
+          promise = generateCommentNotification(emailAddress, notification);
+        } else if (notification.reply) {
+          type = 'reply';
+          promise = generateReplyNotification(emailAddress, notification);
+        } else {
+          type = 'topic';
+          promise = generateTopicNotification(emailAddress, notification);
         }
 
-        if (notification.reply) {
-          return generateReplyNotification(emailAddress, notification);
-        }
+        stats.event('topics_notification_email', {
+          type: type,
+          userId: notification.recipient._id,
+          username: notification.recipient.username,
+          forumId: notification.data.forum.id
+        })
 
-        return generateTopicNotification(emailAddress, notification);
+        return promise;
       });
 
 }

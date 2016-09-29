@@ -3,6 +3,7 @@
 var Promise = require('bluebird');
 var ForumNotification = require('gitter-web-persistence').ForumNotification;
 var _ = require('lodash');
+var assert = require('assert');
 
 function createNotifications(forumObject, userIds) {
   if (!userIds || !userIds.length) return;
@@ -38,6 +39,8 @@ function findNotification(forumObject, userId) {
 }
 
 function markNotificationAsEmailSent(notificationId) {
+  assert(notificationId);
+
   return ForumNotification.update({
       _id: notificationId,
       emailSent: { $eq: null }

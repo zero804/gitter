@@ -1,7 +1,7 @@
 'use strict';
 
 var env = require('gitter-web-env');
-var logger = env.logger.get('topic-notifications');
+var stats = env.stats;
 
 var ForumObject = require('./forum-object');
 var subscriberService = require('./subscriber-service');
@@ -23,7 +23,7 @@ function createTopic(topic) {
     })
     .tap(function(userIds) {
 
-      logger.info('New Topic', {
+      stats.event('new_topic_notifications', {
         forumId: topic.forumId,
         authorUserId: this.authorUserId,
         notificationCount: userIds.length
@@ -48,7 +48,7 @@ function createReply(reply) {
       return subscriberService.listForItem(replyRef, { exclude: this.authorUserId });
     })
     .tap(function(userIds) {
-      logger.info('New Reply', {
+      stats.event('new_reply_notifications', {
         forumId: reply.forumId,
         topicId: reply.topicId,
         authorUserId: this.authorUserId,
@@ -75,7 +75,7 @@ function createComment(comment) {
       return subscriberService.listForItem(replyRef, { exclude: this.authorUserId });
     })
     .tap(function(userIds) {
-      logger.info('New Comment', {
+      stats.event('new_comment_notifications', {
         forumId: comment.forumId,
         topicId: comment.topicId,
         replyId: comment.replyId,
