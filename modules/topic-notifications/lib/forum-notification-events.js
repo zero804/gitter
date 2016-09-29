@@ -1,5 +1,8 @@
 'use strict';
 
+var env = require('gitter-web-env');
+var logger = env.logger.get('topic-notifications');
+
 var ForumObject = require('./forum-object');
 var subscriberService = require('./subscriber-service');
 var notificationService = require('./notification-service');
@@ -19,6 +22,13 @@ function createTopic(topic) {
       return subscriberService.listForItem(topicRef, { exclude: this.authorUserId });
     })
     .tap(function(userIds) {
+
+      logger.info('New Topic', {
+        forumId: topic.forumId,
+        authorUserId: this.authorUserId,
+        notificationCount: userIds.length
+      });
+
       return notificationService.createNotifications(topicRef, userIds);
     });
 }
@@ -38,6 +48,13 @@ function createReply(reply) {
       return subscriberService.listForItem(replyRef, { exclude: this.authorUserId });
     })
     .tap(function(userIds) {
+      logger.info('New Reply', {
+        forumId: reply.forumId,
+        topicId: reply.topicId,
+        authorUserId: this.authorUserId,
+        notificationCount: userIds.length
+      });
+
       return notificationService.createNotifications(replyRef, userIds);
     });
 }
@@ -58,6 +75,14 @@ function createComment(comment) {
       return subscriberService.listForItem(replyRef, { exclude: this.authorUserId });
     })
     .tap(function(userIds) {
+      logger.info('New Comment', {
+        forumId: comment.forumId,
+        topicId: comment.topicId,
+        replyId: comment.replyId,
+        authorUserId: this.authorUserId,
+        notificationCount: userIds.length
+      });
+
       return notificationService.createNotifications(commentRef, userIds);
     });
 
