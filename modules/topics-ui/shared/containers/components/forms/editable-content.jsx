@@ -47,7 +47,7 @@ export default React.createClass({
     }
 
     //Once a request has returned from the server the text property will be deleted
-    //and rendered markdown will be present so we can render a such.
+    //and rendered markdown will be present so we can rendered a such.
     return (
       <div
         className={compiledClass}
