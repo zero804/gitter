@@ -54,7 +54,7 @@ function parseSort(value) {
     // Key is the database key that will be used. Usually it matches with the
     // input on the URI, but in the id -> _id case, it doesn't. Probably more
     // cases in future.
-    var key = (value === '_id') ? '_id' : value;
+    var key = (value === 'id') ? '_id' : value;
 
     if (key[0] === '-') {
       sort[key.slice(1)] = -1;
