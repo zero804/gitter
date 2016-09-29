@@ -275,7 +275,7 @@ export const TopicsLiveCollection = LiveCollection.extend({
 
   //Add a draft model
   addNewDraftItem(){
-    const model = new TopicModel()
+    const model = new TopicModel({ state: MODEL_STATE_DRAFT });
     this.add(model);
   },
 
