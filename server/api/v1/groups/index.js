@@ -165,7 +165,10 @@ module.exports = {
         return groupService.findById(group._id);
       })
       .then(function(group) {
-        var strategy = new restSerializer.GroupStrategy({ currentUserId: user._id, currentUser: user });
+        var strategy = new restSerializer.GroupStrategy({
+          currentUserId: user && user._id,
+          currentUser: user
+        });
         return restSerializer.serializeObject(group, strategy);
       });
   },

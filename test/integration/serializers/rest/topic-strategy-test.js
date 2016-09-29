@@ -72,7 +72,8 @@ describe('TopicStrategy #slow', function() {
           category: {
             id: category.id,
             name: category.name,
-            slug: category.slug
+            slug: category.slug,
+            v: 1
           },
           user: {
             id: user.id,
@@ -91,7 +92,6 @@ describe('TopicStrategy #slow', function() {
           sent: LONG_AGO,
           editedAt: null,
           lastChanged: LONG_AGO,
-          lastModified: LONG_AGO,
           v: 1
         }])
       });
@@ -119,7 +119,8 @@ describe('TopicStrategy #slow', function() {
           category: {
             id: category.id,
             name: category.name,
-            slug: category.slug
+            slug: category.slug,
+            v: 1
           },
           user: {
             id: user.id,
@@ -137,7 +138,6 @@ describe('TopicStrategy #slow', function() {
           sent: LONG_AGO,
           editedAt: null,
           lastChanged: LONG_AGO,
-          lastModified: LONG_AGO,
           v: 1
         }])
       });
@@ -168,7 +168,8 @@ describe('TopicStrategy #slow', function() {
           category: {
             id: category.id,
             name: category.name,
-            slug: category.slug
+            slug: category.slug,
+            v: 1
           },
           user: {
             id: user.id,
@@ -194,7 +195,6 @@ describe('TopicStrategy #slow', function() {
             sent: LONG_AGO,
             editedAt: null,
             lastChanged: LONG_AGO,
-            lastModified: LONG_AGO,
             v: 1
           }],
           repliesTotal: 1,
@@ -207,7 +207,6 @@ describe('TopicStrategy #slow', function() {
           sent: LONG_AGO,
           editedAt: null,
           lastChanged: LONG_AGO,
-          lastModified: LONG_AGO,
           v: 1
         }])
       });
@@ -236,7 +235,8 @@ describe('TopicStrategy #slow', function() {
           category: {
             id: category.id,
             name: category.name,
-            slug: category.slug
+            slug: category.slug,
+            v: 1
           },
           user: {
             id: user.id,
@@ -260,7 +260,6 @@ describe('TopicStrategy #slow', function() {
             sent: LONG_AGO,
             editedAt: null,
             lastChanged: LONG_AGO,
-            lastModified: LONG_AGO,
             v: 1
           }],
           repliesTotal: 1,
@@ -273,7 +272,6 @@ describe('TopicStrategy #slow', function() {
           sent: LONG_AGO,
           editedAt: null,
           lastChanged: LONG_AGO,
-          lastModified: LONG_AGO,
           v: 1
         }])
       });
@@ -302,7 +300,8 @@ describe('TopicStrategy #slow', function() {
             category: {
               id: category.id,
               name: category.name,
-              slug: category.slug
+              slug: category.slug,
+              v: 1
             },
             user: fixture.user1.id,
             repliesTotal: 1,
@@ -315,7 +314,6 @@ describe('TopicStrategy #slow', function() {
             sent: LONG_AGO,
             editedAt: null,
             lastChanged: LONG_AGO,
-            lastModified: LONG_AGO,
             v: 1
           }],
           lookups: {
@@ -367,14 +365,14 @@ describe('TopicStrategy #slow', function() {
             sent: LONG_AGO,
             editedAt: null,
             lastChanged: LONG_AGO,
-            lastModified: LONG_AGO,
             v: 1
           }],
           lookups: {
             categories: makeHash(fixture.category1.id, {
               id: category.id,
               name: category.name,
-              slug: category.slug
+              slug: category.slug,
+              v: 1
             })
           }
         })

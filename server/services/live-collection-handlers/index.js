@@ -18,6 +18,7 @@ var handlers = {
   topics: './live-collection-topics',
   replies: './live-collection-replies',
   comments: './live-collection-comments',
+  categories: './live-collection-categories',
 };
 
 module.exports = {
