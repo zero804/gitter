@@ -24,7 +24,8 @@ export default function canEdit(forum, user, resource = defaultResource){
 
   //User owns resource
   const {id} = user;
-  if(id === resource.user.id) { return true;}
+  const resourceOwnerId = resource && resource.user && resource.user.id;
+  if(id === resourceOwnerId) { return true;}
 
   return false;
 }
