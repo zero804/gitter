@@ -17,6 +17,20 @@ function mongoeval {
   mongo --host "${ANNOUNCE_MONGO1_HOST}" --quiet --eval "$1"
 }
 
+seconds=10
+echo "Waiting for mongo to be online. I'll give it $seconds seconds."
+while [[ $seconds > 0 ]]; do
+  if [[ "$(mongoeval 'db.hostInfo().ok')" -eq 1 ]]; then
+    break
+  fi
+  sleep 1
+  seconds=$((seconds - 1))
+  if [[ $seconds -eq 0 ]]; then
+    echo "Timeout waiting for mongo to come up. Exiting with rc 1."
+    exit 1
+  fi
+done
+
 if [[ -z "$(mongoeval 'rs.isMaster().setname')" ]]; then
 	echo Replicaset not initialised. Initialising
 
@@ -29,9 +43,19 @@ if [[ -z "$(mongoeval 'rs.isMaster().setname')" ]]; then
 	DELIM
 fi
 
-while [[ "$(mongoeval 'rs.isMaster().ismaster')" != "true" ]]; do
-	echo Waiting for replicaset to come online
-	sleep 0.5
+attempts=30
+echo "Waiting for replica set to come online. I'll give it $attempts attempts."
+while [[ $attempts > 0 ]]; do
+  if [[ "$(mongoeval 'rs.isMaster().ismaster')" == "true" ]]; then
+    break
+  fi
+  attempts=$((attempts - 1))
+  echo "Attempt failed. $attempts attempts left. Retrying in half a second."
+  sleep 0.5
+  if [[ $attempts -eq 0 ]]; then
+    echo "Timeout waiting for the replica set. Exiting with rc 1."
+    exit 1
+  fi
 done
 
 SKIP_BACKUP=yes ${SCRIPT_DIR}/../../upgrade-data.sh "${ANNOUNCE_MONGO1_HOST}:27017" gitter
