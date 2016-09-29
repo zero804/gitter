@@ -214,14 +214,6 @@ export const TopicsLiveCollection = LiveCollection.extend({
     });
   },
 
-  //When we get a model back from the socket we may
-  //already have a model in the collection so return that
-  //so it can be populated
-  findModelForOptimisticMerge(){
-    const model = this.findWhere({ state: DRAFT });
-    return model;
-  },
-
   initialize(){
     subscribe(UPDATE_TOPIC, this.onTopicUpdate, this);
     subscribe(UPDATE_CANCEL_TOPIC, this.onTopicEditCancel, this);
