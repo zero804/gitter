@@ -85,9 +85,9 @@ export const TopicModel = BaseModel.extend({
 
   onChangeState(){
     this.clearSystemListeners();
+    //Initialize any draft listeners such that we can update the draft model
     switch(this.get('state')) {
-      //Initialize any draft listeners such that we can update the draft model
-    case MODEL_STATE_DRAFT: return this.listenToDraftUpdates();
+      case MODEL_STATE_DRAFT: return this.listenToDraftUpdates();
     }
   },
 
