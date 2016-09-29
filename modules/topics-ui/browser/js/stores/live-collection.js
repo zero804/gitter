@@ -15,7 +15,7 @@ export default LiveCollection.extend({
   //so it can be populated
   findModelForOptimisticMerge(){
     const model = this.findWhere({ state: MODEL_STATE_DRAFT });
-    return model;
+    if(!model.id) { return model; }
   },
 
   getContextModel() {
