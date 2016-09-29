@@ -34,7 +34,6 @@ export default React.createClass({
   },
 
   getDefaultProps(){
-    //TODO Change to false
     return { value: '' }
   },
 
@@ -50,6 +49,9 @@ export default React.createClass({
     const formattedSentDate = item.sent && moment(item.sent).format('MMM Do');
 
     /* The EditControl situation is BS. It needs to be fixed  */
+    //TODO we need to make edit controls, reaction and follow buttons
+    //smart components so they can dispatch events. This will prevent us
+    //having to have these controls in scope to change state
     return (
       <article className="feed-item">
         <div className="feed-item__content">
