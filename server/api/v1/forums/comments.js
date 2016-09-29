@@ -1,5 +1,6 @@
 "use strict";
 
+var Promise = require('bluebird');
 var StatusError = require('statuserror');
 var internalClientAccessOnly = require('../../../web/middlewares/internal-client-access-only');
 var commentService = require('gitter-web-topics/lib/comment-service');
@@ -16,6 +17,18 @@ function getCommentOptions(body) {
     // required:
     text: text,
   };
+}
+
+function collectPatchActions(forumWithPolicyService, comment, body) {
+  var promises = [];
+
+  if (body.hasOwnProperty('text')) {
+    promises.push(forumWithPolicyService.updateComment(comment, {
+      text: String(body.text)
+    }));
+  }
+
+  return promises;
 }
 
 module.exports = {
@@ -59,6 +72,25 @@ module.exports = {
       .then(function(comment) {
         var commentStrategy = new restSerializer.CommentStrategy();
         return restSerializer.serializeObject(comment, commentStrategy);
+      });
+  },
+
+  patch: function(req) {
+    var user = req.user;
+    var forum = req.forum;
+    var policy = req.userForumPolicy;
+    var comment = req.comment;
+
+    var forumWithPolicyService = new ForumWithPolicyService(forum, user, policy);
+    var promises = collectPatchActions(forumWithPolicyService, comment, req.body);
+
+    return Promise.all(promises)
+      .then(function() {
+        return commentService.findByIdForForumTopicAndReply(forum._id, comment.topicId, comment.replyId, comment._id);
+      })
+      .then(function(updatedComment) {
+        var strategy = new restSerializer.CommentStrategy();
+        return restSerializer.serializeObject(updatedComment, strategy);
       });
   },
 };
