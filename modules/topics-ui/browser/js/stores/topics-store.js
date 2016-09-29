@@ -190,7 +190,8 @@ export const TopicModel = BaseModel.extend({
     return Object.assign({}, attrs, {
       //When we have received data from the server we can assume
       //that it is no longer a draft or has been edited
-      state: SYNCED
+      state: SYNCED,
+      text: null
     });
   }
 

@@ -37,6 +37,7 @@ export default React.createClass({
     //If we are not editing the content and the content
     //has a property of text we can assume it has only just been submitted
     //to the server so we treat it as dirty.
+
     if(content.text) {
       return (
         <section className={compiledClass}>
