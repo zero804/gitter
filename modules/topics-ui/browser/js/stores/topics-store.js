@@ -44,6 +44,10 @@ import {DRAFT, SYNCED} from '../../../shared/constants/model-states';
 
 export const TopicModel = BaseModel.extend({
 
+  defaults: {
+    state: DRAFT,
+  },
+
   initialize(attrs = {}){
     //If the model is initialized by the application it will be in a draft state
     //In this case we need to setup listeners for the createTopic modal events
@@ -141,15 +145,17 @@ export const TopicModel = BaseModel.extend({
   validate(attributes){
     let errors = new Map();
 
-    if(!attributes.title.length) {
+    if(!attributes.title || !attributes.title.length) {
       errors.set('title', 'A new Topic requires a title');
     }
 
-    if(!attributes.text.length) {
+    if(!attributes.text || !attributes.text.length) {
       errors.set('text', 'A new Topic requires content');
     }
 
-    if(!attributes.categoryId.length) {
+    //If we are editing a topic we have a category
+    //If we are creating a new one we need a categoryId
+    if(!attributes.category && (!attributes.categoryId || !attributes.categoryId.length)) {
       errors.set('categoryId', 'A new Topic must have a category');
     }
 
@@ -160,7 +166,6 @@ export const TopicModel = BaseModel.extend({
 
     //Default values to pass to a react component
     const defaults = {
-      state: DRAFT,
       title: '',
       text: '',
       categoryId: '',
@@ -400,10 +405,10 @@ export class TopicsStore {
     const model = this.topicCollection.findWhere({ state: DRAFT });
 
     //Return a sensible default
-    if(!model) { return { title: '', body: '', categoryId: '', tags: [] } }
+    if(!model) { return { title: '', text: '', categoryId: '', tags: [] } }
 
     //Or just return the model
-    return Object.assign({}, model.attributes, {
+    return Object.assign({}, model.toPOJO(), {
       //Add the validation errors into the returned data
       //so we can show validation errors
       validationError: model.validationError
