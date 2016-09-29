@@ -11,7 +11,7 @@ var through2 = require('through2');
 var shutdown = require('shutdown');
 var mongoose = require('mongoose');
 var persistence = require('gitter-web-persistence');
-var onMongoConnect = require('../../server/utils/on-mongo-connect');
+var onMongoConnect = require('gitter-web-persistence-utils/lib/on-mongo-connect');
 var installMigrationSchemas = require('./migration-schemas').install;
 
 var migrationSchemas;

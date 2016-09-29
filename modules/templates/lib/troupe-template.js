@@ -3,8 +3,8 @@
 var fs = require('fs');
 var handlebars = require('handlebars');
 var i18nFactory = require('gitter-web-i18n');
-var _ = require('underscore');
-var hbsHelpers = require('../web/hbs-helpers');
+var _ = require('lodash');
+var hbsHelpers = require('./hbs-helpers');
 var avatarImgSrcSetHbsHelper = require('gitter-web-avatars/shared/avatar-img-srcset-hbs-helper');
 var Promise = require('bluebird');
 
@@ -30,9 +30,7 @@ handlebars.registerHelper('__n', function() {
 });
 
 module.exports = {
-  compile: function(sourceFile, callback) {
-    var sourceFileName = __dirname + '/../../public/templates/' + sourceFile + '.hbs';
-
+  compile: function(sourceFileName, callback) {
     return Promise.fromCallback(function(callback) {
       fs.readFile(sourceFileName, 'utf-8', callback);
     })

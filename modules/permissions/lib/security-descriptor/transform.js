@@ -11,7 +11,7 @@ function transformToGroup(sd, groupId) {
   if (isPublic) {
     members = 'PUBLIC';
   } else {
-    members = 'INVITE';
+    members = 'INVITE_OR_ADMIN';
   }
 
   return {
@@ -34,7 +34,7 @@ function transformToUnbacked(sd) {
   if (isPublic) {
     members = 'PUBLIC';
   } else {
-    members = 'INVITE';
+    members = 'INVITE_OR_ADMIN';
   }
 
   return {

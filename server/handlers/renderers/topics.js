@@ -3,11 +3,10 @@
 var StatusError = require('statuserror');
 var fonts = require('../../web/fonts');
 
-
 var groupService = require('gitter-web-groups');
 var forumService = require('gitter-web-topics/lib/forum-service');
 var topicService = require('gitter-web-topics/lib/topic-service');
-
+var getTopicsFilterSortOptions = require('gitter-web-topics/lib/get-topics-filter-sort-options');
 
 var forumCategoryStore = require('gitter-web-topics-ui/server/stores/forum-category-store');
 var forumTagStore = require('gitter-web-topics-ui/server/stores/forum-tag-store');
@@ -36,6 +35,8 @@ function renderForum(req, res, next, options) {
     return next(new StatusError(404));
   }
 
+  var userId = req.user && req.user._id;
+
   options = (options || {});
   var groupUri = req.params.groupName;
 
@@ -55,7 +56,11 @@ function renderForum(req, res, next, options) {
 
         if(!forum) { return next(new StatusError(404, 'Forum not found')); }
 
-        var strategy = new restSerializer.ForumStrategy();
+        var strategy = restSerializer.ForumStrategy.nested({
+          currentUserId: userId,
+          topicsFilterSort: getTopicsFilterSortOptions(req.query)
+        });
+
         return restSerializer.serializeObject(forum, strategy);
       })
       .then(function(forum){
@@ -104,6 +109,7 @@ function renderTopic(req, res, next) {
 
   var groupUri = req.params.groupName;
   var topicId = req.params.topicId;
+  var userId = req.user && req.user._id;
 
   return contextGenerator.generateNonChatContext(req)
     .then(function(context){
@@ -116,7 +122,14 @@ function renderTopic(req, res, next) {
           return forumService.findById(group.forumId)
             .then(function(forum){
               if(!forum) { return next(new StatusError(404, 'Forum not found')); }
-              var strategy = new restSerializer.ForumStrategy();
+              // TODO: how do we know which topics options to pass in to the
+              // forum strategy? Maybe it shouldn't include any topics at all?
+
+              var strategy = restSerializer.ForumStrategy.nested({
+                currentUserId: userId,
+                topicsFilterSort: null
+              });
+
               return restSerializer.serializeObject(forum, strategy);
             })
           .then(function(forum){
@@ -125,7 +138,10 @@ function renderTopic(req, res, next) {
 
                 if (!topic) { return next(new StatusError(404, 'Topic not found.')); }
 
-                var strategy = restSerializer.TopicStrategy.full();
+                var strategy = restSerializer.TopicStrategy.nested({
+                  currentUserId: userId
+                });
+
                 return restSerializer.serializeObject(topic, strategy);
               })
             .then(function(topic){

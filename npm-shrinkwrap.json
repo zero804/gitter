@@ -256,9 +256,9 @@
           "resolved": "http://beta-internal:4873/rimraf/-/rimraf-2.5.4.tgz",
           "dependencies": {
             "glob": {
-              "version": "7.0.6",
+              "version": "7.1.0",
               "from": "glob@>=7.0.5 <8.0.0",
-              "resolved": "http://beta-internal:4873/glob/-/glob-7.0.6.tgz",
+              "resolved": "https://registry.npmjs.org/glob/-/glob-7.1.0.tgz",
               "dependencies": {
                 "fs.realpath": {
                   "version": "1.0.0",
@@ -717,7 +717,7 @@
         "pause-stream": {
           "version": "0.0.11",
           "from": "pause-stream@0.0.11",
-          "resolved": "http://beta-internal:4873/pause-stream/-/pause-stream-0.0.11.tgz"
+          "resolved": "https://registry.npmjs.org/pause-stream/-/pause-stream-0.0.11.tgz"
         },
         "split": {
           "version": "0.3.3",
@@ -1486,9 +1486,9 @@
                       "resolved": "http://beta-internal:4873/async/-/async-2.0.1.tgz",
                       "dependencies": {
                         "lodash": {
-                          "version": "4.16.0",
+                          "version": "4.16.1",
                           "from": "lodash@>=4.8.0 <5.0.0",
-                          "resolved": "http://beta-internal:4873/lodash/-/lodash-4.16.0.tgz"
+                          "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.16.1.tgz"
                         }
                       }
                     }
@@ -1782,9 +1782,9 @@
           }
         },
         "lodash": {
-          "version": "4.16.0",
+          "version": "4.16.1",
           "from": "lodash@>=4.6.1 <5.0.0",
-          "resolved": "http://beta-internal:4873/lodash/-/lodash-4.16.0.tgz"
+          "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.16.1.tgz"
         },
         "mandrill-api": {
           "version": "1.0.45",
@@ -2007,7 +2007,7 @@
       "dependencies": {
         "redis": {
           "version": "2.6.2",
-          "from": "redis@latest",
+          "from": "redis@>=2.1.0 <3.0.0",
           "resolved": "http://beta-internal:4873/redis/-/redis-2.6.2.tgz",
           "dependencies": {
             "double-ended-queue": {
@@ -2337,9 +2337,9 @@
       "resolved": "file:modules/fake-data",
       "dependencies": {
         "lodash": {
-          "version": "4.16.0",
+          "version": "4.16.1",
           "from": "lodash@>=4.13.1 <5.0.0",
-          "resolved": "http://beta-internal:4873/lodash/-/lodash-4.16.0.tgz"
+          "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.16.1.tgz"
         }
       }
     },
@@ -2398,6 +2398,11 @@
       "from": "modules/live-collection-events",
       "resolved": "file:modules/live-collection-events"
     },
+    "gitter-web-mailer": {
+      "version": "1.0.0",
+      "from": "modules/mailer",
+      "resolved": "file:modules/mailer"
+    },
     "gitter-web-mongoose-bluebird": {
       "version": "1.0.0",
       "from": "modules/mongoose-bluebird",
@@ -2453,10 +2458,20 @@
       "from": "modules/suggestions",
       "resolved": "file:modules/suggestions"
     },
+    "gitter-web-templates": {
+      "version": "1.0.0",
+      "from": "modules/templates",
+      "resolved": "file:modules/templates"
+    },
     "gitter-web-text-processor": {
       "version": "1.0.0",
       "from": "modules/text-processor",
       "resolved": "file:modules/text-processor"
+    },
+    "gitter-web-topic-notifications": {
+      "version": "1.0.0",
+      "from": "modules/topic-notifications",
+      "resolved": "file:modules/topic-notifications"
     },
     "gitter-web-topics": {
       "version": "1.0.0",
@@ -2474,9 +2489,9 @@
           "resolved": "http://beta-internal:4873/backbone/-/backbone-1.2.3.tgz"
         },
         "lodash": {
-          "version": "4.16.0",
+          "version": "4.16.1",
           "from": "lodash@>=4.15.0 <5.0.0",
-          "resolved": "http://beta-internal:4873/lodash/-/lodash-4.16.0.tgz"
+          "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.16.1.tgz"
         },
         "sinon": {
           "version": "1.17.6",
@@ -2819,9 +2834,9 @@
                       "resolved": "http://beta-internal:4873/async/-/async-2.0.1.tgz",
                       "dependencies": {
                         "lodash": {
-                          "version": "4.16.0",
+                          "version": "4.16.1",
                           "from": "lodash@>=4.8.0 <5.0.0",
-                          "resolved": "http://beta-internal:4873/lodash/-/lodash-4.16.0.tgz"
+                          "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.16.1.tgz"
                         }
                       }
                     }
@@ -3366,9 +3381,9 @@
           "resolved": "http://beta-internal:4873/rimraf/-/rimraf-2.5.4.tgz",
           "dependencies": {
             "glob": {
-              "version": "7.0.6",
+              "version": "7.1.0",
               "from": "glob@>=7.0.5 <8.0.0",
-              "resolved": "http://beta-internal:4873/glob/-/glob-7.0.6.tgz",
+              "resolved": "https://registry.npmjs.org/glob/-/glob-7.1.0.tgz",
               "dependencies": {
                 "fs.realpath": {
                   "version": "1.0.0",
@@ -3488,7 +3503,7 @@
         },
         "parseurl": {
           "version": "1.3.1",
-          "from": "parseurl@>=1.3.0 <1.4.0",
+          "from": "parseurl@>=1.3.1 <1.4.0",
           "resolved": "http://beta-internal:4873/parseurl/-/parseurl-1.3.1.tgz"
         },
         "vary": {
@@ -3504,9 +3519,9 @@
       "resolved": "http://beta-internal:4873/mixpanel/-/mixpanel-0.0.20.tgz"
     },
     "moment": {
-      "version": "2.15.0",
+      "version": "2.15.1",
       "from": "moment@>=2.10.3 <3.0.0",
-      "resolved": "http://beta-internal:4873/moment/-/moment-2.15.0.tgz"
+      "resolved": "http://beta-internal:4873/moment/-/moment-2.15.1.tgz"
     },
     "mongodb": {
       "version": "2.1.21",
@@ -3516,12 +3531,12 @@
         "es6-promise": {
           "version": "3.0.2",
           "from": "es6-promise@3.0.2",
-          "resolved": "https://registry.npmjs.org/es6-promise/-/es6-promise-3.0.2.tgz"
+          "resolved": "http://beta-internal:4873/es6-promise/-/es6-promise-3.0.2.tgz"
         },
         "mongodb-core": {
           "version": "1.3.21",
           "from": "mongodb-core@1.3.21",
-          "resolved": "https://registry.npmjs.org/mongodb-core/-/mongodb-core-1.3.21.tgz",
+          "resolved": "http://beta-internal:4873/mongodb-core/-/mongodb-core-1.3.21.tgz",
           "dependencies": {
             "bson": {
               "version": "0.4.23",
@@ -3599,12 +3614,12 @@
         "hooks-fixed": {
           "version": "1.2.0",
           "from": "hooks-fixed@1.2.0",
-          "resolved": "https://registry.npmjs.org/hooks-fixed/-/hooks-fixed-1.2.0.tgz"
+          "resolved": "http://beta-internal:4873/hooks-fixed/-/hooks-fixed-1.2.0.tgz"
         },
         "kareem": {
           "version": "1.1.3",
           "from": "kareem@1.1.3",
-          "resolved": "https://registry.npmjs.org/kareem/-/kareem-1.1.3.tgz"
+          "resolved": "http://beta-internal:4873/kareem/-/kareem-1.1.3.tgz"
         },
         "mongodb": {
           "version": "2.1.18",
@@ -3614,7 +3629,7 @@
             "es6-promise": {
               "version": "3.0.2",
               "from": "es6-promise@3.0.2",
-              "resolved": "https://registry.npmjs.org/es6-promise/-/es6-promise-3.0.2.tgz"
+              "resolved": "http://beta-internal:4873/es6-promise/-/es6-promise-3.0.2.tgz"
             },
             "mongodb-core": {
               "version": "1.3.18",
@@ -3704,7 +3719,7 @@
         "muri": {
           "version": "1.1.0",
           "from": "muri@1.1.0",
-          "resolved": "https://registry.npmjs.org/muri/-/muri-1.1.0.tgz"
+          "resolved": "http://beta-internal:4873/muri/-/muri-1.1.0.tgz"
         },
         "regexp-clone": {
           "version": "0.0.1",
@@ -4130,7 +4145,7 @@
       "dependencies": {
         "passport-oauth2": {
           "version": "1.3.0",
-          "from": "passport-oauth2@>=1.0.0 <2.0.0",
+          "from": "passport-oauth2@>=1.1.2 <2.0.0",
           "resolved": "http://beta-internal:4873/passport-oauth2/-/passport-oauth2-1.3.0.tgz",
           "dependencies": {
             "passport-strategy": {
@@ -4183,7 +4198,7 @@
       "dependencies": {
         "passport-oauth2": {
           "version": "1.3.0",
-          "from": "passport-oauth2@>=1.0.0 <2.0.0",
+          "from": "passport-oauth2@>=1.1.2 <2.0.0",
           "resolved": "http://beta-internal:4873/passport-oauth2/-/passport-oauth2-1.3.0.tgz",
           "dependencies": {
             "passport-strategy": {
@@ -4953,7 +4968,7 @@
         },
         "parseurl": {
           "version": "1.3.1",
-          "from": "parseurl@>=1.3.0 <1.4.0",
+          "from": "parseurl@>=1.3.1 <1.4.0",
           "resolved": "http://beta-internal:4873/parseurl/-/parseurl-1.3.1.tgz"
         }
       }
@@ -5547,9 +5562,9 @@
                   "resolved": "http://beta-internal:4873/rimraf/-/rimraf-2.5.4.tgz",
                   "dependencies": {
                     "glob": {
-                      "version": "7.0.6",
+                      "version": "7.1.0",
                       "from": "glob@>=7.0.5 <8.0.0",
-                      "resolved": "http://beta-internal:4873/glob/-/glob-7.0.6.tgz",
+                      "resolved": "https://registry.npmjs.org/glob/-/glob-7.1.0.tgz",
                       "dependencies": {
                         "fs.realpath": {
                           "version": "1.0.0",
@@ -6078,9 +6093,9 @@
                   "resolved": "http://beta-internal:4873/async/-/async-2.0.1.tgz",
                   "dependencies": {
                     "lodash": {
-                      "version": "4.16.0",
+                      "version": "4.16.1",
                       "from": "lodash@>=4.8.0 <5.0.0",
-                      "resolved": "http://beta-internal:4873/lodash/-/lodash-4.16.0.tgz"
+                      "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.16.1.tgz"
                     }
                   }
                 }
@@ -6093,7 +6108,7 @@
               "dependencies": {
                 "chalk": {
                   "version": "1.1.3",
-                  "from": "chalk@>=1.1.1 <2.0.0",
+                  "from": "chalk@>=1.0.0 <2.0.0",
                   "resolved": "http://beta-internal:4873/chalk/-/chalk-1.1.3.tgz",
                   "dependencies": {
                     "ansi-styles": {
@@ -6711,7 +6726,7 @@
             },
             "strip-ansi": {
               "version": "3.0.1",
-              "from": "strip-ansi@>=3.0.0 <4.0.0",
+              "from": "strip-ansi@>=3.0.1 <4.0.0",
               "resolved": "http://beta-internal:4873/strip-ansi/-/strip-ansi-3.0.1.tgz",
               "dependencies": {
                 "ansi-regex": {

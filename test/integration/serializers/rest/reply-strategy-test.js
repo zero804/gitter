@@ -7,6 +7,10 @@ var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assertUtils = require('../../assert-utils')
 var serialize = testRequire('./serializers/serialize');
 var ReplyStrategy = testRequire('./serializers/rest/reply-strategy');
+var serializeObject = testRequire('./serializers/serialize-object');
+var subscriberService = require('gitter-web-topic-notifications/lib/subscriber-service');
+var ForumObject = require('gitter-web-topic-notifications/lib/forum-object');
+var assert = require('assert');
 
 var LONG_AGO = '2014-01-01T00:00:00.000Z';
 
@@ -18,7 +22,7 @@ function makeHash() {
   return hash;
 }
 
-describe('ReplyStrategy', function() {
+describe('ReplyStrategy #slow', function() {
   var blockTimer = require('../../block-timer');
   before(blockTimer.on);
   after(blockTimer.off);
@@ -54,7 +58,7 @@ describe('ReplyStrategy', function() {
   });
 
   it('should serialize a reply', function() {
-    var strategy = new ReplyStrategy();
+    var strategy = ReplyStrategy.standard();
 
     var reply = fixture.reply1;
     var user = fixture.user1;
@@ -73,6 +77,8 @@ describe('ReplyStrategy', function() {
             displayName: user.displayName,
             avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
           },
+          subscribed: false,
+          commentsTotal: 1,
           sent: LONG_AGO,
           editedAt: null,
           lastChanged: LONG_AGO,
@@ -82,8 +88,8 @@ describe('ReplyStrategy', function() {
       });
   });
 
-  it('should serialize a reply with includeComments', function() {
-    var strategy = new ReplyStrategy({ includeComments: true, includeCommentsTotals: true});
+  it('should serialize a reply with nested comments', function() {
+    var strategy = ReplyStrategy.nested();
 
     var user = fixture.user1;
     var reply = fixture.reply1;
@@ -103,6 +109,7 @@ describe('ReplyStrategy', function() {
             displayName: user.displayName,
             avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
           },
+          subscribed: false,
           comments: [{
             id: comment.id,
             body: {
@@ -130,7 +137,7 @@ describe('ReplyStrategy', function() {
   });
 
   it("should serialize a reply with lookups=['user']", function() {
-    var strategy = new ReplyStrategy({ lookups: ['user'] });
+    var strategy = ReplyStrategy.standard({ lookups: ['user'] });
 
     var reply = fixture.reply1;
     var user = fixture.user1;
@@ -145,6 +152,8 @@ describe('ReplyStrategy', function() {
               html: reply.html
             },
             user: fixture.user1.id,
+            subscribed: false,
+            commentsTotal: 1,
             sent: LONG_AGO,
             editedAt: null,
             lastChanged: LONG_AGO,
@@ -162,4 +171,22 @@ describe('ReplyStrategy', function() {
         })
       });
   });
+
+  it('should tell a user when they are subscribed to a reply', function() {
+    var forumObject = ForumObject.createForReply(fixture.forum1._id, fixture.topic1._id, fixture.reply1._id);
+    var userId = fixture.user1._id;
+
+    return subscriberService.addSubscriber(forumObject, userId)
+      .then(function() {
+        var strategy = ReplyStrategy.nested({
+          currentUserId: userId
+        });
+
+        return serializeObject(fixture.reply1, strategy);
+      })
+      .then(function(serialized) {
+        assert.strictEqual(serialized.subscribed, true);
+      });
+  });
+
 });

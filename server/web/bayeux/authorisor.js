@@ -324,6 +324,7 @@ function populateUserUnreadItemsCollection(options) {
 }
 
 function populateTopicsCollection(options) {
+  var userId = options.userId;
   var match = options.match;
   var forumId = match[1];
 
@@ -331,11 +332,14 @@ function populateTopicsCollection(options) {
     return Promise.resolve();
   }
 
-  return restful.serializeTopicsForForumId(forumId)
+  var snapshotOptions = options.snapshot || {};
+
+  return restful.serializeTopicsForForumId(forumId, userId, snapshotOptions)
     .then(dataToSnapshot('forum.topics'));
 }
 
 function populateRepliesCollection(options) {
+  var userId = options.userId;
   var match = options.match;
   var forumId = match[1];
   var topicId = match[2];
@@ -344,7 +348,7 @@ function populateRepliesCollection(options) {
     return Promise.resolve();
   }
 
-  return restful.serializeRepliesForTopicId(topicId)
+  return restful.serializeRepliesForTopicId(topicId, userId)
     .then(dataToSnapshot('forum.replies'));
 }
 

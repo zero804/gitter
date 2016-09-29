@@ -5,7 +5,7 @@ var _ = require('lodash');
 var replyService = require('gitter-web-topics/lib/reply-service');
 var ReplyStrategy = require('../reply-strategy');
 
-function RepliesForTopicStrategy(/*options*/) {
+function RepliesForTopicStrategy() {
   this.repliesByTopic = null;
   this.replyStrategy = null;
 }
@@ -17,8 +17,7 @@ RepliesForTopicStrategy.prototype = {
       .then(function(replies) {
         this.repliesByTopic = _.groupBy(replies, 'topicId');
 
-        var replyStrategy = this.replyStrategy = new ReplyStrategy();
-        return replyStrategy.preload(Lazy(replies));
+        return this.replyStrategy.preload(Lazy(replies));
       });
   },
 
@@ -35,5 +34,14 @@ RepliesForTopicStrategy.prototype = {
   name: 'RepliesForTopicStrategy'
 };
 
+RepliesForTopicStrategy.standard = function(options) {
+  var strategy = new RepliesForTopicStrategy();
+
+  strategy.replyStrategy = ReplyStrategy.standard({
+    currentUserId: options.currentUserId
+  });
+
+  return strategy;
+}
 
 module.exports = RepliesForTopicStrategy;
