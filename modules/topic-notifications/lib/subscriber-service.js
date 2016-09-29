@@ -7,6 +7,7 @@ var assert = require('assert');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var _ = require('lodash');
+var ObjectIDSet = require('gitter-web-persistence-utils/lib/objectid-set');
 
 /**
  * Push an item to an array if it's not a particular value
@@ -51,7 +52,7 @@ function listForItem(forumObject, options) {
     }
   }
 
-  return ForumSubscription.find(query, { userId: 1, enabled: 1 })
+  return ForumSubscription.find(query, { _id: 0, userId: 1, enabled: 1 })
     .lean()
     .sort({ userId: 1, forumId: 1, topicId: 1, replyId: 1 })
     .exec()
@@ -162,22 +163,78 @@ SubscriptionVisitor.prototype.isSubscribed = function(forumObject) {
     (forumObject.topicId || 'null') +
     (forumObject.replyId || 'null');
 
-  if (this.resultsHash.hasOwnProperty(key)) {
-    return this.resultsHash[key];
+  return !!this.resultsHash[key];
+}
+
+function createQueryForForums(forumObjects) {
+  var forumIdSet = new ObjectIDSet();
+
+  _.forEach(forumObjects, function(forumRef) {
+    forumIdSet.add(forumRef.forumId);
+  });
+
+  var forumIds = forumIdSet.uniqueIds();
+
+  return {
+    forumId: forumIds.length === 1 ? forumIds[0] : { $in: forumIds },
+    topicId: { $eq: null },
+    replyId: { $eq: null }
+  };
+}
+
+function createQueryForTopics(forumObjects) {
+  var forumIdSet = new ObjectIDSet();
+  var topicIdSet = new ObjectIDSet();
+
+  _.forEach(forumObjects, function(forumRef) {
+    forumIdSet.add(forumRef.forumId);
+    topicIdSet.add(forumRef.topicId);
+  });
+
+  var forumIds = forumIdSet.uniqueIds();
+  var topicIds = topicIdSet.uniqueIds();
+
+  return {
+    forumId: forumIds.length === 1 ? forumIds[0] : { $in: forumIds },
+    topicId: topicIds.length === 1 ? topicIds[0] : { $in: topicIds },
+    replyId: { $eq: null }
   }
+}
 
-  if (!forumObject.hasParent()) return false;
-  var parentRef = forumObject.getParent();
+function createQueryForReplies(forumObjects) {
+  var forumIdSet = new ObjectIDSet();
+  var topicIdSet = new ObjectIDSet();
+  var replyIds = [];
 
-  key = (parentRef.forumId || 'null') +
-    (parentRef.topicId || 'null') +
-    (parentRef.replyId || 'null');
+  _.forEach(forumObjects, function(forumRef) {
+    forumIdSet.add(forumRef.forumId);
+    topicIdSet.add(forumRef.topicId);
 
-  if (this.resultsHash.hasOwnProperty(key)) {
-    return this.resultsHash[key];
+    // This should be unique already...
+    replyIds.push(forumRef.replyId);
+  });
+
+  var forumIds = forumIdSet.uniqueIds();
+  var topicIds = topicIdSet.uniqueIds();
+
+  return {
+    forumId: forumIds.length === 1 ? forumIds[0] : { $in: forumIds },
+    topicId: topicIds.length === 1 ? topicIds[0] : { $in: topicIds },
+    replyId: replyIds.length === 1 ? replyIds[0] : { $in: replyIds },
   }
+}
 
-  return false;
+function createQuery(type, forumObjects) {
+  switch(type) {
+    case ForumObject.TYPE.Forum:
+      return createQueryForForums(forumObjects);
+
+    case ForumObject.TYPE.Topic:
+      return createQueryForTopics(forumObjects);
+
+    case ForumObject.TYPE.Reply:
+      return createQueryForReplies(forumObjects);
+  }
 }
 
 function createSubscriptionVisitorForUser(userId, type, forumObjects) {
@@ -185,60 +242,10 @@ function createSubscriptionVisitorForUser(userId, type, forumObjects) {
     return new SubscriptionVisitor();
   }
 
-  var forumIdSet = {};
-  var topicIdSet;
-  var replyIds;
+  assert(type !== ForumObject.TYPE.Comment);
 
-  switch(type) {
-    case ForumObject.TYPE.Forum:
-      break;
-
-    case ForumObject.TYPE.Topic:
-      topicIdSet = {};
-      break;
-
-    case ForumObject.TYPE.Reply:
-      topicIdSet = {};
-      replyIds = [null];
-      break;
-
-    default:
-      assert(false, 'createSubscriptionVisitorForUser requires a forum, topic or reply');
-  }
-
-  _.forEach(forumObjects, function(forumObject) {
-    assert.strictEqual(forumObject.type, type, 'Types do not match');
-
-    forumIdSet[forumObject.forumId] = true;
-
-    if (topicIdSet) {
-      topicIdSet[forumObject.topicId] = true;
-    }
-
-    if (replyIds) {
-      replyIds.push(forumObject.replyId);
-    }
-  });
-
-  var forumIds = mongoUtils.asObjectIDs(Object.keys(forumIdSet));
-  var topicIds;
-
-  switch(type) {
-    case ForumObject.TYPE.Topic:
-      topicIds = [null].concat(mongoUtils.asObjectIDs(Object.keys(topicIdSet)));
-      break;
-
-    case ForumObject.TYPE.Reply:
-      topicIds = mongoUtils.asObjectIDs(Object.keys(topicIdSet));
-      break;
-  }
-
-  var query = {
-    userId: userId,
-    forumId: forumIds.length === 1 ? forumIds[0] : { $in: forumIds },
-    topicId: topicIds ? { $in: topicIds } : { $eq: null },
-    replyId: replyIds ? { $in: replyIds } : { $eq: null },
-  };
+  var query = createQuery(type, forumObjects);
+  query.userId = userId;
 
   return ForumSubscription.find(query, { _id: 0, forumId: 1, topicId: 1, replyId: 1, enabled: 1 })
     .lean()
