@@ -1,17 +1,20 @@
 import Backbone from 'backbone';
 import {LiveCollection} from 'gitter-realtime-client';
-import {DRAFT} from '../../../shared/constants/model-states';
 
 export default LiveCollection.extend({
 
-  constructor(models = [], attrs = {}){
+  constructor(models = [], attrs = {}) {
     this.contextModel = this.getContextModel(attrs);
     attrs.listen = true;
     LiveCollection.prototype.constructor.apply(this, [models, attrs]);
   },
 
-  getContextModel(){
+  getContextModel() {
     return new Backbone.Model();
+  },
+
+  toPOJO(options) {
+    return this.map(function(model) { return model.toPOJO(options); });
   }
 
 });

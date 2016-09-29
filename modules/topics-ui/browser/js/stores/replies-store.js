@@ -21,10 +21,11 @@ import {
 } from '../../../shared/constants/forum.js';
 
 export const ReplyModel = BaseModel.extend({
-  url(){
+  // Why doesn't this just come from it's owner collection?
+  url() {
     return this.get('id') ?
-    `/api/v1/forums/${getForumId()}/topics/${router.get('topicId')}/replies/${this.get('id')}`:
-    `/api/v1/forums/${getForumId()}/topics/${router.get('topicId')}/replies`;
+    `/v1/forums/${getForumId()}/topics/${router.get('topicId')}/replies/${this.get('id')}`:
+    `/v1/forums/${getForumId()}/topics/${router.get('topicId')}/replies`;
   },
 });
 
@@ -56,12 +57,12 @@ export const RepliesStore = LiveCollection.extend({
   getById(id) {
     const model = this.get(id);
     if(!model) { return; }
-    return parseReply(model.toJSON());
+    return parseReply(model.toPOJO());
   },
 
   getReplies(){
     return this.models.map(model => {
-      return parseReply(model.toJSON());
+      return parseReply(model.toPOJO());
     });
   },
 

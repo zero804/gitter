@@ -1,14 +1,14 @@
 import Backbone from 'backbone';
 import LiveCollection from './live-collection';
 import { BaseModel } from './base-model';
-
-import dispatchOnChangeMixin from './mixins/dispatch-on-change';
 import {subscribe} from '../../../shared/dispatcher';
+import dispatchOnChangeMixin from './mixins/dispatch-on-change';
 
-import {getRealtimeClient} from './realtime-client';
-import {getForumId} from './forum-store';
 import router from '../routers';
-import {getCurrentUser} from './current-user-store';
+import { getRealtimeClient } from './realtime-client';
+import { getForumId } from './forum-store';
+import { getCurrentUser } from './current-user-store';
+
 
 import {
   SHOW_REPLY_COMMENTS,
@@ -22,8 +22,8 @@ import {SUBMIT_NEW_COMMENT} from '../../../shared/constants/create-comment';
 export const CommentModel = BaseModel.extend({
   url(){
     return this.get('id') ?
-    `/api/v1/forums/${getForumId()}/topics/${router.get('topicId')}/replies/${this.get('replyId')}/comments/${this.get('id')}`:
-    `/api/v1/forums/${getForumId()}/topics/${router.get('topicId')}/replies/${this.get('replyId')}/comments`;
+    `/v1/forums/${getForumId()}/topics/${router.get('topicId')}/replies/${this.get('replyId')}/comments/${this.get('id')}`:
+    `/v1/forums/${getForumId()}/topics/${router.get('topicId')}/replies/${this.get('replyId')}/comments`;
   }
 });
 
@@ -50,13 +50,13 @@ export const CommentsStore = LiveCollection.extend({
     this.listenTo(router, 'change:topicId', this.onTopicIdUpdate, this);
   },
 
-  getComments(){
-    return this.toJSON();
+  getComments() {
+    return this.toPOJO();
   },
 
   getCommentsByReplyId(id){
     if(id !== this.contextModel.get('replyId')) { return []; }
-    return this.toJSON();
+    return this.toPOJO();
   },
 
   getActiveReplyId(){
