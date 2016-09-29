@@ -1,16 +1,16 @@
-Hi, there's a new comment in a topic on {{ notification.forum.name }} from {{ notification.comment.user.username }}.
+Hi, there's a new comment in a topic on {{ notification.forum.name }} from @{{ notification.comment.user.username }}.
 
-**
-{{ notification.topic.title }}
-**
+|
+| {{ notification.topic.title }}
+|
 
-{{ notification.comment.text }}
+{{ notification.comment.body.text }}
 
 ==
 
 {{ notification.comment.user.username }} was commenting on a reply from {{{ notification.reply.user.username }}}
 
-{{ notification.reply.text }}
+{{ notification.reply.body.text }}
 
 -------------------------------------------------------------
 Topics are currently in beta. You can't reply via email, yet.
