@@ -2478,6 +2478,11 @@
       "from": "modules/topic-notifications",
       "resolved": "file:modules/topic-notifications"
     },
+    "gitter-web-topic-serialization": {
+      "version": "1.0.0",
+      "from": "modules/topic-serialization",
+      "resolved": "file:modules/topic-serialization"
+    },
     "gitter-web-topics": {
       "version": "1.0.0",
       "from": "modules/topics",
@@ -4945,6 +4950,16 @@
           }
         }
       }
+    },
+    "rx": {
+      "version": "4.1.0",
+      "from": "rx@>=4.1.0 <5.0.0",
+      "resolved": "http://beta-internal:4873/rx/-/rx-4.1.0.tgz"
+    },
+    "rx-node": {
+      "version": "1.0.2",
+      "from": "rx-node@>=1.0.2 <2.0.0",
+      "resolved": "http://beta-internal:4873/rx-node/-/rx-node-1.0.2.tgz"
     },
     "sanitizer": {
       "version": "0.0.15",
