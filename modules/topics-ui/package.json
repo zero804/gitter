@@ -20,6 +20,7 @@
     "sinon": "^1.17.5",
     "moment": "^2.10.3",
     "fuzzysearch": "^1.0.3",
+    "gitter-web-api-client": "file:../api-client",
     "gitter-client-env": "file:../client-env",
     "gitter-realtime-client": "^1.6.1",
     "gitter-web-avatars": "file:../avatars",
