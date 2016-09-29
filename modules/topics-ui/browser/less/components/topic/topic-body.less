@@ -9,13 +9,18 @@
 
 .topic-body__footer {
   display: flex;
-  flex-direction: row-reverse;
+  justify-content: flex-end;
 }
 
 .topic-body__footer__action {
-  &:extend(.secondary-button-jaffa--small);
+  &:extend(.secondary-button-jaffa--small all);
   padding-left: 1.5em;
   padding-right: 1.5em;
+  cursor: pointer;
+}
+
+.topic-body__footer__reaction-action {
+  .topic-body__footer__action();
 }
 
 .topic-body__footer__subscribe-action {

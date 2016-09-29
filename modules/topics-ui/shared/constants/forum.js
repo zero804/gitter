@@ -14,5 +14,6 @@ export const SUBSCRIPTION_STATE_SUBSCRIBED = 'subscription-state-subscribed';
 export const SUBSCRIPTION_STATE_UNSUBSCRIBED = 'subscription-state-unsubscribed';
 export const SUBSCRIPTION_STATE_PENDING = 'subscription-state-pending';
 
+export const REQUEST_UPDATE_TOPIC_REACTIONS = 'request-update-topic-reactions';
 export const REQUEST_UPDATE_REPLY_REACTIONS = 'request-update-reply-reactions';
 export const REQUEST_UPDATE_COMMENT_REACTIONS = 'request-update-comment-reactions';
