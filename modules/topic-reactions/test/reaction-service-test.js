@@ -88,7 +88,7 @@ describe('reaction-service', function() {
               return reactionService.removeReaction(ref, userId, 'like')
             })
             .then(function(result) {
-              assert.deepEqual(result, { like: 0 });
+              assert.deepEqual(result, { });
               return find();
             })
             .then(function(o) {
