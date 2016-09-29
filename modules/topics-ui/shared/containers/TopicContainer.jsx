@@ -16,6 +16,7 @@ import showReplyComments from '../action-creators/topic/show-reply-comments';
 import { SUBSCRIPTION_STATE_SUBSCRIBED } from '../constants/forum.js';
 import requestUpdateTopicSubscriptionState from '../action-creators/forum/request-update-topic-subscription-state';
 import requestUpdateReplySubscriptionState from '../action-creators/forum/request-update-reply-subscription-state';
+import requestUpdateTopicReactions from '../action-creators/forum/request-update-topic-reactions';
 import requestUpdateReplyReactions from '../action-creators/forum/request-update-reply-reactions';
 import requestUpdateCommentReactions from '../action-creators/forum/request-update-comment-reactions';
 import requestSignIn from '../action-creators/forum/request-sign-in';
@@ -147,7 +148,8 @@ const TopicContainer = createClass({
             tags={tags}/>
           <TopicBody
             topic={topic}
-            onSubscribeButtonClick={this.onTopicSubscribeButtonClick} />
+            onSubscribeButtonClick={this.onTopicSubscribeButtonClick}
+            onReactionPick={this.onTopicReactionPick} />
         </article>
         <TopicReplyListHeader replies={parsedReplies}/>
         <TopicReplyList
@@ -275,6 +277,12 @@ const TopicContainer = createClass({
     const desiredIsSubscribed = (subscriptionState !== SUBSCRIPTION_STATE_SUBSCRIBED);
 
     dispatch(requestUpdateReplySubscriptionState(replyId, desiredIsSubscribed));
+  },
+
+  onTopicReactionPick(topicId, reactionKey, isReacting) {
+    // TODO: dispatch event and listen in `forum-client`
+    console.log('onTopicReactionPick', topicId, reactionKey, isReacting);
+    dispatch(requestUpdateTopicReactions(topicId, reactionKey, isReacting));
   },
 
   onReplyReactionPick(replyId, reactionKey, isReacting) {

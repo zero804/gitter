@@ -29,11 +29,14 @@ export default React.createClass({
   render() {
     const { children, className } = this.props;
 
+    // TODO: Hook up to API
+    const likeReactionCount = 2;
+
     return (
       <button
         className={className}
         onClick={this.onClick}>
-        {children || '👍'}
+        {children || `👍 ${likeReactionCount}`}
       </button>
     );
   },

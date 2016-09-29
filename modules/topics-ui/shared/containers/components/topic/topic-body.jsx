@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react';
 import Container from '../container.jsx';
 import Panel from '../panel.jsx';
 import WatchButton from '../forum/watch-button.jsx';
+import ReactionButton from '../forum/reaction-button.jsx';
 
 export default React.createClass({
 
@@ -12,7 +13,8 @@ export default React.createClass({
         html: PropTypes.string
       }).isRequired,
     }).isRequired,
-    onSubscribeButtonClick: PropTypes.func
+    onSubscribeButtonClick: PropTypes.func,
+    onReactionPick: PropTypes.func
   },
 
   render() {
@@ -28,16 +30,28 @@ export default React.createClass({
             dangerouslySetInnerHTML={{ __html: topic.body.html}}>
           </section>
           <footer className="topic-body__footer">
-            <button className="topic-body__footer__action">Share</button>
+            <ReactionButton
+              key="reactions"
+              className="topic-body__footer__reaction-action"
+              onReactionPick={this.onReactionPick}/>
             <WatchButton
               subscriptionState={subscriptionState}
               className="topic-body__footer__subscribe-action"
               itemClassName="topic-body__footer__subscribe-action-text-item"
               onClick={onSubscribeButtonClick}/>
+            <button className="topic-body__footer__action">Share</button>
           </footer>
         </Panel>
       </Container>
     );
+  },
+
+
+  onReactionPick(reactionKey, isReacting) {
+    const {topic, onReactionPick} = this.props;
+    if(onReactionPick) {
+      onReactionPick(topic.id, reactionKey, isReacting);
+    }
   },
 
 
