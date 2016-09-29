@@ -1,16 +1,21 @@
-New Comment!
+Hi, there's a new comment in a topic on {{ notification.forum.name }} from {{ notification.comment.user.username }}.
 
-On Topic:
+**
+{{ notification.topic.title }}
+**
 
-From: {{ notification.topicAuthor.username }}
-Title: {{ notification.topic.title }}
-Text: {{ notification.topic.text }}
+{{ notification.comment.text }}
 
-On Reply:
-From: {{ notification.replyAuthorUser.username }}
-Text: {{ notification.reply.text }}
+==
+
+{{ notification.comment.user.username }} was commenting on a reply from {{{ notification.reply.user.username }}}
+
+{{ notification.reply.text }}
+
+-------------------------------------------------------------
+Topics are currently in beta. You can't reply via email, yet.
+-------------------------------------------------------------
 
 
-The Comment Is:
-From: {{ notification.commentAuthorUser.username }}
-Text: {{ notification.comment.text }}
+Please visit the topic if you want to unwatch it and stop email notifications.
+{{ emailBasePath }}/{{ notification.topic.uri }}

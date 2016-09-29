@@ -1,11 +1,16 @@
-New Reply!
+Yes! There's a new reply to a topic in {{ notification.forum.name }} from {{ notification.reply.user.username }}
 
-On Topic:
+**
+{{ notification.topic.title }}
+**
 
-From: {{ notification.topicAuthor.username }}
-Title: {{ notification.topic.title }}
-Text: {{ notification.topic.text }}
+{{ notification.reply.text }}
 
-The Reply is:
-From: {{ notification.replyAuthorUser.username }}
-Text: {{ notification.reply.text }}
+
+-------------------------------------------------------------
+Topics are currently in beta. You can't reply via email, yet.
+-------------------------------------------------------------
+
+
+Please visit the topic if you want to unwatch it and stop email notifications.
+{{ emailBasePath }}/{{ notification.topic.uri }}
