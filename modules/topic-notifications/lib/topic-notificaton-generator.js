@@ -288,10 +288,10 @@ function generateEmailForNotification(notification) {
 
         var promise;
         var type;
-        if (notification.comment) {
+        if (notification.data.comment) {
           type = 'comment';
           promise = generateCommentNotification(emailAddress, notification);
-        } else if (notification.reply) {
+        } else if (notification.data.reply) {
           type = 'reply';
           promise = generateReplyNotification(emailAddress, notification);
         } else {
