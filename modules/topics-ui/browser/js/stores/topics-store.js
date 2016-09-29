@@ -261,10 +261,6 @@ export const TopicsLiveCollection = LiveCollection.extend({
     const topicId = router.get('topicId');
     const model = this.get(topicId);
     if(!model) { return; }
-    console.log('--- patch ---');
-
-    model.on('all', (t) => console.log(t));
-
     model.save({ text: model.get('text') }, { patch: true });
   },
 

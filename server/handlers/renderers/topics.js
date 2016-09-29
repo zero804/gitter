@@ -81,7 +81,6 @@ function renderForum(req, res, next, options) {
           categoryStore: forumCategoryStore(forum.categories, categoryName),
           tagStore: forumTagStore(forum.tags, tagName),
           topicsStore: forumTopicsStore(forum.topics, categoryName, tagName, filterName, sortName, context.user, createTopic),
-          newTopicStore: newTopicStore(),
           forumStore: forumStore(forum),
           accessTokenStore: accessTokenStore(context.accessToken),
           currentUserStore: currentUserStore(context.user),
