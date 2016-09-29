@@ -18,7 +18,7 @@ function makeHash() {
   return hash;
 }
 
-describe('CommentStrategy', function() {
+describe('CommentStrategy #slow', function() {
   var blockTimer = require('../../block-timer');
   before(blockTimer.on);
   after(blockTimer.off);
@@ -72,6 +72,7 @@ describe('CommentStrategy', function() {
           },
           sent: LONG_AGO,
           editedAt: null,
+          lastChanged: LONG_AGO,
           v: 1
         }])
       });
@@ -95,6 +96,7 @@ describe('CommentStrategy', function() {
             user: fixture.user1.id,
             sent: LONG_AGO,
             editedAt: null,
+            lastChanged: LONG_AGO,
             v: 1
           }],
           lookups: {
