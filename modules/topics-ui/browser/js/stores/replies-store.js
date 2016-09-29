@@ -99,7 +99,7 @@ export const RepliesStore = LiveCollection.extend({
   saveUpdatedModel({replyId}){
     const model = this.get(replyId);
     if(!model) { return; }
-    model.save();
+    model.save({ text: model.get('text') }, { patch: true });
   },
 
   onRequestSubscriptionStateUpdate({replyId}) {
