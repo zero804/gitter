@@ -1,8 +1,7 @@
 import _ from 'lodash';
 
-//Half a frame seems like a decent enough time
 //to batch events up
-const DELAY_TIME = 8;
+const DELAY_TIME = 4;
 const cache = new WeakMap();
 
 export default function dipatchOnChangeMixin(Constructor, evts) {
@@ -41,6 +40,9 @@ export default function dipatchOnChangeMixin(Constructor, evts) {
 
     //Get the ACTUAL function we want to unbind out of the cache
     const delayedCaller = cache.get(fn);
+
+    //Stop any further calls to the function
+    delayedCaller.cancel();
 
     //Unbind dem events, yo.
     this.stopListening(this, evts, delayedCaller, ctx);

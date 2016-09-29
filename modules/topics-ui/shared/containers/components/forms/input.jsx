@@ -12,7 +12,7 @@ export default React.createClass({
     onChange: PropTypes.func.isRequired,
     onFocus: PropTypes.func,
     onBlur: PropTypes.func,
-    valid: PropTypes.func
+    valid: PropTypes.bool
   },
 
   getDefaultProps(){

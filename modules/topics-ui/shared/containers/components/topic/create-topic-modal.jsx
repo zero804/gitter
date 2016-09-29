@@ -48,7 +48,7 @@ export default React.createClass({
     //This means an app wide refactor, im not doing that now
     //so we just slice "All Tags" out of here for now
     let cats = categories.slice(1);
-    cats.unshift({ value: null, label: 'Please select a category'})
+    cats.unshift({ value: '', label: 'Please select a category'})
 
     return (
       <Modal active={active} onClose={this.onClose}>

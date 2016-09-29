@@ -204,7 +204,6 @@ const TopicContainer = createClass({
         <TopicReplyList>
           {parsedReplies.map(this.getReplyListItem)}
         </TopicReplyList>
-        <TopicReplyListHeader replies={parsedReplies}/>
         <TopicReplyEditor
           user={currentUser}
           isSignedIn={isSignedIn}
