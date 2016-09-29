@@ -12,6 +12,7 @@
   "private": true,
   "dependencies": {
     "bluebird": "^3.2.1",
+    "debug": "^2.2.0",
     "gitter-web-env": "file:../env",
     "gitter-web-mailer": "file:../mailer",
     "gitter-web-persistence": "file:../persistence",
