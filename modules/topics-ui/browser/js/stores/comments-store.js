@@ -22,8 +22,8 @@ import {SUBMIT_NEW_COMMENT} from '../../../shared/constants/create-comment';
 export const CommentModel = BaseModel.extend({
   url(){
     return this.get('id') ?
-    `/api/v1/forums/${getForumId()}/topics/${router.get('topicId')}/replies/${this.get('replyId')}/comments`:
-    `/api/v1/forums/${getForumId()}/topics/${router.get('topicId')}/replies/${this.get('replyId')}/comments/${this.get('id')}`;
+    `/api/v1/forums/${getForumId()}/topics/${router.get('topicId')}/replies/${this.get('replyId')}/comments/${this.get('id')}`:
+    `/api/v1/forums/${getForumId()}/topics/${router.get('topicId')}/replies/${this.get('replyId')}/comments`;
   }
 });
 
@@ -76,6 +76,7 @@ export const CommentsStore = LiveCollection.extend({
       replyId: replyId,
       text: text,
       user: getCurrentUser(),
+      sent: new Date().toISOString(),
     })
   },
 
