@@ -9,9 +9,7 @@ export default React.createClass({
 
   displayName: 'TopicReplyListItem',
   propTypes: {
-    userId: PropTypes.string.isRequired,
-    forumId: PropTypes.string.isRequired,
-    topicId: PropTypes.string.isRequired,
+    user: PropTypes.object.isRequired,
     reply: PropTypes.shape({
       text: PropTypes.string,
       body: PropTypes.shape({
@@ -24,11 +22,16 @@ export default React.createClass({
       }).isRequired
 
     }).isRequired,
-    user: PropTypes.object.isRequired,
     onCommentsClicked: PropTypes.func.isRequired,
     onNewCommentUpdate: PropTypes.func.isRequired,
     submitNewComment: PropTypes.func.isRequired,
     newCommentContent: PropTypes.string,
+    onReplyEditUpdate: PropTypes.func.isRequired,
+    onReplyEditCancel: PropTypes.func.isRequired,
+    onReplyEditSaved: PropTypes.func.isRequired,
+    onCommentEditUpdate: PropTypes.func.isRequired,
+    onCommentEditCancel: PropTypes.func.isRequired,
+    onCommentEditSave: PropTypes.func.isRequired,
     onSubscribeButtonClick: PropTypes.func
   },
 
@@ -38,6 +41,14 @@ export default React.createClass({
     return (
       <FeedItem
         item={reply}
+        onChange={this.onReplyEditUpdate}
+        onCancel={this.onReplyEditCancel}
+        onSave={this.onReplyEditSaved}
+        primaryLabel="Likes"
+        primaryValue={10}
+        secondaryLabel="Comments"
+        secondaryValue={2}
+        onSecondaryClicked={this.onCommentsClicked}
         footerChildren={this.getFeedItemFooterChildren()}>
         {this.getComments()}
       </FeedItem>
@@ -97,7 +108,10 @@ export default React.createClass({
     return (
       <CommentItem
         key={`comment-list-item-${reply.id}-${index}`}
-        comment={comment} />
+        comment={comment}
+        onChange={this.onCommentEditUpdate.bind(this, comment.id)}
+        onCancel={this.onCommentEditCancel.bind(this, comment.id)}
+        onSave={this.onCommentEditSave.bind(this, comment.id, reply.id)}/>
     );
   },
 
@@ -119,5 +133,36 @@ export default React.createClass({
 
   submitNewComment(){
     this.props.submitNewComment();
-  }
+  },
+
+  onReplyEditUpdate(value){
+    const {reply} = this.props;
+    const {id} = reply;
+    this.props.onReplyEditUpdate(id, value);
+  },
+
+  onReplyEditCancel(){
+    const {reply} = this.props;
+    const {id} = reply;
+    this.props.onReplyEditCancel(id);
+  },
+
+  onReplyEditSaved(){
+    const {reply} = this.props;
+    const {id} = reply;
+    this.props.onReplyEditSaved(id)
+  },
+
+  onCommentEditUpdate(commentId, value){
+    this.props.onCommentEditUpdate(commentId, value);
+  },
+
+  onCommentEditCancel(commentId){
+    this.props.onCommentEditCancel(commentId);
+  },
+
+  onCommentEditSave(commentId, replyId){
+    this.props.onCommentEditSave(commentId, replyId);
+  },
+
 });
