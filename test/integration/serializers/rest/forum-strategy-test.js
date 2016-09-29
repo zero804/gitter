@@ -213,6 +213,7 @@ describe('ForumStrategy #slow', function() {
 
   it('should tell a user when they are an admin of the forum', function() {
     var strategy = ForumStrategy.permissions({
+      // this one sends the whole user
       currentUser: fixture.user1
     });
 
@@ -224,7 +225,8 @@ describe('ForumStrategy #slow', function() {
 
   it('should tell a user when they are NOT an admin of the forum', function() {
     var strategy = ForumStrategy.permissions({
-      currentUser: fixture.user2
+      // this one sends the user id
+      currentUserId: fixture.user2._id
     });
 
     return serializeObject(fixture.forum1, strategy)
