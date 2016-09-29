@@ -151,7 +151,6 @@ describe('forum-notification-events', function() {
             return forumNotificationEvents.createComment(fixture.comment1);
           })
           .then(function(userIds) {
-            userIds.sort();
             assert.deepEqual(userIds.map(String), [fixture.user1.id, fixture.user2.id]);
           });
       });

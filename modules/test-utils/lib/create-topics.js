@@ -12,6 +12,7 @@ function createTopic(fixtureName, f) {
 
   var title = f.title || fixtureUtils.generateName();
   var sent = f.sent || new Date();
+
   var doc = {
     title: title,
     slug: f.slug || slugify(title),
