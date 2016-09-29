@@ -123,8 +123,6 @@ export const TopicModel = BaseModel.extend({
     // We have to trigger here beacuse backbone will not pickup this change
     // event if we were to `[].concat(currentTags)` we still wouldn't get a
     // change event :(
-
-
       this.trigger('change:tags');
   },
 
@@ -166,8 +164,11 @@ export const TopicModel = BaseModel.extend({
     return errors.size ? errors : null;
   },
 
-  //TODO clean this, we shouldn't have to parse tags here
-  toJSON() {
+  url() {
+    return this.get('id') ? null : `/v1/forums/${getForumId()}/topics`;
+  },
+
+  toPOJO() {
     var data = this.attributes;
     data.tags = (data.tags || []);
     return Object.assign({}, data, {
@@ -177,7 +178,7 @@ export const TopicModel = BaseModel.extend({
 
   //Used when saving as we have to clean tags that have been parsed
   getDataToSave(){
-    const data = this.toJSON();
+    const data = this.toPOJO();
     const tags = (data.tags || []);
     const parsedTags = tags.map((t) => t.label);
 
@@ -389,7 +390,7 @@ export class TopicsStore {
   //Return all the viable models in the collection to the UI
   getTopics() {
     return this.collection.map(model => {
-      return parseTopic(model.toJSON());
+      return parseTopic(model.toPOJO());
     });
   }
 
@@ -413,7 +414,7 @@ export class TopicsStore {
   getById(id) {
     const model = this.collection.get(id);
     if(!model) { return; }
-    return parseTopic(model.toJSON());
+    return parseTopic(model.toPOJO());
   }
 
   //Whenevr the router updates make sure we have to
