@@ -23,6 +23,7 @@ var userScopes = require('gitter-web-identity/lib/user-scopes');
 var topicService = require('gitter-web-topics/lib/topic-service');
 var replyService = require('gitter-web-topics/lib/reply-service');
 var commentService = require('gitter-web-topics/lib/comment-service');
+var forumCategoryService = require('gitter-web-topics/lib/forum-category-service');
 
 var survivalMode = !!process.env.SURVIVAL_MODE || false;
 
@@ -314,6 +315,14 @@ function serializeCommentsForReplyId(replyId) {
     });
 }
 
+function serializeCategoriesForForumId(forumId) {
+  return forumCategoryService.findByForumId(forumId)
+    .then(function(categories) {
+      var strategy = new restSerializer.ForumCategoryStrategy();
+      return restSerializer.serialize(categories, strategy);
+    });
+}
+
 module.exports = {
   serializeTroupesForUser: serializeTroupesForUser,
   serializeChatsForTroupe: serializeChatsForTroupe,
@@ -334,4 +343,5 @@ module.exports = {
   serializeTopicsForForumId: serializeTopicsForForumId,
   serializeRepliesForTopicId: serializeRepliesForTopicId,
   serializeCommentsForReplyId: serializeCommentsForReplyId,
+  serializeCategoriesForForumId: serializeCategoriesForForumId
 }
