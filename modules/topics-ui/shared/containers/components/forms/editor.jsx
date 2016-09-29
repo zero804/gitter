@@ -22,14 +22,9 @@ export default React.createClass({
     return { autoFocus: false }
   },
 
-  getInitialState(){
-    return { value: this.props.value }
-  },
-
   render(){
 
-    const { className, name, placeholder, autoFocus, valid } = this.props;
-    const { value } = this.state;
+    const { className, name, value, placeholder, autoFocus, valid } = this.props;
     const compiledClass = classNames({
       editor: true,
       valid: (valid === true),
@@ -54,9 +49,7 @@ export default React.createClass({
 
   onChange(e){
     e.preventDefault();
-    const { value } = e.target;
-    this.setState({ value: value });
-    this.props.onChange(value);
+    this.props.onChange(e.target.value);
   },
 
   onClick() {
