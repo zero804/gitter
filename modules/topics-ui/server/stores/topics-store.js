@@ -52,7 +52,7 @@ module.exports = function topicsStore(models, category, tag, filter, sort, user,
 
   //Basic draft topic object
   const draftTopic = {
-    state: modelStates.DRAFT,
+    state: modelStates.MODEL_STATE_DRAFT,
     body: '',
     title: '',
     categoryId: '',
@@ -67,7 +67,7 @@ module.exports = function topicsStore(models, category, tag, filter, sort, user,
 
 
   //Get resource
-  const getTopics = () => models.filter((topic) => topic.state !== modelStates.DRAFT);
+  const getTopics = () => models.filter((topic) => topic.state !== modelStates.MODEL_STATE_DRAFT);
   const getById = function(id){
     var model = _.find(models, (model) => model.id === id);
     if(!model) { return; }

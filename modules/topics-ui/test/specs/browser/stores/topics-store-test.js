@@ -19,7 +19,7 @@ import {
 
 import {FILTER_BY_TOPIC} from '../../../../shared/constants/forum-filters';
 
-import {DRAFT, SYNCED} from '../../../../shared/constants/model-states';
+import {MODEL_STATE_DRAFT, MODEL_STATE_SYNCED} from '../../../../shared/constants/model-states';
 
 import injector from 'inject-loader!../../../../browser/js/stores/topics-store.js';
 const {TopicsStore, TopicModel} = injector({
@@ -117,14 +117,14 @@ describe('TopicsStore', () => {
 
   it('should create a new draft model when the router changed createTopic to true', () => {
     mockRouter.set({ createTopic: true });
-    const model = store.topicCollection.findWhere({ state: DRAFT });
+    const model = store.topicCollection.findWhere({ state: MODEL_STATE_DRAFT });
     assert(model);
   });
 
   it('should remove draft models the the router changes createTopic to false', () => {
     mockRouter.set({ createTopic: true });
     mockRouter.set({ createTopic: false });
-    const models = store.topicCollection.filter((model) => model.get('state') === DRAFT);
+    const models = store.topicCollection.filter((model) => model.get('state') === MODEL_STATE_DRAFT);
     assert.equal(models.length, 0);
   });
 
@@ -132,14 +132,14 @@ describe('TopicsStore', () => {
     mockRouter.set({ createTopic: true });
     const result = store.getTopics();
     result.forEach((model) => {
-      assert(model.state !== DRAFT, 'A model from getTopics is in a draft state');
+      assert(model.state !== MODEL_STATE_DRAFT, 'A model from getTopics is in a draft state');
     });
   });
 
   it('should return a sigular draft topic from getDraftTopic', () => {
     mockRouter.set({ createTopic: true });
     const result = store.getDraftTopic();
-    assert.equal(result.state, DRAFT);
+    assert.equal(result.state, MODEL_STATE_DRAFT);
   });
 
 });
@@ -159,7 +159,7 @@ describe('TopicModel', () => {
   });
 
   it('should have a default state of draft when created', () => {
-    assert.equal(model.get('state'), DRAFT);
+    assert.equal(model.get('state'), MODEL_STATE_DRAFT);
   });
 
   it('should update the title when the right action is fired', () => {
@@ -168,7 +168,7 @@ describe('TopicModel', () => {
   });
 
   it('should not update the title when the model is not in a draft state', () => {
-    model.set('state', SYNCED);
+    model.set('state', MODEL_STATE_SYNCED);
     dispatch(updateTitle('test'));
     assert.notEqual(model.get('title'), 'test');
   });
@@ -179,7 +179,7 @@ describe('TopicModel', () => {
   });
 
   it('should not update the body when the model is not in a draft state', () => {
-    model.set('state', SYNCED);
+    model.set('state', MODEL_STATE_SYNCED);
     dispatch(updateBody('test'));
     assert.notEqual(model.get('body'), 'test');
   });
@@ -190,7 +190,7 @@ describe('TopicModel', () => {
   });
 
   it('should not update the category id when the model is not in the draft state', () => {
-    model.set('state', SYNCED);
+    model.set('state', MODEL_STATE_SYNCED);
     dispatch(categoryUpdate('test'))
     assert.notEqual(model.get('categoryId'), 'test');
   });

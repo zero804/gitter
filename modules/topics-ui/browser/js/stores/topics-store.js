@@ -39,20 +39,20 @@ import {
   SUBSCRIPTION_STATE_PENDING
 } from '../../../shared/constants/forum.js';
 
-import {DRAFT, SYNCED} from '../../../shared/constants/model-states';
+import {MODEL_STATE_DRAFT, MODEL_STATE_SYNCED} from '../../../shared/constants/model-states';
 
 
 export const TopicModel = BaseModel.extend({
 
   defaults: {
-    state: DRAFT,
+    state: MODEL_STATE_DRAFT,
   },
 
   initialize(attrs = {}){
     //If the model is initialized by the application it will be in a draft state
     //In this case we need to setup listeners for the createTopic modal events
     //which will update the draft content
-    if(this.get('state') === DRAFT || attrs.state === DRAFT) {
+    if(this.get('state') === MODEL_STATE_DRAFT || attrs.state === MODEL_STATE_DRAFT) {
       this.listenToDraftUpdates();
     }
 
@@ -87,7 +87,7 @@ export const TopicModel = BaseModel.extend({
     this.clearSystemListeners();
     switch(this.get('state')) {
       //Initialize any draft listeners such that we can update the draft model
-    case DRAFT: return this.listenToDraftUpdates();
+    case MODEL_STATE_DRAFT: return this.listenToDraftUpdates();
     }
   },
 
@@ -152,7 +152,7 @@ export const TopicModel = BaseModel.extend({
     //Only check the text attribute if we are in a draft state
     //Otherwise we are probably getting something back from the server
     //and we certainly dont want the text attribute in that case
-    if(attributes.state === DRAFT && (!attributes.text || !attributes.text.length)) {
+    if(attributes.state === MODEL_STATE_DRAFT && (!attributes.text || !attributes.text.length)) {
       errors.set('text', 'A new Topic requires content');
     }
 
@@ -198,7 +198,7 @@ export const TopicModel = BaseModel.extend({
     return Object.assign({}, attrs, {
       //When we have received data from the server we can assume
       //that it is no longer a draft or has been edited
-      state: SYNCED,
+      state: MODEL_STATE_SYNCED,
       text: null
     });
   }
@@ -230,7 +230,7 @@ export const TopicsLiveCollection = LiveCollection.extend({
   //the snapshot has been handled. It would be much nicer to be able to pass remove: false
   //to this function to avoid this
   handleSnapshot(){
-    const draftModel = this.findWhere({ state: DRAFT });
+    const draftModel = this.findWhere({ state: MODEL_STATE_DRAFT });
     LiveCollection.prototype.handleSnapshot.apply(this, arguments);
     if(!draftModel) { return; }
     this.add(draftModel);
@@ -281,7 +281,7 @@ export const TopicsLiveCollection = LiveCollection.extend({
 
   //Remove a draft model
   removeDraftItems(){
-    const models = this.filter((model) => model.get('state') === DRAFT);
+    const models = this.filter((model) => model.get('state') === MODEL_STATE_DRAFT);
     this.remove(models);
   }
 
@@ -361,7 +361,7 @@ export class TopicsStore {
     return function(model){
 
       //Never show draft models
-      if(model.get('state') === DRAFT) { return false; }
+      if(model.get('state') === MODEL_STATE_DRAFT) { return false; }
 
       //filter by category
       const category = (model.get('category') || {});
@@ -397,7 +397,7 @@ export class TopicsStore {
   //Return a draft model to the UI as it is removed from teh filtered collection
   //we need an extra function
   getDraftTopic(){
-    const model = this.topicCollection.findWhere({ state: DRAFT });
+    const model = this.topicCollection.findWhere({ state: MODEL_STATE_DRAFT });
 
     //Return a sensible default
     if(!model) { return { title: '', text: '', categoryId: '', tags: [] } }
