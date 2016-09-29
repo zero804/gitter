@@ -102,8 +102,8 @@ export const TopicModel = BaseModel.extend({
   },
 
   //Change category
-  onCategoryUpdate(data){
-    this.set('categoryId', data.categoryId);
+  onCategoryUpdate({categoryId}){
+    this.set('categoryId', categoryId);
   },
 
   //Add tags
