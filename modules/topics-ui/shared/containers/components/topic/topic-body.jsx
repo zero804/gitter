@@ -35,7 +35,6 @@ export default React.createClass({
           {this.getContent()}
           <footer className="topic-body__footer">
             <button className="topic-body__footer__action">Share</button>
-            <button className="topic-body__footer__action">Watch</button>
             {this.getEditButton()}
             <WatchButton
               subscriptionState={subscriptionState}
