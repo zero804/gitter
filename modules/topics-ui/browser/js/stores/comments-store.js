@@ -32,7 +32,7 @@ export const CommentsStore = LiveCollection.extend({
   model: CommentModel,
   client: getRealtimeClient(),
   urlTemplate: '/v1/forums/:forumId/topics/:topicId/replies/:replyId/comments',
-  events: ['change:text'],
+  events: ['change:text', 'change:body' ],
 
   getContextModel(){
     return new Backbone.Model({
