@@ -1,4 +1,4 @@
-import assert from 'assert';
+import assert, { ok } from 'assert';
 
 //Mocks
 import topics from '../../../mocks/mock-data/topics';
@@ -40,7 +40,7 @@ describe('TopicsStore', () => {
     const result = store.getTopics();
     assert(result.length);
     result.forEach((m) => {
-      var category = m.get('category');
+      var category = m.category;
       assert(category);
       assert.strictEqual(category.slug, 'test-1')
     });
@@ -61,8 +61,10 @@ describe('TopicsStore', () => {
     const result = store.getTopics();
     assert(result.length !== topics.length);
     result.forEach((m) => {
-      var tags = m.get('tags');
-      assert(tags.includes('2'), 'tags dont include 2');
+      var tags = m.tags;
+      ok(tags.some((tag) => {
+        return tag.value === '2';
+      }), 'tags dont include 2');
     });
   });
 
