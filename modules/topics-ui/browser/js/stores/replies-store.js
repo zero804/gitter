@@ -11,7 +11,7 @@ import {getRealtimeClient} from './realtime-client';
 import parseReply from '../../../shared/parse/reply';
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
 
-import {DRAFT} from '../../../shared/constants/model-states';
+import {MODEL_STATE_DRAFT} from '../../../shared/constants/model-states';
 import {NAVIGATE_TO_TOPIC} from '../../../shared/constants/navigation';
 import {SUBMIT_NEW_REPLY} from '../../../shared/constants/create-reply';
 import {UPDATE_REPLY, CANCEL_UPDATE_REPLY, SAVE_UPDATE_REPLY} from '../../../shared/constants/topic';
@@ -72,7 +72,7 @@ export const RepliesStore = LiveCollection.extend({
       text: data.body,
       user: getCurrentUser(),
       sent: new Date().toISOString(),
-      state: DRAFT
+      state: MODEL_STATE_DRAFT
     });
   },
 

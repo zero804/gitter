@@ -1,6 +1,6 @@
 import Backbone from 'backbone';
 import {LiveCollection} from 'gitter-realtime-client';
-import {DRAFT} from '../../../shared/constants/model-states';
+import {MODEL_STATE_DRAFT} from '../../../shared/constants/model-states';
 
 export default LiveCollection.extend({
 
@@ -14,7 +14,7 @@ export default LiveCollection.extend({
   //already have a model in the collection so return that
   //so it can be populated
   findModelForOptimisticMerge(){
-    const model = this.findWhere({ state: DRAFT });
+    const model = this.findWhere({ state: MODEL_STATE_DRAFT });
     return model;
   },
 

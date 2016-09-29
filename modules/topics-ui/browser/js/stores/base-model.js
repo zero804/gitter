@@ -1,6 +1,6 @@
 import Backbone from 'backbone';
 import SyncMixin from '../utils/sync-mixin';
-import {SYNCED} from '../../../shared/constants/model-states';
+import {MODEL_STATE_SYNCED} from '../../../shared/constants/model-states';
 
 export const BaseModel = Backbone.Model.extend({
   /**
@@ -18,7 +18,7 @@ export const BaseModel = Backbone.Model.extend({
     //when we get data from the server we need to wipe this out
     return Object.assign({}, res, {
       text: null,
-      state: SYNCED
+      state: MODEL_STATE_SYNCED
     });
   },
 
