@@ -2,39 +2,44 @@ import React, { PropTypes } from 'react';
 import ReactDom from 'react-dom';
 import classnames from 'classnames';
 
+import * as reactionConstants from '../../../constants/reactions';
+
 export default React.createClass({
 
   displayName: 'RawReactionButton',
   propTypes: {
     className: PropTypes.string,
+    ownStateClassName: PropTypes.string,
     children:  React.PropTypes.oneOfType([
       PropTypes.arrayOf(React.PropTypes.node),
       PropTypes.node
     ]),
-    reactionList: PropTypes.arrayOf(React.PropTypes.shape({
-      key: PropTypes.string,
-      label: PropTypes.string
-    })),
-    onClick: PropTypes.func,
-    onBlur: PropTypes.func,
+    reactionCountMap: PropTypes.object,
+    ownReactionMap: PropTypes.object,
     onReactionPick: PropTypes.func
   },
 
   getDefaultProps() {
     return {
-      className: 'reaction-button'
+      className: 'reaction-button',
+      reactionCountMap: {},
+      ownReactionMap: {}
     };
   },
 
   render() {
-    const { children, className } = this.props;
+    const { children, className, ownStateClassName, reactionCountMap, ownReactionMap } = this.props;
 
-    // TODO: Hook up to API
-    const likeReactionCount = 2;
+    const likeReactionCount = reactionCountMap[reactionConstants.LIKE] || 0;
+
+    const compiledClassName = classnames({
+      [className]: true,
+      [ownStateClassName]: ownReactionMap[reactionConstants.LIKE]
+    })
 
     return (
       <button
-        className={className}
+        className={compiledClassName}
         onClick={this.onClick}>
         {children || `👍 ${likeReactionCount}`}
       </button>
@@ -42,7 +47,7 @@ export default React.createClass({
   },
 
   onClick(e) {
-    this.onReactionClick('like');
+    this.onReactionClick(reactionConstants.LIKE);
     e.preventDefault();
   },
 

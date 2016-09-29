@@ -6,10 +6,12 @@ export default React.createClass({
   displayName: 'ReactionButton',
   propTypes: {
     className: PropTypes.string,
-    children:  React.PropTypes.oneOfType([
-      React.PropTypes.arrayOf(React.PropTypes.node),
-      React.PropTypes.node
+    children:  PropTypes.oneOfType([
+      PropTypes.arrayOf(PropTypes.node),
+      PropTypes.node
     ]),
+    reactionCountMap: PropTypes.object,
+    ownReactionMap: PropTypes.object,
     onReactionPick: PropTypes.func
   },
 
@@ -22,13 +24,16 @@ export default React.createClass({
   },
 
   render() {
-    const { children, className } = this.props;
+    const { children, className, reactionCountMap, ownReactionMap } = this.props;
 
     return (
       <RawReactionButton
         className={className}
+        ownStateClassName="has-reaction"
         children={children}
         onBlur={this.onBlur}
+        reactionCountMap={reactionCountMap}
+        ownReactionMap={ownReactionMap}
         onReactionPick={this.onReactionPick} />
     );
   },

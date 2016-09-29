@@ -1,14 +1,20 @@
 import Backbone from 'backbone';
+import {subscribe} from '../../../shared/dispatcher';
 import {getRealtimeClient} from './realtime-client';
-import {getForumId} from './forum-store';
 import LiveCollection from './live-collection';
 import { BaseModel } from './base-model';
+
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
-import {subscribe} from '../../../shared/dispatcher';
-import {SHOW_REPLY_COMMENTS} from '../../../shared/constants/topic';
-import router from '../routers';
-import {SUBMIT_NEW_COMMENT} from '../../../shared/constants/create-comment';
+import onReactionsUpdateMixin from './mixins/on-reactions-update';
+
+import {getForumId} from './forum-store';
 import {getCurrentUser} from './current-user-store';
+import router from '../routers';
+
+import { SHOW_REPLY_COMMENTS } from '../../../shared/constants/topic';
+import { SUBMIT_NEW_COMMENT } from '../../../shared/constants/create-comment';
+import { UPDATE_COMMENT_REACTIONS } from '../../../shared/constants/forum.js';
+
 
 export const CommentModel = BaseModel.extend({
   url(){
@@ -32,6 +38,7 @@ export const CommentsStore = LiveCollection.extend({
   initialize(){
     subscribe(SHOW_REPLY_COMMENTS, this.onRequestNewComments, this);
     subscribe(SUBMIT_NEW_COMMENT, this.onSubmitNewComment, this);
+    subscribe(UPDATE_COMMENT_REACTIONS, this.onReactionsUpdate, this);
     this.listenTo(router, 'change:topicId', this.onTopicIdUpdate, this);
   },
 
@@ -67,6 +74,7 @@ export const CommentsStore = LiveCollection.extend({
 });
 
 dispatchOnChangeMixin(CommentsStore);
+onReactionsUpdateMixin(CommentsStore, 'onReactionsUpdate');
 
 let store;
 

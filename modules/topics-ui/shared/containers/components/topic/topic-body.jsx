@@ -33,6 +33,8 @@ export default React.createClass({
             <ReactionButton
               key="reactions"
               className="topic-body__footer__reaction-action"
+              reactionCountMap={topic.reactionCounts}
+              ownReactionMap={topic.ownReactions}
               onReactionPick={this.onReactionPick}/>
             <WatchButton
               subscriptionState={subscriptionState}

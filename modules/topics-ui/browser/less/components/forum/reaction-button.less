@@ -1,3 +1,4 @@
+@import (reference) "../../colors.less";
 @import (reference) "../topic/feed-item.less";
 
 
@@ -26,6 +27,10 @@
   	animation-name: reaction-button-pulse;
   	animation-duration: .4s;
   	animation-timing-function: ease-in;
+  }
+
+  &.has-reaction {
+    background-color: fade(@caribbean, 20%);
   }
 }
 
