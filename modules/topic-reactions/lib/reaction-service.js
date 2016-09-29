@@ -7,6 +7,19 @@ var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var validReactions = require('./valid-reactions');
 var StatusError = require('statuserror');
 
+function processReactionCounts(reactionCounts) {
+  if (!reactionCounts) return {};
+
+  for(var k in reactionCounts) {
+    var val = reactionCounts[k];
+    if(val === 0 && reactionCounts.hasOwnProperty(k)) {
+      delete reactionCounts[k];
+    }
+  }
+
+  return reactionCounts;
+}
+
 function listReactions(forumObject) {
   var Model = forumObject.type.model;
   var query = forumObject.getQuery();
@@ -15,13 +28,7 @@ function listReactions(forumObject) {
     .select({ _id: 0, reactionCounts: 1 })
     .exec()
     .then(function(doc) {
-      var reactionCounts = doc && doc.reactionCounts;
-
-      if (reactionCounts) {
-        return reactionCounts;
-      }
-
-      return null;
+      return processReactionCounts(doc && doc.reactionCounts);
     });
 }
 
@@ -39,13 +46,11 @@ function updateReactionTotals(forumObject, reaction, inc) {
     .select({ _id: 0, reactionCounts: 1 })
     .exec()
     .then(function(doc) {
-      var reactionCounts = doc && doc.reactionCounts;
+      var reactionCounts = processReactionCounts(doc && doc.reactionCounts);
 
-      if (reactionCounts) {
-        forumObject.liveCollectionPatch({
-          reactions: reactionCounts
-        });
-      }
+      forumObject.liveCollectionPatch({
+        reactions: reactionCounts
+      });
 
       return reactionCounts;
     });
