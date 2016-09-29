@@ -44,11 +44,11 @@ function syncMixinFactory(apiClient) {
       var promise = performAction(m, url, model, options);
 
       if(options.success) {
-        promise.then(options.success);
+        promise = promise.then(options.success);
       }
 
       if(options.error) {
-        promise.catch(options.error); // Backbone will trigger the 'error' event
+        promise = promise.catch(options.error); // Backbone will trigger the 'error' event
       }
 
       model.trigger('request', model, null, _.extend({}, options, {
