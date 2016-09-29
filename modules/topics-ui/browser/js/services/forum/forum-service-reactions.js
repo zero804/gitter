@@ -27,7 +27,6 @@ const generateRequestReactionUpdateCallback = function(action) {
     const params = getForumIdParams(data);
     const reactionsEndpoint = urlJoin(generateForumApiEndpointUrl(params), 'reactions');
     const {
-      userId,
       topicId,
       replyId,
       commentId
