@@ -1,9 +1,10 @@
-import { Collection, Model } from 'backbone';
+import { Collection } from 'backbone';
 import { UPDATE_ACTIVE_CATEGORY } from '../../../shared/constants/forum-categories';
 import router from '../routers/index';
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
+import { BaseModel } from './base-model';
 
-var CategoryModel = Model.extend({
+var CategoryModel = BaseModel.extend({
   defaults: { category: null },
 });
 
@@ -15,7 +16,7 @@ export const ForumCategoryStore = Collection.extend({
   },
 
   getCategories: function() {
-    return this.models.map(model => model.toJSON());
+    return this.map(model => model.toPOJO());
   },
 
   getActiveCategoryName(){
@@ -40,7 +41,7 @@ export const ForumCategoryStore = Collection.extend({
   getById(id){
     const model = this.get(id);
     if(!model) { return; }
-    return model.toJSON();
+    return model.toPOJO();
   }
 
 });
