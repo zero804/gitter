@@ -60,6 +60,10 @@ return Promise.join(
     //var forumUrl = '/v1/forums/' + forumId;
     //client.subscribe(forumUrl, messageHandler(forumUrl));
 
+    var categoriesUri = '/v1/forums/' + forumId + '/categories';
+    registerSnapshotHandler(client, categoriesUri);
+    client.subscribe(categoriesUri, messageHandler(categoriesUri));
+
     var topicsUri = '/v1/forums/' + forumId + '/topics';
     registerSnapshotHandler(client, topicsUri, {
       sort: { repliesTotal: 1 }

@@ -42,7 +42,6 @@ describe('forum-with-policy-service #slow', function() {
       category: 'category1',
       topic: 'topic1'
     },
-    /*
     comment1: {
       user: 'user1',
       forum: 'forum1',
@@ -50,7 +49,6 @@ describe('forum-with-policy-service #slow', function() {
       topic: 'topic1',
       reply: 'reply1'
     }
-    */
   });
 
   var ForumWithPolicyService = testRequire.withProxies('./services/forum-with-policy-service', {
@@ -58,7 +56,8 @@ describe('forum-with-policy-service #slow', function() {
       setForumTags: function() {}
     },
     'gitter-web-topics/lib/forum-category-service': {
-      createCategory: function() {}
+      createCategory: function() {},
+      updateCategory: function() {}
     },
     'gitter-web-topics/lib/topic-service': {
       createTopic: function() {},
@@ -72,7 +71,8 @@ describe('forum-with-policy-service #slow', function() {
       updateReply: function() {}
     },
     'gitter-web-topics/lib/comment-service': {
-      createComment: function() {}
+      createComment: function() {},
+      updateComment: function() {}
     },
     'gitter-web-topic-notifications/lib/subscriber-service': {
       listForItem: function() {},
@@ -227,6 +227,16 @@ describe('forum-with-policy-service #slow', function() {
   makeChecks('updateReply', function() { return [fixture.reply1, {}]; }, {
     admin: true,
     owner: true
+  });
+
+  makeChecks('updateComment', function() { return [fixture.comment1, {}]; }, {
+    admin: true,
+    owner: true
+  });
+
+  makeChecks('updateCategory', function() { return [fixture.category1, {}]; }, {
+    admin: true,
+    owner: false // skip
   });
 
   makeChecks('listSubscribers', function() { return [{forumId: fixture.forum1.id}, {}]; }, {
