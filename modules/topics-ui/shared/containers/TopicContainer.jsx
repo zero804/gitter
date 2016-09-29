@@ -133,6 +133,7 @@ const TopicContainer = createClass({
 
   //TODO We need to cache this result somewhere
   //otherwise this is going to get very time consuming
+  //https://github.com/troupe/gitter-webapp/issues/2186
   getParsedReplies(){
     const {repliesStore, commentsStore, forumStore, currentUserStore} = this.props;
     const forum = forumStore.getForum();
