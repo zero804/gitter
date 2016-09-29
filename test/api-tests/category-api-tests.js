@@ -85,6 +85,13 @@ describe('category-api', function() {
       });
   });
 
+  it('PATCH /v1/forums/:forumId/categories/:categoryId with an empty body', function() {
+    return request(app)
+      .patch('/v1/forums/' + fixture.forum1.id + '/categories/' + fixture.category2.id)
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200);
+  });
+
   it('POST /v1/forums/:forumId/categories', function() {
     return request(app)
       .post('/v1/forums/' + fixture.forum1.id + '/categories')
