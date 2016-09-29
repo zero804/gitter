@@ -112,13 +112,13 @@ function srcSetForUser(user, size) {
 
   if (typeof window !== 'undefined') {
     // fallback for retina displays without srcset support (e.g native android webviews)
-    options.srcSize = size * (window.devicePixelRatio || 1);
+    options.srcSize = size * (window.devicePixelRatio || 1); // eslint-disable-line no-undef
   }
 
-  if (url.hostname == 'pbs.twimg.com') {
+  if (url.hostname === 'pbs.twimg.com') {
     return getSrcSetForTwitterUrl(url, options);
 
-  } else if (url.hostname == 'media.licdn.com') {
+  } else if (url.hostname === 'media.licdn.com') {
     return getSrcSetForLinkedInUrl(url, options);
 
   } else {

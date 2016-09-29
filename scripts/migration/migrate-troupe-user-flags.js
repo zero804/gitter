@@ -4,7 +4,7 @@
 
 var persistence = require('gitter-web-persistence');
 var roomMembershipFlags = require('../../server/services/room-membership-flags');
-var onMongoConnect = require('../../server/utils/on-mongo-connect');
+var onMongoConnect = require('gitter-web-persistence-utils/lib/on-mongo-connect');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var through2Concurrent = require('through2-concurrent');
 var BatchStream = require('batch-stream');

@@ -5,29 +5,28 @@ var _ = require('lodash');
 var topicService = require('gitter-web-topics/lib/topic-service');
 var TopicStrategy = require('../topic-strategy');
 
-function TopicsForForumStrategy(/*options*/) {
+function TopicsForForumStrategy(options) {
+  // TODO: default to default filter & sort options from somewhere?
+  this.topicsFilterSort = options && options.topicsFilterSort;
+
   this.topicsByForum = null;
   this.topicStrategy = null;
 }
 
 TopicsForForumStrategy.prototype = {
   preload: function(forumIds) {
-    // TODO: filter & sort based on passed in options or defaults
-    var options = {
-      // filter: {}
-      // sort: {}
-    };
-    return topicService.findByForumIds(forumIds.toArray(), options)
+    return topicService.findByForumIds(forumIds.toArray(), this.topicsFilterSort)
       .bind(this)
       .then(function(topics) {
         this.topicsByForum = _.groupBy(topics, 'forumId');
 
-        var topicStrategy = this.topicStrategy = TopicStrategy.standard();
-        return topicStrategy.preload(Lazy(topics));
+        return this.topicStrategy.preload(Lazy(topics));
       });
   },
 
   map: function(forumId) {
+    // TODO: should we return some out of band data about the filter&sort?
+
     var topics = this.topicsByForum[forumId];
     if (!topics || !topics.length) return [];
 
@@ -39,6 +38,21 @@ TopicsForForumStrategy.prototype = {
 
   name: 'TopicsForForumStrategy'
 };
+
+
+TopicsForForumStrategy.standard = function(options) {
+  var strategy = new TopicsForForumStrategy({
+    topicsFilterSort: options && options.topicsFilterSort
+  });
+
+  var currentUserId = options && options.currentUserId;
+
+  strategy.topicStrategy = TopicStrategy.standard({
+    currentUserId: currentUserId
+  });
+
+  return strategy;
+}
 
 
 module.exports = TopicsForForumStrategy;

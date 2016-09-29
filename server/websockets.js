@@ -11,7 +11,7 @@ var appVersion = require('gitter-app-version');
 var http = require('http');
 var shutdown = require('shutdown');
 var serverStats = require('./utils/server-stats');
-var onMongoConnect = require('./utils/on-mongo-connect');
+var onMongoConnect = require('gitter-web-persistence-utils/lib/on-mongo-connect');
 
 winston.info("Starting http/ws service");
 

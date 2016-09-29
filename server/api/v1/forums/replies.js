@@ -1,6 +1,5 @@
 "use strict";
 
-var Promise = require('bluebird');
 var StatusError = require('statuserror');
 var internalClientAccessOnly = require('../../../web/middlewares/internal-client-access-only');
 var replyService = require('gitter-web-topics/lib/reply-service');
@@ -8,6 +7,8 @@ var ForumWithPolicyService = require('../../../services/forum-with-policy-servic
 var restSerializer = require('../../../serializers/rest-serializer');
 var restful = require('../../../services/restful');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var SubscribersResource = require('./subscribers-resource');
+var ForumObject = require('gitter-web-topic-notifications/lib/forum-object');
 
 
 function getReplyOptions(body) {
@@ -24,15 +25,14 @@ module.exports = {
 
   index: function(req) {
     var topic = req.topic;
-
-    return restful.serializeRepliesForTopicId(topic._id);
+    var userId = req.user && req.user._id;
+    return restful.serializeRepliesForTopicId(topic._id, userId);
   },
 
   show: function(req) {
     var reply = req.reply;
-    var strategy = new restSerializer.ReplyStrategy({
-      includeComments: true,
-      includeCommentsTotals: true,
+    var strategy = restSerializer.ReplyStrategy.nested({
+      currentUserId: req.user && req.user._id
     });
     return restSerializer.serializeObject(reply, strategy);
   },
@@ -61,12 +61,21 @@ module.exports = {
     var forumWithPolicyService = new ForumWithPolicyService(forum, user, policy);
     return forumWithPolicyService.createReply(topic, replyOptions)
       .then(function(reply) {
-        var replyStrategy = new restSerializer.ReplyStrategy();
-        return restSerializer.serializeObject(reply, replyStrategy);
+        var strategy = restSerializer.ReplyStrategy.standard({
+          currentUserId: req.user && req.user._id
+        });
+
+        return restSerializer.serializeObject(reply, strategy);
       });
   },
 
   subresources: {
     'comments': require('./comments'),
+    'subscribers': new SubscribersResource({
+      id: 'replySubscriber',
+      getForumObject: function(req) {
+        return ForumObject.createForReply(req.forum._id, req.topic._id, req.reply._id);
+      }
+    })
   },
 };

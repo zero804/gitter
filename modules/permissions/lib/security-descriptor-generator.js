@@ -170,6 +170,11 @@ function generateGroupSecurityDescriptor(user, options) {
       isPublic = false;
       break;
 
+    case 'INHERITED':
+      members = 'INVITE_OR_ADMIN';
+      isPublic = false;
+      break;
+
     default:
       throw new StatusError(500, 'Unknown security type: ' + options.security);
   }

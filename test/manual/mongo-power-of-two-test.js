@@ -2,7 +2,7 @@
 
 var speedy = require("speedy");
 var mongoose = require('gitter-web-mongoose-bluebird');
-var onMongoConnect = require('../../server/utils/on-mongo-connect');
+var onMongoConnect = require('gitter-web-persistence-utils/lib/on-mongo-connect');
 var async = require('async');
 
 // speedy.samples(10);
