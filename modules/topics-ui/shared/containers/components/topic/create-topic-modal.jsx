@@ -23,7 +23,7 @@ export default React.createClass({
 
     newTopic: PropTypes.shape({
       title: PropTypes.string.isRequired,
-      body: PropTypes.string.isRequired,
+      text: PropTypes.string.isRequired,
       categoryId: PropTypes.string.isRequired,
       tags: PropTypes.arrayOf(PropTypes.shape({
         label: PropTypes.string.isRequired,
@@ -41,7 +41,7 @@ export default React.createClass({
 
   render(){
     const { active, categories, tagValues, newTopic } = this.props;
-    const { title, body, categoryId, validationError } = newTopic;
+    const { title, text, categoryId, validationError } = newTopic;
     const errors = (validationError || new Map());
 
     //We need to sort out how we format categories
@@ -79,9 +79,9 @@ export default React.createClass({
           {this.getTagsRow()}
           <Editor
             className="create-topic__editor--body"
-            valid={!errors.get('body')}
-            name="body"
-            value={body}
+            valid={!errors.get('text')}
+            name="text"
+            value={text}
             placeholder="Type here. Use Markdown, BBCode, or html to format."
             onChange={this.onBodyChange}/>
 
