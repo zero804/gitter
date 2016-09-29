@@ -27,7 +27,8 @@ describe('ForumCategoryStrategy', function() {
         assertUtils.assertSerializedEqual(s, [{
           id: category.id,
           name: category.name,
-          slug: category.slug
+          slug: category.slug,
+          v: 1
         }])
       });
   });

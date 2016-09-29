@@ -207,11 +207,11 @@ ForumWithPolicyService.prototype.updateComment = secureMethod([matchForum, allow
 /**
  * Category update
  */
-ForumWithPolicyService.prototype.updateCategory = matchForum(secureMethod([allowAdmin], function(category, fields) {
+ForumWithPolicyService.prototype.updateCategory = secureMethod([matchForum, allowAdmin], function(category, fields) {
   var user = this.user;
 
   return forumCategoryService.updateCategory(user, category, fields)
-}));
+});
 
 /**
  * Subscription bits
