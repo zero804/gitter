@@ -111,7 +111,7 @@ export default React.createClass({
         comment={comment}
         onChange={this.onCommentEditUpdate.bind(this, comment.id)}
         onCancel={this.onCommentEditCancel.bind(this, comment.id)}
-        onSave={this.onCommentEditSave.bind(this, comment.id)}/>
+        onSave={this.onCommentEditSave.bind(this, comment.id, reply.id)}/>
     );
   },
 
@@ -161,8 +161,8 @@ export default React.createClass({
     this.props.onCommentEditCancel(commentId);
   },
 
-  onCommentEditSave(commentId){
-    this.props.onCommentEditSave(commentId);
+  onCommentEditSave(commentId, replyId){
+    this.props.onCommentEditSave(commentId, replyId);
   },
 
 });

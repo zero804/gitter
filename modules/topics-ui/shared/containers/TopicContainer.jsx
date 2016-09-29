@@ -360,8 +360,8 @@ const TopicContainer = createClass({
     dispatch(updateCancelComment(commentId));
   },
 
-  onCommentEditSave(commentId){
-    dispatch(updateSaveComment(commentId));
+  onCommentEditSave(commentId, replyId){
+    dispatch(updateSaveComment(commentId, replyId));
   },
 
   onTopicEditUpdate(value){
