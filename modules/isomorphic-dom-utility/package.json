@@ -1,0 +1,11 @@
+{
+  "name": "gitter-web-isomorphic-dom-utility",
+  "version": "0.1.0",
+  "description": "",
+  "private": true,
+  "main": "dom-utility.js",
+  "browser": "browser-dom-utility.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}

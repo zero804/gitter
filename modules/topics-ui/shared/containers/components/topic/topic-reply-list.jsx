@@ -16,7 +16,9 @@ export default React.createClass({
     onReplyCommentsClicked: PropTypes.func.isRequired,
     onNewCommentUpdate: PropTypes.func.isRequired,
     submitNewComment: PropTypes.func.isRequired,
-    onItemSubscribeButtonClick: PropTypes.func
+    onReplySubscribeButtonClick: PropTypes.func,
+    onReplyReactionPick: PropTypes.func,
+    onCommentReactionPick: PropTypes.func,
   },
 
   render(){
@@ -33,7 +35,17 @@ export default React.createClass({
   },
 
   buildReplyListItem(reply, index) {
-    const {userId, forumId, topicId, newCommentContent, user, onItemSubscribeButtonClick} = this.props;
+    const {
+      userId,
+      forumId,
+      topicId,
+      newCommentContent,
+      user,
+      onReplySubscribeButtonClick,
+      onReplyReactionPick,
+      onCommentReactionPick
+    } = this.props;
+
     return (
       <li key={`reply-list-item-${index}`}>
         <TopicReplyListItem
@@ -46,7 +58,9 @@ export default React.createClass({
           submitNewComment={this.submitNewComment}
           onNewCommentUpdate={this.onNewCommentUpdate}
           onCommentsClicked={this.onReplyCommentsClicked}
-          onSubscribeButtonClick={onItemSubscribeButtonClick}/>
+          onSubscribeButtonClick={onReplySubscribeButtonClick}
+          onReplyReactionPick={onReplyReactionPick}
+          onCommentReactionPick={onCommentReactionPick} />
       </li>
     );
   },
