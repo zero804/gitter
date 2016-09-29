@@ -18,6 +18,7 @@ import {
 } from '../../../shared/constants/topic';
 
 import {SUBMIT_NEW_COMMENT} from '../../../shared/constants/create-comment';
+import {DRAFT} from '../../../shared/constants/model-states';
 
 export const CommentModel = BaseModel.extend({
   url(){
@@ -77,6 +78,7 @@ export const CommentsStore = LiveCollection.extend({
       text: text,
       user: getCurrentUser(),
       sent: new Date().toISOString(),
+      state: DRAFT
     })
   },
 

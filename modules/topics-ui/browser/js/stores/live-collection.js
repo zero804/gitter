@@ -1,5 +1,6 @@
 import Backbone from 'backbone';
 import {LiveCollection} from 'gitter-realtime-client';
+import {DRAFT} from '../../../shared/constants/model-states';
 
 export default LiveCollection.extend({
 
@@ -7,6 +8,14 @@ export default LiveCollection.extend({
     this.contextModel = this.getContextModel(attrs);
     attrs.listen = true;
     LiveCollection.prototype.constructor.apply(this, [models, attrs]);
+  },
+
+  //When we get a model back from the socket we may
+  //already have a model in the collection so return that
+  //so it can be populated
+  findModelForOptimisticMerge(){
+    const model = this.findWhere({ state: DRAFT });
+    return model;
   },
 
   getContextModel() {
