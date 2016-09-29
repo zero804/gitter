@@ -93,7 +93,7 @@ const TopicContainer = createClass({
     topicsStore.onChange(this.updateTopics, this);
 
     newCommentStore.onChange(this.updateNewComment, this);
-    newReplyStore.on('change:text', this.updateNewReplyContent, this);
+    newReplyStore.onChange(this.updateNewReplyContent, this);
   },
 
 
@@ -107,7 +107,7 @@ const TopicContainer = createClass({
     topicsStore.removeListeners(this.updateTopics, this);
 
     newCommentStore.removeListeners(this.updateNewComment, this);
-    newReplyStore.off('change:text', this.updateNewReplyContent, this);
+    newReplyStore.removeListeners(this.updateNewReplyContent, this);
   },
 
   getInitialState() {
@@ -284,11 +284,10 @@ const TopicContainer = createClass({
     }));
   },
 
-  updateReplyContent(){
+  updateNewReplyContent(){
     const {newReplyStore} = this.props;
-    const newReplyContent = newReplyStore.get('text');
     this.setState((state) => Object.assign(state, {
-      newReplyContent: newReplyContent,
+      newReplyContent: newReplyStore.getTextContent(),
     }));
   },
 
