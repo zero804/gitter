@@ -35,7 +35,6 @@ export const RepliesStore = LiveCollection.extend({
   model: ReplyModel,
   client: getRealtimeClient(),
   urlTemplate: '/v1/forums/:forumId/topics/:topicId/replies',
-  events: [ 'change:text' ],
 
   getContextModel(){
     return new Backbone.Model({
@@ -125,7 +124,8 @@ export const RepliesStore = LiveCollection.extend({
 
 dispatchOnChangeMixin(RepliesStore, [
   'change:subscriptionState',
-  'change:text'
+  'change:text',
+  'change:body'
 ]);
 
 const serverStore = (window.context.repliesStore|| {});
