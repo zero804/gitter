@@ -330,7 +330,16 @@ module.exports = Backbone.Model.extend({
 
     this.forumCategoryCollection.reset();
     if(this.get('state') === 'org' && forumId) {
-      this.forumCategoryCollection.fetch();
+      this.forumCategoryCollection.fetch()
+        .bind(this)
+        .then(function() {
+          var currentGroup = this.getCurrentGroup();
+          if(currentGroup) {
+            this.forumCategoryCollection.models.forEach(function(model) {
+              model.set('groupUri', currentGroup.get('uri'));
+            });
+          }
+        })
     }
   }
 
