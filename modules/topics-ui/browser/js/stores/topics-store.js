@@ -26,7 +26,7 @@ export const TopicModel = BaseModel.extend({
     return this.get('id') ? null : `/v1/forums/${getForumId()}/topics`;
   },
 
-  toJSON() {
+  toPOJO() {
     var data = this.attributes;
     data.tags = (data.tags || []);
     return Object.assign({}, data, {
@@ -34,8 +34,8 @@ export const TopicModel = BaseModel.extend({
     });
   },
 
-  getDataToSave() {
-    const data = this.toJSON();
+  toJSON() {
+    const data = this.toPOJO();
     const tags = (data.tags || []);
     const parsedTags = tags.map((t) => t.label);
 
@@ -150,14 +150,14 @@ export class TopicsStore {
 
   getTopics() {
     return this.collection.map(model => {
-      return parseTopic(model.toJSON());
+      return parseTopic(model.toPOJO());
     });
   }
 
   getById(id) {
     const model = this.collection.get(id);
     if(!model) { return; }
-    return parseTopic(model.toJSON());
+    return parseTopic(model.toPOJO());
   }
 
   onRouterUpdate() {

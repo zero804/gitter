@@ -45,12 +45,12 @@ export const RepliesStore = LiveCollection.extend({
   getById(id) {
     const model = this.get(id);
     if(!model) { return; }
-    return parseReply(model.toJSON());
+    return parseReply(model.toPOJO());
   },
 
   getReplies(){
     return this.models.map(model => {
-      return parseReply(model.toJSON());
+      return parseReply(model.toPOJO());
     });
   },
 
