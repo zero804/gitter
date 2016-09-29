@@ -12,11 +12,6 @@ export default LiveCollection.extend({
 
   getContextModel(){
     return new Backbone.Model();
-  },
-
-  findModelForOptimisticMerge(){
-    const model = this.findWhere({ state: DRAFT });
-    return model;
   }
 
 });

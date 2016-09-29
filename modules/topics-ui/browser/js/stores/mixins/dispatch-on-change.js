@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 //to batch events up
-const DELAY_TIME = 4;
+const DELAY_TIME = 8;
 const cache = new WeakMap();
 
 export default function dipatchOnChangeMixin(Constructor, evts) {

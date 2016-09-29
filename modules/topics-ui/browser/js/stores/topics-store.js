@@ -46,17 +46,19 @@ export const TopicModel = BaseModel.extend({
 
   defaults: {
     state: DRAFT,
-    title: '',
-    body: '',
+    //title: '',
+    text: '',
     categoryId: '',
     tags: [],
   },
 
-  initialize(){
+  initialize(attrs = {}){
     //If the model is initialized by the application it will be in a draft state
     //In this case we need to setup listeners for the createTopic modal events
     //which will update the draft content
-    if(this.get('state') === DRAFT) { this.listenToDraftUpdates(); }
+    if(this.get('state') === DRAFT || attrs.state === DRAFT) {
+      this.listenToDraftUpdates();
+    }
 
     //When this model is saved/edited we need to clear out all listeners and
     //add any newly appropriate ones like updating content etc
@@ -204,6 +206,14 @@ export const TopicsLiveCollection = LiveCollection.extend({
     return new Backbone.Model({
       forumId: getForumId()
     });
+  },
+
+  //When we get a model back from the socket we may
+  //already have a model in the collection so return that
+  //so it can be populated
+  findModelForOptimisticMerge(){
+    const model = this.findWhere({ state: DRAFT });
+    return model;
   },
 
   initialize(){
