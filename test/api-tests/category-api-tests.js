@@ -45,7 +45,8 @@ describe('category-api', function() {
         assert.deepStrictEqual(category, {
           id: category.id,
           name: category.name,
-          slug: category.slug
+          slug: category.slug,
+          v: 1
         });
       });
   });
@@ -60,7 +61,8 @@ describe('category-api', function() {
         assert.deepStrictEqual(category, {
           id: fixture.category1.id,
           name: fixture.category1.name,
-          slug: fixture.category1.slug
+          slug: fixture.category1.slug,
+          v: 1
         });
       });
   });
