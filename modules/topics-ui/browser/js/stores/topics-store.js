@@ -149,7 +149,10 @@ export const TopicModel = BaseModel.extend({
       errors.set('title', 'A new Topic requires a title');
     }
 
-    if(!attributes.text || !attributes.text.length) {
+    //Only check the text attribute if we are in a draft state
+    //Otherwise we are probably getting something back from the server
+    //and we certainly dont want the text attribute in that case
+    if(attributes.state === DRAFT && (!attributes.text || !attributes.text.length)) {
       errors.set('text', 'A new Topic requires content');
     }
 
@@ -258,7 +261,11 @@ export const TopicsLiveCollection = LiveCollection.extend({
     const topicId = router.get('topicId');
     const model = this.get(topicId);
     if(!model) { return; }
-    model.save({ text: model.get('text') });
+    console.log('--- patch ---');
+
+    model.on('all', (t) => console.log(t));
+
+    model.save({ text: model.get('text') }, { patch: true });
   },
 
   //If a user visits or returns from /create-topic we must either:
