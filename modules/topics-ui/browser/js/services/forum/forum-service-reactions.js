@@ -25,7 +25,7 @@ const generateRequestReactionUpdateCallback = function(action) {
 
     // Figure out the API endpoint we should post/delete on
     const params = getForumIdParams(data);
-    const subscribersEndpoint = urlJoin(generateForumApiEndpointUrl(params), 'reactions');
+    const reactionsEndpoint = urlJoin(generateForumApiEndpointUrl(params), 'reactions');
     const {
       userId,
       topicId,
@@ -40,7 +40,7 @@ const generateRequestReactionUpdateCallback = function(action) {
     return Promise.try(() => {
       // Requested to subscribe to the entity
       if(isReacting) {
-        return apiClient.post(subscribersEndpoint, requestOptions)
+        return apiClient.post(reactionsEndpoint, requestOptions)
           .then(() => {
             // Let the stores know about the response data
             dispatch(action(topicId, replyId, commentId, reactionKey, true));
@@ -48,7 +48,7 @@ const generateRequestReactionUpdateCallback = function(action) {
       }
       // Requested to unsubscribe from the entity
       else {
-        return apiClient.delete(urlJoin(subscribersEndpoint, userId), requestOptions)
+        return apiClient.delete(urlJoin(reactionsEndpoint, reactionKey), requestOptions)
           .then(() => {
             // Let the stores know about the response data
             dispatch(action(topicId, replyId, commentId, reactionKey, false));
