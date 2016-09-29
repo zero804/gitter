@@ -5,28 +5,14 @@ const onReactionsUpdate = function({ entityId, replyId, commentId, reactionKey, 
   const entity = this.collection.get(id);
   if(!entity) { return; }
 
-  if(isReacting) {
-    const reactionCounts = entity.get('reactionCounts') || {};
-    const ownReactions = entity.get('ownReactions') || {};
-    const existingCount = reactionCounts[reactionKey] || 0;
+  const ownReactions = entity.get('ownReactions') || {};
 
-    let newCount = existingCount;
-    if(isReacting === true && ownReactions[reactionKey] === false) {
-      newCount += 1;
-    }
-    else if(isReacting === false && ownReactions[reactionKey] === true) {
-      newCount -= 1;
-    }
-
-    entity.set({
-      reactionCounts: _.extend({}, reactionCounts, {
-        [reactionKey]: newCount
-      }),
-      ownReactions: _.extend({}, ownReactions, {
-        [reactionKey]: isReacting
-      })
-    });
-  }
+  entity.set({
+    // `reactionCounts` is handled in the live-collection
+    ownReactions: _.extend({}, ownReactions, {
+      [reactionKey]: isReacting
+    })
+  });
 }
 
 
