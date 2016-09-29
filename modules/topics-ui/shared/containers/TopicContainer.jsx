@@ -123,7 +123,6 @@ const TopicContainer = createClass({
   getParsedTopic(){
     const { topicId, topicsStore, forumStore, currentUserStore } = this.props;
     const topic = topicsStore.getById(topicId);
-    //console.log(topic);
     const forum = forumStore.getForum();
     const currentUser = currentUserStore.getCurrentUser();
     return Object.assign({}, topic, {
@@ -161,9 +160,10 @@ const TopicContainer = createClass({
 
   render(){
 
-    const { categoryStore, currentUserStore, tagStore, groupUri} = this.props;
-    const {forumId, forumSubscriptionState, newReplyContent} = this.state;
+    const { categoryStore, currentUserStore, tagStore, groupUri, newReplyStore} = this.props;
+    const {forumId, forumSubscriptionState } = this.state;
 
+    const newReplyContent = newReplyStore.getTextContent();
     const topic = this.getParsedTopic();
     const parsedReplies = this.getParsedReplies();
 
@@ -248,12 +248,10 @@ const TopicContainer = createClass({
     const isSignedIn = currentUserStore.getIsSignedIn();
 
     if(isSignedIn) {
-      dispatch(submitNewReply(newReplyStore.get('text')));
-      //Clear input
-      newReplyStore.clear();
-      this.setState((state) => Object.assign(state, {
-        newReplyContent: '',
-      }));
+      const text = newReplyStore.get('text');
+      //Never submit blank content
+      if(!text) { return; }
+      dispatch(submitNewReply(text));
     }
 
     else {
@@ -286,10 +284,7 @@ const TopicContainer = createClass({
   },
 
   updateNewReplyContent(){
-    const {newReplyStore} = this.props;
-    this.setState((state) => Object.assign(state, {
-      newReplyContent: newReplyStore.getTextContent(),
-    }));
+    this.forceUpdate();
   },
 
   updateReplies(){
@@ -334,10 +329,10 @@ const TopicContainer = createClass({
 
   submitNewComment(){
     const {newCommentStore} = this.props;
-    dispatch(submitNewComment(
-      newCommentStore.get('replyId'),
-      newCommentStore.get('text')
-    ));
+    const text = newCommentStore.get('text');
+    //Dont submit blank content
+    if(!text) { return; }
+    dispatch(submitNewComment(newCommentStore.get('replyId'), text ));
   },
 
 

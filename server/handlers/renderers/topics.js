@@ -17,6 +17,7 @@ var repliesStore = require('gitter-web-topics-ui/server/stores/replies-store');
 var currentUserStore = require('gitter-web-topics-ui/server/stores/current-user-store');
 var commentsStore = require('gitter-web-topics-ui/server/stores/comments-store');
 var newCommentStore = require('gitter-web-topics-ui/server/stores/new-comment-store');
+var newReplyStore = require('gitter-web-topics-ui/server/stores/new-reply-store');
 
 var navConstants = require('gitter-web-topics-ui/shared/constants/navigation');
 
@@ -161,6 +162,7 @@ function renderTopic(req, res, next) {
           forumStore: forumStore(forum),
           commentsStore: commentsStore([]),
           newCommentStore: newCommentStore(),
+          newReplyStore: newReplyStore(),
         }
       });
     })
