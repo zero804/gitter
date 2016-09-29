@@ -61,8 +61,6 @@ export const TopicModel = BaseModel.extend({
     //When this model is saved/edited we need to clear out all listeners and
     //add any newly appropriate ones like updating content etc
     this.listenTo(this, 'change:state', this.onChangeState, this);
-
-    this.listenTo(this, 'all', (t) => console.log(t));
   },
 
 
