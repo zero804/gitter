@@ -24,6 +24,7 @@ module.exports = Marionette.ItemView.extend({
 
   initialize: function() {
     this.listenTo(this.model, 'change:focus', this.onModelChangeFocus, this);
+    this.listenTo(this.model, 'change:groupUri', this.render, this);
   },
 
   serializeData: function() {
@@ -41,12 +42,12 @@ module.exports = Marionette.ItemView.extend({
     }
   },
 
-  focusElement: function (){
+  focusElement: function() {
     this.el.classList.add('focus');
     this.ui.link.focus();
   },
 
- blurElement: function (){
+  blurElement: function() {
     this.el.classList.remove('focus');
     this.ui.link.blur();
   },
