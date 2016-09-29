@@ -7,13 +7,20 @@
   font-family: @font-family;
 }
 
+
+.topic-body__content--editor {
+  width: 100%;
+  height: 40rem;
+  margin-left: 0;
+}
+
 .topic-body__footer {
   display: flex;
   flex-direction: row-reverse;
 }
 
 .topic-body__footer__action {
-  &:extend(.secondary-button-jaffa--small);
+  &:extend(.secondary-button-jaffa--small all);
   padding-left: 1.5em;
   padding-right: 1.5em;
 }
