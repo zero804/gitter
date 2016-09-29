@@ -44,14 +44,6 @@ import {DRAFT, SYNCED} from '../../../shared/constants/model-states';
 
 export const TopicModel = BaseModel.extend({
 
-  defaults: {
-    state: DRAFT,
-    //title: '',
-    text: '',
-    categoryId: '',
-    tags: [],
-  },
-
   initialize(attrs = {}){
     //If the model is initialized by the application it will be in a draft state
     //In this case we need to setup listeners for the createTopic modal events
@@ -142,8 +134,8 @@ export const TopicModel = BaseModel.extend({
   //so we derive a different url respectively
   url(){
     return this.get('id') ?
-    `/api/v1/forums/${getForumId()}/topics/${this.get('id')}`:
-    `/api/v1/forums/${getForumId()}/topics`;
+    `/v1/forums/${getForumId()}/topics/${this.get('id')}`:
+    `/v1/forums/${getForumId()}/topics`;
   },
 
   validate(attributes){
@@ -164,14 +156,21 @@ export const TopicModel = BaseModel.extend({
     return errors.size ? errors : null;
   },
 
-  url() {
-    return this.get('id') ? null : `/v1/forums/${getForumId()}/topics`;
-  },
-
   toPOJO() {
+
+    //Default values to pass to a react component
+    const defaults = {
+      state: DRAFT,
+      title: '',
+      text: '',
+      categoryId: '',
+      tags: [],
+    };
+
     var data = this.attributes;
     data.tags = (data.tags || []);
-    return Object.assign({}, data, {
+
+    return Object.assign({}, defaults, data, {
       tags: data.tags.map(parseTag)
     });
   },
