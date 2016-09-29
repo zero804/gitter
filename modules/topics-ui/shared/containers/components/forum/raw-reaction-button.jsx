@@ -1,5 +1,4 @@
 import React, { PropTypes } from 'react';
-import ReactDom from 'react-dom';
 import classnames from 'classnames';
 
 import * as reactionConstants from '../../../constants/reactions';

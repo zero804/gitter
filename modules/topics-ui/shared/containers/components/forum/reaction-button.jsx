@@ -31,7 +31,6 @@ export default React.createClass({
         className={className}
         ownStateClassName="has-reaction"
         children={children}
-        onBlur={this.onBlur}
         reactionCountMap={reactionCountMap}
         ownReactionMap={ownReactionMap}
         onReactionPick={this.onReactionPick} />
