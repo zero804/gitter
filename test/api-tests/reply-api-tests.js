@@ -99,6 +99,7 @@ describe('reply-api', function() {
       .expect(200)
       .then(function(result) {
         var reply = result.body;
+        assert.strictEqual(reply.subscribed, true);
         assert.strictEqual(reply.body.text, 'I am a reply.');
       });
   });

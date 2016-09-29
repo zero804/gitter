@@ -57,11 +57,40 @@ describe('ReplyStrategy #slow', function() {
     }
   });
 
-  it('should serialize a reply', function() {
+  it('should serialize a reply without a userId', function() {
     var strategy = ReplyStrategy.standard();
 
     var reply = fixture.reply1;
     var user = fixture.user1;
+
+    return serialize([reply], strategy)
+      .then(function(s) {
+        assertUtils.assertSerializedEqual(s, [{
+          id: reply.id,
+          body: {
+            text: reply.text,
+            html: reply.html
+          },
+          user: {
+            id: user.id,
+            username: user.username,
+            displayName: user.displayName,
+            avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
+          },
+          commentsTotal: 1,
+          sent: LONG_AGO,
+          editedAt: null,
+          lastChanged: LONG_AGO,
+          v: 1
+        }])
+      });
+  });
+
+  it('should serialize a reply with a userId', function() {
+    var reply = fixture.reply1;
+    var user = fixture.user1;
+
+    var strategy = ReplyStrategy.standard({ currentUserId: user._id });
 
     return serialize([reply], strategy)
       .then(function(s) {
@@ -82,18 +111,46 @@ describe('ReplyStrategy #slow', function() {
           sent: LONG_AGO,
           editedAt: null,
           lastChanged: LONG_AGO,
-          lastModified: LONG_AGO,
           v: 1
         }])
       });
   });
 
-  it('should serialize a reply with nested comments', function() {
-    var strategy = ReplyStrategy.nested();
+  it('should serialize a reply without a userId', function() {
+    var reply = fixture.reply1;
+    var user = fixture.user1;
 
+    var strategy = ReplyStrategy.standard();
+
+    return serialize([reply], strategy)
+      .then(function(s) {
+        assertUtils.assertSerializedEqual(s, [{
+          id: reply.id,
+          body: {
+            text: reply.text,
+            html: reply.html
+          },
+          user: {
+            id: user.id,
+            username: user.username,
+            displayName: user.displayName,
+            avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
+          },
+          commentsTotal: 1,
+          sent: LONG_AGO,
+          editedAt: null,
+          lastChanged: LONG_AGO,
+          v: 1
+        }])
+      });
+  });
+
+  it('should serialize a reply with nested comments with a userId', function() {
     var user = fixture.user1;
     var reply = fixture.reply1;
     var comment = fixture.comment1;
+
+    var strategy = ReplyStrategy.nested({ currentUserId: user._id });
 
     return serialize([reply], strategy)
       .then(function(s) {
@@ -124,13 +181,60 @@ describe('ReplyStrategy #slow', function() {
             },
             sent: LONG_AGO,
             editedAt: null,
+            lastChanged: LONG_AGO,
             v: 1
           }],
           commentsTotal: 1,
           sent: LONG_AGO,
           editedAt: null,
           lastChanged: LONG_AGO,
-          lastModified: LONG_AGO,
+          v: 1
+        }])
+      });
+  });
+
+  it('should serialize a reply with nested comments without a userId', function() {
+    var user = fixture.user1;
+    var reply = fixture.reply1;
+    var comment = fixture.comment1;
+
+    var strategy = ReplyStrategy.nested({ });
+
+    return serialize([reply], strategy)
+      .then(function(s) {
+        assertUtils.assertSerializedEqual(s, [{
+          id: reply.id,
+          body: {
+            text: reply.text,
+            html: reply.html
+          },
+          user: {
+            id: user.id,
+            username: user.username,
+            displayName: user.displayName,
+            avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
+          },
+          comments: [{
+            id: comment.id,
+            body: {
+              text: comment.text,
+              html: comment.html,
+            },
+            user: {
+              id: user.id,
+              username: user.username,
+              displayName: user.displayName,
+              avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
+            },
+            sent: LONG_AGO,
+            editedAt: null,
+            lastChanged: LONG_AGO,
+            v: 1
+          }],
+          commentsTotal: 1,
+          sent: LONG_AGO,
+          editedAt: null,
+          lastChanged: LONG_AGO,
           v: 1
         }])
       });
@@ -152,12 +256,10 @@ describe('ReplyStrategy #slow', function() {
               html: reply.html
             },
             user: fixture.user1.id,
-            subscribed: false,
             commentsTotal: 1,
             sent: LONG_AGO,
             editedAt: null,
             lastChanged: LONG_AGO,
-            lastModified: LONG_AGO,
             v: 1
           }],
           lookups: {

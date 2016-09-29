@@ -130,10 +130,9 @@ function updateRepliesTotal(topicId) {
       }
 
       // if this update won, then patch the live collection with the latest
-      // lastChanged & lastModified values and also the new total replies.
+      // lastChanged values and also the new total replies.
       liveCollections.topics.emit('patch', topic.forumId, topicId, {
         lastChanged: nowString,
-        lastModified: nowString,
         repliesTotal: topic.repliesTotal
       })
     })
@@ -189,22 +188,7 @@ function createReply(user, topic, options) {
     });
 }
 
-/* private */
-function makeTopicUpdater(topicId, lastModified) {
-  return function() {
-    var query = {
-      _id: topicId
-    };
-    var update = {
-      $max: {
-        lastModified: lastModified
-      }
-    };
-    return Topic.findOneAndUpdate(query, update, { new: true })
-      .lean()
-      .exec();
-  };
-}
+var updateTopicLastModified = mongooseUtils.makeLastModifiedUpdater(Topic);
 
 /* private */
 function updateReplyFields(topicId, replyId, fields) {
@@ -219,11 +203,12 @@ function updateReplyFields(topicId, replyId, fields) {
       lastModified: lastModified
     }
   };
-  var updateTopicLastModified = makeTopicUpdater(topicId, lastModified);
   return Reply.findOneAndUpdate(query, update, { new: true })
     .lean()
     .exec()
-    .tap(updateTopicLastModified);
+    .tap(function() {
+      return updateTopicLastModified(topicId, lastModified);
+    });
 }
 
 function updateReply(user, reply, fields) {
@@ -262,11 +247,6 @@ function updateReply(user, reply, fields) {
       // Might as well issue an update rather than a patch because almost the
       // entire thing changed.
       liveCollections.replies.emit('update', updatedReply);
-
-      // The topic was updated at the same time as the reply
-      liveCollections.topics.emit('patch', forumId, topicId, {
-        lastModified: updatedReply.lastModified.toISOString(),
-      });
 
       return updatedReply;
     });
