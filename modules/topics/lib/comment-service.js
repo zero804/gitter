@@ -122,7 +122,6 @@ function updateCommentsTotal(topicId, replyId) {
         // if the topic update won, patch the topics live collection
         liveCollections.topics.emit('patch', topic.forumId, topicId, {
           lastChanged: nowString,
-          lastModified: nowString,
         });
       } else {
         debug('We lost the topic update race.');
@@ -141,7 +140,6 @@ function updateCommentsTotal(topicId, replyId) {
         // if the reply update won, patch the replies live collection
         liveCollections.replies.emit('patch', reply.forumId, reply.topicId, replyId, {
           lastChanged: nowString,
-          lastModified: nowString,
           commentsTotal: reply.commentsTotal
         });
       } else {
@@ -164,6 +162,10 @@ function createComment(user, reply, options) {
   };
 
   var insertData = validateComment(data);
+
+  // make these all be the exact same instant
+  insertData.sent = insertData.lastChanged = insertData.lastModified = new Date();
+
   return processText(options.text)
     .then(function(parsedMessage) {
       insertData.html = parsedMessage.html;
@@ -198,22 +200,8 @@ function createComment(user, reply, options) {
     });
 }
 
-/* private */
-function makeLastModifiedUpdater(Model, id, lastModified) {
-  return function() {
-    var query = {
-      _id: id
-    };
-    var update = {
-      $max: {
-        lastModified: lastModified
-      }
-    };
-    return Model.findOneAndUpdate(query, update, { new: true })
-      .lean()
-      .exec();
-  };
-}
+var updateTopicLastModified = mongooseUtils.makeLastModifiedUpdater(Topic);
+var updateReplyLastModified = mongooseUtils.makeLastModifiedUpdater(Reply);
 
 /* private */
 function updateCommentFields(topicId, replyId, commentId, fields) {
@@ -223,15 +211,19 @@ function updateCommentFields(topicId, replyId, commentId, fields) {
     _id: commentId
   };
   var update = {
-    $set: fields
+    $set: fields,
+    $max: {
+      lastModified: lastModified
+    }
   };
-  var updateTopicLastModified = makeLastModifiedUpdater(Topic, topicId, lastModified);
-  var updateReplyLastModified = makeLastModifiedUpdater(Reply, replyId, lastModified);
   return Comment.findOneAndUpdate(query, update, { new: true })
     .lean()
     .exec()
-    .tap(updateReplyLastModified)
-    .tap(updateTopicLastModified);
+    .tap(function() {
+      return Promise.join(
+        updateReplyLastModified(commentId, lastModified),
+        updateTopicLastModified(commentId, lastModified));
+    });
 }
 
 function updateComment(user, comment, fields) {
@@ -262,8 +254,6 @@ function updateComment(user, comment, fields) {
       });
     })
     .then(function(updatedComment) {
-      this.updatedComment = updatedComment;
-
       stats.event('update_topic_comment', {
         userId: userId,
         forumId: forumId,
@@ -274,25 +264,12 @@ function updateComment(user, comment, fields) {
 
       liveCollections.comments.emit('update', updatedComment);
 
-      // load the reply's lastModified date so we can patch the topic&reply
-      // collections.
-      return Reply.findById(replyId, { lastModified: true });
-    })
-    .then(function(reply) {
-      // The topic and reply were updated at the same time
-      liveCollections.topics.emit('patch', forumId, topicId, {
-        lastModified: reply.lastModified.toISOString(),
-      });
-
-      liveCollections.replies.emit('patch', forumId, topicId, replyId, {
-        lastModified: reply.lastModified.toISOString(),
-      });
-
-      return this.updatedComment;
+      return updatedComment;
     });
 }
 
 module.exports = {
+  findById: findById,
   findByReplyId: findByReplyId,
   findByReplyIds: findByReplyIds,
   findTotalByReplyId: findTotalByReplyId,

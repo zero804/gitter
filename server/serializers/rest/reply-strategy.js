@@ -70,7 +70,6 @@ ReplyStrategy.prototype = {
       sent: formatDate(reply.sent),
       editedAt: formatDate(reply.editedAt),
       lastChanged: formatDate(reply.lastChanged),
-      lastModified: formatDate(reply.lastModified),
       v: getVersion(reply)
     };
   },
@@ -101,10 +100,14 @@ ReplyStrategy.standard = function(options) {
     lookups: options && options.lookups
   });
 
-  strategy.subscriptionStrategy = new ReplySubscriptionStrategy({
-    currentUserId: currentUserId
-  });
   strategy.userStrategy = UserIdStrategy.slim();
+
+  if (currentUserId) {
+    strategy.subscriptionStrategy = new ReplySubscriptionStrategy({
+      currentUserId: currentUserId
+    });
+  }
+
   return strategy;
 }
 

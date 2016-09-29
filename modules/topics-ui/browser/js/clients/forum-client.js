@@ -25,13 +25,16 @@ import apiClient from '../utils/api-client';
 // Takes an action-creator to dispatch
 const generateRequestSubscriptionUpdateCallback = function(action) {
   return function(data) {
-    const {
-      topicId = router.get('topicId'),
+    let {
+      topicId,
       replyId,
       isSubscribed
     } = data;
     const { id: userId } = getCurrentUser();
     const forumId = getForumId();
+    if(replyId && !topicId) {
+      topicId = router.get('topicId');
+    }
 
     // Figure out the API endpoint we should post/delete on
     var subscribersEndpoint = urlJoin('/v1/forums/', forumId);

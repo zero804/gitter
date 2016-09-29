@@ -63,19 +63,12 @@ describe('replies-live-collection #slow', function() {
       })
       .then(checkEvent)
       .then(function(event) {
-        // the patch event must also contain lastModified
-        assert.ok(event.model.lastModified);
-
         return replyService.findById(fixture.reply1._id)
           .then(function(reply) {
-            // lastChanged & lastModified must now match the one we got in the
-            // patch event.
+            // lastChanged must now match the one we got in the patch event.
             assert.ok(reply.lastChanged);
-            assert.ok(reply.lastModified);
             var lastChanged = new Date(event.model.lastChanged);
-            var lastModified = new Date(event.model.lastModified);
             assert.strictEqual(reply.lastChanged.getTime(), lastChanged.getTime());
-            assert.strictEqual(reply.lastModified.getTime(), lastModified.getTime());
           });
       });
   });
@@ -99,9 +92,8 @@ describe('replies-live-collection #slow', function() {
       })
       .then(checkEvent)
       .then(function(event) {
-        // the patch event must also contain editedAt & lastModified
+        // the patch event must also contain editedAt
         assert.ok(event.model.editedAt);
-        assert.ok(event.model.lastModified);
       });
   });
 });
