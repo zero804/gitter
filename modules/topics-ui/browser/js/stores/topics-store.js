@@ -61,6 +61,8 @@ export const TopicModel = BaseModel.extend({
     //When this model is saved/edited we need to clear out all listeners and
     //add any newly appropriate ones like updating content etc
     this.listenTo(this, 'change:state', this.onChangeState, this);
+
+    this.listenTo(this, 'all', (t) => console.log(t));
   },
 
 
@@ -68,7 +70,7 @@ export const TopicModel = BaseModel.extend({
   //Typically found in the create-topic-modal used to make new topics
   listenToDraftUpdates(){
     subscribe(TITLE_UPDATE, this.onTitleUpdate, this);
-    subscribe(BODY_UPDATE, this.onBodyUpdate, this);
+    subscribe(BODY_UPDATE, this.onBodyTextUpdate, this);
     subscribe(CATEGORY_UPDATE, this.onCategoryUpdate, this);
     subscribe(TAGS_UPDATE, this.onTagsUpdate, this);
     subscribe(SUBMIT_NEW_TOPIC, this.onRequestSave, this);
@@ -79,7 +81,7 @@ export const TopicModel = BaseModel.extend({
   //you can craete new topics without updating the wrong model as that would be silly...
   clearSystemListeners(){
     unsubscribe(TITLE_UPDATE, this.onTitleUpdate, this);
-    unsubscribe(BODY_UPDATE, this.onBodyUpdate, this);
+    unsubscribe(BODY_UPDATE, this.onBodyTextUpdate, this);
     unsubscribe(CATEGORY_UPDATE, this.onCategoryUpdate, this);
     unsubscribe(TAGS_UPDATE, this.onTagsUpdate, this);
     unsubscribe(SUBMIT_NEW_TOPIC, this.onRequestSave, this);
@@ -99,8 +101,8 @@ export const TopicModel = BaseModel.extend({
   },
 
   //Update the models body
-  onBodyUpdate(data){
-    this.set('body', data.body);
+  onBodyTextUpdate({body}){
+    this.set('text', body);
   },
 
   //Change category
@@ -153,8 +155,8 @@ export const TopicModel = BaseModel.extend({
       errors.set('title', 'A new Topic requires a title');
     }
 
-    if(!attributes.body.length) {
-      errors.set('body', 'A new Topic requires content');
+    if(!attributes.text.length) {
+      errors.set('text', 'A new Topic requires content');
     }
 
     if(!attributes.categoryId.length) {
@@ -311,8 +313,8 @@ export class TopicsStore {
       this.trigger('change:title', model, val, options);
     });
 
-    this.listenTo(this.topicCollection, 'change:body', (model, val, options) => {
-      this.trigger('change:body', model, val, options);
+    this.listenTo(this.topicCollection, 'change:text', (model, val, options) => {
+      this.trigger('change:text', model, val, options);
     });
 
     this.listenTo(this.topicCollection, 'change:categoryId', (model, val, options) => {
@@ -444,7 +446,7 @@ dispatchOnChangeMixin(TopicsStore, [
   'change:text',
   'change:subscriptionState',
   'change:title',
-  'change:body',
+  'change:text',
   'change:categoryId',
   'change:tags',
   'invalid'
