@@ -127,7 +127,13 @@ export const TopicModel = BaseModel.extend({
   },
 
   onRequestSave() {
-    this.listenTo(this, 'all', (t) => console.log(t));
+    //When we have saved back to the server then we need to change route
+    //we do this here by triggering this event
+    this.listenTo(this, 'sync', function(){
+      this.trigger(TOPIC_CREATED, this.get('id'), this.get('slug'));
+    });
+
+    //Save the model back to the server
     this.save();
   },
 
@@ -142,8 +148,6 @@ export const TopicModel = BaseModel.extend({
 
   validate(attributes){
     let errors = new Map();
-
-    console.log(attributes);
 
     if(!attributes.title.length) {
       errors.set('title', 'A new Topic requires a title');
@@ -301,9 +305,6 @@ export class TopicsStore {
     this.listenTo(this.collection, 'all', (type, collection, val) => {
       this.trigger(type, collection, val);
     });
-
-    this.listenTo(this.topicCollection, 'all', (t) => console.log(t));
-
 
     //Proxy up events from a draft model that is being updated
     this.listenTo(this.topicCollection, 'change:title', (model, val, options) => {

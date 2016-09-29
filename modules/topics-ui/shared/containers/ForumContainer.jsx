@@ -203,9 +203,9 @@ const ForumContainer = React.createClass({
     dispatch(submitNewTopic());
   },
 
-  onTopicCreated(data){
+  onTopicCreated(topicId, slug){
     const {groupUri} = this.props;
-    dispatch(navigateToTopic(groupUri, data.topicId, data.slug));
+    dispatch(navigateToTopic(groupUri, topicId, slug));
   },
 
   onForumUpdate() {
@@ -245,7 +245,6 @@ const ForumContainer = React.createClass({
   },
 
   onCreateTopicChange(){
-    console.log('FIRING');
     const {router} = this.props;
     this.setState((state) => Object.assign(state, {
       createTopic: router.get('createTopic')
