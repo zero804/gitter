@@ -100,6 +100,7 @@ export default React.createClass({
   },
 
   onSaveClicked(e){
+    const {content} = this.props;
     e.preventDefault();
     this.props.onSave();
   }
