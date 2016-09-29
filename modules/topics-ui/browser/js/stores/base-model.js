@@ -1,32 +1,15 @@
 import Backbone from 'backbone';
-import $ from 'jquery';
-import {getAccessToken} from './access-token-store';
+import SyncMixin from '../utils/sync-mixin';
 
 export const BaseModel = Backbone.Model.extend({
-
-  //This is here whilst we have to parse out tags for saving
-  //It will go away
-  getDataToSave(){
+  /**
+   * Return a simple pojo of the object used for
+   * presenting a view to a user
+   */
+  toPOJO() {
+    // By default, toPOJO is the same as toJSON
+    // but ancestor classes can override it
     return this.toJSON();
   },
-
-  sync(method, model, options){
-
-    //Need to abstract and pull in the apiClient here so this is a bodge
-    const headers = { "x-access-token": getAccessToken() }
-    const data = JSON.stringify(this.getDataToSave());
-
-    if(method === 'create') {
-      $.ajax({
-        url: model.url(),
-        contentType: 'application/json',
-        type: 'POST',
-        headers: headers,
-        data: data,
-        success: options.success,
-        error: options.error
-      });
-    }
-
-  }
+  sync: SyncMixin.sync
 });
