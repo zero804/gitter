@@ -27,7 +27,6 @@ export default React.createClass({
 
     const compiledClass = classNames({
       input: true,
-      //valid: (valid === true),
       invalid: (valid === false),
     }, className);
 
