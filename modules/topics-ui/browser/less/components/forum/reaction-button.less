@@ -1,15 +1,10 @@
-
-@reaction-popover-transform-align-value: translateX(-50%) translateY(calc(-100% ~"-" .3rem));
-
-.reaction-button-wrapper {
-  position: relative;
-  display: inline-block;
-}
+@import (reference) "../topic/feed-item.less";
 
 
 .reaction-button {
   .m-details-text();
 
+  display: inline-block;
   vertical-align: middle;
   padding: .2em .5em;
   background-color: transparent;
@@ -38,76 +33,4 @@
 	50% {
   		box-shadow: 0 0 0 .5em rgba(0, 0, 0, .03);
 	}
-}
-
-
-
-
-.reaction-popover {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform:@reaction-popover-transform-align-value;
-
-  background-color: rgba(0, 0, 0, .75);
-  border-radius: .3rem;
-
-  transition:
-    opacity .2s ease,
-    transform .2s ease;
-
-	animation-name: reaction-pop;
-	animation-duration: .4s;
-	animation-timing-function: ease-in;
-
-  &.hidden {
-    visibility: hidden;
-    opacity: 0;
-
-    transition:
-      opacity .2s ease,
-      visibility .2s ease .2s,
-      transform .2s ease;
-  }
-}
-
-
-@keyframes reaction-pop {
-	from {
-    transform:
-      @reaction-popover-transform-align-value
-      scale(.75);
-	}
-}
-
-.reaction-popover__reaction-list {
-  display: flex;
-
-  margin-left: 0;
-  padding-left: 0;
-  list-style: none;
-}
-
-.reaction-popover__reaction-list-item {
-
-}
-
-.reaction-popover__reaction-list-item-button {
-  padding: .8em 1.4em;
-  background-color: transparent;
-  border: 0;
-  filter:
-    drop-shadow(0 0 .7rem rgba(255, 255, 255, .75))
-    drop-shadow(0 0 .1rem rgba(0, 0, 0, .75));
-
-  line-height: 1;
-  cursor: pointer;
-
-  transition: background-color .2s ease;
-
-  &:hover,
-  &:focus {
-    outline: none;
-    background-color: rgba(255, 255, 255, .25);
-  }
 }

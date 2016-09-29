@@ -61,7 +61,6 @@
     "gitter-web-identity": "file:modules/identity",
     "gitter-web-intercom": "file:modules/intercom",
     "gitter-web-invites": "file:modules/invites",
-    "gitter-web-isomorphic-dom-utility": "file:modules/isomorphic-dom-utility",
     "gitter-web-linkedin-backend": "file:modules/linkedin-backend",
     "gitter-web-live-collection-events": "file:modules/live-collection-events",
     "gitter-web-mailer": "file:modules/mailer",

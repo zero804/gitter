@@ -67,13 +67,7 @@ export default React.createClass({
         onClick={this.onSubscribeButtonClick}/>,
       <ReactionButton
         key="reactions"
-        onReactionPick={this.onReactionPick}/>,
-      <button className="topic-reply-list-item__footer__reaction-item">
-        👍 <span className="topic-reply-list-item__footer__reaction-item-count">2</span>
-      </button>,
-      <button className="topic-reply-list-item__footer__reaction-item">
-        🎉 <span className="topic-reply-list-item__footer__reaction-item-count">1</span>
-      </button>
+        onReactionPick={this.onReactionPick}/>
     ];
   },
 
