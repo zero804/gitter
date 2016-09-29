@@ -18,7 +18,7 @@ import dispatchOnChangeMixin from './mixins/dispatch-on-change';
 import {SUBMIT_NEW_TOPIC, TOPIC_CREATED} from '../../../shared/constants/create-topic';
 import {DEFAULT_CATEGORY_NAME, DEFAULT_TAG_NAME} from '../../../shared/constants/navigation';
 import {FILTER_BY_TOPIC} from '../../../shared/constants/forum-filters';
-import {MOST_WATCHERS_SORT} from '../../../shared/constants/forum-sorts';
+import {MOST_REPLY_SORT} from '../../../shared/constants/forum-sorts';
 import { UPDATE_TOPIC_SUBSCRIPTION_STATE, REQUEST_UPDATE_TOPIC_SUBSCRIPTION_STATE, SUBSCRIPTION_STATE_PENDING } from '../../../shared/constants/forum.js';
 
 export const TopicModel = BaseModel.extend({
@@ -78,6 +78,15 @@ export const TopicsLiveCollection = LiveCollection.extend({
     });
   },
 
+  getSnapshotState() {
+    // TODO: read out the current snapshot filter & sort and send that
+    return {
+      filter: {},
+      sort: {
+        id: -1
+      }
+    }
+  }
 });
 
 export class TopicsStore {
@@ -92,10 +101,26 @@ export class TopicsStore {
       filter: this.getFilter(),
       comparator: (a, b) => {
         const sort = router.get('sortName');
-        if(sort === MOST_WATCHERS_SORT) {
-          return (b.get('replyingUsers').length - a.get('replyingUsers').length);
+
+        if (sort === MOST_REPLY_SORT) {
+          return (b.get('repliesTotal') - a.get('repliesTotal'));
         }
-        return new Date(b.get('sent')) - new Date(a.get('sent')) ;
+
+        // assume most recent by default
+        /*
+        NOTE: The server sorts by id as a proxy for sent, so use the same field
+        to match the server's behavior exactly and also so we don't have to
+        unnecessarily create date fields.
+        */
+        const bid = b.get('id');
+        const aid = a.get('id');
+        if (bid > aid) {
+          return 1;
+        } else if (bid < aid) {
+          return -1;
+        } else {
+          return 0;
+        }
       }
     });
 
@@ -117,6 +142,9 @@ export class TopicsStore {
   }
 
   getFilter() {
+    // TODO: this should set both the filter that would be used by the snapshot
+    // AND it should return the function that does the filtering
+
     const categorySlug = (router.get('categoryName') || DEFAULT_CATEGORY_NAME);
     const tagName = (router.get('tagName') || DEFAULT_TAG_NAME);
     const currentUser = getCurrentUser();
@@ -162,10 +190,12 @@ export class TopicsStore {
 
   onRouterUpdate() {
     this.collection.setFilter(this.getFilter());
+    // TODO: kick off an ajax request to get more results
   }
 
   onSortUpdate(){
     this.collection.sort();
+    // TODO: kick off an ajax request to get more results
   }
 
   onRequestSubscriptionStateUpdate({topicId}) {
