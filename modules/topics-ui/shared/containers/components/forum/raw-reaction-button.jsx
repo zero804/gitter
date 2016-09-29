@@ -21,7 +21,6 @@ export default React.createClass({
 
   getDefaultProps() {
     return {
-      className: 'reaction-button',
       reactionCountMap: {},
       ownReactionMap: {}
     };
