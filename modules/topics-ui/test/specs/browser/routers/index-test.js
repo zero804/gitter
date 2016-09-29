@@ -14,7 +14,7 @@ import navigateToTopic from '../../../../shared/action-creators/topic/navigate-t
 import navigateToCreateTopic from '../../../../shared/action-creators/create-topic/navigate-to-create-topic';
 import navigateToCategory from '../../../../shared/action-creators/forum/navigate-to-category';
 
-import forumStore from '../../../../browser/js/stores/current-user-store';
+import currentUserStore from '../../../../browser/js/stores/current-user-store';
 
 describe('Router', function(){
 
@@ -31,7 +31,7 @@ describe('Router', function(){
     });
 
     // For mocking the user is signed in
-    forumStore.set({
+    currentUserStore.set({
       id: '123'
     })
   });
