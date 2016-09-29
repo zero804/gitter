@@ -1,0 +1,54 @@
+{{> topic_html_email_header }}
+
+<table class="row">
+  <tr>
+    <td class="wrapper last">
+      <table class="twelve columns">
+        <tr>
+          <td>
+            <h2>Yes! A new comment in a topic.</h2>
+            <br>
+            <h3>{{ notification.topic.title }}</h3>
+            <br>
+            <table>
+              <tr>
+                <td class="avatar"><img height="24" width="24" {{{ avatarSrcSet notification.comment.user.avatarUrl 24 }}} class="avatar"></td>
+                <td class="chat"><strong>{{ notification.comment.user.username }}</strong></td>
+              </tr>
+              <tr>
+                <td colspan="2"><br>{{{ notification.comment.body.html }}}</td>
+              </tr>
+            </table>
+
+            <br>
+
+            <table>
+              <tr>
+                <td>
+                  <a href="{{ emailBasePath }}/{{ notification.comment.uri }}" style="text-decoration: none" class="button-green">Open topic</a>
+                </td>
+              </tr>
+            </table>
+
+            <br>
+            <hr>
+            <br>
+
+            <p><strong>{{{ notification.comment.user.username}}}</strong> was commenting on the following reply:</p>
+
+            <strong>{{{ notification.reply.user.username }}}</strong><br>
+            {{{ notification.reply.body.html }}}
+
+            <br>
+            <br>
+            <hr>
+            Topics are currently in beta. You can't reply via email, yet.
+            <hr>
+          </td>
+          <td class="expander"></td>
+        </tr>
+      </table>
+
+  </tr>
+</table>
+{{> topic_html_email_footer }}
