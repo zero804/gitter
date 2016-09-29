@@ -1,6 +1,5 @@
 import assert from 'assert';
 import Backbone from 'backbone';
-import router from '../../../../browser/js/routers/index';
 import sinon from 'sinon';
 import { dispatch } from '../../../../shared/dispatcher';
 
@@ -10,11 +9,16 @@ import * as forumTagConstants from '../../../../shared/constants/forum-tags';
 import * as forumSortConstants from '../../../../shared/constants/forum-sorts';
 import * as navConstants from '../../../../shared/constants/navigation';
 
+import currentUserStoreMock from '../../../mocks/current-user-store';
 import navigateToTopic from '../../../../shared/action-creators/topic/navigate-to-topic';
 import navigateToCreateTopic from '../../../../shared/action-creators/create-topic/navigate-to-create-topic';
 import navigateToCategory from '../../../../shared/action-creators/forum/navigate-to-category';
 
-import currentUserStore from '../../../../browser/js/stores/current-user-store';
+import routerInjector from 'inject-loader!../../../../browser/js/routers/index';
+const {default: router} = routerInjector({
+  '../stores/current-user-store': currentUserStoreMock
+});
+
 
 describe('Router', function(){
 
@@ -29,11 +33,6 @@ describe('Router', function(){
     Backbone.history.start({
       pushState: false,
     });
-
-    // For mocking the user is signed in
-    currentUserStore.set({
-      id: '123'
-    })
   });
 
   afterEach(function(){
