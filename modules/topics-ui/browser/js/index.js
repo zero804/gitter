@@ -5,7 +5,7 @@ import React from 'react';
 import reactDOM from 'react-dom';
 import app from './app.jsx';
 import router from './routers/index';
-import ForumClient from './clients/forum-client';
+import ForumService from './services/forum-service';
 
 const App = React.createFactory(app);
 const appRoot = document.getElementById('app-root');
@@ -14,4 +14,4 @@ Backbone.history.start({ pushState: true });
 reactDOM.render(App({ router: router }), appRoot);
 
 
-new ForumClient();
+new ForumService();

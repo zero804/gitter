@@ -267,11 +267,8 @@ const TopicContainer = createClass({
 
 
   onReplySubscribeButtonClick(e, replyId) {
-    const {currentUserStore, repliesStore, topicId} = this.props;
-    const { forumId } = this.state;
+    const {repliesStore} = this.props;
 
-    const currentUser = currentUserStore.getCurrentUser();
-    const userId = currentUser.id;
     const reply = repliesStore.getById(replyId);
     const subscriptionState = reply.subscriptionState;
     const desiredIsSubscribed = (subscriptionState !== SUBSCRIPTION_STATE_SUBSCRIBED);
@@ -281,19 +278,16 @@ const TopicContainer = createClass({
 
   onTopicReactionPick(topicId, reactionKey, isReacting) {
     // TODO: dispatch event and listen in `forum-client`
-    console.log('onTopicReactionPick', topicId, reactionKey, isReacting);
     dispatch(requestUpdateTopicReactions(topicId, reactionKey, isReacting));
   },
 
   onReplyReactionPick(replyId, reactionKey, isReacting) {
     // TODO: dispatch event and listen in `forum-client`
-    console.log('onReplyReactionPick', replyId, reactionKey, isReacting);
     dispatch(requestUpdateReplyReactions(replyId, reactionKey, isReacting));
   },
 
   onCommentReactionPick(replyId, commentId, reactionKey, isReacting) {
     // TODO: dispatch event and listen in `forum-client`
-    console.log('onCommentReactionPick', replyId, commentId, reactionKey, isReacting);
     dispatch(requestUpdateCommentReactions(replyId, commentId, reactionKey, isReacting));
   },
 

@@ -1,5 +1,6 @@
 @import (less, reference) "~gitter-styleguide/css/components/buttons.css";
 @import "../../text.less";
+@import (reference) "../../colors.less";
 
 .topic-body__content {
   padding: 3rem 0;
@@ -21,6 +22,10 @@
 
 .topic-body__footer__reaction-action {
   .topic-body__footer__action();
+
+  &.has-reaction {
+    background-color: fade(@caribbean, 20%);
+  }
 }
 
 .topic-body__footer__subscribe-action {

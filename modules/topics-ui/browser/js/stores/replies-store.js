@@ -4,13 +4,21 @@ import {subscribe} from '../../../shared/dispatcher';
 import {SUBMIT_NEW_REPLY} from '../../../shared/constants/create-reply';
 import LiveCollection from './live-collection';
 import {getRealtimeClient} from './realtime-client';
+
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
+import onReactionsUpdateMixin from './mixins/on-reactions-update';
+
 import {getCurrentUser} from './current-user-store';
 import {getForumId} from './forum-store'
 import router from '../routers';
 import {BaseModel} from './base-model';
 import {NAVIGATE_TO_TOPIC} from '../../../shared/constants/navigation';
-import { UPDATE_REPLY_SUBSCRIPTION_STATE, REQUEST_UPDATE_REPLY_SUBSCRIPTION_STATE, SUBSCRIPTION_STATE_PENDING } from '../../../shared/constants/forum.js';
+import {
+  UPDATE_REPLY_SUBSCRIPTION_STATE,
+  REQUEST_UPDATE_REPLY_SUBSCRIPTION_STATE,
+  SUBSCRIPTION_STATE_PENDING,
+  UPDATE_REPLY_REACTIONS
+} from '../../../shared/constants/forum.js';
 
 export const ReplyModel = BaseModel.extend({
   url(){
@@ -38,6 +46,7 @@ export const RepliesStore = LiveCollection.extend({
     subscribe(NAVIGATE_TO_TOPIC, this.onNavigateToTopic, this);
     subscribe(REQUEST_UPDATE_REPLY_SUBSCRIPTION_STATE, this.onRequestSubscriptionStateUpdate, this);
     subscribe(UPDATE_REPLY_SUBSCRIPTION_STATE, this.onSubscriptionStateUpdate, this);
+    subscribe(UPDATE_REPLY_REACTIONS, this.onReactionsUpdate, this);
     router.on('change:topicId', this.onActiveTopicUpdate, this);
   },
 
@@ -92,6 +101,8 @@ export const RepliesStore = LiveCollection.extend({
 dispatchOnChangeMixin(RepliesStore, [
   'change:subscriptionState'
 ]);
+onReactionsUpdateMixin(RepliesStore, 'onReactionsUpdate');
+
 
 const serverStore = (window.context.repliesStore|| {});
 const serverData = (serverStore.data || [])

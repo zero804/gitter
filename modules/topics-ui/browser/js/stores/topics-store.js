@@ -14,12 +14,18 @@ import router from '../routers';
 import {getCurrentUser} from '../stores/current-user-store';
 
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
+import onReactionsUpdateMixin from './mixins/on-reactions-update';
 
 import {SUBMIT_NEW_TOPIC, TOPIC_CREATED} from '../../../shared/constants/create-topic';
 import {DEFAULT_CATEGORY_NAME, DEFAULT_TAG_NAME} from '../../../shared/constants/navigation';
 import {FILTER_BY_TOPIC} from '../../../shared/constants/forum-filters';
 import {MOST_WATCHERS_SORT} from '../../../shared/constants/forum-sorts';
-import { UPDATE_TOPIC_SUBSCRIPTION_STATE, REQUEST_UPDATE_TOPIC_SUBSCRIPTION_STATE, SUBSCRIPTION_STATE_PENDING } from '../../../shared/constants/forum.js';
+import {
+  UPDATE_TOPIC_SUBSCRIPTION_STATE,
+  REQUEST_UPDATE_TOPIC_SUBSCRIPTION_STATE,
+  SUBSCRIPTION_STATE_PENDING,
+  UPDATE_TOPIC_REACTIONS
+} from '../../../shared/constants/forum.js';
 
 export const TopicModel = BaseModel.extend({
   url(){
@@ -114,6 +120,7 @@ export class TopicsStore {
 
     subscribe(REQUEST_UPDATE_TOPIC_SUBSCRIPTION_STATE, this.onRequestSubscriptionStateUpdate, this);
     subscribe(UPDATE_TOPIC_SUBSCRIPTION_STATE, this.onSubscriptionStateUpdate, this);
+    subscribe(UPDATE_TOPIC_REACTIONS, this.onReactionsUpdate, this);
   }
 
   getFilter() {
@@ -177,14 +184,42 @@ export class TopicsStore {
     });
   }
 
-  onSubscriptionStateUpdate(data) {
-    var {topicId, state} = data;
-    var topic = this.collection.get(topicId);
+  onSubscriptionStateUpdate({topicId, state}) {
+    const topic = this.collection.get(topicId);
     if(!topic) { return; }
 
     topic.set({
       subscriptionState: state
     });
+  }
+
+  onReactionsUpdate({ topicId, reactionKey, isReacting }) {
+    console.log('topics-onReactionsUpdate', topicId, reactionKey, isReacting);
+    const topic = this.collection.get(topicId);
+    if(!topic) { return; }
+
+    if(isReacting) {
+      const reactionCounts = topic.get('reactionCounts') || {};
+      const ownReactions = topic.get('ownReactions') || {};
+      const existingCount = reactionCounts[reactionKey] || 0;
+
+      let newCount = existingCount;
+      if(isReacting === true && ownReactions[reactionKey] === false) {
+        newCount += 1;
+      }
+      else if(isReacting === false && ownReactions[reactionKey] === true) {
+        newCount -= 1;
+      }
+
+      topic.set({
+        reactionCounts: _.extend({}, reactionCounts, {
+          [reactionKey]: newCount
+        }),
+        ownReactions: _.extend({}, ownReactions, {
+          [reactionKey]: isReacting
+        })
+      });
+    }
   }
 }
 
@@ -192,8 +227,12 @@ export class TopicsStore {
 
 dispatchOnChangeMixin(TopicsStore, [
   'sort',
-  'change:subscriptionState'
+  'change:subscriptionState',
+  'change:reactionCounts',
+  'change:ownReactions'
 ]);
+
+onReactionsUpdateMixin(TopicsStore, 'onReactionsUpdate');
 
 const serverStore = (window.context.topicsStore || {});
 const serverData = (serverStore.data || []);
