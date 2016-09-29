@@ -8,6 +8,8 @@ var ForumWithPolicyService = require('../../../services/forum-with-policy-servic
 var restSerializer = require('../../../serializers/rest-serializer');
 var restful = require('../../../services/restful');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var ForumObject = require('gitter-web-topic-models/lib/forum-object');
+var ReactionsResource = require('./reactions-resource');
 
 
 function getCommentOptions(body) {
@@ -92,5 +94,14 @@ module.exports = {
         var strategy = new restSerializer.CommentStrategy();
         return restSerializer.serializeObject(updatedComment, strategy);
       });
+  },
+
+  subresources: {
+    'reactions': new ReactionsResource({
+      id: 'commentReaction',
+      getForumObject: function(req) {
+        return ForumObject.createForComment(req.forum._id, req.topic._id, req.reply._id, req.comment._id);
+      }
+    })
   },
 };

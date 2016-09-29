@@ -7,6 +7,24 @@ var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var validReactions = require('./valid-reactions');
 var StatusError = require('statuserror');
 
+function listReactions(forumObject) {
+  var Model = forumObject.type.model;
+  var query = forumObject.getQuery();
+
+  return Model.findOne(query)
+    .select({ _id: 0, reactionCounts: 1 })
+    .exec()
+    .then(function(doc) {
+      var reactionCounts = doc && doc.reactionCounts;
+
+      if (reactionCounts) {
+        return reactionCounts;
+      }
+
+      return null;
+    });
+}
+
 function updateReactionTotals(forumObject, reaction, inc) {
   var Model = forumObject.type.model;
   var query = forumObject.getQuery();
@@ -95,6 +113,7 @@ function removeReaction(forumObject, userId, reaction) {
 
 
 module.exports = {
+  listReactions: listReactions,
   addReaction: addReaction,
   removeReaction: removeReaction,
 }

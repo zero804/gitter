@@ -10,7 +10,7 @@ var restful = require('../../../services/restful');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var SubscribersResource = require('./subscribers-resource');
 var ForumObject = require('gitter-web-topic-models/lib/forum-object');
-
+var ReactionsResource = require('./reactions-resource');
 
 function getReplyOptions(body) {
   var text = body.text ? String(body.text) : undefined;
@@ -105,6 +105,12 @@ module.exports = {
     'comments': require('./comments'),
     'subscribers': new SubscribersResource({
       id: 'replySubscriber',
+      getForumObject: function(req) {
+        return ForumObject.createForReply(req.forum._id, req.topic._id, req.reply._id);
+      }
+    }),
+    'reactions': new ReactionsResource({
+      id: 'replyReaction',
       getForumObject: function(req) {
         return ForumObject.createForReply(req.forum._id, req.topic._id, req.reply._id);
       }

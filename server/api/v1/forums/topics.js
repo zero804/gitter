@@ -12,6 +12,7 @@ var restful = require('../../../services/restful');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var SubscribersResource = require('./subscribers-resource');
 var ForumObject = require('gitter-web-topic-models/lib/forum-object');
+var ReactionsResource = require('./reactions-resource');
 
 function getTags(tags) {
   if (!Array.isArray(tags)) {
@@ -181,7 +182,14 @@ module.exports = {
       getForumObject: function(req) {
         return ForumObject.createForTopic(req.forum._id, req.topic._id);
       }
+    }),
+    'reactions': new ReactionsResource({
+      id: 'topicReaction',
+      getForumObject: function(req) {
+        return ForumObject.createForTopic(req.forum._id, req.topic._id);
+      }
     })
+
   },
 
 };
