@@ -15,11 +15,11 @@ export default React.createClass({
     onReactionPick: PropTypes.func
   },
 
-  getInitialState() {
+  getDefaultProps() {
     return {
-      // TODO: Remove. This is a dirty place-holder that flip-flops between reacting and not reacting
-      // This will be supersceded by actual state whether the user already has a reaction of that type, etc
-      tempIsAlreadyReacting: false
+      className: 'reaction-button',
+      reactionCountMap: {},
+      ownReactionMap: {}
     };
   },
 
@@ -39,18 +39,12 @@ export default React.createClass({
   },
 
   onReactionPick(reactionKey) {
-    const { onReactionPick } = this.props;
-    const { tempIsAlreadyReacting } = this.state;
-    const newTempIsAlreadyReacting = !tempIsAlreadyReacting;
+    const { ownReactionMap, onReactionPick } = this.props;
+    const currentOwnReactionState = ownReactionMap[reactionKey];
 
     if(onReactionPick) {
-      onReactionPick(reactionKey, newTempIsAlreadyReacting);
+      onReactionPick(reactionKey, !currentOwnReactionState);
     }
-
-    this.setState({
-      // Update our dirty property to flip-flop next time
-      tempIsAlreadyReacting: newTempIsAlreadyReacting
-    });
   }
 
 });
