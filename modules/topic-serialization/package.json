@@ -1,0 +1,17 @@
+{
+  "name": "gitter-web-topic-serialization",
+  "version": "1.0.0",
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha test/"
+  },
+  "dependencies": {
+    "gitter-web-serialization": "file:../serialization",
+    "gitter-web-user-serialization": "file:../user-serialization"
+  },
+  "private": true
+}

@@ -104,3 +104,6 @@ unread-notification.out.html
 .nyc_output
 .tern-port
 .tmp
+modules/topic-notifications/test/comment.html
+modules/topic-notifications/test/reply.html
+modules/topic-notifications/test/topic.html
