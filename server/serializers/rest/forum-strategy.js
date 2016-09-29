@@ -123,3 +123,7 @@ ForumStrategy.nested = function(options) {
 };
 
 module.exports = ForumStrategy;
+module.exports.testOnly = {
+  getCurrentUserFromOptions: getCurrentUserFromOptions,
+  getCurrentUserIdFromOptions: getCurrentUserIdFromOptions
+};
