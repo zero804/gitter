@@ -34,9 +34,10 @@ TroupePermissionsStrategy.prototype = {
       })
       .bind(this)
       .then(function(user) {
-        if (!user) return;
-
+        // setup this.isAdmin _before_ possibly returning, otherwise map will npe
         var isAdmin = this.isAdmin = {};
+
+        if (!user) return;
 
         return Promise.map(troupes.toArray(), function(troupe) {
           return policyFactory.createPolicyForRoom(user, troupe)

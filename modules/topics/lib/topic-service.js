@@ -339,7 +339,6 @@ function setTopicTags(user, topic, tags, options) {
 
       liveCollections.topics.emit('patch', forumId, topicId, {
         tags: updatedTopic.tags,
-        lastModified: updatedTopic.lastModified.toISOString()
       });
 
       return updatedTopic;
@@ -368,7 +367,6 @@ function setTopicSticky(user, topic, sticky) {
 
       liveCollections.topics.emit('patch', forumId, topicId, {
         sticky: updatedTopic.sticky,
-        lastModified: updatedTopic.lastModified.toISOString()
       });
 
       return updatedTopic;

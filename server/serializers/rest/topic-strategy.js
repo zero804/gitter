@@ -53,7 +53,9 @@ TopicStrategy.prototype = {
     var categoryIds = topics.map(function(i) { return i.categoryId; });
     strategies.push(this.categoryStrategy.preload(categoryIds));
 
-    strategies.push(this.topicSubscriptionStrategy.preload(topics));
+    if (this.topicSubscriptionStrategy) {
+      strategies.push(this.topicSubscriptionStrategy.preload(topics));
+    }
 
     return Promise.all(strategies);
   },
@@ -108,7 +110,6 @@ TopicStrategy.prototype = {
       sent: formatDate(topic.sent),
       editedAt: formatDate(topic.editedAt),
       lastChanged: formatDate(topic.lastChanged),
-      lastModified: formatDate(topic.lastModified),
       v: getVersion(topic),
 
       // TODO: participatingTotal
@@ -149,9 +150,12 @@ TopicStrategy.standard = function(options) {
   strategy.userStrategy = UserIdStrategy.slim();
   strategy.replyingUsersStrategy = new TopicReplyingUsersStrategy();
   strategy.categoryStrategy = new ForumCategoryIdStrategy();
-  strategy.topicSubscriptionStrategy = new TopicSubscriptionStrategy({
-    currentUserId: currentUserId
-  });
+
+  if (currentUserId) {
+    strategy.topicSubscriptionStrategy = new TopicSubscriptionStrategy({
+      currentUserId: currentUserId
+    });
+  }
 
   return strategy;
 }
@@ -164,7 +168,7 @@ TopicStrategy.nested = function(options) {
 
   // Added nested strategies to the standard
   strategy.repliesForTopicStrategy = RepliesForTopicStrategy.standard({
-    currentUserId:  options && options.currentUserId
+    currentUserId: options && options.currentUserId
   })
 
   return strategy;

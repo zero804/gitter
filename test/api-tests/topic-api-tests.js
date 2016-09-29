@@ -137,6 +137,8 @@ describe('topic-api', function() {
       .expect(200)
       .then(function(result) {
         var topic = result.body;
+        // Any topic that you create you should be subscribed to
+        assert.strictEqual(topic.subscribed, true);
         assert.strictEqual(topic.title, 'I am a topic');
       });
   });

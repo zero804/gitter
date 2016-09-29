@@ -48,7 +48,9 @@ export default React.createClass({
   buildChildOption(option, index){
     const {label, value} = option;
     return (
-      <option key={`select-option-${label}-${index}`}
+      <option
+        className="option"
+        key={`select-option-${label}-${index}`}
         label={label}
         value={value}>
         {label}
