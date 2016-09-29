@@ -22,8 +22,8 @@ import {MOST_WATCHERS_SORT} from '../../../shared/constants/forum-sorts';
 import { UPDATE_TOPIC_SUBSCRIPTION_STATE, REQUEST_UPDATE_TOPIC_SUBSCRIPTION_STATE, SUBSCRIPTION_STATE_PENDING } from '../../../shared/constants/forum.js';
 
 export const TopicModel = BaseModel.extend({
-  url(){
-    return this.get('id') ? null : `/api/v1/forums/${getForumId()}/topics`;
+  url() {
+    return this.get('id') ? null : `/v1/forums/${getForumId()}/topics`;
   },
 
   toJSON() {
@@ -34,7 +34,7 @@ export const TopicModel = BaseModel.extend({
     });
   },
 
-  getDataToSave(){
+  getDataToSave() {
     const data = this.toJSON();
     const tags = (data.tags || []);
     const parsedTags = tags.map((t) => t.label);

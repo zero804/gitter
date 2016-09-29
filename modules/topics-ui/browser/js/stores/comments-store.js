@@ -1,18 +1,18 @@
 import Backbone from 'backbone';
-import {getRealtimeClient} from './realtime-client';
-import {getForumId} from './forum-store';
+import { getRealtimeClient } from './realtime-client';
+import { getForumId } from './forum-store';
 import LiveCollection from './live-collection';
 import { BaseModel } from './base-model';
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
-import {subscribe} from '../../../shared/dispatcher';
-import {SHOW_REPLY_COMMENTS} from '../../../shared/constants/topic';
+import { subscribe } from '../../../shared/dispatcher';
+import { SHOW_REPLY_COMMENTS } from '../../../shared/constants/topic';
 import router from '../routers';
-import {SUBMIT_NEW_COMMENT} from '../../../shared/constants/create-comment';
-import {getCurrentUser} from './current-user-store';
+import { SUBMIT_NEW_COMMENT } from '../../../shared/constants/create-comment';
+import { getCurrentUser } from './current-user-store';
 
 export const CommentModel = BaseModel.extend({
-  url(){
-    return `/api/v1/forums/${getForumId()}/topics/${router.get('topicId')}/replies/${this.get('replyId')}/comments`;
+  url() {
+    return `/v1/forums/${getForumId()}/topics/${router.get('topicId')}/replies/${this.get('replyId')}/comments`;
   }
 });
 
