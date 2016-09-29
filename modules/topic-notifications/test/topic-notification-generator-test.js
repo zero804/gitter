@@ -1,13 +1,9 @@
 "use strict";
 
-var Promise = require('bluebird');
 var assert = require('assert');
 var ForumObject = require('../lib/forum-object');
 var notificationService = require('../lib/notification-service');
 var topicNotificationGenerator = require('../lib/topic-notificaton-generator');
-var RxNode = require('rx-node');
-var ObjectID = require('mongodb').ObjectID;
-var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var mailerTemplate = require('gitter-web-mailer/lib/mailer-template');
 var fs = require('fs');
