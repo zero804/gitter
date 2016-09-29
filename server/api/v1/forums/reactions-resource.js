@@ -8,9 +8,6 @@ function ReactionsResource(options) {
   this.getForumObject = options.getForumObject;
 }
 
-/**
- * List extraAdmins on a descriptor
- */
 ReactionsResource.prototype.index = function(req) {
   var forumWithPolicyService = this._getForumWithPolicy(req);
 
@@ -20,9 +17,6 @@ ReactionsResource.prototype.index = function(req) {
     });
 }
 
-/**
- * Subscribe
- */
 ReactionsResource.prototype.create = function(req) {
   var forumWithPolicyService = this._getForumWithPolicy(req);
   var reaction = req.body.reaction ? String(req.body.reaction) : undefined;
@@ -42,12 +36,9 @@ ReactionsResource.prototype.destroy = function(req) {
       return reactions;
     });
 }
-/**
- * Unsubscribe
- */
+
 ReactionsResource.prototype._getForumWithPolicy = function(req) {
   return new ForumWithPolicyService(req.forum, req.user, req.userForumPolicy);
 }
-
 
 module.exports = ReactionsResource;
