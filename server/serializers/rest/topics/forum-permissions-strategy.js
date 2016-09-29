@@ -5,20 +5,16 @@ var userService = require("../../../services/user-service");
 var Promise = require('bluebird');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 
-/**
- * Returns the permissions the user has in the orgs.
- * This is not intended to be used for large sets, rather individual items
- */
-function TroupePermissionsStrategy(options) {
+function ForumPermissionsStrategy(options) {
   this.currentUser = options.currentUser;
   this.currentUserId = options.currentUserId;
   this.isAdmin = null;
 }
 
-TroupePermissionsStrategy.prototype = {
+ForumPermissionsStrategy.prototype = {
 
-  preload: function(troupes) {
-    if (troupes.isEmpty()) return;
+  preload: function(forums) {
+    if (forums.isEmpty()) return;
 
     var currentUser = this.currentUser;
     var currentUserId = this.currentUserId;
@@ -34,35 +30,34 @@ TroupePermissionsStrategy.prototype = {
       })
       .bind(this)
       .then(function(user) {
-        // setup this.isAdmin _before_ possibly returning, otherwise map will npe
         var isAdmin = this.isAdmin = {};
 
         if (!user) return;
 
-        return Promise.map(troupes.toArray(), function(troupe) {
-          return policyFactory.createPolicyForRoom(user, troupe)
+        return Promise.map(forums.toArray(), function(forum) {
+          return policyFactory.createPolicyForForum(user, forum)
             .then(function(policy) {
               return policy.canAdmin();
             })
             .then(function(admin) {
-              isAdmin[troupe.id] = admin;
+              isAdmin[forum.id] = admin;
             })
             .catch(function(err) {
               // Fallback in case of GitHub API downtime
               logger.error('Unable to obtain admin permissions', { exception: err });
-              isAdmin[troupe.id] = false;
+              isAdmin[forum.id] = false;
             });
         });
       });
   },
 
-  map: function(troupe) {
+  map: function(forum) {
     return {
-      admin: this.isAdmin[troupe.id] || false
+      admin: this.isAdmin[forum.id] || false
     };
   },
 
-  name: 'TroupePermissionsStrategy'
+  name: 'ForumPermissionsStrategy'
 };
 
-module.exports = TroupePermissionsStrategy;
+module.exports = ForumPermissionsStrategy;
