@@ -258,6 +258,8 @@ export const TopicsLiveCollection = LiveCollection.extend({
     const topicId = router.get('topicId');
     const model = this.get(topicId);
     if(!model) { return; }
+    const text = model.get('text');
+    if(!text) { return; }
     model.save({ text: model.get('text') }, { patch: true });
   },
 

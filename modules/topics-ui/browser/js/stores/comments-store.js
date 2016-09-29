@@ -97,8 +97,10 @@ export const CommentsStore = LiveCollection.extend({
   onCommentSave({commentId, replyId}) {
     const model = this.get(commentId);
     if(!model) { return; }
+    const text = model.get('text');
+    if(text === null) { return; }
     model.set('replyId', replyId);
-    model.save({ text: model.get('text') }, { patch: true });
+    model.save({ text: text }, { patch: true });
   }
 
 });
