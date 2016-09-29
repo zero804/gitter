@@ -14,6 +14,8 @@ var CommentSchema = new Schema({
   userId: {type: ObjectId, required: true},
   sent: { type: Date, "default": Date.now },
   editedAt: { type: Date, "default": null },
+  lastChanged: { type: Date, "default": Date.now },
+  lastModified: { type: Date, "default": Date.now },
   lang: {type: String },
   reactionCounts: Schema.Types.Mixed,
   _tv: { type: 'MongooseNumber', 'default': 0 },
@@ -24,6 +26,7 @@ CommentSchema.schemaTypeName = 'CommentSchema';
 CommentSchema.index({ forumId: 1 });
 CommentSchema.index({ topicId: 1 });
 CommentSchema.index({ replyId: 1 });
+CommentSchema.index({ lastChanged: 1 });
 
 installVersionIncMiddleware(CommentSchema);
 

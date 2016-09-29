@@ -70,7 +70,6 @@ ReplyStrategy.prototype = {
       sent: formatDate(reply.sent),
       editedAt: formatDate(reply.editedAt),
       lastChanged: formatDate(reply.lastChanged),
-      lastModified: formatDate(reply.lastModified),
       v: getVersion(reply)
     };
   },

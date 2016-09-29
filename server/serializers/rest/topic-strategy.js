@@ -110,7 +110,6 @@ TopicStrategy.prototype = {
       sent: formatDate(topic.sent),
       editedAt: formatDate(topic.editedAt),
       lastChanged: formatDate(topic.lastChanged),
-      lastModified: formatDate(topic.lastModified),
       v: getVersion(topic),
 
       // TODO: participatingTotal
