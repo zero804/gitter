@@ -41,6 +41,12 @@ import {
 
 import {MODEL_STATE_DRAFT, MODEL_STATE_SYNCED} from '../../../shared/constants/model-states';
 
+const modelDefaults = {
+  title: '',
+  text: '',
+  categoryId: '',
+  tags: [],
+};
 
 export const TopicModel = BaseModel.extend({
 
@@ -166,19 +172,10 @@ export const TopicModel = BaseModel.extend({
   },
 
   toPOJO() {
-
-    //Default values to pass to a react component
-    const defaults = {
-      title: '',
-      text: '',
-      categoryId: '',
-      tags: [],
-    };
-
     var data = this.attributes;
     data.tags = (data.tags || []);
 
-    return Object.assign({}, defaults, data, {
+    return Object.assign({}, modelDefaults, data, {
       tags: data.tags.map(parseTag)
     });
   },
