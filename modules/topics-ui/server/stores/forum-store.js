@@ -11,14 +11,10 @@ module.exports = function forumStore(initialData) {
   });
   delete data.subscribed;
 
-
-  //Get data
-  const get = (key) => data[key];
-
   //Methods
   return {
-    get: get,
     data: data,
+    get: (key) => data[key],
     getForum: () => {
       return data;
     },

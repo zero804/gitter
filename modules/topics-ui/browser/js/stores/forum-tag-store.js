@@ -31,6 +31,7 @@ export const ForumTagStore = Backbone.Collection.extend({
   },
 
   getTagsByLabel(values){
+    values = (values || []);
     return values.map((val) => {
       const model = this.findWhere({label: val});
       if(!model) { return; }
@@ -42,7 +43,7 @@ export const ForumTagStore = Backbone.Collection.extend({
     //For some reason pluck doesn't work here :(
     //We slice here to remove the "All Tags" entry
     return this.models
-      .filter((t) => t.value !== DEFAULT_TAG_VALUE)
+      .filter((t) => t.attributes.value !== DEFAULT_TAG_VALUE)
       .map(m => m.get('label'));
   }
 
