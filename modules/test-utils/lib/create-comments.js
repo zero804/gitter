@@ -8,6 +8,8 @@ var debug = require('debug')('gitter:tests:test-fixtures');
 function createComment(fixtureName, f) {
   debug('Creating %s', fixtureName);
 
+  var sent = f.sent || new Date();
+
   var doc = {
     forumId: f.forum && f.forum._id,
     userId: f.user && f.user._id,
@@ -15,8 +17,10 @@ function createComment(fixtureName, f) {
     replyId: f.reply && f.reply._id,
     text: f.text,
     html: f.html,
-    sent: f.sent,
+    sent: sent,
     editedAt: f.editedAt,
+    lastChanged: f.lastChanged || sent,
+    lastModified: f.lastModified || sent,
     lang: f.lang,
     _md: f._md
   };
