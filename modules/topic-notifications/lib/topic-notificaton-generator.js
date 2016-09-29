@@ -19,50 +19,6 @@ function resolveEmailAddress(user) {
   return backendMuxer.getEmailAddress();
 }
 
-function streamNotificationsForEmail(options) {
-  var query = {
-    emailSent: null
-  };
-
-  if (options && options.userId) {
-    query.userId = options.userId;
-  }
-
-  return ForumNotification.aggregate([{
-      $match: query
-    }, {
-      $group: {
-        _id: {
-          userId: "$userId",
-          forumId: "$forumId",
-          topicId: "$topicId"
-        },
-        notifications: {
-          $push: {
-            replyId: "$replyId",
-            commentId: "$commentId"
-          }
-        }
-      }
-    }, {
-      $project: {
-        _id: 0,
-        userId: "$_id.userId",
-        forumId: "$_id.forumId",
-        topicId: "$_id.topicId",
-        notifications: 1
-      }
-    }])
-    .read(mongoReadPrefs.secondaryPreferred)
-    .cursor({ batchSize: 100 })
-    .exec()
-    .stream();
-}
-
-/**
- * This is a first effort, to be replaced with
- * streamNotificationsForEmail in future
- */
 function simpleNotificationStream(options) {
   var query = {
     emailSent: null
@@ -320,6 +276,5 @@ function generateNotifications(options) {
 
 module.exports = {
   generateNotifications: generateNotifications,
-  notificationObserver: notificationObserver,
-  streamNotificationsForEmail: streamNotificationsForEmail
+  notificationObserver: notificationObserver
 };
