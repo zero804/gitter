@@ -414,7 +414,7 @@ export class TopicsStore {
     return parseTopic(model.toPOJO());
   }
 
-  //Whenevr the router updates make sure we have to
+  //Whenever the router updates make sure we have to
   //correctly filtered models to give to the UI
   onRouterUpdate() {
     this.collection.setFilter(this.getFilter());
@@ -453,6 +453,7 @@ dispatchOnChangeMixin(TopicsStore, [
   'change:subscriptionState',
   'change:title',
   'change:text',
+  'change:body',
   'change:categoryId',
   'change:tags',
   'invalid'
