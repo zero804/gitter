@@ -13,7 +13,7 @@ describe('<CommentEditor/>', () => {
 
   it('render a custom class', () => {
     const className = wrapper.find('Editor').at(0).prop('className');
-    assert.equal(className, 'reply-comment-editor')
+    assert.equal(className, 'reply-comment-editor__editor')
   });
 
 });

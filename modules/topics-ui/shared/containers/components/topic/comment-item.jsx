@@ -9,7 +9,10 @@ export default React.createClass({
       body: PropTypes.shape({
         text: PropTypes.string.isRequired,
       })
-    })
+    }),
+    onChange: PropTypes.func.isRequired,
+    onCancel: PropTypes.func.isRequired,
+    onSave: PropTypes.func.isRequired,
   },
 
   render(){
@@ -17,8 +20,23 @@ export default React.createClass({
     return (
       <FeedItem
         item={comment}
+        onChange={this.onChange}
+        onCancel={this.onCancel}
+        onSave={this.onSave}
         footerChildren={this.getFeedItemFooterChildren()}/>
     );
+  },
+
+  onChange(val){
+    this.props.onChange(val);
+  },
+
+  onCancel(val){
+    this.props.onCancel(val);
+  },
+
+  onSave(val){
+    this.props.onSave(val);
   },
 
   getFeedItemFooterChildren(){

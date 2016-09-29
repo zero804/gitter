@@ -18,10 +18,14 @@ export default React.createClass({
     onEditorClick: PropTypes.func
   },
 
+  getInitialState(){
+    return { value: this.props.value }
+  },
+
   render(){
 
     const {user, isSignedIn, value} = this.props;
-
+    const editorValue = (value || '');
     var submitText = 'Reply';
     if(!isSignedIn) {
       submitText = 'Sign in to reply';
@@ -40,7 +44,7 @@ export default React.createClass({
             placeholder="Your reply here. Use Markdown, BBCode, or HTML to format. Drag or paste images ..."
             onChange={this.onChange}
             onClick={this.onEditorClick}
-            value={value}/>
+            value={editorValue}/>
           <button
             className="topic-reply-editor__submit"
             onClick={this.onSubmitClicked}>
