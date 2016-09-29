@@ -108,7 +108,7 @@ function serializeUser(user) {
 function serializeGroup(group, user) {
   var strategy = new restSerializer.GroupStrategy({
     currentUser: user,
-    currentUserId: user._id
+    currentUserId: user && user._id
   });
 
   return restSerializer.serializeObject(group, strategy);

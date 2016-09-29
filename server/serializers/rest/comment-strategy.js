@@ -66,6 +66,7 @@ function CommentStrategy(options) {
 
       sent: formatDate(comment.sent),
       editedAt: formatDate(comment.editedAt),
+      lastChanged: formatDate(comment.lastChanged),
       v: getVersion(comment)
     };
   };

@@ -1,10 +1,10 @@
 //TODO Extend a Topic Model
-import Backbone from 'backbone';
 import {subscribe} from '../../../shared/dispatcher';
 import * as consts from '../../../shared/constants/create-topic';
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
+import { BaseModel } from './base-model';
 
-const NewTopicStore = Backbone.Model.extend({
+const NewTopicStore = BaseModel.extend({
 
   defaults: {
     title: '',
@@ -51,8 +51,8 @@ const NewTopicStore = Backbone.Model.extend({
     this.trigger('change:tags');
   },
 
-  getNewTopic(){
-    return this.toJSON();
+  getNewTopic() {
+    return this.toPOJO();
   },
 
 });
