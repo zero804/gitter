@@ -59,6 +59,9 @@ CommentStrategy.prototype = {
       user: this.mapUser(comment.userId),
 
       reactions: mapReactionCounts(comment),
+
+      // Own reactions are not defined for anonymous users
+      // or the broadcast reply live-collection
       ownReactions: this.reactionStrategy ? this.reactionStrategy.map(comment) : undefined,
 
       sent: formatDate(comment.sent),
