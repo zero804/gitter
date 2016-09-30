@@ -7,7 +7,15 @@ var assert = require('assert');
 var _ = require('lodash');
 var ObjectIDSet = require('gitter-web-persistence-utils/lib/objectid-set');
 
+var NO_REACTIONS = Object.freeze({});
+
 function resolveKey(item) {
+  /*
+   * Since IDS are unique across collections we
+   * can choose the highest priority id
+   * instead of concatentating them, since this is
+   * much faster...
+   */
   if (item.commentId) {
     return item.commentId;
   }
@@ -20,10 +28,7 @@ function resolveKey(item) {
     return item.topicId;
   }
 
-  if (item.forumId) {
-    return item.forumId;
-  }
-
+  // Should never get here..
   return 'null';
 }
 
@@ -45,139 +50,96 @@ function ReactionVisitor(results) {
   }, {});
 }
 
-ReactionVisitor.prototype.isSubscribed = function(item) {
-  if (!this.resultsHash) return {};
+ReactionVisitor.prototype.getReactions = function(item) {
+  if (!this.resultsHash) return NO_REACTIONS;
 
   var key = resolveKey(item);
-  return this.resultsHash[key] || {};
+  return this.resultsHash[key] || NO_REACTIONS;
 }
 
-function createQueryForTopics(forumObjects) {
-  if (forumObjects.length === 0) {
-    return {
-      forumId: { $in: [] }
-    }
-  }
-
+function createQueryForTopics(userId, forumObjects) {
   if (forumObjects.length === 1) {
-    var f0 = forumObjects[0]
+    var f0 = forumObjects[0];
+
     return {
-      forumId: f0.forumId,
+      userId: userId,
       topicId: f0.topicId,
       replyId: { $eq: null },
       commentId: { $eq: null }
     }
   }
 
-  var forumIdSet = new ObjectIDSet();
   var topicIdSet = new ObjectIDSet();
 
   _.forEach(forumObjects, function(forumRef) {
-    forumIdSet.add(forumRef.forumId);
     topicIdSet.add(forumRef.topicId);
   });
 
-  var forumIds = forumIdSet.uniqueIds();
   var topicIds = topicIdSet.uniqueIds();
 
   return {
-    forumId: forumIds.length === 1 ? forumIds[0] : { $in: forumIds },
+    userId: userId,
     topicId: topicIds.length === 1 ? topicIds[0] : { $in: topicIds },
     replyId: { $eq: null },
     commentId: { $eq: null }
   }
 }
 
-function createQueryForReplies(forumObjects) {
-  if (forumObjects.length === 0) {
-    return {
-      forumId: { $in: [] }
-    }
-  }
-
+function createQueryForReplies(userId, forumObjects) {
   if (forumObjects.length === 1) {
     var f0 = forumObjects[0]
     return {
-      forumId: f0.forumId,
-      topicId: f0.topicId,
+      userId: userId,
       replyId: f0.replyId,
       commentId: { $eq: null }
     }
   }
 
-  var forumIdSet = new ObjectIDSet();
-  var topicIdSet = new ObjectIDSet();
   var replyIdSet = new ObjectIDSet();
 
   _.forEach(forumObjects, function(forumRef) {
-    forumIdSet.add(forumRef.forumId);
-    topicIdSet.add(forumRef.topicId);
     replyIdSet.add(forumRef.replyId);
   });
 
-  var forumIds = forumIdSet.uniqueIds();
-  var topicIds = topicIdSet.uniqueIds();
   var replyIds = replyIdSet.uniqueIds();
 
   return {
-    forumId: forumIds.length === 1 ? forumIds[0] : { $in: forumIds },
-    topicId: topicIds.length === 1 ? topicIds[0] : { $in: topicIds },
+    userId: userId,
     replyId: replyIds.length === 1 ? replyIds[0] : { $in: replyIds },
     commentId: { $eq: null },
   }
 }
 
-function createQueryForComments(forumObjects) {
-  if (forumObjects.length === 0) {
-    return {
-      forumId: { $in: [] }
-    }
-  }
-
+function createQueryForComments(userId, forumObjects) {
   if (forumObjects.length === 1) {
     var f0 = forumObjects[0]
     return {
-      forumId: f0.forumId,
-      topicId: f0.topicId,
-      replyId: f0.replyId,
+      userId: userId,
       commentId: f0.commentId
     }
   }
 
-  var forumIdSet = new ObjectIDSet();
-  var topicIdSet = new ObjectIDSet();
-  var replyIdSet = new ObjectIDSet();
-  var commentIds = [];
-
-  _.forEach(forumObjects, function(forumRef) {
-    forumIdSet.add(forumRef.forumId);
-    topicIdSet.add(forumRef.topicId);
-    replyIdSet.add(forumRef.replyId);
-    commentIds.push(forumRef.commentId);
+  // Probably no reason to unique the commentIds
+  var commentIds = _.map(forumObjects, function(forumRef) {
+    return forumRef.commentId;
   });
 
-  var forumIds = forumIdSet.uniqueIds();
-  var topicIds = topicIdSet.uniqueIds();
-  var replyIds = replyIdSet.uniqueIds();
-
   return {
-    forumId: forumIds.length === 1 ? forumIds[0] : { $in: forumIds },
-    topicId: topicIds.length === 1 ? topicIds[0] : { $in: topicIds },
-    replyId: replyIds.length === 1 ? replyIds[0] : { $in: replyIds },
-    commentIds: commentIds.length === 1 ? commentIds[0] : { $in: commentIds },
+    userId: userId,
+    commentId: commentIds.length === 1 ? commentIds[0] : { $in: commentIds },
   }
 }
 
-function createQuery(type, forumObjects) {
+function createQuery(userId, type, forumObjects) {
   switch(type) {
     case ForumObject.TYPE.Topic:
-      return createQueryForTopics(forumObjects);
+      return createQueryForTopics(userId, forumObjects);
 
     case ForumObject.TYPE.Reply:
-      return createQueryForReplies(forumObjects);
+      return createQueryForReplies(userId, forumObjects);
 
     case ForumObject.TYPE.Comment:
-      return createQueryForComments(forumObjects);
+      return createQueryForComments(userId, forumObjects);
   }
 }
 
@@ -188,10 +150,9 @@ function createReactionVisitor(userId, type, forumObjects) {
 
   assert(type !== ForumObject.TYPE.Forum);
 
-  var query = createQuery(type, forumObjects);
-  query.userId = userId;
+  var query = createQuery(userId, type, forumObjects);
 
-  return ForumReaction.find(query, { _id: 0, forumId: 1, topicId: 1, replyId: 1, reaction: 1 })
+  return ForumReaction.find(query, { _id: 0, topicId: 1, replyId: 1, commentId: 1, reaction: 1 })
     .lean()
     .exec()
     .then(function(results) {
