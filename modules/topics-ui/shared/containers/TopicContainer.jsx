@@ -26,6 +26,9 @@ import updateCancelTopic from '../action-creators/topic/update-cancel-topic';
 import updateSaveTopic from '../action-creators/topic/update-save-topic';
 import requestUpdateTopicSubscriptionState from '../action-creators/forum/request-update-topic-subscription-state';
 import requestUpdateReplySubscriptionState from '../action-creators/forum/request-update-reply-subscription-state';
+import requestUpdateTopicReactions from '../action-creators/forum/request-update-topic-reactions';
+import requestUpdateReplyReactions from '../action-creators/forum/request-update-reply-reactions';
+import requestUpdateCommentReactions from '../action-creators/forum/request-update-comment-reactions';
 import requestSignIn from '../action-creators/forum/request-sign-in';
 
 import { SUBSCRIPTION_STATE_SUBSCRIBED } from '../constants/forum.js';
@@ -165,7 +168,7 @@ const TopicContainer = createClass({
 
   render(){
 
-    const { groupStore, categoryStore, currentUserStore, tagStore, newReplyStore} = this.props;
+    const { groupStore, categoryStore, currentUserStore, tagStore, newReplyStore } = this.props;
     const {forumId, forumSubscriptionState } = this.state;
 
     const groupUri = groupStore.getGroupUri();
@@ -204,16 +207,22 @@ const TopicContainer = createClass({
             category={category}
             groupUri={groupUri}
             tags={tags}/>
+
           <TopicBody
             topic={topic}
+            onSubscribeButtonClick={this.onTopicSubscribeButtonClick}
+            onReactionPick={this.onTopicReactionPick}
             onTopicEditUpdate={this.onTopicEditUpdate}
             onTopicEditCancel={this.onTopicEditCancel}
             onTopicEditSave={this.onTopicEditSave}/>
         </article>
+
         <TopicReplyListHeader replies={parsedReplies}/>
+
         <TopicReplyList>
           {parsedReplies.map(this.getReplyListItem)}
         </TopicReplyList>
+
         <TopicReplyEditor
           user={currentUser}
           isSignedIn={isSignedIn}
@@ -225,26 +234,27 @@ const TopicContainer = createClass({
     );
   },
 
-
   getReplyListItem(reply, index){
     const {newCommentStore, currentUserStore } = this.props;
     const currentUser = currentUserStore.getCurrentUser();
     return (
       <TopicReplyListItem
-        reply={reply}
         key={`topic-reply-list-item-${reply.id}-${index}`}
+        reply={reply}
         user={currentUser}
         newCommentContent={newCommentStore.get('text')}
-        onCommentsClicked={this.onReplyCommentsClicked}
-        onNewCommentUpdate={this.onNewCommentUpdate}
         submitNewComment={this.submitNewComment}
-        onReplyEditUpdate={this.onReplyEditUpdate}
-        onReplyEditCancel={this.onReplyEditCancel}
-        onReplyEditSaved={this.onReplyEditSaved}
+        onNewCommentUpdate={this.onNewCommentUpdate}
+        onCommentsClicked={this.onCommentsClicked}
+        onSubscribeButtonClick={this.onReplySubscribeButtonClick}
+        onReactionPick={this.onReplyReactionPick}
+        onCommentReactionPick={this.onCommentReactionPick}
+        onEditUpdate={this.onReplyEditUpdate}
+        onEditCancel={this.onReplyEditCancel}
+        onEditSaved={this.onReplyEditSaved}
         onCommentEditUpdate={this.onCommentEditUpdate}
         onCommentEditCancel={this.onCommentEditCancel}
-        onCommentEditSave={this.onCommentEditSave}
-        onSubscribeButtonClick={this.onTopicSubscribeButtonClick} />
+        onCommentEditSave={this.onCommentEditSave} />
     );
   },
 
@@ -316,10 +326,8 @@ const TopicContainer = createClass({
     dispatch(requestUpdateTopicSubscriptionState(topicId, desiredIsSubscribed));
   },
 
-
   onReplySubscribeButtonClick(e, replyId) {
     const { repliesStore } = this.props;
-
     const reply = repliesStore.getById(replyId);
     const subscriptionState = reply.subscriptionState;
     const desiredIsSubscribed = (subscriptionState !== SUBSCRIPTION_STATE_SUBSCRIBED);
@@ -327,7 +335,22 @@ const TopicContainer = createClass({
     dispatch(requestUpdateReplySubscriptionState(replyId, desiredIsSubscribed));
   },
 
-  onReplyCommentsClicked(replyId){
+  onTopicReactionPick(topicId, reactionKey, isReacting) {
+    // TODO: dispatch event and listen in `forum-client`
+    dispatch(requestUpdateTopicReactions(topicId, reactionKey, isReacting));
+  },
+
+  onReplyReactionPick(replyId, reactionKey, isReacting) {
+    // TODO: dispatch event and listen in `forum-client`
+    dispatch(requestUpdateReplyReactions(replyId, reactionKey, isReacting));
+  },
+
+  onCommentReactionPick(replyId, commentId, reactionKey, isReacting) {
+    // TODO: dispatch event and listen in `forum-client`
+    dispatch(requestUpdateCommentReactions(replyId, commentId, reactionKey, isReacting));
+  },
+
+  onCommentsClicked(replyId){
     dispatch(showReplyComments(replyId));
   },
 
