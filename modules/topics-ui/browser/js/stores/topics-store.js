@@ -337,6 +337,7 @@ export class TopicsStore {
     _.extend(this, Backbone.Events);
 
     //Make a new live collection
+    // 
     const topicCollectionOptions = _.extend({
       snapshotFilter: this.getSnapshotFilter(),
       snapshotSort: this.getSnapshotSort()
@@ -504,11 +505,11 @@ export class TopicsStore {
     }
   }
 
-  // TODO: maybe not the best method name
-  fetch() {
+  fetchLatestFilterAndSort() {
     var url = `/v1/forums/${getForumId()}/topics`;
     var data = this.getAPIFilter();
     data.sort = this.getAPISort();
+
     return apiClient.get(url, data)
       .bind(this)
       .then(function(results) {
@@ -554,14 +555,14 @@ export class TopicsStore {
   onRouterUpdate() {
     this.topicCollection.setSnapshotFilter(this.getSnapshotFilter());
     this.collection.setFilter(this.getFilter());
-    this.fetch();
+    this.fetchLatestFilterAndSort();
   }
 
   //Sort your bad self
   onSortUpdate(){
     this.topicCollection.setSnapshotSort(this.getSnapshotSort());
     this.collection.sort();
-    this.fetch();
+    this.fetchLatestFilterAndSort();
   }
 
   onRequestSubscriptionStateUpdate({topicId}) {
