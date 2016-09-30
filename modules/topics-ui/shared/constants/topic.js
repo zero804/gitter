@@ -8,3 +8,6 @@ export const UPDATE_SAVE_COMMENT = 'update-save-comment';
 export const UPDATE_TOPIC = 'update-topic';
 export const UPDATE_CANCEL_TOPIC = 'update-cancel-topic';
 export const UPDATE_SAVE_TOPIC = 'update-save-topic';
+export const TOPIC_REPLIES_SORT_BY_COMMENTS = 'topic-sort-by-comments';
+export const TOPIC_REPLIES_SORT_BY_LIKED = 'topic-sort-by-liked';
+export const TOPIC_REPLIES_SORT_BY_RECENT = 'topic-sort-by-recent';

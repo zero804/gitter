@@ -27,6 +27,9 @@ import updateSaveTopic from '../action-creators/topic/update-save-topic';
 import requestUpdateTopicSubscriptionState from '../action-creators/forum/request-update-topic-subscription-state';
 import requestUpdateReplySubscriptionState from '../action-creators/forum/request-update-reply-subscription-state';
 import requestSignIn from '../action-creators/forum/request-sign-in';
+import topicReplySortByComments from '../action-creators/topic/topic-replies-sort-by-comments';
+import topicReplySortByLike from '../action-creators/topic/topic-replies-sort-by-liked';
+import topicReplySortByReplies from '../action-creators/topic/topic-replies-sort-by-recent';
 
 import { SUBSCRIPTION_STATE_SUBSCRIBED } from '../constants/forum.js';
 const EDITOR_SUBMIT_LINK_SOURCE = 'topics-reply-editor-submit-button';
@@ -374,7 +377,19 @@ const TopicContainer = createClass({
 
   onTopicEditSave(){
     dispatch(updateSaveTopic());
-  }
+  },
+
+  onSortByCommentClicked(){
+    dispatch(topicReplySortByComments());
+  },
+
+  onSortByLikeClicked(){
+    dispatch(topicReplySortByLike());
+  },
+
+  onSortByRecentClicked(){
+    dispatch(topicReplySortByReplies());
+  },
 
 });
 

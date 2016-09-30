@@ -26,7 +26,11 @@ import {
   UPDATE_SAVE_COMMENT,
   UPDATE_TOPIC,
   UPDATE_SAVE_TOPIC,
-  UPDATE_CANCEL_TOPIC
+  UPDATE_CANCEL_TOPIC,
+  TOPIC_REPLIES_SORT_BY_COMMENTS,
+  TOPIC_REPLIES_SORT_BY_LIKED ,
+  TOPIC_REPLIES_SORT_BY_RECENT ,
+
 } from '../../../../shared/constants/topic';
 
 import {BODY_UPDATE, SUBMIT_NEW_REPLY} from '../../../../shared/constants/create-reply';
@@ -184,6 +188,27 @@ describe.skip('<TopicContainer />', () => {
     const handle = spy();
     subscribe(UPDATE_SAVE_TOPIC, handle);
     wrapper.find('TopicBody').at(0).prop('onTopicEditSave')();
+    equal(handle.callCount, 1);
+  });
+
+  it('should dispatch the right event when the reply sort by comment is clicked', () => {
+    const handle = spy();
+    subscribe(TOPIC_REPLIES_SORT_BY_COMMENTS, handle);
+    wrapper.find('TopicReplyListHeader').at(0).prop('onSortByCommentClicked')();
+    equal(handle.callCount, 1);
+  });
+
+  it('should dispatch the right event when the reply sort by like is clicked', () => {
+    const handle = spy();
+    subscribe(TOPIC_REPLIES_SORT_BY_LIKED, handle);
+    wrapper.find('TopicReplyListHeader').at(0).prop('onSortByLikeClicked')();
+    equal(handle.callCount, 1);
+  });
+
+  it('should dispatch the right event when the reply sort by recent is clicked', () => {
+    const handle = spy();
+    subscribe(TOPIC_REPLIES_SORT_BY_RECENT, handle);
+    wrapper.find('TopicReplyListHeader').at(0).prop('onSortByRecentClicked')();
     equal(handle.callCount, 1);
   });
 
