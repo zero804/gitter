@@ -1,18 +1,21 @@
 import React, { PropTypes } from 'react';
 import FeedItem from './feed-item.jsx';
+import ReactionButton from '../forum/reaction-button.jsx';
 
 export default React.createClass({
 
   displayName: 'CommentItem',
   propTypes: {
     comment: PropTypes.shape({
+      id: PropTypes.string,
       body: PropTypes.shape({
         text: PropTypes.string.isRequired,
       })
     }),
+    onReactionPick: PropTypes.func,
     onChange: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
-    onSave: PropTypes.func.isRequired,
+    onSave: PropTypes.func.isRequired
   },
 
   render(){
@@ -40,13 +43,21 @@ export default React.createClass({
   },
 
   getFeedItemFooterChildren(){
+    const { comment } = this.props;
     return [
-      <span
-        key="likes"
-        className="feed-item__likes">
-        10 Likes
-      </span>
+      <ReactionButton
+        key="reactions"
+        reactionCountMap={comment.reactions}
+        ownReactionMap={comment.ownReactions}
+        onReactionPick={this.onReactionPick}/>,
     ];
-  }
+  },
+
+  onReactionPick(reactionKey, isReacting) {
+    const {comment, onReactionPick} = this.props;
+    if(onReactionPick) {
+      onReactionPick(comment.id, reactionKey, isReacting);
+    }
+  },
 
 });

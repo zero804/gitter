@@ -27,7 +27,7 @@ describe('ForumCategoryStore', function(){
   });
 
   //This works when run with only ???
-  it.skip('should dispatch un active:update event when the active category changes', function(){
+  it('should dispatch un active:update event when the active category changes', function(){
     categoryStore.on(forumCatConstants.UPDATE_ACTIVE_CATEGORY, handle)
     mockRouter.set('categoryName', 'test-1');
     assert.equal(handle.callCount, 1);

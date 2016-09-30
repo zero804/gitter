@@ -10,16 +10,20 @@ import {getRealtimeClient} from './realtime-client';
 
 import parseReply from '../../../shared/parse/reply';
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
+import onReactionsUpdateMixin from './mixins/on-reactions-update';
 
 import {MODEL_STATE_DRAFT} from '../../../shared/constants/model-states';
 import {NAVIGATE_TO_TOPIC} from '../../../shared/constants/navigation';
-import {SUBMIT_NEW_REPLY} from '../../../shared/constants/create-reply';
-import {UPDATE_REPLY, CANCEL_UPDATE_REPLY, SAVE_UPDATE_REPLY} from '../../../shared/constants/topic';
 import {
   UPDATE_REPLY_SUBSCRIPTION_STATE,
   REQUEST_UPDATE_REPLY_SUBSCRIPTION_STATE,
-  SUBSCRIPTION_STATE_PENDING
+  SUBSCRIPTION_STATE_PENDING,
+  UPDATE_REPLY_REACTIONS
 } from '../../../shared/constants/forum.js';
+import {SUBMIT_NEW_REPLY} from '../../../shared/constants/create-reply';
+import {UPDATE_REPLY, CANCEL_UPDATE_REPLY, SAVE_UPDATE_REPLY} from '../../../shared/constants/topic';
+
+
 
 export const ReplyModel = BaseModel.extend({
   // Why doesn't this just come from it's owner collection?
@@ -51,6 +55,7 @@ export const RepliesStore = LiveCollection.extend({
     subscribe(SAVE_UPDATE_REPLY, this.saveUpdatedModel, this);
     subscribe(REQUEST_UPDATE_REPLY_SUBSCRIPTION_STATE, this.onRequestSubscriptionStateUpdate, this);
     subscribe(UPDATE_REPLY_SUBSCRIPTION_STATE, this.onSubscriptionStateUpdate, this);
+    subscribe(UPDATE_REPLY_REACTIONS, this.onReactionsUpdate, this);
     router.on('change:topicId', this.onActiveTopicUpdate, this);
   },
 
@@ -129,6 +134,8 @@ dispatchOnChangeMixin(RepliesStore, [
   'change:text',
   'change:body'
 ]);
+onReactionsUpdateMixin(RepliesStore, 'onReactionsUpdate');
+
 
 const serverStore = (window.context.repliesStore|| {});
 const serverData = (serverStore.data || [])

@@ -4,7 +4,8 @@ import _ from 'lodash';
 const DELAY_TIME = 8;
 const cache = new WeakMap();
 
-export default function dipatchOnChangeMixin(Constructor, evts) {
+export default function dipatchOnChangeMixin(Constructor, evts, options) {
+  const opts = _.extend({}, { delay: DELAY_TIME }, options);
 
   //Default events to bind to
   const events = ['add', 'remove', 'reset', 'sync', 'snapshot'].concat(evts);
@@ -25,12 +26,15 @@ export default function dipatchOnChangeMixin(Constructor, evts) {
     //Get a delayed callback. Backbone can throw out a LOT of events
     //ie snapshot which will trigger changes for every attribute on every model
     //in the WHOLE collection
-    const delayedCaller = _.debounce(fn, DELAY_TIME);
+    let caller = _.debounce(fn, opts.delay);
+    if(opts.delay <= 0) {
+      caller = fn;
+    }
 
     //Keep a reference so we can un-bind later
-    cache.set(fn, delayedCaller);
+    cache.set(fn, caller);
 
-    this.listenTo(this, evts, delayedCaller, ctx);
+    this.listenTo(this, evts, caller, ctx);
   }
 
   Constructor.prototype.removeListeners = function(fn, ctx){
@@ -39,13 +43,15 @@ export default function dipatchOnChangeMixin(Constructor, evts) {
     var evts = events.concat(this.events).join(' ');
 
     //Get the ACTUAL function we want to unbind out of the cache
-    const delayedCaller = cache.get(fn);
+    const caller = cache.get(fn);
 
     //Stop any further calls to the function
-    delayedCaller.cancel();
+    if(caller.cancel) {
+      caller.cancel();
+    }
 
     //Unbind dem events, yo.
-    this.stopListening(this, evts, delayedCaller, ctx);
+    this.stopListening(this, evts, caller, ctx);
   }
 
   return Constructor;
