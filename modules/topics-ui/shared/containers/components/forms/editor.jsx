@@ -15,6 +15,7 @@ export default React.createClass({
     value: PropTypes.string,
     placeholder: PropTypes.string,
     autoFocus: PropTypes.bool,
+    valid: PropTypes.bool,
   },
 
   getDefaultProps(){
@@ -23,8 +24,12 @@ export default React.createClass({
 
   render(){
 
-    const { className, name, value, placeholder, autoFocus } = this.props;
-    const compiledClass = classNames('editor', className);
+    const { className, name, value, placeholder, autoFocus, valid } = this.props;
+    const compiledClass = classNames({
+      editor: true,
+      valid: (valid === true),
+      invalid: (valid === false),
+    }, className);
 
     return (
       <textarea

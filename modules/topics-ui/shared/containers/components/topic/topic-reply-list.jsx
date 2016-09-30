@@ -7,18 +7,24 @@ export default React.createClass({
 
   displayName: 'TopicReplyList',
   propTypes: {
-    userId: PropTypes.string.isRequired,
-    user: PropTypes.object.isRequired,
-    forumId: PropTypes.string.isRequired,
-    topicId: PropTypes.string.isRequired,
     replies: PropTypes.array.isRequired,
+    user: PropTypes.object.isRequired,
+
     newCommentContent: PropTypes.string,
-    onReplyCommentsClicked: PropTypes.func.isRequired,
-    onNewCommentUpdate: PropTypes.func.isRequired,
     submitNewComment: PropTypes.func.isRequired,
+    onNewCommentUpdate: PropTypes.func.isRequired,
+    onCommentsClicked: PropTypes.func.isRequired,
+
     onReplySubscribeButtonClick: PropTypes.func,
     onReplyReactionPick: PropTypes.func,
     onCommentReactionPick: PropTypes.func,
+
+    onReplyEditUpdate: PropTypes.func.isRequired,
+    onReplyEditCancel: PropTypes.func.isRequired,
+    onReplyEditSaved: PropTypes.func.isRequired,
+    onCommentEditUpdate: PropTypes.func.isRequired,
+    onCommentEditCancel: PropTypes.func.isRequired,
+    onCommentEditSave: PropTypes.func.isRequired
   },
 
   render(){
@@ -36,45 +42,42 @@ export default React.createClass({
 
   buildReplyListItem(reply, index) {
     const {
-      userId,
-      forumId,
-      topicId,
-      newCommentContent,
       user,
+      newCommentContent,
+      submitNewComment,
+      onNewCommentUpdate,
+      onCommentsClicked,
       onReplySubscribeButtonClick,
       onReplyReactionPick,
-      onCommentReactionPick
+      onCommentReactionPick,
+      onReplyEditUpdate,
+      onReplyEditCancel,
+      onReplyEditSaved,
+      onCommentEditUpdate,
+      onCommentEditCancel,
+      onCommentEditSave
     } = this.props;
 
     return (
       <li key={`reply-list-item-${index}`}>
         <TopicReplyListItem
-          userId={userId}
-          forumId={forumId}
-          topicId={topicId}
           reply={reply}
           user={user}
           newCommentContent={newCommentContent}
-          submitNewComment={this.submitNewComment}
-          onNewCommentUpdate={this.onNewCommentUpdate}
-          onCommentsClicked={this.onReplyCommentsClicked}
+          submitNewComment={submitNewComment}
+          onNewCommentUpdate={onNewCommentUpdate}
+          onCommentsClicked={onCommentsClicked}
           onSubscribeButtonClick={onReplySubscribeButtonClick}
-          onReplyReactionPick={onReplyReactionPick}
-          onCommentReactionPick={onCommentReactionPick} />
+          onReactionPick={onReplyReactionPick}
+          onCommentReactionPick={onCommentReactionPick}
+          onEditUpdate={onReplyEditUpdate}
+          onEditCancel={onReplyEditCancel}
+          onEditSaved={onReplyEditSaved}
+          onCommentEditUpdate={onCommentEditUpdate}
+          onCommentEditCancel={onCommentEditCancel}
+          onCommentEditSave={onCommentEditSave} />
       </li>
     );
   },
-
-  onReplyCommentsClicked(replyId){
-    this.props.onReplyCommentsClicked(replyId);
-  },
-
-  onNewCommentUpdate(replyId, val) {
-    this.props.onNewCommentUpdate(replyId, val);
-  },
-
-  submitNewComment(){
-    this.props.submitNewComment();
-  }
 
 });

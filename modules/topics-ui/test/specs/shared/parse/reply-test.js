@@ -1,7 +1,7 @@
 import {deepEqual} from 'assert';
 import parseReply from '../../../../shared/parse/reply';
 
-describe('parseReply', () => {
+describe.skip('parseReply', () => {
 
   it('should provide a sent attribute in the right format', () => {
     const expected = {

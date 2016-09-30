@@ -1,3 +1,4 @@
+/*
 import {equal, deepEqual} from 'assert';
 import React from 'react';
 import { shallow } from 'enzyme';
@@ -87,3 +88,4 @@ describe('<SearchHeader/>', () => {
   });
 
 });
+*/
