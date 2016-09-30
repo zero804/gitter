@@ -27,7 +27,7 @@ describe('TagStore', () => {
   });
 
   //This passes when run with only ... ?
-  it.skip('should dispatch un active:update event when the active tag changes', function(){
+  it('should dispatch un active:update event when the active tag changes', function(){
     tagStore.on(forumTagConstants.UPDATE_ACTIVE_TAG, handle)
     mockRouter.set('tagName', 1);
     assert.equal(handle.callCount, 1);
