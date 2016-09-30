@@ -7,6 +7,7 @@ import Backbone from 'backbone';
 
 import TopicContainer from '../../../../shared/containers/TopicContainer.jsx';
 
+import groupStore from '../../../mocks/group-store';
 import topicsStore from '../../../mocks/topic-store';
 import categoryStore from '../../../mocks/category-store';
 import repliesStore from '../../../mocks/replies-store';
@@ -39,6 +40,7 @@ describe.skip('<TopicContainer />', () => {
   beforeEach(function(){
     wrapper = shallow(
       <TopicContainer
+        groupStore={groupStore}
         newCommentStore={newCommentStore}
         commentsStore={commentsStore}
         topicsStore={topicsStore}
@@ -47,8 +49,7 @@ describe.skip('<TopicContainer />', () => {
         repliesStore={repliesStore}
         currentUserStore={currentUserStore}
         newReplyStore={new Backbone.Model()}
-        topicId="1"
-        groupUri="gitterHQ"/>
+        topicId="1" />
     );
   });
 
