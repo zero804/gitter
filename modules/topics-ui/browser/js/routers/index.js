@@ -98,8 +98,8 @@ var Router = Backbone.Router.extend({
     const { source } = data;
 
     if(getIsSignedIn()) {
-        const groupUri = this.model.get('groupUri');
-        this.navigate(`/${groupUri}/topics/create-topic/~topics`, { trigger: true });
+      const groupUri = this.model.get('groupUri');
+      this.navigate(`/${groupUri}/topics/create-topic/~topics`, { trigger: true });
     }
     else {
       requestSignIn(source);
