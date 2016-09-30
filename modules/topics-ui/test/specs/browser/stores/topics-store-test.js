@@ -1,4 +1,4 @@
-import assert from 'assert';
+import assert, { ok } from 'assert';
 import {dispatch} from '../../../../shared/dispatcher';
 
 //Mocks
@@ -27,6 +27,7 @@ const {TopicsStore, TopicModel} = injector({
   '../routers': mockRouter,
   '../stores/current-user-store': currentUserStore
 });
+
 
 describe('TopicsStore', () => {
 
@@ -63,7 +64,7 @@ describe('TopicsStore', () => {
   });
 
   //I think this is actually broken and should be fixed
-  it.skip('should filter by tag when the router is in the right state', () => {
+  it('should filter by tag when the router is in the right state', () => {
     mockRouter.set({
       router: 'forum',
       categoryName: DEFAULT_CATEGORY_NAME,
@@ -73,7 +74,9 @@ describe('TopicsStore', () => {
     assert(result.length !== topics.length);
     result.forEach((m) => {
       var tags = m.tags;
-      assert(tags.includes('2'), 'tags dont include 2');
+      ok(tags.some((tag) => {
+        return tag.value === '2';
+      }), 'tags dont include 2');
     });
   });
 
@@ -175,7 +178,7 @@ describe('TopicModel', () => {
 
   it('should update the body when the right action is fired', () => {
     dispatch(updateBody('test'));
-    assert.equal(model.get('body'), 'test');
+    assert.equal(model.get('text'), 'test');
   });
 
   it('should not update the body when the model is not in a draft state', () => {

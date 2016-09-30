@@ -3,6 +3,7 @@ import Container from '../container.jsx';
 import Panel from '../panel.jsx';
 import EditableContent from '../forms/editable-content.jsx';
 import WatchButton from '../forum/watch-button.jsx';
+import ReactionButton from '../forum/reaction-button.jsx';
 
 export default React.createClass({
 
@@ -14,10 +15,11 @@ export default React.createClass({
       }).isRequired,
       canEdit: PropTypes.bool.isRequired,
     }).isRequired,
+    onSubscribeButtonClick: PropTypes.func,
+    onReactionPick: PropTypes.func,
     onTopicEditUpdate: PropTypes.func.isRequired,
     onTopicEditCancel: PropTypes.func.isRequired,
-    onTopicEditSave: PropTypes.func.isRequired,
-    onSubscribeButtonClick: PropTypes.func
+    onTopicEditSave: PropTypes.func.isRequired
   },
 
   getInitialState(){
@@ -34,6 +36,12 @@ export default React.createClass({
         <Panel className="panel--topic-body">
           {this.getContent()}
           <footer className="topic-body__footer">
+            <ReactionButton
+              key="reactions"
+              className="topic-body__footer__reaction-action"
+              reactionCountMap={topic.reactions}
+              ownReactionMap={topic.ownReactions}
+              onReactionPick={this.onReactionPick}/>
             <button className="topic-body__footer__action">Share</button>
             {this.getEditButton()}
             <WatchButton
@@ -95,6 +103,14 @@ export default React.createClass({
   onTopicEditCancel(){
     this.props.onTopicEditCancel();
     this.setState({ isEditing: false });
-  }
+  },
+
+  onReactionPick(reactionKey, isReacting) {
+    const {topic, onReactionPick} = this.props;
+    if(onReactionPick) {
+      onReactionPick(topic.id, reactionKey, isReacting);
+    }
+  },
+
 
 });
