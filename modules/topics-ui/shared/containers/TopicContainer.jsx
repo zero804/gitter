@@ -8,6 +8,7 @@ import SearchHeaderContainer from './components/search/SearchHeaderContainer.jsx
 import TopicReplyEditor from './components/topic/topic-reply-editor.jsx';
 import TopicReplyListHeader from './components/topic/topic-reply-list-header.jsx';
 import TopicReplyList from './components/topic/topic-reply-list.jsx';
+import TopicReplyListItem from './components/topic/topic-reply-list-item.jsx';
 
 import updateReplyBody from '../action-creators/create-reply/body-update';
 import submitNewReply from '../action-creators/create-reply/submit-new-reply';
@@ -209,27 +210,9 @@ const TopicContainer = createClass({
 
         <TopicReplyListHeader replies={parsedReplies}/>
 
-
-        <TopicReplyList
-          replies={parsedReplies}
-          user={currentUser}
-
-          newCommentContent={newCommentStore.get('text')}
-          submitNewComment={this.submitNewComment}
-          onNewCommentUpdate={this.onNewCommentUpdate}
-          onCommentsClicked={this.onCommentsClicked}
-
-          onReplySubscribeButtonClick={this.onReplySubscribeButtonClick}
-          onReplyReactionPick={this.onReplyReactionPick}
-          onCommentReactionPick={this.onCommentReactionPick}
-
-          onReplyEditUpdate={this.onReplyEditUpdate}
-          onReplyEditCancel={this.onReplyEditCancel}
-          onReplyEditSaved={this.onReplyEditSaved}
-          onCommentEditUpdate={this.onCommentEditUpdate}
-          onCommentEditCancel={this.onCommentEditCancel}
-          onCommentEditSave={this.onCommentEditSave} />
-
+        <TopicReplyList>
+          {parsedReplies.map(this.getReplyListItem)}
+        </TopicReplyList>
 
         <TopicReplyEditor
           user={currentUser}
@@ -239,6 +222,30 @@ const TopicContainer = createClass({
           onSubmit={this.onNewReplyEditorSubmit}
           onEditorClick={this.onReplyEditorClick}/>
       </main>
+    );
+  },
+
+  getReplyListItem(reply, index){
+    const {newCommentStore, currentUserStore } = this.props;
+    const currentUser = currentUserStore.getCurrentUser();
+    return (
+      <TopicReplyListItem
+        key={`topic-reply-list-item-${reply.id}-${index}`}
+        reply={reply}
+        user={currentUser}
+        newCommentContent={newCommentStore.get('text')}
+        submitNewComment={this.submitNewComment}
+        onNewCommentUpdate={this.onNewCommentUpdate}
+        onCommentsClicked={this.onCommentsClicked}
+        onSubscribeButtonClick={this.onReplySubscribeButtonClick}
+        onReactionPick={this.onReplyReactionPick}
+        onCommentReactionPick={this.onCommentReactionPick}
+        onEditUpdate={this.onReplyEditUpdate}
+        onEditCancel={this.onReplyEditCancel}
+        onEditSaved={this.onReplyEditSaved}
+        onCommentEditUpdate={this.onCommentEditUpdate}
+        onCommentEditCancel={this.onCommentEditCancel}
+        onCommentEditSave={this.onCommentEditSave} />
     );
   },
 
