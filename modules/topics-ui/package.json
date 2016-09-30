@@ -6,6 +6,7 @@
   "scripts": {
     "test": "node ./test/fixtures/runner-node.js",
     "test-watch": "concurrently --raw \"webpack -w --config ./test/webpack.config.js\" \"http-server ./test/fixtures\"",
+    "test-watch-with-sourcemaps": "concurrently --raw \"webpack -w --config ./test/webpack.config.js --use-sourcemaps\" \"http-server ./test/fixtures\"",
     "generate": "plop"
   },
   "author": "Gitter Team",
