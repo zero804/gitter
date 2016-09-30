@@ -3,8 +3,10 @@ import data from './mock-data/forum';
 
 let store;
 const ForumStore = Backbone.Model.extend({
-  getForumId: ()=> data.id,
+  getForum: () => data,
+  getForumId: () => data.id,
   getForumStore: () => store,
+  getSubscriptionState: () => data.subscriptionState
 });
 
 store = new ForumStore(data);
