@@ -11,6 +11,8 @@ var TopicStrategy = testRequire('./serializers/rest/topic-strategy');
 var subscriberService = require('gitter-web-topic-notifications/lib/subscriber-service');
 var ForumObject = require('gitter-web-topic-models/lib/forum-object');
 var assert = require('assert');
+var reactionService = require('gitter-web-topic-reactions/lib/reaction-service');
+var persistence = require('gitter-web-persistence');
 
 var LONG_AGO = '2014-01-01T00:00:00.000Z';
 
@@ -41,6 +43,12 @@ describe('TopicStrategy #slow', function() {
       category: 'category1',
       sent: new Date(LONG_AGO),
       repliesTotal: 1
+    },
+    topic2: {
+      user: 'user1',
+      forum: 'forum1',
+      category: 'category1',
+      sent: new Date(LONG_AGO)
     },
     reply1: {
       user: 'user1',
@@ -89,6 +97,62 @@ describe('TopicStrategy #slow', function() {
             "displayName": user.displayName,
             "avatarUrl":  nconf.get('avatar:officialHost') + '/g/u/' + user.username
           }],
+          reactions: {},
+          ownReactions: {},
+          sent: LONG_AGO,
+          editedAt: null,
+          lastChanged: LONG_AGO,
+          v: 1
+        }])
+      });
+  });
+
+  it('should serialize a topic with a userId with reactions', function() {
+    var topic = fixture.topic2;
+    var category = fixture.category1;
+    var user = fixture.user1;
+
+    return reactionService.addReaction(ForumObject.createForTopic(topic.forumId, topic._id), user._id, 'like')
+      .then(function() {
+        return persistence.Topic.findById(topic._id);
+      })
+      .then(function(topic) {
+        var strategy = TopicStrategy.standard({ currentUserId: user._id });
+
+        return serialize([topic], strategy)
+      })
+      .then(function(s) {
+        assertUtils.assertSerializedEqual(s, [{
+          id: topic.id,
+          title: topic.title,
+          slug: topic.slug,
+          body: {
+            text: topic.text,
+            html: topic.html
+          },
+          sticky: topic.sticky,
+          tags: [],
+          category: {
+            id: category.id,
+            name: category.name,
+            slug: category.slug,
+            v: 1
+          },
+          user: {
+            id: user.id,
+            username: user.username,
+            displayName: user.displayName,
+            avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
+          },
+          subscribed: false,
+          repliesTotal: 0,
+          replyingUsers: [],
+          reactions: {
+            like: 1
+          },
+          ownReactions: {
+            like: true
+          },
           sent: LONG_AGO,
           editedAt: null,
           lastChanged: LONG_AGO,
@@ -135,6 +199,7 @@ describe('TopicStrategy #slow', function() {
             "displayName": user.displayName,
             "avatarUrl":  nconf.get('avatar:officialHost') + '/g/u/' + user.username
           }],
+          reactions: {},
           sent: LONG_AGO,
           editedAt: null,
           lastChanged: LONG_AGO,
@@ -192,6 +257,8 @@ describe('TopicStrategy #slow', function() {
             },
             subscribed: false,
             commentsTotal: 0,
+            reactions: {},
+            ownReactions: {},
             sent: LONG_AGO,
             editedAt: null,
             lastChanged: LONG_AGO,
@@ -204,6 +271,8 @@ describe('TopicStrategy #slow', function() {
             displayName: user.displayName,
             avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username
           }],
+          reactions: {},
+          ownReactions: {},
           sent: LONG_AGO,
           editedAt: null,
           lastChanged: LONG_AGO,
@@ -257,6 +326,7 @@ describe('TopicStrategy #slow', function() {
               avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username
             },
             commentsTotal: 0,
+            reactions: {},
             sent: LONG_AGO,
             editedAt: null,
             lastChanged: LONG_AGO,
@@ -269,6 +339,7 @@ describe('TopicStrategy #slow', function() {
             displayName: user.displayName,
             avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username
           }],
+          reactions: {},
           sent: LONG_AGO,
           editedAt: null,
           lastChanged: LONG_AGO,
@@ -311,6 +382,7 @@ describe('TopicStrategy #slow', function() {
               displayName: user.displayName,
               avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username
             }],
+            reactions: {},
             sent: LONG_AGO,
             editedAt: null,
             lastChanged: LONG_AGO,
@@ -362,6 +434,7 @@ describe('TopicStrategy #slow', function() {
               displayName: user.displayName,
               avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username
             }],
+            reactions: {},
             sent: LONG_AGO,
             editedAt: null,
             lastChanged: LONG_AGO,
