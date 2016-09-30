@@ -67,7 +67,6 @@ export default React.createClass({
   getDefaultState(){
     const { router } = this.props;
     return {
-      groupUri: router.get('groupUri'),
       route: router.get('route'),
       router: router,
       groupStore: getGroupStore(),

@@ -11,6 +11,12 @@ module.exports = function groupStore(data) {
     },
     getGroupId: () => {
       return data.id;
+    },
+    getGroupUri: () => {
+      return data.uri;
+    },
+    getGroupName: () => {
+      return data.name;
     }
   };
 };
