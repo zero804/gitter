@@ -46,8 +46,6 @@ function parseSort(value) {
 
   var values = value.split(',');
 
-  console.log("SORT IS", values);
-
   values.forEach(function(value) {
     // -lastChanged -> { lastChanged: -1 }
     // lastChanged -> { lastChanged: 1 }
