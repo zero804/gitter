@@ -8,7 +8,7 @@ const onReactionsUpdate = function({ topicId, replyId, commentId, reactionKey, i
   const ownReactions = entity.get('ownReactions') || {};
 
   entity.set({
-    // `reactionCounts` is handled in the live-collection
+    // `reactions` is handled in the live-collection
     ownReactions: _.extend({}, ownReactions, {
       [reactionKey]: isReacting
     })

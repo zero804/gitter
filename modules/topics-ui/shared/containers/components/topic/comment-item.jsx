@@ -43,9 +43,12 @@ export default React.createClass({
   },
 
   getFeedItemFooterChildren(){
+    const { comment } = this.props;
     return [
       <ReactionButton
         key="reactions"
+        reactionCountMap={comment.reactions}
+        ownReactionMap={comment.ownReactions}
         onReactionPick={this.onReactionPick}/>,
     ];
   },

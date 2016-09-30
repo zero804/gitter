@@ -39,7 +39,7 @@ export default React.createClass({
             <ReactionButton
               key="reactions"
               className="topic-body__footer__reaction-action"
-              reactionCountMap={topic.reactionCounts}
+              reactionCountMap={topic.reactions}
               ownReactionMap={topic.ownReactions}
               onReactionPick={this.onReactionPick}/>
             <button className="topic-body__footer__action">Share</button>

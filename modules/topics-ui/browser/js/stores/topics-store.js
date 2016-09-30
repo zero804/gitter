@@ -453,7 +453,7 @@ export class TopicsStore {
 //All events that must be observed
 dispatchOnChangeMixin(TopicsStore, [
   'sort',
-  'change:reactionCounts',
+  'change:reactions',
   'change:ownReactions',
   'change:text',
   'change:subscriptionState',
