@@ -89,7 +89,8 @@ var Router = Backbone.Router.extend({
       route: navConstants.TOPIC_ROUTE,
       groupUri: groupUri,
       topicId: id,
-      slug: slug
+      slug: slug,
+      createTopic: false
     });
   },
 

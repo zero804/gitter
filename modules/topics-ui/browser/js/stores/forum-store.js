@@ -1,9 +1,15 @@
-import Backbone from 'backbone';
+import { BaseModel } from './base-model';
 import {subscribe} from '../../../shared/dispatcher';
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
-import { UPDATE_FORUM_SUBSCRIPTION_STATE, REQUEST_UPDATE_FORUM_SUBSCRIPTION_STATE, SUBSCRIPTION_STATE_UNSUBSCRIBED, SUBSCRIPTION_STATE_PENDING } from '../../../shared/constants/forum.js';
 
-const ForumStore = Backbone.Model.extend({
+import {
+  UPDATE_FORUM_SUBSCRIPTION_STATE,
+  REQUEST_UPDATE_FORUM_SUBSCRIPTION_STATE,
+  SUBSCRIPTION_STATE_UNSUBSCRIBED,
+  SUBSCRIPTION_STATE_PENDING
+} from '../../../shared/constants/forum.js';
+
+const ForumStore = BaseModel.extend({
   defaults: {
     subscriptionState: SUBSCRIPTION_STATE_UNSUBSCRIBED
   },
@@ -30,9 +36,17 @@ const ForumStore = Backbone.Model.extend({
     });
   },
 
-  getForum(){ return this.toJSON(); },
-  getForumId() { return this.get('id'); },
-  getSubscriptionState() { return this.get('subscriptionState'); }
+  getForum() {
+    return this.toPOJO();
+  },
+
+  getForumId() {
+    return this.get('id');
+  },
+
+  getSubscriptionState() {
+    return this.get('subscriptionState');
+  }
 });
 
 dispatchOnChangeMixin(ForumStore);

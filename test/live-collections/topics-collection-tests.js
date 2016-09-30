@@ -10,7 +10,7 @@ var commentService = require('gitter-web-topics/lib/comment-service');
 
 require('../../server/event-listeners').install();
 
-describe('topics-live-collection', function() {
+describe('topics-live-collection #slow', function() {
   var fixture = fixtureLoader.setup({
     user1: {},
     forum1: {

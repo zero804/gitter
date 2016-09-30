@@ -9,7 +9,7 @@ var serialize = require('gitter-web-serialization/lib/serialize');
 var serializeObject = require('gitter-web-serialization/lib/serialize-object');
 var ForumStrategy = testRequire('./serializers/rest/forum-strategy');
 var subscriberService = require('gitter-web-topic-notifications/lib/subscriber-service');
-var ForumObject = require('gitter-web-topic-notifications/lib/forum-object');
+var ForumObject = require('gitter-web-topic-models/lib/forum-object');
 var assert = require('assert');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
@@ -70,14 +70,17 @@ describe('ForumStrategy #slow', function() {
             id: category3.id,
             name: category3.name,
             slug: category3.slug,
+            v: 1
           }, {
             id: category2.id,
             name: category2.name,
             slug: category2.slug,
+            v: 1
           }, {
             id: category1.id,
             name: category1.name,
             slug: category1.slug,
+            v: 1
           }],
           topics: [{
             id: topic.id,
@@ -92,7 +95,8 @@ describe('ForumStrategy #slow', function() {
             category: {
               id: category1.id,
               name: category1.name,
-              slug: category1.slug
+              slug: category1.slug,
+              v: 1
             },
             user: {
               id: user.id,
@@ -132,14 +136,17 @@ describe('ForumStrategy #slow', function() {
             id: category3.id,
             name: category3.name,
             slug: category3.slug,
+            v: 1
           }, {
             id: category2.id,
             name: category2.name,
             slug: category2.slug,
+            v: 1
           }, {
             id: category1.id,
             name: category1.name,
             slug: category1.slug,
+            v: 1
           }],
           topics: [{
             id: topic.id,
@@ -154,7 +161,8 @@ describe('ForumStrategy #slow', function() {
             category: {
               id: category1.id,
               name: category1.name,
-              slug: category1.slug
+              slug: category1.slug,
+              v: 1
             },
             user: {
               id: user.id,
