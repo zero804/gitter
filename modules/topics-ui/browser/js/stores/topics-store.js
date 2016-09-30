@@ -336,8 +336,10 @@ export class TopicsStore {
     //Get access to listenTo etc
     _.extend(this, Backbone.Events);
 
-    //Make a new live collection
-    // 
+    // Passing in the snapshot filter & sort as options to the live collection
+    // so it can be there when the connection first gets established. This also
+    // means that the router MUST have already parsed the url parameters and
+    // initialised the correct initial state by this point.
     const topicCollectionOptions = _.extend({
       snapshotFilter: this.getSnapshotFilter(),
       snapshotSort: this.getSnapshotSort()
