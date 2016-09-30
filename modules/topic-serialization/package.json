@@ -11,6 +11,9 @@
   },
   "dependencies": {
     "gitter-web-serialization": "file:../serialization",
+    "gitter-web-topic-models": "file:../topic-models",
+    "gitter-web-topic-notifications": "file:../topic-notifications",
+    "gitter-web-topic-reactions": "file:../topic-reactions",
     "gitter-web-user-serialization": "file:../user-serialization"
   },
   "private": true
