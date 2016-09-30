@@ -50,6 +50,12 @@ const modelDefaults = {
 
 export const TopicModel = BaseModel.extend({
 
+  // Theres a problem with the realtime client here. When a message comes in from
+  // the realtime connection it will create a new model and patch the values onto an existing model.
+  // If you have any defaults the patch model with override the current models values with the defaults.
+  // Bad Times.
+  //
+  // via @cutandpastey, https://github.com/troupe/gitter-webapp/pull/2293#discussion_r81304415
   defaults: {
     state: MODEL_STATE_DRAFT,
   },
@@ -117,7 +123,7 @@ export const TopicModel = BaseModel.extend({
   //typically when a user de-selects them in the modal
   onTagsUpdate(data){
     const tag = data.tag;
-    const currentTags = this.get('tags');
+    const currentTags = this.get('tags') || [];
     if(currentTags.indexOf(tag) !== -1) { return; }
     currentTags.push(tag);
     this.set('tags', currentTags);
@@ -399,7 +405,7 @@ export class TopicsStore {
     const model = this.topicCollection.findWhere({ state: MODEL_STATE_DRAFT });
 
     //Return a sensible default
-    if(!model) { return { title: '', text: '', categoryId: '', tags: [] } }
+    if(!model) { return _.extend({}, modelDefaults); }
 
     //Or just return the model
     return Object.assign({}, model.toPOJO(), {

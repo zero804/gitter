@@ -15,11 +15,22 @@ require('jsdom-global')();
 var opts = require('yargs')
   .option('grep', {
     alias: 'g',
-    description: 'Filter for only certain tests'
+    description: 'only run tests matching <pattern>'
+  })
+  .option('invert', {
+    alias: 'i',
+    type: 'boolean',
+    description: 'inverts --grep matches',
+    default: false
   })
   .option('full-trace', {
     type: 'boolean',
     description: 'Full stack trace'
+  })
+  .option('bail', {
+    type: 'boolean',
+    description: 'Whether to bail on first failure',
+    default: true
   })
   .help('help')
   .alias('help', 'h')
@@ -28,7 +39,9 @@ var opts = require('yargs')
 var mocha = new Mocha({
   useColors: true,
   grep: opts.grep,
-  fullTrace: opts.fullTrace
+  invert: opts.invert,
+  fullTrace: opts.fullTrace,
+  bail: opts.bail
 });
 
 
@@ -46,9 +59,4 @@ var runner = mocha.run(function(failures){
 
 runner.on('end', function(){
   process.exit();
-});
-
-runner.on('fail', function(i, err){
-  console.log(err.message, err.stack);
-  process.exit(1);
 });

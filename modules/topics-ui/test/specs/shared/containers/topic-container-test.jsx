@@ -1,22 +1,14 @@
-import {equal, ok} from 'assert';
-import {spy} from 'sinon';
-import {shallow} from 'enzyme';
+import { equal, ok } from 'assert';
+import { spy } from 'sinon';
+import { shallow } from 'enzyme';
 import {subscribe} from '../../../../shared/dispatcher';
 import React from 'react';
-import Backbone from 'backbone';
 
 import TopicContainer from '../../../../shared/containers/TopicContainer.jsx';
 
-import groupStore from '../../../mocks/group-store';
-import topicsStore from '../../../mocks/topic-store';
-import categoryStore from '../../../mocks/category-store';
-import repliesStore from '../../../mocks/replies-store';
-import currentUserStore from '../../../mocks/current-user-store';
-import tagStore from '../../../mocks/tag-store';
-import commentsStore from '../../../mocks/comments-store';
-import newCommentStore from '../../../mocks/new-comment-store';
 
-
+import { BODY_UPDATE, SUBMIT_NEW_REPLY } from '../../../../shared/constants/create-reply';
+import { COMMENT_BODY_UPDATE, SUBMIT_NEW_COMMENT } from '../../../../shared/constants/create-comment';
 import {
   SHOW_REPLY_COMMENTS,
   UPDATE_REPLY,
@@ -30,10 +22,22 @@ import {
   UPDATE_CANCEL_TOPIC
 } from '../../../../shared/constants/topic';
 
-import {BODY_UPDATE, SUBMIT_NEW_REPLY} from '../../../../shared/constants/create-reply';
-import {COMMENT_BODY_UPDATE, SUBMIT_NEW_COMMENT} from '../../../../shared/constants/create-comment';
 
-describe.skip('<TopicContainer />', () => {
+import groupStore from '../../../mocks/group-store';
+import forumStore from '../../../mocks/forum-store';
+import currentUserStore from '../../../mocks/current-user-store';
+import topicsStore from '../../../mocks/topic-store';
+import categoryStore from '../../../mocks/category-store';
+import repliesStore from '../../../mocks/replies-store';
+import tagStore from '../../../mocks/tag-store';
+import commentsStore from '../../../mocks/comments-store';
+import newReplyStore from '../../../mocks/new-reply-store';
+import newCommentStore from '../../../mocks/new-comment-store';
+
+
+
+
+describe('<TopicContainer />', () => {
 
   let wrapper;
 
@@ -41,15 +45,17 @@ describe.skip('<TopicContainer />', () => {
     wrapper = shallow(
       <TopicContainer
         groupStore={groupStore}
+        forumStore={forumStore}
+        currentUserStore={currentUserStore}
         newCommentStore={newCommentStore}
         commentsStore={commentsStore}
         topicsStore={topicsStore}
         tagStore={tagStore}
         categoryStore={categoryStore}
         repliesStore={repliesStore}
-        currentUserStore={currentUserStore}
-        newReplyStore={new Backbone.Model()}
-        topicId="1" />
+        newReplyStore={newReplyStore}
+        topicId="1"
+        groupUri="gitterHQ"/>
     );
   });
 
@@ -61,8 +67,8 @@ describe.skip('<TopicContainer />', () => {
     equal(wrapper.find('TopicBody').length, 1);
   });
 
-  it('should render a SearchHeader', () => {
-    equal(wrapper.find('SearchHeader').length, 1);
+  it('should render a SearchHeaderContainer', () => {
+    equal(wrapper.find('SearchHeaderContainer').length, 1);
   });
 
   it('should render a TopicReplyEditor', () => {
@@ -97,6 +103,10 @@ describe.skip('<TopicContainer />', () => {
   it('should dispatch the right action when the enter key is pressed on the editor', () => {
     const handle = spy();
     subscribe(SUBMIT_NEW_REPLY, handle);
+    // Needs some text to actually submit
+    newReplyStore.set({
+      text: 'test'
+    });
     wrapper.find('TopicReplyEditor').at(0).prop('onSubmit')();
     equal(
       handle.callCount, 1,
@@ -121,6 +131,10 @@ describe.skip('<TopicContainer />', () => {
   it('should dispatch the right event when the comment is submitted', () => {
     const handle = spy();
     subscribe(SUBMIT_NEW_COMMENT, handle);
+    // Needs some text to actually submit
+    newCommentStore.set({
+      text: 'test'
+    });
     wrapper.find('TopicReplyListItem').at(0).prop('submitNewComment')();
     equal(handle.callCount, 1);
   });
