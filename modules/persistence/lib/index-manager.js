@@ -84,6 +84,9 @@ function reconcileSpecToActual(spec, actual) {
 
 }
 
+/**
+ * This should only be called from `scripts/utils/reconcile-mongodb-indexes.js`
+ */
 function reconcileIndices(models) {
   return Promise.map(models, function(model) {
     return Promise.fromCallback(function(cb) {
@@ -106,6 +109,8 @@ function reconcileIndices(models) {
       };
     })
     .catch(function(e) {
+      // If mongodb doesn't know about the collection,
+      // don't reconcile the indexes on it!
       if (e.message !== 'no collection') throw e;
 
       return [];
