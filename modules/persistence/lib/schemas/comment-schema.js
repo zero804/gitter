@@ -17,6 +17,7 @@ var CommentSchema = new Schema({
   lastChanged: { type: Date, "default": Date.now },
   lastModified: { type: Date, "default": Date.now },
   lang: {type: String },
+  reactionCounts: Schema.Types.Mixed,
   _tv: { type: 'MongooseNumber', 'default': 0 },
   _md: {type: Number }
 }, { strict: 'throw' });

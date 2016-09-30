@@ -137,5 +137,43 @@ describe('reply-api', function() {
       .expect(204)
   });
 
+  it('GET /v1/forums/:forumId/topics/:topicId/replies/:replyId/reactions', function() {
+    return request(app)
+      .get('/v1/forums/' + fixture.forum1.id + '/topics/' + fixture.topic1.id + '/replies/' + fixture.reply1.id + '/reactions')
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+      .then(function(result) {
+        var body = result.body;
+        assert.deepEqual(body, {});
+      });
+  });
+
+  it('POST /v1/forums/:forumId/topics/:topicId/replies/:replyId/reactions', function() {
+    return request(app)
+      .post('/v1/forums/' + fixture.forum1.id + '/topics/' + fixture.topic1.id + '/replies/' + fixture.reply1.id + '/reactions')
+      .send({
+        reaction: 'like'
+      })
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+      .then(function(result) {
+        var body = result.body;
+        assert.deepEqual(body, {
+          like: 1
+        });
+      });
+  });
+
+  it('DELETE /v1/forums/:forumId/topics/:topicId/replies/:replyId/reactions/like', function() {
+    return request(app)
+      .del('/v1/forums/' + fixture.forum1.id + '/topics/' + fixture.topic1.id + '/replies/' + fixture.reply1.id + '/reactions/like')
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+      .then(function(result) {
+        var body = result.body;
+        assert.deepEqual(body, { });
+      });
+  });
+
 
 });
