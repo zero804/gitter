@@ -69,10 +69,6 @@ const ForumContainer = React.createClass({
       getTopics: PropTypes.func.isRequired
     }).isRequired,
 
-    //New Topic
-    newTopicStore: PropTypes.shape({
-      get: PropTypes.func.isRequired,
-    }).isRequired,
   },
 
   getDefaultProps(){
@@ -84,7 +80,7 @@ const ForumContainer = React.createClass({
   },
 
   getInitialState(){
-    const { forumStore, categoryStore, tagStore, topicsStore, newTopicStore } = this.props;
+    const { forumStore, categoryStore, tagStore, topicsStore } = this.props;
 
     return {
       forumId: forumStore.getForumId(),
@@ -95,18 +91,15 @@ const ForumContainer = React.createClass({
       sortName: this.props.sortName,
       createTopic: this.props.createTopic,
       categories: categoryStore.getCategories(),
-      tags: tagStore.getTags(),
-      topics: topicsStore.getTopics(),
-      newTopic: newTopicStore.getNewTopic(),
+      tags: tagStore.getTags()
     };
   },
 
   componentDidMount(){
-    const { forumStore, categoryStore, tagStore, router, topicsStore, newTopicStore } = this.props;
+    const { forumStore, categoryStore, tagStore, router, topicsStore} = this.props;
 
     forumStore.onChange(this.onForumUpdate, this);
     topicsStore.onChange(this.onTopicsUpdate, this);
-    newTopicStore.onChange(this.onNewTopicUpdate, this);
     topicsStore.on(consts.TOPIC_CREATED, this.onTopicCreated, this);
 
     categoryStore.on(forumCatConstants.UPDATE_ACTIVE_CATEGORY, this.onCategoryUpdate);
@@ -118,11 +111,10 @@ const ForumContainer = React.createClass({
   },
 
   componentWillUnmount(){
-    const { forumStore, categoryStore, tagStore, router, topicsStore, newTopicStore } = this.props;
+    const { forumStore, categoryStore, tagStore, router, topicsStore} = this.props;
 
     forumStore.removeListeners(this.onForumUpdate, this);
     topicsStore.removeListeners(this.onTopicsUpdate, this);
-    newTopicStore.removeListeners(this.onNewTopicUpdate, this);
     topicsStore.off(consts.TOPIC_CREATED, this.onTopicCreated, this);
 
     categoryStore.off(forumCatConstants.UPDATE_ACTIVE_CATEGORY, this.onCategoryUpdate);
@@ -134,13 +126,24 @@ const ForumContainer = React.createClass({
   },
 
   render() {
-    const { forumId, forumSubscriptionState, categoryName, tags, filterName, tagName, sortName, createTopic, topics, newTopic } = this.state;
-    const { currentUserStore, groupUri, categoryStore, tagStore } = this.props;
+    const {
+      forumId,
+      forumSubscriptionState,
+      categoryName,
+      tags,
+      filterName,
+      tagName,
+      sortName,
+      createTopic,
+    } = this.state;
 
+    const { currentUserStore, groupUri, categoryStore, tagStore, topicsStore } = this.props;
+
+    const topics = topicsStore.getTopics();
+    const newTopic = topicsStore.getDraftTopic();
     const currentUser = currentUserStore.getCurrentUser();
     const categories = categoryStore.getCategories();
     const tagValues = tagStore.pluckValues();
-    const newTopicTags = tagStore.getTagsByLabel(newTopic.tags);
 
     return (
       <main>
@@ -169,7 +172,6 @@ const ForumContainer = React.createClass({
         <CreateTopicModal
           active={createTopic}
           newTopic={newTopic}
-          tags={newTopicTags}
           categories={categoryStore.mapForSelectControl()}
           tagValues={tagValues}
           onTitleChange={this.onTitleChange}
@@ -198,18 +200,12 @@ const ForumContainer = React.createClass({
   },
 
   onSubmit(){
-    const {newTopicStore} = this.props;
-    dispatch(submitNewTopic(
-      newTopicStore.get('title'),
-      newTopicStore.get('body'),
-      newTopicStore.get('categoryId'),
-      newTopicStore.get('tags')
-    ));
+    dispatch(submitNewTopic());
   },
 
-  onTopicCreated(data){
+  onTopicCreated(topicId, slug){
     const {groupUri} = this.props;
-    dispatch(navigateToTopic(groupUri, data.topicId, data.slug));
+    dispatch(navigateToTopic(groupUri, topicId, slug));
   },
 
   onForumUpdate() {
@@ -256,19 +252,8 @@ const ForumContainer = React.createClass({
   },
 
   onTopicsUpdate(){
-    const {topicsStore} = this.props;
-    this.setState((state) => Object.assign(state, {
-      topics: topicsStore.getTopics(),
-    }))
-  },
-
-  onNewTopicUpdate(){
-    const {newTopicStore} = this.props;
-    this.setState((state) => Object.assign(state, {
-      newTopic: newTopicStore.getNewTopic(),
-    }));
-  },
-
+    this.forceUpdate();
+  }
 
 });
 

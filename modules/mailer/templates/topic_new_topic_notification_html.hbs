@@ -1,0 +1,41 @@
+{{> topic_html_email_header }}
+<table class="row">
+  <tr>
+    <td class="wrapper last">
+      <table class="twelve columns">
+        <tr>
+          <td>
+            <h2>Hey, there's a new topic in {{ notification.forum.name }}</h2>
+            <br>
+            <h3>{{ notification.topic.title }}</h3>
+            <br>
+            <table>
+              <tr>
+                <td class="avatar"><img {{{ avatarSrcSet notification.topic.user.avatarUrl 24 }}} class="avatar"></td>
+                <td class="chat"><strong>{{ notification.topic.user.username }}</strong></td>
+              </tr>
+              <tr>
+                <td colspan="2"><br>{{{ notification.topic.body.html }}}</td>
+              </tr>
+            </table>
+            <br>
+            <table>
+              <tr>
+                <td>
+                  <a href="{{ emailBasePath }}/{{ notification.topic.uri }}" style="text-decoration: none" class="button-green">Open topic</a>
+                </td>
+              </tr>
+            </table>
+            <br>
+            <br>
+            <hr>
+            Topics are currently in beta. You can't reply via email, yet.
+            <hr>
+          </td>
+          <td class="expander"></td>
+        </tr>
+      </table>
+
+  </tr>
+</table>
+{{> topic_html_email_footer }}

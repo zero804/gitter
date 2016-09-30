@@ -87,7 +87,7 @@ describe('<ForumContainer />', function(){
   });
 
   //Passes when run with .only
-  it.skip('should dispatch the right event when the form is submitted', () => {
+  it('should dispatch the right event when the form is submitted', () => {
     const handle = spy();
     subscribe(createConst.SUBMIT_NEW_TOPIC, handle);
     wrapper.find('CreateTopicModal').at(0).prop('onSubmit')()

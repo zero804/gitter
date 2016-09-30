@@ -3,7 +3,7 @@
 var assert = require('assert');
 var subscriberService = require('../lib/subscriber-service');
 var ObjectID = require('mongodb').ObjectID;
-var ForumObject = require('../lib/forum-object');
+var ForumObject = require('gitter-web-topic-models/lib/forum-object');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
 describe('subscriber-service', function() {

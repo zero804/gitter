@@ -16,7 +16,7 @@ var moduleConfig = _.extend({}, (webpackConfig.module || {}), {
 
 var config = _.extend({}, webpackConfig, {
   // Use `'source-map'` when you want working source-maps in the browser tests
-  devtool: 'eval',//'source-map',
+  devtool: 'source-map',
   entry: {
     runner: path.resolve(__dirname, './fixtures/runner-browser.js')
   },

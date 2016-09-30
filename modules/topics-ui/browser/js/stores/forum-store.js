@@ -1,8 +1,13 @@
-
+import { BaseModel } from './base-model';
 import {subscribe} from '../../../shared/dispatcher';
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
-import { UPDATE_FORUM_SUBSCRIPTION_STATE, REQUEST_UPDATE_FORUM_SUBSCRIPTION_STATE, SUBSCRIPTION_STATE_UNSUBSCRIBED, SUBSCRIPTION_STATE_PENDING } from '../../../shared/constants/forum.js';
-import { BaseModel } from './base-model';
+
+import {
+  UPDATE_FORUM_SUBSCRIPTION_STATE,
+  REQUEST_UPDATE_FORUM_SUBSCRIPTION_STATE,
+  SUBSCRIPTION_STATE_UNSUBSCRIBED,
+  SUBSCRIPTION_STATE_PENDING
+} from '../../../shared/constants/forum.js';
 
 const ForumStore = BaseModel.extend({
   defaults: {

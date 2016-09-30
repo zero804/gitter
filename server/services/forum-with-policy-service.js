@@ -11,6 +11,7 @@ var commentService = require('gitter-web-topics/lib/comment-service');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var secureMethod = require('../utils/secure-method');
 var subscriberService = require('gitter-web-topic-notifications/lib/subscriber-service');
+var reactionService = require('gitter-web-topic-reactions/lib/reaction-service');
 
 function allowAdmin() {
   return this.policy.canAdmin();
@@ -226,6 +227,21 @@ ForumWithPolicyService.prototype.subscribe = secureMethod([matchForum, allowRead
 
 ForumWithPolicyService.prototype.unsubscribe = secureMethod([matchForum, allowAnyone], function(forumObject) {
    return subscriberService.removeSubscriber(forumObject, this.user._id);
+});
+
+/**
+ * Reactions
+ */
+ForumWithPolicyService.prototype.listReactions = secureMethod([matchForum, allowRead], function(forumObject) {
+  return reactionService.listReactions(forumObject, this.user._id);
+});
+
+ForumWithPolicyService.prototype.addReaction = secureMethod([matchForum, allowRead], function(forumObject, reaction) {
+  return reactionService.addReaction(forumObject, this.user._id, reaction);
+});
+
+ForumWithPolicyService.prototype.removeReaction = secureMethod([matchForum, allowAnyone], function(forumObject, reaction) {
+  return reactionService.removeReaction(forumObject, this.user._id, reaction);
 });
 
 module.exports = ForumWithPolicyService;

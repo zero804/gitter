@@ -5,7 +5,7 @@ import dipatchOnChangeMixin from '../../../../../browser/js/stores/mixins/dispat
 
 let collection;
 const Constructor = Backbone.Collection.extend({});
-dipatchOnChangeMixin(Constructor);
+dipatchOnChangeMixin(Constructor, [], { delay: 0 });
 
 beforeEach(() => {
   collection = new Constructor();
@@ -27,7 +27,7 @@ describe('dispatchOnChangeMixin', () => {
   it('should allow handles to be completely removed', () => {
     const handle = spy();
     collection.onChange(handle);
-    collection.removeListeners();
+    collection.removeListeners(handle, this);
     collection.reset([]);
     equal(handle.callCount, 0);
   });

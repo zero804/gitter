@@ -4,8 +4,6 @@ import React from 'react';
 import ForumContainer from '../../shared/containers/ForumContainer.jsx';
 import TopicContainer from '../../shared/containers/TopicContainer.jsx';
 
-//Stores
-import NewTopicStore from './stores/new-topic-store';
 import NewReplyStore from './stores/new-reply-store';
 import NewCommentStore from './stores/new-comment-store-store';
 
@@ -89,7 +87,6 @@ export default React.createClass({
       sortName: router.get('sortName'),
       //Stores
       topicsStore: getTopicsStore(),
-      newTopicStore: new NewTopicStore(),
       createTopic: false,
     });
   },
