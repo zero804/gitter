@@ -20,6 +20,7 @@
 }
 
 .topic-search__all-topics-link {
+  position: relative;
   color:           @light;
   font-weight:     300;
   font-size:        3.5rem;
@@ -28,6 +29,33 @@
   &:hover {
     cursor: pointer;
   }
+}
+
+.topic-search__beta-decoration {
+  @badge-background-color: rgba(255, 255, 255, .35);
+
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  transform:
+    translateX(130%)
+    translateY(-20%)
+    rotateZ(-15deg);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 4rem;
+  height: 4rem;
+
+  background-color: @badge-background-color;
+  border-radius: 50%;
+
+  font-size: 1.2rem;
+  line-height: 1;
+  letter-spacing: .1em;
+  text-transform: uppercase;
 }
 
 .topic-search__create-topic-link {
