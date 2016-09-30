@@ -9,13 +9,18 @@ export default React.createClass({
     children: PropTypes.node
   },
 
+  getDefaultProps() {
+    return {
+      className: 'submit-button'
+    };
+  },
+
   render(){
 
     const { className } = this.props;
-    const compiledClass = classNames('submit-button', className);
 
     return (
-      <button type="submit" className={compiledClass}>
+      <button type="submit" className={className}>
         {this.props.children}
       </button>
     );
