@@ -38,7 +38,12 @@ const TopicContainer = createClass({
   propTypes: {
 
     topicId: PropTypes.string.isRequired,
-    groupUri: PropTypes.string.isRequired,
+
+    //Group
+    groupStore: PropTypes.shape({
+      getGroupUri: PropTypes.func.isRequired,
+      getGroupName: PropTypes.func.isRequired
+    }).isRequired,
 
     //Forum
     forumStore: React.PropTypes.shape({
@@ -160,8 +165,11 @@ const TopicContainer = createClass({
 
   render(){
 
-    const { categoryStore, currentUserStore, tagStore, groupUri, newReplyStore} = this.props;
+    const { groupStore, categoryStore, currentUserStore, tagStore, newReplyStore} = this.props;
     const {forumId, forumSubscriptionState } = this.state;
+
+    const groupUri = groupStore.getGroupUri();
+    const groupName = groupStore.getGroupName();
 
     const newReplyContent = newReplyStore.getTextContent();
     const topic = this.getParsedTopic();
@@ -188,6 +196,7 @@ const TopicContainer = createClass({
           userId={userId}
           forumId={forumId}
           groupUri={groupUri}
+          groupName={groupName}
           subscriptionState={forumSubscriptionState}/>
         <article>
           <TopicHeader
@@ -332,7 +341,7 @@ const TopicContainer = createClass({
     const text = newCommentStore.get('text');
     //Dont submit blank content
     if(!text) { return; }
-    dispatch(submitNewComment(newCommentStore.get('replyId'), text ));
+    dispatch(submitNewComment(newCommentStore.get('replyId'), text));
   },
 
 
