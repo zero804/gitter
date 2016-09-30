@@ -29,9 +29,16 @@ import requestUpdateReplySubscriptionState from '../action-creators/forum/reques
 import requestSignIn from '../action-creators/forum/request-sign-in';
 import topicReplySortByComments from '../action-creators/topic/topic-replies-sort-by-comments';
 import topicReplySortByLike from '../action-creators/topic/topic-replies-sort-by-liked';
-import topicReplySortByReplies from '../action-creators/topic/topic-replies-sort-by-recent';
+import topicReplySortByRecent from '../action-creators/topic/topic-replies-sort-by-recent';
 
 import { SUBSCRIPTION_STATE_SUBSCRIBED } from '../constants/forum.js';
+import {
+  TOPIC_REPLIES_POPULAR_SORT_NAME,
+  TOPIC_REPLIES_COMMENT_SORT_NAME,
+  TOPIC_REPLIES_LIKED_SORT_NAME,
+  TOPIC_REPLIES_RECENT_SORT_NAME
+} from '../constants/topic';
+
 const EDITOR_SUBMIT_LINK_SOURCE = 'topics-reply-editor-submit-button';
 const EDITOR_CLICK_LINK_SOURCE = 'topics-reply-editor-click';
 
@@ -42,6 +49,17 @@ const TopicContainer = createClass({
 
     topicId: PropTypes.string.isRequired,
     groupUri: PropTypes.string.isRequired,
+    sortName: PropTypes.oneOf([
+      TOPIC_REPLIES_POPULAR_SORT_NAME,
+      TOPIC_REPLIES_COMMENT_SORT_NAME,
+      TOPIC_REPLIES_LIKED_SORT_NAME,
+      TOPIC_REPLIES_RECENT_SORT_NAME
+    ]).isRequired,
+
+    router: PropTypes.shape({
+      on: PropTypes.func.isRequired,
+      off: PropTypes.func.isRequired,
+    }),
 
     //Forum
     forumStore: React.PropTypes.shape({
@@ -87,7 +105,7 @@ const TopicContainer = createClass({
   },
 
   componentDidMount(){
-    const {forumStore, topicsStore, repliesStore, newReplyStore, commentsStore, newCommentStore} = this.props;
+    const {forumStore, topicsStore, repliesStore, newReplyStore, commentsStore, newCommentStore, router} = this.props;
 
     forumStore.onChange(this.onForumUpdate, this);
     topicsStore.onChange(this.onTopicsUpdate, this);
@@ -97,6 +115,7 @@ const TopicContainer = createClass({
 
     newCommentStore.onChange(this.updateNewComment, this);
     newReplyStore.onChange(this.updateNewReplyContent, this);
+    router.on('change:sortName', this.onSortUpdate, this);
   },
 
 
@@ -120,6 +139,7 @@ const TopicContainer = createClass({
       forumSubscriptionState: forumStore.getSubscriptionState(),
       topic: topicsStore.getById(topicId),
       newReplyContent: '',
+      sortName: this.props.sortName,
     };
   },
 
@@ -164,7 +184,7 @@ const TopicContainer = createClass({
   render(){
 
     const { categoryStore, currentUserStore, tagStore, groupUri, newReplyStore} = this.props;
-    const {forumId, forumSubscriptionState } = this.state;
+    const {forumId, forumSubscriptionState, sortName } = this.state;
 
     const newReplyContent = newReplyStore.getTextContent();
     const topic = this.getParsedTopic();
@@ -206,6 +226,7 @@ const TopicContainer = createClass({
         </article>
         <TopicReplyListHeader
           replies={parsedReplies}
+          sortName={sortName}
           onSortByCommentClicked={this.onSortByCommentClicked}
           onSortByLikeClicked={this.onSortByLikeClicked}
           onSortByRecentClicked={this.onSortByRecentClicked}/>
@@ -305,6 +326,11 @@ const TopicContainer = createClass({
   updateComments(){ this.forceUpdate(); },
   updateNewComment(){ this.forceUpdate(); },
   updateTopics() { this.forceUpdate(); },
+  onSortUpdate(router, sortName){
+    this.setState((state) => Object.assign({}, state, {
+      sortName: sortName
+    }))
+  },
 
   onTopicSubscribeButtonClick() {
     const { topicsStore, topicId } = this.props;
@@ -380,15 +406,21 @@ const TopicContainer = createClass({
   },
 
   onSortByCommentClicked(){
-    dispatch(topicReplySortByComments());
+    const {topic} = this.state;
+    const {id, slug} = topic;
+    dispatch(topicReplySortByComments(id, slug));
   },
 
   onSortByLikeClicked(){
-    dispatch(topicReplySortByLike());
+    const {topic} = this.state;
+    const {id, slug} = topic;
+    dispatch(topicReplySortByLike(id, slug));
   },
 
   onSortByRecentClicked(){
-    dispatch(topicReplySortByReplies());
+    const {topic} = this.state;
+    const {id, slug} = topic;
+    dispatch(topicReplySortByRecent(id, slug));
   },
 
 });

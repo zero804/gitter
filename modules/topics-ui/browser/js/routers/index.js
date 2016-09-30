@@ -1,13 +1,17 @@
 import { parse, stringify } from 'qs';
 import Backbone from 'backbone';
 import { subscribe } from '../../../shared/dispatcher';
+
+import {getIsSignedIn} from '../stores/current-user-store';
+
 import * as navConstants from '../../../shared/constants/navigation';
 import * as forumCatConstants from '../../../shared/constants/forum-categories';
 import * as forumFilterConstants from '../../../shared/constants/forum-filters';
 import * as forumTagConstants from '../../../shared/constants/forum-tags';
 import * as forumSortConstants from '../../../shared/constants/forum-sorts';
 import * as createTopicConstants from '../../../shared/constants/create-topic';
-import {getIsSignedIn} from '../stores/current-user-store';
+import * as topicConstants from '../../../shared/constants/topic';
+
 import requestSignIn from '../../../shared/action-creators/forum/request-sign-in';
 
 
@@ -30,6 +34,9 @@ var Router = Backbone.Router.extend({
     subscribe(forumSortConstants.NAVIGATE_TO_SORT, this.updateForumSort, this);
     subscribe(navConstants.NAVIGATE_TO_TOPIC, this.navigateToTopic, this);
     subscribe(createTopicConstants.NAVIGATE_TO_CREATE_TOPIC, this.navigateToCreateTopic, this);
+    subscribe(topicConstants.TOPIC_REPLIES_SORT_BY_COMMENTS, this.navigateToTopicRepliesSortByComments, this);
+    subscribe(topicConstants.TOPIC_REPLIES_SORT_BY_LIKED, this.navigateToTopicRepliesSortByLikes, this);
+    subscribe(topicConstants.TOPIC_REPLIES_SORT_BY_RECENT, this.navigateToTopicRepliesSortByRecent, this);
 
     this.listenTo(this.model, 'change:filterName', this.onFilterUpdate, this);
     this.listenTo(this.model, 'change:sortName', this.onSortUpdate, this);
@@ -84,13 +91,15 @@ var Router = Backbone.Router.extend({
     });
   },
 
-  topic(groupUri, id, slug){
+  topic(groupUri, id, slug, queryString){
+    const query = parse(queryString || '');
     this.model.set({
       route: navConstants.TOPIC_ROUTE,
       groupUri: groupUri,
       topicId: id,
       slug: slug,
-      createTopic: false
+      createTopic: false,
+      sortName: (query.sort || topicConstants.TOPIC_REPLY_SORT_DEFAULT_NAME)
     });
   },
 
@@ -134,6 +143,27 @@ var Router = Backbone.Router.extend({
 
   onSortUpdate(model, val){
     this.model.trigger(forumSortConstants.UPDATE_ACTIVE_SORT, { sort: val });
+  },
+
+  navigateToTopicRepliesSortByComments({topicId, slug}){
+    const {TOPIC_REPLIES_COMMENT_SORT_NAME} = topicConstants;
+    const groupUri = this.model.get('groupUri');
+    const url = `/${groupUri}/topics/topic/${topicId}/${slug}/~topics?sort=${TOPIC_REPLIES_COMMENT_SORT_NAME}`;
+    this.navigate(url, { trigger: true });
+  },
+
+  navigateToTopicRepliesSortByLikes({topicId, slug}){
+    const {TOPIC_REPLIES_LIKED_SORT_NAME} = topicConstants;
+    const groupUri = this.model.get('groupUri');
+    const url = `/${groupUri}/topics/topic/${topicId}/${slug}/~topics?sort=${TOPIC_REPLIES_LIKED_SORT_NAME}`;
+    this.navigate(url, { trigger: true });
+  },
+
+  navigateToTopicRepliesSortByRecent({topicId, slug}){
+    const {TOPIC_REPLIES_RECENT_SORT_NAME} = topicConstants;
+    const groupUri = this.model.get('groupUri');
+    const url = `/${groupUri}/topics/topic/${topicId}/${slug}/~topics?sort=${TOPIC_REPLIES_RECENT_SORT_NAME}`;
+    this.navigate(url, { trigger: true });
   },
 
   navigateToTopic(data){
