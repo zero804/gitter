@@ -5,6 +5,8 @@ var getVersion = require('gitter-web-serialization/lib/get-model-version');
 var UserIdStrategy = require('./user-id-strategy');
 var CommentsForReplyStrategy = require('./topics/comments-for-reply-strategy');
 var ReplySubscriptionStrategy = require('./topics/reply-subscription-strategy');
+var ReplyReactionStrategy = require('gitter-web-topic-serialization/lib/rest/reply-reaction-strategy');
+var mapReactionCounts = require('gitter-web-topic-serialization/lib/map-reaction-counts');
 
 function formatDate(d) {
   return d ? d.toISOString() : null;
@@ -31,6 +33,10 @@ ReplyStrategy.prototype = {
 
     if (this.subscriptionStrategy) {
       strategies.push(this.subscriptionStrategy.preload(replies));
+    }
+
+    if (this.reactionStrategy) {
+      strategies.push(this.reactionStrategy.preload(replies));
     }
 
     var userIds = replies.map(function(i) { return i.userId; });
@@ -66,6 +72,9 @@ ReplyStrategy.prototype = {
 
       comments: this.commentsForReplyStrategy ? this.commentsForReplyStrategy.map(id) : undefined,
       commentsTotal: reply.commentsTotal,
+
+      reactions: mapReactionCounts(reply),
+      ownReactions: this.reactionStrategy ? this.reactionStrategy.map(reply) : undefined,
 
       sent: formatDate(reply.sent),
       editedAt: formatDate(reply.editedAt),
@@ -103,6 +112,10 @@ ReplyStrategy.standard = function(options) {
   strategy.userStrategy = UserIdStrategy.slim();
 
   if (currentUserId) {
+    strategy.reactionStrategy = new ReplyReactionStrategy({
+      currentUserId: currentUserId
+    });
+
     strategy.subscriptionStrategy = new ReplySubscriptionStrategy({
       currentUserId: currentUserId
     });
