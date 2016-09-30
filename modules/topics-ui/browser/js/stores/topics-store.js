@@ -288,6 +288,12 @@ export const TopicsLiveCollection = LiveCollection.extend({
 
 });
 
+
+onReactionsUpdateMixin(TopicsLiveCollection, 'onReactionsUpdate');
+
+
+
+
 export class TopicsStore {
 
   constructor(models, options) {
@@ -465,7 +471,6 @@ dispatchOnChangeMixin(TopicsStore, [
   'invalid'
 ]);
 
-onReactionsUpdateMixin(TopicsStore, 'onReactionsUpdate');
 
 const serverStore = (window.context.topicsStore || {});
 const serverData = (serverStore.data || []);
