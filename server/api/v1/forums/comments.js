@@ -38,13 +38,17 @@ module.exports = {
 
   index: function(req) {
     var reply = req.reply;
+    var userId = req.user && req.user._id;
 
-    return restful.serializeCommentsForReplyId(reply._id);
+    return restful.serializeCommentsForReplyId(reply._id, userId);
   },
 
   show: function(req) {
     var comment = req.comment;
-    var strategy = new restSerializer.CommentStrategy();
+    var strategy = restSerializer.CommentStrategy.standard({
+      currentUserId: req.user && req.user._id
+    });
+
     return restSerializer.serializeObject(comment, strategy);
   },
 
@@ -59,6 +63,7 @@ module.exports = {
     var forum = req.forum;
     var reply = req.reply;
     var policy = req.userForumPolicy;
+    var userId = user && user._id;
 
     // This is for internal clients only
     if (!internalClientAccessOnly.isRequestFromInternalClient(req)) {
@@ -72,7 +77,10 @@ module.exports = {
     var forumWithPolicyService = new ForumWithPolicyService(forum, user, policy);
     return forumWithPolicyService.createComment(reply, commentOptions)
       .then(function(comment) {
-        var commentStrategy = new restSerializer.CommentStrategy();
+        var commentStrategy = restSerializer.CommentStrategy.standard({
+          currentUserId: userId
+        });
+
         return restSerializer.serializeObject(comment, commentStrategy);
       });
   },
@@ -82,6 +90,7 @@ module.exports = {
     var forum = req.forum;
     var policy = req.userForumPolicy;
     var comment = req.comment;
+    var userId = user && user._id;
 
     var forumWithPolicyService = new ForumWithPolicyService(forum, user, policy);
     var promises = collectPatchActions(forumWithPolicyService, comment, req.body);
@@ -91,7 +100,9 @@ module.exports = {
         return commentService.findByIdForForumTopicAndReply(forum._id, comment.topicId, comment.replyId, comment._id);
       })
       .then(function(updatedComment) {
-        var strategy = new restSerializer.CommentStrategy();
+        var strategy = restSerializer.CommentStrategy.standard({
+          currentUserId: userId
+        });
         return restSerializer.serializeObject(updatedComment, strategy);
       });
   },
