@@ -101,7 +101,10 @@ function removeReaction(forumObject, userId, reaction) {
     .exec()
     .then(function(result) {
       var modified = result.result.n > 0;
-      if (!modified) return null;
+      if (!modified) {
+        // No change.. Be idempotent
+        return listReactions(forumObject);
+      }
 
       return updateReactionTotals(forumObject, reaction, -1);
     })
