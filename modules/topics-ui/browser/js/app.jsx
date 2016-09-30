@@ -102,7 +102,6 @@ export default React.createClass({
   getTopicState(){
     var {router} = this.props;
     return Object.assign(this.getDefaultState(), {
-      groupUri: router.get('groupUri'),
       topicId: router.get('topicId'),
       topicsStore: getTopicsStore(),
       repliesStore: getRepliesStore(),

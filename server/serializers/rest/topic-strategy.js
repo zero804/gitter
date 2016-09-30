@@ -114,6 +114,8 @@ TopicStrategy.prototype = {
       replyingUsers: this.replyingUsersStrategy ? this.replyingUsersStrategy.map(id): undefined,
 
       reactions: mapReactionCounts(topic),
+      // Own reactions are not defined for anonymous users
+      // or the broadcast topic live-collection
       ownReactions: this.reactionStrategy ? this.reactionStrategy.map(topic) : undefined,
 
       sent: formatDate(topic.sent),
