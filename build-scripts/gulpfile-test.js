@@ -207,7 +207,17 @@ Object.keys(testModules).forEach(function(moduleName) {
 });
 
 gulp.task('test:pre-test', function() {
-  return childProcessPromise.spawn('./scripts/utils/ensure-mongodb-indexes.js', []);
+  var env = {};
+
+
+  if (testSuite === 'docker') {
+    env.NODE_ENV = 'test-docker';
+  } else if (testSuite === 'mocha') {
+    env.NODE_ENV = 'test';
+  }
+
+
+  return childProcessPromise.spawn('./scripts/utils/ensure-mongodb-indexes.js', [], env);
 })
 
 if (RUN_TESTS_IN_PARALLEL) {
