@@ -338,8 +338,6 @@ export class TopicsStore {
 
     //Make a new live collection
     const topicCollectionOptions = _.extend({
-      // TODO: does the router already have the required things initialised at
-      // this stage?
       snapshotFilter: this.getSnapshotFilter(),
       snapshotSort: this.getSnapshotSort()
     }, options);
