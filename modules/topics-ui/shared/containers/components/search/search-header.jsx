@@ -15,6 +15,7 @@ export default React.createClass({
   displayName: 'SearchHeader',
   propTypes: {
     groupUri: PropTypes.string.isRequired,
+    groupName: PropTypes.string,
     subscriptionState: PropTypes.oneOf([
       SUBSCRIPTION_STATE_SUBSCRIBED,
       SUBSCRIPTION_STATE_UNSUBSCRIBED,
@@ -24,17 +25,17 @@ export default React.createClass({
   },
 
   render(){
-    const {groupUri, subscriptionState, onSubscribeButtonClick} = this.props;
+    const {groupUri, groupName, subscriptionState, onSubscribeButtonClick} = this.props;
 
     return (
       <Container>
         <Panel className="panel--topic-search">
-          <H1>
+          <H1 className="topic-search__heading">
             <ForumCategoryLink
               className="topic-search__all-topics-link"
               groupUri={groupUri}
               category={{ category: 'All', slug: DEFAULT_CATEGORY_NAME}}>
-                Topics
+                {groupName} Topics
                 <div className="topic-search__beta-decoration">
                   Beta
                 </div>
