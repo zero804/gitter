@@ -10,6 +10,7 @@ import * as forumSortConstants from '../../../../shared/constants/forum-sorts';
 import * as forumTagConstants from '../../../../shared/constants/forum-tags';
 import * as createConst from '../../../../shared/constants/create-topic';
 
+import groupStore from '../../../mocks/group-store';
 import forumStore from '../../../mocks/forum-store';
 import currentUserStore from '../../../mocks/current-user-store';
 import categoryStore from '../../../mocks/category-store';
@@ -31,14 +32,14 @@ describe('<ForumContainer />', function(){
     tagChangeHandle = sinon.spy();
     wrapper = shallow(
       <ForumContainer
+        groupStore={groupStore}
         forumStore={forumStore}
         currentUserStore={currentUserStore}
         categoryStore={categoryStore}
         categoryName="all"
         tagStore={tagStore}
         topicsStore={topicsStore}
-        newTopicStore={newTopicStore}
-        groupUri='gitterHQ' />
+        newTopicStore={newTopicStore} />
     );
   });
 
