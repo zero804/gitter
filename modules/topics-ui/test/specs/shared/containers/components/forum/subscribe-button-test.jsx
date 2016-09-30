@@ -1,7 +1,7 @@
-import {equal, ok} from 'assert';
+import { equal, ok } from 'assert';
 import React from 'react';
 import { mount } from 'enzyme';
-import {spy} from 'sinon';
+import { spy } from 'sinon';
 import SubscribeButton from '../../../../../../shared/containers/components/forum/subscribe-button.jsx';
 import { SUBSCRIPTION_STATE_SUBSCRIBED, SUBSCRIPTION_STATE_UNSUBSCRIBED, SUBSCRIPTION_STATE_PENDING } from '../../../../../../shared/constants/forum.js';
 
@@ -25,7 +25,7 @@ describe('<SubscribeButton/>', () => {
       );
     });
 
-    it('calls `onClick` callback argument', () => {
+    it('calls `onClick` callback attribute', () => {
       wrapper.simulate('click');
       equal(onClickCb.callCount, 1);
     });

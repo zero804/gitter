@@ -14,11 +14,18 @@ import router from '../routers';
 import {getCurrentUser} from '../stores/current-user-store';
 
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
+import onReactionsUpdateMixin from './mixins/on-reactions-update';
 
 import {SUBMIT_NEW_TOPIC, TOPIC_CREATED} from '../../../shared/constants/create-topic';
 import {DEFAULT_CATEGORY_NAME, DEFAULT_TAG_NAME} from '../../../shared/constants/navigation';
 import {FILTER_BY_TOPIC} from '../../../shared/constants/forum-filters';
 import {MOST_WATCHERS_SORT} from '../../../shared/constants/forum-sorts';
+import {
+  UPDATE_TOPIC_SUBSCRIPTION_STATE,
+  REQUEST_UPDATE_TOPIC_SUBSCRIPTION_STATE,
+  SUBSCRIPTION_STATE_PENDING,
+  UPDATE_TOPIC_REACTIONS
+} from '../../../shared/constants/forum.js';
 
 import {
   TITLE_UPDATE,
@@ -33,12 +40,6 @@ import {
   UPDATE_SAVE_TOPIC
 } from '../../../shared/constants/topic';
 
-import {
-  UPDATE_TOPIC_SUBSCRIPTION_STATE,
-  REQUEST_UPDATE_TOPIC_SUBSCRIPTION_STATE,
-  SUBSCRIPTION_STATE_PENDING
-} from '../../../shared/constants/forum.js';
-
 import {MODEL_STATE_DRAFT, MODEL_STATE_SYNCED} from '../../../shared/constants/model-states';
 
 const modelDefaults = {
@@ -47,6 +48,7 @@ const modelDefaults = {
   categoryId: '',
   tags: [],
 };
+
 
 export const TopicModel = BaseModel.extend({
 
@@ -225,6 +227,7 @@ export const TopicsLiveCollection = LiveCollection.extend({
     subscribe(UPDATE_CANCEL_TOPIC, this.onTopicEditCancel, this);
     subscribe(UPDATE_SAVE_TOPIC, this.onTopicEditSaved, this);
     this.listenTo(router, 'change:createTopic', this.onCreateTopicChange, this);
+    subscribe(UPDATE_TOPIC_REACTIONS, this.onReactionsUpdate, this);
   },
 
   //The default case for snapshots is to completely reset the collection
@@ -291,6 +294,12 @@ export const TopicsLiveCollection = LiveCollection.extend({
   }
 
 });
+
+
+onReactionsUpdateMixin(TopicsLiveCollection, 'onReactionsUpdate');
+
+
+
 
 export class TopicsStore {
 
@@ -442,9 +451,8 @@ export class TopicsStore {
     });
   }
 
-  onSubscriptionStateUpdate(data) {
-    var {topicId, state} = data;
-    var topic = this.collection.get(topicId);
+  onSubscriptionStateUpdate({topicId, state}) {
+    const topic = this.collection.get(topicId);
     if(!topic) { return; }
 
     topic.set({
@@ -457,6 +465,8 @@ export class TopicsStore {
 //All events that must be observed
 dispatchOnChangeMixin(TopicsStore, [
   'sort',
+  'change:reactions',
+  'change:ownReactions',
   'change:text',
   'change:subscriptionState',
   'change:title',
@@ -466,6 +476,7 @@ dispatchOnChangeMixin(TopicsStore, [
   'change:tags',
   'invalid'
 ]);
+
 
 const serverStore = (window.context.topicsStore || {});
 const serverData = (serverStore.data || []);
