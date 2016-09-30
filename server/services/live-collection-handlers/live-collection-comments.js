@@ -11,7 +11,7 @@ function serializeCommentToReply(operation, comment) {
   var replyId = comment.replyId;
   var url = '/forums/' + forumId + '/topics/' + topicId + '/replies/' + replyId + '/comments';
 
-  var strategy = new restSerializer.CommentStrategy();
+  var strategy = restSerializer.CommentStrategy.standard();
   return restSerializer.serializeObject(comment, strategy)
     .then(function(serializedComment) {
       appEvents.dataChange2(url, operation, serializedComment, 'comment');
