@@ -4,6 +4,7 @@ var Promise = require('bluebird');
 var getVersion = require('gitter-web-serialization/lib/get-model-version');
 var UserIdStrategy = require('./user-id-strategy');
 var CommentReactionStrategy = require('gitter-web-topic-serialization/lib/rest/comment-reaction-strategy');
+var mapReactionCounts = require('gitter-web-topic-serialization/lib/map-reaction-counts');
 
 function formatDate(d) {
   return d ? d.toISOString() : null;
@@ -57,6 +58,7 @@ CommentStrategy.prototype = {
       // TODO: support options.user
       user: this.mapUser(comment.userId),
 
+      reactions: mapReactionCounts(comment),
       ownReactions: this.reactionStrategy ? this.reactionStrategy.map(comment) : undefined,
 
       sent: formatDate(comment.sent),

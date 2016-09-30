@@ -89,6 +89,8 @@ describe('TopicStrategy #slow', function() {
             "displayName": user.displayName,
             "avatarUrl":  nconf.get('avatar:officialHost') + '/g/u/' + user.username
           }],
+          reactions: {},
+          ownReactions: {},
           sent: LONG_AGO,
           editedAt: null,
           lastChanged: LONG_AGO,
@@ -135,6 +137,7 @@ describe('TopicStrategy #slow', function() {
             "displayName": user.displayName,
             "avatarUrl":  nconf.get('avatar:officialHost') + '/g/u/' + user.username
           }],
+          reactions: {},
           sent: LONG_AGO,
           editedAt: null,
           lastChanged: LONG_AGO,
@@ -192,6 +195,7 @@ describe('TopicStrategy #slow', function() {
             },
             subscribed: false,
             commentsTotal: 0,
+            reactions: {},
             ownReactions: {},
             sent: LONG_AGO,
             editedAt: null,
@@ -205,6 +209,8 @@ describe('TopicStrategy #slow', function() {
             displayName: user.displayName,
             avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username
           }],
+          reactions: {},
+          ownReactions: {},
           sent: LONG_AGO,
           editedAt: null,
           lastChanged: LONG_AGO,
@@ -258,6 +264,7 @@ describe('TopicStrategy #slow', function() {
               avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username
             },
             commentsTotal: 0,
+            reactions: {},
             sent: LONG_AGO,
             editedAt: null,
             lastChanged: LONG_AGO,
@@ -270,6 +277,7 @@ describe('TopicStrategy #slow', function() {
             displayName: user.displayName,
             avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username
           }],
+          reactions: {},
           sent: LONG_AGO,
           editedAt: null,
           lastChanged: LONG_AGO,
@@ -312,6 +320,7 @@ describe('TopicStrategy #slow', function() {
               displayName: user.displayName,
               avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username
             }],
+            reactions: {},
             sent: LONG_AGO,
             editedAt: null,
             lastChanged: LONG_AGO,
@@ -363,6 +372,7 @@ describe('TopicStrategy #slow', function() {
               displayName: user.displayName,
               avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username
             }],
+            reactions: {},
             sent: LONG_AGO,
             editedAt: null,
             lastChanged: LONG_AGO,
