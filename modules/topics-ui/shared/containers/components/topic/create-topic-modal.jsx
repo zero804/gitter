@@ -23,14 +23,13 @@ export default React.createClass({
 
     newTopic: PropTypes.shape({
       title: PropTypes.string.isRequired,
-      body: PropTypes.string.isRequired,
+      text: PropTypes.string.isRequired,
       categoryId: PropTypes.string.isRequired,
+      tags: PropTypes.arrayOf(PropTypes.shape({
+        label: PropTypes.string.isRequired,
+        value: PropTypes.string.isRequired,
+      }))
     }).isRequired,
-
-    tags: PropTypes.arrayOf(PropTypes.shape({
-      label: PropTypes.string.isRequired,
-      value: PropTypes.string.isRequired,
-    })),
 
     onSubmit: PropTypes.func.isRequired,
     onTitleChange: PropTypes.func.isRequired,
@@ -42,13 +41,21 @@ export default React.createClass({
 
   render(){
     const { active, categories, tagValues, newTopic } = this.props;
-    const { title, body, categoryId } = newTopic;
+    const { title, text, categoryId, validationError } = newTopic;
+    const errors = (validationError || new Map());
+
+    //We need to sort out how we format categories
+    //This means an app wide refactor, im not doing that now
+    //so we just slice "All Tags" out of here for now
+    let cats = categories.slice(1);
+    cats.unshift({ value: '', label: 'Please select a category'})
 
     return (
       <Modal active={active} onClose={this.onClose}>
         <form name="create-topic" onSubmit={this.onSubmit}>
           <H1 className="create-topic__heading">New Topic</H1>
           <Input
+            valid={!errors.get('title')}
             className="create-topic__input--name"
             name="title"
             placeholder="Add title ..."
@@ -57,7 +64,8 @@ export default React.createClass({
 
           <div className="create-topic__details-row">
             <Select
-              options={categories}
+              options={cats}
+              valid={!errors.get('categoryId')}
               className="select--create-topic-category"
               defaultValue={categoryId}
               onChange={this.onCategoryChange}/>
@@ -71,8 +79,9 @@ export default React.createClass({
           {this.getTagsRow()}
           <Editor
             className="create-topic__editor--body"
-            name="body"
-            value={body}
+            valid={!errors.get('text')}
+            name="text"
+            value={text}
             placeholder="Type here. Use Markdown, BBCode, or html to format."
             onChange={this.onBodyChange}/>
 
@@ -85,7 +94,7 @@ export default React.createClass({
   },
 
   getTagsRow(){
-    const {tags} = this.props;
+    const {tags} = this.props.newTopic;
     if(!tags.length) { return; }
     return (
       <div className="create-topic__details-row">

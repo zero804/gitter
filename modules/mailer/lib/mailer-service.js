@@ -2,34 +2,19 @@
 
 var env = require('gitter-web-env');
 var mailer = env.mailer;
-
-var troupeTemplate = require('gitter-web-templates/lib/troupe-template');
 var Promise = require('bluebird');
 var cdn = require('gitter-web-cdn');
-var path = require('path');
-
-var CACHED = { };
-function getCachedTemplate(templateName) {
-  if(CACHED[templateName]) return CACHED[templateName];
-
-  var templateFile = path.join(__dirname, '../templates', templateName + '.hbs');
-  CACHED[templateName] = troupeTemplate.compile(templateFile);
-  return CACHED[templateName];
-}
-
-function applyTemplate(templateName, data) {
-  return getCachedTemplate(templateName)
-    .then(function(template) {
-      return template(data);
-    });
-}
+var mailerTemplate = require('./mailer-template');
 
 var VALID_TEMPLATES = {
   'added-to-room': addedToRoomMapping,
   'invitation-v2': invitationMapping,
   'invitation-reminder-v2': invitationMapping,
   'unread-notification': unreadNoticationMapping,
-  'created-room': createdRoomMapping
+  'created-room': createdRoomMapping,
+  'new-topic': newTopicMapping,
+  'new-topic-reply': newTopicReplyMapping,
+  'new-topic-comment': newTopicCommentMapping,
 };
 
 exports.sendEmail = function(options) {
@@ -76,9 +61,9 @@ function unreadNoticationMapping(data) {
     ROOMURI:    data.roomUri,
     ROOMURL:    data.roomUrl,
     UNSUB:      data.unsubscribeUrl,
-    HTML:       applyTemplate("unread_notification_html", data),
-    MICRODATA:  applyTemplate("unread_notification_microdata", data),
-    PLAINTEXT:  applyTemplate("unread_notification", data),
+    HTML:       mailerTemplate("unread_notification_html", data),
+    MICRODATA:  mailerTemplate("unread_notification_microdata", data),
+    PLAINTEXT:  mailerTemplate("unread_notification", data),
     LOGOURL:    cdn('images/logo/gitter-logo-email-64.png', {email: true})
   };
 
@@ -97,6 +82,31 @@ function createdRoomMapping(data) {
     ORGNOTE:     '', // No used since splitsville
     ROOMTYPE:    data.roomType,
     LOGOURL:     cdn('images/logo/gitter-logo-email-64.png', {email: true})
+  };
+}
+
+
+function newTopicMapping(data) {
+  return {
+    HTML: mailerTemplate("topic_new_topic_notification_html", data),
+    PLAINTEXT: mailerTemplate("topic_new_topic_notification", data),
+    LOGOURL: cdn('images/logo/gitter-logo-email-64.png', {email: true})
+  };
+}
+
+function newTopicReplyMapping(data) {
+  return {
+    HTML: mailerTemplate("topic_new_reply_notification_html", data),
+    PLAINTEXT: mailerTemplate("topic_new_reply_notification", data),
+    LOGOURL: cdn('images/logo/gitter-logo-email-64.png', {email: true})
+  };
+}
+
+function newTopicCommentMapping(data) {
+  return {
+    HTML: mailerTemplate("topic_new_comment_notification_html", data),
+    PLAINTEXT: mailerTemplate("topic_new_comment_notification", data),
+    LOGOURL: cdn('images/logo/gitter-logo-email-64.png', {email: true})
   };
 }
 

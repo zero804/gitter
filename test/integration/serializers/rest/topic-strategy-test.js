@@ -9,7 +9,7 @@ var serialize = require('gitter-web-serialization/lib/serialize');
 var serializeObject = require('gitter-web-serialization/lib/serialize-object');
 var TopicStrategy = testRequire('./serializers/rest/topic-strategy');
 var subscriberService = require('gitter-web-topic-notifications/lib/subscriber-service');
-var ForumObject = require('gitter-web-topic-notifications/lib/forum-object');
+var ForumObject = require('gitter-web-topic-models/lib/forum-object');
 var assert = require('assert');
 
 var LONG_AGO = '2014-01-01T00:00:00.000Z';
@@ -72,7 +72,8 @@ describe('TopicStrategy #slow', function() {
           category: {
             id: category.id,
             name: category.name,
-            slug: category.slug
+            slug: category.slug,
+            v: 1
           },
           user: {
             id: user.id,
@@ -118,7 +119,8 @@ describe('TopicStrategy #slow', function() {
           category: {
             id: category.id,
             name: category.name,
-            slug: category.slug
+            slug: category.slug,
+            v: 1
           },
           user: {
             id: user.id,
@@ -166,7 +168,8 @@ describe('TopicStrategy #slow', function() {
           category: {
             id: category.id,
             name: category.name,
-            slug: category.slug
+            slug: category.slug,
+            v: 1
           },
           user: {
             id: user.id,
@@ -232,7 +235,8 @@ describe('TopicStrategy #slow', function() {
           category: {
             id: category.id,
             name: category.name,
-            slug: category.slug
+            slug: category.slug,
+            v: 1
           },
           user: {
             id: user.id,
@@ -296,7 +300,8 @@ describe('TopicStrategy #slow', function() {
             category: {
               id: category.id,
               name: category.name,
-              slug: category.slug
+              slug: category.slug,
+              v: 1
             },
             user: fixture.user1.id,
             repliesTotal: 1,
@@ -366,7 +371,8 @@ describe('TopicStrategy #slow', function() {
             categories: makeHash(fixture.category1.id, {
               id: category.id,
               name: category.name,
-              slug: category.slug
+              slug: category.slug,
+              v: 1
             })
           }
         })

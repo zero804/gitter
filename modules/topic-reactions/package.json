@@ -1,0 +1,25 @@
+{
+  "name": "gitter-web-topic-reactions",
+  "version": "1.0.0",
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha test/"
+  },
+  "dependencies": {
+    "bluebird": "^3.2.1",
+    "gitter-web-persistence": "file:../persistence",
+    "gitter-web-persistence-utils": "file:../persistence-utils",
+    "gitter-web-topic-models": "file:../topic-models",
+    "lodash": "^3.2.0",
+    "mongodb": "~2.1.18",
+    "statuserror": "^0.1.3"
+  },
+  "devDependencies": {
+    "gitter-web-test-utils": "file:../test-utils"
+  },
+  "private": true
+}
