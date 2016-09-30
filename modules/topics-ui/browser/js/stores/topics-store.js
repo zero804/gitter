@@ -15,6 +15,8 @@ import {getCurrentUser} from '../stores/current-user-store';
 
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
 
+import apiClient from '../utils/api-client';
+
 import {SUBMIT_NEW_TOPIC, TOPIC_CREATED} from '../../../shared/constants/create-topic';
 import {DEFAULT_CATEGORY_NAME, DEFAULT_TAG_NAME, DEFAULT_FILTER_NAME} from '../../../shared/constants/navigation';
 import {FILTER_BY_TOPIC} from '../../../shared/constants/forum-filters';
@@ -450,11 +452,12 @@ export class TopicsStore {
     }
   }
 
+  // The snapshot options take json style simple objects
   getSnapshotFilter() {
+    const filterName = desentinel(router.get('filterName'), DEFAULT_FILTER_NAME);
     const currentUser = getCurrentUser();
     const categorySlug = desentinel(router.get('categoryName'), DEFAULT_CATEGORY_NAME);
     const tagName = desentinel(router.get('tagName'), DEFAULT_TAG_NAME);
-    const filterName = desentinel(router.get('filterName'), DEFAULT_FILTER_NAME);
 
     let filter = {}
 
@@ -462,12 +465,12 @@ export class TopicsStore {
       filter.username = currentUser.username;
     }
 
-    if (tagName) {
-      filter.tags = [tagName];
-    }
-
     if (categorySlug) {
       filter.category = categorySlug;
+    }
+
+    if (tagName) {
+      filter.tags = [tagName];
     }
 
     return filter;
@@ -487,6 +490,34 @@ export class TopicsStore {
     sort.id = -1;
 
     return sort;
+  }
+
+  // the API calls take URI parameters
+  getAPIFilter() {
+    return this.getSnapshotFilter();
+  }
+
+  getAPISort() {
+    const sortBy = router.get('sortName');
+    if (sortBy === MOST_REPLY_SORT) {
+      return '-lastChanged,-id';
+    } else {
+      return '-id';
+    }
+  }
+
+  // TODO: maybe not the best method name
+  fetch() {
+    var url = `/v1/forums/${getForumId()}/topics`;
+    var data = this.getAPIFilter();
+    data.sort = this.getAPISort();
+    return apiClient.get(url, data)
+      .bind(this)
+      .then(function(results) {
+        // TODO: not sure if this is best. Maybe call .set() directly and
+        // override some options?
+        this.topicCollection.handleSnapshot(results);
+      });
   }
 
 
@@ -525,14 +556,14 @@ export class TopicsStore {
   onRouterUpdate() {
     this.topicCollection.setSnapshotFilter(this.getSnapshotFilter());
     this.collection.setFilter(this.getFilter());
-    // TODO: kick off an ajax request to get more results
+    this.fetch();
   }
 
   //Sort your bad self
   onSortUpdate(){
     this.topicCollection.setSnapshotSort(this.getSnapshotSort());
     this.collection.sort();
-    // TODO: kick off an ajax request to get more results
+    this.fetch();
   }
 
   onRequestSubscriptionStateUpdate({topicId}) {
