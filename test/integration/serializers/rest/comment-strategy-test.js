@@ -51,7 +51,7 @@ describe('CommentStrategy #slow', function() {
   });
 
   it('should serialize a comment', function() {
-    var strategy = new CommentStrategy();
+    var strategy = CommentStrategy.standard();
 
     var comment = fixture.comment1;
     var user = fixture.user1;
@@ -79,7 +79,7 @@ describe('CommentStrategy #slow', function() {
   });
 
   it("should serialize a reply with lookups=['user']", function() {
-    var strategy = new CommentStrategy({ lookups: ['user'] });
+    var strategy = CommentStrategy.standard({ lookups: ['user'] });
 
     var comment = fixture.comment1;
     var user = fixture.user1;

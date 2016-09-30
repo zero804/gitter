@@ -54,7 +54,9 @@ ReactionVisitor.prototype.getReactions = function(item) {
   if (!this.resultsHash) return NO_REACTIONS;
 
   var key = resolveKey(item);
-  return this.resultsHash[key] || NO_REACTIONS;
+  var v = this.resultsHash[key];
+
+  return v || NO_REACTIONS;
 }
 
 function createQueryForTopics(userId, forumObjects) {
@@ -148,7 +150,7 @@ function createReactionVisitor(userId, type, forumObjects) {
     return new ReactionVisitor();
   }
 
-  assert(type !== ForumObject.TYPE.Forum);
+  assert(type !== ForumObject.TYPE.Forum, 'Cannot react to a forum');
 
   var query = createQuery(userId, type, forumObjects);
 

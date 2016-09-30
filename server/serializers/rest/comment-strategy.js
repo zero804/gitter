@@ -3,53 +3,46 @@
 var Promise = require('bluebird');
 var getVersion = require('gitter-web-serialization/lib/get-model-version');
 var UserIdStrategy = require('./user-id-strategy');
+var CommentReactionStrategy = require('gitter-web-topic-serialization/lib/rest/comment-reaction-strategy');
 
 function formatDate(d) {
   return d ? d.toISOString() : null;
 }
 
 function CommentStrategy(options) {
-  options = options || {};
+  var doUserLookups = options && options.lookups && options.lookups.indexOf('user') >= 0;
+  this.userLookups = doUserLookups ? {} : null;
+}
 
-  // useLookups will be set to true if there are any lookups that this strategy
-  // understands.
-  var useLookups = false;
-  var userLookups;
-  if (options.lookups) {
-    if (options.lookups.indexOf('user') !== -1) {
-      useLookups = true;
-      userLookups = {};
-    }
-  }
-
-  var userStrategy;
-
-  this.preload = function(comments) {
+CommentStrategy.prototype = {
+  preload: function(comments) {
     if (comments.isEmpty()) return;
 
     var strategies = [];
 
-    // TODO: no user strategy necessary if options.user is passed in
-    userStrategy = UserIdStrategy.slim();
+    if (this.reactionStrategy) {
+      strategies.push(this.reactionStrategy.preload(comments));
+    }
+
     var userIds = comments.map(function(i) { return i.userId; });
-    strategies.push(userStrategy.preload(userIds));
+    strategies.push(this.userStrategy.preload(userIds));
 
     return Promise.all(strategies);
-  };
+  },
 
-  function mapUser(userId) {
-    if (userLookups) {
-      if (!userLookups[userId]) {
-        userLookups[userId] = userStrategy.map(userId);
+  mapUser: function(userId) {
+    if (this.userLookups) {
+      if (!this.userLookups[userId]) {
+        this.userLookups[userId] = this.userStrategy.map(userId);
       }
 
       return userId;
     } else {
-      return userStrategy.map(userId);
+      return this.userStrategy.map(userId);
     }
-  }
+  },
 
-  this.map = function(comment) {
+  map: function(comment) {
     var id = comment.id || comment._id && comment._id.toHexString();
 
     return {
@@ -62,31 +55,51 @@ function CommentStrategy(options) {
       // TODO: should we incude which topic/reply it is for?
 
       // TODO: support options.user
-      user: mapUser(comment.userId),
+      user: this.mapUser(comment.userId),
+
+      ownReactions: this.reactionStrategy ? this.reactionStrategy.map(comment) : undefined,
 
       sent: formatDate(comment.sent),
       editedAt: formatDate(comment.editedAt),
       lastChanged: formatDate(comment.lastChanged),
       v: getVersion(comment)
     };
-  };
+  },
 
-  this.postProcess = function(serialized) {
-    if (useLookups) {
+  postProcess: function(serialized) {
+    if (this.userLookups) {
       return {
         items: serialized.toArray(),
         lookups: {
-          users: userLookups
+          users: this.userLookups
         }
       };
     } else {
       return serialized.toArray();
     }
-  }
-}
+  },
 
-CommentStrategy.prototype = {
-  name: 'CommentStrategy',
+  name: 'CommentStrategy'
 };
+
+/**
+ *
+ */
+CommentStrategy.standard = function(options) {
+  var currentUserId = options && options.currentUserId;
+  var strategy = new CommentStrategy({
+    lookups: options && options.lookups
+  });
+
+  strategy.userStrategy = UserIdStrategy.slim();
+
+  if (currentUserId) {
+    strategy.reactionStrategy = new CommentReactionStrategy({
+      currentUserId: currentUserId
+    });
+  }
+
+  return strategy;
+}
 
 module.exports = CommentStrategy;
