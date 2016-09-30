@@ -59,6 +59,10 @@ TopicStrategy.prototype = {
       strategies.push(this.topicSubscriptionStrategy.preload(topics));
     }
 
+    if (this.reactionStrategy) {
+      strategies.push(this.reactionStrategy.preload(topics));
+    }
+
     return Promise.all(strategies);
   },
 
