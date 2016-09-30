@@ -319,6 +319,11 @@ function categoryMatches(model, slug) {
   return category.slug === slug;
 }
 
+// TODO: we should really get rid of special values that just mean empty or
+// none or don't filter/sort by this thing. It is error-prone,
+// infects/complicates all the code and means that adding a category called
+// "all" or a tag called "all-tags" will just break everything. Also "filtering
+// by activity" currently means "don't filter at all"
 function desentinel(value, sentinel) {
   return (value === sentinel) ? undefined : value;
 }
