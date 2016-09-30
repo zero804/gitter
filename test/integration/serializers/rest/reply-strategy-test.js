@@ -4,6 +4,7 @@ var env = require('gitter-web-env');
 var nconf = env.config;
 var testRequire = require('../../test-require');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
+var persistence = require('gitter-web-persistence');
 var assertUtils = require('../../assert-utils')
 var serialize = require('gitter-web-serialization/lib/serialize');
 var ReplyStrategy = testRequire('./serializers/rest/reply-strategy');
@@ -11,6 +12,7 @@ var serializeObject = require('gitter-web-serialization/lib/serialize-object');
 var subscriberService = require('gitter-web-topic-notifications/lib/subscriber-service');
 var ForumObject = require('gitter-web-topic-models/lib/forum-object');
 var assert = require('assert');
+var reactionService = require('gitter-web-topic-reactions/lib/reaction-service');
 
 var LONG_AGO = '2014-01-01T00:00:00.000Z';
 
@@ -47,6 +49,13 @@ describe('ReplyStrategy #slow', function() {
       sent: new Date(LONG_AGO),
       commentsTotal: 1
     },
+    reply2: {
+      forum: 'forum1',
+      category: 'category1',
+      user: 'user1',
+      topic: 'topic1',
+      sent: new Date(LONG_AGO)
+    },
     comment1: {
       forum: 'forum1',
       category: 'category1',
@@ -78,6 +87,49 @@ describe('ReplyStrategy #slow', function() {
             avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
           },
           commentsTotal: 1,
+          reactions: {},
+          sent: LONG_AGO,
+          editedAt: null,
+          lastChanged: LONG_AGO,
+          v: 1
+        }])
+      });
+  });
+
+  it('should serialize a reply with a userId with reactions', function() {
+    var reply = fixture.reply2;
+    var user = fixture.user1;
+
+    return reactionService.addReaction(ForumObject.createForReply(reply.forumId, reply.topicId, reply._id), user._id, 'like')
+      .then(function() {
+        return persistence.Reply.findById(reply._id);
+      })
+      .then(function(reply) {
+        var strategy = ReplyStrategy.standard({ currentUserId: user._id });
+
+        return serialize([reply], strategy);
+      })
+      .then(function(s) {
+        assertUtils.assertSerializedEqual(s, [{
+          id: reply.id,
+          body: {
+            text: reply.text,
+            html: reply.html
+          },
+          user: {
+            id: user.id,
+            username: user.username,
+            displayName: user.displayName,
+            avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
+          },
+          subscribed: false,
+          commentsTotal: 0,
+          reactions: {
+            like: 1
+          },
+          ownReactions: {
+            like: true
+          },
           sent: LONG_AGO,
           editedAt: null,
           lastChanged: LONG_AGO,
@@ -108,6 +160,8 @@ describe('ReplyStrategy #slow', function() {
           },
           subscribed: false,
           commentsTotal: 1,
+          reactions: {},
+          ownReactions: {},
           sent: LONG_AGO,
           editedAt: null,
           lastChanged: LONG_AGO,
@@ -137,6 +191,7 @@ describe('ReplyStrategy #slow', function() {
             avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
           },
           commentsTotal: 1,
+          reactions: {},
           sent: LONG_AGO,
           editedAt: null,
           lastChanged: LONG_AGO,
@@ -179,12 +234,16 @@ describe('ReplyStrategy #slow', function() {
               displayName: user.displayName,
               avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
             },
+            reactions: {},
+            ownReactions: {},
             sent: LONG_AGO,
             editedAt: null,
             lastChanged: LONG_AGO,
             v: 1
           }],
           commentsTotal: 1,
+          reactions: {},
+          ownReactions: {},
           sent: LONG_AGO,
           editedAt: null,
           lastChanged: LONG_AGO,
@@ -226,12 +285,14 @@ describe('ReplyStrategy #slow', function() {
               displayName: user.displayName,
               avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
             },
+            reactions: {},
             sent: LONG_AGO,
             editedAt: null,
             lastChanged: LONG_AGO,
             v: 1
           }],
           commentsTotal: 1,
+          reactions: {},
           sent: LONG_AGO,
           editedAt: null,
           lastChanged: LONG_AGO,
@@ -257,6 +318,7 @@ describe('ReplyStrategy #slow', function() {
             },
             user: fixture.user1.id,
             commentsTotal: 1,
+            reactions: {},
             sent: LONG_AGO,
             editedAt: null,
             lastChanged: LONG_AGO,

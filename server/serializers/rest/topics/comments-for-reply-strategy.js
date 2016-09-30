@@ -34,7 +34,7 @@ CommentsForReplyStrategy.prototype = {
 CommentsForReplyStrategy.standard = function(options) {
   var strategy = new CommentsForReplyStrategy();
 
-  strategy.commentStrategy = new CommentStrategy({
+  strategy.commentStrategy = CommentStrategy.standard({
     currentUserId: options.currentUserId
   });
 

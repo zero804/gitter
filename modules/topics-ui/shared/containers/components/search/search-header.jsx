@@ -37,6 +37,9 @@ export default React.createClass({
               groupUri={groupUri}
               category={{ category: 'All', slug: DEFAULT_CATEGORY_NAME}}>
                 {groupName} Topics
+                <div className="topic-search__beta-decoration">
+                  Beta
+                </div>
             </ForumCategoryLink>
           </H1>
           <Input
