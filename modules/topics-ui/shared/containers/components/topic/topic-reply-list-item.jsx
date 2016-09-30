@@ -45,10 +45,6 @@ export default React.createClass({
         onCancel={this.onReplyEditCancel}
         onSave={this.onReplyEditSaved}
         primaryLabel="Likes"
-        primaryValue={10}
-        secondaryLabel="Comments"
-        secondaryValue={2}
-        onSecondaryClicked={this.onCommentsClicked}
         footerChildren={this.getFeedItemFooterChildren()}>
         {this.getComments()}
       </FeedItem>
@@ -57,7 +53,8 @@ export default React.createClass({
 
   getFeedItemFooterChildren(){
     const {reply} = this.props;
-    const subscriptionState = reply.subscriptionState;
+    const {subscriptionState, commentsTotal} = reply;
+    const displayCommentsTotal = (commentsTotal || 0);
 
     return [
       <span
@@ -69,7 +66,7 @@ export default React.createClass({
         key="comments"
         className="feed-item__comments"
         onClick={this.onCommentsClicked}>
-        2 Comments
+        {displayCommentsTotal} Comments
       </button>,
       <WatchButton
         key="subscribe"

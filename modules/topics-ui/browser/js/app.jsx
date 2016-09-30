@@ -103,6 +103,7 @@ export default React.createClass({
     return Object.assign(this.getDefaultState(), {
       groupUri: router.get('groupUri'),
       topicId: router.get('topicId'),
+      sortName: router.get('sortName'),
       topicsStore: getTopicsStore(),
       repliesStore: getRepliesStore(),
       newReplyStore: new NewReplyStore(),

@@ -54,6 +54,8 @@ export const RepliesStore = LiveCollection.extend({
     router.on('change:topicId', this.onActiveTopicUpdate, this);
   },
 
+  comparator(){},
+
   getById(id) {
     const model = this.get(id);
     if(!model) { return; }
