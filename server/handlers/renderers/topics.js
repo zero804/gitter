@@ -11,13 +11,13 @@ var getTopicsFilterSortOptions = require('gitter-web-topics/lib/get-topics-filte
 var forumCategoryStore = require('gitter-web-topics-ui/server/stores/forum-category-store');
 var forumTagStore = require('gitter-web-topics-ui/server/stores/forum-tag-store');
 var forumTopicsStore = require('gitter-web-topics-ui/server/stores/topics-store');
-var newTopicStore = require('gitter-web-topics-ui/server/stores/new-topic-store');
 var forumStore = require('gitter-web-topics-ui/server/stores/forum-store');
 var accessTokenStore = require('gitter-web-topics-ui/server/stores/access-token-store');
 var repliesStore = require('gitter-web-topics-ui/server/stores/replies-store');
 var currentUserStore = require('gitter-web-topics-ui/server/stores/current-user-store');
 var commentsStore = require('gitter-web-topics-ui/server/stores/comments-store');
 var newCommentStore = require('gitter-web-topics-ui/server/stores/new-comment-store');
+var newReplyStore = require('gitter-web-topics-ui/server/stores/new-reply-store');
 
 var navConstants = require('gitter-web-topics-ui/shared/constants/navigation');
 
@@ -81,8 +81,7 @@ function renderForum(req, res, next, options) {
 
           categoryStore: forumCategoryStore(forum.categories, categoryName),
           tagStore: forumTagStore(forum.tags, tagName),
-          topicsStore: forumTopicsStore(forum.topics, categoryName, tagName, filterName, sortName, context.user),
-          newTopicStore: newTopicStore(),
+          topicsStore: forumTopicsStore(forum.topics, categoryName, tagName, filterName, sortName, context.user, createTopic),
           forumStore: forumStore(forum),
           accessTokenStore: accessTokenStore(context.accessToken),
           currentUserStore: currentUserStore(context.user),
@@ -163,6 +162,7 @@ function renderTopic(req, res, next) {
           forumStore: forumStore(forum),
           commentsStore: commentsStore([]),
           newCommentStore: newCommentStore(),
+          newReplyStore: newReplyStore(),
         }
       });
     })

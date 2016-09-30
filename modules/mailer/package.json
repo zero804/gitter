@@ -13,7 +13,8 @@
     "bluebird": "^3.2.1",
     "gitter-web-cdn": "file:../cdn",
     "gitter-web-env": "file:../env",
-    "gitter-web-templates": "file:../templates"
+    "gitter-web-templates": "file:../templates",
+    "lodash": "^3.2.0"
   },
   "private": true
 }

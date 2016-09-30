@@ -1,17 +1,18 @@
 import Backbone from 'backbone';
-import parseReply from '../../../shared/parse/reply';
-import {subscribe} from '../../../shared/dispatcher';
-import {SUBMIT_NEW_REPLY} from '../../../shared/constants/create-reply';
 import LiveCollection from './live-collection';
+import {BaseModel} from './base-model';
+import {subscribe} from '../../../shared/dispatcher';
+
+import router from '../routers';
+import {getCurrentUser} from './current-user-store';
+import {getForumId} from './forum-store'
 import {getRealtimeClient} from './realtime-client';
 
+import parseReply from '../../../shared/parse/reply';
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
 import onReactionsUpdateMixin from './mixins/on-reactions-update';
 
-import {getCurrentUser} from './current-user-store';
-import {getForumId} from './forum-store'
-import router from '../routers';
-import {BaseModel} from './base-model';
+import {MODEL_STATE_DRAFT} from '../../../shared/constants/model-states';
 import {NAVIGATE_TO_TOPIC} from '../../../shared/constants/navigation';
 import {
   UPDATE_REPLY_SUBSCRIPTION_STATE,
@@ -19,12 +20,16 @@ import {
   SUBSCRIPTION_STATE_PENDING,
   UPDATE_REPLY_REACTIONS
 } from '../../../shared/constants/forum.js';
+import {SUBMIT_NEW_REPLY} from '../../../shared/constants/create-reply';
+import {UPDATE_REPLY, CANCEL_UPDATE_REPLY, SAVE_UPDATE_REPLY} from '../../../shared/constants/topic';
+
+
 
 export const ReplyModel = BaseModel.extend({
   // Why doesn't this just come from it's owner collection?
   url() {
     return this.get('id') ?
-    null :
+    `/v1/forums/${getForumId()}/topics/${router.get('topicId')}/replies/${this.get('id')}`:
     `/v1/forums/${getForumId()}/topics/${router.get('topicId')}/replies`;
   },
 });
@@ -45,6 +50,9 @@ export const RepliesStore = LiveCollection.extend({
   initialize(){
     subscribe(SUBMIT_NEW_REPLY, this.createNewReply, this);
     subscribe(NAVIGATE_TO_TOPIC, this.onNavigateToTopic, this);
+    subscribe(UPDATE_REPLY, this.updateReplyText, this);
+    subscribe(CANCEL_UPDATE_REPLY, this.cancelEditReply, this);
+    subscribe(SAVE_UPDATE_REPLY, this.saveUpdatedModel, this);
     subscribe(REQUEST_UPDATE_REPLY_SUBSCRIPTION_STATE, this.onRequestSubscriptionStateUpdate, this);
     subscribe(UPDATE_REPLY_SUBSCRIPTION_STATE, this.onSubscriptionStateUpdate, this);
     subscribe(UPDATE_REPLY_REACTIONS, this.onReactionsUpdate, this);
@@ -67,6 +75,8 @@ export const RepliesStore = LiveCollection.extend({
     this.create({
       text: data.body,
       user: getCurrentUser(),
+      sent: new Date().toISOString(),
+      state: MODEL_STATE_DRAFT
     });
   },
 
@@ -76,6 +86,26 @@ export const RepliesStore = LiveCollection.extend({
 
   onNavigateToTopic(){
     this.reset([]);
+  },
+
+  updateReplyText({replyId, text}) {
+    const model = this.get(replyId);
+    if(!model) { return; }
+    model.set('text', text);
+  },
+
+  cancelEditReply({replyId}) {
+    const model = this.get(replyId);
+    if(!model) { return; }
+    model.set('text', null);
+  },
+
+  saveUpdatedModel({replyId}){
+    const model = this.get(replyId);
+    if(!model) { return; }
+    const text = model.get('text');
+    if(text === null) { return; }
+    model.save({ text: text }, { patch: true });
   },
 
   onRequestSubscriptionStateUpdate({replyId}) {
@@ -100,7 +130,9 @@ export const RepliesStore = LiveCollection.extend({
 });
 
 dispatchOnChangeMixin(RepliesStore, [
-  'change:subscriptionState'
+  'change:subscriptionState',
+  'change:text',
+  'change:body'
 ]);
 onReactionsUpdateMixin(RepliesStore, 'onReactionsUpdate');
 

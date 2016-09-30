@@ -10,6 +10,7 @@ module.exports = function newReplyStore(data) {
 
   //Methods
   return {
-    get: get
+    get: get,
+    getTextContent: () => data.text
   };
 };

@@ -10,9 +10,6 @@ export default React.createClass({
 
   displayName: 'TopicReplyListItem',
   propTypes: {
-    userId: PropTypes.string.isRequired,
-    forumId: PropTypes.string.isRequired,
-    topicId: PropTypes.string.isRequired,
     reply: PropTypes.shape({
       id: PropTypes.string,
       text: PropTypes.string,
@@ -27,13 +24,22 @@ export default React.createClass({
 
     }).isRequired,
     user: PropTypes.object.isRequired,
-    onCommentsClicked: PropTypes.func.isRequired,
-    onNewCommentUpdate: PropTypes.func.isRequired,
-    submitNewComment: PropTypes.func.isRequired,
+
     newCommentContent: PropTypes.string,
+    submitNewComment: PropTypes.func.isRequired,
+    onNewCommentUpdate: PropTypes.func.isRequired,
+    onCommentsClicked: PropTypes.func.isRequired,
+
     onSubscribeButtonClick: PropTypes.func,
-    onReplyReactionPick: PropTypes.func,
-    onCommentReactionPick: PropTypes.func
+    onReactionPick: PropTypes.func,
+    onCommentReactionPick: PropTypes.func,
+
+    onEditUpdate: PropTypes.func.isRequired,
+    onEditCancel: PropTypes.func.isRequired,
+    onEditSaved: PropTypes.func.isRequired,
+    onCommentEditUpdate: PropTypes.func.isRequired,
+    onCommentEditCancel: PropTypes.func.isRequired,
+    onCommentEditSave: PropTypes.func.isRequired
   },
 
   render(){
@@ -42,6 +48,14 @@ export default React.createClass({
     return (
       <FeedItem
         item={reply}
+        onChange={this.onEditUpdate}
+        onCancel={this.onEditCancel}
+        onSave={this.onEditSaved}
+        primaryLabel="Likes"
+        primaryValue={10}
+        secondaryLabel="Comments"
+        secondaryValue={2}
+        onSecondaryClicked={this.onCommentsClicked}
         footerChildren={this.getFeedItemFooterChildren()}>
         {this.getComments()}
       </FeedItem>
@@ -100,7 +114,10 @@ export default React.createClass({
       <CommentItem
         key={`comment-list-item-${reply.id}-${index}`}
         comment={comment}
-        onReactionPick={this.onCommentReactionPick} />
+        onReactionPick={this.onCommentReactionPick}
+        onChange={this.onCommentEditUpdate.bind(this, comment.id)}
+        onCancel={this.onCommentEditCancel.bind(this, comment.id)}
+        onSave={this.onCommentEditSave.bind(this, comment.id, reply.id)}/>
     );
   },
 
@@ -118,9 +135,9 @@ export default React.createClass({
   },
 
   onReactionPick(reactionKey, isReacting) {
-    const {reply, onReplyReactionPick} = this.props;
-    if(onReplyReactionPick) {
-      onReplyReactionPick(reply.id, reactionKey, isReacting);
+    const {reply, onReactionPick} = this.props;
+    if(onReactionPick) {
+      onReactionPick(reply.id, reactionKey, isReacting);
     }
   },
 
@@ -139,5 +156,36 @@ export default React.createClass({
 
   submitNewComment(){
     this.props.submitNewComment();
-  }
+  },
+
+  onEditUpdate(value){
+    const {reply} = this.props;
+    const {id} = reply;
+    this.props.onEditUpdate(id, value);
+  },
+
+  onEditCancel(){
+    const {reply} = this.props;
+    const {id} = reply;
+    this.props.onEditCancel(id);
+  },
+
+  onEditSaved(){
+    const {reply} = this.props;
+    const {id} = reply;
+    this.props.onEditSaved(id)
+  },
+
+  onCommentEditUpdate(commentId, value){
+    this.props.onCommentEditUpdate(commentId, value);
+  },
+
+  onCommentEditCancel(commentId){
+    this.props.onCommentEditCancel(commentId);
+  },
+
+  onCommentEditSave(commentId, replyId){
+    this.props.onCommentEditSave(commentId, replyId);
+  },
+
 });

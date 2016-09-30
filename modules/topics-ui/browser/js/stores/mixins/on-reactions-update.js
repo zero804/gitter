@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
-const onReactionsUpdate = function({ entityId, replyId, commentId, reactionKey, isReacting }) {
-  const id = entityId || replyId || commentId;
+const onReactionsUpdate = function({ topicId, replyId, commentId, reactionKey, isReacting }) {
+  const id = topicId || replyId || commentId;
   const entity = this.collection.get(id);
   if(!entity) { return; }
 
