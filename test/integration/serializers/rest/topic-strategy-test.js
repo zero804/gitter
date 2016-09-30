@@ -192,6 +192,7 @@ describe('TopicStrategy #slow', function() {
             },
             subscribed: false,
             commentsTotal: 0,
+            ownReactions: {},
             sent: LONG_AGO,
             editedAt: null,
             lastChanged: LONG_AGO,

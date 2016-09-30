@@ -306,11 +306,14 @@ function serializeRepliesForTopicId(topicId, userId) {
     });
 }
 
-function serializeCommentsForReplyId(replyId) {
+function serializeCommentsForReplyId(replyId, userId) {
   // TODO: don't just return all the comments, return a sample
   return commentService.findByReplyId(replyId)
     .then(function(comments) {
-      var strategy = new restSerializer.CommentStrategy();
+      var strategy = restSerializer.CommentStrategy.standard({
+        currentUserId: userId
+      });
+
       return restSerializer.serialize(comments, strategy);
     });
 }
