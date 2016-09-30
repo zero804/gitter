@@ -35,6 +35,7 @@ export default React.createClass({
     const { category, groupUri, topic, tags } = this.props;
     const { title, user } = topic;
     const { displayName } = user;
+
     return (
       <Container className="container--topic-header">
         <Panel>

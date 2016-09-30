@@ -201,7 +201,11 @@ const TopicContainer = createClass({
             onTopicEditCancel={this.onTopicEditCancel}
             onTopicEditSave={this.onTopicEditSave}/>
         </article>
-        <TopicReplyListHeader replies={parsedReplies}/>
+        <TopicReplyListHeader
+          replies={parsedReplies}
+          onSortByCommentClicked={this.onSortByCommentClicked}
+          onSortByLikeClicked={this.onSortByLikeClicked}
+          onSortByRecentClicked={this.onSortByRecentClicked}/>
         <TopicReplyList>
           {parsedReplies.map(this.getReplyListItem)}
         </TopicReplyList>
