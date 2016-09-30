@@ -104,7 +104,12 @@ function reconcileIndices(models) {
         name: model.modelName,
         changes: reconciled
       };
-    });
+    })
+    .catch(function(e) {
+      if (e.message !== 'no collection') throw e;
+
+      return [];
+    })
   }, { concurrency: 1 })
   .then(function(reconciled) {
     return reconciled.filter(function(item) {
