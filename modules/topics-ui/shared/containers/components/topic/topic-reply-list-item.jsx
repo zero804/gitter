@@ -51,11 +51,6 @@ export default React.createClass({
         onChange={this.onEditUpdate}
         onCancel={this.onEditCancel}
         onSave={this.onEditSaved}
-        primaryLabel="Likes"
-        primaryValue={10}
-        secondaryLabel="Comments"
-        secondaryValue={2}
-        onSecondaryClicked={this.onCommentsClicked}
         footerChildren={this.getFeedItemFooterChildren()}>
         {this.getComments()}
       </FeedItem>
@@ -81,6 +76,8 @@ export default React.createClass({
         onClick={this.onSubscribeButtonClick}/>,
       <ReactionButton
         key="reactions"
+        reactionCountMap={reply.reactions}
+        ownReactionMap={reply.ownReactions}
         onReactionPick={this.onReactionPick}/>
     ];
   },
