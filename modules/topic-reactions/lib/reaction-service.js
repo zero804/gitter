@@ -73,7 +73,10 @@ function addReaction(forumObject, userId, reaction) {
   })
   .then(function(result) {
     var modified = !!(result.nModified || result.upserted && result.upserted.length);
-    if (!modified) return null;
+    if (!modified) {
+      // No change.. Be idempotent
+      return listReactions(forumObject);
+    }
 
     return updateReactionTotals(forumObject, reaction, +1);
   });
