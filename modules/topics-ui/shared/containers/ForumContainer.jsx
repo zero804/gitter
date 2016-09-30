@@ -192,7 +192,7 @@ const ForumContainer = React.createClass({
   onTitleChange(title){ dispatch(titleUpdate(title));},
   onBodyChange(body){ dispatch(bodyUpdate(body));},
   onCategoryChange(id) { dispatch(categoryUpdate(id));},
-  onTopicTagsChange(tags) { dispatch(tagsUpdate(tags)); },
+  onTopicTagsChange(tag, isAdding) { dispatch(tagsUpdate(tag, isAdding)); },
 
   onCreateTopicClose(){
     const {categoryStore} = this.props;
