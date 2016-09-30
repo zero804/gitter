@@ -221,6 +221,7 @@ export const TopicsLiveCollection = LiveCollection.extend({
     subscribe(UPDATE_CANCEL_TOPIC, this.onTopicEditCancel, this);
     subscribe(UPDATE_SAVE_TOPIC, this.onTopicEditSaved, this);
     this.listenTo(router, 'change:createTopic', this.onCreateTopicChange, this);
+    subscribe(UPDATE_TOPIC_REACTIONS, this.onReactionsUpdate, this);
   },
 
   //The default case for snapshots is to completely reset the collection
@@ -356,7 +357,6 @@ export class TopicsStore {
 
     subscribe(REQUEST_UPDATE_TOPIC_SUBSCRIPTION_STATE, this.onRequestSubscriptionStateUpdate, this);
     subscribe(UPDATE_TOPIC_SUBSCRIPTION_STATE, this.onSubscriptionStateUpdate, this);
-    subscribe(UPDATE_TOPIC_REACTIONS, this.onReactionsUpdate, this);
   }
 
   getFilter() {

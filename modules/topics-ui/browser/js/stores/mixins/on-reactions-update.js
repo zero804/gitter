@@ -16,7 +16,7 @@ const onReactionsUpdate = function({ topicId, replyId, commentId, reactionKey, i
 }
 
 
-export default function dipatchOnChangeMixin(Constructor, onReactionsUpdateCallbackName = 'onReactionsUpdate') {
+export default function onReactionsUpdateMixin(Constructor, onReactionsUpdateCallbackName = 'onReactionsUpdate') {
   Constructor.prototype[onReactionsUpdateCallbackName] = onReactionsUpdate;
 
   return Constructor;
