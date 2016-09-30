@@ -42,9 +42,8 @@ describe('topicsStore', () => {
       undefined,
       undefined,
       forumFilterConstants.FILTER_BY_TOPIC,
-      { username: 'cutandpastey' },
       forumSortConstants.MOST_RECENT_SORT,
-      '2'
+      { username: 'cutandpastey' }
     );
     assert.equal(result.data.length, 2);
 

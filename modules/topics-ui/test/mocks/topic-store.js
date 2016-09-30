@@ -7,6 +7,14 @@ var CategoryStore = Backbone.Collection.extend({
   },
   getById: function(id){
     return this.get(id).toJSON();
+  },
+  getDraftTopic: function() {
+    return {
+      title: '',
+      text: '',
+      categoryId: '',
+      tags: [],
+    };
   }
 });
 
