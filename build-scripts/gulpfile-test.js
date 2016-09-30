@@ -114,6 +114,7 @@ function spawnMochaProcess(moduleName, options, files) { // eslint-disable-line 
   var env = {
     SKIP_BADGER_TESTS: 1,
     BLUEBIRD_DEBUG: 1,
+    NO_AUTO_INDEX: 1,
     TZ: 'UTC'
   }
 
@@ -204,6 +205,10 @@ Object.keys(testModules).forEach(function(moduleName) {
   });
 
 });
+
+gulp.task('test:pre-test', function() {
+  return childProcessPromise.spawn('./scripts/utils/ensure-mongodb-indexes.js', []);
+})
 
 if (RUN_TESTS_IN_PARALLEL) {
   // Run tests in parallel
