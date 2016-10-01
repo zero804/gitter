@@ -9,7 +9,6 @@ describe('App', function() {
 
   it('should set the right state when rendered with the forum route', function(){
     const wrapper = shallow(<App router={mockRouter} />);
-    console.log(wrapper.state());
     assert.equal(wrapper.state('route'), 'forum');
   });
 
