@@ -3,7 +3,7 @@
 var assert = require('assert');
 var forumStore = require('../../../../server/stores/forum-store');
 
-describe.skip('forumStore', () => {
+describe('forumStore', () => {
 
   var data = {};
 

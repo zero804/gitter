@@ -1,16 +1,17 @@
 import React, { PropTypes } from 'react';
 
-import WatchButton from '../forum/watch-button.jsx';
 import CommentEditor from './comment-editor.jsx';
 import CommentItem from './comment-item.jsx';
 import FeedItem from './feed-item.jsx';
+import WatchButton from '../forum/watch-button.jsx';
+import ReactionButton from '../forum/reaction-button.jsx';
 
 export default React.createClass({
 
   displayName: 'TopicReplyListItem',
   propTypes: {
-    user: PropTypes.object.isRequired,
     reply: PropTypes.shape({
+      id: PropTypes.string,
       text: PropTypes.string,
       body: PropTypes.shape({
         html: PropTypes.string,
@@ -22,17 +23,23 @@ export default React.createClass({
       }).isRequired
 
     }).isRequired,
-    onCommentsClicked: PropTypes.func.isRequired,
-    onNewCommentUpdate: PropTypes.func.isRequired,
-    submitNewComment: PropTypes.func.isRequired,
+    user: PropTypes.object.isRequired,
+
     newCommentContent: PropTypes.string,
+    submitNewComment: PropTypes.func.isRequired,
+    onNewCommentUpdate: PropTypes.func.isRequired,
+    onCommentsClicked: PropTypes.func.isRequired,
+
+    onSubscribeButtonClick: PropTypes.func,
+    onReactionPick: PropTypes.func,
+    onCommentReactionPick: PropTypes.func,
+
     onReplyEditUpdate: PropTypes.func.isRequired,
     onReplyEditCancel: PropTypes.func.isRequired,
     onReplyEditSaved: PropTypes.func.isRequired,
     onCommentEditUpdate: PropTypes.func.isRequired,
     onCommentEditCancel: PropTypes.func.isRequired,
-    onCommentEditSave: PropTypes.func.isRequired,
-    onSubscribeButtonClick: PropTypes.func
+    onCommentEditSave: PropTypes.func.isRequired
   },
 
   render(){
@@ -44,7 +51,6 @@ export default React.createClass({
         onChange={this.onReplyEditUpdate}
         onCancel={this.onReplyEditCancel}
         onSave={this.onReplyEditSaved}
-        primaryLabel="Likes"
         footerChildren={this.getFeedItemFooterChildren()}>
         {this.getComments()}
       </FeedItem>
@@ -57,11 +63,6 @@ export default React.createClass({
     const displayCommentsTotal = (commentsTotal || 0);
 
     return [
-      <span
-        key="likes"
-        className="feed-item__likes">
-        10 Likes
-      </span>,
       <button
         key="comments"
         className="feed-item__comments"
@@ -73,7 +74,12 @@ export default React.createClass({
         subscriptionState={subscriptionState}
         className="topic-reply-list-item__footer__subscribe-action"
         itemClassName="topic-reply-list-item__footer__subscribe-action-text-item"
-        onClick={this.onSubscribeButtonClick}/>
+        onClick={this.onSubscribeButtonClick}/>,
+      <ReactionButton
+        key="reactions"
+        reactionCountMap={reply.reactions}
+        ownReactionMap={reply.ownReactions}
+        onReactionPick={this.onReactionPick}/>
     ];
   },
 
@@ -106,6 +112,7 @@ export default React.createClass({
       <CommentItem
         key={`comment-list-item-${reply.id}-${index}`}
         comment={comment}
+        onReactionPick={this.onCommentReactionPick}
         onChange={this.onCommentEditUpdate.bind(this, comment.id)}
         onCancel={this.onCommentEditCancel.bind(this, comment.id)}
         onSave={this.onCommentEditSave.bind(this, comment.id, reply.id)}/>
@@ -120,7 +127,24 @@ export default React.createClass({
 
   onSubscribeButtonClick(e) {
     const {reply, onSubscribeButtonClick} = this.props;
-    onSubscribeButtonClick(e, reply.id);
+    if(onSubscribeButtonClick) {
+      onSubscribeButtonClick(e, reply.id);
+    }
+  },
+
+  onReactionPick(reactionKey, isReacting) {
+    const {reply, onReactionPick} = this.props;
+    if(onReactionPick) {
+      onReactionPick(reply.id, reactionKey, isReacting);
+    }
+  },
+
+  onCommentReactionPick(commentId, reactionKey, isReacting) {
+    // TODO: pass it up further
+    const {reply, onCommentReactionPick} = this.props;
+    if(onCommentReactionPick) {
+      onCommentReactionPick(reply.id, commentId, reactionKey, isReacting);
+    }
   },
 
   onNewCommentUpdate(val) {
