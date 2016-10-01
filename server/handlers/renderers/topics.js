@@ -176,7 +176,7 @@ function renderTopic(req, res, next) {
     })
     .then(function(result) {
 
-      var sortName = (req.query.sort || navConstants.DEFAULT_SORT_NAME);
+      var sortName = req.query.sort;
 
       this.serializedForum = result.serializedForum;
       this.serializedTopic = result.serializedTopic;
