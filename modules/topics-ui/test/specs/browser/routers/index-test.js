@@ -1,8 +1,9 @@
 import assert from 'assert';
 import Backbone from 'backbone';
-import router from '../../../../browser/js/routers/index';
 import sinon from 'sinon';
 import { dispatch } from '../../../../shared/dispatcher';
+
+import currentUserStoreMock from '../../../mocks/current-user-store';
 
 import * as forumCatConstants from '../../../../shared/constants/forum-categories';
 import * as forumFilterConstants from '../../../../shared/constants/forum-filters';
@@ -17,6 +18,12 @@ import navigateToCategory from '../../../../shared/action-creators/forum/navigat
 import topicReplySortByComments from '../../../../shared/action-creators/topic/topic-replies-sort-by-comments';
 import topicReplySortByLikes from '../../../../shared/action-creators/topic/topic-replies-sort-by-liked';
 import topicReplySortByReplies from '../../../../shared/action-creators/topic/topic-replies-sort-by-recent';
+
+import routerInjector from 'inject-loader!../../../../browser/js/routers/index';
+const {default: router} = routerInjector({
+  '../stores/current-user-store': currentUserStoreMock
+});
+
 
 describe('Router', function(){
 
@@ -96,13 +103,13 @@ describe('Router', function(){
     assert.equal(router.get('route'), navConstants.FORUM_ROUTE);
   });
 
-  it('should dispacth the right event when the filter property updates', () => {
+  it('should dispatch the right event when the filter property updates', () => {
     router.on(forumFilterConstants.UPDATE_ACTIVE_FILTER, filterHandle);
     router.set('filterName', 'test');
     assert.equal(filterHandle.callCount, 1);
   });
 
-  it('should dispacth the right event when the sort property updates', () => {
+  it('should dispatch the right event when the sort property updates', () => {
     router.on(forumSortConstants.UPDATE_ACTIVE_SORT, sortHandle);
     router.set('sortName', 'test');
     assert.equal(sortHandle.callCount, 1);
@@ -136,14 +143,14 @@ describe('Router', function(){
     assert(spy.calledWithMatch({ sort: 'test' }));
   });
 
-  it.skip('should have the right params after moving to a topic', () => {
+  it('should have the right params after moving to a topic', () => {
     dispatch(navigateToTopic('gitterHQ', '12345', 'slug'));
     assert.equal(router.get('groupUri'), 'gitterHQ');
     assert.equal(router.get('topicId'), '12345');
     assert.equal(router.get('slug'), 'slug');
   });
 
-  it.skip('should have the right params after moving to create topic', () => {
+  it('should have the right params after moving to create topic', () => {
     dispatch(navigateToCreateTopic());
     assert(router.get('createTopic'));
   });

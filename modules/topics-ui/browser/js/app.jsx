@@ -7,8 +7,9 @@ import TopicContainer from '../../shared/containers/TopicContainer.jsx';
 import NewReplyStore from './stores/new-reply-store';
 import NewCommentStore from './stores/new-comment-store-store';
 
-import {getCurrentUserStore} from './stores/current-user-store';
+import {getGroupStore} from './stores/group-store';
 import {getForumStore} from './stores/forum-store';
+import {getCurrentUserStore} from './stores/current-user-store';
 import {getForumTagStore} from './stores/forum-tag-store';
 import {getForumCategoryStore} from './stores/forum-category-store';
 import {getTopicsStore} from './stores/topics-store';
@@ -66,11 +67,11 @@ export default React.createClass({
   getDefaultState(){
     const { router } = this.props;
     return {
-      groupUri: router.get('groupUri'),
       route: router.get('route'),
       router: router,
-      currentUserStore: getCurrentUserStore(),
+      groupStore: getGroupStore(),
       forumStore: getForumStore(),
+      currentUserStore: getCurrentUserStore(),
       categoryStore: getForumCategoryStore(),
       tagStore: getForumTagStore(),
     };
@@ -101,7 +102,6 @@ export default React.createClass({
   getTopicState(){
     var {router} = this.props;
     return Object.assign(this.getDefaultState(), {
-      groupUri: router.get('groupUri'),
       topicId: router.get('topicId'),
       sortName: router.get('sortName'),
       topicsStore: getTopicsStore(),

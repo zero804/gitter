@@ -6,19 +6,7 @@ var assert = require('assert');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var validReactions = require('./valid-reactions');
 var StatusError = require('statuserror');
-
-function processReactionCounts(reactionCounts) {
-  if (!reactionCounts) return {};
-
-  for(var k in reactionCounts) {
-    var val = reactionCounts[k];
-    if(val === 0 && reactionCounts.hasOwnProperty(k)) {
-      delete reactionCounts[k];
-    }
-  }
-
-  return reactionCounts;
-}
+var reactionHashTransformer = require('./reaction-hash-transformer');
 
 function listReactions(forumObject) {
   var Model = forumObject.type.model;
@@ -28,7 +16,7 @@ function listReactions(forumObject) {
     .select({ _id: 0, reactionCounts: 1 })
     .exec()
     .then(function(doc) {
-      return processReactionCounts(doc && doc.reactionCounts);
+      return reactionHashTransformer(doc && doc.reactionCounts);
     });
 }
 
@@ -46,7 +34,7 @@ function updateReactionTotals(forumObject, reaction, inc) {
     .select({ _id: 0, reactionCounts: 1 })
     .exec()
     .then(function(doc) {
-      var reactionCounts = processReactionCounts(doc && doc.reactionCounts);
+      var reactionCounts = reactionHashTransformer(doc && doc.reactionCounts);
 
       forumObject.liveCollectionPatch({
         reactions: reactionCounts
@@ -85,7 +73,10 @@ function addReaction(forumObject, userId, reaction) {
   })
   .then(function(result) {
     var modified = !!(result.nModified || result.upserted && result.upserted.length);
-    if (!modified) return null;
+    if (!modified) {
+      // No change.. Be idempotent
+      return listReactions(forumObject);
+    }
 
     return updateReactionTotals(forumObject, reaction, +1);
   });
@@ -110,7 +101,10 @@ function removeReaction(forumObject, userId, reaction) {
     .exec()
     .then(function(result) {
       var modified = result.result.n > 0;
-      if (!modified) return null;
+      if (!modified) {
+        // No change.. Be idempotent
+        return listReactions(forumObject);
+      }
 
       return updateReactionTotals(forumObject, reaction, -1);
     })

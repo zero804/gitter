@@ -7,6 +7,8 @@ var RepliesForTopicStrategy = require('./topics/replies-for-topic-strategy');
 var TopicReplyingUsersStrategy = require('./topics/topic-replying-users-strategy');
 var UserIdStrategy = require('./user-id-strategy');
 var TopicSubscriptionStrategy = require('./topics/topic-subscription-strategy');
+var TopicReactionStrategy = require('gitter-web-topic-serialization/lib/rest/topic-reaction-strategy');
+var mapReactionCounts = require('gitter-web-topic-serialization/lib/map-reaction-counts');
 
 function formatDate(d) {
   return d ? d.toISOString() : null;
@@ -55,6 +57,10 @@ TopicStrategy.prototype = {
 
     if (this.topicSubscriptionStrategy) {
       strategies.push(this.topicSubscriptionStrategy.preload(topics));
+    }
+
+    if (this.reactionStrategy) {
+      strategies.push(this.reactionStrategy.preload(topics));
     }
 
     return Promise.all(strategies);
@@ -107,6 +113,11 @@ TopicStrategy.prototype = {
       repliesTotal: topic.repliesTotal,
       replyingUsers: this.replyingUsersStrategy ? this.replyingUsersStrategy.map(id): undefined,
 
+      reactions: mapReactionCounts(topic),
+      // Own reactions are not defined for anonymous users
+      // or the broadcast topic live-collection
+      ownReactions: this.reactionStrategy ? this.reactionStrategy.map(topic) : undefined,
+
       sent: formatDate(topic.sent),
       editedAt: formatDate(topic.editedAt),
       lastChanged: formatDate(topic.lastChanged),
@@ -152,6 +163,10 @@ TopicStrategy.standard = function(options) {
   strategy.categoryStrategy = new ForumCategoryIdStrategy();
 
   if (currentUserId) {
+    strategy.reactionStrategy = new TopicReactionStrategy({
+      currentUserId: currentUserId
+    });
+
     strategy.topicSubscriptionStrategy = new TopicSubscriptionStrategy({
       currentUserId: currentUserId
     });

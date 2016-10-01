@@ -36,6 +36,52 @@ ForumReactionSchema.index({
   background: true,
 });
 
+ForumReactionSchema.extraIndices = [{
+  /* Topic Reactions Partial Index */
+  keys: {
+    userId: 1,
+    topicId: 1,
+  },
+  options: {
+    background: true,
+    unique: true,
+    partialFilterExpression: {
+      replyId: { $eq: null },
+      commentId: { $eq: null }
+    },
+  }
+}, {
+  /* Reply Reactions Partial Index */
+  keys: {
+    userId: 1,
+    replyId: 1,
+  },
+  options: {
+    background: true,
+    unique: true,
+    partialFilterExpression: {
+      topicId: { $type: 'objectId' }, // Equiv: Not null
+      replyId: { $type: 'objectId' }, // Equiv: Not null
+      commentId: { $eq: null }
+    },
+  }
+}, {
+  /* Comment Reactions Partial Index */
+  keys: {
+    userId: 1,
+    commentId: 1,
+  },
+  options: {
+    background: true,
+    unique: true,
+    partialFilterExpression: {
+      topicId: { $type: 'objectId' }, // Equiv: Not null
+      replyId: { $type: 'objectId' }, // Equiv: Not null
+      commentId: { $type: 'objectId' }, // Equiv: Not null
+    },
+  }
+}];
+
 module.exports = {
   install: function(mongooseConnection) {
     var Model = mongooseConnection.model('ForumReaction', ForumReactionSchema);

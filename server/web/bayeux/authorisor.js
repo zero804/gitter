@@ -369,6 +369,7 @@ function populateRepliesCollection(options) {
 }
 
 function populateCommentsCollection(options) {
+  var userId = options.userId;
   var match = options.match;
   var forumId = match[1];
   var topicId = match[2];
@@ -378,7 +379,7 @@ function populateCommentsCollection(options) {
     return Promise.resolve();
   }
 
-  return restful.serializeCommentsForReplyId(replyId)
+  return restful.serializeCommentsForReplyId(replyId, userId)
     .then(dataToSnapshot('forum.comments'));
 }
 

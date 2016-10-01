@@ -80,7 +80,7 @@ describe('reaction-service', function() {
               return reactionService.addReaction(ref, userId, 'like')
             })
             .then(function(result) {
-              assert.strictEqual(result, null);
+              assert.deepEqual(result, { like: 1 });
               return find();
             })
             .then(function(o){
@@ -96,7 +96,7 @@ describe('reaction-service', function() {
               return reactionService.removeReaction(ref, userId, 'like')
             })
             .then(function(result) {
-              assert.strictEqual(result, null);
+              assert.deepEqual(result, { });
               return find();
             })
             .then(function(o) {

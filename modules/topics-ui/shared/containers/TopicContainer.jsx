@@ -26,6 +26,9 @@ import updateCancelTopic from '../action-creators/topic/update-cancel-topic';
 import updateSaveTopic from '../action-creators/topic/update-save-topic';
 import requestUpdateTopicSubscriptionState from '../action-creators/forum/request-update-topic-subscription-state';
 import requestUpdateReplySubscriptionState from '../action-creators/forum/request-update-reply-subscription-state';
+import requestUpdateTopicReactions from '../action-creators/forum/request-update-topic-reactions';
+import requestUpdateReplyReactions from '../action-creators/forum/request-update-reply-reactions';
+import requestUpdateCommentReactions from '../action-creators/forum/request-update-comment-reactions';
 import requestSignIn from '../action-creators/forum/request-sign-in';
 import topicReplySortByComments from '../action-creators/topic/topic-replies-sort-by-comments';
 import topicReplySortByLike from '../action-creators/topic/topic-replies-sort-by-liked';
@@ -60,6 +63,12 @@ const TopicContainer = createClass({
       on: PropTypes.func.isRequired,
       off: PropTypes.func.isRequired,
     }),
+
+    //Group
+    groupStore: PropTypes.shape({
+      getGroupUri: PropTypes.func.isRequired,
+      getGroupName: PropTypes.func.isRequired
+    }).isRequired,
 
     //Forum
     forumStore: React.PropTypes.shape({
@@ -183,8 +192,11 @@ const TopicContainer = createClass({
 
   render(){
 
-    const { categoryStore, currentUserStore, tagStore, groupUri, newReplyStore} = this.props;
+    const { groupStore, categoryStore, currentUserStore, tagStore, newReplyStore} = this.props;
     const {forumId, forumSubscriptionState, sortName } = this.state;
+
+    const groupUri = groupStore.getGroupUri();
+    const groupName = groupStore.getGroupName();
 
     const newReplyContent = newReplyStore.getTextContent();
     const topic = this.getParsedTopic();
@@ -211,6 +223,7 @@ const TopicContainer = createClass({
           userId={userId}
           forumId={forumId}
           groupUri={groupUri}
+          groupName={groupName}
           subscriptionState={forumSubscriptionState}/>
         <article>
           <TopicHeader
@@ -218,8 +231,11 @@ const TopicContainer = createClass({
             category={category}
             groupUri={groupUri}
             tags={tags}/>
+
           <TopicBody
             topic={topic}
+            onSubscribeButtonClick={this.onTopicSubscribeButtonClick}
+            onReactionPick={this.onTopicReactionPick}
             onTopicEditUpdate={this.onTopicEditUpdate}
             onTopicEditCancel={this.onTopicEditCancel}
             onTopicEditSave={this.onTopicEditSave}/>
@@ -230,9 +246,11 @@ const TopicContainer = createClass({
           onSortByCommentClicked={this.onSortByCommentClicked}
           onSortByLikeClicked={this.onSortByLikeClicked}
           onSortByRecentClicked={this.onSortByRecentClicked}/>
+
         <TopicReplyList>
           {parsedReplies.map(this.getReplyListItem)}
         </TopicReplyList>
+
         <TopicReplyEditor
           user={currentUser}
           isSignedIn={isSignedIn}
@@ -244,26 +262,27 @@ const TopicContainer = createClass({
     );
   },
 
-
   getReplyListItem(reply, index){
     const {newCommentStore, currentUserStore } = this.props;
     const currentUser = currentUserStore.getCurrentUser();
     return (
       <TopicReplyListItem
-        reply={reply}
         key={`topic-reply-list-item-${reply.id}-${index}`}
+        reply={reply}
         user={currentUser}
         newCommentContent={newCommentStore.get('text')}
-        onCommentsClicked={this.onReplyCommentsClicked}
-        onNewCommentUpdate={this.onNewCommentUpdate}
         submitNewComment={this.submitNewComment}
+        onNewCommentUpdate={this.onNewCommentUpdate}
+        onCommentsClicked={this.onCommentsClicked}
+        onSubscribeButtonClick={this.onReplySubscribeButtonClick}
+        onReactionPick={this.onReplyReactionPick}
+        onCommentReactionPick={this.onCommentReactionPick}
         onReplyEditUpdate={this.onReplyEditUpdate}
         onReplyEditCancel={this.onReplyEditCancel}
         onReplyEditSaved={this.onReplyEditSaved}
         onCommentEditUpdate={this.onCommentEditUpdate}
         onCommentEditCancel={this.onCommentEditCancel}
-        onCommentEditSave={this.onCommentEditSave}
-        onSubscribeButtonClick={this.onTopicSubscribeButtonClick} />
+        onCommentEditSave={this.onCommentEditSave} />
     );
   },
 
@@ -340,10 +359,8 @@ const TopicContainer = createClass({
     dispatch(requestUpdateTopicSubscriptionState(topicId, desiredIsSubscribed));
   },
 
-
   onReplySubscribeButtonClick(e, replyId) {
     const { repliesStore } = this.props;
-
     const reply = repliesStore.getById(replyId);
     const subscriptionState = reply.subscriptionState;
     const desiredIsSubscribed = (subscriptionState !== SUBSCRIPTION_STATE_SUBSCRIBED);
@@ -351,7 +368,22 @@ const TopicContainer = createClass({
     dispatch(requestUpdateReplySubscriptionState(replyId, desiredIsSubscribed));
   },
 
-  onReplyCommentsClicked(replyId){
+  onTopicReactionPick(topicId, reactionKey, isReacting) {
+    // TODO: dispatch event and listen in `forum-client`
+    dispatch(requestUpdateTopicReactions(topicId, reactionKey, isReacting));
+  },
+
+  onReplyReactionPick(replyId, reactionKey, isReacting) {
+    // TODO: dispatch event and listen in `forum-client`
+    dispatch(requestUpdateReplyReactions(replyId, reactionKey, isReacting));
+  },
+
+  onCommentReactionPick(replyId, commentId, reactionKey, isReacting) {
+    // TODO: dispatch event and listen in `forum-client`
+    dispatch(requestUpdateCommentReactions(replyId, commentId, reactionKey, isReacting));
+  },
+
+  onCommentsClicked(replyId){
     dispatch(showReplyComments(replyId));
   },
 
@@ -365,7 +397,7 @@ const TopicContainer = createClass({
     const text = newCommentStore.get('text');
     //Dont submit blank content
     if(!text) { return; }
-    dispatch(submitNewComment(newCommentStore.get('replyId'), text ));
+    dispatch(submitNewComment(newCommentStore.get('replyId'), text));
   },
 
 

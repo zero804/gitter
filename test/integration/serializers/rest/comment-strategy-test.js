@@ -7,6 +7,9 @@ var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assertUtils = require('../../assert-utils')
 var serialize = require('gitter-web-serialization/lib/serialize');
 var CommentStrategy = testRequire('./serializers/rest/comment-strategy');
+var persistence = require('gitter-web-persistence');
+var reactionService = require('gitter-web-topic-reactions/lib/reaction-service');
+var ForumObject = require('gitter-web-topic-models/lib/forum-object');
 
 var LONG_AGO = '2014-01-01T00:00:00.000Z';
 
@@ -47,11 +50,19 @@ describe('CommentStrategy #slow', function() {
       topic: 'topic1',
       reply: 'reply1',
       sent: new Date(LONG_AGO)
+    },
+    comment2: {
+      forum: 'forum1',
+      category: 'category1',
+      user: 'user1',
+      topic: 'topic1',
+      reply: 'reply1',
+      sent: new Date(LONG_AGO)
     }
   });
 
   it('should serialize a comment', function() {
-    var strategy = new CommentStrategy();
+    var strategy = CommentStrategy.standard();
 
     var comment = fixture.comment1;
     var user = fixture.user1;
@@ -70,6 +81,81 @@ describe('CommentStrategy #slow', function() {
             displayName: user.displayName,
             avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
           },
+          reactions: {},
+          sent: LONG_AGO,
+          editedAt: null,
+          lastChanged: LONG_AGO,
+          v: 1
+        }])
+      });
+  });
+
+  it('should serialize a comment with a userId', function() {
+    var strategy = CommentStrategy.standard({
+      currentUserId: fixture.user1._id
+    });
+
+    var comment = fixture.comment1;
+    var user = fixture.user1;
+
+    return serialize([comment], strategy)
+      .then(function(s) {
+        assertUtils.assertSerializedEqual(s, [{
+          id: comment.id,
+          body: {
+            text: comment.text,
+            html: comment.html,
+          },
+          user: {
+            id: user.id,
+            username: user.username,
+            displayName: user.displayName,
+            avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
+          },
+          reactions: {},
+          ownReactions: {},
+          sent: LONG_AGO,
+          editedAt: null,
+          lastChanged: LONG_AGO,
+          v: 1
+        }])
+      });
+  });
+
+  it('should serialize a comment with a userId with reactions', function() {
+    var comment = fixture.comment1;
+    var user = fixture.user1;
+
+    return reactionService.addReaction(ForumObject.createForComment(comment.forumId, comment.topicId, comment.replyId, comment._id), user._id, 'like')
+      .then(function() {
+        return persistence.Comment.findById(comment._id);
+      })
+      .then(function(comment) {
+        var strategy = CommentStrategy.standard({
+          currentUserId: fixture.user1._id
+        });
+
+        return serialize([comment], strategy)
+      })
+      .then(function(s) {
+        assertUtils.assertSerializedEqual(s, [{
+          id: comment.id,
+          body: {
+            text: comment.text,
+            html: comment.html,
+          },
+          user: {
+            id: user.id,
+            username: user.username,
+            displayName: user.displayName,
+            avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + user.username,
+          },
+          reactions: {
+            like: 1
+          },
+          ownReactions: {
+            like: true
+          },
           sent: LONG_AGO,
           editedAt: null,
           lastChanged: LONG_AGO,
@@ -79,7 +165,7 @@ describe('CommentStrategy #slow', function() {
   });
 
   it("should serialize a reply with lookups=['user']", function() {
-    var strategy = new CommentStrategy({ lookups: ['user'] });
+    var strategy = CommentStrategy.standard({ lookups: ['user'] });
 
     var comment = fixture.comment1;
     var user = fixture.user1;
@@ -94,6 +180,7 @@ describe('CommentStrategy #slow', function() {
               html: comment.html,
             },
             user: fixture.user1.id,
+            reactions: {},
             sent: LONG_AGO,
             editedAt: null,
             lastChanged: LONG_AGO,

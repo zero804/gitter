@@ -13,7 +13,6 @@ describe('<CreateTopicModal/>', () => {
   let Component;
 
   let wrapper;
-  let activeWrapper;
 
   let submitHandle;
   let titleChangeHandle;
@@ -46,7 +45,7 @@ describe('<CreateTopicModal/>', () => {
         onTagsChange={tagChangeHandle}/>
     );
 
-    ActiveComponent =  (
+    ActiveComponent = (
       <CreateTopicModal
         tags={tags}
         categories={categories}
@@ -59,7 +58,6 @@ describe('<CreateTopicModal/>', () => {
     );
 
     wrapper = shallow(Component);
-    activeWrapper = shallow(ActiveComponent);
 
   });
 
@@ -108,7 +106,7 @@ describe('<CreateTopicModal/>', () => {
   });
 
   it('should render the editor with a name of body', () => {
-    equal(wrapper.find('Editor').at(0).prop('name'), 'body');
+    equal(wrapper.find('Editor').at(0).prop('name'), 'text');
   });
 
   it('should call onSubmit when submitted', () => {
