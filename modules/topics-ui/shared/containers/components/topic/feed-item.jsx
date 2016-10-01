@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react';
 import UserAvatar from '../user/user-avatar.jsx';
 import moment from 'moment';
 import EditableContent from '../forms/editable-content.jsx';
+import {AVATAR_SIZE_MEDIUM} from '../../../constants/avatar-sizes';
 
 export default React.createClass({
 
@@ -53,8 +54,7 @@ export default React.createClass({
             <UserAvatar
               className="feed-item__avatar"
               user={user}
-              width={avatarDims}
-              height={avatarDims}/>
+              size={AVATAR_SIZE_MEDIUM} />
             <span className="feed-item__sent">
               {formattedSentDate}
             </span>
