@@ -175,6 +175,9 @@ function renderTopic(req, res, next) {
       });
     })
     .then(function(result) {
+
+      var sortName = (req.query.sort || navConstants.DEFAULT_SORT_NAME);
+
       this.serializedForum = result.serializedForum;
       this.serializedTopic = result.serializedTopic;
 
@@ -194,12 +197,13 @@ function renderTopic(req, res, next) {
           groupUri: req.params.groupUri,
           topicsStore: topicStore,
           topicId: topicId,
+          sortName: sortName,
 
           groupStore: groupStore(group),
           forumStore: forumStore(forum),
           accessTokenStore: accessTokenStore(context.accessToken),
           currentUserStore: currentUserStore(context.user),
-          repliesStore: repliesStore(topic.replies),
+          repliesStore: repliesStore(topic.replies, sortName),
           categoryStore: forumCategoryStore(forum.categories),
           tagStore: forumTagStore(forum.tags),
           commentsStore: commentsStore([]),

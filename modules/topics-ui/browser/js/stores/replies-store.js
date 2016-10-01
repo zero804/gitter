@@ -20,8 +20,16 @@ import {
   SUBSCRIPTION_STATE_PENDING,
   UPDATE_REPLY_REACTIONS
 } from '../../../shared/constants/forum.js';
+
 import {SUBMIT_NEW_REPLY} from '../../../shared/constants/create-reply';
-import {UPDATE_REPLY, CANCEL_UPDATE_REPLY, SAVE_UPDATE_REPLY} from '../../../shared/constants/topic';
+import {
+  UPDATE_REPLY,
+  CANCEL_UPDATE_REPLY,
+  SAVE_UPDATE_REPLY,
+  TOPIC_REPLIES_COMMENT_SORT_NAME,
+  TOPIC_REPLIES_LIKED_SORT_NAME,
+  TOPIC_REPLIES_RECENT_SORT_NAME
+} from '../../../shared/constants/topic';
 
 
 
@@ -57,9 +65,21 @@ export const RepliesStore = LiveCollection.extend({
     subscribe(UPDATE_REPLY_SUBSCRIPTION_STATE, this.onSubscriptionStateUpdate, this);
     subscribe(UPDATE_REPLY_REACTIONS, this.onReactionsUpdate, this);
     router.on('change:topicId', this.onActiveTopicUpdate, this);
+    router.on('change:sortName', this.sort, this);
   },
 
-  comparator(){},
+  comparator(a, b){
+    switch(router.get('sortName')) {
+      case TOPIC_REPLIES_COMMENT_SORT_NAME:
+        return b.get('commentsTotal') - a.get('commentsTotal');
+      case TOPIC_REPLIES_LIKED_SORT_NAME:
+        const aCount = ((a.get('reactions') || {}).like || 0);
+        const bCount = ((b.get('reactions') || {}).like || 0);
+        return bCount - aCount;
+      case TOPIC_REPLIES_RECENT_SORT_NAME:
+        return new Date(b.get('sent')) - new Date(a.get('sent'));
+    }
+  },
 
   getById(id) {
     const model = this.get(id);
