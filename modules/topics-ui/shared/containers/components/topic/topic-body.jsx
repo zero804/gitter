@@ -31,24 +31,30 @@ export default React.createClass({
     const { topic, onSubscribeButtonClick } = this.props;
     const subscriptionState = topic.subscriptionState;
 
+    //Remove the share button for now as we have no current ability
+    //to share content
+    //<button className="topic-body__footer__action">Share</button>
+
     return (
       <Container className="container--topic-body">
         <Panel className="panel--topic-body">
           {this.getContent()}
           <footer className="topic-body__footer">
+
+            {this.getEditButton()}
+
+            <WatchButton
+              subscriptionState={subscriptionState}
+              className="topic-body__footer__subscribe-action"
+              itemClassName="topic-body__footer__subscribe-action-text-item"
+              onClick={onSubscribeButtonClick}/>
+
             <ReactionButton
               key="reactions"
               className="topic-body__footer__reaction-action"
               reactionCountMap={topic.reactions}
               ownReactionMap={topic.ownReactions}
               onReactionPick={this.onReactionPick}/>
-            <button className="topic-body__footer__action">Share</button>
-            {this.getEditButton()}
-            <WatchButton
-              subscriptionState={subscriptionState}
-              className="topic-body__footer__subscribe-action"
-              itemClassName="topic-body__footer__subscribe-action-text-item"
-              onClick={onSubscribeButtonClick}/>
           </footer>
         </Panel>
       </Container>
