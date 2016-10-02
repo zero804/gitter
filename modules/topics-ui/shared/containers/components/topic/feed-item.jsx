@@ -2,7 +2,10 @@ import React, { PropTypes } from 'react';
 import UserAvatar from '../user/user-avatar.jsx';
 import moment from 'moment';
 import EditableContent from '../forms/editable-content.jsx';
+import IconButton from '../buttons/icon-button.jsx';
+
 import {AVATAR_SIZE_MEDIUM} from '../../../constants/avatar-sizes';
+import {ICONS_EDIT} from '../../../constants/icons';
 
 export default React.createClass({
 
@@ -86,11 +89,10 @@ export default React.createClass({
     if(!canEdit) { return; }
 
     return (
-      <button
+      <IconButton
         className="feed-item__edit-control"
-        onClick={this.onEditClicked}>
-        Edit
-      </button>
+        type={ICONS_EDIT}
+        onClick={this.onEditClicked} />
     );
   },
 

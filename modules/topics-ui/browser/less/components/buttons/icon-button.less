@@ -12,6 +12,7 @@
   border: none;
   outline: none;
   cursor: pointer;
+  padding: 0;
 
   &:after {
     content: ' ';
@@ -26,6 +27,7 @@
   text-transform: uppercase;
   font-family: @font-family;
   color: @topic-reply-action-text-color;
+  padding-right: 1rem;
 
   &:after {
     display: inline-block;
@@ -45,4 +47,19 @@
 .icon-button-comment {
   .icon-button-like();
   &:after { background-image: url('../../../svg/comments.svg'); }
+}
+
+.icon-button-edit {
+  .icon-button-like();
+  &:after { background-image: url('../../../svg/edit.svg'); }
+}
+
+.icon-button-watch {
+  .icon-button-like();
+  &:after { background-image: url('../../../svg/watch.svg'); }
+}
+
+.icon-button-watch-selected {
+  .icon-button-like();
+  &:after { background-image: url('../../../svg/watch-selected.svg'); }
 }
