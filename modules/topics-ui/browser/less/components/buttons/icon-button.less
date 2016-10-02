@@ -1,0 +1,43 @@
+@import "../../colors.less";
+@import "../../text.less";
+
+@icon-size: 1.5rem;
+
+.icon-button {
+
+  display: flex;
+  align-items: center;
+
+  background: none;
+  border: none;
+  outline: none;
+  cursor: pointer;
+
+  &:after {
+    content: ' ';
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+}
+
+.icon-button-like {
+
+  font-size: 1.35rem;
+  text-transform: uppercase;
+  font-family: @font-family;
+  color: @topic-reply-action-text-color;
+
+  &:after {
+    display: inline-block;
+    width: @icon-size;
+    height: @icon-size;
+    margin-left: .5rem;
+    background-image: url('../../../svg/like.svg');
+  }
+}
+
+.icon-button-like-selected {
+  .icon-button-like();
+  color: @dark;
+  &:after { background-image: url('../../../svg/like-selected.svg'); }
+}
