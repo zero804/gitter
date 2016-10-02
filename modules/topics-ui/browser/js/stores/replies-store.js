@@ -69,13 +69,16 @@ export const RepliesStore = LiveCollection.extend({
   },
 
   comparator(a, b){
+    //Get the count for likes
+    const aLikeCount = ((a.get('reactions') || {}).like || 0);
+    const bLikeCount = ((b.get('reactions') || {}).like || 0);
+
+    //Do some sorting
     switch(router.get('sortName')) {
       case TOPIC_REPLIES_COMMENT_SORT_NAME:
         return b.get('commentsTotal') - a.get('commentsTotal');
       case TOPIC_REPLIES_LIKED_SORT_NAME:
-        const aCount = ((a.get('reactions') || {}).like || 0);
-        const bCount = ((b.get('reactions') || {}).like || 0);
-        return bCount - aCount;
+        return bLikeCount - aLikeCount;
       case TOPIC_REPLIES_RECENT_SORT_NAME:
         return new Date(b.get('sent')) - new Date(a.get('sent'));
     }
