@@ -37,7 +37,8 @@ import {
 import {
   UPDATE_TOPIC,
   UPDATE_CANCEL_TOPIC,
-  UPDATE_SAVE_TOPIC
+  UPDATE_SAVE_TOPIC,
+  UPDATE_TOPIC_IS_EDITING
 } from '../../../shared/constants/topic';
 
 import {MODEL_STATE_DRAFT, MODEL_STATE_SYNCED} from '../../../shared/constants/model-states';
@@ -46,7 +47,7 @@ const modelDefaults = {
   title: '',
   text: '',
   categoryId: '',
-  tags: [],
+  tags: []
 };
 
 
@@ -60,6 +61,7 @@ export const TopicModel = BaseModel.extend({
   // via @cutandpastey, https://github.com/troupe/gitter-webapp/pull/2293#discussion_r81304415
   defaults: {
     state: MODEL_STATE_DRAFT,
+    isEditing: false
   },
 
   initialize(attrs = {}){
@@ -226,6 +228,7 @@ export const TopicsLiveCollection = LiveCollection.extend({
     subscribe(UPDATE_TOPIC, this.onTopicUpdate, this);
     subscribe(UPDATE_CANCEL_TOPIC, this.onTopicEditCancel, this);
     subscribe(UPDATE_SAVE_TOPIC, this.onTopicEditSaved, this);
+    subscribe(UPDATE_TOPIC_IS_EDITING, this.onTopicIsEditingUpdate, this);
     this.listenTo(router, 'change:createTopic', this.onCreateTopicChange, this);
     subscribe(UPDATE_TOPIC_REACTIONS, this.onReactionsUpdate, this);
   },
@@ -270,6 +273,16 @@ export const TopicsLiveCollection = LiveCollection.extend({
     const text = model.get('text');
     if(!text) { return; }
     model.save({ text: model.get('text') }, { patch: true });
+  },
+
+  onTopicIsEditingUpdate({ isEditing }) {
+    const topicId = router.get('topicId');
+    const model = this.get(topicId);
+    if(!model) { return; }
+
+    model.set({
+      isEditing: isEditing
+    });
   },
 
   //If a user visits or returns from /create-topic we must either:
@@ -465,17 +478,24 @@ export class TopicsStore {
 //All events that must be observed
 dispatchOnChangeMixin(TopicsStore, [
   'sort',
+  'invalid',
   'change:reactions',
   'change:ownReactions',
-  'change:text',
   'change:subscriptionState',
-  'change:title',
   'change:text',
+  'change:title',
   'change:body',
   'change:categoryId',
   'change:tags',
-  'invalid'
-]);
+  'change:isEditing'
+], {
+  delay: function(model) {
+    // We need synchronous updates so the cursor is managed properly
+    if(model && (model.get('isEditing') || model.get('state') === MODEL_STATE_DRAFT)) {
+      return 0;
+    }
+  }
+});
 
 
 const serverStore = (window.context.topicsStore || {});
