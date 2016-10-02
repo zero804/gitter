@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 import TopicLink from '../links/topic-link.jsx';
 import UserAvatar from '../user/user-avatar.jsx';
+import {AVATAR_SIZE_SMALL, AVATAR_SIZE_MEDIUM} from '../../../constants/avatar-sizes';
 
 export default React.createClass({
 
@@ -30,8 +31,7 @@ export default React.createClass({
           <UserAvatar
             className="topics-table-body__cell__avatar"
             user={user}
-            width={28}
-            height={28}/>
+            size={AVATAR_SIZE_MEDIUM} />
           <TopicLink
             className="topics-table-body__cell__link"
             groupUri={groupUri}
@@ -59,8 +59,7 @@ export default React.createClass({
   getUserListAvatar(user, i){
     return (
       <UserAvatar
-        width={10}
-        height={10}
+        size={AVATAR_SIZE_SMALL}
         user={user}
         className="topics-table-body__user-list__item"
         key={`user-list-item${i}`} />

@@ -5,6 +5,7 @@ import H1 from '../text/h-1.jsx';
 import UserAvatar from '../user/user-avatar.jsx';
 import ForumCategoryLink from '../links/forum-category-link.jsx';
 import ForumTagLink from '../links/forum-tag-link.jsx';
+import {AVATAR_SIZE_LARGE} from '../../../constants/avatar-sizes';
 
 export default React.createClass({
 
@@ -41,7 +42,10 @@ export default React.createClass({
         <Panel>
           <header>
             <section className="topic-header">
-              <UserAvatar className="topic-header__avatar" user={user} width={44} height={44}/>
+            <UserAvatar
+              className="topic-header__avatar"
+              user={user}
+              size={AVATAR_SIZE_LARGE} />
               <div>
                 <span className="topic-header__username">{displayName}</span>
                 <H1 className="topic-header__title">{title}</H1>
