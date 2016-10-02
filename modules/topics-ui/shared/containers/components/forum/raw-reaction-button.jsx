@@ -39,7 +39,7 @@ export default React.createClass({
       <button
         className={compiledClassName}
         onClick={this.onClick}>
-        {children || `👍 ${likeReactionCount}`}
+        {children || `👍  ${likeReactionCount}`}
       </button>
     );
   },

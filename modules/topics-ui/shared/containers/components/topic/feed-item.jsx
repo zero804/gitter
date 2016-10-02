@@ -55,16 +55,24 @@ export default React.createClass({
               className="feed-item__avatar"
               user={user}
               size={AVATAR_SIZE_MEDIUM} />
-            <span className="feed-item__sent">
-              {formattedSentDate}
-            </span>
           </div>
-          {this.getItemContent()}
+          <div className="feed-item__body">
+
+            <header className="feed-item__header">
+              <span className="feed-item__sent">
+                {formattedSentDate}
+              </span>
+              {this.getEditControl()}
+            </header>
+
+            {this.getItemContent()}
+
+            <footer className="feed-item__footer">
+              {footerChildren}
+            </footer>
+
+          </div>
         </div>
-        <footer className="feed-item__footer">
-          {footerChildren}
-          {this.getEditControl()}
-        </footer>
         {children}
       </article>
     );
@@ -91,7 +99,6 @@ export default React.createClass({
     const {item} = this.props;
     return (
       <EditableContent
-        className="feed-item__body"
         content={item}
         onChange={this.onChange}
         onCancel={this.onCancelClicked}
@@ -100,7 +107,6 @@ export default React.createClass({
     );
 
   },
-
 
   onEditClicked(e){
     e.preventDefault();
