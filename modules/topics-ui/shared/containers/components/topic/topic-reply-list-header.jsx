@@ -1,4 +1,6 @@
 import React, { PropTypes } from 'react';
+import classNames from 'classnames';
+
 import Container from '../container.jsx';
 import Panel from '../panel.jsx';
 import H1 from '../text/h-1.jsx';
@@ -25,45 +27,52 @@ export default React.createClass({
     onSortByCommentClicked: PropTypes.func.isRequired,
     onSortByLikeClicked: PropTypes.func.isRequired,
     onSortByRecentClicked: PropTypes.func.isRequired,
+    replyListEditorInFocus: PropTypes.bool,
   },
 
   render(){
 
-    const {replies, sortName} = this.props;
+    const {replies, sortName, replyListEditorInFocus} = this.props;
     const numOfReplies = replies.length;
 
     //TODO Add the popular button back into the control list
     //<li><button className="topic-reply-list-header__filter-button--active">Popular</button></li>
 
+    const compiledClass = classNames({
+      'topic-reply-list-header-wrap--visually-hidden': replyListEditorInFocus
+    }, 'topic-reply-list-header-wrap')
+
     return (
       <Container>
         <Panel className="panel--reply-list-header">
-          <H1 className="topic-reply-list-header__heading">{numOfReplies} Replies</H1>
-          <ul className="topic-reply-list-header__filter-list">
-            <li>
-              <TopicReplyListHeaderButton
-                active={(sortName === TOPIC_REPLIES_COMMENT_SORT_NAME)}
-                onClick={this.onSortByCommentClicked}>
-                Commented
-              </TopicReplyListHeaderButton>
-            </li>
+          <div className={compiledClass}>
+            <H1 className="topic-reply-list-header__heading">{numOfReplies} Replies</H1>
+            <ul className="topic-reply-list-header__filter-list">
+              <li>
+                <TopicReplyListHeaderButton
+                  active={(sortName === TOPIC_REPLIES_COMMENT_SORT_NAME)}
+                  onClick={this.onSortByCommentClicked}>
+                  Commented
+                </TopicReplyListHeaderButton>
+              </li>
 
-            <li>
-              <TopicReplyListHeaderButton
-                active={(sortName === TOPIC_REPLIES_LIKED_SORT_NAME)}
-                onClick={this.onSortByLikeClicked}>
-                Liked
-              </TopicReplyListHeaderButton>
-            </li>
+              <li>
+                <TopicReplyListHeaderButton
+                  active={(sortName === TOPIC_REPLIES_LIKED_SORT_NAME)}
+                  onClick={this.onSortByLikeClicked}>
+                  Liked
+                </TopicReplyListHeaderButton>
+              </li>
 
-            <li>
-              <TopicReplyListHeaderButton
-                active={(sortName === TOPIC_REPLIES_RECENT_SORT_NAME)}
-                onClick={this.onSortByRecentClicked}>
-                Recent
-              </TopicReplyListHeaderButton>
-            </li>
-          </ul>
+              <li>
+                <TopicReplyListHeaderButton
+                  active={(sortName === TOPIC_REPLIES_RECENT_SORT_NAME)}
+                  onClick={this.onSortByRecentClicked}>
+                  Recent
+                </TopicReplyListHeaderButton>
+              </li>
+            </ul>
+          </div>
         </Panel>
       </Container>
     );
