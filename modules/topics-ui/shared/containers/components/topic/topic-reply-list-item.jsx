@@ -63,23 +63,27 @@ export default React.createClass({
     const displayCommentsTotal = (commentsTotal || 0);
 
     return [
-      <button
-        key="comments"
-        className="feed-item__comments"
-        onClick={this.onCommentsClicked}>
-        {displayCommentsTotal} Comments
-      </button>,
+
+      <ReactionButton
+        key="reactions"
+        reactionCountMap={reply.reactions}
+        ownReactionMap={reply.ownReactions}
+        onReactionPick={this.onReactionPick}/>,
+
       <WatchButton
         key="subscribe"
         subscriptionState={subscriptionState}
         className="topic-reply-list-item__footer__subscribe-action"
         itemClassName="topic-reply-list-item__footer__subscribe-action-text-item"
         onClick={this.onSubscribeButtonClick}/>,
-      <ReactionButton
-        key="reactions"
-        reactionCountMap={reply.reactions}
-        ownReactionMap={reply.ownReactions}
-        onReactionPick={this.onReactionPick}/>
+
+      <button
+        key="comments"
+        className="feed-item__comments"
+        onClick={this.onCommentsClicked}>
+        {displayCommentsTotal} Comments
+      </button>,
+
     ];
   },
 
