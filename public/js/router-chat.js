@@ -37,7 +37,7 @@ require('./components/focus-events');
 // Preload widgets
 require('./components/ping');
 
-onready(function() {
+onready(function() { // eslint-disable-line max-statements
 
   appEvents.on('navigation', function(url, type, title, options) {
     options = options || {};
@@ -48,7 +48,12 @@ onready(function() {
     }
 
     if (frameUtils.hasParentFrameSameOrigin()) {
-      frameUtils.postMessage({ type: 'navigation', url: url, urlType: type, title: title});
+      frameUtils.postMessage({
+        type: 'navigation',
+        url: url,
+        urlType: type,
+        title: title
+      });
     } else {
       // No pushState here. Open the link directly
       // Remember that (window.parent === window) when there is no parent frame
