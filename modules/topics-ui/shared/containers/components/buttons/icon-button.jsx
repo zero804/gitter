@@ -3,6 +3,7 @@ import classNames from 'classnames';
 import {
   ICONS_LIKE,
   ICONS_LIKE_SELECTED,
+  ICONS_COMMENT
 } from '../../../constants/icons';
 
 export default React.createClass({
@@ -13,22 +14,27 @@ export default React.createClass({
     type: PropTypes.oneOf([
       ICONS_LIKE,
     ]),
+    className: PropTypes.string,
     onClick: PropTypes.func,
   },
 
   render(){
-    const {children, type, onClick} = this.props;
+    const {children, type, onClick, className} = this.props;
 
-    let className;
+    let iconClassName;
     if(type === ICONS_LIKE) {
-      className = 'icon-button-like';
+      iconClassName = 'icon-button-like';
     }
 
     if(type === ICONS_LIKE_SELECTED) {
-      className = 'icon-button-like-selected';
+      iconClassName = 'icon-button-like-selected';
     }
 
-    const compiledClassName = classNames('icon-button', className);
+    if (type === ICONS_COMMENT) {
+      iconClassName = 'icon-button-comment'
+    }
+
+    const compiledClassName = classNames('icon-button', className, iconClassName);
 
     return (
       <button

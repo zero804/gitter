@@ -27,10 +27,8 @@ export default React.createClass({
   },
 
   render() {
-    const { children, className, ownStateClassName, reactionCountMap, ownReactionMap } = this.props;
-
+    const { children, reactionCountMap, ownReactionMap } = this.props;
     const likeReactionCount = reactionCountMap[reactionConstants.LIKE] || 0;
-
 
     const type = ownReactionMap[reactionConstants.LIKE] ?
     ICONS_LIKE_SELECTED :
