@@ -113,7 +113,7 @@ export default React.createClass({
   },
 
   //EVENT HANDLES ---------------------------
-  onRouteUpdate(){
+  onRouteUpdate() {
     this.setState(this.getStateForRoute());
   }
 
