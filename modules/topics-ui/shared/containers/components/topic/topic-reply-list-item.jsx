@@ -5,6 +5,9 @@ import CommentItem from './comment-item.jsx';
 import FeedItem from './feed-item.jsx';
 import WatchButton from '../forum/watch-button.jsx';
 import ReactionButton from '../forum/reaction-button.jsx';
+import IconButton from '../buttons/icon-button.jsx';
+
+import {ICONS_COMMENT}  from '../../../constants/icons';
 
 export default React.createClass({
 
@@ -70,19 +73,20 @@ export default React.createClass({
         ownReactionMap={reply.ownReactions}
         onReactionPick={this.onReactionPick}/>,
 
+      <IconButton
+        key="comments"
+        type={ICONS_COMMENT}
+        className="feed-item__comments"
+        onClick={this.onCommentsClicked}>
+        {displayCommentsTotal}
+      </IconButton>,
+
       <WatchButton
         key="subscribe"
         subscriptionState={subscriptionState}
         className="topic-reply-list-item__footer__subscribe-action"
         itemClassName="topic-reply-list-item__footer__subscribe-action-text-item"
         onClick={this.onSubscribeButtonClick}/>,
-
-      <button
-        key="comments"
-        className="feed-item__comments"
-        onClick={this.onCommentsClicked}>
-        {displayCommentsTotal} Comments
-      </button>,
 
     ];
   },
