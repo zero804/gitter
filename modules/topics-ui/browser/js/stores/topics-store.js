@@ -120,20 +120,22 @@ export const TopicModel = BaseModel.extend({
     this.set('categoryId', categoryId);
   },
 
-  //Add tags
-  //TODO we need to think about events that would remove tags from this array
-  //typically when a user de-selects them in the modal
-  onTagsUpdate(data){
-    const tag = data.tag;
+  //Add/Remove tags
+  onTagsUpdate({ tag, isAdding }) {
     const currentTags = this.get('tags') || [];
-    if(currentTags.indexOf(tag) !== -1) { return; }
-    currentTags.push(tag);
-    this.set('tags', currentTags);
+    let newTags = currentTags;
+    // Adding
+    if(isAdding && currentTags.indexOf(tag) === -1) {
+      newTags = currentTags.concat(tag);
+    }
+    // Removing
+    else if(!isAdding && currentTags.indexOf(tag) !== -1) {
+      newTags = currentTags.filter((currentTag) => {
+        return currentTag !== tag;
+      })
+    }
 
-    // We have to trigger here beacuse backbone will not pickup this change
-    // event if we were to `[].concat(currentTags)` we still wouldn't get a
-    // change event :(
-      this.trigger('change:tags');
+    this.set('tags', newTags);
   },
 
   onRequestSave() {
