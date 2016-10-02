@@ -26,6 +26,17 @@ import {UPDATE_REPLY, CANCEL_UPDATE_REPLY, SAVE_UPDATE_REPLY} from '../../../sha
 
 
 export const ReplyModel = BaseModel.extend({
+
+  // Theres a problem with the realtime client here. When a message comes in from
+  // the realtime connection it will create a new model and patch the values onto an existing model.
+  // If you have any defaults the patch model with override the current models values with the defaults.
+  // Bad Times.
+  //
+  // via @cutandpastey, https://github.com/troupe/gitter-webapp/pull/2293#discussion_r81304415
+  defaults: {
+    isEditing: false
+  },
+
   // Why doesn't this just come from it's owner collection?
   url() {
     return this.get('id') ?
@@ -133,7 +144,15 @@ dispatchOnChangeMixin(RepliesStore, [
   'change:subscriptionState',
   'change:text',
   'change:body'
-]);
+], {
+  delay: function(model) {
+    console.log('m', model && model.toJSON());
+    // We need synchronous updates so the cursor is managed properly
+    if(model && (model.get('isEditing') || model.get('state') === MODEL_STATE_DRAFT)) {
+      return 0;
+    }
+  }
+});
 onReactionsUpdateMixin(RepliesStore, 'onReactionsUpdate');
 
 

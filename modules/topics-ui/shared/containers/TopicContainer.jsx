@@ -21,9 +21,11 @@ import saveUpdatedReply from '../action-creators/topic/save-update-reply';
 import updateComment from '../action-creators/topic/update-comment.js';
 import updateCancelComment from '../action-creators/topic/update-cancel-comment.js';
 import updateSaveComment from '../action-creators/topic/update-save-comment.js';
+
 import updateTopic from '../action-creators/topic/update-topic';
 import updateCancelTopic from '../action-creators/topic/update-cancel-topic';
 import updateSaveTopic from '../action-creators/topic/update-save-topic';
+import updateTopicIsEditing from '../action-creators/topic/update-topic-is-editing';
 import requestUpdateTopicSubscriptionState from '../action-creators/forum/request-update-topic-subscription-state';
 import requestUpdateReplySubscriptionState from '../action-creators/forum/request-update-reply-subscription-state';
 import requestUpdateTopicReactions from '../action-creators/forum/request-update-topic-reactions';
@@ -212,6 +214,7 @@ const TopicContainer = createClass({
             topic={topic}
             onSubscribeButtonClick={this.onTopicSubscribeButtonClick}
             onReactionPick={this.onTopicReactionPick}
+            onEditTopicClicked={this.onEditTopicClicked}
             onTopicEditUpdate={this.onTopicEditUpdate}
             onTopicEditCancel={this.onTopicEditCancel}
             onTopicEditSave={this.onTopicEditSave}/>
@@ -392,16 +395,22 @@ const TopicContainer = createClass({
     dispatch(updateSaveComment(commentId, replyId));
   },
 
+  onEditTopicClicked() {
+    dispatch(updateTopicIsEditing(true));
+  },
+
   onTopicEditUpdate(value){
     dispatch(updateTopic(value));
   },
 
   onTopicEditCancel(){
     dispatch(updateCancelTopic());
+    dispatch(updateTopicIsEditing(false));
   },
 
   onTopicEditSave(){
     dispatch(updateSaveTopic());
+    dispatch(updateTopicIsEditing(false));
   }
 
 });

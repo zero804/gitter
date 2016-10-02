@@ -17,13 +17,10 @@ export default React.createClass({
     }).isRequired,
     onSubscribeButtonClick: PropTypes.func,
     onReactionPick: PropTypes.func,
+    onEditTopicClicked: PropTypes.func.isRequired,
     onTopicEditUpdate: PropTypes.func.isRequired,
     onTopicEditCancel: PropTypes.func.isRequired,
     onTopicEditSave: PropTypes.func.isRequired
-  },
-
-  getInitialState(){
-    return { isEditing: false }
   },
 
   render() {
@@ -55,9 +52,10 @@ export default React.createClass({
     );
   },
 
-  getEditButton(){
+  getEditButton() {
     //Don't show the button if we are editing
-    const {isEditing} = this.state;
+    const { topic } = this.props;
+    const { isEditing } = topic;
     if(isEditing) { return; }
 
     //Only show the edit button if the user has permission
@@ -71,9 +69,9 @@ export default React.createClass({
     );
   },
 
-  getContent(){
-    const {isEditing} = this.state;
-    const {topic} = this.props;
+  getContent() {
+    const { topic } = this.props;
+    const { isEditing } = topic;
     return (
       <EditableContent
         className="topic-body__content"
@@ -82,13 +80,12 @@ export default React.createClass({
         onChange={this.onTopicEditUpdate}
         onSave={this.onTopicEditSave}
         onCancel={this.onTopicEditCancel}
-        isEditing={isEditing}/>
+        isEditing={isEditing} />
     );
   },
 
-  onEditTopicClicked(e){
-    e.preventDefault();
-    this.setState({ isEditing: true });
+  onEditTopicClicked() {
+    this.props.onEditTopicClicked();
   },
 
   onTopicEditUpdate(value){
@@ -97,12 +94,10 @@ export default React.createClass({
 
   onTopicEditSave(){
     this.props.onTopicEditSave();
-    this.setState({ isEditing: false });
   },
 
   onTopicEditCancel(){
     this.props.onTopicEditCancel();
-    this.setState({ isEditing: false });
   },
 
   onReactionPick(reactionKey, isReacting) {
