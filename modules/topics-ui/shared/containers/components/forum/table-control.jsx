@@ -39,7 +39,7 @@ export default React.createClass({
       sortBy: [
         { label: 'Most Recent', value: forumSortConstants.MOST_RECENT_SORT, active: (sortName === forumSortConstants.MOST_RECENT_SORT) },
         { label: 'Most Replies', value: forumSortConstants.MOST_REPLY_SORT, active: (sortName === forumSortConstants.MOST_REPLY_SORT) },
-        //{ label: 'Most Likes', value: forumSortConstants.MOST_LIKES_SORT, active: (sortName === forumSortConstants.MOST_LIKES_SORT) },
+        { label: 'Most Likes', value: forumSortConstants.MOST_LIKES_SORT, active: (sortName === forumSortConstants.MOST_LIKES_SORT) },
       ]
     }
   },
