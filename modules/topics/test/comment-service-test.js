@@ -6,6 +6,8 @@ var commentService = require('../lib/comment-service');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 describe('comment-service #slow', function() {
+  fixtureLoader.disableMongoTableScans();
+
   var fixture = fixtureLoader.setup({
     user1: {},
     forum1: {},

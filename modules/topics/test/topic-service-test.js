@@ -6,6 +6,8 @@ var topicService = require('../lib/topic-service');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 describe('topic-service #slow', function() {
+  fixtureLoader.disableMongoTableScans();
+
   var fixture = fixtureLoader.setup({
     user1: {},
     forum1: {},
@@ -38,6 +40,7 @@ describe('topic-service #slow', function() {
         assert(mongoUtils.objectIDsEqual(topic.categoryId, fixture.category1._id));
         assert.deepEqual(topic.tags.slice(), ['cats', 'dogs']);
         assert.strictEqual(topic.sticky, 1);
+        assert.strictEqual(topic.number, 1);
         assert.strictEqual(topic.text, 'This is **my** story.');
         assert.strictEqual(topic.html, 'This is <strong>my</strong> story.');
       });
