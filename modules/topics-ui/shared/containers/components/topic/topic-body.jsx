@@ -28,9 +28,6 @@ export default React.createClass({
 
   render() {
 
-    const { topic, onSubscribeButtonClick } = this.props;
-    const subscriptionState = topic.subscriptionState;
-
     //Remove the share button for now as we have no current ability
     //to share content
     //<button className="topic-body__footer__action">Share</button>
@@ -40,25 +37,35 @@ export default React.createClass({
         <Panel className="panel--topic-body">
           {this.getContent()}
           <footer className="topic-body__footer">
-
             {this.getEditButton()}
-
-            <WatchButton
-              subscriptionState={subscriptionState}
-              className="topic-body__footer__subscribe-action"
-              itemClassName="topic-body__footer__subscribe-action-text-item"
-              onClick={onSubscribeButtonClick}/>
-
-            <ReactionButton
-              key="reactions"
-              className="topic-body__footer__reaction-action"
-              reactionCountMap={topic.reactions}
-              ownReactionMap={topic.ownReactions}
-              onReactionPick={this.onReactionPick}/>
+            {this.getFooterButtons()}
           </footer>
         </Panel>
       </Container>
     );
+  },
+
+  getFooterButtons(){
+    const {topic, onSubscribeButtonClick} = this.props;
+    const subscriptionState = topic.subscriptionState;
+    const {isEditing} = this.state;
+    if(isEditing) { return; }
+
+    return [
+
+      <WatchButton
+        subscriptionState={subscriptionState}
+        className="topic-body__footer__subscribe-action"
+        itemClassName="topic-body__footer__subscribe-action-text-item"
+        onClick={onSubscribeButtonClick}/>,
+
+        <ReactionButton
+          key="reactions"
+          className="topic-body__footer__reaction-action"
+          reactionCountMap={topic.reactions}
+          ownReactionMap={topic.ownReactions}
+          onReactionPick={this.onReactionPick}/>
+    ]
   },
 
   getEditButton(){
