@@ -48,7 +48,12 @@ export default function dipatchOnChangeMixin(Constructor, evts, options) {
       } else {
         debouncedFn();
       }
-    };
+    }
+    caller.cancel = () => {
+      if(debouncedFn.cancel) {
+        debouncedFn.cancel();
+      }
+    }
 
     //Keep a reference so we can un-bind later
     cache.set(fn, caller);
