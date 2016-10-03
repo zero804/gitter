@@ -149,7 +149,6 @@ const TopicContainer = createClass({
       forumSubscriptionState: forumStore.getSubscriptionState(),
       topic: topicsStore.getById(topicId),
       newReplyContent: '',
-      sortName: this.props.sortName,
       replyListEditorInFocus: false,
     };
   },
@@ -194,8 +193,8 @@ const TopicContainer = createClass({
 
   render(){
 
-    const { groupStore, categoryStore, currentUserStore, tagStore, newReplyStore} = this.props;
-    const {forumId, forumSubscriptionState, sortName, replyListEditorInFocus } = this.state;
+    const { groupStore, categoryStore, currentUserStore, tagStore, newReplyStore, sortName} = this.props;
+    const {forumId, forumSubscriptionState, replyListEditorInFocus } = this.state;
 
     const groupUri = groupStore.getGroupUri();
     const groupName = groupStore.getGroupName();
@@ -364,11 +363,7 @@ const TopicContainer = createClass({
   updateComments(){ this.forceUpdate(); },
   updateNewComment(){ this.forceUpdate(); },
   updateTopics() { this.forceUpdate(); },
-  onSortUpdate(router, sortName){
-    this.setState((state) => Object.assign({}, state, {
-      sortName: sortName
-    }))
-  },
+  onSortUpdate(){ this.forceUpdate(); },
 
   onTopicSubscribeButtonClick() {
     const { topicsStore, topicId } = this.props;
