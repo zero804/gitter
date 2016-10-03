@@ -34,10 +34,12 @@ export default React.createClass({
     onReactionPick: PropTypes.func,
     onCommentReactionPick: PropTypes.func,
 
+    onEditClick: PropTypes.func.isRequired,
     onEditUpdate: PropTypes.func.isRequired,
     onEditCancel: PropTypes.func.isRequired,
     onEditSaved: PropTypes.func.isRequired,
     onCommentEditUpdate: PropTypes.func.isRequired,
+    onCommentEditClick: PropTypes.func.isRequired,
     onCommentEditCancel: PropTypes.func.isRequired,
     onCommentEditSave: PropTypes.func.isRequired
   },
@@ -48,6 +50,7 @@ export default React.createClass({
     return (
       <FeedItem
         item={reply}
+        onEditClick={this.onEditClick}
         onChange={this.onEditUpdate}
         onCancel={this.onEditCancel}
         onSave={this.onEditSaved}
@@ -114,7 +117,8 @@ export default React.createClass({
         onReactionPick={this.onCommentReactionPick}
         onChange={this.onCommentEditUpdate.bind(this, comment.id)}
         onCancel={this.onCommentEditCancel.bind(this, comment.id)}
-        onSave={this.onCommentEditSave.bind(this, comment.id, reply.id)}/>
+        onSave={this.onCommentEditSave.bind(this, comment.id, reply.id)}
+        onEditClick={this.onCommentEditClick.bind(this, comment.id)} />
     );
   },
 
@@ -155,22 +159,37 @@ export default React.createClass({
     this.props.submitNewComment();
   },
 
+  onEditClick() {
+    const { reply, onEditClick } = this.props;
+    const { id } = reply;
+    if(onEditClick) {
+      onEditClick(id);
+    }
+  },
+
   onEditUpdate(value){
-    const {reply} = this.props;
-    const {id} = reply;
+    const { reply } = this.props;
+    const { id } = reply;
     this.props.onEditUpdate(id, value);
   },
 
   onEditCancel(){
-    const {reply} = this.props;
-    const {id} = reply;
+    const { reply } = this.props;
+    const { id } = reply;
     this.props.onEditCancel(id);
   },
 
   onEditSaved(){
-    const {reply} = this.props;
-    const {id} = reply;
+    const { reply } = this.props;
+    const { id } = reply;
     this.props.onEditSaved(id)
+  },
+
+  onCommentEditClick(commentId) {
+    const { onCommentEditClick } = this.props;
+    if(onCommentEditClick) {
+      onCommentEditClick(commentId);
+    }
   },
 
   onCommentEditUpdate(commentId, value){
@@ -184,5 +203,6 @@ export default React.createClass({
   onCommentEditSave(commentId, replyId){
     this.props.onCommentEditSave(commentId, replyId);
   },
+
 
 });
