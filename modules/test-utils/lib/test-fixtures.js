@@ -18,9 +18,6 @@ var fixtureSteps = [
   require('./create-messages'),
 ];
 
-
-
-
 function createBaseFixture() {
   return {
     // TODO: deprecate these and use fixtureUtils directly
