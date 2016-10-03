@@ -139,6 +139,7 @@ const TopicContainer = createClass({
 
     newCommentStore.removeListeners(this.updateNewComment, this);
     newReplyStore.removeListeners(this.updateNewReplyContent, this);
+    router.off('change:sortName', this.onSortUpdate, this);
   },
 
   getInitialState() {
