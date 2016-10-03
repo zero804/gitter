@@ -43,7 +43,6 @@ export default React.createClass({
 
     const {item, children, footerChildren} = this.props;
     const {user} = item;
-    const avatarDims = 30;
     const formattedSentDate = item.sent && moment(item.sent).format('MMM Do');
 
     /* The EditControl situation is BS. It needs to be fixed  */
@@ -82,6 +81,9 @@ export default React.createClass({
     //the correct permissions
     const {canEdit} = this.props.item;
     if(!canEdit) { return; }
+
+    const {isEditing} = this.state;
+    if(isEditing) { return; }
 
     return (
       <IconButton
