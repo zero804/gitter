@@ -150,6 +150,7 @@ const TopicContainer = createClass({
       topic: topicsStore.getById(topicId),
       newReplyContent: '',
       sortName: this.props.sortName,
+      replyListEditorInFocus: false,
     };
   },
 
@@ -194,7 +195,7 @@ const TopicContainer = createClass({
   render(){
 
     const { groupStore, categoryStore, currentUserStore, tagStore, newReplyStore} = this.props;
-    const {forumId, forumSubscriptionState, sortName } = this.state;
+    const {forumId, forumSubscriptionState, sortName, replyListEditorInFocus } = this.state;
 
     const groupUri = groupStore.getGroupUri();
     const groupName = groupStore.getGroupName();
@@ -241,14 +242,17 @@ const TopicContainer = createClass({
             onTopicEditCancel={this.onTopicEditCancel}
             onTopicEditSave={this.onTopicEditSave}/>
         </article>
+
         <TopicReplyListHeader
           replies={parsedReplies}
           sortName={sortName}
           onSortByCommentClicked={this.onSortByCommentClicked}
           onSortByLikeClicked={this.onSortByLikeClicked}
-          onSortByRecentClicked={this.onSortByRecentClicked}/>
+          onSortByRecentClicked={this.onSortByRecentClicked}
+          replyListEditorInFocus={replyListEditorInFocus}/>
 
-        <TopicReplyList>
+        <TopicReplyList
+          replyListEditorInFocus={replyListEditorInFocus}>
           {parsedReplies.map(this.getReplyListItem)}
         </TopicReplyList>
 
@@ -258,6 +262,9 @@ const TopicContainer = createClass({
           value={newReplyContent}
           onChange={this.onNewReplyEditorUpdate}
           onSubmit={this.onNewReplyEditorSubmit}
+          onFocus={this.onReplyEditorFocus}
+          onBlur={this.onReplyEditorBlur}
+          replyListEditorInFocus={replyListEditorInFocus}
           onEditorClick={this.onReplyEditorClick}/>
       </main>
     );
@@ -285,6 +292,17 @@ const TopicContainer = createClass({
         onCommentEditCancel={this.onCommentEditCancel}
         onCommentEditSave={this.onCommentEditSave} />
     );
+  },
+
+  onReplyEditorFocus(){
+    this.setState((state) => Object.assign({}, state, {
+      replyListEditorInFocus: true,
+    }));
+  },
+  onReplyEditorBlur(){
+    this.setState((state) => Object.assign({}, state, {
+      replyListEditorInFocus: false,
+    }));
   },
 
   onNewReplyEditorUpdate(val){
