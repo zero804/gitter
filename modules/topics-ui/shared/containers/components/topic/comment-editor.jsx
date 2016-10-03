@@ -37,7 +37,7 @@ export default React.createClass({
         </aside>
         <Editor
           autoFocus={autoFocus}
-          placeholder="Your reply here. Use Markdown, BBCode, or HTML to format. Drag or paste images ..."
+          placeholder="Your reply here. Use Markdown, BBCode, or HTML to format."
           className="reply-comment-editor__editor"
           value={value}
           onEnter={this.onEnter}
