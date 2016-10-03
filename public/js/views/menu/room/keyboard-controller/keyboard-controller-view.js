@@ -55,6 +55,8 @@ var KeyboardController = Marionette.ItemView.extend({
     this.tertiaryCollection = attrs.model.tertiaryCollection;
     this.tertiaryCollectionModel = attrs.model.tertiaryCollectionModel;
 
+    this.forumCategoryCollection = attrs.model.forumCategoryCollection;
+
     //manage search focus
     this.searchFocusModel = attrs.model.searchFocusModel;
   },
@@ -299,8 +301,9 @@ var KeyboardController = Marionette.ItemView.extend({
     var filterFunc = function(model){ return model.get(attr) === val; };
     return this.favouriteCollectionModel.get('active') && this.favouriteCollection.filter(isHiddenFilter).filter(filterFunc)[0] ||
       this.primaryCollectionModel.get('active') && this.primaryCollection.filter(isHiddenFilter).filter(filterFunc)[0] ||
-        this.secondaryCollectionModel.get('active') && this.secondaryCollection.filter(isHiddenFilter).filter(filterFunc)[0] ||
-          this.tertiaryCollectionModel.get('active') && this.tertiaryCollection.filter(isHiddenFilter).filter(filterFunc)[0];
+      this.secondaryCollectionModel.get('active') && this.secondaryCollection.filter(isHiddenFilter).filter(filterFunc)[0] ||
+      this.tertiaryCollectionModel.get('active') && this.tertiaryCollection.filter(isHiddenFilter).filter(filterFunc)[0] ||
+      this.forumCategoryCollection.length > 0 && this.forumCategoryCollection.filter(filterFunc)[0];
   },
 
   queryAttrOnMinibar: function (attr, val){
@@ -336,6 +339,11 @@ var KeyboardController = Marionette.ItemView.extend({
     if(this.tertiaryCollectionModel.get('active')) {
       rooms = rooms.concat(this.tertiaryCollection.filter(isHiddenFilter));
     }
+
+    if(this.forumCategoryCollection.length > 0) {
+      rooms = rooms.concat(this.forumCategoryCollection.models);
+    }
+
 
     return rooms;
   },

@@ -15,22 +15,25 @@ var contextGeneratorRequest = require('./context-generator-request');
 function generateNonChatContext(req) {
   var user = req.user;
   var uriContext = req.uriContext;
+  var group = uriContext && uriContext.group;
   var troupe = uriContext && uriContext.troupe;
   var roomMember = uriContext && uriContext.roomMember;
 
   return Promise.all([
       contextGeneratorRequest(req),
       user ? serializeUser(user) : null,
+      group ? serializeGroup(group, user) : undefined,
       troupe ? serializeTroupe(troupe, user) : undefined,
       user ? userSettingsService.getMultiUserSettingsForUserId(user._id, ['suggestedRoomsHidden', 'leftRoomMenu']) : null,
     ])
-    .spread(function (reqContextHash, serializedUser, serializedTroupe, settings) {
+    .spread(function (reqContextHash, serializedUser, serializedGroup, serializedTroupe, settings) {
       var suggestedRoomsHidden = settings && settings.suggestedRoomsHidden;
       var leftRoomMenuState = settings && settings.leftRoomMenu;
 
       return _.extend({}, reqContextHash, {
         roomMember: roomMember,
         user: serializedUser,
+        group: serializedGroup,
         troupe: serializedTroupe,
         suggestedRoomsHidden: suggestedRoomsHidden,
         leftRoomMenuState: leftRoomMenuState,
@@ -100,6 +103,15 @@ function serializeUser(user) {
   });
 
   return restSerializer.serializeObject(user, strategy);
+}
+
+function serializeGroup(group, user) {
+  var strategy = new restSerializer.GroupStrategy({
+    currentUser: user,
+    currentUserId: user && user._id
+  });
+
+  return restSerializer.serializeObject(group, strategy);
 }
 
 function serializeTroupeId(troupeId, user) {

@@ -1,22 +1,31 @@
 import React, { PropTypes } from 'react';
+import {dispatch} from '../../../dispatcher';
 import Container from '../container.jsx';
 import Panel from '../panel.jsx';
-import ForumCategoryLink from '../links/forum-category-link.jsx';
 import H1 from '../text/h-1.jsx';
 import Input from '../forms/input.jsx';
+import ForumCategoryLink from '../links/forum-category-link.jsx';
+import FollowButton from '../forum/follow-button.jsx';
 import CreateTopicLink from '../links/create-topic-link.jsx';
 import {DEFAULT_CATEGORY_NAME} from '../../../constants/navigation';
+import { SUBSCRIPTION_STATE_SUBSCRIBED, SUBSCRIPTION_STATE_UNSUBSCRIBED, SUBSCRIPTION_STATE_PENDING } from '../../../constants/forum.js';
+
 
 export default React.createClass({
 
   displayName: 'SearchHeader',
   propTypes: {
-    groupName: PropTypes.string.isRequired,
+    groupUri: PropTypes.string.isRequired,
+    subscriptionState: PropTypes.oneOf([
+      SUBSCRIPTION_STATE_SUBSCRIBED,
+      SUBSCRIPTION_STATE_UNSUBSCRIBED,
+      SUBSCRIPTION_STATE_PENDING
+    ]).isRequired,
+    onSubscribeButtonClick: PropTypes.func.isRequired
   },
 
   render(){
-
-    const {groupName} = this.props;
+    const {groupUri, subscriptionState, onSubscribeButtonClick} = this.props;
 
     return (
       <Container>
@@ -24,9 +33,12 @@ export default React.createClass({
           <H1>
             <ForumCategoryLink
               className="topic-search__all-topics-link"
-              groupName={groupName}
+              groupUri={groupUri}
               category={{ category: 'All', slug: DEFAULT_CATEGORY_NAME}}>
                 Topics
+                <div className="topic-search__beta-decoration">
+                  Beta
+                </div>
             </ForumCategoryLink>
           </H1>
           <Input
@@ -34,7 +46,15 @@ export default React.createClass({
             placeholder="Search for topics, replies and comments"
             onChange={this.onSearchUpdate}
             className="topic-search__search-input"/>
-          <CreateTopicLink groupName={groupName} className="topic-search__create-topic-link">
+
+          <FollowButton
+            subscriptionState={subscriptionState}
+            className="topic-search__watch-forum-button"
+            itemClassName="topic-search__watch-forum-button-text-item"
+            onClick={onSubscribeButtonClick}/>
+          <CreateTopicLink
+            groupUri={groupUri}
+            className="topic-search__create-topic-link">
             Create Topic
           </CreateTopicLink>
         </Panel>
@@ -44,6 +64,6 @@ export default React.createClass({
 
   onSearchUpdate(){
 
-  }
+  },
 
 });

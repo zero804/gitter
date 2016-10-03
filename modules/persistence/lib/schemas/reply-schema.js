@@ -17,6 +17,7 @@ var ReplySchema = new Schema({
   lastModified: { type: Date, "default": Date.now },
   commentsTotal: { type: Number, "default": 0 },
   lang: {type: String },
+  reactionCounts: Schema.Types.Mixed,
   _tv: { type: 'MongooseNumber', 'default': 0 },
   _md: {type: Number }
 }, { strict: 'throw' });

@@ -5,8 +5,10 @@ var _ = require('lodash');
 var navConstants = require('../../shared/constants/navigation');
 var forumFilterConstants = require('../../shared/constants/forum-filters');
 var forumSortConstants = require('../../shared/constants/forum-sorts');
+var parseTopic = require('../../shared/parse/topic');
+var modelStates = require('../../shared/constants/model-states');
 
-module.exports = function topicsStore(models, category, tag, filter, sort, user) {
+module.exports = function topicsStore(models, category, tag, filter, sort, user, isCreatingTopic) {
 
   //Defaults
   models = (models || []);
@@ -18,7 +20,7 @@ module.exports = function topicsStore(models, category, tag, filter, sort, user)
 
   //Transform the server side models
   models = models.map((model) => {
-    return model;
+    return parseTopic(model);
   });
 
   //Filter based on the currently selected category
@@ -27,7 +29,6 @@ module.exports = function topicsStore(models, category, tag, filter, sort, user)
   }
 
   if(tag !== navConstants.DEFAULT_TAG_NAME) {
-    //Could this be more efficient? /cc @supreememoocow
     models = models.filter((m) => m.tags.some((t) => t === tag));
   }
 
@@ -39,17 +40,34 @@ module.exports = function topicsStore(models, category, tag, filter, sort, user)
     //TODO ...
   }
 
+  //Sort by most recent
   if(sort === forumSortConstants.MOST_RECENT_SORT) {
     models.sort((a, b) => new Date(b.sent) - new Date(a.sent));
   }
 
+  //Sort by watchers
   if(sort === forumSortConstants.MOST_WATCHERS_SORT) {
     models.sort((a, b) => (a.replyingUsers.length > b.replyingUsers.length ? -1 : 1));
   }
 
+  //Basic draft topic object
+  const draftTopic = {
+    state: modelStates.MODEL_STATE_DRAFT,
+    body: '',
+    title: '',
+    categoryId: '',
+    tags: []
+  }
+
+  if (isCreatingTopic) {
+    //If we are loading the create topic route we need to
+    //bootstrap our collection with a draft model
+    models.push(draftTopic)
+  }
+
 
   //Get resource
-  const getTopics = () => models;
+  const getTopics = () => models.filter((topic) => topic.state !== modelStates.MODEL_STATE_DRAFT);
   const getById = function(id){
     var model = _.find(models, (model) => model.id === id);
     if(!model) { return; }
@@ -59,7 +77,8 @@ module.exports = function topicsStore(models, category, tag, filter, sort, user)
   return {
     data: models,
     getTopics: getTopics,
-    getById: getById
+    getById: getById,
+    getDraftTopic: () => draftTopic
   };
 
 };

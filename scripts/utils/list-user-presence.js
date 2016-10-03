@@ -4,7 +4,7 @@
 
 var userService = require('../../server/services/user-service');
 var troupeService = require('../../server/services/troupe-service');
-var collections = require('../../server/utils/collections');
+var collections = require('gitter-web-utils/lib/collections');
 var presence = require('gitter-web-presence');
 var _ = require('lodash');
 

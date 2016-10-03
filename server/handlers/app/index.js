@@ -172,7 +172,7 @@ var cardMiddlewarePipeline = [
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
 //Topics
-router.use('/:groupName/topics', topicRouter);
+router.use('/:groupUri/topics', topicRouter);
 
 [
   '/:roomPart1/~chat',                         // ORG or ONE_TO_ONE

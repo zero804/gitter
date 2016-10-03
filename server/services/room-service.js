@@ -18,7 +18,7 @@ var oneToOneRoomService = require('./one-to-one-room-service');
 var userDefaultFlagsService = require('./user-default-flags-service');
 var validateUri = require('gitter-web-github').GitHubUriValidator;
 var validate = require('../utils/validate');
-var collections = require('../utils/collections');
+var collections = require('gitter-web-utils/lib/collections');
 var StatusError = require('statuserror');
 var emailNotificationService = require('./email-notification-service');
 var emailAddressService = require('./email-address-service');
@@ -284,8 +284,8 @@ function createRoomByUri(user, uri, options) {
       var resolvedTroupe = resolved && resolved.room;
       var resolvedGroup = resolved && resolved.group;
 
-      // We resolved a group. There will never be a room at this URI
-      if (resolvedGroup) throw new StatusError(404);
+      // We resolved only a group. There will never be a room at this URI
+      if (resolvedGroup && !resolvedTroupe) throw new StatusError(404);
 
       /* Deal with the case of the anonymous user first */
       if(!user) {

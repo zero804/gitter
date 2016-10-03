@@ -1,6 +1,8 @@
 import React, { PropTypes } from 'react';
 import Container from '../container.jsx';
 import Panel from '../panel.jsx';
+import EditableContent from '../forms/editable-content.jsx';
+import WatchButton from '../forum/watch-button.jsx';
 
 export default React.createClass({
 
@@ -10,27 +12,89 @@ export default React.createClass({
       body: PropTypes.shape({
         html: PropTypes.string
       }).isRequired,
-    }).isRequired
+      canEdit: PropTypes.bool.isRequired,
+    }).isRequired,
+    onTopicEditUpdate: PropTypes.func.isRequired,
+    onTopicEditCancel: PropTypes.func.isRequired,
+    onTopicEditSave: PropTypes.func.isRequired,
+    onSubscribeButtonClick: PropTypes.func
   },
 
-  render(){
+  getInitialState(){
+    return { isEditing: false }
+  },
 
-    const { topic } = this.props;
+  render() {
+
+    const { topic, onSubscribeButtonClick } = this.props;
+    const subscriptionState = topic.subscriptionState;
 
     return (
       <Container className="container--topic-body">
         <Panel className="panel--topic-body">
-          <section
-            className="topic-body__content"
-            dangerouslySetInnerHTML={{ __html: topic.body.html}}>
-          </section>
+          {this.getContent()}
           <footer className="topic-body__footer">
             <button className="topic-body__footer__action">Share</button>
-            <button className="topic-body__footer__action">Watch</button>
+            {this.getEditButton()}
+            <WatchButton
+              subscriptionState={subscriptionState}
+              className="topic-body__footer__subscribe-action"
+              itemClassName="topic-body__footer__subscribe-action-text-item"
+              onClick={onSubscribeButtonClick}/>
           </footer>
         </Panel>
       </Container>
     );
+  },
+
+  getEditButton(){
+    //Don't show the button if we are editing
+    const {isEditing} = this.state;
+    if(isEditing) { return; }
+
+    //Only show the edit button if the user has permission
+    const {canEdit} = this.props.topic;
+    if(!canEdit) { return; }
+
+    return (
+      <button
+        onClick={this.onEditTopicClicked}
+        className="topic-body__footer__action">Edit</button>
+    );
+  },
+
+  getContent(){
+    const {isEditing} = this.state;
+    const {topic} = this.props;
+    return (
+      <EditableContent
+        className="topic-body__content"
+        editorClassName="topic-body__content--editor"
+        content={topic}
+        onChange={this.onTopicEditUpdate}
+        onSave={this.onTopicEditSave}
+        onCancel={this.onTopicEditCancel}
+        isEditing={isEditing}/>
+    );
+  },
+
+  onEditTopicClicked(e){
+    e.preventDefault();
+    this.setState({ isEditing: true });
+  },
+
+  onTopicEditUpdate(value){
+    this.props.onTopicEditUpdate(value);
+  },
+
+  onTopicEditSave(){
+    this.props.onTopicEditSave();
+    this.setState({ isEditing: false });
+  },
+
+  onTopicEditCancel(){
+    this.props.onTopicEditCancel();
+    this.setState({ isEditing: false });
   }
 
 });

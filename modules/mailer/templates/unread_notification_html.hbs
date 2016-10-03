@@ -1,44 +1,44 @@
 {{#each troupesWithUnreadCounts}}
-        <table class="row">
+  <table class="row">
+    <tr>
+      <td class="wrapper last">
+        <table class="twelve columns">
           <tr>
-            <td class="wrapper last">
-              <table class="twelve columns">
+            <td>
+              <h2>{{#if troupe.oneToOne}}{{troupe.name}}{{else}}{{troupe.uri}}{{/if}}</h1>
+              <h4>{{__n "%d unread message" "%d unread messages" unreadCount}}{{#if truncated}} (showing {{chats.length}} most recent){{/if}}</h4>
+              <br>
+              {{#each chats}}
+              <table>
                 <tr>
-                  <td>
-                    <h2>{{#if troupe.oneToOne}}{{troupe.name}}{{else}}{{troupe.uri}}{{/if}}</h1>
-                    <h4>{{__n "%d unread message" "%d unread messages" unreadCount}}{{#if truncated}} (showing {{chats.length}} most recent){{/if}}</h4>
-                    <br>
-                    {{#each chats}}
-                    <table>
-                      <tr>
-                        <td class="avatar"><img height="24" width="24" src="{{fromUser.avatarUrlSmall}}" class="avatar"></td>
-                        <td class="chat"><strong>{{fromUser.username}}</strong></td>
-                      </tr>
-                      <tr>
-                        <td></td>
-                        <td>{{text}}</td>
-                      </tr>
-                    </table>
-                    <br>
-                    {{/each}}
-                    <table>
-                      <tr>
-                        <td class="avatar">
-                          <a href="{{../emailBasePath}}{{troupe.url}}#utm_source=notification&utm_medium=email&utm_campaign=unread-notifications" style="text-decoration: none" class="button-green">Open chat</a>
-                        </td>
-                        <td class="chat">
-                          {{#unless troupe.oneToOne}}<a href="{{../../emailBasePath}}{{troupe.url}}#notifications">Notification settings</a>{{/unless}}&nbsp;
-                        </td>
-                      </tr>
-                    </table>
-                    <br>
-                    <hr>
-                    <br>
-                  </td>
-                  <td class="expander"></td>
+                  <td class="avatar"><img height="24" width="24" src="{{fromUser.avatarUrlSmall}}" class="avatar"></td>
+                  <td class="chat"><strong>{{fromUser.username}}</strong></td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td>{{text}}</td>
                 </tr>
               </table>
-
+              <br>
+              {{/each}}
+              <table>
+                <tr>
+                  <td>
+                    <a href="{{../emailBasePath}}{{troupe.url}}#utm_source=notification&utm_medium=email&utm_campaign=unread-notifications" style="text-decoration: none" class="button-green">Open chat</a>
+                  </td>
+                  <td class="chat">
+                    {{#unless troupe.oneToOne}}<a href="{{../../emailBasePath}}{{troupe.url}}#notifications">Notification settings</a>{{/unless}}&nbsp;
+                  </td>
+                </tr>
+              </table>
+              <br>
+              <hr>
+              <br>
+            </td>
+            <td class="expander"></td>
           </tr>
         </table>
+
+    </tr>
+  </table>
 {{/each}}

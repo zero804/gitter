@@ -11,7 +11,8 @@ var restSerializer = require('../../../serializers/rest-serializer');
 var restful = require('../../../services/restful');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var SubscribersResource = require('./subscribers-resource');
-var ForumObject = require('gitter-web-topic-notifications/lib/forum-object');
+var ForumObject = require('gitter-web-topic-models/lib/forum-object');
+var ReactionsResource = require('./reactions-resource');
 
 function getTags(tags) {
   if (!Array.isArray(tags)) {
@@ -121,6 +122,8 @@ module.exports = {
 
     if (!user) throw new StatusError(401);
 
+    var userId = user._id;
+
     // the category gets loaded in separately
     var categoryId = req.body.categoryId ? String(req.body.categoryId) : undefined;
     if (!categoryId) throw new StatusError(400, 'categoryId required.');
@@ -135,7 +138,10 @@ module.exports = {
         return forumWithPolicyService.createTopic(category, topicOptions);
       })
       .then(function(topic) {
-        var topicStrategy = restSerializer.TopicStrategy.standard();
+        var topicStrategy = restSerializer.TopicStrategy.standard({
+          currentUserId: userId
+        });
+
         return restSerializer.serializeObject(topic, topicStrategy);
       });
   },
@@ -146,6 +152,8 @@ module.exports = {
     var policy = req.userForumPolicy;
     var topic = req.topic;
 
+    var userId = user && user._id;
+
     var forumWithPolicyService = new ForumWithPolicyService(forum, user, policy);
     var promises = collectPatchActions(forumWithPolicyService, topic, req.body);
 
@@ -154,7 +162,9 @@ module.exports = {
         return topicService.findByIdForForum(forum._id, topic._id);
       })
       .then(function(updatedTopic) {
-        var strategy = restSerializer.TopicStrategy.standard();
+        var strategy = restSerializer.TopicStrategy.standard({
+          currentUserId: userId
+        });
         return restSerializer.serializeObject(updatedTopic, strategy);
       });
   },
@@ -172,7 +182,14 @@ module.exports = {
       getForumObject: function(req) {
         return ForumObject.createForTopic(req.forum._id, req.topic._id);
       }
+    }),
+    'reactions': new ReactionsResource({
+      id: 'topicReaction',
+      getForumObject: function(req) {
+        return ForumObject.createForTopic(req.forum._id, req.topic._id);
+      }
     })
+
   },
 
 };

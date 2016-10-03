@@ -2,7 +2,7 @@
 
 var Promise = require('bluebird');
 var presenceService = require('gitter-web-presence');
-var collections = require('../utils/collections');
+var collections = require('gitter-web-utils/lib/collections');
 var pushNotificationService = require('./push-notification-service');
 var pushNotificationFilter = require('gitter-web-push-notification-filter');
 var _ = require('lodash');

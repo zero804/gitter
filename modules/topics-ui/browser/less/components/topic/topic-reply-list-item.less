@@ -1,58 +1,43 @@
 @import "../../colors.less";
 @import "../../text.less";
 
-.topic-reply-list-item {
-  display: flex;
-  flex-direction: column;
-}
-
-.topic-reply-list-item__user-details {
-  width: 5rem;
-  padding-top: .5rem;
-}
-
-.topic-reply-list-item__content {
-  display: flex;
-}
-
-.topic-reply-list-item__body {
+.reply-comment-list {
+  box-sizing: border-box;
   width: 100%;
-  padding: 2rem;
-  border: 1px solid @topic-body-border-color;
-  background-color: @light;
-  font-family: @font-family;
+  padding-left: 5rem;
+}
 
-  img {
-    max-width: 100%;
+.reply-comment-list__comments {
+  margin: 0;
+  padding: 0;
+}
+
+
+.topic-reply-list-item__footer__subscribe-action {
+  .m-details-text();
+
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+
+  background-color: transparent;
+  border: 0;
+  cursor: pointer;
+
+  &:hover,
+  &:focus {
+    outline: none;
+    text-decoration: underline;
   }
 }
 
-.topic-reply-list-item__footer {
-  padding: 1rem 0 2rem 6.5rem;
-}
+.topic-reply-list-item__footer__subscribe-action-text-item {
+  width: 100%;
+  height: 0;
+  line-height: 0;
 
-.m-details-text() {
-  font-size: 1.2rem;
-  color: @dark;
-  text-transform: uppercase;
-  font-family: @font-family;
-  color: @topic-reply-sent-details-color;
-}
-
-.topic-reply-list-item__likes {
-  .m-details-text();
-  margin-right: 1rem;
-}
-
-.topic-reply-list-item__comments {
-  .m-details-text();
-}
-
-.topic-reply-list-item__sent {
-  .m-details-text();
-  font-size: 1.5rem;
-}
-
-.topic-reply-list-item__avatar {
-  border-radius: .2rem;
+  &.hidden {
+    opacity: 0;
+  }
 }

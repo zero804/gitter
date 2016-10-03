@@ -6,7 +6,7 @@ var Promise = require('bluebird');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assert = require('assert');
 
-describe('room-api', function() {
+describe('create-github-room-api', function() {
   var app, request;
 
   before(function() {

@@ -7,6 +7,9 @@ import * as forumFilterConstants from '../../../shared/constants/forum-filters';
 import * as forumTagConstants from '../../../shared/constants/forum-tags';
 import * as forumSortConstants from '../../../shared/constants/forum-sorts';
 import * as createTopicConstants from '../../../shared/constants/create-topic';
+import {getIsSignedIn} from '../stores/current-user-store';
+import requestSignIn from '../../../shared/action-creators/forum/request-sign-in';
+
 
 var RouteModel = Backbone.Model.extend({
   //Do we need to use the constructor to get the default values out of the window.context
@@ -35,9 +38,9 @@ var Router = Backbone.Router.extend({
   },
 
   routes: {
-    ':groupName/topics/create-topic(/)(~topics)': 'createTopic',
-    ':groupName/topics(/categories/:categoryName)(/)(~topics)(?*queryString)': 'forums',
-    ':groupName/topics/topic/:id/:slug(/)(~topics)(?*queryString)': 'topic'
+    ':groupUri/topics/create-topic(/)(~topics)': 'createTopic',
+    ':groupUri/topics(/categories/:categoryName)(/)(~topics)(?*queryString)': 'forums',
+    ':groupUri/topics/topic/:id/:slug(/)(~topics)(?*queryString)': 'topic'
   },
 
   navigate(url, options){
@@ -59,20 +62,20 @@ var Router = Backbone.Router.extend({
     Backbone.Router.prototype.navigate.call(this, url, options);
   },
 
-  createTopic(groupName){
+  createTopic(groupUri){
     this.model.set({
       route: navConstants.CREATE_TOPIC_ROUTE,
-      groupName: groupName,
+      groupUri: groupUri,
       categoryName: navConstants.DEFAULT_CATEGORY_NAME,
       createTopic: true,
     });
   },
 
-  forums(groupName, categoryName, queryString){
+  forums(groupUri, categoryName, queryString){
     const query = parse(queryString || '');
     this.model.set({
       route: navConstants.FORUM_ROUTE,
-      groupName: groupName,
+      groupUri: groupUri,
       categoryName: (categoryName || navConstants.DEFAULT_CATEGORY_NAME),
       filterName: (query.filter || navConstants.DEFAULT_FILTER_NAME),
       tagName: (query.tag || navConstants.DEFAULT_TAG_NAME),
@@ -81,18 +84,28 @@ var Router = Backbone.Router.extend({
     });
   },
 
-  topic(groupName, id, slug){
+  topic(groupUri, id, slug){
     this.model.set({
       route: navConstants.TOPIC_ROUTE,
-      groupName: groupName,
+      groupUri: groupUri,
       topicId: id,
-      slug: slug
+      slug: slug,
+      createTopic: false
     });
   },
 
-  navigateToCreateTopic(){
-    const groupName = this.model.get('groupName');
-    this.navigate(`/${groupName}/topics/create-topic/~topics`, { trigger: true });
+  navigateToCreateTopic(data) {
+    const { source } = data;
+
+    if(getIsSignedIn()) {
+        const groupUri = this.model.get('groupUri');
+        this.navigate(`/${groupUri}/topics/create-topic/~topics`, { trigger: true });
+    }
+    else {
+      requestSignIn(source);
+      return;
+    }
+
   },
 
   updateForumCategory(data){
@@ -124,13 +137,13 @@ var Router = Backbone.Router.extend({
   },
 
   navigateToTopic(data){
-    const url = `/${data.groupName}/topics/topic/${data.id}/${data.slug}/~topics`;
+    const url = `/${data.groupUri}/topics/topic/${data.id}/${data.slug}/~topics`;
     this.navigate(url, { trigger: true });
   },
 
   buildForumUrl(categoryName, filterName, tagName, sortName){
 
-    var groupName = this.model.get('groupName');
+    var groupUri = this.model.get('groupUri');
     categoryName = (categoryName || this.model.get('categoryName') || navConstants.DEFAULT_CATEGORY_NAME);
 
     //Get current values and cancel anything that is a default
@@ -145,8 +158,8 @@ var Router = Backbone.Router.extend({
 
     //Base URL
     let url = (categoryName === navConstants.DEFAULT_CATEGORY_NAME) ?
-      `/${groupName}/topics/~topics` :
-      `${groupName}/topics/categories/${categoryName}/~topics`;
+      `/${groupUri}/topics/~topics` :
+      `${groupUri}/topics/categories/${categoryName}/~topics`;
 
     //QUERY STRING
     const query = stringify({
