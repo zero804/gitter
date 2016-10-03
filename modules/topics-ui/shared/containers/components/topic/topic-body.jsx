@@ -46,12 +46,13 @@ export default React.createClass({
   getFooterButtons(){
     const {topic, onSubscribeButtonClick} = this.props;
     const subscriptionState = topic.subscriptionState;
-    const {isEditing} = this.state;
+    const {isEditing} = topic;
     if(isEditing) { return; }
 
     return [
 
       <WatchButton
+        key="watch"
         subscriptionState={subscriptionState}
         className="topic-body__footer__subscribe-action"
         itemClassName="topic-body__footer__subscribe-action-text-item"
