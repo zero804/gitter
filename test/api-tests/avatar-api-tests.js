@@ -28,6 +28,8 @@ describe('avatar-api', function() {
     group1: {
       uri: fixtureLoader.GITTER_INTEGRATION_USERNAME,
       lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase(),
+      avatarVersion: 6,
+      avatarCheckedDate: new Date(),
       securityDescriptor: {
         type: 'GH_USER',
         admins: 'GH_USER_SAME',
@@ -37,6 +39,7 @@ describe('avatar-api', function() {
     group2: {
       avatarUrl: 'http://s3.amazonaws.com/gitter-avatars/moo/cow/original',
       avatarVersion: 1,
+      avatarCheckedDate: new Date(),
       securityDescriptor: {
         type: null
       }
@@ -47,7 +50,7 @@ describe('avatar-api', function() {
     name: '/group/i/:groupId',
     url: null,
     expected: null,
-    proxyRedirect: '/fetch/https://avatars.githubusercontent.com/gitter-integration-tests?s=128'
+    proxyRedirect: '/fetch/https://avatars.githubusercontent.com/gitter-integration-tests?s=128&v=6'
   }, {
     name: '/group/i/:groupId - custom avatar',
     url: null,
@@ -57,7 +60,7 @@ describe('avatar-api', function() {
     name: '/group/iv/:version/:groupId',
     url: null,
     expected: null,
-    proxyRedirect: '/fetch_lt/https://avatars.githubusercontent.com/gitter-integration-tests?s=128'
+    proxyRedirect: '/fetch_lt/https://avatars.githubusercontent.com/gitter-integration-tests?s=128&v=6'
   }, {
     name: '/group/iv/:version/:groupId - custom avatar',
     url: null,
