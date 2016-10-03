@@ -38,6 +38,7 @@ Therefore:
 var TopicSchema = new Schema({
   forumId: { type: ObjectId, required: true },
   title: { type: String, required: true },
+  number: { type: Number },
   slug: { type: String, required: true },
   categoryId: { type: ObjectId, required: true },
   tags: [String],
