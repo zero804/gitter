@@ -2,6 +2,7 @@
 
 //TODO This has basically turned into a controller, refactor it JP 2/2/16
 
+var debug = require('debug-proxy')('app:room-menu-model');
 var Backbone = require('backbone');
 var _ = require('underscore');
 var ProxyCollection = require('backbone-proxy-collection');
@@ -322,24 +323,42 @@ module.exports = Backbone.Model.extend({
   },
 
   updateForumCategoryState: function() {
+    debug('updateForumCategoryState');
     var group = this.getCurrentGroup();
     var forumId = group && group.get('forumId');
+    var forumCategoryCollection = this.forumCategoryCollection;
     this.forumCategoryContextModel.set({
       forumId: forumId
     });
 
-    this.forumCategoryCollection.reset();
+    forumCategoryCollection.reset();
     if(this.get('state') === 'org' && forumId) {
-      this.forumCategoryCollection.fetch()
+      debug('updateForumCategoryState: Fetching new categories for forum:', forumId, ' - associated with group:', group.get('uri'));
+      forumCategoryCollection.fetch()
         .bind(this)
-        .then(function() {
+        .then(function(categories) {
+          if(!categories) {
+            debug('updateForumCategoryState: Failed to fetch any categories for group', currentGroup.get('uri'));
+            return;
+          }
+
           var currentGroup = this.getCurrentGroup();
-          if(currentGroup) {
-            this.forumCategoryCollection.models.forEach(function(model) {
-              model.set('groupUri', currentGroup.get('uri'));
+          if(currentGroup && group.get('id') === currentGroup.get('id')) {
+            categories.forEach(function(category) {
+              var categoryModel = forumCategoryCollection.get(category.id);
+              if(categoryModel) {
+                categoryModel.set('groupUri', currentGroup.get('uri'));
+              }
+            });
+            debug('updateForumCategoryState: Successfully fetched and using categories for group', currentGroup.get('uri'), forumCategoryCollection.toJSON());
+          }
+          else {
+            debug('updateForumCategoryState: Discarding fetched categories because the current group is now different. On request:', group.get('uri'), ' - Now currently:', currentGroup.get('uri'));
+            categories.forEach(function(category) {
+              forumCategoryCollection.remove(category.id);
             });
           }
-        })
+        });
     }
   }
 
