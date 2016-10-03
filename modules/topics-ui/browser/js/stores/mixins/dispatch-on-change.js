@@ -4,6 +4,18 @@ import _ from 'lodash';
 const DELAY_TIME = 8;
 const cache = new WeakMap();
 
+const getDelayFromOpt = function(delayOpt, args) {
+  let delay = delayOpt;
+  if(typeof delayOpt === 'function') {
+    delay = delayOpt.apply(this, args);
+  }
+  if(delay === undefined || delay === null) {
+    delay = DELAY_TIME;
+  }
+
+  return delay;
+}
+
 export default function dipatchOnChangeMixin(Constructor, evts, options) {
   const opts = _.extend({}, { delay: DELAY_TIME }, options);
 
@@ -26,10 +38,17 @@ export default function dipatchOnChangeMixin(Constructor, evts, options) {
     //Get a delayed callback. Backbone can throw out a LOT of events
     //ie snapshot which will trigger changes for every attribute on every model
     //in the WHOLE collection
-    let caller = _.debounce(fn, opts.delay);
-    if(opts.delay <= 0) {
-      caller = fn;
-    }
+   const delay = getDelayFromOpt(opts.delay);
+   let debouncedFn = _.debounce(fn, delay);
+
+    const caller = function() {
+      const delay = getDelayFromOpt(opts.delay, arguments);
+      if(delay <= 0) {
+        fn();
+      } else {
+        debouncedFn();
+      }
+    };
 
     //Keep a reference so we can un-bind later
     cache.set(fn, caller);

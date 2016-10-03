@@ -17,24 +17,22 @@ export default React.createClass({
     }).isRequired,
     onSubscribeButtonClick: PropTypes.func,
     onReactionPick: PropTypes.func,
+    onEditTopicClick: PropTypes.func.isRequired,
     onTopicEditUpdate: PropTypes.func.isRequired,
     onTopicEditCancel: PropTypes.func.isRequired,
     onTopicEditSave: PropTypes.func.isRequired
   },
 
-  getInitialState(){
-    return { isEditing: false }
-  },
-
   render() {
-
+    const {topic} = this.props;
     //Remove the share button for now as we have no current ability
     //to share content
     //<button className="topic-body__footer__action">Share</button>
-
     return (
       <Container className="container--topic-body">
-        <Panel className="panel--topic-body">
+        <Panel
+          id={topic.id}
+          className="panel--topic-body">
           {this.getContent()}
           <footer className="topic-body__footer">
             {this.getEditButton()}
@@ -68,9 +66,10 @@ export default React.createClass({
     ]
   },
 
-  getEditButton(){
+  getEditButton() {
     //Don't show the button if we are editing
-    const {isEditing} = this.state;
+    const { topic } = this.props;
+    const { isEditing } = topic;
     if(isEditing) { return; }
 
     //Only show the edit button if the user has permission
@@ -79,14 +78,14 @@ export default React.createClass({
 
     return (
       <button
-        onClick={this.onEditTopicClicked}
+        onClick={this.onEditTopicClick}
         className="topic-body__footer__action">Edit</button>
     );
   },
 
-  getContent(){
-    const {isEditing} = this.state;
-    const {topic} = this.props;
+  getContent() {
+    const { topic } = this.props;
+    const { isEditing } = topic;
     return (
       <EditableContent
         className="topic-body__content"
@@ -95,13 +94,12 @@ export default React.createClass({
         onChange={this.onTopicEditUpdate}
         onSave={this.onTopicEditSave}
         onCancel={this.onTopicEditCancel}
-        isEditing={isEditing}/>
+        isEditing={isEditing} />
     );
   },
 
-  onEditTopicClicked(e){
-    e.preventDefault();
-    this.setState({ isEditing: true });
+  onEditTopicClick() {
+    this.props.onEditTopicClick();
   },
 
   onTopicEditUpdate(value){
@@ -110,12 +108,10 @@ export default React.createClass({
 
   onTopicEditSave(){
     this.props.onTopicEditSave();
-    this.setState({ isEditing: false });
   },
 
   onTopicEditCancel(){
     this.props.onTopicEditCancel();
-    this.setState({ isEditing: false });
   },
 
   onReactionPick(reactionKey, isReacting) {

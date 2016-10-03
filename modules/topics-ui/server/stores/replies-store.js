@@ -22,6 +22,15 @@ module.exports = function repliesStore(models, sortName) {
     return model;
   };
 
+  /*
+   *  Sorting
+   *  This login should be replaced within the serives used to gather this data
+   *  as with the topics-store we should always asume the correct sample is passed to this module
+   *  and this is only used to parse the data into an acceptable format
+   *
+   *  This sorting logic is also duplicated in broswer/stores/splies-store
+   *  in the collection comparator
+   * */
   if(sortName === topicConstants.TOPIC_REPLIES_COMMENT_SORT_NAME) {
     models.sort((a, b) => b.commentsTotal - a.commentsTotal);
   }

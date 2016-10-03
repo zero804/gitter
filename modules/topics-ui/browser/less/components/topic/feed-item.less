@@ -1,6 +1,7 @@
 @import "../../colors.less";
 @import "../../text.less";
 @import (less, reference) "~gitter-styleguide/css/components/buttons.css";
+@import "../../../../../../public/less/markdown.less";
 
 .feed-item {
   display: flex;
@@ -25,9 +26,7 @@
   font-family: @font-family;
   overflow: hidden;
 
-  img {
-    max-width: 100%;
-  }
+  .markdown-styles();
 }
 
 .feed-item__header {
