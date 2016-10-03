@@ -515,7 +515,7 @@ export class TopicsStore {
   getAPISort() {
     const sortBy = router.get('sortName');
     if (sortBy === MOST_REPLY_SORT) {
-      return '-lastChanged,-id';
+      return '-repliesTotal,-id';
     } else {
       return '-id';
     }
