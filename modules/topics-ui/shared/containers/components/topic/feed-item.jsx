@@ -40,15 +40,18 @@ export default React.createClass({
 
     const {item, children, footerChildren} = this.props;
     const {user} = item;
-    const avatarDims = 30;
     const formattedSentDate = item.sent && moment(item.sent).format('MMM Do');
+
+    const idAttribute = `model-id-${item.id}`;
 
     /* The EditControl situation is BS. It needs to be fixed  */
     //TODO we need to make edit controls, reaction and follow buttons
     //smart components so they can dispatch events. This will prevent us
     //having to have these controls in scope to change state
     return (
-      <article className="feed-item">
+      <article
+        id={idAttribute}
+        className="feed-item">
         <div className="feed-item__content">
           <div className="feed-item__user-details">
             <UserAvatar
