@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react';
 import Editor from '../forms/editor.jsx';
 import UserAvatar from '../user/user-avatar.jsx';
 import moment from 'moment';
+import {AVATAR_SIZE_MEDIUM} from '../../../constants/avatar-sizes';
 
 export default React.createClass({
 
@@ -21,8 +22,7 @@ export default React.createClass({
       <section className="reply-comment-editor">
         <aside className="reply-comment-editor__details">
           <UserAvatar
-            width={30}
-            height={30}
+            size={AVATAR_SIZE_MEDIUM}
             className="reply-comment-editor__avatar"
             user={user} />
           <span

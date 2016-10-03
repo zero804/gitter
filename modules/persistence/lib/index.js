@@ -92,6 +92,7 @@ var schemas = {
   Forum: require('./schemas/forum-schema'),
   ForumCategory: require('./schemas/forum-category-schema'),
   Topic: require('./schemas/topic-schema'),
+  TopicSequence: require('./schemas/topic-sequence-schema'),
   Reply: require('./schemas/reply-schema'),
   Comment: require('./schemas/comment-schema'),
   ForumSubscription: require('./schemas/forum-subscription-schema'),

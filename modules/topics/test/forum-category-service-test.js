@@ -5,6 +5,8 @@ var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var forumCategoryService = require('../lib/forum-category-service');
 
 describe('forum-category-service #slow', function() {
+  fixtureLoader.disableMongoTableScans();
+
   var fixture = fixtureLoader.setup({
     user1: {},
     forum1: {},
