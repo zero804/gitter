@@ -1,11 +1,14 @@
 @import (less, reference) "~gitter-styleguide/css/components/buttons.css";
 @import "../../text.less";
 @import (reference) "../../colors.less";
+@import "../../../../../../public/less/markdown.less";
 
 .topic-body__content {
   padding: 3rem 0;
   font-size: 1.6rem;
   font-family: @font-family;
+
+  .markdown-styles();
 }
 
 
