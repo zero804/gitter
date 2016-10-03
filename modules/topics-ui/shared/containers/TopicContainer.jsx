@@ -10,18 +10,6 @@ import TopicReplyListHeader from './components/topic/topic-reply-list-header.jsx
 import TopicReplyList from './components/topic/topic-reply-list.jsx';
 import TopicReplyListItem from './components/topic/topic-reply-list-item.jsx';
 
-import updateReplyBody from '../action-creators/create-reply/body-update';
-import submitNewReply from '../action-creators/create-reply/submit-new-reply';
-import updateCommentBody from '../action-creators/create-comment/body-update';
-import submitNewComment from '../action-creators/create-comment/submit-new-comment';
-import showReplyComments from '../action-creators/topic/show-reply-comments';
-import updateReply from '../action-creators/topic/update-reply';
-import cancelUpdateReply from '../action-creators/topic/cancel-update-reply';
-import saveUpdatedReply from '../action-creators/topic/save-update-reply';
-import updateComment from '../action-creators/topic/update-comment.js';
-import updateCancelComment from '../action-creators/topic/update-cancel-comment.js';
-import updateSaveComment from '../action-creators/topic/update-save-comment.js';
-
 import updateTopic from '../action-creators/topic/update-topic';
 import updateCancelTopic from '../action-creators/topic/update-cancel-topic';
 import updateSaveTopic from '../action-creators/topic/update-save-topic';
@@ -32,6 +20,21 @@ import requestUpdateTopicReactions from '../action-creators/forum/request-update
 import requestUpdateReplyReactions from '../action-creators/forum/request-update-reply-reactions';
 import requestUpdateCommentReactions from '../action-creators/forum/request-update-comment-reactions';
 import requestSignIn from '../action-creators/forum/request-sign-in';
+
+import updateReplyBody from '../action-creators/create-reply/body-update';
+import submitNewReply from '../action-creators/create-reply/submit-new-reply';
+import updateCommentBody from '../action-creators/create-comment/body-update';
+import submitNewComment from '../action-creators/create-comment/submit-new-comment';
+import showReplyComments from '../action-creators/topic/show-reply-comments';
+import updateReply from '../action-creators/topic/update-reply';
+import cancelUpdateReply from '../action-creators/topic/cancel-update-reply';
+import saveUpdatedReply from '../action-creators/topic/save-update-reply';
+import updateReplyIsEditing from '../action-creators/topic/update-reply-is-editing';
+
+import updateComment from '../action-creators/topic/update-comment.js';
+import updateCancelComment from '../action-creators/topic/update-cancel-comment.js';
+import updateSaveComment from '../action-creators/topic/update-save-comment.js';
+import updateCommentIsEditing from '../action-creators/topic/update-comment-is-editing';
 
 import { SUBSCRIPTION_STATE_SUBSCRIBED } from '../constants/forum.js';
 const EDITOR_SUBMIT_LINK_SOURCE = 'topics-reply-editor-submit-button';
@@ -214,7 +217,7 @@ const TopicContainer = createClass({
             topic={topic}
             onSubscribeButtonClick={this.onTopicSubscribeButtonClick}
             onReactionPick={this.onTopicReactionPick}
-            onEditTopicClicked={this.onEditTopicClicked}
+            onEditTopicClick={this.onEditTopicClick}
             onTopicEditUpdate={this.onTopicEditUpdate}
             onTopicEditCancel={this.onTopicEditCancel}
             onTopicEditSave={this.onTopicEditSave}/>
@@ -252,12 +255,14 @@ const TopicContainer = createClass({
         onSubscribeButtonClick={this.onReplySubscribeButtonClick}
         onReactionPick={this.onReplyReactionPick}
         onCommentReactionPick={this.onCommentReactionPick}
+        onEditClick={this.onReplyEditClick}
         onEditUpdate={this.onReplyEditUpdate}
         onEditCancel={this.onReplyEditCancel}
         onEditSaved={this.onReplyEditSaved}
         onCommentEditUpdate={this.onCommentEditUpdate}
         onCommentEditCancel={this.onCommentEditCancel}
-        onCommentEditSave={this.onCommentEditSave} />
+        onCommentEditSave={this.onCommentEditSave}
+        onCommentEditClick={this.onCommentEditClick} />
     );
   },
 
@@ -370,6 +375,9 @@ const TopicContainer = createClass({
     dispatch(submitNewComment(newCommentStore.get('replyId'), text));
   },
 
+  onReplyEditClick(replyId) {
+    dispatch(updateReplyIsEditing(replyId, true));
+  },
 
   onReplyEditUpdate(replyId, value){
     dispatch(updateReply(replyId, value));
@@ -377,10 +385,16 @@ const TopicContainer = createClass({
 
   onReplyEditCancel(replyId) {
     dispatch(cancelUpdateReply(replyId));
+    dispatch(updateReplyIsEditing(replyId, false));
   },
 
   onReplyEditSaved(replyId){
     dispatch(saveUpdatedReply(replyId));
+    dispatch(updateReplyIsEditing(replyId, false));
+  },
+
+  onCommentEditClick(commentId) {
+    dispatch(updateCommentIsEditing(commentId, true));
   },
 
   onCommentEditUpdate(commentId, value){
@@ -389,13 +403,15 @@ const TopicContainer = createClass({
 
   onCommentEditCancel(commentId) {
     dispatch(updateCancelComment(commentId));
+      dispatch(updateCommentIsEditing(commentId, false));
   },
 
   onCommentEditSave(commentId, replyId){
     dispatch(updateSaveComment(commentId, replyId));
+      dispatch(updateCommentIsEditing(commentId, false));
   },
 
-  onEditTopicClicked() {
+  onEditTopicClick() {
     dispatch(updateTopicIsEditing(true));
   },
 

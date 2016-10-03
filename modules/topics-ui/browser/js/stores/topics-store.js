@@ -305,7 +305,7 @@ export const TopicsLiveCollection = LiveCollection.extend({
     if(!model) { return; }
 
     model.set({
-      isEditing: isEditing
+      isEditing
     });
   },
 

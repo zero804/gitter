@@ -39,6 +39,9 @@ const NewCommentStore = BaseModel.extend({
 
 });
 
-dispatchOnChangeMixin(NewCommentStore, 'change:text');
+dispatchOnChangeMixin(NewCommentStore, ['change:text'], {
+  // We need synchronous updates so the cursor is managed properly
+  delay: 0
+});
 
 export default NewCommentStore;

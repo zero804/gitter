@@ -17,7 +17,7 @@ export default React.createClass({
     }).isRequired,
     onSubscribeButtonClick: PropTypes.func,
     onReactionPick: PropTypes.func,
-    onEditTopicClicked: PropTypes.func.isRequired,
+    onEditTopicClick: PropTypes.func.isRequired,
     onTopicEditUpdate: PropTypes.func.isRequired,
     onTopicEditCancel: PropTypes.func.isRequired,
     onTopicEditSave: PropTypes.func.isRequired
@@ -64,7 +64,7 @@ export default React.createClass({
 
     return (
       <button
-        onClick={this.onEditTopicClicked}
+        onClick={this.onEditTopicClick}
         className="topic-body__footer__action">Edit</button>
     );
   },
@@ -84,8 +84,8 @@ export default React.createClass({
     );
   },
 
-  onEditTopicClicked() {
-    this.props.onEditTopicClicked();
+  onEditTopicClick() {
+    this.props.onEditTopicClick();
   },
 
   onTopicEditUpdate(value){
