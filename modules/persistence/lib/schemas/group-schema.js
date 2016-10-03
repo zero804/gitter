@@ -12,8 +12,8 @@ var GroupSchema = new Schema({
   forumId: { type: ObjectId, required: false },
   sd: { type: securityDescriptor.Schema, required: false },
   avatarUrl: { type: String, required: false },
-  avatarVersion: { type: Number, required: false, default: 0 }
-
+  avatarVersion: { type: Number, required: false, default: 0 },
+  avatarCheckedDate: { type: Date, required: false }
 }, { strict: 'throw' });
 
 GroupSchema.schemaTypeName = 'GroupSchema';
