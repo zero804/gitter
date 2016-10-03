@@ -31,6 +31,11 @@
   cursor: pointer;
 }
 
+.topic-body__footer__action--edit {
+  margin-top: @content-control-top-margin;
+  float: right;
+}
+
 .topic-body__footer__reaction-action {
   .topic-body__footer__action();
 
@@ -60,4 +65,13 @@
   &.hidden {
     opacity: 0;
   }
+}
+
+.topic-body__sent {
+  text-transform: uppercase;
+  font-family: @font-family;
+  color: @topic-reply-action-text-color;
+  font-size: 1.1rem;
+  float: right;
+  margin-top: @content-control-top-margin;
 }
