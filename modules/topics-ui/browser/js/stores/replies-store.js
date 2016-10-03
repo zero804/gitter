@@ -21,11 +21,27 @@ import {
   UPDATE_REPLY_REACTIONS
 } from '../../../shared/constants/forum.js';
 import {SUBMIT_NEW_REPLY} from '../../../shared/constants/create-reply';
-import {UPDATE_REPLY, CANCEL_UPDATE_REPLY, SAVE_UPDATE_REPLY} from '../../../shared/constants/topic';
+import {
+  UPDATE_REPLY,
+  CANCEL_UPDATE_REPLY,
+  SAVE_UPDATE_REPLY,
+  UPDATE_REPLY_IS_EDITING
+} from '../../../shared/constants/topic';
 
 
 
 export const ReplyModel = BaseModel.extend({
+
+  // Theres a problem with the realtime client here. When a message comes in from
+  // the realtime connection it will create a new model and patch the values onto an existing model.
+  // If you have any defaults the patch model with override the current models values with the defaults.
+  // Bad Times.
+  //
+  // via @cutandpastey, https://github.com/troupe/gitter-webapp/pull/2293#discussion_r81304415
+  defaults: {
+    isEditing: false
+  },
+
   // Why doesn't this just come from it's owner collection?
   url() {
     return this.get('id') ?
@@ -53,6 +69,7 @@ export const RepliesStore = LiveCollection.extend({
     subscribe(UPDATE_REPLY, this.updateReplyText, this);
     subscribe(CANCEL_UPDATE_REPLY, this.cancelEditReply, this);
     subscribe(SAVE_UPDATE_REPLY, this.saveUpdatedModel, this);
+    subscribe(UPDATE_REPLY_IS_EDITING, this.onReplyIsEditingUpdate, this);
     subscribe(REQUEST_UPDATE_REPLY_SUBSCRIPTION_STATE, this.onRequestSubscriptionStateUpdate, this);
     subscribe(UPDATE_REPLY_SUBSCRIPTION_STATE, this.onSubscriptionStateUpdate, this);
     subscribe(UPDATE_REPLY_REACTIONS, this.onReactionsUpdate, this);
@@ -88,19 +105,19 @@ export const RepliesStore = LiveCollection.extend({
     this.reset([]);
   },
 
-  updateReplyText({replyId, text}) {
+  updateReplyText({ replyId, text }) {
     const model = this.get(replyId);
     if(!model) { return; }
     model.set('text', text);
   },
 
-  cancelEditReply({replyId}) {
+  cancelEditReply({ replyId }) {
     const model = this.get(replyId);
     if(!model) { return; }
     model.set('text', null);
   },
 
-  saveUpdatedModel({replyId}){
+  saveUpdatedModel({ replyId }){
     const model = this.get(replyId);
     if(!model) { return; }
     const text = model.get('text');
@@ -108,8 +125,17 @@ export const RepliesStore = LiveCollection.extend({
     model.save({ text: text }, { patch: true });
   },
 
-  onRequestSubscriptionStateUpdate({replyId}) {
-    var reply = this.get(replyId);
+  onReplyIsEditingUpdate({ replyId, isEditing }) {
+    const reply = this.get(replyId);
+    if(!reply) { return; }
+
+    reply.set({
+      isEditing
+    });
+  },
+
+  onRequestSubscriptionStateUpdate({ replyId }) {
+    const reply = this.get(replyId);
     if(!reply) { return; }
 
     reply.set({
@@ -117,9 +143,8 @@ export const RepliesStore = LiveCollection.extend({
     });
   },
 
-  onSubscriptionStateUpdate(data) {
-    var {replyId, state} = data;
-    var reply = this.get(replyId);
+  onSubscriptionStateUpdate({ replyId, state }) {
+    const reply = this.get(replyId);
     if(!reply) { return; }
 
     reply.set({
@@ -132,8 +157,16 @@ export const RepliesStore = LiveCollection.extend({
 dispatchOnChangeMixin(RepliesStore, [
   'change:subscriptionState',
   'change:text',
-  'change:body'
-]);
+  'change:body',
+  'change:isEditing'
+], {
+  delay: function(model) {
+    // We need synchronous updates so the cursor is managed properly
+    if(model && (model.get('isEditing') || model.get('state') === MODEL_STATE_DRAFT)) {
+      return 0;
+    }
+  }
+});
 onReactionsUpdateMixin(RepliesStore, 'onReactionsUpdate');
 
 
