@@ -28,12 +28,4 @@ describe('<Avatar/>', () => {
     equal(wrapper.find('.test').length, 1);
   });
 
-  it('should set the correct height', () => {
-    equal(wrapper.find('img').at(0).prop('height'), dim);
-  });
-
-  it('should set the correct width', () => {
-    equal(wrapper.find('img').at(0).prop('width'), dim);
-  });
-
 });
