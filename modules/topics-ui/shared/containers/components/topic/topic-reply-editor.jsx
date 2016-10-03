@@ -3,6 +3,8 @@ import Container from '../container.jsx';
 import Panel from '../panel.jsx';
 import Editor from '../forms/editor.jsx';
 import UserAvatar from '../user/user-avatar.jsx';
+import classNames from 'classnames';
+
 import {AVATAR_SIZE_MEDIUM} from '../../../constants/avatar-sizes';
 
 export default React.createClass({
@@ -13,9 +15,12 @@ export default React.createClass({
     user: PropTypes.shape({
       avatarUrl: PropTypes.string
     }).isRequired,
+    replyListEditorInFocus: PropTypes.bool,
     isSignedIn: PropTypes.bool,
     onChange: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
+    onFocus: PropTypes.func,
+    onBlur: PropTypes.func,
     onEditorClick: PropTypes.func
   },
 
@@ -25,26 +30,32 @@ export default React.createClass({
 
   render(){
 
-    const {user, isSignedIn, value} = this.props;
+    const {user, isSignedIn, value, replyListEditorInFocus} = this.props;
     const editorValue = (value || '');
     var submitText = 'Reply';
     if(!isSignedIn) {
       submitText = 'Sign in to reply';
     }
 
+    const compiledClass = classNames({
+      'panel--reply-editor--active': replyListEditorInFocus
+    }, 'panel--reply-editor')
+
     return (
       <Container className="container--reply-editor">
-        <Panel className="panel--reply-editor">
+        <Panel className={compiledClass}>
           <UserAvatar
             user={user}
             className="avatar--reply-editor"
             size={AVATAR_SIZE_MEDIUM} />
           <Editor
+            value={editorValue}
             className="editor--reply"
             placeholder="Your reply here. Use Markdown, BBCode, or HTML to format. Drag or paste images ..."
             onChange={this.onChange}
             onClick={this.onEditorClick}
-            value={editorValue}/>
+            onFocus={this.onEditorFocus}
+            onBlur={this.onEditorBlur}/>
           <button
             className="topic-reply-editor__submit"
             onClick={this.onSubmitClicked}>
@@ -69,6 +80,18 @@ export default React.createClass({
     if(onEditorClick) {
       onEditorClick(...arguments);
     }
+  },
+
+  onEditorFocus(){
+    const {onFocus} = this.props;
+    if(!onFocus) { return; }
+    onFocus();
+  },
+
+  onEditorBlur(){
+    const {onBlur} = this.props;
+    if(!onBlur) { return; }
+    onBlur();
   }
 
 });

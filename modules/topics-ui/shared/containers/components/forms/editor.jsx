@@ -6,16 +6,21 @@ export default React.createClass({
 
   displayName: 'Editor',
   propTypes: {
-    className: PropTypes.string,
+    //Props
+    value: PropTypes.string,
     name: PropTypes.string,
+    autoFocus: PropTypes.bool,
+    className: PropTypes.string,
     children: PropTypes.node,
+    valid: PropTypes.bool,
+    placeholder: PropTypes.string,
+
+    //Events
     onChange: PropTypes.func.isRequired,
     onEnter: PropTypes.func,
     onClick: PropTypes.func,
-    value: PropTypes.string,
-    placeholder: PropTypes.string,
-    autoFocus: PropTypes.bool,
-    valid: PropTypes.bool,
+    onFocus: PropTypes.func,
+    onBlur: PropTypes.func,
   },
 
   getDefaultProps(){
@@ -33,15 +38,17 @@ export default React.createClass({
 
     return (
       <textarea
-        autoFocus={autoFocus}
         ref="editor"
-        className={compiledClass}
-        name={name}
         value={value}
-        onChange={this.onChange}
+        name={name}
+        autoFocus={autoFocus}
         placeholder={placeholder}
+        className={compiledClass}
+        onChange={this.onChange}
         onClick={this.onClick}
-        onKeyDown={this.onKeyPressed}>
+        onKeyDown={this.onKeyPressed}
+        onFocus={this.onFocus}
+        onBlur={this.onBlur}>
         { this.props.children }
       </textarea>
     );
@@ -66,6 +73,18 @@ export default React.createClass({
       e.stopPropagation();
       onEnter();
     }
+  },
+
+  onFocus() {
+    const {onFocus} = this.props;
+    if(!onFocus) { return; }
+    onFocus();
+  },
+
+  onBlur(){
+    const {onBlur} = this.props;
+    if(!onBlur) { return; }
+    onBlur();
   }
 
 });
