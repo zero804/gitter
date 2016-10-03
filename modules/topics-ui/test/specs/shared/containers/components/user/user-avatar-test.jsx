@@ -34,12 +34,4 @@ describe('<UserAvatar/>', () => {
     equal(wrapper.find('.avatar--user').length, 1);
   });
 
-  it('should set a passed height', () => {
-    equal(wrapper.find('img').at(0).prop('height'), dim);
-  });
-
-  it('should set a passed width', () => {
-    equal(wrapper.find('img').at(0).prop('width'), dim);
-  });
-
 });

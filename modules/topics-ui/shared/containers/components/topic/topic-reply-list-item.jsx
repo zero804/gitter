@@ -34,9 +34,9 @@ export default React.createClass({
     onReactionPick: PropTypes.func,
     onCommentReactionPick: PropTypes.func,
 
-    onEditUpdate: PropTypes.func.isRequired,
-    onEditCancel: PropTypes.func.isRequired,
-    onEditSaved: PropTypes.func.isRequired,
+    onReplyEditUpdate: PropTypes.func.isRequired,
+    onReplyEditCancel: PropTypes.func.isRequired,
+    onReplyEditSaved: PropTypes.func.isRequired,
     onCommentEditUpdate: PropTypes.func.isRequired,
     onCommentEditCancel: PropTypes.func.isRequired,
     onCommentEditSave: PropTypes.func.isRequired
@@ -158,19 +158,19 @@ export default React.createClass({
   onEditUpdate(value){
     const {reply} = this.props;
     const {id} = reply;
-    this.props.onEditUpdate(id, value);
+    this.props.onReplyEditUpdate(id, value);
   },
 
   onEditCancel(){
     const {reply} = this.props;
     const {id} = reply;
-    this.props.onEditCancel(id);
+    this.props.onReplyEditCancel(id);
   },
 
   onEditSaved(){
     const {reply} = this.props;
     const {id} = reply;
-    this.props.onEditSaved(id)
+    this.props.onReplyEditSaved(id)
   },
 
   onCommentEditUpdate(commentId, value){
