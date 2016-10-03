@@ -3,6 +3,7 @@ import Backbone from 'backbone';
 import { subscribe } from '../../../shared/dispatcher';
 
 import {getIsSignedIn} from '../stores/current-user-store';
+import frameUtils from 'gitter-web-frame-utils';
 
 import * as navConstants from '../../../shared/constants/navigation';
 import * as forumCatConstants from '../../../shared/constants/forum-categories';
@@ -50,7 +51,7 @@ var Router = Backbone.Router.extend({
     ':groupUri/topics/topic/:id/:slug(/)(~topics)(?*queryString)': 'topic'
   },
 
-  navigate(url, options){
+  navigate(url, options) {
 
     //Remove ~topics from the url
     let appUrl = url.split('~')[0];
@@ -59,11 +60,12 @@ var Router = Backbone.Router.extend({
     if(appUrl[appUrl.length - 1] === '/') { appUrl = appUrl.substring(0, appUrl.length - 1); }
     if(appUrl[0] !== '/') { appUrl = '/' + appUrl; }
 
-    //Generate payload
-    const json = JSON.stringify({ type: 'navigation', url: appUrl, urlType: 'topics' });
-
     //Proxy up to the frame
-    window.parent.postMessage(json, window.location.origin);
+    frameUtils.postMessage({
+      type: 'navigation',
+      url: appUrl,
+      urlType: 'topics'
+    });
 
     //Call super
     Backbone.Router.prototype.navigate.call(this, url, options);

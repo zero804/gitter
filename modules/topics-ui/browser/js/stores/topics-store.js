@@ -16,9 +16,12 @@ import {getCurrentUser} from '../stores/current-user-store';
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
 import onReactionsUpdateMixin from './mixins/on-reactions-update';
 
+import apiClient from '../utils/api-client';
+
 import {SUBMIT_NEW_TOPIC, TOPIC_CREATED} from '../../../shared/constants/create-topic';
-import {DEFAULT_CATEGORY_NAME, DEFAULT_TAG_NAME} from '../../../shared/constants/navigation';
+import {DEFAULT_CATEGORY_NAME, DEFAULT_TAG_NAME, DEFAULT_FILTER_NAME} from '../../../shared/constants/navigation';
 import {FILTER_BY_TOPIC} from '../../../shared/constants/forum-filters';
+import {MOST_REPLY_SORT} from '../../../shared/constants/forum-sorts';
 import {MOST_WATCHERS_SORT} from '../../../shared/constants/forum-sorts';
 import {
   UPDATE_TOPIC_SUBSCRIPTION_STATE,
@@ -120,20 +123,22 @@ export const TopicModel = BaseModel.extend({
     this.set('categoryId', categoryId);
   },
 
-  //Add tags
-  //TODO we need to think about events that would remove tags from this array
-  //typically when a user de-selects them in the modal
-  onTagsUpdate(data){
-    const tag = data.tag;
+  //Add/Remove tags
+  onTagsUpdate({ tag, isAdding }) {
     const currentTags = this.get('tags') || [];
-    if(currentTags.indexOf(tag) !== -1) { return; }
-    currentTags.push(tag);
-    this.set('tags', currentTags);
+    let newTags = currentTags;
+    // Adding
+    if(isAdding && currentTags.indexOf(tag) === -1) {
+      newTags = currentTags.concat(tag);
+    }
+    // Removing
+    else if(!isAdding && currentTags.indexOf(tag) !== -1) {
+      newTags = currentTags.filter((currentTag) => {
+        return currentTag !== tag;
+      })
+    }
 
-    // We have to trigger here beacuse backbone will not pickup this change
-    // event if we were to `[].concat(currentTags)` we still wouldn't get a
-    // change event :(
-      this.trigger('change:tags');
+    this.set('tags', newTags);
   },
 
   onRequestSave() {
@@ -222,11 +227,15 @@ export const TopicsLiveCollection = LiveCollection.extend({
     });
   },
 
-  initialize(){
+  initialize(models, options){
     subscribe(UPDATE_TOPIC, this.onTopicUpdate, this);
     subscribe(UPDATE_CANCEL_TOPIC, this.onTopicEditCancel, this);
     subscribe(UPDATE_SAVE_TOPIC, this.onTopicEditSaved, this);
     this.listenTo(router, 'change:createTopic', this.onCreateTopicChange, this);
+
+    this.snapshotFilter = options.snapshotFilter;
+    this.snapshotSort = options.snapshotSort;
+
     subscribe(UPDATE_TOPIC_REACTIONS, this.onReactionsUpdate, this);
   },
 
@@ -249,6 +258,21 @@ export const TopicsLiveCollection = LiveCollection.extend({
     const model = this.get(topicId);
     if(!model) { return; }
     model.set('text', text);
+  },
+
+  getSnapshotState() {
+    return {
+      filter: this.snapshotFilter,
+      sort: this.snapshotSort
+    }
+  },
+
+  setSnapshotFilter(filter) {
+    this.snapshotFilter = filter;
+  },
+
+  setSnapshotSort(sort) {
+    this.snapshotSort = sort;
   },
 
   //If a user presses the cancel button reset the text
@@ -295,11 +319,30 @@ export const TopicsLiveCollection = LiveCollection.extend({
 
 });
 
+function tagMatches(model, tag) {
+  const tags = (model.get('tags') || []);
+  return tags.some((t) => t === tag);
+}
+
+function userMatches(model, user) {
+  return model.get('user').username === user.username;
+}
+
+function categoryMatches(model, slug) {
+  const category = (model.get('category') || {});
+  return category.slug === slug;
+}
+
+// TODO: we should really get rid of special values that just mean empty or
+// none or don't filter/sort by this thing. It is error-prone,
+// infects/complicates all the code and means that adding a category called
+// "all" or a tag called "all-tags" will just break everything. Also "filtering
+// by activity" currently means "don't filter at all"
+function desentinel(value, sentinel) {
+  return (value === sentinel) ? undefined : value;
+}
 
 onReactionsUpdateMixin(TopicsLiveCollection, 'onReactionsUpdate');
-
-
-
 
 export class TopicsStore {
 
@@ -307,18 +350,53 @@ export class TopicsStore {
     //Get access to listenTo etc
     _.extend(this, Backbone.Events);
 
-    //Make a new live collection
-    this.topicCollection = new TopicsLiveCollection(models, options);
+    // Passing in the snapshot filter & sort as options to the live collection
+    // so it can be there when the connection first gets established. This also
+    // means that the router MUST have already parsed the url parameters and
+    // initialised the correct initial state by this point.
+    const topicCollectionOptions = _.extend({
+      snapshotFilter: this.getSnapshotFilter(),
+      snapshotSort: this.getSnapshotSort()
+    }, options);
+    this.topicCollection = new TopicsLiveCollection(models, topicCollectionOptions);
 
     //This filtered collection will allow us to filter out any models based on the url state
     this.collection = new SimpleFilteredCollection([], {
       collection: this.topicCollection,
       filter: this.getFilter(),
       comparator: (a, b) => {
+        // NOTE: this logic has to be kept in sync with the backend, otherwise
+        // there will be crappy bugs all over the place.
         const sort = router.get('sortName');
-        if(sort === MOST_WATCHERS_SORT) {
-          return (b.get('replyingUsers').length - a.get('replyingUsers').length);
+
+        // At the time of writing you can only sort by number of replies,
+        // latest first or (not used by the client) most recently updated on
+        // the server.
+
+        if (sort === MOST_REPLY_SORT) {
+          const repliesDiff = (b.get('repliesTotal') - a.get('repliesTotal'));
+          if (repliesDiff !== 0) return repliesDiff;
         }
+
+        // assume most recent by default, by also as a secondary sort key
+        /*
+        NOTE: The server sorts by id as a proxy for sent, so use the same field
+        to match the server's behavior exactly and also so we don't have to
+        unnecessarily create date fields.
+        */
+        const bid = b.get('id');
+        const aid = a.get('id');
+        if (aid && bid) {
+          if (bid > aid) {
+            return 1;
+          } else if (bid < aid) {
+            return -1;
+          } else {
+            return 0;
+          }
+        }
+
+        // fall back to sent if something doesn't have an id yet
         return new Date(b.get('sent')) - new Date(a.get('sent')) ;
       }
     });
@@ -366,40 +444,97 @@ export class TopicsStore {
   }
 
   getFilter() {
-    const categorySlug = (router.get('categoryName') || DEFAULT_CATEGORY_NAME);
-    const tagName = (router.get('tagName') || DEFAULT_TAG_NAME);
     const currentUser = getCurrentUser();
-    const filterName = router.get('filterName');
 
-    //We must return a new function here to avoid caching issues within simpleFilteredCollection
-    return function(model){
+    const categorySlug = desentinel(router.get('categoryName'), DEFAULT_CATEGORY_NAME);
+    const tagName = desentinel(router.get('tagName'), DEFAULT_TAG_NAME);
+    // activity (which means all at the moment) or my-topics for now
+    const filterName = desentinel(router.get('filterName'), DEFAULT_FILTER_NAME);
 
-      //Never show draft models
-      if(model.get('state') === MODEL_STATE_DRAFT) { return false; }
+    // We must return a new function here to avoid caching issues within simpleFilteredCollection
+    return function(model) {
+      // Never show draft models
+      if (model.get('state') === MODEL_STATE_DRAFT) return false;
 
-      //filter by category
-      const category = (model.get('category') || {});
-      let categoryResult = false;
-      if(categorySlug === DEFAULT_CATEGORY_NAME) { categoryResult = true; }
-      if(category.slug === categorySlug) { categoryResult = true; }
+      if (categorySlug && !categoryMatches(model, categorySlug)) return false;
 
-      if(categoryResult === false) { return false; }
+      if (tagName && !tagMatches(model, tagName)) return false;
 
-      const tags = (model.get('tags') || []);
-      let tagResult = false;
-      if(tagName === DEFAULT_TAG_NAME) { tagResult = true; }
-      else { tagResult = tags.some((t) => t === tagName); }
-
-      if(tagResult === false) { return false; }
-
-      if(filterName === FILTER_BY_TOPIC && model.get('user').username !== currentUser.username) {
-        return false;
-      }
+      // NOTE: FILTER_BY_TOPIC means "my topics"
+      if (filterName === FILTER_BY_TOPIC && !userMatches(model, currentUser)) return false;
 
       return true;
-
     }
   }
+
+  // The snapshot options take json style simple objects
+  getSnapshotFilter() {
+    const filterName = desentinel(router.get('filterName'), DEFAULT_FILTER_NAME);
+    const currentUser = getCurrentUser();
+    const categorySlug = desentinel(router.get('categoryName'), DEFAULT_CATEGORY_NAME);
+    const tagName = desentinel(router.get('tagName'), DEFAULT_TAG_NAME);
+
+    let filter = {}
+
+    if (filterName === FILTER_BY_TOPIC) {
+      filter.username = currentUser.username;
+    }
+
+    if (categorySlug) {
+      filter.category = categorySlug;
+    }
+
+    if (tagName) {
+      filter.tags = [tagName];
+    }
+
+    return filter;
+  }
+
+  getSnapshotSort() {
+    const sortBy = router.get('sortName');
+
+    let sort = {};
+
+    if (sortBy === MOST_REPLY_SORT) {
+      sort.repliesTotal = -1;
+    }
+
+    // sort newest first by default AND also sort that way as a secondary sort,
+    // so add it on regardless
+    sort.id = -1;
+
+    return sort;
+  }
+
+  // the API calls take URI parameters
+  getAPIFilter() {
+    return this.getSnapshotFilter();
+  }
+
+  getAPISort() {
+    const sortBy = router.get('sortName');
+    if (sortBy === MOST_REPLY_SORT) {
+      return '-repliesTotal,-id';
+    } else {
+      return '-id';
+    }
+  }
+
+  fetchLatestFilterAndSort() {
+    var url = `/v1/forums/${getForumId()}/topics`;
+    var data = this.getAPIFilter();
+    data.sort = this.getAPISort();
+
+    return apiClient.get(url, data)
+      .bind(this)
+      .then(function(results) {
+        // TODO: not sure if this is best. Maybe call .set() directly and
+        // override some options?
+        this.topicCollection.handleSnapshot(results);
+      });
+  }
+
 
   //Return all the viable models in the collection to the UI
   getTopics() {
@@ -434,12 +569,16 @@ export class TopicsStore {
   //Whenever the router updates make sure we have to
   //correctly filtered models to give to the UI
   onRouterUpdate() {
+    this.topicCollection.setSnapshotFilter(this.getSnapshotFilter());
     this.collection.setFilter(this.getFilter());
+    this.fetchLatestFilterAndSort();
   }
 
   //Sort your bad self
   onSortUpdate(){
+    this.topicCollection.setSnapshotSort(this.getSnapshotSort());
     this.collection.sort();
+    this.fetchLatestFilterAndSort();
   }
 
   onRequestSubscriptionStateUpdate({topicId}) {
