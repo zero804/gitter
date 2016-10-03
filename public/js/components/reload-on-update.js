@@ -13,11 +13,16 @@ var frameUtils = require('gitter-web-frame-utils');
 var ConditionalDebouncer = require('../utils/conditional-debouncer');
 var eyeballsDetector = require('./eyeballs-detector');
 
-var RELOAD_COUNTDOWN_TIMER = 15 * 60 * 1000; /* 15 minutes */
+var RELOAD_MIN_MINUTES = 30; /* Shortest restart will happen after this duration */
+var RELOAD_MAX_MINUTES = 60; /* Longest restart will happen after this duration */
 var TIME_BEFORE_RELOAD = 2 * 60 * 1000; /* 2 minutes */
 
 var reloadCountdownTimer;
 var reloadListener;
+
+function getRandomReloadPeriod() {
+  return Math.round((RELOAD_MIN_MINUTES + Math.random() * (RELOAD_MAX_MINUTES - RELOAD_MIN_MINUTES)) * 60 * 1000);
+}
 
 /**
  * Reload now
@@ -91,14 +96,15 @@ ReloadListener.prototype = {
  */
 function startReloadTimer() {
   if (reloadCountdownTimer || reloadListener) return;
-  debug('Application version mismatch');
+  var timeMs = getRandomReloadPeriod();
+  debug('Application version mismatch. Will restart after %s ms', timeMs);
 
   // Ensure that the deployment has definitely completely before
   // we start trying to reload
   reloadCountdownTimer = setTimeout(function() {
     if (reloadListener) return;
     reloadListener = new ReloadListener();
-  }, RELOAD_COUNTDOWN_TIMER);
+  }, timeMs);
 }
 
 /**

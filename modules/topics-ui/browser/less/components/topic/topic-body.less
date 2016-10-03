@@ -1,11 +1,14 @@
 @import (less, reference) "~gitter-styleguide/css/components/buttons.css";
 @import "../../text.less";
 @import (reference) "../../colors.less";
+@import "../../../../../../public/less/markdown.less";
 
 .topic-body__content {
   padding: 3rem 0;
   font-size: 1.6rem;
   font-family: @font-family;
+
+  .markdown-styles();
 }
 
 
@@ -18,6 +21,7 @@
 .topic-body__footer {
   display: flex;
   justify-content: flex-end;
+  flex-direction: row-reverse;
 }
 
 .topic-body__footer__action {
@@ -25,6 +29,11 @@
   padding-left: 1.5em;
   padding-right: 1.5em;
   cursor: pointer;
+}
+
+.topic-body__footer__action--edit {
+  margin-top: @content-control-top-margin;
+  float: right;
 }
 
 .topic-body__footer__reaction-action {
@@ -54,4 +63,13 @@
   &.hidden {
     opacity: 0;
   }
+}
+
+.topic-body__sent {
+  text-transform: uppercase;
+  font-family: @font-family;
+  color: @topic-reply-action-text-color;
+  font-size: 1.1rem;
+  float: right;
+  margin-top: @content-control-top-margin;
 }
