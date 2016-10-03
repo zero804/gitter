@@ -67,6 +67,8 @@ function parseSort(value) {
     // cases in future.
     if (key === 'id') key = '_id';
 
+    if (key === 'likesTotal') key = 'reactionCounts.like';
+
     sort[key] = direction;
   });
 
