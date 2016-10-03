@@ -105,9 +105,6 @@ export default React.createClass({
 
   submit(val){
     this.props.onSubmit(val);
-    this.setState((state) => Object.assign(state, {
-      value: ''
-    }));
   },
 
   onInputChange(val){
