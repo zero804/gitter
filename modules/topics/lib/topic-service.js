@@ -19,6 +19,7 @@ var validateTopic = require('./validate-topic');
 var validators = require('gitter-web-validators');
 var liveCollections = require('gitter-web-live-collection-events');
 var topicNotificationEvents = require('gitter-web-topic-notifications/lib/forum-notification-events');
+var topicSequencer = require('./topic-sequencer');
 
 var TOPIC_RESULT_LIMIT = 100;
 
@@ -137,7 +138,7 @@ function findByForumIds(forumIds, options) {
   options = options || {};
 
   var filter = options.filter || {};
-  var sort = options.sort || { _id: 1 };
+  var sort = options.sort || { _id: -1 };
 
   if (!validators.validateTopicFilter(filter)) {
     throw new StatusError(400, 'Filter is invalid.');
@@ -181,9 +182,10 @@ function findByIdForForum(forumId, topicId) {
 function createTopic(user, category, options) {
   // these should be passed in from forum.tags
   var allowedTags = options.allowedTags || [];
+  var forumId = category.forumId;
 
   var data = {
-    forumId: category.forumId,
+    forumId: forumId,
     categoryId: category._id,
     userId: user._id,
     title: options.title,
@@ -198,17 +200,21 @@ function createTopic(user, category, options) {
   // make these all be the exact same instant
   insertData.sent = insertData.lastChanged = insertData.lastModified = new Date();
 
-  return processText(options.text)
-    .then(function(parsedMessage) {
-      insertData.html = parsedMessage.html;
-      insertData.lang = parsedMessage.lang;
-      insertData._md = parsedMessage.markdownProcessingFailed ? -markdownMajorVersion : markdownMajorVersion;
-      // urls, issues, mentions?
+  return Promise.join(
+      processText(options.text),
+      topicSequencer.getNextTopicNumber(forumId),
+      function(parsedMessage, number) {
+        insertData.number = number;
+        insertData.html = parsedMessage.html;
+        insertData.lang = parsedMessage.lang;
+        insertData._md = parsedMessage.markdownProcessingFailed ? -markdownMajorVersion : markdownMajorVersion;
+        // urls, issues, mentions?
 
-      debug("Creating topic with %j", insertData);
+        debug("Creating topic with %j", insertData);
 
-      return Topic.create(insertData);
-    })
+        return Topic.create(insertData);
+      }
+    )
     .tap(function(topic) {
       return topicNotificationEvents.createTopic(topic);
     })

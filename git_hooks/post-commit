@@ -1,0 +1,5 @@
+#!/bin/bash
+
+if $(which gtm); then
+  gtm commit --yes
+fi
