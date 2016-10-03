@@ -16,6 +16,11 @@ export default React.createClass({
     children: PropTypes.node,
     type: PropTypes.oneOf([
       ICONS_LIKE,
+      ICONS_LIKE_SELECTED,
+      ICONS_COMMENT,
+      ICONS_EDIT,
+      ICONS_WATCH,
+      ICONS_WATCH_SELECTED,
     ]),
     className: PropTypes.string,
     onClick: PropTypes.func,
