@@ -60,16 +60,11 @@ export default React.createClass({
               size={AVATAR_SIZE_MEDIUM} />
           </div>
           <div className="feed-item__body">
-
-            <header className="feed-item__header">
-              <span className="feed-item__sent">
-                {formattedSentDate}
-              </span>
-              {this.getEditControl()}
-            </header>
-
+            <span className="feed-item__sent">
+              {formattedSentDate}
+            </span>
+            {this.getEditControl()}
             {this.getItemContent()}
-
             <footer className="feed-item__footer">
               {footerChildren}
             </footer>
