@@ -51,16 +51,23 @@ function parseSort(value) {
     // lastChanged -> { lastChanged: 1 }
     if (!value) return;
 
+    var key;
+    var direction;
+
+    if (value[0] === '-') {
+      key = value.slice(1);
+      direction = -1;
+    } else {
+      key = value;
+      direction = 1;
+    }
+
     // Key is the database key that will be used. Usually it matches with the
     // input on the URI, but in the id -> _id case, it doesn't. Probably more
     // cases in future.
-    var key = (value === '_id') ? '_id' : value;
+    if (key === 'id') key = '_id';
 
-    if (key[0] === '-') {
-      sort[key.slice(1)] = -1;
-    } else {
-      sort[key] = 1;
-    }
+    sort[key] = direction;
   });
 
   return sort;

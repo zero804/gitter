@@ -5,6 +5,8 @@ import Editor from '../forms/editor.jsx';
 import UserAvatar from '../user/user-avatar.jsx';
 import classNames from 'classnames';
 
+import {AVATAR_SIZE_MEDIUM} from '../../../constants/avatar-sizes';
+
 export default React.createClass({
 
   displayName: 'TopicReplyEditor',
@@ -45,8 +47,7 @@ export default React.createClass({
           <UserAvatar
             user={user}
             className="avatar--reply-editor"
-            width={30}
-            height={30}/>
+            size={AVATAR_SIZE_MEDIUM} />
           <Editor
             value={editorValue}
             className="editor--reply"
