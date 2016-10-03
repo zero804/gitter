@@ -23,6 +23,7 @@
   padding: 2rem;
   background-color: @topic-reply-body-color;
   font-family: @font-family;
+  overflow: hidden;
 
   img {
     max-width: 100%;
@@ -63,14 +64,18 @@
   cursor: pointer;
 }
 
+@content-control-top-margin: .5rem;
+
 .feed-item__sent {
   .m-details-text();
   font-size: 1.1rem;
   float: right;
+  margin-top: @content-control-top-margin;
 }
 
 .feed-item__edit-control {
   .m-details-text();
+  margin-top: @content-control-top-margin;
   border: none;
   background: none;
   outline: none;
@@ -78,4 +83,3 @@
   cursor: pointer;
   float: right;
 }
-
