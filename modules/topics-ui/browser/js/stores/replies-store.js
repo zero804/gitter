@@ -68,6 +68,9 @@ export const RepliesStore = LiveCollection.extend({
     router.on('change:sortName', this.sort, this);
   },
 
+  //Sorting should be accounted for from the API
+  //TODO move to API requests like the topics-store
+  //this logic is also duplicated in server/stores/replies-store.js
   comparator(a, b){
     //Get the count for likes
     const aLikeCount = ((a.get('reactions') || {}).like || 0);
