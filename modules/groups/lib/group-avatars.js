@@ -128,13 +128,14 @@ function getAvatarUrlForGroupId(groupId, size) {
       }
 
       if (!githubUsername) return null;
+      checkForAvatarUpdate(groupId, group, githubUsername);
 
       avatarUrl = 'https://avatars.githubusercontent.com/' + githubUsername + '?s=' + size;
 
-      checkForAvatarUpdate(groupId, group, githubUsername);
-
       if (group.avatarVersion) {
-        return avatarUrl + '&v=' + group.avatarVersion;
+        avatarUrl = avatarUrl + '&v=' + group.avatarVersion;
+
+        return avatarUrl;
       } else {
         return avatarUrl;
       }
