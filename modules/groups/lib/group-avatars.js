@@ -1,8 +1,13 @@
 'use strict';
 
+var env = require('gitter-web-env');
+var errorReporter = env.errorReporter;
 var Group = require('gitter-web-persistence').Group;
 var url = require('url');
 var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs');
+var groupAvatarUpdater = require('./group-avatar-updater');
+
+var AVATAR_VERSION_CHECK_TIMEOUT = 86400 * 1000;
 
 var KNOWN_AVATAR_SIZES = [
   22,
@@ -18,11 +23,11 @@ var KNOWN_AVATAR_SIZES = [
 // Just in case
 KNOWN_AVATAR_SIZES.sort();
 
-
 var SELECT_FIELDS = {
   _id: 0,
   avatarUrl: 1,
   avatarVersion: 1,
+  avatarCheckedDate: 1,
   'sd.type': 1,
   'sd.linkPath': 1
 };
@@ -70,6 +75,20 @@ function findOnSecondaryOrPrimary(groupId) {
     });
 }
 
+function checkForAvatarUpdate(groupId, group, githubUsername) {
+  // No need to check github if we manage the URL ourselves
+  if (group.avatarUrl) return;
+
+  if (!group.avatarVersion ||
+      !group.avatarCheckedDate ||
+      (group.avatarCheckedDate - Date.now()) > AVATAR_VERSION_CHECK_TIMEOUT) {
+    return groupAvatarUpdater(groupId, githubUsername)
+      .catch(function(err) {
+        errorReporter(err, { }, { module: 'group-avatar' });
+      })
+  }
+}
+
 function getAvatarUrlForGroupId(groupId, size) {
   return findOnSecondaryOrPrimary(groupId)
     .then(function(group) {
@@ -111,6 +130,9 @@ function getAvatarUrlForGroupId(groupId, size) {
       if (!githubUsername) return null;
 
       avatarUrl = 'https://avatars.githubusercontent.com/' + githubUsername + '?s=' + size;
+
+      checkForAvatarUpdate(groupId, group, githubUsername);
+
       if (group.avatarVersion) {
         return avatarUrl + '&v=' + group.avatarVersion;
       } else {
