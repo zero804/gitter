@@ -30,12 +30,10 @@ export default React.createClass({
     const { topic, onSubscribeButtonClick } = this.props;
     const subscriptionState = topic.subscriptionState;
 
-    const idAttribute = `model-id-${topic.id}`
-
     return (
       <Container className="container--topic-body">
         <Panel
-          id={idAttribute}
+          id={topic.id}
           className="panel--topic-body">
           {this.getContent()}
           <footer className="topic-body__footer">
