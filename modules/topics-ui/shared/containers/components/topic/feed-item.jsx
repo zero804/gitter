@@ -24,11 +24,10 @@ export default React.createClass({
       React.PropTypes.arrayOf(React.PropTypes.node),
       React.PropTypes.node
     ]),
-    canEdit: PropTypes.bool,
-    isEditing: PropTypes.bool,
     onChange: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
     onSave: PropTypes.func.isRequired,
+    onEditClick: PropTypes.func
   },
 
   getDefaultProps(){
@@ -50,7 +49,9 @@ export default React.createClass({
     //smart components so they can dispatch events. This will prevent us
     //having to have these controls in scope to change state
     return (
-      <article className="feed-item">
+      <article
+        id={item.id}
+        className="feed-item">
         <div className="feed-item__content">
           <div className="feed-item__user-details">
             <UserAvatar
@@ -108,10 +109,14 @@ export default React.createClass({
   },
 
   onEditClicked(e){
+    const { onEditClick } = this.props;
     e.preventDefault();
     this.setState({
       isEditing: true,
     });
+    if(onEditClick) {
+      onEditClick();
+    }
   },
 
   onChange(val){

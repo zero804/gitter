@@ -16,7 +16,6 @@ import currentUserStore from '../../../mocks/current-user-store';
 import categoryStore from '../../../mocks/category-store';
 import tagStore from '../../../mocks/tag-store';
 import topicsStore from '../../../mocks/topic-store';
-import newTopicStore from '../../../mocks/new-topic-store';
 
 describe('<ForumContainer />', function(){
 
@@ -38,8 +37,7 @@ describe('<ForumContainer />', function(){
         categoryStore={categoryStore}
         categoryName="all"
         tagStore={tagStore}
-        topicsStore={topicsStore}
-        newTopicStore={newTopicStore} />
+        topicsStore={topicsStore}/>
     );
   });
 
