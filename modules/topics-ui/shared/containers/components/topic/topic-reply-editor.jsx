@@ -3,6 +3,7 @@ import Container from '../container.jsx';
 import Panel from '../panel.jsx';
 import Editor from '../forms/editor.jsx';
 import UserAvatar from '../user/user-avatar.jsx';
+import {AVATAR_SIZE_MEDIUM} from '../../../constants/avatar-sizes';
 
 export default React.createClass({
 
@@ -37,8 +38,7 @@ export default React.createClass({
           <UserAvatar
             user={user}
             className="avatar--reply-editor"
-            width={30}
-            height={30}/>
+            size={AVATAR_SIZE_MEDIUM} />
           <Editor
             className="editor--reply"
             placeholder="Your reply here. Use Markdown, BBCode, or HTML to format. Drag or paste images ..."
