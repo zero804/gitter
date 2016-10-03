@@ -34,12 +34,13 @@ export default React.createClass({
     onReactionPick: PropTypes.func,
     onCommentReactionPick: PropTypes.func,
 
-    onEditClick: PropTypes.func.isRequired,
-    onEditUpdate: PropTypes.func.isRequired,
-    onEditCancel: PropTypes.func.isRequired,
-    onEditSaved: PropTypes.func.isRequired,
-    onCommentEditUpdate: PropTypes.func.isRequired,
+    onReplyEditClick: PropTypes.func.isRequired,
+    onReplyEditUpdate: PropTypes.func.isRequired,
+    onReplyEditCancel: PropTypes.func.isRequired,
+    onReplyEditSaved: PropTypes.func.isRequired,
+
     onCommentEditClick: PropTypes.func.isRequired,
+    onCommentEditUpdate: PropTypes.func.isRequired,
     onCommentEditCancel: PropTypes.func.isRequired,
     onCommentEditSave: PropTypes.func.isRequired
   },
@@ -50,7 +51,7 @@ export default React.createClass({
     return (
       <FeedItem
         item={reply}
-        onEditClick={this.onEditClick}
+        onEditClick={this.onReplyEditClick}
         onChange={this.onEditUpdate}
         onCancel={this.onEditCancel}
         onSave={this.onEditSaved}
@@ -159,30 +160,30 @@ export default React.createClass({
     this.props.submitNewComment();
   },
 
-  onEditClick() {
-    const { reply, onEditClick } = this.props;
+  onReplyEditClick() {
+    const { reply, onReplyEditClick } = this.props;
     const { id } = reply;
-    if(onEditClick) {
-      onEditClick(id);
+    if(onReplyEditClick) {
+      onReplyEditClick(id);
     }
   },
 
-  onEditUpdate(value){
+  onEditUpdate(value) {
     const { reply } = this.props;
     const { id } = reply;
-    this.props.onEditUpdate(id, value);
+    this.props.onReplyEditUpdate(id, value);
   },
 
-  onEditCancel(){
+  onEditCancel() {
     const { reply } = this.props;
     const { id } = reply;
-    this.props.onEditCancel(id);
+    this.props.onReplyEditCancel(id);
   },
 
-  onEditSaved(){
+  onEditSaved() {
     const { reply } = this.props;
     const { id } = reply;
-    this.props.onEditSaved(id)
+    this.props.onReplyEditSaved(id)
   },
 
   onCommentEditClick(commentId) {

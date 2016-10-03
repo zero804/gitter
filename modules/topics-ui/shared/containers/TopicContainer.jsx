@@ -130,6 +130,7 @@ const TopicContainer = createClass({
       forumSubscriptionState: forumStore.getSubscriptionState(),
       topic: topicsStore.getById(topicId),
       newReplyContent: '',
+      replyListEditorInFocus: false,
     };
   },
 
@@ -174,7 +175,7 @@ const TopicContainer = createClass({
   render(){
 
     const { groupStore, categoryStore, currentUserStore, tagStore, newReplyStore } = this.props;
-    const {forumId, forumSubscriptionState } = this.state;
+    const {forumId, forumSubscriptionState, replyListEditorInFocus } = this.state;
 
     const groupUri = groupStore.getGroupUri();
     const groupName = groupStore.getGroupName();
@@ -223,9 +224,12 @@ const TopicContainer = createClass({
             onTopicEditSave={this.onTopicEditSave}/>
         </article>
 
-        <TopicReplyListHeader replies={parsedReplies}/>
+        <TopicReplyListHeader
+          replies={parsedReplies}
+          replyListEditorInFocus={replyListEditorInFocus}/>
 
-        <TopicReplyList>
+        <TopicReplyList
+          replyListEditorInFocus={replyListEditorInFocus}>
           {parsedReplies.map(this.getReplyListItem)}
         </TopicReplyList>
 
@@ -235,6 +239,9 @@ const TopicContainer = createClass({
           value={newReplyContent}
           onChange={this.onNewReplyEditorUpdate}
           onSubmit={this.onNewReplyEditorSubmit}
+          onFocus={this.onReplyEditorFocus}
+          onBlur={this.onReplyEditorBlur}
+          replyListEditorInFocus={replyListEditorInFocus}
           onEditorClick={this.onReplyEditorClick}/>
       </main>
     );
@@ -255,15 +262,26 @@ const TopicContainer = createClass({
         onSubscribeButtonClick={this.onReplySubscribeButtonClick}
         onReactionPick={this.onReplyReactionPick}
         onCommentReactionPick={this.onCommentReactionPick}
-        onEditClick={this.onReplyEditClick}
-        onEditUpdate={this.onReplyEditUpdate}
-        onEditCancel={this.onReplyEditCancel}
-        onEditSaved={this.onReplyEditSaved}
+        onReplyEditClick={this.onReplyEditClick}
+        onReplyEditUpdate={this.onReplyEditUpdate}
+        onReplyEditCancel={this.onReplyEditCancel}
+        onReplyEditSaved={this.onReplyEditSaved}
         onCommentEditUpdate={this.onCommentEditUpdate}
         onCommentEditCancel={this.onCommentEditCancel}
         onCommentEditSave={this.onCommentEditSave}
         onCommentEditClick={this.onCommentEditClick} />
     );
+  },
+
+  onReplyEditorFocus(){
+    this.setState((state) => Object.assign({}, state, {
+      replyListEditorInFocus: true,
+    }));
+  },
+  onReplyEditorBlur(){
+    this.setState((state) => Object.assign({}, state, {
+      replyListEditorInFocus: false,
+    }));
   },
 
   onNewReplyEditorUpdate(val){
