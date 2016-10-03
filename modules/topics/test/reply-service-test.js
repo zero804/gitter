@@ -5,8 +5,10 @@ var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var replyService = require('../lib/reply-service');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
-describe('reply-service #slow', function() {
-  describe('service tests', function() {
+describe('reply-service', function() {
+  describe('integration tests #slow', function() {
+    fixtureLoader.disableMongoTableScans();
+
     var fixture = fixtureLoader.setup({
       user1: {},
       forum1: {},

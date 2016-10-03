@@ -38,6 +38,7 @@ Therefore:
 var TopicSchema = new Schema({
   forumId: { type: ObjectId, required: true },
   title: { type: String, required: true },
+  number: { type: Number, required: true },
   slug: { type: String, required: true },
   categoryId: { type: ObjectId, required: true },
   tags: [String],
@@ -62,6 +63,11 @@ TopicSchema.index({ categoryId: 1 });
 TopicSchema.index({ userId: 1 });
 TopicSchema.index({ lastChanged: 1 });
 TopicSchema.index({ repliesTotal: 1 });
+
+TopicSchema.index({ forumId: 1, number: 1 }, {
+  unique: true,
+  background: true
+});
 
 installVersionIncMiddleware(TopicSchema);
 
