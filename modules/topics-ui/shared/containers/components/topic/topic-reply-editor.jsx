@@ -52,7 +52,7 @@ export default React.createClass({
           <Editor
             value={editorValue}
             className="editor--reply"
-            placeholder="Your reply here. Use Markdown, BBCode, or HTML to format. Drag or paste images ..."
+            placeholder="Your reply here. Use Markdown, BBCode, or HTML to format."
             onChange={this.onChange}
             onClick={this.onEditorClick}
             onFocus={this.onEditorFocus}
