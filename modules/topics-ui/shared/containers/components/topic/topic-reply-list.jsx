@@ -1,32 +1,30 @@
 import React, { PropTypes } from 'react';
 import Container from '../container.jsx';
 import Panel from '../panel.jsx';
-import TopicReplyListItem from './topic-reply-list-item.jsx';
 
 export default React.createClass({
 
   displayName: 'TopicReplyList',
   propTypes: {
-    replies: PropTypes.array.isRequired,
+    children: PropTypes.node.isRequired,
   },
 
   render(){
-    const {replies} = this.props;
     return (
       <Container>
         <Panel className="panel--topic-reply-list">
           <ul className="topic-reply-list">
-            {replies.map((reply, i) => this.buildReplyListItem(reply, i))}
+            {this.props.children.map(this.mapChild)}
           </ul>
         </Panel>
       </Container>
     );
   },
 
-  buildReplyListItem(reply, index) {
+  mapChild(child, index) {
     return (
       <li key={`reply-list-item-${index}`}>
-        <TopicReplyListItem reply={reply} />
+        {child}
       </li>
     );
   }

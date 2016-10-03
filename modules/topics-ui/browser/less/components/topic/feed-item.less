@@ -1,0 +1,76 @@
+@import "../../colors.less";
+@import "../../text.less";
+@import (less, reference) "~gitter-styleguide/css/components/buttons.css";
+
+.feed-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.feed-item__user-details {
+  width: 5rem;
+  padding-top: .5rem;
+}
+
+.feed-item__content {
+  display: flex;
+}
+
+.feed-item__body {
+  width: 100%;
+  padding: 2rem;
+  border: 1px solid @topic-body-border-color;
+  background-color: @topic-reply-body-color;
+  font-family: @font-family;
+
+  img {
+    max-width: 100%;
+  }
+}
+
+.feed-item__footer {
+  display: flex;
+  align-items: center;
+  padding: 1rem 0 2rem 4.5rem;
+}
+
+.m-details-text() {
+  font-size: 1.2rem;
+  color: @dark;
+  text-transform: uppercase;
+  font-family: @font-family;
+  color: @topic-reply-sent-details-color;
+}
+
+.feed-item__likes {
+  .m-details-text();
+  margin-right: 1rem;
+}
+
+.feed-item__comments {
+  .m-details-text();
+  outline: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.feed-item__sent {
+  .m-details-text();
+  font-size: 1.5rem;
+}
+
+.feed-item__edit-control {
+  .m-details-text();
+  border: none;
+  background: none;
+  outline: none;
+  margin-left: auto;
+  color: @dark;
+  cursor: pointer;
+}
+
+.feed-item__avatar {
+  border-radius: .2rem;
+}
+

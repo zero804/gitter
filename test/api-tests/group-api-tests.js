@@ -31,6 +31,9 @@ describe('group-api', function() {
         { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() + '/lobby' },
         { lcUri: 'repo-group/lobby' },
         { lcUri: '_repo-group/lobby' },
+      ],
+      Forum: [
+        { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME + '/topics' }
       ]
     },
     user1: {

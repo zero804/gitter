@@ -10,6 +10,8 @@ module.exports = {
     this.currentView = view;
     view.navigable = true;
     view.show();
+
+    this.currentView.listenTo(this.currentView, 'hide-modal', this.destroy.bind(this));
   },
 
   destroy: function() {

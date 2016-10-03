@@ -9,19 +9,23 @@ import categories from '../../../../../mocks/mock-data/categories';
 
 describe('<CreateTopicModal/>', () => {
 
+  let ActiveComponent;
+  let Component;
+
   let wrapper;
   let activeWrapper;
+
   let submitHandle;
   let titleChangeHandle;
   let bodyChangeHandle;
   let tagChangeHandle;
+
   const newTopic = {
     title: '',
     body: '',
     categoryId: '1',
     tags: [],
   }
-
 
   beforeEach(() => {
 
@@ -30,7 +34,7 @@ describe('<CreateTopicModal/>', () => {
     bodyChangeHandle = sinon.spy();
     tagChangeHandle = sinon.spy();
 
-    wrapper = shallow(
+    Component = (
       <CreateTopicModal
         newTopic={newTopic}
         tags={tags}
@@ -42,7 +46,7 @@ describe('<CreateTopicModal/>', () => {
         onTagsChange={tagChangeHandle}/>
     );
 
-    activeWrapper = shallow(
+    ActiveComponent =  (
       <CreateTopicModal
         tags={tags}
         categories={categories}
@@ -53,6 +57,10 @@ describe('<CreateTopicModal/>', () => {
         onSubmit={submitHandle}
         onTagsChange={tagChangeHandle}/>
     );
+
+    wrapper = shallow(Component);
+    activeWrapper = shallow(ActiveComponent);
+
   });
 
   it('should render a modal', () => {

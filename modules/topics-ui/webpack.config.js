@@ -52,6 +52,11 @@ var config = {
       backbone: require.resolve('backbone/backbone.js'),
     }
   },
+  // Fix https://github.com/webpack/webpack/issues/1083#issuecomment-187627979
+  // Also see https://github.com/babel/babel-loader/issues/149
+  resolveLoader: {
+    root: path.join(__dirname, 'node_modules')
+  },
   plugins: [
     new ExtractTextPlugin("style.css", { allChunks: false })
   ],

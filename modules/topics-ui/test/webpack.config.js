@@ -15,6 +15,7 @@ var config = _.extend({}, webpackConfig, {
   },
   resolve: {
     alias: {
+      backbone: require.resolve('backbone/backbone.js'),
       mocha: require.resolve('mocha/mocha.js'),
       mochaCss: require.resolve('mocha/mocha.css'),
       jquery: require.resolve('jquery/dist/jquery.js'),

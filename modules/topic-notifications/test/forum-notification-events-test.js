@@ -5,7 +5,7 @@ var assert = require('assert');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var forumNotificationEvents = require('../lib/forum-notification-events');
 var subscriberService = require('../lib/subscriber-service');
-var ForumObject = require('../lib/forum-object');
+var ForumObject = require('gitter-web-topic-models/lib/forum-object');
 
 describe('forum-notification-events', function() {
 
@@ -151,7 +151,6 @@ describe('forum-notification-events', function() {
             return forumNotificationEvents.createComment(fixture.comment1);
           })
           .then(function(userIds) {
-            userIds.sort();
             assert.deepEqual(userIds.map(String), [fixture.user1.id, fixture.user2.id]);
           });
       });

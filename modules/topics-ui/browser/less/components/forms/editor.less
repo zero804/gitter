@@ -5,7 +5,7 @@
   &:extend(.h4);
 
   border: none;
-  resize: none;
+  resize: vertical;
   background: none;
 
   box-sizing: border-box;
@@ -14,8 +14,14 @@
   color:      @create-topic-body-color;
   transition: box-shadow .4s;
 
+  transition:    border-color .2s ease-in;
+
   &:focus {
     outline: none;
     box-shadow: inset 0 0 .3rem fadeout(@dark, 70%);
+  }
+
+  &.invalid {
+    border: 1px solid @invalid;
   }
 }

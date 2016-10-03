@@ -22,6 +22,7 @@ module.exports = function forumTagStore(tags, activeTagName){
   });
 
   const getTagsByLabel = (values) => {
+    values = (values || []);
     return values.map((value) => _.find(tags, (t) => t.label === value));
   }
 

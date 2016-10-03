@@ -86,6 +86,7 @@ var schemas = {
   TroupeRemovedUser: require('./schemas/troupe-removed-user-schema'),
   TroupeInvite: require('./schemas/troupe-invite-schema'),
   KnownExternalAccess: require('./schemas/known-external-access-schema'),
+  Fingerprint: require('./schemas/fingerprint-schema'),
 
   /* Topics */
   Forum: require('./schemas/forum-schema'),
@@ -94,6 +95,8 @@ var schemas = {
   Reply: require('./schemas/reply-schema'),
   Comment: require('./schemas/comment-schema'),
   ForumSubscription: require('./schemas/forum-subscription-schema'),
+  ForumReaction: require('./schemas/forum-reaction-schema'),
+  ForumNotification: require('./schemas/forum-notification-schema'),
 };
 
 module.exports = createExports(schemas);

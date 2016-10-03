@@ -1,7 +1,7 @@
 "use strict";
 
 var troupeService = require("../../services/troupe-service");
-var idStrategyGenerator = require('../id-strategy-generator');
+var idStrategyGenerator = require('gitter-web-serialization/lib/id-strategy-generator');
 var TroupeStrategy = require('./troupe-strategy');
 var TroupeIdStrategy = idStrategyGenerator('TroupeIdStrategy', TroupeStrategy, troupeService.findByIds);
 

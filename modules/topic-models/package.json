@@ -1,0 +1,19 @@
+{
+  "name": "gitter-web-topic-models",
+  "version": "1.0.0",
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha test/"
+  },
+  "dependencies": {
+    "gitter-web-live-collection-events": "file:../live-collection-events",
+    "gitter-web-persistence": "file:../persistence",
+    "gitter-web-persistence-utils": "file:../persistence-utils",
+    "lodash": "^3.2.0"
+  },
+  "private": true
+}

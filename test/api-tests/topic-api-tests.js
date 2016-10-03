@@ -137,6 +137,8 @@ describe('topic-api', function() {
       .expect(200)
       .then(function(result) {
         var topic = result.body;
+        // Any topic that you create you should be subscribed to
+        assert.strictEqual(topic.subscribed, true);
         assert.strictEqual(topic.title, 'I am a topic');
       });
   });
@@ -170,6 +172,44 @@ describe('topic-api', function() {
       .del('/v1/forums/' + fixture.forum1.id + '/topics/' + fixture.topic1.id + '/subscribers/' + fixture.user1.id)
       .set('x-access-token', fixture.user1.accessToken)
       .expect(204)
+  });
+
+  it('GET /v1/forums/:forumId/topics/:topicId/reactions', function() {
+    return request(app)
+      .get('/v1/forums/' + fixture.forum1.id + '/topics/' + fixture.topic1.id + '/reactions')
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+      .then(function(result) {
+        var body = result.body;
+        assert.deepEqual(body, {});
+      });
+  });
+
+  it('POST /v1/forums/:forumId/topics/:topicId/reactions', function() {
+    return request(app)
+      .post('/v1/forums/' + fixture.forum1.id + '/topics/' + fixture.topic1.id + '/reactions')
+      .send({
+        reaction: 'like'
+      })
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+      .then(function(result) {
+        var body = result.body;
+        assert.deepEqual(body, {
+          like: 1
+        });
+      });
+  });
+
+  it('DELETE /v1/forums/:forumId/topics/:topicId/reactions/like', function() {
+    return request(app)
+      .del('/v1/forums/' + fixture.forum1.id + '/topics/' + fixture.topic1.id + '/reactions/like')
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+      .then(function(result) {
+        var body = result.body;
+        assert.deepEqual(body, { });
+      });
   });
 
 });

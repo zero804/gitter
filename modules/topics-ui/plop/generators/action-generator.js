@@ -7,12 +7,12 @@ module.exports = function(plop){
 
   var baseConstFilePath = path.resolve(__dirname, '../../shared/constants');
   var constFiles = glob.sync(baseConstFilePath + '/**/*.js').map(function(fullPath){
-    return fullPath.replace(baseConstFilePath + '/', '');
+    return path.relative(baseConstFilePath, fullPath);
   });
 
   var baseActionCreatorsFolder = path.resolve(__dirname, '../../shared/action-creators');
   var actionCreatorFolders = glob.sync(baseActionCreatorsFolder + '/*/').map(function(folderPath){
-    return folderPath.replace(baseActionCreatorsFolder, '');
+    return path.relative(baseActionCreatorsFolder, folderPath);
   });
 
   plop.setGenerator('action', {
@@ -49,12 +49,14 @@ module.exports = function(plop){
       },
       {
         type: 'add',
-        path: path.resolve(__dirname, '../../shared/action-creators', '.' + data.actionBaseDir) + '/{{dashCase name}}.js',
+        // The plop templates don't work with backslashes :(
+        path: path.join(path.resolve(__dirname, '../../shared/action-creators', data.actionBaseDir), './{{dashCase name}}.js').replace(/\\/g, '/'),
         templateFile: path.resolve(__dirname, '../templates/action-creator.txt')
       },
       {
         type: 'add',
-        path: path.resolve(__dirname, '../../test/specs/shared/action-creators', '.' + data.actionBaseDir) + '/{{dashCase name}}-test.js',
+        // The plop templates don't work with backslashes :(
+        path: path.join(path.resolve(__dirname, '../../test/specs/shared/action-creators', data.actionBaseDir), './{{dashCase name}}-test.js').replace(/\\/g, '/'),
         templateFile: path.resolve(__dirname, '../templates/action-creator-test.txt')
       }];
 

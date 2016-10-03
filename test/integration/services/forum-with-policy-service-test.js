@@ -2,24 +2,21 @@
 
 var testRequire = require('../test-require');
 var assert = require('assert');
+var StatusError = require('statuserror');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var Promise = require('bluebird');
-var ForumWithPolicyService = testRequire('./services/forum-with-policy-service');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
-
-
-var adminPolicy = {
-  canAdmin: function() {
-    return Promise.resolve(true);
-  },
-  canWrite: function() {
-    return Promise.resolve(true);
-  }
-};
 
 describe('forum-with-policy-service #slow', function() {
   var fixture = fixtureLoader.setup({
+    // user1 is a fake member that added the things below
     user1: {},
+    // user2 is a different fake member
+    user2: {},
+    // user3 is a fake admin
+    user3: {},
+    // user4 is a normal user that's not a member of the forum
+    user4: {},
     forum1: {
       tags: ['cats', 'dogs']
     },
@@ -45,7 +42,6 @@ describe('forum-with-policy-service #slow', function() {
       category: 'category1',
       topic: 'topic1'
     },
-    /*
     comment1: {
       user: 'user1',
       forum: 'forum1',
@@ -53,135 +49,213 @@ describe('forum-with-policy-service #slow', function() {
       topic: 'topic1',
       reply: 'reply1'
     }
-    */
   });
 
-  var forumWithPolicyService;
+  var ForumWithPolicyService = testRequire.withProxies('./services/forum-with-policy-service', {
+    'gitter-web-topics/lib/forum-service': {
+      setForumTags: function() {}
+    },
+    'gitter-web-topics/lib/forum-category-service': {
+      createCategory: function() {},
+      updateCategory: function() {}
+    },
+    'gitter-web-topics/lib/topic-service': {
+      createTopic: function() {},
+      updateTopic: function() {},
+      setTopicTags: function() {},
+      setTopicSticky: function() {},
+      setTopicCategory: function() {},
+    },
+    'gitter-web-topics/lib/reply-service': {
+      createReply: function() {},
+      updateReply: function() {}
+    },
+    'gitter-web-topics/lib/comment-service': {
+      createComment: function() {},
+      updateComment: function() {}
+    },
+    'gitter-web-topic-notifications/lib/subscriber-service': {
+      listForItem: function() {},
+      addSubscriber: function() {},
+      removeSubscriber: function() {}
+    }
+  });
+
+
+  var services;
 
   before(function() {
-    forumWithPolicyService = new ForumWithPolicyService(fixture.forum1, fixture.user1, adminPolicy);
-  });
-
-  it('should allow admins to create categories', function() {
-    return forumWithPolicyService.createCategory({ name: 'foo' })
-      .then(function(category) {
-        assert.strictEqual(category.name, 'foo');
-      });
-  });
-
-  it('should allow members to create topics', function() {
-    return forumWithPolicyService.createTopic(fixture.category1, {
-        title: 'foo',
-        tags: ['cats', 'dogs'],
-        sticky: 1,
-        text: 'This is **my** story.'
+    services = {
+      owner: new ForumWithPolicyService(fixture.forum1, fixture.user1, {
+        canAdmin: function() {
+          return Promise.resolve(false);
+        },
+        canWrite: function() {
+          return Promise.resolve(true);
+        },
+        canRead: function() {
+          return Promise.resolve(true);
+        }
+      }),
+      member: new ForumWithPolicyService(fixture.forum1, fixture.user2, {
+        canAdmin: function() {
+          return Promise.resolve(false);
+        },
+        canWrite: function() {
+          return Promise.resolve(true);
+        },
+        canRead: function() {
+          return Promise.resolve(true);
+        }
+      }),
+      admin: new ForumWithPolicyService(fixture.forum1, fixture.user3, {
+        canAdmin: function() {
+          return Promise.resolve(true);
+        },
+        canWrite: function() {
+          return Promise.resolve(true);
+        },
+        canRead: function() {
+          return Promise.resolve(true);
+        }
+      }),
+      other: new ForumWithPolicyService(fixture.forum1, fixture.user4, {
+        canAdmin: function() {
+          return Promise.resolve(false);
+        },
+        canWrite: function() {
+          return Promise.resolve(false);
+        },
+        canRead: function() {
+          return Promise.resolve(true);
+        }
       })
-      .then(function(topic) {
-        assert.strictEqual(topic.title, 'foo');
-        assert(mongoUtils.objectIDsEqual(topic.categoryId, fixture.category1._id));
-        assert.deepEqual(topic.tags.slice(), ['cats', 'dogs']);
-        assert.strictEqual(topic.sticky, 1);
-        assert.strictEqual(topic.text, 'This is **my** story.');
-        assert.strictEqual(topic.html, 'This is <strong>my</strong> story.');
-      });
+    };
   });
 
-  it('should allow members to reply to topics', function() {
-    return forumWithPolicyService.createReply(fixture.topic1, {
-        text: '_Helloooo_'
-      })
-      .then(function(reply) {
-        assert(mongoUtils.objectIDsEqual(reply.userId, fixture.user1._id));
-        assert(mongoUtils.objectIDsEqual(reply.forumId, fixture.forum1._id));
-        assert(mongoUtils.objectIDsEqual(reply.topicId, fixture.topic1._id));
-        assert.strictEqual(reply.text, '_Helloooo_');
-        assert.strictEqual(reply.html, '<em>Helloooo</em>');
-      });
+  function makeCheck(type, method, getParams, expectedResult) {
+    var shouldOrNot = (expectedResult) ? ' should' : ' should not';
+    it(type + ' users' + shouldOrNot + ' be allowed to ' + method, function() {
+      var expected = !!expectedResult;
+
+      // These things have to be looked up when this function gets executed
+      // because otherwise the fixture isn't set up yet.
+      var forumWithPolicyService = services[type];
+      var params = getParams();
+
+      return forumWithPolicyService[method].apply(forumWithPolicyService, params)
+        .then(function() {
+          assert.strictEqual(expected, true);
+        })
+        .catch(StatusError, function(err) {
+          assert.strictEqual(err.status, 403);
+          assert.strictEqual(expected, false);
+        });
+    });
+  }
+
+  function makeChecks(method, params, expectedResults) {
+    // * true means the user must be allowed to do it
+    // * undefined means the user must not be allowed (403 error)
+    // * false means skip this test because it is not applicable (ie. "owning
+    //   user" makes no sense for creating things)
+
+    if (expectedResults.owner !== false) {
+      makeCheck('owner', method, params, !!expectedResults.owner);
+    }
+
+    if (expectedResults.member !== false) {
+      makeCheck('member', method, params, !!expectedResults.member);
+    }
+
+    if (expectedResults.admin !== false) {
+      makeCheck('admin', method, params, !!expectedResults.admin);
+    }
+
+    if (expectedResults.other !== false) {
+      makeCheck('other', method, params, !!expectedResults.other);
+    }
+  }
+
+  makeChecks('createCategory', function() { return [{}]; }, {
+    admin: true,
+    owner: false // skip
   });
 
-  it('should allow members to comment on replies', function() {
-    return forumWithPolicyService.createComment(fixture.reply1, {
-        text: '**hi!**'
-      })
-      .then(function(comment) {
-        assert(mongoUtils.objectIDsEqual(comment.userId, fixture.user1._id));
-        assert(mongoUtils.objectIDsEqual(comment.forumId, fixture.forum1._id));
-        assert(mongoUtils.objectIDsEqual(comment.topicId, fixture.topic1._id));
-        assert(mongoUtils.objectIDsEqual(comment.replyId, fixture.reply1._id));
-        assert.strictEqual(comment.text, '**hi!**');
-        assert.strictEqual(comment.html, '<strong>hi!</strong>');
-      });
-
+  makeChecks('createTopic', function() { return [fixture.category1, {}]; }, {
+    admin: true,
+    owner: false, // skip
+    member: true
   });
 
-  it("should allow admins to set a forum's tags", function() {
-    // deliberately making the new set a superset if the existing ones in case
-    // tests run out of order
-    var tags = ['cats', 'dogs', 'mice'];
-    return forumWithPolicyService.setForumTags(tags)
-      .then(function(forum) {
-        assert.deepEqual(forum.tags, tags);
-      });
+  makeChecks('createReply', function() { return [fixture.topic1, {}]; }, {
+    admin: true,
+    owner: false, // skip
+    member: true
   });
 
-  it("should allow members to set a topic's title", function() {
-    return forumWithPolicyService.updateTopic(fixture.topic1, { title: "foo" })
-      .then(function(topic) {
-        assert.strictEqual(topic.title, "foo");
-      });
+  makeChecks('createComment', function() { return [fixture.reply1, {}]; }, {
+    admin: true,
+    owner: false, // skip
+    member: true
   });
 
-  it("should allow members to set a topic's slug", function() {
-    return forumWithPolicyService.updateTopic(fixture.topic1, { slug: "bar" })
-      .then(function(topic) {
-        assert.strictEqual(topic.slug, "bar");
-      });
+  makeChecks('setForumTags', function() { return [[]]; }, {
+    admin: true,
+    owner: false, // skip
   });
 
-  it("should allow members to set a topic's text", function() {
-    return forumWithPolicyService.updateTopic(fixture.topic1, { text: "**baz**" })
-      .then(function(topic) {
-        assert.strictEqual(topic.text, "**baz**");
-        assert.strictEqual(topic.html, "<strong>baz</strong>");
-      });
+  makeChecks('updateTopic', function() { return [fixture.topic1, {}]; }, {
+    admin: true,
+    owner: true
   });
 
-  it("should allow members to update all the topic's core fields in one go", function() {
-    return forumWithPolicyService.updateTopic(fixture.topic2, {
-        title: 'foo',
-        slug: 'bar',
-        text: '**baz**'
-      })
-      .then(function(topic) {
-        assert.strictEqual(topic.title, 'foo');
-        assert.strictEqual(topic.slug, 'bar');
-        assert.strictEqual(topic.text, '**baz**');
-        assert.strictEqual(topic.html, '<strong>baz</strong>');
-      });
+  makeChecks('setTopicTags', function() { return [fixture.topic1, []]; }, {
+    admin: true,
+    owner: true
   });
 
-  it("should allow members to set a topic's tags", function() {
-    assert.strictEqual(fixture.topic1.tags.length, 0);
-
-    var tags = ['cats', 'dogs'];
-    return forumWithPolicyService.setTopicTags(fixture.topic1, tags)
-      .then(function(topic) {
-        assert.deepEqual(topic.tags, tags);
-      });
+  makeChecks('setTopicSticky', function() { return [fixture.topic1, 1]; }, {
+    admin: true,
   });
 
-  it("should allow members to set a topic's sticky number", function() {
-    return forumWithPolicyService.setTopicSticky(fixture.topic1, 1)
-      .then(function(topic) {
-        assert.strictEqual(topic.sticky, 1);
-      });
+  makeChecks('setTopicCategory', function() { return [fixture.topic1, fixture.category2]; }, {
+    admin: true,
+    owner: true
   });
 
-  it("should allow members to set a topic's category", function() {
-    return forumWithPolicyService.setTopicCategory(fixture.topic1, fixture.category2)
-      .then(function(topic) {
-        assert(mongoUtils.objectIDsEqual(topic.categoryId, fixture.category2._id));
-      });
+  makeChecks('updateReply', function() { return [fixture.reply1, {}]; }, {
+    admin: true,
+    owner: true
+  });
+
+  makeChecks('updateComment', function() { return [fixture.comment1, {}]; }, {
+    admin: true,
+    owner: true
+  });
+
+  makeChecks('updateCategory', function() { return [fixture.category1, {}]; }, {
+    admin: true,
+    owner: false // skip
+  });
+
+  makeChecks('listSubscribers', function() { return [{forumId: fixture.forum1.id}, {}]; }, {
+    admin: true,
+    owner: false, // skip
+  });
+
+  makeChecks('subscribe', function() { return [{forumId: fixture.forum1.id}, {}]; }, {
+    admin: true,
+    owner: false, // skip
+    member: true,
+    other: true
+  });
+
+  makeChecks('unsubscribe', function() { return [{forumId: fixture.forum1.id}, {}]; }, {
+    admin: true,
+    owner: false, // skip
+    member: true,
+    other: true
   });
 
 });

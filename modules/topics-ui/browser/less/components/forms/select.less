@@ -1,4 +1,5 @@
-@import "../../text";
+@import "../../text.less";
+@import (reference) "../../colors.less";
 
 @unicode-down-arrow: '\2023';
 
@@ -6,6 +7,13 @@
 
   position: relative;
   display: inline-block;
+  transition: color .2s ease-in;
+
+  &.invalid {
+    &:after {
+      color: @invalid;
+    }
+  }
 
   &:after{
     content:   @unicode-down-arrow;
@@ -32,4 +40,13 @@
   font-size:      1.2rem;
   color:          white;
   text-transform: uppercase;
+  transition: border-color .2s ease-in;
+
+  &.invalid {
+    border-color: @invalid;
+  }
+}
+
+.option {
+  color: @dark;
 }
