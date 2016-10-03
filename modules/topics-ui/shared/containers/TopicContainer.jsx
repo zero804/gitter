@@ -129,7 +129,7 @@ const TopicContainer = createClass({
 
 
   componentWillUnmount(){
-    const {forumStore, topicsStore, repliesStore, newReplyStore, commentsStore, newCommentStore} = this.props;
+    const {forumStore, topicsStore, repliesStore, newReplyStore, commentsStore, newCommentStore, router} = this.props;
 
     forumStore.removeListeners(this.onForumUpdate, this);
     topicsStore.removeListeners(this.onTopicsUpdate, this);
