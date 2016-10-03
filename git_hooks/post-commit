@@ -1,5 +1,5 @@
 #!/bin/bash
 
 if $(which gtm); then
-  gtm commit --yes
+  gtm commit -yes
 fi
