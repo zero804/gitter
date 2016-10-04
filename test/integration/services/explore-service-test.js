@@ -8,11 +8,17 @@ var exploreService = testRequire('./services/explore-service');
 
 
 describe('explore-service #slow', function() {
-  //fixtureLoader.disableMongoTableScans();
+  fixtureLoader.disableMongoTableScans();
 
   var fixture = fixtureLoader.setup({
     deleteDocuments: {
-      Troupe: [{tags: ['explore-test']}]
+      Troupe: [
+        {
+          tags: {
+            $in: ['explore-test']
+          }
+        }
+      ]
     },
     troupe1: {
       tags: ['explore-test']
