@@ -34,7 +34,11 @@ function groupAvatarUpdater(groupId, githubUsername) {
 
       return Group.update({
         _id: this.groupId,
-        avatarVersion: { $lt: avatarVersion }
+        $or: [{
+          avatarVersion: { $lt: avatarVersion }
+        }, {
+          avatarVersion: null
+        }]
       }, {
         $max: {
           avatarVersion: avatarVersion,
