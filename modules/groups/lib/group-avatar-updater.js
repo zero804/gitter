@@ -12,6 +12,9 @@ var redisClient = env.ioredis.createClient(config.get('redis_nopersist'), {
   keyPrefix: "avatar-check:"
 });
 
+/**
+ * Returns true iff the avatar was updated
+ */
 function groupAvatarUpdater(groupId, githubUsername) {
   return redisClient.set('group:' + groupId, '1', 'EX', LOCK_TIMEOUT_SECONDS, 'NX')
     .bind({
@@ -30,17 +33,18 @@ function groupAvatarUpdater(groupId, githubUsername) {
       if (!avatarVersion) return false;
 
       return Group.update({
-        _id: this.groupId
+        _id: this.groupId,
+        avatarVersion: { $lt: avatarVersion }
       }, {
-        $set: {
-          avatarVersion: avatarVersion
-        },
         $max: {
+          avatarVersion: avatarVersion,
           avatarCheckedDate: new Date()
         }
       })
       .exec()
-      .return(true);
+      .then(function(result) {
+        return result.nModified >= 1;
+      });
     })
 }
 
