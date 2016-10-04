@@ -1,9 +1,12 @@
 @import (less, reference) "~gitter-styleguide/css/components/buttons.css";
+@import "../../break-points";
 
 .m-category-list__item(){
   margin-right:    2rem;
   text-decoration: none;
   margin-top:      1.5rem;
+
+  @media @small { width: 100% }
 }
 
 .category-list__item {

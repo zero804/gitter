@@ -40,9 +40,9 @@
   right: 0;
 
   transform:
-    translateX(130%)
-    translateY(-20%)
-    rotateZ(-15deg);
+  translateX(130%)
+  translateY(-20%)
+  rotateZ(-15deg);
 
   display: flex;
   justify-content: center;
@@ -62,6 +62,8 @@
 .topic-search__create-topic-link {
   &:extend(.subdued-button-clouds--small all);
   .topic-search-button();
+
+  @media @small { margin: 0; }
 }
 
 .topic-search__watch-forum-button {
