@@ -58,6 +58,15 @@ describe('get-topics-filter-sort-options', function() {
       }
     }, {
       input: {
+        sort: '-likesTotal'
+      },
+      output: {
+        sort: {
+          'reactionCounts.like': -1,
+        }
+      }
+    }, {
+      input: {
         since: '2016-09-19T12:27:15.917Z',
         sort: '-lastChanged'
       },

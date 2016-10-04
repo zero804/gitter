@@ -49,7 +49,9 @@ export default React.createClass({
         <td className="topics-table-body__cell">
           {topic.repliesTotal}
         </td>
-        <td className="topics-table-body__cell">0</td>
+        <td className="topics-table-body__cell">
+          {topic.reactions.like || 0}
+        </td>
       </tr>
     );
   },

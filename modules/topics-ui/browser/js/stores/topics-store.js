@@ -21,7 +21,7 @@ import apiClient from '../utils/api-client';
 import {SUBMIT_NEW_TOPIC, TOPIC_CREATED} from '../../../shared/constants/create-topic';
 import {DEFAULT_CATEGORY_NAME, DEFAULT_TAG_NAME, DEFAULT_FILTER_NAME} from '../../../shared/constants/navigation';
 import {FILTER_BY_TOPIC} from '../../../shared/constants/forum-filters';
-import {MOST_REPLY_SORT} from '../../../shared/constants/forum-sorts';
+import {MOST_REPLY_SORT, MOST_LIKES_SORT} from '../../../shared/constants/forum-sorts';
 import {MOST_WATCHERS_SORT} from '../../../shared/constants/forum-sorts';
 import {
   UPDATE_TOPIC_SUBSCRIPTION_STATE,
@@ -383,12 +383,19 @@ export class TopicsStore {
         const sort = router.get('sortName');
 
         // At the time of writing you can only sort by number of replies,
-        // latest first or (not used by the client) most recently updated on
-        // the server.
+        // number of likes, latest first or (not used by the client) most
+        // recently updated on the server.
 
         if (sort === MOST_REPLY_SORT) {
           const repliesDiff = (b.get('repliesTotal') - a.get('repliesTotal'));
           if (repliesDiff !== 0) return repliesDiff;
+        }
+
+        if (sort === MOST_LIKES_SORT) {
+          const aLikes = (a.get('reactions') || {}).like || 0;
+          const bLikes = (b.get('reactions') || {}).like || 0;
+          const likesDiff = (bLikes - aLikes);
+          if (likesDiff !== 0) return likesDiff;
         }
 
         // assume most recent by default, by also as a secondary sort key
@@ -513,6 +520,10 @@ export class TopicsStore {
       sort.repliesTotal = -1;
     }
 
+    if (sortBy === MOST_LIKES_SORT) {
+      sort.likesTotal = -1;
+    }
+
     // sort newest first by default AND also sort that way as a secondary sort,
     // so add it on regardless
     sort.id = -1;
@@ -527,10 +538,13 @@ export class TopicsStore {
 
   getAPISort() {
     const sortBy = router.get('sortName');
-    if (sortBy === MOST_REPLY_SORT) {
-      return '-repliesTotal,-id';
-    } else {
-      return '-id';
+    switch (sortBy) {
+      case MOST_REPLY_SORT:
+        return '-repliesTotal,-id';
+      case MOST_LIKES_SORT:
+        return '-likesTotal,-id';
+      default:
+        return '-id';
     }
   }
 
