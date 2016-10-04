@@ -524,12 +524,12 @@ export class TopicsStore {
     }
 
     if (sortBy === MOST_LIKES_SORT) {
-      sort.likesTotal = -1;
+      sort['reactionCounts.like'] = -1;
     }
 
     // sort newest first by default AND also sort that way as a secondary sort,
     // so add it on regardless
-    sort.id = -1;
+    sort._id = -1;
 
     return sort;
   }
