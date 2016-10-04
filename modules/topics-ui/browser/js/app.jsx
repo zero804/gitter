@@ -103,6 +103,7 @@ export default React.createClass({
     var {router} = this.props;
     return Object.assign(this.getDefaultState(), {
       topicId: router.get('topicId'),
+      sortName: router.get('sortName'),
       topicsStore: getTopicsStore(),
       repliesStore: getRepliesStore(),
       newReplyStore: new NewReplyStore(),

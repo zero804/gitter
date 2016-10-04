@@ -34,9 +34,12 @@ export default React.createClass({
     onReactionPick: PropTypes.func,
     onCommentReactionPick: PropTypes.func,
 
+    onReplyEditClick: PropTypes.func.isRequired,
     onReplyEditUpdate: PropTypes.func.isRequired,
     onReplyEditCancel: PropTypes.func.isRequired,
     onReplyEditSaved: PropTypes.func.isRequired,
+
+    onCommentEditClick: PropTypes.func.isRequired,
     onCommentEditUpdate: PropTypes.func.isRequired,
     onCommentEditCancel: PropTypes.func.isRequired,
     onCommentEditSave: PropTypes.func.isRequired
@@ -48,9 +51,10 @@ export default React.createClass({
     return (
       <FeedItem
         item={reply}
-        onChange={this.onEditUpdate}
-        onCancel={this.onEditCancel}
-        onSave={this.onEditSaved}
+        onChange={this.onReplyEditUpdate}
+        onCancel={this.onReplyEditCancel}
+        onSave={this.onReplyEditSaved}
+        onEditClick={this.onReplyEditClick}
         footerChildren={this.getFeedItemFooterChildren()}>
         {this.getComments()}
       </FeedItem>
@@ -59,14 +63,15 @@ export default React.createClass({
 
   getFeedItemFooterChildren(){
     const {reply} = this.props;
-    const subscriptionState = reply.subscriptionState;
+    const {subscriptionState, commentsTotal} = reply;
+    const displayCommentsTotal = (commentsTotal || 0);
 
     return [
       <button
         key="comments"
         className="feed-item__comments"
         onClick={this.onCommentsClicked}>
-        2 Comments
+        {displayCommentsTotal} Comments
       </button>,
       <WatchButton
         key="subscribe"
@@ -114,7 +119,8 @@ export default React.createClass({
         onReactionPick={this.onCommentReactionPick}
         onChange={this.onCommentEditUpdate.bind(this, comment.id)}
         onCancel={this.onCommentEditCancel.bind(this, comment.id)}
-        onSave={this.onCommentEditSave.bind(this, comment.id, reply.id)}/>
+        onSave={this.onCommentEditSave.bind(this, comment.id, reply.id)}
+        onEditClick={this.onCommentEditClick.bind(this, comment.id)} />
     );
   },
 
@@ -155,22 +161,37 @@ export default React.createClass({
     this.props.submitNewComment();
   },
 
-  onEditUpdate(value){
+  onReplyEditUpdate(value){
     const {reply} = this.props;
     const {id} = reply;
     this.props.onReplyEditUpdate(id, value);
   },
 
-  onEditCancel(){
+  onReplyEditCancel(){
     const {reply} = this.props;
     const {id} = reply;
     this.props.onReplyEditCancel(id);
   },
 
-  onEditSaved(){
+  onReplyEditSaved(){
     const {reply} = this.props;
     const {id} = reply;
     this.props.onReplyEditSaved(id)
+  },
+
+  onReplyEditClick() {
+    const { reply, onReplyEditClick } = this.props;
+    const { id } = reply;
+    if(onReplyEditClick) {
+      onReplyEditClick(id);
+    }
+  },
+
+  onCommentEditClick(commentId) {
+    const { onCommentEditClick } = this.props;
+    if(onCommentEditClick) {
+      onCommentEditClick(commentId);
+    }
   },
 
   onCommentEditUpdate(commentId, value){
@@ -184,5 +205,6 @@ export default React.createClass({
   onCommentEditSave(commentId, replyId){
     this.props.onCommentEditSave(commentId, replyId);
   },
+
 
 });
