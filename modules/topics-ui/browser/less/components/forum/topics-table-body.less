@@ -1,8 +1,20 @@
-@import "../../colors.less";
 @import (less, reference) "~gitter-styleguide/css/components/headings.css";
+@import "../../colors.less";
+@import "../../break-points";
+@import "../../icons";
 
 .topics-table-body {
   background:    @light;
+
+  //Reset all the tabel-y tableness for mobile
+  @media @small {
+    display: block;
+    & > tr {
+      display: flex;
+      justify-content: space-around;
+    }
+  }
+
 }
 
 .topics-table-body__row {
@@ -18,21 +30,66 @@
   text-align: center;
   color:      @topic-table-header-color;
 
+  @mobile-padding: 2rem;
   &:first-child {
     padding-left: @panel-horiz-padding + @panel-border-width;
     text-align:   left;
     color:        @topic-table-cell-color;
+
+    //ARGGHHH NESTING
+    @media @small { padding-left: @mobile-padding; }
   }
 
   &:last-child {
     padding-right: @panel-horiz-padding + @panel-border-width;
+    @media @small { padding-right: @mobile-padding; }
   }
 
+}
+
+.topics-table-body__cell--user-list {
+  .topics-table-body__cell();
+  @media @small { display: none; }
+}
+
+.m-sudo-icon {
+  content: '';
+  width: 1.5rem;
+  height: 1.5rem;
+  display: inline-block;
+  background-repeat: no-repeat;
+  background-size: cover;
+  margin-left: .5rem;
+}
+
+.m-center-td {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.topics-table-body__cell--replies {
+  .topics-table-body__cell();
+  .m-center-td();
+  &:after {
+    &:extend(.icon-comments);
+    .m-sudo-icon();
+  }
+}
+
+.topics-table-body__cell--likes {
+  .topics-table-body__cell();
+  .m-center-td();
+  &:after {
+    &:extend(.icon-like);
+    .m-sudo-icon();
+  }
 }
 
 .topics-table-body__cell--details {
   .topics-table-body__cell();
   display: flex;
+  @media @small { flex-basis: 60%; }
 }
 
 .topics-table-body__cell__link{

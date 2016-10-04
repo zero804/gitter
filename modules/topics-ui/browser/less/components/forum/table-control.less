@@ -1,3 +1,5 @@
+@import "../../break-points";
+
 .table-control {
   list-style:      none;
   display:         flex;
@@ -6,6 +8,13 @@
   flex-wrap:       wrap;
   margin:          0;
   padding:         0;
+
+  @media @small { flex-direction: column; }
+  & > li {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
 }
 
 .tabel-control__divider {
