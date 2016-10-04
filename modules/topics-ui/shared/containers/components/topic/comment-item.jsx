@@ -13,6 +13,7 @@ export default React.createClass({
       })
     }),
     onReactionPick: PropTypes.func,
+    onEditClick: PropTypes.func.isRequired,
     onChange: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
     onSave: PropTypes.func.isRequired
@@ -23,11 +24,19 @@ export default React.createClass({
     return (
       <FeedItem
         item={comment}
+        onEditClick={this.onEditClick}
         onChange={this.onChange}
         onCancel={this.onCancel}
         onSave={this.onSave}
         footerChildren={this.getFeedItemFooterChildren()}/>
     );
+  },
+
+  onEditClick() {
+    const { onEditClick } = this.props;
+    if(onEditClick) {
+      onEditClick();
+    }
   },
 
   onChange(val){

@@ -25,8 +25,12 @@ export default React.createClass({
   renderChildRow(topic, i) {
     const {groupUri} = this.props;
     const {user, replyingUsers} = topic;
+
     return (
-      <tr className="topics-table-body__row" key={`topics-table-row-${i}`}>
+      <tr
+        key={`topics-table-row-${i}`}
+        id={topic.id}
+        className="topics-table-body__row">
         <td className="topics-table-body__cell--details">
           <UserAvatar
             className="topics-table-body__cell__avatar"

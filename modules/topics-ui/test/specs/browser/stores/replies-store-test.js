@@ -1,6 +1,5 @@
 import assert from 'assert';
 import {dispatch} from '../../../../shared/dispatcher';
-import {RepliesStore} from '../../../../browser/js/stores/replies-store';
 
 import forumStore from '../../../mocks/forum-store';
 import replies from '../../../mocks/mock-data/replies';
@@ -10,13 +9,23 @@ import navigateToTopic from '../../../../shared/action-creators/topic/navigate-t
 import updateReply from '../../../../shared/action-creators/topic/update-reply';
 import cancelUpdateReply from '../../../../shared/action-creators/topic/cancel-update-reply';
 
+import {
+  TOPIC_REPLIES_COMMENT_SORT_NAME,
+  TOPIC_REPLIES_LIKED_SORT_NAME,
+  TOPIC_REPLIES_RECENT_SORT_NAME
+} from '../../../../shared/constants/topic';
+
+import storeInjector from 'inject-loader!../../../../browser/js/stores/replies-store';
+const {RepliesStore} = storeInjector({
+  '../routers': router
+});
+
 describe('RepliesStore', () => {
 
   let store;
   beforeEach(() => {
     store = new RepliesStore(replies, {
       forumStore: forumStore,
-      router: router
     });
   });
 
@@ -43,6 +52,32 @@ describe('RepliesStore', () => {
     assert.equal(store.get('1').get('text'), null);
   });
 
-  //TODO test the save actions
+  it('should sort by comments total when the router is in the right state', () => {
+    router.set('sortName', TOPIC_REPLIES_COMMENT_SORT_NAME);
+    store.models.forEach((model, index) => {
+      const nextModel = store.at(index + 1);
+      if(!nextModel) { return; }
+      assert(model.get('commentsTotal') > nextModel.get('commentsTotal'));
+    });
+  });
+
+  it('should sort by likes total when the router is in the right state', () => {
+    router.set('sortName', TOPIC_REPLIES_LIKED_SORT_NAME);
+    store.models.forEach((model, index) => {
+      const nextModel = store.at(index + 1);
+      if(!nextModel) { return; }
+      assert(model.get('reactions').like > nextModel.get('reactions').like);
+    });
+  });
+
+  it('should sort by sent date when the router is in the right state', () => {
+    router.set('sortName', TOPIC_REPLIES_RECENT_SORT_NAME);
+    store.models.forEach((model, index) => {
+      const nextModel = store.at(index + 1);
+      if(!nextModel) { return; }
+      assert(new Date(model.get('sent')) > new Date(nextModel.get('sent')));
+    });
+  });
+
 
 });
