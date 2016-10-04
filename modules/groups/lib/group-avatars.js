@@ -6,6 +6,8 @@ var Group = require('gitter-web-persistence').Group;
 var url = require('url');
 var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs');
 var groupAvatarUpdater = require('./group-avatar-updater');
+var debug = require('debug')('gitter:app:groups:group-avatars');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 /**
  * Check on avatars once a week. In future, we may bring this
@@ -81,15 +83,22 @@ function findOnSecondaryOrPrimary(groupId) {
 }
 
 function checkForAvatarUpdate(groupId, group, githubUsername) {
+  groupId = mongoUtils.asObjectID(groupId);
+
   // No need to check github if we manage the URL ourselves
   if (group.avatarUrl) return;
 
   if (!group.avatarVersion ||
       !group.avatarCheckedDate ||
       (group.avatarCheckedDate - Date.now()) > AVATAR_VERSION_CHECK_TIMEOUT) {
+
+    debug('Attempting to fetch group avatar for groupId=%s for github user=%s', groupId, githubUsername);
     return groupAvatarUpdater(groupId, githubUsername)
       .catch(function(err) {
-        errorReporter(err, { }, { module: 'group-avatar' });
+        errorReporter(err, {
+          groupId: groupId,
+          githubUsername: githubUsername
+        }, { module: 'group-avatar' });
       })
   }
 }
