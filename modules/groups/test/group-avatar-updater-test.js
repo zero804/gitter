@@ -15,6 +15,7 @@ describe('group-avatar-updater', function() {
     });
 
     it('should update the avatar', function() {
+      var n = Date.now();
       return groupAvatarUpdater(fixture.group1._id, 'suprememoocow')
         .then(function(result) {
           assert.strictEqual(result, true);
@@ -23,7 +24,7 @@ describe('group-avatar-updater', function() {
         })
         .then(function(group1) {
           assert(group1.avatarVersion >= 3);
-          assert(group1.avatarCheckedDate >= 3);
+          assert(group1.avatarCheckedDate >= n);
         })
     });
 

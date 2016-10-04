@@ -7,7 +7,12 @@ var url = require('url');
 var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs');
 var groupAvatarUpdater = require('./group-avatar-updater');
 
-var AVATAR_VERSION_CHECK_TIMEOUT = 86400 * 1000;
+/**
+ * Check on avatars once a week. In future, we may bring this
+ * down or come up with an alternative method of looking
+ * this up.
+ */
+var AVATAR_VERSION_CHECK_TIMEOUT = 7 * 86400 * 1000;
 
 var KNOWN_AVATAR_SIZES = [
   22,
