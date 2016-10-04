@@ -1,6 +1,7 @@
 @import "../../colors.less";
 @import (less, reference) "~gitter-styleguide/css/components/buttons.css";
 @import "../../text";
+@import "../../break-points";
 
 @topic-search-horizontal-spacing: 4rem;
 
@@ -70,6 +71,11 @@
   padding: .8em 1em;
   cursor: pointer;
 
+  @media @small {
+    margin: 0;
+    margin-bottom: 1rem;
+  }
+
   &.pending:after {
     content: '';
     position: absolute;
@@ -129,4 +135,6 @@
   background-color: @search-input-bg;
   color:            @light;
   font-family: @font-family;
+
+  @media @small { display: none; }
 }

@@ -1,5 +1,9 @@
 @import "../colors";
-@import "../dims";
+@import "../break-points";
+
+@panel-horiz-padding: 4rem;
+@panel-vert-padding:  2rem;
+@panel-border-width:  1rem;
 
 .panel {
   width:      100%;
@@ -45,6 +49,10 @@
   align-items:   center;
   padding-left:  0;
   padding-right: 0;
+
+  @media @small {
+    flex-direction: column;
+  }
 }
 
 .panel--reply-list-header {
