@@ -37,8 +37,7 @@ describe('<ForumContainer />', function(){
         categoryStore={categoryStore}
         categoryName="all"
         tagStore={tagStore}
-        topicsStore={topicsStore}
-        newTopicStore={newTopicStore} />
+        topicsStore={topicsStore}/>
     );
   });
 

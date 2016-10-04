@@ -20,11 +20,15 @@ import {
   SUBSCRIPTION_STATE_PENDING,
   UPDATE_REPLY_REACTIONS
 } from '../../../shared/constants/forum.js';
+
 import {SUBMIT_NEW_REPLY} from '../../../shared/constants/create-reply';
 import {
   UPDATE_REPLY,
   CANCEL_UPDATE_REPLY,
   SAVE_UPDATE_REPLY,
+  TOPIC_REPLIES_COMMENT_SORT_NAME,
+  TOPIC_REPLIES_LIKED_SORT_NAME,
+  TOPIC_REPLIES_RECENT_SORT_NAME,
   UPDATE_REPLY_IS_EDITING
 } from '../../../shared/constants/topic';
 
@@ -74,6 +78,26 @@ export const RepliesStore = LiveCollection.extend({
     subscribe(UPDATE_REPLY_SUBSCRIPTION_STATE, this.onSubscriptionStateUpdate, this);
     subscribe(UPDATE_REPLY_REACTIONS, this.onReactionsUpdate, this);
     router.on('change:topicId', this.onActiveTopicUpdate, this);
+    router.on('change:sortName', this.sort, this);
+  },
+
+  //Sorting should be accounted for from the API
+  //TODO move to API requests like the topics-store
+  //this logic is also duplicated in server/stores/replies-store.js
+  comparator(a, b){
+    //Get the count for likes
+    const aLikeCount = ((a.get('reactions') || {}).like || 0);
+    const bLikeCount = ((b.get('reactions') || {}).like || 0);
+
+    //Do some sorting
+    switch(router.get('sortName')) {
+      case TOPIC_REPLIES_COMMENT_SORT_NAME:
+        return b.get('commentsTotal') - a.get('commentsTotal');
+      case TOPIC_REPLIES_LIKED_SORT_NAME:
+        return bLikeCount - aLikeCount;
+      case TOPIC_REPLIES_RECENT_SORT_NAME:
+        return new Date(b.get('sent')) - new Date(a.get('sent'));
+    }
   },
 
   getById(id) {
