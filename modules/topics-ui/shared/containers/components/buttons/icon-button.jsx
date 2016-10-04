@@ -38,7 +38,7 @@ export default React.createClass({
     if (type === ICONS_WATCH) { iconClassName = 'icon-button-watch'}
     if (type === ICONS_WATCH_SELECTED) { iconClassName = 'icon-button-watch-selected'}
 
-    const compiledClassName = classNames('icon-button', className, iconClassName);
+    const compiledClassName = classNames(className, iconClassName);
 
     return (
       <button
