@@ -51,10 +51,10 @@ export default React.createClass({
     return (
       <FeedItem
         item={reply}
+        onChange={this.onReplyEditUpdate}
+        onCancel={this.onReplyEditCancel}
+        onSave={this.onReplyEditSaved}
         onEditClick={this.onReplyEditClick}
-        onChange={this.onEditUpdate}
-        onCancel={this.onEditCancel}
-        onSave={this.onEditSaved}
         footerChildren={this.getFeedItemFooterChildren()}>
         {this.getComments()}
       </FeedItem>
@@ -63,14 +63,15 @@ export default React.createClass({
 
   getFeedItemFooterChildren(){
     const {reply} = this.props;
-    const subscriptionState = reply.subscriptionState;
+    const {subscriptionState, commentsTotal} = reply;
+    const displayCommentsTotal = (commentsTotal || 0);
 
     return [
       <button
         key="comments"
         className="feed-item__comments"
         onClick={this.onCommentsClicked}>
-        2 Comments
+        {displayCommentsTotal} Comments
       </button>,
       <WatchButton
         key="subscribe"
@@ -160,30 +161,30 @@ export default React.createClass({
     this.props.submitNewComment();
   },
 
+  onReplyEditUpdate(value){
+    const {reply} = this.props;
+    const {id} = reply;
+    this.props.onReplyEditUpdate(id, value);
+  },
+
+  onReplyEditCancel(){
+    const {reply} = this.props;
+    const {id} = reply;
+    this.props.onReplyEditCancel(id);
+  },
+
+  onReplyEditSaved(){
+    const {reply} = this.props;
+    const {id} = reply;
+    this.props.onReplyEditSaved(id)
+  },
+
   onReplyEditClick() {
     const { reply, onReplyEditClick } = this.props;
     const { id } = reply;
     if(onReplyEditClick) {
       onReplyEditClick(id);
     }
-  },
-
-  onEditUpdate(value) {
-    const { reply } = this.props;
-    const { id } = reply;
-    this.props.onReplyEditUpdate(id, value);
-  },
-
-  onEditCancel() {
-    const { reply } = this.props;
-    const { id } = reply;
-    this.props.onReplyEditCancel(id);
-  },
-
-  onEditSaved() {
-    const { reply } = this.props;
-    const { id } = reply;
-    this.props.onReplyEditSaved(id)
   },
 
   onCommentEditClick(commentId) {
