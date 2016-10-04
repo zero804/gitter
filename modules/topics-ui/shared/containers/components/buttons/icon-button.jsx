@@ -31,12 +31,11 @@ export default React.createClass({
 
     let iconClassName;
     if(type === ICONS_LIKE) { iconClassName = 'icon-button-like'; }
-    if(type === ICONS_LIKE_SELECTED) { iconClassName = 'icon-button-like-selected'; }
-
-    if (type === ICONS_COMMENT) { iconClassName = 'icon-button-comment'}
-    if (type === ICONS_EDIT) { iconClassName = 'icon-button-edit'}
-    if (type === ICONS_WATCH) { iconClassName = 'icon-button-watch'}
-    if (type === ICONS_WATCH_SELECTED) { iconClassName = 'icon-button-watch-selected'}
+    else if(type === ICONS_LIKE_SELECTED) { iconClassName = 'icon-button-like-selected'; }
+    else if (type === ICONS_COMMENT) { iconClassName = 'icon-button-comment'}
+    else if (type === ICONS_EDIT) { iconClassName = 'icon-button-edit'}
+    else if (type === ICONS_WATCH) { iconClassName = 'icon-button-watch'}
+    else if (type === ICONS_WATCH_SELECTED) { iconClassName = 'icon-button-watch-selected'}
 
     const compiledClassName = classNames(className, iconClassName);
 
