@@ -1,9 +1,10 @@
 import React, { PropTypes } from 'react';
+import classNames from 'classnames';
+
 import Container from '../container.jsx';
 import Panel from '../panel.jsx';
 import Editor from '../forms/editor.jsx';
 import UserAvatar from '../user/user-avatar.jsx';
-import classNames from 'classnames';
 
 import {AVATAR_SIZE_MEDIUM} from '../../../constants/avatar-sizes';
 
@@ -51,7 +52,7 @@ export default React.createClass({
           <Editor
             value={editorValue}
             className="editor--reply"
-            placeholder="Your reply here. Use Markdown, BBCode, or HTML to format. Drag or paste images ..."
+            placeholder="Your reply here. Use Markdown, BBCode, or HTML to format."
             onChange={this.onChange}
             onClick={this.onEditorClick}
             onFocus={this.onEditorFocus}

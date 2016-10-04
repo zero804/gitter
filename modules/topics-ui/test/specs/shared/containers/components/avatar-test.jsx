@@ -2,14 +2,19 @@ import {equal} from 'assert';
 import React from 'react';
 import { shallow } from 'enzyme';
 import Avatar from '../../../../../shared/containers/components/avatar.jsx';
+import {AVATAR_SIZE_SMALL} from '../../../../../shared/constants/avatar-sizes';
 
 describe('<Avatar/>', () => {
 
   let wrapper;
-  const dim = 10;
 
   beforeEach(() => {
-    wrapper = shallow(<Avatar src="test" className="test" height={dim} width={dim}/>);
+    wrapper = shallow(
+    <Avatar
+      size={AVATAR_SIZE_SMALL}
+      src="test"
+      className="test" />
+    );
   });
 
   it('should render an image element', () => {

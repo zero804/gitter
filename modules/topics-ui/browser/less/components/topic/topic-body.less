@@ -21,6 +21,7 @@
 .topic-body__footer {
   display: flex;
   justify-content: flex-end;
+  flex-direction: row-reverse;
 }
 
 .topic-body__footer__action {
@@ -28,6 +29,11 @@
   padding-left: 1.5em;
   padding-right: 1.5em;
   cursor: pointer;
+}
+
+.topic-body__footer__action--edit {
+  margin-top: @content-control-top-margin;
+  float: right;
 }
 
 .topic-body__footer__reaction-action {
@@ -40,10 +46,16 @@
 
 .topic-body__footer__subscribe-action {
   .topic-body__footer__action();
+
+  box-sizing: content-box;
+
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  flex-wrap: wrap;
+  min-height: 1em;
+  padding: .8em 1em;
+
   cursor: pointer;
 }
 
@@ -55,4 +67,13 @@
   &.hidden {
     opacity: 0;
   }
+}
+
+.topic-body__sent {
+  text-transform: uppercase;
+  font-family: @font-family;
+  color: @topic-reply-action-text-color;
+  font-size: 1.1rem;
+  float: right;
+  margin-top: @content-control-top-margin;
 }

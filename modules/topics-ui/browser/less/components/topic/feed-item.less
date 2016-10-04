@@ -15,14 +15,17 @@
 
 .feed-item__content {
   display: flex;
+  margin-bottom: 1.5rem;
 }
 
 .feed-item__body {
+  position: relative;
   width: 100%;
   padding: 2rem;
-  border: 1px solid @topic-body-border-color;
   background-color: @topic-reply-body-color;
   font-family: @font-family;
+  overflow: hidden;
+  word-wrap: break-word;
 
   .markdown-styles();
 }
@@ -30,12 +33,17 @@
 .feed-item__footer {
   display: flex;
   align-items: center;
-  padding: 1rem 0 2rem 4.5rem;
+  padding-top: 1rem;
+
+  //Skeychy but will be refactored when we refactor
+  //the feed-item/reply-list-item/comment-item components
+  button {
+    margin-right: .5rem;
+  }
 }
 
 .m-details-text() {
   font-size: 1.2rem;
-  color: @dark;
   text-transform: uppercase;
   font-family: @font-family;
   color: @topic-reply-action-text-color;
@@ -56,17 +64,22 @@
   cursor: pointer;
 }
 
+@content-control-top-margin: .5rem;
+
 .feed-item__sent {
   .m-details-text();
-  font-size: 1.5rem;
+  font-size: 1.1rem;
+  float: right;
+  margin-top: @content-control-top-margin;
 }
 
 .feed-item__edit-control {
   .m-details-text();
+  margin-top: @content-control-top-margin;
   border: none;
   background: none;
   outline: none;
-  margin-left: auto;
   color: @dark;
   cursor: pointer;
+  float: right;
 }

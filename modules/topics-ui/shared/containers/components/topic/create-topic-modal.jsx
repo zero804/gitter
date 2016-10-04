@@ -23,7 +23,8 @@ export default React.createClass({
 
     newTopic: PropTypes.shape({
       title: PropTypes.string.isRequired,
-      text: PropTypes.string.isRequired,
+      //This __can__ be undefined
+      text: PropTypes.string,
       categoryId: PropTypes.string.isRequired,
       tags: PropTypes.arrayOf(PropTypes.shape({
         label: PropTypes.string.isRequired,

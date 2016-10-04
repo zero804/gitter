@@ -48,7 +48,10 @@ import {MODEL_STATE_DRAFT, MODEL_STATE_SYNCED} from '../../../shared/constants/m
 
 const modelDefaults = {
   title: '',
-  text: '',
+  //We must use undefined here as a default
+  //if we do not when you edit a topic you get a blank editor
+  //this is beacuse blank text is valid
+  text: undefined,
   categoryId: '',
   tags: []
 };

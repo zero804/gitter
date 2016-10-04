@@ -67,6 +67,7 @@
     "require-all": "^2.0.0",
     "source-map-support": "^0.4.2",
     "style-loader": "^0.13.1",
+    "svg-url-loader": "^1.1.0",
     "webpack": "1.12.15",
     "webpack-dev-middleware": "^1.6.1"
   },
