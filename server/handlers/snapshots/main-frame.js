@@ -72,7 +72,7 @@ module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, group
     rooms: parseRoomsIntoLeftMenuRoomList(menuState, rooms, groupId),
     favourites: parseRoomsIntoLeftMenuFavouriteRoomList(menuState, rooms, groupId),
     groups: groups,
-    forum: req.fflip && req.fflip.has('topics') && menuState === 'org' && {
+    forum: menuState === 'org' && {
       hasCategories: forumCategories && forumCategories.length > 0,
       categories: forumCategories && forumCategories.map(parseCategoryForTemplate)
     }
