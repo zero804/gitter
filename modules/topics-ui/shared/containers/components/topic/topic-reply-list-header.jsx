@@ -1,4 +1,6 @@
 import React, { PropTypes } from 'react';
+import classNames from 'classnames';
+
 import Container from '../container.jsx';
 import Panel from '../panel.jsx';
 import H1 from '../text/h-1.jsx';
@@ -11,8 +13,6 @@ import {
   TOPIC_REPLIES_LIKED_SORT_NAME,
   TOPIC_REPLIES_RECENT_SORT_NAME
 } from '../../../../shared/constants/topic';
-
-import classNames from 'classnames';
 
 export default React.createClass({
 

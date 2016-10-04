@@ -2,19 +2,18 @@ import {equal} from 'assert';
 import React from 'react';
 import { mount } from 'enzyme';
 import UserAvatar from '../../../../../../shared/containers/components/user/user-avatar.jsx';
+import {AVATAR_SIZE_SMALL} from '../../../../../../shared/constants/avatar-sizes';
 
 describe('<UserAvatar/>', () => {
 
   let wrapper;
   const avatarUrl = 'test';
   const userDisplayName = 'test-name';
-  const dim = 10;
 
   beforeEach(() => {
     wrapper = mount(
       <UserAvatar
-        width={dim}
-        height={dim}
+        size={AVATAR_SIZE_SMALL}
         user={{
           avatarUrl: avatarUrl,
           displayName: userDisplayName

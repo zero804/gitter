@@ -1,7 +1,8 @@
 import React, { PropTypes } from 'react';
-import classnames from 'classnames';
+import IconButton from '../buttons/icon-button.jsx';
 
 import * as reactionConstants from '../../../constants/reactions';
+import {ICONS_LIKE, ICONS_LIKE_SELECTED} from '../../../constants/icons';
 
 export default React.createClass({
 
@@ -26,21 +27,19 @@ export default React.createClass({
   },
 
   render() {
-    const { children, className, ownStateClassName, reactionCountMap, ownReactionMap } = this.props;
-
+    const { children, reactionCountMap, ownReactionMap } = this.props;
     const likeReactionCount = reactionCountMap[reactionConstants.LIKE] || 0;
 
-    const compiledClassName = classnames({
-      [className]: true,
-      [ownStateClassName]: ownReactionMap[reactionConstants.LIKE]
-    })
+    const type = ownReactionMap[reactionConstants.LIKE] ?
+    ICONS_LIKE_SELECTED :
+    ICONS_LIKE ;
 
     return (
-      <button
-        className={compiledClassName}
+      <IconButton
+        type={type}
         onClick={this.onClick}>
-        {children || `👍 ${likeReactionCount}`}
-      </button>
+        {children || likeReactionCount}
+      </IconButton>
     );
   },
 

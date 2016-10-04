@@ -199,7 +199,7 @@ const TopicContainer = createClass({
 
   render(){
 
-    const { groupStore, categoryStore, currentUserStore, tagStore, newReplyStore} = this.props;
+    const { groupStore, categoryStore, currentUserStore, tagStore, newReplyStore } = this.props;
     const {forumId, forumSubscriptionState, sortName, replyListEditorInFocus } = this.state;
 
     const groupUri = groupStore.getGroupUri();

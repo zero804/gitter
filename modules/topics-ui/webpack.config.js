@@ -29,6 +29,10 @@ var config = {
     ],
     loaders: [
       {
+        test: /.svg$/,
+        loader: 'svg-url-loader'
+      },
+      {
         test: /.less$/,
         loader: ExtractTextPlugin.extract('style-loader', 'css-loader!less-loader'),
         include: path.resolve(__dirname, './browser/less'),

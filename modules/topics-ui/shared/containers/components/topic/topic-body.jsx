@@ -1,9 +1,13 @@
 import React, { PropTypes } from 'react';
+import moment from 'moment';
 import Container from '../container.jsx';
 import Panel from '../panel.jsx';
 import EditableContent from '../forms/editable-content.jsx';
 import WatchButton from '../forum/watch-button.jsx';
 import ReactionButton from '../forum/reaction-button.jsx';
+import IconButton from '../buttons/icon-button.jsx';
+
+import {ICONS_EDIT} from '../../../constants/icons';
 
 export default React.createClass({
 
@@ -24,33 +28,50 @@ export default React.createClass({
   },
 
   render() {
-    const { topic, onSubscribeButtonClick } = this.props;
-    const subscriptionState = topic.subscriptionState;
+    const {topic} = this.props;
+    const formattedSentDate = topic.sent && moment(topic.sent).format('MMM Do');
 
+    //Remove the share button for now as we have no current ability
+    //to share content
+    //<button className="topic-body__footer__action">Share</button>
     return (
       <Container className="container--topic-body">
         <Panel
           id={topic.id}
           className="panel--topic-body">
+          <span className="topic-body__sent">{formattedSentDate}</span>
+          {this.getEditButton()}
           {this.getContent()}
           <footer className="topic-body__footer">
-            <ReactionButton
-              key="reactions"
-              className="topic-body__footer__reaction-action"
-              reactionCountMap={topic.reactions}
-              ownReactionMap={topic.ownReactions}
-              onReactionPick={this.onReactionPick}/>
-            <button className="topic-body__footer__action">Share</button>
-            {this.getEditButton()}
-            <WatchButton
-              subscriptionState={subscriptionState}
-              className="topic-body__footer__subscribe-action"
-              itemClassName="topic-body__footer__subscribe-action-text-item"
-              onClick={onSubscribeButtonClick}/>
+            {this.getFooterButtons()}
           </footer>
         </Panel>
       </Container>
     );
+  },
+
+  getFooterButtons(){
+    const {topic, onSubscribeButtonClick} = this.props;
+    const subscriptionState = topic.subscriptionState;
+    const {isEditing} = topic;
+    if(isEditing) { return; }
+
+    return [
+
+      <WatchButton
+        key="watch"
+        subscriptionState={subscriptionState}
+        className="topic-body__footer__subscribe-action"
+        itemClassName="topic-body__footer__subscribe-action-text-item"
+        onClick={onSubscribeButtonClick}/>,
+
+        <ReactionButton
+          key="reactions"
+          className="topic-body__footer__reaction-action"
+          reactionCountMap={topic.reactions}
+          ownReactionMap={topic.ownReactions}
+          onReactionPick={this.onReactionPick}/>
+    ]
   },
 
   getEditButton() {
@@ -64,9 +85,10 @@ export default React.createClass({
     if(!canEdit) { return; }
 
     return (
-      <button
+      <IconButton
+        type={ICONS_EDIT}
         onClick={this.onEditTopicClick}
-        className="topic-body__footer__action">Edit</button>
+        className="topic-body__footer__action--edit"/>
     );
   },
 

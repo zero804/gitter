@@ -1,9 +1,9 @@
 import { parse, stringify } from 'qs';
 import Backbone from 'backbone';
 import { subscribe } from '../../../shared/dispatcher';
-import frameUtils from 'gitter-web-frame-utils';
 
 import {getIsSignedIn} from '../stores/current-user-store';
+import frameUtils from 'gitter-web-frame-utils';
 
 import * as navConstants from '../../../shared/constants/navigation';
 import * as forumCatConstants from '../../../shared/constants/forum-categories';
