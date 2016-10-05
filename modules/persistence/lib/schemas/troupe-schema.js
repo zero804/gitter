@@ -75,8 +75,22 @@ module.exports = {
     TroupeSchema.index({ lcOwner: 1 });
     TroupeSchema.index({ ownerUserId: 1 });
     TroupeSchema.index({ lcUri: 1 }, { unique: true, sparse: true });
+    TroupeSchema.index({ tags: 1})
 
     TroupeSchema.index({ "oneToOneUsers.userId": 1 });
+
+    TroupeSchema.extraIndices = [{
+      keys: {
+        'sd.public': 1,
+        'tags': 1
+      },
+      options: {
+        background: true,
+        partialFilterExpression: {
+          'sd.public': { $eq: true }
+        }
+      }
+    }];
 
     installVersionIncMiddleware(TroupeSchema);
 
