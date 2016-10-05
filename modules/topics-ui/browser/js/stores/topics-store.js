@@ -105,6 +105,9 @@ export const TopicModel = BaseModel.extend({
     unsubscribe(SUBMIT_NEW_TOPIC, this.onRequestSave, this);
   },
 
+  //TODO, quite frankly and at myslef, this is stupid. <-- @cutandpastey
+  //TODO Remove ALL listeners from models and ONLY have the operations take
+  //place in the parent collection.
   onChangeState(){
     this.clearSystemListeners();
     //Initialize any draft listeners such that we can update the draft model
@@ -330,6 +333,8 @@ export const TopicsLiveCollection = LiveCollection.extend({
   //Remove a draft model
   removeDraftItems(){
     const models = this.filter((model) => model.get('state') === MODEL_STATE_DRAFT);
+    //TODO Remove this when events get moved into here
+    models.forEach((model) => model.clearSystemListeners());
     this.remove(models);
   }
 
