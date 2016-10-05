@@ -3,7 +3,7 @@ import frameUtils from 'gitter-web-frame-utils';
 
 export default function requestSignIn(source = 'topics') {
   frameUtils.postMessage({
-    type: 'route-silent',
+    type: 'route',
     hash: 'login',
     args: [
       `source=${source}&returnTo=CURRENT`
