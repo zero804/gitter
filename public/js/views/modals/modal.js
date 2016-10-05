@@ -179,7 +179,7 @@ var ModalView = Marionette.LayoutView.extend({
   hide: function (e) {
     if(e) e.preventDefault();
     if(this.navigable) {
-      this.trigger('hide-modal');
+      window.location = '#';
       return;
     }
     this.hideInternal();
