@@ -30,7 +30,7 @@ export default React.createClass({
     }));
     return {
       value: this.props.value,
-      shouldShowTypeAhead: true,
+      shouldShowTypeAhead: false,
       activeCompletions: completions,
       allCompletions: completions,
     };
@@ -58,8 +58,9 @@ export default React.createClass({
 
   getCompletions(){
     const {value, shouldShowTypeAhead} = this.state;
+    console.log(value, '<--');
     if(!shouldShowTypeAhead) { return; }
-    if(!value || !value.length) { return; }
+    if((!value || !value.length) && (value !== undefined && value !== '')) { return; }
 
     const { activeCompletions } = this.state;
     if(!activeCompletions.length) { return; }
