@@ -59,11 +59,7 @@ export default React.createClass({
   getCompletions(){
     const {value, shouldShowTypeAhead} = this.state;
     if(!shouldShowTypeAhead) { return; }
-    const trimmedValue = value.trim();
-
-    //In the undefined or "" case we want to show all completions
-    if((!trimmedValue || !trimmedValue.length)
-      && (trimmedValue !== undefined && trimmedValue !== '')) { return; }
+    if(value === null) { return; }
 
     const { activeCompletions } = this.state;
     if(!activeCompletions.length) { return; }
