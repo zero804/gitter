@@ -81,7 +81,6 @@ module.exports = {
 
     TroupeSchema.extraIndices = [{
       keys: {
-        'sd.public': 1,
         'tags': 1
       },
       options: {
