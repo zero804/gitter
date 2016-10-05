@@ -1,6 +1,7 @@
 'use strict';
 
 var Marionette = require('backbone.marionette');
+var appEvents = require('../../../../utils/appevents');
 var parseForTemplate = require('gitter-web-shared/parse/forum-category-item');
 
 var template = require('./category-item-view.hbs');
@@ -21,6 +22,11 @@ module.exports = Marionette.ItemView.extend({
   ui: {
     link: '.js-left-menu-forum-category-item-link'
   },
+
+  events: {
+    'click': 'onActivate',
+  },
+
 
   initialize: function() {
     this.listenTo(this.model, 'change:focus', this.onModelChangeFocus, this);
@@ -51,4 +57,11 @@ module.exports = Marionette.ItemView.extend({
     this.el.classList.remove('focus');
     this.ui.link.blur();
   },
+
+  onActivate: function(e) {
+    var data = parseForTemplate(this.model.toJSON());
+    appEvents.trigger('navigation', data.url, 'chat', 'Topics - ' + this.model.get('name'))
+
+    e.preventDefault();
+  }
 });
