@@ -20,7 +20,7 @@ var moduleConfig = _.extend({}, (webpackConfig.module || {}), {
     {
       // Fix via https://github.com/webpack/webpack/issues/177#issuecomment-151916287
       test: /sinon\.js$/,
-      loader: "imports?define=>false,require=>false"
+      loader: 'imports?define=>false,require=>false'
     }
   ])
 });
