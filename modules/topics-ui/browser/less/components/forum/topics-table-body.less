@@ -70,19 +70,32 @@
 
 .topics-table-body__cell--replies {
   .topics-table-body__cell();
-  .m-center-td();
+
   &:after {
     &:extend(.icon-comments);
     .m-sudo-icon();
+    //Hide the icons on larger screens
+    display: none;
+  }
+
+  @media @small {
+    .m-center-td();
+    &:after { display: inline-block; }
   }
 }
 
 .topics-table-body__cell--likes {
   .topics-table-body__cell();
-  .m-center-td();
+
   &:after {
     &:extend(.icon-like);
     .m-sudo-icon();
+    display: none;
+  }
+
+  @media @small {
+    .m-center-td();
+    &:after { display: inline-block; }
   }
 }
 

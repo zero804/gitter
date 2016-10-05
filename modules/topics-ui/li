@@ -1,0 +1,10 @@
+browser/less/colors.less:20:17:@topic-container-table-control-bg: fadeout(@light, 90%);
+browser/less/components/container.less:19:12:.container--table-control {
+browser/less/components/container.less:20:37:  background-color: @topic-container-table-control-bg;
+browser/less/components/container.less:24:37:  background-color: @topic-container-table-control-bg;
+browser/less/components/container.less:28:37:  background-color: @topic-container-table-control-bg;
+browser/less/components/forum/table-control.less:3:1:.table-control {
+browser/less/components/forum/table-control.less:24:1:.table-control__select {
+browser/less/components/panel.less:38:8:.panel--table-control {
+browser/less/index.less:47:28:@import "./components/forum/table-control";
+browser/less/index.less:48:28:@import "./components/forum/table-control-button";
