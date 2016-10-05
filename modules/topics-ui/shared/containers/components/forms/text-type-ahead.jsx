@@ -58,7 +58,6 @@ export default React.createClass({
 
   getCompletions(){
     const {value, shouldShowTypeAhead} = this.state;
-    console.log(value, '<--');
     if(!shouldShowTypeAhead) { return; }
     if((!value || !value.length) && (value !== undefined && value !== '')) { return; }
 
