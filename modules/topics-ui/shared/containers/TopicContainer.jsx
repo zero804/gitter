@@ -56,7 +56,6 @@ const TopicContainer = createClass({
   propTypes: {
 
     topicId: PropTypes.string.isRequired,
-    groupUri: PropTypes.string.isRequired,
     sortName: PropTypes.oneOf([
       TOPIC_REPLIES_POPULAR_SORT_NAME,
       TOPIC_REPLIES_COMMENT_SORT_NAME,
