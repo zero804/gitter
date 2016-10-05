@@ -9,6 +9,8 @@
   width:      100%;
   box-sizing: border-box;
   padding:    @panel-vert-padding @panel-horiz-padding;
+
+  @media @small { padding: 2rem; }
 }
 
 @decal-height:       1rem;
@@ -61,4 +63,5 @@
 
 .panel--topic-reply-list {
   background-color: @topic-reply-list-header-bg;
+  @media @small { padding: 2rem; }
 }
