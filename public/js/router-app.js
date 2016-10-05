@@ -283,12 +283,12 @@ onready(function() { // eslint-disable-line max-statements
         window.location.hash = '#' + message.hash;
         break;
 
-      case 'route-silent':
-        var routeCb = router.routes[message.hash];
-        if(routeCb) {
-          routeCb.apply(router, message.args);
-        }
-        break;
+      // case 'route-silent':
+      //   var routeCb = router.routes[message.hash];
+      //   if(routeCb) {
+      //     routeCb.apply(router, message.args);
+      //   }
+      //   break;
 
       //when the chat app requests the room list send it
       case 'request:roomList':
