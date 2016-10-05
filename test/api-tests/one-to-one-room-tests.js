@@ -5,6 +5,7 @@ process.env.DISABLE_API_LISTEN = '1';
 var Promise = require('bluebird');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assert = require('assert');
+var unreadItemsEngine = require('../../server/services/unread-items/engine');
 
 describe('one-to-one-rooms', function() {
   var app, request;
@@ -35,7 +36,14 @@ describe('one-to-one-rooms', function() {
       .set('x-access-token', fixture.user1.accessToken)
       .expect(200)
       .then(function(res) {
-        var roomId = res.body.id;
+        return res;
+      })
+      .bind({
+        roomId: null,
+        chatId: null
+      })
+      .then(function(res) {
+        var roomId = this.roomId = res.body.id;
         assert(roomId);
 
         return request(app)
@@ -46,6 +54,27 @@ describe('one-to-one-rooms', function() {
       .then(function(res) {
         var body = res.body;
         assert.strictEqual(body.mode, 'all');
+
+        return request(app)
+          .post('/v1/rooms/' + this.roomId + '/chatMessages')
+          .send({
+            text: 'Hello in a one-to-one'
+          })
+          .set('x-access-token', fixture.user1.accessToken)
+          .expect(200);
+      })
+      .delay(1000) // Unread item distribution is async
+      .then(function(res) {
+        this.chatId = res.body.id;
+        var since = Date.now();
+        return unreadItemsEngine.listTroupeUsersForEmailNotifications(since, 60);
+      })
+      .then(function(result) {
+        // User2 has email notifications
+        assert(result[fixture.user2.id]);
+
+        // User2 will be notified of the new chat in the one-to-one
+        assert.deepEqual(result[fixture.user2.id][this.roomId], [this.chatId]);
       })
   });
 
