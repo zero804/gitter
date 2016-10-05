@@ -103,6 +103,7 @@ var Router = Backbone.Router.extend({
       createTopic: false,
       sortName: (query.sort || topicConstants.TOPIC_REPLY_SORT_DEFAULT_NAME)
     });
+    window.scrollTo(0, 0);
   },
 
   navigateToCreateTopic(data) {
