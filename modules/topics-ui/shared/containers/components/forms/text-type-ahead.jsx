@@ -59,8 +59,6 @@ export default React.createClass({
   getCompletions(){
     const {value, shouldShowTypeAhead} = this.state;
     if(!shouldShowTypeAhead) { return; }
-    if(value === null) { return; }
-
     const { activeCompletions } = this.state;
     if(!activeCompletions.length) { return; }
 
