@@ -107,9 +107,9 @@ export default React.createClass({
     this.props.onSubmit(val);
   },
 
-  onInputChange(val){
+  onInputChange(val = ''){
     this.setState((state) => Object.assign(state, {
-      value: val,
+      value: val.trim(),
       activeCompletions: state.allCompletions.filter((c) => fuzzysearch(val, c.value)),
     }));
   },
