@@ -4,15 +4,42 @@ var testRequire = require('../test-require');
 var assert = require('assert');
 var Promise = require('bluebird');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
+var roomMembershipFlags = testRequire('./services/room-membership-flags');
+var userDefaultFlagsService = testRequire('./services/user-default-flags-service');
+var userDefaultFlagsUpdateService = testRequire('./services/user-default-flags-update-service');
 
 describe('user-default-flags', function() {
+  describe('useOneToOneDefaultWhenMute', function() {
+    var FIXTURES = [{
+      name: 'all', flags: roomMembershipFlags.MODES.all, expected: roomMembershipFlags.MODES.all
+    }, {
+      name: 'annoucement', flags: roomMembershipFlags.MODES.all, expected: roomMembershipFlags.MODES.all
+    }, {
+      name: 'mute', flags: roomMembershipFlags.MODES.mute, expected: roomMembershipFlags.DEFAULT_ONE_TO_ONE_FLAGS_WHEN_MUTE
+    }];
+
+    describe('without default flag', function() {
+      FIXTURES.forEach(function(meta) {
+        it(meta.name, function() {
+          var result = userDefaultFlagsService.testOnly.useOneToOneDefaultWhenMute(meta.flags);
+          assert.strictEqual(result, meta.expected);
+        });
+      });
+    });
+
+    describe('strips off the default flag', function() {
+      FIXTURES.forEach(function(meta) {
+        it(meta.name, function() {
+          var flags = roomMembershipFlags.addDefaultFlag(meta.flags);
+          var result = userDefaultFlagsService.testOnly.useOneToOneDefaultWhenMute(flags);
+          assert.strictEqual(result, meta.expected);
+        });
+      });
+    });
+  });
 
   describe('#slow', function() {
     var fixture = {};
-
-    var userDefaultFlagsService = testRequire('./services/user-default-flags-service');
-    var roomMembershipFlags = testRequire('./services/room-membership-flags');
-    var userDefaultFlagsUpdateService = testRequire('./services/user-default-flags-update-service');
 
     before(fixtureLoader(fixture, {
       user1: { },
