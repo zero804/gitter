@@ -1,4 +1,5 @@
 @import "../colors";
+@import "../break-points";
 
 .modal { display: none; }
 
@@ -21,6 +22,11 @@
   min-width:  66rem;
   max-width:  100%;
   min-height: 25%;
+
+  @media @small {
+    min-width: auto;
+    padding: 0 2rem;
+  }
 }
 
 .modal__close-btn {
