@@ -15,9 +15,9 @@ var ForumReactionSchema = new Schema({
 
 ForumReactionSchema.schemaTypeName = 'ForumReactionSchema';
 
-ForumReactionSchema.index({ topicId: 1 });
-ForumReactionSchema.index({ replyId: 1 });
-ForumReactionSchema.index({ commentId: 1 });
+ForumReactionSchema.index({ topicId: 1 }, { background: true });
+ForumReactionSchema.index({ replyId: 1 }, { background: true });
+ForumReactionSchema.index({ commentId: 1 }, {background: true });
 
 ForumReactionSchema.index({
   userId: 1,
