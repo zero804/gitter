@@ -15,6 +15,10 @@ var ForumNotificationSchema = new Schema({
 
 ForumNotificationSchema.schemaTypeName = 'ForumNotificationSchema';
 
+ForumNotificationSchema.index({ topicId: 1 });
+ForumNotificationSchema.index({ replyId: 1 });
+ForumNotificationSchema.index({ commentId: 1 });
+
 ForumNotificationSchema.index({
   userId: 1,
   forumId: 1,

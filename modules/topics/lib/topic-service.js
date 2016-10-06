@@ -12,6 +12,8 @@ var ForumCategory = persistence.ForumCategory;
 var Reply = persistence.Reply;
 var Comment = persistence.Comment;
 var ForumSubscription = persistence.ForumSubscription;
+var ForumNotification = persistence.ForumNotification;
+var ForumReaction = persistence.ForumReaction;
 var User = persistence.User;
 var debug = require('debug')('gitter:app:topics:topic-service');
 var processText = require('gitter-web-text-processor');
@@ -416,6 +418,8 @@ function deleteTopic(user, topic) {
     Reply.remove({ topicId: topicId }).exec(),
     Comment.remove({ topicId: topicId }).exec(),
     ForumSubscription.remove({ topicId: topicId}).exec(),
+    ForumNotification.remove({ topicId: topicId}).exec(),
+    ForumReaction.remove({ topicId: topicId}).exec(),
     function() {
       stats.event('delete_topic', {
         userId: userId,

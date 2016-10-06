@@ -217,9 +217,9 @@ ForumWithPolicyService.prototype.updateCategory = secureMethod([matchForum, allo
 /**
  * Deleting things
  */
-ForumWithPolicyService.prototype.deleteTopic = matchForum(secureMethod([allowOwner, allowAdmin], function(topic) {
+ForumWithPolicyService.prototype.deleteTopic = secureMethod([matchForum, allowOwner, allowAdmin], function(topic) {
   return topicService.deleteTopic(this.user, topic);
-}));
+});
 
 /**
  * Subscription bits
