@@ -8,8 +8,6 @@ var exploreService = testRequire('./services/explore-service');
 
 
 describe('explore-service #slow', function() {
-  fixtureLoader.disableMongoTableScans();
-
   var fixture = fixtureLoader.setup({
     deleteDocuments: {
       Troupe: [
@@ -31,6 +29,8 @@ describe('explore-service #slow', function() {
   });
 
   it('should only find public troupes', function() {
+    fixtureLoader.disableMongoTableScans();
+
     return exploreService.fetchByTags(['explore-test'])
       .then(function(rooms) {
         // it should only find the public troupe

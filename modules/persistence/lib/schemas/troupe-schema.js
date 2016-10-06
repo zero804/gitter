@@ -75,7 +75,6 @@ module.exports = {
     TroupeSchema.index({ lcOwner: 1 });
     TroupeSchema.index({ ownerUserId: 1 });
     TroupeSchema.index({ lcUri: 1 }, { unique: true, sparse: true });
-    TroupeSchema.index({ tags: 1})
 
     TroupeSchema.index({ "oneToOneUsers.userId": 1 });
 
