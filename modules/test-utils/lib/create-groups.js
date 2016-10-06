@@ -31,6 +31,7 @@ function createGroup(fixtureName, f) {
     lcUri: uri.toLowerCase(),
     avatarUrl: f.avatarUrl || null,
     avatarVersion: avatarVersion,
+    avatarCheckedDate: f.avatarCheckedDate,
     forumId: forumId
   };
 

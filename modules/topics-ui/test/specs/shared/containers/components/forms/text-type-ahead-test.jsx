@@ -39,7 +39,7 @@ describe('<TextTypeAhead/>', () => {
     equal(wrapper.find('li').length, 1, 'failed to render the li\'s');
   });
 
-  it('should call onChange when TAB is pressed', () => {
+  it('should call onSubmit when TAB is pressed', () => {
     mockEvent.keyCode = DOWN_KEY;
     wrapper.find('.type-ahead-wrapper').simulate('keyDown', mockEvent);
     mockEvent.keyCode = TAB_KEY;
@@ -47,7 +47,7 @@ describe('<TextTypeAhead/>', () => {
     equal(changeHandle.callCount, 1);
   });
 
-  it('should call onChange when ENTER is pressed', () => {
+  it('should call onSubmit when ENTER is pressed', () => {
     mockEvent.keyCode = DOWN_KEY;
     wrapper.find('.type-ahead-wrapper').simulate('keyDown', mockEvent);
     mockEvent.keyCode = ENTER_KEY;
@@ -55,11 +55,11 @@ describe('<TextTypeAhead/>', () => {
     equal(changeHandle.callCount, 1);
   });
 
-  it.skip('should call onChange when a type ahead item is clicked', () => {
+  it('should call onSubmit when a type ahead item is clicked', () => {
     mockEvent.keyCode = DOWN_KEY;
     wrapper.find('.type-ahead-wrapper').simulate('keyDown', mockEvent);
     wrapper.find('Input').at(0).prop('onChange')('test');
-    wrapper.find('li').at(0).simulate('click', mockEvent);
+    wrapper.find('li').at(0).simulate('mouseDown', mockEvent);
     equal(changeHandle.callCount, 1);
   });
 

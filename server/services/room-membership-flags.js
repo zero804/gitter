@@ -72,7 +72,7 @@ var MODES = {
 MODES.mention = MODES.announcement;
 
 var DEFAULT_USER_FLAGS = MODES.all | BITMASK_NOTIFY_DEFAULT;
-var DEFAULT_ONE_TO_ONE_FLAGS = MODES.announcement;
+var DEFAULT_ONE_TO_ONE_FLAGS_WHEN_MUTE = MODES.announcement;
 
 function getModeFromFlags(flags, strict) {
   switch(flags & BITMASK_MODE) {
@@ -217,6 +217,10 @@ function hashToFlags(hash) {
     (hash.mobile ? BITMASK_NOTIFY_MOBILE : 0);
 }
 
+function addDefaultFlag(flags) {
+  return flags | BITMASK_NOTIFY_DEFAULT;
+}
+
 function removeDefaultFlag(flags) {
   return flags & BITMASK_NO_NOTIFY_DEFAULT;
 }
@@ -224,7 +228,7 @@ function removeDefaultFlag(flags) {
 module.exports = {
   MODES: MODES,
   DEFAULT_USER_FLAGS: DEFAULT_USER_FLAGS,
-  DEFAULT_ONE_TO_ONE_FLAGS: DEFAULT_ONE_TO_ONE_FLAGS,
+  DEFAULT_ONE_TO_ONE_FLAGS_WHEN_MUTE: DEFAULT_ONE_TO_ONE_FLAGS_WHEN_MUTE,
 
   FLAG_POS_NOTIFY_UNREAD: FLAG_POS_NOTIFY_UNREAD,
   FLAG_POS_NOTIFY_ACTIVITY: FLAG_POS_NOTIFY_ACTIVITY,
@@ -252,5 +256,6 @@ module.exports = {
   flagsToHash: flagsToHash,
   hashToFlags: hashToFlags,
 
+  addDefaultFlag: addDefaultFlag,
   removeDefaultFlag: removeDefaultFlag
 };

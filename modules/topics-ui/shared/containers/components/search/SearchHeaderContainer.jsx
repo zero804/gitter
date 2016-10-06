@@ -11,6 +11,7 @@ export default React.createClass({
   displayName: 'SearchHeaderContainer',
   propTypes: {
     groupUri: PropTypes.string.isRequired,
+    groupName: PropTypes.string,
     subscriptionState: PropTypes.oneOf([
       SUBSCRIPTION_STATE_SUBSCRIBED,
       SUBSCRIPTION_STATE_UNSUBSCRIBED,
@@ -19,11 +20,12 @@ export default React.createClass({
   },
 
   render(){
-    const {groupUri, subscriptionState } = this.props;
+    const {groupUri, groupName, subscriptionState } = this.props;
 
     return (
       <SearchHeader
         groupUri={groupUri}
+        groupName={groupName}
         subscriptionState={subscriptionState}
         onSubscribeButtonClick={this.onSubscribeButtonClick}/>
     );

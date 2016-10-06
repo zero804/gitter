@@ -1,6 +1,6 @@
 import {equal} from 'assert';
 import React from 'react';
-import { shallow } from 'enzyme';
+import { mount } from 'enzyme';
 import TopicBody from '../../../../../../shared/containers/components/topic/topic-body.jsx';
 import topics from '../../../../../mocks/mock-data/topics';
 
@@ -10,7 +10,7 @@ describe('<TopicBody/>', () => {
   const topic = topics[0];
 
   beforeEach(() => {
-    wrapper = shallow(<TopicBody topic={topic}/>);
+    wrapper = mount(<TopicBody topic={topic}/>);
   });
 
   it('should render a container', () => {
@@ -31,6 +31,10 @@ describe('<TopicBody/>', () => {
 
   it('should render a .topic-body__content', () => {
     equal(wrapper.find('.topic-body__content').length, 1);
+  });
+
+  it('should render a ReactionButton', () => {
+     equal(wrapper.find('ReactionButton').length, 1);
   });
 
 });

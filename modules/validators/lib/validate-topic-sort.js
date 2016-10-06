@@ -4,6 +4,7 @@ var KNOWN_SORT_KEYS = [
   '_id',
   'lastChanged',
   'repliesTotal',
+  'reactionCounts.like',
 ];
 
 function validateTopicSort(sort) {
