@@ -24,7 +24,8 @@ export default React.createClass({
     onEditTopicClick: PropTypes.func.isRequired,
     onTopicEditUpdate: PropTypes.func.isRequired,
     onTopicEditCancel: PropTypes.func.isRequired,
-    onTopicEditSave: PropTypes.func.isRequired
+    onTopicEditSave: PropTypes.func.isRequired,
+    onTopicDelete: PropTypes.func.isRequired
   },
 
   render() {
@@ -103,6 +104,7 @@ export default React.createClass({
         onChange={this.onTopicEditUpdate}
         onSave={this.onTopicEditSave}
         onCancel={this.onTopicEditCancel}
+        onDelete={this.onTopicDelete}
         isEditing={isEditing} />
     );
   },
@@ -121,6 +123,10 @@ export default React.createClass({
 
   onTopicEditCancel(){
     this.props.onTopicEditCancel();
+  },
+
+  onTopicDelete() {
+    this.props.onTopicDelete();
   },
 
   onReactionPick(reactionKey, isReacting) {

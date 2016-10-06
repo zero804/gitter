@@ -10,10 +10,12 @@ import TopicReplyListHeader from './components/topic/topic-reply-list-header.jsx
 import TopicReplyList from './components/topic/topic-reply-list.jsx';
 import TopicReplyListItem from './components/topic/topic-reply-list-item.jsx';
 
+import navigateToForums from '../action-creators/forum/navigate-to-forums';
 import updateTopic from '../action-creators/topic/update-topic';
 import updateCancelTopic from '../action-creators/topic/update-cancel-topic';
 import updateSaveTopic from '../action-creators/topic/update-save-topic';
 import updateTopicIsEditing from '../action-creators/topic/update-topic-is-editing';
+import deleteTopic from '../action-creators/topic/delete-topic';
 import requestUpdateTopicSubscriptionState from '../action-creators/forum/request-update-topic-subscription-state';
 import requestUpdateReplySubscriptionState from '../action-creators/forum/request-update-reply-subscription-state';
 import requestUpdateTopicReactions from '../action-creators/forum/request-update-topic-reactions';
@@ -245,7 +247,8 @@ const TopicContainer = createClass({
             onEditTopicClick={this.onEditTopicClick}
             onTopicEditUpdate={this.onTopicEditUpdate}
             onTopicEditCancel={this.onTopicEditCancel}
-            onTopicEditSave={this.onTopicEditSave}/>
+            onTopicEditSave={this.onTopicEditSave}
+            onTopicDelete={this.onTopicDelete} />
         </article>
 
         <TopicReplyListHeader
@@ -478,6 +481,11 @@ const TopicContainer = createClass({
   onTopicEditSave(){
     dispatch(updateSaveTopic());
     dispatch(updateTopicIsEditing(false));
+  },
+
+  onTopicDelete() {
+    dispatch(deleteTopic());
+    dispatch(navigateToForums());
   },
 
   onSortByCommentClicked(){
