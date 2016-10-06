@@ -28,15 +28,23 @@
   padding: 1rem 0 2rem 0;
 }
 
-.editable-content__cancel {
+.editable-content__secondary-button() {
   &:extend(.secondary-button-pampas--small all);
+  margin-left: 2em;
+  margin-right: 2em;
+  padding-left: 1.5em;
+  padding-right: 1.5em;
   cursor: pointer;
 }
 
+.editable-content__cancel {
+  .editable-content__secondary-button();
+}
+
 .editable-content__delete {
-  &:extend(.secondary-button-pampas--small all);
+  .editable-content__secondary-button();
   position: relative;
-  cursor: pointer;
+  margin-left: 0;
 
   @delete-tooltip-transform-positioning: translateX(-50%) translateY(-110%);
   &:before {
