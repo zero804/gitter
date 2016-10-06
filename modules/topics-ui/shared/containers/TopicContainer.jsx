@@ -31,11 +31,13 @@ import showReplyComments from '../action-creators/topic/show-reply-comments';
 import updateReply from '../action-creators/topic/update-reply';
 import cancelUpdateReply from '../action-creators/topic/cancel-update-reply';
 import saveUpdatedReply from '../action-creators/topic/save-update-reply';
+import deleteReply from '../action-creators/topic/delete-reply';
 import updateReplyIsEditing from '../action-creators/topic/update-reply-is-editing';
 
 import updateComment from '../action-creators/topic/update-comment.js';
 import updateCancelComment from '../action-creators/topic/update-cancel-comment.js';
 import updateSaveComment from '../action-creators/topic/update-save-comment.js';
+import deleteComment from '../action-creators/topic/delete-comment.js';
 import topicReplySortByComments from '../action-creators/topic/topic-replies-sort-by-comments';
 import topicReplySortByLike from '../action-creators/topic/topic-replies-sort-by-liked';
 import topicReplySortByRecent from '../action-creators/topic/topic-replies-sort-by-recent';
@@ -297,10 +299,12 @@ const TopicContainer = createClass({
         onReplyEditUpdate={this.onReplyEditUpdate}
         onReplyEditCancel={this.onReplyEditCancel}
         onReplyEditSaved={this.onReplyEditSaved}
+        onReplyDelete={this.onReplyDelete}
         onCommentEditUpdate={this.onCommentEditUpdate}
         onCommentEditCancel={this.onCommentEditCancel}
         onCommentEditSave={this.onCommentEditSave}
-        onCommentEditClick={this.onCommentEditClick} />
+        onCommentEditClick={this.onCommentEditClick}
+        onCommentDelete={this.onCommentDelete} />
     );
   },
 
@@ -447,6 +451,10 @@ const TopicContainer = createClass({
     dispatch(updateReplyIsEditing(replyId, false));
   },
 
+  onReplyDelete(replyId){
+    dispatch(deleteReply(replyId));
+  },
+
   onCommentEditClick(commentId) {
     dispatch(updateCommentIsEditing(commentId, true));
   },
@@ -462,7 +470,11 @@ const TopicContainer = createClass({
 
   onCommentEditSave(commentId, replyId){
     dispatch(updateSaveComment(commentId, replyId));
-      dispatch(updateCommentIsEditing(commentId, false));
+    dispatch(updateCommentIsEditing(commentId, false));
+  },
+
+  onCommentDelete(commentId, replyId){
+    dispatch(deleteComment(commentId, replyId));
   },
 
   onEditTopicClick() {

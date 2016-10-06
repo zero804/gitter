@@ -24,7 +24,10 @@ export default React.createClass({
   },
 
   getDefaultProps(){
-    return { isEditing: false, value: '' }
+    return {
+      isEditing: false,
+      value: ''
+    };
   },
 
   getInitialState() {
