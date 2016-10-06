@@ -23,7 +23,7 @@
 
 .editable-content__footer {
   display: flex;
-  flex-direction: row-reverse;
+  justify-content: flex-end;
   align-items: center;
   padding: 1rem 0 2rem 0;
 }
@@ -31,6 +31,42 @@
 .editable-content__cancel {
   &:extend(.secondary-button-pampas--small all);
   cursor: pointer;
+}
+
+.editable-content__delete {
+  &:extend(.secondary-button-pampas--small all);
+  position: relative;
+  cursor: pointer;
+
+  @delete-tooltip-transform-positioning: translateX(-50%) translateY(-110%);
+  &:before {
+    content: 'Are you sure?';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: @delete-tooltip-transform-positioning scale(.7);
+
+    padding: .2em 1em;
+
+    opacity: 0;
+    background-color: fade(@dark, 60%);
+    border-radius: .3em;
+
+    color: fade(@light, 85%);
+    font-size: .9em;
+    white-space: nowrap;
+
+    transition:
+      transform .2s ease,
+      opacity .2s ease;
+  }
+
+  &.confirming {
+    &:before {
+      opacity: 1;
+      transform: @delete-tooltip-transform-positioning scale(1);
+    }
+  }
 }
 
 .editable-content__save {

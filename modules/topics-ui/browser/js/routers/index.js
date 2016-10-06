@@ -5,6 +5,7 @@ import { subscribe } from '../../../shared/dispatcher';
 import {getIsSignedIn} from '../stores/current-user-store';
 import frameUtils from 'gitter-web-frame-utils';
 
+import { NAVIGATE_TO_FORUMS } from '../../../shared/constants/forum';
 import * as navConstants from '../../../shared/constants/navigation';
 import * as forumCatConstants from '../../../shared/constants/forum-categories';
 import * as forumFilterConstants from '../../../shared/constants/forum-filters';
@@ -29,6 +30,7 @@ var Router = Backbone.Router.extend({
   constructor: function() {
     this.model = new RouteModel();
 
+    subscribe(NAVIGATE_TO_FORUMS, this.navigateToForums, this);
     subscribe(forumCatConstants.NAVIGATE_TO_CATEGORY, this.updateForumCategory, this);
     subscribe(forumFilterConstants.NAVIGATE_TO_FILTER, this.updateForumFilter, this);
     subscribe(forumTagConstants.NAVIGATE_TO_TAG, this.updateForumTag, this);
@@ -106,20 +108,6 @@ var Router = Backbone.Router.extend({
     window.scrollTo(0, 0);
   },
 
-  navigateToCreateTopic(data) {
-    const { source } = data;
-
-    if(getIsSignedIn()) {
-      const groupUri = this.model.get('groupUri');
-      this.navigate(`/${groupUri}/topics/create-topic/~topics`, { trigger: true });
-    }
-    else {
-      requestSignIn(source);
-      return;
-    }
-
-  },
-
   updateForumCategory(data){
     var url = this.buildForumUrl(data.category);
     this.navigate(url, { trigger: true });
@@ -146,6 +134,25 @@ var Router = Backbone.Router.extend({
 
   onSortUpdate(model, val){
     this.model.trigger(forumSortConstants.UPDATE_ACTIVE_SORT, { sort: val });
+  },
+
+  navigateToForums() {
+    var url = this.buildForumUrl();
+    this.navigate(url, { trigger: true });
+  },
+
+  navigateToCreateTopic(data) {
+    const { source } = data;
+
+    if(getIsSignedIn()) {
+      const groupUri = this.model.get('groupUri');
+      this.navigate(`/${groupUri}/topics/create-topic/~topics`, { trigger: true });
+    }
+    else {
+      requestSignIn(source);
+      return;
+    }
+
   },
 
   navigateToTopicRepliesSortByComments({topicId, slug}){

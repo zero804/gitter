@@ -2,6 +2,8 @@ export const UPDATE_TOPIC = 'update-topic';
 export const UPDATE_CANCEL_TOPIC = 'update-cancel-topic';
 export const UPDATE_SAVE_TOPIC = 'update-save-topic';
 export const UPDATE_TOPIC_IS_EDITING = 'update-is-editing-topic';
+export const DELETE_TOPIC = 'delete-topic';
+
 
 export const SHOW_REPLY_COMMENTS = 'show-reply-comments';
 export const UPDATE_REPLY = 'update-reply';
@@ -25,3 +27,6 @@ export const TOPIC_REPLIES_RECENT_SORT_NAME = 'recent';
 //TODO THIS MAY CHANGE ONCE WE HAVE THE POPULAR METRICS
 export const TOPIC_REPLY_SORT_DEFAULT_NAME = 'popular';
 export const UPDATE_COMMENT_IS_EDITING = 'update-is-editing-comment';
+
+export const DELETE_STATE_VOID = 'delete-state-void';
+export const DELETE_STATE_FIRST_ENCOUNTER = 'delete-state-first-encounter';

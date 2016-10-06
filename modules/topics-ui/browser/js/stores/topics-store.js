@@ -41,6 +41,7 @@ import {
   UPDATE_TOPIC,
   UPDATE_CANCEL_TOPIC,
   UPDATE_SAVE_TOPIC,
+  DELETE_TOPIC,
   UPDATE_TOPIC_IS_EDITING
 } from '../../../shared/constants/topic';
 
@@ -239,6 +240,7 @@ export const TopicsLiveCollection = LiveCollection.extend({
     subscribe(UPDATE_TOPIC, this.onTopicUpdate, this);
     subscribe(UPDATE_CANCEL_TOPIC, this.onTopicEditCancel, this);
     subscribe(UPDATE_SAVE_TOPIC, this.onTopicEditSaved, this);
+    subscribe(DELETE_TOPIC, this.onTopicDelete, this);
     subscribe(UPDATE_TOPIC_IS_EDITING, this.onTopicIsEditingUpdate, this);
     this.listenTo(router, 'change:createTopic', this.onCreateTopicChange, this);
 
@@ -303,6 +305,12 @@ export const TopicsLiveCollection = LiveCollection.extend({
     const text = model.get('text');
     if(!text) { return; }
     model.save({ text: model.get('text') }, { patch: true });
+  },
+
+  onTopicDelete() {
+    const topicId = router.get('topicId');
+    const model = this.get(topicId);
+    model.destroy();
   },
 
   onTopicIsEditingUpdate({ isEditing }) {
