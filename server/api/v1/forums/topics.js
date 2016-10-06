@@ -2,7 +2,6 @@
 
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
-var internalClientAccessOnly = require('../../../web/middlewares/internal-client-access-only');
 var forumCategoryService = require('gitter-web-topics/lib/forum-category-service');
 var topicService = require('gitter-web-topics/lib/topic-service');
 var getTopicsFilterSortOptions = require('gitter-web-topics/lib/get-topics-filter-sort-options');
@@ -114,11 +113,6 @@ module.exports = {
     var user = req.user;
     var forum = req.forum;
     var policy = req.userForumPolicy;
-
-    // This is for internal clients only
-    if (!internalClientAccessOnly.isRequestFromInternalClient(req)) {
-      throw new StatusError(404);
-    }
 
     if (!user) throw new StatusError(401);
 
