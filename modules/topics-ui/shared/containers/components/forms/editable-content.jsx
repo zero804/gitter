@@ -19,11 +19,11 @@ export default React.createClass({
     isEditing: PropTypes.bool,
     onChange: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
-    onDelete: PropTypes.func.isRequired,
     onSave: PropTypes.func.isRequired,
+    onDelete: PropTypes.func.isRequired,
   },
 
-  getDefaultProps(){
+  getDefaultProps() {
     return {
       isEditing: false,
       value: ''
@@ -98,7 +98,7 @@ export default React.createClass({
           </button>
           <button
             className={compiledDeleteButtonClass}
-            onClick={this.onDeleteClicked}
+            onClick={this.onDeleteClick}
             onBlur={this.onDeleteBlur}>
             Delete
           </button>
@@ -121,7 +121,7 @@ export default React.createClass({
     this.props.onCancel();
   },
 
-  onDeleteClicked(e) {
+  onDeleteClick(e) {
     const { onDelete } = this.props;
     const { deleteState } = this.state;
 
