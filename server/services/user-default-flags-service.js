@@ -47,18 +47,21 @@ function getDefaultFlagsForUserId(userId) {
  * If the user has their default set to mute,
  * make the one-to-one room annoucement
  */
-function useAnnouncementModeIfMute(flags) {
-  if (flags & roomMembershipFlags.MODES.mute) {
-    return roomMembershipFlags.DEFAULT_ONE_TO_ONE_FLAGS;
+function useOneToOneDefaultWhenMute(flags) {
+  flags = roomMembershipFlags.removeDefaultFlag(flags);
+
+  // Beware `===` has higher operator precendence than `&`!
+  if ((flags & roomMembershipFlags.MODES.mute) === flags) {
+    return roomMembershipFlags.DEFAULT_ONE_TO_ONE_FLAGS_WHEN_MUTE;
   } else {
-    return roomMembershipFlags.removeDefaultFlag(flags);
+    return flags;
   }
 }
 
 function getDefaultFlagsOneToOneForUserId(userId) {
   return getDefaultFlagsForUserId(userId)
     .then(function(defaultFlags) {
-      return useAnnouncementModeIfMute(defaultFlags);
+      return useOneToOneDefaultWhenMute(defaultFlags);
     });
 }
 
@@ -81,7 +84,7 @@ function getDefaultOneToOneFlagsForUserIds(userIds) {
   return getDefaultFlagsForUserIds(userIds)
     .then(function(resultHash) {
       Object.keys(resultHash).forEach(function(userId) {
-        resultHash[userId] = useAnnouncementModeIfMute(resultHash[userId]);
+        resultHash[userId] = useOneToOneDefaultWhenMute(resultHash[userId]);
       })
       return resultHash;
     })
@@ -133,5 +136,7 @@ module.exports = {
 
   getDefaultFlagsOneToOneForUserId: getDefaultFlagsOneToOneForUserId,
   getDefaultOneToOneFlagsForUserIds: getDefaultOneToOneFlagsForUserIds,
-
+  testOnly: {
+    useOneToOneDefaultWhenMute: useOneToOneDefaultWhenMute
+  }
 };
