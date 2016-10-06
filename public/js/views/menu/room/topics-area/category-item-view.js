@@ -60,8 +60,11 @@ module.exports = Marionette.ItemView.extend({
 
   onActivate: function(e) {
     var data = parseForTemplate(this.model.toJSON());
-    appEvents.trigger('navigation', data.url, 'chat', 'Topics - ' + this.model.get('name'))
+    appEvents.trigger('navigation', data.url, 'topics', 'Topics - ' + this.model.get('name'))
 
     e.preventDefault();
+    // This is needed to stop the `link-handler` from reloading the whole page :/
+    // Not sure how the rest of the left menu links keep from getting called there
+    e.stopPropagation();
   }
 });
