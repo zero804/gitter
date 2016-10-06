@@ -417,9 +417,9 @@ function deleteTopic(user, topic) {
     Topic.remove({ _id: topicId }).exec(),
     Reply.remove({ topicId: topicId }).exec(),
     Comment.remove({ topicId: topicId }).exec(),
-    ForumSubscription.remove({ topicId: topicId}).exec(),
-    ForumNotification.remove({ topicId: topicId}).exec(),
-    ForumReaction.remove({ topicId: topicId}).exec(),
+    ForumSubscription.remove({ topicId: topicId }).exec(),
+    ForumNotification.remove({ topicId: topicId }).exec(),
+    ForumReaction.remove({ topicId: topicId }).exec(),
     function() {
       stats.event('delete_topic', {
         userId: userId,
