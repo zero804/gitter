@@ -81,7 +81,11 @@ module.exports = {
 
     TroupeSchema.extraIndices = [{
       keys: {
-        'tags': 1
+        'tags': 1,
+        // interesting: we have to include sd.public here even though it is
+        // always going to be true otherwise mongo complains
+        //Error: key sd.public must not contain '.'
+        'sd.public': 1
       },
       options: {
         background: true,
