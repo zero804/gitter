@@ -1,0 +1,41 @@
+@import (reference) "../../colors.less";
+@import (reference) "../topic/feed-item.less";
+
+
+.reaction-button {
+  .m-details-text();
+
+  display: inline-block;
+  vertical-align: middle;
+  padding: .2em .5em;
+  background-color: transparent;
+  border: 1px solid currentColor;
+  border-radius: .2em;
+
+  cursor: pointer;
+
+  transition:
+    background-color .2s ease,
+    color .2s ease;
+
+  &:hover,
+  &:focus {
+    outline: none;
+    background-color: rgba(255, 255, 255, .25);
+    color: @caribbean;
+
+  	animation-name: reaction-button-pulse;
+  	animation-duration: .4s;
+  	animation-timing-function: ease-in;
+  }
+
+  &.has-reaction {
+    background-color: fade(@caribbean, 20%);
+  }
+}
+
+@keyframes reaction-button-pulse {
+	50% {
+  		box-shadow: 0 0 0 .5em rgba(0, 0, 0, .03);
+	}
+}

@@ -23,7 +23,8 @@ export default React.createClass({
 
     newTopic: PropTypes.shape({
       title: PropTypes.string.isRequired,
-      text: PropTypes.string.isRequired,
+      //This __can__ be undefined
+      text: PropTypes.string,
       categoryId: PropTypes.string.isRequired,
       tags: PropTypes.arrayOf(PropTypes.shape({
         label: PropTypes.string.isRequired,
@@ -73,7 +74,7 @@ export default React.createClass({
               name="test"
               placeholder="Add tags ..."
               className="create-topic__input--tags"
-              onSubmit={this.onTagsChange}
+              onSubmit={this.onTagsTypeaheadSubmit}
               completions={tagValues} />
           </div>
           {this.getTagsRow()}
@@ -108,7 +109,9 @@ export default React.createClass({
   getTagRowChild(tag, i){
     return (
       <li key={`tag-row-child-${tag.value}-${i}`}>
-        <button className="create-topic__tags__child">
+        <button
+          className="create-topic__tags__child"
+          onClick={this.onTagClick.bind(this, tag.value)}>
           {tag.label}
         </button>
       </li>
@@ -136,8 +139,13 @@ export default React.createClass({
     this.props.onCategoryChange(val);
   },
 
-  onTagsChange(tag){
-    this.props.onTagsChange(tag);
+  onTagsTypeaheadSubmit(tag) {
+    this.props.onTagsChange(tag, true);
+  },
+
+  onTagClick(tag, e) {
+    this.props.onTagsChange(tag, false);
+    e.preventDefault();
   }
 
 

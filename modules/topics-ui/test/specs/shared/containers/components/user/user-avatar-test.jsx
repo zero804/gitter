@@ -2,19 +2,18 @@ import {equal} from 'assert';
 import React from 'react';
 import { mount } from 'enzyme';
 import UserAvatar from '../../../../../../shared/containers/components/user/user-avatar.jsx';
+import {AVATAR_SIZE_SMALL} from '../../../../../../shared/constants/avatar-sizes';
 
 describe('<UserAvatar/>', () => {
 
   let wrapper;
   const avatarUrl = 'test';
   const userDisplayName = 'test-name';
-  const dim = 10;
 
   beforeEach(() => {
     wrapper = mount(
       <UserAvatar
-        width={dim}
-        height={dim}
+        size={AVATAR_SIZE_SMALL}
         user={{
           avatarUrl: avatarUrl,
           displayName: userDisplayName
@@ -32,14 +31,6 @@ describe('<UserAvatar/>', () => {
 
   it('should render an avatar--user class', () => {
     equal(wrapper.find('.avatar--user').length, 1);
-  });
-
-  it('should set a passed height', () => {
-    equal(wrapper.find('img').at(0).prop('height'), dim);
-  });
-
-  it('should set a passed width', () => {
-    equal(wrapper.find('img').at(0).prop('width'), dim);
   });
 
 });

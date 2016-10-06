@@ -10,7 +10,7 @@ export default React.createClass({
       <thead className="topics-table-header">
         <tr>
           <th className="topics-table-header__cell">Topic</th>
-          <th className="topics-table-header__cell">Users</th>
+          <th className="topics-table-header__cell--user">Users</th>
           <th className="topics-table-header__cell">Replies</th>
           <th className="topics-table-header__cell">Likes</th>
         </tr>

@@ -5,7 +5,6 @@ import dipatchOnChangeMixin from './mixins/dispatch-on-change';
 
 const NewReplyStore = ReplyModel.extend({
   defaults: {},
-  events: [ 'change:text' ],
   initialize() {
     subscribe(BODY_UPDATE, this.onReplyBodyUpdate, this);
     subscribe(SUBMIT_NEW_REPLY, this.onReplySubmit, this);
@@ -25,6 +24,9 @@ const NewReplyStore = ReplyModel.extend({
 
 });
 
-dipatchOnChangeMixin(NewReplyStore);
+dipatchOnChangeMixin(NewReplyStore, ['change:text'], {
+  // We need synchronous updates so the cursor is managed properly
+  delay: 0
+});
 
 export default NewReplyStore;

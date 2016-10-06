@@ -13,12 +13,11 @@ describe('<TopicReplyListItem/>', () => {
   let wrapper;
   let reply = replies[0];
   reply.formattedSentDate = 'SEPT 14th';
-  const newCommentContent = '';
 
   let commentsClickedHandle;
   let commentUpdateHandle;
   let submitNewCommentHandle;
-  let submitCommentHandle;
+
 
   let onReplyEdit;
   let onReplyCancel;
@@ -36,7 +35,6 @@ describe('<TopicReplyListItem/>', () => {
     commentUpdateHandle = spy();
     commentsClickedHandle = spy();
     commentUpdateHandle = spy();
-    submitCommentHandle = spy();
     onReplyEdit = spy();
     onReplyCancel = spy();
     onReplySave = spy();
@@ -61,6 +59,10 @@ describe('<TopicReplyListItem/>', () => {
     );
   });
 
+  it('should render a FeedItem', () => {
+    equal(wrapper.find('FeedItem').length, 1);
+  });
 
+  it('should render FeedItem with these footer actions');
 
 });

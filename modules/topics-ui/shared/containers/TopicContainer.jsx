@@ -10,6 +10,17 @@ import TopicReplyListHeader from './components/topic/topic-reply-list-header.jsx
 import TopicReplyList from './components/topic/topic-reply-list.jsx';
 import TopicReplyListItem from './components/topic/topic-reply-list-item.jsx';
 
+import updateTopic from '../action-creators/topic/update-topic';
+import updateCancelTopic from '../action-creators/topic/update-cancel-topic';
+import updateSaveTopic from '../action-creators/topic/update-save-topic';
+import updateTopicIsEditing from '../action-creators/topic/update-topic-is-editing';
+import requestUpdateTopicSubscriptionState from '../action-creators/forum/request-update-topic-subscription-state';
+import requestUpdateReplySubscriptionState from '../action-creators/forum/request-update-reply-subscription-state';
+import requestUpdateTopicReactions from '../action-creators/forum/request-update-topic-reactions';
+import requestUpdateReplyReactions from '../action-creators/forum/request-update-reply-reactions';
+import requestUpdateCommentReactions from '../action-creators/forum/request-update-comment-reactions';
+import requestSignIn from '../action-creators/forum/request-sign-in';
+
 import updateReplyBody from '../action-creators/create-reply/body-update';
 import submitNewReply from '../action-creators/create-reply/submit-new-reply';
 import updateCommentBody from '../action-creators/create-comment/body-update';
@@ -18,17 +29,24 @@ import showReplyComments from '../action-creators/topic/show-reply-comments';
 import updateReply from '../action-creators/topic/update-reply';
 import cancelUpdateReply from '../action-creators/topic/cancel-update-reply';
 import saveUpdatedReply from '../action-creators/topic/save-update-reply';
+import updateReplyIsEditing from '../action-creators/topic/update-reply-is-editing';
+
 import updateComment from '../action-creators/topic/update-comment.js';
 import updateCancelComment from '../action-creators/topic/update-cancel-comment.js';
 import updateSaveComment from '../action-creators/topic/update-save-comment.js';
-import updateTopic from '../action-creators/topic/update-topic';
-import updateCancelTopic from '../action-creators/topic/update-cancel-topic';
-import updateSaveTopic from '../action-creators/topic/update-save-topic';
-import requestUpdateTopicSubscriptionState from '../action-creators/forum/request-update-topic-subscription-state';
-import requestUpdateReplySubscriptionState from '../action-creators/forum/request-update-reply-subscription-state';
-import requestSignIn from '../action-creators/forum/request-sign-in';
+import topicReplySortByComments from '../action-creators/topic/topic-replies-sort-by-comments';
+import topicReplySortByLike from '../action-creators/topic/topic-replies-sort-by-liked';
+import topicReplySortByRecent from '../action-creators/topic/topic-replies-sort-by-recent';
+import updateCommentIsEditing from '../action-creators/topic/update-comment-is-editing';
 
 import { SUBSCRIPTION_STATE_SUBSCRIBED } from '../constants/forum.js';
+import {
+  TOPIC_REPLIES_POPULAR_SORT_NAME,
+  TOPIC_REPLIES_COMMENT_SORT_NAME,
+  TOPIC_REPLIES_LIKED_SORT_NAME,
+  TOPIC_REPLIES_RECENT_SORT_NAME
+} from '../constants/topic';
+
 const EDITOR_SUBMIT_LINK_SOURCE = 'topics-reply-editor-submit-button';
 const EDITOR_CLICK_LINK_SOURCE = 'topics-reply-editor-click';
 
@@ -38,7 +56,23 @@ const TopicContainer = createClass({
   propTypes: {
 
     topicId: PropTypes.string.isRequired,
-    groupUri: PropTypes.string.isRequired,
+    sortName: PropTypes.oneOf([
+      TOPIC_REPLIES_POPULAR_SORT_NAME,
+      TOPIC_REPLIES_COMMENT_SORT_NAME,
+      TOPIC_REPLIES_LIKED_SORT_NAME,
+      TOPIC_REPLIES_RECENT_SORT_NAME
+    ]).isRequired,
+
+    router: PropTypes.shape({
+      on: PropTypes.func.isRequired,
+      off: PropTypes.func.isRequired,
+    }),
+
+    //Group
+    groupStore: PropTypes.shape({
+      getGroupUri: PropTypes.func.isRequired,
+      getGroupName: PropTypes.func.isRequired
+    }).isRequired,
 
     //Forum
     forumStore: React.PropTypes.shape({
@@ -84,7 +118,7 @@ const TopicContainer = createClass({
   },
 
   componentDidMount(){
-    const {forumStore, topicsStore, repliesStore, newReplyStore, commentsStore, newCommentStore} = this.props;
+    const {forumStore, topicsStore, repliesStore, newReplyStore, commentsStore, newCommentStore, router} = this.props;
 
     forumStore.onChange(this.onForumUpdate, this);
     topicsStore.onChange(this.onTopicsUpdate, this);
@@ -94,11 +128,12 @@ const TopicContainer = createClass({
 
     newCommentStore.onChange(this.updateNewComment, this);
     newReplyStore.onChange(this.updateNewReplyContent, this);
+    router.on('change:sortName', this.onSortUpdate, this);
   },
 
 
   componentWillUnmount(){
-    const {forumStore, topicsStore, repliesStore, newReplyStore, commentsStore, newCommentStore} = this.props;
+    const {forumStore, topicsStore, repliesStore, newReplyStore, commentsStore, newCommentStore, router} = this.props;
 
     forumStore.removeListeners(this.onForumUpdate, this);
     topicsStore.removeListeners(this.onTopicsUpdate, this);
@@ -108,6 +143,7 @@ const TopicContainer = createClass({
 
     newCommentStore.removeListeners(this.updateNewComment, this);
     newReplyStore.removeListeners(this.updateNewReplyContent, this);
+    router.off('change:sortName', this.onSortUpdate, this);
   },
 
   getInitialState() {
@@ -117,6 +153,8 @@ const TopicContainer = createClass({
       forumSubscriptionState: forumStore.getSubscriptionState(),
       topic: topicsStore.getById(topicId),
       newReplyContent: '',
+      sortName: this.props.sortName,
+      replyListEditorInFocus: false,
     };
   },
 
@@ -160,8 +198,11 @@ const TopicContainer = createClass({
 
   render(){
 
-    const { categoryStore, currentUserStore, tagStore, groupUri, newReplyStore} = this.props;
-    const {forumId, forumSubscriptionState } = this.state;
+    const { groupStore, categoryStore, currentUserStore, tagStore, newReplyStore } = this.props;
+    const {forumId, forumSubscriptionState, sortName, replyListEditorInFocus } = this.state;
+
+    const groupUri = groupStore.getGroupUri();
+    const groupName = groupStore.getGroupName();
 
     const newReplyContent = newReplyStore.getTextContent();
     const topic = this.getParsedTopic();
@@ -188,6 +229,7 @@ const TopicContainer = createClass({
           userId={userId}
           forumId={forumId}
           groupUri={groupUri}
+          groupName={groupName}
           subscriptionState={forumSubscriptionState}/>
         <article>
           <TopicHeader
@@ -195,48 +237,79 @@ const TopicContainer = createClass({
             category={category}
             groupUri={groupUri}
             tags={tags}/>
+
           <TopicBody
             topic={topic}
+            onSubscribeButtonClick={this.onTopicSubscribeButtonClick}
+            onReactionPick={this.onTopicReactionPick}
+            onEditTopicClick={this.onEditTopicClick}
             onTopicEditUpdate={this.onTopicEditUpdate}
             onTopicEditCancel={this.onTopicEditCancel}
             onTopicEditSave={this.onTopicEditSave}/>
         </article>
-        <TopicReplyListHeader replies={parsedReplies}/>
-        <TopicReplyList>
+
+        <TopicReplyListHeader
+          replies={parsedReplies}
+          sortName={sortName}
+          onSortByCommentClicked={this.onSortByCommentClicked}
+          onSortByLikeClicked={this.onSortByLikeClicked}
+          onSortByRecentClicked={this.onSortByRecentClicked}
+          replyListEditorInFocus={replyListEditorInFocus}/>
+
+        <TopicReplyList
+          replyListEditorInFocus={replyListEditorInFocus}>
           {parsedReplies.map(this.getReplyListItem)}
         </TopicReplyList>
+
         <TopicReplyEditor
           user={currentUser}
           isSignedIn={isSignedIn}
           value={newReplyContent}
           onChange={this.onNewReplyEditorUpdate}
           onSubmit={this.onNewReplyEditorSubmit}
+          onFocus={this.onReplyEditorFocus}
+          onBlur={this.onReplyEditorBlur}
+          replyListEditorInFocus={replyListEditorInFocus}
           onEditorClick={this.onReplyEditorClick}/>
       </main>
     );
   },
-
 
   getReplyListItem(reply, index){
     const {newCommentStore, currentUserStore } = this.props;
     const currentUser = currentUserStore.getCurrentUser();
     return (
       <TopicReplyListItem
-        reply={reply}
         key={`topic-reply-list-item-${reply.id}-${index}`}
+        reply={reply}
         user={currentUser}
         newCommentContent={newCommentStore.get('text')}
-        onCommentsClicked={this.onReplyCommentsClicked}
-        onNewCommentUpdate={this.onNewCommentUpdate}
         submitNewComment={this.submitNewComment}
+        onNewCommentUpdate={this.onNewCommentUpdate}
+        onCommentsClicked={this.onCommentsClicked}
+        onSubscribeButtonClick={this.onReplySubscribeButtonClick}
+        onReactionPick={this.onReplyReactionPick}
+        onCommentReactionPick={this.onCommentReactionPick}
+        onReplyEditClick={this.onReplyEditClick}
         onReplyEditUpdate={this.onReplyEditUpdate}
         onReplyEditCancel={this.onReplyEditCancel}
         onReplyEditSaved={this.onReplyEditSaved}
         onCommentEditUpdate={this.onCommentEditUpdate}
         onCommentEditCancel={this.onCommentEditCancel}
         onCommentEditSave={this.onCommentEditSave}
-        onSubscribeButtonClick={this.onTopicSubscribeButtonClick} />
+        onCommentEditClick={this.onCommentEditClick} />
     );
+  },
+
+  onReplyEditorFocus(){
+    this.setState((state) => Object.assign({}, state, {
+      replyListEditorInFocus: true,
+    }));
+  },
+  onReplyEditorBlur(){
+    this.setState((state) => Object.assign({}, state, {
+      replyListEditorInFocus: false,
+    }));
   },
 
   onNewReplyEditorUpdate(val){
@@ -298,6 +371,11 @@ const TopicContainer = createClass({
   updateComments(){ this.forceUpdate(); },
   updateNewComment(){ this.forceUpdate(); },
   updateTopics() { this.forceUpdate(); },
+  onSortUpdate(router, sortName){
+    this.setState((state) => Object.assign({}, state, {
+      sortName: sortName
+    }))
+  },
 
   onTopicSubscribeButtonClick() {
     const { topicsStore, topicId } = this.props;
@@ -307,10 +385,8 @@ const TopicContainer = createClass({
     dispatch(requestUpdateTopicSubscriptionState(topicId, desiredIsSubscribed));
   },
 
-
   onReplySubscribeButtonClick(e, replyId) {
     const { repliesStore } = this.props;
-
     const reply = repliesStore.getById(replyId);
     const subscriptionState = reply.subscriptionState;
     const desiredIsSubscribed = (subscriptionState !== SUBSCRIPTION_STATE_SUBSCRIBED);
@@ -318,7 +394,22 @@ const TopicContainer = createClass({
     dispatch(requestUpdateReplySubscriptionState(replyId, desiredIsSubscribed));
   },
 
-  onReplyCommentsClicked(replyId){
+  onTopicReactionPick(topicId, reactionKey, isReacting) {
+    // TODO: dispatch event and listen in `forum-client`
+    dispatch(requestUpdateTopicReactions(topicId, reactionKey, isReacting));
+  },
+
+  onReplyReactionPick(replyId, reactionKey, isReacting) {
+    // TODO: dispatch event and listen in `forum-client`
+    dispatch(requestUpdateReplyReactions(replyId, reactionKey, isReacting));
+  },
+
+  onCommentReactionPick(replyId, commentId, reactionKey, isReacting) {
+    // TODO: dispatch event and listen in `forum-client`
+    dispatch(requestUpdateCommentReactions(replyId, commentId, reactionKey, isReacting));
+  },
+
+  onCommentsClicked(replyId){
     dispatch(showReplyComments(replyId));
   },
 
@@ -332,9 +423,12 @@ const TopicContainer = createClass({
     const text = newCommentStore.get('text');
     //Dont submit blank content
     if(!text) { return; }
-    dispatch(submitNewComment(newCommentStore.get('replyId'), text ));
+    dispatch(submitNewComment(newCommentStore.get('replyId'), text));
   },
 
+  onReplyEditClick(replyId) {
+    dispatch(updateReplyIsEditing(replyId, true));
+  },
 
   onReplyEditUpdate(replyId, value){
     dispatch(updateReply(replyId, value));
@@ -342,10 +436,16 @@ const TopicContainer = createClass({
 
   onReplyEditCancel(replyId) {
     dispatch(cancelUpdateReply(replyId));
+    dispatch(updateReplyIsEditing(replyId, false));
   },
 
   onReplyEditSaved(replyId){
     dispatch(saveUpdatedReply(replyId));
+    dispatch(updateReplyIsEditing(replyId, false));
+  },
+
+  onCommentEditClick(commentId) {
+    dispatch(updateCommentIsEditing(commentId, true));
   },
 
   onCommentEditUpdate(commentId, value){
@@ -354,10 +454,16 @@ const TopicContainer = createClass({
 
   onCommentEditCancel(commentId) {
     dispatch(updateCancelComment(commentId));
+      dispatch(updateCommentIsEditing(commentId, false));
   },
 
   onCommentEditSave(commentId, replyId){
     dispatch(updateSaveComment(commentId, replyId));
+      dispatch(updateCommentIsEditing(commentId, false));
+  },
+
+  onEditTopicClick() {
+    dispatch(updateTopicIsEditing(true));
   },
 
   onTopicEditUpdate(value){
@@ -366,11 +472,31 @@ const TopicContainer = createClass({
 
   onTopicEditCancel(){
     dispatch(updateCancelTopic());
+    dispatch(updateTopicIsEditing(false));
   },
 
   onTopicEditSave(){
     dispatch(updateSaveTopic());
-  }
+    dispatch(updateTopicIsEditing(false));
+  },
+
+  onSortByCommentClicked(){
+    const {topic} = this.state;
+    const {id, slug} = topic;
+    dispatch(topicReplySortByComments(id, slug));
+  },
+
+  onSortByLikeClicked(){
+    const {topic} = this.state;
+    const {id, slug} = topic;
+    dispatch(topicReplySortByLike(id, slug));
+  },
+
+  onSortByRecentClicked(){
+    const {topic} = this.state;
+    const {id, slug} = topic;
+    dispatch(topicReplySortByRecent(id, slug));
+  },
 
 });
 

@@ -1,6 +1,10 @@
 /*global mocha*/
 "use strict";
 
+if(process.env.useSourcemaps) {
+  require('source-map-support').install();
+}
+
 //Import mocha css
 require('mochaCss');
 

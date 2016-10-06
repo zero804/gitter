@@ -86,6 +86,19 @@ describe('topic-api', function() {
 
   });
 
+  it('GET /v1/forums/:forumId/topics?sort=-likesTotal', function() {
+    return request(app)
+      .get('/v1/forums/' + fixture.forum1.id + '/topics?sort=-likesTotal')
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+      .then(function(result) {
+        var topics = result.body;
+
+        assert.strictEqual(topics.length, 2);
+      });
+
+  });
+
   it('GET /v1/forums/:forumId/topics/:topicId', function() {
     return request(app)
       .get('/v1/forums/' + fixture.forum1.id + '/topics/' + fixture.topic1.id)

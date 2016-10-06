@@ -2,6 +2,7 @@
 @import "../popover";
 @import "chatInputView";
 @import "chatConnectivityIndicatorView";
+@import 'markdown.less';
 
 // Other items required by this library
 @import "../../../less/highlight.less";
@@ -15,6 +16,8 @@
 @chat-spacing: 0.2em;
 @chat-item__action-item__color: rgba(170, 170, 170, 1);
 
+// Define our markdown styles
+.markdown-styles();
 
 .trpChatContainer .isViewers:last-child .chat-item__details {
   visibility: visible;

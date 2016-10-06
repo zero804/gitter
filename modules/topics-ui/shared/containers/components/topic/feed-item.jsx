@@ -2,6 +2,10 @@ import React, { PropTypes } from 'react';
 import UserAvatar from '../user/user-avatar.jsx';
 import moment from 'moment';
 import EditableContent from '../forms/editable-content.jsx';
+import IconButton from '../buttons/icon-button.jsx';
+
+import {AVATAR_SIZE_MEDIUM} from '../../../constants/avatar-sizes';
+import {ICONS_EDIT} from '../../../constants/icons';
 
 export default React.createClass({
 
@@ -20,17 +24,10 @@ export default React.createClass({
       React.PropTypes.arrayOf(React.PropTypes.node),
       React.PropTypes.node
     ]),
-    canEdit: PropTypes.bool,
-    isEditing: PropTypes.bool,
-    primaryLabel: PropTypes.string,
-    secondaryLabel: PropTypes.string,
-    primaryValue: PropTypes.number,
-    secondaryValue: PropTypes.number,
-    onPrimaryClicked: PropTypes.func,
-    onSecondaryClicked: PropTypes.func,
     onChange: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
     onSave: PropTypes.func.isRequired,
+    onEditClick: PropTypes.func
   },
 
   getDefaultProps(){
@@ -45,7 +42,6 @@ export default React.createClass({
 
     const {item, children, footerChildren} = this.props;
     const {user} = item;
-    const avatarDims = 30;
     const formattedSentDate = item.sent && moment(item.sent).format('MMM Do');
 
     /* The EditControl situation is BS. It needs to be fixed  */
@@ -53,24 +49,28 @@ export default React.createClass({
     //smart components so they can dispatch events. This will prevent us
     //having to have these controls in scope to change state
     return (
-      <article className="feed-item">
+      <article
+        id={item.id}
+        className="feed-item">
         <div className="feed-item__content">
           <div className="feed-item__user-details">
             <UserAvatar
               className="feed-item__avatar"
               user={user}
-              width={avatarDims}
-              height={avatarDims}/>
+              size={AVATAR_SIZE_MEDIUM} />
+          </div>
+          <div className="feed-item__body">
             <span className="feed-item__sent">
               {formattedSentDate}
             </span>
+            {this.getEditControl()}
+            {this.getItemContent()}
+            <footer className="feed-item__footer">
+              {footerChildren}
+            </footer>
+
           </div>
-          {this.getItemContent()}
         </div>
-        <footer className="feed-item__footer">
-          {footerChildren}
-          {this.getEditControl()}
-        </footer>
         {children}
       </article>
     );
@@ -83,12 +83,14 @@ export default React.createClass({
     const {canEdit} = this.props.item;
     if(!canEdit) { return; }
 
+    const {isEditing} = this.state;
+    if(isEditing) { return; }
+
     return (
-      <button
+      <IconButton
         className="feed-item__edit-control"
-        onClick={this.onEditClicked}>
-        Edit
-      </button>
+        type={ICONS_EDIT}
+        onClick={this.onEditClicked} />
     );
   },
 
@@ -97,7 +99,6 @@ export default React.createClass({
     const {item} = this.props;
     return (
       <EditableContent
-        className="feed-item__body"
         content={item}
         onChange={this.onChange}
         onCancel={this.onCancelClicked}
@@ -107,12 +108,15 @@ export default React.createClass({
 
   },
 
-
   onEditClicked(e){
+    const { onEditClick } = this.props;
     e.preventDefault();
     this.setState({
       isEditing: true,
     });
+    if(onEditClick) {
+      onEditClick();
+    }
   },
 
   onChange(val){

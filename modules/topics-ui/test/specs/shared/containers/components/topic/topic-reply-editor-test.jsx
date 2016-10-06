@@ -54,11 +54,6 @@ describe('<TopicReplyEditor/>', () => {
     equal(wrapper.find('UserAvatar').prop('className'), 'avatar--reply-editor');
   });
 
-  it('should render the UserAvatar with the right dimensions', () => {
-    equal(wrapper.find('UserAvatar').prop('width'), 30);
-    equal(wrapper.find('UserAvatar').prop('height'), 30);
-  });
-
   it('should pass an onChange call back to the editor', () => {
     ok(
       wrapper.find('Editor').prop('onChange'),

@@ -30,7 +30,6 @@ const ForumContainer = React.createClass({
 
   propTypes: {
     //Route parameters ---
-    groupUri: PropTypes.string.isRequired,
     categoryName: PropTypes.string.isRequired,
     filterName: PropTypes.string,
     tagName: PropTypes.string,
@@ -42,6 +41,12 @@ const ForumContainer = React.createClass({
       on: PropTypes.func.isRequired,
       off: PropTypes.func.isRequired,
     }),
+
+    //Group
+    groupStore: PropTypes.shape({
+      getGroupUri: PropTypes.func.isRequired,
+      getGroupName: PropTypes.func.isRequired
+    }).isRequired,
 
     //Forum
     forumStore: PropTypes.shape({
@@ -80,7 +85,7 @@ const ForumContainer = React.createClass({
   },
 
   getInitialState(){
-    const { forumStore, categoryStore, tagStore, topicsStore } = this.props;
+    const { forumStore, categoryStore, tagStore } = this.props;
 
     return {
       forumId: forumStore.getForumId(),
@@ -137,8 +142,10 @@ const ForumContainer = React.createClass({
       createTopic,
     } = this.state;
 
-    const { currentUserStore, groupUri, categoryStore, tagStore, topicsStore } = this.props;
+    const { groupStore, currentUserStore, categoryStore, tagStore, topicsStore } = this.props;
 
+    const groupUri = groupStore.getGroupUri();
+    const groupName = groupStore.getGroupName();
     const topics = topicsStore.getTopics();
     const newTopic = topicsStore.getDraftTopic();
     const currentUser = currentUserStore.getCurrentUser();
@@ -150,6 +157,7 @@ const ForumContainer = React.createClass({
         <SearchHeaderContainer
           userId={currentUser.id}
           forumId={forumId}
+          groupName={groupName}
           groupUri={groupUri}
           subscriptionState={forumSubscriptionState}/>
         <CategoryList
@@ -192,7 +200,7 @@ const ForumContainer = React.createClass({
   onTitleChange(title){ dispatch(titleUpdate(title));},
   onBodyChange(body){ dispatch(bodyUpdate(body));},
   onCategoryChange(id) { dispatch(categoryUpdate(id));},
-  onTopicTagsChange(tags) { dispatch(tagsUpdate(tags)); },
+  onTopicTagsChange(tag, isAdding) { dispatch(tagsUpdate(tag, isAdding)); },
 
   onCreateTopicClose(){
     const {categoryStore} = this.props;
@@ -204,7 +212,8 @@ const ForumContainer = React.createClass({
   },
 
   onTopicCreated(topicId, slug){
-    const {groupUri} = this.props;
+    const {groupStore} = this.props;
+    const groupUri = groupStore.getGroupUri();
     dispatch(navigateToTopic(groupUri, topicId, slug));
   },
 
