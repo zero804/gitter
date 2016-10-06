@@ -221,6 +221,14 @@ ForumWithPolicyService.prototype.deleteTopic = secureMethod([matchForum, allowOw
   return topicService.deleteTopic(this.user, topic);
 });
 
+ForumWithPolicyService.prototype.deleteReply = secureMethod([matchForum, allowOwner, allowAdmin], function(reply) {
+  return replyService.deleteReply(this.user, reply);
+});
+
+ForumWithPolicyService.prototype.deleteComment = secureMethod([matchForum, allowOwner, allowAdmin], function(comment) {
+  return commentService.deleteComment(this.user, comment);
+});
+
 /**
  * Subscription bits
  */
