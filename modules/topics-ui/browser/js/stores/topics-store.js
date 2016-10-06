@@ -310,6 +310,7 @@ export const TopicsLiveCollection = LiveCollection.extend({
   onTopicDelete() {
     const topicId = router.get('topicId');
     const model = this.get(topicId);
+    if(!model) { return; }
     model.destroy();
   },
 
