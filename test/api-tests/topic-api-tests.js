@@ -25,10 +25,18 @@ describe('topic-api', function() {
         extraAdmins: ['user1']
       }
     },
+    forum2: {
+      securityDescriptor: {
+        extraAdmins: ['user1']
+      }
+    },
     category1: {
       forum: 'forum1'
     },
     category2: {
+      forum: 'forum1'
+    },
+    category3: {
       forum: 'forum1'
     },
     // topic1 will be read out
@@ -47,8 +55,8 @@ describe('topic-api', function() {
     // topic3 will be deleted
     topic3: {
       user: 'user1',
-      forum: 'forum1',
-      category: 'category1'
+      forum: 'forum2',
+      category: 'category3'
     },
     reply1: {
       user: 'user1',
@@ -149,7 +157,7 @@ describe('topic-api', function() {
 
   it('DELETE /v1/forums/:forumId/topics/:topicId', function() {
     return request(app)
-      .del('/v1/forums/' + fixture.forum1.id + '/topics/' + fixture.topic3.id)
+      .del('/v1/forums/' + fixture.topic3.forumId + '/topics/' + fixture.topic3.id)
       .set('x-access-token', fixture.user1.accessToken)
       .expect(204);
   });
