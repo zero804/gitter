@@ -45,23 +45,24 @@ export default React.createClass({
     return (
       <Container className="container--reply-editor">
         <Panel className={compiledClass}>
-          <UserAvatar
-            user={user}
-            className="avatar--reply-editor"
-            size={AVATAR_SIZE_MEDIUM} />
-          <Editor
-            value={editorValue}
-            className="editor--reply"
-            placeholder="Your reply here. Use Markdown, BBCode, or HTML to format."
-            onChange={this.onChange}
-            onClick={this.onEditorClick}
-            onFocus={this.onEditorFocus}
-            onBlur={this.onEditorBlur}/>
-          <button
-            className="topic-reply-editor__submit"
-            onClick={this.onSubmitClicked}>
-            {submitText}
-          </button>
+          <form className="reply-editor__form" onSubmit={this.onSubmit}>
+            <UserAvatar
+              user={user}
+              className="avatar--reply-editor"
+              size={AVATAR_SIZE_MEDIUM} />
+            <Editor
+              value={editorValue}
+              className="editor--reply"
+              placeholder="Your reply here. Use Markdown, BBCode, or HTML to format."
+              onChange={this.onChange}
+              onClick={this.onEditorClick}
+              onFocus={this.onEditorFocus}
+              onBlur={this.onEditorBlur}/>
+            <button
+              className="topic-reply-editor__submit">
+              {submitText}
+            </button>
+          </form>
         </Panel>
       </Container>
     );
@@ -71,7 +72,7 @@ export default React.createClass({
     this.props.onChange(val);
   },
 
-  onSubmitClicked(e){
+  onSubmit(e){
     e.preventDefault();
     this.props.onSubmit();
   },
