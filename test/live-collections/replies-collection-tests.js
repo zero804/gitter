@@ -25,6 +25,11 @@ describe('replies-live-collection #slow', function() {
       user: 'user1',
       forum: 'forum1',
       topic: 'topic1'
+    },
+    reply2: {
+      user: 'user1',
+      forum: 'forum1',
+      topic: 'topic1'
     }
   });
 
@@ -95,5 +100,20 @@ describe('replies-live-collection #slow', function() {
         // the patch event must also contain editedAt
         assert.ok(event.model.editedAt);
       });
+  });
+
+  it('should emit a remove event when deleting the reply', function() {
+    var reply = fixture.reply2;
+    var checkEvent = appEvents.addListener('dataChange2', {
+      url: '/forums/' + reply.forumId + '/topics/' + reply.topicId + '/replies',
+      operation: 'remove',
+      type: 'reply',
+      model: {
+        id: reply.id.toString(),
+      }
+    });
+
+    return replyService.deleteReply(fixture.user1, reply)
+      .then(checkEvent);
   });
 });
