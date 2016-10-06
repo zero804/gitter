@@ -43,6 +43,7 @@
     "eslint": "^2.9.0",
     "eslint-plugin-mocha": "^2.2.0",
     "extract-text-webpack-plugin": "^1.0.1",
+    "file-loader": "^0.9.0",
     "gitter-styleguide": "^1.6.6",
     "gitter-web-qs": "file:../qs",
     "glob": "^6.0.4",
@@ -51,6 +52,7 @@
     "gulp-filter": "^4.0.0",
     "highlight.js": "8.6.0",
     "http-server": "^0.9.0",
+    "imports-loader": "^0.6.5",
     "inject-loader": "^2.0.1",
     "jquery": "^3.1.0",
     "jsdom": "^9.4.5",
@@ -68,6 +70,7 @@
     "source-map-support": "^0.4.2",
     "style-loader": "^0.13.1",
     "svg-url-loader": "^1.1.0",
+    "url-loader": "^0.5.7",
     "webpack": "1.12.15",
     "webpack-dev-middleware": "^1.6.1"
   },

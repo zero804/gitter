@@ -30,7 +30,7 @@ export default React.createClass({
     }));
     return {
       value: this.props.value,
-      shouldShowTypeAhead: true,
+      shouldShowTypeAhead: false,
       activeCompletions: completions,
       allCompletions: completions,
     };
@@ -59,8 +59,6 @@ export default React.createClass({
   getCompletions(){
     const {value, shouldShowTypeAhead} = this.state;
     if(!shouldShowTypeAhead) { return; }
-    if(!value || !value.length) { return; }
-
     const { activeCompletions } = this.state;
     if(!activeCompletions.length) { return; }
 
@@ -107,10 +105,10 @@ export default React.createClass({
     this.props.onSubmit(val);
   },
 
-  onInputChange(val){
+  onInputChange(val = ''){
     this.setState((state) => Object.assign(state, {
-      value: val,
-      activeCompletions: state.allCompletions.filter((c) => fuzzysearch(val, c.value)),
+      value: val.trim(),
+      activeCompletions: state.allCompletions.filter((c) => fuzzysearch(val.trim(), c.value)),
     }));
   },
 
