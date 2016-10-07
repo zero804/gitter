@@ -9,6 +9,11 @@ var persistence = require('gitter-web-persistence');
 var _ = require('lodash');
 var Topic = persistence.Topic;
 var ForumCategory = persistence.ForumCategory;
+var Reply = persistence.Reply;
+var Comment = persistence.Comment;
+var ForumSubscription = persistence.ForumSubscription;
+var ForumNotification = persistence.ForumNotification;
+var ForumReaction = persistence.ForumReaction;
 var User = persistence.User;
 var debug = require('debug')('gitter:app:topics:topic-service');
 var processText = require('gitter-web-text-processor');
@@ -403,6 +408,30 @@ function setTopicCategory(user, topic, category) {
     });
 }
 
+function deleteTopic(user, topic) {
+  var userId = user._id;
+  var forumId = topic.forumId;
+  var topicId = topic._id;
+
+  return Promise.join(
+    Topic.remove({ _id: topicId }).exec(),
+    Reply.remove({ topicId: topicId }).exec(),
+    Comment.remove({ topicId: topicId }).exec(),
+    ForumSubscription.remove({ topicId: topicId }).exec(),
+    ForumNotification.remove({ topicId: topicId }).exec(),
+    ForumReaction.remove({ topicId: topicId }).exec(),
+    function() {
+      stats.event('delete_topic', {
+        userId: userId,
+        forumId: forumId,
+        topicId: topicId,
+      });
+
+      liveCollections.topics.emit('remove', topic);
+    }
+  )
+}
+
 module.exports = {
   findById: findById,
   findByForumId: findByForumId,
@@ -414,4 +443,5 @@ module.exports = {
   setTopicTags: Promise.method(setTopicTags),
   setTopicSticky: Promise.method(setTopicSticky),
   setTopicCategory: Promise.method(setTopicCategory),
+  deleteTopic: deleteTopic
 };
