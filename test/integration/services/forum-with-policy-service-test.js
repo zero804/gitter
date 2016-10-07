@@ -65,14 +65,17 @@ describe('forum-with-policy-service #slow', function() {
       setTopicTags: function() {},
       setTopicSticky: function() {},
       setTopicCategory: function() {},
+      deleteTopic: function() {}
     },
     'gitter-web-topics/lib/reply-service': {
       createReply: function() {},
-      updateReply: function() {}
+      updateReply: function() {},
+      deleteReply: function() {}
     },
     'gitter-web-topics/lib/comment-service': {
       createComment: function() {},
-      updateComment: function() {}
+      updateComment: function() {},
+      deleteComment: function() {}
     },
     'gitter-web-topic-notifications/lib/subscriber-service': {
       listForItem: function() {},
@@ -237,6 +240,21 @@ describe('forum-with-policy-service #slow', function() {
   makeChecks('updateCategory', function() { return [fixture.category1, {}]; }, {
     admin: true,
     owner: false // skip
+  });
+
+  makeChecks('deleteTopic', function() { return [fixture.topic1]; }, {
+    admin: true,
+    owner: true
+  });
+
+  makeChecks('deleteReply', function() { return [fixture.reply1]; }, {
+    admin: true,
+    owner: true
+  });
+
+  makeChecks('deleteComment', function() { return [fixture.comment1]; }, {
+    admin: true,
+    owner: true
   });
 
   makeChecks('listSubscribers', function() { return [{forumId: fixture.forum1.id}, {}]; }, {

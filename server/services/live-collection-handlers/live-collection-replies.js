@@ -39,7 +39,7 @@ var liveCollectionReplies = {
 
   removeId: function(forumId, topicId, replyId) {
     var url = '/forums/' + forumId + '/topics/' + topicId + '/replies';
-    appEvents.dataChange2(url, 'remove', { id: replyId }, 'reply');
+    appEvents.dataChange2(url, 'remove', { id: replyId.toString() }, 'reply');
   }
 }
 
