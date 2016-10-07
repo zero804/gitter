@@ -43,6 +43,7 @@ export default React.createClass({
     const {item, children, footerChildren} = this.props;
     const {user} = item;
     const formattedSentDate = item.sent && moment(item.sent).format('MMM Do');
+    const formattedFullSentDate = item.sent && moment(item.sent).format('YYYY-MM-D, h:m A');
 
     /* The EditControl situation is BS. It needs to be fixed  */
     //TODO we need to make edit controls, reaction and follow buttons
@@ -60,7 +61,9 @@ export default React.createClass({
               size={AVATAR_SIZE_MEDIUM} />
           </div>
           <div className="feed-item__body">
-            <span className="feed-item__sent">
+            <span
+              className="feed-item__sent"
+              title={formattedFullSentDate}>
               {formattedSentDate}
             </span>
             {this.getEditControl()}
