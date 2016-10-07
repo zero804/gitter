@@ -208,7 +208,7 @@ function createTopic(user, category, options) {
   return Promise.join(
       processText(options.text),
       topicSequencer.getNextTopicNumber(forumId))
-    .then(function(parsedMessage, number) {
+    .spread(function(parsedMessage, number) {
       insertData.number = number;
       insertData.html = parsedMessage.html;
       insertData.lang = parsedMessage.lang;
