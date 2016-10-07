@@ -11,6 +11,7 @@ import TopicReplyList from './components/topic/topic-reply-list.jsx';
 import TopicReplyListItem from './components/topic/topic-reply-list-item.jsx';
 
 import updateTopic from '../action-creators/topic/update-topic';
+import updateTopicTitle from '../action-creators/topic/update-topic-title';
 import updateCancelTopic from '../action-creators/topic/update-cancel-topic';
 import updateSaveTopic from '../action-creators/topic/update-save-topic';
 import updateTopicIsEditing from '../action-creators/topic/update-topic-is-editing';
@@ -236,7 +237,8 @@ const TopicContainer = createClass({
             topic={topic}
             category={category}
             groupUri={groupUri}
-            tags={tags}/>
+            tags={tags}
+            onTopicTitleEditUpdate={this.onTopicTitleEditUpdate} />
 
           <TopicBody
             topic={topic}
@@ -468,6 +470,10 @@ const TopicContainer = createClass({
 
   onTopicEditUpdate(value){
     dispatch(updateTopic(value));
+  },
+
+  onTopicTitleEditUpdate(value) {
+    dispatch(updateTopicTitle(value));
   },
 
   onTopicEditCancel(){
