@@ -1,11 +1,15 @@
 import React, { PropTypes } from 'react';
+
+import { AVATAR_SIZE_LARGE } from '../../../constants/avatar-sizes';
+
 import Container from '../container.jsx';
 import Panel from '../panel.jsx';
 import H1 from '../text/h-1.jsx';
+import Input from '../forms/input.jsx';
 import UserAvatar from '../user/user-avatar.jsx';
 import ForumCategoryLink from '../links/forum-category-link.jsx';
 import ForumTagLink from '../links/forum-tag-link.jsx';
-import {AVATAR_SIZE_LARGE} from '../../../constants/avatar-sizes';
+
 
 export default React.createClass({
 
@@ -29,6 +33,8 @@ export default React.createClass({
     category: PropTypes.shape({
       category: PropTypes.string.isRequired,
     }).isRequired,
+
+    onTopicTitleEditUpdate: PropTypes.func.isRequired
   },
 
   render(){
@@ -37,25 +43,28 @@ export default React.createClass({
     const { title, user } = topic;
     const { displayName } = user;
 
+
     return (
       <Container className="container--topic-header">
         <Panel>
           <header>
             <section className="topic-header">
-            <UserAvatar
-              className="topic-header__avatar"
-              user={user}
-              size={AVATAR_SIZE_LARGE} />
-              <div>
+              <UserAvatar
+                className="topic-header__avatar"
+                user={user}
+                size={AVATAR_SIZE_LARGE} />
+              <div className="topic-header__info-wrapper">
                 <span className="topic-header__username">{displayName}</span>
-                <H1 className="topic-header__title">{title}</H1>
+                {this.getTitleView()}
               </div>
             </section>
             <section className="topic-header__control-row">
               <ForumCategoryLink
                 className="topic-header__category-link"
                 category={category}
-                groupUri={groupUri}>{category.category}</ForumCategoryLink>
+                groupUri={groupUri}>
+                {category.category}
+              </ForumCategoryLink>
               <ul className="topic-header__tag-list">{tags.map((tag, i) => this.buildTagView(tag, i))}</ul>
             </section>
           </header>
@@ -77,5 +86,36 @@ export default React.createClass({
       </li>
     );
   },
+
+  getTitleView() {
+    const { topic } = this.props;
+    const { title, editedTitle, isEditing } = topic;
+
+    let displayTitle = title;
+    if(editedTitle || editedTitle === '') {
+      displayTitle = editedTitle;
+    }
+
+    let headerTitle = (
+      <H1 className="topic-header__title">
+        {displayTitle}
+      </H1>
+    );
+    if(isEditing) {
+      headerTitle = (
+        <Input
+          className="topic-header__title-input"
+          value={displayTitle}
+          onChange={this.onTopicTitleEditUpdate} />
+      );
+    }
+
+    return headerTitle;
+  },
+
+  onTopicTitleEditUpdate(newValue) {
+    const { onTopicTitleEditUpdate } = this.props;
+    onTopicTitleEditUpdate(newValue);
+  }
 
 });

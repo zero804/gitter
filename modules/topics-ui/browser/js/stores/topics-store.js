@@ -39,6 +39,7 @@ import {
 
 import {
   UPDATE_TOPIC,
+  UPDATE_TOPIC_TITLE,
   UPDATE_CANCEL_TOPIC,
   UPDATE_SAVE_TOPIC,
   UPDATE_TOPIC_IS_EDITING
@@ -217,6 +218,7 @@ export const TopicModel = BaseModel.extend({
       //When we have received data from the server we can assume
       //that it is no longer a draft or has been edited
       state: MODEL_STATE_SYNCED,
+      editedTitle: null,
       text: null
     });
   }
@@ -237,6 +239,7 @@ export const TopicsLiveCollection = LiveCollection.extend({
 
   initialize(models, options){
     subscribe(UPDATE_TOPIC, this.onTopicUpdate, this);
+    subscribe(UPDATE_TOPIC_TITLE, this.onTopicTitleUpdate, this);
     subscribe(UPDATE_CANCEL_TOPIC, this.onTopicEditCancel, this);
     subscribe(UPDATE_SAVE_TOPIC, this.onTopicEditSaved, this);
     subscribe(UPDATE_TOPIC_IS_EDITING, this.onTopicIsEditingUpdate, this);
@@ -268,6 +271,12 @@ export const TopicsLiveCollection = LiveCollection.extend({
     if(!model) { return; }
     model.set('text', text);
   },
+  onTopicTitleUpdate({title}) {
+    const topicId = router.get('topicId');
+    const model = this.get(topicId);
+    if(!model) { return; }
+    model.set('editedTitle', title);
+  },
 
   getSnapshotState() {
     return {
@@ -291,7 +300,10 @@ export const TopicsLiveCollection = LiveCollection.extend({
     const topicId = router.get('topicId');
     const model = this.get(topicId);
     if(!model) { return; }
-    model.set('text', null);
+    model.set({
+      editedTitle: null,
+      text: null
+    });
   },
 
   //When a user clicks save on the editor we must save it back to the server
@@ -300,9 +312,18 @@ export const TopicsLiveCollection = LiveCollection.extend({
     const topicId = router.get('topicId');
     const model = this.get(topicId);
     if(!model) { return; }
+
+    const title = model.get('editedTitle');
     const text = model.get('text');
-    if(!text) { return; }
-    model.save({ text: model.get('text') }, { patch: true });
+    let dataToSave = {};
+    if(title || title === '') {
+      dataToSave.title = title
+    }
+    if(text || text === '') {
+      dataToSave.text = text
+    }
+
+    model.save(dataToSave, { patch: true });
   },
 
   onTopicIsEditingUpdate({ isEditing }) {
@@ -643,9 +664,10 @@ dispatchOnChangeMixin(TopicsStore, [
   'change:reactions',
   'change:ownReactions',
   'change:subscriptionState',
-  'change:text',
   'change:title',
+  'change:editedTitle',
   'change:body',
+  'change:text',
   'change:categoryId',
   'change:tags',
   'change:isEditing'

@@ -1,4 +1,5 @@
 @import "../../colors.less";
+@import (less, reference) "~gitter-styleguide/css/components/headings.css";
 @import (less, reference) "~gitter-styleguide/css/components/buttons.css";
 @import "../../text";
 
@@ -16,6 +17,7 @@
 }
 
 .topic-search__heading {
+  &:extend(.h1 all);
   white-space: nowrap;
 }
 
