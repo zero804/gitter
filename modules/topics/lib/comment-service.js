@@ -107,9 +107,10 @@ function updateCommentsTotal(topicId, replyId) {
         }
       };
 
-      return Promise.join(
+      return [
         Topic.findOneAndUpdate({ _id: topicId }, topicUpdate, { new: true }).exec(),
-        Reply.findOneAndUpdate({ _id: replyId }, replyUpdate, { new: true }).exec())
+        Reply.findOneAndUpdate({ _id: replyId }, replyUpdate, { new: true }).exec()
+      ];
     })
     .spread(function(topic, reply) {
       this.topic = topic;
@@ -225,9 +226,10 @@ function updateCommentFields(topicId, replyId, commentId, fields) {
     .lean()
     .exec()
     .tap(function() {
-      return Promise.join(
+      return [
         updateReplyLastModified(commentId, lastModified),
-        updateTopicLastModified(commentId, lastModified));
+        updateTopicLastModified(commentId, lastModified)
+      ];
     });
 }
 
@@ -281,10 +283,10 @@ function deleteComment(user, comment) {
   var commentId = comment._id;
 
   return Promise.join(
-    Comment.remove({ _id: commentId }).exec(),
-    ForumNotification.remove({ commentId: commentId }).exec(),
-    ForumReaction.remove({ commentId: commentId }).exec(),
-    function() {
+      Comment.remove({ _id: commentId }).exec(),
+      ForumNotification.remove({ commentId: commentId }).exec(),
+      ForumReaction.remove({ commentId: commentId }).exec())
+    .then(function() {
       return updateCommentsTotal(topicId, replyId);
     })
     .then(function() {
