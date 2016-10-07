@@ -1,7 +1,6 @@
 "use strict";
 
 var assert = require('assert');
-var Promise = require('bluebird');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var topicService = require('../lib/topic-service');
 var replyService = require('../lib/reply-service');
@@ -76,9 +75,10 @@ describe('reply-service', function() {
           return replyService.deleteReply(fixture.user1, fixture.reply2);
         })
         .then(function() {
-          return Promise.join(
+          return [
             topicService.findById(fixture.reply2.topicId),
-            replyService.findById(fixture.reply2._id));
+            replyService.findById(fixture.reply2._id)
+          ];
         })
         .spread(function(topic, reply) {
           assert.strictEqual(topic.repliesTotal, 0);

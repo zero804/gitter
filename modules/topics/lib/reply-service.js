@@ -305,12 +305,12 @@ function deleteReply(user, reply) {
   var replyId = reply._id;
 
   return Promise.join(
-    Reply.remove({ _id: replyId }).exec(),
-    Comment.remove({ replyId: replyId }).exec(),
-    ForumSubscription.remove({ replyId: replyId }).exec(),
-    ForumNotification.remove({ replyId: replyId }).exec(),
-    ForumReaction.remove({ replyId: replyId }).exec(),
-    function() {
+      Reply.remove({ _id: replyId }).exec(),
+      Comment.remove({ replyId: replyId }).exec(),
+      ForumSubscription.remove({ replyId: replyId }).exec(),
+      ForumNotification.remove({ replyId: replyId }).exec(),
+      ForumReaction.remove({ replyId: replyId }).exec())
+    .then(function() {
       // only update the total after we deleted the reply
       return updateRepliesTotal(topicId);
     })
