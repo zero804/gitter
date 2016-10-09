@@ -14,6 +14,9 @@ var ForumSubscriptionSchema = new Schema({
 
 ForumSubscriptionSchema.schemaTypeName = 'ForumSubscriptionSchema';
 
+ForumSubscriptionSchema.index({ topicId: 1 }, { background: true });
+ForumSubscriptionSchema.index({ replyId: 1 }, { background: true });
+
 ForumSubscriptionSchema.index({
   userId: 1,
   forumId: 1,
