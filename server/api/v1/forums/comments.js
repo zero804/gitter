@@ -52,12 +52,6 @@ module.exports = {
     return restSerializer.serializeObject(comment, strategy);
   },
 
-  load: function(req, id) {
-    if (!mongoUtils.isLikeObjectId(id)) throw new StatusError(400);
-
-    return commentService.findByIdForForumTopicAndReply(req.forum._id, req.topic._id, req.reply._id, id);
-  },
-
   create: function(req) {
     var user = req.user;
     var forum = req.forum;
@@ -105,6 +99,26 @@ module.exports = {
         });
         return restSerializer.serializeObject(updatedComment, strategy);
       });
+  },
+
+  destroy: function(req, res) {
+    var user = req.user;
+    var forum = req.forum;
+    var policy = req.userForumPolicy;
+    var comment = req.comment;
+
+    var forumWithPolicyService = new ForumWithPolicyService(forum, user, policy);
+    return forumWithPolicyService.deleteComment(comment)
+      .then(function() {
+        res.status(204);
+        return null;
+      });
+  },
+
+  load: function(req, id) {
+    if (!mongoUtils.isLikeObjectId(id)) throw new StatusError(400);
+
+    return commentService.findByIdForForumTopicAndReply(req.forum._id, req.topic._id, req.reply._id, id);
   },
 
   subresources: {

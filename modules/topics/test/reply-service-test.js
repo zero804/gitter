@@ -2,6 +2,7 @@
 
 var assert = require('assert');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
+var topicService = require('../lib/topic-service');
 var replyService = require('../lib/reply-service');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
@@ -20,11 +21,24 @@ describe('reply-service', function() {
         forum: 'forum1',
         category: 'category1'
       },
+      topic2: {
+        user: 'user1',
+        forum: 'forum1',
+        category: 'category1'
+      },
+      // this one for updating
       reply1: {
         user: 'user1',
         forum: 'forum1',
         topic: 'topic1'
-      }
+      },
+      // this one for deleting
+      reply2: {
+        user: 'user1',
+        forum: 'forum1',
+        // use a separate topic so adding doesn't interfere with the totals
+        topic: 'topic2'
+      },
     });
 
     it('should add a reply', function() {
@@ -47,6 +61,28 @@ describe('reply-service', function() {
         .then(function(reply) {
           assert.strictEqual(reply.text, 'hello **there**');
           assert.strictEqual(reply.html, 'hello <strong>there</strong>');
+        });
+    });
+
+    it('should delete a reply', function() {
+      // the fixtures don't currently calculate the replies total, so sync it
+      // before we start
+      return replyService.updateRepliesTotal(fixture.reply2.topicId)
+        .then(function(topic) {
+          // make sure we start at 1
+          assert.strictEqual(topic.repliesTotal, 1);
+
+          return replyService.deleteReply(fixture.user1, fixture.reply2);
+        })
+        .then(function() {
+          return [
+            topicService.findById(fixture.reply2.topicId),
+            replyService.findById(fixture.reply2._id)
+          ];
+        })
+        .spread(function(topic, reply) {
+          assert.strictEqual(topic.repliesTotal, 0);
+          assert.strictEqual(reply, null);
         });
     });
   });

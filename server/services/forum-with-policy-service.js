@@ -215,6 +215,21 @@ ForumWithPolicyService.prototype.updateCategory = secureMethod([matchForum, allo
 });
 
 /**
+ * Deleting things
+ */
+ForumWithPolicyService.prototype.deleteTopic = secureMethod([matchForum, allowOwner, allowAdmin], function(topic) {
+  return topicService.deleteTopic(this.user, topic);
+});
+
+ForumWithPolicyService.prototype.deleteReply = secureMethod([matchForum, allowOwner, allowAdmin], function(reply) {
+  return replyService.deleteReply(this.user, reply);
+});
+
+ForumWithPolicyService.prototype.deleteComment = secureMethod([matchForum, allowOwner, allowAdmin], function(comment) {
+  return commentService.deleteComment(this.user, comment);
+});
+
+/**
  * Subscription bits
  */
 ForumWithPolicyService.prototype.listSubscribers = secureMethod([matchForum, allowAdmin], function(forumObject) {
