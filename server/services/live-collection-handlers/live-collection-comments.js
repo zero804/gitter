@@ -39,7 +39,7 @@ var liveCollectionComments = {
 
   removeId: function(forumId, topicId, replyId, commentId) {
     var url = '/forums/' + forumId + '/topics/' + topicId + '/replies/' + replyId + '/comments';
-    appEvents.dataChange2(url, 'remove', { id: commentId }, 'comment');
+    appEvents.dataChange2(url, 'remove', { id: commentId.toString() }, 'comment');
   }
 }
 
