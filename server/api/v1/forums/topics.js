@@ -163,6 +163,20 @@ module.exports = {
       });
   },
 
+  destroy: function(req, res) {
+    var user = req.user;
+    var forum = req.forum;
+    var policy = req.userForumPolicy;
+    var topic = req.topic;
+
+    var forumWithPolicyService = new ForumWithPolicyService(forum, user, policy);
+    return forumWithPolicyService.deleteTopic(topic)
+      .then(function() {
+        res.status(204);
+        return null;
+      });
+  },
+
   load: function(req, id) {
     if (!mongoUtils.isLikeObjectId(id)) throw new StatusError(400);
 
