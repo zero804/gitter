@@ -9,6 +9,11 @@ var persistence = require('gitter-web-persistence');
 var _ = require('lodash');
 var Topic = persistence.Topic;
 var ForumCategory = persistence.ForumCategory;
+var Reply = persistence.Reply;
+var Comment = persistence.Comment;
+var ForumSubscription = persistence.ForumSubscription;
+var ForumNotification = persistence.ForumNotification;
+var ForumReaction = persistence.ForumReaction;
 var User = persistence.User;
 var debug = require('debug')('gitter:app:topics:topic-service');
 var processText = require('gitter-web-text-processor');
@@ -202,19 +207,18 @@ function createTopic(user, category, options) {
 
   return Promise.join(
       processText(options.text),
-      topicSequencer.getNextTopicNumber(forumId),
-      function(parsedMessage, number) {
-        insertData.number = number;
-        insertData.html = parsedMessage.html;
-        insertData.lang = parsedMessage.lang;
-        insertData._md = parsedMessage.markdownProcessingFailed ? -markdownMajorVersion : markdownMajorVersion;
-        // urls, issues, mentions?
+      topicSequencer.getNextTopicNumber(forumId))
+    .spread(function(parsedMessage, number) {
+      insertData.number = number;
+      insertData.html = parsedMessage.html;
+      insertData.lang = parsedMessage.lang;
+      insertData._md = parsedMessage.markdownProcessingFailed ? -markdownMajorVersion : markdownMajorVersion;
+      // urls, issues, mentions?
 
-        debug("Creating topic with %j", insertData);
+      debug("Creating topic with %j", insertData);
 
-        return Topic.create(insertData);
-      }
-    )
+      return Topic.create(insertData);
+    })
     .tap(function(topic) {
       return topicNotificationEvents.createTopic(topic);
     })
@@ -403,6 +407,29 @@ function setTopicCategory(user, topic, category) {
     });
 }
 
+function deleteTopic(user, topic) {
+  var userId = user._id;
+  var forumId = topic.forumId;
+  var topicId = topic._id;
+
+  return Promise.join(
+      Topic.remove({ _id: topicId }).exec(),
+      Reply.remove({ topicId: topicId }).exec(),
+      Comment.remove({ topicId: topicId }).exec(),
+      ForumSubscription.remove({ topicId: topicId }).exec(),
+      ForumNotification.remove({ topicId: topicId }).exec(),
+      ForumReaction.remove({ topicId: topicId }).exec())
+    .then(function() {
+      stats.event('delete_topic', {
+        userId: userId,
+        forumId: forumId,
+        topicId: topicId,
+      });
+
+      liveCollections.topics.emit('remove', topic);
+    });
+}
+
 module.exports = {
   findById: findById,
   findByForumId: findByForumId,
@@ -414,4 +441,5 @@ module.exports = {
   setTopicTags: Promise.method(setTopicTags),
   setTopicSticky: Promise.method(setTopicSticky),
   setTopicCategory: Promise.method(setTopicCategory),
+  deleteTopic: deleteTopic
 };

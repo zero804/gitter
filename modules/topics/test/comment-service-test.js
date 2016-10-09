@@ -2,6 +2,7 @@
 
 var assert = require('assert');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
+var replyService = require('../lib/reply-service');
 var commentService = require('../lib/comment-service');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
@@ -24,11 +25,24 @@ describe('comment-service #slow', function() {
       forum: 'forum1',
       topic: 'topic1'
     },
+    reply2: {
+      user: 'user1',
+      forum: 'forum1',
+      topic: 'topic1'
+    },
+    // for updating
     comment1: {
       user: 'user1',
       forum: 'forum1',
       topic: 'topic1',
       reply: 'reply1'
+    },
+    // for deleting
+    comment2: {
+      user: 'user1',
+      forum: 'forum1',
+      topic: 'topic1',
+      reply: 'reply2',
     }
   });
 
@@ -53,6 +67,26 @@ describe('comment-service #slow', function() {
       .then(function(comment) {
         assert.strictEqual(comment.text, 'hello **there**');
         assert.strictEqual(comment.html, 'hello <strong>there</strong>');
+      });
+  });
+
+  it('should delete a comment', function() {
+    return commentService.updateCommentsTotal(fixture.comment2.topicId, fixture.comment2.replyId)
+      .spread(function(topic, reply) {
+        // make sure we start at 1
+        assert.strictEqual(reply.commentsTotal, 1);
+
+        return commentService.deleteComment(fixture.user1, fixture.comment2);
+      })
+      .then(function() {
+        return [
+          replyService.findById(fixture.comment2.replyId),
+          commentService.findById(fixture.comment2._id)
+        ];
+      })
+      .spread(function(reply, comment) {
+        assert.strictEqual(reply.commentsTotal, 0);
+        assert.strictEqual(comment, null);
       });
   });
 });

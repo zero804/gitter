@@ -35,18 +35,26 @@ describe('topics-live-collection #slow', function() {
       forum: 'forum1',
       category: 'category1'
     },
-    // for other smaller patches
+    // for other smaller patches directly to topic
     topic3: {
       user: 'user1',
       forum: 'forum1',
       category: 'category1'
     },
+    // for changing the category
     topic4: {
       user: 'user1',
       forum: 'forum1',
       category: 'category1'
     },
+    // to be deleted
     topic5: {
+      user: 'user1',
+      forum: 'forum1',
+      category: 'category1'
+    },
+    // for patching the topic when deleting a reply
+    topic6: {
       user: 'user1',
       forum: 'forum1',
       category: 'category1'
@@ -55,7 +63,25 @@ describe('topics-live-collection #slow', function() {
       user: 'user1',
       forum: 'forum1',
       topic: 'topic2'
-    }
+    },
+    // for deleting a reply
+    reply2: {
+      user: 'user1',
+      forum: 'forum1',
+      topic: 'topic6'
+    },
+    // for deleting a comment
+    reply3: {
+      user: 'user1',
+      forum: 'forum1',
+      topic: 'topic6'
+    },
+    comment1: {
+      user: 'user1',
+      forum: 'forum1',
+      topic: 'topic6',
+      reply: 'reply3'
+    },
   });
 
   it('should emit a create event when creating a topic', function() {
@@ -153,12 +179,12 @@ describe('topics-live-collection #slow', function() {
       operation: 'update',
       type: 'topic',
       model: {
-        id: fixture.topic4.id.toString(),
+        id: fixture.topic3.id.toString(),
         slug: 'new-slug'
       },
     });
 
-    return topicService.updateTopic(fixture.user1, fixture.topic4, {
+    return topicService.updateTopic(fixture.user1, fixture.topic3, {
         slug: 'new-slug'
       })
       .then(checkEvent);
@@ -170,7 +196,7 @@ describe('topics-live-collection #slow', function() {
       operation: 'update',
       type: 'topic',
       model: {
-        id: fixture.topic5.id.toString(),
+        id: fixture.topic3.id.toString(),
         body: {
           text: 'new text',
           html: 'new text',
@@ -178,7 +204,7 @@ describe('topics-live-collection #slow', function() {
       },
     });
 
-    return topicService.updateTopic(fixture.user1, fixture.topic5, {
+    return topicService.updateTopic(fixture.user1, fixture.topic3, {
         text: 'new text'
       })
       .then(checkEvent)
@@ -226,14 +252,71 @@ describe('topics-live-collection #slow', function() {
       operation: 'update',
       type: 'topic',
       model: {
-        id: fixture.topic3.id.toString(),
+        id: fixture.topic4.id.toString(),
       },
     });
 
-    return topicService.setTopicCategory(fixture.user1, fixture.topic3, fixture.category2)
+    return topicService.setTopicCategory(fixture.user1, fixture.topic4, fixture.category2)
       .then(checkEvent)
       .then(function(event) {
         assert.strictEqual(event.model.category.id.toString(), fixture.category2._id.toString());
+      });
+  });
+
+  it('should emit a remove event when deleting the topic', function() {
+    var checkEvent = appEvents.addListener('dataChange2', {
+      url: '/forums/' + fixture.forum1.id + '/topics',
+      operation: 'remove',
+      type: 'topic',
+      model: {
+        id: fixture.topic5.id.toString(),
+      }
+    });
+
+    return topicService.deleteTopic(fixture.user1, fixture.topic5)
+      .then(checkEvent);
+  });
+
+  it('should emit a patch event when deleting a reply', function() {
+    var topic = fixture.topic6;
+    var reply = fixture.reply2;
+
+    var checkEvent = appEvents.addListener('dataChange2', {
+      url: '/forums/' + reply.forumId + '/topics',
+      operation: 'patch',
+      type: 'topic',
+      model: {
+        id: topic.id.toString(),
+        // the topic now only has 1 reply
+        repliesTotal: 1
+      },
+    });
+
+    return replyService.deleteReply(fixture.user1, reply)
+      .then(checkEvent)
+      .then(function(event) {
+        // the patch event must also contain lastChanged
+        assert.ok(event.model.lastChanged);
+      });
+  });
+
+  it('should emit a patch event when deleting a comment', function() {
+    var topic = fixture.topic6;
+    var comment = fixture.comment1;
+    var checkEvent = appEvents.addListener('dataChange2', {
+      url: '/forums/' + comment.forumId + '/topics',
+      operation: 'patch',
+      type: 'topic',
+      model: {
+        id: topic.id.toString()
+      },
+    });
+
+    return commentService.deleteComment(fixture.user1, comment)
+      .then(checkEvent)
+      .then(function(event) {
+        // the patch event must also contain lastChanged
+        assert.ok(event.model.lastChanged);
       });
   });
 });
