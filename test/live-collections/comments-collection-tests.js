@@ -30,6 +30,12 @@ describe('comments-live-collection #slow', function() {
       forum: 'forum1',
       topic: 'topic1',
       reply: 'reply1'
+    },
+    comment2: {
+      user: 'user1',
+      forum: 'forum1',
+      topic: 'topic1',
+      reply: 'reply1'
     }
   });
 
@@ -72,5 +78,20 @@ describe('comments-live-collection #slow', function() {
         // the patch event must also contain editedAt
         assert.ok(event.model.editedAt);
       });
+  });
+
+  it('should emit a remove event when deleting the comment', function() {
+    var comment = fixture.comment2;
+    var checkEvent = appEvents.addListener('dataChange2', {
+      url: '/forums/' + comment.forumId + '/topics/' + comment.topicId + '/replies/' + comment.replyId + '/comments',
+      operation: 'remove',
+      type: 'comment',
+      model: {
+        id: comment.id.toString(),
+      }
+    });
+
+    return commentService.deleteComment(fixture.user1, comment)
+      .then(checkEvent);
   });
 });
