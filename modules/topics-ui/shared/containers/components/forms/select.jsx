@@ -10,7 +10,7 @@ export default React.createClass({
       label: PropTypes.string.isRequired,
       value: PropTypes.string.isRequired
     })).isRequired,
-    defaulValue: PropTypes.string,
+    defaultValue: PropTypes.string,
     className: PropTypes.string,
     valid: PropTypes.bool
   },
@@ -20,7 +20,7 @@ export default React.createClass({
   },
 
   render(){
-    const { options, className, valid } = this.props;
+    const { options, className, valid, defaultValue } = this.props;
 
     const compiledClass = classNames({
       select: true,
@@ -38,7 +38,10 @@ export default React.createClass({
 
     return (
       <div className={compiledDecalClass}>
-        <select className={compiledClass} onChange={this.onChange}>
+        <select
+          className={compiledClass}
+          onChange={this.onChange}
+          defaultValue={defaultValue}>
           { options.map(this.buildChildOption) }
         </select>
       </div>

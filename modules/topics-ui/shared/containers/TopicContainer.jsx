@@ -11,6 +11,7 @@ import TopicReplyList from './components/topic/topic-reply-list.jsx';
 import TopicReplyListItem from './components/topic/topic-reply-list-item.jsx';
 
 import updateTopic from '../action-creators/topic/update-topic';
+import updateCategory from '../action-creators/topic/update-topic-category';
 import updateCancelTopic from '../action-creators/topic/update-cancel-topic';
 import updateSaveTopic from '../action-creators/topic/update-save-topic';
 import updateTopicIsEditing from '../action-creators/topic/update-topic-is-editing';
@@ -212,7 +213,7 @@ const TopicContainer = createClass({
     const userId = currentUser.id;
     const isSignedIn = currentUserStore.getIsSignedIn();
     const topicCategory = topic.category;
-    const category = categoryStore.getById(topicCategory.id);
+    const categories = categoryStore.getCategories();
 
     //TODO remove
     //This is here because sometimes you can get un-parsed tags
@@ -234,9 +235,10 @@ const TopicContainer = createClass({
         <article>
           <TopicHeader
             topic={topic}
-            category={category}
+            categories={categories}
             groupUri={groupUri}
-            tags={tags}/>
+            tags={tags}
+            onCategoryChange={this.onTopicCategoryChange} />
 
           <TopicBody
             topic={topic}
@@ -468,6 +470,10 @@ const TopicContainer = createClass({
 
   onTopicEditUpdate(value){
     dispatch(updateTopic(value));
+  },
+
+  onTopicCategoryChange(categoryId) {
+    dispatch(updateCategory(categoryId));
   },
 
   onTopicEditCancel(){
