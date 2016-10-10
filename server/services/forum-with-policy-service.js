@@ -229,6 +229,10 @@ ForumWithPolicyService.prototype.deleteComment = secureMethod([matchForum, allow
   return commentService.deleteComment(this.user, comment);
 });
 
+ForumWithPolicyService.prototype.deleteCategory = secureMethod([matchForum, allowOwner, allowAdmin], function(category) {
+  return forumCategoryService.deleteCategory(this.user, category);
+});
+
 /**
  * Subscription bits
  */
