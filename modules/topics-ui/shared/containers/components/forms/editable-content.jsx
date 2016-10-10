@@ -1,7 +1,10 @@
 import React, { PropTypes } from 'react';
-import Editor from './editor.jsx';
 import classNames from 'classnames';
 import { DELETE_STATE_VOID, DELETE_STATE_FIRST_ENCOUNTER } from '../../../constants/topic';
+
+import Tooltip from '../tooltip.jsx';
+import Editor from './editor.jsx';
+
 
 export default React.createClass({
 
@@ -70,10 +73,6 @@ export default React.createClass({
     const { content, editorClassName } = this.props;
     const { deleteState } = this.state;
     const compiledEditorClass = classNames('editable-content__editor', editorClassName);
-    const compiledDeleteButtonClass = classNames({
-      'editable-content__delete': true,
-      'confirming': deleteState === DELETE_STATE_FIRST_ENCOUNTER
-    });
 
     //Assume we want the initial text content of the resource from the server
     let text = content.body.text;
@@ -82,6 +81,11 @@ export default React.createClass({
     //we should account for a updated text content of '' if a user deleted everything
     if(content.text || content.text === '') {
       text = content.text;
+    }
+
+    let tooltip = '';
+    if(deleteState === DELETE_STATE_FIRST_ENCOUNTER) {
+      tooltip = 'Are you sure?'
     }
 
     return (
@@ -96,12 +100,14 @@ export default React.createClass({
             onClick={this.onCancelClicked}>
             Cancel
           </button>
-          <button
-            className={compiledDeleteButtonClass}
-            onClick={this.onDeleteClick}
-            onBlur={this.onDeleteBlur}>
-            Delete
-          </button>
+          <Tooltip tooltip={tooltip}>
+            <button
+              className="editable-content__delete"
+              onClick={this.onDeleteClick}
+              onBlur={this.onDeleteBlur}>
+              Delete
+            </button>
+          </Tooltip>
           <button
             className="editable-content__save"
             onClick={this.onSaveClicked}>
