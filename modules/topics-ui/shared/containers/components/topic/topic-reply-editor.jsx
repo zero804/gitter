@@ -45,7 +45,11 @@ export default React.createClass({
     return (
       <Container className="container--reply-editor">
         <Panel className={compiledClass}>
-          <form className="reply-editor__form" onSubmit={this.onSubmit}>
+          <form
+            className="reply-editor__form"
+            onSubmit={this.onSubmit}
+            action="#"
+            method="post">
             <UserAvatar
               user={user}
               className="avatar--reply-editor"

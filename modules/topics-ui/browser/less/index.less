@@ -1,6 +1,7 @@
 @import "~normalize.css";
 @import "../../../../public/less/highlight.less";
 @import "./colors";
+@import './break-points';
 
 .m-cover-screen() { height: 100%; width: 100%; }
 .m-grad-background() {
@@ -26,15 +27,17 @@ body {
   font-size: 1.6rem;
 }
 
-#app-root {
+#app-root, main {
   width: 100%;
   height: 100%;
 }
 
-main {
+//Ugh iOS scrolling
+//https://remysharp.com/2012/05/24/issues-with-position-fixed-scrolling-on-ios
+.scroller {
   width: 100%;
   height: 100%;
-  overflow: scroll;
+  overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
 }
 
