@@ -56,6 +56,17 @@ describe('forum-category-service #slow', function() {
       });
   });
 
+  it("should set a category's adminOnly", function() {
+    return forumCategoryService.setCategoryAdminOnly(fixture.user1, fixture.category1, true)
+      .then(function(category) {
+        assert.strictEqual(category.adminOnly, true);
+        return forumCategoryService.setCategoryAdminOnly(fixture.user1, category, false)
+      })
+      .then(function(category) {
+        assert.strictEqual(category.adminOnly, false);
+      });
+  });
+
   it('should not blow up when updating with no changed fields', function() {
     return forumCategoryService.updateCategory(fixture.user1, fixture.category2, {
         name: fixture.category2.name,
