@@ -2,17 +2,22 @@
 @import "../../colors.less";
 @import (less, reference) "~gitter-styleguide/css/components/buttons.css";
 
+@mobile-editor-height: 11.5rem;
+
 .panel--reply-editor {
   height: 10rem;
   transition: height .2s;
   background-color: @pampas;
   border-top: 1px solid @topic-body-border-color;
-  @media @small { padding: 2rem; }
+  @media @small {
+    padding: 2rem;
+    height: auto;
+  }
 }
 
 .panel--reply-editor--active {
   height: 25rem;
-  @media @small { height: 10rem; }
+  @media @small { height: auto; }
 }
 
 .reply-editor__form {
@@ -20,6 +25,10 @@
   align-items: center;
   height: 100%;
   width: 100%;
+
+  @media @small {
+    flex-direction: column;
+  }
 }
 
 .editor--reply {
@@ -32,7 +41,9 @@
   background: @light;
 
   @media @small {
+    min-height: 8rem;
     margin-right: 0;
+    margin-bottom: 1rem;
     font-size: 1.4rem;
     line-height: 1.4;
   }
@@ -42,6 +53,10 @@
   position: absolute;
   top: 3.5rem;
   margin-left: 1rem;
+
+  @media @small {
+    left: 2rem;
+  }
 }
 
 .topic-reply-editor__submit {
@@ -50,5 +65,10 @@
   height: 4rem;
   white-space: nowrap;
   cursor: pointer;
-  @media @small { display: none; }
+
+  @media @small {
+    height: 3.5rem;
+    width: 100%;
+    margin-bottom: 44px;
+  }
 }

@@ -225,42 +225,43 @@ const TopicContainer = createClass({
 
     return (
       <main>
-        <SearchHeaderContainer
-          userId={userId}
-          forumId={forumId}
-          groupUri={groupUri}
-          groupName={groupName}
-          subscriptionState={forumSubscriptionState}/>
-        <article>
-          <TopicHeader
-            topic={topic}
-            category={category}
+        <div className="scroller">
+          <SearchHeaderContainer
+            userId={userId}
+            forumId={forumId}
             groupUri={groupUri}
-            tags={tags}/>
+            groupName={groupName}
+            subscriptionState={forumSubscriptionState}/>
+          <article>
+            <TopicHeader
+              topic={topic}
+              category={category}
+              groupUri={groupUri}
+              tags={tags}/>
 
-          <TopicBody
-            topic={topic}
-            onSubscribeButtonClick={this.onTopicSubscribeButtonClick}
-            onReactionPick={this.onTopicReactionPick}
-            onEditTopicClick={this.onEditTopicClick}
-            onTopicEditUpdate={this.onTopicEditUpdate}
-            onTopicEditCancel={this.onTopicEditCancel}
-            onTopicEditSave={this.onTopicEditSave}/>
-        </article>
+            <TopicBody
+              topic={topic}
+              onSubscribeButtonClick={this.onTopicSubscribeButtonClick}
+              onReactionPick={this.onTopicReactionPick}
+              onEditTopicClick={this.onEditTopicClick}
+              onTopicEditUpdate={this.onTopicEditUpdate}
+              onTopicEditCancel={this.onTopicEditCancel}
+              onTopicEditSave={this.onTopicEditSave}/>
+          </article>
 
-        <TopicReplyListHeader
-          replies={parsedReplies}
-          sortName={sortName}
-          onSortByCommentClicked={this.onSortByCommentClicked}
-          onSortByLikeClicked={this.onSortByLikeClicked}
-          onSortByRecentClicked={this.onSortByRecentClicked}
-          replyListEditorInFocus={replyListEditorInFocus}/>
+          <TopicReplyListHeader
+            replies={parsedReplies}
+            sortName={sortName}
+            onSortByCommentClicked={this.onSortByCommentClicked}
+            onSortByLikeClicked={this.onSortByLikeClicked}
+            onSortByRecentClicked={this.onSortByRecentClicked}
+            replyListEditorInFocus={replyListEditorInFocus}/>
 
-        <TopicReplyList
-          replyListEditorInFocus={replyListEditorInFocus}>
-          {parsedReplies.map(this.getReplyListItem)}
-        </TopicReplyList>
-
+          <TopicReplyList
+            replyListEditorInFocus={replyListEditorInFocus}>
+            {parsedReplies.map(this.getReplyListItem)}
+          </TopicReplyList>
+        </div>
         <TopicReplyEditor
           user={currentUser}
           isSignedIn={isSignedIn}
@@ -454,12 +455,12 @@ const TopicContainer = createClass({
 
   onCommentEditCancel(commentId) {
     dispatch(updateCancelComment(commentId));
-      dispatch(updateCommentIsEditing(commentId, false));
+    dispatch(updateCommentIsEditing(commentId, false));
   },
 
   onCommentEditSave(commentId, replyId){
     dispatch(updateSaveComment(commentId, replyId));
-      dispatch(updateCommentIsEditing(commentId, false));
+    dispatch(updateCommentIsEditing(commentId, false));
   },
 
   onEditTopicClick() {
