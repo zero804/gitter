@@ -45,36 +45,6 @@
   .editable-content__secondary-button();
   position: relative;
   margin-left: 0;
-
-  @delete-tooltip-transform-positioning: translateX(-50%) translateY(-110%);
-  &:before {
-    content: 'Are you sure?';
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: @delete-tooltip-transform-positioning scale(.7);
-
-    padding: .2em 1em;
-
-    opacity: 0;
-    background-color: fade(@dark, 60%);
-    border-radius: .3em;
-
-    color: fade(@light, 85%);
-    font-size: .9em;
-    white-space: nowrap;
-
-    transition:
-      transform .2s ease,
-      opacity .2s ease;
-  }
-
-  &.confirming {
-    &:before {
-      opacity: 1;
-      transform: @delete-tooltip-transform-positioning scale(1);
-    }
-  }
 }
 
 .editable-content__save {
