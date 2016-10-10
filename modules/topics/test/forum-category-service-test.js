@@ -2,6 +2,7 @@
 
 var assert = require('assert');
 var StatusError = require('statuserror');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils')
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var forumCategoryService = require('../lib/forum-category-service');
 
@@ -93,6 +94,14 @@ describe('forum-category-service #slow', function() {
       })
       .then(function(category) {
         assert.strictEqual(category, null);
+
+        // and not delete every other category at the same time..
+        return forumCategoryService.findById(fixture.category1.id);
+      })
+      .then(function(otherCategory) {
+        // jip. still there.
+        assert.ok(otherCategory);
+        assert(mongoUtils.objectIDsEqual(otherCategory._id, fixture.category1._id));
       });
   });
 });

@@ -178,7 +178,7 @@ function deleteCategory(user, category) {
   return checkIfCategoryIsDeletable(categoryId)
     .then(function(canDelete) {
       if (!canDelete) throw new StatusError(409, 'Category not empty.');
-      return ForumCategory.remove().exec();
+      return ForumCategory.remove({ _id: categoryId }).exec();
     })
     .then(function() {
       stats.event('delete_category', {
