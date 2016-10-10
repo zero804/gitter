@@ -40,7 +40,7 @@ function routeLink(target, options) {
 }
 
 function installLinkHandler() {
-  $(document).on("click", "a", function (e) {
+  $(document).on('click', 'a', function (e) {
     var target = e.currentTarget;
 
     var disableRouting = dataset.get(target, 'disableRouting');

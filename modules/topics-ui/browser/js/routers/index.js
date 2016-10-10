@@ -64,7 +64,10 @@ var Router = Backbone.Router.extend({
     frameUtils.postMessage({
       type: 'navigation',
       url: appUrl,
-      urlType: 'topics'
+      urlType: 'topics',
+      options: {
+        disableFrameReload: true
+      }
     });
 
     //Call super
