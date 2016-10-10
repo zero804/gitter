@@ -6,17 +6,18 @@ import SimpleFilteredCollection from 'gitter-realtime-client/lib/simple-filtered
 import LiveCollection from './live-collection';
 import {BaseModel} from './base-model';
 
+import apiClient from '../utils/api-client';
+import {getRealtimeClient} from './realtime-client';
 import parseTopic from '../../../shared/parse/topic';
 import parseTag from '../../../shared/parse/tag';
-import {getRealtimeClient} from './realtime-client';
 import {getForumId } from './forum-store';
+import { getForumCategoryStore } from './forum-category-store';
 import router from '../routers';
 import {getCurrentUser} from '../stores/current-user-store';
 
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
 import onReactionsUpdateMixin from './mixins/on-reactions-update';
 
-import apiClient from '../utils/api-client';
 
 import {SUBMIT_NEW_TOPIC, TOPIC_CREATED} from '../../../shared/constants/create-topic';
 import {DEFAULT_CATEGORY_NAME, DEFAULT_TAG_NAME, DEFAULT_FILTER_NAME} from '../../../shared/constants/navigation';
@@ -39,6 +40,7 @@ import {
 
 import {
   UPDATE_TOPIC,
+  UPDATE_TOPIC_CATEGORY,
   UPDATE_CANCEL_TOPIC,
   UPDATE_SAVE_TOPIC,
   UPDATE_TOPIC_IS_EDITING
@@ -205,7 +207,7 @@ export const TopicModel = BaseModel.extend({
   getDataToSave(){
     const data = this.toPOJO();
     const tags = (data.tags || []);
-    const parsedTags = tags.map((t) => t.label);
+    const parsedTags = tags.map((t) => t.value);
 
     return Object.assign({}, data, {
       tags: parsedTags
@@ -217,7 +219,8 @@ export const TopicModel = BaseModel.extend({
       //When we have received data from the server we can assume
       //that it is no longer a draft or has been edited
       state: MODEL_STATE_SYNCED,
-      text: null
+      text: null,
+      editedCategory: null
     });
   }
 
@@ -237,6 +240,7 @@ export const TopicsLiveCollection = LiveCollection.extend({
 
   initialize(models, options){
     subscribe(UPDATE_TOPIC, this.onTopicUpdate, this);
+    subscribe(UPDATE_TOPIC_CATEGORY, this.onTopicCategoryUpdate, this);
     subscribe(UPDATE_CANCEL_TOPIC, this.onTopicEditCancel, this);
     subscribe(UPDATE_SAVE_TOPIC, this.onTopicEditSaved, this);
     subscribe(UPDATE_TOPIC_IS_EDITING, this.onTopicIsEditingUpdate, this);
@@ -269,6 +273,15 @@ export const TopicsLiveCollection = LiveCollection.extend({
     model.set('text', text);
   },
 
+  onTopicCategoryUpdate({ categoryId }) {
+    const topicId = router.get('topicId');
+    const model = this.get(topicId);
+    if(!model) { return; }
+    const forumCategoryStore = getForumCategoryStore();
+    const newCategory = forumCategoryStore.getById(categoryId);
+    model.set('editedCategory', newCategory);
+  },
+
   getSnapshotState() {
     return {
       filter: this.snapshotFilter,
@@ -291,7 +304,10 @@ export const TopicsLiveCollection = LiveCollection.extend({
     const topicId = router.get('topicId');
     const model = this.get(topicId);
     if(!model) { return; }
-    model.set('text', null);
+    model.set({
+      text: null,
+      editedCategory: null
+    });
   },
 
   //When a user clicks save on the editor we must save it back to the server
@@ -300,9 +316,18 @@ export const TopicsLiveCollection = LiveCollection.extend({
     const topicId = router.get('topicId');
     const model = this.get(topicId);
     if(!model) { return; }
+
     const text = model.get('text');
-    if(!text) { return; }
-    model.save({ text: model.get('text') }, { patch: true });
+    const category = model.get('editedCategory');
+    let dataToSave = {};
+    if(category) {
+      dataToSave.categoryId = category.id;
+    }
+    if(text) {
+      dataToSave.text = text
+    }
+
+    model.save(dataToSave, { patch: true });
   },
 
   onTopicIsEditingUpdate({ isEditing }) {

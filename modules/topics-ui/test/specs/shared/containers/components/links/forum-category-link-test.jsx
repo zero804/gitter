@@ -27,7 +27,7 @@ describe('<ForumCategoryLink/>', () => {
   });
 
   it('should render the right title', () => {
-    equal(wrapper.find('a').at(0).prop('title'), `View all ${category.category} topics`);
+    equal(wrapper.find('a').at(0).prop('title'), `View all ${category.name} topics`);
   });
 
   it('should render the right href', () => {
@@ -38,7 +38,7 @@ describe('<ForumCategoryLink/>', () => {
     wrapper = shallow(
       <ForumCategoryLink
       groupUri="gitterHQ"
-      category={{category: DEFAULT_CATEGORY_NAME, slug: 'all'}}>
+      category={{name: DEFAULT_CATEGORY_NAME, slug: 'all'}}>
       test
       </ForumCategoryLink>
     )

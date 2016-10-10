@@ -27,7 +27,7 @@ export default createClass({
         className={className}
         groupUri={groupUri}
         category={category}>
-        {category.category}
+        {category.name}
       </ForumCategoryLink>
     );
   },

@@ -1,11 +1,15 @@
 import React, { PropTypes } from 'react';
+import parseCategory from '../../../../shared/parse/category';
+import parseCategoryForSelect from '../../../../shared/parse/category-for-select';
+import {AVATAR_SIZE_LARGE} from '../../../constants/avatar-sizes';
+
 import Container from '../container.jsx';
 import Panel from '../panel.jsx';
 import H1 from '../text/h-1.jsx';
 import UserAvatar from '../user/user-avatar.jsx';
 import ForumCategoryLink from '../links/forum-category-link.jsx';
 import ForumTagLink from '../links/forum-tag-link.jsx';
-import {AVATAR_SIZE_LARGE} from '../../../constants/avatar-sizes';
+import Select from '../forms/select.jsx';
 
 export default React.createClass({
 
@@ -26,14 +30,16 @@ export default React.createClass({
       }).isRequired,
     }).isRequired,
 
-    category: PropTypes.shape({
-      category: PropTypes.string.isRequired,
-    }).isRequired,
+    categories: PropTypes.arrayOf(PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      value: PropTypes.string,
+    })).isRequired,
+    onCategoryChange: PropTypes.func.isRequired,
   },
 
   render(){
 
-    const { category, groupUri, topic, tags } = this.props;
+    const { topic, tags } = this.props;
     const { title, user } = topic;
     const { displayName } = user;
 
@@ -52,10 +58,7 @@ export default React.createClass({
               </div>
             </section>
             <section className="topic-header__control-row">
-              <ForumCategoryLink
-                className="topic-header__category-link"
-                category={category}
-                groupUri={groupUri}>{category.category}</ForumCategoryLink>
+              {this.buildCategoryView()}
               <ul className="topic-header__tag-list">{tags.map((tag, i) => this.buildTagView(tag, i))}</ul>
             </section>
           </header>
@@ -65,17 +68,55 @@ export default React.createClass({
   },
 
   buildTagView(tag, index){
-    const {groupUri} = this.props;
+    const { groupUri } = this.props;
     return (
       <li key={`topic-header-tag-link-${index}`}>
         <ForumTagLink
           groupUri={groupUri}
           tag={tag}
           className="topic-header__tag-link">
-            {tag.label}
+          {tag.label}
         </ForumTagLink>
       </li>
     );
+  },
+
+  buildCategoryView() {
+   const { groupUri, topic, categories } = this.props;
+   const { category, editedCategory, isEditing } = topic;
+
+  let parsedCategory = parseCategory(category);
+  if(editedCategory) {
+    parsedCategory = parseCategory(editedCategory);
+  }
+
+   // Slice "All Tags" out of here for now
+   const catOptionsForSelect = categories.slice(1).map(parseCategoryForSelect);
+
+    let categoryControl = (
+      <ForumCategoryLink
+        className="topic-header__category-link"
+        category={parsedCategory}
+        groupUri={groupUri}>
+        {category.name}
+      </ForumCategoryLink>
+    );
+    if(isEditing) {
+      categoryControl = (
+        <Select
+          options={catOptionsForSelect}
+          className="select--create-topic-category"
+          defaultValue={parsedCategory.id}
+          onChange={this.onCategoryChange} />
+      )
+    }
+
+    return categoryControl;
+  },
+
+  onCategoryChange(categoryId) {
+    const { onCategoryChange } = this.props;
+    onCategoryChange(categoryId);
   },
 
 });

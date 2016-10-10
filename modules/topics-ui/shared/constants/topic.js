@@ -1,4 +1,5 @@
 export const UPDATE_TOPIC = 'update-topic';
+export const UPDATE_TOPIC_CATEGORY = 'update-topic-category';
 export const UPDATE_CANCEL_TOPIC = 'update-cancel-topic';
 export const UPDATE_SAVE_TOPIC = 'update-save-topic';
 export const UPDATE_TOPIC_IS_EDITING = 'update-is-editing-topic';
