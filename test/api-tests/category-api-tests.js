@@ -57,6 +57,7 @@ describe('category-api', function() {
           id: category.id,
           name: category.name,
           slug: category.slug,
+          adminOnly: false,
           v: 1
         });
       });
@@ -73,6 +74,7 @@ describe('category-api', function() {
           id: fixture.category1.id,
           name: fixture.category1.name,
           slug: fixture.category1.slug,
+          adminOnly: false,
           v: 1
         });
       });
@@ -82,6 +84,7 @@ describe('category-api', function() {
     var update = {
       name: 'Foo',
       slug: 'cats',
+      adminOnly: true
     };
     return request(app)
       .patch('/v1/forums/' + fixture.forum1.id + '/categories/' + fixture.category2.id)
@@ -93,6 +96,7 @@ describe('category-api', function() {
 
         assert.strictEqual(category.name, update.name);
         assert.strictEqual(category.slug, update.slug);
+        assert.strictEqual(category.adminOnly, update.adminOnly);
       });
   });
 
