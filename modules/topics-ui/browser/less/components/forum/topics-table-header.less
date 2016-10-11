@@ -1,11 +1,13 @@
 @import (less, reference) "~gitter-styleguide/css/components/headings.css";
 @import "../../colors";
-@import "../../dims";
+@import "../../break-points";
 
 .topics-table-header {
   background:    @light;
   border-bottom: 1px solid @topic-table-header-color;
   color:         @topic-table-header-color;
+
+  @media @only-small { display: none; }
 }
 
 .topics-table-header__cell {
