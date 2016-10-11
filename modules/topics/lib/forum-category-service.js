@@ -67,7 +67,11 @@ function createCategory(user, forum, categoryInfo) {
   // see https://github.com/Automattic/mongoose/issues/2901. Mongoose is weird
   // about undefined or null in updates whereas they work fine in creates.
   if (categoryInfo.order) {
-    data.order = categoryInfo.order
+    data.order = categoryInfo.order;
+  }
+
+  if (categoryInfo.adminOnly) {
+    data.adminOnly = categoryInfo.adminOnly;
   }
 
   var insertData = validateCategory(data);
@@ -160,6 +164,34 @@ function updateCategory(user, category, fields) {
 
 // TODO: setCategoryOrder
 
+function setCategoryAdminOnly(user, category, adminOnly) {
+  if (adminOnly === category.adminOnly) return category;
+
+  if (!validators.validateAdminOnly(adminOnly)) {
+    throw new StatusError(400, 'adminOnly is invalid.');
+  }
+
+  var userId = user._id;
+  var forumId = category.forumId;
+  var categoryId = category._id;
+
+  return updateCategoryFields(categoryId, { adminOnly: adminOnly })
+    .then(function(updatedCategory) {
+      stats.event('update_category_adminonly', {
+        userId: userId,
+        forumId: forumId,
+        categoryId: categoryId,
+        adminOnly: adminOnly
+      });
+
+      liveCollections.categories.emit('patch', forumId, categoryId, {
+        adminOnly: updatedCategory.adminOnly,
+      });
+
+      return updatedCategory;
+    });
+}
+
 function checkIfCategoryIsDeletable(categoryId) {
   return mongooseUtils.getEstimatedCountForId(Topic, 'categoryId', categoryId, {
       read: 'primary'
@@ -201,6 +233,7 @@ module.exports = {
   createCategory: Promise.method(createCategory),
   createCategories: createCategories,
   updateCategory: Promise.method(updateCategory),
+  setCategoryAdminOnly: Promise.method(setCategoryAdminOnly),
   checkIfCategoryIsDeletable: checkIfCategoryIsDeletable,
   deleteCategory: deleteCategory
 };
