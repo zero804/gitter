@@ -95,7 +95,7 @@ function promptForUpdate {
 function setupHostAlias {
   HOSTNAME=$1
   IP=$2
-  CURRENT_ALIAS=$(grep " $HOSTNAME *$" /etc/hosts|sed 's/ .*//')
+  CURRENT_ALIAS=$(grep " $HOSTNAME *$" /etc/hosts|sed 's/ .*//' || echo '')
   if [[ "$CURRENT_ALIAS" != "$IP" ]]; then
     if promptForUpdate; then
       TMP_HOSTS_FILE="/tmp/hosts.start.$RANDOM"
