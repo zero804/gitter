@@ -10,7 +10,7 @@
   box-sizing: border-box;
   padding:    @panel-vert-padding @panel-horiz-padding;
 
-  @media @small { padding: 2rem; }
+  @media @only-small { padding: 2rem; }
 }
 
 @decal-height:       1rem;
@@ -52,7 +52,7 @@
   padding-left:  0;
   padding-right: 0;
 
-  @media @small {
+  @media @only-small {
     flex-direction: column;
   }
 }
@@ -63,5 +63,5 @@
 
 .panel--topic-reply-list {
   background-color: @topic-reply-list-header-bg;
-  @media @small { padding: 2rem; }
+  @media @only-small { padding: 2rem; }
 }

@@ -63,7 +63,7 @@
   &:extend(.subdued-button-clouds--small all);
   .topic-search-button();
 
-  @media @small { margin: 0; }
+  @media @only-small { margin: 0; }
 }
 
 .topic-search__watch-forum-button {
@@ -73,7 +73,7 @@
   padding: .8em 1em;
   cursor: pointer;
 
-  @media @small {
+  @media @only-small {
     margin: 0;
     margin-bottom: 1rem;
   }
@@ -138,5 +138,5 @@
   color:            @light;
   font-family: @font-family;
 
-  @media @small { display: none; }
+  @media @only-small { display: none; }
 }

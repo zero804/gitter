@@ -1,4 +1,8 @@
-@small: ~"only screen and (max-width: 479px)";
+//Ideally we would be developing mobile first and expanding designs upwards
+//currently we are desktop first and contracting the app to small devices
+//not ideal and the naming of this breakpoint is here to illustrate that
+//you are ONLY targeting small devices (BAD TIMES).
+@only-small: ~"only screen and (max-width: 479px)";
 
 //Media query hack for safari
 @mobile-safari: ~"screen and (min-color-index:0) and(-webkit-min-device-pixel-ratio:0)";
