@@ -4,6 +4,7 @@ var $ = require('jquery');
 var onready = require('./utils/onready');
 var appEvents = require('./utils/appevents');
 var MobileAppLayout = require('./views/layouts/mobile-app');
+var clientEnv = require('gitter-client-env');
 
 //Remove when Left Menu is in
 var FastClick = require('fastclick');
@@ -27,8 +28,35 @@ onready(function() {
     window.location.href = url;
   });
 
+  window.addEventListener('message', function(e){
+    if (e.origin !== clientEnv.basePath) { return; }
+
+    var message;
+    try {
+      message = JSON.parse(e.data);
+    }
+    catch (err) { return; }
+
+    switch (message.type) {
+      case 'navigation':
+        var url = message.url;
+        pushState(url, message.title, url)
+        break;
+    }
+
+  });
+
   new MobileAppLayout({
     template: false,
     el: 'body'
   }).render();
 });
+
+function pushState(state, title, url) {
+  if (state === window.history.state) {
+    // Don't repush the same state...
+    return;
+  }
+
+  window.history.pushState(state, title, url);
+}
