@@ -222,9 +222,9 @@ exports.newChatMessageToTroupe = function(troupe, user, data) {
 
 // Returns some recent public chats
 exports.getRecentPublicChats = function() {
-  var twentyFourHoursAgo = Date.now() - RECENT_WINDOW_MILLISECONDS;
+  var minRecentTime = Date.now() - RECENT_WINDOW_MILLISECONDS;
+  var minId = mongoUtils.createIdForTimestamp(minRecentTime);
 
-  var minId = mongoUtils.createIdForTimestamp(twentyFourHoursAgo.valueOf())
   var aggregation = [{
     $match: {
       _id: { $gt: minId },
