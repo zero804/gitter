@@ -6,7 +6,7 @@ export default React.createClass({
   displayName: 'Tooltip',
   propTypes: {
     tooltip: PropTypes.string,
-    wrapperClassName: PropTypes.string,
+    elementType: PropTypes.string,
     tooltipClassName: PropTypes.string,
     children:  React.PropTypes.oneOfType([
       PropTypes.arrayOf(React.PropTypes.node),
@@ -16,6 +16,7 @@ export default React.createClass({
 
   getDefaultProps() {
     return {
+      elementType: 'div',
       wrapperClassName: 'tooltip__wrapper',
       tooltipClassName: 'tooltip__overlay'
     };
@@ -37,21 +38,22 @@ export default React.createClass({
   },
 
   render() {
-    const { tooltip, wrapperClassName, tooltipClassName, children } = this.props;
+    const { tooltip, elementType, tooltipClassName, children } = this.props;
     const { prevTooltip } = this.state;
 
+    const ElementType = elementType;
     const compiledTooltipClassName = classNames({
       [tooltipClassName]: true,
-      hidden: !tooltip || (tooltip && tooltip.length === 0)
-    })
+      active: !tooltip || (tooltip && tooltip.length === 0)
+    });
 
     return (
-      <div className={wrapperClassName}>
+      <ElementType {...this.props}>
         {children}
         <div className={compiledTooltipClassName}>
           {tooltip || prevTooltip}
         </div>
-      </div>
+      </ElementType>
     );
   },
 
