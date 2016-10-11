@@ -23,11 +23,22 @@ describe('category-api', function() {
         extraAdmins: ['user1']
       }
     },
+    // for retrieving (and you can't delete it because it has a topic)
     category1: {
       forum: 'forum1'
     },
+    // for updating
     category2: {
       forum: 'forum1'
+    },
+    // for deleting (because it is empty)
+    category3: {
+      forum: 'forum1'
+    },
+    topic1: {
+      user: 'user1',
+      forum: 'forum1',
+      category: 'category1'
     }
   });
 
@@ -104,5 +115,21 @@ describe('category-api', function() {
         var category = result.body;
         assert.strictEqual(category.name, "I am a category");
       });
+  });
+
+  it('DELETE /v1/forums/:forumId/categories/:categoryId (non-empty)', function() {
+    var category = fixture.category1;
+    return request(app)
+      .del('/v1/forums/' + category.forumId + '/categories/' + category.id)
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(409);
+  });
+
+  it('DELETE /v1/forums/:forumId/categories/:categoryId (empty)', function() {
+    var category = fixture.category3;
+    return request(app)
+      .del('/v1/forums/' + category.forumId + '/categories/' + category.id)
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(204);
   });
 });
