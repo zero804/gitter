@@ -174,10 +174,10 @@ export const TopicModel = BaseModel.extend({
   validate(attributes){
     let errors = new Map();
 
-    if(!attributes.title || attributes.title.length === 0) {
+    if(!attributes.title || attributes.title.trim().length === 0) {
       errors.set('title', 'A new Topic requires a title');
     }
-    if((attributes.editedTitle !== null && attributes.editedTitle !== undefined) && attributes.editedTitle.length === 0) {
+    if((attributes.editedTitle !== null && attributes.editedTitle !== undefined) && attributes.editedTitle.trim().length === 0) {
       errors.set('editedTitle', 'A Topic requires a title');
     }
 
@@ -324,10 +324,10 @@ export const TopicsLiveCollection = LiveCollection.extend({
     const text = model.get('text');
     let dataToSave = {};
     if(title || title === '') {
-      dataToSave.title = title
+      dataToSave.title = title.trim();
     }
     if(text || text === '') {
-      dataToSave.text = text
+      dataToSave.text = text;
     }
 
     model.save(dataToSave, { patch: true });
