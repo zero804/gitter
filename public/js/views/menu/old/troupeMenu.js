@@ -27,17 +27,9 @@ require('nanoscroller');
 
 require('gitter-styleguide/css/components/buttons.css');
 
-
-
 var SUGGESTED_ROOMS_THRESHOLD = 10; // non inclusive
 
 module.exports = (function () {
-
-  // Reply back to the child iframe - used in search
-  appEvents.on('troupeRequest', function (payload, evt) { // jshint unused:true
-    var msg = { child_window_event: ['troupesResponse', troupeCollections.troupes] };
-    evt.source.postMessage(JSON.stringify(msg), evt.origin);
-  });
 
   // wraps a view to give us more control of when to display it or not
   var CollectionWrapperView = Marionette.LayoutView.extend({
