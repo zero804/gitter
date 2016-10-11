@@ -16,7 +16,8 @@ export default React.createClass({
     onEditClick: PropTypes.func.isRequired,
     onChange: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
-    onSave: PropTypes.func.isRequired
+    onSave: PropTypes.func.isRequired,
+    onDelete: PropTypes.func.isRequired
   },
 
   render(){
@@ -28,6 +29,7 @@ export default React.createClass({
         onChange={this.onChange}
         onCancel={this.onCancel}
         onSave={this.onSave}
+        onDelete={this.onDelete}
         footerChildren={this.getFeedItemFooterChildren()}/>
     );
   },
@@ -49,6 +51,11 @@ export default React.createClass({
 
   onSave(val){
     this.props.onSave(val);
+  },
+
+  onDelete() {
+    const { onDelete } = this.props;
+    onDelete();
   },
 
   getFeedItemFooterChildren(){

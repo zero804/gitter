@@ -153,7 +153,7 @@ const ForumContainer = React.createClass({
     const tagValues = tagStore.pluckValues();
 
     return (
-      <main>
+      <main className="scroller">
         <SearchHeaderContainer
           userId={currentUser.id}
           forumId={forumId}

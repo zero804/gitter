@@ -24,6 +24,7 @@ var ForumCategorySchema = new Schema({
   slug: { type: String, required: true },
   forumId: { type: ObjectId, required: true },
   order: { type: Number, "default": DEFAULT_CATEGORY_ORDER, required: false },
+  adminOnly: { type: Boolean },
   _tv: { type: 'MongooseNumber', 'default': 0 },
 }, { strict: "throw" });
 
