@@ -1,4 +1,5 @@
 @import "../../colors";
+@import "../../break-points";
 
 .reply-comment-editor {
   display: flex;
@@ -13,6 +14,11 @@
 .reply-comment-editor__editor {
   width: 100%;
   background-color: @topic-reply-body-color;
+
+  @media @only-small {
+    font-size: 1.3rem;
+    line-height: 1.4;
+  }
 }
 
 .reply-comment-editor__details {

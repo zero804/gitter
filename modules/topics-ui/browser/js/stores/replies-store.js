@@ -26,6 +26,7 @@ import {
   UPDATE_REPLY,
   CANCEL_UPDATE_REPLY,
   SAVE_UPDATE_REPLY,
+  DELETE_REPLY,
   TOPIC_REPLIES_COMMENT_SORT_NAME,
   TOPIC_REPLIES_LIKED_SORT_NAME,
   TOPIC_REPLIES_RECENT_SORT_NAME,
@@ -73,6 +74,7 @@ export const RepliesStore = LiveCollection.extend({
     subscribe(UPDATE_REPLY, this.updateReplyText, this);
     subscribe(CANCEL_UPDATE_REPLY, this.cancelEditReply, this);
     subscribe(SAVE_UPDATE_REPLY, this.saveUpdatedModel, this);
+    subscribe(DELETE_REPLY, this.deleteReply, this);
     subscribe(UPDATE_REPLY_IS_EDITING, this.onReplyIsEditingUpdate, this);
     subscribe(REQUEST_UPDATE_REPLY_SUBSCRIPTION_STATE, this.onRequestSubscriptionStateUpdate, this);
     subscribe(UPDATE_REPLY_SUBSCRIPTION_STATE, this.onSubscriptionStateUpdate, this);
@@ -147,6 +149,12 @@ export const RepliesStore = LiveCollection.extend({
     const text = model.get('text');
     if(text === null) { return; }
     model.save({ text: text }, { patch: true });
+  },
+
+  deleteReply({ replyId }){
+    const model = this.get(replyId);
+    if(!model) { return; }
+    model.destroy();
   },
 
   onReplyIsEditingUpdate({ replyId, isEditing }) {

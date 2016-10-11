@@ -1,12 +1,18 @@
-@import "../../colors";
 @import (less, reference) "~gitter-styleguide/css/components/headings.css";
 @import (less, reference) "~gitter-styleguide/css/components/buttons.css";
+@import "../../colors";
+@import "../../break-points";
 
 .create-topic__heading {
   &:extend(.h1 all);
   margin-bottom: 6rem;
   color:         @create-modal-heading-color;
   font-weight:   100;
+
+  @media @only-small {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+  }
 }
 
 .create-topic__input--name {
@@ -15,6 +21,8 @@
   margin-bottom: 4rem;
   color:         @create-topic-name-color;
   font-weight:   300;
+
+  @media @only-small { margin-bottom: 3rem; }
 }
 
 .create-topic__editor--body {
@@ -33,6 +41,10 @@
   &:extend(.button-caribbean--small all);
   flex-grow: 0;
   cursor: pointer;
+
+  @media @only-small {
+    margin-bottom: 2rem;
+  }
 }
 
 .select--create-topic-category--decal{
@@ -44,16 +56,30 @@
 .select--create-topic-category{
   border-color: @input-border-color;
   color: @create-topic-name-color;
+
+  @media @only-small {
+    width: 100%;
+  }
 }
 
 .create-topic__details-row {
   margin-bottom: 3rem;
   display: flex;
+
+  @media @only-small {
+    flex-direction: column;
+  }
 }
 
 .create-topic__input--tags {
   width: 100%;
   margin-left: 2rem;
+
+  @media @only-small {
+    margin-left: 0;
+    margin-top: 2rem;
+    line-height: 2;
+  }
 }
 
 .create-topic__tags {

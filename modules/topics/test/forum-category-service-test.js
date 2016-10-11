@@ -28,6 +28,11 @@ describe('forum-category-service #slow', function() {
     category4: {
       forum: 'forum1'
     },
+    // to be updated to adminOnly: false
+    category5: {
+      forum: 'forum1',
+      adminOnly: false
+    },
     topic1: {
       user: 'user1',
       forum: 'forum1',
@@ -54,6 +59,20 @@ describe('forum-category-service #slow', function() {
         assert.strictEqual(category.name, 'foo');
         assert.strictEqual(category.slug, 'bar');
       });
+  });
+
+  it('should set a category to adminOnly', function() {
+    return forumCategoryService.setCategoryAdminOnly(fixture.user1, fixture.category1, true)
+      .then(function(category) {
+        assert.strictEqual(category.adminOnly, true);
+      })
+  });
+
+  it('should set a category to be available to everyone', function() {
+    return forumCategoryService.setCategoryAdminOnly(fixture.user1, fixture.category5, false)
+      .then(function(category) {
+        assert.strictEqual(category.adminOnly, false);
+      })
   });
 
   it('should not blow up when updating with no changed fields', function() {

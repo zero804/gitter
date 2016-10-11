@@ -14,7 +14,7 @@ describe('<CreateTopicLink/>', () => {
   beforeEach(() => {
     wrapper = shallow(
       <CreateTopicLink groupUri="gitterHQ" className="test">
-      This is a link
+        This is a link
       </CreateTopicLink>
     );
   });
