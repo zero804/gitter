@@ -1,9 +1,11 @@
 @import "../colors";
+@import '../break-points';
 
 .container {
   width: 100%;
   box-sizing: border-box;
   padding: 0 6rem;
+  @media @only-small { padding: 0; }
 }
 
 .container--category {
@@ -26,4 +28,5 @@
   position: fixed;
   bottom: 0;
   left: 0;
+  @media @only-small { padding: 0; }
 }

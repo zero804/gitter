@@ -17,6 +17,11 @@ function validateCategory(data) {
     throw new StatusError(400, 'Order is invalid.');
   }
 
+  if (!validators.validateAdminOnly(data.adminOnly)) {
+    throw new StatusError(400, 'adminOnly is invalid.');
+
+  }
+
   return data;
 }
 

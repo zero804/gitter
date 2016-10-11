@@ -14,5 +14,6 @@ module.exports = {
   validateTopicFilter: require('./validate-topic-filter'),
   validateTopicSort: require('./validate-topic-sort'),
   validateUsername: require('./validate-username'),
-  validateSticky: require('./validate-sticky')
+  validateSticky: require('./validate-sticky'),
+  validateAdminOnly: require('./validate-admin-only')
 };

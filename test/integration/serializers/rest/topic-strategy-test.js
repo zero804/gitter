@@ -81,6 +81,7 @@ describe('TopicStrategy #slow', function() {
             id: category.id,
             name: category.name,
             slug: category.slug,
+            adminOnly: false,
             v: 1
           },
           user: {
@@ -136,6 +137,7 @@ describe('TopicStrategy #slow', function() {
             id: category.id,
             name: category.name,
             slug: category.slug,
+            adminOnly: false,
             v: 1
           },
           user: {
@@ -184,6 +186,7 @@ describe('TopicStrategy #slow', function() {
             id: category.id,
             name: category.name,
             slug: category.slug,
+            adminOnly: false,
             v: 1
           },
           user: {
@@ -234,6 +237,7 @@ describe('TopicStrategy #slow', function() {
             id: category.id,
             name: category.name,
             slug: category.slug,
+            adminOnly: false,
             v: 1
           },
           user: {
@@ -305,6 +309,7 @@ describe('TopicStrategy #slow', function() {
             id: category.id,
             name: category.name,
             slug: category.slug,
+            adminOnly: false,
             v: 1
           },
           user: {
@@ -372,6 +377,7 @@ describe('TopicStrategy #slow', function() {
               id: category.id,
               name: category.name,
               slug: category.slug,
+              adminOnly: false,
               v: 1
             },
             user: fixture.user1.id,
@@ -445,6 +451,7 @@ describe('TopicStrategy #slow', function() {
               id: category.id,
               name: category.name,
               slug: category.slug,
+              adminOnly: false,
               v: 1
             })
           }
