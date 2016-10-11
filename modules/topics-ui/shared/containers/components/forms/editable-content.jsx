@@ -100,13 +100,13 @@ export default React.createClass({
             onClick={this.onCancelClicked}>
             Cancel
           </button>
-          <Tooltip tooltip={tooltip}>
-            <button
-              className="editable-content__delete"
-              onClick={this.onDeleteClick}
-              onBlur={this.onDeleteBlur}>
-              Delete
-            </button>
+          <Tooltip
+            tooltip={tooltip}
+            elementType="button"
+            className="editable-content__delete"
+            onClick={this.onDeleteClick}
+            onBlur={this.onDeleteBlur}>
+            Delete
           </Tooltip>
           <button
             className="editable-content__save"
