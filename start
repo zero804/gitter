@@ -6,6 +6,8 @@ export DEBUG=
 
 set -euo pipefail
 
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 DOCKER_MACHINE_NAME=${DOCKER_MACHINE_NAME-default}
 
 function has_local_docker_install {
@@ -140,4 +142,13 @@ startDockerServices
 
 if ! has_local_docker_install; then
   docker-machine env "${DOCKER_MACHINE_NAME}"
+fi
+
+if ! docker-machine ssh default test -f /etc/docker/daemon.json; then
+  docker-machine scp ${SCRIPT_DIR}/scripts/docker/daemon.json default:/tmp/docker-daemon.json
+  docker-machine ssh default sudo mv /tmp/docker-daemon.json /etc/docker/daemon.json
+
+  # echo 'EXTRA_ARGS="${EXTRA_ARGS} --insecure-registry docker-registry.service.beta.gitter"' | docker-machine ssh default sudo tee -a /var/lib/boot2docker/profile
+
+  docker-machine ssh default sudo /etc/init.d/docker restart
 fi
