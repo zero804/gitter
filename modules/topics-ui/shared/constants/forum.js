@@ -1,5 +1,6 @@
 
 export const REQUEST_SIGN_IN = 'request-sign-in';
+export const NAVIGATE_TO_FORUMS = 'navigate-to-forums';
 
 export const UPDATE_FORUM_SUBSCRIPTION_STATE = 'update-forum-subscription-state';
 export const REQUEST_UPDATE_FORUM_SUBSCRIPTION_STATE = 'request-update-forum-subscription-state';
