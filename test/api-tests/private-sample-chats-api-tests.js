@@ -5,7 +5,6 @@ process.env.DISABLE_API_LISTEN = '1';
 var Promise = require('bluebird');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assert = require('assert');
-var _ = require('lodash');
 
 describe('room-api', function() {
   var app, request;
