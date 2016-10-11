@@ -40,9 +40,8 @@ export default React.createClass({
   render(){
 
     const { category, groupUri, topic, tags } = this.props;
-    const { title, user } = topic;
+    const { user } = topic;
     const { displayName } = user;
-
 
     return (
       <Container className="container--topic-header">
@@ -89,7 +88,9 @@ export default React.createClass({
 
   getTitleView() {
     const { topic } = this.props;
-    const { title, editedTitle, isEditing } = topic;
+    const { title, editedTitle, isEditing, validationError } = topic;
+    const errors = (validationError || new Map());
+    const isTitleValid = errors.get('title') === undefined && errors.get('editedTitle') === undefined;
 
     let displayTitle = title;
     if(editedTitle || editedTitle === '') {
@@ -106,6 +107,7 @@ export default React.createClass({
         <Input
           className="topic-header__title-input"
           value={displayTitle}
+          valid={isTitleValid}
           onChange={this.onTopicTitleEditUpdate} />
       );
     }

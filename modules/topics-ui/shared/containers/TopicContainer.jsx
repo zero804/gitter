@@ -478,12 +478,10 @@ const TopicContainer = createClass({
 
   onTopicEditCancel(){
     dispatch(updateCancelTopic());
-    dispatch(updateTopicIsEditing(false));
   },
 
   onTopicEditSave(){
     dispatch(updateSaveTopic());
-    dispatch(updateTopicIsEditing(false));
   },
 
   onSortByCommentClicked(){
