@@ -17,7 +17,14 @@ describe('topic-service #slow', function() {
     category2: {
       forum: 'forum1'
     },
+    // his one for updating
     topic1: {
+      user: 'user1',
+      forum: 'forum1',
+      category: 'category1'
+    },
+    // this one for deleting
+    topic2: {
       user: 'user1',
       forum: 'forum1',
       category: 'category1'
@@ -81,6 +88,16 @@ describe('topic-service #slow', function() {
     return topicService.setTopicCategory(fixture.user1, fixture.topic1, fixture.category2)
       .then(function(topic) {
         assert(mongoUtils.objectIDsEqual(topic.categoryId, fixture.category2._id));
+      });
+  });
+
+  it('should delete a topic', function() {
+    return topicService.deleteTopic(fixture.user1, fixture.topic2)
+      .then(function() {
+        return topicService.findByIdForForum(fixture.forum1._id, fixture.topic2._id)
+      })
+      .then(function(topic) {
+        assert.strictEqual(topic, null);
       });
   });
 });
