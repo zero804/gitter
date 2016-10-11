@@ -1,7 +1,7 @@
 import {equal} from 'assert';
 
 import createAction from '../../../../../shared/action-creators/topic/update-topic-title';
-import { UPDATE_TOPIC_TITLE } from '../../../../../shared/constants/avatar-sizes.js';
+import { UPDATE_TOPIC_TITLE } from '../../../../../shared/constants/topic.js';
 
 describe('updateTopicTitle', () => {
 
