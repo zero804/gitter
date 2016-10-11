@@ -23,8 +23,15 @@ describe('forum-with-policy-service #slow', function() {
     category1: {
       forum: 'forum1'
     },
+    // this one is for changing the category
     category2: {
       forum: 'forum1'
+    },
+    // this one for testing admin-only categories (posting new topics to it or
+    // changing an existing topic's category)
+    category3: {
+      forum: 'forum1',
+      adminOnly: true
     },
     topic1: {
       user: 'user1',
@@ -137,9 +144,12 @@ describe('forum-with-policy-service #slow', function() {
     };
   });
 
-  function makeCheck(type, method, getParams, expectedResult) {
+  function makeCheck(type, method, getParams, expectedResult, note) {
     var shouldOrNot = (expectedResult) ? ' should' : ' should not';
-    it(type + ' users' + shouldOrNot + ' be allowed to ' + method, function() {
+    var description = type + ' users' + shouldOrNot + ' be allowed to ' + method;
+    if (note) description = description + ' (' + note + ')';
+
+    it(description, function() {
       var expected = !!expectedResult;
 
       // These things have to be looked up when this function gets executed
@@ -158,26 +168,26 @@ describe('forum-with-policy-service #slow', function() {
     });
   }
 
-  function makeChecks(method, params, expectedResults) {
+  function makeChecks(method, params, expectedResults, note) {
     // * true means the user must be allowed to do it
     // * undefined means the user must not be allowed (403 error)
     // * false means skip this test because it is not applicable (ie. "owning
     //   user" makes no sense for creating things)
 
     if (expectedResults.owner !== false) {
-      makeCheck('owner', method, params, !!expectedResults.owner);
+      makeCheck('owner', method, params, !!expectedResults.owner, note);
     }
 
     if (expectedResults.member !== false) {
-      makeCheck('member', method, params, !!expectedResults.member);
+      makeCheck('member', method, params, !!expectedResults.member, note);
     }
 
     if (expectedResults.admin !== false) {
-      makeCheck('admin', method, params, !!expectedResults.admin);
+      makeCheck('admin', method, params, !!expectedResults.admin, note);
     }
 
     if (expectedResults.other !== false) {
-      makeCheck('other', method, params, !!expectedResults.other);
+      makeCheck('other', method, params, !!expectedResults.other, note);
     }
   }
 
@@ -190,7 +200,12 @@ describe('forum-with-policy-service #slow', function() {
     admin: true,
     owner: false, // skip
     member: true
-  });
+  }, 'normal category');
+
+  makeChecks('createTopic', function() { return [fixture.category3, {}]; }, {
+    admin: true,
+    owner: false, // skip
+  }, 'adminOnly category');
 
   makeChecks('createReply', function() { return [fixture.topic1, {}]; }, {
     admin: true,
@@ -226,7 +241,11 @@ describe('forum-with-policy-service #slow', function() {
   makeChecks('setTopicCategory', function() { return [fixture.topic1, fixture.category2]; }, {
     admin: true,
     owner: true
-  });
+  }, 'normal category');
+
+  makeChecks('setTopicCategory', function() { return [fixture.topic1, fixture.category3]; }, {
+    admin: true,
+  }, 'adminOnly category');
 
   makeChecks('updateReply', function() { return [fixture.reply1, {}]; }, {
     admin: true,
