@@ -1,6 +1,6 @@
 import {equal} from 'assert';
 
-import createAction from '../../../../../shared/action-creators//create-topic//category-update';
+import createAction from '../../../../../shared/action-creators/create-topic/category-update';
 import { CATEGORY_UPDATE } from '../../../../../shared/constants/create-topic.js';
 
 describe('categoryUpdate', () => {
