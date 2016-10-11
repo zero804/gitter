@@ -105,7 +105,7 @@ export default React.createClass({
       categoryControl = (
         <Select
           options={catOptionsForSelect}
-          className="select--create-topic-category"
+          className="select--topic-category"
           defaultValue={parsedCategory.id}
           onChange={this.onCategoryChange} />
       )
