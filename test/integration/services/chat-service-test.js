@@ -168,4 +168,14 @@ describe('chatService', function() {
 
   });
 
+
+  it('getRecentPublicChats #slow', function() {
+    fixtureLoader.disableMongoTableScans();
+
+    return chatService.getRecentPublicChats()
+      .then(function(chats) {
+        assert(chats.length >= 1);
+      });
+  });
+
 });
