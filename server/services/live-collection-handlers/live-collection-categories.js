@@ -37,7 +37,7 @@ var liveCollectionCategories = {
 
   removeId: function(forumId, categoryId) {
     var url = '/forums/' + forumId + '/categories';
-    appEvents.dataChange2(url, 'remove', { id: categoryId }, 'category');
+    appEvents.dataChange2(url, 'remove', { id: categoryId.toString() }, 'category');
   }
 }
 

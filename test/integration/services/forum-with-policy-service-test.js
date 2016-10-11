@@ -57,7 +57,8 @@ describe('forum-with-policy-service #slow', function() {
     },
     'gitter-web-topics/lib/forum-category-service': {
       createCategory: function() {},
-      updateCategory: function() {}
+      updateCategory: function() {},
+      deleteCategory: function() {}
     },
     'gitter-web-topics/lib/topic-service': {
       createTopic: function() {},
@@ -255,6 +256,11 @@ describe('forum-with-policy-service #slow', function() {
   makeChecks('deleteComment', function() { return [fixture.comment1]; }, {
     admin: true,
     owner: true
+  });
+
+  makeChecks('deleteCategory', function() { return [fixture.category1]; }, {
+    admin: true,
+    owner: false // skip
   });
 
   makeChecks('listSubscribers', function() { return [{forumId: fixture.forum1.id}, {}]; }, {
