@@ -18,8 +18,7 @@ require('./utils/tracking');
 require('./views/widgets/avatar');
 require('./template/helpers/all');
 
-//Super simple router used only to dismiss any modals
-//that are shown
+//Super simple router used only to manage modals
 var Router = Backbone.Router.extend({
   routes: {
     '': 'index',
