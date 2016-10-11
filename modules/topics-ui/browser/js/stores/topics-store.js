@@ -173,8 +173,11 @@ export const TopicModel = BaseModel.extend({
   validate(attributes){
     let errors = new Map();
 
-    if(!attributes.title || !attributes.title.length) {
+    if(!attributes.title || attributes.title.length === 0) {
       errors.set('title', 'A new Topic requires a title');
+    }
+    if((attributes.editedTitle !== null && attributes.editedTitle !== undefined) && attributes.editedTitle.length === 0) {
+      errors.set('editedTitle', 'A Topic requires a title');
     }
 
     //Only check the text attribute if we are in a draft state
@@ -190,7 +193,7 @@ export const TopicModel = BaseModel.extend({
       errors.set('categoryId', 'A new Topic must have a category');
     }
 
-    return errors.size ? errors : null;
+    return errors.size ? errors : undefined;
   },
 
   toPOJO() {
@@ -198,7 +201,8 @@ export const TopicModel = BaseModel.extend({
     data.tags = (data.tags || []);
 
     return Object.assign({}, modelDefaults, data, {
-      tags: data.tags.map(parseTag)
+      tags: data.tags.map(parseTag),
+      validationError: this.validationError
     });
   },
 
@@ -302,7 +306,8 @@ export const TopicsLiveCollection = LiveCollection.extend({
     if(!model) { return; }
     model.set({
       editedTitle: null,
-      text: null
+      text: null,
+      isEditing: false
     });
   },
 
@@ -324,6 +329,11 @@ export const TopicsLiveCollection = LiveCollection.extend({
     }
 
     model.save(dataToSave, { patch: true });
+    if(!model.validationError) {
+      model.set({
+        isEditing: false
+      });
+    }
   },
 
   onTopicIsEditingUpdate({ isEditing }) {
