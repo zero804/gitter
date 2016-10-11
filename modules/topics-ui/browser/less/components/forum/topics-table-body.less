@@ -7,7 +7,7 @@
   background:    @light;
 
   //Reset all the tabel-y tableness for mobile
-  @media @small {
+  @media @only-small {
     display: block;
     & > tr {
       display: flex;
@@ -37,19 +37,19 @@
     color:        @topic-table-cell-color;
 
     //ARGGHHH NESTING
-    @media @small { padding-left: @mobile-padding; }
+    @media @only-small { padding-left: @mobile-padding; }
   }
 
   &:last-child {
     padding-right: @panel-horiz-padding + @panel-border-width;
-    @media @small { padding-right: @mobile-padding; }
+    @media @only-small { padding-right: @mobile-padding; }
   }
 
 }
 
 .topics-table-body__cell--user-list {
   .topics-table-body__cell();
-  @media @small { display: none; }
+  @media @only-small { display: none; }
 }
 
 .m-sudo-icon {
@@ -78,7 +78,7 @@
     display: none;
   }
 
-  @media @small {
+  @media @only-small {
     .m-center-td();
     &:after { display: inline-block; }
   }
@@ -93,7 +93,7 @@
     display: none;
   }
 
-  @media @small {
+  @media @only-small {
     .m-center-td();
     &:after { display: inline-block; }
   }
@@ -102,7 +102,7 @@
 .topics-table-body__cell--details {
   .topics-table-body__cell();
   display: flex;
-  @media @small { flex-basis: 60%; }
+  @media @only-small { flex-basis: 60%; }
 }
 
 .topics-table-body__cell__link{

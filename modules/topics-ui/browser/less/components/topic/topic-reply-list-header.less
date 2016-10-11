@@ -9,7 +9,7 @@
   color:        @topic-reply-list-heading-color;
   white-space:  nowrap;
 
-  @media @small {
+  @media @only-small {
     width: 100%;
     text-align: center;
   }
@@ -22,7 +22,7 @@
   margin:      0;
   padding:     0;
 
-  @media @small {
+  @media @only-small {
     width: 100%;
     justify-content: center;
   }
@@ -48,5 +48,5 @@
 
 .topic-reply-list-header-wrap--visually-hidden {
   transform: scaleY(0);
-  @media @small { transform: none; }
+  @media @only-small { transform: none; }
 }

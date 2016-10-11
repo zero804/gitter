@@ -9,7 +9,7 @@
   transition: height .2s;
   background-color: @pampas;
   border-top: 1px solid @topic-body-border-color;
-  @media @small {
+  @media @only-small {
     padding: 2rem;
     height: auto;
   }
@@ -17,7 +17,7 @@
 
 .panel--reply-editor--active {
   height: 25rem;
-  @media @small { height: auto; }
+  @media @only-small { height: auto; }
 }
 
 .reply-editor__form {
@@ -26,7 +26,7 @@
   height: 100%;
   width: 100%;
 
-  @media @small {
+  @media @only-small {
     flex-direction: column;
   }
 }
@@ -40,7 +40,7 @@
   padding-left: 5rem;
   background: @light;
 
-  @media @small {
+  @media @only-small {
     min-height: 8rem;
     margin-right: 0;
     margin-bottom: 1rem;
@@ -54,7 +54,7 @@
   top: 3.5rem;
   margin-left: 1rem;
 
-  @media @small {
+  @media @only-small {
     left: 2rem;
   }
 }
@@ -66,7 +66,7 @@
   white-space: nowrap;
   cursor: pointer;
 
-  @media @small {
+  @media @only-small {
     height: 3.5rem;
     width: 100%;
   }
