@@ -39,6 +39,12 @@ function collectPatchActions(forumWithPolicyService, category, body) {
     }
 
     promises.push(forumWithPolicyService.updateCategory(category, fields));
+
+  var adminOnly;
+  if (body.hasOwnProperty('adminOnly')) {
+    adminOnly = !!body.adminOnly;
+    promises.push(forumWithPolicyService.setCategoryAdminOnly(category, adminOnly));
+  }
   }
 
   // TODO: setCategoryOrder

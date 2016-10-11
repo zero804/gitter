@@ -1,0 +1,33 @@
+
+.tooltip__wrapper {
+  position: relative;
+}
+
+.tooltip__overlay {
+  @delete-tooltip-transform-positioning: translateX(-50%) translateY(-110%);
+
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: @delete-tooltip-transform-positioning;
+
+  padding: .4em 1em;
+
+  background-color: fade(@dark, 60%);
+  border-radius: .3em;
+
+  color: fade(@light, 85%);
+  font-size: 1.1rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+
+  transition:
+    transform .2s ease,
+    opacity .2s ease;
+
+  &.active {
+    transform: @delete-tooltip-transform-positioning scale(.7);
+    opacity: 0;
+  }
+}

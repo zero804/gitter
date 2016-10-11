@@ -10,11 +10,13 @@ import TopicReplyListHeader from './components/topic/topic-reply-list-header.jsx
 import TopicReplyList from './components/topic/topic-reply-list.jsx';
 import TopicReplyListItem from './components/topic/topic-reply-list-item.jsx';
 
+import navigateToForums from '../action-creators/forum/navigate-to-forums';
 import updateTopic from '../action-creators/topic/update-topic';
 import updateTopicTitle from '../action-creators/topic/update-topic-title';
 import updateCancelTopic from '../action-creators/topic/update-cancel-topic';
 import updateSaveTopic from '../action-creators/topic/update-save-topic';
 import updateTopicIsEditing from '../action-creators/topic/update-topic-is-editing';
+import deleteTopic from '../action-creators/topic/delete-topic';
 import requestUpdateTopicSubscriptionState from '../action-creators/forum/request-update-topic-subscription-state';
 import requestUpdateReplySubscriptionState from '../action-creators/forum/request-update-reply-subscription-state';
 import requestUpdateTopicReactions from '../action-creators/forum/request-update-topic-reactions';
@@ -30,11 +32,13 @@ import showReplyComments from '../action-creators/topic/show-reply-comments';
 import updateReply from '../action-creators/topic/update-reply';
 import cancelUpdateReply from '../action-creators/topic/cancel-update-reply';
 import saveUpdatedReply from '../action-creators/topic/save-update-reply';
+import deleteReply from '../action-creators/topic/delete-reply';
 import updateReplyIsEditing from '../action-creators/topic/update-reply-is-editing';
 
 import updateComment from '../action-creators/topic/update-comment.js';
 import updateCancelComment from '../action-creators/topic/update-cancel-comment.js';
 import updateSaveComment from '../action-creators/topic/update-save-comment.js';
+import deleteComment from '../action-creators/topic/delete-comment.js';
 import topicReplySortByComments from '../action-creators/topic/topic-replies-sort-by-comments';
 import topicReplySortByLike from '../action-creators/topic/topic-replies-sort-by-liked';
 import topicReplySortByRecent from '../action-creators/topic/topic-replies-sort-by-recent';
@@ -226,43 +230,46 @@ const TopicContainer = createClass({
 
     return (
       <main>
-        <SearchHeaderContainer
-          userId={userId}
-          forumId={forumId}
-          groupUri={groupUri}
-          groupName={groupName}
-          subscriptionState={forumSubscriptionState}/>
-        <article>
-          <TopicHeader
-            topic={topic}
-            category={category}
+        <div className="scroller">
+          <SearchHeaderContainer
+            userId={userId}
+            forumId={forumId}
             groupUri={groupUri}
-            tags={tags}
-            onTopicTitleEditUpdate={this.onTopicTitleEditUpdate} />
+            groupName={groupName}
+            subscriptionState={forumSubscriptionState}/>
+          <article>
+            <TopicHeader
+              topic={topic}
+              category={category}
+              groupUri={groupUri}
+              tags={tags}
+              onTopicTitleEditUpdate={this.onTopicTitleEditUpdate} />
 
-          <TopicBody
-            topic={topic}
-            onSubscribeButtonClick={this.onTopicSubscribeButtonClick}
-            onReactionPick={this.onTopicReactionPick}
-            onEditTopicClick={this.onEditTopicClick}
-            onTopicEditUpdate={this.onTopicEditUpdate}
-            onTopicEditCancel={this.onTopicEditCancel}
-            onTopicEditSave={this.onTopicEditSave}/>
-        </article>
+            <TopicBody
+              topic={topic}
+              onSubscribeButtonClick={this.onTopicSubscribeButtonClick}
+              onReactionPick={this.onTopicReactionPick}
+              onEditTopicClick={this.onEditTopicClick}
+              onTopicEditUpdate={this.onTopicEditUpdate}
+              onTopicEditCancel={this.onTopicEditCancel}
+              onTopicEditSave={this.onTopicEditSave}
+              onTopicDelete={this.onTopicDelete} />
+          </article>
 
-        <TopicReplyListHeader
-          replies={parsedReplies}
-          sortName={sortName}
-          onSortByCommentClicked={this.onSortByCommentClicked}
-          onSortByLikeClicked={this.onSortByLikeClicked}
-          onSortByRecentClicked={this.onSortByRecentClicked}
-          replyListEditorInFocus={replyListEditorInFocus}/>
+          <TopicReplyListHeader
+            replies={parsedReplies}
+            sortName={sortName}
+            onSortByCommentClicked={this.onSortByCommentClicked}
+            onSortByLikeClicked={this.onSortByLikeClicked}
+            onSortByRecentClicked={this.onSortByRecentClicked}
+            replyListEditorInFocus={replyListEditorInFocus}/>
 
-        <TopicReplyList
-          replyListEditorInFocus={replyListEditorInFocus}>
-          {parsedReplies.map(this.getReplyListItem)}
-        </TopicReplyList>
-
+          <TopicReplyList
+            replyListEditorInFocus={replyListEditorInFocus}>
+            {parsedReplies.map(this.getReplyListItem)}
+          </TopicReplyList>
+        </div>
+>>>>>>> develop
         <TopicReplyEditor
           user={currentUser}
           isSignedIn={isSignedIn}
@@ -296,10 +303,12 @@ const TopicContainer = createClass({
         onReplyEditUpdate={this.onReplyEditUpdate}
         onReplyEditCancel={this.onReplyEditCancel}
         onReplyEditSaved={this.onReplyEditSaved}
+        onReplyDelete={this.onReplyDelete}
         onCommentEditUpdate={this.onCommentEditUpdate}
         onCommentEditCancel={this.onCommentEditCancel}
         onCommentEditSave={this.onCommentEditSave}
-        onCommentEditClick={this.onCommentEditClick} />
+        onCommentEditClick={this.onCommentEditClick}
+        onCommentDelete={this.onCommentDelete} />
     );
   },
 
@@ -446,6 +455,10 @@ const TopicContainer = createClass({
     dispatch(updateReplyIsEditing(replyId, false));
   },
 
+  onReplyDelete(replyId){
+    dispatch(deleteReply(replyId));
+  },
+
   onCommentEditClick(commentId) {
     dispatch(updateCommentIsEditing(commentId, true));
   },
@@ -456,12 +469,16 @@ const TopicContainer = createClass({
 
   onCommentEditCancel(commentId) {
     dispatch(updateCancelComment(commentId));
-      dispatch(updateCommentIsEditing(commentId, false));
+    dispatch(updateCommentIsEditing(commentId, false));
   },
 
   onCommentEditSave(commentId, replyId){
     dispatch(updateSaveComment(commentId, replyId));
-      dispatch(updateCommentIsEditing(commentId, false));
+    dispatch(updateCommentIsEditing(commentId, false));
+  },
+
+  onCommentDelete(commentId, replyId){
+    dispatch(deleteComment(commentId, replyId));
   },
 
   onEditTopicClick() {
@@ -482,6 +499,11 @@ const TopicContainer = createClass({
 
   onTopicEditSave(){
     dispatch(updateSaveTopic());
+  },
+
+  onTopicDelete() {
+    dispatch(deleteTopic());
+    dispatch(navigateToForums());
   },
 
   onSortByCommentClicked(){

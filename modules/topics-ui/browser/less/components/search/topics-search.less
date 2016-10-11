@@ -2,6 +2,7 @@
 @import (less, reference) "~gitter-styleguide/css/components/headings.css";
 @import (less, reference) "~gitter-styleguide/css/components/buttons.css";
 @import "../../text";
+@import "../../break-points";
 
 @topic-search-horizontal-spacing: 4rem;
 
@@ -41,9 +42,9 @@
   right: 0;
 
   transform:
-    translateX(130%)
-    translateY(-20%)
-    rotateZ(-15deg);
+  translateX(130%)
+  translateY(-20%)
+  rotateZ(-15deg);
 
   display: flex;
   justify-content: center;
@@ -63,6 +64,8 @@
 .topic-search__create-topic-link {
   &:extend(.subdued-button-clouds--small all);
   .topic-search-button();
+
+  @media @only-small { margin: 0; }
 }
 
 .topic-search__watch-forum-button {
@@ -71,6 +74,11 @@
   flex-direction: column;
   padding: .8em 1em;
   cursor: pointer;
+
+  @media @only-small {
+    margin: 0;
+    margin-bottom: 1rem;
+  }
 
   &.pending:after {
     content: '';
@@ -131,4 +139,6 @@
   background-color: @search-input-bg;
   color:            @light;
   font-family: @font-family;
+
+  @media @only-small { display: none; }
 }
