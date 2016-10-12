@@ -35,7 +35,7 @@ function allowWriteCreateTopic(category, topicOptions) {
   }
 
   // Same thing when trying to set some admin-only fields
-  if (topicOptions.hasOwnProperty('sticky')) {
+  if (topicOptions.sticky) {
     return false;
   }
 

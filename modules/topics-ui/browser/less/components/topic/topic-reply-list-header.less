@@ -1,9 +1,11 @@
 @import "../../colors.less";
 @import "../../break-points";
+@import (less, reference) "~gitter-styleguide/css/components/headings.css";
 @import (less, reference) "~gitter-styleguide/css/components/buttons.css";
 
 
 .topic-reply-list-header__heading {
+  &:extend(.h1 all);
   margin-right: auto;
   font-size:    2rem;
   color:        @topic-reply-list-heading-color;
