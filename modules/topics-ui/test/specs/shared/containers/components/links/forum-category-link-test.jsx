@@ -9,7 +9,7 @@ import {subscribe} from '../../../../../../shared/dispatcher';
 import mockEvt from '../../../../../mocks/event';
 import {DEFAULT_CATEGORY_NAME} from '../../../../../../shared/constants/navigation';
 
-describe('<ForumCategoryLink/>', () => {
+describe.only('<ForumCategoryLink/>', () => {
 
   let wrapper;
   const category = categories[1];
@@ -27,7 +27,7 @@ describe('<ForumCategoryLink/>', () => {
   });
 
   it('should render the right title', () => {
-    equal(wrapper.find('a').at(0).prop('title'), `View all ${category.name} topics`);
+    equal(wrapper.find('a').at(0).prop('title'), `View all ${category.category} topics`);
   });
 
   it('should render the right href', () => {
@@ -38,7 +38,7 @@ describe('<ForumCategoryLink/>', () => {
     wrapper = shallow(
       <ForumCategoryLink
       groupUri="gitterHQ"
-      category={{name: DEFAULT_CATEGORY_NAME, slug: 'all'}}>
+      category={{category: DEFAULT_CATEGORY_NAME, slug: 'all'}}>
       test
       </ForumCategoryLink>
     )
