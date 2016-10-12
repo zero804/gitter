@@ -113,7 +113,9 @@ RoomWithPolicyService.prototype.updateTopic = secureMethod(allowAdmin, function(
 RoomWithPolicyService.prototype.updateProviders = secureMethod([allowStaff, allowAdmin], function(providers) {
   var room = this.room;
 
-  if (providers && !validateProviders(providers)) {
+  providers = providers || [];
+
+  if (!validateProviders(providers)) {
     throw new StatusError(400, 'Invalid providers '+providers.toString());
   }
 
