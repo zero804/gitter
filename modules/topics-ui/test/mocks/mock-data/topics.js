@@ -13,7 +13,8 @@ export default [
     tags: [ '1', '2', '3' ],
     user: { username: 'cutandpastey', avatarUrl: 'test-src'},
     replyingUsers: [],
-    subscriptionState: SUBSCRIPTION_STATE_UNSUBSCRIBED
+    subscriptionState: SUBSCRIPTION_STATE_UNSUBSCRIBED,
+    reactions: { likes: 1 }
   },
   {
     title: '2',
@@ -26,7 +27,8 @@ export default [
     tags: [ '2', '3', '4' ],
     user: { username: 'test', avatarUrl: 'test-src'},
     replyingUsers: [],
-    subscriptionState: SUBSCRIPTION_STATE_UNSUBSCRIBED
+    subscriptionState: SUBSCRIPTION_STATE_UNSUBSCRIBED,
+    reactions: { likes: 1 }
   },
   {
     title: '3',
@@ -39,7 +41,8 @@ export default [
     tags: [ '3', '4', '5' ],
     user: { username: 'cutandpastey', avatarUrl: 'test-src'},
     replyingUsers: [],
-    subscriptionState: SUBSCRIPTION_STATE_UNSUBSCRIBED
+    subscriptionState: SUBSCRIPTION_STATE_UNSUBSCRIBED,
+    reactions: { likes: 1 }
   },
   {
     title: '4',
@@ -51,7 +54,8 @@ export default [
     tags: [ '4', '5', '6' ],
     user: { username: 'test', avatarUrl: 'test-src'},
     replyingUsers: [],
-    subscriptionState: SUBSCRIPTION_STATE_UNSUBSCRIBED
+    subscriptionState: SUBSCRIPTION_STATE_UNSUBSCRIBED,
+    reactions: { likes: 1 }
   },
   {
     title: '5',
@@ -64,6 +68,7 @@ export default [
     tags: [ '5', '6', '7' ],
     user: { username: 'test-user', avatarUrl: 'test-src'},
     replyingUsers: [],
-    subscriptionState: SUBSCRIPTION_STATE_UNSUBSCRIBED
+    subscriptionState: SUBSCRIPTION_STATE_UNSUBSCRIBED,
+    reactions: { likes: 1 }
   },
 ];

@@ -44,6 +44,8 @@ export default React.createClass({
     const ElementType = elementType;
     const compiledTooltipClassName = classNames({
       [tooltipClassName]: true,
+      //This active element actually HIDES the element
+      //so the naming here is wrong
       active: !tooltip || (tooltip && tooltip.length === 0)
     });
 

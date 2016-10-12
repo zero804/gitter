@@ -28,13 +28,14 @@ describe('<TextTypeAhead/>', () => {
   });
 
   it('should render a ul when the input has content', () => {
-    equal(wrapper.find('ul').length, 0);
+    wrapper.find('Input').at(0).prop('onFocus')();
     wrapper.find('Input').at(0).prop('onChange')('test');
     equal(wrapper.find('ul').length, 1, 'failed to render the ul');
     equal(wrapper.find('li').length, completions.length, 'failed to render the li\'s');
   });
 
   it('should filter the list items based on the term', () => {
+    wrapper.find('Input').at(0).prop('onFocus')();
     wrapper.find('Input').at(0).prop('onChange')('1');
     equal(wrapper.find('li').length, 1, 'failed to render the li\'s');
   });
@@ -57,34 +58,45 @@ describe('<TextTypeAhead/>', () => {
 
   it('should call onSubmit when a type ahead item is clicked', () => {
     mockEvent.keyCode = DOWN_KEY;
+    wrapper.find('Input').at(0).prop('onFocus')();
     wrapper.find('.type-ahead-wrapper').simulate('keyDown', mockEvent);
     wrapper.find('Input').at(0).prop('onChange')('test');
-    wrapper.find('li').at(0).simulate('mouseDown', mockEvent);
+    wrapper.find('li').at(0).prop('onMouseDown')(mockEvent);
     equal(changeHandle.callCount, 1);
   });
 
   it('should cycle active classes through the completions when the down key is pressed', () => {
-    wrapper.find('Input').at(0).prop('onChange')('test');
     mockEvent.keyCode = DOWN_KEY;
+    wrapper.find('Input').at(0).prop('onFocus')();
+    wrapper.find('Input').at(0).prop('onChange')('test');
+
     wrapper.find('.type-ahead-wrapper').simulate('keyDown', mockEvent);
-    equal(wrapper.find('li').at(0).prop('className'), 'type-ahead__child--active');
+    equal(wrapper.find('li').at(0).prop('className'), 'type-ahead__child--active', 'first');
+
     wrapper.find('.type-ahead-wrapper').simulate('keyDown', mockEvent);
-    equal(wrapper.find('li').at(1).prop('className'), 'type-ahead__child--active');
+    equal(wrapper.find('li').at(1).prop('className'), 'type-ahead__child--active', 'second');
+
     wrapper.find('.type-ahead-wrapper').simulate('keyDown', mockEvent);
-    equal(wrapper.find('li').at(2).prop('className'), 'type-ahead__child--active');
+    equal(wrapper.find('li').at(2).prop('className'), 'type-ahead__child--active', 'third');
+
     wrapper.find('.type-ahead-wrapper').simulate('keyDown', mockEvent);
-    equal(wrapper.find('li').at(0).prop('className'), 'type-ahead__child--active');
+    equal(wrapper.find('li').at(0).prop('className'), 'type-ahead__child--active', 'fouth');
   });
 
   it('should cycle active classes through the completions backwards when the up key is pressed', () => {
-    wrapper.find('Input').at(0).prop('onChange')('test');
     mockEvent.keyCode = UP_KEY;
+    wrapper.find('Input').at(0).prop('onFocus')();
+    wrapper.find('Input').at(0).prop('onChange')('test');
+
     wrapper.find('.type-ahead-wrapper').simulate('keyDown', mockEvent);
     equal(wrapper.find('li').at(2).prop('className'), 'type-ahead__child--active');
+
     wrapper.find('.type-ahead-wrapper').simulate('keyDown', mockEvent);
     equal(wrapper.find('li').at(1).prop('className'), 'type-ahead__child--active');
+
     wrapper.find('.type-ahead-wrapper').simulate('keyDown', mockEvent);
     equal(wrapper.find('li').at(0).prop('className'), 'type-ahead__child--active');
+
     wrapper.find('.type-ahead-wrapper').simulate('keyDown', mockEvent);
     equal(wrapper.find('li').at(2).prop('className'), 'type-ahead__child--active');
   });
