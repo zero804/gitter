@@ -217,7 +217,6 @@ const TopicContainer = createClass({
     const currentUser = currentUserStore.getCurrentUser();
     const userId = currentUser.id;
     const isSignedIn = currentUserStore.getIsSignedIn();
-    const topicCategory = topic.category;
     const categories = categoryStore.getCategories();
 
     //TODO remove

@@ -227,8 +227,7 @@ export const TopicModel = BaseModel.extend({
       state: MODEL_STATE_SYNCED,
       text: null,
       editedTitle: null,
-      editedCategory: null,
-      text: null
+      editedCategory: null
     });
   }
 
