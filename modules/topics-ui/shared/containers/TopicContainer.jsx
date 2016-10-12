@@ -269,7 +269,6 @@ const TopicContainer = createClass({
             {parsedReplies.map(this.getReplyListItem)}
           </TopicReplyList>
         </div>
->>>>>>> develop
         <TopicReplyEditor
           user={currentUser}
           isSignedIn={isSignedIn}
