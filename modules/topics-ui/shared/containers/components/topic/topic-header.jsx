@@ -40,8 +40,8 @@ export default React.createClass({
   },
 
   render(){
-    const { category, groupUri, topic, tags } = this.props;
-    const { title, user } = topic;
+    const { topic, tags } = this.props;
+    const { user } = topic;
     const { displayName } = user;
 
     return (
