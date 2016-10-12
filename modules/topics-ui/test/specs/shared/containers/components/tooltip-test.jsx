@@ -14,16 +14,16 @@ describe('<Tooltip/>', () => {
     );
   });
 
-  it('should have hidden class when tooltip not provided', () => {
+  it('should not have active class when tooltip is not provided', () => {
     const wrapper = shallow(<Tooltip />);
     const overlayEl = wrapper.find('.tooltip__overlay');
-    equal(overlayEl.hasClass('active'), true);
+    equal(overlayEl.hasClass('active'), false);
   });
 
-  it('should not have hidden class when tooltip provided', () => {
+  it('should have active class when tooltip is provided', () => {
     const wrapper = shallow(<Tooltip tooltip="test" />);
     const overlayEl = wrapper.find('.tooltip__overlay');
-    equal(overlayEl.hasClass('active'), false);
+    equal(overlayEl.hasClass('active'), true);
   });
 
   it('should render the children', () => {

@@ -1,7 +1,8 @@
 import React, { PropTypes } from 'react';
+import _ from 'lodash';
 import classNames from 'classnames';
 
-export default React.createClass({
+const Tooltip = React.createClass({
 
   displayName: 'Tooltip',
   propTypes: {
@@ -17,7 +18,6 @@ export default React.createClass({
   getDefaultProps() {
     return {
       elementType: 'div',
-      wrapperClassName: 'tooltip__wrapper',
       tooltipClassName: 'tooltip__overlay'
     };
   },
@@ -39,6 +39,7 @@ export default React.createClass({
 
   render() {
     const { tooltip, elementType, tooltipClassName, children } = this.props;
+    const restOfProps = _.omit(this.props, Object.keys(Tooltip.propTypes));
     const { prevTooltip } = this.state;
 
     const ElementType = elementType;
@@ -46,11 +47,11 @@ export default React.createClass({
       [tooltipClassName]: true,
       //This active element actually HIDES the element
       //so the naming here is wrong
-      active: !tooltip || (tooltip && tooltip.length === 0)
+      active: tooltip && tooltip.length > 0
     });
 
     return (
-      <ElementType {...this.props}>
+      <ElementType {...restOfProps}>
         {children}
         <div className={compiledTooltipClassName}>
           {tooltip || prevTooltip}
@@ -60,3 +61,6 @@ export default React.createClass({
   },
 
 });
+
+
+export default Tooltip;
