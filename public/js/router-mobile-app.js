@@ -6,6 +6,8 @@ var onready = require('./utils/onready');
 var appEvents = require('./utils/appevents');
 var MobileAppLayout = require('./views/layouts/mobile-app');
 var clientEnv = require('gitter-client-env');
+var Router = require('./routes/router');
+var loginRoutes = require('./routes/login-routes');
 
 //Remove when Left Menu is in
 var FastClick = require('fastclick');
@@ -18,31 +20,6 @@ require('./utils/tracking');
 require('./views/widgets/avatar');
 require('./template/helpers/all');
 
-//Super simple router used only to manage modals
-var Router = Backbone.Router.extend({
-  routes: {
-    '': 'index',
-    login: 'login'
-  },
-
-  initialize: function(attrs) {
-    this.modalRegion = attrs.modalRegion;
-  },
-
-  index: function(){
-    //Clear any existing modals
-    this.modalRegion.destroy();
-  },
-
-  login: function(){
-    //Async load our login modal
-    var self = this;
-    require.ensure(['./views/modals/login-view'], function(require){
-      var LoginView = require('./views/modals/login-view');
-      self.modalRegion.show(new LoginView());
-    });
-  }
-});
 
 //Simple helper to get data from
 //any postMessage event handles
@@ -68,7 +45,10 @@ onready(function() {
     el: 'body'
   });
 
-  var router = new Router({ modalRegion: mobileView.dialogRegion });
+  new Router({
+    dialogRegion: mobileView.dialogRegion ,
+    routes: [ loginRoutes() ]
+  });
 
   //Remove for Left Menu
   FastClick.attach(document.body);
@@ -86,7 +66,7 @@ onready(function() {
       case 'navigation': return pushState(message.url, message.title, message.url);
         //I literally have no idea why this in not "navigation"
         //seems foolish not to be .... JP 11/10/16
-      case 'route': return router.navigate('login', { trigger: true });
+      case 'route': return window.location.hash = '#login';
     }
 
   });
