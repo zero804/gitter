@@ -9,7 +9,7 @@ import {subscribe} from '../../../../../../shared/dispatcher';
 import mockEvt from '../../../../../mocks/event';
 import {DEFAULT_CATEGORY_NAME} from '../../../../../../shared/constants/navigation';
 
-describe.only('<ForumCategoryLink/>', () => {
+describe('<ForumCategoryLink/>', () => {
 
   let wrapper;
   const category = categories[1];
