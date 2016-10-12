@@ -180,7 +180,7 @@ const ForumContainer = React.createClass({
         <CreateTopicModal
           active={createTopic}
           newTopic={newTopic}
-          categories={categoryStore.mapForSelectControl()}
+          categories={categories}
           tagValues={tagValues}
           onTitleChange={this.onTitleChange}
           onBodyChange={this.onBodyChange}
