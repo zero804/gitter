@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react';
+import _ from 'lodash';
 import classNames from 'classnames';
 
 const Tooltip = React.createClass({
@@ -44,6 +45,8 @@ const Tooltip = React.createClass({
     const ElementType = elementType;
     const compiledTooltipClassName = classNames({
       [tooltipClassName]: true,
+      //This active element actually HIDES the element
+      //so the naming here is wrong
       active: tooltip && tooltip.length > 0
     });
 
