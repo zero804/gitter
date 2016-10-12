@@ -5,7 +5,7 @@ import TopicHeader from '../../../../../../shared/containers/components/topic/to
 import topics from '../../../../../mocks/mock-data/topics';
 import categories from '../../../../../mocks/mock-data/categories';
 
-describe('<TopicHeader/>', () => {
+describe.only('<TopicHeader/>', () => {
 
   let wrapper;
   const topic = topics[0];
@@ -16,7 +16,7 @@ describe('<TopicHeader/>', () => {
       <TopicHeader
         tags={topic.tags}
         topic={topic}
-        category={category}
+        categories={categories}
         groupUri="gitterHQ"/>
     );
   });
