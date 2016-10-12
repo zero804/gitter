@@ -12,6 +12,7 @@ import TopicReplyListItem from './components/topic/topic-reply-list-item.jsx';
 
 import navigateToForums from '../action-creators/forum/navigate-to-forums';
 import updateTopic from '../action-creators/topic/update-topic';
+import updateTopicTitle from '../action-creators/topic/update-topic-title';
 import updateCategory from '../action-creators/topic/update-topic-category';
 import updateCancelTopic from '../action-creators/topic/update-cancel-topic';
 import updateSaveTopic from '../action-creators/topic/update-save-topic';
@@ -243,6 +244,7 @@ const TopicContainer = createClass({
               categories={categories}
               groupUri={groupUri}
               tags={tags}
+              onTopicTitleEditUpdate={this.onTopicTitleEditUpdate}
               onCategoryChange={this.onTopicCategoryChange} />
 
             <TopicBody
@@ -492,14 +494,16 @@ const TopicContainer = createClass({
     dispatch(updateCategory(categoryId));
   },
 
+  onTopicTitleEditUpdate(value) {
+    dispatch(updateTopicTitle(value));
+  },
+
   onTopicEditCancel(){
     dispatch(updateCancelTopic());
-    dispatch(updateTopicIsEditing(false));
   },
 
   onTopicEditSave(){
     dispatch(updateSaveTopic());
-    dispatch(updateTopicIsEditing(false));
   },
 
   onTopicDelete() {

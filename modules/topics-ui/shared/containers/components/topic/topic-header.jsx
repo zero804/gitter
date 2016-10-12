@@ -1,11 +1,12 @@
 import React, { PropTypes } from 'react';
 import parseCategory from '../../../../shared/parse/category';
 import parseCategoryForSelect from '../../../../shared/parse/category-for-select';
-import {AVATAR_SIZE_LARGE} from '../../../constants/avatar-sizes';
+import { AVATAR_SIZE_LARGE } from '../../../constants/avatar-sizes';
 
 import Container from '../container.jsx';
 import Panel from '../panel.jsx';
 import H1 from '../text/h-1.jsx';
+import Input from '../forms/input.jsx';
 import UserAvatar from '../user/user-avatar.jsx';
 import ForumCategoryLink from '../links/forum-category-link.jsx';
 import ForumTagLink from '../links/forum-tag-link.jsx';
@@ -35,11 +36,11 @@ export default React.createClass({
       value: PropTypes.string,
     })).isRequired,
     onCategoryChange: PropTypes.func.isRequired,
+    onTopicTitleEditUpdate: PropTypes.func.isRequired
   },
 
   render(){
-
-    const { topic, tags } = this.props;
+    const { category, groupUri, topic, tags } = this.props;
     const { title, user } = topic;
     const { displayName } = user;
 
@@ -48,13 +49,13 @@ export default React.createClass({
         <Panel>
           <header>
             <section className="topic-header">
-            <UserAvatar
-              className="topic-header__avatar"
-              user={user}
-              size={AVATAR_SIZE_LARGE} />
-              <div>
+              <UserAvatar
+                className="topic-header__avatar"
+                user={user}
+                size={AVATAR_SIZE_LARGE} />
+              <div className="topic-header__info-wrapper">
                 <span className="topic-header__username">{displayName}</span>
-                <H1 className="topic-header__title">{title}</H1>
+                {this.getTitleView()}
               </div>
             </section>
             <section className="topic-header__control-row">
@@ -108,15 +109,49 @@ export default React.createClass({
           className="select--topic-category"
           defaultValue={parsedCategory.id}
           onChange={this.onCategoryChange} />
-      )
+      );
     }
 
     return categoryControl;
+  },
+
+  getTitleView() {
+    const { topic } = this.props;
+    const { title, editedTitle, isEditing, validationError } = topic;
+    const errors = (validationError || new Map());
+    const isTitleValid = errors.get('title') === undefined && errors.get('editedTitle') === undefined;
+
+    let displayTitle = title;
+    if(editedTitle || editedTitle === '') {
+      displayTitle = editedTitle;
+    }
+
+    let headerTitle = (
+      <H1 className="topic-header__title">
+        {displayTitle}
+      </H1>
+    );
+    if(isEditing) {
+      headerTitle = (
+        <Input
+          className="topic-header__title-input"
+          value={displayTitle}
+          valid={isTitleValid}
+          onChange={this.onTopicTitleEditUpdate} />
+      );
+    }
+
+    return headerTitle;
   },
 
   onCategoryChange(categoryId) {
     const { onCategoryChange } = this.props;
     onCategoryChange(categoryId);
   },
+
+  onTopicTitleEditUpdate(newValue) {
+    const { onTopicTitleEditUpdate } = this.props;
+    onTopicTitleEditUpdate(newValue);
+  }
 
 });

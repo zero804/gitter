@@ -12,11 +12,22 @@
   margin-top: .5rem;
 }
 
+.topic-header__info-wrapper {
+  flex: 1;
+}
+
 .topic-header__title {
-  margin-top:  1rem;
-  color:       @topic-header-color;
+  &:extend(.h1 all);
+
+  width: 100%;
+  margin-top: 1rem;
+  color: @topic-header-color;
   line-height: 1.1;
   font-weight: 100;
+}
+
+.topic-header__title-input {
+  .topic-header__title();
 }
 
 .topic-header__username {
