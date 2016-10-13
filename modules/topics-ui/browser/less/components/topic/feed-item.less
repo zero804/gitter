@@ -1,20 +1,7 @@
-@import "../../colors.less";
-@import "../../text.less";
 @import (less, reference) "~gitter-styleguide/css/components/buttons.css";
 @import "../../../../../../public/less/markdown.less";
-
-//MIXINS
-//----------------------------
-.m-details-text( @capitalize: true,  @font-size: 1.2rem ) {
-
-  font-size: @font-size;
-  font-family: @font-family;
-  color: @topic-reply-action-text-color;
-
-  & when (@capitalize = true) {
-    text-transform: uppercase;
-  }
-}
+@import "../../colors.less";
+@import "../../text.less";
 
 //VARIABLES
 //----------------------------
@@ -30,8 +17,21 @@
 @feed-item-content-background: @light; //Background color of the actual content item
 @feed-item-content-padding: 2.5rem; //Padding of the content item
 @feed-item-content-font-size: 1.5rem; //Font size of a reply/comment .1rem smaller than that of a topic
-@feed-item-content-item-padding: 1rem; //Padding of user generated content
+@feed-item-content-item-vertical-padding: 1rem; //Padding of user generated content
 
+
+//MIXINS
+//----------------------------
+.m-details-text( @capitalize: true,  @font-size: 1.2rem ) {
+
+  font-size: @font-size;
+  font-family: @font-family;
+  color: @topic-reply-action-text-color;
+
+  & when (@capitalize = true) {
+    text-transform: uppercase;
+  }
+}
 
 //COMPONENTS
 //----------------------------
@@ -57,9 +57,9 @@
 
 .feed-item__content__item {
   .markdown-styles();
-  padding: @feed-item-content-item-padding 0;
+  padding: @feed-item-content-item-vertical-padding 0;
   font-family: @font-family;
-  font-size: @feed-item-content-font-size;
+  font-size: @reply-content-font-size;
 
   //We can't guarantee what we get back as markdown
   //paragraphs comeback with margin which we need to cancel as we provide
@@ -72,7 +72,10 @@
 //[displayname | username,   edit-button | sent date]
 .feed-item__content__header { display: flex; }
 
-.feed-item__content__header__user-display-name { .m-details-text(); }
+.feed-item__content__header__user-display-name {
+  .m-details-text();
+  margin-right: .5rem;
+}
 
 .feed-item__content__header__user-user-name {
   .m-details-text(false);
