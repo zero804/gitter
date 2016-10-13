@@ -3,83 +3,57 @@
 @import (less, reference) "~gitter-styleguide/css/components/buttons.css";
 @import "../../../../../../public/less/markdown.less";
 
-.feed-item {
-  display: flex;
-  flex-direction: column;
-}
+//MIXINS
+//----------------------------
+.m-details-text( @font-size: 1.2rem, @capitalize: true ) {
 
-.feed-item__user-details {
-  width: 5rem;
-  padding-top: .5rem;
-}
-
-.feed-item__content {
-  display: flex;
-  margin-bottom: 1.5rem;
-}
-
-.feed-item__body {
-  position: relative;
-  width: 100%;
-  padding: 2rem;
-  background-color: @topic-reply-body-color;
+  font-size: @font-size;
   font-family: @font-family;
-  overflow: hidden;
-  word-wrap: break-word;
+  color: @topic-reply-action-text-color;
 
-  .markdown-styles();
-}
-
-.feed-item__footer {
-  display: flex;
-  align-items: center;
-  padding-top: 1rem;
-
-  //Skeychy but will be refactored when we refactor
-  //the feed-item/reply-list-item/comment-item components
-  button {
-    margin-right: .5rem;
+  & when (@capitalize = true) {
+    text-transform: uppercase;
   }
 }
 
-.m-details-text() {
-  font-size: 1.2rem;
-  text-transform: uppercase;
-  font-family: @font-family;
-  color: @topic-reply-action-text-color;
+//VARIABLES
+//----------------------------
+
+//Aside
+@feed-item-aside-width: 5rem; //Width of the left most column
+@feed-item-aside-padding-top: .5rem; //Spaing between the avatar and the top of the feed-item__content
+
+//Content
+@feed-item-content-background: @light; //Background color of the actual content item
+@feed-item-content-padding: 2.5rem; //Padding of the content item
+
+
+//COMPONENTS
+//----------------------------
+
+//Feed item container
+.feed-item { display: flex; }
+
+//Left hand aside (should just display an avatar)
+.feed-item__aside {
+  flex: 0 0 @feed-item-aside-width;
+  padding-top: @feed-item-aside-padding-top;
 }
 
-// TODO: remove
-.feed-item__likes {
-  .m-details-text();
-  margin-right: 1rem;
+//Main content holder
+.feed-item__content {
+  width: 100%;
+  padding: @feed-item-content-padding;
+  background-color: @feed-item-content-background;
 }
+.feed-item__content__item { .markdown-styles(); }
 
+//Main header displays :
+//[displayname | username   edit-button | sent date]
+.feed-item__content__header { display: flex; }
+.feed-item__content__header__sent { .m-details-text(); }
+.feed-item__content__header__edit-button { margin-left: auto; }
 
-.feed-item__comments {
-  .m-details-text();
-  outline: none;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
-@content-control-top-margin: .5rem;
-
-.feed-item__sent {
-  .m-details-text();
-  font-size: 1.1rem;
-  float: right;
-  margin-top: @content-control-top-margin;
-}
-
-.feed-item__edit-control {
-  .m-details-text();
-  margin-top: @content-control-top-margin;
-  border: none;
-  background: none;
-  outline: none;
-  color: @dark;
-  cursor: pointer;
-  float: right;
-}
+//Item footer, usually contains:
+//[ :+1:, comments, watch ]
+.feed-item__content__footer { display: flex; }
