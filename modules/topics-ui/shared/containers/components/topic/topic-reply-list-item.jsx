@@ -139,6 +139,7 @@ export default React.createClass({
   onCommentsClicked(e){
     e.preventDefault();
     const {reply} = this.props;
+    console.log('click');
     this.props.onCommentsClicked(reply.id);
   },
 
