@@ -67,7 +67,7 @@ export default React.createClass({
 
               {/* Shows the users display name ie: Jon Parsons */}
               <span className="feed-item__content__header__user-display-name">
-                {displayName}&nbsp;
+                {displayName}
               </span>
 
               {/* Shows the users username name ie: cutandpastey */}
