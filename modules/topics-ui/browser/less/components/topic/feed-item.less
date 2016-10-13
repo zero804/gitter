@@ -5,7 +5,7 @@
 
 //MIXINS
 //----------------------------
-.m-details-text( @font-size: 1.2rem, @capitalize: true ) {
+.m-details-text( @capitalize: true,  @font-size: 1.2rem ) {
 
   font-size: @font-size;
   font-family: @font-family;
@@ -19,6 +19,9 @@
 //VARIABLES
 //----------------------------
 
+//Feed Item
+@feed-item-vertical-spacing: 2rem;//The space provided at the bottom of each feed-item
+
 //Aside
 @feed-item-aside-width: 5rem; //Width of the left most column
 @feed-item-aside-padding-top: .5rem; //Spaing between the avatar and the top of the feed-item__content
@@ -26,13 +29,18 @@
 //Content
 @feed-item-content-background: @light; //Background color of the actual content item
 @feed-item-content-padding: 2.5rem; //Padding of the content item
+@feed-item-content-font-size: 1.5rem; //Font size of a reply/comment .1rem smaller than that of a topic
+@feed-item-content-item-padding: 1rem; //Padding of user generated content
 
 
 //COMPONENTS
 //----------------------------
 
 //Feed item container
-.feed-item { display: flex; }
+.feed-item {
+  display: flex;
+  margin-bottom: @feed-item-vertical-spacing;
+}
 
 //Left hand aside (should just display an avatar)
 .feed-item__aside {
@@ -46,14 +54,36 @@
   padding: @feed-item-content-padding;
   background-color: @feed-item-content-background;
 }
-.feed-item__content__item { .markdown-styles(); }
+
+.feed-item__content__item {
+  .markdown-styles();
+  padding: @feed-item-content-item-padding 0;
+  font-family: @font-family;
+  font-size: @feed-item-content-font-size;
+
+  //We can't guarantee what we get back as markdown
+  //paragraphs comeback with margin which we need to cancel as we provide
+  //padding for normal un-wrapped text elements
+  & p:first-child { margin-top: 0; }
+  & p:last-child { margin-bottom: 0; }
+}
 
 //Main header displays :
-//[displayname | username   edit-button | sent date]
+//[displayname | username,   edit-button | sent date]
 .feed-item__content__header { display: flex; }
+
+.feed-item__content__header__user-display-name { .m-details-text(); }
+
+.feed-item__content__header__user-user-name {
+  .m-details-text(false);
+  margin-right: auto;
+}
+
 .feed-item__content__header__sent { .m-details-text(); }
+
 .feed-item__content__header__edit-button { margin-left: auto; }
 
 //Item footer, usually contains:
 //[ :+1:, comments, watch ]
 .feed-item__content__footer { display: flex; }
+
