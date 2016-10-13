@@ -112,6 +112,9 @@ function updateRepliesTotal(topicId) {
         },
         $set: {
           repliesTotal: repliesTotal
+        },
+        $inc: {
+          _tv: 1
         }
       };
 
@@ -206,6 +209,9 @@ function updateReplyFields(topicId, replyId, fields) {
     $set: fields,
     $max: {
       lastModified: lastModified
+    },
+    $inc: {
+      _tv: 1
     }
   };
   return Reply.findOneAndUpdate(query, update, { new: true })
