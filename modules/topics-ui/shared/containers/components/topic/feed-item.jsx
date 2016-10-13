@@ -47,34 +47,45 @@ export default React.createClass({
     //TODO we need to make edit controls, reaction and follow buttons
     //smart components so they can dispatch events. This will prevent us
     //having to have these controls in scope to change state
+
     return (
-      <article
-        id={item.id}
-        className="feed-item">
-        <div className="feed-item__content">
-          <div className="feed-item__user-details">
-            <UserAvatar
-              className="feed-item__avatar"
-              user={user}
-              size={AVATAR_SIZE_MEDIUM} />
-          </div>
-          <div className="feed-item__body">
-            <span
-              className="feed-item__sent"
-              title={formattedFullSentDate}>
+      <article id={item.id} className="feed-item">
+
+        {/* The aside here only displays the avatar pulled to the left hand side*/}
+        <aside className="feed-item__aside">
+          <UserAvatar
+            user={user}
+            size={AVATAR_SIZE_MEDIUM} />
+        </aside>
+
+        <section className="feed-item__content">
+
+          {/* The header displays displayname | username  edit-button | sent date */}
+          <header className="feed-item__content__header">
+
+            {/* Edit controls are only shown for admins or owners */}
+            {this.getEditControl()}
+
+            {/* sent date displayed as -> MM dd */}
+            <span className="feed-item__content__header__sent" title={formattedFullSentDate}>
               {formattedSentDate}
             </span>
-            {this.getEditControl()}
-            {this.getItemContent()}
-            <footer className="feed-item__footer">
-              {footerChildren}
-            </footer>
 
+          </header>
+
+          {/* The actula user generated content */}
+          <div className="feed-item__content__item">
+            {this.getItemContent()}
           </div>
-        </div>
-        {children}
+
+          {/* This will show like/comment/watch buttons */}
+          <footer className="feed-item__content__footer">
+            {footerChildren}
+          </footer>
+        </section>
       </article>
     );
+
   },
 
   getEditControl(){
@@ -87,7 +98,7 @@ export default React.createClass({
 
     return (
       <IconButton
-        className="feed-item__edit-control"
+        className="feed-item__content__header__edit-button"
         type={ICONS_EDIT}
         onClick={this.onEditClicked} />
     );
