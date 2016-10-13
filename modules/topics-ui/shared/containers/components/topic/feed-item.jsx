@@ -40,6 +40,7 @@ export default React.createClass({
 
     const {item, children, footerChildren} = this.props;
     const {user} = item;
+    const { displayName, username } = user;
     const formattedSentDate = item.sent && moment(item.sent).format('MMM Do');
     const formattedFullSentDate = item.sent && moment(item.sent).format('YYYY-MM-D, h:m A');
 
@@ -62,6 +63,16 @@ export default React.createClass({
 
           {/* The header displays displayname | username  edit-button | sent date */}
           <header className="feed-item__content__header">
+
+            {/* Shows the users display name ie: Jon Parsons */}
+            <span className="feed-item__content__header__user-display-name">
+              {displayName}&nbsp;
+            </span>
+
+            {/* Shows the users username name ie: cutandpastey */}
+            <span className="feed-item__content__header__user-user-name">
+              @{username}
+            </span>
 
             {/* Edit controls are only shown for admins or owners */}
             {this.getEditControl()}
