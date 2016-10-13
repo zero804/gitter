@@ -1,9 +1,6 @@
 import React, { PropTypes } from 'react';
 
 import { SUBSCRIPTION_STATE_SUBSCRIBED, SUBSCRIPTION_STATE_UNSUBSCRIBED, SUBSCRIPTION_STATE_PENDING } from '../../../constants/forum.js';
-import SubscribeButton from './subscribe-button.jsx';
-
-
 
 export default React.createClass({
 
@@ -11,7 +8,7 @@ export default React.createClass({
 
   propTypes: {
     className: PropTypes.string,
-    itemClassName: PropTypes.string,
+    groupUri: PropTypes.string.isRequired,
     subscriptionState: PropTypes.oneOf([
       SUBSCRIPTION_STATE_SUBSCRIBED,
       SUBSCRIPTION_STATE_UNSUBSCRIBED,
@@ -21,18 +18,35 @@ export default React.createClass({
   },
 
   render() {
-    const { className, itemClassName, onClick, subscriptionState } = this.props;
+    const { className, subscriptionState, groupUri } = this.props;
+    const unsubscribedText = `unwatch ${groupUri} topics`;
+    const subscribedText = `watch ${groupUri} topics`;
+
+    //When a user is already subscribed
+    if(subscriptionState === SUBSCRIPTION_STATE_SUBSCRIBED) {
+      return (
+        <button
+          className="follow-button--subscribed"
+          onClick={this.onClick}>
+          {unsubscribedText}
+        </button>
+      );
+    }
 
     return (
-      <SubscribeButton
-        className={ className }
-        itemClassName={ itemClassName }
-        onClick={onClick}
-        subscriptionState={subscriptionState}
-        subscribedText="Unfollow"
-        unsubscribedText="Follow"
-        pendingText="..."/>
-    );
+      <button
+        className="follow-button--unsubscribed"
+        onClick={this.onClick}>
+        {subscribedText}
+      </button>
+    )
+
   },
+
+  onClick(e){
+    e.preventDefault();
+    const {onClick} = this.props;
+    onClick();
+  }
 
 });
