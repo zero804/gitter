@@ -50,51 +50,57 @@ export default React.createClass({
     //having to have these controls in scope to change state
 
     return (
-      <article id={item.id} className="feed-item">
+      <div> { /* We have to use a wrapper div here to account for any children passed to this component*/ }
+        <article id={item.id} className="feed-item">
 
-        {/* The aside here only displays the avatar pulled to the left hand side*/}
-        <aside className="feed-item__aside">
-          <UserAvatar
-            user={user}
-            size={AVATAR_SIZE_MEDIUM} />
-        </aside>
+          {/* The aside here only displays the avatar pulled to the left hand side*/}
+          <aside className="feed-item__aside">
+            <UserAvatar
+              user={user}
+              size={AVATAR_SIZE_MEDIUM} />
+          </aside>
 
-        <section className="feed-item__content">
+          <section className="feed-item__content">
 
-          {/* The header displays displayname | username  edit-button | sent date */}
-          <header className="feed-item__content__header">
+            {/* The header displays displayname | username  edit-button | sent date */}
+            <header className="feed-item__content__header">
 
-            {/* Shows the users display name ie: Jon Parsons */}
-            <span className="feed-item__content__header__user-display-name">
-              {displayName}&nbsp;
-            </span>
+              {/* Shows the users display name ie: Jon Parsons */}
+              <span className="feed-item__content__header__user-display-name">
+                {displayName}&nbsp;
+              </span>
 
-            {/* Shows the users username name ie: cutandpastey */}
-            <span className="feed-item__content__header__user-user-name">
-              @{username}
-            </span>
+              {/* Shows the users username name ie: cutandpastey */}
+              <span className="feed-item__content__header__user-user-name">
+                @{username}
+              </span>
 
-            {/* Edit controls are only shown for admins or owners */}
-            {this.getEditControl()}
+              {/* Edit controls are only shown for admins or owners */}
+              {this.getEditControl()}
 
-            {/* sent date displayed as -> MM dd */}
-            <span className="feed-item__content__header__sent" title={formattedFullSentDate}>
-              {formattedSentDate}
-            </span>
+              {/* sent date displayed as -> MM dd */}
+              <span className="feed-item__content__header__sent" title={formattedFullSentDate}>
+                {formattedSentDate}
+              </span>
 
-          </header>
+            </header>
 
-          {/* The actula user generated content */}
-          <div className="feed-item__content__item">
-            {this.getItemContent()}
-          </div>
+            {/* The actula user generated content */}
+            <div className="feed-item__content__item">
+              {this.getItemContent()}
+            </div>
 
-          {/* This will show like/comment/watch buttons */}
-          <footer className="feed-item__content__footer">
-            {footerChildren}
-          </footer>
-        </section>
-      </article>
+            {/* This will show like/comment/watch buttons */}
+            <footer className="feed-item__content__footer">
+              {footerChildren}
+            </footer>
+          </section>
+
+        </article>
+
+        {/* Typically the comments list is passed in as children */}
+        {children}
+      </div>
     );
 
   },
