@@ -7,6 +7,7 @@ import ForumTableControl from './components/forum/table-control.jsx';
 import TopicsTable from './components/forum/topics-table.jsx';
 import SearchHeaderContainer from './components/search/SearchHeaderContainer.jsx';
 import CreateTopicModal from './components/topic/create-topic-modal.jsx';
+import ForumFollowArea from './components/forum/forum-follow-area.jsx';
 
 import navigateToFilter from '../action-creators/forum/navigate-to-filter';
 import navigateToSort from '../action-creators/forum/navigate-to-sort';
@@ -17,6 +18,7 @@ import submitNewTopic from '../action-creators/create-topic/submit-new-topic';
 import navigateToTopic from '../action-creators/topic/navigate-to-topic';
 import categoryUpdate from '../action-creators/create-topic/category-update';
 import tagsUpdate from '../action-creators/create-topic/tags-update'
+import requestUpdateForumSubscriptionState from '../action-creators/forum/request-update-forum-subscription-state';
 
 import * as forumCatConstants from '../constants/forum-categories';
 import * as forumTagConstants from '../constants/forum-tags';
@@ -24,6 +26,7 @@ import * as forumFilterConstants from '../constants/forum-filters';
 import * as forumSortConstants from '../constants/forum-sorts';
 import * as navConstants from '../constants/navigation';
 import * as consts from '../constants/create-topic';
+import {SUBSCRIPTION_STATE_SUBSCRIBED} from '../constants/forum';
 
 const ForumContainer = React.createClass({
   displayName: 'ForumContainer',
@@ -154,12 +157,11 @@ const ForumContainer = React.createClass({
 
     return (
       <main className="scroller">
+
         <SearchHeaderContainer
-          userId={currentUser.id}
-          forumId={forumId}
           groupName={groupName}
-          groupUri={groupUri}
-          subscriptionState={forumSubscriptionState}/>
+          groupUri={groupUri} />
+
         <CategoryList
           groupUri={ groupUri }
           categories={ categories }/>
@@ -174,6 +176,11 @@ const ForumContainer = React.createClass({
           filterChange={this.onFilterChange}
           sortChange={this.onSortChange}
           tagChange={this.onTagsChange}/>
+
+        <ForumFollowArea
+          groupUri={groupUri}
+          subscriptionState={forumSubscriptionState}
+          onSubscriptionClicked={this.onForumSubscribeClicked} />
 
         <TopicsTable topics={topics} groupUri={groupUri}/>
 
@@ -201,6 +208,12 @@ const ForumContainer = React.createClass({
   onBodyChange(body){ dispatch(bodyUpdate(body));},
   onCategoryChange(id) { dispatch(categoryUpdate(id));},
   onTopicTagsChange(tag, isAdding) { dispatch(tagsUpdate(tag, isAdding)); },
+
+  onForumSubscribeClicked(){
+    const {forumSubscriptionState} = this.state;
+    const desiredIsSubscribed = (forumSubscriptionState !== SUBSCRIPTION_STATE_SUBSCRIBED);
+    dispatch(requestUpdateForumSubscriptionState(desiredIsSubscribed));
+  },
 
   onCreateTopicClose(){
     const {categoryStore} = this.props;
