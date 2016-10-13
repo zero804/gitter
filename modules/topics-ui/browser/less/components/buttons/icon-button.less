@@ -15,16 +15,6 @@
   cursor: pointer;
   padding: 0;
 
-  &:after {
-    content: ' ';
-    background-repeat: no-repeat;
-    background-size: cover;
-  }
-}
-
-.icon-button-like {
-  .icon-button();
-
   font-size: 1.35rem;
   text-transform: uppercase;
   font-family: @font-family;
@@ -32,7 +22,10 @@
   padding-right: 1rem;
 
   &:after {
-    &:extend(.icon-like);
+    content: ' ';
+    background-repeat: no-repeat;
+    background-size: cover;
+
     display: inline-block;
     width: @icon-size;
     height: @icon-size;
@@ -40,29 +33,34 @@
   }
 }
 
+.icon-button-like {
+  .icon-button();
+  &:after { &:extend(.icon-like); }
+}
+
 .icon-button-like-selected {
-  .icon-button-like();
-  color: @dark;
+  .icon-button();
+  color: @caribbean;
   &:after { &:extend(.icon-like-selected); }
 }
 
 .icon-button-comment {
-  .icon-button-like();
+  .icon-button();
   &:after { &:extend(.icon-comments); }
 }
 
 .icon-button-edit {
-  .icon-button-like();
+  .icon-button();
   &:after { &:extend(.icon-edit); }
   &:hover { &:after { &:extend(.icon-edit-selected); } }
 }
 
 .icon-button-watch {
-  .icon-button-like();
+  .icon-button();
   &:after { &:extend(.icon-watch); }
 }
 
 .icon-button-watch-selected {
-  .icon-button-like();
-  &:after { &:extend(.icons-watch-selected); }
+  .icon-button();
+  &:after { &:extend(.icon-watch-selected); }
 }
