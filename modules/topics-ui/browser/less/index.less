@@ -1,6 +1,7 @@
 @import "~normalize.css";
 @import "../../../../public/less/highlight.less";
 @import "./colors";
+@import './break-points';
 
 .m-cover-screen() { height: 100%; width: 100%; }
 .m-grad-background() {
@@ -18,14 +19,34 @@ html {
   .m-cover-screen();
   .m-grad-background();
   font-size: 62.5%;
+  -webkit-overflow-scrolling: touch;
 }
-body { .m-cover-screen(); font-size: 1.6rem; }
+
+body {
+  .m-cover-screen();
+  font-size: 1.6rem;
+}
+
+#app-root, main {
+  width: 100%;
+  height: 100%;
+}
+
+//Ugh iOS scrolling
+//https://remysharp.com/2012/05/24/issues-with-position-fixed-scrolling-on-ios
+.scroller {
+  width: 100%;
+  height: 100%;
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
+}
 
 //Generic
 @import "./components/container";
 @import "./components/panel";
 @import "./components/modal";
 @import "./components/avatar";
+@import "./components/tooltip";
 
 //Buttons
 @import "./components/buttons/icon-button";

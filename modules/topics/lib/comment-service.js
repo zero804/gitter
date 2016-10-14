@@ -94,6 +94,9 @@ function updateCommentsTotal(topicId, replyId) {
         $max: {
           lastChanged: now,
           lastModified: now,
+        },
+        $inc: {
+          _tv: 1
         }
       };
 
@@ -104,6 +107,9 @@ function updateCommentsTotal(topicId, replyId) {
         },
         $set: {
           commentsTotal: commentsTotal
+        },
+        $inc: {
+          _tv: 1
         }
       };
 
@@ -220,6 +226,9 @@ function updateCommentFields(topicId, replyId, commentId, fields) {
     $set: fields,
     $max: {
       lastModified: lastModified
+    },
+    $inc: {
+      _tv: 1
     }
   };
   return Comment.findOneAndUpdate(query, update, { new: true })

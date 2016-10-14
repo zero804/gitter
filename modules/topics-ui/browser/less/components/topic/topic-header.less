@@ -12,11 +12,22 @@
   margin-top: .5rem;
 }
 
+.topic-header__info-wrapper {
+  flex: 1;
+}
+
 .topic-header__title {
-  margin-top:  1rem;
-  color:       @light;
+  &:extend(.h1 all);
+
+  width: 100%;
+  margin-top: 1rem;
+  color: @topic-header-color;
   line-height: 1.1;
   font-weight: 100;
+}
+
+.topic-header__title-input {
+  .topic-header__title();
 }
 
 .topic-header__username {
@@ -36,6 +47,10 @@
 .topic-header__category-link {
   &:extend(.button-clouds--xsmall);
   text-decoration: none;
+}
+
+.select--topic-category {
+  color: @topic-header-color;
 }
 
 .topic-header__tag-list {
