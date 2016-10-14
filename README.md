@@ -17,7 +17,7 @@ Getting Started
    * gulp (via npm)
 2. run `./start` to download and start all the docker images for our databases
 3. run `npm install`
-4. run `npm link` (you will get weird errors if you dont)
+4. run `npm run link` (you will get weird errors if you dont)
 5. run `gulp`
 6. run `node web` and go to localhost:5000
 
