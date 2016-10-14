@@ -153,7 +153,7 @@ const ForumContainer = React.createClass({
     const tagValues = tagStore.pluckValues();
 
     return (
-      <main>
+      <main className="scroller">
         <SearchHeaderContainer
           userId={currentUser.id}
           forumId={forumId}
@@ -180,7 +180,7 @@ const ForumContainer = React.createClass({
         <CreateTopicModal
           active={createTopic}
           newTopic={newTopic}
-          categories={categoryStore.mapForSelectControl()}
+          categories={categories}
           tagValues={tagValues}
           onTitleChange={this.onTitleChange}
           onBodyChange={this.onBodyChange}

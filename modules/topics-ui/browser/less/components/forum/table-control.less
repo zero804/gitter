@@ -1,3 +1,5 @@
+@import "../../break-points";
+
 .table-control {
   list-style:      none;
   display:         flex;
@@ -6,6 +8,19 @@
   flex-wrap:       wrap;
   margin:          0;
   padding:         0;
+
+  //Stack the controls vertically on smaller screens
+  @media @only-small { flex-direction: column; }
+
+  //Make all controls in the list full length
+  //on smaller screens
+  & > li {
+    @media @only-small {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+  }
 }
 
 .tabel-control__divider {

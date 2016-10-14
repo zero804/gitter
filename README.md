@@ -9,21 +9,18 @@ All rights reserved.
 
 Please symlink pre-commit to .git/hooks/pre-commit to enable the pre-commit hooks.
 
-Prerequisites
--------------
-* node.js 0.10+ `brew install node`
-* [Virtualbox](https://www.virtualbox.org/wiki/Downloads)
-* [Kitematic](https://kitematic.com/) or `boot2docker` if you prefer
-
 Getting Started
 ---------------
-2. Open Kitematic and choose "Install Docker Commands" from the application menu.
-3. In the root directory of the project run `./start` to start your services
-4. `npm install`
-5. `npm install -g gulp`
-6. `gulp css` (compiles css)
-7. `npm install -g nodemon`
-8. `nodemon` (this will run node and restart when anything changes based on config in nodemon.json)
+1. install prerequisites:
+   * kitematic, not docker-for-mac (it is incompatible with our start script)
+   * node js
+   * gulp (via npm)
+2. run `./start` to download and start all the docker images for our databases
+3. run `npm install`
+4. run `npm link` (you will get weird errors if you dont)
+5. run `gulp`
+6. run `node web` and go to localhost:5000
+
 
 Data Upgrades
 -------------

@@ -16,7 +16,8 @@ function createCategory(fixtureName, f) {
     name: name,
     slug: f.slug || slugify(name),
     forumId: f.forum && f.forum._id,
-    order: f.order
+    order: f.order,
+    adminOnly: f.adminOnly
   };
 
   debug('Creating forum category %s with %j', fixtureName, doc);

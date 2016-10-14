@@ -28,6 +28,7 @@ describe('ForumCategoryStrategy', function() {
           id: category.id,
           name: category.name,
           slug: category.slug,
+          adminOnly: false,
           v: 1
         }])
       });
