@@ -12,7 +12,7 @@ export const ForumCategoryStore = Collection.extend({
   model: CategoryModel,
 
   initialize: function() {
-    this.listenTo(router, 'change:category', this.onCategoryUpdate, this);
+    this.listenTo(router, 'change:categoryName', this.onCategoryUpdate, this);
   },
 
   getCategories: function() {

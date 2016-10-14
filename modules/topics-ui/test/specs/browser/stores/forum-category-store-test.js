@@ -22,14 +22,14 @@ describe('ForumCategoryStore', function(){
   });
 
   it('should update the active element when the route changes', function(){
-    mockRouter.set('category', 'test-1');
+    mockRouter.set('categoryName', 'test-1');
     assert.equal(categoryStore.at(0).get('active'), false);
     assert(categoryStore.at(1).get('active'));
   });
 
   it('should dispatch un active:update event when the active category changes', function(){
     categoryStore.on(UPDATE_ACTIVE_CATEGORY, handle);
-    mockRouter.set('category', 'test-2');
+    mockRouter.set('categoryName', 'test-2');
     assert.equal(handle.callCount, 1);
   });
 
