@@ -8,7 +8,7 @@ export default React.createClass({
 
   propTypes: {
     className: PropTypes.string,
-    groupUri: PropTypes.string.isRequired,
+    groupName: PropTypes.string.isRequired,
     subscriptionState: PropTypes.oneOf([
       SUBSCRIPTION_STATE_SUBSCRIBED,
       SUBSCRIPTION_STATE_UNSUBSCRIBED,
@@ -18,9 +18,9 @@ export default React.createClass({
   },
 
   render() {
-    const { className, subscriptionState, groupUri } = this.props;
-    const unsubscribedText = `Unwatch ${groupUri} topics`;
-    const subscribedText = `Watch ${groupUri} topics`;
+    const { className, subscriptionState, groupName } = this.props;
+    const unsubscribedText = `Unwatch ${groupName} topics`;
+    const subscribedText = `Watch ${groupName} topics`;
 
     //When a user is already subscribed
     if(subscriptionState === SUBSCRIPTION_STATE_SUBSCRIBED) {

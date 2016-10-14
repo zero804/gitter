@@ -17,7 +17,7 @@ describe('<ForumFollowArea/>', () => {
     clickHandle = spy();
     wrapper = shallow(
       <ForumFollowArea
-        groupUri="gitterHQ"
+        groupName="gitterHQ"
         subscriptionState={SUBSCRIPTION_STATE_UNSUBSCRIBED}
         onSubscriptionClicked={clickHandle}/>
     );

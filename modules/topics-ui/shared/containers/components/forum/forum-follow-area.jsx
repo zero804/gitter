@@ -14,7 +14,7 @@ export default React.createClass({
 
   displayName: 'ForumFollowArea',
   propTypes: {
-    groupUri: PropTypes.string.isRequired,
+    groupName: PropTypes.string.isRequired,
     subscriptionState: PropTypes.oneOf([
       SUBSCRIPTION_STATE_SUBSCRIBED,
       SUBSCRIPTION_STATE_UNSUBSCRIBED,
@@ -24,12 +24,12 @@ export default React.createClass({
   },
 
   render(){
-    const {subscriptionState, onSubscriptionClicked, groupUri } = this.props;
+    const {subscriptionState, onSubscriptionClicked, groupName } = this.props;
     return (
       <Container>
         <Panel className="panel--forum-follow-area">
           <FollowButton
-            groupUri={groupUri}
+            groupName={groupName}
             className="forum-follow-area-button"
             subscriptionState={subscriptionState}
             onClick={onSubscriptionClicked}/>
