@@ -178,7 +178,7 @@ const ForumContainer = React.createClass({
           tagChange={this.onTagsChange}/>
 
         <ForumFollowArea
-          groupUri={groupUri}
+          groupName={groupName}
           subscriptionState={forumSubscriptionState}
           onSubscriptionClicked={this.onForumSubscribeClicked} />
 
