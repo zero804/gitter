@@ -23,7 +23,8 @@ describe('chatService', function() {
       user: 'user1',
       troupe: 'troupe1',
       text: 'old_message',
-      sent: new Date("01/01/2014")
+      sent: new Date("01/01/2014"),
+      pub: true
     },
     message2: {
       user: 'user1',
