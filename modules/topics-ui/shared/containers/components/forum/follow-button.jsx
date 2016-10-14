@@ -19,8 +19,8 @@ export default React.createClass({
 
   render() {
     const { className, subscriptionState, groupUri } = this.props;
-    const unsubscribedText = `unwatch ${groupUri} topics`;
-    const subscribedText = `watch ${groupUri} topics`;
+    const unsubscribedText = `Unwatch ${groupUri} topics`;
+    const subscribedText = `Watch ${groupUri} topics`;
 
     //When a user is already subscribed
     if(subscriptionState === SUBSCRIPTION_STATE_SUBSCRIBED) {
