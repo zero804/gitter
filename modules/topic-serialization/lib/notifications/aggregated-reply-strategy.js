@@ -7,26 +7,26 @@ function AggregatedReplyStrategy() {
 }
 
 AggregatedReplyStrategy.prototype = {
-  map: function(item, authorUser, owningTopic, owningForum) {
+  map: function(reply, authorUser, owningTopic, owningForum) {
     var owningTopicId = owningTopic.id || (owningTopic._id && owningTopic._id.toHexString());
 
     return {
-      id: item.id || item._id && item._id.toHexString(),
+      id: reply.id || reply._id && reply._id.toHexString(),
 
       body: {
-        text: item.text,
-        html: item.html,
+        text: reply.text,
+        html: reply.html,
       },
 
       user: this.userStrategy.map(authorUser),
-      commentsTotal: item.commentsTotal,
-      sent: item.sent,
-      editedAt: item.editedAt,
-      lastChanged: item.lastChanged,
-      lastModified: item.lastModified,
+      commentsTotal: reply.commentsTotal,
+      sent: reply.sent,
+      editedAt: reply.editedAt,
+      lastChanged: reply.lastChanged,
+      lastModified: reply.lastModified,
 
       // TODO: permalink?
-      uri: owningForum.uri + '/topic/' + owningTopicId + '/' + item.slug
+      uri: owningForum.uri + '/topic/' + owningTopicId + '/' + reply.slug
     };
   },
 

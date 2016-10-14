@@ -7,21 +7,21 @@ function AggregatedCommentStrategy() {
 }
 
 AggregatedCommentStrategy.prototype = {
-  map: function(item, authorUser, owningComment, owningTopic, owningForum) {
+  map: function(reply, authorUser, owningComment, owningTopic, owningForum) {
     var owningTopicId = owningTopic.id || (owningTopic._id && owningTopic._id.toHexString());
 
     return {
-      id: item.id || item._id && item._id.toHexString(),
+      id: reply.id || reply._id && reply._id.toHexString(),
       body: {
-        text: item.text,
-        html: item.html
+        text: reply.text,
+        html: reply.html
       },
       user: this.userStrategy.map(authorUser),
-      sent: item.sent,
-      editedAt: item.editedAt,
+      sent: reply.sent,
+      editedAt: reply.editedAt,
 
       // TODO: permalink?
-      uri: owningForum.uri + '/topic/' + owningTopicId + '/' + item.slug
+      uri: owningForum.uri + '/topic/' + owningTopicId + '/' + reply.slug
     };
   },
 
