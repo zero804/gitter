@@ -49,7 +49,7 @@ describe('aggregated-reply-strategy', function() {
       editedAt: null,
       lastChanged: "2014-02-01T00:00:00.000Z",
       lastModified: "2014-02-01T00:00:00.000Z",
-      uri: forum.uri + "/topic/" + topic._id + "/undefined"
+      uri: forum.uri + "/topic/" + topic._id + "/" + topic.slug
     });
   });
 

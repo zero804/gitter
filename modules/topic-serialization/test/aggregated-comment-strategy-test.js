@@ -54,7 +54,7 @@ describe('aggregated-comment-strategy', function() {
       body: {},
       sent: "2014-02-01T00:00:00.000Z",
       editedAt: null,
-      uri: forum.uri + "/topic/" + topic._id + "/undefined"
+      uri: forum.uri + "/topic/" + topic._id + "/" + topic.slug
     });
   });
 

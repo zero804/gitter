@@ -21,7 +21,7 @@ AggregatedCommentStrategy.prototype = {
       editedAt: reply.editedAt,
 
       // TODO: permalink?
-      uri: owningForum.uri + '/topic/' + owningTopicId + '/' + reply.slug
+      uri: owningForum.uri + '/topic/' + owningTopicId + '/' + owningTopic.slug
     };
   },
 
