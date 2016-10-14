@@ -9,6 +9,7 @@ import * as forumFilterConstants from '../../../../shared/constants/forum-filter
 import * as forumSortConstants from '../../../../shared/constants/forum-sorts';
 import * as forumTagConstants from '../../../../shared/constants/forum-tags';
 import * as createConst from '../../../../shared/constants/create-topic';
+import {REQUEST_UPDATE_FORUM_SUBSCRIPTION_STATE} from '../../../../shared/constants/forum.js';
 
 import groupStore from '../../../mocks/group-store';
 import forumStore from '../../../mocks/forum-store';
@@ -104,6 +105,13 @@ describe('<ForumContainer />', function(){
     const handle = spy();
     subscribe(createConst.TAGS_UPDATE, handle);
     wrapper.find('CreateTopicModal').at(0).prop('onTagsChange')(['1', '2', '3']);
+    equal(handle.callCount, 1);
+  });
+
+  it('should dispatch the right action when the button from ForumFollowArea is clicked', () => {
+    const handle = spy();
+    subscribe(REQUEST_UPDATE_FORUM_SUBSCRIPTION_STATE, handle);
+    wrapper.find('ForumFollowArea').at(0).prop('onSubscriptionClicked')();
     equal(handle.callCount, 1);
   });
 
