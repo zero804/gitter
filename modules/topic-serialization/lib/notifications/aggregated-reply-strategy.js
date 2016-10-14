@@ -26,7 +26,7 @@ AggregatedReplyStrategy.prototype = {
       lastModified: reply.lastModified,
 
       // TODO: permalink?
-      uri: owningForum.uri + '/topic/' + owningTopicId + '/' + reply.slug
+      uri: owningForum.uri + '/topic/' + owningTopicId + '/' + owningTopic.slug
     };
   },
 
