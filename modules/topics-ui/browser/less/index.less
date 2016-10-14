@@ -85,3 +85,12 @@ body {
 @import "./components/topic/feed-item";
 
 @import "./components/search/topics-search";
+
+.only-small {
+  display: none;
+  @media @only-small { display: initial; }
+}
+
+.hide-only-small {
+  @media @only-small { display: none; }
+}

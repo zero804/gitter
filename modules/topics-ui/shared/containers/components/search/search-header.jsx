@@ -42,7 +42,8 @@ export default React.createClass({
           <CreateTopicLink
             groupUri={groupUri}
             className="topic-search__create-topic-link">
-            Create Topic
+            <span className="hide-only-small">Create Topic</span>
+            <span className="only-small">+</span>
           </CreateTopicLink>
         </Panel>
       </Container>
