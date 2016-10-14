@@ -7,7 +7,6 @@ export default React.createClass({
   displayName: 'FollowButton',
 
   propTypes: {
-    className: PropTypes.string,
     groupName: PropTypes.string.isRequired,
     subscriptionState: PropTypes.oneOf([
       SUBSCRIPTION_STATE_SUBSCRIBED,
@@ -18,28 +17,26 @@ export default React.createClass({
   },
 
   render() {
-    const { className, subscriptionState, groupName } = this.props;
-    const unsubscribedText = `Unwatch ${groupName} topics`;
-    const subscribedText = `Watch ${groupName} topics`;
+    const { subscriptionState, groupName } = this.props;
 
-    //When a user is already subscribed
+    let buttonText, className;
+
     if(subscriptionState === SUBSCRIPTION_STATE_SUBSCRIBED) {
-      return (
-        <button
-          className="follow-button--subscribed"
-          onClick={this.onClick}>
-          {unsubscribedText}
-        </button>
-      );
+      buttonText = `Unwatch ${groupName} topics`;
+      className = "follow-button--subscribed"
+    }
+    else {
+      buttonText = `Watch ${groupName} topics`;
+      className = "follow-button--unsubscribed"
     }
 
     return (
       <button
-        className="follow-button--unsubscribed"
+        className={className}
         onClick={this.onClick}>
-        {subscribedText}
+        {buttonText}
       </button>
-    )
+    );
 
   },
 
