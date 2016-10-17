@@ -6,17 +6,18 @@ import SimpleFilteredCollection from 'gitter-realtime-client/lib/simple-filtered
 import LiveCollection from './live-collection';
 import {BaseModel} from './base-model';
 
+import apiClient from '../utils/api-client';
+import {getRealtimeClient} from './realtime-client';
 import parseTopic from '../../../shared/parse/topic';
 import parseTag from '../../../shared/parse/tag';
-import {getRealtimeClient} from './realtime-client';
 import {getForumId } from './forum-store';
+import { getForumCategoryStore } from './forum-category-store';
 import router from '../routers';
 import {getCurrentUser} from '../stores/current-user-store';
 
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
 import onReactionsUpdateMixin from './mixins/on-reactions-update';
 
-import apiClient from '../utils/api-client';
 
 import {SUBMIT_NEW_TOPIC, TOPIC_CREATED} from '../../../shared/constants/create-topic';
 import {DEFAULT_CATEGORY_NAME, DEFAULT_TAG_NAME, DEFAULT_FILTER_NAME} from '../../../shared/constants/navigation';
@@ -39,8 +40,11 @@ import {
 
 import {
   UPDATE_TOPIC,
+  UPDATE_TOPIC_TITLE,
+  UPDATE_TOPIC_CATEGORY,
   UPDATE_CANCEL_TOPIC,
   UPDATE_SAVE_TOPIC,
+  DELETE_TOPIC,
   UPDATE_TOPIC_IS_EDITING
 } from '../../../shared/constants/topic';
 
@@ -172,8 +176,11 @@ export const TopicModel = BaseModel.extend({
   validate(attributes){
     let errors = new Map();
 
-    if(!attributes.title || !attributes.title.length) {
+    if(!attributes.title || attributes.title.trim().length === 0) {
       errors.set('title', 'A new Topic requires a title');
+    }
+    if((attributes.editedTitle !== null && attributes.editedTitle !== undefined) && attributes.editedTitle.trim().length === 0) {
+      errors.set('editedTitle', 'A Topic requires a title');
     }
 
     //Only check the text attribute if we are in a draft state
@@ -189,7 +196,7 @@ export const TopicModel = BaseModel.extend({
       errors.set('categoryId', 'A new Topic must have a category');
     }
 
-    return errors.size ? errors : null;
+    return errors.size ? errors : undefined;
   },
 
   toPOJO() {
@@ -197,7 +204,8 @@ export const TopicModel = BaseModel.extend({
     data.tags = (data.tags || []);
 
     return Object.assign({}, modelDefaults, data, {
-      tags: data.tags.map(parseTag)
+      tags: data.tags.map(parseTag),
+      validationError: this.validationError
     });
   },
 
@@ -205,7 +213,7 @@ export const TopicModel = BaseModel.extend({
   getDataToSave(){
     const data = this.toPOJO();
     const tags = (data.tags || []);
-    const parsedTags = tags.map((t) => t.label);
+    const parsedTags = tags.map((t) => t.value);
 
     return Object.assign({}, data, {
       tags: parsedTags
@@ -217,7 +225,9 @@ export const TopicModel = BaseModel.extend({
       //When we have received data from the server we can assume
       //that it is no longer a draft or has been edited
       state: MODEL_STATE_SYNCED,
-      text: null
+      text: null,
+      editedTitle: null,
+      editedCategory: null
     });
   }
 
@@ -237,8 +247,11 @@ export const TopicsLiveCollection = LiveCollection.extend({
 
   initialize(models, options){
     subscribe(UPDATE_TOPIC, this.onTopicUpdate, this);
+    subscribe(UPDATE_TOPIC_TITLE, this.onTopicTitleUpdate, this);
+    subscribe(UPDATE_TOPIC_CATEGORY, this.onTopicCategoryUpdate, this);
     subscribe(UPDATE_CANCEL_TOPIC, this.onTopicEditCancel, this);
     subscribe(UPDATE_SAVE_TOPIC, this.onTopicEditSaved, this);
+    subscribe(DELETE_TOPIC, this.onTopicDelete, this);
     subscribe(UPDATE_TOPIC_IS_EDITING, this.onTopicIsEditingUpdate, this);
     this.listenTo(router, 'change:createTopic', this.onCreateTopicChange, this);
 
@@ -268,6 +281,21 @@ export const TopicsLiveCollection = LiveCollection.extend({
     if(!model) { return; }
     model.set('text', text);
   },
+  onTopicTitleUpdate({title}) {
+    const topicId = router.get('topicId');
+    const model = this.get(topicId);
+    if(!model) { return; }
+    model.set('editedTitle', title);
+  },
+
+  onTopicCategoryUpdate({ categoryId }) {
+    const topicId = router.get('topicId');
+    const model = this.get(topicId);
+    if(!model) { return; }
+    const forumCategoryStore = getForumCategoryStore();
+    const newCategory = forumCategoryStore.getById(categoryId);
+    model.set('editedCategory', newCategory);
+  },
 
   getSnapshotState() {
     return {
@@ -291,7 +319,12 @@ export const TopicsLiveCollection = LiveCollection.extend({
     const topicId = router.get('topicId');
     const model = this.get(topicId);
     if(!model) { return; }
-    model.set('text', null);
+    model.set({
+      editedTitle: null,
+      editedCategory: null,
+      text: null,
+      isEditing: false
+    });
   },
 
   //When a user clicks save on the editor we must save it back to the server
@@ -300,9 +333,34 @@ export const TopicsLiveCollection = LiveCollection.extend({
     const topicId = router.get('topicId');
     const model = this.get(topicId);
     if(!model) { return; }
+
+    const category = model.get('editedCategory');
+    const title = model.get('editedTitle');
     const text = model.get('text');
-    if(!text) { return; }
-    model.save({ text: model.get('text') }, { patch: true });
+    let dataToSave = {};
+    if(category) {
+      dataToSave.categoryId = category.id;
+    }
+    if(title || title === '') {
+      dataToSave.title = title.trim();
+    }
+    if(text || text === '') {
+      dataToSave.text = text;
+    }
+
+    model.save(dataToSave, { patch: true });
+    if(!model.validationError) {
+      model.set({
+        isEditing: false
+      });
+    }
+  },
+
+  onTopicDelete() {
+    const topicId = router.get('topicId');
+    const model = this.get(topicId);
+    if(!model) { return; }
+    model.destroy();
   },
 
   onTopicIsEditingUpdate({ isEditing }) {
@@ -643,9 +701,10 @@ dispatchOnChangeMixin(TopicsStore, [
   'change:reactions',
   'change:ownReactions',
   'change:subscriptionState',
-  'change:text',
   'change:title',
+  'change:editedTitle',
   'change:body',
+  'change:text',
   'change:categoryId',
   'change:tags',
   'change:isEditing'

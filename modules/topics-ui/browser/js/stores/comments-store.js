@@ -19,6 +19,7 @@ import {
   UPDATE_COMMENT,
   UPDATE_CANCEL_COMMENT,
   UPDATE_SAVE_COMMENT,
+  DELETE_COMMENT,
   UPDATE_COMMENT_IS_EDITING
 } from '../../../shared/constants/topic';
 
@@ -60,6 +61,7 @@ export const CommentsStore = LiveCollection.extend({
     subscribe(UPDATE_COMMENT, this.onCommentUpdate, this);
     subscribe(UPDATE_CANCEL_COMMENT, this.onCommmentEditCanceled, this);
     subscribe(UPDATE_SAVE_COMMENT, this.onCommentSave, this);
+    subscribe(DELETE_COMMENT, this.onCommentDelete, this);
     subscribe(UPDATE_COMMENT_IS_EDITING, this.onCommentIsEditingUpdate, this);
     subscribe(UPDATE_COMMENT_REACTIONS, this.onReactionsUpdate, this);
     this.listenTo(router, 'change:topicId', this.onTopicIdUpdate, this);
@@ -115,6 +117,13 @@ export const CommentsStore = LiveCollection.extend({
     if(text === null) { return; }
     model.set('replyId', replyId);
     model.save({ text: text }, { patch: true });
+  },
+
+  onCommentDelete({commentId, replyId}) {
+    const model = this.get(commentId);
+    if(!model) { return; }
+    model.set('replyId', replyId);
+    model.destroy();
   },
 
   onCommentIsEditingUpdate({ commentId, isEditing }) {

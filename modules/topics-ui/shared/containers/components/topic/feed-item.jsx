@@ -15,6 +15,7 @@ export default React.createClass({
     item: PropTypes.shape({
       sent: PropTypes.string.isRequired,
       canEdit: PropTypes.bool.isRequired,
+      isEditing: PropTypes.bool.isRequired
     }).isRequired,
     children: React.PropTypes.oneOfType([
       React.PropTypes.arrayOf(React.PropTypes.node),
@@ -27,6 +28,7 @@ export default React.createClass({
     onChange: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
     onSave: PropTypes.func.isRequired,
+    onDelete: PropTypes.func.isRequired,
     onEditClick: PropTypes.func
   },
 
@@ -34,15 +36,12 @@ export default React.createClass({
     return { value: '' }
   },
 
-  getInitialState(){
-    return { isEditing: false }
-  },
-
   render(){
 
     const {item, children, footerChildren} = this.props;
     const {user} = item;
     const formattedSentDate = item.sent && moment(item.sent).format('MMM Do');
+    const formattedFullSentDate = item.sent && moment(item.sent).format('YYYY-MM-D, h:m A');
 
     /* The EditControl situation is BS. It needs to be fixed  */
     //TODO we need to make edit controls, reaction and follow buttons
@@ -60,7 +59,9 @@ export default React.createClass({
               size={AVATAR_SIZE_MEDIUM} />
           </div>
           <div className="feed-item__body">
-            <span className="feed-item__sent">
+            <span
+              className="feed-item__sent"
+              title={formattedFullSentDate}>
               {formattedSentDate}
             </span>
             {this.getEditControl()}
@@ -77,13 +78,11 @@ export default React.createClass({
   },
 
   getEditControl(){
-
     //Only show the edit button if we have
     //the correct permissions
-    const {canEdit} = this.props.item;
+    const { canEdit, isEditing} = this.props.item;
     if(!canEdit) { return; }
 
-    const {isEditing} = this.state;
     if(isEditing) { return; }
 
     return (
@@ -94,16 +93,17 @@ export default React.createClass({
     );
   },
 
-  getItemContent(){
-    const {isEditing} = this.state;
-    const {item} = this.props;
+  getItemContent() {
+    const { item } = this.props;
+    const { isEditing } = item;
     return (
       <EditableContent
         content={item}
         onChange={this.onChange}
         onCancel={this.onCancelClicked}
         onSave={this.onSaveClicked}
-        isEditing={isEditing}/>
+        onDelete={this.onDelete}
+        isEditing={isEditing} />
     );
 
   },
@@ -111,9 +111,6 @@ export default React.createClass({
   onEditClicked(e){
     const { onEditClick } = this.props;
     e.preventDefault();
-    this.setState({
-      isEditing: true,
-    });
     if(onEditClick) {
       onEditClick();
     }
@@ -125,12 +122,15 @@ export default React.createClass({
 
   onCancelClicked(){
     this.props.onCancel();
-    this.setState({ isEditing: false });
   },
 
   onSaveClicked(){
     this.props.onSave();
-    this.setState({ isEditing: false });
+  },
+
+  onDelete() {
+    const { onDelete } = this.props;
+    onDelete();
   }
 
 });

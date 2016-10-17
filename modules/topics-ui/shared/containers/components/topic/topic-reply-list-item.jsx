@@ -41,11 +41,13 @@ export default React.createClass({
     onReplyEditUpdate: PropTypes.func.isRequired,
     onReplyEditCancel: PropTypes.func.isRequired,
     onReplyEditSaved: PropTypes.func.isRequired,
+    onReplyDelete: PropTypes.func.isRequired,
 
     onCommentEditClick: PropTypes.func.isRequired,
     onCommentEditUpdate: PropTypes.func.isRequired,
     onCommentEditCancel: PropTypes.func.isRequired,
-    onCommentEditSave: PropTypes.func.isRequired
+    onCommentEditSave: PropTypes.func.isRequired,
+    onCommentDelete: PropTypes.func.isRequired
   },
 
   render(){
@@ -57,6 +59,7 @@ export default React.createClass({
         onChange={this.onReplyEditUpdate}
         onCancel={this.onReplyEditCancel}
         onSave={this.onReplyEditSaved}
+        onDelete={this.onReplyDelete}
         onEditClick={this.onReplyEditClick}
         footerChildren={this.getFeedItemFooterChildren()}>
         {this.getComments()}
@@ -128,6 +131,7 @@ export default React.createClass({
         onChange={this.onCommentEditUpdate.bind(this, comment.id)}
         onCancel={this.onCommentEditCancel.bind(this, comment.id)}
         onSave={this.onCommentEditSave.bind(this, comment.id, reply.id)}
+        onDelete={this.onCommentDelete.bind(this, comment.id, reply.id)}
         onEditClick={this.onCommentEditClick.bind(this, comment.id)} />
     );
   },
@@ -187,6 +191,12 @@ export default React.createClass({
     this.props.onReplyEditSaved(id)
   },
 
+  onReplyDelete() {
+    const { reply, onReplyDelete } = this.props;
+    const {id} = reply;
+    onReplyDelete(id);
+  },
+
   onReplyEditClick() {
     const { reply, onReplyEditClick } = this.props;
     const { id } = reply;
@@ -212,6 +222,11 @@ export default React.createClass({
 
   onCommentEditSave(commentId, replyId){
     this.props.onCommentEditSave(commentId, replyId);
+  },
+
+  onCommentDelete(commentId, replyId){
+    const { onCommentDelete } = this.props;
+    onCommentDelete(commentId, replyId);
   },
 
 

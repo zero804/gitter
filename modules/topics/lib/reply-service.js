@@ -4,8 +4,13 @@ var env = require('gitter-web-env');
 var stats = env.stats;
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
-var Topic = require('gitter-web-persistence').Topic;
-var Reply = require('gitter-web-persistence').Reply;
+var persistence = require('gitter-web-persistence');
+var Topic = persistence.Topic;
+var Reply = persistence.Reply;
+var Comment = persistence.Comment;
+var ForumSubscription = persistence.ForumSubscription;
+var ForumNotification = persistence.ForumNotification;
+var ForumReaction = persistence.ForumReaction;
 var debug = require('debug')('gitter:app:topics:reply-service');
 var liveCollections = require('gitter-web-live-collection-events');
 var processText = require('gitter-web-text-processor');
@@ -104,6 +109,8 @@ function updateRepliesTotal(topicId) {
         $max: {
           lastChanged: now,
           lastModified: now,
+        },
+        $set: {
           repliesTotal: repliesTotal
         }
       };
@@ -291,6 +298,35 @@ function findSampleReplyingUserIdsForTopics(topicIds) {
     });
 }
 
+function deleteReply(user, reply) {
+  var userId = user._id;
+  var forumId = reply.forumId;
+  var topicId = reply.topicId;
+  var replyId = reply._id;
+
+  return Promise.join(
+      Reply.remove({ _id: replyId }).exec(),
+      Comment.remove({ replyId: replyId }).exec(),
+      ForumSubscription.remove({ replyId: replyId }).exec(),
+      ForumNotification.remove({ replyId: replyId }).exec(),
+      ForumReaction.remove({ replyId: replyId }).exec())
+    .then(function() {
+      // only update the total after we deleted the reply
+      return updateRepliesTotal(topicId);
+    })
+    .then(function() {
+      stats.event('delete_topic_reply', {
+        userId: userId,
+        forumId: forumId,
+        topicId: topicId,
+        replyId: replyId,
+      });
+
+      liveCollections.replies.emit('remove', reply);
+    }
+  )
+}
+
 module.exports = {
   findById: findById,
   findByTopicId: findByTopicId,
@@ -299,7 +335,9 @@ module.exports = {
   findTotalsByTopicIds: findTotalsByTopicIds,
   findByIdForForum: findByIdForForum,
   findByIdForForumAndTopic: findByIdForForumAndTopic,
+  updateRepliesTotal: updateRepliesTotal,
   createReply: Promise.method(createReply),
   updateReply: Promise.method(updateReply),
-  findSampleReplyingUserIdsForTopics: findSampleReplyingUserIdsForTopics
+  findSampleReplyingUserIdsForTopics: findSampleReplyingUserIdsForTopics,
+  deleteReply: deleteReply
 };

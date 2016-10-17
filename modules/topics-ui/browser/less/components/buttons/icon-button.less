@@ -1,5 +1,6 @@
-@import "../../colors.less";
-@import "../../text.less";
+@import "../../colors";
+@import "../../text";
+@import "../../icons";
 
 @icon-size: 1.5rem;
 
@@ -31,37 +32,37 @@
   padding-right: 1rem;
 
   &:after {
+    &:extend(.icon-like);
     display: inline-block;
     width: @icon-size;
     height: @icon-size;
     margin-left: .5rem;
-    background-image: url('../../../svg/like.svg');
   }
 }
 
 .icon-button-like-selected {
   .icon-button-like();
   color: @dark;
-  &:after { background-image: url('../../../svg/like-selected.svg'); }
+  &:after { &:extend(.icon-like-selected); }
 }
 
 .icon-button-comment {
   .icon-button-like();
-  &:after { background-image: url('../../../svg/comments.svg'); }
+  &:after { &:extend(.icon-comments); }
 }
 
 .icon-button-edit {
   .icon-button-like();
-  &:after { background-image: url('../../../svg/edit.svg'); }
-  &:hover { &:after { background-image: url('../../../svg/edit-selected.svg'); } }
+  &:after { &:extend(.icon-edit); }
+  &:hover { &:after { &:extend(.icon-edit-selected); } }
 }
 
 .icon-button-watch {
   .icon-button-like();
-  &:after { background-image: url('../../../svg/watch.svg'); }
+  &:after { &:extend(.icon-watch); }
 }
 
 .icon-button-watch-selected {
   .icon-button-like();
-  &:after { background-image: url('../../../svg/watch-selected.svg'); }
+  &:after { &:extend(.icons-watch-selected); }
 }
