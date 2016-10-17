@@ -40,8 +40,13 @@ router.get('/~topics',
 router.get('/categories/:categoryName',
   identifyRoute('forum'),
   featureToggles,
+  isPhoneMiddleware,
   function(req, res, next){
-    return mainFrameRenderers.renderMainFrame(req, res, next, {
+    var renderer = mainFrameRenderers.renderMainFrame
+    if (req.isPhone) {
+      renderer = mainFrameRenderers.renderMobileMainFrame;
+    }
+    return renderer(req, res, next, {
       subFrameLocation: '/' + req.params.groupUri + '/topics/categories/' + req.params.categoryName + '/~topics'
     });
   }
@@ -58,7 +63,13 @@ router.get('/categories/:categoryName/~topics',
 router.get('/create-topic',
   identifyRoute('create-topic'),
   featureToggles,
+  isPhoneMiddleware,
   function(req, res, next) {
+
+    var renderer = mainFrameRenderers.renderMainFrame
+    if (req.isPhone) {
+      renderer = mainFrameRenderers.renderMobileMainFrame;
+    }
 
     return contextGenerator.generateNonChatContext(req)
       .then(function(context) {
@@ -69,7 +80,7 @@ router.get('/create-topic',
           return res.redirect('/login');
         }
 
-        return mainFrameRenderers.renderMainFrame(req, res, next, {
+        return renderer(req, res, next, {
           subFrameLocation: '/' + req.params.groupUri + '/topics/create-topic/~topics'
         });
       });
@@ -99,8 +110,13 @@ router.get('/create-topic/~topics',
 router.get('/topic/:topicId/:topicSlug',
   identifyRoute('topic'),
   featureToggles,
+  isPhoneMiddleware,
   function(req, res, next){
-    return mainFrameRenderers.renderMainFrame(req, res, next, {
+    var renderer = mainFrameRenderers.renderMainFrame
+    if (req.isPhone) {
+      renderer = mainFrameRenderers.renderMobileMainFrame;
+    }
+    return renderer(req, res, next, {
       subFrameLocation: '/' + req.params.groupUri + '/topics/topic/' + req.params.topicId + '/' + req.params.topicSlug + '/~topics'
     });
   }

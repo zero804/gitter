@@ -14,8 +14,12 @@ function fetchByTags(tags) {
   tags = tags.slice(0, 8);
 
   return persistence.Troupe
-    .where('security').equals('PUBLIC') // TODO: change to sd.public
-    .where('tags').in(tags)
+    .find({
+      'sd.public': true,
+      tags: {
+        $in: tags
+      }
+    })
     .sort({ userCount: -1 })
     .limit(50)
     .exec();

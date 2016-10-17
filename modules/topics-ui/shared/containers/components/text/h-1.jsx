@@ -1,5 +1,4 @@
 import React, { PropTypes } from 'react';
-import classNames from 'classnames';
 
 export default React.createClass({
 
@@ -12,7 +11,7 @@ export default React.createClass({
   render(){
 
     const { className } = this.props;
-    const compiledClass = classNames('h1', className);
+    const compiledClass = className || 'h1';
 
     return (<h1 className={compiledClass}>{this.props.children}</h1>);
   }

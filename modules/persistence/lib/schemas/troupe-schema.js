@@ -78,6 +78,22 @@ module.exports = {
 
     TroupeSchema.index({ "oneToOneUsers.userId": 1 });
 
+    TroupeSchema.extraIndices = [{
+      keys: {
+        'tags': 1,
+        // interesting: we have to include sd.public here even though it is
+        // always going to be true otherwise mongo complains
+        //Error: key sd.public must not contain '.'
+        'sd.public': 1
+      },
+      options: {
+        background: true,
+        partialFilterExpression: {
+          'sd.public': { $eq: true }
+        }
+      }
+    }];
+
     installVersionIncMiddleware(TroupeSchema);
 
     TroupeSchema.pre('save', function (next) {
