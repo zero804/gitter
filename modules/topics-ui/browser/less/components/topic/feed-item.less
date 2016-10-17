@@ -1,85 +1,91 @@
-@import "../../colors.less";
-@import "../../text.less";
 @import (less, reference) "~gitter-styleguide/css/components/buttons.css";
 @import "../../../../../../public/less/markdown.less";
+@import "../../colors.less";
+@import "../../text.less";
 
-.feed-item {
-  display: flex;
-  flex-direction: column;
-}
+//VARIABLES
+//----------------------------
 
-.feed-item__user-details {
-  width: 5rem;
-  padding-top: .5rem;
-}
+//Feed Item
+@feed-item-vertical-spacing: 2rem;//The space provided at the bottom of each feed-item
 
-.feed-item__content {
-  display: flex;
-  margin-bottom: 1.5rem;
-}
+//Aside
+@feed-item-aside-width: 5rem; //Width of the left most column
+@feed-item-aside-padding-top: .5rem; //Spaing between the avatar and the top of the feed-item__content
 
-.feed-item__body {
-  position: relative;
-  width: 100%;
-  padding: 2rem;
-  background-color: @topic-reply-body-color;
+//Content
+@feed-item-content-background: @light; //Background color of the actual content item
+@feed-item-content-padding: 2.5rem; //Padding of the content item
+@feed-item-content-item-vertical-padding: 1rem; //Padding of user generated content
+
+
+//MIXINS
+//----------------------------
+.m-details-text( @capitalize: true,  @font-size: 1.2rem ) {
+
+  font-size: @font-size;
   font-family: @font-family;
-  overflow: hidden;
-  word-wrap: break-word;
+  color: @topic-reply-action-text-color;
 
-  .markdown-styles();
-}
-
-.feed-item__footer {
-  display: flex;
-  align-items: center;
-  padding-top: 1rem;
-
-  //Skeychy but will be refactored when we refactor
-  //the feed-item/reply-list-item/comment-item components
-  button {
-    margin-right: .5rem;
+  & when (@capitalize = true) {
+    text-transform: uppercase;
   }
 }
 
-.m-details-text() {
-  font-size: 1.2rem;
-  text-transform: uppercase;
+//COMPONENTS
+//----------------------------
+
+//Feed item container
+.feed-item {
+  display: flex;
+  margin-bottom: @feed-item-vertical-spacing;
+}
+
+//Left hand aside (should just display an avatar)
+.feed-item__aside {
+  flex: 0 0 @feed-item-aside-width;
+  padding-top: @feed-item-aside-padding-top;
+}
+
+//Main content holder
+.feed-item__content {
+  width: 100%;
+  padding: @feed-item-content-padding;
+  background-color: @feed-item-content-background;
+}
+
+.feed-item__content__item {
+  .markdown-styles();
+  padding: @feed-item-content-item-vertical-padding 0;
   font-family: @font-family;
-  color: @topic-reply-action-text-color;
+  font-size: @reply-content-font-size;
+
+  //We can't guarantee what we get back as markdown
+  //paragraphs comeback with margin which we need to cancel as we provide
+  //padding for normal un-wrapped text elements
+  & p:first-child { margin-top: 0; }
+  & p:last-child { margin-bottom: 0; }
 }
 
-// TODO: remove
-.feed-item__likes {
+//Main header displays :
+//[displayname | username,   edit-button | sent date]
+.feed-item__content__header { display: flex; }
+
+.feed-item__content__header__user-display-name {
   .m-details-text();
-  margin-right: 1rem;
+  margin-right: .5rem;
 }
 
-
-.feed-item__comments {
-  .m-details-text();
-  outline: none;
-  background: none;
-  border: none;
-  cursor: pointer;
+.feed-item__content__header__user-user-name {
+  .m-details-text(false);
+  margin-right: auto;
 }
 
-@content-control-top-margin: .5rem;
+.feed-item__content__header__sent { .m-details-text(); }
 
-.feed-item__sent {
-  .m-details-text();
-  font-size: 1.1rem;
-  float: right;
-  margin-top: @content-control-top-margin;
-}
+.feed-item__content__header__edit-button { margin-left: auto; }
 
-.feed-item__edit-control {
-  .m-details-text();
-  margin-top: @content-control-top-margin;
-  border: none;
-  background: none;
-  outline: none;
-  color: @dark;
-  cursor: pointer;
-  float: right;
-}
+//Item footer, usually contains:
+//[ :+1:, comments, watch ]
+.feed-item__content__footer { display: flex; }
+
