@@ -243,6 +243,9 @@ function updateTopicFields(topicId, fields) {
     $max: {
       // certainly modified, but not necessarily changed or edited.
       lastModified: new Date()
+    },
+    $inc: {
+      _tv: 1
     }
   };
   return Topic.findOneAndUpdate(query, update, { new: true })
