@@ -40,6 +40,7 @@ export default React.createClass({
 
     const {item, children, footerChildren} = this.props;
     const {user} = item;
+    const { displayName, username } = user;
     const formattedSentDate = item.sent && moment(item.sent).format('MMM Do');
     const formattedFullSentDate = item.sent && moment(item.sent).format('YYYY-MM-D, h:m A');
 
@@ -47,34 +48,61 @@ export default React.createClass({
     //TODO we need to make edit controls, reaction and follow buttons
     //smart components so they can dispatch events. This will prevent us
     //having to have these controls in scope to change state
+
     return (
-      <article
-        id={item.id}
-        className="feed-item">
-        <div className="feed-item__content">
-          <div className="feed-item__user-details">
+      <div> { /* We have to use a wrapper div here to account for any children passed to this component*/ }
+        <article id={item.id} className="feed-item">
+
+          {/* The aside here only displays the avatar pulled to the left hand side*/}
+          <aside className="feed-item__aside">
             <UserAvatar
-              className="feed-item__avatar"
               user={user}
               size={AVATAR_SIZE_MEDIUM} />
-          </div>
-          <div className="feed-item__body">
-            <span
-              className="feed-item__sent"
-              title={formattedFullSentDate}>
-              {formattedSentDate}
-            </span>
-            {this.getEditControl()}
-            {this.getItemContent()}
-            <footer className="feed-item__footer">
+          </aside>
+
+          <section className="feed-item__content">
+
+            {/* The header displays displayname | username  edit-button | sent date */}
+            <header className="feed-item__content__header">
+
+              {/* Shows the users display name ie: Jon Parsons */}
+              <span className="feed-item__content__header__user-display-name">
+                {displayName}
+              </span>
+
+              {/* Shows the users username name ie: cutandpastey */}
+              <span className="feed-item__content__header__user-user-name">
+                @{username}
+              </span>
+
+              {/* Edit controls are only shown for admins or owners */}
+              {this.getEditControl()}
+
+              {/* sent date displayed as -> MM dd */}
+              <span className="feed-item__content__header__sent" title={formattedFullSentDate}>
+                {formattedSentDate}
+              </span>
+
+            </header>
+
+            {/* The actula user generated content */}
+            <div className="feed-item__content__item">
+              {this.getItemContent()}
+            </div>
+
+            {/* This will show like/comment/watch buttons */}
+            <footer className="feed-item__content__footer">
               {footerChildren}
             </footer>
+          </section>
 
-          </div>
-        </div>
+        </article>
+
+        {/* Typically the comments list is passed in as children */}
         {children}
-      </article>
+      </div>
     );
+
   },
 
   getEditControl(){
@@ -87,7 +115,7 @@ export default React.createClass({
 
     return (
       <IconButton
-        className="feed-item__edit-control"
+        className="feed-item__content__header__edit-button"
         type={ICONS_EDIT}
         onClick={this.onEditClicked} />
     );
