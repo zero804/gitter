@@ -12,12 +12,17 @@
   @media @only-small {
     padding: 2rem;
     height: auto;
+    transition: transform .1s ease-out;
+    transform: translateY(33%);
   }
 }
 
 .panel--reply-editor--active {
   height: 25rem;
-  @media @only-small { height: auto; }
+  @media @only-small {
+    height: auto;
+    transform: none;
+  }
 }
 
 .reply-editor__form {
