@@ -40,7 +40,8 @@ function getTroupeContextAndDerivedInfo(req, socialMetadataGenerator) {
     .then(function(troupeContext) {
       this.troupeContext = troupeContext;
 
-      var leftMenuGroupId = troupeContext.leftRoomMenuState && troupeContext.leftRoomMenuState.groupId;
+      var currentRoom = (req.troupe || {});
+      var leftMenuGroupId = (troupeContext.leftRoomMenuState && troupeContext.leftRoomMenuState.groupId) || (currentRoom.groupId);
 
       return [
         socialMetadataGenerator && socialMetadataGenerator(troupeContext),

@@ -12,7 +12,7 @@ describe('forum-notification-events', function() {
 
   describe('integration tests #slow', function() {
 
-    describe('notificationObserver multi', function() {
+    describe('notificationObserver with multiple events', function() {
       var fixture = fixtureLoader.setup({
         user1: {},
         user2: {},
@@ -41,7 +41,7 @@ describe('forum-notification-events', function() {
         },
       });
 
-      it('should raise notifications', function() {
+      it('should batch the notifications in order', function() {
 
         var userId = fixture.user1._id;
         var forumId = fixture.forum1._id;
@@ -68,23 +68,21 @@ describe('forum-notification-events', function() {
           })
           .then(function(notifications) {
             assert.strictEqual(notifications.length, 3);
-
+            // first is topic 1
+            assert.strictEqual(String(notifications[0].recipient._id), String(userId));
+            assert.strictEqual(notifications[0].data.forum.id, String(forumId));
             assert.strictEqual(notifications[0].data.topic.id, String(topicId1));
+            assert.strictEqual(notifications[0].data.reply, undefined);
+            // second is topic 2
+            assert.strictEqual(String(notifications[1].recipient._id), String(userId));
+            assert.strictEqual(notifications[1].data.forum.id, String(forumId));
             assert.strictEqual(notifications[1].data.topic.id, String(topicId2));
+            assert.strictEqual(notifications[1].data.reply, undefined);
+            // last is reply1
+            assert.strictEqual(String(notifications[2].recipient._id), String(userId));
+            assert.strictEqual(notifications[2].data.forum.id, String(forumId));
             assert.strictEqual(notifications[2].data.topic.id, String(topicId1));
-
-            assert(!notifications[0].data.reply);
-            assert(!notifications[1].data.reply);
             assert.strictEqual(notifications[2].data.reply.id, String(replyId));
-
-            notifications.forEach(function(notification) {
-              // Check that the user matches
-              assert.strictEqual(String(notification.recipient._id), String(userId));
-
-              // Check that the forum matches
-              assert.strictEqual(notification.data.forum.id, String(forumId));
-            });
-
           });
       });
     });

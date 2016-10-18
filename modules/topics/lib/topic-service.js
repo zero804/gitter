@@ -196,7 +196,7 @@ function createTopic(user, category, options) {
     title: options.title,
     slug: options.slug,
     tags: options.tags || [],
-    sticky: options.sticky,
+    sticky: options.sticky, // NOTE: admin only
     text: options.text || '',
   };
 
@@ -243,6 +243,9 @@ function updateTopicFields(topicId, fields) {
     $max: {
       // certainly modified, but not necessarily changed or edited.
       lastModified: new Date()
+    },
+    $inc: {
+      _tv: 1
     }
   };
   return Topic.findOneAndUpdate(query, update, { new: true })
@@ -356,7 +359,7 @@ function setTopicTags(user, topic, tags, options) {
 }
 
 function setTopicSticky(user, topic, sticky) {
-  if (sticky === topic.sticky) return sticky;
+  if (sticky === topic.sticky) return topic;
 
   if (!validators.validateSticky(sticky)) {
     throw new StatusError(400, 'Sticky is invalid.');

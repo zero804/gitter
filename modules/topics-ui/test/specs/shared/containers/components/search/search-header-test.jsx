@@ -46,10 +46,6 @@ describe('<SearchHeader/>', () => {
       equal(wrapper.find('Input').length, 1);
     });
 
-    it('should render a FollowButton', () => {
-      equal(wrapper.find('FollowButton').length, 1);
-    });
-
     it('should render a CreateTopicLink', () => {
       equal(wrapper.find('CreateTopicLink').length, 1);
     });

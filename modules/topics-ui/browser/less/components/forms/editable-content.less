@@ -23,14 +23,28 @@
 
 .editable-content__footer {
   display: flex;
-  flex-direction: row-reverse;
+  justify-content: flex-end;
   align-items: center;
   padding: 1rem 0 2rem 0;
 }
 
-.editable-content__cancel {
+.editable-content__secondary-button() {
   &:extend(.secondary-button-pampas--small all);
+  margin-left: 2em;
+  margin-right: 2em;
+  padding-left: 1.5em;
+  padding-right: 1.5em;
   cursor: pointer;
+}
+
+.editable-content__cancel {
+  .editable-content__secondary-button();
+}
+
+.editable-content__delete {
+  .editable-content__secondary-button();
+  position: relative;
+  margin-left: 0;
 }
 
 .editable-content__save {

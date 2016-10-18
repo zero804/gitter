@@ -11,8 +11,8 @@ describe('<IconButton/>', () => {
     wrapper = shallow(<IconButton/>);
   });
 
-  it('should fail a test because you should write some', () => {
-    assert(false, 'Srsly, write some tests');
+  it('should render', () => {
+    assert(wrapper.length);
   });
 
 });

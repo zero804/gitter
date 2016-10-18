@@ -20,6 +20,7 @@ function createMessage(fixtureName, f) {
     meta: f.meta,
     sent: f.sent,
     editedAt: f.editedAt,
+    pub: f.pub || false,
     readBy: f.readBy,
   });
 }

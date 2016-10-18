@@ -112,6 +112,9 @@ function updateRepliesTotal(topicId) {
         },
         $set: {
           repliesTotal: repliesTotal
+        },
+        $inc: {
+          _tv: 1
         }
       };
 
@@ -136,12 +139,10 @@ function updateRepliesTotal(topicId) {
         return;
       }
 
-      // if this update won, then patch the live collection with the latest
-      // lastChanged values and also the new total replies.
-      liveCollections.topics.emit('patch', topic.forumId, topicId, {
-        lastChanged: nowString,
-        repliesTotal: topic.repliesTotal
-      })
+      // Do an update rather than a patch so that lastChanged, repliesTotal AND
+      // replyingUsers will go out. replyingUsers requires serializers which
+      // aren't available from here anyway.
+      liveCollections.topics.emit('update', topic);
     })
     .then(function() {
       // return the topic that got updated (if it was updated).
@@ -208,6 +209,9 @@ function updateReplyFields(topicId, replyId, fields) {
     $set: fields,
     $max: {
       lastModified: lastModified
+    },
+    $inc: {
+      _tv: 1
     }
   };
   return Reply.findOneAndUpdate(query, update, { new: true })

@@ -1,4 +1,6 @@
 import React, {PropTypes} from 'react';
+import parseCategoryForSelect from '../../../../shared/parse/category-for-select';
+
 import Modal from '../modal.jsx';
 import Input from '../forms/input.jsx';
 import TextTypeAhead from '../forms/text-type-ahead.jsx';
@@ -16,7 +18,6 @@ export default React.createClass({
     tagValues: PropTypes.arrayOf(PropTypes.string).isRequired,
 
     categories: PropTypes.arrayOf(PropTypes.shape({
-      selected: PropTypes.bool.isRequired,
       label: PropTypes.string.isRequired,
       value: PropTypes.string,
     })).isRequired,
@@ -45,11 +46,12 @@ export default React.createClass({
     const { title, text, categoryId, validationError } = newTopic;
     const errors = (validationError || new Map());
 
-    //We need to sort out how we format categories
-    //This means an app wide refactor, im not doing that now
-    //so we just slice "All Tags" out of here for now
-    let cats = categories.slice(1);
-    cats.unshift({ value: '', label: 'Please select a category'})
+    // Slice "All Tags" out of here for now
+   const catOptionsForSelect = categories.slice(1).map(parseCategoryForSelect);
+   catOptionsForSelect.unshift({
+     value: '',
+     label: 'Please select a category'
+   });
 
     return (
       <Modal active={active} onClose={this.onClose}>
@@ -65,7 +67,7 @@ export default React.createClass({
 
           <div className="create-topic__details-row">
             <Select
-              options={cats}
+              options={catOptionsForSelect}
               valid={!errors.get('categoryId')}
               className="select--create-topic-category"
               defaultValue={categoryId}

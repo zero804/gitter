@@ -24,7 +24,8 @@ describe('<TopicsTableHeader/>', () => {
   });
 
   it('should render the th elements with the right class', () => {
-    equal(wrapper.find('.topics-table-header__cell').length, 4);
+    equal(wrapper.find('.topics-table-header__cell').length, 3);
+    equal(wrapper.find('.topics-table-header__cell--user').length, 1);
   });
 
 });
