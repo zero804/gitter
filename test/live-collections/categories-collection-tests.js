@@ -74,6 +74,21 @@ describe('categories-live-collection #slow', function() {
       .then(checkEvent);
   });
 
+  it('should emit a patch event when changing adminOnly', function() {
+    var checkEvent = appEvents.addListener('dataChange2', {
+      url: '/forums/' + fixture.forum1.id + '/categories',
+      operation: 'patch',
+      type: 'category',
+      model: {
+        id: fixture.category1.id.toString(),
+        adminOnly: true
+      },
+    });
+
+    return forumCategoryService.setCategoryAdminOnly(fixture.user1, fixture.category1, true)
+      .then(checkEvent);
+  });
+
   it('should emit a remove event when deleting the category', function() {
     var category = fixture.category2;
     var checkEvent = appEvents.addListener('dataChange2', {

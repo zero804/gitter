@@ -4,12 +4,12 @@ function AggregatedForumStrategy() {
 }
 
 AggregatedForumStrategy.prototype = {
-  map: function(item) {
+  map: function(forum) {
     return {
-      id: item.id || item._id && item._id.toHexString(),
-      name: item.name,
-      uri: item.uri,
-      tags: item.tags
+      id: forum.id || forum._id && forum._id.toHexString(),
+      name: forum.name,
+      uri: forum.uri,
+      tags: forum.tags
     };
   },
 

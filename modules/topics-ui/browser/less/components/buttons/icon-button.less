@@ -1,5 +1,6 @@
-@import "../../colors.less";
-@import "../../text.less";
+@import "../../colors";
+@import "../../text";
+@import "../../icons";
 
 @icon-size: 1.5rem;
 
@@ -14,16 +15,6 @@
   cursor: pointer;
   padding: 0;
 
-  &:after {
-    content: ' ';
-    background-repeat: no-repeat;
-    background-size: cover;
-  }
-}
-
-.icon-button-like {
-  .icon-button();
-
   font-size: 1.35rem;
   text-transform: uppercase;
   font-family: @font-family;
@@ -31,37 +22,45 @@
   padding-right: 1rem;
 
   &:after {
+    content: '';
+    background-repeat: no-repeat;
+    background-size: contain;
+
     display: inline-block;
     width: @icon-size;
     height: @icon-size;
     margin-left: .5rem;
-    background-image: url('../../../svg/like.svg');
   }
 }
 
+.icon-button-like {
+  .icon-button();
+  &:after { &:extend(.icon-like); }
+}
+
 .icon-button-like-selected {
-  .icon-button-like();
-  color: @dark;
-  &:after { background-image: url('../../../svg/like-selected.svg'); }
+  .icon-button();
+  color: @caribbean;
+  &:after { &:extend(.icon-like-selected); }
 }
 
 .icon-button-comment {
-  .icon-button-like();
-  &:after { background-image: url('../../../svg/comments.svg'); }
+  .icon-button();
+  &:after { &:extend(.icon-comments); }
 }
 
 .icon-button-edit {
-  .icon-button-like();
-  &:after { background-image: url('../../../svg/edit.svg'); }
-  &:hover { &:after { background-image: url('../../../svg/edit-selected.svg'); } }
+  .icon-button();
+  &:after { &:extend(.icon-edit); }
+  &:hover { &:after { &:extend(.icon-edit-selected); } }
 }
 
 .icon-button-watch {
-  .icon-button-like();
-  &:after { background-image: url('../../../svg/watch.svg'); }
+  .icon-button();
+  &:after { &:extend(.icon-watch); }
 }
 
 .icon-button-watch-selected {
-  .icon-button-like();
-  &:after { background-image: url('../../../svg/watch-selected.svg'); }
+  .icon-button();
+  &:after { &:extend(.icon-watch-selected); }
 }

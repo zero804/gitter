@@ -16,6 +16,7 @@ describe('<H1/>', () => {
   });
 
   it('should render a .h1 class', () => {
+    wrapper = shallow(<H1/>);
     equal(wrapper.find('.h1').length, 1);
   });
 

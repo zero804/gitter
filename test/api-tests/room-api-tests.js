@@ -27,10 +27,16 @@ describe('room-api', function() {
     user2: {
       accessToken: 'web-internal'
     },
+    user3: {
+      accessToken: 'web-internal'
+    },
     group1: { },
     troupe1: {
       security: 'PUBLIC',
       users: ['user1'],
+      securityDescriptor: {
+        extraAdmins: ['user3'],
+      },
       group: 'group1'
     }
   });
@@ -133,6 +139,18 @@ describe('room-api', function() {
           assert(suggestion.exists === true && suggestion.id || suggestion.exists === false && !suggestion.id);
         });
       });
+  });
+
+  it('PUT /v1/rooms/:roomId with {providers: []}', function() {
+    var room = fixture.troupe1;
+
+    return request(app)
+      .put('/v1/rooms/' + room.id)
+      .send({
+        providers: []
+      })
+      .set('x-access-token', fixture.user3.accessToken)
+      .expect(200);
   });
 
 })

@@ -1,6 +1,10 @@
 import React, { PropTypes } from 'react';
-import Editor from './editor.jsx';
 import classNames from 'classnames';
+import { DELETE_STATE_VOID, DELETE_STATE_FIRST_ENCOUNTER } from '../../../constants/topic';
+
+import Tooltip from '../tooltip.jsx';
+import Editor from './editor.jsx';
+
 
 export default React.createClass({
 
@@ -19,10 +23,20 @@ export default React.createClass({
     onChange: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
     onSave: PropTypes.func.isRequired,
+    onDelete: PropTypes.func.isRequired,
   },
 
-  getDefaultProps(){
-    return { isEditing: false, value: '' }
+  getDefaultProps() {
+    return {
+      isEditing: false,
+      value: ''
+    };
+  },
+
+  getInitialState() {
+    return {
+      deleteState: DELETE_STATE_VOID
+    };
   },
 
   render(){
@@ -56,8 +70,9 @@ export default React.createClass({
   },
 
   getEditorContent(){
-    const {content, editorClassName} = this.props;
-    const compiledEditorClass = classNames("editable-content__editor", editorClassName);
+    const { content, editorClassName } = this.props;
+    const { deleteState } = this.state;
+    const compiledEditorClass = classNames('editable-content__editor', editorClassName);
 
     //Assume we want the initial text content of the resource from the server
     let text = content.body.text;
@@ -68,6 +83,11 @@ export default React.createClass({
       text = content.text;
     }
 
+    let tooltip = '';
+    if(deleteState === DELETE_STATE_FIRST_ENCOUNTER) {
+      tooltip = 'Are you sure?'
+    }
+
     return (
       <section
         className={compiledEditorClass}>
@@ -76,14 +96,22 @@ export default React.createClass({
           onChange={this.onContentUpdate} />
         <footer className="editable-content__footer">
           <button
-            className="editable-content__save"
-            onClick={this.onSaveClicked}>
-            Update
-          </button>
-          <button
             className="editable-content__cancel"
             onClick={this.onCancelClicked}>
             Cancel
+          </button>
+          <Tooltip
+            tooltip={tooltip}
+            elementType="button"
+            className="editable-content__delete"
+            onClick={this.onDeleteClick}
+            onBlur={this.onDeleteBlur}>
+            Delete
+          </Tooltip>
+          <button
+            className="editable-content__save"
+            onClick={this.onSaveClicked}>
+            Update
           </button>
         </footer>
       </section>
@@ -99,8 +127,32 @@ export default React.createClass({
     this.props.onCancel();
   },
 
+  onDeleteClick(e) {
+    const { onDelete } = this.props;
+    const { deleteState } = this.state;
+
+    if(deleteState === DELETE_STATE_VOID) {
+      this.setState({
+        deleteState: DELETE_STATE_FIRST_ENCOUNTER
+      });
+    }
+    else if(deleteState === DELETE_STATE_FIRST_ENCOUNTER) {
+      onDelete();
+      this.setState({
+        deleteState: DELETE_STATE_VOID
+      });
+    }
+
+    e.preventDefault();
+  },
+
+  onDeleteBlur() {
+    this.setState({
+      deleteState: DELETE_STATE_VOID
+    });
+  },
+
   onSaveClicked(e){
-    const {content} = this.props;
     e.preventDefault();
     this.props.onSave();
   }
