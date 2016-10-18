@@ -3,6 +3,8 @@
     "mongo": true
   },
   "rules": {
-    "strict": "off"
+    "strict": "off",
+    "no-undef": "off",
+    "no-unused-vars": "off"
   }
 }
