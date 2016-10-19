@@ -115,7 +115,7 @@ internal-min:
   volumes:
    - ${WORKSPACE}:${WORKSPACE}
   extra_hosts:
-    beta-internal: 10.0.0.140
+    beta-internal.beta.gitter: 10.0.0.140
   working_dir: ${WORKSPACE}
 
 internal-mac:
@@ -134,7 +134,7 @@ internal-mac:
    - ${WORKSPACE}:${WORKSPACE}
    - ${WORKSPACE}/node_modules_linux:${WORKSPACE}/node_modules/
   extra_hosts:
-    beta-internal: 10.0.0.140
+    beta-internal.beta.gitter: 10.0.0.140
   working_dir: ${WORKSPACE}
 
 internal-mac-np:
@@ -144,7 +144,7 @@ internal-mac-np:
    - ${WORKSPACE}:${WORKSPACE}
    - ${WORKSPACE}/node_modules_linux:${WORKSPACE}/node_modules/
   extra_hosts:
-    beta-internal: 10.0.0.140
+    beta-internal.beta.gitter: 10.0.0.140
   working_dir: ${WORKSPACE}
 
 internal:
