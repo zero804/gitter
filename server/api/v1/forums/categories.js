@@ -39,6 +39,12 @@ function collectPatchActions(forumWithPolicyService, category, body) {
     }
 
     promises.push(forumWithPolicyService.updateCategory(category, fields));
+
+  var adminOnly;
+  if (body.hasOwnProperty('adminOnly')) {
+    adminOnly = !!body.adminOnly;
+    promises.push(forumWithPolicyService.setCategoryAdminOnly(category, adminOnly));
+  }
   }
 
   // TODO: setCategoryOrder
@@ -58,12 +64,6 @@ module.exports = {
     var category = req.forumCategory;
     var strategy = new restSerializer.ForumCategoryStrategy();
     return restSerializer.serializeObject(category, strategy);
-  },
-
-  load: function(req, id) {
-    if (!mongoUtils.isLikeObjectId(id)) throw new StatusError(400);
-
-    return forumCategoryService.findByIdForForum(req.forum._id, id);
   },
 
   create: function(req) {
@@ -105,5 +105,25 @@ module.exports = {
         var strategy = new restSerializer.ForumCategoryStrategy();
         return restSerializer.serializeObject(updatedCategory, strategy);
       });
-  }
+  },
+
+  destroy: function(req, res) {
+    var user = req.user;
+    var forum = req.forum;
+    var policy = req.userForumPolicy;
+    var category = req.forumCategory;
+
+    var forumWithPolicyService = new ForumWithPolicyService(forum, user, policy);
+    return forumWithPolicyService.deleteCategory(category)
+      .then(function() {
+        res.status(204);
+        return null;
+      });
+  },
+
+  load: function(req, id) {
+    if (!mongoUtils.isLikeObjectId(id)) throw new StatusError(400);
+
+    return forumCategoryService.findByIdForForum(req.forum._id, id);
+  },
 };

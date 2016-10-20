@@ -118,7 +118,7 @@ onready(function() {
 
   // Revert to a previously saved state
   window.onpopstate = function(e) {
-    updateContent(e.state || window.location.pathname + '/~chat');
+    updateContent(e.state/* || window.location.pathname + '/~chat'*/);
     appEvents.trigger('track', window.location.pathname + window.location.hash);
     return true;
   };
@@ -153,12 +153,12 @@ onready(function() {
         window.location.hash = '#' + message.hash;
         break;
 
-      case 'route-silent':
-        var routeCb = router.routes[message.hash];
-        if(routeCb) {
-          routeCb.apply(router, message.args);
-        }
-        break;
+      // case 'route-silent':
+      //   var routeCb = router.routes[message.hash];
+      //   if(routeCb) {
+      //     routeCb.apply(router, message.args);
+      //   }
+      //   break;
 
       // case 'realtime.testConnection':
       //   var reason = message.reason;

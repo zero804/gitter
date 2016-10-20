@@ -1,10 +1,16 @@
 @import "../colors";
-@import "../dims";
+@import "../break-points";
+
+@panel-horiz-padding: 4rem;
+@panel-vert-padding:  2rem;
+@panel-border-width:  1rem;
 
 .panel {
   width:      100%;
   box-sizing: border-box;
   padding:    @panel-vert-padding @panel-horiz-padding;
+
+  @media @only-small { padding: 2rem; }
 }
 
 @decal-height:       1rem;
@@ -45,6 +51,11 @@
   align-items:   center;
   padding-left:  0;
   padding-right: 0;
+
+  @media @only-small {
+    flex-wrap: wrap;
+    padding: 2rem;
+  }
 }
 
 .panel--reply-list-header {
@@ -53,4 +64,13 @@
 
 .panel--topic-reply-list {
   background-color: @topic-reply-list-header-bg;
+  @media @only-small { padding: 2rem; }
+}
+
+.panel--forum-follow-area {
+  background-color: @light;
+  border-bottom: 1px solid @forum-subscribe-area-border;
+  padding:    (@panel-vert-padding / 2) @panel-horiz-padding;
+
+  @media @only-small { padding: 1rem; }
 }

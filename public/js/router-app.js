@@ -276,19 +276,19 @@ onready(function() { // eslint-disable-line max-statements
         break;
 
       case 'navigation':
-        appEvents.trigger('navigation', message.url, message.urlType, message.title);
+        appEvents.trigger('navigation', message.url, message.urlType, message.title, message.options);
         break;
 
       case 'route':
         window.location.hash = '#' + message.hash;
         break;
 
-      case 'route-silent':
-        var routeCb = router.routes[message.hash];
-        if(routeCb) {
-          routeCb.apply(router, message.args);
-        }
-        break;
+      // case 'route-silent':
+      //   var routeCb = router.routes[message.hash];
+      //   if(routeCb) {
+      //     routeCb.apply(router, message.args);
+      //   }
+      //   break;
 
       //when the chat app requests the room list send it
       case 'request:roomList':
@@ -390,9 +390,7 @@ onready(function() { // eslint-disable-line max-statements
     //Update windows location
     pushState(frameUrl, title, url);
 
-    //In the case of topics we want to update the windows location
-    //but we want to avoid reloading the frame, hence we cancel out here.
-    if(type === 'topics') { return; }
+    if(options.disableFrameReload) { return; }
 
     //Redirect the App
     roomSwitcher.change(frameUrl);

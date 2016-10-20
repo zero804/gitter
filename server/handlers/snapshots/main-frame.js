@@ -7,7 +7,7 @@ var parseCategoryForTemplate = require('gitter-web-shared/parse/forum-category-i
 var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
 var avatars = require('gitter-web-avatars');
 
-module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, groups, extras) {
+module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, groups, extras) { // eslint-disable-line complexity
   //Defaults
   var lastLeftMenuSnapshot = (troupeContext.leftRoomMenuState || {});
   var currentRoom = (req.troupe || {});
@@ -72,7 +72,7 @@ module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, group
     rooms: parseRoomsIntoLeftMenuRoomList(menuState, rooms, groupId),
     favourites: parseRoomsIntoLeftMenuFavouriteRoomList(menuState, rooms, groupId),
     groups: groups,
-    forum: menuState === 'org' && {
+    forum: (menuState === 'org' || menuState === 'temp-org') && {
       hasCategories: forumCategories && forumCategories.length > 0,
       categories: forumCategories && forumCategories.map(parseCategoryForTemplate)
     }

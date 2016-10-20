@@ -13,7 +13,12 @@ describe('categories-live-collection #slow', function() {
     forum1: {
       tags: ['cats', 'dogs']
     },
+    // for updating
     category1: {
+      forum: 'forum1'
+    },
+    // for deleting
+    category2: {
       forum: 'forum1'
     }
   });
@@ -66,6 +71,36 @@ describe('categories-live-collection #slow', function() {
     return forumCategoryService.updateCategory(fixture.user1, fixture.category1, {
         slug: 'new-category-slug'
       })
+      .then(checkEvent);
+  });
+
+  it('should emit a patch event when changing adminOnly', function() {
+    var checkEvent = appEvents.addListener('dataChange2', {
+      url: '/forums/' + fixture.forum1.id + '/categories',
+      operation: 'patch',
+      type: 'category',
+      model: {
+        id: fixture.category1.id.toString(),
+        adminOnly: true
+      },
+    });
+
+    return forumCategoryService.setCategoryAdminOnly(fixture.user1, fixture.category1, true)
+      .then(checkEvent);
+  });
+
+  it('should emit a remove event when deleting the category', function() {
+    var category = fixture.category2;
+    var checkEvent = appEvents.addListener('dataChange2', {
+      url: '/forums/' + fixture.forum1.id + '/categories',
+      operation: 'remove',
+      type: 'category',
+      model: {
+        id: category.id.toString(),
+      }
+    });
+
+    return forumCategoryService.deleteCategory(fixture.user1, category)
       .then(checkEvent);
   });
 });

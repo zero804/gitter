@@ -24,12 +24,14 @@ export default React.createClass({
     onEditTopicClick: PropTypes.func.isRequired,
     onTopicEditUpdate: PropTypes.func.isRequired,
     onTopicEditCancel: PropTypes.func.isRequired,
-    onTopicEditSave: PropTypes.func.isRequired
+    onTopicEditSave: PropTypes.func.isRequired,
+    onTopicDelete: PropTypes.func.isRequired
   },
 
   render() {
     const {topic} = this.props;
     const formattedSentDate = topic.sent && moment(topic.sent).format('MMM Do');
+    const formattedFullSentDate = topic.sent && moment(topic.sent).format('YYYY-MM-D, h:m A');
 
     //Remove the share button for now as we have no current ability
     //to share content
@@ -39,7 +41,11 @@ export default React.createClass({
         <Panel
           id={topic.id}
           className="panel--topic-body">
-          <span className="topic-body__sent">{formattedSentDate}</span>
+          <span
+            className="topic-body__sent"
+            title={formattedFullSentDate}>
+            {formattedSentDate}
+          </span>
           {this.getEditButton()}
           {this.getContent()}
           <footer className="topic-body__footer">
@@ -103,6 +109,7 @@ export default React.createClass({
         onChange={this.onTopicEditUpdate}
         onSave={this.onTopicEditSave}
         onCancel={this.onTopicEditCancel}
+        onDelete={this.onTopicDelete}
         isEditing={isEditing} />
     );
   },
@@ -121,6 +128,10 @@ export default React.createClass({
 
   onTopicEditCancel(){
     this.props.onTopicEditCancel();
+  },
+
+  onTopicDelete() {
+    this.props.onTopicDelete();
   },
 
   onReactionPick(reactionKey, isReacting) {

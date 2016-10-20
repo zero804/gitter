@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react';
+import IconButton from '../buttons/icon-button.jsx';
 
 import {
   SUBSCRIPTION_STATE_SUBSCRIBED,
@@ -6,15 +7,13 @@ import {
   SUBSCRIPTION_STATE_PENDING
 } from '../../../constants/forum.js';
 
-import SubscribeButton from './subscribe-button.jsx';
+import {ICONS_WATCH_SELECTED, ICONS_WATCH} from '../../../constants/icons';
 
 export default React.createClass({
 
-  displayName: 'WwatchButton',
+  displayName: 'WatchButton',
 
   propTypes: {
-    className: PropTypes.string,
-    itemClassName: PropTypes.string,
     subscriptionState: PropTypes.oneOf([
       SUBSCRIPTION_STATE_SUBSCRIBED,
       SUBSCRIPTION_STATE_UNSUBSCRIBED,
@@ -25,19 +24,22 @@ export default React.createClass({
   },
 
   render() {
-    const { className, itemClassName, onClick, subscriptionState, children } = this.props;
+    const { onClick, subscriptionState, children } = this.props;
+
+    let type;
+    if(subscriptionState === SUBSCRIPTION_STATE_SUBSCRIBED) {
+      type = ICONS_WATCH_SELECTED;
+    }
+    else {
+      type = ICONS_WATCH;
+    }
 
     return (
-      <SubscribeButton
-        className={ className }
-        itemClassName={ itemClassName }
+      <IconButton
         onClick={onClick}
-        subscriptionState={subscriptionState}
-        subscribedText="Stop Watching"
-        unsubscribedText="Watch"
-        pendingText="...">
+        type={type}>
         {children}
-        </SubscribeButton>
+      </IconButton>
     );
   },
 

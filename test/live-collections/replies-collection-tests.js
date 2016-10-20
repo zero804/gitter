@@ -21,10 +21,29 @@ describe('replies-live-collection #slow', function() {
       forum: 'forum1',
       category: 'category1'
     },
+    // to be updated
     reply1: {
       user: 'user1',
       forum: 'forum1',
       topic: 'topic1'
+    },
+    // to be deleted
+    reply2: {
+      user: 'user1',
+      forum: 'forum1',
+      topic: 'topic1'
+    },
+    // for deleting a comment
+    reply3: {
+      user: 'user1',
+      forum: 'forum1',
+      topic: 'topic1'
+    },
+    comment1: {
+      user: 'user1',
+      forum: 'forum1',
+      topic: 'topic1',
+      reply: 'reply3'
     }
   });
 
@@ -94,6 +113,44 @@ describe('replies-live-collection #slow', function() {
       .then(function(event) {
         // the patch event must also contain editedAt
         assert.ok(event.model.editedAt);
+      });
+  });
+
+  it('should emit a remove event when deleting the reply', function() {
+    var reply = fixture.reply2;
+    var checkEvent = appEvents.addListener('dataChange2', {
+      url: '/forums/' + reply.forumId + '/topics/' + reply.topicId + '/replies',
+      operation: 'remove',
+      type: 'reply',
+      model: {
+        id: reply.id.toString(),
+      }
+    });
+
+    return replyService.deleteReply(fixture.user1, reply)
+      .then(checkEvent);
+  });
+
+  it('should emit a patch event when deleting a comment', function() {
+    var reply = fixture.reply3;
+    var comment = fixture.comment1;
+
+    var checkEvent = appEvents.addListener('dataChange2', {
+      url: '/forums/' + comment.forumId + '/topics/' + comment.topicId + '/replies',
+      operation: 'patch',
+      type: 'reply',
+      model: {
+        id: reply.id.toString(),
+        // no comments left on this reply
+        commentsTotal: 0
+      },
+    });
+
+    return commentService.deleteComment(fixture.user1, comment)
+      .then(checkEvent)
+      .then(function(event) {
+        // the patch event must also contain lastChanged
+        assert.ok(event.model.lastChanged);
       });
   });
 });

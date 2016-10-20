@@ -7,29 +7,29 @@ function AggregatedTopicStrategy() {
 }
 
 AggregatedTopicStrategy.prototype = {
-  map: function(item, authorUser, owningForum) {
-    var id = item.id || item._id && item._id.toHexString();
+  map: function(topic, authorUser, owningForum) {
+    var id = topic.id || topic._id && topic._id.toHexString();
 
     return {
       id: id,
-      title: item.title,
-      slug: item.slug,
+      title: topic.title,
+      slug: topic.slug,
       body: {
-        text: item.text,
-        html: item.html,
+        text: topic.text,
+        html: topic.html,
       },
-      sticky: item.sticky,
-      tags: item.tags,
+      sticky: topic.sticky,
+      tags: topic.tags,
       // category: this.mapCategory(topic.categoryId), Deal with Category
       user: this.userStrategy.map(authorUser),
-      repliesTotal: item.repliesTotal,
-      sent: item.sent,
-      editedAt: item.editedAt,
-      lastChanged: item.lastChanged,
-      lastModified: item.lastModified,
+      repliesTotal: topic.repliesTotal,
+      sent: topic.sent,
+      editedAt: topic.editedAt,
+      lastChanged: topic.lastChanged,
+      lastModified: topic.lastModified,
 
       // TODO: permalink?
-      uri: owningForum.uri + '/topic/' + id + '/' + item.slug
+      uri: owningForum.uri + '/topic/' + id + '/' + topic.slug
     }
   },
 

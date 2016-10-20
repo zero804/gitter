@@ -41,7 +41,7 @@ describe('CategoryStore', function(){
   it('should allow you to get by id', () => {
     const expected = categories[1];
     const result = store.getById(expected.id);
-    assert.deepEqual(result, expected);
+    assert.equal(result.category, expected.category);
   });
 
 
