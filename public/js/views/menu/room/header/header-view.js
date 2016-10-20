@@ -41,6 +41,7 @@ var HeaderView = Marionette.ItemView.extend({
     headerSearch:    '#panel-header-search',
     headerFavourite: '#panel-header-favourite',
     headerPeople:    '#panel-header-people',
+    headerGroup:     '#panel-header-group',
     headerOrg:       '#panel-header-org',
     profileToggle:   '#panel-header-profile-toggle',
   },
@@ -67,6 +68,7 @@ var HeaderView = Marionette.ItemView.extend({
         toggleClass(this.ui.headerSearch[0], 'active', state === 'search');
         toggleClass(this.ui.headerFavourite[0], 'active', state === 'favourite');
         toggleClass(this.ui.headerPeople[0], 'active', state === 'people');
+        toggleClass(this.ui.headerGroup[0], 'active', state === 'group');
         toggleClass(this.ui.headerOrg[0], 'active', (state === 'org' || state === 'temp-org'));
       }.bind(this));
     }.bind(this));
