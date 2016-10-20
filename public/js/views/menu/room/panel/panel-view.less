@@ -5,11 +5,8 @@
   left:             0;
   height:           100%;
   padding-left:     100%;
-  background-image: linear-gradient(
-    #251546 30%,
-    #513173 60%,
-    #842a36
-  );
+  border-right:     1px solid #f7f6f6;
+  background-color: white;
 
   //TODO Check how this works on other monitor sizes
   transform:    translateX(-78%);
@@ -37,22 +34,6 @@
     background-color: transparent;
     transition: background-color .2s liner;
     pointer-events: none;
-  }
-
-  //image background
-  &:before {
-    content:             ' ';
-    display:             inline-block;
-    position:            absolute;
-    top:                 0;
-    left:                0;
-    width:               100%;
-    height:              100%;
-    background-image:    url('../images/left-menu-background-darker.jpg');
-    background-position: bottom right;
-    background-repeat:   no-repeat;
-    background-size:     cover;
-    z-index:             -1;
   }
 
   .mobile & {
