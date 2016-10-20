@@ -26,6 +26,10 @@ module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, group
   //if this is the case reset, it will be recalculated below
   if(menuState === 'temp-org') { menuState = 'all'; }
 
+  //Switch anyone looking at an individual org state
+  //onto a group
+  if(menuState === 'org') { menuState = 'group'; }
+
   // Try the suggested
   // ex. If you are loading a home view then activate the search state
   if(extras.suggestedMenuState) {
