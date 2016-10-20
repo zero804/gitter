@@ -11,7 +11,6 @@ var Promise = require('bluebird');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var debug = require('debug')('gitter:app:uri-lookup-service');
 
-
 /**
  * Lookup the owner of a URI
  * @return promise of a UriLookup
@@ -134,9 +133,11 @@ function reserveUriForGroupId(groupId, uri) {
     .exec();
 }
 
-exports.reserveUriForTroupeId = reserveUriForTroupeId;
-exports.reserveUriForGroupId = reserveUriForGroupId;
-exports.lookupUri = lookupUri;
-exports.removeUsernameForUserId = removeUsernameForUserId;
-exports.reserveUriForUsername = reserveUriForUsername;
-exports.removeBadUri = removeBadUri;
+module.exports = {
+  reserveUriForTroupeId: reserveUriForTroupeId,
+  reserveUriForGroupId: reserveUriForGroupId,
+  lookupUri: lookupUri,
+  removeUsernameForUserId: removeUsernameForUserId,
+  reserveUriForUsername: reserveUriForUsername,
+  removeBadUri: removeBadUri,
+}

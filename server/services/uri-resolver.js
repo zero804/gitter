@@ -4,7 +4,7 @@ var Promise = require('bluebird');
 var env = require('gitter-web-env');
 var logger = env.logger;
 
-var uriLookupService = require('./uri-lookup-service');
+var uriLookupService = require('gitter-web-uri-resolver/lib/uri-lookup-service');
 var userService = require('./user-service');
 var troupeService = require('./troupe-service');
 var groupService = require('gitter-web-groups/lib/group-service');

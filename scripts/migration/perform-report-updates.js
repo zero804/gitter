@@ -10,8 +10,7 @@ var shutdown = require('shutdown');
 var onMongoConnect = require('gitter-web-persistence-utils/lib/on-mongo-connect');
 var userService = require('../../server/services/user-service');
 var troupeService = require('../../server/services/troupe-service');
-var uriLookupService = require('../../server/services/uri-lookup-service');
-
+var uriLookupService = require('gitter-web-uri-resolver/lib/uri-lookup-service');
 
 function renameUser(update) {
   console.log("USER", update.oldUsername, update.newUsername);

@@ -6,7 +6,7 @@ var Promise = require('bluebird');
 var _ = require('lodash');
 var cliff = require('cliff');
 var shutdown = require('shutdown');
-var uriLookupService = require("../../server/services/uri-lookup-service");
+var uriLookupService = require('gitter-web-uri-resolver/lib/uri-lookup-service');
 var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs')
 
 function getOrgChannelsWithIncorrectParent() {
