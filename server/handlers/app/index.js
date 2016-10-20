@@ -79,8 +79,12 @@ var mainFrameMiddlewarePipeline = [
 
       saveRoom(req);
       chatRenderer.renderMobileChat(req, res, next);
+      return;
+    }
 
-    } else {
+
+    // Chat room?
+    if (req.uriContext.troupe) {
       // Load the main-frame
       var chatAppQuery = {};
       var aroundId = fixMongoIdQueryParam(req.query.at);
@@ -101,7 +105,30 @@ var mainFrameMiddlewarePipeline = [
           return getSocialMetaDataForRoom(req.troupe, serializedRoom, aroundId);
         }
       });
+
+      return;
     }
+
+    // Group?
+    if (req.uriContext.group) {
+      var groupSubFrameLocation = url.format({
+        pathname: '/orgs/' + req.uriContext.group.uri + '/rooms/~iframe',
+        hash:     '#initial'
+      });
+
+      mainFrameRenderer.renderMainFrame(req, res, next, {
+        subFrameLocation: groupSubFrameLocation,
+        title: req.uriContext.uri,
+        socialMetadataGenerator: function(/*troupeContext*/) {
+          // TODO: generate social meta-data for a group...
+          return null;
+        }
+      });
+
+      return;
+    }
+
+    return next(new StatusError(404));
   },
   redirectErrorMiddleware
 ];
