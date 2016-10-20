@@ -3,7 +3,7 @@
 var assert = require('assert');
 var forumStore = require('../../../../server/stores/forum-store');
 
-describe.skip('forumStore', () => {
+describe('forumStore', () => {
 
   var data = {};
 
@@ -15,4 +15,11 @@ describe.skip('forumStore', () => {
     assert(forumStore(data).getForum);
   });
 
+  it('should expose a getForumId function', () => {
+    assert(forumStore(data).getForumId);
+  });
+
+  it('should expose a getSubscriptionState function', () => {
+    assert(forumStore(data).getSubscriptionState);
+  });
 });

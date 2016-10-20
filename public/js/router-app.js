@@ -1,4 +1,4 @@
-/* eslint complexity: ["error", 18] */
+/* eslint complexity: ["error", 20] */
 'use strict';
 
 require('./utils/initial-setup');
@@ -44,7 +44,34 @@ require('./components/ping');
 // Preload widgets
 require('./views/widgets/avatar');
 
-onready(function() {
+onready(function() { // eslint-disable-line max-statements
+
+  var appLayout = new AppLayout({
+    template: false,
+    el: 'body',
+    roomCollection: troupeCollections.troupes,
+    //TODO ADD THIS TO MOBILE JP 25/1/16
+    orgCollection: troupeCollections.orgs,
+    groupsCollection: troupeCollections.groups
+  });
+  appLayout.render();
+
+  var router = new Router({
+    dialogRegion: appLayout.dialogRegion,
+    routes: [
+      notificationRoutes(),
+      createRoutes({
+        rooms: troupeCollections.troupes,
+        groups: troupeCollections.groups,
+        roomMenuModel: appLayout.getRoomMenuModel()
+      }),
+      upgradeAccessRoutes()
+    ]
+  });
+
+  Backbone.history.start();
+
+
   var chatIFrame = document.getElementById('content-frame');
   var titlebarUpdater = new TitlebarUpdater();
 
@@ -125,7 +152,7 @@ onready(function() {
     // Set the last access time immediately to prevent
     // delay in hidden rooms becoming visible only
     // once we get the server-side update
-    var liveCollectionTroupe = troupeCollections.troupes.get(troupe.id)
+    var liveCollectionTroupe = troupeCollections.troupes.get(troupe.id);
     if (liveCollectionTroupe) {
       liveCollectionTroupe.set('lastAccessTime', moment());
     }
@@ -249,12 +276,19 @@ onready(function() {
         break;
 
       case 'navigation':
-        appEvents.trigger('navigation', message.url, message.urlType, message.title);
+        appEvents.trigger('navigation', message.url, message.urlType, message.title, message.options);
         break;
 
       case 'route':
         window.location.hash = '#' + message.hash;
         break;
+
+      // case 'route-silent':
+      //   var routeCb = router.routes[message.hash];
+      //   if(routeCb) {
+      //     routeCb.apply(router, message.args);
+      //   }
+      //   break;
 
       //when the chat app requests the room list send it
       case 'request:roomList':
@@ -326,15 +360,6 @@ onready(function() {
   });
 
 
-  var appLayout = new AppLayout({
-    template: false,
-    el: 'body',
-    roomCollection: troupeCollections.troupes,
-    //TODO ADD THIS TO MOBILE JP 25/1/16
-    orgCollection: troupeCollections.orgs,
-    groupsCollection: troupeCollections.groups
-  });
-  appLayout.render();
 
 
 
@@ -365,9 +390,7 @@ onready(function() {
     //Update windows location
     pushState(frameUrl, title, url);
 
-    //In the case of topics we want to update the windows location
-    //but we want to avoid reloading the frame, hence we cancel out here.
-    if(type === 'topics') { return; }
+    if(options.disableFrameReload) { return; }
 
     //Redirect the App
     roomSwitcher.change(frameUrl);
@@ -425,20 +448,6 @@ onready(function() {
     postMessage(message);
   });
 
-  new Router({
-    dialogRegion: appLayout.dialogRegion,
-    routes: [
-      notificationRoutes(),
-      createRoutes({
-        rooms: troupeCollections.troupes,
-        groups: troupeCollections.groups,
-        roomMenuModel: appLayout.getRoomMenuModel()
-      }),
-      upgradeAccessRoutes()
-    ]
-  });
-
-  Backbone.history.start();
 
   if (context.popEvent('invite_failed')) {
     appEvents.trigger('user_notification', {

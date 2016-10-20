@@ -16,8 +16,8 @@ describe('<TopicHeader/>', () => {
       <TopicHeader
         tags={topic.tags}
         topic={topic}
-        category={category}
-        groupName="gitterHQ"/>
+        categories={categories}
+        groupUri="gitterHQ"/>
     );
   });
 

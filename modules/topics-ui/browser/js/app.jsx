@@ -4,13 +4,12 @@ import React from 'react';
 import ForumContainer from '../../shared/containers/ForumContainer.jsx';
 import TopicContainer from '../../shared/containers/TopicContainer.jsx';
 
-//Stores
-import NewTopicStore from './stores/new-topic-store';
 import NewReplyStore from './stores/new-reply-store';
 import NewCommentStore from './stores/new-comment-store-store';
 
-import {getCurrentUserStore} from './stores/current-user-store';
+import {getGroupStore} from './stores/group-store';
 import {getForumStore} from './stores/forum-store';
+import {getCurrentUserStore} from './stores/current-user-store';
 import {getForumTagStore} from './stores/forum-tag-store';
 import {getForumCategoryStore} from './stores/forum-category-store';
 import {getTopicsStore} from './stores/topics-store';
@@ -68,11 +67,11 @@ export default React.createClass({
   getDefaultState(){
     const { router } = this.props;
     return {
-      groupName: router.get('groupName'),
       route: router.get('route'),
       router: router,
-      currentUserStore: getCurrentUserStore(),
+      groupStore: getGroupStore(),
       forumStore: getForumStore(),
+      currentUserStore: getCurrentUserStore(),
       categoryStore: getForumCategoryStore(),
       tagStore: getForumTagStore(),
     };
@@ -89,7 +88,6 @@ export default React.createClass({
       sortName: router.get('sortName'),
       //Stores
       topicsStore: getTopicsStore(),
-      newTopicStore: new NewTopicStore(),
       createTopic: false,
     });
   },
@@ -104,8 +102,8 @@ export default React.createClass({
   getTopicState(){
     var {router} = this.props;
     return Object.assign(this.getDefaultState(), {
-      groupName: router.get('groupName'),
       topicId: router.get('topicId'),
+      sortName: router.get('sortName'),
       topicsStore: getTopicsStore(),
       repliesStore: getRepliesStore(),
       newReplyStore: new NewReplyStore(),
@@ -115,7 +113,7 @@ export default React.createClass({
   },
 
   //EVENT HANDLES ---------------------------
-  onRouteUpdate(){
+  onRouteUpdate() {
     this.setState(this.getStateForRoute());
   }
 

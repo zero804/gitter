@@ -75,10 +75,12 @@ mongosetup:
   entrypoint: [ "/src/scripts/docker/mongo/mongo-setup.sh" ]
 
 neo4j:
-  image: kbastani/docker-neo4j
+  image: neo4j:2.3
   restart: always
   ports:
     - "7474:7474"
+  environment:
+    NEO4J_AUTH: none
 
 # The official elasticsearch:1.4.2 image with mapper-attachments and river-mongodb plugins
 # https://github.com/soldotno/elasticsearch-river-mongodb/blob/master/Dockerfile

@@ -2,42 +2,43 @@ import assert, { equal } from 'assert';
 import React from 'react';
 import sinon, {spy} from 'sinon';
 import { shallow } from 'enzyme';
-import ForumContainer from '../../../../shared/containers/ForumContainer.jsx';
 import { subscribe } from '../../../../shared/dispatcher';
+import ForumContainer from '../../../../shared/containers/ForumContainer.jsx';
 
-import * as forumCatConstants from '../../../../shared/constants/forum-categories';
 import * as forumFilterConstants from '../../../../shared/constants/forum-filters';
 import * as forumSortConstants from '../../../../shared/constants/forum-sorts';
 import * as forumTagConstants from '../../../../shared/constants/forum-tags';
 import * as createConst from '../../../../shared/constants/create-topic';
+import {REQUEST_UPDATE_FORUM_SUBSCRIPTION_STATE} from '../../../../shared/constants/forum.js';
 
+import groupStore from '../../../mocks/group-store';
+import forumStore from '../../../mocks/forum-store';
+import currentUserStore from '../../../mocks/current-user-store';
 import categoryStore from '../../../mocks/category-store';
 import tagStore from '../../../mocks/tag-store';
 import topicsStore from '../../../mocks/topic-store';
-import newTopicStore from '../../../mocks/new-topic-store';
 
 describe('<ForumContainer />', function(){
 
   let wrapper;
-  let catChangeHandle;
   let filterChangeHandle;
   let sortChangeHandle;
   let tagChangeHandle;
 
 
   beforeEach(function(){
-    catChangeHandle = sinon.spy();
     filterChangeHandle = sinon.spy();
     sortChangeHandle = sinon.spy();
     tagChangeHandle = sinon.spy();
     wrapper = shallow(
       <ForumContainer
+        groupStore={groupStore}
+        forumStore={forumStore}
+        currentUserStore={currentUserStore}
         categoryStore={categoryStore}
         categoryName="all"
         tagStore={tagStore}
-        topicsStore={topicsStore}
-        newTopicStore={newTopicStore}
-        groupName='gitterHQ' />
+        topicsStore={topicsStore}/>
     );
   });
 
@@ -63,8 +64,8 @@ describe('<ForumContainer />', function(){
     assert.equal(wrapper.find('TopicsTable').length, 1);
   });
 
-  it('should render a search header', () => {
-    assert.equal(wrapper.find('SearchHeader').length, 1);
+  it('should render a SearchHeaderContainer', () => {
+    assert.equal(wrapper.find('SearchHeaderContainer').length, 1);
   });
 
   it('should render the create topic modal', () => {
@@ -86,7 +87,7 @@ describe('<ForumContainer />', function(){
   });
 
   //Passes when run with .only
-  it.skip('should dispatch the right event when the form is submitted', () => {
+  it('should dispatch the right event when the form is submitted', () => {
     const handle = spy();
     subscribe(createConst.SUBMIT_NEW_TOPIC, handle);
     wrapper.find('CreateTopicModal').at(0).prop('onSubmit')()
@@ -104,6 +105,13 @@ describe('<ForumContainer />', function(){
     const handle = spy();
     subscribe(createConst.TAGS_UPDATE, handle);
     wrapper.find('CreateTopicModal').at(0).prop('onTagsChange')(['1', '2', '3']);
+    equal(handle.callCount, 1);
+  });
+
+  it('should dispatch the right action when the button from ForumFollowArea is clicked', () => {
+    const handle = spy();
+    subscribe(REQUEST_UPDATE_FORUM_SUBSCRIPTION_STATE, handle);
+    wrapper.find('ForumFollowArea').at(0).prop('onSubscriptionClicked')();
     equal(handle.callCount, 1);
   });
 

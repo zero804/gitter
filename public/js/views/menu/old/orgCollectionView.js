@@ -1,10 +1,10 @@
 "use strict";
 
 var Marionette = require('backbone.marionette');
+var avatars = require('gitter-web-avatars');
 var orgListItemTemplate = require('./tmpl/org-list-item.hbs');
 var appEvents = require('../../../utils/appevents');
 var troupesCollections = require('../../../collections/instances/troupes');
-var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 
 
 module.exports = (function() {
@@ -27,7 +27,7 @@ module.exports = (function() {
 
     serializeData: function() {
       var data = this.model.toJSON();
-      data.roomAvatarSrcSet = resolveRoomAvatarSrcSet({uri: data.name}, 16);
+      data.avatarUrl = avatars.getForGitHubUsername(data.name);
       return data;
     },
 

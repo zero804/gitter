@@ -20,7 +20,7 @@ describe('NewCommentStoreStore', () => {
   it('should clear the text field when the right action takes place', () => {
     dispatch(commentBodyUpdate(1, 'test'));
     dispatch(showReplyComments());
-    equal(store.get('text'), undefined);
+    equal(store.get('text'), '');
   });
 
 });

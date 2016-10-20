@@ -6,7 +6,7 @@ var restSerializer = require("../../../serializers/rest-serializer");
 var suggestions = require('gitter-web-suggestions');
 var loadTroupeFromParam = require('./load-troupe-param');
 var roomMembershipService = require('../../../services/room-membership-service');
-var collections = require('../../../utils/collections');
+var collections = require('gitter-web-utils/lib/collections');
 var troupeService = require('../../../services/troupe-service');
 
 module.exports = {

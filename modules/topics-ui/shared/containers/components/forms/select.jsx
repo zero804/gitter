@@ -10,8 +10,9 @@ export default React.createClass({
       label: PropTypes.string.isRequired,
       value: PropTypes.string.isRequired
     })).isRequired,
-    defaulValue: PropTypes.string,
-    className: PropTypes.string
+    defaultValue: PropTypes.string,
+    className: PropTypes.string,
+    valid: PropTypes.bool
   },
 
   getDefaultProps(){
@@ -19,15 +20,28 @@ export default React.createClass({
   },
 
   render(){
-    const { options, className } = this.props;
+    const { options, className, valid, defaultValue } = this.props;
 
-    const compiledClass = classNames('select', className);
+    const compiledClass = classNames({
+      select: true,
+      valid: (valid === true),
+      invalid: (valid === false)
+    }, className);
+
     const decalClassName = className ? `${className}--decal` : null;
-    const compiledDecalClass = classNames('select__decal', decalClassName);
+
+    const compiledDecalClass = classNames({
+      'select__decal': true,
+      valid: (valid === true),
+      invalid: (valid === false)
+    }, decalClassName);
 
     return (
       <div className={compiledDecalClass}>
-        <select className={compiledClass} onChange={this.onChange}>
+        <select
+          className={compiledClass}
+          onChange={this.onChange}
+          defaultValue={defaultValue}>
           { options.map(this.buildChildOption) }
         </select>
       </div>
@@ -37,7 +51,9 @@ export default React.createClass({
   buildChildOption(option, index){
     const {label, value} = option;
     return (
-      <option key={`select-option-${label}-${index}`}
+      <option
+        className="option"
+        key={`select-option-${label}-${index}`}
         label={label}
         value={value}>
         {label}

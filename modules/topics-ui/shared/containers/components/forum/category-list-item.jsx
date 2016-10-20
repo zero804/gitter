@@ -4,7 +4,7 @@ import ForumCategoryLink from '../links/forum-category-link.jsx';
 export default createClass({
   displayName: 'CategoryListItem',
   propTypes: {
-    groupName: PropTypes.string.isRequired,
+    groupUri: PropTypes.string.isRequired,
     category: PropTypes.shape({
       active: PropTypes.bool.isRequired,
     }).isRequired,
@@ -16,7 +16,7 @@ export default createClass({
   },
 
   render() {
-    const { category, groupName } = this.props;
+    const { category, groupUri } = this.props;
     const {active} = category;
 
     let className = 'category-list__item';
@@ -25,9 +25,9 @@ export default createClass({
     return (
       <ForumCategoryLink
         className={className}
-        groupName={groupName}
+        groupUri={groupUri}
         category={category}>
-        {category.category}
+        {category.name}
       </ForumCategoryLink>
     );
   },

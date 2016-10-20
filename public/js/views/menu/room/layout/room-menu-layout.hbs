@@ -81,6 +81,7 @@
           {{! JP 5/1/15
               NANO SCROLLER DOES SUPER WEIRD THINGS WITH Z-INDEXES SO THE FOOTER COMES FIRST }}
           <footer id="panel-footer" class="panel-footer-container"></footer>
+
           <div class="nano-content panel-content">
             <div id="search-input" class="left-menu-search-root"></div>
 
@@ -115,7 +116,27 @@
             </section>
 
             <section id="secondary-collection" class="left-menu-collection"></section>
+
+            <div id="left-menu-topics-area" class="left-menu-topics-root {{#unless forum.hasCategories}}hidden{{/unless}}">
+              <div>
+                <h2 class="collection__title">
+                  Topics
+                </h2>
+
+                <div class="js-left-menu-topics-category-list-root">
+                  <ul class="collection-list">
+                    {{#each forum.categories}}
+                      <li data-id="{{id}}" id="{{id}}">
+                        {{{ prerenderView "js/views/menu/room/topics-area/category-item-view" }}}
+                      </li>
+                    {{/each}}
+                  </ul>
+                </div>
+              </div>
+            </div>
+
             <section id="tertiary-collection" class="left-menu-collection"></section>
+
           </div>
         </div>
       </section>

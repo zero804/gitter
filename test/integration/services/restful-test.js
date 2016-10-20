@@ -487,7 +487,9 @@ describe('restful #slow', function() {
 
     describe('serializeCommentsForReplyId', function() {
       it('should serialize comments in a reply', function() {
-        return restful.serializeCommentsForReplyId(fixture.reply1._id)
+        var userId = fixture.user1._id;
+
+        return restful.serializeCommentsForReplyId(fixture.reply1._id, userId)
           .then(function(comments) {
             var comment = comments.find(function(c) {
               return c.id === fixture.comment1.id;
@@ -497,5 +499,16 @@ describe('restful #slow', function() {
       });
     });
 
+    describe('serializeCategoriesForForumId', function() {
+      it('should serialize categories in a forum', function() {
+        return restful.serializeCategoriesForForumId(fixture.forum1._id)
+          .then(function(categories) {
+            var category = categories.find(function(c) {
+              return c.id === fixture.category1.id;
+            });
+            assert.strictEqual(category.id, fixture.category1.id);
+          });
+      });
+    });
   });
 });

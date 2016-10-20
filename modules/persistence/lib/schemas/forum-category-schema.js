@@ -3,8 +3,7 @@
 var mongoose = require('gitter-web-mongoose-bluebird');
 var Schema = mongoose.Schema;
 var ObjectId = Schema.ObjectId;
-
-
+var installVersionIncMiddleware = require('../install-version-inc-middleware');
 
 /*
 Go with a large number by default so that new ones get added to the end.
@@ -24,13 +23,17 @@ var ForumCategorySchema = new Schema({
   name: { type: String, required: true },
   slug: { type: String, required: true },
   forumId: { type: ObjectId, required: true },
-  order: { type: Number, "default": DEFAULT_CATEGORY_ORDER, required: false }
+  order: { type: Number, "default": DEFAULT_CATEGORY_ORDER, required: false },
+  adminOnly: { type: Boolean },
+  _tv: { type: 'MongooseNumber', 'default': 0 },
 }, { strict: "throw" });
 
 ForumCategorySchema.schemaTypeName = 'ForumCategorySchema';
 ForumCategorySchema.index({ forumId: 1 });
 ForumCategorySchema.index({ forumId: 1, slug: 1 }, { unique: true });
 ForumCategorySchema.index({ order: 1 });
+
+installVersionIncMiddleware(ForumCategorySchema);
 
 module.exports = {
   install: function(mongooseConnection) {

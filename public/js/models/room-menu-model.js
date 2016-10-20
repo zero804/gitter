@@ -2,6 +2,7 @@
 
 //TODO This has basically turned into a controller, refactor it JP 2/2/16
 
+var debug = require('debug-proxy')('app:room-menu-model');
 var Backbone = require('backbone');
 var _ = require('underscore');
 var ProxyCollection = require('backbone-proxy-collection');
@@ -19,6 +20,7 @@ var SuggestedRoomsByGroupName = require('../collections/org-suggested-rooms-by-n
 var UserSuggestions = require('../collections/user-suggested-rooms');
 var SearchRoomPeopleCollection = require('../collections/left-menu-search-rooms-and-people');
 var SearchChatMessages = require('../collections/search-chat-messages');
+var ForumCategoryCollection = require('../collections/forum-category-collection');
 
 var FavouriteCollectionModel = require('../views/menu/room/favourite-collection/favourite-collection-model');
 var PrimaryCollectionModel = require('../views/menu/room/primary-collection/primary-collection-model');
@@ -39,6 +41,11 @@ var states = [
 
 var SEARCH_DEBOUNCE_INTERVAL = 1000;
 
+var ForumCategoryContextModel = Backbone.Model.extend({
+  defaults: { forumId: null, }
+});
+
+
 module.exports = Backbone.Model.extend({
 
   defaults: {
@@ -57,7 +64,7 @@ module.exports = Backbone.Model.extend({
     Backbone.Model.prototype.constructor.call(this, attrs, options);
   },
 
-  initialize: function(attrs) {
+  initialize: function(attrs) { // eslint-disable-line max-statements
     this.set('panelOpenState', this.get('roomMenuIsPinned'));
 
     if (!attrs || !attrs.bus) {
@@ -178,6 +185,10 @@ module.exports = Backbone.Model.extend({
 
     this.searchFocusModel = new Backbone.Model({ focus: false });
 
+    var forumSnapshot = context.getSnapshot('forum');
+    this.forumCategoryContextModel = new ForumCategoryContextModel();
+    this.forumCategoryCollection = new ForumCategoryCollection(forumSnapshot && forumSnapshot.categories, { contextModel: this.forumCategoryContextModel });
+
     this.listenTo(this.primaryCollection, 'snapshot', this.onPrimaryCollectionSnapshot, this);
     this.snapshotTimeout = setTimeout(function(){
       this.onPrimaryCollectionSnapshot();
@@ -193,6 +204,7 @@ module.exports = Backbone.Model.extend({
     this.listenTo(context.troupe(), 'change:id', this.onRoomChange, this);
     this.listenTo(this.bus, 'left-menu-menu-bar:activate', this.onMenuBarActivateRequest, this);
     this.onSwitchState(this, this.get('state'));
+    this.listenTo(this, 'change:state change:groupId', this.updateForumCategoryState);
 
     autoModelSave(this, ['state', 'roomMenuIsPinned', 'groupId', 'hasDismissedSuggestions'], this.autoPersist);
   },
@@ -309,5 +321,45 @@ module.exports = Backbone.Model.extend({
         this.tertiaryCollection.findWhere(query) ||
           this._roomCollection.findWhere(query);
   },
+
+  updateForumCategoryState: function() {
+    debug('updateForumCategoryState');
+    var group = this.getCurrentGroup();
+    var forumId = group && group.get('forumId');
+    var forumCategoryCollection = this.forumCategoryCollection;
+    this.forumCategoryContextModel.set({
+      forumId: forumId
+    });
+
+    forumCategoryCollection.reset();
+    if(this.get('state') === 'org' && forumId) {
+      debug('updateForumCategoryState: Fetching new categories for forum:', forumId, ' - associated with group:', group.get('uri'));
+      forumCategoryCollection.fetch()
+        .bind(this)
+        .then(function(categories) {
+          if(!categories) {
+            debug('updateForumCategoryState: Failed to fetch any categories for group', currentGroup.get('uri'));
+            return;
+          }
+
+          var currentGroup = this.getCurrentGroup();
+          if(currentGroup && group.get('id') === currentGroup.get('id')) {
+            categories.forEach(function(category) {
+              var categoryModel = forumCategoryCollection.get(category.id);
+              if(categoryModel) {
+                categoryModel.set('groupUri', currentGroup.get('uri'));
+              }
+            });
+            debug('updateForumCategoryState: Successfully fetched and using categories for group', currentGroup.get('uri'), forumCategoryCollection.toJSON());
+          }
+          else {
+            debug('updateForumCategoryState: Discarding fetched categories because the current group is now different. On request:', group.get('uri'), ' - Now currently:', currentGroup.get('uri'));
+            categories.forEach(function(category) {
+              forumCategoryCollection.remove(category.id);
+            });
+          }
+        });
+    }
+  }
 
 });

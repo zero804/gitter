@@ -91,7 +91,7 @@ function GroupWithPolicyService(group, user, policy) {
 GroupWithPolicyService.prototype.createRoom = secureMethod([allowAdmin], function(options) {
   assert(options, 'options required');
   var type = options.type || null;
-  var providers = options.providers;
+  var providers = options.providers || [];
   var security = options.security;
   var name = options.name;
   var associateWithGitHubRepo = options.associateWithGitHubRepo;
@@ -99,7 +99,7 @@ GroupWithPolicyService.prototype.createRoom = secureMethod([allowAdmin], functio
   var user = this.user;
   var group = this.group;
 
-  if (providers && !validateProviders(providers)) {
+  if (!validateProviders(providers)) {
     throw new StatusError(400, 'Invalid providers ' + providers);
   }
 
@@ -142,7 +142,7 @@ GroupWithPolicyService.prototype._ensureAccessAndFetchRoomInfo = function(option
   var user = this.user;
   var group = this.group;
   var type = options.type || null;
-  var providers = options.providers;
+  var providers = options.providers || [];
   var security = options.security;
   var topic = options.topic;
   var name = options.name;
@@ -154,7 +154,7 @@ GroupWithPolicyService.prototype._ensureAccessAndFetchRoomInfo = function(option
 
   var uri = group.uri + '/' + name;
 
-  if (providers && !validateProviders(providers)) {
+  if (!validateProviders(providers)) {
     throw new StatusError(400, 'Invalid providers ' + providers.toString());
   }
 
@@ -223,8 +223,12 @@ GroupWithPolicyService.prototype.createForum = secureMethod([allowAdmin], functi
     categoriesInfo = getCategoriesInfo(categoryNames);
   }
 
+  var forumUri = group.uri + '/topics';
+
   var forumInfo = {
-    tags: tags
+    tags: tags,
+    uri: forumUri,
+    name: group.name || group.uri
   };
 
   // TODO: this is hardcoded for now, but down the line the user should be able

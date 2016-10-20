@@ -21,7 +21,8 @@ exports.redirectUserToDefaultTroupe = function(req, res, next) {
       if (req.session) {
         req.session.preserveLeftMenuState = true;
       }
-      return res.relativeRedirect(url);
+      var encoded = encodeURI(url);
+      return res.relativeRedirect(encoded);
     })
     .catch(next);
 };

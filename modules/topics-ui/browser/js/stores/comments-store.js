@@ -1,18 +1,44 @@
 import Backbone from 'backbone';
-import {getRealtimeClient} from './realtime-client';
-import {getForumId} from './forum-store';
+
+import {subscribe} from '../../../shared/dispatcher';
 import LiveCollection from './live-collection';
 import { BaseModel } from './base-model';
-import dispatchOnChangeMixin from './mixins/dispatch-on-change';
-import {subscribe} from '../../../shared/dispatcher';
-import {SHOW_REPLY_COMMENTS} from '../../../shared/constants/topic';
-import router from '../routers';
-import {SUBMIT_NEW_COMMENT} from '../../../shared/constants/create-comment';
+
+import { getRealtimeClient } from './realtime-client';
+import { getForumId } from './forum-store';
 import {getCurrentUser} from './current-user-store';
+import router from '../routers';
+import dispatchOnChangeMixin from './mixins/dispatch-on-change';
+import onReactionsUpdateMixin from './mixins/on-reactions-update';
+
+import { SUBMIT_NEW_COMMENT } from '../../../shared/constants/create-comment';
+import { UPDATE_COMMENT_REACTIONS } from '../../../shared/constants/forum.js';
+import {MODEL_STATE_DRAFT} from '../../../shared/constants/model-states';
+import {
+  SHOW_REPLY_COMMENTS,
+  UPDATE_COMMENT,
+  UPDATE_CANCEL_COMMENT,
+  UPDATE_SAVE_COMMENT,
+  DELETE_COMMENT,
+  UPDATE_COMMENT_IS_EDITING
+} from '../../../shared/constants/topic';
+
 
 export const CommentModel = BaseModel.extend({
+  // Theres a problem with the realtime client here. When a message comes in from
+  // the realtime connection it will create a new model and patch the values onto an existing model.
+  // If you have any defaults the patch model with override the current models values with the defaults.
+  // Bad Times.
+  //
+  // via @cutandpastey, https://github.com/troupe/gitter-webapp/pull/2293#discussion_r81304415
+  defaults: {
+    isEditing: false
+  },
+
   url(){
-    return `/api/v1/forums/${getForumId()}/topics/${router.get('topicId')}/replies/${this.get('replyId')}/comments`;
+    return this.get('id') ?
+    `/v1/forums/${getForumId()}/topics/${router.get('topicId')}/replies/${this.get('replyId')}/comments/${this.get('id')}`:
+    `/v1/forums/${getForumId()}/topics/${router.get('topicId')}/replies/${this.get('replyId')}/comments`;
   }
 });
 
@@ -32,16 +58,22 @@ export const CommentsStore = LiveCollection.extend({
   initialize(){
     subscribe(SHOW_REPLY_COMMENTS, this.onRequestNewComments, this);
     subscribe(SUBMIT_NEW_COMMENT, this.onSubmitNewComment, this);
+    subscribe(UPDATE_COMMENT, this.onCommentUpdate, this);
+    subscribe(UPDATE_CANCEL_COMMENT, this.onCommmentEditCanceled, this);
+    subscribe(UPDATE_SAVE_COMMENT, this.onCommentSave, this);
+    subscribe(DELETE_COMMENT, this.onCommentDelete, this);
+    subscribe(UPDATE_COMMENT_IS_EDITING, this.onCommentIsEditingUpdate, this);
+    subscribe(UPDATE_COMMENT_REACTIONS, this.onReactionsUpdate, this);
     this.listenTo(router, 'change:topicId', this.onTopicIdUpdate, this);
   },
 
-  getComments(){
-    return this.toJSON();
+  getComments() {
+    return this.toPOJO();
   },
 
   getCommentsByReplyId(id){
-    if(id !== this.contextModel.get('replyId')) { return; }
-    return this.toJSON();
+    if(id !== this.contextModel.get('replyId')) { return []; }
+    return this.toPOJO();
   },
 
   getActiveReplyId(){
@@ -61,12 +93,63 @@ export const CommentsStore = LiveCollection.extend({
       replyId: replyId,
       text: text,
       user: getCurrentUser(),
+      sent: new Date().toISOString(),
+      state: MODEL_STATE_DRAFT
     })
   },
 
+  onCommentUpdate({commentId, text}){
+    const model = this.get(commentId);
+    if(!model) { return; }
+    model.set('text', text);
+  },
+
+  onCommmentEditCanceled({commentId}){
+    const model = this.get(commentId);
+    if(!model) { return; }
+    model.set('text', null);
+  },
+
+  onCommentSave({commentId, replyId}) {
+    const model = this.get(commentId);
+    if(!model) { return; }
+    const text = model.get('text');
+    if(text === null) { return; }
+    model.set('replyId', replyId);
+    model.save({ text: text }, { patch: true });
+  },
+
+  onCommentDelete({commentId, replyId}) {
+    const model = this.get(commentId);
+    if(!model) { return; }
+    model.set('replyId', replyId);
+    model.destroy();
+  },
+
+  onCommentIsEditingUpdate({ commentId, isEditing }) {
+    const comment = this.get(commentId);
+    if(!comment) { return; }
+
+    comment.set({
+      isEditing
+    });
+  }
+
 });
 
-dispatchOnChangeMixin(CommentsStore);
+dispatchOnChangeMixin(CommentsStore, [
+  'change:text',
+  'change:body',
+  'change:isEditing'
+], {
+  delay: function(model) {
+    // We need synchronous updates so the cursor is managed properly
+    if(model && (model.get('isEditing') || model.get('state') === MODEL_STATE_DRAFT)) {
+      return 0;
+    }
+  }
+});
+onReactionsUpdateMixin(CommentsStore, 'onReactionsUpdate');
 
 let store;
 

@@ -12,7 +12,7 @@ export default React.createClass({
   displayName: 'ForumTableControl',
   propTypes: {
     //Route params
-    groupName: PropTypes.string.isRequired,
+    groupUri: PropTypes.string.isRequired,
     categoryName: PropTypes.string.isRequired,
     filterName: PropTypes.string,
     tagName: PropTypes.string,
@@ -37,16 +37,15 @@ export default React.createClass({
     const { sortName } = this.props;
     return {
       sortBy: [
-        { label: 'Most Recent', value: 'most-recent', active: (sortName === forumSortConstants.MOST_RECENT_SORT) },
-        { label: 'Most Replies', value: 'most-replies', active: (sortName === forumSortConstants.MOST_REPLY_SORT) },
-        { label: 'Most Watchers', value: 'most-watchers', active: (sortName === forumSortConstants.MOST_WATCHERS_SORT) },
-        { label: 'Most Likes', value: 'most-likes', active: (sortName === forumSortConstants.MOST_LIKES_SORT) },
+        { label: 'Most Recent', value: forumSortConstants.MOST_RECENT_SORT, active: (sortName === forumSortConstants.MOST_RECENT_SORT) },
+        { label: 'Most Replies', value: forumSortConstants.MOST_REPLY_SORT, active: (sortName === forumSortConstants.MOST_REPLY_SORT) },
+        { label: 'Most Likes', value: forumSortConstants.MOST_LIKES_SORT, active: (sortName === forumSortConstants.MOST_LIKES_SORT) },
       ]
     }
   },
 
   render(){
-    const { groupName, tags, sortChange, tagChange, filterName, tagName, sortName } = this.props;
+    const { groupUri, tags, sortChange, tagChange, filterName, tagName, sortName } = this.props;
     const { sortBy } = this.state;
     return (
       <Container className="container--table-control">
@@ -54,8 +53,8 @@ export default React.createClass({
           <nav>
             <ul className="table-control">
               <li>{this.getChildTableControlButton('Activity', navConstants.DEFAULT_FILTER_NAME, filterName === navConstants.DEFAULT_FILTER_NAME)}</li>
-              <li>{this.getChildTableControlButton('My Topics', forumFilterConstants.FILTER_BY_TOPIC, filterName === forumFilterConstants.FILTER_BY_TOPIC)}</li>
-              <li className="tabel-control__divider">{this.getChildTableControlButton('Watched', forumFilterConstants.FILTER_BY_WATCHED, filterName === forumFilterConstants.FILTER_BY_WATCHED)}</li>
+              <li className="tabel-control__divider">{this.getChildTableControlButton('My Topics', forumFilterConstants.FILTER_BY_TOPIC, filterName === forumFilterConstants.FILTER_BY_TOPIC)}</li>
+              {/*<li className="tabel-control__divider">{this.getChildTableControlButton('Watched', forumFilterConstants.FILTER_BY_WATCHED, filterName === forumFilterConstants.FILTER_BY_WATCHED)}</li>*/}
               <li><TableControlSelect options={tags} onChange={(tag) => tagChange(tag)} /></li>
               <li><TableControlSelect options={sortBy} onChange={(sort) => sortChange(sort)} /></li>
             </ul>
@@ -66,12 +65,12 @@ export default React.createClass({
   },
 
   getChildTableControlButton(title, value, active=false){
-    const { groupName, categoryName, filterChange } = this.props;
+    const { groupUri, categoryName, filterChange } = this.props;
     return (
       <TableControlButton
         title={title}
         value={value}
-        groupName={groupName}
+        groupUri={groupUri}
         category={categoryName}
         active={active}
         onClick={(filter) => filterChange(filter)}/>

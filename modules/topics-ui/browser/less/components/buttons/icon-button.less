@@ -1,0 +1,66 @@
+@import "../../colors";
+@import "../../text";
+@import "../../icons";
+
+@icon-size: 1.5rem;
+
+.icon-button {
+
+  display: flex;
+  align-items: center;
+
+  background: none;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 0;
+
+  font-size: 1.35rem;
+  text-transform: uppercase;
+  font-family: @font-family;
+  color: @topic-reply-action-text-color;
+  padding-right: 1rem;
+
+  &:after {
+    content: '';
+    background-repeat: no-repeat;
+    background-size: contain;
+
+    display: inline-block;
+    width: @icon-size;
+    height: @icon-size;
+    margin-left: .5rem;
+  }
+}
+
+.icon-button-like {
+  .icon-button();
+  &:after { &:extend(.icon-like); }
+}
+
+.icon-button-like-selected {
+  .icon-button();
+  color: @caribbean;
+  &:after { &:extend(.icon-like-selected); }
+}
+
+.icon-button-comment {
+  .icon-button();
+  &:after { &:extend(.icon-comments); }
+}
+
+.icon-button-edit {
+  .icon-button();
+  &:after { &:extend(.icon-edit); }
+  &:hover { &:after { &:extend(.icon-edit-selected); } }
+}
+
+.icon-button-watch {
+  .icon-button();
+  &:after { &:extend(.icon-watch); }
+}
+
+.icon-button-watch-selected {
+  .icon-button();
+  &:after { &:extend(.icon-watch-selected); }
+}

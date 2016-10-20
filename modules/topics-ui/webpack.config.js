@@ -29,6 +29,10 @@ var config = {
     ],
     loaders: [
       {
+        test: /.svg$/,
+        loaders: ['svg-url-loader', 'svgo-loader']
+      },
+      {
         test: /.less$/,
         loader: ExtractTextPlugin.extract('style-loader', 'css-loader!less-loader'),
         include: path.resolve(__dirname, './browser/less'),
@@ -36,11 +40,12 @@ var config = {
       {
         test: /\.jsx?$/,
         loader: 'babel',
-        exclude: /node_modules/,
+        exclude: [ /node_modules/ ],
         query: {
           presets: [
-            "es2015",
-            "react"
+            // https://github.com/babel/babel-loader/issues/149
+            require.resolve("babel-preset-es2015"),
+            require.resolve("babel-preset-react")
           ]
         }
       }
@@ -50,7 +55,16 @@ var config = {
     alias: {
       jquery: require.resolve('jquery'),
       backbone: require.resolve('backbone/backbone.js'),
+      underscore: require.resolve('lodash')
     }
+  },
+  // Fix https://github.com/webpack/webpack/issues/1083#issuecomment-187627979
+  // Also see https://github.com/babel/babel-loader/issues/149
+  resolveLoader: {
+    // ../../ so that it uses the node_modules parallel to the modules folder
+    // rather than the one in modules/topics-ui. Otherwise you have to run npm
+    // install in the topics-ui modules too.
+    root: path.join(__dirname, '../../node_modules')
   },
   plugins: [
     new ExtractTextPlugin("style.css", { allChunks: false })

@@ -13,8 +13,8 @@ describe('<CreateTopicLink/>', () => {
 
   beforeEach(() => {
     wrapper = shallow(
-      <CreateTopicLink groupName="gitterHQ" className="test">
-      This is a link
+      <CreateTopicLink groupUri="gitterHQ" className="test">
+        This is a link
       </CreateTopicLink>
     );
   });
