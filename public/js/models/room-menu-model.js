@@ -36,7 +36,7 @@ var states = [
   'search',
   'people',
   'group',
-  //'org',
+  'org',
   //'temp-org'
 ];
 
