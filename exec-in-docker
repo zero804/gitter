@@ -5,10 +5,11 @@ set -e
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-WORKSPACE=${WORKSPACE-$SCRIPT_DIR}
-DEBUG=${DEBUG-}
-NODE_VERSION=$(node --version)
-NODE_VERSION=${NODE_VERSION#v} # Drop the `v` prefix
+WORKSPACE="${WORKSPACE-$SCRIPT_DIR}"
+DEBUG="${DEBUG:-}"
+NODE_ENV="${NODE_ENV:-test-docker}"
+NODE_VERSION="$(node --version)"
+NODE_VERSION="${NODE_VERSION#v}" # Drop the `v` prefix
 
 export WORKSPACE
 export DEBUG
@@ -44,7 +45,8 @@ docker-compose -p "${PROJECT_NAME}" -f docker-compose.internal.yml run --rm mong
 docker-compose -p "${PROJECT_NAME}" -f docker-compose.internal.yml run --rm elasticsearchsetup
 
 docker-compose -p "${PROJECT_NAME}" -f docker-compose.internal.yml run \
-    -e "JENKINS_URL=${JENKINS_URL:-}" \
+    -e "NODE_ENV=${NODE_ENV}" \
+    -e "DEBUG=${DEBUG}" \
     -e "GIT_COMMIT=${GIT_COMMIT:-}" \
     -e "GIT_BRANCH=${GIT_BRANCH:-}" \
     -e "BUILD_NUMBER=${BUILD_NUMBER:-}" \
