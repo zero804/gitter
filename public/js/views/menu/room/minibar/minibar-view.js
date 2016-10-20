@@ -98,7 +98,7 @@ module.exports = Marionette.LayoutView.extend({
     return closeView;
   },
 
-  initTemp: function (optionsForRegion){
+  initTemp: function (/*optionsForRegion*/){
     /*
     var tempView = new TempOrgView(optionsForRegion({
       model: this.tempModel,
@@ -112,7 +112,7 @@ module.exports = Marionette.LayoutView.extend({
     */
   },
 
-  initCollection: function (optionsForRegion){
+  initCollection: function (/*optionsForRegion*/){
     /*
     var collectionView = new CollectionView(optionsForRegion({
       collection: this.collection,
