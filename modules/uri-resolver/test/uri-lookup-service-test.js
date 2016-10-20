@@ -10,28 +10,80 @@ describe('uri-lookup-service', function() {
   var fixture = fixtureLoader.setup({
     user1: { },
     troupe1: { },
+    group1: { },
     troupe2: { }, // used in test 3, for missing lookup
     user2: { username: true }, // used in test 3, for missing lookup
     user3: { username: true }
   });
 
+  fixtureLoader.disableMongoTableScans();
 
-  it('04. it should attempt to lookup if a username uri is missing', function() {
+  it('should lookup usernames', function() {
     var uri = fixture.user2.username;
 
     return uriLookupService.lookupUri(uri)
       .then(function(uriLookup) {
         assert(uriLookup);
+        assert(!uriLookup.troupeId);
+        assert(!uriLookup.groupId);
+
         assert.equal(uriLookup.userId, fixture.user2.id);
+
+        return uriLookupService.lookupUri(uri);
       })
-      .finally(function() {
-        return uriLookupService.removeUsernameForUserId(fixture.user2.id);
+      .then(function(uriLookup) {
+        assert(uriLookup);
+        assert(!uriLookup.troupeId);
+        assert(!uriLookup.groupId);
+
+        assert.equal(uriLookup.userId, fixture.user2.id);
       })
   });
 
-  it('07. repo style', function() {
-    return uriLookupService.lookupUri('gitterHQ/cloaked-avenger')
-      .nodeify();
+  it('should lookup rooms', function() {
+    var uri = fixture.troupe1.uri;
+
+    return uriLookupService.lookupUri(uri)
+      .then(function(uriLookup) {
+        assert(uriLookup);
+        assert(!uriLookup.userId);
+        assert(!uriLookup.groupId);
+        assert.equal(uriLookup.troupeId, fixture.troupe1.id);
+
+        return uriLookupService.lookupUri(uri);
+      })
+      .then(function(uriLookup) {
+        assert(uriLookup);
+        assert(!uriLookup.userId);
+        assert(!uriLookup.groupId);
+        assert.equal(uriLookup.troupeId, fixture.troupe1.id);
+      });
+  });
+
+  it('should lookup groups', function() {
+    var uri = fixture.group1.uri;
+
+    return uriLookupService.lookupUri(uri)
+      .then(function(uriLookup) {
+        assert(uriLookup);
+        assert(!uriLookup.userId);
+        assert(!uriLookup.troupeId);
+        assert.equal(uriLookup.groupId, fixture.group1.id);
+
+        return uriLookupService.lookupUri(uri);
+      })
+      .then(function(uriLookup) {
+        assert(uriLookup);
+        assert(!uriLookup.userId);
+        assert(!uriLookup.troupeId);
+
+        assert.equal(uriLookup.groupId, fixture.group1.id);
+      });
+
+  });
+
+  it('should not fail looking up rooms', function() {
+    return uriLookupService.lookupUri('gitterHQ/cloaked-avenger');
   });
 
 });
