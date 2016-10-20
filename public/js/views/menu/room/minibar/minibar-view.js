@@ -22,10 +22,10 @@ module.exports = Marionette.LayoutView.extend({
         home: { el: '#minibar-all', init: 'initHome' },
         search: { el: '#minibar-search', init: 'initSearch' },
         people: { el: '#minibar-people', init: 'initPeople' },
-        collectionView: { el: '#minibar-collection', init: 'initCollection' },
         communityCreate: { el: '#minibar-community-create', init: 'initCommunityCreate' },
         close: { el: '#minibar-close', init: 'initClose' },
-        tempOrg: { el: '#minibar-temp', init: 'initTemp' }
+        //collectionView: { el: '#minibar-collection', init: 'initCollection' },
+        //tempOrg: { el: '#minibar-temp', init: 'initTemp' }
       },
     };
 
@@ -65,17 +65,6 @@ module.exports = Marionette.LayoutView.extend({
     return peopleView;
   },
 
-  initCollection: function (optionsForRegion){
-    var collectionView = new CollectionView(optionsForRegion({
-      collection: this.collection,
-      roomMenuModel: this.model,
-      keyboardControllerView: this.keyboardControllerView,
-    }));
-
-    this.listenTo(collectionView, 'minibar-item:activated', this.onCollectionItemActivated, this);
-    return collectionView;
-  },
-
   initCommunityCreate: function (optionsForRegion){
     var communityCreateView = new CommunityCreateView(optionsForRegion({
       model: this.communityCreateModel,
@@ -97,6 +86,7 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   initTemp: function (optionsForRegion){
+    /*
     var tempView = new TempOrgView(optionsForRegion({
       model: this.tempModel,
       roomMenuModel: this.model,
@@ -106,6 +96,20 @@ module.exports = Marionette.LayoutView.extend({
 
     this.listenTo(tempView, 'minibar-item:activated', this.onTempOrgItemClicked, this);
     return tempView;
+    */
+  },
+
+  initCollection: function (optionsForRegion){
+    /*
+    var collectionView = new CollectionView(optionsForRegion({
+      collection: this.collection,
+      roomMenuModel: this.model,
+      keyboardControllerView: this.keyboardControllerView,
+    }));
+
+    this.listenTo(collectionView, 'minibar-item:activated', this.onCollectionItemActivated, this);
+    return collectionView;
+    */
   },
 
   modelEvents: {

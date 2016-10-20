@@ -168,6 +168,19 @@
   }
 }
 
+.room-menu-options__item--groups {
+  .room-menu-options__item();
+  background: rgba(0, 0, 0, .1);
+  position:   fixed;
+  top:        @desktop-header-height * 3;
+  left:       0;
+  color:      @people-bg;
+
+  &:before {
+    background: @caribbean;
+  }
+}
+
 .room-menu-options__item--favourite {
   .room-menu-options__item();
   background: rgba(0, 0, 0, .2);
@@ -182,7 +195,6 @@
   }
 
   &.dropped {
-    background: @caribbean;
     & img {
       transform: rotate(90deg) scale(1.5);
     }
