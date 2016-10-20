@@ -61,6 +61,9 @@ module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, group
     return category;
   });
 
+  var parsedRooms = parseRoomsIntoLeftMenuRoomList(menuState, rooms, groupId);
+  if(menuState === 'group') { parsedRooms = groups; }
+
   return {
     leftMenu: _.extend({}, lastLeftMenuSnapshot, {
       roomMenuIsPinned: roomMenuIsPinned,
@@ -69,7 +72,7 @@ module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, group
       groupId: groupId,
     }),
     allRooms: rooms,
-    rooms: parseRoomsIntoLeftMenuRoomList(menuState, rooms, groupId),
+    rooms: parsedRooms,
     favourites: parseRoomsIntoLeftMenuFavouriteRoomList(menuState, rooms, groupId),
     groups: groups,
     forum: (menuState === 'org' || menuState === 'temp-org') && {
