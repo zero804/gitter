@@ -251,6 +251,12 @@ module.exports = Backbone.Model.extend({
         this.tertiaryCollection.switchCollection(this._suggestedRoomCollection);
         break;
 
+      case 'group':
+        this.primaryCollection.switchCollection(this.groupsCollection);
+        this.secondaryCollection.switchCollection(new Backbone.Collection(null));
+        this.tertiaryCollection.switchCollection(new Backbone.Collection(null));
+        break;
+
 
       default:
         this.primaryCollection.switchCollection(this.activeRoomCollection);
