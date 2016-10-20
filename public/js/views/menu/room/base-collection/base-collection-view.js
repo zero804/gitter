@@ -82,7 +82,7 @@ module.exports = Marionette.CompositeView.extend({
 
     if(this.roomMenuModel.get('state') === 'group') {
       var groupPageUrl = '/orgs' + url + '/rooms';
-      return this._triggerNavigation(groupPageUrl, 'org-page', name);
+      return this._triggerNavigation(groupPageUrl, 'iframe', name);
     }
 
     if (this.roomExistsForModel(model)) {
