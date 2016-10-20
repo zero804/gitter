@@ -12,7 +12,6 @@ var appEvents = require('../../../utils/appevents');
 var dataset = require('../../../utils/dataset-shim');
 var toggle = require('../../../utils/toggle');
 var toggleClass = require('../../../utils/toggle-class');
-var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 
 require('jquery-sortable'); // eslint-disable-line node/no-missing-require
 
@@ -95,7 +94,6 @@ module.exports = (function() {
     serializeData: function() {
       var data = this.model.toJSON();
       data.name = roomNameTrimmer(data.name, MAX_NAME_LENGTH);
-      data.roomAvatarSrcSet = resolveRoomAvatarSrcSet({ uri: data.url }, 16);
       return data;
     },
 

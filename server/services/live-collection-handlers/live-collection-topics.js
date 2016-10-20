@@ -37,7 +37,7 @@ var liveCollectionTopics = {
 
   removeId: function(forumId, topicId) {
     var url = "/forums/" + forumId + "/topics";
-    appEvents.dataChange2(url, "remove", { id: topicId }, 'topic');
+    appEvents.dataChange2(url, "remove", { id: topicId.toString() }, 'topic');
   }
 }
 

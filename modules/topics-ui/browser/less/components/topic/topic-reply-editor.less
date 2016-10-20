@@ -1,17 +1,39 @@
+@import "../../break-points";
 @import "../../colors.less";
 @import (less, reference) "~gitter-styleguide/css/components/buttons.css";
 
+@mobile-editor-height: 11.5rem;
+
 .panel--reply-editor {
-  display: flex;
-  align-items: center;
   height: 10rem;
-  background-color: @pampas;
-  border-top:       1px solid @topic-body-border-color;
   transition: height .2s;
+  background-color: @pampas;
+  border-top: 1px solid @topic-body-border-color;
+  @media @only-small {
+    padding: 2rem;
+    height: auto;
+    transition: transform .1s ease-out;
+    transform: translateY(33%);
+  }
 }
 
 .panel--reply-editor--active {
   height: 25rem;
+  @media @only-small {
+    height: auto;
+    transform: none;
+  }
+}
+
+.reply-editor__form {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+
+  @media @only-small {
+    flex-direction: column;
+  }
 }
 
 .editor--reply {
@@ -22,12 +44,24 @@
   margin-right: 1rem;
   padding-left: 5rem;
   background: @light;
+
+  @media @only-small {
+    min-height: 8rem;
+    margin-right: 0;
+    margin-bottom: 1rem;
+    font-size: 1.4rem;
+    line-height: 1.4;
+  }
 }
 
 .avatar--reply-editor {
   position: absolute;
   top: 3.5rem;
   margin-left: 1rem;
+
+  @media @only-small {
+    left: 2rem;
+  }
 }
 
 .topic-reply-editor__submit {
@@ -36,4 +70,15 @@
   height: 4rem;
   white-space: nowrap;
   cursor: pointer;
+
+  @media @only-small {
+    height: 3.5rem;
+    width: 100%;
+  }
+
+  //In safari on mobile we need toadd space at the
+  //bottom of the page for safari's stupid toolbar
+  @media @mobile-safari {
+    margin-bottom: 44px;
+  }
 }

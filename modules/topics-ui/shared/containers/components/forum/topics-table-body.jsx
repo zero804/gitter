@@ -43,13 +43,13 @@ export default React.createClass({
             {topic.title}
           </TopicLink>
         </td>
-        <td className="topics-table-body__cell">
+        <td className="topics-table-body__cell--user-list">
           {this.getUserList(replyingUsers)}
         </td>
-        <td className="topics-table-body__cell">
+        <td className="topics-table-body__cell--replies">
           {topic.repliesTotal}
         </td>
-        <td className="topics-table-body__cell">
+        <td className="topics-table-body__cell--likes">
           {topic.reactions.like || 0}
         </td>
       </tr>

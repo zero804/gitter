@@ -14,6 +14,7 @@ function ForumCategoryStrategy(/*options*/) {
       id: id,
       name: category.name,
       slug: category.slug,
+      adminOnly: category.adminOnly || false,
       v: getVersion(category)
     };
   };

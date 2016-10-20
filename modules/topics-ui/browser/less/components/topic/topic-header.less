@@ -1,6 +1,7 @@
-@import "../../colors";
 @import (less, reference) "~gitter-styleguide/css/components/headings.css";
 @import (less, reference) "~gitter-styleguide/css/components/buttons.css";
+@import "../../colors";
+@import "../../break-points";
 
 .topic-header {
   display: flex;
@@ -12,11 +13,24 @@
   margin-top: .5rem;
 }
 
+.topic-header__info-wrapper {
+  flex: 1;
+}
+
 .topic-header__title {
-  margin-top:  1rem;
-  color:       @light;
+  &:extend(.h1 all);
+
+  width: 100%;
+  margin-top: 1rem;
+  color: @topic-header-color;
   line-height: 1.1;
   font-weight: 100;
+
+  @media @only-small { font-size: 2.8rem; }
+}
+
+.topic-header__title-input {
+  .topic-header__title();
 }
 
 .topic-header__username {
@@ -36,6 +50,10 @@
 .topic-header__category-link {
   &:extend(.button-clouds--xsmall);
   text-decoration: none;
+}
+
+.select--topic-category {
+  color: @topic-header-color;
 }
 
 .topic-header__tag-list {

@@ -4,9 +4,12 @@ var env = require('gitter-web-env');
 var stats = env.stats;
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
-var Topic = require('gitter-web-persistence').Topic;
-var Reply = require('gitter-web-persistence').Reply;
-var Comment = require('gitter-web-persistence').Comment;
+var persistence = require('gitter-web-persistence');
+var Topic = persistence.Topic;
+var Reply = persistence.Reply;
+var Comment = persistence.Comment;
+var ForumNotification = persistence.ForumNotification;
+var ForumReaction = persistence.ForumReaction;
 var debug = require('debug')('gitter:app:topics:comment-service');
 var liveCollections = require('gitter-web-live-collection-events');
 var processText = require('gitter-web-text-processor');
@@ -91,20 +94,29 @@ function updateCommentsTotal(topicId, replyId) {
         $max: {
           lastChanged: now,
           lastModified: now,
+        },
+        $inc: {
+          _tv: 1
         }
       };
 
       var replyUpdate = {
         $max: {
           lastChanged: now,
-          lastModified: now,
+          lastModified: now
+        },
+        $set: {
           commentsTotal: commentsTotal
+        },
+        $inc: {
+          _tv: 1
         }
       };
 
-      return Promise.join(
+      return [
         Topic.findOneAndUpdate({ _id: topicId }, topicUpdate, { new: true }).exec(),
-        Reply.findOneAndUpdate({ _id: replyId }, replyUpdate, { new: true }).exec())
+        Reply.findOneAndUpdate({ _id: replyId }, replyUpdate, { new: true }).exec()
+      ];
     })
     .spread(function(topic, reply) {
       this.topic = topic;
@@ -214,15 +226,19 @@ function updateCommentFields(topicId, replyId, commentId, fields) {
     $set: fields,
     $max: {
       lastModified: lastModified
+    },
+    $inc: {
+      _tv: 1
     }
   };
   return Comment.findOneAndUpdate(query, update, { new: true })
     .lean()
     .exec()
     .tap(function() {
-      return Promise.join(
+      return [
         updateReplyLastModified(commentId, lastModified),
-        updateTopicLastModified(commentId, lastModified));
+        updateTopicLastModified(commentId, lastModified)
+      ];
     });
 }
 
@@ -268,6 +284,34 @@ function updateComment(user, comment, fields) {
     });
 }
 
+function deleteComment(user, comment) {
+  var userId = user._id;
+  var forumId = comment.forumId;
+  var topicId = comment.topicId;
+  var replyId = comment.replyId;
+  var commentId = comment._id;
+
+  return Promise.join(
+      Comment.remove({ _id: commentId }).exec(),
+      ForumNotification.remove({ commentId: commentId }).exec(),
+      ForumReaction.remove({ commentId: commentId }).exec())
+    .then(function() {
+      return updateCommentsTotal(topicId, replyId);
+    })
+    .then(function() {
+      stats.event('delete_topic_comment', {
+        userId: userId,
+        forumId: forumId,
+        topicId: topicId,
+        replyId: replyId,
+        commentId: commentId,
+      });
+
+      liveCollections.comments.emit('remove', comment);
+    }
+  )
+}
+
 module.exports = {
   findById: findById,
   findByReplyId: findByReplyId,
@@ -275,6 +319,8 @@ module.exports = {
   findTotalByReplyId: findTotalByReplyId,
   findTotalsByReplyIds: findTotalsByReplyIds,
   findByIdForForumTopicAndReply: findByIdForForumTopicAndReply,
+  updateCommentsTotal: updateCommentsTotal,
   createComment: Promise.method(createComment),
-  updateComment: Promise.method(updateComment)
+  updateComment: Promise.method(updateComment),
+  deleteComment: deleteComment
 };

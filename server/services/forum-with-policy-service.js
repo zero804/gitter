@@ -25,9 +25,46 @@ function allowWrite() {
   return this.policy.canWrite();
 }
 
+function allowWriteCreateTopic(category, topicOptions) {
+  // If the user has write permissions to the forum (but not admin), then she
+  // can still only add a topic to the category if adminOnly is not set. So in
+  // that case we have to return false and fall through to the allowAdmin
+  // check.
+  if (category.adminOnly) {
+    return false;
+  }
+
+  // Same thing when trying to set some admin-only fields
+  if (topicOptions.sticky) {
+    return false;
+  }
+
+  // only perform this potentially expensive check if we didn't short-circuit
+  // above
+  return this.policy.canWrite();
+}
+
 function allowOwner(object) {
   // Users can edit/delete topics, replies or comments they created
   return mongoUtils.objectIDsEqual(object.userId, this.user._id);
+}
+
+function allowOwnerSetTopicCategory(topic, category) {
+  // this only applies if the user owns the topic
+  if (!mongoUtils.objectIDsEqual(topic.userId, this.user._id)) {
+    return false;
+  }
+
+  // This doesn't apply when the user is trying to set the category to one that
+  // is admin-only. In that case things have to fall through to the allowAdmin
+  // check.
+  if (category.adminOnly) {
+    return false;
+  }
+
+  // The user owns the topic and it isn't an admin-only category, therefore she
+  // is allowed to proceed.
+  return true;
 }
 
 function allowAnyone() {
@@ -118,7 +155,7 @@ ForumWithPolicyService.prototype.createCategory = secureMethod([allowAdmin], fun
   return forumCategoryService.createCategory(user, forum, categoryOptions);
 });
 
-ForumWithPolicyService.prototype.createTopic = secureMethod([matchForum, allowWrite], function(category, options) {
+ForumWithPolicyService.prototype.createTopic = secureMethod([matchForum, allowAdmin, allowWriteCreateTopic], function(category, options) {
   var user = this.user;
   var forum = this.forum;
 
@@ -176,7 +213,7 @@ ForumWithPolicyService.prototype.setTopicSticky = secureMethod([matchForum, allo
   return topicService.setTopicSticky(user, topic, sticky);
 });
 
-ForumWithPolicyService.prototype.setTopicCategory = secureMethod([matchForum, allowOwner, allowAdmin], function(topic, category) {
+ForumWithPolicyService.prototype.setTopicCategory = secureMethod([matchForum, allowOwnerSetTopicCategory, allowAdmin], function(topic, category) {
   var user = this.user;
   var forum = this.forum;
 
@@ -212,6 +249,32 @@ ForumWithPolicyService.prototype.updateCategory = secureMethod([matchForum, allo
   var user = this.user;
 
   return forumCategoryService.updateCategory(user, category, fields)
+});
+
+
+ForumWithPolicyService.prototype.setCategoryAdminOnly = secureMethod([matchForum, allowAdmin], function(category, adminOnly) {
+  var user = this.user;
+
+  return forumCategoryService.setCategoryAdminOnly(user, category, adminOnly);
+});
+
+/**
+ * Deleting things
+ */
+ForumWithPolicyService.prototype.deleteTopic = secureMethod([matchForum, allowOwner, allowAdmin], function(topic) {
+  return topicService.deleteTopic(this.user, topic);
+});
+
+ForumWithPolicyService.prototype.deleteReply = secureMethod([matchForum, allowOwner, allowAdmin], function(reply) {
+  return replyService.deleteReply(this.user, reply);
+});
+
+ForumWithPolicyService.prototype.deleteComment = secureMethod([matchForum, allowOwner, allowAdmin], function(comment) {
+  return commentService.deleteComment(this.user, comment);
+});
+
+ForumWithPolicyService.prototype.deleteCategory = secureMethod([matchForum, allowOwner, allowAdmin], function(category) {
+  return forumCategoryService.deleteCategory(this.user, category);
 });
 
 /**

@@ -1,12 +1,20 @@
 @import "../../colors.less";
+@import "../../break-points";
+@import (less, reference) "~gitter-styleguide/css/components/headings.css";
 @import (less, reference) "~gitter-styleguide/css/components/buttons.css";
 
 
 .topic-reply-list-header__heading {
+  &:extend(.h1 all);
   margin-right: auto;
   font-size:    2rem;
   color:        @topic-reply-list-heading-color;
   white-space:  nowrap;
+
+  @media @only-small {
+    width: 100%;
+    text-align: center;
+  }
 }
 
 .topic-reply-list-header__filter-list {
@@ -15,6 +23,11 @@
   align-items: center;
   margin:      0;
   padding:     0;
+
+  @media @only-small {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 .topic-reply-list-header__filter-button {
@@ -37,4 +50,5 @@
 
 .topic-reply-list-header-wrap--visually-hidden {
   transform: scaleY(0);
+  @media @only-small { transform: none; }
 }

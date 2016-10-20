@@ -19,13 +19,14 @@ export const ForumCategoryStore = Collection.extend({
     return this.map(model => model.toPOJO());
   },
 
-  getActiveCategoryName(){
-    return this.findWhere({ active: true }).get('category');
+  getActiveCategoryName() {
+    const activeModel = this.findWhere({ active: true });
+    return activeModel && activeModel.get('category');
   },
 
   onCategoryUpdate(model, val){
     this.where({ active: true }).forEach((m) => m.set('active', false));
-    var activeModel = this.findWhere({ slug: val });
+    var activeModel = this.findWhere({ category: val });
     if(activeModel) { activeModel.set('active', true); }
     this.trigger(UPDATE_ACTIVE_CATEGORY);
   },
@@ -33,7 +34,7 @@ export const ForumCategoryStore = Collection.extend({
   mapForSelectControl(){
     return this.models.map((m) => ({
       selected: m.get('active'),
-      label: m.get('category'),
+      label: m.get('label') || m.get('category'),
       value: m.get('id')
     }))
   },
