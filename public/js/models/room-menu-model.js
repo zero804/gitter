@@ -66,7 +66,6 @@ module.exports = Backbone.Model.extend({
   },
 
   initialize: function(attrs) { // eslint-disable-line max-statements
-    window.model = this;
     this.set('panelOpenState', this.get('roomMenuIsPinned'));
 
     if (!attrs || !attrs.bus) {
