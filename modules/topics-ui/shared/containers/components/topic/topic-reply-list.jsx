@@ -1,58 +1,40 @@
 import React, { PropTypes } from 'react';
 import Container from '../container.jsx';
 import Panel from '../panel.jsx';
-import TopicReplyListItem from './topic-reply-list-item.jsx';
+import classNames from 'classnames';
 
 export default React.createClass({
 
   displayName: 'TopicReplyList',
   propTypes: {
-    currentUser: PropTypes.object.isRequired,
-    replies: PropTypes.array.isRequired,
-    newCommentContent: PropTypes.string,
-    onReplyCommentsClicked: PropTypes.func.isRequired,
-    onNewCommentUpdate: PropTypes.func.isRequired,
-    submitNewComment: PropTypes.func.isRequired,
+    children: PropTypes.node.isRequired,
+    replyListEditorInFocus: PropTypes.bool,
   },
 
   render(){
-    const {replies} = this.props;
+
+    const {replyListEditorInFocus} = this.props;
+    const compiledClass = classNames({
+      'topic-reply-list--editor-active': replyListEditorInFocus
+    }, 'topic-reply-list')
+
     return (
       <Container>
         <Panel className="panel--topic-reply-list">
-          <ul className="topic-reply-list">
-            {replies.map((reply, i) => this.buildReplyListItem(reply, i))}
+          <ul className={compiledClass}>
+            {this.props.children.map(this.mapChild)}
           </ul>
         </Panel>
       </Container>
     );
   },
 
-  buildReplyListItem(reply, index) {
-    const {newCommentContent, currentUser} = this.props;
+  mapChild(child, index) {
     return (
       <li key={`reply-list-item-${index}`}>
-        <TopicReplyListItem
-          reply={reply}
-          currentUser={currentUser}
-          newCommentContent={newCommentContent}
-          submitNewComment={this.submitNewComment}
-          onNewCommentUpdate={this.onNewCommentUpdate}
-          onCommentsClicked={this.onReplyCommentsClicked}/>
+        {child}
       </li>
     );
-  },
-
-  onReplyCommentsClicked(replyId){
-    this.props.onReplyCommentsClicked(replyId);
-  },
-
-  onNewCommentUpdate(replyId, val) {
-    this.props.onNewCommentUpdate(replyId, val);
-  },
-
-  submitNewComment(){
-    this.props.submitNewComment();
   }
 
 });

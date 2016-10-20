@@ -5,8 +5,8 @@ var path = require('path');
 
 module.exports = function(serializerDirectory) {
   var e = {
-    serialize: require('./serialize'),
-    serializeObject: require('./serialize-object')
+    serialize: require('gitter-web-serialization/lib/serialize'),
+    serializeObject: require('gitter-web-serialization/lib/serialize-object')
   };
 
   fs.readdirSync(__dirname + '/' + serializerDirectory).forEach(function(fileName) {

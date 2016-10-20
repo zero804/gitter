@@ -5,25 +5,40 @@ export default React.createClass({
 
   displayName: 'Input',
   propTypes: {
-    name: PropTypes.string.isRequired,
+    name: PropTypes.string,
     placeholder: PropTypes.string,
     className: PropTypes.string,
     autoComplete: PropTypes.string,
+    value: PropTypes.string,
     onChange: PropTypes.func.isRequired,
     onFocus: PropTypes.func,
     onBlur: PropTypes.func,
+    valid: PropTypes.bool
   },
 
   getDefaultProps(){
     return {
-      autoComplete: "on",
+      autoComplete: "on"
     };
   },
 
   render(){
 
-    const { name, className, placeholder, autoComplete, onFocus, onBlur } = this.props;
-    const compiledClass = classNames('input', className);
+    const {
+      name,
+      className,
+      placeholder,
+      value,
+      autoComplete,
+      onFocus,
+      onBlur,
+      valid
+    } = this.props;
+
+    const compiledClass = classNames({
+      input: true,
+      invalid: (valid === false),
+    }, className);
 
     return (
       <input
@@ -31,6 +46,7 @@ export default React.createClass({
         name={name}
         placeholder={placeholder}
         autoComplete={autoComplete}
+        value={value}
         onFocus={onFocus}
         onBlur={onBlur}
         onChange={this.onChange}/>

@@ -1,0 +1,21 @@
+Hi, there's a new comment in a topic on {{ notification.forum.name }} from @{{ notification.comment.user.username }}.
+
+|
+| {{ notification.topic.title }}
+|
+
+{{ notification.comment.body.text }}
+
+==
+
+{{ notification.comment.user.username }} was commenting on a reply from {{{ notification.reply.user.username }}}
+
+{{ notification.reply.body.text }}
+
+-------------------------------------------------------------
+Topics are currently in beta. You can't reply via email, yet.
+-------------------------------------------------------------
+
+
+Please visit the topic if you want to unwatch it and stop email notifications.
+{{ emailBasePath }}/{{ notification.topic.uri }}

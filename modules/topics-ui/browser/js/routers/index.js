@@ -1,12 +1,21 @@
 import { parse, stringify } from 'qs';
 import Backbone from 'backbone';
 import { subscribe } from '../../../shared/dispatcher';
+
+import {getIsSignedIn} from '../stores/current-user-store';
+import frameUtils from 'gitter-web-frame-utils';
+
+import { NAVIGATE_TO_FORUMS } from '../../../shared/constants/forum';
 import * as navConstants from '../../../shared/constants/navigation';
 import * as forumCatConstants from '../../../shared/constants/forum-categories';
 import * as forumFilterConstants from '../../../shared/constants/forum-filters';
 import * as forumTagConstants from '../../../shared/constants/forum-tags';
 import * as forumSortConstants from '../../../shared/constants/forum-sorts';
 import * as createTopicConstants from '../../../shared/constants/create-topic';
+import * as topicConstants from '../../../shared/constants/topic';
+
+import requestSignIn from '../../../shared/action-creators/forum/request-sign-in';
+
 
 var RouteModel = Backbone.Model.extend({
   //Do we need to use the constructor to get the default values out of the window.context
@@ -21,12 +30,16 @@ var Router = Backbone.Router.extend({
   constructor: function() {
     this.model = new RouteModel();
 
+    subscribe(NAVIGATE_TO_FORUMS, this.navigateToForums, this);
     subscribe(forumCatConstants.NAVIGATE_TO_CATEGORY, this.updateForumCategory, this);
     subscribe(forumFilterConstants.NAVIGATE_TO_FILTER, this.updateForumFilter, this);
     subscribe(forumTagConstants.NAVIGATE_TO_TAG, this.updateForumTag, this);
     subscribe(forumSortConstants.NAVIGATE_TO_SORT, this.updateForumSort, this);
     subscribe(navConstants.NAVIGATE_TO_TOPIC, this.navigateToTopic, this);
     subscribe(createTopicConstants.NAVIGATE_TO_CREATE_TOPIC, this.navigateToCreateTopic, this);
+    subscribe(topicConstants.TOPIC_REPLIES_SORT_BY_COMMENTS, this.navigateToTopicRepliesSortByComments, this);
+    subscribe(topicConstants.TOPIC_REPLIES_SORT_BY_LIKED, this.navigateToTopicRepliesSortByLikes, this);
+    subscribe(topicConstants.TOPIC_REPLIES_SORT_BY_RECENT, this.navigateToTopicRepliesSortByRecent, this);
 
     this.listenTo(this.model, 'change:filterName', this.onFilterUpdate, this);
     this.listenTo(this.model, 'change:sortName', this.onSortUpdate, this);
@@ -35,12 +48,12 @@ var Router = Backbone.Router.extend({
   },
 
   routes: {
-    ':groupName/topics/create-topic(/)(~topics)': 'createTopic',
-    ':groupName/topics(/categories/:categoryName)(/)(~topics)(?*queryString)': 'forums',
-    ':groupName/topics/topic/:id/:slug(/)(~topics)(?*queryString)': 'topic'
+    ':groupUri/topics/create-topic(/)(~topics)': 'createTopic',
+    ':groupUri/topics(/categories/:categoryName)(/)(~topics)(?*queryString)': 'forums',
+    ':groupUri/topics/topic/:id/:slug(/)(~topics)(?*queryString)': 'topic'
   },
 
-  navigate(url, options){
+  navigate(url, options) {
 
     //Remove ~topics from the url
     let appUrl = url.split('~')[0];
@@ -49,30 +62,34 @@ var Router = Backbone.Router.extend({
     if(appUrl[appUrl.length - 1] === '/') { appUrl = appUrl.substring(0, appUrl.length - 1); }
     if(appUrl[0] !== '/') { appUrl = '/' + appUrl; }
 
-    //Generate payload
-    const json = JSON.stringify({ type: 'navigation', url: appUrl, urlType: 'topics' });
-
     //Proxy up to the frame
-    window.parent.postMessage(json, window.location.origin);
+    frameUtils.postMessage({
+      type: 'navigation',
+      url: appUrl,
+      urlType: 'topics',
+      options: {
+        disableFrameReload: true
+      }
+    });
 
     //Call super
     Backbone.Router.prototype.navigate.call(this, url, options);
   },
 
-  createTopic(groupName){
+  createTopic(groupUri){
     this.model.set({
       route: navConstants.CREATE_TOPIC_ROUTE,
-      groupName: groupName,
+      groupUri: groupUri,
       categoryName: navConstants.DEFAULT_CATEGORY_NAME,
       createTopic: true,
     });
   },
 
-  forums(groupName, categoryName, queryString){
+  forums(groupUri, categoryName, queryString){
     const query = parse(queryString || '');
     this.model.set({
       route: navConstants.FORUM_ROUTE,
-      groupName: groupName,
+      groupUri: groupUri,
       categoryName: (categoryName || navConstants.DEFAULT_CATEGORY_NAME),
       filterName: (query.filter || navConstants.DEFAULT_FILTER_NAME),
       tagName: (query.tag || navConstants.DEFAULT_TAG_NAME),
@@ -81,18 +98,17 @@ var Router = Backbone.Router.extend({
     });
   },
 
-  topic(groupName, id, slug){
+  topic(groupUri, id, slug, queryString){
+    const query = parse(queryString || '');
     this.model.set({
       route: navConstants.TOPIC_ROUTE,
-      groupName: groupName,
+      groupUri: groupUri,
       topicId: id,
-      slug: slug
+      slug: slug,
+      createTopic: false,
+      sortName: (query.sort || topicConstants.TOPIC_REPLY_SORT_DEFAULT_NAME)
     });
-  },
-
-  navigateToCreateTopic(){
-    const groupName = this.model.get('groupName');
-    this.navigate(`/${groupName}/topics/create-topic/~topics`, { trigger: true });
+    window.scrollTo(0, 0);
   },
 
   updateForumCategory(data){
@@ -123,14 +139,54 @@ var Router = Backbone.Router.extend({
     this.model.trigger(forumSortConstants.UPDATE_ACTIVE_SORT, { sort: val });
   },
 
+  navigateToForums() {
+    var url = this.buildForumUrl();
+    this.navigate(url, { trigger: true });
+  },
+
+  navigateToCreateTopic(data) {
+    const { source } = data;
+
+    if(getIsSignedIn()) {
+      const groupUri = this.model.get('groupUri');
+      this.navigate(`/${groupUri}/topics/create-topic/~topics`, { trigger: true });
+    }
+    else {
+      requestSignIn(source);
+      return;
+    }
+
+  },
+
+  navigateToTopicRepliesSortByComments({topicId, slug}){
+    const {TOPIC_REPLIES_COMMENT_SORT_NAME} = topicConstants;
+    const groupUri = this.model.get('groupUri');
+    const url = `/${groupUri}/topics/topic/${topicId}/${slug}/~topics?sort=${TOPIC_REPLIES_COMMENT_SORT_NAME}`;
+    this.navigate(url, { trigger: true });
+  },
+
+  navigateToTopicRepliesSortByLikes({topicId, slug}){
+    const {TOPIC_REPLIES_LIKED_SORT_NAME} = topicConstants;
+    const groupUri = this.model.get('groupUri');
+    const url = `/${groupUri}/topics/topic/${topicId}/${slug}/~topics?sort=${TOPIC_REPLIES_LIKED_SORT_NAME}`;
+    this.navigate(url, { trigger: true });
+  },
+
+  navigateToTopicRepliesSortByRecent({topicId, slug}){
+    const {TOPIC_REPLIES_RECENT_SORT_NAME} = topicConstants;
+    const groupUri = this.model.get('groupUri');
+    const url = `/${groupUri}/topics/topic/${topicId}/${slug}/~topics?sort=${TOPIC_REPLIES_RECENT_SORT_NAME}`;
+    this.navigate(url, { trigger: true });
+  },
+
   navigateToTopic(data){
-    const url = `/${data.groupName}/topics/topic/${data.id}/${data.slug}/~topics`;
+    const url = `/${data.groupUri}/topics/topic/${data.id}/${data.slug}/~topics`;
     this.navigate(url, { trigger: true });
   },
 
   buildForumUrl(categoryName, filterName, tagName, sortName){
 
-    var groupName = this.model.get('groupName');
+    var groupUri = this.model.get('groupUri');
     categoryName = (categoryName || this.model.get('categoryName') || navConstants.DEFAULT_CATEGORY_NAME);
 
     //Get current values and cancel anything that is a default
@@ -145,8 +201,8 @@ var Router = Backbone.Router.extend({
 
     //Base URL
     let url = (categoryName === navConstants.DEFAULT_CATEGORY_NAME) ?
-      `/${groupName}/topics/~topics` :
-      `${groupName}/topics/categories/${categoryName}/~topics`;
+      `/${groupUri}/topics/~topics` :
+      `${groupUri}/topics/categories/${categoryName}/~topics`;
 
     //QUERY STRING
     const query = stringify({

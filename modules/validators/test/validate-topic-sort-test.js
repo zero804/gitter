@@ -19,6 +19,8 @@ describe('validate-topic-filter', function() {
 
     [{repliesTotal: 1}, true],
 
+    [{'reactionCounts.like': 1}, true],
+
     [{lastChanged: 1, _id: 1}, true],
   ];
 

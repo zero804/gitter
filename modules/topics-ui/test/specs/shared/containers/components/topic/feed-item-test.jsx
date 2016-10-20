@@ -2,17 +2,21 @@ import assert from 'assert';
 import React from 'react';
 import { shallow } from 'enzyme';
 import FeedItem from '../../../../../../shared/containers/components/topic/feed-item.jsx';
+import replies from '../../../../../mocks/mock-data/replies';
 
 describe('<FeedItem/>', () => {
 
   let wrapper;
 
   beforeEach(() => {
-    wrapper = shallow(<FeedItem/>);
+    const reply = replies[0];
+    wrapper = shallow(
+      <FeedItem item={reply}/>
+    );
   });
 
-  it('should fail a test because you should write some', () => {
-    assert(false, 'Srsly, write some tests');
+  it('should render', () => {
+    assert(wrapper.length);
   });
 
 });

@@ -10,8 +10,9 @@ describe('<TopicReplyList/>', () => {
 
   beforeEach(() => {
     wrapper = shallow(
-      <TopicReplyList
-      replies={replies}/>
+      <TopicReplyList>
+        {replies.map(() => <div></div>)}
+      </TopicReplyList>
     );
   });
 
@@ -27,16 +28,8 @@ describe('<TopicReplyList/>', () => {
     equal(wrapper.find('ul').length, 1);
   });
 
-  it('should render the panel with a custom class', () => {
-    equal(wrapper.find('.panel--topic-reply-list').length, 1);
-  });
-
   it('should render a li for each reply', () => {
     equal(wrapper.find('li').length, replies.length);
-  });
-
-  it('should render a TopicReplyListItem for each reply', () => {
-    equal(wrapper.find('TopicReplyListItem').length, replies.length);
   });
 
   it('should render the list with a custom class', () => {

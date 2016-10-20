@@ -4,11 +4,14 @@ var env = require('gitter-web-env');
 var stats = env.stats;
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
-var ForumCategory = require('gitter-web-persistence').ForumCategory;
+var persistence = require('gitter-web-persistence');
+var ForumCategory = persistence.ForumCategory;
+var Topic = persistence.Topic;
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
+var liveCollections = require('gitter-web-live-collection-events');
 var validateCategory = require('./validate-category');
-
+var validators = require('gitter-web-validators');
 
 function findById(categoryId) {
   return ForumCategory.findById(categoryId)
@@ -64,7 +67,11 @@ function createCategory(user, forum, categoryInfo) {
   // see https://github.com/Automattic/mongoose/issues/2901. Mongoose is weird
   // about undefined or null in updates whereas they work fine in creates.
   if (categoryInfo.order) {
-    data.order = categoryInfo.order
+    data.order = categoryInfo.order;
+  }
+
+  if (categoryInfo.adminOnly) {
+    data.adminOnly = categoryInfo.adminOnly;
   }
 
   var insertData = validateCategory(data);
@@ -88,6 +95,8 @@ function createCategory(user, forum, categoryInfo) {
       slug: category.slug
     });
 
+    liveCollections.categories.emit('create', category);
+
     return category;
   });
 }
@@ -101,6 +110,122 @@ function createCategories(user, forum, categoriesInfo) {
   });
 }
 
+/* private */
+function updateCategoryFields(categoryId, fields) {
+  var query = {
+    _id: categoryId
+  };
+  var update = {
+    $set: fields,
+    $inc: {
+      _tv: 1
+    }
+  };
+  return ForumCategory.findOneAndUpdate(query, update, { new: true })
+    .lean()
+    .exec();
+}
+
+function updateCategory(user, category, fields) {
+  // before doing anything else, see if any of the fields actually changed
+  var unchanged = Object.keys(fields).every(function(key) {
+    return fields[key] === category[key];
+  });
+  if (unchanged) return category;
+
+  var known = {};
+  if (fields.hasOwnProperty('name')) {
+    if (!validators.validateDisplayName(fields.name)) {
+      throw new StatusError(400, 'Name is invalid.');
+    }
+    known.name = fields.name;
+  }
+  if (fields.hasOwnProperty('slug')) {
+    if (!validators.validateSlug(fields.slug)) {
+      throw new StatusError(400, 'Slug is invalid.');
+    }
+    known.slug = fields.slug;
+  }
+
+  var userId = user._id;
+  var forumId = category.forumId;
+  var categoryId = category._id;
+
+  return updateCategoryFields(categoryId, known)
+    .then(function(updatedCategory) {
+      stats.event('update_category', {
+        userId: userId,
+        forumId: forumId,
+        categoryId: categoryId
+      });
+
+      liveCollections.categories.emit('update', updatedCategory);
+
+      return updatedCategory;
+    });
+}
+
+// TODO: setCategoryOrder
+
+function setCategoryAdminOnly(user, category, adminOnly) {
+  if (adminOnly === category.adminOnly) return category;
+
+  if (!validators.validateAdminOnly(adminOnly)) {
+    throw new StatusError(400, 'adminOnly is invalid.');
+  }
+
+  var userId = user._id;
+  var forumId = category.forumId;
+  var categoryId = category._id;
+
+  return updateCategoryFields(categoryId, { adminOnly: adminOnly })
+    .then(function(updatedCategory) {
+      stats.event('update_category_adminonly', {
+        userId: userId,
+        forumId: forumId,
+        categoryId: categoryId,
+        adminOnly: adminOnly
+      });
+
+      liveCollections.categories.emit('patch', forumId, categoryId, {
+        adminOnly: updatedCategory.adminOnly,
+      });
+
+      return updatedCategory;
+    });
+}
+
+function checkIfCategoryIsDeletable(categoryId) {
+  return mongooseUtils.getEstimatedCountForId(Topic, 'categoryId', categoryId, {
+      read: 'primary'
+    })
+    .then(function(topicsTotal) {
+      return topicsTotal === 0;
+    });
+}
+
+function deleteCategory(user, category) {
+  var userId = user._id;
+  var forumId = category.forumId;
+  var categoryId = category._id;
+
+  // NOTE: database transactions would have been really handy here
+  return checkIfCategoryIsDeletable(categoryId)
+    .then(function(canDelete) {
+      if (!canDelete) throw new StatusError(409, 'Category not empty.');
+      return ForumCategory.remove({ _id: categoryId }).exec();
+    })
+    .then(function() {
+      stats.event('delete_category', {
+        userId: userId,
+        forumId: forumId,
+        categoryId: categoryId,
+      });
+
+      liveCollections.categories.emit('remove', category);
+    });
+}
+
 module.exports = {
   findById: findById,
   findByIdForForum: findByIdForForum,
@@ -109,5 +234,9 @@ module.exports = {
   findByForumIds: Promise.method(findByForumIds),
   findBySlugForForum: findBySlugForForum,
   createCategory: Promise.method(createCategory),
-  createCategories: createCategories
+  createCategories: createCategories,
+  updateCategory: Promise.method(updateCategory),
+  setCategoryAdminOnly: Promise.method(setCategoryAdminOnly),
+  checkIfCategoryIsDeletable: checkIfCategoryIsDeletable,
+  deleteCategory: deleteCategory
 };

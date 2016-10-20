@@ -1,4 +1,6 @@
 import React, {PropTypes} from 'react';
+import parseCategoryForSelect from '../../../../shared/parse/category-for-select';
+
 import Modal from '../modal.jsx';
 import Input from '../forms/input.jsx';
 import TextTypeAhead from '../forms/text-type-ahead.jsx';
@@ -16,21 +18,20 @@ export default React.createClass({
     tagValues: PropTypes.arrayOf(PropTypes.string).isRequired,
 
     categories: PropTypes.arrayOf(PropTypes.shape({
-      selected: PropTypes.bool.isRequired,
       label: PropTypes.string.isRequired,
       value: PropTypes.string,
     })).isRequired,
 
     newTopic: PropTypes.shape({
       title: PropTypes.string.isRequired,
-      body: PropTypes.string.isRequired,
+      //This __can__ be undefined
+      text: PropTypes.string,
       categoryId: PropTypes.string.isRequired,
+      tags: PropTypes.arrayOf(PropTypes.shape({
+        label: PropTypes.string.isRequired,
+        value: PropTypes.string.isRequired,
+      }))
     }).isRequired,
-
-    tags: PropTypes.arrayOf(PropTypes.shape({
-      label: PropTypes.string.isRequired,
-      value: PropTypes.string.isRequired,
-    })),
 
     onSubmit: PropTypes.func.isRequired,
     onTitleChange: PropTypes.func.isRequired,
@@ -42,13 +43,22 @@ export default React.createClass({
 
   render(){
     const { active, categories, tagValues, newTopic } = this.props;
-    const { title, body, categoryId } = newTopic;
+    const { title, text, categoryId, validationError } = newTopic;
+    const errors = (validationError || new Map());
+
+    // Slice "All Tags" out of here for now
+   const catOptionsForSelect = categories.slice(1).map(parseCategoryForSelect);
+   catOptionsForSelect.unshift({
+     value: '',
+     label: 'Please select a category'
+   });
 
     return (
       <Modal active={active} onClose={this.onClose}>
         <form name="create-topic" onSubmit={this.onSubmit}>
           <H1 className="create-topic__heading">New Topic</H1>
           <Input
+            valid={!errors.get('title')}
             className="create-topic__input--name"
             name="title"
             placeholder="Add title ..."
@@ -57,7 +67,8 @@ export default React.createClass({
 
           <div className="create-topic__details-row">
             <Select
-              options={categories}
+              options={catOptionsForSelect}
+              valid={!errors.get('categoryId')}
               className="select--create-topic-category"
               defaultValue={categoryId}
               onChange={this.onCategoryChange}/>
@@ -65,14 +76,15 @@ export default React.createClass({
               name="test"
               placeholder="Add tags ..."
               className="create-topic__input--tags"
-              onSubmit={this.onTagsChange}
+              onSubmit={this.onTagsTypeaheadSubmit}
               completions={tagValues} />
           </div>
           {this.getTagsRow()}
           <Editor
             className="create-topic__editor--body"
-            name="body"
-            value={body}
+            valid={!errors.get('text')}
+            name="text"
+            value={text}
             placeholder="Type here. Use Markdown, BBCode, or html to format."
             onChange={this.onBodyChange}/>
 
@@ -85,7 +97,7 @@ export default React.createClass({
   },
 
   getTagsRow(){
-    const {tags} = this.props;
+    const {tags} = this.props.newTopic;
     if(!tags.length) { return; }
     return (
       <div className="create-topic__details-row">
@@ -99,7 +111,9 @@ export default React.createClass({
   getTagRowChild(tag, i){
     return (
       <li key={`tag-row-child-${tag.value}-${i}`}>
-        <button className="create-topic__tags__child">
+        <button
+          className="create-topic__tags__child"
+          onClick={this.onTagClick.bind(this, tag.value)}>
           {tag.label}
         </button>
       </li>
@@ -127,8 +141,13 @@ export default React.createClass({
     this.props.onCategoryChange(val);
   },
 
-  onTagsChange(tag){
-    this.props.onTagsChange(tag);
+  onTagsTypeaheadSubmit(tag) {
+    this.props.onTagsChange(tag, true);
+  },
+
+  onTagClick(tag, e) {
+    this.props.onTagsChange(tag, false);
+    e.preventDefault();
   }
 
 

@@ -160,7 +160,7 @@ function renderMobileNativeEmbeddedChat(req, res) {
 function renderMobileNotLoggedInChat(req, res, next) {
   return renderChat(req, res, {
     template: 'mobile/mobile-nli-chat',
-    script: 'mobile-nli-app',
+    script: 'mobile-nli-chat',
     unread: false, // Not logged in users see chats as read
     fetchEvents: false,
     fetchUsers: false,

@@ -10,7 +10,7 @@ var fullTimeFormat = require('gitter-web-shared/time/full-time-format');
 
 var onready = require('./utils/onready');
 var appEvents = require('./utils/appevents');
-var frameUtils = require('./utils/frame-utils');
+var frameUtils = require('gitter-web-frame-utils');
 var liveContext = require('./components/live-context');
 var apiClient = require('./components/api-client');
 var perfTiming = require('./components/perf-timing');
@@ -37,7 +37,7 @@ require('./components/focus-events');
 // Preload widgets
 require('./components/ping');
 
-onready(function() {
+onready(function() { // eslint-disable-line max-statements
 
   appEvents.on('navigation', function(url, type, title, options) {
     options = options || {};
@@ -48,7 +48,12 @@ onready(function() {
     }
 
     if (frameUtils.hasParentFrameSameOrigin()) {
-      frameUtils.postMessage({ type: 'navigation', url: url, urlType: type, title: title});
+      frameUtils.postMessage({
+        type: 'navigation',
+        url: url,
+        urlType: type,
+        title: title
+      });
     } else {
       // No pushState here. Open the link directly
       // Remember that (window.parent === window) when there is no parent frame

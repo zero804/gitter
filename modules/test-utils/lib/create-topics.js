@@ -6,12 +6,17 @@ var Topic = require('gitter-web-persistence').Topic;
 var fixtureUtils = require('./fixture-utils');
 var debug = require('debug')('gitter:tests:test-fixtures');
 
+var topicNumberSequence = 1000000;
+function generateTopicNumber() {
+  return topicNumberSequence++;
+}
 
 function createTopic(fixtureName, f) {
   debug('Creating %s', fixtureName);
 
   var title = f.title || fixtureUtils.generateName();
   var sent = f.sent || new Date();
+
   var doc = {
     title: title,
     slug: f.slug || slugify(title),
@@ -19,6 +24,7 @@ function createTopic(fixtureName, f) {
     categoryId: f.category && f.category._id,
     userId: f.user && f.user._id,
     tags: f.tags,
+    number: f.number || generateTopicNumber(),
     sticky: f.sticky,
     text: f.text,
     html: f.html,

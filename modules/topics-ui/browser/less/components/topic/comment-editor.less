@@ -1,19 +1,24 @@
 @import "../../colors";
+@import "../../break-points";
 
 .reply-comment-editor {
   display: flex;
   width: 100%;
-  margin-bottom: 4rem;
+  margin-bottom: 1.5rem;
 }
 
 .reply-comment-editor__avatar {
-  border-radius: .2rem;
   margin-bottom: .3rem;
 }
 
 .reply-comment-editor__editor {
   width: 100%;
   background-color: @topic-reply-body-color;
+
+  @media @only-small {
+    font-size: 1.3rem;
+    line-height: 1.4;
+  }
 }
 
 .reply-comment-editor__details {

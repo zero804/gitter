@@ -9,6 +9,11 @@ var persistence = require('gitter-web-persistence');
 var _ = require('lodash');
 var Topic = persistence.Topic;
 var ForumCategory = persistence.ForumCategory;
+var Reply = persistence.Reply;
+var Comment = persistence.Comment;
+var ForumSubscription = persistence.ForumSubscription;
+var ForumNotification = persistence.ForumNotification;
+var ForumReaction = persistence.ForumReaction;
 var User = persistence.User;
 var debug = require('debug')('gitter:app:topics:topic-service');
 var processText = require('gitter-web-text-processor');
@@ -19,6 +24,7 @@ var validateTopic = require('./validate-topic');
 var validators = require('gitter-web-validators');
 var liveCollections = require('gitter-web-live-collection-events');
 var topicNotificationEvents = require('gitter-web-topic-notifications/lib/forum-notification-events');
+var topicSequencer = require('./topic-sequencer');
 
 var TOPIC_RESULT_LIMIT = 100;
 
@@ -137,7 +143,7 @@ function findByForumIds(forumIds, options) {
   options = options || {};
 
   var filter = options.filter || {};
-  var sort = options.sort || { _id: 1 };
+  var sort = options.sort || { _id: -1 };
 
   if (!validators.validateTopicFilter(filter)) {
     throw new StatusError(400, 'Filter is invalid.');
@@ -181,15 +187,16 @@ function findByIdForForum(forumId, topicId) {
 function createTopic(user, category, options) {
   // these should be passed in from forum.tags
   var allowedTags = options.allowedTags || [];
+  var forumId = category.forumId;
 
   var data = {
-    forumId: category.forumId,
+    forumId: forumId,
     categoryId: category._id,
     userId: user._id,
     title: options.title,
     slug: options.slug,
     tags: options.tags || [],
-    sticky: options.sticky,
+    sticky: options.sticky, // NOTE: admin only
     text: options.text || '',
   };
 
@@ -198,8 +205,11 @@ function createTopic(user, category, options) {
   // make these all be the exact same instant
   insertData.sent = insertData.lastChanged = insertData.lastModified = new Date();
 
-  return processText(options.text)
-    .then(function(parsedMessage) {
+  return Promise.join(
+      processText(options.text),
+      topicSequencer.getNextTopicNumber(forumId))
+    .spread(function(parsedMessage, number) {
+      insertData.number = number;
       insertData.html = parsedMessage.html;
       insertData.lang = parsedMessage.lang;
       insertData._md = parsedMessage.markdownProcessingFailed ? -markdownMajorVersion : markdownMajorVersion;
@@ -233,6 +243,9 @@ function updateTopicFields(topicId, fields) {
     $max: {
       // certainly modified, but not necessarily changed or edited.
       lastModified: new Date()
+    },
+    $inc: {
+      _tv: 1
     }
   };
   return Topic.findOneAndUpdate(query, update, { new: true })
@@ -339,7 +352,6 @@ function setTopicTags(user, topic, tags, options) {
 
       liveCollections.topics.emit('patch', forumId, topicId, {
         tags: updatedTopic.tags,
-        lastModified: updatedTopic.lastModified.toISOString()
       });
 
       return updatedTopic;
@@ -347,7 +359,7 @@ function setTopicTags(user, topic, tags, options) {
 }
 
 function setTopicSticky(user, topic, sticky) {
-  if (sticky === topic.sticky) return sticky;
+  if (sticky === topic.sticky) return topic;
 
   if (!validators.validateSticky(sticky)) {
     throw new StatusError(400, 'Sticky is invalid.');
@@ -368,7 +380,6 @@ function setTopicSticky(user, topic, sticky) {
 
       liveCollections.topics.emit('patch', forumId, topicId, {
         sticky: updatedTopic.sticky,
-        lastModified: updatedTopic.lastModified.toISOString()
       });
 
       return updatedTopic;
@@ -399,6 +410,29 @@ function setTopicCategory(user, topic, category) {
     });
 }
 
+function deleteTopic(user, topic) {
+  var userId = user._id;
+  var forumId = topic.forumId;
+  var topicId = topic._id;
+
+  return Promise.join(
+      Topic.remove({ _id: topicId }).exec(),
+      Reply.remove({ topicId: topicId }).exec(),
+      Comment.remove({ topicId: topicId }).exec(),
+      ForumSubscription.remove({ topicId: topicId }).exec(),
+      ForumNotification.remove({ topicId: topicId }).exec(),
+      ForumReaction.remove({ topicId: topicId }).exec())
+    .then(function() {
+      stats.event('delete_topic', {
+        userId: userId,
+        forumId: forumId,
+        topicId: topicId,
+      });
+
+      liveCollections.topics.emit('remove', topic);
+    });
+}
+
 module.exports = {
   findById: findById,
   findByForumId: findByForumId,
@@ -410,4 +444,5 @@ module.exports = {
   setTopicTags: Promise.method(setTopicTags),
   setTopicSticky: Promise.method(setTopicSticky),
   setTopicCategory: Promise.method(setTopicCategory),
+  deleteTopic: deleteTopic
 };

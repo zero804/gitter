@@ -104,3 +104,10 @@ unread-notification.out.html
 .nyc_output
 .tern-port
 .tmp
+modules/topic-notifications/test/comment.html
+modules/topic-notifications/test/reply.html
+modules/topic-notifications/test/topic.html
+/.gtm/
+/scripts/useful-queries/*.csv
+/scripts/useful-queries/*.numbers
+/scripts/useful-queries/*.png

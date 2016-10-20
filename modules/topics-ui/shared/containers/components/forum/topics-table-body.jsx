@@ -1,12 +1,13 @@
 import React, { PropTypes } from 'react';
 import TopicLink from '../links/topic-link.jsx';
 import UserAvatar from '../user/user-avatar.jsx';
+import {AVATAR_SIZE_SMALL, AVATAR_SIZE_MEDIUM} from '../../../constants/avatar-sizes';
 
 export default React.createClass({
 
   displayName: 'TopicsTableBody',
   propTypes: {
-    groupName: PropTypes.string.isRequired,
+    groupUri: PropTypes.string.isRequired,
     topics: PropTypes.arrayOf(PropTypes.shape({
       title: PropTypes.string.isRequired
     }))
@@ -22,28 +23,35 @@ export default React.createClass({
   },
 
   renderChildRow(topic, i) {
-    const {groupName} = this.props;
+    const {groupUri} = this.props;
     const {user, replyingUsers} = topic;
+
     return (
-      <tr className="topics-table-body__row" key={`topics-table-row-${i}`}>
+      <tr
+        key={`topics-table-row-${i}`}
+        id={topic.id}
+        className="topics-table-body__row">
         <td className="topics-table-body__cell--details">
           <UserAvatar
             className="topics-table-body__cell__avatar"
             user={user}
-            width={28}
-            height={28}/>
+            size={AVATAR_SIZE_MEDIUM} />
           <TopicLink
             className="topics-table-body__cell__link"
-            groupName={groupName}
+            groupUri={groupUri}
             topic={topic}>
             {topic.title}
           </TopicLink>
         </td>
-        <td className="topics-table-body__cell">
+        <td className="topics-table-body__cell--user-list">
           {this.getUserList(replyingUsers)}
         </td>
-        <td className="topics-table-body__cell">0</td>
-        <td className="topics-table-body__cell">0</td>
+        <td className="topics-table-body__cell--replies">
+          {topic.repliesTotal}
+        </td>
+        <td className="topics-table-body__cell--likes">
+          {topic.reactions.like || 0}
+        </td>
       </tr>
     );
   },
@@ -59,8 +67,7 @@ export default React.createClass({
   getUserListAvatar(user, i){
     return (
       <UserAvatar
-        width={10}
-        height={10}
+        size={AVATAR_SIZE_SMALL}
         user={user}
         className="topics-table-body__user-list__item"
         key={`user-list-item${i}`} />

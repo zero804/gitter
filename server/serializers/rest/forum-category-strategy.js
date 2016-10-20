@@ -1,5 +1,7 @@
 "use strict";
 
+var getVersion = require('gitter-web-serialization/lib/get-model-version');
+
 function ForumCategoryStrategy(/*options*/) {
   this.preload = function(/*categories*/) {
     return;
@@ -12,6 +14,8 @@ function ForumCategoryStrategy(/*options*/) {
       id: id,
       name: category.name,
       slug: category.slug,
+      adminOnly: category.adminOnly || false,
+      v: getVersion(category)
     };
   };
 }

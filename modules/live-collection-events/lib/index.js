@@ -11,6 +11,7 @@ module.exports = {
   groupMembers: new EventEmitter(),
   topics: new EventEmitter(),
   replies: new EventEmitter(),
-  comments: new EventEmitter()
+  comments: new EventEmitter(),
+  categories: new EventEmitter()
 };
 

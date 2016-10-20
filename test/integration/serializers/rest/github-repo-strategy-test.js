@@ -6,7 +6,7 @@ var env = require('gitter-web-env');
 var nconf = env.config;
 var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
-var serialize = testRequire('./serializers/serialize');
+var serialize = require('gitter-web-serialization/lib/serialize');
 var GithubRepoStrategy = testRequire('./serializers/rest/github-repo-strategy');
 
 

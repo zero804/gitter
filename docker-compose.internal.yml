@@ -66,8 +66,10 @@ mongosetup:
   entrypoint: [ "/src/scripts/docker/mongo/mongo-setup.sh" ]
 
 neo4j:
-  image: kbastani/docker-neo4j
+  image: neo4j:2.3.0
   restart: always
+  environment:
+    NEO4J_AUTH: none
 
 elasticsearch:
   image: elasticsearch:1.4.2
@@ -108,12 +110,14 @@ internal-min:
     - elasticsearch
     - neo4j
   environment:
+    NODE_ENV: ${NODE_ENV}
+    DEBUG: ${DEBUG}
     SU_TO_USER: ${SU_TO_USER}
     SU_TO_UID: ${SU_TO_UID}
   volumes:
    - ${WORKSPACE}:${WORKSPACE}
   extra_hosts:
-    beta-internal: 10.0.0.140
+    beta-internal.beta.gitter: 10.0.0.140
   working_dir: ${WORKSPACE}
 
 internal-mac:
@@ -132,17 +136,20 @@ internal-mac:
    - ${WORKSPACE}:${WORKSPACE}
    - ${WORKSPACE}/node_modules_linux:${WORKSPACE}/node_modules/
   extra_hosts:
-    beta-internal: 10.0.0.140
+    beta-internal.beta.gitter: 10.0.0.140
   working_dir: ${WORKSPACE}
 
 internal-mac-np:
   image: node:${NODE_VERSION}
   restart: 'no'
+  environment:
+    NODE_ENV: ${NODE_ENV}
+    DEBUG: ${DEBUG}
   volumes:
    - ${WORKSPACE}:${WORKSPACE}
    - ${WORKSPACE}/node_modules_linux:${WORKSPACE}/node_modules/
   extra_hosts:
-    beta-internal: 10.0.0.140
+    beta-internal.beta.gitter: 10.0.0.140
   working_dir: ${WORKSPACE}
 
 internal:

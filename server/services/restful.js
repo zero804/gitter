@@ -23,6 +23,7 @@ var userScopes = require('gitter-web-identity/lib/user-scopes');
 var topicService = require('gitter-web-topics/lib/topic-service');
 var replyService = require('gitter-web-topics/lib/reply-service');
 var commentService = require('gitter-web-topics/lib/comment-service');
+var forumCategoryService = require('gitter-web-topics/lib/forum-category-service');
 
 var survivalMode = !!process.env.SURVIVAL_MODE || false;
 
@@ -158,9 +159,11 @@ function serializeEventsForTroupe(troupeId, userId, callback) {
 function serializeOrgsForUser(user) {
   return orgService.getOrgsForUser(user)
     .then(function(orgs) {
-      var strategyOptions = { currentUserId: user.id };
       // TODO: not all organisations are going to be github ones in future!
-      var strategy = new restSerializer.GithubOrgStrategy(strategyOptions);
+      var strategy = new restSerializer.GithubOrgStrategy({
+        currentUserId: user && user._id
+      });
+
       return restSerializer.serialize(orgs, strategy);
     });
 }
@@ -177,8 +180,9 @@ function serializeOrgsForUserId(userId, options) {
 function serializeUnusedOrgsForUser(user) {
   return orgService.getUnusedOrgsForUser(user)
     .then(function(orgs) {
-      var strategyOptions = { currentUserId: user.id };
-      var strategy = new restSerializer.GithubOrgStrategy(strategyOptions);
+      var strategy = new restSerializer.GithubOrgStrategy({
+        currentUserId: user && user._id
+      });
       return restSerializer.serialize(orgs, strategy);
     });
 
@@ -187,8 +191,9 @@ function serializeUnusedOrgsForUser(user) {
 function serializeReposForUser(user) {
   return repoService.getReposForUser(user)
     .then(function(repos) {
-      var strategyOptions = { currentUserId: user.id };
-      var strategy = new restSerializer.GithubRepoStrategy(strategyOptions);
+      var strategy = new restSerializer.GithubRepoStrategy({
+        currentUserId: user && user._id
+      });
       return restSerializer.serialize(repos, strategy);
     });
 }
@@ -196,8 +201,9 @@ function serializeReposForUser(user) {
 function serializeUnusedReposForUser(user) {
   return repoService.getUnusedReposForUser(user)
     .then(function(repos) {
-      var strategyOptions = { currentUserId: user.id };
-      var strategy = new restSerializer.GithubRepoStrategy(strategyOptions);
+      var strategy = new restSerializer.GithubRepoStrategy({
+        currentUserId: user && user._id
+      });
       return restSerializer.serialize(repos, strategy);
     });
 }
@@ -205,8 +211,9 @@ function serializeUnusedReposForUser(user) {
 function serializeAdminReposForUser(user) {
   return repoService.getAdminReposForUser(user)
     .then(function(repos) {
-      var strategyOptions = { currentUserId: user.id };
-      var strategy = new restSerializer.GithubRepoStrategy(strategyOptions);
+      var strategy = new restSerializer.GithubRepoStrategy({
+        currentUserId: user && user._id
+      });
       return restSerializer.serialize(repos, strategy);
     });
 }
@@ -299,12 +306,23 @@ function serializeRepliesForTopicId(topicId, userId) {
     });
 }
 
-function serializeCommentsForReplyId(replyId) {
+function serializeCommentsForReplyId(replyId, userId) {
   // TODO: don't just return all the comments, return a sample
   return commentService.findByReplyId(replyId)
     .then(function(comments) {
-      var strategy = new restSerializer.CommentStrategy();
+      var strategy = restSerializer.CommentStrategy.standard({
+        currentUserId: userId
+      });
+
       return restSerializer.serialize(comments, strategy);
+    });
+}
+
+function serializeCategoriesForForumId(forumId) {
+  return forumCategoryService.findByForumId(forumId)
+    .then(function(categories) {
+      var strategy = new restSerializer.ForumCategoryStrategy();
+      return restSerializer.serialize(categories, strategy);
     });
 }
 
@@ -328,4 +346,5 @@ module.exports = {
   serializeTopicsForForumId: serializeTopicsForForumId,
   serializeRepliesForTopicId: serializeRepliesForTopicId,
   serializeCommentsForReplyId: serializeCommentsForReplyId,
+  serializeCategoriesForForumId: serializeCategoriesForForumId
 }

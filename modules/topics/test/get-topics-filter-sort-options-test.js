@@ -53,7 +53,16 @@ describe('get-topics-filter-sort-options', function() {
       output: {
         sort: {
           lastChanged: -1,
-          id: -1
+          _id: -1
+        }
+      }
+    }, {
+      input: {
+        sort: '-likesTotal'
+      },
+      output: {
+        sort: {
+          'reactionCounts.like': -1,
         }
       }
     }, {

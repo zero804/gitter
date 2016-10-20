@@ -3,8 +3,14 @@
 var env = require('gitter-web-env');
 var stats = env.stats;
 var Promise = require('bluebird');
-var Topic = require('gitter-web-persistence').Topic;
-var Reply = require('gitter-web-persistence').Reply;
+var StatusError = require('statuserror');
+var persistence = require('gitter-web-persistence');
+var Topic = persistence.Topic;
+var Reply = persistence.Reply;
+var Comment = persistence.Comment;
+var ForumSubscription = persistence.ForumSubscription;
+var ForumNotification = persistence.ForumNotification;
+var ForumReaction = persistence.ForumReaction;
 var debug = require('debug')('gitter:app:topics:reply-service');
 var liveCollections = require('gitter-web-live-collection-events');
 var processText = require('gitter-web-text-processor');
@@ -12,6 +18,7 @@ var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var markdownMajorVersion = require('gitter-markdown-processor').version.split('.')[0];
 var validateReply = require('./validate-reply');
+var validators = require('gitter-web-validators');
 var _ = require('lodash');
 var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs')
 var topicNotificationEvents = require('gitter-web-topic-notifications/lib/forum-notification-events');
@@ -102,7 +109,12 @@ function updateRepliesTotal(topicId) {
         $max: {
           lastChanged: now,
           lastModified: now,
+        },
+        $set: {
           repliesTotal: repliesTotal
+        },
+        $inc: {
+          _tv: 1
         }
       };
 
@@ -127,13 +139,10 @@ function updateRepliesTotal(topicId) {
         return;
       }
 
-      // if this update won, then patch the live collection with the latest
-      // lastChanged & lastModified values and also the new total replies.
-      liveCollections.topics.emit('patch', topic.forumId, topicId, {
-        lastChanged: nowString,
-        lastModified: nowString,
-        repliesTotal: topic.repliesTotal
-      })
+      // Do an update rather than a patch so that lastChanged, repliesTotal AND
+      // replyingUsers will go out. replyingUsers requires serializers which
+      // aren't available from here anyway.
+      liveCollections.topics.emit('update', topic);
     })
     .then(function() {
       // return the topic that got updated (if it was updated).
@@ -187,6 +196,73 @@ function createReply(user, topic, options) {
     });
 }
 
+var updateTopicLastModified = mongooseUtils.makeLastModifiedUpdater(Topic);
+
+/* private */
+function updateReplyFields(topicId, replyId, fields) {
+  var lastModified = new Date();
+
+  var query = {
+    _id: replyId
+  };
+  var update = {
+    $set: fields,
+    $max: {
+      lastModified: lastModified
+    },
+    $inc: {
+      _tv: 1
+    }
+  };
+  return Reply.findOneAndUpdate(query, update, { new: true })
+    .lean()
+    .exec()
+    .tap(function() {
+      return updateTopicLastModified(topicId, lastModified);
+    });
+}
+
+function updateReply(user, reply, fields) {
+  // you can only update the text field for now.
+  var text = fields.text;
+
+  if (text === reply.text) return reply;
+
+  if (!validators.validateMarkdown(text)) {
+    throw new StatusError(400, 'Text is invalid.');
+  }
+
+  var userId = user._id;
+  var forumId = reply.forumId;
+  var topicId = reply.topicId;
+  var replyId = reply._id;
+
+  return processText(text)
+    .then(function(parsedMessage) {
+      return updateReplyFields(topicId, replyId, {
+        editedAt: new Date(),
+        text: text,
+        html: parsedMessage.html,
+        lang: parsedMessage.lang,
+        _md: parsedMessage.markdownProcessingFailed ? -markdownMajorVersion : markdownMajorVersion
+      });
+    })
+    .then(function(updatedReply) {
+      stats.event('update_topic_reply', {
+        userId: userId,
+        forumId: forumId,
+        topicId: topicId,
+        replyId: replyId
+      });
+
+      // Might as well issue an update rather than a patch because almost the
+      // entire thing changed.
+      liveCollections.replies.emit('update', updatedReply);
+
+      return updatedReply;
+    });
+}
+
 /**
  * Given a set of topicIds, returns a hash
  * of userIds of users replying to those messages
@@ -226,6 +302,35 @@ function findSampleReplyingUserIdsForTopics(topicIds) {
     });
 }
 
+function deleteReply(user, reply) {
+  var userId = user._id;
+  var forumId = reply.forumId;
+  var topicId = reply.topicId;
+  var replyId = reply._id;
+
+  return Promise.join(
+      Reply.remove({ _id: replyId }).exec(),
+      Comment.remove({ replyId: replyId }).exec(),
+      ForumSubscription.remove({ replyId: replyId }).exec(),
+      ForumNotification.remove({ replyId: replyId }).exec(),
+      ForumReaction.remove({ replyId: replyId }).exec())
+    .then(function() {
+      // only update the total after we deleted the reply
+      return updateRepliesTotal(topicId);
+    })
+    .then(function() {
+      stats.event('delete_topic_reply', {
+        userId: userId,
+        forumId: forumId,
+        topicId: topicId,
+        replyId: replyId,
+      });
+
+      liveCollections.replies.emit('remove', reply);
+    }
+  )
+}
+
 module.exports = {
   findById: findById,
   findByTopicId: findByTopicId,
@@ -234,6 +339,9 @@ module.exports = {
   findTotalsByTopicIds: findTotalsByTopicIds,
   findByIdForForum: findByIdForForum,
   findByIdForForumAndTopic: findByIdForForumAndTopic,
+  updateRepliesTotal: updateRepliesTotal,
   createReply: Promise.method(createReply),
-  findSampleReplyingUserIdsForTopics: findSampleReplyingUserIdsForTopics
+  updateReply: Promise.method(updateReply),
+  findSampleReplyingUserIdsForTopics: findSampleReplyingUserIdsForTopics,
+  deleteReply: deleteReply
 };

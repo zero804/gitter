@@ -6,14 +6,21 @@ export default React.createClass({
 
   displayName: 'Editor',
   propTypes: {
-    className: PropTypes.string,
+    //Props
+    value: PropTypes.string,
     name: PropTypes.string,
+    autoFocus: PropTypes.bool,
+    className: PropTypes.string,
     children: PropTypes.node,
+    valid: PropTypes.bool,
+    placeholder: PropTypes.string,
+
+    //Events
     onChange: PropTypes.func.isRequired,
     onEnter: PropTypes.func,
-    value: PropTypes.string,
-    placeholder: PropTypes.string,
-    autoFocus: PropTypes.bool,
+    onClick: PropTypes.func,
+    onFocus: PropTypes.func,
+    onBlur: PropTypes.func,
   },
 
   getDefaultProps(){
@@ -22,19 +29,26 @@ export default React.createClass({
 
   render(){
 
-    const { className, name, value, placeholder, autoFocus } = this.props;
-    const compiledClass = classNames('editor', className);
+    const { className, name, value, placeholder, autoFocus, valid } = this.props;
+    const compiledClass = classNames({
+      editor: true,
+      valid: (valid === true),
+      invalid: (valid === false),
+    }, className);
 
     return (
       <textarea
-        autoFocus={autoFocus}
         ref="editor"
-        className={compiledClass}
-        name={name}
         value={value}
-        onChange={this.onChange}
+        name={name}
+        autoFocus={autoFocus}
         placeholder={placeholder}
-        onKeyDown={this.onKeyPressed}>
+        className={compiledClass}
+        onChange={this.onChange}
+        onClick={this.onClick}
+        onKeyDown={this.onKeyPressed}
+        onFocus={this.onFocus}
+        onBlur={this.onBlur}>
         { this.props.children }
       </textarea>
     );
@@ -45,6 +59,13 @@ export default React.createClass({
     this.props.onChange(e.target.value);
   },
 
+  onClick() {
+    const { onClick } = this.props;
+    if(onClick) {
+      onClick(...arguments);
+    }
+  },
+
   onKeyPressed(e) {
     const {onEnter} = this.props;
     if(e.keyCode === ENTER_KEY && onEnter){
@@ -52,6 +73,18 @@ export default React.createClass({
       e.stopPropagation();
       onEnter();
     }
+  },
+
+  onFocus() {
+    const {onFocus} = this.props;
+    if(!onFocus) { return; }
+    onFocus();
+  },
+
+  onBlur(){
+    const {onBlur} = this.props;
+    if(!onBlur) { return; }
+    onBlur();
   }
 
 });

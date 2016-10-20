@@ -1,8 +1,20 @@
-@import "../../colors.less";
 @import (less, reference) "~gitter-styleguide/css/components/headings.css";
+@import "../../colors.less";
+@import "../../break-points";
+@import "../../icons";
 
 .topics-table-body {
   background:    @light;
+
+  //Reset all the tabel-y tableness for mobile
+  @media @only-small {
+    display: block;
+    & > tr {
+      display: flex;
+      justify-content: space-around;
+    }
+  }
+
 }
 
 .topics-table-body__row {
@@ -18,21 +30,79 @@
   text-align: center;
   color:      @topic-table-header-color;
 
+  @mobile-padding: 1rem;
   &:first-child {
     padding-left: @panel-horiz-padding + @panel-border-width;
     text-align:   left;
     color:        @topic-table-cell-color;
+
+    //ARGGHHH NESTING
+    @media @only-small { padding-left: @mobile-padding; }
   }
 
   &:last-child {
     padding-right: @panel-horiz-padding + @panel-border-width;
+    @media @only-small { padding-right: @mobile-padding; }
   }
 
+}
+
+.topics-table-body__cell--user-list {
+  .topics-table-body__cell();
+  @media @only-small { display: none; }
+}
+
+.m-placeholder-icon {
+  content: '';
+  width: 1.5rem;
+  height: 1.5rem;
+  display: inline-block;
+  background-repeat: no-repeat;
+  background-size: cover;
+  margin-left: .5rem;
+}
+
+.m-center-td {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.topics-table-body__cell--replies {
+  .topics-table-body__cell();
+
+  &:after {
+    &:extend(.icon-comments);
+    .m-placeholder-icon();
+    //Hide the icons on larger screens
+    display: none;
+  }
+
+  @media @only-small {
+    .m-center-td();
+    &:after { display: inline-block; }
+  }
+}
+
+.topics-table-body__cell--likes {
+  .topics-table-body__cell();
+
+  &:after {
+    &:extend(.icon-like);
+    .m-placeholder-icon();
+    display: none;
+  }
+
+  @media @only-small {
+    .m-center-td();
+    &:after { display: inline-block; }
+  }
 }
 
 .topics-table-body__cell--details {
   .topics-table-body__cell();
   display: flex;
+  @media @only-small { flex-basis: 60%; }
 }
 
 .topics-table-body__cell__link{
@@ -42,7 +112,6 @@
 
 .topics-table-body__cell__avatar {
   margin-right: 1rem;
-  border-radius: .2rem;
 }
 
 .topics-table-body__user-list {

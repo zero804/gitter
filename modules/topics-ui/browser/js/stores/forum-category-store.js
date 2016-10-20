@@ -1,9 +1,10 @@
-import { Collection, Model } from 'backbone';
+import { Collection } from 'backbone';
 import { UPDATE_ACTIVE_CATEGORY } from '../../../shared/constants/forum-categories';
 import router from '../routers/index';
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
+import { BaseModel } from './base-model';
 
-var CategoryModel = Model.extend({
+var CategoryModel = BaseModel.extend({
   defaults: { category: null },
 });
 
@@ -15,16 +16,17 @@ export const ForumCategoryStore = Collection.extend({
   },
 
   getCategories: function() {
-    return this.models.map(model => model.toJSON());
+    return this.map(model => model.toPOJO());
   },
 
-  getActiveCategoryName(){
-    return this.findWhere({ active: true }).get('category');
+  getActiveCategoryName() {
+    const activeModel = this.findWhere({ active: true });
+    return activeModel && activeModel.get('category');
   },
 
   onCategoryUpdate(model, val){
     this.where({ active: true }).forEach((m) => m.set('active', false));
-    var activeModel = this.findWhere({ slug: val });
+    var activeModel = this.findWhere({ category: val });
     if(activeModel) { activeModel.set('active', true); }
     this.trigger(UPDATE_ACTIVE_CATEGORY);
   },
@@ -32,7 +34,7 @@ export const ForumCategoryStore = Collection.extend({
   mapForSelectControl(){
     return this.models.map((m) => ({
       selected: m.get('active'),
-      label: m.get('category'),
+      label: m.get('label') || m.get('category'),
       value: m.get('id')
     }))
   },
@@ -40,7 +42,7 @@ export const ForumCategoryStore = Collection.extend({
   getById(id){
     const model = this.get(id);
     if(!model) { return; }
-    return model.toJSON();
+    return model.toPOJO();
   }
 
 });
