@@ -25,7 +25,7 @@ onReady(function(){
   });
 
   //listen for postMessageCalls
-  window.addEventListener('message', function onWindowMessage(message, targetOrigin){
+  window.addEventListener('message', function onWindowMessage(message/*, targetOrigin*/){
     if (message.origin !== clientEnv['basePath']) return;
 
     var data;
@@ -34,7 +34,7 @@ onReady(function(){
         data = JSON.parse(message.data);
       }
       catch(e){
-        //FIXME JP 8/9/15 Should so something with this error
+        //TODO: JP 8/9/15 Should so something with this error
         data = message.data;
       }
     }

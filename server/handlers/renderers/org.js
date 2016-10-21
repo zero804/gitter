@@ -3,12 +3,18 @@
 var env = require('gitter-web-env');
 var nconf = env.config;
 var Promise = require('bluebird');
+var StatusError = require('statuserror');
+var avatars = require('gitter-web-avatars');
+var fonts = require('../../web/fonts');
+var getTopicsFilterSortOptions = require('gitter-web-topics/lib/get-topics-filter-sort-options');
+var restSerializer = require('../../serializers/rest-serializer');
+
 var contextGenerator = require('../../web/context-generator');
 var generateRoomCardContext = require('gitter-web-shared/templates/partials/room-card-context-generator');
-var StatusError = require('statuserror');
-var fonts = require('../../web/fonts');
-var restSerializer = require('../../serializers/rest-serializer');
+var userService = require('../../services/user-service');
 var groupBrowserService = require('gitter-web-groups/lib/group-browser-service');
+var roomMembershipService = require('../../services/room-membership-service');
+var forumService = require('gitter-web-topics/lib/forum-service');
 
 var ROOMS_PER_PAGE = 15;
 
@@ -44,6 +50,45 @@ function findRooms(groupId, user, currentPage) {
     });
 }
 
+function getRooms(groupId, user, currentPage) {
+  return findRooms(groupId, user, currentPage)
+    .then(function(roomBrowseResult) {
+      var rooms = roomBrowseResult.results;
+      // Add `room.users`
+      return Promise.all(rooms.map(function(room) {
+        return roomMembershipService.findMembersForRoom(room.id, { limit: 5 })
+          .then(function(userIds) {
+            return userService.findByIds(userIds);
+          })
+          .then(function(users) {
+            room.users = users.map(function(user) {
+              user.avatarUrl = avatars.getForUser(user);
+              return user;
+            });
+            return room;
+          });
+      }))
+      .then(function() {
+        return roomBrowseResult;
+      });
+    });
+}
+
+function getForumForGroup(forumId, userId) {
+  return forumService.findById(forumId)
+    .then(function(forum) {
+      var strategy = restSerializer.ForumStrategy.nested({
+        currentUserId: userId,
+        topicsFilterSort: getTopicsFilterSortOptions({
+          sort: 'likesTotal'
+        }),
+        topicsLimit: 3
+      });
+
+      return restSerializer.serializeObject(forum, strategy);
+    });
+}
+
 function renderOrgPage(req, res, next) {
   return Promise.try(function() {
     var group = req.group;
@@ -56,10 +101,12 @@ function renderOrgPage(req, res, next) {
 
     return Promise.join(
       serializeGroup(group, user),
-      findRooms(groupId, user, currentPage),
+      getRooms(groupId, user, currentPage),
+      getForumForGroup(group.forumId, user.id),
       contextGenerator.generateNonChatContext(req),
       policy.canAdmin(),
-      function(serializedGroup, roomBrowseResult, troupeContext, isOrgAdmin) {
+      function(serializedGroup, roomBrowseResult, serializedForum, troupeContext, isOrgAdmin) {
+        console.log('serializedForum', serializedForum);
         var isStaff = req.user && req.user.staff;
         var editAccess = isOrgAdmin || isStaff;
         var orgUserCount = roomBrowseResult.totalUsers;
@@ -99,6 +146,7 @@ function renderOrgPage(req, res, next) {
           orgUserCount: orgUserCount,
           group: serializedGroup,
           rooms: rooms,
+          forum: serializedForum,
           troupeContext: troupeContext,
           pagination: {
             page: currentPage,
