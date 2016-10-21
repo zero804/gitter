@@ -115,7 +115,6 @@ function renderOrgPage(req, res, next) {
       contextGenerator.generateNonChatContext(req),
       policy.canAdmin(),
       function(serializedGroup, roomBrowseResult, serializedForum, troupeContext, isOrgAdmin) {
-        console.log('serializedForum', serializedForum);
         var isStaff = req.user && req.user.staff;
         var editAccess = isOrgAdmin || isStaff;
         var orgUserCount = roomBrowseResult.totalUsers;
