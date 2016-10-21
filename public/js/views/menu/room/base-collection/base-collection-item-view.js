@@ -92,6 +92,11 @@ var BaseCollectionItemView = BaseItemView.extend({
   },
 
   onUnreadUpdate: function() {
+
+    //Hide unread indicators in the group view
+    if(this.roomMenuModel.get('state') === 'group') { this.ui.unreadIndicator.hide(); }
+    else { this.ui.unreadIndicator.show(); }
+
     updateUnreadIndicatorClassState(this.model, this.ui.unreadIndicator);
 
     // Update the count inside the badge indicator
