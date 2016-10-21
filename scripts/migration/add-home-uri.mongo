@@ -1,0 +1,30 @@
+db.groups.aggregate([{
+  $match: {
+    homeUri: null
+  }
+}, {
+  $lookup: {
+    from: "troupes",
+    localField: "uri",
+    foreignField: "uri",
+    as: "room"
+  }
+}, {
+  $project: {
+    uri: 1,
+    org_room: { $size: '$room' }
+  }
+}]).forEach(function(doc) {
+  var homeUri = doc.org_room ? doc.uri + '/home' : doc.uri;
+  var lcHomeUri = homeUri.toLowerCase();
+  db.groups.update({
+    _id: doc._id,
+    homeUri: null
+  }, {
+    $set: {
+      homeUri: homeUri,
+      lcHomeUri: lcHomeUri
+    }
+  })
+
+})

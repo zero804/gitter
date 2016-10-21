@@ -84,6 +84,7 @@ function ensureGroupForGitHubRoom(user, githubType, uri) {
 
     case 'ORG':
       options = {
+        useHomeUriSuffix: true,
         uri: uri
       }
       break;

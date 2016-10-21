@@ -40,7 +40,7 @@ function resolveFromLookup(uriLookup, userId) {
           uri: troupe.uri,
           room: troupe,
           roomMember: roomMember,
-          group: null
+          group: null // TODO: consider if this is okay...
         };
       });
   }
@@ -53,7 +53,7 @@ function resolveFromLookup(uriLookup, userId) {
 
         return {
           user: null,
-          uri: group.uri,
+          uri: group.homeUri,
           room: null,
           roomMember: null,
           group: group
