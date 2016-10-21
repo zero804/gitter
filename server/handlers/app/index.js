@@ -5,6 +5,7 @@ var logger = env.logger;
 var express = require('express');
 var mainFrameRenderer = require('../renderers/main-frame');
 var chatRenderer = require('../renderers/chat');
+var orgRenderer = require('../renderers/org');
 var uriContextResolverMiddleware = require('../uri-context/uri-context-resolver-middleware');
 var recentRoomService = require('../../services/recent-room-service');
 var isPhoneMiddleware = require('../../web/middlewares/is-phone');
@@ -68,6 +69,7 @@ var mainFrameMiddlewarePipeline = [
     }
 
     if(req.isPhone) {
+      // TODO: handle groups...!!!
       if(!req.user) {
         if (req.uriContext.accessDenied) {
           return res.redirect('/orgs/' + req.uriContext.uri + '/rooms/~iframe');
@@ -144,6 +146,11 @@ var chatMiddlewarePipeline = [
       return res.redirect('/orgs/' + req.uriContext.uri + '/rooms/~iframe');
     }
 
+    if (req.uriContext.group) {
+      orgRenderer.renderOrgPage(req, res, next);
+      return;
+    }
+
     if(!req.uriContext.troupe) return next(new StatusError(404));
 
     if(req.user) {
@@ -202,9 +209,9 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
 router.use('/:groupUri/topics', topicRouter);
 
 [
-  '/:roomPart1/~chat',                         // ORG or ONE_TO_ONE
-  '/:roomPart1/:roomPart2/~chat',              // REPO or ORG_CHANNEL or ADHOC
-  '/:roomPart1/:roomPart2/:roomPart3/~chat'    // CUSTOM REPO_ROOM
+  '/:roomPart1/~(chat|iframe)',                         // ORG or ONE_TO_ONE
+  '/:roomPart1/:roomPart2/~(chat|iframe)',              // REPO or ORG_CHANNEL or ADHOC
+  '/:roomPart1/:roomPart2/:roomPart3/~(chat|iframe)'    // CUSTOM REPO_ROOM
 ].forEach(function(path) {
   router.get(path, chatMiddlewarePipeline);
 });
