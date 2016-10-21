@@ -248,7 +248,7 @@ var HeaderView = Marionette.ItemView.extend({
 
     if (!homeUri) return;
 
-    appEvents.trigger('navigation', homeUri, 'iframe', group.uri);
+    appEvents.trigger('navigation', '/' + homeUri, 'iframe', group.uri);
   },
 
   toggleFavourite: function() {

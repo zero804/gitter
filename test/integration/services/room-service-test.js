@@ -134,7 +134,8 @@ describe('room-service', function() {
             ensureGroupForGitHubRoomCreation: function(pUser, options) {
               assert.strictEqual(pUser, fixture.user1);
               assert.deepEqual(options, {
-                uri: 'gitterTest'
+                uri: 'gitterTest',
+                useHomeUriSuffix: true
               });
               return Promise.resolve({ _id: groupId });
             }
@@ -986,7 +987,8 @@ describe('room-service', function() {
             ensureGroupForGitHubRoomCreation: function(pUser, options) {
               assert.strictEqual(pUser, fixture.user1);
               assert.deepEqual(options, {
-                uri: "gitterTest"
+                uri: "gitterTest",
+                useHomeUriSuffix: true
               });
               return Promise.resolve({ _id: groupId });
             }
@@ -1025,7 +1027,8 @@ describe('room-service', function() {
             ensureGroupForGitHubRoomCreation: function(pUser, options) {
               assert.strictEqual(pUser, fixture.user1);
               assert.deepEqual(options, {
-                uri: "gitterTest"
+                uri: "gitterTest",
+                useHomeUriSuffix: true
               });
               return Promise.resolve({ _id: groupId });
             }
