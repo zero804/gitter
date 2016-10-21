@@ -1,7 +1,6 @@
-"use strict";
+'use strict';
 
-var env = require('gitter-web-env');
-var nconf = env.config;
+var clientEnv = require('gitter-client-env');
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
 var avatars = require('gitter-web-avatars');
@@ -74,19 +73,29 @@ function getRooms(groupId, user, currentPage) {
     });
 }
 
-function getForumForGroup(forumId, userId) {
+function getForumForGroup(groupUri, forumId, userId) {
   return forumService.findById(forumId)
     .then(function(forum) {
       var strategy = restSerializer.ForumStrategy.nested({
+        groupUri: groupUri,
         currentUserId: userId,
         topicsFilterSort: getTopicsFilterSortOptions({
+          // TODO: Use a filter for created within the last week
           sort: 'likesTotal'
         }),
         topicsLimit: 3
       });
 
       return restSerializer.serializeObject(forum, strategy);
-    });
+    })
+    .then(function(serializedForum) {
+      serializedForum.topics = serializedForum.topics.map(function(topic) {
+        topic.url = clientEnv.basePath + '/' + groupUri + '/topics/topic/' + topic.id + '/' + topic.slug;
+        return topic;
+      })
+
+      return serializedForum;
+    })
 }
 
 function renderOrgPage(req, res, next) {
@@ -102,7 +111,7 @@ function renderOrgPage(req, res, next) {
     return Promise.join(
       serializeGroup(group, user),
       getRooms(groupId, user, currentPage),
-      getForumForGroup(group.forumId, user.id),
+      getForumForGroup(group.uri, group.forumId, user.id),
       contextGenerator.generateNonChatContext(req),
       policy.canAdmin(),
       function(serializedGroup, roomBrowseResult, serializedForum, troupeContext, isOrgAdmin) {
@@ -128,13 +137,16 @@ function renderOrgPage(req, res, next) {
         // This is used to track pageViews in mixpanel
         troupeContext.isCommunityPage = true;
 
-        var fullUri = nconf.get('web:basepath') + "/orgs/" + serializedGroup.uri + "/rooms";
+        var fullUri = clientEnv.basepath + '/orgs/' + serializedGroup.uri + '/rooms';
         var text = encodeURIComponent('Explore our chat community on Gitter:');
         var url = 'https://twitter.com/share?' +
           'text=' + text +
           '&url=' + fullUri +
           '&related=gitchat' +
           '&via=gitchat';
+
+        var topicsUrl = clientEnv.basepath + '/' + serializedGroup.uri + '/topics';
+        var createTopicUrl = clientEnv.basepath + '/' + serializedGroup.uri + '/topics/create-topic';
 
         res.render('org-page', {
           hasCachedFonts: fonts.hasCachedFonts(req.cookies),
@@ -147,6 +159,8 @@ function renderOrgPage(req, res, next) {
           group: serializedGroup,
           rooms: rooms,
           forum: serializedForum,
+          topicsUrl: topicsUrl,
+          createTopicUrl: createTopicUrl,
           troupeContext: troupeContext,
           pagination: {
             page: currentPage,

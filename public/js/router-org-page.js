@@ -48,8 +48,7 @@ onReady(function(){
   var Router = Backbone.Router.extend({
 
     routes: {
-      '': 'index',
-      'tags/:roomId': 'onNavigateTags'
+      '': 'index'
     },
 
     index: function(){
@@ -58,13 +57,6 @@ onReady(function(){
         //a user has added tags to a room
         //jp 3/9/15
         window.location.reload();
-    },
-
-    onNavigateTags: function(roomId){
-      require.ensure(['./views/modals/edit-tags-view'], function(require) {
-        var EditTagsView = require('./views/modals/edit-tags-view');
-        modalRegion.show(new EditTagsView({ roomId: roomId }));
-      });
     }
   });
 
