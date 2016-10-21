@@ -44,7 +44,7 @@
               See All Topics
             </a>
             <a
-              class="subdued-button-jaffa--small"
+              class="org-page__topic-list-heading-action-create subdued-button-jaffa--small"
               href="{{createTopicUrl}}"
               target="_top">
               Create Topic
@@ -56,22 +56,22 @@
           {{#each forum.topics}}
             <li class="org-page__topic-item">
               <a href="{{ url }}?source=orgpage" target="_parent" tabindex="-1" class="org-page__topic-item-heading-link">
-                <h3 class="org-page__room-item-heading">
+                <h3 class="org-page__topic-item-heading">
                   {{ title }}
                 </h3>
               </a>
-              <div class="org-page__room-item-description">
+              <div class="org-page__topic-item-description">
                 {{ body.text }}
               </div>
 
-              <ul class="org-page__room-item-people-list">
+              <ul class="org-page__topic-item-people-list">
                 {{#each replyingUsers}}
                   <li>
-                    <img class="org-page__room-item-people-list-item" {{{ avatarSrcSet avatarUrl 22 }}}>
+                    <img class="org-page__topic-item-people-list-item" {{{ avatarSrcSet avatarUrl 22 }}}>
                   </li>
                 {{/each}}
               </ul>
-              <div>
+              <div class="org-page__topic-item-details">
                 {{ repliesTotal }} {{pluralize repliesTotal 'Reply' 'Replies'}}
               </div>
             </li>
@@ -132,7 +132,7 @@
                 </li>
               {{/each}}
             </ul>
-            <div>
+            <div class="org-page__room-item-details">
               {{ userCount }} People
             </div>
           </li>
