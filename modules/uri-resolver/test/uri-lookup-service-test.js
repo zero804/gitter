@@ -61,7 +61,7 @@ describe('uri-lookup-service', function() {
   });
 
   it('should lookup groups', function() {
-    var uri = fixture.group1.uri;
+    var uri = fixture.group1.homeUri;
 
     return uriLookupService.lookupUri(uri)
       .then(function(uriLookup) {

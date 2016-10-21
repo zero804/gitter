@@ -20,7 +20,7 @@ var GroupSchema = new Schema({
 
 GroupSchema.schemaTypeName = 'GroupSchema';
 GroupSchema.index({ lcUri: 1 }, { unique: true });
-GroupSchema.index({ lcHomeUrl: 1 }, { unique: true, sparse: true });
+GroupSchema.index({ lcHomeUri: 1 }, { unique: true, sparse: true });
 GroupSchema.index({ forumId: 1 }, { unique: true, sparse: true });
 
 module.exports = {
