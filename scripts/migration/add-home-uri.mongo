@@ -1,8 +1,8 @@
 db.groups.aggregate([{
-  $match: {
-    homeUri: null
-  }
-}, {
+//   $match: {
+//     homeUri: null
+//   }
+// }, {
   $lookup: {
     from: "troupes",
     localField: "uri",
@@ -18,8 +18,7 @@ db.groups.aggregate([{
   var homeUri = doc.org_room ? doc.uri + '/home' : doc.uri;
   var lcHomeUri = homeUri.toLowerCase();
   db.groups.update({
-    _id: doc._id,
-    homeUri: null
+    _id: doc._id
   }, {
     $set: {
       homeUri: homeUri,
@@ -27,4 +26,5 @@ db.groups.aggregate([{
     }
   })
 
+  print(doc.uri + '\t' + homeUri);
 })
