@@ -8,6 +8,7 @@ var TopicStrategy = require('../topic-strategy');
 function TopicsForForumStrategy(options) {
   // TODO: default to default filter & sort options from somewhere?
   this.topicsFilterSort = options && options.topicsFilterSort;
+  this.limit = (options && options.limit) || -1;
 
   this.topicsByForum = null;
   this.topicStrategy = null;
@@ -15,7 +16,7 @@ function TopicsForForumStrategy(options) {
 
 TopicsForForumStrategy.prototype = {
   preload: function(forumIds) {
-    return topicService.findByForumIds(forumIds.toArray(), this.topicsFilterSort)
+    return topicService.findByForumIds(forumIds.toArray().slice(0, this.limit), this.topicsFilterSort)
       .bind(this)
       .then(function(topics) {
         this.topicsByForum = _.groupBy(topics, 'forumId');
@@ -29,9 +30,13 @@ TopicsForForumStrategy.prototype = {
 
     var topics = this.topicsByForum[forumId];
     if (!topics || !topics.length) return [];
+    var limitedTopics = topics;
+    if(this.limit > 0) {
+      limitedTopics = topics.slice(0, this.limit);
+    }
 
     var topicStrategy = this.topicStrategy;
-    return _.map(topics, function(topic) {
+    return _.map(limitedTopics, function(topic) {
       return topicStrategy.map(topic);
     })
   },
@@ -42,7 +47,8 @@ TopicsForForumStrategy.prototype = {
 
 TopicsForForumStrategy.standard = function(options) {
   var strategy = new TopicsForForumStrategy({
-    topicsFilterSort: options && options.topicsFilterSort
+    topicsFilterSort: options && options.topicsFilterSort,
+    limit: options && options.limit
   });
 
   var currentUserId = options && options.currentUserId;
