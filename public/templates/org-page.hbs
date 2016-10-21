@@ -39,14 +39,14 @@
           <div class="h3">
             <a
               class="secondary-button-jaffa--small"
-              href="{{socialUrl}}"
-              target="_blank">
+              href="{{topicsUrl}}"
+              target="_top">
               See All Topics
             </a>
             <a
               class="subdued-button-jaffa--small"
-              href="{{socialUrl}}"
-              target="_blank">
+              href="{{createTopicUrl}}"
+              target="_top">
               Create Topic
             </a>
           </div>
@@ -55,7 +55,7 @@
         <ul class="org-page__topic-list">
           {{#each forum.topics}}
             <li class="org-page__topic-item">
-              <a href="/{{ slug }}?source=orgpage" target="_parent" tabindex="-1" class="org-page__topic-item-heading-link">
+              <a href="{{ url }}?source=orgpage" target="_parent" tabindex="-1" class="org-page__topic-item-heading-link">
                 <h3 class="org-page__room-item-heading">
                   {{ title }}
                 </h3>
