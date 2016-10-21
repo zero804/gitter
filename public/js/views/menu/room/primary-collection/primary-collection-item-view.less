@@ -60,19 +60,19 @@ JP 11/2/16
   }
 
 
+  &:before {
+    content: '';
+    display: block;
+    width: 2px;
+    height: 25px;
+    background-color: @caribbean;
+    transition: transform .2s ease-in-out;
+    transform: translateX(-15px);
+  }
+
   &.active {
-
-    .room-item__avatar {
-      margin-left: .8rem;
-    }
-
     &:before {
-      content: '';
-      display: block;
-      width: 2px;
-      height: 25px;
-      background-color: @caribbean;
-      margin-left: 1.5rem;
+      transform: translateX(-2px);
     }
   }
 
@@ -89,7 +89,7 @@ JP 11/2/16
 }
 
 .room-item__avatar--show-more {
- .room-menu-avatar();
+  .room-menu-avatar();
   box-sizing:  border-box;
   margin-left: @desktop-menu-left-padding / 2;
   padding:     .7rem;
@@ -107,23 +107,23 @@ JP 11/2/16
 }
 
 .room-item__title-piece {
-	overflow: hidden;
-	min-width: 4ch;
+  overflow: hidden;
+  min-width: 4ch;
   max-width: 90%;
   max-width: calc(100% ~"-" 1ch);
-	flex-basis: auto;
-	flex-grow: 0;
-	flex-shrink: 1;
-	text-overflow: ellipsis;
+  flex-basis: auto;
+  flex-grow: 0;
+  flex-shrink: 1;
+  text-overflow: ellipsis;
 
-	transition: flex-shrink .2s ease;
+  transition: flex-shrink .2s ease;
 
   &:hover {
-	  flex-shrink: 0;
+    flex-shrink: 0;
   }
 
   &:not(:first-child):before {
-  	content: '/';
+    content: '/';
   }
 }
 
@@ -155,12 +155,12 @@ JP 11/2/16
   opacity: 1;
 
   transition:
-    visibility 0s ease 0s,
-    transform .2s cubic-bezier(1, 2.5, 0.5, 0.76),
-    margin-left .2s ease,
-    opacity .2s ease,
-    background-color .2s ease,
-    border-color .2s ease;
+  visibility 0s ease 0s,
+  transform .2s cubic-bezier(1, 2.5, 0.5, 0.76),
+  margin-left .2s ease,
+  opacity .2s ease,
+  background-color .2s ease,
+  border-color .2s ease;
 }
 
 .room-item__unread-indicator {
@@ -172,59 +172,59 @@ JP 11/2/16
 
   /* Slower transition back to hidden state
    * There is a faster transition in the reset, when they appear */
-  transition:
-    visibility 0s ease .4s,
-    transform .4s cubic-bezier(1, 2.5, 0.5, 0.76),
-    margin-left .4s ease,
-    opacity .4s ease,
-    background-color .2s ease,
-    border-color .2s ease;
+transition:
+visibility 0s ease .4s,
+transform .4s cubic-bezier(1, 2.5, 0.5, 0.76),
+margin-left .4s ease,
+opacity .4s ease,
+background-color .2s ease,
+border-color .2s ease;
 
-  &.has-unreads {
-    .unread-indicator(@menu-unread-badge-size);
-    .room-item__unread-indicator-visibile-reset();
+&.has-unreads {
+  .unread-indicator(@menu-unread-badge-size);
+  .room-item__unread-indicator-visibile-reset();
 
-    background-color: @caribbean;
+  background-color: @caribbean;
 
-    animation-name: unread-indicator-subtle-pulse-animation;
-    animation-duration: 2s;
-    animation-timing-function: ease;
+  animation-name: unread-indicator-subtle-pulse-animation;
+  animation-duration: 2s;
+  animation-timing-function: ease;
+}
+&.has-activity {
+  .unread-indicator(@menu-unread-badge-size / 3);
+  .room-item__unread-indicator-visibile-reset();
+
+  animation-name: unread-indicator-subtle-pulse-animation;
+  animation-duration: 2s;
+  animation-timing-function: ease;
+
+  &:before {
+    content: '';
+    box-sizing: border-box;
+    display: block;
+    width: 100%;
+    height: 100%;
+
+    border: 2px solid @caribbean;
+    border-radius: 100%;
   }
-  &.has-activity {
-    .unread-indicator(@menu-unread-badge-size / 3);
-    .room-item__unread-indicator-visibile-reset();
+}
+&.has-mentions {
+  .unread-indicator(@menu-unread-badge-size);
+  .room-item__unread-indicator-visibile-reset();
 
-    animation-name: unread-indicator-subtle-pulse-animation;
-    animation-duration: 2s;
-    animation-timing-function: ease;
+  background-color: @jaffa;
 
-    &:before {
-      content: '';
-      box-sizing: border-box;
-      display: block;
-      width: 100%;
-      height: 100%;
+  animation-name: mention-indicator-subtle-pulse-animation;
+  animation-duration: 2s;
+  animation-timing-function: ease;
 
-      border: 2px solid @caribbean;
-      border-radius: 100%;
-    }
+  &:before {
+    content: '@';
+    // The `@` character in this font is slightly not vertically centered
+    transform: translateY(-0.125em);
   }
-  &.has-mentions {
-    .unread-indicator(@menu-unread-badge-size);
-    .room-item__unread-indicator-visibile-reset();
-
-    background-color: @jaffa;
-
-    animation-name: mention-indicator-subtle-pulse-animation;
-    animation-duration: 2s;
-    animation-timing-function: ease;
-
-    &:before {
-      content: '@';
-      // The `@` character in this font is slightly not vertically centered
-      transform: translateY(-0.125em);
-    }
-  }
+}
 }
 
 .room-item__options {
