@@ -27,12 +27,11 @@ function discoverRoomUri(lcUri) {
 }
 
 function discoverGroupUri(lcUri) {
-  // Double-check the troupe and user tables to find this uri
-  var repoStyle = lcUri.indexOf('/') >= 0;
-
-  if (repoStyle) return null;
-
-  return persistence.Group.findOne({ lcUri: lcUri }, 'uri', { lean: true })
+  return persistence.Group.findOne({ lcHomeUri: lcUri }, {
+      homeUri: 1
+    }, {
+      lean: true
+    })
     .exec();
 }
 
@@ -47,7 +46,7 @@ function discoverUri(uri) {
     discoverRoomUri(lcUri),
     discoverGroupUri(lcUri),
     function(user, troupe, group) {
-      debug('Found user? %s found troupe? %s', !!user, !!troupe);
+      debug('Found user=%s troupe=%s group=%s', !!user, !!troupe, !!group);
 
       /* Found user. Add to cache and continue */
       if(user) {
@@ -59,7 +58,7 @@ function discoverUri(uri) {
       }
 
       if (group) {
-        return reserveUriForGroupId(group._id, group.uri);
+        return reserveUriForGroupId(group._id, group.homeUri);
       }
 
       /* Last ditch attempt. Look for a room that has been renamed */
@@ -106,6 +105,8 @@ function removeUsernameForUserId(userId) {
 }
 
 function reserveUriForUsername(userId, username) {
+  debug('Reserve URI: userId=%s, username=%s', userId, username);
+
   var lcUri = username.toLowerCase();
   userId = mongoUtils.asObjectID(userId);
 
@@ -139,6 +140,8 @@ function removeBadUri(uri) {
 }
 
 function reserveUriForTroupeId(troupeId, uri) {
+  debug('Reserve URI: troupeId=%s, uri=%s', troupeId, uri);
+
   var lcUri = uri.toLowerCase();
   troupeId = mongoUtils.asObjectID(troupeId);
 
@@ -165,6 +168,8 @@ function reserveUriForTroupeId(troupeId, uri) {
 }
 
 function reserveUriForGroupId(groupId, uri) {
+  debug('Reserve URI: groupId=%s, uri=%s', groupId, uri);
+
   var lcUri = uri.toLowerCase();
   groupId = mongoUtils.asObjectID(groupId);
 
