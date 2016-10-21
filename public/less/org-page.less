@@ -14,7 +14,8 @@
 @import "colors.less";
 @import "bootstrap/pagination";
 
-@mobileBreakPoint: 767px;
+@medium-breakpoint: 767px;
+@small-breakpoint: 600px;
 
 @subdued-border-color: fade(@dark, 20%);
 @subdued-text-color: fade(@dark, 40%);
@@ -76,7 +77,7 @@ body {
   padding: 0 3.25em-@excess-card-margin 3.25em 3.25em-@excess-card-margin;
   @excess-card-margin: 0.5em;
 
-  @media (max-width: @mobileBreakPoint) {
+  @media (max-width: @medium-breakpoint) {
     padding: 1em-@excess-card-margin;
   }
 }
@@ -123,6 +124,10 @@ body {
 .org-page__room-item-heading-link {
   flex-shrink: 0;
   width: 25%;
+
+  @media (max-width: @medium-breakpoint) {
+  width: 45%;
+  }
 }
 
 .org-page__room-item-heading {
@@ -167,14 +172,22 @@ body {
   color: @subdued-text-color;
   white-space: nowrap;
   text-overflow: ellipsis;
+
+  @media (max-width: @small-breakpoint) {
+    visibility: hidden;
+  }
 }
 
 .org-page__room-item__tag-list {
   overflow: hidden;
   flex: 1;
   display: flex;
-  margin-left: 0;
+  margin-left: 2rem;
   list-style: none;
+
+  @media (max-width: @medium-breakpoint) {
+    display: none;
+  }
 }
 
 .org-page__room-item__tag-item {
