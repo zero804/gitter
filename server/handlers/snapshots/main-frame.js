@@ -20,18 +20,9 @@ module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, group
   //Left menu state
   //------------------------------------------------------
   //Default new state is "All Conversations"
-  var menuState = lastLeftMenuSnapshot.state || 'all';
+  var menuState = 'all';
 
-  //It can be the case that a user has saved a state of temp-org
-  //if this is the case reset, it will be recalculated below
-  if(menuState === 'temp-org') { menuState = 'all'; }
-
-  //Switch anyone looking at an individual org state
-  //onto a group
-  if(menuState === 'org') { menuState = 'group'; }
-
-  // Try the suggested
-  // ex. If you are loading a home view then activate the search state
+  //If loading /home/explore use the state that has been passed through
   if(extras.suggestedMenuState) {
     menuState = extras.suggestedMenuState;
   }
