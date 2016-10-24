@@ -40,7 +40,7 @@ function sinceFilter(since) {
 /**
  * Item removed
  */
-var removeItem = Promise.method(function (troupeId, itemId) {
+function removeItem(troupeId, itemId) {
   if(!troupeId) throw new Error("removeItem failed. Troupe cannot be null");
   if(!itemId) throw new Error("removeItem failed. itemId cannot be null");
 
@@ -81,7 +81,9 @@ var removeItem = Promise.method(function (troupeId, itemId) {
         });
 
   });
-});
+}
+
+exports.removeItem = Promise.method(removeItem);
 
 /*
   This ensures that if all else fails, we clear out the unread items
@@ -440,7 +442,6 @@ exports.testOnly = {
   },
   getOldestId: getOldestId,
   sinceFilter: sinceFilter,
-  removeItem: removeItem,
   getTroupeIdsCausingBadgeCount: getTroupeIdsCausingBadgeCount,
   processResultsForNewItemWithMentions: processResultsForNewItemWithMentions
 };
