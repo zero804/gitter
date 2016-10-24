@@ -24,7 +24,7 @@ module.exports = BaseItemView.extend({
   },
 
   modelEvents: {
-    'change:unreadItems change:mentions change:activity': 'onUnreadUpdate',
+    //'change:unreadItems change:mentions change:activity': 'onUnreadUpdate',
     'change:active': 'onActiveStateUpdate',
     'change:allHidden': 'onAllRoomsHiddenUpdate'
   },
