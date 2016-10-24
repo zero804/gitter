@@ -2,7 +2,6 @@
 
 var roomContextService = require('../../services/room-context-service');
 var debug = require('debug')('gitter:app:uri-context-resolver-middleware');
-var StatusError = require('statuserror');
 
 function normaliseUrl(params) {
   if(params.roomPart3) {
