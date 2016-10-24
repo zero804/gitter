@@ -1,6 +1,7 @@
-@import "../../colors";
 @import (less, reference) "~gitter-styleguide/css/components/headings.css";
 @import (less, reference) "~gitter-styleguide/css/components/buttons.css";
+@import "../../colors";
+@import "../../break-points";
 
 .topic-header {
   display: flex;
@@ -24,6 +25,8 @@
   color: @topic-header-color;
   line-height: 1.1;
   font-weight: 100;
+
+  @media @only-small { font-size: 2.8rem; }
 }
 
 .topic-header__title-input {

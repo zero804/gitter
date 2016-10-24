@@ -116,7 +116,10 @@ function updateCategoryFields(categoryId, fields) {
     _id: categoryId
   };
   var update = {
-    $set: fields
+    $set: fields,
+    $inc: {
+      _tv: 1
+    }
   };
   return ForumCategory.findOneAndUpdate(query, update, { new: true })
     .lean()

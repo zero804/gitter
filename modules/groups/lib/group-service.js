@@ -45,13 +45,24 @@ function findByUri(uri) {
 function upsertGroup(user, groupInfo, securityDescriptor) {
   var uri = groupInfo.uri;
   var name = groupInfo.name || uri;
+  var homeUri;
+
+  if(groupInfo.useHomeUriSuffix) {
+    homeUri = uri + '/home';
+  } else {
+    homeUri = uri;
+  }
+
   var lcUri = uri.toLowerCase();
+  var lcHomeUri = homeUri.toLowerCase();
 
   return mongooseUtils.upsert(Group, { lcUri: lcUri }, {
       $setOnInsert: {
         name: name,
         uri: uri,
         lcUri: lcUri,
+        homeUri: homeUri,
+        lcHomeUri: lcHomeUri,
         sd: securityDescriptor
       }
     })
@@ -130,7 +141,8 @@ function ensureAccessAndFetchGroupInfo(user, options) {
         .then(function(securityDescriptor) {
           return [{
             name: name,
-            uri: uri
+            uri: uri,
+            useHomeUriSuffix: options.useHomeUriSuffix
           }, securityDescriptor];
         });
     });
@@ -167,6 +179,7 @@ function canUserAdminGroup(user, group, obtainAccessFromGitHubRepo) {
 function ensureGroupForGitHubRoomCreation(user, options) {
   var uri = options.uri;
   var name = options.name || uri;
+  var useHomeUriSuffix = options.useHomeUriSuffix;
   var obtainAccessFromGitHubRepo = options.obtainAccessFromGitHubRepo;
 
   debug('ensureGroupForGitHubRoomCreation: name=%s uri=%s obtainAccessFromGitHubRepo=%s', name, uri, obtainAccessFromGitHubRepo)
@@ -192,6 +205,7 @@ function ensureGroupForGitHubRoomCreation(user, options) {
         type: 'GH_GUESS', // how do we know if it is a GH_ORG or GH_USER? or GH_REPO?
         name: name,
         uri: uri,
+        useHomeUriSuffix: useHomeUriSuffix,
         linkPath: uri.split('/')[0], // does this make sense? or rather uri?
         obtainAccessFromGitHubRepo: obtainAccessFromGitHubRepo
       });
@@ -257,7 +271,6 @@ module.exports = {
   setAvatarForGroup: setAvatarForGroup,
   setForumForGroup: setForumForGroup,
   migration: {
-    upsertGroup: upsertGroup,
     ensureGroupForGitHubRoomCreation: ensureGroupForGitHubRoomCreation,
   }
 };
