@@ -109,10 +109,14 @@ var ChatCollection = LiveCollection.extend({
   },
 
   initialize: function() {
-    this.listenTo(this, 'add remove', function(model, collection) {
+    this.listenTo(this, 'add', function(model, collection) {
       collection.once('sort', function() {
         burstCalculator.calc.call(this, model);
       });
+    });
+
+    this.listenTo(this, 'remove', function() {
+      burstCalculator.parse(this);
     });
 
     this.listenTo(this, 'sync', function(model) {
