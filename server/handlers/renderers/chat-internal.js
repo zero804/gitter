@@ -19,11 +19,10 @@ var getHeaderViewOptions = require('gitter-web-shared/templates/get-header-view-
 var INITIAL_CHAT_COUNT = 50;
 var ROSTER_SIZE = 25;
 
-
 function renderChat(req, res, next, options) {
   var uriContext = options.uriContext;
 
-  var troupe = req.uriContext.troupe;
+  var troupe = uriContext.troupe;
   var aroundId = fixMongoIdQueryParam(req.query.at);
   var script = options.script;
   var user = req.user;
@@ -35,13 +34,12 @@ function renderChat(req, res, next, options) {
     var limit = unreadItems.chat.length > INITIAL_CHAT_COUNT ? unreadItems.chat.length + 20 : INITIAL_CHAT_COUNT;
 
     var snapshotOptions = {
-        limit: limit, //options.limit || INITIAL_CHAT_COUNT,
+      limit: limit,
       aroundId: aroundId,
       unread: options.unread // Unread can be true, false or undefined
     };
 
-    var chatSerializerOptions = _.defaults({
-    }, snapshotOptions);
+    var chatSerializerOptions = _.defaults({ }, snapshotOptions);
 
     var userSerializerOptions = _.defaults({
       lean: true,
@@ -57,16 +55,11 @@ function renderChat(req, res, next, options) {
       ]).spread(function (troupeContext, chats, activityEvents, users, rightToolbarSnapshot) {
         var initialChat = _.find(chats, function(chat) { return chat.initial; });
         var initialBottom = !initialChat;
-        var githubLink;
         var classNames = options.classNames || [];
         var isStaff = req.user && req.user.staff;
 
         var snapshots = rightToolbarSnapshot;
         troupeContext.snapshots = snapshots;
-
-        if(troupe.githubType === 'REPO' || troupe.githubType === 'ORG') {
-          githubLink = 'https://github.com/' + req.uriContext.uri;
-        }
 
         if (!user) classNames.push("logged-out");
 
@@ -99,8 +92,7 @@ function renderChat(req, res, next, options) {
             isRepo: troupe.sd.type === 'GH_REPO', // Used by chat_toolbar patial
             bootScriptName: script,
             cssFileName: cssFileName,
-            githubLink: githubLink,
-            troupeName: req.uriContext.uri,
+            troupeName: uriContext.uri,
             oneToOne: troupe.oneToOne, // Used by the old left menu
             user: user,
             troupeContext: troupeContext,
@@ -114,7 +106,7 @@ function renderChat(req, res, next, options) {
             hasHiddenMembers: troupe.userCount > 25,
             integrationsUrl: integrationsUrl,
             isMobile: options.isMobile,
-            roomMember: req.uriContext.roomMember,
+            roomMember: uriContext.roomMember,
             isRightToolbarPinned: isRightToolbarPinned,
 
             //Feature Switch Left Menu
