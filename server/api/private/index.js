@@ -128,4 +128,9 @@ router.post('/fp',
   identifyRoute('api-private-fp'),
   require('./fingerprint'));
 
+router.get(/\/resolve\/(.*)/,
+  authMiddleware,
+  identifyRoute('api-private-resolve'),
+  require('./resolve'));
+
 module.exports = router;

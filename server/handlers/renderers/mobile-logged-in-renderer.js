@@ -8,10 +8,6 @@ function renderPrimaryView(req, res, next, options) {
   var troupe = uriContext.troupe;
   var group = uriContext.group;
 
-  if (uriContext.ownUrl) {
-    return res.redirect('/home/explore');
-  }
-
   if (troupe) {
     // Rendering a chat room?
     return renderChat(req, res, next, {

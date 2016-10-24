@@ -33,10 +33,6 @@ var mainFrameMiddlewarePipeline = [
   function (req, res, next) {
     var uriContext = req.uriContext;
 
-    if (uriContext.ownUrl) {
-      return res.redirect('/home/explore');
-    }
-
     var renderer = selectRenderer(req);
 
     if (!renderer.hasSecondaryView()) {
