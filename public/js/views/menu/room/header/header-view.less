@@ -12,8 +12,11 @@
 
 .header-brand-container {
   position: relative;
+  display: flex;
+  align-items: center;
   height: 6.5rem;
   background-color: @header-base-bg-color;
+  padding-left: 2.5rem;
 
   &:after {
     content: '';
@@ -25,6 +28,12 @@
     height: 100%;
     background-color: @header-base-bg-color;
   }
+}
+
+.header-brand-container__logo {
+  width: 7rem;
+  height: auto;
+  opacity: .5;
 }
 
 .panel-header__avatar {
