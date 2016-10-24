@@ -101,10 +101,10 @@ describe('topics-live-collection #slow', function() {
       .then(checkEvent);
   });
 
-  it('should emit a patch event when adding a reply', function() {
+  it('should emit an update event when adding a reply', function() {
     var checkEvent = appEvents.addListener('dataChange2', {
       url: '/forums/' + fixture.forum1.id + '/topics',
-      operation: 'patch',
+      operation: 'update',
       type: 'topic',
       model: {
         id: fixture.topic1.id.toString(),
@@ -123,7 +123,7 @@ describe('topics-live-collection #slow', function() {
 
         return topicService.findById(fixture.topic1._id)
           .then(function(topic) {
-            // lastChanged must now match the one we got in the patch event.
+            // lastChanged must now match the one we got in the event.
             assert.ok(topic.lastChanged);
             var lastChanged = new Date(event.model.lastChanged);
             assert.strictEqual(topic.lastChanged.getTime(), lastChanged.getTime());
@@ -277,13 +277,13 @@ describe('topics-live-collection #slow', function() {
       .then(checkEvent);
   });
 
-  it('should emit a patch event when deleting a reply', function() {
+  it('should emit an update event when deleting a reply', function() {
     var topic = fixture.topic6;
     var reply = fixture.reply2;
 
     var checkEvent = appEvents.addListener('dataChange2', {
       url: '/forums/' + reply.forumId + '/topics',
-      operation: 'patch',
+      operation: 'update',
       type: 'topic',
       model: {
         id: topic.id.toString(),

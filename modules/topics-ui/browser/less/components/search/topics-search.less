@@ -1,6 +1,7 @@
-@import "../../colors.less";
 @import (less, reference) "~gitter-styleguide/css/components/headings.css";
 @import (less, reference) "~gitter-styleguide/css/components/buttons.css";
+
+@import "../../colors.less";
 @import "../../text";
 @import "../../break-points";
 
@@ -32,6 +33,8 @@
   &:hover {
     cursor: pointer;
   }
+
+  @media @only-small { font-size: 2.8rem; }
 }
 
 .topic-search__beta-decoration {
@@ -65,7 +68,11 @@
   &:extend(.subdued-button-clouds--small all);
   .topic-search-button();
 
-  @media @only-small { margin: 0; }
+  @media @only-small {
+    margin-left: auto;
+    padding-left: 1.5em;
+    padding-right: 1.5em;
+  }
 }
 
 .topic-search__watch-forum-button {

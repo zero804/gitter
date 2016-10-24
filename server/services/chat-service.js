@@ -13,7 +13,7 @@ var userService = require("./user-service");
 var processText = require('gitter-web-text-processor');
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
-var _ = require('underscore');
+var _ = require('lodash');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var groupResolver = require('./group-resolver');
 var chatSearchService = require('./chat-search-service');
@@ -35,6 +35,11 @@ var CURRENT_META_DATA_VERSION = markdownMajorVersion;
 // If you edit this, you need to update the client too.
 /* @const */
 var MAX_CHAT_EDIT_AGE_SECONDS = 600;
+
+/**
+ * Milliseconds considered 'recent'
+ */
+var RECENT_WINDOW_MILLISECONDS = 60 * 60 * 1000; // 1 hour
 
 var ObjectID = require('mongodb').ObjectID;
 
@@ -217,15 +222,27 @@ exports.newChatMessageToTroupe = function(troupe, user, data) {
 
 // Returns some recent public chats
 exports.getRecentPublicChats = function() {
-  var twentyFourHoursAgo = new Date(Date.now() - 86400000);
+  var minRecentTime = Date.now() - RECENT_WINDOW_MILLISECONDS;
+  var minId = mongoUtils.createIdForTimestamp(minRecentTime);
 
-  return ChatMessage
-            .where({ pub: true })
-            .where({ sent: { $gt: twentyFourHoursAgo} })
-            .sort({ _id: -1 })
-            .limit(100)
-            .exec();
+  var aggregation = [{
+    $match: {
+      _id: { $gt: minId },
+      pub: true
+    }
+  }, {
+    $sample: {
+      size: 100
+    }
+  }, {
+    $sort: {
+      _id: -1
+    }
+  }];
 
+  return ChatMessage.aggregate(aggregation)
+    .read(mongoReadPrefs.secondaryPreferred)
+    .exec();
 };
 
 /**
@@ -534,6 +551,16 @@ exports.removeAllMessagesForUserIdInRoomId = function(userId, roomId) {
       }, { concurrency: 1 });
     });
 };
+
+function deleteMessageFromRoom(troupeId, chatMessage) {
+  return unreadItemService.removeItem(troupeId, chatMessage._id)
+    .then(function() {
+      return chatMessage.remove();
+    })
+    .return(null);
+}
+exports.deleteMessageFromRoom = deleteMessageFromRoom;
+
 
 exports.testOnly = {
   setUseHints: function(value) {

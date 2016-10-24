@@ -1,9 +1,4 @@
 import React, { PropTypes } from 'react';
-import {dispatch} from '../../../dispatcher';
-import Container from '../container.jsx';
-import { SUBSCRIPTION_STATE_SUBSCRIBED, SUBSCRIPTION_STATE_UNSUBSCRIBED, SUBSCRIPTION_STATE_PENDING } from '../../../constants/forum.js';
-import requestUpdateForumSubscriptionState from '../../../action-creators/forum/request-update-forum-subscription-state';
-
 import SearchHeader from './search-header.jsx';
 
 export default React.createClass({
@@ -11,32 +6,17 @@ export default React.createClass({
   displayName: 'SearchHeaderContainer',
   propTypes: {
     groupUri: PropTypes.string.isRequired,
-    groupName: PropTypes.string,
-    subscriptionState: PropTypes.oneOf([
-      SUBSCRIPTION_STATE_SUBSCRIBED,
-      SUBSCRIPTION_STATE_UNSUBSCRIBED,
-      SUBSCRIPTION_STATE_PENDING
-    ]).isRequired
+    groupName: PropTypes.string
   },
 
   render(){
-    const {groupUri, groupName, subscriptionState } = this.props;
+    const {groupUri, groupName } = this.props;
 
     return (
       <SearchHeader
         groupUri={groupUri}
-        groupName={groupName}
-        subscriptionState={subscriptionState}
-        onSubscribeButtonClick={this.onSubscribeButtonClick}/>
+        groupName={groupName} />
     );
-  },
-
-
-  onSubscribeButtonClick() {
-    const {subscriptionState} = this.props;
-
-    const desiredIsSubscribed = (subscriptionState !== SUBSCRIPTION_STATE_SUBSCRIBED);
-    dispatch(requestUpdateForumSubscriptionState(desiredIsSubscribed));
   }
 
 });
