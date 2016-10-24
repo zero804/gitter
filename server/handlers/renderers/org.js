@@ -89,10 +89,12 @@ function getForumForGroup(groupUri, forumId, userId) {
       return restSerializer.serializeObject(forum, strategy);
     })
     .then(function(serializedForum) {
-      serializedForum.topics = serializedForum.topics.map(function(topic) {
-        topic.url = clientEnv.basePath + '/' + groupUri + '/topics/topic/' + topic.id + '/' + topic.slug;
-        return topic;
-      })
+      if(serializedForum && serializedForum.topics) {
+        serializedForum.topics = serializedForum.topics.map(function(topic) {
+          topic.url = clientEnv.basePath + '/' + groupUri + '/topics/topic/' + topic.id + '/' + topic.slug;
+          return topic;
+        });
+      }
 
       return serializedForum;
     })
