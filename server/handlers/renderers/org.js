@@ -81,7 +81,7 @@ function getForumForGroup(groupUri, forumId, userId) {
         currentUserId: userId,
         topicsFilterSort: getTopicsFilterSortOptions({
           // TODO: Use a filter for created within the last week
-          sort: 'likesTotal',
+          sort: '-likesTotal',
           limit: 3
         })
       });
@@ -126,7 +126,8 @@ function renderOrgPage(req, res, next) {
         var pageCount = Math.ceil(roomCount / ROOMS_PER_PAGE);
         var rooms = roomBrowseResult.results.map(function(room) {
           var result = generateRoomCardContext(room, {
-            isStaff: editAccess
+            isStaff: editAccess,
+            stripGroupName: true
           });
 
           // No idea why this is called `isStaff`
@@ -138,11 +139,11 @@ function renderOrgPage(req, res, next) {
         // This is used to track pageViews in mixpanel
         troupeContext.isCommunityPage = true;
 
-        var fullUri = clientEnv.basePath + '/orgs/' + serializedGroup.uri + '/rooms';
+        var fullUrl = clientEnv.basePath + '/orgs/' + serializedGroup.uri + '/rooms';
         var text = encodeURIComponent('Explore our chat community on Gitter:');
         var url = 'https://twitter.com/share?' +
           'text=' + text +
-          '&url=' + fullUri +
+          '&url=' + fullUrl +
           '&related=gitchat' +
           '&via=gitchat';
 
@@ -155,6 +156,7 @@ function renderOrgPage(req, res, next) {
           socialUrl: url,
           isLoggedIn: !!req.user,
           exploreBaseUrl: '/home/~explore',
+          orgDirectoryUrl: fullUrl,
           roomCount: roomCount,
           orgUserCount: orgUserCount,
           group: serializedGroup,
