@@ -18,9 +18,10 @@
 @small-breakpoint: 600px;
 @xsmall-breakpoint: 400px;
 
+@tag-vertical-padding: .75rem;
+
 @subdued-border-color: fade(@dark, 20%);
 @subdued-text-color: fade(@dark, 40%);
-
 
 
 html {
@@ -91,12 +92,14 @@ body {
 .org-page__room-list-header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
 
   color: @subdued-text-color;
 }
 
 .org-page__room-list-heading {
-  margin-bottom: 2rem;
+
 }
 
 .org-page__room-list-heading-info-item {
@@ -144,6 +147,7 @@ body {
   display: flex;
   align-items: center;
 
+  font-size: 1.1em;
   white-space: nowrap;
 }
 
@@ -191,6 +195,9 @@ body {
   overflow: hidden;
   flex: 1;
   display: flex;
+  flex-wrap: wrap;
+  height: calc(1em ~"+" (2 * @tag-vertical-padding));
+
   margin-left: 2rem;
   list-style: none;
 
@@ -202,7 +209,7 @@ body {
 .org-page__room-item__tag-item {
   display: block;
   margin-right: 1rem;
-  padding: .75rem 2rem;
+  padding: @tag-vertical-padding 2rem;
   background-color: @pampas;
   border-radius: .4rem;
 
