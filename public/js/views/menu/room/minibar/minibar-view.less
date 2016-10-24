@@ -128,10 +128,29 @@
 
 }
 
-.room-menu-options__item--all {
+.room-menu-options__item--header-spacer {
   .room-menu-options__item();
   position:   fixed;
   top:        0;
+  left:       0;
+  background-color: @header-base-bg-color;
+
+  &:after {
+    content: '';
+    display: block;
+    width: 2px;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    right: -1px;
+    background-color: @header-base-bg-color;
+  }
+}
+
+.room-menu-options__item--all {
+  .room-menu-options__item();
+  position:   fixed;
+  top:        @desktop-header-height;
   left:       0;
   color:      @ruby;
 
@@ -144,7 +163,7 @@
 .room-menu-options__item--search {
   .room-menu-options__item();
   position:   fixed;
-  top:        @desktop-header-height;
+  top:        @desktop-header-height * 2;
   left:       0;
   color:      @jaffa;
 
@@ -156,7 +175,7 @@
 .room-menu-options__item--people {
   .room-menu-options__item();
   position:   fixed;
-  top:        @desktop-header-height * 2;
+  top:        @desktop-header-height * 3;
   left:       0;
   color:      @people-bg;
 
@@ -168,39 +187,13 @@
 .room-menu-options__item--groups {
   .room-menu-options__item();
   position:   fixed;
-  top:        @desktop-header-height * 3;
+  top:        @desktop-header-height * 4;
   left:       0;
   color:      @caribbean;
 
   &:before {
     background: @caribbean;
   }
-}
-
-.room-menu-options__item--favourite {
-  .room-menu-options__item();
-
-  position:   fixed;
-  top:        @desktop-header-height * 2;
-  left:       0;
-
-  //Replace with class
-  & img {
-    transition: transform .2s linear;
-  }
-
-  &.dropped {
-    & img {
-      transform: rotate(90deg) scale(1.5);
-    }
-  }
-
-  //This is here because of a dragula bug JP 25/1/16
-  & .room-item, & .room-item--one2one, & .room-item--favourite {
-    display:  none;
-  }
-
-  color: @caribbean;
 }
 
 .room-menu-options__item--org {
