@@ -31,6 +31,12 @@ var mainFrameMiddlewarePipeline = [
   isPhoneMiddleware,
   timezoneMiddleware,
   function (req, res, next) {
+    var uriContext = req.uriContext;
+
+    if (uriContext.ownUrl) {
+      return res.redirect('/home/explore');
+    }
+
     var renderer = selectRenderer(req);
 
     if (!renderer.hasSecondaryView()) {
@@ -40,7 +46,7 @@ var mainFrameMiddlewarePipeline = [
     }
 
     return renderer.renderPrimaryView(req, res, next, {
-      uriContext: req.uriContext
+      uriContext: uriContext
     });
   },
   redirectErrorMiddleware
