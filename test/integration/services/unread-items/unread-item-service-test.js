@@ -212,7 +212,7 @@ describe('unread-item-service', function() {
 
         mockito.when(roomMembershipServiceMock).findMembersForRoomWithLurk(troupeId1).thenReturn(Promise.resolve(usersWithLurkHash));
 
-        return unreadItemService.testOnly.removeItem(troupeId1, chatId)
+        return unreadItemService.removeItem(troupeId1, chatId)
           .then(function() {
             // Two calls here, not three
             mockito.verify(appEvents, once).unreadItemsRemoved(userId1, troupeId1);
