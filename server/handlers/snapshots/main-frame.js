@@ -45,14 +45,8 @@ module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, group
 
   // But if we find something later, let's use it instead
   if(currentRoom && currentRoom.groupId && !hasJoinedRoom && !hasJoinedGroup) {
-    menuState = 'temp-org';
-    tempOrg = {
-      name: getOrgNameFromUri(currentRoom.uri),
-      avatarUrl: avatars.getForGroupId(currentRoom.groupId),
-      type: 'org',
-      active: true,
-      hidden: false
-    };
+    menuState = 'org';
+    groupId = currentRoom.groupId;
   }
 
   var roomMenuIsPinned = true;
