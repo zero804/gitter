@@ -22,20 +22,6 @@
     & > *:not(.notification-center) { opacity: 1; }
   }
 
-  //Right hand border
-  &:after {
-    content:  ' ';
-    display:  inline-block;
-    position: absolute;
-    top:      @desktop-header-height;
-    right:    0;
-    width:    @left-menu-panel-border-width;
-    height:   100%;
-    background-color: transparent;
-    transition: background-color .2s liner;
-    pointer-events: none;
-  }
-
   .mobile & {
     width: @menu-panel-mobile-width;
     padding-bottom: @mobile-header-height;
