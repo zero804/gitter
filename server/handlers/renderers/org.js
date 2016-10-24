@@ -111,7 +111,7 @@ function renderOrgPage(req, res, next) {
     return Promise.join(
       serializeGroup(group, user),
       getRooms(groupId, user, currentPage),
-      getForumForGroup(group.uri, group.forumId, user.id),
+      getForumForGroup(group.uri, group.forumId, user && user.id),
       contextGenerator.generateNonChatContext(req),
       policy.canAdmin(),
       function(serializedGroup, roomBrowseResult, serializedForum, troupeContext, isOrgAdmin) {
