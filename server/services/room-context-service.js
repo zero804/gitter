@@ -53,9 +53,10 @@ function findContextForUri(user, uri, options) {
         }
 
         if(mongoUtils.objectIDsEqual(resolvedUser.id, userId)) {
-          var redirect = new StatusError(301);
-          redirect.path = '/home/explore'; // TODO: is this a good idea??
-          throw redirect;
+          return {
+            uri: resolvedUser.username,
+            ownUrl: true
+          };
         }
 
         debug("localUriLookup returned user for uri=%s. Finding or creating one-to-one", uri);
@@ -125,7 +126,7 @@ function findContextForUri(user, uri, options) {
                 return {
                   group: resolvedGroup,
                   policy: policy,
-                  uri: resolvedGroup.uri
+                  uri: resolvedGroup.homeUri
                 };
               })
           });
