@@ -155,6 +155,7 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
   },
 
   _initNano: _.debounce(function () {
+    /*
     var params = {
       sliderMaxHeight: 100,
       iOSNativeScrolling: true,
@@ -183,6 +184,7 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
         }
       }.bind(this));
     }.bind(this));
+    */
   }, 500),
 
   onDestroy: function() {
