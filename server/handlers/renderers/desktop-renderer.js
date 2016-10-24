@@ -40,10 +40,6 @@ function renderPrimaryView(req, res, next, options) {
   var troupe = uriContext.troupe;
   var group = uriContext.group;
 
-  if (uriContext.ownUrl) {
-    return res.redirect('/home/explore');
-  }
-
   // Chat room?
   if (troupe) {
     // Load the main-frame
@@ -74,7 +70,7 @@ function renderPrimaryView(req, res, next, options) {
     // Rendering a group home?
 
     var groupSubFrameLocation = url.format({
-      pathname: '/orgs/' + group.uri + '/rooms/~iframe',
+      pathname: '/' + uriContext.uri + '/~iframe',
       hash:     '#initial'
     });
 
