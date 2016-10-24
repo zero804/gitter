@@ -138,7 +138,7 @@ function renderOrgPage(req, res, next) {
         // This is used to track pageViews in mixpanel
         troupeContext.isCommunityPage = true;
 
-        var fullUri = clientEnv.basepath + '/orgs/' + serializedGroup.uri + '/rooms';
+        var fullUri = clientEnv.basePath + '/orgs/' + serializedGroup.uri + '/rooms';
         var text = encodeURIComponent('Explore our chat community on Gitter:');
         var url = 'https://twitter.com/share?' +
           'text=' + text +
@@ -146,8 +146,8 @@ function renderOrgPage(req, res, next) {
           '&related=gitchat' +
           '&via=gitchat';
 
-        var topicsUrl = clientEnv.basepath + '/' + serializedGroup.uri + '/topics';
-        var createTopicUrl = clientEnv.basepath + '/' + serializedGroup.uri + '/topics/create-topic';
+        var topicsUrl = clientEnv.basePath + '/' + serializedGroup.uri + '/topics';
+        var createTopicUrl = clientEnv.basePath + '/' + serializedGroup.uri + '/topics/create-topic';
 
         res.render('org-page', {
           hasCachedFonts: fonts.hasCachedFonts(req.cookies),
