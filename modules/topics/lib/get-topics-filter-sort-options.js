@@ -108,7 +108,9 @@ function getTopicsFilterSortOptions(query) {
     // other things.
   });
 
-  var options = {}
+  var options = {
+    limit: query.limit
+  };
   if (filter) options.filter = filter;
   if (sort) options.sort = sort;
   return options;

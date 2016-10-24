@@ -115,8 +115,7 @@ ForumStrategy.nested = function(options) {
 
   strategy.topicsForForumStrategy = TopicsForForumStrategy.standard({
     currentUserId: currentUserId,
-    topicsFilterSort: options && options.topicsFilterSort,
-    limit: options.topicsLimit
+    topicsFilterSort: options && options.topicsFilterSort
   });
 
   return strategy;

@@ -131,12 +131,14 @@ function findByForumId(forumId, options) {
         // TODO: kinda useless without being able to the filter at some value
         // (before id, after id..) and it should probably be configurable up to
         // a limit, but this should do for now.
-        .limit(TOPIC_RESULT_LIMIT)
+        .limit(options.limit || TOPIC_RESULT_LIMIT)
         .lean()
         .exec();
     });
 }
 
+// Note: This is intended for a single forum because
+// it limits topics across all of them instead of for each one
 function findByForumIds(forumIds, options) {
   if (!forumIds.length) return [];
 
@@ -158,7 +160,7 @@ function findByForumIds(forumIds, options) {
       return Topic.find(query)
         .sort(sort)
         // TODO: same as above
-        .limit(TOPIC_RESULT_LIMIT)
+        .limit(options.limit || TOPIC_RESULT_LIMIT)
         .lean()
         .exec();
     });
