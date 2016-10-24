@@ -66,7 +66,7 @@ function main(uri, dryRun) {
           return Promise.map(missingIds, function(itemId) {
             console.log('REMOVING ', itemId);
             // Remove the items, slowly
-            return unreadItemService.testOnly.removeItem(room.id, itemId)
+            return unreadItemService.removeItem(room.id, itemId)
               .delay(10);
           }, { concurrency: 1 });
         });
