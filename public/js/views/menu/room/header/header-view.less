@@ -8,6 +8,17 @@
   min-height: 6.5rem;
   background: @header-base-bg-color;
   text-align: left;
+
+  &:after {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    right: -1px;
+    width: 2px;
+    height: 100%;
+    background-color: @header-base-bg-color;
+  }
 }
 
 .panel-header__avatar {
