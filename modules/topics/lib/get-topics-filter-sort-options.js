@@ -108,11 +108,10 @@ function getTopicsFilterSortOptions(query) {
     // other things.
   });
 
-  var options = {
-    limit: query.limit
-  };
+  var options = {};
   if (filter) options.filter = filter;
   if (sort) options.sort = sort;
+  if(query.limit) options.limit = query.limit;
   return options;
 }
 
