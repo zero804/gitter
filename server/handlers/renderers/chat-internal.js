@@ -20,7 +20,9 @@ var INITIAL_CHAT_COUNT = 50;
 var ROSTER_SIZE = 25;
 
 
-function renderChat(req, res, options, next) {
+function renderChat(req, res, next, options) {
+  var uriContext = options.uriContext;
+
   var troupe = req.uriContext.troupe;
   var aroundId = fixMongoIdQueryParam(req.query.at);
   var script = options.script;

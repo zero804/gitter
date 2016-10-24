@@ -8,50 +8,48 @@ var renderChat = require('./chat-internal');
 function renderChatPage(req, res, next) {
   var scriptName = 'router-chat';
 
-  return renderChat(req, res, {
+  return renderChat(req, res, next, {
+    uriContext: req.uriContext,
     template: 'chat-template',
     script: scriptName
-  }, next);
+  });
 }
 
 function renderMobileChat(req, res, next) {
-  return renderChat(req, res, {
+  return renderChat(req, res, next, {
+    uriContext: req.uriContext,
     template: 'mobile/mobile-chat',
     script: 'mobile-chat',
     isMobile: true
-  }, next);
-}
-
-function renderMobileNativeEmbeddedChat(req, res) {
-  res.render('mobile/native-embedded-chat-app', {
-    isMobile: true,
-    troupeContext: {}
   });
 }
 
 function renderMobileNotLoggedInChat(req, res, next) {
-  return renderChat(req, res, {
+  return renderChat(req, res, next, {
+    uriContext: req.uriContext,
     template: 'mobile/mobile-nli-chat',
     script: 'mobile-nli-chat',
     unread: false, // Not logged in users see chats as read
     fetchEvents: false,
     fetchUsers: false,
     isMobile: true
-  }, next);
+  });
 }
 
 function renderNotLoggedInChatPage(req, res, next) {
-  return renderChat(req, res, {
+  return renderChat(req, res, next, {
+    uriContext: req.uriContext,
     template: 'chat-nli-template',
     script: 'router-nli-chat',
     unread: false // Not logged in users see chats as read
-  }, next);
+  });
 }
 
 function renderEmbeddedChat(req, res, next) {
   roomMembershipService.countMembersInRoom(req.troupe._id)
     .then(function(userCount) {
-      return renderChat(req, res, {
+      return renderChat(req, res, next, {
+        uriContext: req.uriContext,
         template: 'chat-embed-template',
         script: 'router-embed-chat',
         classNames: [ 'embedded' ],
@@ -60,7 +58,7 @@ function renderEmbeddedChat(req, res, next) {
         extras: {
           usersOnline: userCount
         }
-      }, next);
+      });
     })
     .catch(next);
 }
@@ -68,7 +66,8 @@ function renderEmbeddedChat(req, res, next) {
 function renderNotLoggedInEmbeddedChat(req, res, next) {
   roomMembershipService.countMembersInRoom(req.troupe._id)
     .then(function(userCount) {
-      return renderChat(req, res, {
+      return renderChat(req, res, next, {
+        uriContext: req.uriContext,
         template: 'chat-nli-embed-template',
         script: 'router-nli-embed-chat',
         unread: false, // Embedded users see chats as read
@@ -78,7 +77,7 @@ function renderNotLoggedInEmbeddedChat(req, res, next) {
         extras: {
           usersOnline: userCount
         }
-      }, next);
+      });
     })
     .catch(next);
 }
@@ -88,7 +87,8 @@ function renderChatCard(req, res, next) {
   if (!req.query.at) return next(400);
   var aroundId = req.query.at;
 
-  return renderChat(req, res, {
+  return renderChat(req, res, next, {
+    uriContext: req.uriContext,
     limit: 20,
     template: 'chat-card-template',
     stylesheet: 'chat-card',
@@ -106,9 +106,8 @@ function renderChatCard(req, res, next) {
       var burstChats = isolateBurst(chats, permalinkedChat);
       return burstChats;
     }
-  }, next);
+  });
 }
-
 
 module.exports = exports = {
   renderChatPage: renderChatPage,
@@ -118,5 +117,4 @@ module.exports = exports = {
   renderChatCard: renderChatCard,
   renderMobileNotLoggedInChat: renderMobileNotLoggedInChat,
   renderNotLoggedInChatPage: renderNotLoggedInChatPage,
-  renderMobileNativeEmbeddedChat: renderMobileNativeEmbeddedChat
 };
