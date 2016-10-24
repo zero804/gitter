@@ -81,9 +81,9 @@ function getForumForGroup(groupUri, forumId, userId) {
         currentUserId: userId,
         topicsFilterSort: getTopicsFilterSortOptions({
           // TODO: Use a filter for created within the last week
-          sort: 'likesTotal'
-        }),
-        topicsLimit: 3
+          sort: 'likesTotal',
+          limit: 3
+        })
       });
 
       return restSerializer.serializeObject(forum, strategy);
