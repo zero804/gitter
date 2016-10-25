@@ -75,9 +75,17 @@ JP 11/2/16
   z-index: 0;
 
   //This is so gross I want to cry...
-  .room-menu__panel.org & {
+  .room-menu__panel.org .room-item--favourite &,
+  .room-menu__panel.org .room-item--favourite-one2one & {
     visibility: hidden;
     width: .5rem;
+  }
+
+  .room-menu__panel.org .room-item &,
+  .room-menu__panel.org .room-item--one2one & {
+    visibility: hidden;
+    width: 0;
+    margin-left: .5rem;
   }
 
 }
