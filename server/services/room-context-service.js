@@ -92,7 +92,7 @@ function findContextForUri(user, uri, options) {
                       .then(function(group) {
                         if (group && group.homeUri) {
                           var err = new StatusError(301);
-                          err.path = group && group.homeUri;
+                          err.path = '/' + group.homeUri;
                           throw err;
                         }
 
