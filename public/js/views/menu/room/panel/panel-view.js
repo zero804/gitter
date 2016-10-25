@@ -15,6 +15,7 @@ var TopicsAreaView = require('../topics-area/topics-area-view');
 var SearchInputView = require('../../../menu/room/search-input/search-input-view');
 var NeverEndingStory = require('../../../../utils/never-ending-story');
 var GroupBackControl = require('../group-back-control/group-back-control-view');
+var GroupHomeView = require('../group-home-control/group-home-control-view');
 
 require('../../../behaviors/isomorphic');
 
@@ -29,6 +30,7 @@ var PanelView = Marionette.LayoutView.extend({
       searchInput:         { el: '#search-input', init: 'initSearchInput' },
       favouriteCollection: { el: '#favourite-collection', init: 'initFavouriteCollection' },
       primaryCollection:   { el: '#primary-collection', init: 'initPrimaryCollection' },
+      groupHomeControl:    { el: '#group-home-button', init: 'initGroupHomeControl' },
       secondaryCollection: { el: '#secondary-collection', init: 'initSecondaryCollection' },
       teritaryCollection:  { el: '#tertiary-collection', init: 'initTertiaryCollection' },
       footer:              { el: '#panel-footer', init: 'initFooter' },
@@ -88,6 +90,13 @@ var PanelView = Marionette.LayoutView.extend({
       dndCtrl:        this.dndCtrl,
       roomCollection: this.model._roomCollection,
       groupsCollection: this.model.groupsCollection,
+    }));
+  },
+
+  initGroupHomeControl: function(optionsForRegion){
+    return new GroupHomeView(optionsForRegion({
+      groupsCollection: this.model.groupsCollection,
+      model: this.model
     }));
   },
 

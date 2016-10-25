@@ -96,6 +96,9 @@
                   <h2 class="collection__title hidden" id="collection-header-text">Rooms &amp; People</h2>
                   <i id="dismiss-suggestion" class="icon-cancel-circle collection-header__dismiss-suggestion hidden"></i>
                 </header>
+
+                <div class="group-home-button" id="group-home-button"></div>
+
                 <div id="collection-list" class="collection-list--primary">
                   {{#each troupeContext.snapshots.rooms}}
                     <div class="{{#if isNotOneToOne}}room-item{{else}}room-item--one2one{{/if}} {{#if isHidden}}hidden{{/if}}" id="{{id}}"  data-id="{{id}}">
