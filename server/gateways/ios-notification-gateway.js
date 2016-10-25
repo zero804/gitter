@@ -156,9 +156,16 @@ function createAppleNotification(notification, badge) {
     note.sound = sound;
   }
 
+  note.payload = {
+    aps: {
+      "content-available": 1
+    }
+  };
+
   if(link) {
-    note.payload = { 'l': link };
+    note.payload['l'] = link;
   }
+
   return note;
 }
 
