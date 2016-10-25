@@ -97,8 +97,6 @@ function updateRepliesTotal(topicId) {
 
   var now = new Date();
   var nowTime = now.getTime();
-  var nowString = now.toISOString();
-
 
   return findTotalByTopicId(topicId)
     .bind({
@@ -143,6 +141,8 @@ function updateRepliesTotal(topicId) {
       // replyingUsers will go out. replyingUsers requires serializers which
       // aren't available from here anyway.
       liveCollections.topics.emit('update', topic);
+
+      return null;
     })
     .then(function() {
       // return the topic that got updated (if it was updated).

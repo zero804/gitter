@@ -410,7 +410,7 @@ function deleteMessageFromRoomAllowSender(chatMessage) {
  * Delete a message, if it's your own or you're a room admin
  */
 RoomWithPolicyService.prototype.deleteMessageFromRoom = secureMethod([deleteMessageFromRoomEnsureRoomMatch, allowAdmin, deleteMessageFromRoomAllowSender], function(chatMessage) {
-  return chatService.deleteMessageFromRoom(this.room._id, chatMessage);
+  return chatService.deleteMessageFromRoom(this.room, chatMessage);
 });
 
 module.exports = RoomWithPolicyService;
