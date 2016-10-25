@@ -6,12 +6,13 @@ var cypher = require("cypher-promise");
 var neo4jClient = cypher(env.config.get('neo4j:endpoint'));
 var debug = require('debug')('gitter:app:graph-suggestions');
 var _ = require('lodash');
+var Promise = require('bluebird');
 
 function query(text, params) {
   debug("neo4j query: %s %j", text, params);
   var start = Date.now();
 
-  return neo4jClient.query(text, params)
+  return Promise.resolve(neo4jClient.query(text, params))
     .then(function(response) {
       stats.responseTime('suggestions.graph.query', Date.now() - start);
       debug("Neo4j response: %j", response);
