@@ -146,7 +146,8 @@ var PanelView = Marionette.LayoutView.extend({
   modelEvents: {
     'change:panelOpenState':       'onPanelOpenStateChange',
     'primary-collection:snapshot': 'onPrimaryCollectionSnapshot',
-    'change:profileMenuOpenState': 'onProfileToggle'
+    'change:profileMenuOpenState': 'onProfileToggle',
+    'change:state': 'onModelChanegState'
   },
 
   childEvents: {
@@ -237,6 +238,16 @@ var PanelView = Marionette.LayoutView.extend({
   onDestroy: function() {
     this.stopListening(this.bus);
   },
+
+  onModelChanegState: function(){
+    var state = this.model.get('state');
+    toggleClass(this.el, 'all', state === 'all');
+    toggleClass(this.el, 'search', state === 'search');
+    toggleClass(this.el, 'people', state === 'people');
+    toggleClass(this.el, 'group', state === 'group');
+    toggleClass(this.el, 'org', state === 'org');
+    console.log(this.el);
+  }
 });
 
 
