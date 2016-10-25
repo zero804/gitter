@@ -12,8 +12,8 @@ function uriContextAsBrowserState(uriContext) {
   if (troupe) {
     return {
       uri: uriContext.uri,
-      type: 'chat',
-      troupeId: troupe.id
+      type: 'room',
+      roomId: troupe.id
     }
   }
 
