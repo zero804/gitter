@@ -11,8 +11,6 @@ var Promise = require('bluebird');
 var shutdown = require('shutdown');
 var es = require('event-stream');
 
-// require('../../server/event-listeners').install();
-
 var opts = require('yargs')
   .option('room', {
     alias: 'r',
