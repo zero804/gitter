@@ -9,13 +9,13 @@ var appEvents = require('gitter-web-appevents');
 var createDistribution = require('./create-distribution');
 var engine = require('./engine');
 var readByService = require("../readby-service");
-var roomMembershipService = require('../room-membership-service');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var RedisBatcher = require('../../utils/redis-batcher').RedisBatcher;
 var recentRoomCore = require('../core/recent-room-core');
 var debug = require('debug')('gitter:app:unread-items:service');
 var badgeBatcher = new RedisBatcher('badge', 1000, batchBadgeUpdates);
 var distributionDelta = require('./distribution-delta');
+var assert = require('assert');
 
 /* Handles batching badge updates to users */
 function batchBadgeUpdates(key, userIds, done) {
@@ -37,51 +37,62 @@ function sinceFilter(since) {
   };
 }
 
+
 /**
  * Item removed
  */
-var removeItem = Promise.method(function (troupeId, itemId) {
-  if(!troupeId) throw new Error("removeItem failed. Troupe cannot be null");
-  if(!itemId) throw new Error("removeItem failed. itemId cannot be null");
+function removeItem(fromUserId, troupe, chat) {
+  assert(fromUserId, 'fromUserId required');
+  assert(troupe, 'troupe required');
+  assert(chat, 'chat required');
 
-  return roomMembershipService.findMembersForRoomWithLurk(troupeId)
-    .then(function(userIdsWithLurk) {
-      var userIds = Object.keys(userIdsWithLurk);
+  return createDistribution(fromUserId, troupe, chat.mentions)
+    .bind({
+      distribution: null,
+      chatId: chat.id,
+      troupeId: troupe.id
+    })
+    .then(function(distribution) {
+      this.distribution = distribution;
+      var userIdsForRemove = distribution.getEngineRemoveUserIds();
 
-      // Publish out an unread item removed event
-      var data = { chat: [itemId] };
+      return engine.removeItem(this.troupeId, this.chatId, userIdsForRemove);
+    })
+    .then(function(results) {
+      var distribution = this.distribution;
+      var resultsDistribution = distribution.resultsProcessorForUpdate(results);
+      var troupeId = this.troupeId;
 
-      userIds.forEach(function(userId) {
-        appEvents.unreadItemsRemoved(userId, troupeId, data);
-      });
-
-      var userIdsForNotify = userIds.filter(function(u) {
-        return !userIdsWithLurk[u];
-      });
-
-      return engine.removeItem(troupeId, itemId, userIdsForNotify)
-        .then(function(removeResults) {
-          removeResults.forEach(function(removeResult) {
-
-            if(removeResult.unreadCount >= 0 || removeResult.mentionCount >= 0) {
-              appEvents.troupeUnreadCountsChange({
-                userId: removeResult.userId,
-                troupeId: troupeId,
-                total: removeResult.unreadCount,
-                mentions: removeResult.mentionCount
-              });
-            }
-
-            if (removeResult.badgeUpdate) {
-              queueBadgeUpdateForUser(removeResult.userId);
-            }
-
-          });
-
+      var newUnreadItemNoMention = { chat: [this.chatId] };
+      resultsDistribution.getNewUnreadWithoutMention()
+        .forEach(function(userId) {
+          appEvents.unreadItemsRemoved(userId, troupeId, newUnreadItemNoMention);
         });
 
-  });
-});
+      var newUnreadItemWithMention = { chat: [this.chatId], mention: [this.chatId] };
+      resultsDistribution.getNewUnreadWithMention()
+        .forEach(function(userId) {
+          appEvents.unreadItemsRemoved(userId, troupeId, newUnreadItemWithMention);
+        });
+
+      resultsDistribution.getTroupeUnreadCountsChange()
+        .forEach(function(update) {
+          appEvents.troupeUnreadCountsChange({
+            userId: update.userId,
+            troupeId: troupeId,
+            total: update.total,
+            mentions: update.mentions
+          });
+        });
+
+      withSequence(resultsDistribution.getBadgeUpdates(), function(userIds) {
+        queueBadgeUpdateForUser(userIds);
+      });
+    });
+
+}
+
+exports.removeItem = Promise.method(removeItem);
 
 /*
   This ensures that if all else fails, we clear out the unread items
@@ -440,7 +451,6 @@ exports.testOnly = {
   },
   getOldestId: getOldestId,
   sinceFilter: sinceFilter,
-  removeItem: removeItem,
   getTroupeIdsCausingBadgeCount: getTroupeIdsCausingBadgeCount,
   processResultsForNewItemWithMentions: processResultsForNewItemWithMentions
 };

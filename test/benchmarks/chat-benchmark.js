@@ -6,7 +6,7 @@ var chatService = require('../../server/services/chat-service');
 var roomMembershipFlags = require("../../server/services/room-membership-flags");
 
 var fixture = {};
-
+var count = 0;
 makeBenchmark({
   maxTime: 30,
   before: function(done) {
@@ -52,13 +52,18 @@ makeBenchmark({
   },
 
   tests: {
-    'newChatMessageToTroupe#troupeSmall': function(done) {
-      chatService.newChatMessageToTroupe(fixture.troupeSmall, fixture.user1, { text: 'This is a message'})
-        .nodeify(done);
-    },
+    // 'newChatMessageToTroupe#troupeSmall': function(done) {
+    //   chatService.newChatMessageToTroupe(fixture.troupeSmall, fixture.user1, { text: 'This is a message'})
+    //     .nodeify(done);
+    // },
 
-    'newChatMessageToTroupe#troupeBig': function(done) {
-      chatService.newChatMessageToTroupe(fixture.troupeBig, fixture.user1, { text: 'This is a message'})
+    'newChatMessageToTroupeWithDelete#troupeBig': function(done) {
+      count++;
+      chatService.newChatMessageToTroupe(fixture.troupeBig, fixture.user1, { text: 'This is a message: ' + count})
+        .delay(100)
+        .then(function(chat) {
+          return chatService.deleteMessageFromRoom(fixture.troupeBig, chat)
+        })
         .nodeify(done);
     },
 

@@ -13,7 +13,7 @@ var userService = require("./user-service");
 var processText = require('gitter-web-text-processor');
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
-var _ = require('underscore');
+var _ = require('lodash');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var groupResolver = require('./group-resolver');
 var chatSearchService = require('./chat-search-service');
@@ -551,6 +551,16 @@ exports.removeAllMessagesForUserIdInRoomId = function(userId, roomId) {
       }, { concurrency: 1 });
     });
 };
+
+function deleteMessageFromRoom(troupe, chatMessage) {
+  return unreadItemService.removeItem(chatMessage.fromUserId, troupe, chatMessage)
+    .then(function() {
+      return chatMessage.remove();
+    })
+    .return(null);
+}
+exports.deleteMessageFromRoom = deleteMessageFromRoom;
+
 
 exports.testOnly = {
   setUseHints: function(value) {

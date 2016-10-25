@@ -112,4 +112,32 @@ describe('mongoose-utils', function() {
 
     return Promise.each(_.range(20), iter);
   });
+
+  describe('attachNotificationListenersToSchema', function() {
+    it('should generate remove events', function() {
+      var p = new Promise(function(resolve) {
+        mongooseUtils.attachNotificationListenersToSchema(persistence.schemas.UserSchema, {
+          onRemove: function(model) {
+            resolve(model);
+          }
+        });
+
+      });
+
+      return mongooseUtils.upsert(persistence.User, { username: username }, { $setOnInsert: { displayName: x } })
+        .spread(function() {
+          return persistence.User.findOne({ username: username }).exec();
+        })
+        .then(function(user) {
+          return user.remove();
+        })
+        .then(function() {
+          return p;
+        })
+        .then(function(user) {
+          assert.strictEqual(user.username, username);
+        })
+
+    });
+  });
 });
