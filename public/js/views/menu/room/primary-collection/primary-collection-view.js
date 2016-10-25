@@ -113,10 +113,7 @@ var PrimaryCollectionView = BaseCollectionView.extend({
    },
 
   getChildContainerToBeIndexed: function () {
-    //use the third child because the
-    //first child is the hidden search header
-    //and the second child is the group home button
-    return this.el.children[2];
+    return this.el.children[1];
   },
 
   //Before we render we remove the collection container from the drag & drop instance
