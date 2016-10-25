@@ -3,7 +3,6 @@
 var Promise = require('bluebird');
 var CategoriesForForumStrategy = require('./topics/categories-for-forum-strategy');
 var TopicsForForumStrategy = require('./topics/topics-for-forum-strategy');
-var topicService = require('gitter-web-topics/lib/topic-service');
 var ForumSubscriptionStrategy = require('./topics/forum-subscription-strategy');
 var ForumPermissionsStrategy = require('./topics/forum-permissions-strategy');
 
