@@ -8,6 +8,7 @@ var restSerializer = require('../../../serializers/rest-serializer');
 var userAgentTagger = require('../../../web/user-agent-tagger');
 var loadTroupeFromParam = require('./load-troupe-param');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var RoomWithPolicyService = require('../../../services/room-with-policy-service');
 
 
 function parseLookups(lookups) {
@@ -113,6 +114,22 @@ module.exports = {
         var strategy = new restSerializer.ChatStrategy({ currentUserId: req.user.id, troupeId: req.params.troupeId });
         return restSerializer.serializeObject(chatMessage, strategy);
       });
+  },
+
+  destroy: function(req, res) {
+    return Promise.join(
+      chatService.findById(req.params.chatMessageId),
+      loadTroupeFromParam(req),
+      function(chatMessage, troupe) {
+        if (!chatMessage) throw new StatusError(404);
+
+        var roomWithPolicyService = new RoomWithPolicyService(troupe, req.user, req.userRoomPolicy);
+        return roomWithPolicyService.deleteMessageFromRoom(chatMessage);
+      })
+      .then(function() {
+         res.status(204);
+         return null;
+      })
   },
 
   subresources: {

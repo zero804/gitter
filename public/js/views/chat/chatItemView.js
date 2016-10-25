@@ -426,6 +426,10 @@ module.exports = (function() {
       return this.model.id && this.isOwnMessage() && this.isInEditablePeriod() && !this.isEmbedded();
     },
 
+    canDelete: function() {
+      return this.model.id && !this.isEmbedded() && (this.isOwnMessage() || context.isTroupeAdmin());
+    },
+
     hasBeenEdited: function() {
       return !!this.model.get('editedAt');
     },
@@ -859,8 +863,7 @@ module.exports = (function() {
     },
 
     delete: function() {
-      this.model.set('text', '');
-      this.model.save();
+      this.model.destroy();
     },
 
     retry: function() {
@@ -891,6 +894,7 @@ module.exports = (function() {
       var canCollapse = !deleted && this.model.get('isCollapsible');
       var isPersisted = !!this.model.id;
       var canEdit = !deleted && this.chatItemView.canEdit() && isPersisted;
+      var canDelete = this.chatItemView.canDelete() && isPersisted;
 
       var data = {
         actions: [
@@ -903,7 +907,7 @@ module.exports = (function() {
       }
 
       data.actions.push({ name: 'edit', description: 'Edit', disabled: !canEdit });
-      data.actions.push({ name: 'delete', description: 'Delete', disabled: !canEdit });
+      data.actions.push({ name: 'delete', description: 'Delete', disabled: !canDelete });
 
       if (canCollapse) {
         var action;
