@@ -102,7 +102,16 @@ Distribution.prototype = {
 
     // Snapshot the sequence
     return lazy(sequence.toArray());
+  },
 
+  getEngineRemoveUserIds: function() {
+    var sequence = this._getEngineMembers()
+      .map(function(memberDetail) {
+        return memberDetail.userId;
+      });
+
+    // Snapshot the sequence
+    return lazy(sequence.toArray());
   },
 
   _getEngineMembers: function() {
