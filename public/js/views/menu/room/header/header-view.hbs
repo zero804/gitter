@@ -27,5 +27,12 @@
 </div>
 
 <div class="panel-header__container" id="panel-header-org">
+  {{#if avatarSrcset}}
+    <img class="panel-header__org-avatar"
+      src="{{ avatarSrcset.src }}"
+      srcset="{{avatarSrcset.srcset}}"
+      height="{{avatarSrcset.size}}"
+      width="{{avatarSrcset.size}}"/>
+  {{/if}}
   <h2 class="panel-header__title--org">{{groupName}}</h2>
 </div>

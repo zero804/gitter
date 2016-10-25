@@ -7,6 +7,7 @@ var toggleClass = require('../../../../utils/toggle-class');
 var cocktail = require('backbone.cocktail');
 var KeyboardEventMixin = require('../../../keyboard-events-mixin');
 var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
+var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 
 
 var HeaderView = Marionette.ItemView.extend({
@@ -56,7 +57,11 @@ var HeaderView = Marionette.ItemView.extend({
     var name = '';
     if(selectedGroup) { name = selectedGroup.get('name'); }
     else { name = getOrgNameFromUri(document.location.pathname); }
-    return { groupName: name, };
+
+    var avatarSrcset = (!!name.length) ?
+        resolveRoomAvatarSrcSet({ uri: name}, 22) :
+        null;
+    return { groupName: name, avatarSrcset: avatarSrcset };
   },
 
   updateActiveElement: function(model, state) { //jshint unused: true
