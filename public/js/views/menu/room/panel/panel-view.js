@@ -246,7 +246,6 @@ var PanelView = Marionette.LayoutView.extend({
     toggleClass(this.el, 'people', state === 'people');
     toggleClass(this.el, 'group', state === 'group');
     toggleClass(this.el, 'org', state === 'org');
-    console.log(this.el);
   }
 });
 
