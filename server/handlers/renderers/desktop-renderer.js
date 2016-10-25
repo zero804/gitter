@@ -94,10 +94,6 @@ function renderSecondaryView(req, res, next, options) {
   var troupe = uriContext.troupe;
   var group = uriContext.group;
 
-  if (group) {
-    return orgRenderer.renderOrgPage(req, res, next);
-  }
-
   if (troupe) {
     if(req.user) {
       return renderChat(req, res, next, {
@@ -118,6 +114,10 @@ function renderSecondaryView(req, res, next, options) {
         unread: false // Not logged in users see chats as read
       });
     }
+  }
+
+  if (group) {
+    return orgRenderer.renderOrgPage(req, res, next);
   }
 
 }
