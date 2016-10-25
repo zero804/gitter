@@ -73,6 +73,13 @@ JP 11/2/16
   .room-menu-avatar();
   margin-left:  @desktop-menu-left-padding / 2;
   z-index: 0;
+
+  //This is so gross I want to cry...
+  .room-menu__panel.org & {
+    visibility: hidden;
+    width: .5rem;
+  }
+
 }
 
 .room-item__avatar--show-more {
