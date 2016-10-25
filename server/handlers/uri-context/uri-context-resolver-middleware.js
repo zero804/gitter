@@ -23,7 +23,7 @@ function uriContextResolverMiddleware(req, res, next) {
     .then(function(uriContext) {
       if (uriContext.ownUrl) {
         res.relativeRedirect('/home/explore');
-        return;
+        return null;
       }
 
       req.troupe = uriContext.troupe;
@@ -31,6 +31,7 @@ function uriContextResolverMiddleware(req, res, next) {
       req.uriContext = uriContext;
 
       next();
+      return null
     })
     .catch(next);
 }
