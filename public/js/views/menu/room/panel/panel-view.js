@@ -14,6 +14,7 @@ var ProfileMenuView = require('../profile/profile-menu-view');
 var TopicsAreaView = require('../topics-area/topics-area-view');
 var SearchInputView = require('../../../menu/room/search-input/search-input-view');
 var NeverEndingStory = require('../../../../utils/never-ending-story');
+var GroupBackControl = require('../group-back-control/group-back-control-view');
 
 require('../../../behaviors/isomorphic');
 
@@ -23,6 +24,7 @@ var PanelView = Marionette.LayoutView.extend({
     Isomorphic: {
       header:              { el: '#panel-header', init: 'initHeader' },
       profile:             { el: '#profile-menu', init: 'initProfileMenu' },
+      groupBackControl:    { el: '#group-back-button', init: 'initGroupBackArea' },
       topicsArea:          { el: '#left-menu-topics-area', init: 'initTopicsArea' },
       searchInput:         { el: '#search-input', init: 'initSearchInput' },
       favouriteCollection: { el: '#favourite-collection', init: 'initFavouriteCollection' },
@@ -43,6 +45,10 @@ var PanelView = Marionette.LayoutView.extend({
 
   initProfileMenu: function(optionsForRegion) {
     return new ProfileMenuView(optionsForRegion({ model: this.model }));
+  },
+
+  initGroupBackArea: function(optionsForRegion){
+    return new GroupBackControl(optionsForRegion({ model: this.model }));
   },
 
   initTopicsArea: function(optionsForRegion) {
