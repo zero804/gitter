@@ -4,6 +4,7 @@ var _ = require('lodash');
 var Promise = require('bluebird');
 var onExit = require('signal-exit');
 var child_process = require('child_process');
+var crossSpawn = require('cross-spawn');
 
 function childProcessToPromise(executable, command) {
   var removeOnExit = onExit(function(code, signal) {
@@ -30,7 +31,7 @@ function childProcessToPromise(executable, command) {
 
 function spawn(executable, args, env) {
   return Promise.try(function() {
-    return child_process.spawn(executable, args, {
+    return crossSpawn(executable, args, {
       stdio: 'inherit',
       env: _.extend({}, process.env, env)
     });

@@ -2,6 +2,7 @@
 
 var _ = require('underscore');
 var validateTag = require('../../validation/validate-tag').validateTag;
+var getRoomNameFromTroupeName = require('../../get-room-name-from-troupe-name');
 
 // via http://stackoverflow.com/a/17633552/796832
 var ranges = [
@@ -34,7 +35,14 @@ module.exports = function(room, options) {
 
   result.isPrivate = result.security !== 'PUBLIC' && result.security !== null && result.security !== undefined;
   result.canEditTags = opts.isStaff;
-  result.roomNameParts = result.uri.split('/');
+
+  var roomName = room.name;
+  if(opts.stripGroupName) {
+    roomName = getRoomNameFromTroupeName(room.name);
+  }
+  result.name = roomName;
+  result.roomNameParts = roomName.split('/');
+
   result.topic = room.topic || room.description;
   if(room.messageCount) {
     result.messageCountSiPrefixed = formatNumberWithSiPrefix(room.messageCount);
