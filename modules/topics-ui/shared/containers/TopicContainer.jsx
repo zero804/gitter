@@ -236,7 +236,7 @@ const TopicContainer = createClass({
           groupUri={groupUri}
           groupName={groupName}
           subscriptionState={forumSubscriptionState}/>
-        <div className="scroller topic-tontent">
+        <div className="scroller topic-content">
           <article>
             <TopicHeader
               topic={topic}
