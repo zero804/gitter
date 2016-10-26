@@ -21,8 +21,7 @@ module.exports = ItemModel.extend({
   },
 
   reduceRooms: function (){
-    return this.roomCollection.reduce(function(memo, room){
-      if(room.get('oneToOne')) { return memo; }
+    return this.roomCollection.where({ githubType: 'ONETOONE' }).reduce(function(memo, room){
       return {
         mentions:    (memo.mentions + room.get('mentions')),
         unreadItems: (memo.unreadItems + room.get('unreadItems')),
