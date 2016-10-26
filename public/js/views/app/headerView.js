@@ -195,7 +195,6 @@ var HeaderView = Marionette.ItemView.extend({
     var backend = this.model.get('backend');
     var type = backend && backend.type;
     var isOneToOne = this.model.get('oneToOne');
-    var isPublic = this.model.get('public');
     var url = this.model.get('url');
     var staffOrAdmin = isStaff || isAdmin;
     var isGitHubObject = type === 'GH_REPO' || type === 'GH_ORG';
@@ -245,8 +244,11 @@ var HeaderView = Marionette.ItemView.extend({
     e.preventDefault();
     var group = this.model.get('group');
     if (!group) return;
-    var groupUri = group.uri;
-    appEvents.trigger('navigation', '/orgs/' + groupUri + '/rooms', 'iframe', groupUri + ' rooms');
+    var homeUri = group.homeUri;
+
+    if (!homeUri) return;
+
+    appEvents.trigger('navigation', '/' + homeUri, 'iframe', group.uri);
   },
 
   toggleFavourite: function() {
