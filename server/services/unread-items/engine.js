@@ -148,39 +148,46 @@ function getLastChatTimestamps(troupeIds) {
  * @return {promise} promise of nothing
  */
 function removeItem(troupeId, itemId, userIds) {
-  var keys = userIds.reduce(function(memo, userId) {
-      memo.push(
-        "unread:chat:" + userId + ":" + troupeId,                 // Unread for user
-        "ub:" + userId,                                           // Unread badge for user
-        "m:" + userId + ":" + troupeId,                           // User Troupe mention items
-        "m:" + userId                                             // User mentions
-      );
+  var batches = userIds.chunk(UNREAD_BATCH_SIZE);
 
-      return memo;
-    }, []);
+  var promises = batches.map(function(batchedUserIds) {
+    var keys = batchedUserIds.reduce(function(memo, userId, index) {
+        var i = index * 4;
+        memo[i] = "unread:chat:" + userId + ":" + troupeId;   // Unread for user
+        memo[i + 1] = "ub:" + userId;                         // Unread badge for user
+        memo[i + 2] = "m:" + userId + ":" + troupeId;         // User Troupe mention items
+        memo[i + 3] = "m:" + userId;                          // User mentions
 
-  return runScript('unread-remove-item', keys, [troupeId, itemId])
-    .then(function(result) {
-      var results = [];
+        return memo;
+      }, new Array(batchedUserIds.length * 4));
 
-      // Results come back as three items per key in sequence
-      for(var i = 0; result.length > 0; i++) {
-        var troupeUnreadCount = result.shift();
-        var mentionCount = result.shift();
-        var flag = result.shift();
-        var badgeUpdate = !!(flag & 1);
-        var userId = userIds[i];
+    return runScript('unread-remove-item', keys, [troupeId, itemId])
+      .bind({
+        batchedUserIds: batchedUserIds
+      })
+      .then(function(result) {
+        return batchedUserIds.map(function(userId, index) {
+          var i = index * 3;
 
-        results.push({
-          userId: userId,
-          unreadCount: troupeUnreadCount >= 0 ? troupeUnreadCount : undefined,
-          mentionCount: mentionCount >= 0 ? mentionCount : undefined,
-          badgeUpdate: badgeUpdate
+          var troupeUnreadCount = result[i];
+          var mentionCount = result[i + 1];
+          var flag = result[i + 2];
+
+          var badgeUpdate = !!(flag & 1);
+
+          return {
+            userId: userId,
+            unreadCount: troupeUnreadCount >= 0 ? troupeUnreadCount : undefined,
+            mentionCount: mentionCount >= 0 ? mentionCount : undefined,
+            badgeUpdate: badgeUpdate
+          };
         });
+      });
+    });
 
-      }
-
-      return results;
+  return Promise.all(promises.value())
+    .then(function(batchedResults) {
+      return lazy(batchedResults).flatten()
     });
 
 }
