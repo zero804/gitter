@@ -53,9 +53,10 @@ function findContextForUri(user, uri, options) {
         }
 
         if(mongoUtils.objectIDsEqual(resolvedUser.id, userId)) {
-          var redirect = new StatusError(301);
-          redirect.path = '/home/explore'; // TODO: is this a good idea??
-          throw redirect;
+          return {
+            uri: resolvedUser.username,
+            ownUrl: true
+          };
         }
 
         debug("localUriLookup returned user for uri=%s. Finding or creating one-to-one", uri);
@@ -81,12 +82,25 @@ function findContextForUri(user, uri, options) {
             return policy.canRead()
               .then(function(access) {
                 if (!access) {
-                  var error = new StatusError(404);
+                  // If the user has reached the org room
+                  // but does not have access, redirect them
+                  // to the group home
+                  if (uri.indexOf('/') < 0 && resolvedTroupe.groupId) {
+                    debug('Redirecting on ORG room permission denied');
 
-                  // TODO: move away from githubType here
-                  error.githubType = resolvedTroupe.githubType;
-                  error.uri = resolvedTroupe.uri;
-                  throw error;
+                    return groupService.findById(resolvedTroupe.groupId)
+                      .then(function(group) {
+                        if (group && group.homeUri) {
+                          var err = new StatusError(301);
+                          err.path = '/' + group.homeUri;
+                          throw err;
+                        }
+
+                        throw new StatusError(404);
+                      });
+                  } else {
+                    throw new StatusError(404);
+                  }
                 }
 
                 return {
@@ -112,7 +126,7 @@ function findContextForUri(user, uri, options) {
                 return {
                   group: resolvedGroup,
                   policy: policy,
-                  uri: resolvedGroup.uri
+                  uri: resolvedGroup.homeUri
                 };
               })
           });

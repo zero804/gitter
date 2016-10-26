@@ -5,7 +5,7 @@
 var shutdown = require('shutdown');
 var onMongoConnect = require('gitter-web-persistence-utils/lib/on-mongo-connect');
 var persistence = require('gitter-web-persistence');
-var uriLookupService = require('../../server/services/uri-lookup-service');
+var uriLookupService = require('gitter-web-uri-resolver/lib/uri-lookup-service');
 
 var readline = require('readline');
 var Promise = require('bluebird');
