@@ -173,7 +173,7 @@ function renderOrgPage(req, res, next) {
         // This is used to track pageViews in mixpanel
         troupeContext.isCommunityPage = true;
 
-        var fullUrl = clientEnv.basePath + '/orgs/' + serializedGroup.uri + '/rooms';
+        var fullUrl = clientEnv.basePath + '/' + serializedGroup.homeUri;
         var text = encodeURIComponent('Explore our chat community on Gitter:');
         var url = 'https://twitter.com/share?' +
           'text=' + text +
