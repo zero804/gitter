@@ -230,13 +230,13 @@ const TopicContainer = createClass({
 
     return (
       <main>
-        <div className="scroller">
-          <SearchHeaderContainer
-            userId={userId}
-            forumId={forumId}
-            groupUri={groupUri}
-            groupName={groupName}
-            subscriptionState={forumSubscriptionState}/>
+        <SearchHeaderContainer
+          userId={userId}
+          forumId={forumId}
+          groupUri={groupUri}
+          groupName={groupName}
+          subscriptionState={forumSubscriptionState}/>
+        <div className="scroller topic-tontent">
           <article>
             <TopicHeader
               topic={topic}
