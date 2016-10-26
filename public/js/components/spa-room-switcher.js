@@ -26,9 +26,11 @@ _.extend(SpaRoomSwitcher.prototype, Backbone.Events, {
 
     var self = this;
     function fallback() {
+      // TODO: this should move across to the resolve service
       self._isLoadingIFrame = true;
       var windowHash = windowLocation.hash;
       var hash = (!windowHash || windowHash === '#') ? '#initial' : windowHash;
+
       targetParsed.hash = hash;
       var href = urlParser.format(targetParsed);
       href = /^\/orgs\/([^\/]+)\/rooms\/?/.test(targetParsed.pathname) ? getOrgRoomUrl(targetParsed.pathname) : href;
@@ -44,7 +46,7 @@ _.extend(SpaRoomSwitcher.prototype, Backbone.Events, {
     //if we are ever in the process of loading a frame
     //throw the baby out with the bath water and refresh the whole frame
     //JP 4/11/15
-    if(!!this._isLoadingIFrame) return fallback();
+    if(this._isLoadingIFrame) return fallback();
 
     // The frame is currently pointing at another site. Unlikely but possible
     var currentDomain = frameLocation.protocol + '//' + frameLocation.host;

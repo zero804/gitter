@@ -136,7 +136,7 @@ function getForumForGroup(groupUri, forumId, userId) {
 
 function renderOrgPage(req, res, next) {
   return Promise.try(function() {
-    var group = req.group;
+    var group = req.group || req.uriContext.group;
     if (!group) throw new StatusError(404);
     var groupId = group._id;
     var user = req.user;

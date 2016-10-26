@@ -5,7 +5,7 @@
     "@gitterhq/translations": {
       "version": "1.3.0",
       "from": "@gitterhq/translations@>=1.3.0 <2.0.0",
-      "resolved": "https://registry.npmjs.org/@gitterhq/translations/-/translations-1.3.0.tgz"
+      "resolved": "http://beta-internal.beta.gitter:4873/@gitterhq/translations/-/translations-1.3.0.tgz"
     },
     "apn": {
       "version": "1.7.5",
@@ -123,7 +123,7 @@
             "ee-first": {
               "version": "1.1.1",
               "from": "ee-first@1.1.1",
-              "resolved": "https://registry.npmjs.org/ee-first/-/ee-first-1.1.1.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/ee-first/-/ee-first-1.1.1.tgz"
             }
           }
         },
@@ -204,7 +204,7 @@
             },
             "minimatch": {
               "version": "3.0.3",
-              "from": "minimatch@>=2.0.0 <3.0.0||>=3.0.0 <4.0.0",
+              "from": "minimatch@>=3.0.2 <4.0.0",
               "resolved": "http://beta-internal.beta.gitter:4873/minimatch/-/minimatch-3.0.3.tgz",
               "dependencies": {
                 "brace-expansion": {
@@ -687,7 +687,7 @@
     "escape-string-regexp": {
       "version": "1.0.5",
       "from": "escape-string-regexp@>=1.0.5 <2.0.0",
-      "resolved": "https://registry.npmjs.org/escape-string-regexp/-/escape-string-regexp-1.0.5.tgz"
+      "resolved": "http://beta-internal.beta.gitter:4873/escape-string-regexp/-/escape-string-regexp-1.0.5.tgz"
     },
     "event-stream": {
       "version": "3.3.4",
@@ -756,7 +756,7 @@
             "negotiator": {
               "version": "0.6.1",
               "from": "negotiator@0.6.1",
-              "resolved": "https://registry.npmjs.org/negotiator/-/negotiator-0.6.1.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/negotiator/-/negotiator-0.6.1.tgz"
             }
           }
         },
@@ -825,7 +825,7 @@
         "fresh": {
           "version": "0.3.0",
           "from": "fresh@0.3.0",
-          "resolved": "https://registry.npmjs.org/fresh/-/fresh-0.3.0.tgz"
+          "resolved": "http://beta-internal.beta.gitter:4873/fresh/-/fresh-0.3.0.tgz"
         },
         "merge-descriptors": {
           "version": "1.0.1",
@@ -845,7 +845,7 @@
             "ee-first": {
               "version": "1.1.1",
               "from": "ee-first@1.1.1",
-              "resolved": "https://registry.npmjs.org/ee-first/-/ee-first-1.1.1.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/ee-first/-/ee-first-1.1.1.tgz"
             }
           }
         },
@@ -962,7 +962,7 @@
         "utils-merge": {
           "version": "1.0.0",
           "from": "utils-merge@1.0.0",
-          "resolved": "https://registry.npmjs.org/utils-merge/-/utils-merge-1.0.0.tgz"
+          "resolved": "http://beta-internal.beta.gitter:4873/utils-merge/-/utils-merge-1.0.0.tgz"
         },
         "vary": {
           "version": "1.1.0",
@@ -1090,7 +1090,7 @@
         "cookie-signature": {
           "version": "1.0.6",
           "from": "cookie-signature@1.0.6",
-          "resolved": "https://registry.npmjs.org/cookie-signature/-/cookie-signature-1.0.6.tgz"
+          "resolved": "http://beta-internal.beta.gitter:4873/cookie-signature/-/cookie-signature-1.0.6.tgz"
         },
         "crc": {
           "version": "3.4.0",
@@ -1127,7 +1127,7 @@
         "utils-merge": {
           "version": "1.0.0",
           "from": "utils-merge@1.0.0",
-          "resolved": "https://registry.npmjs.org/utils-merge/-/utils-merge-1.0.0.tgz"
+          "resolved": "http://beta-internal.beta.gitter:4873/utils-merge/-/utils-merge-1.0.0.tgz"
         }
       }
     },
@@ -2108,7 +2108,7 @@
                 "utils-merge": {
                   "version": "1.0.0",
                   "from": "utils-merge@>=1.0.0 <2.0.0",
-                  "resolved": "https://registry.npmjs.org/utils-merge/-/utils-merge-1.0.0.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/utils-merge/-/utils-merge-1.0.0.tgz"
                 }
               }
             }
@@ -2551,6 +2551,11 @@
       "version": "1.0.0",
       "from": "modules/twitter-backend",
       "resolved": "file:modules/twitter-backend"
+    },
+    "gitter-web-uri-resolver": {
+      "version": "1.0.0",
+      "from": "modules/uri-resolver",
+      "resolved": "file:modules/uri-resolver"
     },
     "gitter-web-user-serialization": {
       "version": "1.0.0",
@@ -3132,9 +3137,16 @@
                   "resolved": "http://beta-internal.beta.gitter:4873/stringstream/-/stringstream-0.0.5.tgz"
                 },
                 "tough-cookie": {
-                  "version": "2.3.1",
+                  "version": "2.3.2",
                   "from": "tough-cookie@>=2.3.0 <2.4.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873/tough-cookie/-/tough-cookie-2.3.1.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/tough-cookie/-/tough-cookie-2.3.2.tgz",
+                  "dependencies": {
+                    "punycode": {
+                      "version": "1.4.1",
+                      "from": "punycode@>=1.4.1 <2.0.0",
+                      "resolved": "http://beta-internal.beta.gitter:4873/punycode/-/punycode-1.4.1.tgz"
+                    }
+                  }
                 },
                 "tunnel-agent": {
                   "version": "0.4.3",
@@ -3519,7 +3531,7 @@
         },
         "parseurl": {
           "version": "1.3.1",
-          "from": "parseurl@>=1.3.0 <1.4.0",
+          "from": "parseurl@>=1.3.1 <1.4.0",
           "resolved": "http://beta-internal.beta.gitter:4873/parseurl/-/parseurl-1.3.1.tgz"
         },
         "vary": {
@@ -3762,47 +3774,47 @@
         "concat-stream": {
           "version": "1.5.2",
           "from": "concat-stream@>=1.5.0 <2.0.0",
-          "resolved": "https://registry.npmjs.org/concat-stream/-/concat-stream-1.5.2.tgz",
+          "resolved": "http://beta-internal.beta.gitter:4873/concat-stream/-/concat-stream-1.5.2.tgz",
           "dependencies": {
             "inherits": {
               "version": "2.0.3",
               "from": "inherits@>=2.0.1 <2.1.0",
-              "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.3.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/inherits/-/inherits-2.0.3.tgz"
             },
             "typedarray": {
               "version": "0.0.6",
               "from": "typedarray@>=0.0.5 <0.1.0",
-              "resolved": "https://registry.npmjs.org/typedarray/-/typedarray-0.0.6.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/typedarray/-/typedarray-0.0.6.tgz"
             },
             "readable-stream": {
               "version": "2.0.6",
               "from": "readable-stream@>=2.0.0 <2.1.0",
-              "resolved": "https://registry.npmjs.org/readable-stream/-/readable-stream-2.0.6.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/readable-stream/-/readable-stream-2.0.6.tgz",
               "dependencies": {
                 "core-util-is": {
                   "version": "1.0.2",
                   "from": "core-util-is@>=1.0.0 <1.1.0",
-                  "resolved": "https://registry.npmjs.org/core-util-is/-/core-util-is-1.0.2.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/core-util-is/-/core-util-is-1.0.2.tgz"
                 },
                 "isarray": {
                   "version": "1.0.0",
                   "from": "isarray@>=1.0.0 <1.1.0",
-                  "resolved": "https://registry.npmjs.org/isarray/-/isarray-1.0.0.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/isarray/-/isarray-1.0.0.tgz"
                 },
                 "process-nextick-args": {
                   "version": "1.0.7",
                   "from": "process-nextick-args@>=1.0.6 <1.1.0",
-                  "resolved": "https://registry.npmjs.org/process-nextick-args/-/process-nextick-args-1.0.7.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/process-nextick-args/-/process-nextick-args-1.0.7.tgz"
                 },
                 "string_decoder": {
                   "version": "0.10.31",
                   "from": "string_decoder@>=0.10.0 <0.11.0",
-                  "resolved": "https://registry.npmjs.org/string_decoder/-/string_decoder-0.10.31.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/string_decoder/-/string_decoder-0.10.31.tgz"
                 },
                 "util-deprecate": {
                   "version": "1.0.2",
                   "from": "util-deprecate@>=1.0.1 <1.1.0",
-                  "resolved": "https://registry.npmjs.org/util-deprecate/-/util-deprecate-1.0.2.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/util-deprecate/-/util-deprecate-1.0.2.tgz"
                 }
               }
             }
@@ -3811,73 +3823,73 @@
         "https-proxy-agent": {
           "version": "0.3.6",
           "from": "https-proxy-agent@>=0.3.5 <0.4.0",
-          "resolved": "https://registry.npmjs.org/https-proxy-agent/-/https-proxy-agent-0.3.6.tgz",
+          "resolved": "http://beta-internal.beta.gitter:4873/https-proxy-agent/-/https-proxy-agent-0.3.6.tgz",
           "dependencies": {
             "agent-base": {
               "version": "1.0.2",
               "from": "agent-base@>=1.0.1 <1.1.0",
-              "resolved": "https://registry.npmjs.org/agent-base/-/agent-base-1.0.2.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/agent-base/-/agent-base-1.0.2.tgz"
             },
             "debug": {
               "version": "2.2.0",
               "from": "debug@>=2.0.0 <3.0.0",
-              "resolved": "https://registry.npmjs.org/debug/-/debug-2.2.0.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/debug/-/debug-2.2.0.tgz",
               "dependencies": {
                 "ms": {
                   "version": "0.7.1",
                   "from": "ms@0.7.1",
-                  "resolved": "https://registry.npmjs.org/ms/-/ms-0.7.1.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/ms/-/ms-0.7.1.tgz"
                 }
               }
             },
             "extend": {
               "version": "3.0.0",
               "from": "extend@>=3.0.0 <4.0.0",
-              "resolved": "https://registry.npmjs.org/extend/-/extend-3.0.0.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/extend/-/extend-3.0.0.tgz"
             }
           }
         },
         "json-stringify-safe": {
           "version": "5.0.1",
           "from": "json-stringify-safe@>=5.0.0 <6.0.0",
-          "resolved": "https://registry.npmjs.org/json-stringify-safe/-/json-stringify-safe-5.0.1.tgz"
+          "resolved": "http://beta-internal.beta.gitter:4873/json-stringify-safe/-/json-stringify-safe-5.0.1.tgz"
         },
         "readable-stream": {
           "version": "1.1.14",
           "from": "readable-stream@>=1.1.13 <2.0.0",
-          "resolved": "https://registry.npmjs.org/readable-stream/-/readable-stream-1.1.14.tgz",
+          "resolved": "http://beta-internal.beta.gitter:4873/readable-stream/-/readable-stream-1.1.14.tgz",
           "dependencies": {
             "core-util-is": {
               "version": "1.0.2",
               "from": "core-util-is@>=1.0.0 <1.1.0",
-              "resolved": "https://registry.npmjs.org/core-util-is/-/core-util-is-1.0.2.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/core-util-is/-/core-util-is-1.0.2.tgz"
             },
             "isarray": {
               "version": "0.0.1",
               "from": "isarray@0.0.1",
-              "resolved": "https://registry.npmjs.org/isarray/-/isarray-0.0.1.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/isarray/-/isarray-0.0.1.tgz"
             },
             "string_decoder": {
               "version": "0.10.31",
               "from": "string_decoder@>=0.10.0 <0.11.0",
-              "resolved": "https://registry.npmjs.org/string_decoder/-/string_decoder-0.10.31.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/string_decoder/-/string_decoder-0.10.31.tgz"
             },
             "inherits": {
               "version": "2.0.3",
               "from": "inherits@>=2.0.1 <2.1.0",
-              "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.3.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/inherits/-/inherits-2.0.3.tgz"
             }
           }
         },
         "semver": {
           "version": "4.3.6",
           "from": "semver@>=4.2.0 <5.0.0",
-          "resolved": "https://registry.npmjs.org/semver/-/semver-4.3.6.tgz"
+          "resolved": "http://beta-internal.beta.gitter:4873/semver/-/semver-4.3.6.tgz"
         },
         "yakaa": {
           "version": "1.0.1",
           "from": "yakaa@>=1.0.1 <2.0.0",
-          "resolved": "https://registry.npmjs.org/yakaa/-/yakaa-1.0.1.tgz"
+          "resolved": "http://beta-internal.beta.gitter:4873/yakaa/-/yakaa-1.0.1.tgz"
         }
       }
     },
@@ -3928,7 +3940,7 @@
         "utils-merge": {
           "version": "1.0.0",
           "from": "utils-merge@>=1.0.0 <2.0.0",
-          "resolved": "https://registry.npmjs.org/utils-merge/-/utils-merge-1.0.0.tgz"
+          "resolved": "http://beta-internal.beta.gitter:4873/utils-merge/-/utils-merge-1.0.0.tgz"
         },
         "debug": {
           "version": "0.7.4",
@@ -4271,7 +4283,7 @@
             "utils-merge": {
               "version": "1.0.0",
               "from": "utils-merge@>=1.0.0 <2.0.0",
-              "resolved": "https://registry.npmjs.org/utils-merge/-/utils-merge-1.0.0.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/utils-merge/-/utils-merge-1.0.0.tgz"
             }
           }
         },
@@ -4531,7 +4543,7 @@
         "request": {
           "version": "2.76.0",
           "from": "request@>=2.53.0 <3.0.0",
-          "resolved": "https://registry.npmjs.org/request/-/request-2.76.0.tgz",
+          "resolved": "http://beta-internal.beta.gitter:4873/request/-/request-2.76.0.tgz",
           "dependencies": {
             "aws-sign2": {
               "version": "0.6.0",
@@ -4573,7 +4585,7 @@
             "form-data": {
               "version": "2.1.1",
               "from": "form-data@>=2.1.1 <2.2.0",
-              "resolved": "https://registry.npmjs.org/form-data/-/form-data-2.1.1.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/form-data/-/form-data-2.1.1.tgz",
               "dependencies": {
                 "asynckit": {
                   "version": "0.4.0",
@@ -4841,7 +4853,7 @@
             "qs": {
               "version": "6.3.0",
               "from": "qs@>=6.3.0 <6.4.0",
-              "resolved": "https://registry.npmjs.org/qs/-/qs-6.3.0.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/qs/-/qs-6.3.0.tgz"
             },
             "stringstream": {
               "version": "0.0.5",
@@ -4849,9 +4861,16 @@
               "resolved": "http://beta-internal.beta.gitter:4873/stringstream/-/stringstream-0.0.5.tgz"
             },
             "tough-cookie": {
-              "version": "2.3.1",
+              "version": "2.3.2",
               "from": "tough-cookie@>=2.3.0 <2.4.0",
-              "resolved": "http://beta-internal.beta.gitter:4873/tough-cookie/-/tough-cookie-2.3.1.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/tough-cookie/-/tough-cookie-2.3.2.tgz",
+              "dependencies": {
+                "punycode": {
+                  "version": "1.4.1",
+                  "from": "punycode@>=1.4.1 <2.0.0",
+                  "resolved": "http://beta-internal.beta.gitter:4873/punycode/-/punycode-1.4.1.tgz"
+                }
+              }
             },
             "tunnel-agent": {
               "version": "0.4.3",
@@ -4934,7 +4953,7 @@
         "fresh": {
           "version": "0.3.0",
           "from": "fresh@0.3.0",
-          "resolved": "https://registry.npmjs.org/fresh/-/fresh-0.3.0.tgz"
+          "resolved": "http://beta-internal.beta.gitter:4873/fresh/-/fresh-0.3.0.tgz"
         },
         "ms": {
           "version": "0.7.1",
@@ -4943,7 +4962,7 @@
         },
         "parseurl": {
           "version": "1.3.1",
-          "from": "parseurl@>=1.3.0 <1.4.0",
+          "from": "parseurl@>=1.3.1 <1.4.0",
           "resolved": "http://beta-internal.beta.gitter:4873/parseurl/-/parseurl-1.3.1.tgz"
         }
       }
@@ -5038,7 +5057,7 @@
         "request": {
           "version": "2.76.0",
           "from": "request@>=2.53.0 <3.0.0",
-          "resolved": "https://registry.npmjs.org/request/-/request-2.76.0.tgz",
+          "resolved": "http://beta-internal.beta.gitter:4873/request/-/request-2.76.0.tgz",
           "dependencies": {
             "aws-sign2": {
               "version": "0.6.0",
@@ -5080,7 +5099,7 @@
             "form-data": {
               "version": "2.1.1",
               "from": "form-data@>=2.1.1 <2.2.0",
-              "resolved": "https://registry.npmjs.org/form-data/-/form-data-2.1.1.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/form-data/-/form-data-2.1.1.tgz",
               "dependencies": {
                 "asynckit": {
                   "version": "0.4.0",
@@ -5348,7 +5367,7 @@
             "qs": {
               "version": "6.3.0",
               "from": "qs@>=6.3.0 <6.4.0",
-              "resolved": "https://registry.npmjs.org/qs/-/qs-6.3.0.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/qs/-/qs-6.3.0.tgz"
             },
             "stringstream": {
               "version": "0.0.5",
@@ -5356,9 +5375,16 @@
               "resolved": "http://beta-internal.beta.gitter:4873/stringstream/-/stringstream-0.0.5.tgz"
             },
             "tough-cookie": {
-              "version": "2.3.1",
+              "version": "2.3.2",
               "from": "tough-cookie@>=2.3.0 <2.4.0",
-              "resolved": "http://beta-internal.beta.gitter:4873/tough-cookie/-/tough-cookie-2.3.1.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/tough-cookie/-/tough-cookie-2.3.2.tgz",
+              "dependencies": {
+                "punycode": {
+                  "version": "1.4.1",
+                  "from": "punycode@>=1.4.1 <2.0.0",
+                  "resolved": "http://beta-internal.beta.gitter:4873/punycode/-/punycode-1.4.1.tgz"
+                }
+              }
             },
             "tunnel-agent": {
               "version": "0.4.3",
@@ -5471,9 +5497,9 @@
                   "resolved": "http://beta-internal.beta.gitter:4873/jsonfile/-/jsonfile-2.4.0.tgz"
                 },
                 "klaw": {
-                  "version": "1.3.0",
+                  "version": "1.3.1",
                   "from": "klaw@>=1.0.0 <2.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873/klaw/-/klaw-1.3.0.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/klaw/-/klaw-1.3.1.tgz"
                 },
                 "path-is-absolute": {
                   "version": "1.0.1",
@@ -5669,7 +5695,7 @@
             },
             "pinkie-promise": {
               "version": "2.0.1",
-              "from": "pinkie-promise@>=2.0.0 <3.0.0",
+              "from": "pinkie-promise@>=2.0.1 <3.0.0",
               "resolved": "http://beta-internal.beta.gitter:4873/pinkie-promise/-/pinkie-promise-2.0.1.tgz",
               "dependencies": {
                 "pinkie": {
@@ -6032,7 +6058,7 @@
               "dependencies": {
                 "chalk": {
                   "version": "1.1.3",
-                  "from": "chalk@>=1.1.1 <2.0.0",
+                  "from": "chalk@>=1.0.0 <2.0.0",
                   "resolved": "http://beta-internal.beta.gitter:4873/chalk/-/chalk-1.1.3.tgz",
                   "dependencies": {
                     "ansi-styles": {
@@ -6292,9 +6318,16 @@
               "resolved": "http://beta-internal.beta.gitter:4873/stringstream/-/stringstream-0.0.5.tgz"
             },
             "tough-cookie": {
-              "version": "2.3.1",
+              "version": "2.3.2",
               "from": "tough-cookie@>=2.3.0 <2.4.0",
-              "resolved": "http://beta-internal.beta.gitter:4873/tough-cookie/-/tough-cookie-2.3.1.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/tough-cookie/-/tough-cookie-2.3.2.tgz",
+              "dependencies": {
+                "punycode": {
+                  "version": "1.4.1",
+                  "from": "punycode@>=1.4.1 <2.0.0",
+                  "resolved": "http://beta-internal.beta.gitter:4873/punycode/-/punycode-1.4.1.tgz"
+                }
+              }
             },
             "tunnel-agent": {
               "version": "0.4.3",
@@ -6366,7 +6399,7 @@
           "dependencies": {
             "strip-ansi": {
               "version": "3.0.1",
-              "from": "strip-ansi@>=3.0.1 <4.0.0",
+              "from": "strip-ansi@>=3.0.0 <4.0.0",
               "resolved": "http://beta-internal.beta.gitter:4873/strip-ansi/-/strip-ansi-3.0.1.tgz",
               "dependencies": {
                 "ansi-regex": {
