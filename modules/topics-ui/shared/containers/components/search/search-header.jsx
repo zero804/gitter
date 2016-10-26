@@ -20,7 +20,7 @@ export default React.createClass({
     const {groupUri, groupName } = this.props;
 
     return (
-      <Container>
+      <Container className="container--search">
         <Panel className="panel--topic-search">
           <H1 className="topic-search__heading">
             <ForumCategoryLink
