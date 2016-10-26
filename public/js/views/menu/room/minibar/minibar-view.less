@@ -315,15 +315,15 @@
   box-sizing: border-box;
 
   position: absolute;
-  top: 50%;
-  left: 0;
+  top: 38%;
+  left: 63%;
   transform: translateX(-50%) translateY(-50%);
 
   display: block;
   width: @size;
   height: @size;
 
-  border: 2px solid @caribbean;
+  border: 2px solid white;
   border-radius: 100%;
   color: transparent;
 }
@@ -337,12 +337,11 @@
 @icon-size: 1.4rem;
 .room-menu-options__item__unread-indicator {
   .base-minibar-unread-indicator(@icon-size);
-  z-index: 2;
+  z-index: 3;
   visibility: hidden;
   transform: translateX(-100%) translateY(-50%);
   /* We do this over `opacity` because of slight perf */
   background-color: transparent;
-  border-color: transparent;
 
   transition:
     visibility 0s ease .2s,
@@ -355,7 +354,7 @@
     .room-menu-options__item__unread-indicator-visibility-reset();
 
     background-color: transparent;
-    border-color: @caribbean;
+    border-color: white;
 
     &.pulse-animation {
       animation-name: unread-indicator-subtle-pulse-animation;
@@ -379,7 +378,7 @@
     .room-menu-options__item__unread-indicator-visibility-reset();
 
     background-color: @jaffa;
-    border-color: @jaffa;
+    border-color: white;
 
     &.pulse-animation {
       animation-name: unread-indicator-subtle-pulse-animation;
