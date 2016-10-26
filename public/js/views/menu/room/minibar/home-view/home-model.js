@@ -12,6 +12,7 @@ module.exports = ItemModel.extend({
   },
 
   initialize: function(attrs, options) { //jshint unused: true
+    console.log('yo yhis is working');
     this.roomCollection = options.roomCollection;
     this.listenTo(this.roomCollection, 'snapshot sync change remove reset', this.onRoomsUpdate, this);
   },
@@ -21,7 +22,8 @@ module.exports = ItemModel.extend({
   },
 
   reduceRooms: function (){
-    return this.roomCollection.where({ githubType: 'ONETOONE' }).reduce(function(memo, room){
+    console.log('reducing');
+    return this.roomCollection.reduce(function(memo, room){
       return {
         mentions:    (memo.mentions + room.get('mentions')),
         unreadItems: (memo.unreadItems + room.get('unreadItems')),

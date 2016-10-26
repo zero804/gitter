@@ -28,6 +28,7 @@ var SecondaryCollectionModel = require('../views/menu/room/secondary-collection/
 var TertiaryCollectionModel = require('../views/menu/room/tertiary-collection/tertiary-collection-model');
 var favouriteCollectionFilter = require('gitter-web-shared/filters/left-menu-primary-favourite');
 var MinibarItemModel = require('../views/menu/room/minibar/minibar-item-model');
+var MinibarHomeModel = require('../views/menu/room/minibar/home-view/home-model');
 var MinibarTempOrgModel = require('../views/menu/room/minibar/temp-org-view/temp-org-model');
 
 var states = [
@@ -127,7 +128,7 @@ module.exports = Backbone.Model.extend({
     this.suggestedRoomsByOrgName = new SuggestedRoomsByGroupName(null, { roomMenuModel: this });
 
     var state = this.get('state');
-    this.minibarHomeModel = new MinibarItemModel({ name: 'all', type: 'all', active: (state === 'all') });
+    this.minibarHomeModel = new MinibarHomeModel({ name: 'all', type: 'all', active: (state === 'all') }, { roomCollection: this._roomCollection });
     this.minibarSearchModel = new MinibarItemModel({ name: 'search', type: 'search', active: (state === 'search') });
     this.minibarPeopleModel = new MinibarItemModel({ name: 'people', type: 'people',  active: (state === 'people')});
     this.minibarGroupModel = new MinibarItemModel({ name: 'group', type: 'group', active: (state === 'group') });
