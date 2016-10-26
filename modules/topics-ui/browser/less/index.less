@@ -4,20 +4,9 @@
 @import './break-points';
 
 .m-cover-screen() { height: 100%; width: 100%; }
-.m-grad-background() {
-  background-position:   0 0;
-  background-repeat:     no-repeat;
-  background-attachment: fixed;
-  background-image: radial-gradient(
-    150rem at 0 -15rem,
-    @topic-bg-left,
-    @topic-bg-right
-  );
-}
 
 html {
   .m-cover-screen();
-  .m-grad-background();
   font-size: 62.5%;
   -webkit-overflow-scrolling: touch;
 }

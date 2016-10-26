@@ -31,8 +31,6 @@
   padding:          (@decal-height + .5rem) 4rem 2rem;
   border-left:      @panel-border-width solid desaturate(@jaffa, 10%);
   background-color: lighten(@jaffa, 10%);
-
-  &:before { .m-panel--category-decal(); }
 }
 
 .panel--table-control {
@@ -49,8 +47,7 @@
 .panel--topic-search {
   display:       flex;
   align-items:   center;
-  padding-left:  0;
-  padding-right: 0;
+  padding:  0;
 
   @media @only-small {
     flex-wrap: wrap;
@@ -71,6 +68,8 @@
   background-color: @light;
   border-bottom: 1px solid @forum-subscribe-area-border;
   padding:    (@panel-vert-padding / 2) @panel-horiz-padding;
+  border-left: 1px solid @topic-table-border-color;
+  border-right: 1px solid @topic-table-border-color;
 
   @media @only-small { padding: 1rem; }
 }
