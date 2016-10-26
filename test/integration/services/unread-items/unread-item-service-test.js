@@ -196,26 +196,38 @@ describe('unread-item-service', function() {
         var userId2 = mongoUtils.getNewObjectIdString();
         var userId3 = mongoUtils.getNewObjectIdString();
 
-        var roomMembershipServiceMock = mockito.mock(testRequire('./services/room-membership-service'));
         var appEvents = mockito.spy(testRequire('gitter-web-appevents'));
 
+        var createDistribution = mockito.mockFunction();
+
+        mockito.when(createDistribution)().then(function() {
+          return Promise.resolve(new Distribution({
+            membersWithFlags: [
+              { userId: userId2, flags: MODES.all },
+              { userId: userId3, flags: MODES.all },
+            ],
+            presence: makeHash(userId2, 'online', userId3, 'online')
+          }));
+        });
+
         var unreadItemService = testRequire.withProxies("./services/unread-items", {
-          '../room-membership-service': roomMembershipServiceMock,
-          'gitter-web-appevents': appEvents
+          'gitter-web-appevents': appEvents,
+          './create-distribution': createDistribution
         });
         unreadItemService.testOnly.setSendBadgeUpdates(false);
 
-        var usersWithLurkHash = {};
-        usersWithLurkHash[userId1] = false;
-        usersWithLurkHash[userId2] = false;
-        usersWithLurkHash[userId3] = false;
+        var troupe = {
+          id: troupeId1
+        };
 
-        mockito.when(roomMembershipServiceMock).findMembersForRoomWithLurk(troupeId1).thenReturn(Promise.resolve(usersWithLurkHash));
+        var chat = {
+          id: chatId,
+          mentions: []
+        }
 
-        return unreadItemService.removeItem(troupeId1, chatId)
+        return unreadItemService.removeItem(userId1, troupe, chat)
           .then(function() {
             // Two calls here, not three
-            mockito.verify(appEvents, once).unreadItemsRemoved(userId1, troupeId1);
             mockito.verify(appEvents, once).unreadItemsRemoved(userId2, troupeId1);
             mockito.verify(appEvents, once).unreadItemsRemoved(userId3, troupeId1);
 
@@ -411,7 +423,6 @@ describe('unread-item-service', function() {
       var fromUserId;
       var userId1;
       var userId2;
-      var userId3;
       var appEvents;
       var unreadItemService;
       var troupe;
@@ -427,7 +438,6 @@ describe('unread-item-service', function() {
         fromUserId = mongoUtils.getNewObjectIdString() + "";
         userId1 = mongoUtils.getNewObjectIdString() + "";
         userId2 = mongoUtils.getNewObjectIdString() + "";
-        userId3 = mongoUtils.getNewObjectIdString() + "";
 
         chat = {
           id: chatId,
