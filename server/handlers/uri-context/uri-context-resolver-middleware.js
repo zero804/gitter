@@ -21,11 +21,19 @@ function uriContextResolverMiddleware(req, res, next) {
 
   return roomContextService.findContextForUri(req.user, uri)
     .then(function(uriContext) {
+      if (uriContext.ownUrl) {
+        res.relativeRedirect('/home/explore');
+        return null;
+      }
+
       req.troupe = uriContext.troupe;
       req.group = uriContext.group;
       req.uriContext = uriContext;
+
+      next();
+      return null
     })
-    .asCallback(next);
+    .catch(next);
 }
 
 module.exports = uriContextResolverMiddleware;

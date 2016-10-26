@@ -5,7 +5,7 @@ var persistence = require('gitter-web-persistence');
 var Promise = require('bluebird');
 var _ = require('lodash');
 var cliff = require('cliff');
-var uriLookupService = require("../../server/services/uri-lookup-service");
+var uriLookupService = require('gitter-web-uri-resolver/lib/uri-lookup-service');
 var shutdown = require('shutdown');
 
 function getUserChannelsWithRenamedOwner() {

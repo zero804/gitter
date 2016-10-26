@@ -28,6 +28,7 @@ GroupStrategy.prototype = {
       id: id,
       name: group.name,
       uri: group.uri,
+      homeUri: group.homeUri,
       backedBy: this.securityDescriptorStrategy.map(group.sd),
       avatarUrl: avatars.getForGroup(group),
       hasAvatarSet: hasAvatarSet,

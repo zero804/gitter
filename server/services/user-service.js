@@ -6,7 +6,7 @@ var assert = require('assert');
 var _ = require('lodash');
 var Promise = require('bluebird');
 var persistence = require('gitter-web-persistence');
-var uriLookupService = require('./uri-lookup-service');
+var uriLookupService = require('gitter-web-uri-resolver/lib/uri-lookup-service');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 
 /** FIXME: the insert fields should simply extend from options or a key in options.
