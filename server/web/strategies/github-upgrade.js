@@ -3,9 +3,9 @@
 var env = require('gitter-web-env');
 var config = env.config;
 var logger = env.logger;
-
 var GitHubStrategy = require('gitter-passport-github').Strategy;
 var TokenStateProvider = require('gitter-passport-oauth2').TokenStateProvider;
+var callbackUrlBuilder = require('./callback-url-builder');
 
 function githubUpgradeCallback(req, accessToken, refreshToken, params, _profile, done) {
   var requestedScopes = params.scope.split(/,/);
@@ -32,7 +32,7 @@ function githubUpgradeCallback(req, accessToken, refreshToken, params, _profile,
 var githubUpgradeStrategy = new GitHubStrategy({
     clientID: config.get('github:client_id'),
     clientSecret: config.get('github:client_secret'),
-    callbackURL: config.get('web:basepath') + '/login/callback',
+    callbackURL: callbackUrlBuilder(),
     stateProvider: new TokenStateProvider({ passphrase: config.get('github:statePassphrase') }),
     skipUserProfile: true,
     passReqToCallback: true
