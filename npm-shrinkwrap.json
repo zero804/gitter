@@ -20,7 +20,7 @@
         "q": {
           "version": "1.4.1",
           "from": "q@>=1.1.0 <2.0.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//q/-/q-1.4.1.tgz"
+          "resolved": "http://beta-internal.beta.gitter:4873/q/-/q-1.4.1.tgz"
         }
       }
     },
@@ -42,7 +42,7 @@
             "core-util-is": {
               "version": "1.0.2",
               "from": "core-util-is@>=1.0.0 <1.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//core-util-is/-/core-util-is-1.0.2.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/core-util-is/-/core-util-is-1.0.2.tgz"
             },
             "isarray": {
               "version": "0.0.1",
@@ -52,12 +52,12 @@
             "string_decoder": {
               "version": "0.10.31",
               "from": "string_decoder@>=0.10.0 <0.11.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//string_decoder/-/string_decoder-0.10.31.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/string_decoder/-/string_decoder-0.10.31.tgz"
             },
             "inherits": {
               "version": "2.0.3",
               "from": "inherits@>=2.0.1 <2.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//inherits/-/inherits-2.0.3.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/inherits/-/inherits-2.0.3.tgz"
             }
           }
         }
@@ -123,7 +123,7 @@
             "ee-first": {
               "version": "1.1.1",
               "from": "ee-first@1.1.1",
-              "resolved": "http://beta-internal.beta.gitter:4873//ee-first/-/ee-first-1.1.1.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/ee-first/-/ee-first-1.1.1.tgz"
             }
           }
         },
@@ -152,17 +152,17 @@
             "media-typer": {
               "version": "0.3.0",
               "from": "media-typer@0.3.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//media-typer/-/media-typer-0.3.0.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/media-typer/-/media-typer-0.3.0.tgz"
             },
             "mime-types": {
               "version": "2.1.12",
               "from": "mime-types@>=2.1.11 <2.2.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//mime-types/-/mime-types-2.1.12.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/mime-types/-/mime-types-2.1.12.tgz",
               "dependencies": {
                 "mime-db": {
                   "version": "1.24.0",
                   "from": "mime-db@>=1.24.0 <1.25.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//mime-db/-/mime-db-1.24.0.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/mime-db/-/mime-db-1.24.0.tgz"
                 }
               }
             }
@@ -188,7 +188,7 @@
             "inflight": {
               "version": "1.0.6",
               "from": "inflight@>=1.0.4 <2.0.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//inflight/-/inflight-1.0.6.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/inflight/-/inflight-1.0.6.tgz",
               "dependencies": {
                 "wrappy": {
                   "version": "1.0.2",
@@ -200,7 +200,7 @@
             "inherits": {
               "version": "2.0.3",
               "from": "inherits@>=2.0.0 <3.0.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//inherits/-/inherits-2.0.3.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/inherits/-/inherits-2.0.3.tgz"
             },
             "minimatch": {
               "version": "3.0.3",
@@ -241,7 +241,7 @@
             "path-is-absolute": {
               "version": "1.0.1",
               "from": "path-is-absolute@>=1.0.0 <2.0.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//path-is-absolute/-/path-is-absolute-1.0.1.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/path-is-absolute/-/path-is-absolute-1.0.1.tgz"
             }
           }
         },
@@ -258,7 +258,7 @@
             "glob": {
               "version": "7.1.1",
               "from": "glob@>=7.0.5 <8.0.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//glob/-/glob-7.1.1.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/glob/-/glob-7.1.1.tgz",
               "dependencies": {
                 "fs.realpath": {
                   "version": "1.0.0",
@@ -268,7 +268,7 @@
                 "inflight": {
                   "version": "1.0.6",
                   "from": "inflight@>=1.0.4 <2.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//inflight/-/inflight-1.0.6.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/inflight/-/inflight-1.0.6.tgz",
                   "dependencies": {
                     "wrappy": {
                       "version": "1.0.2",
@@ -280,7 +280,7 @@
                 "inherits": {
                   "version": "2.0.3",
                   "from": "inherits@>=2.0.0 <3.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//inherits/-/inherits-2.0.3.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/inherits/-/inherits-2.0.3.tgz"
                 },
                 "minimatch": {
                   "version": "3.0.3",
@@ -321,7 +321,7 @@
                 "path-is-absolute": {
                   "version": "1.0.1",
                   "from": "path-is-absolute@>=1.0.0 <2.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//path-is-absolute/-/path-is-absolute-1.0.1.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/path-is-absolute/-/path-is-absolute-1.0.1.tgz"
                 }
               }
             }
@@ -337,12 +337,12 @@
         "colors": {
           "version": "1.0.3",
           "from": "colors@>=1.0.3 <1.1.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//colors/-/colors-1.0.3.tgz"
+          "resolved": "http://beta-internal.beta.gitter:4873/colors/-/colors-1.0.3.tgz"
         },
         "eyes": {
           "version": "0.1.8",
           "from": "eyes@>=0.1.8 <0.2.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//eyes/-/eyes-0.1.8.tgz"
+          "resolved": "http://beta-internal.beta.gitter:4873/eyes/-/eyes-0.1.8.tgz"
         },
         "winston": {
           "version": "0.8.3",
@@ -352,7 +352,7 @@
             "async": {
               "version": "0.2.10",
               "from": "async@>=0.2.0 <0.3.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//async/-/async-0.2.10.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/async/-/async-0.2.10.tgz"
             },
             "colors": {
               "version": "0.6.2",
@@ -362,22 +362,22 @@
             "cycle": {
               "version": "1.0.3",
               "from": "cycle@>=1.0.0 <1.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//cycle/-/cycle-1.0.3.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/cycle/-/cycle-1.0.3.tgz"
             },
             "isstream": {
               "version": "0.1.2",
               "from": "isstream@>=0.1.0 <0.2.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//isstream/-/isstream-0.1.2.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/isstream/-/isstream-0.1.2.tgz"
             },
             "pkginfo": {
               "version": "0.3.1",
               "from": "pkginfo@>=0.3.0 <0.4.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//pkginfo/-/pkginfo-0.3.1.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/pkginfo/-/pkginfo-0.3.1.tgz"
             },
             "stack-trace": {
               "version": "0.0.9",
               "from": "stack-trace@>=0.0.0 <0.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//stack-trace/-/stack-trace-0.0.9.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/stack-trace/-/stack-trace-0.0.9.tgz"
             }
           }
         }
@@ -469,7 +469,7 @@
                 "json-stringify-safe": {
                   "version": "5.0.1",
                   "from": "json-stringify-safe@>=5.0.0 <5.1.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//json-stringify-safe/-/json-stringify-safe-5.0.1.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/json-stringify-safe/-/json-stringify-safe-5.0.1.tgz"
                 },
                 "forever-agent": {
                   "version": "0.5.2",
@@ -489,7 +489,7 @@
                     "combined-stream": {
                       "version": "0.0.7",
                       "from": "combined-stream@>=0.0.4 <0.1.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//combined-stream/-/combined-stream-0.0.7.tgz",
+                      "resolved": "http://beta-internal.beta.gitter:4873/combined-stream/-/combined-stream-0.0.7.tgz",
                       "dependencies": {
                         "delayed-stream": {
                           "version": "0.0.5",
@@ -583,12 +583,12 @@
     "debug": {
       "version": "2.2.0",
       "from": "debug@>=2.2.0 <3.0.0",
-      "resolved": "http://beta-internal.beta.gitter:4873//debug/-/debug-2.2.0.tgz",
+      "resolved": "http://beta-internal.beta.gitter:4873/debug/-/debug-2.2.0.tgz",
       "dependencies": {
         "ms": {
           "version": "0.7.1",
           "from": "ms@0.7.1",
-          "resolved": "http://beta-internal.beta.gitter:4873//ms/-/ms-0.7.1.tgz"
+          "resolved": "http://beta-internal.beta.gitter:4873/ms/-/ms-0.7.1.tgz"
         }
       }
     },
@@ -600,7 +600,7 @@
         "redis": {
           "version": "0.10.3",
           "from": "redis@>=0.10.1 <0.11.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//redis/-/redis-0.10.3.tgz"
+          "resolved": "http://beta-internal.beta.gitter:4873/redis/-/redis-0.10.3.tgz"
         }
       }
     },
@@ -612,48 +612,48 @@
         "chalk": {
           "version": "1.1.3",
           "from": "chalk@>=1.0.0 <2.0.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//chalk/-/chalk-1.1.3.tgz",
+          "resolved": "http://beta-internal.beta.gitter:4873/chalk/-/chalk-1.1.3.tgz",
           "dependencies": {
             "ansi-styles": {
               "version": "2.2.1",
               "from": "ansi-styles@>=2.2.1 <3.0.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//ansi-styles/-/ansi-styles-2.2.1.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/ansi-styles/-/ansi-styles-2.2.1.tgz"
             },
             "has-ansi": {
               "version": "2.0.0",
               "from": "has-ansi@>=2.0.0 <3.0.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//has-ansi/-/has-ansi-2.0.0.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/has-ansi/-/has-ansi-2.0.0.tgz",
               "dependencies": {
                 "ansi-regex": {
                   "version": "2.0.0",
                   "from": "ansi-regex@>=2.0.0 <3.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//ansi-regex/-/ansi-regex-2.0.0.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/ansi-regex/-/ansi-regex-2.0.0.tgz"
                 }
               }
             },
             "strip-ansi": {
               "version": "3.0.1",
               "from": "strip-ansi@>=3.0.0 <4.0.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//strip-ansi/-/strip-ansi-3.0.1.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/strip-ansi/-/strip-ansi-3.0.1.tgz",
               "dependencies": {
                 "ansi-regex": {
                   "version": "2.0.0",
                   "from": "ansi-regex@>=2.0.0 <3.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//ansi-regex/-/ansi-regex-2.0.0.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/ansi-regex/-/ansi-regex-2.0.0.tgz"
                 }
               }
             },
             "supports-color": {
               "version": "2.0.0",
               "from": "supports-color@>=2.0.0 <3.0.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//supports-color/-/supports-color-2.0.0.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/supports-color/-/supports-color-2.0.0.tgz"
             }
           }
         },
         "forever-agent": {
           "version": "0.6.1",
           "from": "forever-agent@>=0.6.0 <0.7.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//forever-agent/-/forever-agent-0.6.1.tgz"
+          "resolved": "http://beta-internal.beta.gitter:4873/forever-agent/-/forever-agent-0.6.1.tgz"
         },
         "lodash-compat": {
           "version": "3.10.2",
@@ -744,12 +744,12 @@
             "mime-types": {
               "version": "2.1.12",
               "from": "mime-types@>=2.1.11 <2.2.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//mime-types/-/mime-types-2.1.12.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/mime-types/-/mime-types-2.1.12.tgz",
               "dependencies": {
                 "mime-db": {
                   "version": "1.24.0",
                   "from": "mime-db@>=1.24.0 <1.25.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//mime-db/-/mime-db-1.24.0.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/mime-db/-/mime-db-1.24.0.tgz"
                 }
               }
             },
@@ -845,7 +845,7 @@
             "ee-first": {
               "version": "1.1.1",
               "from": "ee-first@1.1.1",
-              "resolved": "http://beta-internal.beta.gitter:4873//ee-first/-/ee-first-1.1.1.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/ee-first/-/ee-first-1.1.1.tgz"
             }
           }
         },
@@ -916,7 +916,7 @@
             "mime": {
               "version": "1.3.4",
               "from": "mime@1.3.4",
-              "resolved": "http://beta-internal.beta.gitter:4873//mime/-/mime-1.3.4.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/mime/-/mime-1.3.4.tgz"
             },
             "ms": {
               "version": "0.7.1",
@@ -943,17 +943,17 @@
             "media-typer": {
               "version": "0.3.0",
               "from": "media-typer@0.3.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//media-typer/-/media-typer-0.3.0.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/media-typer/-/media-typer-0.3.0.tgz"
             },
             "mime-types": {
               "version": "2.1.12",
               "from": "mime-types@>=2.1.11 <2.2.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//mime-types/-/mime-types-2.1.12.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/mime-types/-/mime-types-2.1.12.tgz",
               "dependencies": {
                 "mime-db": {
                   "version": "1.24.0",
                   "from": "mime-db@>=1.24.0 <1.25.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//mime-db/-/mime-db-1.24.0.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/mime-db/-/mime-db-1.24.0.tgz"
                 }
               }
             }
@@ -994,7 +994,7 @@
                 "ini": {
                   "version": "1.3.4",
                   "from": "ini@>=1.3.4 <2.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//ini/-/ini-1.3.4.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/ini/-/ini-1.3.4.tgz"
                 }
               }
             },
@@ -1054,7 +1054,7 @@
                 "core-util-is": {
                   "version": "1.0.2",
                   "from": "core-util-is@>=1.0.0 <1.1.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//core-util-is/-/core-util-is-1.0.2.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/core-util-is/-/core-util-is-1.0.2.tgz"
                 },
                 "isarray": {
                   "version": "0.0.1",
@@ -1064,12 +1064,12 @@
                 "string_decoder": {
                   "version": "0.10.31",
                   "from": "string_decoder@>=0.10.0 <0.11.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//string_decoder/-/string_decoder-0.10.31.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/string_decoder/-/string_decoder-0.10.31.tgz"
                 },
                 "inherits": {
                   "version": "2.0.3",
                   "from": "inherits@>=2.0.1 <2.1.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//inherits/-/inherits-2.0.3.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/inherits/-/inherits-2.0.3.tgz"
                 }
               }
             }
@@ -1255,32 +1255,32 @@
     "gitter-env": {
       "version": "0.26.2",
       "from": "gitter-env@>=0.26.2 <0.27.0",
-      "resolved": "http://beta-internal.beta.gitter:4873//gitter-env/-/gitter-env-0.26.2.tgz",
+      "resolved": "http://beta-internal.beta.gitter:4873/gitter-env/-/gitter-env-0.26.2.tgz",
       "dependencies": {
         "async": {
           "version": "0.8.0",
           "from": "async@>=0.8.0 <0.9.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//async/-/async-0.8.0.tgz"
+          "resolved": "http://beta-internal.beta.gitter:4873/async/-/async-0.8.0.tgz"
         },
         "blocked": {
           "version": "1.2.1",
           "from": "blocked@>=1.1.0 <2.0.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//blocked/-/blocked-1.2.1.tgz"
+          "resolved": "http://beta-internal.beta.gitter:4873/blocked/-/blocked-1.2.1.tgz"
         },
         "gitter-private-cube": {
           "version": "0.2.12",
           "from": "gitter-private-cube@>=0.2.12 <0.3.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//gitter-private-cube/-/gitter-private-cube-0.2.12.tgz",
+          "resolved": "http://beta-internal.beta.gitter:4873/gitter-private-cube/-/gitter-private-cube-0.2.12.tgz",
           "dependencies": {
             "mongodb": {
               "version": "1.3.23",
               "from": "mongodb@>=1.3.18 <1.4.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//mongodb/-/mongodb-1.3.23.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/mongodb/-/mongodb-1.3.23.tgz",
               "dependencies": {
                 "bson": {
                   "version": "0.2.5",
                   "from": "bson@0.2.5",
-                  "resolved": "http://beta-internal.beta.gitter:4873//bson/-/bson-0.2.5.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/bson/-/bson-0.2.5.tgz"
                 },
                 "kerberos": {
                   "version": "0.0.3",
@@ -1297,24 +1297,24 @@
                 "optimist": {
                   "version": "0.6.1",
                   "from": "optimist@>=0.3.4",
-                  "resolved": "http://beta-internal.beta.gitter:4873//optimist/-/optimist-0.6.1.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/optimist/-/optimist-0.6.1.tgz",
                   "dependencies": {
                     "wordwrap": {
                       "version": "0.0.3",
                       "from": "wordwrap@>=0.0.2 <0.1.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//wordwrap/-/wordwrap-0.0.3.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/wordwrap/-/wordwrap-0.0.3.tgz"
                     },
                     "minimist": {
                       "version": "0.0.10",
                       "from": "minimist@>=0.0.1 <0.1.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//minimist/-/minimist-0.0.10.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/minimist/-/minimist-0.0.10.tgz"
                     }
                   }
                 },
                 "colors": {
                   "version": "1.1.2",
                   "from": "colors@>=0.6.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//colors/-/colors-1.1.2.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/colors/-/colors-1.1.2.tgz"
                 }
               }
             },
@@ -1331,12 +1331,12 @@
                 "eyes": {
                   "version": "0.1.8",
                   "from": "eyes@>=0.1.6",
-                  "resolved": "http://beta-internal.beta.gitter:4873//eyes/-/eyes-0.1.8.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/eyes/-/eyes-0.1.8.tgz"
                 },
                 "diff": {
                   "version": "1.0.8",
                   "from": "diff@>=1.0.3 <1.1.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//diff/-/diff-1.0.8.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/diff/-/diff-1.0.8.tgz"
                 }
               }
             },
@@ -1355,89 +1355,89 @@
         "gitter-redis-sentinel-client": {
           "version": "0.3.0",
           "from": "gitter-redis-sentinel-client@>=0.3.0 <0.4.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//gitter-redis-sentinel-client/-/gitter-redis-sentinel-client-0.3.0.tgz",
+          "resolved": "http://beta-internal.beta.gitter:4873/gitter-redis-sentinel-client/-/gitter-redis-sentinel-client-0.3.0.tgz",
           "dependencies": {
             "debug": {
               "version": "0.8.1",
               "from": "debug@>=0.8.0 <0.9.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//debug/-/debug-0.8.1.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/debug/-/debug-0.8.1.tgz"
             }
           }
         },
         "intercom.io": {
           "version": "1.2.1",
           "from": "intercom.io@>=1.2.1 <1.3.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//intercom.io/-/intercom.io-1.2.1.tgz",
+          "resolved": "http://beta-internal.beta.gitter:4873/intercom.io/-/intercom.io-1.2.1.tgz",
           "dependencies": {
             "lodash": {
               "version": "4.3.0",
               "from": "lodash@>=4.3.0 <4.4.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//lodash/-/lodash-4.3.0.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/lodash/-/lodash-4.3.0.tgz"
             },
             "q": {
               "version": "1.4.1",
               "from": "q@>=1.4.1 <1.5.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//q/-/q-1.4.1.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/q/-/q-1.4.1.tgz"
             },
             "qs": {
               "version": "6.1.0",
               "from": "qs@>=6.1.0 <6.2.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//qs/-/qs-6.1.0.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/qs/-/qs-6.1.0.tgz"
             },
             "request": {
               "version": "2.69.0",
               "from": "request@>=2.69.0 <2.70.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//request/-/request-2.69.0.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/request/-/request-2.69.0.tgz",
               "dependencies": {
                 "aws-sign2": {
                   "version": "0.6.0",
                   "from": "aws-sign2@>=0.6.0 <0.7.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//aws-sign2/-/aws-sign2-0.6.0.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/aws-sign2/-/aws-sign2-0.6.0.tgz"
                 },
                 "aws4": {
                   "version": "1.5.0",
                   "from": "aws4@>=1.2.1 <2.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//aws4/-/aws4-1.5.0.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/aws4/-/aws4-1.5.0.tgz"
                 },
                 "bl": {
                   "version": "1.0.3",
                   "from": "bl@>=1.0.0 <1.1.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//bl/-/bl-1.0.3.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/bl/-/bl-1.0.3.tgz",
                   "dependencies": {
                     "readable-stream": {
                       "version": "2.0.6",
                       "from": "readable-stream@>=2.0.5 <2.1.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//readable-stream/-/readable-stream-2.0.6.tgz",
+                      "resolved": "http://beta-internal.beta.gitter:4873/readable-stream/-/readable-stream-2.0.6.tgz",
                       "dependencies": {
                         "core-util-is": {
                           "version": "1.0.2",
                           "from": "core-util-is@>=1.0.0 <1.1.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//core-util-is/-/core-util-is-1.0.2.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/core-util-is/-/core-util-is-1.0.2.tgz"
                         },
                         "inherits": {
                           "version": "2.0.3",
                           "from": "inherits@>=2.0.1 <2.1.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//inherits/-/inherits-2.0.3.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/inherits/-/inherits-2.0.3.tgz"
                         },
                         "isarray": {
                           "version": "1.0.0",
                           "from": "isarray@>=1.0.0 <1.1.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//isarray/-/isarray-1.0.0.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/isarray/-/isarray-1.0.0.tgz"
                         },
                         "process-nextick-args": {
                           "version": "1.0.7",
                           "from": "process-nextick-args@>=1.0.6 <1.1.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//process-nextick-args/-/process-nextick-args-1.0.7.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/process-nextick-args/-/process-nextick-args-1.0.7.tgz"
                         },
                         "string_decoder": {
                           "version": "0.10.31",
                           "from": "string_decoder@>=0.10.0 <0.11.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//string_decoder/-/string_decoder-0.10.31.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/string_decoder/-/string_decoder-0.10.31.tgz"
                         },
                         "util-deprecate": {
                           "version": "1.0.2",
                           "from": "util-deprecate@>=1.0.1 <1.1.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//util-deprecate/-/util-deprecate-1.0.2.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/util-deprecate/-/util-deprecate-1.0.2.tgz"
                         }
                       }
                     }
@@ -1446,44 +1446,44 @@
                 "caseless": {
                   "version": "0.11.0",
                   "from": "caseless@>=0.11.0 <0.12.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//caseless/-/caseless-0.11.0.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/caseless/-/caseless-0.11.0.tgz"
                 },
                 "combined-stream": {
                   "version": "1.0.5",
                   "from": "combined-stream@>=1.0.5 <1.1.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//combined-stream/-/combined-stream-1.0.5.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/combined-stream/-/combined-stream-1.0.5.tgz",
                   "dependencies": {
                     "delayed-stream": {
                       "version": "1.0.0",
                       "from": "delayed-stream@>=1.0.0 <1.1.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//delayed-stream/-/delayed-stream-1.0.0.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/delayed-stream/-/delayed-stream-1.0.0.tgz"
                     }
                   }
                 },
                 "extend": {
                   "version": "3.0.0",
                   "from": "extend@>=3.0.0 <3.1.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//extend/-/extend-3.0.0.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/extend/-/extend-3.0.0.tgz"
                 },
                 "forever-agent": {
                   "version": "0.6.1",
                   "from": "forever-agent@>=0.6.1 <0.7.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//forever-agent/-/forever-agent-0.6.1.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/forever-agent/-/forever-agent-0.6.1.tgz"
                 },
                 "form-data": {
                   "version": "1.0.1",
                   "from": "form-data@>=1.0.0-rc3 <1.1.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//form-data/-/form-data-1.0.1.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/form-data/-/form-data-1.0.1.tgz",
                   "dependencies": {
                     "async": {
                       "version": "2.1.2",
                       "from": "async@>=2.0.1 <3.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//async/-/async-2.1.2.tgz",
+                      "resolved": "http://beta-internal.beta.gitter:4873/async/-/async-2.1.2.tgz",
                       "dependencies": {
                         "lodash": {
                           "version": "4.16.4",
                           "from": "lodash@>=4.14.0 <5.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//lodash/-/lodash-4.16.4.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/lodash/-/lodash-4.16.4.tgz"
                         }
                       }
                     }
@@ -1492,104 +1492,104 @@
                 "har-validator": {
                   "version": "2.0.6",
                   "from": "har-validator@>=2.0.6 <2.1.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//har-validator/-/har-validator-2.0.6.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/har-validator/-/har-validator-2.0.6.tgz",
                   "dependencies": {
                     "chalk": {
                       "version": "1.1.3",
                       "from": "chalk@>=1.1.1 <2.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//chalk/-/chalk-1.1.3.tgz",
+                      "resolved": "http://beta-internal.beta.gitter:4873/chalk/-/chalk-1.1.3.tgz",
                       "dependencies": {
                         "ansi-styles": {
                           "version": "2.2.1",
                           "from": "ansi-styles@>=2.2.1 <3.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//ansi-styles/-/ansi-styles-2.2.1.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/ansi-styles/-/ansi-styles-2.2.1.tgz"
                         },
                         "has-ansi": {
                           "version": "2.0.0",
                           "from": "has-ansi@>=2.0.0 <3.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//has-ansi/-/has-ansi-2.0.0.tgz",
+                          "resolved": "http://beta-internal.beta.gitter:4873/has-ansi/-/has-ansi-2.0.0.tgz",
                           "dependencies": {
                             "ansi-regex": {
                               "version": "2.0.0",
                               "from": "ansi-regex@>=2.0.0 <3.0.0",
-                              "resolved": "http://beta-internal.beta.gitter:4873//ansi-regex/-/ansi-regex-2.0.0.tgz"
+                              "resolved": "http://beta-internal.beta.gitter:4873/ansi-regex/-/ansi-regex-2.0.0.tgz"
                             }
                           }
                         },
                         "strip-ansi": {
                           "version": "3.0.1",
                           "from": "strip-ansi@>=3.0.0 <4.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//strip-ansi/-/strip-ansi-3.0.1.tgz",
+                          "resolved": "http://beta-internal.beta.gitter:4873/strip-ansi/-/strip-ansi-3.0.1.tgz",
                           "dependencies": {
                             "ansi-regex": {
                               "version": "2.0.0",
                               "from": "ansi-regex@>=2.0.0 <3.0.0",
-                              "resolved": "http://beta-internal.beta.gitter:4873//ansi-regex/-/ansi-regex-2.0.0.tgz"
+                              "resolved": "http://beta-internal.beta.gitter:4873/ansi-regex/-/ansi-regex-2.0.0.tgz"
                             }
                           }
                         },
                         "supports-color": {
                           "version": "2.0.0",
                           "from": "supports-color@>=2.0.0 <3.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//supports-color/-/supports-color-2.0.0.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/supports-color/-/supports-color-2.0.0.tgz"
                         }
                       }
                     },
                     "commander": {
                       "version": "2.9.0",
                       "from": "commander@>=2.9.0 <3.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//commander/-/commander-2.9.0.tgz",
+                      "resolved": "http://beta-internal.beta.gitter:4873/commander/-/commander-2.9.0.tgz",
                       "dependencies": {
                         "graceful-readlink": {
                           "version": "1.0.1",
                           "from": "graceful-readlink@>=1.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//graceful-readlink/-/graceful-readlink-1.0.1.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/graceful-readlink/-/graceful-readlink-1.0.1.tgz"
                         }
                       }
                     },
                     "is-my-json-valid": {
                       "version": "2.15.0",
                       "from": "is-my-json-valid@>=2.12.4 <3.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//is-my-json-valid/-/is-my-json-valid-2.15.0.tgz",
+                      "resolved": "http://beta-internal.beta.gitter:4873/is-my-json-valid/-/is-my-json-valid-2.15.0.tgz",
                       "dependencies": {
                         "generate-function": {
                           "version": "2.0.0",
                           "from": "generate-function@>=2.0.0 <3.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//generate-function/-/generate-function-2.0.0.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/generate-function/-/generate-function-2.0.0.tgz"
                         },
                         "generate-object-property": {
                           "version": "1.2.0",
                           "from": "generate-object-property@>=1.1.0 <2.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//generate-object-property/-/generate-object-property-1.2.0.tgz",
+                          "resolved": "http://beta-internal.beta.gitter:4873/generate-object-property/-/generate-object-property-1.2.0.tgz",
                           "dependencies": {
                             "is-property": {
                               "version": "1.0.2",
                               "from": "is-property@>=1.0.0 <2.0.0",
-                              "resolved": "http://beta-internal.beta.gitter:4873//is-property/-/is-property-1.0.2.tgz"
+                              "resolved": "http://beta-internal.beta.gitter:4873/is-property/-/is-property-1.0.2.tgz"
                             }
                           }
                         },
                         "jsonpointer": {
                           "version": "4.0.0",
                           "from": "jsonpointer@>=4.0.0 <5.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//jsonpointer/-/jsonpointer-4.0.0.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/jsonpointer/-/jsonpointer-4.0.0.tgz"
                         },
                         "xtend": {
                           "version": "4.0.1",
                           "from": "xtend@>=4.0.0 <5.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//xtend/-/xtend-4.0.1.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/xtend/-/xtend-4.0.1.tgz"
                         }
                       }
                     },
                     "pinkie-promise": {
                       "version": "2.0.1",
                       "from": "pinkie-promise@>=2.0.0 <3.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//pinkie-promise/-/pinkie-promise-2.0.1.tgz",
+                      "resolved": "http://beta-internal.beta.gitter:4873/pinkie-promise/-/pinkie-promise-2.0.1.tgz",
                       "dependencies": {
                         "pinkie": {
                           "version": "2.0.4",
                           "from": "pinkie@>=2.0.0 <3.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//pinkie/-/pinkie-2.0.4.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/pinkie/-/pinkie-2.0.4.tgz"
                         }
                       }
                     }
@@ -1598,44 +1598,44 @@
                 "hawk": {
                   "version": "3.1.3",
                   "from": "hawk@>=3.1.0 <3.2.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//hawk/-/hawk-3.1.3.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/hawk/-/hawk-3.1.3.tgz",
                   "dependencies": {
                     "hoek": {
                       "version": "2.16.3",
                       "from": "hoek@>=2.0.0 <3.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//hoek/-/hoek-2.16.3.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/hoek/-/hoek-2.16.3.tgz"
                     },
                     "boom": {
                       "version": "2.10.1",
                       "from": "boom@>=2.0.0 <3.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//boom/-/boom-2.10.1.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/boom/-/boom-2.10.1.tgz"
                     },
                     "cryptiles": {
                       "version": "2.0.5",
                       "from": "cryptiles@>=2.0.0 <3.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//cryptiles/-/cryptiles-2.0.5.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/cryptiles/-/cryptiles-2.0.5.tgz"
                     },
                     "sntp": {
                       "version": "1.0.9",
                       "from": "sntp@>=1.0.0 <2.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//sntp/-/sntp-1.0.9.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/sntp/-/sntp-1.0.9.tgz"
                     }
                   }
                 },
                 "http-signature": {
                   "version": "1.1.1",
                   "from": "http-signature@>=1.1.0 <1.2.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//http-signature/-/http-signature-1.1.1.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/http-signature/-/http-signature-1.1.1.tgz",
                   "dependencies": {
                     "assert-plus": {
                       "version": "0.2.0",
                       "from": "assert-plus@>=0.2.0 <0.3.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//assert-plus/-/assert-plus-0.2.0.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/assert-plus/-/assert-plus-0.2.0.tgz"
                     },
                     "jsprim": {
                       "version": "1.3.1",
                       "from": "jsprim@>=1.2.2 <2.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//jsprim/-/jsprim-1.3.1.tgz",
+                      "resolved": "http://beta-internal.beta.gitter:4873/jsprim/-/jsprim-1.3.1.tgz",
                       "dependencies": {
                         "extsprintf": {
                           "version": "1.0.2",
@@ -1657,52 +1657,52 @@
                     "sshpk": {
                       "version": "1.10.1",
                       "from": "sshpk@>=1.7.0 <2.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//sshpk/-/sshpk-1.10.1.tgz",
+                      "resolved": "http://beta-internal.beta.gitter:4873/sshpk/-/sshpk-1.10.1.tgz",
                       "dependencies": {
                         "asn1": {
                           "version": "0.2.3",
                           "from": "asn1@>=0.2.3 <0.3.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//asn1/-/asn1-0.2.3.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/asn1/-/asn1-0.2.3.tgz"
                         },
                         "assert-plus": {
                           "version": "1.0.0",
                           "from": "assert-plus@>=1.0.0 <2.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//assert-plus/-/assert-plus-1.0.0.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/assert-plus/-/assert-plus-1.0.0.tgz"
                         },
                         "dashdash": {
                           "version": "1.14.0",
                           "from": "dashdash@>=1.12.0 <2.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//dashdash/-/dashdash-1.14.0.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/dashdash/-/dashdash-1.14.0.tgz"
                         },
                         "getpass": {
                           "version": "0.1.6",
                           "from": "getpass@>=0.1.1 <0.2.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//getpass/-/getpass-0.1.6.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/getpass/-/getpass-0.1.6.tgz"
                         },
                         "jsbn": {
                           "version": "0.1.0",
                           "from": "jsbn@>=0.1.0 <0.2.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//jsbn/-/jsbn-0.1.0.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/jsbn/-/jsbn-0.1.0.tgz"
                         },
                         "tweetnacl": {
                           "version": "0.14.3",
                           "from": "tweetnacl@>=0.14.0 <0.15.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//tweetnacl/-/tweetnacl-0.14.3.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/tweetnacl/-/tweetnacl-0.14.3.tgz"
                         },
                         "jodid25519": {
                           "version": "1.0.2",
                           "from": "jodid25519@>=1.0.0 <2.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//jodid25519/-/jodid25519-1.0.2.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/jodid25519/-/jodid25519-1.0.2.tgz"
                         },
                         "ecc-jsbn": {
                           "version": "0.1.1",
                           "from": "ecc-jsbn@>=0.1.1 <0.2.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//ecc-jsbn/-/ecc-jsbn-0.1.1.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/ecc-jsbn/-/ecc-jsbn-0.1.1.tgz"
                         },
                         "bcrypt-pbkdf": {
                           "version": "1.0.0",
                           "from": "bcrypt-pbkdf@>=1.0.0 <2.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//bcrypt-pbkdf/-/bcrypt-pbkdf-1.0.0.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/bcrypt-pbkdf/-/bcrypt-pbkdf-1.0.0.tgz"
                         }
                       }
                     }
@@ -1711,59 +1711,59 @@
                 "is-typedarray": {
                   "version": "1.0.0",
                   "from": "is-typedarray@>=1.0.0 <1.1.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//is-typedarray/-/is-typedarray-1.0.0.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/is-typedarray/-/is-typedarray-1.0.0.tgz"
                 },
                 "isstream": {
                   "version": "0.1.2",
                   "from": "isstream@>=0.1.2 <0.2.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//isstream/-/isstream-0.1.2.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/isstream/-/isstream-0.1.2.tgz"
                 },
                 "json-stringify-safe": {
                   "version": "5.0.1",
                   "from": "json-stringify-safe@>=5.0.1 <5.1.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//json-stringify-safe/-/json-stringify-safe-5.0.1.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/json-stringify-safe/-/json-stringify-safe-5.0.1.tgz"
                 },
                 "mime-types": {
                   "version": "2.1.12",
                   "from": "mime-types@>=2.1.7 <2.2.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//mime-types/-/mime-types-2.1.12.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/mime-types/-/mime-types-2.1.12.tgz",
                   "dependencies": {
                     "mime-db": {
                       "version": "1.24.0",
                       "from": "mime-db@>=1.24.0 <1.25.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//mime-db/-/mime-db-1.24.0.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/mime-db/-/mime-db-1.24.0.tgz"
                     }
                   }
                 },
                 "node-uuid": {
                   "version": "1.4.7",
                   "from": "node-uuid@>=1.4.7 <1.5.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//node-uuid/-/node-uuid-1.4.7.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/node-uuid/-/node-uuid-1.4.7.tgz"
                 },
                 "oauth-sign": {
                   "version": "0.8.2",
                   "from": "oauth-sign@>=0.8.0 <0.9.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//oauth-sign/-/oauth-sign-0.8.2.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/oauth-sign/-/oauth-sign-0.8.2.tgz"
                 },
                 "qs": {
                   "version": "6.0.2",
                   "from": "qs@>=6.0.2 <6.1.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//qs/-/qs-6.0.2.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/qs/-/qs-6.0.2.tgz"
                 },
                 "stringstream": {
                   "version": "0.0.5",
                   "from": "stringstream@>=0.0.4 <0.1.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//stringstream/-/stringstream-0.0.5.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/stringstream/-/stringstream-0.0.5.tgz"
                 },
                 "tough-cookie": {
                   "version": "2.2.2",
                   "from": "tough-cookie@>=2.2.0 <2.3.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//tough-cookie/-/tough-cookie-2.2.2.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/tough-cookie/-/tough-cookie-2.2.2.tgz"
                 },
                 "tunnel-agent": {
                   "version": "0.4.3",
                   "from": "tunnel-agent@>=0.4.1 <0.5.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//tunnel-agent/-/tunnel-agent-0.4.3.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/tunnel-agent/-/tunnel-agent-0.4.3.tgz"
                 }
               }
             }
@@ -1772,64 +1772,64 @@
         "lodash": {
           "version": "4.16.4",
           "from": "lodash@>=4.6.1 <5.0.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//lodash/-/lodash-4.16.4.tgz"
+          "resolved": "http://beta-internal.beta.gitter:4873/lodash/-/lodash-4.16.4.tgz"
         },
         "mandrill-api": {
           "version": "1.0.45",
           "from": "mandrill-api@>=1.0.41 <2.0.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//mandrill-api/-/mandrill-api-1.0.45.tgz"
+          "resolved": "http://beta-internal.beta.gitter:4873/mandrill-api/-/mandrill-api-1.0.45.tgz"
         },
         "mongodb-arbiter-discovery": {
           "version": "0.1.2",
           "from": "mongodb-arbiter-discovery@>=0.1.2 <0.2.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//mongodb-arbiter-discovery/-/mongodb-arbiter-discovery-0.1.2.tgz"
+          "resolved": "http://beta-internal.beta.gitter:4873/mongodb-arbiter-discovery/-/mongodb-arbiter-discovery-0.1.2.tgz"
         },
         "mongodb-connection-string": {
           "version": "0.1.1",
           "from": "mongodb-connection-string@>=0.1.1 <0.2.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//mongodb-connection-string/-/mongodb-connection-string-0.1.1.tgz"
+          "resolved": "http://beta-internal.beta.gitter:4873/mongodb-connection-string/-/mongodb-connection-string-0.1.1.tgz"
         },
         "mongodb-datadog-stats": {
           "version": "0.1.2",
           "from": "mongodb-datadog-stats@>=0.1.2 <0.2.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//mongodb-datadog-stats/-/mongodb-datadog-stats-0.1.2.tgz",
+          "resolved": "http://beta-internal.beta.gitter:4873/mongodb-datadog-stats/-/mongodb-datadog-stats-0.1.2.tgz",
           "dependencies": {
             "mongodb-perf-wrapper": {
               "version": "0.1.3",
               "from": "mongodb-perf-wrapper@>=0.1.3 <0.2.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//mongodb-perf-wrapper/-/mongodb-perf-wrapper-0.1.3.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/mongodb-perf-wrapper/-/mongodb-perf-wrapper-0.1.3.tgz"
             }
           }
         },
         "nconf": {
           "version": "0.6.9",
           "from": "nconf@>=0.6.9 <0.7.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//nconf/-/nconf-0.6.9.tgz",
+          "resolved": "http://beta-internal.beta.gitter:4873/nconf/-/nconf-0.6.9.tgz",
           "dependencies": {
             "async": {
               "version": "0.2.9",
               "from": "async@0.2.9",
-              "resolved": "http://beta-internal.beta.gitter:4873//async/-/async-0.2.9.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/async/-/async-0.2.9.tgz"
             },
             "ini": {
               "version": "1.3.4",
               "from": "ini@>=1.0.0 <2.0.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//ini/-/ini-1.3.4.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/ini/-/ini-1.3.4.tgz"
             },
             "optimist": {
               "version": "0.6.0",
               "from": "optimist@0.6.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//optimist/-/optimist-0.6.0.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/optimist/-/optimist-0.6.0.tgz",
               "dependencies": {
                 "wordwrap": {
                   "version": "0.0.3",
                   "from": "wordwrap@>=0.0.2 <0.1.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//wordwrap/-/wordwrap-0.0.3.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/wordwrap/-/wordwrap-0.0.3.tgz"
                 },
                 "minimist": {
                   "version": "0.0.10",
                   "from": "minimist@>=0.0.1 <0.1.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//minimist/-/minimist-0.0.10.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/minimist/-/minimist-0.0.10.tgz"
                 }
               }
             }
@@ -1838,27 +1838,27 @@
         "node-statsd": {
           "version": "0.1.1",
           "from": "node-statsd@>=0.1.1 <0.2.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//node-statsd/-/node-statsd-0.1.1.tgz"
+          "resolved": "http://beta-internal.beta.gitter:4873/node-statsd/-/node-statsd-0.1.1.tgz"
         },
         "raven": {
           "version": "0.8.1",
           "from": "raven@>=0.8.1 <0.9.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//raven/-/raven-0.8.1.tgz",
+          "resolved": "http://beta-internal.beta.gitter:4873/raven/-/raven-0.8.1.tgz",
           "dependencies": {
             "cookie": {
               "version": "0.1.0",
               "from": "cookie@0.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//cookie/-/cookie-0.1.0.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/cookie/-/cookie-0.1.0.tgz"
             },
             "lsmod": {
               "version": "0.0.3",
               "from": "lsmod@>=0.0.3 <0.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//lsmod/-/lsmod-0.0.3.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/lsmod/-/lsmod-0.0.3.tgz"
             },
             "node-uuid": {
               "version": "1.4.7",
               "from": "node-uuid@>=1.4.1 <1.5.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//node-uuid/-/node-uuid-1.4.7.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/node-uuid/-/node-uuid-1.4.7.tgz"
             },
             "stack-trace": {
               "version": "0.0.7",
@@ -1870,78 +1870,78 @@
         "redis": {
           "version": "0.10.3",
           "from": "redis@>=0.10.1 <0.11.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//redis/-/redis-0.10.3.tgz"
+          "resolved": "http://beta-internal.beta.gitter:4873/redis/-/redis-0.10.3.tgz"
         },
         "response-time": {
           "version": "2.3.1",
           "from": "response-time@>=2.3.1 <3.0.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//response-time/-/response-time-2.3.1.tgz",
+          "resolved": "http://beta-internal.beta.gitter:4873/response-time/-/response-time-2.3.1.tgz",
           "dependencies": {
             "depd": {
               "version": "1.0.1",
               "from": "depd@>=1.0.1 <1.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//depd/-/depd-1.0.1.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/depd/-/depd-1.0.1.tgz"
             }
           }
         },
         "universal-analytics": {
           "version": "0.3.11",
           "from": "universal-analytics@>=0.3.4 <0.4.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//universal-analytics/-/universal-analytics-0.3.11.tgz",
+          "resolved": "http://beta-internal.beta.gitter:4873/universal-analytics/-/universal-analytics-0.3.11.tgz",
           "dependencies": {
             "async": {
               "version": "0.2.10",
               "from": "async@>=0.2.0 <0.3.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//async/-/async-0.2.10.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/async/-/async-0.2.10.tgz"
             }
           }
         },
         "winston": {
           "version": "2.2.0",
           "from": "winston@>=2.2.0 <3.0.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//winston/-/winston-2.2.0.tgz",
+          "resolved": "http://beta-internal.beta.gitter:4873/winston/-/winston-2.2.0.tgz",
           "dependencies": {
             "async": {
               "version": "1.0.0",
               "from": "async@>=1.0.0 <1.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//async/-/async-1.0.0.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/async/-/async-1.0.0.tgz"
             },
             "colors": {
               "version": "1.0.3",
               "from": "colors@>=1.0.0 <1.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//colors/-/colors-1.0.3.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/colors/-/colors-1.0.3.tgz"
             },
             "cycle": {
               "version": "1.0.3",
               "from": "cycle@>=1.0.0 <1.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//cycle/-/cycle-1.0.3.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/cycle/-/cycle-1.0.3.tgz"
             },
             "eyes": {
               "version": "0.1.8",
               "from": "eyes@>=0.1.0 <0.2.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//eyes/-/eyes-0.1.8.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/eyes/-/eyes-0.1.8.tgz"
             },
             "isstream": {
               "version": "0.1.2",
               "from": "isstream@>=0.1.0 <0.2.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//isstream/-/isstream-0.1.2.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/isstream/-/isstream-0.1.2.tgz"
             },
             "pkginfo": {
               "version": "0.3.1",
               "from": "pkginfo@>=0.3.0 <0.4.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//pkginfo/-/pkginfo-0.3.1.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/pkginfo/-/pkginfo-0.3.1.tgz"
             },
             "stack-trace": {
               "version": "0.0.9",
               "from": "stack-trace@>=0.0.0 <0.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//stack-trace/-/stack-trace-0.0.9.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/stack-trace/-/stack-trace-0.0.9.tgz"
             }
           }
         },
         "winston-udp": {
           "version": "0.0.6",
           "from": "winston-udp@>=0.0.6 <0.0.7",
-          "resolved": "http://beta-internal.beta.gitter:4873//winston-udp/-/winston-udp-0.0.6.tgz"
+          "resolved": "http://beta-internal.beta.gitter:4873/winston-udp/-/winston-udp-0.0.6.tgz"
         }
       }
     },
@@ -1984,7 +1984,7 @@
         "tunnel-agent": {
           "version": "0.4.3",
           "from": "tunnel-agent@latest",
-          "resolved": "http://beta-internal.beta.gitter:4873//tunnel-agent/-/tunnel-agent-0.4.3.tgz"
+          "resolved": "http://beta-internal.beta.gitter:4873/tunnel-agent/-/tunnel-agent-0.4.3.tgz"
         }
       }
     },
@@ -2074,7 +2074,7 @@
             "xtend": {
               "version": "4.0.1",
               "from": "xtend@>=4.0.0 <4.1.0-0",
-              "resolved": "http://beta-internal.beta.gitter:4873//xtend/-/xtend-4.0.1.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/xtend/-/xtend-4.0.1.tgz"
             }
           }
         }
@@ -2212,7 +2212,7 @@
             "inherits": {
               "version": "2.0.3",
               "from": "inherits@>=2.0.0 <3.0.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//inherits/-/inherits-2.0.3.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/inherits/-/inherits-2.0.3.tgz"
             }
           }
         }
@@ -2504,7 +2504,7 @@
         "lodash": {
           "version": "4.16.4",
           "from": "lodash@>=4.15.0 <5.0.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//lodash/-/lodash-4.16.4.tgz"
+          "resolved": "http://beta-internal.beta.gitter:4873/lodash/-/lodash-4.16.4.tgz"
         },
         "sinon": {
           "version": "1.17.6",
@@ -2580,7 +2580,7 @@
         "inflight": {
           "version": "1.0.6",
           "from": "inflight@>=1.0.4 <2.0.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//inflight/-/inflight-1.0.6.tgz",
+          "resolved": "http://beta-internal.beta.gitter:4873/inflight/-/inflight-1.0.6.tgz",
           "dependencies": {
             "wrappy": {
               "version": "1.0.2",
@@ -2592,7 +2592,7 @@
         "inherits": {
           "version": "2.0.3",
           "from": "inherits@>=2.0.0 <3.0.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//inherits/-/inherits-2.0.3.tgz"
+          "resolved": "http://beta-internal.beta.gitter:4873/inherits/-/inherits-2.0.3.tgz"
         },
         "minimatch": {
           "version": "3.0.3",
@@ -2633,29 +2633,29 @@
         "path-is-absolute": {
           "version": "1.0.1",
           "from": "path-is-absolute@>=1.0.0 <2.0.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//path-is-absolute/-/path-is-absolute-1.0.1.tgz"
+          "resolved": "http://beta-internal.beta.gitter:4873/path-is-absolute/-/path-is-absolute-1.0.1.tgz"
         }
       }
     },
     "handlebars": {
       "version": "3.0.3",
       "from": "handlebars@>=3.0.3 <3.1.0",
-      "resolved": "http://beta-internal.beta.gitter:4873//handlebars/-/handlebars-3.0.3.tgz",
+      "resolved": "http://beta-internal.beta.gitter:4873/handlebars/-/handlebars-3.0.3.tgz",
       "dependencies": {
         "optimist": {
           "version": "0.6.1",
           "from": "optimist@>=0.6.1 <0.7.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//optimist/-/optimist-0.6.1.tgz",
+          "resolved": "http://beta-internal.beta.gitter:4873/optimist/-/optimist-0.6.1.tgz",
           "dependencies": {
             "wordwrap": {
               "version": "0.0.3",
               "from": "wordwrap@>=0.0.2 <0.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//wordwrap/-/wordwrap-0.0.3.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/wordwrap/-/wordwrap-0.0.3.tgz"
             },
             "minimist": {
               "version": "0.0.10",
               "from": "minimist@>=0.0.1 <0.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//minimist/-/minimist-0.0.10.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/minimist/-/minimist-0.0.10.tgz"
             }
           }
         },
@@ -2679,7 +2679,7 @@
             "async": {
               "version": "0.2.10",
               "from": "async@>=0.2.6 <0.3.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//async/-/async-0.2.10.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/async/-/async-0.2.10.tgz"
             },
             "optimist": {
               "version": "0.3.7",
@@ -2689,7 +2689,7 @@
                 "wordwrap": {
                   "version": "0.0.3",
                   "from": "wordwrap@>=0.0.2 <0.1.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//wordwrap/-/wordwrap-0.0.3.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/wordwrap/-/wordwrap-0.0.3.tgz"
                 }
               }
             }
@@ -2722,22 +2722,22 @@
     "intercom-client": {
       "version": "2.8.5",
       "from": "intercom-client@>=2.6.0 <3.0.0",
-      "resolved": "http://beta-internal.beta.gitter:4873//intercom-client/-/intercom-client-2.8.5.tgz",
+      "resolved": "http://beta-internal.beta.gitter:4873/intercom-client/-/intercom-client-2.8.5.tgz",
       "dependencies": {
         "unirest": {
           "version": "0.5.1",
           "from": "unirest@>=0.5.1 <0.6.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//unirest/-/unirest-0.5.1.tgz",
+          "resolved": "http://beta-internal.beta.gitter:4873/unirest/-/unirest-0.5.1.tgz",
           "dependencies": {
             "form-data": {
               "version": "0.2.0",
               "from": "form-data@>=0.2.0 <0.3.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//form-data/-/form-data-0.2.0.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/form-data/-/form-data-0.2.0.tgz",
               "dependencies": {
                 "combined-stream": {
                   "version": "0.0.7",
                   "from": "combined-stream@>=0.0.4 <0.1.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//combined-stream/-/combined-stream-0.0.7.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/combined-stream/-/combined-stream-0.0.7.tgz",
                   "dependencies": {
                     "delayed-stream": {
                       "version": "0.0.5",
@@ -2749,12 +2749,12 @@
                 "mime-types": {
                   "version": "2.0.14",
                   "from": "mime-types@>=2.0.3 <2.1.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//mime-types/-/mime-types-2.0.14.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/mime-types/-/mime-types-2.0.14.tgz",
                   "dependencies": {
                     "mime-db": {
                       "version": "1.12.0",
                       "from": "mime-db@>=1.12.0 <1.13.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//mime-db/-/mime-db-1.12.0.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/mime-db/-/mime-db-1.12.0.tgz"
                     }
                   }
                 }
@@ -2763,62 +2763,62 @@
             "mime": {
               "version": "1.3.4",
               "from": "mime@>=1.3.4 <1.4.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//mime/-/mime-1.3.4.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/mime/-/mime-1.3.4.tgz"
             },
             "request": {
               "version": "2.74.0",
               "from": "request@>=2.74.0 <2.75.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//request/-/request-2.74.0.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/request/-/request-2.74.0.tgz",
               "dependencies": {
                 "aws-sign2": {
                   "version": "0.6.0",
                   "from": "aws-sign2@>=0.6.0 <0.7.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//aws-sign2/-/aws-sign2-0.6.0.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/aws-sign2/-/aws-sign2-0.6.0.tgz"
                 },
                 "aws4": {
                   "version": "1.5.0",
                   "from": "aws4@>=1.2.1 <2.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//aws4/-/aws4-1.5.0.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/aws4/-/aws4-1.5.0.tgz"
                 },
                 "bl": {
                   "version": "1.1.2",
                   "from": "bl@>=1.1.2 <1.2.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//bl/-/bl-1.1.2.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/bl/-/bl-1.1.2.tgz",
                   "dependencies": {
                     "readable-stream": {
                       "version": "2.0.6",
                       "from": "readable-stream@>=2.0.5 <2.1.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//readable-stream/-/readable-stream-2.0.6.tgz",
+                      "resolved": "http://beta-internal.beta.gitter:4873/readable-stream/-/readable-stream-2.0.6.tgz",
                       "dependencies": {
                         "core-util-is": {
                           "version": "1.0.2",
                           "from": "core-util-is@>=1.0.0 <1.1.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//core-util-is/-/core-util-is-1.0.2.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/core-util-is/-/core-util-is-1.0.2.tgz"
                         },
                         "inherits": {
                           "version": "2.0.3",
                           "from": "inherits@>=2.0.1 <2.1.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//inherits/-/inherits-2.0.3.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/inherits/-/inherits-2.0.3.tgz"
                         },
                         "isarray": {
                           "version": "1.0.0",
                           "from": "isarray@>=1.0.0 <1.1.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//isarray/-/isarray-1.0.0.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/isarray/-/isarray-1.0.0.tgz"
                         },
                         "process-nextick-args": {
                           "version": "1.0.7",
                           "from": "process-nextick-args@>=1.0.6 <1.1.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//process-nextick-args/-/process-nextick-args-1.0.7.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/process-nextick-args/-/process-nextick-args-1.0.7.tgz"
                         },
                         "string_decoder": {
                           "version": "0.10.31",
                           "from": "string_decoder@>=0.10.0 <0.11.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//string_decoder/-/string_decoder-0.10.31.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/string_decoder/-/string_decoder-0.10.31.tgz"
                         },
                         "util-deprecate": {
                           "version": "1.0.2",
                           "from": "util-deprecate@>=1.0.1 <1.1.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//util-deprecate/-/util-deprecate-1.0.2.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/util-deprecate/-/util-deprecate-1.0.2.tgz"
                         }
                       }
                     }
@@ -2827,44 +2827,44 @@
                 "caseless": {
                   "version": "0.11.0",
                   "from": "caseless@>=0.11.0 <0.12.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//caseless/-/caseless-0.11.0.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/caseless/-/caseless-0.11.0.tgz"
                 },
                 "combined-stream": {
                   "version": "1.0.5",
                   "from": "combined-stream@>=1.0.5 <1.1.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//combined-stream/-/combined-stream-1.0.5.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/combined-stream/-/combined-stream-1.0.5.tgz",
                   "dependencies": {
                     "delayed-stream": {
                       "version": "1.0.0",
                       "from": "delayed-stream@>=1.0.0 <1.1.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//delayed-stream/-/delayed-stream-1.0.0.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/delayed-stream/-/delayed-stream-1.0.0.tgz"
                     }
                   }
                 },
                 "extend": {
                   "version": "3.0.0",
                   "from": "extend@>=3.0.0 <3.1.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//extend/-/extend-3.0.0.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/extend/-/extend-3.0.0.tgz"
                 },
                 "forever-agent": {
                   "version": "0.6.1",
                   "from": "forever-agent@>=0.6.1 <0.7.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//forever-agent/-/forever-agent-0.6.1.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/forever-agent/-/forever-agent-0.6.1.tgz"
                 },
                 "form-data": {
                   "version": "1.0.1",
                   "from": "form-data@>=1.0.0-rc4 <1.1.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//form-data/-/form-data-1.0.1.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/form-data/-/form-data-1.0.1.tgz",
                   "dependencies": {
                     "async": {
                       "version": "2.1.2",
                       "from": "async@>=2.0.1 <3.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//async/-/async-2.1.2.tgz",
+                      "resolved": "http://beta-internal.beta.gitter:4873/async/-/async-2.1.2.tgz",
                       "dependencies": {
                         "lodash": {
                           "version": "4.16.4",
                           "from": "lodash@>=4.14.0 <5.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//lodash/-/lodash-4.16.4.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/lodash/-/lodash-4.16.4.tgz"
                         }
                       }
                     }
@@ -2873,104 +2873,104 @@
                 "har-validator": {
                   "version": "2.0.6",
                   "from": "har-validator@>=2.0.6 <2.1.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//har-validator/-/har-validator-2.0.6.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/har-validator/-/har-validator-2.0.6.tgz",
                   "dependencies": {
                     "chalk": {
                       "version": "1.1.3",
                       "from": "chalk@>=1.1.1 <2.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//chalk/-/chalk-1.1.3.tgz",
+                      "resolved": "http://beta-internal.beta.gitter:4873/chalk/-/chalk-1.1.3.tgz",
                       "dependencies": {
                         "ansi-styles": {
                           "version": "2.2.1",
                           "from": "ansi-styles@>=2.2.1 <3.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//ansi-styles/-/ansi-styles-2.2.1.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/ansi-styles/-/ansi-styles-2.2.1.tgz"
                         },
                         "has-ansi": {
                           "version": "2.0.0",
                           "from": "has-ansi@>=2.0.0 <3.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//has-ansi/-/has-ansi-2.0.0.tgz",
+                          "resolved": "http://beta-internal.beta.gitter:4873/has-ansi/-/has-ansi-2.0.0.tgz",
                           "dependencies": {
                             "ansi-regex": {
                               "version": "2.0.0",
                               "from": "ansi-regex@>=2.0.0 <3.0.0",
-                              "resolved": "http://beta-internal.beta.gitter:4873//ansi-regex/-/ansi-regex-2.0.0.tgz"
+                              "resolved": "http://beta-internal.beta.gitter:4873/ansi-regex/-/ansi-regex-2.0.0.tgz"
                             }
                           }
                         },
                         "strip-ansi": {
                           "version": "3.0.1",
                           "from": "strip-ansi@>=3.0.0 <4.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//strip-ansi/-/strip-ansi-3.0.1.tgz",
+                          "resolved": "http://beta-internal.beta.gitter:4873/strip-ansi/-/strip-ansi-3.0.1.tgz",
                           "dependencies": {
                             "ansi-regex": {
                               "version": "2.0.0",
                               "from": "ansi-regex@>=2.0.0 <3.0.0",
-                              "resolved": "http://beta-internal.beta.gitter:4873//ansi-regex/-/ansi-regex-2.0.0.tgz"
+                              "resolved": "http://beta-internal.beta.gitter:4873/ansi-regex/-/ansi-regex-2.0.0.tgz"
                             }
                           }
                         },
                         "supports-color": {
                           "version": "2.0.0",
                           "from": "supports-color@>=2.0.0 <3.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//supports-color/-/supports-color-2.0.0.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/supports-color/-/supports-color-2.0.0.tgz"
                         }
                       }
                     },
                     "commander": {
                       "version": "2.9.0",
                       "from": "commander@>=2.9.0 <3.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//commander/-/commander-2.9.0.tgz",
+                      "resolved": "http://beta-internal.beta.gitter:4873/commander/-/commander-2.9.0.tgz",
                       "dependencies": {
                         "graceful-readlink": {
                           "version": "1.0.1",
                           "from": "graceful-readlink@>=1.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//graceful-readlink/-/graceful-readlink-1.0.1.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/graceful-readlink/-/graceful-readlink-1.0.1.tgz"
                         }
                       }
                     },
                     "is-my-json-valid": {
                       "version": "2.15.0",
                       "from": "is-my-json-valid@>=2.12.4 <3.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//is-my-json-valid/-/is-my-json-valid-2.15.0.tgz",
+                      "resolved": "http://beta-internal.beta.gitter:4873/is-my-json-valid/-/is-my-json-valid-2.15.0.tgz",
                       "dependencies": {
                         "generate-function": {
                           "version": "2.0.0",
                           "from": "generate-function@>=2.0.0 <3.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//generate-function/-/generate-function-2.0.0.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/generate-function/-/generate-function-2.0.0.tgz"
                         },
                         "generate-object-property": {
                           "version": "1.2.0",
                           "from": "generate-object-property@>=1.1.0 <2.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//generate-object-property/-/generate-object-property-1.2.0.tgz",
+                          "resolved": "http://beta-internal.beta.gitter:4873/generate-object-property/-/generate-object-property-1.2.0.tgz",
                           "dependencies": {
                             "is-property": {
                               "version": "1.0.2",
                               "from": "is-property@>=1.0.0 <2.0.0",
-                              "resolved": "http://beta-internal.beta.gitter:4873//is-property/-/is-property-1.0.2.tgz"
+                              "resolved": "http://beta-internal.beta.gitter:4873/is-property/-/is-property-1.0.2.tgz"
                             }
                           }
                         },
                         "jsonpointer": {
                           "version": "4.0.0",
                           "from": "jsonpointer@>=4.0.0 <5.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//jsonpointer/-/jsonpointer-4.0.0.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/jsonpointer/-/jsonpointer-4.0.0.tgz"
                         },
                         "xtend": {
                           "version": "4.0.1",
                           "from": "xtend@>=4.0.0 <5.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//xtend/-/xtend-4.0.1.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/xtend/-/xtend-4.0.1.tgz"
                         }
                       }
                     },
                     "pinkie-promise": {
                       "version": "2.0.1",
                       "from": "pinkie-promise@>=2.0.0 <3.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//pinkie-promise/-/pinkie-promise-2.0.1.tgz",
+                      "resolved": "http://beta-internal.beta.gitter:4873/pinkie-promise/-/pinkie-promise-2.0.1.tgz",
                       "dependencies": {
                         "pinkie": {
                           "version": "2.0.4",
                           "from": "pinkie@>=2.0.0 <3.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//pinkie/-/pinkie-2.0.4.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/pinkie/-/pinkie-2.0.4.tgz"
                         }
                       }
                     }
@@ -2979,44 +2979,44 @@
                 "hawk": {
                   "version": "3.1.3",
                   "from": "hawk@>=3.1.3 <3.2.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//hawk/-/hawk-3.1.3.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/hawk/-/hawk-3.1.3.tgz",
                   "dependencies": {
                     "hoek": {
                       "version": "2.16.3",
                       "from": "hoek@>=2.0.0 <3.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//hoek/-/hoek-2.16.3.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/hoek/-/hoek-2.16.3.tgz"
                     },
                     "boom": {
                       "version": "2.10.1",
                       "from": "boom@>=2.0.0 <3.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//boom/-/boom-2.10.1.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/boom/-/boom-2.10.1.tgz"
                     },
                     "cryptiles": {
                       "version": "2.0.5",
                       "from": "cryptiles@>=2.0.0 <3.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//cryptiles/-/cryptiles-2.0.5.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/cryptiles/-/cryptiles-2.0.5.tgz"
                     },
                     "sntp": {
                       "version": "1.0.9",
                       "from": "sntp@>=1.0.0 <2.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//sntp/-/sntp-1.0.9.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/sntp/-/sntp-1.0.9.tgz"
                     }
                   }
                 },
                 "http-signature": {
                   "version": "1.1.1",
                   "from": "http-signature@>=1.1.0 <1.2.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//http-signature/-/http-signature-1.1.1.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/http-signature/-/http-signature-1.1.1.tgz",
                   "dependencies": {
                     "assert-plus": {
                       "version": "0.2.0",
                       "from": "assert-plus@>=0.2.0 <0.3.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//assert-plus/-/assert-plus-0.2.0.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/assert-plus/-/assert-plus-0.2.0.tgz"
                     },
                     "jsprim": {
                       "version": "1.3.1",
                       "from": "jsprim@>=1.2.2 <2.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//jsprim/-/jsprim-1.3.1.tgz",
+                      "resolved": "http://beta-internal.beta.gitter:4873/jsprim/-/jsprim-1.3.1.tgz",
                       "dependencies": {
                         "extsprintf": {
                           "version": "1.0.2",
@@ -3038,52 +3038,52 @@
                     "sshpk": {
                       "version": "1.10.1",
                       "from": "sshpk@>=1.7.0 <2.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//sshpk/-/sshpk-1.10.1.tgz",
+                      "resolved": "http://beta-internal.beta.gitter:4873/sshpk/-/sshpk-1.10.1.tgz",
                       "dependencies": {
                         "asn1": {
                           "version": "0.2.3",
                           "from": "asn1@>=0.2.3 <0.3.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//asn1/-/asn1-0.2.3.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/asn1/-/asn1-0.2.3.tgz"
                         },
                         "assert-plus": {
                           "version": "1.0.0",
                           "from": "assert-plus@>=1.0.0 <2.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//assert-plus/-/assert-plus-1.0.0.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/assert-plus/-/assert-plus-1.0.0.tgz"
                         },
                         "dashdash": {
                           "version": "1.14.0",
                           "from": "dashdash@>=1.12.0 <2.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//dashdash/-/dashdash-1.14.0.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/dashdash/-/dashdash-1.14.0.tgz"
                         },
                         "getpass": {
                           "version": "0.1.6",
                           "from": "getpass@>=0.1.1 <0.2.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//getpass/-/getpass-0.1.6.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/getpass/-/getpass-0.1.6.tgz"
                         },
                         "jsbn": {
                           "version": "0.1.0",
                           "from": "jsbn@>=0.1.0 <0.2.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//jsbn/-/jsbn-0.1.0.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/jsbn/-/jsbn-0.1.0.tgz"
                         },
                         "tweetnacl": {
                           "version": "0.14.3",
                           "from": "tweetnacl@>=0.14.0 <0.15.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//tweetnacl/-/tweetnacl-0.14.3.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/tweetnacl/-/tweetnacl-0.14.3.tgz"
                         },
                         "jodid25519": {
                           "version": "1.0.2",
                           "from": "jodid25519@>=1.0.0 <2.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//jodid25519/-/jodid25519-1.0.2.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/jodid25519/-/jodid25519-1.0.2.tgz"
                         },
                         "ecc-jsbn": {
                           "version": "0.1.1",
                           "from": "ecc-jsbn@>=0.1.1 <0.2.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//ecc-jsbn/-/ecc-jsbn-0.1.1.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/ecc-jsbn/-/ecc-jsbn-0.1.1.tgz"
                         },
                         "bcrypt-pbkdf": {
                           "version": "1.0.0",
                           "from": "bcrypt-pbkdf@>=1.0.0 <2.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//bcrypt-pbkdf/-/bcrypt-pbkdf-1.0.0.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/bcrypt-pbkdf/-/bcrypt-pbkdf-1.0.0.tgz"
                         }
                       }
                     }
@@ -3092,66 +3092,66 @@
                 "is-typedarray": {
                   "version": "1.0.0",
                   "from": "is-typedarray@>=1.0.0 <1.1.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//is-typedarray/-/is-typedarray-1.0.0.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/is-typedarray/-/is-typedarray-1.0.0.tgz"
                 },
                 "isstream": {
                   "version": "0.1.2",
                   "from": "isstream@>=0.1.2 <0.2.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//isstream/-/isstream-0.1.2.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/isstream/-/isstream-0.1.2.tgz"
                 },
                 "json-stringify-safe": {
                   "version": "5.0.1",
                   "from": "json-stringify-safe@>=5.0.1 <5.1.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//json-stringify-safe/-/json-stringify-safe-5.0.1.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/json-stringify-safe/-/json-stringify-safe-5.0.1.tgz"
                 },
                 "mime-types": {
                   "version": "2.1.12",
                   "from": "mime-types@>=2.1.7 <2.2.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//mime-types/-/mime-types-2.1.12.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/mime-types/-/mime-types-2.1.12.tgz",
                   "dependencies": {
                     "mime-db": {
                       "version": "1.24.0",
                       "from": "mime-db@>=1.24.0 <1.25.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//mime-db/-/mime-db-1.24.0.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/mime-db/-/mime-db-1.24.0.tgz"
                     }
                   }
                 },
                 "node-uuid": {
                   "version": "1.4.7",
                   "from": "node-uuid@>=1.4.7 <1.5.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//node-uuid/-/node-uuid-1.4.7.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/node-uuid/-/node-uuid-1.4.7.tgz"
                 },
                 "oauth-sign": {
                   "version": "0.8.2",
                   "from": "oauth-sign@>=0.8.1 <0.9.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//oauth-sign/-/oauth-sign-0.8.2.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/oauth-sign/-/oauth-sign-0.8.2.tgz"
                 },
                 "qs": {
                   "version": "6.2.1",
                   "from": "qs@>=6.2.0 <6.3.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//qs/-/qs-6.2.1.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/qs/-/qs-6.2.1.tgz"
                 },
                 "stringstream": {
                   "version": "0.0.5",
                   "from": "stringstream@>=0.0.4 <0.1.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//stringstream/-/stringstream-0.0.5.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/stringstream/-/stringstream-0.0.5.tgz"
                 },
                 "tough-cookie": {
                   "version": "2.3.2",
                   "from": "tough-cookie@>=2.3.0 <2.4.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//tough-cookie/-/tough-cookie-2.3.2.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/tough-cookie/-/tough-cookie-2.3.2.tgz",
                   "dependencies": {
                     "punycode": {
                       "version": "1.4.1",
                       "from": "punycode@>=1.4.1 <2.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//punycode/-/punycode-1.4.1.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/punycode/-/punycode-1.4.1.tgz"
                     }
                   }
                 },
                 "tunnel-agent": {
                   "version": "0.4.3",
                   "from": "tunnel-agent@>=0.4.1 <0.5.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//tunnel-agent/-/tunnel-agent-0.4.3.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/tunnel-agent/-/tunnel-agent-0.4.3.tgz"
                 }
               }
             }
@@ -3177,7 +3177,7 @@
             "json-stringify-safe": {
               "version": "5.0.1",
               "from": "json-stringify-safe@>=5.0.0 <5.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//json-stringify-safe/-/json-stringify-safe-5.0.1.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/json-stringify-safe/-/json-stringify-safe-5.0.1.tgz"
             },
             "forever-agent": {
               "version": "0.5.2",
@@ -3197,7 +3197,7 @@
                 "combined-stream": {
                   "version": "0.0.7",
                   "from": "combined-stream@>=0.0.4 <0.1.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//combined-stream/-/combined-stream-0.0.7.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/combined-stream/-/combined-stream-0.0.7.tgz",
                   "dependencies": {
                     "delayed-stream": {
                       "version": "0.0.5",
@@ -3287,7 +3287,7 @@
         "debug": {
           "version": "0.8.1",
           "from": "debug@0.8.1",
-          "resolved": "http://beta-internal.beta.gitter:4873//debug/-/debug-0.8.1.tgz"
+          "resolved": "http://beta-internal.beta.gitter:4873/debug/-/debug-0.8.1.tgz"
         },
         "q": {
           "version": "1.0.1",
@@ -3363,12 +3363,12 @@
         "commander": {
           "version": "2.9.0",
           "from": "commander@>=2.9.0 <2.10.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//commander/-/commander-2.9.0.tgz",
+          "resolved": "http://beta-internal.beta.gitter:4873/commander/-/commander-2.9.0.tgz",
           "dependencies": {
             "graceful-readlink": {
               "version": "1.0.1",
               "from": "graceful-readlink@>=1.0.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//graceful-readlink/-/graceful-readlink-1.0.1.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/graceful-readlink/-/graceful-readlink-1.0.1.tgz"
             }
           }
         },
@@ -3411,7 +3411,7 @@
             "glob": {
               "version": "7.1.1",
               "from": "glob@>=7.0.5 <8.0.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//glob/-/glob-7.1.1.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/glob/-/glob-7.1.1.tgz",
               "dependencies": {
                 "fs.realpath": {
                   "version": "1.0.0",
@@ -3421,7 +3421,7 @@
                 "inflight": {
                   "version": "1.0.6",
                   "from": "inflight@>=1.0.4 <2.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//inflight/-/inflight-1.0.6.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/inflight/-/inflight-1.0.6.tgz",
                   "dependencies": {
                     "wrappy": {
                       "version": "1.0.2",
@@ -3433,7 +3433,7 @@
                 "inherits": {
                   "version": "2.0.3",
                   "from": "inherits@>=2.0.0 <3.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//inherits/-/inherits-2.0.3.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/inherits/-/inherits-2.0.3.tgz"
                 },
                 "minimatch": {
                   "version": "3.0.3",
@@ -3474,7 +3474,7 @@
                 "path-is-absolute": {
                   "version": "1.0.1",
                   "from": "path-is-absolute@>=1.0.0 <2.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//path-is-absolute/-/path-is-absolute-1.0.1.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/path-is-absolute/-/path-is-absolute-1.0.1.tgz"
                 }
               }
             }
@@ -3598,7 +3598,7 @@
             "core-util-is": {
               "version": "1.0.2",
               "from": "core-util-is@>=1.0.0 <1.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//core-util-is/-/core-util-is-1.0.2.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/core-util-is/-/core-util-is-1.0.2.tgz"
             },
             "isarray": {
               "version": "0.0.1",
@@ -3608,12 +3608,12 @@
             "string_decoder": {
               "version": "0.10.31",
               "from": "string_decoder@>=0.10.0 <0.11.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//string_decoder/-/string_decoder-0.10.31.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/string_decoder/-/string_decoder-0.10.31.tgz"
             },
             "inherits": {
               "version": "2.0.3",
               "from": "inherits@>=2.0.1 <2.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//inherits/-/inherits-2.0.3.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/inherits/-/inherits-2.0.3.tgz"
             }
           }
         }
@@ -3691,7 +3691,7 @@
                 "core-util-is": {
                   "version": "1.0.2",
                   "from": "core-util-is@>=1.0.0 <1.1.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//core-util-is/-/core-util-is-1.0.2.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/core-util-is/-/core-util-is-1.0.2.tgz"
                 },
                 "isarray": {
                   "version": "0.0.1",
@@ -3701,12 +3701,12 @@
                 "string_decoder": {
                   "version": "0.10.31",
                   "from": "string_decoder@>=0.10.0 <0.11.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//string_decoder/-/string_decoder-0.10.31.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/string_decoder/-/string_decoder-0.10.31.tgz"
                 },
                 "inherits": {
                   "version": "2.0.3",
                   "from": "inherits@>=2.0.1 <2.1.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//inherits/-/inherits-2.0.3.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/inherits/-/inherits-2.0.3.tgz"
                 }
               }
             }
@@ -3901,7 +3901,7 @@
         "debug": {
           "version": "0.8.1",
           "from": "debug@>=0.8.1 <0.9.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//debug/-/debug-0.8.1.tgz"
+          "resolved": "http://beta-internal.beta.gitter:4873/debug/-/debug-0.8.1.tgz"
         }
       }
     },
@@ -3913,7 +3913,7 @@
         "mongodb-perf-wrapper": {
           "version": "0.1.3",
           "from": "mongodb-perf-wrapper@>=0.1.3 <0.2.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//mongodb-perf-wrapper/-/mongodb-perf-wrapper-0.1.3.tgz"
+          "resolved": "http://beta-internal.beta.gitter:4873/mongodb-perf-wrapper/-/mongodb-perf-wrapper-0.1.3.tgz"
         }
       }
     },
@@ -3972,7 +3972,7 @@
                     "core-util-is": {
                       "version": "1.0.2",
                       "from": "core-util-is@>=1.0.0 <1.1.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//core-util-is/-/core-util-is-1.0.2.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/core-util-is/-/core-util-is-1.0.2.tgz"
                     },
                     "isarray": {
                       "version": "0.0.1",
@@ -3982,12 +3982,12 @@
                     "string_decoder": {
                       "version": "0.10.31",
                       "from": "string_decoder@>=0.10.0 <0.11.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//string_decoder/-/string_decoder-0.10.31.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/string_decoder/-/string_decoder-0.10.31.tgz"
                     },
                     "inherits": {
                       "version": "2.0.3",
                       "from": "inherits@>=2.0.1 <2.1.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//inherits/-/inherits-2.0.3.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/inherits/-/inherits-2.0.3.tgz"
                     }
                   }
                 }
@@ -4006,17 +4006,17 @@
             "form-data": {
               "version": "0.2.0",
               "from": "form-data@>=0.2.0 <0.3.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//form-data/-/form-data-0.2.0.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/form-data/-/form-data-0.2.0.tgz",
               "dependencies": {
                 "mime-types": {
                   "version": "2.0.14",
                   "from": "mime-types@>=2.0.3 <2.1.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//mime-types/-/mime-types-2.0.14.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/mime-types/-/mime-types-2.0.14.tgz",
                   "dependencies": {
                     "mime-db": {
                       "version": "1.12.0",
                       "from": "mime-db@>=1.12.0 <1.13.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//mime-db/-/mime-db-1.12.0.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/mime-db/-/mime-db-1.12.0.tgz"
                     }
                   }
                 }
@@ -4025,7 +4025,7 @@
             "json-stringify-safe": {
               "version": "5.0.1",
               "from": "json-stringify-safe@>=5.0.0 <5.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//json-stringify-safe/-/json-stringify-safe-5.0.1.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/json-stringify-safe/-/json-stringify-safe-5.0.1.tgz"
             },
             "mime-types": {
               "version": "1.0.2",
@@ -4040,7 +4040,7 @@
             "tunnel-agent": {
               "version": "0.4.3",
               "from": "tunnel-agent@>=0.4.0 <0.5.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//tunnel-agent/-/tunnel-agent-0.4.3.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/tunnel-agent/-/tunnel-agent-0.4.3.tgz"
             },
             "http-signature": {
               "version": "0.10.1",
@@ -4104,12 +4104,12 @@
             "stringstream": {
               "version": "0.0.5",
               "from": "stringstream@>=0.0.4 <0.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//stringstream/-/stringstream-0.0.5.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/stringstream/-/stringstream-0.0.5.tgz"
             },
             "combined-stream": {
               "version": "0.0.7",
               "from": "combined-stream@>=0.0.5 <0.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//combined-stream/-/combined-stream-0.0.7.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/combined-stream/-/combined-stream-0.0.7.tgz",
               "dependencies": {
                 "delayed-stream": {
                   "version": "0.0.5",
@@ -4428,7 +4428,7 @@
         "json-stringify-safe": {
           "version": "5.0.1",
           "from": "json-stringify-safe@>=5.0.0 <5.1.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//json-stringify-safe/-/json-stringify-safe-5.0.1.tgz"
+          "resolved": "http://beta-internal.beta.gitter:4873/json-stringify-safe/-/json-stringify-safe-5.0.1.tgz"
         },
         "mime-types": {
           "version": "1.0.2",
@@ -4448,7 +4448,7 @@
             "combined-stream": {
               "version": "0.0.7",
               "from": "combined-stream@>=0.0.4 <0.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//combined-stream/-/combined-stream-0.0.7.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/combined-stream/-/combined-stream-0.0.7.tgz",
               "dependencies": {
                 "delayed-stream": {
                   "version": "0.0.5",
@@ -4467,7 +4467,7 @@
         "tunnel-agent": {
           "version": "0.4.3",
           "from": "tunnel-agent@>=0.4.0 <0.5.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//tunnel-agent/-/tunnel-agent-0.4.3.tgz"
+          "resolved": "http://beta-internal.beta.gitter:4873/tunnel-agent/-/tunnel-agent-0.4.3.tgz"
         },
         "http-signature": {
           "version": "0.10.1",
@@ -4531,7 +4531,7 @@
         "stringstream": {
           "version": "0.0.5",
           "from": "stringstream@>=0.0.4 <0.1.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//stringstream/-/stringstream-0.0.5.tgz"
+          "resolved": "http://beta-internal.beta.gitter:4873/stringstream/-/stringstream-0.0.5.tgz"
         }
       }
     },
@@ -4543,49 +4543,49 @@
         "request": {
           "version": "2.76.0",
           "from": "request@>=2.53.0 <3.0.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//request/-/request-2.76.0.tgz",
+          "resolved": "http://beta-internal.beta.gitter:4873/request/-/request-2.76.0.tgz",
           "dependencies": {
             "aws-sign2": {
               "version": "0.6.0",
               "from": "aws-sign2@>=0.6.0 <0.7.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//aws-sign2/-/aws-sign2-0.6.0.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/aws-sign2/-/aws-sign2-0.6.0.tgz"
             },
             "aws4": {
               "version": "1.5.0",
               "from": "aws4@>=1.2.1 <2.0.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//aws4/-/aws4-1.5.0.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/aws4/-/aws4-1.5.0.tgz"
             },
             "caseless": {
               "version": "0.11.0",
               "from": "caseless@>=0.11.0 <0.12.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//caseless/-/caseless-0.11.0.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/caseless/-/caseless-0.11.0.tgz"
             },
             "combined-stream": {
               "version": "1.0.5",
               "from": "combined-stream@>=1.0.5 <1.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//combined-stream/-/combined-stream-1.0.5.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/combined-stream/-/combined-stream-1.0.5.tgz",
               "dependencies": {
                 "delayed-stream": {
                   "version": "1.0.0",
                   "from": "delayed-stream@>=1.0.0 <1.1.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//delayed-stream/-/delayed-stream-1.0.0.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/delayed-stream/-/delayed-stream-1.0.0.tgz"
                 }
               }
             },
             "extend": {
               "version": "3.0.0",
               "from": "extend@>=3.0.0 <3.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//extend/-/extend-3.0.0.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/extend/-/extend-3.0.0.tgz"
             },
             "forever-agent": {
               "version": "0.6.1",
               "from": "forever-agent@>=0.6.1 <0.7.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//forever-agent/-/forever-agent-0.6.1.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/forever-agent/-/forever-agent-0.6.1.tgz"
             },
             "form-data": {
               "version": "2.1.1",
               "from": "form-data@>=2.1.1 <2.2.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//form-data/-/form-data-2.1.1.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/form-data/-/form-data-2.1.1.tgz",
               "dependencies": {
                 "asynckit": {
                   "version": "0.4.0",
@@ -4597,104 +4597,104 @@
             "har-validator": {
               "version": "2.0.6",
               "from": "har-validator@>=2.0.6 <2.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//har-validator/-/har-validator-2.0.6.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/har-validator/-/har-validator-2.0.6.tgz",
               "dependencies": {
                 "chalk": {
                   "version": "1.1.3",
                   "from": "chalk@>=1.1.1 <2.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//chalk/-/chalk-1.1.3.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/chalk/-/chalk-1.1.3.tgz",
                   "dependencies": {
                     "ansi-styles": {
                       "version": "2.2.1",
                       "from": "ansi-styles@>=2.2.1 <3.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//ansi-styles/-/ansi-styles-2.2.1.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/ansi-styles/-/ansi-styles-2.2.1.tgz"
                     },
                     "has-ansi": {
                       "version": "2.0.0",
                       "from": "has-ansi@>=2.0.0 <3.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//has-ansi/-/has-ansi-2.0.0.tgz",
+                      "resolved": "http://beta-internal.beta.gitter:4873/has-ansi/-/has-ansi-2.0.0.tgz",
                       "dependencies": {
                         "ansi-regex": {
                           "version": "2.0.0",
                           "from": "ansi-regex@>=2.0.0 <3.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//ansi-regex/-/ansi-regex-2.0.0.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/ansi-regex/-/ansi-regex-2.0.0.tgz"
                         }
                       }
                     },
                     "strip-ansi": {
                       "version": "3.0.1",
                       "from": "strip-ansi@>=3.0.0 <4.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//strip-ansi/-/strip-ansi-3.0.1.tgz",
+                      "resolved": "http://beta-internal.beta.gitter:4873/strip-ansi/-/strip-ansi-3.0.1.tgz",
                       "dependencies": {
                         "ansi-regex": {
                           "version": "2.0.0",
                           "from": "ansi-regex@>=2.0.0 <3.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//ansi-regex/-/ansi-regex-2.0.0.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/ansi-regex/-/ansi-regex-2.0.0.tgz"
                         }
                       }
                     },
                     "supports-color": {
                       "version": "2.0.0",
                       "from": "supports-color@>=2.0.0 <3.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//supports-color/-/supports-color-2.0.0.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/supports-color/-/supports-color-2.0.0.tgz"
                     }
                   }
                 },
                 "commander": {
                   "version": "2.9.0",
                   "from": "commander@>=2.9.0 <3.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//commander/-/commander-2.9.0.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/commander/-/commander-2.9.0.tgz",
                   "dependencies": {
                     "graceful-readlink": {
                       "version": "1.0.1",
                       "from": "graceful-readlink@>=1.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//graceful-readlink/-/graceful-readlink-1.0.1.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/graceful-readlink/-/graceful-readlink-1.0.1.tgz"
                     }
                   }
                 },
                 "is-my-json-valid": {
                   "version": "2.15.0",
                   "from": "is-my-json-valid@>=2.12.4 <3.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//is-my-json-valid/-/is-my-json-valid-2.15.0.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/is-my-json-valid/-/is-my-json-valid-2.15.0.tgz",
                   "dependencies": {
                     "generate-function": {
                       "version": "2.0.0",
                       "from": "generate-function@>=2.0.0 <3.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//generate-function/-/generate-function-2.0.0.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/generate-function/-/generate-function-2.0.0.tgz"
                     },
                     "generate-object-property": {
                       "version": "1.2.0",
                       "from": "generate-object-property@>=1.1.0 <2.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//generate-object-property/-/generate-object-property-1.2.0.tgz",
+                      "resolved": "http://beta-internal.beta.gitter:4873/generate-object-property/-/generate-object-property-1.2.0.tgz",
                       "dependencies": {
                         "is-property": {
                           "version": "1.0.2",
                           "from": "is-property@>=1.0.0 <2.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//is-property/-/is-property-1.0.2.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/is-property/-/is-property-1.0.2.tgz"
                         }
                       }
                     },
                     "jsonpointer": {
                       "version": "4.0.0",
                       "from": "jsonpointer@>=4.0.0 <5.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//jsonpointer/-/jsonpointer-4.0.0.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/jsonpointer/-/jsonpointer-4.0.0.tgz"
                     },
                     "xtend": {
                       "version": "4.0.1",
                       "from": "xtend@>=4.0.0 <5.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//xtend/-/xtend-4.0.1.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/xtend/-/xtend-4.0.1.tgz"
                     }
                   }
                 },
                 "pinkie-promise": {
                   "version": "2.0.1",
                   "from": "pinkie-promise@>=2.0.0 <3.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//pinkie-promise/-/pinkie-promise-2.0.1.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/pinkie-promise/-/pinkie-promise-2.0.1.tgz",
                   "dependencies": {
                     "pinkie": {
                       "version": "2.0.4",
                       "from": "pinkie@>=2.0.0 <3.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//pinkie/-/pinkie-2.0.4.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/pinkie/-/pinkie-2.0.4.tgz"
                     }
                   }
                 }
@@ -4703,44 +4703,44 @@
             "hawk": {
               "version": "3.1.3",
               "from": "hawk@>=3.1.3 <3.2.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//hawk/-/hawk-3.1.3.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/hawk/-/hawk-3.1.3.tgz",
               "dependencies": {
                 "hoek": {
                   "version": "2.16.3",
                   "from": "hoek@>=2.0.0 <3.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//hoek/-/hoek-2.16.3.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/hoek/-/hoek-2.16.3.tgz"
                 },
                 "boom": {
                   "version": "2.10.1",
                   "from": "boom@>=2.0.0 <3.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//boom/-/boom-2.10.1.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/boom/-/boom-2.10.1.tgz"
                 },
                 "cryptiles": {
                   "version": "2.0.5",
                   "from": "cryptiles@>=2.0.0 <3.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//cryptiles/-/cryptiles-2.0.5.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/cryptiles/-/cryptiles-2.0.5.tgz"
                 },
                 "sntp": {
                   "version": "1.0.9",
                   "from": "sntp@>=1.0.0 <2.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//sntp/-/sntp-1.0.9.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/sntp/-/sntp-1.0.9.tgz"
                 }
               }
             },
             "http-signature": {
               "version": "1.1.1",
               "from": "http-signature@>=1.1.0 <1.2.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//http-signature/-/http-signature-1.1.1.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/http-signature/-/http-signature-1.1.1.tgz",
               "dependencies": {
                 "assert-plus": {
                   "version": "0.2.0",
                   "from": "assert-plus@>=0.2.0 <0.3.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//assert-plus/-/assert-plus-0.2.0.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/assert-plus/-/assert-plus-0.2.0.tgz"
                 },
                 "jsprim": {
                   "version": "1.3.1",
                   "from": "jsprim@>=1.2.2 <2.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//jsprim/-/jsprim-1.3.1.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/jsprim/-/jsprim-1.3.1.tgz",
                   "dependencies": {
                     "extsprintf": {
                       "version": "1.0.2",
@@ -4762,52 +4762,52 @@
                 "sshpk": {
                   "version": "1.10.1",
                   "from": "sshpk@>=1.7.0 <2.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//sshpk/-/sshpk-1.10.1.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/sshpk/-/sshpk-1.10.1.tgz",
                   "dependencies": {
                     "asn1": {
                       "version": "0.2.3",
                       "from": "asn1@>=0.2.3 <0.3.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//asn1/-/asn1-0.2.3.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/asn1/-/asn1-0.2.3.tgz"
                     },
                     "assert-plus": {
                       "version": "1.0.0",
                       "from": "assert-plus@>=1.0.0 <2.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//assert-plus/-/assert-plus-1.0.0.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/assert-plus/-/assert-plus-1.0.0.tgz"
                     },
                     "dashdash": {
                       "version": "1.14.0",
                       "from": "dashdash@>=1.12.0 <2.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//dashdash/-/dashdash-1.14.0.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/dashdash/-/dashdash-1.14.0.tgz"
                     },
                     "getpass": {
                       "version": "0.1.6",
                       "from": "getpass@>=0.1.1 <0.2.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//getpass/-/getpass-0.1.6.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/getpass/-/getpass-0.1.6.tgz"
                     },
                     "jsbn": {
                       "version": "0.1.0",
                       "from": "jsbn@>=0.1.0 <0.2.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//jsbn/-/jsbn-0.1.0.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/jsbn/-/jsbn-0.1.0.tgz"
                     },
                     "tweetnacl": {
                       "version": "0.14.3",
                       "from": "tweetnacl@>=0.14.0 <0.15.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//tweetnacl/-/tweetnacl-0.14.3.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/tweetnacl/-/tweetnacl-0.14.3.tgz"
                     },
                     "jodid25519": {
                       "version": "1.0.2",
                       "from": "jodid25519@>=1.0.0 <2.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//jodid25519/-/jodid25519-1.0.2.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/jodid25519/-/jodid25519-1.0.2.tgz"
                     },
                     "ecc-jsbn": {
                       "version": "0.1.1",
                       "from": "ecc-jsbn@>=0.1.1 <0.2.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//ecc-jsbn/-/ecc-jsbn-0.1.1.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/ecc-jsbn/-/ecc-jsbn-0.1.1.tgz"
                     },
                     "bcrypt-pbkdf": {
                       "version": "1.0.0",
                       "from": "bcrypt-pbkdf@>=1.0.0 <2.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//bcrypt-pbkdf/-/bcrypt-pbkdf-1.0.0.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/bcrypt-pbkdf/-/bcrypt-pbkdf-1.0.0.tgz"
                     }
                   }
                 }
@@ -4816,66 +4816,66 @@
             "is-typedarray": {
               "version": "1.0.0",
               "from": "is-typedarray@>=1.0.0 <1.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//is-typedarray/-/is-typedarray-1.0.0.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/is-typedarray/-/is-typedarray-1.0.0.tgz"
             },
             "isstream": {
               "version": "0.1.2",
               "from": "isstream@>=0.1.2 <0.2.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//isstream/-/isstream-0.1.2.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/isstream/-/isstream-0.1.2.tgz"
             },
             "json-stringify-safe": {
               "version": "5.0.1",
               "from": "json-stringify-safe@>=5.0.1 <5.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//json-stringify-safe/-/json-stringify-safe-5.0.1.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/json-stringify-safe/-/json-stringify-safe-5.0.1.tgz"
             },
             "mime-types": {
               "version": "2.1.12",
               "from": "mime-types@>=2.1.7 <2.2.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//mime-types/-/mime-types-2.1.12.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/mime-types/-/mime-types-2.1.12.tgz",
               "dependencies": {
                 "mime-db": {
                   "version": "1.24.0",
                   "from": "mime-db@>=1.24.0 <1.25.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//mime-db/-/mime-db-1.24.0.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/mime-db/-/mime-db-1.24.0.tgz"
                 }
               }
             },
             "node-uuid": {
               "version": "1.4.7",
               "from": "node-uuid@>=1.4.7 <1.5.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//node-uuid/-/node-uuid-1.4.7.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/node-uuid/-/node-uuid-1.4.7.tgz"
             },
             "oauth-sign": {
               "version": "0.8.2",
               "from": "oauth-sign@>=0.8.1 <0.9.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//oauth-sign/-/oauth-sign-0.8.2.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/oauth-sign/-/oauth-sign-0.8.2.tgz"
             },
             "qs": {
               "version": "6.3.0",
               "from": "qs@>=6.3.0 <6.4.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//qs/-/qs-6.3.0.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/qs/-/qs-6.3.0.tgz"
             },
             "stringstream": {
               "version": "0.0.5",
               "from": "stringstream@>=0.0.4 <0.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//stringstream/-/stringstream-0.0.5.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/stringstream/-/stringstream-0.0.5.tgz"
             },
             "tough-cookie": {
               "version": "2.3.2",
               "from": "tough-cookie@>=2.3.0 <2.4.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//tough-cookie/-/tough-cookie-2.3.2.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/tough-cookie/-/tough-cookie-2.3.2.tgz",
               "dependencies": {
                 "punycode": {
                   "version": "1.4.1",
                   "from": "punycode@>=1.4.1 <2.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//punycode/-/punycode-1.4.1.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/punycode/-/punycode-1.4.1.tgz"
                 }
               }
             },
             "tunnel-agent": {
               "version": "0.4.3",
               "from": "tunnel-agent@>=0.4.1 <0.5.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//tunnel-agent/-/tunnel-agent-0.4.3.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/tunnel-agent/-/tunnel-agent-0.4.3.tgz"
             }
           }
         }
@@ -4904,12 +4904,12 @@
             "hoek": {
               "version": "2.16.3",
               "from": "hoek@>=2.0.0 <3.0.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//hoek/-/hoek-2.16.3.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/hoek/-/hoek-2.16.3.tgz"
             },
             "boom": {
               "version": "2.10.1",
               "from": "boom@>=2.0.0 <3.0.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//boom/-/boom-2.10.1.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/boom/-/boom-2.10.1.tgz"
             }
           }
         }
@@ -5057,49 +5057,49 @@
         "request": {
           "version": "2.76.0",
           "from": "request@>=2.53.0 <3.0.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//request/-/request-2.76.0.tgz",
+          "resolved": "http://beta-internal.beta.gitter:4873/request/-/request-2.76.0.tgz",
           "dependencies": {
             "aws-sign2": {
               "version": "0.6.0",
               "from": "aws-sign2@>=0.6.0 <0.7.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//aws-sign2/-/aws-sign2-0.6.0.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/aws-sign2/-/aws-sign2-0.6.0.tgz"
             },
             "aws4": {
               "version": "1.5.0",
               "from": "aws4@>=1.2.1 <2.0.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//aws4/-/aws4-1.5.0.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/aws4/-/aws4-1.5.0.tgz"
             },
             "caseless": {
               "version": "0.11.0",
               "from": "caseless@>=0.11.0 <0.12.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//caseless/-/caseless-0.11.0.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/caseless/-/caseless-0.11.0.tgz"
             },
             "combined-stream": {
               "version": "1.0.5",
               "from": "combined-stream@>=1.0.5 <1.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//combined-stream/-/combined-stream-1.0.5.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/combined-stream/-/combined-stream-1.0.5.tgz",
               "dependencies": {
                 "delayed-stream": {
                   "version": "1.0.0",
                   "from": "delayed-stream@>=1.0.0 <1.1.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//delayed-stream/-/delayed-stream-1.0.0.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/delayed-stream/-/delayed-stream-1.0.0.tgz"
                 }
               }
             },
             "extend": {
               "version": "3.0.0",
               "from": "extend@>=3.0.0 <3.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//extend/-/extend-3.0.0.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/extend/-/extend-3.0.0.tgz"
             },
             "forever-agent": {
               "version": "0.6.1",
               "from": "forever-agent@>=0.6.1 <0.7.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//forever-agent/-/forever-agent-0.6.1.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/forever-agent/-/forever-agent-0.6.1.tgz"
             },
             "form-data": {
               "version": "2.1.1",
               "from": "form-data@>=2.1.1 <2.2.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//form-data/-/form-data-2.1.1.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/form-data/-/form-data-2.1.1.tgz",
               "dependencies": {
                 "asynckit": {
                   "version": "0.4.0",
@@ -5111,104 +5111,104 @@
             "har-validator": {
               "version": "2.0.6",
               "from": "har-validator@>=2.0.6 <2.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//har-validator/-/har-validator-2.0.6.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/har-validator/-/har-validator-2.0.6.tgz",
               "dependencies": {
                 "chalk": {
                   "version": "1.1.3",
                   "from": "chalk@>=1.1.1 <2.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//chalk/-/chalk-1.1.3.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/chalk/-/chalk-1.1.3.tgz",
                   "dependencies": {
                     "ansi-styles": {
                       "version": "2.2.1",
                       "from": "ansi-styles@>=2.2.1 <3.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//ansi-styles/-/ansi-styles-2.2.1.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/ansi-styles/-/ansi-styles-2.2.1.tgz"
                     },
                     "has-ansi": {
                       "version": "2.0.0",
                       "from": "has-ansi@>=2.0.0 <3.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//has-ansi/-/has-ansi-2.0.0.tgz",
+                      "resolved": "http://beta-internal.beta.gitter:4873/has-ansi/-/has-ansi-2.0.0.tgz",
                       "dependencies": {
                         "ansi-regex": {
                           "version": "2.0.0",
                           "from": "ansi-regex@>=2.0.0 <3.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//ansi-regex/-/ansi-regex-2.0.0.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/ansi-regex/-/ansi-regex-2.0.0.tgz"
                         }
                       }
                     },
                     "strip-ansi": {
                       "version": "3.0.1",
                       "from": "strip-ansi@>=3.0.0 <4.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//strip-ansi/-/strip-ansi-3.0.1.tgz",
+                      "resolved": "http://beta-internal.beta.gitter:4873/strip-ansi/-/strip-ansi-3.0.1.tgz",
                       "dependencies": {
                         "ansi-regex": {
                           "version": "2.0.0",
                           "from": "ansi-regex@>=2.0.0 <3.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//ansi-regex/-/ansi-regex-2.0.0.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/ansi-regex/-/ansi-regex-2.0.0.tgz"
                         }
                       }
                     },
                     "supports-color": {
                       "version": "2.0.0",
                       "from": "supports-color@>=2.0.0 <3.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//supports-color/-/supports-color-2.0.0.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/supports-color/-/supports-color-2.0.0.tgz"
                     }
                   }
                 },
                 "commander": {
                   "version": "2.9.0",
                   "from": "commander@>=2.9.0 <3.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//commander/-/commander-2.9.0.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/commander/-/commander-2.9.0.tgz",
                   "dependencies": {
                     "graceful-readlink": {
                       "version": "1.0.1",
                       "from": "graceful-readlink@>=1.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//graceful-readlink/-/graceful-readlink-1.0.1.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/graceful-readlink/-/graceful-readlink-1.0.1.tgz"
                     }
                   }
                 },
                 "is-my-json-valid": {
                   "version": "2.15.0",
                   "from": "is-my-json-valid@>=2.12.4 <3.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//is-my-json-valid/-/is-my-json-valid-2.15.0.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/is-my-json-valid/-/is-my-json-valid-2.15.0.tgz",
                   "dependencies": {
                     "generate-function": {
                       "version": "2.0.0",
                       "from": "generate-function@>=2.0.0 <3.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//generate-function/-/generate-function-2.0.0.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/generate-function/-/generate-function-2.0.0.tgz"
                     },
                     "generate-object-property": {
                       "version": "1.2.0",
                       "from": "generate-object-property@>=1.1.0 <2.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//generate-object-property/-/generate-object-property-1.2.0.tgz",
+                      "resolved": "http://beta-internal.beta.gitter:4873/generate-object-property/-/generate-object-property-1.2.0.tgz",
                       "dependencies": {
                         "is-property": {
                           "version": "1.0.2",
                           "from": "is-property@>=1.0.0 <2.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//is-property/-/is-property-1.0.2.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/is-property/-/is-property-1.0.2.tgz"
                         }
                       }
                     },
                     "jsonpointer": {
                       "version": "4.0.0",
                       "from": "jsonpointer@>=4.0.0 <5.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//jsonpointer/-/jsonpointer-4.0.0.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/jsonpointer/-/jsonpointer-4.0.0.tgz"
                     },
                     "xtend": {
                       "version": "4.0.1",
                       "from": "xtend@>=4.0.0 <5.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//xtend/-/xtend-4.0.1.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/xtend/-/xtend-4.0.1.tgz"
                     }
                   }
                 },
                 "pinkie-promise": {
                   "version": "2.0.1",
                   "from": "pinkie-promise@>=2.0.0 <3.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//pinkie-promise/-/pinkie-promise-2.0.1.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/pinkie-promise/-/pinkie-promise-2.0.1.tgz",
                   "dependencies": {
                     "pinkie": {
                       "version": "2.0.4",
                       "from": "pinkie@>=2.0.0 <3.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//pinkie/-/pinkie-2.0.4.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/pinkie/-/pinkie-2.0.4.tgz"
                     }
                   }
                 }
@@ -5217,44 +5217,44 @@
             "hawk": {
               "version": "3.1.3",
               "from": "hawk@>=3.1.3 <3.2.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//hawk/-/hawk-3.1.3.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/hawk/-/hawk-3.1.3.tgz",
               "dependencies": {
                 "hoek": {
                   "version": "2.16.3",
                   "from": "hoek@>=2.0.0 <3.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//hoek/-/hoek-2.16.3.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/hoek/-/hoek-2.16.3.tgz"
                 },
                 "boom": {
                   "version": "2.10.1",
                   "from": "boom@>=2.0.0 <3.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//boom/-/boom-2.10.1.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/boom/-/boom-2.10.1.tgz"
                 },
                 "cryptiles": {
                   "version": "2.0.5",
                   "from": "cryptiles@>=2.0.0 <3.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//cryptiles/-/cryptiles-2.0.5.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/cryptiles/-/cryptiles-2.0.5.tgz"
                 },
                 "sntp": {
                   "version": "1.0.9",
                   "from": "sntp@>=1.0.0 <2.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//sntp/-/sntp-1.0.9.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/sntp/-/sntp-1.0.9.tgz"
                 }
               }
             },
             "http-signature": {
               "version": "1.1.1",
               "from": "http-signature@>=1.1.0 <1.2.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//http-signature/-/http-signature-1.1.1.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/http-signature/-/http-signature-1.1.1.tgz",
               "dependencies": {
                 "assert-plus": {
                   "version": "0.2.0",
                   "from": "assert-plus@>=0.2.0 <0.3.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//assert-plus/-/assert-plus-0.2.0.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/assert-plus/-/assert-plus-0.2.0.tgz"
                 },
                 "jsprim": {
                   "version": "1.3.1",
                   "from": "jsprim@>=1.2.2 <2.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//jsprim/-/jsprim-1.3.1.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/jsprim/-/jsprim-1.3.1.tgz",
                   "dependencies": {
                     "extsprintf": {
                       "version": "1.0.2",
@@ -5276,52 +5276,52 @@
                 "sshpk": {
                   "version": "1.10.1",
                   "from": "sshpk@>=1.7.0 <2.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//sshpk/-/sshpk-1.10.1.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/sshpk/-/sshpk-1.10.1.tgz",
                   "dependencies": {
                     "asn1": {
                       "version": "0.2.3",
                       "from": "asn1@>=0.2.3 <0.3.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//asn1/-/asn1-0.2.3.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/asn1/-/asn1-0.2.3.tgz"
                     },
                     "assert-plus": {
                       "version": "1.0.0",
                       "from": "assert-plus@>=1.0.0 <2.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//assert-plus/-/assert-plus-1.0.0.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/assert-plus/-/assert-plus-1.0.0.tgz"
                     },
                     "dashdash": {
                       "version": "1.14.0",
                       "from": "dashdash@>=1.12.0 <2.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//dashdash/-/dashdash-1.14.0.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/dashdash/-/dashdash-1.14.0.tgz"
                     },
                     "getpass": {
                       "version": "0.1.6",
                       "from": "getpass@>=0.1.1 <0.2.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//getpass/-/getpass-0.1.6.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/getpass/-/getpass-0.1.6.tgz"
                     },
                     "jsbn": {
                       "version": "0.1.0",
                       "from": "jsbn@>=0.1.0 <0.2.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//jsbn/-/jsbn-0.1.0.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/jsbn/-/jsbn-0.1.0.tgz"
                     },
                     "tweetnacl": {
                       "version": "0.14.3",
                       "from": "tweetnacl@>=0.14.0 <0.15.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//tweetnacl/-/tweetnacl-0.14.3.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/tweetnacl/-/tweetnacl-0.14.3.tgz"
                     },
                     "jodid25519": {
                       "version": "1.0.2",
                       "from": "jodid25519@>=1.0.0 <2.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//jodid25519/-/jodid25519-1.0.2.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/jodid25519/-/jodid25519-1.0.2.tgz"
                     },
                     "ecc-jsbn": {
                       "version": "0.1.1",
                       "from": "ecc-jsbn@>=0.1.1 <0.2.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//ecc-jsbn/-/ecc-jsbn-0.1.1.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/ecc-jsbn/-/ecc-jsbn-0.1.1.tgz"
                     },
                     "bcrypt-pbkdf": {
                       "version": "1.0.0",
                       "from": "bcrypt-pbkdf@>=1.0.0 <2.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//bcrypt-pbkdf/-/bcrypt-pbkdf-1.0.0.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/bcrypt-pbkdf/-/bcrypt-pbkdf-1.0.0.tgz"
                     }
                   }
                 }
@@ -5330,66 +5330,66 @@
             "is-typedarray": {
               "version": "1.0.0",
               "from": "is-typedarray@>=1.0.0 <1.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//is-typedarray/-/is-typedarray-1.0.0.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/is-typedarray/-/is-typedarray-1.0.0.tgz"
             },
             "isstream": {
               "version": "0.1.2",
               "from": "isstream@>=0.1.2 <0.2.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//isstream/-/isstream-0.1.2.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/isstream/-/isstream-0.1.2.tgz"
             },
             "json-stringify-safe": {
               "version": "5.0.1",
               "from": "json-stringify-safe@>=5.0.1 <5.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//json-stringify-safe/-/json-stringify-safe-5.0.1.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/json-stringify-safe/-/json-stringify-safe-5.0.1.tgz"
             },
             "mime-types": {
               "version": "2.1.12",
               "from": "mime-types@>=2.1.7 <2.2.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//mime-types/-/mime-types-2.1.12.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/mime-types/-/mime-types-2.1.12.tgz",
               "dependencies": {
                 "mime-db": {
                   "version": "1.24.0",
                   "from": "mime-db@>=1.24.0 <1.25.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//mime-db/-/mime-db-1.24.0.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/mime-db/-/mime-db-1.24.0.tgz"
                 }
               }
             },
             "node-uuid": {
               "version": "1.4.7",
               "from": "node-uuid@>=1.4.7 <1.5.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//node-uuid/-/node-uuid-1.4.7.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/node-uuid/-/node-uuid-1.4.7.tgz"
             },
             "oauth-sign": {
               "version": "0.8.2",
               "from": "oauth-sign@>=0.8.1 <0.9.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//oauth-sign/-/oauth-sign-0.8.2.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/oauth-sign/-/oauth-sign-0.8.2.tgz"
             },
             "qs": {
               "version": "6.3.0",
               "from": "qs@>=6.3.0 <6.4.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//qs/-/qs-6.3.0.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/qs/-/qs-6.3.0.tgz"
             },
             "stringstream": {
               "version": "0.0.5",
               "from": "stringstream@>=0.0.4 <0.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//stringstream/-/stringstream-0.0.5.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/stringstream/-/stringstream-0.0.5.tgz"
             },
             "tough-cookie": {
               "version": "2.3.2",
               "from": "tough-cookie@>=2.3.0 <2.4.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//tough-cookie/-/tough-cookie-2.3.2.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/tough-cookie/-/tough-cookie-2.3.2.tgz",
               "dependencies": {
                 "punycode": {
                   "version": "1.4.1",
                   "from": "punycode@>=1.4.1 <2.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//punycode/-/punycode-1.4.1.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/punycode/-/punycode-1.4.1.tgz"
                 }
               }
             },
             "tunnel-agent": {
               "version": "0.4.3",
               "from": "tunnel-agent@>=0.4.1 <0.5.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//tunnel-agent/-/tunnel-agent-0.4.3.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/tunnel-agent/-/tunnel-agent-0.4.3.tgz"
             }
           }
         },
@@ -5413,44 +5413,44 @@
         "readable-stream": {
           "version": "2.0.6",
           "from": "readable-stream@>=2.0.0 <2.1.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//readable-stream/-/readable-stream-2.0.6.tgz",
+          "resolved": "http://beta-internal.beta.gitter:4873/readable-stream/-/readable-stream-2.0.6.tgz",
           "dependencies": {
             "core-util-is": {
               "version": "1.0.2",
               "from": "core-util-is@>=1.0.0 <1.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//core-util-is/-/core-util-is-1.0.2.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/core-util-is/-/core-util-is-1.0.2.tgz"
             },
             "inherits": {
               "version": "2.0.3",
               "from": "inherits@>=2.0.1 <2.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//inherits/-/inherits-2.0.3.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/inherits/-/inherits-2.0.3.tgz"
             },
             "isarray": {
               "version": "1.0.0",
               "from": "isarray@>=1.0.0 <1.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//isarray/-/isarray-1.0.0.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/isarray/-/isarray-1.0.0.tgz"
             },
             "process-nextick-args": {
               "version": "1.0.7",
               "from": "process-nextick-args@>=1.0.6 <1.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//process-nextick-args/-/process-nextick-args-1.0.7.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/process-nextick-args/-/process-nextick-args-1.0.7.tgz"
             },
             "string_decoder": {
               "version": "0.10.31",
               "from": "string_decoder@>=0.10.0 <0.11.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//string_decoder/-/string_decoder-0.10.31.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/string_decoder/-/string_decoder-0.10.31.tgz"
             },
             "util-deprecate": {
               "version": "1.0.2",
               "from": "util-deprecate@>=1.0.1 <1.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//util-deprecate/-/util-deprecate-1.0.2.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/util-deprecate/-/util-deprecate-1.0.2.tgz"
             }
           }
         },
         "xtend": {
           "version": "4.0.1",
           "from": "xtend@>=4.0.0 <4.1.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//xtend/-/xtend-4.0.1.tgz"
+          "resolved": "http://beta-internal.beta.gitter:4873/xtend/-/xtend-4.0.1.tgz"
         }
       }
     },
@@ -5499,12 +5499,12 @@
                 "klaw": {
                   "version": "1.3.1",
                   "from": "klaw@>=1.0.0 <2.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//klaw/-/klaw-1.3.1.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/klaw/-/klaw-1.3.1.tgz"
                 },
                 "path-is-absolute": {
                   "version": "1.0.1",
                   "from": "path-is-absolute@>=1.0.0 <2.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//path-is-absolute/-/path-is-absolute-1.0.1.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/path-is-absolute/-/path-is-absolute-1.0.1.tgz"
                 },
                 "rimraf": {
                   "version": "2.5.4",
@@ -5514,7 +5514,7 @@
                     "glob": {
                       "version": "7.1.1",
                       "from": "glob@>=7.0.5 <8.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//glob/-/glob-7.1.1.tgz",
+                      "resolved": "http://beta-internal.beta.gitter:4873/glob/-/glob-7.1.1.tgz",
                       "dependencies": {
                         "fs.realpath": {
                           "version": "1.0.0",
@@ -5524,7 +5524,7 @@
                         "inflight": {
                           "version": "1.0.6",
                           "from": "inflight@>=1.0.4 <2.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//inflight/-/inflight-1.0.6.tgz",
+                          "resolved": "http://beta-internal.beta.gitter:4873/inflight/-/inflight-1.0.6.tgz",
                           "dependencies": {
                             "wrappy": {
                               "version": "1.0.2",
@@ -5536,7 +5536,7 @@
                         "inherits": {
                           "version": "2.0.3",
                           "from": "inherits@>=2.0.0 <3.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//inherits/-/inherits-2.0.3.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/inherits/-/inherits-2.0.3.tgz"
                         },
                         "minimatch": {
                           "version": "3.0.3",
@@ -5590,41 +5590,41 @@
             "chalk": {
               "version": "1.1.3",
               "from": "chalk@>=1.1.3 <2.0.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//chalk/-/chalk-1.1.3.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/chalk/-/chalk-1.1.3.tgz",
               "dependencies": {
                 "ansi-styles": {
                   "version": "2.2.1",
                   "from": "ansi-styles@>=2.2.1 <3.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//ansi-styles/-/ansi-styles-2.2.1.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/ansi-styles/-/ansi-styles-2.2.1.tgz"
                 },
                 "has-ansi": {
                   "version": "2.0.0",
                   "from": "has-ansi@>=2.0.0 <3.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//has-ansi/-/has-ansi-2.0.0.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/has-ansi/-/has-ansi-2.0.0.tgz",
                   "dependencies": {
                     "ansi-regex": {
                       "version": "2.0.0",
                       "from": "ansi-regex@>=2.0.0 <3.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//ansi-regex/-/ansi-regex-2.0.0.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/ansi-regex/-/ansi-regex-2.0.0.tgz"
                     }
                   }
                 },
                 "strip-ansi": {
                   "version": "3.0.1",
                   "from": "strip-ansi@>=3.0.0 <4.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//strip-ansi/-/strip-ansi-3.0.1.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/strip-ansi/-/strip-ansi-3.0.1.tgz",
                   "dependencies": {
                     "ansi-regex": {
                       "version": "2.0.0",
                       "from": "ansi-regex@>=2.0.0 <3.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//ansi-regex/-/ansi-regex-2.0.0.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/ansi-regex/-/ansi-regex-2.0.0.tgz"
                     }
                   }
                 },
                 "supports-color": {
                   "version": "2.0.0",
                   "from": "supports-color@>=2.0.0 <3.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//supports-color/-/supports-color-2.0.0.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/supports-color/-/supports-color-2.0.0.tgz"
                 }
               }
             },
@@ -5696,12 +5696,12 @@
             "pinkie-promise": {
               "version": "2.0.1",
               "from": "pinkie-promise@>=2.0.1 <3.0.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//pinkie-promise/-/pinkie-promise-2.0.1.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/pinkie-promise/-/pinkie-promise-2.0.1.tgz",
               "dependencies": {
                 "pinkie": {
                   "version": "2.0.4",
                   "from": "pinkie@>=2.0.0 <3.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//pinkie/-/pinkie-2.0.4.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/pinkie/-/pinkie-2.0.4.tgz"
                 }
               }
             },
@@ -5810,7 +5810,7 @@
                         "spdx-expression-parse": {
                           "version": "1.0.4",
                           "from": "spdx-expression-parse@>=1.0.0 <1.1.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//spdx-expression-parse/-/spdx-expression-parse-1.0.4.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/spdx-expression-parse/-/spdx-expression-parse-1.0.4.tgz"
                         }
                       }
                     }
@@ -5949,57 +5949,57 @@
         "request": {
           "version": "2.74.0",
           "from": "request@2.74.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//request/-/request-2.74.0.tgz",
+          "resolved": "http://beta-internal.beta.gitter:4873/request/-/request-2.74.0.tgz",
           "dependencies": {
             "aws-sign2": {
               "version": "0.6.0",
               "from": "aws-sign2@>=0.6.0 <0.7.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//aws-sign2/-/aws-sign2-0.6.0.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/aws-sign2/-/aws-sign2-0.6.0.tgz"
             },
             "aws4": {
               "version": "1.5.0",
               "from": "aws4@>=1.2.1 <2.0.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//aws4/-/aws4-1.5.0.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/aws4/-/aws4-1.5.0.tgz"
             },
             "bl": {
               "version": "1.1.2",
               "from": "bl@>=1.1.2 <1.2.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//bl/-/bl-1.1.2.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/bl/-/bl-1.1.2.tgz",
               "dependencies": {
                 "readable-stream": {
                   "version": "2.0.6",
                   "from": "readable-stream@>=2.0.5 <2.1.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//readable-stream/-/readable-stream-2.0.6.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/readable-stream/-/readable-stream-2.0.6.tgz",
                   "dependencies": {
                     "core-util-is": {
                       "version": "1.0.2",
                       "from": "core-util-is@>=1.0.0 <1.1.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//core-util-is/-/core-util-is-1.0.2.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/core-util-is/-/core-util-is-1.0.2.tgz"
                     },
                     "inherits": {
                       "version": "2.0.3",
                       "from": "inherits@>=2.0.1 <2.1.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//inherits/-/inherits-2.0.3.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/inherits/-/inherits-2.0.3.tgz"
                     },
                     "isarray": {
                       "version": "1.0.0",
                       "from": "isarray@>=1.0.0 <1.1.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//isarray/-/isarray-1.0.0.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/isarray/-/isarray-1.0.0.tgz"
                     },
                     "process-nextick-args": {
                       "version": "1.0.7",
                       "from": "process-nextick-args@>=1.0.6 <1.1.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//process-nextick-args/-/process-nextick-args-1.0.7.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/process-nextick-args/-/process-nextick-args-1.0.7.tgz"
                     },
                     "string_decoder": {
                       "version": "0.10.31",
                       "from": "string_decoder@>=0.10.0 <0.11.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//string_decoder/-/string_decoder-0.10.31.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/string_decoder/-/string_decoder-0.10.31.tgz"
                     },
                     "util-deprecate": {
                       "version": "1.0.2",
                       "from": "util-deprecate@>=1.0.1 <1.1.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//util-deprecate/-/util-deprecate-1.0.2.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/util-deprecate/-/util-deprecate-1.0.2.tgz"
                     }
                   }
                 }
@@ -6008,44 +6008,44 @@
             "caseless": {
               "version": "0.11.0",
               "from": "caseless@>=0.11.0 <0.12.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//caseless/-/caseless-0.11.0.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/caseless/-/caseless-0.11.0.tgz"
             },
             "combined-stream": {
               "version": "1.0.5",
               "from": "combined-stream@>=1.0.5 <1.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//combined-stream/-/combined-stream-1.0.5.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/combined-stream/-/combined-stream-1.0.5.tgz",
               "dependencies": {
                 "delayed-stream": {
                   "version": "1.0.0",
                   "from": "delayed-stream@>=1.0.0 <1.1.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//delayed-stream/-/delayed-stream-1.0.0.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/delayed-stream/-/delayed-stream-1.0.0.tgz"
                 }
               }
             },
             "extend": {
               "version": "3.0.0",
               "from": "extend@>=3.0.0 <3.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//extend/-/extend-3.0.0.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/extend/-/extend-3.0.0.tgz"
             },
             "forever-agent": {
               "version": "0.6.1",
               "from": "forever-agent@>=0.6.1 <0.7.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//forever-agent/-/forever-agent-0.6.1.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/forever-agent/-/forever-agent-0.6.1.tgz"
             },
             "form-data": {
               "version": "1.0.1",
               "from": "form-data@>=1.0.0-rc4 <1.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//form-data/-/form-data-1.0.1.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/form-data/-/form-data-1.0.1.tgz",
               "dependencies": {
                 "async": {
                   "version": "2.1.2",
                   "from": "async@>=2.0.1 <3.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//async/-/async-2.1.2.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/async/-/async-2.1.2.tgz",
                   "dependencies": {
                     "lodash": {
                       "version": "4.16.4",
                       "from": "lodash@>=4.14.0 <5.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//lodash/-/lodash-4.16.4.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/lodash/-/lodash-4.16.4.tgz"
                     }
                   }
                 }
@@ -6054,104 +6054,104 @@
             "har-validator": {
               "version": "2.0.6",
               "from": "har-validator@>=2.0.6 <2.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//har-validator/-/har-validator-2.0.6.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/har-validator/-/har-validator-2.0.6.tgz",
               "dependencies": {
                 "chalk": {
                   "version": "1.1.3",
                   "from": "chalk@>=1.0.0 <2.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//chalk/-/chalk-1.1.3.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/chalk/-/chalk-1.1.3.tgz",
                   "dependencies": {
                     "ansi-styles": {
                       "version": "2.2.1",
                       "from": "ansi-styles@>=2.2.1 <3.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//ansi-styles/-/ansi-styles-2.2.1.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/ansi-styles/-/ansi-styles-2.2.1.tgz"
                     },
                     "has-ansi": {
                       "version": "2.0.0",
                       "from": "has-ansi@>=2.0.0 <3.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//has-ansi/-/has-ansi-2.0.0.tgz",
+                      "resolved": "http://beta-internal.beta.gitter:4873/has-ansi/-/has-ansi-2.0.0.tgz",
                       "dependencies": {
                         "ansi-regex": {
                           "version": "2.0.0",
                           "from": "ansi-regex@>=2.0.0 <3.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//ansi-regex/-/ansi-regex-2.0.0.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/ansi-regex/-/ansi-regex-2.0.0.tgz"
                         }
                       }
                     },
                     "strip-ansi": {
                       "version": "3.0.1",
                       "from": "strip-ansi@>=3.0.0 <4.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//strip-ansi/-/strip-ansi-3.0.1.tgz",
+                      "resolved": "http://beta-internal.beta.gitter:4873/strip-ansi/-/strip-ansi-3.0.1.tgz",
                       "dependencies": {
                         "ansi-regex": {
                           "version": "2.0.0",
                           "from": "ansi-regex@>=2.0.0 <3.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//ansi-regex/-/ansi-regex-2.0.0.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/ansi-regex/-/ansi-regex-2.0.0.tgz"
                         }
                       }
                     },
                     "supports-color": {
                       "version": "2.0.0",
                       "from": "supports-color@>=2.0.0 <3.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//supports-color/-/supports-color-2.0.0.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/supports-color/-/supports-color-2.0.0.tgz"
                     }
                   }
                 },
                 "commander": {
                   "version": "2.9.0",
                   "from": "commander@>=2.9.0 <3.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//commander/-/commander-2.9.0.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/commander/-/commander-2.9.0.tgz",
                   "dependencies": {
                     "graceful-readlink": {
                       "version": "1.0.1",
                       "from": "graceful-readlink@>=1.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//graceful-readlink/-/graceful-readlink-1.0.1.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/graceful-readlink/-/graceful-readlink-1.0.1.tgz"
                     }
                   }
                 },
                 "is-my-json-valid": {
                   "version": "2.15.0",
                   "from": "is-my-json-valid@>=2.12.4 <3.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//is-my-json-valid/-/is-my-json-valid-2.15.0.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/is-my-json-valid/-/is-my-json-valid-2.15.0.tgz",
                   "dependencies": {
                     "generate-function": {
                       "version": "2.0.0",
                       "from": "generate-function@>=2.0.0 <3.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//generate-function/-/generate-function-2.0.0.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/generate-function/-/generate-function-2.0.0.tgz"
                     },
                     "generate-object-property": {
                       "version": "1.2.0",
                       "from": "generate-object-property@>=1.1.0 <2.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//generate-object-property/-/generate-object-property-1.2.0.tgz",
+                      "resolved": "http://beta-internal.beta.gitter:4873/generate-object-property/-/generate-object-property-1.2.0.tgz",
                       "dependencies": {
                         "is-property": {
                           "version": "1.0.2",
                           "from": "is-property@>=1.0.0 <2.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//is-property/-/is-property-1.0.2.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/is-property/-/is-property-1.0.2.tgz"
                         }
                       }
                     },
                     "jsonpointer": {
                       "version": "4.0.0",
                       "from": "jsonpointer@>=4.0.0 <5.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//jsonpointer/-/jsonpointer-4.0.0.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/jsonpointer/-/jsonpointer-4.0.0.tgz"
                     },
                     "xtend": {
                       "version": "4.0.1",
                       "from": "xtend@>=4.0.0 <5.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//xtend/-/xtend-4.0.1.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/xtend/-/xtend-4.0.1.tgz"
                     }
                   }
                 },
                 "pinkie-promise": {
                   "version": "2.0.1",
                   "from": "pinkie-promise@>=2.0.0 <3.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//pinkie-promise/-/pinkie-promise-2.0.1.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/pinkie-promise/-/pinkie-promise-2.0.1.tgz",
                   "dependencies": {
                     "pinkie": {
                       "version": "2.0.4",
                       "from": "pinkie@>=2.0.0 <3.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//pinkie/-/pinkie-2.0.4.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/pinkie/-/pinkie-2.0.4.tgz"
                     }
                   }
                 }
@@ -6160,44 +6160,44 @@
             "hawk": {
               "version": "3.1.3",
               "from": "hawk@>=3.1.3 <3.2.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//hawk/-/hawk-3.1.3.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/hawk/-/hawk-3.1.3.tgz",
               "dependencies": {
                 "hoek": {
                   "version": "2.16.3",
                   "from": "hoek@>=2.0.0 <3.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//hoek/-/hoek-2.16.3.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/hoek/-/hoek-2.16.3.tgz"
                 },
                 "boom": {
                   "version": "2.10.1",
                   "from": "boom@>=2.0.0 <3.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//boom/-/boom-2.10.1.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/boom/-/boom-2.10.1.tgz"
                 },
                 "cryptiles": {
                   "version": "2.0.5",
                   "from": "cryptiles@>=2.0.0 <3.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//cryptiles/-/cryptiles-2.0.5.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/cryptiles/-/cryptiles-2.0.5.tgz"
                 },
                 "sntp": {
                   "version": "1.0.9",
                   "from": "sntp@>=1.0.0 <2.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//sntp/-/sntp-1.0.9.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/sntp/-/sntp-1.0.9.tgz"
                 }
               }
             },
             "http-signature": {
               "version": "1.1.1",
               "from": "http-signature@>=1.1.0 <1.2.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//http-signature/-/http-signature-1.1.1.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/http-signature/-/http-signature-1.1.1.tgz",
               "dependencies": {
                 "assert-plus": {
                   "version": "0.2.0",
                   "from": "assert-plus@>=0.2.0 <0.3.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//assert-plus/-/assert-plus-0.2.0.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/assert-plus/-/assert-plus-0.2.0.tgz"
                 },
                 "jsprim": {
                   "version": "1.3.1",
                   "from": "jsprim@>=1.2.2 <2.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//jsprim/-/jsprim-1.3.1.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/jsprim/-/jsprim-1.3.1.tgz",
                   "dependencies": {
                     "extsprintf": {
                       "version": "1.0.2",
@@ -6219,52 +6219,52 @@
                 "sshpk": {
                   "version": "1.10.1",
                   "from": "sshpk@>=1.7.0 <2.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//sshpk/-/sshpk-1.10.1.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/sshpk/-/sshpk-1.10.1.tgz",
                   "dependencies": {
                     "asn1": {
                       "version": "0.2.3",
                       "from": "asn1@>=0.2.3 <0.3.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//asn1/-/asn1-0.2.3.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/asn1/-/asn1-0.2.3.tgz"
                     },
                     "assert-plus": {
                       "version": "1.0.0",
                       "from": "assert-plus@>=1.0.0 <2.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//assert-plus/-/assert-plus-1.0.0.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/assert-plus/-/assert-plus-1.0.0.tgz"
                     },
                     "dashdash": {
                       "version": "1.14.0",
                       "from": "dashdash@>=1.12.0 <2.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//dashdash/-/dashdash-1.14.0.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/dashdash/-/dashdash-1.14.0.tgz"
                     },
                     "getpass": {
                       "version": "0.1.6",
                       "from": "getpass@>=0.1.1 <0.2.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//getpass/-/getpass-0.1.6.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/getpass/-/getpass-0.1.6.tgz"
                     },
                     "jsbn": {
                       "version": "0.1.0",
                       "from": "jsbn@>=0.1.0 <0.2.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//jsbn/-/jsbn-0.1.0.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/jsbn/-/jsbn-0.1.0.tgz"
                     },
                     "tweetnacl": {
                       "version": "0.14.3",
                       "from": "tweetnacl@>=0.14.0 <0.15.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//tweetnacl/-/tweetnacl-0.14.3.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/tweetnacl/-/tweetnacl-0.14.3.tgz"
                     },
                     "jodid25519": {
                       "version": "1.0.2",
                       "from": "jodid25519@>=1.0.0 <2.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//jodid25519/-/jodid25519-1.0.2.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/jodid25519/-/jodid25519-1.0.2.tgz"
                     },
                     "ecc-jsbn": {
                       "version": "0.1.1",
                       "from": "ecc-jsbn@>=0.1.1 <0.2.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//ecc-jsbn/-/ecc-jsbn-0.1.1.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/ecc-jsbn/-/ecc-jsbn-0.1.1.tgz"
                     },
                     "bcrypt-pbkdf": {
                       "version": "1.0.0",
                       "from": "bcrypt-pbkdf@>=1.0.0 <2.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//bcrypt-pbkdf/-/bcrypt-pbkdf-1.0.0.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/bcrypt-pbkdf/-/bcrypt-pbkdf-1.0.0.tgz"
                     }
                   }
                 }
@@ -6273,66 +6273,66 @@
             "is-typedarray": {
               "version": "1.0.0",
               "from": "is-typedarray@>=1.0.0 <1.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//is-typedarray/-/is-typedarray-1.0.0.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/is-typedarray/-/is-typedarray-1.0.0.tgz"
             },
             "isstream": {
               "version": "0.1.2",
               "from": "isstream@>=0.1.2 <0.2.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//isstream/-/isstream-0.1.2.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/isstream/-/isstream-0.1.2.tgz"
             },
             "json-stringify-safe": {
               "version": "5.0.1",
               "from": "json-stringify-safe@>=5.0.1 <5.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//json-stringify-safe/-/json-stringify-safe-5.0.1.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/json-stringify-safe/-/json-stringify-safe-5.0.1.tgz"
             },
             "mime-types": {
               "version": "2.1.12",
               "from": "mime-types@>=2.1.7 <2.2.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//mime-types/-/mime-types-2.1.12.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/mime-types/-/mime-types-2.1.12.tgz",
               "dependencies": {
                 "mime-db": {
                   "version": "1.24.0",
                   "from": "mime-db@>=1.24.0 <1.25.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//mime-db/-/mime-db-1.24.0.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/mime-db/-/mime-db-1.24.0.tgz"
                 }
               }
             },
             "node-uuid": {
               "version": "1.4.7",
               "from": "node-uuid@>=1.4.7 <1.5.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//node-uuid/-/node-uuid-1.4.7.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/node-uuid/-/node-uuid-1.4.7.tgz"
             },
             "oauth-sign": {
               "version": "0.8.2",
               "from": "oauth-sign@>=0.8.1 <0.9.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//oauth-sign/-/oauth-sign-0.8.2.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/oauth-sign/-/oauth-sign-0.8.2.tgz"
             },
             "qs": {
               "version": "6.2.1",
               "from": "qs@>=6.2.0 <6.3.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//qs/-/qs-6.2.1.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/qs/-/qs-6.2.1.tgz"
             },
             "stringstream": {
               "version": "0.0.5",
               "from": "stringstream@>=0.0.4 <0.1.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//stringstream/-/stringstream-0.0.5.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/stringstream/-/stringstream-0.0.5.tgz"
             },
             "tough-cookie": {
               "version": "2.3.2",
               "from": "tough-cookie@>=2.3.0 <2.4.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//tough-cookie/-/tough-cookie-2.3.2.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/tough-cookie/-/tough-cookie-2.3.2.tgz",
               "dependencies": {
                 "punycode": {
                   "version": "1.4.1",
                   "from": "punycode@>=1.4.1 <2.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//punycode/-/punycode-1.4.1.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/punycode/-/punycode-1.4.1.tgz"
                 }
               }
             },
             "tunnel-agent": {
               "version": "0.4.3",
               "from": "tunnel-agent@>=0.4.1 <0.5.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//tunnel-agent/-/tunnel-agent-0.4.3.tgz"
+              "resolved": "http://beta-internal.beta.gitter:4873/tunnel-agent/-/tunnel-agent-0.4.3.tgz"
             }
           }
         },
@@ -6356,17 +6356,17 @@
     "url-parse": {
       "version": "1.1.6",
       "from": "url-parse@>=1.0.5 <2.0.0",
-      "resolved": "http://beta-internal.beta.gitter:4873//url-parse/-/url-parse-1.1.6.tgz",
+      "resolved": "http://beta-internal.beta.gitter:4873/url-parse/-/url-parse-1.1.6.tgz",
       "dependencies": {
         "querystringify": {
           "version": "0.0.4",
           "from": "querystringify@>=0.0.0 <0.1.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//querystringify/-/querystringify-0.0.4.tgz"
+          "resolved": "http://beta-internal.beta.gitter:4873/querystringify/-/querystringify-0.0.4.tgz"
         },
         "requires-port": {
           "version": "1.0.0",
           "from": "requires-port@>=1.0.0 <1.1.0",
-          "resolved": "http://beta-internal.beta.gitter:4873//requires-port/-/requires-port-1.0.0.tgz"
+          "resolved": "http://beta-internal.beta.gitter:4873/requires-port/-/requires-port-1.0.0.tgz"
         }
       }
     },
@@ -6400,12 +6400,12 @@
             "strip-ansi": {
               "version": "3.0.1",
               "from": "strip-ansi@>=3.0.0 <4.0.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//strip-ansi/-/strip-ansi-3.0.1.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/strip-ansi/-/strip-ansi-3.0.1.tgz",
               "dependencies": {
                 "ansi-regex": {
                   "version": "2.0.0",
                   "from": "ansi-regex@>=2.0.0 <3.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//ansi-regex/-/ansi-regex-2.0.0.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/ansi-regex/-/ansi-regex-2.0.0.tgz"
                 }
               }
             },
@@ -6468,12 +6468,12 @@
                 "pinkie-promise": {
                   "version": "2.0.1",
                   "from": "pinkie-promise@>=2.0.0 <3.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//pinkie-promise/-/pinkie-promise-2.0.1.tgz",
+                  "resolved": "http://beta-internal.beta.gitter:4873/pinkie-promise/-/pinkie-promise-2.0.1.tgz",
                   "dependencies": {
                     "pinkie": {
                       "version": "2.0.4",
                       "from": "pinkie@>=2.0.0 <3.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//pinkie/-/pinkie-2.0.4.tgz"
+                      "resolved": "http://beta-internal.beta.gitter:4873/pinkie/-/pinkie-2.0.4.tgz"
                     }
                   }
                 }
@@ -6521,12 +6521,12 @@
                     "pinkie-promise": {
                       "version": "2.0.1",
                       "from": "pinkie-promise@>=2.0.0 <3.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//pinkie-promise/-/pinkie-promise-2.0.1.tgz",
+                      "resolved": "http://beta-internal.beta.gitter:4873/pinkie-promise/-/pinkie-promise-2.0.1.tgz",
                       "dependencies": {
                         "pinkie": {
                           "version": "2.0.4",
                           "from": "pinkie@>=2.0.0 <3.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//pinkie/-/pinkie-2.0.4.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/pinkie/-/pinkie-2.0.4.tgz"
                         }
                       }
                     },
@@ -6591,7 +6591,7 @@
                         "spdx-expression-parse": {
                           "version": "1.0.4",
                           "from": "spdx-expression-parse@>=1.0.0 <1.1.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//spdx-expression-parse/-/spdx-expression-parse-1.0.4.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/spdx-expression-parse/-/spdx-expression-parse-1.0.4.tgz"
                         }
                       }
                     }
@@ -6615,12 +6615,12 @@
                     "pinkie-promise": {
                       "version": "2.0.1",
                       "from": "pinkie-promise@>=2.0.0 <3.0.0",
-                      "resolved": "http://beta-internal.beta.gitter:4873//pinkie-promise/-/pinkie-promise-2.0.1.tgz",
+                      "resolved": "http://beta-internal.beta.gitter:4873/pinkie-promise/-/pinkie-promise-2.0.1.tgz",
                       "dependencies": {
                         "pinkie": {
                           "version": "2.0.4",
                           "from": "pinkie@>=2.0.0 <3.0.0",
-                          "resolved": "http://beta-internal.beta.gitter:4873//pinkie/-/pinkie-2.0.4.tgz"
+                          "resolved": "http://beta-internal.beta.gitter:4873/pinkie/-/pinkie-2.0.4.tgz"
                         }
                       }
                     }
@@ -6653,12 +6653,12 @@
             "code-point-at": {
               "version": "1.0.1",
               "from": "code-point-at@>=1.0.0 <2.0.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//code-point-at/-/code-point-at-1.0.1.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/code-point-at/-/code-point-at-1.0.1.tgz",
               "dependencies": {
                 "number-is-nan": {
                   "version": "1.0.1",
                   "from": "number-is-nan@>=1.0.0 <2.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//number-is-nan/-/number-is-nan-1.0.1.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/number-is-nan/-/number-is-nan-1.0.1.tgz"
                 }
               }
             },
@@ -6670,19 +6670,19 @@
                 "number-is-nan": {
                   "version": "1.0.1",
                   "from": "number-is-nan@>=1.0.0 <2.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//number-is-nan/-/number-is-nan-1.0.1.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/number-is-nan/-/number-is-nan-1.0.1.tgz"
                 }
               }
             },
             "strip-ansi": {
               "version": "3.0.1",
               "from": "strip-ansi@>=3.0.0 <4.0.0",
-              "resolved": "http://beta-internal.beta.gitter:4873//strip-ansi/-/strip-ansi-3.0.1.tgz",
+              "resolved": "http://beta-internal.beta.gitter:4873/strip-ansi/-/strip-ansi-3.0.1.tgz",
               "dependencies": {
                 "ansi-regex": {
                   "version": "2.0.0",
                   "from": "ansi-regex@>=2.0.0 <3.0.0",
-                  "resolved": "http://beta-internal.beta.gitter:4873//ansi-regex/-/ansi-regex-2.0.0.tgz"
+                  "resolved": "http://beta-internal.beta.gitter:4873/ansi-regex/-/ansi-regex-2.0.0.tgz"
                 }
               }
             }
