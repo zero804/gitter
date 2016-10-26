@@ -552,8 +552,8 @@ exports.removeAllMessagesForUserIdInRoomId = function(userId, roomId) {
     });
 };
 
-function deleteMessageFromRoom(troupeId, chatMessage) {
-  return unreadItemService.removeItem(troupeId, chatMessage._id)
+function deleteMessageFromRoom(troupe, chatMessage) {
+  return unreadItemService.removeItem(chatMessage.fromUserId, troupe, chatMessage)
     .then(function() {
       return chatMessage.remove();
     })

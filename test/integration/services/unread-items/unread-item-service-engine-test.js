@@ -154,9 +154,10 @@ describe('unread-item-service', function() {
       it('should remove items', function(done) {
         unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList(userIds, []))
           .then(function() {
-            return unreadItemServiceEngine.removeItem(troupeId1, itemId1, userIds);
+            return unreadItemServiceEngine.removeItem(troupeId1, itemId1, Lazy(userIds));
           })
-          .then(function(results) {
+          .then(function(resultsSeq) {
+            var results = resultsSeq.value();
             assert.strictEqual(results.length, 2);
             userIds.forEach(function(userId, index) {
               var result = results[index];
@@ -166,9 +167,11 @@ describe('unread-item-service', function() {
               assert.strictEqual(result.badgeUpdate, true);
             });
 
-            return unreadItemServiceEngine.removeItem(troupeId1, itemId1, userIds);
+            return unreadItemServiceEngine.removeItem(troupeId1, itemId1, Lazy(userIds));
           })
-          .then(function(results) {
+          .then(function(resultsSeq) {
+            var results = resultsSeq.value();
+
             assert.strictEqual(results.length, 2);
             userIds.forEach(function(userId, index) {
               var result = results[index];
@@ -184,9 +187,11 @@ describe('unread-item-service', function() {
       it('should remove mentions', function(done) {
         unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, makeNotifyList(userIds, [userId1]))
           .then(function() {
-            return unreadItemServiceEngine.removeItem(troupeId1, itemId1, userIds);
+            return unreadItemServiceEngine.removeItem(troupeId1, itemId1, Lazy(userIds));
           })
-          .then(function(results) {
+          .then(function(resultsSeq) {
+            var results = resultsSeq.value();
+
             assert.deepEqual(results, [{
               userId: userId1,
               unreadCount: 0,
@@ -199,9 +204,11 @@ describe('unread-item-service', function() {
               badgeUpdate: true
             }]);
 
-            return unreadItemServiceEngine.removeItem(troupeId1, itemId1, userIds);
+            return unreadItemServiceEngine.removeItem(troupeId1, itemId1, Lazy(userIds));
           })
-          .then(function(results) {
+          .then(function(resultsSeq) {
+            var results = resultsSeq.value();
+
             assert.strictEqual(results.length, 2);
             userIds.forEach(function(userId, index) {
               var result = results[index];
