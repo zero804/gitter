@@ -30,6 +30,7 @@ var favouriteCollectionFilter = require('gitter-web-shared/filters/left-menu-pri
 var MinibarItemModel = require('../views/menu/room/minibar/minibar-item-model');
 var MinibarHomeModel = require('../views/menu/room/minibar/home-view/home-model');
 var MinibarTempOrgModel = require('../views/menu/room/minibar/temp-org-view/temp-org-model');
+var MinibarPeopleModel = require('../views/menu/room/minibar/people-view/people-model');
 
 var states = [
   'all',
@@ -130,7 +131,7 @@ module.exports = Backbone.Model.extend({
     var state = this.get('state');
     this.minibarHomeModel = new MinibarHomeModel({ name: 'all', type: 'all', active: (state === 'all') }, { roomCollection: this._roomCollection });
     this.minibarSearchModel = new MinibarItemModel({ name: 'search', type: 'search', active: (state === 'search') });
-    this.minibarPeopleModel = new MinibarItemModel({ name: 'people', type: 'people',  active: (state === 'people')});
+    this.minibarPeopleModel = new MinibarPeopleModel({ name: 'people', type: 'people',  active: (state === 'people')}, { roomCollection: this._roomCollection });
     this.minibarGroupModel = new MinibarItemModel({ name: 'group', type: 'group', active: (state === 'group') });
     this.minibarCommunityCreateModel = new MinibarItemModel({ name: 'Create Community', type: 'community-create' });
     this.minibarCloseModel = new MinibarItemModel({ name: 'close', type: 'close' });
