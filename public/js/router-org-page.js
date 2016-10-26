@@ -25,7 +25,7 @@ onReady(function(){
   });
 
   //listen for postMessageCalls
-  window.addEventListener('message', function onWindowMessage(message, targetOrigin){
+  window.addEventListener('message', function onWindowMessage(message/*, targetOrigin*/){
     if (message.origin !== clientEnv['basePath']) return;
 
     var data;
@@ -34,7 +34,7 @@ onReady(function(){
         data = JSON.parse(message.data);
       }
       catch(e){
-        //FIXME JP 8/9/15 Should so something with this error
+        //TODO: JP 8/9/15 Should so something with this error
         data = message.data;
       }
     }
@@ -48,8 +48,7 @@ onReady(function(){
   var Router = Backbone.Router.extend({
 
     routes: {
-      '': 'index',
-      'tags/:roomId': 'onNavigateTags'
+      '': 'index'
     },
 
     index: function(){
@@ -58,13 +57,6 @@ onReady(function(){
         //a user has added tags to a room
         //jp 3/9/15
         window.location.reload();
-    },
-
-    onNavigateTags: function(roomId){
-      require.ensure(['./views/modals/edit-tags-view'], function(require) {
-        var EditTagsView = require('./views/modals/edit-tags-view');
-        modalRegion.show(new EditTagsView({ roomId: roomId }));
-      });
     }
   });
 
