@@ -3,17 +3,17 @@ set -e
 
 BRANCH=${1-$(git rev-parse --abbrev-ref HEAD)}
 
-if ! grep -q 'machine beta-internal' ~/.netrc; then
+if ! grep -q 'machine beta-internal.beta.gitter' ~/.netrc; then
   echo Please add your Jenkins token to \~/.netrc
   echo ------------------------------------------
-  echo machine beta-internal port 8080
+  echo machine beta-internal.beta.gitter port 8080
   echo login YOUR_LOGIN
   echo password YOUR_TOKEN
   echo ------------------------------------------
-  echo Visit "http://beta-internal:8080/user/<your_github_login>/configure"
+  echo Visit "http://beta-internal.beta.gitter:8080/user/<your_github_login>/configure"
   echo and click \"Show API token\" to get your login and token
   exit 1
 fi
 
-curl -vi -q --fail -n -X POST http://beta-internal:8080/job/redeploy-gitter-webapp/build \
+curl -vi -q --fail -n -X POST http://beta-internal.beta.gitter:8080/job/redeploy-gitter-webapp/build \
   --data-urlencode json="{\"parameter\": [{\"name\":\"SELECTED_GIT_BRANCH\", \"value\":\"origin/$BRANCH\"} ]}"

@@ -111,3 +111,4 @@ modules/topic-notifications/test/topic.html
 /scripts/useful-queries/*.csv
 /scripts/useful-queries/*.numbers
 /scripts/useful-queries/*.png
+node_modules_2
