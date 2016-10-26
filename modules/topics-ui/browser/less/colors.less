@@ -39,15 +39,20 @@
 @create-topic-close-btn-color: rgba(204, 204, 204, .5);
 
 //Topic
-@topic-header-color:             @light;
-@topic-username-color:           fadeout(@light, 60%);
-@topic-body-border-color:        darken(@pampas, 10%);
+@topic-header-color:             lighten(@dark, 10%);
+@topic-category-button-border:   lighten(@dark, 60%);
+@topic-tag-button-border-color:  lighten(@dark, 80%);
+@topic-tag-button-text-color:    lighten(@dark, 40%);
+@topic-username-color:           lighten(@dark, 60%);
+@topic-body-border-color:        #f7f6f6;
 @topic-reply-border-color:       darken(@pampas, 10%);
 @topic-reply-body-color:         @light;
 @topic-reply-list-header-bg:     @pampas;
 @topic-reply-list-heading-color: darken(@pampas, 20%);
 @topic-reply-sent-details-color: darken(@pampas, 26%);
 @topic-reply-action-text-color: @topic-reply-sent-details-color;
+@topic-reply-editor-background-color: @light;
+@topic-reply-editor-border-color: @topic-body-border-color;
 
 
 //Search
