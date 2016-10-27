@@ -66,9 +66,8 @@
 
               <ul class="org-page__topic-item-people-list">
                 {{#each replyingUsers}}
-                  <li>
+                  <li class="org-page__topic-item-people-list-item">
                     <img
-                      class="org-page__topic-item-people-list-item"
                       title="{{username}}"
                       aria-hidden="true"
                       {{{ avatarSrcSet avatarUrl 22 }}}>
@@ -131,8 +130,8 @@
 
             <ul class="org-page__room-item-people-list">
               {{#each users}}
-                <li>
-                  <img class="org-page__room-item-people-list-item" {{{ avatarSrcSet avatarUrl 22 }}}>
+                <li class="org-page__room-item-people-list-item">
+                  <img {{{ avatarSrcSet avatarUrl 22 }}}>
                 </li>
               {{/each}}
             </ul>
