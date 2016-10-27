@@ -14,14 +14,20 @@ export default React.createClass({
   propTypes: {
     groupUri: PropTypes.string.isRequired,
     groupName: PropTypes.string,
+    groupAvatarUrl: PropTypes.string,
   },
 
   render(){
-    const {groupUri, groupName } = this.props;
+    const {groupUri, groupName, groupAvatarUrl } = this.props;
 
     return (
       <Container className="container--search">
         <Panel className="panel--topic-search">
+          <img
+            src={groupAvatarUrl}
+            width="36"
+            height="36"
+            className="topics-search__avatar" />
           <H1 className="topic-search__heading">
             <ForumCategoryLink
               className="topic-search__all-topics-link"

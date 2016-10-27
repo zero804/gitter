@@ -21,6 +21,10 @@ const GroupStore = BaseModel.extend({
   getGroupName() {
     return this.get('name');
   },
+
+  getGroupAvatarUrl(){
+    return this.get('avatarUrl');
+  }
 });
 
 
