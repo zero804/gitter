@@ -1,5 +1,6 @@
 'use strict';
 
+var assert = require('assert');
 var clientEnv = require('gitter-client-env');
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
@@ -29,6 +30,7 @@ function serializeGroup(group, user) {
 }
 
 function findRooms(groupId, user, currentPage) {
+  assert(ROOMS_PER_PAGE <= 15, 'Querying for more than 15 rooms can slow things down too much');
   var userId = user && user._id;
 
   var skip = (currentPage - 1) * ROOMS_PER_PAGE;
@@ -49,27 +51,59 @@ function findRooms(groupId, user, currentPage) {
     });
 }
 
-function getRooms(groupId, user, currentPage) {
+function getRoomMembersForRooms(rooms) {
+  var roomMembershipIdMap = {};
+  var userIdMap = {};
+
+  return Promise.all(rooms.map(function(room) {
+    return roomMembershipService.findMembersForRoom(room.id, { limit: 5 })
+      .then(function(userIds) {
+        roomMembershipIdMap[room.id] = userIds;
+        userIds.forEach(function(userId) {
+          userIdMap[userId] = true;
+        });
+      });
+  }))
+  .then(function() {
+    var userIds = Object.keys(userIdMap);
+    return userService.findByIds(userIds)
+      .then(function(users) {
+        return users.reduce(function(map, user) {
+          map[user.id] = user;
+          return map;
+        }, {});
+      });
+  })
+  .then(function(userMap) {
+    return rooms.reduce(function(roomMembershipMap, room) {
+      roomMembershipMap[room.id] = (roomMembershipIdMap[room.id] || []).map(function(userId) {
+        return userMap[userId];
+      });
+      return roomMembershipMap;
+    }, {});
+  });
+}
+
+function getRoomsWithMembership(groupId, user, currentPage) {
   return findRooms(groupId, user, currentPage)
     .then(function(roomBrowseResult) {
       var rooms = roomBrowseResult.results;
-      // Add `room.users`
-      return Promise.all(rooms.map(function(room) {
-        return roomMembershipService.findMembersForRoom(room.id, { limit: 5 })
-          .then(function(userIds) {
-            return userService.findByIds(userIds);
-          })
-          .then(function(users) {
-            room.users = users.map(function(user) {
+
+      return getRoomMembersForRooms(rooms)
+        .then(function(roomMembershipMap) {
+          return rooms.map(function(room) {
+            room.users = (roomMembershipMap[room.id] || []).map(function(user) {
               user.avatarUrl = avatars.getForUser(user);
               return user;
             });
+
             return room;
           });
-      }))
-      .then(function() {
-        return roomBrowseResult;
-      });
+        })
+        .then(function(rooms) {
+          roomBrowseResult.results = rooms;
+          return roomBrowseResult;
+        });
     });
 }
 
@@ -102,7 +136,7 @@ function getForumForGroup(groupUri, forumId, userId) {
 
 function renderOrgPage(req, res, next) {
   return Promise.try(function() {
-    var group = req.group;
+    var group = req.group || req.uriContext.group;
     if (!group) throw new StatusError(404);
     var groupId = group._id;
     var user = req.user;
@@ -112,7 +146,7 @@ function renderOrgPage(req, res, next) {
 
     return Promise.join(
       serializeGroup(group, user),
-      getRooms(groupId, user, currentPage),
+      getRoomsWithMembership(groupId, user, currentPage),
       getForumForGroup(group.uri, group.forumId, user && user.id),
       contextGenerator.generateNonChatContext(req),
       policy.canAdmin(),
@@ -139,7 +173,7 @@ function renderOrgPage(req, res, next) {
         // This is used to track pageViews in mixpanel
         troupeContext.isCommunityPage = true;
 
-        var fullUrl = clientEnv.basePath + '/orgs/' + serializedGroup.uri + '/rooms';
+        var fullUrl = clientEnv.basePath + '/' + serializedGroup.homeUri;
         var text = encodeURIComponent('Explore our chat community on Gitter:');
         var url = 'https://twitter.com/share?' +
           'text=' + text +

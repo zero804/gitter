@@ -94,11 +94,9 @@ describe('room-context-service', function() {
 
   it('should throw a redirect for 1:1 same user', function() {
     return roomContextService.findContextForUri(fixture.user1, fixture.user1.username, {})
-    .then(function(/*roomContext*/) {
-      assert.ok(false);
-    }, function(err) {
-      assert.strictEqual(err.status, 301);
-      assert.strictEqual(err.path, '/home/explore');
+    .then(function(roomContext) {
+      assert.strictEqual(roomContext.ownUrl, true);
+      assert.strictEqual(roomContext.uri, fixture.user1.username);
     })
   });
 

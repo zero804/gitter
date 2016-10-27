@@ -23,7 +23,7 @@ testRequire("./services/room-service");
 testRequire("./services/room-service");
 
 describe('room-service', function() {
-  before(fixtureLoader(fixture, {
+  var fixture = fixtureLoader.setup({
     deleteDocuments: {
       Troupe: [{ lcUri: 'gittertest' }]
     },
@@ -45,10 +45,6 @@ describe('room-service', function() {
     },
     group1: {},
     userToRemove: {},
-  }));
-
-  after(function() {
-    fixture.cleanup();
   });
 
   describe('classic functionality #slow', function() {

@@ -59,8 +59,7 @@ function matchIds(things, ids) {
 }
 
 describe('restful #slow', function() {
-  var fixture = {};
-  before(fixtureLoader(fixture, {
+  var fixture = fixtureLoader.setup({
     // user1 is a google (non-github) user
     user1: {
       id: 1,
@@ -82,10 +81,6 @@ describe('restful #slow', function() {
       group: 'group1',
       users: ['user1']
     }
-  }));
-
-  after(function() {
-    fixture.cleanup();
   });
 
   it('returns a github-backed profile #slow', function(done) {
@@ -166,15 +161,18 @@ describe('restful #slow', function() {
     it('should do what it says on the tin', function() {
       return restful.serializeGroupsForUserId(fixture.user1.id)
         .then(function(result) {
+          var group1 = fixture.group1;
+
           assert.deepEqual(result, [{
-            id: fixture.group1.id,
-            name: fixture.group1.name,
-            uri: fixture.group1.uri,
+            id: group1.id,
+            name: group1.name,
+            uri: group1.uri,
+            homeUri: group1.homeUri,
             backedBy: {
               type: null,
               linkPath: null
             },
-            avatarUrl: nconf.get('avatar:officialHost') + '/group/i/' + fixture.group1.id,
+            avatarUrl: nconf.get('avatar:officialHost') + '/group/i/' + group1.id,
             hasAvatarSet: undefined,
             forumId: undefined
           }]);

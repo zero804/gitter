@@ -1,10 +1,8 @@
 'use strict';
 
-var Promise = require('bluebird');
 var env = require('gitter-web-env');
 var logger = env.logger;
-
-var uriLookupService = require('./uri-lookup-service');
+var uriLookupService = require('gitter-web-uri-resolver/lib/uri-lookup-service');
 var userService = require('./user-service');
 var troupeService = require('./troupe-service');
 var groupService = require('gitter-web-groups/lib/group-service');
@@ -31,22 +29,18 @@ function resolveFromLookup(uriLookup, userId) {
   }
 
   if(uriLookup.troupeId) {
-    /* The uri is for a room */
-    return Promise.all([
-        uriLookup.groupId && groupService.findById(uriLookup.groupId),
-        troupeService.findByIdLeanWithMembership(uriLookup.troupeId, userId)
-      ])
-      .spread(function(group, troupeAndRoomMember) {
+    return troupeService.findByIdLeanWithMembership(uriLookup.troupeId, userId)
+      .then(function(troupeAndRoomMember) {
         var troupe = troupeAndRoomMember[0];
         var roomMember = troupeAndRoomMember[1];
-        if(!troupe) return null;
+        if (!troupe) return null;
 
         return {
           user: null,
           uri: troupe.uri,
           room: troupe,
           roomMember: roomMember,
-          group: group
+          group: null // TODO: consider if this is okay...
         };
       });
   }
@@ -55,14 +49,14 @@ function resolveFromLookup(uriLookup, userId) {
     /* The uri is for a group */
     return groupService.findById(uriLookup.groupId)
       .then(function(group) {
-        if (group) return null;
+        if (!group) return null;
 
         return {
           user: null,
-          uri: group.uri,
+          uri: group.homeUri,
           room: null,
           roomMember: null,
-          group: null
+          group: group
         };
 
       });
@@ -74,7 +68,7 @@ function resolveFromLookup(uriLookup, userId) {
 /**
  * Returns { user, troupe, roomMember, group }
  */
-module.exports = function uriResolver(userId, uri, options) {
+function uriResolver(userId, uri, options) {
   debug("uriResolver %s", uri);
   var ignoreCase = options && options.ignoreCase;
 
@@ -102,4 +96,6 @@ module.exports = function uriResolver(userId, uri, options) {
           }
         });
     });
-};
+}
+
+module.exports = uriResolver;
