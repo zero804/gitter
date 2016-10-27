@@ -147,7 +147,6 @@ var PanelView = Marionette.LayoutView.extend({
     'change:panelOpenState':       'onPanelOpenStateChange',
     'primary-collection:snapshot': 'onPrimaryCollectionSnapshot',
     'change:profileMenuOpenState': 'onProfileToggle',
-    'change:state': 'onModelChanegState'
   },
 
   childEvents: {
@@ -211,8 +210,18 @@ var PanelView = Marionette.LayoutView.extend({
   },
 
   onModelChangeState: function (){
-    if(!this.neverendingstory) { return; }
     var state = this.model.get('state');
+    toggleClass(this.el, 'all', state === 'all');
+    toggleClass(this.el, 'search', state === 'search');
+    toggleClass(this.el, 'people', state === 'people');
+    toggleClass(this.el, 'group', state === 'group');
+    toggleClass(this.el, 'org', state === 'org');
+
+    if(state === 'group') {
+      this.$el.find('.nano').nanoScroller({ scrollTop: 0 });
+    }
+
+    if(!this.neverendingstory) { return; }
     if(state !== 'search') { return this.neverendingstory.disable(); }
     return this.neverendingstory.enable();
   },
@@ -239,14 +248,6 @@ var PanelView = Marionette.LayoutView.extend({
     this.stopListening(this.bus);
   },
 
-  onModelChanegState: function(){
-    var state = this.model.get('state');
-    toggleClass(this.el, 'all', state === 'all');
-    toggleClass(this.el, 'search', state === 'search');
-    toggleClass(this.el, 'people', state === 'people');
-    toggleClass(this.el, 'group', state === 'group');
-    toggleClass(this.el, 'org', state === 'org');
-  }
 });
 
 
