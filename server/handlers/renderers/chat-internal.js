@@ -7,23 +7,22 @@ var contextGenerator = require('../../web/context-generator');
 var restful = require('../../services/restful');
 var burstCalculator = require('../../utils/burst-calculator');
 var userSort = require('../../../public/js/utils/user-sort');
-var isolateBurst = require('gitter-web-shared/burst/isolate-burst-array');
 var unreadItemService = require('../../services/unread-items');
 var _ = require('lodash');
 var getSubResources = require('./sub-resources');
 var fixMongoIdQueryParam = require('../../web/fix-mongo-id-query-param');
 var fonts = require('../../web/fonts');
 var generateRightToolbarSnapshot = require('../snapshots/right-toolbar-snapshot');
-var roomMembershipService = require('../../services/room-membership-service');
 var getHeaderViewOptions = require('gitter-web-shared/templates/get-header-view-options');
 
 /* How many chats to send back */
 var INITIAL_CHAT_COUNT = 50;
 var ROSTER_SIZE = 25;
 
+function renderChat(req, res, next, options) {
+  var uriContext = options.uriContext;
 
-function renderChat(req, res, options, next) {
-  var troupe = req.uriContext.troupe;
+  var troupe = uriContext.troupe;
   var aroundId = fixMongoIdQueryParam(req.query.at);
   var script = options.script;
   var user = req.user;
@@ -35,13 +34,12 @@ function renderChat(req, res, options, next) {
     var limit = unreadItems.chat.length > INITIAL_CHAT_COUNT ? unreadItems.chat.length + 20 : INITIAL_CHAT_COUNT;
 
     var snapshotOptions = {
-        limit: limit, //options.limit || INITIAL_CHAT_COUNT,
+      limit: limit,
       aroundId: aroundId,
       unread: options.unread // Unread can be true, false or undefined
     };
 
-    var chatSerializerOptions = _.defaults({
-    }, snapshotOptions);
+    var chatSerializerOptions = _.defaults({ }, snapshotOptions);
 
     var userSerializerOptions = _.defaults({
       lean: true,
@@ -57,16 +55,11 @@ function renderChat(req, res, options, next) {
       ]).spread(function (troupeContext, chats, activityEvents, users, rightToolbarSnapshot) {
         var initialChat = _.find(chats, function(chat) { return chat.initial; });
         var initialBottom = !initialChat;
-        var githubLink;
         var classNames = options.classNames || [];
         var isStaff = req.user && req.user.staff;
 
         var snapshots = rightToolbarSnapshot;
         troupeContext.snapshots = snapshots;
-
-        if(troupe.githubType === 'REPO' || troupe.githubType === 'ORG') {
-          githubLink = 'https://github.com/' + req.uriContext.uri;
-        }
 
         if (!user) classNames.push("logged-out");
 
@@ -99,8 +92,7 @@ function renderChat(req, res, options, next) {
             isRepo: troupe.sd.type === 'GH_REPO', // Used by chat_toolbar patial
             bootScriptName: script,
             cssFileName: cssFileName,
-            githubLink: githubLink,
-            troupeName: req.uriContext.uri,
+            troupeName: uriContext.uri,
             oneToOne: troupe.oneToOne, // Used by the old left menu
             user: user,
             troupeContext: troupeContext,
@@ -114,7 +106,7 @@ function renderChat(req, res, options, next) {
             hasHiddenMembers: troupe.userCount > 25,
             integrationsUrl: integrationsUrl,
             isMobile: options.isMobile,
-            roomMember: req.uriContext.roomMember,
+            roomMember: uriContext.roomMember,
             isRightToolbarPinned: isRightToolbarPinned,
 
             //Feature Switch Left Menu
@@ -133,118 +125,4 @@ function renderChat(req, res, options, next) {
     .catch(next);
 }
 
-function renderChatPage(req, res, next) {
-  var scriptName = 'router-chat';
-
-  return renderChat(req, res, {
-    template: 'chat-template',
-    script: scriptName
-  }, next);
-}
-
-function renderMobileChat(req, res, next) {
-  return renderChat(req, res, {
-    template: 'mobile/mobile-chat',
-    script: 'mobile-chat',
-    isMobile: true
-  }, next);
-}
-
-function renderMobileNativeEmbeddedChat(req, res) {
-  res.render('mobile/native-embedded-chat-app', {
-    isMobile: true,
-    troupeContext: {}
-  });
-}
-
-function renderMobileNotLoggedInChat(req, res, next) {
-  return renderChat(req, res, {
-    template: 'mobile/mobile-nli-chat',
-    script: 'mobile-nli-chat',
-    unread: false, // Not logged in users see chats as read
-    fetchEvents: false,
-    fetchUsers: false,
-    isMobile: true
-  }, next);
-}
-
-function renderNotLoggedInChatPage(req, res, next) {
-  return renderChat(req, res, {
-    template: 'chat-nli-template',
-    script: 'router-nli-chat',
-    unread: false // Not logged in users see chats as read
-  }, next);
-}
-
-function renderEmbeddedChat(req, res, next) {
-  roomMembershipService.countMembersInRoom(req.troupe._id)
-    .then(function(userCount) {
-      return renderChat(req, res, {
-        template: 'chat-embed-template',
-        script: 'router-embed-chat',
-        classNames: [ 'embedded' ],
-        fetchEvents: false,
-        fetchUsers: false,
-        extras: {
-          usersOnline: userCount
-        }
-      }, next);
-    })
-    .catch(next);
-}
-
-function renderNotLoggedInEmbeddedChat(req, res, next) {
-  roomMembershipService.countMembersInRoom(req.troupe._id)
-    .then(function(userCount) {
-      return renderChat(req, res, {
-        template: 'chat-nli-embed-template',
-        script: 'router-nli-embed-chat',
-        unread: false, // Embedded users see chats as read
-        classNames: [ 'embedded' ],
-        fetchEvents: false,
-        fetchUsers: false,
-        extras: {
-          usersOnline: userCount
-        }
-      }, next);
-    })
-    .catch(next);
-}
-
-
-function renderChatCard(req, res, next) {
-  if (!req.query.at) return next(400);
-  var aroundId = req.query.at;
-
-  return renderChat(req, res, {
-    limit: 20,
-    template: 'chat-card-template',
-    stylesheet: 'chat-card',
-    fetchEvents: false,
-    fetchUsers: false,
-    generateContext: false,
-    unread: false, // Embedded users see chats as read
-    classNames: [ 'card' ],
-    filterChats: function(chats) {
-      // Only show the burst
-      // TODO: move this somewhere useful
-      var permalinkedChat = _.find(chats, function(chat) { return chat.id === aroundId; });
-      if (!permalinkedChat) return [];
-
-      var burstChats = isolateBurst(chats, permalinkedChat);
-      return burstChats;
-    }
-  }, next);
-}
-
-
-module.exports = exports = {
-  renderChatPage: renderChatPage,
-  renderMobileChat: renderMobileChat,
-  renderEmbeddedChat: renderEmbeddedChat,
-  renderNotLoggedInEmbeddedChat: renderNotLoggedInEmbeddedChat,
-  renderChatCard: renderChatCard,
-  renderMobileNotLoggedInChat: renderMobileNotLoggedInChat,
-  renderNotLoggedInChatPage: renderNotLoggedInChatPage,
-  renderMobileNativeEmbeddedChat: renderMobileNativeEmbeddedChat
-};
+module.exports = renderChat;

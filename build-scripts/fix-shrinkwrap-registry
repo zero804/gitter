@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+
+set -euo pipefail
+IFS=$'\n\t'
+
+set -x
+
+sed -i '' 's#http://beta-internal:4873/#http://beta-internal.beta.gitter:4873/#g' npm-shrinkwrap.json
+#sed -i '' 's#https://registry.npmjs.org/#http://beta-internal.beta.gitter:4873/#g' npm-shrinkwrap.json
+sed -i '' 's#http://beta-internal.beta.gitter:8089/nexus/content/groups/npm/#http://beta-internal.beta.gitter:4873/#g' npm-shrinkwrap.json
