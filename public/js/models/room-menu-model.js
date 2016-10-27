@@ -131,7 +131,7 @@ module.exports = Backbone.Model.extend({
     var state = this.get('state');
     this.minibarHomeModel = new MinibarHomeModel({ name: 'all', type: 'all', active: (state === 'all') }, { roomCollection: this._roomCollection });
     this.minibarSearchModel = new MinibarItemModel({ name: 'search', type: 'search', active: (state === 'search') });
-    this.minibarPeopleModel = new MinibarPeopleModel({ name: 'people', type: 'people',  active: (state === 'people')}, { roomCollection: this._roomCollection });
+    this.minibarPeopleModel = new MinibarPeopleModel({ name: 'people', type: 'people', active: (state === 'people')}, { roomCollection: this._roomCollection });
     this.minibarGroupModel = new MinibarItemModel({ name: 'group', type: 'group', active: (state === 'group') });
     this.minibarCommunityCreateModel = new MinibarItemModel({ name: 'Create Community', type: 'community-create' });
     this.minibarCloseModel = new MinibarItemModel({ name: 'close', type: 'close' });
