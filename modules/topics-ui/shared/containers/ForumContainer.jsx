@@ -149,6 +149,8 @@ const ForumContainer = React.createClass({
 
     const groupUri = groupStore.getGroupUri();
     const groupName = groupStore.getGroupName();
+    const groupAvatarUrl = groupStore.getGroupAvatarUrl();
+
     const topics = topicsStore.getTopics();
     const newTopic = topicsStore.getDraftTopic();
     const currentUser = currentUserStore.getCurrentUser();
@@ -159,6 +161,7 @@ const ForumContainer = React.createClass({
       <main>
         <SearchHeaderContainer
           groupName={groupName}
+          groupAvatarUrl={groupAvatarUrl}
           groupUri={groupUri} />
         <div className="scroller topic-content">
           <CategoryList
