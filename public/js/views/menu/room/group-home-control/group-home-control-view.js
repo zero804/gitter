@@ -1,6 +1,7 @@
 'use strict';
 
 var Marionette = require('backbone.marionette');
+var _ = require('underscore');
 var template = require('./group-home-control-view.hbs');
 var toggleClass = require('../../../../utils/toggle-class');
 var appEvents = require('../../../../utils/appevents');
@@ -20,8 +21,19 @@ module.exports = Marionette.ItemView.extend({
   },
 
   initialize: function(attrs) {
-  this.groupsCollection = attrs.groupsCollection;
+    this.groupsCollection = attrs.groupsCollection;
     this.onModelChangeState();
+  },
+
+  serializeData: function(){
+    var data = this.model.toJSON();
+    var groupId = this.model.get('groupId');
+    var groupModel = this.groupsCollection.get(groupId);
+    var homeUri = '';
+    if(groupModel) { homeUri = groupModel.get('homeUri'); }
+    return _.extend({}, data, {
+      homeUri: homeUri
+    });
   },
 
   onModelChangeState: function(){
@@ -36,12 +48,13 @@ module.exports = Marionette.ItemView.extend({
     //Get fully qualified group model
     var groupId = this.model.get('groupId');
     var groupModel = this.groupsCollection.get(groupId);
+
     if(!groupModel) { return; }
 
     //Build org profile room url
-    var groupUri = groupModel.get('uri');
+    var groupHomeUri = groupModel.get('homeUri');
     var groupName = groupModel.get('name');
-    var orgUrl = urlJoin(clientEnv.basePath, '/orgs', groupUri, '/rooms');
+    var orgUrl = urlJoin(clientEnv.basePath, groupHomeUri);
 
     //Call navigation
     appEvents.trigger('navigation', orgUrl, 'iframe', groupName);
