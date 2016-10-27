@@ -105,6 +105,7 @@ body {
   max-width: @page-wrapper-max-width;
   margin-top: @section-spacing;
   margin-left: auto;
+  padding-top: 65px;
   margin-right: auto;
   padding-left: @page-wrapper-horizontal-padding;
   padding-right: @page-wrapper-horizontal-padding;
@@ -115,9 +116,12 @@ body {
 }
 
 .app-header {
+  position: fixed;
   margin-top: 0;
+  padding-top: 0;
   height: 65px;
   background-image: linear-gradient(to left, @header-grad-bg-color, @header-base-bg-color);
+  z-index: 2;
 }
 
 .app-header__h1 {
