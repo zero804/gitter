@@ -54,14 +54,15 @@ var HeaderView = Marionette.ItemView.extend({
   serializeData: function() {
     var groupId = this.model.get('groupId');
     var selectedGroup = this.groupsCollection.get(groupId);
+
+    var avatarUrl = null;
+    if(selectedGroup) { avatarUrl = selectedGroup.get('avatarUrl'); }
+
     var name = '';
     if(selectedGroup) { name = selectedGroup.get('name'); }
     else { name = getOrgNameFromUri(document.location.pathname); }
 
-    var avatarSrcset = (!!name.length) ?
-        resolveRoomAvatarSrcSet({ uri: name}, 22) :
-        null;
-    return { groupName: name, avatarSrcset: avatarSrcset };
+    return { groupName: name, avatarUrl: avatarUrl };
   },
 
   updateActiveElement: function(model, state) { //jshint unused: true
