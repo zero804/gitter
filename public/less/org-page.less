@@ -45,6 +45,9 @@ body {
 
 
 .org-page__header {
+  position: fixed;
+  top: 0;
+  width: 100%;
   display: flex;
   padding: 0 4rem;
   height: 65px;
@@ -90,7 +93,7 @@ body {
 
 .org-page-main {
   margin-top: 6rem;
-  padding: 0 3.25em-@excess-card-margin 3.25em 3.25em-@excess-card-margin;
+  padding: 65px 3.25em-@excess-card-margin 3.25em 3.25em-@excess-card-margin;
   @excess-card-margin: 0.5em;
 
   @media (max-width: @medium-breakpoint) {
