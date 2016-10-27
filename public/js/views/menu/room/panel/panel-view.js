@@ -217,9 +217,7 @@ var PanelView = Marionette.LayoutView.extend({
     toggleClass(this.el, 'group', state === 'group');
     toggleClass(this.el, 'org', state === 'org');
 
-    if(state === 'group') {
-      this.$el.find('.nano').nanoScroller({ scrollTop: 0 });
-    }
+    this.$el.find('.nano').nanoScroller({ scrollTop: 0 });
 
     if(!this.neverendingstory) { return; }
     if(state !== 'search') { return this.neverendingstory.disable(); }
