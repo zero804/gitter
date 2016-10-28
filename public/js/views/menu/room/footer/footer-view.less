@@ -3,7 +3,7 @@
 
 .panel-footer-container {
   position:       absolute;
-  bottom:         0;
+  bottom:         6rem;
   left:           -1px;
   width:          100%;
   z-index:        1;
@@ -28,7 +28,7 @@
 .panel-footer__item--search {
   .panel-footer__item();
   box-sizing:     border-box;
-  padding-bottom: 2.8rem;
+  padding-bottom: 2.1rem;
   text-align:     center;
 
   &.active {
@@ -45,11 +45,11 @@
   flex-direction:      row-reverse;
   align-items:         center;
   padding-bottom:      .15rem;
-  //This makes me feel a bit sick TBH JP 14/4/16
-  background-image:    url('../images/left-menu-footer-bg.png');
-  background-position: bottom right;
-  background-repeat:   no-repeat;
-  background-size:     cover;
+  background: linear-gradient(
+    top,
+    rgba(255, 255, 255, 0),
+    rgba(255, 255, 255, 1) 35%
+  );
 }
 
 .panel-footer__title {
@@ -65,6 +65,7 @@
 
 .panel-footer__button {
   pointer-events: all;
+  width: 80%;
 }
 
 .panel-footer__img {
@@ -78,7 +79,7 @@
 
 .panel-footer__create-room {
   width: 100%;
-  margin-bottom: 1.2rem;
+  margin-bottom: 2rem;
 
   &:hover {
     cursor: pointer;

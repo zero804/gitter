@@ -6,16 +6,18 @@ export default React.createClass({
   displayName: 'SearchHeaderContainer',
   propTypes: {
     groupUri: PropTypes.string.isRequired,
-    groupName: PropTypes.string
+    groupName: PropTypes.string,
+    groupAvatarUrl: PropTypes.string,
   },
 
   render(){
-    const {groupUri, groupName } = this.props;
+    const {groupUri, groupName, groupAvatarUrl } = this.props;
 
     return (
       <SearchHeader
         groupUri={groupUri}
-        groupName={groupName} />
+        groupName={groupName}
+        groupAvatarUrl={groupAvatarUrl}/>
     );
   }
 

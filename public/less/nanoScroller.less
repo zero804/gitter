@@ -1,3 +1,5 @@
+@import './colors';
+
 /** initial setup **/
 @nanoClass: ~'nano';
 @paneClass: ~'nano-pane';
@@ -43,7 +45,7 @@
     border-radius: 5px;
     > .@{sliderClass} {
       background: #444;
-      background: rgba(255,255,255,.5);
+      background: @menu-border-color;
       position: relative;
       margin : 0 1px;
       -moz-border-radius: 8px;

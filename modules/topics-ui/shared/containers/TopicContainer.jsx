@@ -209,6 +209,7 @@ const TopicContainer = createClass({
 
     const groupUri = groupStore.getGroupUri();
     const groupName = groupStore.getGroupName();
+    const groupAvatarUrl = groupStore.getGroupAvatarUrl();
 
     const newReplyContent = newReplyStore.getTextContent();
     const topic = this.getParsedTopic();
@@ -230,13 +231,11 @@ const TopicContainer = createClass({
 
     return (
       <main>
-        <div className="scroller">
-          <SearchHeaderContainer
-            userId={userId}
-            forumId={forumId}
-            groupUri={groupUri}
-            groupName={groupName}
-            subscriptionState={forumSubscriptionState}/>
+        <SearchHeaderContainer
+          groupAvatarUrl={groupAvatarUrl}
+          groupUri={groupUri}
+          groupName={groupName}/>
+        <div className="scroller topic-content">
           <article>
             <TopicHeader
               topic={topic}

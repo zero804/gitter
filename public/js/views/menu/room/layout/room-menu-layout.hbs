@@ -3,10 +3,13 @@
     <nav id="minibar" class="minibar">
       <div class="minibar-inner nano">
         <ul id="minibar-list" class="room-menu-options nano-content">
-
+          <li class="room-menu-options__item--header-spacer">
+            <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/gitter-logos/logo-white-default.svg"}}' />
+          </li>
           <li data-state-change="all" id="minibar-all"  class="room-menu-options__item--all">
             {{! the above li is passed to a Marionette view as its el so, sadly, we need to wrap these in divs}}
             <div class="room-menu-options__container">
+              {{> minibar_activity_indicators}}
               <button class="room-menu-options__item-button" title="All Conversations">
                 <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/home.svg"}}' />
               </button>
@@ -30,28 +33,12 @@
             </div>
           </li>
 
-          <li>
-            <ul id="minibar-temp" class="minibar-collection-list">
-              {{#if troupeContext.snapshots.leftMenu.tempOrg}}
-              {{#with troupeContext.snapshots.leftMenu.tempOrg}}
-                <li data-state-change="org"
-                    id="minibar-{{name}}"
-                    class="room-menu-options__item--org active">
-                          {{{ prerenderView "js/views/menu/room/minibar/minibar-item-view" }}}
-                </li>
-              {{/with}}
-              {{/if}}
-            </ul>
-          </li>
-
-          <li id="minibar-collection">
-            <ul class="minibar-collection-list">
-              {{#each troupeContext.snapshots.groups}} {{! JP 9/12/15 }} {{! TODO SHOULD THIS BE MOVED INTO A PARTIAL TO BE SHARED AROUND }}
-                <li data-state-change="org" id="{{id}}"  data-org-name="{{name}}" class="room-menu-options__item--org">
-                  {{{ prerenderView "js/views/menu/room/minibar/minibar-item-view" }}}
-                </li>
-              {{/each}}
-            </ul>
+          <li data-state-change="people" id="minibar-groups" class="room-menu-options__item--groups">
+            <div class="room-menu-options__container">
+              <button class="room-menu-options__item-button" title="Your Communities">
+                <img class="room-menu-options__item__avatar--groups" src='{{cdn "images/svg/menu/groups.svg"}}' />
+              </button>
+            </div>
           </li>
 
           <li class="room-menu-options__item--community-create" data-state-change="community-create" id="minibar-community-create">
@@ -75,6 +62,12 @@
     </nav>
     <div id="room-menu__panel">
       <section class="room-menu__panel {{#if roomMenuIsPinned}}active loading{{/if}}">
+        <div class="header-brand-container">
+          <img class="header-brand-container__logo" src='{{cdn "images/svg/gitter-logos/logo-white-lettering.svg"}}' />
+        </div>
+
+        <div id="group-back-button" class="group-back-button"></div>
+
         <header class="panel-header" id="panel-header"></header>
         <div id="profile-menu"></div>
         <div id="panel" class="room-menu__panel-inner nano">
@@ -84,6 +77,7 @@
 
           <div class="nano-content panel-content">
             <div id="search-input" class="left-menu-search-root"></div>
+            <div class="group-home-button" id="group-home-button"></div>
 
             <section id="favourite-collection" class="left-menu-collection">
               <div class="favourite-collection loaded active">
@@ -115,8 +109,6 @@
               </div>
             </section>
 
-            <section id="secondary-collection" class="left-menu-collection"></section>
-
             <div id="left-menu-topics-area" class="left-menu-topics-root {{#unless forum.hasCategories}}hidden{{/unless}}">
               <div>
                 <h2 class="collection__title">
@@ -134,9 +126,8 @@
                 </div>
               </div>
             </div>
-
+            <section id="secondary-collection" class="left-menu-collection"></section>
             <section id="tertiary-collection" class="left-menu-collection"></section>
-
           </div>
         </div>
       </section>

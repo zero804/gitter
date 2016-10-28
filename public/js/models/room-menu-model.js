@@ -28,15 +28,16 @@ var SecondaryCollectionModel = require('../views/menu/room/secondary-collection/
 var TertiaryCollectionModel = require('../views/menu/room/tertiary-collection/tertiary-collection-model');
 var favouriteCollectionFilter = require('gitter-web-shared/filters/left-menu-primary-favourite');
 var MinibarItemModel = require('../views/menu/room/minibar/minibar-item-model');
-var MinibarPeopleModel = require('../views/menu/room/minibar/people-view/people-model');
+var MinibarHomeModel = require('../views/menu/room/minibar/home-view/home-model');
 var MinibarTempOrgModel = require('../views/menu/room/minibar/temp-org-view/temp-org-model');
+var MinibarPeopleModel = require('../views/menu/room/minibar/people-view/people-model');
 
 var states = [
   'all',
   'search',
   'people',
+  'group',
   'org',
-  'temp-org'
 ];
 
 var SEARCH_DEBOUNCE_INTERVAL = 1000;
@@ -128,9 +129,10 @@ module.exports = Backbone.Model.extend({
     this.suggestedRoomsByOrgName = new SuggestedRoomsByGroupName(null, { roomMenuModel: this });
 
     var state = this.get('state');
-    this.minibarHomeModel = new MinibarItemModel({ name: 'all', type: 'all', active: (state === 'all') });
+    this.minibarHomeModel = new MinibarHomeModel({ name: 'all', type: 'all', active: (state === 'all') }, { roomCollection: this._roomCollection });
     this.minibarSearchModel = new MinibarItemModel({ name: 'search', type: 'search', active: (state === 'search') });
-    this.minibarPeopleModel = new MinibarPeopleModel({ active: (state === 'people')}, { roomCollection: this._roomCollection });
+    this.minibarPeopleModel = new MinibarPeopleModel({ name: 'people', type: 'people', active: (state === 'people')}, { roomCollection: this._roomCollection });
+    this.minibarGroupModel = new MinibarItemModel({ name: 'group', type: 'group', active: (state === 'group') });
     this.minibarCommunityCreateModel = new MinibarItemModel({ name: 'Create Community', type: 'community-create' });
     this.minibarCloseModel = new MinibarItemModel({ name: 'close', type: 'close' });
     this.minibarTempOrgModel = new MinibarTempOrgModel(attrs.tempOrg, { troupe: context.troupe(), });
@@ -246,6 +248,12 @@ module.exports = Backbone.Model.extend({
         this.primaryCollection.switchCollection(this.activeRoomCollection);
         this.secondaryCollection.switchCollection(this.suggestedRoomsByOrgName);
         this.tertiaryCollection.switchCollection(this._suggestedRoomCollection);
+        break;
+
+      case 'group':
+        this.primaryCollection.switchCollection(this.groupsCollection);
+        this.secondaryCollection.switchCollection(new Backbone.Collection(null));
+        this.tertiaryCollection.switchCollection(new Backbone.Collection(null));
         break;
 
 

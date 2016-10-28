@@ -70,6 +70,8 @@ var BaseCollectionItemView = BaseItemView.extend({
 
   onRender: function() {
     toggleClass(this.el, 'hidden', this.model.get('isHidden'));
+    if(!this.ui.unreadIndicator || !this.ui.unreadIndicator[0]) { return; }
+    toggleClass(this.ui.unreadIndicator[0], 'hidden', this.roomMenuModel.get('state') === 'group');
   },
 
   pulseIndicators: function() {
@@ -110,6 +112,8 @@ var BaseCollectionItemView = BaseItemView.extend({
 
   onHiddenChange: function (model, val){
     toggleClass(this.el, 'hidden', val);
+    if(!this.ui.unreadIndicator || !this.ui.unreadIndicator[0]) { return; }
+    toggleClass(this.ui.unreadIndicator[0], 'hidden', this.roomMenuModel.get('state') === 'group');
   },
 
 });

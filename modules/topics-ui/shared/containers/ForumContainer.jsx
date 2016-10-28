@@ -149,6 +149,8 @@ const ForumContainer = React.createClass({
 
     const groupUri = groupStore.getGroupUri();
     const groupName = groupStore.getGroupName();
+    const groupAvatarUrl = groupStore.getGroupAvatarUrl();
+
     const topics = topicsStore.getTopics();
     const newTopic = topicsStore.getDraftTopic();
     const currentUser = currentUserStore.getCurrentUser();
@@ -156,46 +158,46 @@ const ForumContainer = React.createClass({
     const tagValues = tagStore.pluckValues();
 
     return (
-      <main className="scroller">
-
+      <main>
         <SearchHeaderContainer
           groupName={groupName}
+          groupAvatarUrl={groupAvatarUrl}
           groupUri={groupUri} />
+        <div className="scroller topic-content">
+          <CategoryList
+            groupUri={ groupUri }
+            categories={ categories }/>
 
-        <CategoryList
-          groupUri={ groupUri }
-          categories={ categories }/>
+          <ForumTableControl
+            groupUri={groupUri}
+            categoryName={categoryName}
+            filterName={filterName}
+            tagName={tagName}
+            sortName={sortName}
+            tags={tags}
+            filterChange={this.onFilterChange}
+            sortChange={this.onSortChange}
+            tagChange={this.onTagsChange}/>
 
-        <ForumTableControl
-          groupUri={groupUri}
-          categoryName={categoryName}
-          filterName={filterName}
-          tagName={tagName}
-          sortName={sortName}
-          tags={tags}
-          filterChange={this.onFilterChange}
-          sortChange={this.onSortChange}
-          tagChange={this.onTagsChange}/>
+          <ForumFollowArea
+            groupName={groupName}
+            subscriptionState={forumSubscriptionState}
+            onSubscriptionClicked={this.onForumSubscribeClicked} />
 
-        <ForumFollowArea
-          groupName={groupName}
-          subscriptionState={forumSubscriptionState}
-          onSubscriptionClicked={this.onForumSubscribeClicked} />
+          <TopicsTable topics={topics} groupUri={groupUri}/>
 
-        <TopicsTable topics={topics} groupUri={groupUri}/>
-
-        <CreateTopicModal
-          active={createTopic}
-          newTopic={newTopic}
-          categories={categories}
-          tagValues={tagValues}
-          onTitleChange={this.onTitleChange}
-          onBodyChange={this.onBodyChange}
-          onCategoryChange={this.onCategoryChange}
-          onTagsChange={this.onTopicTagsChange}
-          onClose={this.onCreateTopicClose}
-          onSubmit={this.onSubmit}/>
-
+          <CreateTopicModal
+            active={createTopic}
+            newTopic={newTopic}
+            categories={categories}
+            tagValues={tagValues}
+            onTitleChange={this.onTitleChange}
+            onBodyChange={this.onBodyChange}
+            onCategoryChange={this.onCategoryChange}
+            onTagsChange={this.onTopicTagsChange}
+            onClose={this.onCreateTopicClose}
+            onSubmit={this.onSubmit}/>
+        </div>
       </main>
     );
   },
