@@ -164,6 +164,7 @@ function createAppleNotification(notification, badge) {
 
   if(link) {
     note.payload['l'] = link;
+    note.category = 'NEW_CHAT';
   }
 
   return note;
