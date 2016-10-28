@@ -59,7 +59,30 @@
       <i class="chat-header__action-icon icon-star-empty {{#if headerView.troupeFavourite }}favourite{{/if}}" aria-hidden="true"></i>
     </button>
     <button class="chat-header__settings js-chat-settings" title="Room settings" data-toggle="dropdown">
-       <i class="chat-header__action-icon icon-slider-vertical" aria-hidden="true"></i>
+      <i class="chat-header__action-icon" aria-hidden="true">
+        <svg
+          class="chat-header__action-icon-svg--settings"
+          version="1.1"
+          xmlns="http://www.w3.org/2000/svg"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xml:space="preserve"
+          viewBox="0 0 27 26"
+          stroke="currentColor"
+          stroke-width="1.75"
+          fill="transparent">
+          <line vector-effect="non-scaling-stroke" class="st0" x1="4.5" y1="24" x2="4.5" y2="15"/>
+          <line vector-effect="non-scaling-stroke" class="st0" x1="4.5" y1="3" x2="4.5" y2="9"/>
+          <circle vector-effect="non-scaling-stroke" class="st0" cx="4.5" cy="12" r="3"/>
+
+          <line vector-effect="non-scaling-stroke" class="st0" x1="13.5" y1="24" x2="13.5" y2="20"/>
+          <line vector-effect="non-scaling-stroke" class="st0" x1="13.5" y1="3" x2="13.5" y2="14"/>
+          <circle vector-effect="non-scaling-stroke" class="st0" cx="13.5" cy="17" r="3"/>
+
+          <line vector-effect="non-scaling-stroke" class="st0" x1="22.5" y1="24" x2="22.5" y2="12"/>
+          <line vector-effect="non-scaling-stroke" class="st0" x1="22.5" y1="3" x2="22.5" y2="6"/>
+          <circle vector-effect="non-scaling-stroke" class="st0" cx="22.5" cy="9" r="3"/>
+        </svg>
+      </i>
     </button>
     {{/if}}
     <button class="chat-header__right-toolbar-toggle js-right-toolbar-toggle-button {{when isRightToolbarPinned 'pinned' ''}}" title="Toggle right-toolbar">
