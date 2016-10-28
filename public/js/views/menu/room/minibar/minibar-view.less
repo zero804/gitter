@@ -8,8 +8,8 @@
 .room-menu-container {
   position:   relative;
   height:     100%;
-  background: @menu-bg;
   z-index:    @zIndexLeftMenu;
+  border-right: 1px solid #f7f6f6;
 
   .mobile & {
     width: @mobile-menu-width;
@@ -33,6 +33,7 @@
   width:      100%;
   height:     100%;
   z-index:    1;
+  border-right: 1px solid @menu-border-color;
 
   &:before {
     content:    ' ';
@@ -42,7 +43,6 @@
     left:       0;
     width:      100%;
     height:     100%;
-    background: @menu-panel-bg;
     opacity:    .3;
     transform:  translate3d(0, 0, 0);
   }
@@ -86,7 +86,7 @@
   top:        0;
   left:       0;
   height:     100%;
-  width:      100%;
+  width:      .5rem;
   transform:  translateX(-100%);
   transition: transform .2s linear;
 
@@ -128,11 +128,39 @@
 
 }
 
-.room-menu-options__item--all {
+.room-menu-options__item--header-spacer {
   .room-menu-options__item();
-  background: rgba(0, 0, 0, .4);
   position:   fixed;
   top:        0;
+  left:       0;
+  background-color: @header-base-bg-color;
+  cursor: default;
+
+  &:hover {
+    cursor: default;
+  }
+
+  img {
+    opacity: .5;
+    cursor: default;
+  }
+
+  &:after {
+    content: '';
+    display: block;
+    width: 2px;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    right: -1px;
+    background-color: @header-base-bg-color;
+  }
+}
+
+.room-menu-options__item--all {
+  .room-menu-options__item();
+  position:   fixed;
+  top:        @desktop-header-height;
   left:       0;
   color:      @ruby;
 
@@ -144,9 +172,8 @@
 
 .room-menu-options__item--search {
   .room-menu-options__item();
-  background: rgba(0, 0, 0, .3);
   position:   fixed;
-  top:        @desktop-header-height;
+  top:        @desktop-header-height * 2;
   left:       0;
   color:      @jaffa;
 
@@ -157,9 +184,8 @@
 
 .room-menu-options__item--people {
   .room-menu-options__item();
-  background: rgba(0, 0, 0, .1);
   position:   fixed;
-  top:        @desktop-header-height * 2;
+  top:        @desktop-header-height * 3;
   left:       0;
   color:      @people-bg;
 
@@ -168,32 +194,16 @@
   }
 }
 
-.room-menu-options__item--favourite {
+.room-menu-options__item--groups {
   .room-menu-options__item();
-  background: rgba(0, 0, 0, .2);
-
   position:   fixed;
-  top:        @desktop-header-height * 2;
+  top:        @desktop-header-height * 4;
   left:       0;
+  color:      @caribbean;
 
-  //Replace with class
-  & img {
-    transition: transform .2s linear;
-  }
-
-  &.dropped {
+  &:before {
     background: @caribbean;
-    & img {
-      transform: rotate(90deg) scale(1.5);
-    }
   }
-
-  //This is here because of a dragula bug JP 25/1/16
-  & .room-item, & .room-item--one2one, & .room-item--favourite {
-    display:  none;
-  }
-
-  color: @caribbean;
 }
 
 .room-menu-options__item--org {
@@ -287,11 +297,17 @@
   }
 }
 
+.room-menu-options__item__avatar--groups  {
+  .room-menu-options__item__avatar();
+  width: 33px;
+}
+
 .room-menu-options__item__community-create-icon {
   display: inline-block;
   vertical-align: middle;
   margin: auto;
   font-size: 2.4rem;
+  color: @menu-decal-color;
 }
 
 
@@ -299,15 +315,15 @@
   box-sizing: border-box;
 
   position: absolute;
-  top: 50%;
-  left: 0;
+  top: 38%;
+  left: 63%;
   transform: translateX(-50%) translateY(-50%);
 
   display: block;
   width: @size;
   height: @size;
 
-  border: 2px solid @caribbean;
+  border: 2px solid white;
   border-radius: 100%;
   color: transparent;
 }
@@ -321,12 +337,11 @@
 @icon-size: 1.4rem;
 .room-menu-options__item__unread-indicator {
   .base-minibar-unread-indicator(@icon-size);
-  z-index: 2;
+  z-index: 3;
   visibility: hidden;
   transform: translateX(-100%) translateY(-50%);
   /* We do this over `opacity` because of slight perf */
   background-color: transparent;
-  border-color: transparent;
 
   transition:
     visibility 0s ease .2s,
@@ -339,7 +354,7 @@
     .room-menu-options__item__unread-indicator-visibility-reset();
 
     background-color: transparent;
-    border-color: @caribbean;
+    border-color: white;
 
     &.pulse-animation {
       animation-name: unread-indicator-subtle-pulse-animation;
@@ -363,7 +378,7 @@
     .room-menu-options__item__unread-indicator-visibility-reset();
 
     background-color: @jaffa;
-    border-color: @jaffa;
+    border-color: white;
 
     &.pulse-animation {
       animation-name: unread-indicator-subtle-pulse-animation;
@@ -423,7 +438,7 @@
   margin: auto;
 
   fill: none;
-  stroke: #ffffff;
+  stroke: @menu-decal-color;
   stroke-width: 2;
 
   cursor: pointer;

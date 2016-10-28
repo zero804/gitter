@@ -6,8 +6,34 @@
 .panel-header {
   position:   relative;
   min-height: 6.5rem;
-  background: transparent;
+  overflow: hidden;
   text-align: left;
+}
+
+.header-brand-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 6.5rem;
+  background-color: @header-base-bg-color;
+  padding-left: 2.5rem;
+
+  &:after {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    right: -1px;
+    width: 2px;
+    height: 100%;
+    background-color: @header-base-bg-color;
+  }
+}
+
+.header-brand-container__logo {
+  width: 7rem;
+  height: auto;
+  opacity: .5;
 }
 
 .panel-header__avatar {
@@ -43,27 +69,33 @@
 
 .panel-header__title--all {
   .m-header-title();
-  color: white;
 }
 
 .panel-header__title--search  {
   .m-header-title();
-  color:       @jaffa;
 }
 
 .panel-header__title--favourite {
   .m-header-title();
-  color:       @caribbean;
 }
 
 .panel-header__title--people {
   .m-header-title();
-  color:       @people-header-bg;
+}
+
+.panel-header__title--group {
+  .m-header-title();
 }
 
 .panel-header__title--org {
   .m-header-title();
-  color:       @org-header-color;
+  padding-left: 1rem;
+}
+
+.panel-header__org-avatar {
+  margin-left:   @desktop-menu-left-padding;
+  border-radius: .2rem;
+  background:    white;
 }
 
 

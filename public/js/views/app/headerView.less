@@ -39,7 +39,7 @@
   display:          flex;
   width:            100%;
   padding-left:     @desktop-menu-left-padding;
-  background-color: rgba(255, 255, 255, 0.97);
+  background-image: linear-gradient(to left, @header-grad-bg-color, @header-base-bg-color);
   border-bottom:    1px solid rgba(0,0,0,0.05);
   z-index:          @zIndexChatHeader;
 }
@@ -98,10 +98,10 @@
   display: inline-block;
   max-width: 100%;
 
-  color: #333;
+  color: white;
   font-size: @chat-header-heading-font-size;
   line-height: @chat-header-heading-line-height;
-  font-weight: 600;
+  font-weight: 300;
   text-overflow: ellipsis;
 
   &:hover {
@@ -144,7 +144,8 @@
       content: '\e81a';
       margin-top: @topic-margin-top;
       margin-left: 1em;
-      color: inherit;
+      color: white;
+      opacity: .6;
       font-family: 'fontello';
     }
 
@@ -167,10 +168,10 @@
   // For the italic overflow
   padding-right: .25rem;
 
-  color: @chat-header-topic-color;
+  color: white;
+  opacity: .8;
   font-size: @chat-header-topic-font-size;
   line-height: @chat-header-topic-line-height;
-  font-style: italic;
   text-overflow: ellipsis;
   white-space: nowrap;
 
@@ -224,11 +225,7 @@
 }
 
 .chat-header__topic a {
-  color: #666;
-
-  &:hover {
-    color: @trpLightBlue;
-  }
+  color: white;
 }
 
 .chat-header__content h1 .octicon-lock:before {
@@ -247,11 +244,10 @@
   vertical-align: middle;
 }
 
-
-
-
-
-
+.chat-header__permission-icon {
+  color: white;
+  opacity: .6;
+}
 
 .chat-header__action-grouping {
   align-items: stretch;
@@ -275,7 +271,7 @@
 
   font-size: 26px;
   line-height: 1;
-  color: rgba(51, 51, 51, .4);
+  color: white;
   text-align: center;
   cursor: pointer;
 
@@ -297,7 +293,9 @@
 }
 
 .chat-header__action-icon {
+  color: white;
   &:before {
+    color: currentColor;
     margin-left: 0;
     margin-right: 0;
   }
@@ -424,29 +422,13 @@
   position: relative;
   box-sizing: border-box;
   height: @side;
-  background-color: white;
   user-select: none;
 
   img {
-    width: @side;
-    height: @side;
+    width: 100%;
+    height: 100%;
 
     border-radius: 4px;
-  }
-}
-
-.chat-header__avatar--pro {
-  &:after {
-    position: absolute;
-    display: inline-block;
-    content: '';
-    background: @pro;
-    height: 4px;
-    border-top: 1px solid rgba(255, 255, 255, 1);
-    bottom: 0px;
-    width: 100%;
-    left: 0;
-    border-radius: 0 0 4px 4px;
   }
 }
 
@@ -458,6 +440,13 @@
   display: block;
   margin-bottom: 0;
   cursor: pointer;
+  box-sizing: border-box;
+  width: 38px;
+  height: 38px;
+  overflow: hidden;
+  background-color: white;
+  border-radius: 4px;
+  padding: .3rem;
 }
 
 .chat-header__group-avatar-upload-progress {

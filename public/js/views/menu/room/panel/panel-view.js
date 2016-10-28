@@ -14,6 +14,8 @@ var ProfileMenuView = require('../profile/profile-menu-view');
 var TopicsAreaView = require('../topics-area/topics-area-view');
 var SearchInputView = require('../../../menu/room/search-input/search-input-view');
 var NeverEndingStory = require('../../../../utils/never-ending-story');
+var GroupBackControl = require('../group-back-control/group-back-control-view');
+var GroupHomeView = require('../group-home-control/group-home-control-view');
 
 require('../../../behaviors/isomorphic');
 
@@ -23,10 +25,12 @@ var PanelView = Marionette.LayoutView.extend({
     Isomorphic: {
       header:              { el: '#panel-header', init: 'initHeader' },
       profile:             { el: '#profile-menu', init: 'initProfileMenu' },
+      groupBackControl:    { el: '#group-back-button', init: 'initGroupBackArea' },
       topicsArea:          { el: '#left-menu-topics-area', init: 'initTopicsArea' },
       searchInput:         { el: '#search-input', init: 'initSearchInput' },
       favouriteCollection: { el: '#favourite-collection', init: 'initFavouriteCollection' },
       primaryCollection:   { el: '#primary-collection', init: 'initPrimaryCollection' },
+      groupHomeControl:    { el: '#group-home-button', init: 'initGroupHomeControl' },
       secondaryCollection: { el: '#secondary-collection', init: 'initSecondaryCollection' },
       teritaryCollection:  { el: '#tertiary-collection', init: 'initTertiaryCollection' },
       footer:              { el: '#panel-footer', init: 'initFooter' },
@@ -43,6 +47,10 @@ var PanelView = Marionette.LayoutView.extend({
 
   initProfileMenu: function(optionsForRegion) {
     return new ProfileMenuView(optionsForRegion({ model: this.model }));
+  },
+
+  initGroupBackArea: function(optionsForRegion){
+    return new GroupBackControl(optionsForRegion({ model: this.model }));
   },
 
   initTopicsArea: function(optionsForRegion) {
@@ -82,6 +90,13 @@ var PanelView = Marionette.LayoutView.extend({
       dndCtrl:        this.dndCtrl,
       roomCollection: this.model._roomCollection,
       groupsCollection: this.model.groupsCollection,
+    }));
+  },
+
+  initGroupHomeControl: function(optionsForRegion){
+    return new GroupHomeView(optionsForRegion({
+      groupsCollection: this.model.groupsCollection,
+      model: this.model
     }));
   },
 
@@ -131,7 +146,7 @@ var PanelView = Marionette.LayoutView.extend({
   modelEvents: {
     'change:panelOpenState':       'onPanelOpenStateChange',
     'primary-collection:snapshot': 'onPrimaryCollectionSnapshot',
-    'change:profileMenuOpenState': 'onProfileToggle'
+    'change:profileMenuOpenState': 'onProfileToggle',
   },
 
   childEvents: {
@@ -195,8 +210,16 @@ var PanelView = Marionette.LayoutView.extend({
   },
 
   onModelChangeState: function (){
-    if(!this.neverendingstory) { return; }
     var state = this.model.get('state');
+    toggleClass(this.el, 'all', state === 'all');
+    toggleClass(this.el, 'search', state === 'search');
+    toggleClass(this.el, 'people', state === 'people');
+    toggleClass(this.el, 'group', state === 'group');
+    toggleClass(this.el, 'org', state === 'org');
+
+    this.$el.find('.nano').nanoScroller({ scrollTop: 0 });
+
+    if(!this.neverendingstory) { return; }
     if(state !== 'search') { return this.neverendingstory.disable(); }
     return this.neverendingstory.enable();
   },
@@ -222,6 +245,7 @@ var PanelView = Marionette.LayoutView.extend({
   onDestroy: function() {
     this.stopListening(this.bus);
   },
+
 });
 
 

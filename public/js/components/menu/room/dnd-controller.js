@@ -7,6 +7,7 @@ var _ = require('underscore');
 var DNDCtrl = function() {
 
   this.onMouseUp = this.onMouseUp.bind(this);
+  this.panelRef = document.querySelector('.room-menu__panel');
 
   this.drag = dragula([], {
     moves: this.shouldItemMove.bind(this),
@@ -23,6 +24,8 @@ var DNDCtrl = function() {
 DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
 
   shouldItemMove: function (el) {
+    //Stop dnd behaviour in group view
+    if(this.panelRef.classList.contains('group')) { return false; }
     return (el.tagName !== 'A' &&
             !el.classList.contains('search-message-empty-container') &&
             el.id !== 'empty-view');

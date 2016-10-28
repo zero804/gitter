@@ -79,6 +79,13 @@ module.exports = Marionette.CompositeView.extend({
     //results come through with `exists: false` for rooms yet to be created
     //whereas on room models `exists: undefined` :( JP 10/3/16
     // org-items have `room`, not exists
+    if(this.roomMenuModel.get('state') === 'group') {
+      return this.roomMenuModel.set({
+        state: 'org',
+        groupId: model.get('id')
+      })
+    }
+
     if (this.roomExistsForModel(model)) {
       //default trigger navigation to an existing room
       this._triggerNavigation(url, 'chat', name);

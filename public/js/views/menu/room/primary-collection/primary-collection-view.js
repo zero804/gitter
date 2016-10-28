@@ -113,7 +113,6 @@ var PrimaryCollectionView = BaseCollectionView.extend({
    },
 
   getChildContainerToBeIndexed: function () {
-    //use the second child because the first child is the hidden search header
     return this.el.children[1];
   },
 

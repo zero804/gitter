@@ -14,14 +14,15 @@
 @import "colors.less";
 @import "bootstrap/pagination";
 
+@large-breakpoint: 1200px;
 @medium-breakpoint: 767px;
 @small-breakpoint: 600px;
 @xsmall-breakpoint: 400px;
 
 @tag-vertical-padding: .75rem;
 
-@subdued-border-color: fade(@dark, 20%);
-@subdued-text-color: fade(@dark, 40%);
+@subdued-border-color: @menu-border-color;
+@subdued-text-color: fade(@dark, 60%);
 
 
 html {
@@ -45,10 +46,14 @@ body {
 
 
 .org-page__header {
+  position: fixed;
+  top: 0;
+  width: 100%;
   display: flex;
-  padding: 3.25em 3.25em 2.25em;
-
-  border-bottom: 5px solid #eee;
+  padding: 0 4rem;
+  height: 65px;
+  background-image: linear-gradient(to left, @header-grad-bg-color, @header-base-bg-color);
+  z-index: 1;
 
   @media (max-width: @medium-breakpoint) {
     padding: .5em;
@@ -56,9 +61,15 @@ body {
 }
 
 .org-page__header-logo {
+  box-sizing: border-box;
   align-self: flex-start;
-  margin-right: 3rem;
+  width: 36px;
+  height: auto;
+  margin-right: 1.7rem;
+  margin-top: 1.3rem;
+  padding: .3rem;
   border-radius: .4rem;
+  background-color: white;
 }
 
 .org-page__header-body {
@@ -71,6 +82,10 @@ body {
 
 .org-page__header-heading {
   margin-bottom: 1rem;
+  font-size: 2.4rem;
+  font-weight: 300;
+
+  a { color: white; }
 }
 
 .org-page__header-share-link {
@@ -80,11 +95,11 @@ body {
 
 .org-page-main {
   margin-top: 6rem;
-  padding: 0 3.25em-@excess-card-margin 3.25em 3.25em-@excess-card-margin;
+  padding: 65px 3.25em-@excess-card-margin 3.25em 3.25em-@excess-card-margin;
   @excess-card-margin: 0.5em;
 
   @media (max-width: @medium-breakpoint) {
-    padding: 1em-@excess-card-margin;
+    padding: 30px 1em-@excess-card-margin;
   }
 }
 
@@ -100,10 +115,14 @@ body {
 
 .org-page__room-list-heading {
   // styleguide h3
+  color: @org-section-heading-text-color;
+  font-weight: 300;
 }
 
 .org-page__room-list-heading-info-item {
   margin-left: 1rem;
+  color: @org-section-heading-text-color;
+  font-weight: 300;
 
   @media (max-width: @xsmall-breakpoint) {
     display: none;
@@ -134,11 +153,16 @@ body {
 }
 
 .org-page__room-item-heading-link {
+  overflow: hidden;
   flex-shrink: 0;
   width: 18%;
 
+  @media (max-width: @large-breakpoint) and (min-width: @medium-breakpoint) {
+    width: 25%;
+  }
   @media (max-width: @medium-breakpoint) {
-    width: 45%;
+    flex: 1;
+    width: auto;
   }
 }
 
@@ -148,6 +172,7 @@ body {
   align-items: center;
 
   font-size: 1.1em;
+  font-weight: 400;
   white-space: nowrap;
 }
 
@@ -186,8 +211,8 @@ body {
   white-space: nowrap;
   text-overflow: ellipsis;
 
-  @media (max-width: @small-breakpoint) {
-    visibility: hidden;
+  @media (max-width: @medium-breakpoint) {
+    display: none;
   }
 }
 
@@ -201,7 +226,7 @@ body {
   margin-left: 2rem;
   list-style: none;
 
-  @media (max-width: @medium-breakpoint) {
+  @media (max-width: @large-breakpoint) {
     display: none;
   }
 }
@@ -228,12 +253,20 @@ body {
 }
 
 .org-page__room-item-people-list-item {
+  margin-right: .4rem;
 
+  @media (max-width: @small-breakpoint) {
+    &:nth-child(-n+2) {
+      display: none;
+    }
+  }
 }
 
 .org-page__room-item-details {
+  flex-shrink: 0;
   margin-left: 2rem;
   color: @subdued-text-color;
+  white-space: nowrap;
 
   @media (max-width: @xsmall-breakpoint) {
     display: none;

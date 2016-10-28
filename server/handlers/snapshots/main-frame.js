@@ -20,14 +20,9 @@ module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, group
   //Left menu state
   //------------------------------------------------------
   //Default new state is "All Conversations"
-  var menuState = lastLeftMenuSnapshot.state || 'all';
+  var menuState = 'all';
 
-  //It can be the case that a user has saved a state of temp-org
-  //if this is the case reset, it will be recalculated below
-  if(menuState === 'temp-org') { menuState = 'all'; }
-
-  // Try the suggested
-  // ex. If you are loading a home view then activate the search state
+  //If loading /home/explore use the state that has been passed through
   if(extras.suggestedMenuState) {
     menuState = extras.suggestedMenuState;
   }
@@ -41,14 +36,8 @@ module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, group
 
   // But if we find something later, let's use it instead
   if(currentRoom && currentRoom.groupId && !hasJoinedRoom && !hasJoinedGroup) {
-    menuState = 'temp-org';
-    tempOrg = {
-      name: getOrgNameFromUri(currentRoom.uri),
-      avatarUrl: avatars.getForGroupId(currentRoom.groupId),
-      type: 'org',
-      active: true,
-      hidden: false
-    };
+    menuState = 'org';
+    groupId = currentRoom.groupId;
   }
 
   var roomMenuIsPinned = true;
@@ -61,6 +50,10 @@ module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, group
     return category;
   });
 
+  var parsedRooms = parseRoomsIntoLeftMenuRoomList(menuState, rooms, groupId);
+  var parsedFavourites = parseRoomsIntoLeftMenuFavouriteRoomList(menuState, rooms, groupId);
+  if(menuState === 'group') { parsedRooms = groups; parsedFavourites = []; }
+
   return {
     leftMenu: _.extend({}, lastLeftMenuSnapshot, {
       roomMenuIsPinned: roomMenuIsPinned,
@@ -69,8 +62,8 @@ module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, group
       groupId: groupId,
     }),
     allRooms: rooms,
-    rooms: parseRoomsIntoLeftMenuRoomList(menuState, rooms, groupId),
-    favourites: parseRoomsIntoLeftMenuFavouriteRoomList(menuState, rooms, groupId),
+    rooms: parsedRooms,
+    favourites: parsedFavourites,
     groups: groups,
     forum: (menuState === 'org' || menuState === 'temp-org') && {
       hasCategories: forumCategories && forumCategories.length > 0,

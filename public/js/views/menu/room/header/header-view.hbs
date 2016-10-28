@@ -22,6 +22,16 @@
   <h2 class="panel-header__title--people">People</h2>
 </div>
 
+<div class="panel-header__container" id="panel-header-group">
+  <h2 class="panel-header__title--group">Communities</h2>
+</div>
+
 <div class="panel-header__container" id="panel-header-org">
+  {{#if avatarUrl}}
+    <img class="panel-header__org-avatar"
+      src="{{avatarUrl}}"
+      height="22"
+      width="22"/>
+  {{/if}}
   <h2 class="panel-header__title--org">{{groupName}}</h2>
 </div>

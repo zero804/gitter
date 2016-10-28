@@ -28,6 +28,13 @@ module.exports = BaseCollectionModel.extend({
     });
   },
 
+  onGroup: function(){
+    this.set({
+      header: false,
+      active: false
+    })
+  },
+
   onDefault: function() {
     this.set({
       header:       false,

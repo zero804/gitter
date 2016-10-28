@@ -39,6 +39,9 @@ module.exports = Backbone.Model.extend({
       case 'org':
         this.onOrg();
         break;
+      case 'group':
+        this.onGroup();
+        break;
       default:
         this.onDefault();
         break;
@@ -49,6 +52,7 @@ module.exports = Backbone.Model.extend({
   onSearch:    function() { this.onDefault(); },
   onPeople:    function() { this.onDefault(); },
   onOrg:       function() { this.onDefault(); },
+  onGroup:     function() { this.onDefault(); },
   onDefault:   function() {},
 
 });
