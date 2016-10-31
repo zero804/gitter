@@ -1,3 +1,5 @@
+@import "../../../../../less/colors";
+
 .room-menu__panel {
   box-sizing:       border-box;
   position:         absolute;
@@ -6,7 +8,7 @@
   height:           100%;
   padding-left:     100%;
   border-right:     1px solid @menu-border-color;
-  background-color: white;
+  background-color: @main-application-bg-color;
 
   //TODO Check how this works on other monitor sizes
   transform:    translateX(-78%);
