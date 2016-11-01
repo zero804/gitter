@@ -79,16 +79,6 @@ module.exports = Marionette.CollectionView.extend({
     'mouseleave': 'onMouseLeave'
   },
 
-  modelEvents: {
-    'change:profileMenuOpenState': 'onOpenStateChange',
-  },
-
-  onOpenStateChange: function(model, val) {/*jshint unused:true */
-    fastdom.mutate(function(){
-      toggleClass(this.el, 'active', val);
-    }.bind(this));
-  },
-
   onMouseLeave: function (){
     this.model.set('profileMenuOpenState', false);
   },
