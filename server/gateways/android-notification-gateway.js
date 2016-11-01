@@ -4,7 +4,7 @@ var env = require('gitter-web-env');
 var nconf = env.config;
 var gcm = require('node-gcm');
 var Promise = require('bluebird');
-var pushNotificationService = require('../services/push-notification-service');
+var InvalidRegistrationError = require('./invalid-registration-error');
 
 var MAX_RETRIES = 4;
 
@@ -31,14 +31,18 @@ var sendNotificationToDevice = function(notification, badge, device) {
     if (body.canonical_ids) {
       // this registration id/token is an old duplicate which has been superceded by a canonical id,
       // and we've probably just sent two identical messages to the same phone.
-      return pushNotificationService.deregisterAndroidDevice(device.androidToken).thenReturn(body);
-    } else if (body.failure && body.results[0] && body.results[0].error === "NotRegistered") {
-      // app has been uninstalled / token revoked
-      return pushNotificationService.deregisterAndroidDevice(device.androidToken).thenReturn(body);
-    } else {
-      return body;
+      throw new InvalidRegistrationError('Duplicate identifier');
     }
+
+    if (body.failure && body.results[0] && body.results[0].error === "NotRegistered") {
+      // app has been uninstalled / token revoked
+      throw new InvalidRegistrationError('Not registered');
+    }
+
+    return body;
   });
 };
 
-module.exports.sendNotificationToDevice = sendNotificationToDevice;
+module.exports = {
+  sendNotificationToDevice: sendNotificationToDevice
+};

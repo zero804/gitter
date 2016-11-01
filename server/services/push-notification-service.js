@@ -142,10 +142,9 @@ exports.registerVapidSubscription = function(subscription, userId) {
     .exec();
 };
 
-exports.deregisterAndroidDevice = function(registrationId) {
-  // tokenHash needed as androidToken/registrationId is not indexed
-  var tokenHash = hash(registrationId);
-  return PushNotificationDevice.findOneAndRemove({ tokenHash: tokenHash, androidToken: registrationId }).exec();
+exports.deregisterDeviceById = function(id) {
+  return PushNotificationDevice.findByIdAndRemove(id)
+    .exec();
 };
 
 exports.deregisterIosDevices = function(deviceTokens) {
