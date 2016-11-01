@@ -133,4 +133,10 @@ router.get(/^\/resolve\/(.*)$/,
   identifyRoute('api-private-resolve'),
   require('./resolve'));
 
+/* Web push registration endpoint */
+router.post('/vapid',
+  authMiddleware,
+  identifyRoute('api-private-vapid'),
+  require('./vapid'));
+
 module.exports = router;
