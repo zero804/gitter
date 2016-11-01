@@ -9,13 +9,9 @@
   cursor: pointer;
 }
 
-//Specificity issue causes the
-//need for a compound class here
 .dropdown.profile-menu__list {
-  top: 50px;
-  right: 0;
-  left: auto;
   width: 200px;
+  left: auto;
 }
 
 .profile-menu__item {
@@ -35,4 +31,16 @@
   position: absolute;
   top: 14px;
   right: 20px;
+}
+
+//Specificity issue causes the
+//need for a compound class here
+.explore-header-section .dropdown.profile-menu__list {
+  top: 50px;
+  right: 0;
+}
+
+.org-page__header-body .dropdown.profile-menu__list {
+  top: 70px;
+  right: 8px;
 }
