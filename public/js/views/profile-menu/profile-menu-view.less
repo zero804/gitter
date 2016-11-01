@@ -3,7 +3,7 @@
 }
 
 .profile-menu__avatar {
-  width: 40px;
+  width: 32px;
   height: auto;
   border-radius: 100%;
   cursor: pointer;
@@ -27,14 +27,25 @@
   }
 }
 
+.chat-header__action-grouping .profile-menu {
+  margin-top: 17px;
+  margin-left: 6px;
+  margin-right: 12px;
+}
+
 .explore-header-section .profile-menu {
   position: absolute;
-  top: 14px;
+  top: 17px;
   right: 20px;
 }
 
 //Specificity issue causes the
 //need for a compound class here
+.chat-header__action-grouping .dropdown.profile-menu__list {
+  top: 64px;
+  right: 5px;
+}
+
 .explore-header-section .dropdown.profile-menu__list {
   top: 50px;
   right: 0;

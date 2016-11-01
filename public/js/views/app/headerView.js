@@ -18,6 +18,7 @@ var Dropdown = require('../controls/dropdown');
 var KeyboardEventMixin = require('../keyboard-events-mixin');
 var headerViewTemplate = require('./tmpl/headerViewTemplate.hbs');
 var getHeaderViewOptions = require('gitter-web-shared/templates/get-header-view-options');
+var ProfileMenu = require('../profile-menu/profile-menu-view');
 
 require('../behaviors/tooltip');
 require('transloadit');
@@ -88,6 +89,11 @@ var HeaderView = Marionette.ItemView.extend({
     this.rightToolbarModel = options.rightToolbarModel;
     this.menuItemsCollection = new Backbone.Collection([]);
     this.buildDropdown();
+
+    var profileMenu = new ProfileMenu({
+      el: '#profile-menu'
+    });
+    profileMenu.render();
 
     this.listenTo(this.rightToolbarModel, 'change:isPinned', this.onPanelPinStateChange, this);
   },
@@ -474,5 +480,14 @@ var HeaderView = Marionette.ItemView.extend({
 
 cocktail.mixin(HeaderView, KeyboardEventMixin);
 
+/*
+<button class="chat-header__right-toolbar-toggle js-right-toolbar-toggle-button {{when isRightToolbarPinned 'pinned' ''}}" title="Toggle right-toolbar">
+      <div class="chat-header__right-toolbar-toggle-icon">
+        <img class="chat-header__right-toolbar-toggle-icon-base" src='{{cdn "images/svg/right-toolbar-toggle-base.svg"}}' />
+        <img class="chat-header__right-toolbar-toggle-icon-arrow-collapse" src='{{cdn "images/svg/right-toolbar-toggle-arrow-collapse.svg"}}' />
+        <img class="chat-header__right-toolbar-toggle-icon-arrow-expand" src='{{cdn "images/svg/right-toolbar-toggle-arrow-expand.svg"}}' />
+      </div>
+    </button>
+*/
 
 module.exports = HeaderView;
