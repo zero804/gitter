@@ -91,6 +91,7 @@
     "gitter-web-user-serialization": "file:modules/user-serialization",
     "gitter-web-utils": "file:modules/utils",
     "gitter-web-validators": "file:modules/validators",
+    "gitter-web-web-push": "file:modules/web-push",
     "glob": "^6.0.4",
     "handlebars": "~3.0.3",
     "heapdump": "^0.3.7",
@@ -163,6 +164,7 @@
     "url-join": "0.0.1",
     "url-parse": "^1.0.5",
     "useragent": "2.0.6",
+    "web-push": "^3.1.0",
     "xregexp": "^2.0.0",
     "yargs": "^4.2.0"
   },
@@ -300,7 +302,8 @@
     "webpack-bundle-size-analyzer": "^2.0.2",
     "webpack-dev-middleware": "^1.6.1",
     "webpack-stats-plugin": "^0.1.3",
-    "webpack-visualizer-plugin": "^0.1.5"
+    "webpack-visualizer-plugin": "^0.1.5",
+    "worker-loader": "unizin/worker-loader#3847cc7d9df2e9d83893c628f9332f60327ce8e8"
   },
   "engines": {
     "node": ">=0.10.3 <0.11",

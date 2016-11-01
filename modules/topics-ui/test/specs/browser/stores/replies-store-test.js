@@ -15,6 +15,7 @@ import {
   TOPIC_REPLIES_RECENT_SORT_NAME
 } from '../../../../shared/constants/topic';
 
+// eslint-disable-next-line import/no-unresolved
 import storeInjector from 'inject-loader!../../../../browser/js/stores/replies-store';
 const {RepliesStore} = storeInjector({
   '../routers': router
