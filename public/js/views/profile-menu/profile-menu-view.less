@@ -1,0 +1,38 @@
+.profile-menu {
+  display: inline-block;
+}
+
+.profile-menu__avatar {
+  width: 40px;
+  height: auto;
+  border-radius: 100%;
+  cursor: pointer;
+}
+
+//Specificity issue causes the
+//need for a compound class here
+.dropdown.profile-menu__list {
+  top: 50px;
+  right: 0;
+  left: auto;
+  width: 200px;
+}
+
+.profile-menu__item {
+  border-radius: .2rem;
+}
+
+.profile-menu__item__link {
+  font-weight: 300;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+.explore-header-section .profile-menu {
+  position: absolute;
+  top: 14px;
+  right: 20px;
+}
