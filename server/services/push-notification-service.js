@@ -7,6 +7,7 @@ var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var debug = require('debug')('gitter:app:push-notification-service');
 var uniqueIds = require('mongodb-unique-ids');
 var _ = require('lodash');
+var assert = require('assert');
 
 function buffersEqual(a,b) {
   if (!Buffer.isBuffer(a)) return undefined;
@@ -104,6 +105,41 @@ exports.registerAndroidDevice = function(deviceId, deviceName, registrationId, a
         .thenReturn(device);
     })
     .nodeify(callback);
+};
+
+exports.registerVapidSubscription = function(subscription, userId) {
+  assert(subscription, 'subscription required');
+
+  var endpoint = subscription.endpoint;
+  var auth = subscription.keys && subscription.keys.auth;
+  var p256dh = subscription.keys && subscription.keys.p256dh;
+
+  assert(subscription.endpoint, 'subscription.endpoint required');
+  assert(typeof endpoint === 'string', 'subscription.endpoint must be a string');
+  assert(typeof auth === 'string', 'subscription.keys.auth must be a string');
+  assert(typeof p256dh === 'string', 'subscription.keys.p256dh must be a string');
+
+  debug("Registering vapid endpoint %s", endpoint);
+
+  return PushNotificationDevice.findOneAndUpdate({
+      deviceId: endpoint
+    }, {
+      $set: {
+        userId: userId,
+        deviceId: endpoint,
+        deviceType: 'VAPID',
+        timestamp: new Date(),
+        enabled: true,
+        vapid: {
+          auth: auth,
+          p256dh: p256dh
+        },
+      }
+    }, {
+      upsert: true,
+      new: true
+    })
+    .exec();
 };
 
 exports.deregisterAndroidDevice = function(registrationId) {
