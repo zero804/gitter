@@ -1,25 +1,23 @@
 'use strict';
 
-self.addEventListener('push', function(event) {
-  var notificationTitle = 'Hello';
-  var notificationOptions = {
-    body: 'Thanks for sending this push msg.',
-    icon: './images/logo-192x192.png',
-    tag: 'simple-push-demo-notification',
-    vibrate: [200, 100, 200, 100, 200, 100, 200],
-    data: {
-      url: 'https://developers.google.com/web/fundamentals/getting-started/push-notifications/',
-    }
-  };
+var pushHandler = require('./push-handler');
 
-  if (event.data) {
-    var dataText = event.data.json();
-    notificationTitle = 'Received Payload';
-    notificationOptions.body = "Push data: " + JSON.stringify(dataText);
+function extractPayload(event) {
+  try {
+    return event && event.data && event.data.json();
+  } catch(e) {
+    return;
   }
+}
 
-  var notificationPromise = self.registration.showNotification(notificationTitle, notificationOptions);
-  event.waitUntil(notificationPromise);
+self.addEventListener('push', function(event) {
+  var payload = extractPayload(event);
+  if (!payload) return;
+
+  var promise = pushHandler(event, payload);
+  if (promise) {
+    event.waitUntil(promise);
+  }
 });
 
 self.addEventListener('pushsubscriptionchange', function(/*event*/) {

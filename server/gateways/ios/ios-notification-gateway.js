@@ -4,12 +4,13 @@ var apn = require('apn');
 var debug = require('debug')('gitter:infra:ios-notification-gateway');
 var env = require('gitter-web-env');
 var Promise = require('bluebird');
-var pushNotificationService = require('../services/push-notification-service');
+var pushNotificationService = require('../../services/push-notification-service');
+var iosNotificationGenerator = require('./ios-notification-generator');
 var logger = env.logger.get('push-notifications');
 var config = env.config;
 var errorReporter = env.errorReporter;
 
-var rootDirname = __dirname + '/../..';
+var rootDirname = __dirname + '/../../..';
 
 var ERROR_DESCRIPTIONS = {
   0: 'No errors encountered',
@@ -42,8 +43,9 @@ switch(config.get('NODE_ENV') || 'dev') {
 }
 
 
-function sendNotificationToDevice(notification, badge, device) {
-  var appleNotification = createAppleNotification(notification, badge);
+function sendNotificationToDevice(notificationType, notificationDetails, device) {
+  var appleNotification = iosNotificationGenerator(notificationType, notificationDetails, device);
+  if (!appleNotification) return;
 
   var deviceToken = new apn.Device(device.appleToken);
 
@@ -132,37 +134,69 @@ function createFeedbackListener(suffix, isProduction) {
   }
 }
 
-function createAppleNotification(notification, badge) {
+// function createAppleNotification(notificationType, notificationDetails, device) {
+//   var message = notificationMessageGenerator(room, chats);
+//   var notificationLink = '/mobile/chat#' + room.id;
+//
+//
+//   var notification = {
+//     roomId: troupe.id,
+//     roomName: troupe.name || troupe.uri,
+//     message: message,
+//     sound: hasMentions ? 'notify.caf' : 'notify-2.caf',
+//     link: notificationLink
+//   }
+//
+//   var note = new apn.Notification();
+//   var message = notification && notification.message;
+//   var sound = notification && notification.sound;
+//   var link = notification && notification.link;
+//
+//   if(badge >= 0) {
+//     note.badge = badge;
+//   }
+//
+//   if(message) {
+//     note.setAlertText(message);
+//   }
+//
+//   if(sound) {
+//     note.sound = sound;
+//   }
+//
+//   note.payload = {
+//     aps: {
+//       "content-available": 1
+//     }
+//   };
+//
+//   if(link) {
+//     note.payload['l'] = link;
+//   }
+//
+//   return note;
+// }
+
+function sendBadgeUpdateToDevice(device, badge) {
+  if (!device || !device.appleToken) return;
+
+  var deviceToken = new apn.Device(device.appleToken);
+  var connection = connections[device.deviceType];
+
+  if (!connection) return;
+
   var note = new apn.Notification();
-  var message = notification && notification.message;
-  var sound = notification && notification.sound;
-  var link = notification && notification.link;
+  note.badge = badge;
 
-  if(badge >= 0) {
-    note.badge = badge;
-  }
+  connection.pushNotification(note, deviceToken);
 
-  if(message) {
-    note.setAlertText(message);
-  }
-
-  if(sound) {
-    note.sound = sound;
-  }
-
-  note.payload = {
-    aps: {
-      "content-available": 1
-    }
-  };
-
-  if(link) {
-    note.payload['l'] = link;
-  }
-
-  return note;
+  // timout needed to ensure that the push notification packet is sent.
+  // if we dont, SIGINT will kill notifications before they have left.
+  // until apn uses proper callbacks, we have to guess that it takes a second.
+  return Promise.delay(1000);
 }
 
 module.exports = {
-  sendNotificationToDevice: sendNotificationToDevice
+  sendNotificationToDevice: sendNotificationToDevice,
+  sendBadgeUpdateToDevice: sendBadgeUpdateToDevice
 }
