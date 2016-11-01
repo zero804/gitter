@@ -476,4 +476,7 @@ onready(function() { // eslint-disable-line max-statements
     fingerprint();
   }, 5000);
 
+  require('gitter-web-web-push/browser/web-push').install({
+    apiClient: require('./components/api-client')
+  });
 });

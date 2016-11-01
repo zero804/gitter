@@ -15,8 +15,12 @@ var PushNotificationDeviceSchema = new Schema({
   appleToken: String,
   androidToken: String,
   tokenHash: String,
-  deviceType: { type: String, "enum": ['APPLE', 'APPLE-DEV', 'ANDROID', 'TEST', 'SMS']},
+  deviceType: { type: String, "enum": ['APPLE', 'APPLE-DEV', 'ANDROID', 'TEST', 'SMS', 'VAPID']},
   mobileNumber: { type: String },
+  vapid: {
+    auth: { type: String },
+    p256dh: { type: String }
+  },
   enabled: { type: Boolean, default: true },
   appVersion: String,
   appBuild: String,
