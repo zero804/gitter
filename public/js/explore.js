@@ -1,11 +1,14 @@
 'use strict';
 
 require('./utils/font-setup');
+
 var appEvents = require('./utils/appevents');
 var onready = require('./utils/onready');
 var toggleClass = require('./utils/toggle-class');
 var ExploreView = require('./views/explore/explore-view');
 var frameUtils = require('gitter-web-frame-utils');
+var ProfileMenu = require('./views/profile-menu/profile-menu-view');
+
 require('./utils/tracking');
 
 require('gitter-styleguide/css/components/buttons.css');
@@ -22,6 +25,11 @@ onready(function() {
     el: '.explore-page-wrap'
   });
 
+  var profileMenu = new ProfileMenu({
+    el: '#profile-menu'
+  });
+
+  profileMenu.render();
 
   var tagPillElements = document.querySelectorAll('.js-explore-tag-pill');
   var roomCardElements = document.querySelectorAll('.js-explore-room-card');
