@@ -85,7 +85,7 @@ module.exports = Marionette.CompositeView.extend({
   events: {
     'click #profile-menu-avatar': 'onAvatarClicked',
     'click a': 'onItemClicked',
-    'mouseleave': 'onMouseLeave'
+    'mouseleave @ui.menu': 'onMouseLeave'
   },
 
   modelEvents: {
@@ -102,7 +102,7 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   onMouseLeave: function (){
-    this.model.set('profileMenuOpenState', false);
+    this.model.set('active', false);
   },
 
   onItemClicked: function(e) {
