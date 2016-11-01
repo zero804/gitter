@@ -3,8 +3,9 @@
 var env = require('gitter-web-env');
 var config = env.config;
 var webpush = require('web-push');
-var InvalidRegistrationError = require('./invalid-registration-error');
+var InvalidRegistrationError = require('../invalid-registration-error');
 var Promise = require('bluebird');
+var vapidNotificationGeneration = require('./vapid-notification-generator');
 
 var DEFAULT_TTL_SECONDS = 86400 * 7; // 7 days
 
@@ -20,7 +21,7 @@ function isVapidGoneError(err) {
   return err && err.statusCode && String(err.statusCode) === '410';
 }
 
-function sendNotificationToDevice(notification, badge, device) {
+function sendNotificationToDevice(notificationType, notificationDetails, device) {
   var pushSubscription = {
     endpoint: device.deviceId,
     keys: {
@@ -29,11 +30,8 @@ function sendNotificationToDevice(notification, badge, device) {
     }
   };
 
-  // TODO: do something with the badge?
-  var payloadData = {
-    type: 'new_chat',
-    badge: badge
-  }
+  var payloadData = vapidNotificationGeneration(notificationType, notificationDetails, device);
+  if (!payloadData) return;
 
   return Promise.resolve(webpush.sendNotification(pushSubscription, JSON.stringify(payloadData), {
       TTL: DEFAULT_TTL_SECONDS

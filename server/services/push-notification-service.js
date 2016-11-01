@@ -208,16 +208,21 @@ exports.findUsersWithDevices = function(userIds, callback) {
     .nodeify(callback);
 };
 
-exports.findEnabledDevicesForUsers = function(userIds, callback) {
+exports.findEnabledDevicesForUsers = function(userIds, options) {
   userIds = mongoUtils.asObjectIDs(uniqueIds(userIds));
-  return PushNotificationDevice
-    .where('userId')['in'](userIds)
-    .or([ { enabled: true }, { enabled: { $exists: false } } ]) // Exists false === enabled for old devices
-    .exec()
-    .then(function(devices) {
-      return devices;
-    })
-    .nodeify(callback);
+  var query = {
+    userId: { $in: userIds },
+    $or: [{ enabled: true }, { enabled: { $exists: false } }]
+  };
+
+  if (options && options.supportsBadges) {
+    // Only ios devices support badges
+    query.deviceType = { $in: ['APPLE', 'APPLE-DEV'] };
+    query.appleToken = { $ne: null };
+  }
+
+  return PushNotificationDevice.find(query)
+    .exec();
 };
 
 exports.findDeviceForDeviceId = function(deviceId, callback) {
