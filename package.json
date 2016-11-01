@@ -217,6 +217,7 @@
     "gitter-styleguide": "^1.6.6",
     "gitter-web-client-error-reporting": "file:modules/client-error-reporting",
     "gitter-web-test-utils": "file:modules/test-utils",
+    "gitter-web-web-push": "file:modules/web-push",
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
     "gulp-brotli": "^1.1.0",
