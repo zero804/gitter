@@ -3,7 +3,6 @@
 var path = require('path');
 
 var config = {
-  devtool: 'eval',
   entry: {
     sw: require.resolve('./service-worker/sw'),
   },

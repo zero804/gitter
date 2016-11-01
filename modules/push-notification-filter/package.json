@@ -11,6 +11,7 @@
   },
   "private": true,
   "dependencies": {
-    "debug": "^2.2.0"
+    "debug": "^2.2.0",
+    "gitter-web-env": "file:../env"
   }
 }

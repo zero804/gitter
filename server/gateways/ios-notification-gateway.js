@@ -5,11 +5,11 @@ var debug = require('debug')('gitter:infra:ios-notification-gateway');
 var env = require('gitter-web-env');
 var Promise = require('bluebird');
 var pushNotificationService = require('../services/push-notification-service');
-var logger = env.logger;
+var logger = env.logger.get('push-notifications');
 var config = env.config;
 var errorReporter = env.errorReporter;
 
-var rootDirname = __dirname+'/../..';
+var rootDirname = __dirname + '/../..';
 
 var ERROR_DESCRIPTIONS = {
   0: 'No errors encountered',
@@ -26,9 +26,7 @@ var ERROR_DESCRIPTIONS = {
 
 var connections = {
   'APPLE': createConnection('Prod', true),
-  'APPLE-DEV': createConnection('Dev'),
-  'APPLE-BETA': createConnection('Beta', true),
-  'APPLE-BETA-DEV': createConnection('BetaDev')
+  'APPLE-DEV': createConnection('Dev')
 };
 
 /* Only create the feedback listeners for the current environment */
@@ -38,10 +36,6 @@ switch(config.get('NODE_ENV') || 'dev') {
     break;
 
   case 'beta':
-    createFeedbackListener('Beta', true);
-    createFeedbackListener('BetaDev');
-    break;
-
   case 'dev':
     createFeedbackListener('Dev');
     break;
@@ -169,4 +163,6 @@ function createAppleNotification(notification, badge) {
   return note;
 }
 
-module.exports.sendNotificationToDevice = sendNotificationToDevice;
+module.exports = {
+  sendNotificationToDevice: sendNotificationToDevice
+}
