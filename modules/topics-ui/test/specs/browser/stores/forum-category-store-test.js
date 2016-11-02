@@ -4,7 +4,7 @@ import {UPDATE_ACTIVE_CATEGORY} from '../../../../shared/constants/forum-categor
 import mockRouter from '../../../mocks/router';
 import categories from '../../../mocks/mock-data/categories';
 
-
+// eslint-disable-next-line import/no-unresolved
 import injector from 'inject-loader!../../../../browser/js/stores/forum-category-store';
 const {ForumCategoryStore} = injector({
   '../routers/index': mockRouter

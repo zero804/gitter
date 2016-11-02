@@ -21,7 +21,9 @@ import {FILTER_BY_TOPIC} from '../../../../shared/constants/forum-filters';
 
 import {MODEL_STATE_DRAFT, MODEL_STATE_SYNCED} from '../../../../shared/constants/model-states';
 
+// eslint-disable-next-line import/no-unresolved
 import injector from 'inject-loader!../../../../browser/js/stores/topics-store.js';
+
 const {TopicsStore, TopicModel} = injector({
   './forum-store': forumStore,
   '../routers': mockRouter,
