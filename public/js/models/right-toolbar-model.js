@@ -3,8 +3,9 @@
 var Backbone = require('backbone');
 var apiClient = require('../components/api-client');
 var autoModelSave = require('../utils/auto-model-save');
+var context = require('../utils/context');
 
-module.exports = Backbone.Model.extend({
+var RightToolbarModel =  Backbone.Model.extend({
   defaults: {
     isPinned: true
   },
@@ -32,3 +33,6 @@ module.exports = Backbone.Model.extend({
     });
   }
 });
+
+var rightToolbarSnapshot = context.getSnapshot('rightToolbar');
+module.exports = new RightToolbarModel(rightToolbarSnapshot);
