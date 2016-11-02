@@ -1,11 +1,26 @@
 .profile-menu {
+  box-sizing: border-box;
   display: inline-block;
+  position: relative;
+  padding-left: 19px;
+
+  &:before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    height: 4.3rem;
+    border-right: 1px solid rgba(0, 0, 0, .1);
+    transform: translateY(-50%);
+  }
 }
 
 .profile-menu__avatar {
-  width: 32px;
+  width: 30px;
   height: auto;
-  border-radius: 100%;
+  margin-right: 9px;
+  border-radius: 4px;
   cursor: pointer;
 }
 
@@ -28,15 +43,19 @@
 }
 
 .chat-header__action-grouping .profile-menu {
-  margin-top: 17px;
+  padding-top: 17px;
   margin-left: 6px;
   margin-right: 12px;
 }
 
-.explore-header-section .profile-menu {
+.explore-header .profile-menu {
   position: absolute;
   top: 17px;
   right: 20px;
+}
+
+.org-page__header-body .profile-menu {
+  margin-right: -31px;
 }
 
 //Specificity issue causes the
@@ -46,7 +65,7 @@
   right: 5px;
 }
 
-.explore-header-section .dropdown.profile-menu__list {
+.explore-header .dropdown.profile-menu__list {
   top: 50px;
   right: 0;
 }
