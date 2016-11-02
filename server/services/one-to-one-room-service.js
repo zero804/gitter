@@ -44,6 +44,21 @@ function findOneToOneRoom(fromUserId, toUserId) {
     .exec();
 }
 
+function findOneToOneRoomsForUserId(userId) {
+  assert(userId, "userId required");
+
+  return persistence.Troupe.find({
+      oneToOne: true,
+      oneToOneUsers: {
+        $elemMatch: {
+          userId: mongoUtils.asObjectID(userId)
+        }
+      }
+    })
+    .lean()
+    .exec()
+}
+
 
 /**
  * Internal method.
@@ -81,19 +96,37 @@ function upsertNewOneToOneRoom(userId1, userId2) {
   });
 }
 
+function addOneToOneMemberToRoom(troupeId, userId) {
+  // Deal with https://github.com/troupe/gitter-webapp/issues/1227
+  return userDefaultFlagsService.getDefaultFlagsOneToOneForUserId(userId)
+    .then(function(flags) {
+      return roomMembershipService.addRoomMember(troupeId, userId, flags, null);
+    });
+}
+
 /**
  * Ensure that the current user is in the one-to-one room
  */
-function ensureFromUserInRoom(troupeId, fromUserId) {
-  return roomMembershipService.checkRoomMembership(troupeId, fromUserId)
-    .then(function(isRoomMember) {
-      if (isRoomMember) return;
+function ensureUsersInRoom(troupeId, fromUserId, toUserId) {
+  return roomMembershipService.findMembershipForUsersInRoom(troupeId, [fromUserId, toUserId])
+    .then(function(userIds) {
+      // Both members are in the room
+      if (userIds.length === 2) return;
 
-      // Deal with https://github.com/troupe/gitter-webapp/issues/1227
-      return userDefaultFlagsService.getDefaultFlagsOneToOneForUserId(fromUserId)
-        .then(function(flags) {
-          return roomMembershipService.addRoomMember(troupeId, fromUserId, flags, null);
-        });
+      var fromUserInRoom = userIds.some(function(userId) {
+        return mongoUtils.objectIDsEqual(userId, fromUserId);
+      });
+
+      var toUserInRoom = userIds.some(function(userId) {
+        return mongoUtils.objectIDsEqual(userId, toUserId);
+      });
+
+      debug('Re-adding users to room: fromUser=%s, toUser=%s', fromUserInRoom, toUserInRoom);
+
+      return Promise.all([
+        !fromUserInRoom && addOneToOneMemberToRoom(troupeId, fromUserId),
+        !toUserInRoom && addOneToOneMemberToRoom(troupeId, toUserId),
+      ]);
     });
 }
 
@@ -177,7 +210,7 @@ function findOrCreateOneToOneRoom(fromUser, toUserId) {
       this.troupe = troupe;
 
       if (isAlreadyExisting) {
-        return ensureFromUserInRoom(troupeId, fromUserId);
+        return ensureUsersInRoom(troupeId, fromUserId, toUserId);
       } else {
         stats.event('new_troupe', {
           troupeId: troupeId,
@@ -198,4 +231,5 @@ function findOrCreateOneToOneRoom(fromUser, toUserId) {
 module.exports = {
   findOrCreateOneToOneRoom: Promise.method(findOrCreateOneToOneRoom),
   findOneToOneRoom: Promise.method(findOneToOneRoom),
+  findOneToOneRoomsForUserId: findOneToOneRoomsForUserId
 }

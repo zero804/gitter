@@ -1,7 +1,8 @@
 @import "~normalize.css";
 @import "../../../../public/less/highlight.less";
-@import "./colors";
-@import './break-points';
+@import (reference) './colors';
+@import (reference) './break-points';
+@import (reference) './layout-variables';
 
 .m-cover-screen() { height: 100%; width: 100%; }
 
@@ -9,6 +10,7 @@ html {
   .m-cover-screen();
   font-size: 62.5%;
   -webkit-overflow-scrolling: touch;
+  background-color: @main-application-bg-color;
 }
 
 body {
@@ -21,6 +23,11 @@ body {
   height: 100%;
 }
 
+main {
+  box-sizing: border-box;
+  padding-top: @header-height;
+}
+
 //Ugh iOS scrolling
 //https://remysharp.com/2012/05/24/issues-with-position-fixed-scrolling-on-ios
 .scroller {
@@ -28,10 +35,6 @@ body {
   height: 100%;
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
-}
-
-.topic-content {
-  padding-top: 6.5rem;
 }
 
 //Generic

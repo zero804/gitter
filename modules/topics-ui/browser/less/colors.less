@@ -1,3 +1,4 @@
+@main-application-bg-color: #fdfdfd;
 @light: white;
 @dark: black;
 
@@ -18,7 +19,7 @@
 //Forum specific
 @topic-table-bg:                   @light;
 @topic-container-category-bg:      fadeout(@light, 90%);
-@topic-container-table-control-bg: fadeout(@light, 90%);
+@topic-container-table-control-bg: @main-application-bg-color;
 @topic-table-cell-odd-bg:          lighten(@pampas, 4%);
 @topic-table-header-color:         lighten(@dark, 80%);
 @topic-table-cell-color:           lighten(@dark, 10%);
@@ -51,7 +52,7 @@
 @topic-reply-list-heading-color: darken(@pampas, 20%);
 @topic-reply-sent-details-color: darken(@pampas, 26%);
 @topic-reply-action-text-color: @topic-reply-sent-details-color;
-@topic-reply-editor-background-color: @light;
+@topic-reply-editor-background-color: @main-application-bg-color;
 @topic-reply-editor-border-color: darken(@topic-body-border-color, 10%);
 
 

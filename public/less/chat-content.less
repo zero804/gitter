@@ -1,3 +1,5 @@
+@import "./colors";
+
 // See public/templates/partials/chat_content.hbs
 .chat-container {
   &-invited {
@@ -22,7 +24,7 @@
 
 .trpContentPanel {
   position: relative;
-  background-color: white;
+  background-color: @main-application-bg-color;
   width: 100%;
   flex-shrink: 1;
   flex-grow: 1
