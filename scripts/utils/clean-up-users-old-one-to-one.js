@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 'use strict';
 
 process.env.NO_AUTO_INDEX = 1;
@@ -8,14 +9,13 @@ var opts = require('yargs')
     required: true,
     description: 'Username'
   })
-  .option('execute', {
+  .option('dry-run', {
     type: 'boolean',
-    description: 'Execute (instead of dry run)'
+    description: 'Dry-run. Do not execute, just print out candidates'
   })
   .help('help')
   .alias('help', 'h')
   .argv;
-
 
 var Promise = require('bluebird');
 var userService = require('../../server/services/user-service');
@@ -27,7 +27,7 @@ var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var collections = require('gitter-web-utils/lib/collections');
 var shutdown = require('shutdown');
 
-var MIN_DAYS_BEFORE_TRIM = 365;
+var MIN_DAYS_CUTOFF = 365;
 
 function getOtherUserId(userId, room) {
   if (room.oneToOneUsers.length !== 2) return null;
@@ -76,7 +76,7 @@ function findCandidates(username, dryRun) {
         if (!lat) return true;
         var lastAccessDays = (now - lat) / (86400 * 1000);
         room.lastAccessTime = lat;
-        return lastAccessDays >= MIN_DAYS_BEFORE_TRIM;
+        return lastAccessDays > MIN_DAYS_CUTOFF;
       });
 
       if (dryRun) {
@@ -125,7 +125,7 @@ function removeCandidates(user, candidates) {
   .delay(5000);
 }
 
-findCandidates(opts.username, !opts.execute)
+findCandidates(opts.username, opts.dryRun)
   .finally(function() {
     shutdown.shutdownGracefully();
   });
