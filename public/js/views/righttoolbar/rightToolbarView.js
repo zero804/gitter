@@ -1,6 +1,7 @@
 "use strict";
 
 var Marionette = require('backbone.marionette');
+var _ = require('underscore');
 var context = require('../../utils/context');
 var toggleClass = require('../../utils/toggle-class');
 var itemCollections = require('../../collections/instances/integrated-items');
@@ -8,6 +9,8 @@ var PeopleCollectionView = require('../people/peopleCollectionView');
 var RepoInfoView = require('./repoInfo');
 var ActivityCompositeView = require('./activityCompositeView');
 var RepoInfoModel = require('../../collections/repo-info');
+var cocktail = require('backbone.cocktail');
+var closeViewMixin = require('../menu/room/minibar/close-view/close-view-mixin');
 
 require('../behaviors/isomorphic');
 
@@ -26,7 +29,7 @@ var RightToolbarLayout = Marionette.LayoutView.extend({
     footer:         '#zendesk-footer',
     rosterHeader:   '#people-header',
     repoInfoHeader: '#info-header',
-    toggleButton:   '#right-toolbar-footer-region'
+    toggleIcon: '.js-menu-toggle-icon'
   },
 
   events: {
@@ -34,7 +37,9 @@ var RightToolbarLayout = Marionette.LayoutView.extend({
     'click #people-header': 'showPeopleList',
     'click #info-header':   'showRepoInfo',
     'submit #upload-form':  'upload',
-    'click @ui.toggleButton': 'toggleMenu'
+    'click @ui.toggleIcon': 'toggleMenu',
+    'mouseenter @ui.toggleIcon': 'toggleMenuEnter',
+    'mouseleave @ui.toggleIcon': 'toggleMenuLeave',
   },
 
   childEvents: {
@@ -54,7 +59,9 @@ var RightToolbarLayout = Marionette.LayoutView.extend({
     Marionette.LayoutView.prototype.constructor.apply(this, arguments);
   },
 
-  initialize: function () {
+  initialize: function (attrs) {
+    this.iconOpts = _.extend({}, this.defaults, (attrs.icon || {}));
+    this.iconHover = false;
     this.listenTo(context.troupe(), 'change:id', this.onRoomChange, this);
   },
 
@@ -80,6 +87,9 @@ var RightToolbarLayout = Marionette.LayoutView.extend({
 
   onPanelPinStateChange: function() {
     toggleClass(this.el, 'collapsed', !this.model.get('isPinned'));
+    var isPinned = this.getPinnedState();
+    toggleClass(this.ui.toggleIcon[0], this.iconOpts.pinStateClass, isPinned);
+    this.deflectArms();
   },
 
   showPeopleList: function() {
@@ -113,8 +123,23 @@ var RightToolbarLayout = Marionette.LayoutView.extend({
 
   toggleMenu: function(){
     this.model.set('isPinned', !this.model.get('isPinned'));
+  },
+
+  getPinnedState: function(){
+    return !!this.model.get('isPinned');
+  },
+
+  toggleMenuEnter: function(){
+    this.iconHover = true;
+    this.deflectArms();
+  },
+
+  toggleMenuLeave: function(){
+    this.iconHover = false;
+    this.deflectArms();
   }
 
 });
 
+cocktail.mixin(RightToolbarLayout, closeViewMixin);
 module.exports = RightToolbarLayout;
