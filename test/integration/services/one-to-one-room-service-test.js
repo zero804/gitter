@@ -189,7 +189,7 @@ describe('one-to-one-room-service', function() {
         });
     });
 
-    it('should add the requesting user back into a one-to-one room if they\'ve both been removed', function() {
+    it('should add the users back into a one-to-one room if they\'ve both been removed', function() {
       var user1 = fixture.user1;
       var userId1 = user1._id;
       var userId2 = fixture.user2._id;
@@ -215,8 +215,78 @@ describe('one-to-one-room-service', function() {
           return roomMembershipService.findMembersForRoom(this.room._id);
         })
         .then(function(members) {
+          assert.strictEqual(members.length, 2);
+          var actual = members.map(String);
+          actual.sort();
+          var expected = [userId1, userId2].map(String);
+          expected.sort();
+          assert.deepEqual(actual, expected);
+        });
+    });
+
+    it('should add the users back into a one-to-one room if the fromUser has been removed', function() {
+      var user1 = fixture.user1;
+      var userId1 = user1._id;
+      var userId2 = fixture.user2._id;
+
+      return oneToOneRoomService.findOrCreateOneToOneRoom(user1, userId2)
+        .bind({ room: undefined })
+        .spread(function(room) {
+          this.room = room;
+          return roomMembershipService.removeRoomMember(room._id, userId1);
+        })
+        .then(function() {
+          return roomMembershipService.findMembersForRoom(this.room._id);
+        })
+        .then(function(members) {
           assert.strictEqual(members.length, 1);
-          assert.strictEqual(String(members[0]), String(userId1));
+
+          return oneToOneRoomService.findOrCreateOneToOneRoom(user1, userId2);
+        })
+        .spread(function(room) {
+          assert.strictEqual(room.id, this.room.id);
+          return roomMembershipService.findMembersForRoom(this.room._id);
+        })
+        .then(function(members) {
+          assert.strictEqual(members.length, 2);
+          var actual = members.map(String);
+          actual.sort();
+          var expected = [userId1, userId2].map(String);
+          expected.sort();
+          assert.deepEqual(actual, expected);
+        });
+    });
+
+    it('should add the users back into a one-to-one room if the toUser has been removed', function() {
+      var user1 = fixture.user1;
+      var userId1 = user1._id;
+      var userId2 = fixture.user2._id;
+
+      return oneToOneRoomService.findOrCreateOneToOneRoom(user1, userId2)
+        .bind({ room: undefined })
+        .spread(function(room) {
+          this.room = room;
+          return roomMembershipService.removeRoomMember(room._id, userId2);
+        })
+        .then(function() {
+          return roomMembershipService.findMembersForRoom(this.room._id);
+        })
+        .then(function(members) {
+          assert.strictEqual(members.length, 1);
+
+          return oneToOneRoomService.findOrCreateOneToOneRoom(user1, userId2);
+        })
+        .spread(function(room) {
+          assert.strictEqual(room.id, this.room.id);
+          return roomMembershipService.findMembersForRoom(this.room._id);
+        })
+        .then(function(members) {
+          assert.strictEqual(members.length, 2);
+          var actual = members.map(String);
+          actual.sort();
+          var expected = [userId1, userId2].map(String);
+          expected.sort();
+          assert.deepEqual(actual, expected);
         });
     });
 

@@ -21,6 +21,7 @@ var debug = require('debug')('gitter:infra:passport');
 var obfuscateToken = require('gitter-web-github').obfuscateToken;
 var passportLogin = require('../passport-login');
 var callbackUrlBuilder = require('./callback-url-builder');
+var StatusError = require('statuserror');
 
 // Move this out once we use it multiple times. We're only interested in
 // account age for github users at this stage.
@@ -146,6 +147,10 @@ function githubUserCallback(req, accessToken, refreshToken, params, _profile, do
       return userService.findByGithubIdOrUsername(githubUserProfile.id, githubUserProfile.login)
     })
     .then(function(user) {
+      if (user && user.state === 'DISABLED') {
+        throw new StatusError(403, 'Account temporarily disabled. Please contact support@gitter.im')
+      }
+
       if (req.session && (!user || user.isInvited())) {
         var events = req.session.events;
         if (!events) {
