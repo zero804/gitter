@@ -166,7 +166,7 @@ var $ = require('jquery');
           this.listView.render(data);
         }
 
-        if (!this.listView.data.length && this.listView.shown) {
+        if ((!this.listView.data || !this.listView.data.length) && this.listView.shown) {
           this.listView.deactivate();
         }
       },
