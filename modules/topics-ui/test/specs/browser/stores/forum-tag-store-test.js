@@ -4,6 +4,7 @@ import * as forumTagConstants from '../../../../shared/constants/forum-tags';
 import mockRouter from '../../../mocks/router';
 import tags from '../../../mocks/mock-data/tags';
 
+// eslint-disable-next-line import/no-unresolved
 import injector from 'inject-loader!../../../../browser/js/stores/forum-tag-store';
 const {getForumTagStore} = injector({
   '../routers/index': mockRouter
