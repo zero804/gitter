@@ -101,6 +101,31 @@ body {
 
 
 
+.explore-header {
+  z-index: 2;
+  position: fixed;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: @desktop-header-height;
+  margin-top: 0;
+  margin-left: auto;
+  margin-bottom: 10px;
+  margin-right: auto;
+  padding-top: 0;
+  padding-left: @page-wrapper-horizontal-padding;
+  padding-right: @page-wrapper-horizontal-padding;
+
+  background-image: linear-gradient(to left, @header-grad-bg-color, @header-base-bg-color);
+}
+
+.explore-header__heading {
+  margin: 0;
+  color: white;
+  font-weight: 300;
+  font-size: 24px;
+}
+
 .explore-header-section {
   width: 100%;
   max-width: @page-wrapper-max-width;
@@ -115,21 +140,6 @@ body {
   @media @explore-breakpoint-small {
     margin-top: @section-spacing / 2;
   }
-}
-
-.app-header {
-  position: fixed;
-  margin-top: 0;
-  padding-top: 0;
-  height: 65px;
-  background-image: linear-gradient(to left, @header-grad-bg-color, @header-base-bg-color);
-  z-index: 2;
-}
-
-.app-header__h1 {
-  color: white;
-  font-weight: 300;
-  font-size: 24px;
 }
 
 .explore-secondary-header-info-bar {

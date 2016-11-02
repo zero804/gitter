@@ -1,5 +1,6 @@
 @import "../colors";
 @import '../break-points';
+@import (reference) '../layout-variables';
 
 .container {
   width: 100%;
@@ -8,9 +9,10 @@
 }
 
 .container--search {
-  position: fixed;
   z-index: 1;
-  height: 6.5rem;
+  position: fixed;
+  top: 0;
+  height: @header-height;
   background-image: linear-gradient(to left, @header-grad-bg-color, @header-base-bg-color);
 }
 
