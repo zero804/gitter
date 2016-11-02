@@ -148,8 +148,11 @@ function processRememberMeToken(presentedCookie) {
         .then(function(user) {
           if (!user) return null;
 
+          // Account disabled? Go away
+          if (user.state === 'DISABLED') return null;
+
           /* No token, user will need to relogin */
-          if(userScopes.isMissingTokens(user)) return null;
+          if (userScopes.isMissingTokens(user)) return null;
 
           return generateAuthToken(user._id)
             .catch(function(err) {
