@@ -1,5 +1,5 @@
-
-@import (reference) "trp3Vars.less";
+@import (reference) "trp3Vars";
+@import "../../../less/colors";
 
 // Base
 @import "../../../less/base-avatar.less";
@@ -129,21 +129,6 @@
       background-color: rgba(0, 0, 0, .05);
       outline: none;
     }
-
-    & > .menu-toggle-icon {
-      fill: none;
-      stroke: #969696;
-      stroke-width: 2px;
-
-      transition: transform .2s ease;
-
-      &:hover {
-        transform: translateZ(0) rotateZ(-90deg);
-      }
-    }
-    &:hover > .menu-toggle-icon {
-      transform: translateZ(0) rotateZ(-90deg);
-    }
   }
 
 
@@ -251,4 +236,33 @@
       background-clip: padding-box;
     }
   }
+}
+
+.menu-toggle-icon {
+  display: inline-block;
+  vertical-align: middle;
+  margin: auto;
+
+  fill: none;
+  stroke: @menu-decal-color;
+  stroke-width: 2;
+
+  cursor: pointer;
+
+  transition: transform 0.2s ease;
+
+  &:hover,
+  .menu-toggle-button:hover > & {
+    transform: translateZ(0) rotateZ(-90deg);
+  }
+}
+
+.right-toolbar-region__footer {
+  box-sizing: border-box;
+  width: 100%;
+  height: 70px;
+  padding-top: 18px;
+  padding-right: 25px;
+  background-color: white;
+  text-align: right;
 }

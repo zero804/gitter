@@ -25,14 +25,16 @@ var RightToolbarLayout = Marionette.LayoutView.extend({
     header:         '#toolbar-top-content',
     footer:         '#zendesk-footer',
     rosterHeader:   '#people-header',
-    repoInfoHeader: '#info-header'
+    repoInfoHeader: '#info-header',
+    toggleButton:   '#right-toolbar-footer-region'
   },
 
   events: {
     'click #upgrade-auth':  'onUpgradeAuthClick',
     'click #people-header': 'showPeopleList',
     'click #info-header':   'showRepoInfo',
-    'submit #upload-form':  'upload'
+    'submit #upload-form':  'upload',
+    'click @ui.toggleButton': 'toggleMenu'
   },
 
   childEvents: {
@@ -108,6 +110,10 @@ var RightToolbarLayout = Marionette.LayoutView.extend({
     var peopleList = this.$el.find('#people-list');
     peopleList.toggleClass('hidden', !this.collection.length);
   },
+
+  toggleMenu: function(){
+    this.model.set('isPinned', !this.model.get('isPinned'));
+  }
 
 });
 

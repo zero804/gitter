@@ -90,10 +90,6 @@ var HeaderView = Marionette.ItemView.extend({
     this.menuItemsCollection = new Backbone.Collection([]);
     this.buildDropdown();
 
-    var profileMenu = new ProfileMenu({
-      el: '#profile-menu'
-    });
-    profileMenu.render();
 
     this.listenTo(this.rightToolbarModel, 'change:isPinned', this.onPanelPinStateChange, this);
   },
@@ -176,6 +172,13 @@ var HeaderView = Marionette.ItemView.extend({
       // Deal with re-renders
       this.dropdown.hide();
     }
+
+    //If an instance of the profile menu exists destory it to remove listeners etc
+    if(this.profileMenu) { this.profileMenu.destroy(); }
+    //Make a new profile menu
+    this.profileMenu = new ProfileMenu({ el: '#profile-menu' });
+    //Render it
+    this.profileMenu.render();
 
     this.ui.favourite.css({ visibility: context.isLoggedIn() ? 'visible' : 'hidden' });
     this.ui.favourite.toggleClass('favourite', !!this.model.get('favourite'));
