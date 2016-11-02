@@ -528,14 +528,24 @@ function addUserToRoom(room, instigatingUser, userToAdd) {
  * If the user to be removed is not the one requesting, check permissions
  */
 function removeUserFromRoom(room, user) {
-  if (!room) throw new StatusError(400, 'Room required');
   if (!user) throw new StatusError(400, 'User required');
+
+  // TODO: consider whether this check is still necessary?
   if (room.oneToOne) throw new StatusError(400, 'This room does not support removing.');
 
-  return roomMembershipService.removeRoomMember(room._id, user._id, room.groupId)
+  return removeUserIdFromRoom(room, user._id);
+}
+
+/**
+ */
+function removeUserIdFromRoom(room, userId) {
+  if (!room) throw new StatusError(400, 'Room required');
+  if (!userId) throw new StatusError(400, 'userId required');
+
+  return roomMembershipService.removeRoomMember(room._id, userId, room.groupId)
     .then(function() {
       // Remove favorites, unread items and last access times
-      return recentRoomService.removeRecentRoomForUser(user._id, room._id);
+      return recentRoomService.removeRecentRoomForUser(userId, room._id);
     });
 }
 
@@ -778,6 +788,7 @@ module.exports = {
   joinRoom: Promise.method(joinRoom),
   addUserToRoom: addUserToRoom,
   removeUserFromRoom: Promise.method(removeUserFromRoom),
+  removeUserIdFromRoom: Promise.method(removeUserIdFromRoom),
   removeRoomMemberById: removeRoomMemberById,
   hideRoomFromUser: hideRoomFromUser,
   findBanByUsername: findBanByUsername,
