@@ -35,15 +35,16 @@ var ircClientIdPromise = persistenceService.OAuthClient.findOne({ clientKey: nco
     ircClientId = oauthClient._id;
     return ircClientId;
   });
+
 // Fail on error
 ircClientIdPromise.done();
 
-exports.findClientById = function(id, callback) {
+function findClientById(id, callback) {
   persistenceService.OAuthClient.findById(id, callback);
-};
+}
 
 // this is called when a user actively logs in via oauth
-exports.saveAuthorizationCode = function(code, client, redirectUri, user, callback) {
+function saveAuthorizationCode(code, client, redirectUri, user, callback) {
   var authCode = new persistenceService.OAuthCode({
       code: code,
       clientId: client.id,
@@ -51,11 +52,11 @@ exports.saveAuthorizationCode = function(code, client, redirectUri, user, callba
       userId: user.id
   });
   authCode.save(callback);
-};
+}
 
-exports.findAuthorizationCode = function(code, callback) {
+function findAuthorizationCode(code, callback) {
   persistenceService.OAuthCode.findOne({ code: code }, callback);
-};
+}
 
 /**
  * Turn a token into a user/token/client.
@@ -63,7 +64,7 @@ exports.findAuthorizationCode = function(code, callback) {
  * Returns { user / client / accessToken } hash. If the token is for an anonymous user,
  * user is null;
  */
-exports.validateAccessTokenAndClient = function(token, callback) {
+function validateAccessTokenAndClient(token, callback) {
   return tokenProvider.validateToken(token)
     .then(function(result) {
       if (!result) {
@@ -94,24 +95,29 @@ exports.validateAccessTokenAndClient = function(token, callback) {
            return null;
           }
 
+          if (user && user.state === 'DISABLED') {
+            return deleteToken(token)
+              .return(null);
+          }
+
           return { user: user, client: client };
         });
 
     })
     .nodeify(callback);
-};
+}
 
-exports.removeAllAccessTokensForUser = function(userId, callback) {
+function removeAllAccessTokensForUser(userId, callback) {
   return persistenceService.OAuthAccessToken.remove({ userId: userId })
     .exec()
     .nodeify(callback);
-};
+}
 
-exports.findClientByClientKey = function(clientKey, callback) {
+function findClientByClientKey(clientKey, callback) {
   return persistenceService.OAuthClient.findOne({ clientKey: clientKey })
     .exec()
     .asCallback(callback);
-};
+}
 
 function findOrCreateToken(userId, clientId, callback) {
   if(!clientId) return Promise.reject(new Error('clientId required')).nodeify(callback);
@@ -119,11 +125,10 @@ function findOrCreateToken(userId, clientId, callback) {
   return tokenProvider.getToken(userId, clientId)
     .nodeify(callback);
 }
-exports.findOrCreateToken = findOrCreateToken;
 
 // TODO: move some of this functionality into redis for speed
 // TODO: make the web tokens expire
-exports.findOrGenerateWebToken = function(userId, callback) {
+function findOrGenerateWebToken(userId, callback) {
   return webClientPromise
     .then(function(client) {
       var clientId = client.id;
@@ -134,9 +139,9 @@ exports.findOrGenerateWebToken = function(userId, callback) {
         });
     })
     .nodeify(callback);
-};
+}
 
-exports.generateAnonWebToken = function(callback) {
+function generateAnonWebToken(callback) {
   return webClientPromise
     .then(function(client) {
       var clientId = client.id;
@@ -147,20 +152,20 @@ exports.generateAnonWebToken = function(callback) {
         });
     })
     .nodeify(callback);
-};
+}
 
-exports.findOrGenerateIRCToken = function(userId, callback) {
+function findOrGenerateIRCToken(userId, callback) {
   return ircClientIdPromise
     .then(function(clientId) {
       return tokenProvider.getToken(userId, clientId);
     })
     .nodeify(callback);
-};
+}
 
-exports.deleteToken = function(token, callback) {
+function deleteToken(token, callback) {
   return tokenProvider.deleteToken(token)
     .nodeify(callback);
-};
+}
 
 function clientKeyIsInternal(clientKey) { // eslint-disable-line complexity
   switch(clientKey) {
@@ -187,7 +192,7 @@ function clientKeyIsInternal(clientKey) { // eslint-disable-line complexity
  * In future we should add scopes to our client schema, rather than
  * doing this, which is horrible
  */
-exports.isInternalClient = function(client) {
+function isInternalClient(client) {
   if (!client) return false;
   if (!client.clientKey) return false;
   if (client.canSkipAuthorization) return true;
@@ -195,8 +200,22 @@ exports.isInternalClient = function(client) {
   return clientKeyIsInternal(client.clientKey);
 }
 
-exports.testOnly = {
-  invalidateCache: function() {
-    return tokenProvider.testOnly.invalidateCache();
+module.exports = {
+  findClientById: findClientById,
+  saveAuthorizationCode: saveAuthorizationCode,
+  findAuthorizationCode: findAuthorizationCode,
+  validateAccessTokenAndClient: validateAccessTokenAndClient,
+  removeAllAccessTokensForUser: removeAllAccessTokensForUser,
+  findClientByClientKey: findClientByClientKey,
+  findOrCreateToken: findOrCreateToken,
+  findOrGenerateWebToken: findOrGenerateWebToken,
+  generateAnonWebToken: generateAnonWebToken,
+  findOrGenerateIRCToken: findOrGenerateIRCToken,
+  deleteToken: deleteToken,
+  isInternalClient: isInternalClient,
+  testOnly: {
+    invalidateCache: function() {
+      return tokenProvider.testOnly.invalidateCache();
+    }
   }
-};
+}

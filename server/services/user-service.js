@@ -8,6 +8,7 @@ var Promise = require('bluebird');
 var persistence = require('gitter-web-persistence');
 var uriLookupService = require('gitter-web-uri-resolver/lib/uri-lookup-service');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
+var StatusError = require('statuserror');
 
 /** FIXME: the insert fields should simply extend from options or a key in options.
  * Creates a new user
@@ -127,25 +128,33 @@ var userService = {
 
     var user;
     var isNewUser;
+
     var userInsertData = _.extend({
       identities: [{
           provider: identityData.provider,
           providerKey: identityData.providerKey
         }]
     }, userData);
+
     return mongooseUtils.upsert(persistence.User, userQuery, {
         $setOnInsert: userInsertData
       })
       .spread(function(_user, _isExistingUser) {
+        if (_user && _user.state === 'DISABLED') {
+          throw new StatusError(403, 'Account temporarily disabled. Please contact support@gitter.im');
+        }
+
         user = _user;
         isNewUser = !_isExistingUser;
         var identityQuery = {
           provider: identityData.provider,
           userId: user._id
         };
+
         var identitySetData = _.extend({
           userId: user._id
         }, identityData);
+
         return mongooseUtils.upsert(persistence.Identity, identityQuery, {
           // NOTE: set the identity fields regardless, because the tokens and
           // things could be newer than what we have if this is a login and

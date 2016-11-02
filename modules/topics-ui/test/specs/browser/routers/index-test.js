@@ -19,6 +19,7 @@ import topicReplySortByComments from '../../../../shared/action-creators/topic/t
 import topicReplySortByLikes from '../../../../shared/action-creators/topic/topic-replies-sort-by-liked';
 import topicReplySortByReplies from '../../../../shared/action-creators/topic/topic-replies-sort-by-recent';
 
+// eslint-disable-next-line import/no-unresolved
 import routerInjector from 'inject-loader!../../../../browser/js/routers/index';
 const {default: router} = routerInjector({
   '../stores/current-user-store': currentUserStoreMock
