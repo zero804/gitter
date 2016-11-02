@@ -2,6 +2,8 @@
 /*jslint node:true */
 "use strict";
 
+process.env.NO_AUTO_INDEX = 1;
+
 var shutdown = require('shutdown');
 var oauthService = require('../../server/services/oauth-service');
 

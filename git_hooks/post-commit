@@ -2,6 +2,5 @@
 
 if $(which gtm); then
   set -x
-  echo "About to run: '$(which gtm) commit -yes'" 
   gtm commit -yes
 fi
