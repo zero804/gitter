@@ -55,7 +55,7 @@ function install() {
   passport.deserializeUser(function deserializeUserCallback(id, done) {
     return userService.findById(id)
       .then(function(user) {
-        if (user.state === 'DISABLED') {
+        if (user && user.state === 'DISABLED') {
           return null;
         }
 
