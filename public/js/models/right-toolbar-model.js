@@ -5,7 +5,7 @@ var apiClient = require('../components/api-client');
 var autoModelSave = require('../utils/auto-model-save');
 var context = require('../utils/context');
 
-var RightToolbarModel =  Backbone.Model.extend({
+var RightToolbarModel = Backbone.Model.extend({
   defaults: {
     isPinned: true
   },

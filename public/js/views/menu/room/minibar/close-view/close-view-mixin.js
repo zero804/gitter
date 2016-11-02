@@ -38,7 +38,7 @@ var getFirstLegDescription = function(options, t) {
   return pathDescription;
 };
 
-var getSecondLegDescription = function(options, t) {
+var getSecondLegDescription = function(options) {
   var opts = _.extend({}, legDefaults, options);
   var pathDescription = 'M0,'+((opts.height/2) + opts.deflection) + ' l'+(opts.width/2)+',0' + ' l'+(opts.width/2)+',0';
   return pathDescription;
