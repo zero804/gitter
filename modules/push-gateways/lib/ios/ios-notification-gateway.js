@@ -11,7 +11,7 @@ var logger = env.logger.get('push-notifications');
 var config = env.config;
 var errorReporter = env.errorReporter;
 
-var rootDirname = __dirname + '/../../..';
+var rootDirname = __dirname + '/../../../..';
 
 var ERROR_DESCRIPTIONS = {
   0: 'No errors encountered',
