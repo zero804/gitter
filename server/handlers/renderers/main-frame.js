@@ -117,6 +117,8 @@ function renderMainFrame(req, res, next, options) {
         });
 
       res.render(template, {
+        ////Dark theme
+        hasDarkTheme: req.fflip && req.fflip.has('dark-theme'),
         //left menu
         leftMenuOrgs:           troupeContext.snapshots.orgs,
         roomMenuIsPinned:       snapshots.leftMenu.roomMenuIsPinned,
