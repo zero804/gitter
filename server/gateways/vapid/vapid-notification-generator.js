@@ -1,15 +1,34 @@
 'use strict';
 
-var notificationMessageGenerator = require('../../services/notifications/notification-message-generator');
-
 function generateNewChatNotifications(notificationType, notificationDetails/*, device*/) {
   var room = notificationDetails.room;
   var chats = notificationDetails.chats;
-  var message = notificationMessageGenerator(room, chats);
 
   return {
     type: notificationType,
-    message: message
+    linkUrl: '/' + room.uri + '?utm_source=web-push-notification',
+    room: {
+      id: room.id,
+      uri: room.uri
+    },
+    chats: chats.map(function(chat) {
+      var fromUser;
+
+      if (chat.fromUser) {
+        fromUser = {
+          id: chat.fromUser.id,
+          username: chat.fromUser.username,
+          displayName: chat.fromUser.displayName,
+          avatarUrl: chat.fromUser.avatarUrl
+        }
+      }
+      return {
+        id: chat.id,
+        text: chat.text,
+        sent: chat.sent,
+        fromUser: fromUser
+      };
+    })
   }
 }
 

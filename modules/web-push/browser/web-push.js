@@ -38,6 +38,9 @@ function install(options) {
       var vapidPublicKey = clientEnv.vapidAppServerKey;
       var convertedVapidKey = urlBase64ToUint8Array(vapidPublicKey);
 
+      // TODO: figure out the rules for agent updating the service worker
+      // registration.update();
+
       return registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: convertedVapidKey

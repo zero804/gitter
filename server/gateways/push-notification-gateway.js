@@ -90,7 +90,7 @@ function sendUserNotification(notificationType, userId, options) {
     })
     .then(function(counts) {
       var devices = this.devices;
-      if (!devices.length) return;
+      if (!devices || !devices.length) return;
       var options = this.options;
       var notificationType = this.notificationType;
 

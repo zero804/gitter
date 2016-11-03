@@ -1,10 +1,16 @@
 'use strict';
 
-var pushHandler = require('./push-handler');
+var handler = require('./handler');
+
+var idSeq = 0;
 
 function extractPayload(event) {
   try {
-    return event && event.data && event.data.json();
+    var data = event && event.data && event.data.json();
+    if (!data) return;
+
+    data.uniqueId = (++idSeq) + ':' + Date.now();
+    return data;
   } catch(e) {
     return;
   }
@@ -14,7 +20,7 @@ self.addEventListener('push', function(event) {
   var payload = extractPayload(event);
   if (!payload) return;
 
-  var promise = pushHandler(event, payload);
+  var promise = handler.onPush(event, payload);
   if (promise) {
     event.waitUntil(promise);
   }
@@ -25,13 +31,10 @@ self.addEventListener('pushsubscriptionchange', function(/*event*/) {
 })
 
 self.addEventListener('notificationclick', function(event) {
-  event.notification.close();
-
-  if (event.notification.data && event.notification.data.url) {
-    var clickResponsePromise = clients.openWindow(event.notification.data.url);
-    event.waitUntil(clickResponsePromise);
+  var promise = handler.onNotificationClick(event);
+  if (promise) {
+    event.waitUntil(promise);
   }
-
 });
 
 self.addEventListener('notificationclose', function(/*event*/) {
