@@ -51,7 +51,7 @@ function hash(token) {
   return crypto.createHash('md5').update(token).digest('hex');
 }
 
-exports.registerDevice = function(deviceId, deviceType, deviceToken, deviceName, appVersion, appBuild, callback) {
+function registerDevice(deviceId, deviceType, deviceToken, deviceName, appVersion, appBuild) {
   debug("Registering device %s", deviceId);
   var tokenHash = hash(deviceToken);
 
@@ -75,11 +75,10 @@ exports.registerDevice = function(deviceId, deviceType, deviceToken, deviceName,
       // these are probably phones that have been reset etc, so we need to prune them
       return findAndRemoveDevicesWithDuplicateTokens(deviceId, deviceType, deviceToken, tokenHash)
         .thenReturn(device);
-    })
-    .nodeify(callback);
-};
+    });
+}
 
-exports.registerAndroidDevice = function(deviceId, deviceName, registrationId, appVersion, userId, callback) {
+function registerAndroidDevice(deviceId, deviceName, registrationId, appVersion, userId) {
   debug("Registering device %s", deviceId);
   var tokenHash = hash(registrationId);
 
@@ -103,11 +102,10 @@ exports.registerAndroidDevice = function(deviceId, deviceName, registrationId, a
       // these are probably phones that have been reset etc, so we need to prune them
       return findAndRemoveDevicesWithDuplicateTokens(deviceId, 'ANDROID', registrationId, tokenHash)
         .thenReturn(device);
-    })
-    .nodeify(callback);
-};
+    });
+}
 
-exports.registerVapidSubscription = function(subscription, userId) {
+function registerVapidSubscription(subscription, userId) {
   assert(subscription, 'subscription required');
 
   var endpoint = subscription.endpoint;
@@ -140,14 +138,14 @@ exports.registerVapidSubscription = function(subscription, userId) {
       new: true
     })
     .exec();
-};
+}
 
-exports.deregisterDeviceById = function(id) {
+function deregisterDeviceById(id) {
   return PushNotificationDevice.findByIdAndRemove(id)
     .exec();
-};
+}
 
-exports.deregisterIosDevices = function(deviceTokens) {
+function deregisterIosDevices(deviceTokens) {
   if (deviceTokens.length === 0) return Promise.resolve();
 
   var appleTokens = deviceTokens.map(function(deviceToken) {
@@ -161,16 +159,15 @@ exports.deregisterIosDevices = function(deviceTokens) {
 
   // mongo will do an indexBounded query with the hashes (super fast) before filtering by appleToken
   return PushNotificationDevice.remove({ tokenHash: { $in: tokenHashes }, appleToken: { $in: appleTokens } }).exec();
-};
+}
 
-exports.registerUser = function(deviceId, userId, callback) {
+function registerUser(deviceId, userId) {
   return PushNotificationDevice.findOneAndUpdate(
     { deviceId: deviceId },
     { deviceId: deviceId, userId: userId, timestamp: new Date() },
     { upsert: true, new: true })
-    .exec()
-    .nodeify(callback);
-};
+    .exec();
+}
 
 var usersWithDevicesCache = null;
 function getCachedUsersWithDevices() {
@@ -197,18 +194,17 @@ function expireCachedUsersWithDevices() {
   usersWithDevicesCache = null;
 }
 
-exports.findUsersWithDevices = function(userIds, callback) {
+function findUsersWithDevices(userIds) {
   return getCachedUsersWithDevices()
     .then(function(usersWithDevices) {
       return _.filter(userIds, function(userId) {
         // Only true if the user has a device...
         return usersWithDevices[userId];
       });
-    })
-    .nodeify(callback);
-};
+    });
+}
 
-exports.findEnabledDevicesForUsers = function(userIds, options) {
+function findEnabledDevicesForUsers(userIds, options) {
   userIds = mongoUtils.asObjectIDs(uniqueIds(userIds));
   var query = {
     userId: { $in: userIds },
@@ -223,14 +219,18 @@ exports.findEnabledDevicesForUsers = function(userIds, options) {
 
   return PushNotificationDevice.find(query)
     .exec();
-};
+}
 
-exports.findDeviceForDeviceId = function(deviceId, callback) {
-  return PushNotificationDevice.findOne({ deviceId: deviceId })
-    .exec()
-    .nodeify(callback);
-};
-
-exports.testOnly = {
-  expireCachedUsersWithDevices: expireCachedUsersWithDevices
-};
+module.exports = {
+  registerDevice: registerDevice,
+  registerAndroidDevice: registerAndroidDevice,
+  registerVapidSubscription: registerVapidSubscription,
+  deregisterDeviceById: deregisterDeviceById,
+  deregisterIosDevices: deregisterIosDevices,
+  registerUser: registerUser,
+  findUsersWithDevices: findUsersWithDevices,
+  findEnabledDevicesForUsers: findEnabledDevicesForUsers,
+  testOnly: {
+    expireCachedUsersWithDevices: expireCachedUsersWithDevices
+  }
+}
