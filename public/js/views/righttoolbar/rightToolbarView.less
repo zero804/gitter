@@ -238,20 +238,7 @@
   }
 }
 
-.menu-toggle-icon {
-  display: inline-block;
-  vertical-align: middle;
-  margin: auto;
-  fill: none;
-  stroke: #8d8d8d;
-  stroke-width: 2;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-  &:hover,
-  .menu-toggle-button:hover > & {
-    transform: translateZ(0) rotateZ(-90deg);
-  }
-}
+
 
 .right-toolbar-region__footer {
   box-sizing: border-box;
@@ -265,4 +252,19 @@
   background: white;
   border: 1px solid @menu-border-color;
   text-align: right;
+  .menu-toggle-icon {
+    display: inline-block;
+    vertical-align: middle;
+    margin: auto;
+    fill: none;
+    stroke: #8d8d8d;
+    stroke-width: 2;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    &:hover,
+    .menu-toggle-button:hover > & {
+      transform: translateZ(0) rotateZ(-90deg);
+      stroke: black;
+    }
+  }
 }
