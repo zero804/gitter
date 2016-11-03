@@ -41,6 +41,24 @@
             </div>
           </li>
 
+          <li id="minibar-collection" class="minibar-collection">
+            <ul class="minibar-collection-list">
+              {{!--
+              {{#each troupeContext.snapshots.groups}}
+                <li
+                  id="{{id}}"
+                  data-id="{{id}}"
+                  data-type="group"
+                  data-state-change="org"
+                  data-org-name="{{name}}"
+                  class="room-menu-options__item--org">
+                  {{{ prerenderView "js/views/menu/room/minibar/minibar-item-view" }}}
+                </li>
+              {{/each}}
+              --}}
+            </ul>
+          </li>
+
           <li class="room-menu-options__item--community-create" data-state-change="community-create" id="minibar-community-create">
             <div class="room-menu-options__container">
               <button class="room-menu-options__item-button" title="Create a new community">
@@ -83,9 +101,11 @@
               <div class="favourite-collection loaded active">
                 <div id="collection-list" class="collection-list--favourite">
                   {{#each troupeContext.snapshots.favourites}}
-                    <div class="{{#if isNotOneToOne}}room-item--favourite{{else}}room-item--favourite-one2one{{/if}} {{#if isHidden}}hidden{{/if}}"
-                         id="{{id}}"
-                         data-id="{{id}}">
+                    <div
+                      class="{{#if isNotOneToOne}}room-item--favourite{{else}}room-item--favourite-one2one{{/if}} {{#if isHidden}}hidden{{/if}}"
+                      id="{{id}}"
+                      data-id="{{id}}"
+                      data-type="room">
                       {{{ prerenderView "js/views/menu/room/primary-collection/primary-collection-item-view" }}}
                     </div>
                   {{/each}}
@@ -101,7 +121,11 @@
                 </header>
                 <div id="collection-list" class="collection-list--primary">
                   {{#each troupeContext.snapshots.rooms}}
-                    <div class="{{#if isNotOneToOne}}room-item{{else}}room-item--one2one{{/if}} {{#if isHidden}}hidden{{/if}}" id="{{id}}"  data-id="{{id}}">
+                    <div
+                      class="{{#if isNotOneToOne}}room-item{{else}}room-item--one2one{{/if}} {{#if isHidden}}hidden{{/if}}"
+                      id="{{id}}"
+                      data-id="{{id}}"
+                      data-type="room">
                       {{{ prerenderView "js/views/menu/room/primary-collection/primary-collection-item-view" }}}
                     </div>
                   {{/each}}

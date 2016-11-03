@@ -8,7 +8,7 @@ var PeopleView = require('./people-view/people-view');
 var GroupView = require('./group-view/group-view');
 var CloseView = require('./close-view/close-view');
 //var TempOrgView = require('./temp-org-view/temp-org-view');
-//var CollectionView = require('./minibar-collection-view');
+var CollectionView = require('./minibar-collection-view');
 var CommunityCreateView = require('./minibar-community-create-item-view');
 
 require('../../../behaviors/isomorphic');
@@ -26,7 +26,7 @@ module.exports = Marionette.LayoutView.extend({
         groups: { el: '#minibar-groups', init: 'initGroups' },
         communityCreate: { el: '#minibar-community-create', init: 'initCommunityCreate' },
         close: { el: '#minibar-close', init: 'initClose' },
-        //collectionView: { el: '#minibar-collection', init: 'initCollection' },
+        collectionView: { el: '#minibar-collection', init: 'initCollection' },
         //tempOrg: { el: '#minibar-temp', init: 'initTemp' }
       },
     };
@@ -112,17 +112,16 @@ module.exports = Marionette.LayoutView.extend({
     */
   },
 
-  initCollection: function (/*optionsForRegion*/){
-    /*
+  initCollection: function (optionsForRegion){
     var collectionView = new CollectionView(optionsForRegion({
       collection: this.collection,
       roomMenuModel: this.model,
+      dndCtrl: this.dndCtrl,
       keyboardControllerView: this.keyboardControllerView,
     }));
 
     this.listenTo(collectionView, 'minibar-item:activated', this.onCollectionItemActivated, this);
     return collectionView;
-    */
   },
 
   modelEvents: {
@@ -131,6 +130,7 @@ module.exports = Marionette.LayoutView.extend({
 
   initialize: function(attrs) {
     this.bus = attrs.bus;
+    this.dndCtrl = attrs.dndCtrl;
     this.model = attrs.model;
     this.roomCollection = attrs.roomCollection;
     this.homeModel = this.model.minibarHomeModel;

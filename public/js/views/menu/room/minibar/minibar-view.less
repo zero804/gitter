@@ -1,7 +1,7 @@
 @import (reference) "base-zindex-levels";
 @import 'components/menu/menu.less';
 
-@minibar-top-offset: (3 * @desktop-header-height);
+@minibar-top-offset: (6 * @desktop-header-height);
 @minibar-bottom-offset: (2 * @desktop-header-height);
 
 
@@ -451,7 +451,12 @@
   }
 }
 
+.minibar-collection {
+  height: 100%;
+}
+
 .minibar-collection-list {
-  list-style: none;
+  height: 100%;
   margin-left: 0;
+  list-style: none;
 }
