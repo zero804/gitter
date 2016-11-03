@@ -134,49 +134,6 @@ function createFeedbackListener(suffix, isProduction) {
   }
 }
 
-// function createAppleNotification(notificationType, notificationDetails, device) {
-//   var message = notificationMessageGenerator(room, chats);
-//   var notificationLink = '/mobile/chat#' + room.id;
-//
-//
-//   var notification = {
-//     roomId: troupe.id,
-//     roomName: troupe.name || troupe.uri,
-//     message: message,
-//     sound: hasMentions ? 'notify.caf' : 'notify-2.caf',
-//     link: notificationLink
-//   }
-//
-//   var note = new apn.Notification();
-//   var message = notification && notification.message;
-//   var sound = notification && notification.sound;
-//   var link = notification && notification.link;
-//
-//   if(badge >= 0) {
-//     note.badge = badge;
-//   }
-//
-//   if(message) {
-//     note.setAlertText(message);
-//   }
-//
-//   if(sound) {
-//     note.sound = sound;
-//   }
-//
-//   note.payload = {
-//     aps: {
-//       "content-available": 1
-//     }
-//   };
-//
-//   if(link) {
-//     note.payload['l'] = link;
-//   }
-//
-//   return note;
-// }
-
 function sendBadgeUpdateToDevice(device, badge) {
   if (!device || !device.appleToken) return;
 
