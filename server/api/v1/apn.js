@@ -13,10 +13,10 @@ module.exports = function(req, res, next) {
   var appBuild = req.body.build || null;
 
   winston.info("APN device registration", { deviceId: deviceId, deviceName: deviceName, deviceType: deviceType });
-  pushNotificationService.registerDevice(deviceId, deviceType, deviceToken, deviceName, appVersion, appBuild, function(err) {
-    if(err) return next(err);
 
-    res.send({ success: true });
-  });
-
+  return pushNotificationService.registerDevice(deviceId, deviceType, deviceToken, deviceName, appVersion, appBuild)
+    .then(function() {
+      res.send({ success: true });
+    })
+    .catch(next);
 };
