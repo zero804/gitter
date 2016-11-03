@@ -93,11 +93,10 @@ gulp.task('process:watch:server', function() {
     ignore: [
       path.resolve(__dirname, '../modules/topics-ui/browser'),
       path.resolve(__dirname, '../modules/topics-ui/shared'),
-      path.resolve(__dirname, '../modules/topics-ui/test'),
       path.resolve(__dirname, '../modules/api-client'),
       path.resolve(__dirname, '../modules/web-push/browser'),
-      path.resolve(__dirname, '../modules/web-push/service-worker')
-
+      path.resolve(__dirname, '../modules/web-push/service-worker'),
+      '**/test/**'
     ],
     args: ['--cdn:use', 'true']
   });

@@ -6,7 +6,8 @@ var userService = require('../../server/services/user-service');
 var troupeService = require('../../server/services/troupe-service');
 var chatService = require('../../server/services/chat-service');
 var pushNotificationGateway = require('../../server/gateways/push-notification-gateway');
-var serializer = require("../../server/serializers/notification-serializer");
+var serializer = require('../../server/serializers/notification-serializer');
+var oneToOneRoomService = require('../../server/services/one-to-one-room-service')
 var shutdown = require('shutdown');
 var Promise = require('bluebird');
 
@@ -17,7 +18,6 @@ var opts = require('yargs')
   })
   .option('room-uri', {
     description: 'room uri for chat',
-    required: true
   })
   .help('help')
   .alias('help', 'h')
@@ -25,13 +25,29 @@ var opts = require('yargs')
 
 var promise;
 
+function findRoom(user, opts) {
+  if (opts.roomUri) {
+    return troupeService.findByUri(opts.roomUri);
+  }
+
+  if (opts.otherUser) {
+    return userService.findByUsername(opts.otherUser)
+      .then(function(otherUser) {
+        return oneToOneRoomService.findOneToOneRoom(user._id, otherUser._id);
+      });
+  }
+
+  throw new Error('Require either other user or roomUri')
+}
+
 if (opts.username) {
-  promise = Promise.join(
-      userService.findByUsername(opts.username),
-      troupeService.findByUri(opts.roomUri))
+  promise = userService.findByUsername(opts.username)
     .bind({})
-    .spread(function(user, room) {
+    .then(function(user) {
       this.user = user;
+      return findRoom(user, opts);
+    })
+    .then(function(room) {
       this.room = room;
 
       return chatService.findChatMessagesForTroupe(room._id, {

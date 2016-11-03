@@ -6,10 +6,13 @@ function generateNewChatNotifications(notificationType, notificationDetails/*, d
 
   return {
     type: notificationType,
-    linkUrl: '/' + room.uri + '?utm_source=web-push-notification',
+    linkUrl: room.url + '?utm_source=web-push-notification',
     room: {
       id: room.id,
-      uri: room.uri
+      uri: room.uri,
+      name: room.name || room.uri,
+      oneToOne: room.oneToOne,
+      url: room.url
     },
     chats: chats.map(function(chat) {
       var fromUser;
