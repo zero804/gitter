@@ -4,7 +4,8 @@ var apn = require('apn');
 var debug = require('debug')('gitter:infra:ios-notification-gateway');
 var env = require('gitter-web-env');
 var Promise = require('bluebird');
-var pushNotificationService = require('../../services/push-notification-service');
+var EventEmitter = require('events');
+
 var iosNotificationGenerator = require('./ios-notification-generator');
 var logger = env.logger.get('push-notifications');
 var config = env.config;
@@ -29,18 +30,6 @@ var connections = {
   'APPLE': createConnection('Prod', true),
   'APPLE-DEV': createConnection('Dev')
 };
-
-/* Only create the feedback listeners for the current environment */
-switch(config.get('NODE_ENV') || 'dev') {
-  case 'prod':
-    createFeedbackListener('Prod', true);
-    break;
-
-  case 'beta':
-  case 'dev':
-    createFeedbackListener('Dev');
-    break;
-}
 
 
 function sendNotificationToDevice(notificationType, notificationDetails, device) {
@@ -94,46 +83,6 @@ function createConnection(suffix, isProduction) {
   return connection;
 }
 
-function createFeedbackListener(suffix, isProduction) {
-  try {
-    debug('ios push notification feedback listener (%s) starting', suffix);
-
-    var feedback = new apn.Feedback({
-      cert: rootDirname+'/'+config.get('apn:cert' + suffix),
-      key: rootDirname+'/'+config.get('apn:key' + suffix),
-      interval: config.get('apn:feedbackInterval'),
-      batchFeedback: true,
-      production: isProduction
-    });
-
-    feedback.on('feedback', function(item) {
-      var deviceTokens = item.map(function(item) {
-        return item.device.token;
-      });
-
-      return pushNotificationService.deregisterIosDevices(deviceTokens)
-        .catch(function(err) {
-          logger.error('ios push notification tokens (' + suffix + ') failed to remove after feedback', { error: err.message });
-          errorReporter(err, { apnEnv: suffix }, { module: 'ios-notification-gateway' });
-        });
-    });
-
-    feedback.on('error', function(err) {
-      logger.error('ios push notification feedback (' + suffix + ') experienced an error', { error: err.message });
-      errorReporter(err, { apnEnv: suffix }, { module: 'ios-notification-gateway' });
-    });
-
-    feedback.on('feedbackError', function(err) {
-      logger.error('ios push notification feedback (' + suffix + ') experienced a feedbackError', { error: err.message });
-      errorReporter(err, { apnEnv: suffix }, { module: 'ios-notification-gateway' });
-    });
-
-  } catch(e) {
-    logger.error('Unable to start feedback service (' + suffix + ')', { exception: e });
-    errorReporter(e, { apnEnv: suffix }, { module: 'ios-notification-gateway' });
-  }
-}
-
 function sendBadgeUpdateToDevice(device, badge) {
   if (!device || !device.appleToken) return;
 
@@ -153,7 +102,63 @@ function sendBadgeUpdateToDevice(device, badge) {
   return Promise.delay(1000);
 }
 
+function createFeedbackEmitterForEnv(suffix, isProduction) {
+  var emitter = new EventEmitter();
+
+  try {
+    debug('ios push notification feedback listener (%s) starting', suffix);
+
+    var feedback = new apn.Feedback({
+      cert: rootDirname + '/' + config.get('apn:cert' + suffix),
+      key: rootDirname + '/' + config.get('apn:key' + suffix),
+      interval: config.get('apn:feedbackInterval'),
+      batchFeedback: true,
+      production: isProduction
+    });
+
+    feedback.on('feedback', function(item) {
+      var deviceTokens = item.map(function(item) {
+        return item.device.token;
+      });
+
+      emitter.emit('deregister', deviceTokens);
+    });
+
+    feedback.on('error', function(err) {
+      logger.error('ios push notification feedback (' + suffix + ') experienced an error', { error: err.message });
+      errorReporter(err, { apnEnv: suffix }, { module: 'ios-notification-gateway' });
+    });
+
+    feedback.on('feedbackError', function(err) {
+      logger.error('ios push notification feedback (' + suffix + ') experienced a feedbackError', { error: err.message });
+      errorReporter(err, { apnEnv: suffix }, { module: 'ios-notification-gateway' });
+    });
+
+  } catch(e) {
+    logger.error('Unable to start feedback service (' + suffix + ')', { exception: e });
+    errorReporter(e, { apnEnv: suffix }, { module: 'ios-notification-gateway' });
+  }
+
+  return emitter;
+}
+
+
+function createFeedbackEmitter() {
+  /* Only create the feedback listeners for the current environment */
+  switch(config.get('NODE_ENV') || 'dev') {
+    case 'prod':
+      return createFeedbackEmitterForEnv('Prod', true);
+
+    case 'beta':
+    case 'dev':
+      return createFeedbackEmitterForEnv('Dev');
+  }
+
+  return new EventEmitter();
+}
+
 module.exports = {
   sendNotificationToDevice: sendNotificationToDevice,
-  sendBadgeUpdateToDevice: sendBadgeUpdateToDevice
+  sendBadgeUpdateToDevice: sendBadgeUpdateToDevice,
+  createFeedbackEmitter: createFeedbackEmitter
 }
