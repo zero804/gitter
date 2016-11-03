@@ -66,6 +66,7 @@ var cssWebStyleBuilder = styleBuilder([
   'public/less/org-page.less',
   'public/less/early-bird.less',
   'public/less/topics.less',
+  'public/less/dark-theme.less',
 ], {
   dest: cssDestDir,
   watchGlob: cssWatchGlob,
