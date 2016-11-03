@@ -6,11 +6,11 @@ var logger = env.logger.get('push-notifications');
 var stats = env.stats;
 var pushNotificationService = require("../services/push-notification-service");
 var unreadItemService = require("../services/unread-items");
-var androidGateway = require('./android/android-notification-gateway');
-var iosGateway = require('./ios/ios-notification-gateway');
-var vapidGateway = require('./vapid/vapid-notification-gateway');
+var androidGateway = require('gitter-web-push-gateways/lib/android/android-notification-gateway');
+var iosGateway = require('gitter-web-push-gateways/lib/ios/ios-notification-gateway');
+var vapidGateway = require('gitter-web-push-gateways/lib/vapid/vapid-notification-gateway');
 var debug = require('debug')('gitter:app:push-notification-gateway');
-var InvalidRegistrationError = require('./invalid-registration-error');
+var InvalidRegistrationError = require('gitter-web-push-gateways/lib/invalid-registration-error');
 var _ = require('lodash');
 
 function getGatewayForDevice(device) {

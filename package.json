@@ -69,6 +69,7 @@
     "gitter-web-persistence": "file:modules/persistence",
     "gitter-web-persistence-utils": "file:modules/persistence-utils",
     "gitter-web-presence": "file:modules/presence",
+    "gitter-web-push-gateways": "file:modules/push-gateways",
     "gitter-web-push-notification-filter": "file:modules/push-notification-filter",
     "gitter-web-qs": "file:modules/qs",
     "gitter-web-serialization": "file:modules/serialization",

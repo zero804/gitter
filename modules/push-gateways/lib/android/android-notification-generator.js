@@ -1,7 +1,7 @@
 'use strict';
 
 var gcm = require('node-gcm');
-var notificationMessageGenerator = require('../../services/notifications/notification-message-generator');
+var notificationMessageGenerator = require('../notification-message-generator');
 
 function generateNewChatNotifications(notificationType, notificationDetails/*, device*/) {
   var room = notificationDetails.room;
