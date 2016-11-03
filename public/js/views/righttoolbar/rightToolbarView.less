@@ -238,20 +238,7 @@
   }
 }
 
-.menu-toggle-icon {
-  display: inline-block;
-  vertical-align: middle;
-  margin: auto;
-  fill: none;
-  stroke: #8d8d8d;
-  stroke-width: 2;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-  &:hover,
-  .menu-toggle-button:hover > & {
-    transform: translateZ(0) rotateZ(-90deg);
-  }
-}
+
 
 .right-toolbar-region__footer {
   box-sizing: border-box;
@@ -261,10 +248,28 @@
   height: 70px;
   padding-top: 21px;
   padding-right: 21px;
+
   background: linear-gradient(
     top,
     rgba(255, 255, 255, 0),
     @main-application-bg-color 35%
   );
+
   text-align: right;
+  .menu-toggle-icon {
+    display: inline-block;
+    vertical-align: middle;
+    margin: auto;
+    fill: none;
+    stroke: #8d8d8d;
+    stroke-width: 2;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    &:hover,
+
+    .menu-toggle-button:hover > & {
+      transform: translateZ(0) rotateZ(-90deg);
+      stroke: black;
+    }
+  }
 }
