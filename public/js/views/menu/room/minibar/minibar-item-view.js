@@ -40,9 +40,11 @@ module.exports = BaseItemView.extend({
     var id = (type === 'org') ? this.model.get('name') : type;
 
     return {
-      'class':             className,
-      'data-state-change': type,
-      id:                  'minibar-' + id
+      id: 'minibar-' + id,
+      'class': className,
+      'data-id': id,
+      'data-type': type === 'org' ? 'group' : '',
+      'data-state-change': type
     };
   },
 

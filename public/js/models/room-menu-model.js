@@ -145,7 +145,10 @@ module.exports = Backbone.Model.extend({
     }.bind(this));
 
     this.minibarCollection = new FilteredMinibarGroupCollection(null, {
-      collection: this.groupsCollection
+      collection: new Backbone.Collection(),
+      dndCtrl: this.dndCtrl,
+      groupCollection: this.groupsCollection,
+      roomCollection: this._roomCollection
     });
 
 

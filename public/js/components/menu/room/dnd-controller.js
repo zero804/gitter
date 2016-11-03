@@ -26,6 +26,7 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
   shouldItemMove: function (el) {
     //Stop dnd behaviour in group view
     if(this.panelRef.classList.contains('group')) { return false; }
+
     return (el.tagName !== 'A' &&
             !el.classList.contains('search-message-empty-container') &&
             el.id !== 'empty-view');
@@ -47,14 +48,25 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
     //guard against no drop target
     if(!target || !target.dataset) { return }
 
-    if (target.classList.contains('collection-list--primary')) {
-      this.trigger('room-menu:remove-favourite', el.dataset.id);
-      this.onDragEnd();
-    } else {
-      var siblingID = !!sibling && sibling.dataset.id;
-      this.trigger('room-menu:sort-favourite', el.dataset.id, siblingID);
-      this.onDragEnd();
+    var id = el.dataset.id;
+    var type = el.dataset.type;
+    //console.log('drop', id, type, siblingID, target.classList);
+
+    if (type === 'room' && target.classList.contains('collection-list--primary')) {
+      this.trigger('room-menu:remove-favourite', id);
     }
+    else if (type === 'room' && target.classList.contains('collection-list--favourite')) {
+      var siblingID = !!sibling && sibling.dataset.id;
+      this.trigger('room-menu:sort-favourite', id, siblingID);
+    }
+    else if (target.classList.contains('minibar-collection-list')) {
+      this.trigger('minibar:update-favourite-group', id, type, siblingID);
+      if(type === 'room') {
+        this.drag.cancel(true);
+      }
+    }
+
+    this.onDragEnd();
   },
 
   onDragStart: function () {
