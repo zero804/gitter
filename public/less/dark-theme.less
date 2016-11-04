@@ -11,20 +11,59 @@
 ----------------------------------------------------------------------------------------------------------------------------------
 */
 
-// Variables
-// ---------------------------------------------
+/* -------------------------------------------
+                Contents
 
+- Variables
+  - Global
+  - Left Menu
+  - Chat
+
+- Components
+  - Left Menu
+    - Header
+    - Main
+    - Text
+
+  - Chat
+------------------------------------------- */
+
+
+/* -------------------------------------------
+                Variables
+------------------------------------------- */
+
+// Global
+// --------------------------------------------
 @app-header-bg-color: #2d2c2c;
+@hover-highlight-percentage: 5%;
 
+// LEFT MENU
+// --------------------------------------------
 @left-menu-bg-color: #383736;
 @left-menu-minibar-border-color: #2d2c2c;
 @left-menu-text-color: #868685;
 @left-menu-active-item-bg-color: #2d2c2c;
 @left-menu-active-item-text-color: white;
 
-// Components
-// ---------------------------------------------
+// CHAT
+// --------------------------------------------
+@chat-header-text-color: #bbb7b7;
+@chat-main-bg-color: #434141;
+@chat-main-text-color: #afaead;
+@chat-details-text-color: #aaaaaa;
+@chat-right-toolbar-bg-color: @left-menu-bg-color;
+@chat-right-toolbar-left-border-color: @left-menu-minibar-border-color;
+@chat-right-toolbar-text-color: @chat-main-text-color;
 
+
+/* -------------------------------------------
+                Components
+------------------------------------------- */
+
+
+// LEFT MENU
+// --------------------------------------------
 
 //--- Left Menu Header ---
 
@@ -39,6 +78,10 @@
 
 .header-brand-container {
   background-color: @app-header-bg-color;
+  //Again we use a cheeky pseudo class to span the border
+  &:after {
+    background-color: @app-header-bg-color;
+  }
 }
 
 // --- Left Menu Main ---
@@ -50,7 +93,10 @@
 }
 
 //The main left menu
-.room-menu__panel { background-color: @left-menu-bg-color;  }
+.room-menu__panel {
+  background-color: @left-menu-bg-color;
+  border-color: @left-menu-bg-color;
+}
 
 //The footer that container the "Add a Room button"
 //This fades to allow room items to be visible underneath
@@ -85,5 +131,64 @@
 .room-item .room-item__container:hover { //:cry:
   & .room-item__title {
     color: @left-menu-active-item-text-color;
+  }
+}
+
+
+// Chat
+// --------------------------------------------
+
+// --- Chat Header ---
+.chat-header {
+  background-image: none;
+  background-color: @app-header-bg-color;
+}
+
+.chat-header__title,
+.chat-header__topic {
+  color: @chat-header-text-color;
+}
+
+// --- Chat Main ---
+// @cutandpastey didn't build any of this markup so there will be less comments
+.chat-app { background-color: @chat-main-bg-color; }
+.chat-container { background-color: @chat-main-bg-color; }
+
+.chat-item {
+  background-color: @chat-main-bg-color;
+  color: @chat-details-text-color;
+}
+
+// This is complete and utter BS ...
+body:not(.mobile) .chat-container div.chat-item:hover {
+  background-color: lighten(@chat-main-bg-color, @hover-highlight-percentage);
+}
+
+.chat-item__text {
+  color: @chat-main-text-color;
+}
+
+.chat-input { background-color: @chat-main-bg-color; }
+.chat-input__text-area {
+  background-color: @chat-main-bg-color;
+  color: @chat-main-text-color;
+}
+.chat-input__button-icon { color: @chat-main-text-color; }
+
+// --- Chat Right Toolbar ---
+.right-toolbar-region .right-toolbar {
+  background: @chat-right-toolbar-bg-color;
+  border-color: @chat-right-toolbar-left-border-color;
+}
+
+
+.activity-item,
+.activity-tip {
+  color: @chat-right-toolbar-text-color;
+
+  & a { color: lighten(@chat-right-toolbar-text-color, 10%); }
+
+  &:hover {
+    background-color: lighten(@chat-right-toolbar-bg-color, @hover-highlight-percentage);
   }
 }
