@@ -19,6 +19,9 @@ var opts = require('yargs')
   .option('room-uri', {
     description: 'room uri for chat',
   })
+  .option('other-user', {
+    description: 'Other user',
+  })
   .help('help')
   .alias('help', 'h')
   .argv;

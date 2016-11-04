@@ -20,15 +20,15 @@ function newChatPushHandler(event, payload) {
     if (!chat) return;
     count++;
 
-    var title, body;
     var fromUser = chat.fromUser;
 
+    var body = chat.text;
+
+    var title;
     if (room.oneToOne) {
       title = fromUser.displayName;
-      body = chat.text;
     } else {
-      title = fromUser && (fromUser.displayName || fromUser.username);
-      body = room.uri + ':\n\n' + chat.text;
+      title = fromUser && (fromUser.displayName || fromUser.username) + ' @ ' + room.uri;
     }
 
     var notificationOptions = {
@@ -38,7 +38,6 @@ function newChatPushHandler(event, payload) {
       renotify: false,
       data: payload,
       /*
-      Next step: add actions to the notification
       actions: [{
         action: 'mute',
         title: 'Mute'
