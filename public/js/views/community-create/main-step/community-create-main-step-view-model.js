@@ -1,4 +1,4 @@
-/* eslint complexity: ["error", 14] */
+/* eslint complexity: ["error", 15] */
 'use strict';
 
 var CommunityCreateStepViewModel = require('../community-create-step-view-model');
@@ -30,6 +30,8 @@ var CommunityCreateMainStepViewModel = CommunityCreateStepViewModel.extend({
       errors.communitySlug = 'Slug contains invalid characters';
     } else if(slugAvailabilityStatus === slugAvailabilityStatusConstants.NEEDS_MORE_PERMISSIONS && this.communityCreateModel.get('githubOrgId')) {
       errors.communitySlug = 'Allow private repo access on the GitHub org or make your org membership public';
+    } else if(slugAvailabilityStatus === slugAvailabilityStatusConstants.AUTHENTICATION_FAILED) {
+      errors.communitySlug = 'Authentication Failed. It is probably a GitHub app scope mismatch between public/private on your own user and the org.';
     } else if(slugAvailabilityStatus === slugAvailabilityStatusConstants.UNAVAILABLE) {
       errors.communitySlug = 'This address is not available';
     } else if(slugAvailabilityStatus === slugAvailabilityStatusConstants.PENDING) {
