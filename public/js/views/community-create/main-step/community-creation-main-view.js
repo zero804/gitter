@@ -229,6 +229,9 @@ module.exports = CommunityCreateBaseStepView.extend({
         else if(status === 403) {
           communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.NEEDS_MORE_PERMISSIONS);
         }
+        else if(status === 401) {
+          communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.AUTHENTICATION_FAILED);
+        }
         else {
           communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.INVALID);
         }
@@ -245,6 +248,6 @@ module.exports = CommunityCreateBaseStepView.extend({
 
     this.ui.communitySlugInputWrapper.toggleClass('pending', status === slugAvailabilityStatusConstants.PENDING);
     this.ui.communitySlugInputWrapper.toggleClass('available', status === slugAvailabilityStatusConstants.AVAILABLE);
-    this.ui.communitySlugInputWrapper.toggleClass('unavailable', status === slugAvailabilityStatusConstants.NEEDS_MORE_PERMISSIONS || status === slugAvailabilityStatusConstants.UNAVAILABLE || status === slugAvailabilityStatusConstants.INVALID);
+    this.ui.communitySlugInputWrapper.toggleClass('unavailable', status === slugAvailabilityStatusConstants.NEEDS_MORE_PERMISSIONS || status === slugAvailabilityStatusConstants.AUTHENTICATION_FAILED || status === slugAvailabilityStatusConstants.UNAVAILABLE || status === slugAvailabilityStatusConstants.INVALID);
   }
 });
