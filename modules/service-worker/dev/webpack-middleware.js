@@ -11,15 +11,18 @@ function install(app) {
     watchOptions: {
       aggregateTimeout: 400
     },
-    publicPath: "/_s/l/web-push",
+    publicPath: "/_s/l/service-worker",
     stats: {
       colors: true
     }
   });
-  app.get('/_s/l/web-push/sw.js', function(req, res, next) {
+
+  // This change also needs to be implemented in nginx
+  app.get('/_s/l/service-worker/sw.js', function(req, res, next) {
     res.set('Service-Worker-Allowed', '/')
     next();
-  })
+  });
+
   app.use(middleware);
 }
 

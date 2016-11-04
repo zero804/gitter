@@ -17,14 +17,14 @@ function getOutputPath(relative) {
   }
 }
 
-gulp.task('web-push:compile', ['web-push:compile:webpack']);
+gulp.task('service-worker:compile', ['service-worker:compile:webpack']);
 
-gulp.task('web-push:compile:webpack', function(cb) {
+gulp.task('service-worker:compile:webpack', function(cb) {
   return webpackPipeline(ROOT, cb)
     .pipe(gulp.dest(getOutputPath('assets/js')));
 });
 
-gulp.task('web-push:clean', function(cb) {
+gulp.task('service-worker:clean', function(cb) {
   del([
     getOutputPath()
   ], cb);

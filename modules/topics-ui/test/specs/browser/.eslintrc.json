@@ -18,7 +18,16 @@
   ],
   "rules": {
     "import/no-commonjs": 2,
-    "node/no-unsupported-features": [2, { "version": 6 }],
+    "node/no-unsupported-features": [
+      "error",
+      {
+        "version": 6,
+        "ignores": [
+          "syntax",
+          "modules"
+        ]
+      }
+    ],
     "react/display-name": 2,
     "react/jsx-no-duplicate-props": 2,
     "react/jsx-no-undef": 2,

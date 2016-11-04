@@ -390,7 +390,7 @@
       "dependencies": {
         "redis": {
           "version": "2.6.3",
-          "from": "redis@latest",
+          "from": "redis@>=2.1.0 <3.0.0",
           "resolved": "http://beta-internal.beta.gitter:4873/redis/-/redis-2.6.3.tgz",
           "dependencies": {
             "double-ended-queue": {
@@ -2577,11 +2577,6 @@
       "from": "modules/validators",
       "resolved": "file:modules/validators"
     },
-    "gitter-web-web-push": {
-      "version": "1.0.0",
-      "from": "modules/web-push",
-      "resolved": "file:modules/web-push"
-    },
     "glob": {
       "version": "6.0.4",
       "from": "glob@>=6.0.4 <7.0.0",
@@ -4162,7 +4157,7 @@
       "dependencies": {
         "passport-oauth2": {
           "version": "1.3.0",
-          "from": "passport-oauth2@>=1.1.2 <2.0.0",
+          "from": "passport-oauth2@>=1.0.0 <2.0.0",
           "resolved": "http://beta-internal.beta.gitter:4873/passport-oauth2/-/passport-oauth2-1.3.0.tgz",
           "dependencies": {
             "passport-strategy": {
@@ -4215,7 +4210,7 @@
       "dependencies": {
         "passport-oauth2": {
           "version": "1.3.0",
-          "from": "passport-oauth2@>=1.1.2 <2.0.0",
+          "from": "passport-oauth2@>=1.0.0 <2.0.0",
           "resolved": "http://beta-internal.beta.gitter:4873/passport-oauth2/-/passport-oauth2-1.3.0.tgz",
           "dependencies": {
             "passport-strategy": {
@@ -6473,7 +6468,7 @@
           "dependencies": {
             "strip-ansi": {
               "version": "3.0.1",
-              "from": "strip-ansi@>=3.0.0 <4.0.0",
+              "from": "strip-ansi@>=3.0.1 <4.0.0",
               "resolved": "http://beta-internal.beta.gitter:4873/strip-ansi/-/strip-ansi-3.0.1.tgz",
               "dependencies": {
                 "ansi-regex": {

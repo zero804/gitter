@@ -14,5 +14,5 @@ gulpStaged({
 
   topics: require('./modules/topics-ui/gulpfile-topics'),
   embedtopics: require('./build-scripts/gulpfile-embed-topics'),
-  'embed-web-push': require('./build-scripts/gulpfile-embed-web-push')
+  'embed-service-worker': require('./build-scripts/gulpfile-embed-service-worker')
 });
