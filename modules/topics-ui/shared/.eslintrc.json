@@ -24,7 +24,11 @@
     "node/no-unsupported-features": [
       "error",
       {
-        "version": 6
+        "version": 6,
+        "ignores": [
+          "syntax",
+          "modules"
+        ]
       }
     ],
     "react/display-name": 2,
