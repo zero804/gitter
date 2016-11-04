@@ -26,8 +26,10 @@ trap move_temp_modules_back EXIT
 # Remove the old shrinkwrap file
 rm -f npm-shrinkwrap.json
 
+npm cache clear
+
 # Install production dependencies
-npm i --production
+npm i --production --registry http://beta-internal.beta.gitter:4873/
 
 # Perform shrinkwrap on production dependencies
 npm shrinkwrap
