@@ -3,6 +3,10 @@
     "commonjs": true,
     "shared-node-browser": true
   },
+  "parserOptions": {
+    "ecmaVersion": 5,
+    "sourceType": "script"
+  },
   "rules": {
     "node/no-unpublished-require": "error"
   }
