@@ -87,6 +87,7 @@ function renderChat(req, res, next, options) {
         }
 
         var renderOptions = _.extend({
+            hasDarkTheme: req.fflip && req.fflip.has('dark-theme'),
             hasCachedFonts: fonts.hasCachedFonts(req.cookies),
             fonts: fonts.getFonts(),
             isRepo: troupe.sd.type === 'GH_REPO', // Used by chat_toolbar patial
