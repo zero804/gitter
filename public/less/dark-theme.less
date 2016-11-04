@@ -1,5 +1,4 @@
 /*
-
 ---------------------------------------------------------------------------------------------------------------------------------
 
  ██████╗ ██╗████████╗████████╗███████╗██████╗     ██████╗  █████╗ ██████╗ ██╗  ██╗    ████████╗██╗  ██╗███████╗███╗   ███╗███████╗
@@ -10,16 +9,81 @@
  ╚═════╝ ╚═╝   ╚═╝      ╚═╝   ╚══════╝╚═╝  ╚═╝    ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝       ╚═╝   ╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝╚══════╝
 
 ----------------------------------------------------------------------------------------------------------------------------------
-
-
-TABLE OF CONTENTS
-------------------------------------------------
-
-- Variables
-- Menu Styles
-
 */
 
 // Variables
 // ---------------------------------------------
-body {}
+
+@app-header-bg-color: #2d2c2c;
+
+@left-menu-bg-color: #383736;
+@left-menu-minibar-border-color: #2d2c2c;
+@left-menu-text-color: #868685;
+@left-menu-active-item-bg-color: #2d2c2c;
+@left-menu-active-item-text-color: white;
+
+// Components
+// ---------------------------------------------
+
+
+//--- Left Menu Header ---
+
+//The top most button in the minibar
+.room-menu-options__item--header-spacer {
+  background-color: @app-header-bg-color;
+  //LEGACY
+  //We use a pseudo element here to patch over the border required
+  //by the rest of the minibar
+  &:after { background-color: inherit; }
+}
+
+.header-brand-container {
+  background-color: @app-header-bg-color;
+}
+
+// --- Left Menu Main ---
+
+//The left hand minibar within Gitter's left menu
+.minibar {
+  background-color: @left-menu-bg-color;
+  border-color: @left-menu-minibar-border-color;
+}
+
+//The main left menu
+.room-menu__panel { background-color: @left-menu-bg-color;  }
+
+//The footer that container the "Add a Room button"
+//This fades to allow room items to be visible underneath
+.panel-footer__item--all {
+  background: linear-gradient(
+    top,
+    rgba(255, 255, 255, 0),
+    @left-menu-bg-color 35%
+  );
+}
+
+//A room item container is the link that sits
+//within the room list items the active denotes the room
+//a user is currently viewing
+.room-item .room-item__container.active,
+.room-item .room-item__container:hover { //:cry:
+
+  //:point_up: sometimes I hate specificity
+  //as this is crusty and brittle
+  background-color: @left-menu-active-item-bg-color;
+}
+
+
+// --- Left Menu Text ---
+
+//A room item is a room displayed within the list
+.room-item__title {
+  color: @left-menu-text-color;
+}
+
+.room-item .room-item__container.active,
+.room-item .room-item__container:hover { //:cry:
+  & .room-item__title {
+    color: @left-menu-active-item-text-color;
+  }
+}
