@@ -15,17 +15,27 @@
                 Contents
 
 - Variables
+
   - Global
   - Left Menu
   - Chat
 
 - Components
+
   - Left Menu
     - Header
     - Main
     - Text
 
   - Chat
+    - Header
+    - Main
+    - Right Toolbar
+
+  - Org Directory
+    - Main
+
+
 ------------------------------------------- */
 
 
@@ -33,10 +43,17 @@
                 Variables
 ------------------------------------------- */
 
+
+// Brand
+// --------------------------------------------
+@caribbean: #46BC99;
+
+
 // Global
 // --------------------------------------------
 @app-header-bg-color: #2d2c2c;
 @hover-highlight-percentage: 5%;
+
 
 // LEFT MENU
 // --------------------------------------------
@@ -46,15 +63,22 @@
 @left-menu-active-item-bg-color: #2d2c2c;
 @left-menu-active-item-text-color: white;
 
+
 // CHAT
 // --------------------------------------------
 @chat-header-text-color: #bbb7b7;
+@chat-header-icon-color: #aaaaaa;
 @chat-main-bg-color: #434141;
 @chat-main-text-color: #afaead;
-@chat-details-text-color: #aaaaaa;
+@chat-details-text-color: @chat-header-icon-color;
 @chat-right-toolbar-bg-color: @left-menu-bg-color;
 @chat-right-toolbar-left-border-color: @left-menu-minibar-border-color;
 @chat-right-toolbar-text-color: @chat-main-text-color;
+
+
+// CHAT
+// --------------------------------------------
+@org-page-main-bg-color: @chat-main-bg-color;
 
 
 /* -------------------------------------------
@@ -67,18 +91,18 @@
 
 //--- Left Menu Header ---
 
-//The top most button in the minibar
+//  The top most button in the minibar
 .room-menu-options__item--header-spacer {
   background-color: @app-header-bg-color;
-  //LEGACY
-  //We use a pseudo element here to patch over the border required
-  //by the rest of the minibar
+  //  LEGACY
+  //  We use a pseudo element here to patch over the border required
+  //  by the rest of the minibar
   &:after { background-color: inherit; }
 }
 
 .header-brand-container {
   background-color: @app-header-bg-color;
-  //Again we use a cheeky pseudo class to span the border
+  //  Again we use a cheeky pseudo class to span the border
   &:after {
     background-color: @app-header-bg-color;
   }
@@ -86,20 +110,20 @@
 
 // --- Left Menu Main ---
 
-//The left hand minibar within Gitter's left menu
+//  The left hand minibar within Gitter's left menu
 .minibar {
   background-color: @left-menu-bg-color;
   border-color: @left-menu-minibar-border-color;
 }
 
-//The main left menu
+//  The main left menu
 .room-menu__panel {
   background-color: @left-menu-bg-color;
-  border-color: @left-menu-bg-color;
+  border-color: @left-menu-minibar-border-color;
 }
 
-//The footer that container the "Add a Room button"
-//This fades to allow room items to be visible underneath
+//  The footer that container the "Add a Room button"
+//  This fades to allow room items to be visible underneath
 .panel-footer__item--all {
   background: linear-gradient(
     top,
@@ -108,27 +132,28 @@
   );
 }
 
-//A room item container is the link that sits
-//within the room list items the active denotes the room
-//a user is currently viewing
-.room-item .room-item__container.active,
-.room-item .room-item__container:hover { //:cry:
+//  A room item container is the link that sits within the room list items
+//  the active class denotes the room
+//  a user is currently viewing
+a.room-item__container.active,
+a.room-item__container:hover,
+.room-item--favourite.focus a.room-item__container { //:cry:
 
-  //:point_up: sometimes I hate specificity
-  //as this is crusty and brittle
+  //  :point_up: sometimes I hate specificity
+  //  as this is crusty and brittle
   background-color: @left-menu-active-item-bg-color;
 }
 
 
 // --- Left Menu Text ---
 
-//A room item is a room displayed within the list
+//  A room item is a room displayed within the list
 .room-item__title {
   color: @left-menu-text-color;
 }
 
-.room-item .room-item__container.active,
-.room-item .room-item__container:hover { //:cry:
+a.room-item__container.active,
+a.room-item__container:hover { //:cry:
   & .room-item__title {
     color: @left-menu-active-item-text-color;
   }
@@ -145,12 +170,11 @@
 }
 
 .chat-header__title,
-.chat-header__topic {
-  color: @chat-header-text-color;
-}
+.chat-header__topic { color: @chat-header-text-color; }
+
+.chat-header__action-icon { color: @chat-header-icon-color; }
 
 // --- Chat Main ---
-// @cutandpastey didn't build any of this markup so there will be less comments
 .chat-app { background-color: @chat-main-bg-color; }
 .chat-container { background-color: @chat-main-bg-color; }
 
@@ -161,13 +185,16 @@
 
 // This is complete and utter BS ...
 body:not(.mobile) .chat-container div.chat-item:hover {
-  background-color: lighten(@chat-main-bg-color, @hover-highlight-percentage);
+  background-color: darken(@chat-main-bg-color, @hover-highlight-percentage);
 }
 
 .chat-item__text {
   color: @chat-main-text-color;
+
+  a { color: @caribbean; }
 }
 
+// --- Chat Input ---
 .chat-input { background-color: @chat-main-bg-color; }
 .chat-input__text-area {
   background-color: @chat-main-bg-color;
@@ -181,14 +208,23 @@ body:not(.mobile) .chat-container div.chat-item:hover {
   border-color: @chat-right-toolbar-left-border-color;
 }
 
-
 .activity-item,
 .activity-tip {
   color: @chat-right-toolbar-text-color;
 
-  & a { color: lighten(@chat-right-toolbar-text-color, 10%); }
+  & a { color: darken(@chat-right-toolbar-text-color, 10%); }
 
   &:hover {
-    background-color: lighten(@chat-right-toolbar-bg-color, @hover-highlight-percentage);
+    background-color: darken(@chat-right-toolbar-bg-color, @hover-highlight-percentage);
   }
+}
+
+.trpStatus { border-color: @chat-right-toolbar-bg-color; }
+.trpDisplayPicture.offline .trpStatus { background-color: @chat-right-toolbar-bg-color; }
+
+
+// Org Directory
+// --------------------------------------------
+.org-page-main {
+  ba
 }
