@@ -470,13 +470,16 @@ onready(function() { // eslint-disable-line max-statements
     });
   }
 
-
+  // Fingerprint the user
   setTimeout(function() {
     var fingerprint = require('./components/fingerprint');
     fingerprint();
   }, 5000);
 
-  require('gitter-web-web-push/browser/web-push').install({
-    apiClient: require('./components/api-client')
-  });
+  // Register the service worker
+  setTimeout(function() {
+    require('gitter-web-service-worker/browser/registration').install({
+      apiClient: require('./components/api-client')
+    });
+  }, 10000);
 });
