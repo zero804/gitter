@@ -13,7 +13,9 @@
 
 /* -------------------------------------------
                 Contents
+------------------------------------------- */
 
+/* -------------------------------------------
 - Variables
 
   - Global
@@ -47,8 +49,6 @@
     - Room List
 
   - Topics
-
-
 ------------------------------------------- */
 
 
@@ -113,6 +113,20 @@
 @explore-room-card-heading-color: @org-page-list-item-heading-color;
 @explore-room-card-details-color: @org-page-list-item-details-color;
 @explore-room-card-button-color: @app-header-icon-color;
+
+
+// TOPICS
+// --------------------------------------------
+@topics-main-bg-color: @chat-main-bg-color;
+@topics-section-border-color: @left-menu-minibar-border-color;
+@topics-header-button-color: @app-header-icon-color;
+@topics-table-headings-color: @org-page-list-item-details-color;
+@topics-row-bg-color: @topics-main-bg-color;
+@topics-row-event-bg-color: #474444;
+@topics-row-border-color: #595554;
+@topics-row-title-color: #b6b0af;
+@topics-row-details-color: @org-page-list-item-details-color;
+
 
 
 /* -------------------------------------------
@@ -421,4 +435,78 @@ body:not(.mobile) .chat-container div.chat-item:hover {
 
 .room-card__footer {
   border-color: @explore-room-card-border-color;
+}
+
+
+// TOPICS
+// --------------------------------------------
+//Header element for the topics application
+.container--search {
+  background-image: none;
+  background-color: @app-header-bg-color;
+}
+
+//{orgName}'s topics (back button)
+.topic-search__all-topics-link {
+  color: @app-header-text-color;
+}
+
+//Create Topic link
+.topic-search__create-topic-link {
+  border-color: @app-header-icon-color;
+  color: @app-header-icon-color;
+}
+
+//The headers that contain the links to a specific category
+//and the table controls
+.panel--category,
+.panel--table-control {
+  background-color: @topics-main-bg-color;
+  border-bottom: 1px solid @topics-section-border-color;
+}
+
+//Buttons and selects within the headers described above
+.category-list__item,
+.topic-control__button,
+.table-control__select {
+  border-color: @topics-header-button-color;
+  color: @topics-header-button-color;
+}
+
+//Ugh, custom stylings for selects ...
+.table-control__select--decal:after {
+  color: @topics-header-button-color;
+}
+
+//The area that contains the link to follow an orgs topics
+.panel--forum-follow-area {
+  border-bottom: none;
+  background-color: @topics-main-bg-color;
+}
+
+//Table header
+.topics-table-header {
+  background-color: @topics-main-bg-color;
+  color: @topics-table-headings-color;
+  border-color: @topics-row-border-color;
+}
+
+//Table rows
+.topics-table-body__row {
+  background-color: @topics-row-bg-color;
+  border-color: @topics-row-border-color;
+}
+
+.topics-table-body__row:nth-child(even) {
+  background-color: @topics-row-event-bg-color;
+}
+
+//Topic
+.topics-table-body__cell__link {
+  color: @topics-row-title-color;
+}
+
+.topics-table-body__cell--replies,
+.topics-table-body__cell--likes {
+  color: @topics-row-details-color;
 }
