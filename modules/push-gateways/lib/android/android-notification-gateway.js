@@ -11,9 +11,12 @@ var MAX_RETRIES = 4;
 
 var sender = new gcm.Sender(nconf.get('gcm:apiKey'));
 
+/**
+ * Returns true if a notification was sent
+ */
 function sendNotificationToDevice(notificationType, notificationDetails, device) {
   var message = androidNotificationGenerator(notificationType, notificationDetails, device);
-  if (!message) return;
+  if (!message) return false;
 
   return Promise.fromCallback(function(callback) {
     sender.send(message, [device.androidToken], MAX_RETRIES, callback);
@@ -30,10 +33,10 @@ function sendNotificationToDevice(notificationType, notificationDetails, device)
       throw new InvalidRegistrationError('Not registered');
     }
 
-    return body;
+    return true;
   });
 }
 
 module.exports = {
-  sendNotificationToDevice: sendNotificationToDevice
+  sendNotificationToDevice: Promise.method(sendNotificationToDevice)
 };

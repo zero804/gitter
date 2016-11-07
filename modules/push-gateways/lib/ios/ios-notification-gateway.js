@@ -34,7 +34,7 @@ var connections = {
 
 function sendNotificationToDevice(notificationType, notificationDetails, device) {
   var appleNotification = iosNotificationGenerator(notificationType, notificationDetails, device);
-  if (!appleNotification) return;
+  if (!appleNotification) return false;
 
   var deviceToken = new apn.Device(device.appleToken);
 
@@ -47,7 +47,8 @@ function sendNotificationToDevice(notificationType, notificationDetails, device)
   // timout needed to ensure that the push notification packet is sent.
   // if we dont, SIGINT will kill notifications before they have left.
   // until apn uses proper callbacks, we have to guess that it takes a second.
-  return Promise.delay(1000);
+  return Promise.resolve(true)
+    .delay(1000);
 }
 
 function createConnection(suffix, isProduction) {
@@ -84,12 +85,12 @@ function createConnection(suffix, isProduction) {
 }
 
 function sendBadgeUpdateToDevice(device, badge) {
-  if (!device || !device.appleToken) return;
+  if (!device || !device.appleToken) return false;
 
   var deviceToken = new apn.Device(device.appleToken);
   var connection = connections[device.deviceType];
 
-  if (!connection) return;
+  if (!connection) return false;
 
   var note = new apn.Notification();
   note.badge = badge;
@@ -99,7 +100,8 @@ function sendBadgeUpdateToDevice(device, badge) {
   // timout needed to ensure that the push notification packet is sent.
   // if we dont, SIGINT will kill notifications before they have left.
   // until apn uses proper callbacks, we have to guess that it takes a second.
-  return Promise.delay(1000);
+  return Promise.resolve(true)
+    .delay(1000);
 }
 
 function createFeedbackEmitterForEnv(suffix, isProduction) {
@@ -158,7 +160,7 @@ function createFeedbackEmitter() {
 }
 
 module.exports = {
-  sendNotificationToDevice: sendNotificationToDevice,
-  sendBadgeUpdateToDevice: sendBadgeUpdateToDevice,
+  sendNotificationToDevice: Promise.method(sendNotificationToDevice),
+  sendBadgeUpdateToDevice: Promise.method(sendBadgeUpdateToDevice),
   createFeedbackEmitter: createFeedbackEmitter
 }
