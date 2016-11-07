@@ -8,6 +8,11 @@
     {{> fonts}}
     {{!-- <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,100"> --}}
     <link rel="stylesheet" type="text/css" href="{{ cdn 'styles/explore.css' }}">
+
+    {{#if hasDarkTheme}}
+    <link rel="stylesheet" href='{{cdn "styles/dark-theme.css" }}' media="all" type="text/css">
+    {{/if}}
+
   </head>
   <body>
     <div class="explore-page-wrap">
