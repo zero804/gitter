@@ -482,4 +482,5 @@ onready(function() { // eslint-disable-line max-statements
       apiClient: require('./components/api-client')
     });
   }, 10000);
+
 });
