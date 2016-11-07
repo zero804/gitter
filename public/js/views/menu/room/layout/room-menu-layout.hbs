@@ -11,7 +11,7 @@
             <div class="room-menu-options__container">
               {{> minibar_activity_indicators}}
               <button class="room-menu-options__item-button" title="All Conversations">
-                <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/home.svg"}}' />
+                {{> svg/home }}
               </button>
             </div>
           </li>
@@ -19,7 +19,7 @@
           <li data-state-change="search" id="minibar-search" class="room-menu-options__item--search">
             <div class="room-menu-options__container">
               <button class="room-menu-options__item-button" title="Search Gitter">
-                <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/search.svg"}}' />
+                {{> svg/search }}
               </button>
             </div>
           </li>
@@ -28,7 +28,7 @@
             <div class="room-menu-options__container">
               {{> minibar_activity_indicators}}
               <button class="room-menu-options__item-button" title="Your One to One Conversations">
-                <img class="room-menu-options__item__avatar" src='{{cdn "images/svg/menu/people.svg"}}' />
+                {{> svg/people }}
               </button>
             </div>
           </li>
@@ -36,7 +36,7 @@
           <li data-state-change="people" id="minibar-groups" class="room-menu-options__item--groups">
             <div class="room-menu-options__container">
               <button class="room-menu-options__item-button" title="Your Communities">
-                <img class="room-menu-options__item__avatar--groups" src='{{cdn "images/svg/menu/groups.svg"}}' />
+                {{> svg/groups }}
               </button>
             </div>
           </li>
