@@ -28,7 +28,7 @@ function newChatPushHandler(event, payload) {
     if (room.oneToOne) {
       title = fromUser.displayName;
     } else {
-      title = fromUser && (fromUser.displayName || fromUser.username) + ' @ ' + room.uri;
+      title = fromUser && (fromUser.displayName || fromUser.username) + ' 💬 ' + room.uri;
     }
 
     var notificationOptions = {
