@@ -12,35 +12,39 @@
 */
 
 /* -------------------------------------------
-Contents
+                Contents
 
 - Variables
 
-- Global
-- Left Menu
-- Chat
+  - Global
+    - Left Menu
+    - Chat
+    - Org Directory
+
 
 - Components
 
-- Left Menu
-- Header
-- Main
-- Text
+  - Left Menu
+    - Header
+    - Main
+    - Text
 
-- Chat
-- Header
-- Main
-- Right Toolbar
+  - Chat
+    - Header
+    - Main
+    - Right Toolbar
 
-- Org Directory
-- Main
+  - Org Directory
+    - Main
+    - List Items
+    - Pagination
 
 
 ------------------------------------------- */
 
 
 /* -------------------------------------------
-Variables
+                Variables
 ------------------------------------------- */
 
 
@@ -89,7 +93,7 @@ Variables
 
 
 /* -------------------------------------------
-Components
+              Components
 ------------------------------------------- */
 
 
@@ -232,11 +236,27 @@ body:not(.mobile) .chat-container div.chat-item:hover {
 // Org Directory
 // --------------------------------------------
 
+// --- Main ---
 //main background class for the whole page
 .org-page-main {
   background-color: @org-page-main-bg-color;
 }
 
+.org-page__header {
+  background-image: none;
+  background-color: @app-header-bg-color;
+}
+
+.org-page__header-heading {
+  a { color: @app-header-text-color; }
+}
+
+.org-page__header-share-link {
+  color: @app-header-text-color;
+  border-color: @app-header-text-color;
+}
+
+// --- List Items ---
 //Each topic and room in the two respective lists
 //displayed on the page
 .org-page__room-item,
@@ -264,6 +284,13 @@ body:not(.mobile) .chat-container div.chat-item:hover {
   color: @org-page-list-item-description-color;
 }
 
+//Tags for each room
+.org-page__room-item__tag-item {
+  background-color: @org-page-list-item-tag-background-color;
+  color: @org-page-list-item-tag-text-color;
+}
+
+// --- Pagination ---
 //Pagination at the bottom of the org directory
 .org-page__pagination {
   a {
@@ -280,24 +307,4 @@ body:not(.mobile) .chat-container div.chat-item:hover {
     background-color: lighten(@org-page-main-bg-color, @hover-highlight-percentage);
     color: inherit;
   }
-}
-
-//Tags for each room
-.org-page__room-item__tag-item {
-  background-color: @org-page-list-item-tag-background-color;
-  color: @org-page-list-item-tag-text-color;
-}
-
-.org-page__header {
-  background-image: none;
-  background-color: @app-header-bg-color;
-}
-
-.org-page__header-heading {
-  a { color: @app-header-text-color; }
-}
-
-.org-page__header-share-link {
-  color: @app-header-text-color;
-  border-color: @app-header-text-color;
 }
