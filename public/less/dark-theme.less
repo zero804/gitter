@@ -78,6 +78,7 @@
 @left-menu-text-color: #868685;
 @left-menu-active-item-bg-color: #2d2c2c;
 @left-menu-active-item-text-color: white;
+@left-menu-search-input-active-color: white;
 
 
 // CHAT
@@ -180,6 +181,17 @@
   );
 }
 
+//UGH
+.left-menu-search.active {
+  input {
+    color: @left-menu-search-input-active-color;
+  }
+  .left-menu-search__clear {
+    color: @left-menu-search-input-active-color;
+  }
+}
+
+
 //  A room item container is the link that sits within the room list items
 //  the active class denotes the current room
 a.room-item__container.active,
@@ -253,6 +265,14 @@ body:not(.mobile) .chat-container div.chat-item:hover {
 .right-toolbar-region .right-toolbar {
   background: @chat-right-toolbar-bg-color;
   border-color: @chat-right-toolbar-left-border-color;
+}
+
+.right-toolbar-region__footer {
+  background: linear-gradient(
+    top,
+    rgba(255, 255, 255, 0),
+    @left-menu-bg-color 35%
+  );
 }
 
 .activity-item,
