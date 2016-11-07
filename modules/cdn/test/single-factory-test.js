@@ -37,6 +37,13 @@ describe('single-factory', function() {
       'xyz123': '//cdn01.gitter.test/xyz123',
       'abc123': '//cdn01.gitter.test/abc123',
     }
+  }, {
+    name: 'should handle longTermCache',
+    longTermCache: '1',
+    mappings: {
+      'xyz123': '//cdn01.gitter.test/_s/lt/1/xyz123',
+      'abc123': '//cdn01.gitter.test/_s/lt/1/abc123',
+    }
   }];
 
   FIXTURES.forEach(function(meta) {
@@ -47,7 +54,8 @@ describe('single-factory', function() {
         var actual = cdn(uri, {
           email: meta.email,
           nonrelative: meta.nonrelative,
-          notStatic: meta.notStatic
+          notStatic: meta.notStatic,
+          longTermCache: meta.longTermCache
         });
         assert.strictEqual(actual, expected);
       })

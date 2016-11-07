@@ -23,6 +23,10 @@ function cdnMultiFactory(cdnOptions) {
 
     var prefix = (options && options.nonrelative) ? "https://" : "//";
 
+    if (options && options.longTermCache) {
+      return prefix + host + "/_s/lt/" + options.longTermCache + "/" + url;
+    }
+
     if(options && options.notStatic === true) {
       return prefix + host + "/" + url;
     }
