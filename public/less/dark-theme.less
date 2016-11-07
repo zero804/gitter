@@ -262,7 +262,14 @@ a.room-item__container:hover { //:cry:
   color: @chat-details-text-color;
 }
 
+.gtrActivityItemText .mention {
+  background-color: @chat-right-toolbar-issue-background;
+  border-color: @chat-right-toolbar-issue-background;
+  &:hover { border-color: @chat-right-toolbar-issue-background; }
+}
+
 .mention { color: @chat-mention-color; }
+
 .issue.open { color: @chat-right-toolbar-issue-open-color; }
 .issue.closed { color: @chat-right-toolbar-issue-closed-color; }
 .issue.is-existent {
@@ -275,7 +282,8 @@ a.room-item__container:hover { //:cry:
   &.open {
     color: @chat-right-toolbar-issue-closed-color;
     background-color: @chat-right-toolbar-issue-background;
-    border-color: @chat-right-toolbar-issue-background;  }
+    border-color: @chat-right-toolbar-issue-background;
+  }
 }
 
 // This is complete and utter BS ...
