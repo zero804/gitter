@@ -163,6 +163,7 @@ router.get('/tags/:tags',
           troupeContext.snapshots = snapshots;
 
           res.render('explore', _.extend({}, snapshots, {
+            hasDarkTheme: req.fflip && req.fflip.has('dark-theme'),
             exploreBaseUrl: req.baseUrl,
             troupeContext: troupeContext,
             isLoggedIn: isLoggedIn,

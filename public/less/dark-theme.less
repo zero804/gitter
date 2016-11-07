@@ -20,6 +20,7 @@
     - Left Menu
     - Chat
     - Org Directory
+    - Explore Page
 
 
 - Components
@@ -38,6 +39,8 @@
     - Main
     - List Items
     - Pagination
+
+  - Explore Page
 
 
 ------------------------------------------- */
@@ -90,6 +93,20 @@
 @org-page-list-item-details-color: @org-page-list-item-description-color;
 @org-page-list-item-tag-background-color: #646362;
 @org-page-list-item-tag-text-color: @org-page-list-item-heading-color;
+
+
+// EXPLORE PAGE
+// --------------------------------------------
+@explore-main-bg-color: @chat-main-bg-color;
+@explore-header-details-color: @org-page-list-item-details-color;
+@explore-header-details-icon-color: @app-header-icon-color;
+@explore-tags-bg-color: @org-page-list-item-tag-background-color;
+@explore-tags-text-color: @org-page-list-item-tag-text-color;
+@explore-room-card-bg-color: @explore-main-bg-color;
+@explore-room-card-border-color: @org-page-list-item-border-color;
+@explore-room-card-heading-color: @org-page-list-item-heading-color;
+@explore-room-card-details-color: @org-page-list-item-details-color;
+@explore-room-card-button-color: @app-header-icon-color;
 
 
 /* -------------------------------------------
@@ -307,4 +324,95 @@ body:not(.mobile) .chat-container div.chat-item:hover {
     background-color: lighten(@org-page-main-bg-color, @hover-highlight-percentage);
     color: inherit;
   }
+}
+
+
+// Explore Page
+// --------------------------------------------
+.explore-header {
+  background-image: none;
+  background-color: @app-header-bg-color;
+}
+
+.explore-header__heading {
+  color: @app-header-text-color;
+}
+
+// --- Main ---
+.explore-page-wrap {
+  background-color: @explore-main-bg-color;
+}
+
+
+// --- Details Section ---
+.explore-header-info-bar__mobile-diagram {
+  background-color: @explore-main-bg-color;
+  i {
+    &:before { background-color: @explore-main-bg-color; }
+    &:after { background-color: @explore-main-bg-color; }
+  }
+}
+
+//UGH ...
+.secondary-header-info-bar__item-icon.icon-apple {
+  position: relative;
+  z-index: 1;
+}
+
+.secondary-header-info-bar {
+  border-color: @explore-header-details-icon-color;
+}
+
+.secondary-header-info-bar__item,
+.explore-header-info-bar__mobile-item {
+  color: @explore-header-details-color;
+}
+
+.secondary-header-info-bar__item-icon,
+.explore-header-info-bar__mobile-icon {
+  color: @explore-header-details-icon-color;
+}
+
+.tag-pill,
+.tag-pill-list-pagination-more-button {
+  background-color: @explore-tags-bg-color;
+  color: @explore-tags-text-color;
+  border-color: transparent;
+
+  &:hover {
+    background-color: lighten(@explore-tags-bg-color, @hover-highlight-percentage);
+  }
+}
+
+// --- Room List ---
+.explore-room-card-list-section {
+  background-color: @explore-main-bg-color;
+}
+
+.room-card {
+  opacity: 1;
+  background-color: @explore-room-card-bg-color;
+  border: 1px solid @explore-room-card-border-color;
+}
+
+.room-card__heading {
+  color: @explore-room-card-heading-color;
+}
+
+.room-card__topic {
+  color: @explore-room-card-details-color;
+}
+
+.room-card__tag {
+  background-color: @explore-tags-bg-color;
+  color: @explore-tags-text-color;
+}
+
+.room-card__footer-user-count {
+  color: @explore-room-card-button-color;
+  border-color: @explore-room-card-button-color;
+}
+
+.room-card__footer {
+  border-color: @explore-room-card-border-color;
 }
