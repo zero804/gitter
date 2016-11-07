@@ -197,14 +197,28 @@ module.exports = CommunityCreateBaseStepView.extend({
     var communityCreateModel = this.communityCreateModel;
     var model = this.model;
     var slug = communityCreateModel.get('communitySlug');
+    var githubOrgId = communityCreateModel.get('githubOrgId');
+    var githubRepoId = communityCreateModel.get('githubRepoId');
+    var type = null;
+    if(githubOrgId) {
+      type = 'GH_ORG';
+    }
+    else if(githubRepoId) {
+      type = 'GH_REPO';
+    }
 
     communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.PENDING);
 
     apiClient.priv.get('/check-group-uri', {
         uri: slug
       })
-      .then(function() {
-        communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.AVAILABLE);
+      .then(function(res) {
+        if(res.type === type) {
+          communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.AVAILABLE);
+        }
+        else {
+          communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.UNAVAILABLE);
+        }
         model.isValid();
       })
       .catch(function(err) {
@@ -214,6 +228,9 @@ module.exports = CommunityCreateBaseStepView.extend({
         }
         else if(status === 403) {
           communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.NEEDS_MORE_PERMISSIONS);
+        }
+        else if(status === 401) {
+          communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.AUTHENTICATION_FAILED);
         }
         else {
           communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.INVALID);
@@ -231,6 +248,6 @@ module.exports = CommunityCreateBaseStepView.extend({
 
     this.ui.communitySlugInputWrapper.toggleClass('pending', status === slugAvailabilityStatusConstants.PENDING);
     this.ui.communitySlugInputWrapper.toggleClass('available', status === slugAvailabilityStatusConstants.AVAILABLE);
-    this.ui.communitySlugInputWrapper.toggleClass('unavailable', status === slugAvailabilityStatusConstants.NEEDS_MORE_PERMISSIONS || status === slugAvailabilityStatusConstants.UNAVAILABLE || status === slugAvailabilityStatusConstants.INVALID);
+    this.ui.communitySlugInputWrapper.toggleClass('unavailable', status === slugAvailabilityStatusConstants.NEEDS_MORE_PERMISSIONS || status === slugAvailabilityStatusConstants.AUTHENTICATION_FAILED || status === slugAvailabilityStatusConstants.UNAVAILABLE || status === slugAvailabilityStatusConstants.INVALID);
   }
 });
