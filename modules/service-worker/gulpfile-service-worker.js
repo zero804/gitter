@@ -21,7 +21,7 @@ gulp.task('service-worker:compile', ['service-worker:compile:webpack']);
 
 gulp.task('service-worker:compile:webpack', function(cb) {
   return webpackPipeline(ROOT, cb)
-    .pipe(gulp.dest(getOutputPath('assets/js')));
+    .pipe(gulp.dest(getOutputPath('assets')));
 });
 
 gulp.task('service-worker:clean', function(cb) {

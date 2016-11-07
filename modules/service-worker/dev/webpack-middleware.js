@@ -1,31 +1,23 @@
 'use strict';
 
-function install(app) {
+function create() {
   var webpack = require('webpack');
   var webpackMiddleware = require("webpack-dev-middleware");
 
-  var middleware = webpackMiddleware(webpack(require('../webpack.config')), {
+  return webpackMiddleware(webpack(require('../webpack.config')), {
     noInfo: false,
     quiet: true,
-    lazy: false,
+    lazy: true,
     watchOptions: {
       aggregateTimeout: 400
     },
-    publicPath: "/_s/l/service-worker",
+    publicPath: "/",
     stats: {
       colors: true
     }
   });
-
-  // This change also needs to be implemented in nginx
-  app.get('/_s/l/service-worker/sw.js', function(req, res, next) {
-    res.set('Service-Worker-Allowed', '/')
-    next();
-  });
-
-  app.use(middleware);
 }
 
 module.exports = {
-  install: install
+  create: create
 };
