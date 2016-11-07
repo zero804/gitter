@@ -1,46 +1,46 @@
 /*
 ---------------------------------------------------------------------------------------------------------------------------------
 
- ██████╗ ██╗████████╗████████╗███████╗██████╗     ██████╗  █████╗ ██████╗ ██╗  ██╗    ████████╗██╗  ██╗███████╗███╗   ███╗███████╗
+██████╗ ██╗████████╗████████╗███████╗██████╗     ██████╗  █████╗ ██████╗ ██╗  ██╗    ████████╗██╗  ██╗███████╗███╗   ███╗███████╗
 ██╔════╝ ██║╚══██╔══╝╚══██╔══╝██╔════╝██╔══██╗    ██╔══██╗██╔══██╗██╔══██╗██║ ██╔╝    ╚══██╔══╝██║  ██║██╔════╝████╗ ████║██╔════╝
 ██║  ███╗██║   ██║      ██║   █████╗  ██████╔╝    ██║  ██║███████║██████╔╝█████╔╝        ██║   ███████║█████╗  ██╔████╔██║█████╗
 ██║   ██║██║   ██║      ██║   ██╔══╝  ██╔══██╗    ██║  ██║██╔══██║██╔══██╗██╔═██╗        ██║   ██╔══██║██╔══╝  ██║╚██╔╝██║██╔══╝
 ╚██████╔╝██║   ██║      ██║   ███████╗██║  ██║    ██████╔╝██║  ██║██║  ██║██║  ██╗       ██║   ██║  ██║███████╗██║ ╚═╝ ██║███████╗
- ╚═════╝ ╚═╝   ╚═╝      ╚═╝   ╚══════╝╚═╝  ╚═╝    ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝       ╚═╝   ╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝╚══════╝
+╚═════╝ ╚═╝   ╚═╝      ╚═╝   ╚══════╝╚═╝  ╚═╝    ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝       ╚═╝   ╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝╚══════╝
 
 ----------------------------------------------------------------------------------------------------------------------------------
 */
 
 /* -------------------------------------------
-                Contents
+Contents
 
 - Variables
 
-  - Global
-  - Left Menu
-  - Chat
+- Global
+- Left Menu
+- Chat
 
 - Components
 
-  - Left Menu
-    - Header
-    - Main
-    - Text
+- Left Menu
+- Header
+- Main
+- Text
 
-  - Chat
-    - Header
-    - Main
-    - Right Toolbar
+- Chat
+- Header
+- Main
+- Right Toolbar
 
-  - Org Directory
-    - Main
+- Org Directory
+- Main
 
 
 ------------------------------------------- */
 
 
 /* -------------------------------------------
-                Variables
+Variables
 ------------------------------------------- */
 
 
@@ -52,6 +52,9 @@
 // Global
 // --------------------------------------------
 @app-header-bg-color: #2d2c2c;
+@app-header-text-color: #bbb7b7;
+@app-header-icon-color: #aaaaaa;
+
 @hover-highlight-percentage: 5%;
 
 
@@ -66,23 +69,27 @@
 
 // CHAT
 // --------------------------------------------
-@chat-header-text-color: #bbb7b7;
-@chat-header-icon-color: #aaaaaa;
 @chat-main-bg-color: #434141;
 @chat-main-text-color: #afaead;
-@chat-details-text-color: @chat-header-icon-color;
+@chat-details-text-color: @app-header-icon-color;
 @chat-right-toolbar-bg-color: @left-menu-bg-color;
 @chat-right-toolbar-left-border-color: @left-menu-minibar-border-color;
 @chat-right-toolbar-text-color: @chat-main-text-color;
 
 
-// CHAT
+// ORG DIRECTORY
 // --------------------------------------------
 @org-page-main-bg-color: @chat-main-bg-color;
+@org-page-list-item-border-color: @left-menu-minibar-border-color;
+@org-page-list-item-heading-color: #dedddc;
+@org-page-list-item-description-color: @left-menu-text-color;
+@org-page-list-item-details-color: @org-page-list-item-description-color;
+@org-page-list-item-tag-background-color: #646362;
+@org-page-list-item-tag-text-color: @org-page-list-item-heading-color;
 
 
 /* -------------------------------------------
-                Components
+Components
 ------------------------------------------- */
 
 
@@ -122,19 +129,18 @@
   border-color: @left-menu-minibar-border-color;
 }
 
-//  The footer that container the "Add a Room button"
+//  The footer that contains the "Add a Room button"
 //  This fades to allow room items to be visible underneath
 .panel-footer__item--all {
   background: linear-gradient(
-    top,
-    rgba(255, 255, 255, 0),
-    @left-menu-bg-color 35%
+  top,
+  rgba(255, 255, 255, 0),
+  @left-menu-bg-color 35%
   );
 }
 
 //  A room item container is the link that sits within the room list items
-//  the active class denotes the room
-//  a user is currently viewing
+//  the active class denotes the current room
 a.room-item__container.active,
 a.room-item__container:hover,
 .room-item--favourite.focus a.room-item__container { //:cry:
@@ -170,9 +176,9 @@ a.room-item__container:hover { //:cry:
 }
 
 .chat-header__title,
-.chat-header__topic { color: @chat-header-text-color; }
+.chat-header__topic { color: @app-header-text-color; }
 
-.chat-header__action-icon { color: @chat-header-icon-color; }
+.chat-header__action-icon { color: @app-header-icon-color; }
 
 // --- Chat Main ---
 .chat-app { background-color: @chat-main-bg-color; }
@@ -225,6 +231,73 @@ body:not(.mobile) .chat-container div.chat-item:hover {
 
 // Org Directory
 // --------------------------------------------
+
+//main background class for the whole page
 .org-page-main {
-  ba
+  background-color: @org-page-main-bg-color;
+}
+
+//Each topic and room in the two respective lists
+//displayed on the page
+.org-page__room-item,
+.org-page__topic-item {
+  border-top-color: @org-page-list-item-border-color;
+  border-right-color: @org-page-list-item-border-color;
+  border-bottom-color: @org-page-list-item-border-color;
+}
+
+//The room name
+.org-page__room-item-heading,
+.org-page__topic-item-heading {
+  color: @org-page-list-item-heading-color;
+}
+
+//The description of the room in the list
+.org-page__room-item-description,
+.org-page__topic-item-description {
+  color: @org-page-list-item-description-color;
+}
+
+//Details like the number of people in the room
+.org-page__room-item-details,
+.org-page__topic-item-details {
+  color: @org-page-list-item-description-color;
+}
+
+//Pagination at the bottom of the org directory
+.org-page__pagination {
+  a {
+    color: @org-page-list-item-heading-color;
+    border-color: @org-page-list-item-border-color;
+
+    &:hover {
+      background-color: lighten(@org-page-main-bg-color, @hover-highlight-percentage);
+      color: @org-page-list-item-heading-color;
+    }
+  }
+
+  .active a {
+    background-color: lighten(@org-page-main-bg-color, @hover-highlight-percentage);
+    color: inherit;
+  }
+}
+
+//Tags for each room
+.org-page__room-item__tag-item {
+  background-color: @org-page-list-item-tag-background-color;
+  color: @org-page-list-item-tag-text-color;
+}
+
+.org-page__header {
+  background-image: none;
+  background-color: @app-header-bg-color;
+}
+
+.org-page__header-heading {
+  a { color: @app-header-text-color; }
+}
+
+.org-page__header-share-link {
+  color: @app-header-text-color;
+  border-color: @app-header-text-color;
 }
