@@ -1,16 +1,10 @@
 'use strict';
 
 var Promise = require('bluebird');
+var supportsWebPush = require('./supports-web-push');
 
 function uninstall() {
-  var Uint8Array = window.Uint8Array;
-  var ServiceWorkerRegistration = window.ServiceWorkerRegistration;
-
-  // Does this browser support Web Push?
-  if (!Uint8Array ||
-      !('serviceWorker' in navigator) ||
-      !ServiceWorkerRegistration ||
-      !('pushManager' in ServiceWorkerRegistration.prototype)) {
+  if (!supportsWebPush()) {
     return false;
   }
 

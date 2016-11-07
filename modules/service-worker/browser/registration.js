@@ -2,19 +2,15 @@
 
 var Promise = require('bluebird');
 var clientEnv = require('gitter-client-env');
+var supportsWebPush = require('./supports-web-push');
 
 function install(options) {
   var apiClient = options.apiClient;
 
   var Uint8Array = window.Uint8Array;
-  var ServiceWorkerRegistration = window.ServiceWorkerRegistration;
 
-  // Does this browser support Web Push?
-  if (!Uint8Array ||
-      !('serviceWorker' in navigator) ||
-      !ServiceWorkerRegistration ||
-      !('pushManager' in ServiceWorkerRegistration.prototype)) {
-    return Promise.reject('ServiceWorker not available')
+  if (!supportsWebPush()) {
+    return Promise.reject('ServiceWorker not available');
   }
 
   function urlBase64ToUint8Array(base64String) {
