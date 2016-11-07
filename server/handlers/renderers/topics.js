@@ -89,6 +89,7 @@ function renderForum(req, res, next, options) {
       return res.render('topics/forum', {
         layout: 'topics-layout',
         hasCachedFonts: fonts.hasCachedFonts(req.cookies),
+        hasDarkTheme: req.fflip && req.fflip.has('dark-theme'),
         fonts: fonts.getFonts(),
         componentData: {
           forum: forum,
@@ -189,6 +190,7 @@ function renderTopic(req, res, next) {
       var topicStore = forumTopicsStore([topic]);
       return res.render('topics/topic', {
         layout: 'topics-layout',
+        hasDarkTheme: req.fflip && req.fflip.has('dark-theme'),
         hasCachedFonts: fonts.hasCachedFonts(req.cookies),
         fonts: fonts.getFonts(),
         componentData: {
