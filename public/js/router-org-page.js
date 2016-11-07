@@ -8,6 +8,7 @@ var appEvents = require('./utils/appevents');
 var modalRegion = require('./components/modal-region');
 var _ = require('underscore');
 var clientEnv = require('gitter-client-env');
+var ProfileMenu = require('./views/profile-menu/profile-menu-view.js');
 
 require('gitter-styleguide/css/components/buttons.css');
 require('gitter-styleguide/css/components/headings.css');
@@ -44,6 +45,12 @@ onReady(function(){
     if(data.type !== 'change:room') return;
     window.location.replace(data.url);
   });
+
+  var profileMenu = new ProfileMenu({
+    el: '#profile-menu'
+  });
+
+  profileMenu.render();
 
   var Router = Backbone.Router.extend({
 
