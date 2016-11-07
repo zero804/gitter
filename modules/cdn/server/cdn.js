@@ -4,85 +4,45 @@ var env = require('gitter-web-env');
 var nconf = env.config;
 var appVersion = require('gitter-app-version');
 
-var hosts, hostLength, cdnPrefix;
+function chooseFactory() {
+  var useCdn = nconf.get("cdn:use");
 
-function passthrough(url, options) {
-  if(!url) url = ""; // This should not be happening
+  if(useCdn) {
+    var hosts = nconf.get("cdn:hosts");
+    var hostLength = hosts.length;
 
-  var nonrelative = options && options.nonrelative;
-  var email = options && options.email;
-  var prefix;
-  if (email) {
-    prefix = nconf.get('email:emailBasePath') + "/_s/l/";
+    if(hostLength > 1) {
+      return require('../shared/multi-factory');
+    } else {
+      return require('../shared/single-factory');
+    }
   } else {
-    prefix = nonrelative ? nconf.get('web:basepath') + "/_s/l/" : "/_s/l/";
+    return require('../shared/passthrough-factory');
   }
-  return prefix + url;
 }
 
-function cdnSingle(url, options) {
-  if(!url) url = ""; // This should not be happening
+function getCdnPrefix() {
+  if(nconf.get("cdn:use")) {
+    var cdnPrefix = nconf.get("cdn:prefix");
 
-  var nonrelative = options && options.nonrelative;
-  var email = options && options.email;
+    if(cdnPrefix) {
+      return "/" + cdnPrefix;
+    }
 
-  if (email) {
-    return nconf.get('email:emailBasePath') + "/_s/l/" + url;
-  }
-
-  var prefix = nonrelative ? "https://" : "//";
-  if(options && options.notStatic === true) {
-    return prefix + hosts[0] + "/" + url;
-  }
-
-  return prefix + hosts[0] + cdnPrefix + "/" + url;
-}
-
-function cdnMulti(url, options) {
-  if(!url) url = ""; // This should not be happening
-
-  var email = options && options.email;
-
-  if (email) {
-    return nconf.get('email:emailBasePath') + "/_s/l/" + url;
-  }
-
-  var x = 0;
-  for(var i = 0; i < url.length; i = i + 3) {
-    x = x + url.charCodeAt(i);
-  }
-
-  var host = hosts[x % hostLength];
-
-  var nonrelative = options && options.nonrelative;
-  var prefix = nonrelative ? "https://" : "//";
-
-  if(options && options.notStatic === true) {
-    return prefix + host + "/" + url;
-  }
-
-  return prefix + host + cdnPrefix + "/" + url;
-}
-
-var useCdn = nconf.get("cdn:use");
-
-if(useCdn) {
-  hosts = nconf.get("cdn:hosts");
-  hostLength = hosts.length;
-
-  cdnPrefix = nconf.get("cdn:prefix");
-  if(cdnPrefix) {
-    cdnPrefix = "/" + cdnPrefix;
-  } else {
     var assetTag = appVersion.getAssetTag();
-    cdnPrefix = assetTag ? "/_s/" + assetTag : '';
-  }
-
-  if(hostLength > 1) {
-    module.exports = cdnMulti;
+    return assetTag ? "/_s/" + assetTag : '';
   } else {
-    module.exports = cdnSingle;
+    return '';
   }
-} else {
-  module.exports = passthrough;
 }
+
+var factory = chooseFactory();
+
+var cdnOptions = {
+  emailBasePath: nconf.get('email:emailBasePath'),
+  webBasepath: nconf.get('web:basepath'),
+  hosts: nconf.get("cdn:hosts"),
+  cdnPrefix: getCdnPrefix()
+};
+
+module.exports = factory(cdnOptions);
