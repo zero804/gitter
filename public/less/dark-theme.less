@@ -79,6 +79,7 @@
 @left-menu-active-item-bg-color: #2d2c2c;
 @left-menu-active-item-text-color: white;
 @left-menu-search-input-active-color: white;
+@left-menu-footer-button-color: white;
 
 
 // CHAT
@@ -200,7 +201,15 @@ a.room-item__container:hover,
 
   //  :point_up: sometimes I hate specificity
   //  as this is crusty and brittle
-  background-color: @left-menu-active-item-bg-color;
+  background-color: @left-menu-active-item-bg-color !important;
+  // NB DAMNIT I WANTED TO GET AWAY WITH 0 IMPORTANT RULES
+  // ARRRRRGHHHHHHHHHHHH
+}
+
+.panel-footer__create-room,
+.panel-footer__button {
+  color: @left-menu-footer-button-color;
+  border-color: @left-menu-footer-button-color;
 }
 
 
@@ -214,7 +223,7 @@ a.room-item__container:hover,
 a.room-item__container.active,
 a.room-item__container:hover { //:cry:
   & .room-item__title {
-    color: @left-menu-active-item-text-color;
+    color: @left-menu-active-item-text-color !important;
   }
 }
 
