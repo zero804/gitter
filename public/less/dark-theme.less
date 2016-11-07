@@ -93,6 +93,7 @@
 @chat-main-text-color: #afaead;
 @chat-details-text-color: @app-header-icon-color;
 @chat-mention-color: lighten(@jaffa, @hover-highlight-percentage);
+
 @chat-right-toolbar-bg-color: @left-menu-bg-color;
 @chat-right-toolbar-left-border-color: @left-menu-minibar-border-color;
 @chat-right-toolbar-text-color: @chat-main-text-color;
@@ -100,6 +101,12 @@
 @chat-right-toolbar-issue-open-color: @caribbean;
 @chat-right-toolbar-issue-closed-color: @ruby;
 @chat-right-toolbar-issue-background: #222;
+
+@chat-popover-header-color: @app-header-bg-color;
+@chat-popover-header-text-color: @org-page-list-item-heading-color;
+@chat-popover-detail-text-color: @org-page-list-item-heading-color;
+@chat-popover-body-color: @chat-main-bg-color;
+@chat-popover-footer-color: @chat-popover-header-color;
 
 
 
@@ -250,7 +257,6 @@ a.room-item__container:hover { //:cry:
 
 .chat-header__title,
 .chat-header__topic { color: @app-header-text-color; }
-
 .chat-header__action-icon { color: @app-header-icon-color; }
 
 // --- Chat Main ---
@@ -270,21 +276,33 @@ a.room-item__container:hover { //:cry:
 
 .mention { color: @chat-mention-color; }
 
-.issue.open { color: @chat-right-toolbar-issue-open-color; }
-.issue.closed { color: @chat-right-toolbar-issue-closed-color; }
-.issue.is-existent {
-  &.closed {
-    color: @chat-right-toolbar-issue-closed-color;
-    background-color: @chat-right-toolbar-issue-background;
-    border-color: @chat-right-toolbar-issue-background;
-  }
+.popover { background-color: transparent; }
 
-  &.open {
-    color: @chat-right-toolbar-issue-closed-color;
-    background-color: @chat-right-toolbar-issue-background;
-    border-color: @chat-right-toolbar-issue-background;
-  }
+.popover-title {
+  background-color: @chat-popover-header-color;
+  border-bottom: none;
 }
+
+.issue-popover-title a {
+  color: @chat-popover-header-text-color;
+}
+
+.chat-item__details { color: @chat-popover-detail-text-color; }
+
+.popover-content { background-color: @chat-popover-body-color; }
+
+//TODO Other Directions
+.popover.left .arrow { right: -10px; }
+.popover.left .arrow:after {
+  border-left-color: @chat-popover-body-color;
+}
+
+.popover-footer {
+  background-color: @chat-popover-footer-color;
+  border-bottom: none;
+}
+
+
 
 // This is complete and utter BS ...
 body:not(.mobile) .chat-container div.chat-item:hover {
@@ -293,7 +311,6 @@ body:not(.mobile) .chat-container div.chat-item:hover {
 
 .chat-item__text {
   color: @chat-main-text-color;
-
   a { color: @caribbean; }
 }
 
@@ -319,6 +336,9 @@ body:not(.mobile) .chat-container div.chat-item:hover {
   );
 }
 
+.trpStatus { border-color: @chat-right-toolbar-bg-color; }
+.trpDisplayPicture.offline .trpStatus { background-color: @chat-right-toolbar-bg-color; }
+
 .activity-item,
 .activity-tip {
   color: @chat-right-toolbar-text-color;
@@ -339,9 +359,21 @@ body:not(.mobile) .chat-container div.chat-item:hover {
   }
 }
 
+.issue.open { color: @chat-right-toolbar-issue-open-color; }
+.issue.closed { color: @chat-right-toolbar-issue-closed-color; }
+.issue.is-existent {
+  &.closed {
+    color: @chat-right-toolbar-issue-closed-color;
+    background-color: @chat-right-toolbar-issue-background;
+    border-color: @chat-right-toolbar-issue-background;
+  }
 
-.trpStatus { border-color: @chat-right-toolbar-bg-color; }
-.trpDisplayPicture.offline .trpStatus { background-color: @chat-right-toolbar-bg-color; }
+  &.open {
+    color: @chat-right-toolbar-issue-closed-color;
+    background-color: @chat-right-toolbar-issue-background;
+    border-color: @chat-right-toolbar-issue-background;
+  }
+}
 
 
 // Org Directory
@@ -547,7 +579,7 @@ body:not(.mobile) .chat-container div.chat-item:hover {
   color: @topics-header-button-color;
 }
 
-//Ugh, custom stylings for selects ...
+//  custom stylings for selects ...
 .table-control__select--decal:after {
   color: @topics-header-button-color;
 }
