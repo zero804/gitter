@@ -10,7 +10,7 @@ var config = {
     path: path.resolve(__dirname, "./output/assets/"),
     filename: "[name].js",
     chunkFilename: "[id].chunk.js",
-    publicPath: "/_s/l/web-push/",
+    publicPath: "/",
     devtoolModuleFilenameTemplate: "[resource-path]",
     devtoolFallbackModuleFilenameTemplate: "[resource-path]?[hash]"
   },

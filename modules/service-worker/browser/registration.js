@@ -33,7 +33,7 @@ function install(options) {
     return outputArray;
   }
 
-  return Promise.resolve(navigator.serviceWorker.register('/_s/l/service-worker/sw.js', { scope: '/' }))
+  return Promise.resolve(navigator.serviceWorker.register('/sw.js', { scope: '/' }))
     .then(function(registration) {
       var vapidPublicKey = clientEnv.vapidAppServerKey;
       var convertedVapidKey = urlBase64ToUint8Array(vapidPublicKey);
