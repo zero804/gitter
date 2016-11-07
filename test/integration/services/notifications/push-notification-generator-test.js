@@ -11,12 +11,11 @@ var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var times = mockito.Verifiers.times;
 var once = times(1);
 
+var SERIALIZED_ROOM = { id: 'serializedId', name: 'serializedName', url: 'serializedUrl' };
+var SERIALIZED_CHATS = [{id: 'serializedChatId', text: 'serializedText', fromUser: {displayName: 'serializedFromUser'}}];
+
 var pushNotificationFilterStub = {
   canUnlockForNotification: function() { return Promise.resolve(Date.now()); }
-};
-
-var userServiceStub = {
-  findById: function(userId, callback) { callback(null, {});}
 };
 
 var unreadItemServiceStub = {
@@ -30,11 +29,11 @@ var notificationSerializerStub = {
   ChatIdStrategy: function() { this.name = 'chatId'; },
   serialize: function(item, strategy) {
     assert.strictEqual(strategy.name, 'chatId');
-    return Promise.resolve([{id: 'serializedChatId', text: 'serializedText', fromUser: {displayName: 'serializedFromUser'}}]);
+    return Promise.resolve(SERIALIZED_CHATS);
   },
   serializeObject: function(item, strategy) {
     assert.strictEqual(strategy.name, 'troupeId');
-    return Promise.resolve({id: 'serializedId', name: 'serializedName', url: 'serializedUrl'});
+    return Promise.resolve(SERIALIZED_ROOM);
   }
 };
 
@@ -46,7 +45,6 @@ describe('push notification generator service', function() {
 
     var service = testRequire.withProxies('./services/notifications/push-notification-generator', {
       'gitter-web-push-notification-filter': pushNotificationFilterStub,
-      '../user-service': userServiceStub,
       '../../gateways/push-notification-gateway': {
         sendUserNotification: mockSendUserNotification
       },
@@ -62,19 +60,20 @@ describe('push notification generator service', function() {
   });
 
   it('should serialize troupes and chats correctly', function(done) {
-    var mockSendUserNotification = function(userId, notification) {
+    var mockSendUserNotification = function(notificationType, userId, options) {
+      assert.strictEqual(notificationType, 'new_chat');
       assert.equal(userId, 'userId1234');
-      assert.equal(notification.link, '/mobile/chat#serializedId');
-      assert.equal(notification.roomId, "serializedId");
-      assert.equal(notification.roomName, "serializedName");
-      assert(notification.message);
-      assert(notification.message.indexOf('serializedFromUser') >= 0, 'serialized unread chat data not found');
+      assert.deepEqual(options, {
+        room: SERIALIZED_ROOM,
+        chats: SERIALIZED_CHATS,
+        hasMentions: false
+      });
+
       return Promise.resolve();
     };
 
     var service = testRequire.withProxies('./services/notifications/push-notification-generator', {
       'gitter-web-push-notification-filter': pushNotificationFilterStub,
-      '../user-service': userServiceStub,
       '../../gateways/push-notification-gateway': {
         sendUserNotification: mockSendUserNotification
       },

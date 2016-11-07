@@ -10,6 +10,7 @@ var EVENT_LISTENERS = [
   './room-membership-events',
   './destroy-user-tokens-listener',
   './room-membership-permission-check-failed',
+  './apn-feedback-listener',
 ];
 
 var installed = false;

@@ -32,7 +32,7 @@ npm cache clear
 npm i --production --registry http://beta-internal.beta.gitter:4873/
 
 # Perform shrinkwrap on production dependencies
-npm shrinkwrap
+npm shrinkwrap "$@"
 
 # Fix hostnames in the shrinkwrap file
 ${SCRIPT_DIR}/fix-shrinkwrap-registry
