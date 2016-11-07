@@ -175,7 +175,8 @@ onready(function() {
   });
 
   setTimeout(function() {
-    require('gitter-web-service-worker/browser/deregistration').uninstall();
+    var serviceWorkerDeregistration = require('gitter-web-service-worker/browser/deregistration');
+    serviceWorkerDeregistration.uninstall();
   }, 5000);
 
 
