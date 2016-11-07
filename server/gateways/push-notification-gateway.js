@@ -38,16 +38,15 @@ function getGatewayForDevice(device) {
 function sendNotificationToDevice(notificationType, notificationDetails, device) {
   var gateway = getGatewayForDevice(device);
 
-  if (!gateway) return;
+  if (!gateway) return false;
 
-  var notificationPromise = gateway.sendNotificationToDevice(notificationType, notificationDetails, device);
-  if (!notificationPromise) return;
-
-  return Promise.resolve(notificationPromise)
+  return gateway.sendNotificationToDevice(notificationType, notificationDetails, device)
     .bind({
       device: device
     })
-    .tap(function() {
+    .tap(function(notificationSent) {
+      if (!notificationSent) return;
+
       var device = this.device;
 
       stats.event("push_notification", {

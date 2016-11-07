@@ -31,16 +31,17 @@ function sendNotificationToDevice(notificationType, notificationDetails, device)
   };
 
   var payloadData = vapidNotificationGeneration(notificationType, notificationDetails, device);
-  if (!payloadData) return;
+  if (!payloadData) return false;
 
   return Promise.resolve(webpush.sendNotification(pushSubscription, JSON.stringify(payloadData), {
       TTL: DEFAULT_TTL_SECONDS
     }))
+    .return(true)
     .catch(isVapidGoneError, function(err) {
       throw new InvalidRegistrationError(err.message);
-    });
+    })
 }
 
 module.exports = {
-  sendNotificationToDevice: sendNotificationToDevice
+  sendNotificationToDevice: Promise.method(sendNotificationToDevice)
 }

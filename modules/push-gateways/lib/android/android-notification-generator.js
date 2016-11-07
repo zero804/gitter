@@ -12,7 +12,7 @@ function generateNewChatNotifications(notificationType, notificationDetails/*, d
     data: {
       id: room.id,
       name: room.name || room.uri,
-      message: message // @trevorah - is this actually used?
+      message: message // Still used on Android
     }
   });
 }
