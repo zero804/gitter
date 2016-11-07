@@ -6,7 +6,7 @@
 ██║  ███╗██║   ██║      ██║   █████╗  ██████╔╝    ██║  ██║███████║██████╔╝█████╔╝        ██║   ███████║█████╗  ██╔████╔██║█████╗
 ██║   ██║██║   ██║      ██║   ██╔══╝  ██╔══██╗    ██║  ██║██╔══██║██╔══██╗██╔═██╗        ██║   ██╔══██║██╔══╝  ██║╚██╔╝██║██╔══╝
 ╚██████╔╝██║   ██║      ██║   ███████╗██║  ██║    ██████╔╝██║  ██║██║  ██║██║  ██╗       ██║   ██║  ██║███████╗██║ ╚═╝ ██║███████╗
-╚═════╝ ╚═╝   ╚═╝      ╚═╝   ╚══════╝╚═╝  ╚═╝    ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝       ╚═╝   ╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝╚══════╝
+ ╚═════╝ ╚═╝   ╚═╝      ╚═╝   ╚══════╝╚═╝  ╚═╝    ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝       ╚═╝   ╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝╚══════╝
 
 ----------------------------------------------------------------------------------------------------------------------------------
 */
@@ -92,9 +92,15 @@
 @chat-main-bg-color: #434141;
 @chat-main-text-color: #afaead;
 @chat-details-text-color: @app-header-icon-color;
+@chat-mention-color: lighten(@jaffa, @hover-highlight-percentage);
 @chat-right-toolbar-bg-color: @left-menu-bg-color;
 @chat-right-toolbar-left-border-color: @left-menu-minibar-border-color;
 @chat-right-toolbar-text-color: @chat-main-text-color;
+@chat-right-toolbar-activity-hover-color: white;
+@chat-right-toolbar-issue-open-color: @caribbean;
+@chat-right-toolbar-issue-closed-color: @ruby;
+@chat-right-toolbar-issue-background: #222;
+
 
 
 // ORG DIRECTORY
@@ -140,6 +146,7 @@
               Components
 ------------------------------------------- */
 
+body { background-color: @chat-main-bg-color; }
 
 // LEFT MENU
 // --------------------------------------------
@@ -255,7 +262,21 @@ a.room-item__container:hover { //:cry:
   color: @chat-details-text-color;
 }
 
-.mention { color: @jaffa; }
+.mention { color: @chat-mention-color; }
+.issue.open { color: @chat-right-toolbar-issue-open-color; }
+.issue.closed { color: @chat-right-toolbar-issue-closed-color; }
+.issue.is-existent {
+  &.closed {
+    color: @chat-right-toolbar-issue-closed-color;
+    background-color: @chat-right-toolbar-issue-background;
+    border-color: @chat-right-toolbar-issue-background;
+  }
+
+  &.open {
+    color: @chat-right-toolbar-issue-closed-color;
+    background-color: @chat-right-toolbar-issue-background;
+    border-color: @chat-right-toolbar-issue-background;  }
+}
 
 // This is complete and utter BS ...
 body:not(.mobile) .chat-container div.chat-item:hover {
@@ -300,6 +321,16 @@ body:not(.mobile) .chat-container div.chat-item:hover {
     background-color: darken(@chat-right-toolbar-bg-color, @hover-highlight-percentage);
   }
 }
+
+.activity-item:hover {
+  .gtrActivityItemText {
+    color: @chat-right-toolbar-activity-hover-color;
+  }
+  .activity-item__icon {
+    color: @chat-right-toolbar-activity-hover-color;
+  }
+}
+
 
 .trpStatus { border-color: @chat-right-toolbar-bg-color; }
 .trpDisplayPicture.offline .trpStatus { background-color: @chat-right-toolbar-bg-color; }
