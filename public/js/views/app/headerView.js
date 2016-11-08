@@ -18,6 +18,7 @@ var Dropdown = require('../controls/dropdown');
 var KeyboardEventMixin = require('../keyboard-events-mixin');
 var headerViewTemplate = require('./tmpl/headerViewTemplate.hbs');
 var getHeaderViewOptions = require('gitter-web-shared/templates/get-header-view-options');
+var ProfileMenu = require('../profile-menu/profile-menu-view');
 
 require('../behaviors/tooltip');
 require('transloadit');
@@ -88,6 +89,7 @@ var HeaderView = Marionette.ItemView.extend({
     this.rightToolbarModel = options.rightToolbarModel;
     this.menuItemsCollection = new Backbone.Collection([]);
     this.buildDropdown();
+
 
     this.listenTo(this.rightToolbarModel, 'change:isPinned', this.onPanelPinStateChange, this);
   },
@@ -170,6 +172,13 @@ var HeaderView = Marionette.ItemView.extend({
       // Deal with re-renders
       this.dropdown.hide();
     }
+
+    //If an instance of the profile menu exists destory it to remove listeners etc
+    if(this.profileMenu) { this.profileMenu.destroy(); }
+    //Make a new profile menu
+    this.profileMenu = new ProfileMenu({ el: '#profile-menu' });
+    //Render it
+    this.profileMenu.render();
 
     this.ui.favourite.css({ visibility: context.isLoggedIn() ? 'visible' : 'hidden' });
     this.ui.favourite.toggleClass('favourite', !!this.model.get('favourite'));
@@ -473,6 +482,4 @@ var HeaderView = Marionette.ItemView.extend({
 });
 
 cocktail.mixin(HeaderView, KeyboardEventMixin);
-
-
 module.exports = HeaderView;

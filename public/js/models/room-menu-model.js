@@ -314,7 +314,6 @@ module.exports = Backbone.Model.extend({
     data = data || {};
     this.set({
       panelOpenState: true,
-      profileMenuOpenState: false,
       state: data.state,
       groupId: data.groupId,
     });
