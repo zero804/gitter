@@ -49,7 +49,6 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
     var id = el.dataset.id;
     var type = el.dataset.type;
     var siblingID = !!sibling && sibling.dataset.id;
-    console.log('onItemDropped', type, id);
 
     if (type === 'room' && target.classList.contains('collection-list--primary')) {
       this.trigger('room-menu:remove-favourite', id);
