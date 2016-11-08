@@ -8,7 +8,6 @@ var restful = require("../../../services/restful");
 var restSerializer = require("../../../serializers/rest-serializer");
 
 var groupService = require('gitter-web-groups/lib/group-service');
-var groupCore = require('../../../services/core/group-core');
 
 // Based on ./server/api/v1/user/troupes.js -> `performUpdateToUserRoom`
 function performUpdateToUserGroup(req) {
@@ -24,7 +23,7 @@ function performUpdateToUserGroup(req) {
   if('favourite' in updatedGroup) {
     var fav = updatedGroup.favourite;
 
-    promises.push(groupCore.updateFavourite(userId, groupId, fav));
+    promises.push(groupService.updateFavourite(userId, groupId, fav));
   }
 
   return Promise.all(promises)

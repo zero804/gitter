@@ -1,9 +1,8 @@
 "use strict";
 
-var testRequire = require('../../test-require');
 var assert = require('assert');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
-var groupCore = testRequire("./services/core/group-core");
+var groupFavouritesCore = require('../lib/group-favourites-core');
 
 describe('group-core', function() {
   describe('ordering #slow', function() {
@@ -42,16 +41,16 @@ describe('group-core', function() {
       this.timeout(10000);
 
       function getFavs() {
-        return groupCore.findFavouriteGroupsForUser(fixture.user1.id);
+        return groupFavouritesCore.findFavouriteGroupsForUser(fixture.user1.id);
       }
 
-      groupCore.updateFavourite(fixture.user1.id, fixture.group1.id, 1)
+      groupFavouritesCore.updateFavourite(fixture.user1.id, fixture.group1.id, 1)
         .then(getFavs)
         .then(function(favs) {
           assert.equal(favs[fixture.group1.id], 1);
         })
         .then(function() {
-          return groupCore.updateFavourite(fixture.user1.id, fixture.group2.id, 1);
+          return groupFavouritesCore.updateFavourite(fixture.user1.id, fixture.group2.id, 1);
         })
         .then(getFavs)
         .then(function(favs) {
@@ -59,7 +58,7 @@ describe('group-core', function() {
           assert.equal(favs[fixture.group2.id], 1);
         })
         .then(function() {
-          return groupCore.updateFavourite(fixture.user1.id, fixture.group2.id, 3);
+          return groupFavouritesCore.updateFavourite(fixture.user1.id, fixture.group2.id, 3);
         })
         .then(getFavs)
         .then(function(favs) {
@@ -67,7 +66,7 @@ describe('group-core', function() {
           assert.equal(favs[fixture.group2.id], 3);
         })
         .then(function() {
-          return groupCore.updateFavourite(fixture.user1.id, fixture.group3.id, 1);
+          return groupFavouritesCore.updateFavourite(fixture.user1.id, fixture.group3.id, 1);
         })
         .then(getFavs)
         .then(function(favs) {
@@ -76,7 +75,7 @@ describe('group-core', function() {
           assert.equal(favs[fixture.group2.id], 3);
         })
         .then(function() {
-          return groupCore.updateFavourite(fixture.user1.id, fixture.group2.id, 2);
+          return groupFavouritesCore.updateFavourite(fixture.user1.id, fixture.group2.id, 2);
         })
         .then(getFavs)
         .then(function(favs) {
@@ -85,7 +84,7 @@ describe('group-core', function() {
           assert.equal(favs[fixture.group1.id], 3);
         })
         .then(function() {
-          return groupCore.updateFavourite(fixture.user1.id, fixture.group1.id, 4);
+          return groupFavouritesCore.updateFavourite(fixture.user1.id, fixture.group1.id, 4);
         })
         .then(getFavs)
         .then(function(favs) {
@@ -94,7 +93,7 @@ describe('group-core', function() {
           assert.equal(favs[fixture.group1.id], 4);
         })
         .then(function() {
-          return groupCore.updateFavourite(fixture.user1.id, fixture.group4.id, 1);
+          return groupFavouritesCore.updateFavourite(fixture.user1.id, fixture.group4.id, 1);
         })
         .then(getFavs)
         .then(function(favs) {
@@ -128,9 +127,9 @@ describe('group-core', function() {
     it('should add a group to favourites',function(done) {
 
       function fav(val, callback) {
-        return groupCore.updateFavourite(fixture.user1.id, fixture.group1.id, val)
+        return groupFavouritesCore.updateFavourite(fixture.user1.id, fixture.group1.id, val)
           .then(function() {
-            return groupCore.findFavouriteGroupsForUser(fixture.user1.id);
+            return groupFavouritesCore.findFavouriteGroupsForUser(fixture.user1.id);
           })
           .then(function(favs) {
             var isInGroup = !!favs[fixture.troupe1.id];

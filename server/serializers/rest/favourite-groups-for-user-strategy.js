@@ -1,6 +1,6 @@
 "use strict";
 
-var groupCore = require('../../services/core/group-core');
+var groupService = require('gitter-web-groups/lib/group-service');
 
 // Based on ./server/serializers/rest/troupes/favourite-troupes-for-user-strategy.js
 function FavouriteGroupsForUserStrategy(options) {
@@ -10,7 +10,7 @@ function FavouriteGroupsForUserStrategy(options) {
 
 FavouriteGroupsForUserStrategy.prototype = {
   preload: function() {
-    return groupCore.findFavouriteGroupsForUser(this.userId)
+    return groupService.findFavouriteGroupsForUser(this.userId)
       .bind(this)
       .then(function(favs) {
         this.favs = favs;
