@@ -293,8 +293,8 @@ a.room-item__container:hover { //:cry:
 
 
 // This is complete and utter BS ...
-body:not(.mobile) .chat-container div.chat-item:hover {
-  background-color: darken(@chat-main-bg-color, @hover-highlight-percentage);
+.chat-item:hover {
+  background-color: darken(@chat-main-bg-color, @hover-highlight-percentage) !important;
 }
 
 .chat-item__text {
