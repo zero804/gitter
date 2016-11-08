@@ -80,6 +80,7 @@
 // --------------------------------------------
 @left-menu-bg-color: #383736;
 @left-menu-minibar-border-color: #2d2c2c;
+@left-menu-minibar-icon-color: #aeaeae;
 @left-menu-text-color: #868685;
 @left-menu-active-item-bg-color: #2d2c2c;
 @left-menu-active-item-text-color: white;
@@ -174,6 +175,12 @@ body { background-color: @chat-main-bg-color; }
   //  Again we use a cheeky pseudo class to span the border
   &:after {
     background-color: @app-header-bg-color;
+  }
+}
+.icon-svg {
+  .icon {
+    stroke: @left-menu-minibar-icon-color;
+    fill: @left-menu-minibar-icon-color;
   }
 }
 
