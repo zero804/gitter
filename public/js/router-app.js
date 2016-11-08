@@ -15,6 +15,7 @@ var urlParser = require('./utils/url-parser');
 var RAF = require('./utils/raf');
 var appEvents = require('./utils/appevents');
 var context = require('./utils/context');
+var toggleDarkTheme = require('./utils/toggle-dark-theme');
 
 var TitlebarUpdater = require('./components/titlebar');
 var realtime = require('./components/realtime');
@@ -340,6 +341,10 @@ onready(function() { // eslint-disable-line max-statements
         var title = message.url.substring(1);
         pushState(frameUrl, title, url);
       break;
+
+      case 'toggle-dark-theme':
+        toggleDarkTheme();
+        break;
     }
   }, false);
 
