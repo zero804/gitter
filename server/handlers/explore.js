@@ -16,6 +16,7 @@ var suggestionsService = require('../services/suggestions-service');
 var exploreTagUtils = require('../utils/explore-tag-utils');
 var generateExploreSnapshot = require('./snapshots/explore-snapshot');
 var fonts = require('../web/fonts');
+var isMobile = require('../web/is-phone');
 
 var processTagInput = function(input) {
   input = input || '';
@@ -163,6 +164,7 @@ router.get('/tags/:tags',
           troupeContext.snapshots = snapshots;
 
           res.render('explore', _.extend({}, snapshots, {
+            isMobile: isMobile(req),
             exploreBaseUrl: req.baseUrl,
             troupeContext: troupeContext,
             isLoggedIn: isLoggedIn,
