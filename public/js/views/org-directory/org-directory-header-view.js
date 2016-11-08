@@ -4,12 +4,14 @@ var _ = require('underscore');
 var Marionette = require('backbone.marionette');
 var toggleClass = require('../../utils/toggle-class');
 
+var ProfileMenu = require('../../views/profile-menu/profile-menu-view.js');
 var headerViewTemplate = require('./org-directory-header-view.hbs');
 
+require('../behaviors/isomorphic');
 require('../behaviors/tooltip');
 
 
-var HeaderView = Marionette.ItemView.extend({
+var HeaderView = Marionette.LayoutView.extend({
   el: 'header',
   template: headerViewTemplate,
 
@@ -27,9 +29,19 @@ var HeaderView = Marionette.ItemView.extend({
   },
 
   behaviors: {
+    Isomorphic: {
+      profileMenuView: { el: '#profile-menu', init: 'initProfileMenuView' }
+    },
     Tooltip: {
       '.js-group-favourite-button': { placement: 'left' }
     },
+  },
+
+  initProfileMenuView: function(optionsForRegion) {
+    this.profileMenuView = new ProfileMenu(optionsForRegion({
+      // ...
+    }));
+    return this.profileMenuView;
   },
 
 
