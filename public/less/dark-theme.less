@@ -69,6 +69,7 @@
 
 // Global
 // --------------------------------------------
+@app-main-bg-color: #434141;
 @app-header-bg-color: #2d2c2c;
 @app-header-text-color: #bbb7b7;
 @app-header-icon-color: #aaaaaa;
@@ -92,7 +93,7 @@
 
 // CHAT
 // --------------------------------------------
-@chat-main-bg-color: #434141;
+@chat-main-bg-color: @app-main-bg-color;
 @chat-main-text-color: #afaead;
 @chat-details-text-color: @app-header-icon-color;
 @chat-mention-color: lighten(@jaffa, @hover-highlight-percentage);
@@ -108,7 +109,7 @@
 
 // ORG DIRECTORY
 // --------------------------------------------
-@org-page-main-bg-color: @chat-main-bg-color;
+@org-page-main-bg-color: @app-main-bg-color;
 @org-page-list-item-border-color: @left-menu-minibar-border-color;
 @org-page-list-item-heading-color: #dedddc;
 @org-page-list-item-description-color: @left-menu-text-color;
@@ -119,7 +120,7 @@
 
 // EXPLORE PAGE
 // --------------------------------------------
-@explore-main-bg-color: @chat-main-bg-color;
+@explore-main-bg-color: @app-main-bg-color;
 @explore-header-details-color: @org-page-list-item-details-color;
 @explore-header-details-icon-color: @app-header-icon-color;
 @explore-tags-bg-color: @org-page-list-item-tag-background-color;
@@ -133,7 +134,7 @@
 
 // TOPICS
 // --------------------------------------------
-@topics-main-bg-color: @chat-main-bg-color;
+@topics-main-bg-color: @app-main-bg-color;
 @topics-section-border-color: @left-menu-minibar-border-color;
 @topics-header-button-color: @app-header-icon-color;
 @topics-table-headings-color: @org-page-list-item-details-color;
@@ -149,8 +150,8 @@
               Components
 ------------------------------------------- */
 
-body { background-color: @chat-main-bg-color; }
-code {
+body { background-color: @app-main-bg-color;
+code { //Single line code blocks don't have a `pre` element
   border: none;
   background-color: @app-single-line-code-color;
   padding: .2rem .5rem;
