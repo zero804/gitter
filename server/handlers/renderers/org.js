@@ -148,7 +148,7 @@ function renderOrgPage(req, res, next) {
       serializeGroup(group, user),
       getRoomsWithMembership(groupId, user, currentPage),
       getForumForGroup(group.uri, group.forumId, user && user.id),
-      contextGenerator.generateNonChatContext(req),
+      contextGenerator.generateMainMenuContext(req),
       policy.canAdmin(),
       function(serializedGroup, roomBrowseResult, serializedForum, troupeContext, isOrgAdmin) {
         var isStaff = req.user && req.user.staff;

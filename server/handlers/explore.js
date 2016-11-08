@@ -96,7 +96,8 @@ router.get('/tags/:tags',
   featureToggles,
   isPhoneMiddleware,
   function(req, res, next) {
-    contextGenerator.generateNonChatContext(req).then(function(troupeContext) {
+    contextGenerator.generateBasicContext(req)
+    .then(function(troupeContext) {
       var user = troupeContext.user;
       var isLoggedIn = !!user;
 
