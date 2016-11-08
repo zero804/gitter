@@ -180,7 +180,6 @@ module.exports = Marionette.LayoutView.extend({
     this.model.set({
       panelOpenState: true,
       state: state,
-      profileMenuOpenState: false,
     });
   },
 
