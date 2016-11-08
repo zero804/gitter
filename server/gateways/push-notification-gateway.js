@@ -2,88 +2,140 @@
 
 var env = require('gitter-web-env');
 var Promise = require('bluebird');
-var logger = env.logger;
+var logger = env.logger.get('push-notifications');
 var stats = env.stats;
 var pushNotificationService = require("../services/push-notification-service");
 var unreadItemService = require("../services/unread-items");
-var androidGateway = require('./android-notification-gateway');
-var iosGateway = require('./ios-notification-gateway');
+var androidGateway = require('gitter-web-push-gateways/lib/android/android-notification-gateway');
+var iosGateway = require('gitter-web-push-gateways/lib/ios/ios-notification-gateway');
+var vapidGateway = require('gitter-web-push-gateways/lib/vapid/vapid-notification-gateway');
 var debug = require('debug')('gitter:app:push-notification-gateway');
+var InvalidRegistrationError = require('gitter-web-push-gateways/lib/invalid-registration-error');
+var _ = require('lodash');
 
-function sendNotificationToDevice(notification, badge, device) {
-  var notificationPromise;
-  debug('sendNotificationToDevice: %j, badge=%s', notification, device);
+function getGatewayForDevice(device) {
+  switch(device.deviceType) {
+    case 'APPLE':
+    case 'APPLE-DEV':
+      if (!device.appleToken) {
+        return;
+      }
 
-  if (!device.deviceType) {
-    logger.warn('Unknown device type: ' + device.deviceType);
-    return Promise.resolve();
+      return iosGateway;
+
+    case 'ANDROID':
+      return androidGateway;
+
+    case 'VAPID':
+      return vapidGateway;
+
+    default:
+      logger.warn('Unknown device type', { deviceType: device.deviceType });
+      return;
   }
-
-  if (device.deviceType.indexOf('APPLE') === 0 && device.appleToken) {
-    notificationPromise = iosGateway.sendNotificationToDevice(notification, badge, device);
-  } else if (device.deviceType === 'ANDROID') {
-    notificationPromise = androidGateway.sendNotificationToDevice(notification, badge, device)
-      .then(function(data) {
-        if (data) logger.info('gcm push results', data);
-      });
-  } else {
-    logger.warn('Unknown device type: ' + device.deviceType);
-    return Promise.resolve();
-  }
-
-  return notificationPromise.then(function() {
-    stats.event("push_notification", {
-      userId: device.userId,
-      deviceType: device.deviceType
-    });
-  });
 }
 
-exports.sendUserNotification = function(userId, notification) {
+function sendNotificationToDevice(notificationType, notificationDetails, device) {
+  var gateway = getGatewayForDevice(device);
+
+  if (!gateway) return false;
+
+  return gateway.sendNotificationToDevice(notificationType, notificationDetails, device)
+    .bind({
+      device: device
+    })
+    .tap(function(notificationSent) {
+      if (!notificationSent) return;
+
+      var device = this.device;
+
+      stats.event("push_notification", {
+        userId: device.userId,
+        deviceType: device.deviceType
+      });
+    })
+    .catch(InvalidRegistrationError, function() {
+      // The gateway has told us to get rid of this
+      // device....
+      var device = this.device;
+      logger.info('Removing invalid device', { id: device._id, userId: device.userId });
+      return pushNotificationService.deregisterDeviceById(device._id);
+    })
+    .catch(function(err) {
+      var device = this.device;
+      logger.warn('Failure sending notification', { id: device._id, user: device.userId, exception: err });
+    })
+}
+
+function sendUserNotification(notificationType, userId, options) {
   return pushNotificationService.findEnabledDevicesForUsers([userId])
+    .bind({
+      devices: null,
+      options: options,
+      notificationType: notificationType
+    })
     .then(function(devices) {
       if(!devices.length) return;
+      this.devices = devices;
 
-      return unreadItemService.getBadgeCountsForUserIds([userId]).then(function(counts) {
-        debug("Sending to %s potential devices for %s: %j", devices.length, userId, notification);
+      var hasDevicesSupportingBadges = _.some(devices, function(device) {
+        return device.deviceType === 'APPLE' || device.deviceType === 'APPLE-DEV';
+      });
 
-        var badge = counts[userId] || 0;
+      // Skip badge calculation if we don't need it....
+      if (!hasDevicesSupportingBadges) return null;
 
-        return Promise.map(devices, function(device) {
-          return sendNotificationToDevice(notification, badge, device);
-        });
+      return unreadItemService.getBadgeCountsForUserIds([userId]);
+    })
+    .then(function(counts) {
+      var devices = this.devices;
+      if (!devices || !devices.length) return;
+      var options = this.options;
+      var notificationType = this.notificationType;
+
+      var badgeCount = counts && counts[userId] || 0;
+
+      var notificationDetails = _.extend({
+        badgeCount: badgeCount,
+      }, options);
+
+      return Promise.map(devices, function(device) {
+        return sendNotificationToDevice(notificationType, notificationDetails, device);
+      });
     });
+}
 
-  });
-};
-
-exports.sendUsersBadgeUpdates = function(userIds) {
+function sendUsersBadgeUpdates(userIds) {
   debug('Sending push notifications to %s users', userIds.length);
 
+  // This seems a bit sketchy....
   if(!Array.isArray(userIds)) userIds = [userIds];
 
-  return pushNotificationService.findEnabledDevicesForUsers(userIds)
+  return pushNotificationService.findEnabledDevicesForUsers(userIds, { supportsBadges: true })
     .then(function(devices) {
       if (!devices.length) return;
 
-      // only ios supports badges
-      var iosDevices = devices.filter(function(device) {
-        return device.deviceType && device.deviceType.indexOf('APPLE') === 0;
-      });
+      var uniqueUserIds = Object.keys(_.reduce(function(memo, device) {
+        memo[device.userId] = 1;
+        return memo;
+      }, {}));
 
-      var iosUsers = iosDevices.map(function(device) {
-        return device.userId;
-      });
+      debug("Sending badge updates to %s potential devices for %s users", devices.length, uniqueUserIds.length);
 
-      debug("Sending badge updates to %s potential devices for %s users", iosDevices.length, iosUsers.length);
-
-      return unreadItemService.getBadgeCountsForUserIds(iosUsers)
+      return unreadItemService.getBadgeCountsForUserIds(uniqueUserIds)
         .then(function(counts) {
-          return Promise.map(iosDevices, function(device) {
+
+          return Promise.map(devices, function(device) {
             var badge = counts[device.userId] || 0;
-            return sendNotificationToDevice(null, badge, device);
+
+            return iosGateway.sendBadgeUpdateToDevice(badge, device);
           });
         });
 
     });
-};
+}
+
+module.exports = {
+  sendUserNotification: sendUserNotification,
+  sendUsersBadgeUpdates: sendUsersBadgeUpdates
+}

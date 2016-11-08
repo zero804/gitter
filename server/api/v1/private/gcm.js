@@ -11,9 +11,10 @@ module.exports = function(req, res, next) {
   var userId = req.user.id;
 
   logger.info("GCM device registration", { deviceId: deviceId, deviceName: deviceName });
-  pushNotificationService.registerAndroidDevice(deviceId, deviceName, registrationId, appVersion, userId, function(err) {
-    if(err) return next(err);
 
-    res.send({ success: true });
-  });
+  return pushNotificationService.registerAndroidDevice(deviceId, deviceName, registrationId, appVersion, userId)
+    .then(function() {
+      res.send({ success: true });
+    })
+    .catch(next);
 };

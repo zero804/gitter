@@ -1,8 +1,7 @@
 "use strict";
 
-var testRequire = require('../../test-require');
 var assert = require('assert');
-var underTest = testRequire('./services/notifications/notification-message-generator');
+var underTest = require('../lib/notification-message-generator');
 
 describe('notification-message-generator', function() {
   it('should generate message for the simple case', function() {
@@ -10,6 +9,7 @@ describe('notification-message-generator', function() {
 
     assert.equal(message, 'gitterHQ/gitter-webapp  \nMike Bartlett: Yo');
   });
+
   it('should should not repeat usernames', function() {
     var message = underTest({ uri: 'gitterHQ/gitter-webapp' }, [
       { id: '00001', text: 'Yo', fromUser: { displayName: 'Mike Bartlett '} },
