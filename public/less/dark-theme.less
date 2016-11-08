@@ -171,6 +171,7 @@ code { //Single line code blocks don't have a `pre` element
   &:after { background-color: inherit; }
 }
 
+//The overall header section of the menu
 .header-brand-container {
   background-color: @app-header-bg-color;
   //  Again we use a cheeky pseudo class to span the border
@@ -179,6 +180,7 @@ code { //Single line code blocks don't have a `pre` element
   }
 }
 
+//Minibar Icons
 .icon-svg {
   .icon {
     stroke: @left-menu-minibar-icon-color;
@@ -186,22 +188,15 @@ code { //Single line code blocks don't have a `pre` element
   }
 }
 
+//Create community icon
 .room-menu-options__item__community-create-icon {
   color: @left-menu-minibar-icon-color;
 }
 
+//The hamburger toggle bottom most icon
+//in the minibar
 .menu-toggle-icon {
   stroke: @left-menu-minibar-icon-color;
-}
-
-.right-toolbar-region__footer .menu-toggle-icon {
-  opacity: .45;
-  will-change: opacity;
-  &:hover {
-    stroke: @left-menu-minibar-icon-color;
-    color: @left-menu-minibar-icon-color;
-    opacity: 1;
-  }
 }
 
 // --- Left Menu Main ---
@@ -243,14 +238,13 @@ code { //Single line code blocks don't have a `pre` element
 //  the active class denotes the current room
 .room-item__container.active,
 .room-item__container:hover { //:cry:
-
-  //  :point_up: sometimes I hate specificity
-  //  as this is crusty and brittle
-  background-color: @left-menu-active-item-bg-color !important;
   // NB DAMNIT I WANTED TO GET AWAY WITH 0 IMPORTANT RULES
   // ARRRRRGHHHHHHHHHHHH
+  background-color: @left-menu-active-item-bg-color !important;
 }
 
+//The "Create a Room" & "Explore' footer buttons
+//in the menu
 .panel-footer__create-room,
 .panel-footer__button {
   color: @left-menu-footer-button-color;
@@ -295,12 +289,6 @@ a.room-item__container:hover { //:cry:
   color: @chat-details-text-color;
 }
 
-.gtrActivityItemText .mention {
-  background-color: @chat-right-toolbar-issue-background;
-  border-color: @chat-right-toolbar-issue-background;
-  &:hover { border-color: @chat-right-toolbar-issue-background; }
-}
-
 .mention { color: @chat-mention-color; }
 
 
@@ -328,17 +316,11 @@ body:not(.mobile) .chat-container div.chat-item:hover {
   border-color: @chat-right-toolbar-left-border-color;
 }
 
-.right-toolbar-region__footer {
-  background: linear-gradient(
-    top,
-    rgba(255, 255, 255, 0),
-    @left-menu-bg-color 35%
-  );
-}
-
+//Avatars at the top of the right toolbar
 .trpStatus { border-color: @chat-right-toolbar-bg-color; }
 .trpDisplayPicture.offline .trpStatus { background-color: @chat-right-toolbar-bg-color; }
 
+//Items in the integration list
 .activity-item,
 .activity-tip {
   color: @chat-right-toolbar-text-color;
@@ -359,6 +341,7 @@ body:not(.mobile) .chat-container div.chat-item:hover {
   }
 }
 
+//Github integration stuff
 .issue.open { color: @chat-right-toolbar-issue-open-color; }
 .issue.closed { color: @chat-right-toolbar-issue-closed-color; }
 .issue.is-existent {
@@ -372,6 +355,33 @@ body:not(.mobile) .chat-container div.chat-item:hover {
     color: @chat-right-toolbar-issue-closed-color;
     background-color: @chat-right-toolbar-issue-background;
     border-color: @chat-right-toolbar-issue-background;
+  }
+}
+
+.gtrActivityItemText .mention {
+  background-color: @chat-right-toolbar-issue-background;
+  border-color: @chat-right-toolbar-issue-background;
+  &:hover { border-color: @chat-right-toolbar-issue-background; }
+}
+
+//Right toolbar footer
+.right-toolbar-region__footer {
+  background: linear-gradient(
+    top,
+    rgba(255, 255, 255, 0),
+    @left-menu-bg-color 35%
+  );
+}
+
+//The toggle icon
+//positioned bottom right of the toolbar
+.right-toolbar-region__footer .menu-toggle-icon {
+  opacity: .45;
+  will-change: opacity;
+  &:hover {
+    stroke: @left-menu-minibar-icon-color;
+    color: @left-menu-minibar-icon-color;
+    opacity: 1;
   }
 }
 
@@ -471,6 +481,7 @@ body:not(.mobile) .chat-container div.chat-item:hover {
 
 
 // --- Details Section ---
+//Dubious fixes for icons in the header section
 .explore-header-info-bar__mobile-diagram {
   background-color: @explore-main-bg-color;
   i {
