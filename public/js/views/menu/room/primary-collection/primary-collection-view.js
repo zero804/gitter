@@ -93,12 +93,12 @@ var PrimaryCollectionView = BaseCollectionView.extend({
 
   onDragStart: function () {
     this.uiModel.set('isDragging', true);
-    this.el.classList.add('dragging');
+    this.el.classList.add('dragging-' + this.model.get('state'));
   },
 
   onDragEnd: function () {
     this.uiModel.set('isDragging', false);
-    this.el.classList.remove('dragging');
+    this.el.classList.remove('dragging-' + this.model.get('state'));
   },
 
   onDragStateUpdate: function (model, val) { //jshint unused: true
