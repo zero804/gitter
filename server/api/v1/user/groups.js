@@ -1,10 +1,45 @@
 "use strict";
 
-var restful = require("../../../services/restful");
+var Promise = require('bluebird');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var StatusError = require('statuserror');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
+var restful = require("../../../services/restful");
+var restSerializer = require("../../../serializers/rest-serializer");
+
 var groupService = require('gitter-web-groups/lib/group-service');
+var groupCore = require('../../../services/core/group-core');
+
+// Based on ./server/api/v1/user/troupes.js -> `performUpdateToUserRoom`
+function performUpdateToUserGroup(req) {
+  var user = req.user;
+  if (!user) throw new StatusError(401);
+
+  var userId = user._id;
+  var groupId = req.params.userGroup;
+  var updatedGroup = req.body;
+
+  var promises = [];
+
+  if('favourite' in updatedGroup) {
+    var fav = updatedGroup.favourite;
+
+    promises.push(groupCore.updateFavourite(userId, groupId, fav));
+  }
+
+  return Promise.all(promises)
+    .then(function() {
+      if(req.accepts(['text', 'json']) === 'text') return;
+
+      var strategy = new restSerializer.GroupIdStrategy({
+        currentUserId: userId
+      });
+
+      return restSerializer.serializeObject(req.params.userGroup, strategy);
+    });
+
+}
+
 
 module.exports = {
   id: 'userGroup',
@@ -38,5 +73,14 @@ module.exports = {
 
         return groupService.findById(id);
       });
-  }
+  },
+
+  update: function(req) {
+    // This route is deprecated
+    return performUpdateToUserGroup(req);
+  },
+
+  patch: function(req) {
+    return performUpdateToUserGroup(req);
+  },
 };
