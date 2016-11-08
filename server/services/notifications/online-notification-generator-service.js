@@ -33,7 +33,7 @@ function generateChatMessageNotification(troupeId, chatId) {
       } else {
         return {
           text: chat.text,
-          title: fromUser.displayName + ' @ ' + troupe.uri,
+          title: fromUser.displayName + ' 💬 ' + troupe.uri,
           link: '/' + troupe.uri,
           icon: resolveUserAvatarUrl(fromUser, 128)
         };

@@ -174,6 +174,10 @@ onready(function() {
     }
   });
 
+  setTimeout(function() {
+    var serviceWorkerDeregistration = require('gitter-web-service-worker/browser/deregistration');
+    serviceWorkerDeregistration.uninstall();
+  }, 5000);
 
 
 });
