@@ -1,6 +1,6 @@
 'use strict';
 
-var sortAndFilters = require('gitter-realtime-client/lib/sorts-filters').model;
+var sortAndFilters = require('gitter-realtime-client/lib/sorts-filters').pojo;
 
 module.exports = function generateLeftMenuFavouriteGroupsList(groups) {
   return groups

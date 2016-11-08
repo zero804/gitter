@@ -24,8 +24,6 @@ var DNDCtrl = function() {
 DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
 
   shouldItemMove: function (el) {
-    //Stop dnd behaviour in group view
-    if(this.panelRef.classList.contains('group')) { return false; }
 
     return (el.tagName !== 'A' &&
             !el.classList.contains('search-message-empty-container') &&
@@ -51,6 +49,7 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
     var id = el.dataset.id;
     var type = el.dataset.type;
     var siblingID = !!sibling && sibling.dataset.id;
+    console.log('onItemDropped', type, id);
 
     if (type === 'room' && target.classList.contains('collection-list--primary')) {
       this.trigger('room-menu:remove-favourite', id);
@@ -60,7 +59,7 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
     }
     else if (target.classList.contains('minibar-collection-list')) {
       this.trigger('minibar:update-favourite-group', id, type, siblingID);
-      if(type === 'room') {
+      if(type === 'room' || type === 'room-list-group') {
         this.drag.cancel(true);
       }
     }
