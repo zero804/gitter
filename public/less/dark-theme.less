@@ -177,10 +177,29 @@ body { background-color: @chat-main-bg-color; }
     background-color: @app-header-bg-color;
   }
 }
+
 .icon-svg {
   .icon {
     stroke: @left-menu-minibar-icon-color;
     fill: @left-menu-minibar-icon-color;
+  }
+}
+
+.room-menu-options__item__community-create-icon {
+  color: @left-menu-minibar-icon-color;
+}
+
+.menu-toggle-icon {
+  stroke: @left-menu-minibar-icon-color;
+}
+
+.right-toolbar-region__footer .menu-toggle-icon {
+  opacity: .45;
+  will-change: opacity;
+  &:hover {
+    stroke: @left-menu-minibar-icon-color;
+    color: @left-menu-minibar-icon-color;
+    opacity: 1;
   }
 }
 
