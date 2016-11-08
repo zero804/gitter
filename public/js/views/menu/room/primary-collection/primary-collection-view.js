@@ -102,7 +102,7 @@ var PrimaryCollectionView = BaseCollectionView.extend({
   },
 
   onDragStateUpdate: function (model, val) { //jshint unused: true
-    toggleClass(this.el, 'dragging', val);
+    toggleClass(this.el, 'dragging-' + this.model.get('state'), val);
   },
 
   onDndActivateItem: function(id) {

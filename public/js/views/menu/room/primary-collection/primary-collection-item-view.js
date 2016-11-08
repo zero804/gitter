@@ -34,11 +34,13 @@ module.exports = BaseCollectionItemView.extend({
   className: null,
   attributes: function() {
     var id = this.model.get('id');
+    var type = this.model.get('type');
+
     return {
       id: id,
       class: (this.model.get('githubType') === 'ONETOONE') ? 'room-item--one2one' : 'room-item',
       'data-id': id,
-      'data-type': 'room'
+      'data-type': type === 'org' ? 'room-list-group' : 'room'
     };
   },
 

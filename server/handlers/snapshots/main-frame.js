@@ -54,6 +54,7 @@ module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, group
   var parsedRooms = parseRoomsIntoLeftMenuRoomList(menuState, rooms, groupId);
   var parsedFavourites = parseRoomsIntoLeftMenuFavouriteRoomList(menuState, rooms, groupId);
   var groupFavourites = parseGroupsIntoLeftMenuFavouriteGroupList(groups);
+  console.log('groupFavourites', groupFavourites);
   if(menuState === 'group') { parsedRooms = groups; parsedFavourites = []; }
 
   return {
