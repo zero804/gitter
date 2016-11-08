@@ -50,13 +50,12 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
 
     var id = el.dataset.id;
     var type = el.dataset.type;
-    //console.log('drop', id, type, siblingID, target.classList);
+    var siblingID = !!sibling && sibling.dataset.id;
 
     if (type === 'room' && target.classList.contains('collection-list--primary')) {
       this.trigger('room-menu:remove-favourite', id);
     }
     else if (type === 'room' && target.classList.contains('collection-list--favourite')) {
-      var siblingID = !!sibling && sibling.dataset.id;
       this.trigger('room-menu:sort-favourite', id, siblingID);
     }
     else if (target.classList.contains('minibar-collection-list')) {
@@ -64,6 +63,9 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
       if(type === 'room') {
         this.drag.cancel(true);
       }
+    }
+    else if (type === 'minibar-group' && !target.classList.contains('minibar-collection-list')) {
+      this.trigger('minibar:remove-favourite-group', id);
     }
 
     this.onDragEnd();

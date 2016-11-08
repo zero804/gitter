@@ -43,19 +43,18 @@
 
           <li id="minibar-collection" class="minibar-collection">
             <ul class="minibar-collection-list">
-              {{!--
-              {{#each troupeContext.snapshots.groups}}
-                <li
-                  id="{{id}}"
-                  data-id="{{id}}"
-                  data-type="group"
-                  data-state-change="org"
-                  data-org-name="{{name}}"
-                  class="room-menu-options__item--org">
-                  {{{ prerenderView "js/views/menu/room/minibar/minibar-item-view" }}}
-                </li>
+              {{#each troupeContext.snapshots.groupFavourites}}
+                {{#if favourite}}
+                  <li
+                    id="minibar-{{id}}"
+                    class="room-menu-options__item--org"
+                    data-id="{{id}}"
+                    data-type="minibar-group"
+                    data-state-change="org">
+                    {{{ prerenderView "js/views/menu/room/minibar/minibar-item-view" }}}
+                  </li>
+                {{/if}}
               {{/each}}
-              --}}
             </ul>
           </li>
 

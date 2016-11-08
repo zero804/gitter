@@ -32,18 +32,20 @@ module.exports = BaseItemView.extend({
     'click': 'onItemClicked',
   },
   attributes: function() {
+    var id = this.model.get('id');
     var type = this.model.get('type');
 
     //account for initial render
     var className = 'room-menu-options__item--' + type;
     if (this.model.get('active')) { className = className += ' active'; }
-    var id = (type === 'org') ? this.model.get('name') : type;
+
+    var idString = 'minibar-' + ((type === 'org') ? id : type);
 
     return {
-      id: 'minibar-' + id,
+      id: idString,
       'class': className,
       'data-id': id,
-      'data-type': type === 'org' ? 'group' : '',
+      'data-type': type === 'org' ? 'minibar-group' : '',
       'data-state-change': type
     };
   },
