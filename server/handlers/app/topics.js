@@ -71,7 +71,7 @@ router.get('/create-topic',
       renderer = mainFrameRenderers.renderMobileMainFrame;
     }
 
-    return contextGenerator.generateNonChatContext(req)
+    return contextGenerator.generateMainMenuContext(req)
       .then(function(context) {
         var user = context.user;
         var isSignedIn = !!user;
@@ -91,7 +91,7 @@ router.get('/create-topic/~topics',
   identifyRoute('create-topic-embeded'),
   featureToggles,
   function(req, res, next){
-    return contextGenerator.generateNonChatContext(req)
+    return contextGenerator.generateMainMenuContext(req)
       .then(function(context) {
         var user = context.user;
         var isSignedIn = !!user;

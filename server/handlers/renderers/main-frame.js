@@ -30,7 +30,7 @@ function getLeftMenuForumGroupInfo(leftMenuGroupId) {
 }
 
 function getTroupeContextAndDerivedInfo(req, socialMetadataGenerator) {
-  return contextGenerator.generateNonChatContext(req)
+  return contextGenerator.generateMainMenuContext(req)
     .bind({
       troupeContext: null,
       socialMetadata: null,
@@ -161,7 +161,7 @@ function renderMainFrame(req, res, next, options) {
 function renderMobileMainFrame(req, res, next, options) {
   var socialMetadataGenerator = options.socialMetadataGenerator;
 
-  contextGenerator.generateNonChatContext(req)
+  contextGenerator.generateMainMenuContext(req)
     .then(function(troupeContext) {
       return Promise.all([
         Promise.resolve(troupeContext),
