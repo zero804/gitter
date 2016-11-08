@@ -2,6 +2,7 @@
 
 var Marionette = require('backbone.marionette');
 var Backbone = require('backbone');
+var $ = require('jquery');
 var _ = require('underscore');
 var template = require('./profile-menu-view.hbs');
 var itemTemplate = require('./profile-menu-item-view.hbs');
@@ -10,6 +11,9 @@ var logout = require('../../utils/logout');
 var isMobile = require('../../utils/is-mobile');
 var isNative = require('../../utils/is-native');
 var context = require('../../utils/context');
+var toggleDarkTheme = require('../../utils/toggle-dark-theme');
+var autoModelSave = require('../../utils/auto-model-save');
+var apiClient = require('../../components/api-client');
 
 require('gitter-styleguide/css/components/dropdowns.css');
 
@@ -53,12 +57,30 @@ function getProfileCollection() {
   user.on('change:id', showHideRepoAccess);
   user.on('change:scopes', showHideRepoAccess);
 
+  result.add({ name: 'Toggle Dark Theme', stub: '#dark-theme' });
+
   if(isWebApp) {
     result.add({ name: 'Sign Out', stub: '/logout' });
   }
 
   return result;
 }
+
+var ProfileMenuModel = Backbone.Model.extend({
+
+  defaults: {
+    hasDarkTheme: false
+  },
+
+  initialize: function() {
+    autoModelSave(this, ['hasDarkTheme'], this.autoPersist);
+  },
+
+  autoPersist: function(){
+    return apiClient.user.put('/settings/profileMenu', this.toJSON());
+  }
+
+});
 
 var ItemView = Marionette.ItemView.extend({
   tagName: 'li',
@@ -74,7 +96,13 @@ module.exports = Marionette.CompositeView.extend({
 
   constructor: function() {
     this.collection = getProfileCollection();
-    this.model = new Backbone.Model({ active: false });
+
+    this.model = new ProfileMenuModel({
+      //If the script exists then we have the dark theme enabled
+      hasDarkTheme: !!document.getElementById('dark-theme-styles'),
+    });
+
+    //Super
     Marionette.CollectionView.prototype.constructor.apply(this, arguments);
   },
 
@@ -89,6 +117,7 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   modelEvents: {
+    'change:hasDarkTheme': 'updateDarkTheme',
     'change:active': 'onActiveStateChange'
   },
 
@@ -110,6 +139,13 @@ module.exports = Marionette.CompositeView.extend({
       e.preventDefault();
       logout();
     }
+
+    if(e.target.href && /dark-theme$/.test(e.target.href)) {
+      e.preventDefault();
+      //Toggle the hasDarkTheme val which should already correspond to
+      //whethere the script exists or not
+      this.model.set('hasDarkTheme', !document.getElementById('dark-theme-styles'));
+    }
   },
 
   onAvatarClicked: function(e){
@@ -120,6 +156,10 @@ module.exports = Marionette.CompositeView.extend({
   onActiveStateChange: function(){
     var state = this.model.get('active');
     toggleClass(this.ui.menu[0], 'hidden', !state);
+  },
+
+  updateDarkTheme: function(model, val){
+    toggleDarkTheme(true);
   }
 
 });
