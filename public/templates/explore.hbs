@@ -14,7 +14,7 @@
     {{/if}}
 
   </head>
-  <body>
+  <body {{#if isMobile}}class="mobile"{{/if}}>
     <div class="explore-page-wrap">
       {{{ prerenderView "js/views/explore/tmpl/explore-view" }}}
     </div>
