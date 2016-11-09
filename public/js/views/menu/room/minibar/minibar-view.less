@@ -310,6 +310,37 @@
   color: @menu-decal-color;
 }
 
+// DND mirror styles when dragging a left-menu "room-list item"
+// "room-list item" applies to any item that isn't necessarily a room
+.minibar-collection-list {
+  & .room-item {
+    .room-menu-options__item();
+    opacity: 1;
+  }
+
+  & .room-item__container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+  }
+
+  & .room-item__options-menu {
+    display: none;
+  }
+
+  & .room-item__options-icon {
+    margin: 0;
+  }
+
+  & .room-item__title,
+  & .room-item__options {
+    display: none;
+  }
+}
+
 
 .base-minibar-unread-indicator(@size) {
   box-sizing: border-box;
