@@ -48,24 +48,14 @@ function generateMainMenuContext(req) {
 
 function generateBasicContext(req) {
   var user = req.user;
-  // var uriContext = req.uriContext;
-  // var group = uriContext && uriContext.group;
-  // var troupe = uriContext && uriContext.troupe;
-  // var roomMember = uriContext && uriContext.roomMember;
 
   return Promise.all([
       contextGeneratorRequest(req),
       user ? serializeUser(user) : null,
-      // group ? serializeGroup(group, user) : undefined,
-      // troupe ? serializeTroupe(troupe, user) : undefined,
-      // user ? userSettingsService.getMultiUserSettingsForUserId(user._id, ['suggestedRoomsHidden', 'leftRoomMenu']) : null,
     ])
     .spread(function (reqContextHash, serializedUser) {
       return _.extend({}, reqContextHash, {
         user: serializedUser,
-        // troupe: serializedTroupe,
-        // suggestedRoomsHidden: suggestedRoomsHidden,
-        // leftRoomMenuState: leftRoomMenuState,
       });
     });
 }
