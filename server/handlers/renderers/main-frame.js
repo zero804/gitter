@@ -14,7 +14,7 @@ var roomSort = require('gitter-realtime-client/lib/sorts-filters').pojo; /* <-- 
                                                                                           will bring in tons of client-side
                                                                                           libraries that we don't need */
 var getSubResources = require('./sub-resources');
-var generateMainFrameSnapshots = require('../../handlers/snapshots/main-frame');
+var getMainFrameSnapshots = require('../../handlers/snapshots/main-frame');
 var fonts = require('../../web/fonts');
 
 function getLeftMenuForumGroupInfo(leftMenuGroupId) {
@@ -90,7 +90,7 @@ function renderMainFrame(req, res, next, options) {
         bootScriptName = 'router-nli-app';
       }
 
-      var snapshots = troupeContext.snapshots = generateMainFrameSnapshots(req, troupeContext, rooms, groups, {
+      var snapshots = troupeContext.snapshots = getMainFrameSnapshots(req, troupeContext, rooms, groups, {
         suggestedMenuState: options.suggestedMenuState,
         leftMenuForumGroup: leftMenuForumGroup,
         leftMenuForumGroupCategories: leftMenuForumGroupCategories
