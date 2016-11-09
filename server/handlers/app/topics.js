@@ -1,7 +1,6 @@
 "use strict";
 
 var express = require('express');
-var StatusError = require('statuserror');
 var topicsRenderers = require('../renderers/topics');
 var mainFrameRenderers = require('../renderers/main-frame');
 var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
