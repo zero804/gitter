@@ -3,30 +3,34 @@
 var defaultFilter = require('../filters/left-menu-primary-default');
 var one2oneFilter = require('../filters/left-menu-primary-one2one');
 var orgFilter = require('../filters/left-menu-primary-org');
-
 var defaultSort = require('../sorting/left-menu-primary-default');
-
 var parseToTemplateItem = require('../parse/left-menu-primary-item');
 
-module.exports = function generateLeftMenuRoomsList(state, rooms, groupId){
+var NOTHING_FILTER = function() { return false; };
+var EVERYTHING_FILTER = function() { return true; };
 
-  var filter;
+function getFilterForState(state, groupId) {
   switch(state) {
     //Here we dont return rooms for temp-org because if you are in the temp-org state
     //that you cannot have joined any of the parent group's rooms
     case 'temp-org':
     case 'search':
-      filter = function(){ return false; };
-      break;
+      return NOTHING_FILTER;
+
     case 'people':
-      filter = one2oneFilter;
-      break;
+      return one2oneFilter;
+
     case 'org':
-      filter = function(model) { return orgFilter(model, groupId) };
-      break;
+      return function(model) { return orgFilter(model, groupId) };
+
     default:
-      filter = function(){ return true; };
+      return EVERYTHING_FILTER;
   }
+
+}
+
+function generateLeftMenuRoomsList(state, rooms, groupId){
+  var filter = getFilterForState(state, groupId);
 
   return rooms
     .filter(defaultFilter)
@@ -39,4 +43,6 @@ module.exports = function generateLeftMenuRoomsList(state, rooms, groupId){
     })
     .sort(defaultSort);
 
-};
+}
+
+module.exports = generateLeftMenuRoomsList;

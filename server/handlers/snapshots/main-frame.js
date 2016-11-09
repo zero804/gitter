@@ -5,13 +5,11 @@ var parseRoomsIntoLeftMenuRoomList = require('gitter-web-shared/rooms/left-menu-
 var parseRoomsIntoLeftMenuFavouriteRoomList = require('gitter-web-shared/rooms/left-menu-room-favourite-list');
 var parseCategoryForTemplate = require('gitter-web-shared/parse/forum-category-item');
 var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
-var avatars = require('gitter-web-avatars');
 
-module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, groups, extras) { // eslint-disable-line complexity
+function getMainFrameSnapshots(req, troupeContext, rooms, groups, extras) {
   //Defaults
   var lastLeftMenuSnapshot = (troupeContext.leftRoomMenuState || {});
   var currentRoom = (req.troupe || {});
-  req.uriContext = (req.uriContext || {});
 
   //Groups
   var groupId = (lastLeftMenuSnapshot.groupId || '');
@@ -70,4 +68,6 @@ module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, group
       categories: forumCategories && forumCategories.map(parseCategoryForTemplate)
     }
   };
-};
+}
+
+module.exports = getMainFrameSnapshots;
