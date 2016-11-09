@@ -120,7 +120,7 @@
                 <div id="collection-list" class="collection-list--primary">
                   {{#each troupeContext.snapshots.rooms}}
                     <div
-                      class="{{#if isNotOneToOne}}room-item{{else}}room-item--one2one{{/if}} {{#if isHidden}}hidden{{/if}}"
+                      class="{{#if isNotOneToOne}}{{#if favourite}}room-item--favourite{{else}}room-item{{/if}}{{else}}room-item--one2one{{/if}} {{#if isHidden}}hidden{{/if}}"
                       id="{{id}}"
                       data-id="{{id}}"
                       data-type="room">
