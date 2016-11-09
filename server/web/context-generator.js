@@ -16,6 +16,7 @@ function generateMainMenuContext(req) {
   var user = req.user;
   var uriContext = req.uriContext;
   var group = uriContext && uriContext.group;
+
   var troupe = uriContext && uriContext.troupe;
   var roomMember = uriContext && uriContext.roomMember;
 
@@ -29,6 +30,10 @@ function generateMainMenuContext(req) {
     .spread(function (reqContextHash, serializedUser, serializedGroup, serializedTroupe, settings) {
       var suggestedRoomsHidden = settings && settings.suggestedRoomsHidden;
       var leftRoomMenuState = settings && settings.leftRoomMenu;
+      if (leftRoomMenuState) {
+        delete leftRoomMenuState.state;
+        delete leftRoomMenuState.groupId;
+      }
 
       return _.extend({}, reqContextHash, {
         roomMember: roomMember,
