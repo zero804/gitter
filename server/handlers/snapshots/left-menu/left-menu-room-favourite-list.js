@@ -1,12 +1,10 @@
 'use strict';
 
-var favouriteFilter = require('../filters/left-menu-primary-favourite');
-var favouriteOneToOneFilter = require('../filters/left-menu-primary-favourite-one2one');
-var orgFavouriteFilter = require('../filters/left-menu-primary-favourite-org');
-
-var favouriteSort = require('../sorting/left-menu-primary-favourite');
-
-var parseToTemplateItem = require('../parse/left-menu-primary-item');
+var favouriteFilter = require('gitter-web-shared/filters/left-menu-primary-favourite');
+var favouriteOneToOneFilter = require('gitter-web-shared/filters/left-menu-primary-favourite-one2one');
+var orgFavouriteFilter = require('gitter-web-shared/filters/left-menu-primary-favourite-org');
+var favouriteSort = require('gitter-web-shared/sorting/left-menu-primary-favourite');
+var parseToTemplateItem = require('gitter-web-shared/parse/left-menu-primary-item');
 
 module.exports = function generateLemMenuFavouriteRoomsList(state, rooms, groupId) {
 
@@ -16,7 +14,7 @@ module.exports = function generateLemMenuFavouriteRoomsList(state, rooms, groupI
     //if you have not joined any rooms for a given group
     case 'search':
     case 'temp-org':
-      filter = function(){ return false; };
+      filter = function() { return false; };
       break;
     case 'people':
       filter = favouriteOneToOneFilter;

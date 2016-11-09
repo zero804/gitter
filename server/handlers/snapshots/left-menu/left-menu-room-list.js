@@ -1,10 +1,10 @@
 'use strict';
 
-var defaultFilter = require('../filters/left-menu-primary-default');
-var one2oneFilter = require('../filters/left-menu-primary-one2one');
-var orgFilter = require('../filters/left-menu-primary-org');
-var defaultSort = require('../sorting/left-menu-primary-default');
-var parseToTemplateItem = require('../parse/left-menu-primary-item');
+var defaultFilter = require('gitter-web-shared/filters/left-menu-primary-default');
+var one2oneFilter = require('gitter-web-shared/filters/left-menu-primary-one2one');
+var orgFilter = require('gitter-web-shared/filters/left-menu-primary-org');
+var defaultSort = require('gitter-web-shared/sorting/left-menu-primary-default');
+var parseToTemplateItem = require('gitter-web-shared/parse/left-menu-primary-item');
 
 var NOTHING_FILTER = function() { return false; };
 var EVERYTHING_FILTER = function() { return true; };
@@ -36,9 +36,9 @@ function generateLeftMenuRoomsList(state, rooms, groupId){
     .filter(defaultFilter)
     .map(function(model){
       if(!filter(model)) {
-        if(model.get) { model.set('isHidden', true); }
         model.isHidden = true;
       }
+
       return parseToTemplateItem(model, state);
     })
     .sort(defaultSort);

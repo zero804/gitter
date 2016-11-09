@@ -1,8 +1,8 @@
 "use strict";
 
 var _ = require('lodash');
-var parseRoomsIntoLeftMenuRoomList = require('gitter-web-shared/rooms/left-menu-room-list');
-var parseRoomsIntoLeftMenuFavouriteRoomList = require('gitter-web-shared/rooms/left-menu-room-favourite-list');
+var parseRoomsIntoLeftMenuRoomList = require('./left-menu/left-menu-room-list');
+var parseRoomsIntoLeftMenuFavouriteRoomList = require('./left-menu/left-menu-room-favourite-list');
 var parseCategoryForTemplate = require('gitter-web-shared/parse/forum-category-item');
 var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
 
