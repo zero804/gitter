@@ -208,7 +208,7 @@ module.exports = Backbone.Model.extend({
     this.onSwitchState(this, this.get('state'));
     this.listenTo(this, 'change:state change:groupId', this.updateForumCategoryState);
 
-    autoModelSave(this, ['state', 'roomMenuIsPinned', 'groupId', 'hasDismissedSuggestions'], this.autoPersist);
+    autoModelSave(this, ['roomMenuIsPinned', 'hasDismissedSuggestions'], this.autoPersist);
   },
 
   //custom set to limit states that can be assigned
@@ -280,12 +280,10 @@ module.exports = Backbone.Model.extend({
   toJSON: function() {
     var attrs = this.attributes;
 
-    //only ever store the defaults everything else is determined at run-time
-    return Object.keys(this.defaults).reduce(function(memo, key) {
-      if (key === 'searchTerm') return memo;
-      memo[key] = attrs[key];
-      return memo;
-    }, {});
+    return {
+      roomMenuIsPinned: attrs.roomMenuIsPinned,
+      hasDismissedSuggestions: attrs.hasDismissedSuggestions,
+    };
   },
 
   /**
