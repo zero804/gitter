@@ -18,7 +18,9 @@ FavouriteTroupesForUserStrategy.prototype = {
 
   map: function(id) {
     var favs = this.favs[id];
-    return favs || undefined;
+    if (!favs) return undefined;
+    if (favs === '1') return 1000;
+    return favs;
   },
 
   name: 'FavouriteTroupesForUserStrategy'
