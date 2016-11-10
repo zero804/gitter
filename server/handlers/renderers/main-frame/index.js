@@ -1,7 +1,6 @@
 "use strict";
 
 var env = require('gitter-web-env');
-var winston = env.logger;
 var nconf = env.config;
 var statsd = env.createStatsClient({ prefix: nconf.get('stats:statsd:prefix')});
 var Promise = require('bluebird');
@@ -10,12 +9,12 @@ var restful = require('../../../services/restful');
 var forumCategoryService = require('gitter-web-topics').forumCategoryService;
 var groupService = require('gitter-web-groups');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
-/* 👇 Don't use the default export will bring in tons of client-side libraries that we don't need 👇 */
-var roomSort = require('gitter-realtime-client/lib/sorts-filters').pojo;
 var getSubResources = require('../sub-resources');
 var getMainFrameSnapshots = require('./snapshots');
 var fonts = require('../../../web/fonts');
 var generateLeftMenuStateForUriContext = require('./generate-left-menu-state-for-uri-context');
+var getOldLeftMenuViewData = require('./get-old-left-menu-view-data');
+var getLeftMenuViewData = require('./get-left-menu-view-data');
 
 function getLeftMenuForumGroupInfo(leftMenuGroupId) {
   return groupService.findById(leftMenuGroupId)
@@ -49,8 +48,11 @@ function getTroupeContextAndDerivedInfo(req, leftMenu, socialMetadataGenerator) 
     })
     .spread(function(socialMetadata, leftMenuGroupInfo) {
       this.socialMetadata = socialMetadata;
-      this.leftMenuGroup = leftMenuGroupInfo && leftMenuGroupInfo.group;
-      this.leftMenuGroupForumCategories = leftMenuGroupInfo && leftMenuGroupInfo.forumCategories;
+
+      if (leftMenuGroupInfo) {
+        this.leftMenuGroup = leftMenuGroupInfo.group;
+        this.leftMenuGroupForumCategories = leftMenuGroupInfo.forumCategories;
+      }
 
       return this;
     });
@@ -75,15 +77,10 @@ function renderMainFrame(req, res, next, options) {
       return [
         getTroupeContextAndDerivedInfo(req, leftMenu, socialMetadataGenerator),
         restful.serializeTroupesForUser(userId),
-        restful.serializeOrgsForUserId(userId).catch(function(err) {
-          // Workaround for GitHub outage
-          winston.error('Failed to serialize orgs:' + err, { exception: err });
-          return [];
-        }),
         restful.serializeGroupsForUserId(userId),
       ];
     })
-    .spread(function(troupeContextAndDerivedInfo, rooms, orgs, groups) {
+    .spread(function(troupeContextAndDerivedInfo, rooms, /*orgs, */groups) {
       var troupeContext = troupeContextAndDerivedInfo.troupeContext;
       var socialMetadata = troupeContextAndDerivedInfo.socialMetadata;
       var leftMenuForumGroup = troupeContextAndDerivedInfo.leftMenuGroup;
@@ -101,18 +98,6 @@ function renderMainFrame(req, res, next, options) {
       }
 
       var leftMenu = this.leftMenu;
-      var snapshots = troupeContext.snapshots = getMainFrameSnapshots(leftMenu, rooms, groups, {
-        leftMenuForumGroup: leftMenuForumGroup,
-        leftMenuForumGroupCategories: leftMenuForumGroupCategories
-      });
-
-      if(leftMenu.state) {
-        // Generate `gitter.web.prerender-left-menu` events
-        statsd.increment('prerender-left-menu', 1, 0.25, [
-          'state:' + leftMenu.state,
-          'pinned:' + (leftMenu.roomMenuIsPinned ? '1' : '0')
-        ]);
-      }
 
       // pre-processing rooms
       // Bad mutation ... BAD MUTATION
@@ -126,10 +111,33 @@ function renderMainFrame(req, res, next, options) {
           return room;
         });
 
+      // Add snapshots into the troupeContext
+      troupeContext.snapshots = getMainFrameSnapshots({
+        leftMenu: leftMenu,
+        rooms: rooms,
+        groups: groups,
+        leftMenuForumGroup: leftMenuForumGroup,
+        leftMenuForumGroupCategories: leftMenuForumGroupCategories
+      });
+
+      // Generate `gitter.web.prerender-left-menu` events
+      statsd.increment('prerender-left-menu', 1, 0.25, [
+        'state:' + leftMenu.state,
+        'pinned:' + (leftMenu.roomMenuIsPinned ? '1' : '0')
+      ]);
+
       res.render(template, {
-        //left menu
-        leftMenuOrgs:           troupeContext.snapshots.orgs,
-        roomMenuIsPinned:       snapshots.leftMenu.roomMenuIsPinned,
+        leftMenu: getLeftMenuViewData({
+          leftMenu: leftMenu,
+          rooms: rooms,
+          groups: groups,
+          leftMenuForumGroup: leftMenuForumGroup,
+          leftMenuForumGroupCategories: leftMenuForumGroupCategories
+        }),
+
+        oldLeftMenu: getOldLeftMenuViewData({
+          rooms: rooms
+        }),
 
         //fonts
         hasCachedFonts:         fonts.hasCachedFonts(req.cookies),
@@ -139,27 +147,13 @@ function renderMainFrame(req, res, next, options) {
         cssFileName:            "styles/" + bootScriptName + ".css",
         troupeName:             options.title,
         troupeContext:          troupeContext,
-        forum:                  snapshots.forum,
         chatAppLocation:        chatAppLocation,
         agent:                  req.headers['user-agent'],
         subresources:           getSubResources(bootScriptName),
         showFooterButtons:      true,
         showUnreadTab:          true,
-        menuHeaderExpanded:     false,
         user:                   user,
-        orgs:                   orgs,
-        isPhone:                req.isPhone,
-        //TODO Remove this when left-menu switch goes away JP 23/2/16
-        rooms: {
-          favourites: rooms
-            .filter(roomSort.favourites.filter)
-            .sort(roomSort.favourites.sort),
-          recents: rooms
-            .filter(roomSort.recents.filter)
-            .sort(roomSort.recents.sort)
-        },
-        userHasNoOrgs: !orgs || !orgs.length
-
+        isPhone:                req.isPhone
       });
 
       return null;

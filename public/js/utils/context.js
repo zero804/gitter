@@ -1,8 +1,8 @@
 "use strict";
+
 var Backbone = require('backbone');
 var qs = require('gitter-web-qs');
 var _ = require('underscore');
-var localStore = require('../components/local-store');
 var Promise = require('bluebird');
 var clientEnv = require('gitter-client-env');
 var debug = require('debug-proxy')('app:context');
@@ -14,7 +14,10 @@ function getGroupModel() {
   var groupModel;
   if (ctx.troupe && ctx.troupe.group) {
     groupModel = ctx.troupe.group;
+  } else if (ctx.group) {
+    groupModel = ctx.group;
   }
+
   return new Backbone.Model(groupModel);
 }
 
