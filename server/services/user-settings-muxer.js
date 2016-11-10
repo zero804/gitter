@@ -28,6 +28,7 @@ var HANDLERS = {
   /* Left Room Menu */
   leftRoomMenu: standardHandler('leftRoomMenu'),
   rightToolbar: standardHandler('rightToolbar'),
+  profileMenu: standardHandler('profileMenu'),
 
   /* Lang */
   lang: standardHandler('lang'),

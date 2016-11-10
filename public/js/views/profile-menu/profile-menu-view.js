@@ -77,7 +77,9 @@ var ProfileMenuModel = Backbone.Model.extend({
   },
 
   autoPersist: function(){
-    return apiClient.user.put('/settings/profileMenu', this.toJSON());
+    return apiClient.user.put('/settings/profileMenu', {
+      hasDarkTheme: this.get('hasDarkTheme')
+    });
   }
 
 });
