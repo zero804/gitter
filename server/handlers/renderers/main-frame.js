@@ -10,6 +10,7 @@ var restful = require('../../services/restful');
 var forumCategoryService = require('gitter-web-topics').forumCategoryService;
 var groupService = require('gitter-web-groups');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var generateProfileMenuSnapshot = require('../snapshots/profile-menu-snapshot');
 var roomSort = require('gitter-realtime-client/lib/sorts-filters').pojo; /* <-- Don't use the default export
                                                                                           will bring in tons of client-side
                                                                                           libraries that we don't need */
@@ -65,6 +66,7 @@ function renderMainFrame(req, res, next, options) {
 
   Promise.all([
       getTroupeContextAndDerivedInfo(req, socialMetadataGenerator),
+      generateProfileMenuSnapshot(req),
       restful.serializeTroupesForUser(userId),
       restful.serializeOrgsForUserId(userId).catch(function(err) {
         // Workaround for GitHub outage
@@ -73,12 +75,13 @@ function renderMainFrame(req, res, next, options) {
       }),
       restful.serializeGroupsForUserId(userId),
     ])
-    .spread(function(troupeContextAndDerivedInfo, rooms, orgs, groups) {
+    .spread(function(troupeContextAndDerivedInfo, profileMenuSnapshot, rooms, orgs, groups) {
       var troupeContext = troupeContextAndDerivedInfo.troupeContext;
       var socialMetadata = troupeContextAndDerivedInfo.socialMetadata;
       var leftMenuForumGroup = troupeContextAndDerivedInfo.leftMenuGroup;
       var leftMenuForumGroupCategories = troupeContextAndDerivedInfo.leftMenuGroupForumCategories;
       var chatAppLocation = options.subFrameLocation;
+      profileMenuSnapshot = (profileMenuSnapshot || {});
 
       var template, bootScriptName;
 
@@ -118,7 +121,7 @@ function renderMainFrame(req, res, next, options) {
 
       res.render(template, {
         ////Dark theme
-        hasDarkTheme: req.fflip && req.fflip.has('dark-theme'),
+        hasDarkTheme: profileMenuSnapshot.hasDarkTheme,
         //left menu
         leftMenuOrgs:           troupeContext.snapshots.orgs,
         roomMenuIsPinned:       snapshots.leftMenu.roomMenuIsPinned,

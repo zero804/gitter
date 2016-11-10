@@ -25,6 +25,7 @@ var navConstants = require('gitter-web-topics-ui/shared/constants/navigation');
 
 var restSerializer = require('../../serializers/rest-serializer');
 var contextGenerator = require('../../web/context-generator.js');
+var generateProfileMenuSnapshot = require('../snapshots/profile-menu-snapshot');
 
 
 function renderForum(req, res, next, options) {
@@ -35,12 +36,14 @@ function renderForum(req, res, next, options) {
 
   return Promise.props({
       context: contextGenerator.generateNonChatContext(req),
-      group: groupService.findByUri(groupUri)
+      group: groupService.findByUri(groupUri),
+      profileMenuSnapshot: generateProfileMenuSnapshot(req),
     })
     .bind({
       context: null,
       serializedGroup: null,
-      serializedForum: null
+      serializedForum: null,
+      profileMenuSnapshot: {},
     })
     .then(function(result) {
       this.context = result.context;
@@ -89,7 +92,7 @@ function renderForum(req, res, next, options) {
       return res.render('topics/forum', {
         layout: 'topics-layout',
         hasCachedFonts: fonts.hasCachedFonts(req.cookies),
-        hasDarkTheme: req.fflip && req.fflip.has('dark-theme'),
+        hasDarkTheme: this.profileMenuSnapshot.hasDarkTheme,
         fonts: fonts.getFonts(),
         componentData: {
           forum: forum,
@@ -124,13 +127,15 @@ function renderTopic(req, res, next) {
 
   return Promise.props({
       context: contextGenerator.generateNonChatContext(req),
-      group: groupService.findByUri(groupUri)
+      group: groupService.findByUri(groupUri),
+      profileMenuSnapshot: generateProfileMenuSnapshot(req),
     })
     .bind({
       context: null,
       serializedGroup: null,
       serializedForum: null,
-      serializedTopic: null
+      serializedTopic: null,
+      profileMenuSnapshot: {},
     })
     .then(function(result) {
       this.context = result.context;
@@ -190,7 +195,7 @@ function renderTopic(req, res, next) {
       var topicStore = forumTopicsStore([topic]);
       return res.render('topics/topic', {
         layout: 'topics-layout',
-        hasDarkTheme: req.fflip && req.fflip.has('dark-theme'),
+        hasDarkTheme: this.profileMenuSnapshot.hasDarkTheme,
         hasCachedFonts: fonts.hasCachedFonts(req.cookies),
         fonts: fonts.getFonts(),
         componentData: {

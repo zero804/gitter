@@ -15,6 +15,7 @@ var exploreService = require('../services/explore-service');
 var suggestionsService = require('../services/suggestions-service');
 var exploreTagUtils = require('../utils/explore-tag-utils');
 var generateExploreSnapshot = require('./snapshots/explore-snapshot');
+var generateProfileMenuSnapshot = require('./snapshots/profile-menu-snapshot');
 var fonts = require('../web/fonts');
 var isMobile = require('../web/is-phone');
 
@@ -159,20 +160,29 @@ router.get('/tags/:tags',
           return snapshots;
         })
         .then(function(snapshots) {
-          // Anyone know why we're putting this on the
-          // context? Probably not.
-          troupeContext.snapshots = snapshots;
 
-          res.render('explore', _.extend({}, snapshots, {
-            hasDarkTheme: req.fflip && req.fflip.has('dark-theme'),
-            isMobile: isMobile(req),
-            exploreBaseUrl: req.baseUrl,
-            troupeContext: troupeContext,
-            isLoggedIn: isLoggedIn,
-            createRoomUrl: urlJoin(clientEnv.basePath, '#createroom'),
-            fonts: fonts.getFonts(),
-            hasCachedFonts: fonts.hasCachedFonts(req.cookies),
-          }));
+          //Not 100% sure this is the best thing to do here
+          //but I dont really want to refactor this whole thing
+          generateProfileMenuSnapshot(req)
+            .then(function(profileMenuSnapshot){
+
+              profileMenuSnapshot = (profileMenuSnapshot || {});
+
+              // Anyone know why we're putting this on the
+              // context? Probably not.
+              troupeContext.snapshots = snapshots;
+
+              res.render('explore', _.extend({}, snapshots, {
+                hasDarkTheme: profileMenuSnapshot.hasDarkTheme,
+                isMobile: isMobile(req),
+                exploreBaseUrl: req.baseUrl,
+                troupeContext: troupeContext,
+                isLoggedIn: isLoggedIn,
+                createRoomUrl: urlJoin(clientEnv.basePath, '#createroom'),
+                fonts: fonts.getFonts(),
+                hasCachedFonts: fonts.hasCachedFonts(req.cookies),
+              }));
+            });
         })
         .catch(next);
     });

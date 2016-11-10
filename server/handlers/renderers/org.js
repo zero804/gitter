@@ -15,6 +15,7 @@ var userService = require('../../services/user-service');
 var groupBrowserService = require('gitter-web-groups/lib/group-browser-service');
 var roomMembershipService = require('../../services/room-membership-service');
 var forumService = require('gitter-web-topics/lib/forum-service');
+var generateProfileMenuSnapshot = require('../snapshots/profile-menu-snapshot');
 
 var ROOMS_PER_PAGE = 15;
 
@@ -150,11 +151,13 @@ function renderOrgPage(req, res, next) {
       getForumForGroup(group.uri, group.forumId, user && user.id),
       contextGenerator.generateNonChatContext(req),
       policy.canAdmin(),
-      function(serializedGroup, roomBrowseResult, serializedForum, troupeContext, isOrgAdmin) {
+      generateProfileMenuSnapshot(req),
+      function(serializedGroup, roomBrowseResult, serializedForum, troupeContext, isOrgAdmin, profileMenuSnapshot) {
         var isStaff = req.user && req.user.staff;
         var editAccess = isOrgAdmin || isStaff;
         var orgUserCount = roomBrowseResult.totalUsers;
         var roomCount = roomBrowseResult.total;
+        profileMenuSnapshot = (profileMenuSnapshot || {});
 
         // Calculate total pages
         var pageCount = Math.ceil(roomCount / ROOMS_PER_PAGE);
@@ -185,7 +188,7 @@ function renderOrgPage(req, res, next) {
         var createTopicUrl = clientEnv.basePath + '/' + serializedGroup.uri + '/topics/create-topic';
 
         res.render('org-page', {
-          hasDarkTheme: req.fflip && req.fflip.has('dark-theme'),
+          hasDarkTheme: profileMenuSnapshot.hasDarkTheme,
           hasCachedFonts: fonts.hasCachedFonts(req.cookies),
           fonts: fonts.getFonts(),
           socialUrl: url,
