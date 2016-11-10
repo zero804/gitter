@@ -47,6 +47,7 @@ function renderForum(req, res, next, options) {
     })
     .then(function(result) {
       this.context = result.context;
+      this.profileMenuSnapshot = result.profileMenuSnapshot;
       var group = result.group;
 
       if (!group) throw new StatusError(404, 'Group not found.');
@@ -128,7 +129,7 @@ function renderTopic(req, res, next) {
   return Promise.props({
       context: contextGenerator.generateNonChatContext(req),
       group: groupService.findByUri(groupUri),
-      profileMenuSnapshot: generateProfileMenuSnapshot(req),
+      profileMenuSnapshot: generateProfileMenuSnapshot(req)
     })
     .bind({
       context: null,
@@ -139,6 +140,7 @@ function renderTopic(req, res, next) {
     })
     .then(function(result) {
       this.context = result.context;
+      this.profileMenuSnapshot = result.profileMenuSnapshot;
       var group = result.group;
 
       if (!group) throw new StatusError(404, 'Group not found.');
@@ -182,6 +184,7 @@ function renderTopic(req, res, next) {
     })
     .then(function(result) {
 
+
       var sortName = req.query.sort;
 
       this.serializedForum = result.serializedForum;
@@ -193,6 +196,7 @@ function renderTopic(req, res, next) {
       var topic = this.serializedTopic;
 
       var topicStore = forumTopicsStore([topic]);
+
       return res.render('topics/topic', {
         layout: 'topics-layout',
         hasDarkTheme: this.profileMenuSnapshot.hasDarkTheme,
