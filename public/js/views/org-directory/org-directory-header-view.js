@@ -1,6 +1,5 @@
 'use strict';
 
-var _ = require('underscore');
 var Marionette = require('backbone.marionette');
 var toggleClass = require('../../utils/toggle-class');
 
