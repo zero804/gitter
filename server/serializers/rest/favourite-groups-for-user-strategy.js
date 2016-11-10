@@ -19,10 +19,7 @@ FavouriteGroupsForUserStrategy.prototype = {
 
   map: function(id) {
     var favs = this.favs[id];
-    if (!favs) return undefined;
-
-    if (favs === '1') return 1000;
-    return favs;
+    return favs || undefined;
   },
 
   name: 'FavouriteGroupsForUserStrategy'
