@@ -44,17 +44,6 @@ var HeaderView = Marionette.LayoutView.extend({
     return this.profileMenuView;
   },
 
-
-  serializeData: function() {
-    var data = this.model.toJSON();
-
-    _.extend(data, {
-      // ...
-    });
-
-    return data;
-  },
-
   onFavouriteChange: function() {
     var isFavourited = !!this.model.get('favourite');
     toggleClass(this.ui.favouriteIcon[0], 'favourite', isFavourited);
