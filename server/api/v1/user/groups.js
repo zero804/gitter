@@ -73,11 +73,6 @@ module.exports = {
       });
   },
 
-  update: function(req) {
-    // This route is deprecated
-    return performUpdateToUserGroup(req);
-  },
-
   patch: function(req) {
     return performUpdateToUserGroup(req);
   },

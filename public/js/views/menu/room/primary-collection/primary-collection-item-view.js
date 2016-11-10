@@ -196,7 +196,10 @@ module.exports = BaseCollectionItemView.extend({
     var isFavourited = !!this.model.get('favourite');
     this.model.save({
       favourite: !isFavourited
-    }, { wait: true });
+    }, {
+      wait: true,
+      patch: true
+    });
   },
 
 });

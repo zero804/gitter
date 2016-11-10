@@ -46,8 +46,9 @@ var FilteredMinibarGroupCollection = SimpleFilteredCollection.extend({
     }
 
     if(group) {
-      group.set('favourite', index);
-      group.save();
+      group.save({
+        favourite: index
+      }, { patch: true });
       this.add(group, { merge: true });
     }
   },
@@ -56,8 +57,9 @@ var FilteredMinibarGroupCollection = SimpleFilteredCollection.extend({
     var group = id && this.groupCollection.get(id);
 
     if(group) {
-      group.set('favourite', false);
-      group.save();
+      group.save({
+        favourite: false
+      }, { patch: true });
     }
   },
 
