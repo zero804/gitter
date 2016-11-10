@@ -9,7 +9,6 @@ var restSerializer = require("../../../serializers/rest-serializer");
 
 var groupService = require('gitter-web-groups/lib/group-service');
 
-// Based on ./server/api/v1/user/troupes.js -> `performUpdateToUserRoom`
 function performUpdateToUserGroup(req) {
   var user = req.user;
   if (!user) throw new StatusError(401);
