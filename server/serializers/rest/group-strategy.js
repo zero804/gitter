@@ -6,8 +6,8 @@ var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var SecurityDescriptorStrategy = require('./security-descriptor-strategy');
 var FavouriteGroupsForUserStrategy = require('./favourite-groups-for-user-strategy');
 
-function GroupStrategy(options) {
-  this.options = options || {};
+function GroupStrategy(options = {}) {
+  this.options = options;
 
   var securityDescriptorStrategy;
   var favouriteStrategy;
