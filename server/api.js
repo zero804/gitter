@@ -6,8 +6,8 @@
 require('./utils/diagnostics');
 
 /* Configure winston before all else! */
-var env = require('gitter-web-env');
-var winston = env.logger;
+const env = require('gitter-web-env');
+const winston = env.logger;
 var nconf = env.config;
 var express = require('express');
 var http = require('http');
