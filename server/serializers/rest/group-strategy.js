@@ -2,6 +2,7 @@
 
 var Promise = require('bluebird');
 var avatars = require('gitter-web-avatars');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var SecurityDescriptorStrategy = require('./security-descriptor-strategy');
 var FavouriteGroupsForUserStrategy = require('./favourite-groups-for-user-strategy');
 
@@ -13,13 +14,16 @@ function GroupStrategy(options) {
 
   this.preload = function() {
     var options = this.options;
+    var currentUserId = mongoUtils.asObjectID(options.currentUserId);
     var strategies = [];
 
     securityDescriptorStrategy = SecurityDescriptorStrategy.slim();
 
-    // Favourites for user
-    favouriteStrategy = new FavouriteGroupsForUserStrategy(options);
-    strategies.push(favouriteStrategy.preload());
+    if (currentUserId) {
+      // Favourites for user
+      favouriteStrategy = new FavouriteGroupsForUserStrategy(options);
+      strategies.push(favouriteStrategy.preload());
+    }
 
     return Promise.all(strategies);
   };
