@@ -21,7 +21,9 @@ function GroupStrategy(options) {
 
     if (currentUserId) {
       // Favourites for user
-      favouriteStrategy = new FavouriteGroupsForUserStrategy(options);
+      favouriteStrategy = new FavouriteGroupsForUserStrategy({
+        currentUserId: options.currentUserId
+      });
       strategies.push(favouriteStrategy.preload());
     }
 
