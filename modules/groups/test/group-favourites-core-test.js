@@ -37,6 +37,7 @@ describe('group-core', function() {
       fixture.cleanup();
     });
 
+    // From `./test/integration/services/core/recent-room-core-test.js`
     it('should rearrange the order of favourites correctly',function(done) {
       this.timeout(10000);
 
