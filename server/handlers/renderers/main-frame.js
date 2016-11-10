@@ -90,7 +90,10 @@ function renderMainFrame(req, res, next, options) {
         bootScriptName = 'router-nli-app';
       }
 
-      var snapshots = troupeContext.snapshots = getMainFrameSnapshots(req, troupeContext, rooms, groups, {
+      var uriContext = req.uriContext;
+      var leftMenuPeristedState = troupeContext.leftRoomMenuState; // TODO: remove from troupeContext
+
+      var snapshots = troupeContext.snapshots = getMainFrameSnapshots(uriContext, leftMenuPeristedState, rooms, groups, {
         suggestedMenuState: options.suggestedMenuState,
         leftMenuForumGroup: leftMenuForumGroup,
         leftMenuForumGroupCategories: leftMenuForumGroupCategories

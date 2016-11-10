@@ -5,7 +5,6 @@ function generateLeftMenuStateForUriContext(uriContext, leftMenuPeristedState, o
   var currentGroup = uriContext && uriContext.group;
   var roomMember = uriContext && uriContext.roomMember;
 
-  var tempOrg;
   var menuState;
   var groupId;
 
@@ -14,8 +13,7 @@ function generateLeftMenuStateForUriContext(uriContext, leftMenuPeristedState, o
   } else if (currentRoom) {
     // But if we find something later, let's use it instead
     if(currentRoom.groupId && !roomMember) {
-      menuState = 'temp-org';
-      tempOrg = {}; // TODO: Very NB: put the temp org in here
+      menuState = 'org';
       groupId = currentRoom.groupId;
     } else {
       menuState = 'all'
@@ -28,15 +26,14 @@ function generateLeftMenuStateForUriContext(uriContext, leftMenuPeristedState, o
   }
 
   var roomMenuIsPinned = true;
-  if(leftMenuPeristedState.roomMenuIsPinned !== undefined) {
+  if(leftMenuPeristedState && leftMenuPeristedState.roomMenuIsPinned !== undefined) {
     roomMenuIsPinned = leftMenuPeristedState.roomMenuIsPinned;
   }
 
   return {
     state: menuState,
-    tempOrg: tempOrg,
     groupId: groupId,
-    hasDismissedSuggestions: leftMenuPeristedState.hasDismissedSuggestions,
+    hasDismissedSuggestions: leftMenuPeristedState && leftMenuPeristedState.hasDismissedSuggestions,
     roomMenuIsPinned: roomMenuIsPinned,
   };
 }

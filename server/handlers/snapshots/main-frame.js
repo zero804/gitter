@@ -5,10 +5,7 @@ var parseRoomsIntoLeftMenuFavouriteRoomList = require('./left-menu/left-menu-roo
 var parseCategoryForTemplate = require('gitter-web-shared/parse/forum-category-item');
 var generateLeftMenuStateForUriContext = require('./left-menu/generate-left-menu-state-for-uri-context');
 
-function getMainFrameSnapshots(req, troupeContext, rooms, groups, extras) {
-  var leftMenuPeristedState = troupeContext.leftRoomMenuState; // TODO: remove
-  var uriContext = req.uriContext;
-
+function getMainFrameSnapshots(uriContext, leftMenuPeristedState, rooms, groups, extras) {
   var leftMenu = generateLeftMenuStateForUriContext(uriContext, leftMenuPeristedState, extras);
 
   var forumCategories = (extras.leftMenuForumGroupCategories || []).map(function(category) {
