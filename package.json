@@ -32,7 +32,7 @@
     "fuzzysearch": "^1.0.3",
     "gitter-app-version": "file:modules/app-version",
     "gitter-client-env": "file:modules/client-env",
-    "gitter-env": "^0.28.0",
+    "gitter-env": "^0.28.2",
     "gitter-faye": "^1.1.0-e",
     "gitter-faye-redis": "^0.4.4",
     "gitter-markdown-processor": "^11.2.0",
