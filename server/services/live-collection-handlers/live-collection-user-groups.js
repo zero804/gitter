@@ -12,7 +12,4 @@ module.exports = {
     appEvents.dataChange2('/user/' + userId + '/groups', 'patch', patchMessage, 'group');
   }
 
-  // var liveCollections = require('gitter-web-live-collection-events');
-  // liveCollections.userGroups.emit('patch', userId, groupId, { favourite: x });
-
 };
