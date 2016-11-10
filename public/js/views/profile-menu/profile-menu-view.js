@@ -2,7 +2,6 @@
 
 var Marionette = require('backbone.marionette');
 var Backbone = require('backbone');
-var $ = require('jquery');
 var _ = require('underscore');
 var template = require('./profile-menu-view.hbs');
 var itemTemplate = require('./profile-menu-item-view.hbs');
@@ -160,7 +159,7 @@ module.exports = Marionette.CompositeView.extend({
     toggleClass(this.ui.menu[0], 'hidden', !state);
   },
 
-  updateDarkTheme: function(model, val){
+  updateDarkTheme: function(){
     toggleDarkTheme(true);
   }
 
