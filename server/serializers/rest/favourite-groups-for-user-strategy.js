@@ -3,7 +3,7 @@
 var groupService = require('gitter-web-groups/lib/group-service');
 
 // Based on ./server/serializers/rest/troupes/favourite-troupes-for-user-strategy.js
-function FavouriteGroupsForUserStrategy(options) {
+function FavouriteGroupsForUserStrategy(options = {}) {
   this.userId = options.currentUserId;
   this.favs = null;
 }
