@@ -5,14 +5,13 @@ var Promise = require('bluebird');
 var _ = require('lodash');
 var restSerializer = require("../serializers/rest-serializer");
 var userService = require('../services/user-service');
-var userSettingsService = require('../services/user-settings-service');
 var roomMetaService = require('../services/room-meta-service');
 var contextGeneratorRequest = require('./context-generator-request');
 
 /**
  * Returns the promise of a mini-context
  */
-function generateMainMenuContext(req) {
+function generateMainMenuContext(req, leftMenu) {
   var user = req.user;
   var uriContext = req.uriContext;
   var group = uriContext && uriContext.group;
@@ -25,24 +24,22 @@ function generateMainMenuContext(req) {
       user ? serializeUser(user) : null,
       group ? serializeGroup(group, user) : undefined,
       troupe ? serializeTroupe(troupe, user) : undefined,
-      user ? userSettingsService.getMultiUserSettingsForUserId(user._id, ['suggestedRoomsHidden', 'leftRoomMenu']) : null,
     ])
-    .spread(function (reqContextHash, serializedUser, serializedGroup, serializedTroupe, settings) {
-      var suggestedRoomsHidden = settings && settings.suggestedRoomsHidden;
-      var leftRoomMenuState = settings && settings.leftRoomMenu;
-      if (leftRoomMenuState) {
-        delete leftRoomMenuState.state;
-        delete leftRoomMenuState.groupId;
-      }
+    .spread(function (reqContextHash, serializedUser, serializedGroup, serializedTroupe) {
+      // TODO: how is suggestedRoomsHidden different from hasDismissedSuggestions?
+      var suggestedRoomsHidden = leftMenu.suggestedRoomsHidden;
+      delete leftMenu.suggestedRoomsHidden;
 
-      return _.extend({}, reqContextHash, {
+      var serializedContext = _.extend({}, reqContextHash, {
         roomMember: roomMember,
         user: serializedUser,
         group: serializedGroup,
         troupe: serializedTroupe,
         suggestedRoomsHidden: suggestedRoomsHidden,
-        leftRoomMenuState: leftRoomMenuState,
+        leftRoomMenuState: leftMenu,
       });
+
+      return serializedContext;
     });
 }
 

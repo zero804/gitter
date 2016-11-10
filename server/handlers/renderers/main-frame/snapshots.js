@@ -3,11 +3,8 @@
 var parseRoomsIntoLeftMenuRoomList = require('./left-menu-room-list');
 var parseRoomsIntoLeftMenuFavouriteRoomList = require('./left-menu-room-favourite-list');
 var parseCategoryForTemplate = require('gitter-web-shared/parse/forum-category-item');
-var generateLeftMenuStateForUriContext = require('./generate-left-menu-state-for-uri-context');
 
-function getMainFrameSnapshots(uriContext, leftMenuPeristedState, rooms, groups, extras) {
-  var leftMenu = generateLeftMenuStateForUriContext(uriContext, leftMenuPeristedState, extras);
-
+function getMainFrameSnapshots(leftMenu, rooms, groups, extras) {
   var forumCategories = (extras.leftMenuForumGroupCategories || []).map(function(category) {
     category.groupUri = extras.leftMenuForumGroup && extras.leftMenuForumGroup.uri;
     return category;
