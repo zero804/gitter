@@ -73,7 +73,7 @@ var HeaderView = Marionette.ItemView.extend({
         toggleClass(this.ui.headerFavourite[0], 'active', state === 'favourite');
         toggleClass(this.ui.headerPeople[0], 'active', state === 'people');
         toggleClass(this.ui.headerGroup[0], 'active', state === 'group');
-        toggleClass(this.ui.headerOrg[0], 'active', (state === 'org' || state === 'temp-org'));
+        toggleClass(this.ui.headerOrg[0], 'active', state === 'org');
       }.bind(this));
     }.bind(this));
   },
