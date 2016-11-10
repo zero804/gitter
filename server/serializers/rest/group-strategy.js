@@ -6,21 +6,23 @@ var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var SecurityDescriptorStrategy = require('./security-descriptor-strategy');
 var FavouriteGroupsForUserStrategy = require('./favourite-groups-for-user-strategy');
 
-function GroupStrategy({ currentUserId, includeHasAvatarSet }) {
+function GroupStrategy(options) {
+  this.options = options || {};
 
   var securityDescriptorStrategy;
   var favouriteStrategy;
 
   this.preload = function() {
-    var currentUserObjectId = mongoUtils.asObjectID(currentUserId);
+    var options = this.options;
+    var currentUserId = mongoUtils.asObjectID(options.currentUserId);
     var strategies = [];
 
     securityDescriptorStrategy = SecurityDescriptorStrategy.slim();
 
-    if (currentUserObjectId) {
+    if (currentUserId) {
       // Favourites for user
       favouriteStrategy = new FavouriteGroupsForUserStrategy({
-        currentUserId: currentUserObjectId
+        currentUserId: options.currentUserId
       });
       strategies.push(favouriteStrategy.preload());
     }
@@ -29,10 +31,11 @@ function GroupStrategy({ currentUserId, includeHasAvatarSet }) {
   };
 
   this.map = function(group) {
+    var options = this.options;
     var id = group.id || group._id && group._id.toHexString();
 
     var hasAvatarSet = undefined;
-    if(includeHasAvatarSet) {
+    if(options.includeHasAvatarSet) {
       hasAvatarSet = group.avatarVersion > 0 || group.sd.type === 'GH_ORG' || group.sd.type === 'GH_REPO' || group.sd.type === 'GH_USER';
     }
 

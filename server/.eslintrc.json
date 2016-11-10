@@ -3,21 +3,7 @@
     "commonjs": true,
     "node": true
   },
-  "parserOptions": {
-    "ecmaVersion": 6,
-    "sourceType": "script"
-  },
   "rules": {
-    "node/no-unpublished-require": "error",
-    "node/no-unsupported-features": [
-      "error",
-      {
-        "version": 6,
-        "ignores": [
-          "syntax",
-          "modules"
-        ]
-      }
-    ]
+    "node/no-unpublished-require": "error"
   }
 }
