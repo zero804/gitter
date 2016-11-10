@@ -13,6 +13,7 @@ var getSubResources = require('./sub-resources');
 var fixMongoIdQueryParam = require('../../web/fix-mongo-id-query-param');
 var fonts = require('../../web/fonts');
 var generateRightToolbarSnapshot = require('../snapshots/right-toolbar-snapshot');
+var generateProfileMenuSnapshot = require('../snapshots/profile-menu-snapshot');
 var getHeaderViewOptions = require('gitter-web-shared/templates/get-header-view-options');
 
 /* How many chats to send back */
@@ -51,8 +52,9 @@ function renderChat(req, res, next, options) {
         restful.serializeChatsForTroupe(troupe.id, userId, chatSerializerOptions),
         options.fetchEvents === false ? null : restful.serializeEventsForTroupe(troupe.id, userId),
         options.fetchUsers === false ? null : restful.serializeUsersForTroupe(troupe.id, userId, userSerializerOptions),
-        generateRightToolbarSnapshot(req)
-      ]).spread(function (troupeContext, chats, activityEvents, users, rightToolbarSnapshot) {
+        generateRightToolbarSnapshot(req),
+        generateProfileMenuSnapshot(req),
+      ]).spread(function (troupeContext, chats, activityEvents, users, rightToolbarSnapshot, profileMenuSnapshot) {
         var initialChat = _.find(chats, function(chat) { return chat.initial; });
         var initialBottom = !initialChat;
         var classNames = options.classNames || [];
@@ -60,6 +62,7 @@ function renderChat(req, res, next, options) {
 
         var snapshots = rightToolbarSnapshot;
         troupeContext.snapshots = snapshots;
+        profileMenuSnapshot = (profileMenuSnapshot || {});
 
         if (!user) classNames.push("logged-out");
 
@@ -87,7 +90,7 @@ function renderChat(req, res, next, options) {
         }
 
         var renderOptions = _.extend({
-            hasDarkTheme: req.fflip && req.fflip.has('dark-theme'),
+            hasDarkTheme: profileMenuSnapshot.hasDarkTheme,
             hasCachedFonts: fonts.hasCachedFonts(req.cookies),
             fonts: fonts.getFonts(),
             isRepo: troupe.sd.type === 'GH_REPO', // Used by chat_toolbar patial
