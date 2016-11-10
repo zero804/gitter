@@ -16,20 +16,21 @@ function getMainFrameSnapshots(req, troupeContext, rooms, groups, extras) {
     return category;
   });
 
-  var parsedRooms = parseRoomsIntoLeftMenuRoomList(leftMenu.state, rooms, leftMenu.groupId);
-  var parsedFavourites = parseRoomsIntoLeftMenuFavouriteRoomList(leftMenu.state, rooms, leftMenu.groupId);
+  var forum, parsedRooms, parsedFavourites;
 
   if(leftMenu.state === 'group') {
     parsedRooms = groups;
     parsedFavourites = [];
-  }
+  } else {
+    parsedRooms = parseRoomsIntoLeftMenuRoomList(leftMenu.state, rooms, leftMenu.groupId);
+    parsedFavourites = parseRoomsIntoLeftMenuFavouriteRoomList(leftMenu.state, rooms, leftMenu.groupId);
 
-  var forum;
-  if (forumCategories && (leftMenu.state === 'org' || leftMenu.state === 'temp-org')) {
-    forum = {
-      hasCategories: forumCategories.length > 0,
-      categories: forumCategories.map(parseCategoryForTemplate)
-    };
+    if (forumCategories && (leftMenu.state === 'org' || leftMenu.state === 'temp-org')) {
+      forum = {
+        hasCategories: forumCategories.length > 0,
+        categories: forumCategories.map(parseCategoryForTemplate)
+      };
+    }
   }
 
   return {
