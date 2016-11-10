@@ -1,9 +1,9 @@
 "use strict";
 
-var parseRoomsIntoLeftMenuRoomList = require('./left-menu/left-menu-room-list');
-var parseRoomsIntoLeftMenuFavouriteRoomList = require('./left-menu/left-menu-room-favourite-list');
+var parseRoomsIntoLeftMenuRoomList = require('./left-menu-room-list');
+var parseRoomsIntoLeftMenuFavouriteRoomList = require('./left-menu-room-favourite-list');
 var parseCategoryForTemplate = require('gitter-web-shared/parse/forum-category-item');
-var generateLeftMenuStateForUriContext = require('./left-menu/generate-left-menu-state-for-uri-context');
+var generateLeftMenuStateForUriContext = require('./generate-left-menu-state-for-uri-context');
 
 function getMainFrameSnapshots(uriContext, leftMenuPeristedState, rooms, groups, extras) {
   var leftMenu = generateLeftMenuStateForUriContext(uriContext, leftMenuPeristedState, extras);
