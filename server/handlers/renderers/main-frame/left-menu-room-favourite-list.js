@@ -6,14 +6,12 @@ var orgFavouriteFilter = require('gitter-web-shared/filters/left-menu-primary-fa
 var favouriteSort = require('gitter-web-shared/sorting/left-menu-primary-favourite');
 var parseToTemplateItem = require('gitter-web-shared/parse/left-menu-primary-item');
 
-module.exports = function generateLemMenuFavouriteRoomsList(state, rooms, groupId) {
-
+function generateLeftMenuFavouriteRoomsList(state, rooms, groupId) {
   var filter;
   switch(state) {
     //There is no filter here because you can only be in the temp org state
     //if you have not joined any rooms for a given group
     case 'search':
-    case 'temp-org':
       filter = function() { return false; };
       break;
     case 'people':
@@ -30,10 +28,11 @@ module.exports = function generateLemMenuFavouriteRoomsList(state, rooms, groupI
     .filter(favouriteFilter)
     .map(function(model){
       if(!filter(model)) {
-        if(model.get) { model.set('isHidden', true); }
         model.isHidden = true;
       }
       return parseToTemplateItem(model, state);
     })
     .sort(favouriteSort);
-};
+}
+
+module.exports = generateLeftMenuFavouriteRoomsList;

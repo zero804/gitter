@@ -16,7 +16,6 @@ var FilteredMinibarGroupCollection = require('../collections/filtered-minibar-gr
 var FilteredRoomCollection = require('../collections/filtered-room-collection');
 var FilteredFavouriteRoomCollection = require('../collections/filtered-favourite-room-collection');
 var SuggestedRoomsByRoomCollection = require('../collections/left-menu-suggested-by-room');
-var SuggestedRoomsByGroupName = require('../collections/org-suggested-rooms-by-name');
 var UserSuggestions = require('../collections/user-suggested-rooms');
 var SearchRoomPeopleCollection = require('../collections/left-menu-search-rooms-and-people');
 var SearchChatMessages = require('../collections/search-chat-messages');
@@ -29,7 +28,6 @@ var TertiaryCollectionModel = require('../views/menu/room/tertiary-collection/te
 var favouriteCollectionFilter = require('gitter-web-shared/filters/left-menu-primary-favourite');
 var MinibarItemModel = require('../views/menu/room/minibar/minibar-item-model');
 var MinibarHomeModel = require('../views/menu/room/minibar/home-view/home-model');
-var MinibarTempOrgModel = require('../views/menu/room/minibar/temp-org-view/temp-org-model');
 var MinibarPeopleModel = require('../views/menu/room/minibar/people-view/people-model');
 
 var states = [
@@ -126,8 +124,6 @@ module.exports = Backbone.Model.extend({
       suggestedOrgsCollection: this.suggestedOrgs,
     });
 
-    this.suggestedRoomsByOrgName = new SuggestedRoomsByGroupName(null, { roomMenuModel: this });
-
     var state = this.get('state');
     this.minibarHomeModel = new MinibarHomeModel({ name: 'all', type: 'all', active: (state === 'all') }, { roomCollection: this._roomCollection });
     this.minibarSearchModel = new MinibarItemModel({ name: 'search', type: 'search', active: (state === 'search') });
@@ -135,7 +131,6 @@ module.exports = Backbone.Model.extend({
     this.minibarGroupModel = new MinibarItemModel({ name: 'group', type: 'group', active: (state === 'group') });
     this.minibarCommunityCreateModel = new MinibarItemModel({ name: 'Create Community', type: 'community-create' });
     this.minibarCloseModel = new MinibarItemModel({ name: 'close', type: 'close' });
-    this.minibarTempOrgModel = new MinibarTempOrgModel(attrs.tempOrg, { troupe: context.troupe(), });
 
     //Setup an inital active group model
     this.groupsCollection.forEach(function(model){
@@ -240,13 +235,6 @@ module.exports = Backbone.Model.extend({
       case 'org':
         this.primaryCollection.switchCollection(this.activeRoomCollection);
         this.secondaryCollection.switchCollection(this.suggestedOrgs);
-        this.tertiaryCollection.switchCollection(this._suggestedRoomCollection);
-        break;
-
-      case 'temp-org':
-        this.set('groupId', null);
-        this.primaryCollection.switchCollection(this.activeRoomCollection);
-        this.secondaryCollection.switchCollection(this.suggestedRoomsByOrgName);
         this.tertiaryCollection.switchCollection(this._suggestedRoomCollection);
         break;
 

@@ -22,7 +22,7 @@ function getMainFrameSnapshots(uriContext, leftMenuPeristedState, rooms, groups,
     parsedRooms = parseRoomsIntoLeftMenuRoomList(leftMenu.state, rooms, leftMenu.groupId);
     parsedFavourites = parseRoomsIntoLeftMenuFavouriteRoomList(leftMenu.state, rooms, leftMenu.groupId);
 
-    if (forumCategories && (leftMenu.state === 'org' || leftMenu.state === 'temp-org')) {
+    if (forumCategories && leftMenu.state === 'org') {
       forum = {
         hasCategories: forumCategories.length > 0,
         categories: forumCategories.map(parseCategoryForTemplate)
