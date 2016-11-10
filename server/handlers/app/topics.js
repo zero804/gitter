@@ -6,7 +6,7 @@ var mainFrameRenderers = require('../renderers/main-frame');
 var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
 var featureToggles = require('../../web/middlewares/feature-toggles');
 var isPhoneMiddleware = require('../../web/middlewares/is-phone');
-var contextGenerator = require('../../web/context-generator.js');
+var ensureLoggedIn = require('../../web/middlewares/ensure-logged-in');
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
@@ -60,49 +60,30 @@ router.get('/categories/:categoryName/~topics',
 );
 
 router.get('/create-topic',
+  ensureLoggedIn,
   identifyRoute('create-topic'),
   featureToggles,
   isPhoneMiddleware,
   function(req, res, next) {
-
     var renderer = mainFrameRenderers.renderMainFrame
     if (req.isPhone) {
       renderer = mainFrameRenderers.renderMobileMainFrame;
     }
 
-    return contextGenerator.generateMainMenuContext(req)
-      .then(function(context) {
-        var user = context.user;
-        var isSignedIn = !!user;
-
-        if(!isSignedIn) {
-          return res.redirect('/login');
-        }
-
-        return renderer(req, res, next, {
-          subFrameLocation: '/' + req.params.groupUri + '/topics/create-topic/~topics'
-        });
-      });
+    return renderer(req, res, next, {
+      subFrameLocation: '/' + req.params.groupUri + '/topics/create-topic/~topics'
+    });
   }
 );
 
 router.get('/create-topic/~topics',
+  ensureLoggedIn,
   identifyRoute('create-topic-embeded'),
   featureToggles,
-  function(req, res, next){
-    return contextGenerator.generateMainMenuContext(req)
-      .then(function(context) {
-        var user = context.user;
-        var isSignedIn = !!user;
-
-        if(!isSignedIn) {
-          return res.redirect('/login');
-        }
-
-        return topicsRenderers.renderForum(req, res, next, {
-          createTopic: true
-        });
-      });
+  function(req, res, next) {
+    return topicsRenderers.renderForum(req, res, next, {
+      createTopic: true
+    });
   }
 );
 

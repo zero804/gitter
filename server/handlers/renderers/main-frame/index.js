@@ -15,6 +15,7 @@ var roomSort = require('gitter-realtime-client/lib/sorts-filters').pojo;
 var getSubResources = require('../sub-resources');
 var getMainFrameSnapshots = require('./snapshots');
 var fonts = require('../../../web/fonts');
+var generateLeftMenuStateForUriContext = require('./generate-left-menu-state-for-uri-context');
 
 function getLeftMenuForumGroupInfo(leftMenuGroupId) {
   return groupService.findById(leftMenuGroupId)
@@ -28,8 +29,8 @@ function getLeftMenuForumGroupInfo(leftMenuGroupId) {
     });
 }
 
-function getTroupeContextAndDerivedInfo(req, socialMetadataGenerator) {
-  return contextGenerator.generateMainMenuContext(req)
+function getTroupeContextAndDerivedInfo(req, leftMenu, socialMetadataGenerator) {
+  return contextGenerator.generateMainMenuContext(req, leftMenu)
     .bind({
       troupeContext: null,
       socialMetadata: null,
@@ -39,8 +40,7 @@ function getTroupeContextAndDerivedInfo(req, socialMetadataGenerator) {
     .then(function(troupeContext) {
       this.troupeContext = troupeContext;
 
-      var currentRoom = (req.troupe || {});
-      var leftMenuGroupId = (troupeContext.leftRoomMenuState && troupeContext.leftRoomMenuState.groupId) || (currentRoom.groupId);
+      var leftMenuGroupId = leftMenu.groupId;
 
       return [
         socialMetadataGenerator && socialMetadataGenerator(troupeContext),
@@ -61,17 +61,28 @@ function renderMainFrame(req, res, next, options) {
   var userId = user && user.id;
   var socialMetadataGenerator = options.socialMetadataGenerator;
   var selectedRoomId = req.troupe && req.troupe.id;
+  var suggestedMenuState = options.suggestedMenuState;
+  var uriContext = req.uriContext;
 
-  Promise.all([
-      getTroupeContextAndDerivedInfo(req, socialMetadataGenerator),
-      restful.serializeTroupesForUser(userId),
-      restful.serializeOrgsForUserId(userId).catch(function(err) {
-        // Workaround for GitHub outage
-        winston.error('Failed to serialize orgs:' + err, { exception: err });
-        return [];
-      }),
-      restful.serializeGroupsForUserId(userId),
-    ])
+  // First thing: figure out the state we're planning on rendering...
+  return generateLeftMenuStateForUriContext(userId, uriContext, suggestedMenuState)
+    .bind({
+      leftMenu: null
+    })
+    .then(function(leftMenu) {
+      this.leftMenu = leftMenu;
+
+      return [
+        getTroupeContextAndDerivedInfo(req, leftMenu, socialMetadataGenerator),
+        restful.serializeTroupesForUser(userId),
+        restful.serializeOrgsForUserId(userId).catch(function(err) {
+          // Workaround for GitHub outage
+          winston.error('Failed to serialize orgs:' + err, { exception: err });
+          return [];
+        }),
+        restful.serializeGroupsForUserId(userId),
+      ];
+    })
     .spread(function(troupeContextAndDerivedInfo, rooms, orgs, groups) {
       var troupeContext = troupeContextAndDerivedInfo.troupeContext;
       var socialMetadata = troupeContextAndDerivedInfo.socialMetadata;
@@ -89,20 +100,17 @@ function renderMainFrame(req, res, next, options) {
         bootScriptName = 'router-nli-app';
       }
 
-      var uriContext = req.uriContext;
-      var leftMenuPeristedState = troupeContext.leftRoomMenuState; // TODO: remove from troupeContext
-
-      var snapshots = troupeContext.snapshots = getMainFrameSnapshots(uriContext, leftMenuPeristedState, rooms, groups, {
-        suggestedMenuState: options.suggestedMenuState,
+      var leftMenu = this.leftMenu;
+      var snapshots = troupeContext.snapshots = getMainFrameSnapshots(leftMenu, rooms, groups, {
         leftMenuForumGroup: leftMenuForumGroup,
         leftMenuForumGroupCategories: leftMenuForumGroupCategories
       });
 
-      if(snapshots && snapshots.leftMenu && snapshots.leftMenu.state) {
-        // `gitter.web.prerender-left-menu`
+      if(leftMenu.state) {
+        // Generate `gitter.web.prerender-left-menu` events
         statsd.increment('prerender-left-menu', 1, 0.25, [
-          'state:' + snapshots.leftMenu.state,
-          'pinned:' + (snapshots.leftMenu.roomMenuIsPinned ? '1' : '0')
+          'state:' + leftMenu.state,
+          'pinned:' + (leftMenu.roomMenuIsPinned ? '1' : '0')
         ]);
       }
 
@@ -171,7 +179,6 @@ function renderMobileMainFrame(req, res, next, options) {
       ]);
     })
     .spread(function(troupeContext, socialMetadata) {
-
       var bootScriptName = 'router-mobile-app';
 
       res.render('mobile/mobile-app', {
@@ -184,7 +191,8 @@ function renderMobileMainFrame(req, res, next, options) {
         title: options.title,
         subFrameLocation: options.subFrameLocation
       });
-    });
+    })
+    .catch(next);
 }
 
 module.exports = exports = {
