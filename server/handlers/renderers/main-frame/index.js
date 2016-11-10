@@ -5,17 +5,16 @@ var winston = env.logger;
 var nconf = env.config;
 var statsd = env.createStatsClient({ prefix: nconf.get('stats:statsd:prefix')});
 var Promise = require('bluebird');
-var contextGenerator = require('../../web/context-generator');
-var restful = require('../../services/restful');
+var contextGenerator = require('../../../web/context-generator');
+var restful = require('../../../services/restful');
 var forumCategoryService = require('gitter-web-topics').forumCategoryService;
 var groupService = require('gitter-web-groups');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
-var roomSort = require('gitter-realtime-client/lib/sorts-filters').pojo; /* <-- Don't use the default export
-                                                                                          will bring in tons of client-side
-                                                                                          libraries that we don't need */
-var getSubResources = require('./sub-resources');
-var getMainFrameSnapshots = require('../../handlers/snapshots/main-frame');
-var fonts = require('../../web/fonts');
+/* 👇 Don't use the default export will bring in tons of client-side libraries that we don't need 👇 */
+var roomSort = require('gitter-realtime-client/lib/sorts-filters').pojo;
+var getSubResources = require('../sub-resources');
+var getMainFrameSnapshots = require('./snapshots');
+var fonts = require('../../../web/fonts');
 
 function getLeftMenuForumGroupInfo(leftMenuGroupId) {
   return groupService.findById(leftMenuGroupId)
