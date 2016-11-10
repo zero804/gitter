@@ -182,9 +182,9 @@ module.exports = Backbone.Model.extend({
 
     this.searchFocusModel = new Backbone.Model({ focus: false });
 
-    var forumSnapshot = context.getSnapshot('forum');
+    var forumCategories = context.getSnapshot('forumCategories');
     this.forumCategoryContextModel = new ForumCategoryContextModel();
-    this.forumCategoryCollection = new ForumCategoryCollection(forumSnapshot && forumSnapshot.categories, { contextModel: this.forumCategoryContextModel });
+    this.forumCategoryCollection = new ForumCategoryCollection(forumCategories, { contextModel: this.forumCategoryContextModel });
 
     this.listenTo(this.primaryCollection, 'snapshot', this.onPrimaryCollectionSnapshot, this);
     this.snapshotTimeout = setTimeout(function(){
