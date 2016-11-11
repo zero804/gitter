@@ -80,7 +80,7 @@ function renderMainFrame(req, res, next, options) {
         restful.serializeGroupsForUserId(userId),
       ];
     })
-    .spread(function(troupeContextAndDerivedInfo, rooms, /*orgs, */groups) {
+    .spread(function(troupeContextAndDerivedInfo, rooms, groups) {
       var troupeContext = troupeContextAndDerivedInfo.troupeContext;
       var socialMetadata = troupeContextAndDerivedInfo.socialMetadata;
       var leftMenuForumGroup = troupeContextAndDerivedInfo.leftMenuGroup;
