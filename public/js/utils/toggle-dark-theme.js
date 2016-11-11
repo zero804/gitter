@@ -5,7 +5,7 @@ var frameUtils = require('gitter-web-frame-utils');
 
 module.exports = function toggleDarkTheme(isChildFrame){
 
-  isChildFrame = (isChildFrame || false);
+  isChildFrame = frameUtils.hasParentFrameSameOrigin();
   var darkThemeLink = document.getElementById('dark-theme-styles');
 
   //If we have a reference to the dark-theme script we remove it
