@@ -51,8 +51,8 @@ Gitter uses a number of backend peristence services:
 
 ### Dataflow
 
-![](./images/dataflow.jpg)
+![](./images/dataflow.png)
 
 ### Infrastructure
 
-![](./images/infrastructure.jpg)
+![](./images/infrastructure.png)
