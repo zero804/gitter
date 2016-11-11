@@ -19,9 +19,11 @@ Troubleshooting
 
 ## NPM Install Hanging
 We use our own npm registry on `http://beta-internal.beta.gitter:4873`. In order to access this registry, you need to 
+
 1. Be connected to the Gitter VPN.
 2. Be able to resolve `beta-internal.beta.gitter` (try `ping beta-internal.beta.gitter`).
 3. On some folks systems', the VPN does not correctly configure DNS, but you can add these entries to your hosts file as a workaround:
+
 ```
 10.0.0.140 beta-internal
 10.0.0.140 beta-internal.beta.gitter
