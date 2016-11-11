@@ -151,9 +151,9 @@ var PanelView = Marionette.LayoutView.extend({
     this.dndCtrl = attrs.dndCtrl;
     this.keyboardControllerView = attrs.keyboardControllerView;
     this.queryModel = this.model.searchMessageQueryModel;
-    this.listenTo(this.bus, 'ui:swipeleft', this.onSwipeLeft, this);
-    this.listenTo(this.bus, 'focus.request.chat', this.onSearchItemSelected, this);
-    this.listenTo(this.model, 'change:state', this.onModelChangeState, this);
+    this.listenTo(this.bus, 'ui:swipeleft', this.onSwipeLeft);
+    this.listenTo(this.bus, 'focus.request.chat', this.onSearchItemSelected);
+    this.listenTo(this.model, 'change:state', this.onModelChangeState);
     this.listenTo(this.model.forumCategoryCollection, 'add remove reset', this.onForumCategoryCollectionChange);
     this.$el.find('#search-results').show();
   },
@@ -196,6 +196,10 @@ var PanelView = Marionette.LayoutView.extend({
   onChildRender: _.debounce(function (){
     this.bus.trigger('panel:render');
   }, 10),
+
+  onProfileToggle: function(model, val) {
+    this.ui.profileMenu[0].setAttribute('aria-hidden', !val);
+  },
 
   onModelChangeState: function (){
     var state = this.model.get('state');
