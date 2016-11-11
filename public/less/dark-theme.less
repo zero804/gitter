@@ -146,14 +146,26 @@
 @topics-row-title-color: #b6b0af;
 @topics-row-details-color: @org-page-list-item-details-color;
 
+@topic-background-color: @app-main-bg-color;
+@topic-header-color: @org-page-list-item-heading-color;
+@topic-description-color: @org-page-list-item-description-color;
+@topic-description-border-color: #222;
+@topic-reply-editor-background: @app-header-bg-color;
+@topic-reply-list-background-color: #363434;
+@topic-reply-list-item-background-color: @topic-background-color;
+@topic-reply-list-item-body-color: @topic-description-color;
+@topic-reply-editor-border-color: @topic-description-border-color;
+@topic-reply-list-header-color: @topic-header-color;
+@topic-comment-editor-background-color: @topic-reply-editor-background;
 
 
 /* -------------------------------------------
               Components
 ------------------------------------------- */
 
-body { background-color: @app-main-bg-color;
-code { //Single line code blocks don't have a `pre` element
+body { background-color: @app-main-bg-color; }
+code,
+.topic-body__content code { //Single line code blocks don't have a `pre` element
   border: none;
   background-color: @app-single-line-code-color;
   padding: .2rem .5rem;
@@ -628,4 +640,54 @@ a.room-item__container:hover { //:cry:
 .topics-table-body__cell--likes {
   color: @topics-row-details-color;
 }
+
+.container--topic-header {
+  background-color: @topic-background-color;
+}
+
+.topic-header__title {
+  color: @topic-header-color;
+}
+
+.panel--topic-body {
+  background-color: @topic-background-color;
+  border-color: @topic-description-border-color;
+}
+
+.topic-body__content {
+  color: @topic-description-color;
+
+  a { color: @caribbean; }
+  a:visited { color: darken(@caribbean, 20%); }
+}
+
+.topic-reply-list-header__heading {
+  color: @topic-header-color;
+}
+
+.topic-reply-list-header__filter-button {
+  color: @topic-header-color;
+}
+
+.panel--reply-list-header,
+.panel--topic-reply-list {
+  background-color: @topic-reply-list-background-color;
+}
+
+.feed-item__content {
+  background-color: @topic-reply-list-item-background-color;
+  color: @topic-reply-list-item-body-color;
+}
+
+.panel--reply-editor,
+.editor--reply {
+  background-color: @topic-reply-editor-background;
+  border-color: @topic-reply-editor-border-color;
+  color: @topic-description-color;
+}
+
+.reply-comment-editor__editor {
+  background-color: @topic-comment-editor-background-color;
+  color: @topic-description-color;
+  border-color: @topic-reply-editor-border-color;
 }
