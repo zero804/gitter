@@ -7,7 +7,7 @@
 * [`modules/`](../modules#modules): Monorepo style submodules
 * [`public/`](../public): Public assets for https://gitter.im
 * [`redis-lua/`](../redis-lua): Lua scripts for Redis
-* [`server/`](../server): https://gitter.im backend
+* [`server/`](../server#server): https://gitter.im backend
 * [`shared/`](../shared): Isomorphic Javascript shared by frontend and backend.
 
 
