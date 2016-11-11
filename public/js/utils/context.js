@@ -11,14 +11,14 @@ var ctx = window.troupeContext || {};
 var snapshots = ctx.snapshots || {};
 
 function getGroupModel() {
-  var groupModel;
-  if (ctx.troupe && ctx.troupe.group) {
-    groupModel = ctx.troupe.group;
-  } else if (ctx.group) {
-    groupModel = ctx.group;
+  var groupData;
+  if(ctx.group) {
+    groupData = ctx.group;
   }
-
-  return new Backbone.Model(groupModel);
+  else if (ctx.troupe && ctx.troupe.group) {
+    groupData = ctx.troupe.group;
+  }
+  return new Backbone.Model(groupData);
 }
 
 function getTroupeModel() {
