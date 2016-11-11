@@ -8,7 +8,7 @@
 
 There are three server processes:
 * [`api.js`](../api.js): serving the API
-* [`web.js`](../web.js): serving the web 
+* [`web.js`](../web.js): serving the web
 * [`websockets.js`](../websockets.js): websocket process
 
 ## A Bit of History
@@ -37,7 +37,7 @@ Gitter uses a number of backend peristence services:
   * **redis-caching**: Similar to redis-nonpersist, but capped in size. Used for caching, particularly the **GitHub API**, which we cache using the [`request-http-cache`](https://github.com/gitterHQ/request-http-cache) module.
   * **redis-faye**: Used by [Faye](https://github.com/faye/faye) as a peristent backend.
 * **elasticsearch**
-* **neo4j**: 
+* **neo4j**:
 
 ## Diagrams
 
@@ -48,3 +48,7 @@ Gitter uses a number of backend peristence services:
 ### Software Architecture
 
 ![](./images/architecture.jpg)
+
+### Dataflow
+
+![](./images/dataflow.jpg)
