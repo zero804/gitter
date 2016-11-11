@@ -1,7 +1,7 @@
 Prerequisites
 -------------
 * While the development environment does work on Windows and Linux, **it's easiest to setup on macOS**.
-* Node.js v4 (you can use v6 if you want a faster dev environment, but v4 is used in prod)
+* Node.js v4 (you can use v6 or v7 if you want a faster dev environment, but v4 is used in prod)
 * NPM v2 (you may need to downgrade your copy that came with node)
 * Docker Toolbox (latest version, not Docker for Mac)
 * gulp (`npm install -g gulp`)
