@@ -66,21 +66,6 @@ describe('user-group-api', function() {
   });
 
 
-  it('PUT /v1/user/:userId/groups/:groupId', function() {
-    return request(app)
-      .put('/v1/user/' + fixture.user1.id + '/groups/' + fixture.group1.id)
-      .send({
-        favourite: 1
-      })
-      .set('x-access-token', fixture.user1.accessToken)
-      .set('accept', 'application/json, text/javascript, */*')
-      .expect(200)
-      .then(function(result) {
-        var group = result.body;
-        assert.equal(group.favourite, 1);
-      });
-  });
-
   it('PATCH /v1/user/:userId/groups/:groupId', function() {
     return request(app)
       .patch('/v1/user/' + fixture.user1.id + '/groups/' + fixture.group1.id)

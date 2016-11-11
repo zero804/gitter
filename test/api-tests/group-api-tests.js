@@ -260,6 +260,23 @@ describe('group-api', function() {
       });
   });
 
+  it('PUT /v1/groups/:groupId with forum: {...}', function() {
+    return request(app)
+      .put('/v1/groups/' + fixture.group1.id)
+      .send({
+        forum: {
+          tags: ['monkey', 'banana'],
+          categories: ['General', 'Announcements', 'FAQ']
+        }
+      })
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+      .then(function(result) {
+        var group = result.body;
+        assert.ok(group.forumId);
+      });
+  });
+
   it('GET /v1/groups/:groupId/suggestedRooms', function() {
     return request(app)
       .get('/v1/groups/' + fixture.group1.id + '/suggestedRooms')
