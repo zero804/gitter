@@ -31,3 +31,8 @@ We use our own npm registry on `http://beta-internal.beta.gitter:4873`. In order
 
 ## Docker-Machine Problems
 If you're unable to connect to the docker-machine, it may be worth reinitialising your docker environment. Use the `./kill-services` script to kill your local docker environment, followed by `./start` to restart your environment. Note that doing this will delete all your local data.
+
+
+## Still Stuck
+
+Lots more troubleshooting options over at https://github.com/troupe/gitter-webapp/wiki/Getting-Started-Guide
