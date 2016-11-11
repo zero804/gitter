@@ -1,21 +1,36 @@
 "use strict";
 
+var Promise = require('bluebird');
 var avatars = require('gitter-web-avatars');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var SecurityDescriptorStrategy = require('./security-descriptor-strategy');
+var FavouriteGroupsForUserStrategy = require('./favourite-groups-for-user-strategy');
 
 function GroupStrategy(options) {
   this.options = options || {};
-}
 
-GroupStrategy.prototype = {
-  name: 'GroupStrategy',
+  var securityDescriptorStrategy;
+  var favouriteStrategy;
 
-  preload: function() {
-    this.securityDescriptorStrategy = SecurityDescriptorStrategy.slim();
-    return;
-  },
+  this.preload = function() {
+    var options = this.options;
+    var currentUserId = mongoUtils.asObjectID(options.currentUserId);
+    var strategies = [];
 
-  map: function(group) {
+    securityDescriptorStrategy = SecurityDescriptorStrategy.slim();
+
+    if (currentUserId) {
+      // Favourites for user
+      favouriteStrategy = new FavouriteGroupsForUserStrategy({
+        currentUserId: options.currentUserId
+      });
+      strategies.push(favouriteStrategy.preload());
+    }
+
+    return Promise.all(strategies);
+  };
+
+  this.map = function(group) {
     var options = this.options;
     var id = group.id || group._id && group._id.toHexString();
 
@@ -28,14 +43,19 @@ GroupStrategy.prototype = {
       id: id,
       name: group.name,
       uri: group.uri,
+      favourite: favouriteStrategy ? favouriteStrategy.map(id) : undefined,
       homeUri: group.homeUri,
-      backedBy: this.securityDescriptorStrategy.map(group.sd),
+      backedBy: securityDescriptorStrategy.map(group.sd),
       avatarUrl: avatars.getForGroup(group),
       hasAvatarSet: hasAvatarSet,
       forumId: group.forumId
     };
 
-  }
+  };
+}
+
+GroupStrategy.prototype = {
+  name: 'GroupStrategy'
 };
 
 module.exports = GroupStrategy;

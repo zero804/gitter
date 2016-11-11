@@ -13,6 +13,13 @@ var compositeViewRenderTemplate = require('../../../../utils/composite-view-rend
 var domIndexById = require('../../../../utils/dom-index-by-id');
 var toggleClass = require('../../../../utils/toggle-class');
 
+
+var dragClassMap = {
+  all: 'dragging-all',
+  people: 'dragging-people'
+};
+
+
 var PrimaryCollectionView = BaseCollectionView.extend({
 
   //Ugh, Marionette, get your game together JP 17/2/16
@@ -93,16 +100,16 @@ var PrimaryCollectionView = BaseCollectionView.extend({
 
   onDragStart: function () {
     this.uiModel.set('isDragging', true);
-    this.el.classList.add('dragging');
+    this.el.classList.add(dragClassMap[this.model.get('state')] || 'dragging');
   },
 
   onDragEnd: function () {
     this.uiModel.set('isDragging', false);
-    this.el.classList.remove('dragging');
+    this.el.classList.remove(dragClassMap[this.model.get('state')] || 'dragging');
   },
 
   onDragStateUpdate: function (model, val) { //jshint unused: true
-    toggleClass(this.el, 'dragging', val);
+    toggleClass(this.el, dragClassMap[this.model.get('state')] || 'dragging', val);
   },
 
   onDndActivateItem: function(id) {
