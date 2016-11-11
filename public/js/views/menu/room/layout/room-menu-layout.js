@@ -2,16 +2,12 @@
 
 var _ = require('underscore');
 var Marionette = require('backbone.marionette');
-var fastdom = require('fastdom');
 var context = require('../../../../utils/context');
 var DNDCtrl = require('../../../../components/menu/room/dnd-controller');
-
 var RoomMenuModel = require('../../../../models/room-menu-model');
 var MiniBarView = require('../minibar/minibar-view');
 var PanelView = require('../panel/panel-view');
 var KeyboardControllerView = require('../keyboard-controller/keyboard-controller-view');
-
-var MINIBAR_ITEM_HEIGHT = 65;
 
 require('nanoscroller');
 require('../../../behaviors/isomorphic');

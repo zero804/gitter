@@ -35,7 +35,7 @@ function renderForum(req, res, next, options) {
   var groupUri = req.params.groupUri;
 
   return Promise.props({
-      context: contextGenerator.generateNonChatContext(req),
+      context: contextGenerator.generateBasicContext(req),
       group: groupService.findByUri(groupUri),
       profileMenuSnapshot: generateProfileMenuSnapshot(req),
     })
@@ -127,7 +127,7 @@ function renderTopic(req, res, next) {
   var userId = req.user && req.user._id;
 
   return Promise.props({
-      context: contextGenerator.generateNonChatContext(req),
+      context: contextGenerator.generateBasicContext(req),
       group: groupService.findByUri(groupUri),
       profileMenuSnapshot: generateProfileMenuSnapshot(req)
     })

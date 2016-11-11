@@ -149,7 +149,7 @@ function renderOrgPage(req, res, next) {
       serializeGroup(group, user),
       getRoomsWithMembership(groupId, user, currentPage),
       getForumForGroup(group.uri, group.forumId, user && user.id),
-      contextGenerator.generateNonChatContext(req),
+      contextGenerator.generateBasicContext(req),
       policy.canAdmin(),
       generateProfileMenuSnapshot(req),
       function(serializedGroup, roomBrowseResult, serializedForum, troupeContext, isOrgAdmin, profileMenuSnapshot) {

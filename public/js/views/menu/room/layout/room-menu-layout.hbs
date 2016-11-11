@@ -49,7 +49,7 @@
             </div>
           </li>
 
-          <li data-state-change="close" id="minibar-close"  class="room-menu-options__item--close {{#if roomMenuIsPinned}}left{{/if}}">
+          <li data-state-change="close" id="minibar-close"  class="room-menu-options__item--close {{#if leftMenu.roomMenuIsPinned}}left{{/if}}">
             <div class="room-menu-options__container">
               <button id="menu-toggle-button" class="room-menu-options__item-button menu-toggle-button" title="Toggle left menu">
                 {{> pinned-hamburger-menu-icon }}
@@ -61,7 +61,7 @@
       </div>
     </nav>
     <div id="room-menu__panel">
-      <section class="room-menu__panel {{#if roomMenuIsPinned}}active loading{{/if}}">
+      <section class="room-menu__panel {{#if leftMenu.roomMenuIsPinned}}active loading{{/if}}">
         <div class="header-brand-container">
           <img class="header-brand-container__logo" src='{{cdn "images/svg/gitter-logos/logo-white-lettering.svg"}}' />
         </div>
@@ -81,7 +81,7 @@
             <section id="favourite-collection" class="left-menu-collection">
               <div class="favourite-collection loaded active">
                 <div id="collection-list" class="collection-list--favourite">
-                  {{#each troupeContext.snapshots.favourites}}
+                  {{#each leftMenu.favourites}}
                     <div class="{{#if isNotOneToOne}}room-item--favourite{{else}}room-item--favourite-one2one{{/if}} {{#if isHidden}}hidden{{/if}}"
                          id="{{id}}"
                          data-id="{{id}}">
@@ -99,7 +99,7 @@
                   <i id="dismiss-suggestion" class="icon-cancel-circle collection-header__dismiss-suggestion hidden"></i>
                 </header>
                 <div id="collection-list" class="collection-list--primary">
-                  {{#each troupeContext.snapshots.rooms}}
+                  {{#each leftMenu.rooms}}
                     <div class="{{#if isNotOneToOne}}room-item{{else}}room-item--one2one{{/if}} {{#if isHidden}}hidden{{/if}}" id="{{id}}"  data-id="{{id}}">
                       {{{ prerenderView "js/views/menu/room/primary-collection/primary-collection-item-view" }}}
                     </div>
@@ -108,7 +108,7 @@
               </div>
             </section>
 
-            <div id="left-menu-topics-area" class="left-menu-topics-root {{#unless forum.hasCategories}}hidden{{/unless}}">
+            <div id="left-menu-topics-area" class="left-menu-topics-root {{#unless leftMenu.forum.hasCategories}}hidden{{/unless}}">
               <div>
                 <h2 class="collection__title">
                   Topics
@@ -116,7 +116,7 @@
 
                 <div class="js-left-menu-topics-category-list-root">
                   <ul class="collection-list">
-                    {{#each forum.categories}}
+                    {{#each leftMenu.forum.categories}}
                       <li data-id="{{id}}" id="{{id}}">
                         {{{ prerenderView "js/views/menu/room/topics-area/category-item-view" }}}
                       </li>

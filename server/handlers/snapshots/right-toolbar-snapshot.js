@@ -2,7 +2,7 @@
 
 var userSettingsService = require('../../services/user-settings-service');
 
-module.exports = function getSnapshotsForPageContext(req) {
+function getSnapshotsForPageContext(req) {
   if (!req.user) return {};
   return userSettingsService.getUserSettings(req.user._id, 'rightToolbar')
     .then(function(rightToolbarUserSettings) {
@@ -20,4 +20,6 @@ module.exports = function getSnapshotsForPageContext(req) {
         }
       };
     });
-};
+}
+
+module.exports = getSnapshotsForPageContext;
