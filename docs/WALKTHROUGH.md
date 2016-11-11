@@ -9,3 +9,14 @@
 * [`redis-lua/`](../redis-lua): Lua scripts for Redis
 * [`server/`](../server): https://gitter.im backend
 * [`shared/`](../shared): Isomorphic Javascript shared by frontend and backend.
+
+
+## Diagrams
+
+### Overview
+
+![](./images/overview.jpg)
+
+### Architecture
+
+![](./images/architecture.jpg)
