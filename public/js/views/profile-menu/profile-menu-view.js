@@ -160,7 +160,7 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   updateDarkTheme: function(){
-    toggleDarkTheme(true);
+    toggleDarkTheme();
   }
 
 });
