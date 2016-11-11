@@ -11,7 +11,7 @@ module.exports = function(hbs) {
 
   var files = glob.sync(partialsGlob);
   return files.map(function(file) {
-    var partialName = path.relative(partialsDir, file).replace(/\.hbs$/, '').replace(path.sep, '/');
+    var partialName = path.relative(partialsDir, file).replace(/\.hbs$/, '');
     var partialTemplate = fs.readFileSync(file, 'utf8');
     hbs.registerPartial(partialName, partialTemplate);
 
