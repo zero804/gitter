@@ -4,7 +4,7 @@
 
 * [`build-scripts/`](../build-scripts): Tools and scripts related to building the application
 * [`config/`](../config): Configuration files
-* [`modules/`](../modules): Monorepo style submodules
+* [`modules/`](../modules#modules): Monorepo style submodules
 * [`public/`](../public): Public assets for https://gitter.im
 * [`redis-lua/`](../redis-lua): Lua scripts for Redis
 * [`server/`](../server): https://gitter.im backend
