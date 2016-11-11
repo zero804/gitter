@@ -98,7 +98,7 @@ function sendUserTroupeNotification(userId, troupeId, notificationNumber, userNo
       }
 
       // TODO: remove this....
-      if(userNotifySetting == 'mute') {
+      if(userNotifySetting === 'mute') {
         /* Mute this troupe for this user */
         return;
       }
