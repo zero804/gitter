@@ -187,7 +187,7 @@ function renderOrgPage(req, res, next) {
         var createTopicUrl = clientEnv.basePath + '/' + serializedGroup.uri + '/topics/create-topic';
 
         res.render('org-page', {
-          hasDarkTheme: userThemeSnapshot === 'gitter-dark',
+          hasDarkTheme: userThemeSnapshot.theme === 'gitter-dark',
           hasCachedFonts: fonts.hasCachedFonts(req.cookies),
           fonts: fonts.getFonts(),
           socialUrl: url,

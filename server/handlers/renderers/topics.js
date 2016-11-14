@@ -93,7 +93,7 @@ function renderForum(req, res, next, options) {
       return res.render('topics/forum', {
         layout: 'topics-layout',
         hasCachedFonts: fonts.hasCachedFonts(req.cookies),
-        hasDarkTheme: this.userThemeSnapshot === 'gitter-dark',
+        hasDarkTheme: this.userThemeSnapshot.theme === 'gitter-dark',
         fonts: fonts.getFonts(),
         componentData: {
           forum: forum,
@@ -199,7 +199,7 @@ function renderTopic(req, res, next) {
 
       return res.render('topics/topic', {
         layout: 'topics-layout',
-        hasDarkTheme: this.userThemeSnapshot === 'gitter-dark',
+        hasDarkTheme: this.userThemeSnapshot.theme === 'gitter-dark',
         hasCachedFonts: fonts.hasCachedFonts(req.cookies),
         fonts: fonts.getFonts(),
         componentData: {

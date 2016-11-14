@@ -172,7 +172,7 @@ router.get('/tags/:tags',
               troupeContext.snapshots = snapshots;
 
               res.render('explore', _.extend({}, snapshots, {
-                hasDarkTheme: userThemeSnapshot === 'gitter-dark',
+                hasDarkTheme: userThemeSnapshot.theme === 'gitter-dark',
                 isMobile: isMobile(req),
                 exploreBaseUrl: req.baseUrl,
                 troupeContext: troupeContext,
