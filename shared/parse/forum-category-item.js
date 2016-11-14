@@ -1,4 +1,3 @@
-/* eslint complexity: ["error", 15] */
 'use strict';
 
 var urlJoin = require('url-join');
