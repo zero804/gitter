@@ -1,11 +1,12 @@
 'use strict';
 
+var assert = require('assert');
 var env = require('gitter-web-env');
 var stats = env.stats;
 var Promise = require('bluebird');
 var Group = require('gitter-web-persistence').Group;
 var Troupe = require('gitter-web-persistence').Troupe;
-var assert = require('assert');
+var liveCollections = require('gitter-web-live-collection-events');
 var validateGroupName = require('gitter-web-validators/lib/validate-group-name');
 var StatusError = require('statuserror');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
@@ -15,6 +16,7 @@ var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var ensureAccessAndFetchDescriptor = require('gitter-web-permissions/lib/ensure-access-and-fetch-descriptor');
 var checkIfGroupUriExists = require('./group-uri-checker');
 var groupRoomFinder = require('./group-room-finder');
+var groupFavouritesCore = require('./group-favourites-core');
 
 /**
  * Find a group given an id
@@ -262,6 +264,17 @@ function setForumForGroup(groupId, forumId) {
     });
 }
 
+
+function updateFavourite(userId, groupId, favouritePosition) {
+  return groupFavouritesCore.updateFavourite(userId, groupId, favouritePosition)
+    .then(function(position) {
+      liveCollections.userGroups.emit('patch', userId, groupId, { favourite: position });
+    });
+}
+
+
+
+
 module.exports = {
   findByUri: Promise.method(findByUri),
   findById: Promise.method(findById),
@@ -270,6 +283,8 @@ module.exports = {
   findRoomsIdForGroup: Promise.method(findRoomsIdForGroup),
   setAvatarForGroup: setAvatarForGroup,
   setForumForGroup: setForumForGroup,
+  findFavouriteGroupsForUser: groupFavouritesCore.findFavouriteGroupsForUser,
+  updateFavourite: updateFavourite,
   migration: {
     ensureGroupForGitHubRoomCreation: ensureGroupForGitHubRoomCreation,
   }
