@@ -129,7 +129,7 @@ function renderMainFrame(req, res, next, options) {
       ]);
 
       res.render(template, {
-        hasDarkTheme: userThemeSnapshot === 'gitter-dark',
+        hasDarkTheme: userThemeSnapshot.theme === 'gitter-dark',
         leftMenu: getLeftMenuViewData({
           leftMenu: leftMenu,
           rooms: rooms,
