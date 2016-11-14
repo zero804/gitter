@@ -343,7 +343,8 @@ onready(function() { // eslint-disable-line max-statements
       break;
 
       case 'toggle-dark-theme':
-        toggleDarkTheme();
+        console.log(!!message.theme.length);
+        toggleDarkTheme(!!message.theme.length);
         break;
     }
   }, false);
