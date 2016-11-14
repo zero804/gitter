@@ -11,16 +11,7 @@ Please symlink pre-commit to .git/hooks/pre-commit to enable the pre-commit hook
 
 Getting Started
 ---------------
-1. install prerequisites:
-   * kitematic, not docker-for-mac (it is incompatible with our start script)
-   * node js
-   * gulp (via npm)
-2. run `./start` to download and start all the docker images for our databases
-3. run `npm install`
-4. run `npm run link` (you will get weird errors if you dont)
-5. run `gulp`
-6. run `node web` and go to localhost:5000
-
+Instructions to get this app running can be found [here](docs/GETTING_STARTED.md).
 
 Data Upgrades
 -------------
