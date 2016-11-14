@@ -7,6 +7,7 @@ var toggleClass = require('../../../../utils/toggle-class');
 var cocktail = require('backbone.cocktail');
 var KeyboardEventMixin = require('../../../keyboard-events-mixin');
 var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
+var context = require('../../../../utils/context');
 
 var HeaderView = Marionette.ItemView.extend({
   template: template,
@@ -51,16 +52,25 @@ var HeaderView = Marionette.ItemView.extend({
 
   serializeData: function() {
     var groupId = this.model.get('groupId');
-    var selectedGroup = this.groupsCollection.get(groupId);
+    var selectedGroup = this.groupsCollection.get(groupId) || context.group();
 
     var avatarUrl = null;
-    if(selectedGroup) { avatarUrl = selectedGroup.get('avatarUrl'); }
+    if(selectedGroup) {
+      avatarUrl = selectedGroup.get('avatarUrl');
+    }
 
     var name = '';
-    if(selectedGroup) { name = selectedGroup.get('name'); }
-    else { name = getOrgNameFromUri(document.location.pathname); }
+    if(selectedGroup) {
+      name = selectedGroup.get('name');
+    }
+    else {
+      name = getOrgNameFromUri(document.location.pathname);
+    }
 
-    return { groupName: name, avatarUrl: avatarUrl };
+    return {
+      groupName: name,
+      avatarUrl: avatarUrl
+    };
   },
 
   updateActiveElement: function(model, state) { //jshint unused: true
@@ -73,7 +83,7 @@ var HeaderView = Marionette.ItemView.extend({
         toggleClass(this.ui.headerFavourite[0], 'active', state === 'favourite');
         toggleClass(this.ui.headerPeople[0], 'active', state === 'people');
         toggleClass(this.ui.headerGroup[0], 'active', state === 'group');
-        toggleClass(this.ui.headerOrg[0], 'active', (state === 'org' || state === 'temp-org'));
+        toggleClass(this.ui.headerOrg[0], 'active', state === 'org');
       }.bind(this));
     }.bind(this));
   },

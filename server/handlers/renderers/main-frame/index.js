@@ -1,21 +1,20 @@
 "use strict";
 
 var env = require('gitter-web-env');
-var winston = env.logger;
 var nconf = env.config;
 var statsd = env.createStatsClient({ prefix: nconf.get('stats:statsd:prefix')});
 var Promise = require('bluebird');
-var contextGenerator = require('../../web/context-generator');
-var restful = require('../../services/restful');
+var contextGenerator = require('../../../web/context-generator');
+var restful = require('../../../services/restful');
 var forumCategoryService = require('gitter-web-topics').forumCategoryService;
 var groupService = require('gitter-web-groups');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
-var roomSort = require('gitter-realtime-client/lib/sorts-filters').pojo; /* <-- Don't use the default export
-                                                                                          will bring in tons of client-side
-                                                                                          libraries that we don't need */
-var getSubResources = require('./sub-resources');
-var generateMainFrameSnapshots = require('../../handlers/snapshots/main-frame');
-var fonts = require('../../web/fonts');
+var getSubResources = require('../sub-resources');
+var getMainFrameSnapshots = require('./snapshots');
+var fonts = require('../../../web/fonts');
+var generateLeftMenuStateForUriContext = require('./generate-left-menu-state-for-uri-context');
+var getOldLeftMenuViewData = require('./get-old-left-menu-view-data');
+var getLeftMenuViewData = require('./get-left-menu-view-data');
 
 function getLeftMenuForumGroupInfo(leftMenuGroupId) {
   return groupService.findById(leftMenuGroupId)
@@ -29,8 +28,8 @@ function getLeftMenuForumGroupInfo(leftMenuGroupId) {
     });
 }
 
-function getTroupeContextAndDerivedInfo(req, socialMetadataGenerator) {
-  return contextGenerator.generateNonChatContext(req)
+function getTroupeContextAndDerivedInfo(req, leftMenu, socialMetadataGenerator) {
+  return contextGenerator.generateMainMenuContext(req, leftMenu)
     .bind({
       troupeContext: null,
       socialMetadata: null,
@@ -40,8 +39,7 @@ function getTroupeContextAndDerivedInfo(req, socialMetadataGenerator) {
     .then(function(troupeContext) {
       this.troupeContext = troupeContext;
 
-      var currentRoom = (req.troupe || {});
-      var leftMenuGroupId = (troupeContext.leftRoomMenuState && troupeContext.leftRoomMenuState.groupId) || (currentRoom.groupId);
+      var leftMenuGroupId = leftMenu.groupId;
 
       return [
         socialMetadataGenerator && socialMetadataGenerator(troupeContext),
@@ -50,8 +48,11 @@ function getTroupeContextAndDerivedInfo(req, socialMetadataGenerator) {
     })
     .spread(function(socialMetadata, leftMenuGroupInfo) {
       this.socialMetadata = socialMetadata;
-      this.leftMenuGroup = leftMenuGroupInfo && leftMenuGroupInfo.group;
-      this.leftMenuGroupForumCategories = leftMenuGroupInfo && leftMenuGroupInfo.forumCategories;
+
+      if (leftMenuGroupInfo) {
+        this.leftMenuGroup = leftMenuGroupInfo.group;
+        this.leftMenuGroupForumCategories = leftMenuGroupInfo.forumCategories;
+      }
 
       return this;
     });
@@ -62,18 +63,24 @@ function renderMainFrame(req, res, next, options) {
   var userId = user && user.id;
   var socialMetadataGenerator = options.socialMetadataGenerator;
   var selectedRoomId = req.troupe && req.troupe.id;
+  var suggestedMenuState = options.suggestedMenuState;
+  var uriContext = req.uriContext;
 
-  Promise.all([
-      getTroupeContextAndDerivedInfo(req, socialMetadataGenerator),
-      restful.serializeTroupesForUser(userId),
-      restful.serializeOrgsForUserId(userId).catch(function(err) {
-        // Workaround for GitHub outage
-        winston.error('Failed to serialize orgs:' + err, { exception: err });
-        return [];
-      }),
-      restful.serializeGroupsForUserId(userId),
-    ])
-    .spread(function(troupeContextAndDerivedInfo, rooms, orgs, groups) {
+  // First thing: figure out the state we're planning on rendering...
+  return generateLeftMenuStateForUriContext(userId, uriContext, suggestedMenuState)
+    .bind({
+      leftMenu: null
+    })
+    .then(function(leftMenu) {
+      this.leftMenu = leftMenu;
+
+      return [
+        getTroupeContextAndDerivedInfo(req, leftMenu, socialMetadataGenerator),
+        restful.serializeTroupesForUser(userId),
+        restful.serializeGroupsForUserId(userId),
+      ];
+    })
+    .spread(function(troupeContextAndDerivedInfo, rooms, groups) {
       var troupeContext = troupeContextAndDerivedInfo.troupeContext;
       var socialMetadata = troupeContextAndDerivedInfo.socialMetadata;
       var leftMenuForumGroup = troupeContextAndDerivedInfo.leftMenuGroup;
@@ -90,19 +97,7 @@ function renderMainFrame(req, res, next, options) {
         bootScriptName = 'router-nli-app';
       }
 
-      var snapshots = troupeContext.snapshots = generateMainFrameSnapshots(req, troupeContext, rooms, groups, {
-        suggestedMenuState: options.suggestedMenuState,
-        leftMenuForumGroup: leftMenuForumGroup,
-        leftMenuForumGroupCategories: leftMenuForumGroupCategories
-      });
-
-      if(snapshots && snapshots.leftMenu && snapshots.leftMenu.state) {
-        // `gitter.web.prerender-left-menu`
-        statsd.increment('prerender-left-menu', 1, 0.25, [
-          'state:' + snapshots.leftMenu.state,
-          'pinned:' + (snapshots.leftMenu.roomMenuIsPinned ? '1' : '0')
-        ]);
-      }
+      var leftMenu = this.leftMenu;
 
       // pre-processing rooms
       // Bad mutation ... BAD MUTATION
@@ -116,10 +111,33 @@ function renderMainFrame(req, res, next, options) {
           return room;
         });
 
+      // Add snapshots into the troupeContext
+      troupeContext.snapshots = getMainFrameSnapshots({
+        leftMenu: leftMenu,
+        rooms: rooms,
+        groups: groups,
+        leftMenuForumGroup: leftMenuForumGroup,
+        leftMenuForumGroupCategories: leftMenuForumGroupCategories
+      });
+
+      // Generate `gitter.web.prerender-left-menu` events
+      statsd.increment('prerender-left-menu', 1, 0.25, [
+        'state:' + leftMenu.state,
+        'pinned:' + (leftMenu.roomMenuIsPinned ? '1' : '0')
+      ]);
+
       res.render(template, {
-        //left menu
-        leftMenuOrgs:           troupeContext.snapshots.orgs,
-        roomMenuIsPinned:       snapshots.leftMenu.roomMenuIsPinned,
+        leftMenu: getLeftMenuViewData({
+          leftMenu: leftMenu,
+          rooms: rooms,
+          groups: groups,
+          leftMenuForumGroup: leftMenuForumGroup,
+          leftMenuForumGroupCategories: leftMenuForumGroupCategories
+        }),
+
+        oldLeftMenu: getOldLeftMenuViewData({
+          rooms: rooms
+        }),
 
         //fonts
         hasCachedFonts:         fonts.hasCachedFonts(req.cookies),
@@ -129,27 +147,13 @@ function renderMainFrame(req, res, next, options) {
         cssFileName:            "styles/" + bootScriptName + ".css",
         troupeName:             options.title,
         troupeContext:          troupeContext,
-        forum:                  snapshots.forum,
         chatAppLocation:        chatAppLocation,
         agent:                  req.headers['user-agent'],
         subresources:           getSubResources(bootScriptName),
         showFooterButtons:      true,
         showUnreadTab:          true,
-        menuHeaderExpanded:     false,
         user:                   user,
-        orgs:                   orgs,
-        isPhone:                req.isPhone,
-        //TODO Remove this when left-menu switch goes away JP 23/2/16
-        rooms: {
-          favourites: rooms
-            .filter(roomSort.favourites.filter)
-            .sort(roomSort.favourites.sort),
-          recents: rooms
-            .filter(roomSort.recents.filter)
-            .sort(roomSort.recents.sort)
-        },
-        userHasNoOrgs: !orgs || !orgs.length
-
+        isPhone:                req.isPhone
       });
 
       return null;
@@ -161,7 +165,7 @@ function renderMainFrame(req, res, next, options) {
 function renderMobileMainFrame(req, res, next, options) {
   var socialMetadataGenerator = options.socialMetadataGenerator;
 
-  contextGenerator.generateNonChatContext(req)
+  contextGenerator.generateMainMenuContext(req)
     .then(function(troupeContext) {
       return Promise.all([
         Promise.resolve(troupeContext),
@@ -169,7 +173,6 @@ function renderMobileMainFrame(req, res, next, options) {
       ]);
     })
     .spread(function(troupeContext, socialMetadata) {
-
       var bootScriptName = 'router-mobile-app';
 
       res.render('mobile/mobile-app', {
@@ -182,7 +185,8 @@ function renderMobileMainFrame(req, res, next, options) {
         title: options.title,
         subFrameLocation: options.subFrameLocation
       });
-    });
+    })
+    .catch(next);
 }
 
 module.exports = exports = {

@@ -5,38 +5,68 @@ var Promise = require('bluebird');
 var _ = require('lodash');
 var restSerializer = require("../serializers/rest-serializer");
 var userService = require('../services/user-service');
-var userSettingsService = require('../services/user-settings-service');
 var roomMetaService = require('../services/room-meta-service');
 var contextGeneratorRequest = require('./context-generator-request');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+
+function serializeGroupForMainMenu(uriContext, user, leftMenu) {
+  var groupId = leftMenu.groupId;
+  if (!groupId) return null;
+
+  var group = uriContext && uriContext.group;
+
+  if (mongoUtils.objectIDsEqual(group && group._id, groupId)) {
+    // Save having to do another fetch
+    return serializeGroup(group, user);
+  }
+
+  return serializeGroupId(groupId, user);
+}
 
 /**
  * Returns the promise of a mini-context
  */
-function generateNonChatContext(req) {
+function generateMainMenuContext(req, leftMenu) {
   var user = req.user;
   var uriContext = req.uriContext;
-  var group = uriContext && uriContext.group;
+
   var troupe = uriContext && uriContext.troupe;
   var roomMember = uriContext && uriContext.roomMember;
 
   return Promise.all([
       contextGeneratorRequest(req),
       user ? serializeUser(user) : null,
-      group ? serializeGroup(group, user) : undefined,
+      serializeGroupForMainMenu(uriContext, user, leftMenu),
       troupe ? serializeTroupe(troupe, user) : undefined,
-      user ? userSettingsService.getMultiUserSettingsForUserId(user._id, ['suggestedRoomsHidden', 'leftRoomMenu']) : null,
     ])
-    .spread(function (reqContextHash, serializedUser, serializedGroup, serializedTroupe, settings) {
-      var suggestedRoomsHidden = settings && settings.suggestedRoomsHidden;
-      var leftRoomMenuState = settings && settings.leftRoomMenu;
+    .spread(function (reqContextHash, serializedUser, serializedGroup, serializedTroupe) {
+      // TODO: how is suggestedRoomsHidden different from hasDismissedSuggestions?
+      var suggestedRoomsHidden = leftMenu.suggestedRoomsHidden;
+      delete leftMenu.suggestedRoomsHidden;
 
-      return _.extend({}, reqContextHash, {
+      var serializedContext = _.extend({}, reqContextHash, {
         roomMember: roomMember,
         user: serializedUser,
         group: serializedGroup,
         troupe: serializedTroupe,
         suggestedRoomsHidden: suggestedRoomsHidden,
-        leftRoomMenuState: leftRoomMenuState,
+        leftRoomMenuState: leftMenu,
+      });
+
+      return serializedContext;
+    });
+}
+
+function generateBasicContext(req) {
+  var user = req.user;
+
+  return Promise.all([
+      contextGeneratorRequest(req),
+      user ? serializeUser(user) : null,
+    ])
+    .spread(function (reqContextHash, serializedUser) {
+      return _.extend({}, reqContextHash, {
+        user: serializedUser,
       });
     });
 }
@@ -114,6 +144,15 @@ function serializeGroup(group, user) {
   return restSerializer.serializeObject(group, strategy);
 }
 
+function serializeGroupId(groupId, user) {
+  var strategy = new restSerializer.GroupIdStrategy({
+    currentUser: user,
+    currentUserId: user && user._id
+  });
+
+  return restSerializer.serializeObject(groupId, strategy);
+}
+
 function serializeTroupeId(troupeId, user) {
   var strategy = new restSerializer.TroupeIdStrategy({
     currentUserId: user ? user.id : null,
@@ -145,7 +184,8 @@ function serializeTroupe(troupe, user) {
 }
 
 module.exports = {
-  generateNonChatContext: generateNonChatContext,
+  generateBasicContext: generateBasicContext,
+  generateMainMenuContext: generateMainMenuContext,
   generateSocketContext: generateSocketContext,
   generateTroupeContext: generateTroupeContext
 }
