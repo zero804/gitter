@@ -43,7 +43,11 @@ onready(function() {
     frameUtils.postMessage({ type: 'permalink.requested', url: url, permalinkType: type, id: id });
   });
 
-  var appView = new ChatToolbarLayout({ template: false, el: 'body', chatCollection: chatCollection });
+  var appView = new ChatToolbarLayout({
+    template: false,
+    el: 'body',
+    chatCollection: chatCollection
+  });
   appView.render();
 
   var Router = Backbone.Router.extend({

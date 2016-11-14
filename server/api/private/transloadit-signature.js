@@ -78,12 +78,11 @@ function parseAndValidateTransloadit(user, input) {
       path: '${fields.room_uri}/${fields.token}/thumb/${file.url_name}'
     };
 
-  } else if (input.type === 'avatar' && input.group_uri && input.group_id) {
+  } else if (input.type === 'avatar' && input.group_id) {
     // upload an avatar to a group
     metadata.group_id = input.group_id;
 
     params.auth.max_size = 5242880; // 5MB
-    params.fields.group_uri = input.group_uri;
 
     params.steps.export_original = {
       path: 'groups/' + input.group_id + '/original',
