@@ -49,7 +49,7 @@ function addTroupeAsFavouriteInPosition(userId, troupeId, position) {
       var values = lazy(userTroupeFavourites)
         .pairs()
         .filter(function(a) {
-          return a[1] >= position && a[0] != troupeId;
+          return a[1] >= position && a[0] !== troupeId;
         })
         .sortBy(function(a) {
           return a[1];

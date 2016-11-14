@@ -13,5 +13,6 @@ gulpStaged({
   compress: require('./build-scripts/gulpfile-compress'),
 
   topics: require('./modules/topics-ui/gulpfile-topics'),
-  embedtopics: require('./build-scripts/gulpfile-embed-topics')
+  embedtopics: require('./build-scripts/gulpfile-embed-topics'),
+  'service-worker': require('./modules/service-worker/gulpfile-service-worker')
 });

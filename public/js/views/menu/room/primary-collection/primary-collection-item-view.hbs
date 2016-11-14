@@ -18,6 +18,9 @@
       <i class="room-item__options-icon" aria-hidden="true"></i>
     </button>
   {{/unless}}
+  <button class="room-item__favourite-action js-room-favourite-button" title="Favourite {{ name }}">
+    <i class="room-item__favourite-action-icon icon-star-empty {{#if favourite }}favourite{{/if}} js-room-favourite-button-icon" aria-hidden="true"></i>
+  </button>
 
   <div class="room-item__unread-indicator pulse-animation {{#if unreadItems}}has-unreads{{else if mentions}}has-mentions{{else if lurkActivity}}has-activity{{/if}}" aria-label="{{#if mentions}}You were mentioned in {{name}}{{else}}Unread activity in a {{name}}{{/if}}">
     {{#if mentions}}

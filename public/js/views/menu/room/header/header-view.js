@@ -12,19 +12,9 @@ var context = require('../../../../utils/context');
 var HeaderView = Marionette.ItemView.extend({
   template: template,
 
-  behaviors: {
-    Tooltip: {
-      '.js-left-menu-org-page-action': { placement: 'left' },
-      '.js-profile-menu-toggle': { titleFn: function() {
-        return 'Click to toggle the profile menu';
-      }, placement: 'right' }
-    }
-  },
-
   modelEvents: {
     'change:state': 'updateActiveElement',
     'change:groupId': 'render',
-    'change:profileMenuOpenState': 'onProfileToggle',
   },
 
   events: {
@@ -89,13 +79,6 @@ var HeaderView = Marionette.ItemView.extend({
   },
 
 
-  toggleProfileMenuWhenAll: function() {
-    //Open the profile menu ONLY when in the all channels state
-    if (this.model.get('state') === 'all') {
-      this.model.set('profileMenuOpenState', !this.model.get('profileMenuOpenState'));
-    }
-  },
-
   onRender: function() {
     this.updateActiveElement(this.model, this.model.get('state'));
   },
@@ -106,7 +89,6 @@ var HeaderView = Marionette.ItemView.extend({
     if (this.model.get('roomMenuIsPinned')) return;
     e.stopPropagation();
     this.model.set({
-      profileMenuOpenState: false,
       panelOpenState:       false,
     });
   },

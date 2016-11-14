@@ -2,13 +2,16 @@
 
 var Marionette = require('backbone.marionette');
 var Backbone = require('backbone');
+var _ = require('underscore');
+var template = require('./profile-menu-view.hbs');
 var itemTemplate = require('./profile-menu-item-view.hbs');
-var fastdom = require('fastdom');
-var toggleClass = require('../../../../utils/toggle-class');
-var logout = require('../../../../utils/logout');
-var isMobile = require('../../../../utils/is-mobile');
-var isNative = require('../../../../utils/is-native');
-var context = require('../../../../utils/context');
+var toggleClass = require('../../utils/toggle-class');
+var logout = require('../../utils/logout');
+var isMobile = require('../../utils/is-mobile');
+var isNative = require('../../utils/is-native');
+var context = require('../../utils/context');
+
+require('gitter-styleguide/css/components/dropdowns.css');
 
 function getProfileCollection() {
 
@@ -59,38 +62,47 @@ function getProfileCollection() {
 
 var ItemView = Marionette.ItemView.extend({
   tagName: 'li',
-  className: 'lm-profile-menu__item',
+  className: 'dropdown__item--positive profile-menu__item',
   template: itemTemplate
 });
 
-module.exports = Marionette.CollectionView.extend({
+module.exports = Marionette.CompositeView.extend({
 
-  tagName: 'ul',
-  className: 'lm-profile-menu',
+  template: template,
   childView: ItemView,
+  childViewContainer: '#profile-menu-items',
 
   constructor: function() {
     this.collection = getProfileCollection();
+    this.model = new Backbone.Model({ active: false });
     Marionette.CollectionView.prototype.constructor.apply(this, arguments);
   },
 
+  ui: {
+    menu: '#profile-menu-items'
+  },
+
   events: {
-    'click': 'onItemClicked',
-    'mouseleave': 'onMouseLeave'
+    'click #profile-menu-avatar': 'onAvatarClicked',
+    'click a': 'onItemClicked',
+    'mouseleave @ui.menu': 'onMouseLeave'
   },
 
   modelEvents: {
-    'change:profileMenuOpenState': 'onOpenStateChange',
+    'change:active': 'onActiveStateChange'
   },
 
-  onOpenStateChange: function(model, val) {/*jshint unused:true */
-    fastdom.mutate(function(){
-      toggleClass(this.el, 'active', val);
-    }.bind(this));
+  serializeData: function(){
+    var data = this.model.toJSON();
+    var user = context.user();
+    return _.extend({}, data, {
+      avatarUrl: user.get('avatarUrl'),
+      username: user.get('username')
+    });
   },
 
   onMouseLeave: function (){
-    this.model.set('profileMenuOpenState', false);
+    this.model.set('active', false);
   },
 
   onItemClicked: function(e) {
@@ -98,6 +110,16 @@ module.exports = Marionette.CollectionView.extend({
       e.preventDefault();
       logout();
     }
+  },
+
+  onAvatarClicked: function(e){
+    e.preventDefault();
+    this.model.set({ active: true });
+  },
+
+  onActiveStateChange: function(){
+    var state = this.model.get('active');
+    toggleClass(this.ui.menu[0], 'hidden', !state);
   }
 
 });

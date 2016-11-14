@@ -1,0 +1,28 @@
+{
+  "name": "gitter-web-service-worker",
+  "version": "1.0.0",
+  "main": "server/index.js",
+  "browser": "browser/index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha test/"
+  },
+  "private": true,
+  "dependencies": {
+    "bluebird": "^3.2.1",
+    "gitter-client-env": "file:../client-env",
+    "url-parse": "^1.0.5"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-filter": "^4.0.0",
+    "gulp-sourcemaps": "^1.6.0",
+    "gulp-uglify": "^1.4.2",
+    "gulp-util": "^3.0.7",
+    "gulp-webpack": "^1.5.0",
+    "pump": "^1.0.1"
+  }
+}

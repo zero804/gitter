@@ -39,6 +39,7 @@ print-nodejs-version:
 npm-quick: print-nodejs-version
 	npm prune
 	npm install
+	npm run link
 	./build-scripts/validate-modules-for-build.sh
 
 npm-full: print-nodejs-version
@@ -48,6 +49,7 @@ npm-full: print-nodejs-version
 	rm -rf shared/node_modules
 
 	npm install
+	npm run link
 
 npm:
 	make npm-quick || make npm-full

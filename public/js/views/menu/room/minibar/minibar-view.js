@@ -7,6 +7,7 @@ var SearchView = require('./search-view/search-view');
 var PeopleView = require('./people-view/people-view');
 var GroupView = require('./group-view/group-view');
 var CloseView = require('./close-view/close-view');
+var CollectionView = require('./minibar-collection-view');
 var CommunityCreateView = require('./minibar-community-create-item-view');
 var _ = require('underscore');
 
@@ -24,7 +25,7 @@ module.exports = Marionette.LayoutView.extend({
         groups: { el: '#minibar-groups', init: 'initGroups' },
         communityCreate: { el: '#minibar-community-create', init: 'initCommunityCreate' },
         close: { el: '#minibar-close', init: 'initClose' },
-        //collectionView: { el: '#minibar-collection', init: 'initCollection' }
+        collectionView: { el: '#minibar-collection', init: 'initCollection' },
       },
     };
 
@@ -95,17 +96,16 @@ module.exports = Marionette.LayoutView.extend({
     return closeView;
   },
 
-  initCollection: function (/*optionsForRegion*/){
-    /*
+  initCollection: function (optionsForRegion){
     var collectionView = new CollectionView(optionsForRegion({
       collection: this.collection,
       roomMenuModel: this.model,
+      dndCtrl: this.dndCtrl,
       keyboardControllerView: this.keyboardControllerView,
     }));
 
     this.listenTo(collectionView, 'minibar-item:activated', this.onCollectionItemActivated, this);
     return collectionView;
-    */
   },
 
   modelEvents: {
@@ -114,6 +114,7 @@ module.exports = Marionette.LayoutView.extend({
 
   initialize: function(attrs) {
     this.bus = attrs.bus;
+    this.dndCtrl = attrs.dndCtrl;
     this.model = attrs.model;
     this.roomCollection = attrs.roomCollection;
     this.homeModel = this.model.minibarHomeModel;
@@ -156,7 +157,6 @@ module.exports = Marionette.LayoutView.extend({
     this.model.set({
       panelOpenState: true,
       state: state,
-      profileMenuOpenState: false,
     });
   },
 
