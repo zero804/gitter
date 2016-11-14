@@ -1,4 +1,5 @@
 "use strict";
+
 var Backbone = require('backbone');
 var qs = require('gitter-web-qs');
 var _ = require('underscore');
