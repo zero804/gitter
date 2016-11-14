@@ -168,7 +168,6 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   updateTheme: function(model, val){
-    console.log(val, !!val.length);
     toggleDarkTheme(!!val.length);
     if(!frameUtils.hasParentFrameSameOrigin()){ return; }
     return frameUtils.postMessage({ type: 'toggle-dark-theme', theme: val });
