@@ -22,7 +22,7 @@ function presentPermissionsDialog(options) {
 
     var modal = new permissionsView.Modal({
       model: new PermissionsModel({
-        entity: slimCurrentRoom//currentRoom
+        entity: slimCurrentRoom
       }, {
         groupCollection: groupCollection
       }),
