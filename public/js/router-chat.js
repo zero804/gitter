@@ -16,7 +16,6 @@ var apiClient = require('./components/api-client');
 var perfTiming = require('./components/perf-timing');
 var itemCollections = require('./collections/instances/integrated-items');
 var chatCollection = require('./collections/instances/chats-cached');
-var troupeCollections = require('./collections/instances/troupes');
 var ChatToolbarInputLayout = require('./views/layouts/chat-toolbar-input');
 var DropTargetView = require('./views/app/dropTargetView');
 var Router = require('./routes/router');
@@ -250,9 +249,7 @@ onready(function() { // eslint-disable-line max-statements
     model: context.troupe(),
     template: false,
     el: 'body',
-    chatCollection: chatCollection,
-    groupsCollection: troupeCollections.groups,
-    roomCollection: troupeCollections.troupes
+    chatCollection: chatCollection
   });
 
   appView.render();
@@ -265,11 +262,7 @@ onready(function() { // eslint-disable-line max-statements
     routes: [
       notificationRoutes(),
       roomRoutes({
-        rosterCollection: itemCollections.roster,
-        // TODO: remove these two options:
-        // https://github.com/troupe/gitter-webapp/issues/2211
-        rooms: troupeCollections.troupes,
-        groups: troupeCollections.groups
+        rosterCollection: itemCollections.roster
       }),
     ]
   });
