@@ -16,7 +16,7 @@ var fonts = require('../../../web/fonts');
 var generateLeftMenuStateForUriContext = require('./generate-left-menu-state-for-uri-context');
 var getOldLeftMenuViewData = require('./get-old-left-menu-view-data');
 var getLeftMenuViewData = require('./get-left-menu-view-data');
-var generateProfileMenuSnapshot = require('../../snapshots/profile-menu-snapshot');
+var generateUserThemeSnapshot = require('../../snapshots/user-theme-snapshot');
 
 function getLeftMenuForumGroupInfo(leftMenuGroupId) {
   return groupService.findById(leftMenuGroupId)
@@ -79,16 +79,15 @@ function renderMainFrame(req, res, next, options) {
         getTroupeContextAndDerivedInfo(req, leftMenu, socialMetadataGenerator),
         restful.serializeTroupesForUser(userId),
         restful.serializeGroupsForUserId(userId),
-        generateProfileMenuSnapshot(req),
+        generateUserThemeSnapshot(req),
       ];
     })
-    .spread(function(troupeContextAndDerivedInfo, rooms, groups, profileMenuSnapshot) {
+    .spread(function(troupeContextAndDerivedInfo, rooms, groups, userThemeSnapshot) {
       var troupeContext = troupeContextAndDerivedInfo.troupeContext;
       var socialMetadata = troupeContextAndDerivedInfo.socialMetadata;
       var leftMenuForumGroup = troupeContextAndDerivedInfo.leftMenuGroup;
       var leftMenuForumGroupCategories = troupeContextAndDerivedInfo.leftMenuGroupForumCategories;
       var chatAppLocation = options.subFrameLocation;
-      profileMenuSnapshot = (profileMenuSnapshot || {});
 
       var template, bootScriptName;
 
@@ -130,7 +129,7 @@ function renderMainFrame(req, res, next, options) {
       ]);
 
       res.render(template, {
-        hasDarkTheme: profileMenuSnapshot.hasDarkTheme,
+        hasDarkTheme: userThemeSnapshot === 'gitter-dark',
         leftMenu: getLeftMenuViewData({
           leftMenu: leftMenu,
           rooms: rooms,
