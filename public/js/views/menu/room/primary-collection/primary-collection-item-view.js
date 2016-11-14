@@ -131,6 +131,7 @@ module.exports = BaseCollectionItemView.extend({
     }
 
     var isFavourited = !!model.get('favourite');
+    toggleClass(this.ui.favouriteButton[0], 'favourite', isFavourited);
     toggleClass(this.ui.favouriteButtonIcon[0], 'favourite', isFavourited);
   },
 
