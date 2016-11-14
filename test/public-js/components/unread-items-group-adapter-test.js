@@ -11,7 +11,7 @@ var assert = require('assert');
 var Promise = require('bluebird');
 var Backbone = require('backbone');
 
-describe('unread-items-group-adapter', function() {
+describe('unread-items-group-adapter #slow', function() {
   it('should initialize', function() {
     var groups = new Backbone.Collection([
       { id: 'g1' },

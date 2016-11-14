@@ -69,6 +69,7 @@ var schemas = {
   Identity: require('./schemas/identity-schema'),
   UserTroupeLastAccess: require('./schemas/user-troupe-last-access-schema'),
   UserTroupeFavourites: require('./schemas/user-troupe-favourites-schema'),
+  UserGroupFavourites: require('./schemas/user-group-favourites-schema'),
   Group: require('./schemas/group-schema'),
   Troupe: require('./schemas/troupe-schema'),
   TroupeMeta: require('./schemas/troupe-meta-schema'),

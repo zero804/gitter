@@ -105,7 +105,6 @@ var HeaderView = Marionette.ItemView.extend({
       user: !!context.isLoggedIn(),
       archives: this.options.archives,
       shouldShowPlaceholderRoomTopic: data.userCount <= 1,
-      isRightToolbarPinned: this.rightToolbarModel.get('isPinned'),
       canChangeGroupAvatar: canChangeGroupAvatar
     });
 

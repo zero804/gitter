@@ -3,6 +3,7 @@
 var _ = require('lodash');
 var parseRoomsIntoLeftMenuRoomList = require('gitter-web-shared/rooms/left-menu-room-list');
 var parseRoomsIntoLeftMenuFavouriteRoomList = require('gitter-web-shared/rooms/left-menu-room-favourite-list');
+var parseGroupsIntoLeftMenuFavouriteGroupList = require('gitter-web-shared/groups/left-menu-group-favourite-list');
 var parseCategoryForTemplate = require('gitter-web-shared/parse/forum-category-item');
 var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
 var avatars = require('gitter-web-avatars');
@@ -52,6 +53,7 @@ module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, group
 
   var parsedRooms = parseRoomsIntoLeftMenuRoomList(menuState, rooms, groupId);
   var parsedFavourites = parseRoomsIntoLeftMenuFavouriteRoomList(menuState, rooms, groupId);
+  var groupFavourites = parseGroupsIntoLeftMenuFavouriteGroupList(groups);
   if(menuState === 'group') { parsedRooms = groups; parsedFavourites = []; }
 
   return {
@@ -65,6 +67,7 @@ module.exports = function getMainFrameSnapshots(req, troupeContext, rooms, group
     rooms: parsedRooms,
     favourites: parsedFavourites,
     groups: groups,
+    groupFavourites: groupFavourites,
     forum: (menuState === 'org' || menuState === 'temp-org') && {
       hasCategories: forumCategories && forumCategories.length > 0,
       categories: forumCategories && forumCategories.map(parseCategoryForTemplate)
