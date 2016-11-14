@@ -64,7 +64,7 @@ function cdnMulti(url, options) {
   return prefix + host + cdnPrefix + "/" + url;
 }
 
-var useCdn = nconf.get("cdn:use");
+var useCdn = nconf.getBool("cdn:use");
 
 if(useCdn) {
   hosts = nconf.get("cdn:hosts");
