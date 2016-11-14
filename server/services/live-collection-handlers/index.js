@@ -12,6 +12,7 @@ var handlers = {
   rooms: './live-collection-rooms',
   roomMembers: './live-collection-room-members',
   users: './live-collection-users',
+  userGroups: './live-collection-user-groups',
   groupMembers: './live-collection-group-members',
 
   /* Topics */
@@ -33,6 +34,10 @@ function install() {
   Object.keys(handlers).forEach(function(category) {
     var handlerModuleName = handlers[category];
     var emitter = liveCollectionEvents[category];
+
+    if (!emitter) {
+      throw new Error('No event emitted defined for ' + category + '. gitter-web-live-collection-events probably needs updating.');
+    }
 
     // Don't load the library until install is called otherwise
     // we'll introduce circular references

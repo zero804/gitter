@@ -29,6 +29,7 @@ gulp.task('process:assemble:copy-app:files', function() {
       'websockets.js',
       'package.json',
       'npm-shrinkwrap.json',
+      'preinstall.sh',
       'newrelic.js',
       'config/**',
       'public/templates/**',

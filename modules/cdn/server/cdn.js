@@ -5,7 +5,7 @@ var nconf = env.config;
 var appVersion = require('gitter-app-version');
 
 function chooseFactory() {
-  var useCdn = nconf.get("cdn:use");
+  var useCdn = nconf.getBool("cdn:use");
 
   if(useCdn) {
     var hosts = nconf.get("cdn:hosts");

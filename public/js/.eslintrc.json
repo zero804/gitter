@@ -3,6 +3,10 @@
     "commonjs": true,
     "browser": true
   },
+  "parserOptions": {
+    "ecmaVersion": 5,
+    "sourceType": "script"
+  },
   "plugins": [
     "jquery"
   ],
