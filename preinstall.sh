@@ -27,9 +27,9 @@ find_deps() {
 count=0
 find_deps|while read line; do
   echo "Checking $line"
-  if [[ -d \"$line\" ]] && [[ ! -h \"$line\" ]]; then
+  if [[ -d "${line}" ]] && [[ ! -h "${line}" ]]; then
     let "count++"
-    rm -r \"$line\";
+    rm -r "${line}";
   fi;
 done
 
