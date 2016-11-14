@@ -1,7 +1,7 @@
 @import (reference) "base-zindex-levels";
 @import 'components/menu/menu.less';
 
-@minibar-top-offset: (3 * @desktop-header-height);
+@minibar-top-offset: (5 * @desktop-header-height);
 @minibar-bottom-offset: (2 * @desktop-header-height);
 
 
@@ -323,6 +323,44 @@
   color: @menu-decal-color;
 }
 
+// DND mirror styles when dragging a left-menu "room-list item"
+// "room-list item" applies to any item that isn't necessarily a room
+.minibar-collection-list {
+  & .room-item,
+  & .room-item--group {
+    .room-menu-options__item();
+    opacity: 1;
+  }
+
+  & .room-item--favourite {
+    &:before {
+      display: none;
+    }
+  }
+
+  & .room-item__container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+
+  }
+
+  & .room-item__avatar {
+    margin: 0;
+  }
+
+  & .room-item__title,
+  & .room-item__options,
+  // Specificity issue
+  && .room-item__favourite-action,
+  & .room-item__options-menu {
+    display: none;
+  }
+}
+
 
 .base-minibar-unread-indicator(@size) {
   box-sizing: border-box;
@@ -464,7 +502,12 @@
   }
 }
 
+.minibar-collection {
+  height: 100%;
+}
+
 .minibar-collection-list {
-  list-style: none;
+  height: 100%;
   margin-left: 0;
+  list-style: none;
 }

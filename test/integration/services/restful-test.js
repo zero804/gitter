@@ -174,6 +174,7 @@ describe('restful #slow', function() {
             },
             avatarUrl: nconf.get('avatar:officialHost') + '/group/i/' + group1.id,
             hasAvatarSet: undefined,
+            favourite: undefined,
             forumId: undefined
           }]);
         });

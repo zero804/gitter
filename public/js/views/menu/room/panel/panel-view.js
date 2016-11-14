@@ -10,6 +10,7 @@ var FavouriteCollectionView = require('../favourite-collection/favourite-collect
 var PrimaryCollectionView = require('../primary-collection/primary-collection-view');
 var SecondaryCollectionView = require('../secondary-collection/secondary-collection-view');
 var TertiaryCollectionView = require('../tertiary-collection/tertiary-collection-view');
+var ProfileMenuView = require('../../../profile-menu/profile-menu-view');
 var TopicsAreaView = require('../topics-area/topics-area-view');
 var SearchInputView = require('../../../menu/room/search-input/search-input-view');
 var NeverEndingStory = require('../../../../utils/never-ending-story');
@@ -41,6 +42,10 @@ var PanelView = Marionette.LayoutView.extend({
       model: this.model,
       groupsCollection: this.model.groupsCollection,
     }));
+  },
+
+  initProfileMenu: function(optionsForRegion) {
+    return new ProfileMenuView(optionsForRegion({ model: this.model }));
   },
 
   initGroupBackArea: function(optionsForRegion){

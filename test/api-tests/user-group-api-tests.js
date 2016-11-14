@@ -47,7 +47,7 @@ describe('user-group-api', function() {
 
   it('GET /v1/user/:userId/groups', function() {
     return request(app)
-      .get('/v1/groups')
+      .get('/v1/user/' + fixture.user1.id + '/groups')
       .set('x-access-token', fixture.user1.accessToken)
       .expect(200)
       .then(function(result) {
@@ -61,10 +61,24 @@ describe('user-group-api', function() {
           return r.id === fixture.group2.id;
         }));
 
-
         assert.strictEqual(result.body.length, 2);
       });
   });
 
+
+  it('PATCH /v1/user/:userId/groups/:groupId', function() {
+    return request(app)
+      .patch('/v1/user/' + fixture.user1.id + '/groups/' + fixture.group1.id)
+      .send({
+        favourite: 1
+      })
+      .set('x-access-token', fixture.user1.accessToken)
+      .set('accept', 'application/json, text/javascript, */*')
+      .expect(200)
+      .then(function(result) {
+        var group = result.body;
+        assert.equal(group.favourite, 1);
+      });
+  });
 
 })

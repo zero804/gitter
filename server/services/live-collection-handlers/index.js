@@ -12,6 +12,7 @@ var handlers = {
   rooms: './live-collection-rooms',
   roomMembers: './live-collection-room-members',
   users: './live-collection-users',
+  userGroups: './live-collection-user-groups',
   groupMembers: './live-collection-group-members',
 
   /* Topics */
