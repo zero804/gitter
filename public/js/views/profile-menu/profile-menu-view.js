@@ -13,6 +13,7 @@ var context = require('../../utils/context');
 var toggleDarkTheme = require('../../utils/toggle-dark-theme');
 var autoModelSave = require('../../utils/auto-model-save');
 var apiClient = require('../../components/api-client');
+var frameUtils = require('gitter-web-frame-utils');
 
 require('gitter-styleguide/css/components/dropdowns.css');
 
@@ -65,19 +66,22 @@ function getProfileCollection() {
   return result;
 }
 
+function hasDarkTheme(){
+  return !!document.getElementById('gitter-dark');
+}
+
 var ProfileMenuModel = Backbone.Model.extend({
 
   defaults: {
-    hasDarkTheme: false
+    theme: ''
   },
 
   initialize: function() {
-    autoModelSave(this, ['hasDarkTheme'], this.autoPersist);
+    autoModelSave(this, ['theme'], this.autoPersist);
   },
 
   autoPersist: function(){
-    var theme = this.get('hasDarkTheme') ? 'gitter-dark' : '';
-    return apiClient.user.put('/settings/userTheme', { theme: theme });
+    return apiClient.user.put('/settings/userTheme', this.toJSON());
   }
 
 });
@@ -97,9 +101,13 @@ module.exports = Marionette.CompositeView.extend({
   constructor: function() {
     this.collection = getProfileCollection();
 
+    //At the time of writing there is only one theme: 'gitter-dark' this could change
+    //If that does happen you should only have to change this logic or maybe move
+    //it to a different piece of UI ... JP 14/11/16 ...
+    var currentTheme = hasDarkTheme() ? 'gitter-dark' : '';
     this.model = new ProfileMenuModel({
       //If the script exists then we have the dark theme enabled
-      hasDarkTheme: !!document.getElementById('dark-theme-styles'),
+      theme: currentTheme
     });
 
     //Super
@@ -117,7 +125,7 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   modelEvents: {
-    'change:hasDarkTheme': 'updateDarkTheme',
+    'change:theme': 'updateTheme',
     'change:active': 'onActiveStateChange'
   },
 
@@ -144,7 +152,8 @@ module.exports = Marionette.CompositeView.extend({
       e.preventDefault();
       //Toggle the hasDarkTheme val which should already correspond to
       //whethere the script exists or not
-      this.model.set('hasDarkTheme', !document.getElementById('dark-theme-styles'));
+      var newTheme = hasDarkTheme() ? '' : 'gitter-dark';
+      this.model.set('theme', newTheme);
     }
   },
 
@@ -158,8 +167,11 @@ module.exports = Marionette.CompositeView.extend({
     toggleClass(this.ui.menu[0], 'hidden', !state);
   },
 
-  updateDarkTheme: function(){
-    toggleDarkTheme();
+  updateTheme: function(model, val){
+    console.log(val, !!val.length);
+    toggleDarkTheme(!!val.length);
+    if(!frameUtils.hasParentFrameSameOrigin()){ return; }
+    return frameUtils.postMessage({ type: 'toggle-dark-theme', theme: val });
   }
 
 });
