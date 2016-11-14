@@ -6,6 +6,7 @@ IFS=$'\n\t'
 find_file_deps() {
   node -e '''
   var pkg = require("./package.json");
+  var path = require("path");
   function dep(d) {
     return Object.keys(d).filter(function(key) {
       var spec = d[key];
@@ -14,7 +15,7 @@ find_file_deps() {
   }
   var fileDeps = dep(pkg.dependencies).concat(dep(pkg.devDependencies));
   fileDeps.forEach(function(f) {
-    console.log(f);
+    console.log(path.resolve(path.join("node_modules", f)));
   })
 '''
 }
@@ -25,9 +26,10 @@ find_deps() {
 
 count=0
 find_deps|while read line; do
-  if [[ -d \"$line\" ]] && [[ ! -h \"$line\" ]]; then
+  echo "Checking $line"
+  if [[ -d "${line}" ]] && [[ ! -h "${line}" ]]; then
     let "count++"
-    rm -r \"$line\";
+    rm -r "${line}";
   fi;
 done
 
