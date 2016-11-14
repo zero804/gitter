@@ -25,6 +25,7 @@ var PRERENDERED_VIEWS = [
   "js/views/chat/tmpl/join-room-view",
   'js/views/people/tmpl/peopleCollectionView',
   'js/views/explore/tmpl/explore-view',
+  'js/views/org-directory/org-directory-header-view',
   'js/views/community-create/main-step/community-creation-main-view',
   'js/views/community-create/invite-step/community-creation-invite-people-view',
   'js/views/community-create/invite-confirmation-step/community-creation-invite-confirmation-view',

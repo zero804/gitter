@@ -4,12 +4,14 @@ var apn = require('apn');
 var debug = require('debug')('gitter:infra:ios-notification-gateway');
 var env = require('gitter-web-env');
 var Promise = require('bluebird');
-var pushNotificationService = require('../services/push-notification-service');
-var logger = env.logger;
+var EventEmitter = require('events');
+
+var iosNotificationGenerator = require('./ios-notification-generator');
+var logger = env.logger.get('push-notifications');
 var config = env.config;
 var errorReporter = env.errorReporter;
 
-var rootDirname = __dirname+'/../..';
+var rootDirname = __dirname + '/../../../..';
 
 var ERROR_DESCRIPTIONS = {
   0: 'No errors encountered',
@@ -26,30 +28,13 @@ var ERROR_DESCRIPTIONS = {
 
 var connections = {
   'APPLE': createConnection('Prod', true),
-  'APPLE-DEV': createConnection('Dev'),
-  'APPLE-BETA': createConnection('Beta', true),
-  'APPLE-BETA-DEV': createConnection('BetaDev')
+  'APPLE-DEV': createConnection('Dev')
 };
 
-/* Only create the feedback listeners for the current environment */
-switch(config.get('NODE_ENV') || 'dev') {
-  case 'prod':
-    createFeedbackListener('Prod', true);
-    break;
 
-  case 'beta':
-    createFeedbackListener('Beta', true);
-    createFeedbackListener('BetaDev');
-    break;
-
-  case 'dev':
-    createFeedbackListener('Dev');
-    break;
-}
-
-
-function sendNotificationToDevice(notification, badge, device) {
-  var appleNotification = createAppleNotification(notification, badge);
+function sendNotificationToDevice(notificationType, notificationDetails, device) {
+  var appleNotification = iosNotificationGenerator(notificationType, notificationDetails, device);
+  if (!appleNotification) return false;
 
   var deviceToken = new apn.Device(device.appleToken);
 
@@ -62,7 +47,8 @@ function sendNotificationToDevice(notification, badge, device) {
   // timout needed to ensure that the push notification packet is sent.
   // if we dont, SIGINT will kill notifications before they have left.
   // until apn uses proper callbacks, we have to guess that it takes a second.
-  return Promise.delay(1000);
+  return Promise.resolve(true)
+    .delay(1000);
 }
 
 function createConnection(suffix, isProduction) {
@@ -98,13 +84,35 @@ function createConnection(suffix, isProduction) {
   return connection;
 }
 
-function createFeedbackListener(suffix, isProduction) {
+function sendBadgeUpdateToDevice(device, badge) {
+  if (!device || !device.appleToken) return false;
+
+  var deviceToken = new apn.Device(device.appleToken);
+  var connection = connections[device.deviceType];
+
+  if (!connection) return false;
+
+  var note = new apn.Notification();
+  note.badge = badge;
+
+  connection.pushNotification(note, deviceToken);
+
+  // timout needed to ensure that the push notification packet is sent.
+  // if we dont, SIGINT will kill notifications before they have left.
+  // until apn uses proper callbacks, we have to guess that it takes a second.
+  return Promise.resolve(true)
+    .delay(1000);
+}
+
+function createFeedbackEmitterForEnv(suffix, isProduction) {
+  var emitter = new EventEmitter();
+
   try {
     debug('ios push notification feedback listener (%s) starting', suffix);
 
     var feedback = new apn.Feedback({
-      cert: rootDirname+'/'+config.get('apn:cert' + suffix),
-      key: rootDirname+'/'+config.get('apn:key' + suffix),
+      cert: rootDirname + '/' + config.get('apn:cert' + suffix),
+      key: rootDirname + '/' + config.get('apn:key' + suffix),
       interval: config.get('apn:feedbackInterval'),
       batchFeedback: true,
       production: isProduction
@@ -115,11 +123,7 @@ function createFeedbackListener(suffix, isProduction) {
         return item.device.token;
       });
 
-      return pushNotificationService.deregisterIosDevices(deviceTokens)
-        .catch(function(err) {
-          logger.error('ios push notification tokens (' + suffix + ') failed to remove after feedback', { error: err.message });
-          errorReporter(err, { apnEnv: suffix }, { module: 'ios-notification-gateway' });
-        });
+      emitter.emit('deregister', deviceTokens);
     });
 
     feedback.on('error', function(err) {
@@ -136,38 +140,27 @@ function createFeedbackListener(suffix, isProduction) {
     logger.error('Unable to start feedback service (' + suffix + ')', { exception: e });
     errorReporter(e, { apnEnv: suffix }, { module: 'ios-notification-gateway' });
   }
+
+  return emitter;
 }
 
-function createAppleNotification(notification, badge) {
-  var note = new apn.Notification();
-  var message = notification && notification.message;
-  var sound = notification && notification.sound;
-  var link = notification && notification.link;
 
-  if(badge >= 0) {
-    note.badge = badge;
+function createFeedbackEmitter() {
+  /* Only create the feedback listeners for the current environment */
+  switch(config.get('NODE_ENV') || 'dev') {
+    case 'prod':
+      return createFeedbackEmitterForEnv('Prod', true);
+
+    case 'beta':
+    case 'dev':
+      return createFeedbackEmitterForEnv('Dev');
   }
 
-  if(message) {
-    note.setAlertText(message);
-  }
-
-  if(sound) {
-    note.sound = sound;
-  }
-
-  note.payload = {
-    aps: {
-      "content-available": 1
-    }
-  };
-
-  if(link) {
-    note.payload['l'] = link;
-    note.category = 'NEW_CHAT';
-  }
-
-  return note;
+  return new EventEmitter();
 }
 
-module.exports.sendNotificationToDevice = sendNotificationToDevice;
+module.exports = {
+  sendNotificationToDevice: Promise.method(sendNotificationToDevice),
+  sendBadgeUpdateToDevice: Promise.method(sendBadgeUpdateToDevice),
+  createFeedbackEmitter: createFeedbackEmitter
+}

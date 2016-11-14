@@ -7,6 +7,7 @@ var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var debug = require('debug')('gitter:app:push-notification-service');
 var uniqueIds = require('mongodb-unique-ids');
 var _ = require('lodash');
+var assert = require('assert');
 
 function buffersEqual(a,b) {
   if (!Buffer.isBuffer(a)) return undefined;
@@ -50,7 +51,7 @@ function hash(token) {
   return crypto.createHash('md5').update(token).digest('hex');
 }
 
-exports.registerDevice = function(deviceId, deviceType, deviceToken, deviceName, appVersion, appBuild, callback) {
+function registerDevice(deviceId, deviceType, deviceToken, deviceName, appVersion, appBuild) {
   debug("Registering device %s", deviceId);
   var tokenHash = hash(deviceToken);
 
@@ -74,11 +75,10 @@ exports.registerDevice = function(deviceId, deviceType, deviceToken, deviceName,
       // these are probably phones that have been reset etc, so we need to prune them
       return findAndRemoveDevicesWithDuplicateTokens(deviceId, deviceType, deviceToken, tokenHash)
         .thenReturn(device);
-    })
-    .nodeify(callback);
-};
+    });
+}
 
-exports.registerAndroidDevice = function(deviceId, deviceName, registrationId, appVersion, userId, callback) {
+function registerAndroidDevice(deviceId, deviceName, registrationId, appVersion, userId) {
   debug("Registering device %s", deviceId);
   var tokenHash = hash(registrationId);
 
@@ -102,17 +102,50 @@ exports.registerAndroidDevice = function(deviceId, deviceName, registrationId, a
       // these are probably phones that have been reset etc, so we need to prune them
       return findAndRemoveDevicesWithDuplicateTokens(deviceId, 'ANDROID', registrationId, tokenHash)
         .thenReturn(device);
+    });
+}
+
+function registerVapidSubscription(subscription, userId) {
+  assert(subscription, 'subscription required');
+
+  var endpoint = subscription.endpoint;
+  var auth = subscription.keys && subscription.keys.auth;
+  var p256dh = subscription.keys && subscription.keys.p256dh;
+
+  assert(subscription.endpoint, 'subscription.endpoint required');
+  assert(typeof endpoint === 'string', 'subscription.endpoint must be a string');
+  assert(typeof auth === 'string', 'subscription.keys.auth must be a string');
+  assert(typeof p256dh === 'string', 'subscription.keys.p256dh must be a string');
+
+  debug("Registering vapid endpoint %s", endpoint);
+
+  return PushNotificationDevice.findOneAndUpdate({
+      deviceId: endpoint
+    }, {
+      $set: {
+        userId: userId,
+        deviceId: endpoint,
+        deviceType: 'VAPID',
+        timestamp: new Date(),
+        enabled: true,
+        vapid: {
+          auth: auth,
+          p256dh: p256dh
+        },
+      }
+    }, {
+      upsert: true,
+      new: true
     })
-    .nodeify(callback);
-};
+    .exec();
+}
 
-exports.deregisterAndroidDevice = function(registrationId) {
-  // tokenHash needed as androidToken/registrationId is not indexed
-  var tokenHash = hash(registrationId);
-  return PushNotificationDevice.findOneAndRemove({ tokenHash: tokenHash, androidToken: registrationId }).exec();
-};
+function deregisterDeviceById(id) {
+  return PushNotificationDevice.findByIdAndRemove(id)
+    .exec();
+}
 
-exports.deregisterIosDevices = function(deviceTokens) {
+function deregisterIosDevices(deviceTokens) {
   if (deviceTokens.length === 0) return Promise.resolve();
 
   var appleTokens = deviceTokens.map(function(deviceToken) {
@@ -126,16 +159,15 @@ exports.deregisterIosDevices = function(deviceTokens) {
 
   // mongo will do an indexBounded query with the hashes (super fast) before filtering by appleToken
   return PushNotificationDevice.remove({ tokenHash: { $in: tokenHashes }, appleToken: { $in: appleTokens } }).exec();
-};
+}
 
-exports.registerUser = function(deviceId, userId, callback) {
+function registerUser(deviceId, userId) {
   return PushNotificationDevice.findOneAndUpdate(
     { deviceId: deviceId },
     { deviceId: deviceId, userId: userId, timestamp: new Date() },
     { upsert: true, new: true })
-    .exec()
-    .nodeify(callback);
-};
+    .exec();
+}
 
 var usersWithDevicesCache = null;
 function getCachedUsersWithDevices() {
@@ -162,35 +194,43 @@ function expireCachedUsersWithDevices() {
   usersWithDevicesCache = null;
 }
 
-exports.findUsersWithDevices = function(userIds, callback) {
+function findUsersWithDevices(userIds) {
   return getCachedUsersWithDevices()
     .then(function(usersWithDevices) {
       return _.filter(userIds, function(userId) {
         // Only true if the user has a device...
         return usersWithDevices[userId];
       });
-    })
-    .nodeify(callback);
-};
+    });
+}
 
-exports.findEnabledDevicesForUsers = function(userIds, callback) {
+function findEnabledDevicesForUsers(userIds, options) {
   userIds = mongoUtils.asObjectIDs(uniqueIds(userIds));
-  return PushNotificationDevice
-    .where('userId')['in'](userIds)
-    .or([ { enabled: true }, { enabled: { $exists: false } } ]) // Exists false === enabled for old devices
-    .exec()
-    .then(function(devices) {
-      return devices;
-    })
-    .nodeify(callback);
-};
+  var query = {
+    userId: { $in: userIds },
+    $or: [{ enabled: true }, { enabled: { $exists: false } }]
+  };
 
-exports.findDeviceForDeviceId = function(deviceId, callback) {
-  return PushNotificationDevice.findOne({ deviceId: deviceId })
-    .exec()
-    .nodeify(callback);
-};
+  if (options && options.supportsBadges) {
+    // Only ios devices support badges
+    query.deviceType = { $in: ['APPLE', 'APPLE-DEV'] };
+    query.appleToken = { $ne: null };
+  }
 
-exports.testOnly = {
-  expireCachedUsersWithDevices: expireCachedUsersWithDevices
-};
+  return PushNotificationDevice.find(query)
+    .exec();
+}
+
+module.exports = {
+  registerDevice: registerDevice,
+  registerAndroidDevice: registerAndroidDevice,
+  registerVapidSubscription: registerVapidSubscription,
+  deregisterDeviceById: deregisterDeviceById,
+  deregisterIosDevices: deregisterIosDevices,
+  registerUser: registerUser,
+  findUsersWithDevices: findUsersWithDevices,
+  findEnabledDevicesForUsers: findEnabledDevicesForUsers,
+  testOnly: {
+    expireCachedUsersWithDevices: expireCachedUsersWithDevices
+  }
+}

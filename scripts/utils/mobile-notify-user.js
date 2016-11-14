@@ -3,48 +3,78 @@
 "use strict";
 
 var userService = require('../../server/services/user-service');
+var troupeService = require('../../server/services/troupe-service');
+var chatService = require('../../server/services/chat-service');
 var pushNotificationGateway = require('../../server/gateways/push-notification-gateway');
-var iosNotificationGateway = require('../../server/gateways/ios-notification-gateway');
+var serializer = require('../../server/serializers/notification-serializer');
+var oneToOneRoomService = require('../../server/services/one-to-one-room-service')
 var shutdown = require('shutdown');
 var Promise = require('bluebird');
 
 var opts = require('yargs')
   .option('username', {
-    description: 'username to look up e.g trevorah'
+    description: 'username to look up e.g trevorah',
+    required: true
   })
-  .option('appleToken', {
-    description: 'token for device'
+  .option('room-uri', {
+    description: 'room uri for chat',
   })
-  .option('deviceType', {
-    default: 'APPLE',
-    description: 'usually APPLE or APPLE-DEV'
+  .option('other-user', {
+    description: 'Other user',
   })
   .help('help')
   .alias('help', 'h')
   .argv;
 
-var notification = {
-  roomId: '000000000000000000000000',
-  roomName: 'fake-room',
-  message: 'fake-room \nfake-user: youve got a test push notification!',
-  sound: 'notify.caf',
-  link: '/mobile/chat#000000000000000000000000'
-};
-
 var promise;
+
+function findRoom(user, opts) {
+  if (opts.roomUri) {
+    return troupeService.findByUri(opts.roomUri);
+  }
+
+  if (opts.otherUser) {
+    return userService.findByUsername(opts.otherUser)
+      .then(function(otherUser) {
+        return oneToOneRoomService.findOneToOneRoom(user._id, otherUser._id);
+      });
+  }
+
+  throw new Error('Require either other user or roomUri')
+}
 
 if (opts.username) {
   promise = userService.findByUsername(opts.username)
+    .bind({})
     .then(function(user) {
-      return pushNotificationGateway.sendUserNotification(user.id, notification);
-    });
-} else if (opts.appleToken) {
-  var device = {
-    appleToken: opts.appleToken,
-    deviceType: opts.deviceType
-  };
+      this.user = user;
+      return findRoom(user, opts);
+    })
+    .then(function(room) {
+      this.room = room;
 
-  promise = iosNotificationGateway.sendNotificationToDevice(notification, 666, device);
+      return chatService.findChatMessagesForTroupe(room._id, {
+        limit: 2
+      });
+    })
+    .then(function(chats) {
+      var troupeStrategy = new serializer.TroupeIdStrategy({ recipientUserId: this.user._id });
+      var chatStrategy = new serializer.ChatIdStrategy();
+
+      return [
+        serializer.serializeObject(this.room._id, troupeStrategy),
+        serializer.serialize(chats.map(function(x) { return x._id; }), chatStrategy),
+      ];
+    })
+    .spread(function(room, chats) {
+      var user = this.user;
+
+      return pushNotificationGateway.sendUserNotification('new_chat', user.id, {
+        chats: chats,
+        room: room,
+        hasMentions: false
+      });
+    });
 } else {
   promise = Promise.try(function() {
     throw new Error('username or appleToken required');

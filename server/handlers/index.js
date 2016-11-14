@@ -16,11 +16,11 @@ router.use('/explore', function(req, res, next) {
   if(req.user) {
     var userHomeExploreUrl = urlJoin('/home/explore', req.url);
     res.redirect(userHomeExploreUrl);
-  }
-  else {
+  } else {
     next();
   }
 }, require('./explore'));
+
 // The route for the inner frame
 router.use('/home/~explore', require('./explore'));
 
@@ -29,6 +29,10 @@ router.use('/learn', require('./learn'));
 router.use('/mobile', require('./mobile'));
 router.use('/settings', require('./settings'));
 router.use('/orgs', require('./org-pages'));
+
+// Serve the service-worker code from the root
+// `GET /sw.js`
+require('gitter-web-service-worker/server/sw-static').install(router);
 
 router.use('/', require('./app'));
 

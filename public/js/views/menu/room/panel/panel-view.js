@@ -10,7 +10,7 @@ var FavouriteCollectionView = require('../favourite-collection/favourite-collect
 var PrimaryCollectionView = require('../primary-collection/primary-collection-view');
 var SecondaryCollectionView = require('../secondary-collection/secondary-collection-view');
 var TertiaryCollectionView = require('../tertiary-collection/tertiary-collection-view');
-var ProfileMenuView = require('../profile/profile-menu-view');
+var ProfileMenuView = require('../../../profile-menu/profile-menu-view');
 var TopicsAreaView = require('../topics-area/topics-area-view');
 var SearchInputView = require('../../../menu/room/search-input/search-input-view');
 var NeverEndingStory = require('../../../../utils/never-ending-story');
@@ -24,7 +24,6 @@ var PanelView = Marionette.LayoutView.extend({
   behaviors: {
     Isomorphic: {
       header:              { el: '#panel-header', init: 'initHeader' },
-      profile:             { el: '#profile-menu', init: 'initProfileMenu' },
       groupBackControl:    { el: '#group-back-button', init: 'initGroupBackArea' },
       topicsArea:          { el: '#left-menu-topics-area', init: 'initTopicsArea' },
       searchInput:         { el: '#search-input', init: 'initSearchInput' },
@@ -146,7 +145,6 @@ var PanelView = Marionette.LayoutView.extend({
   modelEvents: {
     'change:panelOpenState':       'onPanelOpenStateChange',
     'primary-collection:snapshot': 'onPrimaryCollectionSnapshot',
-    'change:profileMenuOpenState': 'onProfileToggle',
   },
 
   childEvents: {
@@ -204,7 +202,6 @@ var PanelView = Marionette.LayoutView.extend({
     this.bus.trigger('panel:render');
   }, 10),
 
-
   onProfileToggle: function(model, val) {
     this.ui.profileMenu[0].setAttribute('aria-hidden', !val);
   },
@@ -233,7 +230,6 @@ var PanelView = Marionette.LayoutView.extend({
   }, 100),
 
   onRender: function() {
-    this.ui.profileMenu[0].setAttribute('aria-hidden', !this.profileMenuOpenState);
     if(!this.neverendingstory) {
       this.neverendingstory = new NeverEndingStory(this.$el.find('.nano-content')[0]);
       this.listenTo(this.neverendingstory, 'approaching.bottom', this.scrollBottom, this);

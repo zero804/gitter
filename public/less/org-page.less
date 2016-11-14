@@ -13,6 +13,7 @@
 
 @import "colors.less";
 @import "bootstrap/pagination";
+@import "../js/views/profile-menu/profile-menu-view";
 
 @large-breakpoint: 1200px;
 @medium-breakpoint: 767px;
@@ -42,10 +43,8 @@ body {
   display: none;
 }
 
-
-
-
 .org-page__header {
+  z-index: 1;
   position: fixed;
   top: 0;
   width: 100%;
@@ -53,11 +52,16 @@ body {
   padding: 0 4rem;
   height: 65px;
   background-image: linear-gradient(to left, @header-grad-bg-color, @header-base-bg-color);
-  z-index: 1;
 
   @media (max-width: @medium-breakpoint) {
     padding: .5em;
   }
+}
+
+.org-page__header-inner {
+  display: flex;
+  width: 100%;
+  height: 100%;
 }
 
 .org-page__header-logo {
@@ -66,7 +70,7 @@ body {
   width: 36px;
   height: auto;
   margin-right: 1.7rem;
-  margin-top: 1.3rem;
+  margin-top: 1.7rem;
   padding: .3rem;
   border-radius: .4rem;
   background-color: white;
@@ -82,14 +86,38 @@ body {
 
 .org-page__header-heading {
   margin-bottom: 1rem;
+  padding-top: 7px;
   font-size: 2.4rem;
   font-weight: 300;
 
   a { color: white; }
 }
 
-.org-page__header-share-link {
+.org-page__header-body-actions {
+  display: flex;
+  align-items: center;
+}
 
+.org-page__header-favourite-button {
+  padding-left: 1em;
+  padding-right: 1em;
+
+  background-color: transparent;
+  border: 0;
+  font-size: 3rem;
+}
+
+.org-page__header-favourite-button-icon {
+  color: white;
+
+  &.favourite {
+    color: @trpYellow;
+  }
+}
+
+.org-page__header-share-link {
+  margin-left: auto;
+  margin-right: 10px;
 }
 
 

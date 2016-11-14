@@ -2,6 +2,7 @@
 
 var parseRoomsIntoLeftMenuRoomList = require('./left-menu-room-list');
 var parseRoomsIntoLeftMenuFavouriteRoomList = require('./left-menu-room-favourite-list');
+var parseGroupsIntoLeftMenuFavouriteGroupList = require('./left-menu-group-favourite-list');
 var parseCategoryForTemplate = require('gitter-web-shared/parse/forum-category-item');
 
 function getLeftMenuViewData(options) {
@@ -34,12 +35,15 @@ function getLeftMenuViewData(options) {
     }
   }
 
+  var groupFavourites = parseGroupsIntoLeftMenuFavouriteGroupList(groups);
+
   var serializedData = {
     favourites: parsedFavourites,
     rooms: parsedRooms,
     roomMenuIsPinned: leftMenu.roomMenuIsPinned,
     forum: forum,
-  }
+    groupFavourites: groupFavourites
+  };
 
   return serializedData;
 }
