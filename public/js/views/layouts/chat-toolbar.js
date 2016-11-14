@@ -5,7 +5,6 @@ var context = require('../../utils/context');
 var appEvents = require('../../utils/appevents');
 var ChatLayout = require('./chat');
 var HeaderView = require('../app/headerView');
-
 var rightToolbarModel = require('../../models/right-toolbar-model');
 var RightToolbarView = require('../righttoolbar/rightToolbarView');
 
@@ -40,11 +39,6 @@ module.exports = ChatLayout.extend({
     }
   },
 
-  initialize: function(attrs) {
-    this.groupsCollection = attrs.groupsCollection;
-    this.roomCollection = attrs.roomCollection;
-  },
-
   initToolbarRegion: function(optionsForRegion) {
     return new RightToolbarView(optionsForRegion({
       model: rightToolbarModel
@@ -53,9 +47,7 @@ module.exports = ChatLayout.extend({
 
   initHeaderRegion: function(optionsForRegion) {
     return new HeaderView(optionsForRegion({
-      model: context.troupe(),
-      groupsCollection: this.groupsCollection,
-      roomCollection: this.roomCollection
+      model: context.troupe()
     }));
   }
 });

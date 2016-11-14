@@ -10,8 +10,6 @@ var context = require('../../utils/context');
 var toggleClass = require('../../utils/toggle-class');
 var MenuBuilder = require('../../utils/menu-builder');
 var appEvents = require('../../utils/appevents');
-var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
-
 var apiClient = require('../../components/api-client');
 var userNotifications = require('../../components/user-notifications');
 var Dropdown = require('../controls/dropdown');
@@ -84,8 +82,6 @@ var HeaderView = Marionette.ItemView.extend({
   },
 
   initialize: function(options) {
-    this.groupsCollection = options.groupsCollection;
-    this.roomCollection = options.roomCollection;
     this.rightToolbarModel = options.rightToolbarModel;
     this.menuItemsCollection = new Backbone.Collection([]);
     this.buildDropdown();
@@ -444,21 +440,18 @@ var HeaderView = Marionette.ItemView.extend({
 
   uploadGroupAvatar: function() {
     var currentRoom = context.troupe();
-    if(!this.groupsCollection || !currentRoom) {
+    if(!currentRoom) {
       return;
     }
 
-    var currentGroup = this.groupsCollection.get(currentRoom.get('groupId'));
     // For groups that were created within page lifetime
-    var groupId = currentGroup ? currentGroup.get('id') : currentRoom.get('groupId');
-    var groupUri = currentGroup ? currentGroup.get('uri') : getOrgNameFromUri(document.location.pathname);
+    var groupId = currentRoom.get('groupId');
 
     this.handleUploadStart();
 
     apiClient.priv.get('/generate-signature', {
       type: 'avatar',
-        group_id: groupId,
-        group_uri: groupUri
+        group_id: groupId
       })
       .then(function(res) {
         this.ui.groupAvatarParamsInput[0].setAttribute('value', res.params);

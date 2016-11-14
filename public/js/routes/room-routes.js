@@ -9,11 +9,6 @@ var presentPermissionsDialog = require('../ensured/present-permissions-dialog');
 function createRoutes(options) {
   var rosterCollection = options.rosterCollection;
 
-  // TODO: remove these two options:
-  // https://github.com/troupe/gitter-webapp/issues/2211
-  var roomCollection = options.rooms;
-  var groupsCollection = options.groups;
-
   return {
     'autojoin': function() {
       if (context.roomHasWelcomeMessage()) {
@@ -100,8 +95,6 @@ function createRoutes(options) {
 
     'permissions': function() {
       presentPermissionsDialog({
-        roomCollection: roomCollection,
-        groupCollection: groupsCollection,
         dialogRegion: this.dialogRegion
       });
     },

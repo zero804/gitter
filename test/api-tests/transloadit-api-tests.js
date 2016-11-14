@@ -48,7 +48,6 @@ describe('transloadit-api-tests #slow', function() {
       .get('/private/generate-signature')
       .query({
         type: 'avatar',
-        group_uri: fixture.group1.uri,
         group_id: fixture.group1.id
       })
       .set('x-access-token', fixture.user1.accessToken)
@@ -120,4 +119,3 @@ describe('transloadit-api-tests #slow', function() {
       });
   });
 });
-
