@@ -29,7 +29,7 @@ var WELCOME_MESSAGES = [
 ];
 
 function renderHomePage(req, res, next) {
-  contextGenerator.generateNonChatContext(req)
+  contextGenerator.generateBasicContext(req)
     .then(function (troupeContext) {
       var page = req.isPhone ? 'mobile/mobile-userhome' : 'userhome-template';
 
@@ -60,7 +60,7 @@ function renderHomePage(req, res, next) {
 }
 
 function renderMobileUserHome(req, res, next) {
-  contextGenerator.generateNonChatContext(req)
+  contextGenerator.generateBasicContext(req)
   .then(function(troupeContext) {
     res.render('mobile/mobile-userhome', {
       hasCachedFonts: fonts.hasCachedFonts(req.cookies),
@@ -75,7 +75,7 @@ function renderMobileUserHome(req, res, next) {
 }
 
 function renderMobileNativeUserhome(req, res) {
-  contextGenerator.generateNonChatContext(req)
+  contextGenerator.generateBasicContext(req)
     .then(function(troupeContext) {
       res.render('mobile/native-userhome-app', {
         hasCachedFonts: fonts.hasCachedFonts(req.cookies),
