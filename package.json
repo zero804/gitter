@@ -317,6 +317,7 @@
     "dev": "gulp watch",
     "dev-template": "concurrently --raw \"npm run start -- --watch server --watch shared --watch modules --watch public  --ignore public/**/!(*.hbs)\" \"gulp watch\"",
     "test": "gulp test:test",
+    "mocha": "mocha",
     "link": "linklocal link -r",
     "unlink": "linklocal unlink -r",
     "shrinkwrap": "bash ./build-scripts/shrinkwrap",
