@@ -8,7 +8,6 @@ describe('MinibarView', function(){
   var el;
   var model;
   var collection;
-  var view;
   beforeEach(function(){
     el = document.createElement('div');
     model = new Backbone.Model();
@@ -23,9 +22,8 @@ describe('MinibarView', function(){
     model.minibarPeopleModel = new Backbone.Model({ type: 'people', name: 'people' });
     model.minibarCommunityCreateModel = new Backbone.Model({ name: 'Create Community', type: 'community-create' });
     model.minibarCloseModel = new Backbone.Model({ type: 'close', name: 'close' });
-    model.minibarTempOrgModel = new Backbone.Model({ type: 'org', name: 'google', hidden: true });
 
-    view = new MinibarView({
+    new MinibarView({
       el: el,
       model: model,
       collection: collection
