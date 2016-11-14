@@ -15,7 +15,7 @@ var exploreService = require('../services/explore-service');
 var suggestionsService = require('../services/suggestions-service');
 var exploreTagUtils = require('../utils/explore-tag-utils');
 var generateExploreSnapshot = require('./snapshots/explore-snapshot');
-var generateProfileMenuSnapshot = require('./snapshots/profile-menu-snapshot');
+var generateUserThemeSnapshot = require('./snapshots/user-theme-snapshot');
 var fonts = require('../web/fonts');
 var isMobile = require('../web/is-phone');
 
@@ -164,17 +164,15 @@ router.get('/tags/:tags',
 
           //Not 100% sure this is the best thing to do here
           //but I dont really want to refactor this whole thing
-          generateProfileMenuSnapshot(req)
-            .then(function(profileMenuSnapshot){
-
-              profileMenuSnapshot = (profileMenuSnapshot || {});
+          generateUserThemeSnapshot(req)
+            .then(function(userThemeSnapshot){
 
               // Anyone know why we're putting this on the
               // context? Probably not.
               troupeContext.snapshots = snapshots;
 
               res.render('explore', _.extend({}, snapshots, {
-                hasDarkTheme: profileMenuSnapshot.hasDarkTheme,
+                hasDarkTheme: userThemeSnapshot === 'gitter-dark',
                 isMobile: isMobile(req),
                 exploreBaseUrl: req.baseUrl,
                 troupeContext: troupeContext,
