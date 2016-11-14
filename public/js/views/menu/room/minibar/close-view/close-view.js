@@ -7,7 +7,7 @@ var ItemView = require('../minibar-item-view');
 var closeViewMixin = require('./close-view-mixin');
 var cocktail = require('backbone.cocktail');
 
-var CloseIconView= ItemView.extend({
+var CloseIconView = ItemView.extend({
   template: template,
 
   ui: _.extend({}, ItemView.prototype.ui, {
