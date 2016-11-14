@@ -343,7 +343,6 @@ onready(function() { // eslint-disable-line max-statements
       break;
 
       case 'toggle-dark-theme':
-        console.log(!!message.theme.length);
         toggleDarkTheme(!!message.theme.length);
         break;
     }
