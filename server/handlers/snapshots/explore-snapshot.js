@@ -1,10 +1,8 @@
 'use strict';
 
-var _ = require('underscore');
-
+var _ = require('lodash');
 var restSerializer = require('../../serializers/rest-serializer');
 var generateRoomCardContext = require('gitter-web-shared/templates/partials/room-card-context-generator');
-
 var exploreTagUtils = require('../../utils/explore-tag-utils');
 
 var defaults = {
