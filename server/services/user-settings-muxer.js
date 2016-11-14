@@ -18,6 +18,12 @@ function standardHandler(settingsKey) {
   };
 }
 
+function cleanLeftRoomSettings(value) {
+  // These are no longer stored...
+  delete value.groupId;
+  delete value.state;
+}
+
 /**
  * Each setting key can have it's own handler.
  * This maps the setting key to a read and write handler.
@@ -26,7 +32,20 @@ function standardHandler(settingsKey) {
  */
 var HANDLERS = {
   /* Left Room Menu */
-  leftRoomMenu: standardHandler('leftRoomMenu'),
+  leftRoomMenu: {
+    get: function(user) {
+      return userSettingsService.getUserSettings(user._id, 'leftRoomMenu')
+        .then(function(result) {
+          cleanLeftRoomSettings(result);
+          return result;
+        })
+    },
+    set: function(user, value) {
+      cleanLeftRoomSettings(value);
+      return userSettingsService.setUserSettings(user._id, 'leftRoomMenu', value)
+        .return(value);
+    }
+  },
   rightToolbar: standardHandler('rightToolbar'),
 
   /* Lang */
