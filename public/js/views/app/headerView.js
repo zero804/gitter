@@ -436,7 +436,6 @@ var HeaderView = Marionette.ItemView.extend({
       return;
     }
 
-    // var currentGroup = this.groupsCollection.get(currentRoom.get('groupId'));
     // For groups that were created within page lifetime
     var groupId = currentRoom.get('groupId');
 
