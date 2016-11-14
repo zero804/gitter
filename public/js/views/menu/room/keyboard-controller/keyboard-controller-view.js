@@ -17,7 +17,6 @@ var KeyboardController = Marionette.ItemView.extend({
     'room.1': 'onMinibarAllSelected',
     'room.2': 'onMinibarSearchSelected',
     'room.3': 'onMinibarPeopleSelected',
-    //'room.4': 'onMinibarTempSelected',
     'room.4': 'onMinibarGroupSelected',
     'focus.search': 'onMinibarSearchSelected',
     'room.down': 'onDownKeyPressed',
@@ -38,7 +37,6 @@ var KeyboardController = Marionette.ItemView.extend({
     this.minibarGroupModel = attrs.model.minibarGroupModel;
     this.minibarCommunityCreateModel = attrs.model.minibarCommunityCreateModel;
     this.minibarCloseModel = attrs.model.minibarCloseModel;
-    this.minibarTempOrgModel = attrs.model.minibarTempOrgModel;
 
     //Favourite
     this.favouriteCollection = attrs.model.favouriteCollection;
@@ -86,14 +84,6 @@ var KeyboardController = Marionette.ItemView.extend({
     this.setModelState('group');
   },
 
-  onMinibarTempSelected: function (e){
-    this.blurAllItems();
-    if(!this.minibarTempOrgModel.get('hidden')) {
-      return this.minibarTempOrgModel.set('focus', true);
-    }
-    return this.onMinibarOrgSelected(e);
-  },
-
   onMinibarOrgSelected: function (e){
     this.blurAllItems();
     // On Windows, `e.key` will be the symbols because `shift` is used
@@ -108,7 +98,7 @@ var KeyboardController = Marionette.ItemView.extend({
     this.setModelState({ state: 'org', groupId: model.get('id') });
   },
 
-  onDownKeyPressed: function (e){
+  onDownKeyPressed: function() {
     this.searchFocusModel.set('focus', false);
     if(this.isMinibarInFocus()) { return this.moveMinibarFocus(1);}
     this.moveRoomCollectionFocus(1);
@@ -357,19 +347,14 @@ var KeyboardController = Marionette.ItemView.extend({
   },
 
   getFlatMinibarCollection: function (){
-    var collection = [ this.minibarHomeModel, this.minibarSearchModel, this.minibarPeopleModel ];
-
-    if(!this.minibarTempOrgModel.get('hidden')) {
-      collection = collection.concat([ this.minibarTempOrgModel ]);
-    }
-
-    //collection = collection.concat(this.minibarCollection.models);
-    collection = collection.concat([
+    return [
+      this.minibarHomeModel,
+      this.minibarSearchModel,
+      this.minibarPeopleModel,
       this.minibarGroupModel,
       this.minibarCommunityCreateModel,
       this.minibarCloseModel
-    ]);
-    return collection;
+    ];
   },
 
   setDebouncedState: _.debounce(function (model){
@@ -389,4 +374,5 @@ var KeyboardController = Marionette.ItemView.extend({
 });
 
 cocktail.mixin(KeyboardController, KeyboardEventMixin);
+
 module.exports = KeyboardController;
