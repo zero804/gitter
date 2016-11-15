@@ -10,6 +10,10 @@ var logout = require('../../utils/logout');
 var isMobile = require('../../utils/is-mobile');
 var isNative = require('../../utils/is-native');
 var context = require('../../utils/context');
+var toggleDarkTheme = require('../../utils/toggle-dark-theme');
+var autoModelSave = require('../../utils/auto-model-save');
+var apiClient = require('../../components/api-client');
+var frameUtils = require('gitter-web-frame-utils');
 
 require('gitter-styleguide/css/components/dropdowns.css');
 
@@ -53,12 +57,34 @@ function getProfileCollection() {
   user.on('change:id', showHideRepoAccess);
   user.on('change:scopes', showHideRepoAccess);
 
+  result.add({ name: 'Toggle Dark Theme', stub: '#dark-theme' });
+
   if(isWebApp) {
     result.add({ name: 'Sign Out', stub: '/logout' });
   }
 
   return result;
 }
+
+function hasDarkTheme(){
+  return !!document.getElementById('gitter-dark');
+}
+
+var ProfileMenuModel = Backbone.Model.extend({
+
+  defaults: {
+    theme: ''
+  },
+
+  initialize: function() {
+    autoModelSave(this, ['theme'], this.autoPersist);
+  },
+
+  autoPersist: function(){
+    return apiClient.user.put('/settings/userTheme', this.toJSON());
+  }
+
+});
 
 var ItemView = Marionette.ItemView.extend({
   tagName: 'li',
@@ -74,7 +100,17 @@ module.exports = Marionette.CompositeView.extend({
 
   constructor: function() {
     this.collection = getProfileCollection();
-    this.model = new Backbone.Model({ active: false });
+
+    //At the time of writing there is only one theme: 'gitter-dark' this could change
+    //If that does happen you should only have to change this logic or maybe move
+    //it to a different piece of UI ... JP 14/11/16 ...
+    var currentTheme = hasDarkTheme() ? 'gitter-dark' : '';
+    this.model = new ProfileMenuModel({
+      //If the script exists then we have the dark theme enabled
+      theme: currentTheme
+    });
+
+    //Super
     Marionette.CollectionView.prototype.constructor.apply(this, arguments);
   },
 
@@ -89,6 +125,7 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   modelEvents: {
+    'change:theme': 'updateTheme',
     'change:active': 'onActiveStateChange'
   },
 
@@ -110,6 +147,14 @@ module.exports = Marionette.CompositeView.extend({
       e.preventDefault();
       logout();
     }
+
+    if(e.target.href && /dark-theme$/.test(e.target.href)) {
+      e.preventDefault();
+      //Toggle the hasDarkTheme val which should already correspond to
+      //whethere the script exists or not
+      var newTheme = hasDarkTheme() ? '' : 'gitter-dark';
+      this.model.set('theme', newTheme);
+    }
   },
 
   onAvatarClicked: function(e){
@@ -120,6 +165,12 @@ module.exports = Marionette.CompositeView.extend({
   onActiveStateChange: function(){
     var state = this.model.get('active');
     toggleClass(this.ui.menu[0], 'hidden', !state);
+  },
+
+  updateTheme: function(model, val){
+    toggleDarkTheme(!!val.length);
+    if(!frameUtils.hasParentFrameSameOrigin()){ return; }
+    return frameUtils.postMessage({ type: 'toggle-dark-theme', theme: val });
   }
 
 });
