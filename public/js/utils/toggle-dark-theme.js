@@ -2,21 +2,21 @@
 
 var cdn = require('gitter-web-cdn');
 
+var scriptID = 'gitter-dark';
+
 module.exports = function toggleDarkTheme(shouldAdd){
 
   if(shouldAdd) {
     //Build a new link element
     darkThemeLink = document.createElement('link');
     darkThemeLink.rel = 'stylesheet';
-    darkThemeLink.id = 'gitter-dark';
-    darkThemeLink.media = 'all';
-    darkThemeLink.type = 'text/css';
+    darkThemeLink.id = scriptID;
     darkThemeLink.href = cdn('styles/dark-theme.css');
 
     //Add it to the head
-    document.head.appendChild(darkThemeLink);
+    return document.head.appendChild(darkThemeLink);
   }
 
-  var darkThemeLink = document.getElementById('gitter-dark');
+  var darkThemeLink = document.getElementById(scriptID);
   return darkThemeLink.remove();
 }

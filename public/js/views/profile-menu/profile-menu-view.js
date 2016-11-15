@@ -67,7 +67,8 @@ function getProfileCollection() {
 }
 
 function hasDarkTheme(){
-  return !!document.getElementById('gitter-dark');
+  var r = document.getElementById('gitter-dark');
+  return !!r;
 }
 
 var ProfileMenuModel = Backbone.Model.extend({
@@ -81,7 +82,7 @@ var ProfileMenuModel = Backbone.Model.extend({
   },
 
   autoPersist: function(){
-    return apiClient.user.put('/settings/userTheme', this.toJSON());
+    return apiClient.user.put('/settings/userTheme', { theme: this.get('theme')});
   }
 
 });
@@ -152,7 +153,10 @@ module.exports = Marionette.CompositeView.extend({
       e.preventDefault();
       //Toggle the hasDarkTheme val which should already correspond to
       //whethere the script exists or not
-      var newTheme = hasDarkTheme() ? '' : 'gitter-dark';
+      var newTheme = (this.model.get('theme') === 'gitter-dark') ? '' : 'gitter-dark';
+      console.log('----------------------');
+      console.log(newTheme);
+      console.log('----------------------');
       this.model.set('theme', newTheme);
     }
   },
