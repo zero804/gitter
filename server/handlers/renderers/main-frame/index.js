@@ -9,12 +9,14 @@ var restful = require('../../../services/restful');
 var forumCategoryService = require('gitter-web-topics').forumCategoryService;
 var groupService = require('gitter-web-groups');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+
 var getSubResources = require('../sub-resources');
 var getMainFrameSnapshots = require('./snapshots');
 var fonts = require('../../../web/fonts');
 var generateLeftMenuStateForUriContext = require('./generate-left-menu-state-for-uri-context');
 var getOldLeftMenuViewData = require('./get-old-left-menu-view-data');
 var getLeftMenuViewData = require('./get-left-menu-view-data');
+var generateUserThemeSnapshot = require('../../snapshots/user-theme-snapshot');
 
 function getLeftMenuForumGroupInfo(leftMenuGroupId) {
   return groupService.findById(leftMenuGroupId)
@@ -73,14 +75,14 @@ function renderMainFrame(req, res, next, options) {
     })
     .then(function(leftMenu) {
       this.leftMenu = leftMenu;
-
       return [
         getTroupeContextAndDerivedInfo(req, leftMenu, socialMetadataGenerator),
         restful.serializeTroupesForUser(userId),
         restful.serializeGroupsForUserId(userId),
+        generateUserThemeSnapshot(req),
       ];
     })
-    .spread(function(troupeContextAndDerivedInfo, rooms, groups) {
+    .spread(function(troupeContextAndDerivedInfo, rooms, groups, userThemeSnapshot) {
       var troupeContext = troupeContextAndDerivedInfo.troupeContext;
       var socialMetadata = troupeContextAndDerivedInfo.socialMetadata;
       var leftMenuForumGroup = troupeContextAndDerivedInfo.leftMenuGroup;
@@ -127,6 +129,7 @@ function renderMainFrame(req, res, next, options) {
       ]);
 
       res.render(template, {
+        hasDarkTheme: userThemeSnapshot.theme === 'gitter-dark',
         leftMenu: getLeftMenuViewData({
           leftMenu: leftMenu,
           rooms: rooms,
@@ -134,11 +137,9 @@ function renderMainFrame(req, res, next, options) {
           leftMenuForumGroup: leftMenuForumGroup,
           leftMenuForumGroupCategories: leftMenuForumGroupCategories
         }),
-
         oldLeftMenu: getOldLeftMenuViewData({
           rooms: rooms
         }),
-
         //fonts
         hasCachedFonts:         fonts.hasCachedFonts(req.cookies),
         fonts:                  fonts.getFonts(),

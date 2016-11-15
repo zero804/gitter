@@ -47,6 +47,7 @@ var HANDLERS = {
     }
   },
   rightToolbar: standardHandler('rightToolbar'),
+  userTheme: standardHandler('userTheme'),
 
   /* Lang */
   lang: standardHandler('lang'),
