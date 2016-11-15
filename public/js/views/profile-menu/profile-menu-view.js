@@ -154,9 +154,6 @@ module.exports = Marionette.CompositeView.extend({
       //Toggle the hasDarkTheme val which should already correspond to
       //whethere the script exists or not
       var newTheme = (this.model.get('theme') === 'gitter-dark') ? '' : 'gitter-dark';
-      console.log('----------------------');
-      console.log(newTheme);
-      console.log('----------------------');
       this.model.set('theme', newTheme);
     }
   },
