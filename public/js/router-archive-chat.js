@@ -5,7 +5,7 @@ var clientEnv = require('gitter-client-env');
 var onready = require('./utils/onready');
 var HeaderView = require('./views/app/headerView');
 var ArchiveNavigationView = require('./views/archive/archive-navigation-view');
-var RightToolBarModel = require('./models/right-toolbar-model');
+var rightToolbarModel = require('./models/right-toolbar-model');
 
 /* Set the timezone cookie */
 require('./components/timezone-cookie');
@@ -49,8 +49,6 @@ onready(function() {
     window.parent.location.href = href;
   });
 
-
-  var rightToolbarModel = new RightToolBarModel({});
   // TODO: XXX move this across to a layoutview
   new HeaderView({
     el: '#header',

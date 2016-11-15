@@ -10,7 +10,7 @@ var onready = require('./utils/onready');
 var appEvents = require('./utils/appevents');
 var heatmapUtils = require('./components/archive-heatmap-utils');
 var HeaderView = require('./views/app/headerView');
-var RightToolBarModel = require('./models/right-toolbar-model');
+var rightToolbarModel = require('./models/right-toolbar-model');
 
 require('./components/timezone-cookie');
 require('./views/widgets/preload');
@@ -57,7 +57,6 @@ onready(function() {
     window.parent.location.href = href;
   });
 
-  var rightToolbarModel = new RightToolBarModel({});
   new HeaderView({
     el: '#header',
     model: context.troupe(),
