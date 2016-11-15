@@ -1,0 +1,693 @@
+/*
+---------------------------------------------------------------------------------------------------------------------------------
+
+ ██████╗ ██╗████████╗████████╗███████╗██████╗     ██████╗  █████╗ ██████╗ ██╗  ██╗    ████████╗██╗  ██╗███████╗███╗   ███╗███████╗
+██╔════╝ ██║╚══██╔══╝╚══██╔══╝██╔════╝██╔══██╗    ██╔══██╗██╔══██╗██╔══██╗██║ ██╔╝    ╚══██╔══╝██║  ██║██╔════╝████╗ ████║██╔════╝
+██║  ███╗██║   ██║      ██║   █████╗  ██████╔╝    ██║  ██║███████║██████╔╝█████╔╝        ██║   ███████║█████╗  ██╔████╔██║█████╗
+██║   ██║██║   ██║      ██║   ██╔══╝  ██╔══██╗    ██║  ██║██╔══██║██╔══██╗██╔═██╗        ██║   ██╔══██║██╔══╝  ██║╚██╔╝██║██╔══╝
+╚██████╔╝██║   ██║      ██║   ███████╗██║  ██║    ██████╔╝██║  ██║██║  ██║██║  ██╗       ██║   ██║  ██║███████╗██║ ╚═╝ ██║███████╗
+ ╚═════╝ ╚═╝   ╚═╝      ╚═╝   ╚══════╝╚═╝  ╚═╝    ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝       ╚═╝   ╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝╚══════╝
+
+----------------------------------------------------------------------------------------------------------------------------------
+*/
+
+/* -------------------------------------------
+                Contents
+------------------------------------------- */
+
+/* -------------------------------------------
+- Variables
+
+  - Global
+    - Left Menu
+    - Chat
+    - Org Directory
+    - Explore Page
+    - Topics
+
+
+- Components
+
+  - Left Menu
+    - Header
+    - Main
+    - Text
+
+  - Chat
+    - Header
+    - Main
+    - Right Toolbar
+
+  - Org Directory
+    - Main
+    - List Items
+    - Pagination
+
+  - Explore Page
+    - Main
+    - Details
+    - Room List
+
+  - Topics
+------------------------------------------- */
+
+
+/* -------------------------------------------
+                Variables
+------------------------------------------- */
+
+
+// Brand
+// --------------------------------------------
+@ruby:      #ed1965;
+@jaffa:     #F68D42;
+@caribbean: #46BC99;
+@pampas:    #f2f0ed;
+@thunder:   #3a3133;
+
+
+
+// Global
+// --------------------------------------------
+@app-main-bg-color: #434141;
+@app-header-bg-color: #2d2c2c;
+@app-header-text-color: #bbb7b7;
+@app-header-icon-color: #aaaaaa;
+
+@app-single-line-code-color: #23241f;
+
+@hover-highlight-percentage: 5%;
+
+
+// LEFT MENU
+// --------------------------------------------
+@left-menu-bg-color: #383736;
+@left-menu-minibar-border-color: #2d2c2c;
+@left-menu-minibar-icon-color: #aeaeae;
+@left-menu-text-color: #868685;
+@left-menu-active-item-bg-color: #2d2c2c;
+@left-menu-active-item-text-color: white;
+@left-menu-search-input-active-color: white;
+@left-menu-footer-button-color: white;
+
+
+// CHAT
+// --------------------------------------------
+@chat-main-bg-color: @app-main-bg-color;
+@chat-main-text-color: #afaead;
+@chat-details-text-color: @app-header-icon-color;
+@chat-mention-color: lighten(@jaffa, @hover-highlight-percentage);
+
+@chat-right-toolbar-bg-color: @left-menu-bg-color;
+@chat-right-toolbar-left-border-color: @left-menu-minibar-border-color;
+@chat-right-toolbar-text-color: @chat-main-text-color;
+@chat-right-toolbar-activity-hover-color: white;
+@chat-right-toolbar-issue-open-color: @caribbean;
+@chat-right-toolbar-issue-closed-color: @ruby;
+@chat-right-toolbar-issue-background: #222;
+
+@chat-loading-frame-bg-color: rgba(0, 0, 0, .5);
+
+
+// ORG DIRECTORY
+// --------------------------------------------
+@org-page-main-bg-color: @app-main-bg-color;
+@org-page-list-item-border-color: @left-menu-minibar-border-color;
+@org-page-list-item-heading-color: #dedddc;
+@org-page-list-item-description-color: @left-menu-text-color;
+@org-page-list-item-details-color: @org-page-list-item-description-color;
+@org-page-list-item-tag-background-color: #646362;
+@org-page-list-item-tag-text-color: @org-page-list-item-heading-color;
+
+
+// EXPLORE PAGE
+// --------------------------------------------
+@explore-main-bg-color: @app-main-bg-color;
+@explore-header-details-color: @org-page-list-item-details-color;
+@explore-header-details-icon-color: @app-header-icon-color;
+@explore-tags-bg-color: @org-page-list-item-tag-background-color;
+@explore-tags-text-color: @org-page-list-item-tag-text-color;
+@explore-room-card-bg-color: @explore-main-bg-color;
+@explore-room-card-border-color: @org-page-list-item-border-color;
+@explore-room-card-heading-color: @org-page-list-item-heading-color;
+@explore-room-card-details-color: @org-page-list-item-details-color;
+@explore-room-card-button-color: @app-header-icon-color;
+
+
+// TOPICS
+// --------------------------------------------
+@topics-main-bg-color: @app-main-bg-color;
+@topics-section-border-color: @left-menu-minibar-border-color;
+@topics-header-button-color: @app-header-icon-color;
+@topics-table-headings-color: @org-page-list-item-details-color;
+@topics-row-bg-color: @topics-main-bg-color;
+@topics-row-event-bg-color: #474444;
+@topics-row-border-color: #595554;
+@topics-row-title-color: #b6b0af;
+@topics-row-details-color: @org-page-list-item-details-color;
+
+@topic-background-color: @app-main-bg-color;
+@topic-header-color: @org-page-list-item-heading-color;
+@topic-description-color: @org-page-list-item-description-color;
+@topic-description-border-color: #222;
+@topic-reply-editor-background: @app-header-bg-color;
+@topic-reply-list-background-color: #363434;
+@topic-reply-list-item-background-color: @topic-background-color;
+@topic-reply-list-item-body-color: @topic-description-color;
+@topic-reply-editor-border-color: @topic-description-border-color;
+@topic-reply-list-header-color: @topic-header-color;
+@topic-comment-editor-background-color: @topic-reply-editor-background;
+
+
+/* -------------------------------------------
+              Components
+------------------------------------------- */
+
+body { background-color: @app-main-bg-color; }
+code,
+.topic-body__content code { //Single line code blocks don't have a `pre` element
+  border: none;
+  background-color: @app-single-line-code-color;
+  padding: .2rem .5rem;
+}
+
+// LEFT MENU
+// --------------------------------------------
+
+//--- Left Menu Header ---
+
+//  The top most button in the minibar
+.room-menu-options__item--header-spacer {
+  background-color: @app-header-bg-color;
+  //  LEGACY
+  //  We use a pseudo element here to patch over the border required
+  //  by the rest of the minibar
+  &:after { background-color: inherit; }
+}
+
+//The overall header section of the menu
+.header-brand-container {
+  background-color: @app-header-bg-color;
+  //  Again we use a cheeky pseudo class to span the border
+  &:after {
+    background-color: @app-header-bg-color;
+  }
+}
+
+//Minibar Icons
+.icon-svg {
+  .icon {
+    stroke: @left-menu-minibar-icon-color;
+    fill: @left-menu-minibar-icon-color;
+  }
+}
+
+//Create community icon
+.room-menu-options__item__community-create-icon {
+  color: @left-menu-minibar-icon-color;
+}
+
+//The hamburger toggle bottom most icon
+//in the minibar
+.menu-toggle-icon {
+  stroke: @left-menu-minibar-icon-color;
+}
+
+// --- Left Menu Main ---
+
+//  The left hand minibar within Gitter's left menu
+.minibar {
+  background-color: @left-menu-bg-color;
+  border-color: @left-menu-minibar-border-color;
+}
+
+//  The main left menu
+.room-menu__panel {
+  background-color: @left-menu-bg-color;
+  border-color: @left-menu-minibar-border-color;
+}
+
+//  The footer that contains the "Add a Room button"
+//  This fades to allow room items to be visible underneath
+.panel-footer__item--all {
+  background: linear-gradient(
+    top,
+    rgba(255, 255, 255, 0),
+    @left-menu-bg-color 35%
+  );
+}
+
+//UGH
+.left-menu-search.active {
+  input {
+    color: @left-menu-search-input-active-color;
+  }
+  .left-menu-search__clear {
+    color: @left-menu-search-input-active-color;
+  }
+}
+
+
+//  A room item container is the link that sits within the room list items
+//  the active class denotes the current room
+.room-item__container.active,
+.room-item__container:hover { //:cry:
+  // NB DAMNIT I WANTED TO GET AWAY WITH 0 IMPORTANT RULES
+  // ARRRRRGHHHHHHHHHHHH
+  background-color: @left-menu-active-item-bg-color !important;
+}
+
+//The "Create a Room" & "Explore' footer buttons
+//in the menu
+.panel-footer__create-room,
+.panel-footer__button {
+  color: @left-menu-footer-button-color;
+  border-color: @left-menu-footer-button-color;
+}
+
+
+// --- Left Menu Text ---
+
+//  A room item is a room displayed within the list
+.room-item__title {
+  color: @left-menu-text-color;
+}
+
+a.room-item__container.active,
+a.room-item__container:hover { //:cry:
+  & .room-item__title {
+    color: @left-menu-active-item-text-color !important;
+  }
+}
+
+
+// Chat
+// --------------------------------------------
+
+// --- Chat Header ---
+.chat-header {
+  background-image: none;
+  background-color: @app-header-bg-color;
+}
+
+.chat-header__title,
+.chat-header__topic { color: @app-header-text-color; }
+.chat-header__action-icon { color: @app-header-icon-color; }
+
+// --- Chat Main ---
+.chat-app, .trpContentPanel { background-color: @chat-main-bg-color; }
+.chat-container { background-color: @chat-main-bg-color; }
+
+.chat-item { color: @chat-details-text-color; }
+.loading-frame { background-color: @chat-loading-frame-bg-color; }
+
+.mention { color: @chat-mention-color; }
+
+
+// This is complete and utter BS ...
+.chat-item:hover {
+  background-color: darken(@chat-main-bg-color, @hover-highlight-percentage) !important;
+}
+
+.chat-item__text {
+  color: @chat-main-text-color;
+  a { color: @caribbean; }
+}
+
+// --- Chat Input ---
+.chat-input { background-color: @chat-main-bg-color; }
+.chat-input__text-area {
+  background-color: @chat-main-bg-color;
+  color: @chat-main-text-color;
+}
+.chat-input__button-icon { color: @chat-main-text-color; }
+
+// --- Chat Right Toolbar ---
+.right-toolbar-region .right-toolbar {
+  background: @chat-right-toolbar-bg-color;
+  border-color: @chat-right-toolbar-left-border-color;
+}
+
+//Avatars at the top of the right toolbar
+.trpStatus { border-color: @chat-right-toolbar-bg-color; }
+.trpDisplayPicture.offline .trpStatus { background-color: @chat-right-toolbar-bg-color; }
+
+//Items in the integration list
+.activity-item,
+.activity-tip {
+  color: @chat-right-toolbar-text-color;
+
+  & a { color: darken(@chat-right-toolbar-text-color, 10%); }
+
+  &:hover {
+    background-color: darken(@chat-right-toolbar-bg-color, @hover-highlight-percentage);
+  }
+}
+
+.activity-item:hover {
+  .gtrActivityItemText {
+    color: @chat-right-toolbar-activity-hover-color;
+  }
+  .activity-item__icon {
+    color: @chat-right-toolbar-activity-hover-color;
+  }
+}
+
+//Github integration stuff
+.issue.open { color: @chat-right-toolbar-issue-open-color; }
+.issue.closed { color: @chat-right-toolbar-issue-closed-color; }
+.issue.is-existent {
+  &.closed {
+    color: @chat-right-toolbar-issue-closed-color;
+    background-color: @chat-right-toolbar-issue-background;
+    border-color: @chat-right-toolbar-issue-background;
+  }
+
+  &.open {
+    color: @chat-right-toolbar-issue-closed-color;
+    background-color: @chat-right-toolbar-issue-background;
+    border-color: @chat-right-toolbar-issue-background;
+  }
+}
+
+.gtrActivityItemText .mention {
+  background-color: @chat-right-toolbar-issue-background;
+  border-color: @chat-right-toolbar-issue-background;
+  &:hover { border-color: @chat-right-toolbar-issue-background; }
+}
+
+//Right toolbar footer
+.right-toolbar-region__footer {
+  background: linear-gradient(
+    top,
+    rgba(255, 255, 255, 0),
+    @left-menu-bg-color 35%
+  );
+}
+
+//The toggle icon
+//positioned bottom right of the toolbar
+.right-toolbar-region__footer .menu-toggle-icon {
+  opacity: .45;
+  will-change: opacity;
+  &:hover {
+    stroke: @left-menu-minibar-icon-color;
+    color: @left-menu-minibar-icon-color;
+    opacity: 1;
+  }
+}
+
+
+// Org Directory
+// --------------------------------------------
+
+// --- Main ---
+//main background class for the whole page
+.org-page-main {
+  background-color: @org-page-main-bg-color;
+}
+
+.org-page__header {
+  background-image: none;
+  background-color: @app-header-bg-color;
+}
+
+.org-page__header-heading {
+  a { color: @app-header-text-color; }
+}
+
+.org-page__header-share-link {
+  color: @app-header-text-color;
+  border-color: @app-header-text-color;
+}
+
+// --- List Items ---
+//Each topic and room in the two respective lists
+//displayed on the page
+.org-page__room-item,
+.org-page__topic-item {
+  border-top-color: @org-page-list-item-border-color;
+  border-right-color: @org-page-list-item-border-color;
+  border-bottom-color: @org-page-list-item-border-color;
+}
+
+//The room name
+.org-page__room-item-heading,
+.org-page__topic-item-heading {
+  color: @org-page-list-item-heading-color;
+}
+
+//The description of the room in the list
+.org-page__room-item-description,
+.org-page__topic-item-description {
+  color: @org-page-list-item-description-color;
+}
+
+//Details like the number of people in the room
+.org-page__room-item-details,
+.org-page__topic-item-details {
+  color: @org-page-list-item-description-color;
+}
+
+//Tags for each room
+.org-page__room-item__tag-item {
+  background-color: @org-page-list-item-tag-background-color;
+  color: @org-page-list-item-tag-text-color;
+}
+
+// --- Pagination ---
+//Pagination at the bottom of the org directory
+.org-page__pagination {
+  a {
+    color: @org-page-list-item-heading-color;
+    border-color: @org-page-list-item-border-color;
+
+    &:hover {
+      background-color: lighten(@org-page-main-bg-color, @hover-highlight-percentage);
+      color: @org-page-list-item-heading-color;
+    }
+  }
+
+  .active a {
+    background-color: lighten(@org-page-main-bg-color, @hover-highlight-percentage);
+    color: inherit;
+  }
+}
+
+
+// Explore Page
+// --------------------------------------------
+.explore-header {
+  background-image: none;
+  background-color: @app-header-bg-color;
+}
+
+.explore-header__heading {
+  color: @app-header-text-color;
+}
+
+// --- Main ---
+.explore-page-wrap {
+  background-color: @explore-main-bg-color;
+}
+
+
+// --- Details Section ---
+//Dubious fixes for icons in the header section
+.explore-header-info-bar__mobile-diagram {
+  background-color: @explore-main-bg-color;
+  i {
+    &:before { background-color: @explore-main-bg-color; }
+    &:after { background-color: @explore-main-bg-color; }
+  }
+}
+
+//UGH ...
+.secondary-header-info-bar__item-icon.icon-apple {
+  position: relative;
+  z-index: 1;
+}
+
+.secondary-header-info-bar {
+  border-color: @explore-header-details-icon-color;
+}
+
+.secondary-header-info-bar__item,
+.explore-header-info-bar__mobile-item {
+  color: @explore-header-details-color;
+}
+
+.secondary-header-info-bar__item-icon,
+.explore-header-info-bar__mobile-icon {
+  color: @explore-header-details-icon-color;
+}
+
+.tag-pill,
+.tag-pill-list-pagination-more-button {
+  background-color: @explore-tags-bg-color;
+  color: @explore-tags-text-color;
+  border-color: transparent;
+
+  &:hover {
+    background-color: lighten(@explore-tags-bg-color, @hover-highlight-percentage);
+  }
+}
+
+// --- Room List ---
+.explore-room-card-list-section {
+  background-color: @explore-main-bg-color;
+}
+
+.room-card {
+  opacity: 1;
+  background-color: @explore-room-card-bg-color;
+  border: 1px solid @explore-room-card-border-color;
+}
+
+.room-card__heading {
+  color: @explore-room-card-heading-color;
+}
+
+.room-card__topic {
+  color: @explore-room-card-details-color;
+}
+
+.room-card__tag {
+  background-color: @explore-tags-bg-color;
+  color: @explore-tags-text-color;
+}
+
+.room-card__footer-user-count {
+  color: @explore-room-card-button-color;
+  border-color: @explore-room-card-button-color;
+}
+
+.room-card__footer {
+  border-color: @explore-room-card-border-color;
+}
+
+
+// TOPICS
+// --------------------------------------------
+//Header element for the topics application
+.container--search {
+  background-image: none;
+  background-color: @app-header-bg-color;
+}
+
+//{orgName}'s topics (back button)
+.topic-search__all-topics-link {
+  color: @app-header-text-color;
+}
+
+//Create Topic link
+.topic-search__create-topic-link {
+  border-color: @app-header-icon-color;
+  color: @app-header-icon-color;
+}
+
+//The headers that contain the links to a specific category
+//and the table controls
+.panel--category,
+.panel--table-control {
+  background-color: @topics-main-bg-color;
+  border-bottom: 1px solid @topics-section-border-color;
+}
+
+//Buttons and selects within the headers described above
+.category-list__item,
+.topic-control__button,
+.table-control__select {
+  border-color: @topics-header-button-color;
+  color: @topics-header-button-color;
+}
+
+//  custom stylings for selects ...
+.table-control__select--decal:after {
+  color: @topics-header-button-color;
+}
+
+//The area that contains the link to follow an orgs topics
+.panel--forum-follow-area {
+  border-bottom: none;
+  background-color: @topics-main-bg-color;
+}
+
+//Table header
+.topics-table-header {
+  background-color: @topics-main-bg-color;
+  color: @topics-table-headings-color;
+  border-color: @topics-row-border-color;
+}
+
+//Table rows
+.topics-table-body__row {
+  background-color: @topics-row-bg-color;
+  border-color: @topics-row-border-color;
+}
+
+.topics-table-body__row:nth-child(even) {
+  background-color: @topics-row-event-bg-color;
+}
+
+//Topic Name
+.topics-table-body__cell__link {
+  color: @topics-row-title-color;
+}
+
+//Topic meta counts
+.topics-table-body__cell--replies,
+.topics-table-body__cell--likes {
+  color: @topics-row-details-color;
+}
+
+.container--topic-header {
+  background-color: @topic-background-color;
+}
+
+.topic-header__title {
+  color: @topic-header-color;
+}
+
+.panel--topic-body {
+  background-color: @topic-background-color;
+  border-color: @topic-description-border-color;
+}
+
+.topic-body__content {
+  color: @topic-description-color;
+
+  a { color: @caribbean; }
+  a:visited { color: darken(@caribbean, 20%); }
+}
+
+.topic-reply-list-header__heading {
+  color: @topic-header-color;
+}
+
+.topic-reply-list-header__filter-button {
+  color: @topic-header-color;
+}
+
+.panel--reply-list-header,
+.panel--topic-reply-list {
+  background-color: @topic-reply-list-background-color;
+}
+
+.feed-item__content {
+  background-color: @topic-reply-list-item-background-color;
+  color: @topic-reply-list-item-body-color;
+}
+
+.panel--reply-editor,
+.editor--reply {
+  background-color: @topic-reply-editor-background;
+  border-color: @topic-reply-editor-border-color;
+  color: @topic-description-color;
+}
+
+.reply-comment-editor__editor {
+  background-color: @topic-comment-editor-background-color;
+  color: @topic-description-color;
+  border-color: @topic-reply-editor-border-color;
+}
