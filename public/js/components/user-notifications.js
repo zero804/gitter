@@ -8,7 +8,8 @@ var context = require('../utils/context');
 var onReady = require('../utils/onready');
 
 var linkHandler = require('./link-handler');
-var webNotifications = require('./web-notifications');
+// disabled inline notifications because they are sucky
+// var webNotifications = require('./web-notifications');
 var WindowNotification = window.Notification;
 var webkitNotifications = window.webkitNotifications;
 
@@ -73,7 +74,8 @@ function onNotificationMessageClicked(message) {
 function onUserNotification(message) {
   if (getDesktopNotificationAccess() !== 'granted') {
     // Show web notifications in each tab
-    webNotifications.show(message, onNotificationMessageClicked);
+    // Disabled inline notifications because they are sucky
+    // webNotifications.show(message, onNotificationMessageClicked);
     return;
   }
 
