@@ -168,12 +168,7 @@ var HeaderView = Marionette.ItemView.extend({
       this.dropdown.hide();
     }
 
-    //If an instance of the profile menu exists destory it to remove listeners etc
-    if(this.profileMenu) { this.profileMenu.destroy(); }
-    //Make a new profile menu
-    this.profileMenu = new ProfileMenu({ el: '#profile-menu' });
-    //Render it
-    this.profileMenu.render();
+    this.setupProfileMenu();
 
     this.ui.favourite.css({ visibility: context.isLoggedIn() ? 'visible' : 'hidden' });
     this.ui.favourite.toggleClass('favourite', !!this.model.get('favourite'));
@@ -189,6 +184,17 @@ var HeaderView = Marionette.ItemView.extend({
     this.dropdown.setTargetElement(this.ui.cog[0]);
     this.menuItemsCollection.reset(this.createMenu());
     this.dropdown.show();
+  },
+
+  setupProfileMenu: function() {
+    if(context.isLoggedIn()) {
+      //If an instance of the profile menu exists destory it to remove listeners etc
+      if(this.profileMenu) { this.profileMenu.destroy(); }
+      //Make a new profile menu
+      this.profileMenu = new ProfileMenu({ el: '#profile-menu' });
+      //Render it
+      this.profileMenu.render();
+    }
   },
 
   createMenu: function() {
