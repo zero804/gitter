@@ -73,6 +73,9 @@ JP 11/2/16
     }
     & .room-item__favourite-action {
       color: @menu-item-color;
+      &.favourite {
+        color: @menu-favourite-action-color;
+      }
     }
   }
 
@@ -275,12 +278,16 @@ border-color .2s ease;
 .room-item__favourite-action {
   .room-item__options();
   display: none;
+
+  &.favourite {
+    &:hover {
+      color: @menu-favourite-action-color;
+    }
+  }
 }
 
 .room-item__favourite-action-icon {
-  &.favourite {
-    color: @trpYellow;
-  }
+
 }
 
 .room-item__options-menu {
