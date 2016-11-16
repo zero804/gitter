@@ -1,4 +1,11 @@
-{{#unless isLoggedIn}}
+{{#if isLoggedIn}}
+  <header class="explore-header">
+    <h1 class="explore-header__heading">
+      Explore
+    </h1>
+    <div id="profile-menu" class="profile-menu"></div>
+  </header>
+{{else}}
   <header class="primary-branded-header">
     <div class="primary-branded-header-inner explore-primary-header-innner">
       <div class="explore-primary-header-group">
@@ -22,14 +29,7 @@
       </div>
     </div>
   </header>
-{{/unless}}
-
-<header class="explore-header">
-  <h1 class="explore-header__heading">
-    Explore
-  </h1>
-  <div id="profile-menu" class="profile-menu"></div>
-</header>
+{{/if}}
 
 <div class="explore-header-section">
 

@@ -4,8 +4,10 @@ var $ = require('jquery');
 var Marionette = require('backbone.marionette');
 var urlParse = require('url-parse');
 var appEvents = require('../../utils/appevents');
+var context = require('../../utils/context');
 var modalRegion = require('../../components/modal-region');
 var LoginView = require('../modals/login-view');
+var ProfileMenu = require('../profile-menu/profile-menu-view');
 var template = require('./tmpl/explore-view.hbs');
 var itemTemplate = require('../../../templates/partials/room_card.hbs');
 
@@ -85,17 +87,39 @@ var ExploreView = Marionette.LayoutView.extend({
     'click @ui.createRoomButton': 'popCreate'
   },
 
-  initialize: function() {
-    //console.log('explore init');
-
-    $('.js-explore-tag-pill[data-needs-authentication]').on('click', this.popSignInModal);
-  },
-
   initRoomCardListView: function(optionsForRegion) {
     return new RoomCardListView(optionsForRegion({ }));
   },
   initTagPillListView: function(optionsForRegion) {
     return new TagPillListView(optionsForRegion({ }));
+  },
+
+  initialize: function() {
+    // TODO: Once we re-render on the client with a snapshot, this stuff can be removed
+    $('.js-explore-tag-pill[data-needs-authentication]').on('click', this.popSignInModal);
+    this.setupProfileMenu();
+  },
+
+  serializeData: function() {
+    return {
+      isLoggedIn: context.isLoggedIn(),
+      // TODO: rest of snapshot...
+    };
+  },
+
+  onRender: function() {
+    this.setupProfileMenu();
+  },
+
+  setupProfileMenu: function() {
+    if(context.isLoggedIn()) {
+      //If an instance of the profile menu exists destory it to remove listeners etc
+      if(this.profileMenu) { this.profileMenu.destroy(); }
+      //Make a new profile menu
+      this.profileMenu = new ProfileMenu({ el: '#profile-menu' });
+      //Render it
+      this.profileMenu.render();
+    }
   },
 
   popSignInModal: function(e) {
