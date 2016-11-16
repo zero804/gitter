@@ -20,7 +20,9 @@
         target="_blank">
         Share
       </a>
-      <div id="profile-menu" class="profile-menu"></div>
+      {{#if isLoggedIn}}
+        <div id="profile-menu" class="profile-menu"></div>
+      {{/if}}
     </div>
   </div>
 </div>
