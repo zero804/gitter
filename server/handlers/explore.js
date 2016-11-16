@@ -171,7 +171,7 @@ router.get('/tags/:tags',
               // context? Probably not.
               troupeContext.snapshots = snapshots;
 
-              res.render('explore', _.extend({}, snapshots, {
+              return res.render('explore', _.extend({}, snapshots, {
                 hasDarkTheme: userThemeSnapshot.theme === 'gitter-dark',
                 isMobile: isMobile(req),
                 exploreBaseUrl: req.baseUrl,
