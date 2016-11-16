@@ -7,7 +7,6 @@ var onready = require('./utils/onready');
 var toggleClass = require('./utils/toggle-class');
 var ExploreView = require('./views/explore/explore-view');
 var frameUtils = require('gitter-web-frame-utils');
-var ProfileMenu = require('./views/profile-menu/profile-menu-view');
 
 require('./utils/tracking');
 
@@ -24,12 +23,7 @@ onready(function() {
   new ExploreView({
     el: '.explore-page-wrap'
   });
-
-  var profileMenu = new ProfileMenu({
-    el: '#profile-menu'
-  });
-
-  profileMenu.render();
+  //exploreView.render();
 
   var tagPillElements = document.querySelectorAll('.js-explore-tag-pill');
   var roomCardElements = document.querySelectorAll('.js-explore-room-card');
