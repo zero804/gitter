@@ -85,7 +85,7 @@
 @left-menu-bg-color: #383736;
 @left-menu-minibar-border-color: #2d2c2c;
 @left-menu-minibar-icon-color: #aeaeae;
-@left-menu-text-color: #868685;
+@left-menu-text-color: #bbb;
 @left-menu-active-item-bg-color: #2d2c2c;
 @left-menu-active-item-text-color: white;
 @left-menu-search-input-active-color: white;
@@ -95,7 +95,7 @@
 // CHAT
 // --------------------------------------------
 @chat-main-bg-color: @app-main-bg-color;
-@chat-main-text-color: #afaead;
+@chat-main-text-color: #ccc;
 @chat-details-text-color: @app-header-icon-color;
 @chat-mention-color: lighten(@jaffa, @hover-highlight-percentage);
 
@@ -149,7 +149,7 @@
 
 @topic-background-color: @app-main-bg-color;
 @topic-header-color: @org-page-list-item-heading-color;
-@topic-description-color: @org-page-list-item-description-color;
+@topic-description-color: @chat-main-text-color;
 @topic-description-border-color: #222;
 @topic-reply-editor-background: @app-header-bg-color;
 @topic-reply-list-background-color: #363434;
@@ -158,6 +158,7 @@
 @topic-reply-editor-border-color: @topic-description-border-color;
 @topic-reply-list-header-color: @topic-header-color;
 @topic-comment-editor-background-color: @topic-reply-editor-background;
+@topic-details-text-color: @chat-details-text-color;
 
 
 /* -------------------------------------------
@@ -276,6 +277,14 @@ code,
 //  A room item is a room displayed within the list
 .room-item__title {
   color: @left-menu-text-color;
+}
+
+.left-menu-forum-category-item {
+  color: @left-menu-text-color;
+}
+
+.left-menu-forum-category-item:hover, .left-menu-forum-category-item:focus {
+  background-color: @left-menu-active-item-bg-color !important;
 }
 
 a.room-item__container.active,
@@ -682,6 +691,14 @@ a.room-item__container:hover { //:cry:
 .feed-item__content {
   background-color: @topic-reply-list-item-background-color;
   color: @topic-reply-list-item-body-color;
+}
+
+.feed-item__content__header__user-display-name  {
+  color: @topic-details-text-color;
+}
+
+.feed-item__content__header__user-user-name {
+  color: @topic-details-text-color;
 }
 
 .panel--reply-editor,
