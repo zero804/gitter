@@ -281,7 +281,7 @@
     "qs": "^6.2.1",
     "random-seed": "^0.2.0",
     "raven-js": "^3.7.0",
-    "react-addons-test-utils": "^15.3.1",
+    "react-addons-test-utils": "~15.3.1",
     "reduce-function-call": "^1.0.1",
     "require-all": "^2.0.0",
     "run-sequence": "^1.2.0",
