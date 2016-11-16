@@ -326,7 +326,9 @@
 // DND mirror styles when dragging a left-menu "room-list item"
 // "room-list item" applies to any item that isn't necessarily a room
 .minibar-collection-list {
-  & .room-item,
+  & .room-item {
+    display: none;
+  }
   & .room-item--group {
     .room-menu-options__item();
     opacity: 1;

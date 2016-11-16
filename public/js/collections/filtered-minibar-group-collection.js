@@ -36,12 +36,7 @@ var FilteredMinibarGroupCollection = SimpleFilteredCollection.extend({
     }
 
     var group;
-    if(type === 'room') {
-      var room = this.roomCollection.get(id);
-      var groupId = room && room.get('groupId');
-      group = groupId && this.groupCollection.get(groupId);
-    }
-    else if(type === 'group' || type === 'minibar-group' || type === 'room-list-group') {
+    if(type === 'group' || type === 'minibar-group' || type === 'room-list-group') {
       group = id && this.groupCollection.get(id);
     }
 

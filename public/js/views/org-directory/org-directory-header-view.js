@@ -2,6 +2,7 @@
 
 var Marionette = require('backbone.marionette');
 var toggleClass = require('../../utils/toggle-class');
+var context = require('../../utils/context');
 
 var ProfileMenu = require('../../views/profile-menu/profile-menu-view.js');
 var headerViewTemplate = require('./org-directory-header-view.hbs');
@@ -27,13 +28,24 @@ var HeaderView = Marionette.LayoutView.extend({
     'change:favourite': 'onFavouriteChange'
   },
 
-  behaviors: {
-    Isomorphic: {
-      profileMenuView: { el: '#profile-menu', init: 'initProfileMenuView' }
-    },
-    Tooltip: {
-      '.js-group-favourite-button': { placement: 'left' }
-    },
+  behaviors: function() {
+    var behaviors = {
+      Isomorphic: {
+
+      },
+      Tooltip: {
+        '.js-group-favourite-button': { placement: 'left' }
+      },
+    };
+
+    if(context.isLoggedIn()) {
+      behaviors.Isomorphic.profileMenuView = {
+        el: '#profile-menu',
+        init: 'initProfileMenuView'
+      };
+    }
+
+    return behaviors
   },
 
   initProfileMenuView: function(optionsForRegion) {
