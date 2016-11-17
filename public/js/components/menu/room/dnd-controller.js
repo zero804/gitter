@@ -7,6 +7,7 @@ var _ = require('underscore');
 var DNDCtrl = function() {
 
   this.onMouseUp = this.onMouseUp.bind(this);
+  this.panelRef = document.querySelector('.room-menu__panel');
 
   this.drag = dragula([], {
     moves: this.shouldItemMove.bind(this),
@@ -23,6 +24,7 @@ var DNDCtrl = function() {
 DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
 
   shouldItemMove: function (el) {
+
     return (el.tagName !== 'A' &&
             !el.classList.contains('search-message-empty-container') &&
             el.id !== 'empty-view');
@@ -44,14 +46,27 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
     //guard against no drop target
     if(!target || !target.dataset) { return }
 
-    if (target.classList.contains('collection-list--primary')) {
-      this.trigger('room-menu:remove-favourite', el.dataset.id);
-      this.onDragEnd();
-    } else {
-      var siblingID = !!sibling && sibling.dataset.id;
-      this.trigger('room-menu:sort-favourite', el.dataset.id, siblingID);
-      this.onDragEnd();
+    var id = el.dataset.id;
+    var type = el.dataset.type;
+    var siblingID = !!sibling && sibling.dataset.id;
+
+    if (type === 'room' && target.classList.contains('collection-list--primary')) {
+      this.trigger('room-menu:remove-favourite', id);
     }
+    else if (type === 'room' && target.classList.contains('collection-list--favourite')) {
+      this.trigger('room-menu:sort-favourite', id, siblingID);
+    }
+    else if (target.classList.contains('minibar-collection-list')) {
+      this.trigger('minibar:update-favourite-group', id, type, siblingID);
+      if(type === 'room' || type === 'room-list-group') {
+        this.drag.cancel(true);
+      }
+    }
+    else if (type === 'minibar-group' && !target.classList.contains('minibar-collection-list')) {
+      this.trigger('minibar:remove-favourite-group', id);
+    }
+
+    this.onDragEnd();
   },
 
   onDragStart: function () {

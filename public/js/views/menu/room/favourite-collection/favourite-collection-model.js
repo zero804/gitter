@@ -11,4 +11,11 @@ module.exports = PrimaryCollectionModel.extend({
     });
   },
 
+  onGroup: function(){
+    this.set({
+      header: false,
+      active: false
+    })
+  },
+
 });

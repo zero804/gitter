@@ -1,3 +1,5 @@
+@import "../../../../../less/colors";
+
 .room-menu__panel {
   box-sizing:       border-box;
   position:         absolute;
@@ -5,54 +7,25 @@
   left:             0;
   height:           100%;
   padding-left:     100%;
-  background-image: linear-gradient(
-    #251546 30%,
-    #513173 60%,
-    #842a36
-  );
+  border-right:     1px solid @menu-border-color;
+  background-color: @main-application-bg-color;
 
   //TODO Check how this works on other monitor sizes
-  transform:    translateX(-78%);
+  transform:    translateX(-100%);
   transition:   transform .1s linear .05s;
 
   //TODO not so sure about this JP 22/1/16
-  & > *:not(.notification-center) { opacity: 0; }
+  & > *:not(.notification-center) {
+    will-change: opacity;
+    opacity: 0;
+    transition: opacity .2s ease-out .2s;
+  }
 
   &.active {
     transform: translateX(0);
     &:after { background-color: rgba(255,255,255,.2); }
     //Ouch @MadLittleMods may pwn me for this ;) JP 25/1/16
     & > *:not(.notification-center) { opacity: 1; }
-  }
-
-  //Right hand border
-  &:after {
-    content:  ' ';
-    display:  inline-block;
-    position: absolute;
-    top:      0;
-    right:    0;
-    width:    @left-menu-panel-border-width;
-    height:   100%;
-    background-color: transparent;
-    transition: background-color .2s liner;
-    pointer-events: none;
-  }
-
-  //image background
-  &:before {
-    content:             ' ';
-    display:             inline-block;
-    position:            absolute;
-    top:                 0;
-    left:                0;
-    width:               100%;
-    height:              100%;
-    background-image:    url('../images/left-menu-background-darker.jpg');
-    background-position: bottom right;
-    background-repeat:   no-repeat;
-    background-size:     cover;
-    z-index:             -1;
   }
 
   .mobile & {
@@ -87,6 +60,11 @@
 }
 
 .panel-content {
+
+  .room-menu__panel.org & {
+    padding-bottom: 8rem;
+  }
+
   &:after {
     content: '';
     flex-shrink: 0;

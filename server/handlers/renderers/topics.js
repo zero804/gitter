@@ -25,6 +25,7 @@ var navConstants = require('gitter-web-topics-ui/shared/constants/navigation');
 
 var restSerializer = require('../../serializers/rest-serializer');
 var contextGenerator = require('../../web/context-generator.js');
+var generateUserThemeSnapshot = require('../snapshots/user-theme-snapshot');
 
 
 function renderForum(req, res, next, options) {
@@ -34,16 +35,19 @@ function renderForum(req, res, next, options) {
   var groupUri = req.params.groupUri;
 
   return Promise.props({
-      context: contextGenerator.generateNonChatContext(req),
-      group: groupService.findByUri(groupUri)
+      context: contextGenerator.generateBasicContext(req),
+      group: groupService.findByUri(groupUri),
+      userThemeSnapshot: generateUserThemeSnapshot(req),
     })
     .bind({
       context: null,
       serializedGroup: null,
-      serializedForum: null
+      serializedForum: null,
+      userThemeSnapshot: {},
     })
     .then(function(result) {
       this.context = result.context;
+      this.userThemeSnapshot = result.userThemeSnapshot;
       var group = result.group;
 
       if (!group) throw new StatusError(404, 'Group not found.');
@@ -89,6 +93,7 @@ function renderForum(req, res, next, options) {
       return res.render('topics/forum', {
         layout: 'topics-layout',
         hasCachedFonts: fonts.hasCachedFonts(req.cookies),
+        hasDarkTheme: this.userThemeSnapshot.theme === 'gitter-dark',
         fonts: fonts.getFonts(),
         componentData: {
           forum: forum,
@@ -122,17 +127,20 @@ function renderTopic(req, res, next) {
   var userId = req.user && req.user._id;
 
   return Promise.props({
-      context: contextGenerator.generateNonChatContext(req),
-      group: groupService.findByUri(groupUri)
+      context: contextGenerator.generateBasicContext(req),
+      group: groupService.findByUri(groupUri),
+      userThemeSnapshot: generateUserThemeSnapshot(req)
     })
     .bind({
       context: null,
       serializedGroup: null,
       serializedForum: null,
-      serializedTopic: null
+      serializedTopic: null,
+      userThemeSnapshot: {},
     })
     .then(function(result) {
       this.context = result.context;
+      this.userThemeSnapshot = result.userThemeSnapshot;
       var group = result.group;
 
       if (!group) throw new StatusError(404, 'Group not found.');
@@ -176,6 +184,7 @@ function renderTopic(req, res, next) {
     })
     .then(function(result) {
 
+
       var sortName = req.query.sort;
 
       this.serializedForum = result.serializedForum;
@@ -187,8 +196,10 @@ function renderTopic(req, res, next) {
       var topic = this.serializedTopic;
 
       var topicStore = forumTopicsStore([topic]);
+
       return res.render('topics/topic', {
         layout: 'topics-layout',
+        hasDarkTheme: this.userThemeSnapshot.theme === 'gitter-dark',
         hasCachedFonts: fonts.hasCachedFonts(req.cookies),
         fonts: fonts.getFonts(),
         componentData: {

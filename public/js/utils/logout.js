@@ -1,6 +1,8 @@
 "use strict";
 
 var apiClient = require('../components/api-client');
+var serviceWorkerDeregistation = require('gitter-web-service-worker/browser/deregistration');
+var Promise = require('bluebird');
 
 function navigate(href) {
   try {
@@ -10,9 +12,12 @@ function navigate(href) {
   }
 }
 
-module.exports = function logout() {
-  return apiClient.web.post('/logout')
-    .then(function(response) {
+function logout() {
+  return Promise.all([
+      apiClient.web.post('/logout'),
+      serviceWorkerDeregistation.uninstall()
+    ])
+    .spread(function(response) {
       if(response && response.redirect) {
         navigate(response.redirect);
       } else {
@@ -22,5 +27,6 @@ module.exports = function logout() {
     .catch(function() {
       navigate('/');
     });
+}
 
-};
+module.exports = logout;

@@ -22,7 +22,7 @@ module.exports = Backbone.Model.extend({
     this.determineActiveState(this.roomMenuModel, this.roomMenuModel.get('state'));
   },
 
-  determineActiveState: function(model) {
+  determineActiveState: function(/*model*/) {
     var state = this.roomMenuModel.get('state');
     this.set('state', state);
     switch (state) {
@@ -35,9 +35,11 @@ module.exports = Backbone.Model.extend({
       case 'people':
         this.onPeople();
         break;
-      case 'temp-org':
       case 'org':
         this.onOrg();
+        break;
+      case 'group':
+        this.onGroup();
         break;
       default:
         this.onDefault();
@@ -49,6 +51,7 @@ module.exports = Backbone.Model.extend({
   onSearch:    function() { this.onDefault(); },
   onPeople:    function() { this.onDefault(); },
   onOrg:       function() { this.onDefault(); },
+  onGroup:     function() { this.onDefault(); },
   onDefault:   function() {},
 
 });

@@ -7,24 +7,14 @@ var toggleClass = require('../../../../utils/toggle-class');
 var cocktail = require('backbone.cocktail');
 var KeyboardEventMixin = require('../../../keyboard-events-mixin');
 var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
-
+var context = require('../../../../utils/context');
 
 var HeaderView = Marionette.ItemView.extend({
   template: template,
 
-  behaviors: {
-    Tooltip: {
-      '.js-left-menu-org-page-action': { placement: 'left' },
-      '.js-profile-menu-toggle': { titleFn: function() {
-        return 'Click to toggle the profile menu';
-      }, placement: 'right' }
-    }
-  },
-
   modelEvents: {
     'change:state': 'updateActiveElement',
     'change:groupId': 'render',
-    'change:profileMenuOpenState': 'onProfileToggle',
   },
 
   events: {
@@ -41,6 +31,7 @@ var HeaderView = Marionette.ItemView.extend({
     headerSearch:    '#panel-header-search',
     headerFavourite: '#panel-header-favourite',
     headerPeople:    '#panel-header-people',
+    headerGroup:     '#panel-header-group',
     headerOrg:       '#panel-header-org',
     profileToggle:   '#panel-header-profile-toggle',
   },
@@ -51,11 +42,25 @@ var HeaderView = Marionette.ItemView.extend({
 
   serializeData: function() {
     var groupId = this.model.get('groupId');
-    var selectedGroup = this.groupsCollection.get(groupId);
+    var selectedGroup = this.groupsCollection.get(groupId) || context.group();
+
+    var avatarUrl = null;
+    if(selectedGroup) {
+      avatarUrl = selectedGroup.get('avatarUrl');
+    }
+
     var name = '';
-    if(selectedGroup) { name = selectedGroup.get('name'); }
-    else { name = getOrgNameFromUri(document.location.pathname); }
-    return { groupName: name, };
+    if(selectedGroup) {
+      name = selectedGroup.get('name');
+    }
+    else {
+      name = getOrgNameFromUri(document.location.pathname);
+    }
+
+    return {
+      groupName: name,
+      avatarUrl: avatarUrl
+    };
   },
 
   updateActiveElement: function(model, state) { //jshint unused: true
@@ -67,18 +72,12 @@ var HeaderView = Marionette.ItemView.extend({
         toggleClass(this.ui.headerSearch[0], 'active', state === 'search');
         toggleClass(this.ui.headerFavourite[0], 'active', state === 'favourite');
         toggleClass(this.ui.headerPeople[0], 'active', state === 'people');
-        toggleClass(this.ui.headerOrg[0], 'active', (state === 'org' || state === 'temp-org'));
+        toggleClass(this.ui.headerGroup[0], 'active', state === 'group');
+        toggleClass(this.ui.headerOrg[0], 'active', state === 'org');
       }.bind(this));
     }.bind(this));
   },
 
-
-  toggleProfileMenuWhenAll: function() {
-    //Open the profile menu ONLY when in the all channels state
-    if (this.model.get('state') === 'all') {
-      this.model.set('profileMenuOpenState', !this.model.get('profileMenuOpenState'));
-    }
-  },
 
   onRender: function() {
     this.updateActiveElement(this.model, this.model.get('state'));
@@ -90,7 +89,6 @@ var HeaderView = Marionette.ItemView.extend({
     if (this.model.get('roomMenuIsPinned')) return;
     e.stopPropagation();
     this.model.set({
-      profileMenuOpenState: false,
       panelOpenState:       false,
     });
   },

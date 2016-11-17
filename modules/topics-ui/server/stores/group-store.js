@@ -17,6 +17,9 @@ module.exports = function groupStore(data) {
     },
     getGroupName: () => {
       return data.name;
+    },
+    getGroupAvatarUrl: () => {
+      return data.avatarUrl;
     }
   };
 };

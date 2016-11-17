@@ -120,7 +120,9 @@ module.exports = {
         var group = groupCreationResult.group;
         var defaultRoom = groupCreationResult.defaultRoom;
 
-        var groupStrategy = new restSerializer.GroupStrategy();
+        var groupStrategy = new restSerializer.GroupStrategy({
+          currentUserId: req.user.id,
+        });
         var troupeStrategy = new restSerializer.TroupeStrategy({
           currentUserId: req.user.id,
           includeTags: true,
@@ -178,7 +180,10 @@ module.exports = {
     var user = req.user;
     var userId = user && user._id;
 
-    var strategy = new restSerializer.GroupStrategy({ currentUserId: userId, currentUser: user });
+    var strategy = new restSerializer.GroupStrategy({
+      currentUserId: userId,
+      currentUser: user
+    });
     return restSerializer.serializeObject(group, strategy);
   },
 

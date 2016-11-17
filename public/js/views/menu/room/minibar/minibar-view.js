@@ -5,13 +5,13 @@ var appEvents = require('../../../../utils/appevents');
 var HomeView = require('./home-view/home-view');
 var SearchView = require('./search-view/search-view');
 var PeopleView = require('./people-view/people-view');
+var GroupView = require('./group-view/group-view');
 var CloseView = require('./close-view/close-view');
-var TempOrgView = require('./temp-org-view/temp-org-view');
 var CollectionView = require('./minibar-collection-view');
 var CommunityCreateView = require('./minibar-community-create-item-view');
+var _ = require('underscore');
 
 require('../../../behaviors/isomorphic');
-
 
 module.exports = Marionette.LayoutView.extend({
 
@@ -22,10 +22,10 @@ module.exports = Marionette.LayoutView.extend({
         home: { el: '#minibar-all', init: 'initHome' },
         search: { el: '#minibar-search', init: 'initSearch' },
         people: { el: '#minibar-people', init: 'initPeople' },
-        collectionView: { el: '#minibar-collection', init: 'initCollection' },
+        groups: { el: '#minibar-groups', init: 'initGroups' },
         communityCreate: { el: '#minibar-community-create', init: 'initCommunityCreate' },
         close: { el: '#minibar-close', init: 'initClose' },
-        tempOrg: { el: '#minibar-temp', init: 'initTemp' }
+        collectionView: { el: '#minibar-collection', init: 'initCollection' },
       },
     };
 
@@ -65,15 +65,15 @@ module.exports = Marionette.LayoutView.extend({
     return peopleView;
   },
 
-  initCollection: function (optionsForRegion){
-    var collectionView = new CollectionView(optionsForRegion({
-      collection: this.collection,
+  initGroups: function (optionsForRegion){
+    var groupView = new GroupView(optionsForRegion({
+      model: this.groupModel,
       roomMenuModel: this.model,
-      keyboardControllerView: this.keyboardControllerView,
     }));
 
-    this.listenTo(collectionView, 'minibar-item:activated', this.onCollectionItemActivated, this);
-    return collectionView;
+    //We have to manually bind child events because of the Isomorphic Behaviour
+    this.listenTo(groupView, 'minibar-item:activated', this.onGroupActivate, this);
+    return groupView;
   },
 
   initCommunityCreate: function (optionsForRegion){
@@ -96,16 +96,16 @@ module.exports = Marionette.LayoutView.extend({
     return closeView;
   },
 
-  initTemp: function (optionsForRegion){
-    var tempView = new TempOrgView(optionsForRegion({
-      model: this.tempModel,
+  initCollection: function (optionsForRegion){
+    var collectionView = new CollectionView(optionsForRegion({
+      collection: this.collection,
       roomMenuModel: this.model,
-      roomCollection: this.roomCollection,
-      groupCollection: this.collection,
+      dndCtrl: this.dndCtrl,
+      keyboardControllerView: this.keyboardControllerView,
     }));
 
-    this.listenTo(tempView, 'minibar-item:activated', this.onTempOrgItemClicked, this);
-    return tempView;
+    this.listenTo(collectionView, 'minibar-item:activated', this.onCollectionItemActivated, this);
+    return collectionView;
   },
 
   modelEvents: {
@@ -114,14 +114,15 @@ module.exports = Marionette.LayoutView.extend({
 
   initialize: function(attrs) {
     this.bus = attrs.bus;
+    this.dndCtrl = attrs.dndCtrl;
     this.model = attrs.model;
     this.roomCollection = attrs.roomCollection;
     this.homeModel = this.model.minibarHomeModel;
     this.searchModel = this.model.minibarSearchModel;
     this.peopleModel = this.model.minibarPeopleModel;
+    this.groupModel = this.model.minibarGroupModel;
     this.communityCreateModel = this.model.minibarCommunityCreateModel;
     this.closeModel = this.model.minibarCloseModel;
-    this.tempModel = this.model.minibarTempOrgModel;
     this.keyboardControllerView = attrs.keyboardControllerView;
     this.groupsCollection = attrs.groupsCollection;
     this.listenTo(this.bus, 'navigation', this.clearFocus, this);
@@ -142,15 +143,13 @@ module.exports = Marionette.LayoutView.extend({
     this.changeMenuState('people');
   },
 
+  onGroupActivate: function(){
+    this.changeMenuState('group');
+  },
+
   onCollectionItemActivated: function (view, model){
     this.model.set('groupId', model.get('id'));
     this.changeMenuState('org');
-  },
-
-  onTempOrgItemClicked: function (){
-    var name = this.tempModel.get('name');
-    this.model.set('tempGroupUri', name);
-    this.changeMenuState('temp-org');
   },
 
   changeMenuState: function(state){
@@ -158,7 +157,6 @@ module.exports = Marionette.LayoutView.extend({
     this.model.set({
       panelOpenState: true,
       state: state,
-      profileMenuOpenState: false,
     });
   },
 
@@ -207,13 +205,13 @@ module.exports = Marionette.LayoutView.extend({
         return this.searchModel.set({ active: true, focus: true });
       case 'people':
         return this.peopleModel.set({ active: true, focus: true });
+      case 'group':
+        return this.groupModel.set({ active: true, focus: true });
       case 'org':
         var groupId = this.model.get('groupId');
         var model = this.collection.get(groupId);
         if(!model) { return; }
         return model.set({ active: true, focus: true });
-      case 'temp-org':
-        return this.tempModel.set({ active: true, focus: true });
     }
   },
 
@@ -223,24 +221,31 @@ module.exports = Marionette.LayoutView.extend({
     if(activeModel) { activeModel.set('active', false); }
   },
 
-  getActiveItem: function (){
-    return this.homeModel.get('active') && this.homeModel ||
-      this.searchModel.get('active') && this.searchModel ||
-      this.peopleModel.get('active') && this.peopleModel ||
-      this.tempModel.get('active') && this.tempModel ||
-      this.collection.findWhere({ active: true }) ||
-      this.communityCreateModel.get('active') && this.communityCreateModel ||
-      this.closeModel.get('active') && this.closeModel;
+  getAllModels: function() {
+    return [this.homeModel,
+      this.searchModel,
+      this.peopleModel,
+      this.groupModel]
+      .concat(this.collection.models)
+      .concat([
+      this.communityCreateModel,
+      this.closeModel
+    ]);
+  },
+
+  getActiveItem: function() {
+    var models = this.getAllModels();
+
+    return _.find(models, function(f) {
+      return f.get('active');
+    });
   },
 
   clearFocus: function (){
-    if(this.homeModel.get('focus')) { this.homeModel.set('focus', false); }
-    if(this.searchModel.get('focus')) { this.searchModel.set('focus', false); }
-    if(this.peopleModel.get('focus')) { this.peopleModel.set('focus', false); }
-    if(this.communityCreateModel.get('focus')) { this.communityCreateModel.set('focus', false); }
-    if(this.closeModel.get('focus')) { this.closeModel.set('focus', false); }
-    if(this.tempModel.get('focus')) { this.tempModel.set('focus', false); }
-    this.collection.where({ focus: true }).forEach(function(model){ model.set('focus', false); });
+    var models = this.getAllModels();
+    models.forEach(function(model) {
+      model.set('focus', false);
+    });
   },
 
 });

@@ -8,10 +8,10 @@ module.exports = {
   rooms: new EventEmitter(),
   roomMembers: new EventEmitter(),
   users: new EventEmitter(),
+  userGroups: new EventEmitter(),
   groupMembers: new EventEmitter(),
   topics: new EventEmitter(),
   replies: new EventEmitter(),
   comments: new EventEmitter(),
   categories: new EventEmitter()
 };
-

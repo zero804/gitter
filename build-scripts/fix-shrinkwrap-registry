@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+IFS=$'\n\t'
+
+set -x
+
+cat npm-shrinkwrap.json |
+  sed 's#http://beta-internal:4873/#http://beta-internal.beta.gitter:4873/#g' |
+  sed 's#http://beta-internal.beta.gitter:8089/nexus/content/groups/npm/#http://beta-internal.beta.gitter:4873/#g' > npm-shrinkwrap.json.new
+
+mv npm-shrinkwrap.json.new npm-shrinkwrap.json

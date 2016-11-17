@@ -35,6 +35,7 @@ describe('GroupStrategy', function() {
           id: group.id,
           name: group.name,
           uri: group.uri,
+          homeUri: group.homeUri,
           backedBy: {
             type: null
           },
@@ -52,6 +53,7 @@ describe('GroupStrategy', function() {
           id: group.id,
           name: group.name,
           uri: group.uri,
+          homeUri: group.homeUri,
           backedBy: {
             type: null
           },
@@ -69,6 +71,7 @@ describe('GroupStrategy', function() {
           id: group.id,
           name: group.name,
           uri: group.uri,
+          homeUri: group.homeUri,
           backedBy: {
             type: null
           },
@@ -87,6 +90,7 @@ describe('GroupStrategy', function() {
           id: group.id,
           name: group.name,
           uri: group.uri,
+          homeUri: group.homeUri,
           backedBy: {
             type: null
           },

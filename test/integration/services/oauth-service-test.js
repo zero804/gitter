@@ -18,15 +18,13 @@ describe('oauth-service', function() {
    fixture.cleanup();
   });
 
-  it('should create tokens', function(done) {
-
+  it('should create tokens', function() {
     var userId = mongoUtils.getNewObjectIdString();
 
     return oauthService.findOrGenerateWebToken(userId)
       .then(function(token) {
         assert(token);
-      })
-      .nodeify(done);
+      });
   });
 
   // Set to skip until this problematic test can be

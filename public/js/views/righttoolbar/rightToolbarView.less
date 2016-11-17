@@ -1,5 +1,5 @@
-
-@import (reference) "trp3Vars.less";
+@import (reference) "trp3Vars";
+@import "../../../less/colors";
 
 // Base
 @import "../../../less/base-avatar.less";
@@ -34,7 +34,8 @@
     right: 0;
     top: 0;
     bottom: 0;
-    background-color: fade(@light, 40%);
+    background-color: @main-application-bg-color;
+    border-left: 1px solid @menu-border-color;
 
     transition: width 200ms ease-in-out;
 
@@ -127,21 +128,6 @@
     &:focus {
       background-color: rgba(0, 0, 0, .05);
       outline: none;
-    }
-
-    & > .menu-toggle-icon {
-      fill: none;
-      stroke: #969696;
-      stroke-width: 2px;
-
-      transition: transform .2s ease;
-
-      &:hover {
-        transform: translateZ(0) rotateZ(-90deg);
-      }
-    }
-    &:hover > .menu-toggle-icon {
-      transform: translateZ(0) rotateZ(-90deg);
     }
   }
 
@@ -248,6 +234,42 @@
       width: 240px;
       border-left: 4px solid rgba(211, 223, 211, 0.6);
       background-clip: padding-box;
+    }
+  }
+}
+
+
+
+.right-toolbar-region__footer {
+  box-sizing: border-box;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 70px;
+  padding-top: 21px;
+  padding-right: 21px;
+
+  background: linear-gradient(
+    top,
+    rgba(255, 255, 255, 0),
+    @main-application-bg-color 35%
+  );
+
+  text-align: right;
+  .menu-toggle-icon {
+    display: inline-block;
+    vertical-align: middle;
+    margin: auto;
+    fill: none;
+    stroke: #8d8d8d;
+    stroke-width: 2;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    &:hover,
+
+    .menu-toggle-button:hover > & {
+      transform: translateZ(0) rotateZ(-90deg);
+      stroke: black;
     }
   }
 }

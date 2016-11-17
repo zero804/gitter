@@ -20,6 +20,7 @@ var updateUserLocale = require('../update-user-locale');
 var debug = require('debug')('gitter:infra:passport');
 var obfuscateToken = require('gitter-web-github').obfuscateToken;
 var passportLogin = require('../passport-login');
+var callbackUrlBuilder = require('./callback-url-builder');
 var StatusError = require('statuserror');
 
 // Move this out once we use it multiple times. We're only interested in
@@ -181,7 +182,7 @@ function githubUserCallback(req, accessToken, refreshToken, params, _profile, do
 var githubUserStrategy = new GitHubStrategy({
     clientID: config.get('github:user_client_id'),
     clientSecret: config.get('github:user_client_secret'),
-    callbackURL: config.get('web:basepath') + '/login/callback',
+    callbackURL: callbackUrlBuilder(),
     stateProvider: new TokenStateProvider({ passphrase: config.get('github:statePassphrase') }),
     skipUserProfile: true,
     passReqToCallback: true

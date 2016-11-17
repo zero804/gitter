@@ -3,7 +3,6 @@
 var pushNotificationFilter = require("gitter-web-push-notification-filter");
 var pushNotificationGateway = require("../../gateways/push-notification-gateway");
 var serializer = require("../../serializers/notification-serializer");
-var notificationMessageGenerator = require('./notification-message-generator');
 var unreadItemService = require('../unread-items');
 var debug = require('debug')('gitter:app:push-notification-generator');
 var Promise = require('bluebird');
@@ -72,16 +71,10 @@ function notifyUserOfActivitySince(userId, troupeId, since, notificationNumber) 
         .spread(function(troupe, chats) {
           if (!troupe || !chats || !chats.length) return;
 
-          var notificationLink = '/mobile/chat#' + troupe.id;
-
-          var message = notificationMessageGenerator(troupe, chats);
-
-          return pushNotificationGateway.sendUserNotification(userId, {
-            roomId: troupe.id,
-            roomName: troupe.name || troupe.uri,
-            message: message,
-            sound: mentions && mentions.length ? 'notify.caf' : 'notify-2.caf',
-            link: notificationLink
+          return pushNotificationGateway.sendUserNotification('new_chat', userId, {
+            room: troupe,
+            chats: chats,
+            hasMentions: !!(mentions && mentions.length)
           });
         });
 
@@ -98,7 +91,7 @@ function sendUserTroupeNotification(userId, troupeId, notificationNumber, userNo
       }
 
       // TODO: remove this....
-      if(userNotifySetting == 'mute') {
+      if(userNotifySetting === 'mute') {
         /* Mute this troupe for this user */
         return;
       }

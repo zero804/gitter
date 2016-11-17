@@ -10,8 +10,9 @@
 @import 'components/header-info-bar';
 @import 'components/pills';
 
-@import "../js/views/modals/login-view.less";
-@import "../js/views/modals/create-room-view.less";
+@import "../js/views/modals/login-view";
+@import "../js/views/modals/create-room-view";
+@import "../js/views/profile-menu/profile-menu-view";
 
 
 @page-bg-color: #ffffff;
@@ -100,14 +101,41 @@ body {
 
 
 
+.explore-header {
+  z-index: 2;
+  position: fixed;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: @desktop-header-height;
+  margin-top: 0;
+  margin-left: auto;
+  margin-bottom: 10px;
+  margin-right: auto;
+  padding-top: 0;
+  padding-left: @page-wrapper-horizontal-padding;
+  padding-right: @page-wrapper-horizontal-padding;
+
+  background-image: linear-gradient(to left, @header-grad-bg-color, @header-base-bg-color);
+}
+
+.explore-header__heading {
+  margin: 0;
+  color: white;
+  font-weight: 300;
+  font-size: 24px;
+}
+
 .explore-header-section {
   width: 100%;
   max-width: @page-wrapper-max-width;
   margin-top: @section-spacing;
   margin-left: auto;
+  padding-top: 85px;
   margin-right: auto;
   padding-left: @page-wrapper-horizontal-padding;
   padding-right: @page-wrapper-horizontal-padding;
+  margin-bottom: 10px;
 
   @media @explore-breakpoint-small {
     margin-top: @section-spacing / 2;
@@ -204,6 +232,7 @@ body {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
+  padding-bottom: 1rem;
 }
 
 .explore-pill-list-section__header-secondary-actions {
@@ -252,7 +281,7 @@ body {
   padding-top: @list-padding;
   padding-bottom: @list-padding;
 
-  background-color: fade(@light, 75%);
+  background-color: @menu-border-color;
 }
 
 .explore-room-card-list {

@@ -10,7 +10,7 @@
         <div class="list-favourites menu-list__section" id="favs-region" data-drop-target="favs">
           <ul class="room-list">
           {{!-- put filtered favourites in here --}}
-            {{#each rooms.favourites}}
+            {{#each oldLeftMenu.favourites}}
               <li class="room-list-item  {{#if selected}}room-list-item--current-room{{/if}}" data-id="{{ this.id }}">{{{ prerenderRoomListItem this }}}</li>
             {{/each}}
           </ul>
@@ -19,7 +19,7 @@
           {{!-- put filtered recents in here. remember also that notifications will appear in here if they aren't in favourites --}}
           <div id="recents-region">
           <ul class="room-list">
-            {{#each rooms.recents}}
+            {{#each oldLeftMenu.recents}}
               <li class="room-list-item {{#if selected}}room-list-item--current-room{{/if}}" data-id="{{ this.id }}">
               {{{ prerenderRoomListItem this }}}
               </li>
@@ -29,13 +29,13 @@
       </div>
       <div class='menu-list__item' id="suggested-region"></div>
       <div class='menu-list__item' id="orgs-region">
-        <div {{#if userHasNoOrgs}}style="display:none"{{/if}}>
+        <div {{#if oldLeftMenu.userHasNoOrgs}}style="display:none"{{/if}}>
           <div class="menu-list__header">
             <h5>Your Organisations</h5>
           </div>
           <div id="list">
             <ul class="room-list">
-              {{#each orgs}}
+              {{#each oldLeftMenu.orgs}}
               {{{ prerenderOrgListItem this }}}
               {{/each}}
             </ul>

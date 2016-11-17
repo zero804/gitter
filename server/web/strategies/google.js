@@ -9,6 +9,7 @@ var trackSignupOrLogin = require('../track-signup-or-login');
 var updateUserLocale = require('../update-user-locale');
 var passportLogin = require('../passport-login');
 var identityService = require('gitter-web-identity');
+var callbackUrlBuilder = require('./callback-url-builder');
 
 function googleOauth2Callback(req, accessToken, refreshToken, params, profile, done) {
   var avatar = profile.photos[0].value; // is this always set?
@@ -46,7 +47,7 @@ function googleOauth2Callback(req, accessToken, refreshToken, params, profile, d
 var googleStrategy = new GoogleStrategy({
     clientID: config.get('googleoauth2:client_id'),
     clientSecret: config.get('googleoauth2:client_secret'),
-    callbackURL: config.get('web:basepath') + '/login/google/callback',
+    callbackURL: callbackUrlBuilder('google'),
     passReqToCallback: true
   }, googleOauth2Callback);
 

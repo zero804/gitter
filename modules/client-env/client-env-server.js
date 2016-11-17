@@ -45,7 +45,8 @@ var troupeEnv = {
     cacheBuster: config.get('embed:cacheBuster')
   },
   billingUrl: config.get('web:billingBaseUrl'),
-  maxFreeOrgRoomMembers: config.get('maxFreeOrgRoomMembers')
+  maxFreeOrgRoomMembers: config.get('maxFreeOrgRoomMembers'),
+  vapidAppServerKey: config.get('vapid:publicKey')
 };
 
 

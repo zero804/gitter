@@ -15,7 +15,9 @@ var exploreService = require('../services/explore-service');
 var suggestionsService = require('../services/suggestions-service');
 var exploreTagUtils = require('../utils/explore-tag-utils');
 var generateExploreSnapshot = require('./snapshots/explore-snapshot');
+var generateUserThemeSnapshot = require('./snapshots/user-theme-snapshot');
 var fonts = require('../web/fonts');
+var isMobile = require('../web/is-phone');
 
 var processTagInput = function(input) {
   input = input || '';
@@ -96,7 +98,8 @@ router.get('/tags/:tags',
   featureToggles,
   isPhoneMiddleware,
   function(req, res, next) {
-    contextGenerator.generateNonChatContext(req).then(function(troupeContext) {
+    contextGenerator.generateBasicContext(req)
+    .then(function(troupeContext) {
       var user = troupeContext.user;
       var isLoggedIn = !!user;
 
@@ -158,18 +161,27 @@ router.get('/tags/:tags',
           return snapshots;
         })
         .then(function(snapshots) {
-          // Anyone know why we're putting this on the
-          // context? Probably not.
-          troupeContext.snapshots = snapshots;
 
-          res.render('explore', _.extend({}, snapshots, {
-            exploreBaseUrl: req.baseUrl,
-            troupeContext: troupeContext,
-            isLoggedIn: isLoggedIn,
-            createRoomUrl: urlJoin(clientEnv.basePath, '#createroom'),
-            fonts: fonts.getFonts(),
-            hasCachedFonts: fonts.hasCachedFonts(req.cookies),
-          }));
+          //Not 100% sure this is the best thing to do here
+          //but I dont really want to refactor this whole thing
+          generateUserThemeSnapshot(req)
+            .then(function(userThemeSnapshot){
+
+              // Anyone know why we're putting this on the
+              // context? Probably not.
+              troupeContext.snapshots = snapshots;
+
+              return res.render('explore', _.extend({}, snapshots, {
+                hasDarkTheme: userThemeSnapshot.theme === 'gitter-dark',
+                isMobile: isMobile(req),
+                exploreBaseUrl: req.baseUrl,
+                troupeContext: troupeContext,
+                isLoggedIn: isLoggedIn,
+                createRoomUrl: urlJoin(clientEnv.basePath, '#createroom'),
+                fonts: fonts.getFonts(),
+                hasCachedFonts: fonts.hasCachedFonts(req.cookies),
+              }));
+            });
         })
         .catch(next);
     });

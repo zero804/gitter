@@ -16,7 +16,6 @@ var FilteredMinibarGroupCollection = require('../collections/filtered-minibar-gr
 var FilteredRoomCollection = require('../collections/filtered-room-collection');
 var FilteredFavouriteRoomCollection = require('../collections/filtered-favourite-room-collection');
 var SuggestedRoomsByRoomCollection = require('../collections/left-menu-suggested-by-room');
-var SuggestedRoomsByGroupName = require('../collections/org-suggested-rooms-by-name');
 var UserSuggestions = require('../collections/user-suggested-rooms');
 var SearchRoomPeopleCollection = require('../collections/left-menu-search-rooms-and-people');
 var SearchChatMessages = require('../collections/search-chat-messages');
@@ -28,15 +27,15 @@ var SecondaryCollectionModel = require('../views/menu/room/secondary-collection/
 var TertiaryCollectionModel = require('../views/menu/room/tertiary-collection/tertiary-collection-model');
 var favouriteCollectionFilter = require('gitter-web-shared/filters/left-menu-primary-favourite');
 var MinibarItemModel = require('../views/menu/room/minibar/minibar-item-model');
+var MinibarHomeModel = require('../views/menu/room/minibar/home-view/home-model');
 var MinibarPeopleModel = require('../views/menu/room/minibar/people-view/people-model');
-var MinibarTempOrgModel = require('../views/menu/room/minibar/temp-org-view/temp-org-model');
 
 var states = [
   'all',
   'search',
   'people',
+  'group',
   'org',
-  'temp-org'
 ];
 
 var SEARCH_DEBOUNCE_INTERVAL = 1000;
@@ -125,15 +124,13 @@ module.exports = Backbone.Model.extend({
       suggestedOrgsCollection: this.suggestedOrgs,
     });
 
-    this.suggestedRoomsByOrgName = new SuggestedRoomsByGroupName(null, { roomMenuModel: this });
-
     var state = this.get('state');
-    this.minibarHomeModel = new MinibarItemModel({ name: 'all', type: 'all', active: (state === 'all') });
+    this.minibarHomeModel = new MinibarHomeModel({ name: 'all', type: 'all', active: (state === 'all') }, { roomCollection: this._roomCollection });
     this.minibarSearchModel = new MinibarItemModel({ name: 'search', type: 'search', active: (state === 'search') });
-    this.minibarPeopleModel = new MinibarPeopleModel({ active: (state === 'people')}, { roomCollection: this._roomCollection });
+    this.minibarPeopleModel = new MinibarPeopleModel({ name: 'people', type: 'people', active: (state === 'people')}, { roomCollection: this._roomCollection });
+    this.minibarGroupModel = new MinibarItemModel({ name: 'group', type: 'group', active: (state === 'group') });
     this.minibarCommunityCreateModel = new MinibarItemModel({ name: 'Create Community', type: 'community-create' });
     this.minibarCloseModel = new MinibarItemModel({ name: 'close', type: 'close' });
-    this.minibarTempOrgModel = new MinibarTempOrgModel(attrs.tempOrg, { troupe: context.troupe(), });
 
     //Setup an inital active group model
     this.groupsCollection.forEach(function(model){
@@ -143,7 +140,10 @@ module.exports = Backbone.Model.extend({
     }.bind(this));
 
     this.minibarCollection = new FilteredMinibarGroupCollection(null, {
-      collection: this.groupsCollection
+      collection: this.groupsCollection,
+      dndCtrl: this.dndCtrl,
+      groupCollection: this.groupsCollection,
+      roomCollection: this._roomCollection
     });
 
 
@@ -185,9 +185,9 @@ module.exports = Backbone.Model.extend({
 
     this.searchFocusModel = new Backbone.Model({ focus: false });
 
-    var forumSnapshot = context.getSnapshot('forum');
+    var forumCategories = context.getSnapshot('forumCategories');
     this.forumCategoryContextModel = new ForumCategoryContextModel();
-    this.forumCategoryCollection = new ForumCategoryCollection(forumSnapshot && forumSnapshot.categories, { contextModel: this.forumCategoryContextModel });
+    this.forumCategoryCollection = new ForumCategoryCollection(forumCategories, { contextModel: this.forumCategoryContextModel });
 
     this.listenTo(this.primaryCollection, 'snapshot', this.onPrimaryCollectionSnapshot, this);
     this.snapshotTimeout = setTimeout(function(){
@@ -206,7 +206,7 @@ module.exports = Backbone.Model.extend({
     this.onSwitchState(this, this.get('state'));
     this.listenTo(this, 'change:state change:groupId', this.updateForumCategoryState);
 
-    autoModelSave(this, ['state', 'roomMenuIsPinned', 'groupId', 'hasDismissedSuggestions'], this.autoPersist);
+    autoModelSave(this, ['roomMenuIsPinned', 'hasDismissedSuggestions'], this.autoPersist);
   },
 
   //custom set to limit states that can be assigned
@@ -241,11 +241,10 @@ module.exports = Backbone.Model.extend({
         this.tertiaryCollection.switchCollection(this._suggestedRoomCollection);
         break;
 
-      case 'temp-org':
-        this.set('groupId', null);
-        this.primaryCollection.switchCollection(this.activeRoomCollection);
-        this.secondaryCollection.switchCollection(this.suggestedRoomsByOrgName);
-        this.tertiaryCollection.switchCollection(this._suggestedRoomCollection);
+      case 'group':
+        this.primaryCollection.switchCollection(this.groupsCollection);
+        this.secondaryCollection.switchCollection(new Backbone.Collection(null));
+        this.tertiaryCollection.switchCollection(new Backbone.Collection(null));
         break;
 
 
@@ -272,12 +271,10 @@ module.exports = Backbone.Model.extend({
   toJSON: function() {
     var attrs = this.attributes;
 
-    //only ever store the defaults everything else is determined at run-time
-    return Object.keys(this.defaults).reduce(function(memo, key) {
-      if (key === 'searchTerm') return memo;
-      memo[key] = attrs[key];
-      return memo;
-    }, {});
+    return {
+      roomMenuIsPinned: attrs.roomMenuIsPinned,
+      hasDismissedSuggestions: attrs.hasDismissedSuggestions,
+    };
   },
 
   /**
@@ -303,7 +300,6 @@ module.exports = Backbone.Model.extend({
     data = data || {};
     this.set({
       panelOpenState: true,
-      profileMenuOpenState: false,
       state: data.state,
       groupId: data.groupId,
     });

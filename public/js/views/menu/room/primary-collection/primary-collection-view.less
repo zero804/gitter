@@ -3,7 +3,12 @@
 .primary-collection {
   .m-collection();
 
-  &.dragging {
+  .room-menu__panel.org & {
+    margin-top: 0;
+  }
+
+  &.dragging-all,
+  &.dragging-people {
     min-height: @menu-item-height;
     display:    block;
 

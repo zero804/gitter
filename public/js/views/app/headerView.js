@@ -10,14 +10,13 @@ var context = require('../../utils/context');
 var toggleClass = require('../../utils/toggle-class');
 var MenuBuilder = require('../../utils/menu-builder');
 var appEvents = require('../../utils/appevents');
-var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
-
 var apiClient = require('../../components/api-client');
 var userNotifications = require('../../components/user-notifications');
 var Dropdown = require('../controls/dropdown');
 var KeyboardEventMixin = require('../keyboard-events-mixin');
 var headerViewTemplate = require('./tmpl/headerViewTemplate.hbs');
 var getHeaderViewOptions = require('gitter-web-shared/templates/get-header-view-options');
+var ProfileMenu = require('../profile-menu/profile-menu-view');
 
 require('../behaviors/tooltip');
 require('transloadit');
@@ -83,11 +82,10 @@ var HeaderView = Marionette.ItemView.extend({
   },
 
   initialize: function(options) {
-    this.groupsCollection = options.groupsCollection;
-    this.roomCollection = options.roomCollection;
     this.rightToolbarModel = options.rightToolbarModel;
     this.menuItemsCollection = new Backbone.Collection([]);
     this.buildDropdown();
+
 
     this.listenTo(this.rightToolbarModel, 'change:isPinned', this.onPanelPinStateChange, this);
   },
@@ -103,7 +101,6 @@ var HeaderView = Marionette.ItemView.extend({
       user: !!context.isLoggedIn(),
       archives: this.options.archives,
       shouldShowPlaceholderRoomTopic: data.userCount <= 1,
-      isRightToolbarPinned: this.rightToolbarModel.get('isPinned'),
       canChangeGroupAvatar: canChangeGroupAvatar
     });
 
@@ -171,6 +168,8 @@ var HeaderView = Marionette.ItemView.extend({
       this.dropdown.hide();
     }
 
+    this.setupProfileMenu();
+
     this.ui.favourite.css({ visibility: context.isLoggedIn() ? 'visible' : 'hidden' });
     this.ui.favourite.toggleClass('favourite', !!this.model.get('favourite'));
     var topicEl = this.ui.topic[0];
@@ -187,6 +186,17 @@ var HeaderView = Marionette.ItemView.extend({
     this.dropdown.show();
   },
 
+  setupProfileMenu: function() {
+    if(context.isLoggedIn()) {
+      //If an instance of the profile menu exists destory it to remove listeners etc
+      if(this.profileMenu) { this.profileMenu.destroy(); }
+      //Make a new profile menu
+      this.profileMenu = new ProfileMenu({ el: '#profile-menu' });
+      //Render it
+      this.profileMenu.render();
+    }
+  },
+
   createMenu: function() {
     var c = context();
     var isStaff = context.isStaff();
@@ -195,7 +205,6 @@ var HeaderView = Marionette.ItemView.extend({
     var backend = this.model.get('backend');
     var type = backend && backend.type;
     var isOneToOne = this.model.get('oneToOne');
-    var isPublic = this.model.get('public');
     var url = this.model.get('url');
     var staffOrAdmin = isStaff || isAdmin;
     var isGitHubObject = type === 'GH_REPO' || type === 'GH_ORG';
@@ -245,8 +254,11 @@ var HeaderView = Marionette.ItemView.extend({
     e.preventDefault();
     var group = this.model.get('group');
     if (!group) return;
-    var groupUri = group.uri;
-    appEvents.trigger('navigation', '/orgs/' + groupUri + '/rooms', 'iframe', groupUri + ' rooms');
+    var homeUri = group.homeUri;
+
+    if (!homeUri) return;
+
+    appEvents.trigger('navigation', '/' + homeUri, 'iframe', group.uri);
   },
 
   toggleFavourite: function() {
@@ -434,21 +446,18 @@ var HeaderView = Marionette.ItemView.extend({
 
   uploadGroupAvatar: function() {
     var currentRoom = context.troupe();
-    if(!this.groupsCollection || !currentRoom) {
+    if(!currentRoom) {
       return;
     }
 
-    var currentGroup = this.groupsCollection.get(currentRoom.get('groupId'));
     // For groups that were created within page lifetime
-    var groupId = currentGroup ? currentGroup.get('id') : currentRoom.get('groupId');
-    var groupUri = currentGroup ? currentGroup.get('uri') : getOrgNameFromUri(document.location.pathname);
+    var groupId = currentRoom.get('groupId');
 
     this.handleUploadStart();
 
     apiClient.priv.get('/generate-signature', {
       type: 'avatar',
-        group_id: groupId,
-        group_uri: groupUri
+        group_id: groupId
       })
       .then(function(res) {
         this.ui.groupAvatarParamsInput[0].setAttribute('value', res.params);
@@ -471,6 +480,4 @@ var HeaderView = Marionette.ItemView.extend({
 });
 
 cocktail.mixin(HeaderView, KeyboardEventMixin);
-
-
 module.exports = HeaderView;
