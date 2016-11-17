@@ -79,6 +79,8 @@
 
 @hover-highlight-percentage: 1%;
 
+@darker-highlight-percentage: 5%;
+
 
 // LEFT MENU
 // --------------------------------------------
@@ -331,6 +333,10 @@ a.room-item__container:hover { //:cry:
 .chat-item__text {
   color: @chat-main-text-color;
   a { color: @caribbean; }
+}
+
+.chat-item__text table tr:nth-child(2n) {
+  background-color: darken(@chat-main-bg-color, @darker-highlight-percentage);
 }
 
 // --- Chat Input ---
