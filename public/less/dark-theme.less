@@ -108,6 +108,7 @@
 @chat-right-toolbar-activity-hover-color: white;
 @chat-right-toolbar-issue-open-color: @caribbean;
 @chat-right-toolbar-issue-closed-color: @ruby;
+@chat-right-toolbar-commit-color: #d0abff;
 @chat-right-toolbar-issue-background: #222;
 
 @chat-loading-frame-bg-color: rgba(0, 0, 0, .5);
@@ -190,7 +191,8 @@ code,
   &:after { background-color: inherit; }
 }
 
-.room-menu-options__item__unread-indicator, .room-menu-options__item__unread-indicator.has-mentions {
+.room-menu-options__item__unread-indicator,
+.room-menu-options__item__unread-indicator.has-mentions {
   border: 2px solid @left-menu-bg-color;
 }
 
@@ -352,6 +354,11 @@ a.room-item__container:hover { //:cry:
 .loading-frame { background-color: @chat-loading-frame-bg-color; }
 
 .mention { color: @chat-mention-color; }
+
+.chat-item.mentioned .chat-item__text .mention {
+  background-color: @chat-right-toolbar-issue-background;
+}
+
 .chat-connectivity-indicator { background-color: @chat-connectivity-indicator-bg; }
 
 // This is complete and utter BS ...
@@ -364,16 +371,10 @@ a.room-item__container:hover { //:cry:
   a { color: @caribbean; }
 }
 
+.issue-popover-body .chat-item__text { color: #333; }
+
 .chat-item__text table tr:nth-child(2n) {
   background-color: darken(@chat-main-bg-color, @darker-highlight-percentage);
-}
-
-.chat-item__status .chat-item__text {
-  color: @chat-details-text-color;
-}
-
-.chat-item__status .mention {
-  color: @chat-details-text-color;
 }
 
 .chat-item.unread .chat-item__container {
@@ -383,6 +384,7 @@ a.room-item__container:hover { //:cry:
 .chat-item.unread.mentioned .chat-item__container {
   background-color: rgba(230, 126, 34,0.2);
 }
+
 
 // --- Chat Input ---
 .chat-input { background-color: @chat-main-bg-color; }
@@ -414,6 +416,11 @@ a.room-item__container:hover { //:cry:
   }
 }
 
+.activity-commit .commit {
+  background-color: @chat-right-toolbar-issue-background;
+  color: @chat-right-toolbar-commit-color;
+}
+
 .activity-item:hover {
   .gtrActivityItemText {
     color: @chat-right-toolbar-activity-hover-color;
@@ -434,7 +441,7 @@ a.room-item__container:hover { //:cry:
   }
 
   &.open {
-    color: @chat-right-toolbar-issue-closed-color;
+    color: @chat-right-toolbar-issue-open-color;
     background-color: @chat-right-toolbar-issue-background;
     border-color: @chat-right-toolbar-issue-background;
   }
