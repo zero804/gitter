@@ -377,6 +377,22 @@ a.room-item__container:hover { //:cry:
   background-color: darken(@chat-main-bg-color, @darker-highlight-percentage);
 }
 
+.chat-item.unread .chat-item__container {
+  background-color: rgba(46, 204, 113,0.2);
+}
+
+.chat-item.unread.mentioned .chat-item__container {
+  background-color: rgba(230, 126, 34,0.2);
+}
+
+.chat-item__status .chat-item__text {
+  color: @chat-details-text-color;
+}
+
+.chat-item__status .mention {
+  color: @chat-details-text-color;
+}
+
 // --- Chat Input ---
 .chat-input { background-color: @chat-main-bg-color; }
 .chat-input__text-area, .trpChatInput {
