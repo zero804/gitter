@@ -269,6 +269,30 @@ code,
   background-color: @left-menu-active-item-bg-color !important;
 }
 
+.room-item__options-menu {
+  background: none;
+}
+
+.room-item__options-menu__item {
+  &:before {
+    background: none;
+  }
+
+  & button {
+    padding-left: 2.5rem;
+    margin-left: 2rem;
+  }
+
+  &:hover {
+
+    & button {
+      background: @left-menu-active-item-bg-color;
+      color: @left-menu-active-item-text-color;
+    }
+  }
+}
+
+
 //The "Create a Room" & "Explore' footer buttons
 //in the menu
 .panel-footer__create-room,
