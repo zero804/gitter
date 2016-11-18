@@ -108,6 +108,7 @@
 @chat-right-toolbar-activity-hover-color: white;
 @chat-right-toolbar-issue-open-color: @caribbean;
 @chat-right-toolbar-issue-closed-color: @ruby;
+@chat-right-toolbar-commit-color: #d0abff;
 @chat-right-toolbar-issue-background: #222;
 
 @chat-loading-frame-bg-color: rgba(0, 0, 0, .5);
@@ -404,6 +405,11 @@ a.room-item__container:hover { //:cry:
   &:hover {
     background-color: darken(@chat-right-toolbar-bg-color, @hover-highlight-percentage);
   }
+}
+
+.activity-commit .commit {
+  background-color: @chat-right-toolbar-issue-background;
+  color: @chat-right-toolbar-commit-color;
 }
 
 .activity-item:hover {
