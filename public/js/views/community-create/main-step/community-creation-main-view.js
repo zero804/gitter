@@ -213,7 +213,11 @@ module.exports = CommunityCreateBaseStepView.extend({
         uri: slug
       })
       .then(function(res) {
-        if(res.type === type) {
+        // Check to make sure the type matches in the response to what we are trying to create
+        //
+        // Because of the nature of repo URLs `org/repo` and we only pull off the `repo` part,
+        // we need to allow creation when nothing is at that URL
+        if(res.type === type || (type === 'GH_REPO' && res.type === null)) {
           communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.AVAILABLE);
         }
         else {
