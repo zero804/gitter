@@ -29,14 +29,16 @@ var REMEMBER_ME_PREFIX = "rememberme:";
 /**
  * Generate an auth token for a user and save it in redis
  */
-function generateAuthToken(userId) {
+var generateAuthToken = Promise.method(function (userId) {
   debug('Generate auth token: userId=%s', userId);
   var key = uuid.v4();
   var token = uuid.v4();
 
-  return Promise.fromCallback(function(callback) {
-      return sechash.strongHash('sha512', token, callback);
-    })
+  var promiseLike = sechash.strongHash(token, {
+      algorithm: 'sha512',
+    });
+
+  return Promise.resolve(promiseLike)
     .then(function(hash3) {
       var json = JSON.stringify({ userId: userId, hash: hash3 });
 
@@ -46,7 +48,7 @@ function generateAuthToken(userId) {
       });
     })
     .return(key + ":" + token);
-}
+});
 
 /**
  * Delete a token
@@ -112,9 +114,11 @@ var validateAuthToken = Promise.method(function(authCookieValue) {
 
       var serverHash = stored.hash;
 
-      return Promise.fromCallback(function(callback) {
-          sechash.testHash(clientToken, serverHash, callback);
-        })
+      var promise = sechash.testHash(clientToken, serverHash, {
+        algorithm: 'sha512'
+      });
+
+      return Promise.resolve(promise)
         .then(function(match) {
           if(!match) {
             logger.warn("rememberme: testHash failed. Illegal token", {
