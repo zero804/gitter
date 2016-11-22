@@ -64,6 +64,7 @@
 @caribbean: #46BC99;
 @pampas:    #f2f0ed;
 @thunder:   #3a3133;
+@favourite-star-color: #f1c40f;
 
 
 
@@ -76,7 +77,9 @@
 
 @app-single-line-code-color: #23241f;
 
-@hover-highlight-percentage: 5%;
+@hover-highlight-percentage: 1%;
+
+@darker-highlight-percentage: 5%;
 
 
 // LEFT MENU
@@ -84,7 +87,7 @@
 @left-menu-bg-color: #383736;
 @left-menu-minibar-border-color: #2d2c2c;
 @left-menu-minibar-icon-color: #aeaeae;
-@left-menu-text-color: #868685;
+@left-menu-text-color: #bbb;
 @left-menu-active-item-bg-color: #2d2c2c;
 @left-menu-active-item-text-color: white;
 @left-menu-search-input-active-color: white;
@@ -94,9 +97,10 @@
 // CHAT
 // --------------------------------------------
 @chat-main-bg-color: @app-main-bg-color;
-@chat-main-text-color: #afaead;
+@chat-main-text-color: #ccc;
 @chat-details-text-color: @app-header-icon-color;
 @chat-mention-color: lighten(@jaffa, @hover-highlight-percentage);
+@chat-connectivity-indicator-bg: @left-menu-bg-color;
 
 @chat-right-toolbar-bg-color: @left-menu-bg-color;
 @chat-right-toolbar-left-border-color: @left-menu-minibar-border-color;
@@ -104,6 +108,7 @@
 @chat-right-toolbar-activity-hover-color: white;
 @chat-right-toolbar-issue-open-color: @caribbean;
 @chat-right-toolbar-issue-closed-color: @ruby;
+@chat-right-toolbar-commit-color: #d0abff;
 @chat-right-toolbar-issue-background: #222;
 
 @chat-loading-frame-bg-color: rgba(0, 0, 0, .5);
@@ -148,7 +153,7 @@
 
 @topic-background-color: @app-main-bg-color;
 @topic-header-color: @org-page-list-item-heading-color;
-@topic-description-color: @org-page-list-item-description-color;
+@topic-description-color: @chat-main-text-color;
 @topic-description-border-color: #222;
 @topic-reply-editor-background: @app-header-bg-color;
 @topic-reply-list-background-color: #363434;
@@ -157,6 +162,7 @@
 @topic-reply-editor-border-color: @topic-description-border-color;
 @topic-reply-list-header-color: @topic-header-color;
 @topic-comment-editor-background-color: @topic-reply-editor-background;
+@topic-details-text-color: @chat-details-text-color;
 
 
 /* -------------------------------------------
@@ -185,6 +191,11 @@ code,
   &:after { background-color: inherit; }
 }
 
+.room-menu-options__item__unread-indicator,
+.room-menu-options__item__unread-indicator.has-mentions {
+  border: 2px solid @left-menu-bg-color;
+}
+
 //The overall header section of the menu
 .header-brand-container {
   background-color: @app-header-bg-color;
@@ -194,12 +205,20 @@ code,
   }
 }
 
+.chat-header__favourite.favourite i {
+  color: @favourite-star-color;
+}
+
 //Minibar Icons
 .icon-svg {
   .icon {
     stroke: @left-menu-minibar-icon-color;
     fill: @left-menu-minibar-icon-color;
   }
+}
+
+.favourite-collection.dragging-all:before {
+  background-color:  darken(@left-menu-bg-color, @hover-highlight-percentage);
 }
 
 //Create community icon
@@ -232,7 +251,7 @@ code,
 .panel-footer__item--all {
   background: linear-gradient(
     top,
-    rgba(255, 255, 255, 0),
+    rgba(56, 55, 54, 0),
     @left-menu-bg-color 35%
   );
 }
@@ -257,6 +276,30 @@ code,
   background-color: @left-menu-active-item-bg-color !important;
 }
 
+.room-item__options-menu {
+  background: none;
+}
+
+.room-item__options-menu__item {
+  &:before {
+    background: none;
+  }
+
+  & button {
+    padding-left: 2.5rem;
+    margin-left: 2rem;
+  }
+
+  &:hover {
+
+    & button {
+      background: @left-menu-active-item-bg-color;
+      color: @left-menu-active-item-text-color;
+    }
+  }
+}
+
+
 //The "Create a Room" & "Explore' footer buttons
 //in the menu
 .panel-footer__create-room,
@@ -271,6 +314,15 @@ code,
 //  A room item is a room displayed within the list
 .room-item__title {
   color: @left-menu-text-color;
+}
+
+.left-menu-forum-category-item {
+  color: @left-menu-text-color;
+}
+
+.left-menu-forum-category-item:hover, .left-menu-forum-category-item:focus {
+  background-color: @left-menu-active-item-bg-color !important;
+  color: @left-menu-active-item-text-color !important;
 }
 
 a.room-item__container.active,
@@ -303,6 +355,11 @@ a.room-item__container:hover { //:cry:
 
 .mention { color: @chat-mention-color; }
 
+.chat-item.mentioned .chat-item__text .mention {
+  background-color: @chat-right-toolbar-issue-background;
+}
+
+.chat-connectivity-indicator { background-color: @chat-connectivity-indicator-bg; }
 
 // This is complete and utter BS ...
 .chat-item:hover {
@@ -314,9 +371,31 @@ a.room-item__container:hover { //:cry:
   a { color: @caribbean; }
 }
 
+.issue-popover-body .chat-item__text { color: #333; }
+
+.chat-item__text table tr:nth-child(2n) {
+  background-color: darken(@chat-main-bg-color, @darker-highlight-percentage);
+}
+
+.chat-item.unread .chat-item__container {
+  background-color: rgba(46, 204, 113,0.2);
+}
+
+.chat-item.unread.mentioned .chat-item__container {
+  background-color: rgba(230, 126, 34,0.2);
+}
+
+.chat-item__status .chat-item__text {
+  color: @chat-details-text-color;
+}
+
+.chat-item__status .mention {
+  color: @chat-details-text-color;
+}
+
 // --- Chat Input ---
 .chat-input { background-color: @chat-main-bg-color; }
-.chat-input__text-area {
+.chat-input__text-area, .trpChatInput {
   background-color: @chat-main-bg-color;
   color: @chat-main-text-color;
 }
@@ -344,6 +423,11 @@ a.room-item__container:hover { //:cry:
   }
 }
 
+.activity-commit .commit {
+  background-color: @chat-right-toolbar-issue-background;
+  color: @chat-right-toolbar-commit-color;
+}
+
 .activity-item:hover {
   .gtrActivityItemText {
     color: @chat-right-toolbar-activity-hover-color;
@@ -364,7 +448,7 @@ a.room-item__container:hover { //:cry:
   }
 
   &.open {
-    color: @chat-right-toolbar-issue-closed-color;
+    color: @chat-right-toolbar-issue-open-color;
     background-color: @chat-right-toolbar-issue-background;
     border-color: @chat-right-toolbar-issue-background;
   }
@@ -380,7 +464,7 @@ a.room-item__container:hover { //:cry:
 .right-toolbar-region__footer {
   background: linear-gradient(
     top,
-    rgba(255, 255, 255, 0),
+    rgba(56, 55, 54, 0),
     @left-menu-bg-color 35%
   );
 }
@@ -677,6 +761,14 @@ a.room-item__container:hover { //:cry:
 .feed-item__content {
   background-color: @topic-reply-list-item-background-color;
   color: @topic-reply-list-item-body-color;
+}
+
+.feed-item__content__header__user-display-name  {
+  color: @topic-details-text-color;
+}
+
+.feed-item__content__header__user-user-name {
+  color: @topic-details-text-color;
 }
 
 .panel--reply-editor,

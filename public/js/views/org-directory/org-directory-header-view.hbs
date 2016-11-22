@@ -9,16 +9,20 @@
     </h1>
 
     <div class="org-page__header-body-actions">
-      <button class="org-page__header-favourite-button js-group-favourite-button" title="Favourite {{ group.name }}">
-        <i class="org-page__header-favourite-button-icon icon-star-empty {{#if group.favourite }}favourite{{/if}} js-group-favourite-button-icon" aria-hidden="true"></i>
-      </button>
+      {{#if isLoggedIn}}
+        <button class="org-page__header-favourite-button js-group-favourite-button" title="Favourite {{ group.name }}">
+          <i class="org-page__header-favourite-button-icon icon-star-empty {{#if group.favourite }}favourite{{/if}} js-group-favourite-button-icon" aria-hidden="true"></i>
+        </button>
+      {{/if}}
       <a
         class="org-page__header-share-link subdued-button-clouds--small"
         href="{{socialUrl}}"
         target="_blank">
         Share
       </a>
-      <div id="profile-menu" class="profile-menu"></div>
+      {{#if isLoggedIn}}
+        <div id="profile-menu" class="profile-menu"></div>
+      {{/if}}
     </div>
   </div>
 </div>
