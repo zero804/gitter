@@ -5,6 +5,7 @@ var _ = require('lodash');
 var languageDetector = require('../utils/language-detector');
 var languageAnalyzerMapper = require('../utils/language-analyzer-mapper');
 var chatsForRoomSearch = require('gitter-web-elasticsearch/lib/chats-for-room-search');
+var debug = require('debug')('gitter:app:chat-search-service');
 
 var parseQuery = Promise.method(function (textQuery, userLang) {
   /* Horrible hack - rip a from:xyz field out of the textQuery */
@@ -59,6 +60,8 @@ exports.searchChatMessagesForRoom = function(troupeId, textQuery, options) {
 
   return parseQuery(textQuery, options.lang)
     .then(function(parsedQuery) {
+      debug('Search: %j', parsedQuery);
+
       // TODO: deal with limit and skip
       var searchResults = chatsForRoomSearch.searchRoom(troupeId, parsedQuery, options);
 

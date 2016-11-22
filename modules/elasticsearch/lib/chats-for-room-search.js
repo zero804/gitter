@@ -4,6 +4,7 @@ var env = require('gitter-web-env');
 var stats = env.stats;
 var Promise = require('bluebird');
 var client = require('./elasticsearch-client');
+var debug = require('debug')('gitter:app:elasticsearch:chats-for-room-search');
 
 /* Magic way of figuring out the matching terms so that we can highlight */
 function extractHighlights(text) {
@@ -69,7 +70,7 @@ function searchRoom(troupeId, parsedQuery, options) {
   var queryRequest = {
     size: options.limit || 10,
     from: options.skip,
-    timeout: 500,
+    timeout: 1500,
     index: 'gitter-primary',
     type: 'chat',
     body: {
@@ -94,9 +95,10 @@ function searchRoom(troupeId, parsedQuery, options) {
   };
 
   var startTime = Date.now();
-
+  debug('Query: %j', queryRequest);
   return client.search(queryRequest)
     .then(function(response) {
+      debug('Response: %j', response);
       stats.responseTime('chat.search.exec', Date.now() - startTime);
 
       return response.hits.hits.map(function(hit) {
