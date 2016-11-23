@@ -9,7 +9,7 @@
   background-position: 0 0;
 }
 
-.service-sprite.huboard-logo {
+.service-sprite.gocd-smile {
   width: 16px;
   height: 16px;
   background-position: -16px 0;
@@ -147,160 +147,178 @@
   background-position: -80px -48px;
 }
 
-.service-sprite.heroku-logo {
+.service-sprite.gocd-frown {
   width: 16px;
   height: 16px;
   background-position: 0 -66px;
 }
 
-.service-sprite.appveyor-logo {
+.service-sprite.gocd-logo {
   width: 16px;
   height: 16px;
   background-position: -16px -66px;
 }
 
-.service-sprite.jenkins-frown {
+.service-sprite.appveyor-logo {
   width: 16px;
   height: 16px;
   background-position: -32px -66px;
 }
 
-.service-sprite.jenkins-logo {
+.service-sprite.heroku-logo {
   width: 16px;
   height: 16px;
   background-position: -48px -66px;
 }
 
-.service-sprite.jenkins-meh {
+.service-sprite.huboard-logo {
   width: 16px;
   height: 16px;
   background-position: -64px -66px;
 }
 
-.service-sprite.jenkins-smile {
+.service-sprite.jenkins-frown {
   width: 16px;
   height: 16px;
   background-position: -80px -66px;
 }
 
-.service-sprite.logentries-error {
+.service-sprite.jenkins-logo {
   width: 16px;
   height: 16px;
   background-position: -96px 0;
 }
 
-.service-sprite.logentries-logo {
+.service-sprite.jenkins-meh {
   width: 16px;
   height: 16px;
   background-position: -96px -16px;
 }
 
-.service-sprite.newrelic-error {
+.service-sprite.jenkins-smile {
   width: 16px;
   height: 16px;
   background-position: -96px -32px;
 }
 
-.service-sprite.newrelic-logo {
+.service-sprite.logentries-error {
   width: 16px;
   height: 16px;
   background-position: -96px -48px;
 }
 
-.service-sprite.opencollective-logo {
+.service-sprite.logentries-logo {
   width: 16px;
   height: 16px;
   background-position: -96px -64px;
 }
 
-.service-sprite.pagerduty-logo {
+.service-sprite.newrelic-error {
   width: 16px;
   height: 16px;
   background-position: 0 -82px;
 }
 
-.service-sprite.pivotaltracker-logo {
+.service-sprite.newrelic-logo {
   width: 16px;
   height: 16px;
   background-position: -16px -82px;
 }
 
-.service-sprite.sentry-error {
+.service-sprite.opencollective-logo {
   width: 16px;
   height: 16px;
   background-position: -32px -82px;
 }
 
-.service-sprite.sentry-logo {
+.service-sprite.pagerduty-logo {
   width: 16px;
   height: 16px;
   background-position: -48px -82px;
 }
 
-.service-sprite.snapci-frown {
+.service-sprite.pivotaltracker-logo {
   width: 16px;
   height: 16px;
   background-position: -64px -82px;
 }
 
-.service-sprite.snapci-logo {
+.service-sprite.sentry-error {
   width: 16px;
   height: 16px;
   background-position: -80px -82px;
 }
 
-.service-sprite.snapci-smile {
+.service-sprite.sentry-logo {
   width: 16px;
   height: 16px;
   background-position: -96px -82px;
 }
 
-.service-sprite.sprintly-columns {
+.service-sprite.snapci-frown {
   width: 16px;
   height: 16px;
   background-position: -112px 0;
 }
 
-.service-sprite.sprintly-logo {
+.service-sprite.snapci-logo {
   width: 16px;
   height: 16px;
   background-position: -112px -16px;
 }
 
-.service-sprite.trackjs-error {
+.service-sprite.snapci-smile {
   width: 16px;
   height: 16px;
   background-position: -112px -32px;
 }
 
-.service-sprite.trackjs-logo {
+.service-sprite.sprintly-columns {
   width: 16px;
   height: 16px;
   background-position: -112px -48px;
 }
 
-.service-sprite.travis-frown {
+.service-sprite.sprintly-logo {
   width: 16px;
   height: 16px;
   background-position: -112px -64px;
 }
 
-.service-sprite.travis-logo {
+.service-sprite.trackjs-error {
   width: 16px;
   height: 16px;
   background-position: -112px -80px;
 }
 
-.service-sprite.travis-meh {
+.service-sprite.trackjs-logo {
   width: 16px;
   height: 16px;
   background-position: 0 -98px;
 }
 
-.service-sprite.travis-smile {
+.service-sprite.travis-frown {
   width: 16px;
   height: 16px;
   background-position: -16px -98px;
+}
+
+.service-sprite.travis-logo {
+  width: 16px;
+  height: 16px;
+  background-position: -32px -98px;
+}
+
+.service-sprite.travis-meh {
+  width: 16px;
+  height: 16px;
+  background-position: -48px -98px;
+}
+
+.service-sprite.travis-smile {
+  width: 16px;
+  height: 16px;
+  background-position: -64px -98px;
 }
 
 

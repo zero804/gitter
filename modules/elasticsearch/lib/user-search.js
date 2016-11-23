@@ -1,12 +1,15 @@
 "use strict";
 
+var config = require('gitter-web-env').config;
 var Promise = require('bluebird');
 var client = require('./elasticsearch-client');
+
+const DEFAULT_QUERY_TIMEOUT = parseInt(config.get('elasticsearch:defaultQueryTimeout'), 10) || 500;
 
 function searchGlobalUsers(queryText, options) {
   var queryRequest = {
     size: options.limit || 10,
-    timeout: 500,
+    timeout: DEFAULT_QUERY_TIMEOUT,
     index: 'gitter-primary',
     type: 'user',
     body: {
@@ -66,7 +69,7 @@ function elasticsearchUserTypeahead(queryText, options) {
 
   var queryRequest = {
     size: limit,
-    timeout: 500,
+    timeout: DEFAULT_QUERY_TIMEOUT,
     index: 'gitter-primary',
     type: 'user',
     body: {
