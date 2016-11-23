@@ -1,8 +1,11 @@
 "use strict";
 
+var config = require('gitter-web-env').config;
 var client = require('./elasticsearch-client');
 var assert = require('assert');
 var Promise = require('bluebird');
+
+const DEFAULT_QUERY_TIMEOUT = parseInt(config.get('elasticsearch:defaultQueryTimeout'), 10) || 500;
 
 /**
  * returns heatmap to be used by cal-heatmap https://kamisama.github.io/cal-heatmap/#data-format
@@ -39,7 +42,7 @@ function getHeatmapForRoom(roomId, startMonth, endMonth, tz) {
   }
 
   var queryRequest = {
-    timeout: 500,
+    timeout: DEFAULT_QUERY_TIMEOUT,
     index: 'gitter-primary',
     type: 'chat',
     // limit the search type to only get the aggregation result, not the query

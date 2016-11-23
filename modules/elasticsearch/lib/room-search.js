@@ -1,8 +1,11 @@
 "use strict";
 
+var config = require('gitter-web-env').config;
 var Promise = require('bluebird');
 var client = require('./elasticsearch-client');
 var _ = require('lodash');
+
+const DEFAULT_QUERY_TIMEOUT = parseInt(config.get('elasticsearch:defaultQueryTimeout'), 10) || 500;
 
 var PUBLIC_ROOMS_QUERY = {
     "nested": {
@@ -66,7 +69,7 @@ function searchRooms(queryText, userId, privateRoomIds, options) {
 
   var queryRequest = {
     size: options.limit || 10,
-    timeout: 500,
+    timeout: DEFAULT_QUERY_TIMEOUT,
     index: 'gitter-primary',
     type: 'room',
     body: {

@@ -2,8 +2,11 @@
 
 var env = require('gitter-web-env');
 var stats = env.stats;
+var config = env.config;
 var Promise = require('bluebird');
 var client = require('./elasticsearch-client');
+
+const DEFAULT_QUERY_TIMEOUT = parseInt(config.get('elasticsearch:defaultQueryTimeout'), 10) || 500;
 
 /* Magic way of figuring out the matching terms so that we can highlight */
 function extractHighlights(text) {
@@ -69,7 +72,7 @@ function searchRoom(troupeId, parsedQuery, options) {
   var queryRequest = {
     size: options.limit || 10,
     from: options.skip,
-    timeout: 500,
+    timeout: DEFAULT_QUERY_TIMEOUT,
     index: 'gitter-primary',
     type: 'chat',
     body: {
