@@ -2284,9 +2284,9 @@
       }
     },
     "gitter-services": {
-      "version": "1.19.0",
-      "from": "git+https://github.com/gitterHQ/services.git#1.19.0",
-      "resolved": "git+https://github.com/gitterHQ/services.git#c60702de4fa3555e6449e81902de7b74d3956884",
+      "version": "1.20.0",
+      "from": "git+https://github.com/gitterHQ/services.git#1.20.0",
+      "resolved": "git+https://github.com/gitterHQ/services.git#ffb99003ad1d0f9ad71558ffa1dc82b80ac050ed",
       "dependencies": {
         "require-all": {
           "version": "0.0.8",
