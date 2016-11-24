@@ -1,11 +1,14 @@
 'use strict';
 
+var config = require('gitter-web-env').config;
 var esClient = require('./elasticsearch-client');
 var Promise = require('bluebird');
 
+const DEFAULT_QUERY_TIMEOUT = parseInt(config.get('elasticsearch:defaultQueryTimeout'), 10) || 500;
+
 function findRoomHumanLanguage(roomId) {
   var query = {
-    timeout: 500,
+    timeout: DEFAULT_QUERY_TIMEOUT,
     index: 'gitter-primary',
     type: 'chat',
     search_type: "count",
