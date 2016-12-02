@@ -1,6 +1,6 @@
 "use strict";
 
-var serialize = require('serialize-javascript');
+var safeJson = require('gitter-web-templates/lib/safe-json.js');
 
 module.exports = function topicsContextHelper(context){
   if(!context) return;
@@ -11,6 +11,6 @@ module.exports = function topicsContextHelper(context){
     return;
   }
   if(!data) { return; }
-  data = serialize(data, { isJSON: true });
+  data = safeJson(JSON.stringify(data));
   return '<script>' + 'window.jsonContext = ' + data + ';' + '</script>';
 };
