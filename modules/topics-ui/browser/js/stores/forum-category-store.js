@@ -1,3 +1,4 @@
+import getContext from '../utils/context';
 import { Collection } from 'backbone';
 import { UPDATE_ACTIVE_CATEGORY } from '../../../shared/constants/forum-categories';
 import router from '../routers/index';
@@ -49,7 +50,7 @@ export const ForumCategoryStore = Collection.extend({
 
 dispatchOnChangeMixin(ForumCategoryStore);
 
-const serverStore = (window.context.categoryStore || {});
+const serverStore = (getContext().categoryStore || {});
 const serverData = (serverStore.data || []);
 let store;
 export function getForumCategoryStore(data) {

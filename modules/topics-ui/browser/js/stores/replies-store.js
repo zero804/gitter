@@ -1,3 +1,4 @@
+import getContext from '../utils/context';
 import Backbone from 'backbone';
 import LiveCollection from './live-collection';
 import {BaseModel} from './base-model';
@@ -202,7 +203,7 @@ dispatchOnChangeMixin(RepliesStore, [
 onReactionsUpdateMixin(RepliesStore, 'onReactionsUpdate');
 
 
-const serverStore = (window.context.repliesStore|| {});
+const serverStore = (getContext().repliesStore|| {});
 const serverData = (serverStore.data || [])
 let store;
 
