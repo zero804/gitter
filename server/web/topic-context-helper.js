@@ -1,5 +1,7 @@
 "use strict";
 
+var safeJson = require('gitter-web-templates/lib/safe-json.js');
+
 module.exports = function topicsContextHelper(context){
   if(!context) return;
   var data;
@@ -9,5 +11,6 @@ module.exports = function topicsContextHelper(context){
     return;
   }
   if(!data) { return; }
-  return '<script>' + 'window.context = ' + data + ';' + '</script>';
+  data = safeJson(JSON.stringify(data));
+  return '<script>' + 'window.jsonContext = ' + data + ';' + '</script>';
 };

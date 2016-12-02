@@ -1,3 +1,4 @@
+import getContext from '../utils/context';
 import { BaseModel } from './base-model';
 import {subscribe} from '../../../shared/dispatcher';
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
@@ -53,7 +54,7 @@ dispatchOnChangeMixin(ForumStore);
 
 let store;
 
-const serverSideStore = (window.context.forumStore || {});
+const serverSideStore = (getContext().forumStore || {});
 const serverSideData = (serverSideStore.data || {});
 
 export function getForumStore(data){
