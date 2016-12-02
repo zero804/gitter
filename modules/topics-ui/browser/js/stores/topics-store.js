@@ -1,3 +1,4 @@
+import getContext from '../utils/context';
 import Backbone from 'backbone';
 import _ from 'lodash';
 import {subscribe, unsubscribe} from '../../../shared/dispatcher';
@@ -718,7 +719,7 @@ dispatchOnChangeMixin(TopicsStore, [
 });
 
 
-const serverStore = (window.context.topicsStore || {});
+const serverStore = (getContext().topicsStore || {});
 const serverData = (serverStore.data || []);
 let store;
 export function getTopicsStore(data){

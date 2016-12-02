@@ -1,4 +1,6 @@
-const serverStore = (window.context.accessTokenStore || {});
+import getContext from '../utils/context';
+
+const serverStore = (getContext().accessTokenStore || {});
 const token = (serverStore.token || '');
 
 /**

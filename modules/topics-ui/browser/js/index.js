@@ -1,3 +1,7 @@
+/*
+ * Webpack hoists all imports above any application code
+ * lame ...
+ * */
 import '../less/index.less';
 
 import Backbone from 'backbone';
@@ -8,6 +12,7 @@ import router from './routers/index';
 import ForumService from './services/forum-service';
 import { getCurrentUserStore } from './stores/current-user-store';
 import ravenClientFactory from 'gitter-web-client-error-reporting/lib/raven-client-factory';
+
 
 // Send events to Raven
 var user = getCurrentUserStore().getCurrentUser();

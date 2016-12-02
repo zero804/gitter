@@ -1,3 +1,4 @@
+import getContext from '../utils/context';
 import { BaseModel } from './base-model';
 
 const GroupStore = BaseModel.extend({
@@ -30,7 +31,7 @@ const GroupStore = BaseModel.extend({
 
 let store;
 
-const serverSideStore = (window.context.groupStore || {});
+const serverSideStore = (getContext().groupStore || {});
 const serverSideData = (serverSideStore.data || {});
 
 export function getGroupStore() {

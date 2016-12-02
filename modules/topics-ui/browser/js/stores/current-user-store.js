@@ -1,4 +1,5 @@
 import Backbone from 'backbone';
+import getContext from '../utils/context';
 
 const CurrentUserStore = Backbone.Model.extend({
   getCurrentUser() {
@@ -11,7 +12,7 @@ const CurrentUserStore = Backbone.Model.extend({
 });
 
 
-const serverStore = (window.context.currentUserStore || {});
+const serverStore = (getContext().currentUserStore || {});
 const serverData = (serverStore.data || {});
 const store = new CurrentUserStore(serverData);
 

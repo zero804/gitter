@@ -1,10 +1,11 @@
+import getContext from '../utils/context';
 import Backbone from 'backbone';
 import { UPDATE_ACTIVE_TAG } from '../../../shared/constants/forum-tags';
 import {DEFAULT_TAG_VALUE} from '../../../shared/constants/forum-tags';
 import router from '../routers/index';
 import dispatchOnChangeMixin from './mixins/dispatch-on-change';
 
-const serverStore = (window.context.tagStore || {});
+const serverStore = (getContext().tagStore || {});
 const serverData = (serverStore.data || []);
 
 export const ForumTagStore = Backbone.Collection.extend({
