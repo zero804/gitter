@@ -139,4 +139,15 @@ router.post('/vapid',
   identifyRoute('api-private-vapid'),
   require('./vapid'));
 
+/* Web push registration endpoint */
+router.get('/email',
+  authMiddleware,
+  identifyRoute('api-private-email'),
+  require('./email'));
+
+router.post('/pay',
+  authMiddleware,
+  identifyRoute('api-private-pay'),
+  require('./pay'));
+
 module.exports = router;

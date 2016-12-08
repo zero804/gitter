@@ -46,7 +46,8 @@ var troupeEnv = {
   },
   billingUrl: config.get('web:billingBaseUrl'),
   maxFreeOrgRoomMembers: config.get('maxFreeOrgRoomMembers'),
-  vapidAppServerKey: config.get('vapid:publicKey')
+  vapidAppServerKey: config.get('vapid:publicKey'),
+  stripeKey: config.get('stripe:publishableKey')
 };
 
 
