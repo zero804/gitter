@@ -5,6 +5,7 @@ var Promise = require('bluebird');
 var _ = require('underscore');
 var apiClient = require('../api-client');
 var clientEnv = require('gitter-client-env');
+var cdn = require('gitter-web-cdn');
 
 function getEmail() {
   return apiClient.priv.get('/email');
@@ -42,7 +43,7 @@ CheckoutHandler.prototype.obtainToken = function(options) {
         handler.open(_.extend({
           name: 'Gitter Supporter',
           description: 'Keep Gitter Going',
-          image: 'https://stripe.com/img/documentation/checkout/marketplace.png',
+          image: cdn('images/icon-logo-red-128.png'),
           locale: 'auto',
           email: emailAddress && emailAddress.email,
           bitcoin: true,
