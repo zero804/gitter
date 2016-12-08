@@ -14,6 +14,13 @@ var appEvents = require('gitter-web-appevents');
 var planMappings = {
   200: 'supporter_personal_2',
   500: 'supporter_personal_5',
+  1000: 'supporter_personal_10',
+  2500: 'supporter_personal_25',
+  5000: 'supporter_personal_50',
+  10000: 'supporter_personal_100',
+  25000: 'supporter_personal_250',
+  50000: 'supporter_personal_500',
+  100000: 'supporter_personal_1000',
 };
 
 function createSubscription(user, customer, token, amount) {
