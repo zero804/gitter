@@ -36,7 +36,7 @@ function findOrCreateCustomer(user, token) {
 
       return Promise.resolve(stripeClient.customers.create({
           description: displayName,
-          source: token.id,
+          email: token.email,
           metadata: {
             gitterId: userId,
             name:     displayName,

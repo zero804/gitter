@@ -7,6 +7,7 @@ var logger = env.logger;
 var Promise = require('bluebird');
 var stripeClient = require('./stripe-client');
 var stripeCustomerService = require('./stripe-customer-service');
+var debug = require('debug')('gitter:app:payment-service:index');
 
 var planMappings = {
   200: 'supporter_personal_2',
@@ -34,30 +35,30 @@ function createSubscription(user, customer, token, amount) {
   };
 
   // Create the subscription in Stripe
-  return Promise.resolve(stripeClient.subscriptions.create(subscriptionDetails))
-    // .tap(function(stripeSubscription) {
-    //   console.log(stripeSubscription);
-    // });
-
+  return Promise.resolve(stripeClient.subscriptions.create(subscriptionDetails));
 }
 
-function createOnceOffPayment(user, customer, token, amount) {
+function createOnceOffPayment(user, token, amount) {
+  debug('Creating once-off charge in Stripe')
   return Promise.resolve(stripeClient.charges.create({
     amount: amount,
     currency: "usd",
     source: token.id,
-    description: "Thanks for your supporter."
+    description: "Thank you for supporting Gitter",
+    metadata: {
+      supporter: true,
+    }
   }));
 }
 
 function createPayment(user, token, amount, recurring) {
+  if (!recurring) {
+    return createOnceOffPayment(user, token, amount);
+  }
+
   return stripeCustomerService.findOrCreateCustomer(user, token)
     .then(function(customer) {
-      if (recurring) {
-        return createSubscription(user, customer, token, amount);
-      } else {
-        return createOnceOffPayment(user, customer, token, amount);
-      }
+      return createSubscription(user, customer, token, amount);
     });
 
 }

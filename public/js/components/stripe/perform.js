@@ -5,7 +5,7 @@ var apiClient = require('../api-client');
 
 function perform(options) {
   var recurring = options.recurring;
-  var amount = /* options.amount */ 200;
+  var amount = options.amount;
 
   var checkoutHandler = new CheckoutHandler();
   return checkoutHandler.obtainToken({

@@ -5,9 +5,11 @@ var presentPaymentDialog = require('../ensured/present-payment-dialog');
 function createRouter() {
 
   return {
-    'pay': function() {
+    'pay/:type/:amount': function(type, amount) {
+      var amountCents = parseInt(amount, 10) * 100;
       return presentPaymentDialog({
-        /* options here */
+        recurring: type === 'recurring',
+        amount: amountCents
       });
     }
   }
