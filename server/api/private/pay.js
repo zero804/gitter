@@ -13,9 +13,5 @@ module.exports = function(req, res, next) {
     .then(function() {
       res.sendStatus(204);
     })
-    // .catch(function(err) {
-    //   console.log(err.stack);
-    //   throw err;
-    // })
     .catch(next);
 };
