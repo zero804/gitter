@@ -31,6 +31,7 @@ function createSubscription(user, customer, token, amount) {
     plan: plan,
     source: token.id,
     metadata: {
+      supporter: true,
       userId: userId,
       username: user.username
     }

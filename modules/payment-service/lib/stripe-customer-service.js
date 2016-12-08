@@ -38,8 +38,9 @@ function findOrCreateCustomer(user, token) {
           description: displayName,
           email: token.email,
           metadata: {
+            supporter: true,
             gitterId: userId,
-            name:     displayName,
+            name: displayName,
             username: username
           },
         }))
