@@ -173,7 +173,7 @@ function UserStrategy(options) {
     }
 
     var obj;
-    var supporter = isSupporter(user, nowish)
+    var supporter = isSupporter(user, nowish) || undefined;
 
     if (lean) {
       obj = {
@@ -184,6 +184,7 @@ function UserStrategy(options) {
         role: userRoleInTroupeStrategy && userRoleInTroupeStrategy.map(user.id || user._id) || undefined,
         invited: user.state === 'INVITED' || undefined, // true or undefined
         removed: user.state === 'REMOVED' || undefined, // true or undefined
+        supporter: supporter,
         v: getVersion(user)
       };
 
@@ -215,7 +216,7 @@ function UserStrategy(options) {
       /* TODO: when adding states use user.state and the respective string value desired */
       invited: user.state === 'INVITED' || undefined, // true or undefined
       removed: user.state === 'REMOVED' || undefined, // true or undefined
-      supporter: supporter || undefined,
+      supporter: supporter,
       v: getVersion(user)
     };
 
@@ -238,8 +239,9 @@ UserStrategy.prototype = {
 };
 
 function SlimUserStrategy() {
-
+  this.nowish = Date.now();
 }
+
 SlimUserStrategy.prototype = {
   preload: function() {},
   map: function(user) {
@@ -248,6 +250,7 @@ SlimUserStrategy.prototype = {
       username: user.username,
       displayName: user.displayName,
       avatarUrl: avatars.getForUser(user),
+      supporter: isSupporter(user, this.nowish) || undefined,
     };
   },
   name: 'SlimUserStrategy'
