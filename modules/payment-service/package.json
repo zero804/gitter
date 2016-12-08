@@ -1,0 +1,23 @@
+{
+  "name": "gitter-web-payment-service",
+  "version": "1.0.0",
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha test/"
+  },
+  "dependencies": {
+    "stripe": "^4.14.0",
+    "bluebird": "^3.2.1",
+    "debug": "^2.2.0",
+    "gitter-web-appevents": "file:../appevents",
+    "gitter-web-env": "file:../env",
+    "gitter-web-live-collection-events": "file:../live-collection-events",
+    "gitter-web-persistence": "file:../persistence",
+    "gitter-web-persistence-utils": "file:../persistence-utils"
+  },
+  "private": true
+}

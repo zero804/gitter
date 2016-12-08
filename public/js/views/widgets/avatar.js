@@ -155,7 +155,7 @@ module.exports = (function() {
     }
 
     var avatarSize = options.avatarSize || 's';
-    var imgSize = avatarSize == 'm' ? AVATAR_SIZE_MEDIUM : AVATAR_SIZE_SMALL;
+    var imgSize = avatarSize === 'm' ? AVATAR_SIZE_MEDIUM : AVATAR_SIZE_SMALL;
 
     var currentUserId = context.getUserId();
     var avatarSrcSet = resolveUserAvatarSrcSet(user, imgSize);
@@ -183,7 +183,8 @@ module.exports = (function() {
       role: user.role,
       invited: user.invited,
       removed: user.removed,
-      inactive: user.removed || user.invited
+      inactive: user.removed || user.invited,
+      supporter: user.supporter
     };
   }
 

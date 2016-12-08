@@ -30,6 +30,7 @@ var Router = require('./routes/router');
 var notificationRoutes = require('./routes/notification-routes');
 var createRoutes = require('./routes/create-routes');
 var upgradeAccessRoutes = require('./routes/upgrade-access-routes');
+var paymentRoutes = require('./routes/payment-routes');
 
 require('./components/statsc');
 require('./views/widgets/preload');
@@ -66,7 +67,8 @@ onready(function() { // eslint-disable-line max-statements
         groups: troupeCollections.groups,
         roomMenuModel: appLayout.getRoomMenuModel()
       }),
-      upgradeAccessRoutes()
+      upgradeAccessRoutes(),
+      paymentRoutes()
     ]
   });
 

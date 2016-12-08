@@ -1,4 +1,4 @@
-/* eslint complexity: ["error", 19] */
+/* eslint complexity: ["error", 20  ] */
 "use strict";
 
 var Promise = require('bluebird');
@@ -118,6 +118,14 @@ UserProvidersStrategy.prototype = {
   name: 'UserProvidersStrategy'
 };
 
+const MAX_MS_SINCE_LAST_SUPPORT_FOR_SUPPORTER = 60 * 86400 * 1000;
+
+function isSupporter(user, nowish) {
+  if (!user || !user.supportedDate) return false;
+  if (nowish - user.supportedDate < MAX_MS_SINCE_LAST_SUPPORT_FOR_SUPPORTER) return true;
+  return false;
+}
+
 function UserStrategy(options) {
   options = options ? options : {};
   var lean = !!options.lean;
@@ -125,6 +133,7 @@ function UserStrategy(options) {
   var userRoleInTroupeStrategy;
   var userPresenceInTroupeStrategy;
   var userProvidersStrategy;
+  var nowish = Date.now();
 
   this.preload = function(users) {
     if (users.isEmpty()) return;
@@ -164,6 +173,7 @@ function UserStrategy(options) {
     }
 
     var obj;
+    var supporter = isSupporter(user, nowish) || undefined;
 
     if (lean) {
       obj = {
@@ -174,6 +184,7 @@ function UserStrategy(options) {
         role: userRoleInTroupeStrategy && userRoleInTroupeStrategy.map(user.id || user._id) || undefined,
         invited: user.state === 'INVITED' || undefined, // true or undefined
         removed: user.state === 'REMOVED' || undefined, // true or undefined
+        supporter: supporter,
         v: getVersion(user)
       };
 
@@ -205,6 +216,7 @@ function UserStrategy(options) {
       /* TODO: when adding states use user.state and the respective string value desired */
       invited: user.state === 'INVITED' || undefined, // true or undefined
       removed: user.state === 'REMOVED' || undefined, // true or undefined
+      supporter: supporter,
       v: getVersion(user)
     };
 
@@ -227,8 +239,9 @@ UserStrategy.prototype = {
 };
 
 function SlimUserStrategy() {
-
+  this.nowish = Date.now();
 }
+
 SlimUserStrategy.prototype = {
   preload: function() {},
   map: function(user) {
@@ -237,6 +250,7 @@ SlimUserStrategy.prototype = {
       username: user.username,
       displayName: user.displayName,
       avatarUrl: avatars.getForUser(user),
+      supporter: isSupporter(user, this.nowish) || undefined,
     };
   },
   name: 'SlimUserStrategy'

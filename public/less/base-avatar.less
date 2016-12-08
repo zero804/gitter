@@ -28,6 +28,31 @@
     animation-iteration-count: infinite;
   }
 
+  &.supporter:before {
+    content: " ";
+    position: absolute;
+    bottom: 0;
+    height: 4px;
+    left: 0;
+    right: 0;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    border-radius: 4px;
+    background-color: gold;
+  }
+
+  &.supporter:after {
+    content: " ";
+    position: absolute;
+    bottom: 3px;
+    height: 1px;
+    left: 0;
+    right: 0;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    border-bottom: 1px solid white;
+  }
+
   @media @retina {
     &.unread {
       animation: pulsate-retina 3s ease-out;
