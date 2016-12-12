@@ -54,15 +54,15 @@ module.exports = function(tokenPriority) {
       request(options, function(err, response, body) {
         if (err) return reject(err);
 
-        if(response.statusCode >= 400) {
+        if (response.statusCode >= 400) {
           return reject(new StatusError(response.statusCode, body && body.message));
         }
 
-        if(response.statusCode !== 200) {
+        if (response.statusCode === 200) {
+          return resolve(body);
+        } else {
           /* This is pretty dodgy.... */
           return resolve(response.statusCode);
-        } else {
-          return resolve(body);
         }
       });
     })
@@ -71,6 +71,6 @@ module.exports = function(tokenPriority) {
 
   // return Mirror;
   return wrap(Mirror, function() {
-    return [tokenStrategy(this.user)];
+    return [this.token];
   });
 };
