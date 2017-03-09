@@ -9,7 +9,6 @@ var langs = require('langs');
 var loginUtils = require('../web/login-utils');
 var social = require('./social-metadata');
 var fonts = require('../web/fonts');
-var earlyBirdRenderer = require('./renderers/early-bird');
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
@@ -110,7 +109,9 @@ router.get('/-/unawesome-browser',
 
 router.get('/about/early-bird',
   identifyRoute('earlybird'),
-  earlyBirdRenderer.renderEarlyBirdPage
+  function(req, res) {
+    res.relativeRedirect('/');
+  }
 );
 
 // old campaign that still gets some hits
