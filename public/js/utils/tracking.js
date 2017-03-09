@@ -11,7 +11,6 @@ require('./mixpanel');
 var trackingId = clientEnv['googleTrackingId'];
 var trackingDomain = clientEnv['googleTrackingDomain'] || 'gitter.im'; // Remove this default 23/10/2014;
 var ga;
-var gosquared;
 
 if(trackingId) {
   /* eslint-disable */
@@ -26,34 +25,6 @@ if(trackingId) {
   ga('create', trackingId, trackingDomain);
   ga('send', 'pageview');
 }
-
-var goSquaredTrackingId = clientEnv['goSquaredTrackingId'];
-var user = context.getUser();
-
-if(goSquaredTrackingId) {
-  gosquared = window.GoSquared = {};
-  gosquared.acct = goSquaredTrackingId;
-
-  if (user.username)
-  {
-    gosquared.UserName = user.username;
-    gosquared.Visitor = {
-      id: user.id,
-      displayName: user.displayName,
-      email: user.email
-    };
-  }
-
-  (function(w){
-      w._gstc_lt = +new Date();
-      var d = document, g = d.createElement("script");
-      g.type = "text/javascript";
-      g.src = "//d1l6p2sc9645hc.cloudfront.net/tracker.js";
-      var s = d.getElementsByTagName("script")[0];
-      s.parentNode.insertBefore(g, s);
-  })(window);
-}
-
 
 function trackPageView(routeName) {
   if (window.mixpanel && window.mixpanel.register) {

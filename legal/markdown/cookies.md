@@ -22,9 +22,9 @@ We utilise other cookies to analyse how our visitors use Gitter and to monitor p
 
 ### Does anyone else use cookies on Gitter?
 
-We do use or allow third parties to serve cookies that fall into the two categories above. For example, like many companies, we may place cookies to help us monitor our traffic.  We may also use third party cookies to help us with market research, revenue tracking, improving site functionality and monitoring compliance with our terms and conditions and policies.
+We do use or allow third parties to serve cookies that fall into the two categories above. For example, like many companies, we may place cookies to help us monitor our traffic. We may also use third party cookies to help us with market research, revenue tracking, improving site functionality and monitoring compliance with our terms and conditions and policies.
 
-We currently allow Mixpanel, Google, and GoSquared to place cookies on Gitter.  We reserve the right to add additional cookies at any point in the future.  
+We currently allow Mixpanel and Google to place cookies on Gitter. We reserve the right to add additional cookies at any point in the future.  
 
 ### Can you block cookies?
 

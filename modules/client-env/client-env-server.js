@@ -24,7 +24,6 @@ var troupeEnv = {
   mixpanelToken: config.get('stats:mixpanel:enabled') && config.get('stats:mixpanel:token'),
   googleTrackingId: config.get('stats:ga:key'),
   googleTrackingDomain: config.get('stats:ga:domain'),
-  goSquaredTrackingId: config.get('web:goSquaredId'),
   env: env,
   cdns: cdns,
   version: appVersion.getVersion(),
