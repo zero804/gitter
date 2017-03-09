@@ -44,7 +44,6 @@ var troupeEnv = {
     basepath: config.get('embed:basepath'),
     cacheBuster: config.get('embed:cacheBuster')
   },
-  billingUrl: config.get('web:billingBaseUrl'),
   vapidAppServerKey: config.get('vapid:publicKey')
 };
 

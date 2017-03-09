@@ -56,7 +56,6 @@ router.get(nconf.get('web:homeurl'),
       fonts: fonts.getFonts(),
       hasCachedFonts: fonts.hasCachedFonts(req.cookies),
       socialMetadata: social.getMetadata(),
-      billingBaseUrl: nconf.get('web:billingBaseUrl')
     });
   });
 

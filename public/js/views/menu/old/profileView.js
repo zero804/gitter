@@ -39,8 +39,6 @@ module.exports = (function () {
       return {
         isMobile: isMobile(),
         user: userModel,
-        billingUrl: clientEnv['billingUrl'],
-        showBilling: !isMobile(),
         showGetApps: !isMobile() && !isNativeResult,
         showSignout: !isNativeResult
       };

@@ -99,21 +99,11 @@ var View = Marionette.CompositeView.extend({
     this.typeahead.dropdown.hide();
   },
 
-  billingUrl: function() {
-    var orgName = context.troupe().get('uri').split('/')[0];
-    var billingUrl = clientEnv['billingUrl'] + '/create/' + orgName + '/pro?r=' + context.troupe().get('url');
-    return billingUrl;
-  },
-
   menuItemClicked: function (button) {
     switch (button) {
       case 'share':
         this.dialog.hide();
         window.location.hash = "#share";
-        break;
-
-      case 'get-pro':
-        window.open(this.billingUrl());
         break;
 
       case 'done':
@@ -264,9 +254,7 @@ var View = Marionette.CompositeView.extend({
   }
 });
 
-var modalButtons = [
-  { action: "get-pro", text: "Upgrade to Pro", className: "modal--default__footer__link premium hidden" }
-];
+var modalButtons = [];
 
 if(context.troupe().get('security') !== 'PRIVATE') {
   modalButtons.push({ action: "share", pull: 'right', text: "Share this room", className: "modal--default__footer__link"});
