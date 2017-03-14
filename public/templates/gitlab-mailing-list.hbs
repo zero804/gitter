@@ -1,0 +1,31 @@
+<!doctype html>
+<html class="{{#if hasCachedFonts}}fonts-loaded{{/if}}" lang="en">
+<head>
+	<meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
+  <link id="favicon" rel="shortcut icon" href="{{cdn 'images/favicon-normal.ico' }}">
+
+	<title>Thanks</title>
+
+  {{> fonts}}
+  <link rel="stylesheet" href="{{cdn 'styles/userhome.css' }}">
+  <base target="_blank">
+</head>
+<body>
+  <header class="userhome-header">
+    <div class="userhome-header__logo">
+      {{> logo_man}}
+      <img class="userhome-header__logo-text" src='{{cdn "images/gitter-vector-logo.svg"}}'>
+    </div>
+    <nav class="userhome-header__nav"><a href="/home" target="_parent">Home</a><span class="userhome-header__nav-arrow"></span>GitLab Mailing List</nav>
+    <h1 class="userhome-header__title">Thanks</h1>
+  </header>
+  <div class="userhome-main userhome-main--learn">
+    <section class="learn-section">
+      <h3>Thank You</h3>
+			<p>We've added to you to the GitLab mailing list. Look out for the confirmation email in your inbox.</p>
+			<p><a href="/">Return</a></p>
+    </section>
+  </div>
+</body>
+</html>

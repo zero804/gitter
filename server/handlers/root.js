@@ -2,9 +2,11 @@
 
 var env = require('gitter-web-env');
 var nconf = env.config;
+var stats = env.stats;
 var express = require('express');
 var identifyRoute = env.middlewares.identifyRoute;
 var featureToggles = require('../web/middlewares/feature-toggles');
+var ensureLoggedIn = require('../web/middlewares/ensure-logged-in');
 var langs = require('langs');
 var loginUtils = require('../web/login-utils');
 var social = require('./social-metadata');
@@ -113,6 +115,21 @@ router.get('/about/early-bird',
     res.relativeRedirect('/');
   }
 );
+
+router.get('/about/gitlab/mailing-list',
+  ensureLoggedIn,
+  identifyRoute('gitlab-mailing-list'),
+  function(req, res) {
+    var user = req.user;
+
+    stats.event('gitlab_ml_opt_in', {
+      userId: user.id,
+      username: user.username
+    });
+
+    res.render('gitlab-mailing-list');
+  });
+
 
 // old campaign that still gets some hits
 router.get('/about/*',
