@@ -60,13 +60,7 @@ module.exports = (function() {
           }
         })
         .catch(function(e) {
-          if (e.status === 402) {
-            // money required, let the add modal explain it.
-            window.location.href = '#add';
-
-            // reset the state so the user can try again after paying.
-            self.stateModel.set('state', 'initial');
-          } else if (e.status === 409) {
+          if (e.status === 409) {
             self.stateModel.set('state', 'fail_409');
           } else if (e.status === 428) {
             self.stateModel.set({

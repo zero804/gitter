@@ -52,8 +52,7 @@ function renderHomePage(req, res, next) {
         showWindowsApp: showWindowsApp,
         showLinuxApp: showLinuxApp,
         troupeContext: troupeContext,
-        isNativeDesktopApp: troupeContext.isNativeDesktopApp,
-        billingBaseUrl: nconf.get('web:billingBaseUrl')
+        isNativeDesktopApp: troupeContext.isNativeDesktopApp
       });
     })
     .catch(next);

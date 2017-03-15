@@ -164,7 +164,7 @@ router.get('/tags/:tags',
 
           //Not 100% sure this is the best thing to do here
           //but I dont really want to refactor this whole thing
-          generateUserThemeSnapshot(req)
+          return generateUserThemeSnapshot(req)
             .then(function(userThemeSnapshot){
 
               // Anyone know why we're putting this on the
@@ -182,6 +182,8 @@ router.get('/tags/:tags',
                 hasCachedFonts: fonts.hasCachedFonts(req.cookies),
               }));
             });
+
+
         })
         .catch(next);
     });

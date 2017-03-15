@@ -10,6 +10,7 @@ var LoginView = require('../modals/login-view');
 var ProfileMenu = require('../profile-menu/profile-menu-view');
 var template = require('./tmpl/explore-view.hbs');
 var itemTemplate = require('../../../templates/partials/room_card.hbs');
+var clientEnv = require('gitter-client-env');
 
 require('../behaviors/isomorphic');
 
@@ -101,9 +102,14 @@ var ExploreView = Marionette.LayoutView.extend({
   },
 
   serializeData: function() {
+    var headlineNumbers = clientEnv.headlineNumbers || {};
+
     return {
       isLoggedIn: context.isLoggedIn(),
-      // TODO: rest of snapshot...
+      headlineGitterUsers: headlineNumbers.gitterUsers,
+      headlineGitterRooms: headlineNumbers.gitterRooms,
+      headlineGitterGroups: headlineNumbers.gitterGroups,
+      headlineGitterCountries: headlineNumbers.gitterCountries,
     };
   },
 

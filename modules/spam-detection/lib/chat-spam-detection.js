@@ -8,7 +8,8 @@ var duplicateChatDetector = require('./duplicate-chat-detector');
 var User = require('gitter-web-persistence').User;
 var stats = env.stats;
 
-var PROBATION_PERIOD = 86400 * 1000; // First day
+var ONE_DAY_TIME = 24 * 60 * 60 * 1000; // One day
+var PROBATION_PERIOD = 14 * ONE_DAY_TIME;
 
 function hellbanUser(userId) {
   return User.update({ _id: userId }, {
