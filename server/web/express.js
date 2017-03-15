@@ -54,6 +54,11 @@ function configureLocals(app) {
   locals.stagingText = appTag.text;
   locals.stagingLink = appTag.link;
 
+  locals.headlineGitterUsers = config.get('headlineNumbers:gitterUsers');
+  locals.headlineGitterRooms = config.get('headlineNumbers:gitterRooms');
+  locals.headlineGitterGroups = config.get('headlineNumbers:gitterGroups');
+  locals.headlineGitterCountries = config.get('headlineNumbers:gitterCountries');
+
   locals.dnsPrefetch = (config.get('cdn:hosts') || []).concat([
     config.get('ws:hostname')
   ]);

@@ -21,7 +21,6 @@ function getProfileCollection() {
 
   var result = new Backbone.Collection([
     { name: 'Home', stub: '/home' },
-    { name: 'Billing', stub: 'http://billing.gitter.im/accounts'},
   ]);
 
   var isWebApp = !isNative();

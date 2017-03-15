@@ -2,14 +2,24 @@
 
 var env = require('gitter-web-env');
 var nconf = env.config;
+var stats = env.stats;
 var express = require('express');
 var identifyRoute = env.middlewares.identifyRoute;
 var featureToggles = require('../web/middlewares/feature-toggles');
+var ensureLoggedIn = require('../web/middlewares/ensure-logged-in');
 var langs = require('langs');
 var loginUtils = require('../web/login-utils');
 var social = require('./social-metadata');
 var fonts = require('../web/fonts');
-var earlyBirdRenderer = require('./renderers/early-bird');
+
+var survivalMode = !!process.env.SURVIVAL_MODE || false;
+
+/**
+ * When Gitter hits a big news site, this setting disables
+ * the embedded chats on the home page, which helps with
+ * load
+ */
+var slashdotEffectSurvivalMode = survivalMode || !!process.env.SLASHDOT_EFFECT_SURVIVAL_MODE;
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
@@ -45,6 +55,7 @@ router.get(nconf.get('web:homeurl'),
 
     // when the viewer is not logged in:
     res.render('homepage', {
+      slashdotEffectSurvivalMode: slashdotEffectSurvivalMode,
       bootScriptName: 'homepage',
       cssFileName: 'styles/homepage.css',
       useOptimizely: locale === 'en',
@@ -56,7 +67,6 @@ router.get(nconf.get('web:homeurl'),
       fonts: fonts.getFonts(),
       hasCachedFonts: fonts.hasCachedFonts(req.cookies),
       socialMetadata: social.getMetadata(),
-      billingBaseUrl: nconf.get('web:billingBaseUrl')
     });
   });
 
@@ -111,8 +121,25 @@ router.get('/-/unawesome-browser',
 
 router.get('/about/early-bird',
   identifyRoute('earlybird'),
-  earlyBirdRenderer.renderEarlyBirdPage
+  function(req, res) {
+    res.relativeRedirect('/');
+  }
 );
+
+router.get('/about/gitlab/mailing-list',
+  ensureLoggedIn,
+  identifyRoute('gitlab-mailing-list'),
+  function(req, res) {
+    var user = req.user;
+
+    stats.event('gitlab_ml_opt_in', {
+      userId: user.id,
+      username: user.username
+    });
+
+    res.render('gitlab-mailing-list');
+  });
+
 
 // old campaign that still gets some hits
 router.get('/about/*',

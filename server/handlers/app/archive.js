@@ -270,7 +270,6 @@ exports.chatArchive = [
             var nextDateLink = n && '/' + uri + '/archives/' + n.format('YYYY/MM/DD');
             var monthYearFormatted = startDateLocale.format('MMM YYYY');
 
-            var billingUrl = env.config.get('web:billingBaseUrl') + '/bill/' + req.uriContext.uri.split('/')[0];
             var roomUrl = '/api/v1/rooms/' + troupe.id;
 
             var isPrivate = !securityDescriptorUtils.isPublic(troupe);
@@ -301,7 +300,6 @@ exports.chatArchive = [
               troupeContext: troupeContext,
               troupeName: req.uriContext.uri,
               chats: burstCalculator(serialized),
-              billingUrl: billingUrl,
               noindex: troupe.noindex,
               roomUrl: roomUrl,
               accessToken: req.accessToken,

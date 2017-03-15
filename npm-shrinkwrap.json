@@ -3,9 +3,9 @@
   "version": "13.4.0",
   "dependencies": {
     "@gitterhq/translations": {
-      "version": "1.3.0",
-      "from": "@gitterhq/translations@>=1.3.0 <2.0.0",
-      "resolved": "https://registry.npmjs.org/@gitterhq/translations/-/translations-1.3.0.tgz"
+      "version": "1.3.1",
+      "from": "@gitterhq/translations@>=1.3.1 <2.0.0",
+      "resolved": "https://registry.npmjs.org/@gitterhq/translations/-/translations-1.3.1.tgz"
     },
     "apn": {
       "version": "1.7.5",
@@ -1294,9 +1294,9 @@
       "resolved": "file:modules/client-env"
     },
     "gitter-env": {
-      "version": "0.28.2",
-      "from": "gitter-env@>=0.28.2 <0.29.0",
-      "resolved": "http://beta-internal.beta.gitter:4873/gitter-env/-/gitter-env-0.28.2.tgz",
+      "version": "0.28.4",
+      "from": "gitter-env@>=0.28.4 <0.29.0",
+      "resolved": "http://beta-internal.beta.gitter:4873/gitter-env/-/gitter-env-0.28.4.tgz",
       "dependencies": {
         "async": {
           "version": "0.8.0",

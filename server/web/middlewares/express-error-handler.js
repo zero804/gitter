@@ -9,7 +9,7 @@ function linkStack(stack) {
   if(!stack) return;
   return stack.split(/\n/).map(function(i) {
     return i.replace(/\(([^:]+):(\d+):(\d+)\)/, function(match, file, line, col) {
-      var ourCode = file.indexOf('node_modules') == -1;
+      var ourCode = file.indexOf('node_modules') === -1;
       var h = "(<a href='atm://open/?url=file://" + file + "&line=" + line + "&column=" + col + "'>" + file + ":" + line + ":" + col + "</a>)";
       if(ourCode) h = "<b>" + h + "</b>";
       return h;
@@ -19,7 +19,6 @@ function linkStack(stack) {
 
 function getTemplateForStatus(status) {
   switch(status) {
-    case 402:
     case 404:
       return '' + status;
 
@@ -52,20 +51,6 @@ module.exports = function(err, req, res, next) { // eslint-disable-line no-unuse
   var extraTemplateValues = {
     title: message
   };
-
-  if(status === 402) {
-    /* HTTP 402 = Payment required */
-    template = status.toString();
-
-    var room = err.uri;
-    var org = room.split('/')[0];
-
-    _.extend(extraTemplateValues, {
-      room: room,
-      org: org,
-      billingUrl: config.get('web:billingBaseUrl') + '/bill/' + err.uri,
-    });
-  }
 
   res.format({
     html: function() {

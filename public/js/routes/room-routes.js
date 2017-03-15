@@ -65,21 +65,9 @@ function createRoutes(options) {
     'add': function() {
       var dialogRegion = this.dialogRegion;
 
-      require.ensure(['../views/app/addPeopleView', '../views/modals/upgrade-to-pro-view'], function(require) {
-        var room = context.troupe();
-        var maxFreeMembers = clientEnv.maxFreeOrgRoomMembers;
-        var isOverLimit = room.get('security') !== 'PUBLIC' &&
-          room.get('githubType').indexOf('ORG') >= 0 &&
-          !room.get('premium') &&
-          room.get('userCount') >= maxFreeMembers;
-
-        if (isOverLimit) {
-          var GetProViewModal = require('../views/modals/upgrade-to-pro-view');
-          dialogRegion.show(new GetProViewModal({}));
-        } else {
-          var AddPeopleViewModal = require('../views/app/addPeopleView');
-          dialogRegion.show(new AddPeopleViewModal({}));
-        }
+      require.ensure(['../views/app/addPeopleView'], function(require) {
+        var AddPeopleViewModal = require('../views/app/addPeopleView');
+        dialogRegion.show(new AddPeopleViewModal({}));
       });
 
     },

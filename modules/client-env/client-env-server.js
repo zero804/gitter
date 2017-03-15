@@ -24,7 +24,6 @@ var troupeEnv = {
   mixpanelToken: config.get('stats:mixpanel:enabled') && config.get('stats:mixpanel:token'),
   googleTrackingId: config.get('stats:ga:key'),
   googleTrackingDomain: config.get('stats:ga:domain'),
-  goSquaredTrackingId: config.get('web:goSquaredId'),
   env: env,
   cdns: cdns,
   version: appVersion.getVersion(),
@@ -44,10 +43,13 @@ var troupeEnv = {
     basepath: config.get('embed:basepath'),
     cacheBuster: config.get('embed:cacheBuster')
   },
-  billingUrl: config.get('web:billingBaseUrl'),
-  maxFreeOrgRoomMembers: config.get('maxFreeOrgRoomMembers'),
   vapidAppServerKey: config.get('vapid:publicKey'),
-  stripeKey: config.get('stripe:publishableKey')
+  headlineNumbers: {
+    gitterUsers: config.get('headlineNumbers:gitterUsers'),
+    gitterRooms: config.get('headlineNumbers:gitterRooms'),
+    gitterGroups: config.get('headlineNumbers:gitterGroups'),
+    gitterCountries: config.get('headlineNumbers:gitterCountries'),
+  }
 };
 
 

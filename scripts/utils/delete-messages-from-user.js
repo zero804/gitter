@@ -84,32 +84,35 @@ var clearMessages = onMongoConnect()
       });
     });
 
-    return getExistentMesssages.then(function(messages) {
-      console.log('Working with', messages.length + '/' + messageIds.length);
+    return getExistentMesssages
+      .tap(function(messages) {
+        console.log('Working with', messages.length + '/' + messageIds.length);
 
-      var now = new Date();
-      var filename = 'messages-' + opts.username + '-bak-' + now.getFullYear() + '-' + now.getMonth() + '-' + now.getDate() + '--' + now.getTime() + '.json';
-      var saveLog = mkdir('gitter-delete-message-bak')
-        .then(function(dir) {
-          var filePath = path.join(dir, filename);
-          console.log('Saving log to:', filePath);
-          return outputFile(filePath, JSON.stringify(messages, null, 2));
+        var now = new Date();
+        var filename = 'messages-' + opts.username + '-bak-' + now.getFullYear() + '-' + now.getMonth() + '-' + now.getDate() + '--' + now.getTime() + '.json';
+        var saveLog = mkdir('gitter-delete-message-bak')
+          .then(function(dir) {
+            var filePath = path.join(dir, filename);
+            console.log('Saving log to:', filePath);
+            return outputFile(filePath, JSON.stringify(messages, null, 2));
+          });
+
+        return saveLog;
+      })
+      .then(function(messages) {
+        var clearMessages = messages.map(function(message) {
+          message.set({
+            text: '',
+            html: ''
+          });
+
+          if(!opts.dry) {
+            return message.save();
+          }
         });
 
-      var clearMessages = messages.map(function(message) {
-        message.set({
-          text: '',
-          html: ''
-        });
-
-        if(!opts.dry) {
-          return message.save();
-        }
+        return clearMessages;
       });
-
-      return Promise.all([saveLog, clearMessages]);
-    });
-    /* */
 
   });
 
