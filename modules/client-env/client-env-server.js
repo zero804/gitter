@@ -43,7 +43,13 @@ var troupeEnv = {
     basepath: config.get('embed:basepath'),
     cacheBuster: config.get('embed:cacheBuster')
   },
-  vapidAppServerKey: config.get('vapid:publicKey')
+  vapidAppServerKey: config.get('vapid:publicKey'),
+  headlineNumbers: {
+    gitterUsers: config.get('headlineNumbers:gitterUsers'),
+    gitterRooms: config.get('headlineNumbers:gitterRooms'),
+    gitterGroups: config.get('headlineNumbers:gitterGroups'),
+    gitterCountries: config.get('headlineNumbers:gitterCountries'),
+  }
 };
 
 
