@@ -148,6 +148,7 @@
             </a>
           </h1>
 
+          {{#unless slashdotEffectSurvivalMode}}
           <div class="communities">
             <nav class="communities-tabs">
               <a class="active" data-tab-index="0">
@@ -183,6 +184,8 @@
               <iframe id="embedded-chat" src="/gitterHQ/gitter/~embed"></iframe>
             </div>
           </div>
+          {{/unless}}
+
         </div>
       </section>
 

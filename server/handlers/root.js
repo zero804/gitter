@@ -12,6 +12,15 @@ var loginUtils = require('../web/login-utils');
 var social = require('./social-metadata');
 var fonts = require('../web/fonts');
 
+var survivalMode = !!process.env.SURVIVAL_MODE || false;
+
+/**
+ * When Gitter hits a big news site, this setting disables
+ * the embedded chats on the home page, which helps with
+ * load
+ */
+var slashdotEffectSurvivalMode = survivalMode || !!process.env.SLASHDOT_EFFECT_SURVIVAL_MODE;
+
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
 router.get(nconf.get('web:homeurl'),
@@ -46,6 +55,7 @@ router.get(nconf.get('web:homeurl'),
 
     // when the viewer is not logged in:
     res.render('homepage', {
+      slashdotEffectSurvivalMode: slashdotEffectSurvivalMode,
       bootScriptName: 'homepage',
       cssFileName: 'styles/homepage.css',
       useOptimizely: locale === 'en',
