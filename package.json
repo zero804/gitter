@@ -6,6 +6,7 @@
     "@gitterhq/translations": "^1.3.1",
     "apn": "1.7.5",
     "async": "~0.9.0",
+    "backbone": "1.2.3",
     "batch-stream": "^0.1.2",
     "bluebird": "^3.2.1",
     "body-parser": "^1.13.2",
@@ -35,7 +36,7 @@
     "gitter-env": "^0.28.4",
     "gitter-faye": "^1.1.0-e",
     "gitter-faye-redis": "^0.4.4",
-    "gitter-markdown-processor": "^11.2.0",
+    "gitter-markdown-processor": "^11.3.0",
     "gitter-passport-github": "^0.1.8-f",
     "gitter-passport-http-bearer": "^1.1.2",
     "gitter-passport-oauth2": "^1.1.2-b",
@@ -167,7 +168,6 @@
     "useragent": "2.0.6",
     "web-push": "^3.1.0",
     "xregexp": "^2.0.0",
-    "backbone": "1.2.3",
     "yargs": "^4.2.0"
   },
   "devDependencies": {
