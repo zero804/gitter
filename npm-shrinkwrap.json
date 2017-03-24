@@ -2071,7 +2071,7 @@
       }
     },
     "gitter-markdown-processor": {
-      "version": "11.2.0",
+      "version": "11.3.0",
       "from": "gitter-markdown-processor@>=11.2.0 <12.0.0",
       "resolved": "http://beta-internal.beta.gitter:4873/gitter-markdown-processor/-/gitter-markdown-processor-11.2.0.tgz",
       "dependencies": {

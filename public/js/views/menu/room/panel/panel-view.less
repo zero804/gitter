@@ -1,13 +1,15 @@
 @import "../../../../../less/colors";
 
 .room-menu__panel {
-  box-sizing:       border-box;
-  position:         absolute;
-  top:              0;
-  left:             0;
-  height:           100%;
-  padding-left:     100%;
-  border-right:     1px solid @menu-border-color;
+  box-sizing: border-box;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding-left: 100%;
+  border-right: 1px solid @menu-border-color;
   background-color: @main-application-bg-color;
 
   //TODO Check how this works on other monitor sizes
@@ -30,16 +32,15 @@
 
   .mobile & {
     width: @menu-panel-mobile-width;
-    padding-bottom: @mobile-header-height;
   }
 
   .desktop & {
     width: @menu-panel-desktop-width;
-    padding-bottom: @desktop-header-height;
   }
 }
 
 .room-menu__panel-inner {
+  flex: 1;
   width: 100%;
   height: 100%;
 
