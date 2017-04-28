@@ -69,7 +69,7 @@ var webpackConfig = {
     loaders: [
       {
         test: /\.hbs$/,
-        loader: '@gitter/handlebars-loader', // disable minify for now + path.resolve(path.join(__dirname, "../../build-scripts/html-min-loader"))
+        loader: '@gitterhq/handlebars-loader', // disable minify for now + path.resolve(path.join(__dirname, "../../build-scripts/html-min-loader"))
         query: {
           helperDirs: [
             path.dirname(require.resolve('gitter-web-templates/shared/helpers/pluralize'))
