@@ -15,7 +15,7 @@ var autoModelSave = require('../../utils/auto-model-save');
 var apiClient = require('../../components/api-client');
 var frameUtils = require('gitter-web-frame-utils');
 
-require('gitter-styleguide/css/components/dropdowns.css');
+require('@gitterhq/styleguide/css/components/dropdowns.css');
 
 function getProfileCollection() {
 

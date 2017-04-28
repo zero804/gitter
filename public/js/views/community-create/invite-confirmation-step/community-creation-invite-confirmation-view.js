@@ -6,8 +6,8 @@ var template = require('./community-creation-invite-confirmation-view.hbs');
 var CommunityCreateBaseStepView = require('../shared/community-creation-base-step-view');
 var ExpandedPeopleListView = require('../shared/community-creation-expanded-people-list-view');
 
-require('gitter-styleguide/css/components/headings.css');
-require('gitter-styleguide/css/components/buttons.css');
+require('@gitterhq/styleguide/css/components/headings.css');
+require('@gitterhq/styleguide/css/components/buttons.css');
 
 
 var _super = CommunityCreateBaseStepView.prototype;

@@ -10,8 +10,8 @@ var UserResultListView = require('../shared/community-create-invite-user-result-
 var UserResultCollection = require('../shared/community-create-user-result-collection');
 var avatars = require('gitter-web-avatars');
 
-require('gitter-styleguide/css/components/headings.css');
-require('gitter-styleguide/css/components/buttons.css');
+require('@gitterhq/styleguide/css/components/headings.css');
+require('@gitterhq/styleguide/css/components/buttons.css');
 
 var _super = CommunityCreateBaseStepView.prototype;
 

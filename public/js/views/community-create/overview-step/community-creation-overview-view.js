@@ -9,8 +9,8 @@ var CommunityCreateBaseStepView = require('../shared/community-creation-base-ste
 var InviteListView = require('../shared/community-creation-people-list-view');
 var apiClient = require('../../../components/api-client');
 
-require('gitter-styleguide/css/components/headings.css');
-require('gitter-styleguide/css/components/buttons.css');
+require('@gitterhq/styleguide/css/components/headings.css');
+require('@gitterhq/styleguide/css/components/buttons.css');
 
 
 var _super = CommunityCreateBaseStepView.prototype;

@@ -1,6 +1,6 @@
 "use strict";
 
-var gitterEnv = require('gitter-env');
+var gitterEnv = require('@gitterhq/env');
 var path = require('path');
 
 var configPath = path.join(__dirname, '..', '..', '..', 'config');

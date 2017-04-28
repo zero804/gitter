@@ -2,7 +2,7 @@
 
 var path = require('path');
 var ExtractTextPlugin = require("extract-text-webpack-plugin");//eslint-disable-line node/no-unpublished-require
-var getPostcssStack = require('gitter-styleguide/postcss-stack');//eslint-disable-line node/no-unpublished-require
+var getPostcssStack = require('@gitterhq/styleguide/postcss-stack');//eslint-disable-line node/no-unpublished-require
 
 var config = {
   devtool: 'eval',

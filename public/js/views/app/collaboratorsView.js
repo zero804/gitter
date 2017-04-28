@@ -11,8 +11,8 @@ var emptyViewTemplate = require('./tmpl/collaboratorsEmptyView.hbs');
 var appEvents = require('../../utils/appevents');
 var collaboratorsModels = require('../../collections/collaborators');
 
-require('gitter-styleguide/css/components/buttons.css');
-require('gitter-styleguide/css/components/links.css');
+require('@gitterhq/styleguide/css/components/buttons.css');
+require('@gitterhq/styleguide/css/components/links.css');
 
 module.exports = (function() {
 

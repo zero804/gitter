@@ -11,8 +11,8 @@ var slugAvailabilityStatusConstants = require('../slug-availability-status-const
 var template = require('./community-creation-main-view.hbs');
 var CommunityCreateBaseStepView = require('../shared/community-creation-base-step-view');
 
-require('gitter-styleguide/css/components/headings.css');
-require('gitter-styleguide/css/components/buttons.css');
+require('@gitterhq/styleguide/css/components/headings.css');
+require('@gitterhq/styleguide/css/components/buttons.css');
 
 /**
  * Map validation keys to UI fields

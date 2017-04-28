@@ -25,7 +25,7 @@ var apiClient = require('../../../components/api-client');
 
 require('nanoscroller');
 
-require('gitter-styleguide/css/components/buttons.css');
+require('@gitterhq/styleguide/css/components/buttons.css');
 
 var SUGGESTED_ROOMS_THRESHOLD = 10; // non inclusive
 
