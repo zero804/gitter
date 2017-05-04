@@ -18,7 +18,7 @@ var github = require('./auth-providers/github');
 var google = require('./auth-providers/google');
 var twitter = require('./auth-providers/twitter');
 var linkedin = require('./auth-providers/linkedin');
-
+var validatedMessage = require('../web/validated-message')
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
@@ -51,11 +51,15 @@ router.get('/upgrade-failed',
     res.render('upgrade-failed');
   });
 
+
 router.get('/failed',
   identifyRoute('login-failed'),
   function(req, res) {
+
+    var message = validatedMessage.validate(req.query.message, req.query.check, "An error occurred. Please try again");
+
     res.render('login-failed', {
-      message: req.query.message
+      message: message
     });
   });
 

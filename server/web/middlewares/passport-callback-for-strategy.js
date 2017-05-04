@@ -7,6 +7,7 @@ var errorReporter = env.errorReporter;
 var passport = require('passport');
 var client = require("../../utils/redis").getClient();
 var lock = require("redis-lock")(client);
+var validatedMessage = require('../validated-message');
 
 module.exports = function passportCallbackForStrategy(strategy, options) {
   var handler = passport.authorize(strategy, options);
@@ -27,7 +28,7 @@ module.exports = function passportCallbackForStrategy(strategy, options) {
             errorOptions[strategy+'CallbackFailed'] = 'failed';
             errorReporter(err, errorOptions, { module: 'login-handler' });
 
-            if (strategy.indexOf('upgrade') != -1) {
+            if (strategy.indexOf('upgrade') >= 0) {
               res.redirect('/login/upgrade-failed');
             } else {
               /* For some reason, the user is now logged in, just continue as normal */
@@ -42,7 +43,8 @@ module.exports = function passportCallbackForStrategy(strategy, options) {
               }
 
               if (err.message) {
-                res.redirect('/login/failed?message=' + encodeURIComponent(err.message));
+                var check = validatedMessage.getCheck(err.message);
+                res.redirect('/login/failed?message=' + encodeURIComponent(err.message) + '&check=' + encodeURIComponent(check));
               } else {
                 res.redirect('/login/failed');
               }
