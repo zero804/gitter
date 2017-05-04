@@ -8,7 +8,7 @@
   <h2>{{displayName}}</h2>
 
   {{#if profile}}
-    <h3><a href="{{profile}}" target="_blank">{{username}}</a></h3>
+    <h3><a href="{{profile}}" target="_blank" rel="nofollow noopener noreferrer">{{username}}</a></h3>
   {{else}}
     <h3>{{username}}</h3>
   {{/if}}
@@ -57,7 +57,7 @@
         <div class='trpUserDetails__icon'>
           <i class='octicon octicon-link'></i>
         </div>
-        <div class="trpUserDetails__text"><a target="_blank" href="{{website}}" class="url" rel="nofollow me">{{ website }}</a></div>
+        <div class="trpUserDetails__text"><a target="_blank" href="{{website}}" class="url" rel="nofollow noreferrer noopener me">{{ website }}</a></div>
       </li>
     {{/if}}
   </ul>
