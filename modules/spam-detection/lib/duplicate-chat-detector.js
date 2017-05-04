@@ -12,7 +12,7 @@ var redisClient = env.ioredis.createClient(config.get('redis_nopersist'), {
   keyPrefix: "spam:"
 });
 
-var TTL = 86400;
+var TTL = 12 * 60 * 60;
 
 function defineCommand(name, script, keys) {
   redisClient.defineCommand(name, {
@@ -27,8 +27,8 @@ function getWarnAndBanThresholds(text) {
   // This should catch emojis etc
   if (text.length < 10) {
     return {
-      warn: 40,
-      ban: 50
+      warn: 80,
+      ban: 100
     };
   }
 

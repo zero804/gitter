@@ -30,6 +30,10 @@ require('./workers').listen();
 
 app.use('/', require('./api/'));
 
+if (!process.env.DISABLE_API_ERROR_HANDLER) {
+  app.use(env.middlewares.errorHandler);
+}
+
 if (!process.env.DISABLE_API_LISTEN) {
   onMongoConnect(function() {
     serverStats('api', server);

@@ -29,9 +29,9 @@ describe("email-address-service #github", function() {
     it('should return a public email address from profile with attemptDiscovery', function() {
       var service = require('../lib/github-email-address-service');
 
-      return service({ username: 'gitter-badger' }, { attemptDiscovery: true })
+      return service({ username: 'gittertestbot' }, { attemptDiscovery: true })
         .then(function (email) {
-          assert.strictEqual(email, 'badger@gitter.im');
+          assert.strictEqual(email, 'gittertestbot@datatribe.net');
         });
     });
 
