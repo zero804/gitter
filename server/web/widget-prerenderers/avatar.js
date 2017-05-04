@@ -2,14 +2,14 @@
 
 var resolveUserAvatarSrcSet = require('gitter-web-shared/avatars/resolve-user-avatar-srcset');
 
-function prerenderAvatar(template) {
+module.exports = exports = function(template) {
   return function avatarWidgetHandler(params) {
     var hash = params.hash;
     var user = hash.model || hash.user || {};
 
     var avatarSize = hash.avatarSize || 's';
     var showStatus = hash.showStatus;
-    var imgSize = avatarSize === 'm' ? 64 : 30;
+    var imgSize = avatarSize == 'm' ? 64 : 30;
     var avatarSrcSet = resolveUserAvatarSrcSet(user, imgSize);
 
     var r = template({
@@ -20,12 +20,9 @@ function prerenderAvatar(template) {
       role: user.role,
       showStatus: showStatus,
       presenceClass: user.online ? 'online' : 'offline',
-      inactive: user.invited,
-      supporter: user.supporter
+      inactive: user.invited
     });
 
     return r;
   };
-}
-
-module.exports = prerenderAvatar;
+};
