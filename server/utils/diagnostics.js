@@ -7,8 +7,6 @@ var path = require('path');
 var util = require('util');
 var os = require('os');
 
-if (nconf.get('newrelic:enabled')) require('newrelic');
-
 function getProcessIdentifier() {
   var upstartJob = process.env.UPSTART_JOB || process.env.JOB;
   if (upstartJob) return upstartJob;
