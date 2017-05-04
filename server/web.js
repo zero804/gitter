@@ -36,6 +36,10 @@ if (nconf.get("web:startApiInPrimaryApp")) {
 app.use('/api_web', require('./api-web/'));
 app.use('/', require('./handlers/'));
 
+// Final error handlers
+app.use(env.middlewares.errorReporter);
+app.use(require('./web/middlewares/express-error-handler'));
+
 require('./workers').listen();
 
 var port = nconf.get("PORT");
