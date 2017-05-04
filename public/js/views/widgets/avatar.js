@@ -183,8 +183,7 @@ module.exports = (function() {
       role: user.role,
       invited: user.invited,
       removed: user.removed,
-      inactive: user.removed || user.invited,
-      supporter: user.supporter
+      inactive: user.removed || user.invited
     };
   }
 

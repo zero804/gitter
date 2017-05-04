@@ -134,8 +134,7 @@ module.exports = Marionette.CompositeView.extend({
     var user = context.user();
     return _.extend({}, data, {
       avatarUrl: user.get('avatarUrl'),
-      username: user.get('username'),
-      supporter: user.get('supporter')
+      username: user.get('username')
     });
   },
 
