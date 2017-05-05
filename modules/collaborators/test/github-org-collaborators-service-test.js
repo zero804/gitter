@@ -8,7 +8,7 @@ describe('gitter-org-collaborators-service-test #github', function() {
 
   describe('integration #slow', function() {
 
-    fixtureLoader.ensureIntegrationEnvironment('integrationTests:org1:org_name', 'integrationTests:test_user:username');
+    fixtureLoader.ensureIntegrationEnvironment('GITTER_INTEGRATION_ORG', '#integrationUser1');
 
     var fixture = fixtureLoader.setup({
       user1: '#integrationUser1',

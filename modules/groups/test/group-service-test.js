@@ -32,6 +32,7 @@ describe('group-service', function() {
   describe('integration tests #slow', function() {
 
     describe('createGroup', function() {
+
       var fixture = fixtureLoader.setup({
         deleteDocuments: {
           Group: [

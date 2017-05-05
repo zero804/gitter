@@ -11,24 +11,46 @@ var integrationFixtures = require('./integration-fixtures');
 
 var userCounter = 0;
 
+function getIntegrationConfig(f) {
+  if (f === '#integrationUser1') {
+    return {
+        doc: {
+          username: integrationFixtures.fixtures.GITTER_INTEGRATION_USERNAME,
+          githubToken: integrationFixtures.fixtures.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
+          accessToken: 'web-internal'
+        },
+        deleteQuery: {
+           username: integrationFixtures.fixtures.GITTER_INTEGRATION_USERNAME
+        }
+      }
+  }
+
+  if (f === '#integrationCollabUser1') {
+    return {
+        doc: {
+          username: integrationFixtures.fixtures.GITTER_INTEGRATION_COLLAB_USERNAME,
+          githubToken: integrationFixtures.fixtures.GITTER_INTEGRATION_COLLAB_USER_SCOPE_TOKEN,
+          accessToken: 'web-internal'
+        },
+        deleteQuery: {
+           username: integrationFixtures.GITTER_INTEGRATION_COLLAB_USERNAME
+        }
+      }
+  }
+
+
+}
 function createUser(fixtureName, f) {
   debug('Creating %s', fixtureName);
 
   var preremove = null;
 
-  if (f === '#integrationUser1') {
-    var integrationUsername = integrationFixtures.GITTER_INTEGRATION_USERNAME;
-    var githubToken = integrationFixtures.GITTER_INTEGRATION_USER_SCOPE_TOKEN;
-
-    f = {
-      githubToken: githubToken,
-      accessToken: 'web-internal'
-    }
-
-    if (integrationUsername) {
-      f.username = integrationFixtures.GITTER_INTEGRATION_USERNAME;
+  var integrationConfig = getIntegrationConfig(f);
+  if (integrationConfig) {
+    f = integrationConfig.doc;
+    if (integrationConfig.deleteQuery) {
       preremove = function() {
-        return User.remove({ username: integrationFixtures.GITTER_INTEGRATION_USERNAME });
+        return User.remove(integrationConfig.deleteQuery);
       }
     }
   }

@@ -8,6 +8,7 @@ describe('legacy-group-policy-evaluator', function() {
 
   describe('#slow', function() {
     fixtureLoader.disableMongoTableScans();
+    fixtureLoader.ensureIntegrationEnvironment('GITTER_INTEGRATION_ORG');
 
     function expect(GithubOrgPolicyEvaluator, user, uri, expected) {
       var evaluator = new GithubOrgPolicyEvaluator(user, uri);

@@ -10,7 +10,11 @@ var groupService = require('gitter-web-groups/lib/group-service');
 describe('user-repos #slow', function() {
   var app, request;
 
-  fixtureLoader.ensureIntegrationEnvironment('integrationTests:repo1:repo_name');
+  fixtureLoader.ensureIntegrationEnvironment(
+    '#integrationUser1',
+    '#integrationCollabUser1',
+    'GITTER_INTEGRATION_REPO_FULL',
+    'GITTER_INTEGRATION_REPO_WITH_COLLAB_ONLY_READ');
 
   before(function() {
     request = require("supertest-as-promised")(Promise);
@@ -29,11 +33,7 @@ describe('user-repos #slow', function() {
       ]
     },
     user1: '#integrationUser1',
-    user2: {
-      githubToken: fixtureLoader.GITTER_INTEGRATION_COLLAB_USER_SCOPE_TOKEN,
-      username: fixtureLoader.GITTER_INTEGRATION_COLLAB_USERNAME,
-      accessToken: 'web-internal'
-    }
+    user2: '#integrationCollabUser1'
   });
 
   it('GET /v1/user/:userId/repos', function() {

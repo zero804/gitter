@@ -8,7 +8,7 @@ describe('github-repo-collaborators-service-test #github', function() {
 
   describe('integration #slow', function() {
 
-    fixtureLoader.ensureIntegrationEnvironment('integrationTests:test_user:username');
+    fixtureLoader.ensureIntegrationEnvironment('#integrationUser1');
 
     var fixture = fixtureLoader.setup({
       user1: '#integrationUser1'

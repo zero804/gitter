@@ -1,7 +1,6 @@
 "use strict";
 
 var env = require('gitter-web-env');
-var config = env.config;
 var logger = env.logger;
 var Promise = require('bluebird');
 var debug = require('debug')('gitter:tests:test-fixtures');
@@ -69,14 +68,14 @@ function createExpectedFixtures(expected) {
 
 function fixtureLoaderManual(fixture, expected) {
   debug("Creating fixtures %j", expected);
-  return function(done) {
+  return function() {
+    if (this && this._skipFixtureSetup) return;
     return createExpectedFixtures(expected)
       .then(function(data) {
          Object.keys(data).forEach(function(key) {
           fixture[key] = data[key];
          });
-       })
-       .asCallback(done);
+       });
    };
 }
 
@@ -97,13 +96,10 @@ fixtureLoader.setup = function(expected) {
 };
 
 fixtureLoader.ensureIntegrationEnvironment = function() {
-    var requiredKeys = Array.prototype.slice.call(arguments);
+    var requiredConfigs = Array.prototype.slice.call(arguments);
 
     before(function() {
-
-      var missing = requiredKeys.filter(function(key) {
-        return !config.get(key);
-      });
+      var missing = integrationFixtures.checkConfigSet(requiredConfigs);
 
       if (!missing.length) {
         // No keys missing, continue with the test
@@ -116,6 +112,7 @@ fixtureLoader.ensureIntegrationEnvironment = function() {
       } else {
         logger.warn('Skipping this test due to missing config items', missing.join(', '))
         // Just skip these tests
+        this._skipFixtureSetup = true;
         this.skip();
       }
     });
@@ -148,6 +145,7 @@ fixtureLoader.disableMongoTableScans = function() {
   });
 
 };
+
 fixtureLoader.createExpectedFixtures = createExpectedFixtures;
 
 // TODO: deprecate these, use them from fixtureUtils
@@ -155,32 +153,7 @@ fixtureLoader.generateEmail = fixtureUtils.generateEmail;
 fixtureLoader.generateGithubId = fixtureUtils.generateGithubId;
 fixtureLoader.generateUri = fixtureUtils.generateUri;
 
-_.extend(fixtureLoader, integrationFixtures);
-
-fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN = config.get('integrationTests:test_user:user_scope_token') || '';
-fixtureLoader.GITTER_INTEGRATION_USERNAME = config.get('integrationTests:test_user:username') || '';
-fixtureLoader.GITTER_INTEGRATION_USER_ID = config.get('integrationTests:test_user:user_id') || '';
-
-fixtureLoader.GITTER_INTEGRATION_COLLAB_USER_SCOPE_TOKEN = config.get('integrationTests:collab_user:user_scope_token') || '';
-fixtureLoader.GITTER_INTEGRATION_COLLAB_USERNAME = config.get('integrationTests:collab_user:username') || '';
-fixtureLoader.GITTER_INTEGRATION_COLLAB_USER_ID = config.get('integrationTests:collab_user:user_id') || '';
-
-fixtureLoader.GITTER_INTEGRATION_ORG = config.get('integrationTests:org1:org_name') || '';
-fixtureLoader.GITTER_INTEGRATION_ORG_ID = config.get('integrationTests:org1:org_id') || '';
-fixtureLoader.GITTER_INTEGRATION_REPO = config.get('integrationTests:repo1:repo_name') || '';
-fixtureLoader.GITTER_INTEGRATION_REPO_FULL = fixtureLoader.GITTER_INTEGRATION_USERNAME + '/' + fixtureLoader.GITTER_INTEGRATION_REPO;
-fixtureLoader.GITTER_INTEGRATION_REPO_ID = config.get('integrationTests:repo1:repo_id') || '';
-
-fixtureLoader.GITTER_INTEGRATION_REPO2 = config.get('integrationTests:repo2:repo_name') || '';
-fixtureLoader.GITTER_INTEGRATION_REPO2_FULL = fixtureLoader.GITTER_INTEGRATION_USERNAME + '/' + fixtureLoader.GITTER_INTEGRATION_REPO2;
-fixtureLoader.GITTER_INTEGRATION_REPO2_ID = config.get('integrationTests:repo2:repo_id') || '';
-
-fixtureLoader.GITTER_INTEGRATION_COMMUNITY = '_I-heart-cats-Test-LOL';
-fixtureLoader.GITTER_INTEGRATION_ROOM = 'all-about-kitty-litter';
-
-fixtureLoader.GITTER_INTEGRATION_REPO_WITH_COLLAB = config.get('integrationTests:collabRepos:repo1') || '';
-fixtureLoader.GITTER_INTEGRATION_REPO_WITH_COLLAB2 = config.get('integrationTests:collabRepos:repo2') || '';
-fixtureLoader.GITTER_INTEGRATION_REPO_WITH_COLLAB_ONLY_READ = config.get('integrationTests:collabRepos:repoReadOnly') || '';
-
+// TODO: remove this legacy code...
+_.extend(fixtureLoader, integrationFixtures.fixtures);
 
 module.exports = fixtureLoader;
