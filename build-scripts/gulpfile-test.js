@@ -204,7 +204,7 @@ Object.keys(testModules).forEach(function(moduleName) {
     return spawnMochaProcess(moduleName, definition.options, definition.files)
       .catch(function(err) {
         if (bail) {
-          throw err;
+          throw new Error('Test module ' + moduleName + ' failed. ' + err);
         }
 
         testingErrors.push(err);
