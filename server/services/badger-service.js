@@ -45,7 +45,7 @@ function Client(token) {
     };
   });
 }
-var client = new Client('***REMOVED***');
+var client = new Client(conf.get('badger:githubToken'));
 
 function findReadme(tree, path) {
   if(!path) path = 'README.md';
