@@ -10,8 +10,17 @@ var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var groupService = require('gitter-web-groups/lib/group-service');
 
 
+describe('transloadit-api-tests', function() {
+
 describe('transloadit-api-tests #slow', function() {
   var app, request;
+
+
+  fixtureLoader.ensureIntegrationEnvironment(
+      'transloadit:avatars:bucket',
+      'transloadit:template_avatar_id',
+      'transloadit:template_image_id',
+      'transloadit:template_id');
 
   before(function() {
     request = require("supertest-as-promised")(Promise);
@@ -19,18 +28,10 @@ describe('transloadit-api-tests #slow', function() {
   });
 
   var fixture = fixtureLoader.setup({
-    deleteDocuments: {
-      User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }],
-      Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() }],
-      Troupe: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() + '/lobby' }]
-    },
     user1: {
-      githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
-      username: fixtureLoader.GITTER_INTEGRATION_USERNAME,
       accessToken: 'web-internal'
     },
     group1: {
-      uri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY,
       securityDescriptor: {
         extraAdmins: ['user1']
       }
@@ -118,4 +119,6 @@ describe('transloadit-api-tests #slow', function() {
         assert.strictEqual(params.steps.export_thumbs.path, thumbsPath);
       });
   });
+});
+
 });

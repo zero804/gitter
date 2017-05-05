@@ -1,5 +1,8 @@
 "use strict";
 
+var env = require('gitter-web-env');
+var config = env.config;
+var logger = env.logger;
 var Promise = require('bluebird');
 var debug = require('debug')('gitter:tests:test-fixtures');
 var fixtureUtils = require('./fixture-utils');
@@ -88,6 +91,32 @@ fixtureLoader.setup = function(expected) {
   return fixture;
 };
 
+fixtureLoader.ensureIntegrationEnvironment = function() {
+    var requiredKeys = Array.prototype.slice.call(arguments);
+
+    before(function() {
+
+      var missing = requiredKeys.filter(function(key) {
+        return !config.get(key);
+      });
+
+      if (!missing.length) {
+        // No keys missing, continue with the test
+        return;
+      }
+
+      // Do we throw an error on missing configuration?
+      if (process.env.GITTER_FORCE_INTEGRATION_TESTS) {
+        throw new Error('Configuration required for test is missing: ' + missing.join(', '));
+      } else {
+        logger.warn('Skipping this test due to missing config items', missing.join(', '))
+        // Just skip these tests
+        this.skip();
+      }
+    });
+
+}
+
 fixtureLoader.disableMongoTableScans = function() {
   var mongoTableScans = require('./mongo-table-scans');
   var didDisable;
@@ -121,28 +150,31 @@ fixtureLoader.generateEmail = fixtureUtils.generateEmail;
 fixtureLoader.generateGithubId = fixtureUtils.generateGithubId;
 fixtureLoader.generateUri = fixtureUtils.generateUri;
 
-fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN = '***REMOVED***';
-fixtureLoader.GITTER_INTEGRATION_USERNAME = 'gitter-integration-tests';
-fixtureLoader.GITTER_INTEGRATION_USER_ID = '19433197';
 
-fixtureLoader.GITTER_INTEGRATION_COLLAB_USER_SCOPE_TOKEN = '***REMOVED***';
-fixtureLoader.GITTER_INTEGRATION_COLLAB_USERNAME = 'gitter-integration-tests-collaborator';
-fixtureLoader.GITTER_INTEGRATION_COLLAB_USER_ID = '20068982';
+fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN = config.get('integrationTests:test_user:user_scope_token');
+fixtureLoader.GITTER_INTEGRATION_USERNAME = config.get('integrationTests:test_user:username');
+fixtureLoader.GITTER_INTEGRATION_USER_ID = config.get('integrationTests:test_user:user_id');
 
-fixtureLoader.GITTER_INTEGRATION_ORG = 'gitter-integration-tests-organisation';
-fixtureLoader.GITTER_INTEGRATION_ORG_ID = '19433202';
-fixtureLoader.GITTER_INTEGRATION_REPO = 'public-repo-1';
+fixtureLoader.GITTER_INTEGRATION_COLLAB_USER_SCOPE_TOKEN = config.get('integrationTests:collab_user:user_scope_token');
+fixtureLoader.GITTER_INTEGRATION_COLLAB_USERNAME = config.get('integrationTests:collab_user:username');
+fixtureLoader.GITTER_INTEGRATION_COLLAB_USER_ID = config.get('integrationTests:collab_user:user_id');
+
+fixtureLoader.GITTER_INTEGRATION_ORG = config.get('integrationTests:org1:org_name');
+fixtureLoader.GITTER_INTEGRATION_ORG_ID = config.get('integrationTests:org1:org_id');
+fixtureLoader.GITTER_INTEGRATION_REPO = config.get('integrationTests:repo1:repo_name');
 fixtureLoader.GITTER_INTEGRATION_REPO_FULL = fixtureLoader.GITTER_INTEGRATION_USERNAME + '/' + fixtureLoader.GITTER_INTEGRATION_REPO;
-fixtureLoader.GITTER_INTEGRATION_REPO_ID = '59505414';
-fixtureLoader.GITTER_INTEGRATION_REPO2 = 'public-repo-2';
+fixtureLoader.GITTER_INTEGRATION_REPO_ID = config.get('integrationTests:repo1:repo_id');
+
+fixtureLoader.GITTER_INTEGRATION_REPO2 = config.get('integrationTests:repo2:repo_name');
 fixtureLoader.GITTER_INTEGRATION_REPO2_FULL = fixtureLoader.GITTER_INTEGRATION_USERNAME + '/' + fixtureLoader.GITTER_INTEGRATION_REPO2;
-fixtureLoader.GITTER_INTEGRATION_REPO2_ID = '62724563';
+fixtureLoader.GITTER_INTEGRATION_REPO2_ID = config.get('integrationTests:repo2:repo_id');
+
 fixtureLoader.GITTER_INTEGRATION_COMMUNITY = '_I-heart-cats-Test-LOL';
 fixtureLoader.GITTER_INTEGRATION_ROOM = 'all-about-kitty-litter';
 
-fixtureLoader.GITTER_INTEGRATION_REPO_WITH_COLLAB = 'gitter-integration-tests-organisation/gitter-integration-tests-organisation-repo-1';
-fixtureLoader.GITTER_INTEGRATION_REPO_WITH_COLLAB2 = 'gitter-integration-tests-organisation/gitter-integration-tests-organisation-repo-2';
-fixtureLoader.GITTER_INTEGRATION_REPO_WITH_COLLAB_ONLY_READ = 'gitter-integration-tests-organisation/gitter-integration-tests-organisation-collaborator-read';
+fixtureLoader.GITTER_INTEGRATION_REPO_WITH_COLLAB = config.get('integrationTests:collabRepos:repo1');
+fixtureLoader.GITTER_INTEGRATION_REPO_WITH_COLLAB2 = config.get('integrationTests:collabRepos:repo2');
+fixtureLoader.GITTER_INTEGRATION_REPO_WITH_COLLAB_ONLY_READ = config.get('integrationTests:collabRepos:repoReadOnly');
 
 
 module.exports = fixtureLoader;
