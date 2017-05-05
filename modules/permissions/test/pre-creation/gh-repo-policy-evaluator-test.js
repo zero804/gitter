@@ -45,16 +45,9 @@ describe('gh-repo-policy-evaluator', function() {
         deleteDocuments: {
           User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }]
         },
-        user1: {
-          username: fixtureLoader.GITTER_INTEGRATION_USERNAME,
-          githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN
-        },
+        user1: '#integrationUser1',
         user2: {},
         user3: {},
-        // group1: {
-        //   uri: fixtureLoader.GITTER_INTEGRATION_ORG,
-        //   type: 'ORG'
-        // }
       });
 
       it('should deal with repo members', function() {

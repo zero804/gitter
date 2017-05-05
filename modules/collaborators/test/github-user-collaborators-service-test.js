@@ -5,17 +5,10 @@ var GitHubUserCollaboratorService = require('../lib/github-user-collaborator-ser
 var assert = require('assert');
 
 describe('gitter-user-collaborators-service-test #github', function() {
+
   describe('integration #slow', function() {
     var fixture = fixtureLoader.setup({
-      deleteDocuments: {
-        User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }],
-        Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() }],
-      },
-      user1: {
-        githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
-        username: fixtureLoader.GITTER_INTEGRATION_USERNAME,
-        accessToken: 'web-internal'
-      },
+      user1: '#integrationUser1'
     });
 
     it('should return user collabators', function() {

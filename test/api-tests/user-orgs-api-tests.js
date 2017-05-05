@@ -19,9 +19,6 @@ describe('user-orgs #slow', function() {
 
   var fixture = fixtureLoader.setup({
     deleteDocuments: {
-      User: [
-        { username: fixtureLoader.GITTER_INTEGRATION_USERNAME }
-      ],
       Group: [
         { 'sd.linkPath': fixtureLoader.GITTER_INTEGRATION_ORG },
         { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() }
@@ -31,11 +28,7 @@ describe('user-orgs #slow', function() {
         { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() + '/lobby' }
       ]
     },
-    user1: {
-      githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
-      username: fixtureLoader.GITTER_INTEGRATION_USERNAME,
-      accessToken: 'web-internal'
-    }
+    user1: '#integrationUser1'
   });
 
   it('GET /v1/user/:userId/orgs', function() {

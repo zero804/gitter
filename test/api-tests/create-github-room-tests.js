@@ -19,8 +19,6 @@ describe('create-github-room-api', function() {
   var fixture = fixtureLoader.setup({
     deleteDocuments: {
       User: [{
-        username: fixtureLoader.GITTER_INTEGRATION_USERNAME
-      }, {
         username: fixtureLoader.GITTER_INTEGRATION_COLLAB_USERNAME
       }],
       Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() }],
@@ -29,11 +27,7 @@ describe('create-github-room-api', function() {
         { lcUri: fixtureLoader.GITTER_INTEGRATION_REPO_WITH_COLLAB.toLowerCase() }
       ]
     },
-    user1: {
-      githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
-      username: fixtureLoader.GITTER_INTEGRATION_USERNAME,
-      accessToken: 'web-internal'
-    },
+    user1: '#integrationUser1',
     user2: {
       githubToken: fixtureLoader.GITTER_INTEGRATION_COLLAB_USER_SCOPE_TOKEN,
       username: fixtureLoader.GITTER_INTEGRATION_COLLAB_USERNAME,

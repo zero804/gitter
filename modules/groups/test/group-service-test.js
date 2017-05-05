@@ -34,7 +34,6 @@ describe('group-service', function() {
     describe('createGroup', function() {
       var fixture = fixtureLoader.setup({
         deleteDocuments: {
-          User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }],
           Group: [
             { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
             { lcUri: fixtureLoader.GITTER_INTEGRATION_REPO.toLowerCase() },
@@ -43,10 +42,7 @@ describe('group-service', function() {
             { lcUri: 'bob' }
           ],
         },
-        user1: {
-          githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
-          username: fixtureLoader.GITTER_INTEGRATION_USERNAME
-        }
+        user1: '#integrationUser1'
       });
 
       it('should create a group for a GitHub org', function() {
@@ -196,13 +192,9 @@ describe('group-service', function() {
     describe('ensureGroupForGitHubRoomCreation', function() {
       var fixture = fixtureLoader.setup({
         deleteDocuments: {
-          User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }],
           Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() }],
         },
-        user1: {
-          githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
-          username: fixtureLoader.GITTER_INTEGRATION_USERNAME
-        }
+        user1: '#integrationUser1'
       });
 
       it('should create a room for a repo', function() {

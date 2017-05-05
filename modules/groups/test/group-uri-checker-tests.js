@@ -8,7 +8,6 @@ var groupUriChecker = require('../lib/group-uri-checker');
 
 var deleteDocuments = {
   User: [
-    { username: fixtureLoader.GITTER_INTEGRATION_USERNAME },
     { username: fixtureLoader.GITTER_INTEGRATION_COLLAB_USERNAME },
   ],
   Troupe: [ { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() } ],
@@ -23,10 +22,7 @@ describe('group-uri-checker #slow', function() {
   describe('org group present', function() {
     var fixture = fixtureLoader.setup({
       deleteDocuments: deleteDocuments,
-      user1: {
-        githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
-        username: fixtureLoader.GITTER_INTEGRATION_USERNAME
-      },
+      user1: '#integrationUser1',
       group2: {
         uri: fixtureLoader.GITTER_INTEGRATION_ORG,
         lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase(),
@@ -54,10 +50,7 @@ describe('group-uri-checker #slow', function() {
   describe('without org group present', function() {
     var fixture = fixtureLoader.setup({
       deleteDocuments: deleteDocuments,
-      user1: {
-        githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
-        username: fixtureLoader.GITTER_INTEGRATION_USERNAME
-      },
+      user1: '#integrationUser1',
       user2: {
         githubToken: fixtureLoader.GITTER_INTEGRATION_COLLAB_USER_SCOPE_TOKEN,
         username: fixtureLoader.GITTER_INTEGRATION_COLLAB_USERNAME

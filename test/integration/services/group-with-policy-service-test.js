@@ -31,7 +31,6 @@ describe('group-with-policy-service #slow', function() {
   beforeEach(function() {
     return fixtureLoader.manual(fixture, {
         deleteDocuments: {
-          User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }],
           Group: [
             { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() },
             { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
@@ -47,11 +46,7 @@ describe('group-with-policy-service #slow', function() {
             { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() + '/topics' }
           ]
         },
-        user1: {
-          githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
-          username: fixtureLoader.GITTER_INTEGRATION_USERNAME,
-          accessToken: 'web-internal'
-        },
+        user1: '#integrationUser1',
         // group1 is a github user backed group
         group1: {
           uri: fixtureLoader.GITTER_INTEGRATION_USERNAME,
