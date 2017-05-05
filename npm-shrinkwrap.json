@@ -3,9 +3,9 @@
   "version": "13.4.0",
   "dependencies": {
     "@gitterhq/env": {
-      "version": "0.29.3",
-      "from": "@gitterhq/env@>=0.29.3 <0.30.0",
-      "resolved": "https://registry.npmjs.org/@gitterhq/env/-/env-0.29.3.tgz",
+      "version": "0.29.4",
+      "from": "@gitterhq/env@>=0.29.4 <0.30.0",
+      "resolved": "https://registry.npmjs.org/@gitterhq/env/-/env-0.29.4.tgz",
       "dependencies": {
         "@gitterhq/cube": {
           "version": "0.2.12",
@@ -117,11 +117,6 @@
               }
             }
           }
-        },
-        "async": {
-          "version": "0.8.0",
-          "from": "async@>=0.8.0 <0.9.0",
-          "resolved": "https://registry.npmjs.org/async/-/async-0.8.0.tgz"
         },
         "blocked": {
           "version": "1.2.1",

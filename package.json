@@ -3,7 +3,7 @@
   "version": "13.4.0",
   "private": true,
   "dependencies": {
-    "@gitterhq/env": "^0.29.3",
+    "@gitterhq/env": "^0.29.4",
     "@gitterhq/faye-redis": "^0.4.4",
     "@gitterhq/passport-github": "0.1.8-g",
     "@gitterhq/passport-oauth2": "^1.1.2-b",
