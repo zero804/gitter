@@ -15,7 +15,6 @@ describe('transloadit-api-tests', function() {
 describe('transloadit-api-tests #slow', function() {
   var app, request;
 
-
   fixtureLoader.ensureIntegrationEnvironment(
       'transloadit:avatars:bucket',
       'transloadit:template_avatar_id',

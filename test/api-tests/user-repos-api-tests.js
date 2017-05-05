@@ -10,6 +10,8 @@ var groupService = require('gitter-web-groups/lib/group-service');
 describe('user-repos #slow', function() {
   var app, request;
 
+  fixtureLoader.ensureIntegrationEnvironment('integrationTests:repo1:repo_name');
+
   before(function() {
     request = require("supertest-as-promised")(Promise);
     app = require('../../server/api');

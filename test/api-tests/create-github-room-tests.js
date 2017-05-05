@@ -9,6 +9,8 @@ var assert = require('assert');
 describe('create-github-room-api', function() {
   var app, request;
 
+  fixtureLoader.ensureIntegrationEnvironment('integrationTests:collabRepos:repo1');
+
   before(function() {
     request = require("supertest-as-promised")(Promise);
     app = require('../../server/api');
