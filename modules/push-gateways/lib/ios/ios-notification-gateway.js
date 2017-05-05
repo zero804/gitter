@@ -5,13 +5,14 @@ var debug = require('debug')('gitter:infra:ios-notification-gateway');
 var env = require('gitter-web-env');
 var Promise = require('bluebird');
 var EventEmitter = require('events');
+var path = require('path');
 
 var iosNotificationGenerator = require('./ios-notification-generator');
 var logger = env.logger.get('push-notifications');
 var config = env.config;
 var errorReporter = env.errorReporter;
 
-var rootDirname = __dirname + '/../../../..';
+var rootDirname = path.resolve(__dirname, '..', '..', '..', '..');
 
 var ERROR_DESCRIPTIONS = {
   0: 'No errors encountered',
@@ -55,8 +56,8 @@ function createConnection(suffix, isProduction) {
   debug('ios push notification gateway (%s) starting', suffix);
 
   var connection = new apn.Connection({
-    cert: rootDirname + '/' + config.get('apn:cert' + suffix),
-    key: rootDirname + '/' + config.get('apn:key' + suffix),
+    cert: path.resolve(rootDirname, config.get('apn:cert' + suffix)),
+    key: path.resolve(rootDirname, config.get('apn:key' + suffix)),
     production: isProduction,
     connectionTimeout: 60000
   });
@@ -111,8 +112,8 @@ function createFeedbackEmitterForEnv(suffix, isProduction) {
     debug('ios push notification feedback listener (%s) starting', suffix);
 
     var feedback = new apn.Feedback({
-      cert: rootDirname + '/' + config.get('apn:cert' + suffix),
-      key: rootDirname + '/' + config.get('apn:key' + suffix),
+      cert: path.resolve(rootDirname, config.get('apn:cert' + suffix)),
+      key: path.resolve(rootDirname, config.get('apn:key' + suffix)),
       interval: config.get('apn:feedbackInterval'),
       batchFeedback: true,
       production: isProduction
