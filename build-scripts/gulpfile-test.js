@@ -140,10 +140,6 @@ function spawnMochaProcess(moduleName, options, files) { // eslint-disable-line 
     env.NODE_ENV = 'test-docker';
   }
 
-  if (testSuite === 'mocha') {
-    env.NODE_ENV = 'test';
-  }
-
   if (fast) {
     argGrep = '#slow';
     argInvert = true;
@@ -209,13 +205,9 @@ Object.keys(testModules).forEach(function(moduleName) {
 gulp.task('test:pre-test', function() {
   var env = {};
 
-
   if (testSuite === 'docker') {
     env.NODE_ENV = 'test-docker';
-  } else if (testSuite === 'mocha') {
-    env.NODE_ENV = 'test';
   }
-
 
   return childProcessPromise.spawn('./scripts/utils/ensure-mongodb-indexes.js', [], env);
 })
