@@ -3,10 +3,16 @@
 
 var assert = require("assert");
 var GitHubIssueStateService = require('..').GitHubIssueStateService;
-
-var FAKE_USER = { username: 'gittertestbot', githubToken: '***REMOVED***'};
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
 describe('github-issue-state-search #slow #github', function() {
+  fixtureLoader.ensureIntegrationEnvironment('GITTER_INTEGRATION_USERNAME', 'GITTER_INTEGRATION_USER_SCOPE_TOKEN');
+
+  var FAKE_USER = {
+    username: fixtureLoader.GITTER_INTEGRATION_USERNAME,
+    githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN
+  };
+
   it('return the state', function(done) {
     var underTest = new GitHubIssueStateService(FAKE_USER);
 

@@ -2,13 +2,21 @@
 "use strict";
 
 var assert = require("assert");
-var Search = require('..').GitHubFastSearch;
+var GitHubFastSearch = require('..').GitHubFastSearch;
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
-var FAKE_USER = { username: 'gittertestbot', githubToken: '***REMOVED***'};
 
 describe('github-fast-search #slow #github', function() {
+
+  fixtureLoader.ensureIntegrationEnvironment('GITTER_INTEGRATION_USERNAME', 'GITTER_INTEGRATION_USER_SCOPE_TOKEN');
+
+  var FAKE_USER = {
+    username: fixtureLoader.GITTER_INTEGRATION_USERNAME,
+    githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN
+  };
+
   it('should find suprememoocow', function(done) {
-    var search = new Search(FAKE_USER);
+    var search = new GitHubFastSearch(FAKE_USER);
 
     search.findUsers('andrew newdigate')
       .then(function(results) {
@@ -19,7 +27,7 @@ describe('github-fast-search #slow #github', function() {
   });
 
   it('should not find more than one page of results', function(done) {
-    var search = new Search(FAKE_USER);
+    var search = new GitHubFastSearch(FAKE_USER);
 
     search.findUsers('andrew')
       .then(function(results) {

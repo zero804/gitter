@@ -5,8 +5,9 @@ var config = env.config;
 
 
 var configurationMappings = {
-  GITTER_INTEGRATION_USER_SCOPE_TOKEN: 'integrationTests:test_user:user_scope_token',
   GITTER_INTEGRATION_USERNAME: 'integrationTests:test_user:username',
+  GITTER_INTEGRATION_USER_SCOPE_TOKEN: 'integrationTests:test_user:user_scope_token',
+  GITTER_INTEGRATION_REPO_SCOPE_TOKEN: 'integrationTests:test_user:repo_scope_token',
   GITTER_INTEGRATION_USER_ID: 'integrationTests:test_user:user_id',
 
   GITTER_INTEGRATION_COLLAB_USER_SCOPE_TOKEN: 'integrationTests:collab_user:user_scope_token',
@@ -15,6 +16,7 @@ var configurationMappings = {
 
   GITTER_INTEGRATION_ORG: 'integrationTests:org1:org_name',
   GITTER_INTEGRATION_ORG_ID: 'integrationTests:org1:org_id',
+
   GITTER_INTEGRATION_REPO: 'integrationTests:repo1:repo_name',
   GITTER_INTEGRATION_REPO_ID: 'integrationTests:repo1:repo_id',
 

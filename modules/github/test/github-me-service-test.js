@@ -3,10 +3,16 @@
 
 var assert = require("assert");
 var GithubMeService = require('..').GitHubMeService;
-
-var FAKE_USER = { username: 'gittertestbot', githubToken: '***REMOVED***'};
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
 describe('github-me-service #slow #github', function() {
+  fixtureLoader.ensureIntegrationEnvironment('GITTER_INTEGRATION_USERNAME', 'GITTER_INTEGRATION_USER_SCOPE_TOKEN', 'GITTER_INTEGRATION_ORG');
+
+  var FAKE_USER = {
+    username: fixtureLoader.GITTER_INTEGRATION_USERNAME,
+    githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN
+  };
+
   it('members should detailed emailed', function(done) {
     var gh = new GithubMeService(FAKE_USER);
 
@@ -22,7 +28,7 @@ describe('github-me-service #slow #github', function() {
     it('should return true if the user is an admin', function(done) {
       var gh = new GithubMeService(FAKE_USER);
 
-      gh.isOrgAdmin('gitterTest')
+      gh.isOrgAdmin(fixtureLoader.GITTER_INTEGRATION_ORG)
         .then(function(isAdmin) {
           assert(isAdmin);
         })
@@ -55,7 +61,7 @@ describe('github-me-service #slow #github', function() {
   it('should return that you are and org admin when you are', function(done) {
     var gh = new GithubMeService(FAKE_USER);
 
-    gh.isOrgAdmin('gitterTest')
+    gh.isOrgAdmin(fixtureLoader.GITTER_INTEGRATION_ORG)
       .then(function(isOrgMember) {
         assert(isOrgMember);
       })
@@ -66,7 +72,7 @@ describe('github-me-service #slow #github', function() {
   it('should return that you are and org member when you are', function(done) {
     var gh = new GithubMeService(FAKE_USER);
 
-    gh.isOrgMember('gitterTest')
+    gh.isOrgMember(fixtureLoader.GITTER_INTEGRATION_ORG)
       .then(function(isOrgMember) {
         assert(isOrgMember);
       })
@@ -77,7 +83,7 @@ describe('github-me-service #slow #github', function() {
   it('should return org membership', function(done) {
     var gh = new GithubMeService(FAKE_USER);
 
-    gh.getOrgMembership('gitterTest')
+    gh.getOrgMembership(fixtureLoader.GITTER_INTEGRATION_ORG)
       .then(function(membership) {
         assert('gitterTest', membership.organization.login);
         assert('gittertestbot', membership.user.login);
@@ -92,7 +98,7 @@ describe('github-me-service #slow #github', function() {
     gh.getOrgs()
       .then(function(membership) {
         assert(Array.isArray(membership));
-        assert(membership.length > 1);
+        assert(membership.length >= 1);
       })
       .nodeify(done);
 
