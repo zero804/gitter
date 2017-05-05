@@ -5,8 +5,10 @@ var GitHubRepoCollaboratorService = require('../lib/github-repo-collaborator-ser
 var assert = require('assert');
 
 describe('github-repo-collaborators-service-test #github', function() {
+
   describe('integration #slow', function() {
-    fixtureLoader.ensureIntegrationEnvironment('integrationTests:org1:org_name', 'integrationTests:test_user:username');
+
+    fixtureLoader.ensureIntegrationEnvironment('integrationTests:test_user:username');
 
     var fixture = fixtureLoader.setup({
       user1: '#integrationUser1'

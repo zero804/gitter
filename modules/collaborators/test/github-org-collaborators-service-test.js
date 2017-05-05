@@ -6,9 +6,9 @@ var assert = require('assert');
 
 describe('gitter-org-collaborators-service-test #github', function() {
 
-  fixtureLoader.ensureIntegrationEnvironment('integrationTests:org1:org_name', 'integrationTests:test_user:username');
-
   describe('integration #slow', function() {
+
+    fixtureLoader.ensureIntegrationEnvironment('integrationTests:org1:org_name', 'integrationTests:test_user:username');
 
     var fixture = fixtureLoader.setup({
       user1: '#integrationUser1',
