@@ -10,9 +10,7 @@ var assert = require("assert");
 
 describe('readby-service', function() {
 
-  var fixture = {};
-
-  before(fixtureLoader(fixture, {
+  var fixture = fixtureLoader.setup({
     user1: { },
     user2: { },
     message1: {
@@ -34,10 +32,6 @@ describe('readby-service', function() {
       sent: new Date("01/01/2014")
     },
     troupe1: { users: ['user1', 'user2'] }
-  }));
-
-  after(function() {
-    fixture.cleanup();
   });
 
   describe('batchUpdateReadbyBatch', function() {

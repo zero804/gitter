@@ -6,6 +6,8 @@ var logger = env.logger;
 var Promise = require('bluebird');
 var debug = require('debug')('gitter:tests:test-fixtures');
 var fixtureUtils = require('./fixture-utils');
+var _ = require('lodash');
+var integrationFixtures = require('./integration-fixtures');
 
 var fixtureSteps = [
   require('./delete-documents'),
@@ -65,7 +67,7 @@ function createExpectedFixtures(expected) {
     })
 }
 
-function fixtureLoader(fixture, expected) {
+function fixtureLoaderManual(fixture, expected) {
   debug("Creating fixtures %j", expected);
   return function(done) {
     return createExpectedFixtures(expected)
@@ -78,10 +80,13 @@ function fixtureLoader(fixture, expected) {
    };
 }
 
+var fixtureLoader = {};
+fixtureLoader.manual = fixtureLoaderManual;
+
 fixtureLoader.setup = function(expected) {
   var fixture = {};
 
-  before(fixtureLoader(fixture, expected));
+  before(fixtureLoaderManual(fixture, expected));
   after(function() {
     if (fixture.cleanup) {
       fixture.cleanup();
@@ -150,6 +155,7 @@ fixtureLoader.generateEmail = fixtureUtils.generateEmail;
 fixtureLoader.generateGithubId = fixtureUtils.generateGithubId;
 fixtureLoader.generateUri = fixtureUtils.generateUri;
 
+_.extend(fixtureLoader, integrationFixtures);
 
 fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN = config.get('integrationTests:test_user:user_scope_token') || '';
 fixtureLoader.GITTER_INTEGRATION_USERNAME = config.get('integrationTests:test_user:username') || '';

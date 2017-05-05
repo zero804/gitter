@@ -34,8 +34,6 @@ describe('room-context-delegate', function() {
       }
     });
 
-    after(function() { fixture.cleanup(); });
-
     it('should work with users in the room', function() {
       var delegate = new RoomContextDelegate(fixture.user1._id, fixture.troupe1._id);
       return delegate.isMember()

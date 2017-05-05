@@ -6,19 +6,12 @@ var assert = require('assert');
 
 describe('gitter-org-collaborators-service-test #github', function() {
 
+  fixtureLoader.ensureIntegrationEnvironment('integrationTests:org1:org_name', 'integrationTests:test_user:username');
+
   describe('integration #slow', function() {
 
-    fixtureLoader.ensureIntegrationEnvironment('integrationTests:org1:org_name', 'integrationTests:test_user:username');
-
     var fixture = fixtureLoader.setup({
-      deleteDocuments: {
-        User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }]
-      },
-      user1: {
-        githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
-        username: fixtureLoader.GITTER_INTEGRATION_USERNAME,
-        accessToken: 'web-internal'
-      },
+      user1: '#integrationUser1',
     });
 
     it('should return org collabators', function() {

@@ -16,8 +16,7 @@ describe('TroupeStrategy', function() {
   before(blockTimer.on);
   after(blockTimer.off);
 
-  var fixture = {};
-  before(fixtureLoader(fixture, {
+  var fixture = fixtureLoader.setup({
     user1: {},
     user2: {},
     troupe1: {
@@ -38,10 +37,6 @@ describe('TroupeStrategy', function() {
       tags: ['foo'],
       security: 'PUBLIC'
     },
-  }));
-
-  after(function() {
-    return fixture.cleanup();
   });
 
   it('should serialize a troupe', function() {

@@ -15,11 +15,10 @@ function findUserIdPredicate(userId) {
 describe('one-to-one-room-service', function() {
 
   describe('#slow', function() {
-    var fixture = {};
     var oneToOneRoomService = testRequire('./services/one-to-one-room-service');
     var roomMembershipService = testRequire('./services/room-membership-service');
 
-    before(fixtureLoader(fixture, {
+    var fixture = fixtureLoader.setup({
       user1: {
       },
       user2: {
@@ -32,9 +31,7 @@ describe('one-to-one-room-service', function() {
       userRemoved: {
         state: 'REMOVED'
       }
-    }));
-
-    after(function() { fixture.cleanup(); });
+    });
 
     it('should handle the creation of a oneToOneTroupe single', function() {
       return oneToOneRoomService.findOrCreateOneToOneRoom(fixture.user1, fixture.user2.id)
@@ -145,18 +142,15 @@ describe('one-to-one-room-service', function() {
   });
 
   describe('https://github.com/troupe/gitter-webapp/issues/1227 #slow', function() {
-    var fixture = {};
     var oneToOneRoomService = testRequire('./services/one-to-one-room-service');
     var roomMembershipService = testRequire('./services/room-membership-service');
 
-    before(fixtureLoader(fixture, {
+    var fixture = fixtureLoader.setup({
       user1: {
       },
       user2: {
       }
-    }));
-
-    after(function() { fixture.cleanup(); });
+    });
 
     it('should add the requesting user back into a one-to-one room if they\'ve been removed', function() {
       var user1 = fixture.user1;

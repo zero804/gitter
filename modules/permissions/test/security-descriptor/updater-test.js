@@ -8,10 +8,9 @@ var securityDescriptorService = require('../../lib/security-descriptor');
 describe('security-descriptor-updater', function() {
 
   describe('updateLinksForRepo #slow', function() {
-    var fixture = {};
     fixtureLoader.disableMongoTableScans();
 
-    before(fixtureLoader(fixture, {
+    var fixture = fixtureLoader.setup({
       troupe1: {
         securityDescriptor: {
           type: 'GH_REPO',
@@ -23,9 +22,7 @@ describe('security-descriptor-updater', function() {
           internalId: null,
         }
       }
-    }));
-
-    after(function() { fixture.cleanup(); });
+    });
 
     it('should rename links', function() {
       return securityDescriptorUpdater.updateLinksForRepo('gitterHQ/gitter', 'gitterHQ/test')

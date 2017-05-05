@@ -29,7 +29,7 @@ describe('group-with-policy-service #slow', function() {
   var linkPath = fixtureLoader.GITTER_INTEGRATION_USERNAME + '/' + fixtureLoader.GITTER_INTEGRATION_REPO;
 
   beforeEach(function() {
-    return fixtureLoader(fixture, {
+    return fixtureLoader.manual(fixture, {
         deleteDocuments: {
           User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }],
           Group: [
@@ -87,7 +87,9 @@ describe('group-with-policy-service #slow', function() {
   });
 
   afterEach(function() {
-    fixture.cleanup();
+    if (fixture.cleanup) {
+      return fixture.cleanup();
+    }
   });
 
   // repo rooms

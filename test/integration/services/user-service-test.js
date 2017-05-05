@@ -7,16 +7,13 @@ var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var testRequire = require('./../test-require');
 
-
-var fixture2 = {};
-
 describe("User Service", function() {
 
-  before(fixtureLoader(fixture2, {
+  var fixture2 = fixtureLoader.setup({
     user1: { username: true },
     user2: { },
     user3: { }
-  }));
+  });
 
   it('should allow two users with the same githubId to be created at the same moment, but only create a single account', function() {
     var userService = testRequire("./services/user-service");
@@ -107,7 +104,4 @@ describe("User Service", function() {
 
   });
 
-  after(function() {
-    fixture2.cleanup();
-  });
 });

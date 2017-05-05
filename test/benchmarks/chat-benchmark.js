@@ -44,7 +44,7 @@ makeBenchmark({
     }
     // userOnlyOne is in one room
     // user0...5000 are in two or three rooms
-    fixtureLoader(fixture, fixtureDescription)(done);
+    fixtureLoader.manual(fixture, fixtureDescription)(done);
   },
 
   after: function(done) {

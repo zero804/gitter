@@ -7,11 +7,31 @@ var OAuthAccessToken = require('gitter-web-persistence').OAuthAccessToken;
 var OAuthClient = require('gitter-web-persistence').OAuthClient;
 var fixtureUtils = require('./fixture-utils');
 var debug = require('debug')('gitter:tests:test-fixtures');
+var integrationFixtures = require('./integration-fixtures');
 
 var userCounter = 0;
 
 function createUser(fixtureName, f) {
   debug('Creating %s', fixtureName);
+
+  var preremove = null;
+
+  if (f === '#integrationUser1') {
+    var integrationUsername = integrationFixtures.GITTER_INTEGRATION_USERNAME;
+    var githubToken = integrationFixtures.GITTER_INTEGRATION_USER_SCOPE_TOKEN;
+
+    f = {
+      githubToken: githubToken,
+      accessToken: 'web-internal'
+    }
+
+    if (integrationUsername) {
+      f.username = integrationFixtures.GITTER_INTEGRATION_USERNAME;
+      preremove = function() {
+        return User.remove({ username: integrationFixtures.GITTER_INTEGRATION_USERNAME });
+      }
+    }
+  }
 
   function possibleGenerate(key, fn) {
     if (f.hasOwnProperty(key)) {
@@ -38,7 +58,14 @@ function createUser(fixtureName, f) {
 
   debug('Creating user %s with %j', fixtureName, doc);
 
-  var promise = User.create(doc);
+  var promise = Promise.try(function() {
+      if (preremove) {
+        return preremove();
+      }
+    })
+    .then(function() {
+      return User.create(doc);
+    })
 
   if (f.accessToken) {
     promise = promise.tap(function(user) {

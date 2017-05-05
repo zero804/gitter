@@ -10,15 +10,9 @@ describe("user-settings-muxer", function() {
 
   describe('#slow', function() {
 
-    var fixture = {};
-
-    before(fixtureLoader(fixture, {
+    var fixture = fixtureLoader.setup({
       user1: { },
       user2: { }
-    }));
-
-    after(function() {
-      return fixture.cleanup();
     });
 
     describe('getSetting', function() {

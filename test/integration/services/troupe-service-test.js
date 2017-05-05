@@ -5,9 +5,20 @@ var testRequire = require('../test-require');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assert = require("assert");
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
-var fixture = {};
 
 describe('troupe-service', function() {
+
+    var fixture = fixtureLoader.setup({
+      user1: {
+      },
+      user2: {
+      },
+      troupe1: {
+        users: ['user1', 'user2']
+      },
+      troupe2: {
+      },
+    });
 
   describe('#findByIdLeanWithMembership', function() {
     var troupeService = testRequire('./services/troupe-service');
@@ -59,19 +70,5 @@ describe('troupe-service', function() {
         .nodeify(done);
     });
   });
-
-  before(fixtureLoader(fixture, {
-    user1: {
-    },
-    user2: {
-    },
-    troupe1: {
-      users: ['user1', 'user2']
-    },
-    troupe2: {
-    },
-  }));
-
-  after(function() { fixture.cleanup(); });
 
 });

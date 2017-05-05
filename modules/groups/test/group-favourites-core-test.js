@@ -6,9 +6,7 @@ var groupFavouritesCore = require('../lib/group-favourites-core');
 
 describe('group-core', function() {
   describe('ordering #slow', function() {
-    var fixture = {};
-
-    before(fixtureLoader(fixture, {
+    var fixture = fixtureLoader.setup({
       user1: { },
       userNoGroups: { },
       group1: { },
@@ -31,10 +29,6 @@ describe('group-core', function() {
         group: 'group4',
         users: ['user1']
       },
-    }));
-
-    after(function() {
-      fixture.cleanup();
     });
 
     // From `./test/integration/services/core/recent-room-core-test.js`
@@ -110,19 +104,14 @@ describe('group-core', function() {
   });
 
   describe('updateFavourite #slow', function() {
-    var fixture = {};
 
-    before(fixtureLoader(fixture, {
+    var fixture = fixtureLoader.setup({
       user1: { },
       group1: { },
       troupe1: {
         group: 'group1',
         users: ['user1']
       },
-    }));
-
-    after(function() {
-      fixture.cleanup();
     });
 
     it('should add a group to favourites',function(done) {

@@ -35,15 +35,16 @@ describe('email-notification-generator-service', function() {
   this.timeout(5000);
   var fixture = {};
 
-  beforeEach(fixtureLoader(fixture, {
+  beforeEach(fixtureLoader.manual(fixture, {
     user1: { },
     user2: { },
     user3: { },
     troupe1: { users: ['user1', 'user2', 'user3']}
   }));
+
   afterEach(function() { fixture.cleanup(); });
 
-  it('should send out an email notification for a user with unread items #slow', function(done) {
+  it('should send out an email notification for a user with unread items #slow', function() {
     var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
     var unreadEngine = testRequire('./services/unread-items/engine');
 
@@ -57,14 +58,14 @@ describe('email-notification-generator-service', function() {
 
     var u = 0, v = 0;
     mockito.when(emailNotificationServiceMock).sendUnreadItemsNotification().then(function(user, troupeWithCounts) {
-      if(user.id == fixture.user2.id) {
+      if(user.id === fixture.user2.id) {
         u++;
         assert.equal(u, 1);
         assert.equal(troupeWithCounts.length, 1);
         assert.equal(troupeWithCounts[0].troupe.id, troupeId);
       }
 
-      if(user.id == fixture.user3.id) {
+      if(user.id === fixture.user3.id) {
         v++;
         assert.equal(v, 1);
         assert.equal(troupeWithCounts.length, 1);
@@ -74,7 +75,7 @@ describe('email-notification-generator-service', function() {
       return Promise.resolve();
     });
 
-    Promise.all([
+    return Promise.all([
       userSettingsService.setUserSettings(fixture.user2.id, 'unread_notifications_optout', false),
       ])
       .then(function() {
@@ -86,12 +87,11 @@ describe('email-notification-generator-service', function() {
       .then(function() {
         assert.equal(u, 1);
         assert.equal(v, 1);
-      })
-      .nodeify(done);
+      });
 
   });
 
-  it('SHOULD NOT email somebody who has opted out of notifications 1 #slow', function(done) {
+  it('SHOULD NOT email somebody who has opted out of notifications 1 #slow', function() {
     var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
     var unreadEngine = testRequire('./services/unread-items/engine');
 
@@ -107,7 +107,7 @@ describe('email-notification-generator-service', function() {
     mockito.when(emailNotificationServiceMock).sendUnreadItemsNotification().then(function(user, troupeWithCounts) {
       assert(user.id !== fixture.user2.id);
 
-      if(user.id == fixture.user3.id) {
+      if(user.id === fixture.user3.id) {
         v++;
         assert.equal(v, 1);
         assert.equal(troupeWithCounts.length, 1);
@@ -117,7 +117,7 @@ describe('email-notification-generator-service', function() {
       return Promise.resolve();
     });
 
-    Promise.all([
+    return Promise.all([
       userSettingsService.setUserSettings(fixture.user2.id, 'unread_notifications_optout', true),
       ])
       .then(function() {
@@ -128,13 +128,12 @@ describe('email-notification-generator-service', function() {
       })
       .then(function() {
         assert.equal(v, 1);
-      })
-      .nodeify(done);
+      });
 
   });
 
 
-  it('SHOULD NOT email somebody who has opted out of notifications 2 #slow', function(done) {
+  it('SHOULD NOT email somebody who has opted out of notifications 2 #slow', function() {
     var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
     var unreadEngine = testRequire('./services/unread-items/engine');
 
@@ -153,7 +152,7 @@ describe('email-notification-generator-service', function() {
     mockito.when(emailNotificationServiceMock).sendUnreadItemsNotification().then(function(user, troupeWithCounts) {
       assert(user.id !== fixture.user2.id);
 
-      if(user.id == fixture.user3.id) {
+      if(user.id === fixture.user3.id) {
         v++;
         assert.equal(v, 1);
         assert.equal(troupeWithCounts.length, 1);
@@ -182,15 +181,14 @@ describe('email-notification-generator-service', function() {
       .then(function() {
         return sendEmailNotifications(Date.now(), 1000)
           .then(function() {
-            assert.equal(v, 1);
+            assert.equal(v, 1, 'Expected a notification for user3');
           });
-      })
-      .nodeify(done);
+      });
 
   });
 
 
-it('SHOULD NOT email somebody who has opted out of notifications set to mention only #slow', function(done) {
+it('SHOULD NOT email somebody who has opted out of notifications set to mention only #slow', function() {
   var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
   var unreadEngine = testRequire('./services/unread-items/engine');
 
@@ -206,7 +204,7 @@ it('SHOULD NOT email somebody who has opted out of notifications set to mention 
   mockito.when(emailNotificationServiceMock).sendUnreadItemsNotification().then(function(user, troupeWithCounts) {
     assert.notEqual(user.id, fixture.user2.id);
 
-    if(user.id == fixture.user3.id) {
+    if(user.id === fixture.user3.id) {
       v++;
       assert.equal(v, 1);
       assert.equal(troupeWithCounts.length, 1);
@@ -228,14 +226,13 @@ it('SHOULD NOT email somebody who has opted out of notifications set to mention 
       return sendEmailNotifications(Date.now());
     })
     .then(function() {
-      assert.equal(v, 1);
-    })
-    .nodeify(done);
+      assert.equal(v, 1, 'Expected a notification for user3');
+    });
 
 });
 
   // TODO: handle mentions
-  it('SHOULD email somebody who has not opted out of notifications for a specific troupe #slow', function(done) {
+  it('should email somebody who has not opted out of notifications for a specific troupe #slow', function() {
     var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
     var unreadEngine = testRequire('./services/unread-items/engine');
 
@@ -249,14 +246,14 @@ it('SHOULD NOT email somebody who has opted out of notifications set to mention 
 
     var u = 0, v = 0;
     mockito.when(emailNotificationServiceMock).sendUnreadItemsNotification().then(function(user, troupeWithCounts) {
-      if(user.id == fixture.user2.id) {
+      if(user.id === fixture.user2.id) {
         u++;
         assert.equal(u, 1);
         assert.equal(troupeWithCounts.length, 1);
         assert.equal(troupeWithCounts[0].troupe.id, fixture.troupe1.id);
       }
 
-      if(user.id == fixture.user3.id) {
+      if(user.id === fixture.user3.id) {
         v++;
         assert.equal(v, 1);
         assert.equal(troupeWithCounts.length, 1);
@@ -265,7 +262,7 @@ it('SHOULD NOT email somebody who has opted out of notifications set to mention 
       return Promise.resolve();
     });
 
-    Promise.all([
+    return Promise.all([
       userSettingsService.setUserSettings(fixture.user2.id, 'unread_notifications_optout', false),
       roomMembershipService.setMembershipMode(fixture.user2.id, fixture.troupe1.id, 'all'),
       unreadEngine.newItemWithMentions(troupeId, itemId1, makeNotifyList([fixture.user2.id, fixture.user3.id], []))
@@ -274,10 +271,9 @@ it('SHOULD NOT email somebody who has opted out of notifications set to mention 
         return sendEmailNotifications(Date.now());
       })
       .then(function() {
-        assert.equal(u, 1);
-        assert.equal(v, 1);
-      })
-      .nodeify(done);
+        assert.equal(u, 1, 'Expected a notification for user2');
+        assert.equal(v, 1, 'Expected a notification for user3');
+      });
   });
 
 
