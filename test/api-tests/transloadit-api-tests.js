@@ -12,7 +12,7 @@ var groupService = require('gitter-web-groups/lib/group-service');
 
 describe('transloadit-api-tests', function() {
 
-describe('transloadit-api-tests #slow', function() {
+describe('integration tests #slow', function() {
   var app, request;
 
   fixtureLoader.ensureIntegrationEnvironment(

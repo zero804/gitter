@@ -95,6 +95,19 @@ fixtureLoader.setup = function(expected) {
   return fixture;
 };
 
+fixtureLoader.setupEach = function(expected) {
+  var fixture = {};
+
+  beforeEach(fixtureLoaderManual(fixture, expected));
+  afterEach(function() {
+    if (fixture.cleanup) {
+      fixture.cleanup();
+    }
+  });
+
+  return fixture;
+};
+
 fixtureLoader.ensureIntegrationEnvironment = function() {
     var requiredConfigs = Array.prototype.slice.call(arguments);
 

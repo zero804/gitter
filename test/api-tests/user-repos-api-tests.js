@@ -13,7 +13,7 @@ describe('user-repos #slow', function() {
   fixtureLoader.ensureIntegrationEnvironment(
     '#integrationUser1',
     '#integrationCollabUser1',
-    'GITTER_INTEGRATION_REPO_FULL',
+    'GITTER_INTEGRATION_REPO',
     'GITTER_INTEGRATION_REPO_WITH_COLLAB_ONLY_READ');
 
   before(function() {

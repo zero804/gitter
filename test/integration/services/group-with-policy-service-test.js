@@ -21,70 +21,64 @@ var isAdminPolicy = {
 };
 
 describe('group-with-policy-service #slow', function() {
-  var fixture = {};
   var group1WithPolicyService;
   var group2WithPolicyService;
   var group3WithPolicyService;
 
   var linkPath = fixtureLoader.GITTER_INTEGRATION_USERNAME + '/' + fixtureLoader.GITTER_INTEGRATION_REPO;
 
-  beforeEach(function() {
-    return fixtureLoader.manual(fixture, {
-        deleteDocuments: {
-          Group: [
-            { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() },
-            { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
-            { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() }
-          ],
-          Troupe: [
-            { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() + '/' + fixtureLoader.GITTER_INTEGRATION_REPO.toLowerCase() },
-            { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() + '/' + fixtureLoader.GITTER_INTEGRATION_ROOM.toLowerCase() },
-            { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() + '/' + fixtureLoader.GITTER_INTEGRATION_ROOM.toLowerCase() },
-            { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() + '/' + fixtureLoader.GITTER_INTEGRATION_ROOM.toLowerCase() },
-          ],
-          Forum: [
-            { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() + '/topics' }
-          ]
-        },
-        user1: '#integrationUser1',
-        // group1 is a github user backed group
-        group1: {
-          uri: fixtureLoader.GITTER_INTEGRATION_USERNAME,
-          lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase(),
-          securityDescriptor: {
-            type: 'GH_USER',
-            linkPath: fixtureLoader.GITTER_INTEGRATION_USERNAME,
-            extraAdmins: ['user1']
-          }
-        },
-        // group2 is a "normal" group
-        group2: {
-          securityDescriptor: {
-            extraAdmins: ['user1']
-          }
-        },
-        // group3 is a github org backed group
-        group3: {
-          uri: fixtureLoader.GITTER_INTEGRATION_ORG,
-          lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase(),
-          securityDescriptor: {
-            type: 'GH_ORG',
-            linkPath: fixtureLoader.GITTER_INTEGRATION_ORG,
-            extraAdmins: ['user1']
-          }
-        }
-      })()
-    .then(function() {
-      group1WithPolicyService = new GroupWithPolicyService(fixture.group1, fixture.user1, isAdminPolicy);
-      group2WithPolicyService = new GroupWithPolicyService(fixture.group2, fixture.user1, isAdminPolicy);
-      group3WithPolicyService = new GroupWithPolicyService(fixture.group3, fixture.user1, isAdminPolicy);
-    });
-  });
+  fixtureLoader.ensureIntegrationEnvironment('#integrationUser1', 'GITTER_INTEGRATION_ORG');
 
-  afterEach(function() {
-    if (fixture.cleanup) {
-      return fixture.cleanup();
-    }
+  var fixture = fixtureLoader.setupEach({
+      deleteDocuments: {
+        Group: [
+          { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() },
+          { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
+          { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() }
+        ],
+        Troupe: [
+          { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() + '/' + fixtureLoader.GITTER_INTEGRATION_REPO.toLowerCase() },
+          { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() + '/' + fixtureLoader.GITTER_INTEGRATION_ROOM.toLowerCase() },
+          { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() + '/' + fixtureLoader.GITTER_INTEGRATION_ROOM.toLowerCase() },
+          { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() + '/' + fixtureLoader.GITTER_INTEGRATION_ROOM.toLowerCase() },
+        ],
+        Forum: [
+          { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() + '/topics' }
+        ]
+      },
+      user1: '#integrationUser1',
+      // group1 is a github user backed group
+      group1: {
+        uri: fixtureLoader.GITTER_INTEGRATION_USERNAME,
+        lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase(),
+        securityDescriptor: {
+          type: 'GH_USER',
+          linkPath: fixtureLoader.GITTER_INTEGRATION_USERNAME,
+          extraAdmins: ['user1']
+        }
+      },
+      // group2 is a "normal" group
+      group2: {
+        securityDescriptor: {
+          extraAdmins: ['user1']
+        }
+      },
+      // group3 is a github org backed group
+      group3: {
+        uri: fixtureLoader.GITTER_INTEGRATION_ORG,
+        lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase(),
+        securityDescriptor: {
+          type: 'GH_ORG',
+          linkPath: fixtureLoader.GITTER_INTEGRATION_ORG,
+          extraAdmins: ['user1']
+        }
+      }
+    });
+
+  beforeEach(function() {
+    group1WithPolicyService = new GroupWithPolicyService(fixture.group1, fixture.user1, isAdminPolicy);
+    group2WithPolicyService = new GroupWithPolicyService(fixture.group2, fixture.user1, isAdminPolicy);
+    group3WithPolicyService = new GroupWithPolicyService(fixture.group3, fixture.user1, isAdminPolicy);
   });
 
   // repo rooms

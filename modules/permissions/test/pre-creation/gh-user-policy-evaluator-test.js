@@ -8,6 +8,7 @@ describe('gh-user-policy-evaluator', function() {
 
   describe('#slow', function() {
     fixtureLoader.disableMongoTableScans();
+    fixtureLoader.ensureIntegrationEnvironment('#integrationUser1');
 
     function expect(GhUserPolicyEvaluator, user, uri, expected) {
       var evaluator = new GhUserPolicyEvaluator(user, uri);

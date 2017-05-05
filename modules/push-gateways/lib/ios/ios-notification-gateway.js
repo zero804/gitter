@@ -32,6 +32,12 @@ var connections = {
   'APPLE-DEV': createConnection('Dev')
 };
 
+function resolveCertConfig(key) {
+  var relative = config.get(key)
+  if (!relative) return;
+
+  return path.resolve(rootDirname, relative);
+}
 
 function sendNotificationToDevice(notificationType, notificationDetails, device) {
   var appleNotification = iosNotificationGenerator(notificationType, notificationDetails, device);
@@ -56,8 +62,8 @@ function createConnection(suffix, isProduction) {
   debug('ios push notification gateway (%s) starting', suffix);
 
   var connection = new apn.Connection({
-    cert: path.resolve(rootDirname, config.get('apn:cert' + suffix)),
-    key: path.resolve(rootDirname, config.get('apn:key' + suffix)),
+    cert: resolveCertConfig('apn:cert' + suffix),
+    key: resolveCertConfig('apn:key' + suffix),
     production: isProduction,
     connectionTimeout: 60000
   });
@@ -112,8 +118,8 @@ function createFeedbackEmitterForEnv(suffix, isProduction) {
     debug('ios push notification feedback listener (%s) starting', suffix);
 
     var feedback = new apn.Feedback({
-      cert: path.resolve(rootDirname, config.get('apn:cert' + suffix)),
-      key: path.resolve(rootDirname, config.get('apn:key' + suffix)),
+      cert: resolveCertConfig('apn:cert' + suffix),
+      key: resolveCertConfig('apn:key' + suffix),
       interval: config.get('apn:feedbackInterval'),
       batchFeedback: true,
       production: isProduction

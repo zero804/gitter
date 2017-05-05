@@ -17,6 +17,10 @@ describe('group-api', function() {
     app = require('../../server/api');
   });
 
+  fixtureLoader.ensureIntegrationEnvironment(
+      '#integrationUser1',
+      'GITTER_INTEGRATION_ORG');
+
   var fixture = fixtureLoader.setup({
     deleteDocuments: {
       Group: [

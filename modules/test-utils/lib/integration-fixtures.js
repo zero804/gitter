@@ -66,11 +66,11 @@ function checkConfigSet(requiredSets) {
     }
 
     if (!requiredItems) {
-      throw new Error('Test is requesting ' + requiredSet + ' but no configuration can be found');
+      requiredItems = [requiredSet]
     }
 
     requiredItems.forEach(function(item) {
-      if (!fixtures[item]) {
+      if (!fixtures[item] && !config.get(item)) {
         memo[item] = true;
       }
     });

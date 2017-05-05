@@ -31,6 +31,11 @@ describe('group-service', function() {
 
   describe('integration tests #slow', function() {
 
+    fixtureLoader.ensureIntegrationEnvironment(
+      '#integrationUser1',
+      'GITTER_INTEGRATION_ORG',
+      'GITTER_INTEGRATION_USERNAME');
+
     describe('createGroup', function() {
 
       var fixture = fixtureLoader.setup({
@@ -191,6 +196,7 @@ describe('group-service', function() {
     });
 
     describe('ensureGroupForGitHubRoomCreation', function() {
+
       var fixture = fixtureLoader.setup({
         deleteDocuments: {
           Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() }],

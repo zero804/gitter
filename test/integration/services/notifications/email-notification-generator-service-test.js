@@ -33,16 +33,13 @@ function makeNotifyList(userIds, mentionIds) {
 
 describe('email-notification-generator-service', function() {
   this.timeout(5000);
-  var fixture = {};
 
-  beforeEach(fixtureLoader.manual(fixture, {
+  var fixture = fixtureLoader.setupEach({
     user1: { },
     user2: { },
     user3: { },
     troupe1: { users: ['user1', 'user2', 'user3']}
-  }));
-
-  afterEach(function() { fixture.cleanup(); });
+  });
 
   it('should send out an email notification for a user with unread items #slow', function() {
     var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
