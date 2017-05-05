@@ -4,9 +4,12 @@ var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var GitHubOrgCollaboratorService = require('../lib/github-org-collaborator-service');
 var assert = require('assert');
 
-
 describe('gitter-org-collaborators-service-test #github', function() {
+
   describe('integration #slow', function() {
+
+    fixtureLoader.ensureIntegrationEnvironment('integrationTests:test_user:username');
+
     var fixture = fixtureLoader.setup({
       deleteDocuments: {
         User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }],
@@ -24,21 +27,9 @@ describe('gitter-org-collaborators-service-test #github', function() {
       return underTest.findCollaborators()
         .then(function(results) {
           assert(Array.isArray(results));
+          assert(results.length > 0);
         });
     });
 
-    describe('old tests', function() {
-      var FAKE_USER = { username: 'gittertestbot', githubToken: '***REMOVED***'};
-
-      it('should return suggestions for a ORG', function() {
-        var underTest = new GitHubOrgCollaboratorService(FAKE_USER, 'troupe');
-        return underTest.findCollaborators()
-          .then(function(userSuggestions) {
-            assert(Array.isArray(userSuggestions));
-            assert(userSuggestions.length > 0);
-          });
-      });
-
-    });
   });
 });
