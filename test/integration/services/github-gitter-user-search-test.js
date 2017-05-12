@@ -1,9 +1,9 @@
-/* global describe:true, it:true */
 "use strict";
 
 var testRequire = require('../test-require');
 var assert = require("assert");
 var Promise = require('bluebird');
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
 var fakeUser = { username: 'fake-user', id: 'abc123' };
 
@@ -109,26 +109,24 @@ describe('github-gitter-user-search', function() {
   });
 
   describe('end-to-end #slow', function() {
-    var search, user;
-    beforeEach(function() {
-      search = testRequire('./services/github-gitter-user-search');
-      user = { id: '54eb53c202281dd5f26fa58f', username: 'gittertestbot', githubToken: '***REMOVED***'};
+    fixtureLoader.ensureIntegrationEnvironment('#integrationUser1');
+    var fixture = fixtureLoader.setup({
+      'user1': '#integrationUser1'
+    })
 
-    });
+    var search = testRequire('./services/github-gitter-user-search');
 
-    it('should find users', function(done) {
-      return search('Andrew Newdigate', user)
+    it('should find users', function() {
+      return search('Andrew Newdigate', fixture.user1)
         .then(function(data) {
           assert(data.results.some(function(user) {
-            return user.username == 'suprememoocow';
+            return user.username === 'suprememoocow';
           }));
-        })
-        .nodeify(done);
+        });
     });
 
-    it('should find with reserved words', function(done) {
-      return search('AND', user)
-        .nodeify(done);
+    it('should find with reserved words', function() {
+      return search('AND', fixture.user1);
     });
 
   });
