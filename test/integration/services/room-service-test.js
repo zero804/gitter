@@ -22,13 +22,22 @@ testRequire("./services/room-service");
 testRequire("./services/room-service");
 
 describe('room-service', function() {
+
+  fixtureLoader.ensureIntegrationEnvironment('GITTER_INTEGRATION_USER_SCOPE_TOKEN');
+
   var fixture = fixtureLoader.setup({
     deleteDocuments: {
       Troupe: [{ lcUri: 'gittertest' }]
     },
-    user1: { },
-    user2: { },
-    user3: { },
+    user1: {
+      githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
+    },
+    user2: {
+      githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
+    },
+    user3: {
+      githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
+    },
     troupeOrg1: {
       githubType: 'ORG',
       users: ['user1', 'user2']
