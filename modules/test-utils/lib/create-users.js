@@ -58,12 +58,20 @@ function createUser(fixtureName, f) {
   function possibleGenerate(key, fn) {
     if (f.hasOwnProperty(key)) {
       if (f[key] === true) {
-        return fn();
+        if (fn) {
+          return fn();
+        } else {
+          return null;
+        }
       } else {
         return f[key];
       }
     } else {
-      return fn()
+      if (fn) {
+        return fn()
+      } else {
+        return null;
+      }
     }
   }
 
@@ -71,7 +79,7 @@ function createUser(fixtureName, f) {
     identities: f.identities,
     displayName: possibleGenerate('displayName', fixtureUtils.generateName),
     githubId: possibleGenerate('githubId', fixtureUtils.generateGithubId),
-    githubToken: possibleGenerate('githubToken', fixtureUtils.generateGithubToken),
+    githubToken: possibleGenerate('githubToken'),
     username: possibleGenerate('username', fixtureUtils.generateUsername),
     gravatarImageUrl: f.gravatarImageUrl,
     state: f.state || undefined,

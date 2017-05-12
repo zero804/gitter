@@ -61,10 +61,7 @@ function matchIds(things, ids) {
 describe('restful #slow', function() {
   var fixture = fixtureLoader.setup({
     // user1 is a google (non-github) user
-    user1: {
-      id: 1,
-      username: generateNonGithubUsername()
-    },
+    user1: '#integrationUser1',
     identity1: {
       user: 'user1',
       provider: 'google',

@@ -15,23 +15,28 @@ describe("User Service", function() {
     user3: { }
   });
 
-  it('should allow two users with the same githubId to be created at the same moment, but only create a single account', function() {
-    var userService = testRequire("./services/user-service");
+  describe('duplicate account creation', function() {
+    fixtureLoader.ensureIntegrationEnvironment('GITTER_INTEGRATION_USER_SCOPE_TOKEN');
 
-    var githubId = fixture2.generateGithubId();
-    return Promise.all([
-      userService.findOrCreateUserForGithubId({ githubId: githubId, username: fixture2.generateUsername(), githubToken: fixture2.generateGithubToken() }),
-      userService.findOrCreateUserForGithubId({ githubId: githubId, username: fixture2.generateUsername(), githubToken: fixture2.generateGithubToken() })
-      ])
-      .spread(function(user1, user2) {
-        assert.strictEqual(user1.id, user2.id);
-        assert.strictEqual(user1.confirmationCode, user2.confirmationCode);
-      })
-      .catch(mongoUtils.mongoErrorWithCode(11000), function() {
-        // It looks like mongo is just incapable of guaranteeing this. Up to
-        // 50% of the time this test runs it throws this error.
-        console.log("Duplicate user.");
-      });
+    it('should allow two users with the same githubId to be created at the same moment, but only create a single account', function() {
+      var userService = testRequire("./services/user-service");
+
+      var githubId = fixture2.generateGithubId();
+
+      return Promise.all([
+        userService.findOrCreateUserForGithubId({ githubId: githubId, username: fixture2.generateUsername(), githubToken: fixture2.GITTER_INTEGRATION_USER_SCOPE_TOKEN }),
+        userService.findOrCreateUserForGithubId({ githubId: githubId, username: fixture2.generateUsername(), githubToken: fixture2.GITTER_INTEGRATION_USER_SCOPE_TOKEN})
+        ])
+        .spread(function(user1, user2) {
+          assert.strictEqual(user1.id, user2.id);
+        })
+        .catch(mongoUtils.mongoErrorWithCode(11000), function() {
+          // It looks like mongo is just incapable of guaranteeing this. Up to
+          // 50% of the time this test runs it throws this error.
+          console.log("Duplicate user.");
+        });
+    });
+
   });
 
   it('should create new users', function(done) {

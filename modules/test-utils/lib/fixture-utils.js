@@ -27,10 +27,6 @@ function generateGithubId() {
   return (++counter) + seed;
 }
 
-function generateGithubToken() {
-  return '***REMOVED***';
-}
-
 function generateGroupUri() {
   return '_group' + (++counter) + Date.now();
 }
@@ -42,6 +38,5 @@ module.exports = {
   generateUri: generateUri,
   generateUsername: generateUsername,
   generateGithubId: generateGithubId,
-  generateGithubToken: generateGithubToken,
   generateGroupUri: generateGroupUri
 }

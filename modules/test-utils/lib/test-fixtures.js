@@ -30,7 +30,6 @@ function createBaseFixture() {
     generateUri: fixtureUtils.generateUri,
     generateUsername: fixtureUtils.generateUsername,
     generateGithubId: fixtureUtils.generateGithubId,
-    generateGithubToken: fixtureUtils.generateGithubToken,
     generateGroupUri: fixtureUtils.generateGroupUri,
 
     cleanup: function(callback) {
