@@ -95,8 +95,6 @@ LessWatcher.prototype.startWatching = function(/*optional*/newWatchGlob) {
             depMap,
             absoluteEntryPoints,
             needlePath
-            //'/Users/eric/Documents/github/gitter-webapp/public/js/views/app/headerView.less'
-            //'/Users/eric/Documents/github/gitter-webapp/public/less/colors.less'
           );
 
           affectedEmitter.emit('change', affectedEntryPoints);
