@@ -9,6 +9,7 @@ var configurationMappings = {
   GITTER_INTEGRATION_USER_SCOPE_TOKEN: 'integrationTests:test_user:user_scope_token',
   GITTER_INTEGRATION_REPO_SCOPE_TOKEN: 'integrationTests:test_user:repo_scope_token',
   GITTER_INTEGRATION_USER_ID: 'integrationTests:test_user:user_id',
+  GITTER_INTEGRATION_EMAIL: 'integrationTests:test_user:email',
 
   GITTER_INTEGRATION_COLLAB_USER_SCOPE_TOKEN: 'integrationTests:collab_user:user_scope_token',
   GITTER_INTEGRATION_COLLAB_USERNAME: 'integrationTests:collab_user:username',

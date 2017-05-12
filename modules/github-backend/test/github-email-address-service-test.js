@@ -1,19 +1,18 @@
 "use strict";
 
 var assert = require('assert');
-
-var TOKEN = '***REMOVED***';
-var USERNAME = 'gittertestbot';
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
 describe("email-address-service #github", function() {
+  fixtureLoader.ensureIntegrationEnvironment('GITTER_INTEGRATION_USERNAME', 'GITTER_INTEGRATION_USER_SCOPE_TOKEN', 'GITTER_INTEGRATION_EMAIL');
 
   describe('integration #slow', function() {
     it('should return the validated email address if the user has a token', function() {
       var service = require('../lib/github-email-address-service');
 
-      return service({ username: USERNAME, githubToken: TOKEN })
+      return service({ username: fixtureLoader.GITTER_INTEGRATION_USERNAME, githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN })
         .then(function (email) {
-          assert.strictEqual(email, 'gittertestbot@datatribe.net');
+          assert.strictEqual(email, fixtureLoader.GITTER_INTEGRATION_EMAIL);
         });
     });
 
