@@ -43,6 +43,7 @@ describe('group-api', function() {
     },
     user1: '#integrationUser1',
     user2: {
+      githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
       accessToken: 'web-internal'
     },
     group1: {
