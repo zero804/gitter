@@ -98,10 +98,13 @@ fixtureLoader.setup = function(expected) {
 fixtureLoader.setupEach = function(expected) {
   var fixture = {};
 
-  beforeEach(fixtureLoaderManual(fixture, expected));
+  beforeEach(function() {
+    return fixtureLoaderManual(fixture, _.cloneDeep(expected))()
+  });
+
   afterEach(function() {
-    if (fixture.cleanup) {
-      fixture.cleanup();
+    if (fixture && fixture.cleanup) {
+      return fixture.cleanup();
     }
   });
 
