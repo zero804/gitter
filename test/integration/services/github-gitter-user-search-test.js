@@ -120,7 +120,7 @@ describe('github-gitter-user-search', function() {
       return search('Andrew Newdigate', user)
         .then(function(data) {
           assert(data.results.some(function(user) {
-            return user.username == 'suprememoocow';
+            return user.username === 'suprememoocow';
           }));
         })
         .nodeify(done);

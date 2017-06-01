@@ -5,21 +5,15 @@ var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assert = require('assert');
 var ObjectID = require('mongodb').ObjectID;
 
-var fixture = {};
-
 var rememberMeMiddleware = testRequire('./web/middlewares/rememberme-middleware');
 
 describe('rememberme-middleware #slow', function() {
-  before(fixtureLoader(fixture, {
+  var fixture = fixtureLoader.setup({
     user1: { },
     userNoTokens: {
       username: 'remembermetest' + Date.now(),
       githubToken: null
     }
-  }));
-
-  after(function() {
-   fixture.cleanup();
   });
 
   it('should generate a token for a user', function() {
@@ -72,22 +66,26 @@ describe('rememberme-middleware #slow', function() {
     rememberMeMiddleware.testOnly.setTokenGracePeriodMillis(100);
 
     return rememberMeMiddleware.testOnly.generateAuthToken(fixture.user1.id)
+      .bind({
+        cookieValue: null
+      })
       .then(function(cookieValue) {
         assert(cookieValue);
+        this.cookieValue = cookieValue;
 
-        return rememberMeMiddleware.testOnly.validateAuthToken(cookieValue)
-          .then(function(userId) {
-            assert.strictEqual(userId, fixture.user1.id);
+        return rememberMeMiddleware.testOnly.validateAuthToken(cookieValue);
+      })
+      .then(function(userId) {
+        assert.strictEqual(userId, fixture.user1.id);
 
-            return rememberMeMiddleware.testOnly.deleteAuthToken(cookieValue);
-          })
-          .then(function() {
-            return rememberMeMiddleware.testOnly.validateAuthToken(cookieValue);
-          })
-          .then(function(userId) {
-            assert(!userId);
-          });
-        });
+        return rememberMeMiddleware.testOnly.deleteAuthToken(this.cookieValue);
+      })
+      .then(function() {
+        return rememberMeMiddleware.testOnly.validateAuthToken(this.cookieValue);
+      })
+      .then(function(userId) {
+        assert(!userId);
+      });
   });
 
   it('should handle bad keys', function() {

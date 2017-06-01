@@ -1,4 +1,4 @@
-/* eslint complexity: ["error", 19] */
+/* eslint complexity: ["error", 21] */
 "use strict";
 
 var Promise = require('bluebird');

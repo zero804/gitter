@@ -5,6 +5,7 @@ var stats = env.stats;
 var config = env.config;
 var Promise = require('bluebird');
 var client = require('./elasticsearch-client');
+var debug = require('debug')('gitter:app:elasticsearch:chats-for-room-search');
 
 const DEFAULT_QUERY_TIMEOUT = parseInt(config.get('elasticsearch:defaultQueryTimeout'), 10) || 500;
 
@@ -97,9 +98,10 @@ function searchRoom(troupeId, parsedQuery, options) {
   };
 
   var startTime = Date.now();
-
+  debug('Query: %j', queryRequest);
   return client.search(queryRequest)
     .then(function(response) {
+      debug('Response: %j', response);
       stats.responseTime('chat.search.exec', Date.now() - startTime);
 
       return response.hits.hits.map(function(hit) {
