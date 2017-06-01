@@ -34,9 +34,6 @@ npm i --production
 # Perform shrinkwrap on production dependencies
 npm shrinkwrap "$@"
 
-# Fix hostnames in the shrinkwrap file
-# ${SCRIPT_DIR}/fix-shrinkwrap-registry
-
 # Now, override production node_modules
 move_temp_modules_back
 
