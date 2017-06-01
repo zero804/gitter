@@ -1,4 +1,3 @@
-/*global describe:true, it:true, before:true, after:true */
 "use strict";
 
 var assert = require("assert");
@@ -33,7 +32,7 @@ describe("User Service", function() {
         .catch(mongoUtils.mongoErrorWithCode(11000), function() {
           // It looks like mongo is just incapable of guaranteeing this. Up to
           // 50% of the time this test runs it throws this error.
-          console.log("Duplicate user.");
+          console.log("Duplicate user."); // eslint-disable-line no-console
         });
     });
 
