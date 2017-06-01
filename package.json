@@ -223,7 +223,7 @@
     "gulp-codecov": "^2.0.2",
     "gulp-eslint": "^3.0.1",
     "gulp-filter": "^4.0.0",
-    "gulp-git": "^0.5.4",
+    "gulp-git": "^2.4.0",
     "gulp-github": "^0.3.4",
     "gulp-grep-stream": "0.0.2",
     "gulp-gzip": "^1.2.0",
