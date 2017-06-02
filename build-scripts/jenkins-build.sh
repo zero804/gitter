@@ -9,11 +9,8 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+set -e
 set -x
-
-ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
-
-cd "${ROOT_DIR}"
 
 if [[ "${FORCE_CLEAN_WORKSPACE}" == "true" ]]; then
   git clean -xfd
@@ -64,24 +61,24 @@ if [[ -n ${ghprbPullId} ]]; then
 fi
 
 ### Build Reports for Jenkins plot plugin
-mkdir -p output/plot-reports/
+#mkdir -p output/plot-reports/
 
-PROD_DEPS_ALL_COUNT=$(npm --parseable --loglevel error ls --production |wc -l)
-echo "YVALUE=${PROD_DEPS_ALL_COUNT}" > output/plot-reports/production-dependencies-all-count.properties
+#PROD_DEPS_ALL_COUNT=$(npm --parseable --loglevel error ls --production |wc -l)
+#echo "YVALUE=${PROD_DEPS_ALL_COUNT}" > output/plot-reports/production-dependencies-all-count.properties
 
-PROD_DEPS_DIRECT_COUNT=$(npm --parseable --loglevel error ls --production --depth 0 |wc -l)
-echo "YVALUE=${PROD_DEPS_DIRECT_COUNT}" > output/plot-reports/production-dependencies-direct-count.properties
+#PROD_DEPS_DIRECT_COUNT=$(npm --parseable --loglevel error ls --production --depth 0 |wc -l)
+#echo "YVALUE=${PROD_DEPS_DIRECT_COUNT}" > output/plot-reports/production-dependencies-direct-count.properties
 
-for i in router-app router-chat; do
-  SIZE=$(stat --printf="%s" "output/assets/styles/${i}.css.gz")
-  echo "YVALUE=${SIZE}" > output/plot-reports/css-size-${i}.properties
-done
 
-for i in vendor router-app router-chat; do
-  SIZE=$(stat --printf="%s" "output/assets/js/${i}.js.gz")
-  echo "YVALUE=${SIZE}" > output/plot-reports/js-size-${i}.properties
-done
+#for i in router-app router-chat; do
+#  SIZE=$(stat --printf="%s" "output/assets/styles/${i}.css.gz")
+#  echo "YVALUE=${SIZE}" > output/plot-reports/css-size-${i}.properties
+#done
 
+#for i in vendor router-app router-chat; do
+#  SIZE=$(stat --printf="%s" "output/assets/js/${i}.js.gz")
+#  echo "YVALUE=${SIZE}" > output/plot-reports/js-size-${i}.properties
+#done
 
 if [[ "${FORCE_AUTO_DEPLOY}" != true ]] && [[ "${ENVIRONMENT}" = beta ]] && [[ "${STAGED_ENVIRONMENT}" = true ]]; then
   echo "Should we do an auto-deploy?"
