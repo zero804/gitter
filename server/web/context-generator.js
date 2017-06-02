@@ -10,6 +10,7 @@ var contextGeneratorRequest = require('./context-generator-request');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 function serializeGroupForMainMenu(uriContext, user, leftMenu) {
+  if (!leftMenu) return null;
   var groupId = leftMenu.groupId;
   if (!groupId) return null;
 
@@ -40,6 +41,7 @@ function generateMainMenuContext(req, leftMenu) {
       troupe ? serializeTroupe(troupe, user) : undefined,
     ])
     .spread(function (reqContextHash, serializedUser, serializedGroup, serializedTroupe) {
+      if (!leftMenu) leftMenu = {};
       // TODO: how is suggestedRoomsHidden different from hasDismissedSuggestions?
       var suggestedRoomsHidden = leftMenu.suggestedRoomsHidden;
       delete leftMenu.suggestedRoomsHidden;
