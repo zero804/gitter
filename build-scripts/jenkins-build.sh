@@ -9,13 +9,10 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+set -e
 set -x
 
-ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
-
-cd "${ROOT_DIR}"
-
-if [[ "${FORCE_CLEAN_WORKSPACE}" == "true" ]]; then
+if [[ "${FORCE_CLEAN_WORKSPACE:-}" == "true" ]]; then
   git clean -xfd
 fi
 
@@ -34,56 +31,57 @@ function get_pr_labels {
         python -c 'import sys, json; j=json.load(sys.stdin); print "\n".join(map(lambda x: x["name"], j))'
 }
 
-if [[ -z "${ghprbPullId}" ]] && [[ -n "${GIT_BRANCH_SHORT}" ]] && [[ "${GIT_BRANCH_SHORT}" != "develop" ]] && [[ "${GIT_BRANCH_SHORT}" != "master" ]] ; then
+if [[ -z "${ghprbPullId:-}" ]] && [[ -n "${GIT_BRANCH_SHORT:-}" ]] && [[ "${GIT_BRANCH_SHORT:-}" != "develop" ]] && [[ "${GIT_BRANCH_SHORT:-}" != "master" ]] ; then
   export ghprbPullId=$(get_pr || "")
-  echo "Pull Request found: ${ghprbPullId}"
+  echo "Pull Request found: ${ghprbPullId:-}"
 fi
 
-export TEST_REDIS_HOST=${TEST_REDIS_HOST}
-export FAST_UGLIFY=${FAST_UGLIFY}
-export SENTRY_API_KEY=${SENTRY_API_KEY}
-export SENTRY_DOMAIN=${SENTRY_DOMAIN}
-export SENTRY_SLUG=${SENTRY_SLUG}
+export TEST_REDIS_HOST=${TEST_REDIS_HOST:-}
+export FAST_UGLIFY=${FAST_UGLIFY:-}
+export SENTRY_API_KEY=${SENTRY_API_KEY:-}
+export SENTRY_DOMAIN=${SENTRY_DOMAIN:-}
+export SENTRY_SLUG=${SENTRY_SLUG:-}
 
 # test if the selected git tag is actually the checked out branch.
 # a prod build checked out a feature branch once, and we have no idea why.
 # better to be safe than have premature builds on prod.
-test $SELECTED_GIT_TAG = $GIT_BRANCH
+test ${SELECTED_GIT_TAG:-} = ${GIT_BRANCH:-}
 
-if [ $STAGED_ENVIRONMENT = true ]; then
-  make continuous-integration ASSET_TAG_PREFIX=S GIT_BRANCH=$GIT_BRANCH GIT_COMMIT=$GIT_COMMIT
+if [ ${STAGED_ENVIRONMENT:-} = true ]; then
+  make continuous-integration ASSET_TAG_PREFIX=S GIT_BRANCH=${GIT_BRANCH:-} GIT_COMMIT=${GIT_COMMIT:-}
 else
-  make continuous-integration GIT_BRANCH=$GIT_BRANCH GIT_COMMIT=$GIT_COMMIT
+  make continuous-integration GIT_BRANCH=${GIT_BRANCH:-} GIT_COMMIT=${GIT_COMMIT:-}
 fi
 
 mkdir -p output/meta/
+
 ### Write pull-request labels to file for later
-if [[ -n ${ghprbPullId} ]]; then
+if [[ -n ${ghprbPullId:-} ]]; then
   get_pr_labels > output/meta/pr-labels.txt
-  echo "${ghprbPullId}" > output/meta/pr-number.txt
+  echo "${ghprbPullId:-}" > output/meta/pr-number.txt
 fi
 
 ### Build Reports for Jenkins plot plugin
-mkdir -p output/plot-reports/
+#mkdir -p output/plot-reports/
 
-PROD_DEPS_ALL_COUNT=$(npm --parseable --loglevel error ls --production |wc -l)
-echo "YVALUE=${PROD_DEPS_ALL_COUNT}" > output/plot-reports/production-dependencies-all-count.properties
+#PROD_DEPS_ALL_COUNT=$(npm --parseable --loglevel error ls --production |wc -l)
+#echo "YVALUE=${PROD_DEPS_ALL_COUNT}" > output/plot-reports/production-dependencies-all-count.properties
 
-PROD_DEPS_DIRECT_COUNT=$(npm --parseable --loglevel error ls --production --depth 0 |wc -l)
-echo "YVALUE=${PROD_DEPS_DIRECT_COUNT}" > output/plot-reports/production-dependencies-direct-count.properties
-
-for i in router-app router-chat; do
-  SIZE=$(stat --printf="%s" "output/assets/styles/${i}.css.gz")
-  echo "YVALUE=${SIZE}" > output/plot-reports/css-size-${i}.properties
-done
-
-for i in vendor router-app router-chat; do
-  SIZE=$(stat --printf="%s" "output/assets/js/${i}.js.gz")
-  echo "YVALUE=${SIZE}" > output/plot-reports/js-size-${i}.properties
-done
+#PROD_DEPS_DIRECT_COUNT=$(npm --parseable --loglevel error ls --production --depth 0 |wc -l)
+#echo "YVALUE=${PROD_DEPS_DIRECT_COUNT}" > output/plot-reports/production-dependencies-direct-count.properties
 
 
-if [[ "${FORCE_AUTO_DEPLOY}" != true ]] && [[ "${ENVIRONMENT}" = beta ]] && [[ "${STAGED_ENVIRONMENT}" = true ]]; then
+#for i in router-app router-chat; do
+#  SIZE=$(stat --printf="%s" "output/assets/styles/${i}.css.gz")
+#  echo "YVALUE=${SIZE}" > output/plot-reports/css-size-${i}.properties
+#done
+
+#for i in vendor router-app router-chat; do
+#  SIZE=$(stat --printf="%s" "output/assets/js/${i}.js.gz")
+#  echo "YVALUE=${SIZE}" > output/plot-reports/js-size-${i}.properties
+#done
+
+if [[ "${FORCE_AUTO_DEPLOY:-}" != true ]] && [[ "${ENVIRONMENT:-}" = beta ]] && [[ "${STAGED_ENVIRONMENT:-}" = true ]]; then
   echo "Should we do an auto-deploy?"
   if [[ -f "output/meta/pr-labels.txt" ]]; then
     if grep -q 'auto-deploy' output/meta/pr-labels.txt; then
