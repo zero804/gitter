@@ -15,11 +15,6 @@ describe('room-api', function() {
     app = require('../../server/api');
   });
 
-/**
- * fixtureLoader.GITTER_INTEGRATION_COLLAB_USER_SCOPE_TOKEN = '***REMOVED***';
- fixtureLoader.GITTER_INTEGRATION_COLLAB_USERNAME = 'gitter-integration-tests-collaborator';
- fixtureLoader.GITTER_INTEGRATION_COLLAB_USER_ID = '20068982';
- */
   var fixture = fixtureLoader.setup({
     user1: {
       accessToken: 'web-internal'

@@ -9,7 +9,7 @@ var secondaryPreferred;
 // timing, since you never know when the data will be
 // eventually consistent. So, for that reason, in test-fixtures
 // we only read off primaries
-if (config.get('mongo:onlyUsePrimary')) {
+if (process.env.GITTER_TEST || config.get('mongo:onlyUsePrimary')) {
   secondaryPreferred = 'primary'
 } else {
   secondaryPreferred = 'secondaryPreferred'

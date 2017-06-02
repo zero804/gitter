@@ -14,16 +14,11 @@ describe('GroupStrategy', function() {
   before(blockTimer.on);
   after(blockTimer.off);
 
-  var fixture = {};
-  before(fixtureLoader(fixture, {
+  var fixture = fixtureLoader.setup({
     group1: {},
     group2: {
       avatarUrl: 'https://gitter-avatars-beta.s3.amazonaws.com/groups/5798c8fa96b02166f9ac5a7b/original'
     }
-  }));
-
-  after(function() {
-    return fixture.cleanup();
   });
 
   it('should serialize a group', function() {

@@ -5,7 +5,7 @@ var ProvidePlugin = require('webpack/lib/ProvidePlugin');
 var CommonsChunkPlugin = require("webpack/lib/optimize/CommonsChunkPlugin");
 var ContextReplacementPlugin = require("webpack/lib/ContextReplacementPlugin");
 
-var getPostcssStack = require('gitter-styleguide/postcss-stack');
+var getPostcssStack = require('@gitterhq/styleguide/postcss-stack');
 
 var devMode = process.env.WEBPACK_DEV_MODE === '1';
 
@@ -69,7 +69,7 @@ var webpackConfig = {
     loaders: [
       {
         test: /\.hbs$/,
-        loader: 'gitter-handlebars-loader', // disable minify for now + path.resolve(path.join(__dirname, "../../build-scripts/html-min-loader"))
+        loader: '@gitterhq/handlebars-loader', // disable minify for now + path.resolve(path.join(__dirname, "../../build-scripts/html-min-loader"))
         query: {
           helperDirs: [
             path.dirname(require.resolve('gitter-web-templates/shared/helpers/pluralize'))

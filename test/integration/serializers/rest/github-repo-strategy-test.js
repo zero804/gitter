@@ -15,18 +15,13 @@ describe('GithubRepoStrategy', function() {
   before(blockTimer.on);
   after(blockTimer.off);
 
-  var fixture = {};
-  before(fixtureLoader(fixture, {
+  var fixture = fixtureLoader.setup({
     user1: {},
     troupe1: {
       users: ['user1'],
       githubType: 'REPO',
       security: 'PUBLIC'
     }
-  }));
-
-  after(function() {
-    return fixture.cleanup();
   });
 
   it('should serialize a repo that does not have a room', function() {

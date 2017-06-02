@@ -8,6 +8,7 @@ describe('legacy-group-policy-evaluator', function() {
 
   describe('#slow', function() {
     fixtureLoader.disableMongoTableScans();
+    fixtureLoader.ensureIntegrationEnvironment('GITTER_INTEGRATION_ORG');
 
     function expect(GithubOrgPolicyEvaluator, user, uri, expected) {
       var evaluator = new GithubOrgPolicyEvaluator(user, uri);
@@ -42,13 +43,7 @@ describe('legacy-group-policy-evaluator', function() {
       });
 
       var fixture = fixtureLoader.setup({
-        deleteDocuments: {
-          User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }]
-        },
-        user1: {
-          username: fixtureLoader.GITTER_INTEGRATION_USERNAME,
-          githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN
-        },
+        user1: '#integrationUser1',
         user2: {},
         user3: {},
       });

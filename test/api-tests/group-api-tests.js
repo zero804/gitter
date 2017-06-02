@@ -10,14 +10,19 @@ var securityDescriptorService = require('gitter-web-permissions/lib/security-des
 describe('group-api', function() {
   var app, request;
 
+  fixtureLoader.ensureIntegrationEnvironment('#integrationUser1', 'GITTER_INTEGRATION_ORG');
+
   before(function() {
     request = require("supertest-as-promised")(Promise);
     app = require('../../server/api');
   });
 
+  fixtureLoader.ensureIntegrationEnvironment(
+      '#integrationUser1',
+      'GITTER_INTEGRATION_ORG');
+
   var fixture = fixtureLoader.setup({
     deleteDocuments: {
-      User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }],
       Group: [
         { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() },
         { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
@@ -36,12 +41,9 @@ describe('group-api', function() {
         { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME + '/topics' }
       ]
     },
-    user1: {
-      githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
-      username: fixtureLoader.GITTER_INTEGRATION_USERNAME,
-      accessToken: 'web-internal'
-    },
+    user1: '#integrationUser1',
     user2: {
+      githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
       accessToken: 'web-internal'
     },
     group1: {

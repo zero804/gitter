@@ -8,12 +8,10 @@ var getModelVersion = require('../lib/get-model-version');
 describe('get-model-version', function() {
 
   describe('using real mongoose objects #slow', function() {
-    var fixture = {};
-    before(fixtureLoader(fixture, {
-      user1: {}
-    }));
 
-    after(function() { return fixture.cleanup(); });
+    var fixture = fixtureLoader.setup({
+      user1: {}
+    });
 
     describe('with initial value', function() {
       it('should read the _tv value ', function() {

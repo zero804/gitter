@@ -6,19 +6,18 @@ var mockito = require('jsmockito').JsMockito;
 var Promise = require('bluebird');
 
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
-var fixture = {};
 
 describe('room-context-service', function() {
   var createPolicyForRoom, createPolicyForOneToOne, roomContextService, access;
 
-  before(fixtureLoader(fixture, {
+  var fixture = fixtureLoader.setup({
     user1: {},
     user2: {},
     troupe1: {
       users: ['user1', 'user2']
     },
     troupe2: {}
-  }));
+  });
 
   beforeEach(function() {
     createPolicyForRoom = mockito.mockFunction();
@@ -107,10 +106,6 @@ describe('room-context-service', function() {
     }, function(err) {
       assert.strictEqual(err.status, 401);
     });
-  });
-
-  after(function() {
-    fixture.cleanup();
   });
 
 });

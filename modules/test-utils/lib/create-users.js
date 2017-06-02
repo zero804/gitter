@@ -7,21 +7,71 @@ var OAuthAccessToken = require('gitter-web-persistence').OAuthAccessToken;
 var OAuthClient = require('gitter-web-persistence').OAuthClient;
 var fixtureUtils = require('./fixture-utils');
 var debug = require('debug')('gitter:tests:test-fixtures');
+var integrationFixtures = require('./integration-fixtures');
 
 var userCounter = 0;
 
+function getIntegrationConfig(f) {
+  if (f === '#integrationUser1') {
+    return {
+        doc: {
+          username: integrationFixtures.fixtures.GITTER_INTEGRATION_USERNAME,
+          githubToken: integrationFixtures.fixtures.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
+          accessToken: 'web-internal'
+        },
+        deleteQuery: {
+           username: integrationFixtures.fixtures.GITTER_INTEGRATION_USERNAME
+        }
+      }
+  }
+
+  if (f === '#integrationCollabUser1') {
+    return {
+        doc: {
+          username: integrationFixtures.fixtures.GITTER_INTEGRATION_COLLAB_USERNAME,
+          githubToken: integrationFixtures.fixtures.GITTER_INTEGRATION_COLLAB_USER_SCOPE_TOKEN,
+          accessToken: 'web-internal'
+        },
+        deleteQuery: {
+           username: integrationFixtures.GITTER_INTEGRATION_COLLAB_USERNAME
+        }
+      }
+  }
+
+
+}
 function createUser(fixtureName, f) {
   debug('Creating %s', fixtureName);
+
+  var preremove = null;
+
+  var integrationConfig = getIntegrationConfig(f);
+  if (integrationConfig) {
+    f = integrationConfig.doc;
+    if (integrationConfig.deleteQuery) {
+      preremove = function() {
+        return User.remove(integrationConfig.deleteQuery);
+      }
+    }
+  }
 
   function possibleGenerate(key, fn) {
     if (f.hasOwnProperty(key)) {
       if (f[key] === true) {
-        return fn();
+        if (fn) {
+          return fn();
+        } else {
+          return null;
+        }
       } else {
         return f[key];
       }
     } else {
-      return fn()
+      if (fn) {
+        return fn()
+      } else {
+        return null;
+      }
     }
   }
 
@@ -29,7 +79,7 @@ function createUser(fixtureName, f) {
     identities: f.identities,
     displayName: possibleGenerate('displayName', fixtureUtils.generateName),
     githubId: possibleGenerate('githubId', fixtureUtils.generateGithubId),
-    githubToken: possibleGenerate('githubToken', fixtureUtils.generateGithubToken),
+    githubToken: possibleGenerate('githubToken'),
     username: possibleGenerate('username', fixtureUtils.generateUsername),
     gravatarImageUrl: f.gravatarImageUrl,
     state: f.state || undefined,
@@ -38,7 +88,14 @@ function createUser(fixtureName, f) {
 
   debug('Creating user %s with %j', fixtureName, doc);
 
-  var promise = User.create(doc);
+  var promise = Promise.try(function() {
+      if (preremove) {
+        return preremove();
+      }
+    })
+    .then(function() {
+      return User.create(doc);
+    })
 
   if (f.accessToken) {
     promise = promise.tap(function(user) {

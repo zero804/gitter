@@ -6,7 +6,6 @@ var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var Promise = require('bluebird');
 var ObjectID = require('mongodb').ObjectID;
 var StatusError = require('statuserror');
-var fixture = {};
 
 var mockito = require('jsmockito').JsMockito;
 var times = mockito.Verifiers.times;
@@ -23,13 +22,22 @@ testRequire("./services/room-service");
 testRequire("./services/room-service");
 
 describe('room-service', function() {
+
+  fixtureLoader.ensureIntegrationEnvironment('GITTER_INTEGRATION_USER_SCOPE_TOKEN');
+
   var fixture = fixtureLoader.setup({
     deleteDocuments: {
       Troupe: [{ lcUri: 'gittertest' }]
     },
-    user1: { },
-    user2: { },
-    user3: { },
+    user1: {
+      githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
+    },
+    user2: {
+      githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
+    },
+    user3: {
+      githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
+    },
     troupeOrg1: {
       githubType: 'ORG',
       users: ['user1', 'user2']
@@ -792,7 +800,7 @@ describe('room-service', function() {
 
     describe('room-service #slow', function() {
 
-      beforeEach(fixtureLoader(fixture, {
+      var fixture = fixtureLoader.setup({
         troupeCanRemove: {
           security: 'PUBLIC',
           githubType: 'REPO',
@@ -813,10 +821,6 @@ describe('room-service', function() {
         userToRemove: {},
         userRemoveNonAdmin: {},
         userRemoveAdmin: {}
-      }));
-
-      afterEach(function() {
-        fixture.cleanup();
       });
 
       describe('#removeFavourite', function() {
@@ -1443,22 +1447,17 @@ describe('room-service', function() {
     });
 
     describe('integration tests #slow', function() {
-      var fixture = {};
       var roomService;
       var createPolicyForRoom;
       var access;
       var roomMembershipService;
 
-      before(fixtureLoader(fixture, {
+      var fixture = fixtureLoader.setup({
         troupeOrg1: {
           githubType: 'ORG',
           users: []
         },
         user1: {}
-      }));
-
-      after(function() {
-        fixture.cleanup();
       });
 
       beforeEach(function() {

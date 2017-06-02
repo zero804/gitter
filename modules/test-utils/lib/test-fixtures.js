@@ -1,8 +1,12 @@
 "use strict";
 
+var env = require('gitter-web-env');
+var logger = env.logger;
 var Promise = require('bluebird');
 var debug = require('debug')('gitter:tests:test-fixtures');
 var fixtureUtils = require('./fixture-utils');
+var _ = require('lodash');
+var integrationFixtures = require('./integration-fixtures');
 
 var fixtureSteps = [
   require('./delete-documents'),
@@ -26,7 +30,6 @@ function createBaseFixture() {
     generateUri: fixtureUtils.generateUri,
     generateUsername: fixtureUtils.generateUsername,
     generateGithubId: fixtureUtils.generateGithubId,
-    generateGithubToken: fixtureUtils.generateGithubToken,
     generateGroupUri: fixtureUtils.generateGroupUri,
 
     cleanup: function(callback) {
@@ -62,23 +65,26 @@ function createExpectedFixtures(expected) {
     })
 }
 
-function fixtureLoader(fixture, expected) {
+function fixtureLoaderManual(fixture, expected) {
   debug("Creating fixtures %j", expected);
-  return function(done) {
+  return function() {
+    if (this && this._skipFixtureSetup) return;
     return createExpectedFixtures(expected)
       .then(function(data) {
          Object.keys(data).forEach(function(key) {
           fixture[key] = data[key];
          });
-       })
-       .asCallback(done);
+       });
    };
 }
+
+var fixtureLoader = {};
+fixtureLoader.manual = fixtureLoaderManual;
 
 fixtureLoader.setup = function(expected) {
   var fixture = {};
 
-  before(fixtureLoader(fixture, expected));
+  before(fixtureLoaderManual(fixture, expected));
   after(function() {
     if (fixture.cleanup) {
       fixture.cleanup();
@@ -87,6 +93,46 @@ fixtureLoader.setup = function(expected) {
 
   return fixture;
 };
+
+fixtureLoader.setupEach = function(expected) {
+  var fixture = {};
+
+  beforeEach(function() {
+    return fixtureLoaderManual(fixture, _.cloneDeep(expected))()
+  });
+
+  afterEach(function() {
+    if (fixture && fixture.cleanup) {
+      return fixture.cleanup();
+    }
+  });
+
+  return fixture;
+};
+
+fixtureLoader.ensureIntegrationEnvironment = function() {
+    var requiredConfigs = Array.prototype.slice.call(arguments);
+
+    before(function() {
+      var missing = integrationFixtures.checkConfigSet(requiredConfigs);
+
+      if (!missing.length) {
+        // No keys missing, continue with the test
+        return;
+      }
+
+      // Do we throw an error on missing configuration?
+      if (process.env.GITTER_FORCE_INTEGRATION_TESTS) {
+        throw new Error('Configuration required for test is missing: ' + missing.join(', '));
+      } else {
+        logger.warn('Skipping this test due to missing config items', missing.join(', '))
+        // Just skip these tests
+        this._skipFixtureSetup = true;
+        this.skip();
+      }
+    });
+
+}
 
 fixtureLoader.disableMongoTableScans = function() {
   var mongoTableScans = require('./mongo-table-scans');
@@ -114,6 +160,7 @@ fixtureLoader.disableMongoTableScans = function() {
   });
 
 };
+
 fixtureLoader.createExpectedFixtures = createExpectedFixtures;
 
 // TODO: deprecate these, use them from fixtureUtils
@@ -121,28 +168,7 @@ fixtureLoader.generateEmail = fixtureUtils.generateEmail;
 fixtureLoader.generateGithubId = fixtureUtils.generateGithubId;
 fixtureLoader.generateUri = fixtureUtils.generateUri;
 
-fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN = '***REMOVED***';
-fixtureLoader.GITTER_INTEGRATION_USERNAME = 'gitter-integration-tests';
-fixtureLoader.GITTER_INTEGRATION_USER_ID = '19433197';
-
-fixtureLoader.GITTER_INTEGRATION_COLLAB_USER_SCOPE_TOKEN = '***REMOVED***';
-fixtureLoader.GITTER_INTEGRATION_COLLAB_USERNAME = 'gitter-integration-tests-collaborator';
-fixtureLoader.GITTER_INTEGRATION_COLLAB_USER_ID = '20068982';
-
-fixtureLoader.GITTER_INTEGRATION_ORG = 'gitter-integration-tests-organisation';
-fixtureLoader.GITTER_INTEGRATION_ORG_ID = '19433202';
-fixtureLoader.GITTER_INTEGRATION_REPO = 'public-repo-1';
-fixtureLoader.GITTER_INTEGRATION_REPO_FULL = fixtureLoader.GITTER_INTEGRATION_USERNAME + '/' + fixtureLoader.GITTER_INTEGRATION_REPO;
-fixtureLoader.GITTER_INTEGRATION_REPO_ID = '59505414';
-fixtureLoader.GITTER_INTEGRATION_REPO2 = 'public-repo-2';
-fixtureLoader.GITTER_INTEGRATION_REPO2_FULL = fixtureLoader.GITTER_INTEGRATION_USERNAME + '/' + fixtureLoader.GITTER_INTEGRATION_REPO2;
-fixtureLoader.GITTER_INTEGRATION_REPO2_ID = '62724563';
-fixtureLoader.GITTER_INTEGRATION_COMMUNITY = '_I-heart-cats-Test-LOL';
-fixtureLoader.GITTER_INTEGRATION_ROOM = 'all-about-kitty-litter';
-
-fixtureLoader.GITTER_INTEGRATION_REPO_WITH_COLLAB = 'gitter-integration-tests-organisation/gitter-integration-tests-organisation-repo-1';
-fixtureLoader.GITTER_INTEGRATION_REPO_WITH_COLLAB2 = 'gitter-integration-tests-organisation/gitter-integration-tests-organisation-repo-2';
-fixtureLoader.GITTER_INTEGRATION_REPO_WITH_COLLAB_ONLY_READ = 'gitter-integration-tests-organisation/gitter-integration-tests-organisation-collaborator-read';
-
+// TODO: remove this legacy code...
+_.extend(fixtureLoader, integrationFixtures.fixtures);
 
 module.exports = fixtureLoader;

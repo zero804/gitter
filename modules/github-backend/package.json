@@ -16,5 +16,8 @@
     "gitter-web-env": "file:../env",
     "gitter-web-github": "file:../github",
     "lodash": "^3.2.0"
+  },
+  "devDependencies": {
+    "gitter-web-test-utils": "file:../test-utils"
   }
 }

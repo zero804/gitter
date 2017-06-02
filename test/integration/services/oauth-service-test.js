@@ -7,15 +7,10 @@ var oauthService = testRequire("./services/oauth-service");
 var Promise = require('bluebird');
 
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
-var fixture = {};
 
 describe('oauth-service', function() {
-  before(fixtureLoader(fixture, {
+  var fixture = fixtureLoader.setup({
     user1: { }
-  }));
-
-  after(function() {
-   fixture.cleanup();
   });
 
   it('should create tokens', function() {

@@ -10,7 +10,7 @@ var isCompact = require('../../utils/detect-compact');
 
 require('../../template/helpers/all');
 require('../behaviors/isomorphic');
-require('gitter-styleguide/css/components/modals.css');
+require('@gitterhq/styleguide/css/components/modals.css');
 
 var ModalView = Marionette.LayoutView.extend({
   template: modalTemplate,

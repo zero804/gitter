@@ -26,6 +26,7 @@ describe('group-membership-service', function() {
   }
 
   describe('integration tests #slow', function() {
+    fixtureLoader.ensureIntegrationEnvironment('GITTER_INTEGRATION_USER_SCOPE_TOKEN');
 
     var fixture = fixtureLoader.setup({
       group1: {},
@@ -35,9 +36,15 @@ describe('group-membership-service', function() {
         }
       },
       group3: {},
-      user1: {},
-      user2: {},
-      user3: {},
+      user1: {
+        githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
+      },
+      user2: {
+        githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
+      },
+      user3: {
+        githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
+      },
       troupe1: { users: ['user1', 'user2'], group: 'group1' },
       troupe2: { users: ['user2'], group: 'group2' },
       troupe3: { users: ['user1'], group: 'group3' },

@@ -12,19 +12,13 @@ var persistenceService = require('gitter-web-persistence');
 
 describe('recent-room-service', function() {
   describe('ordering', function() {
-    var fixture = {};
-
-    before(fixtureLoader(fixture, {
+    var fixture = fixtureLoader.setup({
       user1: { },
       userNoTroupes: { },
       troupe1: { users: ['user1'] },
       troupe2: { users: ['user1'] },
       troupe3: { users: ['user1'] },
       troupe4: { users: ['user1'] }
-    }));
-
-    after(function() {
-      fixture.cleanup();
     });
 
     it('should rearrange the order of favourites correctly',function(done) {
@@ -99,15 +93,9 @@ describe('recent-room-service', function() {
   });
 
   describe('#updateFavourite()', function() {
-    var fixture = {};
-
-    before(fixtureLoader(fixture, {
+    var fixture = fixtureLoader.setup({
       user1: { },
       troupe1: { users: ['user1'] }
-    }));
-
-    after(function() {
-      fixture.cleanup();
     });
 
     it('should add a troupe to favourites',function(done) {
@@ -139,15 +127,9 @@ describe('recent-room-service', function() {
   });
 
   describe("#saveLastVisitedTroupeforUserId", function() {
-    var fixture = {};
-
-    before(fixtureLoader(fixture, {
+    var fixture = fixtureLoader.setup({
       user1: { },
       troupe1: { users: ['user1'] }
-    }));
-
-    after(function() {
-      fixture.cleanup();
     });
 
     it('should record the time each troupe was last accessed by a user', function(done) {
@@ -182,18 +164,12 @@ describe('recent-room-service', function() {
 
 
   describe('#findInitialRoomUrlForUser', function() {
-    var fixture = {};
-
-    before(fixtureLoader(fixture, {
+    var fixture = fixtureLoader.setup({
       user1: { },
       user2: { },
       userNoTroupes: { },
       troupe1: { users: ['user1'] },
       troupeOneToOne: { oneToOne: true, users: ['user1', 'user2'] },
-    }));
-
-    after(function() {
-      fixture.cleanup();
     });
 
     it('#01 should return null when a user has no troupes',function(done) {

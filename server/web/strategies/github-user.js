@@ -7,8 +7,8 @@ var stats = env.stats;
 var logger = env.logger;
 
 var moment = require('moment');
-var GitHubStrategy = require('gitter-passport-github').Strategy;
-var TokenStateProvider = require('gitter-passport-oauth2').TokenStateProvider;
+var GitHubStrategy = require('@gitterhq/passport-github').Strategy;
+var TokenStateProvider = require('@gitterhq/passport-oauth2').TokenStateProvider;
 var mixpanel = require('../../web/mixpanelUtils');
 var extractGravatarVersion = require('gitter-web-avatars/server/extract-gravatar-version');
 var gaCookieParser = require('../ga-cookie-parser');

@@ -9,6 +9,13 @@ var assert = require('assert');
 describe('create-github-room-api', function() {
   var app, request;
 
+  fixtureLoader.ensureIntegrationEnvironment(
+    '#integrationUser1',
+    '#integrationCollabUser1',
+    'GITTER_INTEGRATION_ORG',
+    'GITTER_INTEGRATION_REPO_WITH_COLLAB'
+  );
+
   before(function() {
     request = require("supertest-as-promised")(Promise);
     app = require('../../server/api');
@@ -16,27 +23,14 @@ describe('create-github-room-api', function() {
 
   var fixture = fixtureLoader.setup({
     deleteDocuments: {
-      User: [{
-        username: fixtureLoader.GITTER_INTEGRATION_USERNAME
-      }, {
-        username: fixtureLoader.GITTER_INTEGRATION_COLLAB_USERNAME
-      }],
       Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() }],
       Troupe: [
         { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
         { lcUri: fixtureLoader.GITTER_INTEGRATION_REPO_WITH_COLLAB.toLowerCase() }
       ]
     },
-    user1: {
-      githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
-      username: fixtureLoader.GITTER_INTEGRATION_USERNAME,
-      accessToken: 'web-internal'
-    },
-    user2: {
-      githubToken: fixtureLoader.GITTER_INTEGRATION_COLLAB_USER_SCOPE_TOKEN,
-      username: fixtureLoader.GITTER_INTEGRATION_COLLAB_USERNAME,
-      accessToken: 'web-internal'
-    },
+    user1: '#integrationUser1',
+    user2: '#integrationCollabUser1',
     group1: {
     },
     troupe1: {

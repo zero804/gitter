@@ -14,6 +14,8 @@ describe('avatar-api', function() {
     app = require('../../server/api');
   });
 
+  fixtureLoader.ensureIntegrationEnvironment('GITTER_INTEGRATION_USERNAME');
+
   var fixture = fixtureLoader.setup({
     deleteDocuments: {
       User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }],
@@ -104,6 +106,8 @@ describe('avatar-api', function() {
   }];
 
   before(function() {
+    if (this._skipFixtureSetup) return;
+
     FIXTURES_TEMPLATES[0].url = '/group/i/' + fixture.group1.id;
     FIXTURES_TEMPLATES[1].url = '/group/i/' + fixture.group2.id;
     FIXTURES_TEMPLATES[2].url = '/group/iv/1/' + fixture.group1.id;

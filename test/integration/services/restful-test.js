@@ -22,10 +22,6 @@ function generateId() {
 function generateGithubUsername() {
   return 'github' + (++counter) + Date.now();
 }
-// for some tests it specifically has to be a non-github user
-function generateNonGithubUsername() {
-  return ''+(++counter) + Date.now()+'_google';
-}
 
 // I need to make sure that a gitter user that is a github user returns the
 // right stuff and therefore I have to make sure that a gitter account exists
@@ -59,12 +55,11 @@ function matchIds(things, ids) {
 }
 
 describe('restful #slow', function() {
+  fixtureLoader.ensureIntegrationEnvironment('#integrationUser1');
+
   var fixture = fixtureLoader.setup({
     // user1 is a google (non-github) user
-    user1: {
-      id: 1,
-      username: generateNonGithubUsername()
-    },
+    user1: '#integrationUser1',
     identity1: {
       user: 'user1',
       provider: 'google',

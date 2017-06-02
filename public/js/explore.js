@@ -10,8 +10,8 @@ var frameUtils = require('gitter-web-frame-utils');
 
 require('./utils/tracking');
 
-require('gitter-styleguide/css/components/buttons.css');
-require('gitter-styleguide/css/components/headings.css');
+require('@gitterhq/styleguide/css/components/buttons.css');
+require('@gitterhq/styleguide/css/components/headings.css');
 
 appEvents.on('route', function(hash) {
   frameUtils.postMessage({ type: 'route', hash: hash });

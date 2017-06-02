@@ -8,18 +8,12 @@ var unreadItemService = testRequire("./services/unread-items");
 var appEvents = testRequire("gitter-web-appevents");
 
 describe("unread item end-to-end integration tests #slow", function() {
-  var fixture = {};
-
-  before(fixtureLoader(fixture, {
+  var fixture = fixtureLoader.setup({
     user1: { username: true },
     user2: { username: true },
     user3: { username: true },
     troupe1: { users: ['user1'], githubType: 'REPO_CHANNEL', security: 'PUBLIC' },
     troupe2: { users: ['user1'], githubType: 'ORG_CHANNEL', security: 'PRIVATE' },
-  }));
-
-  after(function() {
-    return fixture.cleanup();
   });
 
   it('should notify when the user has access', function() {
