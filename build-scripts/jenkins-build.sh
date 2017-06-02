@@ -54,10 +54,11 @@ else
 fi
 
 mkdir -p output/meta/
+
 ### Write pull-request labels to file for later
-if [[ -n ${ghprbPullId} ]]; then
+if [[ -n ${ghprbPullId:-} ]]; then
   get_pr_labels > output/meta/pr-labels.txt
-  echo "${ghprbPullId}" > output/meta/pr-number.txt
+  echo "${ghprbPullId:-}" > output/meta/pr-number.txt
 fi
 
 ### Build Reports for Jenkins plot plugin
