@@ -31,7 +31,8 @@ function load_secrets {
   secrets_dir=`mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir'`
   git clone -b develop --depth 1 git@gitlab.com:gitlab-org/gitter/secrets.git ${secrets_dir}
   pushd ${secrets_dir}
-  eval $(${secrets_dir}./webapp/env dev)
+  ls -la ${secrets_dir}
+  eval $(${secrets_dir}/webapp/env dev)
   popd
 }
 
