@@ -33,6 +33,8 @@ module.exports = function(options, callback, request) {
 
     var uri = url.format(parsed);
 
+    console.log('ANONYMOUSE', uri); // eslint-disable-line no-console
+
     if(options.uri) {
       options.uri = uri;
     } else if(options.url) {

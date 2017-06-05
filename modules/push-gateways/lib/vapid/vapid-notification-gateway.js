@@ -9,10 +9,18 @@ var vapidNotificationGeneration = require('./vapid-notification-generator');
 
 var DEFAULT_TTL_SECONDS = 86400 * 7; // 7 days
 
-webpush.setVapidDetails(
-  config.get('vapid:contact'),
-  config.get('vapid:publicKey'),
-  config.get('vapid:privateKey'));
+var setup = false;
+
+function performSetup() {
+  if (setup) return;
+
+  webpush.setVapidDetails(
+    config.get('vapid:contact'),
+    config.get('vapid:publicKey'),
+    config.get('vapid:privateKey'));
+
+  setup = true;
+}
 
 /**
  * Predicate function for bluebird
@@ -22,6 +30,8 @@ function isVapidGoneError(err) {
 }
 
 function sendNotificationToDevice(notificationType, notificationDetails, device) {
+  if (!setup) performSetup();
+
   var pushSubscription = {
     endpoint: device.deviceId,
     keys: {
