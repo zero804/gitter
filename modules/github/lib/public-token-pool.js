@@ -8,8 +8,6 @@ var stats = env.stats;
 var anonymousClientId = nconf.get('github:anonymous_app:client_id');
 var anonymousClientSecret = nconf.get('github:anonymous_app:client_secret');
 
-console.log('ANONYMOUSE', anonymousClientId); // eslint-disable-line no-console
-
 module.exports = function(options, callback, request) {
   var accessToken;
   if (options.headers) {
@@ -34,6 +32,8 @@ module.exports = function(options, callback, request) {
     delete parsed.search;
 
     var uri = url.format(parsed);
+
+    console.log('ANONYMOUSE', uri); // eslint-disable-line no-console
 
     if(options.uri) {
       options.uri = uri;
