@@ -23,16 +23,23 @@ trap clean_up EXIT
 
 function clean_up {
   if [[ -n "${secrets_dir}" ]]; then
-    rm -rf ${secrets_dir}
+    rm -rf "${secrets_dir}"
+  fi
+
+  if [[ -n "${secrets_file}" ]]; then
+    rm -rf "${secrets_file}"
   fi
 }
 
 function load_secrets {
-  secrets_dir=`mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir'`
+  secrets_dir=$(mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir')
+  secrets_file=$(mktemp)
   git clone -b develop --depth 1 git@gitlab.com:gitlab-org/gitter/secrets.git ${secrets_dir}
   pushd ${secrets_dir}
-  ls -la ${secrets_dir}
-  eval $(${secrets_dir}/webapp/env dev)
+  ${secrets_dir}/webapp/env-file test > ${secrets_file}
+  chmod 400 "${secrets_file}"
+  GITTER_SECRETS_ENV_FILE="${secrets_file}"
+  export GITTER_SECRETS_ENV_FILE
   popd
 }
 
