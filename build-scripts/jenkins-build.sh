@@ -34,7 +34,7 @@ function clean_up {
 function load_secrets {
   secrets_dir=$(mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir')
   secrets_file=$(mktemp)
-  git clone -b develop --depth 1 git@gitlab.com:gitlab-org/gitter/secrets.git ${secrets_dir}
+  git clone -b develop --depth 1 git@gitlab.com:gl-gitter/secrets.git ${secrets_dir}
   pushd ${secrets_dir}
   ${secrets_dir}/webapp/env-file test > ${secrets_file}
   chmod 400 "${secrets_file}"
