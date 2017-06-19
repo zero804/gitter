@@ -7,11 +7,21 @@ var uuid = require('node-uuid');
 var StatusError = require('statuserror');
 var Promise = require('bluebird');
 
-var TransloaditClient = require('transloadit');
-var transloadit = new TransloaditClient({
-  authKey: nconf.get('transloadit:key'),
-  authSecret: nconf.get('transloadit:secret')
-});
+var singletonTransloaditClient;
+
+function getTransloaditClient() {
+  if (singletonTransloaditClient) {
+    return singletonTransloaditClient;
+  }
+
+  var TransloaditClient = require('transloadit');
+  singletonTransloaditClient = new TransloaditClient({
+    authKey: nconf.get('transloadit:key'),
+    authSecret: nconf.get('transloadit:secret')
+  });
+
+  return singletonTransloaditClient
+}
 
 var redisClient = redis.getClient();
 
@@ -120,7 +130,7 @@ function transloaditSignature(req, res, next) {
     var expiry = 30 * 60; // 30 mins to be safe, S3 uploads, etc
     redisClient.setex('transloadit:' + token, expiry, JSON.stringify(metadata));
 
-    var signed = transloadit.calcSignature(params);
+    var signed = getTransloaditClient().calcSignature(params);
     res.send({
       sig: signed.signature,
       params: signed.params

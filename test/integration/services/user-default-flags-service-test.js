@@ -39,16 +39,10 @@ describe('user-default-flags', function() {
   });
 
   describe('#slow', function() {
-    var fixture = {};
-
-    before(fixtureLoader(fixture, {
+    var fixture = fixtureLoader.setup({
       user1: { },
       user2: { },
       user3: { }
-    }));
-
-    after(function() {
-      return fixture.cleanup();
     });
 
     describe('getDefaultFlagsForUserId', function() {

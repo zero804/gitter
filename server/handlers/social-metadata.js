@@ -4,6 +4,8 @@ var env = require('gitter-web-env');
 var nconf = env.config;
 var avatars = require('gitter-web-avatars');
 
+var facebookAppId = nconf.get('facebook:appId');
+
 function getMetadata(options) {
   var room = options && options.room;
 
@@ -16,7 +18,7 @@ function getMetadata(options) {
     'og:description': description,
     'og:type': 'website',
     'og:image': imageUrl,
-    'fb:app_id': nconf.get('facebook:app-id'),
+    'fb:app_id': facebookAppId,
     'twitter:card': 'summary',
     'twitter:site': '@gitchat',
     'twitter:title': title,
@@ -42,7 +44,7 @@ function getMetadataForChatPermalink(options) {
     'og:description': description,
     'og:type': 'website',
     'og:image': imageUrl,
-    'fb:app_id': nconf.get('facebook:app-id'),
+    'fb:app_id': facebookAppId,
     'twitter:card': 'summary',
     'twitter:site': '@gitchat',
     'twitter:title': title,

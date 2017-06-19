@@ -8,6 +8,7 @@ describe('gh-user-policy-evaluator', function() {
 
   describe('#slow', function() {
     fixtureLoader.disableMongoTableScans();
+    fixtureLoader.ensureIntegrationEnvironment('#integrationUser1');
 
     function expect(GhUserPolicyEvaluator, user, uri, expected) {
       var evaluator = new GhUserPolicyEvaluator(user, uri);
@@ -37,13 +38,7 @@ describe('gh-user-policy-evaluator', function() {
 
     describe('precreate user orgs', function() {
       var fixture = fixtureLoader.setup({
-        deleteDocuments: {
-          User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }]
-        },
-        user1: {
-          username: fixtureLoader.GITTER_INTEGRATION_USERNAME,
-          githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN
-        },
+        user1: '#integrationUser1',
         user2: {}
       });
 

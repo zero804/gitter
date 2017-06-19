@@ -20,7 +20,7 @@ require('./components/ping');
 // Preload widgets
 require('./views/widgets/avatar');
 
-require('gitter-styleguide/css/components/buttons.css');
+require('@gitterhq/styleguide/css/components/buttons.css');
 
 
 

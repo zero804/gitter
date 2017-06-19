@@ -14,12 +14,10 @@ describe('restSerializer', function() {
   before(blockTimer.on);
   after(blockTimer.off);
 
-  var fixture = {};
-  before(fixtureLoader(fixture, {
+  var fixture = fixtureLoader.setup({
     user1: {},
     troupe1: {users: ['user1']}
-  }));
-  after(function() { fixture.cleanup(); });
+  });
 
   describe('#UserStrategy()', function() {
 

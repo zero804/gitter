@@ -11,6 +11,7 @@ var mkdirp = require('mkdirp');
 var glob = require('glob');
 var childProcessPromise = require('./child-process-promise');
 var del = require('del');
+var Promise = require('bluebird');
 
 var argv = require('yargs')
   .option('test-suite', {
@@ -115,7 +116,8 @@ function spawnMochaProcess(moduleName, options, files) { // eslint-disable-line 
     SKIP_BADGER_TESTS: 1,
     BLUEBIRD_DEBUG: 1,
     NO_AUTO_INDEX: 1,
-    TZ: 'UTC'
+    TZ: 'UTC',
+    GITTER_TEST: 1
   }
 
   if (generateCoverage) {
@@ -138,10 +140,6 @@ function spawnMochaProcess(moduleName, options, files) { // eslint-disable-line 
   if (testSuite === 'docker') {
     env.HOME = '/tmp'; // Needs to be writeable inside docker for `nyc`
     env.NODE_ENV = 'test-docker';
-  }
-
-  if (testSuite === 'mocha') {
-    env.NODE_ENV = 'test';
   }
 
   if (fast) {
@@ -189,6 +187,8 @@ function spawnMochaProcess(moduleName, options, files) { // eslint-disable-line 
 }
 
 var subTasks = [];
+var testingErrors = [];
+
 Object.keys(testModules).forEach(function(moduleName) {
   var definition = testModules[moduleName];
 
@@ -199,8 +199,16 @@ Object.keys(testModules).forEach(function(moduleName) {
   var testTaskName = 'test:test:' + moduleName;
   subTasks.push(testTaskName);
 
+
   gulp.task(testTaskName, function() {
     return spawnMochaProcess(moduleName, definition.options, definition.files)
+      .catch(function(err) {
+        if (bail) {
+          throw new Error('Test module ' + moduleName + ' failed. ' + err);
+        }
+
+        testingErrors.push(err);
+      })
 
   });
 
@@ -209,26 +217,35 @@ Object.keys(testModules).forEach(function(moduleName) {
 gulp.task('test:pre-test', function() {
   var env = {};
 
-
   if (testSuite === 'docker') {
     env.NODE_ENV = 'test-docker';
-  } else if (testSuite === 'mocha') {
-    env.NODE_ENV = 'test';
   }
-
 
   return childProcessPromise.spawn('./scripts/utils/ensure-mongodb-indexes.js', [], env);
 })
 
 if (RUN_TESTS_IN_PARALLEL) {
   // Run tests in parallel
-  gulp.task('test:test', subTasks);
+  gulp.task('test:test', subTasks, function() {
+    if (testingErrors.length) {
+      return Promise.reject(testingErrors[0])
+    }
+  });
 } else {
   // Run tests in sequence
   gulp.task('test:test', function(callback) {
     gutil.log('Run sequence for test:test', subTasks.join(','));
 
-    var args = subTasks.concat(callback);
+    var args = subTasks.concat(function(err) {
+      if (err) return callback(err);
+
+      if (testingErrors.length) {
+        return callback(testingErrors[0])
+      }
+
+      return callback();
+    });
+
     runSequence.apply(null, args);
   });
 }

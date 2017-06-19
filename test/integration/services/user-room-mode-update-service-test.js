@@ -8,21 +8,16 @@ var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 describe('user-room-mode-update-service', function() {
 
   describe('#slow', function() {
-    var fixture = {};
 
     var userRoomModeUpdateService = testRequire('./services/user-room-mode-update-service');
     var userDefaultFlagsUpdateService = testRequire('./services/user-default-flags-update-service');
     var roomMembershipService = testRequire('./services/room-membership-service');
 
-    before(fixtureLoader(fixture, {
+    var fixture = fixtureLoader.setup({
       user1: { },
       user2: { },
       user3: { },
       troupe1: { users: ['user1', 'user2', 'user3']}
-    }));
-
-    after(function() {
-      return fixture.cleanup();
     });
 
     describe('updateModeForUserInRoom', function() {

@@ -3,6 +3,10 @@
   "version": "13.4.0",
   "private": true,
   "dependencies": {
+    "@gitterhq/env": "^0.29.4",
+    "@gitterhq/faye-redis": "^0.4.4",
+    "@gitterhq/passport-github": "0.1.8-g",
+    "@gitterhq/passport-oauth2": "^1.1.2-b",
     "@gitterhq/translations": "^1.3.1",
     "apn": "1.7.5",
     "async": "~0.9.0",
@@ -33,13 +37,9 @@
     "fuzzysearch": "^1.0.3",
     "gitter-app-version": "file:modules/app-version",
     "gitter-client-env": "file:modules/client-env",
-    "gitter-env": "^0.28.4",
     "gitter-faye": "^1.1.0-e",
-    "gitter-faye-redis": "^0.4.4",
     "gitter-markdown-processor": "^11.3.1",
-    "gitter-passport-github": "^0.1.8-f",
     "gitter-passport-http-bearer": "^1.1.2",
-    "gitter-passport-oauth2": "^1.1.2-b",
     "gitter-realtime-client": "^1.6.1",
     "gitter-redis-scripto": "^0.2.2",
     "gitter-services": "git+https://github.com/gitterHQ/services.git#1.20.0",
@@ -147,7 +147,7 @@
     "rx-node": "^1.0.2",
     "sanitizer": "0.0.15",
     "scriptjs": "^2.5.7",
-    "sechash": "suprememoocow/node-sechash#10d6a9f5231c3b4ebad9e99f7a4961cfdedd446c",
+    "sechash": "github:suprememoocow/node-sechash#10d6a9f5231c3b4ebad9e99f7a4961cfdedd446c",
     "serve-favicon": "^2.3.0",
     "shutdown": "^0.2.3",
     "slug": "^0.9.1",
@@ -170,7 +170,10 @@
     "yargs": "^4.2.0"
   },
   "devDependencies": {
+    "@gitterhq/backbone-proxy-collection": "^2.3.0",
     "@gitterhq/cal-heatmap": "^3.6.1",
+    "@gitterhq/handlebars-loader": "1.2.0-a",
+    "@gitterhq/styleguide": "^1.7.1",
     "autoprefixer-core": "^5.1.0",
     "babel-core": "^6.16.0",
     "babel-loader": "^6.2.5",
@@ -180,7 +183,6 @@
     "babel-preset-react": "^6.11.1",
     "babel-register": "^6.9.0",
     "babel-runtime": "^6.11.6",
-    "backbone-proxy-collection": "^2.3.0",
     "backbone-url-resolver": "^0.1.1",
     "backbone.cocktail": "^0.5.13",
     "backbone.marionette": "^2.4.4",
@@ -213,8 +215,6 @@
     "file-loader": "^0.9.0",
     "fingerprintjs2": "^1.4.1",
     "fontfaceobserver": "^1.7.1",
-    "gitter-handlebars-loader": "^1.2.0",
-    "gitter-styleguide": "^1.6.6",
     "gitter-web-client-error-reporting": "file:modules/client-error-reporting",
     "gitter-web-test-utils": "file:modules/test-utils",
     "gulp": "^3.9.1",
@@ -223,7 +223,7 @@
     "gulp-codecov": "^2.0.2",
     "gulp-eslint": "^3.0.1",
     "gulp-filter": "^4.0.0",
-    "gulp-git": "^0.5.4",
+    "gulp-git": "^2.4.0",
     "gulp-github": "^0.3.4",
     "gulp-grep-stream": "0.0.2",
     "gulp-gzip": "^1.2.0",
@@ -265,7 +265,7 @@
     "mocha-multi": "^0.9.0",
     "mutantjs": "^0.2.0",
     "nanoscroller": "^0.8.7",
-    "node-spritesheet": "trevorah/node-spritesheet",
+    "node-spritesheet": "github:trevorah/node-spritesheet",
     "nodemon": "^1.8.1",
     "nodeselektor": "^0.14.0",
     "normalize.css": "^4.2.0",
@@ -302,7 +302,7 @@
     "webpack-dev-middleware": "^1.6.1",
     "webpack-stats-plugin": "^0.1.3",
     "webpack-visualizer-plugin": "^0.1.5",
-    "worker-loader": "unizin/worker-loader#3847cc7d9df2e9d83893c628f9332f60327ce8e8"
+    "worker-loader": "github:unizin/worker-loader#3847cc7d9df2e9d83893c628f9332f60327ce8e8"
   },
   "engines": {
     "node": ">=0.10.3 <0.11",
@@ -321,7 +321,6 @@
     "shrinkwrap": "bash ./build-scripts/shrinkwrap",
     "preinstall": "bash ./preinstall.sh",
     "shrinkwrap-conflict": "rm -f npm-shrinkwrap.json && npm run shrinkwrap",
-    "fix-shrinkwrap-registry": "./build-scripts/fix-shrinkwrap-registry",
     "flush-dev-db": "mongo gitter-mongo-dev/gitter --eval 'printjson(db.dropDatabase())'; ./scripts/dataupgrades/001-oauth-client/002-add-redirect-uri.sh gitter-mongo-dev/gitter; redis-cli -h gitter-redis-dev flushall",
     "nodeselektor": "ns",
     "task-css": "gulp css:compile",
@@ -347,5 +346,20 @@
       "public/repo/**",
       "**/test/**"
     ]
-  }
+  },
+  "description": "Gitter Webapp =============",
+  "directories": {
+    "doc": "docs",
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/troupe/gitter-webapp.git"
+  },
+  "author": "Andrew Newdigate <andrewn@datatribe.net> (http://about.me/andrewnewdigate)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/troupe/gitter-webapp/issues"
+  },
+  "homepage": "https://github.com/troupe/gitter-webapp#readme"
 }

@@ -14,7 +14,8 @@ describe('explore-service #slow', function() {
         {
           tags: {
             $in: ['explore-test']
-          }
+          },
+          'sd.public': true
         }
       ]
     },

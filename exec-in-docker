@@ -40,9 +40,19 @@ function mongo_run {
 ISOLATED_UNIQ_ID=${BUILD_NUMBER:-$(date +"%Y%m%d%H%M%S")}
 PROJECT_NAME="webapp${ISOLATED_UNIQ_ID}"
 
+
+if [[ -z ${GITTER_SECRETS_ENV_FILE:-} ]]; then
+  GITTER_SECRETS_ENV_FILE=$(mktemp)
+  export GITTER_SECRETS_ENV_FILE
+  FAKE_GITTER_SECRETS_ENV_FILE=true
+fi
+
 function finish {
   docker-compose -p "${PROJECT_NAME}" -f docker-compose.internal.yml stop
   docker-compose -p "${PROJECT_NAME}" -f docker-compose.internal.yml rm -f -v
+  if [[ ${FAKE_GITTER_SECRETS_ENV_FILE:-} == "true" ]]; then
+    rm "${GITTER_SECRETS_ENV_FILE}"
+  fi
 }
 trap finish EXIT
 

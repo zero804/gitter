@@ -14,16 +14,15 @@ describe('user-group-api', function() {
     app = require('../../server/api');
   });
 
+  fixtureLoader.ensureIntegrationEnvironment(
+      '#integrationUser1',
+      'GITTER_INTEGRATION_ORG');
+
   var fixture = fixtureLoader.setup({
     deleteDocuments: {
-      User: [{ username: fixtureLoader.GITTER_INTEGRATION_USERNAME }],
       Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() }],
     },
-    user1: {
-      githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
-      username: fixtureLoader.GITTER_INTEGRATION_USERNAME,
-      accessToken: 'web-internal'
-    },
+    user1: '#integrationUser1',
     group1: {
     },
     group2: {

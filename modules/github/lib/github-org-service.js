@@ -3,6 +3,8 @@
 var wrap = require('./github-cache-wrapper');
 var tentacles = require('./tentacles-client');
 var userTokenSelector = require('./user-token-selector').full;
+var StatusError = require('statuserror');
+var Promise = require('bluebird');
 
 function GitHubOrgService(user) {
   this.user = user;
@@ -29,6 +31,9 @@ GitHubOrgService.prototype.members = function(org, options) {
 };
 
 GitHubOrgService.prototype.someMembers = function(org) {
+  if (!org) {
+    return Promise.reject(new StatusError(500, 'Expected an org'));
+  }
   return tentacles.orgMember.listMembers(org, {
     accessToken: this.accessToken,
     firstPageOnly: true,

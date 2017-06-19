@@ -16,12 +16,11 @@ describe('user-strategy-test', function() {
   before(blockTimer.on);
   after(blockTimer.off);
 
-  var fixture = {};
-  before(fixtureLoader(fixture, {
+  var fixture = fixtureLoader.setup({
     user1: {},
     user2: {},
     troupe1: { users: ['user1']}
-  }));
+  });
 
   beforeEach(function() {
     expected1 = [{
@@ -43,11 +42,6 @@ describe('user-strategy-test', function() {
     }];
 
   });
-
-  after(function() {
-    return fixture.cleanup();
-  });
-
 
   describe('user-serializer', function() {
 

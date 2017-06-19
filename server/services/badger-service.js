@@ -45,7 +45,7 @@ function Client(token) {
     };
   });
 }
-var client = new Client('***REMOVED***');
+var client = new Client(conf.get('badger:githubToken'));
 
 function findReadme(tree, path) {
   if(!path) path = 'README.md';
@@ -302,7 +302,7 @@ function ReadmeUpdater(context) {
 
 function updateFileAndCreatePullRequest(sourceRepo, roomUri, user, branchPrefix) {
   return new ReadmeUpdater({
-      token: '***REMOVED***',
+      token: conf.get('badger:githubToken'),
       sourceRepo: sourceRepo,
       roomUri: roomUri,
       user: user,

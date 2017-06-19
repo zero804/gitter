@@ -11,18 +11,12 @@ var troupeUriMapper = testRequire("./services/troupe-uri-mapper");
 describe('troupe-uri-mapper', function() {
 
   describe('#findInitialRoomUrlForUser', function() {
-    var fixture = {};
-
-    before(fixtureLoader(fixture, {
+    var fixture = fixtureLoader.setup({
       user1: { },
       user2: { },
       userNoTroupes: { },
       troupe1: { users: ['user1'] },
       troupeOneToOne: { oneToOne: true, users: ['user1', 'user2'] },
-    }));
-
-    after(function() {
-      fixture.cleanup();
     });
 
     it('#01 should return null when a user has no troupes',function(done) {

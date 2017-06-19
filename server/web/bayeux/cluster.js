@@ -6,7 +6,7 @@ var nconf = env.config;
 var stats = env.stats;
 
 var faye = require('gitter-faye');
-var fayeRedis = require('gitter-faye-redis');
+var fayeRedis = require('@gitterhq/faye-redis');
 var deflate = require('permessage-deflate');
 var presenceService = require('gitter-web-presence');
 var shutdown = require('shutdown');

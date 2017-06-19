@@ -4,6 +4,7 @@
 var assert = require('assert');
 var Promise = require('bluebird');
 var proxyquireNoCallThru = require("proxyquire").noCallThru();
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
 describe('github-members #github', function() {
 
@@ -105,7 +106,19 @@ describe('github-members #github', function() {
   });
 
   describe('real #slow', function() {
-    var FAKE_USER = { username: 'gittertestbot', githubToken: '***REMOVED***'};
+
+    fixtureLoader.ensureIntegrationEnvironment(
+      'GITTER_INTEGRATION_USERNAME',
+      'GITTER_INTEGRATION_REPO_SCOPE_TOKEN',
+      'GITTER_INTEGRATION_REPO',
+      'GITTER_INTEGRATION_ORG');
+
+    var FAKE_USER = {
+      username: fixtureLoader.GITTER_INTEGRATION_USERNAME,
+      githubToken: fixtureLoader.GITTER_INTEGRATION_REPO_SCOPE_TOKEN
+    };
+
+
     var githubMembers = require('..').GitHubMembers;
 
 
@@ -120,7 +133,7 @@ describe('github-members #github', function() {
       });
 
       it('should get members of an REPO', function(done) {
-        githubMembers.getMembers('gittertestbot/docs', 'REPO', FAKE_USER)
+        githubMembers.getMembers(fixtureLoader.GITTER_INTEGRATION_REPO_FULL, 'REPO', FAKE_USER)
           .then(function(members) {
             assert(members.length > 0);
             members.forEach(assert);
@@ -148,7 +161,7 @@ describe('github-members #github', function() {
       });
 
       it('should get member of an ORG current user', function(done) {
-        githubMembers.isMember('gittertestbot', 'gitterHQ', 'ORG', FAKE_USER)
+        githubMembers.isMember(fixtureLoader.GITTER_INTEGRATION_USERNAME, fixtureLoader.GITTER_INTEGRATION_ORG, 'ORG', FAKE_USER)
           .then(function(isMember) {
             assert.strictEqual(isMember, true);
           })
@@ -164,7 +177,7 @@ describe('github-members #github', function() {
       });
 
       it('should get member of an REPO', function(done) {
-        githubMembers.isMember('suprememoocow', 'gittertestbot/docs', 'REPO', FAKE_USER)
+        githubMembers.isMember('suprememoocow', fixtureLoader.GITTER_INTEGRATION_REPO_FULL, 'REPO', FAKE_USER)
           .then(function(isMember) {
             assert.strictEqual(isMember, false);
           })
@@ -172,7 +185,7 @@ describe('github-members #github', function() {
       });
 
       it('should get member of an REPO current user', function(done) {
-        githubMembers.isMember('gittertestbot', 'gittertestbot/docs', 'REPO', FAKE_USER)
+        githubMembers.isMember(fixtureLoader.GITTER_INTEGRATION_USERNAME, fixtureLoader.GITTER_INTEGRATION_REPO_FULL, 'REPO', FAKE_USER)
           .then(function(isMember) {
             assert.strictEqual(isMember, true);
           })

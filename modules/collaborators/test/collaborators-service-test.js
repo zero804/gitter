@@ -1,7 +1,7 @@
 'use strict';
 
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var collaboratorsService = require('../lib/collaborators-service');
-var FAKE_USER = { username: 'gittertestbot', githubToken: '***REMOVED***'};
 var assert = require('assert');
 
 function assertNoDuplicates(collaborators) {
@@ -14,8 +14,14 @@ function assertNoDuplicates(collaborators) {
 }
 
 describe('collaborators-service #slow #github', function() {
+  fixtureLoader.ensureIntegrationEnvironment('#integrationUser1');
+
+  var fixture = fixtureLoader.setup({
+    user1: '#integrationUser1'
+  });
+
   it('should return collaborators for a PUBLIC REPO', function() {
-    return collaboratorsService.findCollaborators(FAKE_USER, 'GH_REPO', 'gitterHQ/gitter')
+    return collaboratorsService.findCollaborators(fixture.user1, 'GH_REPO', 'gitterHQ/gitter')
       .then(function(collaborators) {
         assert(Array.isArray(collaborators));
         assert(collaborators.length > 0);
@@ -26,7 +32,7 @@ describe('collaborators-service #slow #github', function() {
   });
 
   it('should return collaborators for a PRIVATE REPO', function() {
-    return collaboratorsService.findCollaborators(FAKE_USER, 'GH_REPO', 'troupe/gitter-webapp')
+    return collaboratorsService.findCollaborators(fixture.user1, 'GH_REPO', 'troupe/gitter-webapp')
       .then(function(collaborators) {
         assert(Array.isArray(collaborators));
         assert(collaborators.length > 0);
@@ -37,16 +43,15 @@ describe('collaborators-service #slow #github', function() {
   });
 
   it('should return collaborators for a unknown REPO', function() {
-    return collaboratorsService.findCollaborators(FAKE_USER, 'GH_REPO', 'troupe/xyz')
+    return collaboratorsService.findCollaborators(fixture.user1, 'GH_REPO', 'troupe123123123/xy123123123z')
       .then(function(collaborators) {
         assert(Array.isArray(collaborators));
-        assert.strictEqual(collaborators.length, 0);
         assertNoDuplicates(collaborators);
       });
   });
 
   it('should return collaborators for an ORG', function() {
-    return collaboratorsService.findCollaborators(FAKE_USER, 'GH_ORG', 'troupe')
+    return collaboratorsService.findCollaborators(fixture.user1, 'GH_ORG', 'troupe')
       .then(function(collaborators) {
         assert(Array.isArray(collaborators));
         assert(collaborators.length > 0);
@@ -57,7 +62,7 @@ describe('collaborators-service #slow #github', function() {
   });
 
   it('should return collaborators for an USER', function() {
-    return collaboratorsService.findCollaborators(FAKE_USER, null, null)
+    return collaboratorsService.findCollaborators(fixture.user1, null, null)
       .then(function(collaborators) {
         assert(Array.isArray(collaborators));
         // assert(collaborators.length > 0);

@@ -9,8 +9,7 @@ var persistence = require('gitter-web-persistence');
 var RoomWithPolicyService = testRequire('./services/room-with-policy-service');
 
 describe('room-with-policy-service', function() {
-    var fixture = {};
-    before(fixtureLoader(fixture, {
+    var fixture = fixtureLoader.setup({
       user1: {
       },
       userStaff: {
@@ -38,9 +37,7 @@ describe('room-with-policy-service', function() {
       userBan: { },
       userBanAdmin: {},
       troupeForDeletion: {}
-    }));
-
-    after(function() { fixture.cleanup(); });
+    });
 
   var isAdminPolicy = {
     canAdmin: function() {

@@ -114,6 +114,7 @@ internal-min:
     DEBUG: ${DEBUG}
     SU_TO_USER: ${SU_TO_USER}
     SU_TO_UID: ${SU_TO_UID}
+  env_file: ${GITTER_SECRETS_ENV_FILE}
   volumes:
    - ${WORKSPACE}:${WORKSPACE}
   extra_hosts:
@@ -139,6 +140,7 @@ internal-mac:
   extra_hosts:
     beta-internal: 10.0.0.140
     beta-internal.beta.gitter: 10.0.0.140
+  env_file: ${GITTER_SECRETS_ENV_FILE}
   working_dir: ${WORKSPACE}
 
 internal-mac-np:
@@ -153,6 +155,7 @@ internal-mac-np:
   extra_hosts:
     beta-internal: 10.0.0.140
     beta-internal.beta.gitter: 10.0.0.140
+  env_file: ${GITTER_SECRETS_ENV_FILE}
   working_dir: ${WORKSPACE}
 
 internal:
@@ -169,4 +172,5 @@ internal:
     - sentinel1
   volumes:
    - ${WORKSPACE}:/src
+  env_file: ${GITTER_SECRETS_ENV_FILE}
   working_dir: /src

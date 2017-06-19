@@ -16,16 +16,10 @@ var lazy = require('lazy.js');
 describe('auto-lurker-service', function() {
 
   describe('#findRemovalCandidates', function() {
-    var fixture = {};
-
-    before(fixtureLoader(fixture, {
+    var fixture = fixtureLoader.setup({
       user1: { },
       user2: { },
       troupe1: { users: ['user1', 'user2'] },
-    }));
-
-    after(function() {
-      fixture.cleanup();
     });
 
     it('should return a lurk candidate',function() {
@@ -48,18 +42,12 @@ describe('auto-lurker-service', function() {
   });
 
   describe('#bulkRemoveUsersFromRoom', function() {
-    var fixture = {};
-
-    before(fixtureLoader(fixture, {
+    var fixture = fixtureLoader.setup({
       user1: { },
       user2: { },
       group1: { },
       troupe1: { users: ['user1', 'user2'], group: 'group1' },
       troupe2: { users: ['user1', 'user2'], group: 'group1' },
-    }));
-
-    after(function() {
-      fixture.cleanup();
     });
 
     it('should return a lurk candidate',function() {

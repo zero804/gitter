@@ -5,28 +5,20 @@ var assert = require("assert");
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var groupUriChecker = require('../lib/group-uri-checker');
 
-
-var deleteDocuments = {
-  User: [
-    { username: fixtureLoader.GITTER_INTEGRATION_USERNAME },
-    { username: fixtureLoader.GITTER_INTEGRATION_COLLAB_USERNAME },
-  ],
-  Troupe: [ { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() } ],
-  Group: [
-    { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
-    { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() }
-  ]
-};
-
 describe('group-uri-checker #slow', function() {
+  fixtureLoader.ensureIntegrationEnvironment('#integrationUser1', 'GITTER_INTEGRATION_ORG');
 
   describe('org group present', function() {
     var fixture = fixtureLoader.setup({
-      deleteDocuments: deleteDocuments,
-      user1: {
-        githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
-        username: fixtureLoader.GITTER_INTEGRATION_USERNAME
+      deleteDocuments: {
+        Troupe: [{
+          lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase()
+        }],
+        Group: [{
+          lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase()
+        }]
       },
+      user1: '#integrationUser1',
       group2: {
         uri: fixtureLoader.GITTER_INTEGRATION_ORG,
         lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase(),
@@ -53,15 +45,14 @@ describe('group-uri-checker #slow', function() {
 
   describe('without org group present', function() {
     var fixture = fixtureLoader.setup({
-      deleteDocuments: deleteDocuments,
-      user1: {
-        githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
-        username: fixtureLoader.GITTER_INTEGRATION_USERNAME
+      deleteDocuments: {
+        Group: [
+          { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
+          { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() }
+        ]
       },
-      user2: {
-        githubToken: fixtureLoader.GITTER_INTEGRATION_COLLAB_USER_SCOPE_TOKEN,
-        username: fixtureLoader.GITTER_INTEGRATION_COLLAB_USERNAME
-      },
+      user1: '#integrationUser1',
+      user2: '#integrationCollabUser1',
       group1: {},
       troupe1: {}
     });

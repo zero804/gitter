@@ -8,17 +8,12 @@ var Promise = require('bluebird');
 describe('group-resolver', function() {
   describe('#slow', function() {
 
-    var fixture = {};
     var groupResolver;
     var adminPermission;
 
-    before(fixtureLoader(fixture, {
+    var fixture = fixtureLoader.setup({
       user1: {},
       troupe1: { users: ['user1'] }
-    }));
-
-    after(function() {
-      fixture.cleanup();
     });
 
     beforeEach(function() {

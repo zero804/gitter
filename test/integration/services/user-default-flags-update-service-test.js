@@ -8,7 +8,6 @@ var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 describe('user-default-flags-update-service', function() {
 
   describe('#slow', function() {
-    var fixture = {};
 
     var userDefaultFlagsUpdateService = testRequire('./services/user-default-flags-update-service');
     var userDefaultFlagsService = testRequire('./services/user-default-flags-service');
@@ -16,7 +15,7 @@ describe('user-default-flags-update-service', function() {
     var roomMembershipFlags = testRequire('./services/room-membership-flags');
     var roomService = testRequire('./services/room-service');
 
-    before(fixtureLoader(fixture, {
+    var fixture = fixtureLoader.setup({
       user1: { },
       user2: { },
       user3: { },
@@ -32,10 +31,6 @@ describe('user-default-flags-update-service', function() {
         security: 'PUBLIC',
         githubType: 'USER_CHANNEL',
       },
-    }));
-
-    after(function() {
-      return fixture.cleanup();
     });
 
     describe('updateDefaultModeForUser', function() {

@@ -5,8 +5,7 @@ var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assert = require('assert');
 
 describe('identityService', function() {
-  var fixture = {};
-  before(fixtureLoader(fixture, {
+  var fixture = fixtureLoader.setup({
     deleteDocuments: {
       User: [
         // use this as a proxy for githubId: null.
@@ -31,10 +30,6 @@ describe('identityService', function() {
       provider: 'google',
       providerKey: 'google-identity'
     }
-  }));
-
-  after(function() {
-    fixture.cleanup();
   });
 
   describe('getIdentityForUser', function() {

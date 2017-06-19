@@ -115,8 +115,7 @@ describe('push notification generator service', function() {
   });
 
   describe('serializeItems #slow', function() {
-    var fixture = {};
-    before(fixtureLoader(fixture, {
+    var fixture = fixtureLoader.setup({
       user1: {},
       troupe1: {users: ['user1']},
       message1: {
@@ -133,10 +132,6 @@ describe('push notification generator service', function() {
         text: 'bar',
         sent: new Date('2014-01-02T00:00:00.000Z')
       }
-    }));
-
-    after(function() {
-      return fixture.cleanup();
     });
 
     it('should serialize for troupe, user and chats', function() {

@@ -4,20 +4,15 @@ var testRequire = require('../test-require');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
 var repoPremiumStatusNotifier = testRequire("./services/repo-premium-status-notifier");
-var fixture = {};
 
 describe('repo-premium-status-notifier', function() {
 
-  before(fixtureLoader(fixture, {
+  var fixture = fixtureLoader.setup({
     user1: { },
     troupeOrg1: {
       githubType: 'ORG',
       users: ['user1', 'user2']
     }
-  }));
-
-  after(function() {
-    fixture.cleanup();
   });
 
   it('should work with users on', function(done) {

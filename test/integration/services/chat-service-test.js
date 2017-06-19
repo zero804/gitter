@@ -15,8 +15,7 @@ describe('chatService', function() {
   before(blockTimer.on);
   after(blockTimer.off);
 
-  var fixture = {};
-  before(fixtureLoader(fixture, {
+  var fixture = fixtureLoader.setup({
     user1: {},
     troupe1: {users: ['user1']},
     message1: {
@@ -32,7 +31,7 @@ describe('chatService', function() {
       text: 'new_message',
       sent: new Date()
     }
-  }));
+  });
 
   describe('updateChatMessage', function() {
     it('should update a recent chat message sent by the same user', function() {
@@ -141,9 +140,9 @@ describe('chatService', function() {
       return chatService.findChatMessagesForTroupe(fixture.troupe1.id, { beforeId: chat2 })
         .then(function(chats) {
           assert(chats.length >= 1);
-          assert.strictEqual(chats.filter(function(f) { return f.id == chat1; }).length, 1);
-          assert.strictEqual(chats.filter(function(f) { return f.id == chat2; }).length, 0);
-          assert.strictEqual(chats.filter(function(f) { return f.id == chat3; }).length, 0);
+          assert.strictEqual(chats.filter(function(f) { return f.id === String(chat1); }).length, 1);
+          assert.strictEqual(chats.filter(function(f) { return f.id === String(chat2); }).length, 0);
+          assert.strictEqual(chats.filter(function(f) { return f.id === String(chat3); }).length, 0);
         });
     });
 
@@ -151,9 +150,9 @@ describe('chatService', function() {
       return chatService.findChatMessagesForTroupe(fixture.troupe1.id, { beforeInclId: chat2 })
         .then(function(chats) {
           assert(chats.length >= 2);
-          assert.strictEqual(chats.filter(function(f) { return f.id == chat1; }).length, 1);
-          assert.strictEqual(chats.filter(function(f) { return f.id == chat2; }).length, 1);
-          assert.strictEqual(chats.filter(function(f) { return f.id == chat3; }).length, 0);
+          assert.strictEqual(chats.filter(function(f) { return f.id === String(chat1); }).length, 1);
+          assert.strictEqual(chats.filter(function(f) { return f.id === String(chat2); }).length, 1);
+          assert.strictEqual(chats.filter(function(f) { return f.id === String(chat3); }).length, 0);
         });
     });
 
@@ -161,9 +160,9 @@ describe('chatService', function() {
       return chatService.findChatMessagesForTroupe(fixture.troupe1.id, { afterId: chat2 })
         .then(function(chats) {
           assert(chats.length >= 1);
-          assert.strictEqual(chats.filter(function(f) { return f.id == chat1; }).length, 0);
-          assert.strictEqual(chats.filter(function(f) { return f.id == chat2; }).length, 0);
-          assert.strictEqual(chats.filter(function(f) { return f.id == chat3; }).length, 1);
+          assert.strictEqual(chats.filter(function(f) { return f.id === String(chat1); }).length, 0);
+          assert.strictEqual(chats.filter(function(f) { return f.id === String(chat2); }).length, 0);
+          assert.strictEqual(chats.filter(function(f) { return f.id === String(chat3); }).length, 1);
         });
     });
 

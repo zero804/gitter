@@ -3,10 +3,17 @@
 
 var assert = require("assert");
 var GitHubIssueService = require('..').GitHubIssueService;
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
-var FAKE_USER = { username: 'gittertestbot', githubToken: '***REMOVED***'};
 
 describe('github-issue-service #slow #github', function() {
+  fixtureLoader.ensureIntegrationEnvironment('GITTER_INTEGRATION_USERNAME', 'GITTER_INTEGRATION_REPO_SCOPE_TOKEN', 'GITTER_INTEGRATION_REPO_FULL');
+
+  var FAKE_USER = {
+    username: fixtureLoader.GITTER_INTEGRATION_USERNAME,
+    githubToken: fixtureLoader.GITTER_INTEGRATION_REPO_SCOPE_TOKEN
+  };
+
   it('return the state', function(done) {
     var underTest = new GitHubIssueService(FAKE_USER);
 
@@ -20,11 +27,10 @@ describe('github-issue-service #slow #github', function() {
 
   it('return the state for a private repo', function(done) {
     var underTest = new GitHubIssueService(FAKE_USER);
-
-    underTest.getIssue('troupe/gitter-webapp', 3)
+    underTest.getIssue(fixtureLoader.GITTER_INTEGRATION_REPO_FULL, 1)
       .then(function(f) {
         assert(f);
-        assert.strictEqual(f.number, 3);
+        assert.strictEqual(f.number, 1);
       })
       .nodeify(done);
   });

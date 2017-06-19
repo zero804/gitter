@@ -3,7 +3,6 @@
 process.env.DISABLE_API_LISTEN = '1';
 
 var Promise = require('bluebird');
-var assert = require('assert');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
 describe('check-group-uri #slow', function() {
@@ -14,12 +13,10 @@ describe('check-group-uri #slow', function() {
     app = require('../../server/api');
   });
 
+  fixtureLoader.ensureIntegrationEnvironment('#integrationUser1');
+
   var fixture = fixtureLoader.setup({
-    user1: {
-      githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
-      username: fixtureLoader.GITTER_INTEGRATION_USERNAME,
-      accessToken: 'web-internal'
-    }
+    user1: '#integrationUser1'
   });
 
   it('GET /private/check-group-uri', function() {

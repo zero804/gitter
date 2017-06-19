@@ -19,8 +19,8 @@ var CommunityCreationRepoListView = require('./community-creation-repo-list-view
 
 require('../../behaviors/isomorphic');
 
-require('gitter-styleguide/css/components/headings.css');
-require('gitter-styleguide/css/components/buttons.css');
+require('@gitterhq/styleguide/css/components/headings.css');
+require('@gitterhq/styleguide/css/components/buttons.css');
 
 
 var _super = CommunityCreateBaseStepView.prototype;

@@ -18,6 +18,33 @@ fi
 
 GIT_BRANCH_SHORT=${GIT_BRANCH##origin/}
 
+secrets_dir=""
+trap clean_up EXIT
+
+function clean_up {
+  if [[ -n "${secrets_dir}" ]]; then
+    rm -rf "${secrets_dir}"
+  fi
+
+  if [[ -n "${secrets_file}" ]]; then
+    rm -rf "${secrets_file}"
+  fi
+}
+
+function load_secrets {
+  secrets_dir=$(mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir')
+  secrets_file=$(mktemp)
+  git clone -b develop --depth 1 git@gitlab.com:gl-gitter/secrets.git ${secrets_dir}
+  pushd ${secrets_dir}
+  ${secrets_dir}/webapp/env-file test > ${secrets_file}
+  chmod 400 "${secrets_file}"
+  GITTER_SECRETS_ENV_FILE="${secrets_file}"
+  export GITTER_SECRETS_ENV_FILE
+  popd
+}
+
+load_secrets
+
 function get_pr {
   curl -s --fail -u "${GITHUB_API_CREDENTIALS_USERNAME}:${GITHUB_API_CREDENTIALS_PASSWORD}" \
       "https://api.github.com/repos/troupe/gitter-webapp/pulls?state=all&head=troupe:${GIT_BRANCH_SHORT}" | \

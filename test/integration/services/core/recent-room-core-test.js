@@ -9,19 +9,13 @@ var recentRoomCore = testRequire("./services/core/recent-room-core");
 
 describe('recent-room-core', function() {
   describe('ordering #slow', function() {
-    var fixture = {};
-
-    before(fixtureLoader(fixture, {
+    var fixture = fixtureLoader.setup({
       user1: { },
       userNoTroupes: { },
       troupe1: { users: ['user1'] },
       troupe2: { users: ['user1'] },
       troupe3: { users: ['user1'] },
       troupe4: { users: ['user1'] }
-    }));
-
-    after(function() {
-      fixture.cleanup();
     });
 
     it('should rearrange the order of favourites correctly',function(done) {
@@ -96,15 +90,9 @@ describe('recent-room-core', function() {
   });
 
   describe('updateFavourite #slow', function() {
-    var fixture = {};
-
-    before(fixtureLoader(fixture, {
+    var fixture = fixtureLoader.setup({
       user1: { },
       troupe1: { users: ['user1'] }
-    }));
-
-    after(function() {
-      fixture.cleanup();
     });
 
     it('should add a troupe to favourites',function(done) {
@@ -136,16 +124,10 @@ describe('recent-room-core', function() {
   });
 
   describe('findLastAccessTimesForUsersInRoom #slow', function() {
-    var fixture = {};
-
-    before(fixtureLoader(fixture, {
+    var fixture = fixtureLoader.setup({
       user1: { },
       user2: { },
       troupe1: { users: ['user1'] }
-    }));
-
-    after(function() {
-      fixture.cleanup();
     });
 
     it('should handle default values', function(done) {

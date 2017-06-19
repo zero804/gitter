@@ -5,17 +5,13 @@ var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var userSettingsService = testRequire('./services/user-settings-service');
 var assert = testRequire("assert");
 var ObjectID = require('mongodb').ObjectID;
-var fixture = {};
+
 
 describe("User Settings Service", function() {
 
-  before(fixtureLoader(fixture, {
+  var fixture = fixtureLoader.setup({
     user1: { },
     user2: { }
-  }));
-
-  after(function() {
-    fixture.cleanup();
   });
 
   it('should be able to set user settings', function(done) {

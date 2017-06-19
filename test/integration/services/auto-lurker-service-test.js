@@ -14,16 +14,10 @@ var roomService = testRequire("./services/room-service");
 describe('auto-lurker-service', function() {
 
   describe('#findLurkCandidates', function() {
-    var fixture = {};
-
-    before(fixtureLoader(fixture, {
+    var fixture = fixtureLoader.setup({
       user1: { },
       troupe1: { users: ['user1'] },
       troupe2: { users: ['user1'] },
-    }));
-
-    after(function() {
-      fixture.cleanup();
     });
 
     it('should return a lurk candidate',function() {
@@ -125,15 +119,9 @@ describe('auto-lurker-service', function() {
   });
 
   describe('#autoLurkInactiveUsers', function() {
-    var fixture = {};
-
-    before(fixtureLoader(fixture, {
+    var fixture = fixtureLoader.setup({
       user1: { },
       troupe1: { users: ['user1'] }
-    }));
-
-    after(function() {
-      fixture.cleanup();
     });
 
     it('should return a lurk candidate',function() {

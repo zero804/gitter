@@ -25,8 +25,7 @@ describe('chat-strategy-test', function() {
   before(blockTimer.on);
   after(blockTimer.off);
 
-  var fixture = {};
-  before(fixtureLoader(fixture, {
+  var fixture = fixtureLoader.setup({
     user1: {},
     troupe1: {users: ['user1']},
     message1: {
@@ -36,7 +35,7 @@ describe('chat-strategy-test', function() {
       text: 'old_message',
       sent: new Date('2014-01-01T00:00:00.000Z')
     }
-  }));
+  });
 
   beforeEach(function() {
     expected1 = [{
@@ -155,11 +154,6 @@ describe('chat-strategy-test', function() {
     };
 
   });
-
-  after(function() {
-    return fixture.cleanup();
-  });
-
 
   describe('chat-serializer', function() {
 

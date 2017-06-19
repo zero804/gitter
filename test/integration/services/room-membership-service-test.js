@@ -5,7 +5,6 @@ var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assert = require("assert");
 var Promise = require('bluebird');
 var sinon = require('sinon');
-var fixture = {};
 var roomMembershipFlags = testRequire('./services/room-membership-flags');
 
 function mongoIdEqualPredicate(value) {
@@ -23,7 +22,7 @@ describe('room-membership-service', function() {
        persistence = require('gitter-web-persistence');
     });
 
-    before(fixtureLoader(fixture, {
+    var fixture = fixtureLoader.setup({
       user1: {
       },
       user2: {
@@ -36,9 +35,7 @@ describe('room-membership-service', function() {
       },
       troupe3: {
       }
-    }));
-
-    after(function() { fixture.cleanup(); });
+    });
 
     describe('addRoomMember', function() {
       beforeEach(function() {

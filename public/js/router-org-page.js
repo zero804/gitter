@@ -16,8 +16,8 @@ var modalRegion = require('./components/modal-region');
 var OrgDirectoryLayout = require('./views/layouts/org-directory-layout');
 
 
-require('gitter-styleguide/css/components/buttons.css');
-require('gitter-styleguide/css/components/headings.css');
+require('@gitterhq/styleguide/css/components/buttons.css');
+require('@gitterhq/styleguide/css/components/headings.css');
 
 require('./utils/tracking');
 
