@@ -1,6 +1,6 @@
 {
   "web": {
-    "homeurl": "/x",
+    "homeurl": "/",
     "baseserver": "beta.gitter.im",
     "baseport": "80",
     "basepath": "https://beta.gitter.im",
