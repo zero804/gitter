@@ -7,7 +7,7 @@ var mqpacker = require('css-mqpacker');
 var csswring = require('csswring');
 var styleBuilder = require('./style-builder');
 var getSourceMapOptions = require('./get-sourcemap-options');
-var webpack = require('gulp-webpack');
+var webpack = require('webpack-stream');
 var uglify = require('gulp-uglify');
 
 var cssDestDir = 'output/assets/styles';
