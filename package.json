@@ -291,7 +291,6 @@
     "svgo-loader": "^1.1.0",
     "tentacles-streams": "^0.1.9",
     "tiny-cookie": "^0.5.5",
-    "ui-components": "^0.1.5",
     "url-loader": "^0.5.7",
     "vinyl-file": "^3.0.0",
     "webpack": "1.12.15",
