@@ -1,6 +1,6 @@
 {
   "web": {
-    "homeurl": "/x",
+    "homeurl": "/",
     "domain": "localhost",
     "baseserver": "localhost",
     "baseport": "5000",
