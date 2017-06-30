@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@gitterhq/env": "^0.29.2"
+    "@gitterhq/env": "^0.33.0"
   },
   "private": true
 }

@@ -3,7 +3,7 @@
   "version": "13.4.0",
   "private": true,
   "dependencies": {
-    "@gitterhq/env": "^0.31.0",
+    "@gitterhq/env": "^0.33.0",
     "@gitterhq/faye-redis": "^0.4.4",
     "@gitterhq/passport-github": "0.1.8-g",
     "@gitterhq/passport-oauth2": "^1.1.2-b",
@@ -171,7 +171,7 @@
     "@gitterhq/backbone-proxy-collection": "^2.3.0",
     "@gitterhq/cal-heatmap": "^3.6.1",
     "@gitterhq/handlebars-loader": "1.2.0-a",
-    "@gitterhq/styleguide": "^1.10.0",
+    "@gitterhq/styleguide": "^1.13.0",
     "autoprefixer-core": "^6.0.1",
     "babel-core": "^6.16.0",
     "babel-loader": "^6.2.5",
