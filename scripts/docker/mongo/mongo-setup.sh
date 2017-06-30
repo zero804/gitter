@@ -19,7 +19,7 @@ function mongoeval {
 
 seconds=10
 echo "Waiting for mongo to be online. I'll give it $seconds seconds."
-while [[ $seconds > 0 ]]; do
+while [[ $seconds -gt 0 ]]; do
   if [[ "$(mongoeval 'db.hostInfo().ok')" -eq 1 ]]; then
     break
   fi

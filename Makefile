@@ -8,28 +8,32 @@ continuous-integration: build
 
 build: clean npm validate test package
 
-validate: npm
+validate:
 	gulp validate
 
 test-lua:
 	echo lua tests disabled #gulp test-redis-lua
 
-package: npm
+package:
 	gulp package --skip-stage validate --skip-stage test
 
-clean: npm
+clean:
 	gulp clean || (make npm-full && gulp clean)
   # If gulp clean failed, it's almost certainly a problem
   # with the npm folder, so nuke it and try again
 
-test: clean npm
+ci-test: clean
 	mkdir -p output/
-	./exec-in-docker ./node_modules/.bin/gulp test --test-coverage --test-suite docker --test-xunit-reports
+	gulp test --test-coverage --test-suite docker --test-xunit-reports
 	echo "Docker tests completed"
 
-test-no-coverage: clean npm
+test: clean
 	mkdir -p output/
-	./exec-in-docker ./node_modules/.bin/gulp test --test-suite docker --test-xunit-reports
+	gulp test
+
+test-no-coverage: clean
+	mkdir -p output/
+	gulp test --test-suite docker --test-xunit-reports
 	echo "Docker tests completed"
 
 print-nodejs-version:
@@ -39,17 +43,12 @@ print-nodejs-version:
 npm-quick: print-nodejs-version
 	npm prune
 	npm install
-	npm run link
 	./build-scripts/validate-modules-for-build.sh
 
 npm-full: print-nodejs-version
-	npm cache clean
-	rm -rf node_modules/
-	rm -rf modules/*/node_modules
-	rm -rf shared/node_modules
+	rm -rf node_modules/ modules/*/node_modules shared/node_modules
 
 	npm install
-	npm run link
 
 npm:
 	make npm-quick || make npm-full

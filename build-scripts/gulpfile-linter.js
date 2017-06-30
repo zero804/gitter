@@ -12,7 +12,7 @@ var eslintFilter = require('./eslint-filter');
 var del = require('del');
 
 function guessBaseBranch() {
-  var branch = process.env.GIT_BRANCH;
+  var branch = process.env.CI_COMMIT_REF_NAME || process.env.GIT_BRANCH;
   if (!branch) return 'develop';
 
   if (branch.match(/\bfeature\//)) return 'origin/develop';
@@ -35,6 +35,7 @@ gulp.task('linter:validate:eslint', function() {
       quiet: argv.quiet,
       extensions: ['.js', '.jsx']
     }))
+    .pipe(eslint.format('unix'))
     .pipe(eslint.format('checkstyle', function(checkstyleData) {
       fs.writeFileSync('output/eslint/checkstyle.xml', checkstyleData);
     }))
@@ -69,7 +70,7 @@ gulp.task('linter:validate:eslint-diff', function() {
 /**
  * Hook into the validate phase
  */
-gulp.task('linter:validate', ['linter:validate:config', 'linter:validate:eslint', 'linter:validate:eslint-diff']);
+gulp.task('linter:validate', ['linter:validate:config', 'linter:validate:eslint'/*, 'linter:validate:eslint-diff'*/]);
 
 
 gulp.task('linter:clean', function (cb) {

@@ -47,6 +47,7 @@
     "no-with": "error",
     "no-useless-call": "error",
     "no-spaced-func": "error",
+    "no-useless-escape": "warn",
     "max-statements": [
       "warn",
       30

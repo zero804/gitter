@@ -1,0 +1,96 @@
+stages:
+  - docker_images
+  - build_unit_test
+  - deploy
+
+.job_template: &node_job
+  image: registry.gitlab.com/gitlab-org/gitter/webapp
+  before_script:
+    - npm config set prefer-offline true
+    - npm config set cache /npm_cache
+    - mv /app/node_modules ./node_modules
+    - npm install
+    # Do this until we've solved the bug in
+    # shrinkwrap process
+    # this means that this fork is not production ready quite yet
+    - npm shrinkwrap
+
+.job_template: &docker_job
+  image: registry.gitlab.com/gitlab-org/gitter/webapp/dind:latest
+  services:
+  - docker:dind
+
+# Disabled for now
+# test:
+#   <<: *docker_job
+#   stage: build_unit_test
+#   variables:
+#     COMPOSE_HTTP_TIMEOUT: 120 # Two minute timeout for slow pulls
+#   script:
+#   - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+#   - ./exec-in-docker2 make test
+
+validate:
+  <<: *node_job
+  stage: build_unit_test
+  script:
+    - make validate
+
+package:
+  <<: *node_job
+  stage: build_unit_test
+  script:
+    - make package
+  artifacts:
+    paths:
+    - output/app.tar.gz
+    - output/assets.tar.gz
+    expire_in: 1 week
+
+docker-base:
+  variables:
+    DOCKER_DRIVER: overlay
+  stage: docker_images
+  only:
+  - schedules
+  image: docker:latest
+  services:
+  - docker:dind
+  script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+    - docker build -t registry.gitlab.com/gitlab-org/gitter/webapp .
+    - docker push registry.gitlab.com/gitlab-org/gitter/webapp
+
+docker-dind:
+  variables:
+    DOCKER_DRIVER: overlay
+  stage: docker_images
+  only:
+  - schedules
+  image: docker:latest
+  services:
+  - docker:dind
+  script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+    - docker build -t registry.gitlab.com/gitlab-org/gitter/webapp/dind:latest scripts/docker/dind/
+    - docker push registry.gitlab.com/gitlab-org/gitter/webapp/dind:latest
+
+deploy_beta:
+  stage: deploy
+  script:
+    - echo "Deploy to beta server"
+  environment:
+    name: beta
+    url: https://beta.gitter.im
+  only:
+  - develop
+
+deploy_beta_staging:
+  stage: deploy
+  script:
+    - echo "Deploy to beta staging server"
+  environment:
+    name: beta
+    url: https://beta.gitter.im
+  only:
+  - /^feature\/.*$/

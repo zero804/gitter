@@ -15,7 +15,7 @@
     "gitter-web-env": "file:../env",
     "gitter-web-persistence": "file:../persistence",
     "gitter-web-persistence-utils": "file:../persistence-utils",
-    "mongodb": "~2.1.18"
+    "mongodb": "~2.2.19"
   },
   "private": true
 }

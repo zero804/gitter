@@ -1,33 +1,16 @@
-FROM docker-registry.service.jenkins.gitter:5000/node/node:${NODE_VERSION}
+FROM node:4
 
-ENV PKGLIST="git make gcc g++ python linux-headers paxctl gnupg"
-
-RUN apk add --no-cache $PKGLIST libgcc libstdc++
-
-ENV ENV="${ENVIRONMENT}"
-ENV NODE_ENV="$ENV"
-ENV GIT_TAG="${GIT_TAG}"
-ENV GIT_COMMIT="${GIT_COMMIT}"
-ENV HOME="/root"
-ENV TMPDIR="/tmp/gitter"
-ENV PORT=5000
-
-LABEL selected-git-tag="${SELECTED_GIT_TAG}"
-LABEL git-tag="${GIT_TAG}"
-LABEL git-commit="${GIT_COMMIT}"
-LABEL staged="${STAGED_ENVIRONMENT}"
-LABEL node-version="${NODE_VERSION}"
-LABEL env="${ENVIRONMENT}"
-
-EXPOSE $PORT
-ENTRYPOINT ["node"]
+RUN mkdir -p /app /npm_cache
 
 WORKDIR /app
 
-COPY ./app/ /app
-COPY ./ssh/ /root/.ssh
+RUN npm install -g npm@latest-5
+RUN npm config set cache /npm_cache
+RUN npm config set prefer-offline true
+# TODO: add npm-shrinkwrap here too
 
-RUN rm -rf /app/node_modules
-RUN npm install --production
-RUN apk del $PKGLIST
+COPY package.json /app/
+RUN sed -i '/file:.*modules/d; /file:.*shared/d' package.json
+RUN npm install
+
 RUN rm -rf /tmp/* /var/cache/apk/* /root/.npm /root/.node-gyp /root/.gnupg /root/.ssh 2>/dev/null

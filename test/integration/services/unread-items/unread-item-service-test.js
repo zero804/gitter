@@ -4,11 +4,20 @@
 // its nasty, but if jsmockito uses a different instance of the library
 // it won't work correctly
 function getHamcrest() {
+    try {
+      return require('jshamcrest').JsHamcrest
+    } catch (e) { /* do nothing */ }
+
   try {
-    return require('jsmockito/node_modules/jshamcrest').JsHamcrest;
-  } catch(e) {
-    return require('jsmockito').JsHamcrest;
+    return require('jsmockito/node_modules/jshamcrest').JsHamcrest; // eslint-disable-line
+  } catch(e) { /* do nothing */ }
+
+  var hamcrest = require('jsmockito').JsHamcrest;
+  if (!hamcrest) {
+    throw new Error('Unable to obtain hamcrest instance')
   }
+
+  return hamcrest;
 }
 
 var testRequire = require('../../test-require');
