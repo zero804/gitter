@@ -59,8 +59,8 @@ gulp.task('process:assemble:copy-app:version', function(done) {
           }
 
           // Use jenkins variables
-          if(branch === 'HEAD' && process.env.GIT_BRANCH) {
-            branch = process.env.GIT_BRANCH;
+          if(branch === 'HEAD' && process.env.CI_COMMIT_REF_SLUG) {
+            branch = process.env.CI_COMMIT_REF_SLUG;
           }
 
           mkdirp.sync('output/app/');
