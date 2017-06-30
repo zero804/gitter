@@ -9,11 +9,13 @@ Gitter requires MongoDB, Redis, ElasticSearch and Neo4J. These are all included 
 ## Mac
 
 1. Install [Docker Toolbox](https://www.docker.com/products/docker-toolbox)
+   * **Please note this is different to Docker for Mac**
    * Due to limitations in Docker for Mac and Docker for Windows, you cannot use these products.
    * You can choose either *Docker Quickstart Terminal* or *Kitematic*
 2. Install [Node.js 4](https://nodejs.org/dist/latest-v4.x/)
    * We recommend doing this with **nvm**
-   * `curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash`
+   * You can install nvm with `curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash`
+   * `nvm install 4/*` will install the latest 4.x version of node
 3. Install **npm 5** with `npm install npm@latest -g`
    * If you are unable to run npm 5 for whatever reason, you will need to `npm i -g linklocal` and then run `linklocal` after running `npm install`
 3. Clone this repo
@@ -66,6 +68,12 @@ Gitter is executed through Gulp with the following command:
 `gulp watch`
 
 Visit [http://localhost:5000](http://localhost:5000)
+
+### Shutting Docker down
+
+You can stop the docker containers with `./kill-services` or `docker-machine stop`
+
+If this doesn't work, you can also use `docker-machine rm -f default`.
 
 # Contributing
 
