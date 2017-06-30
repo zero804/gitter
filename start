@@ -10,6 +10,20 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 DOCKER_MACHINE_NAME=${DOCKER_MACHINE_NAME-default}
 
+function has_docker_for_mac {
+  if [[ "$OSTYPE" == "linux-gnu" ]]; then
+    return 1
+  fi
+
+  # Is Docker for Mac running?
+  if (pgrep -f /Applications/Docker.app/Contents/MacOS/Docker > /dev/null); then
+    return 0
+  fi
+
+  return 1
+}
+
+
 function has_local_docker_install {
   if [[ "$OSTYPE" == "linux-gnu" ]]; then
     return 0
@@ -118,6 +132,11 @@ function startDockerServices {
   echo "-- Starting services using docker-compose"
   docker-compose up -d --no-recreate
 }
+
+if has_docker_for_mac; then
+  echo "The docker-compose setup is not compatible with Docker for Mac. Please install Docker Toolbox for Mac: https://docs.docker.com/toolbox/toolbox_install_mac/"
+  exit 1
+fi
 
 if ! has_local_docker_install; then
   startDockerMachine

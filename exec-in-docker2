@@ -1,0 +1,44 @@
+#!/bin/sh
+
+set -u
+set -e
+set -x
+
+WORKSPACE="$(pwd)"
+DEBUG="${DEBUG:-}"
+NODE_ENV="${NODE_ENV:-test-docker}"
+NODE_VERSION="4"
+
+export WORKSPACE
+export DEBUG
+export NODE_VERSION
+export NODE_ENV
+
+TARGET_DOCKER_CONTAINER=internal-min
+
+function setup_env {
+  docker-compose -f docker-compose.internal.yml run --rm mongosetup &
+  sleep 2;
+  docker-compose -f docker-compose.internal.yml run --rm elasticsearchsetup &
+  echo "Waiting for setup to complete"
+  wait
+  echo "Setup complete"
+}
+
+if [[ -z "${SKIP_COMPOSE_SETUP:-}" ]]; then
+  setup_env
+fi
+
+docker-compose -f docker-compose.internal.yml run \
+    -e "NODE_ENV=${NODE_ENV}" \
+    -e "DEBUG=${DEBUG}" \
+    -e "WORKSPACE=${WORKSPACE:-}" \
+    "${TARGET_DOCKER_CONTAINER}" \
+  "/bin/sh" "-c" "$@"
+
+echo "docker-compose run exited with $?"
+
+# docker-compose -f docker-compose.internal.yml ps
+# docker ps -a|grep "${PROJECT_NAME}"
+
+echo "exec-in-docker complete, shutting down"
