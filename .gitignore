@@ -113,3 +113,4 @@ modules/topic-notifications/test/topic.html
 /scripts/useful-queries/*.png
 node_modules_2
 config/overrides
+.env
