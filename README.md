@@ -78,3 +78,5 @@ If this doesn't work, you can also use `docker-machine rm -f default`.
 # Contributing
 
 We use GitFlow and MRs should be made against `develop` not `master`.
+
+Please join us in [gitterHQ/contributing](https://gitter.im/gitterHQ/contributing) for questions or to get in touch.
