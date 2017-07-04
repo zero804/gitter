@@ -29,7 +29,7 @@ Gitter requires MongoDB, Redis, ElasticSearch and Neo4J. These are all included 
 
 ### Background
 
-Gitter uses hostnames to connect to the dependant Docker-provided services. When starting Gitter, we will prompt you to automatically add these to your hostfile. This requires sudo. If you do not feel comfortable, you will need to do it manually in order for Gitter to work.
+Gitter uses hostnames to connect to the dependent Docker-provided services. When starting Gitter, we will prompt you to automatically add these to your hostfile. This requires sudo. If you do not feel comfortable, you will need to do it manually in order for Gitter to work.
 
 Below is an example of what this should look like. If you are happy for us to do this for you, you don't need to do anything here.
 
