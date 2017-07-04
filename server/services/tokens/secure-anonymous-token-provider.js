@@ -1,11 +1,18 @@
 'use strict';
 
-// TODO: delete this after 11 July 2017
-
+var random = require('../../utils/random');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var crypto = require('crypto');
 
-var password = 'soapP2igs1Od2gen';
+var env = require('gitter-web-env');;
+var conf = env.config;
+
+var password = conf.get('ws:anonymousTokenPassword');
+
+function encrypt(tokenPair) {
+  var cipher = crypto.createCipher('aes128', password);
+  return cipher.update(tokenPair, 'ascii', 'base64') + cipher.final('base64');
+}
 
 function decrypt(encrypted) {
   try {
@@ -15,9 +22,18 @@ function decrypt(encrypted) {
     return null;
   }
 }
+
 module.exports = {
   getToken: function(userId, clientId, callback) {
-    return callback();
+    if (userId) return callback();
+
+    return random.generateShortToken()
+      .then(function(token) {
+        // Anonymous tokens start with a `$`
+        var tokenPair = token + ':' + clientId;
+        return "$" + encrypt(tokenPair);
+      })
+      .nodeify(callback);
   },
 
   validateToken: function(token, callback) {
@@ -27,14 +43,18 @@ module.exports = {
 
     if (!decrypted) return callback();
 
-    var clientId = decrypted.substring(4);
+    var pairs = decrypted.split(':');
+    if (pairs.length !== 2 || !pairs[0] || !pairs[1]) {
+      return callback();
+    }
+
+    var clientId = pairs[1];
 
     if (!mongoUtils.isLikeObjectId(clientId)) {
       return callback();
     }
 
     return callback(null, [null, clientId]);
-
   },
 
   cacheToken: function(userId, clientId, token, callback) {

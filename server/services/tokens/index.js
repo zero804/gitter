@@ -5,7 +5,8 @@ var UpAndDown = require('./up-and-down');
 
 var PROVIDERS = [
   require('./memory-token-provider'),
-  require('./anonymous-token-provider'),
+  require('./secure-anonymous-token-provider'),
+  require('./anonymous-token-provider'), // TODO: remove this after 11 July 2017
   require('./redis-token-provider'),
   require('./access-token-provider')
 ];
