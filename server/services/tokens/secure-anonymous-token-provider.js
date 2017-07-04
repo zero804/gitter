@@ -1,11 +1,11 @@
 'use strict';
 
+var env = require('gitter-web-env');
+var conf = env.config;
 var random = require('../../utils/random');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var crypto = require('crypto');
 
-var env = require('gitter-web-env');;
-var conf = env.config;
 
 var password = conf.get('ws:anonymousTokenPassword');
 
