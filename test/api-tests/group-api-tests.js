@@ -10,9 +10,11 @@ var securityDescriptorService = require('gitter-web-permissions/lib/security-des
 describe('group-api', function() {
   var app, request;
 
-  fixtureLoader.ensureIntegrationEnvironment('#integrationUser1', 'GITTER_INTEGRATION_ORG');
+  fixtureLoader.ensureIntegrationEnvironment('#integrationUser1', 'GITTER_INTEGRATION_ORG', '#oauthTokens');
 
   before(function() {
+    if(this._skipFixtureSetup) return;
+
     request = require("supertest-as-promised")(Promise);
     app = require('../../server/api');
   });

@@ -14,9 +14,12 @@ describe('user-repos #slow', function() {
     '#integrationUser1',
     '#integrationCollabUser1',
     'GITTER_INTEGRATION_REPO',
-    'GITTER_INTEGRATION_REPO_WITH_COLLAB_ONLY_READ');
+    'GITTER_INTEGRATION_REPO_WITH_COLLAB_ONLY_READ',
+    '#oauthTokens');
 
   before(function() {
+    if(this._skipFixtureSetup) return;
+
     request = require("supertest-as-promised")(Promise);
     app = require('../../server/api');
   });

@@ -19,9 +19,12 @@ describe('integration tests #slow', function() {
       'transloadit:avatars:bucket',
       'transloadit:template_avatar_id',
       'transloadit:template_image_id',
-      'transloadit:template_id');
+      'transloadit:template_id',
+      '#oauthTokens');
 
   before(function() {
+    if(this._skipFixtureSetup) return;
+
     request = require("supertest-as-promised")(Promise);
     app = require('../../server/api');
   });

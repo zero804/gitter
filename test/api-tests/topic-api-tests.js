@@ -10,7 +10,11 @@ var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 describe('topic-api', function() {
   var app, request;
 
+  fixtureLoader.ensureIntegrationEnvironment('#oauthTokens');
+
   before(function() {
+    if(this._skipFixtureSetup) return;
+
     request = require("supertest-as-promised")(Promise);
     app = require('../../server/api');
   });

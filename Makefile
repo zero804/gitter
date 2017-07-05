@@ -22,10 +22,9 @@ clean:
   # If gulp clean failed, it's almost certainly a problem
   # with the npm folder, so nuke it and try again
 
-ci-test: clean
+ci-test:
 	mkdir -p output/
-	gulp test --test-coverage --test-suite docker --test-xunit-reports
-	echo "Docker tests completed"
+	gulp test --test-coverage --test-suite docker --test-xunit-reports --test-bail
 
 test: clean
 	mkdir -p output/
