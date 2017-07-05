@@ -28,15 +28,15 @@ module.exports = function(entryPoints, options) {
         .pipe(sourcemaps.init())
         .pipe(less(opts.lessOptions));
 
-        opts.streamTransform(stream)
-          .pipe(sourcemaps.write(opts.sourceMapOptions.dest, opts.sourceMapOptions.options))
-          .pipe(gulp.dest(opts.dest))
-          .on('end', function() {
-            resolve();
-          })
-          .on('error', function(err) {
-            reject(err);
-          });
+      opts.streamTransform(stream)
+        .pipe(sourcemaps.write(opts.sourceMapOptions.dest, opts.sourceMapOptions.options))
+        .pipe(gulp.dest(opts.dest))
+        .on('end', function() {
+          resolve();
+        })
+        .on('error', function(err) {
+          reject(err);
+        });
     });
   };
 
@@ -49,8 +49,16 @@ module.exports = function(entryPoints, options) {
   });
 
   return {
-    build: function() {
-      return buildStyles(entryPoints)
+    build: function(force) {
+      var getTargetEntryPointsPromise = Promise.resolve(entryPoints);
+      if (!force) {
+        getTargetEntryPointsPromise = myLessWatcher.getDirtyEntryPoints();
+      }
+
+      return getTargetEntryPointsPromise
+        .then(function(targetEntryPoints) {
+          return buildStyles(targetEntryPoints);
+        })
         .then(function() {
           console.log('building done');
         });
