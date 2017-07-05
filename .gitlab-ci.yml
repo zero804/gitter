@@ -15,39 +15,13 @@ stages:
     # this means that this fork is not production ready quite yet
     - npm shrinkwrap
 
-.job_template: &docker_job
-  image: registry.gitlab.com/gitlab-org/gitter/webapp/dind:latest
-  services:
-  - docker:dind
-
-# Disabled for now
-# test:
-#   <<: *docker_job
-#   stage: build_unit_test
-#   variables:
-#     COMPOSE_HTTP_TIMEOUT: 120 # Two minute timeout for slow pulls
-#   script:
-#   - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
-#   - ./exec-in-docker2 make test
-
 validate:
   <<: *node_job
   stage: build_unit_test
   script:
     - make validate
 
-package:
-  <<: *node_job
-  stage: build_unit_test
-  script:
-    - make package
-  artifacts:
-    paths:
-    - output/app.tar.gz
-    - output/assets.tar.gz
-    expire_in: 1 week
-
-testing:
+test:
   <<: *node_job
   variables:
     BLUEBIRD_DEBUG: 1
@@ -59,33 +33,45 @@ testing:
   script:
     - make ci-test
 
-docker-base:
-  variables:
-    DOCKER_DRIVER: overlay
-  stage: docker_images
-  only:
-  - schedules
-  image: docker:latest
-  services:
-  - docker:dind
+package:
+  <<: *node_job
+  stage: build_unit_test
   script:
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
-    - docker build -t registry.gitlab.com/gitlab-org/gitter/webapp .
-    - docker push registry.gitlab.com/gitlab-org/gitter/webapp
+    - make package
+    - ls -la output/
+  artifacts:
+    paths:
+    - output/*,
+    - output/app/ASSET_TAG,
+    - output/app/GIT_COMMIT,
+    - output/app/VERSION
+    expire_in: 1 week
 
-docker-dind:
+containerize:
+  stage: deploy
   variables:
     DOCKER_DRIVER: overlay
-  stage: docker_images
-  only:
-  - schedules
   image: docker:latest
+  dependencies:
+    - package
   services:
   - docker:dind
   script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
-    - docker build -t registry.gitlab.com/gitlab-org/gitter/webapp/dind:latest scripts/docker/dind/
-    - docker push registry.gitlab.com/gitlab-org/gitter/webapp/dind:latest
+    - docker build -t registry.gitlab.com/gitlab-org/gitter/webapp/app:$CI_COMMIT_REF_SLUG -f Dockerfile-app-base .
+    - docker push registry.gitlab.com/gitlab-org/gitter/webapp/app:$CI_COMMIT_REF_SLUG
+
+# upload-staging:
+#   stage: deploy
+#   image: python:latest
+#   dependencies:
+#   - package
+#   script:
+#   - pip install awscli
+#   - aws s3 cp output/app s3://gitter-deployments/gitter-webapp/beta
+#   - aws s3 cp output/*
+#   only:
+#   - develop
 
 deploy_beta:
   stage: deploy
@@ -107,6 +93,19 @@ deploy_beta_staging:
   only:
   - /^feature\/.*$/
 
+docker-base:
+  variables:
+    DOCKER_DRIVER: overlay
+  stage: docker_images
+  only:
+  - schedules
+  image: docker:latest
+  services:
+  - docker:dind
+  script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+    - docker build -t registry.gitlab.com/gitlab-org/gitter/webapp:latest .
+    - docker push registry.gitlab.com/gitlab-org/gitter/webapp:latest
 
 mongo-base:
   variables:
