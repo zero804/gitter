@@ -8,25 +8,6 @@ set -euo pipefail
 
 DOCKER_MACHINE_NAME=${DOCKER_MACHINE_NAME-default}
 
-
-function has_docker_for_mac {
-  if [[ "$OSTYPE" == "linux-gnu" ]]; then
-    return 1
-  fi
-
-  # Is Docker for Mac running?
-  if (pgrep -f /Applications/Docker.app/Contents/MacOS/Docker > /dev/null); then
-    return 0
-  fi
-
-  return 1
-}
-
-if has_docker_for_mac; then
-  echo "The docker-compose setup is not compatible with Docker for Mac. Please install Docker Toolbox for Mac: https://docs.docker.com/toolbox/toolbox_install_mac/"
-  exit 1
-fi
-
 function has_local_docker_install {
   if [[ "$OSTYPE" == "linux-gnu" ]]; then
     return 0
@@ -40,18 +21,9 @@ function has_local_docker_install {
   return 1
 }
 
-get_local_ip() {
-    local _ip _line
-    while IFS=$': \t' read -a _line ;do
-        [ -z "${_line%inet}" ] &&
-           _ip=${_line[${#_line[1]}>4?1:2]} &&
-           [ "${_ip#127.0.0.1}" ] && echo $_ip && return 0
-      done< <(LANG=C /sbin/ifconfig)
-}
-
 function get_ip {
   if has_local_docker_install; then
-    get_local_ip
+    echo "127.0.0.1"
   else
     echo "$(docker-machine ip $DOCKER_MACHINE_NAME)"
   fi

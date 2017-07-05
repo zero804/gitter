@@ -27,6 +27,15 @@ var configurationMappings = {
   GITTER_INTEGRATION_REPO_WITH_COLLAB: 'integrationTests:collabRepos:repo1',
   GITTER_INTEGRATION_REPO_WITH_COLLAB2: 'integrationTests:collabRepos:repo2',
   GITTER_INTEGRATION_REPO_WITH_COLLAB_ONLY_READ: 'integrationTests:collabRepos:repoReadOnly',
+
+  GITHUB_PRIVATE_CLIENT_ID: "github:client_id",
+  GITHUB_PRIVATE_CLIENT_SECRET: "github:client_secret",
+  GITHUB_USER_CLIENT_ID: "github:user_client_id",
+  GITHUB_USER_SECRET: "github:user_client_secret",
+  GITHUB_ANON_CLIENT_ID: "github:anonymous_app:client_id",
+  GITHUB_ANON_CLIENT_SECRET: "github:anonymous_app:client_secret",
+  TWITTER_CONSUMER_KEY: "twitteroauth__consumer_key",
+  TWITTER_CONSUMER_SECRET: "twitteroauth__consumer_secret",
 }
 
 var configSets = {
@@ -37,6 +46,16 @@ var configSets = {
   '#integrationCollabUser1': [
       'GITTER_INTEGRATION_COLLAB_USERNAME',
       'GITTER_INTEGRATION_COLLAB_USER_SCOPE_TOKEN'
+  ],
+  '#oauthTokens': [
+    'GITHUB_PRIVATE_CLIENT_ID',
+    'GITHUB_PRIVATE_CLIENT_SECRET',
+    'GITHUB_USER_CLIENT_ID',
+    'GITHUB_USER_SECRET',
+    'GITHUB_ANON_CLIENT_ID',
+    'GITHUB_ANON_CLIENT_SECRET',
+    'TWITTER_CONSUMER_KEY',
+    'TWITTER_CONSUMER_SECRET',
   ]
 }
 

@@ -84,19 +84,11 @@
   "mongo": {
     "connection": {
       "hosts": [
-        "gitter-mongo-dev:27017",
-        "gitter-mongo-dev:27018",
-        "gitter-mongo-dev:27019"
+        "gitter-mongo-dev:27017"
       ],
       "database": "gitter",
       "options": {
-        "replicaSet": "troupeSet",
-        "w": 1
       }
-    },
-    "autoDiscovery": {
-      "host": "gitter-mongo-dev",
-      "port": 27017
     },
     "profileSlowQueries": true,
     "logQueries": false,
@@ -141,9 +133,9 @@
     "basepath": "http://localhost:8061",
     "cacheBuster": "1"
   },
-  "redis": "redis-sentinel://gitter-redis-dev:26379?db=1&master=gitter-master-dev",
-  "redis_nopersist": "redis-sentinel://gitter-redis-dev:26379?db=1&master=gitter-master-dev",
-  "redis_caching": "redis-sentinel://gitter-redis-dev:26379?master=gitter-master-dev",
+  "redis": "redis://gitter-redis-dev?db=1",
+  "redis_nopersist": "redis://gitter-redis-dev?db=1",
+  "redis_caching": "redis://gitter-redis-dev",
   "elasticsearch": {
     "hosts": [
       "http://gitter-es-dev:9200"

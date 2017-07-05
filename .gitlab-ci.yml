@@ -47,6 +47,18 @@ package:
     - output/assets.tar.gz
     expire_in: 1 week
 
+testing:
+  <<: *node_job
+  variables:
+    BLUEBIRD_DEBUG: 1
+  stage: build_unit_test
+  services:
+    - registry.gitlab.com/gitlab-org/gitter/webapp/mongo:latest
+    - registry.gitlab.com/gitlab-org/gitter/webapp/elasticsearch:latest
+    - redis:3.0
+  script:
+    - make ci-test
+
 docker-base:
   variables:
     DOCKER_DRIVER: overlay
@@ -94,3 +106,32 @@ deploy_beta_staging:
     url: https://beta.gitter.im
   only:
   - /^feature\/.*$/
+
+
+mongo-base:
+  variables:
+    DOCKER_DRIVER: overlay
+  stage: docker_images
+  only:
+  - schedules
+  image: docker:latest
+  services:
+  - docker:dind
+  script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+    - docker build -t registry.gitlab.com/gitlab-org/gitter/webapp/mongo:latest scripts/docker/mongo-image/
+    - docker push registry.gitlab.com/gitlab-org/gitter/webapp/mongo:latest
+
+elasticsearch-base:
+  variables:
+    DOCKER_DRIVER: overlay
+  stage: docker_images
+  only:
+  - schedules
+  image: docker:latest
+  services:
+  - docker:dind
+  script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+    - docker build -t registry.gitlab.com/gitlab-org/gitter/webapp/elasticsearch:latest scripts/docker/elasticsearch-image/
+    - docker push registry.gitlab.com/gitlab-org/gitter/webapp/elasticsearch:latest

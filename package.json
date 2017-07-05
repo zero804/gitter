@@ -118,7 +118,7 @@
     "moment": "^2.10.3",
     "mongodb": "~2.2.19",
     "mongodb-unique-ids": "^0.2.0",
-    "mongoose": "~4.10.8",
+    "mongoose": "~4.6.0",
     "mongoose-number": "^0.1.1",
     "node-gcm": "^0.9.12",
     "node-mongodb-debug-log": "^0.1.2",

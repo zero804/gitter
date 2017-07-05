@@ -13,10 +13,13 @@ describe('create-github-room-api', function() {
     '#integrationUser1',
     '#integrationCollabUser1',
     'GITTER_INTEGRATION_ORG',
-    'GITTER_INTEGRATION_REPO_WITH_COLLAB'
+    'GITTER_INTEGRATION_REPO_WITH_COLLAB',
+    '#oauthTokens'
   );
 
   before(function() {
+    if(this._skipFixtureSetup) return;
+
     request = require("supertest-as-promised")(Promise);
     app = require('../../server/api');
   });

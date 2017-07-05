@@ -29,11 +29,13 @@ function githubUpgradeCallback(req, accessToken, refreshToken, params, _profile,
 
 }
 
+var statePassphrase = config.get('github:statePassphrase');
+
 var githubUpgradeStrategy = new GitHubStrategy({
     clientID: config.get('github:client_id'),
     clientSecret: config.get('github:client_secret'),
     callbackURL: callbackUrlBuilder(),
-    stateProvider: new TokenStateProvider({ passphrase: config.get('github:statePassphrase') }),
+    stateProvider: statePassphrase && new TokenStateProvider({ passphrase: statePassphrase }),
     skipUserProfile: true,
     passReqToCallback: true
   }, githubUpgradeCallback);
