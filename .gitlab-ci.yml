@@ -57,6 +57,7 @@ containerize:
   services:
   - docker:dind
   script:
+    - ls -la output
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
     - docker build -t registry.gitlab.com/gitlab-org/gitter/webapp/app:$CI_COMMIT_REF_SLUG -f Dockerfile-app-base .
     - docker push registry.gitlab.com/gitlab-org/gitter/webapp/app:$CI_COMMIT_REF_SLUG
