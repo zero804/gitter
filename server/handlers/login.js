@@ -63,6 +63,16 @@ router.get('/failed',
     });
   });
 
+
+router.get('/token-revoked',
+  identifyRoute('token-revoked'),
+  function(req, res) {
+    res.status(401);
+    res.render('token-revoked', {
+      appsLink: config.get('web:basepath') + '/apps'
+    });
+  });
+
 // ----------------------------------------------------------
 // GitHub
 // ----------------------------------------------------------
