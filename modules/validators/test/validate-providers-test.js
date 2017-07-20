@@ -8,7 +8,8 @@ describe('validate-providers', function() {
     [[], true],
     [['github'], true],
     [['twitter'], false],
-    [['github', 'twitter'], false],
+    [['gitlab'], false],
+    [['github', 'twitter', 'gitlab'], false],
     ['', false],
     [{}, false],
     [undefined, false],
@@ -30,5 +31,3 @@ describe('validate-providers', function() {
     });
   })
 });
-
-

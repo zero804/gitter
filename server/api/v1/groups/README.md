@@ -72,6 +72,7 @@ Try it from the CLI:
     - `linkPath`: Represents how we find the backing object given the type
  - `invites`: Array of user objects. Below is a list of properties you can include on each object to invite on various platforms
     - `username`: Gitter username
+    - `gitlabUsername`: GitLab username
     - `githubUsername`: GitHub username
     - `twitterUsername`: Twitter username
     - `emailAddress`: Manual email address

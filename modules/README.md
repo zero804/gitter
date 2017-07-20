@@ -16,6 +16,7 @@
 * [`frame-utils`](./frame-utils): Frontend: Client utility
 * [`github`](./github): Backend: GitHub API
 * [`github-backend`](./github-backend): Backend: Muxer GitHub Backend
+* [`gitlab-backend`](./gitlab-backend): Backend: Muxer GitLab Backend
 * [`google-backend`](./google-backend): Backed - Muxer Google Backend
 * [`groups`](./groups): Backend: Communities/Groups
 * [`i18n`](./i18n): Universal: Internationalization

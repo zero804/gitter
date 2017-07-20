@@ -21,6 +21,24 @@ describe('login-required', function() {
     loginRequired(req, res);
   });
 
+  it('redirects to /login/gitlab if GitLab provider is given', function(done) {
+    var req = {
+      nonApiRoute: true,
+      query: {
+        auth_provider: 'gitlab'
+      }
+    };
+
+    var res = {
+      relativeRedirect: function(url) {
+        assert.equal(url, '/login/gitlab');
+        done();
+      }
+    };
+
+    loginRequired(req, res);
+  });
+
   it('redirects to /login/twitter if twitter provider is given', function(done) {
     var req = {
       nonApiRoute: true,

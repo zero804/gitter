@@ -43,6 +43,7 @@ function parseAndValidateInput(input) {
 
       case 'gitter':
       case identityService.GITHUB_IDENTITY_PROVIDER:
+      case identityService.GITLAB_IDENTITY_PROVIDER:
       case identityService.TWITTER_IDENTITY_PROVIDER:
         return {
           type: input.type,
@@ -70,6 +71,7 @@ function parseAndValidateInput(input) {
 
   addUserIdentifer('gitter', 'username');
   addUserIdentifer(identityService.GITHUB_IDENTITY_PROVIDER, 'githubUsername');
+  addUserIdentifer(identityService.GITLAB_IDENTITY_PROVIDER, 'gitlabUsername');
   // TODO: this doesn't actually work in the rest if the invites code
   addUserIdentifer(identityService.TWITTER_IDENTITY_PROVIDER, 'twitterUsername');
 
@@ -109,6 +111,7 @@ function getAvatar(type, externalId, resolvedEmailAddress) {
   }
 
   // TODO: what about a twitter user? At least one that has signed up.
+  // TODO: what about a gitlab user? At least one that has signed up.
 
   if (resolvedEmailAddress) {
     return avatars.getForGravatarEmail(resolvedEmailAddress);

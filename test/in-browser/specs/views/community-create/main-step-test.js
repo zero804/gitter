@@ -114,11 +114,25 @@ describe('community-creation-main-view', function() {
     });
   });
 
-  describe('with non-GitHub user', function() {
+  describe('with Twitter user', function() {
     beforeEach(generateBeforeEachCb({
       user: {
         providers: [
           'twitter'
+        ]
+      }
+    }));
+
+    it('should not show the associated project area', function() {
+      assert.strictEqual(view.ui.githubProjectLink.length, 0);
+    });
+  });
+
+  describe('with GitLab user', function() {
+    beforeEach(generateBeforeEachCb({
+      user: {
+        providers: [
+          'gitlab'
         ]
       }
     }));
