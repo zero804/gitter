@@ -3,6 +3,7 @@
 var Promise = require('bluebird');
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
+var log = require('../../../utils/log');
 var context = require('../../../utils/context');
 var apiClient = require('../../../components/api-client');
 var appEvents = require('../../../utils/appevents');
@@ -21,7 +22,8 @@ function isGitHubUser(user) {
   });
 }
 
-function convertToIssueAnchor(element, githubIssueUrl) {
+// This is used for the legacy <span> references
+function convertToIssueAnchor(element, issueUrl) {
   var resultantElement = element;
   if(
     element.tagName !== 'a' &&
@@ -40,7 +42,7 @@ function convertToIssueAnchor(element, githubIssueUrl) {
        }
     }
 
-    newElement.setAttribute('href', githubIssueUrl || '');
+    newElement.setAttribute('href', issueUrl || '');
     newElement.setAttribute('target', '_blank');
 
     resultantElement = newElement;
@@ -49,8 +51,10 @@ function convertToIssueAnchor(element, githubIssueUrl) {
   return resultantElement;
 }
 
-function getIssueState(repo, issueNumber) {
+function getIssuableState(type, provider, repo, issueNumber) {
   return apiClient.priv.get('/issue-state', {
+      t: type,
+      p: provider,
       r: repo,
       i: issueNumber
     })
@@ -91,11 +95,14 @@ var FooterView = Marionette.ItemView.extend({
   },
   onMentionClick: function() {
     getRoomRepo()
-      .then(function(roomRepo) {
+      .then((roomRepo) => {
         var modelRepo = this.model.get('repo');
         var modelNumber = this.model.get('number');
         var mentionText = (modelRepo === roomRepo) ? '#' + modelNumber : modelRepo + '#' + modelNumber;
         appEvents.trigger('input.append', mentionText);
+      })
+      .catch((err) => {
+        log.error(`Problem getting room repo`, { exception: err });
       });
 
     this.parentPopover.hide();
@@ -173,17 +180,8 @@ function createPopover(model, targetElement) {
 }
 
 var IssueModel = Backbone.Model.extend({
-  idAttribute: 'number',
   urlRoot: function() {
-    var repo = this.get('repo');
-
-    var endpoint = '/private/gh/repos/' + repo + '/issues/';
-
-    if(!repo) {
-      endpoint = apiClient.room.uri('/issues');
-    }
-
-    return endpoint;
+    return apiClient.priv.uri('/issue-mirror');
   },
   sync: SyncMixin.sync
 });
@@ -220,17 +218,25 @@ function getAnchorUrl(githubRepo, issueNumber) {
   return 'https://github.com/issues?q=' + issueNumber;
 }
 
-function bindAnchorToIssue(view, issueElement, repo, issueNumber, anchorUrl) {
+function bindAnchorToIssue(view, issueElement, type, provider, repo, issueNumber, anchorUrl) {
   // Lazy model, will be fetched when it's needed, but not before
   function getModel() {
     var model = new IssueModel({
+      type: type,
+      provider: provider || 'github',
       repo: repo,
       number: issueNumber,
       html_url: anchorUrl
     });
 
     model.fetch({
-      data: { renderMarkdown: true },
+      data: {
+        renderMarkdown: true,
+        t: type,
+        p: provider,
+        r: repo,
+        i: issueNumber
+      },
       error: function() {
         model.set({ error: true });
       }
@@ -268,7 +274,7 @@ function bindAnchorToIssue(view, issueElement, repo, issueNumber, anchorUrl) {
 
 var decorator = {
   decorate: function(view) {
-    Array.prototype.forEach.call(view.el.querySelectorAll('*[data-link-type="issue"]'), function(issueElement) {
+    Array.prototype.forEach.call(view.el.querySelectorAll('*[data-link-type="issue"], *[data-link-type="mr"], *[data-link-type="pr"]'), function(issueElement) {
       return Promise.try(function() {
         var repoFromElement = issueElement.dataset.issueRepo;
 
@@ -279,12 +285,18 @@ var decorator = {
         return getRoomRepo();
       })
       .then(function(repo) {
+        var type = issueElement.dataset.linkType || 'issue';
         var issueNumber = issueElement.dataset.issue;
-        var anchorUrl = getAnchorUrl(repo, issueNumber) || '';
-        issueElement = convertToIssueAnchor(issueElement, anchorUrl);
+        var anchorUrl = issueElement.getAttribute('href') || getAnchorUrl(repo, issueNumber);
+        if(anchorUrl) {
+          // This is used for the legacy <span> references
+          issueElement = convertToIssueAnchor(issueElement, anchorUrl);
+        }
+        var provider = issueElement.dataset.provider || 'github';
+
 
         if (repo && issueNumber) {
-          getIssueState(repo, issueNumber)
+          getIssuableState(type, provider, repo, issueNumber)
             .then(function(state) {
               if(!state) return;
 
@@ -296,10 +308,16 @@ var decorator = {
                 issueElement.classList.add(state);
               }
 
-              bindAnchorToIssue(view, issueElement, repo, issueNumber, anchorUrl);
+              bindAnchorToIssue(view, issueElement, type, provider, repo, issueNumber, anchorUrl);
+            })
+            .catch((err) => {
+              log.error(`Problem fetching issuable state ${repo}#${issueNumber}`, { exception: err });
             });
         }
 
+      })
+      .catch((err) => {
+        log.error(`Problem getting repo for room`, { exception: err });
       });
     });
   }

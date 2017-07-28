@@ -111,6 +111,22 @@ describe('cache-wrapper', function() {
       wrapped.addPrefix('world');
     });
 
+    it('looks up correct key when getInstanceId returns promise', function(done) {
+      var wrapper = getWrapper(function(key) {
+        assert.equal(key, 'my-module:hello:addPrefix:world');
+        done();
+      });
+
+      var Wrapped = wrapper('my-module', Klass, {
+        getInstanceId: function(obj) {
+          return Promise.resolve(obj.prefix);
+        }
+      });
+
+      var wrapped = new Wrapped('hello');
+      wrapped.addPrefix('world');
+    });
+
     it('calls method correctly on cache miss', function(done) {
       var wrapper = getWrapper(function(key, cachedFunc, cb) {
         cachedFunc(cb);

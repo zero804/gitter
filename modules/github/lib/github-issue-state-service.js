@@ -1,18 +1,15 @@
 "use strict";
 
 var wrap = require('./github-cache-wrapper');
-var tentacles = require('./tentacles-client');
-var userTokenSelector = require('./user-token-selector').full;
+var IssueService = require('./github-issue-service');
 
 function GitHubIssueStateService(user) {
-  this.user = user;
-  this.accessToken = userTokenSelector(user);
+  this.issueService = new IssueService(user);
 }
 
 GitHubIssueStateService.prototype.getIssueState = function(repo, issueNumber) {
-  return tentacles.issue.get(repo, issueNumber, { accessToken: this.accessToken })
+  return this.issueService.getIssue(repo, issueNumber)
     .then(function(issue) {
-      if (!issue) return '';
       return issue.state;
     });
 };

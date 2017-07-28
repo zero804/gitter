@@ -1,5 +1,7 @@
 # 19.13.0 - *upcoming*
 
+ - Add GitLab issue decorations, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1077
+
 Developer facing:
 
  - Update to Mocha@5.x for better debugging, `--inspect` (node inspector devtools), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1212

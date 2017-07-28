@@ -1,17 +1,21 @@
-.issue.is-existent {
-  border-bottom: 1px dotted;
-  cursor: pointer;
-  padding: 0 2px;
-  border-radius: 2px;
-  text-decoration: none;
+.issue,
+.pr,
+.mr {
+  &.is-existent {
+    border-bottom: 1px dotted;
+    cursor: pointer;
+    padding: 0 2px;
+    border-radius: 2px;
+    text-decoration: none;
 
-  &.open {
-    color: @trpGreen;
-    background-color: lighten(@trpGreen, 45%);
-  }
-  &.closed {
-    color: @trpRed;
-    background-color: lighten(@trpRed, 35%);
+    &.open {
+      color: @trpGreen;
+      background-color: lighten(@trpGreen, 45%);
+    }
+    &.closed {
+      color: @trpRed;
+      background-color: lighten(@trpRed, 35%);
+    }
   }
 }
 
@@ -23,6 +27,10 @@
   background-color: lighten(@purple, 50%);
   border-radius: 2px;
   color: @purple;
+
+  &:hover {
+    text-decoration: none;
+  }
 }
 
 .popover-footer a.open-in-github,

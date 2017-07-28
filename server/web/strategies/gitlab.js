@@ -11,7 +11,7 @@ var passportLogin = require('../passport-login');
 var identityService = require('gitter-web-identity');
 var callbackUrlBuilder = require('./callback-url-builder');
 
-function gitlabOauthCallback(req, token, tokenSecret, profile, done) {
+function gitlabOauthCallback(req, token, refreshToken, profile, done) {
   var gitlabUser = {
     username: profile.username+'_gitlab',
     displayName: profile.displayName,
@@ -24,7 +24,7 @@ function gitlabOauthCallback(req, token, tokenSecret, profile, done) {
     displayName: profile.displayName,
     email: profile._json.email,
     accessToken: token,
-    accessTokenSecret: tokenSecret.access_token,
+    accessTokenSecret: refreshToken,
     avatar: profile.avatarUrl
   };
 
@@ -43,7 +43,9 @@ var gitlabStrategy = new GitLabStrategy({
     clientID: config.get('gitlaboauth:client_id'),
     clientSecret: config.get('gitlaboauth:client_secret'),
     callbackURL: callbackUrlBuilder('gitlab'),
-    passReqToCallback: true
+    passReqToCallback: true,
+    scope: ['read_user', 'api'],
+    scopeSeparator: ' '
   }, gitlabOauthCallback);
 
 gitlabStrategy.name = 'gitlab';
