@@ -1,9 +1,11 @@
 "use strict";
 
+var Promise = require('bluebird');
 var env = require('gitter-web-env');
 var config = env.config;
 var _ = require('lodash');
 var userScopes = require('gitter-web-identity/lib/user-scopes');
+var logout = Promise.promisify(require('./logout'));
 
 function linkStack(stack) {
   if(!stack) return;
@@ -31,19 +33,25 @@ module.exports = function(err, req, res, next) { // eslint-disable-line no-unuse
   var status = res.statusCode;
 
   /* Got a 401, the user isn't logged in and this is a browser? */
-  if(status === 401 && req.accepts(['json','html']) === 'html' && !req.user) {
+  if(status === 401 && req.accepts(['json','html']) === 'html') {
     var returnUrl = req.originalUrl.replace(/\/~(\w+)$/,"");
 
-    if(req.session) {
+    if(err.clientRevoked) {
+      return logout(req, res)
+        .then(() => {
+          return res.redirect('/login/token-revoked');
+        });
+    }
+    else if(!req.user && req.session) {
       req.session.returnTo = returnUrl;
-      res.redirect('/login');
-    } else {
+      return res.redirect('/login');
+    }
+    else if(!req.user) {
       // This should not really be happening but
       // may do if the gitter client isn't doing
       // oauth properly
-      res.redirect('/login?returnTo=' + encodeURIComponent(returnUrl));
+      return res.redirect('/login?returnTo=' + encodeURIComponent(returnUrl));
     }
-    return;
   }
 
   var template = getTemplateForStatus(status);
@@ -68,7 +76,7 @@ module.exports = function(err, req, res, next) { // eslint-disable-line no-unuse
       res.send({ error: message });
     },
     text: function() {
-      res.send('Error: ', message);
+      res.send('Error: ' + message);
     }
   });
 

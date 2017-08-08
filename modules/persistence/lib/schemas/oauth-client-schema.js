@@ -14,7 +14,8 @@ var OAuthClientSchema = new Schema({
   clientSecret: String,
   registeredRedirectUri: String,
   canSkipAuthorization: Boolean,
-  ownerUserId: ObjectId
+  ownerUserId: ObjectId,
+  revoked: Boolean
 });
 OAuthClientSchema.index({ clientKey: 1 });
 OAuthClientSchema.index({ ownerUserId: 1 });

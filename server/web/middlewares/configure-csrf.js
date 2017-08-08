@@ -1,9 +1,10 @@
 'use strict';
 
-var oauthService = require('../../services/oauth-service');
-var debug = require('debug')('gitter:infra:configure-csrf');
+var Promise = require('bluebird');
 var env = require('gitter-web-env');
 var stats = env.stats;
+var debug = require('debug')('gitter:infra:configure-csrf');
+var oauthService = require('../../services/oauth-service');
 
 function setAccessToken(req, userId, accessToken) {
   if(req.session) {
@@ -57,14 +58,21 @@ module.exports = function(req, res, next) {
   var sessionAccessToken = getSessionAccessToken(req, userId);
   if(sessionAccessToken) {
     return oauthService.validateAccessTokenAndClient(sessionAccessToken)
-      .then(function(result) {
-        if (!result) {
+      .then(function(tokenInfo) {
+        if(!tokenInfo) {
           return generateAccessToken();
         }
+
         req.accessToken = sessionAccessToken;
       })
       .catch(function(err) {
+        // We shouldn't try to regenerate something that was revoked
+        if(err.clientRevoked) {
+          throw err;
+        }
+
         debug('csrf: OAuth access token validation failed: %j', err);
+        // Refresh anonymous tokens
         return generateAccessToken();
       })
       .nodeify(next);

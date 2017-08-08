@@ -1,16 +1,23 @@
 "use strict";
 
+var Promise = require('bluebird');
 var testRequire = require('../test-require');
 var assert = require('assert');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
-var oauthService = testRequire("./services/oauth-service");
-var Promise = require('bluebird');
+var oauthService = testRequire('./services/oauth-service');
 
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
 describe('oauth-service', function() {
   var fixture = fixtureLoader.setup({
-    user1: { }
+    user1: { },
+    oAuthClientRevoked1: {
+      revoked: true
+    },
+    oAuthAccessTokenRevoked1: {
+      user: 'user1',
+      client: 'oAuthClientRevoked1'
+    }
   });
 
   it('should create tokens', function() {
@@ -133,10 +140,10 @@ describe('oauth-service', function() {
   });
 
 
-  it('should use validate tokens', function(done) {
-    var userId = fixture.user1.id;
+  it('should validate tokens', function(done) {
+    var user = fixture.user1;
 
-    return oauthService.findOrGenerateWebToken(userId)
+    return oauthService.findOrGenerateWebToken(user._id)
       .spread(function(token1, client) {
         assert(token1);
         assert.equal('string', typeof token1);
@@ -147,12 +154,14 @@ describe('oauth-service', function() {
         return oauthService.validateAccessTokenAndClient(token1)
           .then(function(tokenInfo) {
             assert(tokenInfo);
+            assert(mongoUtils.objectIDsEqual(tokenInfo.user._id, user._id));
+            assert(mongoUtils.objectIDsEqual(tokenInfo.client._id, client._id));
           });
       })
       .nodeify(done);
   });
 
-  it('should use validate anonymous tokens', function(done) {
+  it('should validate anonymous tokens', function(done) {
     return oauthService.generateAnonWebToken()
       .spread(function(token1, client) {
         assert(token1);
@@ -164,7 +173,19 @@ describe('oauth-service', function() {
         return oauthService.validateAccessTokenAndClient(token1)
           .then(function(tokenInfo) {
             assert(tokenInfo);
+            assert.equal(tokenInfo.user, null);
+            assert(mongoUtils.objectIDsEqual(tokenInfo.client._id, client._id));
           });
+      })
+      .nodeify(done);
+  });
+
+  it('should consider a revoked client as an invalid token', function(done) {
+    var token = fixture.oAuthAccessTokenRevoked1.token;
+
+    return oauthService.validateAccessTokenAndClient(token)
+      .catch(function(err) {
+        assert.equal(err.clientRevoked, true);
       })
       .nodeify(done);
   });
