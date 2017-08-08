@@ -22,7 +22,6 @@ Gitter requires MongoDB, Redis, ElasticSearch and Neo4J. These are all included 
  1. Clone this repo
  1. Run `npm install`
    * Go and make a cup of tea, because this will take a rather long time.
- 1. Do an initial compile of the CSS with `npm run task-css` this will be part of the gulp task [in the future](https://gitlab.com/gitlab-org/gitter/webapp/issues/1741).
 
 
 ## Starting Gitter

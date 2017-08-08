@@ -3,6 +3,8 @@
 var Promise = require('bluebird');
 var _ = require('underscore');
 var path = require('path');
+var fs = require('fs');
+var stat = Promise.promisify(fs.stat);
 
 var EventEmitter = require('events').EventEmitter;
 var chokidar = require('chokidar');
@@ -18,8 +20,23 @@ var transformPathsToAbsolute = function(paths, /*option*/basePath) {
   });
 };
 
+var transformEntryPointToDestFile = function(entryPoint, dest) {
+  var fileName = path.basename(entryPoint, '.less') + '.css';
+  return transformPathsToAbsolute(path.join(dest, fileName))[0];
+};
 
 
+var getLastModifiedTime = function(targetFile) {
+  return stat(targetFile)
+    .catch(function() {
+      return {
+        mtime: -1
+      };
+    })
+    .then(function(targetStats) {
+      return targetStats.mtime;
+    });
+};
 
 
 var defaults = {
@@ -36,32 +53,75 @@ var LessWatcher = function(entryPoints, options) {
   this.watchHandle = null;
 };
 
-LessWatcher.prototype.getDepMap = function() {
-  var depMap = this.depMap;
 
-  if(!depMap) {
-    var absoluteEntryPoints = transformPathsToAbsolute(this.entryPoints);
-    var lessOptions = this.opts.lessOptions;
+LessWatcher.prototype.generateDepMap = function() {
+  var depMap = {};
+  var absoluteEntryPoints = transformPathsToAbsolute(this.entryPoints);
+  var lessOptions = this.opts.lessOptions;
 
-    depMap = {};
-    var depMapGeneratedPromise = Promise.all(absoluteEntryPoints.map(function(entryPoint) {
-      var depMapPromise = lessDependencyMapUtils.generateLessDependencyMap(entryPoint, lessOptions);
-
-      return depMapPromise
-        .then(function(partialDepMap) {
-          depMap = lessDependencyMapUtils.extendDepMaps(depMap, partialDepMap);
-        });
-    }.bind(this)));
-
-    return depMapGeneratedPromise
-      .then(function() {
-        return depMap;
+  var depMapGeneratedPromise = Promise.all(absoluteEntryPoints.map(function(entryPoint) {
+    return lessDependencyMapUtils.generateLessDependencyMap(entryPoint, lessOptions)
+      .then(function(partialDepMap) {
+        depMap = lessDependencyMapUtils.extendDepMaps(depMap, partialDepMap);
       });
-  }
+  }));
 
-  this.depMap = depMap;
-  return Promise.resolve(this.depMap);
+  return depMapGeneratedPromise
+    .then(function() {
+      return depMap;
+    });
 };
+
+LessWatcher.prototype.getDepMap = function() {
+  return this.depMap ?
+    Promise.resolve(this.depMap) :
+    this.generateDepMap()
+      .tap(function(depMap) {
+        this.depMap = depMap;
+      }.bind(this));
+};
+
+LessWatcher.prototype.getDirtyEntryPoints = function() {
+  var opts = this.opts;
+  var entryPoints = this.entryPoints;
+  var absoluteEntryPoints = transformPathsToAbsolute(entryPoints);
+
+  var dirtyEntryMap = {};
+
+  return this.getDepMap()
+    .then(function(depMap) {
+      var filesToCheck = Object.keys(depMap).concat(absoluteEntryPoints);
+
+      return Promise.map(filesToCheck, function(needleFile) {
+        return getLastModifiedTime(needleFile)
+          .then(function(needleMTime) {
+            var affectedEntryPoints = lessDependencyMapUtils.getEntryPointsAffectedByFile(
+              depMap,
+              absoluteEntryPoints,
+              needleFile
+            );
+
+            return Promise.each(affectedEntryPoints, function(entryPoint) {
+              var destFile = transformEntryPointToDestFile(entryPoint, opts.dest);
+
+              // Compare the entry(root) compiled file time to the needle(child) file time
+              return getLastModifiedTime(destFile)
+                .then(function(destMTime) {
+                  var destTime = new Date(destMTime).getTime();
+                  var needleTime = new Date(needleMTime).getTime();
+
+                  if (destTime < needleTime) {
+                    dirtyEntryMap[entryPoint] = true;
+                  }
+                });
+            });
+          });
+      });
+    })
+    .then(function() {
+      return Object.keys(dirtyEntryMap);
+    });
+}
 
 LessWatcher.prototype.startWatching = function(/*optional*/newWatchGlob) {
   console.log('Starting to watch Less');
