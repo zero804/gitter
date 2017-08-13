@@ -1,7 +1,7 @@
 'use strict';
 
 var Builder = require('node-spritesheet').Builder;
-var services = require('gitter-services');
+var services = require('@gitterhq/services');
 var fse = require('fs-extra');
 
 var legacyImages = [];
