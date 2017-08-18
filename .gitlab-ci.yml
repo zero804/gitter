@@ -75,6 +75,20 @@ docker-dind:
     - docker build -t registry.gitlab.com/gitlab-org/gitter/webapp/dind:latest scripts/docker/dind/
     - docker push registry.gitlab.com/gitlab-org/gitter/webapp/dind:latest
 
+deploy-build-image:
+  variables:
+    DOCKER_DRIVER: overlay
+  stage: docker_images
+  # only:
+  # - schedules
+  image: docker:latest
+  services:
+  - docker:dind
+  script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+    - docker build -t registry.gitlab.com/gitlab-org/gitter/webapp/deploy-build-image:latest scripts/docker/deploy-build-image/
+    - docker push registry.gitlab.com/gitlab-org/gitter/webapp/deploy-build-image:latest
+
 deploy_beta:
   stage: deploy
   script:
