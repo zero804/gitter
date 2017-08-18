@@ -43,6 +43,10 @@
     "exposeInBrowserTests": true,
     "exposeDataForTestingPurposes": true
   },
+  "gitlaboauth": {
+    "consumer_key": "",
+    "consumer_secret": ""
+  },
   "twitteroauth": {
     "consumer_key": "",
     "consumer_secret": ""

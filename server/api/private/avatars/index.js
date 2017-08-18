@@ -5,6 +5,7 @@ var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 var fixMongoIdQueryParam = require('../../../web/fix-mongo-id-query-param');
 var Promise = require('bluebird');
+var request = Promise.promisify(require('request'));
 var cdn = require('gitter-web-cdn');
 var avatars = require('gitter-web-avatars');
 var githubUserByUsernameVersioned = require('./github-user-by-username-versioned');
@@ -149,6 +150,26 @@ router.get('/tw/i/:id/:filename',
 
     return twitterByIds(id, filename);
   }))
+
+router.get('/gl/u/:username',
+  identifyRoute('api-private-gitlab-username'),
+  sendAvatar(function(req) {
+    var username = req.params.username;
+    if (!username) return null;
+
+    // Gravatar or https://gitlab.com/uploads/-/system/user/avatar/:userid/avatar.png
+    return request({
+      method: 'GET',
+      uri: 'https://gitlab.com/api/v4/users?username=' + username,
+      json: true
+    })
+      .then((res) => {
+        return {
+          url: res.body.avatar_url,
+          longTermCachable: false
+        };
+      });
+  }));
 
 /**
  * Only used in DEV. Otherwise nginx handles this route

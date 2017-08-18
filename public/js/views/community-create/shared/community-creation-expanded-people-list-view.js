@@ -76,8 +76,9 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
     var data = this.model.toJSON();
 
     var githubUsername = data.githubUsername;
+    var gitlabUsername = data.gitlabUsername;
     var twitterUsername = data.twitterUsername;
-    var username = githubUsername || twitterUsername || data.username;
+    var username = githubUsername || gitlabUsername || twitterUsername || data.username;
     data.vendorUsername = username;
     data.absoluteUri = urlJoin(clientEnv.basePath, username);
     var statusStates = getStatusClassStates(data.type, data.inviteStatus, this.communityCreateModel.get('allowTweetBadger'));

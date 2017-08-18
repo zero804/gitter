@@ -13,6 +13,7 @@
   "dependencies": {
     "bluebird": "^3.2.1",
     "gitter-web-github-backend": "file:../github-backend",
+    "gitter-web-gitlab-backend": "file:../gitlab-backend",
     "gitter-web-google-backend": "file:../google-backend",
     "gitter-web-identity": "file:../identity",
     "gitter-web-linkedin-backend": "file:../linkedin-backend",
