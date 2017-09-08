@@ -84,7 +84,7 @@
   "mongo": {
     "connection": {
       "hosts": [
-        "gitter-mongo-dev:27017"
+        "localhost:27017"
       ],
       "database": "gitter",
       "options": {
@@ -133,12 +133,12 @@
     "basepath": "http://localhost:8061",
     "cacheBuster": "1"
   },
-  "redis": "redis://gitter-redis-dev?db=1",
-  "redis_nopersist": "redis://gitter-redis-dev?db=1",
-  "redis_caching": "redis://gitter-redis-dev",
+  "redis": "redis://localhost",
+  "redis_nopersist": "redis://localhost?db=1",
+  "redis_caching": "redis://localhost?db=2",
   "elasticsearch": {
     "hosts": [
-      "http://gitter-es-dev:9200"
+      "http://localhost:9200"
     ],
     "sniffOnStart": false
   },
@@ -152,7 +152,7 @@
   },
   "dev-mode": true,
   "neo4j": {
-    "endpoint": "http://gitter-neo4j-dev:7474"
+    "endpoint": "http://localhost:7474"
   },
   "resque": {
     "queuePrefix": ""
