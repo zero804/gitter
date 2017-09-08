@@ -8,6 +8,9 @@ describe('make-room-provider-sentence', function() {
   it('should tell you only GitHub users are allowed.', function() {
     assert.equal(makeRoomProviderSentence(['github']), 'Only GitHub users can join this room.');
   });
+  it('should tell you only GitHub and GitLab users are allowed.', function() {
+    assert.equal(makeRoomProviderSentence(['github', 'gitlab']), 'Only GitHub and GitLab users can join this room.');
+  });
   it('should tell you only GitHub and Twitter users are allowed.', function() {
     assert.equal(makeRoomProviderSentence(['github', 'twitter']), 'Only GitHub and Twitter users can join this room.');
   });

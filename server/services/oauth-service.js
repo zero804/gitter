@@ -7,6 +7,7 @@ var logger = env.logger;
 
 var persistenceService = require('gitter-web-persistence');
 var Promise = require('bluebird');
+var StatusError = require('statuserror');
 var userService = require('./user-service');
 var tokenProvider = require('./tokens/');
 var MongooseCachedLookup = require('../utils/mongoose-cached-lookup');
@@ -64,7 +65,7 @@ function findAuthorizationCode(code, callback) {
  * Returns { user / client / accessToken } hash. If the token is for an anonymous user,
  * user is null;
  */
-function validateAccessTokenAndClient(token, callback) {
+function validateAccessTokenAndClient(token) {
   return tokenProvider.validateToken(token)
     .then(function(result) {
       if (!result) {
@@ -89,6 +90,13 @@ function validateAccessTokenAndClient(token, callback) {
             logger.warn('Invalid token presented (client not found): ', { token: token, clientId: clientId });
             return null;
           }
+          else if(client.revoked) {
+            logger.warn('Token can not be accepted (client has been revoked): ', { token: token, clientId: clientId });
+            var e = new StatusError(401);
+            e.clientRevoked = true;
+            throw e;
+          }
+
 
           if(userId && !user) {
            logger.warn('Invalid token presented (user not found): ', { token: token, userId: userId });
@@ -102,10 +110,9 @@ function validateAccessTokenAndClient(token, callback) {
 
           return { user: user, client: client };
         });
-
-    })
-    .nodeify(callback);
+    });
 }
+
 
 function removeAllAccessTokensForUser(userId, callback) {
   return persistenceService.OAuthAccessToken.remove({ userId: userId })

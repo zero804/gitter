@@ -90,6 +90,8 @@
   "apn": {
     "feedbackInterval": 60
   },
+  "gitlaboauth": {
+  },
   "twitteroauth": {
   },
   "linkedinoauth2": {

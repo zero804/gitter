@@ -1,6 +1,6 @@
 "use strict";
 
-var mongoose = require('mongoose');
+var mongoose = require('gitter-web-mongoose-bluebird');
 var Promise = require('bluebird');
 var debug = require('debug')('gitter:infra:on-mongo-connect');
 

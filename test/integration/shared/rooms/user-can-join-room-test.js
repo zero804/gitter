@@ -17,6 +17,12 @@ describe('user-can-join-room', function() {
     assert.equal(userCanJoinRoom(['github'], GITHUB_ONLY), true);
   });
 
+  it('should allow GitLab users to join open rooms', function() {
+    assert.equal(userCanJoinRoom(['gitlab'], null), true);
+    assert.equal(userCanJoinRoom(['gitlab'], undefined), true);
+    assert.equal(userCanJoinRoom(['gitlab'], []), true);
+  });
+
   it('should allow twitter users to join open rooms', function() {
     assert.equal(userCanJoinRoom(['twitter'], null), true);
     assert.equal(userCanJoinRoom(['twitter'], undefined), true);
@@ -25,6 +31,10 @@ describe('user-can-join-room', function() {
 
   it('should not allow twitter users to join github-only rooms', function() {
     assert.equal(userCanJoinRoom(['twitter'], GITHUB_ONLY), false);
+  });
+
+  it('should not allow GitLab users to join github-only rooms', function() {
+    assert.equal(userCanJoinRoom(['gitlab'], GITHUB_ONLY), false);
   });
 
   it('should allow users with multiple identities to join if at least one is allowed', function() {

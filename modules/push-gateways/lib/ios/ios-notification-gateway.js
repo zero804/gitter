@@ -47,7 +47,12 @@ function sendNotificationToDevice(notificationType, notificationDetails, device)
 
   var connection = connections[device.deviceType];
 
-  if (!connection) return Promise.reject(new Error('unknown device type: ' + device.deviceType));
+  if (connection === false) {
+    return false;
+  }
+  else if (!connection) {
+    return Promise.reject(new Error('unknown device type: ' + device.deviceType));
+  }
 
   connection.pushNotification(appleNotification, deviceToken);
 
@@ -61,9 +66,19 @@ function sendNotificationToDevice(notificationType, notificationDetails, device)
 function createConnection(suffix, isProduction) {
   debug('ios push notification gateway (%s) starting', suffix);
 
+  var certConfigKey = 'apn:cert' + suffix;
+  var cert = resolveCertConfig(certConfigKey);
+  var keyConfigKey = 'apn:key' + suffix;
+  var key = resolveCertConfig(keyConfigKey);
+
+  if(!cert || !key) {
+    logger.warn('ios push notification gateway (' + suffix + ') missing config, ' + certConfigKey + ':' + cert + ' ' + keyConfigKey + ':' + key);
+    return false;
+  }
+
   var connection = new apn.Connection({
-    cert: resolveCertConfig('apn:cert' + suffix),
-    key: resolveCertConfig('apn:key' + suffix),
+    cert: cert,
+    key: key,
     production: isProduction,
     connectionTimeout: 60000
   });
@@ -97,7 +112,12 @@ function sendBadgeUpdateToDevice(device, badge) {
   var deviceToken = new apn.Device(device.appleToken);
   var connection = connections[device.deviceType];
 
-  if (!connection) return false;
+  if (connection === false) {
+    return false;
+  }
+  else if (!connection) {
+    return false;
+  }
 
   var note = new apn.Notification();
   note.badge = badge;
@@ -117,9 +137,19 @@ function createFeedbackEmitterForEnv(suffix, isProduction) {
   try {
     debug('ios push notification feedback listener (%s) starting', suffix);
 
+    var certConfigKey = 'apn:cert' + suffix;
+    var cert = resolveCertConfig(certConfigKey);
+    var keyConfigKey = 'apn:key' + suffix;
+    var key = resolveCertConfig(keyConfigKey);
+
+    if(!cert || !key) {
+      logger.warn('ios push notification feedback (' + suffix + ') missing config, ' + certConfigKey + ':' + cert + ' ' + keyConfigKey + ':' + key);
+      return emitter;
+    }
+
     var feedback = new apn.Feedback({
-      cert: resolveCertConfig('apn:cert' + suffix),
-      key: resolveCertConfig('apn:key' + suffix),
+      cert: cert,
+      key: key,
       interval: config.get('apn:feedbackInterval'),
       batchFeedback: true,
       production: isProduction
@@ -143,9 +173,9 @@ function createFeedbackEmitterForEnv(suffix, isProduction) {
       errorReporter(err, { apnEnv: suffix }, { module: 'ios-notification-gateway' });
     });
 
-  } catch(e) {
-    logger.error('Unable to start feedback service (' + suffix + ')', { exception: e });
-    errorReporter(e, { apnEnv: suffix }, { module: 'ios-notification-gateway' });
+  } catch(err) {
+    logger.error('Unable to start feedback service (' + suffix + ')', { exception: err });
+    errorReporter(err, { apnEnv: suffix }, { module: 'ios-notification-gateway' });
   }
 
   return emitter;

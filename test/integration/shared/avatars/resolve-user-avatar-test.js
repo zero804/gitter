@@ -15,6 +15,24 @@ describe('user avatar url generator', function() {
       assert.equal(result, 'https://avatars1.githubusercontent.com/u/69737?v=3&s=40');
     });
 
+    it('should return a GitLab url for a GitLab gravatarImageUrl', function() {
+      var user = {
+        username: 'MadLittleMods',
+        gravatarImageUrl: 'https://secure.gravatar.com/avatar/4d634a2b818e2265fa2924b5f4c2da71?s=80&d=identicon'
+      };
+      var result = resolveUserAvatarUrl(user, 60);
+      assert.equal(result, 'https://secure.gravatar.com/avatar/4d634a2b818e2265fa2924b5f4c2da71?s=60&d=identicon');
+    });
+
+    it('should return a GitLab url for a GitLab uploaded image', function() {
+      var user = {
+        username: 'EricTroupeTester',
+        gravatarImageUrl: 'https://gitlab.com/uploads/-/system/user/avatar/1490805/avatar.png'
+      };
+      var result = resolveUserAvatarUrl(user, 60);
+      assert.equal(result, 'https://gitlab.com/uploads/-/system/user/avatar/1490805/avatar.png?s=60');
+    });
+
     it('should return a google url for a google gravatarImageUrl', function() {
       var user = {
         gravatarImageUrl: 'https://lh5.googleusercontent.com/-8JzxZyD84qE/AAAAAAAAAAI/AAAAAAAAAN4/_x36v4AaxKo/photo.jpg'

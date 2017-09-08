@@ -1,8 +1,9 @@
 'use strict';
 
-var oauthService = require('../../services/oauth-service');
 var env = require('gitter-web-env');
 var logger = env.logger;
+var StatusError = require('statuserror');
+var oauthService = require('../../services/oauth-service');
 
 function getAccessToken(req) {
 
@@ -18,7 +19,7 @@ function getAccessToken(req) {
 
     var parts = authHeader.split(' ');
 
-    if (parts.length == 2) {
+    if (parts.length === 2) {
       var scheme = parts[0];
 
       if (/Bearer/i.test(scheme)) {
@@ -54,10 +55,10 @@ module.exports = function(req, res, next) {
   return oauthService.validateAccessTokenAndClient(accessToken)
     .then(function(tokenInfo) {
       // Token not found
-      if(!tokenInfo) return next(401);
+      if(!tokenInfo) return next(new StatusError(401, 'Token not found'));
 
       // Anonymous tokens cannot be used for Bearer tokens
-      if(!tokenInfo.user) return next(401);
+      if(!tokenInfo.user) return next(new StatusError(401, 'Anonymous tokens cannot be used for Bearer tokens'));
 
       var user = tokenInfo.user;
       var client = tokenInfo.client;
