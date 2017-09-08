@@ -7,8 +7,6 @@ function startRedis {
   cp ./config/sentinel.dev.conf.template ./config/sentinel.dev.conf
 
   redis-server --loglevel warning --port 6379 --bind 127.0.0.1 &
-  redis-server --loglevel warning --port 6380 --slaveof 127.0.0.1 6379 --bind 127.0.0.1 &
-  redis-server ./config/sentinel.dev.conf --sentinel --bind 127.0.0.1 &
 }
 
 function startMongo {
@@ -46,32 +44,6 @@ function startMongo {
   	./scripts/upgrade-data.sh
   fi
 }
-
-function setupHostAlias {
-  HOSTNAME=$1
-  IP=$2
-  CURRENT_ALIAS=$(grep " $HOSTNAME *$" /etc/hosts|sed 's/ .*//')
-  if [[ "$CURRENT_ALIAS" != "$IP" ]]; then
-    >&2 echo "Warning. Your current $HOSTNAME ($CURRENT_ALIAS) hostname does not match the IP $IP"
-    read -p "Would you like to update your hostfile? Requires sudo [yN] " -r
-    echo
-    if [[ "$REPLY" =~ ^[Yy]$ ]]; then
-      TMP_HOSTS_FILE="/tmp/hosts.start.$RANDOM"
-      sudo /bin/sh -c "
-        grep -v \" $HOSTNAME *$\" /etc/hosts > \"$TMP_HOSTS_FILE\" &&
-        echo \"$IP $HOSTNAME\" >> \"$TMP_HOSTS_FILE\" &&
-        cat \"$TMP_HOSTS_FILE\" > /etc/hosts &&
-        rm -f \"$TMP_HOSTS_FILE\"
-      "
-    else
-      echo Remember to add \'"$IP" "$HOSTNAME"\' to your /etc/hosts file
-    fi
-
-  fi
-}
-
-setupHostAlias gitter-mongo-dev 127.0.0.1
-setupHostAlias gitter-redis-dev 127.0.0.1
 
 (startRedis 1>&2 > /dev/null) &
 (startMongo 1>&2 > /dev/null) &
