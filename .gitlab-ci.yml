@@ -78,8 +78,8 @@ deploy-build-image:
   variables:
     DOCKER_DRIVER: overlay
   stage: docker_images
-  # only:
-  # - schedules
+  only:
+  - schedules
   image: docker:latest
   services:
   - docker:dind
