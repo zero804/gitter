@@ -6,13 +6,23 @@ var clientEnv = require('gitter-client-env');
 var apiClient = require('../components/api-client');
 var presentPermissionsDialog = require('../ensured/present-permissions-dialog');
 
+
+function showWelcomeMessage() {
+  var dialogRegion = this.dialogRegion;
+
+  require.ensure(['../views/modals/welcome-message'], function(require){
+    var WelcomeMessageView = require('../views/modals/welcome-message');
+    dialogRegion.show(new WelcomeMessageView.Modal());
+  });
+}
+
 function createRoutes(options) {
   var rosterCollection = options.rosterCollection;
 
   return {
     'autojoin': function() {
       if (context.roomHasWelcomeMessage()) {
-        this.showWelcomeMessage();
+        showWelcomeMessage.call(this);
         return;
       }
 
@@ -143,14 +153,7 @@ function createRoutes(options) {
       });
     },
 
-    'welcome-message': function (){
-      var dialogRegion = this.dialogRegion;
-
-      require.ensure(['../views/modals/welcome-message'], function(require){
-        var WelcomeMessageView = require('../views/modals/welcome-message');
-        dialogRegion.show(new WelcomeMessageView.Modal());
-      });
-    },
+    'welcome-message': showWelcomeMessage,
   }
 }
 
