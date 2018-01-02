@@ -9,7 +9,8 @@ var topicService = require('gitter-web-topics/lib/topic-service');
 var opts = yargs
   .option('username', {
     required: true,
-    description: 'username of the user that should perform the action'
+    description: 'username of the user that should perform the action',
+    string: true
   })
   .option('group', {
     required: true,

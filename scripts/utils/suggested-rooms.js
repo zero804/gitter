@@ -17,7 +17,8 @@ var opts = yargs
   .option('username', shimPositionOption({
     position: 0,
     required: !argv.uri,
-    description: 'username to look up e.g trevorah'
+    description: 'username to look up e.g trevorah',
+    string: true
   }))
   .option('uri', {
     type: 'array',

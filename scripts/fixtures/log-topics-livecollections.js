@@ -14,7 +14,8 @@ var oauthService = require('../../server/services/oauth-service');
 var opts = yargs
   .option('username', {
     required: true,
-    description: 'username of the user doing the listening'
+    description: 'username of the user doing the listening',
+    string: true
   })
   .option('group', {
     required: true,
@@ -109,4 +110,3 @@ function messageHandler(uri) {
     }
   }
 }
-

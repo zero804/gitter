@@ -15,7 +15,8 @@ var opts = require('yargs')
   .option('username', shimPositionOption({
     position: 0,
     required: true,
-    description: "username to look up e.g trevorah"
+    description: "username to look up e.g trevorah",
+    string: true
   }))
   .help('help')
   .alias('help', 'h')
