@@ -41,7 +41,7 @@ Start Gitter's dependent services:
 docker-compose up -d
 ```
 
-If it returns the error below, run the same command with `sudo`.
+If you run into the following error, you may need to re-run the same command with `sudo`.
 ```
 ERROR: Couldn't connect to Docker daemon at http+docker://localunixsocket - is it running?
 
