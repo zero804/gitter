@@ -41,6 +41,13 @@ Start Gitter's dependent services:
 docker-compose up -d
 ```
 
+If you run into the following error, you may need to re-run the same command with `sudo`.
+```
+ERROR: Couldn't connect to Docker daemon at http+docker://localunixsocket - is it running?
+
+If it's at a non-standard location, specify the URL with the DOCKER_HOST environment variable.
+```
+
 This process will fetch Docker images from Docker Hub. You might want to make another cup of tea and have a biscuit at this point. You can also continue to the next section at this point to kill some time.
 
 
