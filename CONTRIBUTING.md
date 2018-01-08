@@ -1,5 +1,8 @@
-# Contributor license agreement
+## Developer Certificate of Origin + License
 
-By submitting code or text for the website you agree to the GitLab [Developer Certificate of Origin and License](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/CONTRIBUTING.md).
-
-For more information about the technicalities of contributing please see the [README](README.md).
+By contributing to GitLab B.V., You accept and agree to the following terms and
+conditions for Your present and future Contributions submitted to GitLab B.V.
+Except for the license granted herein to GitLab B.V. and recipients of software
+distributed by GitLab B.V., You reserve all right, title, and interest in and to
+Your Contributions. All Contributions are subject to the following DCO + License
+terms.
