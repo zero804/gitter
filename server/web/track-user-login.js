@@ -13,9 +13,12 @@ module.exports = function trackUserLogin(req, user, provider) {
     .then(function(email) {
       var properties = useragentTagger(req);
 
-      // this is only set because stats.userUpdate requires it
-      user.email = email;
-      stats.userUpdate(user, properties);
+      user.emails = [email];
+
+      stats.userUpdate(Object.assign({}, user, {
+        // this is only set because stats.userUpdate requires it
+        email: email
+      }), properties);
 
       // NOTE: other stats calls also pass in source and googleAnalyticsUniqueId
       stats.event("user_login", _.extend({
@@ -23,5 +26,8 @@ module.exports = function trackUserLogin(req, user, provider) {
         method: provider + '_oauth',
         username: user.username
       }, properties));
+
+      // Persist the new emails
+      return user.save();
     });
 }

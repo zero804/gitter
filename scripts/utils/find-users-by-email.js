@@ -27,7 +27,7 @@ userService.findAllByEmail(opts.email)
       })
     }
     else {
-      console.log('No user found!')
+      console.log('No user found!');
     }
 
     shutdown.shutdownGracefully();
