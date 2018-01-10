@@ -232,12 +232,6 @@ var userService = {
       .nodeify(callback);
   },
 
-  findByUnconfirmedEmail: function(email, callback) {
-    return persistence.User.findOne({ 'unconfirmedEmails.email': email.toLowerCase() })
-      .exec()
-      .nodeify(callback);
-  },
-
   findByUsername: function(username, callback) {
     return persistence.User.findOne({ username: username })
             .exec()
