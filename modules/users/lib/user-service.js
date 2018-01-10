@@ -204,9 +204,40 @@ var userService = {
   },
 
   findByEmail: function(email, callback) {
-    return persistence.User.findOne({ $or: [{ email: email.toLowerCase()}, { emails: email.toLowerCase() }]})
+    return this.findAllByEmail(email)
+      .then((users) => {
+        return users[0];
+      })
+      .nodeify(callback);
+  },
+
+  findAllByEmail: function(email) {
+    return persistence.Identity.findOne({ email: email })
+      .exec()
+      .then((identity) => {
+        var userByIdentityPromise = Promise.resolve();
+        if (identity) {
+           userByIdentityPromise = persistence.User.findOne({
+            identities: {
+              $elemMatch: {
+                provider: identity.provider,
+                providerKey: identity.providerKey
+              }
+            }
+          });
+        }
+
+        return Promise.all([
+          userByIdentityPromise,
+          persistence.User.findOne({
+              $or: [{ email: email.toLowerCase()}, { emails: email.toLowerCase() }]
+            })
             .exec()
-            .nodeify(callback);
+        ]);
+      })
+      .filter((user) => {
+        return !!user;
+      });
   },
 
   findByEmailsIndexed: function(emails, callback) {

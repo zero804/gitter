@@ -26,6 +26,7 @@ module.exports = {
 
     IdentitySchema.index({ userId: 1, provider: 1 }, { unique: true });
     IdentitySchema.index({ provider: 1, providerKey: 1 }, { unique: true });
+    IdentitySchema.index({ email: 1 });
 
     IdentitySchema.extraIndices = [{
       keys: {
