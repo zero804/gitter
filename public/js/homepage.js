@@ -54,11 +54,6 @@ var featuredRooms = [
   language: 'Mozilla Science Lab community',
   locale: 'en'
  },
- { uri: 'openai/gym',
-   name: 'Open AI Gym',
-   language: 'Reinforcement Learning',
-   locale: 'en'
- },
  { uri: 'deeplearning4j/deeplearning4j',
    name: 'Deeplearning4J',
    language: 'Deep Learning for Java',
