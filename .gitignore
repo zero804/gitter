@@ -4,7 +4,7 @@ node_modules_temp
 .DS_Store
 .com.apple.timemachine.supported
 /.project
-/npm-debug.log
+/npm-debug.log*
 /nodemon.log
 /.externalToolBuilders
 /.settings
