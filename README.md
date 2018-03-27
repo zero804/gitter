@@ -91,6 +91,9 @@ REM Visit https://apps.twitter.com/app/new, name: Gitter Twitter YOURTWITTERUSER
 REM After creation, click "manage keys and access tokens" to get they key/secret
 SET twitteroauth__consumer_key=xxx
 SET twitteroauth__consumer_secret=xxx
+REM Visit https://gitlab.com/profile/applications, name: Gitter User Dev, authorization callback url: http://localhost:5000/login/gitlab/callback
+SET gitlaboauth__client_id=xxx
+SET gitlaboauth__client_secret=xxx
 REM Visit https://github.com/settings/applications/new, name: Gitter Private Dev, authorization callback url: http://localhost:5000/login/callback
 SET github__client_id=xxx
 SET github__client_secret=xxx
