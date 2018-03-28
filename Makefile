@@ -15,7 +15,6 @@ test-lua:
 	echo lua tests disabled #gulp test-redis-lua
 
 package:
-	echo $$PATH
 	./node_modules/.bin/gulp package assemble --skip-stage validate --skip-stage test
 
 clean:

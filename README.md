@@ -66,7 +66,7 @@ To do this automatically, run the following command which will create a `.env` f
 
 Export the environment variables with:
 
-```shell
+```
 . .env
 # or
 source .env
@@ -116,7 +116,7 @@ Export the environment variables with:
 
 Only proceed once the Docker containers have downloaded and installed.
 
-Gitter can be started via npm script which executes a Gulp task with the following command:
+Gitter is executed through Gulp with the following command:
 
 ```shell
 npm start

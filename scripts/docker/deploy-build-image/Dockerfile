@@ -1,6 +1,7 @@
 FROM williamyeh/ansible:alpine3
 
-RUN apk add --no-cache bash git make && pip install awscli boto --upgrade
+# alpine-sdk to get `make`
+RUN apk add --no-cache bash git alpine-sdk && pip install awscli boto --upgrade
 
 ENV PATH $PATH:/root/.local/bin
 
