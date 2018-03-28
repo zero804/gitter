@@ -25,25 +25,25 @@ validate:
     #- make validate
 
 
-# test:
-#   <<: *node_job
-#   variables:
-#     BLUEBIRD_DEBUG: 1
-#   stage: build_unit_test
-#   services:
-#     - registry.gitlab.com/gitlab-org/gitter/webapp/mongo:latest
-#     - registry.gitlab.com/gitlab-org/gitter/webapp/elasticsearch:latest
-#     - redis:3.0
-#   script:
-#     - make ci-test
+test:
+  <<: *node_job
+  variables:
+    BLUEBIRD_DEBUG: 1
+  stage: build_unit_test
+  services:
+    - registry.gitlab.com/gitlab-org/gitter/webapp/mongo:latest
+    - registry.gitlab.com/gitlab-org/gitter/webapp/elasticsearch:latest
+    - redis:3.0
+  script:
+    - make ci-test
 
 package:
   <<: *node_job
   stage: build_unit_test
   script:
     # While testing the deploment, you can use cached artifacts instead of packaging every time which is slow
-    (apt-get update && apt-get install unzip && curl -Ls https://gitlab.com/gitlab-org/gitter/webapp/-/jobs/60049410/artifacts/download -o previous-artifacts.zip && unzip previous-artifacts.zip) || (make package)
-    #- make package
+    #- (apt-get update && apt-get install unzip && curl -Ls https://gitlab.com/gitlab-org/gitter/webapp/-/jobs/60049410/artifacts/download -o previous-artifacts.zip && unzip previous-artifacts.zip) || (make package)
+    - make package
   artifacts:
     paths:
       - output/app.tar.gz
@@ -53,15 +53,27 @@ package:
       - output/app/VERSION
     expire_in: 1 week
 
-distribute:
+.distribute_job: &distribute_job
   image: registry.gitlab.com/gitlab-org/gitter/webapp/deploy-build-image:latest
   stage: pre_deploy
   dependencies:
-  - package
-  variables:
-    DIST_S3_URL: s3://gitter-deployments/gitter-webapp/beta-staging
+    - package
   script:
     - make upload-to-s3
+
+distribute_beta:
+  <<: *distribute_job
+  only:
+   - develop
+  variables:
+    DIST_S3_URL: s3://gitter-deployments/gitter-webapp/beta
+
+distribute_beta_staging:
+  <<: *distribute_job
+  only:
+    - /^feature\/.*$/
+  variables:
+    DIST_S3_URL: s3://gitter-deployments/gitter-webapp/beta-staging
 
 containerize:
   stage: deploy
@@ -100,8 +112,6 @@ deploy-build-image:
 .deploy_job: &deploy_job
   stage: deploy
   image: registry.gitlab.com/gitlab-org/gitter/webapp/deploy-build-image:latest
-  dependencies:
-    - distribute
   variables:
     GIT_STRATEGY: none
   before_script:
@@ -122,9 +132,10 @@ deploy-build-image:
 
 deploy_beta:
   <<: *deploy_job
-  # TODO: remove comments when done testing
-  #only:
-  #  - develop
+  dependencies:
+    - distribute_beta
+  only:
+   - develop
   script:
     - cd $ANSIBLE_DIR && ansible-playbook -i beta --vault-password-file "/root/.vault_pass" playbooks/gitter/webapp-deploy.yml -vvvv
   environment:
@@ -133,6 +144,8 @@ deploy_beta:
 
 deploy_beta_staging:
   <<: *deploy_job
+  dependencies:
+    - distribute_beta_staging
   only:
     - /^feature\/.*$/
   script:
