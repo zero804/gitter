@@ -1,6 +1,6 @@
 EMBEDDED_NODE_ENV ?= prod
 EMBEDDED_WWW_DIRECTORY ?= ~/code/gitter/ios/Troupe/www/build
-PATH := ./node_modules/.bin:$(PATH)
+export PATH := ./node_modules/.bin:$(PATH)
 
 .PHONY: build clean test npm sprites npm-quick npm-full performance-tests test-no-coverage continuous-integration validate
 
@@ -15,12 +15,18 @@ test-lua:
 	echo lua tests disabled #gulp test-redis-lua
 
 package:
-	gulp package --skip-stage validate --skip-stage test
+	./node_modules/.bin/gulp package assemble --skip-stage validate --skip-stage test
 
 clean:
 	gulp clean || (make npm-full && gulp clean)
   # If gulp clean failed, it's almost certainly a problem
   # with the npm folder, so nuke it and try again
+
+upload-to-s3:
+	rm -rf output/s3upload/
+	mkdir -p output/s3upload/
+	cp output/app.tar.gz output/assets.tar.gz output/app/ASSET_TAG output/app/GIT_COMMIT output/app/VERSION output/s3upload/
+	aws s3 cp --recursive --metadata GIT_COMMIT=$(CI_COMMIT_SHA) output/s3upload/ $(DIST_S3_URL)
 
 ci-test:
 	mkdir -p output/

@@ -189,7 +189,7 @@
     "beautify-benchmark": "^0.2.4",
     "benchmark": "^2.1.0",
     "cheerio": "^0.22.0",
-    "chokidar": "^1.4.3",
+    "chokidar": "^2.0.1",
     "concurrently": "^2.0.0",
     "cross-spawn": "^4.0.2",
     "css-loader": "^0.23.1",
