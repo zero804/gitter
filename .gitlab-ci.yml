@@ -42,66 +42,66 @@ package:
   stage: build_unit_test
   script:
     # While testing the deploment, you can use cached artifacts instead of packaging every time which is slow
-    # (apt-get update && apt-get install unzip && curl -Ls https://gitlab.com/gitlab-org/gitter/webapp/-/jobs/59835849/artifacts/download -o previous-artifacts.zip && unzip previous-artifacts.zip) || (make package)
+    #- (apt-get update && apt-get install unzip && curl -Ls https://gitlab.com/gitlab-org/gitter/webapp/-/jobs/60049410/artifacts/download -o previous-artifacts.zip && unzip previous-artifacts.zip) || (make package)
     - make package
   artifacts:
     paths:
-    - output/app.tar.gz
-    - output/assets.tar.gz
-    - output/app/ASSET_TAG
-    - output/app/GIT_COMMIT
-    - output/app/VERSION
+      - output/app.tar.gz
+      - output/assets.tar.gz
+      - output/app/ASSET_TAG
+      - output/app/GIT_COMMIT
+      - output/app/VERSION
     expire_in: 1 week
 
-distribute:
+.distribute_job: &distribute_job
   image: registry.gitlab.com/gitlab-org/gitter/webapp/deploy-build-image:latest
   stage: pre_deploy
   dependencies:
-  - package
-  variables:
-    DIST_S3_URL: s3://gitter-deployments/gitter-webapp/beta-staging
+    - package
   script:
     - make upload-to-s3
 
+distribute_beta:
+  <<: *distribute_job
+  only:
+   - develop
+  variables:
+    DIST_S3_URL: s3://gitter-deployments/gitter-webapp/beta
+
+distribute_beta_staging:
+  <<: *distribute_job
+  only:
+    - /^feature\/.*$/
+  variables:
+    DIST_S3_URL: s3://gitter-deployments/gitter-webapp/beta-staging
+
 containerize:
   stage: deploy
-  variables:
-    DOCKER_DRIVER: overlay
   image: docker:latest
   dependencies:
     - package
+  allow_failure: true
+  variables:
+    DOCKER_DRIVER: overlay
   services:
-  - docker:dind
+    - docker:dind
   script:
     - ls -la output
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
     - docker build -t registry.gitlab.com/gitlab-org/gitter/webapp/app:$CI_COMMIT_REF_SLUG -f Dockerfile-app-base .
     - docker push registry.gitlab.com/gitlab-org/gitter/webapp/app:$CI_COMMIT_REF_SLUG
-  allow_failure: true
   tags:
     - docker
 
-# upload-staging:
-#   stage: deploy
-#   image: python:latest
-#   dependencies:
-#   - package
-#   script:
-#   - pip install awscli
-#   - aws s3 cp output/app s3://gitter-deployments/gitter-webapp/beta
-#   - aws s3 cp output/*
-#   only:
-#   - develop
-
 deploy-build-image:
-  variables:
-    DOCKER_DRIVER: overlay
   stage: docker_images
-  only:
-  - schedules
   image: docker:latest
   services:
-  - docker:dind
+    - docker:dind
+  only:
+    - schedules
+  variables:
+    DOCKER_DRIVER: overlay
   script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
     - docker build -t registry.gitlab.com/gitlab-org/gitter/webapp/deploy-build-image:latest scripts/docker/deploy-build-image/
@@ -110,14 +110,10 @@ deploy-build-image:
     - docker
 
 .deploy_job: &deploy_job
+  stage: deploy
+  image: registry.gitlab.com/gitlab-org/gitter/webapp/deploy-build-image:latest
   variables:
     GIT_STRATEGY: none
-  tags:
-    - internal # This has to be within the Gitter network
-  image: registry.gitlab.com/gitlab-org/gitter/webapp/deploy-build-image:latest
-  dependencies:
-    - distribute
-  stage: deploy
   before_script:
     # run ssh-agent
     - eval $(ssh-agent -s)
@@ -126,41 +122,47 @@ deploy-build-image:
     - ssh-add <(echo "$INTERNAL_GITTER_NETWORK_SSH_KEY")
     - mkdir -p ~/.ssh
     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+    # Make the infra tools available (like Ansible)
     - git clone git@gitlab.com:gl-infra/gitter-infrastructure.git
     - ANSIBLE_DIR=$(cd gitter-infrastructure/ansible && pwd) && echo $ANSIBLE_DIR
     - mkdir -p /root && echo "$ANSIBLE_VAULT_PASS" > /root/.vault_pass
-
+  tags:
+    - internal # This has to be within the Gitter network
 
 
 deploy_beta:
   <<: *deploy_job
+  dependencies:
+    - distribute_beta
+  only:
+   - develop
   script:
     - cd $ANSIBLE_DIR && ansible-playbook -i beta --vault-password-file "/root/.vault_pass" playbooks/gitter/webapp-deploy.yml -vvvv
   environment:
     name: beta
     url: https://beta.gitter.im
-  only:
-  - develop
 
 deploy_beta_staging:
   <<: *deploy_job
+  dependencies:
+    - distribute_beta_staging
+  only:
+    - /^feature\/.*$/
   script:
     - cd $ANSIBLE_DIR && ansible-playbook -i beta --vault-password-file "/root/.vault_pass" playbooks/gitter/webapp-staging-deploy.yml -vvvv
   environment:
     name: beta_staging
     url: https://beta.gitter.im?gitter_next=true
-  only:
-  - /^feature\/.*$/
 
 docker-base:
-  variables:
-    DOCKER_DRIVER: overlay
+  image: docker:latest
   stage: docker_images
   only:
-  - schedules
-  image: docker:latest
+    - schedules
+  variables:
+    DOCKER_DRIVER: overlay
   services:
-  - docker:dind
+    - docker:dind
   script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
     - docker build -t registry.gitlab.com/gitlab-org/gitter/webapp:latest .
@@ -169,14 +171,14 @@ docker-base:
     - docker
 
 mongo-base:
+  stage: docker_images
+  image: docker:latest
+  only:
+    - schedules
   variables:
     DOCKER_DRIVER: overlay
-  stage: docker_images
-  only:
-  - schedules
-  image: docker:latest
   services:
-  - docker:dind
+    - docker:dind
   script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
     - docker build -t registry.gitlab.com/gitlab-org/gitter/webapp/mongo:latest scripts/docker/mongo-image/
@@ -185,14 +187,14 @@ mongo-base:
     - docker
 
 elasticsearch-base:
+  stage: docker_images
+  image: docker:latest
+  only:
+    - schedules
   variables:
     DOCKER_DRIVER: overlay
-  stage: docker_images
-  only:
-  - schedules
-  image: docker:latest
   services:
-  - docker:dind
+    - docker:dind
   script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
     - docker build -t registry.gitlab.com/gitlab-org/gitter/webapp/elasticsearch:latest scripts/docker/elasticsearch-image/
