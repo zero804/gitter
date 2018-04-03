@@ -166,5 +166,8 @@
     "location": "https://s3.amazonaws.com/gitter-sitemap/dev/sitemap.xml"
   },
   "mandrill": {
+  },
+  "tokens": {
+    "anonymousPassword": ""
   }
 }
