@@ -104,6 +104,8 @@ REM Same as github__user_client_id
 SET github__anonymous_app__client_id=xxx
 REM Same as github__user_client_secret
 SET github__anonymous_app__client_secret=xxx
+REM This can be some random string
+SET tokens__anonymousPassword=xxx
 ```
 
 Export the environment variables with:

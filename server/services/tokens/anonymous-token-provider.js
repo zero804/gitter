@@ -1,10 +1,13 @@
 'use strict';
 
+var env = require('gitter-web-env');
+var config = env.config;
+
 var random = require('../../utils/random');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var crypto = require('crypto');
 
-var password = 'soapP2igs1Od2gen';
+var password = config.get("tokens:anonymousPassword");
 
 function encrypt(tokenPair) {
   var cipher = crypto.createCipher('aes128', password);

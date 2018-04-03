@@ -91,5 +91,8 @@
     "avatars": {
       "bucket": ""
     }
+  },
+  "tokens": {
+    "anonymousPassword": "abc123"
   }
 }
