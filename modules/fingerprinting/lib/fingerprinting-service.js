@@ -28,6 +28,13 @@ function recordFingerprint(userId, fingerprint, ipAddress) {
   });
 }
 
+function findByUsername(username, callback) {
+  return Fingerprint.find({ username: username })
+          .exec()
+          .nodeify(callback);
+}
+
 module.exports = {
-  recordFingerprint: recordFingerprint
+  recordFingerprint: recordFingerprint,
+  findByUsername: findByUsername
 };
