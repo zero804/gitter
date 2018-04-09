@@ -140,8 +140,38 @@ If you want to remove your containers, use
 docker-compose rm -f
 ```
 
+
+### Going further
+
+We also have some other docs which give a [overview/walkthrough of the codebase](https://gitlab.com/gitlab-org/gitter/webapp/blob/develop/docs/code-overview.md)
+and [some notes on touching production](https://gitlab.com/gitlab-org/gitter/webapp/blob/develop/docs/getting-started-production.md).
+
+
+### Testing
+
+All unit tests etc can be run with `npm test`
+
+#### Browser testing
+
+Running browser unit tests during development requires this command:
+
+```
+npm run browser-watch-test
+```
+
+Then open your favourite browser and view `http://localhost:9191/fixtures`. This page will live reload with you test changes when required.
+
+To perform an automated test run use the following command:
+
+```
+npm run browser-test
+```
+
+This will run all tests in [devtool](https://www.npmjs.com/package/devtool).
+
+
 # Contributing
 
-We use GitFlow and MRs should be made against `develop` not `master`.
+We use [git-flow](https://danielkummer.github.io/git-flow-cheatsheet/). Merge requests should be made against `develop` not `master`.
 
 Please join us in [gitterHQ/contributing](https://gitter.im/gitterHQ/contributing) for questions or to get in touch.
