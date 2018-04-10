@@ -36,9 +36,12 @@ Values (WIP)
 
 Restart beta servers (WIP: idk if this actually works)
 
-```
-cd /opt/gitter-infrastructure/ansible/ && ansible-playbook -i beta --vault-password-file "/root/.vault_pass" playbooks/gitter/restart-services.yml -vvvv
-```
+
+ - production: `ansible-playbook -i prod playbooks/gitter/restart-services.yml -vvv -t nonstaging --diff`
+ - staging (`next`): `ansible-playbook -i prod playbooks/gitter/restart-services.yml -vvv -t staging --diff`
+ - beta: `ansible-playbook -i beta playbooks/gitter/restart-services.yml -vvv -t nonstaging --diff`
+ - beta-staging: `ansible-playbook -i beta playbooks/gitter/restart-services.yml -vvv -t staging --diff`
+
 
 ## Find Gitter internal network hostnames/IPs
 
@@ -336,14 +339,49 @@ See `script/utils/delete-token.js`
 
 #### Fix broken rivers
 
+Mongo -> Elasticsearch rivers, https://github.com/richardwilly98/elasticsearch-river-mongodb
+
 If search isn't giving results for recent messages, the rivers may be broken. You can check if the "Last Replicated" date is behind or "Documents Indexed" isn't incrementing when you send new messages.
 
 Try starting and stopping: http://es-01:9200/_plugin/river-mongodb/
 
-##### Local development
+The river is based on the Mongo oplog. If the Mongo oplog is ahead of the river last replicated date(found here http://es-01:9200/_plugin/river-mongodb/) then you need to recreate the rivers.
 
-If the previous solutions do not work, you can remove the ES Docker container, `docker rm webapp_elasticsearch_1`, and run `docker-compose up -d` again.
+```
+$ mongo mongo-replica-01.prod.gitter
+> db.getReplicationInfo()
+{
+        "logSizeMB" : 1024,
+        "usedMB" : 1035.64,
+        "timeDiff" : 62910,
+        "timeDiffHours" : 17.48,
+        "tFirst" : "Mon Apr 09 2018 10:11:52 GMT-0500 (Central Standard Time)",
+        "tLast" : "Tue Apr 10 2018 03:40:22 GMT-0500 (Central Standard Time)",
+        "now" : "Tue Apr 10 2018 03:40:19 GMT-0500 (Central Standard Time)"
+}
+```
 
+##### Recreate rivers with prod servers
+
+```
+$ ssh deployer@webapp-01
+$ cd /opt/gitter-infrastructure/ansible/roles/elasticsearch/instances/prod/files/elastic-config/
+# increment `INDEX_VERSION`, `sudo su` -> `vim vars-prod-preset`
+$ source vars-prod-preset
+$ ./01-create-index-with-mapping
+$ ./02-create-rivers
+# Wait for the rivers to complete
+$ ./03-setup-alias
+# set `INDEX_VERSION` back to what it was temporarily so we can delete the old rivers
+$ source vars-prod-preset
+$ ./XX-delete-rivers
+```
+
+Afterwards, don't forget to update the infra repo with the new index version, https://gitlab.com/gl-infra/gitter-infrastructure/blob/master/ansible/roles/elasticsearch/instances/prod/files/elastic-config/vars-prod-preset
+
+##### Recreate rivers in local development Docker
+
+You can remove the ES Docker container, `docker rm webapp_elasticsearch_1`, and run `docker-compose up -d --no-recreate` again.
 
 
 ## Utility Scripts
