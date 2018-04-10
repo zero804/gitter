@@ -6,12 +6,12 @@ var ObjectId = Schema.ObjectId;
 
 var SecurityDescriptorSchema = new Schema({
   type: { type: String, enum: [
-    null,   // TODO: should none be null?
+    null, // No association
     'ONE_TO_ONE',
-    'GH_REPO',
-    'GH_ORG',
-    'GH_USER',
-    'GROUP'
+    'GH_REPO', // Associated with a GitHub repo
+    'GH_ORG', // Associated with a GitHub org
+    'GH_USER', // Associated with a GitHub user
+    'GROUP' // Associated with a Gitter community
   ], required: false },
   members: { type: String, enum: [
     null,              // For one-to-one
