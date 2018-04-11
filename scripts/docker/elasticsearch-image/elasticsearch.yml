@@ -5,3 +5,6 @@ path:
   logs: /data/es/logs
   data: /data/es/data
   plugins: /data/es/plugins
+
+index:
+  number_of_replicas: 0
