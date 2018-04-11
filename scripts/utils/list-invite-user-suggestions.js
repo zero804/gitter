@@ -10,7 +10,8 @@ var opts = require('yargs')
   .option('username', {
     alias: 'u',
     required: true,
-    description: 'Username to find suggestions for'
+    description: 'Username to find suggestions for',
+    string: true
   })
   .option('type', {
     description: 'null, \'GH_REPO\', \'GH_ORG\''

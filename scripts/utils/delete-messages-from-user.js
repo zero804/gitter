@@ -18,7 +18,8 @@ var opts = require('yargs')
   .option('username', {
     alias: 'u',
     required: true,
-    description: 'Username of the user to remove'
+    description: 'Username of the user to remove',
+    string: true
   })
   .option('limit', {
     alias: 'l',
@@ -49,6 +50,7 @@ if(opts.dry) {
 
 var clearMessages = onMongoConnect()
   .then(function() {
+    console.log('username', opts.username, process.argv);
     return userService.findByUsername(opts.username);
   })
   .then(function(user) {

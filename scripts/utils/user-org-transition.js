@@ -17,7 +17,8 @@ var permissionsModel = null;
 var opts = require('yargs')
   .option('username', {
     required: true,
-    description: 'Username of the user to make into an org'
+    description: 'Username of the user to make into an org',
+    string: true
   })
   .option('first-user', {
     required: true,

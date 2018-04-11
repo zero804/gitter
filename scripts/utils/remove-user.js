@@ -11,7 +11,8 @@ var opts = require('yargs')
   .option('username', {
     alias: 'u',
     required: true,
-    description: 'Username of the user to remove'
+    description: 'Username of the user to remove',
+    string: true
   })
   .help('help')
   .alias('help', 'h')

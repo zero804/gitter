@@ -6,7 +6,8 @@ var opts = require('yargs')
   .option('username', {
     type: 'string',
     required: true,
-    description: 'Username'
+    description: 'Username',
+    string: true
   })
   .option('execute', {
     type: 'boolean',

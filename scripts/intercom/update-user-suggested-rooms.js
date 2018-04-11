@@ -19,7 +19,8 @@ var opts = require('yargs')
     description: 'mongo user id'
   })
   .option('username', {
-    required: false
+    required: false,
+    string: true
   })
   .option('email', {
     required: false

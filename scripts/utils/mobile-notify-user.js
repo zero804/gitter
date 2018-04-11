@@ -14,7 +14,8 @@ var Promise = require('bluebird');
 var opts = require('yargs')
   .option('username', {
     description: 'username to look up e.g trevorah',
-    required: true
+    required: true,
+    string: true
   })
   .option('room-uri', {
     description: 'room uri for chat',
