@@ -1,5 +1,6 @@
 "use strict";
 
+const _ = require('lodash');
 var env = require('gitter-web-env');
 var stats = env.stats;
 
@@ -11,7 +12,9 @@ module.exports = function trackNewUser(req, user, provider) {
   // NOTE: tracking a signup after an invite is separate to this
   emailAddressService(user)
     .then(function(email) {
-      user.emails = [email];
+      const emailList = (user.emails || []);
+      emailList.unshift(email);
+      user.emails = _.uniq(emailList);
 
       stats.userUpdate(Object.assign({}, user, {
         // this is only set because stats.userUpdate requires it

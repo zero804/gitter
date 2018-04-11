@@ -13,7 +13,9 @@ module.exports = function trackUserLogin(req, user, provider) {
     .then(function(email) {
       var properties = useragentTagger(req);
 
-      user.emails = [email];
+      const emailList = (user.emails || []);
+      emailList.unshift(email);
+      user.emails = _.uniq(emailList);
 
       stats.userUpdate(Object.assign({}, user, {
         // this is only set because stats.userUpdate requires it
