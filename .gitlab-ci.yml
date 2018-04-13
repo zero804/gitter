@@ -7,14 +7,19 @@ stages:
 .node_job: &node_job
   image: registry.gitlab.com/gitlab-org/gitter/webapp
   before_script:
+    - node --version
+    - npm --version
     - npm config set prefer-offline true
     - npm config set cache /npm_cache
     - mv /app/node_modules ./node_modules
     - npm install
-    # Do this until we've solved the bug in
-    # shrinkwrap process
-    # this means that this fork is not production ready quite yet
-    - npm shrinkwrap
+  artifacts:
+    expire_in: 31d
+    when: always
+    paths:
+      - /npm_cache/
+      - npm_cache/
+
 
 validate:
   <<: *node_job
