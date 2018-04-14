@@ -9,27 +9,22 @@ Gitter is entirely free for all public and private conversations.
 
 ## Can I merge/connect my accounts?
 
-There isn't a way to merge accounts.
+See [Accounts](./accounts.md#can-i-mergeconnect-my-accounts)
 
 
 ## Can I change my username?
 
-You can't change your username. Your username matches whatever OAuth provider you signed in with.
-
-If you changed your username on GitHub, sign out of Gitter and sign back in again to update it.
+See [Accounts](./accounts.md#can-i-change-my-username)
 
 
 ### How do I remove the  `_twitter` suffix from my username
 
-See above, you can't change your username.
-
-We add the `_twitter` suffix to avoid name collisions with GitHub.
-If you don't want the suffix added, sign in with GitHub.
+See [Accounts](./accounts.md#how-do-i-remove-the-twitter-suffix-from-my-username)
 
 
 ## How do I update my avatar?
 
-Sign out of Gitter and sign back in to update your avatar (or any other info).
+See [Accounts](./accounts.md#how-do-i-update-my-avatar)
 
 
 ## Why isn't my GitHub organisation or repos appearing?
@@ -53,7 +48,7 @@ For more information see [OAuth Scopes](./oauth-scopes).
 
 ## You want write access on my private repos? Are you insane?
 
-See ["Private Repositories" on the OAuth scopes page](./oauth-scopes#private-repositories)
+See ["Private Repositories" on the OAuth scopes page](./oauth-scopes.md#private-repositories)
 
 ## What happens if I rename something on GitHub (org, repo)
 

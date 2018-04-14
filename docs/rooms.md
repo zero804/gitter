@@ -4,8 +4,20 @@ Rooms are part of a community.
 
 Rooms are also referred to as "troupes" internally for legacy reasons.
 
+## Room user
 
-## Room creation
+### Leave a room
+
+You can leave a room via **Room settings dropdown** -> **Leave this room**
+
+If you have mad skillz, you can also type "/leave" in the chat room (slash command).
+
+![](https://i.imgur.com/Rc4EVnV.png)
+
+
+## Room admin
+
+### Room creation
 
 Use the "Add a room" button at the bottom of the conversation list in the left menu to start creating a room.
 
@@ -20,12 +32,12 @@ If you don't see the repo listed in the typeahead or isn't being associated, see
 
 ![](https://i.imgur.com/8tiwwZM.png)
 
-### Why isn't my GitHub organisation or repos appearing?
+#### Why isn't my GitHub organisation or repos appearing?
 
 See the [FAQ](./faq.md#why-isn-t-my-github-organisation-or-repos-appearing).
 
 
-## Room security
+### Room security
 
 **Public rooms**
 
@@ -39,14 +51,14 @@ See the [FAQ](./faq.md#why-isn-t-my-github-organisation-or-repos-appearing).
 
 
 
-## Restrict room to GitHub users
+### Restrict room to GitHub users
 
 You can restrict a room to GitHub users via **Room settings dropdown** -> **Settings** -> **Only GitHub users are allowed to join this room.** checkbox
 
 ![](https://i.imgur.com/ujd8kHE.png) ![](https://i.imgur.com/oOGoEYw.png)
 
 
-## Rename a room
+### Rename a room
 
 If you want to rename a room because a GitHub repo was renamed/transferred, see this [FAQ section instead](./faq.md#what-happens-if-i-rename-something-on-GitHub-org-repo) instead.
 
@@ -56,7 +68,7 @@ Currently, there isn't a way to rename a room in the UI. But you can send a mess
  - Desired room name
 
 
-## Delete a room
+### Delete a room
 
 If you are a room admin, you can delete a room via **Room settings dropdown** -> **Delete this room**
 

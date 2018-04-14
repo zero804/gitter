@@ -4,6 +4,7 @@
 ## Users
 
  - [FAQ](./faq.md)
+ - [Gitter Accounts](./accounts.md)
  - [Rooms](./rooms.md)
  - [Communities](./communities.md)
  - [Notifications](./notifications.md)
