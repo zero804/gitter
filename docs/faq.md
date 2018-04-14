@@ -54,3 +54,41 @@ For more information see [OAuth Scopes](./oauth-scopes).
 ## You want write access on my private repos? Are you insane?
 
 See ["Private Repositories" on the OAuth scopes page](./oauth-scopes#private-repositories)
+
+## What happens if I rename something on GitHub (org, repo)
+
+#### Org rename
+
+Org renames do not happen automatically and require a script to be run manually on our side.
+
+Send a message to support@gitter.im with the following info. Make sure to email with the primary email address associated with the GitLab/GitHub/Twitter account tied to your Gitter account.
+
+ - Make sure your org membership is public on both the old and new org, `https://github.com/orgs/your-org/people`
+ - Link to the old org on GitHub
+ - Link to the new org on GitHub
+ - Link to the community on Gitter, `https://gitter.im/orgs/your-community/rooms`
+
+#### Repo rename
+
+Repo renames do not happen automatically. Create a new room tied to the repo and we can move the messages over manually. Please note, this will not move room members over.
+
+Send a message to support@gitter.im with the following info. Make sure to email with the primary email address associated with the GitLab/GitHub/Twitter account tied to your Gitter account.
+
+ - Create a new room tied to the repo
+ - Link to where the repo used to exist on GitHub
+ - Link to where the repo now exists on GitHub
+ - Link to the old room on Gitter
+ - Link to the new room on Gitter
+
+#### Transfer repo to a new org
+
+Repo transfers do not happen automatically. Create a new room tied to the repo and we can move the messages over manually. Please note, this will not move room members over.
+
+Send a message to support@gitter.im with the following info. Make sure to email with the primary email address associated with the GitLab/GitHub/Twitter account tied to your Gitter account.
+
+ - Create a new room tied to the repo
+ - Make sure your org membership is public on both the old and new org, `https://github.com/orgs/your-org/people`
+ - Link to where the repo used to exist on GitHub
+ - Link to where the repo now exists on GitHub
+ - Link to the old room on Gitter
+ - Link to the new room on Gitter
