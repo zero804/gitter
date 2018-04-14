@@ -1,29 +1,28 @@
-#!/bin/bash -xe
+#!/bin/bash
 
 set -euo pipefail
 set -x
-
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 function inline {
   cat $1| perl -p -e 's/\n/\\n/g;s/"/\\"/g;'
 }
 
-# source $SCRIPT_DIR/vars
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+source $SCRIPT_DIR/vars
 
 curl -q --fail -vi -XPUT "$ES_URL/_river/$USER_RIVER/_meta?pretty=true" -d @- << EOD
 {
   "type": "mongodb",
   "mongodb": {
     "servers": [
-      { "host": "$MONGO_HOST_1", "port": $MONGO_PORT_1 },
-      { "host": "$MONGO_HOST_2", "port": $MONGO_PORT_2 }
+      { "host": "mongo1", "port": 27017 }
     ],
-    "options": { },
     "db": "gitter",
     "collection": "users",
     "scriptType": "groovy",
-    "script": "$(inline $SCRIPT_DIR/scripts/river/user.groovy)"
+    "script": "$(inline $SCRIPT_DIR/scripts/river/user.groovy)",
+    "options": { }
   },
   "index": {
     "name": "$INDEX_NAME",
@@ -39,14 +38,13 @@ curl -q --fail -vi -XPUT "$ES_URL/_river/$CHAT_RIVER/_meta?pretty=true" -d @- <<
   "type": "mongodb",
   "mongodb": {
     "servers": [
-      { "host": "$MONGO_HOST_1", "port": $MONGO_PORT_1 },
-      { "host": "$MONGO_HOST_2", "port": $MONGO_PORT_2 }
+      { "host": "mongo1", "port": 27017 }
     ],
-    "options": { },
     "db": "gitter",
     "collection": "chatmessages",
     "scriptType": "groovy",
-    "script": "$(inline $SCRIPT_DIR/scripts/river/chat.groovy)"
+    "script": "$(inline $SCRIPT_DIR/scripts/river/chat.groovy)",
+    "options": { }
   },
   "index": {
     "name": "$INDEX_NAME",
@@ -62,14 +60,13 @@ curl -q --fail -vi -XPUT "$ES_URL/_river/$GROUP_RIVER/_meta?pretty=true" -d @- <
   "type": "mongodb",
   "mongodb": {
     "servers": [
-      { "host": "$MONGO_HOST_1", "port": $MONGO_PORT_1 },
-      { "host": "$MONGO_HOST_2", "port": $MONGO_PORT_2 }
+      { "host": "mongo1", "port": 27017 }
     ],
-    "options": { },
     "db": "gitter",
     "collection": "groups",
     "scriptType": "groovy",
-    "script": "$(inline $SCRIPT_DIR/scripts/river/group.groovy)"
+    "script": "$(inline $SCRIPT_DIR/scripts/river/group.groovy)",
+    "options": { }
   },
   "index": {
     "name": "$INDEX_NAME",
@@ -85,14 +82,13 @@ curl -q --fail -vi -XPUT "$ES_URL/_river/$ROOM_RIVER/_meta?pretty=true" -d @- <<
   "type": "mongodb",
   "mongodb": {
     "servers": [
-      { "host": "$MONGO_HOST_1", "port": $MONGO_PORT_1 },
-      { "host": "$MONGO_HOST_2", "port": $MONGO_PORT_2 }
+      { "host": "mongo1", "port": 27017 }
     ],
-    "options": { },
     "db": "gitter",
     "collection": "troupes",
     "scriptType": "groovy",
-    "script": "$(inline $SCRIPT_DIR/scripts/river/room.groovy)"
+    "script": "$(inline $SCRIPT_DIR/scripts/river/room.groovy)",
+    "options": { }
   },
   "index": {
     "name": "$INDEX_NAME",

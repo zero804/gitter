@@ -32,6 +32,6 @@ ctx.document = [
   uri: d.uri,
   topic: d.topic,
   tags: d.tags,
+  sd: sd,
   userCount: d.userCount,
-  sd: sd
 ];

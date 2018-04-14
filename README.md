@@ -39,7 +39,7 @@ Follow these instructions to setup an environment to hack on Gitter.
 Start Gitter's dependent services:
 
 ```shell
-docker-compose up -d
+docker-compose up -d --no-recreate
 ```
 
 If you run into the following error, you may need to re-run the same command with `sudo`.
