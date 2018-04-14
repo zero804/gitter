@@ -22,25 +22,29 @@ Some useful notes for a Gitter developer/engineer that may have to touch product
 
 ## Restart servers
 
-Values (WIP)
- - production: `gitter-web`
-    - Websocket: `gitter-websockets`
- - staging (`next`): `gitter-web-staging`
-    - Websocket: `gitter-websockets-staging`
+Restart servers
+
+ - production: ` cd /opt/gitter-infrastructure/ansible && ansible-playbook -i prod playbooks/gitter/restart-services.yml -vvv -t nonstaging --diff`
+ - staging (`next`): ` cd /opt/gitter-infrastructure/ansible && ansible-playbook -i prod playbooks/gitter/restart-services.yml -vvv -t staging --diff`
+ - beta: ` cd /opt/gitter-infrastructure/ansible && ansible-playbook -i beta playbooks/gitter/restart-services.yml -vvv -t nonstaging --diff`
+ - beta-staging: ` cd /opt/gitter-infrastructure/ansible && ansible-playbook -i beta playbooks/gitter/restart-services.yml -vvv -t staging --diff`
+
+## Stop and start a service/process (like Elasticsearch)
+
+Stop Elasticsearch
 
 ```
-/opt/deploy-tools/service-tree gitter-web-staging start
-/opt/deploy-tools/service-tree gitter-web-staging stop
-/opt/deploy-tools/service-tree gitter-web-staging status
+service monit stop
+service elasticsearch stop
 ```
 
-Restart beta servers (WIP: idk if this actually works)
+Start Elasticsearch
 
+```
+service elasticsearch start
+service monit start
+```
 
- - production: `ansible-playbook -i prod playbooks/gitter/restart-services.yml -vvv -t nonstaging --diff`
- - staging (`next`): `ansible-playbook -i prod playbooks/gitter/restart-services.yml -vvv -t staging --diff`
- - beta: `ansible-playbook -i beta playbooks/gitter/restart-services.yml -vvv -t nonstaging --diff`
- - beta-staging: `ansible-playbook -i beta playbooks/gitter/restart-services.yml -vvv -t staging --diff`
 
 
 ## Find Gitter internal network hostnames/IPs
@@ -301,7 +305,11 @@ See `script/utils/delete-token.js`
   },
   "from": 0,
   "size": 50,
-  "sort": [],
+  "sort": [{
+    "sent": {
+      "order": "desc"
+    }
+  }],
   "aggs": {}
 }
 ```
@@ -328,7 +336,7 @@ See `script/utils/delete-token.js`
   "sort": [
     {
       "sent": {
-        "order": "asc"
+        "order": "desc"
       }
     }
   ],
