@@ -50,7 +50,7 @@ var CreateRoomViewModel = Backbone.Model.extend({
     else if(this.get('roomAvailabilityStatus') === roomAvailabilityStatusConstants.REPO_CONFLICT) {
       errors.push({
         key: 'roomName',
-        message: 'You cannot create a channel with a same name that as an already existing repo'
+        message: 'You cannot create a room with a same name that as an already existing repo. You may need to grant public/private repo scope on the GitHub org in order for us to see and auto-associate it (the repo should appear in the room name typeahead).'
       });
     }
     else if(this.get('roomAvailabilityStatus') === roomAvailabilityStatusConstants.PENDING) {
