@@ -105,6 +105,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
 
   initialize: function(attrs) {
     this.model = attrs.model;
+    this.model.set('initialGroupId', attrs.initialGroupId);
     this.groupsCollection = attrs.groupsCollection;
     this.roomCollection = attrs.roomCollection;
     this.repoCollection = attrs.repoCollection;
@@ -115,7 +116,6 @@ var CreateRoomView = Marionette.LayoutView.extend({
     });
 
     this.model.set({
-      groupId: attrs.initialGroupId || null,
       roomName: attrs.initialRoomName || ''
     });
 
@@ -346,15 +346,18 @@ var CreateRoomView = Marionette.LayoutView.extend({
   },
 
   onRoomNameChange: function() {
-    var group = this.getGroupFromId(this.model.get('groupId'));
-    var repoUriToFind = group.get('uri') + '/' + this.model.get('roomName');
-    var matchingRepo = this.repoCollection.findWhere({ uri: repoUriToFind });
-    // Auto-associate repo if the name matches
-    if(matchingRepo) {
-      this.model.set('associatedGithubProject', matchingRepo);
+    if (group) {
+      var group = this.getGroupFromId(this.model.get('groupId'));
+      var repoUriToFind = group.get('uri') + '/' + this.model.get('roomName');
+      var matchingRepo = this.repoCollection.findWhere({ uri: repoUriToFind });
+      // Auto-associate repo if the name matches
+      if(matchingRepo) {
+        this.model.set('associatedGithubProject', matchingRepo);
+      }
+
+      this.debouncedCheckForRoomConflict();
     }
 
-    this.debouncedCheckForRoomConflict();
     this.safeUpdateFields();
   },
 
@@ -436,7 +439,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
 
       var shouldHideOnlyGroupUsersOption = security !== 'PRIVATE';
       toggleClass(this.ui.onlyGroupUsersOption[0], 'hidden', shouldHideOnlyGroupUsersOption);
-      this.ui.onlyGroupUsersOptionGroupName[0].textContent = group.get('name');
+      this.ui.onlyGroupUsersOptionGroupName[0].textContent = group ? group.get('name') : 'Unknown';
 
       var groupBackedByRepo = null;
       if(groupBackedBy && groupBackedBy.type === 'GH_REPO') {
@@ -487,8 +490,8 @@ var CreateRoomView = Marionette.LayoutView.extend({
     this.filterReposForSelectedGroup();
 
     if(this.groupSelect) {
-      var groupId = this.model.get('groupId');
-      this.groupSelect.selectGroupId(groupId);
+      var initialGroupId = this.model.get('initialGroupId');
+      this.groupSelect.selectGroupId(initialGroupId);
     }
   },
 
