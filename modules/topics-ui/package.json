@@ -30,12 +30,13 @@
     "url-join": "0.0.1"
   },
   "devDependencies": {
-    "babel-loader": "^6.2.4",
+    "@gitterhq/styleguide": "^2.0.0",
+    "babel-loader": "^6.4.1",
     "babel-plugin-add-module-exports": "^0.2.1",
-    "babel-plugin-istanbul": "^2.0.0",
-    "babel-preset-es2015": "^6.9.0",
-    "babel-preset-react": "^6.11.1",
-    "babel-register": "^6.9.0",
+    "babel-plugin-istanbul": "^2.0.3",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "babel-register": "^6.26.0",
     "concurrently": "^3.0.0",
     "css-loader": "^0.23.1",
     "del": "^1.1.1",
@@ -44,11 +45,10 @@
     "eslint-plugin-mocha": "^2.2.0",
     "extract-text-webpack-plugin": "^1.0.1",
     "file-loader": "^0.9.0",
-    "@gitterhq/styleguide": "^1.6.6",
     "gitter-web-qs": "file:../qs",
     "glob": "^6.0.4",
     "gulp": "^3.9.1",
-    "gulp-babel": "^6.1.2",
+    "gulp-babel": "^6.1.3",
     "gulp-filter": "^4.0.0",
     "highlight.js": "8.6.0",
     "http-server": "^0.9.0",
@@ -61,7 +61,7 @@
     "mocha": "^2.5.3",
     "plop": "^1.5.0",
     "postcss-less": "^0.14.0",
-    "postcss-loader": "^0.8.2",
+    "postcss-loader": "^1.3.3",
     "pump": "^1.0.1",
     "qs": "^6.2.1",
     "react-addons-shallow-compare": "^15.3.1",
@@ -73,8 +73,8 @@
     "svgo": "^0.7.1",
     "svgo-loader": "^1.1.0",
     "url-loader": "^0.5.7",
-    "webpack": "1.12.15",
-    "webpack-dev-middleware": "^1.6.1"
+    "webpack": "^1.15.0",
+    "webpack-dev-middleware": "^1.12.2"
   },
   "babel": {
     "presets": [
