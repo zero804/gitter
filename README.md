@@ -1,3 +1,5 @@
+If you are just interested in the Gitter API, see https://developer.gitter.im/
+
 # Install prerequisites
 
 ## Background
@@ -10,7 +12,6 @@ to provide a pre-canned environment which contains:
  1. Mongodb
  1. Elasticsearch
  1. Neo4j
-
 
 ## Setup
 
