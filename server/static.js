@@ -15,6 +15,13 @@ var app = express();
 
 var server = http.createServer(app);
 
+// Sanity check whether the server is up and running so it doesn't fail silently
+setTimeout(() => {
+  if (!server.listening) {
+    winston.info('Static server failed to startup after 5 seconds, ' + server.listening);
+  }
+}, 5000);
+
 // API uses CORS
 var corsOptions = {
   origin: true,
@@ -41,6 +48,11 @@ require('./web/express-static').install(app);
 
 var port = process.env.PORT || 5001;
 
-server.listen(port, function() {
-  winston.info("Listening on " + port);
-});
+server
+  .listen(port, function(err) {
+    if(err) {
+      winston.error('An error occured during static server startup: ' + err, { exception: err });
+    }
+
+    winston.info("Listening on " + port);
+  });

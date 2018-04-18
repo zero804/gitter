@@ -38,5 +38,4 @@ exports.install = function(app) {
   app.use('/_s/l', staticServer);
 
   app.use(favicon(resolveStatic('favicon.ico')));
-
 };
