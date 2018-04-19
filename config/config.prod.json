@@ -83,6 +83,9 @@
     "intercom": {
       "enabled" : false
     },
+    "mixpanel": {
+      "enabled": false
+    },
     "ga": {
       "enabled": true
     }
