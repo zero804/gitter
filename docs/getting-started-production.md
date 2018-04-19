@@ -2,7 +2,8 @@
 Some useful notes for a Gitter developer/engineer that may have to touch production.
 
  - Infrastructure code (Ansible), https://gitlab.com/gl-infra/gitter-infrastructure
- - Infrastructure deploy tools (shell scripts), https://github.com/troupe/deploy-tools
+ - Infrastructure deploy tools (shell scripts), https://gitlab.com/gitlab-org/gitter/deploy-tools
+
 
 ## See what code/commit is running on production or next
 
@@ -24,12 +25,54 @@ Some useful notes for a Gitter developer/engineer that may have to touch product
 
 Restart servers
 
- - production: ` cd /opt/gitter-infrastructure/ansible && ansible-playbook -i prod playbooks/gitter/restart-services.yml -vvv -t nonstaging --diff`
- - staging (`next`): ` cd /opt/gitter-infrastructure/ansible && ansible-playbook -i prod playbooks/gitter/restart-services.yml -vvv -t staging --diff`
- - beta: ` cd /opt/gitter-infrastructure/ansible && ansible-playbook -i beta playbooks/gitter/restart-services.yml -vvv -t nonstaging --diff`
- - beta-staging: ` cd /opt/gitter-infrastructure/ansible && ansible-playbook -i beta playbooks/gitter/restart-services.yml -vvv -t staging --diff`
+ - production: `cd /opt/gitter-infrastructure/ansible && ansible-playbook -i prod playbooks/gitter/restart-services.yml -vvv -t nonstaging --diff`
+ - staging (`next`): `cd /opt/gitter-infrastructure/ansible && ansible-playbook -i prod playbooks/gitter/restart-services.yml -vvv -t staging --diff`
+ - beta: `cd /opt/gitter-infrastructure/ansible && ansible-playbook -i beta playbooks/gitter/restart-services.yml -vvv -t nonstaging --diff`
+ - beta-staging: `cd /opt/gitter-infrastructure/ansible && ansible-playbook -i beta playbooks/gitter/restart-services.yml -vvv -t staging --diff`
 
-## Stop and start a service/process (like Elasticsearch)
+
+## Stop and start group of services, [`deploy-tools/service-tree`](https://gitlab.com/gitlab-org/gitter/deploy-tools/blob/master/service-tree)
+
+Available groups (see `monit_group` in the `gitter-infrastructure` Ansible directory)
+
+ - `gitter-web`
+ - `gitter-web-staging`
+ - `gitter-websockets`
+ - `gitter-websockets-staging`
+
+```sh
+$ /opt/deploy-tools/service-tree gitter-web status
+gitter-api-1 start/running, process 13136
+gitter-api-2 start/running, process 13137
+gitter-web start/running
+gitter-web-1 start/running, process 13135
+gitter-web-2 start/running, process 13134
+gitter-websockets start/running
+gitter-websockets-1 start/running, process 13138
+gitter-websockets-2 start/running, process 13139
+$ /opt/deploy-tools/service-tree gitter-web stop
+gitter-web stop/waiting
+gitter-web stop/waiting
+gitter-web-2 stop/waiting
+gitter-websockets stop/waiting
+gitter-websockets-1 stop/waiting
+gitter-websockets-2 stop/waiting
+gitter-web-1 stop/waiting
+gitter-api-1 stop/waiting
+gitter-api-2 stop/waiting
+$ /opt/deploy-tools/service-tree gitter-web start
+gitter-web start/running
+gitter-web start/running
+gitter-web-2 start/running, process 13134
+gitter-websockets start/running
+gitter-websockets-1 start/running, process 13138
+gitter-websockets-2 start/running, process 13139
+gitter-web-1 start/running, process 13135
+gitter-api-1 start/running, process 13136
+gitter-api-2 start/running, process 13137
+```
+
+## Stop and start individual service/process (like Elasticsearch)
 
 Stop Elasticsearch
 
@@ -133,6 +176,14 @@ We follow git-flow, https://danielkummer.github.io/git-flow-cheatsheet/
  - `release/` go onto `staging` (`next`)
  - Manually start a production build to go onto `production`
 
+
+## Moving a project to GitLab
+
+ - After importing, if the project is public on GitHub, adjust the visibility on GitLab
+ - Update GitHub project's readme to point to GitLab repo. Disable issues on the GitHub repo
+ - If the project is private, add [@gitter-deployer](https://gitlab.com/gitter-deployer) as a `master` so we can clone it in production
+ - Update any references in https://gitlab.com/gl-infra/gitter-infrastructure
+ - Update any references in Gitter rooms
 
 
 ## Mongo DB
