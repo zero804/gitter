@@ -180,10 +180,29 @@ We follow git-flow, https://danielkummer.github.io/git-flow-cheatsheet/
 ## Moving a project to GitLab
 
  - After importing, if the project is public on GitHub, adjust the visibility on GitLab
- - Update GitHub project's readme to point to GitLab repo. Disable issues on the GitHub repo
- - If the project is private, add [@gitter-deployer](https://gitlab.com/gitter-deployer) as a `master` so we can clone it in production
+ - Update the GitHub project's readme to point to GitLab repo. Disable issues on the GitHub repo
+ - If the project is private,
+    - Add [@gitter-deployer](https://gitlab.com/gitter-deployer) as a `master` so we can clone it in production
+    - Enable the `webapp` deploy key on the new GitLab project
  - Update any references in https://gitlab.com/gl-infra/gitter-infrastructure
  - Update any references in Gitter rooms
+
+
+## Updating Node.js/npm versions running on the servers
+
+ - Update `ansible/roles/nodejs/vars/main.yml`
+    - Add a new `nodejs_versions`
+    - Update `nodejs_stable`, `nodejs_next`, `nodejs_latest`
+    - Add an entry in `nodejs_aliases`
+ - Search https://gitlab.com/gl-infra/gitter-infrastructure for `v[0-9]+-latest`(Node.js), and `latest-v[0-9]+`(npm) and replace necessary places
+
+```
+$ cd /opt/gitter-infrastructure/ansible
+# Dry-run
+$ ansible-playbook -i beta playbooks/site.yml -t node_alt_versions --check --diff
+# Actually install on beta servers
+$ ansible-playbook -i beta playbooks/site.yml -t node_alt_versions --diff
+```
 
 
 ## Mongo DB
