@@ -28,20 +28,6 @@
         </div>
       </div>
       <div class='menu-list__item' id="suggested-region"></div>
-      <div class='menu-list__item' id="orgs-region">
-        <div {{#if oldLeftMenu.userHasNoOrgs}}style="display:none"{{/if}}>
-          <div class="menu-list__header">
-            <h5>Your Organisations</h5>
-          </div>
-          <div id="list">
-            <ul class="room-list">
-              {{#each oldLeftMenu.orgs}}
-              {{{ prerenderOrgListItem this }}}
-              {{/each}}
-            </ul>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
   <div class="menu-list__overflow-shadow"></div>

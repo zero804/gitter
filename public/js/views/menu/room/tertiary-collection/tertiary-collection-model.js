@@ -6,9 +6,7 @@ module.exports = BaseCollectionModel.extend({
 
   onAll: function() {
     this.set({
-      header: 'Your Organisations',
-      isSuggestion: false,
-      active: !!this.collection.length && !!this.collection.models.length,
+      active: false
     });
   },
 
