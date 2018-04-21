@@ -225,7 +225,6 @@ module.exports = Backbone.Model.extend({
       case 'all':
         this.primaryCollection.switchCollection(this.activeRoomCollection);
         this.secondaryCollection.switchCollection(this.userSuggestions);
-        this.tertiaryCollection.switchCollection(this._orgCollection);
         break;
 
       case 'search':

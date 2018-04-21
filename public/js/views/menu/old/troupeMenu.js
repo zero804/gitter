@@ -151,20 +151,6 @@ module.exports = (function () {
               roomsCollection: troupeCollections.troupes,
             }));
           }
-        },
-        orgs: {
-          el: "#orgs-region",
-          init: function(optionsForRegion) {
-            this.listenTo(troupeCollections.orgs, 'add remove', this.initNanoScrollerThrottled);
-
-            return new CollectionWrapperView(optionsForRegion({
-              collection: troupeCollections.orgs,
-              childView: OrgCollectionView,
-              header: 'Your Organisations',
-              prerendered: true
-            }));
-
-          }
         }
       }
     },
