@@ -33,12 +33,27 @@ Restart servers
 
 ## Stop and start group of services, [`deploy-tools/service-tree`](https://gitlab.com/gitlab-org/gitter/deploy-tools/blob/master/service-tree)
 
-Available groups (see `monit_group` in the `gitter-infrastructure` Ansible directory)
+Available groups (see `monit_group` and `service_name` in the `gitter-infrastructure` Ansible directory)
 
  - `gitter-web`
  - `gitter-web-staging`
  - `gitter-websockets`
  - `gitter-websockets-staging`
+ - `gitter-avatars`
+ - `gitter-badges`
+ - `gitter-billing`
+ - `gitter-developer-web`
+ - `gitter-embed`
+ - `gitter-errors`
+ - `gitter-irc`
+ - `gitter-irc-web`
+ - `gitter-stream`
+ - `gitter-webhooks`
+ - `redis-caching`
+ - `redis-faye`
+ - `redis-caching`
+ - `redis-nopersist`
+ - `redis-persist`
 
 ```sh
 $ /opt/deploy-tools/service-tree gitter-web status
