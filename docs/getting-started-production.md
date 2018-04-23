@@ -196,9 +196,11 @@ We follow git-flow, https://danielkummer.github.io/git-flow-cheatsheet/
 
  - After importing, if the project is public on GitHub, adjust the visibility on GitLab
  - Update the GitHub project's readme to point to GitLab repo. Disable issues on the GitHub repo
- - If the project is private,
-    - Add [@gitter-deployer](https://gitlab.com/gitter-deployer) as a `master` so we can clone it in production
-    - Enable the `webapp` deploy key on the new GitLab project
+ - Add [@gitter-deployer](https://gitlab.com/gitter-deployer) as a `master` so we can clone it in production
+ - Enable the `webapp` deploy key on the new GitLab project
+ - Add GitLab CI runners that have access to the internal Gitter network
+    - `jenkins-slave-01`, `jenkins-slave-02`
+    - https://i.imgur.com/Ud0S6UP.png
  - Update any references in https://gitlab.com/gl-infra/gitter-infrastructure
  - Update any references in Gitter rooms
 
@@ -328,6 +330,8 @@ db.usersettings.update({ userId: db.users.findOne({ username: 'something' })._id
 
 
 #### Working with tokens
+
+To find a list of internal Gitter tokens for the desktop and mobile apps like `1`, `windows-desktop-prod`, `ios-prod`, see https://gitlab.com/gitlab-org/gitter/webapp/blob/8e6d82aca490b37df087def6885196bf4173ea4d/server/services/oauth-service.js#L177
 
 ##### Listing a user's tokens
 
