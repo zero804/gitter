@@ -80,6 +80,20 @@ distribute_beta_staging:
   variables:
     DIST_S3_URL: s3://gitter-deployments/gitter-webapp/beta-staging
 
+distribute_staging:
+  <<: *distribute_job
+  only:
+    - master
+  variables:
+    DIST_S3_URL: s3://gitter-deployments/gitter-webapp/staging
+
+distribute_prod:
+  <<: *distribute_job
+  only:
+    - tags
+  variables:
+    DIST_S3_URL: s3://gitter-deployments/gitter-webapp/prod
+
 containerize:
   stage: deploy
   image: docker:latest
@@ -135,7 +149,7 @@ deploy-build-image:
     - internal # This has to be within the Gitter network
 
 
-deploy_beta:
+deploy_beta: &deploy_beta
   <<: *deploy_job
   dependencies:
     - distribute_beta
@@ -147,7 +161,11 @@ deploy_beta:
     name: beta
     url: https://beta.gitter.im
 
-deploy_beta_staging:
+deploy_beta_manual:
+  <<: *deploy_beta
+  when: manual
+
+deploy_beta_staging: &deploy_beta_staging
   <<: *deploy_job
   dependencies:
     - distribute_beta_staging
@@ -158,6 +176,41 @@ deploy_beta_staging:
   environment:
     name: beta_staging
     url: https://beta.gitter.im?gitter_next=true
+
+deploy_beta_staging_manual:
+  <<: *deploy_beta_staging
+  when: manual
+
+deploy_staging: &deploy_staging
+  <<: *deploy_job
+  dependencies:
+    - distribute_staging
+  only:
+    - master
+  script:
+    - cd $ANSIBLE_DIR && ansible-playbook -i prod --vault-password-file "/root/.vault_pass" playbooks/gitter/webapp-staging-deploy.yml -vvvv
+  environment:
+    name: staging
+    url: https://gitter.im?gitter_next=true
+
+deploy_staging_manual:
+  <<: *deploy_staging
+  when: manual
+
+deploy_prod_manual: &deploy_prod
+  <<: *deploy_job
+  dependencies:
+    - distribute_prod
+  only:
+    - tags
+  # Production is only manual
+  when: manual
+  script:
+    - cd $ANSIBLE_DIR && ansible-playbook -i prod --vault-password-file "/root/.vault_pass" playbooks/gitter/webapp-deploy.yml -vvvv
+  environment:
+    name: prod
+    url: https://gitter.im
+
 
 docker-base:
   image: docker:latest
