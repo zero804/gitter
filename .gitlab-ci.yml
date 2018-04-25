@@ -83,7 +83,7 @@ distribute_beta_staging:
 distribute_staging:
   <<: *distribute_job
   only:
-    - tags
+    - /^release\/.*$/
   variables:
     DIST_S3_URL: s3://gitter-deployments/gitter-webapp/staging
 
@@ -186,7 +186,7 @@ deploy_staging: &deploy_staging
   dependencies:
     - distribute_staging
   only:
-    - tags
+    - /^release\/.*$/
   script:
     - cd $ANSIBLE_DIR && ansible-playbook -i prod --vault-password-file "/root/.vault_pass" playbooks/gitter/webapp-staging-deploy.yml -vvvv
   environment:
