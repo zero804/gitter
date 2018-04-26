@@ -3,7 +3,7 @@ Some useful notes for a Gitter developer/engineer that may have to touch product
 
  - Infrastructure code (Ansible), https://gitlab.com/gl-infra/gitter-infrastructure
  - Infrastructure deploy tools (shell scripts), https://gitlab.com/gitlab-org/gitter/deploy-tools
-
+ - Production secrets/variables, https://gitlab.com/gl-gitter/secrets
 
 ## See what code/commit is running on production or next
 
@@ -19,6 +19,42 @@ Some useful notes for a Gitter developer/engineer that may have to touch product
 - `beta-staging`
    - https://beta.gitter.im/api_web/private/health_check
    - https://beta.gitter.im/api_staging/private/health_check or https://beta-staging.gitter.im/api/private/health_check
+
+
+## Find Gitter internal network hostnames/IPs
+
+Visit the following pages or run the commands from one of internal Gitter servers
+
+ - prod: https://console.aws.amazon.com/route53/home?region=us-east-1#resource-record-sets:ZLV6X5P28OJXS
+    - `aws route53 list-resource-record-sets --hosted-zone-id ZLV6X5P28OJXS`
+ - beta: https://console.aws.amazon.com/route53/home?region=us-east-1#resource-record-sets:Z37MTOMQF7KDHA
+    - `aws route53 list-resource-record-sets --hosted-zone-id Z37MTOMQF7KDHA`
+
+
+## SSH to boxes
+
+ - Production `gitter.im`: `ssh deployer@webapp-01`
+ - Beta `beta.gitter.im`: `ssh deployer@gitter-beta`
+
+
+## Configure secrets
+
+Production secrets are located here, https://gitlab.com/gl-gitter/secrets/tree/master/webapp
+
+ - Production
+    - production: `eval $(../secrets/webapp/env prod)`
+    - staging (`next`): `eval $(../secrets/webapp/env prod-staging)`
+    - beta: `eval $(/opt/gitter/secrets/webapp/env beta)`
+    - beta-staging: `eval $(/opt/gitter/secrets/webapp/env beta-staging)`
+ - Locally: See https://gitlab.com/gitlab-org/gitter/webapp#configure-service-secrets
+
+### Update secrets on servers
+
+Here is an example to update the secrets repo on the beta app servers
+
+```
+cd /opt/gitter-infrastructure/ansible/ && ansible-playbook -i beta --vault-password-file "/root/.vault_pass" playbooks/gitter/secrets.yml -vvvv
+```
 
 
 ## Restart servers
@@ -104,43 +140,6 @@ service monit start
 ```
 
 
-
-## Find Gitter internal network hostnames/IPs
-
-Visit the following pages or run the commands from one of internal Gitter servers
-
- - prod: https://console.aws.amazon.com/route53/home?region=us-east-1#resource-record-sets:ZLV6X5P28OJXS
-    - `aws route53 list-resource-record-sets --hosted-zone-id ZLV6X5P28OJXS`
- - beta: https://console.aws.amazon.com/route53/home?region=us-east-1#resource-record-sets:Z37MTOMQF7KDHA
-    - `aws route53 list-resource-record-sets --hosted-zone-id Z37MTOMQF7KDHA`
-
-
-## SSH to boxes
-
- - Production `gitter.im`: `ssh deployer@webapp-01`
- - Beta `beta.gitter.im`: `ssh gitter-beta`
-
-
-## Configure secrets
-
-Production secrets are located here, https://gitlab.com/gl-gitter/secrets/tree/master/webapp
-
- - Production
-    - production: `eval $(../secrets/webapp/env prod)`
-    - staging (`next`): `eval $(../secrets/webapp/env prod-staging)`
-    - beta: `eval $(/opt/gitter/secrets/webapp/env beta)`
-    - beta-staging: `eval $(/opt/gitter/secrets/webapp/env beta-staging)`
- - Locally: See https://gitlab.com/gitlab-org/gitter/webapp#configure-service-secrets
-
-### Update secrets on servers
-
-Here is an example to update the secrets repo on the beta app servers
-
-```
-cd /opt/gitter-infrastructure/ansible/ && ansible-playbook -i beta --vault-password-file "/root/.vault_pass" playbooks/gitter/secrets.yml -vvvv
-```
-
-
 ## Production logging
 
  - `ssh deployer@webapp-01`
@@ -157,6 +156,36 @@ $ mkdir -p /home/deployer/delete-me-logs/ && cp /var/log/upstart/gitter-web-stag
 # Locally run,
 $ mkdir -p ~/Downloads/gitter-logs && scp deployer@gitter-beta.beta.gitter:/home/deployer/delete-me-logs/gitter-web-staging-1-beta.log ~/Downloads/gitter-logs
 # See gitter-web-staging-1-beta.log
+```
+
+### Find what environment variables are running on the
+
+Get `beta-staging` variables
+
+```
+$ ssh deployer@gitter-beta
+$ sudo strings /proc/$(ps -ef | grep gitter-webapp-staging/web.js | grep -v grep | awk '{print $2}')/environ
+```
+
+Get `beta` variables
+
+```
+$ ssh deployer@gitter-beta
+$ sudo strings /proc/$(ps -ef | grep gitter-webapp/web.js | grep -v grep | awk '{print $2}')/environ
+```
+
+Get `staging`(next) variables
+
+```
+$ ssh deployer@webapp-01
+$ sudo strings /proc/$(ps -ef | grep gitter-webapp-staging/web.js | grep -v grep | awk '{print $2}')/environ
+```
+
+Get `production` variables
+
+```
+$ ssh deployer@webapp-01
+$ sudo strings /proc/$(ps -ef | grep gitter-webapp/web.js | grep -v grep | awk '{print $2}')/environ
 ```
 
 
@@ -186,10 +215,34 @@ DEBUG="gitter:*,-gitter:redis-client,-gitter:mongo"
 
 We follow git-flow, https://danielkummer.github.io/git-flow-cheatsheet/
 
- - If you push that `feature/branch` it will build to `beta-staging`
- - `develop` || `hotfix/` branch will build to `beta`
- - `release/` go onto `staging` (`next`)
- - Manually start a production build to go onto `production`
+ - `feature/xxx` branch will deploy to `beta-staging`
+ - `develop` or `hotfix/xxx` branch will deploy to `beta`
+ - `release/xxx` branch will deploy to `staging` ([next](http://next.gitter.im/))
+ - Manually start a production build to deploy to `production`
+
+### Release checklist
+
+ 1. Do you need to update the [secrets](https://gitlab.com/gl-gitter/secrets)?
+    - Check for activity in the repo, https://gitlab.com/gl-gitter/secrets
+    - If something has changed, create a git-flow release there first (TODO: We should auto-deploy new secrets with GitLab CI, https://gitlab.com/gl-gitter/secrets/issues/1)
+    - `cd /opt/gitter-infrastructure/ansible/ && ansible-playbook -i prod --vault-password-file "/root/.vault_pass" playbooks/gitter/secrets.yml -vvvv`
+ 1. Do you need to update Node.js/npm?
+    - Update config in https://gitlab.com/gl-infra/gitter-infrastructure if you haven't already
+    - `cd /opt/gitter-infrastructure/ansible/ && ansible-playbook -i beta playbooks/site.yml -t node_alt_versions --diff`
+    - `cd /opt/gitter-infrastructure/ansible/ && ansible-playbook -i prod playbooks/site.yml -t node_alt_versions --diff`
+ 1. Deploy to `staging`([next](http://next.gitter.im/))
+    1. `git flow release start 19.0.0`
+    1. `git flow release publish 19.0.0`
+    1. `git flow release finish 19.0.0`
+    1. `git checkout develop && git push`
+    1. `git checkout master && git push`
+ 1. Look for new errors in Sentry
+    - https://sentry.gitlap.com/gitlab/backend-staging/
+    - https://sentry.gitlap.com/gitlab/frontend-staging/
+ 1. Deploy to `prod`
+    1. `git push --tags`
+    1. Run manual `deploy_prod_manual` job
+
 
 
 ## Moving a project to GitLab
