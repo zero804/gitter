@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "gitter-client-env": "file:../client-env",
-    "raven-js": "^3.7.0"
+    "raven-js": "^3.24.2"
   },
   "private": true
 }
