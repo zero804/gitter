@@ -1,4 +1,13 @@
+# Gitter webapp
+
+[Gitter](https://gitter.im) is a community for software developers. This project is the main monolith web application.
+
+This codebase even covers a lot of the mobile and desktop applications which embed a web frame.
+
+![](https://i.imgur.com/wT0bSy2.png)
+
 If you are just interested in the Gitter API, see https://developer.gitter.im/
+
 
 # Install prerequisites
 
@@ -8,10 +17,10 @@ Development of Gitter can be done in any environment that supports Node.js and b
 and can run Redis and MongoDB, but for simplicity we use Docker Compose
 to provide a pre-canned environment which contains:
 
- 1. Redis
- 1. Mongodb
- 1. Elasticsearch
- 1. Neo4j
+ 1. Mongodb (persistent storage)
+ 1. Elasticsearch (search)
+ 1. Redis (caching and some persistent storage)
+ 1. Neo4j (suggestions)
 
 ## Setup
 
