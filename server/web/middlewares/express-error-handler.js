@@ -4,8 +4,10 @@ var Promise = require('bluebird');
 var env = require('gitter-web-env');
 var config = env.config;
 var _ = require('lodash');
+var urlJoin = require('url-join');
 var userScopes = require('gitter-web-identity/lib/user-scopes');
 var logout = Promise.promisify(require('./logout'));
+var unauthorizedRedirectMap = require('../../utils/unauthorized-redirect-map');
 
 function linkStack(stack) {
   if(!stack) return;
@@ -28,6 +30,7 @@ function getTemplateForStatus(status) {
       return '500';
   }
 }
+
 /* Has to have four args */
 module.exports = function(err, req, res, next) { // eslint-disable-line no-unused-vars
   var status = res.statusCode;
@@ -39,18 +42,18 @@ module.exports = function(err, req, res, next) { // eslint-disable-line no-unuse
     if(err.clientRevoked) {
       return logout(req, res)
         .then(() => {
-          return res.redirect('/login/token-revoked');
+          return res.redirect(unauthorizedRedirectMap.TOKEN_REVOKED_URL);
         });
     }
     else if(!req.user && req.session) {
       req.session.returnTo = returnUrl;
-      return res.redirect('/login');
+      return res.redirect(unauthorizedRedirectMap.LOGIN_URL);
     }
     else if(!req.user) {
       // This should not really be happening but
       // may do if the gitter client isn't doing
       // oauth properly
-      return res.redirect('/login?returnTo=' + encodeURIComponent(returnUrl));
+      return res.redirect(urlJoin(unauthorizedRedirectMap.LOGIN_URL, '?returnTo=' + encodeURIComponent(returnUrl)));
     }
   }
 
