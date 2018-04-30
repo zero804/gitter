@@ -26,6 +26,8 @@ function getGatewayForDevice(device) {
     case 'ANDROID':
       return androidGateway;
 
+    // Web push, https://developer.mozilla.org/en-US/docs/Web/API/Push_API
+    // VAPID spec, https://tools.ietf.org/html/draft-thomson-webpush-vapid
     case 'VAPID':
       return vapidGateway;
 

@@ -18,6 +18,7 @@ function extractPayload(event) {
 
 self.addEventListener('push', function(event) {
   var payload = extractPayload(event);
+  console.log('push', event, payload);
   if (!payload) return;
 
   var promise = handler.onPush(event, payload);

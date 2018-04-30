@@ -16,6 +16,7 @@ function newChatPushHandler(event, payload) {
 
   function next() {
     var chat = chats.pop();
+    console.log('next', responded[payload.uniqueId], chat);
     if (responded[payload.uniqueId]) return;
     if (!chat) return;
     count++;
@@ -53,8 +54,10 @@ function newChatPushHandler(event, payload) {
       notificationOptions.vibrate = [100, 90, 80];
     }
 
+    console.log('try showNotification', Notification.permission, title, notificationOptions);
     return self.registration.showNotification(title, notificationOptions)
       .then(function(result) {
+        console.log('showNotification', result);
         if (result) return;
 
         return delay(4000);
@@ -62,13 +65,20 @@ function newChatPushHandler(event, payload) {
       .then(function() {
         return next();
       })
+      .catch((err) => {
+        console.log('sw.js err', err, err.stack);
+      })
   }
+
+  console.log('newChatPushHandler', chats);
 
   return self.registration.getNotifications({ tag: tag })
     .then(function(notifications) {
+      console.log('newChatPushHandler notifications', notifications, !!(notifications && notifications.length));
       // Already notifying for this room? Skip
       if (notifications && notifications.length) return;
 
+      console.log('going to next()');
       return next();
     });
 

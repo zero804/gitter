@@ -31,18 +31,36 @@ function install(options) {
 
   return Promise.resolve(navigator.serviceWorker.register('/sw.js', { scope: '/' }))
     .then(function(registration) {
-      var vapidPublicKey = clientEnv.vapidAppServerKey;
-      var convertedVapidKey = urlBase64ToUint8Array(vapidPublicKey);
-
       // TODO: figure out the rules for agent updating the service worker
       // registration.update();
 
-      return registration.pushManager.subscribe({
+      const serviceWorker = registration.installing || registration.waiting || registration.active;
+
+      let whenRegistrationActive = Promise.resolve(registration);
+      if(!registration.active || registration.active.state !== 'activated') {
+        whenRegistrationActive = new Promise((resolve) => {
+          serviceWorker.addEventListener('statechange', function(e) {
+            if (e.target.state === 'activated') {
+              resolve(registration);
+            }
+          });
+        });
+      }
+
+      return whenRegistrationActive;
+    })
+    .then((activeRegistration) => {
+      var vapidPublicKey = clientEnv.vapidAppServerKey;
+      var convertedVapidKey = urlBase64ToUint8Array(vapidPublicKey);
+
+      const subscription = activeRegistration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: convertedVapidKey
       });
+
+      return subscription;
     })
-    .then(function(subscription) {
+    .then((subscription) => {
       return apiClient.priv.post('/vapid', subscription);
     });
 }
