@@ -93,6 +93,8 @@ onMongoConnect()
             group.name = opts.new;
             group.uri = opts.new;
             group.lcUri = lcNew;
+            group.homeUri = `${lcNew}/home`;
+            group.lcHomeUri = group.homeUri.toLowerCase();
             // Assumes the new name is also the org name
             if(group.sd.type === 'GH_ORG') {
               group.sd.linkPath = opts.new;
