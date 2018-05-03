@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "apn": "1.7.5",
-    "bluebird": "^3.2.1",
+    "bluebird": "^3.5.1",
     "debug": "^2.2.0",
     "gitter-web-env": "file:../env",
     "node-gcm": "^0.9.12",
