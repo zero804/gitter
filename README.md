@@ -155,7 +155,7 @@ docker-compose rm -f
 ### Going further
 
 We also have some other docs which give a [overview/walkthrough of the codebase](https://gitlab.com/gitlab-org/gitter/webapp/blob/develop/docs/code-overview.md)
-and [some notes on touching production](https://gitlab.com/gitlab-org/gitter/webapp/blob/develop/docs/getting-started-production.md).
+and [some notes on touching production](https://gitlab.com/gl-infra/gitter-infrastructure/blob/master/README.md).
 
 
 ### Testing
