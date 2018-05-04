@@ -156,7 +156,7 @@ deploy_beta: &deploy_beta
   only:
    - develop
   script:
-    - cd $ANSIBLE_DIR && ansible-playbook -i beta --vault-password-file "/root/.vault_pass" playbooks/gitter/webapp-deploy.yml -vvvv
+    - cd $ANSIBLE_DIR && ansible-playbook -i beta --vault-password-file "/root/.vault_pass" playbooks/gitter/webapp-deploy.yml
   environment:
     name: beta
     url: https://beta.gitter.im
@@ -172,7 +172,7 @@ deploy_beta_staging: &deploy_beta_staging
   only:
     - /^feature\/.*$/
   script:
-    - cd $ANSIBLE_DIR && ansible-playbook -i beta --vault-password-file "/root/.vault_pass" playbooks/gitter/webapp-staging-deploy.yml -vvvv
+    - cd $ANSIBLE_DIR && ansible-playbook -i beta --vault-password-file "/root/.vault_pass" playbooks/gitter/webapp-staging-deploy.yml
   environment:
     name: beta_staging
     url: https://beta.gitter.im?gitter_next=true
@@ -188,7 +188,7 @@ deploy_staging: &deploy_staging
   only:
     - /^release\/.*$/
   script:
-    - cd $ANSIBLE_DIR && ansible-playbook -i prod --vault-password-file "/root/.vault_pass" playbooks/gitter/webapp-staging-deploy.yml -vvvv
+    - cd $ANSIBLE_DIR && ansible-playbook -i prod --vault-password-file "/root/.vault_pass" playbooks/gitter/webapp-staging-deploy.yml
   environment:
     name: staging
     url: https://gitter.im?gitter_next=true
@@ -206,7 +206,7 @@ deploy_prod_manual: &deploy_prod
   # Production is only manual
   when: manual
   script:
-    - cd $ANSIBLE_DIR && ansible-playbook -i prod --vault-password-file "/root/.vault_pass" playbooks/gitter/webapp-deploy.yml -vvvv
+    - cd $ANSIBLE_DIR && ansible-playbook -i prod --vault-password-file "/root/.vault_pass" playbooks/gitter/webapp-deploy.yml
   environment:
     name: prod
     url: https://gitter.im
