@@ -20,15 +20,12 @@ scripts/mongo-backup-*
 public-processed/
 scripts/dataupgrades/004-reverse-geocoder/data
 output
-test/end-to-end/casper/*.png
 mongo-backup-*/
 GIT_COMMIT
 VERSION
 git_hooks/*.sample
 ghostdriver.log
 finished.png
-chromedriver
-chromedriver.log
 coverage
 output/coverage.html
 cobertura-coverage.xml
@@ -36,8 +33,6 @@ html-report
 *.pyc
 .ackrc
 /deployment/config/roles/geckoconnector/files/opt/geckoconnector/node_modules
-test/end-to-end/ios/ios-driver.log
-test/end-to-end/ios/ios-driver.log.lck
 v8.log
 *.swp
 *.swo
