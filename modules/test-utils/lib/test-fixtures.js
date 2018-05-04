@@ -5,6 +5,7 @@ var logger = env.logger;
 var Promise = require('bluebird');
 var debug = require('debug')('gitter:tests:test-fixtures');
 var fixtureUtils = require('./fixture-utils');
+var onMongoConnect = require('gitter-web-persistence-utils/lib/on-mongo-connect');
 var _ = require('lodash');
 var integrationFixtures = require('./integration-fixtures');
 
@@ -141,7 +142,8 @@ fixtureLoader.disableMongoTableScans = function() {
   var didDisable;
 
   before(function() {
-    return mongoTableScans.isDisabled()
+    onMongoConnect()
+      .then(mongoTableScans.isDisabled)
       .then(function(isDisabled) {
         if (isDisabled) return;
 
@@ -149,7 +151,7 @@ fixtureLoader.disableMongoTableScans = function() {
           .then(function() {
             return didDisable = true;
           });
-      })
+      });
   });
 
   after(function() {
