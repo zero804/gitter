@@ -10,7 +10,7 @@
     "test": "mocha test/"
   },
   "dependencies": {
-    "bluebird": "^3.2.1",
+    "bluebird": "^3.5.1",
     "debug": "^2.2.0",
     "gitter-web-env": "file:../env",
     "gitter-web-persistence": "file:../persistence",

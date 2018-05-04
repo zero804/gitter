@@ -11,7 +11,7 @@
   },
   "private": true,
   "dependencies": {
-    "bluebird": "^3.2.1",
+    "bluebird": "^3.5.1",
     "debug": "^2.2.0",
     "email-validator": "^1.0.0",
     "gitter-web-appevents": "file:../appevents",
