@@ -145,14 +145,14 @@ function fieldInPredicate(fieldName, values, additionalClauses) {
 
 function setId(model) {
   if (!model) return model;
-  model.id = serializeObjectId(model._id);
+  model.id = serializeObjectId(model._id || model.id);
   return model;
 }
 
 function setIds(array) {
   array.forEach(function(f) {
     if (!f) return;
-    f.id = serializeObjectId(f._id);
+    f.id = serializeObjectId(f._id || f.id);
   });
   return array;
 }

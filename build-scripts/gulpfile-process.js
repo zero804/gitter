@@ -9,6 +9,14 @@ var fs = require('fs');
 var mkdirp = require('mkdirp');
 var childProcessPromise = require('./child-process-promise');
 
+var argv = require('yargs')
+  .option('inspect-node', {
+    type: 'boolean',
+    describe: 'Remotely inspect the Node.js instance with Chrome devtools (adds the `--inspect` flag to the Node.js process)'
+  })
+  .help('help')
+  .argv;
+
 /**
  * Hook into the package stage
  */
@@ -98,7 +106,8 @@ gulp.task('process:watch:server', function() {
       path.resolve(__dirname, '../modules/web-push/service-worker'),
       '**/test/**'
     ],
-    args: ['--cdn:use', 'true']
+    args: ['--cdn:use', 'true'],
+    nodeArgs: argv.inspectNode ? ['--inspect'] : []
   });
 });
 
