@@ -17,7 +17,7 @@
     "gitter-web-identity": "file:../identity",
     "gitter-web-persistence": "file:../persistence",
     "gitter-web-persistence-utils": "file:../persistence-utils",
-    "mongodb": "~2.2.19",
+    "mongodb": "^2.2.35",
     "node-uuid": "^1.4.0",
     "statuserror": "^0.1.3"
   }

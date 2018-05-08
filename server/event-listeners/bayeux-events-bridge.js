@@ -10,6 +10,7 @@ var ent = require('ent');
 var presenceService = require("gitter-web-presence");
 var restSerializer = require('../serializers/rest-serializer');
 var debug = require('debug')('gitter:app:bayeux-events-bridge');
+var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 var useDeprecatedChannels = nconf.get('ws:useDeprecatedChannels');
 
@@ -69,7 +70,8 @@ exports.install = function() {
       case 'remove':
         var message = {
           operation: operation,
-          model: model
+          // Properly serialize the ObjectID to a string with `mongoUtils.setId`
+          model: mongoUtils.setId(model)
         };
 
         publish(url, message, 'dataChange2', operation, type);

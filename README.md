@@ -137,6 +137,19 @@ npm start
 
 Visit [http://localhost:5000](http://localhost:5000)
 
+#### Inspecting the Node.js instance
+
+You can inspect the Node.js instance with Chrome devtools by adding the `--inspect-node` flag.
+This allows you to use things like breakpoints, `debugger`, and step through the code.
+
+```sh
+npm start -- --inspect-node
+```
+
+You can also install the [Node.js inspector Manager (NiM)](https://chrome.google.com/webstore/detail/gnhhdgbaldcilmgcpfddgdbkhjohddkj)
+browser extension to automatically keep your devtools up to date when
+Nodemon restarts the Node.js process.
+
 ### Shutting Docker down
 
 You can stop the docker containers with:
