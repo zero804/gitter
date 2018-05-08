@@ -42,6 +42,22 @@ Follow these instructions to setup an environment to hack on Gitter.
     * Go and make a cup of tea, because this will take a rather long time.
 
 
+#### `npm ERR! Maximum call stack size exceeded`
+
+If you are running into `npm ERR! Maximum call stack size exceeded`
+
+```
+# Remove nested `node_modules` directories
+$ find . -name "node_modules" -exec rm -rf '{}' +
+# Remove nested `package-lock.json`
+$ find . -name "package-lock.json" -exec rm -rf '{}' +
+
+# Try installing again
+$ npm install
+```
+
+
+
 ## Starting Gitter
 
 ### Start dependent services
