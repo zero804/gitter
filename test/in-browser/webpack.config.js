@@ -37,6 +37,17 @@ module.exports = {
     preLoaders: preLoaders,
     loaders: [
       {
+        test: /\.js?$/,
+        loader: 'babel',
+        exclude: [ /node_modules/ ],
+        query: {
+          presets: [
+            // https://github.com/babel/babel-loader/issues/149
+            require.resolve("babel-preset-es2015")
+          ]
+        }
+      },
+      {
         test: /\.hbs$/,
         loader: '@gitterhq/handlebars-loader', // disable minify for now + path.resolve(path.join(__dirname, "../../build-scripts/html-min-loader"))
         query: {
