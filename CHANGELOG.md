@@ -1,3 +1,8 @@
+## 19.0.1
+
+ - Fix desktop app JavaScript being broken, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1149
+
+
 ## 19.0.0
 
  - Sign in with GitLab (usernames are suffixed with `_gitlab`), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1076
