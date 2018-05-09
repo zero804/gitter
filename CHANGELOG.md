@@ -1,3 +1,8 @@
+## 19.0.2
+
+ - Fix new messages with mentions not appearing in chat list, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1151
+
+
 ## 19.0.1
 
  - Fix desktop app JavaScript being broken, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1149
