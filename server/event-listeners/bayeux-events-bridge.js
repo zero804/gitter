@@ -70,8 +70,7 @@ exports.install = function() {
       case 'remove':
         var message = {
           operation: operation,
-          // Properly serialize the ObjectID to a string with `mongoUtils.setId`
-          model: mongoUtils.setId(model)
+          model: model
         };
 
         publish(url, message, 'dataChange2', operation, type);
