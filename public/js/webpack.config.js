@@ -53,7 +53,8 @@ var webpackConfig = {
       'moment',
       'bluebird',
       'fuzzysearch',
-      'url-join'
+      'url-join',
+      path.resolve(path.join(__dirname, './commons.js'))
     ]
   },
   output: {
@@ -67,6 +68,17 @@ var webpackConfig = {
   module: {
     //JP 12/1/16 If you add a loader remember to add it to /test/in-browser/webpack.config.js
     loaders: [
+      {
+        test: /\.js?$/,
+        loader: 'babel',
+        exclude: [ /node_modules/ ],
+        query: {
+          presets: [
+            // https://github.com/babel/babel-loader/issues/149
+            require.resolve("babel-preset-es2015")
+          ]
+        }
+      },
       {
         test: /\.hbs$/,
         loader: '@gitterhq/handlebars-loader', // disable minify for now + path.resolve(path.join(__dirname, "../../build-scripts/html-min-loader"))
