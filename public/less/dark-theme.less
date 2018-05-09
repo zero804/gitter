@@ -170,6 +170,11 @@
 ------------------------------------------- */
 
 body { background-color: @app-main-bg-color; }
+
+a {
+  color: darken(@chat-right-toolbar-text-color, 10%);
+}
+
 .chat-item code,
 .topic-body__content code { //Single line code blocks don't have a `pre` element
   border: none;
@@ -405,6 +410,7 @@ a.room-item__container:hover { //:cry:
 .right-toolbar-region .right-toolbar {
   background: @chat-right-toolbar-bg-color;
   border-color: @chat-right-toolbar-left-border-color;
+  color: @chat-right-toolbar-text-color;
 }
 
 //Avatars at the top of the right toolbar

@@ -10,7 +10,11 @@ var unreadItemsEngine = require('../../server/services/unread-items/engine');
 describe('one-to-one-rooms', function() {
   var app, request;
 
+  fixtureLoader.ensureIntegrationEnvironment('#oauthTokens');
+
   before(function() {
+    if(this._skipFixtureSetup) return;
+
     request = require("supertest-as-promised")(Promise);
     app = require('../../server/api');
   });

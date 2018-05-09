@@ -4,28 +4,26 @@ var context = require('../utils/context');
 var appEvents = require('../utils/appevents');
 var ravenClientFactory = require('gitter-web-client-error-reporting/lib/raven-client-factory');
 
+var REPORT_UNHANDLED_REJECTIONS = true;
+
 var user = context.user();
 
 var ravenClient = ravenClientFactory({
-  username: user && user.get('username')
+  username: user && user.get('username'),
+  // We handle this ourselves just below (see reasoning below)
+  // TODO: We can re-enable built-in raven handling when there is a new Bluebird release, tracked by https://github.com/petkaantonov/bluebird/issues/1509
+  captureUnhandledRejections: false
 });
 
-// See https://github.com/troupe/gitter-webapp/issues/1056
-// TODO: renable unhandled rejections
-var REPORT_UNHANDLED_REJECTIONS = false;
-
 if (REPORT_UNHANDLED_REJECTIONS) {
-  // Report unhandled bluebird rejections
-  // See http://bluebirdjs.com/docs/api/error-management-configuration.html#global-rejection-events
-  window.addEventListener("unhandledrejection", function(e) {
-      // NOTE: e.preventDefault() must be manually called to prevent the default
-      // action which is currently to log the stack trace to console.warn
-      e.preventDefault();
-
-      var reason = e.detail.reason;
+  // We handle this ourselves because Bluebird doesn't implement PromiseRejectionEvent correctly(spec-compliant)
+  // TODO: This handler can be removed when there is a new Bluebird release, tracked by https://github.com/petkaantonov/bluebird/issues/1509
+  window.addEventListener('unhandledrejection', function(e) {
+      // `e.detail.reason` is bluebird
+      // `e.reason` is native PromiseRejectionEvent, https://developer.mozilla.org/en-US/docs/Web/API/PromiseRejectionEvent/reason
+      var reason = e.detail ? e.detail.reason : e.reason;
       ravenClient(reason);
   });
-
 }
 
 appEvents.on('bugreport', function(description, data) {

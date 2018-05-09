@@ -12,7 +12,8 @@ var opts = require('yargs')
   .option('username', shimPositionOption({
     position: 0,
     required: true,
-    description: "username to send badge update to"
+    description: "username to send badge update to",
+    string: true
   }))
   .help('help')
   .alias('help', 'h')

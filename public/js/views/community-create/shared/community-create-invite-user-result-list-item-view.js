@@ -29,8 +29,9 @@ var InviteUserResultListItemView = Marionette.ItemView.extend({
     var data = _.extend({}, this.model.toJSON());
 
     var githubUsername = this.model.get('githubUsername');
+    var gitlabUsername = this.model.get('gitlabUsername');
     var twitterUsername = this.model.get('twitterUsername');
-    var username = githubUsername || twitterUsername || this.model.get('username');
+    var username = githubUsername || gitlabUsername || twitterUsername || this.model.get('username');
     data.vendorUsername = username;
     var emailAddress = data.emailAddress;
 

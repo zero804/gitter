@@ -9,7 +9,11 @@ var assert = require('assert');
 describe('user-api', function() {
   var app, request;
 
+  fixtureLoader.ensureIntegrationEnvironment('#oauthTokens');
+
   before(function() {
+    if(this._skipFixtureSetup) return;
+
     request = require("supertest-as-promised")(Promise);
     app = require('../../server/api');
   });

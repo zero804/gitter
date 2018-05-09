@@ -44,7 +44,8 @@ var opts = require('yargs')
   .option('username', {
     alias: 'u',
     required: true,
-    description: 'User to check permissions on behalf of'
+    description: 'User to check permissions on behalf of',
+    string: true
   })
   .option('uri', {
     alias: 'g',

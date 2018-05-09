@@ -47,8 +47,9 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
     data.allowRemove = this.options.allowRemove;
 
     var githubUsername = data.githubUsername;
+    var gitlabUsername = data.gitlabUsername;
     var twitterUsername = data.twitterUsername;
-    var username = githubUsername || twitterUsername || data.username;
+    var username = githubUsername || gitlabUsername || twitterUsername || data.username;
     data.vendorUsername = username;
 
     data.absoluteUri = urlJoin(clientEnv.basePath, username);

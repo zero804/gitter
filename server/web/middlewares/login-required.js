@@ -6,6 +6,7 @@ var url = require('url');
 var debug = require('debug')('gitter:infra:login-required-middleware');
 
 var validAuthProviders = {
+  gitlab: true,
   github: true,
   google: true,
   linkedin: true,

@@ -81,7 +81,10 @@
       "cubeUrl": "ws://cube.prod.gitter:1080"
     },
     "intercom": {
-      "enabled" : true
+      "enabled" : false
+    },
+    "mixpanel": {
+      "enabled": false
     },
     "ga": {
       "enabled": true

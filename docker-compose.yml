@@ -8,71 +8,11 @@ redis1:
     - "6379:6379"
   entrypoint: [ "/usr/local/bin/redis-server", "--bind", "0.0.0.0", "--port", "6379", "--maxclients", "200", "--dir", "/tmp", "--save", ""]
 
-redis2:
-  image: redis:3.0.3
-  restart: always
-  ports:
-    - "6380:6380"
-  links:
-    - redis1
-  extra_hosts:
-     - gitter-redis-dev:${DOCKER_HOST_IP}
-  entrypoint: [ "/usr/local/bin/redis-server", "--bind", "0.0.0.0",  "--port", "6380", "--slaveof", "gitter-redis-dev", "6379", "--maxclients", "200", "--dir", "/tmp", "--save", ""]
-
-sentinel1:
-  image: redis:3.0.3
-  restart: 'on-failure:5'
-  links:
-    - redis1
-    - redis2
-  ports:
-    - "26379:26379"
-  extra_hosts:
-     - gitter-redis-dev:${DOCKER_HOST_IP}
-  entrypoint: [ "/bin/bash", "-c", "echo 'sentinel monitor gitter-master-dev gitter-redis-dev 6379 1' > /redis-sentinel.conf && exec /usr/local/bin/redis-server /redis-sentinel.conf --sentinel --bind 0.0.0.0 --maxclients 200"]
-
-#
-# Mongo
-#
-mongo2:
-  image: mongo:3.2
-  restart: always
-  entrypoint: [ "/usr/bin/mongod", "--replSet", "troupeSet", "--journal", "--smallfiles", "--storageEngine=wiredTiger", "--oplogSize=20", "--port=27018" ]
-  ports:
-    - "27018:27018"
-
-mongo3:
-  image: mongo:3.2
-  restart: always
-  entrypoint: [ "/usr/bin/mongod", "--replSet", "troupeSet", "--journal", "--smallfiles", "--storageEngine=wiredTiger", "--oplogSize=20", "--port=27019" ]
-  ports:
-    - "27019:27019"
-
 mongo1:
-  image: mongo:3.2
+  image: registry.gitlab.com/gitlab-org/gitter/webapp/mongo:latest
   restart: always
-  entrypoint: [ "/usr/bin/mongod", "--replSet", "troupeSet", "--journal", "--smallfiles", "--storageEngine=wiredTiger", "--oplogSize=20" ]
   ports:
     - "27017:27017"
-  links:
-    - mongo2
-    - mongo3
-
-mongosetup:
-  image: mongo:3.2
-  restart: 'no'
-  links:
-    - mongo1
-    - mongo2
-    - mongo3
-  volumes:
-   - ${WORKSPACE}:/src
-  environment:
-    ANNOUNCE_MONGO1_HOST: ${DOCKER_HOST_IP}
-    ANNOUNCE_MONGO2_HOST: ${DOCKER_HOST_IP}
-    ANNOUNCE_MONGO3_HOST: ${DOCKER_HOST_IP}
-  working_dir: /src
-  entrypoint: [ "/src/scripts/docker/mongo/mongo-setup.sh" ]
 
 neo4j:
   image: neo4j:2.3
@@ -85,30 +25,9 @@ neo4j:
 # The official elasticsearch:1.4.2 image with mapper-attachments and river-mongodb plugins
 # https://github.com/soldotno/elasticsearch-river-mongodb/blob/master/Dockerfile
 elasticsearch:
-  image: elasticsearch:1.4.2
+  image: registry.gitlab.com/gitlab-org/gitter/webapp/elasticsearch:latest
   ports:
     - "9200:9200"
     - "9300:9300"
   links:
     - mongo1
-    - mongo2
-    - mongo3
-  volumes:
-   - ${WORKSPACE}:/src
-  environment:
-    ANNOUNCE_ES_HOST: ${DOCKER_HOST_IP}
-  working_dir: /src
-  entrypoint: [ "/src/scripts/docker/es/start-elasticsearch.sh" ]
-
-elasticsearchsetup:
-  image: elasticsearch:1.4.2
-  restart: 'no'
-  links:
-    - mongo1
-    - mongo2
-    - mongo3
-    - elasticsearch:elasticsearch
-  volumes:
-   - ${WORKSPACE}:/src
-  working_dir: /src
-  entrypoint: [ "/src/scripts/docker/es/setup-elasticsearch.sh" ]

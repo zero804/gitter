@@ -9,12 +9,14 @@ var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 describe('avatar-api', function() {
   var app, request;
 
+  fixtureLoader.ensureIntegrationEnvironment('GITTER_INTEGRATION_USERNAME','#oauthTokens');
+
   before(function() {
+    if(this._skipFixtureSetup) return;
+
     request = require("supertest-as-promised")(Promise);
     app = require('../../server/api');
   });
-
-  fixtureLoader.ensureIntegrationEnvironment('GITTER_INTEGRATION_USERNAME');
 
   var fixture = fixtureLoader.setup({
     deleteDocuments: {
@@ -139,5 +141,6 @@ describe('avatar-api', function() {
       });
     });
   });
+
 
 });

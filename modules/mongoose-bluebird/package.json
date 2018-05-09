@@ -8,7 +8,7 @@
   },
   "private": true,
   "dependencies": {
-    "bluebird": "^3.2.1",
-    "mongoose": "~4.10.0"
+    "bluebird": "^3.5.1",
+    "mongoose": "^4.6.8"
   }
 }

@@ -11,7 +11,8 @@ var opts = require('yargs')
   .option('username', {
     alias: 'u',
     required: true,
-    description: 'Username to add staff status'
+    description: 'Username to add staff status',
+    string: true
   })
   .option('remove', {
     alias: 'r',

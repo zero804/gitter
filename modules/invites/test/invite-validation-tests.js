@@ -53,6 +53,14 @@ describe('parseAndValidateInput', function() {
     it("should return the default avatar if it isn't a github username or email address", function() {
       assert.strictEqual(getAvatar('twitter', '__leroux'), 'getDefault()');
     });
+
+    it('should return a gravatar for an email address', function() {
+      assert.strictEqual(getAvatar('gitlab', 'MadLittleMods', 'contact@ericeastwood.com'), "getForGravatarEmail('contact@ericeastwood.com')");
+    });
+
+    it("should return the default avatar if it isn't a github username or email address", function() {
+      assert.strictEqual(getAvatar('gitlab', 'MadLittleMods'), 'getDefault()');
+    });
   });
 
   describe('parseAndValidateInput', function() {
@@ -131,6 +139,24 @@ describe('parseAndValidateInput', function() {
           emailAddress: 'lerouxb@gmail.com'
         });
       });
+
+      it('should return type gitlab if gitlabUsername was passed in', function() {
+        var result = parseAndValidateInput({gitlabUsername: 'MadLittleMods'});
+        assert.deepStrictEqual(result, {
+          type: 'gitlab',
+          externalId: 'MadLittleMods',
+          emailAddress: undefined
+        });
+      });
+
+      it('should return the email address if one was passed in with a username', function() {
+        var result = parseAndValidateInput({gitlabUsername: 'MadLittleMods', email: 'contact@ericeastwood.com'});
+        assert.deepStrictEqual(result, {
+          type: 'gitlab',
+          externalId: 'MadLittleMods',
+          emailAddress: 'contact@ericeastwood.com'
+        });
+      });
     });
 
     describe('new method', function() {
@@ -143,6 +169,15 @@ describe('parseAndValidateInput', function() {
         });
       });
 
+      it('should parse github invites', function() {
+        var invite = parseAndValidateInput({ type: 'github', externalId: 'suprememoocow' });
+        assert.deepEqual(invite, {
+          emailAddress: undefined,
+          externalId: "suprememoocow",
+          type: 'github'
+        });
+      });
+
       it('should parse twitter invites', function() {
         var invite = parseAndValidateInput({ type: 'twitter', externalId: 'suprememoocow' });
         assert.deepEqual(invite, {
@@ -152,12 +187,12 @@ describe('parseAndValidateInput', function() {
         });
       });
 
-      it('should parse github invites', function() {
-        var invite = parseAndValidateInput({ type: 'github', externalId: 'suprememoocow' });
+      it('should parse gitlab invites', function() {
+        var invite = parseAndValidateInput({ type: 'gitlab', externalId: 'MadLittleMods' });
         assert.deepEqual(invite, {
           emailAddress: undefined,
-          externalId: "suprememoocow",
-          type: 'github'
+          externalId: 'MadLittleMods',
+          type: 'gitlab'
         });
       });
 

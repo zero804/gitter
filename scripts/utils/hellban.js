@@ -10,7 +10,8 @@ var opts = require('yargs')
   .option('username', shimPositionOption({
     position: 0,
     required: true,
-    description: 'username to hellban e.g trevorah'
+    description: 'username to hellban e.g trevorah',
+    string: true
   }))
  .option('unban', {
     alias: 'u',

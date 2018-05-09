@@ -38,8 +38,6 @@ var View = Marionette.ItemView.extend({
       action: this.action,
       source: this.source,
       returnTo: this.returnTo,
-      // TODO: remove this and just show it anyway
-      showTwitter: true
     }
   }
 });

@@ -23,7 +23,11 @@ function isGitHubUser(user) {
 
 function convertToIssueAnchor(element, githubIssueUrl) {
   var resultantElement = element;
-  if(element.tagName !== 'a') {
+  if(
+    element.tagName !== 'a' &&
+    // Protect against Safari-backed desktop app somehow isolating the node and removing the parent
+    element.parentNode
+  ) {
     var newElement = document.createElement('a');
     newElement.innerHTML = element.innerHTML;
     element.parentNode.replaceChild(newElement, element);

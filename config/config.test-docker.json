@@ -3,13 +3,10 @@
     "onlyUsePrimary": true,
     "connection": {
       "hosts": [
-        "mongo1:27017",
-        "mongo2:27017"
+        "registry.gitlab.com-gitlab-org-gitter-webapp-mongo:27017"
       ],
       "database": "gitter",
       "options": {
-        "replicaSet": "troupeSet",
-        "w": 1
       }
     },
     "profileSlowQueries": true,
@@ -33,18 +30,22 @@
   "irc": {
     "clientKey": "irc-dev"
   },
-  "redis": "redis-sentinel://sentinel1:26379?db=1&master=gitter-master-dev",
-  "redis_nopersist": "redis-sentinel://sentinel1:26379?db=1&master=gitter-master-dev",
-  "redis_caching": "redis-sentinel://sentinel1:26379?master=gitter-master-dev",
+  "redis": "redis://redis?db=1",
+  "redis_nopersist": "redis://redis?db=1",
+  "redis_caching": "redis://redis",
   "elasticsearch": {
     "comment": "Override with GITTER_ES_ENDPOINT (comma separated)",
     "hosts": [
-      "http://elasticsearch:9200"
+      "http://registry.gitlab.com-gitlab-org-gitter-webapp-elasticsearch:9200"
     ]
   },
   "test": {
     "exposeInBrowserTests": true,
     "exposeDataForTestingPurposes": true
+  },
+  "gitlaboauth": {
+    "consumer_key": "",
+    "consumer_secret": ""
   },
   "twitteroauth": {
     "consumer_key": "",
@@ -90,5 +91,8 @@
     "avatars": {
       "bucket": ""
     }
+  },
+  "tokens": {
+    "anonymousPassword": "abc123"
   }
 }

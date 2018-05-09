@@ -14,6 +14,7 @@ var oauth2 = require('../web/oauth2');
 var ensureLoggedIn = require('../web/middlewares/ensure-logged-in');
 var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-srcset');
 
+var gitlab = require('./auth-providers/gitlab');
 var github = require('./auth-providers/github');
 var google = require('./auth-providers/google');
 var twitter = require('./auth-providers/twitter');
@@ -63,6 +64,16 @@ router.get('/failed',
     });
   });
 
+
+router.get('/token-revoked',
+  identifyRoute('token-revoked'),
+  function(req, res) {
+    res.status(401);
+    res.render('token-revoked', {
+      appsLink: config.get('web:basepath') + '/apps'
+    });
+  });
+
 // ----------------------------------------------------------
 // GitHub
 // ----------------------------------------------------------
@@ -77,6 +88,13 @@ router.get('/upgrade', github.upgrade);
 ['/github/callback', '/callback'].forEach(function(path) {
   router.get(path, github.callback);
 });
+
+// ----------------------------------------------------------
+// GitLab
+// ----------------------------------------------------------
+
+router.get('/gitlab', gitlab.login);
+router.get('/gitlab/callback', gitlab.callback);
 
 // ----------------------------------------------------------
 // Google

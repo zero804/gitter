@@ -166,6 +166,7 @@ module.exports = {
   findPrimaryIdentityForUser: Promise.method(findPrimaryIdentityForUser),
 
   GITHUB_IDENTITY_PROVIDER: 'github',
+  GITLAB_IDENTITY_PROVIDER: 'gitlab',
   GOOGLE_IDENTITY_PROVIDER: 'google',
   TWITTER_IDENTITY_PROVIDER: 'twitter',
   LINKEDIN_IDENTITY_PROVIDER: 'linkedin',

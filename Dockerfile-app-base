@@ -1,0 +1,11 @@
+FROM registry.gitlab.com/gitlab-org/gitter/webapp:latest
+
+WORKDIR /app
+
+COPY output/app.tar.gz /tmp/app.tar.gz
+
+RUN tar -xvzf /tmp/app.tar.gz -C /app && \
+    rm -rf node_modules npm-shrinkwrap.json package-lock.json && \
+    npm install --production
+
+RUN rm -rf /tmp/* /npm_cache /var/cache/apk/* /root/.npm /root/.node-gyp /root/.gnupg /root/.ssh 2>/dev/null

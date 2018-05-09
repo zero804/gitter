@@ -3,6 +3,8 @@
 var path = require('path');
 var ProgressBarPlugin = require('progress-bar-webpack-plugin');
 
+var getPostcssStack = require('@gitterhq/styleguide/postcss-stack');
+
 var opts = require('yargs')
   .option('nocoverage', {
     type: 'boolean',
@@ -74,6 +76,9 @@ module.exports = {
       'filtered-collection': path.resolve(__dirname, '../../public/repo/filtered-collection/filtered-collection.js'),
       'gitter-client-env': path.resolve(__dirname, './fixtures/helpers/gitter-client-env.js'),
     },
+  },
+  postcss: function(webpack) {
+    return getPostcssStack(webpack);
   },
   node: {
     fs: 'empty',

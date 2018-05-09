@@ -4,6 +4,7 @@ var env = require('gitter-web-env');
 var logger = env.logger;
 var nconf = env.config;
 var stats = env.stats;
+var errorReporter = env.errorReporter;
 
 var faye = require('gitter-faye');
 var fayeRedis = require('@gitterhq/faye-redis');
@@ -13,7 +14,6 @@ var shutdown = require('shutdown');
 var zlib = require('zlib');
 var debug = require('debug')('gitter:infra:bayeux');
 var Promise = require('bluebird');
-
 
 /* Disabled after the outage 8 April 2015 XXX investigate further */
 // var createDoormanExtension = require('./doorman');
@@ -163,19 +163,27 @@ faye.stringify = function(object) {
   }
 };
 
-/* TEMPORARY DEBUGGING SOLUTION */
+function errorLogger(msg) {
+  const err = new Error(msg);
+  logger.error('bayeux-cluster-faye: error ' + msg, { exception: err });
+  errorReporter(err, { }, { module: 'bayeux-cluster' });
+}
+
 faye.logger = {
+  // `fatal` does not exist in our logger
+  fatal: errorLogger,
+  error: errorLogger,
+  warn: logger.warn
 };
 
-var logLevels = ['fatal', 'error', 'warn'];
-if(fayeLoggingLevel === 'info' || fayeLoggingLevel === 'debug') logLevels.push('info');
+if(fayeLoggingLevel === 'info' || fayeLoggingLevel === 'debug') {
+  faye.logger.info = logger.info;
+}
 
-logLevels.forEach(function(level) {
-  faye.logger[level] = function(msg) { logger[level]('faye: ' + msg.substring(0,180)); };
-});
-
-if(debug.enabled && fayeLoggingLevel === 'debug') {
-  faye.logger.debug = function(msg) { debug("faye: %s", msg); };
+if(fayeLoggingLevel === 'debug') {
+  faye.logger.debug = (msg) => {
+    debug("bayeux-cluster-faye: %s", msg);
+  };
 }
 
 function BayeuxCluster(lightweight) {

@@ -78,38 +78,38 @@ module.exports = bayeuxExtension({
 
     statsd.increment('bayeux.handshake.attempt', 1, 0.25, tags);
 
-    oauth.validateAccessTokenAndClient(ext.token, function(err, tokenInfo) {
-      if(err) return callback(err);
+    oauth.validateAccessTokenAndClient(ext.token)
+      .then(function(tokenInfo) {
+        if(!tokenInfo) {
+          return callback(new StatusError(401, "Invalid access token"));
+        }
 
-      if(!tokenInfo) {
-        return callback(new StatusError(401, "Invalid access token"));
-      }
+        var user = tokenInfo.user;
+        var oauthClient = tokenInfo.client;
+        var userId = user && user.id;
 
-      var user = tokenInfo.user;
-      var oauthClient = tokenInfo.client;
-      var userId = user && user.id;
+        if(user && oauthClient) {
+          clientUsageStats.record(user, oauthClient);
+        }
 
-      if(user && oauthClient) {
-        clientUsageStats.record(user, oauthClient);
-      }
+        debug('bayeux: handshake. appVersion=%s, username=%s, client=%s', ext.appVersion, user && user.username, oauthClient.name);
 
-      debug('bayeux: handshake. appVersion=%s, username=%s, client=%s', ext.appVersion, user && user.username, oauthClient.name);
+        var connectionType = getConnectionType(ext.connType);
 
-      var connectionType = getConnectionType(ext.connType);
+        message._private.authenticator = {
+          userId: userId,
+          connectionType: connectionType,
+          client: ext.client,
+          troupeId: ext.troupeId,
+          oauthClientId: oauthClient.id,
+          uniqueClientId: ext.uniqueClientId,
+          realtimeLibrary: ext.realtimeLibrary,
+          eyeballState: parseInt(ext.eyeballs, 10) || 0
+        };
 
-      message._private.authenticator = {
-        userId: userId,
-        connectionType: connectionType,
-        client: ext.client,
-        troupeId: ext.troupeId,
-        oauthClientId: oauthClient.id,
-        uniqueClientId: ext.uniqueClientId,
-        realtimeLibrary: ext.realtimeLibrary,
-        eyeballState: parseInt(ext.eyeballs, 10) || 0
-      };
-
-      return callback(null, message);
-    });
+        return message;
+      })
+      .asCallback(callback);
 
   },
 

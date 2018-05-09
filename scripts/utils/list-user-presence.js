@@ -13,7 +13,8 @@ var shutdown = require('shutdown');
 var opts = require('yargs')
   .option('username', {
     required: true,
-    description: "username of user to list presence for"
+    description: "username of user to list presence for",
+    string: true
   })
   .help('help')
   .alias('help', 'h')

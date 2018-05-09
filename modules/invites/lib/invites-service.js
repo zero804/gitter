@@ -41,6 +41,7 @@ function findExistingUser(type, externalId) {
       return findExistingGitterUser(externalId);
 
     // TODO: twitter?
+    // TODO: gitlab?
   }
 
   return findExistingIdentityUsername(type, externalId);

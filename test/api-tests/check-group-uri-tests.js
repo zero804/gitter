@@ -8,7 +8,11 @@ var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 describe('check-group-uri #slow', function() {
   var app, request;
 
+  fixtureLoader.ensureIntegrationEnvironment('#oauthTokens');
+
   before(function() {
+    if(this._skipFixtureSetup) return;
+
     request = require("supertest-as-promised")(Promise);
     app = require('../../server/api');
   });

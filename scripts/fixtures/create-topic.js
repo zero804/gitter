@@ -10,7 +10,8 @@ var categoryService = require('gitter-web-topics/lib/forum-category-service');
 var opts = yargs
   .option('username', {
     required: true,
-    description: 'username of the user that should perform the action'
+    description: 'username of the user that should perform the action',
+    string: true
   })
   .option('group', {
     required: true,

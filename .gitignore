@@ -4,7 +4,7 @@ node_modules_temp
 .DS_Store
 .com.apple.timemachine.supported
 /.project
-/npm-debug.log
+/npm-debug.log*
 /nodemon.log
 /.externalToolBuilders
 /.settings
@@ -20,15 +20,12 @@ scripts/mongo-backup-*
 public-processed/
 scripts/dataupgrades/004-reverse-geocoder/data
 output
-test/end-to-end/casper/*.png
 mongo-backup-*/
 GIT_COMMIT
 VERSION
 git_hooks/*.sample
 ghostdriver.log
 finished.png
-chromedriver
-chromedriver.log
 coverage
 output/coverage.html
 cobertura-coverage.xml
@@ -36,8 +33,6 @@ html-report
 *.pyc
 .ackrc
 /deployment/config/roles/geckoconnector/files/opt/geckoconnector/node_modules
-test/end-to-end/ios/ios-driver.log
-test/end-to-end/ios/ios-driver.log.lck
 v8.log
 *.swp
 *.swo
@@ -113,3 +108,4 @@ modules/topic-notifications/test/topic.html
 /scripts/useful-queries/*.png
 node_modules_2
 config/overrides
+.env

@@ -11,7 +11,7 @@
   },
   "private": true,
   "dependencies": {
-    "bluebird": "^3.2.1",
+    "bluebird": "^3.5.1",
     "debug": "^2.2.0",
     "gitter-web-backend-muxer": "file:../backend-muxer",
     "gitter-web-env": "file:../env",
@@ -22,7 +22,7 @@
     "gitter-web-topic-serialization": "file:../topic-serialization",
     "lodash": "^3.2.0",
     "moment": "^2.10.3",
-    "mongodb": "~2.2.19",
+    "mongodb": "^2.2.35",
     "rx": "^4.1.0",
     "rx-node": "^1.0.2"
   },

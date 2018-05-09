@@ -1,6 +1,7 @@
 'use strict';
 
 var providerMap = {
+  'gitlab': 'GitLab',
   'github': 'GitHub',
   'twitter': 'Twitter',
   'linkedin': 'LinkedIn',

@@ -93,6 +93,9 @@ gulp.task('css:compile:desktop', function() {
 });
 
 gulp.task('css:watch', function() {
+  cssWebStyleBuilder.build();
+  cssMobileStyleBuilder.build();
+
   cssMobileStyleBuilder.startWatching();
   cssWebStyleBuilder.startWatching();
 });

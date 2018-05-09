@@ -1,8 +1,16 @@
 'use strict';
 
-var oauthService = require('../../services/oauth-service');
 var env = require('gitter-web-env');
 var logger = env.logger;
+var StatusError = require('statuserror');
+var escapeStringRegexp = require('escape-string-regexp');
+var unauthorizedRedirectMap = require('../../utils/unauthorized-redirect-map');
+var oauthService = require('../../services/oauth-service');
+
+var unauthorizedUrlRedirectRegexList = Object.keys(unauthorizedRedirectMap).map((redirectKey) => {
+  const redirectUrl = unauthorizedRedirectMap[redirectKey];
+  return new RegExp(`${escapeStringRegexp(redirectUrl)}(\\/(\\?.*)?)?$`);
+});
 
 function getAccessToken(req) {
 
@@ -18,7 +26,7 @@ function getAccessToken(req) {
 
     var parts = authHeader.split(' ');
 
-    if (parts.length == 2) {
+    if (parts.length === 2) {
       var scheme = parts[0];
 
       if (/Bearer/i.test(scheme)) {
@@ -43,21 +51,28 @@ function getAccessToken(req) {
   }
 
 }
+
 /**
  *
  */
 module.exports = function(req, res, next) {
   /* No access token? Continue! */
   var accessToken = getAccessToken(req);
-  if(!accessToken) return next();
+
+  // Avoid a redirect loop even when someone is forcing a token via
+  // `?access_token=xxxtoken` query parameter or `Authorization: bearer xxxtoken` header
+  var alreadyOnUnauthorizedUrl = unauthorizedUrlRedirectRegexList.some((unauthorizedRe) => {
+    return req.url.match(unauthorizedRe);
+  });
+  if(!accessToken || alreadyOnUnauthorizedUrl) return next();
 
   return oauthService.validateAccessTokenAndClient(accessToken)
     .then(function(tokenInfo) {
       // Token not found
-      if(!tokenInfo) return next(401);
+      if(!tokenInfo) return next(new StatusError(401, 'Token not found'));
 
       // Anonymous tokens cannot be used for Bearer tokens
-      if(!tokenInfo.user) return next(401);
+      if(!tokenInfo.user) return next(new StatusError(401, 'Anonymous tokens cannot be used for Bearer tokens'));
 
       var user = tokenInfo.user;
       var client = tokenInfo.client;
