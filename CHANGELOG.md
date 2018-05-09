@@ -39,3 +39,4 @@ Developer facing:
  - Update `scripts/utils/rename-group.js` to account for `homeUri`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1133
     - Rename `scripts/utils/rename-org.js` -> `scripts/utils/rename-group.js` to better represent our current naming for communties internally
  - Update to `bluebird@3.5.1`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1139
+ - Update to `@gitterhq/env@0.36.0` to fix Sentry sending errors, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1148
