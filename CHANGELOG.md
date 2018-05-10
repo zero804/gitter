@@ -1,3 +1,12 @@
+# *upcoming*
+
+ - ...
+
+Developer facing:
+
+ - Update `scripts/utils/auto-remove-from-room.js` to be robust against a room not existing, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1153
+
+
 ## 19.0.2
 
  - Fix new messages with mentions not appearing in chat list, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1151
