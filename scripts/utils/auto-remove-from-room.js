@@ -26,9 +26,15 @@ var opts = require('yargs')
   .option('members', {
     description: 'Minimum number of members in the room'
   })
+  .option('quiet', {
+    type: 'boolean',
+    description: 'Disables printing of the users removed',
+    default: false
+  })
   .option('dryRun', {
     type: 'boolean',
-    description: 'Just show the users who will be affected'
+    description: 'Just show the users who will be affected',
+    default: false
   })
   .help('help')
   .alias('help', 'h')
@@ -51,9 +57,9 @@ var total = 0;
 
 function handleRoom(troupe) {
   return (opts.dryRun ?
-            autoRemovalService.findRemovalCandidates(troupe.id, { minTimeInDays: minTimeInDays }) :
-            autoRemovalService.autoRemoveInactiveUsers(troupe.id, troupe.groupId, { minTimeInDays: minTimeInDays })
-            )
+    autoRemovalService.findRemovalCandidates(troupe.id, { minTimeInDays: minTimeInDays }) :
+    autoRemovalService.autoRemoveInactiveUsers(troupe.id, troupe.groupId, { minTimeInDays: minTimeInDays })
+  )
     .then(function(candidates) {
       var userIds = candidates.map(function(c) { return c.userId; });
       return [candidates, userService.findByIds(userIds)];
@@ -80,14 +86,22 @@ function handleRoom(troupe) {
         c.lastAccess = c.lastAccessTime && moment(c.lastAccessTime).format('YYYY/MM/DD HH:mm');
       });
 
-      console.log(cliff.stringifyObjectRows(candidates, ['userId', 'username', 'lastAccess'])); // eslint-disable-line
-
-        });
+      if(!opts.quiet) {
+        console.log(cliff.stringifyObjectRows(candidates, ['userId', 'username', 'lastAccess'])); // eslint-disable-line
+      }
+    });
 }
 
 function handleSingleRoom() {
   return troupeService.findByUri(opts.room)
-    .then(handleRoom);
+    .then((troupe) => {
+      if(!troupe) {
+        console.warn(`${opts.room} room passed does not exist! Skipping ${opts.room} room`);
+        return Promise.resolve();
+      }
+
+      return handleRoom(troupe)
+    });
 }
 
 function handleMultipleRooms() {
