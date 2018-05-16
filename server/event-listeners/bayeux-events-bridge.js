@@ -81,6 +81,17 @@ exports.install = function() {
     }
   });
 
+  appEvents.onTokenRevoked(function(data) {
+    var token = data.token;
+    var url = "/api/v1/token/" + token;
+    var message = {
+      notification: "token_revoked"
+    };
+    debug("Token revoked on %s: %j", url, message);
+
+    publish(url, message, 'tokenRevoked');
+  });
+
   appEvents.onUserRemovedFromTroupe(function(options) {
     var userId = options.userId;
     var troupeId = options.troupeId;

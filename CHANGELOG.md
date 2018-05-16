@@ -1,6 +1,6 @@
 # *upcoming*
 
- - ...
+ - Logout user when token revoked in realtime, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1155
 
 Developer facing:
 
