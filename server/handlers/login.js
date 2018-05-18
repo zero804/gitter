@@ -74,6 +74,15 @@ router.get('/token-revoked',
     });
   });
 
+router.get('/user-agent-revoked',
+  identifyRoute('user-agent-revoked'),
+  function(req, res) {
+    res.status(401);
+    res.render('user-agent-revoked', {
+      appsLink: config.get('web:basepath') + '/apps'
+    });
+  });
+
 // ----------------------------------------------------------
 // GitHub
 // ----------------------------------------------------------

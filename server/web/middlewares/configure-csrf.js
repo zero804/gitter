@@ -1,10 +1,10 @@
 'use strict';
 
-var Promise = require('bluebird');
 var env = require('gitter-web-env');
 var stats = env.stats;
 var debug = require('debug')('gitter:infra:configure-csrf');
 var oauthService = require('../../services/oauth-service');
+var validateUserAgentFromReq = require('../validate-user-agent-from-req');
 
 function setAccessToken(req, userId, accessToken) {
   if(req.session) {
@@ -46,39 +46,40 @@ module.exports = function(req, res, next) {
       });
   }
 
-  /* OAuth clients have req.authInfo. Propogate their access token to their entire session
-   * so that all related web-requests are made by the same client
-   */
-  if(req.authInfo && req.authInfo.accessToken) {
-    debug('csrf: Using OAuth access token');
-    setAccessToken(req, userId, req.authInfo.accessToken);
-    return next();
-  }
+  return validateUserAgentFromReq(req)
+    .then(() => {
+      /* OAuth clients have req.authInfo. Propogate their access token to their entire session
+       * so that all related web-requests are made by the same client
+       */
+      if(req.authInfo && req.authInfo.accessToken) {
+        debug('csrf: Using OAuth access token');
+        setAccessToken(req, userId, req.authInfo.accessToken);
+        return;
+      }
 
-  var sessionAccessToken = getSessionAccessToken(req, userId);
-  if(sessionAccessToken) {
-    return oauthService.validateAccessTokenAndClient(sessionAccessToken)
-      .then(function(tokenInfo) {
-        if(!tokenInfo) {
-          return generateAccessToken();
-        }
+      var sessionAccessToken = getSessionAccessToken(req, userId);
+      if(sessionAccessToken) {
+        return oauthService.validateAccessTokenAndClient(sessionAccessToken)
+          .then(function(tokenInfo) {
+            if(!tokenInfo) {
+              return generateAccessToken();
+            }
 
-        req.accessToken = sessionAccessToken;
-      })
-      .catch(function(err) {
-        // We shouldn't try to regenerate something that was revoked
-        if(err.clientRevoked) {
-          throw err;
-        }
+            req.accessToken = sessionAccessToken;
+          })
+          .catch(function(err) {
+            // We shouldn't try to regenerate something that was revoked
+            if(err.clientRevoked) {
+              throw err;
+            }
 
-        debug('csrf: OAuth access token validation failed: %j', err);
-        // Refresh anonymous tokens
-        return generateAccessToken();
-      })
-      .nodeify(next);
-  }
+            debug('csrf: OAuth access token validation failed: %j', err);
+            // Refresh anonymous tokens
+            return generateAccessToken();
+          })
+      }
 
-  return generateAccessToken()
-    .nodeify(next);
-
+      return generateAccessToken();
+    })
+    .asCallback(next);
 };

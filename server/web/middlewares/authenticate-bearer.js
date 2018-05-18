@@ -3,14 +3,9 @@
 var env = require('gitter-web-env');
 var logger = env.logger;
 var StatusError = require('statuserror');
-var escapeStringRegexp = require('escape-string-regexp');
-var unauthorizedRedirectMap = require('../../utils/unauthorized-redirect-map');
 var oauthService = require('../../services/oauth-service');
-
-var unauthorizedUrlRedirectRegexList = Object.keys(unauthorizedRedirectMap).map((redirectKey) => {
-  const redirectUrl = unauthorizedRedirectMap[redirectKey];
-  return new RegExp(`${escapeStringRegexp(redirectUrl)}(\\/(\\?.*)?)?$`);
-});
+var validateUserAgentFromReq = require('../validate-user-agent-from-req');
+var checkAlreadyOnUnauthorizedUrl = require('../../utils/check-already-on-unauthorized-url');
 
 function getAccessToken(req) {
 
@@ -61,12 +56,11 @@ module.exports = function(req, res, next) {
 
   // Avoid a redirect loop even when someone is forcing a token via
   // `?access_token=xxxtoken` query parameter or `Authorization: bearer xxxtoken` header
-  var alreadyOnUnauthorizedUrl = unauthorizedUrlRedirectRegexList.some((unauthorizedRe) => {
-    return req.url.match(unauthorizedRe);
-  });
+  var alreadyOnUnauthorizedUrl = checkAlreadyOnUnauthorizedUrl(req.url);
   if(!accessToken || alreadyOnUnauthorizedUrl) return next();
 
-  return oauthService.validateAccessTokenAndClient(accessToken)
+  validateUserAgentFromReq(req)
+    .then(() => oauthService.validateAccessTokenAndClient(accessToken))
     .then(function(tokenInfo) {
       // Token not found
       if(!tokenInfo) return next(new StatusError(401, 'Token not found'));

@@ -45,6 +45,12 @@ module.exports = function(err, req, res, next) { // eslint-disable-line no-unuse
           return res.redirect(unauthorizedRedirectMap.TOKEN_REVOKED_URL);
         });
     }
+    else if (err.revokedUserAgent) {
+      return logout(req, res)
+        .then(() => {
+          return res.redirect(unauthorizedRedirectMap.USER_AGENT_REVOKED_URL);
+        });
+    }
     else if(!req.user && req.session) {
       req.session.returnTo = returnUrl;
       return res.redirect(unauthorizedRedirectMap.LOGIN_URL);
