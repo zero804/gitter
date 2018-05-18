@@ -83,6 +83,12 @@ function generatePassword() {
     canSkipAuthorization: true
   },
   {
+    clientKey: 'osx-desktop-prod',
+    name: 'Gitter OSX Desktop App',
+    tag: 'windows-desktop',
+    registeredRedirectUri: 'app://gitter/oauth.html'
+  },
+  {
     clientKey: 'windows-desktop-prod',
     name: 'Gitter Windows Desktop App',
     tag: 'windows-desktop',
@@ -93,6 +99,24 @@ function generatePassword() {
     name: 'Gitter Linux Desktop App',
     tag: 'linux-desktop',
     registeredRedirectUri: 'app://gitter/oauth.html'
+  },
+  {
+    clientKey: 'osx-desktop-prod-v4',
+    name: 'Gitter macOS Desktop App',
+    tag: 'windows-desktop',
+    registeredRedirectUri: 'https://gitter.im/login/desktop/callback'
+  },
+  {
+    clientKey: 'windows-desktop-prod-v4',
+    name: 'Gitter Windows Desktop App',
+    tag: 'windows-desktop',
+    registeredRedirectUri: 'https://gitter.im/login/desktop/callback'
+  },
+  {
+    clientKey: 'linux-desktop-prod-v4',
+    name: 'Gitter Linux Desktop App',
+    tag: 'linux-desktop',
+    registeredRedirectUri: 'https://gitter.im/login/desktop/callback'
   },
   {
     clientKey: 'irc-dev',
