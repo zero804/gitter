@@ -5,6 +5,7 @@ var env = require('gitter-web-env');
 var nconf = env.config;
 var logger = env.logger;
 
+var appEvents = require('gitter-web-appevents');
 var persistenceService = require('gitter-web-persistence');
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
@@ -92,9 +93,16 @@ function validateAccessTokenAndClient(token) {
           }
           else if(client.revoked) {
             logger.warn('Token can not be accepted (client has been revoked): ', { token: token, clientId: clientId });
-            var e = new StatusError(401);
-            e.clientRevoked = true;
-            throw e;
+
+            // Sends a message to the websockets
+            appEvents.tokenRevoked({
+              userId: userId,
+              token: token
+            });
+
+            var err = new StatusError(401);
+            err.clientRevoked = true;
+            throw err;
           }
 
 

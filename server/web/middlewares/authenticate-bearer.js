@@ -84,6 +84,8 @@ module.exports = function(req, res, next) {
         next();
         return null;
       });
+
+      return null;
     })
     .catch(next);
 

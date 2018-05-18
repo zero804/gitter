@@ -12,20 +12,26 @@ function navigate(href) {
   }
 }
 
-function logout() {
+function logout(forcedRedirect) {
   return Promise.all([
       apiClient.web.post('/logout'),
       serviceWorkerDeregistation.uninstall()
     ])
     .spread(function(response) {
-      if(response && response.redirect) {
+      if(forcedRedirect) {
+        navigate(forcedRedirect);
+      } else if(response && response.redirect) {
         navigate(response.redirect);
       } else {
         navigate('/');
       }
     })
     .catch(function() {
-      navigate('/');
+      if(forcedRedirect) {
+        navigate(forcedRedirect);
+      } else {
+        navigate('/');
+      }
     });
 }
 

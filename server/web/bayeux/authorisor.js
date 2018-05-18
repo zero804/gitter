@@ -16,6 +16,7 @@ var debug = require('debug')('gitter:app:bayeux-authorisor');
 var recentRoomService = require('../../services/recent-room-service');
 var topicService = require('gitter-web-topics/lib/topic-service');
 var replyService = require('gitter-web-topics/lib/reply-service');
+var tokenProvider = require('../../services/tokens');
 
 var survivalMode = !!process.env.SURVIVAL_MODE || false;
 
@@ -64,6 +65,9 @@ var routes = [{
   }, {
     re: /^\/api\/v1\/user\/(\w+)$/,
     validator: validateUserForUserSubscription
+  }, {
+    re: /^\/api\/v1\/token\/(\w+)$/,
+    validator: validateTokenForTokenSubscription
   }, {
     re: /^\/api\/v1\/ping(\/\w+)?$/,
     validator: validateUserForPingSubscription
@@ -186,9 +190,25 @@ function validateUserForUserSubscription(options) {
     return Promise.reject(new StatusError(400, 'Invalid ID: ' + userId));
   }
 
-  var result = userId === subscribeUserId;
+  var result = mongoUtils.objectIDsEqual(userId, subscribeUserId);
 
   return Promise.resolve(result);
+}
+
+// This strategy ensures that a user can access a URL under a /token/ URL
+function validateTokenForTokenSubscription(options) {
+  var userId = options.userId;
+  var match = options.match;
+  var subscribedToken = match[1];
+
+  // All /token/ subscriptions need to be authenticated
+  if(!userId) return Promise.resolve(false);
+
+  return tokenProvider.validateToken(subscribedToken)
+    .then((result) => {
+      const tokenUserId = result && result[0];
+      return tokenUserId && mongoUtils.objectIDsEqual(userId, tokenUserId);
+    });
 }
 
 function dataToSnapshot(type) {
