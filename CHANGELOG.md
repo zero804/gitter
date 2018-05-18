@@ -1,10 +1,11 @@
 # *upcoming*
 
- - Logout user when token revoked in realtime, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1155
+ - Sign out user when token revoked in realtime, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1155
 
 Developer facing:
 
  - Update `scripts/utils/auto-remove-from-room.js` to be robust against a room not existing, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1153
+ - Add Gitter desktop app v4 OAuth clients (consider internal Gitter client), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1156
 
 
 ## 19.0.2 - 2018-5-9

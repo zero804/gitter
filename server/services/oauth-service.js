@@ -192,6 +192,9 @@ function clientKeyIsInternal(clientKey) { // eslint-disable-line complexity
     case 'osx-desktop-prod':
     case 'windows-desktop-prod':
     case 'linux-desktop-prod':
+    case 'osx-desktop-prod-v4':
+    case 'windows-desktop-prod-v4':
+    case 'linux-desktop-prod-v4':
     case 'android-prod':
     case 'ios-beta':
     case 'ios-beta-dev':
