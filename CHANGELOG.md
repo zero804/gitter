@@ -1,4 +1,4 @@
-# *upcoming*
+# 19.1.0 - 2018-5-21
 
  - Sign out user when token revoked in realtime, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1155
  - Sign out user when using revoked user-agent, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1157
