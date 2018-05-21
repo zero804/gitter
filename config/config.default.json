@@ -122,6 +122,7 @@
   "chat-service": {
     "get-rough-message-count-cache-timeout": 86400
   },
+  "revokedUserAgents": [],
   "irc": {
   },
   "diagnostics": {
