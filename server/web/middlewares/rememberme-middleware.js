@@ -14,6 +14,7 @@ var debug = require('debug')('gitter:infra:rememberme-middleware');
 var userScopes = require('gitter-web-identity/lib/user-scopes');
 var passportLogin = require('../passport-login');
 var Promise = require('bluebird');
+var validateUserAgentFromReq = require('../validate-user-agent-from-req');
 
 var cookieName = nconf.get('web:cookiePrefix') + 'auth';
 var cookieDomain = nconf.get("web:cookieDomain");
@@ -215,7 +216,8 @@ module.exports = {
     /* If the user is logged in or doesn't have cookies, continue */
     if (req.user || !req.cookies || !req.cookies[cookieName]) return next();
 
-    return processRememberMeToken(req.cookies[cookieName])
+    return validateUserAgentFromReq(req)
+      .then(() => processRememberMeToken(req.cookies[cookieName]))
       .then(function(loginDetails) {
         if (!loginDetails) {
           stats.event("rememberme_rejected");

@@ -24,7 +24,8 @@ describe('authorisor', function() {
       meta: {
         socketExists: true,
         clientId: 'x',
-        userId: '53d8a945451e506ad636c9ba'
+        userId: '53d8a945451e506ad636c9ba',
+        token: 'myToken'
       },
       tests: [{
         name: 'room subscription',
@@ -110,6 +111,17 @@ describe('authorisor', function() {
           subscription: "/api/v1/user/53d8aa12d795e2ab8be23550", // different
           expectedError: true // Access denied
         }
+      }, {
+        name: 'token subscription (own token)',
+        meta: {
+          subscription: "/api/v1/token/myToken"
+        }
+      }, {
+        name: 'token subscription (another users token)',
+        meta: {
+          subscription: "/api/v1/token/anotherUsersToken",
+          expectedError: true // Access denied
+        }
       }]
     },];
 
@@ -175,7 +187,16 @@ describe('authorisor', function() {
           }
         },
         'gitter-web-presence': presenceServiceMock,
-        '../../services/restful': restfulMock
+        '../../services/restful': restfulMock,
+        '../../services/tokens': {
+          validateToken: (token) => {
+            if (token === meta.token) {
+              return Promise.resolve([meta.userId, meta.clientId]);
+            } else {
+              return Promise.resolve(null);
+            }
+          }
+        }
       });
 
       it(name, function(done) {

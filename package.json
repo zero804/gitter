@@ -1,6 +1,6 @@
 {
   "name": "gitter-webapp",
-  "version": "13.4.0",
+  "version": "19.1.0",
   "private": true,
   "dependencies": {
     "@gitterhq/faye-redis": "^0.4.4",
