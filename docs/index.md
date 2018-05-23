@@ -4,7 +4,8 @@
 ## Users
 
  - [FAQ](./faq.md)
- - [Gitter Accounts](./accounts.md)
+ - [Gitter accounts](./accounts.md)
+ - [Mobile apps (Android/iOS)](./mobile-apps.md)
  - [Rooms](./rooms.md)
  - [Communities](./communities.md)
  - [Notifications](./notifications.md)
@@ -14,4 +15,5 @@
 ## Developers
 
  - [Code overview](./code-overview.md)
- - [Getting started with production](./getting-started-production.md)
+ - [Utility scripts](./utility-scripts.md)
+ - [`gitter.im` production infrastructure docs](https://gitlab.com/gl-infra/gitter-infrastructure)
