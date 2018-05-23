@@ -7,6 +7,7 @@ Developer facing:
 
  - Add developer FAQ, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1163
     - First FAQ is on how to configure Gitter so you can access it over your local network on separate devices
+ - Correlate user-agent with OAuth token usage (stats), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1160
 
 
 # 19.1.0 - 2018-5-21
