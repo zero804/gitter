@@ -58,6 +58,8 @@ function getProfileCollection() {
 
   result.add({ name: 'Toggle Dark Theme', stub: '#dark-theme' });
 
+  result.add({ name: 'Terms of Service', stub: 'https://about.gitlab.com/terms/', target: '_blank' });
+
   if(isWebApp) {
     result.add({ name: 'Sign Out', stub: '/logout' });
   }
