@@ -1,7 +1,7 @@
 "use strict";
 
-var unreadItemService = require("../../../services/unread-items");
-var recentRoomService = require("../../../services/recent-room-service");
+var unreadItemService = require("gitter-web-unread-items");
+var recentRoomService = require("gitter-web-rooms/lib/recent-room-service");
 var StatusError = require('statuserror');
 var uniqueIds = require('mongodb-unique-ids');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');

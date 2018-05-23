@@ -1,10 +1,10 @@
 'use strict';
 
 var makeBenchmark = require('../make-benchmark');
-var Distribution = require('../../server/services/unread-items/distribution');
+var Distribution = require('gitter-web-unread-items/lib/distribution');
 var _ = require('lodash');
 var lazy = require('lazy.js');
-var roomMembershipFlags = require('../../server/services/room-membership-flags');
+var roomMembershipFlags = require('gitter-web-rooms/lib/room-membership-flags');
 var MODES = roomMembershipFlags.MODES;
 
 var PRESENCE_VALUES = ['inroom', 'online', 'mobile', 'push', 'push_connected', 'push_notified', 'push_notified_connected'];

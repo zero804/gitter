@@ -1,0 +1,39 @@
+{
+  "name": "gitter-web-rooms",
+  "version": "1.0.0",
+  "main": "lib/room-service.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha test/"
+  },
+  "private": true,
+  "dependencies": {
+    "bluebird": "^3.5.1",
+    "gitter-web-identity": "file:../identity",
+    "gitter-web-shared": "file:../../shared",
+    "statuserror": "^0.1.3",
+    "gitter-web-env": "file:../env",
+    "gitter-web-persistence": "file:../persistence",
+    "gitter-web-persistence-utils": "file:../persistence-utils",
+    "gitter-web-uri-resolver": "file:../uri-resolver",
+    "gitter-web-github": "file:../github",
+    "gitter-web-elasticsearch": "file:../elasticsearch",
+    "gitter-web-validators": "file:../validators",
+    "gitter-web-unread-items": "file:../unread-items",
+    "gitter-web-permissions": "file:../permissions",
+    "gitter-web-appevents": "file:../appevents",
+    "gitter-web-groups": "file:../groups",
+    "mongodb": "^2.2.35",
+    "debug": "^2.2.0",
+    "lazy.js": "^0.4.2",
+    "underscore": "^1.8.3",
+    "moment": "^2.10.3",
+    "lodash": "^3.2.0"
+  },
+  "devDependencies": {
+    "gitter-web-test-utils": "file:../test-utils"
+  }
+}

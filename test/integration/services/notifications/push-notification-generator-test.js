@@ -48,7 +48,7 @@ describe('push notification generator service', function() {
       '../../gateways/push-notification-gateway': {
         sendUserNotification: mockSendUserNotification
       },
-      '../unread-items': unreadItemServiceStub,
+      'gitter-web-unread-items': unreadItemServiceStub,
       '../../serializers/notification-serializer': notificationSerializerStub
     });
 
@@ -77,7 +77,7 @@ describe('push notification generator service', function() {
       '../../gateways/push-notification-gateway': {
         sendUserNotification: mockSendUserNotification
       },
-      '../unread-items': unreadItemServiceStub,
+      'gitter-web-unread-items': unreadItemServiceStub,
       '../../serializers/notification-serializer': notificationSerializerStub
     });
 

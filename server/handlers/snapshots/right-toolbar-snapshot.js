@@ -1,6 +1,6 @@
 'use strict';
 
-var userSettingsService = require('../../services/user-settings-service');
+var userSettingsService = require('gitter-web-user-settings');
 
 function getSnapshotsForPageContext(req) {
   if (!req.user) return {};

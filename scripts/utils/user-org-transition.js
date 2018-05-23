@@ -4,9 +4,9 @@
 
 var shutdown = require('shutdown');
 var Promise = require('bluebird');
-var userRemovalService = require('../../server/services/user-removal-service');
-var roomService = require('../../server/services/room-service');
-var userService = require('../../server/services/user-service');
+var userRemovalService = require('gitter-web-rooms/lib/user-removal-service');
+var roomService = require('gitter-web-rooms');
+var userService = require('gitter-web-users');
 var persistence = require('gitter-web-persistence');
 var uriLookupService = require('gitter-web-uri-resolver/lib/uri-lookup-service');
 var validateUri = require('gitter-web-github').GitHubUriValidator;

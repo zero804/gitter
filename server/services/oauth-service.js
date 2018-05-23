@@ -9,7 +9,7 @@ var appEvents = require('gitter-web-appevents');
 var persistenceService = require('gitter-web-persistence');
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
-var userService = require('./user-service');
+var userService = require('gitter-web-users');
 var tokenProvider = require('./tokens/');
 var MongooseCachedLookup = require('../utils/mongoose-cached-lookup');
 

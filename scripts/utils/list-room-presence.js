@@ -2,11 +2,11 @@
 /*jslint node:true, unused:true */
 "use strict";
 
-var userService = require('../../server/services/user-service');
-var troupeService = require('../../server/services/troupe-service');
-var oneToOneRoomService = require('../../server/services/one-to-one-room-service');
-var categoriseUsersInRoom = require('../../server/services/categorise-users-in-room');
-var roomMembershipService = require('../../server/services/room-membership-service');
+var userService = require('gitter-web-users');
+var troupeService = require('gitter-web-rooms/lib/troupe-service');
+var oneToOneRoomService = require('gitter-web-rooms/lib/one-to-one-room-service');
+var categoriseUsersInRoom = require('gitter-web-unread-item/lib/categorise-users-in-room');
+var roomMembershipService = require('gitter-web-rooms/lib/room-membership-service');
 var collections = require('gitter-web-utils/lib/collections');
 var Promise = require('bluebird');
 

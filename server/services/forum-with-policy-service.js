@@ -9,7 +9,7 @@ var topicService = require('gitter-web-topics/lib/topic-service');
 var replyService = require('gitter-web-topics/lib/reply-service');
 var commentService = require('gitter-web-topics/lib/comment-service');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
-var secureMethod = require('../utils/secure-method');
+var secureMethod = require('gitter-web-utils/lib/secure-method');
 var subscriberService = require('gitter-web-topic-notifications/lib/subscriber-service');
 var reactionService = require('gitter-web-topic-reactions/lib/reaction-service');
 

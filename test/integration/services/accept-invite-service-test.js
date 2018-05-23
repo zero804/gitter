@@ -40,7 +40,7 @@ describe('accept-invite-service', function() {
       }
 
       acceptInviteService = testRequire.withProxies('./services/accept-invite-service', {
-        './room-with-policy-service': RoomWithPolicyService,
+        'gitter-web-rooms/lib/room-with-policy-service': RoomWithPolicyService,
         'gitter-web-permissions/lib/policy-factory': policyFactory
       });
     });

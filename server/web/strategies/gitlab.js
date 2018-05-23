@@ -4,7 +4,7 @@ var env = require('gitter-web-env');
 var config = env.config;
 
 var GitLabStrategy = require('passport-gitlab2');
-var userService = require('../../services/user-service');
+var userService = require('gitter-web-users');
 var trackSignupOrLogin = require('../track-signup-or-login');
 var updateUserLocale = require('../update-user-locale');
 var passportLogin = require('../passport-login');

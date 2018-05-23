@@ -5,10 +5,9 @@
 var Promise = require('bluebird');
 var shutdown = require('shutdown');
 var avatars = require('gitter-web-avatars');
-var userService = require('../../server/services/user-service');
-var troupeService = require('../../server/services/troupe-service');
-var chatService = require('../../server/services/chat-service');
-var emailNotificationService = require('../../server/services/email-notification-service');
+var userService = require('gitter-web-users');
+var troupeService = require('gitter-web-rooms/lib/troupe-service');
+var emailNotificationService = require('gitter-web-email-notifications');
 
 var opts = require('yargs')
   .option('username', {

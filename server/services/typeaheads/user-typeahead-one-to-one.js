@@ -1,7 +1,7 @@
 'use strict';
 
 var Promise = require('bluebird');
-var userService = require('../user-service');
+var userService = require('gitter-web-users');
 var inputsForUser = require('./elastic-inputs-for-user');
 
 module.exports = {

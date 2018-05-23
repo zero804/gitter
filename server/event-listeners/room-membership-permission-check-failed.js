@@ -4,7 +4,7 @@ var env = require('gitter-web-env');
 var stats = env.stats;
 var errorReporter = env.errorReporter;
 var appEvents = require('gitter-web-appevents');
-var roomService = require('../services/room-service');
+var roomService = require('gitter-web-rooms');
 
 var installed = false;
 exports.install = function() {

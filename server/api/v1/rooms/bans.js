@@ -1,9 +1,9 @@
 "use strict";
 
-var roomService = require('../../../services/room-service');
+var roomService = require('gitter-web-rooms');
 var restSerializer = require("../../../serializers/rest-serializer");
 var loadTroupeFromParam = require('./load-troupe-param');
-var RoomWithPolicyService = require('../../../services/room-with-policy-service');
+var RoomWithPolicyService = require('gitter-web-rooms/lib/room-with-policy-service');
 
 module.exports = {
   id: 'troupeBan',

@@ -1,6 +1,7 @@
 {
   "name": "gitter-web-utils",
   "version": "1.0.0",
+  "private": true,
   "main": "lib/index.js",
   "directories": {
     "lib": "lib",
@@ -9,5 +10,7 @@
   "scripts": {
     "test": "mocha test/"
   },
-  "private": true
+  "devDependencies": {
+    "mocha": "^2.5.3"
+  }
 }

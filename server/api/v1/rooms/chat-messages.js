@@ -3,12 +3,12 @@
 var Promise = require('bluebird');
 var _ = require('underscore');
 var StatusError = require('statuserror');
-var chatService = require('../../../services/chat-service');
+var chatService = require('gitter-web-chats');
 var restSerializer = require('../../../serializers/rest-serializer');
 var userAgentTagger = require('../../../web/user-agent-tagger');
 var loadTroupeFromParam = require('./load-troupe-param');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
-var RoomWithPolicyService = require('../../../services/room-with-policy-service');
+var RoomWithPolicyService = require('gitter-web-rooms/lib/room-with-policy-service');
 
 
 function parseLookups(lookups) {

@@ -1,6 +1,6 @@
 "use strict";
 
-var roomRepoService = require('../../../services/room-repo-service');
+var roomRepoService = require('gitter-web-rooms/lib/room-repo-service');
 
 function AssociatedRepoStrategy(/*options*/) {
   this.associatedRepos = null;

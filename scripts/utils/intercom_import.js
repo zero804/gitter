@@ -6,7 +6,7 @@ var nconf = env.config;
 var persistence = require('gitter-web-persistence');
 var shutdown = require('shutdown');
 var async = require('async');
-var emailAddressService = require('../../server/services/email-address-service');
+var emailAddressService = require('gitter-web-email-addresses');
 
 function getAllUsers(callback) {
   persistence.User.find(function (err, users) {

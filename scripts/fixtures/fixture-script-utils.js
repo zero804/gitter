@@ -10,7 +10,7 @@ Promise.config({
 
 var StatusError = require('statuserror');
 var shutdown = require('shutdown');
-var userService = require('../../server/services/user-service');
+var userService = require('gitter-web-users');
 var groupService = require('gitter-web-groups/lib/group-service');
 var forumService = require('gitter-web-topics/lib/forum-service');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');

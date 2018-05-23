@@ -1,6 +1,6 @@
 'use strict';
 
-var roomService = require("../../services/room-service");
+var roomService = require("gitter-web-rooms");
 var restSerializer = require("../../serializers/rest-serializer");
 var Promise = require('bluebird');
 var StatusError = require('statuserror');

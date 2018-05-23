@@ -3,7 +3,7 @@
 var env = require('gitter-web-env');
 var logger = env.logger;
 
-var userSettingsService = require('../services/user-settings-service');
+var userSettingsService = require('gitter-web-user-settings');
 
 // use this whenever a user signs up or logs in
 // (Why don't we add it as middleware to those routes rather?)

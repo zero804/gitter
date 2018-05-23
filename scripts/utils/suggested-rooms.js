@@ -3,12 +3,12 @@
 
 var yargs = require('yargs');
 var shutdown = require('shutdown');
-var userService = require('../../server/services/user-service');
-var troupeService = require('../../server/services/troupe-service');
+var userService = require('gitter-web-users');
+var troupeService = require('gitter-web-rooms/lib/troupe-service');
 var restSerializer = require('../../server/serializers/rest-serializer');
 var suggestionsService = require('../../server/services/suggestions-service')
-var roomMembershipService = require('../../server/services/room-membership-service');
-var userSettingsService = require('../../server/services/user-settings-service');
+var roomMembershipService = require('gitter-web-rooms/lib/room-membership-service');
+var userSettingsService = require('gitter-web-user-settings');
 var shimPositionOption = require('../yargs-shim-position-option');
 var Promise = require('bluebird');
 

@@ -2,7 +2,7 @@
 /*jslint node:true, unused:true */
 "use strict";
 
-var userService = require('../../server/services/user-service');
+var userService = require('gitter-web-users');
 var pushNotificationGateway = require('../../server/gateways/push-notification-gateway');
 var shutdown = require('shutdown');
 var onMongoConnect = require('gitter-web-persistence-utils/lib/on-mongo-connect');

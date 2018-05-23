@@ -1,7 +1,7 @@
 "use strict";
 
-var unreadItemService = require('../../../services/unread-items');
-var roomMembershipService = require('../../../services/room-membership-service');
+var unreadItemService = require('gitter-web-unread-items');
+var roomMembershipService = require('gitter-web-rooms/lib/room-membership-service');
 var _ = require("lodash");
 
 function LurkAndActivityForUserStrategy(options) {

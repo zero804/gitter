@@ -1,6 +1,6 @@
 'use strict';
 
-var roomContextService = require('../../services/room-context-service');
+var roomContextService = require('gitter-web-rooms/lib/room-context-service');
 var StatusError = require('statuserror');
 var uriContextAsBrowserState = require('gitter-web-uri-resolver/lib/uri-context-as-browser-state');
 

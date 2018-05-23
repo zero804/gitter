@@ -4,8 +4,8 @@ var assert = require("assert");
 var Promise = require('bluebird');
 var _ = require('lodash');
 var restSerializer = require("../serializers/rest-serializer");
-var userService = require('../services/user-service');
-var roomMetaService = require('../services/room-meta-service');
+var userService = require('gitter-web-users');
+var roomMetaService = require('gitter-web-rooms/lib/room-meta-service');
 var contextGeneratorRequest = require('./context-generator-request');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 

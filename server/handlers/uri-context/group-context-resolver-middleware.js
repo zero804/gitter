@@ -1,6 +1,6 @@
 "use strict";
 
-var roomContextService = require('../../services/room-context-service');
+var roomContextService = require('gitter-web-rooms/lib/room-context-service');
 var debug = require('debug')('gitter:app:group-context-resolver-middleware');
 
 function groupContextResolverMiddleware(req, res, next) {

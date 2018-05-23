@@ -1,7 +1,7 @@
 'use strict';
 
 var speedy = require("speedy");
-var chatService = require('../../server/services/chat-service');
+var chatService = require('gitter-web-chats');
 
 // speedy.samples(10);
 

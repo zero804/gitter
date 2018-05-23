@@ -3,8 +3,8 @@
 
 var persistence = require('gitter-web-persistence');
 var onMongoConnect = require('gitter-web-persistence-utils/lib/on-mongo-connect');
-var roomMembershipService = require('../../server/services/room-membership-service');
-var userService = require('../../server/services/user-service');
+var roomMembershipService = require('gitter-web-rooms/lib/room-membership-service');
+var userService = require('gitter-web-users');
 var through2Concurrent = require('through2-concurrent');
 var Promise = require('bluebird');
 var GitHubRepoService = require('gitter-web-github').GitHubRepoService;

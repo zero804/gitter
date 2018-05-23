@@ -6,16 +6,16 @@ var config = env.config;
 var stats = env.stats;
 
 var _ = require("underscore");
-var troupeService = require("../troupe-service");
-var userService = require("../user-service");
-var unreadItemService = require("../unread-items");
+var troupeService = require("gitter-web-rooms/lib/troupe-service");
+var userService = require("gitter-web-users");
+var unreadItemService = require('gitter-web-unread-items');
 var serializer = require('../../serializers/notification-serializer');
 var moment = require('moment');
 var Promise = require('bluebird');
 var collections = require('gitter-web-utils/lib/collections');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
-var emailNotificationService = require('../email-notification-service');
-var userSettingsService = require('../user-settings-service');
+var emailNotificationService = require('gitter-web-email-notifications');
+var userSettingsService = require('gitter-web-user-settings');
 var debug = require('debug')('gitter:app:email-notification-generator-service');
 var userScopes = require('gitter-web-identity/lib/user-scopes');
 

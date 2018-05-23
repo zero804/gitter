@@ -6,7 +6,7 @@ var collapsedChatService = require('../../../server/services/collapsed-chats-ser
 
 describe('collapsed-chats-service', function() {
 
-  var blockTimer = require('../block-timer');
+  var blockTimer = require('gitter-web-test-utils/lib/block-timer');
   before(blockTimer.on);
   after(blockTimer.off);
 

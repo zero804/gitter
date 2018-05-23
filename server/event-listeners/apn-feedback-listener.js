@@ -9,7 +9,7 @@ exports.install = function() {
   installed = true;
 
   var iosGateway = require('gitter-web-push-gateways/lib/ios/ios-notification-gateway');
-  var pushNotificationService = require('../services/push-notification-service');
+  var pushNotificationService = require('gitter-web-push-notifications');
 
   var feedbackEmitter = iosGateway.createFeedbackEmitter();
 

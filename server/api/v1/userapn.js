@@ -2,7 +2,7 @@
 
 var env = require('gitter-web-env');
 var winston = env.logger;
-var pushNotificationService = require('../../services/push-notification-service');
+var pushNotificationService = require('gitter-web-push-notifications');
 
 module.exports = function(req, res, next) {
   winston.info("APN user registration", { deviceId: req.body.deviceId, userId: req.user.id});

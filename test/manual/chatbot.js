@@ -3,9 +3,9 @@
 /*jslint node: true, unused:true */
 "use strict";
 
-var userService = require('../../server/services/user-service');
-var troupeService = require('../../server/services/troupe-service');
-var chatService = require('../../server/services/chat-service');
+var userService = require('gitter-web-users');
+var troupeService = require('gitter-web-rooms/lib/troupe-service');
+var chatService = require('gitter-web-chats');
 var shutdown = require('shutdown');
 
 require('../../server/event-listeners').install();

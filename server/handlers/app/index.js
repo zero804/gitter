@@ -2,7 +2,7 @@
 
 var express = require('express');
 var uriContextResolverMiddleware = require('../uri-context/uri-context-resolver-middleware');
-var recentRoomService = require('../../services/recent-room-service');
+var recentRoomService = require('gitter-web-rooms/lib/recent-room-service');
 var isPhoneMiddleware = require('../../web/middlewares/is-phone');
 var timezoneMiddleware = require('../../web/middlewares/timezone');
 var featureToggles = require('../../web/middlewares/feature-toggles');

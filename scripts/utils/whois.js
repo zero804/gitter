@@ -5,8 +5,8 @@
 var shutdown = require('shutdown');
 var Promise = require('bluebird');
 var env = require('gitter-web-env');
-var userService = require('../../server/services/user-service');
-var emailService = require('../../server/services/email-address-service');
+var userService = require('gitter-web-users');
+var emailService = require('gitter-web-email-addresses');
 
 env.installUncaughtExceptionHandler();
 

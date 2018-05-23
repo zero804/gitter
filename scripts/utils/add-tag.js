@@ -23,7 +23,7 @@ var opts = require('yargs')
   .alias('help', 'h')
   .argv;
 
-var troupeService = require('../../server/services/troupe-service');
+var troupeService = require('gitter-web-rooms/lib/troupe-service');
 var persistenceService = require('gitter-web-persistence');
 
 function dedupe(item, index, arr) {

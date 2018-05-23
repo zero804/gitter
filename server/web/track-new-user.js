@@ -3,7 +3,7 @@
 var env = require('gitter-web-env');
 var stats = env.stats;
 
-var emailAddressService = require('../services/email-address-service');
+var emailAddressService = require('gitter-web-email-addresses');
 var gaCookieParser = require('./ga-cookie-parser');
 
 // Use this whenever a user first signs up.
