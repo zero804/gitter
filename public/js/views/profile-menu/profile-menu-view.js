@@ -46,7 +46,7 @@ function getProfileCollection() {
       if (existing) return;
       var appsItem = result.find(function(f) { return f.get('stub') === '/apps' });
 
-      result.add({ name: 'Allow Private Repo Access', stub: '#upgraderepoaccess', upgradeItem: true }, {
+      result.add({ name: 'Allow Private Repo Access', stub: '/login/upgrade?scopes=repo', upgradeItem: true }, {
         at: result.indexOf(appsItem) + 1
       });
     }
