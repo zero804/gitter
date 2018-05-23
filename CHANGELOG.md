@@ -1,6 +1,7 @@
 # 19.2.0 - *upcoming*
 
  - Add "Terms of Service" profile menu item linking to https://about.gitlab.com/terms/, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1161
+ - Fix "Allow private repo access" profile menu item not redirecting to GitHub OAuth upgrade flow, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1162
 
 
 # 19.1.0 - 2018-5-21
