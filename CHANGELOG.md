@@ -1,3 +1,8 @@
+# 19.2.0 - *upcoming*
+
+ - Add "Terms of Service" profile menu item linking to https://about.gitlab.com/terms/, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1161
+
+
 # 19.1.0 - 2018-5-21
 
  - Sign out user when token revoked in realtime, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1155
