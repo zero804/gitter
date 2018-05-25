@@ -3,7 +3,7 @@
 var Promise = require('bluebird');
 var appEvents = require('gitter-web-appevents');
 var restSerializer = require("../../serializers/rest-serializer");
-var roomMembershipService = require('../room-membership-service');
+var roomMembershipService = require('gitter-web-rooms/lib/room-membership-service');
 var presenceService = require('gitter-web-presence');
 var _ = require('lodash');
 

@@ -3,7 +3,7 @@
 var env = require('gitter-web-env');
 var winston = env.logger;
 var Mirror = require('gitter-web-github').GitHubMirrorService('user');
-var userService = require('../../../services/user-service');
+var userService = require('gitter-web-users');
 var url = require('url');
 var StatusError = require('statuserror');
 

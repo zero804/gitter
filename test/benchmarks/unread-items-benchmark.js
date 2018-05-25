@@ -43,14 +43,14 @@ makeBenchmark({
       _id: troupeId,
     };
 
-    userService = mockito.mock(testRequire('./services/user-service'));
+    userService = mockito.mock(testRequire('gitter-web-users'));
     appEvents = mockito.mock(testRequire('gitter-web-appevents'));
 
     mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId).thenReturn(Promise.resolve(troupeLurkersUserHash));
 
-    unreadItemService = testRequire.withProxies("./services/unread-items", {
-      '../room-membership-service': roomMembershipService,
-      '../user-service': userService,
+    unreadItemService = testRequire.withProxies("gitter-web-unread-items", {
+      'gitter-web-rooms/lib/room-membership-service': roomMembershipService,
+      'gitter-web-users': userService,
       '../app-events': appEvents,
     });
     unreadItemService.testOnly.setSendBadgeUpdates(false);
@@ -59,7 +59,7 @@ makeBenchmark({
   after: function(done) {
     if (process.env.DISABLE_EMAIL_NOTIFY_CLEAR_AFTER_TEST) return done();
 
-    var unreadItemServiceEngine = testRequire('./services/unread-items/engine');
+    var unreadItemServiceEngine = testRequire('gitter-web-unread-items/lib/engine');
     unreadItemServiceEngine.testOnly.removeAllEmailNotifications()
       .nodeify(done);
   },

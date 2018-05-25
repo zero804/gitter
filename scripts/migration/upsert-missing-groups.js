@@ -7,7 +7,7 @@ var through2 = require('through2');
 var Promise = require('bluebird');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var onMongoConnect = require('gitter-web-persistence-utils/lib/on-mongo-connect');
-var userService = require('../../server/services/user-service');
+var userService = require('gitter-web-users');
 var securityDescriptorGenerator = require('gitter-web-permissions/lib/security-descriptor-generator');
 var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs')
 

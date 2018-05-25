@@ -1,6 +1,6 @@
 "use strict";
 
-var unreadItemService = require('../../../services/unread-items');
+var unreadItemService = require('gitter-web-unread-items');
 
 function AllUnreadItemCountStrategy(options) {
   this.userId = options.userId || options.currentUserId;

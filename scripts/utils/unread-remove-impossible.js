@@ -1,10 +1,10 @@
 'use strict';
 
-var redis = require('../../server/utils/redis');
-var userService = require('../../server/services/user-service');
-var roomService = require('../../server/services/room-service');
-var troupeService = require('../../server/services/troupe-service');
-var unreadService = require('../../server/services/unread-items');
+var redis = require('gitter-web-utils/lib/redis');
+var userService = require('gitter-web-users');
+var roomService = require('gitter-web-rooms');
+var troupeService = require('gitter-web-rooms/lib/troupe-service');
+var unreadService = require('gitter-web-unread-items');
 var Promise = require('bluebird');
 var shutdown = require('shutdown');
 var _ = require('underscore');

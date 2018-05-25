@@ -139,7 +139,7 @@ function createSearchWithStubData(data) {
     'gitter-web-github': {
       GitHubFastSearch: createFakeGithubSearch(data.github)
     },
-    './user-service': createFakeUserService(data.userService)
+    'gitter-web-users': createFakeUserService(data.userService)
   });
 }
 

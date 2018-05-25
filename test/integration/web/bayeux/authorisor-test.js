@@ -3,7 +3,7 @@
 var testRequire = require('../../test-require');
 var assert = require('assert');
 var Promise = require('bluebird');
-var testGenerator = require('../../test-generator');
+var testGenerator = require('gitter-web-test-utils/lib/test-generator');
 
 var mockito = require('jsmockito').JsMockito;
 

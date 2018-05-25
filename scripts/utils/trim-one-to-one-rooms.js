@@ -19,11 +19,11 @@ var opts = require('yargs')
 
 
 var Promise = require('bluebird');
-var userService = require('../../server/services/user-service');
-var oneToOneRoomService = require('../../server/services/one-to-one-room-service');
-var unreadItemsService = require('../../server/services/unread-items');
-var recentRoomCore = require('../../server/services/core/recent-room-core');
-var roomService = require('../../server/services/room-service');
+var userService = require('gitter-web-users');
+var oneToOneRoomService = require('gitter-web-rooms/lib/one-to-one-room-service');
+var unreadItemsService = require('gitter-web-unread-items');
+var recentRoomCore = require('gitter-web-rooms/lib/recent-room-core');
+var roomService = require('gitter-web-rooms');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var collections = require('gitter-web-utils/lib/collections');
 var shutdown = require('shutdown');

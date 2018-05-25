@@ -1,7 +1,7 @@
 'use strict';
 
 var speedy = require("speedy");
-var troupeService = require('../../server/services/troupe-service');
+var troupeService = require('gitter-web-rooms/lib/troupe-service');
 var onMongoConnect = require('gitter-web-persistence-utils/lib/on-mongo-connect');
 
 onMongoConnect(function() {

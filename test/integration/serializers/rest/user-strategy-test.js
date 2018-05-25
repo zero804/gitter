@@ -10,7 +10,7 @@ var UserStrategy = testRequire('./serializers/rest/user-strategy');
 var UserIdStrategy = testRequire('./serializers/rest/user-id-strategy');
 
 describe('user-strategy-test', function() {
-  var blockTimer = require('../../block-timer');
+  var blockTimer = require('gitter-web-test-utils/lib/block-timer');
   var expected1, expectedLean;
 
   before(blockTimer.on);

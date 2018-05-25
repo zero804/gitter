@@ -1,6 +1,6 @@
 "use strict";
 
-var recentRoomCore = require('../../../services/core/recent-room-core');
+var recentRoomCore = require('gitter-web-rooms/lib/recent-room-core');
 
 function LastTroupeAccessTimesForUserStrategy(options) {
   this.userId = options.userId || options.currentUserId;

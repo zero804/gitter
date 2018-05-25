@@ -3,8 +3,8 @@
 "use strict";
 
 var shutdown = require('shutdown');
-var roomService = require('../../server/services/room-service');
-var troupeService = require('../../server/services/troupe-service');
+var roomService = require('gitter-web-rooms');
+var troupeService = require('gitter-web-rooms/lib/troupe-service');
 var Promise = require('bluebird');
 
 require('../../server/event-listeners').install();

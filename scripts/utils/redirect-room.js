@@ -4,8 +4,8 @@
 
 var shutdown = require('shutdown');
 var uriLookupService = require('gitter-web-uri-resolver/lib/uri-lookup-service');
-var roomService = require('../../server/services/room-service');
-var troupeService = require('../../server/services/troupe-service');
+var roomService = require('gitter-web-rooms');
+var troupeService = require('gitter-web-rooms/lib/troupe-service');
 
 var readline = require('readline');
 var Promise = require('bluebird');

@@ -4,7 +4,7 @@ var env = require('gitter-web-env');
 var stats = env.stats;
 
 var _ = require('lodash');
-var emailAddressService = require('../services/email-address-service');
+var emailAddressService = require('gitter-web-email-addresses');
 var useragentTagger = require('./user-agent-tagger');
 
 // Use this whenever a user logs in again

@@ -2,9 +2,9 @@
 
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
-var roomMembershipService = require('../../../services/room-membership-service');
-var userDefaultFlagsService = require('../../../services/user-default-flags-service');
-var userRoomModeUpdateService = require('../../../services/user-room-mode-update-service');
+var roomMembershipService = require('gitter-web-rooms/lib/room-membership-service');
+var userDefaultFlagsService = require('gitter-web-rooms/lib/user-default-flags-service');
+var userRoomModeUpdateService = require('gitter-web-rooms/lib/user-room-mode-update-service');
 
 function generateResponse(userId, troupeId) {
   return Promise.join(

@@ -4,10 +4,10 @@
 var persistence = require('gitter-web-persistence');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var _ = require('lodash');
-var userService = require('../../server/services/user-service');
+var userService = require('gitter-web-users');
 var collections = require('gitter-web-utils/lib/collections');
-var roomMembershipService = require('../../server/services/room-membership-service');
-var roomMembershipFlags = require('../../server/services/room-membership-flags');
+var roomMembershipService = require('gitter-web-rooms/lib/room-membership-service');
+var roomMembershipFlags = require('gitter-web-rooms/lib/room-membership-flags');
 var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs')
 
 var Promise = require('bluebird');

@@ -7,7 +7,7 @@ var fixtureUtils = require('./fixture-utils');
 var debug = require('debug')('gitter:tests:test-fixtures');
 
 
-// This corresponds with require("/services/room-membership-flags").MODES.all
+// This corresponds with require("giter-web-rooms/lib/room-membership-flags").MODES.all
 var DEFAULT_ROOM_MEMBERSHIP_FLAGS = 109;
 
 
@@ -187,5 +187,3 @@ function createTroupes(expected, fixture) {
 }
 
 module.exports = createTroupes;
-
-

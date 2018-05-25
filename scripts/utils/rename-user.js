@@ -3,7 +3,7 @@
 "use strict";
 
 var shutdown = require('shutdown');
-var userService = require('../../server/services/user-service');
+var userService = require('gitter-web-users');
 var StatusError = require('statuserror');
 
 require('../../server/event-listeners').install();

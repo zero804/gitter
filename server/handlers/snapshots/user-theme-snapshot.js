@@ -1,7 +1,7 @@
 'use strict';
 
 var Promise = require('bluebird');
-var userSettingsService = require('../../services/user-settings-service');
+var userSettingsService = require('gitter-web-user-settings');
 
 module.exports = Promise.method(function getSnapshotsForPageContext(req) {
   if (!req.user) return {};

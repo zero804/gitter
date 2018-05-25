@@ -7,7 +7,7 @@ var persistence = require('gitter-web-persistence');
 
 /**
  * Internal call
- * Based on ./server/services/core/recent-room-core.js
+ * Based on gitter-web-rooms/lib/recent-room-core.js
  */
 function addGroupAsFavouriteInLastPosition(userId, groupId) {
   return findFavouriteGroupsForUser(userId)
@@ -31,7 +31,7 @@ function addGroupAsFavouriteInLastPosition(userId, groupId) {
 
 /**
  * Internal call
- * Based on ./server/services/core/recent-room-core.js
+ * Based on gitter-web-rooms/lib/recent-room-core.js
  */
 function addGroupAsFavouriteInPosition(userId, groupId, position) {
   return findFavouriteGroupsForUser(userId)
@@ -85,7 +85,7 @@ function addGroupAsFavouriteInPosition(userId, groupId, position) {
 
 /**
  * Internal call
- * Based on ./server/services/core/recent-room-core.js
+ * Based on gitter-web-rooms/lib/recent-room-core.js
  */
 function clearFavourite(userId, groupId) {
   var setOp = {};

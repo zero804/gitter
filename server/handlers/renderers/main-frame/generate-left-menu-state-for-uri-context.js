@@ -1,7 +1,7 @@
 "use strict";
 
 var Promise = require('bluebird');
-var userSettingsService = require('../../../services/user-settings-service');
+var userSettingsService = require('gitter-web-user-settings');
 
 function calculate(uriContext, options) {
   var currentRoom = uriContext && uriContext.troupe;

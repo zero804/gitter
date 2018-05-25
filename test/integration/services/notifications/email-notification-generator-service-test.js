@@ -7,11 +7,11 @@ var assert = require("assert");
 var mockito = require('jsmockito').JsMockito;
 var Promise = require('bluebird');
 
-var userSettingsService = testRequire('./services/user-settings-service');
+var userSettingsService = require('gitter-web-user-settings');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
-var underlyingUnreadItemService = testRequire('./services/unread-items');
+var underlyingUnreadItemService = require('gitter-web-unread-items');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
-var roomMembershipService = testRequire("./services/room-membership-service");
+var roomMembershipService = require('gitter-web-rooms/lib/room-membership-service');
 var Lazy = require('lazy.js');
 
 var unreadItemServiceMock = mockito.spy(underlyingUnreadItemService);
@@ -42,12 +42,12 @@ describe('email-notification-generator-service', function() {
   });
 
   it('should send out an email notification for a user with unread items #slow', function() {
-    var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
-    var unreadEngine = testRequire('./services/unread-items/engine');
+    var emailNotificationServiceMock = mockito.spy(require('gitter-web-email-notifications'));
+    var unreadEngine = require('gitter-web-unread-items/lib/engine');
 
     var sendEmailNotifications = testRequire.withProxies('./services/notifications/email-notification-generator-service', {
-      '../email-notification-service': emailNotificationServiceMock,
-      '../unread-items': unreadItemServiceMock
+      'gitter-web-email-notifications': emailNotificationServiceMock,
+      'gitter-web-unread-items': unreadItemServiceMock
     });
 
     var itemId1 = mongoUtils.getNewObjectIdString();
@@ -89,12 +89,12 @@ describe('email-notification-generator-service', function() {
   });
 
   it('SHOULD NOT email somebody who has opted out of notifications 1 #slow', function() {
-    var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
-    var unreadEngine = testRequire('./services/unread-items/engine');
+    var emailNotificationServiceMock = mockito.spy(require('gitter-web-email-notifications'));
+    var unreadEngine = require('gitter-web-unread-items/lib/engine');
 
     var sendEmailNotifications = testRequire.withProxies('./services/notifications/email-notification-generator-service', {
-      '../email-notification-service': emailNotificationServiceMock,
-      '../unread-items': unreadItemServiceMock
+      'gitter-web-email-notifications': emailNotificationServiceMock,
+      'gitter-web-unread-items': unreadItemServiceMock
     });
 
     var itemId1 = mongoUtils.getNewObjectIdString();
@@ -131,12 +131,12 @@ describe('email-notification-generator-service', function() {
 
 
   it('SHOULD NOT email somebody who has opted out of notifications 2 #slow', function() {
-    var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
-    var unreadEngine = testRequire('./services/unread-items/engine');
+    var emailNotificationServiceMock = mockito.spy(require('gitter-web-email-notifications'));
+    var unreadEngine = require('gitter-web-unread-items/lib/engine');
 
     var sendEmailNotifications = testRequire.withProxies('./services/notifications/email-notification-generator-service', {
-      '../email-notification-service': emailNotificationServiceMock,
-      '../unread-items': unreadItemServiceMock
+      'gitter-web-email-notifications': emailNotificationServiceMock,
+      'gitter-web-unread-items': unreadItemServiceMock
     });
 
 
@@ -186,12 +186,12 @@ describe('email-notification-generator-service', function() {
 
 
 it('SHOULD NOT email somebody who has opted out of notifications set to mention only #slow', function() {
-  var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
-  var unreadEngine = testRequire('./services/unread-items/engine');
+  var emailNotificationServiceMock = mockito.spy(require('gitter-web-email-notifications'));
+  var unreadEngine = require('gitter-web-unread-items/lib/engine');
 
   var sendEmailNotifications = testRequire.withProxies('./services/notifications/email-notification-generator-service', {
-    '../email-notification-service': emailNotificationServiceMock,
-    '../unread-items': unreadItemServiceMock
+    'gitter-web-email-notifications': emailNotificationServiceMock,
+    'gitter-web-unread-items': unreadItemServiceMock
   });
 
   var v = 0;
@@ -230,12 +230,12 @@ it('SHOULD NOT email somebody who has opted out of notifications set to mention 
 
   // TODO: handle mentions
   it('should email somebody who has not opted out of notifications for a specific troupe #slow', function() {
-    var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
-    var unreadEngine = testRequire('./services/unread-items/engine');
+    var emailNotificationServiceMock = mockito.spy(require('gitter-web-email-notifications'));
+    var unreadEngine = require('gitter-web-unread-items/lib/engine');
 
     var sendEmailNotifications = testRequire.withProxies('./services/notifications/email-notification-generator-service', {
-      '../email-notification-service': emailNotificationServiceMock,
-      '../unread-items': unreadItemServiceMock
+      'gitter-web-email-notifications': emailNotificationServiceMock,
+      'gitter-web-unread-items': unreadItemServiceMock
     });
 
     var itemId1 = mongoUtils.getNewObjectIdString();

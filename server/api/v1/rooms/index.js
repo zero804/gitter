@@ -1,14 +1,14 @@
 "use strict";
 
-var roomService = require("../../../services/room-service");
+var roomService = require("gitter-web-rooms");
 var restful = require("../../../services/restful");
 var restSerializer = require("../../../serializers/rest-serializer");
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
 var loadTroupeFromParam = require('./load-troupe-param');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
-var RoomWithPolicyService = require('../../../services/room-with-policy-service');
-var roomContextService = require('../../../services/room-context-service');
+var RoomWithPolicyService = require('gitter-web-rooms/lib/room-with-policy-service');
+var roomContextService = require('gitter-web-rooms/lib/room-context-service');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 function searchRooms(req) {

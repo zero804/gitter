@@ -1,7 +1,7 @@
 "use strict";
 
 var appEvents = require('gitter-web-appevents');
-var userService = require('../services/user-service');
+var userService = require('gitter-web-users');
 
 var installed = false;
 exports.install = function() {

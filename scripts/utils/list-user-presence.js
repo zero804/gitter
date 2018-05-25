@@ -2,8 +2,8 @@
 /*jslint node:true, unused:true */
 "use strict";
 
-var userService = require('../../server/services/user-service');
-var troupeService = require('../../server/services/troupe-service');
+var userService = require('gitter-web-users');
+var troupeService = require('gitter-web-rooms/lib/troupe-service');
 var collections = require('gitter-web-utils/lib/collections');
 var presence = require('gitter-web-presence');
 var _ = require('lodash');

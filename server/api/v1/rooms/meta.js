@@ -1,7 +1,7 @@
 "use strict";
 
 var _ = require('lodash');
-var RoomWithPolicyService = require('../../../services/room-with-policy-service');
+var RoomWithPolicyService = require('gitter-web-rooms/lib/room-with-policy-service');
 var StatusError = require('statuserror');
 var loadTroupeFromParam = require('./load-troupe-param');
 

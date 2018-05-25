@@ -9,7 +9,7 @@ var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avata
 var userScopes = require('gitter-web-identity/lib/user-scopes');
 var collections = require('gitter-web-utils/lib/collections');
 var getVersion = require('gitter-web-serialization/lib/get-model-version');
-var troupeService = require('../../services/troupe-service');
+var troupeService = require('gitter-web-rooms/lib/troupe-service');
 var adminFilter = require('gitter-web-permissions/lib/known-external-access/admin-filter')
 
 function UserRoleInTroupeStrategy(options) {

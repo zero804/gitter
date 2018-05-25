@@ -8,7 +8,7 @@ var cliff = require('cliff');
 var persistence = require('gitter-web-persistence');
 var TroupeUser = persistence.TroupeUser;
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
-var userService = require('../../server/services/user-service');
+var userService = require('gitter-web-users');
 var shimPositionOption = require('../yargs-shim-position-option');
 
 var argv = yargs.argv;

@@ -2,8 +2,8 @@
 
 var makeBenchmark = require('../make-benchmark');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
-var chatService = require('../../server/services/chat-service');
-var roomMembershipFlags = require("../../server/services/room-membership-flags");
+var chatService = require('gitter-web-chats');
+var roomMembershipFlags = require("gitter-web-rooms/lib/room-membership-flags");
 
 var fixture = {};
 var count = 0;

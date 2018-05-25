@@ -6,15 +6,15 @@ var logger = env.logger;
 var nconf = env.config;
 
 var groupService = require('gitter-web-groups/lib/group-service');
-var userService = require('../../services/user-service');
-var troupeService = require('../../services/troupe-service');
-var chatService = require('../../services/chat-service');
+var userService = require('gitter-web-users');
+var troupeService = require('gitter-web-rooms/lib/troupe-service');
+var chatService = require('gitter-web-chats');
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var GroupWithPolicyService = require('../../services/group-with-policy-service');
 
-var redis = require('../../utils/redis');
+var redis = require('gitter-web-utils/lib/redis');
 var redisClient = redis.getClient();
 
 function fixUrl(url) {

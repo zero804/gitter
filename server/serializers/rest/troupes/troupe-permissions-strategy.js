@@ -1,7 +1,7 @@
 "use strict";
 
 var logger = require('gitter-web-env').logger;
-var userService = require("../../../services/user-service");
+var userService = require("gitter-web-users");
 var Promise = require('bluebird');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 

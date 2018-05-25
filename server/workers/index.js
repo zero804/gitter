@@ -10,7 +10,7 @@ exports.listen = function() {
   listening = true;
 
   debug('Starting scheduler instance');
-  require('../utils/worker-queue-redis').startScheduler();
+  require('gitter-web-utils/lib/worker-queue-redis').startScheduler();
 
   // Do not start the workers until theres a valid mongo connection
   // A redis connection is implied since resque needs redis to process
@@ -18,8 +18,8 @@ exports.listen = function() {
   onMongoConnect()
     .then(function() {
       debug('Starting works on successful mongodb connection');
-      require('../services/readby-service').listen();
-      require('../services/unread-items').listen();
+      require('gitter-web-unread-items/lib/readby-service').listen();
+      require('gitter-web-unread-items').listen();
       require('../services/notifications/push-notification-postbox').listen();
     });
 

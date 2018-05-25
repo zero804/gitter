@@ -1,6 +1,6 @@
 'use strict';
 
-var troupeService = require('../troupe-service');
+var troupeService = require('gitter-web-rooms/lib/troupe-service');
 var oneToOneTypeahead = require('./user-typeahead-one-to-one');
 var elasticTypeahead = require('./user-typeahead-elastic');
 var userSearchService = require('../user-search-service');

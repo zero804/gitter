@@ -2,7 +2,7 @@
 /*jslint node: true */
 "use strict";
 
-var userService = require('../../server/services/user-service');
+var userService = require('gitter-web-users');
 var shutdown = require('shutdown');
 var shimPositionOption = require('../yargs-shim-position-option');
 

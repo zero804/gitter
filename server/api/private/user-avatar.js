@@ -1,7 +1,7 @@
 'use strict';
 
 var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-url');
-var userService = require('../../services/user-service');
+var userService = require('gitter-web-users');
 
 var DEFAULT_AVATAR_URL = "https://avatars1.githubusercontent.com/u/0";
 

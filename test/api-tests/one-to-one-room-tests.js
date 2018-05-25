@@ -5,7 +5,7 @@ process.env.DISABLE_API_LISTEN = '1';
 var Promise = require('bluebird');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assert = require('assert');
-var unreadItemsEngine = require('../../server/services/unread-items/engine');
+var unreadItemsEngine = require('gitter-web-unread-items/lib/engine');
 
 describe('one-to-one-rooms', function() {
   var app, request;

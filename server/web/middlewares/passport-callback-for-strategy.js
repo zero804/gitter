@@ -5,7 +5,7 @@ var stats = env.stats;
 var errorReporter = env.errorReporter;
 
 var passport = require('passport');
-var client = require("../../utils/redis").getClient();
+var client = require("gitter-web-utils/lib/redis").getClient();
 var lock = require("redis-lock")(client);
 var validatedMessage = require('../validated-message');
 

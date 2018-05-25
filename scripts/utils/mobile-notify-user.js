@@ -2,12 +2,12 @@
 /*jslint node: true */
 "use strict";
 
-var userService = require('../../server/services/user-service');
-var troupeService = require('../../server/services/troupe-service');
-var chatService = require('../../server/services/chat-service');
+var userService = require('gitter-web-users');
+var troupeService = require('gitter-web-rooms/lib/troupe-service');
+var chatService = require('gitter-web-chats');
 var pushNotificationGateway = require('../../server/gateways/push-notification-gateway');
 var serializer = require('../../server/serializers/notification-serializer');
-var oneToOneRoomService = require('../../server/services/one-to-one-room-service')
+var oneToOneRoomService = require('gitter-web-rooms/lib/one-to-one-room-service')
 var shutdown = require('shutdown');
 var Promise = require('bluebird');
 

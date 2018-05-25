@@ -1,6 +1,6 @@
 "use strict";
 
-var RoomWithPolicyService = require('../../../services/room-with-policy-service');
+var RoomWithPolicyService = require('gitter-web-rooms/lib/room-with-policy-service');
 var restSerializer = require("../../../serializers/rest-serializer");
 var loadTroupeFromParam = require('./load-troupe-param');
 var inviteValidation = require('gitter-web-invites/lib/invite-validation');

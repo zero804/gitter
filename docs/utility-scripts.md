@@ -23,6 +23,13 @@ NODE_ENV=prod npm run nodeselektor -- scripts/utils/auto-lurk-room.js --members 
 ```
 
 
+### `delete-user.js`
+
+Removes a user from all room and destroys their auth tokens. Requires a username.
+
+e.g `./scripts/utils/delete-user.js --username trevorah`
+
+
 ### `delete-messages-from-user.js`
 
 Delete all messages for a given user
@@ -88,13 +95,6 @@ e.g `./scripts/utils/online-state.js trevorah`
 Redirect `roomA` to `roomB`. *note:* this will delete `roomA`
 
 e.g `./scripts/utils/redirect-room.js -f fromroom -t toroom`
-
-
-### `remove-user.js`
-
-Removes a user from all room and destroys their auth tokens. Requires a username.
-
-e.g `./scripts/utils/remove-user.js --username trevorah`
 
 
 ### `suggested-rooms.js`

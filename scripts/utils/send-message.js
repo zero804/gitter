@@ -3,10 +3,10 @@
 'use strict';
 
 var _ = require('lodash');
-var userService = require('../../server/services/user-service');
-var troupeService = require('../../server/services/troupe-service');
-var chatService = require('../../server/services/chat-service');
-var oneToOneRoomService = require('../../server/services/one-to-one-room-service');
+var userService = require('gitter-web-users');
+var troupeService = require('gitter-web-rooms/lib/troupe-service');
+var chatService = require('gitter-web-chats');
+var oneToOneRoomService = require('gitter-web-rooms/lib/one-to-one-room-service');
 var loremIpsum = require('lorem-ipsum');
 
 require('../../server/event-listeners').install();
