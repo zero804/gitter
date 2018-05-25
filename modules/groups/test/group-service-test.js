@@ -185,7 +185,7 @@ describe('group-service', function() {
       });
 
       it('should find a group', function() {
-        return groupService.findById(fixture.group1._id)
+        return groupService.findById(fixture.group1._id, { lean: true })
           .then(function(group) {
             assert.strictEqual(group.name, fixture.group1.name);
             assert.strictEqual(group.uri, fixture.group1.uri);
@@ -320,7 +320,38 @@ describe('group-service', function() {
           });
       });
     });
-
   });
 
+  describe('findRoomsInGroup', () => {
+    var fixture = fixtureLoader.setup({
+      group1: {},
+      troupe1: { group: 'group1', security: 'PUBLIC' },
+      troupe2: { group: 'group1', security: 'PUBLIC' },
+      troupe3: { group: 'group1', security: 'PRIVATE' },
+      troupe4: { group: 'group1', security: 'PRIVATE' },
+    });
+
+    it('should find rooms in group', () => {
+      return groupService.findRoomsInGroup(fixture.group1.get('id'))
+        .then(function(results) {
+          assert.strictEqual(results.length, 4);
+        });
+    });
+  });
+
+  describe('deleteGroup', () => {
+    var fixture = fixtureLoader.setup({
+      group1: {}
+    });
+
+    it('should delete group', () => {
+      return groupService.deleteGroup(fixture.group1)
+        .then(function() {
+          return groupService.findById(fixture.group1.get('id'));
+        })
+        .then((groupResult) => {
+          assert.strictEqual(groupResult, null);
+        });
+    });
+  });
 })

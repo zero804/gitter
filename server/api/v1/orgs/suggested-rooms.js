@@ -11,7 +11,7 @@ module.exports = {
     if (!req.user) return [];
     var userId = req.user._id;
 
-    return groupService.findByUri(req.params.orgName)
+    return groupService.findByUri(req.params.orgName, { lean: true })
       .then(function(group) {
         if (!group) return [];
 

@@ -21,9 +21,8 @@ var groupFavouritesCore = require('./group-favourites-core');
 /**
  * Find a group given an id
  */
-function findById(groupId) {
-  return Group.findById(groupId)
-    .lean()
+function findById(groupId, opts = {}) {
+  return Group.findById(groupId, {}, { lean: opts.lean || false })
     .exec();
 }
 
@@ -34,10 +33,17 @@ function findByIds(ids) {
 /**
  * Find a group given a URI
  */
-function findByUri(uri) {
+function findByUri(uri, opts = {}) {
   assert(uri, 'uri required');
-  return Group.findOne({ lcUri: uri.toLowerCase() })
-    .lean()
+  return Group.findOne({ lcUri: uri.toLowerCase() }, {}, { lean: opts.lean || false })
+    .exec();
+}
+
+// Find all rooms in a given group
+function findRoomsInGroup(groupId) {
+  return Troupe.find({
+      groupId: groupId
+    })
     .exec();
 }
 
@@ -272,12 +278,34 @@ function updateFavourite(userId, groupId, favouritePosition) {
     });
 }
 
+function deleteGroup(group) {
+  assert(group, 'group is required');
+
+  // Avoid the circular dependency with the rooms module using `gitter-web-groups`
+  // This will cause an empty object import in the rooms module
+  var roomService = require('gitter-web-rooms');
+
+  return findRoomsInGroup(group.get('id'))
+    .then((rooms) => {
+      return rooms.reduce((promiseChain, room) => {
+        return promiseChain.then(() => {
+          return roomService.deleteRoom(room);
+        });
+      }, Promise.resolve());
+    })
+    .then(() => {
+      return group.remove();
+    });
+}
+
 
 module.exports = {
   findByUri: Promise.method(findByUri),
   findById: Promise.method(findById),
   findByIds: findByIds,
+  findRoomsInGroup: findRoomsInGroup,
   createGroup: Promise.method(createGroup),
+  deleteGroup: deleteGroup,
   findRoomsIdForGroup: Promise.method(findRoomsIdForGroup),
   setAvatarForGroup: setAvatarForGroup,
   setForumForGroup: setForumForGroup,

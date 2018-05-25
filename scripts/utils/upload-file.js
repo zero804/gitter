@@ -47,7 +47,7 @@ var opts = yargs
 function getParams() {
   var params = { type: opts.type };
   if (opts.type === 'avatar') {
-    return groupService.findByUri(opts.group_uri)
+    return groupService.findByUri(opts.group_uri, { lean: true })
       .then(function(group) {
         if (!group) throw new StatusError(404, 'Group not found.')
         params.group_id = group._id.toString();

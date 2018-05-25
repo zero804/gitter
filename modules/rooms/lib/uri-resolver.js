@@ -47,7 +47,7 @@ function resolveFromLookup(uriLookup, userId) {
 
   if (uriLookup.groupId) {
     /* The uri is for a group */
-    return groupService.findById(uriLookup.groupId)
+    return groupService.findById(uriLookup.groupId, { lean: true })
       .then(function(group) {
         if (!group) return null;
 

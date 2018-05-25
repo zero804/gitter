@@ -36,7 +36,7 @@ function renderForum(req, res, next, options) {
 
   return Promise.props({
       context: contextGenerator.generateBasicContext(req),
-      group: groupService.findByUri(groupUri),
+      group: groupService.findByUri(groupUri, { lean: true }),
       userThemeSnapshot: generateUserThemeSnapshot(req),
     })
     .bind({
@@ -128,7 +128,7 @@ function renderTopic(req, res, next) {
 
   return Promise.props({
       context: contextGenerator.generateBasicContext(req),
-      group: groupService.findByUri(groupUri),
+      group: groupService.findByUri(groupUri, { lean: true }),
       userThemeSnapshot: generateUserThemeSnapshot(req)
     })
     .bind({
