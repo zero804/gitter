@@ -14,7 +14,7 @@ var RATE = 86400 / 4;
 
 module.exports = {
 
-  record: function (user, client) {
+  record: function (user, client, userAgent) {
     if(user && client) {
       var userId = user.id;
       var clientId = client.id;
@@ -29,7 +29,14 @@ module.exports = {
             stats.userUpdate(user, properties);
           }
 
-          stats.event('client.access', { userId: userId, clientName: client.name, clientId: client.name, tag: client.tag });
+          stats.event('client.access', {
+            userId: userId,
+            clientId: client.id,
+            clientName: client.name,
+            clientKey: client.clientKey,
+            tag: client.tag,
+            userAgent: userAgent
+          });
         }
       });
     }

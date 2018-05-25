@@ -1,3 +1,15 @@
+# 19.2.0 - 2018-5-23
+
+ - Add "Terms of Service" profile menu item linking to https://about.gitlab.com/terms/, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1161
+ - Fix "Allow private repo access" profile menu item not redirecting to GitHub OAuth upgrade flow, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1162
+
+Developer facing:
+
+ - Add developer FAQ, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1163
+    - First FAQ is on how to configure Gitter so you can access it over your local network on separate devices
+ - Correlate user-agent with OAuth token usage (stats), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1160
+
+
 # 19.1.0 - 2018-5-21
 
  - Sign out user when token revoked in realtime, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1155

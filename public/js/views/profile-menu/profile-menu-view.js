@@ -46,7 +46,7 @@ function getProfileCollection() {
       if (existing) return;
       var appsItem = result.find(function(f) { return f.get('stub') === '/apps' });
 
-      result.add({ name: 'Allow Private Repo Access', stub: '#upgraderepoaccess', upgradeItem: true }, {
+      result.add({ name: 'Allow Private Repo Access', stub: '/login/upgrade?scopes=repo', upgradeItem: true }, {
         at: result.indexOf(appsItem) + 1
       });
     }
@@ -57,6 +57,8 @@ function getProfileCollection() {
   user.on('change:scopes', showHideRepoAccess);
 
   result.add({ name: 'Toggle Dark Theme', stub: '#dark-theme' });
+
+  result.add({ name: 'Terms of Service', stub: 'https://about.gitlab.com/terms/', target: '_blank' });
 
   if(isWebApp) {
     result.add({ name: 'Sign Out', stub: '/logout' });
