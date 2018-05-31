@@ -1,6 +1,6 @@
 # 19.3.0 - *upcoming*
 
- - ..
+ - Add ability to delete account, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1169
 
 Developer facing:
 
@@ -9,6 +9,8 @@ Developer facing:
  - Update utility script docs to be more copy-pasta friendly, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1173
  - Fix `skip` parameter in the room search API endpoint `/v1/rooms?q=foo&skip=15&limit=3`
     - Thanks to [@nsuchy](https://gitlab.com/nsuchy) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1175
+ - Add room `lcUri` to room deletion log warning for easier grepping, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1168
+
 
 # 19.2.0 - 2018-5-23
 

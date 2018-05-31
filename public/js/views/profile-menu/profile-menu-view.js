@@ -60,6 +60,8 @@ function getProfileCollection() {
 
   result.add({ name: 'Terms of Service', stub: 'https://about.gitlab.com/terms/', target: '_blank' });
 
+  result.add({ name: 'Delete Account', stub: '#delete-account' });
+
   if(isWebApp) {
     result.add({ name: 'Sign Out', stub: '/logout' });
   }

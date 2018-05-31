@@ -1,17 +1,18 @@
 "use strict";
 
 var Marionette = require('backbone.marionette');
-var Backbone = require('backbone');
-var ModalView = require('./modal');
+var log = require('../../utils/log');
+var logout = require('../../utils/logout');
 var context = require('../../utils/context');
-var apiClient = require('../../components/api-client');
 var appEvents = require('../../utils/appevents');
+var ModalView = require('./modal');
+var apiClient = require('../../components/api-client');
 var DelayLock = require('../../models/delay-lock-model');
-var template = require('./tmpl/delete-room-view.hbs');
+var template = require('./tmpl/delete-account-view.hbs');
 
 var View = Marionette.ItemView.extend({
   tagName: 'p',
-  attributes: { style: 'padding-bottom: 15px' },
+  attributes: { style: '' },
   modelEvents: {
     'change': 'render'
   },
@@ -22,9 +23,17 @@ var View = Marionette.ItemView.extend({
   menuItemClicked: function(button) {
     switch(button) {
       case 'delete':
-        apiClient.room.delete().then(function() {
-          appEvents.trigger('navigation', '/home', 'home', '');
-        });
+        // Notify others, that they shouldn't redirect while we are trying to logout
+        appEvents.trigger('account.delete-start');
+
+        apiClient.user.delete()
+          .then(() => {
+            return logout();
+          })
+          .catch((err) => {
+            log.error('Error while deleting account', { exception: err });
+            this.model.set('error', `Error while deleting account: ${err} (status: ${err.status})`);
+          });
         break;
 
       case 'cancel':
@@ -38,11 +47,11 @@ var Modal = ModalView.extend({
   initialize: function(options) {
     options = options || {};
     options.title = 'Careful Now...';
-    var roomName = context.troupe().get('uri');
+    var username = context.user().get('username');
     options.menuItems = [{
       disabled: true,
       action: 'delete',
-      text: 'Delete "' + roomName + '"',
+      text: `Delete ${username}`,
       className: 'modal--default__footer__btn--negative'
     }];
 

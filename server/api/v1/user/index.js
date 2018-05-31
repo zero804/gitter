@@ -5,6 +5,7 @@ var githubGitterUserSearch = require("../../../services/github-gitter-user-searc
 var gitterUserSearch = require("../../../services/user-search-service");
 var StatusError = require('statuserror');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+var userRemovalService = require('gitter-web-rooms/lib/user-removal-service');
 
 module.exports = {
   id: 'resourceUser',
@@ -43,6 +44,15 @@ module.exports = {
   show: function(req) {
     var strategy = new restSerializer.UserStrategy({ includeProviders: true });
     return restSerializer.serializeObject(req.resourceUser, strategy);
+  },
+
+  destroy: function(req) {
+    if(!req.user) throw new StatusError(401);
+
+    return userRemovalService.removeByUsername(req.user.username)
+      .then(function() {
+        return { success: true };
+      });
   },
 
   load: function(req, id) {
