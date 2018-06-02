@@ -3,7 +3,6 @@
 var env = require('gitter-web-env');
 var config = env.config;
 
-
 var configurationMappings = {
   GITTER_INTEGRATION_USERNAME: 'integrationTests:test_user:username',
   GITTER_INTEGRATION_USER_SCOPE_TOKEN: 'integrationTests:test_user:user_scope_token',
@@ -34,8 +33,8 @@ var configurationMappings = {
   GITHUB_USER_SECRET: "github:user_client_secret",
   GITHUB_ANON_CLIENT_ID: "github:anonymous_app:client_id",
   GITHUB_ANON_CLIENT_SECRET: "github:anonymous_app:client_secret",
-  TWITTER_CONSUMER_KEY: "twitteroauth__consumer_key",
-  TWITTER_CONSUMER_SECRET: "twitteroauth__consumer_secret",
+  TWITTER_CONSUMER_KEY: "twitteroauth:consumer_key",
+  TWITTER_CONSUMER_SECRET: "twitteroauth:consumer_secret",
 }
 
 var configSets = {
