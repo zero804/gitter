@@ -13,7 +13,7 @@ For `gitter.im` production,
 You can use any box but the beta box works well,
 
 ```
-ssh deployer@gitter-beta
+ssh deployer@gitter-beta.beta.gitter
 ```
 
 Also see https://gitlab.com/gl-infra/gitter-infrastructure#ssh-to-boxes
