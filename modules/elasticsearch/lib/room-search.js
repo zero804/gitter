@@ -68,6 +68,7 @@ function searchRooms(queryText, userId, privateRoomIds, options) {
   var roomRestrictionTerms = or(PUBLIC_ROOMS_QUERY, privateRooms(privateRoomIds));
 
   var queryRequest = {
+    from: options.skip || 0,
     size: options.limit || 10,
     timeout: DEFAULT_QUERY_TIMEOUT,
     index: 'gitter-primary',
