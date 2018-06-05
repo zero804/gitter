@@ -7,7 +7,8 @@ Developer facing:
  - Technical debt: Move `server/services/room-service.js` to `gitter-web-rooms` module, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1165
     - Also create dependent modules: `gitter-web-unread-items`, `gitter-web-push-notifications`, `gitter-web-users`, `gitter-web-chats`, `gitter-web-events`, `gitter-web-email-addresses`, `gitter-web-user-settings`, `gitter-web-email-notifications`
  - Update utility script docs to be more copy-pasta friendly, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1173
-
+ - Fix `skip` parameter in the room search API endpoint `/v1/rooms?q=foo&skip=15&limit=3`
+    - Thanks to [@nsuchy](https://gitlab.com/nsuchy) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1175
 
 # 19.2.0 - 2018-5-23
 
