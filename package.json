@@ -139,7 +139,7 @@
     "on-headers": "^1.0.1",
     "parse-links": "~0.1.0",
     "passport": "^0.2.2",
-    "passport-gitlab2": "^3.0.0",
+    "passport-gitlab2": "git+https://github.com/gitterhq/passport-gitlab2.git#update-to-gitlab-api-v4",
     "passport-google-oauth2": "^0.1.6",
     "passport-http": "^0.2.2",
     "passport-linkedin-oauth2": "^1.4.0",
