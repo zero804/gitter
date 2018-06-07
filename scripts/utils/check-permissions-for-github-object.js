@@ -4,7 +4,7 @@
 
 var Promise = require('bluebird');
 var validateUri = require('gitter-web-github').GitHubUriValidator;
-var userService = require('../../server/services/user-service');
+var userService = require('gitter-web-users');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory')
 
 function execute(username, uri) {

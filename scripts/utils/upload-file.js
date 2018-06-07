@@ -7,7 +7,7 @@ var Promise = require('bluebird');
 var yargs = require('yargs');
 var shutdown = require('shutdown');
 var StatusError = require('statuserror');
-var troupeService = require('../../server/services/troupe-service');
+var troupeService = require('gitter-web-rooms/lib/troupe-service');
 var groupService = require('gitter-web-groups/lib/group-service');
 
 process.env.DISABLE_API_LISTEN = '1';

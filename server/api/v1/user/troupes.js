@@ -1,16 +1,16 @@
 "use strict";
 
-var troupeService = require("../../../services/troupe-service");
+var troupeService = require("gitter-web-rooms/lib/troupe-service");
 var restful = require("../../../services/restful");
 var restSerializer = require("../../../serializers/rest-serializer");
-var recentRoomService = require('../../../services/recent-room-service');
-var userRoomModeUpdateService = require('../../../services/user-room-mode-update-service');
-var roomService = require('../../../services/room-service');
+var recentRoomService = require('gitter-web-rooms/lib/recent-room-service');
+var userRoomModeUpdateService = require('gitter-web-rooms/lib/user-room-mode-update-service');
+var roomService = require('gitter-web-rooms');
 var Promise = require('bluebird');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var StatusError = require('statuserror');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
-var RoomWithPolicyService = require('../../../services/room-with-policy-service');
+var RoomWithPolicyService = require('gitter-web-rooms/lib/room-with-policy-service');
 
 function joinRoom(user, room, policy, options) {
   var roomWithPolicyService = new RoomWithPolicyService(room, user, policy);

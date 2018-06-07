@@ -4,7 +4,7 @@ var makeBenchmark = require('../make-benchmark');
 var testRequire = require('../integration/test-require');
 
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
-var unreadItemsServiceEngine = testRequire('./services/unread-items/engine');
+var unreadItemsServiceEngine = testRequire('gitter-web-unread-items/lib/engine');
 
 var largeUserSet = [];
 var largeUserSetSingleMention = [];
@@ -38,7 +38,7 @@ makeBenchmark({
   after: function(done) {
     if (process.env.DISABLE_EMAIL_NOTIFY_CLEAR_AFTER_TEST) return done();
 
-    var unreadItemServiceEngine = testRequire('./services/unread-items/engine');
+    var unreadItemServiceEngine = testRequire('gitter-web-unread-items/lib/engine');
     unreadItemServiceEngine.testOnly.removeAllEmailNotifications()
       .nodeify(done);
   },

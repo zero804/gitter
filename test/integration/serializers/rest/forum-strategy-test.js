@@ -16,7 +16,7 @@ var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var LONG_AGO = '2014-01-01T00:00:00.000Z';
 
 describe('ForumStrategy #slow', function() {
-  var blockTimer = require('../../block-timer');
+  var blockTimer = require('gitter-web-test-utils/lib/block-timer');
   before(blockTimer.on);
   after(blockTimer.off);
 

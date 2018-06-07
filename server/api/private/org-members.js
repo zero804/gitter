@@ -3,7 +3,7 @@
 var GitHubMeService = require('gitter-web-github').GitHubMeService;
 var GitHubOrgService = require('gitter-web-github').GitHubOrgService;
 var restSerializer = require("../../serializers/rest-serializer");
-var userService = require('../../services/user-service');
+var userService = require('gitter-web-users');
 var StatusError = require('statuserror');
 var Promise = require('bluebird');
 

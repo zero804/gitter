@@ -5,7 +5,7 @@ var appEvents = require('gitter-web-appevents');
 var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 var troupeDao = require('../daos/troupe-dao').lean;
 var userDao = require('../daos/user-dao').lean;
-var chatService = require('../chat-service');
+var chatService = require('gitter-web-chats');
 var _ = require('lodash');
 var debug = require('debug')('gitter:app:online-notification-generator');
 

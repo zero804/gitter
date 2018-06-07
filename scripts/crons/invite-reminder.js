@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 "use strict";
 
-var emailNotificationService = require('../../server/services/email-notification-service');
+var emailNotificationService = require('gitter-web-email-notifications');
 var Promise = require('bluebird');
 var invitesService = require('gitter-web-invites/lib/invites-service');
 var logger = require('gitter-web-env').logger;

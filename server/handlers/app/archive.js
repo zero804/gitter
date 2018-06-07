@@ -5,7 +5,7 @@ var identifyRoute = env.middlewares.identifyRoute;
 
 var moment = require('moment');
 var uriContextResolverMiddleware = require('../uri-context/uri-context-resolver-middleware');
-var chatService = require('../../services/chat-service');
+var chatService = require('gitter-web-chats');
 var chatHeapmapAggregator = require('gitter-web-elasticsearch/lib/chat-heatmap-aggregator');
 var restSerializer = require('../../serializers/rest-serializer');
 var contextGenerator = require('../../web/context-generator');

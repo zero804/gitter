@@ -11,9 +11,9 @@ var restSerializer = require('../../serializers/rest-serializer');
 
 var contextGenerator = require('../../web/context-generator');
 var generateRoomCardContext = require('gitter-web-shared/templates/partials/room-card-context-generator');
-var userService = require('../../services/user-service');
+var userService = require('gitter-web-users');
 var groupBrowserService = require('gitter-web-groups/lib/group-browser-service');
-var roomMembershipService = require('../../services/room-membership-service');
+var roomMembershipService = require('gitter-web-rooms/lib/room-membership-service');
 var forumService = require('gitter-web-topics/lib/forum-service');
 var generateUserThemeSnapshot = require('../snapshots/user-theme-snapshot');
 

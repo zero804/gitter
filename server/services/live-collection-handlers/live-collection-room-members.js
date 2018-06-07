@@ -3,7 +3,7 @@
 var Promise = require('bluebird');
 var appEvents = require('gitter-web-appevents');
 var restSerializer = require("../../serializers/rest-serializer");
-var troupeService = require('../troupe-service');
+var troupeService = require('gitter-web-rooms/lib/troupe-service');
 var userTypeaheadElastic = require('../typeaheads/user-typeahead-elastic');
 var debug = require('debug')('gitter:app:live-collection-room-members');
 

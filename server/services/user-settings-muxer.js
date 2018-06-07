@@ -2,9 +2,9 @@
 
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
-var userSettingsService = require('./user-settings-service');
-var userDefaultFlagsService = require('./user-default-flags-service');
-var userDefaultFlagsUpdateService = require('./user-default-flags-update-service');
+var userSettingsService = require('gitter-web-user-settings');
+var userDefaultFlagsService = require('gitter-web-rooms/lib/user-default-flags-service');
+var userDefaultFlagsUpdateService = require('gitter-web-rooms/lib/user-default-flags-update-service');
 
 function standardHandler(settingsKey) {
   return {

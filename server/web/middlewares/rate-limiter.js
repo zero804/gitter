@@ -1,7 +1,7 @@
 "use strict";
 
 var dolph = require('dolph');
-var redis = require("../../utils/redis");
+var redis = require("gitter-web-utils/lib/redis");
 var redisClient = redis.getClient();
 
 var env = require('gitter-web-env');

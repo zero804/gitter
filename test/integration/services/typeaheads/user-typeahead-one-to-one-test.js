@@ -14,7 +14,7 @@ var room = {
 };
 
 var typeahead = proxyquire('../../../../server/services/typeaheads/user-typeahead-one-to-one', {
-  '../user-service': {
+  'gitter-web-users': {
     findByIds: function() {
       return Promise.resolve([anna, bob]);
     }

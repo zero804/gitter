@@ -17,13 +17,15 @@ You can't change your username. Your username matches whatever OAuth provider yo
 If you changed your username on GitHub, sign out of Gitter and sign back in again to update it.
 
 
-### How do I remove the  `_twitter` suffix from my username
+### How do I remove the  `_gitlab`/`_twitter` suffix from my username
 
 See above, you can't change your username.
 
-We add the `_twitter` suffix to avoid name collisions with GitHub.
+We add the `_gitlab`/`_twitter` suffix to avoid name collisions with GitHub.
 If you don't want the suffix added, sign in with GitHub.
 
+You can track [#1851](https://gitlab.com/gitlab-org/gitter/webapp/issues/1851)
+for the ability to customize your username in the future and remove the suffix.
 
 ## How do I update my avatar?
 
@@ -32,6 +34,8 @@ Sign out of Gitter and sign back in to update your avatar (or any other info).
 
 ## How do I delete my account?
 
-Whilst we're very sad to see you go, we're more than happy to help you out. Please contact support@gitter.im with your Gitter username and we'll take care of that for you.
+You can delete your account by using the profile menu dropdown in the top-right -> **Delete Account**
 
-We'd love to hear why so we can improve our service going forward.
+![](https://i.imgur.com/j3Gowl7.png)
+
+We can't recover your data after deletion but you can re-create your account at any time by signing back in.

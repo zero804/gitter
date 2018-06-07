@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 'use strict';
 
-var troupeService = require('../../server/services/troupe-service');
+var troupeService = require('gitter-web-rooms/lib/troupe-service');
 var Promise = require('bluebird');
 var persistence = require('gitter-web-persistence');
-var roomMembershipService = require('../../server/services/room-membership-service');
-var roomMembershipFlags = require('../../server/services/room-membership-flags');
+var roomMembershipService = require('gitter-web-rooms/lib/room-membership-service');
+var roomMembershipFlags = require('gitter-web-rooms/lib/room-membership-flags');
 var cumberbatch = require('cumberbatch-name');
 
 var opts = require('yargs')

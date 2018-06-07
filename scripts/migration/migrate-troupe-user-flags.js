@@ -3,7 +3,7 @@
 'use strict';
 
 var persistence = require('gitter-web-persistence');
-var roomMembershipFlags = require('../../server/services/room-membership-flags');
+var roomMembershipFlags = require('gitter-web-rooms/lib/room-membership-flags');
 var onMongoConnect = require('gitter-web-persistence-utils/lib/on-mongo-connect');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var through2Concurrent = require('through2-concurrent');

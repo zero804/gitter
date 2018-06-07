@@ -2,9 +2,9 @@
 
 "use strict";
 
-var userService = require('../../server/services/user-service');
-var autoRemovalService = require('../../server/services/auto-removal-service');
-var troupeService = require('../../server/services/troupe-service');
+var userService = require('gitter-web-users');
+var autoRemovalService = require('gitter-web-rooms/lib/auto-removal-service');
+var troupeService = require('gitter-web-rooms/lib/troupe-service');
 var persistence = require('gitter-web-persistence');
 var collections = require('gitter-web-utils/lib/collections');
 var Promise = require('bluebird');

@@ -1,6 +1,6 @@
 "use strict";
 
-var recentRoomService = require('../services/recent-room-service');
+var recentRoomService = require('gitter-web-rooms/lib/recent-room-service');
 
 /**
  * For a user who has nowhere to go? Where to Next?

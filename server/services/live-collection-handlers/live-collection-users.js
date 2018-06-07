@@ -4,7 +4,7 @@ var _ = require('lodash');
 var Promise = require('bluebird');
 var appEvents = require('gitter-web-appevents');
 var restSerializer = require("../../serializers/rest-serializer");
-var roomMembershipService = require('../room-membership-service');
+var roomMembershipService = require('gitter-web-rooms/lib/room-membership-service');
 var userTypeaheadElastic = require('../typeaheads/user-typeahead-elastic');
 
 function getRoomDistribution(userId) {

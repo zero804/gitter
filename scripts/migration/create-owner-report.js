@@ -11,7 +11,7 @@ var mongoose = require('mongoose');
 var persistence = require('gitter-web-persistence');
 var installMigrationSchemas = require('./migration-schemas').install;
 var onMongoConnect = require('gitter-web-persistence-utils/lib/on-mongo-connect');
-var userService = require('../../server/services/user-service');
+var userService = require('gitter-web-users');
 var through2Concurrent = require('through2-concurrent');
 var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs')
 

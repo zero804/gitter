@@ -2,7 +2,7 @@
 
 var env = require('gitter-web-env');
 var nconf = env.config;
-var redis = require('../../utils/redis');
+var redis = require('gitter-web-utils/lib/redis');
 var uuid = require('node-uuid');
 var StatusError = require('statuserror');
 var Promise = require('bluebird');

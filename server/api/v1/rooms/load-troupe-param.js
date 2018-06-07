@@ -1,6 +1,6 @@
 'use strict';
 
-var troupeService = require("../../../services/troupe-service");
+var troupeService = require("gitter-web-rooms/lib/troupe-service");
 var StatusError = require('statuserror');
 
 module.exports = function(req) {

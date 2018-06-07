@@ -1,7 +1,7 @@
 "use strict";
 
 var logger = require('gitter-web-env').logger;
-var pushNotificationService = require('../../services/push-notification-service');
+var pushNotificationService = require('gitter-web-push-notifications');
 
 module.exports = function(req, res, next) {
   var userId = req.user.id;

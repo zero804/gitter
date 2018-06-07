@@ -4,8 +4,8 @@ var persistence = require('gitter-web-persistence');
 var Promise = require('bluebird');
 var collections = require('gitter-web-utils/lib/collections');
 var _ = require('underscore');
-var userService = require('./user-service');
-var roomMembershipService = require('./room-membership-service');
+var userService = require('gitter-web-users');
+var roomMembershipService = require('gitter-web-rooms/lib/room-membership-service');
 var userSearch = require('gitter-web-elasticsearch/lib/user-search');
 
 var LARGE_ROOM_SIZE_THRESHOLD = 200;

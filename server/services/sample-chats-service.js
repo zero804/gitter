@@ -1,6 +1,6 @@
 "use strict";
 
-var chatService = require('./chat-service');
+var chatService = require('gitter-web-chats');
 var restSerializer = require('../serializers/rest-serializer');
 var Promise = require('bluebird');
 

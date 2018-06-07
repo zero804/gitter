@@ -1,9 +1,9 @@
 'use strict';
 
-var userService = require('../../server/services/user-service');
-var troupeService = require('../../server/services/troupe-service');
+var userService = require('gitter-web-users');
+var troupeService = require('gitter-web-rooms/lib/troupe-service');
 var Promise = require('bluebird');
-var chatService = require('../../server/services/chat-service');
+var chatService = require('gitter-web-chats');
 var loremIpsum = require('lorem-ipsum');
 var dictionary = require('lorem-ipsum/lib/dictionary').words;
 

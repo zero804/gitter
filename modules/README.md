@@ -34,6 +34,7 @@
 * [`push-gateways`](./push-gateways): Backend: Push Message Notification
 * [`push-notification-filter`](./push-notification-filter): Backend: Push Message Filtering
 * [`qs`](./qs): Frontend: Query String utility
+* [`rooms`](./rooms): Backend: Rooms/Troupes
 * [`serialization`](./serialization): Backend: JSON serialization
 * [`service-worker`](./service-worker): Frontend: Service worker
 * [`slugify`](./slugify): Frontend: Slug generation

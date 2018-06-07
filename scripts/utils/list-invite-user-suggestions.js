@@ -4,7 +4,7 @@
 
 var shutdown = require('shutdown');
 var collaboratorsService = require('gitter-web-collaborators');
-var userService = require('../../server/services/user-service');
+var userService = require('gitter-web-users');
 
 var opts = require('yargs')
   .option('username', {

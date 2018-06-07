@@ -273,8 +273,6 @@ function updateFavourite(userId, groupId, favouritePosition) {
 }
 
 
-
-
 module.exports = {
   findByUri: Promise.method(findByUri),
   findById: Promise.method(findById),

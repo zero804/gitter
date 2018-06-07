@@ -2,7 +2,7 @@
 /*jslint node: true */
 "use strict";
 
-var troupeService = require('../../server/services/troupe-service');
+var troupeService = require('gitter-web-rooms/lib/troupe-service');
 var persistance = require('gitter-web-persistence');
 var Promise = require('bluebird');
 var assert = require('assert');

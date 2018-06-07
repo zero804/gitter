@@ -6,6 +6,7 @@ var ModalView = require('./modal');
 var context = require('../../utils/context');
 var apiClient = require('../../components/api-client');
 var appEvents = require('../../utils/appevents');
+var DelayLock = require('../../models/delay-lock-model');
 var template = require('./tmpl/delete-room-view.hbs');
 
 var View = Marionette.ItemView.extend({
@@ -30,32 +31,6 @@ var View = Marionette.ItemView.extend({
         this.dialog.hide();
         break;
     }
-  }
-});
-
-var DelayLock = Backbone.Model.extend({
-  defaults: {
-    locked: true,
-    // give enough time to read the warnings
-    secondsLeft: 8
-  },
-  initialize: function() {
-    this.tick();
-  },
-  tick: function() {
-    var self = this;
-    if (!this.get('locked')) return;
-
-    setTimeout(function() {
-      var seconds = self.get('secondsLeft') - 1;
-      self.set('secondsLeft', seconds);
-
-      if (seconds <= 0) {
-        self.set('locked', false);
-      } else {
-        self.tick();
-      }
-    }, 1000);
   }
 });
 

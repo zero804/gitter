@@ -7,9 +7,9 @@
 var env = require('gitter-web-env');
 var stats = env.stats;
 var errorReporter = env.errorReporter;
-var roomMembershipService = require('../services/room-membership-service');
+var roomMembershipService = require('gitter-web-rooms/lib/room-membership-service');
 var liveCollections = require('gitter-web-live-collection-events');
-var unreadItemService = require('../services/unread-items');
+var unreadItemService = require('gitter-web-unread-items');
 var _ = require('lodash');
 
 function onMembersAdded(troupeId, userIds) {

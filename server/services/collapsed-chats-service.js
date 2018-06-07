@@ -1,7 +1,7 @@
 "use strict";
 
 var Promise = require('bluebird');
-var redis = require("../utils/redis");
+var redis = require("gitter-web-utils/lib/redis");
 var redisClient = redis.getClient();
 var Scripto = require('gitter-redis-scripto');
 

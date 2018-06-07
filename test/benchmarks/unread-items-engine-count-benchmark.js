@@ -6,7 +6,7 @@ var _ = require('lodash');
 var Promise = require('bluebird');
 
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
-var unreadItemsServiceEngine = testRequire('./services/unread-items/engine');
+var unreadItemsServiceEngine = testRequire('gitter-web-unread-items/lib/engine');
 
 var largeUserSet = [];
 var largeUserSetSingleMention = [];

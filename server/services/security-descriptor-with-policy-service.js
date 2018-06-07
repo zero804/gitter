@@ -1,6 +1,6 @@
 'use strict';
 
-var secureMethod = require('../utils/secure-method');
+var secureMethod = require('gitter-web-utils/lib/secure-method');
 var assert = require('assert');
 var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor');
 

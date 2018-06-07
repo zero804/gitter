@@ -6,7 +6,7 @@ var orgRenderer = require('./org');
 var fixMongoIdQueryParam = require('../../web/fix-mongo-id-query-param');
 var url = require('url');
 var social = require('../social-metadata');
-var chatService = require('../../services/chat-service');
+var chatService = require('gitter-web-chats');
 var restSerializer = require("../../serializers/rest-serializer");
 var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
 

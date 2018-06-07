@@ -1,8 +1,8 @@
 "use strict";
 
-var troupeService = require('../../services/troupe-service');
+var troupeService = require('gitter-web-rooms/lib/troupe-service');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
-var RoomWithPolicyService = require('../../services/room-with-policy-service');
+var RoomWithPolicyService = require('gitter-web-rooms/lib/room-with-policy-service');
 
 module.exports = function (req, res, next) {
   var uri = "" + req.body.uri;

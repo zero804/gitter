@@ -4,8 +4,8 @@ var env = require('gitter-web-env');
 var logger = env.logger;
 var stats = env.stats;
 
-var RoomWithPolicyService = require('./room-with-policy-service');
-var troupeService = require('./troupe-service');
+var RoomWithPolicyService = require('gitter-web-rooms/lib/room-with-policy-service');
+var troupeService = require('gitter-web-rooms/lib/troupe-service');
 var invitesService = require('gitter-web-invites/lib/invites-service');
 var StatusError = require('statuserror');
 var assert = require('assert');

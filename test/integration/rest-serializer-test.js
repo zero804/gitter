@@ -10,7 +10,7 @@ var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
 describe('restSerializer', function() {
 
-  var blockTimer = require('./block-timer');
+  var blockTimer = require('gitter-web-test-utils/lib/block-timer');
   before(blockTimer.on);
   after(blockTimer.off);
 

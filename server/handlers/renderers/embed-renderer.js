@@ -1,7 +1,7 @@
 'use strict';
 
 var renderChat = require('./chat-internal');
-var roomMembershipService = require('../../services/room-membership-service');
+var roomMembershipService = require('gitter-web-rooms/lib/room-membership-service');
 
 function renderSecondaryView(req, res, next, options) {
   var uriContext = options.uriContext;

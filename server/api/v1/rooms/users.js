@@ -1,13 +1,13 @@
 "use strict";
 
 var restful = require('../../../services/restful');
-var userService = require("../../../services/user-service");
+var userService = require("gitter-web-users");
 var restSerializer = require("../../../serializers/rest-serializer");
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
-var troupeService = require("../../../services/troupe-service");
+var troupeService = require("gitter-web-rooms/lib/troupe-service");
 var StatusError = require('statuserror');
 var loadTroupeFromParam = require('./load-troupe-param');
-var RoomWithPolicyService = require('../../../services/room-with-policy-service');
+var RoomWithPolicyService = require('gitter-web-rooms/lib/room-with-policy-service');
 var Promise = require('bluebird');
 
 var SEARCH_EXPIRES_SECONDS = 60;

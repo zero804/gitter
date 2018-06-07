@@ -1,6 +1,6 @@
 "use strict";
 
-var userService = require("../../services/user-service");
+var userService = require("gitter-web-users");
 var UserStrategy = require('./user-strategy');
 
 var idStrategyGenerator = require('gitter-web-serialization/lib/id-strategy-generator');

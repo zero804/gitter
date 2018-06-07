@@ -4,7 +4,7 @@
 var yargs = require('yargs');
 var _ = require('lodash');
 var shutdown = require('shutdown');
-var troupeService = require('../../server/services/troupe-service');
+var troupeService = require('gitter-web-rooms/lib/troupe-service');
 
 
 var argv = yargs.argv;

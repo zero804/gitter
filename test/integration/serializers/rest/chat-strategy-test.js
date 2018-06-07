@@ -19,7 +19,7 @@ function makeHash() {
 
 
 describe('chat-strategy-test', function() {
-  var blockTimer = require('../../block-timer');
+  var blockTimer = require('gitter-web-test-utils/lib/block-timer');
   var expected1, expectedAnonymous, expectedLeanTrue, expectedInitialId, expectedLookups;
 
   before(blockTimer.on);

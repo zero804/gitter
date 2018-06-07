@@ -1,0 +1,23 @@
+{
+  "name": "gitter-web-events",
+  "version": "1.0.0",
+  "main": "lib/event-service.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha test/"
+  },
+  "private": true,
+  "dependencies": {
+    "gitter-web-persistence": "file:../persistence",
+    "gitter-web-text-processor": "file:../text-processor",
+    "mongodb": "^2.2.35",
+    "bluebird": "^3.5.1",
+    "statuserror": "^0.1.3"
+  },
+  "devDependencies": {
+    "gitter-web-test-utils": "file:../test-utils"
+  }
+}

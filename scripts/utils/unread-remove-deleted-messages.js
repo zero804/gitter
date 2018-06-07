@@ -3,9 +3,9 @@
 "use strict";
 
 var Promise = require('bluebird');
-var troupeService = require('../../server/services/troupe-service');
-var unreadItemService = require('../../server/services/unread-items');
-var roomMembershipService = require('../../server/services/room-membership-service');
+var troupeService = require('gitter-web-rooms/lib/troupe-service');
+var unreadItemService = require('gitter-web-unread-items');
+var roomMembershipService = require('gitter-web-rooms/lib/room-membership-service');
 var persistence = require('gitter-web-persistence');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var shutdown = require('shutdown');

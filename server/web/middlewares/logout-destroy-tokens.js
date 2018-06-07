@@ -7,7 +7,7 @@ var StatusError = require('statuserror');
 
 var logout = require('./logout');
 var oauthService = require('../../services/oauth-service');
-var userService = require('../../services/user-service');
+var userService = require('gitter-web-users');
 
 module.exports = function(req, res, next) {
   var user = req.user;

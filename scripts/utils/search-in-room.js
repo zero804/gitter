@@ -4,7 +4,7 @@
 
 var shutdown = require('shutdown');
 var persistence = require('gitter-web-persistence');
-var chatService = require('../../server/services/chat-service');
+var chatService = require('gitter-web-chats');
 
 var opts = require('yargs')
   .option('uri', {

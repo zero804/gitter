@@ -5,7 +5,7 @@
 var env = require('gitter-web-env');
 var winston = env.logger;
 var appEvents = require('gitter-web-appevents');
-var userService = require('../../server/services/user-service');
+var userService = require('gitter-web-users');
 var shutdown = require('shutdown');
 
 require('../../server/event-listeners').install();

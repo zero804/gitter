@@ -5,8 +5,8 @@ var stats = env.stats;
 var winston = env.logger;
 
 var crypto = require('crypto');
-var eventService = require('../../services/event-service');
-var troupeService = require('../../services/troupe-service');
+var eventService = require('gitter-web-events');
+var troupeService = require('gitter-web-rooms/lib/troupe-service');
 var checkRepoPrivacy = require('../../services/check-repo-privacy');
 var StatusError = require('statuserror');
 

@@ -38,12 +38,12 @@ You can check these settings here,
  - [Personal OAuth application settings](https://github.com/settings/applications)
  - Organisation OAuth application settings, `https://github.com/organizations/YOURORG/settings/applications`
 
-For example, if you have ["Gitter Private Repo Access"](./oauth-scopes#private-repositories)
+For example, if you have ["Gitter Private Repo Access"](./oauth-scopes.md#private-repositories)
 granted personally or on the organisation, please make sure it is also granted on the other.
 
 You can also try making your organisation membership public, `https://github.com/orgs/YOURORG/people`
 
-For more information see [OAuth Scopes](./oauth-scopes).
+For more information see [OAuth Scopes](./oauth-scopes.md).
 
 
 ## You want write access on my private repos? Are you insane?

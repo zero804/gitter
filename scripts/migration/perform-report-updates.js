@@ -8,8 +8,8 @@ var _ = require('lodash');
 var Promise = require('bluebird');
 var shutdown = require('shutdown');
 var onMongoConnect = require('gitter-web-persistence-utils/lib/on-mongo-connect');
-var userService = require('../../server/services/user-service');
-var troupeService = require('../../server/services/troupe-service');
+var userService = require('gitter-web-users');
+var troupeService = require('gitter-web-rooms/lib/troupe-service');
 var uriLookupService = require('gitter-web-uri-resolver/lib/uri-lookup-service');
 
 function renameUser(update) {

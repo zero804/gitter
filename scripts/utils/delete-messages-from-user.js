@@ -10,8 +10,8 @@ var temp = require('temp');
 var mkdir = Promise.promisify(temp.mkdir);
 
 var onMongoConnect = require('gitter-web-persistence-utils/lib/on-mongo-connect');
-var userService = require('../../server/services/user-service');
-var chatService = require('../../server/services/chat-service');
+var userService = require('gitter-web-users');
+var chatService = require('gitter-web-chats');
 var chatsForUserSearch = require('gitter-web-elasticsearch/lib/chats-for-user-search');
 
 var opts = require('yargs')

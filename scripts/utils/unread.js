@@ -2,10 +2,10 @@
 /*jslint node:true, unused:true */
 "use strict";
 
-var userService = require('../../server/services/user-service');
-var troupeService = require('../../server/services/troupe-service');
-var troupeUriMapper = require('../../server/services/troupe-uri-mapper');
-var unreadService = require('../../server/services/unread-items');
+var userService = require('gitter-web-users');
+var troupeService = require('gitter-web-rooms/lib/troupe-service');
+var troupeUriMapper = require('gitter-web-rooms/lib/troupe-uri-mapper');
+var unreadService = require('gitter-web-unread-items');
 var restful = require("../../server/services/restful");
 var shimPositionOption = require('../yargs-shim-position-option');
 
