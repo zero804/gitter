@@ -3,7 +3,7 @@
  - Add ability to delete account, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1169
  - Update code syntax highlighting to have better visual contrast,
     - Thanks to [@TallTed](https://gitlab.com/TallTed) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1174
- - Fix "Sign in with GitLab" not working -> "Failed to fetch user profile", TODO
+ - Fix "Sign in with GitLab" not working -> "Failed to fetch user profile", https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1177
 
 Developer facing:
 
