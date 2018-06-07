@@ -1,4 +1,4 @@
-# 19.3.0 - *upcoming*
+# 19.3.0 - 2018-6-7
 
  - Add ability to delete account, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1169
 
