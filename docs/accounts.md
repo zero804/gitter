@@ -34,6 +34,8 @@ Sign out of Gitter and sign back in to update your avatar (or any other info).
 
 ## How do I delete my account?
 
-Whilst we're very sad to see you go, we're more than happy to help you out. Please contact support@gitter.im with your Gitter username and we'll take care of that for you.
+You can delete your account by using the profile menu dropdown in the top-right -> **Delete Account**
 
-We'd love to hear why so we can improve our service going forward.
+![](https://i.imgur.com/j3Gowl7.png)
+
+We can't recover your data after deletion but you can re-create your account at any time by signing back in.

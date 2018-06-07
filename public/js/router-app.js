@@ -345,6 +345,10 @@ onready(function() { // eslint-disable-line max-statements
       case 'toggle-dark-theme':
         toggleDarkTheme(!!message.theme.length);
         break;
+
+      case 'account.delete-start':
+        appEvents.trigger('account.delete-start');
+        break;
     }
   }, false);
 
@@ -352,7 +356,7 @@ onready(function() { // eslint-disable-line max-statements
   var allRoomsCollection = troupeCollections.troupes;
   new RoomCollectionTracker(allRoomsCollection);
 
-  allRoomsCollection.on('remove', function(model) {
+  const onRoomRemoveHandler = function(model) {
     if (model.id === context.getTroupeId()) {
       //context.troupe().set('roomMember', false);
       var newLocation = '/home';
@@ -362,6 +366,14 @@ onready(function() { // eslint-disable-line max-statements
       pushState(newFrame, title, newLocation);
       roomSwitcher.change(newFrame);
     }
+  };
+
+  allRoomsCollection.on('remove', onRoomRemoveHandler);
+
+  // We remove `onRoomRemoveHandler` so we don't try to redirect to the user home
+  // before the `logout()` kicks in (see `delete-account-view.js`)
+  appEvents.on('account.delete-start', function() {
+    allRoomsCollection.off('remove', onRoomRemoveHandler);
   });
 
 
