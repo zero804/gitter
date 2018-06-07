@@ -1,3 +1,9 @@
+# 19.4.0 - *upcoming*
+
+ - Update code syntax highlighting to have better visual contrast,
+    - Thanks to [@TallTed](https://gitlab.com/TallTed) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1174
+
+
 # 19.3.0 - 2018-6-7
 
  - Add ability to delete account, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1169
