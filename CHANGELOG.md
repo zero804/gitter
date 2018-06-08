@@ -1,3 +1,8 @@
+# 19.4.0 - *upcoming*
+
+ - Update `@gitterhq/translations` dependency to v1.4.3, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1079
+
+
 # 19.3.0 - 2018-6-7
 
  - Add ability to delete account, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1169
