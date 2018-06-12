@@ -11,7 +11,7 @@
   },
   "private": true,
   "dependencies": {
-    "@gitterhq/translations": "^1.4.3",
+    "@gitterhq/translations": "^1.5.0",
     "gitter-web-env": "file:../env",
     "i18n-2": "^0.4.6"
   }
