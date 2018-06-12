@@ -10,7 +10,7 @@ Developer facing:
 # 19.4.0 - 2018-6-11
 
  - Revoke desktop app v2, v3 to prevent token leaks, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1180
-    - Context http://blog.gitter.im/2018/06/11/gitter-token-leak-security-issue-notification/
+    - Context https://blog.gitter.im/2018/06/11/gitter-token-leak-security-issue-notification/
     - Thanks to Dale Higgs for [responsibly disclosing this vulnerability](https://about.gitlab.com/disclosure/) to us
  - Update `@gitterhq/translations` dependency to v1.4.3, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1079
 
