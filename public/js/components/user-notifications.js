@@ -1,18 +1,17 @@
 'use strict';
 
 var appEvents = require('../utils/appevents');
-var cdn = require('gitter-web-cdn');
 var urlParser = require('../utils/url-parser');
 var sessionMutex = require('../utils/session-mutex');
 var context = require('../utils/context');
 var onReady = require('../utils/onready');
+var showDesktopNotification = require('../utils/show-desktop-notification');
 
 var linkHandler = require('./link-handler');
 // disabled inline notifications because they are sucky
 // var webNotifications = require('./web-notifications');
 var WindowNotification = window.Notification;
 var webkitNotifications = window.webkitNotifications;
-
 
 /**
  * Returns "granted", "denied", "default" or undefined
@@ -30,27 +29,6 @@ function getDesktopNotificationAccess() {
       case 2: return 'denied';
     }
   }
-}
-
-function showDesktopNotification(message, callback) {
-  var title = message.title;
-  var text = message.text;
-  var icon = message.icon || cdn('images/icon-logo-red-64.png');
-
-  var notification = new WindowNotification(title, { body: text, icon: icon });
-
-  var timeout = setTimeout(function() {
-    notification.onclick = null;
-    notification.close();
-  }, 10000);
-
-  notification.onclick = function() {
-    clearTimeout(timeout);
-    notification.onclick = null;
-    notification.close();
-    window.focus();
-    callback(message);
-  };
 }
 
 /**

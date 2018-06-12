@@ -19,7 +19,6 @@ var chatCollection = require('./collections/instances/chats-cached');
 var ChatToolbarInputLayout = require('./views/layouts/chat-toolbar-input');
 var DropTargetView = require('./views/app/dropTargetView');
 var Router = require('./routes/router');
-var userRoutes = require('./routes/user-routes');
 var roomRoutes = require('./routes/room-routes');
 var notificationRoutes = require('./routes/notification-routes');
 
@@ -229,10 +228,6 @@ onready(function() { // eslint-disable-line max-statements
     frameUtils.postMessage({ type: 'ajaxError' });
   });
 
-  appEvents.on('account.delete-start', function() {
-    frameUtils.postMessage({ type: 'account.delete-start' });
-  });
-
   var notifyRemoveError = function(message) {
     appEvents.triggerParent('user_notification', {
       title: 'Failed to remove user',
@@ -266,7 +261,6 @@ onready(function() { // eslint-disable-line max-statements
     dialogRegion: appView.dialogRegion,
     routes: [
       notificationRoutes(),
-      userRoutes(),
       roomRoutes({
         rosterCollection: itemCollections.roster
       }),

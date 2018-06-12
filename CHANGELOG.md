@@ -1,5 +1,7 @@
 # 19.5.0 - *upcoming*
 
+ - Fix delete account profile menu action not working on explore page, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1181
+
 Developer facing:
 
  - Add `scripts/utils/delete-group.js` util script to delete a group/community, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1166
