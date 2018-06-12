@@ -1,3 +1,10 @@
+# 19.5.0 - *upcoming*
+
+Developer facing:
+
+ - Add `scripts/utils/delete-group.js` util script to delete a group/community, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1166
+
+
 # 19.4.0 - 2018-6-11
 
  - Revoke desktop app v2, v3 to prevent token leaks, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1180

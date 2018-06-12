@@ -88,7 +88,7 @@ function findContextForUri(user, uri, options) {
                   if (uri.indexOf('/') < 0 && resolvedTroupe.groupId) {
                     debug('Redirecting on ORG room permission denied');
 
-                    return groupService.findById(resolvedTroupe.groupId)
+                    return groupService.findById(resolvedTroupe.groupId, { lean: true })
                       .then(function(group) {
                         if (group && group.homeUri) {
                           var err = new StatusError(301);
@@ -201,7 +201,7 @@ function findContextForGroup(user, uri, options) {
 
   if (!uri) throw new StatusError(400, 'uri required');
 
-  return groupService.findByUri(uri)
+  return groupService.findByUri(uri, { lean: true })
     .then(function (group) {
       if (!group) throw new StatusError(404);
 

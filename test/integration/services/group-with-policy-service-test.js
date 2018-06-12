@@ -345,7 +345,7 @@ describe('group-with-policy-service #slow', function() {
         this.forum = forum;
 
         // load the group again so we can see if it actually set the group's forum
-        return groupService.findById(fixture.group1._id);
+        return groupService.findById(fixture.group1._id, { lean: true });
       })
       .then(function(group) {
         // did it set the group's forumId?
@@ -357,7 +357,7 @@ describe('group-with-policy-service #slow', function() {
     return group2WithPolicyService.createForum()
       .then(function() {
         // reload the group so we get the updated group.forumId
-        return groupService.findById(fixture.group2._id);
+        return groupService.findById(fixture.group2._id, { lean: true });
       })
       .then(function(group) {
         var updatedGroupWithPolicyService = new GroupWithPolicyService(group, fixture.user1, isAdminPolicy);

@@ -86,7 +86,7 @@ describe('integration tests #slow', function() {
       })
       .then(function() {
         // load the group again so we can see if the url changed
-        return groupService.findById(fixture.group1.id);
+        return groupService.findById(fixture.group1.id, { lean: true });
       })
       .then(function(group) {
         assert.strictEqual(group.avatarUrl, transloaditUrl);

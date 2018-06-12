@@ -19,7 +19,7 @@ var getLeftMenuViewData = require('./get-left-menu-view-data');
 var generateUserThemeSnapshot = require('../../snapshots/user-theme-snapshot');
 
 function getLeftMenuForumGroupInfo(leftMenuGroupId) {
-  return groupService.findById(leftMenuGroupId)
+  return groupService.findById(leftMenuGroupId, { lean: true })
     .then(function(group) {
       var forumId = group && group.forumId;
 
