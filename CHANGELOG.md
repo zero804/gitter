@@ -1,4 +1,4 @@
-# 19.5.0 - *upcoming*
+# 19.5.0 - 2018-6-16
 
  - Fix delete account profile menu action not working on explore page, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1181
  - Update `@gitterhq/translations` dependency to v1.5.0, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1182
@@ -7,6 +7,7 @@ Developer facing:
 
  - Add `scripts/utils/delete-group.js` util script to delete a group/community, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1166
  - Only subscribe to `/v1/token/xxx` Faye endpoint if signed in, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1183
+
 
 # 19.4.0 - 2018-6-11
 
