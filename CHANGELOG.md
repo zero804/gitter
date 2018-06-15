@@ -1,6 +1,7 @@
 # 19.5.0 - *upcoming*
 
  - Fix delete account profile menu action not working on explore page, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1181
+ - Update `@gitterhq/translations` dependency to v1.5.0, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1182
 
 Developer facing:
 
