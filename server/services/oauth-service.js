@@ -92,7 +92,9 @@ function validateAccessTokenAndClient(token) {
             return null;
           }
           else if(client.revoked) {
-            logger.warn('Token can not be accepted (client has been revoked): ', { token: token, clientId: clientId });
+            // FIXME: Uncomment after 2018-7-20 (random date a month in change from when we revoked things, http://blog.gitter.im/2018/06/11/gitter-token-leak-security-issue-notification/)
+            // This commented out for now because it is filling up the logs, https://gitlab.com/gitlab-com/infrastructure/issues/4413
+            //logger.warn('Token can not be accepted (client has been revoked): ', { token: token, clientId: clientId });
 
             // Sends a message to the websockets
             appEvents.tokenRevoked({

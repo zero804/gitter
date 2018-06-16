@@ -7,7 +7,7 @@ Developer facing:
 
  - Add `scripts/utils/delete-group.js` util script to delete a group/community, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1166
  - Only subscribe to `/v1/token/xxx` Faye endpoint if signed in, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1183
-
+ - Remove token revoked logging because it is filling up disk space on websocket servers, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1185
 
 # 19.4.0 - 2018-6-11
 
