@@ -1,12 +1,6 @@
 'use strict';
 
-var Backbone = require('backbone');
-var context = require('../utils/context');
-var clientEnv = require('gitter-client-env');
-var apiClient = require('../components/api-client');
-
-function createRoutes(options) {
-
+function createRoutes(options = {}) {
   return {
     'delete-account': function() {
       var dialogRegion = this.dialogRegion;

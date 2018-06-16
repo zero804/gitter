@@ -69,7 +69,7 @@ module.exports = {
       .then(function(access) {
         if (!access) return null;
 
-        return groupService.findById(id);
+        return groupService.findById(id, { lean: true });
       });
   },
 

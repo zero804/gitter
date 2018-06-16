@@ -1,3 +1,22 @@
+# 19.5.0 - 2018-6-16
+
+ - Fix delete account profile menu action not working on explore page, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1181
+ - Update `@gitterhq/translations` dependency to v1.5.0, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1182
+
+Developer facing:
+
+ - Add `scripts/utils/delete-group.js` util script to delete a group/community, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1166
+ - Only subscribe to `/v1/token/xxx` Faye endpoint if signed in, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1183
+ - Remove token revoked logging because it is filling up disk space on websocket servers, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1185
+
+# 19.4.0 - 2018-6-11
+
+ - Revoke desktop app v2, v3 to prevent token leaks, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1180
+    - Context https://blog.gitter.im/2018/06/11/gitter-token-leak-security-issue-notification/
+    - Thanks to Dale Higgs for [responsibly disclosing this vulnerability](https://about.gitlab.com/disclosure/) to us
+ - Update `@gitterhq/translations` dependency to v1.4.3, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1079
+
+
 # 19.3.0 - 2018-6-7
 
  - Add ability to delete account, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1169

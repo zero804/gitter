@@ -87,7 +87,7 @@ function handleUploadToGroup(transloadit, metadata) {
   var group, user, policy;
 
   return Promise.join(
-      groupService.findById(metadata.group_id),
+      groupService.findById(metadata.group_id, { lean: true }),
       userService.findById(metadata.user_id))
     .spread(function(_group, _user) {
       group = _group;

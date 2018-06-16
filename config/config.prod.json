@@ -203,5 +203,18 @@
       "https://avatars-04.gitter.im",
       "https://avatars-05.gitter.im"
     ]
-  }
+  },
+  "revokedUserAgents": [
+    "Gitter/3.1.0",
+    "Gitter/3.0.3",
+    "Gitter/3.0.2",
+    "Gitter/3.0.1",
+    "Gitter/3.0.0",
+    "Gitter/2.4.0",
+    "Gitter/2.4.0",
+    "Gitter/2.3.3",
+    "Gitter/2.3.2",
+    "Gitter/2.3.1",
+    "Gitter/2.3.0"
+  ]
 }

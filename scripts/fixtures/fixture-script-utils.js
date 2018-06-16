@@ -21,7 +21,7 @@ var ForumWithPolicyService = require('../../server/services/forum-with-policy-se
 function getGroupWithPolicyService(username, groupUri) {
   return Promise.join(
       userService.findByUsername(username),
-      groupService.findByUri(groupUri))
+      groupService.findByUri(groupUri), { lean: true })
     .bind({})
     .spread(function(user, group) {
       if (!user) throw new StatusError(404, 'User not found.');
@@ -40,7 +40,7 @@ function getGroupWithPolicyService(username, groupUri) {
 function getForumWithPolicyService(username, groupUri) {
   return Promise.join(
       userService.findByUsername(username),
-      groupService.findByUri(groupUri))
+      groupService.findByUri(groupUri), { lean: true })
     .bind({})
     .spread(function(user, group) {
       if (!user) throw new StatusError(404, 'User not found.');
@@ -71,7 +71,7 @@ function getUser(username) {
 }
 
 function getForum(uri) {
-  return groupService.findByUri(uri)
+  return groupService.findByUri(uri, { lean: true })
     .then(function(group) {
       if (!group) throw new StatusError(404, 'Group not found.');
       if (!group.forumId) throw new StatusError(404, 'The group has no forum.');

@@ -51,7 +51,7 @@ Importer.prototype = {
             if (user) return user;
             return userService.findByUsername('suprememoocow');
           }),
-        groupService.findByUri(groupUri))
+        groupService.findByUri(groupUri, { lean: true }))
       .bind({})
       .spread(function(user, group) {
         if (!user) throw new StatusError(404, 'User not found.');

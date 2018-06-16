@@ -30,6 +30,7 @@ var Router = require('./routes/router');
 var notificationRoutes = require('./routes/notification-routes');
 var createRoutes = require('./routes/create-routes');
 var upgradeAccessRoutes = require('./routes/upgrade-access-routes');
+var userRoutes = require('./routes/user-routes');
 
 require('./components/statsc');
 require('./views/widgets/preload');
@@ -60,6 +61,7 @@ onready(function() { // eslint-disable-line max-statements
   var router = new Router({
     dialogRegion: appLayout.dialogRegion,
     routes: [
+      userRoutes(),
       notificationRoutes(),
       createRoutes({
         rooms: troupeCollections.troupes,
@@ -344,10 +346,6 @@ onready(function() { // eslint-disable-line max-statements
 
       case 'toggle-dark-theme':
         toggleDarkTheme(!!message.theme.length);
-        break;
-
-      case 'account.delete-start':
-        appEvents.trigger('account.delete-start');
         break;
     }
   }, false);

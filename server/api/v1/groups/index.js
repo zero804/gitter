@@ -164,7 +164,7 @@ module.exports = {
     return Promise.all(promises)
       .then(function() {
         // reload the group so we get the updated forumId, etc.
-        return groupService.findById(group._id);
+        return groupService.findById(group._id, { lean: true });
       })
       .then(function(group) {
         var strategy = new restSerializer.GroupStrategy({
@@ -200,7 +200,7 @@ module.exports = {
       .then(function(access) {
         if (!access) return null;
 
-        return groupService.findById(id);
+        return groupService.findById(id, { lean: true });
       });
   },
 

@@ -148,34 +148,36 @@ function getOrCreateClient() {
   });
 
   // Subscribe to the token for changes to check if it was revoked
-  context.getAccessToken()
-    .then(function(accessToken) {
-      var contextModel = new Backbone.Model({
-        token: accessToken
-      });
+  if(context.isLoggedIn()) {
+    context.getAccessToken()
+      .then(function(accessToken) {
+        var contextModel = new Backbone.Model({
+          token: accessToken
+        });
 
-      var templateSubscription = client.subscribeTemplate({
-        urlTemplate: '/v1/token/:token',
-        contextModel: contextModel,
-        onMessage: function(message) {
-          switch(message.notification) {
-            case 'token_revoked':
-              log.error('Token was revoked', message);
-              logout('/login/token-revoked');
-              break;
+        var templateSubscription = client.subscribeTemplate({
+          urlTemplate: '/v1/token/:token',
+          contextModel: contextModel,
+          onMessage: function(message) {
+            switch(message.notification) {
+              case 'token_revoked':
+                log.error('Token was revoked', message);
+                logout('/login/token-revoked');
+                break;
+            }
           }
-        }
-      });
+        });
 
-      templateSubscription.on('subscriptionError', function(channel, err) {
-        log.error('Token subscription error' + channel, { exception: err });
+        templateSubscription.on('subscriptionError', function(channel, err) {
+          log.error('Token subscription error' + channel, { exception: err });
 
-        if(err.code === 401 || err.code === 403) {
-          log.error('Token subscription unathorized/forbidden, logging out' + channel, { exception: err });
-          logout('/login/token-revoked');
-        }
+          if(err.code === 401 || err.code === 403) {
+            log.error('Token subscription unathorized/forbidden, logging out' + channel, { exception: err });
+            logout('/login/token-revoked');
+          }
+        });
       });
-    });
+  }
 
   return client;
 }
