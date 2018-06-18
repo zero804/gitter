@@ -1,4 +1,4 @@
-# 19.6.0 - 2018-6-17
+# 19.6.0 - 2018-6-18
 
  - Fix desktop client trying to handshake with realtime/websocket/faye server (Update `interval` from 2 seconds to 10 days), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1186
 
