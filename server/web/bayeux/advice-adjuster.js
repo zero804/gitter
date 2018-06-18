@@ -14,10 +14,14 @@ module.exports = {
 
       if(errorCode === 401) {
         var reconnect;
+        var interval = config.get('ws:fayeRetry') * 1000;
 
         if(message.channel === '/meta/handshake') {
           // Handshake failing, go away
           reconnect = 'none';
+          // They shouldn't try to reconnect at all but bugged clients might try
+          // 10 days
+          interval = (10 * 24 * 60 * 60) * 1000;
         } else {
           // Rehandshake
           reconnect = 'handshake';
@@ -26,7 +30,7 @@ module.exports = {
         if (!message.advice) message.advice = { };
 
         message.advice.reconnect = reconnect;
-        message.advice.interval = config.get('ws:fayeRetry') * 1000;
+        message.advice.interval = interval;
 
       }
     }
