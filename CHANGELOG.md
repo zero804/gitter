@@ -1,3 +1,8 @@
+# 19.6.0 - 2018-6-17
+
+ - Fix desktop client trying to handshake with realtime/websocket/faye server (Update `interval` from 2 seconds to 10 days), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1186
+
+
 # 19.5.0 - 2018-6-16
 
  - Fix delete account profile menu action not working on explore page, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1181
