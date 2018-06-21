@@ -1,3 +1,9 @@
+# 19.7.0 - *upcoming*
+
+- Emoji typeahead (autocomplete) only appears after two characters have been typed to more easily send a simple emoticon `:p`
+   - Thanks to [@jonhoo](https://gitlab.com/jonhoo) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1188
+
+
 # 19.6.0 - 2018-6-18
 
  - Fix revoked desktop client trying to handshake with realtime/websocket/faye server every 2 seconds (update `interval` from 2 seconds to 10 days), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1186
