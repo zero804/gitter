@@ -9,7 +9,7 @@ var SUGGESTED_EMOJI = ['smile', 'worried', '+1', '-1', 'fire', 'sparkles', 'clap
 
 module.exports = function() {
   return {
-    match: /(^|\s):([\-+\w]*)$/,
+    match: /(^|\s):([\-+\w]{2,})$/,
     maxCount: isMobile() ? 3 : 10,
     search: function(term, callback) {
       if(term.length < 1) return callback(SUGGESTED_EMOJI);
