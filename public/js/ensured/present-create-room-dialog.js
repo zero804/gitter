@@ -4,7 +4,6 @@ var context = require('../utils/context');
 
 function presentCreateRoomDialog(options) {
   var roomCollection = options.roomCollection;
-  var groupsCollection = options.groupsCollection;
   var dialogRegion = options.dialogRegion;
   var roomMenuModel = options.roomMenuModel;
   var initialRoomName = options.initialRoomName;
@@ -49,7 +48,7 @@ function presentCreateRoomDialog(options) {
       return slimCurrentTroupe.get('groupId');
     }
 
-    var adminGroupsCollection = new groupModels.Collection(groupsCollection.models.slice());
+    var adminGroupsCollection = new groupModels.Collection();
 
     adminGroupsCollection.fetch({ add: true, remove: true, reset: true, data: { type: 'admin' } })
       .then(function() {
