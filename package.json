@@ -39,7 +39,7 @@
     "gitter-faye": "^1.1.0-m",
     "gitter-markdown-processor": "^11.4.0",
     "gitter-passport-http-bearer": "^1.1.2",
-    "gitter-realtime-client": "^1.6.2",
+    "gitter-realtime-client": "^1.7.0",
     "gitter-redis-scripto": "^0.2.2",
     "gitter-services": "git+https://github.com/gitterHQ/services.git#1.20.0",
     "gitter-web-api-client": "file:modules/api-client",
