@@ -1,3 +1,8 @@
+# 19.8.0 - *upcoming*
+
+ - Restore token revoked logging, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1192
+
+
 # 19.7.0 - 2018-6-27
 
  - Emoji typeahead (autocomplete) only appears after two characters have been typed to more easily send a simple emoticon `:p`
