@@ -1304,7 +1304,7 @@ describe('room-service', function() {
       getRoomIdsMentioningUserMock = mockito.mockFunction();
       findRoomIdsForUserMock = mockito.mockFunction();
       roomService = proxyquireNoCallThru('../lib/room-service', {
-        './unread-items': {
+        'gitter-web-unread-items': {
           getRoomIdsMentioningUser: getRoomIdsMentioningUserMock
         },
         './room-membership-service': {
