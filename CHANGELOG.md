@@ -1,4 +1,4 @@
-# 19.7.0 - *upcoming*
+# 19.7.0 - 2018-6-27
 
  - Emoji typeahead (autocomplete) only appears after two characters have been typed to more easily send a simple emoticon `:p`
    - Thanks to [@jonhoo](https://gitlab.com/jonhoo) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1188
