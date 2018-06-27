@@ -17,7 +17,7 @@
     "classnames": "^2.2.3",
     "fuzzysearch": "^1.0.3",
     "gitter-client-env": "file:../client-env",
-    "gitter-realtime-client": "^1.6.1",
+    "gitter-realtime-client": "^1.7.0",
     "gitter-web-api-client": "file:../api-client",
     "gitter-web-avatars": "file:../avatars",
     "gitter-web-frame-utils": "file:../frame-utils",

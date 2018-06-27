@@ -4,6 +4,10 @@
    - Thanks to [@jonhoo](https://gitlab.com/jonhoo) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1188
  - Ensure you can admin the auto-selected community before populating create room modal, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1117
 
+ Developer facing:
+
+  - Update to `gitter-realtime-client@1.7.0` which has an updated Halley (smart WebSocket client) ([more context](https://gitlab.com/gitlab-org/gitter/webapp/issues/1937#solution)), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1190
+
 
 # 19.6.0 - 2018-6-18
 
