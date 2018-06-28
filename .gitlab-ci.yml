@@ -34,11 +34,13 @@ test:
   <<: *node_job
   variables:
     BLUEBIRD_DEBUG: 1
+    NEO4J_AUTH: none
   stage: build_unit_test
   services:
     - registry.gitlab.com/gitlab-org/gitter/webapp/mongo:latest
     - registry.gitlab.com/gitlab-org/gitter/webapp/elasticsearch:latest
     - redis:3.0
+    - neo4j:2.3
   script:
     - make ci-test
 
