@@ -1,4 +1,4 @@
-# 19.8.0 - *upcoming*
+# 19.8.0 - 2018-6-29
 
  - Restore token revoked logging, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1192
 
