@@ -2,6 +2,10 @@
 
  - Restore token revoked logging, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1192
 
+Developer facing:
+
+ - Run integration tests in GitLab CI, https://gitlab.com/gitlab-org/gitter/webapp/issues/1918
+
 
 # 19.7.0 - 2018-6-27
 
