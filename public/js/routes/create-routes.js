@@ -5,7 +5,6 @@ var presentCreateCommunityDialog = require('../ensured/present-create-community-
 
 function createRoutes(options) {
   var roomCollection = options.rooms;
-  var groupsCollection = options.groups;
   var roomMenuModel = options.roomMenuModel;
 
   return {
@@ -26,7 +25,6 @@ function createRoutes(options) {
       presentCreateRoomDialog({
         dialogRegion: dialogRegion,
         roomCollection: roomCollection,
-        groupsCollection: groupsCollection,
         roomMenuModel: roomMenuModel,
         initialRoomName: initialRoomName
       });

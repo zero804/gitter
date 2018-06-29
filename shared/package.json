@@ -10,7 +10,7 @@
   "dependencies": {
     "escape-string-regexp": "^1.0.5",
     "gitter-client-env": "file:../modules/client-env",
-    "gitter-realtime-client": "^1.1.0",
+    "gitter-realtime-client": "^1.7.0",
     "gitter-web-avatars": "file:../modules/avatars",
     "moment": "^2.10.3",
     "underscore": "^1.8.3",

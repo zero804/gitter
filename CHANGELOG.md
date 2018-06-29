@@ -1,6 +1,17 @@
+# 19.7.0 - 2018-6-27
+
+ - Emoji typeahead (autocomplete) only appears after two characters have been typed to more easily send a simple emoticon `:p`
+   - Thanks to [@jonhoo](https://gitlab.com/jonhoo) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1188
+ - Ensure you can admin the auto-selected community before populating create room modal, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1117
+
+ Developer facing:
+
+  - Update to `gitter-realtime-client@1.7.0` which has an updated Halley (smart WebSocket client) ([more context](https://gitlab.com/gitlab-org/gitter/webapp/issues/1937#solution)), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1190
+
+
 # 19.6.0 - 2018-6-18
 
- - Fix desktop client trying to handshake with realtime/websocket/faye server (Update `interval` from 2 seconds to 10 days), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1186
+ - Fix revoked desktop client trying to handshake with realtime/websocket/faye server every 2 seconds (update `interval` from 2 seconds to 10 days), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1186
 
 
 # 19.5.0 - 2018-6-16
