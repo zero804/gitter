@@ -1,12 +1,22 @@
+# 19.8.0 - 2018-6-29
+
+ - Restore token revoked logging, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1192
+
+Developer facing:
+
+ - Run integration tests in GitLab CI, https://gitlab.com/gitlab-org/gitter/webapp/issues/1918
+
+
 # 19.7.0 - 2018-6-27
 
  - Emoji typeahead (autocomplete) only appears after two characters have been typed to more easily send a simple emoticon `:p`
    - Thanks to [@jonhoo](https://gitlab.com/jonhoo) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1188
  - Ensure you can admin the auto-selected community before populating create room modal, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1117
 
- Developer facing:
+Developer facing:
 
-  - Update to `gitter-realtime-client@1.7.0` which has an updated Halley (smart WebSocket client) ([more context](https://gitlab.com/gitlab-org/gitter/webapp/issues/1937#solution)), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1190
+ - Update to `gitter-realtime-client@1.7.0` which has an updated Halley (smart WebSocket client) ([more context](https://gitlab.com/gitlab-org/gitter/webapp/issues/1937#solution)), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1190
+ - Update Apple push notification (APN) `prod` and `prod-dev` certificates/keys, https://gitlab.com/gl-gitter/secrets/merge_requests/9
 
 
 # 19.6.0 - 2018-6-18

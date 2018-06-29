@@ -6,7 +6,7 @@ var GitHubIssueStateService = require('..').GitHubIssueStateService;
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
 describe('github-issue-state-search #slow #github', function() {
-  fixtureLoader.ensureIntegrationEnvironment('GITTER_INTEGRATION_USERNAME', 'GITTER_INTEGRATION_USER_SCOPE_TOKEN');
+  fixtureLoader.ensureIntegrationEnvironment('GITTER_INTEGRATION_USERNAME', 'GITTER_INTEGRATION_USER_SCOPE_TOKEN', 'GITTER_INTEGRATION_REPO_FULL');
 
   var FAKE_USER = {
     username: fixtureLoader.GITTER_INTEGRATION_USERNAME,
@@ -16,9 +16,9 @@ describe('github-issue-state-search #slow #github', function() {
   it('return the state', function(done) {
     var underTest = new GitHubIssueStateService(FAKE_USER);
 
-    underTest.getIssueState('gitterHQ/gitter', 1)
+    underTest.getIssueState(fixtureLoader.GITTER_INTEGRATION_REPO_FULL, 1)
       .then(function(f) {
-        assert.strictEqual(f, 'closed');
+        assert.strictEqual(f, 'open');
       })
       .nodeify(done);
   });
@@ -26,7 +26,7 @@ describe('github-issue-state-search #slow #github', function() {
   it('return empty for missing issue', function(done) {
     var underTest = new GitHubIssueStateService(FAKE_USER);
 
-    underTest.getIssueState('gitterHQ/gitter213123123', 1)
+    underTest.getIssueState(fixtureLoader.GITTER_INTEGRATION_REPO_FULL, 999999)
       .then(function(f) {
         assert.strictEqual(f, '');
       })
