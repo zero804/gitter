@@ -158,12 +158,24 @@ function findPrimaryIdentityForUser(user) {
     });
 }
 
+/**
+ * Remove all the identities for a user
+ */
+var removeForUser = function (user) {
+  assert(user);
+
+  var userId = user._id;
+
+  return Identity.remove({ userId: userId });
+};
+
 module.exports = {
   getIdentityForUser: getIdentityForUser,
   listForUser: listForUser,
   listProvidersForUser: listProvidersForUser,
   findUserIdForProviderUsername: findUserIdForProviderUsername,
   findPrimaryIdentityForUser: Promise.method(findPrimaryIdentityForUser),
+  removeForUser: Promise.method(removeForUser),
 
   GITHUB_IDENTITY_PROVIDER: 'github',
   GITLAB_IDENTITY_PROVIDER: 'gitlab',

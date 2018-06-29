@@ -3,6 +3,7 @@
 var identityService = require('../lib/identity-service');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assert = require('assert');
+var Identity = require('gitter-web-persistence').Identity;
 
 describe('identityService', function() {
   var fixture = fixtureLoader.setup({
@@ -65,68 +66,79 @@ describe('identityService', function() {
   });
 
   describe('listForUser', function() {
-
-      describe('non-github users', function() {
-        it('returns the identities', function() {
-          return identityService.listForUser(fixture.user1)
-            .then(function(identities) {
-              assert.deepEqual(identities, [{
-                provider: "google",
-                providerKey: "google-identity"
-              }]);
-            })
-        });
-
-        it('returns the cached identities', function() {
-          var identities1;
-          return identityService.listForUser(fixture.user1)
-            .then(function(identities) {
-              identities1 = identities;
-              return identityService.listForUser(fixture.user1)
-            })
-            .then(function(identities2) {
-              assert.equal(identities2, identities1);
-            })
-        });
+    describe('non-github users', function() {
+      it('returns the identities', function() {
+        return identityService.listForUser(fixture.user1)
+          .then(function(identities) {
+            assert.deepEqual(identities, [{
+              provider: "google",
+              providerKey: "google-identity"
+            }]);
+          })
       });
 
-      describe('github users', function() {
-        it('returns the identities', function() {
-          var user = fixture.user2;
-          return identityService.listForUser(user)
-            .then(function(identities) {
-              assert.deepEqual(identities, [{
-                provider: "github",
-                providerKey: user.githubId,
-                username: user.username,
-                displayName: user.displayName,
-                email: null,
-                accessToken: user.githubUserToken,
-                refreshToken: null,
-                accessTokenSecret: null,
-                upgradedAccessToken: user.githubToken,
-                scopes: user.githubScopes,
-                avatar: user.gravatarImageUrl
-              }]);
-            })
-        });
+      it('returns the cached identities', function() {
+        var identities1;
+        return identityService.listForUser(fixture.user1)
+          .then(function(identities) {
+            identities1 = identities;
+            return identityService.listForUser(fixture.user1)
+          })
+          .then(function(identities2) {
+            assert.equal(identities2, identities1);
+          })
+      });
+    });
 
-        it('returns the cached identities', function() {
-          var identities1;
-          return identityService.listForUser(fixture.user2)
-            .then(function(identities) {
-              identities1 = identities;
-              return identityService.listForUser(fixture.user2)
-            })
-            .then(function(identities2) {
-              assert.deepEqual(identities2, identities1);
-            })
-        });
-
+    describe('github users', function() {
+      it('returns the identities', function() {
+        var user = fixture.user2;
+        return identityService.listForUser(user)
+          .then(function(identities) {
+            assert.deepEqual(identities, [{
+              provider: "github",
+              providerKey: user.githubId,
+              username: user.username,
+              displayName: user.displayName,
+              email: null,
+              accessToken: user.githubUserToken,
+              refreshToken: null,
+              accessTokenSecret: null,
+              upgradedAccessToken: user.githubToken,
+              scopes: user.githubScopes,
+              avatar: user.gravatarImageUrl
+            }]);
+          })
       });
 
+      it('returns the cached identities', function() {
+        var identities1;
+        return identityService.listForUser(fixture.user2)
+          .then(function(identities) {
+            identities1 = identities;
+            return identityService.listForUser(fixture.user2)
+          })
+          .then(function(identities2) {
+            assert.deepEqual(identities2, identities1);
+          })
+      });
+
+    });
   })
 
+  describe('removeForUser', function() {
+    describe('non-github users', function() {
+      it('removes the identities', function() {
+        assert.strictEqual(fixture.user1.identities.length, 1);
+
+        return identityService.removeForUser(fixture.user1)
+          .then(() => Identity.find({ userId: fixture.user1._id }))
+          .then(function(identities) {
+            assert.strictEqual(identities.length, 0);
+          })
+      });
+    });
+  });
 
 
 });
