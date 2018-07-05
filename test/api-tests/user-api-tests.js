@@ -73,4 +73,19 @@ describe('user-api', function() {
       });
   });
 
+  it('DELETE /v1/user/:userId with ghost option', function() {
+    return request(app)
+      .delete('/v1/user/me')
+      .send({
+        ghost: true
+      })
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+      .then(function(result) {
+        assert.strictEqual(result.status, 200);
+        assert.deepEqual(result.body, {
+          success: true
+        });
+      });
+  });
 });

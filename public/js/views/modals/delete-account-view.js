@@ -13,33 +13,21 @@ var template = require('./tmpl/delete-account-view.hbs');
 var View = Marionette.ItemView.extend({
   tagName: 'p',
   attributes: { style: '' },
+  ui: {
+    ghostUserCheckbox: '.js-delete-account-ghost-user-checkbox'
+  },
+  events: {
+    'input @ui.ghostUserCheckbox': 'onGhostCheckboxChanged'
+  },
   modelEvents: {
     'change': 'render'
   },
   initialize: function() {
-    this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
+    this.model.set('ghostUsername', `ghost~${context.getUserId()}`);
   },
   template: template,
-  menuItemClicked: function(button) {
-    switch(button) {
-      case 'delete':
-        // Notify others, that they shouldn't redirect while we are trying to logout
-        appEvents.trigger('account.delete-start');
-
-        apiClient.user.delete()
-          .then(() => {
-            return logout();
-          })
-          .catch((err) => {
-            log.error('Error while deleting account', { exception: err });
-            this.model.set('error', `Error while deleting account: ${err} (status: ${err.status})`);
-          });
-        break;
-
-      case 'cancel':
-        this.dialog.hide();
-        break;
-    }
+  onGhostCheckboxChanged: function() {
+    this.model.set('ghost', this.ui.ghostUserCheckbox.is(':checked'));
   }
 });
 
@@ -55,17 +43,42 @@ var Modal = ModalView.extend({
       className: 'modal--default__footer__btn--negative'
     }];
 
-    var lock = new DelayLock();
+    this.lockModel = new DelayLock();
 
-    this.listenTo(lock, 'change:locked', function() {
+    this.listenTo(this.lockModel, 'change:locked', function() {
       this.setButtonState('delete', true);
     });
 
     ModalView.prototype.initialize.call(this, options);
     this.view = new View({
-      model: lock
+      model: this.lockModel
     });
-  }
+
+    this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
+  },
+  menuItemClicked: function(button) {
+    switch(button) {
+      case 'delete':
+        // Notify others, that they shouldn't redirect while we are trying to logout
+        appEvents.trigger('account.delete-start');
+
+        apiClient.user.delete('/', {
+          ghost: this.lockModel.get('ghost') || false
+        })
+          .then(() => {
+            return logout();
+          })
+          .catch((err) => {
+            log.error('Error while deleting account', { exception: err });
+            this.model.set('error', `Error while deleting account: ${err} (status: ${err.status})`);
+          });
+        break;
+
+      case 'cancel':
+        this.dialog.hide();
+        break;
+    }
+  },
 });
 
 module.exports = Modal;
