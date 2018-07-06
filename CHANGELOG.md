@@ -1,3 +1,8 @@
+# 19.9.0 - *upcoming*
+
+ - Add ghost option to account deletion in order to disassociate personal data, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1197
+
+
 # 19.8.0 - 2018-6-29
 
  - Restore token revoked logging, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1192

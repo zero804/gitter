@@ -6,8 +6,9 @@ var roomService = require('./room-service');
 var roomMembershipService = require('./room-membership-service');
 var Promise = require('bluebird');
 var debug = require('debug')('gitter:app:user-removal-service');
+var identityService = require('gitter-web-identity');
 
-exports.removeByUsername = function(username, options) {
+exports.removeByUsername = function(username, options = {}) {
   return userService.findByUsername(username)
     .then(function(user) {
       debug('Remove by username %s', username);
@@ -29,7 +30,7 @@ exports.removeByUsername = function(username, options) {
           }));
         })
         .then(function() {
-          if (options && options.deleteUser) {
+          if (options.deleteUser) {
             return user.remove();
           }
 
@@ -40,9 +41,25 @@ exports.removeByUsername = function(username, options) {
           user.githubScopes = { };
           user.githubUserToken = null;
 
-          // TODO: remove user from intercom etc
+          let whenIdentitiesRemoved = Promise.resolve();
+          if(options.ghost) {
+            user.username = `ghost~${user.id}`;
+            user.displayName = 'Ghost';
+            user.identities = [];
+            user.emails = [];
+            user.gravatarImageUrl = undefined;
+            user.gravatarVersion = undefined;
+            user.githubId = undefined;
+            user.stripeCustomerId = undefined;
+            user.tz = undefined;
 
-          return user.save();
+            whenIdentitiesRemoved = identityService.removeForUser(user);
+          }
+
+          return Promise.all([
+            user.save(),
+            whenIdentitiesRemoved
+          ]);
         });
 
     });

@@ -20,7 +20,6 @@ var UserSchema = new Schema({
   gravatarImageUrl: { type: String },
   gravatarVersion: { type: String },
   lastTroupe: ObjectId,
-  googleRefreshToken: String,
   githubToken: { type: String },
   githubUserToken: { type: String }, // The scope for this token will always be 'user'
   githubId: {type: Number },
