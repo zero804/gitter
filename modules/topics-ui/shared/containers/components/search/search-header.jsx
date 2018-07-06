@@ -18,32 +18,36 @@ export default React.createClass({
   },
 
   render(){
-    const {groupUri, groupName, groupAvatarUrl } = this.props;
+    const {
+      groupUri,
+      groupName,
+      groupAvatarUrl,
+      deprecatedBlogUrl
+    } = this.props;
 
     return (
       <Container className="container--search">
         <Panel className="panel--topic-search">
-          <img
-            src={groupAvatarUrl}
-            width="36"
-            height="36"
-            className="topics-search__avatar" />
           <H1 className="topic-search__heading">
+            <img
+              src={groupAvatarUrl}
+              width="36"
+              height="36"
+              className="topics-search__avatar" />
             <ForumCategoryLink
               className="topic-search__all-topics-link"
               groupUri={groupUri}
               category={{ category: 'All', slug: DEFAULT_CATEGORY_NAME}}>
                 {groupName} Topics
-                <div className="topic-search__beta-decoration">
-                  Beta
-                </div>
             </ForumCategoryLink>
+            <a
+              className="topic-search__deprecated-decoration"
+              href={deprecatedBlogUrl}
+              target="_blank"
+            >
+              Deprecated
+            </a>
           </H1>
-          <Input
-            name="Search Topics"
-            placeholder="Search for topics, replies and comments"
-            onChange={this.onSearchUpdate}
-            className="topic-search__search-input"/>
 
           <CreateTopicLink
             groupUri={groupUri}
@@ -54,10 +58,6 @@ export default React.createClass({
         </Panel>
       </Container>
     );
-  },
-
-  onSearchUpdate(){
-
   },
 
 });

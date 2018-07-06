@@ -1,3 +1,9 @@
+# 19.10.0 - *upcoming*
+
+ - Add ability to export [topics](https://blog.gitter.im/2016/09/30/introducing-gitter-topics/)
+    - Update to `@gitterhq/env@0.38.0` to stream error if headers already sent, https://gitlab.com/gitlab-org/gitter/env/merge_requests/15
+
+
 # 19.9.0 - 2018-7-11
 
  - Add ghost option to account deletion in order to disassociate personal data, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1197

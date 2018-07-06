@@ -145,6 +145,15 @@ function getCommentOptions(options) {
 }
 
 /**
+ * Export things
+ */
+ForumWithPolicyService.prototype.getTopicCursor = secureMethod([allowAdmin], function() {
+  var forum = this.forum;
+
+  return topicService.getCursorByForumId(forum._id);
+});
+
+/**
  * Adding things
  */
 ForumWithPolicyService.prototype.createCategory = secureMethod([allowAdmin], function(options) {

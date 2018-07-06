@@ -99,6 +99,9 @@ function renderForum(req, res, next, options) {
           forum: forum,
           context: context,
 
+          downloadTopicsUri: `/api_web/export/forums/${forum.id}/topics.ndjson`,
+          deprecatedBlogUrl: 'https://blog.gitter.im/2018/07/13/gitter-topics-deprecation-notice/',
+
           groupName: group.name,
           groupUri: req.params.groupUri,
           categoryName: categoryName,

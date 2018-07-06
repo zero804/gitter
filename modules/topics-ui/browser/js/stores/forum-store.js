@@ -47,7 +47,12 @@ const ForumStore = BaseModel.extend({
 
   getSubscriptionState() {
     return this.get('subscriptionState');
-  }
+  },
+
+  getForumIsAdmin() {
+    const permissions = this.get('permissions');
+    return permissions && permissions.admin;
+  },
 });
 
 dispatchOnChangeMixin(ForumStore);

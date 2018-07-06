@@ -13,6 +13,14 @@
   @media @only-small { padding: 2rem; }
 }
 
+.panel--deprecated {
+  position:         relative;
+  padding:          2rem 4rem;
+  border-left:      @panel-border-width solid desaturate(@error-red, 10%);
+  background-color: lighten(@error-red, 10%);
+  color: @light;
+}
+
 .panel--category {
   position:         relative;
   padding:          .5rem 4rem 2rem;
@@ -34,6 +42,7 @@
 
 .panel--topic-search {
   display: flex;
+  justify-content: space-between;
   align-items: center;
   height: 100%;
   padding-top: 0;

@@ -8,6 +8,7 @@ import TopicsTable from './components/forum/topics-table.jsx';
 import SearchHeaderContainer from './components/search/SearchHeaderContainer.jsx';
 import CreateTopicModal from './components/topic/create-topic-modal.jsx';
 import ForumFollowArea from './components/forum/forum-follow-area.jsx';
+import DeprecatedPanel from './components/deprecated/deprecated-panel.jsx';
 
 import navigateToFilter from '../action-creators/forum/navigate-to-filter';
 import navigateToSort from '../action-creators/forum/navigate-to-sort';
@@ -77,6 +78,9 @@ const ForumContainer = React.createClass({
       getTopics: PropTypes.func.isRequired
     }).isRequired,
 
+    downloadTopicsUri: PropTypes.string,
+    deprecatedBlogUrl: PropTypes.string,
+
   },
 
   getDefaultProps(){
@@ -88,18 +92,27 @@ const ForumContainer = React.createClass({
   },
 
   getInitialState(){
-    const { forumStore, categoryStore, tagStore } = this.props;
+    const {
+      forumStore,
+      categoryStore,
+      tagStore,
+      downloadTopicsUri,
+      deprecatedBlogUrl
+    } = this.props;
 
     return {
       forumId: forumStore.getForumId(),
       forumSubscriptionState: forumStore.getSubscriptionState(),
+      isAdmin: forumStore.getForumIsAdmin(),
       categoryName: this.props.categoryName,
       filterName: this.props.filterName,
       tagName: this.props.tagName,
       sortName: this.props.sortName,
       createTopic: this.props.createTopic,
       categories: categoryStore.getCategories(),
-      tags: tagStore.getTags()
+      tags: tagStore.getTags(),
+      downloadTopicsUri: downloadTopicsUri,
+      deprecatedBlogUrl: deprecatedBlogUrl
     };
   },
 
@@ -137,12 +150,15 @@ const ForumContainer = React.createClass({
     const {
       forumId,
       forumSubscriptionState,
+      isAdmin,
       categoryName,
       tags,
       filterName,
       tagName,
       sortName,
       createTopic,
+      downloadTopicsUri,
+      deprecatedBlogUrl,
     } = this.state;
 
     const { groupStore, currentUserStore, categoryStore, tagStore, topicsStore } = this.props;
@@ -162,8 +178,15 @@ const ForumContainer = React.createClass({
         <SearchHeaderContainer
           groupName={groupName}
           groupAvatarUrl={groupAvatarUrl}
-          groupUri={groupUri} />
+          groupUri={groupUri}
+          deprecatedBlogUrl={deprecatedBlogUrl} />
         <div className="scroller topic-content">
+          <DeprecatedPanel
+            isAdmin={isAdmin}
+            downloadTopicsUri={downloadTopicsUri}
+            deprecatedBlogUrl={deprecatedBlogUrl}
+          />
+
           <CategoryList
             groupUri={ groupUri }
             categories={ categories }/>

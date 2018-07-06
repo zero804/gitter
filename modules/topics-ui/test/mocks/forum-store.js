@@ -6,7 +6,8 @@ const ForumStore = Backbone.Model.extend({
   getForum: () => data,
   getForumId: () => data.id,
   getForumStore: () => store,
-  getSubscriptionState: () => data.subscriptionState
+  getSubscriptionState: () => data.subscriptionState,
+  getForumIsAdmin: () => data.permissions && data.permissions.admin,
 });
 
 store = new ForumStore(data);
