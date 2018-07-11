@@ -1,3 +1,10 @@
+# 19.9.0 - 2018-6-10
+
+ - Add ghost option to account deletion in order to disassociate personal data, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1197
+ - Add native QML/Qt app to 3rd party app list, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1200
+    - Thanks to [@eklavya](https://gitlab.com/eklavya) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1200
+
+
 # 19.8.0 - 2018-6-29
 
  - Restore token revoked logging, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1192
@@ -10,7 +17,7 @@ Developer facing:
 # 19.7.0 - 2018-6-27
 
  - Emoji typeahead (autocomplete) only appears after two characters have been typed to more easily send a simple emoticon `:p`
-   - Thanks to [@jonhoo](https://gitlab.com/jonhoo) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1188
+    - Thanks to [@jonhoo](https://gitlab.com/jonhoo) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1188
  - Ensure you can admin the auto-selected community before populating create room modal, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1117
 
 Developer facing:

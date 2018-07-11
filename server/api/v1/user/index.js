@@ -49,7 +49,14 @@ module.exports = {
   destroy: function(req) {
     if(!req.user) throw new StatusError(401);
 
-    return userRemovalService.removeByUsername(req.user.username)
+    let ghost = false;
+    if (typeof req.body.ghost === 'boolean') {
+      ghost = req.body.ghost;
+    }
+
+    return userRemovalService.removeByUsername(req.user.username, {
+      ghost: ghost
+    })
       .then(function() {
         return { success: true };
       });

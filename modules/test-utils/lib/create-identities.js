@@ -30,6 +30,12 @@ function createIdentities(expected, fixture) {
       return createIdentity(key, expectedIdentity)
         .then(function(identity) {
           fixture[key] = identity;
+
+          // Add the identity back on the user object
+          fixture[expectedIdentity.user].identities = (fixture[expectedIdentity.user].identities || []).concat({
+            provider: identity.provider,
+            providerKey: identity.providerKey
+          });
         });
     }
 

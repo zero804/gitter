@@ -38,4 +38,27 @@ You can delete your account by using the profile menu dropdown in the top-right 
 
 ![](https://i.imgur.com/j3Gowl7.png)
 
+This could leave some communities/rooms orphaned without an admin (make sure to set another admin before deletion).
+
 We can't recover your data after deletion but you can re-create your account at any time by signing back in.
+
+### Ghost user
+
+If you want to remove/disassociate all of your personal information from your Gitter account,
+you can use the **Remove personal information and turn my account into a "ghost"** checkbox in the delete account modal.
+
+This will:
+
+ - Clear any backing identities (such as GitLab/Twitter) including GitHub tokens
+ - Clear any emails
+ - Change your username to `ghost~<id>` and your display name to "Ghost"
+ - Clear your avatar
+ - Mark your ghost user account as removed
+
+This will **NOT**:
+
+ - Delete your messages
+ - Delete your communities/rooms
+ - Change mentions of your username
+
+![](https://i.imgur.com/rX3plq5.png)
