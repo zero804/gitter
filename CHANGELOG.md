@@ -1,4 +1,4 @@
-# 19.9.0 - 2018-7-10
+# 19.9.0 - 2018-7-11
 
  - Add ghost option to account deletion in order to disassociate personal data, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1197
  - Add native QML/Qt app to 3rd party app list, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1200
