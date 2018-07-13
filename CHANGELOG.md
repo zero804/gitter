@@ -2,7 +2,7 @@
 
  - Add ability to export [topics](https://blog.gitter.im/2016/09/30/introducing-gitter-topics/)
     - Update to `@gitterhq/env@0.38.0` to stream error if headers already sent, https://gitlab.com/gitlab-org/gitter/env/merge_requests/15
-
+    - Add utility scripts `scripts/utils/list-group-admins.js` and `scripts/utils/list-admins-of-every-forum.js` to help gather topics/forum admin emails
 
 # 19.9.0 - 2018-7-11
 
