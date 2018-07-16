@@ -1,7 +1,9 @@
 'use strict';
 
 const Promise = require('bluebird');
-var StatusError = require('statuserror');
+const StatusError = require('statuserror');
+const env = require('gitter-web-env');
+const stats = env.stats;
 const restSerializer = require('../../serializers/rest-serializer');
 
 function generateExportSubresource(key, getCursor, getStrategy) {
@@ -11,6 +13,11 @@ function generateExportSubresource(key, getCursor, getStrategy) {
       res.end();
     },
     index: function(req, res) {
+      // Assume `topics` means we are exporting a topics forum
+      if(key === 'topics') {
+        stats.event(`api.export.${key}`, { userId: req.user && req.user.id, forumId: req.forum && String(req.forum._id), forumLcUri: req.forum && req.forum.lcUri });
+      }
+
       return Promise.resolve()
         .then(() => {
           if(req.accepts('application/x-ndjson') !== 'application/x-ndjson') {
