@@ -44,10 +44,14 @@ require('./workers').listen();
 
 var port = nconf.get("PORT");
 
-onMongoConnect(function() {
-  serverStats('web', server);
+if (!process.env.DISABLE_API_WEB_LISTEN) {
+  onMongoConnect(function() {
+    serverStats('web', server);
 
-  server.listen(port, undefined, nconf.get("web:backlog"), function() {
-    winston.info("Listening on " + port);
+    server.listen(port, undefined, nconf.get("web:backlog"), function() {
+      winston.info("Listening on " + port);
+    });
   });
-});
+}
+
+module.exports = server;

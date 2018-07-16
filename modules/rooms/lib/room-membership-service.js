@@ -17,6 +17,7 @@ var _ = require('lodash');
 var roomMembershipFlags = require('./room-membership-flags');
 var groupMembershipDeltaService = require('gitter-web-groups/lib/group-membership-delta-service');
 var removedUsers = require('./room-removed-user-core');
+var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs');
 
 /**
  * Returns the rooms the user is in
@@ -339,13 +340,17 @@ function findAllMembersForRooms(troupeIds) {
  * a hash keyed by the troupeId, with a userId array
  * as the value
  */
-function findMembersForRoomMulti(troupeIds) {
+function findMembersForRoomMulti(troupeIds, options) {
+  options = options || {};
+  options.read = options.read || mongoReadPrefs.secondaryPreferred;
+
   if(!troupeIds.length) return Promise.resolve({});
   troupeIds.forEach(function(troupeIds) {
     assert(troupeIds);
   });
 
   return TroupeUser.find({ troupeId: { $in: mongoUtils.asObjectIDs(troupeIds) } }, { _id: 0, troupeId: 1, userId: 1 })
+    .read(options.read)
     .exec()
     .then(function(troupeUsers) {
       return _.reduce(troupeUsers, function(memo, troupeUser) {

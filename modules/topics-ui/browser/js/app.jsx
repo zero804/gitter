@@ -1,5 +1,7 @@
 import React from 'react';
 
+import getContext from './utils/context';
+
 //Containers
 import ForumContainer from '../../shared/containers/ForumContainer.jsx';
 import TopicContainer from '../../shared/containers/TopicContainer.jsx';
@@ -79,6 +81,9 @@ export default React.createClass({
 
   getForumState(){
     const { router } = this.props;
+
+    const context = getContext();
+
     //Construct State
     return Object.assign(this.getDefaultState(), {
       //Route params
@@ -89,6 +94,8 @@ export default React.createClass({
       //Stores
       topicsStore: getTopicsStore(),
       createTopic: false,
+      downloadTopicsUri: context.downloadTopicsUri,
+      deprecatedBlogUrl: context.deprecatedBlogUrl
     });
   },
 
