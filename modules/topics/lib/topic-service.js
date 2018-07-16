@@ -25,6 +25,7 @@ var validators = require('gitter-web-validators');
 var liveCollections = require('gitter-web-live-collection-events');
 var topicNotificationEvents = require('gitter-web-topic-notifications/lib/forum-notification-events');
 var topicSequencer = require('./topic-sequencer');
+const mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs');
 
 var TOPIC_RESULT_LIMIT = 100;
 
@@ -436,6 +437,18 @@ function deleteTopic(user, topic) {
     });
 }
 
+function getCursorByForumId(forumId) {
+  const topicCursor = persistence.Topic.find({
+    forumId: forumId
+  })
+    .lean()
+    .read(mongoReadPrefs.secondaryPreferred)
+    .batchSize(100)
+    .cursor();
+
+  return topicCursor;
+}
+
 module.exports = {
   findById: findById,
   findByForumId: findByForumId,
@@ -447,5 +460,6 @@ module.exports = {
   setTopicTags: Promise.method(setTopicTags),
   setTopicSticky: Promise.method(setTopicSticky),
   setTopicCategory: Promise.method(setTopicCategory),
-  deleteTopic: deleteTopic
+  deleteTopic: deleteTopic,
+  getCursorByForumId: getCursorByForumId
 };

@@ -24,5 +24,8 @@ module.exports = function forumStore(initialData) {
     getSubscriptionState: () => {
       return data.subscriptionState;
     },
+    getForumIsAdmin: () => {
+      return data.permissions && data.permissions.admin;
+    },
   };
 };

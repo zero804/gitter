@@ -26,7 +26,7 @@ function createStatic() {
 }
 
 function install(app) {
-  if (process.env.NODE_ENV === 'dev') {
+  if (process.env.NODE_ENV === 'dev' || process.env.NODE_ENV === 'test'  || process.env.NODE_ENV === 'test-docker') {
     app.use('/', require('../dev/webpack-middleware').create());
   } else {
     app.get('/sw.js', createStatic());

@@ -72,6 +72,7 @@ data
 scripts/graphs/users.csv
 scripts/utils/output.txt
 scripts/utils/run.txt
+scripts/utils/forum-admin-map.json
 hostaliases
 config/redis-docker
 config/mongo-docker
