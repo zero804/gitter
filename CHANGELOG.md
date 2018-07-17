@@ -1,3 +1,8 @@
+# 19.10.1 - 2018-7-16
+
+ - Fix topics export rate-limit applying globally instead of per-user, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1204
+
+
 # 19.10.0 - 2018-7-16
 
  - Add ability to export [topics](https://blog.gitter.im/2016/09/30/introducing-gitter-topics/)
