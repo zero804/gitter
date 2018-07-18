@@ -1,3 +1,9 @@
+# 19.11.0 - *upcoming*
+
+ - Persist emails for GitHub users when they sign in, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1095
+    - Add utility script to find a user by email, `node script/utils/find-users-by-email.js --email foo@bar.com`
+
+
 # 19.10.1 - 2018-7-16
 
  - Fix topics export rate-limit applying globally instead of per-user, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1204
