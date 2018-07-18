@@ -2,8 +2,12 @@
 
 var log = require('loglevel');
 
-window.gitterSetLogLevel = function(level) {
-  log.setLevel(level);
-};
+try {
+  window.gitterSetLogLevel = function(level) {
+    log.setLevel(level);
+  };
+} catch(err) {
+  // noop, ignore `ReferenceError: window is not defined` when running in tests
+}
 
 module.exports = log;
