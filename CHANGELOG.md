@@ -2,6 +2,7 @@
 
  - `/v1/repo-info?repo=foo%bar` now returns a `204` status code(previously 200) when the given `repo` query parameter can't be found which caused JSON parsing on the frontend to fail, https://gitlab.com/gitlab-org/gitter/webapp/issues/1948
  - Fix `loading-view.js` NPE when hooking iframe `DOMContentLoaded` event, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1208
+ - Stop Elasticsearch `NoConnections` error being spammed to Sentry, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1209
 
 
 # 19.11.0 - 2018-7-18
