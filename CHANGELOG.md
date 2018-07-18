@@ -1,3 +1,8 @@
+# 19.12.0 - *upcoming*
+
+ - `/v1/repo-info?repo=foo%bar` now returns a `204` status code(previously 200) when the given `repo` query parameter can't be found which caused JSON parsing on the frontend to fail, https://gitlab.com/gitlab-org/gitter/webapp/issues/1948
+
+
 # 19.11.0 - 2018-7-18
 
  - Persist emails for GitHub users when they sign in, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1095
