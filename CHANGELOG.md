@@ -1,4 +1,4 @@
-# 19.11.0 - *upcoming*
+# 19.11.0 - 2018-7-18
 
  - Persist emails for GitHub users when they sign in, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1095
     - Add utility script to find a user by email, `node script/utils/find-users-by-email.js --email foo@bar.com`
