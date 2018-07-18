@@ -9,8 +9,9 @@ module.exports = function(req, res, next) {
   if (!repoName) return next(new StatusError(400, 'repo parameter required'));
   var repoService = new RepoService(req.user);
 
-  repoService.getRepo(repoName)
-  .then(function(repo) {
-    res.send(repo);
-  }, next);
+  return repoService.getRepo(repoName)
+    .then(function(repo) {
+      if(!repo) return next(new StatusError(204, 'repo not found'));
+      res.send(repo);
+    }, next);
 };
