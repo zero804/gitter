@@ -42,6 +42,7 @@ UserSchema.index({ githubId: 1 }, { unique: true, sparse: true }); // TODO: does
 UserSchema.index({'identities.provider': 1, 'identities.providerKey': 1}, { unique: true, sparse: true });
 UserSchema.index({ username: 1 }, { unique: true /*, sparse: true */});
 UserSchema.index({ stripeCustomerId: 1 }, { unique: true, sparse: true });
+UserSchema.index({ emails: 1 });
 UserSchema.schemaTypeName = 'UserSchema';
 
 installVersionIncMiddleware(UserSchema);
