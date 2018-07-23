@@ -1,5 +1,6 @@
 "use strict";
 
+var _ = require('lodash');
 var env = require('gitter-web-env');
 var logger = env.logger;
 var nconf = env.config;
@@ -163,10 +164,16 @@ faye.stringify = function(object) {
   }
 };
 
-function errorLogger(msg) {
+// additionalData is based off of Raven, https://docs.sentry.io/clients/node/usage/#raven-node-additional-data
+function errorLogger(msg, additionalData) {
   const err = new Error(msg);
   logger.error('bayeux-cluster-faye: error ' + msg, { exception: err });
-  errorReporter(err, { }, { module: 'bayeux-cluster' });
+  errorReporter(
+    err,
+    additionalData.extra,
+    _.extend({ module: 'bayeux-cluster' }, additionalData.tags),
+    additionalData.request
+  );
 }
 
 faye.logger = {
