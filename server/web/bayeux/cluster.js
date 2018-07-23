@@ -165,7 +165,7 @@ faye.stringify = function(object) {
 };
 
 // additionalData is based off of Raven, https://docs.sentry.io/clients/node/usage/#raven-node-additional-data
-function errorLogger(msg, additionalData) {
+function errorLogger(msg, additionalData = {}) {
   const err = new Error(msg);
   logger.error('bayeux-cluster-faye: error ' + msg, { exception: err });
   errorReporter(
