@@ -1,5 +1,6 @@
 "use strict";
 
+var log = require('../../utils/log');
 var appEvents = require('../../utils/appevents');
 
 var LoadingView = function(iframe, loadingFrame) {
@@ -20,20 +21,32 @@ var LoadingView = function(iframe, loadingFrame) {
     }, 500);
   }
 
-  function onunload() {
-
+  let onUnloadAttempts = 0;
+  function onUnload() {
     // the unload hasnt been cancelled
     clearTimeout(unloadTimeout);
 
     // the exiting contentDocument is about to be destroyed, but the
     // iframe's new contentDocument will be instantiated in the next event loop.
     setTimeout(function() {
-      self.iframe.contentDocument.removeEventListener('DOMContentLoaded', onIframeLoad);
-      self.iframe.contentDocument.addEventListener('DOMContentLoaded', onIframeLoad);
+      if(self.iframe && self.iframe.contentDocument) {
+        self.iframe.contentDocument.removeEventListener('DOMContentLoaded', onIframeLoad);
+        self.iframe.contentDocument.addEventListener('DOMContentLoaded', onIframeLoad);
+      }
+      // Retry after another frame if the contentDocument does not exist yet
+      else if(onUnloadAttempts < 3) {
+        onUnload();
+      }
+      else {
+        log.warn('Unable to hook iframe DOMContentLoaded event in loading-view');
+      }
     }, 0);
+
+    onUnloadAttempts++;
   }
 
   function onIframeLoad() {
+    onUnloadAttempts = 0;
     self.hide();
 
     // now that we have a new content window,
@@ -42,8 +55,8 @@ var LoadingView = function(iframe, loadingFrame) {
     self.iframe.contentWindow.removeEventListener('beforeunload', onbeforeunload);
     self.iframe.contentWindow.addEventListener('beforeunload', onbeforeunload);
 
-    self.iframe.contentWindow.removeEventListener('unload', onunload);
-    self.iframe.contentWindow.addEventListener('unload', onunload);
+    self.iframe.contentWindow.removeEventListener('unload', onUnload);
+    self.iframe.contentWindow.addEventListener('unload', onUnload);
   }
 
   var readyState = this.iframe.contentDocument.readyState;

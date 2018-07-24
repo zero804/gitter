@@ -1,3 +1,17 @@
+# 19.12.0 - 2018-7-23
+
+ - Update `@gitterhq/services@1.21.0` (integrations), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1078
+    - Adds Discourse integration
+    - Adds The Bug Genie integration
+ - `/v1/repo-info?repo=foo%bar` now returns a `204` status code(previously 200) when the given `repo` query parameter can't be found which caused JSON parsing on the frontend to fail, https://gitlab.com/gitlab-org/gitter/webapp/issues/1948
+ - Fix `loading-view.js` NPE when hooking iframe `DOMContentLoaded` event, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1208
+ - Stop Elasticsearch `NoConnections` errors being spammed to Sentry, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1209
+ - Pass along `additionalData` from `gitter-faye` to Sentry for more context (trying to solve [#1906](https://gitlab.com/gitlab-org/gitter/webapp/issues/1906)), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1210
+    - Update to `@gitterhq/env@0.39.0` to pass additional data to Sentry/raven, https://gitlab.com/gitlab-org/gitter/env/merge_requests/16
+    - Update to `gitter-faye@1.2.0` to get additional data passed from logger, https://gitlab.com/gitlab-org/gitter/faye/merge_requests/3
+
+
+
 # 19.11.0 - 2018-7-18
 
  - Persist emails for GitHub users when they sign in, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1095
