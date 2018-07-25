@@ -1,3 +1,10 @@
+# 19.13.0 - *upcoming*
+
+Developer facing:
+
+ - Update to Mocha@5.x for better debugging, `--inspect` (node inspector devtools), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1212
+
+
 # 19.12.0 - 2018-7-23
 
  - Update `@gitterhq/services@1.21.0` (integrations), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1078

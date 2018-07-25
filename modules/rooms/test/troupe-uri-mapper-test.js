@@ -18,36 +18,32 @@ describe('troupe-uri-mapper', function() {
       troupeOneToOne: { oneToOne: true, users: ['user1', 'user2'] },
     });
 
-    it('#01 should return null when a user has no troupes',function(done) {
+    it('#01 should return null when a user has no troupes',function() {
       return troupeUriMapper.getUrlOfFirstAccessibleRoom([fixture.userNoTroupes.id], fixture.user1.id)
         .then(function(url) {
           assert(!url);
-        })
-        .nodeify(done);
+        });
     });
 
-    it('#02 should return the first room that allows access',function(done) {
+    it('#02 should return the first room that allows access',function() {
       return troupeUriMapper.getUrlOfFirstAccessibleRoom([fixture.userNoTroupes.id, fixture.troupe1.id], fixture.user1.id)
         .then(function(url) {
           assert.strictEqual(url, '/' + fixture.troupe1.uri);
-        })
-        .nodeify(done);
+        });
     });
 
-    it('#03 should return the one to one rooms',function(done) {
+    it('#03 should return the one to one rooms',function() {
       return troupeUriMapper.getUrlOfFirstAccessibleRoom([fixture.userNoTroupes.id, fixture.troupeOneToOne.id, fixture.troupe1.id], fixture.user1.id)
         .then(function(url) {
           assert.strictEqual(url, '/' + fixture.user2.username);
-        })
-        .nodeify(done);
+        });
     });
 
-    it('#04 should return the other user in a one-to-one room',function(done) {
+    it('#04 should return the other user in a one-to-one room',function() {
       return troupeUriMapper.getUrlOfFirstAccessibleRoom([fixture.userNoTroupes.id, fixture.troupeOneToOne.id], fixture.user2.id)
         .then(function(url) {
           assert.strictEqual(url, '/' + fixture.user1.username);
-        })
-        .nodeify(done);
+        });
     });
 
   });

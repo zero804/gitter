@@ -13,7 +13,7 @@ describe("User Settings Service", function() {
     user2: { }
   });
 
-  it('should be able to set user settings', function(done) {
+  it('should be able to set user settings', function() {
     var userId = fixture.user1.id;
 
     return userSettingsService.setUserSettings(userId, 'test', { value1: 1, value2: true, value3: 'string' })
@@ -24,11 +24,10 @@ describe("User Settings Service", function() {
         assert.equal(settings.value1, 1);
         assert.equal(settings.value2, true);
         assert.equal(settings.value3, 'string');
-      })
-      .nodeify(done);
+      });
   });
 
-  it('should be able to set multiple keys', function(done) {
+  it('should be able to set multiple keys', function() {
     var userId = fixture.user1.id;
 
     return userSettingsService.setUserSettings(userId, 'test', { value1: 1, value2: true, value3: 'string' })
@@ -58,8 +57,7 @@ describe("User Settings Service", function() {
         assert(settings.test.value1);
         assert(settings.test2);
         assert(settings.test2.human);
-      })
-      .nodeify(done);
+      });
   });
 
   it('should be able to get multiple keys', function() {
@@ -90,7 +88,7 @@ describe("User Settings Service", function() {
       });
   });
 
-  it('should be able to fetch keys for multiple usertroupes', function(done) {
+  it('should be able to fetch keys for multiple usertroupes', function() {
     var user1Id = fixture.user1.id;
     var user2Id = fixture.user2.id;
 
@@ -105,8 +103,7 @@ describe("User Settings Service", function() {
         assert.equal(Object.keys(results).length, 2);
         assert.equal(results[user1Id].bob, 1);
         assert.equal(results[user2Id].bob, 2);
-      })
-      .nodeify(done);
+      });
   });
 
 

@@ -38,12 +38,11 @@ var fakeEngine = {
 
 describe('presenceService', function () {
 
-  function cleanup(done) {
+  function cleanup() {
     return presenceService.collectGarbage(fakeEngine)
       .then(function () {
         return presenceService.validateUsers();
-      })
-      .nodeify(done);
+      });
   }
 
   beforeEach(cleanup);
