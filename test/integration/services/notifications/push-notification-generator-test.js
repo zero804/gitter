@@ -39,7 +39,7 @@ var notificationSerializerStub = {
 
 describe('push notification generator service', function() {
 
-  it('should send a notification', function(done) {
+  it('should send a notification', function() {
     var mockSendUserNotification = mockito.mockFunction();
     mockito.when(mockSendUserNotification)().then(function() { return Promise.resolve(); });
 
@@ -55,11 +55,10 @@ describe('push notification generator service', function() {
     return service.sendUserTroupeNotification('userId1234', '1234567890', 1)
       .then(function() {
         mockito.verify(mockSendUserNotification, once)();
-      })
-      .nodeify(done);
+      });
   });
 
-  it('should serialize troupes and chats correctly', function(done) {
+  it('should serialize troupes and chats correctly', function() {
     var mockSendUserNotification = function(notificationType, userId, options) {
       assert.strictEqual(notificationType, 'new_chat');
       assert.equal(userId, 'userId1234');
@@ -81,8 +80,7 @@ describe('push notification generator service', function() {
       '../../serializers/notification-serializer': notificationSerializerStub
     });
 
-    return service.sendUserTroupeNotification('userId1234', '1234567890', 1)
-      .nodeify(done);
+    return service.sendUserTroupeNotification('userId1234', '1234567890', 1);
   });
 
   describe('selectChatsForNotification', function() {

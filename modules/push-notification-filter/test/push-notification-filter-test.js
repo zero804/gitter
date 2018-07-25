@@ -10,18 +10,17 @@ describe('push-notification-filter', function() {
   });
 
   describe('findUsersInRoomAcceptingNotifications', function() {
-    it('should not filter users who have received no notifications', function(done) {
+    it('should not filter users who have received no notifications', function() {
       var userId1 = 'TEST_USER1_' + Date.now();
       var troupeId = 'TEST_TROUPE1_' + Date.now();
 
       return pushNotificationFilter.findUsersInRoomAcceptingNotifications(troupeId, [userId1])
         .then(function(result) {
           assert.deepEqual(result, [userId1]); // Notify
-        })
-        .nodeify(done);
+        });
     });
 
-    it('should filter users who have received notifications', function(done) {
+    it('should filter users who have received notifications', function() {
       var userId1 = 'TEST_USER1_' + Date.now();
       var troupeId = 'TEST_TROUPE1_' + Date.now();
       var MAX_LOCK_VALUE = 2;
@@ -68,13 +67,12 @@ describe('push-notification-filter', function() {
         })
         .then(function(result) {
           assert.deepEqual(result, [userId1]);
-        })
-        .nodeify(done);
+        });
     });
   });
 
   describe('Notification Locking', function() {
-    it('should lock user troupe pairs so that users dont get too many notifications', function(done) {
+    it('should lock user troupe pairs so that users dont get too many notifications', function() {
       var userId = 'TEST_USER1_' + Date.now();
       var troupeId = 'TEST_TROUPE1_' + Date.now();
       var startTime = Date.now();
@@ -121,12 +119,10 @@ describe('push-notification-filter', function() {
         })
         .then(function(st) {
           assert.equal(st, startTime);
-        })
-
-        .nodeify(done);
+        });
     });
 
-   it('should handle notification resets', function(done) {
+   it('should handle notification resets', function() {
       var userId = 'TEST_USER1_' + Date.now();
       var troupeId = 'TEST_TROUPE1_' + Date.now();
       var startTime = Date.now();
@@ -154,13 +150,12 @@ describe('push-notification-filter', function() {
         })
         .then(function(st) {
           assert.equal(st, 0);
-        })
-        .nodeify(done);
+        });
     });
 
   });
 
-  it('should set the expiry correctly on the redis keys', function(done) {
+  it('should set the expiry correctly on the redis keys', function() {
     var userId = 'TEST_USER1_' + Date.now();
     var troupeId = 'TEST_TROUPE1_' + Date.now();
     var startTime = Date.now();
@@ -195,8 +190,7 @@ describe('push-notification-filter', function() {
         assert.strictEqual(exists, 0);
 
         return pushNotificationFilter.canUnlockForNotification(userId, troupeId, 1);
-      })
-      .nodeify(done);
+      });
   });
 
 });

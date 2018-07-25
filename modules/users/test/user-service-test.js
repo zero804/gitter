@@ -37,16 +37,15 @@ describe("User Service", function() {
 
   });
 
-  it('should create new users', function(done) {
+  it('should create new users', function() {
     return persistence.User.findOneAndRemove({ githubId: - 1})
       .exec()
       .then(function() {
         return userService.findOrCreateUserForGithubId({ githubId: -1, username: '__test__gitter_007' });
-      })
-      .nodeify(done);
+      });
   });
 
-  it('should destroy tokens for users', function(done) {
+  it('should destroy tokens for users', function() {
     return userService.findOrCreateUserForGithubId({
         githubId: -Date.now(),
         username: fixture2.generateUsername(),
@@ -68,8 +67,7 @@ describe("User Service", function() {
         assert(!user.githubToken);
         assert(!user.githubUserToken);
         assert.deepEqual(user.githubScopes, {});
-      })
-      .nodeify(done);
+      });
 
   });
 

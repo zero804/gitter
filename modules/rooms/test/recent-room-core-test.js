@@ -17,14 +17,14 @@ describe('recent-room-core', function() {
       troupe4: { users: ['user1'] }
     });
 
-    it('should rearrange the order of favourites correctly',function(done) {
+    it('should rearrange the order of favourites correctly',function() {
       this.timeout(10000);
 
       function getFavs() {
         return recentRoomCore.findFavouriteTroupesForUser(fixture.user1.id);
       }
 
-      recentRoomCore.updateFavourite(fixture.user1.id, fixture.troupe1.id, 1)
+      return recentRoomCore.updateFavourite(fixture.user1.id, fixture.troupe1.id, 1)
         .then(getFavs)
         .then(function(favs) {
           assert.equal(favs[fixture.troupe1.id], 1);
@@ -81,9 +81,7 @@ describe('recent-room-core', function() {
           assert.equal(favs[fixture.troupe3.id], 2);
           assert.equal(favs[fixture.troupe2.id], 3);
           assert.equal(favs[fixture.troupe1.id], 4);
-        })
-
-        .nodeify(done);
+        });
     });
 
   });
@@ -94,9 +92,9 @@ describe('recent-room-core', function() {
       troupe1: { users: ['user1'] }
     });
 
-    it('should add a troupe to favourites',function(done) {
+    it('should add a troupe to favourites',function() {
 
-      function fav(val, callback) {
+      function fav(val) {
         return recentRoomCore.updateFavourite(fixture.user1.id, fixture.troupe1.id, val)
           .then(function() {
             return recentRoomCore.findFavouriteTroupesForUser(fixture.user1.id);
@@ -104,20 +102,13 @@ describe('recent-room-core', function() {
           .then(function(favs) {
             var isInTroupe = !!favs[fixture.troupe1.id];
             assert(isInTroupe === val, 'Troupe should ' + (val? '': 'not ') + 'be a favourite');
-          })
-          .nodeify(callback);
+          });
       }
 
-      fav(true, function() {
-        fav(true, function() {
-          fav(false, function() {
-            fav(false, function() {
-              done();
-            });
-          });
-        });
-      });
-
+      return fav(true)
+        .then(() => fav(true))
+        .then(() => fav(false))
+        .then(() => fav(true));
     });
 
   });
@@ -129,16 +120,15 @@ describe('recent-room-core', function() {
       troupe1: { users: ['user1'] }
     });
 
-    it('should handle default values', function(done) {
+    it('should handle default values', function() {
       return recentRoomCore.findLastAccessTimesForUsersInRoom(fixture.troupe1.id, [fixture.user1.id, fixture.user2._id])
         .then(function(result) {
           assert(result[fixture.user1.id]);
           assert(result[fixture.user2.id]);
-        })
-        .nodeify(done);
+        });
     });
 
-    it('should handle non default values', function(done) {
+    it('should handle non default values', function() {
       return Promise.all([
           recentRoomCore.saveUserTroupeLastAccess(fixture.user1.id, fixture.troupe1.id),
           recentRoomCore.saveUserTroupeLastAccess(fixture.user2.id, fixture.troupe1.id)
@@ -154,8 +144,7 @@ describe('recent-room-core', function() {
 
           assert(d2 >= 0);
           assert(d2 < 5000);
-        })
-        .nodeify(done);
+        });
     });
 
   });

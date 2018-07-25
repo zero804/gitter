@@ -131,7 +131,7 @@ function spawnMochaProcess(moduleName, options, files) { // eslint-disable-line 
       'output/coverage-reports/' + moduleName,
       '--reporter',
       'lcov',
-      './node_modules/.bin/mocha'
+      './node_modules/.bin/mocha',
     ];
 
     mkdirp.sync('output/coverage-reports/' + moduleName);
@@ -139,6 +139,9 @@ function spawnMochaProcess(moduleName, options, files) { // eslint-disable-line 
     executable = './node_modules/.bin/mocha';
     args = [];
   }
+
+  // This is needed because Mocha no longer force exits, https://boneskull.com/mocha-v4-nears-release/#mochawontforceexit
+  args.push('--exit');
 
   if (testSuite === 'docker') {
     env.HOME = '/tmp'; // Needs to be writeable inside docker for `nyc`
