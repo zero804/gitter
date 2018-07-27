@@ -5,7 +5,7 @@ var modalRegion = require('../../components/modal-region');
 var ChatContainerView = require('../chat/chatContainerView');
 
 /* Decorators */
-var issueDecorator = require('../chat/decorators/issueDecorator');
+var issuableDecorator = require('../chat/decorators/issuableDecorator');
 var commitDecorator = require('../chat/decorators/commitDecorator');
 var mentionDecorator = require('../chat/decorators/mentionDecorator');
 var embedDecorator = require('../chat/decorators/embedDecorator');
@@ -33,7 +33,7 @@ var ChatLayout = Marionette.LayoutView.extend({
 
     return new ChatContainerView(optionsForRegion({
       collection: this.options.chatCollection,
-      decorators: [issueDecorator, commitDecorator, mentionDecorator, embedDecorator, emojiDecorator],
+      decorators: [issuableDecorator, commitDecorator, mentionDecorator, embedDecorator, emojiDecorator],
       monitorScrollPane: monitorUnreadItems && this.ui.scroll // Monitor the scroll region for unread items
     }));
   }

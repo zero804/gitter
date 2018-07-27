@@ -177,8 +177,8 @@ module.exports = {
   findPrimaryIdentityForUser: Promise.method(findPrimaryIdentityForUser),
   removeForUser: Promise.method(removeForUser),
 
-  GITHUB_IDENTITY_PROVIDER: 'github',
   GITLAB_IDENTITY_PROVIDER: 'gitlab',
+  GITHUB_IDENTITY_PROVIDER: 'github',
   GOOGLE_IDENTITY_PROVIDER: 'google',
   TWITTER_IDENTITY_PROVIDER: 'twitter',
   LINKEDIN_IDENTITY_PROVIDER: 'linkedin',

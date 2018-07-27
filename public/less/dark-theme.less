@@ -444,19 +444,24 @@ a.room-item__container:hover { //:cry:
 }
 
 //Github integration stuff
-.issue.open { color: @chat-right-toolbar-issue-open-color; }
-.issue.closed { color: @chat-right-toolbar-issue-closed-color; }
-.issue.is-existent {
-  &.closed {
-    color: @chat-right-toolbar-issue-closed-color;
-    background-color: @chat-right-toolbar-issue-background;
-    border-color: @chat-right-toolbar-issue-background;
-  }
+.issue,
+.pr,
+.mr {
+  &.open { color: @chat-right-toolbar-issue-open-color; }
+  &.closed { color: @chat-right-toolbar-issue-closed-color; }
 
-  &.open {
-    color: @chat-right-toolbar-issue-open-color;
-    background-color: @chat-right-toolbar-issue-background;
-    border-color: @chat-right-toolbar-issue-background;
+  &.is-existent {
+    &.closed {
+      color: @chat-right-toolbar-issue-closed-color;
+      background-color: @chat-right-toolbar-issue-background;
+      border-color: @chat-right-toolbar-issue-background;
+    }
+
+    &.open {
+      color: @chat-right-toolbar-issue-open-color;
+      background-color: @chat-right-toolbar-issue-background;
+      border-color: @chat-right-toolbar-issue-background;
+    }
   }
 }
 

@@ -43,6 +43,11 @@ router.get('/irc-token',
   identifyRoute('api-private-irc-token'),
   require('./irc-token'));
 
+router.get('/issue-mirror',
+  authMiddleware,
+  identifyRoute('api-private-issue-mirror'),
+  require('./issue-mirror'));
+
 router.get('/issue-state',
   authMiddleware,
   identifyRoute('api-private-issue-state'),

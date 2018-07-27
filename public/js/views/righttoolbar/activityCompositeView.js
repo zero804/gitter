@@ -3,7 +3,7 @@ var _ = require('underscore');
 var Marionette = require('backbone.marionette');
 var classnames = require('classnames');
 var appEvents = require('../../utils/appevents');
-var issueDecorator = require('../chat/decorators/issueDecorator');
+var issuableDecorator = require('../chat/decorators/issuableDecorator');
 var commitDecorator = require('../chat/decorators/commitDecorator');
 var mentionDecorator = require('../chat/decorators/mentionDecorator');
 var debug = require('debug-proxy')('app:activity-composite-view');
@@ -134,7 +134,7 @@ module.exports = (function() {
     },
 
     onRender: function() {
-      issueDecorator.decorate(this);
+      issuableDecorator.decorate(this);
       commitDecorator.decorate(this);
       mentionDecorator.decorate(this);
     },

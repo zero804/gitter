@@ -58,7 +58,7 @@ describe('oauth-service', function() {
       });
   });
 
-  it('should use cached tokens', function(done) {
+  it('should use cached tokens', function() {
     var userId = mongoUtils.getNewObjectIdString();
 
     return oauthService.findOrGenerateWebToken(userId)
@@ -72,11 +72,10 @@ describe('oauth-service', function() {
           assert.equal(token1, token2);
           assert.deepEqual(client, client2);
         });
-      })
-      .nodeify(done);
+      });
   });
 
-  it('should use uncached tokens #slow', function(done) {
+  it('should use uncached tokens #slow', function() {
     this.timeout(20000);
 
     var users = [mongoUtils.getNewObjectIdString(), mongoUtils.getNewObjectIdString()];
@@ -134,13 +133,11 @@ describe('oauth-service', function() {
                 }
               });
             });
-      })
-      .nodeify(done);
-
+      });
   });
 
 
-  it('should validate tokens', function(done) {
+  it('should validate tokens', function() {
     var user = fixture.user1;
 
     return oauthService.findOrGenerateWebToken(user._id)
@@ -157,11 +154,10 @@ describe('oauth-service', function() {
             assert(mongoUtils.objectIDsEqual(tokenInfo.user._id, user._id));
             assert(mongoUtils.objectIDsEqual(tokenInfo.client._id, client._id));
           });
-      })
-      .nodeify(done);
+      });
   });
 
-  it('should validate anonymous tokens', function(done) {
+  it('should validate anonymous tokens', function() {
     return oauthService.generateAnonWebToken()
       .spread(function(token1, client) {
         assert(token1);
@@ -176,21 +172,19 @@ describe('oauth-service', function() {
             assert.equal(tokenInfo.user, null);
             assert(mongoUtils.objectIDsEqual(tokenInfo.client._id, client._id));
           });
-      })
-      .nodeify(done);
+      });
   });
 
-  it('should consider a revoked client as an invalid token', function(done) {
+  it('should consider a revoked client as an invalid token', function() {
     var token = fixture.oAuthAccessTokenRevoked1.token;
 
     return oauthService.validateAccessTokenAndClient(token)
       .catch(function(err) {
         assert.equal(err.clientRevoked, true);
-      })
-      .nodeify(done);
+      });
   });
 
-  it('should reuse cached tokens', function(done) {
+  it('should reuse cached tokens', function() {
     var userId = fixture.user1.id;
 
     return oauthService.findOrGenerateWebToken(userId)
@@ -207,8 +201,7 @@ describe('oauth-service', function() {
             assert.deepEqual(client, client2);
           });
 
-      })
-      .nodeify(done);
+      });
   });
 
   describe('isInternalClient', function() {

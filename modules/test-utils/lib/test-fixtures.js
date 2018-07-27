@@ -8,6 +8,7 @@ var fixtureUtils = require('./fixture-utils');
 var onMongoConnect = require('gitter-web-persistence-utils/lib/on-mongo-connect');
 var _ = require('lodash');
 var integrationFixtures = require('./integration-fixtures');
+var shutdown = require('shutdown');
 
 var fixtureSteps = [
   require('./delete-documents'),
@@ -131,7 +132,10 @@ fixtureLoader.ensureIntegrationEnvironment = function() {
         logger.warn('Skipping this test due to missing config items', missing.join(', '))
         // Just skip these tests
         this._skipFixtureSetup = true;
+
         this.skip();
+        // Skip hack from, https://github.com/mochajs/mocha/issues/2683#issuecomment-375629901
+        this.test.parent.pending = true;
       }
     });
 

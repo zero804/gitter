@@ -13,24 +13,29 @@ describe('github-issue-state-search #slow #github', function() {
     githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN
   };
 
-  it('return the state', function(done) {
+  it('return the state', function() {
     var underTest = new GitHubIssueStateService(FAKE_USER);
 
-    underTest.getIssueState(fixtureLoader.GITTER_INTEGRATION_REPO_FULL, 1)
+    return underTest.getIssueState(fixtureLoader.GITTER_INTEGRATION_REPO_FULL, 1)
       .then(function(f) {
         assert.strictEqual(f, 'open');
-      })
-      .nodeify(done);
+      });
   });
 
-  it('return empty for missing issue', function(done) {
+  it('throw error for missing issue', function() {
     var underTest = new GitHubIssueStateService(FAKE_USER);
 
-    underTest.getIssueState(fixtureLoader.GITTER_INTEGRATION_REPO_FULL, 999999)
-      .then(function(f) {
-        assert.strictEqual(f, '');
+    return underTest.getIssueState(fixtureLoader.GITTER_INTEGRATION_REPO_FULL, 999999)
+      .then(() => {
+        assert.fail('Shouldn\'t be able to fetch missing issue');
       })
-      .nodeify(done);
+      .catch((err) => {
+        if(err instanceof assert.AssertionError) {
+          throw err;
+        }
+
+        assert.strictEqual(err.status, 404);
+      });
   });
 
 });
