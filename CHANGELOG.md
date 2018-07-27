@@ -2,6 +2,10 @@
 
  - Remove rooms that now 404 from the homepage, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1215
 
+Developer facing:
+
+ - Fix `new_user` stat not being pushed out and tracked, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1216
+
 
 # 19.13.0 - 2018-7-27
 
