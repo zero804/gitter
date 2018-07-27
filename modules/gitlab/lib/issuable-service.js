@@ -11,7 +11,7 @@ function standardizeResponse(response) {
   if(response.state === 'opened' || response.state === 'reopened') {
     state = 'open';
   }
-  else if(response.state === 'closed') {
+  else if(response.state === 'closed' || response.state === 'merged') {
     state = 'closed';
   }
 
