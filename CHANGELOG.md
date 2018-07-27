@@ -1,4 +1,4 @@
-# 19.13.0 - *upcoming*
+# 19.13.0 - 2018-7-27
 
  - Add GitLab issue decorations, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1077
 
