@@ -136,6 +136,8 @@ module.exports = (function() {
           var popover = createPopover(model, e.target);
           popover.show();
           Popover.singleton(view, popover);
+
+          e.preventDefault();
         }
 
         function showPopoverLater(e) {
@@ -149,15 +151,21 @@ module.exports = (function() {
         }
 
         var $commit = $(this);
+        var provider = $commit.data('provider');
         var repo = $commit.data('commitRepo');
         var sha = $commit.data('commitSha');
 
         if(!repo || !sha) return;
 
+        var baseUrl = 'https://github.com/';
+        if(provider === 'gitlab') {
+          baseUrl = 'https://gitlab.com/';
+        }
+
         var model = new Backbone.Model({
           repo: repo,
           sha: sha,
-          html_url: 'https://github.com/'+repo+'/commit/'+sha
+          html_url: baseUrl+repo+'/commit/'+sha
         });
 
         $commit.on('click', showPopover);

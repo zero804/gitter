@@ -26,7 +26,7 @@ describe('github-issue-service #slow #github', function() {
       .then(() => underTest.getIssue(fixtureLoader.GITTER_INTEGRATION_REPO_FULL, 1))
       .then(function(f) {
         assert(f);
-        assert.strictEqual(f.number, 1);
+        assert.strictEqual(f.iid, 1);
       })
       .nodeify(done);
   });
@@ -48,19 +48,25 @@ describe('github-issue-service #slow #github', function() {
       .nodeify(done);
   }*/);
 
-  it('return empty for missing issue', function(done) {
+  it('return error for missing issue', function() {
     var repoService = new GitHubRepoService(FAKE_USER);
     var underTest = new GitHubIssueService(FAKE_USER);
 
-    repoService.getRepo(fixtureLoader.GITTER_INTEGRATION_REPO_FULL)
+    return repoService.getRepo(fixtureLoader.GITTER_INTEGRATION_REPO_FULL)
       .then((repo) => {
         assert.strictEqual(repo.private, false);
       })
       .then(() => underTest.getIssue(fixtureLoader.GITTER_INTEGRATION_REPO_FULL, 999999))
-      .then(function(f) {
-        assert.strictEqual(f, null);
+      .then(() => {
+        assert.fail('Shouldn\'t be able to fetch issue in unauthorized private project');
       })
-      .nodeify(done);
+      .catch((err) => {
+        if(err instanceof assert.AssertionError) {
+          throw err;
+        }
+
+        assert.strictEqual(err.status, 404);
+      });
   });
 
   it('return the state for an anonymous user', function(done) {
@@ -74,7 +80,7 @@ describe('github-issue-service #slow #github', function() {
       .then(() => underTest.getIssue(fixtureLoader.GITTER_INTEGRATION_REPO_FULL, 1))
       .then(function(f) {
         assert(f);
-        assert.strictEqual(f.number, 1);
+        assert.strictEqual(f.iid, 1);
       })
       .nodeify(done);
   });

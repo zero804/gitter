@@ -42,17 +42,19 @@ function wrapFunction(cache, moduleName, func, funcName, getInstanceIdFunc) {
     var args = Array.prototype.slice.apply(arguments);
     var self = this;
 
-    var instanceId = getInstanceIdFunc ? getInstanceIdFunc(this) : '';
-    var key = generateKey(moduleName, instanceId, funcName, args);
+    var instanceIdPromise = Promise.resolve(getInstanceIdFunc ? getInstanceIdFunc(this) : '');
+    return instanceIdPromise.then(function(instanceId) {
+      var key = generateKey(moduleName, instanceId, funcName, args);
 
-    return new Promise(function(resolve, reject) {
-      cache.lookup(key, function(cb) {
-        func.apply(self, args).nodeify(cb);
-      }, function(err, result) {
-        if (err) return reject(err);
-        resolve(result);
+      return new Promise(function(resolve, reject) {
+        cache.lookup(key, function(cb) {
+          func.apply(self, args).nodeify(cb);
+        }, function(err, result) {
+          if (err) return reject(err);
+          resolve(result);
+        });
+
       });
-
     });
 
   };

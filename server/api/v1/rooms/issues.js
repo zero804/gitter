@@ -113,8 +113,6 @@ module.exports = {
         return issueService.getIssue(repoUri, issueNumber);
       })
       .then(function(issue) {
-        if(!issue) throw new StatusError(404);
-
         if(req.query.renderMarkdown && issue.body) {
           return processText(issue.body)
             .then(function(result) {
