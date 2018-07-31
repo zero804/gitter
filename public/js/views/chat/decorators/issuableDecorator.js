@@ -250,8 +250,6 @@ function bindAnchorToIssue(view, issueElement, type, provider, repo, issueNumber
     var popover = createPopover(model, e.target);
     popover.show();
     Popover.singleton(view, popover);
-
-    e.preventDefault();
   }
 
   function showPopoverLater(e) {
@@ -263,11 +261,9 @@ function bindAnchorToIssue(view, issueElement, type, provider, repo, issueNumber
   }
 
   // Hook up all of the listeners
-  issueElement.addEventListener('click', showPopover);
   issueElement.addEventListener('mouseover', showPopoverLater);
 
   view.once('destroy', function() {
-    issueElement.removeEventListener('click', showPopover);
     issueElement.removeEventListener('mouseover', showPopoverLater);
   });
 }
