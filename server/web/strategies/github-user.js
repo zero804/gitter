@@ -9,7 +9,6 @@ var logger = env.logger;
 var moment = require('moment');
 var GitHubStrategy = require('@gitterhq/passport-github').Strategy;
 var TokenStateProvider = require('@gitterhq/passport-oauth2').TokenStateProvider;
-var mixpanel = require('../../web/mixpanelUtils');
 var extractGravatarVersion = require('gitter-web-avatars/server/extract-gravatar-version');
 var gaCookieParser = require('../ga-cookie-parser');
 var userService = require('gitter-web-users');
@@ -40,17 +39,12 @@ function ageInHours(date) {
 function updateUser(req, accessToken, user, githubUserProfile) {
   // If the user was in the DB already but was invited, notify stats services
   if (user.isInvited()) {
-    // IMPORTANT: The alias can only happen ONCE. Do not remove.
-    stats.alias(mixpanel.getMixpanelDistinctId(req.cookies), user.id, function(err) {
-      if (err) logger.error('Error aliasing user:', { exception: err });
-
-      stats.event("new_user", {
-        userId: user.id,
-        method: 'github_oauth',
-        username: user.username,
-        source: 'invited',
-        googleAnalyticsUniqueId: gaCookieParser(req)
-      });
+    stats.event("new_user", {
+      userId: user.id,
+      method: 'github_oauth',
+      username: user.username,
+      source: 'invited',
+      googleAnalyticsUniqueId: gaCookieParser(req)
     });
   }
 
@@ -106,23 +100,18 @@ function addUser(req, accessToken, githubUserProfile) {
 
       updateUserLocale(req, user);
 
-      // IMPORTANT: The alias can only happen ONCE. Do not remove.
-      stats.alias(mixpanel.getMixpanelDistinctId(req.cookies), user.id, function(err) {
-        if (err) logger.error('Error aliasing user:', { exception: err });
+      trackNewUser(req, user, 'github');
 
-        trackNewUser(req, user, 'github');
-
-        // Flag the user as a new github user if they've created their account
-        // in the last two hours
-        // NOTE: this relies on the fact that undefined is not smaller than 2..
-        if (ageInHours(githubUserProfile.created_at) < 2) {
-          stats.event("new_github_user", {
-            userId: user.id,
-            username: user.username,
-            googleAnalyticsUniqueId: gaCookieParser(req)
-          });
-        }
-      });
+      // Flag the user as a new github user if they've created their account
+      // in the last two hours
+      // NOTE: this relies on the fact that undefined is not smaller than 2..
+      if (ageInHours(githubUserProfile.created_at) < 2) {
+        stats.event("new_github_user", {
+          userId: user.id,
+          username: user.username,
+          googleAnalyticsUniqueId: gaCookieParser(req)
+        });
+      }
 
       return passportLogin(req, user);
     });

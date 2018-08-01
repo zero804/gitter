@@ -43,12 +43,6 @@ var featuredRooms = [
    language: 'Scala',
    locale: 'en'
  },
- { uri: 'FreeCodeCamp/FreeCodeCamp',
-   name: 'FreeCodeCamp',
-   channel: true,
-   language: 'JavaScript',
-   locale: 'en'
- },
  { uri: 'mozillascience/community',
   name: 'Mozilla Science',
   language: 'Mozilla Science Lab community',
@@ -83,11 +77,6 @@ var featuredRooms = [
   name: 'AWS Ruby SDK',
   language: 'The official AWS SDK for Ruby',
   locale: 'en'
- },
- { uri: 'postcss/postcss',
-   name: 'PostCSS',
-   language: 'CSS',
-   locale: 'en'
  }
 ];
 

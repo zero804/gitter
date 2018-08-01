@@ -11,7 +11,7 @@ var mixpanel = require('../../web/mixpanelUtils');
  * @return  Boolean - the result of the check
  */
 function isRelativeURL(url) {
-  var relativeUrl = new RegExp('^\/[^/]');
+  var relativeUrl = new RegExp('^/[^/]');
   return relativeUrl.test(url);
 }
 
@@ -31,7 +31,6 @@ module.exports = function trackLoginForProvider(provider) {
     //send data to stats service
     if (query.action) {
       stats.event(query.action + "_clicked", {
-        distinctId: mixpanel.getMixpanelDistinctId(req.cookies),
         method: provider+'_oauth',
         button: query.source
       });

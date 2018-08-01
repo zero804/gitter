@@ -1,3 +1,13 @@
+# 19.14.0 - 2018-8-1
+
+ - Remove missing 404 rooms from the homepage, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1215
+ - Clicking decorated issue will open the link instead of opening the popover, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1217
+
+Developer facing:
+
+ - Fix `new_user` stat not being pushed out and tracked, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1216
+
+
 # 19.13.0 - 2018-7-27
 
  - Add GitLab issue decorations, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1077
