@@ -1,3 +1,12 @@
+# 19.15.0 - *upcoming*
+
+ - ...
+
+Developer facing:
+
+ - Move Android embedded chat build to cross-platform Gulp scripts, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1218
+
+
 # 19.14.0 - 2018-8-1
 
  - Remove missing 404 rooms from the homepage, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1215

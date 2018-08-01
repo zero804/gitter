@@ -1,10 +1,14 @@
 #!/usr/bin/env node
 "use strict";
 
-var express = require('express');
-var fs = require('fs');
-var expressHbs = require('express-hbs');
-var resolveStatic = require('../server/web/resolve-static');
+const Promise = require('bluebird');
+const express = require('express');
+const fs = require('fs-extra');
+const outputFile = Promise.promisify(fs.outputFile);
+const expressHbs = require('express-hbs');
+const resolveStatic = require('../server/web/resolve-static');
+require('../server/web/register-helpers')(expressHbs);
+const shutdown = require('shutdown');
 
 var opts = require('yargs')
   .option('output', {
@@ -21,8 +25,7 @@ function die(err) {
   process.exit(1);
 }
 
-var app = express();
-require('../server/web/register-helpers')(expressHbs);
+const app = express();
 
 app.engine('hbs', expressHbs.express3({
   partialsDir: resolveStatic('/templates/partials'),
@@ -37,8 +40,13 @@ app.set('view engine', 'hbs');
 app.set('views', resolveStatic('/templates'));
 
 app.render('mobile/native-embedded-chat-app', {}, function(err, html) {
-  if(err) return die(err);
+  if(err) {
+    die(err);
+  }
 
-  fs.writeFileSync(opts.output, html, { encoding: 'utf8' });
-  process.exit(0);
+  outputFile(opts.output, html, { encoding: 'utf8' })
+    .catch(die)
+    .then(() => {
+      shutdown.shutdownGracefully();
+    });
 });
