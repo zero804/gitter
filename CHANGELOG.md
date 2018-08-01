@@ -1,6 +1,6 @@
-# 19.14.0 - *upcoming*
+# 19.14.0 - 2018-8-1
 
- - Remove rooms that now 404 from the homepage, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1215
+ - Remove missing 404 rooms from the homepage, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1215
  - Clicking decorated issue will open the link instead of opening the popover, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1217
 
 Developer facing:
