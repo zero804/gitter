@@ -2,9 +2,10 @@
 
 var fs = require('fs');
 var path = require('path');
+var shutdown = require('shutdown');
 
 function hotswapReloader(baseDir, callback) {
-  fs.watch(baseDir, { persistent: true }, function (event, filename) {
+  const watcher = fs.watch(baseDir, { persistent: true }, function (event, filename) {
     if (event === 'change' && filename) {
 
       var location = path.resolve(baseDir, filename);
@@ -18,6 +19,11 @@ function hotswapReloader(baseDir, callback) {
 
       callback(filename, location);
     }
+  });
+
+  shutdown.addHandler('bayeux', 5, (doneShuttingDown) => {
+    watcher.close();
+    doneShuttingDown();
   });
 }
 
