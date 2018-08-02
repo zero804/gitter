@@ -2,14 +2,21 @@
 
 A community holds many rooms.
 
-Communities are also referred to as "groups" internally.
+Communities are also referred to as "groups" internally in the codebase.
 
 
 ## Community creation
 
-Use the "+" button in the bottom-left of the menu bar to start the community creation process
+Use the "+" button in the bottom-left of the menu bar to start the community creation process.
+
+Communities can be associated with a GitHub organisation or repo. If you don't see the GitHub org/repo listed that you want to associate, see [*Why isn't my GitHub organisation or repos appearing?* FAQ](./faq.md#why-isnt-my-github-organisation-or-repos-appearing]
 
 ![](https://i.imgur.com/Wjk6Y4h.png)
+
+
+## Community admins
+
+You can add new admins for a room by visiting a room in the community -> **Room settings dropdown** -> **Permissions** modal -> **Edit community permissions**
 
 
 ## Rename a community
