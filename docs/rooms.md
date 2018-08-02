@@ -2,7 +2,31 @@
 
 Rooms are part of a community.
 
-Rooms are also referred to as "troupes" internally for legacy reasons.
+Rooms are also referred to as "troupes" internally in the codebase for legacy reasons.
+
+All rooms have unlimited message history, public or private.
+
+
+## People/Roster
+
+You can see who is in the room and add/invite new users via the roster section in the right-toolbar
+
+![](https://i.imgur.com/nW29SY1.png)
+
+#### Eyeballs Disambiguation
+
+Eyeballs are the green and yellow/orange dots on top of the avatars in the people section of a room. They represent the current status or online presence of a person in the room.
+
+![](https://i.imgur.com/MRuIXK4.png)
+
+So what does each color mean?
+
+ - **Green**: Actively looking at the room
+ - **Yellow/Orange**: Not actively looking at the room
+
+"Actively looking" equates to whether the window has focus and the room is open.
+
+
 
 ## Room user
 
@@ -32,6 +56,7 @@ If you don't see the repo listed in the typeahead or isn't being associated, see
 
 ![](https://i.imgur.com/8tiwwZM.png)
 
+
 #### Why isn't my GitHub organisation or repos appearing?
 
 See the [FAQ](./faq.md#why-isn-t-my-github-organisation-or-repos-appearing).
@@ -49,6 +74,23 @@ See the [FAQ](./faq.md#why-isn-t-my-github-organisation-or-repos-appearing).
  - A private room with no association can only be accessed if they are manually invited to the room.
  - A private room can also be associated with the community and anyone in the community can join the room. If the community was associated with an org, anyone in the org could join for example
 
+
+### Room topic/description
+
+A room topic/description will help the community members and new people joining to know what's the purpose of the room.
+
+To set up your room topic, double-click on the area next to the room name in the chat header.
+
+You can also use the `/topic <some topic message>` slash command to set the room topic.
+
+![](https://i.imgur.com/ecdteoh.png)
+
+
+### Moderation
+
+As an admin of the room, you can delete messages from other users.
+
+You can add new admins for a room via **Room settings dropdown** -> **Permissions** modal
 
 
 ### Restrict room to GitHub users

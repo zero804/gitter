@@ -31,6 +31,8 @@ for the ability to customize your username in the future and remove the suffix.
 
 Sign out of Gitter and sign back in to update your avatar (or any other info).
 
+Currently, there is an outstanding bug where this doesn't work with GitLab/Twitter accounts, https://gitlab.com/gitlab-org/gitter/webapp/issues/1834
+
 
 ## How do I delete my account?
 

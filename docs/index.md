@@ -6,10 +6,16 @@
  - [FAQ](./faq.md)
  - [Gitter accounts](./accounts.md)
  - [Mobile apps (Android/iOS)](./mobile-apps.md)
- - [Rooms](./rooms.md)
+ - [Desktop app](https://gitlab.com/gitlab-org/gitter/desktop/)
+ - [Keyboard shortcuts](./keyboard-shortcuts.md)
+ - [Customization](./customization.md)
  - [Communities](./communities.md)
+ - [Rooms](./rooms.md)
+ - [Messages](./messages.md)
  - [Notifications](./notifications.md)
  - [OAuth Scopes](./oauth-scopes.md)
+ - [Integrations/Activity](./integrations.md)
+ - [Feature toggles](./feature-toggles.md)
 
 
 ## Developers
