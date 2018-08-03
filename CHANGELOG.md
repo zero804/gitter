@@ -5,6 +5,7 @@
 Developer facing:
 
  - Move Android embedded chat build to cross-platform Gulp scripts, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1218
+ - Separate Android and iOS builds (restore chat input for Android), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1222
 
 
 # 19.14.0 - 2018-8-1

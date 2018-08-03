@@ -21,6 +21,9 @@
 
   <div id="mainPage" class="chat-app">
     {{> chat_content}}
+    {{#if isAndroidBuild}}
+      {{> chat_input}}
+    {{/if}}
   </div>
 
   {{{ bootScript "mobile-native-embedded-chat" root="../" }}}
