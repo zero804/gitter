@@ -3,7 +3,6 @@
 const Promise = require('bluebird');
 const path = require('path');
 const gulp = require('gulp');
-const glob = Promise.promisify(require('glob'));
 
 const postcss = require('gulp-postcss');
 const autoprefixer = require('autoprefixer-core');
@@ -16,8 +15,31 @@ const uglify = require('gulp-uglify');
 const childProcessPromise = require('./child-process-promise');
 const extractUrls = require('./extract-urls');
 
-const cssDestDir = 'output/embedded/www/styles';
-const cssWatchGlob = 'public/**/*.less';
+var opts = require('yargs')
+  .option('android', {
+    type: 'boolean',
+    default: false,
+    description: 'Output'
+  })
+  .option('ios', {
+    type: 'boolean',
+    default: false,
+    description: 'Output'
+  })
+  .help('help')
+  .alias('help', 'h')
+  .argv;
+
+let buildPath;
+if(opts.android) {
+  buildPath = 'output/android/www/';
+}
+else if(opts.ios) {
+  buildPath = 'output/ios/www/';
+}
+else {
+  throw new Error('Please define the --android of --ios args when running the embedded build')
+}
 
 /**
  * Hook into the compile stage
@@ -39,21 +61,32 @@ gulp.task('clientapp:compile:copy-files', function() {
       base: './public',
       stat: true
     })
-    .pipe(gulp.dest('output/embedded/www'));
+    .pipe(gulp.dest(buildPath));
 });
 
 gulp.task('embedded:compile:markup', function() {
-  return childProcessPromise.spawn('node', [
+  const args = [
     path.join(__dirname, './render-embedded-chat.js'),
-    '--output', 'output/embedded/www/mobile/embedded-chat.html',
-  ], process.env);
+    '--output', path.join(buildPath, 'mobile/embedded-chat.html'),
+  ];
+  if(opts.android) {
+    args.push('--android');
+  }
+  if(opts.ios) {
+    args.push('--ios');
+  }
+
+  return childProcessPromise.spawn('node', args, Object.assign({}, process.env, {
+    // Default to prod config
+    NODE_ENV: process.env.NODE_ENV || 'prod'
+  }));
 });
 
 const cssIosStyleBuilder = styleBuilder([
   'public/less/mobile-native-chat.less'
 ], {
-  dest: cssDestDir,
-  watchGlob: cssWatchGlob,
+  dest: path.join(buildPath, 'styles'),
+  watchGlob: 'public/**/*.less',
   sourceMapOptions: getSourceMapOptions(),
   lessOptions: {
     paths: ['public/less'],
@@ -82,7 +115,7 @@ gulp.task('embedded:compile:css', function() {
 gulp.task('embedded:compile:webpack', ['clientapp:compile:copy-files'], function() {
   return gulp.src('./public/js/webpack-mobile-native.config')
     .pipe(webpack(require('../public/js/webpack-mobile-native.config')))
-    .pipe(gulp.dest('output/embedded/www/js'));
+    .pipe(gulp.dest(path.join(buildPath, 'js')));
 });
 
 gulp.task('embedded:post-compile', [
@@ -91,14 +124,14 @@ gulp.task('embedded:post-compile', [
 ]);
 
 gulp.task('embedded:post-compile:uglify', function() {
-  return gulp.src('output/embedded/www/js/*.js')
+  return gulp.src(path.join(buildPath, 'js/*.js'))
     .pipe(uglify())
-    .pipe(gulp.dest('output/embedded/www/js'));
+    .pipe(gulp.dest(path.join(buildPath, 'js')));
 });
 
 gulp.task('embedded:post-compile:copy-linked-assets', function() {
   return Promise.all([
-    extractUrls('output/embedded/www/styles/mobile-native-chat.css', 'output/embedded/www/'),
+    extractUrls(path.join(buildPath, 'styles/mobile-native-chat.css'), buildPath),
   ])
     .then((resourceLists) => {
       const resourceList = resourceLists.reduce((list, resultantList) => {
@@ -109,6 +142,6 @@ gulp.task('embedded:post-compile:copy-linked-assets', function() {
           base: './public',
           stat: true
         })
-        .pipe(gulp.dest('output/embedded/www'));
+        .pipe(gulp.dest(buildPath));
     })
 });

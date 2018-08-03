@@ -16,6 +16,11 @@ var opts = require('yargs')
      required: true,
      description: 'Output'
   })
+  .option('android', {
+    type: 'boolean',
+    default: false,
+    description: 'Output'
+  })
   .help('help')
   .alias('help', 'h')
   .argv;
@@ -39,7 +44,9 @@ app.engine('hbs', expressHbs.express3({
 app.set('view engine', 'hbs');
 app.set('views', resolveStatic('/templates'));
 
-app.render('mobile/native-embedded-chat-app', {}, function(err, html) {
+app.render('mobile/native-embedded-chat-app', {
+  isAndroidBuild: opts.android
+}, function(err, html) {
   if(err) {
     die(err);
   }
