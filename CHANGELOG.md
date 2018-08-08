@@ -1,11 +1,12 @@
-# 19.15.0 - *upcoming*
+# 19.15.0 - 2018-8-8
 
- - ...
+ - Add feature toggle for embeds and disable by default, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1223
 
 Developer facing:
 
- - Move Android embedded chat build to cross-platform Gulp scripts, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1218
- - Separate Android and iOS builds (restore chat input for Android), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1222
+ - Gitter Android app is now open-source, https://gitlab.com/gitlab-org/gitter/gitter-android-app
+    - Move Android embedded chat build to cross-platform Gulp scripts, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1218
+    - Separate Android and iOS builds (restore chat input for Android), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1222
 
 
 # 19.14.0 - 2018-8-1

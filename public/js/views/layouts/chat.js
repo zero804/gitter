@@ -1,6 +1,7 @@
 "use strict";
 
 var Marionette = require('backbone.marionette');
+var context = require('../../utils/context');
 var modalRegion = require('../../components/modal-region');
 var ChatContainerView = require('../chat/chatContainerView');
 
@@ -31,9 +32,14 @@ var ChatLayout = Marionette.LayoutView.extend({
   initChatRegion: function(optionsForRegion) {
     var monitorUnreadItems = Marionette.getOption(this, "monitorUnreadItems");
 
+    const decorators = [issuableDecorator, commitDecorator, mentionDecorator, emojiDecorator];
+    if (context.hasFeature('embeds-deprecated')) {
+      decorators.push(embedDecorator);
+    }
+
     return new ChatContainerView(optionsForRegion({
       collection: this.options.chatCollection,
-      decorators: [issuableDecorator, commitDecorator, mentionDecorator, embedDecorator, emojiDecorator],
+      decorators,
       monitorScrollPane: monitorUnreadItems && this.ui.scroll // Monitor the scroll region for unread items
     }));
   }
