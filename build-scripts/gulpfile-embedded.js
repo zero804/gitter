@@ -1,28 +1,92 @@
 'use strict';
 
-var gulp = require('gulp');
-var postcss = require('gulp-postcss');
-var autoprefixer = require('autoprefixer-core');
-var mqpacker = require('css-mqpacker');
-var csswring = require('csswring');
-var styleBuilder = require('./style-builder');
-var getSourceMapOptions = require('./get-sourcemap-options');
-var webpack = require('webpack-stream');
-var uglify = require('gulp-uglify');
+const Promise = require('bluebird');
+const path = require('path');
+const gulp = require('gulp');
 
-var cssDestDir = 'output/assets/styles';
-var cssWatchGlob = 'public/**/*.less';
+const postcss = require('gulp-postcss');
+const autoprefixer = require('autoprefixer-core');
+const mqpacker = require('css-mqpacker');
+const csswring = require('csswring');
+const styleBuilder = require('./style-builder');
+const getSourceMapOptions = require('./get-sourcemap-options');
+const webpack = require('webpack-stream');
+const uglify = require('gulp-uglify');
+const childProcessPromise = require('./child-process-promise');
+const extractUrls = require('./extract-urls');
+
+var opts = require('yargs')
+  .option('android', {
+    type: 'boolean',
+    default: false,
+    description: 'Output'
+  })
+  .option('ios', {
+    type: 'boolean',
+    default: false,
+    description: 'Output'
+  })
+  .help('help')
+  .alias('help', 'h')
+  .argv;
+
+let buildPath;
+if(opts.android) {
+  buildPath = 'output/android/www/';
+}
+else if(opts.ios) {
+  buildPath = 'output/ios/www/';
+}
+else {
+  throw new Error('Please define the --android of --ios args when running the embedded build')
+}
 
 /**
  * Hook into the compile stage
  */
-gulp.task('embedded:compile', ['clientapp:compile:copy-files', 'embedded:compile:css', 'embedded:compile:webpack']);
+gulp.task('embedded:compile', [
+  'clientapp:compile:copy-files',
+  'embedded:compile:markup',
+  'embedded:compile:css',
+  'embedded:compile:webpack'
+]);
 
-var cssIosStyleBuilder = styleBuilder([
+// We also copy files after the CSS is compiled in `embedded:post-compile:copy-linked-assets`
+gulp.task('clientapp:compile:copy-files', function() {
+  return gulp.src([
+      'public/images/emoji/*',
+      // 'public/sprites/**',
+      'public/repo/katex/**',
+    ], {
+      base: './public',
+      stat: true
+    })
+    .pipe(gulp.dest(buildPath));
+});
+
+gulp.task('embedded:compile:markup', function() {
+  const args = [
+    path.join(__dirname, './render-embedded-chat.js'),
+    '--output', path.join(buildPath, 'mobile/embedded-chat.html'),
+  ];
+  if(opts.android) {
+    args.push('--android');
+  }
+  if(opts.ios) {
+    args.push('--ios');
+  }
+
+  return childProcessPromise.spawn('node', args, Object.assign({}, process.env, {
+    // Default to prod config
+    NODE_ENV: process.env.NODE_ENV || 'prod'
+  }));
+});
+
+const cssIosStyleBuilder = styleBuilder([
   'public/less/mobile-native-chat.less'
 ], {
-  dest: cssDestDir,
-  watchGlob: cssWatchGlob,
+  dest: path.join(buildPath, 'styles'),
+  watchGlob: 'public/**/*.less',
   sourceMapOptions: getSourceMapOptions(),
   lessOptions: {
     paths: ['public/less'],
@@ -47,31 +111,37 @@ gulp.task('embedded:compile:css', function() {
   return cssIosStyleBuilder.build();
 });
 
-
 /* Generate embedded native */
 gulp.task('embedded:compile:webpack', ['clientapp:compile:copy-files'], function() {
   return gulp.src('./public/js/webpack-mobile-native.config')
     .pipe(webpack(require('../public/js/webpack-mobile-native.config')))
-    .pipe(gulp.dest('output/assets/js'));
+    .pipe(gulp.dest(path.join(buildPath, 'js')));
 });
 
-gulp.task('embedded:post-compile', ['embedded:post-compile:uglify']);
+gulp.task('embedded:post-compile', [
+  'embedded:post-compile:uglify',
+  'embedded:post-compile:copy-linked-assets'
+]);
 
 gulp.task('embedded:post-compile:uglify', function() {
-  return gulp.src('output/assets/js/*.js')
+  return gulp.src(path.join(buildPath, 'js/*.js'))
     .pipe(uglify())
-    .pipe(gulp.dest('output/assets/js'));
+    .pipe(gulp.dest(path.join(buildPath, 'js')));
 });
 
-gulp.task('clientapp:compile:copy-files', function() {
-  return gulp.src([
-      'public/fonts/**',
-      'public/images/**',
-      // 'public/sprites/**',
-      'public/repo/katex/**',
-    ], {
-      base: "./public",
-      stat: true
+gulp.task('embedded:post-compile:copy-linked-assets', function() {
+  return Promise.all([
+    extractUrls(path.join(buildPath, 'styles/mobile-native-chat.css'), buildPath),
+  ])
+    .then((resourceLists) => {
+      const resourceList = resourceLists.reduce((list, resultantList) => {
+        return resultantList.concat(list);
+      }, []);
+
+      return gulp.src(resourceList, {
+          base: './public',
+          stat: true
+        })
+        .pipe(gulp.dest(buildPath));
     })
-    .pipe(gulp.dest('output/assets'));
 });
