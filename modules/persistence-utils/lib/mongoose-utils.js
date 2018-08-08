@@ -2,12 +2,22 @@
 
 var _ = require('lodash');
 var Promise = require('bluebird');
+var mongoose = require('gitter-web-mongoose-bluebird');
 var mongoUtils = require('./mongo-utils');
 var uniqueIds = require('mongodb-unique-ids');
-var mongoReadPrefs = require('./mongo-read-prefs')
+var mongoReadPrefs = require('./mongo-read-prefs');
+
+var Schema = mongoose.Schema;
 
 function idsIn(ids) {
   return uniqueIds(ids).filter(function(id) { return !!id; });
+}
+
+function cloneSchema(schema) {
+  var tree = _.extend({}, schema.tree);
+  delete tree.id;
+  delete tree._id;
+  return new Schema(tree);
 }
 
 function hashList(list) {
@@ -298,6 +308,7 @@ module.exports = {
   findByIdsLean: findByIdsLean,
   addIdToLean: addIdToLean,
   addIdToLeanArray: addIdToLeanArray,
+  cloneSchema: cloneSchema,
   getEstimatedCountForId: getEstimatedCountForId,
   getEstimatedCountForIds: getEstimatedCountForIds,
   makeLastModifiedUpdater: makeLastModifiedUpdater

@@ -2,29 +2,32 @@
 
 "use strict";
 
-var env = require('gitter-web-env');
-var stats = env.stats;
-var errorReporter = env.errorReporter;
-var logger = env.logger.get('chat');
+const Promise = require('bluebird');
+const _ = require('lodash');
+const StatusError = require('statuserror');
 
-var ChatMessage = require('gitter-web-persistence').ChatMessage;
-var collections = require('gitter-web-utils/lib/collections');
-var userService = require("gitter-web-users");
-var processText = require('gitter-web-text-processor');
-var Promise = require('bluebird');
-var StatusError = require('statuserror');
-var _ = require('lodash');
-var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
-var groupResolver = require('./group-resolver');
-var chatSearchService = require('./chat-search-service');
-var unreadItemService = require('gitter-web-unread-items');
-var markdownMajorVersion = require('gitter-markdown-processor').version.split('.')[0];
-var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
-var recentRoomService = require("gitter-web-rooms/lib/recent-room-service");
-var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
-var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
-var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs')
-var chatSpamDetection = require('gitter-web-spam-detection/lib/chat-spam-detection');
+const env = require('gitter-web-env');
+const stats = env.stats;
+const errorReporter = env.errorReporter;
+const logger = env.logger.get('chat');
+
+const mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
+const mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs');
+const persistence = require('gitter-web-persistence');
+const ChatMessage = persistence.ChatMessage;
+const ChatMessageBackup = persistence.ChatMessageBackup;
+const mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+const securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
+const chatSpamDetection = require('gitter-web-spam-detection/lib/chat-spam-detection');
+const collections = require('gitter-web-utils/lib/collections');
+const processText = require('gitter-web-text-processor');
+const getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
+const groupResolver = require('./group-resolver');
+const userService = require('gitter-web-users');
+const chatSearchService = require('./chat-search-service');
+const unreadItemService = require('gitter-web-unread-items');
+const recentRoomService = require('gitter-web-rooms/lib/recent-room-service');
+const markdownMajorVersion = require('gitter-markdown-processor').version.split('.')[0];
 
 var useHints = true;
 
@@ -127,7 +130,7 @@ function resolveMentions(troupe, user, parsedMessage) {
  * NB: it is the callers responsibility to ensure that the user has permission
  * to chat in the room
  */
-exports.newChatMessageToTroupe = function(troupe, user, data) {
+function newChatMessageToTroupe(troupe, user, data) {
   // Keep this up here, set sent time asap to ensure order
   var sentAt = new Date();
 
@@ -167,8 +170,8 @@ exports.newChatMessageToTroupe = function(troupe, user, data) {
       fromUserId: user.id,
       toTroupeId: troupe.id,
       sent:       sentAt,
-      text:       data.text,                    // Keep the raw message.
-      status:     data.status,                // Checks if it is a status update
+      text:       data.text, // Keep the raw message.
+      status:     data.status, // Checks if it is a status update
       pub:        isPublic || undefined, // Public room - useful for sampling
       html:       parsedMessage.html,
       lang:       parsedMessage.lang,
@@ -218,10 +221,10 @@ exports.newChatMessageToTroupe = function(troupe, user, data) {
         return chatMessage;
       });
   });
-};
+}
 
 // Returns some recent public chats
-exports.getRecentPublicChats = function() {
+function getRecentPublicChats() {
   var minRecentTime = Date.now() - RECENT_WINDOW_MILLISECONDS;
   var minId = mongoUtils.createIdForTimestamp(minRecentTime);
 
@@ -243,12 +246,12 @@ exports.getRecentPublicChats = function() {
   return ChatMessage.aggregate(aggregation)
     .read(mongoReadPrefs.secondaryPreferred)
     .exec();
-};
+}
 
 /**
  * NB: It is the callers responsibility to ensure that the user has access to the room!
  */
-exports.updateChatMessage = function(troupe, chatMessage, user, newText, callback) {
+function updateChatMessage(troupe, chatMessage, user, newText, callback) {
   return Promise.try(function() {
       newText = newText || '';
 
@@ -303,25 +306,25 @@ exports.updateChatMessage = function(troupe, chatMessage, user, newText, callbac
         .thenReturn(chatMessage);
     })
     .nodeify(callback);
-};
+}
 
-exports.findById = function(id, callback) {
+function findById(id, callback) {
   return ChatMessage.findById(id)
     .exec()
     .nodeify(callback);
-};
+}
 
-exports.findByIdLean = function(id, fields) {
+function findByIdLean(id, fields) {
   return ChatMessage.findById(id, fields)
     .lean()
     .exec();
-};
+}
 
-exports.findByIdInRoom = function(troupeId, id, callback) {
+function findByIdInRoom(troupeId, id, callback) {
   return ChatMessage.findOne({ _id: id, toTroupeId: troupeId })
     .exec()
     .nodeify(callback);
-};
+}
 
 /**
  * Returns a promise of chats with given ids
@@ -329,7 +332,6 @@ exports.findByIdInRoom = function(troupeId, id, callback) {
 function findByIds(ids, callback) {
   return mongooseUtils.findByIds(ChatMessage, ids, callback);
 }
-exports.findByIds = findByIds;
 
 /* This is much more cacheable than searching less than a date */
 function getDateOfFirstMessageInRoom(troupeId) {
@@ -345,7 +347,6 @@ function getDateOfFirstMessageInRoom(troupeId) {
       return r[0].sent;
     });
 }
-exports.getDateOfFirstMessageInRoom = getDateOfFirstMessageInRoom;
 
 function findFirstUnreadMessageId(troupeId, userId) {
   return unreadItemService.getFirstUnreadItem(userId, troupeId);
@@ -368,7 +369,7 @@ function sentAfter(objectId) {
 /**
  * Returns a promise of messages
  */
-exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
+function findChatMessagesForTroupe(troupeId, options = {}, callback) {
   var limit = Math.min(options.limit || 50, 100);
   var skip = options.skip || 0;
 
@@ -492,9 +493,9 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
     .nodeify(callback);
 
 
-};
+}
 
-exports.findChatMessagesForTroupeForDateRange = function(troupeId, startDate, endDate) {
+function findChatMessagesForTroupeForDateRange(troupeId, startDate, endDate) {
   var q = ChatMessage
           .where('toTroupeId', troupeId)
           .where('sent').gte(startDate)
@@ -502,14 +503,14 @@ exports.findChatMessagesForTroupeForDateRange = function(troupeId, startDate, en
           .sort({ sent: 'asc' });
 
   return q.exec();
-};
+}
 
 /**
  * Search for messages in a room using a full-text index.
  *
  * Returns promise messages
  */
-exports.searchChatMessagesForRoom = function(troupeId, textQuery, options) {
+function searchChatMessagesForRoom(troupeId, textQuery, options) {
   return chatSearchService.searchChatMessagesForRoom(troupeId, textQuery, options)
     .then(function(searchResults) {
       // We need to maintain the order of the original results
@@ -539,31 +540,50 @@ exports.searchChatMessagesForRoom = function(troupeId, textQuery, options) {
           return chatsOrdered;
         });
     });
+}
 
-};
+function deleteMessage(message) {
+  // `_.omit` because of `Cannot update '__v' and '__v' at the same time` error
+  return mongooseUtils.upsert(ChatMessageBackup, { _id: message._id }, _.omit(message.toObject(), '__v'))
+    .then(() => {
+      message.remove();
+    });
+}
 
-exports.removeAllMessagesForUserIdInRoomId = function(userId, roomId) {
+function removeAllMessagesForUserIdInRoomId(userId, roomId) {
   return ChatMessage.find({ toTroupeId: roomId, fromUserId: userId })
     .exec()
     .then(function(messages) {
-      return Promise.map(messages, function(message) {
-        return message.remove();
-      }, { concurrency: 1 });
+      return Promise.map(messages, (message) => deleteMessage(message), { concurrency: 1 });
     });
-};
+}
 
 function deleteMessageFromRoom(troupe, chatMessage) {
   return unreadItemService.removeItem(chatMessage.fromUserId, troupe, chatMessage)
-    .then(function() {
-      return chatMessage.remove();
-    })
+    .then(() => deleteMessage(chatMessage))
     .return(null);
 }
-exports.deleteMessageFromRoom = deleteMessageFromRoom;
 
 
-exports.testOnly = {
+const testOnly = {
   setUseHints: function(value) {
     useHints = value;
   }
+};
+
+module.exports = {
+  newChatMessageToTroupe,
+  getRecentPublicChats,
+  updateChatMessage,
+  findById,
+  findByIdLean,
+  findByIdInRoom,
+  findByIds,
+  getDateOfFirstMessageInRoom,
+  findChatMessagesForTroupe,
+  findChatMessagesForTroupeForDateRange,
+  searchChatMessagesForRoom,
+  removeAllMessagesForUserIdInRoomId,
+  deleteMessageFromRoom,
+  testOnly
 };
