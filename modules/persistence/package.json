@@ -15,6 +15,7 @@
     "debug": "^2.2.0",
     "gitter-web-env": "file:../env",
     "gitter-web-mongoose-bluebird": "file:../mongoose-bluebird",
+    "gitter-web-persistence-utils": "file:../persistence-utils",
     "lodash": "^3.2.0",
     "mongoose": "^4.6.8",
     "mongoose-number": "^0.1.1",

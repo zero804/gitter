@@ -35,6 +35,7 @@ ChatMessageSchema.schemaTypeName = 'ChatMessageSchema';
 installVersionIncMiddleware(ChatMessageSchema);
 
 module.exports = {
+  ChatMessageSchema: ChatMessageSchema,
   install: function(mongooseConnection) {
     var model = mongooseConnection.model('ChatMessage', ChatMessageSchema);
 

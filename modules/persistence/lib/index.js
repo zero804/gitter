@@ -76,6 +76,7 @@ var schemas = {
   TroupeUser: require('./schemas/troupe-user-schema'),
   UserSettings: require('./schemas/user-settings-schema'),
   ChatMessage: require('./schemas/chat-message-schema'),
+  ChatMessageBackup: require('./schemas/chat-message-backup-schema'),
   Event: require('./schemas/event-schema'),
   OAuthClient: require('./schemas/oauth-client-schema'),
   OAuthCode: require('./schemas/oauth-code-schema'),

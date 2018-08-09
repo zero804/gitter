@@ -1,3 +1,12 @@
+# 19.16.0 - *upcoming*
+
+ - ...
+
+Developer facing:
+
+ - Add message soft-delete (store message in another collection on delete), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1225
+
+
 # 19.15.0 - 2018-8-8
 
  - Add feature toggle for embeds and disable by default, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1223
