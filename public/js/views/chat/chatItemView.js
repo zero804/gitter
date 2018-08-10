@@ -1,34 +1,38 @@
 "use strict";
 
-var $ = require('jquery');
-var _ = require('underscore');
-var classnames = require('classnames');
-var context = require('../../utils/context');
-var clientEnv = require('gitter-client-env');
-var chatModels = require('../../collections/chat');
-var AvatarView = require('../widgets/avatar');
-var Marionette = require('backbone.marionette');
-var moment = require('moment');
-var isMobile = require('../../utils/is-mobile');
-var isAndroid = require('../../utils/is-android');
-var DoubleTapper = require('../../utils/double-tapper');
-var Popover = require('../popover');
-var chatItemTemplate = require('./tmpl/chatItemView.hbs');
-var statusItemTemplate = require('./tmpl/statusItemView.hbs');
-var actionsTemplate = require('./tmpl/actionsView.hbs');
-var ChatEditView = require('../chat/chat-edit-view');
-var appEvents = require('../../utils/appevents');
-var cocktail = require('backbone.cocktail');
-var chatCollapse = require('../../utils/collapsed-item-client');
-var LoadingCollectionMixin = require('../loading-mixin');
-var FastAttachMixin = require('../fast-attach-mixin');
-var timeFormat = require('gitter-web-shared/time/time-format');
-var fullTimeFormat = require('gitter-web-shared/time/full-time-format');
-var dataset = require('../../utils/dataset-shim');
-var toggleClass = require('../../utils/toggle-class');
+const $ = require('jquery');
+const _ = require('underscore');
+const classnames = require('classnames');
+const moment = require('moment');
+const Marionette = require('backbone.marionette');
+const cocktail = require('backbone.cocktail');
+const urlJoin = require('url-join');
 
-var RAF = require('../../utils/raf');
-var toggle = require('../../utils/toggle');
+const context = require('../../utils/context');
+const clientEnv = require('gitter-client-env');
+const appEvents = require('../../utils/appevents');
+const apiClient = require('../../components/api-client');
+const dataset = require('../../utils/dataset-shim');
+const toggleClass = require('../../utils/toggle-class');
+const toggle = require('../../utils/toggle');
+const RAF = require('../../utils/raf');
+const isMobile = require('../../utils/is-mobile');
+const isAndroid = require('../../utils/is-android');
+const timeFormat = require('gitter-web-shared/time/time-format');
+const fullTimeFormat = require('gitter-web-shared/time/full-time-format');
+const DoubleTapper = require('../../utils/double-tapper');
+const chatCollapse = require('../../utils/collapsed-item-client');
+const LoadingCollectionMixin = require('../loading-mixin');
+const FastAttachMixin = require('../fast-attach-mixin');
+const chatModels = require('../../collections/chat');
+
+const AvatarView = require('../widgets/avatar');
+const Popover = require('../popover');
+const chatItemTemplate = require('./tmpl/chatItemView.hbs');
+const statusItemTemplate = require('./tmpl/statusItemView.hbs');
+const actionsTemplate = require('./tmpl/actionsView.hbs');
+const ChatEditView = require('../chat/chat-edit-view');
+
 require('../behaviors/unread-items');
 require('../behaviors/widgets');
 require('../behaviors/highlight');
@@ -841,6 +845,7 @@ module.exports = (function() {
       'click .js-chat-action-reply': 'reply',
       'click .js-chat-action-quote': 'quote',
       'click .js-chat-action-delete': 'delete',
+      'click .js-chat-action-report': 'report',
       'click .js-chat-action-retry': 'retry',
       'click .js-chat-action-cancel': 'cancel',
     },
@@ -864,6 +869,11 @@ module.exports = (function() {
 
     delete: function() {
       this.model.destroy();
+    },
+
+    report: function() {
+      const apiUrl = urlJoin('/v1/rooms/', context.getTroupeId(), 'chatMessages', this.model.get('id'), 'report');
+      apiClient.post(apiUrl);
     },
 
     retry: function() {
@@ -896,6 +906,10 @@ module.exports = (function() {
       var canEdit = !deleted && this.chatItemView.canEdit() && isPersisted;
       var canDelete = this.chatItemView.canDelete() && isPersisted;
 
+      const currentUser = context.user();
+      const messageAuthor = this.model.get('fromUser');
+      const isOwnMessage = messageAuthor && currentUser && messageAuthor.id === currentUser.id;
+
       var data = {
         actions: [
           { name: 'reply', description: 'Reply', disabled: !isPersisted }
@@ -908,6 +922,7 @@ module.exports = (function() {
 
       data.actions.push({ name: 'edit', description: 'Edit', disabled: !canEdit });
       data.actions.push({ name: 'delete', description: 'Delete', disabled: !canDelete });
+      data.actions.push({ name: 'report', description: 'Report', disabled: isOwnMessage });
 
       if (canCollapse) {
         var action;

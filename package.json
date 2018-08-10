@@ -49,6 +49,7 @@
     "gitter-web-cache-wrapper": "file:modules/cache-wrapper",
     "gitter-web-cdn": "file:modules/cdn",
     "gitter-web-chats": "file:modules/chats",
+    "gitter-web-chat-reports": "file:modules/chat-reports",
     "gitter-web-collaborators": "file:modules/collaborators",
     "gitter-web-elasticsearch": "file:modules/elasticsearch",
     "gitter-web-email-addresses": "file:modules/email-addresses",

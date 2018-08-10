@@ -86,6 +86,10 @@ function createUser(fixtureName, f) {
     staff: f.staff || false
   };
 
+  if(f._id) {
+    doc._id = f._id;
+  }
+
   debug('Creating user %s with %j', fixtureName, doc);
 
   var promise = Promise.try(function() {

@@ -93,6 +93,33 @@ You can quickly jump to editing your last message by using the up-arrow keyboard
 ![](https://i.imgur.com/28mHUvq.png)
 
 
+## Delete messages
+
+The **Delete** option is available in the message `...` dropdown in the top-right of every message.
+
+You can delete any of your own messages. Room admins can also delete a message.
+
+![](https://i.imgur.com/klpJ1IX.png)
+
+
+## Report messages
+
+The **Report** option is available in the message `...` dropdown in the top-right of every message.
+
+![](https://i.imgur.com/mE0gbPM.png)
+
+Messages should only be reported if they are spam, scams, or abuse. False-reports will be punished.
+
+Some examples of reportable messages,
+
+ - Spam (especially messages cross-posted across many rooms)
+ - Random Ethereum addresses
+ - Crypto scams
+ - Skype address/number trolling for victims (scammers)
+ - Excessive name calling and retaliation
+
+
+
 ## Searching messages
 
 Search is located in the left menu under the magnifying glass menu bar icon. You can press **Ctrl/Cmd + S** to jump straight to that view.
@@ -106,7 +133,7 @@ You can use the `from:username` syntax to only find messages from the specified 
 
 ## Message archive
 
-You can access a rooms message archive via the **Room settings dropdown** -> **Arhives**.
+You can access a rooms message archive via the **Room settings dropdown** -> **Archives**.
 
 The archive heatmap currently only shows a year but you can manually navigate by changing the URL. You can [track this issue for increasing the heatmap size](https://gitlab.com/gitlab-org/gitter/webapp/issues/785)
 

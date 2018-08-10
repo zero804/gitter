@@ -40,6 +40,14 @@ function findById(id, callback) {
     .nodeify(callback);
 }
 
+function findByIdLean(id) {
+  assert(mongoUtils.isLikeObjectId(id));
+
+  return persistence.Troupe.findById(id)
+    .lean()
+    .exec();
+}
+
 function checkIdExists(id) {
   return persistence.Troupe.findById(id)
     .count()
@@ -106,6 +114,7 @@ module.exports = {
   findByUri: findByUri,
   findByUris: Promise.method(findByUris),
   findById: findById,
+  findByIdLean: findByIdLean,
   checkIdExists: checkIdExists,
   findByIds: findByIds,
   findByIdsLean: findByIdsLean,

@@ -27,6 +27,7 @@ const userService = require('gitter-web-users');
 const chatSearchService = require('./chat-search-service');
 const unreadItemService = require('gitter-web-unread-items');
 const recentRoomService = require('gitter-web-rooms/lib/recent-room-service');
+const troupeService = require('gitter-web-rooms/lib/troupe-service');
 const markdownMajorVersion = require('gitter-markdown-processor').version.split('.')[0];
 
 var useHints = true;
@@ -550,16 +551,36 @@ function deleteMessage(message) {
     });
 }
 
-function removeAllMessagesForUserIdInRoomId(userId, roomId) {
-  return ChatMessage.find({ toTroupeId: roomId, fromUserId: userId })
+function removeAllMessagesForUserId(userId) {
+  return ChatMessage.find({ fromUserId: userId })
     .exec()
     .then(function(messages) {
-      return Promise.map(messages, (message) => deleteMessage(message), { concurrency: 1 });
+      logger.info('removeAllMessagesForUserId(' + userId + '): Removing ' + messages.length + ' messages');
+      const troupeMap = {};
+      // Clear any unreads and delete the messages
+      return Promise.map(messages, (function(message) {
+        const toTroupeId = message.toTroupeId;
+        return Promise.resolve(troupeMap[toTroupeId] || troupeService.findById(message.toTroupeId))
+          .then(function(troupe) {
+            troupeMap[toTroupeId] = troupe;
+            return deleteMessageFromRoom(troupe, message);
+          });
+      }));
     });
 }
 
-function deleteMessageFromRoom(troupe, chatMessage) {
-  return unreadItemService.removeItem(chatMessage.fromUserId, troupe, chatMessage)
+function removeAllMessagesForUserIdInRoomId(userId, roomId) {
+  return Promise.props({
+    room: troupeService.findById(roomId),
+    messages: ChatMessage.find({ toTroupeId: roomId, fromUserId: userId }).exec()
+  })
+    .then(function({ room, messages }) {
+      return Promise.map(messages, (message) => deleteMessageFromRoom(room, message), { concurrency: 1 });
+    });
+}
+
+function deleteMessageFromRoom(room, chatMessage) {
+  return unreadItemService.removeItem(chatMessage.fromUserId, room, chatMessage)
     .then(() => deleteMessage(chatMessage))
     .return(null);
 }
@@ -583,6 +604,7 @@ module.exports = {
   findChatMessagesForTroupe,
   findChatMessagesForTroupeForDateRange,
   searchChatMessagesForRoom,
+  removeAllMessagesForUserId,
   removeAllMessagesForUserIdInRoomId,
   deleteMessageFromRoom,
   testOnly
