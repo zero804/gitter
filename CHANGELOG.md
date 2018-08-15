@@ -1,6 +1,6 @@
 # 19.16.0 - *upcoming*
 
- - ...
+ - Fix terms of service links pointing to Zendesk instead of GitLab, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1227
 
 Developer facing:
 
