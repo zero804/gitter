@@ -1,6 +1,7 @@
 # 19.16.0 - *upcoming*
 
  - Fix terms of service links pointing to Zendesk instead of GitLab, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1227
+ - Fix "Gitter from GitLab" footer link styling, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1228
 
 Developer facing:
 
