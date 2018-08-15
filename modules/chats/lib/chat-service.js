@@ -547,7 +547,7 @@ function deleteMessage(message) {
   // `_.omit` because of `Cannot update '__v' and '__v' at the same time` error
   return mongooseUtils.upsert(ChatMessageBackup, { _id: message._id }, _.omit(message.toObject(), '__v'))
     .then(() => {
-      message.remove();
+      return message.remove();
     });
 }
 

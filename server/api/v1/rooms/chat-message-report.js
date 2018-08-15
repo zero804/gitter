@@ -9,7 +9,7 @@ module.exports = {
   create: function(req) {
     return chatReportService.newReport(req.user, req.params.chatMessageId)
       .then(function(report) {
-        const strategy = new restSerializer.ChatReportStrategy();
+        const strategy = new restSerializer.ChatMessageReportStrategy();
         return restSerializer.serializeObject(report, strategy);
       });
   },

@@ -21,11 +21,13 @@ describe('chatReportService', function() {
     userBad1: {},
     user2: {},
     user3: {},
+    user4: {},
     troupe1: {
       users: [
         'userBad1',
         'user2',
         'user3',
+        'user4',
         'userMessageOverThreshold1',
         'userOverThreshold1',
         'userOldOverThreshold1'
@@ -38,10 +40,12 @@ describe('chatReportService', function() {
 
     messageReport1: { user: 'user2', message: 'message1', sent: Date.now(), weight: 1 },
     // Ignored because report is too old
-    messageReport2: { user: 'user2', message: 'message2', sent: new Date(Date.now() - (500 * ONE_DAY_TIME)), weight: 7 },
-    // Ignored because there is another report from this user with higher weight
-    messageReport3: { user: 'user3', message: 'message1', sent: Date.now(), weight: 1 },
-    messageReport4: { user: 'user3', message: 'message2', sent: Date.now(), weight: 2 },
+    messageReport2: { user: 'user4', message: 'message1', sent: new Date(Date.now() - (500 * ONE_DAY_TIME)), weight: 7 },
+    // Ignored because report is too old
+    messageReport3: { user: 'user2', message: 'message2', sent: new Date(Date.now() - (500 * ONE_DAY_TIME)), weight: 7 },
+    // Ignored because there is another report from this user with higher weight below
+    messageReport4: { user: 'user3', message: 'message1', sent: Date.now(), weight: 1 },
+    messageReport5: { user: 'user3', message: 'message2', sent: Date.now(), weight: 2 },
 
     userMessageOverThreshold1: {},
     messageToReportOverThreshold1: { user: 'userMessageOverThreshold1', troupe: 'troupe1', text: 'over_threshold_message (message)', sent: new Date() },
@@ -159,7 +163,7 @@ describe('chatReportService', function() {
         });
     });
 
-    it('detected bad user that is old', function() {
+    it('detected bad user but is old enough to not automatically clear messages', function() {
       return chatReportService.newReport(fixture.user3, fixture.messageToReportUserOldOverThreshold1.id)
         .then(function() {
           assert(statsLog.some(function(entry) {

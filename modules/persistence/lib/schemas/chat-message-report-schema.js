@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 const ObjectId = Schema.ObjectId;
 
 const ChatMessageReportSchema = new Schema({
-  sent: { type: Date, "default": Date.now },
+  sent: { type: Date },
   weight: Number,
   reporterUserId: { type: ObjectId, required: true },
   messageId: { type: ObjectId, required: true },

@@ -5,9 +5,9 @@ const env = require('gitter-web-env');
 const stats = env.stats;
 const logger = env.logger.get('chat-report-service');
 const StatusError = require('statuserror');
+const ObjectID = require('mongodb').ObjectID;
 const mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 const mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
-const User = require('gitter-web-persistence').User;
 const ChatMessageReport = require('gitter-web-persistence').ChatMessageReport;
 const chatService = require('gitter-web-chats');
 const userService = require('gitter-web-users');
@@ -19,6 +19,14 @@ const BAD_MESSAGE_THRESHOLD = 2;
 const ONE_DAY_TIME = 24 * 60 * 60 * 1000; // One day
 const SUM_PERIOD = 5 * ONE_DAY_TIME;
 const NEW_USER_CLEAR_MESSAGE_PERIOD = 3 * ONE_DAY_TIME;
+
+function sentBefore(objectId) {
+  return new Date(objectId.getTimestamp().valueOf() + 1000);
+}
+
+function sentAfter(objectId) {
+  return new Date(objectId.getTimestamp().valueOf() - 1000);
+}
 
 function getReportSumForUser(userInQuestionId) {
   return ChatMessageReport.find({ messageUserId: userInQuestionId })
@@ -50,7 +58,10 @@ function getReportSumForMessage(messageId) {
     .exec()
     .then(function(reports) {
       return reports.reduce(function(sum, report) {
-        return sum + report.weight;
+        const reportSent = report.sent ? report.sent.valueOf() : Date.now();
+        const reportWithinRange = (Date.now() - reportSent) <= SUM_PERIOD;
+
+        return sum + (reportWithinRange ? report.weight : 0);
       }, 0);
     });
 }
@@ -85,6 +96,7 @@ function newReport(fromUser, messageId) {
 
       return mongooseUtils.upsert(ChatMessageReport, { reporterUserId: reporterUserId, messageId: messageId }, {
         $setOnInsert: {
+          sent: new Date(),
           weight: this.weight,
           reporterUserId: reporterUserId,
           messageId: messageId,
@@ -166,11 +178,40 @@ function findByIds(ids, callback) {
   return mongooseUtils.findByIds(ChatMessageReport, ids, callback);
 }
 
+function findChatMessageReports(options) {
+  const limit = Math.min(options.limit || 50, 100);
+
+  let query = ChatMessageReport
+    .find();
+
+  if(options.beforeId) {
+    const beforeId = new ObjectID(options.beforeId);
+    query = query.where('sent').lte(sentBefore(beforeId));
+    query = query.where('_id').lt(beforeId);
+  }
+
+  if(options.afterId) {
+    const afterId = new ObjectID(options.afterId);
+    query = query.where('sent').gte(sentAfter(afterId));
+    query = query.where('_id').gt(afterId);
+  }
+
+  if(options.lean) {
+    query = query.lean();
+  }
+
+  return query
+    .sort({ sent: 'desc' })
+    .limit(limit)
+    .exec();
+}
+
 module.exports = {
   BAD_USER_THRESHOLD: BAD_USER_THRESHOLD,
   BAD_MESSAGE_THRESHOLD: BAD_MESSAGE_THRESHOLD,
   getReportSumForUser: getReportSumForUser,
   getReportSumForMessage: getReportSumForMessage,
   newReport: newReport,
-  findByIds: findByIds
+  findByIds: findByIds,
+  findChatMessageReports: findChatMessageReports
 };

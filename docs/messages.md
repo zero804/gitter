@@ -113,8 +113,9 @@ Messages should only be reported if they are spam, scams, or abuse. False-report
 Some examples of reportable messages,
 
  - Spam (especially messages cross-posted across many rooms)
+ - Doxing and personal information
  - Random Ethereum addresses
- - Crypto scams
+ - Crypto scams and viruses
  - Skype address/number trolling for victims (scammers)
  - Excessive name calling and retaliation
 

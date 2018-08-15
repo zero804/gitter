@@ -1,18 +1,22 @@
 "use strict";
 
-var env = require('gitter-web-env');
-var nconf = env.config;
-var stats = env.stats;
-var express = require('express');
-var identifyRoute = env.middlewares.identifyRoute;
-var featureToggles = require('../web/middlewares/feature-toggles');
-var ensureLoggedIn = require('../web/middlewares/ensure-logged-in');
-var langs = require('langs');
-var loginUtils = require('../web/login-utils');
-var social = require('./social-metadata');
-var fonts = require('../web/fonts');
+const Promise = require('bluebird');
+const env = require('gitter-web-env');
+const nconf = env.config;
+const stats = env.stats;
+const express = require('express');
+const StatusError = require('statuserror');
+const identifyRoute = env.middlewares.identifyRoute;
+const featureToggles = require('../web/middlewares/feature-toggles');
+const ensureLoggedIn = require('../web/middlewares/ensure-logged-in');
+const langs = require('langs');
+const loginUtils = require('../web/login-utils');
+const social = require('./social-metadata');
+const fonts = require('../web/fonts');
+const contextGenerator = require('../web/context-generator');
+const generateAdminChatMessageReportSnapshot = require('./snapshots/admin-chat-message-report-snapshot');
 
-var survivalMode = !!process.env.SURVIVAL_MODE || false;
+const survivalMode = !!process.env.SURVIVAL_MODE || false;
 
 /**
  * When Gitter hits a big news site, this setting disables
@@ -156,5 +160,28 @@ router.get('/_s/cdn/*',
   function(req, res) {
     res.redirect(req.path.replace('/_s/cdn', ''));
   });
+
+router.get('/-/admin/chat-message-reports',
+  identifyRoute('admin-chat-message-reports'),
+  function(req, res) {
+    if(!req.user || !req.user.staff) {
+      throw new StatusError(403, 'Only staff can view this area');
+    }
+
+    Promise.props({
+      troupeContext: contextGenerator.generateBasicContext(req),
+      snapshots: generateAdminChatMessageReportSnapshot(req)
+    })
+      .then(function({ troupeContext, snapshots }) {
+        troupeContext.snapshots = snapshots;
+
+        res.render('admin/chat-message-reports', {
+          bootScriptName: 'chat-message-reports',
+          cssFileName: 'styles/router-admin-dashboard.css',
+          troupeContext: troupeContext,
+        });
+      });
+  });
+
 
 module.exports = router;
