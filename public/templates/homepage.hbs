@@ -193,7 +193,7 @@
         <div class="wrap">
           <h1>{{ __ "Designed for community collaboration"}}</h1>
           <p>{{ __ "Gitter is designed to make community messaging, collaboration and discovery as smooth and simple as possible. You can easily create, organise and grow your communities, inviting others to join just in one click." }}</p>
-          <p>{{{ __ "We also provide integrations with GitHub, Trello, Jenkins, Travis CI, Heroku, Sentry, BitBucket, HuBoard, Logentries, Pagerduty & Sprintly. We accept custom webhooks, have an <a %s>open source repository</a> for integrations as well as a <a %s>flexible API</a>." "href='https://github.com/gitterHQ/services' target='_blank'" " href='https://developer.gitter.im' target='_blank'" }}}</p>
+          <p>{{{ __ "We also provide integrations with GitHub, Trello, Jenkins, Travis CI, Heroku, Sentry, BitBucket, HuBoard, Logentries, Pagerduty & Sprintly. We accept custom webhooks, have an <a %s>open source repository</a> for integrations as well as a <a %s>flexible API</a>." "href='https://gitlab.com/gitlab-org/gitter/services' target='_blank'" " href='https://developer.gitter.im' target='_blank'" }}}</p>
 
           <div class="loves">
             <img src="{{cdn 'images/home/gitter-loves.png'}}" alt="Gitter loves">
@@ -331,12 +331,12 @@
         </small>
         {{#if translationRequired}}
         <p class="translation">
-          <a href="https://github.com/gitterHQ/gitter-translations">Want this in {{ requestLangLocalName}}?</a>
+          <a href="https://gitlab.com/gitlab-org/gitter/gitter-translations">Want this in {{ requestLangLocalName}}?</a>
         </p>
         {{else}}
           {{#if translated}}
           <p class="translation">
-            <a href="https://github.com/gitterHQ/gitter-translations">Translation</a>  kindly done by {{{ translated }}}.
+            <a href="https://gitlab.com/gitlab-org/gitter/gitter-translations">Translation</a>  kindly done by {{{ translated }}}.
           </p>
           {{/if}}
         {{/if}}
