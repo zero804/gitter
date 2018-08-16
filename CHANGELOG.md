@@ -2,6 +2,8 @@
 
  - Fix terms of service links pointing to Zendesk instead of GitLab, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1227
  - Fix "Gitter from GitLab" footer link styling, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1228
+ - Fix links on homepage for Gitter projects (point to GitLab)
+    - Thanks to [@MajkelKorczak](https://gitlab.com/MajkelKorczak) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1230
 
 Developer facing:
 
