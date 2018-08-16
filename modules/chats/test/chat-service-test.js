@@ -2,10 +2,13 @@
 /*global describe:true, it: true, before:true */
 "use strict";
 
-var chatService = require('../lib/chat-service');
-var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assert = require('assert');
 var Promise = require('bluebird');
+var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
+var persistence = require('gitter-web-persistence');
+var ChatMessage = persistence.ChatMessage;
+var ChatMessageBackup = persistence.ChatMessageBackup;
+var chatService = require('../lib/chat-service');
 
 describe('chatService', function() {
 
@@ -16,19 +19,14 @@ describe('chatService', function() {
   var fixture = fixtureLoader.setup({
     user1: {},
     troupe1: {users: ['user1']},
-    message1: {
-      user: 'user1',
-      troupe: 'troupe1',
-      text: 'old_message',
-      sent: new Date("01/01/2014"),
-      pub: true
-    },
-    message2: {
-      user: 'user1',
-      troupe: 'troupe1',
-      text: 'new_message',
-      sent: new Date()
-    }
+  });
+
+  // Cleanup after every test so there isn't any contamination
+  afterEach(() => {
+    return Promise.all([
+      ChatMessage.remove({ toTroupeId: fixture.troupe1._id, fromUserId: fixture.user1._id }),
+      ChatMessageBackup.remove({ toTroupeId: fixture.troupe1._id, fromUserId: fixture.user1._id })
+    ]);
   });
 
   describe('updateChatMessage', function() {
@@ -81,7 +79,7 @@ describe('chatService', function() {
   describe('Finding messages #slow', function() {
     var chat1, chat2, chat3;
 
-    before(function() {
+    beforeEach(function() {
       return chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, { text: 'A' })
         .then(function(chat) {
           chat1 = chat.id;
@@ -100,9 +98,9 @@ describe('chatService', function() {
       return chatService.findChatMessagesForTroupe(fixture.troupe1.id, { aroundId: chat2 })
         .then(function(chats) {
           assert(chats.length >= 3);
-          assert.strictEqual(chats.filter(function(f) { return f.id == chat1; }).length, 1);
-          assert.strictEqual(chats.filter(function(f) { return f.id == chat2; }).length, 1);
-          assert.strictEqual(chats.filter(function(f) { return f.id == chat3; }).length, 1);
+          assert.strictEqual(chats.filter(function(f) { return f.id === chat1; }).length, 1);
+          assert.strictEqual(chats.filter(function(f) { return f.id === chat2; }).length, 1);
+          assert.strictEqual(chats.filter(function(f) { return f.id === chat3; }).length, 1);
         });
     });
 
@@ -111,15 +109,15 @@ describe('chatService', function() {
         chatService.findChatMessagesForTroupe(fixture.troupe1.id, { skip: 1, readPreference: 'primaryPreferred' }),
         chatService.findChatMessagesForTroupe(fixture.troupe1.id, { }),
         function(withSkip, withoutSkip) {
-          assert(withSkip.length > 2);
-          assert(withoutSkip.length > 2);
+          assert.strictEqual(withSkip.length, 2);
+          assert.strictEqual(withoutSkip.length, 3);
 
           var lastItemWithoutSkip = withoutSkip[withoutSkip.length - 1];
           var secondLastItemWithoutSkip = withoutSkip[withoutSkip.length - 2];
 
           var lastItemWithSkip = withSkip[withSkip.length - 1];
           // Last item without skip does not exist in with skip...
-          assert.deepEqual(withSkip.filter(function(f) { return f.id == lastItemWithoutSkip.id; }), []);
+          assert.deepEqual(withSkip.filter(function(f) { return f.id === lastItemWithoutSkip.id; }), []);
 
           assert.strictEqual(secondLastItemWithoutSkip.id, lastItemWithSkip.id);
         });
@@ -167,13 +165,66 @@ describe('chatService', function() {
   });
 
 
-  it('getRecentPublicChats #slow', function() {
-    fixtureLoader.disableMongoTableScans();
+  describe('getRecentPublicChats #slow', function() {
+    beforeEach(() => {
+      fixtureLoader.disableMongoTableScans();
 
-    return chatService.getRecentPublicChats()
-      .then(function(chats) {
-        assert(chats.length >= 1);
-      });
+      return Promise.all([
+        chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, { text: 'm1', status: true }),
+        chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, { text: 'm2', status: true })
+      ]);
+    })
+
+    it('finds messages', () => {
+      return chatService.getRecentPublicChats()
+        .then(function(chats) {
+          assert(chats.length >= 1);
+        });
+    });
+  });
+
+  describe('removeAllMessagesForUserIdInRoomId', () => {
+    it('should delete all messages for user ', function () {
+      return Promise.all([
+        chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, { text: 'happy goat', status: true }),
+        chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, { text: 'sad goat', status: true })
+      ])
+        .then((chatMessages) => {
+          assert.strictEqual(chatMessages.length, 2);
+        })
+        .then(() => {
+          return chatService.removeAllMessagesForUserIdInRoomId(fixture.user1._id, fixture.troupe1._id);
+        })
+        .then(() => {
+          return Promise.props({
+            messages: ChatMessage.find({ toTroupeId: fixture.troupe1._id, fromUserId: fixture.user1._id }),
+            messageBackups: ChatMessageBackup.find({ toTroupeId: fixture.troupe1._id, fromUserId: fixture.user1._id })
+          })
+        })
+        .then(({ messages, messageBackups }) => {
+          assert.strictEqual(messages.length, 0);
+          assert.strictEqual(messageBackups.length, 2);
+        });
+    });
+  });
+
+  describe('deleteMessageFromRoom', () => {
+    it('should delete message', function () {
+      return chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, { text: 'happy goat', status: true })
+        .then((message) => {
+          return chatService.deleteMessageFromRoom(fixture.troupe1, message);
+        })
+        .then(() => {
+          return Promise.props({
+            messages: ChatMessage.find({ toTroupeId: fixture.troupe1._id, fromUserId: fixture.user1._id }),
+            messageBackups: ChatMessageBackup.find({ toTroupeId: fixture.troupe1._id, fromUserId: fixture.user1._id })
+          });
+        })
+        .then(({ messages, messageBackups }) => {
+          assert.strictEqual(messages.length, 0);
+          assert.strictEqual(messageBackups.length, 1);
+        });
+    });
   });
 
 });

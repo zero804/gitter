@@ -1,3 +1,15 @@
+# 19.16.0 - 2018-8-15
+
+ - Fix terms of service links pointing to Zendesk instead of GitLab, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1227
+ - Fix "Gitter from GitLab" footer link styling, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1228
+ - Fix links on homepage for Gitter projects (point to GitLab)
+    - Thanks to [@MajkelKorczak](https://gitlab.com/MajkelKorczak) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1230
+
+Developer facing:
+
+ - Add message soft-delete (store message in another collection on delete), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1225
+
+
 # 19.15.0 - 2018-8-8
 
  - Add feature toggle for embeds and disable by default, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1223
