@@ -77,6 +77,7 @@ var schemas = {
   UserSettings: require('./schemas/user-settings-schema'),
   ChatMessage: require('./schemas/chat-message-schema'),
   ChatMessageBackup: require('./schemas/chat-message-backup-schema'),
+  ChatMessageReport: require('./schemas/chat-message-report-schema'),
   Event: require('./schemas/event-schema'),
   OAuthClient: require('./schemas/oauth-client-schema'),
   OAuthCode: require('./schemas/oauth-code-schema'),

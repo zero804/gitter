@@ -60,6 +60,27 @@ describe('chat-api', function() {
       sent: new Date(),
       pub: 1
     },
+    messageBad1: {
+      user: 'user1',
+      troupe: 'troupe1',
+      text: 'HELLO1',
+      sent: new Date(),
+      pub: 1
+    },
+    messageBad2: {
+      user: 'user1',
+      troupe: 'troupe1',
+      text: 'HELLO1',
+      sent: new Date(),
+      pub: 1
+    },
+    messageBad3: {
+      user: 'user1',
+      troupe: 'troupe1',
+      text: 'HELLO1',
+      sent: new Date(),
+      pub: 1
+    },
   });
 
   it('POST /v1/rooms/:roomId/chatMessages', function() {
@@ -195,5 +216,34 @@ describe('chat-api', function() {
       })
   });
 
+  it('POST /v1/rooms/:roomId/chatMessages/:chatMessageId/report - own message', function() {
+    return request(app)
+      .post('/v1/rooms/' + fixture.troupe1.id + '/chatMessages/' + fixture.messageBad3.id + '/report')
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(403);
+  });
 
-})
+  it('POST /v1/rooms/:roomId/chatMessages/:chatMessageId/report - some elses message', function() {
+    return request(app)
+      .post('/v1/rooms/' + fixture.troupe1.id + '/chatMessages/' + fixture.messageBad2.id + '/report')
+      .set('x-access-token', fixture.user2.accessToken)
+      .expect(200)
+      .then(function(result) {
+        const body = result.body;
+        assert.strictEqual(body.messageId, fixture.messageBad2.id);
+        assert.strictEqual(body.messageText, fixture.messageBad2.text);
+      });
+  });
+
+  it('POST /v1/rooms/:roomId/chatMessages/:chatMessageId/report - as admin', function() {
+    return request(app)
+      .post('/v1/rooms/' + fixture.troupe1.id + '/chatMessages/' + fixture.messageBad2.id + '/report')
+      .set('x-access-token', fixture.user3.accessToken)
+      .expect(200)
+      .then(function(result) {
+        const body = result.body;
+        assert.strictEqual(body.messageId, fixture.messageBad2.id);
+        assert.strictEqual(body.messageText, fixture.messageBad2.text);
+      });
+  });
+});

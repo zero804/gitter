@@ -133,7 +133,8 @@ module.exports = {
   },
 
   subresources: {
-    'readBy': require('./chat-read-by')
+    'readBy': require('./chat-read-by'),
+    'report': require('./chat-message-report')
   }
 
 };

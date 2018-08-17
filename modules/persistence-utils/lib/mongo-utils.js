@@ -128,6 +128,17 @@ function createIdForTimestamp(timestamp) {
   return new ObjectID(createIdForTimestampString(timestamp));
 }
 
+let currentIncrement = 0;
+function createTestIdForTimestampString(timestamp) {
+  var hexSeconds = Math.floor(timestamp/1000).toString(16);
+
+  while(hexSeconds.length < 8) {
+    hexSeconds = "0" + hexSeconds;
+  }
+  currentIncrement++;
+  return hexSeconds + _.padLeft(currentIncrement.toString(16), 16, '0');
+}
+
 function fieldInPredicate(fieldName, values, additionalClauses) {
   var predicate = {};
   if (values.length === 1) {
@@ -297,6 +308,7 @@ module.exports = {
   serializeObjectIds: serializeObjectIds,
   createIdForTimestamp: createIdForTimestamp,
   createIdForTimestampString: createIdForTimestampString,
+  createTestIdForTimestampString: createTestIdForTimestampString,
   fieldInPredicate: fieldInPredicate,
   conjunctionIds: conjunctionIds,
   mongoErrorWithCode: mongoErrorWithCode,

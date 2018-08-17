@@ -27,7 +27,7 @@ function createMessage(fixtureName, f) {
 
 function createMessages(expected, fixture) {
   return Promise.map(Object.keys(expected), function(key) {
-    if (key.match(/^message/)) {
+     if (key.match(/^message(?!Report)/)) {
       var expectedMessage = expected[key];
 
       expectedMessage.fromUserId = fixture[expectedMessage.user]._id;

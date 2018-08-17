@@ -55,7 +55,9 @@ function main(uri, dryRun) {
         .lean(true)
         .exec()
         .then(function(chats) {
+          var chatMap = {};
           chats.forEach(function(chat) {
+            chatMap[chat.id] = chat;
             delete allUnreadHash[chat._id.toString()];
           });
           var missingIds = Object.keys(allUnreadHash);
@@ -66,7 +68,7 @@ function main(uri, dryRun) {
           return Promise.map(missingIds, function(itemId) {
             console.log('REMOVING ', itemId);
             // Remove the items, slowly
-            return unreadItemService.removeItem(room.id, itemId)
+            return unreadItemService.removeItem(chatMap[itemId].fromUserId, room, itemId)
               .delay(10);
           }, { concurrency: 1 });
         });

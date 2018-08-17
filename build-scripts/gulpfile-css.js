@@ -60,6 +60,7 @@ var cssWebStyleBuilder = styleBuilder([
   'public/less/router-archive-home.less',
   'public/less/router-archive-links.less',
   'public/less/router-archive-chat.less',
+  'public/less/router-admin-dashboard.less',
   'public/less/homepage.less',
   'public/less/userhome.less',
   'public/less/org-page.less',

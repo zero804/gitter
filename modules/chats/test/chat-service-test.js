@@ -16,17 +16,10 @@ describe('chatService', function() {
   before(blockTimer.on);
   after(blockTimer.off);
 
-  var fixture = fixtureLoader.setup({
+  var fixture = fixtureLoader.setupEach({
     user1: {},
     troupe1: {users: ['user1']},
-  });
-
-  // Cleanup after every test so there isn't any contamination
-  afterEach(() => {
-    return Promise.all([
-      ChatMessage.remove({ toTroupeId: fixture.troupe1._id, fromUserId: fixture.user1._id }),
-      ChatMessageBackup.remove({ toTroupeId: fixture.troupe1._id, fromUserId: fixture.user1._id })
-    ]);
+    troupe2: {users: ['user1']},
   });
 
   describe('updateChatMessage', function() {
@@ -183,8 +176,36 @@ describe('chatService', function() {
     });
   });
 
+  describe('removeAllMessagesForUserId', function() {
+    it('should delete all messages for user', function () {
+      return Promise.all([
+        chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, { text: 'happy goat', status: true }),
+        chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, { text: 'sad goat', status: true }),
+
+        chatService.newChatMessageToTroupe(fixture.troupe2, fixture.user1, { text: 'happy goat2', status: true }),
+        chatService.newChatMessageToTroupe(fixture.troupe2, fixture.user1, { text: 'sad goat2', status: true })
+      ])
+        .then((chatMessages) => {
+          assert.strictEqual(chatMessages.length, 4);
+        })
+        .then(() => {
+          return chatService.removeAllMessagesForUserId(fixture.user1._id);
+        })
+        .then(() => {
+          return Promise.props({
+            messages: ChatMessage.find({ fromUserId: fixture.user1._id }),
+            messageBackups: ChatMessageBackup.find({ fromUserId: fixture.user1._id })
+          })
+        })
+        .then(({ messages, messageBackups }) => {
+          assert.strictEqual(messages.length, 0);
+          assert.strictEqual(messageBackups.length, 4);
+        });
+    });
+  });
+
   describe('removeAllMessagesForUserIdInRoomId', () => {
-    it('should delete all messages for user ', function () {
+    it('should delete all messages for user in specific room', function () {
       return Promise.all([
         chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, { text: 'happy goat', status: true }),
         chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, { text: 'sad goat', status: true })
