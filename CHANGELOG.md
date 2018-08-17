@@ -1,4 +1,4 @@
-# 19.17.0 - *upcoming*
+# 19.17.0 - 2018-8-20
 
  - Add reporting/flagging of messages, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1226
 
