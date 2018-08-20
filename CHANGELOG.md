@@ -1,3 +1,8 @@
+# 19.17.0 - 2018-8-20
+
+ - Add reporting/flagging of messages, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1226
+
+
 # 19.16.0 - 2018-8-15
 
  - Fix terms of service links pointing to Zendesk instead of GitLab, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1227

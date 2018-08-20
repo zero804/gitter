@@ -27,6 +27,7 @@ const userService = require('gitter-web-users');
 const chatSearchService = require('./chat-search-service');
 const unreadItemService = require('gitter-web-unread-items');
 const recentRoomService = require('gitter-web-rooms/lib/recent-room-service');
+const troupeService = require('gitter-web-rooms/lib/troupe-service');
 const markdownMajorVersion = require('gitter-markdown-processor').version.split('.')[0];
 
 var useHints = true;
@@ -546,20 +547,40 @@ function deleteMessage(message) {
   // `_.omit` because of `Cannot update '__v' and '__v' at the same time` error
   return mongooseUtils.upsert(ChatMessageBackup, { _id: message._id }, _.omit(message.toObject(), '__v'))
     .then(() => {
-      message.remove();
+      return message.remove();
+    });
+}
+
+function removeAllMessagesForUserId(userId) {
+  return ChatMessage.find({ fromUserId: userId })
+    .exec()
+    .then(function(messages) {
+      logger.info('removeAllMessagesForUserId(' + userId + '): Removing ' + messages.length + ' messages');
+      const troupeMap = {};
+      // Clear any unreads and delete the messages
+      return Promise.map(messages, (function(message) {
+        const toTroupeId = message.toTroupeId;
+        return Promise.resolve(troupeMap[toTroupeId] || troupeService.findById(message.toTroupeId))
+          .then(function(troupe) {
+            troupeMap[toTroupeId] = troupe;
+            return deleteMessageFromRoom(troupe, message);
+          });
+      }));
     });
 }
 
 function removeAllMessagesForUserIdInRoomId(userId, roomId) {
-  return ChatMessage.find({ toTroupeId: roomId, fromUserId: userId })
-    .exec()
-    .then(function(messages) {
-      return Promise.map(messages, (message) => deleteMessage(message), { concurrency: 1 });
+  return Promise.props({
+    room: troupeService.findById(roomId),
+    messages: ChatMessage.find({ toTroupeId: roomId, fromUserId: userId }).exec()
+  })
+    .then(function({ room, messages }) {
+      return Promise.map(messages, (message) => deleteMessageFromRoom(room, message), { concurrency: 1 });
     });
 }
 
-function deleteMessageFromRoom(troupe, chatMessage) {
-  return unreadItemService.removeItem(chatMessage.fromUserId, troupe, chatMessage)
+function deleteMessageFromRoom(room, chatMessage) {
+  return unreadItemService.removeItem(chatMessage.fromUserId, room, chatMessage)
     .then(() => deleteMessage(chatMessage))
     .return(null);
 }
@@ -583,6 +604,7 @@ module.exports = {
   findChatMessagesForTroupe,
   findChatMessagesForTroupeForDateRange,
   searchChatMessagesForRoom,
+  removeAllMessagesForUserId,
   removeAllMessagesForUserIdInRoomId,
   deleteMessageFromRoom,
   testOnly

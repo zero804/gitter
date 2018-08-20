@@ -8,7 +8,6 @@ var fixtureUtils = require('./fixture-utils');
 var onMongoConnect = require('gitter-web-persistence-utils/lib/on-mongo-connect');
 var _ = require('lodash');
 var integrationFixtures = require('./integration-fixtures');
-var shutdown = require('shutdown');
 
 var fixtureSteps = [
   require('./delete-documents'),
@@ -24,6 +23,7 @@ var fixtureSteps = [
   require('./create-groups'),
   require('./create-troupes'),
   require('./create-messages'),
+  require('./create-message-reports'),
 ];
 
 function createBaseFixture() {
