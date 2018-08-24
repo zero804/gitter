@@ -1,3 +1,10 @@
+
+# 19.18.0 - *upcoming*
+
+ - Add "Contribute to Gitter" item to profile menu
+    - Thanks to [@pdurbin](https://gitlab.com/pdurbin) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1233
+
+
 # 19.17.0 - 2018-8-20
 
  - Add reporting/flagging of messages, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1226
