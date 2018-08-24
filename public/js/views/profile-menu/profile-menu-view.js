@@ -89,6 +89,8 @@ function getProfileCollection() {
 
   result.add({ name: 'Terms of Service', stub: 'https://about.gitlab.com/terms/', target: '_blank' });
 
+  result.add({ name: 'Contribute to Gitter', stub: 'https://gitlab.com/gitlab-org/gitter/webapp', target: '_blank' });
+
   result.add({
     name: 'Delete Account',
     onClick: (e) => {
