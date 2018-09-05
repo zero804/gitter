@@ -19,6 +19,7 @@ var toggleDarkTheme = require('./utils/toggle-dark-theme');
 
 var TitlebarUpdater = require('./components/titlebar');
 var realtime = require('./components/realtime');
+const userNotifications = require('./components/user-notifications');
 var RoomCollectionTracker = require('./components/room-collection-tracker');
 var SPARoomSwitcher = require('./components/spa-room-switcher');
 var linkHandler = require('./components/link-handler');
@@ -34,7 +35,6 @@ var userRoutes = require('./routes/user-routes');
 
 require('./components/statsc');
 require('./views/widgets/preload');
-require('./components/user-notifications');
 require('./template/helpers/all');
 require('./components/bug-reporting');
 require('./components/focus-events');
@@ -45,6 +45,8 @@ require('./components/ping');
 
 // Preload widgets
 require('./views/widgets/avatar');
+
+userNotifications.initUserNotifications();
 
 onready(function() { // eslint-disable-line max-statements
 

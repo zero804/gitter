@@ -4,6 +4,10 @@
     - Thanks to [@pdurbin](https://gitlab.com/pdurbin) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1233
  - Update homepage to reflect free without limits for public and private, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1234
 
+ Developer facing:
+
+  - Only initialize notification listener in app frame and add some debug logging, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1235
+
 
 # 19.17.0 - 2018-8-20
 
