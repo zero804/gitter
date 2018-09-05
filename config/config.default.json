@@ -125,9 +125,6 @@
   "revokedUserAgents": [],
   "irc": {
   },
-  "diagnostics": {
-    "heapdump": false
-  },
   "errorReporting": {
     "enabled": false
   },
