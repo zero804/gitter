@@ -1,4 +1,4 @@
-# 19.18.0 - *upcoming*
+# 19.18.0 - 2018-9-5
 
  - Add "Contribute to Gitter" item to profile menu
     - Thanks to [@pdurbin](https://gitlab.com/pdurbin) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1233
