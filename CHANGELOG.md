@@ -6,7 +6,10 @@
 
  Developer facing:
 
-  - Only initialize notification listener in app frame and add some debug logging, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1235
+ - Use Node.js v10 as the default/recommended version
+    - https://gitlab.com/gitlab-org/gitter/webapp/commit/4b1264476a8b770a942b05c1a10aecf8ac69f129
+    - https://gitlab.com/gl-infra/gitter-infrastructure/merge_requests/57
+ - Only initialize notification listener in app frame and add some debug logging, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1235
 
 
 # 19.17.0 - 2018-8-20
