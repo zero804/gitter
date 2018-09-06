@@ -64,7 +64,6 @@ var cssWebStyleBuilder = styleBuilder([
   'public/less/homepage.less',
   'public/less/userhome.less',
   'public/less/org-page.less',
-  'public/less/topics.less',
   'public/less/dark-theme.less',
 ], {
   dest: cssDestDir,

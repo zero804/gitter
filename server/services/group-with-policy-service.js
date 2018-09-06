@@ -2,7 +2,6 @@
 
 var assert = require('assert');
 var StatusError = require('statuserror');
-var slugify = require('gitter-web-slugify');
 var ensureAccessAndFetchDescriptor = require('gitter-web-permissions/lib/ensure-access-and-fetch-descriptor');
 var debug = require('debug')('gitter:app:group-with-policy-service');
 var roomService = require('gitter-web-rooms');
@@ -11,15 +10,6 @@ var validateRoomName = require('gitter-web-validators/lib/validate-room-name');
 var validateProviders = require('gitter-web-validators/lib/validate-providers');
 var troupeService = require('gitter-web-rooms/lib/troupe-service');
 var groupService = require('gitter-web-groups/lib/group-service');
-var forumService = require('gitter-web-topics/lib/forum-service');
-var forumCategoryService = require('gitter-web-topics/lib/forum-category-service');
-var validateCategory = require('gitter-web-topics/lib/validate-category');
-var securityDescriptorGenerator = require('gitter-web-permissions/lib/security-descriptor-generator');
-
-
-// Not sure what would be a good number, but this is here "just in case" for
-// now.
-var MAX_INITIAL_CATEGORIES = 5;
 
 /**
  * @private
@@ -38,42 +28,6 @@ function validateRoomSecurity(type, security) {
 
 function allowAdmin() {
   return this.policy.canAdmin();
-}
-
-function getCategoriesInfo(categoryNames) {
-  if (!categoryNames || !categoryNames.length) return undefined;
-
-  if (categoryNames.length > MAX_INITIAL_CATEGORIES) {
-    throw new StatusError(400, 'Too many categories.');
-  }
-
-  /*
-  Ordinarily we try and validate things as low down as possible, but we don't
-  want to add a forum and then crash a moment later when trying to add a
-  category, so we have to make very sure that things will work ahead of time.
-  */
-
-  var categorySlugMap = {};
-  return categoryNames.map(function(name, index) {
-    var slug = slugify(name);
-
-    if (categorySlugMap[slug]) {
-      throw new StatusError(400, 'Duplicate category slug.')
-    }
-
-    var categoryInfo = {
-      name: name,
-      slug: slug,
-      order: index
-    };
-
-    // this will throw a 400 error if some of it is wrong
-    validateCategory(categoryInfo);
-
-    categorySlugMap[slug] = true;
-
-    return categoryInfo;
-  });
 }
 
 function GroupWithPolicyService(group, user, policy) {
@@ -194,74 +148,6 @@ GroupWithPolicyService.prototype._ensureAccessAndFetchRoomInfo = function(option
         });
     })
 }
-
-
-/**
- * Allow admins to create a new forum
- * @return {Promise} Promise of forum
- */
-GroupWithPolicyService.prototype.createForum = secureMethod([allowAdmin], function(options) {
-  options = options || {};
-
-  var tags = options.tags;
-  var categoryNames = options.categories;
-
-  var user = this.user;
-  var group = this.group;
-
-  // For now we only allow one forum per group.
-  // We don't upsert into the existing one either.
-  // NOTE: should this check be part of an integration service too?
-  if (group.forumId) {
-    throw new StatusError(409, 'Group already has a forum.');
-  }
-
-  var categoriesInfo;
-  if (categoryNames && categoryNames.length) {
-    // this can throw a 400 so that things are validated before we ever start
-    // inserting things
-    categoriesInfo = getCategoriesInfo(categoryNames);
-  }
-
-  var forumUri = group.uri + '/topics';
-
-  var forumInfo = {
-    tags: tags,
-    uri: forumUri,
-    name: group.name || group.uri
-  };
-
-  // TODO: this is hardcoded for now, but down the line the user should be able
-  // to make it PRIVATE too.
-  var securityDescriptor = securityDescriptorGenerator.generate(user, {
-    type: 'GROUP',
-    internalId: group._id,
-    security: 'PUBLIC'
-  });
-
-  return forumService.createForum(user, forumInfo, securityDescriptor)
-    .bind({
-      forum: null,
-      category: null
-    })
-    .then(function(forum) {
-      this.forum = forum;
-
-      // store the forum as the group's forum
-      return groupService.setForumForGroup(group._id, forum._id);
-    })
-    .then(function() {
-      // add the default categories if they were specified and just skip this
-      // step if not
-      if (categoriesInfo) {
-        var forum = this.forum;
-        return forumCategoryService.createCategories(user, forum, categoriesInfo);
-      }
-    })
-    .then(function() {
-      return this.forum;
-    });
-});
 
 GroupWithPolicyService.prototype.setAvatar = secureMethod([allowAdmin], function(url) {
   return groupService.setAvatarForGroup(this.group._id, url);

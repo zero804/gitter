@@ -14,8 +14,6 @@ var Promise = require('bluebird');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var debug = require('debug')('gitter:app:bayeux-authorisor');
 var recentRoomService = require('gitter-web-rooms/lib/recent-room-service');
-var topicService = require('gitter-web-topics/lib/topic-service');
-var replyService = require('gitter-web-topics/lib/reply-service');
 var tokenProvider = require('../../services/tokens');
 
 var survivalMode = !!process.env.SURVIVAL_MODE || false;
@@ -38,22 +36,6 @@ var routes = [{
     re: /^\/api\/v1\/(?:troupes|rooms)\/(\w+)\/(\w+)\/(\w+)\/(\w+)$/,
     validator: validateUserForSubTroupeSubscription,
     populator: populateSubSubTroupeCollection
-  }, {
-    re: /^\/api\/v1\/forums\/(\w+)\/categories/,
-    validator: validateUserForForumSubscription,
-    populator: populateCategoriesCollection
-  }, {
-    re: /^\/api\/v1\/forums\/(\w+)\/topics$/,
-    validator: validateUserForForumSubscription,
-    populator: populateTopicsCollection
-  }, {
-    re: /^\/api\/v1\/forums\/(\w+)\/topics\/(\w+)\/replies$/,
-    validator: validateUserForTopicSubscription,
-    populator: populateRepliesCollection
-  }, {
-    re: /^\/api\/v1\/forums\/(\w+)\/topics\/(\w+)\/replies\/(\w+)\/comments$/,
-    validator: validateUserForReplySubscription,
-    populator: populateCommentsCollection
   }, {
     re: /^\/api\/v1\/user\/(\w+)\/(\w+)$/,
     validator: validateUserForUserSubscription,
@@ -117,58 +99,6 @@ function validateUserForSubTroupeSubscription(options) {
         logger.error('Unable to reassociate connection or update last access: ', { exception: err, userId: userId, troupeId: troupeId });
       });
   });
-}
-
-// This strategy ensures that a user can access a forum URL
-function validateUserForForumSubscription(options) {
-  var userId = options.userId;
-  var match = options.match;
-
-  var forumId = match[1];
-
-  if (!mongoUtils.isLikeObjectId(forumId)) {
-    return Promise.reject(new StatusError(400, 'Invalid ID: ' + forumId));
-  }
-
-  return policyFactory.createPolicyForUserIdInForumId(userId, forumId)
-    .then(function(policy) {
-      return policy.canRead();
-    });
-}
-
-function validateUserForTopicSubscription(options) {
-  var match = options.match;
-
-  var forumId = match[1];
-  var topicId = match[2];
-
-  // first make sure that the topic exists and is actually in the specified
-  // forum
-  return topicService.findByIdForForum(forumId, topicId)
-    .then(function(topic) {
-      if (!topic) return false;
-
-      // then pass the options along to see if the user can access this forum
-      return validateUserForForumSubscription(options);
-    });
-}
-
-function validateUserForReplySubscription(options) {
-  var match = options.match;
-
-  var forumId = match[1];
-  var topicId = match[2];
-  var replyId = match[3];
-
-  // first make sure that the reply exists and is actually in the specified
-  // forum and topic
-  return replyService.findByIdForForumAndTopic(forumId, topicId, replyId)
-    .then(function(reply) {
-      if (!reply) return false;
-
-      // then pass the options along to see if the user can access this forum
-      return validateUserForForumSubscription(options);
-    });
 }
 
 // This is only used by the native client. The web client publishes to
@@ -345,62 +275,6 @@ function populateUserUnreadItemsCollection(options) {
 
   return restful.serializeUnreadItemsForTroupe(troupeId, userId)
     .then(dataToSnapshot('user.room.unreadItems'));
-}
-
-function populateCategoriesCollection(options) {
-  var match = options.match;
-  var forumId = match[1];
-
-  if (!forumId) {
-    return Promise.resolve();
-  }
-
-  return restful.serializeCategoriesForForumId(forumId)
-    .then(dataToSnapshot('forum.categories'));
-}
-
-function populateTopicsCollection(options) {
-  var userId = options.userId;
-  var match = options.match;
-  var forumId = match[1];
-
-  if (!forumId) {
-    return Promise.resolve();
-  }
-
-  var snapshotOptions = options.snapshot || {};
-
-  return restful.serializeTopicsForForumId(forumId, userId, snapshotOptions)
-    .then(dataToSnapshot('forum.topics'));
-}
-
-function populateRepliesCollection(options) {
-  var userId = options.userId;
-  var match = options.match;
-  var forumId = match[1];
-  var topicId = match[2];
-
-  if (!forumId || !topicId) {
-    return Promise.resolve();
-  }
-
-  return restful.serializeRepliesForTopicId(topicId, userId)
-    .then(dataToSnapshot('forum.replies'));
-}
-
-function populateCommentsCollection(options) {
-  var userId = options.userId;
-  var match = options.match;
-  var forumId = match[1];
-  var topicId = match[2];
-  var replyId = match[3];
-
-  if (!forumId || !topicId || !replyId) {
-    return Promise.resolve();
-  }
-
-  return restful.serializeCommentsForReplyId(replyId, userId)
-    .then(dataToSnapshot('forum.comments'));
 }
 
 // Authorize a sbscription message

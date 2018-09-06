@@ -42,9 +42,6 @@ describe('group-with-policy-service #slow', function() {
           { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() + '/' + fixtureLoader.GITTER_INTEGRATION_ROOM.toLowerCase() },
           { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() + '/' + fixtureLoader.GITTER_INTEGRATION_ROOM.toLowerCase() },
         ],
-        Forum: [
-          { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() + '/topics' }
-        ]
       },
       user1: '#integrationUser1',
       // group1 is a github user backed group
@@ -331,45 +328,6 @@ describe('group-with-policy-service #slow', function() {
           linkPath: fixtureLoader.GITTER_INTEGRATION_USERNAME,
           externalId: fixtureLoader.GITTER_INTEGRATION_USER_ID
         });
-      });
-  });
-
-  // TODO: test all the obtainAccessFromGitHubRepo cases
-
-  it('should create a forum for a group if it does not have one yet', function() {
-    return group1WithPolicyService.createForum()
-      .bind({
-        forum: null
-      })
-      .then(function(forum) {
-        this.forum = forum;
-
-        // load the group again so we can see if it actually set the group's forum
-        return groupService.findById(fixture.group1._id, { lean: true });
-      })
-      .then(function(group) {
-        // did it set the group's forumId?
-        assert(mongoUtils.objectIDsEqual(group.forumId, this.forum._id));
-      });
-  });
-
-  it('should throw an error when trying to create a forum for a group that has one already', function() {
-    return group2WithPolicyService.createForum()
-      .then(function() {
-        // reload the group so we get the updated group.forumId
-        return groupService.findById(fixture.group2._id, { lean: true });
-      })
-      .then(function(group) {
-        var updatedGroupWithPolicyService = new GroupWithPolicyService(group, fixture.user1, isAdminPolicy);
-
-        // try again (should fail)
-        return updatedGroupWithPolicyService.createForum()
-      })
-      .then(function() {
-        assert.ok(false, "Expected error.");
-      })
-      .catch(StatusError, function(err) {
-        assert.strictEqual(err.status, 409);
       });
   });
 });

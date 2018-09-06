@@ -10,8 +10,4 @@ module.exports = {
   users: new EventEmitter(),
   userGroups: new EventEmitter(),
   groupMembers: new EventEmitter(),
-  topics: new EventEmitter(),
-  replies: new EventEmitter(),
-  comments: new EventEmitter(),
-  categories: new EventEmitter()
 };

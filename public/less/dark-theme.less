@@ -23,7 +23,6 @@
     - Chat
     - Org Directory
     - Explore Page
-    - Topics
 
 
 - Components
@@ -48,8 +47,6 @@
     - Details
     - Room List
 
-  - Topics
-------------------------------------------- */
 
 
 /* -------------------------------------------
@@ -139,32 +136,6 @@
 @explore-room-card-button-color: @app-header-icon-color;
 
 
-// TOPICS
-// --------------------------------------------
-@topics-main-bg-color: @app-main-bg-color;
-@topics-section-border-color: @left-menu-minibar-border-color;
-@topics-header-button-color: @app-header-icon-color;
-@topics-table-headings-color: @org-page-list-item-details-color;
-@topics-row-bg-color: @topics-main-bg-color;
-@topics-row-event-bg-color: #474444;
-@topics-row-border-color: #595554;
-@topics-row-title-color: #b6b0af;
-@topics-row-details-color: @org-page-list-item-details-color;
-
-@topic-background-color: @app-main-bg-color;
-@topic-header-color: @org-page-list-item-heading-color;
-@topic-description-color: @chat-main-text-color;
-@topic-description-border-color: #222;
-@topic-reply-editor-background: @app-header-bg-color;
-@topic-reply-list-background-color: #363434;
-@topic-reply-list-item-background-color: @topic-background-color;
-@topic-reply-list-item-body-color: @topic-description-color;
-@topic-reply-editor-border-color: @topic-description-border-color;
-@topic-reply-list-header-color: @topic-header-color;
-@topic-comment-editor-background-color: @topic-reply-editor-background;
-@topic-details-text-color: @chat-details-text-color;
-
-
 /* -------------------------------------------
               Components
 ------------------------------------------- */
@@ -175,8 +146,8 @@ a {
   color: darken(@chat-right-toolbar-text-color, 10%);
 }
 
-.chat-item code,
-.topic-body__content code { //Single line code blocks don't have a `pre` element
+// Single line code blocks don't have a `pre` element
+.chat-item code {
   border: none;
   background-color: @app-single-line-code-color;
   padding: .2rem .5rem;
@@ -319,15 +290,6 @@ a {
 //  A room item is a room displayed within the list
 .room-item__title {
   color: @left-menu-text-color;
-}
-
-.left-menu-forum-category-item {
-  color: @left-menu-text-color;
-}
-
-.left-menu-forum-category-item:hover, .left-menu-forum-category-item:focus {
-  background-color: @left-menu-active-item-bg-color !important;
-  color: @left-menu-active-item-text-color !important;
 }
 
 a.room-item__container.active,
@@ -517,30 +479,24 @@ a.room-item__container:hover { //:cry:
 }
 
 // --- List Items ---
-//Each topic and room in the two respective lists
-//displayed on the page
-.org-page__room-item,
-.org-page__topic-item {
+.org-page__room-item {
   border-top-color: @org-page-list-item-border-color;
   border-right-color: @org-page-list-item-border-color;
   border-bottom-color: @org-page-list-item-border-color;
 }
 
 //The room name
-.org-page__room-item-heading,
-.org-page__topic-item-heading {
+.org-page__room-item-heading {
   color: @org-page-list-item-heading-color;
 }
 
 //The description of the room in the list
-.org-page__room-item-description,
-.org-page__topic-item-description {
+.org-page__room-item-description {
   color: @org-page-list-item-description-color;
 }
 
 //Details like the number of people in the room
-.org-page__room-item-details,
-.org-page__topic-item-details {
+.org-page__room-item-details {
   color: @org-page-list-item-description-color;
 }
 
@@ -659,138 +615,4 @@ a.room-item__container:hover { //:cry:
 
 .room-card__footer {
   border-color: @explore-room-card-border-color;
-}
-
-
-// TOPICS
-// --------------------------------------------
-//Header element for the topics application
-.container--search {
-  background-image: none;
-  background-color: @app-header-bg-color;
-}
-
-//{orgName}'s topics (back button)
-.topic-search__all-topics-link {
-  color: @app-header-text-color;
-}
-
-//Create Topic link
-.topic-search__create-topic-link {
-  border-color: @app-header-icon-color;
-  color: @app-header-icon-color;
-}
-
-//The headers that contain the links to a specific category
-//and the table controls
-.panel--category,
-.panel--table-control {
-  background-color: @topics-main-bg-color;
-  border-bottom: 1px solid @topics-section-border-color;
-}
-
-//Buttons and selects within the headers described above
-.category-list__item,
-.topic-control__button,
-.table-control__select {
-  border-color: @topics-header-button-color;
-  color: @topics-header-button-color;
-}
-
-//  custom stylings for selects ...
-.table-control__select--decal:after {
-  color: @topics-header-button-color;
-}
-
-//The area that contains the link to follow an orgs topics
-.panel--forum-follow-area {
-  border-bottom: none;
-  background-color: @topics-main-bg-color;
-}
-
-//Table header
-.topics-table-header {
-  background-color: @topics-main-bg-color;
-  color: @topics-table-headings-color;
-  border-color: @topics-row-border-color;
-}
-
-//Table rows
-.topics-table-body__row {
-  background-color: @topics-row-bg-color;
-  border-color: @topics-row-border-color;
-}
-
-.topics-table-body__row:nth-child(even) {
-  background-color: @topics-row-event-bg-color;
-}
-
-//Topic Name
-.topics-table-body__cell__link {
-  color: @topics-row-title-color;
-}
-
-//Topic meta counts
-.topics-table-body__cell--replies,
-.topics-table-body__cell--likes {
-  color: @topics-row-details-color;
-}
-
-.container--topic-header {
-  background-color: @topic-background-color;
-}
-
-.topic-header__title {
-  color: @topic-header-color;
-}
-
-.panel--topic-body {
-  background-color: @topic-background-color;
-  border-color: @topic-description-border-color;
-}
-
-.topic-body__content {
-  color: @topic-description-color;
-
-  a { color: @caribbean; }
-  a:visited { color: darken(@caribbean, 20%); }
-}
-
-.topic-reply-list-header__heading {
-  color: @topic-header-color;
-}
-
-.topic-reply-list-header__filter-button {
-  color: @topic-header-color;
-}
-
-.panel--reply-list-header,
-.panel--topic-reply-list {
-  background-color: @topic-reply-list-background-color;
-}
-
-.feed-item__content {
-  background-color: @topic-reply-list-item-background-color;
-  color: @topic-reply-list-item-body-color;
-}
-
-.feed-item__content__header__user-display-name  {
-  color: @topic-details-text-color;
-}
-
-.feed-item__content__header__user-user-name {
-  color: @topic-details-text-color;
-}
-
-.panel--reply-editor,
-.editor--reply {
-  background-color: @topic-reply-editor-background;
-  border-color: @topic-reply-editor-border-color;
-  color: @topic-description-color;
-}
-
-.reply-comment-editor__editor {
-  background-color: @topic-comment-editor-background-color;
-  color: @topic-description-color;
-  border-color: @topic-reply-editor-border-color;
 }

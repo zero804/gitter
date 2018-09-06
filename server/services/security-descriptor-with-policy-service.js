@@ -53,12 +53,7 @@ function createForRoom(room, policy) {
   return new SecurityDescriptorWithPolicy(securityDescriptorService.room, room._id, room.sd, policy, room.groupId);
 }
 
-function createForForum(forum, policy) {
-  return new SecurityDescriptorWithPolicy(securityDescriptorService.forum, forum._id, forum.sd, policy, null);
-}
-
 module.exports = {
   createForGroup: createForGroup,
   createForRoom: createForRoom,
-  createForForum: createForForum
 };

@@ -73,16 +73,6 @@ function getGroupOptions(body) {
   return groupOptions;
 }
 
-function getForumOptions(body) {
-  var tags = validateStringArray(body.tags, "Tags must be strings.");
-  var categories = validateStringArray(body.categories, "Categories must be strings.");
-
-  return {
-    tags: tags,
-    categories: categories
-  };
-}
-
 
 module.exports = {
   id: 'group',
@@ -146,16 +136,9 @@ module.exports = {
   update: function(req) {
     var group = req.group;
     var user = req.user;
-    var userGroupPolicy = req.userGroupPolicy;
-
-    var groupWithPolicyService = new GroupWithPolicyService(group, user, userGroupPolicy);
 
     var promises = [];
-
-    if (req.body.forum) {
-      var forumOptions = getForumOptions(req.body.forum);
-      promises.push(groupWithPolicyService.createForum(forumOptions));
-    }
+    // Nothing to update on groups
 
     if (!promises.length) {
       throw new StatusError(400, 'Nothing to update.');
@@ -163,10 +146,6 @@ module.exports = {
 
     return Promise.all(promises)
       .then(function() {
-        // reload the group so we get the updated forumId, etc.
-        return groupService.findById(group._id, { lean: true });
-      })
-      .then(function(group) {
         var strategy = new restSerializer.GroupStrategy({
           currentUserId: user && user._id,
           currentUser: user

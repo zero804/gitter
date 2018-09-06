@@ -11,7 +11,6 @@ var PrimaryCollectionView = require('../primary-collection/primary-collection-vi
 var SecondaryCollectionView = require('../secondary-collection/secondary-collection-view');
 var TertiaryCollectionView = require('../tertiary-collection/tertiary-collection-view');
 var ProfileMenuView = require('../../../profile-menu/profile-menu-view');
-var TopicsAreaView = require('../topics-area/topics-area-view');
 var SearchInputView = require('../../../menu/room/search-input/search-input-view');
 var NeverEndingStory = require('../../../../utils/never-ending-story');
 var GroupBackControl = require('../group-back-control/group-back-control-view');
@@ -25,7 +24,6 @@ var PanelView = Marionette.LayoutView.extend({
     Isomorphic: {
       header:              { el: '#panel-header', init: 'initHeader' },
       groupBackControl:    { el: '#group-back-button', init: 'initGroupBackArea' },
-      topicsArea:          { el: '#left-menu-topics-area', init: 'initTopicsArea' },
       searchInput:         { el: '#search-input', init: 'initSearchInput' },
       favouriteCollection: { el: '#favourite-collection', init: 'initFavouriteCollection' },
       primaryCollection:   { el: '#primary-collection', init: 'initPrimaryCollection' },
@@ -50,13 +48,6 @@ var PanelView = Marionette.LayoutView.extend({
 
   initGroupBackArea: function(optionsForRegion){
     return new GroupBackControl(optionsForRegion({ model: this.model }));
-  },
-
-  initTopicsArea: function(optionsForRegion) {
-    return new TopicsAreaView(optionsForRegion({
-      model: this.model,
-      collection: this.model.forumCategoryCollection
-    }));
   },
 
   initSearchInput: function(optionsForRegion) {
@@ -135,7 +126,6 @@ var PanelView = Marionette.LayoutView.extend({
 
   ui: {
     profileMenu: '#profile-menu',
-    topicsArea: '#left-menu-topics-area'
   },
 
   events: {
@@ -159,7 +149,6 @@ var PanelView = Marionette.LayoutView.extend({
     this.listenTo(this.bus, 'ui:swipeleft', this.onSwipeLeft);
     this.listenTo(this.bus, 'focus.request.chat', this.onSearchItemSelected);
     this.listenTo(this.model, 'change:state', this.onModelChangeState);
-    this.listenTo(this.model.forumCategoryCollection, 'add remove reset', this.onForumCategoryCollectionChange);
     this.$el.find('#search-results').show();
   },
 
@@ -219,10 +208,6 @@ var PanelView = Marionette.LayoutView.extend({
     if(!this.neverendingstory) { return; }
     if(state !== 'search') { return this.neverendingstory.disable(); }
     return this.neverendingstory.enable();
-  },
-
-  onForumCategoryCollectionChange: function() {
-    toggleClass(this.ui.topicsArea[0], 'hidden', this.model.forumCategoryCollection.length === 0);
   },
 
   scrollBottom: _.debounce(function (){
