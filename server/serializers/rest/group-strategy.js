@@ -47,8 +47,7 @@ function GroupStrategy(options) {
       homeUri: group.homeUri,
       backedBy: securityDescriptorStrategy.map(group.sd),
       avatarUrl: avatars.getForGroup(group),
-      hasAvatarSet: hasAvatarSet,
-      forumId: group.forumId
+      hasAvatarSet: hasAvatarSet
     };
 
   };

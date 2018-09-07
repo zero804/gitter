@@ -72,7 +72,6 @@ data
 scripts/graphs/users.csv
 scripts/utils/output.txt
 scripts/utils/run.txt
-scripts/utils/forum-admin-map.json
 hostaliases
 config/redis-docker
 config/mongo-docker
@@ -94,15 +93,10 @@ scripts/graphs/*.dot
 scripts/graphs/*.gephi
 .devhttps.ca.crt
 .devhttps.ca.key
-modules/topics-ui/test/fixtures/build/*
-modules/topics-ui/test/build/*
 unread-notification.out.html
 .nyc_output
 .tern-port
 .tmp
-modules/topic-notifications/test/comment.html
-modules/topic-notifications/test/reply.html
-modules/topic-notifications/test/topic.html
 /.gtm/
 /scripts/useful-queries/*.csv
 /scripts/useful-queries/*.numbers

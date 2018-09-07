@@ -6,8 +6,6 @@ var statsd = env.createStatsClient({ prefix: nconf.get('stats:statsd:prefix')});
 var Promise = require('bluebird');
 var contextGenerator = require('../../../web/context-generator');
 var restful = require('../../../services/restful');
-var forumCategoryService = require('gitter-web-topics').forumCategoryService;
-var groupService = require('gitter-web-groups');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 var getSubResources = require('../sub-resources');
@@ -18,43 +16,19 @@ var getOldLeftMenuViewData = require('./get-old-left-menu-view-data');
 var getLeftMenuViewData = require('./get-left-menu-view-data');
 var generateUserThemeSnapshot = require('../../snapshots/user-theme-snapshot');
 
-function getLeftMenuForumGroupInfo(leftMenuGroupId) {
-  return groupService.findById(leftMenuGroupId, { lean: true })
-    .then(function(group) {
-      var forumId = group && group.forumId;
-
-      return Promise.props({
-        group: group,
-        forumCategories: forumId && forumCategoryService.findByForumId(forumId)
-      });
-    });
-}
-
 function getTroupeContextAndDerivedInfo(req, leftMenu, socialMetadataGenerator) {
   return contextGenerator.generateMainMenuContext(req, leftMenu)
     .bind({
       troupeContext: null,
       socialMetadata: null,
-      leftMenuGroup: null,
-      leftMenuGroupForumCategories: null
     })
     .then(function(troupeContext) {
       this.troupeContext = troupeContext;
 
-      var leftMenuGroupId = leftMenu.groupId;
-
-      return [
-        socialMetadataGenerator && socialMetadataGenerator(troupeContext),
-        leftMenuGroupId && getLeftMenuForumGroupInfo(leftMenuGroupId),
-      ];
+      return socialMetadataGenerator && socialMetadataGenerator(troupeContext);
     })
-    .spread(function(socialMetadata, leftMenuGroupInfo) {
+    .then(function(socialMetadata) {
       this.socialMetadata = socialMetadata;
-
-      if (leftMenuGroupInfo) {
-        this.leftMenuGroup = leftMenuGroupInfo.group;
-        this.leftMenuGroupForumCategories = leftMenuGroupInfo.forumCategories;
-      }
 
       return this;
     });
@@ -85,8 +59,6 @@ function renderMainFrame(req, res, next, options) {
     .spread(function(troupeContextAndDerivedInfo, rooms, groups, userThemeSnapshot) {
       var troupeContext = troupeContextAndDerivedInfo.troupeContext;
       var socialMetadata = troupeContextAndDerivedInfo.socialMetadata;
-      var leftMenuForumGroup = troupeContextAndDerivedInfo.leftMenuGroup;
-      var leftMenuForumGroupCategories = troupeContextAndDerivedInfo.leftMenuGroupForumCategories;
       var chatAppLocation = options.subFrameLocation;
 
       var template, bootScriptName;
@@ -117,9 +89,7 @@ function renderMainFrame(req, res, next, options) {
       troupeContext.snapshots = getMainFrameSnapshots({
         leftMenu: leftMenu,
         rooms: rooms,
-        groups: groups,
-        leftMenuForumGroup: leftMenuForumGroup,
-        leftMenuForumGroupCategories: leftMenuForumGroupCategories
+        groups: groups
       });
 
       // Generate `gitter.web.prerender-left-menu` events
@@ -133,9 +103,7 @@ function renderMainFrame(req, res, next, options) {
         leftMenu: getLeftMenuViewData({
           leftMenu: leftMenu,
           rooms: rooms,
-          groups: groups,
-          leftMenuForumGroup: leftMenuForumGroup,
-          leftMenuForumGroupCategories: leftMenuForumGroupCategories
+          groups: groups
         }),
         oldLeftMenu: getOldLeftMenuViewData({
           rooms: rooms

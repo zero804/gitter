@@ -35,7 +35,6 @@ var webpackConfig = {
 
     "mobile-native-userhome": path.resolve(path.join(__dirname, "./mobile-native-userhome")),
     "router-home-learn": path.resolve(path.join(__dirname, './router-home-learn')),
-    "topics-bootstrap": path.resolve(path.join(__dirname, './topics-bootstrap')),
 
     vendor: [
       require.resolve('./utils/webpack'),

@@ -17,9 +17,6 @@ function registerPartial(name) {
   handlebarsWrapper.handlebars.registerPartial(name, partialContent);
 }
 
-registerPartial('topic_html_email_header')
-registerPartial('topic_html_email_footer')
-
 var CACHED = { };
 function getCachedTemplate(templateName) {
   if(CACHED[templateName]) return CACHED[templateName];

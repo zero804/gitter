@@ -131,23 +131,6 @@
               </div>
             </section>
 
-            <div id="left-menu-topics-area" class="left-menu-topics-root {{#unless leftMenu.forum.hasCategories}}hidden{{/unless}}">
-              <div>
-                <h2 class="collection__title">
-                  Topics
-                </h2>
-
-                <div class="js-left-menu-topics-category-list-root">
-                  <ul class="collection-list">
-                    {{#each leftMenu.forum.categories}}
-                      <li data-id="{{id}}" id="{{id}}">
-                        {{{ prerenderView "js/views/menu/room/topics-area/category-item-view" }}}
-                      </li>
-                    {{/each}}
-                  </ul>
-                </div>
-              </div>
-            </div>
             <section id="secondary-collection" class="left-menu-collection"></section>
             <section id="tertiary-collection" class="left-menu-collection"></section>
           </div>

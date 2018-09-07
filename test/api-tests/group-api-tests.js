@@ -39,9 +39,6 @@ describe('group-api', function() {
         { lcUri: 'repo-group/lobby' },
         { lcUri: '_repo-group/lobby' },
       ],
-      Forum: [
-        { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME + '/topics' }
-      ]
     },
     user1: '#integrationUser1',
     user2: {
@@ -261,23 +258,6 @@ describe('group-api', function() {
         assert.strictEqual(descriptor.admins, 'GROUP_ADMIN');
         assert.strictEqual(descriptor.type, 'GROUP');
 
-      });
-  });
-
-  it('PUT /v1/groups/:groupId with forum: {...}', function() {
-    return request(app)
-      .put('/v1/groups/' + fixture.group1.id)
-      .send({
-        forum: {
-          tags: ['monkey', 'banana'],
-          categories: ['General', 'Announcements', 'FAQ']
-        }
-      })
-      .set('x-access-token', fixture.user1.accessToken)
-      .expect(200)
-      .then(function(result) {
-        var group = result.body;
-        assert.ok(group.forumId);
       });
   });
 

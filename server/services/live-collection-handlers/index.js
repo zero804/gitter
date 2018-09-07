@@ -14,12 +14,6 @@ var handlers = {
   users: './live-collection-users',
   userGroups: './live-collection-user-groups',
   groupMembers: './live-collection-group-members',
-
-  /* Topics */
-  topics: './live-collection-topics',
-  replies: './live-collection-replies',
-  comments: './live-collection-comments',
-  categories: './live-collection-categories',
 };
 
 module.exports = {

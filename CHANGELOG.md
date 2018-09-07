@@ -1,3 +1,8 @@
+# 19.19.0 - *upcoming*
+
+ - Remove Gitter Topics from the codebase, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1238
+
+
 # 19.18.0 - 2018-9-5
 
  - Add "Contribute to Gitter" item to profile menu

@@ -4,8 +4,6 @@
   "ext": "js json hbs",
   "ignore": [
     ".git",
-    "modules/topics-ui/containers/**",
-    "modules/topics-ui/output/**",
     "modules/api-client/lib/**",
     "modules/api-client/**",
     "modules/web-push/browser/**",

@@ -131,7 +131,6 @@ function createExtraUsers(expected, fixture, key) {
   var users = [];
 
   if (obj.user) {
-    // topics, replies and comments
     users.push(obj.user);
   }
 
@@ -185,7 +184,6 @@ function createExtraUsers(expected, fixture, key) {
     })
     .then(function() {
       // now try and fill in the ones specified at the top level
-      // (This applies to topics, replies and comments)
 
       var obj = expected[key];
       var user = obj.user;
@@ -215,7 +213,7 @@ function createUsers(expected, fixture) {
     // duplicate users before the ones above got saved and then they won't
     // link back to the same objects.
     return Promise.map(Object.keys(expected), function(key) {
-      if (key.match(/^(troupe|group|forum|topic|reply|comment)/)) {
+      if (key.match(/^(troupe|group)/)) {
         return createExtraUsers(expected, fixture, key);
       }
 

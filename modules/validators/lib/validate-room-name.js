@@ -7,7 +7,7 @@ function validateRoomName(name) {
   // must be defined and empty string not allowed
   if (!name) return false;
 
-  // prevent rooms called "topics" and stuff like that.
+  // prevent rooms called "archives"/"home" and stuff like that.
   if (reservedSubNamespaceHash[name.toLowerCase()]) {
     return false;
   }

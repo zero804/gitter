@@ -36,7 +36,7 @@ module.exports = (function() {
       return 'minibar.item';
     }
 
-    if(element.classList.contains('room-item__container') || element.classList.contains('js-left-menu-forum-category-item-link')) {
+    if(element.classList.contains('room-item__container')) {
       return 'room-list.item';
     }
 
