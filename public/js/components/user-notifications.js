@@ -1,5 +1,6 @@
 'use strict';
 
+const debug = require('debug-proxy')('app:user-notifications');
 var appEvents = require('../utils/appevents');
 var urlParser = require('../utils/url-parser');
 var sessionMutex = require('../utils/session-mutex');
@@ -50,6 +51,8 @@ function onNotificationMessageClicked(message) {
 }
 
 function onUserNotification(message) {
+  debug('onUserNotification', message);
+
   if (getDesktopNotificationAccess() !== 'granted') {
     // Show web notifications in each tab
     // Disabled inline notifications because they are sucky
@@ -70,6 +73,16 @@ function onUserNotification(message) {
 
 }
 
+
+function requestDesktopNotificationAccess() {
+  if (!WindowNotification) return;
+  if (getDesktopNotificationAccess() === 'granted') return;
+
+  WindowNotification.requestPermission(function() {
+  });
+}
+
+
 function initUserNotifications() {
   //subscribe to notifications
   appEvents.on('user_notification', onUserNotification);
@@ -88,27 +101,19 @@ function initUserNotifications() {
       }
     });
   });
-}
 
-initUserNotifications();
-
-function requestDesktopNotificationAccess() {
-  if (!WindowNotification) return;
-  if (getDesktopNotificationAccess() === 'granted') return;
-
-  WindowNotification.requestPermission(function() {
+  onReady(function() {
+    // We don't show any notifications if you aren't logged in
+    // so we might as well not bother those people
+    if (context.isLoggedIn()) {
+      requestDesktopNotificationAccess();
+    }
   });
 }
 
-onReady(function() {
-  // We don't show any notifications if you aren't logged in
-  // so we might as well not bother those people
-  if (context.isLoggedIn()) {
-    requestDesktopNotificationAccess();
-  }
-});
 
 module.exports = {
+  initUserNotifications: initUserNotifications,
   requestAccess: requestDesktopNotificationAccess,
   isAccessDenied: function() {
     return getDesktopNotificationAccess() === 'denied';

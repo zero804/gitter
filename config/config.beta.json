@@ -165,9 +165,6 @@
   },
   "transloadit": {
   },
-  "diagnostics": {
-    "heapdump": true
-  },
   "errorReporting": {
     "enabled": true
   },

@@ -148,9 +148,6 @@
   },
   "transloadit": {
   },
-  "diagnostics": {
-    "heapdump": false
-  },
   "serializer": {
     "warning-period": 300
   },

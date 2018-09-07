@@ -65,16 +65,3 @@ if(!process.env.NODEMON && process.env.NODE_ENV !== 'dev') {
 if (process.env.NODE_ENV === 'dev') {
   process.traceDeprecation = true;
 }
-
-if(nconf.get('diagnostics:heapdump')) {
-  var memwatch = require('memwatch-next');
-  memwatch.on('leak', function(info) {
-    winston.warn('memwatch: leak: ' + info.reason);
-  });
-
-  memwatch.on('stats', function(stats) {
-    if(stats && stats.usage_trend) {
-      winston.info('memwatch: stats: ', stats);
-    }
-  });
-}
