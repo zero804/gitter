@@ -1,6 +1,9 @@
-# 19.19.0 - *upcoming*
+# 19.19.0 - 2018-9-10
 
  - Remove Gitter Topics from the codebase, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1238
+
+Developer facing:
+
  - Remove orphaned `.js` files, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1239
 
 
