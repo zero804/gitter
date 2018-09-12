@@ -20,10 +20,6 @@ var roomMembershipService = require('gitter-web-rooms/lib/room-membership-servic
 var orgService = require("./org-service");
 var repoService = require("./repo-service");
 var userScopes = require('gitter-web-identity/lib/user-scopes');
-var topicService = require('gitter-web-topics/lib/topic-service');
-var replyService = require('gitter-web-topics/lib/reply-service');
-var commentService = require('gitter-web-topics/lib/comment-service');
-var forumCategoryService = require('gitter-web-topics/lib/forum-category-service');
 
 var survivalMode = !!process.env.SURVIVAL_MODE || false;
 
@@ -282,50 +278,6 @@ function serializeRoomsForGroupId(groupId, userId) {
     });
 }
 
-function serializeTopicsForForumId(forumId, userId, options) {
-  // TODO: return a sample set, not all of them
-  return topicService.findByForumId(forumId, options)
-    .then(function(topics) {
-      var strategy = restSerializer.TopicStrategy.nested({
-        currentUserId: userId
-      });
-
-      return restSerializer.serialize(topics, strategy);
-    });
-}
-
-function serializeRepliesForTopicId(topicId, userId) {
-  // TODO: return a sample set, not all of them
-  return replyService.findByTopicId(topicId)
-    .then(function(replies) {
-      var strategy = restSerializer.ReplyStrategy.nested({
-        currentUserId: userId
-      });
-
-      return restSerializer.serialize(replies, strategy);
-    });
-}
-
-function serializeCommentsForReplyId(replyId, userId) {
-  // TODO: don't just return all the comments, return a sample
-  return commentService.findByReplyId(replyId)
-    .then(function(comments) {
-      var strategy = restSerializer.CommentStrategy.standard({
-        currentUserId: userId
-      });
-
-      return restSerializer.serialize(comments, strategy);
-    });
-}
-
-function serializeCategoriesForForumId(forumId) {
-  return forumCategoryService.findByForumId(forumId)
-    .then(function(categories) {
-      var strategy = new restSerializer.ForumCategoryStrategy();
-      return restSerializer.serialize(categories, strategy);
-    });
-}
-
 module.exports = {
   serializeTroupesForUser: serializeTroupesForUser,
   serializeChatsForTroupe: serializeChatsForTroupe,
@@ -343,8 +295,4 @@ module.exports = {
   serializeGroupsForUserId: Promise.method(serializeGroupsForUserId),
   serializeAdminGroupsForUser: Promise.method(serializeAdminGroupsForUser),
   serializeRoomsForGroupId: serializeRoomsForGroupId,
-  serializeTopicsForForumId: serializeTopicsForForumId,
-  serializeRepliesForTopicId: serializeRepliesForTopicId,
-  serializeCommentsForReplyId: serializeCommentsForReplyId,
-  serializeCategoriesForForumId: serializeCategoriesForForumId
 }

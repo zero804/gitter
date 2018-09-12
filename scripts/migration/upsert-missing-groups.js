@@ -167,7 +167,7 @@ function migrate(batch, enc, callback) {
       // upsert the lcOwner into group
       var query = { lcUri: lcOwner };
       return mongooseUtils.upsert(persistence.Group, query, {
-          // only set on insert because we don't want to override name or forumId
+          // only set on insert because we don't want to override name
           // or anything like that
           $setOnInsert: {
             name: info.owner.uri,

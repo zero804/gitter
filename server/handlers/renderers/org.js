@@ -6,7 +6,6 @@ var Promise = require('bluebird');
 var StatusError = require('statuserror');
 var avatars = require('gitter-web-avatars');
 var fonts = require('../../web/fonts');
-var getTopicsFilterSortOptions = require('gitter-web-topics/lib/get-topics-filter-sort-options');
 var restSerializer = require('../../serializers/rest-serializer');
 
 var contextGenerator = require('../../web/context-generator');
@@ -14,7 +13,6 @@ var generateRoomCardContext = require('gitter-web-shared/templates/partials/room
 var userService = require('gitter-web-users');
 var groupBrowserService = require('gitter-web-groups/lib/group-browser-service');
 var roomMembershipService = require('gitter-web-rooms/lib/room-membership-service');
-var forumService = require('gitter-web-topics/lib/forum-service');
 var generateUserThemeSnapshot = require('../snapshots/user-theme-snapshot');
 
 var ROOMS_PER_PAGE = 15;
@@ -108,33 +106,6 @@ function getRoomsWithMembership(groupId, user, currentPage) {
     });
 }
 
-function getForumForGroup(groupUri, forumId, userId) {
-  return forumService.findById(forumId)
-    .then(function(forum) {
-      var strategy = restSerializer.ForumStrategy.nested({
-        groupUri: groupUri,
-        currentUserId: userId,
-        topicsFilterSort: getTopicsFilterSortOptions({
-          // TODO: Use a filter for created within the last week
-          sort: '-likesTotal',
-          limit: 3
-        })
-      });
-
-      return restSerializer.serializeObject(forum, strategy);
-    })
-    .then(function(serializedForum) {
-      if(serializedForum && serializedForum.topics) {
-        serializedForum.topics = serializedForum.topics.map(function(topic) {
-          topic.url = clientEnv.basePath + '/' + groupUri + '/topics/topic/' + topic.id + '/' + topic.slug;
-          return topic;
-        });
-      }
-
-      return serializedForum;
-    })
-}
-
 function renderOrgPage(req, res, next) {
   return Promise.try(function() {
     var group = req.group || req.uriContext.group;
@@ -148,11 +119,10 @@ function renderOrgPage(req, res, next) {
     return Promise.join(
       serializeGroup(group, user),
       getRoomsWithMembership(groupId, user, currentPage),
-      getForumForGroup(group.uri, group.forumId, user && user.id),
       contextGenerator.generateBasicContext(req),
       policy.canAdmin(),
       generateUserThemeSnapshot(req),
-      function(serializedGroup, roomBrowseResult, serializedForum, troupeContext, isOrgAdmin, userThemeSnapshot) {
+      function(serializedGroup, roomBrowseResult, troupeContext, isOrgAdmin, userThemeSnapshot) {
         var isStaff = req.user && req.user.staff;
         var editAccess = isOrgAdmin || isStaff;
         var orgUserCount = roomBrowseResult.totalUsers;
@@ -183,9 +153,6 @@ function renderOrgPage(req, res, next) {
           '&related=gitchat' +
           '&via=gitchat';
 
-        var topicsUrl = clientEnv.basePath + '/' + serializedGroup.uri + '/topics';
-        var createTopicUrl = clientEnv.basePath + '/' + serializedGroup.uri + '/topics/create-topic';
-
         res.render('org-page', {
           hasDarkTheme: userThemeSnapshot.theme === 'gitter-dark',
           hasCachedFonts: fonts.hasCachedFonts(req.cookies),
@@ -198,9 +165,6 @@ function renderOrgPage(req, res, next) {
           orgUserCount: orgUserCount,
           group: serializedGroup,
           rooms: rooms,
-          forum: serializedForum,
-          topicsUrl: topicsUrl,
-          createTopicUrl: createTopicUrl,
           troupeContext: troupeContext,
           pagination: {
             page: currentPage,

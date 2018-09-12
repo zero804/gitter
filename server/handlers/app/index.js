@@ -9,7 +9,6 @@ var featureToggles = require('../../web/middlewares/feature-toggles');
 var archive = require('./archive');
 var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
 var redirectErrorMiddleware = require('../uri-context/redirect-error-middleware');
-var topicRouter = require('./topics');
 var selectRenderer = require('./select-renderer');
 var desktopRenderer = require('../renderers/desktop-renderer');
 var embedRenderer = require('../renderers/embed-renderer');
@@ -92,10 +91,6 @@ var cardMiddlewarePipeline = [
 ];
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
-
-// Topics
-// TODO: Fix this and make it use the uriContext
-router.use('/:groupUri/topics', topicRouter);
 
 [
   '/:roomPart1',

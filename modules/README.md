@@ -44,12 +44,6 @@
 * [`templates`](./templates): Backend: Handlebars Template Utilities
 * [`test-utils`](./test-utils): Testing: Test Helpers and Fixture Generators
 * [`text-processor`](./text-processor): Backend: Markdown Processor
-* [`topic-models`](./topic-models): Backend: Topic Common Models
-* [`topic-notifications`](./topic-notifications): Backend: Topic Notifications
-* [`topic-reactions`](./topic-reactions): Backend: Topic Reactions
-* [`topic-serialization`](./topic-serialization): Backend: Topic Serializers
-* [`topics`](./topics): Backend: Topics
-* [`topics-ui`](./topics-ui): Frontend: Topics User-Interface
 * [`twitter`](./twitter): Backend: Twitter Utilities
 * [`twitter-backend`](./twitter-backend): Backend: Muxer Twitter Backend
 * [`uri-resolver`](./uri-resolver): Backend: URI resolution

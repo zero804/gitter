@@ -1,7 +1,5 @@
 "use strict";
 
-var env = require('gitter-web-env');
-var config = env.config;
 var liveCollections = require('gitter-web-live-collection-events');
 
 exports.install = function(persistenceService) {
@@ -81,84 +79,4 @@ exports.install = function(persistenceService) {
       liveCollections.rooms.emit('remove', model);
     }
   });
-
-  /**
-   * Topics
-   */
-  mongooseUtils.attachNotificationListenersToSchema(schemas.TopicSchema, {
-    onCreate: function(model, next) {
-      liveCollections.topics.emit("create", model);
-      next();
-    },
-
-    onUpdate: function(model, next) {
-      liveCollections.topics.emit('update', model);
-      next();
-    },
-
-    onRemove: function(model) {
-      liveCollections.topics.emit("remove", model);
-    }
-  });
-
-  /**
-   * Replies
-   */
-  mongooseUtils.attachNotificationListenersToSchema(schemas.ReplySchema, {
-    onCreate: function(model, next) {
-      liveCollections.replies.emit("create", model);
-      next();
-    },
-
-    onUpdate: function(model, next) {
-      liveCollections.replies.emit('update', model);
-      next();
-    },
-
-    onRemove: function(model) {
-      liveCollections.replies.emit("remove", model);
-    }
-  });
-
-  /**
-   * Comments
-   */
-  mongooseUtils.attachNotificationListenersToSchema(schemas.CommentSchema, {
-    onCreate: function(model, next) {
-      liveCollections.comments.emit("create", model);
-      next();
-    },
-
-    onUpdate: function(model, next) {
-      liveCollections.comments.emit('update', model);
-      next();
-    },
-
-    onRemove: function(model) {
-      liveCollections.comments.emit("remove", model);
-    }
-  });
-
-  /**
-   * Categories
-   */
-  mongooseUtils.attachNotificationListenersToSchema(schemas.ForumCategorySchema, {
-    // NOTE: this one is not actually used due to the fact that adding a
-    // category goes via an upsert. So we fire the event manually.
-    onCreate: function(model, next) {
-      liveCollections.categories.emit("create", model);
-      next();
-    },
-
-    onUpdate: function(model, next) {
-      liveCollections.categories.emit('update', model);
-      next();
-    },
-
-    onRemove: function(model) {
-      liveCollections.categories.emit("remove", model);
-    }
-  });
-
-
 };

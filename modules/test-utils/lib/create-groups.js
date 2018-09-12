@@ -23,7 +23,6 @@ function createGroup(fixtureName, f) {
     }
   }
 
-  var forumId = f.forum && f.forum._id;
   var homeUri = f.homeUri || uri;
   var lcHomeUri = homeUri.toLowerCase();
 
@@ -34,7 +33,6 @@ function createGroup(fixtureName, f) {
     avatarUrl: f.avatarUrl || null,
     avatarVersion: avatarVersion,
     avatarCheckedDate: f.avatarCheckedDate,
-    forumId: forumId,
     homeUri: homeUri,
     lcHomeUri: lcHomeUri
   };

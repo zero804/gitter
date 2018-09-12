@@ -1,7 +1,0 @@
-import { {{constantCase name}} } from '../../constants/{{constantFile}}';
-
-export default function {{camelCase name}}() {
-  return {
-    type: {{constantCase name}}
-  };
-}

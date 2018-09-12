@@ -235,5 +235,4 @@ SecurityDescriptorService.prototype.update = function(id, update, options) {
 module.exports = {
   room: new SecurityDescriptorService(persistence.Troupe),
   group: new SecurityDescriptorService(persistence.Group),
-  forum: new SecurityDescriptorService(persistence.Forum),
 }
