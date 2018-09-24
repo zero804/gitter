@@ -1,3 +1,8 @@
+# 19.21.0 - *upcoming*
+
+ - Update `@gitterhq/services` dependency with Heroku fixes, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1244
+
+
 # 19.20.0 - 2018-9-18
 
  - Fix null pointer exception -> 500 status error with empty markdown links, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1241
