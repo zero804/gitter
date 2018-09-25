@@ -49,7 +49,7 @@ function removeItem(fromUserId, troupe, chat) {
   return createDistribution(fromUserId, troupe, chat.mentions)
     .bind({
       distribution: null,
-      chatId: chat.id,
+      chatId: chat.id || chat._id,
       troupeId: troupe.id
     })
     .then(function(distribution) {
