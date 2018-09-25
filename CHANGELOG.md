@@ -5,6 +5,7 @@
  Developer facing:
 
   - Gitter iOS app is now open-source, https://gitlab.com/gitlab-org/gitter/gitter-ios-app
+  - Fix `unread-remove-deleted-messages` script so it actually removes stuck unreads, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1245
 
 
 # 19.20.0 - 2018-9-18
