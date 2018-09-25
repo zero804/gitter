@@ -2,6 +2,10 @@
 
  - Update `@gitterhq/services` dependency with Heroku fixes, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1244
 
+ Developer facing:
+
+  - Gitter iOS app is now open-source, https://gitlab.com/gitlab-org/gitter/gitter-ios-app
+
 
 # 19.20.0 - 2018-9-18
 
