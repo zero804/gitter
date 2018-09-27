@@ -49,7 +49,7 @@ function removeItem(fromUserId, troupe, chat) {
   return createDistribution(fromUserId, troupe, chat.mentions)
     .bind({
       distribution: null,
-      chatId: chat.id,
+      chatId: chat.id || chat._id,
       troupeId: troupe.id
     })
     .then(function(distribution) {
@@ -92,8 +92,6 @@ function removeItem(fromUserId, troupe, chat) {
 
 }
 
-exports.removeItem = Promise.method(removeItem);
-
 /*
   This ensures that if all else fails, we clear out the unread items
   It should only have any effect when data is inconsistent
@@ -120,21 +118,19 @@ var ensureAllItemsRead = Promise.method(function(userId, troupeId) {
     });
 });
 
-exports.ensureAllItemsRead = ensureAllItemsRead;
-
 /**
  * Returns a hash of hash {user:troupe:ids} of users who have
  * outstanding notifications since before the specified time
  * @return a promise of hash
  */
-exports.listTroupeUsersForEmailNotifications = function(horizonTime, emailLatchExpiryTimeS) {
+function listTroupeUsersForEmailNotifications(horizonTime, emailLatchExpiryTimeS) {
   return engine.listTroupeUsersForEmailNotifications(horizonTime, emailLatchExpiryTimeS);
-};
+}
 
 /**
  * Mark many items as read, for a single user and troupe
  */
-exports.markItemsRead = Promise.method(function markItemsRead(userId, troupeId, itemIds, options) {
+function markItemsRead(userId, troupeId, itemIds, options) {
   if(!userId) throw new Error("userId required");
   if(!troupeId) throw new Error("troupeId required");
 
@@ -169,17 +165,16 @@ exports.markItemsRead = Promise.method(function markItemsRead(userId, troupeId, 
       }
 
     });
+}
 
-});
-
-exports.markAllChatsRead = Promise.method(function(userId, troupeId, options) {
+function markAllChatsRead(userId, troupeId, options) {
   if(!mongoUtils.isLikeObjectId(userId)) throw new Error('userId must be a mongoid');
   if(!mongoUtils.isLikeObjectId(troupeId)) throw new Error('troupeId must be a mongoid');
 
   if(!options) options = {};
   appEvents.markAllRead({ userId: userId, troupeId: troupeId });
 
-  return exports.getUnreadItems(userId, troupeId)
+  return getUnreadItems(userId, troupeId)
     .then(function(chatIds) {
       /* If we already have everything marked as read, force all read */
       if(!chatIds.length) return ensureAllItemsRead(userId, troupeId, options);
@@ -189,27 +184,27 @@ exports.markAllChatsRead = Promise.method(function(userId, troupeId, options) {
       options.markAllRead = true; // Don't send individual item read events
 
       /* Don't mark the items as read */
-      return exports.markItemsRead(userId, troupeId, chatIds, options);
+      return markItemsRead(userId, troupeId, chatIds, options);
     });
-});
+}
 
-exports.getUserUnreadCountsForTroupeIds = function(userId, troupeIds) {
+function getUserUnreadCountsForTroupeIds(userId, troupeIds) {
   return engine.getUserUnreadCountsForRooms(userId, troupeIds);
-};
+}
 
-exports.getUnreadItems = function(userId, troupeId) {
+function getUnreadItems(userId, troupeId) {
   return engine.getUnreadItems(userId, troupeId);
-};
+}
 
-exports.getAllUnreadItemCounts = function(userId) {
+function getAllUnreadItemCounts(userId) {
   return engine.getAllUnreadItemCounts(userId);
-};
+}
 
-exports.getRoomIdsMentioningUser = function(userId) {
+function getRoomIdsMentioningUser(userId) {
   return engine.getRoomsMentioningUser(userId);
-};
+}
 
-exports.getFirstUnreadItem = function(userId, troupeId) {
+function getFirstUnreadItem(userId, troupeId) {
   return engine.getUnreadItems(userId, troupeId)
     .then(function(members) {
       return getOldestId(members);
@@ -218,9 +213,9 @@ exports.getFirstUnreadItem = function(userId, troupeId) {
       logger.warn("unreadItemService.getUnreadItems failed: " + err, { exception: err });
       return null;
     });
-};
+}
 
-exports.getUnreadItemsForUser = function(userId, troupeId) {
+function getUnreadItemsForUser(userId, troupeId) {
   return engine.getUnreadItemsAndMentions(userId, troupeId)
     .spread(function(chats, mentions) {
       return {
@@ -228,10 +223,10 @@ exports.getUnreadItemsForUser = function(userId, troupeId) {
         mention: mentions
       };
     });
-};
+}
 
 /* Get unread items and mentions for a user since a particular date */
-exports.getUnreadItemsForUserTroupeSince = function(userId, troupeId, since) {
+function getUnreadItemsForUserTroupeSince(userId, troupeId, since) {
   return engine.getUnreadItemsAndMentions(userId, troupeId)
     .spread(function(chats, mentions) {
 
@@ -240,17 +235,17 @@ exports.getUnreadItemsForUserTroupeSince = function(userId, troupeId, since) {
         mentions.filter(sinceFilter(since))
       ];
     });
-};
+}
 
 
 /**
  * Get the badge counts for userIds
  * @return promise of a hash { userId1: 1, userId: 2, etc }
  */
-exports.getBadgeCountsForUserIds = function(userIds, callback) {
+function getBadgeCountsForUserIds(userIds, callback) {
   return engine.getBadgeCountsForUserIds(userIds)
     .nodeify(callback);
-};
+}
 
 function getOldestId(ids) {
   if(!ids.length) return null;
@@ -345,7 +340,6 @@ function createChatUnreadItems(fromUserId, troupe, chat) {
         });
     });
 }
-exports.createChatUnreadItems = createChatUnreadItems;
 
 function removeMentionsForUpdatedChat(troupeId, chatId, removeUserIds) {
   return engine.removeItem(troupeId, chatId, removeUserIds)
@@ -402,7 +396,6 @@ function updateChatUnreadItems(fromUserId, troupe, chat, originalMentions) {
         });
     });
 }
-exports.updateChatUnreadItems = updateChatUnreadItems;
 
 var sendBadgeUpdates = true;
 function queueBadgeUpdateForUser(userIds) {
@@ -412,7 +405,7 @@ function queueBadgeUpdateForUser(userIds) {
   badgeBatcher.add('queue', userIds);
 }
 
-exports.getActivityIndicatorForTroupeIds = function(troupeIds, userId) {
+function getActivityIndicatorForTroupeIds(troupeIds, userId) {
   return Promise.join(
     recentRoomCore.getTroupeLastAccessTimesForUser(userId),
     engine.getLastChatTimestamps(troupeIds),
@@ -438,14 +431,14 @@ exports.getActivityIndicatorForTroupeIds = function(troupeIds, userId) {
 
       return activity;
   });
-};
+}
 
 
-exports.listen = function() {
+function listen() {
   badgeBatcher.listen();
-};
+}
 
-exports.testOnly = {
+const testOnly = {
   setSendBadgeUpdates: function(value) {
     sendBadgeUpdates = value;
   },
@@ -454,3 +447,25 @@ exports.testOnly = {
   getTroupeIdsCausingBadgeCount: getTroupeIdsCausingBadgeCount,
   processResultsForNewItemWithMentions: processResultsForNewItemWithMentions
 };
+
+
+module.exports = {
+  removeItem: Promise.method(removeItem),
+  ensureAllItemsRead,
+  listTroupeUsersForEmailNotifications,
+  markItemsRead: Promise.method(markItemsRead),
+  markAllChatsRead: Promise.method(markAllChatsRead),
+  getUserUnreadCountsForTroupeIds,
+  getUnreadItems,
+  getAllUnreadItemCounts,
+  getRoomIdsMentioningUser,
+  getFirstUnreadItem,
+  getUnreadItemsForUser,
+  getUnreadItemsForUserTroupeSince,
+  getBadgeCountsForUserIds,
+  createChatUnreadItems,
+  updateChatUnreadItems,
+  getActivityIndicatorForTroupeIds,
+  listen,
+  testOnly
+}
