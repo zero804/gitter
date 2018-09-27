@@ -1,4 +1,4 @@
-# 19.21.0 - *upcoming*
+# 19.21.0 - 2018-9-27
 
  - Update `@gitterhq/services` dependency with Heroku fixes, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1244
 
