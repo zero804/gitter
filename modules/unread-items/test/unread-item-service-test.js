@@ -250,6 +250,58 @@ describe('unread-item-service', function() {
           });
 
       });
+
+      it('should remove an item from the unread-item-store with lean objects passed', function() {
+        var troupeId1 = mongoUtils.getNewObjectIdString();
+        var chatId = mongoUtils.getNewObjectIdString();
+        var userId1 = mongoUtils.getNewObjectIdString();
+        var userId2 = mongoUtils.getNewObjectIdString();
+        var userId3 = mongoUtils.getNewObjectIdString();
+
+        var appEvents = mockito.spy(require('gitter-web-appevents'));
+
+        var createDistribution = mockito.mockFunction();
+
+        mockito.when(createDistribution)().then(function() {
+          return Promise.resolve(new Distribution({
+            membersWithFlags: [
+              { userId: userId2, flags: MODES.all },
+              { userId: userId3, flags: MODES.all },
+            ],
+            presence: makeHash(userId2, 'online', userId3, 'online')
+          }));
+        });
+
+        var unreadItemService = proxyquireNoCallThru("../", {
+          'gitter-web-appevents': appEvents,
+          './create-distribution': createDistribution
+        });
+        unreadItemService.testOnly.setSendBadgeUpdates(false);
+
+        var leanTroupe = {
+          _id: troupeId1
+        };
+
+        var leanChat = {
+          _id: chatId,
+          mentions: []
+        }
+
+        return unreadItemService.removeItem(userId1, leanTroupe, leanChat)
+          .then(function() {
+            // Two calls here, not three
+            mockito.verify(appEvents, once).unreadItemsRemoved(userId2, troupeId1);
+            mockito.verify(appEvents, once).unreadItemsRemoved(userId3, troupeId1);
+
+            return unreadItemService.getBadgeCountsForUserIds([userId1, userId2, userId3]);
+          })
+          .then(function(result) {
+            assert.equal(result[userId1], 0);
+            assert.equal(result[userId2], 0);
+            assert.equal(result[userId3], 0);
+          });
+
+      });
     });
 
     describe('createChatUnreadItems', function() {

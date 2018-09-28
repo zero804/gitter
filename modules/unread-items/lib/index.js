@@ -50,7 +50,7 @@ function removeItem(fromUserId, troupe, chat) {
     .bind({
       distribution: null,
       chatId: chat.id || chat._id,
-      troupeId: troupe.id
+      troupeId: troupe.id || troupe._id,
     })
     .then(function(distribution) {
       this.distribution = distribution;
