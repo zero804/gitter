@@ -27,56 +27,74 @@ var opts = require('yargs')
   .alias('help', 'h')
   .argv;
 
-function main(uri, dryRun) {
-  return troupeService.findByUri(uri)
-    .then(function(room) {
-      return [room, roomMembershipService.findMembersForRoom(room._id)];
-    })
-    .spread(function(room, userIds) {
-      console.log('QUERYING unread items for ', userIds.length, 'users');
-      var allUnread = {};
+async function main(uri, dryRun) {
+  const room = await troupeService.findByUri(uri);
+  const userIds = await roomMembershipService.findMembersForRoom(room._id);
 
-      return Promise.map(userIds, function(userId) {
-        return unreadItemService.getUnreadItems(userId, room._id)
-          .then(function(items) {
-            items.forEach(function(chatId) {
-              allUnread[chatId] = true;
-            });
-          })
-      }, { concurrency: 5 })
-      .then(function() {
-        return [room, allUnread];
-      });
-    })
-    .spread(function(room, allUnreadHash) {
-      var ids = mongoUtils.asObjectIDs(Object.keys(allUnreadHash));
-      console.log('SEARCHING FOR ', ids.length, 'chat messages');
-      return persistence.ChatMessage.find({ _id: { $in: ids }}, { _id: 1})
-        .lean(true)
-        .exec()
-        .then(function(chats) {
-          var chatMap = {};
-          chats.forEach(function(chat) {
-            chatMap[chat.id] = chat;
-            delete allUnreadHash[chat._id.toString()];
-          });
-          var missingIds = Object.keys(allUnreadHash);
-          console.log('MISSING: ', missingIds);
-
-          if (dryRun || !missingIds.length) return;
-
-          return Promise.map(missingIds, function(itemId) {
-            console.log('REMOVING ', itemId);
-            // Remove the items, slowly
-            return unreadItemService.removeItem(chatMap[itemId].fromUserId, room, itemId)
-              .delay(10);
-          }, { concurrency: 1 });
+  console.log('QUERYING unread items for ', userIds.length, 'users');
+  var allUnread = {};
+  await Promise.map(userIds, function(userId) {
+    return unreadItemService.getUnreadItems(userId, room._id)
+      .then(function(items) {
+        items.forEach(function(chatId) {
+          allUnread[chatId] = true;
         });
-    });
+      })
+  }, { concurrency: 5 });
 
+  var ids = mongoUtils.asObjectIDs(Object.keys(allUnread));
+  console.log('SEARCHING FOR ', ids.length, 'chat messages');
+
+  const chatMap = {};
+  const missingUnreads = Object.assign({}, allUnread);
+
+  await Promise.all([
+    // Find which messages actually exist
+    persistence.ChatMessage.find({ _id: { $in: ids }})
+      .lean(true)
+      .exec()
+      .then(function(chats) {
+        chats.forEach(function(chat) {
+          chatMap[chat._id.toString()] = chat;
+          // Since the message exists, remove it from our tracking list
+          delete missingUnreads[chat._id.toString()];
+        });
+      }),
+
+    // Populate our map with information for deleted messages
+    persistence.ChatMessageBackup.find({ _id: { $in: ids }})
+      .lean(true)
+      .exec()
+      .then(function(chats) {
+        chats.forEach(function(chat) {
+          chatMap[chat._id.toString()] = chat;
+        });
+      })
+  ]);
+
+  var missingIds = Object.keys(missingUnreads);
+  console.log(`MISSING ${missingIds.length} chatmessages that appeared in unreads: `, missingIds);
+
+  if (dryRun) {
+    console.log('Dry-run, nothing deleted');
+    return;
+  }
+
+  if(!missingIds.length) {
+    console.log('Nothing missing...');
+    return;
+  }
+
+  return Promise.map(missingIds, function(itemId) {
+    console.log('REMOVING ', itemId);
+
+    // Remove the items, slowly
+    return unreadItemService.removeItem(chatMap[itemId].fromUserId, room, chatMap[itemId])
+      .delay(10);
+  }, { concurrency: 1 });
 }
 
-main(opts.uri, opts.dryRun)
+Promise.resolve(main(opts.uri, opts.dryRun))
   .delay(1000)
   .catch(function(err) {
     console.error(err.stack);
