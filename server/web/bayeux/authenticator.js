@@ -89,8 +89,7 @@ module.exports = bayeuxExtension({
         var userId = user && user.id;
 
         if(user && oauthClient) {
-          const userAgent = req.headers && req.headers['user-agent'];
-          clientUsageStats.record(user, oauthClient, userAgent);
+          clientUsageStats.record(user, oauthClient, req);
         }
 
         debug('bayeux: handshake. appVersion=%s, username=%s, client=%s', ext.appVersion, user && user.username, oauthClient.name);
