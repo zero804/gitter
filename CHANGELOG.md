@@ -3,7 +3,7 @@
 Developer facing:
 
  - Fix `unreadItemService.removeItem` not working with lean objects causing stuck unreads, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1247
-
+ - Correlate client access stat with segmentable user-agent, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1248
 
 # 19.21.0 - 2018-9-27
 

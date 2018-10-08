@@ -7,8 +7,7 @@ module.exports = function(req, res, next) {
   var client = req.authInfo && req.authInfo.client;
 
   if(user && client) {
-    const userAgent = req.headers && req.headers['user-agent'];
-    clientUsageStats.record(user, client, userAgent);
+    clientUsageStats.record(user, client, req);
   }
 
   next();
