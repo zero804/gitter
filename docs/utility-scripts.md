@@ -24,6 +24,11 @@ Also see https://gitlab.com/gl-infra/gitter-infrastructure#ssh-to-boxes
 See https://gitlab.com/gl-infra/gitter-infrastructure#configure-secrets
 
 
+## Spam on Gitter (fighting abuse)
+
+See https://gitlab.com/gitlab-com/gl-security/runbooks/blob/master/gitter_spam.md
+
+
 ## Utility scripts
 
 **IMPORTANT:** Adjust the `NODE_ENV=prod` environment variable to the desired environment, `prod`, `beta`, `dev`
