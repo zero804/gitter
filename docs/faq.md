@@ -134,3 +134,8 @@ There's a convenient little toggle on the Gitter menu of your application to tur
 **Gitter** menu bar dropdown in the top-left -> **Use Gitter Next**
 
 ![](https://i.imgur.com/YXtPn4N.png)
+
+
+## No notifications on mobile (Android, iOS)
+
+See [Notifications](./notifications.md#no-notifications-on-mobile-android-ios)
