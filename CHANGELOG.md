@@ -1,3 +1,8 @@
+# 19.23.0 - *upcoming*
+
+ - Add docs about notifications not happening on mobile (Android, iOS), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1254
+
+
 # 19.22.0 - 2018-10-29
 
 Developer facing:

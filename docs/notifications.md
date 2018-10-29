@@ -38,6 +38,15 @@ You can instead use browser desktop notifications by allowing the browser permis
 ![](http://i.imgur.com/Mpttpxs.png) ![](https://i.imgur.com/YVqInos.png)
  
 
+## Mobile notifications
+
+### No notifications on mobile (Android, iOS)
+
+When you have a Gitter instance open on a desktop/browser, we don't send a notification to your mobile device to avoid double-buzzing.
+
+We understand this can be unexpected and undesirable, you can track, https://gitlab.com/gitlab-org/gitter/webapp/issues/1846
+
+
 ## Emails
 
 You can toggle email notifications on and off in the "Configure Defaults" section of the notification modal. There is also an unsubscribe link at the bottom each notification email that does the same thing.
