@@ -2,6 +2,11 @@
 
  - Add docs about notifications not happening on mobile (Android, iOS), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1254
 
+Developer Facing:
+
+ - Link to Gitter spam runbook doc, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1255
+    - Thanks to [@rostrander](https://gitlab.com/rostrander) for creating the runbook
+
 
 # 19.22.0 - 2018-10-29
 
