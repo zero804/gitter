@@ -1,6 +1,7 @@
 # 19.23.0 - *upcoming*
 
  - Add docs about notifications not happening on mobile (Android, iOS), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1254
+ - Add docs about how to change room security after creation (public/private), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1256
 
 Developer Facing:
 

@@ -52,6 +52,11 @@ See [Accounts](./accounts.md#how-do-i-update-my-avatar)
 See ["Private Repositories" on the OAuth scopes page](./oauth-scopes.md#private-repositories)
 
 
+## How do I change my room from public to private?
+
+See [Rooms](./rooms.md#change-room-security-after-creation)
+
+
 ## Why isn't my GitHub organisation or repos appearing?
 
 The first thing to check is [adding private repo access OAuth scope](./oauth-scopes.md#private-repositories) in order to see a private GitHub repo.
