@@ -4,6 +4,7 @@ var dolph = require('dolph');
 var env = require('gitter-web-env');
 var stats = env.stats;
 var redisClient = env.redis.getClient();
+var userAgentTagger = require('../web/user-agent-tagger');
 
 var rateLimiter = dolph.rateLimiter({
   prefix: 'cu:',
@@ -14,7 +15,7 @@ var RATE = 86400 / 4;
 
 module.exports = {
 
-  record: function (user, client, userAgent) {
+  record: function (user, client, req) {
     if(user && client) {
       var userId = user.id;
       var clientId = client.id;
@@ -29,14 +30,13 @@ module.exports = {
             stats.userUpdate(user, properties);
           }
 
-          stats.event('client.access', {
+          stats.event('client.access', Object.assign({
             userId: userId,
             clientId: client.id,
             clientName: client.name,
             clientKey: client.clientKey,
-            tag: client.tag,
-            userAgent: userAgent
-          });
+            tag: client.tag
+          }, userAgentTagger(req)));
         }
       });
     }

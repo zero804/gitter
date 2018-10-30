@@ -4,9 +4,15 @@
 
 This codebase even covers a lot of the mobile and desktop applications which embed a web frame.
 
+If you are just interested in the Gitter API, see https://developer.gitter.im/
+
+We also have a roadmap/plan (dates not accurate),
+
+ - [Epics roadmap](https://gitlab.com/groups/gitlab-org/-/roadmap?scope=all&utf8=%E2%9C%93&state=opened&label_name[]=Gitter&layout=QUARTERS)
+ - [Epics list](https://gitlab.com/groups/gitlab-org/-/epics?label_name%5B%5D=Gitter&scope=all&sort=start_date_asc&state=opened)
+
 ![](https://i.imgur.com/wT0bSy2.png)
 
-If you are just interested in the Gitter API, see https://developer.gitter.im/
 
 
 # Install prerequisites

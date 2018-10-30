@@ -1,6 +1,15 @@
+# 19.22.0 - 2018-10-29
+
+Developer facing:
+
+ - Fix `unreadItemService.removeItem` not working with lean objects causing stuck unreads, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1247
+ - Correlate client access stat with segmentable user-agent, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1248
+
+
 # 19.21.0 - 2018-9-27
 
  - Update `@gitterhq/services` dependency with Heroku fixes, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1244
+    - Thanks to [@wlach](https://gitlab.com/wlach) for the contribution, https://gitlab.com/gitlab-org/gitter/services/merge_requests/98
 
  Developer facing:
 
