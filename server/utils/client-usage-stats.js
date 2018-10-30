@@ -35,8 +35,7 @@ module.exports = {
             clientId: client.id,
             clientName: client.name,
             clientKey: client.clientKey,
-            tag: client.tag,
-            userAgent: userAgent
+            tag: client.tag
           }, userAgentTagger(req)));
         }
       });
