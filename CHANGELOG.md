@@ -2,6 +2,8 @@
 
  - Add docs about notifications not happening on mobile (Android, iOS), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1254
  - Add docs about how to change room security after creation (public/private), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1256
+ - Update `@gitterhq/services@1.23.0` dependency with Heroku fixes to only generate an activity event for a completed Heroku app update event
+    - Thanks to [@wlach](https://gitlab.com/wlach) for the contribution, https://gitlab.com/gitlab-org/gitter/services/merge_requests/101
 
 Developer Facing:
 
