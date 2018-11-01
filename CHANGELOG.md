@@ -1,4 +1,4 @@
-# 19.23.0 - *upcoming*
+# 19.23.0 - 2018-11-1
 
  - Add Gitter hiring/job link to left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1252
  - Add docs about notifications not happening on mobile (Android, iOS), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1254
