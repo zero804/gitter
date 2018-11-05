@@ -6,7 +6,7 @@
     "@gitterhq/faye-redis": "^0.4.4",
     "@gitterhq/passport-github": "0.1.8-g",
     "@gitterhq/passport-oauth2": "^1.1.2-b",
-    "@gitterhq/services": "^1.22.0",
+    "@gitterhq/services": "^1.23.0",
     "apn": "1.7.5",
     "async": "~0.9.0",
     "backbone": "1.2.3",

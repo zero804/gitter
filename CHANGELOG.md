@@ -1,3 +1,18 @@
+# 19.23.0 - 2018-11-1
+
+ - Add Gitter hiring/job link to left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1252
+ - Add docs about notifications not happening on mobile (Android, iOS), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1254
+ - Add docs about how to change room security after creation (public/private), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1256
+ - Update `@gitterhq/services@1.23.0` dependency with Heroku fixes to only generate an activity event for a completed Heroku app update event
+    - Thanks to [@wlach](https://gitlab.com/wlach) for the contribution, https://gitlab.com/gitlab-org/gitter/services/merge_requests/101
+
+Developer Facing:
+
+ - Link to Gitter spam runbook doc, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1255
+    - Thanks to [@rostrander](https://gitlab.com/rostrander) for creating the runbook
+ - Remove dead security descriptor updater code, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1259
+
+
 # 19.22.0 - 2018-10-29
 
 Developer facing:

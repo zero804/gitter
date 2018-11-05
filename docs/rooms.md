@@ -74,6 +74,20 @@ See the [FAQ](./faq.md#why-isn-t-my-github-organisation-or-repos-appearing).
  - A private room with no association can only be accessed if they are manually invited to the room.
  - A private room can also be associated with the community and anyone in the community can join the room. If the community was associated with an org, anyone in the org could join for example
 
+#### Change room security after creation
+
+It is currently not possible to adjust your room security (public/private) after creation,
+but we can do it manually for you.
+
+Send a message to support@gitter.im with the following info. Make sure to email with the primary email address associated with the GitLab/GitHub/Twitter account tied to your Gitter account.
+
+ - Link to the room on Gitter
+ - New desired public/private security or repo/org association
+ - Some context behind the change
+
+You can track https://gitlab.com/gitlab-org/gitter/webapp/issues/676 for progress on this issue.
+
+
 
 ### Room topic/description
 
