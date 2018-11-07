@@ -864,7 +864,11 @@ module.exports = (function() {
     },
 
     quote: function() {
-      appEvents.trigger('input.append', "> " + this.model.get('text'), { newLine: true });
+      const formattedText = this.model.get('text')
+        .split(/\r?\n/)
+        .map(sentence => `> ${sentence}`)
+        .join('\n')
+      appEvents.trigger('input.append', formattedText, { newLine: true });
     },
 
     delete: function() {
