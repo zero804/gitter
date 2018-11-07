@@ -1,3 +1,11 @@
+# 19.24.0 - 2018-11-6
+
+Developer Facing:
+
+ - Remove root-level config cruft, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1249
+ - Add trackable hiring/job posting link for in left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1262
+
+
 # 19.23.0 - 2018-11-1
 
  - Add Gitter hiring/job link to left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1252

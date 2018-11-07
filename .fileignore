@@ -1,8 +1,0 @@
-config/*
-npm-shrinkwrap.json
-package.json
-scripts/dataupgrades/**
-public/repo/**
-public/js/**
-public/fonts/**
-public/images/**
