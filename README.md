@@ -90,6 +90,8 @@ You only need to perform this section once.
 
 Gitter connects to third party APIs. In order to do this, you will need to generate API tokens and add them to your configuration.
 
+In the future, we hope to streamline this process and skip OAuth providers. You can track https://gitlab.com/gitlab-org/gitter/webapp/issues/1973
+
 #### Mac
 
 To do this automatically, run the following command which will create a `.env` file:
