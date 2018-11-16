@@ -5,7 +5,9 @@
   <input id="error-text" class="error-input" size="55" readonly="readonly"><br><br>
 
   {{#unless user}}
-<a href="/login">There may be a chat room here but you are not signed in, sign in</a>
+    <p>
+      There may be a private chat room here but you are not signed in, <a href="/login?returnTo={{currentPath}}">sign in</a>
+    </p>
   {{/unless}}
 
   {{#if userMissingPrivateRepoScope}}
