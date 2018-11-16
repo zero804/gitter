@@ -90,6 +90,8 @@ You only need to perform this section once.
 
 Gitter connects to third party APIs. In order to do this, you will need to generate API tokens and add them to your configuration.
 
+In the future, we hope to streamline this process and skip OAuth providers. You can track https://gitlab.com/gitlab-org/gitter/webapp/issues/1973
+
 #### Mac
 
 To do this automatically, run the following command which will create a `.env` file:
@@ -124,7 +126,7 @@ REM Visit https://apps.twitter.com/app/new, name: Gitter Twitter YOURTWITTERUSER
 REM After creation, click "manage keys and access tokens" to get they key/secret
 SET twitteroauth__consumer_key=xxx
 SET twitteroauth__consumer_secret=xxx
-REM Visit https://gitlab.com/profile/applications, name: Gitter User Dev, redirect URI: http://localhost:5000/login/gitlab/callback, scopes: read_user
+REM Visit https://gitlab.com/profile/applications, name: Gitter User Dev, redirect URI: http://localhost:5000/login/gitlab/callback, scopes: api, read_user
 SET gitlaboauth__client_id=xxx
 SET gitlaboauth__client_secret=xxx
 REM Visit https://github.com/settings/applications/new, name: Gitter Private Dev, authorization callback url: http://localhost:5000/login/callback
