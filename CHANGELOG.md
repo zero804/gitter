@@ -5,6 +5,7 @@
  - Remove outdated legal docs, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1266
  - Update readme to link issue discussing streamlining initial OAuth config setup, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1267
  - Use correct GitLab OAuth redirect URI in `obtain-secrets` script, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1268
+ - Add frame policies to disable another site `<iframe>` embedding the app (prevent clickjacking), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1270
 
 
 # 19.24.0 - 2018-11-6
