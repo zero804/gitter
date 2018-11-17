@@ -4,6 +4,12 @@
   Gitter<br>
   <input id="error-text" class="error-input" size="55" readonly="readonly"><br><br>
 
+  {{#unless user}}
+    <p>
+      There may be a private chat room here but you are not signed in, <a href="/login?returnTo={{currentPath}}">sign in</a>
+    </p>
+  {{/unless}}
+
   {{#if userMissingPrivateRepoScope}}
     <p>If you're looking to access a private repository, you will need to upgrade your GitHub authentication to
       allow us to access the list of your private repositories.</p>
