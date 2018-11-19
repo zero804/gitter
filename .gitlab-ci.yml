@@ -60,6 +60,21 @@ package:
       - output/app/VERSION
     expire_in: 1 week
 
+mobile-asset-build:
+  <<: *node_job
+  stage: build_unit_test
+  only:
+   - master
+  script:
+    - npm run build-android-assets
+    - npm run build-ios-assets
+  artifacts:
+    paths:
+      - output/android/www
+      - output/ios/www
+
+
+
 .distribute_job: &distribute_job
   image: registry.gitlab.com/gitlab-org/gitter/webapp/deploy-build-image:latest
   stage: pre_deploy
