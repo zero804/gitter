@@ -1,6 +1,10 @@
-# 19.26.0 - *upcoming*
+# 19.26.0 - 2018-11-19
 
  - Add "Sign in" link to 404 page, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1269
+
+Developer Facing:
+
+ - Build mobile Android/iOS assets in CI for artifact usage in downstream Android/iOS builds, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1272
 
 
 # 19.25.0 - 2018-11-15
