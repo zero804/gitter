@@ -1,3 +1,9 @@
+# 19.27.0 - *upcoming*
+
+ - Fix period/dot in username breaking mention syntax
+    - Thanks to [@hho](https://gitlab.com/hho) for the contribution, https://gitlab.com/gitlab-org/gitter/gitter-marked/merge_requests/10
+
+
 # 19.26.0 - 2018-11-19
 
  - Add "Sign in" link to 404 page, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1269
