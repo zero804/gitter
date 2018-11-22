@@ -5,6 +5,10 @@
  - Fix quoting multi-line messages. Angle bracket `>` added to each line
     - Thanks to [@auua](https://gitlab.com/auua) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1264
 
+Developer facing:
+
+ - Fix 404 when trying to delete an [Gitter developer OAuth app](https://developer.gitter.im/apps), https://gitlab.com/gitlab-org/gitter/developer-gitter-im/merge_requests/19
+
 
 # 19.26.0 - 2018-11-19
 
