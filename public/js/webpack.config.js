@@ -104,7 +104,6 @@ var webpackConfig = {
       "jquery": require.resolve('jquery'),
       "mutant": path.resolve(path.join(__dirname, "../repo/mutant/mutant.js")),
       "emojify": path.resolve(path.join(__dirname, "../repo/emojify/emojify.js")),
-      "jquery-iframely": path.resolve(path.join(__dirname, "../repo/jquery-iframely/jquery-iframely.js")),
       "jquery-textcomplete": path.resolve(path.join(__dirname, "../repo/jquery-textcomplete/jquery.textcomplete.js")),
       "autolink": path.resolve(path.join(__dirname, "../repo/autolink/autolink.js")),
       "transloadit": path.resolve(path.join(__dirname, "../repo/transloadit/jquery.transloadit2-v2-latest.js")),

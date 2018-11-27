@@ -10,7 +10,6 @@ var isolateBurst = require('gitter-web-shared/burst/isolate-burst-bb');
 var context = require('../../utils/context');
 var perfTiming = require('../../components/perf-timing');
 var debug = require('debug-proxy')('app:chat-collection-view');
-var collapsedItemsClient = require('../../utils/collapsed-item-client');
 
 require('../behaviors/infinite-scroll');
 require('../behaviors/smooth-scroll');
@@ -204,10 +203,6 @@ module.exports = (function() {
         this.rollers.setModeLocked(false);
       });
 
-      this.listenTo(appEvents, 'command.collapse.chat', this.collapseChats);
-      this.listenTo(appEvents, 'command.collapse.chat.all', this.collapseAllChats);
-      this.listenTo(appEvents, 'command.expand.chat', this.expandChats);
-
       this.listenTo(appEvents, 'chatCollectionView:pageUp', this.pageUp);
       this.listenTo(appEvents, 'chatCollectionView:pageDown', this.pageDown);
       this.listenTo(appEvents, 'chatCollectionView:editLastChat', this.editLastChat);
@@ -276,37 +271,6 @@ module.exports = (function() {
       } catch (e) {
         debug('Could not clear previously highlighted item');
       }
-    },
-
-    findLastCollapsibleChat: function() {
-      var c = this.collection;
-      for (var i = c.length - 1; i >= 0; i--) {
-        var m = c.at(i);
-        if (m.get('isCollapsible')) {
-          return m;
-        }
-      }
-    },
-
-    setLastCollapsibleChat: function(state) {
-      var last = this.findLastCollapsibleChat();
-      if (!last) return;
-      var chatItem = this.children.findByModel(last);
-      if (chatItem) chatItem.setCollapse(state);
-    },
-
-    /* Collapses the most recent chat with embedded media */
-    collapseChats: function() {
-      this.setLastCollapsibleChat(true);
-    },
-
-    collapseAllChats: function() {
-      collapsedItemsClient.collapseAll(this.collection);
-    },
-
-    /* Expands the most recent chat with embedded media */
-    expandChats: function() {
-      this.setLastCollapsibleChat(false);
     },
 
     onCopy: function(e) {
