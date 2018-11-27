@@ -1,4 +1,4 @@
-# 19.27.0 - *upcoming*
+# 19.27.0 - 2018-11-27
 
  - Fix period/dot in username breaking mention syntax
     - Thanks to [@hho](https://gitlab.com/hho) for the contribution, https://gitlab.com/gitlab-org/gitter/gitter-marked/merge_requests/10
