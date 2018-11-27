@@ -39,10 +39,6 @@ var troupeEnv = {
   },
   avatarsUrl: config.get('avatar:officialHost'),
   avatarCdns: config.get('avatar:hosts'),
-  embed: {
-    basepath: config.get('embed:basepath'),
-    cacheBuster: config.get('embed:cacheBuster')
-  },
   vapidAppServerKey: config.get('vapid:publicKey'),
   headlineNumbers: {
     gitterUsers: config.get('headlineNumbers:gitterUsers'),

@@ -80,8 +80,6 @@ We support a few /commands and will continue to add new ones. At the moment, you
  - `/remove @username`: Removes a user from a conversation. Only available to owners/admin of the conversation.
  - `/ban @username`: Bans a user from a conversation. Only available to owners/admins in public rooms.
  - `/unban @username`: Unbans a user from a conversation. Only available to owners/admins in public rooms.
- - `/collapse`: Collapse the first chat message with embedded media
-
 
 
 ## Edit messages

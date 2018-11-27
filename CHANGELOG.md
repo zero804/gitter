@@ -4,6 +4,8 @@
     - Thanks to [@hho](https://gitlab.com/hho) for the contribution, https://gitlab.com/gitlab-org/gitter/gitter-marked/merge_requests/10
  - Fix quoting multi-line messages. Angle bracket `>` added to each line
     - Thanks to [@auua](https://gitlab.com/auua) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1264
+ - Remove embeds (link unfurling/expansion), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1275
+    - Embeds were already deprecated and put behind a feature toggle that was defaulted to off, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1223
 
 Developer facing:
 

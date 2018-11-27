@@ -155,10 +155,6 @@
   "apn": {
     "feedbackInterval": 60
   },
-  "embed": {
-    "basepath": "https://embed.gitter.im",
-    "cacheBuster": "1"
-  },
   "errorReporting": {
     "enabled": true
   },

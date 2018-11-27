@@ -20,9 +20,6 @@
  *
  * Advanced usage
  * ---------------
- * apiClient.user.post('/collapsedItems', data, options)
- * apiClient.user.delete('/collapsedItems', data, options)
- *
  * These operations will use the current user resource as their root,
  *
  * The sub-resources available are:

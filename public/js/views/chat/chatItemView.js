@@ -21,7 +21,6 @@ const isAndroid = require('../../utils/is-android');
 const timeFormat = require('gitter-web-shared/time/time-format');
 const fullTimeFormat = require('gitter-web-shared/time/full-time-format');
 const DoubleTapper = require('../../utils/double-tapper');
-const chatCollapse = require('../../utils/collapsed-item-client');
 const LoadingCollectionMixin = require('../loading-mixin');
 const FastAttachMixin = require('../fast-attach-mixin');
 const chatModels = require('../../collections/chat');
@@ -55,7 +54,6 @@ module.exports = (function() {
 
   var mouseEvents = {
     'click .js-chat-item-edit':       'toggleEdit',
-    'click .js-chat-item-collapse':   'toggleCollapse',
     'click .js-chat-item-readby':     'showReadBy',
     'click .js-chat-item-from':       'mentionUser',
     'click .js-chat-time':            'permalink',
@@ -95,7 +93,6 @@ module.exports = (function() {
     },
     ui: {
       actions: '.js-chat-item-actions',
-      collapse: '.js-chat-item-collapse',
       text: '.js-chat-item-text',
       sent: '.js-chat-time',
       timestampLink: '.js-chat-time'
@@ -307,7 +304,6 @@ module.exports = (function() {
       this.handleUpdateMentionChanges(changes);
       this.handleUpdateMessageStateChanges(changes);
       this.handleUpdateReadbyStateChanges(changes);
-      this.handleUpdateCollapseStateChanges(changes);
 
       if (!context.isLoggedIn()) this.ui.actions.hide();
     },
@@ -364,23 +360,6 @@ module.exports = (function() {
             readByLabel.toggleClass(className, !!readByCount);
           }
         }
-      }
-    },
-    handleUpdateCollapseStateChanges: function(changes) {
-      if(changes && 'collapsed' in changes) {
-        var collapsed = this.model.get('collapsed');
-        if(collapsed) {
-          this.collapseEmbeds();
-        } else {
-          this.expandEmbeds();
-        }
-
-      }
-
-      if(!changes || 'isCollapsible' in changes) {
-        var isCollapsible = !!this.model.get('isCollapsible');
-        var $collapse = this.ui.collapse;
-        toggle($collapse[0], isCollapsible);
       }
     },
 
@@ -477,116 +456,6 @@ module.exports = (function() {
         text: newText,
         html: null
       }).save();
-    },
-
-    setCollapse: function (state) {
-      state = !!state;
-      var chatId = this.model.get('id');
-      var collapsed = !!this.model.get('collapsed');
-      if(state === collapsed) return;
-
-      if (collapsed) {
-        chatCollapse.uncollapse(chatId);
-      } else {
-        chatCollapse.collapse(chatId);
-      }
-      this.model.set('collapsed', !collapsed);
-    },
-
-    onToggleCollapse: function() {
-      this.toggleCollapse();
-    },
-
-    // deals with collapsing images and embeds
-    toggleCollapse: function () {
-      var collapsed = this.model.get('collapsed');
-      this.setCollapse(!collapsed);
-    },
-
-    collapseEmbeds: function() {
-      // this.bindUIElements();
-      var self = this;
-      var embeds = self.$el.find('.embed');
-      var icon = this.ui.collapse.find('i');
-
-      clearTimeout(self.embedTimeout);
-
-      this.ui.collapse.removeClass('chat-item__icon--collapse');
-      this.ui.collapse.addClass('chat-item__icon--expand');
-      icon.removeClass('octicon-fold');
-      icon.addClass('octicon-unfold');
-
-      if(self.rollers) {
-        embeds.each(function(i, e) { // jshint unused:true
-          self.rollers.startTransition(e, 500);
-        });
-      }
-
-      embeds.css("overflow", undefined);
-      embeds.css("max-height", "0");
-      embeds.addClass('animateOut');
-
-      // Remove after
-      self.embedTimeout = setTimeout(function() {
-        self.renderText();
-      }, 600);
-    },
-
-    expandEmbeds: function() {
-      // this.bindUIElements();
-      var self = this;
-      clearTimeout(self.embedTimeout);
-      var icon = this.ui.collapse.find('i');
-
-      icon.addClass('octicon-fold');
-      icon.removeClass('octicon-unfold');
-      this.ui.collapse.removeClass('chat-item__icon--expand');
-      this.ui.collapse.addClass('chat-item__icon--collapse');
-
-      function adjustMaxHeight(embeds) {
-        setTimeout(function() {
-          embeds.each(function(i, e) { // jshint unused:true
-            var h = $(e).height();
-            if(h <= MAX_HEIGHT) {
-              $(e).css("max-height", h + "px");
-            } else {
-              $(e).css("overflow", "hidden");
-            }
-          });
-        }, 3000);
-      }
-
-      // Used by the decorator
-      self.expandFunction = function(embed) {
-        embed.addClass('animateOut');
-
-        RAF(function() {
-
-          if(self.rollers) {
-            self.rollers.startTransition(embed, 500);
-          }
-
-          embed.removeClass('animateOut');
-          adjustMaxHeight(embed);
-        });
-      };
-
-      self.renderText();
-
-      // Give the browser a second to load the content
-      self.embedTimeout = setTimeout(function() {
-        var embeds = self.$el.find('.embed');
-
-        if(self.rollers) {
-          embeds.each(function(i, e) {  // jshint unused:true
-            self.rollers.startTransition(e, 500);
-          });
-        }
-
-        embeds.removeClass('animateOut');
-
-        adjustMaxHeight(embeds);
-      }, 10);
     },
 
     showText: function() {
@@ -839,8 +708,6 @@ module.exports = (function() {
       this.chatItemView = options.chatItemView;
     },
     events: {
-      'click .js-chat-action-collapse': 'toggleCollapse',
-      'click .js-chat-action-expand': 'toggleCollapse',
       'click .js-chat-action-edit': 'edit',
       'click .js-chat-action-reply': 'reply',
       'click .js-chat-action-quote': 'quote',
@@ -848,10 +715,6 @@ module.exports = (function() {
       'click .js-chat-action-report': 'report',
       'click .js-chat-action-retry': 'retry',
       'click .js-chat-action-cancel': 'cancel',
-    },
-
-    toggleCollapse: function() {
-      this.chatItemView.triggerMethod('toggleCollapse');
     },
 
     edit: function() {
@@ -905,7 +768,6 @@ module.exports = (function() {
       }
 
       var deleted = !this.model.get('text');
-      var canCollapse = !deleted && this.model.get('isCollapsible');
       var isPersisted = !!this.model.id;
       var canEdit = !deleted && this.chatItemView.canEdit() && isPersisted;
       var canDelete = this.chatItemView.canDelete() && isPersisted;
@@ -927,18 +789,6 @@ module.exports = (function() {
       data.actions.push({ name: 'edit', description: 'Edit', disabled: !canEdit });
       data.actions.push({ name: 'delete', description: 'Delete', disabled: !canDelete });
       data.actions.push({ name: 'report', description: 'Report', disabled: isOwnMessage });
-
-      if (canCollapse) {
-        var action;
-
-        if (this.model.get('collapsed')) {
-          action = { name: 'expand', description: 'Expand' };
-        } else {
-          action = { name: 'collapse', description: 'Collapse'};
-        }
-
-        data.actions.push(action);
-      }
 
       return data;
     }
