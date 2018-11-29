@@ -122,8 +122,8 @@ SET web__messageSecret=xxx
 SET email__unsubscribeNotificationsSecret=xxx
 SET integrations__secret=xxx
 SET github__statePassphrase=xxx
-REM Visit https://apps.twitter.com/app/new, name: Gitter Twitter YOURTWITTERUSERNAME, callback url: http://localhost:5000/login/twitter/callback
-REM After creation, click "manage keys and access tokens" to get they key/secret
+REM Visit https://developer.twitter.com/en/apps/create, name: Gitter Twitter YOURTWITTERUSERNAME, callback url: http://localhost:5000/login/twitter/callback
+REM After creation, click "keys and tokens" to get your Consumer API Keys
 SET twitteroauth__consumer_key=xxx
 SET twitteroauth__consumer_secret=xxx
 REM Visit https://gitlab.com/profile/applications, name: Gitter User Dev, redirect URI: http://localhost:5000/login/gitlab/callback, scopes: api, read_user
