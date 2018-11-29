@@ -159,10 +159,6 @@
   },
   "irc": {
   },
-  "embed": {
-    "basepath": "https://embed-beta.gitter.im",
-    "cacheBuster": "1"
-  },
   "transloadit": {
   },
   "errorReporting": {

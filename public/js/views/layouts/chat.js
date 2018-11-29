@@ -9,7 +9,6 @@ var ChatContainerView = require('../chat/chatContainerView');
 var issuableDecorator = require('../chat/decorators/issuableDecorator');
 var commitDecorator = require('../chat/decorators/commitDecorator');
 var mentionDecorator = require('../chat/decorators/mentionDecorator');
-var embedDecorator = require('../chat/decorators/embedDecorator');
 var emojiDecorator = require('../chat/decorators/emojiDecorator');
 require('../behaviors/isomorphic');
 
@@ -33,9 +32,6 @@ var ChatLayout = Marionette.LayoutView.extend({
     var monitorUnreadItems = Marionette.getOption(this, "monitorUnreadItems");
 
     const decorators = [issuableDecorator, commitDecorator, mentionDecorator, emojiDecorator];
-    if (context.hasFeature('embeds-deprecated')) {
-      decorators.push(embedDecorator);
-    }
 
     return new ChatContainerView(optionsForRegion({
       collection: this.options.chatCollection,

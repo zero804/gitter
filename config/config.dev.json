@@ -133,10 +133,6 @@
   "irc": {
     "clientKey": "irc-dev"
   },
-  "embed": {
-    "basepath": "http://localhost:8061",
-    "cacheBuster": "1"
-  },
   "redis": "redis://localhost",
   "redis_nopersist": "redis://localhost?db=1",
   "redis_caching": "redis://localhost?db=2",
