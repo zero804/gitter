@@ -9,6 +9,8 @@ Developer facing:
     - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1278
  - Remove reference to `gulp` in `obtain-secrets` script (just use `npm start`)
     - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1279
+ - Remove collapse embeds chat item server-side endpoints, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1276
+
 
 # 19.27.0 - 2018-11-27
 
