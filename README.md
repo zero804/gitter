@@ -13,22 +13,16 @@ We also have a roadmap/plan (dates not accurate),
 
 ![](https://i.imgur.com/wT0bSy2.png)
 
-
-
-# Install prerequisites
-
 ## Background
 
-Development of Gitter can be done in any environment that supports Node.js and bash
-and can run Redis and MongoDB, but for simplicity we use Docker Compose
-to provide a pre-canned environment which contains:
+Development of Gitter can be done in any environment that supports Node.js and bash and can run Redis and MongoDB, but for simplicity we use Docker Compose to provide a pre-canned environment which contains:
 
  1. Mongodb (persistent storage)
  1. Elasticsearch (search)
  1. Redis (caching and some persistent storage)
  1. Neo4j (suggestions)
 
-## Setup
+## Prerequisites
 
 Follow these instructions to setup an environment to hack on Gitter.
 
@@ -36,33 +30,30 @@ Follow these instructions to setup an environment to hack on Gitter.
     * On Linux, follow the instructions over at  https://docs.docker.com/compose/install/
     * On Mac, use [Docker for Mac](https://docs.docker.com/docker-for-mac/install/)
     * On Windows, get [Docker for Windows](https://docs.docker.com/docker-for-windows/install/)
- 1. Install [Node.js v10](https://nodejs.org/dist/latest-v10.x/)
-    * We recommend doing this with **nvm**
-    * If you are on macOS/Linux install nvm with `curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.8/install.sh | bash`
-    * If you are on Windows, you can use https://github.com/coreybutler/nvm-windows
-    * `nvm install 10/*` will install the latest 10.x version of node
+ 1. Install **Node 10.x (LTS)** [manually](https://nodejs.org/dist/latest-v10.x/) or using a tool like [nvm](https://github.com/creationix/nvm)
+    * If you are on Windows, you can use [nvm-windows](https://github.com/coreybutler/nvm-windows)
  1. Install **npm 5** with `npm install npm@^5 -g`
     * If you are unable to run npm 5 for whatever reason, you will need to `npm i -g linklocal` and then run `linklocal` after running `npm install`
  1. Clone this repo: `git clone https://gitlab.com/gitlab-org/gitter/webapp.git`
  1. Run `npm install`
     * Go and make a cup of tea, because this will take a rather long time.
 
+### Troubleshooting 
 
 #### `npm ERR! Maximum call stack size exceeded`
 
 If you are running into `npm ERR! Maximum call stack size exceeded`
 
-```
+```bash
 # Remove nested `node_modules` directories
 $ find . -name "node_modules" -exec rm -rf '{}' +
+
 # Remove nested `package-lock.json`
 $ find . -name "package-lock.json" -exec rm -rf '{}' +
 
 # Try installing again
 $ npm install
 ```
-
-
 
 ## Starting Gitter
 
@@ -83,7 +74,6 @@ If it's at a non-standard location, specify the URL with the DOCKER_HOST environ
 
 This process will fetch Docker images from Docker Hub. You might want to make another cup of tea and have a biscuit at this point. You can also continue to the next section at this point to kill some time.
 
-
 ### Configure service secrets
 
 You only need to perform this section once.
@@ -101,12 +91,9 @@ To do this automatically, run the following command which will create a `.env` f
 
 Export the environment variables with:
 
-```
-. .env
-# or
+```bash
 source .env
 ```
-
 
 #### Windows
 
@@ -151,7 +138,7 @@ Export the environment variables with:
 
 ### Start Gitter services
 
-Only proceed once the Docker containers have downloaded and installed.
+Only proceed once [dependent services](#start-dependent-services) (Docker containers) have started.
 
 Gitter is executed through Gulp with the following command:
 
@@ -174,7 +161,7 @@ You can also install the [Node.js inspector Manager (NiM)](https://chrome.google
 browser extension to automatically keep your devtools up to date when
 Nodemon restarts the Node.js process.
 
-### Shutting Docker down
+### Shutting down Docker Compose
 
 You can stop the docker containers with:
 
@@ -188,12 +175,10 @@ If you want to remove your containers, use
 docker-compose rm -f
 ```
 
-
 ### Going further
 
 We also have some other docs which give a [overview/walkthrough of the codebase](https://gitlab.com/gitlab-org/gitter/webapp/blob/develop/docs/code-overview.md)
 and [some notes on touching production](https://gitlab.com/gl-infra/gitter-infrastructure/blob/master/README.md).
-
 
 ### Testing
 
@@ -216,7 +201,6 @@ npm run browser-test
 ```
 
 This will run all tests in [devtool](https://www.npmjs.com/package/devtool).
-
 
 # Contributing
 
