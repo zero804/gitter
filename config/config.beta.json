@@ -15,7 +15,7 @@
     "startApiInPrimaryApp": true
   },
   "webhooks": {
-    "basepath": "http://gitter-beta:5014"
+    "basepath": "http://gitter-beta-01:5014"
   },
   "ws": {
     "hostname": "ws-beta.gitter.im",

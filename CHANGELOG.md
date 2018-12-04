@@ -10,6 +10,7 @@ Developer facing:
  - Remove reference to `gulp` in `obtain-secrets` script (just use `npm start`)
     - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1279
  - Remove collapse embeds chat item server-side endpoints, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1276
+ - Fix webhooks on [beta](https://beta.gitter.im/) by pointing it at the new `gitter-beta-01`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1283
 
 
 # 19.27.0 - 2018-11-27
