@@ -6,6 +6,8 @@ var groupContextResolverMiddleware = require('./uri-context/group-context-resolv
 var featureToggles = require('../web/middlewares/feature-toggles');
 var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
 var redirectErrorMiddleware = require('./uri-context/redirect-error-middleware');
+var preventClickjackingMiddleware = require('../web/middlewares/prevent-clickjacking');
+var preventClickjackingOnlyGitterEmbedMiddleware = require('../web/middlewares/prevent-clickjacking-only-gitter-embed');
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
 /**
@@ -13,6 +15,7 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
  */
 router.get('/:groupUri/rooms',
   identifyRoute('group-rooms-mainframe'),
+  preventClickjackingMiddleware,
   featureToggles,
   isPhoneMiddleware,
   groupContextResolverMiddleware,
@@ -31,6 +34,7 @@ router.get('/:groupUri/rooms',
 
 router.get('/:groupUri/rooms/~iframe',
   identifyRoute('group-rooms-frame'),
+  preventClickjackingOnlyGitterEmbedMiddleware,
   featureToggles,
   isPhoneMiddleware,
   groupContextResolverMiddleware,

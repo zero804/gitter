@@ -4,24 +4,30 @@ var env = require('gitter-web-env');
 var logger = env.logger;
 var stats = env.stats;
 var config = env.config;
+
 var express = require('express');
-var ensureLoggedIn = require('../web/middlewares/ensure-logged-in');
 var crypto = require('crypto');
-var userSettingsService = require('gitter-web-user-settings');
-var passphrase = config.get('email:unsubscribeNotificationsSecret');
 var request = require('request');
-var uriContextResolverMiddleware = require('./uri-context/uri-context-resolver-middleware');
+var StatusError = require('statuserror');
 var jwt = require('jwt-simple');
+
+var userSettingsService = require('gitter-web-user-settings');
 var cdn = require('gitter-web-cdn');
 var services = require('@gitterhq/services');
-var identifyRoute = env.middlewares.identifyRoute;
 var debug = require('debug')('gitter:app:settings-route');
-var StatusError = require('statuserror');
 var userScopes = require('gitter-web-identity/lib/user-scopes');
 var fonts = require('../web/fonts');
 var acceptInviteService = require('../services/accept-invite-service');
 var loginUtils = require('../web/login-utils');
 var resolveRoomUri = require('../utils/resolve-room-uri');
+
+var identifyRoute = env.middlewares.identifyRoute;
+var ensureLoggedIn = require('../web/middlewares/ensure-logged-in');
+var uriContextResolverMiddleware = require('./uri-context/uri-context-resolver-middleware');
+var preventClickjackingMiddleware = require('../web/middlewares/prevent-clickjacking');
+var preventClickjackingOnlyGitterEmbedMiddleware = require('../web/middlewares/prevent-clickjacking-only-gitter-embed');
+
+var passphrase = config.get('email:unsubscribeNotificationsSecret');
 
 var supportedServices = [
   { id: 'github', name: 'GitHub'},
@@ -156,6 +162,7 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
 
   router.get(uri,
     ensureLoggedIn,
+    preventClickjackingOnlyGitterEmbedMiddleware,
     identifyRoute('settings-room-get'),
     uriContextResolverMiddleware,
     adminAccessCheck,
@@ -163,6 +170,7 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
 
   router.delete(uri,
     ensureLoggedIn,
+    preventClickjackingOnlyGitterEmbedMiddleware,
     identifyRoute('settings-room-delete'),
     uriContextResolverMiddleware,
     adminAccessCheck,
@@ -170,6 +178,7 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
 
   router.post(uri,
     ensureLoggedIn,
+    preventClickjackingOnlyGitterEmbedMiddleware,
     identifyRoute('settings-room-create'),
     uriContextResolverMiddleware,
     adminAccessCheck,
@@ -179,6 +188,7 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
 router.get('/accept-invite/:secret',
   identifyRoute('settings-accept-invite'),
   ensureLoggedIn,
+  preventClickjackingMiddleware,
   function(req, res, next) {
     var secret = req.params.secret;
     return acceptInviteService.acceptInvite(req.user, secret, { source: req.query.source })
@@ -213,6 +223,7 @@ router.get('/accept-invite/:secret',
 
 router.get('/unsubscribe/:hash',
   identifyRoute('settings-unsubscribe'),
+  preventClickjackingMiddleware,
   function (req, res, next) {
     var plaintext;
     try {
@@ -241,6 +252,7 @@ router.get('/unsubscribe/:hash',
 
 router.get('/badger/opt-out',
   ensureLoggedIn,
+  preventClickjackingMiddleware,
   identifyRoute('settings-badger-optout'),
   function (req, res, next) {
     var userId = req.user.id;
