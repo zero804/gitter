@@ -1,3 +1,11 @@
+# 19.29.0 - *upcoming*
+
+Developer facing:
+
+ - Update readme setup instructions to favor `source .env` and adjust some Node.js install language,
+    - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1281
+
+
 # 19.28.0 - 2018-12-4
 
  - Update readme badger and service URLs in `hbs` templates to point at GitLab projects (previously GitHub)
