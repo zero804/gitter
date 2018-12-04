@@ -4,6 +4,8 @@ Developer facing:
 
  - Update readme setup instructions to favor `source .env` and adjust some Node.js install language,
     - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1281
+ - Update minimum requirement to npm 6.x
+    - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1286
 
 
 # 19.28.0 - 2018-12-4
