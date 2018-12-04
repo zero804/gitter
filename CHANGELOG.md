@@ -1,4 +1,4 @@
-# 19.28.0 - *upcoming*
+# 19.28.0 - 2018-12-4
 
  - Update readme badger and service URLs in `hbs` templates to point at GitLab projects (previously GitHub)
     - Thanks to [@avelino](https://gitlab.com/avelino) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1280, https://gitlab.com/gitlab-org/gitter/docs/merge_requests/57
