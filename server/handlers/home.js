@@ -9,12 +9,15 @@ var featureToggles = require('../web/middlewares/feature-toggles');
 var userHomeRenderer = require('./renderers/userhome');
 var mainFrameRenderer = require('./renderers/main-frame');
 var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
+var preventClickjackingMiddleware = require('../web/middlewares/prevent-clickjacking');
+var preventClickjackingOnlyGitterEmbedMiddleware = require('../web/middlewares/prevent-clickjacking-only-gitter-embed');
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
 router.get('/',
   identifyRoute('home-main'),
   featureToggles,
+  preventClickjackingMiddleware,
   isPhoneMiddleware,
   timezoneMiddleware,
   function (req, res, next) {
@@ -33,6 +36,7 @@ router.get('/',
 router.get('/~home',
   identifyRoute('home-frame'),
   ensureLoggedIn,
+  preventClickjackingOnlyGitterEmbedMiddleware,
   featureToggles,
   isPhoneMiddleware,
   function(req, res, next) {
@@ -44,6 +48,7 @@ router.get('/~home',
 router.get('/createroom',
   identifyRoute('create-room-redirect'),
   ensureLoggedIn,
+  preventClickjackingMiddleware,
   featureToggles,
   function (req, res) {
     res.redirect('/home#createroom');
@@ -51,6 +56,7 @@ router.get('/createroom',
 
 router.get(new RegExp('/explore(.*)?'),
   identifyRoute('home-explore'),
+  preventClickjackingMiddleware,
   featureToggles,
   isPhoneMiddleware,
   function (req, res, next) {
@@ -76,6 +82,7 @@ router.get(new RegExp('/explore(.*)?'),
 router.get('/learn',
   identifyRoute('home-learn-main'),
   ensureLoggedIn,
+  preventClickjackingMiddleware,
   featureToggles,
   isPhoneMiddleware,
   function (req, res, next) {
