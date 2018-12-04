@@ -2,7 +2,7 @@
 
  - Update readme badger and service URLs in `hbs` templates to point at GitLab projects (previously GitHub)
     - Thanks to [@avelino](https://gitlab.com/avelino) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1280, https://gitlab.com/gitlab-org/gitter/docs/merge_requests/57
- - Add more frame policies to disable another site `<iframe>` embedding the app (prevent clickjacking), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1284
+ - Add more frame policies to disable another site `<iframe>` embedding the app (prevent clickjacking), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1284, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1287
 
 Developer facing:
 

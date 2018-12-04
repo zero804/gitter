@@ -8,7 +8,7 @@ var preventClickjackingOnlyGitterEmbedMiddleware = require('../web/middlewares/p
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
-router.use('/', preventClickjackingMiddleware, require('./root'));
+router.use('/', /* clickjacking is fine-tuned in the file */ require('./root'));
 router.use('/logout', preventClickjackingMiddleware, require('./logout'));
 router.use('/login', preventClickjackingMiddleware, require('./login'));
 
