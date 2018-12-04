@@ -32,8 +32,8 @@ Follow these instructions to setup an environment to hack on Gitter.
     * On Windows, get [Docker for Windows](https://docs.docker.com/docker-for-windows/install/)
  1. Install **Node 10.x (LTS)** [manually](https://nodejs.org/dist/latest-v10.x/) or using a tool like [nvm](https://github.com/creationix/nvm)
     * If you are on Windows, you can use [nvm-windows](https://github.com/coreybutler/nvm-windows)
- 1. Install **npm 5** with `npm install npm@^5 -g`
-    * If you are unable to run npm 5 for whatever reason, you will need to `npm i -g linklocal` and then run `linklocal` after running `npm install`
+ 1. Install **npm 6.x**
+    * Node **10.x** already comes with **npm 6.x**. Otherwise, you can install manually with `npm install npm@^6.x -g`
  1. Clone this repo: `git clone https://gitlab.com/gitlab-org/gitter/webapp.git`
  1. Run `npm install`
     * Go and make a cup of tea, because this will take a rather long time.
