@@ -1,5 +1,8 @@
 # 19.29.0 - *upcoming*
 
+ - Update footer padding on homepage(`/?redirect=no`) and `/apps` to be more consistent/purposeful
+    - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1288
+
 Developer facing:
 
  - Update readme setup instructions to favor `source .env` and adjust some Node.js install language,
