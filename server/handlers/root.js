@@ -9,6 +9,7 @@ const StatusError = require('statuserror');
 const identifyRoute = env.middlewares.identifyRoute;
 const featureToggles = require('../web/middlewares/feature-toggles');
 const ensureLoggedIn = require('../web/middlewares/ensure-logged-in');
+const preventClickjackingMiddleware = require('../web/middlewares/prevent-clickjacking');
 const langs = require('langs');
 const loginUtils = require('../web/login-utils');
 const social = require('./social-metadata');
@@ -29,6 +30,7 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
 
 router.get(nconf.get('web:homeurl'),
   identifyRoute('homepage'),
+  preventClickjackingMiddleware,
   featureToggles,
   require('../web/middlewares/unawesome-browser'),
   function(req, res, next) {
@@ -78,6 +80,7 @@ router.get(nconf.get('web:homeurl'),
 if (nconf.get('web:homeurl') !== '/') {
   router.get('/',
     identifyRoute('homepage-landing'),
+    preventClickjackingMiddleware,
     function(req, res) {
       if(req.user) {
         if(req.query.redirect === 'no') {
@@ -94,6 +97,7 @@ if (nconf.get('web:homeurl') !== '/') {
 
 router.get('/apps',
   identifyRoute('homepage-apps'),
+  preventClickjackingMiddleware,
   function (req, res) {
     res.render('apps', {
       homeUrl: nconf.get('web:homeurl')
@@ -102,6 +106,7 @@ router.get('/apps',
 
 router.get('/robots.txt',
   identifyRoute('homepage-robots'),
+  preventClickjackingMiddleware,
   function(req, res) {
     res.set('Content-Type', 'text/text');
     res.render('robotstxt', {
@@ -112,6 +117,7 @@ router.get('/robots.txt',
 
 router.get('/humans.txt',
   identifyRoute('homepage-humans'),
+  preventClickjackingMiddleware,
   function(req, res) {
     res.set('Content-Type', 'text/text');
     res.render('humanstxt');
@@ -119,12 +125,14 @@ router.get('/humans.txt',
 
 router.get('/-/unawesome-browser',
   identifyRoute('homepage-unawesome-browser'),
+  preventClickjackingMiddleware,
   function(req, res) {
     res.status(406/* Not Acceptable */).render('unawesome-browser', { });
   });
 
 router.get('/about/early-bird',
   identifyRoute('earlybird'),
+  preventClickjackingMiddleware,
   function(req, res) {
     res.relativeRedirect('/');
   }
@@ -133,6 +141,7 @@ router.get('/about/early-bird',
 router.get('/about/gitlab/mailing-list',
   ensureLoggedIn,
   identifyRoute('gitlab-mailing-list'),
+  preventClickjackingMiddleware,
   function(req, res) {
     var user = req.user;
 
@@ -148,6 +157,7 @@ router.get('/about/gitlab/mailing-list',
 // old campaign that still gets some hits
 router.get('/about/*',
   identifyRoute('homepage-about'),
+  preventClickjackingMiddleware,
   function(req, res) {
     res.redirect(nconf.get('web:homeurl'));
   });
@@ -157,12 +167,14 @@ router.get('/about/*',
 // Does anyone know what this is for?
 router.get('/_s/cdn/*',
   identifyRoute('homepage-cdn'),
+  preventClickjackingMiddleware,
   function(req, res) {
     res.redirect(req.path.replace('/_s/cdn', ''));
   });
 
 router.get('/-/admin/chat-message-reports',
   identifyRoute('admin-chat-message-reports'),
+  preventClickjackingMiddleware,
   function(req, res) {
     if(!req.user || !req.user.staff) {
       throw new StatusError(403, 'Only staff can view this area');
