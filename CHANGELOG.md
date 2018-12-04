@@ -1,3 +1,19 @@
+# 19.28.0 - 2018-12-4
+
+ - Update readme badger and service URLs in `hbs` templates to point at GitLab projects (previously GitHub)
+    - Thanks to [@avelino](https://gitlab.com/avelino) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1280, https://gitlab.com/gitlab-org/gitter/docs/merge_requests/57
+ - Add more frame policies to disable another site `<iframe>` embedding the app (prevent clickjacking), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1284, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1287
+
+Developer facing:
+
+ - Update `obtain-secrets` script to better align with Twitter's new developer site
+    - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1278
+ - Remove reference to `gulp` in `obtain-secrets` script (just use `npm start`)
+    - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1279
+ - Remove collapse embeds chat item server-side endpoints, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1276
+ - Fix webhooks on [beta](https://beta.gitter.im/) by pointing it at the new `gitter-beta-01`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1283
+
+
 # 19.27.0 - 2018-11-27
 
  - Fix period/dot in username breaking mention syntax
@@ -29,7 +45,8 @@ Developer Facing:
 
  Developer Facing:
 
- - Remove outdated legal docs, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1266
+ - Remove outdated legal docs
+    - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1266
  - Update readme to link issue discussing streamlining initial OAuth config setup, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1267
  - Use correct GitLab OAuth redirect URI in `obtain-secrets` script, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1268
 

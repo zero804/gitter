@@ -3,24 +3,27 @@
 var env = require('gitter-web-env');
 var identifyRoute = env.middlewares.identifyRoute;
 
+var Promise = require('bluebird');
 var moment = require('moment');
-var uriContextResolverMiddleware = require('../uri-context/uri-context-resolver-middleware');
+var _ = require('underscore');
+var StatusError = require('statuserror');
+
 var chatService = require('gitter-web-chats');
 var chatHeapmapAggregator = require('gitter-web-elasticsearch/lib/chat-heatmap-aggregator');
 var restSerializer = require('../../serializers/rest-serializer');
 var contextGenerator = require('../../web/context-generator');
-var Promise = require('bluebird');
 var burstCalculator = require('../../utils/burst-calculator');
-var timezoneMiddleware = require('../../web/middlewares/timezone');
 var dateTZtoUTC = require('gitter-web-shared/time/date-timezone-to-utc');
 var beforeTodayAnyTimezone = require('gitter-web-shared/time/before-today-any-timezone');
 var debug = require('debug')('gitter:app:app-archive');
-var _ = require('underscore');
-var StatusError = require('statuserror');
 var fonts = require('../../web/fonts');
 var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
-var redirectErrorMiddleware = require('../uri-context/redirect-error-middleware');
 var getHeaderViewOptions = require('gitter-web-shared/templates/get-header-view-options');
+
+var uriContextResolverMiddleware = require('../uri-context/uri-context-resolver-middleware');
+var redirectErrorMiddleware = require('../uri-context/redirect-error-middleware');
+var timezoneMiddleware = require('../../web/middlewares/timezone');
+var preventClickjackingMiddleware = require('../../web/middlewares/prevent-clickjacking');
 
 var ONE_DAY_SECONDS = 60 * 60 * 24; // 1 day
 var ONE_DAY_MILLISECONDS = ONE_DAY_SECONDS * 1000;
@@ -79,6 +82,7 @@ function generateChatTree(chatActivity) {
 
 exports.datesList = [
   identifyRoute('app-archive-main'),
+  preventClickjackingMiddleware,
   uriContextResolverMiddleware,
   function(req, res, next) {
     var user = req.user;
@@ -125,6 +129,7 @@ exports.datesList = [
 
 exports.linksList = [
   identifyRoute('app-archive-links'),
+  preventClickjackingMiddleware,
   uriContextResolverMiddleware,
   function(req, res, next) {
     var user = req.user;
@@ -182,6 +187,7 @@ exports.linksList = [
 exports.chatArchive = [
   identifyRoute('app-archive-date'),
   uriContextResolverMiddleware,
+  preventClickjackingMiddleware,
   timezoneMiddleware,
   function(req, res, next) {
     var user = req.user;
