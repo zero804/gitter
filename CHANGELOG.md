@@ -2,6 +2,8 @@
 
  - Update footer padding on homepage(`/?redirect=no`) and `/apps` to be more consistent/purposeful
     - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1288
+ - Increase star contrast and use yellow for favorite rooms in the left menu
+    - Thanks to [@avelino](https://gitlab.com/avelino) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1282
 
 Developer facing:
 
