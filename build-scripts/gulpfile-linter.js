@@ -33,7 +33,7 @@ gulp.task('linter:validate:eslint', function() {
   return gulp.src(['**/*.js','!node_modules/**', '!node_modules_linux/**', '!public/repo/**'])
     .pipe(eslint({
       quiet: argv.quiet,
-      extensions: ['.js', '.jsx']
+      extensions: ['.js']
     }))
     .pipe(eslint.format('unix'))
     .pipe(eslint.format('checkstyle', function(checkstyleData) {
