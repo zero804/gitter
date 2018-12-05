@@ -11,6 +11,8 @@ Developer facing:
     - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1281
  - Update minimum requirement to npm 6.x
     - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1286
+ - Remove unused/orphaned dependencies, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1289
+ - Re-enable validation CI job (fix eslint errors), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1290
 
 
 # 19.28.0 - 2018-12-4
