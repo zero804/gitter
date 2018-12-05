@@ -155,6 +155,7 @@ function UserStrategy(options) {
     return options.exposeRawDisplayName ? user.displayName : user.displayName || user.username
   }
 
+  // eslint-disable-next-line complexity
   this.map = function(user) {
     if (!user) return null;
     var scopes;

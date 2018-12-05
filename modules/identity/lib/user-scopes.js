@@ -4,6 +4,7 @@ var isGitHubUsername = require('./is-github-username');
 
 var LEGACY_DEFAULT_SCOPE = {'user': 1, 'user:email': 1, 'user:follow': 1, 'repo': 1, 'public_repo': 1};
 
+// eslint-disable-next-line complexity
 function hasGitHubScope(user, scope) {
   var githubToken = user.githubToken;
   var githubScopes = user.githubScopes;

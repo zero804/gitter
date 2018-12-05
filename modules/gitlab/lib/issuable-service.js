@@ -6,6 +6,7 @@ var avatars = require('gitter-web-avatars');
 var getGitlabAccessTokenFromUser = require('./get-gitlab-access-token-from-user');
 var getPublicTokenFromPool = require('./get-public-token-from-pool');
 
+// eslint-disable-next-line complexity
 function standardizeResponse(response) {
   var state = '';
   if(response.state === 'opened' || response.state === 'reopened') {

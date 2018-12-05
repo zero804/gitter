@@ -25,9 +25,8 @@ validate:
   <<: *node_job
   stage: build_unit_test
   script:
-    # TODO: Skip for now because we have new eslint failures
     - "echo 'TODO: Skip validation for now because we have new eslint failures'"
-    #- make validate
+    - make validate
 
 
 test:

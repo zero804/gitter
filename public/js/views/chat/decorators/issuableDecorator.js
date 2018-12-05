@@ -186,6 +186,7 @@ var IssueModel = Backbone.Model.extend({
   sync: SyncMixin.sync
 });
 
+// eslint-disable-next-line complexity
 function getAnchorUrl(githubRepo, issueNumber) {
   var currentRoom = context.troupe();
   var currentGroup = context.group();

@@ -136,6 +136,7 @@ module.exports = (function() {
       }, self.options.delay.hide)
     }
 
+    // eslint-disable-next-line complexity
   , show: function () {
       var $tip
         , pos

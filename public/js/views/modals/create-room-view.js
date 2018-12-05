@@ -412,6 +412,7 @@ var CreateRoomView = Marionette.LayoutView.extend({
     var associatedGithubProject = this.model.get('associatedGithubProject');
     var security = this.model.get('security');
 
+    // eslint-disable-next-line complexity
     fastdom.mutate(function() {
       // Room name
       this.ui.nameInput[0].value = roomName;
