@@ -1,4 +1,4 @@
-# 19.29.0 - *upcoming*
+# 19.29.0 - 2018-12-5
 
  - Update footer padding on homepage(`/?redirect=no`) and `/apps` to be more consistent/purposeful
     - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1288
