@@ -12,6 +12,8 @@ var github = require('gulp-github');
 var eslintFilter = require('./eslint-filter');
 var del = require('del');
 
+const JS_GLOBS = ['**/*.js','!node_modules/**', '!node_modules_linux/**', '!public/repo/**'];
+
 function guessBaseBranch() {
   var branch = process.env.CI_COMMIT_REF_NAME || process.env.GIT_BRANCH;
   if (!branch) return 'develop';
@@ -31,7 +33,7 @@ gulp.task('linter:validate:config', function() {
 // Full eslint
 gulp.task('linter:validate:eslint', function() {
   mkdirp.sync('output/eslint/');
-  return gulp.src(['**/*.js','!node_modules/**', '!node_modules_linux/**', '!public/repo/**'])
+  return gulp.src(JS_GLOBS)
     .pipe(eslint({
       quiet: argv.quiet,
       fix: argv.fix,
@@ -50,7 +52,7 @@ gulp.task('linter:validate:eslint-diff', function() {
   var baseBranch = process.env.BASE_BRANCH || guessBaseBranch();
   gutil.log('Performing eslint comparison to', baseBranch);
 
-  var eslintPipe = gulp.src(['**/*.js','!node_modules/**', '!node_modules_linux/**', '!public/repo/**'], { read: false })
+  var eslintPipe = gulp.src(JS_GLOBS, { read: false })
     .pipe(eslintFilter.filterFiles(baseBranch))
     .pipe(eslint({
       quiet: argv.quiet
@@ -73,8 +75,11 @@ gulp.task('linter:validate:eslint-diff', function() {
 /**
  * Hook into the validate phase
  */
-gulp.task('linter:validate', ['linter:validate:config', 'linter:validate:eslint'/*, 'linter:validate:eslint-diff'*/]);
-
+gulp.task('linter:validate', [
+  'linter:validate:config',
+  'linter:validate:eslint',
+  // 'linter:validate:eslint-diff',
+]);
 
 gulp.task('linter:clean', function (cb) {
   del([
