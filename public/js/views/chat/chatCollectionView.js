@@ -273,6 +273,7 @@ module.exports = (function() {
       }
     },
 
+    // eslint-disable-next-line complexity
     onCopy: function(e) {
       if (!window.getSelection /* ios8 */) return;
 

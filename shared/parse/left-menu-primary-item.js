@@ -1,4 +1,4 @@
-/* eslint complexity: ["error", 15] */
+/* eslint complexity: ["error", 17] */
 'use strict';
 
 var _ = require('underscore');

@@ -9,6 +9,7 @@ module.exports = (function() {
   var toString = ObjProto.toString;
 
   // Internal recursive comparison function for `isEqual`.
+  // eslint-disable-next-line complexity, max-statements
   var eq = function(a, b, aStack, bStack) {
     // Identical objects are equal. `0 === -0`, but they aren't identical.
     // See the [Harmony `egal` proposal](http://wiki.ecmascript.org/doku.php?id=harmony:egal).

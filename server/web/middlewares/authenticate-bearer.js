@@ -7,6 +7,7 @@ var oauthService = require('../../services/oauth-service');
 var validateUserAgentFromReq = require('../validate-user-agent-from-req');
 var checkAlreadyOnUnauthorizedUrl = require('../../utils/check-already-on-unauthorized-url');
 
+// eslint-disable-next-line complexity
 function getAccessToken(req) {
 
   if(req.headers && req.headers['authorization']) {

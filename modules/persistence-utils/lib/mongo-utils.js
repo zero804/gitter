@@ -196,6 +196,7 @@ function setIds(array) {
  * associated with doing this, so only the trivial case is attempted.
  *
  */
+// eslint-disable-next-line complexity
 function conjunctionIds(terms, termIdentifiers) {
   if (!terms.length) return { $or: terms };
   if (terms.length < 3) return { $or: terms };

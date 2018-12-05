@@ -1,4 +1,4 @@
-/* eslint complexity: ["error", 14] */
+/* eslint complexity: ["error", 15] */
 
 "use strict";
 
@@ -386,6 +386,7 @@ function findChatMessagesForTroupe(troupeId, options = {}, callback) {
   }
 
   return findMarker
+    // eslint-disable-next-line max-statements
     .then(function(markerId) {
       if(!markerId && !options.aroundId) {
         var q = ChatMessage

@@ -48,6 +48,7 @@ function updateUserTzInfo(user, timezoneInfo) {
     .done();
 }
 
+// eslint-disable-next-line complexity
 module.exports = function(req, res, next) {
   /** Parse the cookie if one exists */
   var parsed = parseTimezoneCookie(req.cookies.gitter_tz);

@@ -4,7 +4,7 @@
     "node": true
   },
   "parserOptions": {
-    "ecmaVersion": 6,
+    "ecmaVersion": 2017,
     "sourceType": "script"
   },
   "plugins": [
@@ -113,7 +113,7 @@
     "node/no-unsupported-features": [
       "error",
       {
-        "version": 6
+        "version": 10
       }
     ]
   }

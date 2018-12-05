@@ -57,7 +57,8 @@ module.exports = Backbone.Model.extend({
     Backbone.Model.prototype.constructor.call(this, attrs, options);
   },
 
-  initialize: function(attrs) { // eslint-disable-line max-statements
+  // eslint-disable-next-line max-statements
+  initialize: function(attrs) {
     this.set('panelOpenState', this.get('roomMenuIsPinned'));
 
     if (!attrs || !attrs.bus) {

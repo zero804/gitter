@@ -54,6 +54,8 @@ function renderChat(req, res, next, options) {
         options.fetchUsers === false ? null : restful.serializeUsersForTroupe(troupe.id, userId, userSerializerOptions),
         generateRightToolbarSnapshot(req),
         generateUserThemeSnapshot(req),
+
+      // eslint-disable-next-line complexity
       ]).spread(function (troupeContext, chats, activityEvents, users, rightToolbarSnapshot, userThemeSnapshot) {
         var initialChat = _.find(chats, function(chat) { return chat.initial; });
         var initialBottom = !initialChat;

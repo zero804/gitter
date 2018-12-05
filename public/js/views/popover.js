@@ -253,6 +253,7 @@ var Popover = Marionette.ItemView.extend({
 
   },
 
+  // eslint-disable-next-line complexity, max-statements
   applyPlacement: function(offset, placement){
     var $e = this.$el;
     var e = $e[0];

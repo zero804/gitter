@@ -260,6 +260,7 @@ function TroupeStrategy(options) {
     }
   }
 
+  // eslint-disable-next-line complexity
   this.map = function(item) {
     var id = item.id || item._id
     var uri = item.uri;

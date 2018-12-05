@@ -61,6 +61,7 @@ function getShortFromUserName(user) {
   return displayName.trim();
 }
 
+// eslint-disable-next-line complexity
 function summarizeChatsInRoom(troupe, chats, options) {
   var appendText = options && options.appendText;
   var maxMessageLength = options && options.maxMessageLength || MAX_NOTIFICATION_TEXT;

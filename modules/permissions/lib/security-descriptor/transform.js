@@ -61,6 +61,7 @@ function validateTransformation(Model, sd, newType, groupId) {
   }
 }
 
+// eslint-disable-next-line complexity
 function transform(Model, sd, newType, options) {
   var groupId = options && options.groupId;
   // Idempotent?
