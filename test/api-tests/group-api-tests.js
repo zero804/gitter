@@ -34,10 +34,10 @@ describe('group-api', function() {
       ],
       Troupe: [
         { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() + '/' + fixtureLoader.GITTER_INTEGRATION_REPO.toLowerCase() },
-        { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() + '/lobby' },
-        { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() + '/lobby' },
-        { lcUri: 'repo-group/lobby' },
-        { lcUri: '_repo-group/lobby' },
+        { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() + '/community' },
+        { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() + '/community' },
+        { lcUri: 'repo-group/community' },
+        { lcUri: '_repo-group/community' },
       ],
     },
     user1: '#integrationUser1',
@@ -99,7 +99,7 @@ describe('group-api', function() {
       .then(function(result) {
         var group = result.body;
         assert.strictEqual(group.uri, fixtureLoader.GITTER_INTEGRATION_COMMUNITY);
-        assert.strictEqual(group.defaultRoom.uri, fixtureLoader.GITTER_INTEGRATION_COMMUNITY + '/Lobby');
+        assert.strictEqual(group.defaultRoom.uri, fixtureLoader.GITTER_INTEGRATION_COMMUNITY + '/community');
       });
   });
 
@@ -119,7 +119,7 @@ describe('group-api', function() {
       .then(function(result) {
         var group = result.body;
         assert.strictEqual(group.uri, fixtureLoader.GITTER_INTEGRATION_ORG);
-        assert.strictEqual(group.defaultRoom.uri, fixtureLoader.GITTER_INTEGRATION_ORG + '/Lobby');
+        assert.strictEqual(group.defaultRoom.uri, fixtureLoader.GITTER_INTEGRATION_ORG + '/community');
       });
   });
 
@@ -145,7 +145,7 @@ describe('group-api', function() {
         var group = result.body;
         assert.strictEqual(group.uri, '_Repo-Group');
         var room = group.defaultRoom;
-        assert.strictEqual(room.uri, '_Repo-Group/Lobby');
+        assert.strictEqual(room.uri, '_Repo-Group/community');
         assert.deepEqual(room.providers, ['github']);
       });
   });

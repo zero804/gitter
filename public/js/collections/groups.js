@@ -13,7 +13,7 @@ var GroupModel = Backbone.Model.extend({
     uri: '',
     type: 'org',
     linkPath: null,
-    defaultRoomName: 'Lobby',
+    defaultRoomName: 'community',
     unreadItems: false,
     mentions: false,
     activity: false,

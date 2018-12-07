@@ -159,11 +159,11 @@ function groupCreationService(user, options) {
       var group = this.group;
       var groupWithPolicyService = new GroupWithPolicyService(group, user, userGroupPolicy);
 
-      var defaultRoomName = defaultRoomOptions.defaultRoomName || 'Lobby';
+      var defaultRoomName = defaultRoomOptions.defaultRoomName || 'community';
       var associateWithGitHubRepo;
 
       // If the group is backed by a REPO
-      // associate the lobby room with that repo
+      // associate the community room with that repo
       if (group.sd.type === 'GH_REPO') {
         associateWithGitHubRepo = group.sd.linkPath;
       }

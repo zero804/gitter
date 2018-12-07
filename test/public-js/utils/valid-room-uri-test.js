@@ -54,7 +54,7 @@ describe('valid-room-uri', function () {
 
   it('accepts room URIs', function () {
     test('/i-love-cats');
-    test('/i-love-cats/Lobby');
+    test('/i-love-cats/community');
     test('/gitterHQ');
     test('/gitterHQ/gitter');
     test('/gitterHQ/gitter/channel');
