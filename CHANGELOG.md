@@ -1,3 +1,10 @@
+# 19.30.0 - *upcoming*
+
+Developer facing:
+
+ - Fix Mocha not skipping integration tests that have nested `describe`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1294
+
+
 # 19.29.0 - 2018-12-5
 
  - Update footer padding on homepage(`/?redirect=no`) and `/apps` to be more consistent/purposeful
