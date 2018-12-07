@@ -1,6 +1,7 @@
 'use strict';
 
 const $ = require('jquery');
+const _ = require('underscore');
 const Backbone = require('backbone');
 const Marionette = require('backbone.marionette');
 require('./views/behaviors/isomorphic');
@@ -57,7 +58,7 @@ const ReportView = Marionette.ItemView.extend({
           ${data.messageId}
         </div>
         <div>
-          ${data.messageText}
+          ${_.escape(data.messageText)}
         </div>
       </td>
     `

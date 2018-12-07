@@ -3,6 +3,7 @@
 Developer facing:
 
  - Fix Mocha not skipping integration tests that have nested `describe`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1294
+ - Escape message text from chat message reports, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1295
 
 
 # 19.29.0 - 2018-12-5
