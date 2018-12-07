@@ -110,31 +110,34 @@ fixtureLoader.setupEach = function(expected) {
 };
 
 fixtureLoader.ensureIntegrationEnvironment = function() {
-    var requiredConfigs = Array.prototype.slice.call(arguments);
+  const requiredConfigs = Array.prototype.slice.call(arguments);
 
-    before(function() {
-      var missing = integrationFixtures.checkConfigSet(requiredConfigs);
+  const beforeCallback = function() {
+    const missing = integrationFixtures.checkConfigSet(requiredConfigs);
 
-      if (!missing.length) {
-        // No keys missing, continue with the test
-        return;
-      }
+    if (!missing.length) {
+      // No keys missing, continue with the test
+      return;
+    }
 
-      // Do we throw an error on missing configuration?
-      if (process.env.GITTER_FORCE_INTEGRATION_TESTS) {
-        throw new Error('Configuration required for test is missing: ' + missing.join(', '));
-      } else {
-        logger.warn('Skipping this test due to missing config items', missing.join(', '))
-        // Just skip these tests
-        this._skipFixtureSetup = true;
+    // Do we throw an error on missing configuration?
+    if (process.env.GITTER_FORCE_INTEGRATION_TESTS) {
+      throw new Error('Configuration required for test is missing: ' + missing.join(', '));
+    } else {
+      logger.warn('Skipping this test due to missing config items', missing.join(', '));
+      // Just skip these tests
+      this._skipFixtureSetup = true;
 
-        this.skip();
-        // Skip hack from, https://github.com/mochajs/mocha/issues/2683#issuecomment-375629901
-        this.test.parent.pending = true;
-      }
-    });
+      this.skip();
+      // Skip hack from, https://github.com/mochajs/mocha/issues/2683#issuecomment-375629901
+      this.test.parent.pending = true;
+    }
+  };
 
-}
+  before(beforeCallback);
+  // We have a beforeEach because Mocha doesn't skip nested describes
+  beforeEach(beforeCallback);
+};
 
 fixtureLoader.disableMongoTableScans = function() {
   var mongoTableScans = require('./mongo-table-scans');
