@@ -1,5 +1,8 @@
 # 19.30.0 - *upcoming*
 
+ - Rename the default room when you create a community from `Lobby` -> `community`
+    - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1293
+
 Developer facing:
 
  - Fix Mocha not skipping integration tests that have nested `describe`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1294
