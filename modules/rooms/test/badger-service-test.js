@@ -30,7 +30,7 @@ describe('badger-service #slow', function() {
 
   it('should create pull requests for repos that have a README.markdown', function() {
     var uri = 'gittertestbot/readme-dot-markdown';
-    var roomUri = 'gittertestbot/Lobby';
+    var roomUri = 'gittertestbot/community';
     return badgerService.sendBadgePullRequest(uri, roomUri, USER)
       .finally(function() {
         return client.del('/repos/gitter-badger/readme-dot-markdown', { })
@@ -58,7 +58,7 @@ describe('badger-service #slow', function() {
 
   it('should create pull requests for repos that have a plaintext readme', function() {
     var uri = 'gittertestbot/readme-dot-txt';
-    var roomUri = 'gittertestbot/Lobby';
+    var roomUri = 'gittertestbot/community';
     return badgerService.sendBadgePullRequest(uri, roomUri, USER)
       .finally(function() {
         return client.del('/repos/gitter-badger/readme-dot-txt', { })

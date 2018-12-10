@@ -27,7 +27,7 @@ describe('user-orgs #slow', function() {
       ],
       Troupe: [
         { 'sd.type': 'GH_ORG', 'sd.linkPath': fixtureLoader.GITTER_INTEGRATION_ORG },
-        { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() + '/lobby' }
+        { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() + '/community' }
       ]
     },
     user1: '#integrationUser1'
