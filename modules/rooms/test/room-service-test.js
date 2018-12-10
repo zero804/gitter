@@ -844,6 +844,8 @@ describe('room-service', function() {
         };
 
         beforeEach(function() {
+          if(this._skipFixtureSetup) return;
+
           return createFav();
         });
 
