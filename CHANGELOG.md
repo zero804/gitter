@@ -5,6 +5,7 @@ Developer facing:
  - Fix Mocha not skipping integration tests that have nested `describe`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1294
     - Fix test failing because before hook still runs when we should skip, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1297
  - Escape message text from chat message reports, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1295
+ - Fix "No query solutions" error caused by not using an existing index and `notablescan: true`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1298
 
 
 # 19.29.0 - 2018-12-5
