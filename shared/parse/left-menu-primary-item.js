@@ -59,6 +59,7 @@ module.exports = function parseContentToTemplateData(data, state) {
   var namePieces = undefined;
 
   // TODO: Do we want this to be `defaultRoomName` from the group?
+  // The default root room has been renamed from `Lobby` to `community`
   if(roomName === 'community') {
     displayName = orgName;
   }
