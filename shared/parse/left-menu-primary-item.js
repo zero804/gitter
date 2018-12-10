@@ -60,7 +60,7 @@ module.exports = function parseContentToTemplateData(data, state) {
 
   // TODO: Do we want this to be `defaultRoomName` from the group?
   // The default root room has been renamed from `Lobby` to `community`
-  if(roomName === 'community') {
+  if(roomName === 'Lobby' || roomName === 'community') {
     displayName = orgName;
   }
   else if(orgName === roomName) {
