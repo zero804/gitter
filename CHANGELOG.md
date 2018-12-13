@@ -1,3 +1,20 @@
+# 19.29.0 - 2018-12-5
+
+ - Update footer padding on homepage(`/?redirect=no`) and `/apps` to be more consistent/purposeful
+    - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1288
+ - Increase star contrast and use yellow for favorite rooms in the left menu
+    - Thanks to [@avelino](https://gitlab.com/avelino) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1282
+
+Developer facing:
+
+ - Update readme setup instructions to favor `source .env` and adjust some Node.js install language,
+    - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1281
+ - Update minimum requirement to npm 6.x
+    - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1286
+ - Remove unused/orphaned dependencies, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1289
+ - Re-enable validation CI job (fix eslint errors), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1290
+
+
 # 19.28.0 - 2018-12-4
 
  - Update readme badger and service URLs in `hbs` templates to point at GitLab projects (previously GitHub)

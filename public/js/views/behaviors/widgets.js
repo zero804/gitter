@@ -32,6 +32,7 @@ WidgetManager.prototype.destroy = function() {
   this._widgets = [];
 };
 
+// eslint-disable-next-line complexity
 function render(template, data, view) {
   if (!template) {
     var pseudoSelectorString = '';

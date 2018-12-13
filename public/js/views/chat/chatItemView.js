@@ -270,6 +270,7 @@ module.exports = (function() {
       return false;
     },
 
+    // eslint-disable-next-line complexity
     updateRender: function(changes) {
       if (this._requiresFullRender(changes)) {
         return this.render();

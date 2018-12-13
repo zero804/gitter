@@ -261,6 +261,7 @@ var PermissionsView = Marionette.LayoutView.extend({
   },
 
 
+  // eslint-disable-next-line complexity
   getPermissionOptions: function() {
     var entity = this.model.get('entity');
     var sd = this.model.get('securityDescriptor');

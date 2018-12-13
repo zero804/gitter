@@ -24,6 +24,7 @@ function parseLookups(lookups) {
 
 module.exports = {
   id: 'chatMessageId',
+  // eslint-disable-next-line complexity
   index: function(req) {
     var skip = req.query.skip;
     var limit = req.query.limit;

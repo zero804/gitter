@@ -101,6 +101,7 @@ module.exports = (function() {
       this.updateRender(null); // Null means its the initial render
     },
 
+    // eslint-disable-next-line complexity
     updateRender: function(model) {
       var changed = model && model.changed;
       var attributes = model && model.attributes || this.model.attributes;

@@ -106,6 +106,7 @@ function bulkInsertTroupeUsers(troupeId, userIds, membershipStrategy) {
     });
   }
 
+// eslint-disable-next-line complexity
 function createTroupe(fixtureName, f, fixture) {
   var oneToOneUsers;
 

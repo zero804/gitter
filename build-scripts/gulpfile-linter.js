@@ -5,6 +5,7 @@ var argv = require('yargs').argv;
 var gutil = require('gulp-util');
 var eslint = require('gulp-eslint');
 var jsonlint = require('gulp-jsonlint');
+var gulpIf = require('gulp-if');
 var fs = require('fs-extra');
 var mkdirp = require('mkdirp');
 var github = require('gulp-github');
@@ -33,12 +34,14 @@ gulp.task('linter:validate:eslint', function() {
   return gulp.src(['**/*.js','!node_modules/**', '!node_modules_linux/**', '!public/repo/**'])
     .pipe(eslint({
       quiet: argv.quiet,
-      extensions: ['.js', '.jsx']
+      fix: argv.fix,
+      extensions: ['.js']
     }))
     .pipe(eslint.format('unix'))
     .pipe(eslint.format('checkstyle', function(checkstyleData) {
       fs.writeFileSync('output/eslint/checkstyle.xml', checkstyleData);
     }))
+    .pipe(gulpIf((file) => file.eslint != null && file.eslint.fixed, gulp.dest('./')))
     .pipe(eslint.failAfterError());
 });
 

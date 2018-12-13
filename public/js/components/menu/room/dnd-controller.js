@@ -42,6 +42,7 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
     this.drag.containers.splice(index, 1);
   },
 
+  // eslint-disable-next-line complexity
   onItemDropped: function(el, target, source, sibling) {//jshint unused: true
     //guard against no drop target
     if(!target || !target.dataset) { return }
