@@ -82,7 +82,7 @@ function searchRoom(troupeId, parsedQuery, options) {
       highlight: {
         order: "score",
         pre_tags: ["<m0>","<m1>","<m2>","<m3>","<m4>","<m5>"],
-        post_tags: ["<m0>","</m1>","</m2>","</m3>","</m4>","</m5>"],
+        post_tags: ["</m0>","</m1>","</m2>","</m3>","</m4>","</m5>"],
         fields: {
           text: {
             matched_fields: ["text"],
