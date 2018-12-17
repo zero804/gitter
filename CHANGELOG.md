@@ -1,8 +1,7 @@
-# 19.30.0 - *upcoming*
+# 19.30.0 - 2018-12-17
 
  - Rename the default room when you create a community from `Lobby` -> `community`
     - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1293
- - Fix XSS in left-menu room display name, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1301
 
 Developer facing:
 
@@ -10,6 +9,11 @@ Developer facing:
     - Fix test failing because before hook still runs when we should skip, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1297
  - Escape message text from chat message reports, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1295
  - Fix "No query solutions" error caused by not using an existing index and `notablescan: true`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1298
+
+
+# 19.29.2 - 2018-12-17
+
+ - Fix XSS in left-menu room display name, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1301
 
 
 # 19.29.0 - 2018-12-5
