@@ -2,6 +2,7 @@
 
  - Rename the default room when you create a community from `Lobby` -> `community`
     - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1293
+ - Fix XSS in left-menu room display name, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1301
 
 Developer facing:
 
