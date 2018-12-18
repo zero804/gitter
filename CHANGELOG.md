@@ -1,3 +1,11 @@
+# 19.31.0 - *upcoming*
+
+Developer facing:
+
+ - Update Elasticsearch highlight `pre_tag` `<m0>` to have matching closing `post_tag` `</m0>`
+    - Thanks to [@AdmiralSnyder](https://gitlab.com/AdmiralSnyder) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1303
+
+
 # 19.30.0 - 2018-12-17
 
  - Rename the default room when you create a community from `Lobby` -> `community`
