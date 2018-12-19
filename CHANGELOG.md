@@ -1,5 +1,7 @@
 # 19.31.0 - *upcoming*
 
+ - Fix Korean homepage translation erroring out (500), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1304
+
 Developer facing:
 
  - Update Elasticsearch highlight `pre_tag` `<m0>` to have matching closing `post_tag` `</m0>`

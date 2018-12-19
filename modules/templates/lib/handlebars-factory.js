@@ -28,6 +28,8 @@ function create() {
   handlebars.registerHelper('cdn', hbsHelpers.cdn);
   handlebars.registerHelper('pad', hbsHelpers.pad);
   handlebars.registerHelper('avatarSrcSet', avatarImgSrcSetHbsHelper);
+  // These helpers are different from what is used in other page rendered templates
+  // which normally come from `i18n-2` in `server/web/middlewares/i18n.js` -> `I18n.registerMethods(res.locals, req);`
   handlebars.registerHelper('__', i18nHelper);
   handlebars.registerHelper('__n', i18nNumberHelper);
 
