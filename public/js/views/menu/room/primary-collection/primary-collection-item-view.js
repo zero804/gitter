@@ -101,10 +101,10 @@ module.exports = BaseCollectionItemView.extend({
 
     if(data.namePieces) {
       // If we don't want to re-render, then we need to duplicate this template logic
-      this.ui.title.html(data.namePieces.reduce(function(html, piece) { return html + '<span class="room-item__title-piece">' + piece + '</span>'; }, ''));
+      this.ui.title.html(data.namePieces.reduce(function(html, piece) { return html + '<span class="room-item__title-piece">' + _.escape(piece) + '</span>'; }, ''));
     }
     else {
-      this.ui.title.html('<span class="room-item__title-piece">' + data.displayName || data.name + '</span>');
+      this.ui.title.html('<span class="room-item__title-piece">' + _.escape(data.displayName || data.name) + '</span>');
     }
   },
 

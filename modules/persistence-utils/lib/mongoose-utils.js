@@ -14,10 +14,14 @@ function idsIn(ids) {
 }
 
 function cloneSchema(schema) {
-  var tree = _.extend({}, schema.tree);
+  const tree = _.extend({}, schema.tree);
   delete tree.id;
   delete tree._id;
-  return new Schema(tree);
+
+  const clone = new Schema(tree);
+  clone._indexes = [].concat(schema._indexes);
+
+  return clone;
 }
 
 function hashList(list) {

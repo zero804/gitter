@@ -1,4 +1,4 @@
-/* eslint complexity: ["error", 17] */
+/* eslint complexity: ["error", 18] */
 'use strict';
 
 var _ = require('underscore');
@@ -59,7 +59,8 @@ module.exports = function parseContentToTemplateData(data, state) {
   var namePieces = undefined;
 
   // TODO: Do we want this to be `defaultRoomName` from the group?
-  if(roomName === 'Lobby') {
+  // The default root room has been renamed from `Lobby` to `community`
+  if(roomName === 'Lobby' || roomName === 'community') {
     displayName = orgName;
   }
   else if(orgName === roomName) {

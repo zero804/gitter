@@ -27,12 +27,12 @@ describe('user-repos #slow', function() {
   var fixture = fixtureLoader.setup({
     deleteDocuments: {
       Group: [
-        { 'sd.linkPath': fixtureLoader.GITTER_INTEGRATION_REPO_FULL },
+        { 'sd.type': 'GH_REPO', 'sd.linkPath': fixtureLoader.GITTER_INTEGRATION_REPO_FULL },
         { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() }
       ],
       Troupe: [
-        { 'sd.linkPath': fixtureLoader.GITTER_INTEGRATION_REPO_FULL },
-        { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() + '/lobby' }
+        { 'sd.type': 'GH_REPO', 'sd.linkPath': fixtureLoader.GITTER_INTEGRATION_REPO_FULL },
+        { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() + '/community' }
       ]
     },
     user1: '#integrationUser1',

@@ -22,12 +22,12 @@ describe('user-orgs #slow', function() {
   var fixture = fixtureLoader.setup({
     deleteDocuments: {
       Group: [
-        { 'sd.linkPath': fixtureLoader.GITTER_INTEGRATION_ORG },
+        { 'sd.type': 'GH_ORG', 'sd.linkPath': fixtureLoader.GITTER_INTEGRATION_ORG },
         { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() }
       ],
       Troupe: [
-        { 'sd.linkPath': fixtureLoader.GITTER_INTEGRATION_ORG },
-        { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() + '/lobby' }
+        { 'sd.type': 'GH_ORG', 'sd.linkPath': fixtureLoader.GITTER_INTEGRATION_ORG },
+        { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() + '/community' }
       ]
     },
     user1: '#integrationUser1'

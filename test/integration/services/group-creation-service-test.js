@@ -35,8 +35,8 @@ describe('group-creation-service', function() {
         assert.deepEqual(group.sd.extraAdmins.map(String), [fixture.user1.id]);
         assert.deepEqual(group.sd.extraMembers.map(String), []);
 
-        assert.strictEqual(defaultRoom.uri, uri + '/Lobby');
-        assert.strictEqual(defaultRoom.lcUri, uri + '/lobby');
+        assert.strictEqual(defaultRoom.uri, uri + '/community');
+        assert.strictEqual(defaultRoom.lcUri, uri + '/community');
 
         assert.strictEqual(defaultRoom.sd.type, 'GROUP');
         assert.strictEqual(defaultRoom.sd.members, 'PUBLIC');
@@ -81,8 +81,8 @@ describe('group-creation-service', function() {
         assert.deepEqual(group.sd.extraAdmins.map(String), [fixture.user1.id]);
         assert.deepEqual(group.sd.extraMembers.map(String), []);
 
-        assert.strictEqual(defaultRoom.uri, uri + '/Lobby');
-        assert.strictEqual(defaultRoom.lcUri, uri + '/lobby');
+        assert.strictEqual(defaultRoom.uri, uri + '/community');
+        assert.strictEqual(defaultRoom.lcUri, uri + '/community');
 
         assert.strictEqual(defaultRoom.sd.type, 'GROUP');
         assert.strictEqual(defaultRoom.sd.members, 'PUBLIC');
