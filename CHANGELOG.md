@@ -2,6 +2,7 @@
 
  - Update `@gitterhq/translations@1.7.0` dependency for updated Chinese(`zh`) translations
     - Thanks to [@imba-tjd](https://gitlab.com/imba-tjd) for the contribution, https://gitlab.com/gitlab-org/gitter/gitter-translations/merge_requests/63
+ - Update KaTeX dependency to 0.10.0, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1308
 
 
 # 19.31.0 - 2019-1-3
