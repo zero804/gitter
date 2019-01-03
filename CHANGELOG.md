@@ -2,7 +2,7 @@
 
  - Fix Korean homepage translation erroring out (500), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1304
  - Add ability to toggle dark theme in mobile webframe (embedded)
-    - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1232
+    - Thanks to [@charafau](https://gitlab.com/charafau) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1232
 
 Developer facing:
 
