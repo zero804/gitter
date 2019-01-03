@@ -1,4 +1,6 @@
 "use strict";
+
+const debug = require('debug-proxy')('app:mobile-native-embedded-chat');
 var $ = require('jquery');
 var context = require('./utils/context');
 var liveContext = require('./components/live-context');
@@ -11,6 +13,8 @@ var mobileDecorator = require('./views/chat/decorators/mobileDecorator');
 var onready = require('././utils/onready');
 var FastClick = require('fastclick');
 var appEvents = require('./utils/appevents');
+const toggleDarkTheme = require('./utils/toggle-dark-theme');
+
 
 require('./components/eyeballs-room-sync');
 require('./components/ping');
@@ -78,6 +82,12 @@ onready(function() {
     chatCollection.create(newMessage);
     appEvents.trigger('chat.send');
   };
+
+  window._toggleDarkTheme = function (isDarkModeOn) {
+    debug(`_toggleDarkTheme ${isDarkModeOn}`);
+    toggleDarkTheme(isDarkModeOn);
+  };
+
 
   // Listen for changes to the room
   liveContext.syncRoom();
