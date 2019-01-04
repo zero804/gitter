@@ -1,8 +1,9 @@
 # 19.31.0 - 2019-1-3
 
  - Fix Korean homepage translation erroring out (500), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1304
- - Add ability to toggle dark theme in mobile webframe (embedded)
+ - Add ability to toggle dark theme in mobile app WebFrame (Android)
     - Thanks to [@charafau](https://gitlab.com/charafau) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1232
+    - Also see accompanying Android MR, https://gitlab.com/gitlab-org/gitter/gitter-android-app/merge_requests/2
 
 Developer facing:
 
