@@ -1,5 +1,5 @@
 {
-	"Translated By": "Carlos Xu and imba-tjd (https://github.com/imba-tjd)",
+	"Translated By": "Carlos Xu and <a href=\"https://github.com/imba-tjd\" title=\"imba-tjd GitHub\" target=\"_blank\">imba-tjd</a>",
 	"Gitter &mdash; Where developers come to talk.": "Gitter &mdash; 开发者交谈的地方",
 	"Integrations": "集成",
 	"Pricing": "价格",
