@@ -1,3 +1,9 @@
+# 19.32.0 - *upcoming*
+
+ - Update `@gitterhq/translations@1.7.0` dependency for updated Chinese(`zh`) translations
+    - Thanks to [@imba-tjd](https://gitlab.com/imba-tjd) for the contribution, https://gitlab.com/gitlab-org/gitter/gitter-translations/merge_requests/63
+
+
 # 19.31.0 - 2019-1-3
 
  - Fix Korean homepage translation erroring out (500), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1304
