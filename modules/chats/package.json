@@ -23,7 +23,7 @@
     "gitter-web-text-processor": "file:../text-processor",
     "gitter-web-persistence-utils": "file:../persistence-utils",
     "gitter-web-unread-items": "file:../unread-items",
-    "gitter-markdown-processor": "^12.1.0",
+    "gitter-markdown-processor": "^13.0.0",
     "gitter-web-shared": "file:../../shared",
     "gitter-web-rooms": "file:../rooms",
     "gitter-web-permissions": "file:../permissions",
