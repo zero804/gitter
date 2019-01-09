@@ -1,6 +1,8 @@
 # 19.33.0 - *upcoming*
 
  - Fix left-menu minibar scrollbar track visible on Firefox (annoying in dark theme), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1311
+  - Add "What's new?" on profile menu linking to changelog
+     - Thanks to [@avelino](https://gitlab.com/avelino) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1300
 
 
 # 19.32.0 - 2019-1-8
