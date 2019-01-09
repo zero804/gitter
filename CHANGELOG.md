@@ -4,6 +4,10 @@
   - Add "What's new?" on profile menu linking to changelog
      - Thanks to [@avelino](https://gitlab.com/avelino) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1300
 
+Developer facing:
+
+ - Update base Docker images to use node@10 and npm@5, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1312
+
 
 # 19.32.0 - 2019-1-8
 
