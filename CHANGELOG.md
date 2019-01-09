@@ -1,13 +1,22 @@
+# 19.32.0 - 2019-1-8
+
+ - Update `@gitterhq/translations@1.7.0` dependency for updated Chinese(`zh`) translations
+    - Thanks to [@imba-tjd](https://gitlab.com/imba-tjd) for the contribution, https://gitlab.com/gitlab-org/gitter/gitter-translations/merge_requests/63
+ - Update KaTeX dependency to 0.10.0, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1308
+
+
 # 19.31.0 - 2019-1-3
 
  - Fix Korean homepage translation erroring out (500), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1304
- - Add ability to toggle dark theme in mobile webframe (embedded)
-    - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1232
+ - Add ability to toggle dark theme in mobile app WebFrame (Android)
+    - Thanks to [@charafau](https://gitlab.com/charafau) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1232
+    - Also see accompanying Android MR, https://gitlab.com/gitlab-org/gitter/gitter-android-app/merge_requests/2
 
 Developer facing:
 
  - Update Elasticsearch highlight `pre_tag` `<m0>` to have matching closing `post_tag` `</m0>`
     - Thanks to [@AdmiralSnyder](https://gitlab.com/AdmiralSnyder) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1303
+ - Fix Elasticsearch and MongoDB Docker image builds, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1305
 
 
 # 19.30.0 - 2018-12-17
