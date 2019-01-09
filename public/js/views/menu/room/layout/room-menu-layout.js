@@ -2,6 +2,7 @@
 
 var _ = require('underscore');
 var Marionette = require('backbone.marionette');
+const fastdom = require('fastdom');
 var context = require('../../../../utils/context');
 var DNDCtrl = require('../../../../components/menu/room/dnd-controller');
 var RoomMenuModel = require('../../../../models/room-menu-model');
@@ -12,6 +13,7 @@ var KeyboardControllerView = require('../keyboard-controller/keyboard-controller
 require('nanoscroller');
 require('../../../behaviors/isomorphic');
 
+const MINIBAR_ITEM_HEIGHT = 65;
 
 var RoomMenuLayoutView = Marionette.LayoutView.extend({
 
@@ -151,7 +153,6 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
   },
 
   _initNano: _.debounce(function () {
-    /*
     var params = {
       sliderMaxHeight: 100,
       iOSNativeScrolling: true,
@@ -160,8 +161,7 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
     };
     fastdom.mutate(function() {
 
-      //init panel && minibar scrollers
-      this.ui.panel.nanoScroller(params);
+      // init minibar scrollers
       this.ui.minibarInner.nanoScroller(params);
 
       //because of the margins nanoScroller will never show the scroller
@@ -180,7 +180,6 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
         }
       }.bind(this));
     }.bind(this));
-    */
   }, 500),
 
   onDestroy: function() {

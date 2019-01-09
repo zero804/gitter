@@ -1,3 +1,8 @@
+# 19.33.0 - *upcoming*
+
+ - Fix left-menu minibar scrollbar track visible on Firefox (annoying in dark theme), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1311
+
+
 # 19.32.0 - 2019-1-8
 
  - Update `@gitterhq/translations@1.7.0` dependency for updated Chinese(`zh`) translations
