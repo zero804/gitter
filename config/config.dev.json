@@ -25,7 +25,8 @@
     "responseTimeout": 20000
   },
   "webhooks": {
-    "basepath": "http://localhost:3001"
+    "basepath": "http://localhost:3001",
+    "secret": "HeKhSvi6Jz8MNx0wU3XKbIeE"
   },
   "ws": {
     "fayeUrl": "http://localhost:5000/bayeux",

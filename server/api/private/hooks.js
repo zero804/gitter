@@ -3,6 +3,7 @@
 var env = require('gitter-web-env');
 var stats = env.stats;
 var winston = env.logger;
+var config = env.config;
 
 var crypto = require('crypto');
 var eventService = require('gitter-web-events');
@@ -10,8 +11,10 @@ var troupeService = require('gitter-web-rooms/lib/troupe-service');
 var checkRepoPrivacy = require('../../services/check-repo-privacy');
 var StatusError = require('statuserror');
 
-// TODO: this is just horrible
-var passphrase = 'wyElt0ian8waunt8';
+const WEBHOOKS_SECRET = config.get('webhooks:secret');
+if(!WEBHOOKS_SECRET) {
+  winston.error('No webhooks secret provided');
+}
 
 // This is a bit of a hack, but it's somewhat useful:
 // check to see whether a repo has been made public
@@ -33,7 +36,7 @@ function checkRepo(meta) {
 
 function decipherHash(hash) {
   try {
-    var decipher = crypto.createDecipher('aes256', passphrase);
+    var decipher = crypto.createDecipher('aes256', WEBHOOKS_SECRET);
     return decipher.update(hash, 'hex', 'utf8') + decipher.final('utf8');
   } catch(err) {
     /* */
