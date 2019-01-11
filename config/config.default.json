@@ -18,6 +18,9 @@
     "startApiInPrimaryApp": true,
     "apiRateLimit": 100
   },
+  "webhooks": {
+    "secret": "sEjtXk0HW5lWXVgApuAJdk8sejME"
+  },
   "express": {
     "showStack": false,
     "fileCleanupExpiration": 60,
