@@ -1,19 +1,11 @@
-FROM node:6.14.1
+FROM node:10.15.0
 
 RUN mkdir -p /app
 RUN mkdir -p /npm_cache
 
 WORKDIR /app
 
-# From https://github.com/npm/npm/issues/16807#issuecomment-310084968
-# We can simplify this back to `npm install npm@latest-5 -g` once we update to > `FROM node:8.9.4`
-RUN currentDirectory=$(pwd) \
-	&& mkdir -p /tmp/npm-install-directory \
-	&& cd /tmp/npm-install-directory \
-	&& npm install npm@latest-5 \
-	&& rm -rf /usr/local/lib/node_modules \
-	&& mv node_modules /usr/local/lib/ \
-	&& cd $currentDirectory
+RUN npm install npm@latest-5 -g
 
 RUN npm config set cache /npm_cache
 RUN npm config set prefer-offline true
