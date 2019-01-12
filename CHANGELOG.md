@@ -1,12 +1,18 @@
-# 19.33.0 - *upcoming*
+# 19.33.0 - 2019-1-11
 
  - Fix left-menu minibar scrollbar track visible on Firefox (annoying in dark theme), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1311
-  - Add "What's new?" on profile menu linking to changelog
+ - Add "What's new?" on profile menu linking to changelog
      - Thanks to [@avelino](https://gitlab.com/avelino) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1300
 
 Developer facing:
 
  - Update base Docker images to use node@10 and npm@5, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1312
+ - Remove authorization code after used to exchange for token (OAuth), https://gitlab.com/gitlab-org/gitter/webapp/issues/2054
+    - https://gitlab.com/MadLittleMods/webapp/merge_requests/6
+ - Rotate and move webhook cypher secret to secrets repo, https://gitlab.com/gitlab-org/gitter/webapp/issues/2063
+    - https://gitlab.com/MadLittleMods/webapp/merge_requests/7
+    - https://gitlab.com/gitlab-org/gitter/gitter-webhooks-handler/merge_requests/27
+    - https://gitlab.com/gl-gitter/secrets/merge_requests/17
 
 
 # 19.32.0 - 2019-1-8
