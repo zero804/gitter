@@ -15,6 +15,7 @@ function createOAuthClient(fixtureName, f) {
     name: name,
     clientKey: f.clientKey || crypto.randomBytes(20).toString('hex'),
     clientSecret: f.clientSecret || crypto.randomBytes(20).toString('hex'),
+    registeredRedirectUri: f.registeredRedirectUri,
     revoked: f.revoked || false
   });
 }

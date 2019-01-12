@@ -56,8 +56,12 @@ function saveAuthorizationCode(code, client, redirectUri, user, callback) {
   authCode.save(callback);
 }
 
-function findAuthorizationCode(code, callback) {
-  persistenceService.OAuthCode.findOne({ code: code }, callback);
+function findAuthorizationCode(code) {
+  return persistenceService.OAuthCode.findOne({ code: code });
+}
+
+function deleteAuthorizationCode(code) {
+  return persistenceService.OAuthCode.remove({ code: code });
 }
 
 /**
@@ -222,6 +226,7 @@ module.exports = {
   findClientById: findClientById,
   saveAuthorizationCode: saveAuthorizationCode,
   findAuthorizationCode: findAuthorizationCode,
+  deleteAuthorizationCode: deleteAuthorizationCode,
   validateAccessTokenAndClient: validateAccessTokenAndClient,
   removeAllAccessTokensForUser: removeAllAccessTokensForUser,
   findClientByClientKey: findClientByClientKey,

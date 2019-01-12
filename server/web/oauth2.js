@@ -71,18 +71,22 @@ server.grant(oauth2orize.grant.code(function(client, redirectUri, user, ares, do
 // application issues an access token on behalf of the user who authorized the
 // code.
 
-server.exchange(oauth2orize.exchange.code(function(client, code, redirectUri, done) {
-  oauthService.findAuthorizationCode(code, function(err, authCode) {
-    if (err) return done(err);
+server.exchange(oauth2orize.exchange.code(async function(client, code, redirectUri, done) {
+  try {
+    const authCode = await oauthService.findAuthorizationCode(code);
     if (!authCode) return done();
 
     if (!client._id.equals(authCode.clientId)) { return done(); }
     if (redirectUri !== authCode.redirectUri) { return done(); }
 
-    return oauthService.findOrCreateToken(authCode.userId, authCode.clientId)
-      .nodeify(done);
-
-  });
+    const token = await oauthService.findOrCreateToken(authCode.userId, authCode.clientId);
+    // > The client MUST NOT use the authorization code more than once.
+    // > https://tools.ietf.org/html/rfc6749#section-4.1.2
+    await oauthService.deleteAuthorizationCode(code);
+    done(null, token);
+  } catch(err) {
+    if (err) return done(err);
+  }
 }));
 
 

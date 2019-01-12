@@ -91,6 +91,8 @@ function getProfileCollection() {
 
   result.add({ name: 'Contribute to Gitter', stub: 'https://gitlab.com/gitlab-org/gitter/webapp', target: '_blank' });
 
+  result.add({ name: 'What\'s new?', stub: 'https://gitlab.com/gitlab-org/gitter/webapp/blob/develop/CHANGELOG.md', target: '_blank' });
+
   result.add({
     name: 'Delete Account',
     onClick: (e) => {
