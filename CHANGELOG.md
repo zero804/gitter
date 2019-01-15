@@ -9,10 +9,12 @@ Developer facing:
  - Update base Docker images to use node@10 and npm@5, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1312
  - Remove authorization code after used to exchange for token (OAuth), https://gitlab.com/gitlab-org/gitter/webapp/issues/2054
     - https://gitlab.com/MadLittleMods/webapp/merge_requests/6
+    - Thanks to [@cache-money](https://hackerone.com/cache-money) for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
  - Rotate and move webhook cypher secret to secrets repo, https://gitlab.com/gitlab-org/gitter/webapp/issues/2063
     - https://gitlab.com/MadLittleMods/webapp/merge_requests/7
     - https://gitlab.com/gitlab-org/gitter/gitter-webhooks-handler/merge_requests/27
     - https://gitlab.com/gl-gitter/secrets/merge_requests/17
+    - Thanks to [@mishre](https://hackerone.com/mishre) for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
 
 
 # 19.32.0 - 2019-1-8
@@ -20,6 +22,7 @@ Developer facing:
  - Update `@gitterhq/translations@1.7.0` dependency for updated Chinese(`zh`) translations
     - Thanks to [@imba-tjd](https://gitlab.com/imba-tjd) for the contribution, https://gitlab.com/gitlab-org/gitter/gitter-translations/merge_requests/63
  - Update KaTeX dependency to 0.10.0, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1308
+    - Thanks to [@edoverflow](https://hackerone.com/edoverflow) for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
 
 
 # 19.31.0 - 2019-1-3
@@ -52,6 +55,7 @@ Developer facing:
 # 19.29.2 - 2018-12-17
 
  - Fix XSS in left-menu room display name, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1301
+    - Thanks to [@amark](https://gitlab.com/amark) for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
 
 
 # 19.29.0 - 2018-12-5
@@ -76,6 +80,7 @@ Developer facing:
  - Update readme badger and service URLs in `hbs` templates to point at GitLab projects (previously GitHub)
     - Thanks to [@avelino](https://gitlab.com/avelino) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1280, https://gitlab.com/gitlab-org/gitter/docs/merge_requests/57
  - Add more frame policies to disable another site `<iframe>` embedding the app (prevent clickjacking), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1284, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1287
+    - Thanks to [@harry_mg](https://hackerone.com/harry_mg) for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
 
 Developer facing:
 
@@ -115,6 +120,7 @@ Developer Facing:
  - Update `/apps` footer to match homepage
     - Thanks to [@auua](https://gitlab.com/auua) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1265
  - Add frame policies to disable another site `<iframe>` embedding the app (prevent clickjacking), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1270
+    - Thanks to [@harry_mg](https://hackerone.com/harry_mg) for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
 
  Developer Facing:
 
