@@ -13,7 +13,7 @@
 
 	"Where communities thrive": "社区蓬勃发展的地方",
 	"Gitter is a chat and networking platform that helps to manage, grow and connect communities through messaging, content and discovery.": "Gitter 是一个聊天和网络平台，通过消息、内容和发现，帮助管理、发展和连接社区。",
-	"Create your own community": "创造你自己的社区",
+	"Create your own community": "创建你自己的社区",
 	"Explore other communities": "探索其他社区",
 	"By signing up you agree to our <a %s>Terms and Conditions</a>": "注册即表示同意我们的<a %s>服务条款和隐私政策</a>",
 	"Free without limits": "自由无限制",
