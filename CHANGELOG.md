@@ -3,6 +3,10 @@
  - Update `@gitterhq/translations@1.8.1` dependency for Chinese(`zh`) typo fix
     - Thanks to [@nodexy](https://gitlab.com/nodexy) for the contribution, https://gitlab.com/gitlab-org/gitter/gitter-translations/merge_requests/65
 
+Developer facing:
+
+ - Lowercase persisted emails for easier matching, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1316
+
 
 # 19.33.0 - 2019-1-11
 

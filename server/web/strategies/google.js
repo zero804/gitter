@@ -23,7 +23,7 @@ function googleOauth2Callback(req, accessToken, refreshToken, params, profile, d
     provider: identityService.GOOGLE_IDENTITY_PROVIDER,
     providerKey: profile.id,
     displayName: profile.displayName,
-    email: profile.email,
+    email: profile.email && profile.email.toLowerCase(),
     // Google accessTokens only live one hour.
     accessToken: accessToken,
     // Google will only give you a refreshToken if you ask for offline access

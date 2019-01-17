@@ -23,7 +23,7 @@ function linkedinOauth2Callback(req, accessToken, refreshToken, profile, done) {
     provider: identityService.LINKEDIN_IDENTITY_PROVIDER,
     providerKey: profile.id,
     displayName: profile.displayName,
-    email: profile.email,
+    email: profile.email && profile.email.toLowerCase(),
     // LinkedIn accessTokens only live 60 days
     accessToken: accessToken,
     // appears to be undefined for LinkedIn

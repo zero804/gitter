@@ -15,7 +15,8 @@ module.exports = function trackUserLogin(req, user, provider) {
 
       const emailList = (user.emails || []);
       emailList.unshift(email);
-      user.emails = _.uniq(emailList);
+      const lowerCaseEmailList = emailList.map(email => email.toLowerCase());
+      user.emails = _.uniq(lowerCaseEmailList);
 
       stats.userUpdate(Object.assign({}, user, {
         // this is only set because stats.userUpdate requires it
