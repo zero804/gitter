@@ -76,7 +76,7 @@ function addUser(req, accessToken, githubUserProfile) {
   var githubUser = {
     username:           githubUserProfile.login,
     displayName:        githubUserProfile.name || githubUserProfile.login,
-    emails:             githubUserProfile.email ? [githubUserProfile.email] : [],
+    emails:             githubUserProfile.email ? [githubUserProfile.email.toLowerCase()] : [],
     gravatarImageUrl:   githubUserProfile.avatar_url,
     gravatarVersion:    extractGravatarVersion(githubUserProfile.avatar_url),
     githubUserToken:    accessToken,

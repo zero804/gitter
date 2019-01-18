@@ -27,7 +27,7 @@ function twitterOauthCallback(req, token, tokenSecret, profile, done) {
     displayName: profile.displayName,
     // NOTE: doesn't look like passport is parsing out the email address if we
     // set userProfileURL for some reason. So profile.email is not set.
-    email: profile._json.email,
+    email: profile._json.email && profile._json.email.toLowerCase(),
     accessToken: token,
     accessTokenSecret: tokenSecret,
     avatar: avatar

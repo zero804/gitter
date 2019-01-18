@@ -22,7 +22,7 @@ function gitlabOauthCallback(req, token, refreshToken, profile, done) {
     providerKey: profile.id,
     username: profile.username,
     displayName: profile.displayName,
-    email: profile._json.email,
+    email: profile._json.email && profile._json.email.toLowerCase(),
     accessToken: token,
     accessTokenSecret: refreshToken,
     avatar: profile.avatarUrl
