@@ -7,6 +7,7 @@ var TwitterStrategy = require('passport-twitter');
 var userService = require('gitter-web-users');
 var trackSignupOrLogin = require('../track-signup-or-login');
 var updateUserLocale = require('../update-user-locale');
+var unremoveUser = require('../unremove-user');
 var passportLogin = require('../passport-login');
 var identityService = require('gitter-web-identity');
 var callbackUrlBuilder = require('./callback-url-builder');
@@ -40,6 +41,9 @@ function twitterOauthCallback(req, token, tokenSecret, profile, done) {
       updateUserLocale(req, user);
 
       return passportLogin(req, user);
+    })
+    .then(function(user) {
+      return unremoveUser(user);
     })
     .asCallback(done);
 }
