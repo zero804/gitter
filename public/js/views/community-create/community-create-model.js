@@ -105,9 +105,8 @@ var CommunityCreateModel = Backbone.Model.extend({
     if (type !== 'email') {
       // Check if we need to capture the email address
       apiClient.priv.get('/check-invite', { type: type, externalId: externalId })
-        .then(function(result) {
+        .then(function() {
           invite.set({
-            maskedEmail: result.email,
             inviteStatus: INVITE_STATUS_READY
           });
         })

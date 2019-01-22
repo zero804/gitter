@@ -60,14 +60,9 @@ function checkInvite(req, res, next) {
   var input = inviteValidation.parseAndValidateInput(req.query);
   return findInvitationInfo(req.user, input.type, input.externalId, input.emailAddress)
     .then(function(result) {
-      if (!input.emailAddress && result.emailAddress) {
-        result.emailAddress = inviteValidation.maskEmail(result.emailAddress);
-      }
-
       if (!result.user) {
         return {
           displayName: result.displayName,
-          email: result.emailAddress,
           avatarUrl: result.avatarUrl
         }
       }
@@ -78,7 +73,6 @@ function checkInvite(req, res, next) {
           return {
             user: serializedUser,
             displayName: result.displayName,
-            email: result.emailAddress,
             avatarUrl: result.avatarUrl
           }
         });
