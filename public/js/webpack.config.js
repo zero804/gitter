@@ -17,6 +17,7 @@ var webpackConfig = {
     "router-chat": path.resolve(path.join(__dirname, "./router-chat.js")),
     "explore": path.resolve(path.join(__dirname, "./explore.js")),
     "router-login": path.resolve(path.join(__dirname, "./router-login.js")),
+    "login-upgrade-landing": path.resolve(path.join(__dirname, "./login-upgrade-landing.js")),
     "just-tracking": path.resolve(path.join(__dirname, "./just-tracking.js")),
     "router-mobile-app": path.resolve(path.join(__dirname, "./router-mobile-app.js")),
     "mobile-userhome": path.resolve(path.join(__dirname, "./mobile-userhome.js")),

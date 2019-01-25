@@ -90,7 +90,8 @@ router.get('/user-agent-revoked',
 router.get('/github', github.login);
 router.get('/invited', github.invited);
 router.get('/explain', github.explain);
-router.get('/upgrade', github.upgrade);
+router.get('/upgrade', github.upgradeLandingPage);
+router.post('/upgrade', github.upgrade);
 
 // alias the old /callback to the new /github/callback for backwards
 // compatibility and so we can switch over without downtime
