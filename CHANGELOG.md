@@ -1,11 +1,15 @@
-# 19.34.0 - *upcoming*
+# 19.34.0 - 2018-1-25
 
  - Update `@gitterhq/translations@1.8.1` dependency for Chinese(`zh`) typo fix
     - Thanks to [@nodexy](https://gitlab.com/nodexy) for the contribution, https://gitlab.com/gitlab-org/gitter/gitter-translations/merge_requests/65
+ - Fix `/login/upgrade` CSRF by adding dedicated landing page with "Upgrade" button to `POST` upgrade, https://gitlab.com/gitlab-org/gitter/webapp/issues/2061
+    - https://gitlab.com/MadLittleMods/webapp/merge_requests/11
 
 Developer facing:
 
  - Lowercase persisted emails for easier matching, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1316
+ - Remove masked email from `/api/private/check-invite` response, https://gitlab.com/gitlab-org/gitter/webapp/issues/2064
+    - https://gitlab.com/MadLittleMods/webapp/merge_requests/10
 
 
 # 19.33.0 - 2019-1-11
