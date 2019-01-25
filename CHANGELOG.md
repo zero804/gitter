@@ -1,3 +1,9 @@
+# 19.35.0 - *upcoming*
+
+ - Update `@gitterhq/translations@1.8.2` dependency for Chinese(`zh`) translation update
+    - Thanks to [@imba-tjd](https://gitlab.com/imba-tjd) for the contribution, https://gitlab.com/gitlab-org/gitter/gitter-translations/merge_requests/66
+
+
 # 19.34.0 - 2018-1-25
 
  - Update `@gitterhq/translations@1.8.1` dependency for Chinese(`zh`) typo fix
