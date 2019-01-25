@@ -100,7 +100,7 @@ GitHubUserEmailAddressService.prototype._getEmailFromCommit = function(username)
 
             var emails = commits
               .map(function(commit) {
-                return commit.commit && commit.commit.author && commit.commit.author.email;
+                return commit.commit && commit.commit.author && commit.commit.author.email && commit.commit.author.email.toLowerCase();
               })
               .filter(function(email) {
                 return email && isValidEmail(email);

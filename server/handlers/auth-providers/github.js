@@ -11,8 +11,17 @@ var ensureLoggedIn = require('../../web/middlewares/ensure-logged-in');
 var redirectAfterLogin = require('../../web/middlewares/redirect-after-login');
 var passportCallbackForStrategy = require('../../web/middlewares/passport-callback-for-strategy');
 var userScopes = require('gitter-web-identity/lib/user-scopes');
+var fonts = require('../../web/fonts');
 
 var routes = {};
+
+function getScopesFromReq(req) {
+  const newScopes = req.query.scopes ? req.query.scopes.split(/\s*,\s*/) : [''];
+  newScopes.push('user:email');
+  newScopes.push('read:org');
+
+  return newScopes;
+}
 
 routes.login = [
   identifyRoute('login-github'),
@@ -50,13 +59,27 @@ routes.explain = [
   }
 ];
 
+routes.upgradeLandingPage = [
+  ensureLoggedIn,
+  identifyRoute('login-upgrade-landing-page'),
+  function(req, res) {
+    const newScopes = getScopesFromReq(req);
+
+    res.render('login-upgrade-landing', {
+      accessToken: req.accessToken,
+      user: req.user,
+      newScopes,
+      fonts: fonts.getFonts(),
+      hasCachedFonts: fonts.hasCachedFonts(req.cookies),
+    });
+  }
+];
+
 routes.upgrade = [
   ensureLoggedIn,
   identifyRoute('login-upgrade'),
   function(req, res, next) {
-    var scopes = req.query.scopes ? req.query.scopes.split(/\s*,\s*/) : [''];
-    scopes.push('user:email');  // Always request user:email scope
-    scopes.push('read:org');    // Always request read-only access to orgs
+    var scopes = getScopesFromReq(req);
     var existing = req.user.githubScopes || { };
     var addedScopes = false;
 

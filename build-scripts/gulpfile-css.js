@@ -49,6 +49,7 @@ var cssWebStyleBuilder = styleBuilder([
   'public/less/generic-layout.less',
   'public/less/trpHooks.less',
   'public/less/login.less',
+  'public/less/login-upgrade-landing.less',
   'public/less/explore.less',
   'public/less/router-chat.less',
   'public/less/router-app.less',

@@ -99,6 +99,12 @@ You can also use the `/topic <some topic message>` slash command to set the room
 
 ![](https://i.imgur.com/ecdteoh.png)
 
+### Room welcome message
+
+You can set a room welcome message via **Room settings dropdown** -> **Settings** -> **Welcome message**. This message is only shown when joining a room and the user needs to click the "I understand" button before joining the room.
+
+![](https://i.imgur.com/ujd8kHE.png) ![](https://i.imgur.com/06azySl.png) ![](https://i.imgur.com/Sou791K.png)
+
 
 ### Moderation
 

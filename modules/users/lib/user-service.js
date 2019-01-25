@@ -45,7 +45,7 @@ function newUser(options) {
   };
 
   if (options.emails && options.emails.length) {
-    insertFields.emails = options.emails;
+    insertFields.emails = options.emails.map(email => email.toLowerCase());
   }
 
   // Remove undefined fields
