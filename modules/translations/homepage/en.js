@@ -17,7 +17,7 @@
 	"Explore other communities": "Explore other communities",
 	"By signing up you agree to our <a %s>Terms and Conditions</a>": "By signing up you agree to our <a %s>Terms and Conditions</a>",
 	"Free without limits": "Free without limits",
-	"Enjoy free public communities with unlimited people, message history and integrations.": "Enjoy free public communities with unlimited people, message history and integrations.",
+	"Enjoy free public and private communities with unlimited people, message history and integrations.": "Enjoy free public and private communities with unlimited people, message history and integrations.",
 	"Simple to create": "Simple to create",
 	"Simply create your community and start talking - no need to set up any invitation services.": "Simply create your community and start talking - no need to set up any invitation services.",
 	"Quick to grow": "Quick to grow",

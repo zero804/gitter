@@ -17,7 +17,7 @@
 	"Explore other communities": "探索其他社区",
 	"By signing up you agree to our <a %s>Terms and Conditions</a>": "注册即表示同意我们的<a %s>服务条款和隐私政策</a>",
 	"Free without limits": "自由无限制",
-	"Enjoy free public communities with unlimited people, message history and integrations.": "无限人员、历史消息和集成，享受自由的公共社区。",
+	"Enjoy free public and private communities with unlimited people, message history and integrations.": "无限人员、历史消息和集成，享受自由的公共和私有社区。",
 	"Simple to create": "易于创建",
 	"Simply create your community and start talking - no need to set up any invitation services.": "只需创建您的社区并开始交谈 - 无需设置任何邀请服务。",
 	"Quick to grow": "增长迅速",
@@ -63,7 +63,7 @@
 
 	"Get Gitter now!": "即刻获取 Gitter ！",
 	"Gitter is available in all modern browsers as well as apps for desktops and mobile phones.": "Gitter 支持所有现代浏览器，并为桌面设备和移动电话提供了应用程序。",
-	"We currently have apps for OSX, iOS, Android, Windows and Linux. We also have a sweet little <a %s>IRC bridge</a>": "当前，我们为OSX, iOS, Android, Windows 和 Linux 提供了应用程序。我们还有一款小巧可爱的 <a %s>IRC bridge</a>",
+	"We currently have apps for OSX, iOS, Android, Windows and Linux. We also have a sweet little <a %s>IRC bridge</a>": "当前，我们为 OSX, iOS, Android, Windows 和 Linux 提供了应用程序。我们还有一款小巧可爱的 <a %s>IRC bridge</a>",
 	"Mac": "Mac",
 	"Windows": "Windows",
 	"Linux 32": "Linux 32",
